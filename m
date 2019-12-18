@@ -2,130 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D4DCD124F63
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 18:33:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73D82124F66
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 18:33:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727281AbfLRRdL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 12:33:11 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:55124 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726960AbfLRRdK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 12:33:10 -0500
-Received: by mail-wm1-f65.google.com with SMTP id b19so2705562wmj.4
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 09:33:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=EmdiTCSW+qdLJ/ySNcC4RyYfPANbZi6YQbRb8xQ8Z9k=;
-        b=IN7ZaFQKqm+QJkmujj6Eyh8YgFEWNfI28U/PzJSYn2XoC/H5LVlsKVR5YuzerCHLCM
-         AQAGtqdFAANK0EvvHoOj+3LJLbTkC2/zbHm29N11eqkjgGma3tCkl6wAnymLGw8RPeCb
-         WmXvFvUei0rdolwayKXKwzyfLIWfmDEPSdUu7/FCbyqeLLfz637ISmSgMBBwuKRx4wQX
-         oEQhheGMxkRylC9owL9uu7tynVXI0pP1nmrGeBePj0qm11ThQCE+7QU/gdeLoSU+WXYP
-         YP6l93XYQp4oDac9DHjevtT3gWsv4yZnUsx5xmLVI7ZmOX0WNBCgaVgMRKFoWEOeian7
-         J8jg==
+        id S1727120AbfLRRdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 12:33:38 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38849 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727071AbfLRRdi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 12:33:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576690417;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/2b/vDqw+ozQRfXoTPtUPyy72TArTScgbED5dzJFnaE=;
+        b=KzQ1cvBKtNQF3VRMKTZlKdvrD4Wsuqe6ZwItyEaJlqb3MHhjqU68Ps1xiuAmDPNkbay55l
+        fiGx8Tv/U/seuzmhXkDzCFvqCmOER4WBntV8EIRfF2PQOJvmreNHwsTxUsyvL1orOQ8Frb
+        2qXKb+aHDVFRxD6br3KeQ7h/iNGv1E8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-Qj4e2DH9Ps-TGnxKM92FFg-1; Wed, 18 Dec 2019 12:33:36 -0500
+X-MC-Unique: Qj4e2DH9Ps-TGnxKM92FFg-1
+Received: by mail-wm1-f70.google.com with SMTP id t17so35559wmi.7
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 09:33:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=EmdiTCSW+qdLJ/ySNcC4RyYfPANbZi6YQbRb8xQ8Z9k=;
-        b=j1g27t/H2VCXl6iIaoi4k/3J6onS9brCLnnhFe3AbRQLh6iPSStR4OcTHVJFMCqwMt
-         2hQNucfpmZT34J6wsFrwEpDB5RG2RyawJWWQ1aVCPrgUaoop7H4RohrcKJkmv8JQUV7p
-         TcqrpucwHheGWgOUTQY6Iq1PUA5t2WSF4Q2hIRdTnWWN7X4oklajxKdDOAMBIMJAtgB1
-         0WJv0wg+/cUKd8T/rIpnHWdCnkPwOj6O0D2Nb/IiG55dhns1pqEDjmsHVlWm/ytnaU9m
-         YCJD2bvFqNDJvoi05BQEhQLz2UH6J/LXUNoVzohFpqhXKe3gcvnTKKUNGE0bRtQovQrG
-         KMdQ==
-X-Gm-Message-State: APjAAAUWFHcVwUsdKads0uZHsulYY4s01/GQjcHplV1Vir/xd/DdTygu
-        UMmYCa6cjNBL4BZKZWpuLcDVmbRS
-X-Google-Smtp-Source: APXvYqzUzPy0ZLI43KNS+s1BkT58j8fkpfLRnQpI7H3/oqkqFxh9MsPDaF3cS/yFtcVr07EBB7xcMg==
-X-Received: by 2002:a1c:a513:: with SMTP id o19mr4298785wme.156.1576690387890;
-        Wed, 18 Dec 2019 09:33:07 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id u22sm3411362wru.30.2019.12.18.09.33.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 18 Dec 2019 09:33:07 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/2b/vDqw+ozQRfXoTPtUPyy72TArTScgbED5dzJFnaE=;
+        b=i75PDB7hDQoBDKlCGq1M9pdZOUJDkjfsbXilf2mUMcS2qgs4Hd/Rq1PThNdhxF/mFH
+         X9e9zqZJBHGf07BsBNFg2sHjFgJthodZh84p8+MMNd49sosCCF8jBgZJMWQqq6BwXpSQ
+         DLJ/wQ+YAJi+xeNxlki4xapG3KzyI4wyd4EiVGRXNB9KUm+RqJJgjmoPnBBdXkKkwbuN
+         KVOwYvALlcuwbaS1JoNJ5qgdWZE2May+vvmbDO/+IqCXGb+FnHAHhE1VcmmvhLeNw8t5
+         mxstfdTwq7koPQIiCPGU+Ft+gz/xQCW+kR/L+LkEgqsolPpKO3fFgrGyFQko2R5xN7CD
+         jbmA==
+X-Gm-Message-State: APjAAAW9/PkFvqGtdk1LEFig/IC9hOSwwX3N1UhMZUP+5G7Sl4+F3EQj
+        9gHkelWd2l3OYoxCGiiyMVpPK81wBB+fZD6qyqRvBrQk4wl4t7qXIkioqFLqNBY4dORLhAUd6H6
+        LO0CD+dg9ecKR
+X-Received: by 2002:a1c:740b:: with SMTP id p11mr4887202wmc.78.1576690415165;
+        Wed, 18 Dec 2019 09:33:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy92N0AYB0AtyIwVEC/gFojCtUjdkCfiSAbx5G+Mq6ZebBFFgycCkame14FDWKtc1ZZsYDEHw==
+X-Received: by 2002:a1c:740b:: with SMTP id p11mr4887175wmc.78.1576690414907;
+        Wed, 18 Dec 2019 09:33:34 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:ac09:bce1:1c26:264c? ([2001:b07:6468:f312:ac09:bce1:1c26:264c])
+        by smtp.gmail.com with ESMTPSA id v8sm3330146wrw.2.2019.12.18.09.33.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Dec 2019 09:33:34 -0800 (PST)
+Subject: Re: [PATCH kvm-unit-tests] Update AMD instructions to conform to LLVM
+ assembler
+To:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, drjones@redhat.com
+References: <20190220202442.145494-1-pshier@google.com>
+ <CALMp9eRMbht+7xHXJV90MSs52LtjjdCtVeCdd_=5nqeSms8VxQ@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     cavery@redhat.com
-Subject: [PATCH kvm-unit-tests 2/2] svm: replace set_host_if with prepare_gif_clear callback
-Date:   Wed, 18 Dec 2019 18:33:03 +0100
-Message-Id: <1576690383-16170-3-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1576690383-16170-1-git-send-email-pbonzini@redhat.com>
-References: <1576690383-16170-1-git-send-email-pbonzini@redhat.com>
+Message-ID: <4ed8612a-1baf-fbd4-5248-45803562e1a6@redhat.com>
+Date:   Wed, 18 Dec 2019 18:33:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <CALMp9eRMbht+7xHXJV90MSs52LtjjdCtVeCdd_=5nqeSms8VxQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Instead of setting a flag in the prepare callback, override the
-default value of the host IF flag in the prepare_gif_clear
-callback.
+On 11/12/19 21:22, Jim Mattson wrote:
+> On Wed, Feb 20, 2019 at 12:25 PM Peter Shier <pshier@google.com> wrote:
+>>
+>> The GNU assembler (gas) allows omitting operands where there is only a
+>> single choice e.g. "VMRUN rAX".The LLVM assembler requires those operands
+>> even though they are the default and only choice.
+>>
+>> In addition, LLVM does not allow a CLGI instruction with a terminating
+>> \n\t. Adding a ; separator after the instruction is a workaround.
+>>
+>> Signed-off-by: Peter Shier <pshier@google.com>
+>> Reviewed-by: Marc Orr <marcorr@google.com>
+>> Reviewed-by: Jim Mattson <jmattson@google.com>
+>> ---
+>>  x86/svm.c | 16 ++++++++--------
+>>  1 file changed, 8 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/x86/svm.c b/x86/svm.c
+>> index bc74e7c690a8..e5cb730b08cb 100644
+>> --- a/x86/svm.c
+>> +++ b/x86/svm.c
+>> @@ -154,7 +154,7 @@ static void vmcb_ident(struct vmcb *vmcb)
+>>      struct descriptor_table_ptr desc_table_ptr;
+>>
+>>      memset(vmcb, 0, sizeof(*vmcb));
+>> -    asm volatile ("vmsave" : : "a"(vmcb_phys) : "memory");
+>> +    asm volatile ("vmsave %0" : : "a"(vmcb_phys) : "memory");
+>>      vmcb_set_seg(&save->es, read_es(), 0, -1U, data_seg_attr);
+>>      vmcb_set_seg(&save->cs, read_cs(), 0, -1U, code_seg_attr);
+>>      vmcb_set_seg(&save->ss, read_ss(), 0, -1U, data_seg_attr);
+>> @@ -262,20 +262,20 @@ static void test_run(struct test *test, struct vmcb *vmcb)
+>>      do {
+>>          tsc_start = rdtsc();
+>>          asm volatile (
+>> -            "clgi \n\t"
+>> -            "vmload \n\t"
+>> +            "clgi;\n\t" // semi-colon needed for LLVM compatibility
+>> +            "vmload %0\n\t"
+>>              "mov regs+0x80, %%r15\n\t"  // rflags
+>>              "mov %%r15, 0x170(%0)\n\t"
+>>              "mov regs, %%r15\n\t"       // rax
+>>              "mov %%r15, 0x1f8(%0)\n\t"
+>>              LOAD_GPR_C
+>> -            "vmrun \n\t"
+>> +            "vmrun %0\n\t"
+>>              SAVE_GPR_C
+>>              "mov 0x170(%0), %%r15\n\t"  // rflags
+>>              "mov %%r15, regs+0x80\n\t"
+>>              "mov 0x1f8(%0), %%r15\n\t"  // rax
+>>              "mov %%r15, regs\n\t"
+>> -            "vmsave \n\t"
+>> +            "vmsave %0\n\t"
+>>              "stgi"
+>>              : : "a"(vmcb_phys)
+>>              : "rbx", "rcx", "rdx", "rsi",
+>> @@ -330,7 +330,7 @@ static bool check_no_vmrun_int(struct test *test)
+>>
+>>  static void test_vmrun(struct test *test)
+>>  {
+>> -    asm volatile ("vmrun" : : "a"(virt_to_phys(test->vmcb)));
+>> +    asm volatile ("vmrun %0" : : "a"(virt_to_phys(test->vmcb)));
+>>  }
+>>
+>>  static bool check_vmrun(struct test *test)
+>> @@ -1241,7 +1241,7 @@ static bool lat_svm_insn_finished(struct test *test)
+>>
+>>      for ( ; runs != 0; runs--) {
+>>          tsc_start = rdtsc();
+>> -        asm volatile("vmload\n\t" : : "a"(vmcb_phys) : "memory");
+>> +        asm volatile("vmload %0\n\t" : : "a"(vmcb_phys) : "memory");
+>>          cycles = rdtsc() - tsc_start;
+>>          if (cycles > latvmload_max)
+>>              latvmload_max = cycles;
+>> @@ -1250,7 +1250,7 @@ static bool lat_svm_insn_finished(struct test *test)
+>>          vmload_sum += cycles;
+>>
+>>          tsc_start = rdtsc();
+>> -        asm volatile("vmsave\n\t" : : "a"(vmcb_phys) : "memory");
+>> +        asm volatile("vmsave %0\n\t" : : "a"(vmcb_phys) : "memory");
+>>          cycles = rdtsc() - tsc_start;
+>>          if (cycles > latvmsave_max)
+>>              latvmsave_max = cycles;
+> 
+> Ping.
+> 
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/svm.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+Applied.
 
-diff --git a/x86/svm.c b/x86/svm.c
-index 63fda65..2cbd9fd 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -44,8 +44,6 @@ u64 runs;
- u8 *io_bitmap;
- u8 io_bitmap_area[16384];
- 
--u8 set_host_if;
--
- #define MSR_BITMAP_SIZE 8192
- 
- u8 *msr_bitmap;
-@@ -261,7 +259,6 @@ static void test_run(struct test *test, struct vmcb *vmcb)
- 
-     irq_disable();
-     test->vmcb = vmcb;
--    set_host_if = 1;
-     test->prepare(test);
-     vmcb->save.rip = (ulong)test_thunk;
-     vmcb->save.rsp = (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
-@@ -325,8 +322,6 @@ static void default_prepare(struct test *test)
- 
- static void default_prepare_gif_clear(struct test *test)
- {
--    if (!set_host_if)
--        asm("cli");
- }
- 
- static bool default_finished(struct test *test)
-@@ -1412,8 +1407,6 @@ static void pending_event_prepare_vmask(struct test *test)
- 
-     pending_event_ipi_fired = false;
- 
--    set_host_if = 0;
--
-     handle_irq(0xf1, pending_event_ipi_isr);
- 
-     apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
-@@ -1422,6 +1415,11 @@ static void pending_event_prepare_vmask(struct test *test)
-     set_test_stage(test, 0);
- }
- 
-+static void pending_event_prepare_gif_clear_vmask(struct test *test)
-+{
-+    asm("cli");
-+}
-+
- static void pending_event_test_vmask(struct test *test)
- {
-     if (pending_event_ipi_fired == true) {
-@@ -1575,7 +1573,7 @@ static struct test tests[] = {
-       default_prepare_gif_clear,
-       pending_event_test, pending_event_finished, pending_event_check },
-     { "pending_event_vmask", default_supported, pending_event_prepare_vmask,
--      default_prepare_gif_clear,
-+      pending_event_prepare_gif_clear_vmask,
-       pending_event_test_vmask, pending_event_finished_vmask,
-       pending_event_check_vmask },
- };
--- 
-1.8.3.1
+Paolo
 
