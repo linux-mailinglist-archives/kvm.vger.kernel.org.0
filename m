@@ -2,67 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 729E31246E6
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 13:31:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A6731247EF
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 14:19:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbfLRMbb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 07:31:31 -0500
-Received: from imap2.colo.codethink.co.uk ([78.40.148.184]:40550 "EHLO
-        imap2.colo.codethink.co.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726029AbfLRMbb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 07:31:31 -0500
-Received: from [167.98.27.226] (helo=rainbowdash.codethink.co.uk)
-        by imap2.colo.codethink.co.uk with esmtpsa  (Exim 4.92 #3 (Debian))
-        id 1ihYU4-0002im-NY; Wed, 18 Dec 2019 12:31:20 +0000
-Received: from ben by rainbowdash.codethink.co.uk with local (Exim 4.92.3)
-        (envelope-from <ben@rainbowdash.codethink.co.uk>)
-        id 1ihYU4-00Apur-7O; Wed, 18 Dec 2019 12:31:20 +0000
-From:   "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>
-To:     ben.dooks@codethink.co.uk
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] vfio/mdev: make create attribute static
-Date:   Wed, 18 Dec 2019 12:31:19 +0000
-Message-Id: <20191218123119.2582802-1-ben.dooks@codethink.co.uk>
-X-Mailer: git-send-email 2.24.0
+        id S1726944AbfLRNTH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 08:19:07 -0500
+Received: from mga05.intel.com ([192.55.52.43]:36888 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726749AbfLRNTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 08:19:07 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 05:19:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,329,1571727600"; 
+   d="scan'208";a="266886586"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by FMSMGA003.fm.intel.com with ESMTP; 18 Dec 2019 05:19:05 -0800
+Date:   Wed, 18 Dec 2019 21:20:14 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com,
+        yu-cheng.yu@intel.com
+Subject: Re: [PATCH v8 4/7] KVM: VMX: Load CET states on vmentry/vmexit
+Message-ID: <20191218132014.GA7926@local-michael-cet-test>
+References: <20191101085222.27997-1-weijiang.yang@intel.com>
+ <20191101085222.27997-5-weijiang.yang@intel.com>
+ <20191210212305.GM15758@linux.intel.com>
+ <20191211015423.GC12845@local-michael-cet-test>
+ <20191211163510.GF5044@linux.intel.com>
+ <20191212010423.GB17570@local-michael-cet-test.sh.intel.com>
+ <20191218003005.GO11771@linux.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218003005.GO11771@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The create attribute is not exported, so make it
-static to avoid the following sparse warning:
-
-drivers/vfio/mdev/mdev_sysfs.c:77:1: warning: symbol 'mdev_type_attr_create' was not declared. Should it be static?
-
-Signed-off-by: Ben Dooks (Codethink) <ben.dooks@codethink.co.uk>
----
-Cc: Kirti Wankhede <kwankhede@nvidia.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- drivers/vfio/mdev/mdev_sysfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
-index 7570c7602ab4..8ad14e5c02bf 100644
---- a/drivers/vfio/mdev/mdev_sysfs.c
-+++ b/drivers/vfio/mdev/mdev_sysfs.c
-@@ -74,7 +74,7 @@ static ssize_t create_store(struct kobject *kobj, struct device *dev,
- 	return count;
- }
- 
--MDEV_TYPE_ATTR_WO(create);
-+static MDEV_TYPE_ATTR_WO(create);
- 
- static void mdev_type_release(struct kobject *kobj)
- {
--- 
-2.24.0
-
+On Tue, Dec 17, 2019 at 04:30:05PM -0800, Sean Christopherson wrote:
+> On Thu, Dec 12, 2019 at 09:04:24AM +0800, Yang Weijiang wrote:
+> > On Wed, Dec 11, 2019 at 08:35:10AM -0800, Sean Christopherson wrote:
+> > > Have you tested SMM at all?  The interaction between CR0 and CR4 may be
+> > > problematic for em_rsm() and/or rsm_enter_protected_mode().
+> > >
+> > Not yet, what's an easy way to test code in SMM mode?
+> 
+> IIRC, SeaBIOS does SMM stuff by default.
+Thanks Sean. I'll check this part.
