@@ -2,249 +2,532 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 35177125251
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 20:51:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E22A31252A3
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 21:06:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727437AbfLRTv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 14:51:28 -0500
-Received: from mail-eopbgr760049.outbound.protection.outlook.com ([40.107.76.49]:10135
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726698AbfLRTv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 14:51:28 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JpJCBvS1fMMiV0KuE0FqphCgA1wbi6JbyOrRt7DostBuEQpQV059aggdCN7G0qTt4S5RUWrf2kvTjf0qsDk6TtKuCZldNaF0vPdEwPW6gDCXteGsYkdDJyq7Bo+SzQP9UkYR6saSPhpuyc35onytsLKYpO0pFZA5ZsGA9g2D6axjYTW2wZHiD56bwykJZheR89eUjuBTVAv4woHLyxuQ1IxbNymuGLUOS1CI3DCFnYa+fioqmh2hSuO7GllWFUfg0rlBKZCb5VMhxx5Os/I4xf1xQv1QiGGq3D+M223VjNSVCqe0lBF3QI+2EA4rwm7kqwRAFWjsx6Q/m1c02iOsNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NMe6M+qzGfMneg8pkhXi4GvQC/efEnhQOBvnKHCC15k=;
- b=MImaw2ZDLDThU+U+RszStxnmhX7Ux3LIwnZT5D0aHuerjmRfrC9GBbArNu3xev2LEMJ9lers2zNvwv4Kl4PIsJdi/Jxr3hjTyCxIQZNZa0o6QYAJfDLahxlnxj+A7MpAMl9rzvinjT78QMYqkHSucOrhLPDgDxnh8vfgGZON9zZtfxAXTAqJvUUMsr8lkIW+OwSJcdgENXcQBJuGXb0H5a7Cv+DUNTY+ZbeHwm6AlvMwzCsaAMvzBx+Nsxip1dfNMwmS6Gm3qy1waLNhb3HvixMKpogsSvsUGBW+jJIXePTxv8zF0kwz8ZBSd5fbvbRUU/zJe/vIrVwUz2Jndtrh9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NMe6M+qzGfMneg8pkhXi4GvQC/efEnhQOBvnKHCC15k=;
- b=T+1n+mhxFCrDmA1QdCpXLPyZxfXC9ksqPnfpYW2BsRZ3otpa+DkGE2BC8cenDFPCYHPw8JTirBS6G1Yt+vnq5keKvgz5DBAFsxNaskJphaTs1JnaCGd/mpKlishVsQzosJoJN2jqvcPerkFfk5WJ4wAqC49zW/dMjZ8921wAK7I=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Thomas.Lendacky@amd.com; 
-Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.71.154) by
- DM6PR12MB3339.namprd12.prod.outlook.com (20.178.30.87) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2538.20; Wed, 18 Dec 2019 19:51:25 +0000
-Received: from DM6PR12MB3163.namprd12.prod.outlook.com
- ([fe80::a0cd:463:f444:c270]) by DM6PR12MB3163.namprd12.prod.outlook.com
- ([fe80::a0cd:463:f444:c270%7]) with mapi id 15.20.2538.019; Wed, 18 Dec 2019
- 19:51:24 +0000
-Subject: Re: [PATCH v1 1/2] KVM: x86/mmu: Allow for overriding MMIO SPTE mask
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <cover.1576698347.git.thomas.lendacky@amd.com>
- <10fdb77c9b6795f68137cf4315571ab791ab6feb.1576698347.git.thomas.lendacky@amd.com>
-Message-ID: <f0bc54c8-cea2-e574-6191-5c34d1b504c9@amd.com>
-Date:   Wed, 18 Dec 2019 13:51:23 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-In-Reply-To: <10fdb77c9b6795f68137cf4315571ab791ab6feb.1576698347.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM6PR10CA0033.namprd10.prod.outlook.com
- (2603:10b6:5:60::46) To DM6PR12MB3163.namprd12.prod.outlook.com
- (2603:10b6:5:15e::26)
+        id S1727497AbfLRUGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 15:06:12 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38648 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726824AbfLRUGL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 15:06:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576699569;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pPkTeMYof+esBG2cN0oan+4EH4IHD1S9DFbi430VD9w=;
+        b=KDIXziMbttmwuqP3g0ELVWC+J7efPrY0OqYs6GUBzVZY0FsgcxRvNFhiABoGQqZTxtrGl8
+        cEpI/Sl7UFfa3sl9OLF6g8ujm/DXKUXKf0/XY660cHSgsNUEH2NhBr6CtOsD8YsVwQnTS0
+        Vm/gK52aJbM/2qYIB8MY/F2reVAXKxQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-_l-P-L8-MoGI-QqO8pr0aA-1; Wed, 18 Dec 2019 15:06:05 -0500
+X-MC-Unique: _l-P-L8-MoGI-QqO8pr0aA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EB6A1800D42;
+        Wed, 18 Dec 2019 20:06:02 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1127A4E6C8;
+        Wed, 18 Dec 2019 20:05:54 +0000 (UTC)
+Date:   Wed, 18 Dec 2019 20:05:52 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20191218200552.GX3707@work-vm>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
+ <20191217051513.GE21868@joy-OptiPlex-7040>
+ <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
+ <20191217095110.GH21868@joy-OptiPlex-7040>
+ <0d9604d9-3bb2-6944-9858-983366f332bb@nvidia.com>
+ <20191218010451.GI21868@joy-OptiPlex-7040>
 MIME-Version: 1.0
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 22ed5307-81b2-4384-657f-08d783f3a9d6
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3339:|DM6PR12MB3339:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB333956AC7C0B9E62351A2AC5EC530@DM6PR12MB3339.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 0255DF69B9
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(136003)(376002)(346002)(39860400002)(396003)(189003)(199004)(31696002)(66556008)(52116002)(6506007)(186003)(8936002)(86362001)(81156014)(81166006)(66946007)(316002)(8676002)(53546011)(6486002)(4326008)(54906003)(5660300002)(2906002)(31686004)(66476007)(6512007)(36756003)(478600001)(2616005)(26005);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3339;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: C/xF8b2w80kLFSCjCfjH8pQOp3Lrk9UnAGajyiEScOWbjk/qXj+NwWnTKyVvScjOUIjBvb+2Z+0XYPXmkxv0KTlLkwmGqKA4dVFqyc5a8+i+KSr59P/8S0sYcIlsVcx8IS1OpB9P5ieed6ODsHLWfBkqa/kDkCs7sqW29fxTZf5c8imCQweaRDkE0XspdpWJiji78DSoA+iQ9xkHsr6j7zDlwrXf2YlU2uZJct6ZmhA8/eiFXf8ydDZVIADU3gDU83LDNteKzH/7T2H1na1qVu656xpdNrcMG9hQSu8jaKA3kkrTfWzMgF0z/0144akWyo14yKhQlasUiMnzyUcvYZUQ2VMyWs2KMmiwuSe5md03ME8VNizUARQyrHi5w51f+rwBR+EtuCUps6kKmsINXXX4ZzyjWkKgkTM8DvnGGg3Ol5cnzTDZNT4Iu3dmfsrQ
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22ed5307-81b2-4384-657f-08d783f3a9d6
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2019 19:51:24.8085
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8s+EmSIbxhslxicCNC7BWAqzH+v5Cr9ncP087+4ls5IFyjaM5thFws7OUq/CAQ0qwaSxHLfcurT3OWJO481txA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3339
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218010451.GI21868@joy-OptiPlex-7040>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/18/19 1:45 PM, Tom Lendacky wrote:
-> The KVM MMIO support uses bit 51 as the reserved bit to cause nested page
-> faults when a guest performs MMIO. The AMD memory encryption support uses
-> CPUID functions to define the encryption bit position. Given this, KVM
-> can't assume that bit 51 will be safe all the time.
+* Yan Zhao (yan.y.zhao@intel.com) wrote:
+> On Tue, Dec 17, 2019 at 07:47:05PM +0800, Kirti Wankhede wrote:
+> > 
+> > 
+> > On 12/17/2019 3:21 PM, Yan Zhao wrote:
+> > > On Tue, Dec 17, 2019 at 05:24:14PM +0800, Kirti Wankhede wrote:
+> > >>
+> > >>
+> > >> On 12/17/2019 10:45 AM, Yan Zhao wrote:
+> > >>> On Tue, Dec 17, 2019 at 04:21:39AM +0800, Kirti Wankhede wrote:
+> > >>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+> > >>>> - Start unpinned pages dirty pages tracking while migration is active and
+> > >>>>     device is running, i.e. during pre-copy phase.
+> > >>>> - Stop unpinned pages dirty pages tracking. This is required to stop
+> > >>>>     unpinned dirty pages tracking if migration failed or cancelled during
+> > >>>>     pre-copy phase. Unpinned pages tracking is clear.
+> > >>>> - Get dirty pages bitmap. Stop unpinned dirty pages tracking and clear
+> > >>>>     unpinned pages information on bitmap read. This ioctl returns bitmap of
+> > >>>>     dirty pages, its user space application responsibility to copy content
+> > >>>>     of dirty pages from source to destination during migration.
+> > >>>>
+> > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > >>>> ---
+> > >>>>    drivers/vfio/vfio_iommu_type1.c | 210 ++++++++++++++++++++++++++++++++++++++--
+> > >>>>    1 file changed, 203 insertions(+), 7 deletions(-)
+> > >>>>
+> > >>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > >>>> index 3f6b04f2334f..264449654d3f 100644
+> > >>>> --- a/drivers/vfio/vfio_iommu_type1.c
+> > >>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+> > >>>> @@ -70,6 +70,7 @@ struct vfio_iommu {
+> > >>>>    	unsigned int		dma_avail;
+> > >>>>    	bool			v2;
+> > >>>>    	bool			nesting;
+> > >>>> +	bool			dirty_page_tracking;
+> > >>>>    };
+> > >>>>    
+> > >>>>    struct vfio_domain {
+> > >>>> @@ -112,6 +113,7 @@ struct vfio_pfn {
+> > >>>>    	dma_addr_t		iova;		/* Device address */
+> > >>>>    	unsigned long		pfn;		/* Host pfn */
+> > >>>>    	atomic_t		ref_count;
+> > >>>> +	bool			unpinned;
+> > >>>>    };
+> > >>>>    
+> > >>>>    struct vfio_regions {
+> > >>>> @@ -244,6 +246,32 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
+> > >>>>    	kfree(vpfn);
+> > >>>>    }
+> > >>>>    
+> > >>>> +static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma, bool warn)
+> > >>>> +{
+> > >>>> +	struct rb_node *n = rb_first(&dma->pfn_list);
+> > >>>> +
+> > >>>> +	for (; n; n = rb_next(n)) {
+> > >>>> +		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
+> > >>>> +
+> > >>>> +		if (warn)
+> > >>>> +			WARN_ON_ONCE(vpfn->unpinned);
+> > >>>> +
+> > >>>> +		if (vpfn->unpinned)
+> > >>>> +			vfio_remove_from_pfn_list(dma, vpfn);
+> > >>>> +	}
+> > >>>> +}
+> > >>>> +
+> > >>>> +static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
+> > >>>> +{
+> > >>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
+> > >>>> +
+> > >>>> +	for (; n; n = rb_next(n)) {
+> > >>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> > >>>> +
+> > >>>> +		vfio_remove_unpinned_from_pfn_list(dma, false);
+> > >>>> +	}
+> > >>>> +}
+> > >>>> +
+> > >>>>    static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+> > >>>>    					       unsigned long iova)
+> > >>>>    {
+> > >>>> @@ -254,13 +282,17 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+> > >>>>    	return vpfn;
+> > >>>>    }
+> > >>>>    
+> > >>>> -static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+> > >>>> +static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn,
+> > >>>> +				  bool dirty_tracking)
+> > >>>>    {
+> > >>>>    	int ret = 0;
+> > >>>>    
+> > >>>>    	if (atomic_dec_and_test(&vpfn->ref_count)) {
+> > >>>>    		ret = put_pfn(vpfn->pfn, dma->prot);
+> > >>> if physical page here is put, it may cause problem when pin this iova
+> > >>> next time:
+> > >>> vfio_iommu_type1_pin_pages {
+> > >>>       ...
+> > >>>       vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+> > >>>       if (vpfn) {
+> > >>>           phys_pfn[i] = vpfn->pfn;
+> > >>>           continue;
+> > >>>       }
+> > >>>       ...
+> > >>> }
+> > >>>
+> > >>
+> > >> Good point. Fixing it as:
+> > >>
+> > >>                   vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+> > >>                   if (vpfn) {
+> > >> -                       phys_pfn[i] = vpfn->pfn;
+> > >> -                       continue;
+> > >> +                       if (vpfn->unpinned)
+> > >> +                               vfio_remove_from_pfn_list(dma, vpfn);
+> > > what about updating vpfn instead?
+> > > 
+> > 
+> > vfio_pin_page_external() takes care of verification checks and mem lock 
+> > accounting. I prefer to free existing and add new node with existing 
+> > functions.
+> > 
+> > >> +                       else {
+> > >> +                               phys_pfn[i] = vpfn->pfn;
+> > >> +                               continue;
+> > >> +                       }
+> > >>                   }
+> > >>
+> > >>
+> > >>
+> > >>>> -		vfio_remove_from_pfn_list(dma, vpfn);
+> > >>>> +		if (dirty_tracking)
+> > >>>> +			vpfn->unpinned = true;
+> > >>>> +		else
+> > >>>> +			vfio_remove_from_pfn_list(dma, vpfn);
+> > >>> so the unpinned pages before dirty page tracking is not treated as
+> > >>> dirty?
+> > >>>
+> > >>
+> > >> Yes. That's we agreed on previous version:
+> > >> https://www.mail-archive.com/qemu-devel@nongnu.org/msg663157.html
+> > >>
+> > >>>>    	}
+> > >>>>    	return ret;
+> > >>>>    }
+> > >>>> @@ -504,7 +536,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
+> > >>>>    }
+> > >>>>    
+> > >>>>    static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+> > >>>> -				    bool do_accounting)
+> > >>>> +				    bool do_accounting, bool dirty_tracking)
+> > >>>>    {
+> > >>>>    	int unlocked;
+> > >>>>    	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
+> > >>>> @@ -512,7 +544,10 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+> > >>>>    	if (!vpfn)
+> > >>>>    		return 0;
+> > >>>>    
+> > >>>> -	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
+> > >>>> +	if (vpfn->unpinned)
+> > >>>> +		return 0;
+> > >>>> +
+> > >>>> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
+> > >>>>    
+> > >>>>    	if (do_accounting)
+> > >>>>    		vfio_lock_acct(dma, -unlocked, true);
+> > >>>> @@ -583,7 +618,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> > >>>>    
+> > >>>>    		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+> > >>>>    		if (ret) {
+> > >>>> -			vfio_unpin_page_external(dma, iova, do_accounting);
+> > >>>> +			vfio_unpin_page_external(dma, iova, do_accounting,
+> > >>>> +						 false);
+> > >>>>    			goto pin_unwind;
+> > >>>>    		}
+> > >>>>    	}
+> > >>>> @@ -598,7 +634,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> > >>>>    
+> > >>>>    		iova = user_pfn[j] << PAGE_SHIFT;
+> > >>>>    		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> > >>>> -		vfio_unpin_page_external(dma, iova, do_accounting);
+> > >>>> +		vfio_unpin_page_external(dma, iova, do_accounting, false);
+> > >>>>    		phys_pfn[j] = 0;
+> > >>>>    	}
+> > >>>>    pin_done:
+> > >>>> @@ -632,7 +668,8 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
+> > >>>>    		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> > >>>>    		if (!dma)
+> > >>>>    			goto unpin_exit;
+> > >>>> -		vfio_unpin_page_external(dma, iova, do_accounting);
+> > >>>> +		vfio_unpin_page_external(dma, iova, do_accounting,
+> > >>>> +					 iommu->dirty_page_tracking);
+> > >>>>    	}
+> > >>>>    
+> > >>>>    unpin_exit:
+> > >>>> @@ -850,6 +887,88 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+> > >>>>    	return bitmap;
+> > >>>>    }
+> > >>>>    
+> > >>>> +/*
+> > >>>> + * start_iova is the reference from where bitmaping started. This is called
+> > >>>> + * from DMA_UNMAP where start_iova can be different than iova
+> > >>>> + */
+> > >>>> +
+> > >>>> +static void vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> > >>>> +				  size_t size, uint64_t pgsize,
+> > >>>> +				  dma_addr_t start_iova, unsigned long *bitmap)
+> > >>>> +{
+> > >>>> +	struct vfio_dma *dma;
+> > >>>> +	dma_addr_t i = iova;
+> > >>>> +	unsigned long pgshift = __ffs(pgsize);
+> > >>>> +
+> > >>>> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
+> > >>>> +		/* mark all pages dirty if all pages are pinned and mapped. */
+> > >>>> +		if (dma->iommu_mapped) {
+> > >>> This prevents pass-through devices from calling vfio_pin_pages to do
+> > >>> fine grained log dirty.
+> > >>
+> > >> Yes, I mentioned that in yet TODO item in cover letter:
+> > >>
+> > >> "If IOMMU capable device is present in the container, then all pages are
+> > >> marked dirty. Need to think smart way to know if IOMMU capable device's
+> > >> driver is smart to report pages to be marked dirty by pinning those
+> > >> pages externally."
+> > >>
+> > > why not just check first if any vpfn present for IOMMU capable devices?
+> > > 
+> > 
+> > vfio_pin_pages(dev, ...) calls driver->ops->pin_pages(iommu, ...)
+> > 
+> > In vfio_iommu_type1 module, vfio_iommu_type1_pin_pages() doesn't know 
+> > the device. vpfn are tracked against container->iommu, not against 
+> > device. Need to think of smart way to know if devices in container are 
+> > all smart which report pages dirty ny pinning those pages manually.
+> >
+> I believe in such case, the mdev on top of device is in the same iommu
+> group (i.e. 1:1 mdev on top of device).
+> device vendor driver calls vfio_pin_pages to notify vfio which pages are dirty. 
+> > 
+> > >>
+> > >>>> +			dma_addr_t iova_limit;
+> > >>>> +
+> > >>>> +			iova_limit = (dma->iova + dma->size) < (iova + size) ?
+> > >>>> +				     (dma->iova + dma->size) : (iova + size);
+> > >>>> +
+> > >>>> +			for (; i < iova_limit; i += pgsize) {
+> > >>>> +				unsigned int start;
+> > >>>> +
+> > >>>> +				start = (i - start_iova) >> pgshift;
+> > >>>> +
+> > >>>> +				__bitmap_set(bitmap, start, 1);
+> > >>>> +			}
+> > >>>> +			if (i >= iova + size)
+> > >>>> +				return;
+> > >>>> +		} else {
+> > >>>> +			struct rb_node *n = rb_first(&dma->pfn_list);
+> > >>>> +			bool found = false;
+> > >>>> +
+> > >>>> +			for (; n; n = rb_next(n)) {
+> > >>>> +				struct vfio_pfn *vpfn = rb_entry(n,
+> > >>>> +							struct vfio_pfn, node);
+> > >>>> +				if (vpfn->iova >= i) {
+> > >>>> +					found = true;
+> > >>>> +					break;
+> > >>>> +				}
+> > >>>> +			}
+> > >>>> +
+> > >>>> +			if (!found) {
+> > >>>> +				i += dma->size;
+> > >>>> +				continue;
+> > >>>> +			}
+> > >>>> +
+> > >>>> +			for (; n; n = rb_next(n)) {
+> > >>>> +				unsigned int start;
+> > >>>> +				struct vfio_pfn *vpfn = rb_entry(n,
+> > >>>> +							struct vfio_pfn, node);
+> > >>>> +
+> > >>>> +				if (vpfn->iova >= iova + size)
+> > >>>> +					return;
+> > >>>> +
+> > >>>> +				start = (vpfn->iova - start_iova) >> pgshift;
+> > >>>> +
+> > >>>> +				__bitmap_set(bitmap, start, 1);
+> > >>>> +
+> > >>>> +				i = vpfn->iova + pgsize;
+> > >>>> +			}
+> > >>>> +		}
+> > >>>> +		vfio_remove_unpinned_from_pfn_list(dma, false);
+> > >>>> +	}
+> > >>>> +}
+> > >>>> +
+> > >>>> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
+> > >>>> +{
+> > >>>> +	long bsize;
+> > >>>> +
+> > >>>> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
+> > >>>> +		return -EINVAL;
+> > >>>> +
+> > >>>> +	bsize = ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
+> > >>>> +
+> > >>>> +	if (bitmap_size < bsize)
+> > >>>> +		return -EINVAL;
+> > >>>> +
+> > >>>> +	return bsize;
+> > >>>> +}
+> > >>>> +
+> > >>>>    static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> > >>>>    			     struct vfio_iommu_type1_dma_unmap *unmap)
+> > >>>>    {
+> > >>>> @@ -2298,6 +2417,83 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> > >>>>    
+> > >>>>    		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+> > >>>>    			-EFAULT : 0;
+> > >>>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+> > >>>> +		struct vfio_iommu_type1_dirty_bitmap range;
+> > >>>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+> > >>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> > >>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> > >>>> +		int ret;
+> > >>>> +
+> > >>>> +		if (!iommu->v2)
+> > >>>> +			return -EACCES;
+> > >>>> +
+> > >>>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+> > >>>> +				    bitmap);
+> > >>>> +
+> > >>>> +		if (copy_from_user(&range, (void __user *)arg, minsz))
+> > >>>> +			return -EFAULT;
+> > >>>> +
+> > >>>> +		if (range.argsz < minsz || range.flags & ~mask)
+> > >>>> +			return -EINVAL;
+> > >>>> +
+> > >>>> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+> > >>>> +			iommu->dirty_page_tracking = true;
+> > >>>> +			return 0;
+> > >>>> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+> > >>>> +			iommu->dirty_page_tracking = false;
+> > >>>> +
+> > >>>> +			mutex_lock(&iommu->lock);
+> > >>>> +			vfio_remove_unpinned_from_dma_list(iommu);
+> > >>>> +			mutex_unlock(&iommu->lock);
+> > >>>> +			return 0;
+> > >>>> +
+> > >>>> +		} else if (range.flags &
+> > >>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> > >>>> +			uint64_t iommu_pgmask;
+> > >>>> +			unsigned long pgshift = __ffs(range.pgsize);
+> > >>>> +			unsigned long *bitmap;
+> > >>>> +			long bsize;
+> > >>>> +
+> > >>>> +			iommu_pgmask =
+> > >>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+> > >>>> +
+> > >>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+> > >>>> +			    (range.pgsize - 1))
+> > >>>> +				return -EINVAL;
+> > >>>> +
+> > >>>> +			if (range.iova & iommu_pgmask)
+> > >>>> +				return -EINVAL;
+> > >>>> +			if (!range.size || range.size > SIZE_MAX)
+> > >>>> +				return -EINVAL;
+> > >>>> +			if (range.iova + range.size < range.iova)
+> > >>>> +				return -EINVAL;
+> > >>>> +
+> > >>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
+> > >>>> +						   range.bitmap_size);
+> > >>>> +			if (bsize)
+> > >>>> +				return ret;
+> > >>>> +
+> > >>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);
+> > >>>> +			if (!bitmap)
+> > >>>> +				return -ENOMEM;
+> > >>>> +
+> > >>>> +			ret = copy_from_user(bitmap,
+> > >>>> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
+> > >>>> +			if (ret)
+> > >>>> +				goto bitmap_exit;
+> > >>>> +
+> > >>>> +			iommu->dirty_page_tracking = false;
+> > >>> why iommu->dirty_page_tracking is false here?
+> > >>> suppose this ioctl can be called several times.
+> > >>>
+> > >>
+> > >> This ioctl can be called several times, but once this ioctl is called
+> > >> that means vCPUs are stopped and VFIO devices are stopped (i.e. in
+> > >> stop-and-copy phase) and dirty pages bitmap are being queried by user.
+> > >>
+> > > can't agree that VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP can only be
+> > > called in stop-and-copy phase.
+> > > As stated in last version, this will cause QEMU to get a wrong expectation
+> > > of VM downtime and this is also the reason for previously pinned pages
+> > > before log_sync cannot be treated as dirty. If this get bitmap ioctl can
+> > > be called early in save_setup phase, then it's no problem even all ram
+> > > is dirty.
+> > > 
+> > 
+> > Device can also write to pages which are pinned, and then there is no 
+> > way to know pages dirtied by device during pre-copy phase.
+> > If user ask dirty bitmap in per-copy phase, even then user will have to 
+> > query dirty bitmap in stop-and-copy phase where this will be superset 
+> > including all pages reported during pre-copy. Then instead of copying 
+> > all pages twice, its better to do it once during stop-and-copy phase.
+> >
+> I think the flow should be like this:
+> 1. save_setup --> GET_BITMAP ioctl --> return bitmap for currently + previously
+> pinned pages and clean all previously pinned pages
 > 
-> Add a callback to return a reserved bit(s) mask that can be used for the
-> MMIO pagetable entries. The callback is not responsible for setting the
-> present bit.
+> 2. save_pending --> GET_BITMAP ioctl  --> return bitmap of (currently
+> pinned pages + previously pinned pages since last clean) and clean all
+> previously pinned pages
 > 
-> If a callback is registered:
->   - any non-zero mask returned is updated with the present bit and used
->     as the MMIO SPTE mask.
->   - a zero mask returned results in a mask with only bit 51 set (i.e. no
->     present bit) as the MMIO SPTE mask, similar to the way 52-bit physical
->     addressing is handled.
+> 3. save_complete_precopy --> GET_BITMAP ioctl --> return bitmap of (currently
+> pinned pages + previously pinned pages since last clean) and clean all
+> previously pinned pages
 > 
-> If no callback is registered, the current method of setting the MMIO SPTE
-> mask is used.
 > 
-> Fixes: 28a1f3ac1d0c ("kvm: x86: Set highest physical address bits in non-present/reserved SPTEs")
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  4 ++-
->  arch/x86/kvm/mmu/mmu.c          | 54 +++++++++++++++++++++------------
->  arch/x86/kvm/x86.c              |  2 +-
->  3 files changed, 38 insertions(+), 22 deletions(-)
+> Copying pinned pages multiple times is unavoidable because those pinned pages
+> are always treated as dirty. That's per vendor's implementation.
+> But if the pinned pages are not reported as dirty before stop-and-copy phase,
+> QEMU would think dirty pages has converged
+> and enter blackout phase, making downtime_limit severely incorrect.
 
-This patch has some extra churn because kvm_x86_ops isn't set yet when the
-call to kvm_set_mmio_spte_mask() is made. If it's not a problem to move
-setting kvm_x86_ops just a bit earlier in kvm_arch_init(), some of the
-churn can be avoided.
+I'm not sure it's any worse.
+I *think* we do a last sync after we've decided to go to stop-and-copy;
+wont that then mark all those pages as dirty again, so it'll have the
+same behaviour?
+Anyway, it seems wrong to repeatedly send pages that you know are
+pointless - but that probably means we need a way to mark those somehow
+to avoid it.
 
-Thanks,
-Tom
+Dave
 
+> Thanks
+> Yan
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index b79cd6aa4075..0c666c10f1a2 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1233,6 +1233,8 @@ struct kvm_x86_ops {
->  
->  	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
->  	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
-> +
-> +	u64 (*get_reserved_mask)(void);
->  };
->  
->  struct kvm_arch_async_pf {
-> @@ -1266,7 +1268,7 @@ static inline int kvm_arch_flush_remote_tlb(struct kvm *kvm)
->  		return -ENOTSUPP;
->  }
->  
-> -int kvm_mmu_module_init(void);
-> +int kvm_mmu_module_init(struct kvm_x86_ops *ops);
->  void kvm_mmu_module_exit(void);
->  
->  void kvm_mmu_destroy(struct kvm_vcpu *vcpu);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 6f92b40d798c..d419df7a4056 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6227,30 +6227,44 @@ static void mmu_destroy_caches(void)
->  	kmem_cache_destroy(mmu_page_header_cache);
->  }
->  
-> -static void kvm_set_mmio_spte_mask(void)
-> +static void kvm_set_mmio_spte_mask(struct kvm_x86_ops *ops)
->  {
->  	u64 mask;
->  
-> -	/*
-> -	 * Set the reserved bits and the present bit of an paging-structure
-> -	 * entry to generate page fault with PFER.RSV = 1.
-> -	 */
-> +	if (ops->get_reserved_mask) {
-> +		mask = ops->get_reserved_mask();
->  
-> -	/*
-> -	 * Mask the uppermost physical address bit, which would be reserved as
-> -	 * long as the supported physical address width is less than 52.
-> -	 */
-> -	mask = 1ull << 51;
-> +		/*
-> +		 * If there are reserved bits available, add the present bit
-> +		 * to the mask to generate a page fault with PFER.RSV = 1.
-> +		 * If there are no reserved bits available, mask the uppermost
-> +		 * physical address bit, but keep the present bit cleared.
-> +		 */
-> +		if (mask)
-> +			mask |= 1ull;
-> +		else
-> +			mask = 1ull << 51;
-> +	} else {
-> +		/*
-> +		 * Set the reserved bits and the present bit of a
-> +		 * paging-structure entry to generate page fault with
-> +		 * PFER.RSV = 1.
-> +		 */
->  
-> -	/* Set the present bit. */
-> -	mask |= 1ull;
-> +		/*
-> +		 * Mask the uppermost physical address bit, which would be
-> +		 * reserved as long as the supported physical address width
-> +		 * is less than 52.
-> +		 */
-> +		mask = 1ull << 51;
->  
-> -	/*
-> -	 * If reserved bit is not supported, clear the present bit to disable
-> -	 * mmio page fault.
-> -	 */
-> -	if (IS_ENABLED(CONFIG_X86_64) && shadow_phys_bits == 52)
-> -		mask &= ~1ull;
-> +		/*
-> +		 * If reserved bit is not supported, don't set the present bit
-> +		 * to disable mmio page fault.
-> +		 */
-> +		if (!IS_ENABLED(CONFIG_X86_64) || shadow_phys_bits != 52)
-> +			mask |= 1ull;
-> +	}
->  
->  	kvm_mmu_set_mmio_spte_mask(mask, mask, ACC_WRITE_MASK | ACC_USER_MASK);
->  }
-> @@ -6301,7 +6315,7 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
->  	return 0;
->  }
->  
-> -int kvm_mmu_module_init(void)
-> +int kvm_mmu_module_init(struct kvm_x86_ops *ops)
->  {
->  	int ret = -ENOMEM;
->  
-> @@ -6320,7 +6334,7 @@ int kvm_mmu_module_init(void)
->  
->  	kvm_mmu_reset_all_pte_masks();
->  
-> -	kvm_set_mmio_spte_mask();
-> +	kvm_set_mmio_spte_mask(ops);
->  
->  	pte_list_desc_cache = kmem_cache_create("pte_list_desc",
->  					    sizeof(struct pte_list_desc),
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 3ed167e039e5..311da4ed423d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7234,7 +7234,7 @@ int kvm_arch_init(void *opaque)
->  		goto out_free_x86_fpu_cache;
->  	}
->  
-> -	r = kvm_mmu_module_init();
-> +	r = kvm_mmu_module_init(ops);
->  	if (r)
->  		goto out_free_percpu;
->  
+> > >>>> +			mutex_lock(&iommu->lock);
+> > >>>> +			vfio_iova_dirty_bitmap(iommu, range.iova, range.size,
+> > >>>> +					     range.pgsize, range.iova, bitmap);
+> > >>>> +			mutex_unlock(&iommu->lock);
+> > >>>> +
+> > >>>> +			ret = copy_to_user((void __user *)range.bitmap, bitmap,
+> > >>>> +					   range.bitmap_size) ? -EFAULT : 0;
+> > >>>> +bitmap_exit:
+> > >>>> +			kfree(bitmap);
+> > >>>> +			return ret;
+> > >>>> +		}
+> > >>>>    	}
+> > >>>>    
+> > >>>>    	return -ENOTTY;
+> > >>>> -- 
+> > >>>> 2.7.0
+> > >>>>
 > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
