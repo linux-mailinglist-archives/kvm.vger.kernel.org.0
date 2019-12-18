@@ -2,185 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C0F4124CF5
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 17:18:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C730E124CFD
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 17:19:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726984AbfLRQSE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 11:18:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60220 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727217AbfLRQSC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 11:18:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576685881;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=P88rx9cd9kQKZ8dguxvhOHW4MjtfLZb0Tzz3Us5jasg=;
-        b=EUPZQd1VCV0DH9rFSYDzGzlFodhCmm9T2duBN4l/y1NxEgQYlO9monx0SCCRxQfSxLbYm4
-        YsR7qLetI0/1tb/cVJXVwHkLhBl/qtPZpq1b7mLLbJQBNZF7hGCgLAvSDxfOfVTTZMB7yB
-        zRD4F9aOBYZBWDLl3LYyOBMuEu1Y4X0=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-HhQwE7ulNj6VJ2NnsKRtLg-1; Wed, 18 Dec 2019 11:17:58 -0500
-X-MC-Unique: HhQwE7ulNj6VJ2NnsKRtLg-1
-Received: by mail-qt1-f197.google.com with SMTP id 69so1691290qtb.15
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 08:17:58 -0800 (PST)
+        id S1727487AbfLRQTL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 11:19:11 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:44152 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727370AbfLRQTL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 11:19:11 -0500
+Received: by mail-lj1-f195.google.com with SMTP id u71so2784565lje.11
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 08:19:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=1DGAjM55vpYX9DGiWQ7jC+BuPBEROaJ1QWpfbgzGOAs=;
+        b=14CMCeLAINpm3ZV8MtR1RG8xV/J5WqHqe0M9oWFTC4pD19UGdVdMY13F8IIsMksm4W
+         kTSNndEmcYcPmybyvjsTv6xtEW7+tkkinAcC1MDXkXKoNmZ1SK85nBC+tIiOZGHxYiSE
+         ErROILC6IQXrJTMN8gfAw4y8jZgbQsFPr7JEAK4l0hFz0/VKc6BkApPPjq40gufHusUR
+         6UvR7LXBYwDS6pUFn7B3nlXBgDLzdcTNFffWkV/qNFz0/kIOhSYmssrziSjQPxEtyx0c
+         rJwD1MmUSyQUt9cbhZNcLHY8CW2D/VtVF58ATc7Qb2ieL8bMuLSSx8+04+/1y1quw4DP
+         qbvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=P88rx9cd9kQKZ8dguxvhOHW4MjtfLZb0Tzz3Us5jasg=;
-        b=Y7rx71CiM1zPsvDi0UwY9Q6IymSkLrY0pp4kX0tLy4RBLkxUxH4upimjPZeC25G+4S
-         uqolHaBFKVli79ZNs4nADvggRgpCjLACPE0NcxUJlagS42OHl1w2L1038d0kFnpBMXY4
-         EX4MUF/ItdhHyOQK5XAORLr6nADohUqcvuHmeEt3yc3FnV/OqMEnJ5WaDeBMHRg9pl3K
-         cyryzmhrt32OzUYQlOR3+XkEjlisjEgpu3p+LdgamRPFFGOEB4JtGbguDqqxbZ7ibRXS
-         LwQnUGdyVKg68EOaLcmEC5OrJBlwpsL7L1H2ZXBn5G3lHnrmLn95z5rk+jFxRoT6ui44
-         k32A==
-X-Gm-Message-State: APjAAAWpvqzqbk/A6/TkRsqFwswxGsd2lnkG/Bt0pjcH6np5oZqQ6DKA
-        fVVdqErObOdH1xPALBsC6SgRHr7go8QSXoey5CHFhdmtLoTppcFkGMikU14COCZZUtGzw3cRRi+
-        GEeS36yRo0xB7
-X-Received: by 2002:ac8:7a70:: with SMTP id w16mr2877835qtt.154.1576685877631;
-        Wed, 18 Dec 2019 08:17:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy4qHGhFCQSr/jP29aEubtfbaj7wEV9G/hOTID6lKw6YyGvv0dEeZDPR8BH6CrL2bXiQvdTHQ==
-X-Received: by 2002:ac8:7a70:: with SMTP id w16mr2877791qtt.154.1576685877330;
-        Wed, 18 Dec 2019 08:17:57 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id o16sm769610qkj.91.2019.12.18.08.17.55
+        bh=1DGAjM55vpYX9DGiWQ7jC+BuPBEROaJ1QWpfbgzGOAs=;
+        b=RjTyk+TO4APPkvMYTk8pT3V7TGureo58BiEZ3Cl+c1Wug4zUyaZgSr7LuPDWFB7Fb9
+         ke3fhDjNbFWVanJOqgfIvpOyOG2j1fK3lgnBG3ap2mQkFw7M43/ky3LI1uuSyUN4V7Uy
+         7qzWTzNVWtujh9wsEGnRRDg4nHra9vwBEYt9pEVgw1XFoePlLNGNSdAbcW0qbYMyg/TC
+         b85q3XQqSaDDQuBUBkR5Pl6zMnDUz5+zsdZRpBvHZRC376kGf51YTQ6vYl2jPljDWLhk
+         otH82xzYQvzjtCyfe681/fH4Eu74YAwICWKMhQu60exLdwzYDpZczOn7kmj6682YSYBn
+         xiWQ==
+X-Gm-Message-State: APjAAAW9Bglfq+Jny4RGXekDuaDcQxxB7CQ7wl8NprxpYzyhjRQ3TPAa
+        UFGVerLThi0cN+MIcogw9hKNwQ==
+X-Google-Smtp-Source: APXvYqy8ptrsSDx1m4BazaV2cUqif19xWrwH+lZkkh3fZ2X5vIkCH+jyW+1oGFguRAmcQm5RYV3mLw==
+X-Received: by 2002:a2e:b4e7:: with SMTP id s7mr2195072ljm.58.1576685948274;
+        Wed, 18 Dec 2019 08:19:08 -0800 (PST)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id 2sm1412292ljq.38.2019.12.18.08.19.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2019 08:17:56 -0800 (PST)
-Date:   Wed, 18 Dec 2019 11:17:55 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v4 07/19] KVM: Explicitly free allocated-but-unused dirty
- bitmap
-Message-ID: <20191218161755.GB26669@xz-x1>
-References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
- <20191217204041.10815-8-sean.j.christopherson@intel.com>
- <20191217222446.GK7258@xz-x1>
- <20191217225118.GF11771@linux.intel.com>
+        Wed, 18 Dec 2019 08:19:07 -0800 (PST)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id E28BB1012CF; Wed, 18 Dec 2019 19:19:07 +0300 (+03)
+Date:   Wed, 18 Dec 2019 19:19:07 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Jason Gunthorpe <jgg@mellanox.com>
+Subject: Re: [PATCH v11 06/25] mm: fix get_user_pages_remote()'s handling of
+ FOLL_LONGTERM
+Message-ID: <20191218161907.yczbijr3ngm7wwnj@box>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191216222537.491123-7-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191217225118.GF11771@linux.intel.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191216222537.491123-7-jhubbard@nvidia.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 02:51:18PM -0800, Sean Christopherson wrote:
-> On Tue, Dec 17, 2019 at 05:24:46PM -0500, Peter Xu wrote:
-> > On Tue, Dec 17, 2019 at 12:40:29PM -0800, Sean Christopherson wrote:
-> > > Explicitly free an allocated-but-unused dirty bitmap instead of relying
-> > > on kvm_free_memslot() if an error occurs in __kvm_set_memory_region().
-> > > There is no longer a need to abuse kvm_free_memslot() to free arch
-> > > specific resources as arch specific code is now called only after the
-> > > common flow is guaranteed to succeed.  Arch code can still fail, but
-> > > it's responsible for its own cleanup in that case.
-> > > 
-> > > Eliminating the error path's abuse of kvm_free_memslot() paves the way
-> > > for simplifying kvm_free_memslot(), i.e. dropping its @dont param.
-> > > 
-> > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > ---
-> > >  virt/kvm/kvm_main.c | 7 ++++---
-> > >  1 file changed, 4 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index d403e93e3028..6b2261a9e139 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -1096,7 +1096,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> > >  
-> > >  	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
-> > >  	if (!slots)
-> > > -		goto out_free;
-> > > +		goto out_bitmap;
-> > >  	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
-> > >  
-> > >  	if ((change == KVM_MR_DELETE) || (change == KVM_MR_MOVE)) {
-> > > @@ -1144,8 +1144,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> > >  	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
-> > >  		slots = install_new_memslots(kvm, as_id, slots);
-> > >  	kvfree(slots);
-> > > -out_free:
-> > > -	kvm_free_memslot(kvm, &new, &old);
-> > > +out_bitmap:
-> > > +	if (new.dirty_bitmap && !old.dirty_bitmap)
-> > > +		kvm_destroy_dirty_bitmap(&new);
-> > 
-> > What if both the old and new have KVM_MEM_LOG_DIRTY_PAGES set?
-> > kvm_free_memslot() did cover that but I see that you explicitly
-> > dropped it.  Could I ask why?  Thanks,
+On Mon, Dec 16, 2019 at 02:25:18PM -0800, John Hubbard wrote:
+> As it says in the updated comment in gup.c: current FOLL_LONGTERM
+> behavior is incompatible with FAULT_FLAG_ALLOW_RETRY because of the
+> FS DAX check requirement on vmas.
 > 
-> In that case, old.dirty_bitmap == new.dirty_bitmap, i.e. shouldn't be freed
-> by this error path since doing so would result in a use-after-free via the
-> old memslot.
+> However, the corresponding restriction in get_user_pages_remote() was
+> slightly stricter than is actually required: it forbade all
+> FOLL_LONGTERM callers, but we can actually allow FOLL_LONGTERM callers
+> that do not set the "locked" arg.
 > 
-> The kvm_free_memslot() logic is the same, albeit in a very twisted way.
+> Update the code and comments to loosen the restriction, allowing
+> FOLL_LONGTERM in some cases.
+> 
+> Also, copy the DAX check ("if a VMA is DAX, don't allow long term
+> pinning") from the VFIO call site, all the way into the internals
+> of get_user_pages_remote() and __gup_longterm_locked(). That is:
+> get_user_pages_remote() calls __gup_longterm_locked(), which in turn
+> calls check_dax_vmas(). This check will then be removed from the VFIO
+> call site in a subsequent patch.
+> 
+> Thanks to Jason Gunthorpe for pointing out a clean way to fix this,
+> and to Dan Williams for helping clarify the DAX refactoring.
+> 
+> Tested-by: Alex Williamson <alex.williamson@redhat.com>
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
+> Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
+> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Jerome Glisse <jglisse@redhat.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  mm/gup.c | 27 ++++++++++++++++++++++-----
+>  1 file changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 3ecce297a47f..c0c56888e7cc 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -29,6 +29,13 @@ struct follow_page_context {
+>  	unsigned int page_mask;
+>  };
+>  
+> +static __always_inline long __gup_longterm_locked(struct task_struct *tsk,
+> +						  struct mm_struct *mm,
+> +						  unsigned long start,
+> +						  unsigned long nr_pages,
+> +						  struct page **pages,
+> +						  struct vm_area_struct **vmas,
+> +						  unsigned int flags);
 
-Yes it is. :)
+Any particular reason for the forward declaration? Maybe move
+get_user_pages_remote() down?
 
+>  /*
+>   * Return the compound head page with ref appropriately incremented,
+>   * or NULL if that failed.
+> @@ -1179,13 +1186,23 @@ long get_user_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
+>  		struct vm_area_struct **vmas, int *locked)
+>  {
+>  	/*
+> -	 * FIXME: Current FOLL_LONGTERM behavior is incompatible with
+> +	 * Parts of FOLL_LONGTERM behavior are incompatible with
+>  	 * FAULT_FLAG_ALLOW_RETRY because of the FS DAX check requirement on
+> -	 * vmas.  As there are no users of this flag in this call we simply
+> -	 * disallow this option for now.
+> +	 * vmas. However, this only comes up if locked is set, and there are
+> +	 * callers that do request FOLL_LONGTERM, but do not set locked. So,
+> +	 * allow what we can.
+>  	 */
+> -	if (WARN_ON_ONCE(gup_flags & FOLL_LONGTERM))
+> -		return -EINVAL;
+> +	if (gup_flags & FOLL_LONGTERM) {
+> +		if (WARN_ON_ONCE(locked))
+> +			return -EINVAL;
+> +		/*
+> +		 * This will check the vmas (even if our vmas arg is NULL)
+> +		 * and return -ENOTSUPP if DAX isn't allowed in this case:
+> +		 */
+> +		return __gup_longterm_locked(tsk, mm, start, nr_pages, pages,
+> +					     vmas, gup_flags | FOLL_TOUCH |
+> +					     FOLL_REMOTE);
+> +	}
+>  
+>  	return __get_user_pages_locked(tsk, mm, start, nr_pages, pages, vmas,
+>  				       locked,
+> -- 
+> 2.24.1
 > 
-> In __kvm_set_memory_region(), @old and @new start with the same dirty_bitmap.
-> 
-> 	new = old = *slot;
-> 
-> And @new is modified based on KVM_MEM_LOG_DIRTY_PAGES.  If LOG_DIRTY_PAGES
-> is set in both @new and @old, then both the "if" and "else if" evaluate
-> false, i.e. new.dirty_bitmap == old.dirty_bitmap.
-> 
-> 	/* Allocate/free page dirty bitmap as needed */
-> 	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
-> 		new.dirty_bitmap = NULL;
-> 	else if (!new.dirty_bitmap) {
-> 		r = kvm_create_dirty_bitmap(&new);
-> 		if (r)
-> 			return r;
-> 	}
-> 
-> Subbing "@free <= @new" and "@dont <= @old" in kvm_free_memslot()
-> 
->   static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
-> 			       struct kvm_memory_slot *dont)
->   {
-> 	if (!dont || free->dirty_bitmap != dont->dirty_bitmap)
-> 		kvm_destroy_dirty_bitmap(free);
-> 
-> 
-> yeids this, since @old is obviously non-NULL
-> 
-> 	if (new.dirty_bitmap != old.dirty_bitmap)
-> 		kvm_destroy_dirty_bitmap(&new);
-> 
-> The dirty_bitmap allocation logic guarantees that new.dirty_bitmap is
->   a) NULL (the "if" case")
->   b) != old.dirty_bitmap iff old.dirty_bitmap == NULL (the "else if" case)
->   c) == old.dirty_bitmap (the implicit "else" case).
-> 
-> kvm_free_memslot() frees @new.dirty_bitmap iff its != @old.dirty_bitmap,
-> thus the explicit destroy only needs to check for (b).
-
-Thanks for explaining with such a detail.
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
 
 -- 
-Peter Xu
-
+ Kirill A. Shutemov
