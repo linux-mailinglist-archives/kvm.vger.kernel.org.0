@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 11A5B1245C7
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 12:30:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D3DB1245EF
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 12:39:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbfLRLaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 06:30:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36214 "EHLO
+        id S1726699AbfLRLjz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 06:39:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59348 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726591AbfLRLaL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 06:30:11 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBIBNBZA112969
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 06:30:10 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wyjbd23vg-1
+        by vger.kernel.org with ESMTP id S1726141AbfLRLjy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 06:39:54 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBIBbPW0100753
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 06:39:54 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wyjf7ab7e-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 06:30:09 -0500
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 06:39:53 -0500
 Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 18 Dec 2019 11:30:07 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Wed, 18 Dec 2019 11:39:51 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 18 Dec 2019 11:29:59 -0000
+        Wed, 18 Dec 2019 11:39:45 -0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBIBTxSR53608522
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBIBd1Qd45482342
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Dec 2019 11:29:59 GMT
+        Wed, 18 Dec 2019 11:39:01 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0564D4C046;
-        Wed, 18 Dec 2019 11:29:59 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C0BFE4C046;
+        Wed, 18 Dec 2019 11:39:44 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FE024C044;
-        Wed, 18 Dec 2019 11:29:58 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 182E94C044;
+        Wed, 18 Dec 2019 11:39:44 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.119])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Dec 2019 11:29:58 +0000 (GMT)
+        Wed, 18 Dec 2019 11:39:44 +0000 (GMT)
 Subject: Re: [PATCH v4 19/19] KVM: selftests: Add test for
  KVM_SET_USER_MEMORY_REGION
 To:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -107,26 +107,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 18 Dec 2019 12:29:58 +0100
+Date:   Wed, 18 Dec 2019 12:39:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
 In-Reply-To: <20191217204041.10815-20-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19121811-0028-0000-0000-000003C9DCC7
+x-cbid: 19121811-0012-0000-0000-000003762703
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121811-0029-0000-0000-0000248D28FA
-Message-Id: <028948db-b59c-08bf-b2ce-29d8745ab9c7@de.ibm.com>
+x-cbparentid: 19121811-0013-0000-0000-000021B2154B
+Message-Id: <f962fafb-3956-746f-d077-3dbcefaae7c8@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-18_03:2019-12-17,2019-12-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- mlxscore=0 adultscore=0 malwarescore=0 phishscore=0 mlxlogscore=999
- suspectscore=2 bulkscore=0 spamscore=0 lowpriorityscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1015
+ malwarescore=0 bulkscore=0 impostorscore=0 mlxlogscore=999
  priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912180095
+ engine=8.12.0-1910280000 definitions=main-1912180097
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -139,18 +139,6 @@ On 17.12.19 21:40, Sean Christopherson wrote:
 > region.  The test is primarily targeted at x86 to verify its memslot
 > metadata is correctly updated, but also provides basic functionality
 > coverage on other architectures.
-
-This fails to build on s390 (and probably others)
-
-set_memory_region_test.c: In function ‘test_move_memory_region’:
-set_memory_region_test.c:78:2: warning: implicit declaration of function ‘vcpu_set_cpuid’ [-Wimplicit-function-declaration]
-   78 |  vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-      |  ^~~~~~~~~~~~~~
-set_memory_region_test.c:78:30: warning: implicit declaration of function ‘kvm_get_supported_cpuid’ [-Wimplicit-function-declaration]
-   78 |  vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-      |                              ^~~~~~~~~~~~~~~~~~~~~~~
-
-
 > 
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
@@ -180,18 +168,18 @@ set_memory_region_test.c:78:30: warning: implicit declaration of function ‘kvm
 >  TEST_GEN_PROGS_x86_64 += dirty_log_test
 >  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
 > +TEST_GEN_PROGS_x86_64 += set_memory_region_test
->  
+> 
 >  TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
 >  TEST_GEN_PROGS_aarch64 += dirty_log_test
 >  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
 > +TEST_GEN_PROGS_aarch64 += set_memory_region_test
->  
+> 
 >  TEST_GEN_PROGS_s390x = s390x/memop
 >  TEST_GEN_PROGS_s390x += s390x/sync_regs_test
 >  TEST_GEN_PROGS_s390x += dirty_log_test
 >  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
 > +TEST_GEN_PROGS_s390x += set_memory_region_test
->  
+> 
 >  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
 >  LIBKVM += $(LIBKVM_$(UNAME_M))
 > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
@@ -213,7 +201,7 @@ set_memory_region_test.c:78:30: warning: implicit declaration of function ‘kvm
 > @@ -756,6 +756,36 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags)
 >  		ret, errno, slot, flags);
 >  }
->  
+> 
 > +/*
 > + * VM Memory Region Move
 > + *
@@ -314,86 +302,7 @@ set_memory_region_test.c:78:30: warning: implicit declaration of function ‘kvm
 > +
 > +	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
 > +		    "Unexpected exit reason = %d", run->exit_reason);
-> +
-> +	cmd = get_ucall(vm, VCPU_ID, &uc);
-> +	TEST_ASSERT(cmd == UCALL_DONE, "Unexpected val in guest = %llu",
-> +		    uc.args[0]);
-> +	return NULL;
-> +}
-> +
-> +static void test_move_memory_region(void)
-> +{
-> +	pthread_t vcpu_thread;
-> +	struct kvm_vm *vm;
-> +	uint64_t *hva;
-> +	uint64_t gpa;
-> +
-> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
-> +
-> +	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-> +
-> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_THP,
-> +				    MEM_REGION_GPA, MEM_REGION_SLOT,
-> +				    MEM_REGION_SIZE / getpagesize(), 0);
-> +
-> +	/*
-> +	 * Allocate and map two pages so that the GPA accessed by guest_code()
-> +	 * stays valid across the memslot move.
-> +	 */
-> +	gpa = vm_phy_pages_alloc(vm, 2, MEM_REGION_GPA, MEM_REGION_SLOT);
-> +	TEST_ASSERT(gpa == MEM_REGION_GPA, "Failed vm_phy_pages_alloc\n");
-> +
-> +	virt_map(vm, MEM_REGION_GPA, MEM_REGION_GPA, 2 * 4096, 0);
-> +
-> +	/* Ditto for the host mapping so that both pages can be zeroed. */
-> +	hva = addr_gpa2hva(vm, MEM_REGION_GPA);
-> +	memset(hva, 0, 2 * 4096);
-> +
-> +	pthread_create(&vcpu_thread, NULL, vcpu_worker, vm);
-> +
-> +	/* Ensure the guest thread is spun up. */
-> +	usleep(100000);
-> +
-> +	/*
-> +	 * Shift the region's base GPA.  The guest should not see "2" as the
-> +	 * hva->gpa translation is misaligned, i.e. the guest is accessing a
-> +	 * different host pfn.
-> +	 */
-> +	vm_mem_region_move(vm, MEM_REGION_SLOT, MEM_REGION_GPA - 4096);
-> +	WRITE_ONCE(*hva, 2);
-> +
-> +	usleep(100000);
-> +
-> +	/*
-> +	 * Note, value in memory needs to be changed *before* restoring the
-> +	 * memslot, else the guest could race the update and see "2".
-> +	 */
-> +	WRITE_ONCE(*hva, 1);
-> +
-> +	/* Restore the original base, the guest should see "1". */
-> +	vm_mem_region_move(vm, MEM_REGION_SLOT, MEM_REGION_GPA);
-> +
-> +	pthread_join(vcpu_thread, NULL);
-> +
-> +	kvm_vm_free(vm);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	int i, loops;
-> +
-> +	/* Tell stdout not to buffer its content */
-> +	setbuf(stdout, NULL);
-> +
-> +	if (argc > 1)
-> +		loops = atoi(argv[1]);
-> +	else
-> +		loops = 10;
-> +
-> +	for (i = 0; i < loops; i++)
-> +		test_move_memory_region();
-> +
-> +	return 0;
-> +}
-> 
+
+
+This will also not work for s390. Maybe just make this test x86 specific for now?
 
