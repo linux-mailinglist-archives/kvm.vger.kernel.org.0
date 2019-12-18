@@ -2,119 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1197112503C
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 19:08:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BC3D12505B
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 19:11:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727696AbfLRSID (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 13:08:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21055 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727686AbfLRSIC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 13:08:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576692482;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vrd2YMHgYqCL3NryYw02VWg7A0uKKgAHx3jq/JxCp5I=;
-        b=WuYJLdLqF3dssYPiWk9DUcXVu/i99ZJPFtHqVjuVRpSEArJeg63iAHcTS9+yr7kB/2epP9
-        7qAb5p37z0J/JDuZ8XWIfs87a4IIWiSX+OCDhqhnleR2jIXd5/XtqeMM8ZNgsXtkzA+f3a
-        MsiDEYZwVyUtJDKGcNeevKICsXiJfWE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-8k2LkPvON3iKCuAAOxJTcQ-1; Wed, 18 Dec 2019 13:08:00 -0500
-X-MC-Unique: 8k2LkPvON3iKCuAAOxJTcQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13DD6800D4E;
-        Wed, 18 Dec 2019 18:07:59 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-117-218.ams2.redhat.com [10.36.117.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E2FBB5D9E2;
-        Wed, 18 Dec 2019 18:07:56 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     davem@davemloft.net
-Cc:     Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Dexuan Cui <decui@microsoft.com>, netdev@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH net-next v3 11/11] vsock_test: add SOCK_STREAM MSG_PEEK test
-Date:   Wed, 18 Dec 2019 19:07:08 +0100
-Message-Id: <20191218180708.120337-12-sgarzare@redhat.com>
-In-Reply-To: <20191218180708.120337-1-sgarzare@redhat.com>
-References: <20191218180708.120337-1-sgarzare@redhat.com>
+        id S1727198AbfLRSLM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 13:11:12 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:44619 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726960AbfLRSLM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 13:11:12 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1ihdmZ-0007pw-8W; Wed, 18 Dec 2019 19:10:47 +0100
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v4 00/19] KVM: Dynamically size memslot arrays
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 18 Dec 2019 18:10:47 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <linux-mips@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+In-Reply-To: <20191217204041.10815-1-sean.j.christopherson@intel.com>
+References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
+Message-ID: <3a6b03cc1300bc3cffd3904e22c09478@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, jhogan@kernel.org, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com, david@redhat.com, cohuck@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, f4bug@amsat.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test if the MSG_PEEK flags of recv(2) works as expected.
+On 2019-12-17 20:40, Sean Christopherson wrote:
+> The end goal of this series is to dynamically size the memslot array 
+> so
+> that KVM allocates memory based on the number of memslots in use, as
+> opposed to unconditionally allocating memory for the maximum number 
+> of
+> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 
+> address
+> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+> E.g. given a VM that uses a total of 30 memslots, dynamic sizing 
+> reduces
+> the memory footprint from 90k to ~2.6k bytes.
+>
+> The changes required to support dynamic sizing are relatively small,
+> e.g. are essentially contained in patches 17/19 and 18/19.
+>
+> Patches 2-16 clean up the memslot code, which has gotten quite 
+> crusty,
+> especially __kvm_set_memory_region().  The clean up is likely not 
+> strictly
+> necessary to switch to dynamic sizing, but I didn't have a remotely
+> reasonable level of confidence in the correctness of the dynamic 
+> sizing
+> without first doing the clean up.
+>
+> The only functional change in v4 is the addition of an x86-specific 
+> bug
+> fix in x86's handling of KVM_MR_MOVE.  The bug fix is not directly 
+> related
+> to dynamically allocating memslots, but it has subtle and hidden 
+> conflicts
+> with the cleanup patches, and the fix is higher priority than 
+> anything
+> else in the series, i.e. should be merged first.
+>
+> On non-x86 architectures, v3 and v4 should be functionally 
+> equivalent,
+> the only non-x86 change in v4 is the dropping of a "const" in
+> kvm_arch_commit_memory_region().
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- tools/testing/vsock/vsock_test.c | 34 ++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+Gave it another go on top of 5.5-rc2 on an arm64 box, and nothing
+exploded. So thumbs up from me.
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock=
-_test.c
-index a63e05d6a0f9..1d8b93f1af31 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -178,6 +178,35 @@ static void test_stream_multiconn_server(const struc=
-t test_opts *opts)
- 		close(fds[i]);
- }
-=20
-+static void test_stream_msg_peek_client(const struct test_opts *opts)
-+{
-+	int fd;
-+
-+	fd =3D vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	send_byte(fd, 1, 0);
-+	close(fd);
-+}
-+
-+static void test_stream_msg_peek_server(const struct test_opts *opts)
-+{
-+	int fd;
-+
-+	fd =3D vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	recv_byte(fd, 1, MSG_PEEK);
-+	recv_byte(fd, 1, 0);
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] =3D {
- 	{
- 		.name =3D "SOCK_STREAM connection reset",
-@@ -198,6 +227,11 @@ static struct test_case test_cases[] =3D {
- 		.run_client =3D test_stream_multiconn_client,
- 		.run_server =3D test_stream_multiconn_server,
- 	},
-+	{
-+		.name =3D "SOCK_STREAM MSG_PEEK",
-+		.run_client =3D test_stream_msg_peek_client,
-+		.run_server =3D test_stream_msg_peek_server,
-+	},
- 	{},
- };
-=20
---=20
-2.24.1
+Thanks,
 
+        M.
+-- 
+Jazz is not dead. It just smells funny...
