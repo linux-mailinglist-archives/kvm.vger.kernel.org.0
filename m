@@ -2,41 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 937A012522C
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 20:46:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35177125251
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 20:51:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727534AbfLRTqI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 14:46:08 -0500
-Received: from mail-dm6nam11on2076.outbound.protection.outlook.com ([40.107.223.76]:1696
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        id S1727437AbfLRTv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 14:51:28 -0500
+Received: from mail-eopbgr760049.outbound.protection.outlook.com ([40.107.76.49]:10135
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726698AbfLRTqG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 14:46:06 -0500
+        id S1726698AbfLRTv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 14:51:28 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fbJtVF1C4OXtdMwfaVl2uqE9aMCW/XR7YS4gW3aRdEFqYr7qMGLnB9HLzeAeicpCHSCKf4SWJtjSdFuWoXzQ9bMXpbLWRlvQY4C92rvbFYp6zY57r4csmjvGFOQWGSjoE81Typr2qoI9jEUhz9o4YaZPVGuaILyDhrE8p8aIf9N38MwHBpIsUlzlRwkDd5xDr0dS1Y0DhfQBbVCt89J4MavFbUUwcNbElCHvp9ud8FwdMhQG3rsltWRYZbFtlsysKeAN8blQMYCd4pJXygx/qSMid+jTmeyW7pCHu8IOgqTbCAlU2Ro29ZLvZdgDyFFW8yyZIedmzeceS5bvmJROkQ==
+ b=JpJCBvS1fMMiV0KuE0FqphCgA1wbi6JbyOrRt7DostBuEQpQV059aggdCN7G0qTt4S5RUWrf2kvTjf0qsDk6TtKuCZldNaF0vPdEwPW6gDCXteGsYkdDJyq7Bo+SzQP9UkYR6saSPhpuyc35onytsLKYpO0pFZA5ZsGA9g2D6axjYTW2wZHiD56bwykJZheR89eUjuBTVAv4woHLyxuQ1IxbNymuGLUOS1CI3DCFnYa+fioqmh2hSuO7GllWFUfg0rlBKZCb5VMhxx5Os/I4xf1xQv1QiGGq3D+M223VjNSVCqe0lBF3QI+2EA4rwm7kqwRAFWjsx6Q/m1c02iOsNA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kYWCpeUyyOK1booI6/Nbb8ENUnfh4Mf4FAOsEZa8rEc=;
- b=GHn4x7KjE2Z+/KYBGTy5U2txdXTGm/kfVw1h3DmwJ6AJHQYZaFsUygaS4SinJZMcIfbidTRsYmaJGcp89wvmYDp83xSWkqwamN7OgfJBYKk6zZsIZxWZxqrGoIwRk+NmPSUxoxsNaxF3iZqK+YojEIRPYR8GOpMXJH5MCb03nZKYq9t9a+gCugOjlLc9YXLEoURziv8Y5VZatUeIreRlwrthUpjvpBCAtYO2/Qows70Nd8tftAeyhOMySoJodx4hDqiXe260CQDA/vdg3sHoFeOqMfUTbIBaY9EURh1lQMzNZlucZ3G651oVSErEQF+cgJyL5J6+3miPUJ56gO5LxQ==
+ bh=NMe6M+qzGfMneg8pkhXi4GvQC/efEnhQOBvnKHCC15k=;
+ b=MImaw2ZDLDThU+U+RszStxnmhX7Ux3LIwnZT5D0aHuerjmRfrC9GBbArNu3xev2LEMJ9lers2zNvwv4Kl4PIsJdi/Jxr3hjTyCxIQZNZa0o6QYAJfDLahxlnxj+A7MpAMl9rzvinjT78QMYqkHSucOrhLPDgDxnh8vfgGZON9zZtfxAXTAqJvUUMsr8lkIW+OwSJcdgENXcQBJuGXb0H5a7Cv+DUNTY+ZbeHwm6AlvMwzCsaAMvzBx+Nsxip1dfNMwmS6Gm3qy1waLNhb3HvixMKpogsSvsUGBW+jJIXePTxv8zF0kwz8ZBSd5fbvbRUU/zJe/vIrVwUz2Jndtrh9g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kYWCpeUyyOK1booI6/Nbb8ENUnfh4Mf4FAOsEZa8rEc=;
- b=lmgUTdU5uiIKtzG53Rt0381dPt/V8EZbD42jerKYQajhJRVNbkOi+pYYxJGFz1XiYx+m14r92aj8etxK2MKfG9NY0a3MbRfzi/5lqIOj4qA4zw8b0247xYi7CA/DUtCQcHd6YRbJbyfG9d9LR8R7iyFwBWAGYxIDkgabiy9g2gY=
+ bh=NMe6M+qzGfMneg8pkhXi4GvQC/efEnhQOBvnKHCC15k=;
+ b=T+1n+mhxFCrDmA1QdCpXLPyZxfXC9ksqPnfpYW2BsRZ3otpa+DkGE2BC8cenDFPCYHPw8JTirBS6G1Yt+vnq5keKvgz5DBAFsxNaskJphaTs1JnaCGd/mpKlishVsQzosJoJN2jqvcPerkFfk5WJ4wAqC49zW/dMjZ8921wAK7I=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Thomas.Lendacky@amd.com; 
 Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.71.154) by
- DM6PR12MB2876.namprd12.prod.outlook.com (20.179.71.85) with Microsoft SMTP
+ DM6PR12MB3339.namprd12.prod.outlook.com (20.178.30.87) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2559.14; Wed, 18 Dec 2019 19:46:02 +0000
+ 15.20.2538.20; Wed, 18 Dec 2019 19:51:25 +0000
 Received: from DM6PR12MB3163.namprd12.prod.outlook.com
  ([fe80::a0cd:463:f444:c270]) by DM6PR12MB3163.namprd12.prod.outlook.com
  ([fe80::a0cd:463:f444:c270%7]) with mapi id 15.20.2538.019; Wed, 18 Dec 2019
- 19:46:02 +0000
+ 19:51:24 +0000
+Subject: Re: [PATCH v1 1/2] KVM: x86/mmu: Allow for overriding MMIO SPTE mask
 From:   Tom Lendacky <thomas.lendacky@amd.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -46,123 +47,204 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v1 2/2] KVM: SVM: Implement reserved bit callback to set MMIO SPTE mask
-Date:   Wed, 18 Dec 2019 13:45:47 -0600
-Message-Id: <519cd0f0f2ff7fa0e097967546506c07e2e56dda.1576698347.git.thomas.lendacky@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1576698347.git.thomas.lendacky@amd.com>
 References: <cover.1576698347.git.thomas.lendacky@amd.com>
-Content-Type: text/plain
-X-ClientProxiedBy: DM6PR21CA0007.namprd21.prod.outlook.com
- (2603:10b6:5:174::17) To DM6PR12MB3163.namprd12.prod.outlook.com
+ <10fdb77c9b6795f68137cf4315571ab791ab6feb.1576698347.git.thomas.lendacky@amd.com>
+Message-ID: <f0bc54c8-cea2-e574-6191-5c34d1b504c9@amd.com>
+Date:   Wed, 18 Dec 2019 13:51:23 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+In-Reply-To: <10fdb77c9b6795f68137cf4315571ab791ab6feb.1576698347.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR10CA0033.namprd10.prod.outlook.com
+ (2603:10b6:5:60::46) To DM6PR12MB3163.namprd12.prod.outlook.com
  (2603:10b6:5:15e::26)
 MIME-Version: 1.0
-X-Mailer: git-send-email 2.17.1
 X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 620533ef-a3a2-4acb-e519-08d783f2e996
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2876:|DM6PR12MB2876:
+X-MS-Office365-Filtering-Correlation-Id: 22ed5307-81b2-4384-657f-08d783f3a9d6
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3339:|DM6PR12MB3339:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB2876B8483234A5B7A97DC90CEC530@DM6PR12MB2876.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB333956AC7C0B9E62351A2AC5EC530@DM6PR12MB3339.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-Forefront-PRVS: 0255DF69B9
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(376002)(346002)(39860400002)(366004)(189003)(199004)(478600001)(5660300002)(81156014)(66946007)(81166006)(6486002)(6512007)(186003)(52116002)(54906003)(36756003)(86362001)(6666004)(4326008)(8676002)(66476007)(8936002)(66556008)(2616005)(6506007)(2906002)(26005)(316002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB2876;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(136003)(376002)(346002)(39860400002)(396003)(189003)(199004)(31696002)(66556008)(52116002)(6506007)(186003)(8936002)(86362001)(81156014)(81166006)(66946007)(316002)(8676002)(53546011)(6486002)(4326008)(54906003)(5660300002)(2906002)(31686004)(66476007)(6512007)(36756003)(478600001)(2616005)(26005);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3339;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 Received-SPF: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: acAWswFqSm27kKf7rWEvmMYlm31I1PwhOm1Ud6WCdyLS4gEnSyEavQ8dJSCvHfuyR1z6bd41WUSkh9rbIdVlFFU5Ht+2eafnwCOS6Su3zPKtZmjofQbh/nZylTWfhOMxKhAFj9FmPgKJmlzyiKgYf6Yt+AL+QjcYKzUqV/UW8iOXSxxwT7V6dXJmxRObPeHcBzKhhCvV3l3VsL0QISF8VDVk8VK/YO+lgcIKMK21MskeZvAzZ7fg72MG73bpecnU5b2iYRqKEkkSm1vlltIf5S2XSFMmcEa72Sss9986/y6neQMpKN2tmVB+NLOhaozugKVsf7p/h6X+5BOKFTrPCi9Ai70EAqrvl26C4pCLcWjxsu+6yZXsJCH78dWqXZccgXajkJp5xft/RanPpskZ8uV8Uv1SD8pRVdmIPDFHN9NndQ6Nq9SC8ZVOBI9BOSa8
+X-Microsoft-Antispam-Message-Info: C/xF8b2w80kLFSCjCfjH8pQOp3Lrk9UnAGajyiEScOWbjk/qXj+NwWnTKyVvScjOUIjBvb+2Z+0XYPXmkxv0KTlLkwmGqKA4dVFqyc5a8+i+KSr59P/8S0sYcIlsVcx8IS1OpB9P5ieed6ODsHLWfBkqa/kDkCs7sqW29fxTZf5c8imCQweaRDkE0XspdpWJiji78DSoA+iQ9xkHsr6j7zDlwrXf2YlU2uZJct6ZmhA8/eiFXf8ydDZVIADU3gDU83LDNteKzH/7T2H1na1qVu656xpdNrcMG9hQSu8jaKA3kkrTfWzMgF0z/0144akWyo14yKhQlasUiMnzyUcvYZUQ2VMyWs2KMmiwuSe5md03ME8VNizUARQyrHi5w51f+rwBR+EtuCUps6kKmsINXXX4ZzyjWkKgkTM8DvnGGg3Ol5cnzTDZNT4Iu3dmfsrQ
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 620533ef-a3a2-4acb-e519-08d783f2e996
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2019 19:46:02.2707
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22ed5307-81b2-4384-657f-08d783f3a9d6
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2019 19:51:24.8085
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +jN0Y2hrl2R8JdffeKJJSLC5gkwR+c0E3l7OObjpS/eDJR321rGdt+mIRyxdPEHYkFFEHNiMZP3IpYqVDN4/sA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2876
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8s+EmSIbxhslxicCNC7BWAqzH+v5Cr9ncP087+4ls5IFyjaM5thFws7OUq/CAQ0qwaSxHLfcurT3OWJO481txA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3339
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Register a reserved bit(s) mask callback that will check if memory
-encryption is supported/enabled:
-  If enabled, then the physical address width is reduced and the first
-  bit after the last valid reduced physical address bit will always be
-  reserved.
+On 12/18/19 1:45 PM, Tom Lendacky wrote:
+> The KVM MMIO support uses bit 51 as the reserved bit to cause nested page
+> faults when a guest performs MMIO. The AMD memory encryption support uses
+> CPUID functions to define the encryption bit position. Given this, KVM
+> can't assume that bit 51 will be safe all the time.
+> 
+> Add a callback to return a reserved bit(s) mask that can be used for the
+> MMIO pagetable entries. The callback is not responsible for setting the
+> present bit.
+> 
+> If a callback is registered:
+>   - any non-zero mask returned is updated with the present bit and used
+>     as the MMIO SPTE mask.
+>   - a zero mask returned results in a mask with only bit 51 set (i.e. no
+>     present bit) as the MMIO SPTE mask, similar to the way 52-bit physical
+>     addressing is handled.
+> 
+> If no callback is registered, the current method of setting the MMIO SPTE
+> mask is used.
+> 
+> Fixes: 28a1f3ac1d0c ("kvm: x86: Set highest physical address bits in non-present/reserved SPTEs")
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  4 ++-
+>  arch/x86/kvm/mmu/mmu.c          | 54 +++++++++++++++++++++------------
+>  arch/x86/kvm/x86.c              |  2 +-
+>  3 files changed, 38 insertions(+), 22 deletions(-)
 
-  If disabled, then the physical address width is not reduced, so bit 51
-  can be used, unless the physical address width is 52. In this case,
-  return zero for the mask.
+This patch has some extra churn because kvm_x86_ops isn't set yet when the
+call to kvm_set_mmio_spte_mask() is made. If it's not a problem to move
+setting kvm_x86_ops just a bit earlier in kvm_arch_init(), some of the
+churn can be avoided.
 
-Fixes: 28a1f3ac1d0c ("kvm: x86: Set highest physical address bits in non-present/reserved SPTEs")
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- arch/x86/kvm/svm.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+Thanks,
+Tom
 
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 122d4ce3b1ab..a769aab45841 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -7242,6 +7242,46 @@ static bool svm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
- 		   (svm->vmcb->control.intercept & (1ULL << INTERCEPT_INIT));
- }
- 
-+static u64 svm_get_reserved_mask(void)
-+{
-+	u64 mask, msr;
-+
-+	/* The default mask, used when memory encryption is not enabled */
-+	mask = 1ull << 51;
-+
-+	/* No support for memory encryption, use the default */
-+	if (cpuid_eax(0x80000000) < 0x8000001f)
-+		return mask;
-+
-+	/*
-+	 * Check for memory encryption support. If memory encryption support
-+	 * is enabled:
-+	 *   The physical addressing width is reduced. The first bit above the
-+	 *   new physical addressing limit will always be reserved.
-+	 */
-+	rdmsrl(MSR_K8_SYSCFG, msr);
-+	if (msr & MSR_K8_SYSCFG_MEM_ENCRYPT) {
-+		/*
-+		 * x86_phys_bits has been adjusted as part of the memory
-+		 * encryption support.
-+		 */
-+		mask = 1ull << boot_cpu_data.x86_phys_bits;
-+
-+		return mask;
-+	}
-+
-+	/*
-+	 * If memory encryption support is disabled:
-+	 *   The physical addressing width is not reduced, so the default mask
-+	 *   will always be reserved unless the physical addressing width is 52,
-+	 *   in which case there are no reserved bits, so return an empty mask.
-+	 */
-+	if (IS_ENABLED(CONFIG_X86_64) && boot_cpu_data.x86_phys_bits == 52)
-+		mask = 0;
-+
-+	return mask;
-+}
-+
- static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.cpu_has_kvm_support = has_svm,
- 	.disabled_by_bios = is_disabled,
-@@ -7379,6 +7419,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
- 
- 	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
-+
-+	.get_reserved_mask = svm_get_reserved_mask,
- };
- 
- static int __init svm_init(void)
--- 
-2.17.1
-
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index b79cd6aa4075..0c666c10f1a2 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1233,6 +1233,8 @@ struct kvm_x86_ops {
+>  
+>  	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
+>  	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
+> +
+> +	u64 (*get_reserved_mask)(void);
+>  };
+>  
+>  struct kvm_arch_async_pf {
+> @@ -1266,7 +1268,7 @@ static inline int kvm_arch_flush_remote_tlb(struct kvm *kvm)
+>  		return -ENOTSUPP;
+>  }
+>  
+> -int kvm_mmu_module_init(void);
+> +int kvm_mmu_module_init(struct kvm_x86_ops *ops);
+>  void kvm_mmu_module_exit(void);
+>  
+>  void kvm_mmu_destroy(struct kvm_vcpu *vcpu);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6f92b40d798c..d419df7a4056 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6227,30 +6227,44 @@ static void mmu_destroy_caches(void)
+>  	kmem_cache_destroy(mmu_page_header_cache);
+>  }
+>  
+> -static void kvm_set_mmio_spte_mask(void)
+> +static void kvm_set_mmio_spte_mask(struct kvm_x86_ops *ops)
+>  {
+>  	u64 mask;
+>  
+> -	/*
+> -	 * Set the reserved bits and the present bit of an paging-structure
+> -	 * entry to generate page fault with PFER.RSV = 1.
+> -	 */
+> +	if (ops->get_reserved_mask) {
+> +		mask = ops->get_reserved_mask();
+>  
+> -	/*
+> -	 * Mask the uppermost physical address bit, which would be reserved as
+> -	 * long as the supported physical address width is less than 52.
+> -	 */
+> -	mask = 1ull << 51;
+> +		/*
+> +		 * If there are reserved bits available, add the present bit
+> +		 * to the mask to generate a page fault with PFER.RSV = 1.
+> +		 * If there are no reserved bits available, mask the uppermost
+> +		 * physical address bit, but keep the present bit cleared.
+> +		 */
+> +		if (mask)
+> +			mask |= 1ull;
+> +		else
+> +			mask = 1ull << 51;
+> +	} else {
+> +		/*
+> +		 * Set the reserved bits and the present bit of a
+> +		 * paging-structure entry to generate page fault with
+> +		 * PFER.RSV = 1.
+> +		 */
+>  
+> -	/* Set the present bit. */
+> -	mask |= 1ull;
+> +		/*
+> +		 * Mask the uppermost physical address bit, which would be
+> +		 * reserved as long as the supported physical address width
+> +		 * is less than 52.
+> +		 */
+> +		mask = 1ull << 51;
+>  
+> -	/*
+> -	 * If reserved bit is not supported, clear the present bit to disable
+> -	 * mmio page fault.
+> -	 */
+> -	if (IS_ENABLED(CONFIG_X86_64) && shadow_phys_bits == 52)
+> -		mask &= ~1ull;
+> +		/*
+> +		 * If reserved bit is not supported, don't set the present bit
+> +		 * to disable mmio page fault.
+> +		 */
+> +		if (!IS_ENABLED(CONFIG_X86_64) || shadow_phys_bits != 52)
+> +			mask |= 1ull;
+> +	}
+>  
+>  	kvm_mmu_set_mmio_spte_mask(mask, mask, ACC_WRITE_MASK | ACC_USER_MASK);
+>  }
+> @@ -6301,7 +6315,7 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+>  	return 0;
+>  }
+>  
+> -int kvm_mmu_module_init(void)
+> +int kvm_mmu_module_init(struct kvm_x86_ops *ops)
+>  {
+>  	int ret = -ENOMEM;
+>  
+> @@ -6320,7 +6334,7 @@ int kvm_mmu_module_init(void)
+>  
+>  	kvm_mmu_reset_all_pte_masks();
+>  
+> -	kvm_set_mmio_spte_mask();
+> +	kvm_set_mmio_spte_mask(ops);
+>  
+>  	pte_list_desc_cache = kmem_cache_create("pte_list_desc",
+>  					    sizeof(struct pte_list_desc),
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3ed167e039e5..311da4ed423d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7234,7 +7234,7 @@ int kvm_arch_init(void *opaque)
+>  		goto out_free_x86_fpu_cache;
+>  	}
+>  
+> -	r = kvm_mmu_module_init();
+> +	r = kvm_mmu_module_init(ops);
+>  	if (r)
+>  		goto out_free_percpu;
+>  
+> 
