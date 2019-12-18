@@ -2,94 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B28CF124B00
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 16:13:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 726EE124BB8
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 16:30:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726858AbfLRPNm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 10:13:42 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:41413 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727086AbfLRPNl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 10:13:41 -0500
-Received: by mail-il1-f194.google.com with SMTP id f10so1968852ils.8
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 07:13:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=R9l9mbjTMtC+3agOxuj88vgGSGUSi1shzIvbtHPQHDA=;
-        b=U2ZGqcu98hFuCq5RpeTCWhmsrif7dqgrfPnkymEQCkzU4ETL8Y5C1ci9OhaNnT7/Lv
-         ZXPAwTmB1DX+fWtPumPtYEda0EJ7n5f9okoHJKrklSSbo1cHJcKALHRbbnbx7grIRZkj
-         WVDnXztzRx+rJiyJ/hhCwzpRe2nF4Ky5mFloZLMsYYAE4H9CLGHEJUUbDdhUzLKVDAWT
-         +ejs9EWkUD9wvbu5rSLeFEH1yiVO9YrAGvzjAyKibdck9mox4WHwAVleQV1ZuULaZ8tJ
-         2aRPEnOESIoe3NJuOEAu6bmjXxUmjAVD8zABLxRNn6bfzC+Y/vvInS2IrG2pznDudxYJ
-         BuiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=R9l9mbjTMtC+3agOxuj88vgGSGUSi1shzIvbtHPQHDA=;
-        b=f7b+i5/D4XdTbsZpHRRhqk+1YK4fh/wli04jOOjTtVgS+TxNmaCyePQ4QZQBM2uzvw
-         UGoWux55uopa7focGmm31wzmT81q6AncRXRuu0nCE/N8trxCB816y5P5CIhJN19ZMkyt
-         /VMCxldY2IrD7zHBsvBwrmIad5Jt+usoXKiAJV1K8CCsNH4EiIWaed1oOREmtwLY643z
-         LCWaSqHQHV3mHy9s413Pe1CDnuLoOcwv/4RtBt4H5d5KKKckZWn5y4nxIaQtLjopfJR9
-         b+iH9Iqp0Pfyw6Uy4RuzXLNAuOsh1ce8ThuRgFah70H/8ExqLBDhKsKKS/2edmW6A+6x
-         5J3Q==
-X-Gm-Message-State: APjAAAWFBKS+En5NDpMZ6iA9xccUUPBpsidb0MQGM4vKxJdVyo92nxFl
-        85cbLeutmEE7jQK147HGhz/tWv8HHmNsLv5tGA==
-X-Google-Smtp-Source: APXvYqx6/RmLANXX/vPlWW5dxMFTHVq88mzyzyK5ZNY221b6izSlFe7hmn3F6M39YmRG3JLpfhEG4NgH/+fGMkC8KOM=
-X-Received: by 2002:a92:5ec8:: with SMTP id f69mr2379997ilg.8.1576682021040;
- Wed, 18 Dec 2019 07:13:41 -0800 (PST)
+        id S1727255AbfLRPa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 10:30:27 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:35235 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727001AbfLRPa1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 10:30:27 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1ihbH2-0003tk-7u; Wed, 18 Dec 2019 16:30:04 +0100
+To:     James Morse <james.morse@arm.com>
+Subject: Re: [PATCH 7/7] KVM: arm/arm64: Elide CMOs when unmapping a range
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-Received: by 2002:a02:6603:0:0:0:0:0 with HTTP; Wed, 18 Dec 2019 07:13:39
- -0800 (PST)
-Reply-To: dhl.expresscourier102156@outlook.fr
-From:   "MS. MARYANNA B. THOMASON" <info.zennitbankplcnigerian@gmail.com>
-Date:   Wed, 18 Dec 2019 16:13:39 +0100
-Message-ID: <CABHzvrnRhvP4H85iG3J35teTysHMuqtgB+SQ0gKSGRfJe2UHDw@mail.gmail.com>
-Subject: =?UTF-8?Q?Urgent_delivery_Notification_of_your_ATM_MASTER_CARD?=
-        =?UTF-8?Q?_Amount=2C=2415=2E800=E2=80=99000=E2=80=9900=2C?=
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 18 Dec 2019 15:30:04 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Ra?= =?UTF-8?Q?dim_Kr=C4=8Dm=C3=A1=C5=99?= 
+        <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <linux-mips@vger.kernel.org>,
+        <kvm-ppc@vger.kernel.org>, <kvm@vger.kernel.org>
+In-Reply-To: <0c832b27-7041-a6c8-31c0-d71a25c6f5b8@arm.com>
+References: <20191213182503.14460-1-maz@kernel.org>
+ <20191213182503.14460-8-maz@kernel.org>
+ <0c832b27-7041-a6c8-31c0-d71a25c6f5b8@arm.com>
+Message-ID: <de462fe29fb40fb1644e6a071e6c0c69@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, jhogan@kernel.org, paulus@ozlabs.org, pbonzini@redhat.com, rkrcmar@redhat.com, sean.j.christopherson@intel.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Attn Dear.
+Hi James,
 
-Urgent delivery Notification of your ATM MASTER CARD, Dhl-Benin is
-ready for delivery of your ATM Master card worth $15.800=E2=80=99000=E2=80=
-=9900, as
-approved this morning, Date, 18/12/2019. Through the Intruction from
-INTERNATIONAL MONETARY FUNDS, I.M.F official Directors.
+On 2019-12-18 15:07, James Morse wrote:
+> Hi Marc,
+>
+> On 13/12/2019 18:25, Marc Zyngier wrote:
+>> If userspace issues a munmap() on a set of pages, there is no
+>> expectation that the pages are cleaned to the PoC.
+>
+> (Pedantry: Clean and invalidate. If the guest wrote through a device
+> mapping, we ditch any clean+stale lines with this path, meaning 
+> swapout
+> saves the correct values)
 
-REGISTRATION NO :EG58945
-PARCEL NUMBER: 140479
-Delivery Schuleded now,
-Finally all we required from you is your ATM Card Proccessing Delivery
-fees $19.00 only which you must send to this DHL service to enable us
-dispatch the parcel to your destination today.
+Indeed.
 
-Here is our receiving payment details.
-You are advised to send it Via Money Gram Service.
+>> So let's
+>> not do more work than strictly necessary, and set the magic
+>> flag that avoids CMOs in this case.
+>
+> I think this assumes the pages went from anonymous->free, so no-one
+> cares about the contents.
+>
+> If the pages are backed by a file, won't dirty pages will still get
+> written back before the page is free? (e.g. EFI flash 'file' mmap()ed 
+> in)
 
-Receiver's Name--------Alan Ude
-Country-------Benin Republic.
-City/ Address--------Cotonou
-Test Question--------In God
-Answer-------We Trust
-Amount------------$US19.00 only
-Mtcn-------------
-Sender's Name-------
+I believe so. Is that a problem?
 
-Your delivery  ATM card worth $15.800=E2=80=99000=E2=80=9900,
-Is Due for delivery to your address today upon confirmation of
-required fee from you asap.
+> What if this isn't the only mapping of the page? Can't it be swapped
+> out from another VMA? (tenuous example, poor man's memory mirroring?)
 
-Call us on this phone number for any inquiry. +229 62819378
-Awaiting your urgent response.
+Swap-out wouldn't trigger this code path, as it would use a different
+MMU notifier event (MMU_NOTIFY_CLEAR vs MMU_NOTIFY_UNMAP), I believe.
 
-MS. MARYANNA B. THOMASON, Shipment director, DHL Express
-Courier Company-Benin
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
