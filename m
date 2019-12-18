@@ -2,95 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 726EE124BB8
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 16:30:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F68E124C38
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 16:52:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727255AbfLRPa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 10:30:27 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:35235 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727001AbfLRPa1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 10:30:27 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1ihbH2-0003tk-7u; Wed, 18 Dec 2019 16:30:04 +0100
-To:     James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 7/7] KVM: arm/arm64: Elide CMOs when unmapping a range
-X-PHP-Originating-Script: 0:main.inc
+        id S1727150AbfLRPwO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 10:52:14 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:43428 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727031AbfLRPwO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 10:52:14 -0500
+Received: by mail-lj1-f195.google.com with SMTP id a13so2682162ljm.10
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 07:52:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=9SaCbmKz1ngtAKjewhoah2l6ODU7+VciCnZ7nlhe26A=;
+        b=KDdHHJJR0qVpHZqAH81m6HqiNucHS6+DyOVljs3zJhGM2FtVdbdAm0v2Xxx2kkMzcc
+         COndoaW+YFAjiesHFNY+QGvBhkVduyh7QLCQeLwcNzFcgoRSyGgSLcKxln6/f1EUD6yP
+         0y/6+ZumAIbzC9iZaVPFSydS1BkjYoeUFSafS/fB2OWFlpyQaG5ZPEXYvAMbIqCKuFSL
+         vWtk3rEHKc5uyahuOPC2nUQfw14PqKcbFsQXhuikgf46s/H3eDyiCMpavZwnwbAsy3mj
+         YXZ/SZZpNe1V4549MQIslp0gnIgv8CLO8jjGejFKXWpzPMIfXWxDiYo5N9hhWPoVV8yK
+         Z+eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=9SaCbmKz1ngtAKjewhoah2l6ODU7+VciCnZ7nlhe26A=;
+        b=F8oi0UYhA9VNRzcSDWYoDEqP95UK4GT4mW3njz1O8YauT4p/AMGG3dzdfoBiv7LgbM
+         1DCsZBCJv+8SBHEi51Kg7T1Qy5Yz8Pnyb0uidZF/5JD9Rc95dRNd6GzwtJmbWCQL5F8/
+         9pAANfLSunUn78WYbEXbWykEzqoFbbqPGYI3givmwwQ4tpgnDjNmAj89sL/m2Qa8VBrv
+         TEyfgOU6MrX+fx2qcFMBTHaabLgrO68mq4ecgSmvbC8lx7oJv5YnTI3HBOY2AsPSxmfu
+         gE6xHdxAFOJhuCmGm/GaDxLC/ZXXwl0b8Ju5eqba+Kzt6h8IZKrqj5IYvfK+8ESnj4g/
+         umBg==
+X-Gm-Message-State: APjAAAV6VwSrEFw5GYUjzud0hvLisuH2fMl8QDD8b8IFRtTZDX2DN6gT
+        Kgyr6rt0Koy/sy7TfxkSsn4Tfg==
+X-Google-Smtp-Source: APXvYqwSmzkDxFfUqfRx+ol+ctreHSER3AZEkxHGbqQ5sNtLr5I/0+mwtD90Owb4uveY0c44Ujy5Kw==
+X-Received: by 2002:a2e:3312:: with SMTP id d18mr2333248ljc.222.1576684332255;
+        Wed, 18 Dec 2019 07:52:12 -0800 (PST)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id s16sm1351312lfc.35.2019.12.18.07.52.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2019 07:52:11 -0800 (PST)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 66C2E1012CF; Wed, 18 Dec 2019 18:52:11 +0300 (+03)
+Date:   Wed, 18 Dec 2019 18:52:11 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+Subject: Re: [PATCH v11 01/25] mm/gup: factor out duplicate code from four
+ routines
+Message-ID: <20191218155211.emcegdp5uqgorfwe@box>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191216222537.491123-2-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 18 Dec 2019 15:30:04 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Ra?= =?UTF-8?Q?dim_Kr=C4=8Dm=C3=A1=C5=99?= 
-        <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <linux-mips@vger.kernel.org>,
-        <kvm-ppc@vger.kernel.org>, <kvm@vger.kernel.org>
-In-Reply-To: <0c832b27-7041-a6c8-31c0-d71a25c6f5b8@arm.com>
-References: <20191213182503.14460-1-maz@kernel.org>
- <20191213182503.14460-8-maz@kernel.org>
- <0c832b27-7041-a6c8-31c0-d71a25c6f5b8@arm.com>
-Message-ID: <de462fe29fb40fb1644e6a071e6c0c69@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, jhogan@kernel.org, paulus@ozlabs.org, pbonzini@redhat.com, rkrcmar@redhat.com, sean.j.christopherson@intel.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191216222537.491123-2-jhubbard@nvidia.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi James,
+On Mon, Dec 16, 2019 at 02:25:13PM -0800, John Hubbard wrote:
+> +static void put_compound_head(struct page *page, int refs)
+> +{
+> +	/* Do a get_page() first, in case refs == page->_refcount */
+> +	get_page(page);
+> +	page_ref_sub(page, refs);
+> +	put_page(page);
+> +}
 
-On 2019-12-18 15:07, James Morse wrote:
-> Hi Marc,
->
-> On 13/12/2019 18:25, Marc Zyngier wrote:
->> If userspace issues a munmap() on a set of pages, there is no
->> expectation that the pages are cleaned to the PoC.
->
-> (Pedantry: Clean and invalidate. If the guest wrote through a device
-> mapping, we ditch any clean+stale lines with this path, meaning 
-> swapout
-> saves the correct values)
+It's not terribly efficient. Maybe something like:
 
-Indeed.
+	VM_BUG_ON_PAGE(page_ref_count(page) < ref, page);
+	if (refs > 2)
+		page_ref_sub(page, refs - 1);
+	put_page(page);
 
->> So let's
->> not do more work than strictly necessary, and set the magic
->> flag that avoids CMOs in this case.
->
-> I think this assumes the pages went from anonymous->free, so no-one
-> cares about the contents.
->
-> If the pages are backed by a file, won't dirty pages will still get
-> written back before the page is free? (e.g. EFI flash 'file' mmap()ed 
-> in)
+?
 
-I believe so. Is that a problem?
-
-> What if this isn't the only mapping of the page? Can't it be swapped
-> out from another VMA? (tenuous example, poor man's memory mirroring?)
-
-Swap-out wouldn't trigger this code path, as it would use a different
-MMU notifier event (MMU_NOTIFY_CLEAR vs MMU_NOTIFY_UNMAP), I believe.
-
-Thanks,
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+ Kirill A. Shutemov
