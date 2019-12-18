@@ -2,89 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CC4B124061
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 08:31:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05D1F12406E
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 08:37:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726777AbfLRHbo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 02:31:44 -0500
-Received: from outbound-smtp37.blacknight.com ([46.22.139.220]:54094 "EHLO
-        outbound-smtp37.blacknight.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726633AbfLRHbn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 02:31:43 -0500
-Received: from mail.blacknight.com (unknown [81.17.255.152])
-        by outbound-smtp37.blacknight.com (Postfix) with ESMTPS id 6EDEADB3
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 07:31:42 +0000 (GMT)
-Received: (qmail 21674 invoked from network); 18 Dec 2019 07:31:42 -0000
-Received: from unknown (HELO techsingularity.net) (mgorman@techsingularity.net@[84.203.18.57])
-  by 81.17.254.9 with ESMTPSA (AES256-SHA encrypted, authenticated); 18 Dec 2019 07:31:42 -0000
-Date:   Wed, 18 Dec 2019 07:31:39 +0000
-From:   Mel Gorman <mgorman@techsingularity.net>
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, vbabka@suse.cz, yang.zhang.wz@gmail.com,
-        konrad.wilk@oracle.com, david@redhat.com, pagupta@redhat.com,
-        riel@surriel.com, lcapitulino@redhat.com, dave.hansen@intel.com,
-        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, osalvador@suse.de
-Subject: Re: [PATCH v15 4/7] mm: Introduce Reported pages
-Message-ID: <20191218073139.GE3178@techsingularity.net>
-References: <20191205161928.19548.41654.stgit@localhost.localdomain>
- <20191205162238.19548.68238.stgit@localhost.localdomain>
- <0bb29ec2-9dcb-653c-dda5-0825aea7d4b0@redhat.com>
- <537e970f062e0c7f89723f63fc1f3ec6e53614a5.camel@linux.intel.com>
- <06ca452e-90b3-c1b5-f2c0-e8da2444bcfe@redhat.com>
- <03e1e95c2cc8d6e3206212df48a971e9696d3b20.camel@linux.intel.com>
+        id S1726545AbfLRHg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 02:36:58 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:46803 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725799AbfLRHg6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 02:36:58 -0500
+Received: by mail-pf1-f194.google.com with SMTP id y14so719504pfm.13;
+        Tue, 17 Dec 2019 23:36:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=pg4QWq+v6GL4Rqi0KrNkbBy7ChOwtldNf1BCqo0xgwg=;
+        b=DKDNn88wkruXoKMY1NzZ+hXIuRTXdUdicFpgelALcHp9N4xyLCsxLi5GwVSTFTLFPB
+         NuNjJZNsFTtBWqAQybCg4hv2eZJQJiLs+Cn4EsUzKfXBsMTbWLkxKopWRDO+7AYORErt
+         na5p8Q0Y3ZEbZPYoHMFBGk/lNnBJoADJdIj+ootuVfG0vnS8BhysFdAV/xR2rZ4rJV8f
+         ND46h0fXkMgjBGmS1t5Uc9YeVJdu3koRvqxoxTO/NsC/k6uQxmki3l0lR6S1HX9b8b0h
+         ofkdTxibe6A7We+wtvJNjjVyfeyVIceOjFHj29uVo6fWWi5hi9WgGbB2AE3kvPje6ZNx
+         ZfUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=pg4QWq+v6GL4Rqi0KrNkbBy7ChOwtldNf1BCqo0xgwg=;
+        b=X1hNL8Paq0bO7Vzb1aled7yUT8pbjl9iQ9EvVsBJO7x946+Q2krN6m3YoApF6aY2Td
+         TuPUU6TK56FswjlVwUJKmTNNTDpwsrfi4sJz6pQwPTw2cEQig5e9DFQUZebjmr86dVJ1
+         TQZz9qtqnl3VtuddftoPo776HHc4NJs3Vgp0ii186gx09wdx5XVwCcGNtDqL4P8wTx+f
+         YjAmomH0llsB9RtnLSPlhOIUIyjAl9uvZvwkMAKZHyR8ZnSMtzzt2AaN5lWudGVOBfRj
+         q5pJj2trekDNAvUWc2s6E/DSLdjFkIqJ5A7mFHZdqBUXEiqA63ielbtNDOq/sm3qsOyw
+         9H+A==
+X-Gm-Message-State: APjAAAXY9V8cPTlGzIHWwIQDlR6HuE6OQbkJJNS0hLSicd8hieY0x/+t
+        RiXC+8Sh5nWbojTpUXiZiQ==
+X-Google-Smtp-Source: APXvYqykzcjQaYHwHiQ0EjzUn6HtCHp8hGSiRRNg6WpcmmBHBfrcz8LxD6SEJ0MBpJ8PhtL88V8d/w==
+X-Received: by 2002:a62:1857:: with SMTP id 84mr1485263pfy.257.1576654617070;
+        Tue, 17 Dec 2019 23:36:57 -0800 (PST)
+Received: from [127.0.0.1] ([203.205.141.36])
+        by smtp.gmail.com with ESMTPSA id j3sm1697366pfi.8.2019.12.17.23.36.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2019 23:36:56 -0800 (PST)
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, hpa@zytor.com
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Subject: [PATCH] KVM: VMX: Clean up the spaces redundant.
+Message-ID: <5c33f601-0bee-7958-7295-541b87b95138@gmail.com>
+Date:   Wed, 18 Dec 2019 15:36:35 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-In-Reply-To: <03e1e95c2cc8d6e3206212df48a971e9696d3b20.camel@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 08:31:59AM -0800, Alexander Duyck wrote:
-> > > > I think you recently switched to using an atomic variable for maintaining page
-> > > > reporting status as I was doing in v12.
-> > > > Which is good, as we will not have a disagreement on it now.
-> > >
-> > > There is still some differences between our approaches if I am not
-> > > mistaken. Specifically I have code in place so that any requests to report
-> > > while we are actively working on reporting will trigger another pass being
-> > > scheduled after we completed. I still believe you were lacking any logic
-> > > like that as I recall.
-> > > 
-> > 
-> > Yes, I was specifically referring to the atomic state variable.
-> > Though I am wondering if having an atomic variable to track page reporting state
-> > is better than having a page reporting specific unsigned long flag, which we can
-> > manipulate via __set_bit() and __clear_bit().
-> 
-> So the reason for using an atomic state variable is because I only really
-> have 3 possible states; idle, active, and requested. It allows for a
-> pretty simple state machine as any transition from idle indicates that we
-> need to schedule the worker, transition from requested to active when the
-> worker starts, and if at the end of a pass if we are still in the active
-> state it means we can transition back to idle, otherwise we reschedule the
-> worker.
-> 
-> In order to do the same sort of thing using the bitops would require at
-> least 2 bits. In addition with the requirement that I cannot use the zone
-> lock for protection of the state I cannot use the non-atomic versions of
-> things such as __set_bit and __clear_bit so they would require additional
-> locking protections.
-> 
+ From 6b2634f16cfd5d48896a7c0a094b59410ce078c5 Mon Sep 17 00:00:00 2001
+From: Haiwei Li <lihaiwei@tencent.com>
+Date: Wed, 18 Dec 2019 15:21:10 +0800
+Subject: [PATCH] Clean up the spaces redundant.
 
-I completely agree with this. I had pointed out in an earlier review
-that expanding the scope of the zone lock was inappropriate, the
-non-atomic operations on separate flags potentially misses updates and
-in general, I prefer the atomic variable approach a lot more than the
-previous zone->flag based approach.
+Clean up the spaces redundant in vmx.c.
 
--- 
-Mel Gorman
-SUSE Labs
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+  arch/x86/kvm/vmx/vmx.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 51e3b27..94a7456 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -173,7 +173,7 @@
+  module_param(ple_window_shrink, uint, 0444);
+
+  /* Default is to compute the maximum so we can never overflow. */
+-static unsigned int ple_window_max        = KVM_VMX_DEFAULT_PLE_WINDOW_MAX;
++static unsigned int ple_window_max = KVM_VMX_DEFAULT_PLE_WINDOW_MAX;
+  module_param(ple_window_max, uint, 0444);
+
+  /* Default is SYSTEM mode, 1 for host-guest mode */
+--
+1.8.3.1
