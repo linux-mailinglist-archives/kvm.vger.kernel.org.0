@@ -2,157 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F38AB12555B
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 22:56:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18A901255F1
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 22:59:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727402AbfLRV4L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 16:56:11 -0500
-Received: from mga04.intel.com ([192.55.52.120]:16973 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727346AbfLRV4F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 16:56:05 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 13:55:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; 
-   d="scan'208";a="222108201"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 13:55:52 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1727150AbfLRV7G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 16:59:06 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56992 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727403AbfLRV7F (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 16:59:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576706343;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xyRq0uSWZtoF1xSeEB8lICjPIcYYqv0mpEMiHQwYmsc=;
+        b=ZobevB9evxz2RgIMe+dHIFnQWUUaXf9xhegU6owLqq3OdoVW8c4u7i36HIckZwYMGu3kj3
+        aYE4x8QrTir48rqJIPhFhEIbwnKvAqnycAtvqnDMi2teXwYvw5P2Rkn30ZcD3/gxjCHhZf
+        +eNCpTUn5fQD/QdVRSHHGa8LUob4kq0=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-UhcNa1DlPkO9kp4QV6xL2Q-1; Wed, 18 Dec 2019 16:59:00 -0500
+X-MC-Unique: UhcNa1DlPkO9kp4QV6xL2Q-1
+Received: by mail-qv1-f71.google.com with SMTP id z12so2322213qvk.14
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 13:59:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=xyRq0uSWZtoF1xSeEB8lICjPIcYYqv0mpEMiHQwYmsc=;
+        b=hKsqFf4rhs9YV+WFxS/EzKqvbel3Z/I8IVVmiL893bSXsKSC+6KNeaOMGBk7J1oEUr
+         VG4UyzaiR0fTbxoas2XCT2iZpOTIjycz+L2WVqvGzAgzxJq7nZbgiTO/LONSS559S5eu
+         v5htAicpbQ2RwRMd8+qA4F/ZcGcDK4DHCShzaKd6glccWW4eu320niqkhhGGIdpkXFXm
+         m47l+jIWF3GhNbo3vFfvsWW8F6yUZEOFcCyTJfaAR3IjRUPp//plakjBvNqOS4heH8+y
+         TaELYUncQYAT2+XPFKaQZLYcXi4Ixc0KMinBRK51GuU0GKZh2lJ6jiYLDLZFHUlC40Oj
+         2iZw==
+X-Gm-Message-State: APjAAAUffGdE/Q3xYkg66bhQd/w+gHRxDHzVIY2mqyqGLnl4Cxh10C+/
+        fJpYQvsQSU39mKt7GuoQhA3zHdRFBy69tSCBmnVOU0zyFY826cwR2REHEHoHu1aMgfNEZYB6iDD
+        6rI0zKVFoFOua
+X-Received: by 2002:a37:4905:: with SMTP id w5mr4969506qka.267.1576706340079;
+        Wed, 18 Dec 2019 13:59:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzVX8iG95niunFTpS5tBBbhXdu5Y9XJU2Owx29mSQ+hRkMsBGZvfhvamN55CSq/5e+E+hVhyg==
+X-Received: by 2002:a37:4905:: with SMTP id w5mr4969484qka.267.1576706339769;
+        Wed, 18 Dec 2019 13:58:59 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id e2sm1066715qkb.112.2019.12.18.13.58.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2019 13:58:58 -0800 (PST)
+Date:   Wed, 18 Dec 2019 16:58:57 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Greg Kurz <groug@kaod.org>
-Subject: [PATCH v2 45/45] KVM: Move vcpu->run page allocation out of kvm_vcpu_init()
-Date:   Wed, 18 Dec 2019 13:55:30 -0800
-Message-Id: <20191218215530.2280-46-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20191218215530.2280-1-sean.j.christopherson@intel.com>
-References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+Message-ID: <20191218215857.GE26669@xz-x1>
+References: <20191209215400.GA3352@xz-x1>
+ <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
+ <20191210155259.GD3352@xz-x1>
+ <3e6cb5ec-66c0-00ab-b75e-ad2beb1d216d@redhat.com>
+ <20191215172124.GA83861@xz-x1>
+ <f117d46a-7528-ce32-8e46-4f3f35937079@redhat.com>
+ <20191216185454.GG83861@xz-x1>
+ <815923d9-2d48-2915-4acb-97eb90996403@redhat.com>
+ <20191217162405.GD7258@xz-x1>
+ <c01d0732-2172-2573-8251-842e94da4cfc@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c01d0732-2172-2573-8251-842e94da4cfc@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Open code the allocation and freeing of the vcpu->run page in
-kvm_vm_ioctl_create_vcpu() and kvm_vcpu_destroy() respectively.  Doing
-so allows kvm_vcpu_init() to be a pure init function and eliminates
-kvm_vcpu_uninit() entirely.
+On Tue, Dec 17, 2019 at 05:28:54PM +0100, Paolo Bonzini wrote:
+> On 17/12/19 17:24, Peter Xu wrote:
+> >> No, please pass it all the way down to the [&] functions but not to
+> >> kvm_write_guest_page.  Those should keep using vcpu->kvm.
+> > Actually I even wanted to refactor these helpers.  I mean, we have two
+> > sets of helpers now, kvm_[vcpu]_{read|write}*(), so one set is per-vm,
+> > the other set is per-vcpu.  IIUC the only difference of these two are
+> > whether we should consider ((vcpu)->arch.hflags & HF_SMM_MASK) or we
+> > just write to address space zero always.
+> 
+> Right.
+> 
+> > Could we unify them into a
+> > single set of helper (I'll just drop the *_vcpu_* helpers because it's
+> > longer when write) but we always pass in vcpu* as the first parameter?
+> > Then we add another parameter "vcpu_smm" to show whether we want to
+> > consider the HF_SMM_MASK flag.
+> 
+> You'd have to check through all KVM implementations whether you always
+> have the vCPU.  Also non-x86 doesn't have address spaces, and by the
+> time you add ", true" or ", false" it's longer than the "_vcpu_" you
+> have removed.  So, not a good idea in my opinion. :D
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- virt/kvm/kvm_main.c | 34 +++++++++++++---------------------
- 1 file changed, 13 insertions(+), 21 deletions(-)
+Well, now I've changed my mind. :) (considering that we still have
+many places that will not have vcpu*...)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 6912d81ca32d..220dce38cf79 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -321,10 +321,8 @@ void kvm_reload_remote_mmus(struct kvm *kvm)
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
- }
- 
--static int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
-+static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- {
--	struct page *page;
--
- 	mutex_init(&vcpu->mutex);
- 	vcpu->cpu = -1;
- 	vcpu->kvm = kvm;
-@@ -336,23 +334,11 @@ static int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 	vcpu->pre_pcpu = -1;
- 	INIT_LIST_HEAD(&vcpu->blocked_vcpu_list);
- 
--	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
--	if (!page)
--		return -ENOMEM;
--	vcpu->run = page_address(page);
--
- 	kvm_vcpu_set_in_spin_loop(vcpu, false);
- 	kvm_vcpu_set_dy_eligible(vcpu, false);
- 	vcpu->preempted = false;
- 	vcpu->ready = false;
- 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
--
--	return 0;
--}
--
--static void kvm_vcpu_uninit(struct kvm_vcpu *vcpu)
--{
--	free_page((unsigned long)vcpu->run);
- }
- 
- void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
-@@ -366,7 +352,7 @@ void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	 */
- 	put_pid(rcu_dereference_protected(vcpu->pid, 1));
- 
--	kvm_vcpu_uninit(vcpu);
-+	free_page((unsigned long)vcpu->run);
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_destroy);
-@@ -2711,6 +2697,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- {
- 	int r;
- 	struct kvm_vcpu *vcpu;
-+	struct page *page;
- 
- 	if (id >= KVM_MAX_VCPU_ID)
- 		return -EINVAL;
-@@ -2734,13 +2721,18 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 		goto vcpu_decrement;
- 	}
- 
--	r = kvm_vcpu_init(vcpu, kvm, id);
--	if (r)
-+	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
-+	if (!page) {
-+		r = -ENOMEM;
- 		goto vcpu_free;
-+	}
-+	vcpu->run = page_address(page);
-+
-+	kvm_vcpu_init(vcpu, kvm, id);
- 
- 	r = kvm_arch_vcpu_create(vcpu);
- 	if (r)
--		goto vcpu_uninit;
-+		goto vcpu_free_run_page;
- 
- 	kvm_create_vcpu_debugfs(vcpu);
- 
-@@ -2778,8 +2770,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 	mutex_unlock(&kvm->lock);
- 	debugfs_remove_recursive(vcpu->debugfs_dentry);
- 	kvm_arch_vcpu_destroy(vcpu);
--vcpu_uninit:
--	kvm_vcpu_uninit(vcpu);
-+vcpu_free_run_page:
-+	free_page((unsigned long)vcpu->run);
- vcpu_free:
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
- vcpu_decrement:
+I can simply add that "vcpu_smm" parameter to kvm_vcpu_write_*()
+without removing the kvm_write_*() helpers.  Then I'll be able to
+convert most of the kvm_write_*() (or its family) callers to
+kvm_vcpu_write*(..., vcpu_smm=false) calls where proper.
+
+Would that be good?
+
 -- 
-2.24.1
+Peter Xu
 
