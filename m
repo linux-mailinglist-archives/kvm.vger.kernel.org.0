@@ -2,101 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A5E2B126D4D
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 20:10:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1497D126DF6
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 20:28:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727262AbfLSTKF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Dec 2019 14:10:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54889 "EHLO
+        id S1727217AbfLST2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Dec 2019 14:28:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48434 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727179AbfLSTKD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Dec 2019 14:10:03 -0500
+        with ESMTP id S1727177AbfLST2w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Dec 2019 14:28:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576782602;
+        s=mimecast20190719; t=1576783731;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TsFvSsTqVBZ+tF91hnxKk0O+iZiuPyz2pCFwyuo+kkY=;
-        b=YFZAvi8IgjpnhNafd99YSnm1tGzhhYLt9t8+Ev0A4N+yAwj4bA3K622oIREH5cz+4a7s/L
-        Awh0LyO5W/gIVA+KWuUfMI91yrcnhnp5IXI4l5lM+OXhyZPqWmr0h9iksdWqXNzzOQ8yTb
-        GSdfpLQxMS7f9PMQDv1uc4xhjoOp1u0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-xKX_cPXqPaiy5xGEr3GwDQ-1; Thu, 19 Dec 2019 14:10:00 -0500
-X-MC-Unique: xKX_cPXqPaiy5xGEr3GwDQ-1
-Received: by mail-wr1-f69.google.com with SMTP id f15so2759001wrr.2
-        for <kvm@vger.kernel.org>; Thu, 19 Dec 2019 11:10:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=TsFvSsTqVBZ+tF91hnxKk0O+iZiuPyz2pCFwyuo+kkY=;
-        b=Tz6M5OIgjfnLgRr9u/vI2EXNnr+yAvb5kL/nH0FIE2yPYz36DjFjdjFkJYX5tHrEZq
-         f9vHw06jbnotKB0USJgDn7+qs2ucY8l30oTQ66i6CdYC8dufAYOK8bW5iKsg7caTT28F
-         eMApf3o2pePG+ipWyZ19eJ8cqNsa64E928gyAIUoPXbpmqJDPpCLKnIUvARsR4riOUiF
-         iF2SXIqI85aQdidYpKJtV7J+kthXFrj9dzIF2ARxaLijf3Onle2c/4cWoaUp9eenh9Wz
-         OZSJPfjkLVBWJc0Om0/eWikJ2AawMWepD194hQSo/gOmHXwzbK2Iei09AyJir5oAUbiP
-         o/mQ==
-X-Gm-Message-State: APjAAAWNElM/lIvjbpZ1IeU3NIzv8wkvZ5y95Gn0pZZBXx2pZs0z1Jtq
-        31OiKBVFcka7+f2eT4tIN+2Eh0uDfahwozpvgTVaEzgvhJtGUlWd54srLavxPGUavtY20nlH9RC
-        GHwVuaiY/mWeN
-X-Received: by 2002:a1c:4d03:: with SMTP id o3mr11976163wmh.164.1576782599916;
-        Thu, 19 Dec 2019 11:09:59 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyCPSAQBtZpVyCHuMDoSVEQwEOPH4leBjaVKeWb7GppTaUWkTOvT9jwqDl7h6ChPbVt3S9Xrw==
-X-Received: by 2002:a1c:4d03:: with SMTP id o3mr11976139wmh.164.1576782599685;
-        Thu, 19 Dec 2019 11:09:59 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f65sm7124998wmf.2.2019.12.19.11.09.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2019 11:09:58 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     John Allen <john.allen@amd.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        rkrcmar@redhat.com, John Allen <john.allen@amd.com>
-Subject: Re: [PATCH] kvm/svm: PKU not currently supported
-In-Reply-To: <20191219152332.28857-1-john.allen@amd.com>
-References: <20191219152332.28857-1-john.allen@amd.com>
-Date:   Thu, 19 Dec 2019 20:09:57 +0100
-Message-ID: <87immc873u.fsf@vitty.brq.redhat.com>
+        bh=vAIxDhFZG4KNnWbcoM1z/eNh1hoZhidyKE5sG/UkD5w=;
+        b=PFHb9ppAZSdrztzN13AkJXfJwoQ4HSUioSSeXLQYd1I6WwVi74SRjdBcWFfaprsyLpqZrx
+        7fHiuZ1lBmwi7PBidNlFEv6Bg2/gXdNBvK2u2D5YtknNCz41xYPos9aReo8fAXZ7lU1BHL
+        nSiqfJu8QSBS3SnXFsyFIlfUDzdDets=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-7KuzwdpAO0uhdJbA8J3gpA-1; Thu, 19 Dec 2019 14:28:48 -0500
+X-MC-Unique: 7KuzwdpAO0uhdJbA8J3gpA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B2CA18FF698;
+        Thu, 19 Dec 2019 19:28:45 +0000 (UTC)
+Received: from gondolin (ovpn-117-134.ams2.redhat.com [10.36.117.134])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 01C375DA70;
+        Thu, 19 Dec 2019 19:28:37 +0000 (UTC)
+Date:   Thu, 19 Dec 2019 20:28:35 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 24/45] KVM: Add kvm_arch_vcpu_precreate() to handle
+ pre-allocation issues
+Message-ID: <20191219202835.06fc6f2f.cohuck@redhat.com>
+In-Reply-To: <20191218215530.2280-25-sean.j.christopherson@intel.com>
+References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
+        <20191218215530.2280-25-sean.j.christopherson@intel.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-John Allen <john.allen@amd.com> writes:
+On Wed, 18 Dec 2019 13:55:09 -0800
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-> Current SVM implementation does not have support for handling PKU. Guests
-> running on a host with future AMD cpus that support the feature will read
-> garbage from the PKRU register and will hit segmentation faults on boot as
-> memory is getting marked as protected that should not be. Ensure that cpuid
-> from SVM does not advertise the feature.
->
-> Signed-off-by: John Allen <john.allen@amd.com>
+> Add a pre-allocation arch hook to handle checks that are currently done
+> by arch specific code prior to allocating the vCPU object.  This paves
+> the way for moving the allocation to common KVM code.
+> 
+> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->  arch/x86/kvm/svm.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 122d4ce3b1ab..f911aa1b41c8 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -5933,6 +5933,8 @@ static void svm_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2 *entry)
->  		if (avic)
->  			entry->ecx &= ~bit(X86_FEATURE_X2APIC);
->  		break;
-> +	case 0x7:
-> +		entry->ecx &= ~bit(X86_FEATURE_PKU);
+>  arch/mips/kvm/mips.c       |  5 +++++
+>  arch/powerpc/kvm/powerpc.c |  5 +++++
+>  arch/s390/kvm/kvm-s390.c   | 12 ++++++++----
+>  arch/x86/kvm/x86.c         | 14 +++++++++-----
+>  include/linux/kvm_host.h   |  1 +
+>  virt/kvm/arm/arm.c         | 21 +++++++++++----------
+>  virt/kvm/kvm_main.c        |  4 ++++
+>  7 files changed, 43 insertions(+), 19 deletions(-)
+> 
 
-Would it make more sense to introduce kvm_x86_ops->pku_supported() (and
-return false for SVM and boot_cpu_has(X86_FEATURE_PKU) for vmx) so we
-don't set the bit in the first place?
+(...)
 
->  	case 0x80000001:
->  		if (nested)
->  			entry->ecx |= (1 << 2); /* Set SVM bit */
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index d9e6bf3d54f0..57c6838dff37 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3035,15 +3035,19 @@ int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
+>  	return rc;
+>  }
+>  
+> +int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+> +{
+> +	if (!kvm_is_ucontrol(kvm) && !sca_can_add_vcpu(kvm, id))
+> +		return -EINVAL;
+> +	return 0;
+> +}
+> +
+>  struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+>  				      unsigned int id)
+>  {
+>  	struct kvm_vcpu *vcpu;
+>  	struct sie_page *sie_page;
+> -	int rc = -EINVAL;
+> -
+> -	if (!kvm_is_ucontrol(kvm) && !sca_can_add_vcpu(kvm, id))
+> -		goto out;
+> +	int rc;
 
--- 
-Vitaly
+You might want to make this
+
+int rc = -ENOMEM;
+
+instead.
+
+>  
+>  	rc = -ENOMEM;
+>  
+
+(...)
+
+Regardless,
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
