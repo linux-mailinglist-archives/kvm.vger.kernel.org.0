@@ -2,149 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E63CC125C11
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 08:36:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 72ECD125CFF
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 09:52:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726623AbfLSHg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Dec 2019 02:36:29 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:4230 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726340AbfLSHg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Dec 2019 02:36:29 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dfb28710000>; Wed, 18 Dec 2019 23:36:17 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Wed, 18 Dec 2019 23:36:27 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Wed, 18 Dec 2019 23:36:27 -0800
-Received: from [10.2.165.11] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Dec
- 2019 07:36:25 +0000
-Subject: Re: [PATCH v11 04/25] mm: devmap: refactor 1-based refcounting for
- ZONE_DEVICE pages
-To:     Dan Williams <dan.j.williams@intel.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191216222537.491123-5-jhubbard@nvidia.com>
- <CAPcyv4hQBMxYMurxG=Vwh0=FKWoT3z-Kf=dqES1-icRV5bLwKg@mail.gmail.com>
- <d0a99e75-0175-0f31-f176-8c37c18a4108@nvidia.com>
- <CAPcyv4j+Zgom17UZ-6Njkij1R0UQ=vUQdnaEZj9qDezEUJSZGg@mail.gmail.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <a9782048-0c6a-b906-2bd6-3800269f4b01@nvidia.com>
-Date:   Wed, 18 Dec 2019 23:33:36 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
-MIME-Version: 1.0
-In-Reply-To: <CAPcyv4j+Zgom17UZ-6Njkij1R0UQ=vUQdnaEZj9qDezEUJSZGg@mail.gmail.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576740978; bh=AwGIHszd33R/kLZlUt1Z4JwwlD2NSoQAiltNw2UIah0=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=rn2yGjgwQ9+/2v2mcxWjrZFxdrk3/eEgjxRU1LJiuOVyjVOa62J0tvoTcmLOK6fXS
-         xTiiEKdaSrRaYvKoHJFISdC+5xDr9wuGKGy6eL+p8mnXTv3WmxTBQ5uSD1vNUHW7Zv
-         FL1u5zml1dT0aGOGbVIB8FGZRe/vZmwx0E0SfZqPp5XPLjqF6k+D7FwuHs+yKnEljh
-         6K2DgflrDdhvNm7j657NcorkWkt+15POYkE/QPPC6A7qk9vcVVLh/jftFFqBiaLSef
-         +CbFHF0Oi6KJR9YDOdsjceXX460BQcgisIE59hm4mMu6iV3pT5dz1gvUWjcugiRrZC
-         tT/WLbmWB9r/w==
+        id S1726742AbfLSIwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Dec 2019 03:52:38 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:55750 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726591AbfLSIwh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Dec 2019 03:52:37 -0500
+Received: by mail-wm1-f65.google.com with SMTP id q9so4565978wmj.5
+        for <kvm@vger.kernel.org>; Thu, 19 Dec 2019 00:52:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=fE0beaW51bVROqMNkTXFKxWcz+Tb87M69L5AJyAkTjc=;
+        b=RENnMshqJ/F1XA23nUq7xrUf2jjBSgsdXM6OvJbL+kOqqMTdg3+PpiFAsPBxkQlAM1
+         vJgKPMWSq4URZ43jXPlTYBgaoAvIDsYYX0SCwD9tN81ybirXqcOxCs5xzvlJaCMXiWPy
+         HBIBFu3Yoxh6w5FbGHtwiUF2g+dY5y4CqZzdmzvlN1tFzfylYMNb+ueRSIjwV9jvpz46
+         147CAKntzf/+vABgnB5dLCfzkz0HgyM3ucbcCi7ag0bNWsfktxY/QmM6VZELI8GolqtD
+         aKqCrDQuRC2NtjbLOi3vtXRBAWqqBjX6sEAOG3o4vb2g2qspmS5upQG82sXhzYkgmiKz
+         tcKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=fE0beaW51bVROqMNkTXFKxWcz+Tb87M69L5AJyAkTjc=;
+        b=MhPt0wlkyhteMZ/KBeIuao/sfomqy5wwRQrDbrZoK/HjEBqBxIj5UDo4Kff/RD3+Du
+         eOekgXnaWz/LthMGR7F3eVkt8a8A3F51DYLnBICpKkztvRjHe2mw33vk+Vf1wxHQTy7n
+         gduclW/fDoe3GyLnk8XT+Yq2uIwWgHlokMk4hNMV6OEJSgrkQ3dPCoIGdk+i5HYYuSnD
+         PgszRrPUE0N7zF+FP+mwwT/hyjodgxk1J4X49+JbL7TiHNeVyvlV12X9SLE6EV2W7JS0
+         WdamsOzi9ucmx94H5y+8pxh03Kcvi0pgpLRRRiUAI7oWUG5JB8qZu07h4qB2emOXdTFN
+         jOLw==
+X-Gm-Message-State: APjAAAX5pswpbrj4awJD50xpY5p2BTGbjDrl0qeya3pfncBOH0NI7eGK
+        WteeDnTRFUAI11xo/Da+/OA=
+X-Google-Smtp-Source: APXvYqwBPKC4vZaQv4h1Ic/C76bPDMeY1bUz3J5Viu2MNrOuWOtjTuK34arVD9rfxroIxQzSM1c0Fw==
+X-Received: by 2002:a05:600c:220e:: with SMTP id z14mr8662698wml.114.1576745555584;
+        Thu, 19 Dec 2019 00:52:35 -0800 (PST)
+Received: from ?IPv6:2a00:a040:196:18a:c097:da9:b879:56d6? ([2a00:a040:196:18a:c097:da9:b879:56d6])
+        by smtp.gmail.com with ESMTPSA id d12sm5647498wrp.62.2019.12.19.00.52.34
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 19 Dec 2019 00:52:34 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [kvm-unit-tests PATCH] x86: Fix max VMCS field encoding index
+ check
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20191218002410.GN11771@linux.intel.com>
+Date:   Thu, 19 Dec 2019 10:52:33 +0200
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <0F6C621D-5953-4818-A278-BBFEC21E80DF@gmail.com>
+References: <20190518163743.5396-1-nadav.amit@gmail.com>
+ <CALMp9eQOKX6m0ih6bH5Oyqq5hFbSs7vn0MAZXka3RcOCrC+sUg@mail.gmail.com>
+ <51BBC492-AD4F-4AA4-B9AD-8E0AAFFC276F@gmail.com>
+ <CALMp9eT+K7qwLeBb231OjNwqTaS4XE6Ci+-j_b+a=0JU__HEqg@mail.gmail.com>
+ <20191218002410.GN11771@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/18/19 10:52 PM, Dan Williams wrote:
-> On Wed, Dec 18, 2019 at 9:51 PM John Hubbard <jhubbard@nvidia.com> wrote:
->>
->> On 12/18/19 9:27 PM, Dan Williams wrote:
->> ...
->>>> @@ -461,5 +449,5 @@ void __put_devmap_managed_page(struct page *page)
->>>>           page->mapping = NULL;
->>>>           page->pgmap->ops->page_free(page);
->>>>    }
->>>> -EXPORT_SYMBOL(__put_devmap_managed_page);
->>>> +EXPORT_SYMBOL(free_devmap_managed_page);
->>>
->>> This patch does not have a module consumer for
->>> free_devmap_managed_page(), so the export should move to the patch
->>> that needs the new export.
->>
->> Hi Dan,
->>
->> OK, I know that's a policy--although it seems quite pointless here given
->> that this is definitely going to need an EXPORT.
->>
->> At the moment, the series doesn't use it in any module at all, so I'll just
->> delete the EXPORT for now.
->>
->>>
->>> Also the only reason that put_devmap_managed_page() is EXPORT_SYMBOL
->>> instead of EXPORT_SYMBOL_GPL is that there was no practical way to
->>> hide the devmap details from evey module in the kernel that did
->>> put_page(). I would expect free_devmap_managed_page() to
->>> EXPORT_SYMBOL_GPL if it is not inlined into an existing exported
->>> static inline api.
->>>
->>
->> Sure, I'll change it to EXPORT_SYMBOL_GPL when the time comes. We do have
->> to be careful that we don't shut out normal put_page() types of callers,
->> but...glancing through the current callers, that doesn't look to be a problem.
->> Good. So it should be OK to do EXPORT_SYMBOL_GPL here.
->>
->> Are you *sure* you don't want to just pre-emptively EXPORT now, and save
->> looking at it again?
-> 
-> I'm positive. There is enough history for "trust me the consumer is
-> coming" turning out not to be true to justify the hassle in my mind. I
-> do trust you, but things happen.
-> 
+> On Dec 18, 2019, at 2:24 AM, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> On Fri, Dec 13, 2019 at 09:30:45AM -0800, Jim Mattson wrote:
+>> On Fri, Dec 13, 2019 at 1:13 AM Nadav Amit <nadav.amit@gmail.com> =
+wrote:
+>>>> On Dec 13, 2019, at 12:59 AM, Jim Mattson <jmattson@google.com> =
+wrote:
+>>>>=20
+>>>> On Sat, May 18, 2019 at 4:58 PM Nadav Amit <nadav.amit@gmail.com> =
+wrote:
+>>>>> The test that checks the maximum VMCS field encoding does not =
+probe all
+>>>>> possible VMCS fields. As a result it might fail since the actual
+>>>>> IA32_VMX_VMCS_ENUM.MAX_INDEX would be higher than the expected =
+value.
+>>>>>=20
+>>>>> Change the test to check that the maximum of the supported probed
+>>>>> VMCS fields is lower/equal than the actual reported
+>>>>> IA32_VMX_VMCS_ENUM.MAX_INDEX.
+>>>>=20
+>>>> Wouldn't it be better to probe all possible VMCS fields and keep =
+the
+>>>> test for equality?
+>>>=20
+>>> It might take a while though=E2=80=A6
+>>>=20
+>>> How about probing VMREAD/VMWRITE to MAX_INDEX in addition to all the =
+known
+>>> VMCS fields and then checking for equation?
+>> It can't take that long. VMCS field encodings are only 15 bits, and
+>> you can ignore the "high" part of 64-bit fields, so that leaves only
+>> 14 bits.
+>=20
+> Unless kvm-unit-tests is being run in L1, in which case things like =
+this
+> are painful.  That being said, I do agree that probing "all" VMCS =
+fields
+> is the way to go.  Walking from highest->lowest probably won't even =
+take
+> all that many VMREADS.  If it is slow, the test can be binned to its =
+own
+> config.
 
-OK, it's deleted locally. Thanks for looking at the patch. I'll post a v12 series
-that includes the change, once it looks like reviews are slowing down.
+Ok. I=E2=80=99ll send a patch for that.
 
-
-thanks,
--- 
-John Hubbard
-NVIDIA
