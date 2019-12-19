@@ -2,121 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34E83125E98
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 11:11:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F29F126090
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 12:11:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726712AbfLSKLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Dec 2019 05:11:31 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:41490 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726708AbfLSKLa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Dec 2019 05:11:30 -0500
-Received: by mail-pf1-f196.google.com with SMTP id w62so2938558pfw.8
-        for <kvm@vger.kernel.org>; Thu, 19 Dec 2019 02:11:30 -0800 (PST)
+        id S1726846AbfLSLL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Dec 2019 06:11:29 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40124 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726698AbfLSLL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Dec 2019 06:11:29 -0500
+Received: by mail-wm1-f66.google.com with SMTP id t14so5165136wmi.5;
+        Thu, 19 Dec 2019 03:11:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=YrnybgUoheTzv0oO8IdIe7ptyQE6UeKhluLQtlHkiL4=;
+        b=L5jwgvu8SJyXaL7/gM2ue6Gliiu5B28abgkn3MBXlepIvB/3e6eiEFI/xoJx0DWQFm
+         Czc1EeAnKsiRfSDoEORA5nGYqKCBTs7YKYQVkJkUdqtpiNBo+35g+6gH2ym8BKM16kRi
+         futwiDg6xervRZyvvWdf5vW4X/jRSkUxOl6tWZ0PlvJMSyyqIuIZpg1WEnCb7WQDcOvM
+         HtqvwZ47j4yCHXIc3/f8UiWo+bqmUBbsPfkK44q6AjnkcpLwpDmNQV+WYVne+FhJHJ1m
+         5W2BQJpVAdLCzCZDZNSuXJqOqDf/LtsZi6CLCgYCkCPzY30fBRFyxyyzwMEpyiwBtrF1
+         271A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=n8yO7xftBIOe1P8sRlvhhOgMt72/4wCK1ls+6BhIkpk=;
-        b=ENPxveabQbXoGggTlFPYsygu17dZRDlPLY+Okm7uPe/UtfMbUQvLJ520z1pckWVxt7
-         5Wnljrhld/6JI/puUsDd5hFBS8CxrTrKcqHY14SMRJZENIHTfWQo50/2RO6D23t0Mp4M
-         KlbziyKMTqUZq9ZheMprWBqLKP9wRKjG8POenKRnwvCRtj2YRmVM+d+Ut4IpPZ61oEXI
-         /Ks5R3sTMJUV8kyTrAE+9oJCvpAVU7dZ+fvXv1T24HqoFMFXKN/H2OvCaZhFSVw+a7/Y
-         KyiyXrao4K0K8nhc+C1pSaj68y0G47a13USuHEjeleYWW+mA1kp/U/zASF+G+wdCYJW8
-         aV7w==
-X-Gm-Message-State: APjAAAU6VS2tOSgYMFFgWKf0raKw5Fk0bx0GxqjOGOh1ncrhoMLEhOdH
-        Kx/ynaMRokrEDLjjoT0SYrk=
-X-Google-Smtp-Source: APXvYqwZJghPYUpd1nNKlYUGYkGIlh34Yk1yg3v4wiBEce/qp78zDdGnBiRP2MV64trdEQ6nr85T2w==
-X-Received: by 2002:a62:ed19:: with SMTP id u25mr8995317pfh.173.1576750289708;
-        Thu, 19 Dec 2019 02:11:29 -0800 (PST)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id c184sm7565530pfa.39.2019.12.19.02.11.28
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=YrnybgUoheTzv0oO8IdIe7ptyQE6UeKhluLQtlHkiL4=;
+        b=Wq5QHylnpilkbnjrOSUiwTl+XOPZS3KUe7XgqmLrW+Tt6sn8BiUjv1rYsG+WyOB6T6
+         t1C8o+g4iOhK03hugoOa07F0H3+B8PchxaAwRUNbGUWjufnZWH92v4PREVy4H6YE4901
+         zJlvryixjJaUmGf6J98a0KzmQpoexPV0DVyahtOP/f1KxvkG0AnR625pHhfzS5XBergD
+         kBKDLfRMXdT/30vvPsXNyWDFdigozvTZ3ILTCXRPd9fufKd4Tuu2hTB5COfdT5xHGHIR
+         L7EFypn3plzICl1KOggVDRgK/eUE824lcH0f7E/VrtrlX+vKab9MRp1Vd4VPzkK4BJAS
+         Hoag==
+X-Gm-Message-State: APjAAAWUAntl8vxx4BOFT2J7hgXmvQRsHwN6qB2BUEWLv+71XaZLkM44
+        k4xub5IAOUFhitbFpuv0saI=
+X-Google-Smtp-Source: APXvYqzUvVcY3kHWc63gcuoVbKWoG+jj5xTx9pH8lTTdeQpbORs22WGWlPob0aZnv9F0VQt7Oxzvkw==
+X-Received: by 2002:a1c:16:: with SMTP id 22mr9647105wma.8.1576753887091;
+        Thu, 19 Dec 2019 03:11:27 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id p17sm5975871wmk.30.2019.12.19.03.11.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2019 02:11:28 -0800 (PST)
-From:   Nadav Amit <namit@vmware.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <namit@vmware.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [kvm-unit-tests PATCH 2/2] x86: vmx: Remove max_index tracking in check_vmcs_field()
-Date:   Thu, 19 Dec 2019 02:10:06 -0800
-Message-Id: <20191219101006.49103-3-namit@vmware.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191219101006.49103-1-namit@vmware.com>
-References: <20191219101006.49103-1-namit@vmware.com>
+        Thu, 19 Dec 2019 03:11:25 -0800 (PST)
+Date:   Thu, 19 Dec 2019 11:11:24 +0000
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     davem@davemloft.net, kvm@vger.kernel.org, netdev@vger.kernel.org,
+        Dexuan Cui <decui@microsoft.com>, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jorgen Hansen <jhansen@vmware.com>
+Subject: Re: [PATCH net-next v3 00/11] VSOCK: add vsock_test test suite
+Message-ID: <20191219111124.GA1624084@stefanha-x1.localdomain>
+References: <20191218180708.120337-1-sgarzare@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
+Content-Disposition: inline
+In-Reply-To: <20191218180708.120337-1-sgarzare@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that comprehensive search for maximum VMCS field index is performed,
-the tracking of the maximum index in __check_vmcs_field() is no longer
-needed. Remove all the related logic accordingly.
 
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Nadav Amit <namit@vmware.com>
----
- x86/vmx.c | 18 +++---------------
- 1 file changed, 3 insertions(+), 15 deletions(-)
+--UugvWAfsgieZRqgk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/x86/vmx.c b/x86/vmx.c
-index a1af59c..8bcb438 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -281,11 +281,10 @@ static void set_vmcs_field(struct vmcs_field *f, u8 cookie)
- 	vmcs_write(f->encoding, vmcs_field_value(f, cookie));
- }
- 
--static bool check_vmcs_field(struct vmcs_field *f, u8 cookie, u32 *max_index)
-+static bool check_vmcs_field(struct vmcs_field *f, u8 cookie)
- {
- 	u64 expected;
- 	u64 actual;
--	u32 index;
- 	int ret;
- 
- 	if (f->encoding == VMX_INST_ERROR) {
-@@ -299,12 +298,6 @@ static bool check_vmcs_field(struct vmcs_field *f, u8 cookie, u32 *max_index)
- 	if (ret & X86_EFLAGS_ZF)
- 		return true;
- 
--	if (max_index) {
--		index = f->encoding & VMCS_FIELD_INDEX_MASK;
--		if (index > *max_index)
--			*max_index = index;
--	}
--
- 	if (vmcs_field_readonly(f)) {
- 		printf("Skipping read-only field %lx\n", f->encoding);
- 		return true;
-@@ -330,24 +323,19 @@ static void set_all_vmcs_fields(u8 cookie)
- 		set_vmcs_field(&vmcs_fields[i], cookie);
- }
- 
--static bool __check_all_vmcs_fields(u8 cookie, u32 *max_index)
-+static bool check_all_vmcs_fields(u8 cookie)
- {
- 	bool pass = true;
- 	int i;
- 
- 	for (i = 0; i < ARRAY_SIZE(vmcs_fields); i++) {
--		if (!check_vmcs_field(&vmcs_fields[i], cookie, max_index))
-+		if (!check_vmcs_field(&vmcs_fields[i], cookie))
- 			pass = false;
- 	}
- 
- 	return pass;
- }
- 
--static bool check_all_vmcs_fields(u8 cookie)
--{
--	return __check_all_vmcs_fields(cookie, NULL);
--}
--
- static u32 find_vmcs_max_index(void)
- {
- 	u32 idx, width, type, enc;
--- 
-2.17.1
+On Wed, Dec 18, 2019 at 07:06:57PM +0100, Stefano Garzarella wrote:
+> The vsock_diag.ko module already has a test suite but the core AF_VSOCK
+> functionality has no tests. This patch series adds several test cases that
+> exercise AF_VSOCK SOCK_STREAM socket semantics (send/recv, connect/accept,
+> half-closed connections, simultaneous connections).
+>=20
+> The v1 of this series was originally sent by Stefan.
+>=20
+> v3:
+> - Patch 6:
+>   * check the byte received in the recv_byte()
+>   * use send(2)/recv(2) instead of write(2)/read(2) to test also flags
+>     (e.g. MSG_PEEK)
+> - Patch 8:
+>   * removed unnecessary control_expectln("CLOSED") [Stefan].
+> - removed patches 9,10,11 added in the v2
+> - new Patch 9 add parameters to list and skip tests (e.g. useful for vmci
+>   that doesn't support half-closed socket in the host)
+> - new Patch 10 prints a list of options in the help
+> - new Patch 11 tests MSG_PEEK flags of recv(2)
+>=20
+> v2: https://patchwork.ozlabs.org/cover/1140538/
+> v1: https://patchwork.ozlabs.org/cover/847998/
+>=20
+> Stefan Hajnoczi (7):
+>   VSOCK: fix header include in vsock_diag_test
+>   VSOCK: add SPDX identifiers to vsock tests
+>   VSOCK: extract utility functions from vsock_diag_test.c
+>   VSOCK: extract connect/accept functions from vsock_diag_test.c
+>   VSOCK: add full barrier between test cases
+>   VSOCK: add send_byte()/recv_byte() test utilities
+>   VSOCK: add AF_VSOCK test cases
+>=20
+> Stefano Garzarella (4):
+>   vsock_test: wait for the remote to close the connection
+>   testing/vsock: add parameters to list and skip tests
+>   testing/vsock: print list of options and description
+>   vsock_test: add SOCK_STREAM MSG_PEEK test
+>=20
+>  tools/testing/vsock/.gitignore        |   1 +
+>  tools/testing/vsock/Makefile          |   9 +-
+>  tools/testing/vsock/README            |   3 +-
+>  tools/testing/vsock/control.c         |  15 +-
+>  tools/testing/vsock/control.h         |   2 +
+>  tools/testing/vsock/timeout.h         |   1 +
+>  tools/testing/vsock/util.c            | 376 +++++++++++++++++++++++++
+>  tools/testing/vsock/util.h            |  49 ++++
+>  tools/testing/vsock/vsock_diag_test.c | 202 ++++----------
+>  tools/testing/vsock/vsock_test.c      | 379 ++++++++++++++++++++++++++
+>  10 files changed, 883 insertions(+), 154 deletions(-)
+>  create mode 100644 tools/testing/vsock/util.c
+>  create mode 100644 tools/testing/vsock/util.h
+>  create mode 100644 tools/testing/vsock/vsock_test.c
+>=20
+> --=20
+> 2.24.1
+>=20
+> _______________________________________________
+> Virtualization mailing list
+> Virtualization@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--UugvWAfsgieZRqgk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl37WtwACgkQnKSrs4Gr
+c8ghowf8CLQjydPRjm3F7iQ8iS7EhFcrctrj96QbH/gFGwkxcSiXqC0mwtLprUzL
+sbzvy6lfKd7nfmXz2O4fJkyKa3qF8/xm3j04fg+6m5WbLNtKMHGE9nyH0NUttTiH
+chth84d78ZFP1m+KV0spdJQBoHFi3pHh3eZWdzNaEEkCdEU0sTI37W4CsJjBw1AF
+PeJFTmO/sGi8c8f8lvBTb8TipXM7THMhr0O+ypUYXFBG6IuNXsKkXcPOjzd9qKFd
+DGr/Ecd6BMIHdNjGgJ707hxsmOooJv9DT4MZQ58KcEzGR9fmtM+E4hnugMt40upL
+3ysZQApGZuQOWqxa7oYNLe86Az04uw==
+=JzCU
+-----END PGP SIGNATURE-----
+
+--UugvWAfsgieZRqgk--
