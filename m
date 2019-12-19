@@ -2,92 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 558B3126BF6
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 20:00:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5E2B126D4D
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 20:10:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730192AbfLSTAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Dec 2019 14:00:31 -0500
-Received: from mga18.intel.com ([134.134.136.126]:31252 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728433AbfLSTAa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Dec 2019 14:00:30 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Dec 2019 11:00:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,332,1571727600"; 
-   d="scan'208";a="241261269"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 19 Dec 2019 11:00:28 -0800
-Date:   Thu, 19 Dec 2019 11:00:28 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Frederic Weisbecker <frederic@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org
-Subject: Re: Async page fault delivered while irq are disabled?
-Message-ID: <20191219190028.GB6439@linux.intel.com>
-References: <20191219152814.GA24080@lenoir>
- <20191219155745.GA6439@linux.intel.com>
- <20191219161524.GB24080@lenoir>
+        id S1727262AbfLSTKF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Dec 2019 14:10:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54889 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727179AbfLSTKD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Dec 2019 14:10:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576782602;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TsFvSsTqVBZ+tF91hnxKk0O+iZiuPyz2pCFwyuo+kkY=;
+        b=YFZAvi8IgjpnhNafd99YSnm1tGzhhYLt9t8+Ev0A4N+yAwj4bA3K622oIREH5cz+4a7s/L
+        Awh0LyO5W/gIVA+KWuUfMI91yrcnhnp5IXI4l5lM+OXhyZPqWmr0h9iksdWqXNzzOQ8yTb
+        GSdfpLQxMS7f9PMQDv1uc4xhjoOp1u0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-93-xKX_cPXqPaiy5xGEr3GwDQ-1; Thu, 19 Dec 2019 14:10:00 -0500
+X-MC-Unique: xKX_cPXqPaiy5xGEr3GwDQ-1
+Received: by mail-wr1-f69.google.com with SMTP id f15so2759001wrr.2
+        for <kvm@vger.kernel.org>; Thu, 19 Dec 2019 11:10:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=TsFvSsTqVBZ+tF91hnxKk0O+iZiuPyz2pCFwyuo+kkY=;
+        b=Tz6M5OIgjfnLgRr9u/vI2EXNnr+yAvb5kL/nH0FIE2yPYz36DjFjdjFkJYX5tHrEZq
+         f9vHw06jbnotKB0USJgDn7+qs2ucY8l30oTQ66i6CdYC8dufAYOK8bW5iKsg7caTT28F
+         eMApf3o2pePG+ipWyZ19eJ8cqNsa64E928gyAIUoPXbpmqJDPpCLKnIUvARsR4riOUiF
+         iF2SXIqI85aQdidYpKJtV7J+kthXFrj9dzIF2ARxaLijf3Onle2c/4cWoaUp9eenh9Wz
+         OZSJPfjkLVBWJc0Om0/eWikJ2AawMWepD194hQSo/gOmHXwzbK2Iei09AyJir5oAUbiP
+         o/mQ==
+X-Gm-Message-State: APjAAAWNElM/lIvjbpZ1IeU3NIzv8wkvZ5y95Gn0pZZBXx2pZs0z1Jtq
+        31OiKBVFcka7+f2eT4tIN+2Eh0uDfahwozpvgTVaEzgvhJtGUlWd54srLavxPGUavtY20nlH9RC
+        GHwVuaiY/mWeN
+X-Received: by 2002:a1c:4d03:: with SMTP id o3mr11976163wmh.164.1576782599916;
+        Thu, 19 Dec 2019 11:09:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyCPSAQBtZpVyCHuMDoSVEQwEOPH4leBjaVKeWb7GppTaUWkTOvT9jwqDl7h6ChPbVt3S9Xrw==
+X-Received: by 2002:a1c:4d03:: with SMTP id o3mr11976139wmh.164.1576782599685;
+        Thu, 19 Dec 2019 11:09:59 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id f65sm7124998wmf.2.2019.12.19.11.09.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2019 11:09:58 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     John Allen <john.allen@amd.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        rkrcmar@redhat.com, John Allen <john.allen@amd.com>
+Subject: Re: [PATCH] kvm/svm: PKU not currently supported
+In-Reply-To: <20191219152332.28857-1-john.allen@amd.com>
+References: <20191219152332.28857-1-john.allen@amd.com>
+Date:   Thu, 19 Dec 2019 20:09:57 +0100
+Message-ID: <87immc873u.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191219161524.GB24080@lenoir>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 19, 2019 at 05:15:25PM +0100, Frederic Weisbecker wrote:
-> On Thu, Dec 19, 2019 at 07:57:46AM -0800, Sean Christopherson wrote:
-> > On Thu, Dec 19, 2019 at 04:28:15PM +0100, Frederic Weisbecker wrote:
-> > > Hi,
-> > > 
-> > > While checking the x86 async page fault code, I can't
-> > > find anything that prevents KVM_PV_REASON_PAGE_READY to be injected
-> > > while the guest has interrupts disabled. If that page fault happens
-> > > to trap in an interrupt disabled section, there may be a deadlock due to the
-> > > call to wake_up_process() which locks the rq->lock (among others).
-> > > 
-> > > Given how long that code is there, I guess such an issue would
-> > > have been reported for a while already. But I just would like to
-> > > be sure we are checking that.
-> > > 
-> > > Can someone enlighten me?
-> > 
-> > The check is triggered from the caller of kvm_async_page_present().
-> > 
-> > kvm_check_async_pf_completion()
-> > |
-> > |-> kvm_arch_can_inject_async_page_present()
-> >     |
-> >     |-> kvm_can_do_async_pf()
-> >         |
-> >         |-> kvm_x86_ops->interrupt_allowed()
-> 
-> Ah thanks, I missed that one. And what about
-> kvm_async_page_present_sync()? I don't see a similar check
-> there.
+John Allen <john.allen@amd.com> writes:
 
-CONFIG_KVM_ASYNC_PF_SYNC is selected only by s390, it can't be turned on
-for x86.
+> Current SVM implementation does not have support for handling PKU. Guests
+> running on a host with future AMD cpus that support the feature will read
+> garbage from the PKRU register and will hit segmentation faults on boot as
+> memory is getting marked as protected that should not be. Ensure that cpuid
+> from SVM does not advertise the feature.
+>
+> Signed-off-by: John Allen <john.allen@amd.com>
+> ---
+>  arch/x86/kvm/svm.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 122d4ce3b1ab..f911aa1b41c8 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -5933,6 +5933,8 @@ static void svm_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2 *entry)
+>  		if (avic)
+>  			entry->ecx &= ~bit(X86_FEATURE_X2APIC);
+>  		break;
+> +	case 0x7:
+> +		entry->ecx &= ~bit(X86_FEATURE_PKU);
 
-> And one last silly question, what about that line in
-> kvm_arch_can_inject_async_page_present:
-> 
-> 	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
-> 		return true;
-> 
-> That looks weird, also it shortcuts the irqs_allowed() check.
+Would it make more sense to introduce kvm_x86_ops->pku_supported() (and
+return false for SVM and boot_cpu_has(X86_FEATURE_PKU) for vmx) so we
+don't set the bit in the first place?
 
-I wondered about that code as well :-).  Definitely odd, but it would
-require the guest to disable async #PF after an async #PF is queued.  Best
-guess is the idea is that it's the guest's problem if it disables async #PF
-on the fly.
+>  	case 0x80000001:
+>  		if (nested)
+>  			entry->ecx |= (1 << 2); /* Set SVM bit */
+
+-- 
+Vitaly
+
