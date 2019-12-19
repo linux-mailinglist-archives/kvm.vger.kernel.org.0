@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EC181259D7
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 04:17:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC9651259EA
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 04:18:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726858AbfLSDRh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 22:17:37 -0500
+        id S1727070AbfLSDSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 22:18:06 -0500
 Received: from mga05.intel.com ([192.55.52.43]:29385 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726463AbfLSDRf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 22:17:35 -0500
+        id S1726875AbfLSDRn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 22:17:43 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 19:17:35 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 19:17:37 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; 
-   d="scan'208";a="222160402"
+   d="scan'208";a="222160406"
 Received: from allen-box.sh.intel.com ([10.239.159.136])
-  by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 19:17:33 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 19:17:35 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Joerg Roedel <joro@8bytes.org>,
         David Woodhouse <dwmw2@infradead.org>,
@@ -29,10 +29,11 @@ Cc:     ashok.raj@intel.com, sanjay.k.kumar@intel.com,
         yi.l.liu@intel.com, yi.y.sun@intel.com,
         Peter Xu <peterx@redhat.com>, iommu@lists.linux-foundation.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v4 1/7] iommu/vt-d: Identify domains using first level page table
-Date:   Thu, 19 Dec 2019 11:16:28 +0800
-Message-Id: <20191219031634.15168-2-baolu.lu@linux.intel.com>
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: [PATCH v4 2/7] iommu/vt-d: Add set domain DOMAIN_ATTR_NESTING attr
+Date:   Thu, 19 Dec 2019 11:16:29 +0800
+Message-Id: <20191219031634.15168-3-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191219031634.15168-1-baolu.lu@linux.intel.com>
 References: <20191219031634.15168-1-baolu.lu@linux.intel.com>
@@ -41,78 +42,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This checks whether a domain should use the first level page
-table for map/unmap and marks it in the domain structure.
+This adds the Intel VT-d specific callback of setting
+DOMAIN_ATTR_NESTING domain attribution. It is necessary
+to let the VT-d driver know that the domain represents
+a virtual machine which requires the IOMMU hardware to
+support nested translation mode. Return success if the
+IOMMU hardware suports nested mode, otherwise failure.
 
+Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/iommu/intel-iommu.c | 39 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ drivers/iommu/intel-iommu.c | 56 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
 diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-index 82b9687e82d3..c93fe716e6b0 100644
+index c93fe716e6b0..2b5a47584baf 100644
 --- a/drivers/iommu/intel-iommu.c
 +++ b/drivers/iommu/intel-iommu.c
-@@ -307,6 +307,14 @@ static int hw_pass_through = 1;
+@@ -315,6 +315,12 @@ static int hw_pass_through = 1;
   */
- #define DOMAIN_FLAG_LOSE_CHILDREN		BIT(1)
+ #define DOMAIN_FLAG_USE_FIRST_LEVEL		BIT(2)
  
 +/*
-+ * When VT-d works in the scalable mode, it allows DMA translation to
-+ * happen through either first level or second level page table. This
-+ * bit marks that the DMA translation for the domain goes through the
-+ * first level page table, otherwise, it goes through the second level.
++ * Domain represents a virtual machine which demands iommu nested
++ * translation mode support.
 + */
-+#define DOMAIN_FLAG_USE_FIRST_LEVEL		BIT(2)
++#define DOMAIN_FLAG_NESTING_MODE		BIT(3)
 +
  #define for_each_domain_iommu(idx, domain)			\
  	for (idx = 0; idx < g_num_of_iommus; idx++)		\
  		if (domain->iommu_refcnt[idx])
-@@ -1714,6 +1722,35 @@ static void free_dmar_iommu(struct intel_iommu *iommu)
- #endif
+@@ -5635,6 +5641,24 @@ static inline bool iommu_pasid_support(void)
+ 	return ret;
  }
  
-+/*
-+ * Check and return whether first level is used by default for
-+ * DMA translation. Currently, we make it off by setting
-+ * first_level_support = 0, and will change it to -1 after all
-+ * map/unmap paths support first level page table.
-+ */
-+static bool first_level_by_default(void)
++static inline bool nested_mode_support(void)
 +{
 +	struct dmar_drhd_unit *drhd;
 +	struct intel_iommu *iommu;
-+	static int first_level_support = 0;
-+
-+	if (likely(first_level_support != -1))
-+		return first_level_support;
-+
-+	first_level_support = 1;
++	bool ret = true;
 +
 +	rcu_read_lock();
 +	for_each_active_iommu(iommu, drhd) {
-+		if (!sm_supported(iommu) || !ecap_flts(iommu->ecap)) {
-+			first_level_support = 0;
++		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap)) {
++			ret = false;
 +			break;
 +		}
 +	}
 +	rcu_read_unlock();
 +
-+	return first_level_support;
++	return ret;
 +}
 +
- static struct dmar_domain *alloc_domain(int flags)
+ static bool intel_iommu_capable(enum iommu_cap cap)
  {
- 	struct dmar_domain *domain;
-@@ -1725,6 +1762,8 @@ static struct dmar_domain *alloc_domain(int flags)
- 	memset(domain, 0, sizeof(*domain));
- 	domain->nid = NUMA_NO_NODE;
- 	domain->flags = flags;
-+	if (first_level_by_default())
-+		domain->flags |= DOMAIN_FLAG_USE_FIRST_LEVEL;
- 	domain->has_iotlb_device = false;
- 	INIT_LIST_HEAD(&domain->devices);
+ 	if (cap == IOMMU_CAP_CACHE_COHERENCY)
+@@ -6013,10 +6037,42 @@ static bool intel_iommu_is_attach_deferred(struct iommu_domain *domain,
+ 	return dev->archdata.iommu == DEFER_DEVICE_DOMAIN_INFO;
+ }
  
++static int
++intel_iommu_domain_set_attr(struct iommu_domain *domain,
++			    enum iommu_attr attr, void *data)
++{
++	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
++	unsigned long flags;
++	int ret = 0;
++
++	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
++		return -EINVAL;
++
++	switch (attr) {
++	case DOMAIN_ATTR_NESTING:
++		spin_lock_irqsave(&device_domain_lock, flags);
++		if (nested_mode_support() &&
++		    list_empty(&dmar_domain->devices)) {
++			dmar_domain->flags |= DOMAIN_FLAG_NESTING_MODE;
++			dmar_domain->flags &= ~DOMAIN_FLAG_USE_FIRST_LEVEL;
++		} else {
++			ret = -ENODEV;
++		}
++		spin_unlock_irqrestore(&device_domain_lock, flags);
++		break;
++	default:
++		ret = -EINVAL;
++		break;
++	}
++
++	return ret;
++}
++
+ const struct iommu_ops intel_iommu_ops = {
+ 	.capable		= intel_iommu_capable,
+ 	.domain_alloc		= intel_iommu_domain_alloc,
+ 	.domain_free		= intel_iommu_domain_free,
++	.domain_set_attr	= intel_iommu_domain_set_attr,
+ 	.attach_dev		= intel_iommu_attach_device,
+ 	.detach_dev		= intel_iommu_detach_device,
+ 	.aux_attach_dev		= intel_iommu_aux_attach_device,
 -- 
 2.17.1
 
