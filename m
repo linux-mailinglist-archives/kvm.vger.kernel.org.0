@@ -2,171 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EA155126162
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 12:59:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFE2412636D
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 14:26:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726801AbfLSL7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Dec 2019 06:59:12 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2109 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726668AbfLSL7M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Dec 2019 06:59:12 -0500
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.56])
-        by Forcepoint Email with ESMTP id 271993F2B861E22293DF;
-        Thu, 19 Dec 2019 19:59:08 +0800 (CST)
-Received: from dggeme755-chm.china.huawei.com (10.3.19.101) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 19 Dec 2019 19:59:07 +0800
-Received: from [127.0.0.1] (10.173.221.248) by dggeme755-chm.china.huawei.com
- (10.3.19.101) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5; Thu, 19
- Dec 2019 19:59:06 +0800
-Subject: Re: [PATCH 2/5] KVM: arm64: Implement PV_LOCK_FEATURES call
-To:     Steven Price <steven.price@arm.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        James Morse <James.Morse@arm.com>,
-        "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-        Suzuki Poulose <Suzuki.Poulose@arm.com>,
-        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
-        "Catalin Marinas" <Catalin.Marinas@arm.com>,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>
-References: <20191217135549.3240-1-yezengruan@huawei.com>
- <20191217135549.3240-3-yezengruan@huawei.com>
- <20191217142848.GB38811@arm.com>
-From:   yezengruan <yezengruan@huawei.com>
-Message-ID: <21910175-c89a-7a14-66a9-7b53d72a4543@huawei.com>
-Date:   Thu, 19 Dec 2019 19:59:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1726786AbfLSN0M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Dec 2019 08:26:12 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35448 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726752AbfLSN0M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Dec 2019 08:26:12 -0500
+Received: from localhost (unknown [193.47.165.251])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 076532082E;
+        Thu, 19 Dec 2019 13:26:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1576761970;
+        bh=Nt4AsznAJczJ5zCTNKsSdwMVSLrxUdnqo37vgvQ0OF4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fZO8FYQGKYTN23DSopobFqvVPHVEiTU3rCijsWALm/TpO+2k2RvgvXLiZTUezb9Ih
+         PYR4p/oQDaGomrJAjDo0iszYWQ83DV1WrowlfVlri3I3Xkjkq6JkUJFUddWR+0w7eT
+         LH7esLv0k7pPKgMyEdkBcTuzEKjwZhv8LrTOf9r0=
+Date:   Thu, 19 Dec 2019 15:26:07 +0200
+From:   Leon Romanovsky <leon@kernel.org>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+Message-ID: <20191219132607.GA410823@unreal>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20191217142848.GB38811@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.221.248]
-X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
- dggeme755-chm.china.huawei.com (10.3.19.101)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191216222537.491123-1-jhubbard@nvidia.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Steve,
+On Mon, Dec 16, 2019 at 02:25:12PM -0800, John Hubbard wrote:
+> Hi,
+>
+> This implements an API naming change (put_user_page*() -->
+> unpin_user_page*()), and also implements tracking of FOLL_PIN pages. It
+> extends that tracking to a few select subsystems. More subsystems will
+> be added in follow up work.
 
-On 2019/12/17 22:28, Steven Price wrote:
-> On Tue, Dec 17, 2019 at 01:55:46PM +0000, yezengruan@huawei.com wrote:
->> From: Zengruan Ye <yezengruan@huawei.com>
->>
->> This provides a mechanism for querying which paravirtualized lock
->> features are available in this hypervisor.
->>
->> Also add the header file which defines the ABI for the paravirtualized
->> lock features we're about to add.
->>
->> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
->> ---
->>  arch/arm64/include/asm/pvlock-abi.h | 16 ++++++++++++++++
->>  include/linux/arm-smccc.h           | 13 +++++++++++++
->>  virt/kvm/arm/hypercalls.c           |  3 +++
->>  3 files changed, 32 insertions(+)
->>  create mode 100644 arch/arm64/include/asm/pvlock-abi.h
->>
->> diff --git a/arch/arm64/include/asm/pvlock-abi.h b/arch/arm64/include/asm/pvlock-abi.h
->> new file mode 100644
->> index 000000000000..06e0c3d7710a
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/pvlock-abi.h
->> @@ -0,0 +1,16 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright(c) 2019 Huawei Technologies Co., Ltd
->> + * Author: Zengruan Ye <yezengruan@huawei.com>
->> + */
->> +
->> +#ifndef __ASM_PVLOCK_ABI_H
->> +#define __ASM_PVLOCK_ABI_H
->> +
->> +struct pvlock_vcpu_state {
->> +	__le64 preempted;
-> 
-> Somewhere we need to document when 'preempted' is. It looks like it's a
-> 1-bit field from the later patches.
+Hi John,
 
-Good point, I'll document this in the pvlock doc.
+The patchset generates kernel panics in our IB testing. In our tests, we
+allocated single memory block and registered multiple MRs using the single
+block.
 
-> 
->> +	/* Structure must be 64 byte aligned, pad to that size */
->> +	u8 padding[56];
->> +} __packed;
->> +
->> +#endif
->> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
->> index 59494df0f55b..59e65a951959 100644
->> --- a/include/linux/arm-smccc.h
->> +++ b/include/linux/arm-smccc.h
->> @@ -377,5 +377,18 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
->>  			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
->>  			   0x21)
->>  
->> +/* Paravirtualised lock calls */
->> +#define ARM_SMCCC_HV_PV_LOCK_FEATURES				\
->> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
->> +			   ARM_SMCCC_SMC_64,			\
->> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
->> +			   0x40)
->> +
->> +#define ARM_SMCCC_HV_PV_LOCK_PREEMPTED				\
->> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
->> +			   ARM_SMCCC_SMC_64,			\
->> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
->> +			   0x41)
->> +
->>  #endif /*__ASSEMBLY__*/
->>  #endif /*__LINUX_ARM_SMCCC_H*/
->> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
->> index 550dfa3e53cd..ff13871fd85a 100644
->> --- a/virt/kvm/arm/hypercalls.c
->> +++ b/virt/kvm/arm/hypercalls.c
->> @@ -52,6 +52,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>  		case ARM_SMCCC_HV_PV_TIME_FEATURES:
->>  			val = SMCCC_RET_SUCCESS;
->>  			break;
->> +		case ARM_SMCCC_HV_PV_LOCK_FEATURES:
->> +			val = SMCCC_RET_SUCCESS;
->> +			break;
-> 
-> Ideally you wouldn't report that PV_LOCK_FEATURES exists until the
-> actual hypercalls are wired up to avoid breaking a bisect.
+The possible bad flow is:
+ ib_umem_geti() ->
+  pin_user_pages_fast(FOLL_WRITE) ->
+   internal_get_user_pages_fast(FOLL_WRITE) ->
+    gup_pgd_range() ->
+     gup_huge_pd() ->
+      gup_hugepte() ->
+       try_grab_compound_head() ->
 
-Thanks for pointing it out to me! I'll update the code.
+ 108 static __maybe_unused struct page *try_grab_compound_head(struct page *page,
+ 109                                                           int refs,
+ 110                                                           unsigned int flags)
+ 111 {
+ 112         if (flags & FOLL_GET)
+ 113                 return try_get_compound_head(page, refs);
+ 114         else if (flags & FOLL_PIN)
+ 115                 return try_pin_compound_head(page, refs);
+ 116
+ 117         WARN_ON_ONCE(1);
+ 118         return NULL;
+ 119 }
 
-> 
-> Steve
-> 
->>  		}
->>  		break;
->>  	case ARM_SMCCC_HV_PV_TIME_FEATURES:
->> -- 
->> 2.19.1
->>
->>
-> 
-> .
-> 
+# (master) $ dmesg
+[10924.722220] mlx5_core 0000:00:08.0 eth2: Link up
+[10924.725383] IPv6: ADDRCONF(NETDEV_CHANGE): eth2: link becomes ready
+[10960.902254] ------------[ cut here ]------------
+[10960.905614] WARNING: CPU: 3 PID: 8838 at mm/gup.c:61 try_grab_compound_head+0x92/0xd0
+[10960.907313] Modules linked in: nfsv3 nfs_acl rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache ib_isert iscsi_target_mod ib_srpt target_core_mod ib_srp rpcrdma rdma_ucm ib_iser ib_umad rdma_cm ib_ipoib iw_cm ib_cm mlx5_ib ib_uverbs ib_core kvm_intel mlx5_core rfkill mlxfw sunrpc virtio_net pci_hyperv_intf kvm irqbypass net_failover crc32_pclmul i2c_piix4 ptp crc32c_intel failover pcspkr ghash_clmulni_intel i2c_core pps_core sch_fq_codel ip_tables ata_generic pata_acpi serio_raw ata_piix floppy [last unloaded: mlxkvl]
+[10960.917806] CPU: 3 PID: 8838 Comm: consume_mtts Tainted: G           OE     5.5.0-rc2-for-upstream-perf-2019-12-18_10-06-50-78 #1
+[10960.920530] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+[10960.923024] RIP: 0010:try_grab_compound_head+0x92/0xd0
+[10960.924329] Code: e4 8d 14 06 48 8d 4f 34 f0 0f b1 57 34 0f 94 c2 84 d2 75 cb 85 c0 74 cd 8d 14 06 f0 0f b1 11 0f 94 c2 84 d2 75 b9 66 90 eb ea <0f> 0b 31 ff eb b7 85 c0 66 0f 1f 44 00 00 74 ab 8d 14 06 f0 0f b1
+[10960.928512] RSP: 0018:ffffc9000129f880 EFLAGS: 00010082
+[10960.929831] RAX: 0000000080000001 RBX: 00007f6397446000 RCX: 000fffffffe00000
+[10960.931422] RDX: 0000000000040000 RSI: 0000000000011800 RDI: ffffea000f5d8000
+[10960.933005] RBP: ffffc9000129f93c R08: ffffc9000129f93c R09: 0000000000200000
+[10960.934584] R10: ffff88840774b200 R11: ffff888000000230 R12: 00007f6397446000
+[10960.936212] R13: 0000000000000046 R14: 80000003d76000e7 R15: 0000000000000080
+[10960.937793] FS:  00007f63a0590740(0000) GS:ffff88842f980000(0000) knlGS:0000000000000000
+[10960.939962] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[10960.941367] CR2: 00000000023e9008 CR3: 0000000406d0a002 CR4: 00000000007606e0
+[10960.942975] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[10960.944654] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[10960.946394] PKRU: 55555554
+[10960.947310] Call Trace:
+[10960.948193]  gup_pgd_range+0x61e/0x950
+[10960.949585]  internal_get_user_pages_fast+0x98/0x1c0
+[10960.951313]  ib_umem_get+0x2b3/0x5a0 [ib_uverbs]
+[10960.952929]  mr_umem_get+0xd8/0x280 [mlx5_ib]
+[10960.954150]  ? xas_store+0x49/0x550
+[10960.955187]  mlx5_ib_reg_user_mr+0x149/0x7a0 [mlx5_ib]
+[10960.956478]  ? xas_load+0x9/0x80
+[10960.957474]  ? xa_load+0x54/0x90
+[10960.958465]  ? lookup_get_idr_uobject.part.10+0x12/0x80 [ib_uverbs]
+[10960.959926]  ib_uverbs_reg_mr+0x138/0x2a0 [ib_uverbs]
+[10960.961192]  ib_uverbs_handler_UVERBS_METHOD_INVOKE_WRITE+0xb1/0xf0 [ib_uverbs]
+[10960.963208]  ib_uverbs_cmd_verbs.isra.8+0x997/0xb30 [ib_uverbs]
+[10960.964603]  ? uverbs_disassociate_api+0xd0/0xd0 [ib_uverbs]
+[10960.965949]  ? mem_cgroup_commit_charge+0x6a/0x140
+[10960.967177]  ? page_add_new_anon_rmap+0x58/0xc0
+[10960.968360]  ib_uverbs_ioctl+0xbc/0x130 [ib_uverbs]
+[10960.969595]  do_vfs_ioctl+0xa6/0x640
+[10960.970631]  ? syscall_trace_enter+0x1f8/0x2e0
+[10960.971829]  ksys_ioctl+0x60/0x90
+[10960.972825]  __x64_sys_ioctl+0x16/0x20
+[10960.973888]  do_syscall_64+0x48/0x130
+[10960.974949]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[10960.976219] RIP: 0033:0x7f639fe9b267
+[10960.977260] Code: b3 66 90 48 8b 05 19 3c 2c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d e9 3b 2c 00 f7 d8 64 89 01 48
+[10960.981413] RSP: 002b:00007fff5335ca08 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+[10960.983472] RAX: ffffffffffffffda RBX: 00007fff5335ca98 RCX: 00007f639fe9b267
+[10960.985037] RDX: 00007fff5335ca80 RSI: 00000000c0181b01 RDI: 0000000000000003
+[10960.986603] RBP: 00007fff5335ca60 R08: 0000000000000003 R09: 00007f63a055e010
+[10960.988194] R10: 00000000ffffffff R11: 0000000000000246 R12: 00007f63a055e150
+[10960.989903] R13: 00007fff5335ca60 R14: 00007fff5335cc38 R15: 00007f6397246000
+[10960.991544] ---[ end trace 1f0ee07a75a16a93 ]---
+[10960.992773] ------------[ cut here ]------------
+[10960.993995] WARNING: CPU: 3 PID: 8838 at mm/gup.c:150 try_grab_page+0x55/0x70
+[10960.995758] Modules linked in: nfsv3 nfs_acl rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache ib_isert iscsi_target_mod ib_srpt target_core_mod ib_srp rpcrdma rdma_ucm ib_iser ib_umad rdma_cm ib_ipoib iw_cm ib_cm mlx5_ib ib_uverbs ib_core kvm_intel mlx5_core rfkill mlxfw sunrpc virtio_net pci_hyperv_intf kvm irqbypass net_failover crc32_pclmul i2c_piix4 ptp crc32c_intel failover pcspkr ghash_clmulni_intel i2c_core pps_core sch_fq_codel ip_tables ata_generic pata_acpi serio_raw ata_piix floppy [last unloaded: mlxkvl]
+[10961.008579] CPU: 3 PID: 8838 Comm: consume_mtts Tainted: G        W  OE     5.5.0-rc2-for-upstream-perf-2019-12-18_10-06-50-78 #1
+[10961.011416] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+[10961.013766] RIP: 0010:try_grab_page+0x55/0x70
+[10961.014921] Code: 00 04 00 00 b8 01 00 00 00 f3 c3 48 8b 47 08 a8 01 75 1c 8b 47 34 85 c0 7e 1d f0 ff 47 34 b8 01 00 00 00 c3 48 8d 78 ff eb cb <0f> 0b 31 c0 c3 48 8d 78 ff 66 90 eb dc 0f 0b 31 c0 c3 66 0f 1f 84
+[10961.019058] RSP: 0018:ffffc9000129f7e8 EFLAGS: 00010282
+[10961.020351] RAX: 0000000080000001 RBX: 0000000000050201 RCX: 000000000f5d8000
+[10961.021921] RDX: 000ffffffffff000 RSI: 0000000000040000 RDI: ffffea000f5d8000
+[10961.023494] RBP: 00007f6397400000 R08: ffffea000f986cc0 R09: ffff8883c758bdd0
+[10961.025067] R10: 0000000000000001 R11: ffff888000000230 R12: ffff888407701c00
+[10961.026637] R13: ffff8883e61b35d0 R14: ffffea000f5d8000 R15: 0000000000050201
+[10961.028217] FS:  00007f63a0590740(0000) GS:ffff88842f980000(0000) knlGS:0000000000000000
+[10961.030353] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[10961.031721] CR2: 00000000023e9008 CR3: 0000000406d0a002 CR4: 00000000007606e0
+[10961.033305] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[10961.034884] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[10961.036456] PKRU: 55555554
+[10961.037369] Call Trace:
+[10961.038285]  follow_trans_huge_pmd+0x10c/0x300
+[10961.039555]  follow_page_mask+0x64a/0x760
+[10961.040762]  __get_user_pages+0xf1/0x720
+[10961.041851]  ? apic_timer_interrupt+0xa/0x20
+[10961.042996]  internal_get_user_pages_fast+0x14b/0x1c0
+[10961.044266]  ib_umem_get+0x2b3/0x5a0 [ib_uverbs]
+[10961.045474]  mr_umem_get+0xd8/0x280 [mlx5_ib]
+[10961.046652]  ? xas_store+0x49/0x550
+[10961.047696]  mlx5_ib_reg_user_mr+0x149/0x7a0 [mlx5_ib]
+[10961.048967]  ? xas_load+0x9/0x80
+[10961.049949]  ? xa_load+0x54/0x90
+[10961.050935]  ? lookup_get_idr_uobject.part.10+0x12/0x80 [ib_uverbs]
+[10961.052378]  ib_uverbs_reg_mr+0x138/0x2a0 [ib_uverbs]
+[10961.053635]  ib_uverbs_handler_UVERBS_METHOD_INVOKE_WRITE+0xb1/0xf0 [ib_uverbs]
+[10961.055646]  ib_uverbs_cmd_verbs.isra.8+0x997/0xb30 [ib_uverbs]
+[10961.057033]  ? uverbs_disassociate_api+0xd0/0xd0 [ib_uverbs]
+[10961.058381]  ? mem_cgroup_commit_charge+0x6a/0x140
+[10961.059611]  ? page_add_new_anon_rmap+0x58/0xc0
+[10961.060796]  ib_uverbs_ioctl+0xbc/0x130 [ib_uverbs]
+[10961.062034]  do_vfs_ioctl+0xa6/0x640
+[10961.063081]  ? syscall_trace_enter+0x1f8/0x2e0
+[10961.064253]  ksys_ioctl+0x60/0x90
+[10961.065252]  __x64_sys_ioctl+0x16/0x20
+[10961.066315]  do_syscall_64+0x48/0x130
+[10961.067382]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[10961.068647] RIP: 0033:0x7f639fe9b267
+[10961.069691] Code: b3 66 90 48 8b 05 19 3c 2c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d e9 3b 2c 00 f7 d8 64 89 01 48
+[10961.073882] RSP: 002b:00007fff5335ca08 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+[10961.075949] RAX: ffffffffffffffda RBX: 00007fff5335ca98 RCX: 00007f639fe9b267
+[10961.077545] RDX: 00007fff5335ca80 RSI: 00000000c0181b01 RDI: 0000000000000003
+[10961.079128] RBP: 00007fff5335ca60 R08: 0000000000000003 R09: 00007f63a055e010
+[10961.080709] R10: 00000000ffffffff R11: 0000000000000246 R12: 00007f63a055e150
+[10961.082278] R13: 00007fff5335ca60 R14: 00007fff5335cc38 R15: 00007f6397246000
+[10961.083873] ---[ end trace 1f0ee07a75a16a94 ]---
 
-Thanks,
-
-Zengruan
-
-
+Thanks
