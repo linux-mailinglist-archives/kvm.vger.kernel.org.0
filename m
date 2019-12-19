@@ -2,146 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6DB2125A06
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 04:34:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38AEF125ABC
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 06:27:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbfLSDeL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 22:34:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23210 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726779AbfLSDeL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 22:34:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576726450;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IAXDZ2yPhWgynCk13CH9tKDg9wRbgefG5kyIZ57F1Fo=;
-        b=XQYQ06Ez4p9ei14EVstORoa+c7S+sqigr+aL7lkGHdOVa5fxUTzcVEI6337C0jXEF4xdfv
-        WFkX4I16jlFZWeYUw4vTQs8uhNy3x91PiVTE/8+PHljfLY2AQI4hJkpXsoZV+aOuCPgvav
-        FDYgBwKOUdxQax6hiwfNWHe3b5IiMQM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-ScClcFYTNhOKCCP1lSNHKw-1; Wed, 18 Dec 2019 22:34:08 -0500
-X-MC-Unique: ScClcFYTNhOKCCP1lSNHKw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C57A593A0;
-        Thu, 19 Dec 2019 03:34:07 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-48.bne.redhat.com [10.64.54.48])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0226426DF8;
-        Thu, 19 Dec 2019 03:33:59 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v2] tools/kvm_stat: Fix kvm_exit filter name
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
-        vkuznets@redhat.com, maz@kernel.org
-References: <20191217020600.10268-1-gshan@redhat.com>
- <20191218084538.qnnnla6rqcnoeeah@kamzik.brq.redhat.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <6aa080d0-05a3-cbfc-ada0-4482be152fc2@redhat.com>
-Date:   Thu, 19 Dec 2019 14:33:57 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1726928AbfLSF1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Dec 2019 00:27:55 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:43223 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726880AbfLSF1z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Dec 2019 00:27:55 -0500
+Received: by mail-ot1-f68.google.com with SMTP id p8so5594386oth.10
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 21:27:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=YiNT2OwN1PC5xiClJXvmIxtU8FKdWcajydHQPOKowMQ=;
+        b=dqorifJ4f+v2Gylbu8oAiFDcKa1F8skIpz6V3IgWOqRB33n7U59EJyePbqvuTj6Vy4
+         uOPeG7Kob1GhJUtITzia2N5iO6b+FgQt0PfBLv1SShdXtnPTkzPXC4wv8NlfHewxSVCr
+         BWaS5xgO+C3htMgxe5c7ubvEmgYEe4TsZt+Zn5XRlxBQhxFahwlW/Mo0S+TgOXqQ/47k
+         mtfOMZwImte59GAX6ig1VEn2mK8lUBxmhPPLTpVmIFFbH4EVvah9nw+1Oh0aFp9cBJiW
+         sz8ohgGLCmoNne0NYqks6igeYI3pnrq7++p4oBryH4HFQcsawtXKY12nyEVckq37Q8q+
+         63BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=YiNT2OwN1PC5xiClJXvmIxtU8FKdWcajydHQPOKowMQ=;
+        b=KdWNJQRTF5T+vfm/AA2DQxRHBkyXCCYeCgOs0AcFX7nwGBChyGwLWcefoRGK6XX6Kl
+         SzGLrzCYpUwTRUu0r0FejAgI2IYM/MTX7Ybjg2JLQL3VKvqJYtOAaQnWGTa98X6dpy0q
+         xOCU9WSsO2hqGEQes3y7ASiCQBfLH24hhLxkmqu+eV/m0Pvt0sFinXNppQXlqQYc6YUZ
+         M+u5kQU+J3Hj3uEHQVPwBbVPrE8JkaW9SPahsz8ZDOrNbRYLG5N08PVLJzLC6k0DAJyZ
+         Ntbh1Ge8hmS9FxjkRDgN+TCL8NjfeAikpTvQQf5Jbt03c0SffY/luPPT0+N0HMOcWO+y
+         d1yw==
+X-Gm-Message-State: APjAAAX1NyR9KqDnNk8D/TzpNKwyZHZQXwxs6L+QdOCjrZxpnOwsAhpH
+        TEfc5gr1WaLUD32koGlFv3LvaZlkGJa5cd7+PTIUEg==
+X-Google-Smtp-Source: APXvYqzIho60C4tgIgH4FPSEG3bP2Gra7VUCaG88r8S6eX3efYPsOK7esN+4WGhr8L+TiHfEgJwBcHps0ms7QGyGe6Y=
+X-Received: by 2002:a05:6830:1744:: with SMTP id 4mr6583360otz.71.1576733274234;
+ Wed, 18 Dec 2019 21:27:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191218084538.qnnnla6rqcnoeeah@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20191216222537.491123-1-jhubbard@nvidia.com> <20191216222537.491123-5-jhubbard@nvidia.com>
+In-Reply-To: <20191216222537.491123-5-jhubbard@nvidia.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 18 Dec 2019 21:27:43 -0800
+Message-ID: <CAPcyv4hQBMxYMurxG=Vwh0=FKWoT3z-Kf=dqES1-icRV5bLwKg@mail.gmail.com>
+Subject: Re: [PATCH v11 04/25] mm: devmap: refactor 1-based refcounting for
+ ZONE_DEVICE pages
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kselftest@vger.kernel.org,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/18/19 7:45 PM, Andrew Jones wrote:
-> On Tue, Dec 17, 2019 at 01:06:00PM +1100, Gavin Shan wrote:
->> The filter name is fixed to "exit_reason" for some kvm_exit events, no
->> matter what architect we have. Actually, the filter name ("exit_reason")
->> is only applicable to x86, meaning it's broken on other architects
->> including aarch64.
->>
->> This fixes the issue by providing various kvm_exit filter names, depending
->> on architect we're on. Afterwards, the variable filter name is picked and
->> applied by ioctl(fd, SET_FILTER).
->>
->> Reported-by: Andrew Jones <drjones@redhat.com>
-> 
-> This wasn't reported by me - I was just the middleman. Credit should go
-> to Jeff Bastian <jbastian@redhat.com>
-> 
+On Mon, Dec 16, 2019 at 2:26 PM John Hubbard <jhubbard@nvidia.com> wrote:
+>
+> An upcoming patch changes and complicates the refcounting and
+> especially the "put page" aspects of it. In order to keep
+> everything clean, refactor the devmap page release routines:
+>
+> * Rename put_devmap_managed_page() to page_is_devmap_managed(),
+>   and limit the functionality to "read only": return a bool,
+>   with no side effects.
+>
+> * Add a new routine, put_devmap_managed_page(), to handle checking
+>   what kind of page it is, and what kind of refcount handling it
+>   requires.
+>
+> * Rename __put_devmap_managed_page() to free_devmap_managed_page(),
+>   and limit the functionality to unconditionally freeing a devmap
+>   page.
+>
+> This is originally based on a separate patch by Ira Weiny, which
+> applied to an early version of the put_user_page() experiments.
+> Since then, J=C3=A9r=C3=B4me Glisse suggested the refactoring described a=
+bove.
+>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Suggested-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> Signed-off-by: Ira Weiny <ira.weiny@intel.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  include/linux/mm.h | 17 +++++++++++++----
+>  mm/memremap.c      | 16 ++--------------
+>  mm/swap.c          | 24 ++++++++++++++++++++++++
+>  3 files changed, 39 insertions(+), 18 deletions(-)
+>
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index c97ea3b694e6..77a4df06c8a7 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -952,9 +952,10 @@ static inline bool is_zone_device_page(const struct =
+page *page)
+>  #endif
+>
+>  #ifdef CONFIG_DEV_PAGEMAP_OPS
+> -void __put_devmap_managed_page(struct page *page);
+> +void free_devmap_managed_page(struct page *page);
+>  DECLARE_STATIC_KEY_FALSE(devmap_managed_key);
+> -static inline bool put_devmap_managed_page(struct page *page)
+> +
+> +static inline bool page_is_devmap_managed(struct page *page)
+>  {
+>         if (!static_branch_unlikely(&devmap_managed_key))
+>                 return false;
+> @@ -963,7 +964,6 @@ static inline bool put_devmap_managed_page(struct pag=
+e *page)
+>         switch (page->pgmap->type) {
+>         case MEMORY_DEVICE_PRIVATE:
+>         case MEMORY_DEVICE_FS_DAX:
+> -               __put_devmap_managed_page(page);
+>                 return true;
+>         default:
+>                 break;
+> @@ -971,7 +971,14 @@ static inline bool put_devmap_managed_page(struct pa=
+ge *page)
+>         return false;
+>  }
+>
+> +bool put_devmap_managed_page(struct page *page);
+> +
+>  #else /* CONFIG_DEV_PAGEMAP_OPS */
+> +static inline bool page_is_devmap_managed(struct page *page)
+> +{
+> +       return false;
+> +}
+> +
+>  static inline bool put_devmap_managed_page(struct page *page)
+>  {
+>         return false;
+> @@ -1028,8 +1035,10 @@ static inline void put_page(struct page *page)
+>          * need to inform the device driver through callback. See
+>          * include/linux/memremap.h and HMM for details.
+>          */
+> -       if (put_devmap_managed_page(page))
+> +       if (page_is_devmap_managed(page)) {
+> +               put_devmap_managed_page(page);
+>                 return;
+> +       }
+>
+>         if (put_page_testzero(page))
+>                 __put_page(page);
+> diff --git a/mm/memremap.c b/mm/memremap.c
+> index e899fa876a62..2ba773859031 100644
+> --- a/mm/memremap.c
+> +++ b/mm/memremap.c
+> @@ -411,20 +411,8 @@ struct dev_pagemap *get_dev_pagemap(unsigned long pf=
+n,
+>  EXPORT_SYMBOL_GPL(get_dev_pagemap);
+>
+>  #ifdef CONFIG_DEV_PAGEMAP_OPS
+> -void __put_devmap_managed_page(struct page *page)
+> +void free_devmap_managed_page(struct page *page)
+>  {
+> -       int count =3D page_ref_dec_return(page);
+> -
+> -       /* still busy */
+> -       if (count > 1)
+> -               return;
+> -
+> -       /* only triggered by the dev_pagemap shutdown path */
+> -       if (count =3D=3D 0) {
+> -               __put_page(page);
+> -               return;
+> -       }
+> -
+>         /* notify page idle for dax */
+>         if (!is_device_private_page(page)) {
+>                 wake_up_var(&page->_refcount);
+> @@ -461,5 +449,5 @@ void __put_devmap_managed_page(struct page *page)
+>         page->mapping =3D NULL;
+>         page->pgmap->ops->page_free(page);
+>  }
+> -EXPORT_SYMBOL(__put_devmap_managed_page);
+> +EXPORT_SYMBOL(free_devmap_managed_page);
 
-Sure. Paolo, please let me know if I need post a v3 to fix it up :)
+This patch does not have a module consumer for
+free_devmap_managed_page(), so the export should move to the patch
+that needs the new export.
 
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
->> ---
->> v2: Rename exit_field to exit_reason_field
->>      Fix the name to esr_ec for aarch64
->> ---
->>   tools/kvm/kvm_stat/kvm_stat | 8 ++++++--
->>   1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
->> index ad1b9e646c49..4cf93110c259 100755
->> --- a/tools/kvm/kvm_stat/kvm_stat
->> +++ b/tools/kvm/kvm_stat/kvm_stat
->> @@ -270,6 +270,7 @@ class ArchX86(Arch):
->>       def __init__(self, exit_reasons):
->>           self.sc_perf_evt_open = 298
->>           self.ioctl_numbers = IOCTL_NUMBERS
->> +        self.exit_reason_field = 'exit_reason'
->>           self.exit_reasons = exit_reasons
->>   
->>       def debugfs_is_child(self, field):
->> @@ -289,6 +290,7 @@ class ArchPPC(Arch):
->>           # numbers depend on the wordsize.
->>           char_ptr_size = ctypes.sizeof(ctypes.c_char_p)
->>           self.ioctl_numbers['SET_FILTER'] = 0x80002406 | char_ptr_size << 16
->> +        self.exit_reason_field = 'exit_nr'
->>           self.exit_reasons = {}
->>   
->>       def debugfs_is_child(self, field):
->> @@ -300,6 +302,7 @@ class ArchA64(Arch):
->>       def __init__(self):
->>           self.sc_perf_evt_open = 241
->>           self.ioctl_numbers = IOCTL_NUMBERS
->> +        self.exit_reason_field = 'esr_ec'
->>           self.exit_reasons = AARCH64_EXIT_REASONS
->>   
->>       def debugfs_is_child(self, field):
->> @@ -311,6 +314,7 @@ class ArchS390(Arch):
->>       def __init__(self):
->>           self.sc_perf_evt_open = 331
->>           self.ioctl_numbers = IOCTL_NUMBERS
->> +        self.exit_reason_field = None
->>           self.exit_reasons = None
->>   
->>       def debugfs_is_child(self, field):
->> @@ -541,8 +545,8 @@ class TracepointProvider(Provider):
->>           """
->>           filters = {}
->>           filters['kvm_userspace_exit'] = ('reason', USERSPACE_EXIT_REASONS)
->> -        if ARCH.exit_reasons:
->> -            filters['kvm_exit'] = ('exit_reason', ARCH.exit_reasons)
->> +        if ARCH.exit_reason_field and ARCH.exit_reasons:
->> +            filters['kvm_exit'] = (ARCH.exit_reason_field, ARCH.exit_reasons)
->>           return filters
->>   
->>       def _get_available_fields(self):
->> -- 
->> 2.23.0
->>
-> 
-> Looks like a reasonable fix to me.
-> 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> 
-
-Thanks for the review and comments.
-
-Regards,
-Gavin
-
+Also the only reason that put_devmap_managed_page() is EXPORT_SYMBOL
+instead of EXPORT_SYMBOL_GPL is that there was no practical way to
+hide the devmap details from evey module in the kernel that did
+put_page(). I would expect free_devmap_managed_page() to
+EXPORT_SYMBOL_GPL if it is not inlined into an existing exported
+static inline api.
