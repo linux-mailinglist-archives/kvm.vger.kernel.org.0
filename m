@@ -2,225 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E24FE1259E4
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 04:17:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6DB2125A06
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 04:34:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727020AbfLSDRv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 22:17:51 -0500
-Received: from mga12.intel.com ([192.55.52.136]:62656 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726961AbfLSDRu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 22:17:50 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 19:17:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; 
-   d="scan'208";a="222160433"
-Received: from allen-box.sh.intel.com ([10.239.159.136])
-  by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 19:17:47 -0800
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-To:     Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     ashok.raj@intel.com, sanjay.k.kumar@intel.com,
-        jacob.jun.pan@linux.intel.com, kevin.tian@intel.com,
-        yi.l.liu@intel.com, yi.y.sun@intel.com,
-        Peter Xu <peterx@redhat.com>, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v4 7/7] iommu/vt-d: debugfs: Add support to show page table internals
-Date:   Thu, 19 Dec 2019 11:16:34 +0800
-Message-Id: <20191219031634.15168-8-baolu.lu@linux.intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191219031634.15168-1-baolu.lu@linux.intel.com>
-References: <20191219031634.15168-1-baolu.lu@linux.intel.com>
+        id S1726817AbfLSDeL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 22:34:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23210 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726779AbfLSDeL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 22:34:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576726450;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IAXDZ2yPhWgynCk13CH9tKDg9wRbgefG5kyIZ57F1Fo=;
+        b=XQYQ06Ez4p9ei14EVstORoa+c7S+sqigr+aL7lkGHdOVa5fxUTzcVEI6337C0jXEF4xdfv
+        WFkX4I16jlFZWeYUw4vTQs8uhNy3x91PiVTE/8+PHljfLY2AQI4hJkpXsoZV+aOuCPgvav
+        FDYgBwKOUdxQax6hiwfNWHe3b5IiMQM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-94-ScClcFYTNhOKCCP1lSNHKw-1; Wed, 18 Dec 2019 22:34:08 -0500
+X-MC-Unique: ScClcFYTNhOKCCP1lSNHKw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C57A593A0;
+        Thu, 19 Dec 2019 03:34:07 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-48.bne.redhat.com [10.64.54.48])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0226426DF8;
+        Thu, 19 Dec 2019 03:33:59 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v2] tools/kvm_stat: Fix kvm_exit filter name
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        vkuznets@redhat.com, maz@kernel.org
+References: <20191217020600.10268-1-gshan@redhat.com>
+ <20191218084538.qnnnla6rqcnoeeah@kamzik.brq.redhat.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <6aa080d0-05a3-cbfc-ada0-4482be152fc2@redhat.com>
+Date:   Thu, 19 Dec 2019 14:33:57 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <20191218084538.qnnnla6rqcnoeeah@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Export page table internals of the domain attached to each device.
-Example of such dump on a Skylake machine:
+On 12/18/19 7:45 PM, Andrew Jones wrote:
+> On Tue, Dec 17, 2019 at 01:06:00PM +1100, Gavin Shan wrote:
+>> The filter name is fixed to "exit_reason" for some kvm_exit events, no
+>> matter what architect we have. Actually, the filter name ("exit_reason")
+>> is only applicable to x86, meaning it's broken on other architects
+>> including aarch64.
+>>
+>> This fixes the issue by providing various kvm_exit filter names, depending
+>> on architect we're on. Afterwards, the variable filter name is picked and
+>> applied by ioctl(fd, SET_FILTER).
+>>
+>> Reported-by: Andrew Jones <drjones@redhat.com>
+> 
+> This wasn't reported by me - I was just the middleman. Credit should go
+> to Jeff Bastian <jbastian@redhat.com>
+> 
 
-$ sudo cat /sys/kernel/debug/iommu/intel/domain_translation_struct
-[ ... ]
-Device 0000:00:14.0 with pasid 0 @0x15f3d9000
-IOVA_PFN                PML5E                   PML4E
-0x000000008ced0 |       0x0000000000000000      0x000000015f3da003
-0x000000008ced1 |       0x0000000000000000      0x000000015f3da003
-0x000000008ced2 |       0x0000000000000000      0x000000015f3da003
-0x000000008ced3 |       0x0000000000000000      0x000000015f3da003
-0x000000008ced4 |       0x0000000000000000      0x000000015f3da003
-0x000000008ced5 |       0x0000000000000000      0x000000015f3da003
-0x000000008ced6 |       0x0000000000000000      0x000000015f3da003
-0x000000008ced7 |       0x0000000000000000      0x000000015f3da003
-0x000000008ced8 |       0x0000000000000000      0x000000015f3da003
-0x000000008ced9 |       0x0000000000000000      0x000000015f3da003
+Sure. Paolo, please let me know if I need post a v3 to fix it up :)
 
-PDPE                    PDE                     PTE
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced0003
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced1003
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced2003
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced3003
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced4003
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced5003
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced6003
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced7003
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced8003
-0x000000015f3db003      0x000000015f3dc003      0x000000008ced9003
-[ ... ]
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>> v2: Rename exit_field to exit_reason_field
+>>      Fix the name to esr_ec for aarch64
+>> ---
+>>   tools/kvm/kvm_stat/kvm_stat | 8 ++++++--
+>>   1 file changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+>> index ad1b9e646c49..4cf93110c259 100755
+>> --- a/tools/kvm/kvm_stat/kvm_stat
+>> +++ b/tools/kvm/kvm_stat/kvm_stat
+>> @@ -270,6 +270,7 @@ class ArchX86(Arch):
+>>       def __init__(self, exit_reasons):
+>>           self.sc_perf_evt_open = 298
+>>           self.ioctl_numbers = IOCTL_NUMBERS
+>> +        self.exit_reason_field = 'exit_reason'
+>>           self.exit_reasons = exit_reasons
+>>   
+>>       def debugfs_is_child(self, field):
+>> @@ -289,6 +290,7 @@ class ArchPPC(Arch):
+>>           # numbers depend on the wordsize.
+>>           char_ptr_size = ctypes.sizeof(ctypes.c_char_p)
+>>           self.ioctl_numbers['SET_FILTER'] = 0x80002406 | char_ptr_size << 16
+>> +        self.exit_reason_field = 'exit_nr'
+>>           self.exit_reasons = {}
+>>   
+>>       def debugfs_is_child(self, field):
+>> @@ -300,6 +302,7 @@ class ArchA64(Arch):
+>>       def __init__(self):
+>>           self.sc_perf_evt_open = 241
+>>           self.ioctl_numbers = IOCTL_NUMBERS
+>> +        self.exit_reason_field = 'esr_ec'
+>>           self.exit_reasons = AARCH64_EXIT_REASONS
+>>   
+>>       def debugfs_is_child(self, field):
+>> @@ -311,6 +314,7 @@ class ArchS390(Arch):
+>>       def __init__(self):
+>>           self.sc_perf_evt_open = 331
+>>           self.ioctl_numbers = IOCTL_NUMBERS
+>> +        self.exit_reason_field = None
+>>           self.exit_reasons = None
+>>   
+>>       def debugfs_is_child(self, field):
+>> @@ -541,8 +545,8 @@ class TracepointProvider(Provider):
+>>           """
+>>           filters = {}
+>>           filters['kvm_userspace_exit'] = ('reason', USERSPACE_EXIT_REASONS)
+>> -        if ARCH.exit_reasons:
+>> -            filters['kvm_exit'] = ('exit_reason', ARCH.exit_reasons)
+>> +        if ARCH.exit_reason_field and ARCH.exit_reasons:
+>> +            filters['kvm_exit'] = (ARCH.exit_reason_field, ARCH.exit_reasons)
+>>           return filters
+>>   
+>>       def _get_available_fields(self):
+>> -- 
+>> 2.23.0
+>>
+> 
+> Looks like a reasonable fix to me.
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> 
 
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
----
- drivers/iommu/intel-iommu-debugfs.c | 75 +++++++++++++++++++++++++++++
- drivers/iommu/intel-iommu.c         |  4 +-
- include/linux/intel-iommu.h         |  2 +
- 3 files changed, 79 insertions(+), 2 deletions(-)
+Thanks for the review and comments.
 
-diff --git a/drivers/iommu/intel-iommu-debugfs.c b/drivers/iommu/intel-iommu-debugfs.c
-index 471f05d452e0..c1257bef553c 100644
---- a/drivers/iommu/intel-iommu-debugfs.c
-+++ b/drivers/iommu/intel-iommu-debugfs.c
-@@ -5,6 +5,7 @@
-  * Authors: Gayatri Kammela <gayatri.kammela@intel.com>
-  *	    Sohil Mehta <sohil.mehta@intel.com>
-  *	    Jacob Pan <jacob.jun.pan@linux.intel.com>
-+ *	    Lu Baolu <baolu.lu@linux.intel.com>
-  */
- 
- #include <linux/debugfs.h>
-@@ -283,6 +284,77 @@ static int dmar_translation_struct_show(struct seq_file *m, void *unused)
- }
- DEFINE_SHOW_ATTRIBUTE(dmar_translation_struct);
- 
-+static inline unsigned long level_to_directory_size(int level)
-+{
-+	return BIT_ULL(VTD_PAGE_SHIFT + VTD_STRIDE_SHIFT * (level - 1));
-+}
-+
-+static inline void
-+dump_page_info(struct seq_file *m, unsigned long iova, u64 *path)
-+{
-+	seq_printf(m, "0x%013lx |\t0x%016llx\t0x%016llx\t0x%016llx\t0x%016llx\t0x%016llx\n",
-+		   iova >> VTD_PAGE_SHIFT, path[5], path[4],
-+		   path[3], path[2], path[1]);
-+}
-+
-+static void pgtable_walk_level(struct seq_file *m, struct dma_pte *pde,
-+			       int level, unsigned long start,
-+			       u64 *path)
-+{
-+	int i;
-+
-+	if (level > 5 || level < 1)
-+		return;
-+
-+	for (i = 0; i < BIT_ULL(VTD_STRIDE_SHIFT);
-+			i++, pde++, start += level_to_directory_size(level)) {
-+		if (!dma_pte_present(pde))
-+			continue;
-+
-+		path[level] = pde->val;
-+		if (dma_pte_superpage(pde) || level == 1)
-+			dump_page_info(m, start, path);
-+		else
-+			pgtable_walk_level(m, phys_to_virt(dma_pte_addr(pde)),
-+					   level - 1, start, path);
-+		path[level] = 0;
-+	}
-+}
-+
-+static int show_device_domain_translation(struct device *dev, void *data)
-+{
-+	struct dmar_domain *domain = find_domain(dev);
-+	struct seq_file *m = data;
-+	u64 path[6] = { 0 };
-+
-+	if (!domain)
-+		return 0;
-+
-+	seq_printf(m, "Device %s with pasid %d @0x%llx\n",
-+		   dev_name(dev), domain->default_pasid,
-+		   (u64)virt_to_phys(domain->pgd));
-+	seq_puts(m, "IOVA_PFN\t\tPML5E\t\t\tPML4E\t\t\tPDPE\t\t\tPDE\t\t\tPTE\n");
-+
-+	pgtable_walk_level(m, domain->pgd, domain->agaw + 2, 0, path);
-+	seq_putc(m, '\n');
-+
-+	return 0;
-+}
-+
-+static int domain_translation_struct_show(struct seq_file *m, void *unused)
-+{
-+	unsigned long flags;
-+	int ret;
-+
-+	spin_lock_irqsave(&device_domain_lock, flags);
-+	ret = bus_for_each_dev(&pci_bus_type, NULL, m,
-+			       show_device_domain_translation);
-+	spin_unlock_irqrestore(&device_domain_lock, flags);
-+
-+	return ret;
-+}
-+DEFINE_SHOW_ATTRIBUTE(domain_translation_struct);
-+
- #ifdef CONFIG_IRQ_REMAP
- static void ir_tbl_remap_entry_show(struct seq_file *m,
- 				    struct intel_iommu *iommu)
-@@ -396,6 +468,9 @@ void __init intel_iommu_debugfs_init(void)
- 			    &iommu_regset_fops);
- 	debugfs_create_file("dmar_translation_struct", 0444, intel_iommu_debug,
- 			    NULL, &dmar_translation_struct_fops);
-+	debugfs_create_file("domain_translation_struct", 0444,
-+			    intel_iommu_debug, NULL,
-+			    &domain_translation_struct_fops);
- #ifdef CONFIG_IRQ_REMAP
- 	debugfs_create_file("ir_translation_struct", 0444, intel_iommu_debug,
- 			    NULL, &ir_translation_struct_fops);
-diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-index 6a2b2d72c7a5..41b031d5ba65 100644
---- a/drivers/iommu/intel-iommu.c
-+++ b/drivers/iommu/intel-iommu.c
-@@ -396,7 +396,7 @@ EXPORT_SYMBOL_GPL(intel_iommu_gfx_mapped);
- 
- #define DUMMY_DEVICE_DOMAIN_INFO ((struct device_domain_info *)(-1))
- #define DEFER_DEVICE_DOMAIN_INFO ((struct device_domain_info *)(-2))
--static DEFINE_SPINLOCK(device_domain_lock);
-+DEFINE_SPINLOCK(device_domain_lock);
- static LIST_HEAD(device_domain_list);
- 
- #define device_needs_bounce(d) (!intel_no_bounce && dev_is_pci(d) &&	\
-@@ -2503,7 +2503,7 @@ static void domain_remove_dev_info(struct dmar_domain *domain)
- 	spin_unlock_irqrestore(&device_domain_lock, flags);
- }
- 
--static struct dmar_domain *find_domain(struct device *dev)
-+struct dmar_domain *find_domain(struct device *dev)
- {
- 	struct device_domain_info *info;
- 
-diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-index 3a4708a8a414..4a16b39ae353 100644
---- a/include/linux/intel-iommu.h
-+++ b/include/linux/intel-iommu.h
-@@ -441,6 +441,7 @@ enum {
- #define VTD_FLAG_SVM_CAPABLE		(1 << 2)
- 
- extern int intel_iommu_sm;
-+extern spinlock_t device_domain_lock;
- 
- #define sm_supported(iommu)	(intel_iommu_sm && ecap_smts((iommu)->ecap))
- #define pasid_supported(iommu)	(sm_supported(iommu) &&			\
-@@ -663,6 +664,7 @@ int for_each_device_domain(int (*fn)(struct device_domain_info *info,
- 				     void *data), void *data);
- void iommu_flush_write_buffer(struct intel_iommu *iommu);
- int intel_iommu_enable_pasid(struct intel_iommu *iommu, struct device *dev);
-+struct dmar_domain *find_domain(struct device *dev);
- 
- #ifdef CONFIG_INTEL_IOMMU_SVM
- extern void intel_svm_check(struct intel_iommu *iommu);
--- 
-2.17.1
+Regards,
+Gavin
 
