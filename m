@@ -2,204 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C8EB12599E
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 03:35:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F5651259D6
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 04:17:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726813AbfLSCfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 21:35:52 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:57026 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726700AbfLSCfv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 21:35:51 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id E3B169EA66CD9E325FA9;
-        Thu, 19 Dec 2019 10:35:48 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Thu, 19 Dec 2019
- 10:35:40 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <hpa@zytor.com>
-CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH v2] KVM: x86: remove unnecessary return vals of kvm pit functions
-Date:   Thu, 19 Dec 2019 10:35:20 +0800
-Message-ID: <1576722920-10558-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
+        id S1726797AbfLSDRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 22:17:34 -0500
+Received: from mga05.intel.com ([192.55.52.43]:29385 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726463AbfLSDRe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 22:17:34 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 19:17:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; 
+   d="scan'208";a="222160398"
+Received: from allen-box.sh.intel.com ([10.239.159.136])
+  by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 19:17:30 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Joerg Roedel <joro@8bytes.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     ashok.raj@intel.com, sanjay.k.kumar@intel.com,
+        jacob.jun.pan@linux.intel.com, kevin.tian@intel.com,
+        yi.l.liu@intel.com, yi.y.sun@intel.com,
+        Peter Xu <peterx@redhat.com>, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v4 0/7] Use 1st-level for IOVA translation
+Date:   Thu, 19 Dec 2019 11:16:27 +0800
+Message-Id: <20191219031634.15168-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
+Intel VT-d in scalable mode supports two types of page tables
+for DMA translation: the first level page table and the second
+level page table. The first level page table uses the same
+format as the CPU page table, while the second level page table
+keeps compatible with previous formats. The software is able
+to choose any one of them for DMA remapping according to the use
+case.
 
-The return vals of kvm pit functions are always equal to 0, which means
-there is no way to failed with these function. So remove the return vals
-as it's unnecessary to check these. Also add BUILD_BUG_ON to guard against
-channels size changed unexpectly.
+This patchset aims to move IOVA (I/O Virtual Address) translation
+to 1st-level page table in scalable mode. This will simplify vIOMMU
+(IOMMU simulated by VM hypervisor) design by using the two-stage
+translation, a.k.a. nested mode translation.
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
-v2:
-	reorganize the patches. The previous one looks unresonable. I'm
-sorry about it.
----
- arch/x86/kvm/x86.c | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+As Intel VT-d architecture offers caching mode, guest IOVA (GIOVA)
+support is currently implemented in a shadow page manner. The device
+simulation software, like QEMU, has to figure out GIOVA->GPA mappings
+and write them to a shadowed page table, which will be used by the
+physical IOMMU. Each time when mappings are created or destroyed in
+vIOMMU, the simulation software has to intervene. Hence, the changes
+on GIOVA->GPA could be shadowed to host.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8bb2fb1705ff..b8a75c581214 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4596,7 +4596,7 @@ static int kvm_vm_ioctl_set_irqchip(struct kvm *kvm, struct kvm_irqchip *chip)
- 	return r;
- }
- 
--static int kvm_vm_ioctl_get_pit(struct kvm *kvm, struct kvm_pit_state *ps)
-+static void kvm_vm_ioctl_get_pit(struct kvm *kvm, struct kvm_pit_state *ps)
- {
- 	struct kvm_kpit_state *kps = &kvm->arch.vpit->pit_state;
- 
-@@ -4605,40 +4605,44 @@ static int kvm_vm_ioctl_get_pit(struct kvm *kvm, struct kvm_pit_state *ps)
- 	mutex_lock(&kps->lock);
- 	memcpy(ps, &kps->channels, sizeof(*ps));
- 	mutex_unlock(&kps->lock);
--	return 0;
- }
- 
--static int kvm_vm_ioctl_set_pit(struct kvm *kvm, struct kvm_pit_state *ps)
-+static void kvm_vm_ioctl_set_pit(struct kvm *kvm, struct kvm_pit_state *ps)
- {
- 	int i;
- 	struct kvm_pit *pit = kvm->arch.vpit;
- 
-+	BUILD_BUG_ON(sizeof(*ps) != sizeof(pit->pit_state.channels));
-+
- 	mutex_lock(&pit->pit_state.lock);
- 	memcpy(&pit->pit_state.channels, ps, sizeof(*ps));
- 	for (i = 0; i < 3; i++)
- 		kvm_pit_load_count(pit, i, ps->channels[i].count, 0);
- 	mutex_unlock(&pit->pit_state.lock);
--	return 0;
- }
- 
--static int kvm_vm_ioctl_get_pit2(struct kvm *kvm, struct kvm_pit_state2 *ps)
-+static void kvm_vm_ioctl_get_pit2(struct kvm *kvm, struct kvm_pit_state2 *ps)
- {
-+	BUILD_BUG_ON(sizeof(ps->channels) !=
-+		     sizeof(kvm->arch.vpit->pit_state.channels));
-+
- 	mutex_lock(&kvm->arch.vpit->pit_state.lock);
- 	memcpy(ps->channels, &kvm->arch.vpit->pit_state.channels,
- 		sizeof(ps->channels));
- 	ps->flags = kvm->arch.vpit->pit_state.flags;
- 	mutex_unlock(&kvm->arch.vpit->pit_state.lock);
- 	memset(&ps->reserved, 0, sizeof(ps->reserved));
--	return 0;
- }
- 
--static int kvm_vm_ioctl_set_pit2(struct kvm *kvm, struct kvm_pit_state2 *ps)
-+static void kvm_vm_ioctl_set_pit2(struct kvm *kvm, struct kvm_pit_state2 *ps)
- {
- 	int start = 0;
- 	int i;
- 	u32 prev_legacy, cur_legacy;
- 	struct kvm_pit *pit = kvm->arch.vpit;
- 
-+	BUILD_BUG_ON(sizeof(ps->channels) != sizeof(pit->pit_state.channels));
-+
- 	mutex_lock(&pit->pit_state.lock);
- 	prev_legacy = pit->pit_state.flags & KVM_PIT_FLAGS_HPET_LEGACY;
- 	cur_legacy = ps->flags & KVM_PIT_FLAGS_HPET_LEGACY;
-@@ -4651,17 +4655,13 @@ static int kvm_vm_ioctl_set_pit2(struct kvm *kvm, struct kvm_pit_state2 *ps)
- 		kvm_pit_load_count(pit, i, pit->pit_state.channels[i].count,
- 				   start && i == 0);
- 	mutex_unlock(&pit->pit_state.lock);
--	return 0;
- }
- 
--static int kvm_vm_ioctl_reinject(struct kvm *kvm,
-+static void kvm_vm_ioctl_reinject(struct kvm *kvm,
- 				 struct kvm_reinject_control *control)
- {
- 	struct kvm_pit *pit = kvm->arch.vpit;
- 
--	if (!pit)
--		return -ENXIO;
--
- 	/* pit->pit_state.lock was overloaded to prevent userspace from getting
- 	 * an inconsistent state after running multiple KVM_REINJECT_CONTROL
- 	 * ioctls in parallel.  Use a separate lock if that ioctl isn't rare.
-@@ -4669,8 +4669,6 @@ static int kvm_vm_ioctl_reinject(struct kvm *kvm,
- 	mutex_lock(&pit->pit_state.lock);
- 	kvm_pit_set_reinject(pit, control->pit_reinject);
- 	mutex_unlock(&pit->pit_state.lock);
--
--	return 0;
- }
- 
- /**
-@@ -4981,9 +4979,7 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = -ENXIO;
- 		if (!kvm->arch.vpit)
- 			goto out;
--		r = kvm_vm_ioctl_get_pit(kvm, &u.ps);
--		if (r)
--			goto out;
-+		kvm_vm_ioctl_get_pit(kvm, &u.ps);
- 		r = -EFAULT;
- 		if (copy_to_user(argp, &u.ps, sizeof(struct kvm_pit_state)))
- 			goto out;
-@@ -4997,16 +4993,15 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = -ENXIO;
- 		if (!kvm->arch.vpit)
- 			goto out;
--		r = kvm_vm_ioctl_set_pit(kvm, &u.ps);
-+		kvm_vm_ioctl_set_pit(kvm, &u.ps);
-+		r = 0;
- 		break;
- 	}
- 	case KVM_GET_PIT2: {
- 		r = -ENXIO;
- 		if (!kvm->arch.vpit)
- 			goto out;
--		r = kvm_vm_ioctl_get_pit2(kvm, &u.ps2);
--		if (r)
--			goto out;
-+		kvm_vm_ioctl_get_pit2(kvm, &u.ps2);
- 		r = -EFAULT;
- 		if (copy_to_user(argp, &u.ps2, sizeof(u.ps2)))
- 			goto out;
-@@ -5020,7 +5015,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = -ENXIO;
- 		if (!kvm->arch.vpit)
- 			goto out;
--		r = kvm_vm_ioctl_set_pit2(kvm, &u.ps2);
-+		kvm_vm_ioctl_set_pit2(kvm, &u.ps2);
-+		r = 0;
- 		break;
- 	}
- 	case KVM_REINJECT_CONTROL: {
-@@ -5028,7 +5024,11 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r =  -EFAULT;
- 		if (copy_from_user(&control, argp, sizeof(control)))
- 			goto out;
--		r = kvm_vm_ioctl_reinject(kvm, &control);
-+		r = -ENXIO;
-+		if (!kvm->arch.vpit)
-+			goto out;
-+		kvm_vm_ioctl_reinject(kvm, &control);
-+		r = 0;
- 		break;
- 	}
- 	case KVM_SET_BOOT_CPU_ID:
+
+     .-----------.
+     |  vIOMMU   |
+     |-----------|                 .--------------------.
+     |           |IOTLB flush trap |        QEMU        |
+     .-----------. (map/unmap)     |--------------------|
+     |GIOVA->GPA |---------------->|    .------------.  |
+     '-----------'                 |    | GIOVA->HPA |  |
+     |           |                 |    '------------'  |
+     '-----------'                 |                    |
+                                   |                    |
+                                   '--------------------'
+                                                |
+            <------------------------------------
+            |
+            v VFIO/IOMMU API
+      .-----------.
+      |  pIOMMU   |
+      |-----------|
+      |           |
+      .-----------.
+      |GIOVA->HPA |
+      '-----------'
+      |           |
+      '-----------'
+
+In VT-d 3.0, scalable mode is introduced, which offers two-level
+translation page tables and nested translation mode. Regards to
+GIOVA support, it can be simplified by 1) moving the GIOVA support
+over 1st-level page table to store GIOVA->GPA mapping in vIOMMU,
+2) binding vIOMMU 1st level page table to the pIOMMU, 3) using pIOMMU
+second level for GPA->HPA translation, and 4) enable nested (a.k.a.
+dual-stage) translation in host. Compared with current shadow GIOVA
+support, the new approach makes the vIOMMU design simpler and more
+efficient as we only need to flush the pIOMMU IOTLB and possible
+device-IOTLB when an IOVA mapping in vIOMMU is torn down.
+
+     .-----------.
+     |  vIOMMU   |
+     |-----------|                 .-----------.
+     |           |IOTLB flush trap |   QEMU    |
+     .-----------.    (unmap)      |-----------|
+     |GIOVA->GPA |---------------->|           |
+     '-----------'                 '-----------'
+     |           |                       |
+     '-----------'                       |
+           <------------------------------
+           |      VFIO/IOMMU          
+           |  cache invalidation and  
+           | guest gpd bind interfaces
+           v
+     .-----------.
+     |  pIOMMU   |
+     |-----------|
+     .-----------.
+     |GIOVA->GPA |<---First level
+     '-----------'
+     | GPA->HPA  |<---Scond level
+     '-----------'
+     '-----------'
+
+This patch applies the first level page table for IOVA translation
+unless the DOMAIN_ATTR_NESTING domain attribution has been set.
+Setting of this attribution means the second level will be used to
+map gPA (guest physical address) to hPA (host physical address), and
+the mappings between gVA (guest virtual address) and gPA will be
+maintained by the guest with the page table address binding to host's
+first level.
+
+Based-on-idea-by: Ashok Raj <ashok.raj@intel.com>
+Based-on-idea-by: Kevin Tian <kevin.tian@intel.com>
+Based-on-idea-by: Liu Yi L <yi.l.liu@intel.com>
+Based-on-idea-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Based-on-idea-by: Sanjay Kumar <sanjay.k.kumar@intel.com>
+Based-on-idea-by: Lu Baolu <baolu.lu@linux.intel.com>
+
+Change log:
+
+v3->v4:
+ - The previous version was posted here
+   https://lkml.org/lkml/2019/12/10/2126
+ - Set Execute Disable (bit 63) in first level table entries.
+ - Enhance pasid-based iotlb invalidation for both default domain
+   and auxiliary domain.
+ - Add debugfs file to expose page table internals.
+
+v2->v3:
+ - The previous version was posted here
+   https://lkml.org/lkml/2019/11/27/1831
+ - Accept Jacob's suggestion on merging two page tables.
+
+ v1->v2
+ - The first series was posted here
+   https://lkml.org/lkml/2019/9/23/297
+ - Use per domain page table ops to handle different page tables.
+ - Use first level for DMA remapping by default on both bare metal
+   and vm guest.
+ - Code refine according to code review comments for v1.
+
+Lu Baolu (7):
+  iommu/vt-d: Identify domains using first level page table
+  iommu/vt-d: Add set domain DOMAIN_ATTR_NESTING attr
+  iommu/vt-d: Add PASID_FLAG_FL5LP for first-level pasid setup
+  iommu/vt-d: Setup pasid entries for iova over first level
+  iommu/vt-d: Flush PASID-based iotlb for iova over first level
+  iommu/vt-d: Use iova over first level
+  iommu/vt-d: debugfs: Add support to show page table internals
+
+ drivers/iommu/dmar.c                |  41 ++++++
+ drivers/iommu/intel-iommu-debugfs.c |  75 +++++++++++
+ drivers/iommu/intel-iommu.c         | 201 +++++++++++++++++++++++++---
+ drivers/iommu/intel-pasid.c         |   7 +-
+ drivers/iommu/intel-pasid.h         |   6 +
+ drivers/iommu/intel-svm.c           |   8 +-
+ include/linux/intel-iommu.h         |  20 ++-
+ 7 files changed, 326 insertions(+), 32 deletions(-)
+
 -- 
-2.19.1
+2.17.1
 
