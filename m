@@ -2,152 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 25BE0126B72
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 19:57:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 558B3126BF6
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 20:00:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730834AbfLSS4d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Dec 2019 13:56:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43926 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730825AbfLSS4b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Dec 2019 13:56:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576781790;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=50ypp4twcT7h3+0B/Lg/fNtkFrCt7aoByDDwvMuuMiQ=;
-        b=UMVp1uj/8lekcWC7bYg83gA1r3mrlTp4DcKXsdgNKKi+8y/74TYDlqxdrhdNq/J9m2Akf+
-        ceyUGY4n59N/ERy+49oQW0wYW1aVazhgbREkQzjDO0hR/fHDRQo06eiOTd8g1XXbWG6Lxl
-        CGHybQegGPtcSmSHcu0de4IkICr/ftE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-w_dsgI9dOZK8MOwxNR9XOA-1; Thu, 19 Dec 2019 13:56:26 -0500
-X-MC-Unique: w_dsgI9dOZK8MOwxNR9XOA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04ABA107ACC9;
-        Thu, 19 Dec 2019 18:56:24 +0000 (UTC)
-Received: from x1.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D127100EBAA;
-        Thu, 19 Dec 2019 18:56:22 +0000 (UTC)
-Date:   Thu, 19 Dec 2019 11:56:21 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20191219115621.67e2fe7c@x1.home>
-In-Reply-To: <6667e0b4-f3da-6283-3f27-c1cba3d13117@nvidia.com>
-References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
-        <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
-        <20191217051513.GE21868@joy-OptiPlex-7040>
-        <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
-        <20191218143902.3c9b06df@x1.home>
-        <6667e0b4-f3da-6283-3f27-c1cba3d13117@nvidia.com>
-Organization: Red Hat
+        id S1730192AbfLSTAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Dec 2019 14:00:31 -0500
+Received: from mga18.intel.com ([134.134.136.126]:31252 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728433AbfLSTAa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Dec 2019 14:00:30 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Dec 2019 11:00:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,332,1571727600"; 
+   d="scan'208";a="241261269"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga004.fm.intel.com with ESMTP; 19 Dec 2019 11:00:28 -0800
+Date:   Thu, 19 Dec 2019 11:00:28 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Frederic Weisbecker <frederic@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org
+Subject: Re: Async page fault delivered while irq are disabled?
+Message-ID: <20191219190028.GB6439@linux.intel.com>
+References: <20191219152814.GA24080@lenoir>
+ <20191219155745.GA6439@linux.intel.com>
+ <20191219161524.GB24080@lenoir>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191219161524.GB24080@lenoir>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Dec 2019 00:12:30 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
-
-> On 12/19/2019 3:09 AM, Alex Williamson wrote:
-> > On Tue, 17 Dec 2019 14:54:14 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> On 12/17/2019 10:45 AM, Yan Zhao wrote:  
-> >>> On Tue, Dec 17, 2019 at 04:21:39AM +0800, Kirti Wankhede wrote:  
-> >>>> +		} else if (range.flags &
-> >>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> >>>> +			uint64_t iommu_pgmask;
-> >>>> +			unsigned long pgshift = __ffs(range.pgsize);
-> >>>> +			unsigned long *bitmap;
-> >>>> +			long bsize;
-> >>>> +
-> >>>> +			iommu_pgmask =
-> >>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
-> >>>> +
-> >>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
-> >>>> +			    (range.pgsize - 1))
-> >>>> +				return -EINVAL;
-> >>>> +
-> >>>> +			if (range.iova & iommu_pgmask)
-> >>>> +				return -EINVAL;
-> >>>> +			if (!range.size || range.size > SIZE_MAX)
-> >>>> +				return -EINVAL;
-> >>>> +			if (range.iova + range.size < range.iova)
-> >>>> +				return -EINVAL;
-> >>>> +
-> >>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
-> >>>> +						   range.bitmap_size);
-> >>>> +			if (bsize)
-> >>>> +				return ret;
-> >>>> +
-> >>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);
-> >>>> +			if (!bitmap)
-> >>>> +				return -ENOMEM;
-> >>>> +
-> >>>> +			ret = copy_from_user(bitmap,
-> >>>> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
-> >>>> +			if (ret)
-> >>>> +				goto bitmap_exit;
-> >>>> +
-> >>>> +			iommu->dirty_page_tracking = false;  
-> >>> why iommu->dirty_page_tracking is false here?
-> >>> suppose this ioctl can be called several times.
-> >>>      
-> >>
-> >> This ioctl can be called several times, but once this ioctl is called
-> >> that means vCPUs are stopped and VFIO devices are stopped (i.e. in
-> >> stop-and-copy phase) and dirty pages bitmap are being queried by user.  
+On Thu, Dec 19, 2019 at 05:15:25PM +0100, Frederic Weisbecker wrote:
+> On Thu, Dec 19, 2019 at 07:57:46AM -0800, Sean Christopherson wrote:
+> > On Thu, Dec 19, 2019 at 04:28:15PM +0100, Frederic Weisbecker wrote:
+> > > Hi,
+> > > 
+> > > While checking the x86 async page fault code, I can't
+> > > find anything that prevents KVM_PV_REASON_PAGE_READY to be injected
+> > > while the guest has interrupts disabled. If that page fault happens
+> > > to trap in an interrupt disabled section, there may be a deadlock due to the
+> > > call to wake_up_process() which locks the rq->lock (among others).
+> > > 
+> > > Given how long that code is there, I guess such an issue would
+> > > have been reported for a while already. But I just would like to
+> > > be sure we are checking that.
+> > > 
+> > > Can someone enlighten me?
 > > 
-> > Do not assume how userspace works or its intent.  If dirty tracking is
-> > on, it should remain on until the user turns it off.  We cannot assume
-> > userspace uses a one-shot approach.  Thanks,
-> >   
+> > The check is triggered from the caller of kvm_async_page_present().
+> > 
+> > kvm_check_async_pf_completion()
+> > |
+> > |-> kvm_arch_can_inject_async_page_present()
+> >     |
+> >     |-> kvm_can_do_async_pf()
+> >         |
+> >         |-> kvm_x86_ops->interrupt_allowed()
 > 
-> Dirty tracking should be on until user turns it off or user reads 
-> bitmap, right? This ioctl is used to read bitmap.
+> Ah thanks, I missed that one. And what about
+> kvm_async_page_present_sync()? I don't see a similar check
+> there.
 
-No, dirty bitmap tracking is on until the user turns it off, period.
-Retrieving the bitmap is probably only looking at a portion of the
-container address space at a time, anything else would place
-impractical requirements on the user allocated bitmap.  We also need to
-support a usage model where the user is making successive calls, where
-each should report pages dirtied since the previous call.  If the user
-is required to re-enable tracking, there's an irreconcilable gap
-between the call to retrieve the dirty bitmap and their opportunity to
-re-enable dirty tracking.  It's fundamentally broken to automatically
-disable tracking on read.  Thanks,
+CONFIG_KVM_ASYNC_PF_SYNC is selected only by s390, it can't be turned on
+for x86.
 
-Alex
+> And one last silly question, what about that line in
+> kvm_arch_can_inject_async_page_present:
+> 
+> 	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
+> 		return true;
+> 
+> That looks weird, also it shortcuts the irqs_allowed() check.
 
+I wondered about that code as well :-).  Definitely odd, but it would
+require the guest to disable async #PF after an async #PF is queued.  Best
+guess is the idea is that it's the guest's problem if it disables async #PF
+on the fly.
