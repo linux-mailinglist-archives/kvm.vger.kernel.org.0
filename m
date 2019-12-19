@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3383E126123
-	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 12:46:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA155126162
+	for <lists+kvm@lfdr.de>; Thu, 19 Dec 2019 12:59:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726702AbfLSLqB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Dec 2019 06:46:01 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2108 "EHLO huawei.com"
+        id S1726801AbfLSL7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Dec 2019 06:59:12 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2109 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726668AbfLSLqB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Dec 2019 06:46:01 -0500
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.54])
-        by Forcepoint Email with ESMTP id 0245EC08727047931738;
-        Thu, 19 Dec 2019 19:45:58 +0800 (CST)
+        id S1726668AbfLSL7M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Dec 2019 06:59:12 -0500
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.56])
+        by Forcepoint Email with ESMTP id 271993F2B861E22293DF;
+        Thu, 19 Dec 2019 19:59:08 +0800 (CST)
 Received: from dggeme755-chm.china.huawei.com (10.3.19.101) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 19 Dec 2019 19:45:57 +0800
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 19 Dec 2019 19:59:07 +0800
 Received: from [127.0.0.1] (10.173.221.248) by dggeme755-chm.china.huawei.com
  (10.3.19.101) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5; Thu, 19
- Dec 2019 19:45:56 +0800
-Subject: Re: [PATCH 1/5] KVM: arm64: Document PV-lock interface
+ Dec 2019 19:59:06 +0800
+Subject: Re: [PATCH 2/5] KVM: arm64: Implement PV_LOCK_FEATURES call
 To:     Steven Price <steven.price@arm.com>
 CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-arm-kernel@lists.infradead.org" 
@@ -41,20 +41,20 @@ CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "will@kernel.org" <will@kernel.org>,
         "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>
 References: <20191217135549.3240-1-yezengruan@huawei.com>
- <20191217135549.3240-2-yezengruan@huawei.com>
- <20191217142138.GA38811@arm.com>
+ <20191217135549.3240-3-yezengruan@huawei.com>
+ <20191217142848.GB38811@arm.com>
 From:   yezengruan <yezengruan@huawei.com>
-Message-ID: <49120a3c-405d-d2e3-2a88-ba590feccbcc@huawei.com>
-Date:   Thu, 19 Dec 2019 19:45:55 +0800
+Message-ID: <21910175-c89a-7a14-66a9-7b53d72a4543@huawei.com>
+Date:   Thu, 19 Dec 2019 19:59:04 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20191217142138.GA38811@arm.com>
+In-Reply-To: <20191217142848.GB38811@arm.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.173.221.248]
-X-ClientProxiedBy: dggeme707-chm.china.huawei.com (10.1.199.103) To
+X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
  dggeme755-chm.china.huawei.com (10.3.19.101)
 X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
@@ -64,91 +64,103 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Steve,
 
-On 2019/12/17 22:21, Steven Price wrote:
-> On Tue, Dec 17, 2019 at 01:55:45PM +0000, yezengruan@huawei.com wrote:
+On 2019/12/17 22:28, Steven Price wrote:
+> On Tue, Dec 17, 2019 at 01:55:46PM +0000, yezengruan@huawei.com wrote:
 >> From: Zengruan Ye <yezengruan@huawei.com>
 >>
->> Introduce a paravirtualization interface for KVM/arm64 to obtain the vcpu
->> is currently running or not.
+>> This provides a mechanism for querying which paravirtualized lock
+>> features are available in this hypervisor.
 >>
->> A hypercall interface is provided for the guest to interrogate the
->> hypervisor's support for this interface and the location of the shared
->> memory structures.
+>> Also add the header file which defines the ABI for the paravirtualized
+>> lock features we're about to add.
 >>
 >> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
 >> ---
->>  Documentation/virt/kvm/arm/pvlock.rst | 31 +++++++++++++++++++++++++++
->>  1 file changed, 31 insertions(+)
->>  create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
+>>  arch/arm64/include/asm/pvlock-abi.h | 16 ++++++++++++++++
+>>  include/linux/arm-smccc.h           | 13 +++++++++++++
+>>  virt/kvm/arm/hypercalls.c           |  3 +++
+>>  3 files changed, 32 insertions(+)
+>>  create mode 100644 arch/arm64/include/asm/pvlock-abi.h
 >>
->> diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
+>> diff --git a/arch/arm64/include/asm/pvlock-abi.h b/arch/arm64/include/asm/pvlock-abi.h
 >> new file mode 100644
->> index 000000000000..eec0c36edf17
+>> index 000000000000..06e0c3d7710a
 >> --- /dev/null
->> +++ b/Documentation/virt/kvm/arm/pvlock.rst
->> @@ -0,0 +1,31 @@
->> +.. SPDX-License-Identifier: GPL-2.0
+>> +++ b/arch/arm64/include/asm/pvlock-abi.h
+>> @@ -0,0 +1,16 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * Copyright(c) 2019 Huawei Technologies Co., Ltd
+>> + * Author: Zengruan Ye <yezengruan@huawei.com>
+>> + */
 >> +
->> +Paravirtualized lock support for arm64
->> +======================================
+>> +#ifndef __ASM_PVLOCK_ABI_H
+>> +#define __ASM_PVLOCK_ABI_H
 >> +
->> +KVM/arm64 provids some hypervisor service calls to support a paravirtualized
->> +guest obtaining the vcpu is currently running or not.
->> +
->> +Two new SMCCC compatible hypercalls are defined:
->> +
->> +* PV_LOCK_FEATURES:   0xC5000040
->> +* PV_LOCK_PREEMPTED:  0xC5000041
+>> +struct pvlock_vcpu_state {
+>> +	__le64 preempted;
 > 
-> These values are in the "Standard Hypervisor Service Calls" section of
-> SMCCC - so is there a document that describes this features such that
-> other OSes or hypervisors can implement it? I'm also not entirely sure
-> of the process of ensuring that the IDs picked are non-conflicting.
-> 
-> Otherwise if this is a KVM specific interface this should probably
-> belong within the "Vendor Specific Hypervisor Service Calls" section
-> along with some probing that the hypervisor is actually KVM. Although I
-> don't see anything KVM specific.
+> Somewhere we need to document when 'preempted' is. It looks like it's a
+> 1-bit field from the later patches.
 
-Thanks for pointing it out to me! Actually, I also don't see any documents
-or KVM specific that describes this features. The values in the "Vendor
-Specific Hypervisor Service Calls" section may be more appropriate, such as
-the following
-
-* PV_LOCK_FEATURES:   0xC6000020
-* PV_LOCK_PREEMPTED:  0xC6000021
-
-Please let me know if you have any suggestions.
+Good point, I'll document this in the pvlock doc.
 
 > 
+>> +	/* Structure must be 64 byte aligned, pad to that size */
+>> +	u8 padding[56];
+>> +} __packed;
 >> +
->> +The existence of the PV_LOCK hypercall should be probed using the SMCCC 1.1
->> +ARCH_FEATURES mechanism before calling it.
+>> +#endif
+>> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+>> index 59494df0f55b..59e65a951959 100644
+>> --- a/include/linux/arm-smccc.h
+>> +++ b/include/linux/arm-smccc.h
+>> @@ -377,5 +377,18 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
+>>  			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+>>  			   0x21)
+>>  
+>> +/* Paravirtualised lock calls */
+>> +#define ARM_SMCCC_HV_PV_LOCK_FEATURES				\
+>> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+>> +			   ARM_SMCCC_SMC_64,			\
+>> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+>> +			   0x40)
 >> +
->> +PV_LOCK_FEATURES
->> +    ============= ========    ==========
->> +    Function ID:  (uint32)    0xC5000040
->> +    PV_call_id:   (uint32)    The function to query for support.
->> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
->> +                              PV-lock feature is supported by the hypervisor.
->> +    ============= ========    ==========
+>> +#define ARM_SMCCC_HV_PV_LOCK_PREEMPTED				\
+>> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+>> +			   ARM_SMCCC_SMC_64,			\
+>> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+>> +			   0x41)
 >> +
->> +PV_LOCK_PREEMPTED
->> +    ============= ========    ==========
->> +    Function ID:  (uint32)    0xC5000041
->> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the IPA of
->> +                              this vcpu's pv data structure is configured by
->> +                              the hypervisor.
->> +    ============= ========    ==========
+>>  #endif /*__ASSEMBLY__*/
+>>  #endif /*__LINUX_ARM_SMCCC_H*/
+>> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
+>> index 550dfa3e53cd..ff13871fd85a 100644
+>> --- a/virt/kvm/arm/hypercalls.c
+>> +++ b/virt/kvm/arm/hypercalls.c
+>> @@ -52,6 +52,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>>  		case ARM_SMCCC_HV_PV_TIME_FEATURES:
+>>  			val = SMCCC_RET_SUCCESS;
+>>  			break;
+>> +		case ARM_SMCCC_HV_PV_LOCK_FEATURES:
+>> +			val = SMCCC_RET_SUCCESS;
+>> +			break;
 > 
->>From the code it looks like there's another argument for this SMC - the
-> physical address (or IPA) of a struct pvlock_vcpu_state. This structure
-> also needs to be described as it is part of the ABI.
+> Ideally you wouldn't report that PV_LOCK_FEATURES exists until the
+> actual hypercalls are wired up to avoid breaking a bisect.
 
-Will update.
+Thanks for pointing it out to me! I'll update the code.
 
 > 
 > Steve
+> 
+>>  		}
+>>  		break;
+>>  	case ARM_SMCCC_HV_PV_TIME_FEATURES:
+>> -- 
+>> 2.19.1
+>>
+>>
 > 
 > .
 > 
