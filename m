@@ -2,91 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A1D31285A3
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 00:45:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00A961285C3
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 00:55:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726556AbfLTXpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 18:45:44 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:46209 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726514AbfLTXpo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 18:45:44 -0500
-Received: by mail-io1-f68.google.com with SMTP id t26so11054245ioi.13
-        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 15:45:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2VVoGEzfR7gG4AluE0EIlluC91OZtoA+xaJXujx9EZA=;
-        b=fDddvzBb0bYbEvg2ftxslgpoxEewFZ/Kex/j4djuhoeS4r4YTD+7rhUUiwlFtYhzKi
-         Gl1Z7EtniYAfN9Ruc13+zc4x9ruUDseNybwv5OL/Ktnkpe+9zAisaB9r9nDFlW9rm768
-         ElCd59YH1eXi5XWW1QYFgml2d8E5PjcXG7gSnQ8IAB800j35JmLYaIYZcXzTEgofbS/a
-         M1Vf2qbri5SamAscRWbgoskm+wCaZF4F1JcIO4YSsQ/5ridbpOWbJn7USXR/c3asZswy
-         XG7IRinwL+v/9/T+8amRzugQ8lneun6LajG5tkad7ipfvDf3EGC/GHPj02YZ+o11oIf8
-         aXtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2VVoGEzfR7gG4AluE0EIlluC91OZtoA+xaJXujx9EZA=;
-        b=Vz2bLMHH/dAq6BFQfAO5Ao9otMCRaZAXG41hr+Dv/LjrikkuF9q6VMLJBXTp1rePm4
-         iEoWIs4GHCLve6x8Vd/pNaTPzudNuXVWmnjSfqhR7JvIipe+YvfrQr6WMJl2nQI+O5mr
-         DhQ00U/3QilRYrq8/9H2TdNhlOJM2hAoujSgzlA4+2OjPpKH7IuFVI6Q3sxH9jC1romz
-         HQxX31rJ0P3kRqblk3pjIwudMf0UEClOXioxTDi+48C3PssoUWO7KjV3SLHWkQVuD3Bq
-         NK6inqg7uSzQ5652/VtLsDkaQBKqq1tSm0PtLq0FgY/JzlN11NuLJNGXWMuhZ8gbd3PG
-         SvcA==
-X-Gm-Message-State: APjAAAXv0uCmhBqiPBXK0SPuTWO3RxnmEB2T+1NFC9vCNQVygNBYvN5N
-        PAZB9KGI2azmNnvEJ84p6sNxlixu/a/MvefYqedMtPa6oXo=
-X-Google-Smtp-Source: APXvYqxxsYyzCNu9Eu/1MywB6OE97eDUlHasPK3azbCI8cKUplzk3B6ajOmm1egl8JHy3xYXhJ+Ts/H2KWyVR4H1ma8=
-X-Received: by 2002:a5d:8cda:: with SMTP id k26mr12131599iot.26.1576885543547;
- Fri, 20 Dec 2019 15:45:43 -0800 (PST)
+        id S1726736AbfLTXzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 18:55:06 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:10960 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726462AbfLTXzF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 18:55:05 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dfd5f350000>; Fri, 20 Dec 2019 15:54:29 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Fri, 20 Dec 2019 15:55:00 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Fri, 20 Dec 2019 15:55:00 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 20 Dec
+ 2019 23:54:55 +0000
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+To:     Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        "Paul Mackerras" <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191219132607.GA410823@unreal>
+ <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
+ <20191219210743.GN17227@ziepe.ca> <20191220182939.GA10944@unreal>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <1001a5fc-a71d-9c0f-1090-546c4913d8a2@nvidia.com>
+Date:   Fri, 20 Dec 2019 15:54:55 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-References: <20190829205635.20189-1-krish.sadhukhan@oracle.com>
- <20190829205635.20189-3-krish.sadhukhan@oracle.com> <CALMp9eSekWEvvgwhMXWOtRZG1saQDOaKr+_4AacuM9JtH5guww@mail.gmail.com>
- <a4882749-a5cc-f8cd-4641-dd61314e6312@oracle.com> <CALMp9eTBPRT+Re9rZzmutAiy62qSMQRfMrnyiYkNHkCKDy-KPQ@mail.gmail.com>
-In-Reply-To: <CALMp9eTBPRT+Re9rZzmutAiy62qSMQRfMrnyiYkNHkCKDy-KPQ@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 20 Dec 2019 15:45:32 -0800
-Message-ID: <CALMp9eR2GQ_aerH-arOEpa08k8ZdtYCA5ftxHfDCo5fS1r3VtA@mail.gmail.com>
-Subject: Re: [PATCH 2/4] KVM: nVMX: Check GUEST_DR7 on vmentry of nested guests
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191220182939.GA10944@unreal>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1576886069; bh=/03FljbsYciU5tHAkbKg2NU1vxam4rPGvNuyvBOvTmI=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=oRvXZWdofYZmMnKtHbC887r9WWAfrydUr/UibodWJ1qaNTyMPy3+W8R0NcaZhg7dS
+         971HGgJD6LwSffJ62pj2tIvxp3eHI8BXVOtdjk7S3sjdZSz9tGHLzm7ujCZVURuC8a
+         irEUmm/OhCMXyR+iqtnm6nCO/xQp89VT1WotayqMgxGp4mpoDDX+NNHJX4q0B3UwU3
+         +RvXPnLJz1mCrbJfx3TkKb0L+jPAoTDVjeRU4xrKmbuD30tHozBBlUpnyYWoaOHmat
+         YDkXozvEZrxOc0h7qKS+l5AK23MRif8N+YKUGoUxe7vXoCKoEk2wdk8r2SNOo6On86
+         EItNjAud0AHkw==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 30, 2019 at 4:15 PM Jim Mattson <jmattson@google.com> wrote:
->
-> On Fri, Aug 30, 2019 at 4:07 PM Krish Sadhukhan
-> <krish.sadhukhan@oracle.com> wrote:
-> >
-> >
-> >
-> > On 08/29/2019 03:26 PM, Jim Mattson wrote:
-> > > On Thu, Aug 29, 2019 at 2:25 PM Krish Sadhukhan
-> > > <krish.sadhukhan@oracle.com> wrote:
-> > >> According to section "Checks on Guest Control Registers, Debug Registers, and
-> > >> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
-> > >> of nested guests:
-> > >>
-> > >>      If the "load debug controls" VM-entry control is 1, bits 63:32 in the DR7
-> > >>      field must be 0.
-> > > Can't we just let the hardware check guest DR7? This results in
-> > > "VM-entry failure due to invalid guest state," right? And we just
-> > > reflect that to L1?
-> >
-> > Just trying to understand the reason why this particular check can be
-> > deferred to the hardware.
->
-> The vmcs02 field has the same value as the vmcs12 field, and the
-> physical CPU has the same requirements as the virtual CPU.
+On 12/20/19 10:29 AM, Leon Romanovsky wrote:
+...
+>> $ ./build.sh
+>> $ build/bin/run_tests.py
+>>
+>> If you get things that far I think Leon can get a reproduction for you
+> 
+> I'm not so optimistic about that.
+> 
 
-Sadly, I was mistaken. The guest DR7 value is not transferred from
-vmcs12 to vmcs02. It is set prior to the vmcs02 VM-entry by
-kvm_set_dr(). Unfortunately, that function synthesizes a #GP if any
-bit in the high dword of DR7 is set. So, you are correct, Krish: this
-field must be checked in software.
+OK, I'm going to proceed for now on the assumption that I've got an overflow
+problem that happens when huge pages are pinned. If I can get more information,
+great, otherwise it's probably enough.
+
+One thing: for your repro, if you know the huge page size, and the system
+page size for that case, that would really help. Also the number of pins per
+page, more or less, that you'd expect. Because Jason says that only 2M huge 
+pages are used...
+
+Because the other possibility is that the refcount really is going negative, 
+likely due to a mismatched pin/unpin somehow.
+
+If there's not an obvious repro case available, but you do have one (is it easy
+to repro, though?), then *if* you have the time, I could point you to a github
+branch that reduces GUP_PIN_COUNTING_BIAS by, say, 4x, by applying this:
+
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index bb44c4d2ada7..8526fd03b978 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1077,7 +1077,7 @@ static inline void put_page(struct page *page)
+  * get_user_pages and page_mkclean and other calls that race to set up page
+  * table entries.
+  */
+-#define GUP_PIN_COUNTING_BIAS (1U << 10)
++#define GUP_PIN_COUNTING_BIAS (1U << 8)
+ 
+ void unpin_user_page(struct page *page);
+ void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages,
+
+If that fails to repro, then we would be zeroing in on the root cause. 
+
+The branch is here (I just tested it and it seems healthy):
+
+git@github.com:johnhubbard/linux.git  pin_user_pages_tracking_v11_with_diags
+
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
