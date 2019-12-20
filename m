@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE233128386
+	by mail.lfdr.de (Postfix) with ESMTP id 73FDF128384
 	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 22:02:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727699AbfLTVCc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 16:02:32 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21929 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727567AbfLTVB7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Dec 2019 16:01:59 -0500
+        id S1727675AbfLTVCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 16:02:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52017 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727569AbfLTVB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 16:01:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576875718;
+        s=mimecast20190719; t=1576875719;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5JYh7n3fhb27PXs/bYUs6lzlcg1ya8dgcofIlxRo1Jg=;
-        b=R+EMY2ksp6+CtCRlHggj+R/UOMNX3XUsSO1qh/OK6wxB4HF2X5XTqL+TxuLN5tOhZXwyaN
-        sZywXxbB6jxBJedQCnkWHWTTS6QS9Y5HU9/4XeQouva7if60UVOwt42VfGwCyUQlK3bRH0
-        M36Abg+mwwL5tAwUe0GJO/h21n2BkLw=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-zQr5PqAqNN6EYAMkAUvBaw-1; Fri, 20 Dec 2019 16:01:56 -0500
-X-MC-Unique: zQr5PqAqNN6EYAMkAUvBaw-1
-Received: by mail-qt1-f197.google.com with SMTP id x8so6789202qtq.14
-        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 13:01:56 -0800 (PST)
+        bh=vtGsufOEBQRYi5aVidxZ4SgIBK6STwpDg+qKmGEtjBY=;
+        b=eso8JP2CrtBIIe2HBbUEfnEm1cYTcKMv0sqOhrbp6Ul+SBv5TAJp64WSmR53fESRekb0GA
+        JnfKbqYcN0FFVfdX20RgLOLNu7li5KoZUFat5MmlW/dJvAlyZuLWH56PWKwA6gkNdh9gHF
+        xJftIqrHbhqKWvGPo8shhZ4TiYJO4qo=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-5UuFT7BUOr67u9u_WIhs9w-1; Fri, 20 Dec 2019 16:01:57 -0500
+X-MC-Unique: 5UuFT7BUOr67u9u_WIhs9w-1
+Received: by mail-qt1-f200.google.com with SMTP id t4so6800591qtd.3
+        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 13:01:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=5JYh7n3fhb27PXs/bYUs6lzlcg1ya8dgcofIlxRo1Jg=;
-        b=qf1mKDs5prWqi8Ee8zRMJ/DXZACCGqjYyavau9aT/SDHZQul49zsOvFZGWPbdirHuu
-         swL4HHVhQbRn81N0GCCkkVg+dibGZhXO0wwnnjxCe6HfBlWea3YkwexGxHYrgOkL9EE9
-         BBYpfTY4XqhQ/oeSkSE1/xjYtxSfM5+lU9uwvP/cL4rCr1rd/nttp2rtyaJLYAEdFHcY
-         GaGpH/UGEswzDLM9Oa47tLowJagcWETIXr/DPNWigzoAk7MahdtAz0i9AqZ13tj2gyre
-         dI73Dl6ACV4xk71dnmA9M5Zr6DMn1lks5rRBaf1+iZ1DlUzr6kqlgfvZDhTsSi89g5hG
-         chWA==
-X-Gm-Message-State: APjAAAVo5rjQqqEpkwhXmI20IC2eJ4rvOFvvWuU/sfl0F42D7JhAB8B1
-        OvUh7MOXHuzWc9P51Fm/1GwP/3b+UP7H3hGFVTn74t52hEdlncBlpOeRwdPsqCrrT+bc9NQx+08
-        Yrkw7DOC5+wyG
-X-Received: by 2002:a0c:e790:: with SMTP id x16mr13985279qvn.18.1576875715450;
-        Fri, 20 Dec 2019 13:01:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzxjMbl8dopUvmXOVnU59sQzlQMC13n1sxeg16FHaFklsjTG3gNoJMkd4GKQCJVP7iplYp8CA==
-X-Received: by 2002:a0c:e790:: with SMTP id x16mr13985250qvn.18.1576875715239;
-        Fri, 20 Dec 2019 13:01:55 -0800 (PST)
+        bh=vtGsufOEBQRYi5aVidxZ4SgIBK6STwpDg+qKmGEtjBY=;
+        b=bTXgv9m1Gea3lKH3ueHBoqYIVg6EX0DPlfpYR6G9DmXGwme6YFyFdnlf1MgEOFU7ji
+         cSKrEBmub9pkUgjNJf1EG4QyzGjOh/KOYFBhyOz9EONTWkLPwRCe3WP6JajWMAEruD3L
+         IWkoJwuhNzkhmjRzWQ+FMHHD4bFY8cdU2v7l81FKUKEFA0TtZ0RQx2FbnoKkqT+2Nxz9
+         YzFNj4Pk2wJKgzAEhmQ5yyIgB+Sa092CCQZl0ZoRyxM8w0YyZlGf8Qw15oa8VeIqmDQa
+         Rd/ogGvdvJU8XBl3KxNCVcaswK4yenYdk5Ur43TK4rfVwcubngTDaxo4jeGjNZPxl4vM
+         ieCQ==
+X-Gm-Message-State: APjAAAUpJyaZeg2Ei1S9sWFK9s+87C8pSwXtPMvdThD0xUKOUAQT14BH
+        WL2E4c+Djp/8copzV2WuYheKY3C+2V+KU6LizX467NYWhHtxOiUBKutw5U2CPIP/spsgrfwyFeF
+        WL16ecvIwD3+z
+X-Received: by 2002:aed:2f01:: with SMTP id l1mr13185487qtd.391.1576875717093;
+        Fri, 20 Dec 2019 13:01:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwUjglzhpKCa6NEkGoo+WgRdTpi2Yj49KnA848sGtgvwu9B6qCZKB1sG+DNQuHerE0WraffwA==
+X-Received: by 2002:aed:2f01:: with SMTP id l1mr13185466qtd.391.1576875716921;
+        Fri, 20 Dec 2019 13:01:56 -0800 (PST)
 Received: from xz-x1.redhat.com ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id q25sm3243836qkq.88.2019.12.20.13.01.53
+        by smtp.gmail.com with ESMTPSA id q25sm3243836qkq.88.2019.12.20.13.01.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2019 13:01:54 -0800 (PST)
+        Fri, 20 Dec 2019 13:01:56 -0800 (PST)
 From:   Peter Xu <peterx@redhat.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jason Wang <jasowang@redhat.com>, peterx@redhat.com,
@@ -59,9 +59,9 @@ Cc:     Jason Wang <jasowang@redhat.com>, peterx@redhat.com,
         Christophe de Dinechin <dinechin@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>
-Subject: [PATCH v2 04/17] KVM: Cache as_id in kvm_memory_slot
-Date:   Fri, 20 Dec 2019 16:01:34 -0500
-Message-Id: <20191220210147.49617-5-peterx@redhat.com>
+Subject: [PATCH v2 05/17] KVM: Add build-time error check on kvm_run size
+Date:   Fri, 20 Dec 2019 16:01:35 -0500
+Message-Id: <20191220210147.49617-6-peterx@redhat.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191220210147.49617-1-peterx@redhat.com>
 References: <20191220210147.49617-1-peterx@redhat.com>
@@ -72,41 +72,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's cache the address space ID just like the slot ID.
+It's already going to reach 2400 Bytes (which is over half of page
+size on 4K page archs), so maybe it's good to have this build-time
+check in case it overflows when adding new fields.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/linux/kvm_host.h | 1 +
- virt/kvm/kvm_main.c      | 2 ++
- 2 files changed, 3 insertions(+)
+ virt/kvm/kvm_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4e34cf97ca90..24854c9e3717 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -348,6 +348,7 @@ struct kvm_memory_slot {
- 	unsigned long userspace_addr;
- 	u32 flags;
- 	short id;
-+	u8 as_id;
- };
- 
- static inline unsigned long kvm_dirty_bitmap_bytes(struct kvm_memory_slot *memslot)
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index b1047173d78e..cea4b8dd4ac9 100644
+index cea4b8dd4ac9..c80a363831ae 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1027,6 +1027,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
+@@ -338,6 +338,7 @@ int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
+ 	vcpu->pre_pcpu = -1;
+ 	INIT_LIST_HEAD(&vcpu->blocked_vcpu_list);
  
- 	new = old = *slot;
- 
-+	BUILD_BUG_ON(U8_MAX < KVM_ADDRESS_SPACE_NUM);
-+	new.as_id = as_id;
- 	new.id = id;
- 	new.base_gfn = base_gfn;
- 	new.npages = npages;
++	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
+ 	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
+ 	if (!page) {
+ 		r = -ENOMEM;
 -- 
 2.24.1
 
