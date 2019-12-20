@@ -2,179 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B0B23127A2D
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 12:43:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55CC7127A30
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 12:44:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727276AbfLTLnz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 06:43:55 -0500
-Received: from foss.arm.com ([217.140.110.172]:49772 "EHLO foss.arm.com"
+        id S1727397AbfLTLoT convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 20 Dec 2019 06:44:19 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56232 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727177AbfLTLnz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 06:43:55 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0555B30E;
-        Fri, 20 Dec 2019 03:43:54 -0800 (PST)
-Received: from [10.1.194.52] (e112269-lin.cambridge.arm.com [10.1.194.52])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 228E83F719;
-        Fri, 20 Dec 2019 03:43:52 -0800 (PST)
-Subject: Re: [PATCH 1/5] KVM: arm64: Document PV-lock interface
-To:     yezengruan <yezengruan@huawei.com>
-Cc:     Mark Rutland <Mark.Rutland@arm.com>,
-        "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
+        id S1727177AbfLTLoS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 06:44:18 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Dec 2019 03:44:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,335,1571727600"; 
+   d="scan'208";a="416513880"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by fmsmga005.fm.intel.com with ESMTP; 20 Dec 2019 03:44:18 -0800
+Received: from fmsmsx114.amr.corp.intel.com (10.18.116.8) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 20 Dec 2019 03:44:18 -0800
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ FMSMSX114.amr.corp.intel.com (10.18.116.8) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 20 Dec 2019 03:44:17 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.90]) by
+ shsmsx102.ccr.corp.intel.com ([169.254.2.109]) with mapi id 14.03.0439.000;
+ Fri, 20 Dec 2019 19:44:15 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        Suzuki Poulose <Suzuki.Poulose@arm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        James Morse <James.Morse@arm.com>,
-        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
-        Catalin Marinas <Catalin.Marinas@arm.com>,
-        "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-        "will@kernel.org" <will@kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-References: <20191217135549.3240-1-yezengruan@huawei.com>
- <20191217135549.3240-2-yezengruan@huawei.com>
- <20191217142138.GA38811@arm.com>
- <49120a3c-405d-d2e3-2a88-ba590feccbcc@huawei.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <e326cd81-7e22-72a8-7b80-8258e8f6a5c6@arm.com>
-Date:   Fri, 20 Dec 2019 11:43:50 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
-MIME-Version: 1.0
-In-Reply-To: <49120a3c-405d-d2e3-2a88-ba590feccbcc@huawei.com>
-Content-Type: text/plain; charset=utf-8
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v4 4/7] iommu/vt-d: Setup pasid entries for iova over
+ first level
+Thread-Topic: [PATCH v4 4/7] iommu/vt-d: Setup pasid entries for iova over
+ first level
+Thread-Index: AQHVthrhmA1+nPY36UOVgBomY8KF4KfC58BA
+Date:   Fri, 20 Dec 2019 11:44:15 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A13A334@SHSMSX104.ccr.corp.intel.com>
+References: <20191219031634.15168-1-baolu.lu@linux.intel.com>
+ <20191219031634.15168-5-baolu.lu@linux.intel.com>
+In-Reply-To: <20191219031634.15168-5-baolu.lu@linux.intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZjliMzllZmEtYzk0MS00YzBhLWEwNGQtMzE3ODk5NTgzYWYzIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiRktFb1l3NDlWOUZ1RFh2SERTK2FiS2MrNXdSMU9CUDZEc0o2NE5jRzl1YmVySUhESGRKcnFORDZYVUpJVWxRQyJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/12/2019 11:45, yezengruan wrote:
-> Hi Steve,
+> From: Lu Baolu [mailto:baolu.lu@linux.intel.com]
+> Sent: Thursday, December 19, 2019 11:17 AM
+> To: Joerg Roedel <joro@8bytes.org>; David Woodhouse <dwmw2@infradead.org>;
+> Alex Williamson <alex.williamson@redhat.com>
+> Subject: [PATCH v4 4/7] iommu/vt-d: Setup pasid entries for iova over first level
 > 
-> On 2019/12/17 22:21, Steven Price wrote:
->> On Tue, Dec 17, 2019 at 01:55:45PM +0000, yezengruan@huawei.com wrote:
->>> From: Zengruan Ye <yezengruan@huawei.com>
->>>
->>> Introduce a paravirtualization interface for KVM/arm64 to obtain the vcpu
->>> is currently running or not.
->>>
->>> A hypercall interface is provided for the guest to interrogate the
->>> hypervisor's support for this interface and the location of the shared
->>> memory structures.
->>>
->>> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
->>> ---
->>>  Documentation/virt/kvm/arm/pvlock.rst | 31 +++++++++++++++++++++++++++
->>>  1 file changed, 31 insertions(+)
->>>  create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
->>>
->>> diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
->>> new file mode 100644
->>> index 000000000000..eec0c36edf17
->>> --- /dev/null
->>> +++ b/Documentation/virt/kvm/arm/pvlock.rst
->>> @@ -0,0 +1,31 @@
->>> +.. SPDX-License-Identifier: GPL-2.0
->>> +
->>> +Paravirtualized lock support for arm64
->>> +======================================
->>> +
->>> +KVM/arm64 provids some hypervisor service calls to support a paravirtualized
->>> +guest obtaining the vcpu is currently running or not.
->>> +
->>> +Two new SMCCC compatible hypercalls are defined:
->>> +
->>> +* PV_LOCK_FEATURES:   0xC5000040
->>> +* PV_LOCK_PREEMPTED:  0xC5000041
->>
->> These values are in the "Standard Hypervisor Service Calls" section of
->> SMCCC - so is there a document that describes this features such that
->> other OSes or hypervisors can implement it? I'm also not entirely sure
->> of the process of ensuring that the IDs picked are non-conflicting.
->>
->> Otherwise if this is a KVM specific interface this should probably
->> belong within the "Vendor Specific Hypervisor Service Calls" section
->> along with some probing that the hypervisor is actually KVM. Although I
->> don't see anything KVM specific.
+> Intel VT-d in scalable mode supports two types of page tables for IOVA translation:
+> first level and second level. The IOMMU driver can choose one from both for IOVA
+> translation according to the use case. This sets up the pasid entry if a domain is
+> selected to use the first-level page table for iova translation.
 > 
-> Thanks for pointing it out to me! Actually, I also don't see any documents
-> or KVM specific that describes this features. The values in the "Vendor
-> Specific Hypervisor Service Calls" section may be more appropriate, such as
-> the following
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  drivers/iommu/intel-iommu.c | 48 +++++++++++++++++++++++++++++++++++--
+>  include/linux/intel-iommu.h | 16 ++++++++-----
+>  2 files changed, 56 insertions(+), 8 deletions(-)
 > 
-> * PV_LOCK_FEATURES:   0xC6000020
-> * PV_LOCK_PREEMPTED:  0xC6000021
+> diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c index
+> 2b5a47584baf..f0813997dea2 100644
+> --- a/drivers/iommu/intel-iommu.c
+> +++ b/drivers/iommu/intel-iommu.c
+> @@ -571,6 +571,11 @@ static inline int domain_type_is_si(struct dmar_domain
+> *domain)
+>  	return domain->flags & DOMAIN_FLAG_STATIC_IDENTITY;  }
 > 
-> Please let me know if you have any suggestions.
+> +static inline bool domain_use_first_level(struct dmar_domain *domain) {
+> +	return domain->flags & DOMAIN_FLAG_USE_FIRST_LEVEL; }
+> +
+>  static inline int domain_pfn_supported(struct dmar_domain *domain,
+>  				       unsigned long pfn)
+>  {
+> @@ -2288,6 +2293,8 @@ static int __domain_mapping(struct dmar_domain
+> *domain, unsigned long iov_pfn,
+>  		return -EINVAL;
+> 
+>  	prot &= DMA_PTE_READ | DMA_PTE_WRITE | DMA_PTE_SNP;
+> +	if (domain_use_first_level(domain))
+> +		prot |= DMA_FL_PTE_PRESENT | DMA_FL_PTE_XD;
+> 
+>  	if (!sg) {
+>  		sg_res = nr_pages;
+> @@ -2515,6 +2522,36 @@ dmar_search_domain_by_dev_info(int segment, int bus,
+> int devfn)
+>  	return NULL;
+>  }
+> 
+> +static int domain_setup_first_level(struct intel_iommu *iommu,
+> +				    struct dmar_domain *domain,
+> +				    struct device *dev,
+> +				    int pasid)
+> +{
+> +	int flags = PASID_FLAG_SUPERVISOR_MODE;
 
-I don't have strong feelings on whether this should be KVM-specific or
-generic. I'm not familiar with whether there are competing solutions to
-this problem - it's obviously ideal if all hypervisors can make use of
-the same interface if possible, but maybe that ship has sailed already?
+Hi Baolu,
 
-However if this going to be KVM-specific then you'll need to add the
-probing logic for checking whether the hypervisor is KVM or not. Will
-has a couple of patches on a branch which do this [1] and [2]. Then you
-can use kvm_arm_hyp_services_available() as the first step to probe
-whether the hypervisor is KVM.
+Could you explain a bit why PASID_FLAG_SUPERVISOR_MODE is
+required?
 
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/commit/?h=kvm/hvc&id=464f5a1741e5959c3e4d2be1966ae0093b4dce06
-
-[2]
-https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/commit/?h=kvm/hvc&id=6597490e005d0eeca8ed8c1c1d7b4318ee014681
-
-Steve
-
->>
->>> +
->>> +The existence of the PV_LOCK hypercall should be probed using the SMCCC 1.1
->>> +ARCH_FEATURES mechanism before calling it.
->>> +
->>> +PV_LOCK_FEATURES
->>> +    ============= ========    ==========
->>> +    Function ID:  (uint32)    0xC5000040
->>> +    PV_call_id:   (uint32)    The function to query for support.
->>> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
->>> +                              PV-lock feature is supported by the hypervisor.
->>> +    ============= ========    ==========
->>> +
->>> +PV_LOCK_PREEMPTED
->>> +    ============= ========    ==========
->>> +    Function ID:  (uint32)    0xC5000041
->>> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the IPA of
->>> +                              this vcpu's pv data structure is configured by
->>> +                              the hypervisor.
->>> +    ============= ========    ==========
->>
->> >From the code it looks like there's another argument for this SMC - the
->> physical address (or IPA) of a struct pvlock_vcpu_state. This structure
->> also needs to be described as it is part of the ABI.
-> 
-> Will update.
-> 
->>
->> Steve
->>
->> .
->>
-> 
-> Thanks,
-> 
-> Zengruan
-> 
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+Regards,
+Yi Liu
 
