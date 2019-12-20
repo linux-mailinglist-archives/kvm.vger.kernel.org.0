@@ -2,97 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BCB9712808A
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 17:22:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40CAE1280AA
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 17:29:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727443AbfLTQWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 11:22:48 -0500
-Received: from mga03.intel.com ([134.134.136.65]:9744 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727388AbfLTQWs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 11:22:48 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Dec 2019 08:22:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,336,1571727600"; 
-   d="scan'208";a="241543730"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 20 Dec 2019 08:22:45 -0800
-Date:   Fri, 20 Dec 2019 08:22:45 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v2 35/45] KVM: s390: Manually invoke vcpu setup during
- kvm_arch_vcpu_create()
-Message-ID: <20191220162245.GC20453@linux.intel.com>
-References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
- <20191218215530.2280-36-sean.j.christopherson@intel.com>
- <20191220110445.3a42041a.cohuck@redhat.com>
- <20191220155607.GB20453@linux.intel.com>
- <20191220170246.76ba681a.cohuck@redhat.com>
+        id S1727270AbfLTQ3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 11:29:45 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51168 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726808AbfLTQ3p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 11:29:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576859384;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=9KQWkC7u/r+Ge5VWofWspVvn0pZbHgMnzh1SQlJF00Q=;
+        b=DcsG9QHC0OQcFMdZaSv6e/ZJZVl+FJjAxkqmSHBp6GFMLS7yl+SIllBtr2/i4jnZiyuzJC
+        m997gjeU806VRjNeLU56X1Nf8ik3ZE9uvNbylGHABWKgjlMkZjfra0Y+gSBG1yRe/KnF1Y
+        S1oiiTEgvwT1r59MrMJGsnRO52ElhYo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-132-hE7-EDYzNRCJM6c_jMrbGA-1; Fri, 20 Dec 2019 11:29:42 -0500
+X-MC-Unique: hE7-EDYzNRCJM6c_jMrbGA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38C95800D4E;
+        Fri, 20 Dec 2019 16:29:40 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com [10.36.116.42])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 315626FDCF;
+        Fri, 20 Dec 2019 16:29:32 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id 5DEA411386A7; Fri, 20 Dec 2019 17:29:30 +0100 (CET)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Cleber Rosa <crosa@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Fam Zheng <fam@euphon.net>,
+        Juan Quintela <quintela@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Aleksandar Markovic <amarkovic@wavecomp.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Fabien Chouteau <chouteau@adacore.com>,
+        KONRAD Frederic <frederic.konrad@adacore.com>,
+        =?utf-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+        =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+        kvm@vger.kernel.org, qemu-block@nongnu.org, qemu-ppc@nongnu.org
+Subject: Can we retire Python 2 now?
+Date:   Fri, 20 Dec 2019 17:29:30 +0100
+Message-ID: <8736dfdkph.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191220170246.76ba681a.cohuck@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 20, 2019 at 05:02:46PM +0100, Cornelia Huck wrote:
-> On Fri, 20 Dec 2019 07:56:07 -0800
-> Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> 
-> > On Fri, Dec 20, 2019 at 11:04:45AM +0100, Cornelia Huck wrote:
-> > > On Wed, 18 Dec 2019 13:55:20 -0800
-> > > Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> > >   
-> > > > Rename kvm_arch_vcpu_setup() to kvm_s390_vcpu_setup() and manually call
-> > > > the new function during kvm_arch_vcpu_create().  Define an empty
-> > > > kvm_arch_vcpu_setup() as it's still required for compilation.  This
-> > > > is effectively a nop as kvm_arch_vcpu_create() and kvm_arch_vcpu_setup()
-> > > > are called back-to-back by common KVM code.  Obsoleting
-> > > > kvm_arch_vcpu_setup() paves the way for its removal.
-> > > > 
-> > > > Note, gmap_remove() is now called if setup fails, as s390 was previously
-> > > > freeing it via kvm_arch_vcpu_destroy(), which is called by common KVM
-> > > > code if kvm_arch_vcpu_setup() fails.  
-> > > 
-> > > Yes, this looks like the only thing that needs to be undone
-> > > (sca_add_vcpu() is done later in the process.)
-> > > 
-> > > Maybe mention that gmap_remove() is for ucontrol only? I was confused
-> > > for a moment :)  
-> > 
-> > Will do.
-> > 
-> > Would it also make sense to open code __kvm_ucontrol_vcpu_init() in a
-> > separate patch immediately preceding this change?  That'd make it a little
-> > more obvious why gmap_remove() is called, and it would eliminate the
-> > "uninit" verbiage in the label, e.g.:
-> 
-> I'm a bit undecided here; especially as I'm not sure if there are any
-> future plans with ucontrol. I'll leave that for Christian and Janosch
-> to decide.
+Python 2 EOL is only a few days away[*].  We made configure bitch about
+it in commit e5abf59eae "Deprecate Python 2 support", 2019-07-01.  Any
+objections to retiring it now, i.e. in 5.0?
 
-Sounds good.  Thanks for the reviews!
+Cc'ing everyone who appears to be maintaining something that looks like
+a Python script.
+
+[*] https://pythonclock.org/
+
