@@ -2,38 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2C3B12767A
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 08:29:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96EA9127682
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 08:34:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726651AbfLTH3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 02:29:30 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:50360 "EHLO huawei.com"
+        id S1726002AbfLTHeb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 02:34:31 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:8160 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725920AbfLTH3a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 02:29:30 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 7EF0A9E8FB0866428E41;
-        Fri, 20 Dec 2019 15:29:27 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Fri, 20 Dec 2019
- 15:29:16 +0800
-Subject: Re: [kvm-unit-tests PATCH 12/16] arm/arm64: ITS: commands
-To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        id S1725874AbfLTHeb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 02:34:31 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 3DF20FFEDCEF0B4DF2E7;
+        Fri, 20 Dec 2019 15:34:29 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Fri, 20 Dec 2019
+ 15:34:22 +0800
+Subject: Re: [kvm-unit-tests PATCH 05/16] arm/arm64: ITS: Introspection tests
+To:     Auger Eric <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
         <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
         <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
         <qemu-arm@nongnu.org>
-CC:     <drjones@redhat.com>, <andre.przywara@arm.com>,
-        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
-        <thuth@redhat.com>
+CC:     <andre.przywara@arm.com>, <drjones@redhat.com>,
+        <alexandru.elisei@arm.com>, <thuth@redhat.com>,
+        <peter.maydell@linaro.org>
 References: <20191216140235.10751-1-eric.auger@redhat.com>
- <20191216140235.10751-13-eric.auger@redhat.com>
+ <20191216140235.10751-6-eric.auger@redhat.com>
+ <c133ebe6-10f4-2ff7-f75f-75b755397785@huawei.com>
+ <6542297b-74d2-f3c2-63d8-04bb284414df@redhat.com>
 From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <d56a4973-ac01-65e6-8e5d-f48da9458b5c@huawei.com>
-Date:   Fri, 20 Dec 2019 15:29:15 +0800
+Message-ID: <c164db0f-2e18-093f-8886-4746cb197fe2@huawei.com>
+Date:   Fri, 20 Dec 2019 15:34:21 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191216140235.10751-13-eric.auger@redhat.com>
+In-Reply-To: <6542297b-74d2-f3c2-63d8-04bb284414df@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -44,46 +46,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 2019/12/16 22:02, Eric Auger wrote:
-> Implement main ITS commands. The code is largely inherited from
-> the ITS driver.
+On 2019/12/18 16:34, Auger Eric wrote:
+> Hi Zenghui,
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
+> On 12/18/19 4:46 AM, Zenghui Yu wrote:
+>> Hi Eric,
+>>
+>> I have to admit that this is the first time I've looked into
+>> the kvm-unit-tests code, so only some minor comments inline :)
+> 
+> no problem. Thank you for looking at this.
+> 
+> By the way, with patch 16 I was able to test yout fix: "KVM: arm/arm64:
+> vgic: Don't rely on the wrong pending table". Reverting it produced an
+> error.
 
-[...]
-
-> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-> index 245ef61..d074c17 100644
-> --- a/lib/arm/asm/gic-v3-its.h
-> +++ b/lib/arm/asm/gic-v3-its.h
-> @@ -161,5 +179,23 @@ extern void its_enable_defaults(void);
->   extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
->   extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
->   
-> +extern void its_send_mapd(struct its_device *dev, int valid);
-> +extern void its_send_mapc(struct its_collection *col, int valid);
-> +extern void its_send_mapti(struct its_device *dev, u32 irq_id,
-> +			   u32 event_id, struct its_collection *col);
-> +extern void its_send_int(struct its_device *dev, u32 event_id);
-> +extern void its_send_inv(struct its_device *dev, u32 event_id);
-> +extern void its_send_discard(struct its_device *dev, u32 event_id);
-> +extern void its_send_clear(struct its_device *dev, u32 event_id);
-> +extern void its_send_invall(struct its_collection *col);
-> +extern void its_send_movi(struct its_device *dev,
-> +			  struct its_collection *col, u32 id);
-> +extern void its_send_sync(struct its_collection *col);
-> +extern void its_print_cmd_state(void);
-
-This function is not used by later patches, I guess it's mostly used
-for debug.
-
-(Assuming the Linux ITS driver has done the right thing ;-), I just skip
-looking at this patch.)
+which is great! Thanks for your work!
 
 
-Thanks,
 Zenghui
 
