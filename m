@@ -2,135 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D3BD31277F4
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 10:22:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 385CB12780E
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 10:25:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727291AbfLTJWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 04:22:02 -0500
-Received: from mx2.suse.de ([195.135.220.15]:46708 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727188AbfLTJWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 04:22:01 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 98BD2AE00;
-        Fri, 20 Dec 2019 09:21:57 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 38E621E0B44; Fri, 20 Dec 2019 10:21:54 +0100 (CET)
-Date:   Fri, 20 Dec 2019 10:21:54 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Leon Romanovsky <leon@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Maor Gottlieb <maorg@mellanox.com>
-Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
-Message-ID: <20191220092154.GA10068@quack2.suse.cz>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191219132607.GA410823@unreal>
- <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
+        id S1727347AbfLTJZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 04:25:21 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56130 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727269AbfLTJZU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Dec 2019 04:25:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576833918;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LsxcLVbBun1f96xBFFfgPOlzuKGlq4r29EdM+SsmX7k=;
+        b=XCSvcuHZl4fYpSg3+lJGo7wB9zu/5eGQ/Sk161B0dNiEKY/TWOPMT4PKIswsjbfsgWmozX
+        30WcZ2NxviW42XxYvpMCXrNS4PQvI3F//kMadPHcURTdX5+TGwZjCutY6tAVNbdh0tM9XC
+        VNIv2l6v3eIrXbxeJYOQ8yICFjiWQr0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-MV1GUbcFPF2micIZKGBcEw-1; Fri, 20 Dec 2019 04:25:17 -0500
+X-MC-Unique: MV1GUbcFPF2micIZKGBcEw-1
+Received: by mail-wr1-f70.google.com with SMTP id d8so3541787wrq.12
+        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 01:25:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LsxcLVbBun1f96xBFFfgPOlzuKGlq4r29EdM+SsmX7k=;
+        b=sYN+cC2Ufh555lfoslo1B8yvLOfxwBnZrwT/QDojDwuIMeF9gQ1dvsD4qwTTMejM05
+         SBaIvV0hv17qJlFyyxGow13RMRgT5+iaOU98cxy5LzkbK0rn0o3qKIWzvdA9bKTqe4xR
+         QhUu8yl8UEYXmKT38dhDT6unYwu0eKjYMCns9r78ZjmCjoOURdCL3wwRg2wmnWjTScix
+         bPAUgBdboAz3tdhOxXSreKemhNLsVwjeVuRoknLbU8un+m03IWX6zOTwZqv9OFkED1Hj
+         5LpDtNq7jlRHf1rKyJZur7w6f2hZvWZCtXdG7lcdipE5ayiOIch6HBVhZ/H9UASO0eLt
+         kZ5Q==
+X-Gm-Message-State: APjAAAVP4DyTunflxMxIfR/5vnL7SOrAmLCXWySqadt3L9pzgPLL3w/V
+        6NRYCJv8DaTL9WIXDLg2i6WlqWVUFqlKnbB6j0JcYHNxcQvLk03adw2g3ZZR/22WQLWBB0kAFlC
+        npX9pff3UcE+r
+X-Received: by 2002:a05:600c:246:: with SMTP id 6mr15371256wmj.122.1576833916357;
+        Fri, 20 Dec 2019 01:25:16 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzw8wZPLS7TkKIeuMQ4kT47hh6TgBs/pAj1q7SP7litoY6M7b4efDd9KnpDPbJZMMJOaN3lqQ==
+X-Received: by 2002:a05:600c:246:: with SMTP id 6mr15371232wmj.122.1576833916119;
+        Fri, 20 Dec 2019 01:25:16 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id m7sm9097969wrr.40.2019.12.20.01.25.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Dec 2019 01:25:15 -0800 (PST)
+Subject: Re: [PATCH v2] kvm/svm: PKU not currently supported
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        John Allen <john.allen@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rkrcmar@redhat.com, vkuznets@redhat.com
+References: <20191219201759.21860-1-john.allen@amd.com>
+ <20191219203214.GC6439@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8a77e3b9-049e-e622-9332-9bebb829bc3d@redhat.com>
+Date:   Fri, 20 Dec 2019 10:25:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191219203214.GC6439@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu 19-12-19 12:30:31, John Hubbard wrote:
-> On 12/19/19 5:26 AM, Leon Romanovsky wrote:
-> > On Mon, Dec 16, 2019 at 02:25:12PM -0800, John Hubbard wrote:
-> > > Hi,
-> > > 
-> > > This implements an API naming change (put_user_page*() -->
-> > > unpin_user_page*()), and also implements tracking of FOLL_PIN pages. It
-> > > extends that tracking to a few select subsystems. More subsystems will
-> > > be added in follow up work.
-> > 
-> > Hi John,
-> > 
-> > The patchset generates kernel panics in our IB testing. In our tests, we
-> > allocated single memory block and registered multiple MRs using the single
-> > block.
-> > 
-> > The possible bad flow is:
-> >   ib_umem_geti() ->
-> >    pin_user_pages_fast(FOLL_WRITE) ->
-> >     internal_get_user_pages_fast(FOLL_WRITE) ->
-> >      gup_pgd_range() ->
-> >       gup_huge_pd() ->
-> >        gup_hugepte() ->
-> >         try_grab_compound_head() ->
+On 19/12/19 21:32, Sean Christopherson wrote:
+> On Thu, Dec 19, 2019 at 02:17:59PM -0600, John Allen wrote:
+>> Current SVM implementation does not have support for handling PKU. Guests
+>> running on a host with future AMD cpus that support the feature will read
+>> garbage from the PKRU register and will hit segmentation faults on boot as
+>> memory is getting marked as protected that should not be. Ensure that cpuid
+>> from SVM does not advertise the feature.
+>>
+>> Signed-off-by: John Allen <john.allen@amd.com>
+>> ---
+>> v2:
+>>   -Introduce kvm_x86_ops->pku_supported()
 > 
-> Hi Leon,
+> I like the v1 approach better, it's less code to unwind when SVM gains
+> support for virtualizaing PKU.
 > 
-> Thanks very much for the detailed report! So we're overflowing...
+> The existing cases of kvm_x86_ops->*_supported() in __do_cpuid_func() are
+> necessary to handle cases where it may not be possible to expose a feature
+> even though it's supported in hardware, host and KVM, e.g. VMX's separate
+> MSR-based features and PT's software control to hide it from guest.  In
+> this case, hiding PKU is purely due to lack of support in KVM.  The SVM
+> series to enable PKU can then delete a single line of SVM code instead of
+> having to go back in and do surgery on x86 and VMX.
 > 
-> At first look, this seems likely to be hitting a weak point in the
-> GUP_PIN_COUNTING_BIAS-based design, one that I believed could be deferred
-> (there's a writeup in Documentation/core-api/pin_user_page.rst, lines
-> 99-121). Basically it's pretty easy to overflow the page->_refcount
-> with huge pages if the pages have a *lot* of subpages.
-> 
-> We can only do about 7 pins on 1GB huge pages that use 4KB subpages.
-> Do you have any idea how many pins (repeated pins on the same page, which
-> it sounds like you have) might be involved in your test case,
-> and the huge page and system page sizes? That would allow calculating
-> if we're likely overflowing for that reason.
-> 
-> So, ideas and next steps:
-> 
-> 1. Assuming that you *are* hitting this, I think I may have to fall back to
-> implementing the "deferred" part of this design, as part of this series, after
-> all. That means:
-> 
->   For the pin/unpin calls at least, stop treating all pages as if they are
->   a cluster of PAGE_SIZE pages; instead, retrieve a huge page as one page.
->   That's not how it works now, and the need to hand back a huge array of
->   subpages is part of the problem. This affects the callers too, so it's not
->   a super quick change to make. (I was really hoping not to have to do this
->   yet.)
 
-Does that mean that you would need to make all GUP users huge page aware?
-Otherwise I don't see how what you suggest would work... And I don't think
-making all GUP users huge page aware is realistic (effort-wise) or even
-wanted (maintenance overhead in all those places).
+I sort of liked the V1 approach better, in that I liked using
+set_supported_cpuid but I didn't like *removing* features from it.
 
-I believe there might be also a different solution for this: For
-transparent huge pages, we could find a space in 'struct page' of the
-second page in the huge page for proper pin counter and just account pins
-there so we'd have full width of 32-bits for it.
+I think all *_supported() should be removed, and the code moved from
+__do_cpuid_func() to set_supported_cpuid.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+For now, however, this one is consistent with other features so I am
+applying it.
+
+Paolo
+
