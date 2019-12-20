@@ -2,244 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BB06127A40
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 12:51:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73D49127BBF
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 14:34:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727388AbfLTLu4 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 20 Dec 2019 06:50:56 -0500
-Received: from mga14.intel.com ([192.55.52.115]:43217 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727177AbfLTLu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 06:50:56 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Dec 2019 03:50:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,335,1571727600"; 
-   d="scan'208";a="228584602"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
-  by orsmga002.jf.intel.com with ESMTP; 20 Dec 2019 03:50:54 -0800
-Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 20 Dec 2019 03:50:54 -0800
-Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
- fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 20 Dec 2019 03:50:54 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.90]) by
- SHSMSX103.ccr.corp.intel.com ([169.254.4.29]) with mapi id 14.03.0439.000;
- Fri, 20 Dec 2019 19:50:52 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "Raj, Ashok" <ashok.raj@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v4 0/7] Use 1st-level for IOVA translation
-Thread-Topic: [PATCH v4 0/7] Use 1st-level for IOVA translation
-Thread-Index: AQHVthray/3ZZTiwzUq7igUsBwcT3qfC6XAw
-Date:   Fri, 20 Dec 2019 11:50:52 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A13A364@SHSMSX104.ccr.corp.intel.com>
-References: <20191219031634.15168-1-baolu.lu@linux.intel.com>
-In-Reply-To: <20191219031634.15168-1-baolu.lu@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzVmNGY2YTUtM2IzMC00NWJjLTg0ZjYtYzk2NGM2YjlhNGZiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiK0NqSTRiTk9FY0ltVksrZ1cxWWtXUlhRZlI1MG1Zb0RNdnZJZ3FsUnMrNlZWN3diOUl3QlNvMVhaSHlzYVwvQUsifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727403AbfLTNe0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 08:34:26 -0500
+Received: from mail-qv1-f68.google.com ([209.85.219.68]:44067 "EHLO
+        mail-qv1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727381AbfLTNe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 08:34:26 -0500
+Received: by mail-qv1-f68.google.com with SMTP id n8so3590115qvg.11
+        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 05:34:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=5r9Zi+Au/gtKbsFaE0fKhn5Z9mh4Uiv+qjM4b27ESt8=;
+        b=gS91bsS4NjRyWzEDV454oc5qOgomjYBCltRmKzH7Nu9vdI8tQd65a6Yp2TVGSlgA1T
+         37v5Lb1zFtvOvSi94i0Yt83/4AqEpVzmzRwSkFPiESUgqKx4PUFqFCjV/s3xXBOVi9U4
+         w+ZUvVeXy6xbZ8B7zSi+DLnr0w1yjX7v6UIJiebq6UOkRZYcGvU4/THsXU/G/ZDo26P9
+         Xc2y8nF265eAeIX5xgl66hBVWEixNbJ1XzQjNRNan6ViT+Wn6RFHm+C8bWOAWNCFyUU3
+         D0D+BCr//3+mjkgiCcFfBfObTFOz8gI7nHowmgBdF1XYr9LIFcBR6SXbWA6e0W7l8hfH
+         tNRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=5r9Zi+Au/gtKbsFaE0fKhn5Z9mh4Uiv+qjM4b27ESt8=;
+        b=cn8D6hHLXm0B5YiuUT8KALARL4oCmbluAR/tjZPUj2tSgNaiemv0eVfpZp3KpXmgzM
+         Vz4LBqDEW+yfoIWr2xMq8Kd22zSBnwzWM27MoHsi9W+7Q29nVPhg1pH6zEQz5gnQwvl4
+         5IdYi2jHQjcpC3ewmZO9YU5baVfPzV46MjfqIaOmZod6/seEi8aJkThxG0RGs8THDgqx
+         ybZO2P5DKg3mVAfIykA1ow2ZMSKodnyGZcA1lBPFkxa9rTVWM4LTfS1DCKI/xfLLIKpp
+         ogaIXulSjt7E+S8fFfSvAkF+iWBsnupmWxIhAqgEyT0aw7awZwgPLn4JpklD/6euVO2b
+         Pyug==
+X-Gm-Message-State: APjAAAUsvGWBrLKhaZxB1Hnq46Nnl8Kx89T0VbqMi+FfAH1Xn8/p357R
+        O5DfDdmYrOZ3DfZn7h9+2+GYEg==
+X-Google-Smtp-Source: APXvYqz9az5JjtCMEl1OLVSzBMZYIFm7RbLMGJ3PjpAUx1pKMUVrf5ynor78RCoLoFWtbwHwcCO7NQ==
+X-Received: by 2002:a0c:893d:: with SMTP id 58mr4949386qvp.4.1576848864984;
+        Fri, 20 Dec 2019 05:34:24 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id q73sm2786969qka.56.2019.12.20.05.34.23
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 20 Dec 2019 05:34:24 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1iiIQB-0003cq-Co; Fri, 20 Dec 2019 09:34:23 -0400
+Date:   Fri, 20 Dec 2019 09:34:23 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Leon Romanovsky <leon@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+Message-ID: <20191220133423.GA13506@ziepe.ca>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191219132607.GA410823@unreal>
+ <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
+ <20191219210743.GN17227@ziepe.ca>
+ <42a3e5c1-6301-db0b-5d09-212edf5ecf2a@nvidia.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42a3e5c1-6301-db0b-5d09-212edf5ecf2a@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Baolu,
+On Thu, Dec 19, 2019 at 01:13:54PM -0800, John Hubbard wrote:
+> On 12/19/19 1:07 PM, Jason Gunthorpe wrote:
+> > On Thu, Dec 19, 2019 at 12:30:31PM -0800, John Hubbard wrote:
+> > > On 12/19/19 5:26 AM, Leon Romanovsky wrote:
+> > > > On Mon, Dec 16, 2019 at 02:25:12PM -0800, John Hubbard wrote:
+> > > > > Hi,
+> > > > > 
+> > > > > This implements an API naming change (put_user_page*() -->
+> > > > > unpin_user_page*()), and also implements tracking of FOLL_PIN pages. It
+> > > > > extends that tracking to a few select subsystems. More subsystems will
+> > > > > be added in follow up work.
+> > > > 
+> > > > Hi John,
+> > > > 
+> > > > The patchset generates kernel panics in our IB testing. In our tests, we
+> > > > allocated single memory block and registered multiple MRs using the single
+> > > > block.
+> > > > 
+> > > > The possible bad flow is:
+> > > >    ib_umem_geti() ->
+> > > >     pin_user_pages_fast(FOLL_WRITE) ->
+> > > >      internal_get_user_pages_fast(FOLL_WRITE) ->
+> > > >       gup_pgd_range() ->
+> > > >        gup_huge_pd() ->
+> > > >         gup_hugepte() ->
+> > > >          try_grab_compound_head() ->
+> > > 
+> > > Hi Leon,
+> > > 
+> > > Thanks very much for the detailed report! So we're overflowing...
+> > > 
+> > > At first look, this seems likely to be hitting a weak point in the
+> > > GUP_PIN_COUNTING_BIAS-based design, one that I believed could be deferred
+> > > (there's a writeup in Documentation/core-api/pin_user_page.rst, lines
+> > > 99-121). Basically it's pretty easy to overflow the page->_refcount
+> > > with huge pages if the pages have a *lot* of subpages.
+> > > 
+> > > We can only do about 7 pins on 1GB huge pages that use 4KB subpages.
+> > 
+> > Considering that establishing these pins is entirely under user
+> > control, we can't have a limit here.
+> 
+> There's already a limit, it's just a much larger one. :) What does "no limit"
+> really mean, numerically, to you in this case?
 
-In a brief, this version is pretty good to me. However, I still want
-to have the following checks to see if anything missed. Wish it
-helps.
+I guess I mean 'hidden limit' - hitting the limit and failing would
+be managable.
 
-1) would using IOVA over FLPT default on?
-My opinion is that before we have got gIOVA nested translation
-done for passthru devices, we should make this feature as off.
+I think 7 is probably too low though, but we are not using 1GB huge
+pages, only 2M..
 
-2) the domain->agaw is somehow calculated according to the
-capabilities related to second level page table. As we are moving
-IOVA to FLPT, I'd suggest to calculate domain->agaw with the
-translation modes FLPT supports (e.g. 4 level and 5 level)
+> > If the number of allowed pins are exhausted then the
+> > pin_user_pages_fast() must fail back to the user.
+> 
+> I'll poke around the IB call stack and see how much of that return
+> path is in place, if any. Because it's the same situation for
+> get_user_pages_fast().  This code just added a warning on overflow
+> so we could spot it early.
 
-3) Per VT-d spec, FLPT has canonical requirement to the input
-addresses. So I'd suggest to add some enhance regards to it.
-Please refer to chapter 3.6 :-).
+All GUP callers must be prepared for failure, IB should be fine...
 
-3.6 First-Level Translation
-First-level translation restricts the input-address to a canonical address (i.e., address bits 63:N have
-the same value as address bit [N-1], where N is 48-bits with 4-level paging and 57-bits with 5-level
-paging). Requests subject to first-level translation by remapping hardware are subject to canonical
-address checking as a pre-condition for first-level translation, and a violation is treated as a
-translation-fault.
-
-Regards,
-Yi Liu
-
-> From: Lu Baolu [mailto:baolu.lu@linux.intel.com]
-> Sent: Thursday, December 19, 2019 11:16 AM
-> To: Joerg Roedel <joro@8bytes.org>; David Woodhouse <dwmw2@infradead.org>;
-> Alex Williamson <alex.williamson@redhat.com>
-> Subject: [PATCH v4 0/7] Use 1st-level for IOVA translation
-> 
-> Intel VT-d in scalable mode supports two types of page tables
-> for DMA translation: the first level page table and the second
-> level page table. The first level page table uses the same
-> format as the CPU page table, while the second level page table
-> keeps compatible with previous formats. The software is able
-> to choose any one of them for DMA remapping according to the use
-> case.
-> 
-> This patchset aims to move IOVA (I/O Virtual Address) translation
-> to 1st-level page table in scalable mode. This will simplify vIOMMU
-> (IOMMU simulated by VM hypervisor) design by using the two-stage
-> translation, a.k.a. nested mode translation.
-> 
-> As Intel VT-d architecture offers caching mode, guest IOVA (GIOVA)
-> support is currently implemented in a shadow page manner. The device
-> simulation software, like QEMU, has to figure out GIOVA->GPA mappings
-> and write them to a shadowed page table, which will be used by the
-> physical IOMMU. Each time when mappings are created or destroyed in
-> vIOMMU, the simulation software has to intervene. Hence, the changes
-> on GIOVA->GPA could be shadowed to host.
-> 
-> 
->      .-----------.
->      |  vIOMMU   |
->      |-----------|                 .--------------------.
->      |           |IOTLB flush trap |        QEMU        |
->      .-----------. (map/unmap)     |--------------------|
->      |GIOVA->GPA |---------------->|    .------------.  |
->      '-----------'                 |    | GIOVA->HPA |  |
->      |           |                 |    '------------'  |
->      '-----------'                 |                    |
->                                    |                    |
->                                    '--------------------'
->                                                 |
->             <------------------------------------
->             |
->             v VFIO/IOMMU API
->       .-----------.
->       |  pIOMMU   |
->       |-----------|
->       |           |
->       .-----------.
->       |GIOVA->HPA |
->       '-----------'
->       |           |
->       '-----------'
-> 
-> In VT-d 3.0, scalable mode is introduced, which offers two-level
-> translation page tables and nested translation mode. Regards to
-> GIOVA support, it can be simplified by 1) moving the GIOVA support
-> over 1st-level page table to store GIOVA->GPA mapping in vIOMMU,
-> 2) binding vIOMMU 1st level page table to the pIOMMU, 3) using pIOMMU
-> second level for GPA->HPA translation, and 4) enable nested (a.k.a.
-> dual-stage) translation in host. Compared with current shadow GIOVA
-> support, the new approach makes the vIOMMU design simpler and more
-> efficient as we only need to flush the pIOMMU IOTLB and possible
-> device-IOTLB when an IOVA mapping in vIOMMU is torn down.
-> 
->      .-----------.
->      |  vIOMMU   |
->      |-----------|                 .-----------.
->      |           |IOTLB flush trap |   QEMU    |
->      .-----------.    (unmap)      |-----------|
->      |GIOVA->GPA |---------------->|           |
->      '-----------'                 '-----------'
->      |           |                       |
->      '-----------'                       |
->            <------------------------------
->            |      VFIO/IOMMU
->            |  cache invalidation and
->            | guest gpd bind interfaces
->            v
->      .-----------.
->      |  pIOMMU   |
->      |-----------|
->      .-----------.
->      |GIOVA->GPA |<---First level
->      '-----------'
->      | GPA->HPA  |<---Scond level
->      '-----------'
->      '-----------'
-> 
-> This patch applies the first level page table for IOVA translation
-> unless the DOMAIN_ATTR_NESTING domain attribution has been set.
-> Setting of this attribution means the second level will be used to
-> map gPA (guest physical address) to hPA (host physical address), and
-> the mappings between gVA (guest virtual address) and gPA will be
-> maintained by the guest with the page table address binding to host's
-> first level.
-> 
-> Based-on-idea-by: Ashok Raj <ashok.raj@intel.com>
-> Based-on-idea-by: Kevin Tian <kevin.tian@intel.com>
-> Based-on-idea-by: Liu Yi L <yi.l.liu@intel.com>
-> Based-on-idea-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Based-on-idea-by: Sanjay Kumar <sanjay.k.kumar@intel.com>
-> Based-on-idea-by: Lu Baolu <baolu.lu@linux.intel.com>
-> 
-> Change log:
-> 
-> v3->v4:
->  - The previous version was posted here
->    https://lkml.org/lkml/2019/12/10/2126
->  - Set Execute Disable (bit 63) in first level table entries.
->  - Enhance pasid-based iotlb invalidation for both default domain
->    and auxiliary domain.
->  - Add debugfs file to expose page table internals.
-> 
-> v2->v3:
->  - The previous version was posted here
->    https://lkml.org/lkml/2019/11/27/1831
->  - Accept Jacob's suggestion on merging two page tables.
-> 
->  v1->v2
->  - The first series was posted here
->    https://lkml.org/lkml/2019/9/23/297
->  - Use per domain page table ops to handle different page tables.
->  - Use first level for DMA remapping by default on both bare metal
->    and vm guest.
->  - Code refine according to code review comments for v1.
-> 
-> Lu Baolu (7):
->   iommu/vt-d: Identify domains using first level page table
->   iommu/vt-d: Add set domain DOMAIN_ATTR_NESTING attr
->   iommu/vt-d: Add PASID_FLAG_FL5LP for first-level pasid setup
->   iommu/vt-d: Setup pasid entries for iova over first level
->   iommu/vt-d: Flush PASID-based iotlb for iova over first level
->   iommu/vt-d: Use iova over first level
->   iommu/vt-d: debugfs: Add support to show page table internals
-> 
->  drivers/iommu/dmar.c                |  41 ++++++
->  drivers/iommu/intel-iommu-debugfs.c |  75 +++++++++++
->  drivers/iommu/intel-iommu.c         | 201 +++++++++++++++++++++++++---
->  drivers/iommu/intel-pasid.c         |   7 +-
->  drivers/iommu/intel-pasid.h         |   6 +
->  drivers/iommu/intel-svm.c           |   8 +-
->  include/linux/intel-iommu.h         |  20 ++-
->  7 files changed, 326 insertions(+), 32 deletions(-)
-> 
-> --
-> 2.17.1
-
+Jason
