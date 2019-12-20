@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 029B4127CED
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 15:32:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD82D127CF5
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 15:32:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728070AbfLTObL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 09:31:11 -0500
-Received: from foss.arm.com ([217.140.110.172]:51352 "EHLO foss.arm.com"
+        id S1728076AbfLTOb3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 09:31:29 -0500
+Received: from foss.arm.com ([217.140.110.172]:51362 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728060AbfLTObK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 09:31:10 -0500
+        id S1727441AbfLTObM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 09:31:12 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 893C611B3;
-        Fri, 20 Dec 2019 06:31:09 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B240831B;
+        Fri, 20 Dec 2019 06:31:11 -0800 (PST)
 Received: from e119886-lin.cambridge.arm.com (unknown [10.37.6.20])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AFC5B3F718;
-        Fri, 20 Dec 2019 06:31:07 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9AF03F718;
+        Fri, 20 Dec 2019 06:31:09 -0800 (PST)
 From:   Andrew Murray <andrew.murray@arm.com>
 To:     Marc Zyngier <marc.zyngier@arm.com>,
         Catalin Marinas <catalin.marinas@arm.com>,
@@ -24,9 +24,9 @@ To:     Marc Zyngier <marc.zyngier@arm.com>,
 Cc:     Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH v2 17/18, KVMTOOL] update_headers: Sync kvm UAPI headers with linux v5.5-rc2
-Date:   Fri, 20 Dec 2019 14:30:24 +0000
-Message-Id: <20191220143025.33853-18-andrew.murray@arm.com>
+Subject: [PATCH v2 18/18, KVMTOOL] kvm: add a vcpu feature for SPEv1 support
+Date:   Fri, 20 Dec 2019 14:30:25 +0000
+Message-Id: <20191220143025.33853-19-andrew.murray@arm.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191220143025.33853-1-andrew.murray@arm.com>
 References: <20191220143025.33853-1-andrew.murray@arm.com>
@@ -37,183 +37,210 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The local copies of the kvm user API headers are getting stale.
-
-In preparation for some arch-specific updated, this patch reflects
-a re-run of util/update_headers.sh to pull in upstream updates from
-linux v5.5-rc2.
+This is a runtime configurable for KVM tool to enable Statistical
+Profiling Extensions version 1 support in guest kernel. A command line
+option --spe is required to use the same.
 
 Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-[ Update headers to v5.5-rc2 ]
+[ Add SPE to init features ]
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 ---
- arm/aarch32/include/asm/kvm.h |  7 +++++--
- arm/aarch64/include/asm/kvm.h | 13 +++++++++++--
- include/linux/kvm.h           | 18 ++++++++++++++++++
- powerpc/include/asm/kvm.h     |  3 +++
- 4 files changed, 37 insertions(+), 4 deletions(-)
+ Makefile                                  |  2 +-
+ arm/aarch64/arm-cpu.c                     |  2 +
+ arm/aarch64/include/kvm/kvm-config-arch.h |  2 +
+ arm/aarch64/include/kvm/kvm-cpu-arch.h    |  3 +-
+ arm/aarch64/kvm-cpu.c                     |  4 ++
+ arm/include/arm-common/kvm-config-arch.h  |  1 +
+ arm/include/arm-common/spe.h              |  4 ++
+ arm/spe.c                                 | 81 +++++++++++++++++++++++
+ 8 files changed, 97 insertions(+), 2 deletions(-)
+ create mode 100644 arm/include/arm-common/spe.h
+ create mode 100644 arm/spe.c
 
-diff --git a/arm/aarch32/include/asm/kvm.h b/arm/aarch32/include/asm/kvm.h
-index a4217c1a5d01..03cd7c19a683 100644
---- a/arm/aarch32/include/asm/kvm.h
-+++ b/arm/aarch32/include/asm/kvm.h
-@@ -131,8 +131,9 @@ struct kvm_vcpu_events {
- 	struct {
- 		__u8 serror_pending;
- 		__u8 serror_has_esr;
-+		__u8 ext_dabt_pending;
- 		/* Align it to 8 bytes */
--		__u8 pad[6];
-+		__u8 pad[5];
- 		__u64 serror_esr;
- 	} exception;
- 	__u32 reserved[12];
-@@ -266,8 +267,10 @@ struct kvm_vcpu_events {
- #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
+diff --git a/Makefile b/Makefile
+index 3862112c5ec6..04dddb3e7699 100644
+--- a/Makefile
++++ b/Makefile
+@@ -158,7 +158,7 @@ endif
+ # ARM
+ OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/gicv2m.o arm/ioport.o \
+ 			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
+-			   arm/pmu.o
++			   arm/pmu.o arm/spe.o
+ HDRS_ARM_COMMON		:= arm/include
+ ifeq ($(ARCH), arm)
+ 	DEFINES		+= -DCONFIG_ARM
+diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+index d7572b7790b1..6ccea033f361 100644
+--- a/arm/aarch64/arm-cpu.c
++++ b/arm/aarch64/arm-cpu.c
+@@ -6,6 +6,7 @@
+ #include "arm-common/gic.h"
+ #include "arm-common/timer.h"
+ #include "arm-common/pmu.h"
++#include "arm-common/spe.h"
  
- /* KVM_IRQ_LINE irq field index values */
-+#define KVM_ARM_IRQ_VCPU2_SHIFT		28
-+#define KVM_ARM_IRQ_VCPU2_MASK		0xf
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
--#define KVM_ARM_IRQ_TYPE_MASK		0xff
-+#define KVM_ARM_IRQ_TYPE_MASK		0xf
- #define KVM_ARM_IRQ_VCPU_SHIFT		16
- #define KVM_ARM_IRQ_VCPU_MASK		0xff
- #define KVM_ARM_IRQ_NUM_SHIFT		0
-diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
-index 9a507716ae2f..905a73f30079 100644
---- a/arm/aarch64/include/asm/kvm.h
-+++ b/arm/aarch64/include/asm/kvm.h
-@@ -106,6 +106,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-+#define KVM_ARM_VCPU_SPE_V1		7 /* Support guest SPEv1 */
+ #include <linux/byteorder.h>
+ #include <linux/types.h>
+@@ -17,6 +18,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ 	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
+ 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
+ 	pmu__generate_fdt_nodes(fdt, kvm);
++	spe__generate_fdt_nodes(fdt, kvm);
+ }
  
- struct kvm_vcpu_init {
- 	__u32 target;
-@@ -164,8 +165,9 @@ struct kvm_vcpu_events {
- 	struct {
- 		__u8 serror_pending;
- 		__u8 serror_has_esr;
-+		__u8 ext_dabt_pending;
- 		/* Align it to 8 bytes */
--		__u8 pad[6];
-+		__u8 pad[5];
- 		__u64 serror_esr;
- 	} exception;
- 	__u32 reserved[12];
-@@ -323,10 +325,17 @@ struct kvm_vcpu_events {
- #define KVM_ARM_VCPU_TIMER_CTRL		1
- #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
- #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-+#define KVM_ARM_VCPU_PVTIME_CTRL	2
-+#define   KVM_ARM_VCPU_PVTIME_IPA	0
-+#define KVM_ARM_VCPU_SPE_V1_CTRL	3
-+#define   KVM_ARM_VCPU_SPE_V1_IRQ	0
-+#define   KVM_ARM_VCPU_SPE_V1_INIT	1
+ static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
+diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+index 04be43dfa9b2..9968e1666de5 100644
+--- a/arm/aarch64/include/kvm/kvm-config-arch.h
++++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+@@ -6,6 +6,8 @@
+ 			"Run AArch32 guest"),				\
+ 	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
+ 			"Create PMUv3 device"),				\
++	OPT_BOOLEAN('\0', "spe", &(cfg)->has_spev1,			\
++			"Create SPEv1 device"),				\
+ 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+ 			"Specify random seed for Kernel Address Space "	\
+ 			"Layout Randomization (KASLR)"),
+diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+index 8dfb82ecbc37..080183fa4f81 100644
+--- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
++++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
+@@ -8,7 +8,8 @@
+ #define ARM_VCPU_FEATURE_FLAGS(kvm, cpuid)	{				\
+ 	[0] = ((!!(cpuid) << KVM_ARM_VCPU_POWER_OFF) |				\
+ 	       (!!(kvm)->cfg.arch.aarch32_guest << KVM_ARM_VCPU_EL1_32BIT) |	\
+-	       (!!(kvm)->cfg.arch.has_pmuv3 << KVM_ARM_VCPU_PMU_V3))		\
++	       (!!(kvm)->cfg.arch.has_pmuv3 << KVM_ARM_VCPU_PMU_V3) |		\
++	       (!!(kvm)->cfg.arch.has_spev1 << KVM_ARM_VCPU_SPE_V1))		\
+ }
  
- /* KVM_IRQ_LINE irq field index values */
-+#define KVM_ARM_IRQ_VCPU2_SHIFT		28
-+#define KVM_ARM_IRQ_VCPU2_MASK		0xf
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
--#define KVM_ARM_IRQ_TYPE_MASK		0xff
-+#define KVM_ARM_IRQ_TYPE_MASK		0xf
- #define KVM_ARM_IRQ_VCPU_SHIFT		16
- #define KVM_ARM_IRQ_VCPU_MASK		0xff
- #define KVM_ARM_IRQ_NUM_SHIFT		0
-diff --git a/include/linux/kvm.h b/include/linux/kvm.h
-index 5e3f12d5359e..1a362c230e4a 100644
---- a/include/linux/kvm.h
-+++ b/include/linux/kvm.h
-@@ -235,6 +235,7 @@ struct kvm_hyperv_exit {
- #define KVM_EXIT_S390_STSI        25
- #define KVM_EXIT_IOAPIC_EOI       26
- #define KVM_EXIT_HYPERV           27
-+#define KVM_EXIT_ARM_NISV         28
+ #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
+diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
+index 9f3e8586880c..90c2e1784e97 100644
+--- a/arm/aarch64/kvm-cpu.c
++++ b/arm/aarch64/kvm-cpu.c
+@@ -140,6 +140,10 @@ void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init)
+ 	/* Enable SVE if available */
+ 	if (kvm__supports_extension(kvm, KVM_CAP_ARM_SVE))
+ 		init->features[0] |= 1UL << KVM_ARM_VCPU_SVE;
++
++	/* Enable SPE if available */
++	if (kvm__supports_extension(kvm, KVM_CAP_ARM_SPE_V1))
++		init->features[0] |= 1UL << KVM_ARM_VCPU_SPE_V1;
+ }
  
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -243,6 +244,8 @@ struct kvm_hyperv_exit {
- #define KVM_INTERNAL_ERROR_SIMUL_EX	2
- /* Encounter unexpected vm-exit due to delivery event. */
- #define KVM_INTERNAL_ERROR_DELIVERY_EV	3
-+/* Encounter unexpected vm-exit reason */
-+#define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON	4
- 
- /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
- struct kvm_run {
-@@ -392,6 +395,11 @@ struct kvm_run {
- 		} eoi;
- 		/* KVM_EXIT_HYPERV */
- 		struct kvm_hyperv_exit hyperv;
-+		/* KVM_EXIT_ARM_NISV */
-+		struct {
-+			__u64 esr_iss;
-+			__u64 fault_ipa;
-+		} arm_nisv;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
-@@ -996,6 +1004,12 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
- #define KVM_CAP_PMU_EVENT_FILTER 173
-+#define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
-+#define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
-+#define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 176
-+#define KVM_CAP_ARM_NISV_TO_USER 177
-+#define KVM_CAP_ARM_INJECT_EXT_DABT 178
-+#define KVM_CAP_ARM_SPE_V1 179
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1142,6 +1156,7 @@ struct kvm_dirty_tlb {
- #define KVM_REG_S390		0x5000000000000000ULL
- #define KVM_REG_ARM64		0x6000000000000000ULL
- #define KVM_REG_MIPS		0x7000000000000000ULL
-+#define KVM_REG_RISCV		0x8000000000000000ULL
- 
- #define KVM_REG_SIZE_SHIFT	52
- #define KVM_REG_SIZE_MASK	0x00f0000000000000ULL
-@@ -1222,6 +1237,8 @@ enum kvm_device_type {
- #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
- 	KVM_DEV_TYPE_XIVE,
- #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
-+	KVM_DEV_TYPE_ARM_PV_TIME,
-+#define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
- 	KVM_DEV_TYPE_MAX,
- };
- 
-@@ -1332,6 +1349,7 @@ struct kvm_s390_ucas_mapping {
- #define KVM_PPC_GET_CPU_CHAR	  _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
- /* Available with KVM_CAP_PMU_EVENT_FILTER */
- #define KVM_SET_PMU_EVENT_FILTER  _IOW(KVMIO,  0xb2, struct kvm_pmu_event_filter)
-+#define KVM_PPC_SVM_OFF		  _IO(KVMIO,  0xb3)
- 
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
-diff --git a/powerpc/include/asm/kvm.h b/powerpc/include/asm/kvm.h
-index b0f72dea8b11..264e266a85bf 100644
---- a/powerpc/include/asm/kvm.h
-+++ b/powerpc/include/asm/kvm.h
-@@ -667,6 +667,8 @@ struct kvm_ppc_cpu_char {
- 
- /* PPC64 eXternal Interrupt Controller Specification */
- #define KVM_DEV_XICS_GRP_SOURCES	1	/* 64-bit source attributes */
-+#define KVM_DEV_XICS_GRP_CTRL		2
-+#define   KVM_DEV_XICS_NR_SERVERS	1
- 
- /* Layout of 64-bit source attribute values */
- #define  KVM_XICS_DESTINATION_SHIFT	0
-@@ -683,6 +685,7 @@ struct kvm_ppc_cpu_char {
- #define KVM_DEV_XIVE_GRP_CTRL		1
- #define   KVM_DEV_XIVE_RESET		1
- #define   KVM_DEV_XIVE_EQ_SYNC		2
-+#define   KVM_DEV_XIVE_NR_SERVERS	3
- #define KVM_DEV_XIVE_GRP_SOURCE		2	/* 64-bit source identifier */
- #define KVM_DEV_XIVE_GRP_SOURCE_CONFIG	3	/* 64-bit source identifier */
- #define KVM_DEV_XIVE_GRP_EQ_CONFIG	4	/* 64-bit EQ identifier */
+ int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
+diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
+index 5734c46ab9e6..742733e289af 100644
+--- a/arm/include/arm-common/kvm-config-arch.h
++++ b/arm/include/arm-common/kvm-config-arch.h
+@@ -9,6 +9,7 @@ struct kvm_config_arch {
+ 	bool		virtio_trans_pci;
+ 	bool		aarch32_guest;
+ 	bool		has_pmuv3;
++	bool		has_spev1;
+ 	u64		kaslr_seed;
+ 	enum irqchip_type irqchip;
+ 	u64		fw_addr;
+diff --git a/arm/include/arm-common/spe.h b/arm/include/arm-common/spe.h
+new file mode 100644
+index 000000000000..bcfa40877f6f
+--- /dev/null
++++ b/arm/include/arm-common/spe.h
+@@ -0,0 +1,4 @@
++
++#define KVM_ARM_SPEV1_PPI			21
++
++void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm);
+diff --git a/arm/spe.c b/arm/spe.c
+new file mode 100644
+index 000000000000..ec03b01a3866
+--- /dev/null
++++ b/arm/spe.c
+@@ -0,0 +1,81 @@
++#include "kvm/fdt.h"
++#include "kvm/kvm.h"
++#include "kvm/kvm-cpu.h"
++#include "kvm/util.h"
++
++#include "arm-common/gic.h"
++#include "arm-common/spe.h"
++
++#ifdef CONFIG_ARM64
++static int set_spe_attr(struct kvm *kvm, int vcpu_idx,
++			struct kvm_device_attr *attr)
++{
++	int ret, fd;
++
++	fd = kvm->cpus[vcpu_idx]->vcpu_fd;
++
++	ret = ioctl(fd, KVM_HAS_DEVICE_ATTR, attr);
++	if (!ret) {
++		ret = ioctl(fd, KVM_SET_DEVICE_ATTR, attr);
++		if (ret)
++			pr_err("SPE KVM_SET_DEVICE_ATTR failed (%d)\n", ret);
++	} else {
++		pr_err("Unsupported SPE on vcpu%d\n", vcpu_idx);
++	}
++
++	return ret;
++}
++
++void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm)
++{
++	const char compatible[] = "arm,statistical-profiling-extension-v1";
++	int irq = KVM_ARM_SPEV1_PPI;
++	int i, ret;
++
++	u32 cpu_mask = (((1 << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT) \
++		       & GIC_FDT_IRQ_PPI_CPU_MASK;
++	u32 irq_prop[] = {
++		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
++		cpu_to_fdt32(irq - 16),
++		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH),
++	};
++
++	if (!kvm->cfg.arch.has_spev1)
++		return;
++
++	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_SPE_V1)) {
++		pr_info("SPE unsupported\n");
++		return;
++	}
++
++	for (i = 0; i < kvm->nrcpus; i++) {
++		struct kvm_device_attr spe_attr;
++
++		spe_attr = (struct kvm_device_attr){
++			.group	= KVM_ARM_VCPU_SPE_V1_CTRL,
++			.addr	= (u64)(unsigned long)&irq,
++			.attr	= KVM_ARM_VCPU_SPE_V1_IRQ,
++		};
++
++		ret = set_spe_attr(kvm, i, &spe_attr);
++		if (ret)
++			return;
++
++		spe_attr = (struct kvm_device_attr){
++			.group	= KVM_ARM_VCPU_SPE_V1_CTRL,
++			.attr	= KVM_ARM_VCPU_SPE_V1_INIT,
++		};
++
++		ret = set_spe_attr(kvm, i, &spe_attr);
++		if (ret)
++			return;
++	}
++
++	_FDT(fdt_begin_node(fdt, "spe"));
++	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
++	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
++	_FDT(fdt_end_node(fdt));
++}
++#else
++void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm) { }
++#endif
 -- 
 2.21.0
 
