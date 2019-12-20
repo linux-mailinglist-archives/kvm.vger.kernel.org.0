@@ -2,94 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8162F128280
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 19:57:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6FD71282B8
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 20:28:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727413AbfLTS5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 13:57:16 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36757 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727390AbfLTS5P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Dec 2019 13:57:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576868234;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=cFh8F4XAF89lvEmScuXu4am01Qq5Q9wcAjX2EcomoIw=;
-        b=EHIZU6bxM6uhB29by1nM4+n4xLi8YIkncyrfRJJ/uBH8SwiZC6jSUNR7/KCgWnYAGXO1FB
-        Xt3E8+8taTyzAhQd5Bm7BCZSH93EYbEl15mxkPwtKM5KR8Im55NglTsJlXHHyMp/wy6kF1
-        omCsMqLE2raSpIF+QJuwDVNenognUrk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-sj1FOLOxMNmaPaLAlpUiSA-1; Fri, 20 Dec 2019 13:57:12 -0500
-X-MC-Unique: sj1FOLOxMNmaPaLAlpUiSA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1A1918B5F6A;
-        Fri, 20 Dec 2019 18:57:09 +0000 (UTC)
-Received: from redhat.com (ovpn-116-65.ams2.redhat.com [10.36.116.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E3615649A5;
-        Fri, 20 Dec 2019 18:57:00 +0000 (UTC)
-From:   Juan Quintela <quintela@redhat.com>
-To:     Markus Armbruster <armbru@redhat.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Cleber Rosa <crosa@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-        Michael Roth <mdroth@linux.vnet.ibm.com>,
-        Fam Zheng <fam@euphon.net>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Aleksandar Markovic <amarkovic@wavecomp.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Fabien Chouteau <chouteau@adacore.com>,
-        KONRAD Frederic <frederic.konrad@adacore.com>,
-        =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
-        kvm@vger.kernel.org, qemu-block@nongnu.org, qemu-ppc@nongnu.org
-Subject: Re: Can we retire Python 2 now?
-In-Reply-To: <8736dfdkph.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-        of "Fri, 20 Dec 2019 17:29:30 +0100")
-References: <8736dfdkph.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Fri, 20 Dec 2019 19:56:58 +0100
-Message-ID: <877e2qakqt.fsf@trasno.org>
+        id S1727531AbfLTT1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 14:27:39 -0500
+Received: from mga17.intel.com ([192.55.52.151]:28192 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727394AbfLTT1j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 14:27:39 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Dec 2019 11:27:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,336,1571727600"; 
+   d="scan'208";a="222547137"
+Received: from gza.jf.intel.com ([10.54.75.28])
+  by fmsmga001.fm.intel.com with ESMTP; 20 Dec 2019 11:27:38 -0800
+From:   John Andersen <john.s.andersen@intel.com>
+To:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        pbonzini@redhat.com
+Cc:     hpa@zytor.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        John Andersen <john.s.andersen@intel.com>
+Subject: [RESEND RFC 0/2] Paravirtualized Control Register pinning
+Date:   Fri, 20 Dec 2019 11:26:59 -0800
+Message-Id: <20191220192701.23415-1-john.s.andersen@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Markus Armbruster <armbru@redhat.com> wrote:
-> Python 2 EOL is only a few days away[*].  We made configure bitch about
-> it in commit e5abf59eae "Deprecate Python 2 support", 2019-07-01.  Any
-> objections to retiring it now, i.e. in 5.0?
->
-> Cc'ing everyone who appears to be maintaining something that looks like
-> a Python script.
->
-> [*] https://pythonclock.org/
+Paravirtualized Control Register pinning is a strengthened version of
+existing protections on the Write Protect, Supervisor Mode Execution /
+Access Protection, and User-Mode Instruction Prevention bits. The
+existing protections prevent native_write_cr*() functions from writing
+values which disable those bits. This patchset prevents any guest
+writes to control registers from disabling pinned bits, not just writes
+from native_write_cr*(). This stops attackers within the guest from
+using ROP to disable protection bits.
 
-I am pretty sure that I am not a python maintaainer at all.
+https://web.archive.org/web/20171029060939/http://www.blackbunny.io/linux-kernel-x86-64-bypass-smep-kaslr-kptr_restric/
 
-But anyways, python3 is only at python3.7.
-python3.0 debuted at 2008, so ...
+The protection is implemented by adding MSRs to KVM which contain the
+bits that are allowed to be pinned, and the bits which are pinned. The
+guest or userspace can enable bit pinning by reading MSRs to check
+which bits are allowed to be pinned, and then writing MSRs to set which
+bits they want pinned.
 
-Acked-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Other hypervisors such as HyperV have implemented similar protections
+for Control Registers and MSRs; which security researchers have found
+effective.
 
-And anything else that you can think that endorses the change.
+https://www.abatchy.com/2018/01/kernel-exploitation-4
 
-Later, Juan.
+We add a CR pin feature bit to the KVM cpuid, read only MSRs which
+guests use to identify which bits they may request be pinned, and
+CR pinned MSRs which contain the pinned bits. Guests can request that
+KVM pin bits within control register 0 or 4 via the CR pinned MSRs.
+Writes to the MSRs fail if they include bits that aren't allowed to be
+pinned. Host userspace may clear or modify pinned bits at any time.
+Once pinned bits are set, the guest may pin more allowed bits, but may
+never clear pinned bits.
+
+In the event that the guest vcpu attempts to disable any of the pinned
+bits, the vcpu that issued the write is sent a general protection
+fault, and the register is left unchanged.
+
+Pinning is not active when running in SMM. Entering SMM disables pinned
+bits, writes to control registers within SMM would therefore trigger
+general protection faults if pinning was enforced.
+
+The guest may never read pinned bits. If an attacker were to read the
+CR pinned MSRs, they might decide to preform another attack which would
+not cause a general protection fault.
+
+Should userspace expose the CR pining CPUID feature bit, it must zero CR
+pinned MSRs on reboot. If it does not, it runs the risk of having the
+guest enable pinning and subsequently cause general protection faults on
+next boot due to early boot code setting control registers to values
+which do not contain the pinned bits.
+
+When running with KVM guest support and paravirtualized CR pinning
+enabled, paravirtualized and existing pinning are setup at the same
+point on the boot CPU. Non-boot CPUs setup pinning upon identification.
+
+Guests using the kexec system call currently do not support
+paravirtualized control register pinning. This is due to early boot
+code writing known good values to control registers, these values do
+not contain the protected bits. This is due to CPU feature
+identification being done at a later time, when the kernel properly
+checks if it can enable protections.
+
+Most distributions enable kexec. However, kexec could be made boot time
+disableable. In this case if a user has disabled kexec at boot time
+the guest will request that paravirtualized control register pinning
+be enabled. This would expand the userbase to users of major
+distributions.
+
+Paravirtualized CR pinning will likely be incompatible with kexec for
+the foreseeable future. Early boot code could possibly be changed to
+not clear protected bits. However, a kernel that requests CR bits be
+pinned can't know if the kernel it's kexecing has been updated to not
+clear protected bits. This would result in the kernel being kexec'd
+almost immediately receiving a general protection fault.
+
+Security conscious kernel configurations disable kexec already, per KSPP
+guidelines. Projects such as Kata Containers, AWS Lambda, ChromeOS
+Termina, and others using KVM to virtualize Linux will benefit from
+this protection.
+
+The usage of SMM in SeaBIOS was explored as a way to communicate to KVM
+that a reboot has occurred and it should zero the pinned bits. When
+using QEMU and SeaBIOS, SMM initialization occurs on reboot. However,
+prior to SMM initialization, BIOS writes zero values to CR0, causing a
+general protection fault to be sent to the guest before SMM can signal
+that the machine has booted.
+
+Pinning of sensitive CR bits has already been implemented to protect
+against exploits directly calling native_write_cr*(). The current
+protection cannot stop ROP attacks which jump directly to a MOV CR
+instruction. Guests running with paravirtualized CR pinning are now
+protected against the use of ROP to disable CR bits. The same bits that
+are being pinned natively may be pinned via the CR pinned MSRs. These
+bits are WP in CR0, and SMEP, SMAP, and UMIP in CR4.
+
+Future patches could protect bits in MSRs in a similar fashion. The NXE
+bit of the EFER MSR is a prime candidate.
+
+John Andersen (2):
+  KVM: X86: Add CR pin MSRs
+  X86: Use KVM CR pin MSRs
+
+ Documentation/virt/kvm/msr.txt       | 38 +++++++++++++++++++++++
+ arch/x86/Kconfig                     |  9 ++++++
+ arch/x86/include/asm/kvm_host.h      |  2 ++
+ arch/x86/include/asm/kvm_para.h      | 10 +++++++
+ arch/x86/include/uapi/asm/kvm_para.h |  5 ++++
+ arch/x86/kernel/cpu/common.c         |  5 ++++
+ arch/x86/kernel/kvm.c                | 17 +++++++++++
+ arch/x86/kvm/cpuid.c                 |  3 +-
+ arch/x86/kvm/x86.c                   | 45 ++++++++++++++++++++++++++++
+ 9 files changed, 133 insertions(+), 1 deletion(-)
+
+-- 
+2.21.0
 
