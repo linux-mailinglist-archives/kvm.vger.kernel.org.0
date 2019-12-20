@@ -2,226 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C9BD12856E
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 00:14:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A1D31285A3
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 00:45:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbfLTXOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 18:14:11 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:9006 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726470AbfLTXOL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 18:14:11 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dfd55980001>; Fri, 20 Dec 2019 15:13:29 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Fri, 20 Dec 2019 15:14:00 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Fri, 20 Dec 2019 15:14:00 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 20 Dec
- 2019 23:13:58 +0000
-Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
-To:     Leon Romanovsky <leon@kernel.org>
-CC:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        Maor Gottlieb <maorg@mellanox.com>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191219132607.GA410823@unreal>
- <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
- <20191219210743.GN17227@ziepe.ca>
- <f10b2a18-a109-d87d-f156-2e5941cbf4a0@nvidia.com>
- <20191220184821.GB10944@unreal>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <b70ac328-2dc0-efe3-05c2-3e040b662256@nvidia.com>
-Date:   Fri, 20 Dec 2019 15:13:57 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1726556AbfLTXpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 18:45:44 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:46209 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726514AbfLTXpo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 18:45:44 -0500
+Received: by mail-io1-f68.google.com with SMTP id t26so11054245ioi.13
+        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 15:45:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2VVoGEzfR7gG4AluE0EIlluC91OZtoA+xaJXujx9EZA=;
+        b=fDddvzBb0bYbEvg2ftxslgpoxEewFZ/Kex/j4djuhoeS4r4YTD+7rhUUiwlFtYhzKi
+         Gl1Z7EtniYAfN9Ruc13+zc4x9ruUDseNybwv5OL/Ktnkpe+9zAisaB9r9nDFlW9rm768
+         ElCd59YH1eXi5XWW1QYFgml2d8E5PjcXG7gSnQ8IAB800j35JmLYaIYZcXzTEgofbS/a
+         M1Vf2qbri5SamAscRWbgoskm+wCaZF4F1JcIO4YSsQ/5ridbpOWbJn7USXR/c3asZswy
+         XG7IRinwL+v/9/T+8amRzugQ8lneun6LajG5tkad7ipfvDf3EGC/GHPj02YZ+o11oIf8
+         aXtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2VVoGEzfR7gG4AluE0EIlluC91OZtoA+xaJXujx9EZA=;
+        b=Vz2bLMHH/dAq6BFQfAO5Ao9otMCRaZAXG41hr+Dv/LjrikkuF9q6VMLJBXTp1rePm4
+         iEoWIs4GHCLve6x8Vd/pNaTPzudNuXVWmnjSfqhR7JvIipe+YvfrQr6WMJl2nQI+O5mr
+         DhQ00U/3QilRYrq8/9H2TdNhlOJM2hAoujSgzlA4+2OjPpKH7IuFVI6Q3sxH9jC1romz
+         HQxX31rJ0P3kRqblk3pjIwudMf0UEClOXioxTDi+48C3PssoUWO7KjV3SLHWkQVuD3Bq
+         NK6inqg7uSzQ5652/VtLsDkaQBKqq1tSm0PtLq0FgY/JzlN11NuLJNGXWMuhZ8gbd3PG
+         SvcA==
+X-Gm-Message-State: APjAAAXv0uCmhBqiPBXK0SPuTWO3RxnmEB2T+1NFC9vCNQVygNBYvN5N
+        PAZB9KGI2azmNnvEJ84p6sNxlixu/a/MvefYqedMtPa6oXo=
+X-Google-Smtp-Source: APXvYqxxsYyzCNu9Eu/1MywB6OE97eDUlHasPK3azbCI8cKUplzk3B6ajOmm1egl8JHy3xYXhJ+Ts/H2KWyVR4H1ma8=
+X-Received: by 2002:a5d:8cda:: with SMTP id k26mr12131599iot.26.1576885543547;
+ Fri, 20 Dec 2019 15:45:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191220184821.GB10944@unreal>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576883609; bh=YyPKn1pTUo9maui0Cl8wPUC9pCaG4pozfEeSM/q2Xuw=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=BbpbjMRADbiieG0wZwg7/MNcvb0htkXoIVaUqVfL2cVFSq6P/VSfqRlwCWpnneJfD
-         xftzXoBcLiTWuqMXsQ7t6AWCT71WLO1xkGZrhrOn0tcyM5yAfm54j70C7fBwcgnofn
-         b/9H8aCfEVq0LawCERbdcQV3VCGhVN60vVxhAFwFbbDtIhnnLa+AeJbbNjJrpU3Dje
-         2yRq6wb9M/4s8MWJ9EJb7rqgBCMp3VCFwcIApBLsdFacXnYn6jAEGhJxMH7ZmKJPOr
-         2JhGFatda38gjZx3YL2suxRK7cjyk0lHKZiEYew9WUnhSKJKmAtAm3lHA3ArKec7HY
-         TMeZ1MUC9Bnkw==
+References: <20190829205635.20189-1-krish.sadhukhan@oracle.com>
+ <20190829205635.20189-3-krish.sadhukhan@oracle.com> <CALMp9eSekWEvvgwhMXWOtRZG1saQDOaKr+_4AacuM9JtH5guww@mail.gmail.com>
+ <a4882749-a5cc-f8cd-4641-dd61314e6312@oracle.com> <CALMp9eTBPRT+Re9rZzmutAiy62qSMQRfMrnyiYkNHkCKDy-KPQ@mail.gmail.com>
+In-Reply-To: <CALMp9eTBPRT+Re9rZzmutAiy62qSMQRfMrnyiYkNHkCKDy-KPQ@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 20 Dec 2019 15:45:32 -0800
+Message-ID: <CALMp9eR2GQ_aerH-arOEpa08k8ZdtYCA5ftxHfDCo5fS1r3VtA@mail.gmail.com>
+Subject: Re: [PATCH 2/4] KVM: nVMX: Check GUEST_DR7 on vmentry of nested guests
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/20/19 10:48 AM, Leon Romanovsky wrote:
-...
->> test_query_qp (tests.test_qp.QPTest) ... ok
->> test_rdmacm_sync_traffic (tests.test_rdmacm.CMTestCase) ... skipped 'No devices with net interface'
->>
->> ======================================================================
->> FAIL: test_query_port (tests.test_device.DeviceTest)
->> ----------------------------------------------------------------------
->> Traceback (most recent call last):
->>   File "/kernel_work/rdma-core/tests/test_device.py", line 129, in test_query_port
->>     self.verify_port_attr(port_attr)
->>   File "/kernel_work/rdma-core/tests/test_device.py", line 113, in verify_port_attr
->>     assert 'Invalid' not in d.speed_to_str(attr.active_speed)
->> AssertionError
-> 
-> I'm very curious how did you get this assert "d.speed_to_str" covers all
-> known speeds according to the IBTA.
-> 
+On Fri, Aug 30, 2019 at 4:15 PM Jim Mattson <jmattson@google.com> wrote:
+>
+> On Fri, Aug 30, 2019 at 4:07 PM Krish Sadhukhan
+> <krish.sadhukhan@oracle.com> wrote:
+> >
+> >
+> >
+> > On 08/29/2019 03:26 PM, Jim Mattson wrote:
+> > > On Thu, Aug 29, 2019 at 2:25 PM Krish Sadhukhan
+> > > <krish.sadhukhan@oracle.com> wrote:
+> > >> According to section "Checks on Guest Control Registers, Debug Registers, and
+> > >> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
+> > >> of nested guests:
+> > >>
+> > >>      If the "load debug controls" VM-entry control is 1, bits 63:32 in the DR7
+> > >>      field must be 0.
+> > > Can't we just let the hardware check guest DR7? This results in
+> > > "VM-entry failure due to invalid guest state," right? And we just
+> > > reflect that to L1?
+> >
+> > Just trying to understand the reason why this particular check can be
+> > deferred to the hardware.
+>
+> The vmcs02 field has the same value as the vmcs12 field, and the
+> physical CPU has the same requirements as the virtual CPU.
 
-Hi Leon,
-
-Short answer: I can make that one pass, with a small fix the the rdma-core test
-suite:
-
-commit a1b9fb0846e1b2356d7a16f4fbdd1960cf8dcbe5 (HEAD -> fix_speed_to_str)
-Author: John Hubbard <jhubbard@nvidia.com>
-Date:   Fri Dec 20 15:07:47 2019 -0800
-
-    device: fix speed_to_str(), to handle disabled links
-    
-    For disabled links, the raw speed token is 0. However,
-    speed_to_str() doesn't have that in the list. This leads
-    to an assertion when running tests (test_query_port) when
-    one link is down and other link(s) are up.
-    
-    Fix this by returning '(Disabled/down)' for the zero speed
-    case.
-
-diff --git a/pyverbs/device.pyx b/pyverbs/device.pyx
-index 33d133fd..f8b7826b 100755
---- a/pyverbs/device.pyx
-+++ b/pyverbs/device.pyx
-@@ -923,8 +923,8 @@ def width_to_str(width):
- 
- 
- def speed_to_str(speed):
--    l = {1: '2.5 Gbps', 2: '5.0 Gbps', 4: '5.0 Gbps', 8: '10.0 Gbps',
--         16: '14.0 Gbps', 32: '25.0 Gbps', 64: '50.0 Gbps'}
-+    l = {0: '(Disabled/down)', 1: '2.5 Gbps', 2: '5.0 Gbps', 4: '5.0 Gbps',
-+         8: '10.0 Gbps', 16: '14.0 Gbps', 32: '25.0 Gbps', 64: '50.0 Gbps'}
-     try:
-         return '{s} ({n})'.format(s=l[speed], n=speed)
-     except KeyError:
-
-
-Longer answer:
-==============
-
-It looks like this test suite assumes that every link is connected! (Probably
-in most test systems, they are.) But in my setup, the ConnectX cards each have
-two slots, and I only have (and only need) one cable. So one link is up, and
-the other is disabled. 
-
-This leads to the other problem, which is that if a link is disabled, the
-test suite finds a "0" token for attr.active_speed. That token is not in the
-approved list, and so d.speed_to_str() asserts.
-
-With some diagnostics added, I can see it checking each link: one passes, and
-the other asserts:
-
-diff --git a/tests/test_device.py b/tests/test_device.py
-index 524e0e89..7b33d7db 100644
---- a/tests/test_device.py
-+++ b/tests/test_device.py
-@@ -110,6 +110,12 @@ class DeviceTest(unittest.TestCase):
-         assert 'Invalid' not in d.translate_mtu(attr.max_mtu)
-         assert 'Invalid' not in d.translate_mtu(attr.active_mtu)
-         assert 'Invalid' not in d.width_to_str(attr.active_width)
-+        print("")
-+        print('Diagnostics ===========================================')
-+        print('phys_state:    ', d.phys_state_to_str(attr.phys_state))
-+        print('active_width): ', d.width_to_str(attr.active_width))
-+        print('active_speed:  ',   d.speed_to_str(attr.active_speed))
-+        print('END of Diagnostics ====================================')
-         assert 'Invalid' not in d.speed_to_str(attr.active_speed)
-         assert 'Invalid' not in d.translate_link_layer(attr.link_layer)
-         assert attr.max_msg_sz > 0x1000
-
-         assert attr.max_msg_sz > 0x1000
-
-...and the test run from that is:
-
-# ./build/bin/run_tests.py --verbose tests.test_device.DeviceTest
-test_dev_list (tests.test_device.DeviceTest) ... ok
-test_open_dev (tests.test_device.DeviceTest) ... ok
-test_query_device (tests.test_device.DeviceTest) ... ok
-test_query_device_ex (tests.test_device.DeviceTest) ... ok
-test_query_gid (tests.test_device.DeviceTest) ... ok
-test_query_port (tests.test_device.DeviceTest) ... 
-Diagnostics ===========================================
-phys_state:     Link up (5)
-active_width):  4X (2)
-active_speed:   25.0 Gbps (32)
-END of Diagnostics ====================================
-
-Diagnostics ===========================================
-phys_state:     Disabled (3)
-active_width):  4X (2)
-active_speed:   Invalid speed
-END of Diagnostics ====================================
-FAIL
-test_query_port_bad_flow (tests.test_device.DeviceTest) ... ok
-
-======================================================================
-FAIL: test_query_port (tests.test_device.DeviceTest)
-----------------------------------------------------------------------
-Traceback (most recent call last):
-  File "/kernel_work/rdma-core/tests/test_device.py", line 135, in test_query_port
-    self.verify_port_attr(port_attr)
-  File "/kernel_work/rdma-core/tests/test_device.py", line 119, in verify_port_attr
-    assert 'Invalid' not in d.speed_to_str(attr.active_speed)
-AssertionError
-
-----------------------------------------------------------------------
-Ran 7 tests in 0.055s
-
-FAILED (failures=1)
-
-
-
-thanks,
--- 
-John Hubbard
-NVIDIA
-
+Sadly, I was mistaken. The guest DR7 value is not transferred from
+vmcs12 to vmcs02. It is set prior to the vmcs02 VM-entry by
+kvm_set_dr(). Unfortunately, that function synthesizes a #GP if any
+bit in the high dword of DR7 is set. So, you are correct, Krish: this
+field must be checked in software.
