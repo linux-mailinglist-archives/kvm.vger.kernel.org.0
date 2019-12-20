@@ -2,110 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 385CB12780E
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 10:25:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6A02127838
+	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2019 10:33:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727347AbfLTJZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 04:25:21 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56130 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727269AbfLTJZU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Dec 2019 04:25:20 -0500
+        id S1727283AbfLTJds (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 04:33:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57406 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727265AbfLTJdo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 04:33:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576833918;
+        s=mimecast20190719; t=1576834422;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LsxcLVbBun1f96xBFFfgPOlzuKGlq4r29EdM+SsmX7k=;
-        b=XCSvcuHZl4fYpSg3+lJGo7wB9zu/5eGQ/Sk161B0dNiEKY/TWOPMT4PKIswsjbfsgWmozX
-        30WcZ2NxviW42XxYvpMCXrNS4PQvI3F//kMadPHcURTdX5+TGwZjCutY6tAVNbdh0tM9XC
-        VNIv2l6v3eIrXbxeJYOQ8yICFjiWQr0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-MV1GUbcFPF2micIZKGBcEw-1; Fri, 20 Dec 2019 04:25:17 -0500
-X-MC-Unique: MV1GUbcFPF2micIZKGBcEw-1
-Received: by mail-wr1-f70.google.com with SMTP id d8so3541787wrq.12
-        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 01:25:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LsxcLVbBun1f96xBFFfgPOlzuKGlq4r29EdM+SsmX7k=;
-        b=sYN+cC2Ufh555lfoslo1B8yvLOfxwBnZrwT/QDojDwuIMeF9gQ1dvsD4qwTTMejM05
-         SBaIvV0hv17qJlFyyxGow13RMRgT5+iaOU98cxy5LzkbK0rn0o3qKIWzvdA9bKTqe4xR
-         QhUu8yl8UEYXmKT38dhDT6unYwu0eKjYMCns9r78ZjmCjoOURdCL3wwRg2wmnWjTScix
-         bPAUgBdboAz3tdhOxXSreKemhNLsVwjeVuRoknLbU8un+m03IWX6zOTwZqv9OFkED1Hj
-         5LpDtNq7jlRHf1rKyJZur7w6f2hZvWZCtXdG7lcdipE5ayiOIch6HBVhZ/H9UASO0eLt
-         kZ5Q==
-X-Gm-Message-State: APjAAAVP4DyTunflxMxIfR/5vnL7SOrAmLCXWySqadt3L9pzgPLL3w/V
-        6NRYCJv8DaTL9WIXDLg2i6WlqWVUFqlKnbB6j0JcYHNxcQvLk03adw2g3ZZR/22WQLWBB0kAFlC
-        npX9pff3UcE+r
-X-Received: by 2002:a05:600c:246:: with SMTP id 6mr15371256wmj.122.1576833916357;
-        Fri, 20 Dec 2019 01:25:16 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzw8wZPLS7TkKIeuMQ4kT47hh6TgBs/pAj1q7SP7litoY6M7b4efDd9KnpDPbJZMMJOaN3lqQ==
-X-Received: by 2002:a05:600c:246:: with SMTP id 6mr15371232wmj.122.1576833916119;
-        Fri, 20 Dec 2019 01:25:16 -0800 (PST)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id m7sm9097969wrr.40.2019.12.20.01.25.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Dec 2019 01:25:15 -0800 (PST)
-Subject: Re: [PATCH v2] kvm/svm: PKU not currently supported
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        John Allen <john.allen@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rkrcmar@redhat.com, vkuznets@redhat.com
-References: <20191219201759.21860-1-john.allen@amd.com>
- <20191219203214.GC6439@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8a77e3b9-049e-e622-9332-9bebb829bc3d@redhat.com>
-Date:   Fri, 20 Dec 2019 10:25:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        bh=kARvpg6EeSn47uf+HJvOWWm63eTYV3jwqH0aHeRURHY=;
+        b=KoEe95fXnH3+7rYUbP5Hts1DNLWdfbNzptZwkKz2TRf2ARuv2Kj6C3PfBIF5D5C4MleZbj
+        ljBUto9BjwrkUvIZDoZyQHGHU7XupKqHT7UrTi25AT2KCzsey2jJXMnfSj4yTq7vb9CfZX
+        v02eH6fh8zjJ9iQ8/niHvCplbCniFL4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-euuv6RBAMwGCsT-Q338LuQ-1; Fri, 20 Dec 2019 04:33:41 -0500
+X-MC-Unique: euuv6RBAMwGCsT-Q338LuQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 444D1911EB;
+        Fri, 20 Dec 2019 09:33:38 +0000 (UTC)
+Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 82CC560BF3;
+        Fri, 20 Dec 2019 09:33:27 +0000 (UTC)
+Date:   Fri, 20 Dec 2019 10:33:25 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 30/45] KVM: Move vcpu alloc and init invocation to
+ common code
+Message-ID: <20191220103325.34fc2bf0.cohuck@redhat.com>
+In-Reply-To: <20191218215530.2280-31-sean.j.christopherson@intel.com>
+References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
+        <20191218215530.2280-31-sean.j.christopherson@intel.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191219203214.GC6439@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/12/19 21:32, Sean Christopherson wrote:
-> On Thu, Dec 19, 2019 at 02:17:59PM -0600, John Allen wrote:
->> Current SVM implementation does not have support for handling PKU. Guests
->> running on a host with future AMD cpus that support the feature will read
->> garbage from the PKRU register and will hit segmentation faults on boot as
->> memory is getting marked as protected that should not be. Ensure that cpuid
->> from SVM does not advertise the feature.
->>
->> Signed-off-by: John Allen <john.allen@amd.com>
->> ---
->> v2:
->>   -Introduce kvm_x86_ops->pku_supported()
+On Wed, 18 Dec 2019 13:55:15 -0800
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+
+> Now that all architectures tightly couple vcpu allocation/free with the
+> mandatory calls to kvm_{un}init_vcpu(), move the sequences verbatim to
+> common KVM code.
 > 
-> I like the v1 approach better, it's less code to unwind when SVM gains
-> support for virtualizaing PKU.
+> Move both allocation and initialization in a single patch to eliminate
+> thrash in arch specific code.  The bisection benefits of moving the two
+> pieces in separate patches is marginal at best, whereas the odds of
+> introducing a transient arch specific bug are non-zero.
 > 
-> The existing cases of kvm_x86_ops->*_supported() in __do_cpuid_func() are
-> necessary to handle cases where it may not be possible to expose a feature
-> even though it's supported in hardware, host and KVM, e.g. VMX's separate
-> MSR-based features and PT's software control to hide it from guest.  In
-> this case, hiding PKU is purely due to lack of support in KVM.  The SVM
-> series to enable PKU can then delete a single line of SVM code instead of
-> having to go back in and do surgery on x86 and VMX.
-> 
+> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/mips/kvm/mips.c       | 33 ++++++---------------------------
+>  arch/powerpc/kvm/powerpc.c | 27 ++++-----------------------
+>  arch/s390/kvm/kvm-s390.c   | 31 +++++--------------------------
+>  arch/x86/kvm/x86.c         | 28 ++--------------------------
+>  include/linux/kvm_host.h   |  2 +-
+>  virt/kvm/arm/arm.c         | 29 ++---------------------------
+>  virt/kvm/kvm_main.c        | 21 ++++++++++++++++++---
+>  7 files changed, 38 insertions(+), 133 deletions(-)
 
-I sort of liked the V1 approach better, in that I liked using
-set_supported_cpuid but I didn't like *removing* features from it.
+(...)
 
-I think all *_supported() should be removed, and the code moved from
-__do_cpuid_func() to set_supported_cpuid.
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 8543d338a06a..2ed76584ebd9 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2530,9 +2530,6 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	if (vcpu->kvm->arch.use_cmma)
+>  		kvm_s390_vcpu_unsetup_cmma(vcpu);
+>  	free_page((unsigned long)(vcpu->arch.sie_block));
+> -
+> -	kvm_vcpu_uninit(vcpu);
+> -	kmem_cache_free(kvm_vcpu_cache, vcpu);
+>  }
+>  
+>  static void kvm_free_vcpus(struct kvm *kvm)
+> @@ -3014,29 +3011,15 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+>  	return 0;
+>  }
+>  
+> -struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+> -				      unsigned int id)
+> +int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_vcpu *vcpu;
+>  	struct sie_page *sie_page;
+>  	int rc;
+>  
+> -	rc = -ENOMEM;
+> -
+> -	vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
+> -	if (!vcpu)
+> -		goto out;
+> -
+> -	rc = kvm_vcpu_init(vcpu, kvm, id);
+> -	if (rc)
+> -		goto out_free_cpu;
+> -
+> -	rc = -ENOMEM;
+> -
+>  	BUILD_BUG_ON(sizeof(struct sie_page) != 4096);
+>  	sie_page = (struct sie_page *) get_zeroed_page(GFP_KERNEL);
+>  	if (!sie_page)
+> -		goto out_uninit_vcpu;
+> +		return -ENOMEM;
+>  
+>  	vcpu->arch.sie_block = &sie_page->sie_block;
+>  	vcpu->arch.sie_block->itdba = (unsigned long) &sie_page->itdb;
+> @@ -3087,15 +3070,11 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+>  		 vcpu->arch.sie_block);
+>  	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
+>  
+> -	return vcpu;
+> +	return 0;
+> +
+>  out_free_sie_block:
+>  	free_page((unsigned long)(vcpu->arch.sie_block));
+> -out_uninit_vcpu:
+> -	kvm_vcpu_uninit(vcpu);
+> -out_free_cpu:
+> -	kmem_cache_free(kvm_vcpu_cache, vcpu);
+> -out:
+> -	return ERR_PTR(rc);
+> +	return rc;
 
-For now, however, this one is consistent with other features so I am
-applying it.
+This is getting a bit hard to follow across the patches, but I think rc
+is now only set for ucontrol guests. So this looks correct right now,
+but feels a bit brittle... should we maybe init rc to 0 and always
+return rc instead?
 
-Paolo
+>  }
+>  
+>  int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+
+Otherwise, looks good.
 
