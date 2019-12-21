@@ -2,191 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C048F128953
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 14:58:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C582128956
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 15:00:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726909AbfLUN6A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 Dec 2019 08:58:00 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:55558 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726339AbfLUN57 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 21 Dec 2019 08:57:59 -0500
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
-        (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1iifGW-00047r-QW; Sat, 21 Dec 2019 14:57:57 +0100
-Date:   Sat, 21 Dec 2019 13:57:55 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Andrew Murray <andrew.murray@arm.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 08/18] arm64: KVM: add support to save/restore SPE
- profiling buffer controls
-Message-ID: <20191221135755.70a6e8df@why>
-In-Reply-To: <20191220143025.33853-9-andrew.murray@arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
-        <20191220143025.33853-9-andrew.murray@arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1726842AbfLUN77 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Dec 2019 08:59:59 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56029 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726339AbfLUN76 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 21 Dec 2019 08:59:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576936797;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OzGanSLZTyj0rQovzhKYZlGacf6XiNSu8LL+snIztqY=;
+        b=fFK/+JAuFdzfM4hilgmUIDGLshPc5v5ij9k7VWOTBhLaL4LF/+RnrVSTQAe8/u69ZJ8q+y
+        Q7MmLLlmAMnqsZJDKMd5lGkP+SdkcEoPqL0WfOyasb5qAK60vLvQLZOaiiaHul4UbjAeFy
+        6s8zi23EDEzjJLDFAcWf92Z048z41lg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-377-COaqtliaN7e9mAFW3Sy94Q-1; Sat, 21 Dec 2019 08:59:56 -0500
+X-MC-Unique: COaqtliaN7e9mAFW3Sy94Q-1
+Received: by mail-wr1-f72.google.com with SMTP id f17so5248701wrt.19
+        for <kvm@vger.kernel.org>; Sat, 21 Dec 2019 05:59:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OzGanSLZTyj0rQovzhKYZlGacf6XiNSu8LL+snIztqY=;
+        b=OTLCODmzRdPHMNGNuorRKe4+lCU+A4E+Yrxxn7WF5WeexDw+GLiMFcaOmGRlzYdQt+
+         v6dfJReReGFbi4NouEYzCozZTKlhmP4jjVkofcv6FxVT9reoCjBT/RvgrN9C+G+beRZJ
+         c0EeC/yYHCLz37d6PLd2VfqSbhyBjvyiMAl+skc9i/NEexv9+QA1JI9EjYWYayh5fYcV
+         8ohXuhBF/L06H95LkDhUann2funFJNgbvd/BUpHYQc4yRd6dfTw67IgOcoPGPv4/E5XJ
+         eS0YcM7KArtXN9j9137YqWOiJOWEjKagf6hV06S7IgZoXdM+GRqIxsl7muXQQ2u9oiRu
+         Ie7w==
+X-Gm-Message-State: APjAAAVruvnW3cQU2BlYyTvxDitJD/PgkTt9/zSa3lNMwgI9jgpTVlcx
+        UH6oLeABDCL8gQTEpTYW2IFTqsuh9jlFI09NlyGLddjjW3SrhHOu7BJIxMFijjGMMVm6Zx0nWW1
+        FbNp95E+WSI8B
+X-Received: by 2002:a7b:c246:: with SMTP id b6mr22038920wmj.75.1576936795196;
+        Sat, 21 Dec 2019 05:59:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyLRAsNew8w/Njk74OL0w+jRQfW7rEi8LEKPv1tveKg6C+XetMl+GwMwsCmTl3DOuerVovVrw==
+X-Received: by 2002:a7b:c246:: with SMTP id b6mr22038894wmj.75.1576936794923;
+        Sat, 21 Dec 2019 05:59:54 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:ac09:bce1:1c26:264c? ([2001:b07:6468:f312:ac09:bce1:1c26:264c])
+        by smtp.gmail.com with ESMTPSA id y7sm17763133wmd.1.2019.12.21.05.59.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Dec 2019 05:59:54 -0800 (PST)
+Subject: Re: [RESEND RFC 0/2] Paravirtualized Control Register pinning
+To:     John Andersen <john.s.andersen@intel.com>, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org
+Cc:     hpa@zytor.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20191220192701.23415-1-john.s.andersen@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0f42e52a-6a16-69f4-41da-06e53d8025d2@redhat.com>
+Date:   Sat, 21 Dec 2019 14:59:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20191220192701.23415-1-john.s.andersen@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, catalin.marinas@arm.com, will@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, sudeep.holla@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Dec 2019 14:30:15 +0000
-Andrew Murray <andrew.murray@arm.com> wrote:
-
-> From: Sudeep Holla <sudeep.holla@arm.com>
+On 20/12/19 20:26, John Andersen wrote:
+> Paravirtualized CR pinning will likely be incompatible with kexec for
+> the foreseeable future. Early boot code could possibly be changed to
+> not clear protected bits. However, a kernel that requests CR bits be
+> pinned can't know if the kernel it's kexecing has been updated to not
+> clear protected bits. This would result in the kernel being kexec'd
+> almost immediately receiving a general protection fault.
 > 
-> Currently since we don't support profiling using SPE in the guests,
-> we just save the PMSCR_EL1, flush the profiling buffers and disable
-> sampling. However in order to support simultaneous sampling both in
-
-Is the sampling actually simultaneous? I don't believe so (the whole
-series would be much simpler if it was).
-
-> the host and guests, we need to save and reatore the complete SPE
-
-s/reatore/restore/
-
-> profiling buffer controls' context.
+> Security conscious kernel configurations disable kexec already, per KSPP
+> guidelines. Projects such as Kata Containers, AWS Lambda, ChromeOS
+> Termina, and others using KVM to virtualize Linux will benefit from
+> this protection.
 > 
-> Let's add the support for the same and keep it disabled for now.
-> We can enable it conditionally only if guests are allowed to use
-> SPE.
+> The usage of SMM in SeaBIOS was explored as a way to communicate to KVM
+> that a reboot has occurred and it should zero the pinned bits. When
+> using QEMU and SeaBIOS, SMM initialization occurs on reboot. However,
+> prior to SMM initialization, BIOS writes zero values to CR0, causing a
+> general protection fault to be sent to the guest before SMM can signal
+> that the machine has booted.
+
+SMM is optional; I think it makes sense to leave it to userspace to
+reset pinning (including for the case of triple faults), while INIT
+which is handled within KVM would keep it active.
+
+> Pinning of sensitive CR bits has already been implemented to protect
+> against exploits directly calling native_write_cr*(). The current
+> protection cannot stop ROP attacks which jump directly to a MOV CR
+> instruction. Guests running with paravirtualized CR pinning are now
+> protected against the use of ROP to disable CR bits. The same bits that
+> are being pinned natively may be pinned via the CR pinned MSRs. These
+> bits are WP in CR0, and SMEP, SMAP, and UMIP in CR4.
 > 
-> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> [ Clear PMBSR bit when saving state to prevent spurious interrupts ]
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> ---
->  arch/arm64/kvm/hyp/debug-sr.c | 51 +++++++++++++++++++++++++++++------
->  1 file changed, 43 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-> index 8a70a493345e..12429b212a3a 100644
-> --- a/arch/arm64/kvm/hyp/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/debug-sr.c
-> @@ -85,7 +85,8 @@
->  	default:	write_debug(ptr[0], reg, 0);			\
->  	}
->  
-> -static void __hyp_text __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt)
-> +static void __hyp_text
-> +__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> Future patches could protect bits in MSRs in a similar fashion. The NXE
+> bit of the EFER MSR is a prime candidate.
 
-nit: don't split lines like this if you can avoid it. You can put the
-full_ctxt parameter on a separate line instead.
+Please include patches for either kvm-unit-tests or
+tools/testing/selftests/kvm that test the functionality.
 
->  {
->  	u64 reg;
->  
-> @@ -102,22 +103,46 @@ static void __hyp_text __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt)
->  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
->  		return;
->  
-> -	/* No; is the host actually using the thing? */
-> -	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
-> -	if (!(reg & BIT(SYS_PMBLIMITR_EL1_E_SHIFT)))
-> +	/* Save the control register and disable data generation */
-> +	ctxt->sys_regs[PMSCR_EL1] = read_sysreg_el1(SYS_PMSCR);
-> +
-> +	if (!ctxt->sys_regs[PMSCR_EL1])
+Paolo
 
-Shouldn't you check the enable bits instead of relying on the whole
-thing being zero?
-
->  		return;
->  
->  	/* Yes; save the control register and disable data generation */
-> -	ctxt->sys_regs[PMSCR_EL1] = read_sysreg_el1(SYS_PMSCR);
-
-You've already saved the control register...
-
->  	write_sysreg_el1(0, SYS_PMSCR);
->  	isb();
->  
->  	/* Now drain all buffered data to memory */
->  	psb_csync();
->  	dsb(nsh);
-> +
-> +	if (!full_ctxt)
-> +		return;
-> +
-> +	ctxt->sys_regs[PMBLIMITR_EL1] = read_sysreg_s(SYS_PMBLIMITR_EL1);
-> +	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
-> +
-> +	/*
-> +	 * As PMBSR is conditionally restored when returning to the host we
-> +	 * must ensure the service bit is unset here to prevent a spurious
-> +	 * host SPE interrupt from being raised.
-> +	 */
-> +	ctxt->sys_regs[PMBSR_EL1] = read_sysreg_s(SYS_PMBSR_EL1);
-> +	write_sysreg_s(0, SYS_PMBSR_EL1);
-> +
-> +	isb();
-> +
-> +	ctxt->sys_regs[PMSICR_EL1] = read_sysreg_s(SYS_PMSICR_EL1);
-> +	ctxt->sys_regs[PMSIRR_EL1] = read_sysreg_s(SYS_PMSIRR_EL1);
-> +	ctxt->sys_regs[PMSFCR_EL1] = read_sysreg_s(SYS_PMSFCR_EL1);
-> +	ctxt->sys_regs[PMSEVFR_EL1] = read_sysreg_s(SYS_PMSEVFR_EL1);
-> +	ctxt->sys_regs[PMSLATFR_EL1] = read_sysreg_s(SYS_PMSLATFR_EL1);
-> +	ctxt->sys_regs[PMBPTR_EL1] = read_sysreg_s(SYS_PMBPTR_EL1);
->  }
->  
-> -static void __hyp_text __debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt)
-> +static void __hyp_text
-> +__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
->  {
->  	if (!ctxt->sys_regs[PMSCR_EL1])
->  		return;
-> @@ -126,6 +151,16 @@ static void __hyp_text __debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt)
->  	isb();
->  
->  	/* Re-enable data generation */
-> +	if (full_ctxt) {
-> +		write_sysreg_s(ctxt->sys_regs[PMBPTR_EL1], SYS_PMBPTR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMBLIMITR_EL1], SYS_PMBLIMITR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSFCR_EL1], SYS_PMSFCR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSEVFR_EL1], SYS_PMSEVFR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSLATFR_EL1], SYS_PMSLATFR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSIRR_EL1], SYS_PMSIRR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSICR_EL1], SYS_PMSICR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMBSR_EL1], SYS_PMBSR_EL1);
-> +	}
->  	write_sysreg_el1(ctxt->sys_regs[PMSCR_EL1], SYS_PMSCR);
->  }
->  
-> @@ -198,7 +233,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
->  	guest_ctxt = &vcpu->arch.ctxt;
->  
->  	if (!has_vhe())
-> -		__debug_restore_spe_nvhe(host_ctxt);
-> +		__debug_restore_spe_nvhe(host_ctxt, false);
->  
->  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
->  		return;
-> @@ -222,7 +257,7 @@ void __hyp_text __debug_save_host_context(struct kvm_vcpu *vcpu)
->  
->  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
->  	if (!has_vhe())
-> -		__debug_save_spe_nvhe(host_ctxt);
-> +		__debug_save_spe_nvhe(host_ctxt, false);
->  }
->  
->  void __hyp_text __debug_save_guest_context(struct kvm_vcpu *vcpu)
-
-So all of this is for non-VHE. What happens in the VHE case?
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
