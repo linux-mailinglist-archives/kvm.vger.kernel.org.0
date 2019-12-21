@@ -2,70 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A6F71286B7
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 04:14:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B9F521286D0
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 04:45:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726671AbfLUDOk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 22:14:40 -0500
-Received: from mga18.intel.com ([134.134.136.126]:11326 "EHLO mga18.intel.com"
+        id S1726674AbfLUDo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 22:44:57 -0500
+Received: from mga06.intel.com ([134.134.136.31]:51368 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726537AbfLUDOj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 22:14:39 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1726613AbfLUDo5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 22:44:57 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Dec 2019 19:14:38 -0800
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Dec 2019 19:44:54 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,338,1571727600"; 
-   d="scan'208";a="222611031"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.239.195.247]) ([10.239.195.247])
-  by fmsmga001.fm.intel.com with ESMTP; 20 Dec 2019 19:14:35 -0800
-Subject: Re: [PATCH v4 0/7] Use 1st-level for IOVA translation
-To:     "Liu, Yi L" <yi.l.liu@intel.com>, Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20191219031634.15168-1-baolu.lu@linux.intel.com>
- <A2975661238FB949B60364EF0F2C25743A13A364@SHSMSX104.ccr.corp.intel.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <434d7478-1ed3-1962-ff9d-1b37d0c44b9c@linux.intel.com>
-Date:   Sat, 21 Dec 2019 11:14:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+   d="scan'208";a="228789519"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga002.jf.intel.com with ESMTP; 20 Dec 2019 19:44:54 -0800
+Date:   Fri, 20 Dec 2019 19:44:54 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH v4 00/19] x86/cpu: Clean up handling of VMX features
+Message-ID: <20191221034454.GB22351@linux.intel.com>
+References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
+ <20191212140755.GF4991@zn.tnic>
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A13A364@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191212140755.GF4991@zn.tnic>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi again,
-
-On 2019/12/20 19:50, Liu, Yi L wrote:
-> 3) Per VT-d spec, FLPT has canonical requirement to the input
-> addresses. So I'd suggest to add some enhance regards to it.
-> Please refer to chapter 3.6:-).
+On Thu, Dec 12, 2019 at 03:07:55PM +0100, Borislav Petkov wrote:
+> On Wed, Nov 27, 2019 at 05:39:57PM -0800, Sean Christopherson wrote:
+> > Clean up a handful of interrelated warts in the kernel's handling of VMX:
+> > 
+> >   - Enable VMX in IA32_FEATURE_CONTROL during boot instead of on-demand
+> >     during KVM load to avoid future contention over IA32_FEATURE_CONTROL.
+> > 
+> >   - Rework VMX feature reporting so that it is accurate and up-to-date,
+> >     now and in the future.
+> > 
+> >   - Consolidate code across CPUs that support VMX.
 > 
-> 3.6 First-Level Translation
-> First-level translation restricts the input-address to a canonical address (i.e., address bits 63:N have
-> the same value as address bit [N-1], where N is 48-bits with 4-level paging and 57-bits with 5-level
-> paging). Requests subject to first-level translation by remapping hardware are subject to canonical
-> address checking as a pre-condition for first-level translation, and a violation is treated as a
-> translation-fault.
+> Ok, this is shaping up slowly to be upstream-ready, AFAICT.
+> 
+> How are we merging the next revision, after the minor things have been
+> taken care of? Through tip?
+> 
+> Paolo?
 
-It seems to be a conflict at bit 63. It should be the same as bit[N-1]
-according to the canonical address requirement; but it is also used as
-the XD control. Any thought?
-
-Best regards,
-baolu
+Tip would be my preference, we'll need to rebase the SGX series on this
+and tip would probably be slightly more convenient for that. 
