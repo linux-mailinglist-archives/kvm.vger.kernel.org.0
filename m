@@ -2,135 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D45DF1285D8
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 01:02:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31D891285F3
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 01:28:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726634AbfLUACW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 19:02:22 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:17577 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbfLUACV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 19:02:21 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dfd61010000>; Fri, 20 Dec 2019 16:02:10 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Fri, 20 Dec 2019 16:02:20 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Fri, 20 Dec 2019 16:02:20 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 21 Dec
- 2019 00:02:16 +0000
-Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
-To:     Jan Kara <jack@suse.cz>
-CC:     Leon Romanovsky <leon@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Alex Williamson" <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        Maor Gottlieb <maorg@mellanox.com>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191219132607.GA410823@unreal>
- <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
- <20191220092154.GA10068@quack2.suse.cz>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <b4b720c6-bb65-4928-f94f-618a39781c17@nvidia.com>
-Date:   Fri, 20 Dec 2019 16:02:15 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1726556AbfLUA1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 19:27:38 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:33438 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726462AbfLUA1i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 19:27:38 -0500
+Received: by mail-io1-f65.google.com with SMTP id z8so11147506ioh.0
+        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 16:27:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OZNK1+TUcHhHbvzo/ui/RticmVqi6ywWiXT5CH9RLjg=;
+        b=aJtHqMrEXe7WAcK/ciq8OO0lGBjQxSKRDwPYaZpk9iCCuF+8NbYdXOgZqxuPy2PGCh
+         FVoZAtGENVOmWX0hCfoMigaZkqmqmqP0Kq4yyTD/eXza4kwlqj6dUv/Tf8OyqFz0QqYJ
+         e/W7MOUf6V2Ex3MpkUMmkJwqCL+M/n1bXI+zL8XrInSYAhHmVdgN8gsjbvfXL2zHWSG9
+         GaIYdLDK+52Sg1JqM8zlGBsww1DeMFXd5vhKAEDWM98blIpit/+KDnWJpQo8REtqaI1g
+         XNyrGMY8rLOJ0qU5W/rG4u/B2QAzhiQEGBKNABM32i3S61KSoD4DEEQKmbWiz2y2SzaY
+         KZAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OZNK1+TUcHhHbvzo/ui/RticmVqi6ywWiXT5CH9RLjg=;
+        b=ZbvhXQV418nTisoKt6oFrawdAbGN2T3LKHTOrUeR0+LGfSqwIiLIf7xAqxDmvMAl2B
+         EX2G6Vc56XLMn47Mg99CmcBdMdd2MXczIaoWrYBM7YPCL7U4hzpyY+4k2Y5OZpnV7w8Z
+         H3uX3fcAg5CqY6XuQjEMxSyQdKsw3KECibRNraMQChGi/8VTFD7pKTWSoOtP+otAmRNk
+         UKsdlduhoWS9fJIcTehYG/rrwDrM6j/dj7AiFhSjsppWbl2PA+z4vhyUAQBfjTgvb8NN
+         fuJzc8Oy51duC0H2jszkXeECps3ksCUrdwkVoTntBdvw+TNMVI6p9f3tgyZsKcPSBwi+
+         UzvQ==
+X-Gm-Message-State: APjAAAWE+1GXRPqjVuBuevPcsjBrwbmqkKIvARBWQKFj9k5D8mduJCUH
+        0RYlD7sxjQ53Qtbh6CPkYngkrHNf/ZwNJOMT6Eand0X+KF0=
+X-Google-Smtp-Source: APXvYqztS9DZIg2BL0i+UU2CZjfwVBDTpKsiljJe8lyqcihGoPvU53jS+pYS+a1CmAJnpAARppC9DV5aNPDRo5FGSfQ=
+X-Received: by 2002:a02:cd3b:: with SMTP id h27mr14542447jaq.18.1576888057588;
+ Fri, 20 Dec 2019 16:27:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191220092154.GA10068@quack2.suse.cz>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576886530; bh=lYmRHUKxjje08r87sxcrKTHiQd7mjXE1LoyaAhCgFxg=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=f7r38Ma6i3MI9nFSKeDIvPdt5vYrXy+JJsSfP31k7u+2wCxmmNufD1MCidKlHygn3
-         9DLRItYTVN4NHfhd0m+R/vw4197VAkr47By2QIcXSjvCdK32rmWdX1HB29Za9NhH9u
-         hudNbxuLpZYfSsTqz7cK57z334jwi4I1tLEi9lH/ca1Ff62dT4UIra7e9vrIur0HB5
-         JlY4V/uCEY0LG0MxUfhFQE9legwb8M5VcPujH9NTF0fF15bOxKlnVGzri/2jDISypV
-         Ta+rQMc92Kz26PG64qcQiVvssdWbJbDYbG+1Hm1r44PlB1G6okvsKpTqDlZ87Fs/zI
-         Q76HA4eWaOe1g==
+References: <20190829205635.20189-1-krish.sadhukhan@oracle.com> <20190829205635.20189-3-krish.sadhukhan@oracle.com>
+In-Reply-To: <20190829205635.20189-3-krish.sadhukhan@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 20 Dec 2019 16:27:26 -0800
+Message-ID: <CALMp9eSxdg9evNJYSifsS1jrAhKe_bVURCRckG67YWJ=YcGB4Q@mail.gmail.com>
+Subject: Re: [PATCH 2/4] KVM: nVMX: Check GUEST_DR7 on vmentry of nested guests
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/20/19 1:21 AM, Jan Kara wrote:
-...
->> So, ideas and next steps:
->>
->> 1. Assuming that you *are* hitting this, I think I may have to fall back to
->> implementing the "deferred" part of this design, as part of this series, after
->> all. That means:
->>
->>   For the pin/unpin calls at least, stop treating all pages as if they are
->>   a cluster of PAGE_SIZE pages; instead, retrieve a huge page as one page.
->>   That's not how it works now, and the need to hand back a huge array of
->>   subpages is part of the problem. This affects the callers too, so it's not
->>   a super quick change to make. (I was really hoping not to have to do this
->>   yet.)
-> 
-> Does that mean that you would need to make all GUP users huge page aware?
-> Otherwise I don't see how what you suggest would work... And I don't think
-> making all GUP users huge page aware is realistic (effort-wise) or even
-> wanted (maintenance overhead in all those places).
-> 
+On Thu, Aug 29, 2019 at 2:25 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+> According to section "Checks on Guest Control Registers, Debug Registers, and
+> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
+> of nested guests:
+>
+>     If the "load debug controls" VM-entry control is 1, bits 63:32 in the DR7
+>     field must be 0.
+>
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 6 ++++++
+>  arch/x86/kvm/x86.c        | 2 +-
+>  arch/x86/kvm/x86.h        | 6 ++++++
+>  3 files changed, 13 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 0b234e95e0ed..f04619daf906 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2681,6 +2681,12 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+>             !kvm_debugctl_valid(vmcs12->guest_ia32_debugctl))
+>                 return -EINVAL;
+>
+> +#ifdef CONFIG_X86_64
+> +       if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
+> +           !kvm_dr7_valid(vmcs12->guest_dr7))
+> +               return -EINVAL;
+> +#endif
+> +
+>         if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
+>             !kvm_pat_valid(vmcs12->guest_ia32_pat))
+>                 return -EINVAL;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index fafd81d2c9ea..423a7a573608 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1051,7 +1051,7 @@ static int __kvm_set_dr(struct kvm_vcpu *vcpu, int dr, unsigned long val)
+>         case 5:
+>                 /* fall through */
+>         default: /* 7 */
+> -               if (val & 0xffffffff00000000ULL)
+> +               if (!kvm_dr7_valid(val))
+>                         return -1; /* #GP */
+>                 vcpu->arch.dr7 = (val & DR7_VOLATILE) | DR7_FIXED_1;
+>                 kvm_update_dr7(vcpu);
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 28ba6d0c359f..4e55851fc3fb 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -360,6 +360,12 @@ static inline bool kvm_debugctl_valid(u64 data)
+>         return ((data & 0xFFFFFFFFFFFF203Cull) ? false : true);
+>  }
+>
+> +static inline bool kvm_dr7_valid(u64 data)
 
-Well, pretty much yes. It's really just the pin_user_pages*() callers, but
-the internals, follow_page() and such, are so interconnected right now that
-it would probably blow up into a huge effort, as you point out.
+This should be 'unsigned long data.'
 
-> I believe there might be also a different solution for this: For
-> transparent huge pages, we could find a space in 'struct page' of the
-> second page in the huge page for proper pin counter and just account pins
-> there so we'd have full width of 32-bits for it.
-> 
-> 								Honza
-> 
+> +{
+> +       /* Bits [63:32] are reserved */
+> +       return ((data & 0xFFFFFFFF00000000ull) ? false : true);
 
-OK, let me pursue that. Given that I shouldn't need to handle pages
-splitting, it should be not *too* bad.
+    return !(data & 0xFFFFFFFF00000000ull);
 
-I am starting to think that I should just post the first 9 or so 
-prerequisite patches (first 9 patches, plus the v4l2 fix that arguably should 
-have been earlier in the sequence I guess), as 5.6 candidates, while I go
-back to the drawing board here. 
+Or, shorter:
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+    return (u32)data == data;
+
+> +}
+> +
+>  void kvm_load_guest_xcr0(struct kvm_vcpu *vcpu);
+>  void kvm_put_guest_xcr0(struct kvm_vcpu *vcpu);
+>
+> --
+> 2.20.1
+>
