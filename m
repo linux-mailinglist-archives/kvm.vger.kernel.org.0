@@ -2,94 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B6591286FE
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 05:46:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E58BE128749
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 06:10:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727397AbfLUEqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 23:46:12 -0500
-Received: from mga03.intel.com ([134.134.136.65]:31841 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726709AbfLUEqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 23:46:09 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Dec 2019 20:46:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,338,1571727600"; 
-   d="scan'208";a="222620136"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 20 Dec 2019 20:46:08 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: [PATCH v5 19/19] KVM: VMX: Allow KVM_INTEL when building for Centaur and/or Zhaoxin CPUs
-Date:   Fri, 20 Dec 2019 20:45:13 -0800
-Message-Id: <20191221044513.21680-20-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20191221044513.21680-1-sean.j.christopherson@intel.com>
-References: <20191221044513.21680-1-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726024AbfLUFKK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Dec 2019 00:10:10 -0500
+Received: from shards.monkeyblade.net ([23.128.96.9]:56798 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725774AbfLUFKK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 Dec 2019 00:10:10 -0500
+Received: from localhost (unknown [IPv6:2601:601:9f00:1c3::3d5])
+        (using TLSv1 with cipher AES256-SHA (256/256 bits))
+        (Client did not present a certificate)
+        (Authenticated sender: davem-davemloft)
+        by shards.monkeyblade.net (Postfix) with ESMTPSA id 297B0153CA121;
+        Fri, 20 Dec 2019 21:10:09 -0800 (PST)
+Date:   Fri, 20 Dec 2019 21:10:08 -0800 (PST)
+Message-Id: <20191220.211008.1078307833860411304.davem@davemloft.net>
+To:     sgarzare@redhat.com
+Cc:     jhansen@vmware.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stefanha@redhat.com,
+        decui@microsoft.com, netdev@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH net-next v3 00/11] VSOCK: add vsock_test test suite
+From:   David Miller <davem@davemloft.net>
+In-Reply-To: <20191218180708.120337-1-sgarzare@redhat.com>
+References: <20191218180708.120337-1-sgarzare@redhat.com>
+X-Mailer: Mew version 6.8 on Emacs 26.1
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Fri, 20 Dec 2019 21:10:09 -0800 (PST)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Change the dependency for KVM_INTEL, i.e. KVM w/ VMX, from Intel CPUs to
-any CPU that supports the IA32_FEAT_CTL MSR and thus VMX functionality.
-This effectively allows building KVM_INTEL for Centaur and Zhaoxin CPUs.
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Wed, 18 Dec 2019 19:06:57 +0100
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/Kconfig | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+> The vsock_diag.ko module already has a test suite but the core AF_VSOCK
+> functionality has no tests. This patch series adds several test cases that
+> exercise AF_VSOCK SOCK_STREAM socket semantics (send/recv, connect/accept,
+> half-closed connections, simultaneous connections).
+> 
+> The v1 of this series was originally sent by Stefan.
+> 
+> v3:
+> - Patch 6:
+>   * check the byte received in the recv_byte()
+>   * use send(2)/recv(2) instead of write(2)/read(2) to test also flags
+>     (e.g. MSG_PEEK)
+> - Patch 8:
+>   * removed unnecessary control_expectln("CLOSED") [Stefan].
+> - removed patches 9,10,11 added in the v2
+> - new Patch 9 add parameters to list and skip tests (e.g. useful for vmci
+>   that doesn't support half-closed socket in the host)
+> - new Patch 10 prints a list of options in the help
+> - new Patch 11 tests MSG_PEEK flags of recv(2)
+> 
+> v2: https://patchwork.ozlabs.org/cover/1140538/
+> v1: https://patchwork.ozlabs.org/cover/847998/
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 840e12583b85..991019d5eee1 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -60,13 +60,11 @@ config KVM
- 	  If unsure, say N.
- 
- config KVM_INTEL
--	tristate "KVM for Intel processors support"
--	depends on KVM
--	# for perf_guest_get_msrs():
--	depends on CPU_SUP_INTEL
-+	tristate "KVM for Intel (and compatible) processors support"
-+	depends on KVM && IA32_FEAT_CTL
- 	---help---
--	  Provides support for KVM on Intel processors equipped with the VT
--	  extensions.
-+	  Provides support for KVM on processors equipped with Intel's VT
-+	  extensions, a.k.a. Virtual Machine Extensions (VMX).
- 
- 	  To compile this as a module, choose M here: the module
- 	  will be called kvm-intel.
--- 
-2.24.1
-
+Series applied, thanks.
