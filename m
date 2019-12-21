@@ -2,193 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16D07128960
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 15:13:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 712D41289C0
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 16:04:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727034AbfLUONb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 Dec 2019 09:13:31 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:39526 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726650AbfLUONb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 21 Dec 2019 09:13:31 -0500
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
-        (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1iifVX-0004U0-4h; Sat, 21 Dec 2019 15:13:27 +0100
-Date:   Sat, 21 Dec 2019 14:13:25 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Andrew Murray <andrew.murray@arm.com>
-Cc:     Catalin Marinas <Catalin.Marinas@arm.com>,
-        Mark Rutland <Mark.Rutland@arm.com>, will@kernel.org,
-        Sudeep Holla <Sudeep.Holla@arm.com>, <kvm@vger.kernel.org>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
- full SPE profiling buffer controls
-Message-ID: <20191221141325.5a177343@why>
-In-Reply-To: <20191220143025.33853-10-andrew.murray@arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-10-andrew.murray@arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1726802AbfLUPEQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Dec 2019 10:04:16 -0500
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:39374 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727090AbfLUPEP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 Dec 2019 10:04:15 -0500
+Received: by mail-ed1-f68.google.com with SMTP id t17so11390861eds.6
+        for <kvm@vger.kernel.org>; Sat, 21 Dec 2019 07:04:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tcd-ie.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Wrv1jKXMHqqWHNzOL/6EYVPe/DHxphPiIOsjGB9s2BI=;
+        b=neV87FDzcGxEtXMGvHrtTmbUOLtYtU+7I9MOQqfdQ+hsUXA8p8rI9n+KxmtaOLCADC
+         oqzQwM+E41sGIEhE26+tkV5wTeVqusoqBdHCsFTHLhlkaDp++P9e9+/8rjVQr/Wsf9hN
+         kPbAbKsiSsT63+7OMPlwjagzVfM0swjA056jVZJc1EqBSggoujvgAZK6bAD1VYJYtXeD
+         ft7DHsq/EkMf9BhDvmD36g1hqGBWyqNIVG1DfNnWrfT4s1zi4GMzfbjEz0QIobV6kmY1
+         laD6eUJQwGoQ0UWRg2PHTAA5VDA0M3C2Amsc74c9QymUHI36GRshkavBOusZCLhvlyeT
+         csig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Wrv1jKXMHqqWHNzOL/6EYVPe/DHxphPiIOsjGB9s2BI=;
+        b=ryzglJDLABVyhOEbVr2Ywgqcoj4U1WfvXsXHqljndMCsOlVCih++HWHXwe8p3rvayC
+         r+9Fg8r+obXw+2rbezbwRTo92mXa1h0FLKufPa+wZTx0+9iX7MeVvnF5pzf3O5zGs1fo
+         0hQ6u2pJ0/jJtvWdFsQuIgyA6WPXgUR372Y88lcnRnIbc4fi5fGfF6U9Cqf4pK+kvRWk
+         kYUZgrKssSLh7zJ+AOsYhFQexeEcqtDwiEHtK+oAaGIEv2zyt0mtfUQJAsbfC6yFat1R
+         acjmGB+rN/KAW33YEBoRDD7VNrdC/9r6ttt+hbVAy3FU9UnerZPQ0VfFF2EFyeKLOtSk
+         HaBw==
+X-Gm-Message-State: APjAAAUOimnDWn/YDFowIbjPXU2L01DncW9gcuIBVvOGQxkSftkoBKG4
+        y3wPn0lo+cnR4gZB6+anusX4kw==
+X-Google-Smtp-Source: APXvYqzVFV+nAZt2efpFSBwn8fHDfarT+lNLK2u/m6P0Ib5tJlSKcUyhpXmrMgKd3Rdn4f4Yf8qeow==
+X-Received: by 2002:a17:906:2e53:: with SMTP id r19mr22235209eji.306.1576940652743;
+        Sat, 21 Dec 2019 07:04:12 -0800 (PST)
+Received: from localhost.localdomain ([80.233.37.20])
+        by smtp.googlemail.com with ESMTPSA id u13sm1517639ejz.69.2019.12.21.07.04.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 21 Dec 2019 07:04:12 -0800 (PST)
+From:   Tom Murphy <murphyt7@tcd.ie>
+To:     iommu@lists.linux-foundation.org
+Cc:     Tom Murphy <murphyt7@tcd.ie>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Rob Clark <robdclark@gmail.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Julien Grall <julien.grall@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-tegra@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: [PATCH 0/8] Convert the intel iommu driver to the dma-iommu api
+Date:   Sat, 21 Dec 2019 15:03:52 +0000
+Message-Id: <20191221150402.13868-1-murphyt7@tcd.ie>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, Catalin.Marinas@arm.com, Mark.Rutland@arm.com, will@kernel.org, Sudeep.Holla@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Dec 2019 14:30:16 +0000
-Andrew Murray <andrew.murray@arm.com> wrote:
+This patchset converts the intel iommu driver to the dma-iommu api.
 
-[somehow managed not to do a reply all, re-sending]
+While converting the driver I exposed a bug in the intel i915 driver which causes a huge amount of artifacts on the screen of my laptop. You can see a picture of it here:
+https://github.com/pippy360/kernelPatches/blob/master/IMG_20191219_225922.jpg
 
-> From: Sudeep Holla <sudeep.holla@arm.com>
-> 
-> Now that we can save/restore the full SPE controls, we can enable it
-> if SPE is setup and ready to use in KVM. It's supported in KVM only if
-> all the CPUs in the system supports SPE.
-> 
-> However to support heterogenous systems, we need to move the check if
-> host supports SPE and do a partial save/restore.
+This issue is most likely in the i915 driver and is most likely caused by the driver not respecting the return value of the dma_map_ops::map_sg function. You can see the driver ignoring the return value here:
+https://github.com/torvalds/linux/blob/7e0165b2f1a912a06e381e91f0f4e495f4ac3736/drivers/gpu/drm/i915/gem/i915_gem_dmabuf.c#L51
 
-No. Let's just not go down that path. For now, KVM on heterogeneous
-systems do not get SPE. If SPE has been enabled on a guest and a CPU
-comes up without SPE, this CPU should fail to boot (same as exposing a
-feature to userspace).
+Previously this didn’t cause issues because the intel map_sg always returned the same number of elements as the input scatter gather list but with the change to this dma-iommu api this is no longer the case. I wasn’t able to track the bug down to a specific line of code unfortunately.  
 
-> 
-> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> ---
->  arch/arm64/kvm/hyp/debug-sr.c | 33 ++++++++++++++++-----------------
->  include/kvm/arm_spe.h         |  6 ++++++
->  2 files changed, 22 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-> index 12429b212a3a..d8d857067e6d 100644
-> --- a/arch/arm64/kvm/hyp/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/debug-sr.c
-> @@ -86,18 +86,13 @@
->  	}
->  
->  static void __hyp_text
-> -__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
-> +__debug_save_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
->  {
->  	u64 reg;
->  
->  	/* Clear pmscr in case of early return */
->  	ctxt->sys_regs[PMSCR_EL1] = 0;
->  
-> -	/* SPE present on this CPU? */
-> -	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
-> -						  ID_AA64DFR0_PMSVER_SHIFT))
-> -		return;
-> -
->  	/* Yes; is it owned by higher EL? */
->  	reg = read_sysreg_s(SYS_PMBIDR_EL1);
->  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
-> @@ -142,7 +137,7 @@ __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
->  }
->  
->  static void __hyp_text
-> -__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
-> +__debug_restore_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
->  {
->  	if (!ctxt->sys_regs[PMSCR_EL1])
->  		return;
-> @@ -210,11 +205,14 @@ void __hyp_text __debug_restore_guest_context(struct kvm_vcpu *vcpu)
->  	struct kvm_guest_debug_arch *host_dbg;
->  	struct kvm_guest_debug_arch *guest_dbg;
->  
-> +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> +	guest_ctxt = &vcpu->arch.ctxt;
-> +
-> +	__debug_restore_spe_context(guest_ctxt, kvm_arm_spe_v1_ready(vcpu));
-> +
->  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
->  		return;
->  
-> -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> -	guest_ctxt = &vcpu->arch.ctxt;
->  	host_dbg = &vcpu->arch.host_debug_state.regs;
->  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
->  
-> @@ -232,8 +230,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
->  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
->  	guest_ctxt = &vcpu->arch.ctxt;
->  
-> -	if (!has_vhe())
-> -		__debug_restore_spe_nvhe(host_ctxt, false);
-> +	__debug_restore_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
+Could someone from the intel team look at this?
 
-So you now do an unconditional save/restore on the exit path for VHE as
-well? Even if the host isn't using the SPE HW? That's not acceptable
-as, in most cases, only the host /or/ the guest will use SPE. Here, you
-put a measurable overhead on each exit.
 
-If the host is not using SPE, then the restore/save should happen in
-vcpu_load/vcpu_put. Only if the host is using SPE should you do
-something in the run loop. Of course, this only applies to VHE and
-non-VHE must switch eagerly.
+I have been testing on a lenovo x1 carbon 5th generation. Let me know if there’s any more information you need.
 
->  
->  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
->  		return;
-> @@ -249,19 +246,21 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
->  
->  void __hyp_text __debug_save_host_context(struct kvm_vcpu *vcpu)
->  {
-> -	/*
-> -	 * Non-VHE: Disable and flush SPE data generation
-> -	 * VHE: The vcpu can run, but it can't hide.
-> -	 */
->  	struct kvm_cpu_context *host_ctxt;
->  
->  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> -	if (!has_vhe())
-> -		__debug_save_spe_nvhe(host_ctxt, false);
-> +	if (cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
-> +						 ID_AA64DFR0_PMSVER_SHIFT))
-> +		__debug_save_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
->  }
->  
->  void __hyp_text __debug_save_guest_context(struct kvm_vcpu *vcpu)
->  {
-> +	bool kvm_spe_ready = kvm_arm_spe_v1_ready(vcpu);
-> +
-> +	/* SPE present on this vCPU? */
-> +	if (kvm_spe_ready)
-> +		__debug_save_spe_context(&vcpu->arch.ctxt, kvm_spe_ready);
->  }
->  
->  u32 __hyp_text __kvm_get_mdcr_el2(void)
-> diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
-> index 48d118fdb174..30c40b1bc385 100644
-> --- a/include/kvm/arm_spe.h
-> +++ b/include/kvm/arm_spe.h
-> @@ -16,4 +16,10 @@ struct kvm_spe {
->  	bool irq_level;
->  };
->  
-> +#ifdef CONFIG_KVM_ARM_SPE
-> +#define kvm_arm_spe_v1_ready(v)		((v)->arch.spe.ready)
-> +#else
-> +#define kvm_arm_spe_v1_ready(v)		(false)
-> +#endif /* CONFIG_KVM_ARM_SPE */
-> +
->  #endif /* __ASM_ARM_KVM_SPE_H */
+To allow my patch set to be tested I have added a patch (patch 8/8) in this series to disable combining sg segments in the dma-iommu api which fixes the bug but it doesn't fix the actual problem.
 
-Thanks,
+As part of this patch series I copied the intel bounce buffer code to the dma-iommu path. The addition of the bounce buffer code took me by surprise. I did most of my development on this patch series before the bounce buffer code was added and my reimplementation in the dma-iommu path is very rushed and not properly tested but I’m running out of time to work on this patch set.
 
-	M.
+On top of that I also didn’t port over the intel tracing code from this commit:
+https://github.com/torvalds/linux/commit/3b53034c268d550d9e8522e613a14ab53b8840d8#diff-6b3e7c4993f05e76331e463ab1fc87e1
+So all the work in that commit is now wasted. The code will need to be removed and reimplemented in the dma-iommu path. I would like to take the time to do this but I really don’t have the time at the moment and I want to get these changes out before the iommu code changes any more.
+
+
+Tom Murphy (8):
+  iommu/vt-d: clean up 32bit si_domain assignment
+  iommu/vt-d: Use default dma_direct_* mapping functions for direct
+    mapped devices
+  iommu/vt-d: Remove IOVA handling code from non-dma_ops path
+  iommu: Handle freelists when using deferred flushing in iommu drivers
+  iommu: Add iommu_dma_free_cpu_cached_iovas function
+  iommu: allow the dma-iommu api to use bounce buffers
+  iommu/vt-d: Convert intel iommu driver to the iommu ops
+  DO NOT MERGE: iommu: disable list appending in dma-iommu
+
+ drivers/iommu/Kconfig           |   1 +
+ drivers/iommu/amd_iommu.c       |  14 +-
+ drivers/iommu/arm-smmu-v3.c     |   3 +-
+ drivers/iommu/arm-smmu.c        |   3 +-
+ drivers/iommu/dma-iommu.c       | 183 +++++--
+ drivers/iommu/exynos-iommu.c    |   3 +-
+ drivers/iommu/intel-iommu.c     | 936 ++++----------------------------
+ drivers/iommu/iommu.c           |  39 +-
+ drivers/iommu/ipmmu-vmsa.c      |   3 +-
+ drivers/iommu/msm_iommu.c       |   3 +-
+ drivers/iommu/mtk_iommu.c       |   3 +-
+ drivers/iommu/mtk_iommu_v1.c    |   3 +-
+ drivers/iommu/omap-iommu.c      |   3 +-
+ drivers/iommu/qcom_iommu.c      |   3 +-
+ drivers/iommu/rockchip-iommu.c  |   3 +-
+ drivers/iommu/s390-iommu.c      |   3 +-
+ drivers/iommu/tegra-gart.c      |   3 +-
+ drivers/iommu/tegra-smmu.c      |   3 +-
+ drivers/iommu/virtio-iommu.c    |   3 +-
+ drivers/vfio/vfio_iommu_type1.c |   2 +-
+ include/linux/dma-iommu.h       |   3 +
+ include/linux/intel-iommu.h     |   1 -
+ include/linux/iommu.h           |  32 +-
+ 23 files changed, 345 insertions(+), 908 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+2.20.1
+
