@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AE72F128686
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 03:05:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A259A128688
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 03:05:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726674AbfLUCEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 21:04:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53727 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726666AbfLUCEw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 21:04:52 -0500
+        id S1726874AbfLUCE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 21:04:56 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39632 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726680AbfLUCEy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Dec 2019 21:04:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576893892;
+        s=mimecast20190719; t=1576893893;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ulPWf8Brzg5F7en4DnY+b2FP2/4bB7SIlRQb5Tezjhk=;
-        b=R9t2ev+fi1N5DYsLN0hhheS+2T/US+FEu+zxZ1mVF+jDfmf+nJV81jPG+ceN9AsruqxG0n
-        tPYGBKYWIJomf4yB5QO6HKjTEqrrQ4Urncz2mJQR1xa54ZZhUbRKXaTvpn7Rc1JS94DA/i
-        vWw7WJ7SFntWQexOvokMKG7ctGk/CZ4=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-bpx6fQSNN_6TgyMFYEjoPw-1; Fri, 20 Dec 2019 21:04:51 -0500
-X-MC-Unique: bpx6fQSNN_6TgyMFYEjoPw-1
-Received: by mail-qk1-f198.google.com with SMTP id a6so4471601qkl.7
-        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 18:04:51 -0800 (PST)
+        bh=+Gsy1bZQHBxWbwKyjlPkgV/hsiA2M/WXRsoxOsyryh4=;
+        b=iWVJNvBi7Ir5y04VjDPQ6uL6IxQya0jjoFZlSj+vV5MWfFuwIB+SLvSgnEAnPcZ8aiMC3B
+        dFJUnUUR7BEhhqxN7zmP3bi/qczF48i66GR0TeAQU85NpgwerpPn1AuLAlBges9PGmOoAk
+        /8g5DQs3yZU3qtlJ0b0lfPpjphi7f04=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-129-ef_Da7OTPVG0mWovqP2VNQ-1; Fri, 20 Dec 2019 21:04:52 -0500
+X-MC-Unique: ef_Da7OTPVG0mWovqP2VNQ-1
+Received: by mail-qv1-f71.google.com with SMTP id v3so1358335qvm.2
+        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 18:04:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ulPWf8Brzg5F7en4DnY+b2FP2/4bB7SIlRQb5Tezjhk=;
-        b=lEzozLqRW73uoXjQlopkzsWLk99/QcylMGxQbA2+HEGQvzleOxKqhjhZXJYcJPupcq
-         tw7W5jBAscnfuGb7m68jTCN3EKYvUm9JGfZCzxodQpWvZ/pGinZZMjJKTde0Mp9k3POC
-         v0S6Wi0CzEGhgI/uXONEJuxQiycQd3UkwsxI4OWs8DDv3qRH65ouWjWEf3J+KaidFM1R
-         mgT0g5mLyOcIfhvOZ2V4Jb50OUP74PFmoWx95GRfXCDavOTFNNK4NtRl157mlbl002fK
-         a1t8qOJc/XDeiirzP5RBlYOJTAAQwyv/K9Bns3rfktjbJjzPFsN/5LlMo/KJy03EH3jl
-         dVtg==
-X-Gm-Message-State: APjAAAXNjsXTUPcUeP2JundoXpOWWtYcSDFg2lleTqT72t3GYVXXh+Cg
-        Aw3W0k8VZpkiVUpedQ0/Ybfs1ekKLhoMK+r4/BhIp0CdxPxcD1wcT64RmrbQxjjqh/4ebNLimE4
-        bNUsy8R8KI8ru
-X-Received: by 2002:a37:a70c:: with SMTP id q12mr4993678qke.484.1576893889517;
-        Fri, 20 Dec 2019 18:04:49 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwi6EpBxyuC1AaxbuV0H2bPRBVFZGuE77abXFYffswUMBxwuwWHioRNl3ysylFXmR1QHzb/VQ==
-X-Received: by 2002:a37:a70c:: with SMTP id q12mr4993661qke.484.1576893889274;
-        Fri, 20 Dec 2019 18:04:49 -0800 (PST)
+        bh=+Gsy1bZQHBxWbwKyjlPkgV/hsiA2M/WXRsoxOsyryh4=;
+        b=OS5zKzb3URgqtzlXQxW9G6WRK3iPQjVGlo0y7N+1mLTvzIJYg3Xt4zhHVskz1Ht9XF
+         HJgzwuyS7MLTLXQHEG0V76rJJPfFmSDFcF2bN6rOwFEjtM1qdSKcqLi2cyOSJbfd7Z6t
+         XMfDMtbBECIIqg5vxoUGeLoBWfRY0Cbe268l1Z8//CKWguGzA/w/5UzsSGU4RZcZ7vJZ
+         nNH3bxqXH3sHoGxFj3NwWA2qQLuP4qez/p3NX792UY+JH1NQ2jeJFcHwUUT7EXaHvgLm
+         SHnBH7CI7ik++NfrFmoK5O/KWCeuswUQLqVSZb63pzRsBd4sC417a2Z5wOC+DANUzTF2
+         TdXw==
+X-Gm-Message-State: APjAAAVw7/sBf5Vffh9whMGrz4XEF2gHChXnq5tHTZpDfTBuYCkLxPQO
+        O+R6saTeqoYpLnEmjl7HiHkkfO2YrdJSLunkyLUwbk9jiVwRymrZZ3hNGznYdUOP0wpVtLX6oaZ
+        Tlx6TS6z9X1Am
+X-Received: by 2002:a37:4d10:: with SMTP id a16mr16565760qkb.325.1576893891243;
+        Fri, 20 Dec 2019 18:04:51 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw4rBcJVn1spyjNjaCCpdXEr3su8bqYBzz9tCx0LavLI9GsJIxfmuSAke7nvgEw0aMn94vhaw==
+X-Received: by 2002:a37:4d10:: with SMTP id a16mr16565726qkb.325.1576893890869;
+        Fri, 20 Dec 2019 18:04:50 -0800 (PST)
 Received: from xz-x1.hitronhub.home ([2607:9880:19c0:3f::2])
-        by smtp.gmail.com with ESMTPSA id t7sm3400114qkm.136.2019.12.20.18.04.47
+        by smtp.gmail.com with ESMTPSA id t7sm3400114qkm.136.2019.12.20.18.04.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2019 18:04:48 -0800 (PST)
+        Fri, 20 Dec 2019 18:04:50 -0800 (PST)
 From:   Peter Xu <peterx@redhat.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Dr David Alan Gilbert <dgilbert@redhat.com>,
@@ -60,9 +60,9 @@ Cc:     Dr David Alan Gilbert <dgilbert@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH RESEND v2 12/17] KVM: selftests: Sync uapi/linux/kvm.h to tools/
-Date:   Fri, 20 Dec 2019 21:04:40 -0500
-Message-Id: <20191221020445.60476-2-peterx@redhat.com>
+Subject: [PATCH RESEND v2 13/17] KVM: selftests: Use a single binary for dirty/clear log test
+Date:   Fri, 20 Dec 2019 21:04:41 -0500
+Message-Id: <20191221020445.60476-3-peterx@redhat.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191221014938.58831-1-peterx@redhat.com>
 References: <20191221020445.60476-1-peterx@redhat.com>
@@ -73,93 +73,243 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This will be needed to extend the kvm selftest program.
+Remove the clear_dirty_log test, instead merge it into the existing
+dirty_log_test.  It should be cleaner to use this single binary to do
+both tests, also it's a preparation for the upcoming dirty ring test.
+
+The default test will still be the dirty_log test.  To run the clear
+dirty log test, we need to specify "-M clear-log".
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- tools/include/uapi/linux/kvm.h | 36 ++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ tools/testing/selftests/kvm/Makefile          |   2 -
+ .../selftests/kvm/clear_dirty_log_test.c      |   2 -
+ tools/testing/selftests/kvm/dirty_log_test.c  | 131 +++++++++++++++---
+ 3 files changed, 110 insertions(+), 25 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/clear_dirty_log_test.c
 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 52641d8ca9e8..17df0de21cce 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -235,6 +235,7 @@ struct kvm_hyperv_exit {
- #define KVM_EXIT_S390_STSI        25
- #define KVM_EXIT_IOAPIC_EOI       26
- #define KVM_EXIT_HYPERV           27
-+#define KVM_EXIT_DIRTY_RING_FULL  28
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index c5ec868fa1e5..ad91b7129a93 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -25,11 +25,9 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_dirty_log_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
+-TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_test
+ TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
  
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -246,6 +247,11 @@ struct kvm_hyperv_exit {
- /* Encounter unexpected vm-exit reason */
- #define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON	4
+-TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+ TEST_GEN_PROGS_aarch64 += dirty_log_test
+ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
  
-+struct kvm_dirty_ring_indices {
-+	__u32 avail_index; /* set by kernel */
-+	__u32 fetch_index; /* set by userspace */
+diff --git a/tools/testing/selftests/kvm/clear_dirty_log_test.c b/tools/testing/selftests/kvm/clear_dirty_log_test.c
+deleted file mode 100644
+index 749336937d37..000000000000
+--- a/tools/testing/selftests/kvm/clear_dirty_log_test.c
++++ /dev/null
+@@ -1,2 +0,0 @@
+-#define USE_CLEAR_DIRTY_LOG
+-#include "dirty_log_test.c"
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 3c0ffd34b3b0..a8ae8c0042a8 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -128,6 +128,66 @@ static uint64_t host_dirty_count;
+ static uint64_t host_clear_count;
+ static uint64_t host_track_next_count;
+ 
++enum log_mode_t {
++	/* Only use KVM_GET_DIRTY_LOG for logging */
++	LOG_MODE_DIRTY_LOG = 0,
++
++	/* Use both KVM_[GET|CLEAR]_DIRTY_LOG for logging */
++	LOG_MODE_CLERA_LOG = 1,
++
++	LOG_MODE_NUM,
 +};
 +
- /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
- struct kvm_run {
- 	/* in */
-@@ -415,6 +421,13 @@ struct kvm_run {
- 		struct kvm_sync_regs regs;
- 		char padding[SYNC_REGS_SIZE_BYTES];
- 	} s;
++/* Mode of logging.  Default is LOG_MODE_DIRTY_LOG */
++static enum log_mode_t host_log_mode;
 +
-+	struct kvm_dirty_ring_indices vcpu_ring_indices;
++static void clear_log_create_vm_done(struct kvm_vm *vm)
++{
++	struct kvm_enable_cap cap = {};
++
++	if (!kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2)) {
++		fprintf(stderr, "KVM_CLEAR_DIRTY_LOG not available, skipping tests\n");
++		exit(KSFT_SKIP);
++	}
++
++	cap.cap = KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2;
++	cap.args[0] = 1;
++	vm_enable_cap(vm, &cap);
++}
++
++static void dirty_log_collect_dirty_pages(struct kvm_vm *vm, int slot,
++					  void *bitmap, uint32_t num_pages)
++{
++	kvm_vm_get_dirty_log(vm, slot, bitmap);
++}
++
++static void clear_log_collect_dirty_pages(struct kvm_vm *vm, int slot,
++					  void *bitmap, uint32_t num_pages)
++{
++	kvm_vm_get_dirty_log(vm, slot, bitmap);
++	kvm_vm_clear_dirty_log(vm, slot, bitmap, 0, num_pages);
++}
++
++struct log_mode {
++	const char *name;
++	/* Hook when the vm creation is done (before vcpu creation) */
++	void (*create_vm_done)(struct kvm_vm *vm);
++	/* Hook to collect the dirty pages into the bitmap provided */
++	void (*collect_dirty_pages) (struct kvm_vm *vm, int slot,
++				     void *bitmap, uint32_t num_pages);
++} log_modes[LOG_MODE_NUM] = {
++	{
++		.name = "dirty-log",
++		.create_vm_done = NULL,
++		.collect_dirty_pages = dirty_log_collect_dirty_pages,
++	},
++	{
++		.name = "clear-log",
++		.create_vm_done = clear_log_create_vm_done,
++		.collect_dirty_pages = clear_log_collect_dirty_pages,
++	},
 +};
 +
-+/* Returned by mmap(kvm->fd, offset=0) */
-+struct kvm_vm_run {
-+	struct kvm_dirty_ring_indices vm_ring_indices;
- };
+ /*
+  * We use this bitmap to track some pages that should have its dirty
+  * bit set in the _next_ iteration.  For example, if we detected the
+@@ -137,6 +197,33 @@ static uint64_t host_track_next_count;
+  */
+ static unsigned long *host_bmap_track;
  
- /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
-@@ -1000,6 +1013,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PMU_EVENT_FILTER 173
- #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
- #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
-+#define KVM_CAP_DIRTY_LOG_RING 176
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1461,6 +1475,9 @@ struct kvm_enc_region {
- /* Available with KVM_CAP_ARM_SVE */
- #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
- 
-+/* Available with KVM_CAP_DIRTY_LOG_RING */
-+#define KVM_RESET_DIRTY_RINGS     _IO(KVMIO, 0xc3)
++static void log_modes_dump(void)
++{
++	int i;
 +
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
- 	/* Guest initialization commands */
-@@ -1611,4 +1628,23 @@ struct kvm_hyperv_eventfd {
- #define KVM_HYPERV_CONN_ID_MASK		0x00ffffff
- #define KVM_HYPERV_EVENTFD_DEASSIGN	(1 << 0)
++	for (i = 0; i < LOG_MODE_NUM; i++)
++		printf("%s, ", log_modes[i].name);
++	puts("\b\b  \b\b");
++}
++
++static void log_mode_create_vm_done(struct kvm_vm *vm)
++{
++	struct log_mode *mode = &log_modes[host_log_mode];
++
++	if (mode->create_vm_done)
++		mode->create_vm_done(vm);
++}
++
++static void log_mode_collect_dirty_pages(struct kvm_vm *vm, int slot,
++					 void *bitmap, uint32_t num_pages)
++{
++	struct log_mode *mode = &log_modes[host_log_mode];
++
++	TEST_ASSERT(mode->collect_dirty_pages != NULL,
++		    "collect_dirty_pages() is required for any log mode!");
++	mode->collect_dirty_pages(vm, slot, bitmap, num_pages);
++}
++
+ static void generate_random_array(uint64_t *guest_array, uint64_t size)
+ {
+ 	uint64_t i;
+@@ -257,6 +344,7 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
+ #ifdef __x86_64__
+ 	vm_create_irqchip(vm);
+ #endif
++	log_mode_create_vm_done(vm);
+ 	vm_vcpu_add_default(vm, vcpuid, guest_code);
+ 	return vm;
+ }
+@@ -316,14 +404,6 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+ 	bmap = bitmap_alloc(host_num_pages);
+ 	host_bmap_track = bitmap_alloc(host_num_pages);
  
-+/*
-+ * The following are the requirements for supporting dirty log ring
-+ * (by enabling KVM_DIRTY_LOG_PAGE_OFFSET).
-+ *
-+ * 1. Memory accesses by KVM should call kvm_vcpu_write_* instead
-+ *    of kvm_write_* so that the global dirty ring is not filled up
-+ *    too quickly.
-+ * 2. kvm_arch_mmu_enable_log_dirty_pt_masked should be defined for
-+ *    enabling dirty logging.
-+ * 3. There should not be a separate step to synchronize hardware
-+ *    dirty bitmap with KVM's.
-+ */
-+
-+struct kvm_dirty_gfn {
-+	__u32 pad;
-+	__u32 slot;
-+	__u64 offset;
-+};
-+
- #endif /* __LINUX_KVM_H */
+-#ifdef USE_CLEAR_DIRTY_LOG
+-	struct kvm_enable_cap cap = {};
+-
+-	cap.cap = KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2;
+-	cap.args[0] = 1;
+-	vm_enable_cap(vm, &cap);
+-#endif
+-
+ 	/* Add an extra memory slot for testing dirty logging */
+ 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+ 				    guest_test_phys_mem,
+@@ -364,11 +444,8 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+ 	while (iteration < iterations) {
+ 		/* Give the vcpu thread some time to dirty some pages */
+ 		usleep(interval * 1000);
+-		kvm_vm_get_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap);
+-#ifdef USE_CLEAR_DIRTY_LOG
+-		kvm_vm_clear_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap, 0,
+-				       host_num_pages);
+-#endif
++		log_mode_collect_dirty_pages(vm, TEST_MEM_SLOT_INDEX,
++					     bmap, host_num_pages);
+ 		vm_dirty_log_verify(bmap);
+ 		iteration++;
+ 		sync_global_to_guest(vm, iteration);
+@@ -413,6 +490,9 @@ static void help(char *name)
+ 	       TEST_HOST_LOOP_INTERVAL);
+ 	printf(" -p: specify guest physical test memory offset\n"
+ 	       "     Warning: a low offset can conflict with the loaded test code.\n");
++	printf(" -M: specify the host logging mode "
++	       "(default: log-dirty).  Supported modes: \n\t");
++	log_modes_dump();
+ 	printf(" -m: specify the guest mode ID to test "
+ 	       "(default: test all supported modes)\n"
+ 	       "     This option may be used multiple times.\n"
+@@ -437,13 +517,6 @@ int main(int argc, char *argv[])
+ 	unsigned int host_ipa_limit;
+ #endif
+ 
+-#ifdef USE_CLEAR_DIRTY_LOG
+-	if (!kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2)) {
+-		fprintf(stderr, "KVM_CLEAR_DIRTY_LOG not available, skipping tests\n");
+-		exit(KSFT_SKIP);
+-	}
+-#endif
+-
+ #ifdef __x86_64__
+ 	vm_guest_mode_params_init(VM_MODE_PXXV48_4K, true, true);
+ #endif
+@@ -463,7 +536,7 @@ int main(int argc, char *argv[])
+ 	vm_guest_mode_params_init(VM_MODE_P40V48_4K, true, true);
+ #endif
+ 
+-	while ((opt = getopt(argc, argv, "hi:I:p:m:")) != -1) {
++	while ((opt = getopt(argc, argv, "hi:I:p:m:M:")) != -1) {
+ 		switch (opt) {
+ 		case 'i':
+ 			iterations = strtol(optarg, NULL, 10);
+@@ -485,6 +558,22 @@ int main(int argc, char *argv[])
+ 				    "Guest mode ID %d too big", mode);
+ 			vm_guest_mode_params[mode].enabled = true;
+ 			break;
++		case 'M':
++			for (i = 0; i < LOG_MODE_NUM; i++) {
++				if (!strcmp(optarg, log_modes[i].name)) {
++					DEBUG("Setting log mode to: '%s'\n",
++					      optarg);
++					host_log_mode = i;
++					break;
++				}
++			}
++			if (i == LOG_MODE_NUM) {
++				printf("Log mode '%s' is invalid.  "
++				       "Please choose from: ", optarg);
++				log_modes_dump();
++				exit(-1);
++			}
++			break;
+ 		case 'h':
+ 		default:
+ 			help(argv[0]);
 -- 
 2.24.1
 
