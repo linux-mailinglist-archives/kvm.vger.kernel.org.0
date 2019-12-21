@@ -2,130 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B19A2128875
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 11:08:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44CF21288B1
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 11:48:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726363AbfLUKIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 Dec 2019 05:08:50 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37090 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726087AbfLUKIt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 Dec 2019 05:08:49 -0500
-Received: from localhost (unknown [5.29.147.182])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0A0D0206EC;
-        Sat, 21 Dec 2019 10:08:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576922927;
-        bh=9acaA/8fKn1399pza9UZM74CCEP9IQOiAcwxAFB8uv0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=C5VL6ejrikwv/fPR/5hW1vC5g7ZxqQArLHZI9V0Acv45zpCoEu7KVSUG363aSOh1d
-         8mWTxU92Mkz/MNea4rOvwk4lPkm3QVmugiAJmAPtyzW4ix2JAMqI4I9mKaT4oTHqTx
-         danVQGmjzaX4h7HmaTFOuro/EjXVdeZW+yY0HmyE=
-Date:   Sat, 21 Dec 2019 12:08:43 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Maor Gottlieb <maorg@mellanox.com>
-Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
-Message-ID: <20191221100843.GB13335@unreal>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191219132607.GA410823@unreal>
- <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
- <20191219210743.GN17227@ziepe.ca>
- <20191220182939.GA10944@unreal>
- <1001a5fc-a71d-9c0f-1090-546c4913d8a2@nvidia.com>
+        id S1726339AbfLUKsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Dec 2019 05:48:19 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:38416 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726144AbfLUKsT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 21 Dec 2019 05:48:19 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iicIy-00080I-IP; Sat, 21 Dec 2019 11:48:16 +0100
+To:     Andrew Murray <andrew.murray@arm.com>
+Subject: Re: [PATCH v2 00/18] arm64: KVM: add SPE profiling support
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1001a5fc-a71d-9c0f-1090-546c4913d8a2@nvidia.com>
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Sat, 21 Dec 2019 10:48:16 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <will@kernel.org>
+In-Reply-To: <20191220143025.33853-1-andrew.murray@arm.com>
+References: <20191220143025.33853-1-andrew.murray@arm.com>
+Message-ID: <f023f5529361cc1e2d799daa70f196c2@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: andrew.murray@arm.com, catalin.marinas@arm.com, mark.rutland@arm.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, sudeep.holla@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 20, 2019 at 03:54:55PM -0800, John Hubbard wrote:
-> On 12/20/19 10:29 AM, Leon Romanovsky wrote:
-> ...
-> >> $ ./build.sh
-> >> $ build/bin/run_tests.py
-> >>
-> >> If you get things that far I think Leon can get a reproduction for you
-> >
-> > I'm not so optimistic about that.
-> >
->
-> OK, I'm going to proceed for now on the assumption that I've got an overflow
-> problem that happens when huge pages are pinned. If I can get more information,
-> great, otherwise it's probably enough.
->
-> One thing: for your repro, if you know the huge page size, and the system
-> page size for that case, that would really help. Also the number of pins per
-> page, more or less, that you'd expect. Because Jason says that only 2M huge
-> pages are used...
->
-> Because the other possibility is that the refcount really is going negative,
-> likely due to a mismatched pin/unpin somehow.
->
-> If there's not an obvious repro case available, but you do have one (is it easy
-> to repro, though?), then *if* you have the time, I could point you to a github
-> branch that reduces GUP_PIN_COUNTING_BIAS by, say, 4x, by applying this:
+[fixing email addresses]
 
-I'll see what I can do this Sunday.
+Hi Andrew,
 
+On 2019-12-20 14:30, Andrew Murray wrote:
+> This series implements support for allowing KVM guests to use the Arm
+> Statistical Profiling Extension (SPE).
+
+Thanks for this. In future, please Cc me and Will on email addresses
+we can actually read.
+
+> It has been tested on a model to ensure that both host and guest can
+> simultaneously use SPE with valid data. E.g.
 >
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index bb44c4d2ada7..8526fd03b978 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1077,7 +1077,7 @@ static inline void put_page(struct page *page)
->   * get_user_pages and page_mkclean and other calls that race to set up page
->   * table entries.
->   */
-> -#define GUP_PIN_COUNTING_BIAS (1U << 10)
-> +#define GUP_PIN_COUNTING_BIAS (1U << 8)
+> $ perf record -e arm_spe/ts_enable=1,pa_enable=1,pct_enable=1/ \
+>         dd if=/dev/zero of=/dev/null count=1000
+> $ perf report --dump-raw-trace > spe_buf.txt
 >
->  void unpin_user_page(struct page *page);
->  void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages,
+> As we save and restore the SPE context, the guest can access the SPE
+> registers directly, thus in this version of the series we remove the
+> trapping and emulation.
 >
-> If that fails to repro, then we would be zeroing in on the root cause.
->
-> The branch is here (I just tested it and it seems healthy):
->
-> git@github.com:johnhubbard/linux.git  pin_user_pages_tracking_v11_with_diags
->
->
->
-> thanks,
-> --
-> John Hubbard
-> NVIDIA
+> In the previous series of this support, when KVM SPE isn't supported
+> (e.g. via CONFIG_KVM_ARM_SPE) we were able to return a value of 0 to
+> all reads of the SPE registers - as we can no longer do this there 
+> isn't
+> a mechanism to prevent the guest from using SPE - thus I'm keen for
+> feedback on the best way of resolving this.
+
+Surely there is a way to conditionally trap SPE registers, right? You
+should still be able to do this if SPE is not configured for a given
+guest (as we do for other feature such as PtrAuth).
+
+> It appears necessary to pin the entire guest memory in order to 
+> provide
+> guest SPE access - otherwise it is possible for the guest to receive
+> Stage-2 faults.
+
+Really? How can the guest receive a stage-2 fault? This doesn't fit 
+what
+I understand of the ARMv8 exception model. Or do you mean a SPE 
+interrupt
+describing a S2 fault?
+
+And this is not just pinning the memory either. You have to ensure that
+all S2 page tables are created ahead of SPE being able to DMA to guest
+memory. This may have some impacts on the THP code...
+
+I'll have a look at the actual series ASAP (but that's not very soon).
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
