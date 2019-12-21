@@ -2,102 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 28444128695
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 03:11:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 175F612869D
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 03:28:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbfLUCLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 21:11:11 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29912 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726462AbfLUCLK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Dec 2019 21:11:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576894268;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ms7ZM3YmtvF2wzYl19JuRjEHViRq+4SWhLPmVosAqLs=;
-        b=H4767h8pOUiblRHgdYB79WgvoLbx/mvqks1FbFVPdCsJZq9Sz5826c/sagpnc8Zkrd1bw/
-        CWGO8IOPLTcPRp99ts1eIdyGWjnBPpaboetl9XYHKzOwt0+lXgT02Oughnn8w1o6ZJlPrp
-        1LhM2OIPNwjBx7T1qEhMVW7o8DtcDkI=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329--5Hk5RWyMjWUfPx0s2DLVg-1; Fri, 20 Dec 2019 21:11:07 -0500
-X-MC-Unique: -5Hk5RWyMjWUfPx0s2DLVg-1
-Received: by mail-qk1-f197.google.com with SMTP id 65so3191514qkl.23
-        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 18:11:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ms7ZM3YmtvF2wzYl19JuRjEHViRq+4SWhLPmVosAqLs=;
-        b=aXdkA2wmEZIAduwpFopKeMt/yb5EryF7TWZ50d33JDY9EvPNeG+K0GlVOPt7p/5GD0
-         jx4l3NXpKqG7ttGpz8qElC/3UZBjRIi2Kg08dbzHLI8Ib07Jl8K9eJ5JxDiWkRIFkV+q
-         CrkPOsb2ceNKwhAMMPKN5ZygM4QZk4a/bUg2F9HjTtF7fbCQ+abrNKN1s5VLKRibzltA
-         4/SgIpwXpPBRIpClTm0xodwAKgefVKKwjmTOQBM1AccEniFpvPjcdb6YvxfHo+oN4+IZ
-         FOoMw7DzJ6nM8TihzfrHEyWyGXeEmZ1mm+9bKyRqIFd7Ecyk3zJjNDvb8LvjYG6rNsJv
-         uekg==
-X-Gm-Message-State: APjAAAXt3Vi6fxXR9WAEsqg2C9xewVyiiXKNA/f5oVRiXOvg2Tx7WBLx
-        gprkgWTyHC39D0kgh86ub2VJDfYhsmss3wAUVVHsvRk6I0IOAE1Dzw6rVqLvmaPN0iw7umLMwTx
-        du5ZSOP88lnDE
-X-Received: by 2002:ac8:460a:: with SMTP id p10mr13726111qtn.98.1576894267342;
-        Fri, 20 Dec 2019 18:11:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzIQ2ze+nInYWvxAbBHNFji24kDf074ME1rfeNCFt0Tp3IQF5g4xn3qTCSfad+ysEPdCVNd1w==
-X-Received: by 2002:ac8:460a:: with SMTP id p10mr13726102qtn.98.1576894267155;
-        Fri, 20 Dec 2019 18:11:07 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c0:3f::2])
-        by smtp.gmail.com with ESMTPSA id v5sm3799321qth.70.2019.12.20.18.11.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2019 18:11:06 -0800 (PST)
-Date:   Fri, 20 Dec 2019 21:11:04 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: [PATCH v2 00/17] KVM: Dirty ring interface
-Message-ID: <20191221021104.GA59330@xz-x1>
-References: <20191220211634.51231-1-peterx@redhat.com>
- <20191220213803.GA51391@xz-x1>
- <20191220214354.GE20453@linux.intel.com>
+        id S1726633AbfLUC1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 21:27:49 -0500
+Received: from mga05.intel.com ([192.55.52.43]:20084 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726537AbfLUC1s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 21:27:48 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Dec 2019 18:27:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,338,1571727600"; 
+   d="scan'208";a="228779440"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.136]) ([10.239.159.136])
+  by orsmga002.jf.intel.com with ESMTP; 20 Dec 2019 18:27:45 -0800
+Cc:     baolu.lu@linux.intel.com, "Raj, Ashok" <ashok.raj@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 4/7] iommu/vt-d: Setup pasid entries for iova over
+ first level
+To:     "Liu, Yi L" <yi.l.liu@intel.com>, Joerg Roedel <joro@8bytes.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+References: <20191219031634.15168-1-baolu.lu@linux.intel.com>
+ <20191219031634.15168-5-baolu.lu@linux.intel.com>
+ <A2975661238FB949B60364EF0F2C25743A13A334@SHSMSX104.ccr.corp.intel.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <84fd6b9e-0226-cc5f-b51a-884f834d4556@linux.intel.com>
+Date:   Sat, 21 Dec 2019 10:26:49 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191220214354.GE20453@linux.intel.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A13A334@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 20, 2019 at 01:43:54PM -0800, Sean Christopherson wrote:
-> On Fri, Dec 20, 2019 at 04:38:03PM -0500, Peter Xu wrote:
-> > If you see three identical half-posted series which only contains
-> > patches 00-09... I am very sorry for ruining your inbox...  I think my
-> > mail server is not happy to continue sending the rest of the patches,
-> > and I'll get this during sending the patch 10:
-> > 
-> > 4.3.0 Temporary System Problem.  Try again later (10). d25sm3385231qtq.11 - gsmtp
-> > 
-> > So far I don't see what's wrong with patch 10, either.
-> > 
-> > I'll try to fix it up before I send 4th time (or anyone knows please
-> > hint me)... Please ignore the previous three in-complete versions.
+Hi Yi,
+
+On 12/20/19 7:44 PM, Liu, Yi L wrote:
+>> From: Lu Baolu [mailto:baolu.lu@linux.intel.com]
+>> Sent: Thursday, December 19, 2019 11:17 AM
+>> To: Joerg Roedel <joro@8bytes.org>; David Woodhouse <dwmw2@infradead.org>;
+>> Alex Williamson <alex.williamson@redhat.com>
+>> Subject: [PATCH v4 4/7] iommu/vt-d: Setup pasid entries for iova over first level
+>>
+>> Intel VT-d in scalable mode supports two types of page tables for IOVA translation:
+>> first level and second level. The IOMMU driver can choose one from both for IOVA
+>> translation according to the use case. This sets up the pasid entry if a domain is
+>> selected to use the first-level page table for iova translation.
+>>
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>> ---
+>>   drivers/iommu/intel-iommu.c | 48 +++++++++++++++++++++++++++++++++++--
+>>   include/linux/intel-iommu.h | 16 ++++++++-----
+>>   2 files changed, 56 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c index
+>> 2b5a47584baf..f0813997dea2 100644
+>> --- a/drivers/iommu/intel-iommu.c
+>> +++ b/drivers/iommu/intel-iommu.c
+>> @@ -571,6 +571,11 @@ static inline int domain_type_is_si(struct dmar_domain
+>> *domain)
+>>   	return domain->flags & DOMAIN_FLAG_STATIC_IDENTITY;  }
+>>
+>> +static inline bool domain_use_first_level(struct dmar_domain *domain) {
+>> +	return domain->flags & DOMAIN_FLAG_USE_FIRST_LEVEL; }
+>> +
+>>   static inline int domain_pfn_supported(struct dmar_domain *domain,
+>>   				       unsigned long pfn)
+>>   {
+>> @@ -2288,6 +2293,8 @@ static int __domain_mapping(struct dmar_domain
+>> *domain, unsigned long iov_pfn,
+>>   		return -EINVAL;
+>>
+>>   	prot &= DMA_PTE_READ | DMA_PTE_WRITE | DMA_PTE_SNP;
+>> +	if (domain_use_first_level(domain))
+>> +		prot |= DMA_FL_PTE_PRESENT | DMA_FL_PTE_XD;
+>>
+>>   	if (!sg) {
+>>   		sg_res = nr_pages;
+>> @@ -2515,6 +2522,36 @@ dmar_search_domain_by_dev_info(int segment, int bus,
+>> int devfn)
+>>   	return NULL;
+>>   }
+>>
+>> +static int domain_setup_first_level(struct intel_iommu *iommu,
+>> +				    struct dmar_domain *domain,
+>> +				    struct device *dev,
+>> +				    int pasid)
+>> +{
+>> +	int flags = PASID_FLAG_SUPERVISOR_MODE;
 > 
-> Please add RESEND in the subject when resending an idential patch (set),
-> it gives recipients a heads up that the two (or four :-)) sets are the
-> same, e.g. previous versions can be ignored if he/she received both the
-> original and RESEND version(s).
+> Hi Baolu,
 > 
->   [PATCH RESEND v2 00/17] KVM: Dirty ring interface
+> Could you explain a bit why PASID_FLAG_SUPERVISOR_MODE is
+> required?
+> 
 
-Thanks Sean, new version sent.  Just in case if anyone read the old
-versions: they have exactly the same content with the RESEND series.
-I still resent the first 10 emails just to make things simple.
+This flag indicates a PASID which can be used for access to kernel
+addresses (static 1:1 only). Otherwise, DMA requests requesting
+supervisor level privilege level will be blocked.
 
--- 
-Peter Xu
+> Regards,
+> Yi Liu
+> 
 
+Best regards,
+baolu
