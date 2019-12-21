@@ -2,136 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 31D891285F3
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 01:28:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C62041285F8
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2019 01:32:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726556AbfLUA1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Dec 2019 19:27:38 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:33438 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbfLUA1i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Dec 2019 19:27:38 -0500
-Received: by mail-io1-f65.google.com with SMTP id z8so11147506ioh.0
-        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 16:27:38 -0800 (PST)
+        id S1726726AbfLUAcZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Dec 2019 19:32:25 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:35299 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726717AbfLUAcZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Dec 2019 19:32:25 -0500
+Received: by mail-ot1-f68.google.com with SMTP id k16so9458956otb.2
+        for <kvm@vger.kernel.org>; Fri, 20 Dec 2019 16:32:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=OZNK1+TUcHhHbvzo/ui/RticmVqi6ywWiXT5CH9RLjg=;
-        b=aJtHqMrEXe7WAcK/ciq8OO0lGBjQxSKRDwPYaZpk9iCCuF+8NbYdXOgZqxuPy2PGCh
-         FVoZAtGENVOmWX0hCfoMigaZkqmqmqP0Kq4yyTD/eXza4kwlqj6dUv/Tf8OyqFz0QqYJ
-         e/W7MOUf6V2Ex3MpkUMmkJwqCL+M/n1bXI+zL8XrInSYAhHmVdgN8gsjbvfXL2zHWSG9
-         GaIYdLDK+52Sg1JqM8zlGBsww1DeMFXd5vhKAEDWM98blIpit/+KDnWJpQo8REtqaI1g
-         XNyrGMY8rLOJ0qU5W/rG4u/B2QAzhiQEGBKNABM32i3S61KSoD4DEEQKmbWiz2y2SzaY
-         KZAg==
+        bh=x7w4UD7OpHop1e3Pz2ddMBPnhs3gOWoGc1gZLtDq0vk=;
+        b=vxEhprSqaQNYHFQ4H7dcX/E/mSO1yt4IUVMZ4sAhLDFH4ZGUKPILIYVqnfnOi8vncn
+         TkMivZIMeBGXnc2DZxbo8rhaadDmZ0J8YlsyjunZpHnqoJnITQdI9o+0sVlYw4wIwgNg
+         hVrkgdMe4LV+bJ1UOTvAeTPb7daNE36o1jVBQU5BvO3ZoVIoBadMJDXjLnRiZsHYGooC
+         TNPa9bH1kbJLrQnHkt24kZfMiD+6hcL+ePqBCPpBSGancvjEQx8QdtGwVjyhNWrmhcl4
+         X37OrtjEVw+33y61x0Kg++5hk4Jka/RWupbXhqGSK3ZcyRVBMCG0sfPDxatqX5Z1NvKS
+         I51A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=OZNK1+TUcHhHbvzo/ui/RticmVqi6ywWiXT5CH9RLjg=;
-        b=ZbvhXQV418nTisoKt6oFrawdAbGN2T3LKHTOrUeR0+LGfSqwIiLIf7xAqxDmvMAl2B
-         EX2G6Vc56XLMn47Mg99CmcBdMdd2MXczIaoWrYBM7YPCL7U4hzpyY+4k2Y5OZpnV7w8Z
-         H3uX3fcAg5CqY6XuQjEMxSyQdKsw3KECibRNraMQChGi/8VTFD7pKTWSoOtP+otAmRNk
-         UKsdlduhoWS9fJIcTehYG/rrwDrM6j/dj7AiFhSjsppWbl2PA+z4vhyUAQBfjTgvb8NN
-         fuJzc8Oy51duC0H2jszkXeECps3ksCUrdwkVoTntBdvw+TNMVI6p9f3tgyZsKcPSBwi+
-         UzvQ==
-X-Gm-Message-State: APjAAAWE+1GXRPqjVuBuevPcsjBrwbmqkKIvARBWQKFj9k5D8mduJCUH
-        0RYlD7sxjQ53Qtbh6CPkYngkrHNf/ZwNJOMT6Eand0X+KF0=
-X-Google-Smtp-Source: APXvYqztS9DZIg2BL0i+UU2CZjfwVBDTpKsiljJe8lyqcihGoPvU53jS+pYS+a1CmAJnpAARppC9DV5aNPDRo5FGSfQ=
-X-Received: by 2002:a02:cd3b:: with SMTP id h27mr14542447jaq.18.1576888057588;
- Fri, 20 Dec 2019 16:27:37 -0800 (PST)
+        bh=x7w4UD7OpHop1e3Pz2ddMBPnhs3gOWoGc1gZLtDq0vk=;
+        b=ufah+zv3IiSsPJXfPvg7UJs+ZTyMkq//CjrhwhxLSODWyolnLw8ptHy4EwVu083Dbb
+         wuUMFwRiOjVrIuf06/olRnvtcfwgOFVaiB1BdA6zLLWwSAAW+PvqgE78Q9wIpHWcbsq7
+         MCBq0frSb4Qh/wVgzxCKCk6up7WwJJjSXRWtBEsn1qSg2P0qVWfwyberm23PelaVAUDn
+         K7VmmYRcv964/UHxLlyep/kGTuI+xUDX9TacwF5Pf3KpUx3s7A2pNRM5dX2+1FcexlEn
+         8wU+dXBw2/VI8cuTmaHdPoS0TC/E3cFKRSIUZTYNOvhYbSChykESrz9Qg2Tpe8RMmM+2
+         GZPg==
+X-Gm-Message-State: APjAAAVZmmxvFkWOQXCRzRW9fJqiGRWiGUX6mr4/coCqLYM+ncI2Amwq
+        DOn1cl6yFcEhI1iAqXE0biKyS6BL8+DkKNRdjPzd1w==
+X-Google-Smtp-Source: APXvYqz/XCcCPtPTpD6diyokGu99CSTPorQgAyb2cALnDUt6lAGgGTah0l7Kj7pZCHJSAA7gXN8KcX+bngnSk0tk1h8=
+X-Received: by 2002:a9d:7852:: with SMTP id c18mr12814325otm.247.1576888344708;
+ Fri, 20 Dec 2019 16:32:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20190829205635.20189-1-krish.sadhukhan@oracle.com> <20190829205635.20189-3-krish.sadhukhan@oracle.com>
-In-Reply-To: <20190829205635.20189-3-krish.sadhukhan@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 20 Dec 2019 16:27:26 -0800
-Message-ID: <CALMp9eSxdg9evNJYSifsS1jrAhKe_bVURCRckG67YWJ=YcGB4Q@mail.gmail.com>
-Subject: Re: [PATCH 2/4] KVM: nVMX: Check GUEST_DR7 on vmentry of nested guests
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
+References: <20191216222537.491123-1-jhubbard@nvidia.com> <20191219132607.GA410823@unreal>
+ <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com> <20191219210743.GN17227@ziepe.ca>
+ <42a3e5c1-6301-db0b-5d09-212edf5ecf2a@nvidia.com> <20191220133423.GA13506@ziepe.ca>
+In-Reply-To: <20191220133423.GA13506@ziepe.ca>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Fri, 20 Dec 2019 16:32:13 -0800
+Message-ID: <CAPcyv4hX9TsTMjsv2hnbEM-TpkC9abtWGSVskr9nPwpR8c5E1Q@mail.gmail.com>
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     John Hubbard <jhubbard@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kselftest@vger.kernel.org,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 29, 2019 at 2:25 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
+On Fri, Dec 20, 2019 at 5:34 AM Jason Gunthorpe <jgg@ziepe.ca> wrote:
 >
-> According to section "Checks on Guest Control Registers, Debug Registers, and
-> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
-> of nested guests:
+> On Thu, Dec 19, 2019 at 01:13:54PM -0800, John Hubbard wrote:
+> > On 12/19/19 1:07 PM, Jason Gunthorpe wrote:
+> > > On Thu, Dec 19, 2019 at 12:30:31PM -0800, John Hubbard wrote:
+> > > > On 12/19/19 5:26 AM, Leon Romanovsky wrote:
+> > > > > On Mon, Dec 16, 2019 at 02:25:12PM -0800, John Hubbard wrote:
+> > > > > > Hi,
+> > > > > >
+> > > > > > This implements an API naming change (put_user_page*() -->
+> > > > > > unpin_user_page*()), and also implements tracking of FOLL_PIN pages. It
+> > > > > > extends that tracking to a few select subsystems. More subsystems will
+> > > > > > be added in follow up work.
+> > > > >
+> > > > > Hi John,
+> > > > >
+> > > > > The patchset generates kernel panics in our IB testing. In our tests, we
+> > > > > allocated single memory block and registered multiple MRs using the single
+> > > > > block.
+> > > > >
+> > > > > The possible bad flow is:
+> > > > >    ib_umem_geti() ->
+> > > > >     pin_user_pages_fast(FOLL_WRITE) ->
+> > > > >      internal_get_user_pages_fast(FOLL_WRITE) ->
+> > > > >       gup_pgd_range() ->
+> > > > >        gup_huge_pd() ->
+> > > > >         gup_hugepte() ->
+> > > > >          try_grab_compound_head() ->
+> > > >
+> > > > Hi Leon,
+> > > >
+> > > > Thanks very much for the detailed report! So we're overflowing...
+> > > >
+> > > > At first look, this seems likely to be hitting a weak point in the
+> > > > GUP_PIN_COUNTING_BIAS-based design, one that I believed could be deferred
+> > > > (there's a writeup in Documentation/core-api/pin_user_page.rst, lines
+> > > > 99-121). Basically it's pretty easy to overflow the page->_refcount
+> > > > with huge pages if the pages have a *lot* of subpages.
+> > > >
+> > > > We can only do about 7 pins on 1GB huge pages that use 4KB subpages.
+> > >
+> > > Considering that establishing these pins is entirely under user
+> > > control, we can't have a limit here.
+> >
+> > There's already a limit, it's just a much larger one. :) What does "no limit"
+> > really mean, numerically, to you in this case?
 >
->     If the "load debug controls" VM-entry control is 1, bits 63:32 in the DR7
->     field must be 0.
+> I guess I mean 'hidden limit' - hitting the limit and failing would
+> be managable.
 >
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 6 ++++++
->  arch/x86/kvm/x86.c        | 2 +-
->  arch/x86/kvm/x86.h        | 6 ++++++
->  3 files changed, 13 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 0b234e95e0ed..f04619daf906 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2681,6 +2681,12 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
->             !kvm_debugctl_valid(vmcs12->guest_ia32_debugctl))
->                 return -EINVAL;
->
-> +#ifdef CONFIG_X86_64
-> +       if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
-> +           !kvm_dr7_valid(vmcs12->guest_dr7))
-> +               return -EINVAL;
-> +#endif
-> +
->         if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
->             !kvm_pat_valid(vmcs12->guest_ia32_pat))
->                 return -EINVAL;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fafd81d2c9ea..423a7a573608 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1051,7 +1051,7 @@ static int __kvm_set_dr(struct kvm_vcpu *vcpu, int dr, unsigned long val)
->         case 5:
->                 /* fall through */
->         default: /* 7 */
-> -               if (val & 0xffffffff00000000ULL)
-> +               if (!kvm_dr7_valid(val))
->                         return -1; /* #GP */
->                 vcpu->arch.dr7 = (val & DR7_VOLATILE) | DR7_FIXED_1;
->                 kvm_update_dr7(vcpu);
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 28ba6d0c359f..4e55851fc3fb 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -360,6 +360,12 @@ static inline bool kvm_debugctl_valid(u64 data)
->         return ((data & 0xFFFFFFFFFFFF203Cull) ? false : true);
->  }
->
-> +static inline bool kvm_dr7_valid(u64 data)
+> I think 7 is probably too low though, but we are not using 1GB huge
+> pages, only 2M..
 
-This should be 'unsigned long data.'
-
-> +{
-> +       /* Bits [63:32] are reserved */
-> +       return ((data & 0xFFFFFFFF00000000ull) ? false : true);
-
-    return !(data & 0xFFFFFFFF00000000ull);
-
-Or, shorter:
-
-    return (u32)data == data;
-
-> +}
-> +
->  void kvm_load_guest_xcr0(struct kvm_vcpu *vcpu);
->  void kvm_put_guest_xcr0(struct kvm_vcpu *vcpu);
->
-> --
-> 2.20.1
->
+What about RDMA to 1GB-hugetlbfs and 1GB-device-dax mappings?
