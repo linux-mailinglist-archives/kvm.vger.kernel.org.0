@@ -2,79 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DAFE128DE3
-	for <lists+kvm@lfdr.de>; Sun, 22 Dec 2019 13:18:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F501128DE8
+	for <lists+kvm@lfdr.de>; Sun, 22 Dec 2019 13:22:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726564AbfLVMSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Dec 2019 07:18:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52954 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726189AbfLVMSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Dec 2019 07:18:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1577017088;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gVcwDJ9q7mHGB0f2gxBplUO1RgXxxYA7NYBgVoLV4zs=;
-        b=VvciwW9NJ1UxL/8Bp9iiVZ4vS/8rzsqPyk02CVfFK1gm8ZTJFASvabOXJr4BhRJGN8A013
-        2/E6VR9/lGlrWnA2XUs1Pfy6tTZJckBkGIQJ1/jR0iuD8DScxt6cQS8S7NRWZuH8eTB34C
-        oyMA2x3Ao9W9B9WzoTLhbVGmSnxuUVg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-auKEapRFNbqbd81SRCzGKw-1; Sun, 22 Dec 2019 07:18:04 -0500
-X-MC-Unique: auKEapRFNbqbd81SRCzGKw-1
-Received: by mail-wr1-f71.google.com with SMTP id f10so5608697wro.14
-        for <kvm@vger.kernel.org>; Sun, 22 Dec 2019 04:18:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gVcwDJ9q7mHGB0f2gxBplUO1RgXxxYA7NYBgVoLV4zs=;
-        b=YCXH/qCujlXu2WtgWTXngtxHapgzpdMWl+fIfN5yLWOwcqVfmiSsiZ++DMw6wjDCMz
-         fDFOgvIvCDrSzxvUN1Q14/cTjJvNZMPZR/04Tx/pJh8Lmsdfn1epmo7Dxx6ZSrBppEkr
-         fD21tPHgvZsboxdp8KmwjJbZ5z4mPlTibO/M44+NgvpMF8tkDXkjapHYuov5ld9VB8IB
-         EBsiGivc3RyNVolXQX7OdcKFg2uNPai/WkJ6M5xiniUyRfUU+Qh0zpxaxaUygh1SiDdg
-         8b2p+kFDs2W9KvpNwe5kPOql7jRzY5hRi3+A8+MIMETazyh41RMw+HqKW8GI+6XCylCt
-         45KQ==
-X-Gm-Message-State: APjAAAV8eoTbDyiv1Ve11c9afFEGcQGjB8DNnu2V/Vbh/lJ7dS1HOaRl
-        +eu3cKk8icfQsEf1nE2ruYqCTPQ4eKnQKuH9Y3n0Wkpvh3JF0JP+mEZnpsj35nXUTuAzBC3sbw2
-        k1itj5k+ZJyyV
-X-Received: by 2002:adf:ea51:: with SMTP id j17mr25281571wrn.83.1577017083058;
-        Sun, 22 Dec 2019 04:18:03 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx9KSkR+4EMtJDrj1y3LsZ/vh9fax2RGIQnEf6Wg1AUH38J0MO5GcK4ZJoEwziC8drrgnmk5A==
-X-Received: by 2002:adf:ea51:: with SMTP id j17mr25281552wrn.83.1577017082869;
-        Sun, 22 Dec 2019 04:18:02 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:7009:9cf0:6204:f570? ([2001:b07:6468:f312:7009:9cf0:6204:f570])
-        by smtp.gmail.com with ESMTPSA id n187sm1522196wme.28.2019.12.22.04.18.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Dec 2019 04:18:02 -0800 (PST)
-Subject: Re: [GIT PULL] Please pull my kvm-ppc-fixes-5.5-1 tag
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org
-References: <20191219001912.GA12288@blackberry>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a82fc920-66b4-4c0a-89ea-500df2993fa3@redhat.com>
-Date:   Sun, 22 Dec 2019 13:18:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191219001912.GA12288@blackberry>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726623AbfLVMWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Dec 2019 07:22:15 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:44611 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726267AbfLVMWP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 22 Dec 2019 07:22:15 -0500
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=big-swifty.misterjones.org)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1ij0FP-00083P-Rq; Sun, 22 Dec 2019 13:22:12 +0100
+Date:   Sun, 22 Dec 2019 12:22:10 +0000
+Message-ID: <864kxsim8d.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Murray <andrew.murray@arm.com>
+Cc:     kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
+        will@kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 00/18] arm64: KVM: add SPE profiling support
+In-Reply-To: <f023f5529361cc1e2d799daa70f196c2@www.loen.fr>
+References: <20191220143025.33853-1-andrew.murray@arm.com>
+        <f023f5529361cc1e2d799daa70f196c2@www.loen.fr>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: andrew.murray@arm.com, kvm@vger.kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, sudeep.holla@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/12/19 01:19, Paul Mackerras wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.5-1
+On Sat, 21 Dec 2019 10:48:16 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> [fixing email addresses]
+> 
+> Hi Andrew,
+> 
+> On 2019-12-20 14:30, Andrew Murray wrote:
+> > This series implements support for allowing KVM guests to use the Arm
+> > Statistical Profiling Extension (SPE).
+> 
+> Thanks for this. In future, please Cc me and Will on email addresses
+> we can actually read.
+> 
+> > It has been tested on a model to ensure that both host and guest can
+> > simultaneously use SPE with valid data. E.g.
+> > 
+> > $ perf record -e arm_spe/ts_enable=1,pa_enable=1,pct_enable=1/ \
+> >         dd if=/dev/zero of=/dev/null count=1000
+> > $ perf report --dump-raw-trace > spe_buf.txt
+> > 
+> > As we save and restore the SPE context, the guest can access the SPE
+> > registers directly, thus in this version of the series we remove the
+> > trapping and emulation.
+> > 
+> > In the previous series of this support, when KVM SPE isn't
+> > supported (e.g. via CONFIG_KVM_ARM_SPE) we were able to return a
+> > value of 0 to all reads of the SPE registers - as we can no longer
+> > do this there isn't a mechanism to prevent the guest from using
+> > SPE - thus I'm keen for feedback on the best way of resolving
+> > this.
+> 
+> Surely there is a way to conditionally trap SPE registers, right? You
+> should still be able to do this if SPE is not configured for a given
+> guest (as we do for other feature such as PtrAuth).
+> 
+> > It appears necessary to pin the entire guest memory in order to
+> > provide guest SPE access - otherwise it is possible for the guest
+> > to receive Stage-2 faults.
+> 
+> Really? How can the guest receive a stage-2 fault? This doesn't fit
+> what I understand of the ARMv8 exception model. Or do you mean a SPE
+> interrupt describing a S2 fault?
+> 
+> And this is not just pinning the memory either. You have to ensure that
+> all S2 page tables are created ahead of SPE being able to DMA to guest
+> memory. This may have some impacts on the THP code...
+> 
+> I'll have a look at the actual series ASAP (but that's not very soon).
 
-Pulled, thanks.
+I found some time to go through the series, and there is clearly a lot
+of work left to do:
 
-Paolo
+- There so nothing here to handle memory pinning whatsoever. If it
+  works, it is only thanks to some side effect.
 
+- The missing trapping is deeply worrying. Given that this is an
+  optional feature, you cannot just let the guest do whatever it wants
+  in an uncontrolled manner.
+
+- The interrupt handling is busted. You mix concepts picked from both
+  the PMU and the timer code, while the SPE device doesn't behave like
+  any of these two (it is neither a fully emulated device, nor a
+  device that is exclusively owned by a guest at any given time).
+
+I expect some level of discussion on the list including at least Will
+and myself before you respin this.
+
+	M.
+
+-- 
+Jazz is not dead, it just smells funny.
