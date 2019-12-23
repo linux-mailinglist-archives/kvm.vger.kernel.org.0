@@ -2,134 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DFF912959A
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 12:41:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BED2E1295BA
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 12:57:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726821AbfLWLlr convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 23 Dec 2019 06:41:47 -0500
-Received: from mga11.intel.com ([192.55.52.93]:49453 "EHLO mga11.intel.com"
+        id S1726717AbfLWL4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Dec 2019 06:56:55 -0500
+Received: from foss.arm.com ([217.140.110.172]:43766 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726663AbfLWLlr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Dec 2019 06:41:47 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Dec 2019 03:41:45 -0800
-X-IronPort-AV: E=Sophos;i="5.69,347,1571727600"; 
-   d="scan'208";a="211530914"
-Received: from jnikula-mobl3.fi.intel.com (HELO localhost) ([10.237.66.161])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Dec 2019 03:41:35 -0800
-From:   Jani Nikula <jani.nikula@linux.intel.com>
-To:     Robin Murphy <robin.murphy@arm.com>, Tom Murphy <murphyt7@tcd.ie>,
-        iommu@lists.linux-foundation.org
-Cc:     Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Kukjin Kim <kgene@kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Rob Clark <robdclark@gmail.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Julien Grall <julien.grall@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 0/8] Convert the intel iommu driver to the dma-iommu api
-In-Reply-To: <432d306c-fe9f-75b2-f0f7-27698f1467ad@arm.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20191221150402.13868-1-murphyt7@tcd.ie> <87blrzwcn8.fsf@intel.com> <432d306c-fe9f-75b2-f0f7-27698f1467ad@arm.com>
-Date:   Mon, 23 Dec 2019 13:41:33 +0200
-Message-ID: <87o8vzuv4i.fsf@intel.com>
+        id S1726679AbfLWL4z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Dec 2019 06:56:55 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4BEFA1FB;
+        Mon, 23 Dec 2019 03:56:54 -0800 (PST)
+Received: from localhost (unknown [10.37.6.20])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B5C7F3F68F;
+        Mon, 23 Dec 2019 03:56:53 -0800 (PST)
+Date:   Mon, 23 Dec 2019 11:56:52 +0000
+From:   Andrew Murray <andrew.murray@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Marc Zyngier <marc.zyngier@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 11/18] KVM: arm64: don't trap Statistical Profiling
+ controls to EL2
+Message-ID: <20191223115651.GA42593@e119886-lin.cambridge.arm.com>
+References: <20191220143025.33853-1-andrew.murray@arm.com>
+ <20191220143025.33853-12-andrew.murray@arm.com>
+ <86bls0iqv6.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86bls0iqv6.wl-maz@kernel.org>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 Dec 2019, Robin Murphy <robin.murphy@arm.com> wrote:
-> On 2019-12-23 10:37 am, Jani Nikula wrote:
->> On Sat, 21 Dec 2019, Tom Murphy <murphyt7@tcd.ie> wrote:
->>> This patchset converts the intel iommu driver to the dma-iommu api.
->>>
->>> While converting the driver I exposed a bug in the intel i915 driver
->>> which causes a huge amount of artifacts on the screen of my
->>> laptop. You can see a picture of it here:
->>> https://github.com/pippy360/kernelPatches/blob/master/IMG_20191219_225922.jpg
->>>
->>> This issue is most likely in the i915 driver and is most likely caused
->>> by the driver not respecting the return value of the
->>> dma_map_ops::map_sg function. You can see the driver ignoring the
->>> return value here:
->>> https://github.com/torvalds/linux/blob/7e0165b2f1a912a06e381e91f0f4e495f4ac3736/drivers/gpu/drm/i915/gem/i915_gem_dmabuf.c#L51
->>>
->>> Previously this didn’t cause issues because the intel map_sg always
->>> returned the same number of elements as the input scatter gather list
->>> but with the change to this dma-iommu api this is no longer the
->>> case. I wasn’t able to track the bug down to a specific line of code
->>> unfortunately.
->>>
->>> Could someone from the intel team look at this?
->> 
->> Let me get this straight. There is current API that on success always
->> returns the same number of elements as the input scatter gather
->> list. You propose to change the API so that this is no longer the case?
->
-> No, the API for dma_map_sg() has always been that it may return fewer 
-> DMA segments than nents - see Documentation/DMA-API.txt (and otherwise, 
-> the return value would surely be a simple success/fail condition). 
-> Relying on a particular implementation behaviour has never been strictly 
-> correct, even if it does happen to be a very common behaviour.
->
->> A quick check of various dma_map_sg() calls in the kernel seems to
->> indicate checking for 0 for errors and then ignoring the non-zero return
->> is a common pattern. Are you sure it's okay to make the change you're
->> proposing?
->
-> Various code uses tricks like just iterating the mapped list until the 
-> first segment with zero sg_dma_len(). Others may well simply have bugs.
+On Sun, Dec 22, 2019 at 10:42:05AM +0000, Marc Zyngier wrote:
+> On Fri, 20 Dec 2019 14:30:18 +0000,
+> Andrew Murray <andrew.murray@arm.com> wrote:
+> > 
+> > As we now save/restore the profiler state there is no need to trap
+> > accesses to the statistical profiling controls. Let's unset the
+> > _TPMS bit.
+> > 
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >  arch/arm64/kvm/debug.c | 2 --
+> >  1 file changed, 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> > index 43487f035385..07ca783e7d9e 100644
+> > --- a/arch/arm64/kvm/debug.c
+> > +++ b/arch/arm64/kvm/debug.c
+> > @@ -88,7 +88,6 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
+> >   *  - Performance monitors (MDCR_EL2_TPM/MDCR_EL2_TPMCR)
+> >   *  - Debug ROM Address (MDCR_EL2_TDRA)
+> >   *  - OS related registers (MDCR_EL2_TDOSA)
+> > - *  - Statistical profiler (MDCR_EL2_TPMS/MDCR_EL2_E2PB)
+> >   *
+> >   * Additionally, KVM only traps guest accesses to the debug registers if
+> >   * the guest is not actively using them (see the KVM_ARM64_DEBUG_DIRTY
+> > @@ -111,7 +110,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+> >  	 */
+> >  	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) & MDCR_EL2_HPMN_MASK;
+> >  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
+> > -				MDCR_EL2_TPMS |
+> 
+> No. This is an *optional* feature (the guest could not be presented
+> with the SPE feature, or the the support simply not be compiled in).
+> 
+> If the guest is not allowed to see the feature, for whichever reason,
+> the traps *must* be enabled and handled.
 
-Thanks for the clarification.
+I'll update this (and similar) to trap such registers when we don't support
+SPE in the guest.
 
-BR,
-Jani.
+My original concern in the cover letter was in how to prevent the guest
+from attempting to use these registers in the first place - I think the
+solution I was looking for is to trap-and-emulate ID_AA64DFR0_EL1 such that
+the PMSVer bits indicate that SPE is not emulated.
 
->
-> Robin.
->
->> Anyway, due to the time of year and all, I'd like to ask you to file a
->> bug against i915 at [1] so this is not forgotten, and please let's not
->> merge the changes before this is resolved.
->> 
->> 
->> Thanks,
->> Jani.
->> 
->> 
->> [1] https://gitlab.freedesktop.org/drm/intel/issues/new
->> 
->> 
+Thanks,
 
--- 
-Jani Nikula, Intel Open Source Graphics Center
+Andrew Murray
+
+
+> 
+> 	M.
+> 
+> -- 
+> Jazz is not dead, it just smells funny.
