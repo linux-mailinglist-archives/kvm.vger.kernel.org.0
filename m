@@ -2,123 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C78711299D6
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 19:24:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C34F129AB9
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 21:10:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726828AbfLWSYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Dec 2019 13:24:52 -0500
-Received: from mail-qv1-f67.google.com ([209.85.219.67]:39167 "EHLO
-        mail-qv1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726817AbfLWSYv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Dec 2019 13:24:51 -0500
-Received: by mail-qv1-f67.google.com with SMTP id y8so6662612qvk.6
-        for <kvm@vger.kernel.org>; Mon, 23 Dec 2019 10:24:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=KNSp0xKzXXca6h2YP8X3emLAqK9GuJuCbstCZTI5ulI=;
-        b=FctYOOrJ074bGu2erxfD+ggi+amf34vJ2+/SB/OaLs8ZFEcoEOPSKxrX7J7vfW72iX
-         iaD1ph6XI9oWEr/nnku4Pr+MbBh9He5Xr+rBPzoju6TBhM7n5pqaYtl/oqkKFK9Nr8fH
-         Us04jbJ3zTX0WDIVdGhJyQO5EPn2JUvIhBvTug4ZRXtCzaFxharK0qUYwO9ZIkwiEqhS
-         c9Aa/tUvtqh3RdzKBnkDvwefmOBkVu9RUXlbwmdawA3jtTcA8wQCgHrvBfiWYN8r7VQg
-         T/hlkSjI6vXJcCVxYIXrbbrRmfsaCa4t09oEgSwlogc3AYXQW7LtDW06LM/jq8bAmut6
-         WCJg==
+        id S1726965AbfLWUKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Dec 2019 15:10:35 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33997 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726884AbfLWUKe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Dec 2019 15:10:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1577131833;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0qtXzJ7ZTRR2+SWknxQLJ4Je16nI1/Qg+c9ZI9bZMqQ=;
+        b=OVMG9VsscSa7gz+2VBYHBFB0AC29jM84iszTqq1fDAF+Us5ps3D0QbjQrzGvCWEbdQ3nrb
+        xZ1nLrO0C9oNXoKnElaRQTi/CCdTdLUl+YxTnM7FcJqHTCbMT/rnwtl2T7gvpFmIjzZ2F1
+        p/UXW89rSQl+a2K3Uv6BXLtuswdJ/t8=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-18-fpgJ_HRNPnKGElYJPJp1QA-1; Mon, 23 Dec 2019 15:10:28 -0500
+X-MC-Unique: fpgJ_HRNPnKGElYJPJp1QA-1
+Received: by mail-qk1-f197.google.com with SMTP id m13so4894450qka.9
+        for <kvm@vger.kernel.org>; Mon, 23 Dec 2019 12:10:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=KNSp0xKzXXca6h2YP8X3emLAqK9GuJuCbstCZTI5ulI=;
-        b=og7NEo0qBT+YkD9unD/GTl/M5hRBMZLRWP8P9W/7FlPCwZF3Xjw89emQf+l4HgP/87
-         95/ZigYLWfh3gX46Xacg1B25PxxJbLDBvP4l6aJApDOS+rao71WjPb6RPioDTqvIOsg5
-         PXjdALYuQNXbtjcFSAvGx+xtjwgjxoTEouT5JgKwMChNrDr7IV7aGky+qUvqcG6c06NW
-         7cGq2O+myPsOCUVxaNNZdNh7erjHKLc/OW9yVibnx2keOIjjtzvZ6tbzdzVtYo3ezONg
-         KGP52YRxHkE6rJtznhoIvbAxkixHU0XT9/mOyt7NEcDszFOGfT03OpL75TAWrmMXvI12
-         p6EA==
-X-Gm-Message-State: APjAAAVnVXTTdjdS16rTjWJKJ0v0tResESw6tF1Xw5FA5oqKJZ0XG84n
-        /4NzlgZsw1f9aU4lVIc+sWmbqw==
-X-Google-Smtp-Source: APXvYqyOJm+HA/OOXOk1TxOLC8pk6pJEfZhfUy8M7as0rtMhyNSoNfAsriRZZomXf9eRLN7qDrjm+A==
-X-Received: by 2002:a0c:e150:: with SMTP id c16mr25637620qvl.51.1577125488455;
-        Mon, 23 Dec 2019 10:24:48 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id b7sm6449933qtj.15.2019.12.23.10.24.47
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 23 Dec 2019 10:24:47 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1ijSNq-0007Pv-LV; Mon, 23 Dec 2019 14:24:46 -0400
-Date:   Mon, 23 Dec 2019 14:24:46 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     John Hubbard <jhubbard@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Maor Gottlieb <maorg@mellanox.com>
-Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
-Message-ID: <20191223182446.GA28321@ziepe.ca>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191219132607.GA410823@unreal>
- <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
- <20191219210743.GN17227@ziepe.ca>
- <42a3e5c1-6301-db0b-5d09-212edf5ecf2a@nvidia.com>
- <20191220133423.GA13506@ziepe.ca>
- <CAPcyv4hX9TsTMjsv2hnbEM-TpkC9abtWGSVskr9nPwpR8c5E1Q@mail.gmail.com>
+         :mime-version:content-disposition:in-reply-to;
+        bh=0qtXzJ7ZTRR2+SWknxQLJ4Je16nI1/Qg+c9ZI9bZMqQ=;
+        b=ChcRd9jNkqMVqASndqj7vnMPBA7/TRw87FqvYKdnFgpDA4M5/CrBWYSOkDtlV3+DuW
+         RpgdlmPzNv/UyZ/bl8RMILsepN01u8AQ5cYIMRDMzIBJWIqKn95+lOLibpjisaxfAQVA
+         Trrvm8I8eHgX8T2gNPmwBatjhak2xZ/1/axS9ew9zpehj38H42fgHCrxvhBDoJVSGdPt
+         0eS4oj1hNEAdSggu9pzehCN7TVnfzIpV4mAiCPnbPKk+aLDDl4RLFkMkDkUboi1rUvM0
+         qjh99maZkLLCgHnB0vmcsI2NtU1zZoZ8gcjJPd5wy29WyRwisygvho1QKjLA3W7oAMvM
+         KWdw==
+X-Gm-Message-State: APjAAAVfqXkYrzToWT7/+J1qqMF9WyOa8bOUtXznBsbZ1CXOvpxggCp3
+        z9kmQEm6MxqVe1qAGLMT6+OoaBm/2+eQiu3Rf2AenDTGz1u6pP433GbIMRbEDrEw4CtAt51ySod
+        gYmhxXlWRuBWk
+X-Received: by 2002:ac8:5143:: with SMTP id h3mr4271604qtn.144.1577131827223;
+        Mon, 23 Dec 2019 12:10:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz8EPclLzs35Mazg0q7YeuMs7p5oxoosgwsGt+91CmWfu3wCXNiWspQrkNOv4zJ1zMg5qVOsA==
+X-Received: by 2002:ac8:5143:: with SMTP id h3mr4271587qtn.144.1577131827021;
+        Mon, 23 Dec 2019 12:10:27 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id o9sm6120558qko.16.2019.12.23.12.10.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Dec 2019 12:10:25 -0800 (PST)
+Date:   Mon, 23 Dec 2019 15:10:24 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RESEND v2 03/17] KVM: X86: Don't track dirty for
+ KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+Message-ID: <20191223201024.GB90172@xz-x1>
+References: <20191221014938.58831-1-peterx@redhat.com>
+ <20191221014938.58831-4-peterx@redhat.com>
+ <cf232ce8-bc07-0192-580f-d08736980273@redhat.com>
+ <20191223172737.GA81196@xz-x1>
+ <851bd9ed-3ff3-6aef-725c-b586d819211c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAPcyv4hX9TsTMjsv2hnbEM-TpkC9abtWGSVskr9nPwpR8c5E1Q@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <851bd9ed-3ff3-6aef-725c-b586d819211c@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 20, 2019 at 04:32:13PM -0800, Dan Williams wrote:
-
-> > > There's already a limit, it's just a much larger one. :) What does "no limit"
-> > > really mean, numerically, to you in this case?
-> >
-> > I guess I mean 'hidden limit' - hitting the limit and failing would
-> > be managable.
-> >
-> > I think 7 is probably too low though, but we are not using 1GB huge
-> > pages, only 2M..
+On Mon, Dec 23, 2019 at 06:59:01PM +0100, Paolo Bonzini wrote:
+> On 23/12/19 18:27, Peter Xu wrote:
+> > Yes.  Though it is a bit tricky in that then we'll also need to make
+> > sure to take slots_lock or srcu to protect that hva (say, we must drop
+> > that hva reference before we release the locks, otherwise the hva
+> > could gone under us, iiuc).
 > 
-> What about RDMA to 1GB-hugetlbfs and 1GB-device-dax mappings?
+> Yes, kvm->slots_lock is taken by x86_set_memory_region.  We need to move
+> that to the callers, of which several are already taking the lock (all
+> except vmx_set_tss_addr and kvm_arch_destroy_vm).
 
-I don't think the failing testing is doing that.
+OK, will do.  I'll directly replace the x86_set_memory_region() calls
+in kvm_arch_destroy_vm() to be __x86_set_memory_region() since IIUC
+the slots_lock is helpless when destroying the vm... then drop the
+x86_set_memory_region() helper in the next version.  Thanks,
 
-It is also less likely that 1GB regions will need multi-mapping, IMHO.
+-- 
+Peter Xu
 
-Jason
