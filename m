@@ -2,109 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 409D9129955
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 18:27:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 99FDF12995D
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 18:29:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726874AbfLWR1n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Dec 2019 12:27:43 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48769 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726766AbfLWR1m (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Dec 2019 12:27:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1577122061;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2FQpGKHqmKgP8roRbgRwKHYu0GCskB3t0E3YVUxgG0w=;
-        b=ZlDgbEMsk/Z8Zas4xcpQE7OkH2+XW4TGyCqJ5E8cmFqgPqsUvA6a2zLnCVBVqKngelaSvo
-        MTvIHSxy7eGgTGWkGNgQZ+wv22SZbSj+V2FhZHuoTR7bXLA9O3SNWE6bTTLXpuNZy943QX
-        n/9DQZm7kwJQ4v4DLaHK0u8i5bIDUDI=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-a-FTD6LVMBuRxaDF2DU2Gw-1; Mon, 23 Dec 2019 12:27:40 -0500
-X-MC-Unique: a-FTD6LVMBuRxaDF2DU2Gw-1
-Received: by mail-qk1-f197.google.com with SMTP id s9so11499362qkg.21
-        for <kvm@vger.kernel.org>; Mon, 23 Dec 2019 09:27:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2FQpGKHqmKgP8roRbgRwKHYu0GCskB3t0E3YVUxgG0w=;
-        b=SN6LO7TgtxLx1xqjeyLzXduV5BHm4oB5UvyG30v6IZX8SdlGaG0szciVz4gHdRPSGK
-         06GUMPJpXn5RcWV/IlgXqfYy8CIeccVsx+XRlngKQi1HzciyaUEp4J6YTcoUETgJfAOZ
-         QM8SMyoWeTodU2sfFuiTKzGoHZ2CqXwWk+oQ4A98PEbomdrRQ7Hwkd3QLowFjBpry+Ah
-         HldxeMeRWs6hk6b4/+KxYV3pxt4HBAQky+zk6fw3FvUfV27xD4ijV3gMh7kqoFFAtL0D
-         nXzzUPg00JlkKqGN5RJqU4TtaBiiEong2AEb3q3W4yrngKKLW9oeKUYGZX6W/dx2RHO8
-         p1dw==
-X-Gm-Message-State: APjAAAXj7in4Z1ispB1MilJNdVeUkSlu6rVa0oXNo79GBjqRlq/YOAU+
-        yXyiRDf/3/K7t4IbETbI3FNK8HOyKULqVYkQX7F831hdjSlHnHEMR2rFS6wZPwG5laXRdS8Ogj3
-        LWaZFKRtjK1AH
-X-Received: by 2002:a37:a70c:: with SMTP id q12mr15555622qke.484.1577122059614;
-        Mon, 23 Dec 2019 09:27:39 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyYzt7+Hss5QmOIfwnIr/JMapF2vhOFE7agaZrdLdvNu9aXaC3w6bEL5ww3BUrHUWO1SQNPIw==
-X-Received: by 2002:a37:a70c:: with SMTP id q12mr15555594qke.484.1577122059322;
-        Mon, 23 Dec 2019 09:27:39 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id l4sm422045qkb.37.2019.12.23.09.27.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Dec 2019 09:27:38 -0800 (PST)
-Date:   Mon, 23 Dec 2019 12:27:37 -0500
-From:   Peter Xu <peterx@redhat.com>
+        id S1726903AbfLWR3m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Dec 2019 12:29:42 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:39114 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726783AbfLWR3l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Dec 2019 12:29:41 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBNHP2ZJ102801;
+        Mon, 23 Dec 2019 17:28:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=moISOd56NtpVL8zRNki9zqtAXCaGXiRk1XLrhSHfLvs=;
+ b=BBcyJOJPQagl7ysF/j32lf9kxfKEgIyXcZzjMPLh1GKqCzvsGEB/IRv74rJEBfHvhcHM
+ ciQrU4F2pV1ZF7WpdnyEN2w6wnLPVVN0BcYJfvrLL23DwBqdjpQU524Gp6fNqQHEPFK6
+ xRB9lGdneIDu3ooYOw+m7RSId6JgldxnOrfAb0obapR6Pc62nnjYQPLUXWuhnmoXU92p
+ 5eSRNm2pkn9NBHI+ilRjJ/uDtHJi0JXY2sXeTlJZSKJNMAlK66vaLLaW6ANs6W0ttx+7
+ 6LopLaf3rw2RXKz2pnbFEbNgra4RC7jDgvL5EjL8sYwaRn+8SRTc8ehv/65N/mjGXA+k cg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2x1bbpr09v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Dec 2019 17:28:20 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBNHJNR1150573;
+        Mon, 23 Dec 2019 17:28:20 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2x1wh3ku86-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Dec 2019 17:28:19 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBNHSINB031195;
+        Mon, 23 Dec 2019 17:28:18 GMT
+Received: from [192.168.14.112] (/109.64.214.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 23 Dec 2019 09:28:18 -0800
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [RESEND RFC 0/2] Paravirtualized Control Register pinning
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <15b57d6b-0f46-01f5-1f75-b9b55db0611a@redhat.com>
+Date:   Mon, 23 Dec 2019 19:28:13 +0200
+Cc:     John Andersen <john.s.andersen@intel.com>, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <03F5FE31-E769-4497-922B-C8613F0951FA@oracle.com>
+References: <20191220192701.23415-1-john.s.andersen@intel.com>
+ <1EBCD42E-9109-47A1-B959-6363A509D48D@oracle.com>
+ <15b57d6b-0f46-01f5-1f75-b9b55db0611a@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RESEND v2 03/17] KVM: X86: Don't track dirty for
- KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
-Message-ID: <20191223172737.GA81196@xz-x1>
-References: <20191221014938.58831-1-peterx@redhat.com>
- <20191221014938.58831-4-peterx@redhat.com>
- <cf232ce8-bc07-0192-580f-d08736980273@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cf232ce8-bc07-0192-580f-d08736980273@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9479 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912230147
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9480 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912230148
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Dec 21, 2019 at 02:51:52PM +0100, Paolo Bonzini wrote:
-> On 21/12/19 02:49, Peter Xu wrote:
-> > Originally, we have three code paths that can dirty a page without
-> > vcpu context for X86:
-> > 
-> >   - init_rmode_identity_map
-> >   - init_rmode_tss
-> >   - kvmgt_rw_gpa
-> > 
-> > init_rmode_identity_map and init_rmode_tss will be setup on
-> > destination VM no matter what (and the guest cannot even see them), so
-> > it does not make sense to track them at all.
-> > 
-> > To do this, a new parameter is added to kvm_[write|clear]_guest_page()
-> > to show whether we would like to track dirty bits for the operations.
-> > With that, pass in "false" to this new parameter for any guest memory
-> > write of the ioctls (KVM_SET_TSS_ADDR, KVM_SET_IDENTITY_MAP_ADDR).
-> 
-> We can also return the hva from x86_set_memory_region and
-> __x86_set_memory_region.
 
-Yes.  Though it is a bit tricky in that then we'll also need to make
-sure to take slots_lock or srcu to protect that hva (say, we must drop
-that hva reference before we release the locks, otherwise the hva
-could gone under us, iiuc).  So if we want to do that we'd better
-comment on that hva value very explicitly, just in case some future
-callers of __x86_set_memory_region could cache it somewhere.
 
-(Side topic: I feel like the srcu_read_lock() pair in
- init_rmode_identity_map() is redundant..)
+> On 23 Dec 2019, at 19:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 23/12/19 15:48, Liran Alon wrote:
+>>> Should userspace expose the CR pining CPUID feature bit, it must =
+zero CR
+>>> pinned MSRs on reboot. If it does not, it runs the risk of having =
+the
+>>> guest enable pinning and subsequently cause general protection =
+faults on
+>>> next boot due to early boot code setting control registers to values
+>>> which do not contain the pinned bits.
+>>=20
+>> Why reset CR pinned MSRs by userspace instead of KVM INIT handling?
+>=20
+> Most MSRs are not reset by INIT, are they?
+>=20
+> Paolo
+>=20
 
--- 
-Peter Xu
+MSR_KVM_SYSTEM_TIME saved in vcpu->arch.time is reset at =
+kvmclock_reset() which is called by kvm_vcpu_reset() (KVM INIT handler).
+In addition, vmx_vcpu_reset(), called from kvm_vcpu_reset(), also resets =
+multiple MSRs such as: MSR_IA32_SPEC_CTRL (vmx->spec_ctrl) and =
+MSR_IA32_UMWAIT_CONTROL (msr_ia32_umwait_control).
 
+Having said that, I see indeed that most of MSRs are being set by QEMU =
+in kvm_put_msrs() when level >=3D KVM_PUT_RESET_STATE.
+When is triggered by qemu_system_reset() -> =
+cpu_synchronize_all_post_reset -> cpu_synchronize_post_reset() -> =
+kvm_cpu_synchronize_post_reset().
+
+So given current design, OK I agree with you that CR pinned MSRs should =
+be zeroed by userspace VMM.
+
+It does though seems kinda weird to me that part of CPU state is =
+initialised on KVM INIT handler and part of it in userspace VMM.
+It could lead to inconsistent (i.e. diverging from spec) CPU behaviour.
+
+-Liran=
