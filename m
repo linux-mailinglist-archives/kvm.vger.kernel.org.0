@@ -2,91 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB3F912924C
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 08:39:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 706CA12932D
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 09:38:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726243AbfLWHje (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Dec 2019 02:39:34 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52564 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726096AbfLWHje (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Dec 2019 02:39:34 -0500
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EA23F21775
-        for <kvm@vger.kernel.org>; Mon, 23 Dec 2019 07:39:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1577086773;
-        bh=6kUmueKMHGyL/V40p0iccrdydhRADXHFNXNJZT4clQg=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=R9u5zjk9qts4seFUPL9TdvFghNsWHhCmG2jxgFKh5OocM5d2hhOz58MCNW3P/kfDz
-         gKdYfr19ohh0f2/WZUd1Ak523yP9hqGWXwgPszQQJvEFyIVdOqzl6NXL87cmVWVpsz
-         7gNgOQNRVMEbAUZbOGy/xyAexl+IcUNZh48VdaVk=
-Received: by mail-wr1-f43.google.com with SMTP id w15so2984871wru.4
-        for <kvm@vger.kernel.org>; Sun, 22 Dec 2019 23:39:32 -0800 (PST)
-X-Gm-Message-State: APjAAAUzZbX17BuGIHa48HidyXjRw52VtdeAzJVCuMp+P1LxACBnnjg0
-        n+akYY/M6C+ktTL5OIU0TkEtgyT5JVKX/Zc2IsbjeA==
-X-Google-Smtp-Source: APXvYqxZuwX9Kfu1iZ+8NG85u+DEwBb56J2/HAP0R9IPLLT1GVXHQzneFCto1L5SUZFpzh5wj48K2Jwhrb0XcI5fkqk=
-X-Received: by 2002:adf:eb09:: with SMTP id s9mr29780361wrn.61.1577086771187;
- Sun, 22 Dec 2019 23:39:31 -0800 (PST)
-MIME-Version: 1.0
-References: <20191220192701.23415-1-john.s.andersen@intel.com> <20191220192701.23415-3-john.s.andersen@intel.com>
-In-Reply-To: <20191220192701.23415-3-john.s.andersen@intel.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Sun, 22 Dec 2019 23:39:19 -0800
-X-Gmail-Original-Message-ID: <CALCETrV1nOpc3mqyXTXOzw-8Aa3zFpGi1cY7oc_2pz2-JVyH8Q@mail.gmail.com>
-Message-ID: <CALCETrV1nOpc3mqyXTXOzw-8Aa3zFpGi1cY7oc_2pz2-JVyH8Q@mail.gmail.com>
-Subject: Re: [RESEND RFC 2/2] X86: Use KVM CR pin MSRs
-To:     John Andersen <john.s.andersen@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        id S1725912AbfLWIiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Dec 2019 03:38:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28172 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725880AbfLWIiS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Dec 2019 03:38:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1577090297;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XnOi8KdkPNeH7kxyMasf9MX3PhEHIiVQI77jSjBPQtM=;
+        b=NML8/2b0I6/0fb0zCEYXy6L/5FYd/ngtFGbjAU5YLWCVE70jh7sSIf6i0jrsLaNEhdgqkJ
+        HsiZeb5mcwL07GINmryCqxkD3Qqxi9ig0uugvNWWTjOsGMI2r9nBfWHGW8oPDXXqBhntiI
+        Ix3I10z4GTKP30xsvSdwzZhg3shYbuY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-xWX57NFKNbOWiQCBMboCnw-1; Mon, 23 Dec 2019 03:38:15 -0500
+X-MC-Unique: xWX57NFKNbOWiQCBMboCnw-1
+Received: by mail-wr1-f72.google.com with SMTP id f10so6777091wro.14
+        for <kvm@vger.kernel.org>; Mon, 23 Dec 2019 00:38:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XnOi8KdkPNeH7kxyMasf9MX3PhEHIiVQI77jSjBPQtM=;
+        b=QkCLdvrU1h8p7UcxRLQhsgIDIEpas9FrHbfbKIkaBxgM0iBmxVkXN/k41JLgUHIo39
+         Q7DI7Y3aQiMg1LAUZgSaFv89kbPSeKrsXznbrcZ9Ej/rvJwFioUa6bxm+2s8rsvAZrx5
+         DfFqdR0W62/dBwMJl/94MvIJDnJ3/f8TF0CjpiYbStnQkJ45jOqWQz6YAlUiWaUiiDxI
+         v00+XT+GRvq3Wfqegb1bXFIhxtZN2D5bEqs61skJ7NXANB8KF/R4ZaeQnexuYeClSfl8
+         uB7cNLRXM/o/PLnG5QTx2C+sjvTT5txgv98tly6r+8A6X0+Rx/WEl5+X4LVuBdJuLec4
+         4q6g==
+X-Gm-Message-State: APjAAAXPadbdXqawBZHOlZNt/AszLBLT5mMcRp0EjSV0p+gF0QBLYE4D
+        +jeyR34rPC+RGAEjPTF9zLs8ppbtTWiCcusLpeQnIvo2VPkTH9xX2bf9I59QponjMM0Ut/hKGl2
+        UMI8ejLbU5VOM
+X-Received: by 2002:a7b:cfc9:: with SMTP id f9mr31219793wmm.1.1577090294328;
+        Mon, 23 Dec 2019 00:38:14 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx9nTUL9FbeLW2fHuSyBjmm0kJnIZOEmeByEWXSXIYjjjZ6G4Cs87Mxtk6ksMkmTIDSoAWPNQ==
+X-Received: by 2002:a7b:cfc9:: with SMTP id f9mr31219765wmm.1.1577090294080;
+        Mon, 23 Dec 2019 00:38:14 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:ac09:bce1:1c26:264c? ([2001:b07:6468:f312:ac09:bce1:1c26:264c])
+        by smtp.gmail.com with ESMTPSA id z187sm19162109wme.16.2019.12.23.00.38.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Dec 2019 00:38:13 -0800 (PST)
+Subject: Re: Async page fault delivered while irq are disabled?
+To:     Frederic Weisbecker <frederic@kernel.org>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org
+References: <20191219152814.GA24080@lenoir>
+ <20191219155745.GA6439@linux.intel.com> <20191219161524.GB24080@lenoir>
+ <20191219190028.GB6439@linux.intel.com>
+ <925b4dd2-7919-055e-0041-672dad8c082e@redhat.com>
+ <20191223021745.GA21615@lenoir>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9bfb0925-a571-d51d-367d-3dc2cf74fc8c@redhat.com>
+Date:   Mon, 23 Dec 2019 09:38:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191223021745.GA21615@lenoir>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 20, 2019 at 11:27 AM John Andersen
-<john.s.andersen@intel.com> wrote:
->
-> Strengthen existing control register pinning when running
-> paravirtualized under KVM. Check which bits KVM supports pinning for
-> each control register and only pin supported bits which are already
-> pinned via the existing native protection. Write to KVM CR0 and CR4
-> pinned MSRs to enable pinning.
->
-> Initiate KVM assisted pinning directly following the setup of native
-> pinning on boot CPU. For non-boot CPUs initiate paravirtualized pinning
-> on CPU identification.
->
-> Identification of non-boot CPUs takes place after the boot CPU has setup
-> native CR pinning. Therefore, non-boot CPUs access pinned bits setup by
-> the boot CPU and request that those be pinned. All CPUs request
-> paravirtualized pinning of the same bits which are already pinned
-> natively.
->
-> Guests using the kexec system call currently do not support
-> paravirtualized control register pinning. This is due to early boot
-> code writing known good values to control registers, these values do
-> not contain the protected bits. This is due to CPU feature
-> identification being done at a later time, when the kernel properly
-> checks if it can enable protections.
+On 23/12/19 03:17, Frederic Weisbecker wrote:
+> On Fri, Dec 20, 2019 at 10:34:20AM +0100, Paolo Bonzini wrote:
+>> On 19/12/19 20:00, Sean Christopherson wrote:
+>>>> And one last silly question, what about that line in
+>>>> kvm_arch_can_inject_async_page_present:
+>>>>
+>>>> 	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
+>>>> 		return true;
+>>>>
+>>>> That looks weird, also it shortcuts the irqs_allowed() check.
+>>>
+>>> I wondered about that code as well :-).  Definitely odd, but it would
+>>> require the guest to disable async #PF after an async #PF is queued.  Best
+>>> guess is the idea is that it's the guest's problem if it disables async #PF
+>>> on the fly.
+>>>
+>>
+>> When the guest disables async #PF all outstanding page faults are
+>> cancelled by kvm_clear_async_pf_completion_queue.  However, in case they
+>> complete while in cancel_work_sync. you need to inject them even if
+>> interrupts are disabled.
+> 
+> Hmm, shouldn't the guest wait for the whole pending waitqueue in kvm_async_pf_task_wait()
+> to be serviced and woken up before actually allowing to disable async #PF ?
+> Because you can't really afford to inject those #PF while IRQs are disabled,
+> that's a big rq deadlock risk.
 
-Is hibernation supported?  How about suspend-to-RAM?
+That's just how Linux works, and Linux doesn't ever disable async page
+faults with disabled IRQ (reboot_notifier_list is a blocking notifier).
 
-FWIW, I think that handling these details through Kconfig is the wrong
-choice.  Distribution kernels should enable this, and they're not
-going to turn off kexec.  Arguably kexec should be made to work --
-there is no fundamental reason that kexec should need to fiddle with
-CR0.WP, for example.  But a boot option could also work as a
-short-term option.
+Paolo
+
