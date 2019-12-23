@@ -2,76 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A502E129953
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 18:27:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 409D9129955
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 18:27:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbfLWR1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Dec 2019 12:27:06 -0500
-Received: from mga09.intel.com ([134.134.136.24]:15605 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726754AbfLWR1G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Dec 2019 12:27:06 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Dec 2019 09:27:05 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,348,1571727600"; 
-   d="scan'208";a="223058323"
-Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Dec 2019 09:27:05 -0800
-Received: from orsmsx116.amr.corp.intel.com ([169.254.7.30]) by
- ORSMSX109.amr.corp.intel.com ([169.254.11.176]) with mapi id 14.03.0439.000;
- Mon, 23 Dec 2019 09:27:04 -0800
-From:   "Andersen, John S" <john.s.andersen@intel.com>
-To:     "liran.alon@oracle.com" <liran.alon@oracle.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-CC:     "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, "bp@alien8.de" <bp@alien8.de>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RESEND RFC 0/2] Paravirtualized Control Register pinning
-Thread-Topic: [RESEND RFC 0/2] Paravirtualized Control Register pinning
-Thread-Index: AQHVt2uK2a8jsyPFKUGPuWHWZO4ZBqfIV12AgAAnYgCAAAVQgA==
-Date:   Mon, 23 Dec 2019 17:27:04 +0000
-Message-ID: <26f2b7e58fd45eede50f845a57761d1f01aff3f7.camel@intel.com>
-References: <20191220192701.23415-1-john.s.andersen@intel.com>
-         <1EBCD42E-9109-47A1-B959-6363A509D48D@oracle.com>
-         <15b57d6b-0f46-01f5-1f75-b9b55db0611a@redhat.com>
-In-Reply-To: <15b57d6b-0f46-01f5-1f75-b9b55db0611a@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.19.9.42]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B040A5A2AB5A1E48A05E92B1630C4E15@intel.com>
-Content-Transfer-Encoding: base64
+        id S1726874AbfLWR1n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Dec 2019 12:27:43 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48769 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726766AbfLWR1m (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Dec 2019 12:27:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1577122061;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2FQpGKHqmKgP8roRbgRwKHYu0GCskB3t0E3YVUxgG0w=;
+        b=ZlDgbEMsk/Z8Zas4xcpQE7OkH2+XW4TGyCqJ5E8cmFqgPqsUvA6a2zLnCVBVqKngelaSvo
+        MTvIHSxy7eGgTGWkGNgQZ+wv22SZbSj+V2FhZHuoTR7bXLA9O3SNWE6bTTLXpuNZy943QX
+        n/9DQZm7kwJQ4v4DLaHK0u8i5bIDUDI=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-a-FTD6LVMBuRxaDF2DU2Gw-1; Mon, 23 Dec 2019 12:27:40 -0500
+X-MC-Unique: a-FTD6LVMBuRxaDF2DU2Gw-1
+Received: by mail-qk1-f197.google.com with SMTP id s9so11499362qkg.21
+        for <kvm@vger.kernel.org>; Mon, 23 Dec 2019 09:27:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2FQpGKHqmKgP8roRbgRwKHYu0GCskB3t0E3YVUxgG0w=;
+        b=SN6LO7TgtxLx1xqjeyLzXduV5BHm4oB5UvyG30v6IZX8SdlGaG0szciVz4gHdRPSGK
+         06GUMPJpXn5RcWV/IlgXqfYy8CIeccVsx+XRlngKQi1HzciyaUEp4J6YTcoUETgJfAOZ
+         QM8SMyoWeTodU2sfFuiTKzGoHZ2CqXwWk+oQ4A98PEbomdrRQ7Hwkd3QLowFjBpry+Ah
+         HldxeMeRWs6hk6b4/+KxYV3pxt4HBAQky+zk6fw3FvUfV27xD4ijV3gMh7kqoFFAtL0D
+         nXzzUPg00JlkKqGN5RJqU4TtaBiiEong2AEb3q3W4yrngKKLW9oeKUYGZX6W/dx2RHO8
+         p1dw==
+X-Gm-Message-State: APjAAAXj7in4Z1ispB1MilJNdVeUkSlu6rVa0oXNo79GBjqRlq/YOAU+
+        yXyiRDf/3/K7t4IbETbI3FNK8HOyKULqVYkQX7F831hdjSlHnHEMR2rFS6wZPwG5laXRdS8Ogj3
+        LWaZFKRtjK1AH
+X-Received: by 2002:a37:a70c:: with SMTP id q12mr15555622qke.484.1577122059614;
+        Mon, 23 Dec 2019 09:27:39 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyYzt7+Hss5QmOIfwnIr/JMapF2vhOFE7agaZrdLdvNu9aXaC3w6bEL5ww3BUrHUWO1SQNPIw==
+X-Received: by 2002:a37:a70c:: with SMTP id q12mr15555594qke.484.1577122059322;
+        Mon, 23 Dec 2019 09:27:39 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id l4sm422045qkb.37.2019.12.23.09.27.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Dec 2019 09:27:38 -0800 (PST)
+Date:   Mon, 23 Dec 2019 12:27:37 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RESEND v2 03/17] KVM: X86: Don't track dirty for
+ KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+Message-ID: <20191223172737.GA81196@xz-x1>
+References: <20191221014938.58831-1-peterx@redhat.com>
+ <20191221014938.58831-4-peterx@redhat.com>
+ <cf232ce8-bc07-0192-580f-d08736980273@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cf232ce8-bc07-0192-580f-d08736980273@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gTW9uLCAyMDE5LTEyLTIzIGF0IDE4OjA5ICswMTAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
-PiBPbiAyMy8xMi8xOSAxNTo0OCwgTGlyYW4gQWxvbiB3cm90ZToNCj4gPiA+IFNob3VsZCB1c2Vy
-c3BhY2UgZXhwb3NlIHRoZSBDUiBwaW5pbmcgQ1BVSUQgZmVhdHVyZSBiaXQsIGl0IG11c3QNCj4g
-PiA+IHplcm8gQ1INCj4gPiA+IHBpbm5lZCBNU1JzIG9uIHJlYm9vdC4gSWYgaXQgZG9lcyBub3Qs
-IGl0IHJ1bnMgdGhlIHJpc2sgb2YgaGF2aW5nDQo+ID4gPiB0aGUNCj4gPiA+IGd1ZXN0IGVuYWJs
-ZSBwaW5uaW5nIGFuZCBzdWJzZXF1ZW50bHkgY2F1c2UgZ2VuZXJhbCBwcm90ZWN0aW9uDQo+ID4g
-PiBmYXVsdHMgb24NCj4gPiA+IG5leHQgYm9vdCBkdWUgdG8gZWFybHkgYm9vdCBjb2RlIHNldHRp
-bmcgY29udHJvbCByZWdpc3RlcnMgdG8NCj4gPiA+IHZhbHVlcw0KPiA+ID4gd2hpY2ggZG8gbm90
-IGNvbnRhaW4gdGhlIHBpbm5lZCBiaXRzLg0KPiA+IA0KPiA+IFdoeSByZXNldCBDUiBwaW5uZWQg
-TVNScyBieSB1c2Vyc3BhY2UgaW5zdGVhZCBvZiBLVk0gSU5JVCBoYW5kbGluZz8NCj4gDQo+IE1v
-c3QgTVNScyBhcmUgbm90IHJlc2V0IGJ5IElOSVQsIGFyZSB0aGV5Pw0KPiANCg0KQXMgZmFyIGFz
-IEkgY2FuIHRlbGwsIEtWTSBkb2Vzbid0IGtub3cgaWYgdGhlIGd1ZXN0IGlzIHJlYm9vdGVkLg0K
-VXNlcnNwYWNlIHVzZXMgdGhlIHNyZWdzIGFuZCBzZXQgTVNScyBpb2N0bHMgdG8gcmVzZXQgc3Rh
-dGUuDQprdm1fdmNwdV9yZXNldCBpcyBjYWxsZWQgb24gbm9uLWJvb3QgQ1BVcy4ga3ZtX3ZjcHVf
-aW5pdCBpc24ndCBjYWxsZWQNCm9uIHJlYm9vdC4NCg==
+On Sat, Dec 21, 2019 at 02:51:52PM +0100, Paolo Bonzini wrote:
+> On 21/12/19 02:49, Peter Xu wrote:
+> > Originally, we have three code paths that can dirty a page without
+> > vcpu context for X86:
+> > 
+> >   - init_rmode_identity_map
+> >   - init_rmode_tss
+> >   - kvmgt_rw_gpa
+> > 
+> > init_rmode_identity_map and init_rmode_tss will be setup on
+> > destination VM no matter what (and the guest cannot even see them), so
+> > it does not make sense to track them at all.
+> > 
+> > To do this, a new parameter is added to kvm_[write|clear]_guest_page()
+> > to show whether we would like to track dirty bits for the operations.
+> > With that, pass in "false" to this new parameter for any guest memory
+> > write of the ioctls (KVM_SET_TSS_ADDR, KVM_SET_IDENTITY_MAP_ADDR).
+> 
+> We can also return the hva from x86_set_memory_region and
+> __x86_set_memory_region.
+
+Yes.  Though it is a bit tricky in that then we'll also need to make
+sure to take slots_lock or srcu to protect that hva (say, we must drop
+that hva reference before we release the locks, otherwise the hva
+could gone under us, iiuc).  So if we want to do that we'd better
+comment on that hva value very explicitly, just in case some future
+callers of __x86_set_memory_region could cache it somewhere.
+
+(Side topic: I feel like the srcu_read_lock() pair in
+ init_rmode_identity_map() is redundant..)
+
+-- 
+Peter Xu
+
