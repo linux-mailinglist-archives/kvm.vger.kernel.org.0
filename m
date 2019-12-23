@@ -2,53 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FF5A128FB1
-	for <lists+kvm@lfdr.de>; Sun, 22 Dec 2019 20:10:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 400CD129097
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 02:09:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727439AbfLVTKN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Dec 2019 14:10:13 -0500
-Received: from mail.kernel.org ([198.145.29.99]:32778 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726726AbfLVTKM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Dec 2019 14:10:12 -0500
-Subject: Re: [GIT PULL] KVM patches for 5.5-rc3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1577041812;
-        bh=sWzONr3qKC6qgg10Sb+Bn9JI8FPF3i2gvsdC80RQ/NE=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=cS8FXONXU3VpA2crffLZs7vCSV7ik09fT+SJqGIZ5nZTN8LeSny8K1hh+0sc1JqsI
-         1Xustuqs7FDbVN+wLup/zoh3XnckfuF+6ObGR2hltDtaf/vQhf1q6l0V4zWK5Bsx7l
-         wytdxLVmqa/ldcHP0EOGqGb17dqCy4NcQkZ15SxE=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <1577023254-13034-1-git-send-email-pbonzini@redhat.com>
-References: <1577023254-13034-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1577023254-13034-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git
- tags/for-linus
-X-PR-Tracked-Commit-Id: d68321dec1b2234fb32f423e32c3af5915eae36c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: a313c8e056f86d13ae95a4aef30715918efff20f
-Message-Id: <157704181215.1067.14583320724918228605.pr-tracker-bot@kernel.org>
-Date:   Sun, 22 Dec 2019 19:10:12 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        id S1726539AbfLWBJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Dec 2019 20:09:31 -0500
+Received: from 107-174-27-60-host.colocrossing.com ([107.174.27.60]:42768 "EHLO
+        ozlabs.ru" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1726190AbfLWBJa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Dec 2019 20:09:30 -0500
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 384C8AE80026;
+        Sun, 22 Dec 2019 20:08:19 -0500 (EST)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
         kvm@vger.kernel.org
+Subject: [PATCH kernel] vfio/spapr/nvlink2: Skip unpinning pages on error exit
+Date:   Mon, 23 Dec 2019 12:09:27 +1100
+Message-Id: <20191223010927.79843-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Sun, 22 Dec 2019 15:00:54 +0100:
+The nvlink2 subdriver for IBM Witherspoon machines preregisters
+GPU memory in the IOMMI API so KVM TCE code can map this memory
+for DMA as well. This is done by mm_iommu_newdev() called from
+vfio_pci_nvgpu_regops::mmap.
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+In an unlikely event of failure the data->mem remains NULL and
+since mm_iommu_put() (which unregisters the region and unpins memory
+if that was regular memory) does not expect mem==NULL, it should not be
+called.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/a313c8e056f86d13ae95a4aef30715918efff20f
+This adds a check to only call mm_iommu_put() for a valid data->mem.
 
-Thank you!
+Fixes: 7f92891778df ("vfio_pci: Add NVIDIA GV100GL [Tesla V100 SXM2] subdriver")
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ drivers/vfio/pci/vfio_pci_nvlink2.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
+index f2983f0f84be..3f5f8198a6bb 100644
+--- a/drivers/vfio/pci/vfio_pci_nvlink2.c
++++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
+@@ -97,8 +97,10 @@ static void vfio_pci_nvgpu_release(struct vfio_pci_device *vdev,
+ 
+ 	/* If there were any mappings at all... */
+ 	if (data->mm) {
+-		ret = mm_iommu_put(data->mm, data->mem);
+-		WARN_ON(ret);
++		if (data->mem) {
++			ret = mm_iommu_put(data->mm, data->mem);
++			WARN_ON(ret);
++		}
+ 
+ 		mmdrop(data->mm);
+ 	}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+2.17.1
+
