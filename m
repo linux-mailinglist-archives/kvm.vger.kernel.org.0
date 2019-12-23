@@ -2,111 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 31B9B1295CE
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 13:05:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 752AC1295D1
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2019 13:06:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726787AbfLWMFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Dec 2019 07:05:16 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:50961 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726663AbfLWMFQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Dec 2019 07:05:16 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1ijMSW-0003P7-RT; Mon, 23 Dec 2019 13:05:12 +0100
-To:     Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v2 11/18] KVM: arm64: don't trap Statistical Profiling  controls to EL2
-X-PHP-Originating-Script: 0:main.inc
+        id S1726744AbfLWMGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Dec 2019 07:06:33 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:58820 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726663AbfLWMGc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Dec 2019 07:06:32 -0500
+Received: from zn.tnic (p200300EC2F0ED6007C3BCB4901AE3123.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:d600:7c3b:cb49:1ae:3123])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A35131EC0391;
+        Mon, 23 Dec 2019 13:06:30 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1577102790;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Eujr/vAbQ2+cnbA/Y/6VFm+E4rkaCIhGe6e2vcZvass=;
+        b=Q98VjP1I9b3remsMyKwJzpRUKaHZAGkbkSljIct6MbXJSaxbb/Zr2/0DAvMFaDOtdO0cJ2
+        8skqG+iJpT//VlShtc9qkPMGbl6+gkVrMILWj8nHb/Hg3OVvInUZoAy5St4UzTF3/TWey9
+        w84WUwbP9AWTpFtlXBLnJA4uSYQ0urk=
+Date:   Mon, 23 Dec 2019 13:06:22 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     John Andersen <john.s.andersen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, X86 ML <x86@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [RESEND RFC 2/2] X86: Use KVM CR pin MSRs
+Message-ID: <20191223120622.GC16710@zn.tnic>
+References: <20191220192701.23415-1-john.s.andersen@intel.com>
+ <20191220192701.23415-3-john.s.andersen@intel.com>
+ <CALCETrV1nOpc3mqyXTXOzw-8Aa3zFpGi1cY7oc_2pz2-JVyH8Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 23 Dec 2019 12:05:12 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>
-In-Reply-To: <20191223115651.GA42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-12-andrew.murray@arm.com>
- <86bls0iqv6.wl-maz@kernel.org>
- <20191223115651.GA42593@e119886-lin.cambridge.arm.com>
-Message-ID: <1bb190091362262021dbaf41b5fe601e@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, catalin.marinas@arm.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, sudeep.holla@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CALCETrV1nOpc3mqyXTXOzw-8Aa3zFpGi1cY7oc_2pz2-JVyH8Q@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-12-23 11:56, Andrew Murray wrote:
-> On Sun, Dec 22, 2019 at 10:42:05AM +0000, Marc Zyngier wrote:
->> On Fri, 20 Dec 2019 14:30:18 +0000,
->> Andrew Murray <andrew.murray@arm.com> wrote:
->> >
->> > As we now save/restore the profiler state there is no need to trap
->> > accesses to the statistical profiling controls. Let's unset the
->> > _TPMS bit.
->> >
->> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
->> > ---
->> >  arch/arm64/kvm/debug.c | 2 --
->> >  1 file changed, 2 deletions(-)
->> >
->> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> > index 43487f035385..07ca783e7d9e 100644
->> > --- a/arch/arm64/kvm/debug.c
->> > +++ b/arch/arm64/kvm/debug.c
->> > @@ -88,7 +88,6 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu 
->> *vcpu)
->> >   *  - Performance monitors (MDCR_EL2_TPM/MDCR_EL2_TPMCR)
->> >   *  - Debug ROM Address (MDCR_EL2_TDRA)
->> >   *  - OS related registers (MDCR_EL2_TDOSA)
->> > - *  - Statistical profiler (MDCR_EL2_TPMS/MDCR_EL2_E2PB)
->> >   *
->> >   * Additionally, KVM only traps guest accesses to the debug 
->> registers if
->> >   * the guest is not actively using them (see the 
->> KVM_ARM64_DEBUG_DIRTY
->> > @@ -111,7 +110,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu 
->> *vcpu)
->> >  	 */
->> >  	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) & 
->> MDCR_EL2_HPMN_MASK;
->> >  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
->> > -				MDCR_EL2_TPMS |
->>
->> No. This is an *optional* feature (the guest could not be presented
->> with the SPE feature, or the the support simply not be compiled in).
->>
->> If the guest is not allowed to see the feature, for whichever 
->> reason,
->> the traps *must* be enabled and handled.
->
-> I'll update this (and similar) to trap such registers when we don't 
-> support
-> SPE in the guest.
->
-> My original concern in the cover letter was in how to prevent the 
-> guest
-> from attempting to use these registers in the first place - I think 
-> the
-> solution I was looking for is to trap-and-emulate ID_AA64DFR0_EL1 
-> such that
-> the PMSVer bits indicate that SPE is not emulated.
+On Sun, Dec 22, 2019 at 11:39:19PM -0800, Andy Lutomirski wrote:
+> FWIW, I think that handling these details through Kconfig is the wrong
+> choice.  Distribution kernels should enable this, and they're not
+> going to turn off kexec.
 
-That, and active trapping of the SPE system registers resulting in 
-injection
-of an UNDEF into the offending guest.
+Nope, the other way around is way likely.
 
-Thanks,
+> Arguably kexec should be made to work -- there is no fundamental
+> reason that kexec should need to fiddle with CR0.WP, for example. But
+> a boot option could also work as a short-term option.
 
-         M.
+The problem with short-term solutions is that they become immutable
+once people start using them. So it better be done right from the very
+beginning, before it gets exposed.
+
+Thx.
+
 -- 
-Jazz is not dead. It just smells funny...
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
