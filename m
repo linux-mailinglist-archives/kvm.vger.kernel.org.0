@@ -2,100 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C84712A430
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 22:18:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C7D812A458
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 23:58:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726262AbfLXVS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Dec 2019 16:18:28 -0500
-Received: from mga07.intel.com ([134.134.136.100]:47007 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726184AbfLXVS2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Dec 2019 16:18:28 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Dec 2019 13:18:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,353,1571727600"; 
-   d="scan'208";a="367422018"
-Received: from orsmsx107.amr.corp.intel.com ([10.22.240.5])
-  by orsmga004.jf.intel.com with ESMTP; 24 Dec 2019 13:18:28 -0800
-Received: from orsmsx116.amr.corp.intel.com ([169.254.7.30]) by
- ORSMSX107.amr.corp.intel.com ([169.254.1.58]) with mapi id 14.03.0439.000;
- Tue, 24 Dec 2019 13:18:27 -0800
-From:   "Andersen, John S" <john.s.andersen@intel.com>
-To:     "luto@kernel.org" <luto@kernel.org>
-CC:     "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, "bp@alien8.de" <bp@alien8.de>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RESEND RFC 2/2] X86: Use KVM CR pin MSRs
-Thread-Topic: [RESEND RFC 2/2] X86: Use KVM CR pin MSRs
-Thread-Index: AQHVt2uKu6eHdNQTz0i3fUdfaU+1QqfH33CAgAJ3m4A=
-Date:   Tue, 24 Dec 2019 21:18:27 +0000
-Message-ID: <19f3a3f98d259accf67a6c22c112bfa8f11513d4.camel@intel.com>
+        id S1726269AbfLXW5y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Dec 2019 17:57:54 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:48482 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726225AbfLXW5y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Dec 2019 17:57:54 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBOMsI0x124461;
+        Tue, 24 Dec 2019 22:56:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=/dgJ8XuSEwopCmXfGg18AuXhFUHdN3GB/Y4XIlcxZyI=;
+ b=BHlHU5eIkhzcnVBY5L45sIQ47YbRIKktvREB94jys27/0DzDY0S3pWHoxR8CP0rpGbcU
+ hN0djlTosL1vf1uxdXYhyuSodVNqkDCzDzsMUtUpQQWnHrB2L70j9QjIE0W7izBGyjxR
+ SgYSLGE4gXkiW1uWGKaaWaDsWx9wpmA1KuDT+G1/SpmEiKmbio1rEkF/HrhBbHw/5Mic
+ yeGFyigN3KzF0Sdoaa28XEFWBIs+KFvNiuCLecObkWDXxe/gXimopiQnROeinCkR9FDp
+ JUQKT+4vQ3AJDQSp43anr16r2M3ulDybsBxXc6b2KStAF2dKkE9hwu7irwDqqJzt7ALa ZQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2x1c1qw267-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Dec 2019 22:56:22 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBOMsCKl068489;
+        Tue, 24 Dec 2019 22:56:22 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2x3nn5tptx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Dec 2019 22:56:21 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBOMuIVZ000679;
+        Tue, 24 Dec 2019 22:56:18 GMT
+Received: from [192.168.14.112] (/109.64.214.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 24 Dec 2019 14:56:18 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [RESEND RFC 0/2] Paravirtualized Control Register pinning
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <F82D153A-F083-432B-864C-1CF6A02C19DD@oracle.com>
+Date:   Wed, 25 Dec 2019 00:56:03 +0200
+Cc:     John Andersen <john.s.andersen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, pbonzini@redhat.com, hpa@zytor.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <12D7EEB4-C77E-4BD1-AF61-8B0FBBA2ED05@oracle.com>
 References: <20191220192701.23415-1-john.s.andersen@intel.com>
-         <20191220192701.23415-3-john.s.andersen@intel.com>
-         <CALCETrV1nOpc3mqyXTXOzw-8Aa3zFpGi1cY7oc_2pz2-JVyH8Q@mail.gmail.com>
-In-Reply-To: <CALCETrV1nOpc3mqyXTXOzw-8Aa3zFpGi1cY7oc_2pz2-JVyH8Q@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.19.9.42]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AD3D47AD34E9254197DE09827F1AF43B@intel.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+ <F82D153A-F083-432B-864C-1CF6A02C19DD@oracle.com>
+To:     Liran Alon <liran.alon@oracle.com>,
+        kernel-hardening@lists.openwall.com
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9481 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912240198
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9481 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912240198
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gU3VuLCAyMDE5LTEyLTIyIGF0IDIzOjM5IC0wODAwLCBBbmR5IEx1dG9taXJza2kgd3JvdGU6
-DQo+IE9uIEZyaSwgRGVjIDIwLCAyMDE5IGF0IDExOjI3IEFNIEpvaG4gQW5kZXJzZW4NCj4gPGpv
-aG4ucy5hbmRlcnNlbkBpbnRlbC5jb20+IHdyb3RlOg0KPiA+IFN0cmVuZ3RoZW4gZXhpc3Rpbmcg
-Y29udHJvbCByZWdpc3RlciBwaW5uaW5nIHdoZW4gcnVubmluZw0KPiA+IHBhcmF2aXJ0dWFsaXpl
-ZCB1bmRlciBLVk0uIENoZWNrIHdoaWNoIGJpdHMgS1ZNIHN1cHBvcnRzIHBpbm5pbmcNCj4gPiBm
-b3INCj4gPiBlYWNoIGNvbnRyb2wgcmVnaXN0ZXIgYW5kIG9ubHkgcGluIHN1cHBvcnRlZCBiaXRz
-IHdoaWNoIGFyZSBhbHJlYWR5DQo+ID4gcGlubmVkIHZpYSB0aGUgZXhpc3RpbmcgbmF0aXZlIHBy
-b3RlY3Rpb24uIFdyaXRlIHRvIEtWTSBDUjAgYW5kIENSNA0KPiA+IHBpbm5lZCBNU1JzIHRvIGVu
-YWJsZSBwaW5uaW5nLg0KPiA+IA0KPiA+IEluaXRpYXRlIEtWTSBhc3Npc3RlZCBwaW5uaW5nIGRp
-cmVjdGx5IGZvbGxvd2luZyB0aGUgc2V0dXAgb2YNCj4gPiBuYXRpdmUNCj4gPiBwaW5uaW5nIG9u
-IGJvb3QgQ1BVLiBGb3Igbm9uLWJvb3QgQ1BVcyBpbml0aWF0ZSBwYXJhdmlydHVhbGl6ZWQNCj4g
-PiBwaW5uaW5nDQo+ID4gb24gQ1BVIGlkZW50aWZpY2F0aW9uLg0KPiA+IA0KPiA+IElkZW50aWZp
-Y2F0aW9uIG9mIG5vbi1ib290IENQVXMgdGFrZXMgcGxhY2UgYWZ0ZXIgdGhlIGJvb3QgQ1BVIGhh
-cw0KPiA+IHNldHVwDQo+ID4gbmF0aXZlIENSIHBpbm5pbmcuIFRoZXJlZm9yZSwgbm9uLWJvb3Qg
-Q1BVcyBhY2Nlc3MgcGlubmVkIGJpdHMNCj4gPiBzZXR1cCBieQ0KPiA+IHRoZSBib290IENQVSBh
-bmQgcmVxdWVzdCB0aGF0IHRob3NlIGJlIHBpbm5lZC4gQWxsIENQVXMgcmVxdWVzdA0KPiA+IHBh
-cmF2aXJ0dWFsaXplZCBwaW5uaW5nIG9mIHRoZSBzYW1lIGJpdHMgd2hpY2ggYXJlIGFscmVhZHkg
-cGlubmVkDQo+ID4gbmF0aXZlbHkuDQo+ID4gDQo+ID4gR3Vlc3RzIHVzaW5nIHRoZSBrZXhlYyBz
-eXN0ZW0gY2FsbCBjdXJyZW50bHkgZG8gbm90IHN1cHBvcnQNCj4gPiBwYXJhdmlydHVhbGl6ZWQg
-Y29udHJvbCByZWdpc3RlciBwaW5uaW5nLiBUaGlzIGlzIGR1ZSB0byBlYXJseSBib290DQo+ID4g
-Y29kZSB3cml0aW5nIGtub3duIGdvb2QgdmFsdWVzIHRvIGNvbnRyb2wgcmVnaXN0ZXJzLCB0aGVz
-ZSB2YWx1ZXMNCj4gPiBkbw0KPiA+IG5vdCBjb250YWluIHRoZSBwcm90ZWN0ZWQgYml0cy4gVGhp
-cyBpcyBkdWUgdG8gQ1BVIGZlYXR1cmUNCj4gPiBpZGVudGlmaWNhdGlvbiBiZWluZyBkb25lIGF0
-IGEgbGF0ZXIgdGltZSwgd2hlbiB0aGUga2VybmVsIHByb3Blcmx5DQo+ID4gY2hlY2tzIGlmIGl0
-IGNhbiBlbmFibGUgcHJvdGVjdGlvbnMuDQo+IA0KPiBJcyBoaWJlcm5hdGlvbiBzdXBwb3J0ZWQ/
-ICBIb3cgYWJvdXQgc3VzcGVuZC10by1SQU0/DQo+IA0KDQpTb21ldGhpbmcgaXMgd3JpdGluZyB0
-byBDUjQgZHVyaW5nIHJlc3VtZSB3aGljaCBpcyBicmVha2luZw0KaGliZXJuYXRpb24uIFVuZm9y
-dHVuYXRlbHkgSSBoYWRuJ3QgYmVlbiBhYmxlIHRvIGdldCBteSBoaWJlcm5hdGlvbg0KdGVzdCB3
-b3JraW5nIGJlZm9yZSBzZW5kaW5nIHRoaXMgb3V0LiBJIHdpbGwgaW52ZXN0aWdhdGUuDQoNCj4g
-RldJVywgSSB0aGluayB0aGF0IGhhbmRsaW5nIHRoZXNlIGRldGFpbHMgdGhyb3VnaCBLY29uZmln
-IGlzIHRoZQ0KPiB3cm9uZw0KPiBjaG9pY2UuICBEaXN0cmlidXRpb24ga2VybmVscyBzaG91bGQg
-ZW5hYmxlIHRoaXMsIGFuZCB0aGV5J3JlIG5vdA0KPiBnb2luZyB0byB0dXJuIG9mZiBrZXhlYy4g
-IEFyZ3VhYmx5IGtleGVjIHNob3VsZCBiZSBtYWRlIHRvIHdvcmsgLS0NCj4gdGhlcmUgaXMgbm8g
-ZnVuZGFtZW50YWwgcmVhc29uIHRoYXQga2V4ZWMgc2hvdWxkIG5lZWQgdG8gZmlkZGxlIHdpdGgN
-Cj4gQ1IwLldQLCBmb3IgZXhhbXBsZS4gIEJ1dCBhIGJvb3Qgb3B0aW9uIGNvdWxkIGFsc28gd29y
-ayBhcyBhDQo+IHNob3J0LXRlcm0gb3B0aW9uLg0KDQpHaXZlbiB0aGUgc2l0dWF0aW9uIHdpdGgg
-aGliZXJuYXRpb24uIEkgdGhpbmsgSSdsbCBpbXBsZW1lbnQgdGhlIGtleGVjDQpkaXNjb3Zlcnkg
-TGlyYW4gc3VnZ2VzdGVkLCBhbmQgdGhlbiBpbnZlc3RpZ2F0ZSB0aGUgaGliZXJuYXRlIHNpdHVh
-dGlvbg0KZnVydGhlci4NCg0KVGhhbmtzLA0KSm9obg0K
++kernel-hardening mailing list.
+
+> On 23 Dec 2019, at 16:30, Liran Alon <liran.alon@oracle.com> wrote:
+>=20
+>=20
+>=20
+>> On 20 Dec 2019, at 21:26, John Andersen <john.s.andersen@intel.com> =
+wrote:
+>>=20
+>> Paravirtualized Control Register pinning is a strengthened version of
+>> existing protections on the Write Protect, Supervisor Mode Execution =
+/
+>> Access Protection, and User-Mode Instruction Prevention bits. The
+>> existing protections prevent native_write_cr*() functions from =
+writing
+>> values which disable those bits. This patchset prevents any guest
+>> writes to control registers from disabling pinned bits, not just =
+writes
+>> from native_write_cr*(). This stops attackers within the guest from
+>> using ROP to disable protection bits.
+>>=20
+>> =
+https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__web.archive.org_web=
+_20171029060939_http-3A__www.blackbunny.io_linux-2Dkernel-2Dx86-2D64-2Dbyp=
+ass-2Dsmep-2Dkaslr-2Dkptr-5Frestric_&d=3DDwIDAg&c=3DRoP1YumCXCgaWHvlZYR8PZ=
+h8Bv7qIrMUB65eapI_JnE&r=3DJk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=3D=
+-H3SsRpu0sEBqqn9-OOVimBDXk6TimcJerlu4-ko5Io&s=3DTrjU4_UEZIoYjxtoXcjsA8Riu0=
+QZ8eI7a4fH96hSBQc&e=3D=20
+>>=20
+>> The protection is implemented by adding MSRs to KVM which contain the
+>> bits that are allowed to be pinned, and the bits which are pinned. =
+The
+>> guest or userspace can enable bit pinning by reading MSRs to check
+>> which bits are allowed to be pinned, and then writing MSRs to set =
+which
+>> bits they want pinned.
+>>=20
+>> Other hypervisors such as HyperV have implemented similar protections
+>> for Control Registers and MSRs; which security researchers have found
+>> effective.
+>>=20
+>> =
+https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__www.abatchy.com_201=
+8_01_kernel-2Dexploitation-2D4&d=3DDwIDAg&c=3DRoP1YumCXCgaWHvlZYR8PZh8Bv7q=
+IrMUB65eapI_JnE&r=3DJk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=3D-H3SsR=
+pu0sEBqqn9-OOVimBDXk6TimcJerlu4-ko5Io&s=3DFg3e-BSUebNg44Ocp_y19xIoK0HJEHPW=
+2AgM958F3Uc&e=3D=20
+>>=20
+>=20
+> I think it=E2=80=99s important to mention how Hyper-V implements this =
+protection as it is done in a very different architecture.
+>=20
+> Hyper-V implements a set of PV APIs named VSM (Virtual Secure Mode) =
+aimed to allow a guest (partition) to separate itself to multiple =
+security domains called VTLs (Virtual Trust Level).
+> The VSM API expose an interface to higher VTLs to control the =
+execution of lower VTLs. In theory, VSM supports up to 16 VTLs, but =
+Windows VBS (Virtualization Based Security) that is
+> the only current technology which utilise VSM, use only 2 VTLs. VTL0 =
+for most of OS execution (Normal-Mode) and VTL1 for a secure OS =
+execution (Secure-Mode).
+>=20
+> Higher VTL controls execution of lower VTL by the following VSM =
+mechanisms:
+> 1) Memory Access Protections: Allows higher VTL to restrict memory =
+access to physical pages. Either making them inaccessible or limited to =
+certain permissions.
+> 2) Secure Intercepts: Allows a higher VTL to request hypervisor to =
+intercept certain events in lower VTLs for handling by higher VTL. This =
+includes access to system registers (e.g. CRs & MSRs).
+>=20
+> VBS use above mentioned mechanisms as follows:
+> a) Credentials Guard: Prevents pass-the-hash attacks. Done by =
+encrypting credentials using a VTL1 trustlet to encrypt them by an =
+encryption-key stored in VTL1-only accessible memory.
+> b) HVCI (Hypervisor-based Code-Integrity): Prevents execution of =
+unsigned code. Done by marking all EPT entries with NX until signature =
+verified by VTL1 service. Once verified, mark EPT entries as RO+X.
+> (HVCI also supports enforcing code-signing only on Ring0 code =
+efficiently by utilising Intel MBEC or AMD GMET CPU features. Which =
+allows setting NX-bit on EPT entries based on guest CPL).
+> c) KDP (Kernel Data Protection): Marks certain pages after =
+initialisation as read-only on VTL0 EPT.
+> d) kCFG (Kernel Control-Flow Guard): VTL1 protects bitmap,specifying =
+valid indirect branch targets, by protecting it with read-only on VTL0 =
+EPT.
+> e) HyperGuard: VTL1 use =E2=80=9CSecure Intercepts=E2=80=9D mechanism =
+to prevent VTL0 from modifying important system registers. Including CR0 =
+& CR4 as done by this patch.
+>    HyperGuard also implements a mechanism named NPIEP (Non-Privileged =
+Instruction Execution Prevention) that prevents VTL0 Ring3 executing =
+SIDT/SGDT/SLDT/STR to leak Ring0 addresses.
+>=20
+> To sum-up, In Hyper-V, the hypervisor expose a relatively thin API to =
+allow guest to partition itself to multiple security domains (enforced =
+by virtualization).
+> Using this framework, it=E2=80=99s possible to implement multiple =
+OS-level protection mechanisms. Only one of them are pinning certain =
+registers to specific values as done by this patch.
+>=20
+> Therefore, as I also tried to say in recent KVM Forum, I think KVM =
+should consider exposing a VSM-like API to guest to allow various guest =
+OS,
+> Including Linux, to implement VBS-like features. To decide on how this =
+API should look like, we need to have a more broad discussion with Linux
+> Security maintainers and KVM maintainers on which security features we =
+would like to implement using such API and what should be their =
+architecture.
+> Then, we can implement this API in KVM and start to gradually =
+introduce more security features in Linux which utilise this API.
+>=20
+> Once Linux will have security features implemented with this new KVM =
+API, we could also consider implementing them on top of other similar =
+hypervisor APIs
+> such as Hyper-V VSM. To achieve, for example, Linux being more secure =
+when running on Microsoft Azure compute instances.
+>=20
+> Therefore, I see this patch as a short-term solution to quickly gain =
+real security value on a very specific issue.
+> But if we are serious about improving Linux security using =
+Virtualization, we should have this more broad discussion.
+>=20
+> -Liran
+>=20
+
