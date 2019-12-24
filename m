@@ -2,246 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9932B12A2E6
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 16:17:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB7AD12A2EE
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 16:22:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726250AbfLXPRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Dec 2019 10:17:43 -0500
-Received: from foss.arm.com ([217.140.110.172]:52960 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726168AbfLXPRn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Dec 2019 10:17:43 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3037E1FB;
-        Tue, 24 Dec 2019 07:17:42 -0800 (PST)
-Received: from localhost (unknown [10.37.6.20])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 97CCD3F6CF;
-        Tue, 24 Dec 2019 07:17:41 -0800 (PST)
-Date:   Tue, 24 Dec 2019 15:17:39 +0000
-From:   Andrew Murray <andrew.murray@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 08/18] arm64: KVM: add support to save/restore SPE
- profiling buffer controls
-Message-ID: <20191224151739.GP42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-9-andrew.murray@arm.com>
- <20191221135755.70a6e8df@why>
- <20191224104929.GE42593@e119886-lin.cambridge.arm.com>
+        id S1726259AbfLXPWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Dec 2019 10:22:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33846 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726140AbfLXPWv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Dec 2019 10:22:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1577200969;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MuI7b+nn3459lNvQkwSbmuvlvnSiMF65nG57H/ptVY8=;
+        b=aqCGKHMSg0Dq51SuGimgMrNqN/GqJMzJv2hgbfNuvAXFtX0nFKI7D9b/TNDuPSoZ/yBXTQ
+        vFFdfwhsRn2AzizwRzSvGw0rSU0whtJPdVSb/zoL3hUoLecceZ49AclW6Tb03KYFq6CDoy
+        9iBpvg66aWW8v43ReewHEO7/R6VbS30=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-qA4cHORhOemkmn_YEN1Qcw-1; Tue, 24 Dec 2019 10:22:48 -0500
+X-MC-Unique: qA4cHORhOemkmn_YEN1Qcw-1
+Received: by mail-qv1-f69.google.com with SMTP id l1so13365037qvu.13
+        for <kvm@vger.kernel.org>; Tue, 24 Dec 2019 07:22:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=MuI7b+nn3459lNvQkwSbmuvlvnSiMF65nG57H/ptVY8=;
+        b=VQITdDiD5Lt0+t3IRafnW3v+TJasR25j8Q/DQQ+BMdjZYH82iQ0OWs7R4B5boeKzgU
+         fQRTPjiGPEE/fqN4u3Kga6J9AJ+46aJhyqUm2S/H9A2uYdsXGnnWvmdvxI1a6UoEUU2K
+         e/2ghMzPjotO77SmtUf5xNjfQZUyScH3eOtxZ9c3VFr/g38jMNUu2dhmuBgaqtru9J7f
+         j24OEQDOsOT5o1Oj6SnPtVYsn2OrCpq34xnR0lJEVUJUBDtq1ynPWknfgnlMiu2MLgUy
+         sd45zcOfSq0pAI0tVuhV9pMla56dLLn3haDch4oVDrt2QVbWWg6bvdWiDuaJYlNFyPiM
+         P9AA==
+X-Gm-Message-State: APjAAAUJsmQ3bdN3glQKYxGnaekGV/ZyqKqvCtLrY1rRUGO9C+dP8LmI
+        u/slwYPQchX7SRmw+CbQbNM0ota0mAKOqyOteYJpWUoJcdJo3GMNKdK/5VjMw8kekLrEDm+POsg
+        kkiU1mGOvFJry
+X-Received: by 2002:a05:620a:1014:: with SMTP id z20mr30191052qkj.196.1577200967807;
+        Tue, 24 Dec 2019 07:22:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxm9X0Ulp164MwCgzA6asjIcE8aiO1u/sC2ZnBoMfHFDI+t0HcMgrLoAcn6xNfXVagojVgfow==
+X-Received: by 2002:a05:620a:1014:: with SMTP id z20mr30191028qkj.196.1577200967586;
+        Tue, 24 Dec 2019 07:22:47 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c0:3f::2])
+        by smtp.gmail.com with ESMTPSA id s11sm6954216qkg.99.2019.12.24.07.22.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Dec 2019 07:22:46 -0800 (PST)
+Date:   Tue, 24 Dec 2019 10:22:45 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dr David Alan Gilbert <dgilbert@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RESEND v2 15/17] KVM: selftests: Add dirty ring buffer
+ test
+Message-ID: <20191224152245.GA17176@xz-x1>
+References: <20191221020445.60476-1-peterx@redhat.com>
+ <20191221020445.60476-5-peterx@redhat.com>
+ <521fcdf6-db45-566d-7a83-e8c7a22cf7c5@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20191224104929.GE42593@e119886-lin.cambridge.arm.com>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
+In-Reply-To: <521fcdf6-db45-566d-7a83-e8c7a22cf7c5@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 24, 2019 at 10:49:30AM +0000, Andrew Murray wrote:
-> On Sat, Dec 21, 2019 at 01:57:55PM +0000, Marc Zyngier wrote:
-> > On Fri, 20 Dec 2019 14:30:15 +0000
-> > Andrew Murray <andrew.murray@arm.com> wrote:
-> > 
-> > > From: Sudeep Holla <sudeep.holla@arm.com>
-> > > 
-> > > Currently since we don't support profiling using SPE in the guests,
-> > > we just save the PMSCR_EL1, flush the profiling buffers and disable
-> > > sampling. However in order to support simultaneous sampling both in
-> > 
-> > Is the sampling actually simultaneous? I don't believe so (the whole
-> > series would be much simpler if it was).
-> 
-> No the SPE is used by either the guest or host at any one time. I guess
-> the term simultaneous was used to refer to illusion given to both guest
-> and host that they are able to use it whenever they like. I'll update
-> the commit message to drop the magic.
->  
-> 
-> > 
-> > > the host and guests, we need to save and reatore the complete SPE
-> > 
-> > s/reatore/restore/
-> 
-> Noted.
-> 
-> 
-> > 
-> > > profiling buffer controls' context.
-> > > 
-> > > Let's add the support for the same and keep it disabled for now.
-> > > We can enable it conditionally only if guests are allowed to use
-> > > SPE.
-> > > 
-> > > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> > > [ Clear PMBSR bit when saving state to prevent spurious interrupts ]
-> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/debug-sr.c | 51 +++++++++++++++++++++++++++++------
-> > >  1 file changed, 43 insertions(+), 8 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-> > > index 8a70a493345e..12429b212a3a 100644
-> > > --- a/arch/arm64/kvm/hyp/debug-sr.c
-> > > +++ b/arch/arm64/kvm/hyp/debug-sr.c
-> > > @@ -85,7 +85,8 @@
-> > >  	default:	write_debug(ptr[0], reg, 0);			\
-> > >  	}
-> > >  
-> > > -static void __hyp_text __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt)
-> > > +static void __hyp_text
-> > > +__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
-> > 
-> > nit: don't split lines like this if you can avoid it. You can put the
-> > full_ctxt parameter on a separate line instead.
-> 
-> Yes understood.
-> 
-> 
-> > 
-> > >  {
-> > >  	u64 reg;
-> > >  
-> > > @@ -102,22 +103,46 @@ static void __hyp_text __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt)
-> > >  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
-> > >  		return;
-> > >  
-> > > -	/* No; is the host actually using the thing? */
-> > > -	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
-> > > -	if (!(reg & BIT(SYS_PMBLIMITR_EL1_E_SHIFT)))
-> > > +	/* Save the control register and disable data generation */
-> > > +	ctxt->sys_regs[PMSCR_EL1] = read_sysreg_el1(SYS_PMSCR);
-> > > +
-> > > +	if (!ctxt->sys_regs[PMSCR_EL1])
-> > 
-> > Shouldn't you check the enable bits instead of relying on the whole
-> > thing being zero?
-> 
-> Yes that would make more sense (E1SPE and E0SPE).
-> 
-> I feel that this check makes an assumption about the guest/host SPE
-> driver... What happens if the SPE driver writes to some SPE registers
-> but doesn't enable PMSCR? If the guest is also using SPE then those
-> writes will be lost, when the host returns and the SPE driver enables
-> SPE it won't work.
-> 
-> With a quick look at the SPE driver I'm not sure this will happen, but
-> even so it makes me nervous relying on these assumptions. I wonder if
-> this risk is present in other devices?
+On Tue, Dec 24, 2019 at 02:18:37PM +0800, Jason Wang wrote:
 
-In fact, this may be a good reason to trap the SPE registers - this would
-allow you to conditionally save/restore based on a dirty bit. It would
-also allow you to re-evaluate the SPE interrupt (for example when the guest
-clears the status register) and thus potentially reduce any black hole.
+[...]
 
-Thanks,
+> > +	while (fetch != avail) {
+> > +		cur = &dirty_gfns[fetch % TEST_DIRTY_RING_COUNT];
+> > +		TEST_ASSERT(cur->pad == 0, "Padding is non-zero: 0x%x", cur->pad);
+> > +		TEST_ASSERT(cur->slot == slot, "Slot number didn't match: "
+> > +			    "%u != %u", cur->slot, slot);
+> > +		TEST_ASSERT(cur->offset < num_pages, "Offset overflow: "
+> > +			    "0x%llx >= 0x%llx", cur->offset, num_pages);
+> > +		DEBUG("fetch 0x%x offset 0x%llx\n", fetch, cur->offset);
+> > +		test_and_set_bit(cur->offset, bitmap);
+> > +		fetch++;
+> 
+> 
+> Any reason to use test_and_set_bit()? I guess set_bit() should be
+> sufficient.
 
-Andrew Murray
+Yes.
 
 > 
 > 
-> > 
-> > >  		return;
-> > >  
-> > >  	/* Yes; save the control register and disable data generation */
-> > > -	ctxt->sys_regs[PMSCR_EL1] = read_sysreg_el1(SYS_PMSCR);
-> > 
-> > You've already saved the control register...
-> 
-> I'll remove that.
+> > +		count++;
+> > +	}
+> > +	WRITE_ONCE(indices->fetch_index, fetch);
 > 
 > 
-> > 
-> > >  	write_sysreg_el1(0, SYS_PMSCR);
-> > >  	isb();
-> > >  
-> > >  	/* Now drain all buffered data to memory */
-> > >  	psb_csync();
-> > >  	dsb(nsh);
-> > > +
-> > > +	if (!full_ctxt)
-> > > +		return;
-> > > +
-> > > +	ctxt->sys_regs[PMBLIMITR_EL1] = read_sysreg_s(SYS_PMBLIMITR_EL1);
-> > > +	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
-> > > +
-> > > +	/*
-> > > +	 * As PMBSR is conditionally restored when returning to the host we
-> > > +	 * must ensure the service bit is unset here to prevent a spurious
-> > > +	 * host SPE interrupt from being raised.
-> > > +	 */
-> > > +	ctxt->sys_regs[PMBSR_EL1] = read_sysreg_s(SYS_PMBSR_EL1);
-> > > +	write_sysreg_s(0, SYS_PMBSR_EL1);
-> > > +
-> > > +	isb();
-> > > +
-> > > +	ctxt->sys_regs[PMSICR_EL1] = read_sysreg_s(SYS_PMSICR_EL1);
-> > > +	ctxt->sys_regs[PMSIRR_EL1] = read_sysreg_s(SYS_PMSIRR_EL1);
-> > > +	ctxt->sys_regs[PMSFCR_EL1] = read_sysreg_s(SYS_PMSFCR_EL1);
-> > > +	ctxt->sys_regs[PMSEVFR_EL1] = read_sysreg_s(SYS_PMSEVFR_EL1);
-> > > +	ctxt->sys_regs[PMSLATFR_EL1] = read_sysreg_s(SYS_PMSLATFR_EL1);
-> > > +	ctxt->sys_regs[PMBPTR_EL1] = read_sysreg_s(SYS_PMBPTR_EL1);
-> > >  }
-> > >  
-> > > -static void __hyp_text __debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt)
-> > > +static void __hyp_text
-> > > +__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
-> > >  {
-> > >  	if (!ctxt->sys_regs[PMSCR_EL1])
-> > >  		return;
-> > > @@ -126,6 +151,16 @@ static void __hyp_text __debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt)
-> > >  	isb();
-> > >  
-> > >  	/* Re-enable data generation */
-> > > +	if (full_ctxt) {
-> > > +		write_sysreg_s(ctxt->sys_regs[PMBPTR_EL1], SYS_PMBPTR_EL1);
-> > > +		write_sysreg_s(ctxt->sys_regs[PMBLIMITR_EL1], SYS_PMBLIMITR_EL1);
-> > > +		write_sysreg_s(ctxt->sys_regs[PMSFCR_EL1], SYS_PMSFCR_EL1);
-> > > +		write_sysreg_s(ctxt->sys_regs[PMSEVFR_EL1], SYS_PMSEVFR_EL1);
-> > > +		write_sysreg_s(ctxt->sys_regs[PMSLATFR_EL1], SYS_PMSLATFR_EL1);
-> > > +		write_sysreg_s(ctxt->sys_regs[PMSIRR_EL1], SYS_PMSIRR_EL1);
-> > > +		write_sysreg_s(ctxt->sys_regs[PMSICR_EL1], SYS_PMSICR_EL1);
-> > > +		write_sysreg_s(ctxt->sys_regs[PMBSR_EL1], SYS_PMBSR_EL1);
-> > > +	}
-> > >  	write_sysreg_el1(ctxt->sys_regs[PMSCR_EL1], SYS_PMSCR);
-> > >  }
-> > >  
-> > > @@ -198,7 +233,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
-> > >  	guest_ctxt = &vcpu->arch.ctxt;
-> > >  
-> > >  	if (!has_vhe())
-> > > -		__debug_restore_spe_nvhe(host_ctxt);
-> > > +		__debug_restore_spe_nvhe(host_ctxt, false);
-> > >  
-> > >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
-> > >  		return;
-> > > @@ -222,7 +257,7 @@ void __hyp_text __debug_save_host_context(struct kvm_vcpu *vcpu)
-> > >  
-> > >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> > >  	if (!has_vhe())
-> > > -		__debug_save_spe_nvhe(host_ctxt);
-> > > +		__debug_save_spe_nvhe(host_ctxt, false);
-> > >  }
-> > >  
-> > >  void __hyp_text __debug_save_guest_context(struct kvm_vcpu *vcpu)
-> > 
-> > So all of this is for non-VHE. What happens in the VHE case?
+> Is WRITE_ONCE a must here?
+
+No.
+
+[...]
+
+> > +void *vcpu_map_dirty_ring(struct kvm_vm *vm, uint32_t vcpuid)
+> > +{
+> > +	struct vcpu *vcpu;
+> > +	uint32_t size = vm->dirty_ring_size;
+> > +
+> > +	TEST_ASSERT(size > 0, "Should enable dirty ring first");
+> > +
+> > +	vcpu = vcpu_find(vm, vcpuid);
+> > +
+> > +	TEST_ASSERT(vcpu, "Cannot find vcpu %u", vcpuid);
+> > +
+> > +	if (!vcpu->dirty_gfns) {
+> > +		vcpu->dirty_gfns_count = size / sizeof(struct kvm_dirty_gfn);
+> > +		vcpu->dirty_gfns = mmap(NULL, size, PROT_READ | PROT_WRITE,
+> > +					MAP_SHARED, vcpu->fd, vm->page_size *
+> > +					KVM_DIRTY_LOG_PAGE_OFFSET);
 > 
-> By the end of the series this ends up in __debug_save_host_context which is
-> called for both VHE/nVHE - on the re-spin I'll make it not look so confusing.
 > 
-> Thanks,
+> It looks to me that we don't write to dirty_gfn.
 > 
-> Andrew Murray
-> 
-> > 
-> > 	M.
-> > -- 
-> > Jazz is not dead. It just smells funny...
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> So PROT_READ should be sufficient.
+
+Yes.  Thanks,
+
+-- 
+Peter Xu
+
