@@ -2,33 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5B4512A40B
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 20:45:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B53C912A41C
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 21:37:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726237AbfLXToi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Dec 2019 14:44:38 -0500
-Received: from mga05.intel.com ([192.55.52.43]:63816 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726184AbfLXToi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Dec 2019 14:44:38 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Dec 2019 11:44:37 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,352,1571727600"; 
-   d="scan'208";a="391951287"
-Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
-  by orsmga005.jf.intel.com with ESMTP; 24 Dec 2019 11:44:37 -0800
-Received: from orsmsx156.amr.corp.intel.com (10.22.240.22) by
- ORSMSX103.amr.corp.intel.com (10.22.225.130) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 24 Dec 2019 11:44:37 -0800
-Received: from orsmsx116.amr.corp.intel.com ([169.254.7.30]) by
- ORSMSX156.amr.corp.intel.com ([169.254.8.240]) with mapi id 14.03.0439.000;
- Tue, 24 Dec 2019 11:44:36 -0800
-From:   "Andersen, John S" <john.s.andersen@intel.com>
-To:     "liran.alon@oracle.com" <liran.alon@oracle.com>
-CC:     "jmattson@google.com" <jmattson@google.com>,
+        id S1726250AbfLXUhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Dec 2019 15:37:24 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:56358 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726201AbfLXUhY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Dec 2019 15:37:24 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBOKY2Jb043693;
+        Tue, 24 Dec 2019 20:35:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=lNCF4RZKGjVUIUjuki0UL6qlAXZJd6vY+N1gl3J6aqM=;
+ b=fE4cc+UILaBonFrEj8cDhuqR6xb7sykQY/opaEI1qmnFcuuMHC//LGkl+crrGKRtVaUG
+ p+9BnsmO6MCCTxVCpUlXjrbk34iGUWbEFKoUxW2kxNMZE6uIZRmWpAiaJIsOOpYnoD/o
+ ifRXup++98Bsm6K9o0ZDdsZkuRnR1QyyPTisz0Rjpy+vYtZ/7V8apolLCHse1lv3VTOo
+ 0UwJuYBlzCH+CkfjbrsX62PhDBfWQnqZc+82AP4FAb+hnNnqzo98/UkDc0pIiwK5EYoK
+ qMZ3SvaX8gzyDry+OQFCKFfsmdIyGT19FxBNpsylx84OlGSTSHKucf5z2s514XNRs5Mj PQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2x1c1qvur0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Dec 2019 20:35:51 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBOKTMWL151477;
+        Tue, 24 Dec 2019 20:35:50 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2x3amshsk7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Dec 2019 20:35:50 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBOKZnKJ019145;
+        Tue, 24 Dec 2019 20:35:49 GMT
+Received: from [192.168.14.112] (/109.64.214.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 24 Dec 2019 12:35:49 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [RESEND RFC 0/2] Paravirtualized Control Register pinning
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <73950aff51bdf908f75ffa5e5cb629fc1d4ebbb6.camel@intel.com>
+Date:   Tue, 24 Dec 2019 22:35:43 +0200
+Cc:     "jmattson@google.com" <jmattson@google.com>,
         "joro@8bytes.org" <joro@8bytes.org>, "bp@alien8.de" <bp@alien8.de>,
         "x86@kernel.org" <x86@kernel.org>,
         "vkuznets@redhat.com" <vkuznets@redhat.com>,
@@ -40,103 +59,219 @@ CC:     "jmattson@google.com" <jmattson@google.com>,
         "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
         "wanpengli@tencent.com" <wanpengli@tencent.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RESEND RFC 0/2] Paravirtualized Control Register pinning
-Thread-Topic: [RESEND RFC 0/2] Paravirtualized Control Register pinning
-Thread-Index: AQHVt2uK2a8jsyPFKUGPuWHWZO4ZBqfIV12AgAHldQA=
-Date:   Tue, 24 Dec 2019 19:44:36 +0000
-Message-ID: <73950aff51bdf908f75ffa5e5cb629fc1d4ebbb6.camel@intel.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <91A51486-9CE8-4041-AAB2-0507D42C5A72@oracle.com>
 References: <20191220192701.23415-1-john.s.andersen@intel.com>
-         <1EBCD42E-9109-47A1-B959-6363A509D48D@oracle.com>
-In-Reply-To: <1EBCD42E-9109-47A1-B959-6363A509D48D@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.19.9.42]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D12B104FD2B4D0428E3040CAFD2B0F03@intel.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+ <1EBCD42E-9109-47A1-B959-6363A509D48D@oracle.com>
+ <73950aff51bdf908f75ffa5e5cb629fc1d4ebbb6.camel@intel.com>
+To:     "Andersen, John S" <john.s.andersen@intel.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9481 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912240180
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9481 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912240181
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gTW9uLCAyMDE5LTEyLTIzIGF0IDE2OjQ4ICswMjAwLCBMaXJhbiBBbG9uIHdyb3RlOg0KPiA+
-IE9uIDIwIERlYyAyMDE5LCBhdCAyMToyNiwgSm9obiBBbmRlcnNlbiA8am9obi5zLmFuZGVyc2Vu
-QGludGVsLmNvbT4NCj4gPiB3cm90ZToNCj4gPiANCj4gPiBQaW5uaW5nIGlzIG5vdCBhY3RpdmUg
-d2hlbiBydW5uaW5nIGluIFNNTS4gRW50ZXJpbmcgU01NIGRpc2FibGVzDQo+ID4gcGlubmVkDQo+
-ID4gYml0cywgd3JpdGVzIHRvIGNvbnRyb2wgcmVnaXN0ZXJzIHdpdGhpbiBTTU0gd291bGQgdGhl
-cmVmb3JlDQo+ID4gdHJpZ2dlcg0KPiA+IGdlbmVyYWwgcHJvdGVjdGlvbiBmYXVsdHMgaWYgcGlu
-bmluZyB3YXMgZW5mb3JjZWQuDQo+IA0KPiBGb3IgY29tcGF0aWJpbGl0eSByZWFzb25zLCBpdOKA
-mXMgcmVhc29uYWJsZSB0aGF0IHBpbm5pbmcgd29u4oCZdCBiZQ0KPiBhY3RpdmUgd2hlbiBydW5u
-aW5nIGluIFNNTS4NCj4gSG93ZXZlciwgSSBkbyB0aGluayB3ZSBzaG91bGQgbm90IGFsbG93IHZT
-TU0gY29kZSB0byBjaGFuZ2UgcGlubmVkDQo+IHZhbHVlcyB3aGVuIHJldHVybmluZyBiYWNrIGZy
-b20gU01NLg0KPiBUaGlzIHdvdWxkIHByZXZlbnQgYSB2dWxuZXJhYmxlIHZTTUkgaGFuZGxlciBm
-cm9tIG1vZGlmeWluZyB2U01NDQo+IHN0YXRlLWFyZWEgdG8gbW9kaWZ5IENSNCB3aGVuIHJ1bm5p
-bmcgb3V0c2lkZSBvZiB2U01NLg0KPiBJIGJlbGlldmUgaW4gdGhpcyBjYXNlIGl04oCZcyBsZWdp
-dCB0byBqdXN0IGZvcmNpYmx5IHJlc3RvcmUgb3JpZ2luYWwNCj4gQ1IwL0NSNCBwaW5uZWQgdmFs
-dWVzLiBJZ25vcmluZyB2U01NIGNoYW5nZXMuDQo+IA0KDQpJbiBlbV9yc20gY291bGQgd2UganVz
-dCBPUiB3aXRoIHRoZSB2YWx1ZSBvZiB0aGUgUElOTkVEIE1TUnMgcmlnaHQNCmJlZm9yZSB0aGUg
-ZmluYWwgcmV0dXJuPw0KDQo+ID4gVGhlIGd1ZXN0IG1heSBuZXZlciByZWFkIHBpbm5lZCBiaXRz
-LiBJZiBhbiBhdHRhY2tlciB3ZXJlIHRvIHJlYWQNCj4gPiB0aGUNCj4gPiBDUiBwaW5uZWQgTVNS
-cywgdGhleSBtaWdodCBkZWNpZGUgdG8gcHJlZm9ybSBhbm90aGVyIGF0dGFjayB3aGljaA0KPiA+
-IHdvdWxkDQo+ID4gbm90IGNhdXNlIGEgZ2VuZXJhbCBwcm90ZWN0aW9uIGZhdWx0Lg0KPiANCj4g
-SSBkaXNhZ3JlZSB3aXRoIHRoaXMgc3RhdGVtZW50Lg0KPiBBbiBhdHRhY2tlciBrbm93cyB3aGF0
-IGlzIHRoZSBzeXN0ZW0gaXQgaXMgYXR0YWNraW5nIGFuZCBjYW4gZGVkdWNlDQo+IGJ5IHRoYXQg
-d2hpY2ggYml0cyBpdCBwaW5uZWTigKYNCj4gVGhlcmVmb3JlLCBwcm90ZWN0aW5nIGZyb20gZ3Vl
-c3QgcmVhZGluZyB0aGVzZSBpcyBub3QgaW1wb3J0YW50IGF0DQo+IGFsbC4NCj4gDQoNClN1cmUs
-IEknbGwgbWFrZSBpdCByZWFkYWJsZS4NCg0KPiA+IFNob3VsZCB1c2Vyc3BhY2UgZXhwb3NlIHRo
-ZSBDUiBwaW5pbmcgQ1BVSUQgZmVhdHVyZSBiaXQsIGl0IG11c3QNCj4gPiB6ZXJvIENSDQo+ID4g
-cGlubmVkIE1TUnMgb24gcmVib290LiBJZiBpdCBkb2VzIG5vdCwgaXQgcnVucyB0aGUgcmlzayBv
-ZiBoYXZpbmcNCj4gPiB0aGUNCj4gPiBndWVzdCBlbmFibGUgcGlubmluZyBhbmQgc3Vic2VxdWVu
-dGx5IGNhdXNlIGdlbmVyYWwgcHJvdGVjdGlvbg0KPiA+IGZhdWx0cyBvbg0KPiA+IG5leHQgYm9v
-dCBkdWUgdG8gZWFybHkgYm9vdCBjb2RlIHNldHRpbmcgY29udHJvbCByZWdpc3RlcnMgdG8NCj4g
-PiB2YWx1ZXMNCj4gPiB3aGljaCBkbyBub3QgY29udGFpbiB0aGUgcGlubmVkIGJpdHMuDQo+IA0K
-PiBXaHkgcmVzZXQgQ1IgcGlubmVkIE1TUnMgYnkgdXNlcnNwYWNlIGluc3RlYWQgb2YgS1ZNIElO
-SVQgaGFuZGxpbmc/DQo+IA0KPiA+IFdoZW4gcnVubmluZyB3aXRoIEtWTSBndWVzdCBzdXBwb3J0
-IGFuZCBwYXJhdmlydHVhbGl6ZWQgQ1IgcGlubmluZw0KPiA+IGVuYWJsZWQsIHBhcmF2aXJ0dWFs
-aXplZCBhbmQgZXhpc3RpbmcgcGlubmluZyBhcmUgc2V0dXAgYXQgdGhlIHNhbWUNCj4gPiBwb2lu
-dCBvbiB0aGUgYm9vdCBDUFUuIE5vbi1ib290IENQVXMgc2V0dXAgcGlubmluZyB1cG9uDQo+ID4g
-aWRlbnRpZmljYXRpb24uDQo+ID4gDQo+ID4gR3Vlc3RzIHVzaW5nIHRoZSBrZXhlYyBzeXN0ZW0g
-Y2FsbCBjdXJyZW50bHkgZG8gbm90IHN1cHBvcnQNCj4gPiBwYXJhdmlydHVhbGl6ZWQgY29udHJv
-bCByZWdpc3RlciBwaW5uaW5nLiBUaGlzIGlzIGR1ZSB0byBlYXJseSBib290DQo+ID4gY29kZSB3
-cml0aW5nIGtub3duIGdvb2QgdmFsdWVzIHRvIGNvbnRyb2wgcmVnaXN0ZXJzLCB0aGVzZSB2YWx1
-ZXMNCj4gPiBkbw0KPiA+IG5vdCBjb250YWluIHRoZSBwcm90ZWN0ZWQgYml0cy4gVGhpcyBpcyBk
-dWUgdG8gQ1BVIGZlYXR1cmUNCj4gPiBpZGVudGlmaWNhdGlvbiBiZWluZyBkb25lIGF0IGEgbGF0
-ZXIgdGltZSwgd2hlbiB0aGUga2VybmVsIHByb3Blcmx5DQo+ID4gY2hlY2tzIGlmIGl0IGNhbiBl
-bmFibGUgcHJvdGVjdGlvbnMuDQo+ID4gDQo+ID4gTW9zdCBkaXN0cmlidXRpb25zIGVuYWJsZSBr
-ZXhlYy4gSG93ZXZlciwga2V4ZWMgY291bGQgYmUgbWFkZSBib290DQo+ID4gdGltZQ0KPiA+IGRp
-c2FibGVhYmxlLiBJbiB0aGlzIGNhc2UgaWYgYSB1c2VyIGhhcyBkaXNhYmxlZCBrZXhlYyBhdCBi
-b290IHRpbWUNCj4gPiB0aGUgZ3Vlc3Qgd2lsbCByZXF1ZXN0IHRoYXQgcGFyYXZpcnR1YWxpemVk
-IGNvbnRyb2wgcmVnaXN0ZXINCj4gPiBwaW5uaW5nDQo+ID4gYmUgZW5hYmxlZC4gVGhpcyB3b3Vs
-ZCBleHBhbmQgdGhlIHVzZXJiYXNlIHRvIHVzZXJzIG9mIG1ham9yDQo+ID4gZGlzdHJpYnV0aW9u
-cy4NCj4gPiANCj4gPiBQYXJhdmlydHVhbGl6ZWQgQ1IgcGlubmluZyB3aWxsIGxpa2VseSBiZSBp
-bmNvbXBhdGlibGUgd2l0aCBrZXhlYw0KPiA+IGZvcg0KPiA+IHRoZSBmb3Jlc2VlYWJsZSBmdXR1
-cmUuIEVhcmx5IGJvb3QgY29kZSBjb3VsZCBwb3NzaWJseSBiZSBjaGFuZ2VkDQo+ID4gdG8NCj4g
-PiBub3QgY2xlYXIgcHJvdGVjdGVkIGJpdHMuIEhvd2V2ZXIsIGEga2VybmVsIHRoYXQgcmVxdWVz
-dHMgQ1IgYml0cw0KPiA+IGJlDQo+ID4gcGlubmVkIGNhbid0IGtub3cgaWYgdGhlIGtlcm5lbCBp
-dCdzIGtleGVjaW5nIGhhcyBiZWVuIHVwZGF0ZWQgdG8NCj4gPiBub3QNCj4gPiBjbGVhciBwcm90
-ZWN0ZWQgYml0cy4gVGhpcyB3b3VsZCByZXN1bHQgaW4gdGhlIGtlcm5lbCBiZWluZyBrZXhlYydk
-DQo+ID4gYWxtb3N0IGltbWVkaWF0ZWx5IHJlY2VpdmluZyBhIGdlbmVyYWwgcHJvdGVjdGlvbiBm
-YXVsdC4NCj4gDQo+IEluc3RlYWQgb2YgZGlzYWJsaW5nIGtleGVjIGVudGlyZWx5LCBJIHRoaW5r
-IGl0IG1ha2VzIG1vcmUgc2Vuc2UgdG8NCj4gaW52ZW50DQo+IHNvbWUgZ2VuZXJpYyBtZWNoYW5p
-c20gaW4gd2hpY2ggbmV3IGtlcm5lbCBjYW4gZGVzY3JpYmUgdG8gb2xkIGtlcm5lbA0KPiBhIHNl
-dCBvZiBmbGFncyB0aGF0IHNwZWNpZmllcyB3aGljaCBmZWF0dXJlcyBoYW5kLW92ZXIgaXQgc3Vw
-cG9ydHMuDQo+IE9uZSBvZiB0aGVtDQo+IGJlaW5nIHBpbm5lZCBDUnMuDQo+IA0KPiBGb3IgZXhh
-bXBsZSwgaXNu4oCZdCB0aGlzIGFsc28gcmVsZXZhbnQgZm9yIElPTU1VIERNQSBwcm90ZWN0aW9u
-Pw0KPiBpLmUuIERvZXNu4oCZdCBvbGQga2VybmVsIG5lZWQgdG8ga25vdyBpZiBpdCBzaG91bGQg
-ZGlzYWJsZSBvciBlbmFibGUNCj4gSU9NTVUgRE1BUg0KPiBiZWZvcmUga2V4ZWMgdG8gbmV3IGtl
-cm5lbD8gU2ltaWxhciB0byBFREsyIElPTU1VIERNQSBwcm90ZWN0aW9uDQo+IGhhbmQtb3Zlcj8N
-Cg0KR3JlYXQgaWRlYS4NCg0KTWFraW5nIGtleGVjIHdvcmsgd2lsbCByZXF1aXJlIGNoYW5nZXMg
-dG8gdGhlc2UgZmlsZXMgYW5kIG1heWJlIG1vcmU6DQoNCmFyY2gveDg2L2Jvb3QvY29tcHJlc3Nl
-ZC9oZWFkXzY0LlMNCmFyY2gveDg2L2tlcm5lbC9oZWFkXzY0LlMNCmFyY2gveDg2L2tlcm5lbC9y
-ZWxvY2F0ZV9rZXJuZWxfNjQuUw0KDQpXaGljaCBteSBwcmV2aW91cyBhdHRlbXB0cyBzaG93ZWQg
-ZGlmZmVyZW50IHJlc3VsdHMgd2hlbiBydW5uaW5nDQp2aXJ0dWFsaXplZCB2cy4gdW52aXJ0dWFs
-aXplZC4gU3BlY2lmaWNpdHkgZGlmZmVyZW50IGJlaGF2aW9yIHdpdGggU01BUA0KYW5kIFVNSVAg
-Yml0cy4NCg0KVGhpcyB3b3VsZCBiZSBhIGxvbmdlciBwcm9jZXNzIHRob3VnaC4gQXMgdmFsaWRh
-dGluZyB0aGF0IGV2ZXJ5dGhpbmcNCnN0aWxsIHdvcmtzIGluIGJvdGggdGhlIFZNIGFuZCBvbiBw
-aHlzaWNhbCBob3N0cyB3aWxsIGJlIHJlcXVpcmVkLiBBcw0KaXQgc3RhbmRzIHRoaXMgcGF0Y2hz
-ZXQgY291bGQgcGljayB1cCBhIGZhaXJseSBsYXJnZSB1c2VyYmFzZSB2aWEgdGhlDQp2aXJ0dWFs
-aXplZCBjb250YWluZXIgcHJvamVjdHMuIFNob3VsZCB3ZSBwdXJzdWUga2V4ZWMgaW4gdGhpcyBw
-YXRjaHNldA0Kb3IgYSBsYXRlciBvbmU/DQoNClRoYW5rcywNCkpvaG4NCg==
+
+
+> On 24 Dec 2019, at 21:44, Andersen, John S <john.s.andersen@intel.com> =
+wrote:
+>=20
+> On Mon, 2019-12-23 at 16:48 +0200, Liran Alon wrote:
+>>> On 20 Dec 2019, at 21:26, John Andersen <john.s.andersen@intel.com>
+>>> wrote:
+>>>=20
+>>> Pinning is not active when running in SMM. Entering SMM disables
+>>> pinned
+>>> bits, writes to control registers within SMM would therefore
+>>> trigger
+>>> general protection faults if pinning was enforced.
+>>=20
+>> For compatibility reasons, it=E2=80=99s reasonable that pinning =
+won=E2=80=99t be
+>> active when running in SMM.
+>> However, I do think we should not allow vSMM code to change pinned
+>> values when returning back from SMM.
+>> This would prevent a vulnerable vSMI handler from modifying vSMM
+>> state-area to modify CR4 when running outside of vSMM.
+>> I believe in this case it=E2=80=99s legit to just forcibly restore =
+original
+>> CR0/CR4 pinned values. Ignoring vSMM changes.
+>>=20
+>=20
+> In em_rsm could we just OR with the value of the PINNED MSRs right
+> before the final return?
+
+Not exactly.
+
+If I understand correctly, the proposed mechanism should also allow =
+pinning specific
+system registers (e.g. CR0/CR4) bits to either being cleared or being =
+set. Not necessarily being set.
+As kvm_set_cr0() & kvm_set_cr4() were modified to only check if pinned =
+bit changed value.
+
+Therefore, you should modify enter_smm() to save current pinned bits =
+values
+and then silently restore their values on em_rsm().
+
+>=20
+>>> The guest may never read pinned bits. If an attacker were to read
+>>> the
+>>> CR pinned MSRs, they might decide to preform another attack which
+>>> would
+>>> not cause a general protection fault.
+>>=20
+>> I disagree with this statement.
+>> An attacker knows what is the system it is attacking and can deduce
+>> by that which bits it pinned=E2=80=A6
+>> Therefore, protecting from guest reading these is not important at
+>> all.
+>>=20
+>=20
+> Sure, I'll make it readable.
+>=20
+>>> Should userspace expose the CR pining CPUID feature bit, it must
+>>> zero CR
+>>> pinned MSRs on reboot. If it does not, it runs the risk of having
+>>> the
+>>> guest enable pinning and subsequently cause general protection
+>>> faults on
+>>> next boot due to early boot code setting control registers to
+>>> values
+>>> which do not contain the pinned bits.
+>>=20
+>> Why reset CR pinned MSRs by userspace instead of KVM INIT handling?
+>>=20
+>>> When running with KVM guest support and paravirtualized CR pinning
+>>> enabled, paravirtualized and existing pinning are setup at the same
+>>> point on the boot CPU. Non-boot CPUs setup pinning upon
+>>> identification.
+>>>=20
+>>> Guests using the kexec system call currently do not support
+>>> paravirtualized control register pinning. This is due to early boot
+>>> code writing known good values to control registers, these values
+>>> do
+>>> not contain the protected bits. This is due to CPU feature
+>>> identification being done at a later time, when the kernel properly
+>>> checks if it can enable protections.
+>>>=20
+>>> Most distributions enable kexec. However, kexec could be made boot
+>>> time
+>>> disableable. In this case if a user has disabled kexec at boot time
+>>> the guest will request that paravirtualized control register
+>>> pinning
+>>> be enabled. This would expand the userbase to users of major
+>>> distributions.
+>>>=20
+>>> Paravirtualized CR pinning will likely be incompatible with kexec
+>>> for
+>>> the foreseeable future. Early boot code could possibly be changed
+>>> to
+>>> not clear protected bits. However, a kernel that requests CR bits
+>>> be
+>>> pinned can't know if the kernel it's kexecing has been updated to
+>>> not
+>>> clear protected bits. This would result in the kernel being kexec'd
+>>> almost immediately receiving a general protection fault.
+>>=20
+>> Instead of disabling kexec entirely, I think it makes more sense to
+>> invent
+>> some generic mechanism in which new kernel can describe to old kernel
+>> a set of flags that specifies which features hand-over it supports.
+>> One of them
+>> being pinned CRs.
+>>=20
+>> For example, isn=E2=80=99t this also relevant for IOMMU DMA =
+protection?
+>> i.e. Doesn=E2=80=99t old kernel need to know if it should disable or =
+enable
+>> IOMMU DMAR
+>> before kexec to new kernel? Similar to EDK2 IOMMU DMA protection
+>> hand-over?
+>=20
+> Great idea.
+>=20
+> Making kexec work will require changes to these files and maybe more:
+>=20
+> arch/x86/boot/compressed/head_64.S
+> arch/x86/kernel/head_64.S
+> arch/x86/kernel/relocate_kernel_64.S
+>=20
+> Which my previous attempts showed different results when running
+> virtualized vs. unvirtualized. Specificity different behavior with =
+SMAP
+> and UMIP bits.
+
+I didn=E2=80=99t understand why there should be different results when =
+running virtualized or not.
+
+What I suggested is to just add metadata in a vmlinux ELF section that =
+will be designated to
+describe vmlinux handover capabilities.
+
+Then, kexec functionality can be modified to read this section before =
+loading & jumping
+to new kernel vmlinux.
+
+In the context of this patch-set, this section will specify a flag of if =
+new vmlinux supports
+CR0/CR4 pinning hand-over. If not and current kernel already pinned =
+these values,
+kexec should just return failure.
+
+Just for example, in the context of IOMMU DMA protection hand-over, =
+kexec will
+use another flag to new of new vmlinux supports IOMMU DMA protection =
+hand-over,
+and if not, make sure to disable IOMMU before jumping to new vmlinux.
+
+>=20
+> This would be a longer process though. As validating that everything
+> still works in both the VM and on physical hosts will be required. As
+> it stands this patchset could pick up a fairly large userbase via the
+> virtualized container projects. Should we pursue kexec in this =
+patchset
+> or a later one?
+
+In my opinion, this should be handled as part of this patch-series.
+Otherwise, you basically introduce a kernel change that breaks existing =
+functionality
+in unpredictable manner to user.
+
+i.e. It=E2=80=99s ok of kernel would haven=E2=80=99t allowed to use =
+system registers pinning functionality
+unless user also configured at boot-time that it disables kexec. But =
+it=E2=80=99s not ok for
+kernel behaviour to change such that kexec suddenly crashes if kernel =
+was upgraded
+to now use system registers pinning.
+
+My personal opinion though is that kexec should first be enhanced to =
+read hand-over metadata
+as I described. And only then apply this patch-series which also =
+modifies kexec to define and use
+one of the hand-over bits as I mentioned above. But I would like to hear =
+additional opinions on this.
+
+In addition, I would like to understand Linux security maintainers point =
+of view on the comment
+I mentioned in another reply regarding how this mechanism is implemented =
+in Hyper-V.
+
+-Liran
+
+>=20
+> Thanks,
+> John
+
