@@ -2,96 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D791712A2F6
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 16:24:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7A0212A30D
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 16:48:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726214AbfLXPY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Dec 2019 10:24:28 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59936 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726183AbfLXPY2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Dec 2019 10:24:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1577201066;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ywK49erekGqxd3CUaRhTxMhJ8oeIv01btWZagZa8bg8=;
-        b=a9JLJ+bYduFsApHgR1fk9iRvh6RIqXKjWk5+qIMwaxcFl4iS9cIpOHGeeVvD0aZfmcKC/x
-        78p61U6LV5A9us6zY++P8kjEN5FLnjwpFj1h6ZKJZqNsHYhynk8gUdJPM8vu9av5uyQcat
-        WWGymKbVsSiOQ3vYKHhS+1TMxTenTEY=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-X8kkaLBkMLSy1dsyypkWdw-1; Tue, 24 Dec 2019 10:24:23 -0500
-X-MC-Unique: X8kkaLBkMLSy1dsyypkWdw-1
-Received: by mail-qt1-f199.google.com with SMTP id y7so13256335qto.8
-        for <kvm@vger.kernel.org>; Tue, 24 Dec 2019 07:24:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=ywK49erekGqxd3CUaRhTxMhJ8oeIv01btWZagZa8bg8=;
-        b=tV9hcWbse3efABdaWQkD4dGpE1fKD0qu0HxlEYKs5Bc75xOi/4gmjrktOigH5syKD6
-         q4o4SkT+Za4cvEvfYDPqcazH0FO9OYEUDX1eA/lb0sl38aFGDP6eXFU1uvEKEJdrEntT
-         LIIZitZ/G8Y5ccLNJGyaWN4orDY5XWfEgMMoAquFrYVL501V0IDAMW5qLtjochnFmf36
-         pgNwGvAlr59kPChZFB+rCOCY8jRxRDoCog4cGKMZcnIqXXgxZB95giKxOA8xeFGEgB52
-         8zu8Me+iymq6bJq0a/u0RiIn2fxJieVt7yY//a3ljI+pPkbjOkYMy3ZKfOVZLrThCiXi
-         fL9w==
-X-Gm-Message-State: APjAAAXHWEhsgcWARqOj0sD/uonZ444H1+Ti7nLw8IJcZcuOuHKxZWb3
-        ceaT6/JOhj/S7LEX/K4S5XdHkbEASoQJHB/+ET3aUDgEi7iRYtbgQ10kVsVvuJzJekKAAxrDzW9
-        /BzVMA/lV1APb
-X-Received: by 2002:a0c:b515:: with SMTP id d21mr29202510qve.106.1577201063041;
-        Tue, 24 Dec 2019 07:24:23 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxROSsqGDowb78aAglNEiZ33GnO6TB2pNhWXqE4OuKHD3QbdllhHpK3icOUHHcvOCY9uvQPqQ==
-X-Received: by 2002:a0c:b515:: with SMTP id d21mr29202468qve.106.1577201062364;
-        Tue, 24 Dec 2019 07:24:22 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c0:3f::2])
-        by smtp.gmail.com with ESMTPSA id n190sm7034896qke.90.2019.12.24.07.24.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Dec 2019 07:24:21 -0800 (PST)
-Date:   Tue, 24 Dec 2019 10:24:20 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dr David Alan Gilbert <dgilbert@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RESEND v2 15/17] KVM: selftests: Add dirty ring buffer
- test
-Message-ID: <20191224152420.GB17176@xz-x1>
-References: <20191221020445.60476-1-peterx@redhat.com>
- <20191221020445.60476-5-peterx@redhat.com>
- <b0dc3d30-7fa5-3896-6905-9b1cb51d8d6c@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b0dc3d30-7fa5-3896-6905-9b1cb51d8d6c@redhat.com>
+        id S1726375AbfLXPsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Dec 2019 10:48:38 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:47224 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726140AbfLXPsh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Dec 2019 10:48:37 -0500
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=big-swifty.misterjones.org)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1ijmQD-00050u-Uq; Tue, 24 Dec 2019 16:48:34 +0100
+Date:   Tue, 24 Dec 2019 15:48:33 +0000
+Message-ID: <8636d9iv1q.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Murray <andrew.murray@arm.com>
+Cc:     kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 08/18] arm64: KVM: add support to save/restore SPE profiling buffer controls
+In-Reply-To: <20191224151739.GP42593@e119886-lin.cambridge.arm.com>
+References: <20191220143025.33853-1-andrew.murray@arm.com>
+        <20191220143025.33853-9-andrew.murray@arm.com>
+        <20191221135755.70a6e8df@why>
+        <20191224104929.GE42593@e119886-lin.cambridge.arm.com>
+        <20191224151739.GP42593@e119886-lin.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: andrew.murray@arm.com, kvm@vger.kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, sudeep.holla@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 24, 2019 at 02:50:48PM +0800, Jason Wang wrote:
+On Tue, 24 Dec 2019 15:17:39 +0000,
+Andrew Murray <andrew.murray@arm.com> wrote:
 > 
-> On 2019/12/21 上午10:04, Peter Xu wrote:
-> > Add the initial dirty ring buffer test.
+> On Tue, Dec 24, 2019 at 10:49:30AM +0000, Andrew Murray wrote:
+> > On Sat, Dec 21, 2019 at 01:57:55PM +0000, Marc Zyngier wrote:
+> > > On Fri, 20 Dec 2019 14:30:15 +0000
+> > > Andrew Murray <andrew.murray@arm.com> wrote:
+> > > 
+> > > > From: Sudeep Holla <sudeep.holla@arm.com>
+> > > > 
+> > > > Currently since we don't support profiling using SPE in the guests,
+> > > > we just save the PMSCR_EL1, flush the profiling buffers and disable
+> > > > sampling. However in order to support simultaneous sampling both in
+> > > 
+> > > Is the sampling actually simultaneous? I don't believe so (the whole
+> > > series would be much simpler if it was).
 > > 
-> > The current test implements the userspace dirty ring collection, by
-> > only reaping the dirty ring when the ring is full.
+> > No the SPE is used by either the guest or host at any one time. I guess
+> > the term simultaneous was used to refer to illusion given to both guest
+> > and host that they are able to use it whenever they like. I'll update
+> > the commit message to drop the magic.
+> >  
 > > 
-> > So it's still running asynchronously like this:
-> 
-> 
-> I guess you meant "synchronously" here.
+> > > 
+> > > > the host and guests, we need to save and reatore the complete SPE
+> > > 
+> > > s/reatore/restore/
+> > 
+> > Noted.
+> > 
+> > 
+> > > 
+> > > > profiling buffer controls' context.
+> > > > 
+> > > > Let's add the support for the same and keep it disabled for now.
+> > > > We can enable it conditionally only if guests are allowed to use
+> > > > SPE.
+> > > > 
+> > > > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> > > > [ Clear PMBSR bit when saving state to prevent spurious interrupts ]
+> > > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > > > ---
+> > > >  arch/arm64/kvm/hyp/debug-sr.c | 51 +++++++++++++++++++++++++++++------
+> > > >  1 file changed, 43 insertions(+), 8 deletions(-)
+> > > > 
+> > > > diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> > > > index 8a70a493345e..12429b212a3a 100644
+> > > > --- a/arch/arm64/kvm/hyp/debug-sr.c
+> > > > +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> > > > @@ -85,7 +85,8 @@
+> > > >  	default:	write_debug(ptr[0], reg, 0);			\
+> > > >  	}
+> > > >  
+> > > > -static void __hyp_text __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt)
+> > > > +static void __hyp_text
+> > > > +__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> > > 
+> > > nit: don't split lines like this if you can avoid it. You can put the
+> > > full_ctxt parameter on a separate line instead.
+> > 
+> > Yes understood.
+> > 
+> > 
+> > > 
+> > > >  {
+> > > >  	u64 reg;
+> > > >  
+> > > > @@ -102,22 +103,46 @@ static void __hyp_text __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt)
+> > > >  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
+> > > >  		return;
+> > > >  
+> > > > -	/* No; is the host actually using the thing? */
+> > > > -	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
+> > > > -	if (!(reg & BIT(SYS_PMBLIMITR_EL1_E_SHIFT)))
+> > > > +	/* Save the control register and disable data generation */
+> > > > +	ctxt->sys_regs[PMSCR_EL1] = read_sysreg_el1(SYS_PMSCR);
+> > > > +
+> > > > +	if (!ctxt->sys_regs[PMSCR_EL1])
+> > > 
+> > > Shouldn't you check the enable bits instead of relying on the whole
+> > > thing being zero?
+> > 
+> > Yes that would make more sense (E1SPE and E0SPE).
+> > 
+> > I feel that this check makes an assumption about the guest/host SPE
+> > driver... What happens if the SPE driver writes to some SPE registers
+> > but doesn't enable PMSCR? If the guest is also using SPE then those
+> > writes will be lost, when the host returns and the SPE driver enables
+> > SPE it won't work.
+> >
+> > With a quick look at the SPE driver I'm not sure this will happen, but
+> > even so it makes me nervous relying on these assumptions. I wonder if
+> > this risk is present in other devices?
 
-Yes, definitely. :)
+As a rule of thumb, you should always save whatever you're about to
+overwrite if the registers are not under exclusive control of KVM. No
+exception.
+
+So if the guest is willing to use SPE *and* that it isn't enabled on
+the host, these registers have to be saved on vcpu_load() and restored
+on vcpu_put().
+
+If SPE is enabled on the host, then trapping has to be enabled, and no
+tracing occurs in the guest for this time slice.
+
+> In fact, this may be a good reason to trap the SPE registers - this would
+> allow you to conditionally save/restore based on a dirty bit. It would
+> also allow you to re-evaluate the SPE interrupt (for example when the guest
+> clears the status register) and thus potentially reduce any black hole.
+
+I don't see what trapping buys you in the expected case (where the
+guest is tracing and the host isn't). To clear PMBSR_EL1.S, you first
+need to know that an interrupt has fired. So this brings you exactly
+nothing in this particular case, and just adds overhead for everything
+else. The whole point of the architecture is that in the non-contended
+case, we can give SPE to the guest and mostly forget about it.
+
+I strongly suggest that you start with the simplest possible, non
+broken implementation. It doesn't matter if the black holes last for
+seconds for now. Once you have something that looks reasonable, we can
+evaluate how to improve on it by throwing actual HW and workloads at
+it.
+
+	M.
 
 -- 
-Peter Xu
-
+Jazz is not dead, it just smells funny.
