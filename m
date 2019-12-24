@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BB7AD12A2EE
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 16:22:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D791712A2F6
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 16:24:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726259AbfLXPWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Dec 2019 10:22:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33846 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726140AbfLXPWv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Dec 2019 10:22:51 -0500
+        id S1726214AbfLXPY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Dec 2019 10:24:28 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59936 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726183AbfLXPY2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Dec 2019 10:24:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1577200969;
+        s=mimecast20190719; t=1577201066;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MuI7b+nn3459lNvQkwSbmuvlvnSiMF65nG57H/ptVY8=;
-        b=aqCGKHMSg0Dq51SuGimgMrNqN/GqJMzJv2hgbfNuvAXFtX0nFKI7D9b/TNDuPSoZ/yBXTQ
-        vFFdfwhsRn2AzizwRzSvGw0rSU0whtJPdVSb/zoL3hUoLecceZ49AclW6Tb03KYFq6CDoy
-        9iBpvg66aWW8v43ReewHEO7/R6VbS30=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-qA4cHORhOemkmn_YEN1Qcw-1; Tue, 24 Dec 2019 10:22:48 -0500
-X-MC-Unique: qA4cHORhOemkmn_YEN1Qcw-1
-Received: by mail-qv1-f69.google.com with SMTP id l1so13365037qvu.13
-        for <kvm@vger.kernel.org>; Tue, 24 Dec 2019 07:22:48 -0800 (PST)
+        bh=ywK49erekGqxd3CUaRhTxMhJ8oeIv01btWZagZa8bg8=;
+        b=a9JLJ+bYduFsApHgR1fk9iRvh6RIqXKjWk5+qIMwaxcFl4iS9cIpOHGeeVvD0aZfmcKC/x
+        78p61U6LV5A9us6zY++P8kjEN5FLnjwpFj1h6ZKJZqNsHYhynk8gUdJPM8vu9av5uyQcat
+        WWGymKbVsSiOQ3vYKHhS+1TMxTenTEY=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-30-X8kkaLBkMLSy1dsyypkWdw-1; Tue, 24 Dec 2019 10:24:23 -0500
+X-MC-Unique: X8kkaLBkMLSy1dsyypkWdw-1
+Received: by mail-qt1-f199.google.com with SMTP id y7so13256335qto.8
+        for <kvm@vger.kernel.org>; Tue, 24 Dec 2019 07:24:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MuI7b+nn3459lNvQkwSbmuvlvnSiMF65nG57H/ptVY8=;
-        b=VQITdDiD5Lt0+t3IRafnW3v+TJasR25j8Q/DQQ+BMdjZYH82iQ0OWs7R4B5boeKzgU
-         fQRTPjiGPEE/fqN4u3Kga6J9AJ+46aJhyqUm2S/H9A2uYdsXGnnWvmdvxI1a6UoEUU2K
-         e/2ghMzPjotO77SmtUf5xNjfQZUyScH3eOtxZ9c3VFr/g38jMNUu2dhmuBgaqtru9J7f
-         j24OEQDOsOT5o1Oj6SnPtVYsn2OrCpq34xnR0lJEVUJUBDtq1ynPWknfgnlMiu2MLgUy
-         sd45zcOfSq0pAI0tVuhV9pMla56dLLn3haDch4oVDrt2QVbWWg6bvdWiDuaJYlNFyPiM
-         P9AA==
-X-Gm-Message-State: APjAAAUJsmQ3bdN3glQKYxGnaekGV/ZyqKqvCtLrY1rRUGO9C+dP8LmI
-        u/slwYPQchX7SRmw+CbQbNM0ota0mAKOqyOteYJpWUoJcdJo3GMNKdK/5VjMw8kekLrEDm+POsg
-        kkiU1mGOvFJry
-X-Received: by 2002:a05:620a:1014:: with SMTP id z20mr30191052qkj.196.1577200967807;
-        Tue, 24 Dec 2019 07:22:47 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxm9X0Ulp164MwCgzA6asjIcE8aiO1u/sC2ZnBoMfHFDI+t0HcMgrLoAcn6xNfXVagojVgfow==
-X-Received: by 2002:a05:620a:1014:: with SMTP id z20mr30191028qkj.196.1577200967586;
-        Tue, 24 Dec 2019 07:22:47 -0800 (PST)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=ywK49erekGqxd3CUaRhTxMhJ8oeIv01btWZagZa8bg8=;
+        b=tV9hcWbse3efABdaWQkD4dGpE1fKD0qu0HxlEYKs5Bc75xOi/4gmjrktOigH5syKD6
+         q4o4SkT+Za4cvEvfYDPqcazH0FO9OYEUDX1eA/lb0sl38aFGDP6eXFU1uvEKEJdrEntT
+         LIIZitZ/G8Y5ccLNJGyaWN4orDY5XWfEgMMoAquFrYVL501V0IDAMW5qLtjochnFmf36
+         pgNwGvAlr59kPChZFB+rCOCY8jRxRDoCog4cGKMZcnIqXXgxZB95giKxOA8xeFGEgB52
+         8zu8Me+iymq6bJq0a/u0RiIn2fxJieVt7yY//a3ljI+pPkbjOkYMy3ZKfOVZLrThCiXi
+         fL9w==
+X-Gm-Message-State: APjAAAXHWEhsgcWARqOj0sD/uonZ444H1+Ti7nLw8IJcZcuOuHKxZWb3
+        ceaT6/JOhj/S7LEX/K4S5XdHkbEASoQJHB/+ET3aUDgEi7iRYtbgQ10kVsVvuJzJekKAAxrDzW9
+        /BzVMA/lV1APb
+X-Received: by 2002:a0c:b515:: with SMTP id d21mr29202510qve.106.1577201063041;
+        Tue, 24 Dec 2019 07:24:23 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxROSsqGDowb78aAglNEiZ33GnO6TB2pNhWXqE4OuKHD3QbdllhHpK3icOUHHcvOCY9uvQPqQ==
+X-Received: by 2002:a0c:b515:: with SMTP id d21mr29202468qve.106.1577201062364;
+        Tue, 24 Dec 2019 07:24:22 -0800 (PST)
 Received: from xz-x1 ([2607:9880:19c0:3f::2])
-        by smtp.gmail.com with ESMTPSA id s11sm6954216qkg.99.2019.12.24.07.22.46
+        by smtp.gmail.com with ESMTPSA id n190sm7034896qke.90.2019.12.24.07.24.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Dec 2019 07:22:46 -0800 (PST)
-Date:   Tue, 24 Dec 2019 10:22:45 -0500
+        Tue, 24 Dec 2019 07:24:21 -0800 (PST)
+Date:   Tue, 24 Dec 2019 10:24:20 -0500
 From:   Peter Xu <peterx@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -61,76 +63,34 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>
 Subject: Re: [PATCH RESEND v2 15/17] KVM: selftests: Add dirty ring buffer
  test
-Message-ID: <20191224152245.GA17176@xz-x1>
+Message-ID: <20191224152420.GB17176@xz-x1>
 References: <20191221020445.60476-1-peterx@redhat.com>
  <20191221020445.60476-5-peterx@redhat.com>
- <521fcdf6-db45-566d-7a83-e8c7a22cf7c5@redhat.com>
+ <b0dc3d30-7fa5-3896-6905-9b1cb51d8d6c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <521fcdf6-db45-566d-7a83-e8c7a22cf7c5@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b0dc3d30-7fa5-3896-6905-9b1cb51d8d6c@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 24, 2019 at 02:18:37PM +0800, Jason Wang wrote:
+On Tue, Dec 24, 2019 at 02:50:48PM +0800, Jason Wang wrote:
+> 
+> On 2019/12/21 上午10:04, Peter Xu wrote:
+> > Add the initial dirty ring buffer test.
+> > 
+> > The current test implements the userspace dirty ring collection, by
+> > only reaping the dirty ring when the ring is full.
+> > 
+> > So it's still running asynchronously like this:
+> 
+> 
+> I guess you meant "synchronously" here.
 
-[...]
-
-> > +	while (fetch != avail) {
-> > +		cur = &dirty_gfns[fetch % TEST_DIRTY_RING_COUNT];
-> > +		TEST_ASSERT(cur->pad == 0, "Padding is non-zero: 0x%x", cur->pad);
-> > +		TEST_ASSERT(cur->slot == slot, "Slot number didn't match: "
-> > +			    "%u != %u", cur->slot, slot);
-> > +		TEST_ASSERT(cur->offset < num_pages, "Offset overflow: "
-> > +			    "0x%llx >= 0x%llx", cur->offset, num_pages);
-> > +		DEBUG("fetch 0x%x offset 0x%llx\n", fetch, cur->offset);
-> > +		test_and_set_bit(cur->offset, bitmap);
-> > +		fetch++;
-> 
-> 
-> Any reason to use test_and_set_bit()? I guess set_bit() should be
-> sufficient.
-
-Yes.
-
-> 
-> 
-> > +		count++;
-> > +	}
-> > +	WRITE_ONCE(indices->fetch_index, fetch);
-> 
-> 
-> Is WRITE_ONCE a must here?
-
-No.
-
-[...]
-
-> > +void *vcpu_map_dirty_ring(struct kvm_vm *vm, uint32_t vcpuid)
-> > +{
-> > +	struct vcpu *vcpu;
-> > +	uint32_t size = vm->dirty_ring_size;
-> > +
-> > +	TEST_ASSERT(size > 0, "Should enable dirty ring first");
-> > +
-> > +	vcpu = vcpu_find(vm, vcpuid);
-> > +
-> > +	TEST_ASSERT(vcpu, "Cannot find vcpu %u", vcpuid);
-> > +
-> > +	if (!vcpu->dirty_gfns) {
-> > +		vcpu->dirty_gfns_count = size / sizeof(struct kvm_dirty_gfn);
-> > +		vcpu->dirty_gfns = mmap(NULL, size, PROT_READ | PROT_WRITE,
-> > +					MAP_SHARED, vcpu->fd, vm->page_size *
-> > +					KVM_DIRTY_LOG_PAGE_OFFSET);
-> 
-> 
-> It looks to me that we don't write to dirty_gfn.
-> 
-> So PROT_READ should be sufficient.
-
-Yes.  Thanks,
+Yes, definitely. :)
 
 -- 
 Peter Xu
