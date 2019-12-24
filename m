@@ -2,166 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D72A412A0F8
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 13:01:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D52712A13F
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2019 13:15:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726201AbfLXMBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Dec 2019 07:01:44 -0500
-Received: from foss.arm.com ([217.140.110.172]:51556 "EHLO foss.arm.com"
+        id S1726256AbfLXMPq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Dec 2019 07:15:46 -0500
+Received: from foss.arm.com ([217.140.110.172]:51694 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726102AbfLXMBn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Dec 2019 07:01:43 -0500
+        id S1726157AbfLXMPp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Dec 2019 07:15:45 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A6A61FB;
-        Tue, 24 Dec 2019 04:01:43 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 22D471FB;
+        Tue, 24 Dec 2019 04:15:45 -0800 (PST)
 Received: from localhost (unknown [10.37.6.20])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 92BDB3F534;
-        Tue, 24 Dec 2019 04:01:42 -0800 (PST)
-Date:   Tue, 24 Dec 2019 12:01:40 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DB2D3F534;
+        Tue, 24 Dec 2019 04:15:44 -0800 (PST)
+Date:   Tue, 24 Dec 2019 12:15:42 +0000
 From:   Andrew Murray <andrew.murray@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     will@kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+To:     Mark Rutland <mark.rutland@arm.com>
+Cc:     Marc Zyngier <marc.zyngier@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
         Sudeep Holla <sudeep.holla@arm.com>,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 03/18] arm64: KVM: define SPE data structure for each
- vcpu
-Message-ID: <20191224120140.GH42593@e119886-lin.cambridge.arm.com>
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
+ full SPE profiling buffer controls
+Message-ID: <20191224121542.GI42593@e119886-lin.cambridge.arm.com>
 References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-4-andrew.murray@arm.com>
- <20191221131936.21fa2dfa@why>
+ <20191220143025.33853-10-andrew.murray@arm.com>
+ <20191220180657.GD25258@lakrids.cambridge.arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191221131936.21fa2dfa@why>
+In-Reply-To: <20191220180657.GD25258@lakrids.cambridge.arm.com>
 User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Dec 21, 2019 at 01:19:36PM +0000, Marc Zyngier wrote:
-> On Fri, 20 Dec 2019 14:30:10 +0000
-> Andrew Murray <andrew.murray@arm.com> wrote:
-> 
+On Fri, Dec 20, 2019 at 06:06:58PM +0000, Mark Rutland wrote:
+> On Fri, Dec 20, 2019 at 02:30:16PM +0000, Andrew Murray wrote:
 > > From: Sudeep Holla <sudeep.holla@arm.com>
 > > 
-> > In order to support virtual SPE for guest, so define some basic structs.
-> > This features depends on host having hardware with SPE support.
+> > Now that we can save/restore the full SPE controls, we can enable it
+> > if SPE is setup and ready to use in KVM. It's supported in KVM only if
+> > all the CPUs in the system supports SPE.
 > > 
-> > Since we can support this only on ARM64, add a separate config symbol
-> > for the same.
-> > 
-> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> > [ Add irq_level, rename irq to irq_num for kvm_spe ]
-> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  2 ++
-> >  arch/arm64/kvm/Kconfig            |  7 +++++++
-> >  include/kvm/arm_spe.h             | 19 +++++++++++++++++++
-> >  3 files changed, 28 insertions(+)
-> >  create mode 100644 include/kvm/arm_spe.h
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index c61260cf63c5..f5dcff912645 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -35,6 +35,7 @@
-> >  #include <kvm/arm_vgic.h>
-> >  #include <kvm/arm_arch_timer.h>
-> >  #include <kvm/arm_pmu.h>
-> > +#include <kvm/arm_spe.h>
-> >  
-> >  #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
-> >  
-> > @@ -302,6 +303,7 @@ struct kvm_vcpu_arch {
-> >  	struct vgic_cpu vgic_cpu;
-> >  	struct arch_timer_cpu timer_cpu;
-> >  	struct kvm_pmu pmu;
-> > +	struct kvm_spe spe;
-> >  
-> >  	/*
-> >  	 * Anything that is not used directly from assembly code goes
-> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> > index a475c68cbfec..af5be2c57dcb 100644
-> > --- a/arch/arm64/kvm/Kconfig
-> > +++ b/arch/arm64/kvm/Kconfig
-> > @@ -35,6 +35,7 @@ config KVM
-> >  	select HAVE_KVM_EVENTFD
-> >  	select HAVE_KVM_IRQFD
-> >  	select KVM_ARM_PMU if HW_PERF_EVENTS
-> > +	select KVM_ARM_SPE if (HW_PERF_EVENTS && ARM_SPE_PMU)
-> >  	select HAVE_KVM_MSI
-> >  	select HAVE_KVM_IRQCHIP
-> >  	select HAVE_KVM_IRQ_ROUTING
-> > @@ -61,6 +62,12 @@ config KVM_ARM_PMU
-> >  	  Adds support for a virtual Performance Monitoring Unit (PMU) in
-> >  	  virtual machines.
-> >  
-> > +config KVM_ARM_SPE
-> > +	bool
-> > +	---help---
-> > +	  Adds support for a virtual Statistical Profiling Extension(SPE) in
-> > +	  virtual machines.
-> > +
-> >  config KVM_INDIRECT_VECTORS
-> >         def_bool KVM && (HARDEN_BRANCH_PREDICTOR || HARDEN_EL2_VECTORS)
-> >  
-> > diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
-> > new file mode 100644
-> > index 000000000000..48d118fdb174
-> > --- /dev/null
-> > +++ b/include/kvm/arm_spe.h
-> > @@ -0,0 +1,19 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright (C) 2019 ARM Ltd.
-> > + */
-> > +
-> > +#ifndef __ASM_ARM_KVM_SPE_H
-> > +#define __ASM_ARM_KVM_SPE_H
-> > +
-> > +#include <uapi/linux/kvm.h>
-> > +#include <linux/kvm_host.h>
+> > However to support heterogenous systems, we need to move the check if
+> > host supports SPE and do a partial save/restore.
 > 
-> I don't believe these are required at this stage.
+> I don't think that it makes sense to support this for heterogeneous
+> systems, given their SPE capabilities and IMP DEF details will differ.
 > 
-> > +
-> > +struct kvm_spe {
-> > +	int irq_num;
-> 
-> 'irq' was the right name *if* this represents a Linux irq. If this
-> instead represents a guest PPI, then it should be named 'intid'.
-> 
-> In either case, please document what this represents.
-> 
-> > +	bool ready; /* indicates that SPE KVM instance is ready for use */
-> > +	bool created; /* SPE KVM instance is created, may not be ready yet */
-> > +	bool irq_level;
-> 
-> What does this represent? The state of the interrupt on the host? The
-> guest? Something else? Also, please consider grouping related fields
-> together.
+> Is there some way we can limit this to homogeneous systems?
 
-It should be the state of the interrupt on the guest.
+No problem, I'll see how to limit this.
 
-> 
-> > +};
-> 
-> If you've added a config option that controls the selection of the SPE
-> feature, why doesn't this result in an empty structure when it isn't
-> selected?
-
-OK, all noted.
+Thanks,
 
 Andrew Murray
 
 > 
-> > +
-> > +#endif /* __ASM_ARM_KVM_SPE_H */
-> 
 > Thanks,
+> Mark.
 > 
-> 	M.
-> -- 
-> Jazz is not dead. It just smells funny...
+> > 
+> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >  arch/arm64/kvm/hyp/debug-sr.c | 33 ++++++++++++++++-----------------
+> >  include/kvm/arm_spe.h         |  6 ++++++
+> >  2 files changed, 22 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> > index 12429b212a3a..d8d857067e6d 100644
+> > --- a/arch/arm64/kvm/hyp/debug-sr.c
+> > +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> > @@ -86,18 +86,13 @@
+> >  	}
+> >  
+> >  static void __hyp_text
+> > -__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> > +__debug_save_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> >  {
+> >  	u64 reg;
+> >  
+> >  	/* Clear pmscr in case of early return */
+> >  	ctxt->sys_regs[PMSCR_EL1] = 0;
+> >  
+> > -	/* SPE present on this CPU? */
+> > -	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> > -						  ID_AA64DFR0_PMSVER_SHIFT))
+> > -		return;
+> > -
+> >  	/* Yes; is it owned by higher EL? */
+> >  	reg = read_sysreg_s(SYS_PMBIDR_EL1);
+> >  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
+> > @@ -142,7 +137,7 @@ __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> >  }
+> >  
+> >  static void __hyp_text
+> > -__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> > +__debug_restore_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> >  {
+> >  	if (!ctxt->sys_regs[PMSCR_EL1])
+> >  		return;
+> > @@ -210,11 +205,14 @@ void __hyp_text __debug_restore_guest_context(struct kvm_vcpu *vcpu)
+> >  	struct kvm_guest_debug_arch *host_dbg;
+> >  	struct kvm_guest_debug_arch *guest_dbg;
+> >  
+> > +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > +	guest_ctxt = &vcpu->arch.ctxt;
+> > +
+> > +	__debug_restore_spe_context(guest_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> > +
+> >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+> >  		return;
+> >  
+> > -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > -	guest_ctxt = &vcpu->arch.ctxt;
+> >  	host_dbg = &vcpu->arch.host_debug_state.regs;
+> >  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> >  
+> > @@ -232,8 +230,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
+> >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> >  	guest_ctxt = &vcpu->arch.ctxt;
+> >  
+> > -	if (!has_vhe())
+> > -		__debug_restore_spe_nvhe(host_ctxt, false);
+> > +	__debug_restore_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> >  
+> >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+> >  		return;
+> > @@ -249,19 +246,21 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
+> >  
+> >  void __hyp_text __debug_save_host_context(struct kvm_vcpu *vcpu)
+> >  {
+> > -	/*
+> > -	 * Non-VHE: Disable and flush SPE data generation
+> > -	 * VHE: The vcpu can run, but it can't hide.
+> > -	 */
+> >  	struct kvm_cpu_context *host_ctxt;
+> >  
+> >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > -	if (!has_vhe())
+> > -		__debug_save_spe_nvhe(host_ctxt, false);
+> > +	if (cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> > +						 ID_AA64DFR0_PMSVER_SHIFT))
+> > +		__debug_save_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> >  }
+> >  
+> >  void __hyp_text __debug_save_guest_context(struct kvm_vcpu *vcpu)
+> >  {
+> > +	bool kvm_spe_ready = kvm_arm_spe_v1_ready(vcpu);
+> > +
+> > +	/* SPE present on this vCPU? */
+> > +	if (kvm_spe_ready)
+> > +		__debug_save_spe_context(&vcpu->arch.ctxt, kvm_spe_ready);
+> >  }
+> >  
+> >  u32 __hyp_text __kvm_get_mdcr_el2(void)
+> > diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
+> > index 48d118fdb174..30c40b1bc385 100644
+> > --- a/include/kvm/arm_spe.h
+> > +++ b/include/kvm/arm_spe.h
+> > @@ -16,4 +16,10 @@ struct kvm_spe {
+> >  	bool irq_level;
+> >  };
+> >  
+> > +#ifdef CONFIG_KVM_ARM_SPE
+> > +#define kvm_arm_spe_v1_ready(v)		((v)->arch.spe.ready)
+> > +#else
+> > +#define kvm_arm_spe_v1_ready(v)		(false)
+> > +#endif /* CONFIG_KVM_ARM_SPE */
+> > +
+> >  #endif /* __ASM_ARM_KVM_SPE_H */
+> > -- 
+> > 2.21.0
+> > 
