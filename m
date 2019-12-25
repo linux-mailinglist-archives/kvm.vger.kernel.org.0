@@ -2,142 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D18012A634
-	for <lists+kvm@lfdr.de>; Wed, 25 Dec 2019 06:39:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91E5B12A7D4
+	for <lists+kvm@lfdr.de>; Wed, 25 Dec 2019 13:21:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726185AbfLYFjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Dec 2019 00:39:18 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:35773 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725798AbfLYFjS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Dec 2019 00:39:18 -0500
-Received: by mail-pf1-f195.google.com with SMTP id i23so6217341pfo.2
-        for <kvm@vger.kernel.org>; Tue, 24 Dec 2019 21:39:18 -0800 (PST)
+        id S1726397AbfLYMVI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Dec 2019 07:21:08 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:45643 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726106AbfLYMVH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Dec 2019 07:21:07 -0500
+Received: by mail-pl1-f193.google.com with SMTP id b22so9420881pls.12;
+        Wed, 25 Dec 2019 04:21:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=Kr75G0dJMpzW2xt1gSy/8q0zSaUTw7HkCjIQQDeq6VQ=;
-        b=V8nQPF1sfLH2JAe4P5RCePSJEX2JpUUHDsTrpMAB+I0upYI1xR19lj9g7KMXSaQAHU
-         Je1djGxU1k+PG9Zx4sBt5uVm9PDgUHCe5g3fUFcTzCLPjZmnUyTNMX2fCEVe+zV/xpC8
-         qVutP1L4AzgPjuvZfhWoIxDCjDOuSAuTqkTWzf8e756TfpONv/knGeturzOz3oIdu37R
-         4ZuLRZt/BYnXZvy1TbNupqh6jYMhT4PxFsWDyUmcF/K8i3LfvOigBrNRnv4Gbdx3KIpU
-         b3nGmJi8g8lv7x4CSQbR+b4epZ2Qf6i8eVNR11fKo35rhWG1npIynwqy2+IiKLsMVrXi
-         /J7w==
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=Wnv0YtxvwjhRCPhA4AJ3WaBp5/g5a1eicQCrc+kMTmY=;
+        b=OMG2oDNknz48cEtssDl/vVCwRTDpy4JZD7NsViNt1A+1tVmxUvamS9au6lXuwsfsbb
+         xo7sYco5GmLylmIKjvVYxQbeDWo7CINAyrGKej02lF1ONZc7Ij+iiWgI0fvXGFVf7JIa
+         Qj2XJgg5U2BXd7VaXEQQaMqF66hMrscytGmNF2e5U1AIxdXFYRRuLw2HOn8tCGywk/Ms
+         6GJBKQjpjpc08ZZvU/gqtKv+992lHA4zqnlBS9hEkNo2vVG8z+/XPDB1Z+YjCt7hVThR
+         DO76tUarJfoxdKwQ0ewdU7FW+XrT4fVhFo0KeJgFhk0EK9f4IOaWflpfWJQnNEPLKrVb
+         wQdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=Kr75G0dJMpzW2xt1gSy/8q0zSaUTw7HkCjIQQDeq6VQ=;
-        b=gqPY+GeHObwiJ2+86m8hXSZ1YxqypDgaVbWaVmcrhnUBVQRCv/V1EDUgzg9wTz2lga
-         IyOBatimVQUFQF+7W1VBOZD8uIUfxiHp69LZnMW3DlsDRY8r1esw9ttex9yIZtSDcP+Q
-         blk/a/GCM4WHVVyANVg5Xww5z89GnhLgRRgUI70/Kox11JphhxC3DdAcLSji43ZLjNVr
-         WxMRpX+YWA64hpSCJWOC+ENk6Wdj5OVfxbc/mNrQUxHxXjEaHhPCITaGgc52/73nMUY/
-         Ypc77dTTxZVQnUXQqOItDrJmFuOeA6r6Vbn9QCgFS0SweGBpESeyBWrYHpCrBFmne7WV
-         gopQ==
-X-Gm-Message-State: APjAAAVvTeT5rtCGY+tQvbnvAl8Di9Efzzzn9PKFGMgvZWSkI4LCSyud
-        E0taFaXdBc/YH78LWYSeHuldVIk=
-X-Google-Smtp-Source: APXvYqxRK2hrmz6k6KMy9zjtPV/aBxYhizRGpC2wWL5D5nBXjx/N5tEqkWQ3xCM0Hxt26JlsL4QTkg==
-X-Received: by 2002:a63:4b49:: with SMTP id k9mr41086988pgl.269.1577252357718;
-        Tue, 24 Dec 2019 21:39:17 -0800 (PST)
-Received: from [127.0.0.1] ([203.205.141.53])
-        by smtp.gmail.com with ESMTPSA id a14sm29967852pfn.22.2019.12.24.21.39.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Dec 2019 21:39:17 -0800 (PST)
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-Subject: [kvm-unit-tests] ./run_tests.sh error?
-Message-ID: <46d9112f-1520-0d81-e109-015b7962b1a7@gmail.com>
-Date:   Wed, 25 Dec 2019 13:38:53 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.3.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=Wnv0YtxvwjhRCPhA4AJ3WaBp5/g5a1eicQCrc+kMTmY=;
+        b=swTZun40150ZKGhmHR1Xj73bjh5ha/iw13nyjwS41lG4a/RVMG4cw/gfYOmpH9g7I4
+         QsuoIU3U02i0G7vxV5eodK3w9MpuAq7nu+Bsph3Hqgo1+wT9sMvPvjhjcauDt/shDl1Y
+         N1AO3V7rxIRqUehnziNt4//9YhuVzdPdp0KV3ndAEx6J0ETB0WZoq4dvTAVFeOD49A5p
+         NeDqBObrmqFuaCcMPY3TbnRRl59hR7+kWbOucNXqxF6YLODnhIXvPJapt8C+uPxiuU9F
+         woCpPmrHRJ3HpkSB3zmcEF1Px2oFDNVNiGp/h1ntCXmx16u1PZY3q8HOX7li3U0a6LJj
+         T1tQ==
+X-Gm-Message-State: APjAAAWWfQD+/c987CkrJbhWV6Oc2gTCZSjH4aap82MCTJk5B02nC6/s
+        rtsCoDNYiAR6MDOjPC8qRa0=
+X-Google-Smtp-Source: APXvYqy58ZqVkaIvHcFkCrMhdICYlw646jVoZnTKQnvdCw8RedHK5kwZitO2+Q0vWLmz8BO97emiag==
+X-Received: by 2002:a17:902:74cb:: with SMTP id f11mr39713272plt.139.1577276466677;
+        Wed, 25 Dec 2019 04:21:06 -0800 (PST)
+Received: from nishad ([106.51.232.103])
+        by smtp.gmail.com with ESMTPSA id b65sm30400263pgc.18.2019.12.25.04.21.02
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 25 Dec 2019 04:21:06 -0800 (PST)
+Date:   Wed, 25 Dec 2019 17:50:58 +0530
+From:   Nishad Kamdar <nishadkamdar@gmail.com>
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joe Perches <joe@perches.com>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] vfio-ccw: Use the correct style for SPDX License Identifier
+Message-ID: <20191225122054.GA4598@nishad>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When i run ./run_tests.sh, i get output like this:
+This patch corrects the SPDX License Identifier style in
+header file related to S/390 common i/o drivers.
+It assigns explicit block comment to the SPDX License
+Identifier.
 
-SKIP apic-split (qemu: could not open kernel file '_NO_FILE_4Uhere_': No 
-such file or directory)
-SKIP ioapic-split (qemu: could not open kernel file '_NO_FILE_4Uhere_': 
-No such file or directory)
-SKIP apic (qemu: could not open kernel file '_NO_FILE_4Uhere_': No such 
-file or directory)
-......
+Changes made by using a script provided by Joe Perches here:
+https://lkml.org/lkml/2019/2/7/46.
 
-Seems like the code below causing of "SKIP" above.
+Suggested-by: Joe Perches <joe@perches.com>
+Signed-off-by: Nishad Kamdar <nishadkamdar@gmail.com>
+---
+ drivers/s390/cio/vfio_ccw_trace.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-file: scripts/runtime.bash
+diff --git a/drivers/s390/cio/vfio_ccw_trace.h b/drivers/s390/cio/vfio_ccw_trace.h
+index 30162a318a8a..f5d31887d413 100644
+--- a/drivers/s390/cio/vfio_ccw_trace.h
++++ b/drivers/s390/cio/vfio_ccw_trace.h
+@@ -1,5 +1,5 @@
+-/* SPDX-License-Identifier: GPL-2.0
+- * Tracepoints for vfio_ccw driver
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Tracepoints for vfio_ccw driver
+  *
+  * Copyright IBM Corp. 2018
+  *
+-- 
+2.17.1
 
-# We assume that QEMU is going to work if it tried to load the kernel
-premature_failure()
-{
-     local log="$(eval $(get_cmdline _NO_FILE_4Uhere_) 2>&1)"
-
-     echo "$log" | grep "_NO_FILE_4Uhere_" |
-         grep -q -e "could not load kernel" -e "error loading" &&
-         return 1
-
-     RUNTIME_log_stderr <<< "$log"
-
-     echo "$log"
-     return 0
-}
-
-get_cmdline()
-{
-     local kernel=$1
-     echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel 
-$RUNTIME_arch_run $kernel -smp $smp $opts"
-}
-
-function run()
-{
-...
-     last_line=$(premature_failure > >(tail -1)) && {
-         print_result "SKIP" $testname "" "$last_line"
-         return 77
-     }
-...
-}
-
-Is that proper? What can i do?
-
-What i did:
-
-1. git clone git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
-2. cd kvm-unit-tests/
-3. git checkout -b next origin/next
-4. ./configure
-5. make
-6. ./run_test.sh
-
-Related config file:
-
-# cat config.mak
-SRCDIR=/data/kvm-unit-tests
-PREFIX=/usr/local
-HOST=x86_64
-ARCH=x86_64
-ARCH_NAME=x86_64
-PROCESSOR=x86_64
-CC=gcc
-CXX=g++
-LD=ld
-OBJCOPY=objcopy
-OBJDUMP=objdump
-AR=ar
-ADDR2LINE=addr2line
-API=yes
-TEST_DIR=x86
-FIRMWARE=
-ENDIAN=
-PRETTY_PRINT_STACKS=yes
-ENVIRON_DEFAULT=yes
-ERRATATXT=errata.txt
-U32_LONG_FMT=
