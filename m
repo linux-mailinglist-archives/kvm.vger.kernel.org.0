@@ -2,152 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 552EB12AE91
-	for <lists+kvm@lfdr.de>; Thu, 26 Dec 2019 21:38:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 003AE12B072
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2019 03:08:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727105AbfLZUiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Dec 2019 15:38:13 -0500
-Received: from mail-io1-f50.google.com ([209.85.166.50]:37310 "EHLO
-        mail-io1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726839AbfLZUiN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Dec 2019 15:38:13 -0500
-Received: by mail-io1-f50.google.com with SMTP id k24so15429529ioc.4
-        for <kvm@vger.kernel.org>; Thu, 26 Dec 2019 12:38:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=wdz/YTgDqVmIrzxg/wKv7mwUoanM0ehP9hKBt+o4uvw=;
-        b=UrcNSbTbeVGjRAbjn7iyIn2mDDSUrgmHjrj+kcasBeuJbYautt28QYdCZnySnmfFds
-         FqdgcalSH61wV91mWD9ZsPxx6+OTb4laTe59C2rzcGNPrLVIyqfW1Tf7Xoqce2Z7pRSS
-         5OtZF305gLIKnlr2CfG+aokdlY4wVMTjV0vNAECkV6sYjyvfwSX0Hv943FHkb3X60VRo
-         36XrgVtaEcsNbUD3mS8aRGaP4OSc45f0HmrXpXTOYOblzRn/LZ6W46z7zr13s7FY0gnF
-         I4vRddVnMgqNqwaq/ttqyOkAYscmTEWJcRJdxwvFzf6rKfzawndn8WpJnPIqYUHCHSQA
-         1iDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=wdz/YTgDqVmIrzxg/wKv7mwUoanM0ehP9hKBt+o4uvw=;
-        b=I+eIe6cqGlpHD1MYgounOmA7JNxLLhf3k05/jq92kjsJc5g2rDPF+C0sGv1h91HlQ4
-         5ABINdBOUeajtE7Tj3amx9yqZx+l+vwOJA2Y7HKkVowAy/V2DrE2z6Bl+oSBvLEfrvMq
-         E6f2OhGFQ5au1dgv1hyn6W5YntOAPyVY+Y+pO3SQpMeDVXVVf58GZpokR9k5bkL8nt7C
-         EDxIIHPuOt3Gk1e+ddKI4eKNJCUFIGJNoa8u+N/PPmr1bCKpTSaIJgeXohrUK75zpFmW
-         GM3a6tAc3hnptMF4kJGwd3sgZ02NfHFhr9Gtjw8zTZ1BCVK5jqbgJ1BHg23qzeD7ysqZ
-         Kh2g==
-X-Gm-Message-State: APjAAAWu6vu8bdWpJFa4Ga++xbF97f2imm8IxDjYrWdbYf2Iefv8NiKq
-        EFgt9NOg+TJIvW2HNn7DJRXOFuQy35ksgzxKP0s=
-X-Google-Smtp-Source: APXvYqwCpmZmPC161TYRqhBY2mHPyz1mpe2aixvayidwH9MkDabZr86o3q9KO8hXmEu8MHUNm1vxLvVYe0CPPP+nlsU=
-X-Received: by 2002:a6b:7b41:: with SMTP id m1mr29814761iop.191.1577392692586;
- Thu, 26 Dec 2019 12:38:12 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a6b:4a0e:0:0:0:0:0 with HTTP; Thu, 26 Dec 2019 12:38:12
- -0800 (PST)
-From:   Ultimate Wealth <ultimatewealthmanagementltd@gmail.com>
-Date:   Thu, 26 Dec 2019 12:38:12 -0800
-Message-ID: <CAMpO-c+k588JwWXbywFx7J3KNt=ixDoupgS8i3WX+uGT5_YtxQ@mail.gmail.com>
-Subject: TRANSACTION PROCEDURE:
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S1727000AbfL0CH0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Dec 2019 21:07:26 -0500
+Received: from mga17.intel.com ([192.55.52.151]:38918 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726115AbfL0CH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Dec 2019 21:07:26 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Dec 2019 18:07:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,361,1571727600"; 
+   d="scan'208";a="223675006"
+Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
+  by fmsmga001.fm.intel.com with ESMTP; 26 Dec 2019 18:07:24 -0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Cc:     yu.c.zhang@linux.intel.com, Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v9 0/7] Introduce support for guest CET feature
+Date:   Fri, 27 Dec 2019 10:11:26 +0800
+Message-Id: <20191227021133.11993-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pls read through our BG/SBLC Procedure bellow and see if it can work for yo=
-u.
+Control-flow Enforcement Technology (CET) provides protection against
+Return/Jump-Oriented Programming (ROP/JOP) attack. It includes two
+sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
+
+KVM change is required to support guest CET feature.
+This patch serial implemented CET related CPUID/XSAVES enumeration, MSRs
+and vmentry/vmexit configuration etc.so that guest kernel can setup CET
+runtime infrastructure based on them. Some CET MSRs and related feature
+flags used reference the definitions in kernel patchset.
+
+CET kernel patches is here:
+https://lkml.org/lkml/2019/8/13/1110
+https://lkml.org/lkml/2019/8/13/1109
+Note: CET hasn't been supported for nested case now, since CR4.CET
+is fixed to 0 in FIXED1 MSR, actually nested VM cannot enable CET.
+
+v8 -> v9:
+- Refactored msr-check functions per Sean's feedback.
+- Fixed a few issues per Sean's suggestion.
+- Rebased patch to kernel-v5.4.
+- Moved CET CPUID feature bits and CR4.CET to last patch.
+
+v7 -> v8:
+- Addressed Jim and Sean's feedback on: 1) CPUID(0xD,i) enumeration. 2)
+  sanity check when configure guest CET. 3) function improvement.
+- Added more sanity check functions.
+- Set host vmexit default status so that guest won't leak CET status to
+  host when vmexit.
+- Added CR0.WP vs. CR4.CET mutual constrains.
+
+v6 -> v7:
+- Rebased patch to kernel v5.3
+- Sean suggested to change CPUID(0xd, n) enumeration code as alined with
+  existing one, and I think it's better to make the fix as an independent patch 
+  since XSS MSR are being used widely on X86 platforms.
+- Check more host and guest status before configure guest CET
+  per Sean's feedback.
+- Add error-check before guest accesses CET MSRs per Sean's feedback.
+- Other minor fixes suggested by Sean.
+
+v5 -> v6:
+- Rebase patch to kernel v5.2.
+- Move CPUID(0xD, n>=1) helper to a seperate patch.
+- Merge xsave size fix with other patch.
+- Other minor fixes per community feedback.
+
+v4 -> v5:
+- Rebase patch to kernel v5.1.
+- Wrap CPUID(0xD, n>=1) code to a helper function.
+- Pass through MSR_IA32_PL1_SSP and MSR_IA32_PL2_SSP to Guest.
+- Add Co-developed-by expression in patch description.
+- Refine patch description.
+
+v3 -> v4:
+- Add Sean's patch for loading Guest fpu state before access XSAVES
+  managed CET MSRs.
+- Melt down CET bits setting into CPUID configuration patch.
+- Add VMX interface to query Host XSS.
+- Check Host and Guest XSS support bits before set Guest XSS.
+- Make Guest SHSTK and IBT feature enabling independent.
+- Do not report CET support to Guest when Host CET feature is Disabled.
+
+v2 -> v3:
+- Modified patches to make Guest CET independent to Host enabling.
+- Added patch 8 to add user space access for Guest CET MSR access.
+- Modified code comments and patch description to reflect changes.
+
+v1 -> v2:
+- Re-ordered patch sequence, combined one patch.
+- Added more description for CET related VMCS fields.
+- Added Host CET capability check while enabling Guest CET loading bit.
+- Added Host CET capability check while reporting Guest CPUID(EAX=7, EXC=0).
+- Modified code in reporting Guest CPUID(EAX=D,ECX>=1), make it clearer.
+- Added Host and Guest XSS mask check while setting bits for Guest XSS.
+
+
+PATCH 1    : Fix CPUID(0xD, n) enumeration to support XSS MSR.
+PATCH 2    : Define CET VMCS fields and bits.
+PATCH 3    : Pass through CET MSRs to guest.
+PATCH 4    : Load guest/host CET states on vmentry/vmexit.
+PATCH 5    : Enable update to IA32_XSS for guest.
+PATCH 6    : Load Guest FPU states for XSAVES managed MSRs.
+PATCH 7    : Add user-space CET MSR access interface.
 
 
 
-TRANSACTION PROCEDURE:
 
-1. Lessee submits signed letter of intent (LOI)/MOU, together with
-International passport scanned copy, full text of MT799 & MT760
-verbiages, Lessee and Beneficiary=E2=80=98s bank details, CIS, and Corporat=
-e
-Registration Copy.
+Sean Christopherson (1):
+  KVM: X86: Load guest fpu state when accessing MSRs managed by XSAVES
 
+Yang Weijiang (6):
+  KVM: CPUID: Fix IA32_XSS support in CPUID(0xd,i) enumeration
+  KVM: VMX: Define CET VMCS fields and #CP flag
+  KVM: VMX: Pass through CET related MSRs
+  KVM: VMX: Load CET states on vmentry/vmexit
+  KVM: X86: Enable CET bits update in IA32_XSS
+  KVM: X86: Add user-space access interface for CET MSRs
 
+ arch/x86/include/asm/kvm_host.h |   6 +-
+ arch/x86/include/asm/vmx.h      |   8 +
+ arch/x86/include/uapi/asm/kvm.h |   1 +
+ arch/x86/kvm/cpuid.c            | 122 ++++++++++-----
+ arch/x86/kvm/cpuid.h            |   2 +
+ arch/x86/kvm/svm.c              |   7 +
+ arch/x86/kvm/vmx/capabilities.h |  10 ++
+ arch/x86/kvm/vmx/vmx.c          | 256 +++++++++++++++++++++++++++++++-
+ arch/x86/kvm/x86.c              |  36 ++++-
+ arch/x86/kvm/x86.h              |  10 +-
+ 10 files changed, 412 insertions(+), 46 deletions(-)
 
-2. Provider countersigns Agreement along with issuing bank=E2=80=99s full
-banking coordinates.
+-- 
+2.17.2
 
-
-
-3. This LOI automatically becomes a full commercial recourse contract
-and will be notarized and authenticated to avoid contract breach and
-Lessee will be required to pay for the notary authentication cost of
-the contract documents here in UK. After the notary authentication of
-the contract documents here in the UK, both parties shall lodge the
-executed contract with their respective banks.
-
-
-
-4. The Lessor=E2=80=99s bank issues Pre-advice by SWIFT MT199 or MT-799 to
-Lessee Beneficiary=E2=80=99s nominated bank within 48-72 banking hours.
-Simultaneously a copy of the Pre-advice by SWIFT MT199 or MT-799 will
-be sent to the Lessee via email.
-
-
-
-5. Within 48-72 banking hours following issuance of Pre-advice by
-SWIFT MT199 or MT-799 and upon successful authentication, the Lessee=E2=80=
-=99s
-Beneficiary bank replies to the Provider/Issuing Bank via MT799
-confirming readiness to receive the BG/SBLC via SWIFT MT 760.
-Simultaneously a copy of the =E2=80=98readiness to receive=E2=80=99 by SWIF=
-T MT799
-will be sent to the Provider via email.
-
-
-
-6. Successive to the Lessee=E2=80=99s Beneficiary Bank reply confirming
-readiness to receive the BG/SBLC via MT760, Issuing Bank shall within
-24-48 banking hours deliver the bank instrument (BG/SBLC) via SWIFT
-M760 to Lessee=E2=80=99s Beneficiary=E2=80=98s nominated bank.
-
-
-
-7. Within 15-21 banking days Upon receipt of the SWIFT MT760 BG/SBLC
-and upon successful authentication and final confirmation by the
-Lessee Beneficiary=E2=80=98s nominated bank, Lessee agrees to pay by SWIFT
-MT103 wire transfer the total BG/SBLC Lease cost of 6%+2% of face
-value to the nominated banks accounts of Provider and facilitators.
-
-
-
-8. Within 7 banking days after receipt of funds (6%+2%), the hard copy
-will be sent to Lessee Beneficiary=E2=80=99s nominated bank by bank-bonded
-courier.
-
-
-
-According to the provider, review became necessary to bypass certain
-Prudential Banking protocols and to underwrite Provider/Stakeholders
-confidence in providing the BG/SBLC.
---=20
-
-
---=20
-
-
-*Ultimate Wealth Management*
-
-Registered address: Unit 1, West Point Court
-Great Park Road, Bradley Stoke
-Bristol, BS32 4PY. United Kingdom.
-
-Tel/Fax: +44 (020) 8185 7409
-Email:  info@ultimatewealthmanagementltd.com
-Website Address: www.ultimatewealthmanagementltd.com
-
-
-*CONFIDENTIALITY NOTE:This communication and any attachments here to
-contain information that may be privileged, confidential and exempt from
-disclosure under applicable law. The information is intended solely for the
-use of the individual or entity to which it is addressed. If you are not
-the intended recipient or the employee or agent entrusted with the
-responsibility of delivering the  message to the intended recipient,
-be aware that any disclosure, copying or distribution of this transmission
-is strictly prohibited. Thank you.*
