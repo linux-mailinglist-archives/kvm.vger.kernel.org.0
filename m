@@ -2,281 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B207D12B070
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2019 03:07:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5429A12B224
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2019 07:52:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727289AbfL0CHf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Dec 2019 21:07:35 -0500
-Received: from mga17.intel.com ([192.55.52.151]:38924 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727270AbfL0CHf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Dec 2019 21:07:35 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Dec 2019 18:07:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,361,1571727600"; 
-   d="scan'208";a="223675053"
-Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
-  by fmsmga001.fm.intel.com with ESMTP; 26 Dec 2019 18:07:34 -0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com,
-        sean.j.christopherson@intel.com
-Cc:     yu.c.zhang@linux.intel.com, Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v9 7/7] KVM: X86: Add user-space access interface for CET MSRs
-Date:   Fri, 27 Dec 2019 10:11:33 +0800
-Message-Id: <20191227021133.11993-8-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20191227021133.11993-1-weijiang.yang@intel.com>
-References: <20191227021133.11993-1-weijiang.yang@intel.com>
+        id S1726483AbfL0GwX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Dec 2019 01:52:23 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2918 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725854AbfL0GwW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Dec 2019 01:52:22 -0500
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.57])
+        by Forcepoint Email with ESMTP id 78BE4E4F3F2AAFF53153;
+        Fri, 27 Dec 2019 14:52:16 +0800 (CST)
+Received: from dggeme755-chm.china.huawei.com (10.3.19.101) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 27 Dec 2019 14:52:15 +0800
+Received: from [127.0.0.1] (10.173.221.248) by dggeme755-chm.china.huawei.com
+ (10.3.19.101) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5; Fri, 27
+ Dec 2019 14:52:15 +0800
+Subject: Re: [PATCH v2 5/6] KVM: arm64: Add interface to support VCPU
+ preempted check
+To:     kbuild test robot <lkp@intel.com>
+CC:     <kbuild-all@lists.01.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>, <maz@kernel.org>,
+        <james.morse@arm.com>, <linux@armlinux.org.uk>,
+        <suzuki.poulose@arm.com>, <julien.thierry.kdev@gmail.com>,
+        <catalin.marinas@arm.com>, <mark.rutland@arm.com>,
+        <will@kernel.org>, <steven.price@arm.com>,
+        <daniel.lezcano@linaro.org>
+References: <20191226135833.1052-6-yezengruan@huawei.com>
+ <201912270236.nkxsDrid%lkp@intel.com>
+From:   yezengruan <yezengruan@huawei.com>
+Message-ID: <47879233-4437-4166-b61a-2d1cc8e7e44b@huawei.com>
+Date:   Fri, 27 Dec 2019 14:52:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
+MIME-Version: 1.0
+In-Reply-To: <201912270236.nkxsDrid%lkp@intel.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.248]
+X-ClientProxiedBy: dggeme709-chm.china.huawei.com (10.1.199.105) To
+ dggeme755-chm.china.huawei.com (10.3.19.101)
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There're two different places storing Guest CET states, states
-managed with XSAVES/XRSTORS, as restored/saved
-in previous patch, can be read/write directly from/to the MSRs.
-For those stored in VMCS fields, they're access via vmcs_read/
-vmcs_write.
+Hi,
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+On 2019/12/27 2:51, kbuild test robot wrote:
+> Hi Zengruan,
+> 
+> Thank you for the patch! Yet something to improve:
+> 
+> [auto build test ERROR on kvmarm/next]
+> [also build test ERROR on kvm/linux-next linus/master v5.5-rc3 next-20191220]
+> [cannot apply to arm64/for-next/core]
+> [if your patch is applied to the wrong git tree, please drop us a note to help
+> improve the system. BTW, we also suggest to use '--base' option to specify the
+> base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Zengruan-Ye/KVM-arm64-VCPU-preempted-check-support/20191227-000637
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+> config: arm64-alldefconfig (attached as .config)
+> compiler: aarch64-linux-gcc (GCC) 7.5.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         GCC_VERSION=7.5.0 make.cross ARCH=arm64 
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    In file included from include/linux/spinlock.h:89:0,
+>                     from include/linux/radix-tree.h:16,
+>                     from include/linux/idr.h:15,
+>                     from include/linux/kernfs.h:13,
+>                     from include/linux/sysfs.h:16,
+>                     from include/linux/kobject.h:20,
+>                     from include/linux/of.h:17,
+>                     from include/linux/irqdomain.h:35,
+>                     from include/linux/acpi.h:13,
+>                     from include/acpi/apei.h:9,
+>                     from include/acpi/ghes.h:5,
+>                     from include/linux/arm_sdei.h:8,
+>                     from arch/arm64/kernel/asm-offsets.c:10:
+>    arch/arm64/include/asm/spinlock.h: In function 'vcpu_is_preempted':
+>>> arch/arm64/include/asm/spinlock.h:18:9: error: implicit declaration of function 'pv_vcpu_is_preempted'; did you mean 'vcpu_is_preempted'? [-Werror=implicit-function-declaration]
+>      return pv_vcpu_is_preempted(cpu);
+>             ^~~~~~~~~~~~~~~~~~~~
+>             vcpu_is_preempted
+>    cc1: some warnings being treated as errors
+>    make[2]: *** [arch/arm64/kernel/asm-offsets.s] Error 1
+>    make[2]: Target '__build' not remade because of errors.
+>    make[1]: *** [prepare0] Error 2
+>    make[1]: Target 'prepare' not remade because of errors.
+>    make: *** [sub-make] Error 2
+>    27 real  5 user  7 sys  48.63% cpu 	make prepare
+> 
+> vim +18 arch/arm64/include/asm/spinlock.h
+> 
+>     14	
+>     15	#define vcpu_is_preempted vcpu_is_preempted
+>     16	static inline bool vcpu_is_preempted(long cpu)
+>     17	{
+>   > 18		return pv_vcpu_is_preempted(cpu);
+>     19	}
+>     20	
+> 
+> ---
+> 0-DAY kernel test infrastructure                 Open Source Technology Center
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org Intel Corporation
+> 
+
+Thanks for posting this, I'll update the code to fix this issue.
+
+Thanks,
+
+Zengruan
+
+
 ---
- arch/x86/include/asm/kvm_host.h |   3 +-
- arch/x86/kvm/cpuid.c            |   5 +-
- arch/x86/kvm/vmx/vmx.c          | 138 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c              |  11 +++
- 4 files changed, 154 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/spinlock.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 64bf379381e4..34140462084f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -90,7 +90,8 @@
- 			  | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_OSFXSR | X86_CR4_PCIDE \
- 			  | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
- 			  | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
--			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP))
-+			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP \
-+			  | X86_CR4_CET))
- 
- #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 126a31b99823..4414bd110f3c 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -385,13 +385,14 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
- 		F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
- 		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
- 		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
--		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/;
-+		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | F(SHSTK) |
-+		0 /*WAITPKG*/;
- 
- 	/* cpuid 7.0.edx*/
- 	const u32 kvm_cpuid_7_0_edx_x86_features =
- 		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
- 		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
--		F(MD_CLEAR);
-+		F(MD_CLEAR) | F(IBT);
- 
- 	/* cpuid 7.1.eax */
- 	const u32 kvm_cpuid_7_1_eax_x86_features =
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0a75b65d03f0..52ac67604026 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1763,6 +1763,96 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
- 	return 0;
+diff --git a/arch/arm64/include/asm/spinlock.h b/arch/arm64/include/asm/spinlock.h
+index 45ff1b2949a6..b5d1982414c5 100644
+--- a/arch/arm64/include/asm/spinlock.h
++++ b/arch/arm64/include/asm/spinlock.h
+@@ -12,10 +12,12 @@
+ /* See include/linux/spinlock.h */
+ #define smp_mb__after_spinlock()	smp_mb()
+
++#ifdef CONFIG_PARAVIRT
+ #define vcpu_is_preempted vcpu_is_preempted
+ static inline bool vcpu_is_preempted(long cpu)
+ {
+ 	return pv_vcpu_is_preempted(cpu);
  }
- 
-+#define CET_MSR_RSVD_BITS_1    0x3
-+#define CET_MSR_RSVD_BITS_2   (0xF << 6)
-+
-+static bool cet_ssp_write_allowed(struct kvm_vcpu *vcpu, struct msr_data *msr)
-+{
-+	u64 data = msr->data;
-+	u32 high_word = data >> 32;
-+
-+	if (is_64_bit_mode(vcpu)) {
-+		if (data & CET_MSR_RSVD_BITS_1)
-+			return false;
-+	} else if (high_word) {
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static bool cet_ctl_write_allowed(struct kvm_vcpu *vcpu, struct msr_data *msr)
-+{
-+	u64 data = msr->data;
-+	u32 high_word = data >> 32;
-+
-+	if (data & CET_MSR_RSVD_BITS_2)
-+		return false;
-+
-+	if (!is_64_bit_mode(vcpu) && high_word)
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool cet_ssp_access_allowed(struct kvm_vcpu *vcpu, struct msr_data *msr)
-+{
-+	u64 kvm_xss;
-+	u32 index = msr->index;
-+
-+	if (is_guest_mode(vcpu))
-+		return false;
-+
-+	if (!boot_cpu_has(X86_FEATURE_SHSTK))
-+		return false;
-+
-+	if (!msr->host_initiated &&
-+	    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-+		return false;
-+
-+	if (index == MSR_IA32_INT_SSP_TAB)
-+		return true;
-+
-+	kvm_xss = kvm_supported_xss();
-+
-+	if (index == MSR_IA32_PL3_SSP) {
-+		if (!(kvm_xss & XFEATURE_MASK_CET_USER))
-+			return false;
-+	} else if (!(kvm_xss & XFEATURE_MASK_CET_KERNEL)) {
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static bool cet_ctl_access_allowed(struct kvm_vcpu *vcpu, struct msr_data *msr)
-+{
-+	u64 kvm_xss;
-+	u32 index = msr->index;
-+
-+	if (is_guest_mode(vcpu))
-+		return false;
-+
-+	kvm_xss = kvm_supported_xss();
-+
-+	if (!boot_cpu_has(X86_FEATURE_SHSTK) &&
-+	    !boot_cpu_has(X86_FEATURE_IBT))
-+		return false;
-+
-+	if (!msr->host_initiated &&
-+	    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
-+	    !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
-+		return false;
-+
-+	if (index == MSR_IA32_U_CET) {
-+		if (!(kvm_xss & XFEATURE_MASK_CET_USER))
-+			return false;
-+	} else if (!(kvm_xss & XFEATURE_MASK_CET_KERNEL)) {
-+		return false;
-+	}
-+
-+	return true;
-+}
- /*
-  * Reads an msr value (of 'msr_index') into 'pdata'.
-  * Returns 0 on success, non-0 otherwise.
-@@ -1886,6 +1976,26 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		else
- 			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
- 		break;
-+	case MSR_IA32_S_CET:
-+		if (!cet_ctl_access_allowed(vcpu, msr_info))
-+			return 1;
-+		msr_info->data = vmcs_readl(GUEST_S_CET);
-+		break;
-+	case MSR_IA32_INT_SSP_TAB:
-+		if (!cet_ssp_access_allowed(vcpu, msr_info))
-+			return 1;
-+		msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
-+		break;
-+	case MSR_IA32_U_CET:
-+		if (!cet_ctl_access_allowed(vcpu, msr_info))
-+			return 1;
-+		rdmsrl(MSR_IA32_U_CET, msr_info->data);
-+		break;
-+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-+		if (!cet_ssp_access_allowed(vcpu, msr_info))
-+			return 1;
-+		rdmsrl(msr_info->index, msr_info->data);
-+		break;
- 	case MSR_TSC_AUX:
- 		if (!msr_info->host_initiated &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-@@ -2147,6 +2257,34 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		else
- 			vmx->pt_desc.guest.addr_a[index / 2] = data;
- 		break;
-+	case MSR_IA32_S_CET:
-+		if (!cet_ctl_access_allowed(vcpu, msr_info))
-+			return 1;
-+		if (!cet_ctl_write_allowed(vcpu, msr_info))
-+			return 1;
-+		vmcs_writel(GUEST_S_CET, data);
-+		break;
-+	case MSR_IA32_INT_SSP_TAB:
-+		if (!cet_ctl_access_allowed(vcpu, msr_info))
-+			return 1;
-+		if (!is_64_bit_mode(vcpu))
-+			return 1;
-+		vmcs_writel(GUEST_INTR_SSP_TABLE, data);
-+		break;
-+	case MSR_IA32_U_CET:
-+		if (!cet_ctl_access_allowed(vcpu, msr_info))
-+			return 1;
-+		if (!cet_ctl_write_allowed(vcpu, msr_info))
-+			return 1;
-+		wrmsrl(MSR_IA32_U_CET, data);
-+		break;
-+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-+		if (!cet_ssp_access_allowed(vcpu, msr_info))
-+			return 1;
-+		if (!cet_ssp_write_allowed(vcpu, msr_info))
-+			return 1;
-+		wrmsrl(msr_info->index, data);
-+		break;
- 	case MSR_TSC_AUX:
- 		if (!msr_info->host_initiated &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6dbe77365b22..7de6faa6aa51 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1186,6 +1186,10 @@ static const u32 msrs_to_save_all[] = {
- 	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
- 	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
- 	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
-+
-+	MSR_IA32_XSS, MSR_IA32_U_CET, MSR_IA32_S_CET,
-+	MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP, MSR_IA32_PL2_SSP,
-+	MSR_IA32_PL3_SSP, MSR_IA32_INT_SSP_TAB,
- };
- 
- static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
-@@ -1468,6 +1472,13 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
- 		 * invokes 64-bit SYSENTER.
- 		 */
- 		data = get_canonical(data, vcpu_virt_addr_bits(vcpu));
-+		break;
-+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-+	case MSR_IA32_U_CET:
-+	case MSR_IA32_S_CET:
-+	case MSR_IA32_INT_SSP_TAB:
-+		if (is_noncanonical_address(data, vcpu))
-+			return 1;
- 	}
- 
- 	msr.data = data;
++#endif // CONFIG_PARAVIRT
+
+ #endif /* __ASM_SPINLOCK_H */
 -- 
-2.17.2
+2.19.1
+
+
+
 
