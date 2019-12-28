@@ -2,74 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 489D112BCDE
-	for <lists+kvm@lfdr.de>; Sat, 28 Dec 2019 07:24:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDEF612BEA7
+	for <lists+kvm@lfdr.de>; Sat, 28 Dec 2019 20:19:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726165AbfL1GXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Dec 2019 01:23:54 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:8201 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725942AbfL1GXy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Dec 2019 01:23:54 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 43E9D6F2D5DB2AAD800A;
-        Sat, 28 Dec 2019 14:23:51 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Sat, 28 Dec 2019
- 14:23:41 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <hpa@zytor.com>
-CC:     <linmiaohe@huawei.com>, <liran.alon@oracle.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <x86@kernel.org>
-Subject: [PATCH v2] KVM: nVMX: vmread should not set rflags to specify success in case of #PF
-Date:   Sat, 28 Dec 2019 14:25:24 +0800
-Message-ID: <1577514324-18362-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726395AbfL1TTR convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 28 Dec 2019 14:19:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38548 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726362AbfL1TTR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Dec 2019 14:19:17 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206003] New: Parallels Desktop Crack Mac + Keygen
+Date:   Sat, 28 Dec 2019 19:19:16 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: drtoolism@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-206003-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=206003
 
-In case writing to vmread destination operand result in a #PF, vmread
-should not call nested_vmx_succeed() to set rflags to specify success.
-Similar to as done in VMPTRST (See handle_vmptrst()).
+            Bug ID: 206003
+           Summary: Parallels Desktop Crack Mac + Keygen
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 15.369
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: drtoolism@gmail.com
+        Regression: No
 
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
-v2:
-	rephrase commit title & message
----
- arch/x86/kvm/vmx/nested.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Parallels Desktop 15.0.0.46967 Crack is the fastest, easiest and most powerful
+application for running Windows on a Mac without rebooting. Includes over 30
+utilities to simplify everyday tasks on Mac and Windows. Whether you have to
+run Windows programs without the Mac version or switch from a PC to a Mac and
+transfer your data, Parallels Desktop Crack has helped you. Use Windows
+side-by-side with macOS (no reboot is required) on your MacBook, MacBook Pro,
+iMac, iMac Pro, Mac mini, or Mac Pro. Share files and folders, copy images and
+text, and drag them into Mac and Windows applications.
+Parallels Desktop Crack Mac + Keygen
+https://crackmines.com/parallels-desktop-crack-mac/
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 8edefdc9c0cb..c1ec9f25a417 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4799,8 +4799,10 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 					instr_info, true, len, &gva))
- 			return 1;
- 		/* _system ok, nested_vmx_check_permission has verified cpl=0 */
--		if (kvm_write_guest_virt_system(vcpu, gva, &value, len, &e))
-+		if (kvm_write_guest_virt_system(vcpu, gva, &value, len, &e)) {
- 			kvm_inject_page_fault(vcpu, &e);
-+			return 1;
-+		}
- 	}
- 
- 	return nested_vmx_succeed(vcpu);
 -- 
-2.19.1
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
