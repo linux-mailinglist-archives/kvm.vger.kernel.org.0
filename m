@@ -2,328 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 942A912CE37
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2019 10:29:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 99FE312D6B6
+	for <lists+kvm@lfdr.de>; Tue, 31 Dec 2019 07:47:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727257AbfL3J3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Dec 2019 04:29:20 -0500
-Received: from foss.arm.com ([217.140.110.172]:53710 "EHLO foss.arm.com"
+        id S1725875AbfLaGqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Dec 2019 01:46:43 -0500
+Received: from mga04.intel.com ([192.55.52.120]:16543 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727162AbfL3J3U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Dec 2019 04:29:20 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3DE7328;
-        Mon, 30 Dec 2019 01:29:18 -0800 (PST)
-Received: from [10.37.8.67] (unknown [10.37.8.67])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E3E63F703;
-        Mon, 30 Dec 2019 01:29:15 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 15/18] arm/arm64: Perform dcache clean +
- invalidate after turning MMU off
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
-        maz@kernel.org, andre.przywara@arm.com, vladimir.murzin@arm.com,
-        mark.rutland@arm.com
-References: <20191128180418.6938-1-alexandru.elisei@arm.com>
- <20191128180418.6938-16-alexandru.elisei@arm.com>
- <20191213184247.2j4s3llwp6zvkeuj@kamzik.brq.redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <721b3c1e-a843-9352-9b8c-cd49da760a1f@arm.com>
-Date:   Mon, 30 Dec 2019 09:29:13 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191213184247.2j4s3llwp6zvkeuj@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        id S1725497AbfLaGqn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Dec 2019 01:46:43 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Dec 2019 22:46:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,378,1571727600"; 
+   d="scan'208";a="224368469"
+Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
+  by fmsmga001.fm.intel.com with ESMTP; 30 Dec 2019 22:46:41 -0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Cc:     yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
+        edwin.zhai@intel.com, Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v10 00/10] Enable Sub-Page Write Protection Support
+Date:   Tue, 31 Dec 2019 14:50:33 +0800
+Message-Id: <20191231065043.2209-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+EPT-Based Sub-Page write Protection(SPP) allows Virtual Machine Monitor(VMM)
+specify write-permission for guest physical memory at a sub-page(128 byte)
+granularity. When SPP works, HW enforces write-access check for sub-pages
+within a protected 4KB page.
 
-On 12/13/19 6:42 PM, Andrew Jones wrote:
-> On Thu, Nov 28, 2019 at 06:04:15PM +0000, Alexandru Elisei wrote:
->> When the MMU is off, data accesses are to Device nGnRnE memory on arm64 [1]
->> or to Strongly-Ordered memory on arm [2]. This means that the accesses are
->> non-cacheable.
->>
->> Perform a dcache clean to PoC so we can read the newer values from the
->> cache, instead of the stale values from memory.
->>
->> Perform an invalidation so when we re-enable the MMU, we can access the
->> data written to memory while the MMU was off, instead of potentially
->> stale values from the cache.
->>
->> Data caches are PIPT and the VAs are translated using the current
->> translation tables, or an identity mapping (what Arm calls a "flat
->> mapping") when the MMU is off [1], [2]. Do the clean + invalidate when the
->> MMU is off so we don't depend on the current translation tables and we can
->> make sure that the operation applies to the entire physical memory.
->>
->> [1] ARM DDI 0487E.a, section D5.2.9
->> [2] ARM DDI 0406C.d, section B3.2.1
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>
->> Tested with the following hack:
->>
->> diff --git a/arm/selftest.c b/arm/selftest.c
->> index e9dc5c0cab28..7f29548bc468 100644
->> --- a/arm/selftest.c
->> +++ b/arm/selftest.c
->> @@ -350,10 +350,21 @@ static void cpu_report(void *data __unused)
->>  	report_info("CPU%3d: MPIDR=%010" PRIx64, cpu, mpidr);
->>  }
->>  
->> +#include <alloc_page.h>
->> +#include <asm/mmu.h>
->>  int main(int argc, char **argv)
->>  {
->> +	int *x = alloc_page();
->> +
->>  	report_prefix_push("selftest");
->>  
->> +	*x = 0x42;
->> +	mmu_disable();
->> +	report("read back value written with MMU on", *x == 0x42);
->> +	*x = 0x50;
->> +	mmu_enable(current_thread_info()->pgtable);
->> +	report("read back value written with MMU off", *x == 0x50);
->> +
->>  	if (argc < 2)
->>  		report_abort("no test specified");
-> When applying this patch the above hack also gets applied, and I'm
-> guessing that wasn't the intent. It can go above the ---, as it's useful
-> information.
+The feature targets to provide fine-grained memory protection for
+usages such as memory guard and VM introspection etc.
 
-That is unfortunate, I didn't intend for the reproducer to get applied. I'll add
-the diff to the commit message, as well as the explanation (below) for the
-failures without this patch.
+SPP is active when the "sub-page write protection" (bit 23) is 1 in
+Secondary VM-Execution Controls. The feature is backed with a Sub-Page
+Permission Table(SPPT), and subpage permission vector is stored in the
+leaf entry of SPPT. The root page is referenced via a Sub-Page Permission
+Table Pointer (SPPTP) in VMCS.
 
-Thanks,
-Alex
-> Thanks,
-> drew
->
->>  
->> Without the fix, the first report fails, and the test usually hangs because
->> mmu_enable pushes the LR register on the stack before asm_mmu_enable, which
->> goes to memory, then pops it after asm_mmu_enable, and reads back garbage
->> from the dcache.
->>
->> With the fix, the two reports pass.
->>
->>  lib/arm/asm/processor.h   |  6 ++++++
->>  lib/arm64/asm/processor.h |  6 ++++++
->>  lib/arm/processor.c       | 10 ++++++++++
->>  lib/arm/setup.c           |  2 ++
->>  lib/arm64/processor.c     | 11 +++++++++++
->>  arm/cstart.S              | 22 ++++++++++++++++++++++
->>  arm/cstart64.S            | 23 +++++++++++++++++++++++
->>  7 files changed, 80 insertions(+)
->>
->> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
->> index a8c4628da818..4684fb4755b3 100644
->> --- a/lib/arm/asm/processor.h
->> +++ b/lib/arm/asm/processor.h
->> @@ -9,6 +9,11 @@
->>  #include <asm/sysreg.h>
->>  #include <asm/barrier.h>
->>  
->> +#define CTR_DMINLINE_SHIFT	16
->> +#define CTR_DMINLINE_MASK	(0xf << 16)
->> +#define CTR_DMINLINE(x)	\
->> +	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
->> +
->>  enum vector {
->>  	EXCPTN_RST,
->>  	EXCPTN_UND,
->> @@ -25,6 +30,7 @@ typedef void (*exception_fn)(struct pt_regs *);
->>  extern void install_exception_handler(enum vector v, exception_fn fn);
->>  
->>  extern void show_regs(struct pt_regs *regs);
->> +extern void init_dcache_line_size(void);
->>  
->>  static inline unsigned long current_cpsr(void)
->>  {
->> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
->> index 1d9223f728a5..fd508c02f30d 100644
->> --- a/lib/arm64/asm/processor.h
->> +++ b/lib/arm64/asm/processor.h
->> @@ -16,6 +16,11 @@
->>  #define SCTLR_EL1_A	(1 << 1)
->>  #define SCTLR_EL1_M	(1 << 0)
->>  
->> +#define CTR_EL0_DMINLINE_SHIFT	16
->> +#define CTR_EL0_DMINLINE_MASK	(0xf << 16)
->> +#define CTR_EL0_DMINLINE(x)	\
->> +	(((x) & CTR_EL0_DMINLINE_MASK) >> CTR_EL0_DMINLINE_SHIFT)
->> +
->>  #ifndef __ASSEMBLY__
->>  #include <asm/ptrace.h>
->>  #include <asm/esr.h>
->> @@ -60,6 +65,7 @@ extern void vector_handlers_default_init(vector_fn *handlers);
->>  
->>  extern void show_regs(struct pt_regs *regs);
->>  extern bool get_far(unsigned int esr, unsigned long *far);
->> +extern void init_dcache_line_size(void);
->>  
->>  static inline unsigned long current_level(void)
->>  {
->> diff --git a/lib/arm/processor.c b/lib/arm/processor.c
->> index 773337e6d3b7..c57657c5ea53 100644
->> --- a/lib/arm/processor.c
->> +++ b/lib/arm/processor.c
->> @@ -25,6 +25,8 @@ static const char *vector_names[] = {
->>  	"rst", "und", "svc", "pabt", "dabt", "addrexcptn", "irq", "fiq"
->>  };
->>  
->> +unsigned int dcache_line_size;
->> +
->>  void show_regs(struct pt_regs *regs)
->>  {
->>  	unsigned long flags;
->> @@ -145,3 +147,11 @@ bool is_user(void)
->>  {
->>  	return current_thread_info()->flags & TIF_USER_MODE;
->>  }
->> +void init_dcache_line_size(void)
->> +{
->> +	u32 ctr;
->> +
->> +	asm volatile("mrc p15, 0, %0, c0, c0, 1" : "=r" (ctr));
->> +	/* DminLine is log2 of the number of words in the smallest cache line */
->> +	dcache_line_size = 1 << (CTR_DMINLINE(ctr) + 2);
->> +}
->> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
->> index 4f02fca85607..54fc19a20942 100644
->> --- a/lib/arm/setup.c
->> +++ b/lib/arm/setup.c
->> @@ -20,6 +20,7 @@
->>  #include <asm/thread_info.h>
->>  #include <asm/setup.h>
->>  #include <asm/page.h>
->> +#include <asm/processor.h>
->>  #include <asm/smp.h>
->>  
->>  #include "io.h"
->> @@ -63,6 +64,7 @@ static void cpu_init(void)
->>  	ret = dt_for_each_cpu_node(cpu_set, NULL);
->>  	assert(ret == 0);
->>  	set_cpu_online(0, true);
->> +	init_dcache_line_size();
->>  }
->>  
->>  static void mem_init(phys_addr_t freemem_start)
->> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
->> index 2a024e3f4e9d..f28066d40145 100644
->> --- a/lib/arm64/processor.c
->> +++ b/lib/arm64/processor.c
->> @@ -62,6 +62,8 @@ static const char *ec_names[EC_MAX] = {
->>  	[ESR_EL1_EC_BRK64]		= "BRK64",
->>  };
->>  
->> +unsigned int dcache_line_size;
->> +
->>  void show_regs(struct pt_regs *regs)
->>  {
->>  	int i;
->> @@ -257,3 +259,12 @@ bool is_user(void)
->>  {
->>  	return current_thread_info()->flags & TIF_USER_MODE;
->>  }
->> +
->> +void init_dcache_line_size(void)
->> +{
->> +	u64 ctr;
->> +
->> +	ctr = read_sysreg(ctr_el0);
->> +	/* DminLine is log2 of the number of words in the smallest cache line */
->> +	dcache_line_size = 1 << (CTR_EL0_DMINLINE(ctr) + 2);
->> +}
->> diff --git a/arm/cstart.S b/arm/cstart.S
->> index dfef48e4dbb2..3c2a3bcde61a 100644
->> --- a/arm/cstart.S
->> +++ b/arm/cstart.S
->> @@ -188,6 +188,20 @@ asm_mmu_enable:
->>  
->>  	mov     pc, lr
->>  
->> +.macro dcache_clean_inval domain, start, end, tmp1, tmp2
->> +	ldr	\tmp1, =dcache_line_size
->> +	ldr	\tmp1, [\tmp1]
->> +	sub	\tmp2, \tmp1, #1
->> +	bic	\start, \start, \tmp2
->> +9998:
->> +	/* DCCIMVAC */
->> +	mcr	p15, 0, \start, c7, c14, 1
->> +	add	\start, \start, \tmp1
->> +	cmp	\start, \end
->> +	blo	9998b
->> +	dsb	\domain
->> +.endm
->> +
->>  .globl asm_mmu_disable
->>  asm_mmu_disable:
->>  	/* SCTLR */
->> @@ -195,6 +209,14 @@ asm_mmu_disable:
->>  	bic	r0, #CR_M
->>  	mcr	p15, 0, r0, c1, c0, 0
->>  	isb
->> +
->> +	ldr	r0, =__phys_offset
->> +	ldr	r0, [r0]
->> +	ldr	r1, =__phys_end
->> +	ldr	r1, [r1]
->> +	dcache_clean_inval sy, r0, r1, r2, r3
->> +	isb
->> +
->>  	mov     pc, lr
->>  
->>  /*
->> diff --git a/arm/cstart64.S b/arm/cstart64.S
->> index c98842f11e90..f41ffa3bc6c2 100644
->> --- a/arm/cstart64.S
->> +++ b/arm/cstart64.S
->> @@ -201,12 +201,35 @@ asm_mmu_enable:
->>  
->>  	ret
->>  
->> +/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
->> +.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
->> +	adrp	\tmp1, dcache_line_size
->> +	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
->> +	sub	\tmp2, \tmp1, #1
->> +	bic	\start, \start, \tmp2
->> +9998:
->> +	dc	\op , \start
->> +	add	\start, \start, \tmp1
->> +	cmp	\start, \end
->> +	b.lo	9998b
->> +	dsb	\domain
->> +.endm
->> +
->>  .globl asm_mmu_disable
->>  asm_mmu_disable:
->>  	mrs	x0, sctlr_el1
->>  	bic	x0, x0, SCTLR_EL1_M
->>  	msr	sctlr_el1, x0
->>  	isb
->> +
->> +	/* Clean + invalidate the entire memory */
->> +	adrp	x0, __phys_offset
->> +	ldr	x0, [x0, :lo12:__phys_offset]
->> +	adrp	x1, __phys_end
->> +	ldr	x1, [x1, :lo12:__phys_end]
->> +	dcache_by_line_op civac, sy, x0, x1, x2, x3
->> +	isb
->> +
->>  	ret
->>  
->>  /*
->> -- 
->> 2.20.1
->>
+To enable SPP for guest memory, the guest page should be first mapped
+to a 4KB EPT entry, then set SPP bit 61 of the corresponding entry. 
+While HW walks EPT, it traverses SPPT with the gpa to look up the sub-page
+permission vector within SPPT leaf entry. If the corresponding bit is set,
+write to sub-page is permitted, otherwise, SPP induced EPT violation is generated.
+
+This patch serial passed SPP function test and selftest on Ice-Lake platform.
+
+Please refer to the SPP introduction document in this patch set and
+Intel SDM for details:
+
+Intel SDM:
+https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+Patch 1: Documentation for SPP and related API.
+Patch 2: Add control flags for Sub-Page Protection(SPP).
+Patch 3: Add SPP Table setup functions.
+Patch 4: Add functions to create/destroy SPP bitmap block.
+Patch 5: Introduce user-space SPP IOCTLs.
+Patch 6: Set up SPP paging table at vmentry/vmexit.
+Patch 7: Enable Lazy mode SPP protection.
+Patch 8: Handle SPP protected pages when VM memory changes.
+Patch 9: Add SPP protection check in emulation case.
+Patch 10: SPP selftest.
+
+Change logs:
+
+v9 ->v10
+  1. Cleared SPP active flag on VM resetting.
+  2. Added trancepoints on subpage setup and SPP induced vmexits.
+  3. Other minor code fix.
+
+v8 ->v9:
+  1. Added SPP protection check in pte prefetch case.
+  2. Flushed EPT rmap to remove existing mappings of the target gfns.
+  3. Modified documentation to reflect recent changes.
+  4. Other minor code refactor.
+
+v7 -> v8:
+  1. Changed ioctl interface definition per Paolo's comments.
+  2. Replaced SPP_INIT ioctl funciton with KVM_ENABLE_CAP.
+  3. Removed SPP bit from X86 feature word.
+  4. Returned instruction length to user-space when SPP induced EPT
+     violation happens, this is to provide flexibility to use SPP,
+     revert write or track write.
+  5. Modified selftest application and added into this serial.
+  6. Simplified SPP permission vector check.
+  7. Moved spp.c and spp.h to kvm/mmu folder.
+  8. Other code fix according to Paolo's feedback and testing.
+
+v6 -> v7:
+  1. Configured all available protected pages once SPP induced vmexit
+     happens since there's no PRESENT bit in SPPT leaf entry.
+  2. Changed SPP protection check flow in tdp_page_fault().
+  3. Code refactor and minior fixes.
+
+v5 -> v6:
+  1. Added SPP protection patch for emulation cases per Jim's review.
+  2. Modified documentation and added API description per Jim's review.
+  3. Other minior changes suggested by Jim.
+
+v4 -> v5:
+  1. Enable SPP support for Hugepage(1GB/2MB) to extend application.
+  2. Make SPP miss vm-exit handler as the unified place to set up SPPT.
+  3. If SPP protected pages are access-tracked or dirty-page-tracked,
+     store SPP flag in reserved address bit, restore it in
+     fast_page_fault() handler.
+  4. Move SPP specific functions to vmx/spp.c and vmx/spp.h
+  5. Rebased code to kernel v5.3
+  6. Other change suggested by KVM community.
+  
+v3 -> v4:
+  1. Modified documentation to make it consistent with patches.
+  2. Allocated SPPT root page in init_spp() instead of vmx_set_cr3() to
+     avoid SPPT miss error.
+  3. Added back co-developers and sign-offs.
+
+v2 -> v3:                                                                
+  1. Rebased patches to kernel 5.1 release                                
+  2. Deferred SPPT setup to EPT fault handler if the page is not
+     available while set_subpage() is being called.
+  3. Added init IOCTL to reduce extra cost if SPP is not used.
+  4. Refactored patch structure, cleaned up cross referenced functions.
+  5. Added code to deal with memory swapping/migration/shrinker cases.
+
+v2 -> v1:
+  1. Rebased to 4.20-rc1
+  2. Move VMCS change to a separated patch.
+  3. Code refine and Bug fix 
+
+Yang Weijiang (10):
+  Documentation: Add EPT based Subpage Protection and related APIs
+  vmx: spp: Add control flags for Sub-Page Protection(SPP)
+  mmu: spp: Add SPP Table setup functions
+  mmu: spp: Add functions to operate SPP access bitmap
+  x86: spp: Introduce user-space SPP IOCTLs
+  vmx: spp: Set up SPP paging table at vmentry/vmexit
+  mmu: spp: Enable Lazy mode SPP protection
+  mmu: spp: Handle SPP protected pages when VM memory changes
+  x86: spp: Add SPP protection check in emulation
+  kvm: selftests: selftest for Sub-Page protection
+
+ Documentation/virt/kvm/api.txt                |  39 ++
+ Documentation/virtual/kvm/spp_kvm.txt         | 179 +++++
+ arch/x86/include/asm/kvm_host.h               |  11 +-
+ arch/x86/include/asm/vmx.h                    |  10 +
+ arch/x86/include/uapi/asm/vmx.h               |   2 +
+ arch/x86/kvm/mmu.h                            |   2 +
+ arch/x86/kvm/mmu/mmu.c                        | 106 ++-
+ arch/x86/kvm/mmu/spp.c                        | 660 ++++++++++++++++++
+ arch/x86/kvm/mmu/spp.h                        |  35 +
+ arch/x86/kvm/trace.h                          |  66 ++
+ arch/x86/kvm/vmx/capabilities.h               |   5 +
+ arch/x86/kvm/vmx/vmx.c                        | 104 ++-
+ arch/x86/kvm/x86.c                            | 136 +++-
+ include/uapi/linux/kvm.h                      |  17 +
+ tools/testing/selftests/kvm/Makefile          |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+ tools/testing/selftests/kvm/x86_64/spp_test.c | 234 +++++++
+ 17 files changed, 1599 insertions(+), 10 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/spp_kvm.txt
+ create mode 100644 arch/x86/kvm/mmu/spp.c
+ create mode 100644 arch/x86/kvm/mmu/spp.h
+ create mode 100644 tools/testing/selftests/kvm/x86_64/spp_test.c
+
+-- 
+2.17.2
+
