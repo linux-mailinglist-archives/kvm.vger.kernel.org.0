@@ -2,327 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B7D1B12D6AA
-	for <lists+kvm@lfdr.de>; Tue, 31 Dec 2019 07:47:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B96A912DA15
+	for <lists+kvm@lfdr.de>; Tue, 31 Dec 2019 17:10:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727081AbfLaGrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Dec 2019 01:47:07 -0500
-Received: from mga04.intel.com ([192.55.52.120]:16543 "EHLO mga04.intel.com"
+        id S1727104AbfLaQKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Dec 2019 11:10:11 -0500
+Received: from foss.arm.com ([217.140.110.172]:35442 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727056AbfLaGq7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Dec 2019 01:46:59 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Dec 2019 22:46:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,378,1571727600"; 
-   d="scan'208";a="224368511"
-Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
-  by fmsmga001.fm.intel.com with ESMTP; 30 Dec 2019 22:46:57 -0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com,
-        sean.j.christopherson@intel.com
-Cc:     yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
-        edwin.zhai@intel.com, Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v10 10/10] kvm: selftests: selftest for Sub-Page protection
-Date:   Tue, 31 Dec 2019 14:50:43 +0800
-Message-Id: <20191231065043.2209-11-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20191231065043.2209-1-weijiang.yang@intel.com>
-References: <20191231065043.2209-1-weijiang.yang@intel.com>
+        id S1726060AbfLaQKL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Dec 2019 11:10:11 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA42F328;
+        Tue, 31 Dec 2019 08:10:08 -0800 (PST)
+Received: from e121566-lin.arm.com,emea.arm.com,asiapac.arm.com,usa.arm.com (unknown [10.37.8.41])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C43A33F68F;
+        Tue, 31 Dec 2019 08:10:06 -0800 (PST)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, drjones@redhat.com, maz@kernel.org,
+        andre.przywara@arm.com, vladimir.murzin@arm.com,
+        mark.rutland@arm.com
+Subject: [kvm-unit-tests PATCH v3 00/18] arm/arm64: Various fixes
+Date:   Tue, 31 Dec 2019 16:09:31 +0000
+Message-Id: <1577808589-31892-1-git-send-email-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.7.4
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sub-Page Permission(SPP) is to protect finer granularity subpages
-(128Byte each) within a 4KB page. It's not enabled in KVM by default,
-the test first initializes the SPP runtime environment with
-KVM_ENABLE_CAP ioctl, then sets protection with KVM_SUBPAGES_SET_ACCESS
-for the target guest page, check permissions with KVM_SUBPAGES_GET_ACCESS
-to make sure they are set as expected.
+This is a combination of the fixes from my EL2 series [1] and other new
+fixes. I've rebased the series on top of 2c6589bc4e8b ("Update AMD
+instructions to conform to LLVM assembler"), which means that I had to
+switch the order of parameters for the report function.
 
-Two steps in guest code to very whether SPP is working:
-1) protect all 128byte subpages, write data to each subpage
-to see if SPP induced EPT violation happening. 2)unprotect all
-subpages, again write data to each subpage to see if SPP still
-works or not.
+This time around I tried to do a better job at testing. I've ran
+kvm-unit-tests in the following configurations:
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- tools/testing/selftests/kvm/Makefile          |   2 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
- tools/testing/selftests/kvm/x86_64/spp_test.c | 234 ++++++++++++++++++
- 3 files changed, 236 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/spp_test.c
+- with kvmtool, on an arm64 host kernel: 64 and 32 bit tests, with GICv3
+  (on an Ampere eMAG) and GICv2 (on a AMD Seattle box).
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 3138a916574a..48582b7d1963 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -29,7 +29,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
- TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
--
-+TEST_GEN_PROGS_x86_64 += x86_64/spp_test
- TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 41cf45416060..bc0a25f4276b 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1486,6 +1486,7 @@ static struct exit_reason {
- 	{KVM_EXIT_UNKNOWN, "UNKNOWN"},
- 	{KVM_EXIT_EXCEPTION, "EXCEPTION"},
- 	{KVM_EXIT_IO, "IO"},
-+	{KVM_EXIT_SPP, "SPP"},
- 	{KVM_EXIT_HYPERCALL, "HYPERCALL"},
- 	{KVM_EXIT_DEBUG, "DEBUG"},
- 	{KVM_EXIT_HLT, "HLT"},
-diff --git a/tools/testing/selftests/kvm/x86_64/spp_test.c b/tools/testing/selftests/kvm/x86_64/spp_test.c
-new file mode 100644
-index 000000000000..2e83ff60768b
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/spp_test.c
-@@ -0,0 +1,234 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Sub-Page Permission test
-+ *
-+ * Copyright (C) 2019, Intel Corp.
-+ *
-+ */
-+
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "../../lib/kvm_util_internal.h"
-+#include "linux/kvm.h"
-+
-+#define VCPU_ID           1
-+#define PAGE_SIZE         (4096)
-+#define SPP_GUARD_SIZE    (16 * PAGE_SIZE)
-+#define SPP_GUARD_MEMSLOT (1)
-+#define SPP_GUARD_PAGES   (SPP_GUARD_SIZE / PAGE_SIZE)
-+#define SPP_GUARD_GPA      0x10000000
-+
-+#define SUBPAGE_ACCESS_DEFAULT   (0x0)
-+#define SUBPAGE_ACCESS_FULL      (0xFFFFFFFF)
-+#define START_SPP_VM_ADDR        (0x700000)
-+#define SUBPAGE_SIZE             (128)
-+
-+vm_vaddr_t vspp_start;
-+vm_paddr_t pspp_start;
-+
-+void guest_code(void)
-+{
-+	uint8_t *iterator = (uint8_t *)vspp_start;
-+	int count;
-+
-+	GUEST_SYNC(1);
-+	/*
-+	 * expect EPT violation induced by SPP in each interation since
-+	 * the full page is protected by SPP.
-+	 */
-+	for (count = 0; count < PAGE_SIZE / SUBPAGE_SIZE; count++) {
-+		*(uint32_t *)(iterator) = 0x99;
-+		iterator += SUBPAGE_SIZE;
-+	}
-+	GUEST_SYNC(2);
-+	iterator = (uint8_t *)vspp_start;
-+
-+	/*
-+	 * don't expect EPT violation happen since SPP is disabled
-+	 * for the page
-+	 */
-+	for (count = 0; count < PAGE_SIZE / SUBPAGE_SIZE; count++) {
-+		*(uint32_t *)(iterator) = 0x99;
-+		iterator += SUBPAGE_SIZE;
-+	}
-+}
-+
-+void prepare_test(struct kvm_vm **g_vm, struct kvm_run **g_run)
-+{
-+	void *spp_hva;
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+	/* Create VM, SPP is only valid for 4KB page mode */
-+	*g_vm = vm_create_default(VCPU_ID, 0, guest_code);
-+	vm = *g_vm;
-+
-+	*g_run = vcpu_state(vm, VCPU_ID);
-+	run = *g_run;
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, SPP_GUARD_GPA,
-+				    SPP_GUARD_MEMSLOT, SPP_GUARD_PAGES, 0);
-+
-+	pspp_start = vm_phy_pages_alloc(vm, 1, SPP_GUARD_GPA,
-+					SPP_GUARD_MEMSLOT);
-+
-+	memset(addr_gpa2hva(vm, SPP_GUARD_GPA), 0x0, PAGE_SIZE);
-+
-+	virt_map(vm, START_SPP_VM_ADDR, SPP_GUARD_GPA, PAGE_SIZE, 0);
-+
-+	vspp_start = vm_vaddr_alloc(vm, PAGE_SIZE, START_SPP_VM_ADDR,
-+				    SPP_GUARD_MEMSLOT, 0);
-+
-+	spp_hva = addr_gva2hva(vm, vspp_start);
-+
-+	pspp_start = addr_hva2gpa(vm, spp_hva);
-+
-+	printf("SPP protected zone: size = %d, gva = 0x%lx, gpa = 0x%lx, "
-+	       "hva = 0x%p\n", PAGE_SIZE, vspp_start, pspp_start, spp_hva);
-+
-+	/* make sure the virtual address is visible to VM. */
-+	sync_global_to_guest(vm, vspp_start);
-+
-+	vcpu_run(vm, VCPU_ID);
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "exit reason: %u (%s),\n", run->exit_reason,
-+		     exit_reason_str(run->exit_reason));
-+}
-+
-+void setup_spp(struct kvm_vm *vm)
-+{
-+	struct kvm_enable_cap cap;
-+	int ret = 0;
-+	struct kvm_subpage *sp;
-+	int len;
-+	memset(&cap, 0, sizeof(cap));
-+	cap.cap = KVM_CAP_X86_SPP;
-+	cap.flags = 0;
-+
-+	/* initialize the SPP runtime environment.*/
-+	ret = ioctl(vm->fd, KVM_ENABLE_CAP, &cap);
-+	TEST_ASSERT(ret == 0, "KVM_CAP_X86_SPP failed.");
-+	len = sizeof(*sp) + sizeof(__u32);
-+	printf("SPP initialized successfully.\n");
-+
-+	sp = malloc(len);
-+	TEST_ASSERT(sp > 0, "Low memory 1!");
-+	memset(sp, 0, len);
-+	/* set up SPP protection for the page. */
-+	sp->npages = 1;
-+	sp->gfn_base = pspp_start >> 12;
-+	sp->access_map[0] = SUBPAGE_ACCESS_DEFAULT;
-+	ret = ioctl(vm->fd, KVM_SUBPAGES_SET_ACCESS, sp);
-+
-+	TEST_ASSERT(ret == 1, "KVM_SUBPAGES_SET_ACCESS failed. ret = 0x%x, "
-+		    "gfn_base = 0x%llx\n", ret, sp->gfn_base);
-+	printf("set spp protection info: gfn = 0x%llx, access = 0x%x, "
-+	       "npages = %d\n", sp->gfn_base, sp->access_map[0],
-+	       sp->npages);
-+
-+	memset(sp, 0, len);
-+	/* make sure the SPP permission bits are actully set as expected. */
-+	sp->npages = 1;
-+	sp->gfn_base = pspp_start >> 12;
-+
-+	ret = ioctl(vm->fd, KVM_SUBPAGES_GET_ACCESS, sp);
-+
-+	TEST_ASSERT(ret == 1, "KVM_SUBPAGES_GET_ACCESS failed.");
-+
-+	TEST_ASSERT(sp->access_map[0] == SUBPAGE_ACCESS_DEFAULT,
-+		    "subpage access didn't match.");
-+	printf("get spp protection info: gfn = 0x%llx, access = 0x%x, "
-+	       "npages = %d\n", sp->gfn_base,
-+	       sp->access_map[0], sp->npages);
-+
-+	free(sp);
-+	printf("got matched subpage permission vector.\n");
-+	printf("expect VM exits caused by SPP below.\n");
-+}
-+
-+void unset_spp(struct kvm_vm *vm)
-+{
-+	struct kvm_subpage *sp;
-+	int len;
-+
-+	len = sizeof(*sp) + sizeof(__u32);
-+	sp = malloc(len);
-+	TEST_ASSERT(sp > 0, "Low memory 2!");
-+	memset(sp, 0, len);
-+
-+	/* now unprotect the SPP to the page.*/
-+	sp->npages = 1;
-+	sp->gfn_base = pspp_start >> 12;
-+	sp->access_map[0] = SUBPAGE_ACCESS_FULL;
-+	ioctl(vm->fd, KVM_SUBPAGES_SET_ACCESS, sp);
-+
-+	printf("unset SPP protection at gfn: 0x%llx\n", sp->gfn_base);
-+	printf("expect NO VM exits caused by SPP below.\n");
-+	free(sp);
-+}
-+
-+#define TEST_SYNC_FIELDS   KVM_SYNC_X86_REGS
-+
-+void run_test(struct kvm_vm *vm, struct kvm_run *run)
-+{
-+	int loop;
-+	int ept_fault = 0;
-+	struct kvm_regs regs;
-+
-+	run->kvm_valid_regs = TEST_SYNC_FIELDS;
-+	vcpu_run(vm, VCPU_ID);
-+
-+	for (loop = 0; loop < PAGE_SIZE / SUBPAGE_SIZE; loop++) {
-+		/*
-+		 * if everything goes correctly, should get VM exit
-+		 * with KVM_EXIT_SPP.
-+		 */
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_SPP,
-+			    "exit reason: %u (%s),\n", run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+		printf("%d - exit reason: %s\n", loop + 1,
-+		       exit_reason_str(run->exit_reason));
-+		ept_fault++;
-+
-+		vcpu_regs_get(vm, VCPU_ID, &regs);
-+
-+		run->s.regs.regs.rip += run->spp.ins_len;
-+
-+		run->kvm_valid_regs = TEST_SYNC_FIELDS;
-+		run->kvm_dirty_regs = KVM_SYNC_X86_REGS;
-+
-+		vcpu_run(vm, VCPU_ID);
-+	}
-+
-+	printf("total EPT violation count: %d\n", ept_fault);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+
-+	prepare_test(&vm, &run);
-+
-+	setup_spp(vm);
-+
-+	run_test(vm, run);
-+
-+	unset_spp(vm);
-+
-+	vcpu_run(vm, VCPU_ID);
-+
-+	printf("completed SPP test successfully!\n");
-+
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
-+
+- with qemu, on an arm64 host kernel:
+    a. with accel=kvm, 64 and 32 bit tests, with GICv3 (Ampere eMAG) and
+       GICv2 (Seattle).
+    b. with accel=tcg, 64 and 32 bit tests, on the Ampere eMAG machine.
+
+I didn't run the 32 bit tests under a 32 bit host kernel because I don't
+have a 32 bit arm board at hand at the moment. It's also worth noting that
+when I tried running the selftest-vectors-kernel tests on an ancient
+version of qemu (QEMU emulator version 2.5.0 (Debian
+1:2.5+dfsg-5ubuntu10.42)) I got the following error:
+
+ $ arm/run arm/selftest.flat -append vectors-kernel
+/usr/bin/qemu-system-aarch64 -nodefaults -machine virt,accel=tcg -cpu cortex-a57 -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/selftest.flat -append vectors-kernel # -initrd /tmp/tmp.zNO1kWtmuM
+PASS: selftest: vectors-kernel: und
+PASS: selftest: vectors-kernel: svc
+qemu: fatal: Trying to execute code outside RAM or ROM at 0x0000003fffff0000
+
+PC=0000003fffff0000  SP=00000000400aff70
+X00=00000000400805a0 X01=0000000040092f20 X02=0000003fffff0000 X03=0000000040092f20
+X04=0000000000000010 X05=00000000400aff40 X06=00000000400aff70 X07=00000000400aff70
+X08=00000000400afde0 X09=ffffff80ffffffc8 X10=00000000400afe20 X11=00000000400afe20
+X12=00000000400b0000 X13=00000000400afeac X14=00000000400b0000 X15=0000000000000000
+X16=0000000000000000 X17=0000000000000000 X18=0000000000000000 X19=0000000040092000
+X20=0000000000000004 X21=0000000040092e98 X22=0000000040092f20 X23=0000000000000000
+X24=0000000000000000 X25=0000000000000000 X26=0000000000000000 X27=0000000000000000
+X28=0000000000000000 X29=0000000000000000 X30=000000004008052c 
+PSTATE=800003c5 N--- EL1h
+q00=0000000000000000:0000000000000000 q01=0000000000000000:0000000000000000
+q02=0000000000000000:0000000000000000 q03=0000000000000000:0000000000000000
+q04=0000000000000000:0000000000000000 q05=0000000000000000:0000000000000000
+q06=0000000000000000:0000000000000000 q07=0000000000000000:0000000000000000
+q08=0000000000000000:0000000000000000 q09=0000000000000000:0000000000000000
+q10=0000000000000000:0000000000000000 q11=0000000000000000:0000000000000000
+q12=0000000000000000:0000000000000000 q13=0000000000000000:0000000000000000
+q14=0000000000000000:0000000000000000 q15=0000000000000000:0000000000000000
+q16=0000000000000000:0000000000000000 q17=0000000000000000:0000000000000000
+q18=0000000000000000:0000000000000000 q19=0000000000000000:0000000000000000
+q20=0000000000000000:0000000000000000 q21=0000000000000000:0000000000000000
+q22=0000000000000000:0000000000000000 q23=0000000000000000:0000000000000000
+q24=0000000000000000:0000000000000000 q25=0000000000000000:0000000000000000
+q26=0000000000000000:0000000000000000 q27=0000000000000000:0000000000000000
+q28=0000000000000000:0000000000000000 q29=0000000000000000:0000000000000000
+q30=0000000000000000:0000000000000000 q31=0000000000000000:0000000000000000
+FPCR: 00000000  FPSR: 00000000
+QEMU Aborted
+
+I'm not sure if we support such an old version of qemu. If we do, please
+let me know, and I'll try to come up with a solution. I am reluctant to
+drop the prefetch abort test because it uncovered a bug in the nested
+virtualization patches.
+
+Summary of the patches:
+* Patch 1 adds coherent translation table walks for ARMv7 and removes
+  unneeded dcache maintenance.
+* Patches 2-4 make translation table updates more robust.
+* Patches 5-6 fix a pretty serious bug in our PSCI test, which was causing
+  an infinite loop of prefetch aborts.
+* Patches 7-10 add a proper test for prefetch aborts. The test now uses
+  mmu_clear_user.
+* Patches 11-13 are fixes for the timer test.
+* Patches 14-15 fix turning the MMU off.
+* Patches 16-18 are small fixes to make the code more robust, and perhaps
+  more important, remove unnecessary operations that might hide real bugs
+  in KVM.
+
+Patches 1-4, 9, 18 are new. The rest are taken from the EL2 series, and
+I've kept the Reviewed-by tag where appropriate.
+
+Changes in v3:
+* Implemented review comments.
+* Minor cosmetic changes to the commit messages here and there.
+* Removed the duplicate DSB ISHST that I had added to mmu.c in patch #1.
+  flush_tlb_page already has the needed barriers.
+* Replaced patch #2 "lib: arm64: Remove barriers before TLB operations"
+  with "lib: arm: Add proper data synchronization barriers for TLBIs".
+  I've decided to keep the needed barriers in the flush_tlb_* functions, to
+  match what the kernel does.
+* Added a missing DSB ISHST in flush_tlb_all in patch #8 "lib: arm:
+  Implement flush_tlb_all"
+* The address for the prefetch abort test is now in hexadecimal to prevent
+  a compile error.
+* Added information about the KVM bug that patch #13 "arm64: timer: Test
+  behavior when timer disabled or masked" helped find.
+* Explained in the commit message for #15 how to reproduce some of the
+  errors that I was seeing without the patch.
+
+Changes in v2:
+* Fixed the prefetch abort test on QEMU by changing the address used to
+  cause the abort.
+
+[1] https://www.spinics.net/lists/kvm/msg196797.html
+
+Alexandru Elisei (18):
+  lib: arm/arm64: Remove unnecessary dcache maintenance operations
+  lib: arm: Add proper data synchronization barriers for TLBIs
+  lib: Add WRITE_ONCE and READ_ONCE implementations in compiler.h
+  lib: arm/arm64: Use WRITE_ONCE to update the translation tables
+  lib: arm/arm64: Remove unused CPU_OFF parameter
+  arm/arm64: psci: Don't run C code without stack or vectors
+  lib: arm/arm64: Add missing include for alloc_page.h in pgtable.h
+  lib: arm: Implement flush_tlb_all
+  lib: arm/arm64: Teach mmu_clear_user about block mappings
+  arm/arm64: selftest: Add prefetch abort test
+  arm64: timer: Write to ICENABLER to disable timer IRQ
+  arm64: timer: EOIR the interrupt after masking the timer
+  arm64: timer: Test behavior when timer disabled or masked
+  lib: arm/arm64: Refuse to disable the MMU with non-identity stack
+    pointer
+  arm/arm64: Perform dcache clean + invalidate after turning MMU off
+  arm: cstart64.S: Downgrade TLBI to non-shareable in asm_mmu_enable
+  arm/arm64: Invalidate TLB before enabling MMU
+  arm: cstart64.S: Remove icache invalidation from asm_mmu_enable
+
+ lib/linux/compiler.h          |  83 +++++++++++++++++++++++++++++++
+ lib/arm/asm/gic-v3.h          |   1 +
+ lib/arm/asm/gic.h             |   1 +
+ lib/arm/asm/mmu-api.h         |   2 +-
+ lib/arm/asm/mmu.h             |  18 ++++---
+ lib/arm/asm/pgtable-hwdef.h   |  11 +++++
+ lib/arm/asm/pgtable.h         |  20 ++++++--
+ lib/arm/asm/processor.h       |   6 +++
+ lib/arm64/asm/esr.h           |   3 ++
+ lib/arm64/asm/pgtable-hwdef.h |   3 ++
+ lib/arm64/asm/pgtable.h       |  15 +++++-
+ lib/arm64/asm/processor.h     |   6 +++
+ lib/arm/mmu.c                 |  60 ++++++++++++----------
+ lib/arm/processor.c           |  10 ++++
+ lib/arm/psci.c                |   4 +-
+ lib/arm/setup.c               |   2 +
+ lib/arm64/processor.c         |  11 +++++
+ arm/cstart.S                  |  40 ++++++++++++++-
+ arm/cstart64.S                |  35 +++++++++++--
+ arm/cache.c                   |   3 +-
+ arm/psci.c                    |   5 +-
+ arm/selftest.c                | 112 +++++++++++++++++++++++++++++++++++++++++-
+ arm/timer.c                   |  38 +++++++++-----
+ 23 files changed, 425 insertions(+), 64 deletions(-)
+ create mode 100644 lib/linux/compiler.h
+
 -- 
-2.17.2
+2.7.4
 
