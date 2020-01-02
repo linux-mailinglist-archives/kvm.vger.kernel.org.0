@@ -2,168 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D23212E1BB
-	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2020 03:33:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12B0712E27B
+	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2020 06:15:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727536AbgABCdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jan 2020 21:33:16 -0500
-Received: from mga01.intel.com ([192.55.52.88]:51762 "EHLO mga01.intel.com"
+        id S1726026AbgABFPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jan 2020 00:15:08 -0500
+Received: from mga12.intel.com ([192.55.52.136]:22040 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727509AbgABCdQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jan 2020 21:33:16 -0500
+        id S1725788AbgABFPI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jan 2020 00:15:08 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Jan 2020 18:33:15 -0800
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Jan 2020 21:15:07 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,385,1571727600"; 
-   d="scan'208";a="244494271"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.136]) ([10.239.159.136])
-  by fmsmga004.fm.intel.com with ESMTP; 01 Jan 2020 18:33:13 -0800
-Cc:     baolu.lu@linux.intel.com, "Raj, Ashok" <ashok.raj@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 0/9] Use 1st-level for IOVA translation
-To:     "Liu, Yi L" <yi.l.liu@intel.com>, Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-References: <20191224074502.5545-1-baolu.lu@linux.intel.com>
- <8b40dd00-3bec-1fd9-9ba7-0db9fd727e52@linux.intel.com>
- <A2975661238FB949B60364EF0F2C25743A16466C@SHSMSX104.ccr.corp.intel.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <d04092c6-bc50-a320-0fdb-a734ec02f11c@linux.intel.com>
-Date:   Thu, 2 Jan 2020 10:32:05 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A16466C@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+   d="scan'208";a="369236511"
+Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
+  by orsmga004.jf.intel.com with ESMTP; 01 Jan 2020 21:15:05 -0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Cc:     yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
+        edwin.zhai@intel.com, Yang Weijiang <weijiang.yang@intel.com>
+Subject: [RESEND PATCH v10 00/10] Enable Sub-Page Write Protection Support
+Date:   Thu,  2 Jan 2020 13:18:54 +0800
+Message-Id: <20200102051904.32090-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+EPT-Based Sub-Page write Protection(SPP) allows Virtual Machine Monitor(VMM)
+specify write-permission for guest physical memory at a sub-page(128 byte)
+granularity. When SPP works, HW enforces write-access check for sub-pages
+within a protected 4KB page.
 
-On 1/2/20 10:31 AM, Liu, Yi L wrote:
->> From: Lu Baolu [mailto:baolu.lu@linux.intel.com]
->> Sent: Thursday, January 2, 2020 7:38 AM
->> To: Joerg Roedel <joro@8bytes.org>; David Woodhouse <dwmw2@infradead.org>;
->> Alex Williamson <alex.williamson@redhat.com>
->> Subject: Re: [PATCH v5 0/9] Use 1st-level for IOVA translation
->>
->> On 12/24/19 3:44 PM, Lu Baolu wrote:
->>> Intel VT-d in scalable mode supports two types of page tables for DMA
->>> translation: the first level page table and the second level page
->>> table. The first level page table uses the same format as the CPU page
->>> table, while the second level page table keeps compatible with
->>> previous formats. The software is able to choose any one of them for
->>> DMA remapping according to the use case.
->>>
->>> This patchset aims to move IOVA (I/O Virtual Address) translation to
->>> 1st-level page table in scalable mode. This will simplify vIOMMU
->>> (IOMMU simulated by VM hypervisor) design by using the two-stage
->>> translation, a.k.a. nested mode translation.
->>>
->>> As Intel VT-d architecture offers caching mode, guest IOVA (GIOVA)
->>> support is currently implemented in a shadow page manner. The device
->>> simulation software, like QEMU, has to figure out GIOVA->GPA mappings
->>> and write them to a shadowed page table, which will be used by the
->>> physical IOMMU. Each time when mappings are created or destroyed in
->>> vIOMMU, the simulation software has to intervene. Hence, the changes
->>> on GIOVA->GPA could be shadowed to host.
->>>
->>>
->>>        .-----------.
->>>        |  vIOMMU   |
->>>        |-----------|                 .--------------------.
->>>        |           |IOTLB flush trap |        QEMU        |
->>>        .-----------. (map/unmap)     |--------------------|
->>>        |GIOVA->GPA |---------------->|    .------------.  |
->>>        '-----------'                 |    | GIOVA->HPA |  |
->>>        |           |                 |    '------------'  |
->>>        '-----------'                 |                    |
->>>                                      |                    |
->>>                                      '--------------------'
->>>                                                   |
->>>               <------------------------------------
->>>               |
->>>               v VFIO/IOMMU API
->>>         .-----------.
->>>         |  pIOMMU   |
->>>         |-----------|
->>>         |           |
->>>         .-----------.
->>>         |GIOVA->HPA |
->>>         '-----------'
->>>         |           |
->>>         '-----------'
->>>
->>> In VT-d 3.0, scalable mode is introduced, which offers two-level
->>> translation page tables and nested translation mode. Regards to GIOVA
->>> support, it can be simplified by 1) moving the GIOVA support over
->>> 1st-level page table to store GIOVA->GPA mapping in vIOMMU,
->>> 2) binding vIOMMU 1st level page table to the pIOMMU, 3) using pIOMMU
->>> second level for GPA->HPA translation, and 4) enable nested (a.k.a.
->>> dual-stage) translation in host. Compared with current shadow GIOVA
->>> support, the new approach makes the vIOMMU design simpler and more
->>> efficient as we only need to flush the pIOMMU IOTLB and possible
->>> device-IOTLB when an IOVA mapping in vIOMMU is torn down.
->>>
->>>        .-----------.
->>>        |  vIOMMU   |
->>>        |-----------|                 .-----------.
->>>        |           |IOTLB flush trap |   QEMU    |
->>>        .-----------.    (unmap)      |-----------|
->>>        |GIOVA->GPA |---------------->|           |
->>>        '-----------'                 '-----------'
->>>        |           |                       |
->>>        '-----------'                       |
->>>              <------------------------------
->>>              |      VFIO/IOMMU
->>>              |  cache invalidation and
->>>              | guest gpd bind interfaces
->>>              v
->>>        .-----------.
->>>        |  pIOMMU   |
->>>        |-----------|
->>>        .-----------.
->>>        |GIOVA->GPA |<---First level
->>>        '-----------'
->>>        | GPA->HPA  |<---Scond level
->>>        '-----------'
->>>        '-----------'
->>>
->>> This patch applies the first level page table for IOVA translation
->>> unless the DOMAIN_ATTR_NESTING domain attribution has been set.
->>> Setting of this attribution means the second level will be used to map
->>> gPA (guest physical address) to hPA (host physical address), and the
->>> mappings between gVA (guest virtual address) and gPA will be
->>> maintained by the guest with the page table address binding to host's
->>> first level.
->>>
->>> Based-on-idea-by: Ashok Raj<ashok.raj@intel.com>
->>> Based-on-idea-by: Kevin Tian<kevin.tian@intel.com>
->>> Based-on-idea-by: Liu Yi L<yi.l.liu@intel.com>
->>> Based-on-idea-by: Jacob Pan<jacob.jun.pan@linux.intel.com>
->>> Based-on-idea-by: Sanjay Kumar<sanjay.k.kumar@intel.com>
->>> Based-on-idea-by: Lu Baolu<baolu.lu@linux.intel.com>
->>
->> Queued all patches for v5.6.
-> 
-> Reviewed-by: Liu Yi L <yi.l.liu@intel.com>
-> 
-> Aha, looks like I forgot to give my Reviewed-by after offline review..
-> Yeah, this patchset looks good to me.
+The feature targets to provide fine-grained memory protection for
+usages such as memory guard and VM introspection etc.
 
-Thank you, Yi. Very appreciated for your time.
+SPP is active when the "sub-page write protection" (bit 23) is 1 in
+Secondary VM-Execution Controls. The feature is backed with a Sub-Page
+Permission Table(SPPT), and subpage permission vector is stored in the
+leaf entry of SPPT. The root page is referenced via a Sub-Page Permission
+Table Pointer (SPPTP) in VMCS.
 
-Best regards,
--baolu
+To enable SPP for guest memory, the guest page should be first mapped
+to a 4KB EPT entry, then set SPP bit 61 of the corresponding entry. 
+While HW walks EPT, it traverses SPPT with the gpa to look up the sub-page
+permission vector within SPPT leaf entry. If the corresponding bit is set,
+write to sub-page is permitted, otherwise, SPP induced EPT violation is generated.
+
+This patch serial passed SPP function test and selftest on Ice-Lake platform.
+
+Please refer to the SPP introduction document in this patch set and
+Intel SDM for details:
+
+Intel SDM:
+https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+Patch 1: Documentation for SPP and related API.
+Patch 2: Add control flags for Sub-Page Protection(SPP).
+Patch 3: Add SPP Table setup functions.
+Patch 4: Add functions to create/destroy SPP bitmap block.
+Patch 5: Introduce user-space SPP IOCTLs.
+Patch 6: Set up SPP paging table at vmentry/vmexit.
+Patch 7: Enable Lazy mode SPP protection.
+Patch 8: Handle SPP protected pages when VM memory changes.
+Patch 9: Add SPP protection check in emulation case.
+Patch 10: SPP selftest.
+
+Change logs:
+
+v9 ->v10
+  1. Cleared SPP active flag on VM resetting.
+  2. Added trancepoints on subpage setup and SPP induced vmexits.
+  3. Fixed a few code issues reported by Intel test robot.
+
+v8 ->v9:
+  1. Added SPP protection check in pte prefetch case.
+  2. Flushed EPT rmap to remove existing mappings of the target gfns.
+  3. Modified documentation to reflect recent changes.
+  4. Other minor code refactor.
+
+v7 -> v8:
+  1. Changed ioctl interface definition per Paolo's comments.
+  2. Replaced SPP_INIT ioctl funciton with KVM_ENABLE_CAP.
+  3. Removed SPP bit from X86 feature word.
+  4. Returned instruction length to user-space when SPP induced EPT
+     violation happens, this is to provide flexibility to use SPP,
+     revert write or track write.
+  5. Modified selftest application and added into this serial.
+  6. Simplified SPP permission vector check.
+  7. Moved spp.c and spp.h to kvm/mmu folder.
+  8. Other code fix according to Paolo's feedback and testing.
+
+v6 -> v7:
+  1. Configured all available protected pages once SPP induced vmexit
+     happens since there's no PRESENT bit in SPPT leaf entry.
+  2. Changed SPP protection check flow in tdp_page_fault().
+  3. Code refactor and minior fixes.
+
+v5 -> v6:
+  1. Added SPP protection patch for emulation cases per Jim's review.
+  2. Modified documentation and added API description per Jim's review.
+  3. Other minior changes suggested by Jim.
+
+v4 -> v5:
+  1. Enable SPP support for Hugepage(1GB/2MB) to extend application.
+  2. Make SPP miss vm-exit handler as the unified place to set up SPPT.
+  3. If SPP protected pages are access-tracked or dirty-page-tracked,
+     store SPP flag in reserved address bit, restore it in
+     fast_page_fault() handler.
+  4. Move SPP specific functions to vmx/spp.c and vmx/spp.h
+  5. Rebased code to kernel v5.3
+  6. Other change suggested by KVM community.
+  
+v3 -> v4:
+  1. Modified documentation to make it consistent with patches.
+  2. Allocated SPPT root page in init_spp() instead of vmx_set_cr3() to
+     avoid SPPT miss error.
+  3. Added back co-developers and sign-offs.
+
+v2 -> v3:                                                                
+  1. Rebased patches to kernel 5.1 release                                
+  2. Deferred SPPT setup to EPT fault handler if the page is not
+     available while set_subpage() is being called.
+  3. Added init IOCTL to reduce extra cost if SPP is not used.
+  4. Refactored patch structure, cleaned up cross referenced functions.
+  5. Added code to deal with memory swapping/migration/shrinker cases.
+
+v2 -> v1:
+  1. Rebased to 4.20-rc1
+  2. Move VMCS change to a separated patch.
+  3. Code refine and Bug fix 
+
+
+Yang Weijiang (10):
+  Documentation: Add EPT based Subpage Protection and related APIs
+  vmx: spp: Add control flags for Sub-Page Protection(SPP)
+  mmu: spp: Add SPP Table setup functions
+  mmu: spp: Add functions to operate SPP access bitmap
+  x86: spp: Introduce user-space SPP IOCTLs
+  vmx: spp: Set up SPP paging table at vmentry/vmexit
+  mmu: spp: Enable Lazy mode SPP protection
+  mmu: spp: Handle SPP protected pages when VM memory changes
+  x86: spp: Add SPP protection check in emulation
+  kvm: selftests: selftest for Sub-Page protection
+
+ Documentation/virt/kvm/api.txt                |  39 ++
+ Documentation/virtual/kvm/spp_kvm.txt         | 179 +++++
+ arch/x86/include/asm/kvm_host.h               |  11 +-
+ arch/x86/include/asm/vmx.h                    |  10 +
+ arch/x86/include/uapi/asm/vmx.h               |   2 +
+ arch/x86/kvm/mmu.h                            |   2 +
+ arch/x86/kvm/mmu/mmu.c                        | 106 ++-
+ arch/x86/kvm/mmu/spp.c                        | 660 ++++++++++++++++++
+ arch/x86/kvm/mmu/spp.h                        |  35 +
+ arch/x86/kvm/trace.h                          |  66 ++
+ arch/x86/kvm/vmx/capabilities.h               |   5 +
+ arch/x86/kvm/vmx/vmx.c                        | 104 ++-
+ arch/x86/kvm/x86.c                            | 136 +++-
+ include/uapi/linux/kvm.h                      |  17 +
+ tools/testing/selftests/kvm/Makefile          |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+ tools/testing/selftests/kvm/x86_64/spp_test.c | 234 +++++++
+ 17 files changed, 1599 insertions(+), 10 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/spp_kvm.txt
+ create mode 100644 arch/x86/kvm/mmu/spp.c
+ create mode 100644 arch/x86/kvm/mmu/spp.h
+ create mode 100644 tools/testing/selftests/kvm/x86_64/spp_test.c
+
+-- 
+2.17.2
+
