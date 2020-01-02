@@ -2,130 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 19E7012E8A2
-	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2020 17:21:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D346B12E9B2
+	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2020 19:06:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728843AbgABQVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jan 2020 11:21:51 -0500
-Received: from foss.arm.com ([217.140.110.172]:48318 "EHLO foss.arm.com"
+        id S1727939AbgABSGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jan 2020 13:06:05 -0500
+Received: from foss.arm.com ([217.140.110.172]:49112 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728678AbgABQVv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jan 2020 11:21:51 -0500
+        id S1727829AbgABSGF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jan 2020 13:06:05 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2E78328;
-        Thu,  2 Jan 2020 08:21:50 -0800 (PST)
-Received: from localhost (unknown [10.37.6.20])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B3873F68F;
-        Thu,  2 Jan 2020 08:21:50 -0800 (PST)
-Date:   Thu, 2 Jan 2020 16:21:48 +0000
-From:   Andrew Murray <andrew.murray@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
-        linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
-        will@kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 02/18] arm64: KVM: reset E2PB correctly in MDCR_EL2
- when exiting the guest(VHE)
-Message-ID: <20200102162147.GQ42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-3-andrew.murray@arm.com>
- <20191221131214.769a140e@why>
- <20191224102949.GD42593@e119886-lin.cambridge.arm.com>
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61448328;
+        Thu,  2 Jan 2020 10:06:04 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0538E3F703;
+        Thu,  2 Jan 2020 10:06:02 -0800 (PST)
+Date:   Thu, 2 Jan 2020 18:03:24 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        maz@kernel.org, vladimir.murzin@arm.com, mark.rutland@arm.com,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 03/18] lib: Add WRITE_ONCE and
+ READ_ONCE implementations in compiler.h
+Message-ID: <20200102180324.085a136e@donnerap.cambridge.arm.com>
+In-Reply-To: <1577808589-31892-4-git-send-email-alexandru.elisei@arm.com>
+References: <1577808589-31892-1-git-send-email-alexandru.elisei@arm.com>
+ <1577808589-31892-4-git-send-email-alexandru.elisei@arm.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191224102949.GD42593@e119886-lin.cambridge.arm.com>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 24, 2019 at 10:29:50AM +0000, Andrew Murray wrote:
-> On Sat, Dec 21, 2019 at 01:12:14PM +0000, Marc Zyngier wrote:
-> > On Fri, 20 Dec 2019 14:30:09 +0000
-> > Andrew Murray <andrew.murray@arm.com> wrote:
-> > 
-> > > From: Sudeep Holla <sudeep.holla@arm.com>
-> > > 
-> > > On VHE systems, the reset value for MDCR_EL2.E2PB=b00 which defaults
-> > > to profiling buffer using the EL2 stage 1 translations. 
-> > 
-> > Does the reset value actually matter here? I don't see it being
-> > specific to VHE systems, and all we're trying to achieve is to restore
-> > the SPE configuration to a state where it can be used by the host.
-> > 
-> > > However if the
-> > > guest are allowed to use profiling buffers changing E2PB settings, we
-> > 
-> > How can the guest be allowed to change E2PB settings? Or do you mean
-> > here that allowing the guest to use SPE will mandate changes of the
-> > E2PB settings, and that we'd better restore the hypervisor state once
-> > we exit?
-> > 
-> > > need to ensure we resume back MDCR_EL2.E2PB=b00. Currently we just
-> > > do bitwise '&' with MDCR_EL2_E2PB_MASK which will retain the value.
-> > > 
-> > > So fix it by clearing all the bits in E2PB.
-> > > 
-> > > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/switch.c | 4 +---
-> > >  1 file changed, 1 insertion(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > > index 72fbbd86eb5e..250f13910882 100644
-> > > --- a/arch/arm64/kvm/hyp/switch.c
-> > > +++ b/arch/arm64/kvm/hyp/switch.c
-> > > @@ -228,9 +228,7 @@ void deactivate_traps_vhe_put(void)
-> > >  {
-> > >  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
-> > >  
-> > > -	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
-> > > -		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
-> > > -		    MDCR_EL2_TPMS;
-> > > +	mdcr_el2 &= MDCR_EL2_HPMN_MASK | MDCR_EL2_TPMS;
-> > >  
-> > >  	write_sysreg(mdcr_el2, mdcr_el2);
-> > >  
-> > 
-> > I'm OK with this change, but I believe the commit message could use
-> > some tidying up.
+On Tue, 31 Dec 2019 16:09:34 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+
+Hi,
+
+> Add the WRITE_ONCE and READ_ONCE macros which are used to prevent the
+> compiler from optimizing a store or a load, respectively, into something
+> else.
+
+Compared to the Linux version and found to be equivalent:
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre
+
+> Cc: Drew Jones <drjones@redhat.com>
+> Cc: Laurent Vivier <lvivier@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  lib/linux/compiler.h | 83 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 83 insertions(+)
+>  create mode 100644 lib/linux/compiler.h
 > 
-> No problem, I'll update the commit message.
+> diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
+> new file mode 100644
+> index 000000000000..2d72f18c36e5
+> --- /dev/null
+> +++ b/lib/linux/compiler.h
+> @@ -0,0 +1,83 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Taken from Linux commit 219d54332a09 ("Linux 5.4"), from the file
+> + * tools/include/linux/compiler.h, with minor changes.
+> + */
+> +#ifndef __LINUX_COMPILER_H
+> +#define __LINUX_COMPILER_H
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +#include <stdint.h>
+> +
+> +#define barrier()	asm volatile("" : : : "memory")
+> +
+> +#define __always_inline	inline __attribute__((always_inline))
+> +
+> +static __always_inline void __read_once_size(const volatile void *p, void *res, int size)
+> +{
+> +	switch (size) {
+> +	case 1: *(uint8_t *)res = *(volatile uint8_t *)p; break;
+> +	case 2: *(uint16_t *)res = *(volatile uint16_t *)p; break;
+> +	case 4: *(uint32_t *)res = *(volatile uint32_t *)p; break;
+> +	case 8: *(uint64_t *)res = *(volatile uint64_t *)p; break;
+> +	default:
+> +		barrier();
+> +		__builtin_memcpy((void *)res, (const void *)p, size);
+> +		barrier();
+> +	}
+> +}
+> +
+> +/*
+> + * Prevent the compiler from merging or refetching reads or writes. The
+> + * compiler is also forbidden from reordering successive instances of
+> + * READ_ONCE and WRITE_ONCE, but only when the compiler is aware of some
+> + * particular ordering. One way to make the compiler aware of ordering is to
+> + * put the two invocations of READ_ONCE or WRITE_ONCE in different C
+> + * statements.
+> + *
+> + * These two macros will also work on aggregate data types like structs or
+> + * unions. If the size of the accessed data type exceeds the word size of
+> + * the machine (e.g., 32 bits or 64 bits) READ_ONCE() and WRITE_ONCE() will
+> + * fall back to memcpy and print a compile-time warning.
+> + *
+> + * Their two major use cases are: (1) Mediating communication between
+> + * process-level code and irq/NMI handlers, all running on the same CPU,
+> + * and (2) Ensuring that the compiler does not fold, spindle, or otherwise
+> + * mutilate accesses that either do not require ordering or that interact
+> + * with an explicit memory barrier or atomic instruction that provides the
+> + * required ordering.
+> + */
+> +
+> +#define READ_ONCE(x)					\
+> +({							\
+> +	union { typeof(x) __val; char __c[1]; } __u =	\
+> +		{ .__c = { 0 } };			\
+> +	__read_once_size(&(x), __u.__c, sizeof(x));	\
+> +	__u.__val;					\
+> +})
+> +
+> +static __always_inline void __write_once_size(volatile void *p, void *res, int size)
+> +{
+> +	switch (size) {
+> +	case 1: *(volatile uint8_t *) p = *(uint8_t  *) res; break;
+> +	case 2: *(volatile uint16_t *) p = *(uint16_t *) res; break;
+> +	case 4: *(volatile uint32_t *) p = *(uint32_t *) res; break;
+> +	case 8: *(volatile uint64_t *) p = *(uint64_t *) res; break;
+> +	default:
+> +		barrier();
+> +		__builtin_memcpy((void *)p, (const void *)res, size);
+> +		barrier();
+> +	}
+> +}
+> +
+> +#define WRITE_ONCE(x, val)				\
+> +({							\
+> +	union { typeof(x) __val; char __c[1]; } __u =	\
+> +		{ .__val = (val) }; 			\
+> +	__write_once_size(&(x), __u.__c, sizeof(x));	\
+> +	__u.__val;					\
+> +})
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +#endif /* !__LINUX_COMPILER_H */
 
-This is my new description:
-
-    arm64: KVM: reset E2PB correctly in MDCR_EL2 when exiting the guest (VHE)
-    
-    Upon leaving the guest on VHE systems we currently preserve the value of
-    MDCR_EL2.E2PB. This register determines if the SPE profiling buffer controls
-    are trapped and which translation regime they use.
-    
-    In order to permit guest access to SPE we may use a different translation
-    regime whilst the vCPU is scheduled - therefore let's ensure that upon leaving
-    the guest we set E2PB back to the value expected by the host (b00).
-    
-    For nVHE systems we already explictly set E2PB back to the expected value
-    of 0b11 in __deactivate_traps_nvhe.
-
-Thanks,
-
-Andrew Murray
-
-> 
-> Thanks,
-> 
-> Andrew Murray
-> 
-> > 
-> > Thanks,
-> > 
-> > 	M.
-> > -- 
-> > Jazz is not dead. It just smells funny...
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
