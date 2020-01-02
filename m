@@ -2,190 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E26C812E4E3
-	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2020 11:18:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29A3712E6AB
+	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2020 14:24:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728035AbgABKSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jan 2020 05:18:03 -0500
-Received: from mail-mw2nam10on2066.outbound.protection.outlook.com ([40.107.94.66]:45281
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727990AbgABKSD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jan 2020 05:18:03 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P6qdjfYHv/YABc5X5p0j7mWVHXEmB+KZE9kl+akt6+T/1LHKoBlqm8ERlJIEKQpBpQKKrow8cpyKKy3WGOSUW5/BRsxxi2WijERH+tVHDLl1xPl8FvjHP6efyNvl3fu/ZgT3F3j7FKJN+sUQedrBb5U9g2ekdYLzyYtB4wAj8IEcBGuCJG9M0kCB7EAXZNkMmIO3Mn9RW+DL0relSSk7Puq+ZE3AFCGUBLJ7rrSOXQdUaqQrXWYANjicn3DIAmicYhQNTodFttsxBOPE7KuEgiS+m1p3puQTPehfrlmM0dCSPC6e/xBUwrkOPKBO8HwLwLpjL0JFvscpA3qpPqecIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2zMJToqKXojpUKDYL5SkdbqK8qxRe9p30td+zc0dqHo=;
- b=AngjtlaU9oRYoa3mRzOfEPZT4Zr9s2UbNBaCMCk9Hqha/4zg24xHMuK32PfqmMdkRvPYUcPCHXyp8YWqw4Gz2aQGb4qk9l5QqsdicCNgRGk90ETcSf2wSVhGaYAdKSzKUdwaovtIYjOX9pDYk8wigJic5q3wEKSze4Qw5dMUugVh+YqKOORPUbJRBqSbwC9zD2BN8H4NU8wRagbVaOcHqB+WFFBHjNdP8pDq8pDJIqKQWBq+3DRSNj9b9dqrkmdlbZKxYzU45q2fQlzKJXhJ2qoqzisxTHu77POA3KZCD4da7qddxGi0MJ4eMl645eevmgnr18CU2moc0IFsqnxGhg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2zMJToqKXojpUKDYL5SkdbqK8qxRe9p30td+zc0dqHo=;
- b=n6nfYd5MM82u2ZPH/f7fcuUw7tmnKVn6gwcgHwI0L2eVSJrgrG+tb+8FmLPm6TGNr+nAhAs6VrVRe3MPBhSEPtTyjMNcDUFf0o4Hef9eFLSwTuu9A+lS9jsYrVsV7zdjSzuaqEBQkWJwxd3w+Bgh+zVwWGF+lyD/caIbKd9vzLg=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
-Received: from BY5PR12MB3860.namprd12.prod.outlook.com (10.255.138.89) by
- BY5PR12MB4081.namprd12.prod.outlook.com (52.135.55.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2602.10; Thu, 2 Jan 2020 10:17:59 +0000
-Received: from BY5PR12MB3860.namprd12.prod.outlook.com
- ([fe80::793f:db82:f2ab:9758]) by BY5PR12MB3860.namprd12.prod.outlook.com
- ([fe80::793f:db82:f2ab:9758%7]) with mapi id 15.20.2581.007; Thu, 2 Jan 2020
- 10:17:59 +0000
-Subject: Re: [PATCH v5 00/18] kvm: x86: Support AMD SVM AVIC w/ in-kernel
- irqchip mode
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, joro@8bytes.org,
-        vkuznets@redhat.com, rkagan@virtuozzo.com, graf@amazon.com,
-        jschoenh@amazon.de, karahmed@amazon.de, rimasluk@amazon.com,
-        jon.grimm@amd.com
-References: <1573762520-80328-1-git-send-email-suravee.suthikulpanit@amd.com>
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Message-ID: <9e3e9692-d786-844e-c625-62b69505d2c9@amd.com>
-Date:   Thu, 2 Jan 2020 17:17:47 +0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.3.1
-In-Reply-To: <1573762520-80328-1-git-send-email-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+        id S1728358AbgABNYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jan 2020 08:24:00 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:36064 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728298AbgABNYA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jan 2020 08:24:00 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 002DMQkW074848;
+        Thu, 2 Jan 2020 13:22:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=E58dPgAUN7qsIQeKA+zHJ3+zUCt1y/EVyKTFMcsGSJo=;
+ b=Kz+SHpD4btPYSgwtW5zjM8cC7w79xYikWd8b5pXBtTC9WjddOHkgjQm94e1yHvtva4TB
+ 6MtgKIVaGC1+QOYaPLo2dPZ+kWeiju5DFyR1URrrVBEXT4I3a+Sn0S/w8qHFzb2ggUn6
+ FBSvVF7WsKrMVru9PB0BzFlzkPXONFNqkOmPRrjVuYq6HOq4PwRZOMryOolAtNMvWgGd
+ 0sWDqUy9UtD3vFF+7LUgKWqhiQEMJ67ZU+MRMOudg7pVz3tVE6FNyiTB5dDoUFpRLTW+
+ jGTW6RBcnHV7iifq9Lwjx87pyu/wkP+0PvyzSuxF+yHRL6EV6pbMN8apm9l7f1ExciaA Tw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2x5ypqq8mc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Jan 2020 13:22:26 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 002DJ8UU066806;
+        Thu, 2 Jan 2020 13:22:26 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 2x8gjajhxw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Jan 2020 13:22:26 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 002DMLiO004117;
+        Thu, 2 Jan 2020 13:22:21 GMT
+Received: from [192.168.14.112] (/79.178.220.19)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 02 Jan 2020 05:22:21 -0800
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH] KVM: SVM: Fix potential memory leak in svm_cpu_init()
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <1577931640-29420-1-git-send-email-linmiaohe@huawei.com>
+Date:   Thu, 2 Jan 2020 15:22:14 +0200
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0089.apcprd02.prod.outlook.com
- (2603:1096:4:90::29) To BY5PR12MB3860.namprd12.prod.outlook.com
- (2603:10b6:a03:1ac::25)
-MIME-Version: 1.0
-Received: from Suravees-MacBook-Pro.local (165.204.140.250) by SG2PR02CA0089.apcprd02.prod.outlook.com (2603:1096:4:90::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2602.12 via Frontend Transport; Thu, 2 Jan 2020 10:17:55 +0000
-X-Originating-IP: [165.204.140.250]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 7a9aca43-ce81-4bb0-c48d-08d78f6d0a80
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4081:|BY5PR12MB4081:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BY5PR12MB4081AA676AD2A34E06AEF277F3200@BY5PR12MB4081.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-Forefront-PRVS: 0270ED2845
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(39860400002)(376002)(366004)(346002)(199004)(189003)(86362001)(31696002)(6486002)(4326008)(6512007)(44832011)(6666004)(8936002)(81166006)(81156014)(8676002)(478600001)(7416002)(2906002)(36756003)(6506007)(316002)(53546011)(16526019)(186003)(66556008)(2616005)(956004)(5660300002)(66476007)(66946007)(26005)(52116002)(31686004)(21314003);DIR:OUT;SFP:1101;SCL:1;SRVR:BY5PR12MB4081;H:BY5PR12MB3860.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IjyqGGtj7ouqa5aSoioBXWKNM/Go353SDX+hgbtLOTtPL+qTnSKbBW6CkW0snhvq+hT1Kf6RqiS0ACNJushbk6Q7u5zbTOFtXVcbnEK1LPGW9/E2nMW0jv9Y7IPENwzGYe0Ntowx/JWV2efgG2DZYQT/4oukBXWsdK9UrFTOTuRGpFOCRvNE2M3GQq1ZPo5hjA14S+QvYAhS9tAaZDFy3TyhmkY3yQppx3gzHegUqm5oxoQL6zxLV21PeSLDd+sM+Fmo/vb1C9/uNz6q75Czfne5FOPcrfBK402mYDPTJhYExqYBlXNmeviVIGr3xirJ175XfDbbdY6iHF/Rt5G+8Cat9sDE11/vFHnFR0q5DyyN4F2bo5D+8JQib58KMeXSJhR0S6+2Wk9LUF7vD3uYQs5vMzqhxhqHNOBxCIUwlenzGvYMxaSR3T20pM07nGbmi9xPODm/8j0g7u0nMw6s3znPAyPY+CK+2t3WUAihc77rAQioadeMyTrE7Gj0w8l2mNHxkoN/diRT4wUZvPkVSw==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a9aca43-ce81-4bb0-c48d-08d78f6d0a80
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2020 10:17:59.0790
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Wt7x7B0xRkBhYqB4hEMNTqnYq9Kd8464zdHvzEJlc4kpPr514hl2Gb/AsIOJW+lsQmalQtHMXP9c8JhvI31I3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4081
+Message-Id: <BEE0CD6D-B921-4FFE-ADD6-76A7A170C2B0@oracle.com>
+References: <1577931640-29420-1-git-send-email-linmiaohe@huawei.com>
+To:     linmiaohe <linmiaohe@huawei.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9487 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001020120
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9487 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001020120
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
 
-Ping. Would you please let me know your feedback when you get a chance to review this series
 
-Thanks,
-Suravee
+> On 2 Jan 2020, at 4:20, linmiaohe <linmiaohe@huawei.com> wrote:
+> 
+> From: Miaohe Lin <linmiaohe@huawei.com>
+> 
+> When kmalloc memory for sd->sev_vmcbs failed, we forget to free the page
+> held by sd->save_area.
+> 
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 
-On 11/15/19 3:15 AM, Suravee Suthikulpanit wrote:
-> The 'commit 67034bb9dd5e ("KVM: SVM: Add irqchip_split() checks before
-> enabling AVIC")' was introduced to fix miscellaneous boot-hang issues
-> when enable AVIC. This is mainly due to AVIC hardware doest not #vmexit
-> on write to LAPIC EOI register resulting in-kernel PIC and IOAPIC to
-> wait and do not inject new interrupts (e.g. PIT, RTC).
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+
+-Liran
+
+> ---
+> arch/x86/kvm/svm.c | 8 +++++---
+> 1 file changed, 5 insertions(+), 3 deletions(-)
 > 
-> This limits AVIC to only work with kernel_irqchip=split mode, which is
-> not currently enabled by default, and also required user-space to
-> support split irqchip model, which might not be the case.
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 8f1b715dfde8..89eb382e8580 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -1012,7 +1012,7 @@ static int svm_cpu_init(int cpu)
+> 	r = -ENOMEM;
+> 	sd->save_area = alloc_page(GFP_KERNEL);
+> 	if (!sd->save_area)
+> -		goto err_1;
+> +		goto free_cpu_data;
 > 
-> The goal of this series is to enable AVIC to work in both irqchip modes,
-> by allowing AVIC to be deactivated temporarily during runtime, and fallback
-> to legacy interrupt injection mode (w/ vINTR and interrupt windows)
-> when needed, and then re-enabled subsequently (a.k.a Dynamic APICv).
+> 	if (svm_sev_enabled()) {
+> 		r = -ENOMEM;
+> @@ -1020,14 +1020,16 @@ static int svm_cpu_init(int cpu)
+> 					      sizeof(void *),
+> 					      GFP_KERNEL);
+> 		if (!sd->sev_vmcbs)
+> -			goto err_1;
+> +			goto free_save_area;
+> 	}
 > 
-> Similar approach is also used to handle Hyper-V SynIC in the
-> 'commit 5c919412fe61 ("kvm/x86: Hyper-V synthetic interrupt controller")',
-> where APICv is permanently disabled at runtime (currently broken for
-> AVIC, and fixed by this series).
+> 	per_cpu(svm_data, cpu) = sd;
 > 
-> This series contains several parts:
->    * Part 1: patch 1,2
->      Code clean up, refactor, and introduce helper functions
+> 	return 0;
 > 
->    * Part 2: patch 3
->      Introduce APICv deactivate bits to keep track of APICv state
->      for each vm.
->   
->    * Part 3: patch 4-10
->      Add support for activate/deactivate APICv at runtime
+> -err_1:
+> +free_save_area:
+> +	__free_page(sd->save_area);
+> +free_cpu_data:
+> 	kfree(sd);
+> 	return r;
 > 
->    * Part 4: patch 11-14:
->      Add support for various cases where APICv needs to
->      be deactivated
+> -- 
+> 2.19.1
 > 
->    * Part 5: patch 15-17:
->      Introduce in-kernel IOAPIC workaround for AVIC EOI
-> 
->    * Part 6: path 18
->      Allow enable AVIC w/ kernel_irqchip=on
-> 
-> Pre-requisite Patch:
->    * commit b9c6ff94e43a ("iommu/amd: Re-factor guest virtual APIC (de-)activation code")
->      (https://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu.git/commit/
->       ?h=next&id=b9c6ff94e43a0ee053e0c1d983fba1ac4953b762)
-> 
-> This series has been tested against v5.3 as following:
->    * Booting Linux, FreeBSD, and Windows Server 2019 VMs upto 240 vcpus
->      w/ qemu option "kernel-irqchip=on" and "-no-hpet".
->    * Pass-through Intel 10GbE NIC and run netperf in the VM.
-> 
-> Changes from V4: (https://lkml.org/lkml/2019/11/1/764)
->    * Rename APICV_DEACT_BIT_xxx to APICV_INHIBIT_REASON_xxxx
->    * Introduce kvm_x86_ops.check_apicv_inhibit_reasons hook
->      to allow vendors to specify which APICv inhibit reason bits
->      to support (patch 08/18).
->    * Update comment on kvm_request_apicv_update() no-lock requirement.
->      (patch 04/18)
-> 
-> Suravee Suthikulpanit (18):
->    kvm: x86: Modify kvm_x86_ops.get_enable_apicv() to use struct kvm
->      parameter
->    kvm: lapic: Introduce APICv update helper function
->    kvm: x86: Introduce APICv inhibit reason bits
->    kvm: x86: Add support for dynamic APICv
->    kvm: x86: Add APICv (de)activate request trace points
->    kvm: x86: svm: Add support to (de)activate posted interrupts
->    svm: Add support for setup/destroy virutal APIC backing page for AVIC
->    kvm: x86: Introduce APICv x86 ops for checking APIC inhibit reasons
->    kvm: x86: Introduce x86 ops hook for pre-update APICv
->    svm: Add support for dynamic APICv
->    kvm: x86: hyperv: Use APICv update request interface
->    svm: Deactivate AVIC when launching guest with nested SVM support
->    svm: Temporary deactivate AVIC during ExtINT handling
->    kvm: i8254: Deactivate APICv when using in-kernel PIT re-injection
->      mode.
->    kvm: lapic: Clean up APIC predefined macros
->    kvm: ioapic: Refactor kvm_ioapic_update_eoi()
->    kvm: ioapic: Lazy update IOAPIC EOI
->    svm: Allow AVIC with in-kernel irqchip mode
-> 
->   arch/x86/include/asm/kvm_host.h |  19 ++++-
->   arch/x86/kvm/hyperv.c           |   5 +-
->   arch/x86/kvm/i8254.c            |  12 +++
->   arch/x86/kvm/ioapic.c           | 149 +++++++++++++++++++++++-------------
->   arch/x86/kvm/lapic.c            |  35 +++++----
->   arch/x86/kvm/lapic.h            |   2 +
->   arch/x86/kvm/svm.c              | 164 +++++++++++++++++++++++++++++++++++-----
->   arch/x86/kvm/trace.h            |  19 +++++
->   arch/x86/kvm/vmx/vmx.c          |  12 ++-
->   arch/x86/kvm/x86.c              |  71 ++++++++++++++---
->   10 files changed, 385 insertions(+), 103 deletions(-)
-> 
+
