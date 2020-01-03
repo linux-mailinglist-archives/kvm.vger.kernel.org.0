@@ -2,62 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA54A12FE40
-	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2020 22:17:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4B5F12FE51
+	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2020 22:21:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728882AbgACVRM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jan 2020 16:17:12 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:37160 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728872AbgACVRL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jan 2020 16:17:11 -0500
-Received: by mail-pf1-f195.google.com with SMTP id p14so24034220pfn.4;
-        Fri, 03 Jan 2020 13:17:11 -0800 (PST)
+        id S1728795AbgACVVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jan 2020 16:21:11 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40968 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728549AbgACVVK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jan 2020 16:21:10 -0500
+Received: by mail-pf1-f196.google.com with SMTP id w62so24036119pfw.8;
+        Fri, 03 Jan 2020 13:21:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:from:to:cc:date:message-id:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=d/px5ol/IpLIQI4VHOPlH6LMGgBauhkI55UKC6oSPnc=;
-        b=Hprox+7YhX4vp/7ApJs7XtJYtsa0BYDFC2QN81cfX/asePRHFYKBPlY/F5X2RsAV3i
-         58FRXPyIAH9AT4MIcQQ179PjkaUhX4tTRtL73lMOcEeWsjK9cGvMxVD/VVamyj3VGsw3
-         TV+ZUAK5eon63Er2i4SNqwkx9bTYiCRGvlQAIEotBkzRTlDX9gSCxKXUHSBj37tbwzer
-         Oe2xqBTKi3KRGPr1wf1921IvBivfrygOzuNn9KMsRYtIDEDcXzxMxQtHBV0LHfGTZteR
-         Ix64ynkVRsPzzNrwlOOIXl/uBgXZyyWStGYkbrJdk7nLpXuPPIjrTXCFYta6oFLnCJug
-         cAMA==
+        bh=yOvpSx16yNanZpbvFfAUMxFv0SM7m3MFplEES/wscuI=;
+        b=aUnnZPoyzNSRZI+t0GKzb0TiRDWqBbMy6GlerfoXN1OAqft7NaJEzn11o9T/3DMq5m
+         D5lh3LBDCt0ZanoRzaNEMVxEkXPa0M9P1E220EWP2F59b00BA4OG79c6V2n3y9Eo545d
+         QD+tLlReeFsllG9KaJ1OekusQGVfJ7Zxdtv429ovUZUEnqUK+51gA6eOLfHUomr1Aet/
+         yfDu+Y5PiczTZwrNZ08YNf8D4DJfGSplZfhj7UDe8L2wCHMDBpqFijZfgOsn+VLS9Omz
+         GPxhdghSOZjPtQ7giiRMtP7rnfLzWPfAIykW/Fx50jiJapPwSY2jeAOSPwumC1Mn8U+A
+         qhvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=d/px5ol/IpLIQI4VHOPlH6LMGgBauhkI55UKC6oSPnc=;
-        b=atSjubplmkHVrO7BVa2mrsxmhG1AQYfwLYU4+9C2F72QqvK6kKDUa9GAjUnOBttK1Y
-         X7tcRWbiPyGPiPLCMFzHP2JkTLlk3NTHiScKiCl50GDeeGcszemQzRByMBMxqmmRcCDG
-         73aBV0i3P24UYp7csWyWL5ezBtbocrPYeo23B9GdKZ9eLM33tRuVLzC15y7Y3HUgMPDP
-         SkccIG8qTa99TMHHnC3rulfywnc2NDbbMEbtwYYNP6YUFzeK6Mq+1tjqHXp19qoll+fL
-         wNDtVWKW72vDUJI6wDOo6f8vsKnWSgcPs4JAv2HfOqh+oy6kElDQAN8FvGHAeeKY706q
-         p8cg==
-X-Gm-Message-State: APjAAAWXrU3JVBON7se+9xCS0yE/VHY/I1UUULiQdD+QvfjOOre37Tlp
-        BkIzZmc4iVDeskSc4Q5jftKg7ZC/T6s=
-X-Google-Smtp-Source: APXvYqyY3fKbNPGAiS+tAsYD6rrQUojk2xvXkRF2/sBCy3c3WSTOc4Rf9CnsNPVEbSYT6rLPnfMDAg==
-X-Received: by 2002:a63:444c:: with SMTP id t12mr95445975pgk.433.1578086230990;
-        Fri, 03 Jan 2020 13:17:10 -0800 (PST)
+        bh=yOvpSx16yNanZpbvFfAUMxFv0SM7m3MFplEES/wscuI=;
+        b=OcdLZocLD6egBy0h+rZO5qteULckBqn2ghJFqSnnsiMor3RYLt20MyhHl27h1tjeog
+         H0WTEN2i4HhBE1/CtOCFPBEGDmnpvFWyTTGGHnHOV8k4BLnWxwZmfJVAPhAmQFPkxA70
+         VP1efGbu+yziE2kEiwmZ9ZzjAzpUPIq3T1tRLlgwqBNhs7bMkNd2EupUyl0UDzrxuWqw
+         tnZpB+VQf6KoNA0e+ZR3l4BroAWdUyEZKfiRf3piB1p+mp6x9dnoqwm1UcwSAC7LP6IB
+         d3UmmR2luwBSKNh6bp07iTgldMxBfmaYkaXLGgO0KG29lfMy9McFaJ2DZenUnsXbaNKb
+         D6Hg==
+X-Gm-Message-State: APjAAAUnyJB1C+IPgRAxBYOBvF+1yI05ED2Lxw+nzUSw/gDZ6CGlipvN
+        6ioeGnNuHUdsf5RXN/V3dRc=
+X-Google-Smtp-Source: APXvYqyl/OVK4piGSFsYxsF33xMxvHQ/DgomiEAziuxRDwCwRMxsSuZnqK2aGPyyvqltNieLPJI63Q==
+X-Received: by 2002:a63:3d8e:: with SMTP id k136mr97287157pga.4.1578086469815;
+        Fri, 03 Jan 2020 13:21:09 -0800 (PST)
 Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id u23sm68481143pfm.29.2020.01.03.13.17.10
+        by smtp.gmail.com with ESMTPSA id z22sm61861872pfr.83.2020.01.03.13.21.09
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 03 Jan 2020 13:17:10 -0800 (PST)
-Subject: [PATCH v16 9/9] mm: Add free page reporting documentation
+        Fri, 03 Jan 2020 13:21:09 -0800 (PST)
+Subject: [PATCH v16 QEMU 1/3] virtio-ballon: Implement support for page
+ poison tracking feature
 From:   Alexander Duyck <alexander.duyck@gmail.com>
-To:     kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, mgorman@techsingularity.net,
-        vbabka@suse.cz
+To:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
+        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz
 Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
         david@redhat.com, pagupta@redhat.com, riel@surriel.com,
         lcapitulino@redhat.com, dave.hansen@intel.com,
         wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
         dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com,
         osalvador@suse.de
-Date:   Fri, 03 Jan 2020 13:17:10 -0800
-Message-ID: <20200103211709.29237.75092.stgit@localhost.localdomain>
+Date:   Fri, 03 Jan 2020 13:21:08 -0800
+Message-ID: <20200103212108.29681.99290.stgit@localhost.localdomain>
 In-Reply-To: <20200103210509.29237.18426.stgit@localhost.localdomain>
 References: <20200103210509.29237.18426.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
@@ -71,62 +72,113 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-Add documentation for free page reporting. Currently the only consumer is
-virtio-balloon, however it is possible that other drivers might make use of
-this so it is best to add a bit of documetation explaining at a high level
-how to use the API.
+We need to make certain to advertise support for page poison tracking if
+we want to actually get data on if the guest will be poisoning pages. So
+if free page hinting is active we should add page poisoning support and
+let the guest disable it if it isn't using it.
+
+Page poisoning will result in a page being dirtied on free. As such we
+cannot really avoid having to copy the page at least one more time since
+we will need to write the poison value to the destination. As such we can
+just ignore free page hinting if page poisoning is enabled as it will
+actually reduce the work we have to do.
 
 Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
- Documentation/vm/free_page_reporting.rst |   41 ++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
- create mode 100644 Documentation/vm/free_page_reporting.rst
+ hw/virtio/virtio-balloon.c         |   25 +++++++++++++++++++++----
+ include/hw/virtio/virtio-balloon.h |    1 +
+ 2 files changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/vm/free_page_reporting.rst b/Documentation/vm/free_page_reporting.rst
-new file mode 100644
-index 000000000000..33f54a450a4a
---- /dev/null
-+++ b/Documentation/vm/free_page_reporting.rst
-@@ -0,0 +1,41 @@
-+.. _free_page_reporting:
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 40b04f518028..6ecfec422309 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -531,6 +531,15 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
+         return;
+     }
+ 
++    /*
++     * If page poisoning is enabled then we probably shouldn't bother with
++     * the hinting since the poisoning will dirty the page and invalidate
++     * the work we are doing anyway.
++     */
++    if (virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)) {
++        return;
++    }
 +
-+=====================
-+Free Page Reporting
-+=====================
+     if (s->free_page_report_cmd_id == UINT_MAX) {
+         s->free_page_report_cmd_id =
+                        VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
+@@ -618,12 +627,10 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
+     if (s->qemu_4_0_config_size) {
+         return sizeof(struct virtio_balloon_config);
+     }
+-    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
++    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON) ||
++        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+         return sizeof(struct virtio_balloon_config);
+     }
+-    if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+-        return offsetof(struct virtio_balloon_config, poison_val);
+-    }
+     return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
+ }
+ 
+@@ -634,6 +641,7 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
+ 
+     config.num_pages = cpu_to_le32(dev->num_pages);
+     config.actual = cpu_to_le32(dev->actual);
++    config.poison_val = cpu_to_le32(dev->poison_val);
+ 
+     if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
+         config.free_page_report_cmd_id =
+@@ -697,6 +705,8 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
+         qapi_event_send_balloon_change(vm_ram_size -
+                         ((ram_addr_t) dev->actual << VIRTIO_BALLOON_PFN_SHIFT));
+     }
++    dev->poison_val = virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON) ? 
++                      le32_to_cpu(config.poison_val) : 0;
+     trace_virtio_balloon_set_config(dev->actual, oldactual);
+ }
+ 
+@@ -706,6 +716,9 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
+     VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
+     f |= dev->host_features;
+     virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
++    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
++        virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
++    }
+ 
+     return f;
+ }
+@@ -847,6 +860,8 @@ static void virtio_balloon_device_reset(VirtIODevice *vdev)
+         g_free(s->stats_vq_elem);
+         s->stats_vq_elem = NULL;
+     }
 +
-+Free page reporting is an API by which a device can register to receive
-+lists of pages that are currently unused by the system. This is useful in
-+the case of virtualization where a guest is then able to use this data to
-+notify the hypervisor that it is no longer using certain pages in memory.
-+
-+For the driver, typically a balloon driver, to use of this functionality
-+it will allocate and initialize a page_reporting_dev_info structure. The
-+field within the structure it will populate is the "report" function
-+pointer used to process the scatterlist. It must also guarantee that it can
-+handle at least PAGE_REPORTING_CAPACITY worth of scatterlist entries per
-+call to the function. A call to page_reporting_register will register the
-+page reporting interface with the reporting framework assuming no other
-+page reporting devices are already registered.
-+
-+Once registered the page reporting API will begin reporting batches of
-+pages to the driver. The API will start reporting pages 2 seconds after
-+the interface is registered and will continue to do so 2 seconds after any
-+page of a sufficiently high order is freed.
-+
-+Pages reported will be stored in the scatterlist passed to the reporting
-+function with the final entry having the end bit set in entry nent - 1.
-+While pages are being processed by the report function they will not be
-+accessible to the allocator. Once the report function has been completed
-+the pages will be returned to the free area from which they were obtained.
-+
-+Prior to removing a driver that is making use of free page reporting it
-+is necessary to call page_reporting_unregister to have the
-+page_reporting_dev_info structure that is currently in use by free page
-+reporting removed. Doing this will prevent further reports from being
-+issued via the interface. If another driver or the same driver is
-+registered it is possible for it to resume where the previous driver had
-+left off in terms of reporting free pages.
-+
-+Alexander Duyck, Dec 04, 2019
-+
++    s->poison_val = 0;
+ }
+ 
+ static void virtio_balloon_set_status(VirtIODevice *vdev, uint8_t status)
+@@ -909,6 +924,8 @@ static Property virtio_balloon_properties[] = {
+                     VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
+     DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
+                     VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
++    DEFINE_PROP_BIT("x-page-poison", VirtIOBalloon, host_features,
++                    VIRTIO_BALLOON_F_PAGE_POISON, false),
+     /* QEMU 4.0 accidentally changed the config size even when free-page-hint
+      * is disabled, resulting in QEMU 3.1 migration incompatibility.  This
+      * property retains this quirk for QEMU 4.1 machine types.
+diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
+index d1c968d2376e..7fe78e5c14d7 100644
+--- a/include/hw/virtio/virtio-balloon.h
++++ b/include/hw/virtio/virtio-balloon.h
+@@ -70,6 +70,7 @@ typedef struct VirtIOBalloon {
+     uint32_t host_features;
+ 
+     bool qemu_4_0_config_size;
++    uint32_t poison_val;
+ } VirtIOBalloon;
+ 
+ #endif
 
