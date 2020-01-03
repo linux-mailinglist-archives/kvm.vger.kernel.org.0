@@ -2,234 +2,315 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 444E412F9CE
-	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2020 16:31:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DDDD12FACE
+	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2020 17:49:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727793AbgACPbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jan 2020 10:31:13 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57723 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727539AbgACPbN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Jan 2020 10:31:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578065471;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m7LwSvw4kZT6m+VWL29hf447kUvmDHEGKUw/r/5JYxo=;
-        b=BL58vW74apzSpALrckHvzK5rby4LuEBDCPdT0RGQVeHwlGg5w3XvCwMCUJzZReohQ9FvWB
-        cjlVV6PbL5Tz1Ifk25YkBUgeepzgRkCTXxbwv0U7np0zuGhYeX2DV1mdu2g9kg5AmCOe+z
-        QGcDMj+u6W6nOWphmT/j+aL7DTxzWvc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-3wJwOdW9M2i5n7EYl0QOgQ-1; Fri, 03 Jan 2020 10:31:10 -0500
-X-MC-Unique: 3wJwOdW9M2i5n7EYl0QOgQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7DBB801E7A;
-        Fri,  3 Jan 2020 15:31:08 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 33AB3385;
-        Fri,  3 Jan 2020 15:31:07 +0000 (UTC)
-Date:   Fri, 3 Jan 2020 16:31:04 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, vladimir.murzin@arm.com,
-        mark.rutland@arm.com
-Subject: Re: [kvm-unit-tests PATCH v3 06/18] arm/arm64: psci: Don't run C
- code without stack or vectors
-Message-ID: <20200103153104.bletctgkql67ftzu@kamzik.brq.redhat.com>
+        id S1727996AbgACQtS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jan 2020 11:49:18 -0500
+Received: from foss.arm.com ([217.140.110.172]:56880 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727912AbgACQtS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jan 2020 11:49:18 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 535D8328;
+        Fri,  3 Jan 2020 08:49:17 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5310D3F703;
+        Fri,  3 Jan 2020 08:49:16 -0800 (PST)
+Date:   Fri, 3 Jan 2020 16:49:03 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        maz@kernel.org, vladimir.murzin@arm.com, mark.rutland@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 15/18] arm/arm64: Perform dcache clean
+ + invalidate after turning MMU off
+Message-ID: <20200103164903.07cf0c56@donnerap.cambridge.arm.com>
+In-Reply-To: <1577808589-31892-16-git-send-email-alexandru.elisei@arm.com>
 References: <1577808589-31892-1-git-send-email-alexandru.elisei@arm.com>
- <1577808589-31892-7-git-send-email-alexandru.elisei@arm.com>
- <20200102181121.6895344d@donnerap.cambridge.arm.com>
+        <1577808589-31892-16-git-send-email-alexandru.elisei@arm.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200102181121.6895344d@donnerap.cambridge.arm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 02, 2020 at 06:11:21PM +0000, Andre Przywara wrote:
-> On Tue, 31 Dec 2019 16:09:37 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi,
-> 
-> > The psci test performs a series of CPU_ON/CPU_OFF cycles for CPU 1. This is
-> > done by setting the entry point for the CPU_ON call to the physical address
-> > of the C function cpu_psci_cpu_die.
-> > 
-> > The compiler is well within its rights to use the stack when generating
-> > code for cpu_psci_cpu_die.
-> 
-> I am a bit puzzled: Is this an actual test failure at the moment? Or just a potential problem? Because I see it using the stack pointer in the generated code in lib/arm/psci.o. But the psci test seems to pass. Or is that just because the SP is somehow not cleared, because of some KVM implementation specifics?
+On Tue, 31 Dec 2019 16:09:46 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-I think the test just doesn't care that the CPU is in an infinite
-exception loop. Indeed we should probably put the CPU into an
-infinite loop instead of attempting to call PSCI die with it, as
-the status of a dying or dead CPU may conflict with our expected
-status of the test.
+Hi,
 
+> When the MMU is off, data accesses are to Device nGnRnE memory on arm64 [1]
+> or to Strongly-Ordered memory on arm [2]. This means that the accesses are
+> non-cacheable.
 > 
-> One more thing below ...
-> 
-> >  However, because no stack initialization has
-> > been done, the stack pointer is zero, as set by KVM when creating the VCPU.
-> > This causes a data abort without a change in exception level. The VBAR_EL1
-> > register is also zero (the KVM reset value for VBAR_EL1), the MMU is off,
-> > and we end up trying to fetch instructions from address 0x200.
-> > 
-> > At this point, a stage 2 instruction abort is generated which is taken to
-> > KVM. KVM interprets this as an instruction fetch from an I/O region, and
-> > injects a prefetch abort into the guest. Prefetch abort is a synchronous
-> > exception, and on guest return the VCPU PC will be set to VBAR_EL1 + 0x200,
-> > which is...  0x200. The VCPU ends up in an infinite loop causing a prefetch
-> > abort while fetching the instruction to service the said abort.
-> > 
-> > cpu_psci_cpu_die is basically a wrapper over the HVC instruction, so
-> > provide an assembly implementation for the function which will serve as the
-> > entry point for CPU_ON.
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  arm/cstart.S   | 7 +++++++
-> >  arm/cstart64.S | 7 +++++++
-> >  arm/psci.c     | 5 +++--
-> >  3 files changed, 17 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arm/cstart.S b/arm/cstart.S
-> > index 2c81d39a666b..dfef48e4dbb2 100644
-> > --- a/arm/cstart.S
-> > +++ b/arm/cstart.S
-> > @@ -7,6 +7,7 @@
-> >   */
-> >  #define __ASSEMBLY__
-> >  #include <auxinfo.h>
-> > +#include <linux/psci.h>
-> >  #include <asm/thread_info.h>
-> >  #include <asm/asm-offsets.h>
-> >  #include <asm/pgtable-hwdef.h>
-> > @@ -139,6 +140,12 @@ secondary_entry:
-> >  	blx	r0
-> >  	b	do_idle
-> >  
-> > +.global asm_cpu_psci_cpu_die
-> > +asm_cpu_psci_cpu_die:
-> > +	ldr	r0, =PSCI_0_2_FN_CPU_OFF
-> > +	hvc	#0
-> > +	b	.
-> 
-> I am wondering if this implementation is actually too simple. Both the current implementation and the kernel clear at least the first three arguments to 0.
-> I failed to find a requirement for doing this (nothing in the SMCCC or the PSCI spec), but I guess it would make sense when looking at forward compatibility.
-> 
-> At the very least it's a change in behaviour (ignoring the missing printf).
-> So shall we just clear r1, r2 and r3 here? (Same for arm64 below)
+> Perform a dcache clean to PoC so we can read the newer values from the
+> cache after we turn the MMU off, instead of the stale values from memory.
 
-If we were to keep this function, then I agree we should zero the
-registers, but as I said above, I think the proper fix for this issue is
-to just not call PSCI die. Rather we should drop into an infinite loop,
-which also doesn't use the stack. Maybe something like this will work
-
-diff --git a/arm/psci.c b/arm/psci.c
-index 5c1accb6cea4..74c179d4976c 100644
---- a/arm/psci.c
-+++ b/arm/psci.c
-@@ -79,10 +79,14 @@ static void cpu_on_secondary_entry(void)
- 	cpumask_set_cpu(cpu, &cpu_on_ready);
- 	while (!cpu_on_start)
- 		cpu_relax();
--	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(cpu_psci_cpu_die));
-+	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(halt));
- 	cpumask_set_cpu(cpu, &cpu_on_done);
- }
+Wow, did we really not do this before?
  
-+/*
-+ * This test expects CPU1 to not have previously been boot,
-+ * and when this test completes CPU1 will be stuck in halt.
-+ */
- static bool psci_cpu_on_test(void)
- {
- 	bool failed = false;
-@@ -104,7 +108,7 @@ static bool psci_cpu_on_test(void)
- 	cpu_on_start = 1;
- 	smp_mb();
- 
--	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(cpu_psci_cpu_die));
-+	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(halt));
- 	cpumask_set_cpu(0, &cpu_on_done);
- 
- 	while (!cpumask_full(&cpu_on_done))
+> Perform an invalidation so we can access the data written to memory after
+> we turn the MMU back on. This prevents reading back the stale values we
+> cleaned from the cache when we turned the MMU off.
+> 
+> Data caches are PIPT and the VAs are translated using the current
+> translation tables, or an identity mapping (what Arm calls a "flat
+> mapping") when the MMU is off [1, 2]. Do the clean + invalidate when the
+> MMU is off so we don't depend on the current translation tables and we can
+> make sure that the operation applies to the entire physical memory.
 
-Thanks,
-drew
+The intention of the patch is very much valid, I am just wondering if there is any reason why you do the cache line size determination in (quite some lines of) C?
+Given that you only use that in asm, wouldn't it be much easier to read the CTR register there, just before you actually use it? The actual CTR read is (inline) assembly anyway, so you just need the mask/shift/add in asm as well. You could draw inspiration from here, for instance:
+https://gitlab.denx.de/u-boot/u-boot/blob/master/arch/arm/cpu/armv8/cache.S#L132
 
+> The patch was tested by hacking arm/selftest.c:
 > 
-> Cheers,
-> Andre
+> +#include <alloc_page.h>
+> +#include <asm/mmu.h>
+>  int main(int argc, char **argv)
+>  {
+> +	int *x = alloc_page();
+> +
+>  	report_prefix_push("selftest");
 > 
-> > +
-> >  .globl halt
-> >  halt:
-> >  1:	wfi
-> > diff --git a/arm/cstart64.S b/arm/cstart64.S
-> > index b0e8baa1a23a..c98842f11e90 100644
-> > --- a/arm/cstart64.S
-> > +++ b/arm/cstart64.S
-> > @@ -7,6 +7,7 @@
-> >   */
-> >  #define __ASSEMBLY__
-> >  #include <auxinfo.h>
-> > +#include <linux/psci.h>
-> >  #include <asm/asm-offsets.h>
-> >  #include <asm/ptrace.h>
-> >  #include <asm/processor.h>
-> > @@ -128,6 +129,12 @@ secondary_entry:
-> >  	blr	x0
-> >  	b	do_idle
-> >  
-> > +.globl asm_cpu_psci_cpu_die
-> > +asm_cpu_psci_cpu_die:
-> > +	ldr	x0, =PSCI_0_2_FN_CPU_OFF
-> > +	hvc	#0
-> > +	b	.
-> > +
-> >  .globl halt
-> >  halt:
-> >  1:	wfi
-> > diff --git a/arm/psci.c b/arm/psci.c
-> > index 5c1accb6cea4..c45a39c7d6e8 100644
-> > --- a/arm/psci.c
-> > +++ b/arm/psci.c
-> > @@ -72,6 +72,7 @@ static int cpu_on_ret[NR_CPUS];
-> >  static cpumask_t cpu_on_ready, cpu_on_done;
-> >  static volatile int cpu_on_start;
-> >  
-> > +extern void asm_cpu_psci_cpu_die(void);
-> >  static void cpu_on_secondary_entry(void)
-> >  {
-> >  	int cpu = smp_processor_id();
-> > @@ -79,7 +80,7 @@ static void cpu_on_secondary_entry(void)
-> >  	cpumask_set_cpu(cpu, &cpu_on_ready);
-> >  	while (!cpu_on_start)
-> >  		cpu_relax();
-> > -	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(cpu_psci_cpu_die));
-> > +	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(asm_cpu_psci_cpu_die));
-> >  	cpumask_set_cpu(cpu, &cpu_on_done);
-> >  }
-> >  
-> > @@ -104,7 +105,7 @@ static bool psci_cpu_on_test(void)
-> >  	cpu_on_start = 1;
-> >  	smp_mb();
-> >  
-> > -	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(cpu_psci_cpu_die));
-> > +	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(asm_cpu_psci_cpu_die));
-> >  	cpumask_set_cpu(0, &cpu_on_done);
-> >  
-> >  	while (!cpumask_full(&cpu_on_done))
+> +	*x = 0x42;
+> +	mmu_disable();
+> +	report("read back value written with MMU on", *x == 0x42);
+> +	*x = 0x50;
+> +	mmu_enable(current_thread_info()->pgtable);
+> +	report("read back value written with MMU off", *x == 0x50);
+> +
+
+Shall this be a new test then as well? At least to avoid regressions in kvm-unit-tests itself? But also to test for proper MMU-off and cache inval operations inside guests?
+
+Cheers,
+Andre
+
+>  	if (argc < 2)
+>  		report_abort("no test specified");
 > 
+> Without the fix, the first report fails, and the test usually hangs before
+> the second report. This is because mmu_enable pushes the LR register on the
+> stack when the MMU is off, which means that the value will be written to
+> memory.  However, after asm_mmu_enable, the MMU is enabled, and we read it
+> back from the dcache, thus getting garbage.
+> 
+> With the fix, the two reports pass.
+> 
+> [1] ARM DDI 0487E.a, section D5.2.9
+> [2] ARM DDI 0406C.d, section B3.2.1
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  lib/arm/asm/processor.h   |  6 ++++++
+>  lib/arm64/asm/processor.h |  6 ++++++
+>  lib/arm/processor.c       | 10 ++++++++++
+>  lib/arm/setup.c           |  2 ++
+>  lib/arm64/processor.c     | 11 +++++++++++
+>  arm/cstart.S              | 22 ++++++++++++++++++++++
+>  arm/cstart64.S            | 23 +++++++++++++++++++++++
+>  7 files changed, 80 insertions(+)
+> 
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index a8c4628da818..4684fb4755b3 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -9,6 +9,11 @@
+>  #include <asm/sysreg.h>
+>  #include <asm/barrier.h>
+>  
+> +#define CTR_DMINLINE_SHIFT	16
+> +#define CTR_DMINLINE_MASK	(0xf << 16)
+> +#define CTR_DMINLINE(x)	\
+> +	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
+> +
+>  enum vector {
+>  	EXCPTN_RST,
+>  	EXCPTN_UND,
+> @@ -25,6 +30,7 @@ typedef void (*exception_fn)(struct pt_regs *);
+>  extern void install_exception_handler(enum vector v, exception_fn fn);
+>  
+>  extern void show_regs(struct pt_regs *regs);
+> +extern void init_dcache_line_size(void);
+>  
+>  static inline unsigned long current_cpsr(void)
+>  {
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 1d9223f728a5..fd508c02f30d 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -16,6 +16,11 @@
+>  #define SCTLR_EL1_A	(1 << 1)
+>  #define SCTLR_EL1_M	(1 << 0)
+>  
+> +#define CTR_EL0_DMINLINE_SHIFT	16
+> +#define CTR_EL0_DMINLINE_MASK	(0xf << 16)
+> +#define CTR_EL0_DMINLINE(x)	\
+> +	(((x) & CTR_EL0_DMINLINE_MASK) >> CTR_EL0_DMINLINE_SHIFT)
+> +
+>  #ifndef __ASSEMBLY__
+>  #include <asm/ptrace.h>
+>  #include <asm/esr.h>
+> @@ -60,6 +65,7 @@ extern void vector_handlers_default_init(vector_fn *handlers);
+>  
+>  extern void show_regs(struct pt_regs *regs);
+>  extern bool get_far(unsigned int esr, unsigned long *far);
+> +extern void init_dcache_line_size(void);
+>  
+>  static inline unsigned long current_level(void)
+>  {
+> diff --git a/lib/arm/processor.c b/lib/arm/processor.c
+> index 773337e6d3b7..c57657c5ea53 100644
+> --- a/lib/arm/processor.c
+> +++ b/lib/arm/processor.c
+> @@ -25,6 +25,8 @@ static const char *vector_names[] = {
+>  	"rst", "und", "svc", "pabt", "dabt", "addrexcptn", "irq", "fiq"
+>  };
+>  
+> +unsigned int dcache_line_size;
+> +
+>  void show_regs(struct pt_regs *regs)
+>  {
+>  	unsigned long flags;
+> @@ -145,3 +147,11 @@ bool is_user(void)
+>  {
+>  	return current_thread_info()->flags & TIF_USER_MODE;
+>  }
+> +void init_dcache_line_size(void)
+> +{
+> +	u32 ctr;
+> +
+> +	asm volatile("mrc p15, 0, %0, c0, c0, 1" : "=r" (ctr));
+> +	/* DminLine is log2 of the number of words in the smallest cache line */
+> +	dcache_line_size = 1 << (CTR_DMINLINE(ctr) + 2);
+> +}
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 4f02fca85607..54fc19a20942 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -20,6 +20,7 @@
+>  #include <asm/thread_info.h>
+>  #include <asm/setup.h>
+>  #include <asm/page.h>
+> +#include <asm/processor.h>
+>  #include <asm/smp.h>
+>  
+>  #include "io.h"
+> @@ -63,6 +64,7 @@ static void cpu_init(void)
+>  	ret = dt_for_each_cpu_node(cpu_set, NULL);
+>  	assert(ret == 0);
+>  	set_cpu_online(0, true);
+> +	init_dcache_line_size();
+>  }
+>  
+>  static void mem_init(phys_addr_t freemem_start)
+> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+> index 2a024e3f4e9d..f28066d40145 100644
+> --- a/lib/arm64/processor.c
+> +++ b/lib/arm64/processor.c
+> @@ -62,6 +62,8 @@ static const char *ec_names[EC_MAX] = {
+>  	[ESR_EL1_EC_BRK64]		= "BRK64",
+>  };
+>  
+> +unsigned int dcache_line_size;
+> +
+>  void show_regs(struct pt_regs *regs)
+>  {
+>  	int i;
+> @@ -257,3 +259,12 @@ bool is_user(void)
+>  {
+>  	return current_thread_info()->flags & TIF_USER_MODE;
+>  }
+> +
+> +void init_dcache_line_size(void)
+> +{
+> +	u64 ctr;
+> +
+> +	ctr = read_sysreg(ctr_el0);
+> +	/* DminLine is log2 of the number of words in the smallest cache line */
+> +	dcache_line_size = 1 << (CTR_EL0_DMINLINE(ctr) + 2);
+> +}
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index dfef48e4dbb2..3c2a3bcde61a 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -188,6 +188,20 @@ asm_mmu_enable:
+>  
+>  	mov     pc, lr
+>  
+> +.macro dcache_clean_inval domain, start, end, tmp1, tmp2
+> +	ldr	\tmp1, =dcache_line_size
+> +	ldr	\tmp1, [\tmp1]
+> +	sub	\tmp2, \tmp1, #1
+> +	bic	\start, \start, \tmp2
+> +9998:
+> +	/* DCCIMVAC */
+> +	mcr	p15, 0, \start, c7, c14, 1
+> +	add	\start, \start, \tmp1
+> +	cmp	\start, \end
+> +	blo	9998b
+> +	dsb	\domain
+> +.endm
+> +
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+>  	/* SCTLR */
+> @@ -195,6 +209,14 @@ asm_mmu_disable:
+>  	bic	r0, #CR_M
+>  	mcr	p15, 0, r0, c1, c0, 0
+>  	isb
+> +
+> +	ldr	r0, =__phys_offset
+> +	ldr	r0, [r0]
+> +	ldr	r1, =__phys_end
+> +	ldr	r1, [r1]
+> +	dcache_clean_inval sy, r0, r1, r2, r3
+> +	isb
+> +
+>  	mov     pc, lr
+>  
+>  /*
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index c98842f11e90..f41ffa3bc6c2 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -201,12 +201,35 @@ asm_mmu_enable:
+>  
+>  	ret
+>  
+> +/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
+> +.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
+> +	adrp	\tmp1, dcache_line_size
+> +	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
+> +	sub	\tmp2, \tmp1, #1
+> +	bic	\start, \start, \tmp2
+> +9998:
+> +	dc	\op , \start
+> +	add	\start, \start, \tmp1
+> +	cmp	\start, \end
+> +	b.lo	9998b
+> +	dsb	\domain
+> +.endm
+> +
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+>  	mrs	x0, sctlr_el1
+>  	bic	x0, x0, SCTLR_EL1_M
+>  	msr	sctlr_el1, x0
+>  	isb
+> +
+> +	/* Clean + invalidate the entire memory */
+> +	adrp	x0, __phys_offset
+> +	ldr	x0, [x0, :lo12:__phys_offset]
+> +	adrp	x1, __phys_end
+> +	ldr	x1, [x1, :lo12:__phys_end]
+> +	dcache_by_line_op civac, sy, x0, x1, x2, x3
+> +	isb
+> +
+>  	ret
+>  
+>  /*
 
