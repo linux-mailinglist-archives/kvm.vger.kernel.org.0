@@ -2,121 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD8DE12F29F
-	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2020 02:12:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD64512F2E3
+	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2020 03:20:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727240AbgACBMS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jan 2020 20:12:18 -0500
-Received: from mga06.intel.com ([134.134.136.31]:48945 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725872AbgACBMS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jan 2020 20:12:18 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Jan 2020 17:12:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,388,1571727600"; 
-   d="scan'208";a="221511534"
-Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.9])
-  by orsmga006.jf.intel.com with ESMTP; 02 Jan 2020 17:12:16 -0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     zhenyuw@linux.intel.com
-Cc:     alex.williamson@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, intel-gvt@eclists.intel.com,
-        pbonzini@redhat.com, kevin.tian@intel.com,
-        Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH 2/2] drm/i915/gvt: subsitute kvm_read/write_guest with vfio_iova_rw
-Date:   Thu,  2 Jan 2020 20:03:49 -0500
-Message-Id: <20200103010349.4262-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200103010055.4140-1-yan.y.zhao@intel.com>
-References: <20200103010055.4140-1-yan.y.zhao@intel.com>
+        id S1727289AbgACCTg convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 2 Jan 2020 21:19:36 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:51116 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726130AbgACCTg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jan 2020 21:19:36 -0500
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.53])
+        by Forcepoint Email with ESMTP id C40AB3720E2D970A9063;
+        Fri,  3 Jan 2020 10:19:33 +0800 (CST)
+Received: from dggeme766-chm.china.huawei.com (10.3.19.112) by
+ DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 3 Jan 2020 10:19:33 +0800
+Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
+ dggeme766-chm.china.huawei.com (10.3.19.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Fri, 3 Jan 2020 10:19:33 +0800
+Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
+ dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
+ Fri, 3 Jan 2020 10:19:33 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     "liran.alon@oracle.com" <liran.alon@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
+Subject: Re: [PATCH] KVM: SVM: Fix potential memory leak in svm_cpu_init()
+Thread-Topic: [PATCH] KVM: SVM: Fix potential memory leak in svm_cpu_init()
+Thread-Index: AdXB22PCGgAmhN24HEq8r6drwzC6/g==
+Date:   Fri, 3 Jan 2020 02:19:33 +0000
+Message-ID: <9083833afd7c465a9222e6801cb66499@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.221.158]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As a device model, it is better to read/write guest memory using vfio
-interface, so that vfio is able to maintain dirty info of device IOVAs.
+Vitaly writes:
+>> From: Miaohe Lin <linmiaohe@huawei.com>
+>>  	if (svm_sev_enabled()) {
+>>  		r = -ENOMEM;
+>
+>Not your fault but this assignment to 'r' seem to be redundant: it is already set to '-ENOMEM' above, but this is also not perfect as ... 
+>
+>> @@ -1020,14 +1020,16 @@ static int svm_cpu_init(int cpu)
+>>  					      sizeof(void *),
+>>  	return r;
+>
+>... '-ENOMEM' is actually the only possible outcome here. In case you'll be re-submitting, I'd suggest we drop 'r' entirely and just reture -ENOMEM here.
 
-Compared to CPU side interfaces kvm_read/write_guest(), vfio_iova_rw()
-has ~600 cycles more overhead on average.
--------------------------------------
-|    interface     | avg cpu cycles |
-|-----------------------------------|
-| kvm_write_guest  |     1546       |
-| ----------------------------------|
-| kvm_read_guest   |     686        |
-|-----------------------------------|
-| vfio_iova_rw(w)  |     2233       |
-|-----------------------------------|
-| vfio_iova_rw(r)  |     1262       |
--------------------------------------
+The var r is really unnecessary and we should clean it up. Thanks for your good suggest. I would send a patch v2 soon.
 
-Comparison of benchmarks scores are as blow:
----------------------------------------------------------
-|  avg score  | kvm_read/write_guest   | vfio_iova_rw   |
----------------------------------------------------------
-|   Glmark2   |         1132           |      1138.2    |
----------------------------------------------------------
-|  Lightsmark |        61.558          |      61.538    |
-|--------------------------------------------------------
-|  OpenArena  |        142.77          |      136.6     |
----------------------------------------------------------
-|   Heaven    |         698            |      686.8     |
---------------------------------------------------------
-No obvious performance downgrade found.
+>
+>Anyways, your patch seems to be correct, so:
+>
+>Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Cc: Kevin Tian <kevin.tian@intel.com>
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- drivers/gpu/drm/i915/gvt/kvmgt.c | 26 +++++++-------------------
- 1 file changed, 7 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index bd79a9718cc7..576b05db3998 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -1966,31 +1966,19 @@ static int kvmgt_rw_gpa(unsigned long handle, unsigned long gpa,
- 			void *buf, unsigned long len, bool write)
- {
- 	struct kvmgt_guest_info *info;
--	struct kvm *kvm;
--	int idx, ret;
--	bool kthread = current->mm == NULL;
-+	int ret;
-+	struct intel_vgpu *vgpu;
-+	struct device *dev;
- 
- 	if (!handle_valid(handle))
- 		return -ESRCH;
- 
- 	info = (struct kvmgt_guest_info *)handle;
--	kvm = info->kvm;
--
--	if (kthread) {
--		if (!mmget_not_zero(kvm->mm))
--			return -EFAULT;
--		use_mm(kvm->mm);
--	}
--
--	idx = srcu_read_lock(&kvm->srcu);
--	ret = write ? kvm_write_guest(kvm, gpa, buf, len) :
--		      kvm_read_guest(kvm, gpa, buf, len);
--	srcu_read_unlock(&kvm->srcu, idx);
-+	vgpu = info->vgpu;
-+	dev = mdev_dev(vgpu->vdev.mdev);
- 
--	if (kthread) {
--		unuse_mm(kvm->mm);
--		mmput(kvm->mm);
--	}
-+	ret = write ? vfio_iova_rw(dev, gpa, buf, len, true) :
-+			vfio_iova_rw(dev, gpa, buf, len, false);
- 
- 	return ret;
- }
--- 
-2.17.1
+Thanks for your review.
 
