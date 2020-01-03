@@ -2,50 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 47EA312FE3F
+	by mail.lfdr.de (Postfix) with ESMTP id DA54A12FE40
 	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2020 22:17:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728858AbgACVRI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jan 2020 16:17:08 -0500
-Received: from mail-pg1-f181.google.com ([209.85.215.181]:40603 "EHLO
-        mail-pg1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728848AbgACVRF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jan 2020 16:17:05 -0500
-Received: by mail-pg1-f181.google.com with SMTP id k25so23926060pgt.7;
-        Fri, 03 Jan 2020 13:17:05 -0800 (PST)
+        id S1728882AbgACVRM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jan 2020 16:17:12 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:37160 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728872AbgACVRL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jan 2020 16:17:11 -0500
+Received: by mail-pf1-f195.google.com with SMTP id p14so24034220pfn.4;
+        Fri, 03 Jan 2020 13:17:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:from:to:cc:date:message-id:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=yW1O0jjXB9z8bWi4RkuBpy5DqO+Vy5mEgFaRwUh2ELE=;
-        b=N80AAa3s0zzd3IKELy/pbRakvvtwA55lPakZG0dcI6ezILUb1eCpIyR9Q1ehAbeKRD
-         2bbB4pS/D2iQTaP5M99p5+BeB3boYWFCkk0nwaydCdGDI16JTQJP7IWTqlTjRWmEqM8c
-         L/Ze6ZVTH21A0XPI4MnVOIqXkIMzoxSxrWwuMLmApBmqIpafRJdLn2ybp5xAqNJJOO8V
-         EjH2ROym8hZAoXkNPgXwY0zcbYZrL/ulVvHwud6NLmuOirehKNsZlr53orYwHCFyN1MY
-         fI2C1dWH1Fp+ZJ2JmBkmVimkP1kWR5uBzOQ9rNc0tVAG55Y4WeMxBOThtX1j/ulvnnJj
-         T6AQ==
+        bh=d/px5ol/IpLIQI4VHOPlH6LMGgBauhkI55UKC6oSPnc=;
+        b=Hprox+7YhX4vp/7ApJs7XtJYtsa0BYDFC2QN81cfX/asePRHFYKBPlY/F5X2RsAV3i
+         58FRXPyIAH9AT4MIcQQ179PjkaUhX4tTRtL73lMOcEeWsjK9cGvMxVD/VVamyj3VGsw3
+         TV+ZUAK5eon63Er2i4SNqwkx9bTYiCRGvlQAIEotBkzRTlDX9gSCxKXUHSBj37tbwzer
+         Oe2xqBTKi3KRGPr1wf1921IvBivfrygOzuNn9KMsRYtIDEDcXzxMxQtHBV0LHfGTZteR
+         Ix64ynkVRsPzzNrwlOOIXl/uBgXZyyWStGYkbrJdk7nLpXuPPIjrTXCFYta6oFLnCJug
+         cAMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=yW1O0jjXB9z8bWi4RkuBpy5DqO+Vy5mEgFaRwUh2ELE=;
-        b=J+1d2x7Bp+jhiSVDrSFxYpNJLFQedd65Ykhrd9imn0iVIqlpGrxF9HkMa6mc1LUyHL
-         eSDtLEKfHjoAgXSbjYv6vJuq21ycT5z5+qC5wa+73OP1hhW300/7Yc1TQmfln1nzEPn5
-         atv74ypdlctXriFuSppAY8vUoH0z/yr4iNFWL0yTnRAd5CLX69KEtctNrREha/0Z0WtG
-         mAfVxYK8BjpuSOolJCr4uDbyz3A23RTAkl9Y/Fazjm2aU8sICPgpoWG8c9sOZHHlxVo0
-         lpj7/yG6wtHfGlhjgkVTsOw62OGyfjCkcOQBA0z9atvKNoC8Ku4u3keR3rlaMd5Tj5JU
-         ZqDg==
-X-Gm-Message-State: APjAAAWSU/h2ljidVVInHZzuATS7MZSIDgZnNJ3wBWz9fF8g+b4kYPXT
-        1v5L3b0dTKmbpjrGs2C3JTI=
-X-Google-Smtp-Source: APXvYqwsbem4TbYMQQreA2Pi/h0WlGAfaGKiQLSCp81sdU5fSB81pX1FGoqthPyYMX3DmCit7YbtBQ==
-X-Received: by 2002:aa7:9218:: with SMTP id 24mr95742121pfo.145.1578086224950;
-        Fri, 03 Jan 2020 13:17:04 -0800 (PST)
+        bh=d/px5ol/IpLIQI4VHOPlH6LMGgBauhkI55UKC6oSPnc=;
+        b=atSjubplmkHVrO7BVa2mrsxmhG1AQYfwLYU4+9C2F72QqvK6kKDUa9GAjUnOBttK1Y
+         X7tcRWbiPyGPiPLCMFzHP2JkTLlk3NTHiScKiCl50GDeeGcszemQzRByMBMxqmmRcCDG
+         73aBV0i3P24UYp7csWyWL5ezBtbocrPYeo23B9GdKZ9eLM33tRuVLzC15y7Y3HUgMPDP
+         SkccIG8qTa99TMHHnC3rulfywnc2NDbbMEbtwYYNP6YUFzeK6Mq+1tjqHXp19qoll+fL
+         wNDtVWKW72vDUJI6wDOo6f8vsKnWSgcPs4JAv2HfOqh+oy6kElDQAN8FvGHAeeKY706q
+         p8cg==
+X-Gm-Message-State: APjAAAWXrU3JVBON7se+9xCS0yE/VHY/I1UUULiQdD+QvfjOOre37Tlp
+        BkIzZmc4iVDeskSc4Q5jftKg7ZC/T6s=
+X-Google-Smtp-Source: APXvYqyY3fKbNPGAiS+tAsYD6rrQUojk2xvXkRF2/sBCy3c3WSTOc4Rf9CnsNPVEbSYT6rLPnfMDAg==
+X-Received: by 2002:a63:444c:: with SMTP id t12mr95445975pgk.433.1578086230990;
+        Fri, 03 Jan 2020 13:17:10 -0800 (PST)
 Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id z16sm69364196pff.125.2020.01.03.13.17.04
+        by smtp.gmail.com with ESMTPSA id u23sm68481143pfm.29.2020.01.03.13.17.10
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 03 Jan 2020 13:17:04 -0800 (PST)
-Subject: [PATCH v16 8/9] mm: Add budget limit to how many pages can be
- reported per list per pass
+        Fri, 03 Jan 2020 13:17:10 -0800 (PST)
+Subject: [PATCH v16 9/9] mm: Add free page reporting documentation
 From:   Alexander Duyck <alexander.duyck@gmail.com>
 To:     kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
         willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
@@ -57,8 +56,8 @@ Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
         wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
         dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com,
         osalvador@suse.de
-Date:   Fri, 03 Jan 2020 13:17:04 -0800
-Message-ID: <20200103211703.29237.95865.stgit@localhost.localdomain>
+Date:   Fri, 03 Jan 2020 13:17:10 -0800
+Message-ID: <20200103211709.29237.75092.stgit@localhost.localdomain>
 In-Reply-To: <20200103210509.29237.18426.stgit@localhost.localdomain>
 References: <20200103210509.29237.18426.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
@@ -72,119 +71,62 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-In order to keep ourselves from reporting pages that are just going to be
-reused again in the case of heavy churn we can put a limit on how many
-total pages we will process per pass. Doing this will allow the worker
-thread to go into idle much more quickly so that we avoid competing with
-other threads that might be allocating or freeing pages.
-
-The logic added here will limit the worker thread to no more than one
-sixteenth of the total free pages in a given area per list. Once that limit
-is reached it will update the state so that at the end of the pass we will
-reschedule the worker to try again in 2 seconds when the memory churn has
-hopefully settled down.
-
-Again this optimization doesn't show much of a benefit in the standard case
-as the memory churn is minmal. However with page allocator shuffling
-enabled the gain is quite noticeable. Below are the results with a THP
-enabled version of the will-it-scale page_fault1 test showing the
-improvement in iterations for 16 processes or threads.
-
-Without:
-tasks   processes       processes_idle  threads         threads_idle
-16      8283274.75      0.17            5594261.00      38.15
-
-With:
-tasks   processes       processes_idle  threads         threads_idle
-16      8767010.50      0.21            5791312.75      36.98
+Add documentation for free page reporting. Currently the only consumer is
+virtio-balloon, however it is possible that other drivers might make use of
+this so it is best to add a bit of documetation explaining at a high level
+how to use the API.
 
 Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
- include/linux/page_reporting.h |    1 +
- mm/page_reporting.c            |   33 ++++++++++++++++++++++++++++++++-
- 2 files changed, 33 insertions(+), 1 deletion(-)
+ Documentation/vm/free_page_reporting.rst |   41 ++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+ create mode 100644 Documentation/vm/free_page_reporting.rst
 
-diff --git a/include/linux/page_reporting.h b/include/linux/page_reporting.h
-index 32355486f572..3b99e0ec24f2 100644
---- a/include/linux/page_reporting.h
-+++ b/include/linux/page_reporting.h
-@@ -5,6 +5,7 @@
- #include <linux/mmzone.h>
- #include <linux/scatterlist.h>
- 
-+/* This value should always be a power of 2, see page_reporting_cycle() */
- #define PAGE_REPORTING_CAPACITY		32
- 
- struct page_reporting_dev_info {
-diff --git a/mm/page_reporting.c b/mm/page_reporting.c
-index 6885e74c2367..3bbd471cfc81 100644
---- a/mm/page_reporting.c
-+++ b/mm/page_reporting.c
-@@ -114,6 +114,7 @@ void __page_reporting_notify(void)
- 	struct list_head *list = &area->free_list[mt];
- 	unsigned int page_len = PAGE_SIZE << order;
- 	struct page *page, *next;
-+	long budget;
- 	int err = 0;
- 
- 	/*
-@@ -125,12 +126,39 @@ void __page_reporting_notify(void)
- 
- 	spin_lock_irq(&zone->lock);
- 
-+	/*
-+	 * Limit how many calls we will be making to the page reporting
-+	 * device for this list. By doing this we avoid processing any
-+	 * given list for too long.
-+	 *
-+	 * The current value used allows us enough calls to process over a
-+	 * sixteenth of the current list plus one additional call to handle
-+	 * any pages that may have already been present from the previous
-+	 * list processed. This should result in us reporting all pages on
-+	 * an idle system in about 30 seconds.
-+	 *
-+	 * The division here should be cheap since PAGE_REPORTING_CAPACITY
-+	 * should always be a power of 2.
-+	 */
-+	budget = DIV_ROUND_UP(area->nr_free, PAGE_REPORTING_CAPACITY * 16);
+diff --git a/Documentation/vm/free_page_reporting.rst b/Documentation/vm/free_page_reporting.rst
+new file mode 100644
+index 000000000000..33f54a450a4a
+--- /dev/null
++++ b/Documentation/vm/free_page_reporting.rst
+@@ -0,0 +1,41 @@
++.. _free_page_reporting:
 +
- 	/* loop through free list adding unreported pages to sg list */
- 	list_for_each_entry_safe(page, next, list, lru) {
- 		/* We are going to skip over the reported pages. */
- 		if (PageReported(page))
- 			continue;
- 
-+		/*
-+		 * If we fully consumed our budget then update our
-+		 * state to indicate that we are requesting additional
-+		 * processing and exit this list.
-+		 */
-+		if (budget < 0) {
-+			atomic_set(&prdev->state, PAGE_REPORTING_REQUESTED);
-+			next = page;
-+			break;
-+		}
++=====================
++Free Page Reporting
++=====================
 +
- 		/* Attempt to pull page from list and place in scatterlist */
- 		if (*offset) {
- 			if (!__isolate_free_page(page, order)) {
-@@ -146,7 +174,7 @@ void __page_reporting_notify(void)
- 		}
- 
- 		/*
--		 * Make the first non-processed page in the free list
-+		 * Make the first non-reported page in the free list
- 		 * the new head of the free list before we release the
- 		 * zone lock.
- 		 */
-@@ -162,6 +190,9 @@ void __page_reporting_notify(void)
- 		/* reset offset since the full list was reported */
- 		*offset = PAGE_REPORTING_CAPACITY;
- 
-+		/* update budget to reflect call to report function */
-+		budget--;
++Free page reporting is an API by which a device can register to receive
++lists of pages that are currently unused by the system. This is useful in
++the case of virtualization where a guest is then able to use this data to
++notify the hypervisor that it is no longer using certain pages in memory.
 +
- 		/* reacquire zone lock and resume processing */
- 		spin_lock_irq(&zone->lock);
- 
++For the driver, typically a balloon driver, to use of this functionality
++it will allocate and initialize a page_reporting_dev_info structure. The
++field within the structure it will populate is the "report" function
++pointer used to process the scatterlist. It must also guarantee that it can
++handle at least PAGE_REPORTING_CAPACITY worth of scatterlist entries per
++call to the function. A call to page_reporting_register will register the
++page reporting interface with the reporting framework assuming no other
++page reporting devices are already registered.
++
++Once registered the page reporting API will begin reporting batches of
++pages to the driver. The API will start reporting pages 2 seconds after
++the interface is registered and will continue to do so 2 seconds after any
++page of a sufficiently high order is freed.
++
++Pages reported will be stored in the scatterlist passed to the reporting
++function with the final entry having the end bit set in entry nent - 1.
++While pages are being processed by the report function they will not be
++accessible to the allocator. Once the report function has been completed
++the pages will be returned to the free area from which they were obtained.
++
++Prior to removing a driver that is making use of free page reporting it
++is necessary to call page_reporting_unregister to have the
++page_reporting_dev_info structure that is currently in use by free page
++reporting removed. Doing this will prevent further reports from being
++issued via the interface. If another driver or the same driver is
++registered it is possible for it to resume where the previous driver had
++left off in terms of reporting free pages.
++
++Alexander Duyck, Dec 04, 2019
++
 
