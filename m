@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D780131932
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 21:20:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6D61131935
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 21:20:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727088AbgAFUSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 15:18:47 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:33221 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726683AbgAFUSo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 15:18:44 -0500
-Received: by mail-io1-f66.google.com with SMTP id z8so49950438ioh.0
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2020 12:18:43 -0800 (PST)
+        id S1726939AbgAFUTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 15:19:04 -0500
+Received: from mail-il1-f196.google.com ([209.85.166.196]:34662 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726895AbgAFUTD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jan 2020 15:19:03 -0500
+Received: by mail-il1-f196.google.com with SMTP id s15so43700918iln.1
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2020 12:19:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Hkwe6gCS0xXqcJJZW7uqlIoLqLcdTHhaPPV9HPAYJLA=;
-        b=gzPxF6SbVaL+Q8f/0OUvPd4pGrCNyy3H+vkMlNxMyCFUACVPB22nhw7CW+mRIGgQ3f
-         iC/gReQLeeGDSkKhUL37T9WNE1pL2ItXr276QwD6tCmTBAGhmLXzZTke6Rq8dBQPbOHq
-         P5o62eK2UKq5jUxXseiTHaOP8geIypRCmKPQj6H9KHMS6YF57YEvwpqJXxoL5z6ZOBex
-         Z9YIgLKj8/hR5kERIkkZaVIjpk1LMDFe3p+QzwUwunXpcu6N3vh4PfuAXJjn3a4nc4Xy
-         RNBTgCyIIgQd5AcUrywwLVopwZUUIFlXZn4zuvAsYeWLWZRJcDncl4bs0NOmvEA3fG1Q
-         Z0Mw==
+        bh=On8S/jqcqhWm1gA75kni93hxDaFgmyxXA8OYLeg6pRw=;
+        b=pj5xEWC2k1f0PDOEDl4ycNhV9/3mEeqCFoZlQ6jKJtbe77lzXp8pzFq26ztwSG9V+V
+         Kq/A6Em27Lt9MrhZKAC3Nw+qJogSJDU9M+w73gCuds+KJEOjYORSWyCbiG2QNVIx8nAX
+         MZk0LhnqI+m2EvlcOCUkv20bX9qw8Cv39Bbtnby/EMmb+Sz8+HwI13s1a8U7X01f3Hq1
+         Dxc9ndFQw4DlH2N3jG1H/6eSOiNhnSd90uRIh8ZzcvSAmwqHzqDwPOL5T3ZPKWp5y7bf
+         QZqCDDlB3FxjzOcqPePxq8ksuPYFPL0YS0AO41kD+eoBlTCpPDcnrZYkyCnkzbl5sgLy
+         OJKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Hkwe6gCS0xXqcJJZW7uqlIoLqLcdTHhaPPV9HPAYJLA=;
-        b=nTQu2FL8jpy2zhzsy+n9spANL4rV5yJXm/23Hg1UUHGvX/GoOwXvuTga42ONzqgl3B
-         vjiXxgLyQkzjzaQF7HN2W9w0qVntZjZefb7npZdH7QH7DetQhOinEdqfQe4UvLmgm8tk
-         ZoGAVok9iUNDWobyBAuq1vjmgpOqdzs5fm9q6JMzRpTE5xRXLhH2Ov2wfd8djlzA9Mpq
-         qBVRGapsTFw2y7x7ZXilUzdUn9XR8tFzjZEDbyk+qZemguwcfWtXkhhO27jPzx22j+MY
-         bCBYbU1Rv7HBEQrPOYdr/6Kduv9tMQxkBRSwUZD4xo/FBlN8c+Kd4ishlIKkcY9kMbxQ
-         al0A==
-X-Gm-Message-State: APjAAAXQrobwDiscspryt5j1CW339C892TaRZvLbnfsSC3Nn2l5tZ5tu
-        buyq/k4aM/gDi6opT4EdPU93+aBwPwL3aayqDxyECQ==
-X-Google-Smtp-Source: APXvYqwB+24zHP/102YfQQE2qR7LjHh4cFem6VFU5fpXWOGl6aX54N0y+TTrv4usjFmDM3ZnakpCtAKCtgDHWQpd+Xo=
-X-Received: by 2002:a5d:8cda:: with SMTP id k26mr45673841iot.26.1578341922908;
- Mon, 06 Jan 2020 12:18:42 -0800 (PST)
+        bh=On8S/jqcqhWm1gA75kni93hxDaFgmyxXA8OYLeg6pRw=;
+        b=Rs4YNHcQLfz2xo4my/ADLg7YtyS2wcThp/GwFMKb3oIzJUZ6b3ka+3DggG6WVYAIz1
+         LOFziaUsHWXYi/1UcSPOhrh2iqKHGp85IDeMHL5LUcq3skrsUnDbk7T4Z7gYHf9wXJTE
+         7dJGx1k4ouxYzexqycGJsQbGkCnhBn4j+sahVm4qquE7ef4LqiiUWrzjIEfc5pZW7IfL
+         Np8NdJRbiWGLqiLER1u6rXns2PhjWyjV+iVdWmZd2qpnHS5402fckURRRy99tMtg2GuK
+         ZicQhEMCkR/tkvzFxNb9spKcnF+jQBz4HpWDDk2YbQKfp38JyV0eebb0fdSCgV4gmZy5
+         Df7A==
+X-Gm-Message-State: APjAAAX++UBtak3e6JlQq85/DjMiekdtcbam+l1VB4nyA45BP1DsOo3m
+        GlzmYIw9smAjAnc3HXCpvNcAV28EYVnwPEq+1whauQ==
+X-Google-Smtp-Source: APXvYqw/uA456NSw77dxi0HDBubRLZXT5catRpIZeEV7h/AuDPtK8k5E+UuB/HK9diCwlWzkyenxKNoQyTYwehnh+ls=
+X-Received: by 2002:a92:3b98:: with SMTP id n24mr67439328ilh.108.1578341942677;
+ Mon, 06 Jan 2020 12:19:02 -0800 (PST)
 MIME-Version: 1.0
-References: <20191211204753.242298-1-pomonis@google.com> <20191211204753.242298-9-pomonis@google.com>
-In-Reply-To: <20191211204753.242298-9-pomonis@google.com>
+References: <20191211204753.242298-1-pomonis@google.com> <20191211204753.242298-10-pomonis@google.com>
+In-Reply-To: <20191211204753.242298-10-pomonis@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 6 Jan 2020 12:18:31 -0800
-Message-ID: <CALMp9eQmWB9WZaD=n5rTZEzWkjBx_emTn3zaVxk7YrwBGv2VrQ@mail.gmail.com>
-Subject: Re: [PATCH v2 08/13] KVM: x86: Protect MSR-based index computations
- in pmu.h from Spectre-v1/L1TF attacks
+Date:   Mon, 6 Jan 2020 12:18:51 -0800
+Message-ID: <CALMp9eRTLMM17nVvGD9P38uP=886hgck1YabpnPXqyuFb1n0Jg@mail.gmail.com>
+Subject: Re: [PATCH v2 09/13] KVM: x86: Protect MSR-based index computations
+ from Spectre-v1/L1TF attacks in x86.c
 To:     Marios Pomonis <pomonis@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
@@ -71,12 +71,12 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Dec 11, 2019 at 12:49 PM Marios Pomonis <pomonis@google.com> wrote:
 >
-> This fixes a Spectre-v1/L1TF vulnerability in the get_gp_pmc() and
-> get_fixed_pmc() functions.
-> They both contain index computations based on the (attacker-controlled)
-> MSR number.
+> This fixes a Spectre-v1/L1TF vulnerability in set_msr_mce() and
+> get_msr_mce().
+> Both functions contain index computations based on the
+> (attacker-controlled) MSR number.
 >
-> Fixes: commit 25462f7f5295 ("KVM: x86/vPMU: Define kvm_pmu_ops to support vPMU function dispatch")
+> Fixes: commit 890ca9aefa78 ("KVM: Add MCE support")
 >
 > Signed-off-by: Nick Finco <nifi@google.com>
 > Signed-off-by: Marios Pomonis <pomonis@google.com>
