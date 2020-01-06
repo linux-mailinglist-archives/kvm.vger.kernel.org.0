@@ -2,48 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DB30130FE9
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 11:04:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2998130FEB
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 11:04:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726515AbgAFKEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 05:04:07 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31313 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726508AbgAFKEG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jan 2020 05:04:06 -0500
+        id S1726484AbgAFKEJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 05:04:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21218 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726498AbgAFKEI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jan 2020 05:04:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578305045;
+        s=mimecast20190719; t=1578305047;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iGnDFwqzynqo0Lekz3iG4OqSHRFQjgewZkI/i0FtSIg=;
-        b=R9efa0DQjDj5L9gILjx46SCUkvFgfLwP6KweYKGEA4RUaswvRq/2KS9tDJsC33XFpKJ8Xu
-        ehH9KYMJcdYhK3793s6DTySVn8dj7yDC02hNUaVayTGzbvAFBcOypF1J+jGp4VNc6+Mi2t
-        YWMzZcXNAqiDc3PHmzP2jomRnV9zsCA=
+        bh=HpCRdtfOfEwYfb8ng+pocxnbSgz5NKQpQTrzqY+1vng=;
+        b=bxx+Vj41GB0VBNbguiNq5DuvEknFrjri6smUVcn1d82yglE4jFdMBl5ZDODrbRmoHueqco
+        1qaPatb06eUf8+Hi6OA4Ko53srm18gIAhjGbFJcEUJ2UrQXf4vzZnrSCcE0DPoEJSh8eRG
+        Bzl1ITtW0dnompK+edFyRdeIL5CkbUQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-6xcv7mg2Md6xTXIBdmuiBw-1; Mon, 06 Jan 2020 05:04:03 -0500
-X-MC-Unique: 6xcv7mg2Md6xTXIBdmuiBw-1
+ us-mta-428-raJCSS1WMuukgHYA7AXeLw-1; Mon, 06 Jan 2020 05:04:05 -0500
+X-MC-Unique: raJCSS1WMuukgHYA7AXeLw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89853801E6C;
-        Mon,  6 Jan 2020 10:04:02 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EAE78024CD;
+        Mon,  6 Jan 2020 10:04:04 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8647A63BCA;
-        Mon,  6 Jan 2020 10:03:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D323363BCA;
+        Mon,  6 Jan 2020 10:04:02 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Drew Jones <drjones@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
         Andre Przywara <andre.przywara@arm.com>
-Subject: [PULL kvm-unit-tests 07/17] lib: Add WRITE_ONCE and READ_ONCE implementations in compiler.h
-Date:   Mon,  6 Jan 2020 11:03:37 +0100
-Message-Id: <20200106100347.1559-8-drjones@redhat.com>
+Subject: [PULL kvm-unit-tests 08/17] lib: arm/arm64: Use WRITE_ONCE to update the translation tables
+Date:   Mon,  6 Jan 2020 11:03:38 +0100
+Message-Id: <20200106100347.1559-9-drjones@redhat.com>
 In-Reply-To: <20200106100347.1559-1-drjones@redhat.com>
 References: <20200106100347.1559-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -56,121 +53,165 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Add the WRITE_ONCE and READ_ONCE macros which are used to prevent the
-compiler from optimizing a store or a load, respectively, into something
-else.
+Use WRITE_ONCE to prevent store tearing when updating an entry in the
+translation tables. Without WRITE_ONCE, the compiler, even though it is
+unlikely, can emit several stores when changing the table, and we might
+end up with bogus TLB entries.
 
-Cc: Drew Jones <drjones@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+It's worth noting that the existing code is mostly fine without any
+changes because the translation tables are updated in one of the
+following situations:
+
+- When the tables are being created with the MMU off, which means no TLB
+  caching is being performed.
+
+- When new page table entries are added as a result of vmalloc'ing a
+  stack for a secondary CPU, which doesn't happen very often.
+
+- When clearing the PTE_USER bit for the cache test, and store tearing
+  has no effect on the table walker because there are no intermediate
+  values between bit values 0 and 1. We still use WRITE_ONCE in this case
+  for consistency.
+
+However, the functions are global and there is nothing preventing someone
+from writing a test that uses them in a different scenario. Let's make
+sure that when that happens, there will be no breakage once in a blue
+moon.
+
+Reported-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/linux/compiler.h | 83 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
- create mode 100644 lib/linux/compiler.h
+ lib/arm/asm/pgtable.h   | 12 ++++++++----
+ lib/arm/mmu.c           | 19 +++++++++++++------
+ lib/arm64/asm/pgtable.h |  7 +++++--
+ 3 files changed, 26 insertions(+), 12 deletions(-)
 
-diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
-new file mode 100644
-index 000000000000..2d72f18c36e5
---- /dev/null
-+++ b/lib/linux/compiler.h
-@@ -0,0 +1,83 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Taken from Linux commit 219d54332a09 ("Linux 5.4"), from the file
-+ * tools/include/linux/compiler.h, with minor changes.
-+ */
-+#ifndef __LINUX_COMPILER_H
-+#define __LINUX_COMPILER_H
+diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
+index 241dff69b38a..794514b8c927 100644
+--- a/lib/arm/asm/pgtable.h
++++ b/lib/arm/asm/pgtable.h
+@@ -19,6 +19,8 @@
+  * because we always allocate their pages with alloc_page(), and
+  * alloc_page() always returns identity mapped pages.
+  */
++#include <linux/compiler.h>
 +
-+#ifndef __ASSEMBLY__
+ #define pgtable_va(x)		((void *)(unsigned long)(x))
+ #define pgtable_pa(x)		((unsigned long)(x))
+=20
+@@ -58,8 +60,9 @@ static inline pmd_t *pmd_alloc_one(void)
+ static inline pmd_t *pmd_alloc(pgd_t *pgd, unsigned long addr)
+ {
+ 	if (pgd_none(*pgd)) {
+-		pmd_t *pmd =3D pmd_alloc_one();
+-		pgd_val(*pgd) =3D pgtable_pa(pmd) | PMD_TYPE_TABLE;
++		pgd_t entry;
++		pgd_val(entry) =3D pgtable_pa(pmd_alloc_one()) | PMD_TYPE_TABLE;
++		WRITE_ONCE(*pgd, entry);
+ 	}
+ 	return pmd_offset(pgd, addr);
+ }
+@@ -84,8 +87,9 @@ static inline pte_t *pte_alloc_one(void)
+ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
+ {
+ 	if (pmd_none(*pmd)) {
+-		pte_t *pte =3D pte_alloc_one();
+-		pmd_val(*pmd) =3D pgtable_pa(pte) | PMD_TYPE_TABLE;
++		pmd_t entry;
++		pmd_val(entry) =3D pgtable_pa(pte_alloc_one()) | PMD_TYPE_TABLE;
++		WRITE_ONCE(*pmd, entry);
+ 	}
+ 	return pte_offset(pmd, addr);
+ }
+diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+index 5c31c00ccb31..86a829966a3c 100644
+--- a/lib/arm/mmu.c
++++ b/lib/arm/mmu.c
+@@ -17,6 +17,8 @@
+ #include <asm/pgtable-hwdef.h>
+ #include <asm/pgtable.h>
+=20
++#include <linux/compiler.h>
 +
-+#include <stdint.h>
+ extern unsigned long etext;
+=20
+ pgd_t *mmu_idmap;
+@@ -86,7 +88,7 @@ static pteval_t *install_pte(pgd_t *pgtable, uintptr_t =
+vaddr, pteval_t pte)
+ {
+ 	pteval_t *p_pte =3D get_pte(pgtable, vaddr);
+=20
+-	*p_pte =3D pte;
++	WRITE_ONCE(*p_pte, pte);
+ 	flush_tlb_page(vaddr);
+ 	return p_pte;
+ }
+@@ -131,12 +133,15 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t v=
+irt_offset,
+ 	phys_addr_t paddr =3D phys_start & PGDIR_MASK;
+ 	uintptr_t vaddr =3D virt_offset & PGDIR_MASK;
+ 	uintptr_t virt_end =3D phys_end - paddr + vaddr;
++	pgd_t *pgd;
++	pgd_t entry;
+=20
+ 	for (; vaddr < virt_end; vaddr +=3D PGDIR_SIZE, paddr +=3D PGDIR_SIZE) =
+{
+-		pgd_t *pgd =3D pgd_offset(pgtable, vaddr);
+-		pgd_val(*pgd) =3D paddr;
+-		pgd_val(*pgd) |=3D PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S;
+-		pgd_val(*pgd) |=3D pgprot_val(prot);
++		pgd_val(entry) =3D paddr;
++		pgd_val(entry) |=3D PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S;
++		pgd_val(entry) |=3D pgprot_val(prot);
++		pgd =3D pgd_offset(pgtable, vaddr);
++		WRITE_ONCE(*pgd, entry);
+ 		flush_tlb_page(vaddr);
+ 	}
+ }
+@@ -210,6 +215,7 @@ void mmu_clear_user(unsigned long vaddr)
+ {
+ 	pgd_t *pgtable;
+ 	pteval_t *pte;
++	pteval_t entry;
+=20
+ 	if (!mmu_enabled())
+ 		return;
+@@ -217,6 +223,7 @@ void mmu_clear_user(unsigned long vaddr)
+ 	pgtable =3D current_thread_info()->pgtable;
+ 	pte =3D get_pte(pgtable, vaddr);
+=20
+-	*pte &=3D ~PTE_USER;
++	entry =3D *pte & ~PTE_USER;
++	WRITE_ONCE(*pte, entry);
+ 	flush_tlb_page(vaddr);
+ }
+diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
+index ee0a2c88cc18..dbf9e7253b71 100644
+--- a/lib/arm64/asm/pgtable.h
++++ b/lib/arm64/asm/pgtable.h
+@@ -18,6 +18,8 @@
+ #include <asm/page.h>
+ #include <asm/pgtable-hwdef.h>
+=20
++#include <linux/compiler.h>
 +
-+#define barrier()	asm volatile("" : : : "memory")
-+
-+#define __always_inline	inline __attribute__((always_inline))
-+
-+static __always_inline void __read_once_size(const volatile void *p, voi=
-d *res, int size)
-+{
-+	switch (size) {
-+	case 1: *(uint8_t *)res =3D *(volatile uint8_t *)p; break;
-+	case 2: *(uint16_t *)res =3D *(volatile uint16_t *)p; break;
-+	case 4: *(uint32_t *)res =3D *(volatile uint32_t *)p; break;
-+	case 8: *(uint64_t *)res =3D *(volatile uint64_t *)p; break;
-+	default:
-+		barrier();
-+		__builtin_memcpy((void *)res, (const void *)p, size);
-+		barrier();
-+	}
-+}
-+
-+/*
-+ * Prevent the compiler from merging or refetching reads or writes. The
-+ * compiler is also forbidden from reordering successive instances of
-+ * READ_ONCE and WRITE_ONCE, but only when the compiler is aware of some
-+ * particular ordering. One way to make the compiler aware of ordering i=
-s to
-+ * put the two invocations of READ_ONCE or WRITE_ONCE in different C
-+ * statements.
-+ *
-+ * These two macros will also work on aggregate data types like structs =
-or
-+ * unions. If the size of the accessed data type exceeds the word size o=
-f
-+ * the machine (e.g., 32 bits or 64 bits) READ_ONCE() and WRITE_ONCE() w=
-ill
-+ * fall back to memcpy and print a compile-time warning.
-+ *
-+ * Their two major use cases are: (1) Mediating communication between
-+ * process-level code and irq/NMI handlers, all running on the same CPU,
-+ * and (2) Ensuring that the compiler does not fold, spindle, or otherwi=
-se
-+ * mutilate accesses that either do not require ordering or that interac=
-t
-+ * with an explicit memory barrier or atomic instruction that provides t=
-he
-+ * required ordering.
-+ */
-+
-+#define READ_ONCE(x)					\
-+({							\
-+	union { typeof(x) __val; char __c[1]; } __u =3D	\
-+		{ .__c =3D { 0 } };			\
-+	__read_once_size(&(x), __u.__c, sizeof(x));	\
-+	__u.__val;					\
-+})
-+
-+static __always_inline void __write_once_size(volatile void *p, void *re=
-s, int size)
-+{
-+	switch (size) {
-+	case 1: *(volatile uint8_t *) p =3D *(uint8_t  *) res; break;
-+	case 2: *(volatile uint16_t *) p =3D *(uint16_t *) res; break;
-+	case 4: *(volatile uint32_t *) p =3D *(uint32_t *) res; break;
-+	case 8: *(volatile uint64_t *) p =3D *(uint64_t *) res; break;
-+	default:
-+		barrier();
-+		__builtin_memcpy((void *)p, (const void *)res, size);
-+		barrier();
-+	}
-+}
-+
-+#define WRITE_ONCE(x, val)				\
-+({							\
-+	union { typeof(x) __val; char __c[1]; } __u =3D	\
-+		{ .__val =3D (val) }; 			\
-+	__write_once_size(&(x), __u.__c, sizeof(x));	\
-+	__u.__val;					\
-+})
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* !__LINUX_COMPILER_H */
+ /*
+  * We can convert va <=3D> pa page table addresses with simple casts
+  * because we always allocate their pages with alloc_page(), and
+@@ -66,8 +68,9 @@ static inline pte_t *pte_alloc_one(void)
+ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
+ {
+ 	if (pmd_none(*pmd)) {
+-		pte_t *pte =3D pte_alloc_one();
+-		pmd_val(*pmd) =3D pgtable_pa(pte) | PMD_TYPE_TABLE;
++		pmd_t entry;
++		pmd_val(entry) =3D pgtable_pa(pte_alloc_one()) | PMD_TYPE_TABLE;
++		WRITE_ONCE(*pmd, entry);
+ 	}
+ 	return pte_offset(pmd, addr);
+ }
 --=20
 2.21.0
 
