@@ -2,113 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6266E131BD0
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 23:49:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BA5BD131C08
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 00:05:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbgAFWtc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 17:49:32 -0500
-Received: from mga12.intel.com ([192.55.52.136]:51362 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726721AbgAFWtc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 17:49:32 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Jan 2020 14:49:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,403,1571727600"; 
-   d="scan'208";a="216958946"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga007.fm.intel.com with ESMTP; 06 Jan 2020 14:49:31 -0800
-Date:   Mon, 6 Jan 2020 14:49:31 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v2] KVM: SVM: Override default MMIO mask if memory
- encryption is enabled
-Message-ID: <20200106224931.GB12879@linux.intel.com>
-References: <d741b3a58769749b7873fea703c027a68b8e2e3d.1577462279.git.thomas.lendacky@amd.com>
+        id S1726858AbgAFXFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 18:05:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46418 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726735AbgAFXFK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jan 2020 18:05:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578351909;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5FUwndBIrFS376iq6UZxigDCdyXQx4W62Bo2bpWtvvU=;
+        b=FgeJbRHr4KbP1RcGEfBU0Onoc8DC6xcK958b28NrJWaUtoQfxphZeLP4IKbk7pGbhPpdhn
+        3iKl40p+TfNd9rPG+bF4UiEvya6rmlgWf0sUw/pI6AIc6RIeShgIUjSTqGQOHt/vqy2wxw
+        FPNpzYH5BvSxFJkMbeuEb515h3P/JmE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-iBhoNrFePfelJiDunoLm6A-1; Mon, 06 Jan 2020 18:05:08 -0500
+X-MC-Unique: iBhoNrFePfelJiDunoLm6A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 834CB1800D4E;
+        Mon,  6 Jan 2020 23:05:06 +0000 (UTC)
+Received: from w520.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 257F65D9D6;
+        Mon,  6 Jan 2020 23:05:05 +0000 (UTC)
+Date:   Mon, 6 Jan 2020 16:05:05 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Julia Lawall <Julia.Lawall@inria.fr>
+Cc:     kernel-janitors@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] vfio: vfio_pci_nvlink2: use mmgrab
+Message-ID: <20200106160505.2f962d38@w520.home>
+In-Reply-To: <1577634178-22530-3-git-send-email-Julia.Lawall@inria.fr>
+References: <1577634178-22530-1-git-send-email-Julia.Lawall@inria.fr>
+        <1577634178-22530-3-git-send-email-Julia.Lawall@inria.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d741b3a58769749b7873fea703c027a68b8e2e3d.1577462279.git.thomas.lendacky@amd.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 27, 2019 at 09:58:00AM -0600, Tom Lendacky wrote:
-> The KVM MMIO support uses bit 51 as the reserved bit to cause nested page
-> faults when a guest performs MMIO. The AMD memory encryption support uses
-> a CPUID function to define the encryption bit position. Given this, it is
-> possible that these bits can conflict.
+On Sun, 29 Dec 2019 16:42:56 +0100
+Julia Lawall <Julia.Lawall@inria.fr> wrote:
+
+> Mmgrab was introduced in commit f1f1007644ff ("mm: add new mmgrab()
+> helper") and most of the kernel was updated to use it. Update a
+> remaining file.
 > 
-> Use svm_hardware_setup() to override the MMIO mask if memory encryption
-> support is enabled. When memory encryption support is enabled the physical
-> address width is reduced and the first bit after the last valid reduced
-> physical address bit will always be reserved. Use this bit as the MMIO
-> mask.
+> The semantic patch that makes this change is as follows:
+> (http://coccinelle.lip6.fr/)
 > 
-> Fixes: 28a1f3ac1d0c ("kvm: x86: Set highest physical address bits in non-present/reserved SPTEs")
-> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> <smpl>
+> @@ expression e; @@
+> - atomic_inc(&e->mm_count);
+> + mmgrab(e);
+> </smpl>
+> 
+> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+> 
 > ---
->  arch/x86/kvm/svm.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
+>  drivers/vfio/pci/vfio_pci_nvlink2.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 122d4ce3b1ab..2cb834b5982a 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -1361,6 +1361,32 @@ static __init int svm_hardware_setup(void)
->  		}
->  	}
+> diff --git a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
+> index f2983f0f84be..43df10af7f66 100644
+> --- a/drivers/vfio/pci/vfio_pci_nvlink2.c
+> +++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
+> @@ -159,7 +159,7 @@ static int vfio_pci_nvgpu_mmap(struct vfio_pci_device *vdev,
+>  	data->useraddr = vma->vm_start;
+>  	data->mm = current->mm;
 >  
-> +	/*
-> +	 * The default MMIO mask is a single bit (excluding the present bit),
-> +	 * which could conflict with the memory encryption bit. Check for
-> +	 * memory encryption support and override the default MMIO masks if
-> +	 * it is enabled.
-> +	 */
-> +	if (cpuid_eax(0x80000000) >= 0x8000001f) {
-> +		u64 msr, mask;
-> +
-> +		rdmsrl(MSR_K8_SYSCFG, msr);
-> +		if (msr & MSR_K8_SYSCFG_MEM_ENCRYPT)  {
-> +			/*
-> +			 * The physical addressing width is reduced. The first
-> +			 * bit above the new physical addressing limit will
-> +			 * always be reserved. Use this bit and the present bit
-> +			 * to generate a page fault with PFER.RSV = 1.
-> +			 */
-> +			mask = BIT_ULL(boot_cpu_data.x86_phys_bits);
-
-This doesn't handle the case where x86_phys_bits _isn't_ reduced by SME/SEV
-on a future processor, i.e. x86_phys_bits==52.
-
-After staring at things for a while, I think we can handle this issue with
-minimal fuss by special casing MKTME in kvm_set_mmio_spte_mask().  I'll
-send a patch, I have a related bug fix for kvm_set_mmio_spte_mask() that
-touches the same code.
-
-> +			mask |= BIT_ULL(0);
-> +
-> +			kvm_mmu_set_mmio_spte_mask(mask, mask,
-> +						   PT_WRITABLE_MASK |
-> +						   PT_USER_MASK);
-> +		}
-> +	}
-> +
->  	for_each_possible_cpu(cpu) {
->  		r = svm_cpu_init(cpu);
->  		if (r)
-> -- 
-> 2.17.1
+> -	atomic_inc(&data->mm->mm_count);
+> +	mmgrab(data->mm);
+>  	ret = (int) mm_iommu_newdev(data->mm, data->useraddr,
+>  			vma_pages(vma), data->gpu_hpa, &data->mem);
+>  
 > 
+
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+
+Thanks!  I'm assuming these will be routed via janitors tree, please
+let me know if you intend me to grab these two vfio patches from the
+series.  Thanks,
+
+Alex
+
