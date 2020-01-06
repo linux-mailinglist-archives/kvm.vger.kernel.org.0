@@ -2,73 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82624130F59
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 10:24:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 429DD130F6B
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 10:28:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbgAFJYX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 04:24:23 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39531 "EHLO
+        id S1726080AbgAFJ20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 04:28:26 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58518 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725996AbgAFJYX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jan 2020 04:24:23 -0500
+        by vger.kernel.org with ESMTP id S1725446AbgAFJ2Z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jan 2020 04:28:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578302661;
+        s=mimecast20190719; t=1578302903;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=fSPVgoG8nSOQFecs0y2cFcNF0Dl0NQMBbgDK+MFMyEQ=;
-        b=ZOBKiycirCQ/4f04RYb7uESo630nGC1ApWvGdzg49x94xpdFe6cPSIrI2G2JvLpxDXtgGi
-        2s+2b+9uffqMSiskr6l+gh+QcispD4oqK9EvxZEfLnpEnjmZwysg2IQzKz9+YAwWDHuhr4
-        2loyU/HzP9ALY+HZQg9Jl7djcu4hSPw=
+        bh=fnFP7Bv5whfD5JS++8jIcYiWcborSb9C6PGDhbDZiTw=;
+        b=C31PI5GEiQJXSTZFbGw+/6Wh4Gmwb1VkN+mn0fu30h1/1Q1Utzy0gHRDSfQlvF4XGFrBHK
+        Vwa/dvVjd0dgb5CQzt1Z2rtNnUBm9LtEB2K9RLcFfLES1OsX2heYH/M4rJyoTYXrZc/D/W
+        S0AE7J7Zj/HQBi75Od2OUsd/S5pxWjM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-qrWhIv16Pi-zL9oe8DlsZw-1; Mon, 06 Jan 2020 04:24:17 -0500
-X-MC-Unique: qrWhIv16Pi-zL9oe8DlsZw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-76-JPxI3vFlPfOeHydnhbS2zA-1; Mon, 06 Jan 2020 04:28:20 -0500
+X-MC-Unique: JPxI3vFlPfOeHydnhbS2zA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4175C8018C7;
-        Mon,  6 Jan 2020 09:24:16 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06376107ACC4;
+        Mon,  6 Jan 2020 09:28:19 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BAA54272A6;
-        Mon,  6 Jan 2020 09:24:14 +0000 (UTC)
-Date:   Mon, 6 Jan 2020 10:24:12 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 60BD67BFF8;
+        Mon,  6 Jan 2020 09:28:17 +0000 (UTC)
+Date:   Mon, 6 Jan 2020 10:28:15 +0100
 From:   Andrew Jones <drjones@redhat.com>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
         andre.przywara@arm.com, vladimir.murzin@arm.com,
         mark.rutland@arm.com
-Subject: Re: [kvm-unit-tests PATCH v3 10/18] arm/arm64: selftest: Add
- prefetch abort test
-Message-ID: <20200106092412.xbluliqpemim6swj@kamzik.brq.redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 00/18] arm/arm64: Various fixes
+Message-ID: <20200106092815.bxmiuai3ltv7nl64@kamzik.brq.redhat.com>
 References: <1577808589-31892-1-git-send-email-alexandru.elisei@arm.com>
- <1577808589-31892-11-git-send-email-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1577808589-31892-11-git-send-email-alexandru.elisei@arm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <1577808589-31892-1-git-send-email-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 31, 2019 at 04:09:41PM +0000, Alexandru Elisei wrote:
-> When a guest tries to execute code from MMIO memory, KVM injects an
-> external abort into that guest. We have now fixed the psci test to not
-> fetch instructions from the I/O region, and it's not that often that a
-> guest misbehaves in such a way. Let's expand our coverage by adding a
-> proper test targetting this corner case.
+On Tue, Dec 31, 2019 at 04:09:31PM +0000, Alexandru Elisei wrote:
+> This is a combination of the fixes from my EL2 series [1] and other new
+> fixes. I've rebased the series on top of 2c6589bc4e8b ("Update AMD
+> instructions to conform to LLVM assembler"), which means that I had to
+> switch the order of parameters for the report function.
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  lib/arm64/asm/esr.h |   3 ++
->  arm/selftest.c      | 112 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 113 insertions(+), 2 deletions(-)
+> This time around I tried to do a better job at testing. I've ran
+> kvm-unit-tests in the following configurations:
+> 
+> - with kvmtool, on an arm64 host kernel: 64 and 32 bit tests, with GICv3
+>   (on an Ampere eMAG) and GICv2 (on a AMD Seattle box).
+> 
+> - with qemu, on an arm64 host kernel:
+>     a. with accel=kvm, 64 and 32 bit tests, with GICv3 (Ampere eMAG) and
+>        GICv2 (Seattle).
+>     b. with accel=tcg, 64 and 32 bit tests, on the Ampere eMAG machine.
+> 
+> I didn't run the 32 bit tests under a 32 bit host kernel because I don't
+> have a 32 bit arm board at hand at the moment. It's also worth noting that
+> when I tried running the selftest-vectors-kernel tests on an ancient
+> version of qemu (QEMU emulator version 2.5.0 (Debian
+> 1:2.5+dfsg-5ubuntu10.42)) I got the following error:
+> 
+>  $ arm/run arm/selftest.flat -append vectors-kernel
+> /usr/bin/qemu-system-aarch64 -nodefaults -machine virt,accel=tcg -cpu cortex-a57 -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/selftest.flat -append vectors-kernel # -initrd /tmp/tmp.zNO1kWtmuM
+> PASS: selftest: vectors-kernel: und
+> PASS: selftest: vectors-kernel: svc
+> qemu: fatal: Trying to execute code outside RAM or ROM at 0x0000003fffff0000
+> 
+> PC=0000003fffff0000  SP=00000000400aff70
+> X00=00000000400805a0 X01=0000000040092f20 X02=0000003fffff0000 X03=0000000040092f20
+> X04=0000000000000010 X05=00000000400aff40 X06=00000000400aff70 X07=00000000400aff70
+> X08=00000000400afde0 X09=ffffff80ffffffc8 X10=00000000400afe20 X11=00000000400afe20
+> X12=00000000400b0000 X13=00000000400afeac X14=00000000400b0000 X15=0000000000000000
+> X16=0000000000000000 X17=0000000000000000 X18=0000000000000000 X19=0000000040092000
+> X20=0000000000000004 X21=0000000040092e98 X22=0000000040092f20 X23=0000000000000000
+> X24=0000000000000000 X25=0000000000000000 X26=0000000000000000 X27=0000000000000000
+> X28=0000000000000000 X29=0000000000000000 X30=000000004008052c 
+> PSTATE=800003c5 N--- EL1h
+> q00=0000000000000000:0000000000000000 q01=0000000000000000:0000000000000000
+> q02=0000000000000000:0000000000000000 q03=0000000000000000:0000000000000000
+> q04=0000000000000000:0000000000000000 q05=0000000000000000:0000000000000000
+> q06=0000000000000000:0000000000000000 q07=0000000000000000:0000000000000000
+> q08=0000000000000000:0000000000000000 q09=0000000000000000:0000000000000000
+> q10=0000000000000000:0000000000000000 q11=0000000000000000:0000000000000000
+> q12=0000000000000000:0000000000000000 q13=0000000000000000:0000000000000000
+> q14=0000000000000000:0000000000000000 q15=0000000000000000:0000000000000000
+> q16=0000000000000000:0000000000000000 q17=0000000000000000:0000000000000000
+> q18=0000000000000000:0000000000000000 q19=0000000000000000:0000000000000000
+> q20=0000000000000000:0000000000000000 q21=0000000000000000:0000000000000000
+> q22=0000000000000000:0000000000000000 q23=0000000000000000:0000000000000000
+> q24=0000000000000000:0000000000000000 q25=0000000000000000:0000000000000000
+> q26=0000000000000000:0000000000000000 q27=0000000000000000:0000000000000000
+> q28=0000000000000000:0000000000000000 q29=0000000000000000:0000000000000000
+> q30=0000000000000000:0000000000000000 q31=0000000000000000:0000000000000000
+> FPCR: 00000000  FPSR: 00000000
+> QEMU Aborted
+> 
+> I'm not sure if we support such an old version of qemu. If we do, please
+> let me know, and I'll try to come up with a solution. I am reluctant to
+> drop the prefetch abort test because it uncovered a bug in the nested
+> virtualization patches.
+> 
+> Summary of the patches:
+> * Patch 1 adds coherent translation table walks for ARMv7 and removes
+>   unneeded dcache maintenance.
+> * Patches 2-4 make translation table updates more robust.
+> * Patches 5-6 fix a pretty serious bug in our PSCI test, which was causing
+>   an infinite loop of prefetch aborts.
+> * Patches 7-10 add a proper test for prefetch aborts. The test now uses
+>   mmu_clear_user.
+> * Patches 11-13 are fixes for the timer test.
+> * Patches 14-15 fix turning the MMU off.
+> * Patches 16-18 are small fixes to make the code more robust, and perhaps
+>   more important, remove unnecessary operations that might hide real bugs
+>   in KVM.
+> 
+> Patches 1-4, 9, 18 are new. The rest are taken from the EL2 series, and
+> I've kept the Reviewed-by tag where appropriate.
+> 
+> Changes in v3:
+> * Implemented review comments.
+> * Minor cosmetic changes to the commit messages here and there.
+> * Removed the duplicate DSB ISHST that I had added to mmu.c in patch #1.
+>   flush_tlb_page already has the needed barriers.
+> * Replaced patch #2 "lib: arm64: Remove barriers before TLB operations"
+>   with "lib: arm: Add proper data synchronization barriers for TLBIs".
+>   I've decided to keep the needed barriers in the flush_tlb_* functions, to
+>   match what the kernel does.
+> * Added a missing DSB ISHST in flush_tlb_all in patch #8 "lib: arm:
+>   Implement flush_tlb_all"
+> * The address for the prefetch abort test is now in hexadecimal to prevent
+>   a compile error.
+> * Added information about the KVM bug that patch #13 "arm64: timer: Test
+>   behavior when timer disabled or masked" helped find.
+> * Explained in the commit message for #15 how to reproduce some of the
+>   errors that I was seeing without the patch.
+> 
+> Changes in v2:
+> * Fixed the prefetch abort test on QEMU by changing the address used to
+>   cause the abort.
+> 
+> [1] https://www.spinics.net/lists/kvm/msg196797.html
+> 
+> Alexandru Elisei (18):
+>   lib: arm/arm64: Remove unnecessary dcache maintenance operations
+>   lib: arm: Add proper data synchronization barriers for TLBIs
+>   lib: Add WRITE_ONCE and READ_ONCE implementations in compiler.h
+>   lib: arm/arm64: Use WRITE_ONCE to update the translation tables
+>   lib: arm/arm64: Remove unused CPU_OFF parameter
+>   arm/arm64: psci: Don't run C code without stack or vectors
+>   lib: arm/arm64: Add missing include for alloc_page.h in pgtable.h
+>   lib: arm: Implement flush_tlb_all
+>   lib: arm/arm64: Teach mmu_clear_user about block mappings
+>   arm/arm64: selftest: Add prefetch abort test
+>   arm64: timer: Write to ICENABLER to disable timer IRQ
+>   arm64: timer: EOIR the interrupt after masking the timer
+>   arm64: timer: Test behavior when timer disabled or masked
+>   lib: arm/arm64: Refuse to disable the MMU with non-identity stack
+>     pointer
+>   arm/arm64: Perform dcache clean + invalidate after turning MMU off
+>   arm: cstart64.S: Downgrade TLBI to non-shareable in asm_mmu_enable
+>   arm/arm64: Invalidate TLB before enabling MMU
+>   arm: cstart64.S: Remove icache invalidation from asm_mmu_enable
+> 
+>  lib/linux/compiler.h          |  83 +++++++++++++++++++++++++++++++
+>  lib/arm/asm/gic-v3.h          |   1 +
+>  lib/arm/asm/gic.h             |   1 +
+>  lib/arm/asm/mmu-api.h         |   2 +-
+>  lib/arm/asm/mmu.h             |  18 ++++---
+>  lib/arm/asm/pgtable-hwdef.h   |  11 +++++
+>  lib/arm/asm/pgtable.h         |  20 ++++++--
+>  lib/arm/asm/processor.h       |   6 +++
+>  lib/arm64/asm/esr.h           |   3 ++
+>  lib/arm64/asm/pgtable-hwdef.h |   3 ++
+>  lib/arm64/asm/pgtable.h       |  15 +++++-
+>  lib/arm64/asm/processor.h     |   6 +++
+>  lib/arm/mmu.c                 |  60 ++++++++++++----------
+>  lib/arm/processor.c           |  10 ++++
+>  lib/arm/psci.c                |   4 +-
+>  lib/arm/setup.c               |   2 +
+>  lib/arm64/processor.c         |  11 +++++
+>  arm/cstart.S                  |  40 ++++++++++++++-
+>  arm/cstart64.S                |  35 +++++++++++--
+>  arm/cache.c                   |   3 +-
+>  arm/psci.c                    |   5 +-
+>  arm/selftest.c                | 112 +++++++++++++++++++++++++++++++++++++++++-
+>  arm/timer.c                   |  38 +++++++++-----
+>  23 files changed, 425 insertions(+), 64 deletions(-)
+>  create mode 100644 lib/linux/compiler.h
+> 
+> -- 
+> 2.7.4
 >
 
-I like this test, but I have a few idea on how to make it more robust.
-I'll send something out for review soon.
+Thanks Alexandru. I'm queuing everything except
+
+ arm/arm64: psci: Don't run C code without stack or vectors
+ arm/arm64: selftest: Add prefetch abort test
+ arm64: timer: EOIR the interrupt after masking the timer
+ arm64: timer: Test behavior when timer disabled or masked
+ arm/arm64: Perform dcache clean + invalidate after turning MMU off
+
+as those had comments from Andre and myself to address.
 
 Thanks,
 drew 
