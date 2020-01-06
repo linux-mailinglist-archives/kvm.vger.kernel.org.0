@@ -2,129 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BFCE130F1C
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 10:02:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82624130F59
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 10:24:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726368AbgAFJCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 04:02:00 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50152 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725446AbgAFJCA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 04:02:00 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id B2328B027;
-        Mon,  6 Jan 2020 09:01:55 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 821931E0B47; Mon,  6 Jan 2020 10:01:47 +0100 (CET)
-Date:   Mon, 6 Jan 2020 10:01:47 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Maor Gottlieb <maorg@mellanox.com>,
-        Ran Rozenstein <ranro@mellanox.com>
-Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
-Message-ID: <20200106090147.GA9176@quack2.suse.cz>
-References: <20191219132607.GA410823@unreal>
- <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
- <20191219210743.GN17227@ziepe.ca>
- <20191220182939.GA10944@unreal>
- <1001a5fc-a71d-9c0f-1090-546c4913d8a2@nvidia.com>
- <20191222132357.GF13335@unreal>
- <49d57efe-85e1-6910-baf5-c18df1382206@nvidia.com>
- <20191225052612.GA212002@unreal>
- <b879d191-a07c-e808-e48f-2b9bd8ba4fa3@nvidia.com>
- <612aa292-ec45-295c-b56c-c622876620fa@nvidia.com>
+        id S1726133AbgAFJYX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 04:24:23 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39531 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725996AbgAFJYX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jan 2020 04:24:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578302661;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fSPVgoG8nSOQFecs0y2cFcNF0Dl0NQMBbgDK+MFMyEQ=;
+        b=ZOBKiycirCQ/4f04RYb7uESo630nGC1ApWvGdzg49x94xpdFe6cPSIrI2G2JvLpxDXtgGi
+        2s+2b+9uffqMSiskr6l+gh+QcispD4oqK9EvxZEfLnpEnjmZwysg2IQzKz9+YAwWDHuhr4
+        2loyU/HzP9ALY+HZQg9Jl7djcu4hSPw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-qrWhIv16Pi-zL9oe8DlsZw-1; Mon, 06 Jan 2020 04:24:17 -0500
+X-MC-Unique: qrWhIv16Pi-zL9oe8DlsZw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4175C8018C7;
+        Mon,  6 Jan 2020 09:24:16 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BAA54272A6;
+        Mon,  6 Jan 2020 09:24:14 +0000 (UTC)
+Date:   Mon, 6 Jan 2020 10:24:12 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        andre.przywara@arm.com, vladimir.murzin@arm.com,
+        mark.rutland@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 10/18] arm/arm64: selftest: Add
+ prefetch abort test
+Message-ID: <20200106092412.xbluliqpemim6swj@kamzik.brq.redhat.com>
+References: <1577808589-31892-1-git-send-email-alexandru.elisei@arm.com>
+ <1577808589-31892-11-git-send-email-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <612aa292-ec45-295c-b56c-c622876620fa@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1577808589-31892-11-git-send-email-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat 28-12-19 20:33:32, John Hubbard wrote:
-> On 12/27/19 1:56 PM, John Hubbard wrote:
-> ...
-> >> It is ancient verification test (~10y) which is not an easy task to
-> >> make it understandable and standalone :).
-> >>
-> > 
-> > Is this the only test that fails, btw? No other test failures or hints of
-> > problems?
-> > 
-> > (Also, maybe hopeless, but can *anyone* on the RDMA list provide some
-> > characterization of the test, such as how many pins per page, what page
-> > sizes are used? I'm still hoping to write a test to trigger something
-> > close to this...)
-> > 
-> > I do have a couple more ideas for test runs:
-> > 
-> > 1. Reduce GUP_PIN_COUNTING_BIAS to 1. That would turn the whole override of
-> > page->_refcount into a no-op, and so if all is well (it may not be!) with the
-> > rest of the patch, then we'd expect this problem to not reappear.
-> > 
-> > 2. Active /proc/vmstat *foll_pin* statistics unconditionally (just for these
-> > tests, of course), so we can see if there is a get/put mismatch. However, that
-> > will change the timing, and so it must be attempted independently of (1), in
-> > order to see if it ends up hiding the repro.
-> > 
-> > I've updated this branch to implement (1), but not (2), hoping you can give
-> > this one a spin?
-> > 
-> >     git@github.com:johnhubbard/linux.git  pin_user_pages_tracking_v11_with_diags
-> > 
-> > 
+On Tue, Dec 31, 2019 at 04:09:41PM +0000, Alexandru Elisei wrote:
+> When a guest tries to execute code from MMIO memory, KVM injects an
+> external abort into that guest. We have now fixed the psci test to not
+> fetch instructions from the I/O region, and it's not that often that a
+> guest misbehaves in such a way. Let's expand our coverage by adding a
+> proper test targetting this corner case.
 > 
-> Also, looking ahead:
-> 
-> a) if the problem disappears with the latest above test, then we likely have
->    a huge page refcount overflow, and there are a couple of different ways to
->    fix it. 
-> 
-> b) if it still reproduces with the above, then it's some other random mistake,
->    and in that case I'd be inclined to do a sort of guided (or classic, unguided)
->    git bisect of the series. Because it could be any of several patches.
-> 
->    If that's too much trouble, then I'd have to fall back to submitting a few
->    patches at a time and working my way up to the tracking patch...
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  lib/arm64/asm/esr.h |   3 ++
+>  arm/selftest.c      | 112 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 113 insertions(+), 2 deletions(-)
+>
 
-It could also be that an ordinary page reference is dropped with 'unpin'
-thus underflowing the page refcount...
+I like this test, but I have a few idea on how to make it more robust.
+I'll send something out for review soon.
 
-								Honza
+Thanks,
+drew 
 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
