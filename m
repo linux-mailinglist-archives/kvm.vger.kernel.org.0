@@ -2,89 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 21E67130FF0
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 11:04:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 851B51310B8
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 11:42:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726681AbgAFKEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 05:04:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29453 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726640AbgAFKET (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 05:04:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578305058;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wj6IAqlh+XnGpahfgQdkQqwj32LrGOPkbZAukG9b+ak=;
-        b=JgtQhKl5DdIE0ADabiYP//PfcKw0K/eE9zR12+Z20Wo6OU7PQdT1LcqkaAgl8uB9WNJFwm
-        0T2gIn/K3immTfBPjL0sAH+ChW6G3zs/I/ST3qk3lkX9OtHKun3YIt/10iVxMirjuxguFA
-        gYGEQ0MBKpeDUiB/BQuNcHzBTGcP9BQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-unEXVf9sORC-QLgzPltAcw-1; Mon, 06 Jan 2020 05:04:17 -0500
-X-MC-Unique: unEXVf9sORC-QLgzPltAcw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CA30801E7E;
-        Mon,  6 Jan 2020 10:04:16 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 701F163BCA;
-        Mon,  6 Jan 2020 10:04:15 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PULL kvm-unit-tests 17/17] arm: cstart64.S: Remove icache invalidation from asm_mmu_enable
-Date:   Mon,  6 Jan 2020 11:03:47 +0100
-Message-Id: <20200106100347.1559-18-drjones@redhat.com>
-In-Reply-To: <20200106100347.1559-1-drjones@redhat.com>
-References: <20200106100347.1559-1-drjones@redhat.com>
+        id S1726212AbgAFKmE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 05:42:04 -0500
+Received: from foss.arm.com ([217.140.110.172]:42702 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725787AbgAFKmE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jan 2020 05:42:04 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FE72328;
+        Mon,  6 Jan 2020 02:42:01 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 70B0E3F534;
+        Mon,  6 Jan 2020 02:42:00 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH v3 06/18] arm/arm64: psci: Don't run C code
+ without stack or vectors
+To:     Andre Przywara <andre.przywara@arm.com>, mark.rutland@arm.com
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        maz@kernel.org, vladimir.murzin@arm.com
+References: <1577808589-31892-1-git-send-email-alexandru.elisei@arm.com>
+ <1577808589-31892-7-git-send-email-alexandru.elisei@arm.com>
+ <20200102181121.6895344d@donnerap.cambridge.arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <61ea7391-7e65-4548-17b6-7dbd977fa394@arm.com>
+Date:   Mon, 6 Jan 2020 10:41:55 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200102181121.6895344d@donnerap.cambridge.arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+Hi Andre,
 
-According to the ARM ARM [1]:
+Thank you for reviewing the patches!
 
-"In Armv8, any permitted instruction cache implementation can be
-described as implementing the IVIPT Extension to the Arm architecture.
+On 1/2/20 6:11 PM, Andre Przywara wrote:
+> On Tue, 31 Dec 2019 16:09:37 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+>> The psci test performs a series of CPU_ON/CPU_OFF cycles for CPU 1. This is
+>> done by setting the entry point for the CPU_ON call to the physical address
+>> of the C function cpu_psci_cpu_die.
+>>
+>> The compiler is well within its rights to use the stack when generating
+>> code for cpu_psci_cpu_die.
+> I am a bit puzzled: Is this an actual test failure at the moment? Or just a potential problem? Because I see it using the stack pointer in the generated code in lib/arm/psci.o. But the psci test seems to pass. Or is that just because the SP is somehow not cleared, because of some KVM implementation specifics?
 
-The formal definition of the Arm IVIPT Extension is that it reduces the
-instruction cache maintenance requirement to the following condition:
-Instruction cache maintenance is required only after writing new data to
-a PA that holds an instruction".
+The test checks for the return value of the CPU_ON function. What the CPU does
+while it's live is inconsequential.
 
-We never patch instructions in the boot path, so remove the icache
-invalidation from asm_mmu_enable. Tests that modify instructions (like
-the cache test) should have their own icache maintenance operations.
+> One more thing below ...
+>
+>>  However, because no stack initialization has
+>> been done, the stack pointer is zero, as set by KVM when creating the VCPU.
+>> This causes a data abort without a change in exception level. The VBAR_EL1
+>> register is also zero (the KVM reset value for VBAR_EL1), the MMU is off,
+>> and we end up trying to fetch instructions from address 0x200.
+>>
+>> At this point, a stage 2 instruction abort is generated which is taken to
+>> KVM. KVM interprets this as an instruction fetch from an I/O region, and
+>> injects a prefetch abort into the guest. Prefetch abort is a synchronous
+>> exception, and on guest return the VCPU PC will be set to VBAR_EL1 + 0x200,
+>> which is...  0x200. The VCPU ends up in an infinite loop causing a prefetch
+>> abort while fetching the instruction to service the said abort.
+>>
+>> cpu_psci_cpu_die is basically a wrapper over the HVC instruction, so
+>> provide an assembly implementation for the function which will serve as the
+>> entry point for CPU_ON.
+>>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  arm/cstart.S   | 7 +++++++
+>>  arm/cstart64.S | 7 +++++++
+>>  arm/psci.c     | 5 +++--
+>>  3 files changed, 17 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arm/cstart.S b/arm/cstart.S
+>> index 2c81d39a666b..dfef48e4dbb2 100644
+>> --- a/arm/cstart.S
+>> +++ b/arm/cstart.S
+>> @@ -7,6 +7,7 @@
+>>   */
+>>  #define __ASSEMBLY__
+>>  #include <auxinfo.h>
+>> +#include <linux/psci.h>
+>>  #include <asm/thread_info.h>
+>>  #include <asm/asm-offsets.h>
+>>  #include <asm/pgtable-hwdef.h>
+>> @@ -139,6 +140,12 @@ secondary_entry:
+>>  	blx	r0
+>>  	b	do_idle
+>>  
+>> +.global asm_cpu_psci_cpu_die
+>> +asm_cpu_psci_cpu_die:
+>> +	ldr	r0, =PSCI_0_2_FN_CPU_OFF
+>> +	hvc	#0
+>> +	b	.
+> I am wondering if this implementation is actually too simple. Both the current implementation and the kernel clear at least the first three arguments to 0.
+> I failed to find a requirement for doing this (nothing in the SMCCC or the PSCI spec), but I guess it would make sense when looking at forward compatibility.
 
-[1] ARM DDI 0487E.a, section D5.11.2 "Instruction caches"
+The SMC calling convention only specifies the values for the arguments that are
+used by a function, not the values for all possible arguments. kvm-unit-tests sets
+the other arguments to 0 because the function prototype that does the actual SMC
+call takes 4 arguments. The value 0 is a random value that was chosen for those
+unused parameters. For example, it could have been a random number on each call.
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arm/cstart64.S | 1 -
- 1 file changed, 1 deletion(-)
+Let me put it another way. Suggesting that unused arguments should be set to 0 is
+the same as suggesting that normal C function that adheres to procedure call
+standard for arm64 should always have 8 arguments, and for a particular function
+that doesn't use all of them, they should be set to 0 by the caller.
 
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 6f49506ca19b..e5a561ea2e39 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -159,7 +159,6 @@ halt:
-=20
- .globl asm_mmu_enable
- asm_mmu_enable:
--	ic	iallu			// I+BTB cache invalidate
- 	tlbi	vmalle1			// invalidate I + D TLBs
- 	dsb	nsh
-=20
---=20
-2.21.0
+@Mark Rutland has worked on the SMC implementation for the Linux kernel, if he
+wants to chime in on this.
 
+Thanks,
+Alex
+> At the very least it's a change in behaviour (ignoring the missing printf).
+> So shall we just clear r1, r2 and r3 here? (Same for arm64 below)
+>
+> Cheers,
+> Andre
+>
+>> +
+>>  .globl halt
+>>  halt:
+>>  1:	wfi
+>> diff --git a/arm/cstart64.S b/arm/cstart64.S
+>> index b0e8baa1a23a..c98842f11e90 100644
+>> --- a/arm/cstart64.S
+>> +++ b/arm/cstart64.S
+>> @@ -7,6 +7,7 @@
+>>   */
+>>  #define __ASSEMBLY__
+>>  #include <auxinfo.h>
+>> +#include <linux/psci.h>
+>>  #include <asm/asm-offsets.h>
+>>  #include <asm/ptrace.h>
+>>  #include <asm/processor.h>
+>> @@ -128,6 +129,12 @@ secondary_entry:
+>>  	blr	x0
+>>  	b	do_idle
+>>  
+>> +.globl asm_cpu_psci_cpu_die
+>> +asm_cpu_psci_cpu_die:
+>> +	ldr	x0, =PSCI_0_2_FN_CPU_OFF
+>> +	hvc	#0
+>> +	b	.
+>> +
+>>  .globl halt
+>>  halt:
+>>  1:	wfi
+>> diff --git a/arm/psci.c b/arm/psci.c
+>> index 5c1accb6cea4..c45a39c7d6e8 100644
+>> --- a/arm/psci.c
+>> +++ b/arm/psci.c
+>> @@ -72,6 +72,7 @@ static int cpu_on_ret[NR_CPUS];
+>>  static cpumask_t cpu_on_ready, cpu_on_done;
+>>  static volatile int cpu_on_start;
+>>  
+>> +extern void asm_cpu_psci_cpu_die(void);
+>>  static void cpu_on_secondary_entry(void)
+>>  {
+>>  	int cpu = smp_processor_id();
+>> @@ -79,7 +80,7 @@ static void cpu_on_secondary_entry(void)
+>>  	cpumask_set_cpu(cpu, &cpu_on_ready);
+>>  	while (!cpu_on_start)
+>>  		cpu_relax();
+>> -	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(cpu_psci_cpu_die));
+>> +	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(asm_cpu_psci_cpu_die));
+>>  	cpumask_set_cpu(cpu, &cpu_on_done);
+>>  }
+>>  
+>> @@ -104,7 +105,7 @@ static bool psci_cpu_on_test(void)
+>>  	cpu_on_start = 1;
+>>  	smp_mb();
+>>  
+>> -	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(cpu_psci_cpu_die));
+>> +	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(asm_cpu_psci_cpu_die));
+>>  	cpumask_set_cpu(0, &cpu_on_done);
+>>  
+>>  	while (!cpumask_full(&cpu_on_done))
