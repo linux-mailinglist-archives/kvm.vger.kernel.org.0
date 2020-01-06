@@ -2,85 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1928E130D7D
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 07:21:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BFCE130F1C
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 10:02:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726858AbgAFGVY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 01:21:24 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:34371 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726338AbgAFGVY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 01:21:24 -0500
-Received: by mail-ot1-f67.google.com with SMTP id a15so70264532otf.1;
-        Sun, 05 Jan 2020 22:21:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uwZ2SiPflAo2gMhAO1B+oTaVC9KrM+PVnRjYk/ratMc=;
-        b=KuCFY6D6VJ9hn4OiaxJtMwWEQG8NmA3MxjnNQOZSc5mR7A88m+caskdq7A/waITkGQ
-         MnElD30Zann/cg+8HjO1QoHyN8so6ptaAT4JfOJTb3K/vMokV4Q+jHRJUA2Qhv/7kwMN
-         FfJYiURQuGfoYLO+5yUoFi3UjJhAVW2Gikk7BtJsoMgZ+3MqAyIG9dMcu5QMIKsqg1kl
-         ukRgts8sLgL3CkRnMYG2ijI8k+U328q0UxMy+Sko9DC3SSUN2JA6a5OpFZMUOAcXJpD8
-         ZbxzkZ6r3rauCCgMgfQGtsdoJADm7lB6kG/HQt3ZGEPcztnBluuxw4t/CX+Cm8RtDFsI
-         3zQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uwZ2SiPflAo2gMhAO1B+oTaVC9KrM+PVnRjYk/ratMc=;
-        b=EjW6c9aLJsmwDhOrH4xYykR5mLFkHczc8wz4HX35OU4bB89kDpiX0vCdqAkM5D7yaP
-         9RA2t+cyYuxIPBp3xOXabjIOR+fsd9NW8Q+B9d5/CBmJR+Mk7E3HX8zJOiNyE4e7oKZP
-         LMFM+KIFeilhSwFuONFdlx5RjBeC4aACiAI1IMq6Ypf6unwa0yuU5CV68GZLJlLTfKHG
-         lml/NvnuQr/qKqqoFc398IMxCaPaabqfhhGpW11fpfeDhoCYJs6HNOxfq/NYi1WXLRIT
-         C68fxjyHORFGpwURfT7ItimSeDlhRtEGVL4IbcSn/XMZqTq0TrVkvLi9U3cMX1ogAW3i
-         v7Pw==
-X-Gm-Message-State: APjAAAXTPI8mULf7sFS4UlN3YnvjakL6hHV2aX1VgvaDeqERPOpryKSM
-        pKGJscx54NcU3EzcdGZUA1GhYkcdtrY3tZLk2HA=
-X-Google-Smtp-Source: APXvYqxSz+b6F8LCIGIB5VIaGn6Cwvvmn5NGtc/3Mr2o8u1nlt15cKuWTr4XZ0S6VEX/2BCSmmay9uuguOVl8IfS0YQ=
-X-Received: by 2002:a05:6830:120b:: with SMTP id r11mr13747016otp.254.1578291683382;
- Sun, 05 Jan 2020 22:21:23 -0800 (PST)
+        id S1726368AbgAFJCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 04:02:00 -0500
+Received: from mx2.suse.de ([195.135.220.15]:50152 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725446AbgAFJCA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jan 2020 04:02:00 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id B2328B027;
+        Mon,  6 Jan 2020 09:01:55 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 821931E0B47; Mon,  6 Jan 2020 10:01:47 +0100 (CET)
+Date:   Mon, 6 Jan 2020 10:01:47 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Maor Gottlieb <maorg@mellanox.com>,
+        Ran Rozenstein <ranro@mellanox.com>
+Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
+Message-ID: <20200106090147.GA9176@quack2.suse.cz>
+References: <20191219132607.GA410823@unreal>
+ <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
+ <20191219210743.GN17227@ziepe.ca>
+ <20191220182939.GA10944@unreal>
+ <1001a5fc-a71d-9c0f-1090-546c4913d8a2@nvidia.com>
+ <20191222132357.GF13335@unreal>
+ <49d57efe-85e1-6910-baf5-c18df1382206@nvidia.com>
+ <20191225052612.GA212002@unreal>
+ <b879d191-a07c-e808-e48f-2b9bd8ba4fa3@nvidia.com>
+ <612aa292-ec45-295c-b56c-c622876620fa@nvidia.com>
 MIME-Version: 1.0
-References: <1561682593-12071-1-git-send-email-wanpengli@tencent.com>
- <20190628011012.GA19488@lerouge> <CANRm+CxUpwZ9KwOcQp=Ok64giyjjcJOGb2=zU6vayQzLqYvpXQ@mail.gmail.com>
- <alpine.DEB.2.21.1910231028250.2308@nanos.tec.linutronix.de>
-In-Reply-To: <alpine.DEB.2.21.1910231028250.2308@nanos.tec.linutronix.de>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 6 Jan 2020 14:21:13 +0800
-Message-ID: <CANRm+Cw1eTNgB1r79J7U__ynio7pMSR4Xa35XuQuj-JKAQGxmg@mail.gmail.com>
-Subject: Re: [PATCH v2] sched/nohz: Optimize get_nohz_timer_target()
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <612aa292-ec45-295c-b56c-c622876620fa@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Thomas,
-On Wed, 23 Oct 2019 at 16:29, Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> On Wed, 23 Oct 2019, Wanpeng Li wrote:
-> > I didn't see your refactor to get_nohz_timer_target() which you
-> > mentioned in IRC after four months, I can observe cyclictest drop from
-> > 4~5us to 8us in kvm guest(we offload the lapic timer emulation to
-> > housekeeping cpu to avoid timer fire external interrupt on the pCPU
-> > which vCPU resident incur a vCPU vmexit) w/o this patch in the case of
-> > there is no busy housekeeping cpu. The score can be recovered after I
-> > give stress to create a busy housekeeping cpu.
-> >
-> > Could you consider applying this patch for temporary since I'm not
-> > sure when the refactor can be ready.
->
-> Yeah. It's delayed (again).... Will pick that up.
+On Sat 28-12-19 20:33:32, John Hubbard wrote:
+> On 12/27/19 1:56 PM, John Hubbard wrote:
+> ...
+> >> It is ancient verification test (~10y) which is not an easy task to
+> >> make it understandable and standalone :).
+> >>
+> > 
+> > Is this the only test that fails, btw? No other test failures or hints of
+> > problems?
+> > 
+> > (Also, maybe hopeless, but can *anyone* on the RDMA list provide some
+> > characterization of the test, such as how many pins per page, what page
+> > sizes are used? I'm still hoping to write a test to trigger something
+> > close to this...)
+> > 
+> > I do have a couple more ideas for test runs:
+> > 
+> > 1. Reduce GUP_PIN_COUNTING_BIAS to 1. That would turn the whole override of
+> > page->_refcount into a no-op, and so if all is well (it may not be!) with the
+> > rest of the patch, then we'd expect this problem to not reappear.
+> > 
+> > 2. Active /proc/vmstat *foll_pin* statistics unconditionally (just for these
+> > tests, of course), so we can see if there is a get/put mismatch. However, that
+> > will change the timing, and so it must be attempted independently of (1), in
+> > order to see if it ends up hiding the repro.
+> > 
+> > I've updated this branch to implement (1), but not (2), hoping you can give
+> > this one a spin?
+> > 
+> >     git@github.com:johnhubbard/linux.git  pin_user_pages_tracking_v11_with_diags
+> > 
+> > 
+> 
+> Also, looking ahead:
+> 
+> a) if the problem disappears with the latest above test, then we likely have
+>    a huge page refcount overflow, and there are a couple of different ways to
+>    fix it. 
+> 
+> b) if it still reproduces with the above, then it's some other random mistake,
+>    and in that case I'd be inclined to do a sort of guided (or classic, unguided)
+>    git bisect of the series. Because it could be any of several patches.
+> 
+>    If that's too much trouble, then I'd have to fall back to submitting a few
+>    patches at a time and working my way up to the tracking patch...
 
-I didn't find WIP tag for this work after ~half year since v4 was
-posted https://lkml.org/lkml/2019/6/28/231 Could you apply this patch
-for temporary because the completion time of refactor is not
-deterministic.
+It could also be that an ordinary page reference is dropped with 'unpin'
+thus underflowing the page refcount...
 
-    Wanpeng
+								Honza
+
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
