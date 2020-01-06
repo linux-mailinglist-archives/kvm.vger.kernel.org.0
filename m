@@ -2,111 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D1EBE131172
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 12:36:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B89E2131175
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 12:36:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726173AbgAFLf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 06:35:59 -0500
-Received: from foss.arm.com ([217.140.110.172]:43146 "EHLO foss.arm.com"
+        id S1726385AbgAFLgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 06:36:31 -0500
+Received: from foss.arm.com ([217.140.110.172]:43156 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725787AbgAFLf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 06:35:59 -0500
+        id S1726360AbgAFLga (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jan 2020 06:36:30 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4204E328;
-        Mon,  6 Jan 2020 03:35:58 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 552223F534;
-        Mon,  6 Jan 2020 03:35:57 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v3 12/18] arm64: timer: EOIR the interrupt
- after masking the timer
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D415328;
+        Mon,  6 Jan 2020 03:36:30 -0800 (PST)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E7783F534;
+        Mon,  6 Jan 2020 03:36:29 -0800 (PST)
+Date:   Mon, 6 Jan 2020 11:36:22 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
 To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
-        maz@kernel.org, vladimir.murzin@arm.com, mark.rutland@arm.com
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, drjones@redhat.com, maz@kernel.org,
+        vladimir.murzin@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 06/18] arm/arm64: psci: Don't run C
+ code without stack or vectors
+Message-ID: <20200106113622.GA9630@lakrids.cambridge.arm.com>
 References: <1577808589-31892-1-git-send-email-alexandru.elisei@arm.com>
- <1577808589-31892-13-git-send-email-alexandru.elisei@arm.com>
- <20200103133651.4988de7a@donnerap.cambridge.arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <6516afb5-3eb4-e307-3762-0a4b2dfd1864@arm.com>
-Date:   Mon, 6 Jan 2020 11:35:56 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ <1577808589-31892-7-git-send-email-alexandru.elisei@arm.com>
+ <20200102181121.6895344d@donnerap.cambridge.arm.com>
+ <61ea7391-7e65-4548-17b6-7dbd977fa394@arm.com>
+ <20200106111716.692c949f@donnerap.cambridge.arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200103133651.4988de7a@donnerap.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200106111716.692c949f@donnerap.cambridge.arm.com>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 1/3/20 1:36 PM, Andre Przywara wrote:
-> On Tue, 31 Dec 2019 16:09:43 +0000
+On Mon, Jan 06, 2020 at 11:17:16AM +0000, Andre Przywara wrote:
+> On Mon, 6 Jan 2020 10:41:55 +0000
 > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
->> Writing to the EOIR register before masking the HW mapped timer
->> interrupt can cause taking another timer interrupt immediately after
->> exception return. This doesn't happen all the time, because KVM
->> reevaluates the state of pending HW mapped level sensitive interrupts on
->> each guest exit. If the second interrupt is pending and a guest exit
->> occurs after masking the timer interrupt and before the ERET (which
->> restores PSTATE.I), then KVM removes it.
->>
->> Move the write after the IMASK bit has been set to prevent this from
->> happening.
-> Sounds about right, just one comment below:
->
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  arm/timer.c | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/arm/timer.c b/arm/timer.c
->> index f390e8e65d31..67e95ede24ef 100644
->> --- a/arm/timer.c
->> +++ b/arm/timer.c
->> @@ -149,8 +149,8 @@ static void irq_handler(struct pt_regs *regs)
->>  	u32 irqstat = gic_read_iar();
->>  	u32 irqnr = gic_iar_irqnr(irqstat);
->>  
->> -	if (irqnr != GICC_INT_SPURIOUS)
->> -		gic_write_eoir(irqstat);
->> +	if (irqnr == GICC_INT_SPURIOUS)
->> +		return;
->>  
->>  	if (irqnr == PPI(vtimer_info.irq)) {
->>  		info = &vtimer_info;
->> @@ -162,7 +162,11 @@ static void irq_handler(struct pt_regs *regs)
->>  	}
->>  
->>  	info->write_ctl(ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE);
->> +	isb();
-> Shall this isb() actually go into the write_[pv]timer_ctl() implementation? I see one other call where we enable the timer without an isb() afterwards. Plus I am not sure we wouldn't need it as well for disabling the timers?
+> 
+> > Hi Andre,
+> > 
+> > Thank you for reviewing the patches!
+> > 
+> > On 1/2/20 6:11 PM, Andre Przywara wrote:
+> > >> +.global asm_cpu_psci_cpu_die
+> > >> +asm_cpu_psci_cpu_die:
+> > >> +	ldr	r0, =PSCI_0_2_FN_CPU_OFF
+> > >> +	hvc	#0
+> > >> +	b	.  
+> > > I am wondering if this implementation is actually too simple. Both
+> > > the current implementation and the kernel clear at least the first
+> > > three arguments to 0.  I failed to find a requirement for doing
+> > > this (nothing in the SMCCC or the PSCI spec), but I guess it would
+> > > make sense when looking at forward compatibility.  
 
-Good catch. From ARM DDI 0487E.a glossary, the section "Context synchronization
-event":
+This is a Linux implementation detail, and is not intended to be an
+SMCCC contract detail. To be generic to all SMCCC calls, the invocation
+functions have to take the largest set of potential arguments, and
+callers have to pass /something/ for the unused values.
 
-"All direct and indirect writes to System registers that are made before the
-Context synchronization event affect any instruction, including a direct read,
-that appears in program order after the instruction causing the Context
-synchronization event."
+It would be perfectly valid for callers to pass the result of
+get_random_long() instead. The SMCCC implementation should not derive
+any meaning from registers which are not arguments to the call in
+question.
 
-Based on that, I'll add an ISB after a control register write.
+> > The SMC calling convention only specifies the values for the arguments that are
+> > used by a function, not the values for all possible arguments. kvm-unit-tests sets
+> > the other arguments to 0 because the function prototype that does the actual SMC
+> > call takes 4 arguments. The value 0 is a random value that was chosen for those
+> > unused parameters. For example, it could have been a random number on each call.
+> > 
+> > Let me put it another way. Suggesting that unused arguments should be set to 0 is
+> > the same as suggesting that normal C function that adheres to procedure call
+> > standard for arm64 should always have 8 arguments, and for a particular function
+> > that doesn't use all of them, they should be set to 0 by the caller.
+> 
+> I understand that, but was wondering if the SMCCC would mandate
+> stricter requirements. After all every PSCI call from Linux goes
+> through a function which clears all unused input parameters.
+
+Callers are not deliberately clearingh the unused parameters, but rather
+passing arbitrary values because they are forced to.
 
 Thanks,
-Alex
->
-> Cheers,
-> Andre.
->
->> +
->>  	info->irq_received = true;
->> +
->> +	gic_write_eoir(irqstat);
->>  }
->>  
->>  static bool gic_timer_pending(struct timer_info *info)
+Mark.
