@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 930C313193B
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 21:20:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F35F513193E
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 21:20:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726998AbgAFUTm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 15:19:42 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:41132 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726657AbgAFUTm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 15:19:42 -0500
-Received: by mail-io1-f68.google.com with SMTP id c16so46392268ioo.8
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2020 12:19:42 -0800 (PST)
+        id S1726825AbgAFUUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 15:20:07 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:33868 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726739AbgAFUUG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jan 2020 15:20:06 -0500
+Received: by mail-io1-f66.google.com with SMTP id z193so49946929iof.1
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2020 12:20:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=8cEtudWCtdf6T3TMjKJwqF9jbkVULslZxeRKZ27Kc2s=;
-        b=QtjcFB+DYa5pkgsRjodVAvu18u5iUIdjoDtsQfyPg0cR2KUvdk6NSqhCFic8jOgE8i
-         +/atQtyFL2WCfmgZuTf8l1sdjJz4ad1dbppZzgdWM4JzY4jOr+oTqIY8jGd5pQBIL1Mx
-         sAOhoZ4wnKAwncJdDWNTuHaq8q3S+jprxcKyvHnZSUFHERkZ2HW4lwVgfu5drNiPtk0m
-         s9yGNQr32VnTU0zc3tX/3RIm2xxKtSX0p1u5O6RPGKYGaIk5GU6C9Vo4I+eBGp+42Cw1
-         WYp4V5JGMW6YIAuyr9NTOmmOlJIVupTC5pDpOg/KpLc3wHzd/tAiJixszOZcFhEXI0jf
-         MClA==
+        bh=TLp/ufTp0fYjzVGW4DuTeiICdn7BWt7SHYlnsorurds=;
+        b=ZBuZ0lTtXh/HFFduyGbHQ9mz6qhkf8isglZMJ6rkGMDKlIz348zz+FJBrCXiecfNaM
+         G9XU0aDZUJkspgvq3dFrptFOtCxw7/9q6e0oYnK4KIO+tN/R91Gho+qO1JCbvEKUAZ9B
+         +DgRmsuBBUYTJ8icaKwHyadigaTDz5JFzR+Bo1+tsDQ0c0N2tI06q1X4Zz9aDcm0HIVR
+         nTRaKaCZ91cXY6OTZ8kS7QNPWIxeMgLEwMscPMAiEggKYcabM9fBWnPCP9DCezGB+Fxa
+         Mmws4V8umADBZPcQsWfcItQzOaa1cL8vCQopvUyD7PBZAt8gfpLwO1Y+ZF9DyQ43UM+Y
+         Q+FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=8cEtudWCtdf6T3TMjKJwqF9jbkVULslZxeRKZ27Kc2s=;
-        b=V2p0DNvu8tmydyojYSgF18GUNvluKC6iyI/QSQuXegE9U+ntJCWIbi44pmDrMJGaAE
-         oZGVEjClqV7chtXo0ekgGSCoglGjO+xNjSTTsvQ4uJxcHcNQ4maWkqLqobYtjSxQuD61
-         2LHG92q6AZl3LBh6j881sIz03AFLVRfzB9s1ogLkDExo0Aer7KwmdZyLmJIHkgmc10VL
-         7NqU4Wrk1lvQBIVx6n8TG2+OYSc3uazj761Tqh+bz0WZNIxMMFrqzCE4B05p4IWZUxS+
-         h1f5zOG0PVtzcoXgf/PuYxlTVACzLZLcbSFw95803Z3L+cTTYvPfmD0O0636huYhBWvj
-         YEUQ==
-X-Gm-Message-State: APjAAAUfQ91NO1Le/e4sqPszWDmWVkeBcUni8PrMvFgmEY6tuEQErBW2
-        6EmF773gwGv+VqNzaijSpkjH/CCrfSUBCsbFQ7UhLw==
-X-Google-Smtp-Source: APXvYqwB0MqyFY0NlYniQH2GAgfw3+4V5Y4bkxqU/VtEtdJT4o0YGAbxlFo4+429pMjJn1SvNXIHBzLCnfX1NSJTpLs=
-X-Received: by 2002:a5d:9904:: with SMTP id x4mr68099509iol.119.1578341981709;
- Mon, 06 Jan 2020 12:19:41 -0800 (PST)
+        bh=TLp/ufTp0fYjzVGW4DuTeiICdn7BWt7SHYlnsorurds=;
+        b=PyJvtIShIPIvzkxwwUMAe+5Vz0fhiO2UM360fk+Im0r5AA1CKpi8KzPQO4/R7OEKzX
+         tG7CH2SWeWtChJglWshtmZCdKR0ukpxvrzB6pUHb4eLjbwLtDCMJal9wjKQLdYtDPuV2
+         J6df0fcXyKnPxQssbzyA91Xqee2knU//atnU+H4rfQZD1UJWW1POvDoPMXN5N4kIssXv
+         mbZma5bfk7hPSWynISJ09X5O+3K7ifKhvFkRp3R0bRdWPwKmP6NNtPLj9AkuV+/6pGdq
+         FEXQJP5u+sj6BrzpDfjr/XBBvoxPLaFMJGBJl29eE8CmRr8/ecfqQMcZnDrLdYZGN4Qa
+         eVHg==
+X-Gm-Message-State: APjAAAWOgtDT5bP9M1NCtAifcTYJsoHY4xgj/QoPgtAV8Ux/LoQFnuSD
+        pTy98/u5G86WMibTtJh1N7OxI2lLGBr/P8bNYvsOZQ==
+X-Google-Smtp-Source: APXvYqwumr0YiUR0oP6hMxgSGdJNExJQPdoLDRU2fDq+CxkJ0j2PVxuRSCVAbrGf9CGxXEwqGtmFfotDtPJwPjeEIiU=
+X-Received: by 2002:a02:3312:: with SMTP id c18mr79437851jae.24.1578342005752;
+ Mon, 06 Jan 2020 12:20:05 -0800 (PST)
 MIME-Version: 1.0
-References: <20191211204753.242298-1-pomonis@google.com> <20191211204753.242298-13-pomonis@google.com>
-In-Reply-To: <20191211204753.242298-13-pomonis@google.com>
+References: <20191211204753.242298-1-pomonis@google.com> <20191211204753.242298-14-pomonis@google.com>
+In-Reply-To: <20191211204753.242298-14-pomonis@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 6 Jan 2020 12:19:30 -0800
-Message-ID: <CALMp9eS+8kwmTyYDieNkhbRMBW-rkphKh4fmtV3X2d9XVh3U8Q@mail.gmail.com>
-Subject: Re: [PATCH v2 12/13] KVM: x86: Protect DR-based index computations
- from Spectre-v1/L1TF attacks
+Date:   Mon, 6 Jan 2020 12:19:53 -0800
+Message-ID: <CALMp9eSixcb+LMxNV6t-_FHzxPHDRV45R3FZ835xvpqk6hM1Gg@mail.gmail.com>
+Subject: Re: [PATCH v2 13/13] KVM: x86: Protect pmu_intel.c from
+ Spectre-v1/L1TF attacks
 To:     Marios Pomonis <pomonis@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
@@ -71,13 +71,14 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Dec 11, 2019 at 12:49 PM Marios Pomonis <pomonis@google.com> wrote:
 >
-> This fixes a Spectre-v1/L1TF vulnerability in __kvm_set_dr() and
-> kvm_get_dr().
-> Both kvm_get_dr() and kvm_set_dr() (a wrapper of __kvm_set_dr()) are
-> exported symbols so KVM should tream them conservatively from a security
+> This fixes Spectre-v1/L1TF vulnerabilities in intel_find_fixed_event()
+> and intel_rdpmc_ecx_to_pmc().
+> kvm_rdpmc() (ancestor of intel_find_fixed_event()) and
+> reprogram_fixed_counter() (ancestor of intel_rdpmc_ecx_to_pmc()) are
+> exported symbols so KVM should treat them conservatively from a security
 > perspective.
 >
-> Fixes: commit 020df0794f57 ("KVM: move DR register access handling into generic code")
+> Fixes: commit 25462f7f5295 ("KVM: x86/vPMU: Define kvm_pmu_ops to support vPMU function dispatch")
 >
 > Signed-off-by: Nick Finco <nifi@google.com>
 > Signed-off-by: Marios Pomonis <pomonis@google.com>
