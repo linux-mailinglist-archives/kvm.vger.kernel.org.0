@@ -2,88 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92404131BAB
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 23:41:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25DD5131BC4
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 23:47:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727226AbgAFWk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 17:40:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26033 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726742AbgAFWk7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 17:40:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578350458;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IBbAbpkjrTzANgPT/NBsopjzqfAgjde8LEv/Bht0csk=;
-        b=TWKv+S0+9SeN81C4FYrOCaYWCzx80v7wVUj8B86ktM4UFC9C3apusr16bNCDeP2Wrvb+m1
-        Aikn6YEqyX1uvl6Q6VcmQ60XJKztw2MLGYDkpodRuHN45lHOqkrXoPic1nMYUi4RwWBmDT
-        INH0B+quyj3fcgT8/GFXuxIO0tSP3rQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-mrZzEpgGOGaC8Q9ypDRg6w-1; Mon, 06 Jan 2020 17:40:56 -0500
-X-MC-Unique: mrZzEpgGOGaC8Q9ypDRg6w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD431189CD01;
-        Mon,  6 Jan 2020 22:40:55 +0000 (UTC)
-Received: from w520.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B1DE15C1B2;
-        Mon,  6 Jan 2020 22:40:55 +0000 (UTC)
-Date:   Mon, 6 Jan 2020 15:40:55 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Renjun Wang <rwang@panyi.ai>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: VFIO PROBLEM: pci_alloc_irq_vectors function request 32 MSI
- interrupts vectors, but return 1 in KVM virtual machine.
-Message-ID: <20200106154055.294322d0@w520.home>
-In-Reply-To: <BJXPR01MB0534C845ED8D3942E95E7BC7DE250@BJXPR01MB0534.CHNPR01.prod.partner.outlook.cn>
-References: <BJXPR01MB0534C845ED8D3942E95E7BC7DE250@BJXPR01MB0534.CHNPR01.prod.partner.outlook.cn>
+        id S1727108AbgAFWqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 17:46:55 -0500
+Received: from mail-vk1-f193.google.com ([209.85.221.193]:33464 "EHLO
+        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726721AbgAFWqz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jan 2020 17:46:55 -0500
+Received: by mail-vk1-f193.google.com with SMTP id i78so12922340vke.0
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2020 14:46:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mziUzibu7VLVDwY8yEp20Vq+KwzBjLeq76cwdTMo5x4=;
+        b=azrNAJ/0EtMbREH1NtA0iDE9tkgz+lezr6yJohafJy+P8F+wCOpe5etiWW5zbeenJ8
+         BuUxEouYLUyZamI6Sj/f7QE7Do55ZUW5U1nbPK0JY+m4cgfaVZ5Ua3yhylQ7vHbM/LDP
+         rEDv6PYjAEDVr0CZXi10Ou2j3P0KGuClTRSWAE3/Nate8bvsUsFTodfIeRQYyInfqjxO
+         BJV2lH8lf3na4nwz7QYAPpWRRuPhBPR+Hei/s1G/JBLAru3SvRfatYHmqBZ+VQFrcu7j
+         NcNJrRGiB8g1SMnEZQFMCIjaXG7+JowagU8FQW7gv2gxE4/WZT5ef9WhsSsnAUomthRc
+         nekw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mziUzibu7VLVDwY8yEp20Vq+KwzBjLeq76cwdTMo5x4=;
+        b=io4WZvH39aKM93pVB22R0cucv712C9qTOJShucTQvjwOk03ioDfZjJwKDWU0o26sm5
+         xNzn3z5mhHlpLseb5LWnc9zATXuC9igr8ztY6dWl4wsZmRty/KjcbrxB3gjGRnmzS92/
+         RYHn2EDiY8iJJE5Us0PKJckwRJ0jf8Qdb78rU5S5IEoQkPuuxcpaAzbbTzxK0JkiuseH
+         ec5QikBNv441z3dPXK5ciPoJ9bSD4aujPY8NQv8PKuFN2SqTJegZc7oJdowjbh2AIhJy
+         hXpypCYV1fwaAmK7xhQuraG9g0pGpalyqDmyr0dvJ00SxRpHilvR+7/1O1eHJWDMu8cG
+         FG1Q==
+X-Gm-Message-State: APjAAAURzuFN2+7fUejkVUb3NFAhp/VDnQg0CtlYYDy1q+xe6+Ro1iKN
+        hA7VwDG+k2xfhI2/+9tS84HJBvWDKARzENs4uyICkw==
+X-Google-Smtp-Source: APXvYqxrbtzAinZlDXcCjYPK6LBCByV8b5PSRzrqMiqxqAMCfpyAe3z+ilcUjrsjXoMao63ZvkkvzsfE1n1YT0zDASA=
+X-Received: by 2002:a1f:1fd1:: with SMTP id f200mr3881672vkf.21.1578350813834;
+ Mon, 06 Jan 2020 14:46:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20191216213901.106941-1-bgardon@google.com>
+In-Reply-To: <20191216213901.106941-1-bgardon@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 6 Jan 2020 14:46:42 -0800
+Message-ID: <CANgfPd-vDhHeBxCeJNfT7m75KYvGZTi+wHTAuZKO3ZchxMsBxw@mail.gmail.com>
+Subject: Re: [PATCH v3 0/8] Create a userfaultfd demand paging test
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>, Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 28 Dec 2019 01:59:43 +0000
-Renjun Wang <rwang@panyi.ai> wrote:
+If anyone has a chance to re-review this test patch series I'd be
+grateful. I responded to most of the feedback I received in the first
+series, and believe this test will be a useful performance benchmark
+for future development.
 
-> Hi all:
-> I have a question about PCI which troubled me for a few weeks.
-> I have a virtual machine with ubuntu 16.4.03 on KVM platform. There
-> is a PCIe device(Xilinx PCIe IP) plugged in the host machine, and
-> passthrough to guest via VFIO feature. On the ubuntu operation
-> system, I am developing the pcie driver. When I use
-> pci_alloc_irq_vectors() function to allocate 32 msi vectors, but
-> return 1. The command=C2=A0 `lspci -vvv` output shows MSI: Enable+
-> Count=3D1/32 Maskable+ 64bit+
->=20
-> there is a similar case
-> https://stackoverflow.com/questions/49821599/multiple-msi-vectors-linux-p=
-ci-alloc-irq-vectors-return-one-while-the-devi.
-> But not working for KVM virtual machine.
->=20
-> I do not known why the function=C2=A0 pci_alloc_irq_vectors() returns one=
- ?
-
-When you say it's not working in the virtual machine with that
-stackoverflow tip, does that mean your VM is running a Q35 machine type
-with the intel-iommu device enabled in both QEMU and on the guest
-command line?  You should see "IR-PCI-MSI" in /proc/interrupts on host
-and guest for the interrupt type if the interrupt remapping is enabled.
-Linux doesn't support multiple MSI vectors without some kind of
-interrupt remapper support.  You probably have that on the host, but
-you'll need it in the guest as well or else the guest kernel will limit
-you to a single vector.
-
-BTW, if you have any influence over the device, you really, really want
-to use MSI-X for supporting multiple vectors.  Thanks,
-
-Alex
-
+On Mon, Dec 16, 2019 at 1:39 PM Ben Gardon <bgardon@google.com> wrote:
+>
+> When handling page faults for many vCPUs during demand paging, KVM's MMU
+> lock becomes highly contended. This series creates a test with a naive
+> userfaultfd based demand paging implementation to demonstrate that
+> contention. This test serves both as a functional test of userfaultfd
+> and a microbenchmark of demand paging performance with a variable number
+> of vCPUs and memory per vCPU.
+>
+> The test creates N userfaultfd threads, N vCPUs, and a region of memory
+> with M pages per vCPU. The N userfaultfd polling threads are each set up
+> to serve faults on a region of memory corresponding to one of the vCPUs.
+> Each of the vCPUs is then started, and touches each page of its disjoint
+> memory region, sequentially. In response to faults, the userfaultfd
+> threads copy a static buffer into the guest's memory. This creates a
+> worst case for MMU lock contention as we have removed most of the
+> contention between the userfaultfd threads and there is no time required
+> to fetch the contents of guest memory.
+>
+> This test was run successfully on Intel Haswell, Broadwell, and
+> Cascadelake hosts with a variety of vCPU counts and memory sizes.
+>
+> This test was adapted from the dirty_log_test.
+>
+> The series can also be viewed in Gerrit here:
+> https://linux-review.googlesource.com/c/virt/kvm/kvm/+/1464
+> (Thanks to Dmitry Vyukov <dvyukov@google.com> for setting up the Gerrit
+> instance)
+>
+> Ben Gardon (9):
+>   KVM: selftests: Create a demand paging test
+>   KVM: selftests: Add demand paging content to the demand paging test
+>   KVM: selftests: Add memory size parameter to the demand paging test
+>   KVM: selftests: Pass args to vCPU instead of using globals
+>   KVM: selftests: Support multiple vCPUs in demand paging test
+>   KVM: selftests: Time guest demand paging
+>   KVM: selftests: Add parameter to _vm_create for memslot 0 base paddr
+>   KVM: selftests: Support large VMs in demand paging test
+>   Add static flag
+>
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   4 +-
+>  .../selftests/kvm/demand_paging_test.c        | 610 ++++++++++++++++++
+>  tools/testing/selftests/kvm/dirty_log_test.c  |   2 +-
+>  .../testing/selftests/kvm/include/kvm_util.h  |   3 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |   7 +-
+>  6 files changed, 621 insertions(+), 6 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/demand_paging_test.c
+>
+> --
+> 2.23.0.444.g18eeb5a265-goog
+>
