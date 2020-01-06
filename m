@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9020213192D
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 21:18:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D780131932
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2020 21:20:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727053AbgAFUSX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 15:18:23 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:37119 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726723AbgAFUSX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 15:18:23 -0500
-Received: by mail-io1-f68.google.com with SMTP id k24so19604618ioc.4
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2020 12:18:23 -0800 (PST)
+        id S1727088AbgAFUSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jan 2020 15:18:47 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:33221 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726683AbgAFUSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jan 2020 15:18:44 -0500
+Received: by mail-io1-f66.google.com with SMTP id z8so49950438ioh.0
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2020 12:18:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=4Rcg5ibwjG8y5aZAcf4B6F5Z9gExCdMlFDQO0Lciu24=;
-        b=lqiq0v9HxFYQSzvoTItL5VboCgvXcPwJrDfjRt4tRzrNP91NfyDXsOiJ0/fojLIeK3
-         cZDHOPcKfYWr1Imrjm4ukSv9jgmuqIUFul4cWpToTfFisGt9agV5pyTQYUhw/d56TCA1
-         TED+wvKRPwaaajR6wEOAcNtQqO4eOcvinx1dX2jdTd2Kemd8PzCsuPJGravprw31HYd/
-         /Q4rQfBCmTNo24mSI3jiIJdTm1ysoZI5RejQGz1yQd0FjM+dJ3zBPY7kWWX0BAepujEy
-         B0rIjdFhlP24gElV5/X3YMNSxkww59fgjkVGTad5O92J+/njh17oPYTfbM5B7a3NrsxH
-         MpTQ==
+        bh=Hkwe6gCS0xXqcJJZW7uqlIoLqLcdTHhaPPV9HPAYJLA=;
+        b=gzPxF6SbVaL+Q8f/0OUvPd4pGrCNyy3H+vkMlNxMyCFUACVPB22nhw7CW+mRIGgQ3f
+         iC/gReQLeeGDSkKhUL37T9WNE1pL2ItXr276QwD6tCmTBAGhmLXzZTke6Rq8dBQPbOHq
+         P5o62eK2UKq5jUxXseiTHaOP8geIypRCmKPQj6H9KHMS6YF57YEvwpqJXxoL5z6ZOBex
+         Z9YIgLKj8/hR5kERIkkZaVIjpk1LMDFe3p+QzwUwunXpcu6N3vh4PfuAXJjn3a4nc4Xy
+         RNBTgCyIIgQd5AcUrywwLVopwZUUIFlXZn4zuvAsYeWLWZRJcDncl4bs0NOmvEA3fG1Q
+         Z0Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=4Rcg5ibwjG8y5aZAcf4B6F5Z9gExCdMlFDQO0Lciu24=;
-        b=GcLdp20Orv6lT69A6HXmoJQu0eXPTR0g+3ptUmBg+9PkN/AD2rnlzhnBZwmzExc+Fd
-         xCSteEfMtQmlvLVrJdfxXRr2XHGsD1w6rKtSeKZEld0KdQ31Ky2l83WRqciBm8V8WEwo
-         GZcB9mLZZCooHPsx2FZPMNZ7wcxfMNW5EB/GNaGZdFFJX+IDMaliber/KNSbQ45ALCJf
-         w2IENRA7AFjHFT8oqBWkHe/b6ONO73LhrocWKQn2WA29nc2sMmFUcAX8cF3kcxjNYIQn
-         YGgJqsmj76Li2h+XxHLtawPe0+Zs4h9qbfYk/hFBRQfJMYpuuX41Ghq7Ie2q0PlSCNhi
-         PJ5A==
-X-Gm-Message-State: APjAAAUNUJOaBASD7Js7A6eC7pPy+YBeI74eWqooHgyJLw07pvWfOFPw
-        fs1YWW88VvKucPoLg61qwkuKFo0QJNdGiTeQK82EwA==
-X-Google-Smtp-Source: APXvYqxjZclUu0eB6nMi8sSpfdOj8OZ6c2MrV6ct440WVHQXTLBSRRbC9HlKNRn8NRGFiuthiYpgPudrQf4lSXaDVdI=
-X-Received: by 2002:a02:c906:: with SMTP id t6mr73461739jao.75.1578341902473;
- Mon, 06 Jan 2020 12:18:22 -0800 (PST)
+        bh=Hkwe6gCS0xXqcJJZW7uqlIoLqLcdTHhaPPV9HPAYJLA=;
+        b=nTQu2FL8jpy2zhzsy+n9spANL4rV5yJXm/23Hg1UUHGvX/GoOwXvuTga42ONzqgl3B
+         vjiXxgLyQkzjzaQF7HN2W9w0qVntZjZefb7npZdH7QH7DetQhOinEdqfQe4UvLmgm8tk
+         ZoGAVok9iUNDWobyBAuq1vjmgpOqdzs5fm9q6JMzRpTE5xRXLhH2Ov2wfd8djlzA9Mpq
+         qBVRGapsTFw2y7x7ZXilUzdUn9XR8tFzjZEDbyk+qZemguwcfWtXkhhO27jPzx22j+MY
+         bCBYbU1Rv7HBEQrPOYdr/6Kduv9tMQxkBRSwUZD4xo/FBlN8c+Kd4ishlIKkcY9kMbxQ
+         al0A==
+X-Gm-Message-State: APjAAAXQrobwDiscspryt5j1CW339C892TaRZvLbnfsSC3Nn2l5tZ5tu
+        buyq/k4aM/gDi6opT4EdPU93+aBwPwL3aayqDxyECQ==
+X-Google-Smtp-Source: APXvYqwB+24zHP/102YfQQE2qR7LjHh4cFem6VFU5fpXWOGl6aX54N0y+TTrv4usjFmDM3ZnakpCtAKCtgDHWQpd+Xo=
+X-Received: by 2002:a5d:8cda:: with SMTP id k26mr45673841iot.26.1578341922908;
+ Mon, 06 Jan 2020 12:18:42 -0800 (PST)
 MIME-Version: 1.0
-References: <20191211204753.242298-1-pomonis@google.com> <20191211204753.242298-8-pomonis@google.com>
-In-Reply-To: <20191211204753.242298-8-pomonis@google.com>
+References: <20191211204753.242298-1-pomonis@google.com> <20191211204753.242298-9-pomonis@google.com>
+In-Reply-To: <20191211204753.242298-9-pomonis@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 6 Jan 2020 12:18:11 -0800
-Message-ID: <CALMp9eSvJYzuYmn6sUo5zNGLAmA=d_Pu4DcmCQTMAFCP_dBHsg@mail.gmail.com>
-Subject: Re: [PATCH v2 07/13] KVM: x86: Protect MSR-based index computations
- in fixed_msr_to_seg_unit() from Spectre-v1/L1TF attacks
+Date:   Mon, 6 Jan 2020 12:18:31 -0800
+Message-ID: <CALMp9eQmWB9WZaD=n5rTZEzWkjBx_emTn3zaVxk7YrwBGv2VrQ@mail.gmail.com>
+Subject: Re: [PATCH v2 08/13] KVM: x86: Protect MSR-based index computations
+ in pmu.h from Spectre-v1/L1TF attacks
 To:     Marios Pomonis <pomonis@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
@@ -69,13 +69,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 12:48 PM Marios Pomonis <pomonis@google.com> wrote:
+On Wed, Dec 11, 2019 at 12:49 PM Marios Pomonis <pomonis@google.com> wrote:
 >
-> This fixes a Spectre-v1/L1TF vulnerability in fixed_msr_to_seg_unit().
-> This function contains index computations based on the
-> (attacker-controlled) MSR number.
+> This fixes a Spectre-v1/L1TF vulnerability in the get_gp_pmc() and
+> get_fixed_pmc() functions.
+> They both contain index computations based on the (attacker-controlled)
+> MSR number.
 >
-> Fixes: commit de9aef5e1ad6 ("KVM: MTRR: introduce fixed_mtrr_segment table")
+> Fixes: commit 25462f7f5295 ("KVM: x86/vPMU: Define kvm_pmu_ops to support vPMU function dispatch")
 >
 > Signed-off-by: Nick Finco <nifi@google.com>
 > Signed-off-by: Marios Pomonis <pomonis@google.com>
