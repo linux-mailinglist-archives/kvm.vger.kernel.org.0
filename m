@@ -2,216 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 11273132984
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 16:03:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D80D31329B1
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 16:13:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728218AbgAGPC7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 10:02:59 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22670 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727814AbgAGPC6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jan 2020 10:02:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578409376;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EUJ0mt7q0dKdiWSQ8UabatJSnhVJrzvXfaQL9dNUYs4=;
-        b=Hf49G2GYWh3OARdMNvyM5bvTiBFB6m/exEecwmpGxQFQXg8Pehsb5SIQCeNklAAoN4nBWv
-        YhTemvaatRebq3YFiPPtpj8uM5EhZbMWj13xCdo5bGIgUXBRf2LaYkKzi/HL6DOSFtlG+g
-        ANhZF0oTHmqvahsHq2pxAVIZMQf5NaA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-4BlvWmnuPdeIVxRAM_5BiQ-1; Tue, 07 Jan 2020 10:02:53 -0500
-X-MC-Unique: 4BlvWmnuPdeIVxRAM_5BiQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E072C8005BC;
-        Tue,  7 Jan 2020 15:02:51 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 153F87BFFA;
-        Tue,  7 Jan 2020 15:02:47 +0000 (UTC)
-Date:   Tue, 7 Jan 2020 16:02:45 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v3 4/8] KVM: selftests: Add memory size parameter to the
- demand paging test
-Message-ID: <20200107150245.cblsqirr5mu4fqoo@kamzik.brq.redhat.com>
-References: <20191216213901.106941-1-bgardon@google.com>
- <20191216213901.106941-5-bgardon@google.com>
+        id S1728052AbgAGPNd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 10:13:33 -0500
+Received: from foss.arm.com ([217.140.110.172]:58934 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727559AbgAGPNd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 10:13:33 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05127328;
+        Tue,  7 Jan 2020 07:13:32 -0800 (PST)
+Received: from localhost (unknown [10.37.6.20])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C0F93F703;
+        Tue,  7 Jan 2020 07:13:31 -0800 (PST)
+Date:   Tue, 7 Jan 2020 15:13:29 +0000
+From:   Andrew Murray <andrew.murray@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Catalin Marinas <Catalin.Marinas@arm.com>,
+        Mark Rutland <Mark.Rutland@arm.com>, will@kernel.org,
+        Sudeep Holla <Sudeep.Holla@arm.com>, kvm@vger.kernel.org,
+        kvmarm <kvmarm@lists.cs.columbia.edu>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
+ full SPE profiling buffer controls
+Message-ID: <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
+References: <20191220143025.33853-1-andrew.murray@arm.com>
+ <20191220143025.33853-10-andrew.murray@arm.com>
+ <20191221141325.5a177343@why>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191216213901.106941-5-bgardon@google.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20191221141325.5a177343@why>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 01:38:57PM -0800, Ben Gardon wrote:
-> Add an argument to allow the demand paging test to work on larger and
-> smaller guest sizes.
+On Sat, Dec 21, 2019 at 02:13:25PM +0000, Marc Zyngier wrote:
+> On Fri, 20 Dec 2019 14:30:16 +0000
+> Andrew Murray <andrew.murray@arm.com> wrote:
 > 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  .../selftests/kvm/demand_paging_test.c        | 56 ++++++++++++-------
->  1 file changed, 35 insertions(+), 21 deletions(-)
+> [somehow managed not to do a reply all, re-sending]
 > 
-> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> index 11de5b58995fb..4aa90a3fce99c 100644
-> --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> @@ -32,6 +32,8 @@
->  /* Default guest test virtual memory offset */
->  #define DEFAULT_GUEST_TEST_MEM		0xc0000000
->  
-> +#define DEFAULT_GUEST_TEST_MEM_SIZE (1 << 30) /* 1G */
-> +
->  /*
->   * Guest/Host shared variables. Ensure addr_gva2hva() and/or
->   * sync_global_to/from_guest() are used when accessing from
-> @@ -264,11 +266,10 @@ static int setup_demand_paging(struct kvm_vm *vm,
->  	return 0;
->  }
->  
-> -#define GUEST_MEM_SHIFT 30 /* 1G */
->  #define PAGE_SHIFT_4K  12
->  
->  static void run_test(enum vm_guest_mode mode, bool use_uffd,
-> -		     useconds_t uffd_delay)
-> +		     useconds_t uffd_delay, uint64_t guest_memory_bytes)
->  {
->  	pthread_t vcpu_thread;
->  	pthread_t uffd_handler_thread;
-> @@ -276,33 +277,40 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
->  	int r;
->  
->  	/*
-> -	 * We reserve page table for 2 times of extra dirty mem which
-> -	 * will definitely cover the original (1G+) test range.  Here
-> -	 * we do the calculation with 4K page size which is the
-> -	 * smallest so the page number will be enough for all archs
-> -	 * (e.g., 64K page size guest will need even less memory for
-> -	 * page tables).
-> +	 * We reserve page table for twice the ammount of memory we intend
-> +	 * to use in the test region for demand paging. Here we do the
-> +	 * calculation with 4K page size which is the smallest so the page
-> +	 * number will be enough for all archs. (e.g., 64K page size guest
-> +	 * will need even less memory for page tables).
->  	 */
->  	vm = create_vm(mode, VCPU_ID,
-> -		       2ul << (GUEST_MEM_SHIFT - PAGE_SHIFT_4K),
-> +		       (2 * guest_memory_bytes) >> PAGE_SHIFT_4K,
->  		       guest_code);
->  
->  	guest_page_size = vm_get_page_size(vm);
-> -	/*
-> -	 * A little more than 1G of guest page sized pages.  Cover the
-> -	 * case where the size is not aligned to 64 pages.
-> -	 */
-> -	guest_num_pages = (1ul << (GUEST_MEM_SHIFT -
-> -				   vm_get_page_shift(vm))) + 16;
-> +
-> +	TEST_ASSERT(guest_memory_bytes % guest_page_size == 0,
-> +		    "Guest memory size is not guest page size aligned.");
-> +
-> +	guest_num_pages = guest_memory_bytes / guest_page_size;
-> +
->  #ifdef __s390x__
->  	/* Round up to multiple of 1M (segment size) */
->  	guest_num_pages = (guest_num_pages + 0xff) & ~0xffUL;
->  #endif
-> +	/*
-> +	 * If there should be more memory in the guest test region than there
-> +	 * can be pages in the guest, it will definitely cause problems.
-> +	 */
-> +	TEST_ASSERT(guest_num_pages < vm_get_max_gfn(vm),
-> +		    "Requested more guest memory than address space allows.\n"
-> +		    "    guest pages: %lx max gfn: %lx\n",
-> +		    guest_num_pages, vm_get_max_gfn(vm));
->  
->  	host_page_size = getpagesize();
-> -	host_num_pages = (guest_num_pages * guest_page_size) / host_page_size +
-> -			 !!((guest_num_pages * guest_page_size) %
-> -			    host_page_size);
-> +	TEST_ASSERT(guest_memory_bytes % host_page_size == 0,
-> +		    "Guest memory size is not host page size aligned.");
-> +	host_num_pages = guest_memory_bytes / host_page_size;
->  
->  	guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
->  			      guest_page_size;
-> @@ -381,7 +389,8 @@ static void help(char *name)
->  	int i;
->  
->  	puts("");
-> -	printf("usage: %s [-h] [-m mode] [-u] [-d uffd_delay_usec]\n", name);
-> +	printf("usage: %s [-h] [-m mode] [-u] [-d uffd_delay_usec]\n"
-> +	       "          [-b bytes test memory]\n", name);
->  	printf(" -m: specify the guest mode ID to test\n"
->  	       "     (default: test all supported modes)\n"
->  	       "     This option may be used multiple times.\n"
-> @@ -395,6 +404,8 @@ static void help(char *name)
->  	printf(" -d: add a delay in usec to the User Fault\n"
->  	       "     FD handler to simulate demand paging\n"
->  	       "     overheads. Ignored without -u.\n");
-> +	printf(" -b: specify the number of bytes of memory which should be\n"
-> +	       "     allocated to the guest.\n");
+> > From: Sudeep Holla <sudeep.holla@arm.com>
+> > 
+> > Now that we can save/restore the full SPE controls, we can enable it
+> > if SPE is setup and ready to use in KVM. It's supported in KVM only if
+> > all the CPUs in the system supports SPE.
+> > 
+> > However to support heterogenous systems, we need to move the check if
+> > host supports SPE and do a partial save/restore.
+> 
+> No. Let's just not go down that path. For now, KVM on heterogeneous
+> systems do not get SPE.
 
-Can we input in megabytes instead? And also it might be nice to output the
-default size here.
+At present these patches only offer the SPE feature to VCPU's where the
+sanitised AA64DFR0 register indicates that all CPUs have this support
+(kvm_arm_support_spe_v1) at the time of setting the attribute
+(KVM_SET_DEVICE_ATTR).
 
->  	puts("");
->  	exit(0);
->  }
-> @@ -402,6 +413,7 @@ static void help(char *name)
->  int main(int argc, char *argv[])
->  {
->  	bool mode_selected = false;
-> +	uint64_t guest_memory_bytes = DEFAULT_GUEST_TEST_MEM_SIZE;
->  	unsigned int mode;
->  	int opt, i;
->  	bool use_uffd = false;
-> @@ -414,7 +426,7 @@ int main(int argc, char *argv[])
->  	vm_guest_mode_params_init(VM_MODE_P40V48_4K, true, true);
->  #endif
->  
-> -	while ((opt = getopt(argc, argv, "hm:ud:")) != -1) {
-> +	while ((opt = getopt(argc, argv, "hm:ud:b:")) != -1) {
->  		switch (opt) {
->  		case 'm':
->  			if (!mode_selected) {
-> @@ -435,6 +447,8 @@ int main(int argc, char *argv[])
->  			TEST_ASSERT(uffd_delay >= 0,
->  				    "A negative UFFD delay is not supported.");
->  			break;
-> +		case 'b':
-> +			guest_memory_bytes = strtoull(optarg, NULL, 0);
+Therefore if a new CPU comes online without SPE support, and an
+existing VCPU is scheduled onto it, then bad things happen - which I guess
+must have been the intention behind this patch.
 
-Missing break. So it doesn't look like this was tested.
 
->  		case 'h':
->  		default:
->  			help(argv[0]);
-> @@ -448,7 +462,7 @@ int main(int argc, char *argv[])
->  		TEST_ASSERT(vm_guest_mode_params[i].supported,
->  			    "Guest mode ID %d (%s) not supported.",
->  			    i, vm_guest_mode_string(i));
-> -		run_test(i, use_uffd, uffd_delay);
-> +		run_test(i, use_uffd, uffd_delay, guest_memory_bytes);
->  	}
->  
->  	return 0;
-> -- 
-> 2.24.1.735.g03f4e72817-goog
->
+> If SPE has been enabled on a guest and a CPU
+> comes up without SPE, this CPU should fail to boot (same as exposing a
+> feature to userspace).
+
+I'm unclear as how to prevent this. We can set the FTR_STRICT flag on
+the sanitised register - thus tainting the kernel if such a non-SPE CPU
+comes online - thought that doesn't prevent KVM from blowing up. Though
+I don't believe we can prevent a CPU coming up. At the moment this is
+my preferred approach.
+
+Looking at the vcpu_load and related code, I don't see a way of saying
+'don't schedule this VCPU on this CPU' or bailing in any way.
+
+One solution could be to allow scheduling onto non-SPE VCPUs but wrap the
+SPE save/restore code in a macro (much like kvm_arm_spe_v1_ready) that
+reads the non-sanitised feature register. Therefore we don't go bang, but
+we also increase the size of any black-holes in SPE capturing. Though this
+feels like something that will cause grief down the line.
+
+Is there something else that can be done?
 
 Thanks,
-drew
 
+Andrew Murray
+
+> 
+> > 
+> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >  arch/arm64/kvm/hyp/debug-sr.c | 33 ++++++++++++++++-----------------
+> >  include/kvm/arm_spe.h         |  6 ++++++
+> >  2 files changed, 22 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> > index 12429b212a3a..d8d857067e6d 100644
+> > --- a/arch/arm64/kvm/hyp/debug-sr.c
+> > +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> > @@ -86,18 +86,13 @@
+> >  	}
+> >  
+> >  static void __hyp_text
+> > -__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> > +__debug_save_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> >  {
+> >  	u64 reg;
+> >  
+> >  	/* Clear pmscr in case of early return */
+> >  	ctxt->sys_regs[PMSCR_EL1] = 0;
+> >  
+> > -	/* SPE present on this CPU? */
+> > -	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> > -						  ID_AA64DFR0_PMSVER_SHIFT))
+> > -		return;
+> > -
+> >  	/* Yes; is it owned by higher EL? */
+> >  	reg = read_sysreg_s(SYS_PMBIDR_EL1);
+> >  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
+> > @@ -142,7 +137,7 @@ __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> >  }
+> >  
+> >  static void __hyp_text
+> > -__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> > +__debug_restore_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> >  {
+> >  	if (!ctxt->sys_regs[PMSCR_EL1])
+> >  		return;
+> > @@ -210,11 +205,14 @@ void __hyp_text __debug_restore_guest_context(struct kvm_vcpu *vcpu)
+> >  	struct kvm_guest_debug_arch *host_dbg;
+> >  	struct kvm_guest_debug_arch *guest_dbg;
+> >  
+> > +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > +	guest_ctxt = &vcpu->arch.ctxt;
+> > +
+> > +	__debug_restore_spe_context(guest_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> > +
+> >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+> >  		return;
+> >  
+> > -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > -	guest_ctxt = &vcpu->arch.ctxt;
+> >  	host_dbg = &vcpu->arch.host_debug_state.regs;
+> >  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> >  
+> > @@ -232,8 +230,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
+> >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> >  	guest_ctxt = &vcpu->arch.ctxt;
+> >  
+> > -	if (!has_vhe())
+> > -		__debug_restore_spe_nvhe(host_ctxt, false);
+> > +	__debug_restore_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> 
+> So you now do an unconditional save/restore on the exit path for VHE as
+> well? Even if the host isn't using the SPE HW? That's not acceptable
+> as, in most cases, only the host /or/ the guest will use SPE. Here, you
+> put a measurable overhead on each exit.
+> 
+> If the host is not using SPE, then the restore/save should happen in
+> vcpu_load/vcpu_put. Only if the host is using SPE should you do
+> something in the run loop. Of course, this only applies to VHE and
+> non-VHE must switch eagerly.
+> 
+> >  
+> >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+> >  		return;
+> > @@ -249,19 +246,21 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
+> >  
+> >  void __hyp_text __debug_save_host_context(struct kvm_vcpu *vcpu)
+> >  {
+> > -	/*
+> > -	 * Non-VHE: Disable and flush SPE data generation
+> > -	 * VHE: The vcpu can run, but it can't hide.
+> > -	 */
+> >  	struct kvm_cpu_context *host_ctxt;
+> >  
+> >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > -	if (!has_vhe())
+> > -		__debug_save_spe_nvhe(host_ctxt, false);
+> > +	if (cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> > +						 ID_AA64DFR0_PMSVER_SHIFT))
+> > +		__debug_save_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> >  }
+> >  
+> >  void __hyp_text __debug_save_guest_context(struct kvm_vcpu *vcpu)
+> >  {
+> > +	bool kvm_spe_ready = kvm_arm_spe_v1_ready(vcpu);
+> > +
+> > +	/* SPE present on this vCPU? */
+> > +	if (kvm_spe_ready)
+> > +		__debug_save_spe_context(&vcpu->arch.ctxt, kvm_spe_ready);
+> >  }
+> >  
+> >  u32 __hyp_text __kvm_get_mdcr_el2(void)
+> > diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
+> > index 48d118fdb174..30c40b1bc385 100644
+> > --- a/include/kvm/arm_spe.h
+> > +++ b/include/kvm/arm_spe.h
+> > @@ -16,4 +16,10 @@ struct kvm_spe {
+> >  	bool irq_level;
+> >  };
+> >  
+> > +#ifdef CONFIG_KVM_ARM_SPE
+> > +#define kvm_arm_spe_v1_ready(v)		((v)->arch.spe.ready)
+> > +#else
+> > +#define kvm_arm_spe_v1_ready(v)		(false)
+> > +#endif /* CONFIG_KVM_ARM_SPE */
+> > +
+> >  #endif /* __ASM_ARM_KVM_SPE_H */
+> 
+> Thanks,
+> 
+> 	M.
+> -- 
+> Jazz is not dead. It just smells funny...
