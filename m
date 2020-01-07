@@ -2,526 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D307E13304A
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 21:07:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B7B513307D
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 21:16:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728726AbgAGUHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 15:07:19 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:15205 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728358AbgAGUHS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 15:07:18 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e14e4e30001>; Tue, 07 Jan 2020 12:06:59 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 07 Jan 2020 12:07:16 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 07 Jan 2020 12:07:16 -0800
-Received: from [10.40.100.83] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 7 Jan
- 2020 20:07:07 +0000
-Subject: Re: [PATCH v11 Kernel 3/6] vfio iommu: Implementation of ioctl to for
- dirty pages tracking.
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-References: <1576602651-15430-1-git-send-email-kwankhede@nvidia.com>
- <1576602651-15430-4-git-send-email-kwankhede@nvidia.com>
- <20191217151203.342b686a@x1.home>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <ebd08133-e258-9f5e-5c8f-f88d7165cd7a@nvidia.com>
-Date:   Wed, 8 Jan 2020 01:37:03 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
-MIME-Version: 1.0
-In-Reply-To: <20191217151203.342b686a@x1.home>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+        id S1728723AbgAGUQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 15:16:43 -0500
+Received: from mail-bn8nam11on2063.outbound.protection.outlook.com ([40.107.236.63]:43105
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728379AbgAGUQn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 15:16:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CoIsC/cCBZ46AQUkQu1pKarxWQs+3Zl8ClgM8bn/ly5B7CYkR3WFiqz+3cJRwMXmcG0LcGlgTg4au9GQ8Wxniy4JruUqu0wdpmhpDhBhxfaHpOkodlGgda1KTqCr12yMFiMa8gy0CHMjpePsieYf33ZyXqznCWUVBKZyqHs8vWB5Mqlmg4+qg1H94XQeq6cEeQKukJZxUkEWBr+fdWXPqAhKRhtOAxHH71f2kfA+buWFXek9yULLPrHBEhi3VB/uaOvHz4KhcJmKIfnNqWg1MFfYUfNNPzYeT2Woe2B/SZ0IyROQ6N0hl3Dcg4G9Wlt7ownUnXCeo9k6xx+WJoaGeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SKHZ30Cvzabcrsk7Sy8A4LjLrswDhrdcGSXUfMUHsms=;
+ b=Of8y0k56lwYMDBO4Sn7WHtLqrqLOlndCSriaMe4DxilMWdpVXNxibW7VoZiMnYAfyC0d0I3Bqx/ZGFTE5HhnpNkQo3LoJIwpmfIqO97CC4VivoC0lAHosods18Tp/1wNqDyY7OqZuFzsPSo8lclpCuKNyUvRc0f9u2Lubsw4w3Bgc19qf4r8IXeNXxKnS9Wz3Q3O56ABXk5tQqf13ZjucpnwKKwGR5DAoFW9B9EfXE/rf0Ut1jJJlMPAM2843JiGRuLc+P67C03a1UzoARV+zd/vS40hV1cjWS4QiOqrrRP175T1XCnj/69fB+KBcnLarJKrANUIjLPZuvaiKxJVZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SKHZ30Cvzabcrsk7Sy8A4LjLrswDhrdcGSXUfMUHsms=;
+ b=vJ3QKVYMlpRTdsligrsG9W0ij0wMW2gWe1oeWobCBTM+zlVT/SG9gGt7wS2XZZGiBAAINjB0eEFvIbb8NQhj7lYL9kBUZankpcR+JjHGHiIXcMFtqvTu/Di4e/AUs4jaxdqRj+cEttp00tJFFIHlsXEuGX9i6H9GYvua5qAR+NI=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Thomas.Lendacky@amd.com; 
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.71.154) by
+ DM6PR12MB3355.namprd12.prod.outlook.com (20.178.29.90) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2602.13; Tue, 7 Jan 2020 20:16:39 +0000
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::a0cd:463:f444:c270]) by DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::a0cd:463:f444:c270%7]) with mapi id 15.20.2602.016; Tue, 7 Jan 2020
+ 20:16:39 +0000
+Subject: Re: [PATCH v2] KVM: SVM: Override default MMIO mask if memory
+ encryption is enabled
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <d741b3a58769749b7873fea703c027a68b8e2e3d.1577462279.git.thomas.lendacky@amd.com>
+ <20200106224931.GB12879@linux.intel.com>
+ <f5c2e60c-536f-e0cd-98b9-86e6da82e48f@amd.com>
+ <20200106233846.GC12879@linux.intel.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <a4fb7657-59b6-2a3f-1765-037a9a9cd03a@amd.com>
+Date:   Tue, 7 Jan 2020 14:16:37 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+In-Reply-To: <20200106233846.GC12879@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1578427619; bh=IF4NHQPWea6S9lG9Pzp90OE5CkGeqEJ5WiCLBgMiC28=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=hBFm9pUt8R5iKGILOBH0wlzOPBzJU8eyM7+Q5x5k4k4UDm/cr3vk3fhPeZWfuVFXA
-         drF6b3IZ5X6GjPOTnKVm+QFo0dmvqmLSgUsWKOBm5iPAKqtlj/dKqKUG+mfgscwCdf
-         Mz+HKEOuIAqswR5uQzXVYn1zBn6gT5IxyH3tLLkqheFd6q1Kbn8kj/jSCoNarQj5mh
-         V1IOcOIpaoxvCyqOtzZtcUZaFlh/bI0+CEtJnioMRBuRbiYdKzMlEgKgZXqQXoMyuA
-         AZ2+h9OfIUm2WU8GZtqfVsiwfqtSD4GCXyhipU/ncQcX4Cq0JJ9CH8ZwTA0xfazoWd
-         BllJZ7kTsz+QQ==
+X-ClientProxiedBy: SN6PR01CA0006.prod.exchangelabs.com (2603:10b6:805:b6::19)
+ To DM6PR12MB3163.namprd12.prod.outlook.com (2603:10b6:5:15e::26)
+MIME-Version: 1.0
+Received: from [10.236.30.74] (165.204.77.1) by SN6PR01CA0006.prod.exchangelabs.com (2603:10b6:805:b6::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.8 via Frontend Transport; Tue, 7 Jan 2020 20:16:38 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 27609db1-de51-4c75-11ef-08d793ae80ed
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3355:|DM6PR12MB3355:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3355DA22047940119A472C8EEC3F0@DM6PR12MB3355.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 027578BB13
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(136003)(39860400002)(396003)(376002)(346002)(199004)(189003)(81156014)(2906002)(6916009)(5660300002)(16576012)(8936002)(81166006)(316002)(8676002)(86362001)(31696002)(6486002)(2616005)(956004)(36756003)(26005)(186003)(4326008)(53546011)(31686004)(16526019)(66476007)(52116002)(66556008)(54906003)(478600001)(66946007);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3355;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zMpvyS2xRvc1SOGTwolDzeL8T/g4PqcqR1+DvvKyx5ruqPG7WtD+E/I638xW606BmNxub88y0WqIDeGFug6jVutbkbj/+YwkGUBo9V7IrWeb6RlH/1P4bkb5P6dT07LhOa7IAkKhlQF3PQ3K//almIktCaI09C8c7a/+Vj3URrzIb7Vs+dt9Rr+oDSxA5okXF13uk4KjAUMjwhln+iwrk1ITQfvX990XQMUMRUzGWtLfJx2ho5yk1xAWwlv1knR9WzK7KHPfJbBwtm0WqbN8t8WX/pZsl+qAAtOj3i6Mja4cQSmDWBrJTukbjB+1c7FSQ4PmprqM4aX4dXLG/jjmXJgm7Kkv5EUBTpu0Ap5u+6SXoIp2pGo8PWne+O0j4P3Qxi4Zw1d0QfTeb5rpscQAHSkIXa3Rwi1ZRJ2mVb0Au8QE7PbLGqJjdn1qCJPNxPdU
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27609db1-de51-4c75-11ef-08d793ae80ed
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2020 20:16:39.4626
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qO7K0Fry01MG87+r8tSUSn5ZOaZOQBDGyCGzQOaEBepAf4JapITT5UNnhN+HdW6O7L+n7oW+nsxYdMbbut4Ncg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3355
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 12/18/2019 3:42 AM, Alex Williamson wrote:
-> On Tue, 17 Dec 2019 22:40:48 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
->> - Start unpinned pages dirty pages tracking while migration is active and
->>    device is running, i.e. during pre-copy phase.
->> - Stop unpinned pages dirty pages tracking. This is required to stop
->>    unpinned dirty pages tracking if migration failed or cancelled during
->>    pre-copy phase. Unpinned pages tracking is clear.
->> - Get dirty pages bitmap. Stop unpinned dirty pages tracking and clear
->>    unpinned pages information on bitmap read. This ioctl returns bitmap of
->>    dirty pages, its user space application responsibility to copy content
->>    of dirty pages from source to destination during migration.
+On 1/6/20 5:38 PM, Sean Christopherson wrote:
+> On Mon, Jan 06, 2020 at 05:14:04PM -0600, Tom Lendacky wrote:
+>> On 1/6/20 4:49 PM, Sean Christopherson wrote:
+>>> This doesn't handle the case where x86_phys_bits _isn't_ reduced by SME/SEV
+>>> on a future processor, i.e. x86_phys_bits==52.
 >>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   drivers/vfio/vfio_iommu_type1.c | 218 ++++++++++++++++++++++++++++++++++++++--
->>   1 file changed, 209 insertions(+), 9 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 2ada8e6cdb88..215aecb25453 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -70,6 +70,7 @@ struct vfio_iommu {
->>   	unsigned int		dma_avail;
->>   	bool			v2;
->>   	bool			nesting;
->> +	bool			dirty_page_tracking;
->>   };
->>   
->>   struct vfio_domain {
->> @@ -112,6 +113,7 @@ struct vfio_pfn {
->>   	dma_addr_t		iova;		/* Device address */
->>   	unsigned long		pfn;		/* Host pfn */
->>   	atomic_t		ref_count;
->> +	bool			unpinned;
+>> Not sure I follow. If MSR_K8_SYSCFG_MEM_ENCRYPT is set then there will
+>> always be a reduction in physical addressing (so I'm told).
 > 
-> Doesn't this duplicate ref_count == 0?
+> Hmm, I'm going off APM Vol 2, which states, or at least strongly implies,
+> that reducing the PA space is optional.  Section 7.10.2 is especially
+> clear on this:
 > 
+>   In implementations where the physical address size of the processor is
+>   reduced when memory encryption features are enabled, software must
+>   ensure it is executing from addresses where these upper physical address
+>   bits are 0 prior to setting SYSCFG[MemEncryptionModEn].
 
-Yes, actually. Removing unpinned.
+It's probably not likely, but given what is stated, I can modify my patch
+to check for a x86_phys_bits == 52 and skip the call to set the mask, eg:
 
->>   };
->>   
->>   struct vfio_regions {
->> @@ -244,6 +246,32 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
->>   	kfree(vpfn);
->>   }
->>   
->> +static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma, bool warn)
->> +{
->> +	struct rb_node *n = rb_first(&dma->pfn_list);
->> +
->> +	for (; n; n = rb_next(n)) {
->> +		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
->> +
->> +		if (warn)
->> +			WARN_ON_ONCE(vpfn->unpinned);
+	if (msr & MSR_K8_SYSCFG_MEM_ENCRYPT &&
+	    boot_cpu_data.x86_phys_bits < 52) {
+
 > 
-> This option isn't used within this patch, perhaps better to add with
-> its use case, but it seems this presents both a denial of service via
-> kernel tainting and an undocumented feature/bug.  As I interpret its
-> use within the next patch, this generates a warning if the user
-> unmapped the IOVA with dirty pages present, without using the dirty
-> bitmap extension of the unmap call.  Our job is not to babysit the
-> user, if they don't care to look at the dirty bitmap, that's their
-> prerogative.  Drop this warning and the function arg.
-> 
+> But, hopefully the other approach I have in mind actually works, as it's
+> significantly less special-case code and would naturally handle either
+> case, i.e. make this a moot point.
 
-I was trying to extra cautious. Dropping this warning.
-
->> +
->> +		if (vpfn->unpinned)
-> 
-> if (!atomic_read(&vpfn->ref_count))
-> 
-
-Ok.
-
->> +			vfio_remove_from_pfn_list(dma, vpfn);
->> +	}
->> +}
->> +
->> +static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
->> +{
->> +	struct rb_node *n = rb_first(&iommu->dma_list);
->> +
->> +	for (; n; n = rb_next(n)) {
->> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->> +
->> +		vfio_remove_unpinned_from_pfn_list(dma, false);
->> +	}
->> +}
->> +
->>   static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->>   					       unsigned long iova)
->>   {
->> @@ -254,13 +282,17 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->>   	return vpfn;
->>   }
->>   
->> -static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
->> +static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn,
->> +				  bool dirty_tracking)
->>   {
->>   	int ret = 0;
->>   
->>   	if (atomic_dec_and_test(&vpfn->ref_count)) {
->>   		ret = put_pfn(vpfn->pfn, dma->prot);
->> -		vfio_remove_from_pfn_list(dma, vpfn);
->> +		if (dirty_tracking)
->> +			vpfn->unpinned = true;
->> +		else
->> +			vfio_remove_from_pfn_list(dma, vpfn);
-> 
-> This can also simply use ref_count.  BTW, checking the locking, I think
-> ->ref_count is only manipulated under iommu->lock, therefore the atomic
-> ops are probably overkill.
-> 
-
-Yes, I'll create a seperate commit to remove atomic.
-
->>   	}
->>   	return ret;
->>   }
->> @@ -504,7 +536,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
->>   }
->>   
->>   static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
->> -				    bool do_accounting)
->> +				    bool do_accounting, bool dirty_tracking)
->>   {
->>   	int unlocked;
->>   	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
->> @@ -512,7 +544,10 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
->>   	if (!vpfn)
->>   		return 0;
->>   
->> -	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
->> +	if (vpfn->unpinned)
->> +		return 0;
-> 
-> Combine with above, if (!vpfn || !vpfn->ref_count)
-> 
-
-Yes.
-
->> +
->> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
->>   
->>   	if (do_accounting)
->>   		vfio_lock_acct(dma, -unlocked, true);
->> @@ -571,8 +606,12 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>   
->>   		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
->>   		if (vpfn) {
->> -			phys_pfn[i] = vpfn->pfn;
->> -			continue;
->> +			if (vpfn->unpinned)
->> +				vfio_remove_from_pfn_list(dma, vpfn);
-> 
-> This seems inefficient, we have an allocated vpfn at the right places
-> in the list, wouldn't it be better to repin the page?
-> 
-
-vfio_pin_page_external() takes care of pinning and accounting as well.
-
-
->> +			else {
->> +				phys_pfn[i] = vpfn->pfn;
->> +				continue;
->> +			}
->>   		}
->>   
->>   		remote_vaddr = dma->vaddr + iova - dma->iova;
->> @@ -583,7 +622,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>   
->>   		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
->>   		if (ret) {
->> -			vfio_unpin_page_external(dma, iova, do_accounting);
->> +			vfio_unpin_page_external(dma, iova, do_accounting,
->> +						 false);
->>   			goto pin_unwind;
->>   		}
->>   	}
->> @@ -598,7 +638,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>   
->>   		iova = user_pfn[j] << PAGE_SHIFT;
->>   		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
->> -		vfio_unpin_page_external(dma, iova, do_accounting);
->> +		vfio_unpin_page_external(dma, iova, do_accounting, false);
->>   		phys_pfn[j] = 0;
->>   	}
->>   pin_done:
->> @@ -632,7 +672,8 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
->>   		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
->>   		if (!dma)
->>   			goto unpin_exit;
->> -		vfio_unpin_page_external(dma, iova, do_accounting);
->> +		vfio_unpin_page_external(dma, iova, do_accounting,
->> +					 iommu->dirty_page_tracking);
->>   	}
->>   
->>   unpin_exit:
->> @@ -850,6 +891,88 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->>   	return bitmap;
->>   }
->>   
->> +/*
->> + * start_iova is the reference from where bitmaping started. This is called
->> + * from DMA_UNMAP where start_iova can be different than iova
->> + */
->> +
->> +static void vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
->> +				  size_t size, uint64_t pgsize,
->> +				  dma_addr_t start_iova, unsigned long *bitmap)
->> +{
->> +	struct vfio_dma *dma;
->> +	dma_addr_t i = iova;
->> +	unsigned long pgshift = __ffs(pgsize);
->> +
->> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
->> +		/* mark all pages dirty if all pages are pinned and mapped. */
->> +		if (dma->iommu_mapped) {
->> +			dma_addr_t iova_limit;
->> +
->> +			iova_limit = (dma->iova + dma->size) < (iova + size) ?
->> +				     (dma->iova + dma->size) : (iova + size);
-> 
-> min(dma->iova + dma->size, iova + size);
-> 
->> +
->> +			for (; i < iova_limit; i += pgsize) {
->> +				unsigned int start;
->> +
->> +				start = (i - start_iova) >> pgshift;
->> +
->> +				__bitmap_set(bitmap, start, 1);
-> 
-> Why __bitmap_set() rather than bitmap_set()?  Also why not try to take
-> advantage of the number of bits arg?
-> 
-bitmap_set() can be used, I didn't checked about it earlier.
-Yes, we can take advantage of nbits, updating it.
-
-
->> +			}
->> +			if (i >= iova + size)
->> +				return;
-> 
-> This skips the removed unpinned callback at the end of the loop,
-> leaving unnecessarily tracked, unpinned vpfns.
-> 
-
-Right, fixing it.
-
->> +		} else {
->> +			struct rb_node *n = rb_first(&dma->pfn_list);
->> +			bool found = false;
->> +
->> +			for (; n; n = rb_next(n)) {
->> +				struct vfio_pfn *vpfn = rb_entry(n,
->> +							struct vfio_pfn, node);
->> +				if (vpfn->iova >= i) {
-> 
-> This doesn't look right, how does a vpfn with .iova > i necessarily
-> contain i?
-> 
-
-i might not be equal to dma->iova.
-Also iova == i might not be pinned, but there might be pages pinned 
-between i to iova + size. So find a vpfn node whose (vpfn->iova >= i)
-
->> +					found = true;
->> +					break;
->> +				}
->> +			}
->> +
->> +			if (!found) {
->> +				i += dma->size;
->> +				continue;
->> +			}
->> +
->> +			for (; n; n = rb_next(n)) {
->> +				unsigned int start;
->> +				struct vfio_pfn *vpfn = rb_entry(n,
->> +							struct vfio_pfn, node);
->> +
->> +				if (vpfn->iova >= iova + size)
->> +					return;
->> +
->> +				start = (vpfn->iova - start_iova) >> pgshift;
->> +
->> +				__bitmap_set(bitmap, start, 1);
-> 
-> Don't we need to iterate over the vfpn relative to pgsize?  Oh, I
-> see below that pgsize is the minimum user advertised size, which is at
-> least PAGE_SIZE, to maybe not.  Same bitmap_set() question as above
-> though.
-> 
-
-Changing to bitmap_set.
-
->> +
->> +				i = vpfn->iova + pgsize;
->> +			}
->> +		}
->> +		vfio_remove_unpinned_from_pfn_list(dma, false);
->> +	}
->> +}
->> +
->> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
->> +{
->> +	long bsize;
->> +
->> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
->> +		return -EINVAL;
->> +
->> +	bsize = ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
->> +
->> +	if (bitmap_size < bsize)
->> +		return -EINVAL;
->> +
->> +	return bsize;
->> +}
->> +
->>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>   			     struct vfio_iommu_type1_dma_unmap *unmap)
->>   {
->> @@ -2297,6 +2420,83 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->>   
->>   		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->>   			-EFAULT : 0;
->> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
->> +		struct vfio_iommu_type1_dirty_bitmap range;
->> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
->> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
->> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
->> +		int ret;
->> +
->> +		if (!iommu->v2)
->> +			return -EACCES;
->> +
->> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
->> +				    bitmap);
->> +
->> +		if (copy_from_user(&range, (void __user *)arg, minsz))
->> +			return -EFAULT;
->> +
->> +		if (range.argsz < minsz || range.flags & ~mask)
->> +			return -EINVAL;
->> +
-> 
-> flags should be sanitized further, invalid combinations should be
-> rejected.  For example, if a user provides STOP|GET_BITMAP it should
-> either populate the bitmap AND turn off tracking, or error.  It's not
-> acceptable to turn off tracking and silently ignore GET_BITMAP.
-> 
-
-Ok. adding a check such that only one flag should be set at a time is 
-valid.
-
->> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
->> +			iommu->dirty_page_tracking = true;
->> +			return 0;
->> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
->> +			iommu->dirty_page_tracking = false;
->> +
->> +			mutex_lock(&iommu->lock);
->> +			vfio_remove_unpinned_from_dma_list(iommu);
->> +			mutex_unlock(&iommu->lock);
->> +			return 0;
->> +
->> +		} else if (range.flags &
->> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
->> +			uint64_t iommu_pgmask;
->> +			unsigned long pgshift = __ffs(range.pgsize);
->> +			unsigned long *bitmap;
->> +			long bsize;
->> +
->> +			iommu_pgmask =
->> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
->> +
->> +			if (((range.pgsize - 1) & iommu_pgmask) !=
->> +			    (range.pgsize - 1))
->> +				return -EINVAL;
->> +
->> +			if (range.iova & iommu_pgmask)
->> +				return -EINVAL;
->> +			if (!range.size || range.size > SIZE_MAX)
->> +				return -EINVAL;
->> +			if (range.iova + range.size < range.iova)
->> +				return -EINVAL;
->> +
->> +			bsize = verify_bitmap_size(range.size >> pgshift,
->> +						   range.bitmap_size);
->> +			if (bsize < 0)
->> +				return ret;
->> +
->> +			bitmap = kmalloc(bsize, GFP_KERNEL);
-> 
-> I think I remember mentioning previously that we cannot allocate an
-> arbitrary buffer on behalf of the user, it's far too easy for them to
-> kill the kernel that way.  kmalloc is also limited in what it can
-> alloc.  
-
-That's the reason added verify_bitmap_size(), so that size is verified
-
-> Can't we use the user buffer directly or only work on a part of
-> it at a time?
-> 
-
-without copy_from_user(), how?
-
-
->> +			if (!bitmap)
->> +				return -ENOMEM;
->> +
->> +			ret = copy_from_user(bitmap,
->> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
->> +			if (ret)
->> +				goto bitmap_exit;
->> +
->> +			iommu->dirty_page_tracking = false;
-> 
-> a) This is done outside of the mutex and susceptible to races,
-
-moving inside lock
-
-> b) why is this done?
-once bitmap is read, dirty_page_tracking should be stopped. Right?
+I'll hold off on the above and wait for your patch.
 
 Thanks,
-Kirti
+Tom
 
 > 
-> Thanks,
-> Alex
 > 
->> +			mutex_lock(&iommu->lock);
->> +			vfio_iova_dirty_bitmap(iommu, range.iova, range.size,
->> +					     range.pgsize, range.iova, bitmap);
->> +			mutex_unlock(&iommu->lock);
->> +
->> +			ret = copy_to_user((void __user *)range.bitmap, bitmap,
->> +					   range.bitmap_size) ? -EFAULT : 0;
->> +bitmap_exit:
->> +			kfree(bitmap);
->> +			return ret;
->> +		}
->>   	}
->>   
->>   	return -ENOTTY;
+> Entry on SYSCFG:
+> 
+>   3.2.1 System Configuration Register (SYSCFG)
+> 
+>   ...
+> 
+>   MemEncryptionMode. Bit 23.  Setting this bit to 1 enables the SME and
+>   SEV memory encryption features.
+> 
+> The SME entry the above links to says:
+> 
+>   7.10.1 Determining Support for Secure Memory Encryption
+> 
+>   ...
+> 
+>   Additionally, in some implementations, the physical address size of the
+>   processor may be reduced when memory encryption features are enabled, for
+>   example from 48 to 43 bits. In this case the upper physical address bits are
+>   treated as reserved when the feature is enabled except where otherwise
+>   indicated. When memory encryption is supported in an implementation, CPUID
+>   Fn8000_001F[EBX] reports any physical address size reduction present. Bits
+>   reserved in this mode are treated the same as other page table reserved bits,
+>   and will generate a page fault if found to be non-zero when used for address
+>   translation.
+> 
+>   ...
+> 
+>   7.10.2 Enabling Memory Encryption Extensions
+> 
+>   Prior to using SME, memory encryption features must be enabled by setting
+>   SYSCFG MSR bit 23 (MemEncryptionModEn) to 1. In implementations where the
+>   physical address size of the processor is reduced when memory encryption
+>   features are enabled, software must ensure it is executing from addresses where
+>   these upper physical address bits are 0 prior to setting
+>   SYSCFG[MemEncryptionModEn]. Memory encryption is then further controlled via
+>   the page tables.
 > 
