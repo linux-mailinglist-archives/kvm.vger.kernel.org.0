@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7813C132213
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 10:17:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 21FF513224E
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 10:29:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727735AbgAGJQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 04:16:13 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35356 "EHLO mail.kernel.org"
+        id S1727728AbgAGJ3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 04:29:33 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58446 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727680AbgAGJQL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 04:16:11 -0500
+        id S1727616AbgAGJ3c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 04:29:32 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 38B2920656;
-        Tue,  7 Jan 2020 09:16:10 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 173BA2073D;
+        Tue,  7 Jan 2020 09:29:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578388570;
-        bh=hdFiCaeaNP79bTue6oK3n76q0rsZ9EjJ5bhLkJslDM8=;
+        s=default; t=1578389371;
+        bh=EzepXcOh6NNd+CModDYitbngAr5w/T80SpUwJ7cBNS8=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=w0RyRqrDUQlTP1euuzRbIXeNZRqGkpwEvpAwzpKbuY7InKXmxbL20omILRfsrnFEE
-         dmpIx2rlolza0oax2ce89zyFWA/z/y+UOPTguSQ71+j07OjmMHTYj6FxIzEnx7PEMB
-         3ZN7lXAqfL6LFrKu9dIQLSmHfd7BX9aduw+3immQ=
+        b=am+oPwxfbwzq+wL8gwB7ktpHLYqN9T2T165OVDrwWX63EEHla0tcTBmmldG58hkdy
+         fFMZ5jsJ4XJFWqzHD+/S4Zs14ojmHnNkq2kEQu2Oi0+ca0mJv3X1vJ7+2aM+mG+GhH
+         XSTfyBAZZuOS29De993l+MuKeJyXlI1kpycDq5WI=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
         by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1ioky8-0000iX-HV; Tue, 07 Jan 2020 09:16:08 +0000
+        id 1iolB3-0000wX-EC; Tue, 07 Jan 2020 09:29:29 +0000
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Tue, 07 Jan 2020 09:16:08 +0000
+Date:   Tue, 07 Jan 2020 09:29:29 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     Jianyong Wu <jianyong.wu@arm.com>
 Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
@@ -43,11 +43,11 @@ Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Steve.Capper@arm.com, Kaly.Xin@arm.com,
         justin.he@arm.com, nd@arm.com
-Subject: Re: [RFC PATCH v9 6/8] psci: Add hvc call service for ptp_kvm.
-In-Reply-To: <20191210034026.45229-7-jianyong.wu@arm.com>
+Subject: Re: [RFC PATCH v9 7/8] ptp: arm64: Enable ptp_kvm for arm64
+In-Reply-To: <20191210034026.45229-8-jianyong.wu@arm.com>
 References: <20191210034026.45229-1-jianyong.wu@arm.com>
- <20191210034026.45229-7-jianyong.wu@arm.com>
-Message-ID: <7383dc06897bba253f174cd21a19b5c0@kernel.org>
+ <20191210034026.45229-8-jianyong.wu@arm.com>
+Message-ID: <ca162efb3a0de530e119f5237c006515@kernel.org>
 X-Sender: maz@kernel.org
 User-Agent: Roundcube Webmail/1.3.8
 X-SA-Exim-Connect-IP: 51.254.78.96
@@ -60,132 +60,242 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 2019-12-10 03:40, Jianyong Wu wrote:
-> ptp_kvm modules will call hvc to get this service.
-> The service offers real time and counter cycle of host for guest.
+> Currently in arm64 virtualization environment, there is no mechanism to
+> keep time sync between guest and host. Time in guest will drift 
+> compared
+> with host after boot up as they may both use third party time sources
+> to correct their time respectively. The time deviation will be in order
+> of milliseconds but some scenarios ask for higher time precision, like
+> in cloud envirenment, we want all the VMs running in the host aquire 
+> the
+> same level accuracy from host clock.
+> 
+> Use of kvm ptp clock, which choose the host clock source clock as a
+> reference clock to sync time clock between guest and host has been 
+> adopted
+> by x86 which makes the time sync order from milliseconds to 
+> nanoseconds.
+> 
+> This patch enable kvm ptp on arm64 and we get the similar clock drift 
+> as
+> found with x86 with kvm ptp.
+> 
+> Test result comparison between with kvm ptp and without it in arm64 are
+> as follows. This test derived from the result of command 'chronyc
+> sources'. we should take more cure of the last sample column which 
+> shows
+> the offset between the local clock and the source at the last 
+> measurement.
+> 
+> no kvm ptp in guest:
+> MS Name/IP address   Stratum Poll Reach LastRx Last sample
+> ========================================================================
+> ^* dns1.synet.edu.cn      2   6   377    13  +1040us[+1581us] +/-   
+> 21ms
+> ^* dns1.synet.edu.cn      2   6   377    21  +1040us[+1581us] +/-   
+> 21ms
+> ^* dns1.synet.edu.cn      2   6   377    29  +1040us[+1581us] +/-   
+> 21ms
+> ^* dns1.synet.edu.cn      2   6   377    37  +1040us[+1581us] +/-   
+> 21ms
+> ^* dns1.synet.edu.cn      2   6   377    45  +1040us[+1581us] +/-   
+> 21ms
+> ^* dns1.synet.edu.cn      2   6   377    53  +1040us[+1581us] +/-   
+> 21ms
+> ^* dns1.synet.edu.cn      2   6   377    61  +1040us[+1581us] +/-   
+> 21ms
+> ^* dns1.synet.edu.cn      2   6   377     4   -130us[ +796us] +/-   
+> 21ms
+> ^* dns1.synet.edu.cn      2   6   377    12   -130us[ +796us] +/-   
+> 21ms
+> ^* dns1.synet.edu.cn      2   6   377    20   -130us[ +796us] +/-   
+> 21ms
+> 
+> in host:
+> MS Name/IP address   Stratum Poll Reach LastRx Last sample
+> ========================================================================
+> ^* 120.25.115.20          2   7   377    72   -470us[ -603us] +/-   
+> 18ms
+> ^* 120.25.115.20          2   7   377    92   -470us[ -603us] +/-   
+> 18ms
+> ^* 120.25.115.20          2   7   377   112   -470us[ -603us] +/-   
+> 18ms
+> ^* 120.25.115.20          2   7   377     2   +872ns[-6808ns] +/-   
+> 17ms
+> ^* 120.25.115.20          2   7   377    22   +872ns[-6808ns] +/-   
+> 17ms
+> ^* 120.25.115.20          2   7   377    43   +872ns[-6808ns] +/-   
+> 17ms
+> ^* 120.25.115.20          2   7   377    63   +872ns[-6808ns] +/-   
+> 17ms
+> ^* 120.25.115.20          2   7   377    83   +872ns[-6808ns] +/-   
+> 17ms
+> ^* 120.25.115.20          2   7   377   103   +872ns[-6808ns] +/-   
+> 17ms
+> ^* 120.25.115.20          2   7   377   123   +872ns[-6808ns] +/-   
+> 17ms
+> 
+> The dns1.synet.edu.cn is the network reference clock for guest and
+> 120.25.115.20 is the network reference clock for host. we can't get the
+> clock error between guest and host directly, but a roughly estimated 
+> value
+> will be in order of hundreds of us to ms.
+> 
+> with kvm ptp in guest:
+> chrony has been disabled in host to remove the disturb by network 
+> clock.
+> 
+> MS Name/IP address         Stratum Poll Reach LastRx Last sample
+> ========================================================================
+> * PHC0                    0   3   377     8     -7ns[   +1ns] +/-    
+> 3ns
+> * PHC0                    0   3   377     8     +1ns[  +16ns] +/-    
+> 3ns
+> * PHC0                    0   3   377     6     -4ns[   -0ns] +/-    
+> 6ns
+> * PHC0                    0   3   377     6     -8ns[  -12ns] +/-    
+> 5ns
+> * PHC0                    0   3   377     5     +2ns[   +4ns] +/-    
+> 4ns
+> * PHC0                    0   3   377    13     +2ns[   +4ns] +/-    
+> 4ns
+> * PHC0                    0   3   377    12     -4ns[   -6ns] +/-    
+> 4ns
+> * PHC0                    0   3   377    11     -8ns[  -11ns] +/-    
+> 6ns
+> * PHC0                    0   3   377    10    -14ns[  -20ns] +/-    
+> 4ns
+> * PHC0                    0   3   377     8     +4ns[   +5ns] +/-    
+> 4ns
+> 
+> The PHC0 is the ptp clock which choose the host clock as its source
+> clock. So we can be sure to say that the clock error between host and 
+> guest
+> is in order of ns.
 > 
 > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 > ---
->  include/linux/arm-smccc.h | 12 ++++++++++++
->  virt/kvm/arm/psci.c       | 22 ++++++++++++++++++++++
->  2 files changed, 34 insertions(+)
+>  drivers/clocksource/arm_arch_timer.c | 22 ++++++++++++
+>  drivers/ptp/Kconfig                  |  2 +-
+>  drivers/ptp/ptp_kvm_arm64.c          | 53 ++++++++++++++++++++++++++++
+>  3 files changed, 76 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/ptp/ptp_kvm_arm64.c
 > 
-> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-> index 6f82c87308ed..aafb6bac167d 100644
-> --- a/include/linux/arm-smccc.h
-> +++ b/include/linux/arm-smccc.h
-> @@ -94,6 +94,7 @@
-> 
->  /* KVM "vendor specific" services */
->  #define ARM_SMCCC_KVM_FUNC_FEATURES		0
-> +#define ARM_SMCCC_KVM_PTP			1
->  #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
->  #define ARM_SMCCC_KVM_NUM_FUNCS			128
-> 
-> @@ -103,6 +104,17 @@
->  			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
->  			   ARM_SMCCC_KVM_FUNC_FEATURES)
-> 
-> +/*
-> + * This ID used for virtual ptp kvm clock and it will pass second 
-> value
-> + * and nanosecond value of host real time and system counter by vcpu
-> + * register to guest.
-> + */
-> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-> +			   ARM_SMCCC_KVM_PTP)
+> diff --git a/drivers/clocksource/arm_arch_timer.c
+> b/drivers/clocksource/arm_arch_timer.c
+> index 277846decd33..72260b66f02e 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -1636,3 +1636,25 @@ static int __init arch_timer_acpi_init(struct
+> acpi_table_header *table)
+>  }
+>  TIMER_ACPI_DECLARE(arch_timer, ACPI_SIG_GTDT, arch_timer_acpi_init);
+>  #endif
 > +
+> +#if IS_ENABLED(CONFIG_PTP_1588_CLOCK_KVM)
+> +#include <linux/arm-smccc.h>
+> +int kvm_arch_ptp_get_crosststamp(unsigned long *cycle, struct 
+> timespec64 *ts,
+> +			      struct clocksource **cs)
+> +{
+> +	struct arm_smccc_res hvc_res;
+> +	ktime_t ktime_overall;
+> +
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID, &hvc_res);
+> +	if ((long)(hvc_res.a0) < 0)
+> +		return -EOPNOTSUPP;
+> +
+> +	ktime_overall = hvc_res.a0 << 32 | hvc_res.a1;
+> +	*ts = ktime_to_timespec64(ktime_overall);
+> +	*cycle = hvc_res.a2 << 32 | hvc_res.a3;
 
-All of this depends on patches that have never need posted to any ML, 
-and
-just linger in Will's tree. You need to pick them up and post them as 
-part
-of this series so that they can at least be reviewed.
+So why isn't that just a read of the virtual counter, given that what 
+you do
+in the hypervisor seems to be "cntpct - cntvoff"?
 
->  #ifndef __ASSEMBLY__
-> 
->  #include <linux/linkage.h>
-> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-> index 0debf49bf259..682d892d6717 100644
-> --- a/virt/kvm/arm/psci.c
-> +++ b/virt/kvm/arm/psci.c
-> @@ -9,6 +9,7 @@
->  #include <linux/kvm_host.h>
->  #include <linux/uaccess.h>
->  #include <linux/wait.h>
-> +#include <linux/clocksource_ids.h>
-> 
->  #include <asm/cputype.h>
->  #include <asm/kvm_emulate.h>
-> @@ -389,6 +390,8 @@ static int kvm_psci_call(struct kvm_vcpu *vcpu)
-> 
->  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  {
-> +	struct system_time_snapshot systime_snapshot;
-> +	u64 cycles;
->  	u32 func_id = smccc_get_function(vcpu);
->  	u32 val[4] = {};
->  	u32 option;
-> @@ -431,6 +434,25 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
->  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
->  		break;
-> +	/*
-> +	 * This will used for virtual ptp kvm clock. three
-> +	 * values will be passed back.
-> +	 * reg0 stores high 32-bit host ktime;
-> +	 * reg1 stores low 32-bit host ktime;
-> +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
-> +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
+What am I missing here?
 
-That's either two or four values, and not three as you claim above.
+> +	*cs = &clocksource_counter;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_arch_ptp_get_crosststamp);
+> +#endif
+> diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
+> index 9b8fee5178e8..3c31ff8eb05f 100644
+> --- a/drivers/ptp/Kconfig
+> +++ b/drivers/ptp/Kconfig
+> @@ -110,7 +110,7 @@ config PTP_1588_CLOCK_PCH
+>  config PTP_1588_CLOCK_KVM
+>  	tristate "KVM virtual PTP clock"
+>  	depends on PTP_1588_CLOCK
+> -	depends on KVM_GUEST && X86
+> +	depends on KVM_GUEST && X86 || ARM64 && ARM_ARCH_TIMER
+>  	default y
+>  	help
+>  	  This driver adds support for using kvm infrastructure as a PTP
+> diff --git a/drivers/ptp/ptp_kvm_arm64.c b/drivers/ptp/ptp_kvm_arm64.c
+> new file mode 100644
+> index 000000000000..f3f957117865
+> --- /dev/null
+> +++ b/drivers/ptp/ptp_kvm_arm64.c
+> @@ -0,0 +1,53 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + *  Virtual PTP 1588 clock for use with KVM guests
+> + *  Copyright (C) 2019 ARM Ltd.
+> + *  All Rights Reserved
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/err.h>
+> +#include <asm/hypervisor.h>
+> +#include <linux/module.h>
+> +#include <linux/psci.h>
+> +#include <linux/arm-smccc.h>
+> +#include <linux/timecounter.h>
+> +#include <linux/sched/clock.h>
+> +#include <asm/arch_timer.h>
+> +
+> +int kvm_arch_ptp_init(void)
+> +{
+> +	struct arm_smccc_res hvc_res;
+> +
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+> +			     &hvc_res);
+> +	if ((long)(hvc_res.a0) < 0)
+> +		return -EOPNOTSUPP;
+> +
+> +	return 0;
+> +}
+> +
+> +int kvm_arch_ptp_get_clock_generic(struct timespec64 *ts,
+> +				   struct arm_smccc_res *hvc_res)
+> +{
+> +	ktime_t ktime_overall;
+> +
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+> +				  hvc_res);
+> +	if ((long)(hvc_res->a0) < 0)
+> +		return -EOPNOTSUPP;
+> +
+> +	ktime_overall = hvc_res->a0 << 32 | hvc_res->a1;
+> +	*ts = ktime_to_timespec64(ktime_overall);
+> +
+> +	return 0;
+> +}
+> +
+> +int kvm_arch_ptp_get_clock(struct timespec64 *ts)
+> +{
+> +	struct arm_smccc_res hvc_res;
+> +
+> +	kvm_arch_ptp_get_clock_generic(ts, &hvc_res);
+> +
+> +	return 0;
+> +}
 
-Also, I fail to understand the meaning of the host cycle vs cntvoff
-comparison. This is something that guest can perform on its own
-(it has access to both physical and virtual timers, and can compute
-cntvoff without intervention of the hypervisor).
-
-Finally, how does it work with nested virt, where cntvoff is for the
-the vEL2 guest?
-
-> +	 */
-> +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-> +		ktime_get_snapshot(&systime_snapshot);
-> +		if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
-> +			return kvm_psci_call(vcpu);
-
-What does this mean? Calling PSCI because you've failed to identify
-the clock source? What result do you expect from this? Hint: this
-isn't a PSCI call.
-
-Cosmetic comments below:
-
-> +		val[0] = systime_snapshot.real >> 32;
-
-val[0] = upper_32_bits(systime_snapshot.real);
-
-> +		val[1] = systime_snapshot.real << 32 >> 32;
-
-val[1] = lower_32_bits(systime_snapshot.real);
-
-> +		cycles = systime_snapshot.cycles -
-> +			 vcpu_vtimer(vcpu)->cntvoff;
-
-On a single line please.
-
-> +		val[2] = cycles >> 32;
-> +		val[3] = cycles << 32 >> 32;
-
-Same as above.
-
-> +		break;
->  	default:
->  		return kvm_psci_call(vcpu);
->  	}
-
-Thanks,
+I also wonder why this is all arm64 specific, while everything
+should also work just fine on 32bit.
 
          M.
 -- 
