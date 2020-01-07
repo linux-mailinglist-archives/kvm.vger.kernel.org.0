@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 02186132524
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 12:48:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 020AC132553
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 12:55:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727968AbgAGLsB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 06:48:01 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29870 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727806AbgAGLsA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jan 2020 06:48:00 -0500
+        id S1728031AbgAGLzc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 06:55:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33070 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726690AbgAGLzc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 06:55:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578397678;
+        s=mimecast20190719; t=1578398129;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ajwwg1tTuaqvf2+iTZv4F7nVRs4fx4vlQX7SEEZvm5I=;
-        b=BDLtJJXCRpN+uaiecjgeAXxHyNHqkJ8fg4A55zbPAEj4EbshTsdFBUbwg5jpNwc+0BSUDF
-        FiLyo933h6kC36fGXkeqlmlBrFrfowuJ7m2mq/i3BI4BkeLF0ql1Vk+NFiAOZ31MDLuy6+
-        PZF9yixCYvXcbY28+OYi+B4YsS3Grq8=
+        bh=KKDZj81sAccgrzkhgIj794ifqolNRhLOvA0CIx37wWs=;
+        b=WFJcxeTLfbM3CgWgC55v3gvcfSIwpc/qCDiuBzQbAbe0VoBdCJpWs1y88gC1nPs/2zOftu
+        8VweNe97R7CRNHuR/Zc33qXPuDDGKBnQ9usdm4TS+dKXobofWav+/FdKrG2aun5fIX0aje
+        onRKeSek6TMdtTu07bzLH4JP3qXlfp0=
 Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
  [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-30gIlvURMX6oHtWyNuyvAQ-1; Tue, 07 Jan 2020 06:47:56 -0500
-X-MC-Unique: 30gIlvURMX6oHtWyNuyvAQ-1
-Received: by mail-qt1-f199.google.com with SMTP id e1so33287162qto.5
-        for <kvm@vger.kernel.org>; Tue, 07 Jan 2020 03:47:56 -0800 (PST)
+ us-mta-234-R66hIVf4NeSdBgPqkc7T8Q-1; Tue, 07 Jan 2020 06:55:28 -0500
+X-MC-Unique: R66hIVf4NeSdBgPqkc7T8Q-1
+Received: by mail-qt1-f199.google.com with SMTP id t4so36356480qtd.3
+        for <kvm@vger.kernel.org>; Tue, 07 Jan 2020 03:55:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=Ajwwg1tTuaqvf2+iTZv4F7nVRs4fx4vlQX7SEEZvm5I=;
-        b=RItdvWpeTa0XVr2UV9GDrDo7k1nubwzhM1SH88G8druU+UQnohIR/VAtMmt8wMw7QV
-         VA8SYdmSK5P1THX0THtPUC6uxb0z2/kycEanF1mW7PemaiIWnR2/IiJ4xRBIJcrYfa21
-         dA0WkHkNxiPdV2QoJ0MuUFJpc2HXJnL2oJV32AuIQGx0GeX93tg4fAH+pYf5eVsY01Hz
-         +479+39KH+JDKwm2nZi+P9umBVZ9AafYXQGgLltLCbzMlJ6uIvH/xVQBbZglOQXxuAVq
-         NiBYFOGkLOxrK7Xl/SLQ6iqh5IATcVB1SNTkNXDzNK/TfMguv5vp0m1LGO6AkcqjWFQg
-         JC1w==
-X-Gm-Message-State: APjAAAUqUmZoIgqpH48ceZJ3NG4ZmrH48gwE7f4Jd5TwiuDsjGL9EoS3
-        TTcU9nC8dS/GEfeG/2K9EfmcIRVlfgi1+BDqur88D1lQSuHkcz6Bs2fDjbpvk2BhCJuBTPYeiWl
-        lGpx/XMvm0sXD
-X-Received: by 2002:a05:620a:548:: with SMTP id o8mr89001521qko.490.1578397676016;
-        Tue, 07 Jan 2020 03:47:56 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwPdW3bN5Qrk8jx6DNFsiQ6HbJh5wOHP1je7PYJ8IDXlHg3qat/Sw8UC73f0mXWvj1+oj563Q==
-X-Received: by 2002:a05:620a:548:: with SMTP id o8mr89001491qko.490.1578397675714;
-        Tue, 07 Jan 2020 03:47:55 -0800 (PST)
+        bh=KKDZj81sAccgrzkhgIj794ifqolNRhLOvA0CIx37wWs=;
+        b=SGfz/fNwFx3Zz00vPrsnrzkxIS1OdaFNMZHcKzVjUkeKi4UewxBQofK1QCajtzdj4N
+         sWOr1+2uR7w8t1I7gXxiv5X8l92nVGJt9aJMLHWgz3tDBwHMhXGegixbftMnJybBXUz2
+         tHcknCeJw1+QXCiGHy8/y+Cq55Wbkp7UoCzXjpI2Xy2Z3dn3i1pXJu2ClbYHR7q+u5In
+         qhWjY+R2SNHFT8hKrvfQry6MCP7mtLkFzA2vFOmmnvOJPfrhxse5UJdPrGMXqMXdynbe
+         XZ/V9BFGDImLFHqRS+G/nps6S7Q2z7uHywyJAvkJPjxSOt2KBU0tuvT9zCa4zzyszOLe
+         rDBA==
+X-Gm-Message-State: APjAAAXxRusib8B5rqNeVV8T/oYe5gqS63U9JEGcA4XO5MEdTpGAmyp5
+        FOQz9QukJBQR8isane1h/JltSfPK+QVvmMXw+WDD8F/MvOAVVKcvMt8Gg/2pnV59EccOydCsWUF
+        pMzEV6Q+rUYnk
+X-Received: by 2002:a37:a642:: with SMTP id p63mr80587785qke.85.1578398127873;
+        Tue, 07 Jan 2020 03:55:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyq1n8OiAxkRvySBU4BNoH32+bCXpIgv5dDJl00BVFh2v1+ue0mG4WwIqiHHC8FA0mwU5qoug==
+X-Received: by 2002:a37:a642:: with SMTP id p63mr80587764qke.85.1578398127536;
+        Tue, 07 Jan 2020 03:55:27 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
-        by smtp.gmail.com with ESMTPSA id f19sm22090879qkk.69.2020.01.07.03.47.51
+        by smtp.gmail.com with ESMTPSA id d71sm22259619qkg.4.2020.01.07.03.55.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2020 03:47:54 -0800 (PST)
-Date:   Tue, 7 Jan 2020 06:47:49 -0500
+        Tue, 07 Jan 2020 03:55:26 -0800 (PST)
+Date:   Tue, 7 Jan 2020 06:55:22 -0500
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Christian Borntraeger <borntraeger@de.ibm.com>
 Cc:     "virtualization@lists.linux-foundation.org" 
@@ -63,7 +63,7 @@ Cc:     "virtualization@lists.linux-foundation.org"
         Halil Pasic <pasic@linux.ibm.com>
 Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
  crashes in KVM guests after reboot
-Message-ID: <20200107064113-mutt-send-email-mst@kernel.org>
+Message-ID: <20200107065434-mutt-send-email-mst@kernel.org>
 References: <c022e1d6-0d57-ae07-5e6b-8e40d3b01f4b@de.ibm.com>
  <20191218100926-mutt-send-email-mst@kernel.org>
  <2ffdbd95-e375-a627-55a1-6990b0a0e37a@de.ibm.com>
@@ -147,10 +147,7 @@ On Tue, Jan 07, 2020 at 12:34:50PM +0100, Christian Borntraeger wrote:
 >       |        i
 > 
 > I changed that to i
-
-Hmm no that's wrong I think. Sorry about all the errors. Let me push a
-fixed v3.
-
+> 
 > 
 > The last step then gave me  (on commit 50297a8480b439efc5f3f23088cb2d90b799acef vhost: use batched version by default)
 > net enc1: Unexpected TXQ (0) queue failure: -5
@@ -171,5 +168,9 @@ fixed v3.
 > git bisect bad 1414d7ee3d10d2ec2bc4ee652d1d90ec91da1c79
 > 
 > 
-> 
+
+I pushed batched-v3 - same head but bisect should work now.
+
+-- 
+MST
 
