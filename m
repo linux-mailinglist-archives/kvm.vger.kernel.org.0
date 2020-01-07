@@ -2,161 +2,461 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B82841325E8
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 13:17:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F4B81325EE
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 13:20:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727896AbgAGMQ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 07:16:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12036 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727177AbgAGMQ6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jan 2020 07:16:58 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 007CC335078573
-        for <kvm@vger.kernel.org>; Tue, 7 Jan 2020 07:16:57 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xb92n51v6-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 07 Jan 2020 07:16:57 -0500
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 7 Jan 2020 12:16:55 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 7 Jan 2020 12:16:51 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 007CGoXJ37748818
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Jan 2020 12:16:50 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B48E54C059;
-        Tue,  7 Jan 2020 12:16:50 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 70E184C052;
-        Tue,  7 Jan 2020 12:16:50 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.119])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Jan 2020 12:16:50 +0000 (GMT)
-Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
- crashes in KVM guests after reboot
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Halil Pasic <pasic@linux.ibm.com>
-References: <c022e1d6-0d57-ae07-5e6b-8e40d3b01f4b@de.ibm.com>
- <20191218100926-mutt-send-email-mst@kernel.org>
- <2ffdbd95-e375-a627-55a1-6990b0a0e37a@de.ibm.com>
- <20200106054041-mutt-send-email-mst@kernel.org>
- <08ae8d28-3d8c-04e8-bdeb-0117d06c6dc7@de.ibm.com>
- <20200107042401-mutt-send-email-mst@kernel.org>
- <c6795e53-d12c-0709-c2e9-e35d9af1f693@de.ibm.com>
- <20200107065434-mutt-send-email-mst@kernel.org>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 7 Jan 2020 13:16:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1727958AbgAGMUI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 07:20:08 -0500
+Received: from foss.arm.com ([217.140.110.172]:56938 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727177AbgAGMUH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 07:20:07 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB08331B;
+        Tue,  7 Jan 2020 04:20:06 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E2893F534;
+        Tue,  7 Jan 2020 04:20:05 -0800 (PST)
+Date:   Tue, 7 Jan 2020 12:19:21 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org, drjones@redhat.com,
+        andrew.murray@arm.com, peter.maydell@linaro.org,
+        alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH 05/10] arm: pmu: Basic event counter
+ Tests
+Message-ID: <20200107121921.07bbee41@donnerap.cambridge.arm.com>
+In-Reply-To: <20191216204757.4020-6-eric.auger@redhat.com>
+References: <20191216204757.4020-1-eric.auger@redhat.com>
+        <20191216204757.4020-6-eric.auger@redhat.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200107065434-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20010712-0028-0000-0000-000003CEE699
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20010712-0029-0000-0000-00002492F62E
-Message-Id: <fe6e7e90-3004-eb7a-9ed8-b53a7667959f@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2020-01-07_03:2020-01-06,2020-01-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- lowpriorityscore=0 spamscore=0 phishscore=0 priorityscore=1501
- impostorscore=0 bulkscore=0 malwarescore=0 mlxlogscore=989 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001070101
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.01.20 12:55, Michael S. Tsirkin wrote:
+On Mon, 16 Dec 2019 21:47:52 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
+Hi Eric,
+
+thanks a lot for your work on these elaborate tests! I have some PMU test extensions as well, but they are nowhere as sophisticated as yours!
+
+Just ran this on my ThunderX2 desktop (4.15.0-65-generic #74-Ubuntu kernel, QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.21)), and it reported the following fails:
+INFO: pmu: basic-event-count: counter #0 is 0x207e (CPU_CYCLES)
+INFO: pmu: basic-event-count: counter #1 is 0xc89 (INST_RETIRED)
+INFO: pmu: basic-event-count: overflow reg = 0x0
+FAIL: pmu: basic-event-count: check overflow happened on #0 only
+....
+INFO: PMU version: 4
+INFO: Implements 6 event counters
+INFO: pmu: mem-access: counter #0 is 1297 (MEM_ACCESS)
+INFO: pmu: mem-access: counter #1 is 1287 (MEM_ACCESS)
+FAIL: pmu: mem-access: Ran 20 mem accesses
+FAIL: pmu: mem-access: Ran 20 mem accesses with expected overflows on both counters
+INFO: pmu: mem-access: cnt#0 = 1353 cnt#1=1259 overflow=0x0
+
+Do you know about this? Is this due to kernel bugs? Because Ubuntu cleverly chose an EOL kernel for their stable distro :-P
+Will try to have a look and repeat on a Juno.
+
+Comments inline ....
+
+> Adds the following tests:
+> - event-counter-config: test event counter configuration
+> - basic-event-count:
+>   - programs counters #0 and #1 to count 2 required events
+>   (resp. CPU_CYCLES and INST_RETIRED). Counter #0 is preset
+>   to a value close enough to the 32b
+>   overflow limit so that we check the overflow bit is set
+>   after the execution of the asm loop.
+> - mem-access: counts MEM_ACCESS event on counters #0 and #1
+>   with and without 32-bit overflow.
 > 
-> I pushed batched-v3 - same head but bisect should work now.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arm/pmu.c         | 261 ++++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg |  18 ++++
+>  2 files changed, 279 insertions(+)
 > 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index d88ef22..139dae3 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -18,9 +18,15 @@
+>  #include "asm/barrier.h"
+>  #include "asm/sysreg.h"
+>  #include "asm/processor.h"
+> +#include <bitops.h>
+> +#include <asm/gic.h>
+>  
+>  #define PMU_PMCR_E         (1 << 0)
+> +#define PMU_PMCR_P         (1 << 1)
+>  #define PMU_PMCR_C         (1 << 2)
+> +#define PMU_PMCR_D         (1 << 3)
+> +#define PMU_PMCR_X         (1 << 4)
+> +#define PMU_PMCR_DP        (1 << 5)
+>  #define PMU_PMCR_LC        (1 << 6)
+>  #define PMU_PMCR_N_SHIFT   11
+>  #define PMU_PMCR_N_MASK    0x1f
+> @@ -104,6 +110,9 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  
+>  /* event counter tests only implemented for aarch64 */
+>  static void test_event_introspection(void) {}
+> +static void test_event_counter_config(void) {}
+> +static void test_basic_event_count(void) {}
+> +static void test_mem_access(void) {}
+>  
+>  #elif defined(__aarch64__)
+>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+> @@ -145,6 +154,32 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  }
+>  
+>  #define PMCEID1_EL0 sys_reg(11, 3, 9, 12, 7)
+> +#define PMCNTENSET_EL0 sys_reg(11, 3, 9, 12, 1)
+> +#define PMCNTENCLR_EL0 sys_reg(11, 3, 9, 12, 2)
 
-With 
-commit 38ced0208491103b50f1056f0d1c8f28e2e13d08 (HEAD)
-Author:     Michael S. Tsirkin <mst@redhat.com>
-AuthorDate: Wed Dec 11 12:19:26 2019 -0500
-Commit:     Michael S. Tsirkin <mst@redhat.com>
-CommitDate: Tue Jan 7 06:52:42 2020 -0500
+op0 (the first argument) is only two bits, so it should read "3" instead of "11" here. That's already a bug in the existing PMCEID1_EL0 definition. We get away with it because the macro masks with 3, but it should be still written correctly here. Not sure where the "11" actually comes from.
 
-    vhost: use batched version by default
+> +
+> +#define PMEVTYPER_EXCLUDE_EL1 (1 << 31)
+> +#define PMEVTYPER_EXCLUDE_EL0 (1 << 30)
+> +
+> +#define regn_el0(__reg, __n) __reg ## __n  ## _el0
+> +#define write_regn(__reg, __n, __val) \
+> +	write_sysreg((__val), __reg ## __n ## _el0)
+> +
+> +#define read_regn(__reg, __n) \
+> +	read_sysreg(__reg ## __n ## _el0)
+> +
+> +#define print_pmevtyper(__s, __n) do { \
+> +	uint32_t val; \
+> +	val = read_regn(pmevtyper, __n);\
+> +	report_info("%s pmevtyper%d=0x%x, eventcount=0x%x (p=%ld, u=%ld nsk=%ld, nsu=%ld, nsh=%ld m=%ld, mt=%ld)", \
+> +			(__s), (__n), val, val & 0xFFFF,  \
+> +			(BIT_MASK(31) & val) >> 31, \
+> +			(BIT_MASK(30) & val) >> 30, \
+> +			(BIT_MASK(29) & val) >> 29, \
+> +			(BIT_MASK(28) & val) >> 28, \
+> +			(BIT_MASK(27) & val) >> 27, \
+> +			(BIT_MASK(26) & val) >> 26, \
+> +			(BIT_MASK(25) & val) >> 25); \
 
+Just a nit, but later versions of the ARMv8 ARM list bit 24 as "SH", for filtering Secure EL2 events. For the sake of completeness you could add this as well, since we list the EL3 filter bit as well.
 
-I have exactly one successful ping and then the network inside the guest is broken (no packet
-anymore).
+> +	} while (0)
+>  
+>  static bool is_event_supported(uint32_t n, bool warn)
+>  {
+> @@ -207,6 +242,223 @@ static void test_event_introspection(void)
+>  	report(required_events, "Check required events are implemented");
+>  }
+>  
+> +static inline void mem_access_loop(void *addr, int loop, uint32_t pmcr)
 
-So you could consider this commit broken (but in a different way and also without any
-guest reboot necessary).
+Do we really need the "inline" here? If you rely on this being inlined, we need something stronger, I believe (because inline itself is just a hint).
 
+And can you please add a comment about what this code is supposed to do (because that's much harder to derive in assembly)? And why it needs to be in assembly?
 
-bisect log:
-git bisect start
-# bad: [d2f6175f52062ee51ee69754a6925608213475d2] vhost: use vhost_desc instead of vhost_log
-git bisect bad d2f6175f52062ee51ee69754a6925608213475d2
-# good: [d1281e3a562ec6a08f944a876481dd043ba739b9] virtio-blk: remove VIRTIO_BLK_F_SCSI support
-git bisect good d1281e3a562ec6a08f944a876481dd043ba739b9
-# good: [fac7c0f46996e32d996f5c46121df24a6b95ec3b] vhost: option to fetch descriptors through an independent struct
-git bisect good fac7c0f46996e32d996f5c46121df24a6b95ec3b
-# bad: [539eb9d738f048cd7be61f404e8f9c7d9d2ff3cc] vhost: batching fetches
-git bisect bad 539eb9d738f048cd7be61f404e8f9c7d9d2ff3cc
+> +{
+> +asm volatile(
+> +	"       msr     pmcr_el0, %[pmcr]\n"
+> +	"       isb\n"
+> +	"       mov     x10, %[loop]\n"
+
+Given that %[loop] is just a register, do we need to use x10 at all?
+
+> +	"1:     sub     x10, x10, #1\n"
+> +	"       mov x8, %[addr]\n"
+
+Are you doing this on purpose inside the loop? And do you actually need to move it to a new register anyway? Why not just use %[addr] directly instead of x8?
+
+> +	"       ldr x9, [x8]\n"
+
+I think you could declare some "asm" variable to avoid explicitly specifying a numbered register.
+
+> +	"       cmp     x10, #0x0\n"
+> +	"       b.gt    1b\n"
+
+I think "cbnz" (Compare and Branch on Nonzero) can replace those two instructions.
+
+> +	"       msr     pmcr_el0, xzr\n"
+> +	"       isb\n"
+> +	:
+> +	: [addr] "r" (addr), [pmcr] "r" (pmcr), [loop] "r" (loop)
+> +	: );
+
+Don't you need to tell the compiler that you clobber x8 - x10?
+
+> +}
+> +
+> +
+> +static void pmu_reset(void)
+> +{
+> +	/* reset all counters, counting disabled at PMCR level*/
+> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
+> +	/* Disable all counters */
+> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
+> +	/* clear overflow reg */
+> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
+> +	/* disable overflow interrupts on all counters */
+> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
+> +	isb();
+> +}
+> +
+> +static void test_event_counter_config(void)
+> +{
+> +	int i;
+> +
+> +	if (!pmu.nb_implemented_counters) {
+> +		report_skip("No event counter, skip ...");
+> +		return;
+> +	}
+> +
+> +	pmu_reset();
+> +
+> +	/*
+> +	 * Test setting through PMESELR/PMXEVTYPER and PMEVTYPERn read,
+> +	 * select counter 0
+> +	 */
+> +	write_sysreg(1, PMSELR_EL0);
+> +	/* program this counter to count unsupported event */
+> +	write_sysreg(0xEA, PMXEVTYPER_EL0);
+> +	write_sysreg(0xdeadbeef, PMXEVCNTR_EL0);
+> +	report((read_regn(pmevtyper, 1) & 0xFFF) == 0xEA,
+> +		"PMESELR/PMXEVTYPER/PMEVTYPERn");
+> +	report((read_regn(pmevcntr, 1) == 0xdeadbeef),
+> +		"PMESELR/PMXEVCNTR/PMEVCNTRn");
+> +
+> +	/* try configure an unsupported event within the range [0x0, 0x3F] */
+> +	for (i = 0; i <= 0x3F; i++) {
+> +		if (!is_event_supported(i, false))
+> +			goto test_unsupported;
+> +	}
+> +	report_skip("pmevtyper: all events within [0x0, 0x3F] are supported");
+
+Doesn't report_skip just *mark* it as SKIP, but then proceeds anyway? So you would need to return here?
+
+And I wonder if it would be nicer to use a break, then check for i being 0x40, instead of using goto.
+
+> +
+> +test_unsupported:
+> +	/* select counter 0 */
+> +	write_sysreg(0, PMSELR_EL0);
+> +	/* program this counter to count unsupported event */
+> +	write_sysreg(i, PMXEVCNTR_EL0);
+> +	/* read the counter value */
+> +	read_sysreg(PMXEVCNTR_EL0);
+> +	report(read_sysreg(PMXEVCNTR_EL0) == i,
+> +		"read of a counter programmed with unsupported event");
+> +
+> +}
+> +
+> +static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
+> +{
+> +	int i;
+> +
+> +	if (pmu.nb_implemented_counters < nb_events) {
+> +		report_skip("Skip test as number of counters is too small (%d)",
+> +			    pmu.nb_implemented_counters);
+> +		return false;
+> +	}
+> +
+> +	for (i = 0; i < nb_events; i++) {
+> +		if (!is_event_supported(events[i], false)) {
+> +			report_skip("Skip test as event %d is not supported",
+> +				    events[i]);
+> +			return false;
+> +		}
+> +	}
+> +	return true;
+> +}
+> +
+> +static void test_basic_event_count(void)
+> +{
+> +	uint32_t implemented_counter_mask, non_implemented_counter_mask;
+> +	uint32_t counter_mask;
+> +	uint32_t events[] = {
+> +		0x11,	/* CPU_CYCLES */
+> +		0x8,	/* INST_RETIRED */
+> +	};
+> +
+> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> +		return;
+> +
+> +	implemented_counter_mask = (1 << pmu.nb_implemented_counters) - 1;
+> +	non_implemented_counter_mask = ~((1 << 31) | implemented_counter_mask);
+
+I might be paranoid, but I think it's good practise to use "1U << ...", to avoid signed shifts. Or use the BIT() macro.
+
+> +	counter_mask = implemented_counter_mask | non_implemented_counter_mask;
+> +
+> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
+> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+> +
+> +	/* disable all counters */
+> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
+> +	report(!read_sysreg_s(PMCNTENCLR_EL0) && !read_sysreg_s(PMCNTENSET_EL0),
+> +		"pmcntenclr: disable all counters");
+> +
+> +	/*
+> +	 * clear cycle and all event counters and allow counter enablement
+> +	 * through PMCNTENSET. LC is RES1.
+> +	 */
+> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
+> +	isb();
+> +	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
+> +
+> +	/* Preset counter #0 to 0xFFFFFFF0 to trigger an overflow interrupt */
+> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
+> +	report(read_regn(pmevcntr, 0) == 0xFFFFFFF0,
+> +		"counter #0 preset to 0xFFFFFFF0");
+> +	report(!read_regn(pmevcntr, 1), "counter #1 is 0");
+> +
+> +	/*
+> +	 * Enable all implemented counters and also attempt to enable
+> +	 * not supported counters. Counting still is disabled by !PMCR.E
+> +	 */
+> +	write_sysreg_s(counter_mask, PMCNTENSET_EL0);
+> +
+> +	/* check only those implemented are enabled */
+> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
+> +		(read_sysreg_s(PMCNTENSET_EL0) == implemented_counter_mask),
+> +		"pmcntenset: enabled implemented_counters");
+> +
+> +	/* Disable all counters but counters #0 and #1 */
+> +	write_sysreg_s(~0x3, PMCNTENCLR_EL0);
+> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
+> +		(read_sysreg_s(PMCNTENSET_EL0) == 0x3),
+> +		"pmcntenset: just enabled #0 and #1");
+> +
+> +	/* clear overflow register */
+> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
+> +	report(!read_sysreg(pmovsclr_el0), "check overflow reg is 0");
+> +
+> +	/* disable overflow interrupts on all counters*/
+> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
+> +	report(!read_sysreg(pmintenclr_el1),
+> +		"pmintenclr_el1=0, all interrupts disabled");
+> +
+> +	/* enable overflow interrupts on all event counters */
+> +	write_sysreg(implemented_counter_mask | non_implemented_counter_mask,
+> +		     pmintenset_el1);
+> +	report(read_sysreg(pmintenset_el1) == implemented_counter_mask,
+> +		"overflow interrupts enabled on all implemented counters");
+> +
+> +	/* Set PMCR.E, execute asm code and unset PMCR.E */
+> +	precise_instrs_loop(20, pmu.pmcr_ro | PMU_PMCR_E);
+> +
+> +	report_info("counter #0 is 0x%lx (CPU_CYCLES)",
+> +		    read_regn(pmevcntr, 0));
+> +	report_info("counter #1 is 0x%lx (INST_RETIRED)",
+> +		    read_regn(pmevcntr, 1));
+> +
+> +	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+> +	report(read_sysreg(pmovsclr_el0) & 0x1,
+> +		"check overflow happened on #0 only");
+> +}
+> +
+> +static void test_mem_access(void)
+> +{
+> +	void *addr = malloc(PAGE_SIZE);
+> +	uint32_t events[] = {
+> +		0x13,   /* MEM_ACCESS */
+> +		0x13,   /* MEM_ACCESS */
+> +	};
+> +
+> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> +		return;
+> +
+> +	pmu_reset();
+> +
+> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
+> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
+> +	isb();
+> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 0));
+> +	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 1));
+> +	/* We may not measure exactly 20 mem access. Depends on the platform */
+
+Are you thinking about speculative accesses here? Could you name this explicitly? "Platform" suggests it's something in the SoC or the board, but I believe this is a pure core choice.
+
+> +	report((read_regn(pmevcntr, 0) == read_regn(pmevcntr, 1)) &&
+> +	       (read_regn(pmevcntr, 0) >= 20) && !read_sysreg(pmovsclr_el0),
+> +	       "Ran 20 mem accesses");
+> +
+> +	pmu_reset();
+> +
+> +	write_regn(pmevcntr, 0, 0xFFFFFFFA);
+> +	write_regn(pmevcntr, 1, 0xFFFFFFF0);
+> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
+> +	isb();
+> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	report(read_sysreg(pmovsclr_el0) == 0x3,
+> +	       "Ran 20 mem accesses with expected overflows on both counters");
+> +	report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
+> +			read_regn(pmevcntr, 0), read_regn(pmevcntr, 1),
+> +			read_sysreg(pmovsclr_el0));
+> +}
+> +
+>  #endif
+>  
+>  /*
+> @@ -397,6 +649,15 @@ int main(int argc, char *argv[])
+>  	} else if (strcmp(argv[1], "event-introspection") == 0) {
+>  		report_prefix_push(argv[1]);
+>  		test_event_introspection();
+> +	} else if (strcmp(argv[1], "event-counter-config") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_event_counter_config();
+> +	} else if (strcmp(argv[1], "basic-event-count") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_basic_event_count();
+> +	} else if (strcmp(argv[1], "mem-access") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_mem_access();
+
+I was wondering if we need all of them as separately selectable tests? Could this be just one "basic_counter" test?
+
+Cheers,
+Andre
+
+>  	} else {
+>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>  	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 4433ef3..7a59403 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -72,6 +72,24 @@ groups = pmu
+>  arch = arm64
+>  extra_params = -append 'event-introspection'
+>  
+> +[pmu-event-counter-config]
+> +file = pmu.flat
+> +groups = pmu
+> +arch = arm64
+> +extra_params = -append 'event-counter-config'
+> +
+> +[pmu-basic-event-count]
+> +file = pmu.flat
+> +groups = pmu
+> +arch = arm64
+> +extra_params = -append 'basic-event-count'
+> +
+> +[pmu-mem-access]
+> +file = pmu.flat
+> +groups = pmu
+> +arch = arm64
+> +extra_params = -append 'mem-access'
+> +
+>  # Test PMU support (TCG) with -icount IPC=1
+>  #[pmu-tcg-icount-1]
+>  #file = pmu.flat
 
