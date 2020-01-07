@@ -2,624 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B4061335F9
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 23:46:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69FCF1336EA
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 23:55:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727825AbgAGWqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 17:46:17 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:11487 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727690AbgAGWqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 17:46:16 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e1509fa0003>; Tue, 07 Jan 2020 14:45:14 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Tue, 07 Jan 2020 14:46:02 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Tue, 07 Jan 2020 14:46:02 -0800
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 7 Jan
- 2020 22:46:02 +0000
-Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Tue, 7 Jan 2020 22:46:02 +0000
-Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5e150a29000f>; Tue, 07 Jan 2020 14:46:02 -0800
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v12 22/22] mm, tree-wide: rename put_user_page*() to unpin_user_page*()
-Date:   Tue, 7 Jan 2020 14:45:58 -0800
-Message-ID: <20200107224558.2362728-23-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200107224558.2362728-1-jhubbard@nvidia.com>
-References: <20200107224558.2362728-1-jhubbard@nvidia.com>
+        id S1727253AbgAGWzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 17:55:20 -0500
+Received: from mail-mw2nam10on2084.outbound.protection.outlook.com ([40.107.94.84]:11167
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727046AbgAGWzU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 17:55:20 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HrX7zaDsvhqA+S7zJ2pXvQCVGfA7krjLQtyknCQTcxXNaVKfC2JYTpAJtp8wWpAlAQAskSnL+Gyylxp5gh/he8lu5vkFejEXdmAUhaghOAuWhVB0sM5SGbnPiaLoQFA0fMlPhEm7HhhxFIfMWQooDqLkfja3nmoHRMaBSl0DXHmnwRCrO1CJLIwYlxoG5vgqg0D47dXmLatP6gUTe/W66ilc+GXEAxBehfO3i6nheDaPzt0uOOtenw75rZAFFwCy1yIymcR590x7oSQo+EUuz1Uj5QXP39icnhKIXWlIULl5xw9Ml6gk+VJa8slkdCAXuguv52TXc2LpB0S6gqvMWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=g24uyAFCQflbr82Wg4okp4yY84A+nPTuPzIaTNTKzaY=;
+ b=bTyLK3zPR99aafV06reRUqST5DP8r3b938DbMXH5dhL3aPInyIXtSSJ9QX7HAb6y3McxyC+tjdmdu0M2upndUAQKs5KRw8s2nSNzlTo/O3F63cWHJBFyC8kuVmZ4elRo8IcNHyBhhKMg9tfDsUTRqNaRRAd99Vby79vG5McAkPVTqLF8tLjWR90XjdUTQb064IKE8lCC9CFFGXnX/igjU/v6o4x8tD47jwoskWuMiOCUY1WnWav5HOpHDcLm7iMD0g5gbjxe623piioRhwkX49/c+phkmDJP3+eJOPjknGQoVnIqQR9iIWXkX+kOM8mig8W26JzKCajTHR7ATPPrRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=g24uyAFCQflbr82Wg4okp4yY84A+nPTuPzIaTNTKzaY=;
+ b=Ggbb1w/nYAT+JFbTuHtF4+3mda/10admEAGU2LjBWz4n96Fijx0KFNY2S0TqYEobrChIuPqYZsySwOtN2p35/OCnSjO3CpS7E1IMwdgBoOTgklMaI20VckA/xU7Fu4BLkdFKtBpe9qcZdCWc+JwymGiy4mo4T12UtaHvl0PcrAk=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Thomas.Lendacky@amd.com; 
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.71.154) by
+ DM6SPR01MB0105.namprd12.prod.outlook.com (20.179.164.214) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.8; Tue, 7 Jan 2020 22:54:37 +0000
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::a0cd:463:f444:c270]) by DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::a0cd:463:f444:c270%7]) with mapi id 15.20.2602.016; Tue, 7 Jan 2020
+ 22:54:37 +0000
+Subject: Re: [PATCH v2] KVM: SVM: Override default MMIO mask if memory
+ encryption is enabled
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <d741b3a58769749b7873fea703c027a68b8e2e3d.1577462279.git.thomas.lendacky@amd.com>
+ <20200106224931.GB12879@linux.intel.com>
+ <f5c2e60c-536f-e0cd-98b9-86e6da82e48f@amd.com>
+ <20200106233846.GC12879@linux.intel.com>
+ <a4fb7657-59b6-2a3f-1765-037a9a9cd03a@amd.com>
+ <20200107222813.GB16987@linux.intel.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <298352c6-7670-2929-9621-1124775bfaed@amd.com>
+Date:   Tue, 7 Jan 2020 16:54:34 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+In-Reply-To: <20200107222813.GB16987@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0201CA0052.namprd02.prod.outlook.com
+ (2603:10b6:803:20::14) To DM6PR12MB3163.namprd12.prod.outlook.com
+ (2603:10b6:5:15e::26)
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1578437115; bh=9NJ9LLQjy2m8bDEsQYXxXPdiLbI64LdenH+YV9Z4hRE=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=Tz0m8qy5zviTPY+n2JdkQm4cfSruoc3E71s66qWJonmQ5asY5JaVXqADG+Os1vaj9
-         vRte0RwxobseuTOdB2hedbrDBWoVqm7W3Av4dmzxdViY2bp2e1mG0l92/UzDJcVJJX
-         UMsB7kld0RT5+8A+eMfFpopVfFL+2fmnki11TMgV8XokKEHOt9NyEJVsHtQUNLhzZu
-         txNeakC6uIhdtHoEwq+vx1Vh4cxYlxJbsM92OSl/h8IWMiS8bMUbeEXAlK1YQ/YH4W
-         ich+CrjZxpQFntwq7jpU77iU5j2dGMGYaYtRNOvBlscHEl59rF9RgOmDCdJJ/uVhQw
-         rYBm0+fbaaf1Q==
+Received: from [10.236.30.74] (165.204.77.1) by SN4PR0201CA0052.namprd02.prod.outlook.com (2603:10b6:803:20::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.9 via Frontend Transport; Tue, 7 Jan 2020 22:54:36 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: c19c4852-4765-45de-b1e3-08d793c49226
+X-MS-TrafficTypeDiagnostic: DM6SPR01MB0105:|DM6SPR01MB0105:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6SPR01MB0105436C788E719EC305C406EC3F0@DM6SPR01MB0105.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 027578BB13
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(346002)(366004)(136003)(376002)(189003)(199004)(54906003)(316002)(66946007)(2906002)(31686004)(66556008)(16576012)(31696002)(478600001)(66476007)(4326008)(86362001)(5660300002)(956004)(53546011)(2616005)(8936002)(81166006)(26005)(52116002)(6916009)(6486002)(186003)(81156014)(16526019)(36756003)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6SPR01MB0105;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xKCZ9wJL6YI5I2ZYV55ZWgcmdtxAPT8jQD1/A+6tdZzcUtL7+3xkSDMzUtcNg04GKUIvMDeltONosacKM9/gJM+9wJCiPzVXia7IYon8RFXIMmwn1XMIoFAOPlHzUYozVsrW730Z9Joci/OsgjRams5uAeDbLqIvT8F2w1AEHvHwSdmUpngT9NLqGNdix5Ok88BwcJaU7jL9Adhq+DRd3eBANATT5pp25YmNsOCGhBipXKrQ5zh2OBcDYobqKGiJHCRvhIAX8VjSzLyvqJ+dK1g3DOOt9w/7Gu0dSDoUnVBg+EzWjiLCPNq39A39pZkpOEr6sybbSOQiyC4byi1f7z6UFrePz97Qy43yUTCOU120mZLhbGr2RzbvH8KRTAiJqhEhPTwMJVSkQuo9DxHyMhsyOd7hVFoow6NuLYMiHA7YegTphSMIczZPe0wFgXuI
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c19c4852-4765-45de-b1e3-08d793c49226
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2020 22:54:37.3285
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SFTBXiN+rzKTCGPM5STcHqPKU/w4/e8GTeja7Pc25GJsXqNGj1LV57UDp/9GIlUS1rK/4szcx/4Ttkj14/Lglg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6SPR01MB0105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to provide a clearer, more symmetric API for pinning
-and unpinning DMA pages. This way, pin_user_pages*() calls
-match up with unpin_user_pages*() calls, and the API is a lot
-closer to being self-explanatory.
+On 1/7/20 4:28 PM, Sean Christopherson wrote:
+> On Tue, Jan 07, 2020 at 02:16:37PM -0600, Tom Lendacky wrote:
+>> On 1/6/20 5:38 PM, Sean Christopherson wrote:
+>>> On Mon, Jan 06, 2020 at 05:14:04PM -0600, Tom Lendacky wrote:
+>>>> On 1/6/20 4:49 PM, Sean Christopherson wrote:
+>>>>> This doesn't handle the case where x86_phys_bits _isn't_ reduced by SME/SEV
+>>>>> on a future processor, i.e. x86_phys_bits==52.
+>>>>
+>>>> Not sure I follow. If MSR_K8_SYSCFG_MEM_ENCRYPT is set then there will
+>>>> always be a reduction in physical addressing (so I'm told).
+>>>
+>>> Hmm, I'm going off APM Vol 2, which states, or at least strongly implies,
+>>> that reducing the PA space is optional.  Section 7.10.2 is especially
+>>> clear on this:
+>>>
+>>>   In implementations where the physical address size of the processor is
+>>>   reduced when memory encryption features are enabled, software must
+>>>   ensure it is executing from addresses where these upper physical address
+>>>   bits are 0 prior to setting SYSCFG[MemEncryptionModEn].
+>>
+>> It's probably not likely, but given what is stated, I can modify my patch
+>> to check for a x86_phys_bits == 52 and skip the call to set the mask, eg:
+>>
+>> 	if (msr & MSR_K8_SYSCFG_MEM_ENCRYPT &&
+>> 	    boot_cpu_data.x86_phys_bits < 52) {
+>>
+>>>
+>>> But, hopefully the other approach I have in mind actually works, as it's
+>>> significantly less special-case code and would naturally handle either
+>>> case, i.e. make this a moot point.
+>>
+>> I'll hold off on the above and wait for your patch.
+> 
+> Sorry for the delay, this is a bigger mess than originally thought.  Or
+> I'm completely misunderstanding the issue, which is also a distinct
+> possibility :-)
+> 
+> Due to KVM activating its L1TF mitigation irrespective of whether the CPU
+> is whitelisted as not being vulnerable to L1TF, simply using 86_phys_bits
+> to avoid colliding with the C-bit isn't sufficient as the L1TF mitigation
+> uses those first five reserved PA bits to store the MMIO GFN.  Setting
+> BIT(x86_phys_bits) for all MMIO sptes would cause it to be interpreted as
+> a GFN bit when the L1TF mitigation is active and lead to bogus MMIO.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
----
- Documentation/core-api/pin_user_pages.rst   |  2 +-
- arch/powerpc/mm/book3s64/iommu_api.c        |  4 +--
- drivers/gpu/drm/via/via_dmablit.c           |  4 +--
- drivers/infiniband/core/umem.c              |  2 +-
- drivers/infiniband/hw/hfi1/user_pages.c     |  2 +-
- drivers/infiniband/hw/mthca/mthca_memfree.c |  6 ++--
- drivers/infiniband/hw/qib/qib_user_pages.c  |  2 +-
- drivers/infiniband/hw/qib/qib_user_sdma.c   |  6 ++--
- drivers/infiniband/hw/usnic/usnic_uiom.c    |  2 +-
- drivers/infiniband/sw/siw/siw_mem.c         |  2 +-
- drivers/media/v4l2-core/videobuf-dma-sg.c   |  4 +--
- drivers/platform/goldfish/goldfish_pipe.c   |  4 +--
- drivers/vfio/vfio_iommu_type1.c             |  2 +-
- fs/io_uring.c                               |  4 +--
- include/linux/mm.h                          | 26 ++++++++---------
- mm/gup.c                                    | 32 ++++++++++-----------
- mm/process_vm_access.c                      |  4 +--
- net/xdp/xdp_umem.c                          |  2 +-
- 18 files changed, 55 insertions(+), 55 deletions(-)
+The L1TF mitigation only gets applied when:
+  boot_cpu_data.x86_cache_bits < 52 - shadow_nonpresent_or_rsvd_mask_len
 
-diff --git a/Documentation/core-api/pin_user_pages.rst b/Documentation/core=
--api/pin_user_pages.rst
-index 71849830cd48..1d490155ecd7 100644
---- a/Documentation/core-api/pin_user_pages.rst
-+++ b/Documentation/core-api/pin_user_pages.rst
-@@ -219,7 +219,7 @@ since the system was booted, via two new /proc/vmstat e=
-ntries: ::
-     /proc/vmstat/nr_foll_pin_requested
-=20
- Those are both going to show zero, unless CONFIG_DEBUG_VM is set. This is
--because there is a noticeable performance drop in put_user_page(), when th=
-ey
-+because there is a noticeable performance drop in unpin_user_page(), when =
-they
- are activated.
-=20
- References
-diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s6=
-4/iommu_api.c
-index a86547822034..eba73ebd8ae5 100644
---- a/arch/powerpc/mm/book3s64/iommu_api.c
-+++ b/arch/powerpc/mm/book3s64/iommu_api.c
-@@ -168,7 +168,7 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, uns=
-igned long ua,
-=20
- free_exit:
- 	/* free the references taken */
--	put_user_pages(mem->hpages, pinned);
-+	unpin_user_pages(mem->hpages, pinned);
-=20
- 	vfree(mem->hpas);
- 	kfree(mem);
-@@ -214,7 +214,7 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_=
-mem_t *mem)
- 		if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
- 			SetPageDirty(page);
-=20
--		put_user_page(page);
-+		unpin_user_page(page);
-=20
- 		mem->hpas[i] =3D 0;
- 	}
-diff --git a/drivers/gpu/drm/via/via_dmablit.c b/drivers/gpu/drm/via/via_dm=
-ablit.c
-index 37c5e572993a..719d036c9384 100644
---- a/drivers/gpu/drm/via/via_dmablit.c
-+++ b/drivers/gpu/drm/via/via_dmablit.c
-@@ -188,8 +188,8 @@ via_free_sg_info(struct pci_dev *pdev, drm_via_sg_info_=
-t *vsg)
- 		kfree(vsg->desc_pages);
- 		/* fall through */
- 	case dr_via_pages_locked:
--		put_user_pages_dirty_lock(vsg->pages, vsg->num_pages,
--					  (vsg->direction =3D=3D DMA_FROM_DEVICE));
-+		unpin_user_pages_dirty_lock(vsg->pages, vsg->num_pages,
-+					   (vsg->direction =3D=3D DMA_FROM_DEVICE));
- 		/* fall through */
- 	case dr_via_pages_alloc:
- 		vfree(vsg->pages);
-diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.=
-c
-index 55daefaa9b88..a6094766b6f5 100644
---- a/drivers/infiniband/core/umem.c
-+++ b/drivers/infiniband/core/umem.c
-@@ -54,7 +54,7 @@ static void __ib_umem_release(struct ib_device *dev, stru=
-ct ib_umem *umem, int d
-=20
- 	for_each_sg_page(umem->sg_head.sgl, &sg_iter, umem->sg_nents, 0) {
- 		page =3D sg_page_iter_page(&sg_iter);
--		put_user_pages_dirty_lock(&page, 1, umem->writable && dirty);
-+		unpin_user_pages_dirty_lock(&page, 1, umem->writable && dirty);
- 	}
-=20
- 	sg_free_table(&umem->sg_head);
-diff --git a/drivers/infiniband/hw/hfi1/user_pages.c b/drivers/infiniband/h=
-w/hfi1/user_pages.c
-index 9a94761765c0..3b505006c0a6 100644
---- a/drivers/infiniband/hw/hfi1/user_pages.c
-+++ b/drivers/infiniband/hw/hfi1/user_pages.c
-@@ -118,7 +118,7 @@ int hfi1_acquire_user_pages(struct mm_struct *mm, unsig=
-ned long vaddr, size_t np
- void hfi1_release_user_pages(struct mm_struct *mm, struct page **p,
- 			     size_t npages, bool dirty)
- {
--	put_user_pages_dirty_lock(p, npages, dirty);
-+	unpin_user_pages_dirty_lock(p, npages, dirty);
-=20
- 	if (mm) { /* during close after signal, mm can be NULL */
- 		atomic64_sub(npages, &mm->pinned_vm);
-diff --git a/drivers/infiniband/hw/mthca/mthca_memfree.c b/drivers/infiniba=
-nd/hw/mthca/mthca_memfree.c
-index 8269ab040c21..78a48aea3faf 100644
---- a/drivers/infiniband/hw/mthca/mthca_memfree.c
-+++ b/drivers/infiniband/hw/mthca/mthca_memfree.c
-@@ -482,7 +482,7 @@ int mthca_map_user_db(struct mthca_dev *dev, struct mth=
-ca_uar *uar,
-=20
- 	ret =3D pci_map_sg(dev->pdev, &db_tab->page[i].mem, 1, PCI_DMA_TODEVICE);
- 	if (ret < 0) {
--		put_user_page(pages[0]);
-+		unpin_user_page(pages[0]);
- 		goto out;
- 	}
-=20
-@@ -490,7 +490,7 @@ int mthca_map_user_db(struct mthca_dev *dev, struct mth=
-ca_uar *uar,
- 				 mthca_uarc_virt(dev, uar, i));
- 	if (ret) {
- 		pci_unmap_sg(dev->pdev, &db_tab->page[i].mem, 1, PCI_DMA_TODEVICE);
--		put_user_page(sg_page(&db_tab->page[i].mem));
-+		unpin_user_page(sg_page(&db_tab->page[i].mem));
- 		goto out;
- 	}
-=20
-@@ -556,7 +556,7 @@ void mthca_cleanup_user_db_tab(struct mthca_dev *dev, s=
-truct mthca_uar *uar,
- 		if (db_tab->page[i].uvirt) {
- 			mthca_UNMAP_ICM(dev, mthca_uarc_virt(dev, uar, i), 1);
- 			pci_unmap_sg(dev->pdev, &db_tab->page[i].mem, 1, PCI_DMA_TODEVICE);
--			put_user_page(sg_page(&db_tab->page[i].mem));
-+			unpin_user_page(sg_page(&db_tab->page[i].mem));
- 		}
- 	}
-=20
-diff --git a/drivers/infiniband/hw/qib/qib_user_pages.c b/drivers/infiniban=
-d/hw/qib/qib_user_pages.c
-index 7fc4b5f81fcd..342e3172ca40 100644
---- a/drivers/infiniband/hw/qib/qib_user_pages.c
-+++ b/drivers/infiniband/hw/qib/qib_user_pages.c
-@@ -40,7 +40,7 @@
- static void __qib_release_user_pages(struct page **p, size_t num_pages,
- 				     int dirty)
- {
--	put_user_pages_dirty_lock(p, num_pages, dirty);
-+	unpin_user_pages_dirty_lock(p, num_pages, dirty);
- }
-=20
- /**
-diff --git a/drivers/infiniband/hw/qib/qib_user_sdma.c b/drivers/infiniband=
-/hw/qib/qib_user_sdma.c
-index 1a3cc2957e3a..a67599b5a550 100644
---- a/drivers/infiniband/hw/qib/qib_user_sdma.c
-+++ b/drivers/infiniband/hw/qib/qib_user_sdma.c
-@@ -317,7 +317,7 @@ static int qib_user_sdma_page_to_frags(const struct qib=
-_devdata *dd,
- 		 * the caller can ignore this page.
- 		 */
- 		if (put) {
--			put_user_page(page);
-+			unpin_user_page(page);
- 		} else {
- 			/* coalesce case */
- 			kunmap(page);
-@@ -631,7 +631,7 @@ static void qib_user_sdma_free_pkt_frag(struct device *=
-dev,
- 			kunmap(pkt->addr[i].page);
-=20
- 		if (pkt->addr[i].put_page)
--			put_user_page(pkt->addr[i].page);
-+			unpin_user_page(pkt->addr[i].page);
- 		else
- 			__free_page(pkt->addr[i].page);
- 	} else if (pkt->addr[i].kvaddr) {
-@@ -706,7 +706,7 @@ static int qib_user_sdma_pin_pages(const struct qib_dev=
-data *dd,
- 	/* if error, return all pages not managed by pkt */
- free_pages:
- 	while (i < j)
--		put_user_page(pages[i++]);
-+		unpin_user_page(pages[i++]);
-=20
- done:
- 	return ret;
-diff --git a/drivers/infiniband/hw/usnic/usnic_uiom.c b/drivers/infiniband/=
-hw/usnic/usnic_uiom.c
-index 600896727d34..bd9f944b68fc 100644
---- a/drivers/infiniband/hw/usnic/usnic_uiom.c
-+++ b/drivers/infiniband/hw/usnic/usnic_uiom.c
-@@ -75,7 +75,7 @@ static void usnic_uiom_put_pages(struct list_head *chunk_=
-list, int dirty)
- 		for_each_sg(chunk->page_list, sg, chunk->nents, i) {
- 			page =3D sg_page(sg);
- 			pa =3D sg_phys(sg);
--			put_user_pages_dirty_lock(&page, 1, dirty);
-+			unpin_user_pages_dirty_lock(&page, 1, dirty);
- 			usnic_dbg("pa: %pa\n", &pa);
- 		}
- 		kfree(chunk);
-diff --git a/drivers/infiniband/sw/siw/siw_mem.c b/drivers/infiniband/sw/si=
-w/siw_mem.c
-index e53b07dcfed5..e2061dc0b043 100644
---- a/drivers/infiniband/sw/siw/siw_mem.c
-+++ b/drivers/infiniband/sw/siw/siw_mem.c
-@@ -63,7 +63,7 @@ struct siw_mem *siw_mem_id2obj(struct siw_device *sdev, i=
-nt stag_index)
- static void siw_free_plist(struct siw_page_chunk *chunk, int num_pages,
- 			   bool dirty)
- {
--	put_user_pages_dirty_lock(chunk->plist, num_pages, dirty);
-+	unpin_user_pages_dirty_lock(chunk->plist, num_pages, dirty);
- }
-=20
- void siw_umem_release(struct siw_umem *umem, bool dirty)
-diff --git a/drivers/media/v4l2-core/videobuf-dma-sg.c b/drivers/media/v4l2=
--core/videobuf-dma-sg.c
-index 162a2633b1e3..13b65ed9e74c 100644
---- a/drivers/media/v4l2-core/videobuf-dma-sg.c
-+++ b/drivers/media/v4l2-core/videobuf-dma-sg.c
-@@ -349,8 +349,8 @@ int videobuf_dma_free(struct videobuf_dmabuf *dma)
- 	BUG_ON(dma->sglen);
-=20
- 	if (dma->pages) {
--		put_user_pages_dirty_lock(dma->pages, dma->nr_pages,
--					  dma->direction =3D=3D DMA_FROM_DEVICE);
-+		unpin_user_pages_dirty_lock(dma->pages, dma->nr_pages,
-+					    dma->direction =3D=3D DMA_FROM_DEVICE);
- 		kfree(dma->pages);
- 		dma->pages =3D NULL;
- 	}
-diff --git a/drivers/platform/goldfish/goldfish_pipe.c b/drivers/platform/g=
-oldfish/goldfish_pipe.c
-index 2a5901efecde..1ab207ec9c94 100644
---- a/drivers/platform/goldfish/goldfish_pipe.c
-+++ b/drivers/platform/goldfish/goldfish_pipe.c
-@@ -360,8 +360,8 @@ static int transfer_max_buffers(struct goldfish_pipe *p=
-ipe,
-=20
- 	*consumed_size =3D pipe->command_buffer->rw_params.consumed_size;
-=20
--	put_user_pages_dirty_lock(pipe->pages, pages_count,
--				  !is_write && *consumed_size > 0);
-+	unpin_user_pages_dirty_lock(pipe->pages, pages_count,
-+				    !is_write && *consumed_size > 0);
-=20
- 	mutex_unlock(&pipe->lock);
- 	return 0;
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type=
-1.c
-index 18bfc2fc8e6d..a177bf2c6683 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -310,7 +310,7 @@ static int put_pfn(unsigned long pfn, int prot)
- 	if (!is_invalid_reserved_pfn(pfn)) {
- 		struct page *page =3D pfn_to_page(pfn);
-=20
--		put_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
-+		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
- 		return 1;
- 	}
- 	return 0;
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 9f804cb25c61..87618e3c05ea 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -4694,7 +4694,7 @@ static int io_sqe_buffer_unregister(struct io_ring_ct=
-x *ctx)
- 		struct io_mapped_ubuf *imu =3D &ctx->user_bufs[i];
-=20
- 		for (j =3D 0; j < imu->nr_bvecs; j++)
--			put_user_page(imu->bvec[j].bv_page);
-+			unpin_user_page(imu->bvec[j].bv_page);
-=20
- 		if (ctx->account_mem)
- 			io_unaccount_mem(ctx->user, imu->nr_bvecs);
-@@ -4839,7 +4839,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx =
-*ctx, void __user *arg,
- 			 * release any pages we did get
- 			 */
- 			if (pret > 0)
--				put_user_pages(pages, pret);
-+				unpin_user_pages(pages, pret);
- 			if (ctx->account_mem)
- 				io_unaccount_mem(ctx->user, nr_pages);
- 			kvfree(imu->bvec);
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index f9653e666bf4..0ede06a15eea 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1044,27 +1044,27 @@ static inline void put_page(struct page *page)
- }
-=20
- /**
-- * put_user_page() - release a gup-pinned page
-+ * unpin_user_page() - release a gup-pinned page
-  * @page:            pointer to page to be released
-  *
-  * Pages that were pinned via pin_user_pages*() must be released via eithe=
-r
-- * put_user_page(), or one of the put_user_pages*() routines. This is so t=
-hat
-- * eventually such pages can be separately tracked and uniquely handled. I=
-n
-+ * unpin_user_page(), or one of the unpin_user_pages*() routines. This is =
-so
-+ * that eventually such pages can be separately tracked and uniquely handl=
-ed. In
-  * particular, interactions with RDMA and filesystems need special handlin=
-g.
-  *
-- * put_user_page() and put_page() are not interchangeable, despite this ea=
-rly
-- * implementation that makes them look the same. put_user_page() calls mus=
-t
-+ * unpin_user_page() and put_page() are not interchangeable, despite this =
-early
-+ * implementation that makes them look the same. unpin_user_page() calls m=
-ust
-  * be perfectly matched up with pin*() calls.
-  */
--static inline void put_user_page(struct page *page)
-+static inline void unpin_user_page(struct page *page)
- {
- 	put_page(page);
- }
-=20
--void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
--			       bool make_dirty);
-+void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages=
-,
-+				 bool make_dirty);
-=20
--void put_user_pages(struct page **pages, unsigned long npages);
-+void unpin_user_pages(struct page **pages, unsigned long npages);
-=20
- #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
- #define SECTION_IN_PAGE_FLAGS
-@@ -2594,7 +2594,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
- #define FOLL_ANON	0x8000	/* don't do file mappings */
- #define FOLL_LONGTERM	0x10000	/* mapping lifetime is indefinite: see below=
- */
- #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
--#define FOLL_PIN	0x40000	/* pages must be released via put_user_page() */
-+#define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
-=20
- /*
-  * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with eac=
-h
-@@ -2629,7 +2629,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
-  * Direct IO). This lets the filesystem know that some non-file-system ent=
-ity is
-  * potentially changing the pages' data. In contrast to FOLL_GET (whose pa=
-ges
-  * are released via put_page()), FOLL_PIN pages must be released, ultimate=
-ly, by
-- * a call to put_user_page().
-+ * a call to unpin_user_page().
-  *
-  * FOLL_PIN is similar to FOLL_GET: both of these pin pages. They use diff=
-erent
-  * and separate refcounting mechanisms, however, and that means that each =
-has
-@@ -2637,7 +2637,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
-  *
-  *     FOLL_GET: get_user_pages*() to acquire, and put_page() to release.
-  *
-- *     FOLL_PIN: pin_user_pages*() to acquire, and put_user_pages to relea=
-se.
-+ *     FOLL_PIN: pin_user_pages*() to acquire, and unpin_user_pages to rel=
-ease.
-  *
-  * FOLL_PIN and FOLL_GET are mutually exclusive for a given function call.
-  * (The underlying pages may experience both FOLL_GET-based and FOLL_PIN-b=
-ased
-@@ -2647,7 +2647,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
-  * FOLL_PIN should be set internally by the pin_user_pages*() APIs, never
-  * directly by the caller. That's in order to help avoid mismatches when
-  * releasing pages: get_user_pages*() pages must be released via put_page(=
-),
-- * while pin_user_pages*() pages must be released via put_user_page().
-+ * while pin_user_pages*() pages must be released via unpin_user_page().
-  *
-  * Please see Documentation/vm/pin_user_pages.rst for more information.
-  */
-diff --git a/mm/gup.c b/mm/gup.c
-index 1c200eeabd77..b8079d22c0be 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -45,7 +45,7 @@ static inline struct page *try_get_compound_head(struct p=
-age *page, int refs)
- }
-=20
- /**
-- * put_user_pages_dirty_lock() - release and optionally dirty gup-pinned p=
-ages
-+ * unpin_user_pages_dirty_lock() - release and optionally dirty gup-pinned=
- pages
-  * @pages:  array of pages to be maybe marked dirty, and definitely releas=
-ed.
-  * @npages: number of pages in the @pages array.
-  * @make_dirty: whether to mark the pages dirty
-@@ -55,19 +55,19 @@ static inline struct page *try_get_compound_head(struct=
- page *page, int refs)
-  *
-  * For each page in the @pages array, make that page (or its head page, if=
- a
-  * compound page) dirty, if @make_dirty is true, and if the page was previ=
-ously
-- * listed as clean. In any case, releases all pages using put_user_page(),
-- * possibly via put_user_pages(), for the non-dirty case.
-+ * listed as clean. In any case, releases all pages using unpin_user_page(=
-),
-+ * possibly via unpin_user_pages(), for the non-dirty case.
-  *
-- * Please see the put_user_page() documentation for details.
-+ * Please see the unpin_user_page() documentation for details.
-  *
-  * set_page_dirty_lock() is used internally. If instead, set_page_dirty() =
-is
-  * required, then the caller should a) verify that this is really correct,
-  * because _lock() is usually required, and b) hand code it:
-- * set_page_dirty_lock(), put_user_page().
-+ * set_page_dirty_lock(), unpin_user_page().
-  *
-  */
--void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
--			       bool make_dirty)
-+void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages=
-,
-+				 bool make_dirty)
- {
- 	unsigned long index;
-=20
-@@ -78,7 +78,7 @@ void put_user_pages_dirty_lock(struct page **pages, unsig=
-ned long npages,
- 	 */
-=20
- 	if (!make_dirty) {
--		put_user_pages(pages, npages);
-+		unpin_user_pages(pages, npages);
- 		return;
- 	}
-=20
-@@ -106,21 +106,21 @@ void put_user_pages_dirty_lock(struct page **pages, u=
-nsigned long npages,
- 		 */
- 		if (!PageDirty(page))
- 			set_page_dirty_lock(page);
--		put_user_page(page);
-+		unpin_user_page(page);
- 	}
- }
--EXPORT_SYMBOL(put_user_pages_dirty_lock);
-+EXPORT_SYMBOL(unpin_user_pages_dirty_lock);
-=20
- /**
-- * put_user_pages() - release an array of gup-pinned pages.
-+ * unpin_user_pages() - release an array of gup-pinned pages.
-  * @pages:  array of pages to be marked dirty and released.
-  * @npages: number of pages in the @pages array.
-  *
-- * For each page in the @pages array, release the page using put_user_page=
-().
-+ * For each page in the @pages array, release the page using unpin_user_pa=
-ge().
-  *
-- * Please see the put_user_page() documentation for details.
-+ * Please see the unpin_user_page() documentation for details.
-  */
--void put_user_pages(struct page **pages, unsigned long npages)
-+void unpin_user_pages(struct page **pages, unsigned long npages)
- {
- 	unsigned long index;
-=20
-@@ -130,9 +130,9 @@ void put_user_pages(struct page **pages, unsigned long =
-npages)
- 	 * single operation to the head page should suffice.
- 	 */
- 	for (index =3D 0; index < npages; index++)
--		put_user_page(pages[index]);
-+		unpin_user_page(pages[index]);
- }
--EXPORT_SYMBOL(put_user_pages);
-+EXPORT_SYMBOL(unpin_user_pages);
-=20
- #ifdef CONFIG_MMU
- static struct page *no_page_table(struct vm_area_struct *vma,
-diff --git a/mm/process_vm_access.c b/mm/process_vm_access.c
-index fd20ab675b85..de41e830cdac 100644
---- a/mm/process_vm_access.c
-+++ b/mm/process_vm_access.c
-@@ -126,8 +126,8 @@ static int process_vm_rw_single_vec(unsigned long addr,
- 		pa +=3D pinned_pages * PAGE_SIZE;
-=20
- 		/* If vm_write is set, the pages need to be made dirty: */
--		put_user_pages_dirty_lock(process_pages, pinned_pages,
--					  vm_write);
-+		unpin_user_pages_dirty_lock(process_pages, pinned_pages,
-+					    vm_write);
- 	}
-=20
- 	return rc;
-diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
-index d071003b5e76..ac182c38f7b0 100644
---- a/net/xdp/xdp_umem.c
-+++ b/net/xdp/xdp_umem.c
-@@ -212,7 +212,7 @@ static int xdp_umem_map_pages(struct xdp_umem *umem)
-=20
- static void xdp_umem_unpin_pages(struct xdp_umem *umem)
- {
--	put_user_pages_dirty_lock(umem->pgs, umem->npgs, true);
-+	unpin_user_pages_dirty_lock(umem->pgs, umem->npgs, true);
-=20
- 	kfree(umem->pgs);
- 	umem->pgs =3D NULL;
---=20
-2.24.1
+  and with shadow_nonpresent_or_rsvd_mask_len = 5, that means that means
+  boot_cpu_data.x86_cache_bits < 47.
 
+On AMD processors that support memory encryption, the x86_cache_bits value
+is not adjusted, just the x86_phys_bits. So for AMD processors that have
+memory encryption support, this value will be at least 48 and therefore
+not activate the L1TF mitigation.
+
+> 
+> The only sane approach I can think of is to activate the L1TF mitigation
+> based on whether the CPU is vulnerable to L1TF, as opposed to activating> the mitigation purely based on the max PA of the CPU.  Since all CPUs that
+> support SME/SEV are whitelisted as NO_L1TF, the L1TF mitigation and C-bit
+> should never be active at the same time.
+
+There is still the issue of setting a single bit that can conflict with
+the C-bit. As it is today, if the C-bit were to be defined as bit 51, then
+KVM would not take a nested page fault and MMIO would be broken.
+
+Thanks,
+Tom
+
+> 
+> Patch should be incoming soon...
+> 
