@@ -2,127 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A65F132A3D
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 16:42:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36814132A89
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 16:57:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728381AbgAGPmh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 10:42:37 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47265 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728376AbgAGPmh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jan 2020 10:42:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578411756;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4wLEHGHPhIC5q6TMsrDGtuJlxvXE4KzHLl3MK2FPWK8=;
-        b=i59dRoyFr6LLXXSTv7k5nsHKeTjTSawOnIlmKvQwSPby0SAaQZ+LmE3HPhLNAtACHpQsCO
-        cjAbyGRY3/ZjHyynD1e+WhmufBTupMWPSD9zsfsh29u+zlmDYB7ImPhwVAIiV8+WxfZwbK
-        uhoY1hJlWlDnQtnJ0ios1y5j88gLMAg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424-wutgYkhiOu2XDKVMUqeJlQ-1; Tue, 07 Jan 2020 10:42:35 -0500
-X-MC-Unique: wutgYkhiOu2XDKVMUqeJlQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 096CE800D4E;
-        Tue,  7 Jan 2020 15:42:34 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 029CC10842AB;
-        Tue,  7 Jan 2020 15:42:29 +0000 (UTC)
-Date:   Tue, 7 Jan 2020 16:42:27 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v3 8/8] KVM: selftests: Move large memslots above KVM
- internal memslots in _vm_create
-Message-ID: <20200107154227.tvex5natt7a64nzj@kamzik.brq.redhat.com>
-References: <20191216213901.106941-1-bgardon@google.com>
- <20191216213901.106941-9-bgardon@google.com>
+        id S1728080AbgAGP53 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 10:57:29 -0500
+Received: from mail-dm6nam10on2062.outbound.protection.outlook.com ([40.107.93.62]:35169
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727974AbgAGP53 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 10:57:29 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T9+nVa7V/lR39U+OMMC7SwhVX1JqgjBfjMpiDG7mzvGz3AYD/FA4dFw6fa0vPBm6yZCCvnYWUWp17VnZYviMI3rlBMns/5eE7lmNjAyWipqzfpK/ypVLasYkNRr/67oPmW6FRYv9Tg7cnqMRO+M6PY5q30rx/Y1AYnNx4mCpV6O2AEGzF7x84YIub+7/T1YGhFCNTtbtiW1UMd7IwsewhSLYBvXZsPG/Bw18s3ZkU7UE1+8jUq0lSn9NtOJbZ09OygpzZPm60ae325Z9Yj6oFaHLgkSkNOt+NE8+z9NflYm1O3uDBQR5MSpdBAFUbJR3OAKibmV256t/Gkhg9GNTDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aUPDoReg5JYfCSVvE/+SE0qXwqI53EaSx2COCtuYDQs=;
+ b=AN/QgGSqP0c1D6LJG9PzT8o3mB43e0h6CAvEMPTb+Du7pEp7gBMUaVJ6bakFibpZaL5uSEpziPnf5GCFozJl43uOfIA4j/ERDnqZB5R3FtqBbXdB0PwETFx62GRjFcHuZ0JGkKjmfQifqoNeUFj/Y6ME/x2p4uX4ALAAayIfB/dHyzkkiNAxMBuu6dMhiLLeRlsvS5fBT7050ieO+y5LkNH9KzdWIkee0iYErGBPk/FCTJep8fsFuDbNyom3K9VvbzacgjDwaXJOcn8jtNHfNurNF0AViOfNgIkZF/t0qyH3B9NM/YHBYTVoud1x+RvDdd90lU46zYb7TxiNeEfHDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 81.255.187.177) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=exfo.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=exfo.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=EXFO.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aUPDoReg5JYfCSVvE/+SE0qXwqI53EaSx2COCtuYDQs=;
+ b=SYZIREPxYZx0ENoArBXNVlL6T03brACzj6bg0Tfkk8daAXze/7P1oqt4mYvIShOy7xMh+p8cB9oM6h9EGPfG+8S5SqesKdC/vU6/ciuDVh4TYjptLyCeDYJzree90AvQAcwxYxAtGsmah0x4vYzj/NgnKgnSGO1OhXhmDiMd/Tg=
+Received: from DM5PR11CA0013.namprd11.prod.outlook.com (2603:10b6:3:115::23)
+ by CY4PR11MB1255.namprd11.prod.outlook.com (2603:10b6:903:30::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2602.10; Tue, 7 Jan
+ 2020 15:57:25 +0000
+Received: from DM3NAM05FT037.eop-nam05.prod.protection.outlook.com
+ (2a01:111:f400:7e51::201) by DM5PR11CA0013.outlook.office365.com
+ (2603:10b6:3:115::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.9 via Frontend
+ Transport; Tue, 7 Jan 2020 15:57:23 +0000
+Authentication-Results: spf=pass (sender IP is 81.255.187.177)
+ smtp.mailfrom=exfo.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=exfo.com;
+Received-SPF: Pass (protection.outlook.com: domain of exfo.com designates
+ 81.255.187.177 as permitted sender) receiver=protection.outlook.com;
+ client-ip=81.255.187.177; helo=ON_Mail.exfo.com;
+Received: from ON_Mail.exfo.com (81.255.187.177) by
+ DM3NAM05FT037.mail.protection.outlook.com (10.152.98.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.2623.4 via Frontend Transport; Tue, 7 Jan 2020 15:57:23 +0000
+Received: from SPRNEXCHANGE01.exfo.com (10.50.50.95) by
+ SPRNEXCHANGE01.exfo.com (10.50.50.95) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1531.3; Tue, 7 Jan 2020 16:57:21 +0100
+Received: from SPRNEXCHANGE01.exfo.com ([::1]) by SPRNEXCHANGE01.exfo.com
+ ([::1]) with mapi id 15.01.1531.010; Tue, 7 Jan 2020 16:57:21 +0100
+From:   Gregory Esnaud <Gregory.ESNAUD@exfo.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [Newbie question] Why usage of CPU inside VM and outside VM is
+ different
+Thread-Topic: [Newbie question] Why usage of CPU inside VM and outside VM is
+ different
+Thread-Index: AdXFchc6k6fghFvyR2Cb2NX5qpnvFQ==
+Date:   Tue, 7 Jan 2020 15:57:21 +0000
+Message-ID: <8254fdfcfb7c4a82a5fc7a309152528e@exfo.com>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.72.130.123]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191216213901.106941-9-bgardon@google.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-EOPAttributedMessage: 0
+X-Forefront-Antispam-Report: CIP:81.255.187.177;IPV:CAL;SCL:-1;CTRY:FR;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(396003)(346002)(376002)(39850400004)(136003)(189003)(199004)(8936002)(316002)(36906005)(8676002)(26826003)(478600001)(81156014)(81166006)(2906002)(70586007)(70206006)(6916009)(108616005)(24736004)(2616005)(26005)(356004)(186003)(7696005)(5660300002)(4744005)(86362001)(336012)(36756003)(426003);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR11MB1255;H:ON_Mail.exfo.com;FPR:;SPF:Pass;LANG:en;PTR:extranet.astellia.com;MX:1;A:1;
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ff151c9d-1a88-41d9-c197-08d7938a48f9
+X-MS-TrafficTypeDiagnostic: CY4PR11MB1255:
+X-Microsoft-Antispam-PRVS: <CY4PR11MB1255A3AAD6673104E4D689CBF43F0@CY4PR11MB1255.namprd11.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 027578BB13
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: OMCLrpacFF772OPDM4g418MuZREiAY+6usDk1eiIT/GMCULd7fUxW1oY/Z9+58m0cYycKiqsJsMnhLYbDb0883iHBtAgniLWHbXVTawedgAA5vZvB/YN5+1HjvFSL3u16/mAFwTs+36UmWD8AZmodry3ihctkvNVEIK8ZbU0xYUrLA4N6UI9ZsKXSGBmQDyksyd+8QCeJp+xrnZI35MTpHpx0V8swNLSJlPI/zbKnJA6JeATLD3ekUgHIeEC8zGaJOjJIn0QmEcNNWLZsHFXKZxVcF6zpeG9m+sUwobifP8Mup50LezMvmdIgdItGK7Qm0hJw47ffKMb4mxjYS56fkXEteAD2V5jp60TKRCNXul+26o4VAKgc4SY5zSydyFv+e7dCvB/pT3ETh/dYPfPntiPBaWYZhwX13uG6dddS7Qg9K66gj4PLv0stvbFL54t
+X-OriginatorOrg: EXFO.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2020 15:57:23.1969
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff151c9d-1a88-41d9-c197-08d7938a48f9
+X-MS-Exchange-CrossTenant-Id: 1c75be0f-2569-4bcc-95f7-3ad9d904f42a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1c75be0f-2569-4bcc-95f7-3ad9d904f42a;Ip=[81.255.187.177];Helo=[ON_Mail.exfo.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB1255
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 01:39:01PM -0800, Ben Gardon wrote:
-> KVM creates internal memslots between 3 and 4 GiB paddrs on the first
-> vCPU creation. If memslot 0 is large enough it collides with these
-> memslots an causes vCPU creation to fail. When requesting more than 3G,
-> start memslot 0 at 4G in _vm_create.
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  tools/testing/selftests/kvm/lib/kvm_util.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 41cf45416060f..886d58e6cac39 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -113,6 +113,8 @@ const char * const vm_guest_mode_string[] = {
->  _Static_assert(sizeof(vm_guest_mode_string)/sizeof(char *) == NUM_VM_MODES,
->  	       "Missing new mode strings?");
->  
-> +#define KVM_INTERNAL_MEMSLOTS_START_PADDR (3UL << 30)
-> +#define KVM_INTERNAL_MEMSLOTS_END_PADDR (4UL << 30)
->  /*
->   * VM Create
->   *
-> @@ -128,13 +130,16 @@ _Static_assert(sizeof(vm_guest_mode_string)/sizeof(char *) == NUM_VM_MODES,
->   *
->   * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
->   * When phy_pages is non-zero, a memory region of phy_pages physical pages
-> - * is created and mapped starting at guest physical address 0.  The file
-> - * descriptor to control the created VM is created with the permissions
-> - * given by perm (e.g. O_RDWR).
-> + * is created. If phy_pages is less that 3G, it is mapped starting at guest
-> + * physical address 0. If phy_pages is greater than 3G it is mapped starting
-> + * 4G into the guest physical address space to avoid KVM internal memslots
-> + * which map the region between 3G and 4G. The file descriptor to control the
-> + * created VM is created with the permissions given by perm (e.g. O_RDWR).
->   */
->  struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
->  {
->  	struct kvm_vm *vm;
-> +	uint64_t guest_paddr = 0;
->  
->  	DEBUG("Testing guest mode: %s\n", vm_guest_mode_string(mode));
->  
-> @@ -227,9 +232,11 @@ struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
->  
->  	/* Allocate and setup memory for guest. */
->  	vm->vpages_mapped = sparsebit_alloc();
-> +	if (guest_paddr + phy_pages > KVM_INTERNAL_MEMSLOTS_START_PADDR)
-> +		guest_paddr = KVM_INTERNAL_MEMSLOTS_END_PADDR;
->  	if (phy_pages != 0)
->  		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> -					    0, 0, phy_pages, 0);
-> +					    guest_paddr, 0, phy_pages, 0);
->  
->  	return vm;
->  }
-> -- 
-> 2.24.1.735.g03f4e72817-goog
->
+Hello dear ML!
 
-I feel like this function is becoming too magic and it'll be more
-complicated for tests that need to add additional memory regions
-to know what physical addresses are available. Maybe we should assert
-if we can't allocate more than 3G at offset zero and also provide
-another interface for allocating at an offset input by the user,
-as long as the offset is 4G or above (asserting when it isn't)?
+We have deployed our application on an openstack RedHat platform with a KVM=
+ integration.
+Our VM have 14 vCPU 'reserved'.
 
-Thanks,
-drew
+From an hypervisor (via top command) point of view our VM is consuming 9 CP=
+U (900%). This was reported by our platform provider.
+From a VM point of view we are consuming only 2 CPU (200%), with a top also=
+.
 
+Our provider claim us to explain why we are consuming so much CPU. But we c=
+annot troubleshoot the infra as it's not our responsibility. From our point=
+ of view, everything is ok.
+
+Would you please give any bugs/config/whatever that could help us to drive =
+our provider to a misconfiguration or whatever?
+
+
+Thanks very much,
+Greg
