@@ -2,123 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 906F1132D34
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 18:38:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E41AF132D89
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 18:50:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728391AbgAGRiC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 12:38:02 -0500
-Received: from mail-eopbgr770089.outbound.protection.outlook.com ([40.107.77.89]:30852
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728344AbgAGRiC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 12:38:02 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WrFeP5rKvx70dRFt9uR5JF4KgjI1UCn5QZkX+Kjk+9UNDQboVoTrzbP2b2NN5/zBKdx49rFxlIggJGzk4xC3/FKIteunLWDUJITplAn5hLiV0SAfsxj5UIGGZ6K41m172qs9DETxOuqZ96fJQ8mEhY+b/DUWt9qM59kR45QVf20S2kA+z51s5zLsFon94mWFyovT8bYtOUnqH9EhxwAsD2dE/d94vlDKl0DdNoYzgspJhGws7bTFcvIb+pEpRLojplGtPHYQwCwkX+dthFGpLnXoUc3ZS9X4yIjTN0l4CtSbN+HI77io+htSnBLC3jyZwAfe8syFchIwuaZ5C1Ux/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3P6FHk2oK+RbLU4dn7rR2DTbNY9syJsy580x+71sU/A=;
- b=K+kL7TCj/5QCOt9A8Hom1hM5flUyed5zqTyswWQaGjsKIn/1JUjBo0Rbx1BbzDPJapQzRuZ8YaqqqmW6CaVEmhJZD9hn97ng10rI0xS7d5j/2hf9XtFVWuR6R07NH+KREbG91wRe6CX3mA9KnehAOrfxlPYctOxqbQ020+mOOuos779rB5fd+mMQ3kbu1uA0oZYkzHOo/RecA/HtZFWjx+QyGB51x2mznxuGLMrDY5yF9K0K5ZriDKHcvnZvPhXGUqeZLDJAIyksJG6vXVULDqmkOl39oDShN36uXPm+idZ7ow1/Nwy+WzptRmOYdeeh6jVBR0gtMpRwH7clZIThbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 81.255.187.177) smtp.rcpttodomain=redhat.com smtp.mailfrom=exfo.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=exfo.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=EXFO.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3P6FHk2oK+RbLU4dn7rR2DTbNY9syJsy580x+71sU/A=;
- b=gsKXVUrFe7ZQQNTZQuFOy7+RuNYL1kajpDcetjafF2RDB8MjcYQrnPTkasoftycy6FQ8XrFqG6G6FAaLIrnnB6MDvCfd6pcXM76mzir18my5WRZDtmdKNwf0ypb3FR4l0WtpLM3+Apau2p41843Kwr/ivxQDt9j7yU+vQWQFRUk=
-Received: from DM5PR11CA0015.namprd11.prod.outlook.com (2603:10b6:3:115::25)
- by MWHPR11MB1808.namprd11.prod.outlook.com (2603:10b6:300:10f::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2602.12; Tue, 7 Jan
- 2020 17:37:59 +0000
-Received: from CO1NAM05FT010.eop-nam05.prod.protection.outlook.com
- (2a01:111:f400:7e50::204) by DM5PR11CA0015.outlook.office365.com
- (2603:10b6:3:115::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2602.11 via Frontend
- Transport; Tue, 7 Jan 2020 17:37:59 +0000
-Authentication-Results: spf=pass (sender IP is 81.255.187.177)
- smtp.mailfrom=exfo.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=exfo.com;
-Received-SPF: Pass (protection.outlook.com: domain of exfo.com designates
- 81.255.187.177 as permitted sender) receiver=protection.outlook.com;
- client-ip=81.255.187.177; helo=ON_Mail.exfo.com;
-Received: from ON_Mail.exfo.com (81.255.187.177) by
- CO1NAM05FT010.mail.protection.outlook.com (10.152.96.117) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.2623.4 via Frontend Transport; Tue, 7 Jan 2020 17:37:58 +0000
-Received: from SPRNEXCHANGE01.exfo.com (10.50.50.95) by
- SPRNEXCHANGE01.exfo.com (10.50.50.95) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1531.3; Tue, 7 Jan 2020 18:37:56 +0100
-Received: from SPRNEXCHANGE01.exfo.com ([::1]) by SPRNEXCHANGE01.exfo.com
- ([::1]) with mapi id 15.01.1531.010; Tue, 7 Jan 2020 18:37:56 +0100
-From:   Gregory Esnaud <Gregory.ESNAUD@exfo.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [Newbie question] Why usage of CPU inside VM and outside VM is
- different
-Thread-Topic: [Newbie question] Why usage of CPU inside VM and outside VM is
- different
-Thread-Index: AdXFchc6k6fghFvyR2Cb2NX5qpnvFQAAUI6AAAKJVSD///YxgP//7wbw
-Date:   Tue, 7 Jan 2020 17:37:56 +0000
-Message-ID: <ab0ccf4e4ed14b058f859197f204083f@exfo.com>
-References: <8254fdfcfb7c4a82a5fc7a309152528e@exfo.com>
- <a8fb7ace-f52e-3a36-1c53-1db9468404e6@redhat.com>
- <fc4a7dfc9d344facaed8d34adcff3fc4@exfo.com>
- <3193f727-1031-b76b-4b3b-302316c9d058@redhat.com>
-In-Reply-To: <3193f727-1031-b76b-4b3b-302316c9d058@redhat.com>
-Accept-Language: fr-FR, en-US
-Content-Language: fr-FR
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.72.130.123]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1728429AbgAGRuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 12:50:54 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54287 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728348AbgAGRuy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 12:50:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578419453;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2GTm1l5zQtZ52XhEMdXoYtz6Pjm3g5KvI/aIwxC4+9w=;
+        b=WrTtwqVgPVINw4HqHyHyhLSL53diSxaqqmCWifSF7rAzv1hSvoIal3XZpU96oTub02S5Am
+        V0e82ze+2RlzzFweorsviwpE6BpC131Ried7W2osSDNnG+Dvqmol7k3Kc0Wr+7Ev/eBXc+
+        neUeBojm2N6bysjWwJb13cdvb+c3Ak4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-10-cWjUiVAuMqeB90ek5Knc5w-1; Tue, 07 Jan 2020 12:50:49 -0500
+X-MC-Unique: cWjUiVAuMqeB90ek5Knc5w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2577E1951287;
+        Tue,  7 Jan 2020 17:50:47 +0000 (UTC)
+Received: from work-vm (ovpn-117-52.ams2.redhat.com [10.36.117.52])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E77B29A84;
+        Tue,  7 Jan 2020 17:50:40 +0000 (UTC)
+Date:   Tue, 7 Jan 2020 17:50:37 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com,
+        kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com,
+        yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com,
+        cohuck@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com,
+        aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com,
+        Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+        Ken.Xue@amd.com, zhi.a.wang@intel.com, yan.y.zhao@intel.com,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+Message-ID: <20200107175037.GL2732@work-vm>
+References: <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
+ <20191217114357.6496f748@x1.home>
+ <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
+ <20191219102706.0a316707@x1.home>
+ <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
+ <20191219140929.09fa24da@x1.home>
+ <20200102182537.GK2927@work-vm>
+ <20200106161851.07871e28@w520.home>
+ <20200107095740.GB2778@work-vm>
+ <20200107095410.2be5a064@w520.home>
 MIME-Version: 1.0
-X-EOPAttributedMessage: 0
-X-Forefront-Antispam-Report: CIP:81.255.187.177;IPV:CAL;SCL:-1;CTRY:FR;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(396003)(346002)(376002)(136003)(189003)(199004)(186003)(356004)(86362001)(36756003)(316002)(24736004)(53546011)(7696005)(2616005)(108616005)(426003)(110136005)(26005)(81166006)(81156014)(8936002)(8676002)(70586007)(70206006)(5660300002)(336012)(26826003)(2906002)(478600001)(966005);DIR:OUT;SFP:1101;SCL:1;SRVR:MWHPR11MB1808;H:ON_Mail.exfo.com;FPR:;SPF:Pass;LANG:en;PTR:extranet.astellia.com;MX:1;A:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ccb36914-d1aa-468f-729c-08d79398564d
-X-MS-TrafficTypeDiagnostic: MWHPR11MB1808:
-X-Microsoft-Antispam-PRVS: <MWHPR11MB1808AEFE5509E176D6B8EED2F43F0@MWHPR11MB1808.namprd11.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-Forefront-PRVS: 027578BB13
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9BHsnvBc0NgBokcovMQ0lBnu/QxmIRFpQhHMIOIsXvNVWX/Jb6CvW6/puO+hXI27CtlREmQ7/lZk0WbawvQiLt+2+cL9dvlWn+/DzHXxR4tW6N5a/Hh1YnHqM5b6hdsdu+tzPWdlXwsVXn5A3pcMLzMyF31oRQ0CdWHalURkJDHdkt7EkXLiFJuzFNXELlVznas73ysIpwtEPEjXdFBtrvBKiXr0aGJxsLPht+pag9ToDHhiT/o2YWqcTf5loC/Sqq6pxRM5hiq+FrWaBwKB76YvNo9le55gPh8iZfSjywA6gMdcUIA0WE7UOI1L9lZbhbrUb9L9DBtYZHq7V4l/6gJKHRdvTcDU1cD4bFGlAPdmFhfdNozs/i/2UOZp/Wp1Q3K9EqA/XAoYuyfy3CIfG8eF5ArOtHuiOl/g3dOfLBKxq5fLdK/+c/UgoBJyMEFgr3VzDYV8sZJ3ce2EX4adK24KdJ3F9zGrBc+AlSQ8ev/drxsyn6b6+241plBZe0ixOBZeZPhPGZnLSfFFfYTbvw==
-X-OriginatorOrg: EXFO.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2020 17:37:58.5330
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ccb36914-d1aa-468f-729c-08d79398564d
-X-MS-Exchange-CrossTenant-Id: 1c75be0f-2569-4bcc-95f7-3ad9d904f42a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1c75be0f-2569-4bcc-95f7-3ad9d904f42a;Ip=[81.255.187.177];Helo=[ON_Mail.exfo.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1808
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200107095410.2be5a064@w520.home>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBUaGF0J3MgYSBwb3NzaWJpbGl0eS4gIEFuZCBpZiBpdCdzIGNvcnJlY3QsIHlvdXIgcHJvdmlk
-ZXIgaXMgY2VydGFpbmx5IGNvcnJlY3QgaW4gY29tcGxhaW5pbmcuIDopDQpZZXMsIGJ1dCBhcyBh
-IGNsb3VkIHByb3ZpZGVyIGhlIHNob3VsZCBwcm92aWRlIHVzIHByZXJlcXVpc2l0ZXMgb24gVk0g
-Y29uZmlnIPCfmIkuDQoNCkkgd2lsbCBnaXZlIGl0IGEgdHJ5IQ0KDQpUaGFua3MhDQoNCi0tLS0t
-TWVzc2FnZSBkJ29yaWdpbmUtLS0tLQ0KRGXCoDogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVk
-aGF0LmNvbT4gDQpFbnZvecOpwqA6IG1hcmRpIDcgamFudmllciAyMDIwIDE4OjM2DQrDgMKgOiBH
-cmVnb3J5IEVzbmF1ZCA8R3JlZ29yeS5FU05BVURAZXhmby5jb20+OyBrdm1Admdlci5rZXJuZWwu
-b3JnDQpPYmpldMKgOiBSZTogW05ld2JpZSBxdWVzdGlvbl0gV2h5IHVzYWdlIG9mIENQVSBpbnNp
-ZGUgVk0gYW5kIG91dHNpZGUgVk0gaXMgZGlmZmVyZW50DQoNCk9uIDA3LzAxLzIwIDE4OjMyLCBH
-cmVnb3J5IEVzbmF1ZCB3cm90ZToNCj4gSGkgUGFvbG8sDQo+IA0KPiBUaGFua3MgZm9yIHlvdXIg
-cXVpY2sgYW5zd2VyLg0KPiANCj4gQXJlIHlvdSB1c2luZyBvbmx5IDIgQ1BVcyBhdCAxMDAlLCBv
-ciBhcmUgeW91IHVzaW5nIDkgQ1BVcyBhdCBhIHRvdGFsIG9mIDIwMCU/IA0KPiANCj4gSW5zaWRl
-IHRoZSBWTSwgYSB0b3AgY29tbWFuZCBzaG93IHRoYXQgd2UgYXJlIHVzaW5nIDIgQ1BVIEAgMTAw
-JTogDQo+IGh0dHBzOi8vZnJhbWFkcm9wLm9yZy9yL2dOZjNlckpWZjYjdDJITElwelBIR3R4SHpI
-ZUxybkdHanNSU1pacG12OUhQVloNCj4gdC9MSUlQOHM9IEZyb20gdGhlIGh5cGVydmlzb3IgKGll
-LCAqb3V0c2lkZSogdGhlIHZtKSwgYSB0b3AgY29tbWFuZCANCj4gc2hvdyB0aGF0IHRoZSBWTSBj
-b25zdW1pbmcgOSBjcHU6IA0KPiBodHRwczovL2ZyYW1hZHJvcC5vcmcvci8tRm1yQmhNR1g1I3Ev
-NmFaOEZxMk1udXp6Mys2Ri9wYTgzVStqelBveDFoZDk4DQo+IDR0dzdEa3VBPQ0KPiANCj4gU28s
-IGlmIEknbSB1bmRlcnN0YW5kaW5nIHlvdSBjb3JyZWN0bHksIGFuIHBhcmFtZXRlciBvZiBrZXJu
-ZWwgb2Ygb3VyIFZNIGlzIGlkZWw9cG9sbCB0aGF0IHdlIHNob3VsZCBjaGFuZ2U/DQo+IA0KDQpU
-aGF0J3MgYSBwb3NzaWJpbGl0eS4gIEFuZCBpZiBpdCdzIGNvcnJlY3QsIHlvdXIgcHJvdmlkZXIg
-aXMgY2VydGFpbmx5IGNvcnJlY3QgaW4gY29tcGxhaW5pbmcuIDopDQoNClBhb2xvDQoNCg==
+* Alex Williamson (alex.williamson@redhat.com) wrote:
+> On Tue, 7 Jan 2020 09:57:40 +0000
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Alex Williamson (alex.williamson@redhat.com) wrote:
+> > > On Thu, 2 Jan 2020 18:25:37 +0000
+> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > >   
+> > > > * Alex Williamson (alex.williamson@redhat.com) wrote:  
+> > > > > On Fri, 20 Dec 2019 01:40:35 +0530
+> > > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > > > >     
+> > > > > > On 12/19/2019 10:57 PM, Alex Williamson wrote:
+> > > > > > 
+> > > > > > <Snip>
+> > > > > >     
+> > > > 
+> > > > <snip>
+> > > >   
+> > > > > > 
+> > > > > > If device state it at pre-copy state (011b).
+> > > > > > Transition, i.e., write to device state as stop-and-copy state (010b) 
+> > > > > > failed, then by previous state I meant device should return pre-copy 
+> > > > > > state(011b), i.e. previous state which was successfully set, or as you 
+> > > > > > said current state which was successfully set.    
+> > > > > 
+> > > > > Yes, the point I'm trying to make is that this version of the spec
+> > > > > tries to tell the user what they should do upon error according to our
+> > > > > current interpretation of the QEMU migration protocol.  We're not
+> > > > > defining the QEMU migration protocol, we're defining something that can
+> > > > > be used in a way to support that protocol.  So I think we should be
+> > > > > concerned with defining our spec, for example my proposal would be: "If
+> > > > > a state transition fails the user can read device_state to determine the
+> > > > > current state of the device.  This should be the previous state of the
+> > > > > device unless the vendor driver has encountered an internal error, in
+> > > > > which case the device may report the invalid device_state 110b.  The
+> > > > > user must use the device reset ioctl in order to recover the device
+> > > > > from this state.  If the device is indicated in a valid device state
+> > > > > via reading device_state, the user may attempt to transition the device
+> > > > > to any valid state reachable from the current state."    
+> > > > 
+> > > > We might want to be able to distinguish between:
+> > > >   a) The device has failed and needs a reset
+> > > >   b) The migration has failed  
+> > > 
+> > > I think the above provides this.  For Kirti's example above of
+> > > transitioning from pre-copy to stop-and-copy, the device could refuse
+> > > to transition to stop-and-copy, generating an error on the write() of
+> > > device_state.  The user re-reading device_state would allow them to
+> > > determine the current device state, still in pre-copy or failed.  Only
+> > > the latter would require a device reset.  
+> > 
+> > OK - but that doesn't give you any way to figure out 'why' it failed;
+> > I guess I was expecting you to then read an 'error' register to find
+> > out what happened.
+> > Assuming the write() to transition to stop-and-copy fails and you're
+> > still in pre-copy, what's the defined thing you're supposed to do next?
+> > Decide migration has failed and then do a write() to transition to running?
+> 
+> Defining semantics for an error register seems like a project on its
+> own.  We do have flags, we could use them to add an error register
+> later, but I think it's only going to rat hole this effort to try to
+> incorporate that now.
+
+OK, to be honest I didn't really mean for that thing to be used by code
+to decide on it's next action, rather to have something to report when
+it failed.
+
+> The state machine is fairly small, so in the
+> scenario you present, I think the user would assume a failure at
+> pre-copy to stop-and-copy transition would fail the migration and the
+> device could go back to running state.  If the device then fails to
+> return to the running state, we might be stuck with a device with
+> reduced performance or overhead and the user could warn about that and
+> continue with the device as-is.  The vendor drivers could make use of
+> -EAGAIN on transition failure to indicate a temporary issue, but
+> otherwise the user should probably consider it a persistent error until
+> either a device reset or start of a new migration sequence (ie. return
+> to running and start over).  Thanks,
+
+OK as long as we define somewhere that the action on a failed transition
+is then try and transitino to running before restarting the VM and fail
+the migration.
+
+Dave
+
+> Alex
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
