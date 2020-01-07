@@ -2,85 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DFEBB132AB4
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 17:04:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BF84132B32
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 17:37:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728374AbgAGQEJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 11:04:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23410 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728266AbgAGQEJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 11:04:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578413048;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6/pI4t6B9z0wRX+NvUB89xIHygZ7s0TFKH3LWLJINv4=;
-        b=glV97bbJAGPgV+M2Z2fZhusGO2pk1Tpa3fpFcZweCUliJCFYkYztEkHU0u84/EuJ+6Hxhz
-        kVerEg3TwknY9k4ypTB00idi937GZyxMHliG2gqdoNYKg9H3TC4LAg+WqJTh+wop/ubgPQ
-        IY3I2qiC4Atp+vBWE07Y3WauqRBzpcc=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-zigPcgfsN-GOQBxD2V1Hvg-1; Tue, 07 Jan 2020 11:04:07 -0500
-X-MC-Unique: zigPcgfsN-GOQBxD2V1Hvg-1
-Received: by mail-qk1-f199.google.com with SMTP id u10so106124qkk.1
-        for <kvm@vger.kernel.org>; Tue, 07 Jan 2020 08:04:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=6/pI4t6B9z0wRX+NvUB89xIHygZ7s0TFKH3LWLJINv4=;
-        b=PKFTJxvpDD/wnQP2HzywZUtPOOjUGT1pt4mdJsbufiFCUyazab8MxjhD8T6k44YhKw
-         7dtOGR+mEOmUHMHnM7nBzRsOJp/01YJ294rzVTx8mwXvBVZKFEE5RZEelJZ4C2N43Fpn
-         ia369dM37kreR8+eqpZJ6RuIOvHQO+JRK3Q4ywKcem6wQ2JIQ3sFxjY/uMzpF6sFXALa
-         /41a1YF95prcS3wLgkAH1EfMcRRdZwbVfLe1dzX6WTUwKJqMNi/bR/zBNZsjFQA7jldo
-         VddlNrTMjiM0s7a+EJqBNi54egc7uisVEKpjb3wXEGgOUGDRfmyQqyT5BHuAadQ4ydpq
-         X21w==
-X-Gm-Message-State: APjAAAWJWoWkfV8ScxQqOSlhggDZNp5e3a6ouJCxdDzh1lBRsqR5fmT8
-        azuPef/j5Y7Re0EkQ95+Eziz8+HZOWjJBgfP5jWPsiLf8qd1zO1O9JF/FH1BiGn+QeT95o02UOR
-        KqYqi7lIWTHL4
-X-Received: by 2002:aed:2d67:: with SMTP id h94mr78673828qtd.74.1578413046804;
-        Tue, 07 Jan 2020 08:04:06 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw66uIFnVme9AqF60F5anI9TjXT0ppMeOA6QoIMEfNwjdJGOKZ3GP3xMn0fUgfQqx9ibtRZXQ==
-X-Received: by 2002:aed:2d67:: with SMTP id h94mr78673801qtd.74.1578413046612;
-        Tue, 07 Jan 2020 08:04:06 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id k50sm47999qtc.90.2020.01.07.08.04.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2020 08:04:05 -0800 (PST)
-Date:   Tue, 7 Jan 2020 11:04:04 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v3 3/8] KVM: selftests: Add configurable demand paging
- delay
-Message-ID: <20200107160404.GH219677@xz-x1>
-References: <20191216213901.106941-1-bgardon@google.com>
- <20191216213901.106941-4-bgardon@google.com>
+        id S1728352AbgAGQhD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 11:37:03 -0500
+Received: from mga09.intel.com ([134.134.136.24]:46103 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728020AbgAGQhD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 11:37:03 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jan 2020 08:37:02 -0800
+X-IronPort-AV: E=Sophos;i="5.69,406,1571727600"; 
+   d="scan'208";a="215618049"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jan 2020 08:37:02 -0800
+Message-ID: <3025ad3e90ec5c6b48e3101174ab090e054f4c9a.camel@linux.intel.com>
+Subject: Re: [PATCH 0/2] page hinting add passthrough support
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     weiqi <weiqi4@huawei.com>, alex.williamson@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, x86@kernel.org
+Date:   Tue, 07 Jan 2020 08:37:02 -0800
+In-Reply-To: <1578408399-20092-1-git-send-email-weiqi4@huawei.com>
+References: <1578408399-20092-1-git-send-email-weiqi4@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191216213901.106941-4-bgardon@google.com>
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 01:38:56PM -0800, Ben Gardon wrote:
-> When running the demand paging test with the -u option, the User Fault
-> FD handler essentially adds an arbitrary delay to page fault resolution.
-> To enable better simulation of a real demand paging scenario, add a
-> configurable delay to the UFFD handler.
+On Tue, 2020-01-07 at 22:46 +0800, weiqi wrote:
+> From: wei qi <weiqi4@huawei.com>
 > 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
+> 
+> I just implemented dynamically updating the iommu table to support pass-through,
+> It seen to work fine.
+> 
+> Test:
+> start a 4G vm with 2M hugetlb and ixgbevf passthrough, 
+>     GuestOS: linux-5.2.6 + 	(mm / virtio: Provide support for free page reporting)
+>     HostOS: 5.5-rc4
+>     Host: Intel(R) Xeon(R) Gold 6161 CPU @ 2.20GHz 
+> 
+> after enable page hinting, free pages at GuestOS can be free at host. 
+> 
+> 
+> before,
+>  # cat /sys/devices/system/node/node*/hugepages/hugepages-2048kB/free_hugepages 
+>  5620
+>  5620
+> after start VM,
+>  # numastat -c qemu
+> 
+>  Per-node process memory usage (in MBs)
+>  PID              Node 0 Node 1 Total
+>  ---------------  ------ ------ -----
+>  24463 (qemu_hotr      6      6    12
+>  24479 (qemu_tls_      0      8     8
+>  70718 (qemu-syst     58    539   597
+>  ---------------  ------ ------ -----
+>  Total                64    553   616
+>  # cat /sys/devices/system/node/node*/hugepages/hugepages-2048kB/free_hugepages 
+>  5595
+>  5366
+> 
+> the modify at qemu,
+>  +int kvm_discard_range(struct kvm_discard_msg discard_msg)  
+>  +{
+>  +    return kvm_vm_ioctl(kvm_state, KVM_DISCARD_RANGE, &discard_msg);
+>  +}
+> 
+>  static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
+>  {
+>             ..................
+>  +           discard_msg.in_addr = elem->in_addr[i];
+>  +           discard_msg.iov_len = elem->in_sg[i].iov_len;
+> 
+>             ram_block_discard_range(rb, ram_offset, size);
+>  +           kvm_discard_range(discard_msg);
+> 
+> then, further test network bandwidth, performance seem ok.
+>  
+> Is there any hidden problem in this implementation?
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+How is it you are avoiding triggering the call to qemu_balloon_inhibit in
+QEMU?
 
--- 
-Peter Xu
+> And, is there plan to support pass-throughyour?
+
+It wasn't something I was immediately planning to do. Before we got there
+we would need to really address the fact that the host has no idea what
+pages the device could be accessing since normally the entire guest is
+pinned. I guess these patches are a step toward addressing that?
+
 
