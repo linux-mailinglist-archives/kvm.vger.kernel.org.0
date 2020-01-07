@@ -2,92 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D61F213227B
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 10:34:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE4DC1322A4
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 10:39:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727801AbgAGJd6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 04:33:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37506 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726565AbgAGJd5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 04:33:57 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1D9B7206DB;
-        Tue,  7 Jan 2020 09:33:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578389637;
-        bh=0RwFzwAEmrIP5sG0tKGrxv2D/cxDWEkx4BvAxCF7YcY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=H4MhWpEv9OaFCgT3pOtwNa8691FoPe9u0TYSCg/+0HvXNb3xrg8Z0UMTp3WlgCN9V
-         sZneQrxj1cZTzcdnNMP4HyRW3GUYvhQYxpSdzhrj9w+ugT+W+e09aturGqr6jVjdnQ
-         EuPegGrp4+ChfhOaNGONnb4I074kMSLOP/LCXt6g=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1iolFL-000143-D1; Tue, 07 Jan 2020 09:33:55 +0000
+        id S1727742AbgAGJjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 04:39:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56630 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727559AbgAGJjK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 04:39:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578389949;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KTZsZnppU+2QHEms25h87mEXIcd3CR1WH++YNAVYQNY=;
+        b=E0E59r7nXc15Ugy5ig041GMuBr51+WGsKOktoetnTalvgh73vgmZCtbDi2k1dEV2t/vvTS
+        NF0q5SadBMqzCTIZPwmZ9VMZilS5R1zSnmDnn21PJx49M9PIagCDaVJ+5r1qEZ+5o1red5
+        QonH7W3MrxNhEUs6S2GkVesAdu7Ai1w=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-426-6wP0hYJVM0mZOh79LWPGUw-1; Tue, 07 Jan 2020 04:39:06 -0500
+X-MC-Unique: 6wP0hYJVM0mZOh79LWPGUw-1
+Received: by mail-qk1-f200.google.com with SMTP id g28so17546784qkl.6
+        for <kvm@vger.kernel.org>; Tue, 07 Jan 2020 01:39:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=KTZsZnppU+2QHEms25h87mEXIcd3CR1WH++YNAVYQNY=;
+        b=EejCdYcQqFUwxQHHdunOLlybbMdJglmbvahL02SDMrCJGhGYl8N0gDe8z8twGB1B/e
+         F9qbdwxHgu7g/ip9kRYdxgwZieBNDPwJ+zlbvbq1MguNev3IhdCtrhn3hsD9rv9oSVaH
+         fKgg0bYIuhbqor0pcMrWURGLpjfBIZQDpdFGQaBQrCFmGfapVZay+TWC544aUUq5nQ1/
+         /m/kCU1zNrpaqNwiAgm3yy69Cz3pvS8O26yWD0QjfGkkABbzi+MR9DeQUnkioO4VJO4e
+         Sx/zRkr5YKrv18IC23VB4wNYe2sS6vcAL+8p0kxfoKDgsS+5jpiB9BMLPYcKKo69w/oR
+         YGkw==
+X-Gm-Message-State: APjAAAWSd8p2uiSOhvMecpsbb/aa4S+4PV6+9WivOfEpR8UyInv6QkPo
+        v/00mM7lHTYmkbni9QrKjliDBBuombRTf75RjeEQ4jID1GpLWgyNh3rxU9yPTHCuv9XUX+gSyEA
+        D4YqG3ocAOOyf
+X-Received: by 2002:ac8:1bd4:: with SMTP id m20mr80192052qtk.301.1578389946372;
+        Tue, 07 Jan 2020 01:39:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxNBSffjTXlW+OajOtddlXmtV11+UXzECSfu7cNC0iRx6P/v+pltqGMwIX+pamDcwsrKCW75A==
+X-Received: by 2002:ac8:1bd4:: with SMTP id m20mr80192040qtk.301.1578389946145;
+        Tue, 07 Jan 2020 01:39:06 -0800 (PST)
+Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
+        by smtp.gmail.com with ESMTPSA id u57sm24900235qth.68.2020.01.07.01.39.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jan 2020 01:39:05 -0800 (PST)
+Date:   Tue, 7 Jan 2020 04:39:00 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
+ crashes in KVM guests after reboot
+Message-ID: <20200107042401-mutt-send-email-mst@kernel.org>
+References: <c022e1d6-0d57-ae07-5e6b-8e40d3b01f4b@de.ibm.com>
+ <20191218100926-mutt-send-email-mst@kernel.org>
+ <2ffdbd95-e375-a627-55a1-6990b0a0e37a@de.ibm.com>
+ <20200106054041-mutt-send-email-mst@kernel.org>
+ <08ae8d28-3d8c-04e8-bdeb-0117d06c6dc7@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 07 Jan 2020 09:33:55 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jianyong Wu <Jianyong.Wu@arm.com>, netdev@vger.kernel.org,
-        yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
-        sean.j.christopherson@intel.com, richardcochran@gmail.com,
-        Mark Rutland <Mark.Rutland@arm.com>, will@kernel.org,
-        Suzuki Poulose <Suzuki.Poulose@arm.com>,
-        Steven Price <Steven.Price@arm.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve Capper <Steve.Capper@arm.com>,
-        Kaly Xin <Kaly.Xin@arm.com>, Justin He <Justin.He@arm.com>,
-        nd <nd@arm.com>
-Subject: Re: [RFC PATCH v9 0/8] Enable ptp_kvm for arm64
-In-Reply-To: <bf333cdc-3455-7c64-89c2-014639614904@redhat.com>
-References: <20191210034026.45229-1-jianyong.wu@arm.com>
- <HE1PR0801MB1676CFC9A06B6CE800052A99F43C0@HE1PR0801MB1676.eurprd08.prod.outlook.com>
- <bf333cdc-3455-7c64-89c2-014639614904@redhat.com>
-Message-ID: <7a589be6dc0d5562caf8c8f795b31efc@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, Jianyong.Wu@arm.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, sean.j.christopherson@intel.com, richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org, Suzuki.Poulose@arm.com, Steven.Price@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, Kaly.Xin@arm.com, Justin.He@arm.com, nd@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <08ae8d28-3d8c-04e8-bdeb-0117d06c6dc7@de.ibm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-01-07 08:15, Paolo Bonzini wrote:
-> On 06/01/20 10:38, Jianyong Wu wrote:
->> Ping ...
->> Any comments to this patch set?
+On Tue, Jan 07, 2020 at 09:59:16AM +0100, Christian Borntraeger wrote:
 > 
-> Marc, Will, can you ack it?  Since the sticky point was the detection 
-> of
-> the clocksource and it was solved by Thomas's patch, I don't have any
-> more problems including it.
+> 
+> On 06.01.20 11:50, Michael S. Tsirkin wrote:
+> > On Wed, Dec 18, 2019 at 04:59:02PM +0100, Christian Borntraeger wrote:
+> >> On 18.12.19 16:10, Michael S. Tsirkin wrote:
+> >>> On Wed, Dec 18, 2019 at 03:43:43PM +0100, Christian Borntraeger wrote:
+> >>>> Michael,
+> >>>>
+> >>>> with 
+> >>>> commit db7286b100b503ef80612884453bed53d74c9a16 (refs/bisect/skip-db7286b100b503ef80612884453bed53d74c9a16)
+> >>>>     vhost: use batched version by default
+> >>>> plus
+> >>>> commit 6bd262d5eafcdf8cdfae491e2e748e4e434dcda6 (HEAD, refs/bisect/bad)
+> >>>>     Revert "vhost/net: add an option to test new code"
+> >>>> to make things compile (your next tree is not easily bisectable, can you fix that as well?).
+> >>>
+> >>> I'll try.
+> >>>
+> >>>>
+> >>>> I get random crashes in my s390 KVM guests after reboot.
+> >>>> Reverting both patches together with commit decd9b8 "vhost: use vhost_desc instead of vhost_log" to
+> >>>> make it compile again) on top of linux-next-1218 makes the problem go away.
+> >>>>
+> >>>> Looks like the batched version is not yet ready for prime time. Can you drop these patches until
+> >>>> we have fixed the issues?
+> >>>>
+> >>>> Christian
+> >>>>
+> >>>
+> >>> Will do, thanks for letting me know.
+> >>
+> >> I have confirmed with the initial reporter (internal test team) that <driver name='qemu'/> 
+> >> with a known to be broken linux next kernel also fixes the problem, so it is really the
+> >> vhost changes.
+> > 
+> > OK I'm back and trying to make it more bisectable.
+> > 
+> > I pushed a new tag "batch-v2".
+> > It's same code but with this bisect should get more information.
+> 
+> I get the following with this tag
+> 
+> drivers/vhost/net.c: In function ‘vhost_net_tx_get_vq_desc’:
+> drivers/vhost/net.c:574:7: error: implicit declaration of function ‘vhost_get_vq_desc_batch’; did you mean ‘vhost_get_vq_desc’? [-Werror=implicit-function-declaration]
+>   574 |   r = vhost_get_vq_desc_batch(tvq, tvq->iov, ARRAY_SIZE(tvq->iov),
+>       |       ^~~~~~~~~~~~~~~~~~~~~~~
+>       |       vhost_get_vq_desc
+> 
 
-Boo. I had forgotten about this series. :-(
+Not sure why but I pushed a wrong commit. Sorry. Should be good now.
 
-Going back to it, there is a few ugly points in the arm-specific code
-(I'm OK with the generic changes though).
-
-Another thing is that the whole series depends on three patches that 
-have
-never been posted to any list, hence never reviewed.
-
-Jianyong: Please repost this series *with* the dependencies so that they
-can be reviewed, once you've addressed my comments on two of the 
-patches.
-
-Thanks,
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+MST
+
