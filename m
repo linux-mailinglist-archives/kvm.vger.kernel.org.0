@@ -2,364 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD15D13293D
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 15:47:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E059C132969
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 15:56:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728326AbgAGOrM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 09:47:12 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9120 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728080AbgAGOrM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 09:47:12 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 3A7811D2FC4068FC053E;
-        Tue,  7 Jan 2020 22:47:07 +0800 (CST)
-Received: from localhost (10.177.98.84) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Tue, 7 Jan 2020
- 22:46:58 +0800
-From:   weiqi <weiqi4@huawei.com>
-To:     <alexander.h.duyck@linux.intel.com>, <alex.williamson@redhat.com>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <pbonzini@redhat.com>, <x86@kernel.org>, wei qi <weiqi4@huawei.com>
-Subject: [PATCH 2/2] KVM: add support for page hinting
-Date:   Tue, 7 Jan 2020 22:46:39 +0800
-Message-ID: <1578408399-20092-3-git-send-email-weiqi4@huawei.com>
-X-Mailer: git-send-email 1.8.4.msysgit.0
-In-Reply-To: <1578408399-20092-1-git-send-email-weiqi4@huawei.com>
-References: <1578408399-20092-1-git-send-email-weiqi4@huawei.com>
+        id S1728202AbgAGO4V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 09:56:21 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59165 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727994AbgAGO4S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jan 2020 09:56:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578408977;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AMsY+5AfULXXQPieaO9m1OwQcv8Xr5ZMsyyOrT8Fw9k=;
+        b=bUFCjzqC7th5UypWPVL/1R7VapYKerroS15saH+gE4GAJK5OEumhVeq5moKrYVC2LvXkpt
+        GWc5BgGELct9Hj8cJShD1lRICmmLYbMwU/yaI0Mp7fLa07ZwLHvqta7LRB8wisGgwxgNEX
+        E5UT1V0IyVvZbPqegwgoXUScMnL9mLw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-2BCXJcVsMTWMhcag17A0mg-1; Tue, 07 Jan 2020 09:56:15 -0500
+X-MC-Unique: 2BCXJcVsMTWMhcag17A0mg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49303100550E;
+        Tue,  7 Jan 2020 14:56:14 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CDB4C5D9CA;
+        Tue,  7 Jan 2020 14:56:10 +0000 (UTC)
+Date:   Tue, 7 Jan 2020 15:56:08 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cannon Matthews <cannonmatthews@google.com>
+Subject: Re: [PATCH v3 1/8] KVM: selftests: Create a demand paging test
+Message-ID: <20200107145608.ogi34nkyh2abdgrq@kamzik.brq.redhat.com>
+References: <20191216213901.106941-1-bgardon@google.com>
+ <20191216213901.106941-2-bgardon@google.com>
+ <20200107143334.GF219677@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.177.98.84]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200107143334.GF219677@xz-x1>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: wei qi <weiqi4@huawei.com>
+On Tue, Jan 07, 2020 at 09:33:34AM -0500, Peter Xu wrote:
+> On Mon, Dec 16, 2019 at 01:38:54PM -0800, Ben Gardon wrote:
+> > While userfaultfd, KVM's demand paging implementation, is not specific
+> > to KVM, having a benchmark for its performance will be useful for
+> > guiding performance improvements to KVM. As a first step towards creating
+> > a userfaultfd demand paging test, create a simple memory access test,
+> > based on dirty_log_test.
+> > 
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> 
+> It's fine to start with x86-only for this test, but imho it would be
+> better to mention that in cover letter, or reply to reviewer comments
+> on that you removed aarch64 from previous post.
 
-add support for page hinting.
+I'd also prefer that if it's x86-only that it be put in the x86_64
+subdirectory and drop the arch #ifdefs. The question is why is it
+x86-only for now though? Will it take a lot of work to port it to
+other architectures? Or does it just need testing by someone with
+the hardware?
 
-Signed-off-by: wei qi <weiqi4@huawei.com>
----
- arch/x86/kvm/mmu/mmu.c   | 79 +++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c       | 96 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/kvm_host.h | 41 +++++++++++++++++++++
- include/uapi/linux/kvm.h |  7 ++++
- virt/kvm/vfio.c          | 11 ------
- 5 files changed, 223 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6f92b40..0cf2584 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4259,6 +4259,71 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- 	return kvm_mtrr_check_gfn_range_consistency(vcpu, gfn, page_num);
- }
- 
-+#include <linux/vfio.h>
-+static void kvm_vfio_mmap_range(struct kvm_vcpu *vcpu, struct kvm_device *tmp,
-+				gfn_t gfn, kvm_pfn_t pfn)
-+{
-+	struct kvm_vfio *kv = tmp->private;
-+	struct kvm_vfio_group *kvg;
-+
-+	list_for_each_entry(kvg, &kv->group_list, node) {
-+		struct vfio_group *group = kvg->vfio_group;
-+		struct vfio_device *it, *device = NULL;
-+
-+		list_for_each_entry(it, &group->device_list, group_next) {
-+			int flags;
-+			unsigned long page_size;
-+			struct kvm_memory_slot *memslot;
-+			int size;
-+			unsigned long old_pfn = 0;
-+			gfn_t gfn_base;
-+			kvm_pfn_t pfn_base;
-+
-+			device = it;
-+			memslot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-+			page_size = kvm_host_page_size(vcpu->kvm, gfn);
-+
-+			/* only discard free pages, just check 2M hugetlb */
-+			if (page_size >> PAGE_SHIFT != 512)
-+				return;
-+
-+			gfn_base = ((gfn << PAGE_SHIFT) & (~(page_size - 1)))
-+					>> PAGE_SHIFT;
-+			pfn_base = ((pfn << PAGE_SHIFT) & (~(page_size - 1)))
-+					>> PAGE_SHIFT;
-+
-+			while ((gfn << PAGE_SHIFT) & (page_size - 1))
-+				page_size >>= 1;
-+
-+			while (__gfn_to_hva_memslot(memslot, gfn) &
-+						(page_size - 1))
-+				page_size >>= 1;
-+
-+			size = vfio_dma_find(device->dev, gfn_base,
-+					page_size >> PAGE_SHIFT, &old_pfn);
-+			if (!size) {
-+				pr_err("%s:not find dma: gfn: %llx, size: %lu.\n",
-+					__func__, gfn_base,
-+					page_size >> PAGE_SHIFT);
-+				return;
-+			}
-+			if (!old_pfn)
-+				pr_err("%s: not find pfn: gfn: %llx, size: %lu.\n",
-+					__func__, gfn_base,
-+					page_size >> PAGE_SHIFT);
-+
-+			if (pfn_base == old_pfn)
-+				return;
-+
-+			flags = IOMMU_READ;
-+			if (!(memslot->flags & KVM_MEM_READONLY))
-+				flags |= IOMMU_WRITE;
-+			vfio_mmap_pages(device->dev, gfn,
-+					page_size, flags, pfn);
-+		}
-+	}
-+}
-+
- static int tdp_page_fault(struct kvm_vcpu *vcpu, gva_t gpa, u32 error_code,
- 			  bool prefault)
- {
-@@ -4317,6 +4382,20 @@ static int tdp_page_fault(struct kvm_vcpu *vcpu, gva_t gpa, u32 error_code,
- 			 prefault, lpage_disallowed);
- out_unlock:
- 	spin_unlock(&vcpu->kvm->mmu_lock);
-+
-+	if (!is_noslot_pfn(pfn) && gfn) {
-+		struct kvm_device *tmp;
-+
-+		list_for_each_entry(tmp, &vcpu->kvm->devices, vm_node) {
-+			if (tmp->ops && tmp->ops->name &&
-+				(!strcmp(tmp->ops->name, "kvm-vfio"))) {
-+				spin_lock(&vcpu->kvm->discard_lock);
-+				kvm_vfio_mmap_range(vcpu, tmp, gfn, pfn);
-+				spin_unlock(&vcpu->kvm->discard_lock);
-+			}
-+		}
-+	}
-+
- 	kvm_release_pfn_clean(pfn);
- 	return r;
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index cf91713..264c65e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4837,6 +4837,92 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 	return r;
- }
- 
-+#include <linux/vfio.h>
-+static void kvm_vfio_ummap_range(struct kvm *kvm, struct kvm_device *tmp,
-+				gfn_t gfn, int npages, unsigned long hva)
-+{
-+	struct kvm_vfio *kv = tmp->private;
-+	struct kvm_vfio_group *kvg;
-+
-+	list_for_each_entry(kvg, &kv->group_list, node) {
-+		struct vfio_group *group = kvg->vfio_group;
-+		struct vfio_device *it, *device = NULL;
-+
-+		list_for_each_entry(it, &group->device_list, group_next) {
-+			unsigned long page_size, page_size_base;
-+			unsigned long addr;
-+			int size;
-+			unsigned long old_pfn = 0;
-+			int ret = 0;
-+			size_t unmapped = npages;
-+			gfn_t iova_gfn = gfn;
-+			unsigned long iova_hva = hva;
-+
-+			device = it;
-+			while (unmapped) {
-+				addr = gfn_to_hva(kvm, iova_gfn);
-+				page_size_base = page_size =
-+						kvm_host_page_size(kvm,
-+						iova_gfn);
-+
-+				if (addr != iova_hva)
-+					return;
-+
-+				while ((iova_gfn << PAGE_SHIFT) &
-+					(page_size - 1))
-+					page_size >>= 1;
-+
-+				while (addr & (page_size - 1))
-+					page_size >>= 1;
-+
-+				if (page_size_base != page_size)
-+					return;
-+
-+				size = vfio_dma_find(device->dev, iova_gfn,
-+						page_size >> PAGE_SHIFT,
-+						&old_pfn);
-+				if (!size)
-+					return;
-+
-+				if (!old_pfn)
-+					return;
-+
-+				ret = vfio_munmap_pages(device->dev,
-+						iova_gfn, page_size);
-+				unmapped -= page_size >> PAGE_SHIFT;
-+				iova_hva += page_size;
-+				iova_gfn += page_size >> PAGE_SHIFT;
-+			}
-+		}
-+	}
-+}
-+
-+
-+static int kvm_vm_ioctl_discard_range(struct kvm *kvm,
-+				struct kvm_discard_msg *msg)
-+{
-+	gfn_t gfn, end_gfn;
-+	int idx;
-+	struct kvm_device *tmp;
-+	unsigned long hva = msg->iov_base;
-+	int npages = msg->iov_len >> PAGE_SHIFT;
-+
-+	gfn = gpa_to_gfn(msg->in_addr);
-+	end_gfn = gpa_to_gfn(msg->in_addr + msg->iov_len);
-+
-+	idx = srcu_read_lock(&kvm->srcu);
-+
-+	list_for_each_entry(tmp, &kvm->devices, vm_node) {
-+		if (tmp->ops->name && (!strcmp(tmp->ops->name, "kvm-vfio"))) {
-+			spin_lock(&kvm->discard_lock);
-+			kvm_vfio_ummap_range(kvm, tmp, gfn, npages, hva);
-+			spin_unlock(&kvm->discard_lock);
-+		}
-+	}
-+	srcu_read_unlock(&kvm->srcu, idx);
-+	return 0;
-+}
-+
- long kvm_arch_vm_ioctl(struct file *filp,
- 		       unsigned int ioctl, unsigned long arg)
- {
-@@ -5134,6 +5220,16 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 	case KVM_SET_PMU_EVENT_FILTER:
- 		r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
- 		break;
-+	case KVM_DISCARD_RANGE: {
-+		struct kvm_discard_msg discard_msg;
-+
-+		r = -EFAULT;
-+		if (copy_from_user(&discard_msg, argp, sizeof(discard_msg)))
-+			goto out;
-+
-+		r = kvm_vm_ioctl_discard_range(kvm, &discard_msg);
-+		break;
-+	}
- 	default:
- 		r = -ENOTTY;
- 	}
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 538c25e..6667e6b 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -442,6 +442,7 @@ struct kvm_memslots {
- 
- struct kvm {
- 	spinlock_t mmu_lock;
-+	spinlock_t discard_lock;
- 	struct mutex slots_lock;
- 	struct mm_struct *mm; /* userspace tied to this vm */
- 	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
-@@ -502,6 +503,46 @@ struct kvm {
- 	struct srcu_struct irq_srcu;
- 	pid_t userspace_pid;
- };
-+struct vfio_device {
-+	struct kref                     kref;
-+	struct device                   *dev;
-+	const struct vfio_device_ops    *ops;
-+	struct vfio_group               *group;
-+	struct list_head                group_next;
-+	void                            *device_data;
-+};
-+
-+struct vfio_group {
-+	struct kref                     kref;
-+	int                             minor;
-+	atomic_t                        container_users;
-+	struct iommu_group              *iommu_group;
-+	struct vfio_container           *container;
-+	struct list_head                device_list;
-+	struct mutex                    device_lock;
-+	struct device                   *dev;
-+	struct notifier_block           nb;
-+	struct list_head                vfio_next;
-+	struct list_head                container_next;
-+	struct list_head                unbound_list;
-+	struct mutex                    unbound_lock;
-+	atomic_t                        opened;
-+	wait_queue_head_t               container_q;
-+	bool                            noiommu;
-+	struct kvm                      *kvm;
-+	struct blocking_notifier_head   notifier;
-+};
-+
-+struct kvm_vfio_group {
-+	struct list_head node;
-+	struct vfio_group *vfio_group;
-+};
-+
-+struct kvm_vfio {
-+	struct list_head group_list;
-+	struct mutex lock;
-+	bool noncoherent;
-+};
- 
- #define kvm_err(fmt, ...) \
- 	pr_err("kvm [%i]: " fmt, task_pid_nr(current), ## __VA_ARGS__)
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f0a16b4..53331fe 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1264,6 +1264,13 @@ struct kvm_vfio_spapr_tce {
- 					struct kvm_userspace_memory_region)
- #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
- #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
-+struct kvm_discard_msg {
-+	__u64 iov_len;
-+	__u64 iov_base;
-+	__u64 in_addr;
-+};
-+#define KVM_DISCARD_RANGE   _IOW(KVMIO, 0x49, struct kvm_discard_msg)
-+
- 
- /* enable ucontrol for s390 */
- struct kvm_s390_ucas_mapping {
-diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
-index 8fcbc50..f6dc61e 100644
---- a/virt/kvm/vfio.c
-+++ b/virt/kvm/vfio.c
-@@ -21,17 +21,6 @@
- #include <asm/kvm_ppc.h>
- #endif
- 
--struct kvm_vfio_group {
--	struct list_head node;
--	struct vfio_group *vfio_group;
--};
--
--struct kvm_vfio {
--	struct list_head group_list;
--	struct mutex lock;
--	bool noncoherent;
--};
--
- static struct vfio_group *kvm_vfio_group_get_external_user(struct file *filep)
- {
- 	struct vfio_group *vfio_group;
--- 
-1.8.3.1
-
+Thanks,
+drew
 
