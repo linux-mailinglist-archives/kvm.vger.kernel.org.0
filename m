@@ -2,128 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E94B3131D38
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 02:29:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F7AB131F98
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 06:51:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727434AbgAGB3R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jan 2020 20:29:17 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:4935 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727315AbgAGB3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jan 2020 20:29:16 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e13deb90000>; Mon, 06 Jan 2020 17:28:25 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Mon, 06 Jan 2020 17:29:12 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Mon, 06 Jan 2020 17:29:12 -0800
-Received: from [10.2.162.105] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 7 Jan
- 2020 01:29:10 +0000
-Subject: Re: [PATCH v11 00/25] mm/gup: track dma-pinned pages: FOLL_PIN
-To:     Jan Kara <jack@suse.cz>
-CC:     Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Alex Williamson" <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        "Mike Kravetz" <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        "Shuah Khan" <shuah@kernel.org>, Vlastimil Babka <vbabka@suse.cz>,
-        <bpf@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        <kvm@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-media@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-        <netdev@vger.kernel.org>, <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Maor Gottlieb <maorg@mellanox.com>,
-        "Ran Rozenstein" <ranro@mellanox.com>
-References: <20191219132607.GA410823@unreal>
- <a4849322-8e17-119e-a664-80d9f95d850b@nvidia.com>
- <20191219210743.GN17227@ziepe.ca> <20191220182939.GA10944@unreal>
- <1001a5fc-a71d-9c0f-1090-546c4913d8a2@nvidia.com>
- <20191222132357.GF13335@unreal>
- <49d57efe-85e1-6910-baf5-c18df1382206@nvidia.com>
- <20191225052612.GA212002@unreal>
- <b879d191-a07c-e808-e48f-2b9bd8ba4fa3@nvidia.com>
- <612aa292-ec45-295c-b56c-c622876620fa@nvidia.com>
- <20200106090147.GA9176@quack2.suse.cz>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <9128d033-530f-468c-e076-05a9f845c72f@nvidia.com>
-Date:   Mon, 6 Jan 2020 17:26:16 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1727335AbgAGFvo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 00:51:44 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:50062 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725267AbgAGFvn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 00:51:43 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0075oWqQ138231;
+        Tue, 7 Jan 2020 05:51:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=FX1w0gnaqOtHVlLB12KUrqDVgRh7RKvu7wXTN3xpWIs=;
+ b=VikCSRTC7gD7hAyIiLEqBoe6ga15HhXlnAKDOHSlfNl2YiUbKD1NoZzpPi39PCZLT5Fn
+ vL9owj0PTd7R45oEwAksU+P+GWGhH3BxcU/ldQvoelDoTh5iNMgEofi8+pS4YvIgKYM0
+ E2/R4RqdLMxTkooSzj6VeLQp1anV4xMZyLS6PlGMS2zqbId9YFxcJ930dMPn015e0/gT
+ LTF3Yd+fkRLljhE048kEcRI70CjAdUpMVHYW2gIejYQAoa1VL5Lf59/+5Uf3USz3Z6w4
+ 8xc8Ftn0fHiDxj9MfhGOrE+CEAbHWugCoOU+CsI9JArzveYBKDz5h2qWXIql3BrGCpFJ NA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2xakbqk3nw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 07 Jan 2020 05:51:35 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0075oSAv060346;
+        Tue, 7 Jan 2020 05:51:35 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 2xcjvcc1hs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 07 Jan 2020 05:51:34 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0075pXc3009766;
+        Tue, 7 Jan 2020 05:51:33 GMT
+Received: from kadam (/129.205.23.165)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 06 Jan 2020 21:51:33 -0800
+Date:   Tue, 7 Jan 2020 08:51:26 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Julia Lawall <Julia.Lawall@inria.fr>,
+        kernel-janitors@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] vfio: vfio_pci_nvlink2: use mmgrab
+Message-ID: <20200107055126.GM3911@kadam>
+References: <1577634178-22530-1-git-send-email-Julia.Lawall@inria.fr>
+ <1577634178-22530-3-git-send-email-Julia.Lawall@inria.fr>
+ <20200106160505.2f962d38@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <20200106090147.GA9176@quack2.suse.cz>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1578360505; bh=LL2UCmBD6dZ6/uQLwOdlycpOuM7M1h0oO/bWAMRgNao=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=UF91zYGOBNpqOMdNxjoixM6A+WrovnWJPV5f23Cd6aWVZvb4k4hny35IQtR86qo3A
-         ybsCYLDgDCC84XoPp5q++dTbiHz8qPcKr7FsoP9vF2aJUPLN5RE+WoFcsvUpQp6Wc2
-         zNktxwdJI6r7Z4Jx6GBcZwJVgSIHOvx/jDuAkAY6QN5yRyfr0B432Pz1svbf1jmTGQ
-         FxsQoEJMt9bxhtvplOYDl+pZYlQ2c5wNyCrma3ZR+XCeeJMxRSHBXNwH+cwfQ2GRkp
-         dgVeumMAJjlrrLn66kxKb59m+siRWt1zL/Z88CodJlQeEcjmF24n1h+sFApQWzTsY4
-         OfRiCW4M+tSQA==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200106160505.2f962d38@w520.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001070046
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001070046
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/6/20 1:01 AM, Jan Kara wrote:
-...
->> Also, looking ahead:
->>
->> a) if the problem disappears with the latest above test, then we likely have
->>     a huge page refcount overflow, and there are a couple of different ways to
->>     fix it.
->>
->> b) if it still reproduces with the above, then it's some other random mistake,
->>     and in that case I'd be inclined to do a sort of guided (or classic, unguided)
->>     git bisect of the series. Because it could be any of several patches.
->>
->>     If that's too much trouble, then I'd have to fall back to submitting a few
->>     patches at a time and working my way up to the tracking patch...
+On Mon, Jan 06, 2020 at 04:05:05PM -0700, Alex Williamson wrote:
 > 
-> It could also be that an ordinary page reference is dropped with 'unpin'
-> thus underflowing the page refcount...
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
 > 
-> 								Honza
-> 
+> Thanks!  I'm assuming these will be routed via janitors tree, please
+> let me know if you intend me to grab these two vfio patches from the
+> series.  Thanks,
 
-Yes.
+There isn't a janitors tree.
 
-And, I think I'm about out of time for this release cycle, so I'm probably going to
-submit the prerequisite patches (patches 1-10, or more boldly, 1-22), for candidates
-for 5.6.
+regards,
+dan carpenter
 
-
-thanks,
--- 
-John Hubbard
-NVIDIA
