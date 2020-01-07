@@ -2,438 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6A561329E5
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 16:22:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD4401329F1
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 16:23:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728115AbgAGPWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 10:22:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34925 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727944AbgAGPWI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 10:22:08 -0500
+        id S1728052AbgAGPXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 10:23:53 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21377 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727908AbgAGPXw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jan 2020 10:23:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578410526;
+        s=mimecast20190719; t=1578410630;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3J7p5DhBL2FGU3FgpuvPVeELoNahRGXPDHRoZa+Vi3M=;
-        b=e1trPHhFHKGfRksVDPkv7Yvy3gUEdrwFJ2o7avBetnDr1fA4y4a0+OipI3G5vLx3FjL4Xa
-        EhFNx+QAzBK3JGM1z/T1hQP64Ayt4O2q4t7C2ZmQq52yY/JMcYeyCWclWHH3Mq/iqB8pHD
-        xeSMqTBtdWQgegzpbLMDgw4vlRqbgaY=
+        bh=ObryUJ+YHFjoiVoshbRcx17aC5SBcb7cBxKyuAtSgQI=;
+        b=RPe0A3TCWHW5myWM5WZVrKAzSWxhMkyu5k9PAJLDcHdOXGWEQN8lB6w1gIWWVLaejfyS2N
+        QArE+kLjyKq4DsgD4jXvk6mN3pGwY9VnZd/iYJYS7TeV1gfpU2C9KiIX3bemy38AbcxQxI
+        jGXrWd8CU71muNb2z82eYpvNY0ikaMs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-atq9bkPuMKidfNMfwRWhGQ-1; Tue, 07 Jan 2020 10:22:04 -0500
-X-MC-Unique: atq9bkPuMKidfNMfwRWhGQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-214-9xeyJXvfOJKQ-eof7EmcSg-1; Tue, 07 Jan 2020 10:23:49 -0500
+X-MC-Unique: 9xeyJXvfOJKQ-eof7EmcSg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6728801E6C;
-        Tue,  7 Jan 2020 15:22:03 +0000 (UTC)
-Received: from x1.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 38F7A7BA50;
-        Tue,  7 Jan 2020 15:22:03 +0000 (UTC)
-Date:   Tue, 7 Jan 2020 08:22:02 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     weiqi <weiqi4@huawei.com>
-Cc:     <alexander.h.duyck@linux.intel.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <pbonzini@redhat.com>,
-        <x86@kernel.org>
-Subject: Re: [PATCH 1/2] vfio: add mmap/munmap API for page hinting
-Message-ID: <20200107082202.5ee90295@x1.home>
-In-Reply-To: <1578408399-20092-2-git-send-email-weiqi4@huawei.com>
-References: <1578408399-20092-1-git-send-email-weiqi4@huawei.com>
-        <1578408399-20092-2-git-send-email-weiqi4@huawei.com>
-Organization: Red Hat
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC560477;
+        Tue,  7 Jan 2020 15:23:47 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CEC9B5D9E1;
+        Tue,  7 Jan 2020 15:23:43 +0000 (UTC)
+Date:   Tue, 7 Jan 2020 16:23:41 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v3 5/8] KVM: selftests: Pass args to vCPU instead of
+ using globals
+Message-ID: <20200107152341.rtfmciob5ly6nnjj@kamzik.brq.redhat.com>
+References: <20191216213901.106941-1-bgardon@google.com>
+ <20191216213901.106941-6-bgardon@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191216213901.106941-6-bgardon@google.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Jan 2020 22:46:38 +0800
-weiqi <weiqi4@huawei.com> wrote:
+On Mon, Dec 16, 2019 at 01:38:58PM -0800, Ben Gardon wrote:
+> In preparation for supporting multiple vCPUs in the demand paging test,
+> pass arguments to the vCPU instead of syncing globals to it.
 
-> From: wei qi <weiqi4@huawei.com>
->=20
-> add mmap/munmap API for page hinting.
+This will only work if we don't spill parameters onto the stack and all
+data we want to pass fit in registers. I've used multiple VCPUs in tests
+before and stuck with the global syncing. I simply used arrays like this
 
-AIUI, this is arbitrarily chunking IOMMU mappings into 512 pages (what
-happens with 1G pages?) and creating a back channel for KVM to map and
-unmap ranges that the user has mapped (why's it called "mmap"?).  Can't
-we do this via the existing user API rather than directed via another
-module?  For example, userspace can choose to map chunks of IOVA space
-in whatever granularity they choose.  Clearly they can then unmap and
-re-map chunks from those previous mappings.  Why can't KVM tell
-userspace how and when to do this?  I'm really not in favor of back
-channel paths like this, especially to unmap what a user has told us to
-map.  Thanks,
+ static my_type_t my_data[NR_VCPUS];
 
-Alex
+ static void guest_code(void)
+ {
+     int cpu = arch_get_cpu_id();
+     
+     // do something with my_data[cpu]
+ }
 
-> Signed-off-by: wei qi <weiqi4@huawei.com>
+ int main(void)
+ {
+     for (i = 0; i < NR_VCPUS; ++i) {
+         // prepare my_data[i]
+         sync_global_to_guest(vm, my_data[i]);
+     }
+
+     // run vcpus
+
+    for (i = 0; i < NR_VCPUS; ++i) {
+         sync_global_from_guest(vm, my_data[i]);
+         // do something with my_data[i]
+    }
+ }
+
+> 
+> Signed-off-by: Ben Gardon <bgardon@google.com>
 > ---
->  drivers/vfio/vfio.c             | 109 ++++++++++++++++++++++++++++
->  drivers/vfio/vfio_iommu_type1.c | 157 ++++++++++++++++++++++++++++++++++=
-+++++-
->  include/linux/vfio.h            |  17 ++++-
->  3 files changed, 280 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index c848262..c7e9103 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -1866,6 +1866,115 @@ int vfio_set_irqs_validate_and_prepare(struct vfi=
-o_irq_set *hdr, int num_irqs,
->  }
->  EXPORT_SYMBOL(vfio_set_irqs_validate_and_prepare);
-> =20
-> +int vfio_mmap_pages(struct device *dev, unsigned long user_pfn,
-> +			unsigned long page_size, int prot,
-> +			unsigned long pfn)
-> +{
-> +	struct vfio_container *container;
-> +	struct vfio_group *group;
-> +	struct vfio_iommu_driver *driver;
-> +	int ret;
-> +
-> +	if (!dev || !user_pfn || !page_size)
-> +		return -EINVAL;
-> +
-> +	group =3D vfio_group_get_from_dev(dev);
-> +	if (!group)
-> +		return -ENODEV;
-> +
-> +	ret =3D vfio_group_add_container_user(group);
-> +	if (ret)
-> +		goto err_pin_pages;
-> +
-> +	container =3D group->container;
-> +	driver =3D container->iommu_driver;
-> +	if (likely(driver && driver->ops->mmap_pages))
-> +		ret =3D driver->ops->mmap_pages(container->iommu_data, user_pfn,
-> +					page_size, prot, pfn);
-> +	else
-> +		ret =3D -ENOTTY;
-> +
-> +	vfio_group_try_dissolve_container(group);
-> +
-> +err_pin_pages:
-> +	vfio_group_put(group);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_mmap_pages);
-> +
-> +int vfio_munmap_pages(struct device *dev, unsigned long user_pfn,
-> +			unsigned long page_size)
-> +{
-> +	struct vfio_container *container;
-> +	struct vfio_group *group;
-> +	struct vfio_iommu_driver *driver;
-> +	int ret;
-> +
-> +	if (!dev || !user_pfn || !page_size)
-> +		return -EINVAL;
-> +
-> +	group =3D vfio_group_get_from_dev(dev);
-> +	if (!group)
-> +		return -ENODEV;
-> +
-> +	ret =3D vfio_group_add_container_user(group);
-> +	if (ret)
-> +		goto err_pin_pages;
-> +
-> +	container =3D group->container;
-> +	driver =3D container->iommu_driver;
-> +	if (likely(driver && driver->ops->munmap_pages))
-> +		ret =3D driver->ops->munmap_pages(container->iommu_data, user_pfn,
-> +						page_size);
-> +	else
-> +		ret =3D -ENOTTY;
-> +
-> +	vfio_group_try_dissolve_container(group);
-> +
-> +err_pin_pages:
-> +	vfio_group_put(group);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_munmap_pages);
-> +
-> +int vfio_dma_find(struct device *dev, unsigned long user_pfn, int npage,
-> +		unsigned long *phys_pfn)
-> +{
-> +	struct vfio_container *container;
-> +	struct vfio_group *group;
-> +	struct vfio_iommu_driver *driver;
-> +	int ret;
-> +
-> +	if (!dev || !user_pfn || !npage || !phys_pfn)
-> +		return -EINVAL;
-> +
-> +	if (npage > VFIO_PIN_PAGES_MAX_ENTRIES)
-> +		return -E2BIG;
-> +
-> +	group =3D vfio_group_get_from_dev(dev);
-> +	if (!group)
-> +		return -ENODEV;
-> +
-> +	ret =3D vfio_group_add_container_user(group);
-> +	if (ret)
-> +		goto err_pin_pages;
-> +
-> +	container =3D group->container;
-> +	driver =3D container->iommu_driver;
-> +	if (driver && driver->ops->dma_find)
-> +		ret =3D driver->ops->dma_find(container->iommu_data, user_pfn,
-> +					npage, phys_pfn);
-> +	else
-> +		ret =3D -ENOTTY;
-> +
-> +	vfio_group_try_dissolve_container(group);
-> +
-> +err_pin_pages:
-> +	vfio_group_put(group);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(vfio_dma_find);
-> +
->  /*
->   * Pin a set of guest PFNs and return their associated host PFNs for loc=
-al
->   * domain only.
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_ty=
-pe1.c
-> index 2ada8e6..df115dc 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -414,7 +414,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dm=
-a, unsigned long vaddr,
->  		goto out;
-> =20
->  	/* Lock all the consecutive pages from pfn_base */
-> -	for (vaddr +=3D PAGE_SIZE, iova +=3D PAGE_SIZE; pinned < npage;
-> +	for (vaddr +=3D PAGE_SIZE, iova +=3D PAGE_SIZE; (pinned < npage && pinn=
-ed < 512);
->  	     pinned++, vaddr +=3D PAGE_SIZE, iova +=3D PAGE_SIZE) {
->  		ret =3D vaddr_get_pfn(current->mm, vaddr, dma->prot, &pfn);
->  		if (ret)
-> @@ -768,7 +768,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu=
-, struct vfio_dma *dma,
->  		phys_addr_t phys, next;
-> =20
->  		phys =3D iommu_iova_to_phys(domain->domain, iova);
-> -		if (WARN_ON(!phys)) {
-> +		if (!phys) {
->  			iova +=3D PAGE_SIZE;
->  			continue;
->  		}
-> @@ -1154,6 +1154,156 @@ static int vfio_dma_do_map(struct vfio_iommu *iom=
-mu,
->  	return ret;
->  }
-> =20
-> +static int vfio_iommu_type1_munmap_pages(void *iommu_data,
-> +					unsigned long user_pfn,
-> +					unsigned long page_size)
-> +{
-> +	struct vfio_iommu *iommu =3D iommu_data;
-> +	struct vfio_domain *domain;
-> +	struct vfio_dma *dma;
-> +	dma_addr_t iova =3D user_pfn  << PAGE_SHIFT;
-> +	int ret =3D 0;
-> +	phys_addr_t phys;
-> +	size_t unmapped;
-> +	long unlocked =3D 0;
-> +
-> +	if (!iommu || !user_pfn || !page_size)
-> +		return -EINVAL;
-> +
-> +	/* Supported for v2 version only */
-> +	if (!iommu->v2)
-> +		return -EACCES;
-> +
-> +	mutex_lock(&iommu->lock);
-> +	dma =3D vfio_find_dma(iommu, iova, page_size);
-> +	if (!dma) {
-> +		ret =3D -EINVAL;
-> +		goto out_unlock;
-> +	}
-> +
-> +	domain =3D list_first_entry(&iommu->domain_list,
-> +			struct vfio_domain, next);
-> +	phys =3D iommu_iova_to_phys(domain->domain, iova);
-> +	if (!phys) {
-> +		goto out_unlock;
-> +	} else {
-> +		unmapped =3D iommu_unmap(domain->domain, iova, page_size);
-> +		unlocked =3D vfio_unpin_pages_remote(dma, iova,
-> +					phys >> PAGE_SHIFT,
-> +					unmapped >> PAGE_SHIFT, true);
-> +	}
-> +
-> +out_unlock:
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
-> +}
-> +
-> +static int vfio_iommu_type1_mmap_pages(void *iommu_data,
-> +				unsigned long user_pfn,
-> +				unsigned long page_size, int prot,
-> +				unsigned long pfn)
-> +{
-> +	struct vfio_iommu *iommu =3D iommu_data;
-> +	struct vfio_domain *domain;
-> +	struct vfio_dma *dma;
-> +	dma_addr_t iova =3D user_pfn  << PAGE_SHIFT;
-> +	int ret =3D 0;
-> +	size_t unmapped;
-> +	phys_addr_t phys;
-> +	long unlocked =3D 0;
-> +
-> +	if (!iommu || !user_pfn || !page_size || !pfn)
-> +		return -EINVAL;
-> +
-> +	/* Supported for v2 version only */
-> +	if (!iommu->v2)
-> +		return -EACCES;
-> +
-> +	mutex_lock(&iommu->lock);
-> +
-> +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> +		ret =3D -EACCES;
-> +		goto out_unlock;
-> +	}
-> +
-> +	dma =3D vfio_find_dma(iommu, iova, page_size);
-> +	if (!dma) {
-> +		ret =3D -EINVAL;
-> +		goto out_unlock;
-> +	}
-> +
-> +	domain =3D list_first_entry(&iommu->domain_list,
-> +		struct vfio_domain, next);
-> +
-> +	phys =3D iommu_iova_to_phys(domain->domain, iova);
-> +	if (phys) {
-> +		unmapped =3D iommu_unmap(domain->domain, iova, page_size);
-> +		unlocked =3D vfio_unpin_pages_remote(dma, iova,
-> +					phys >> PAGE_SHIFT,
-> +					unmapped >> PAGE_SHIFT, false);
-> +	}
-> +
-> +	ret =3D vfio_iommu_map(iommu, iova, pfn, page_size >> PAGE_SHIFT, prot);
-> +	if (ret) {
-> +		pr_warn("%s: gfn: %lx, pfn: %lx, npages=EF=BC=9A%lu\n", __func__,
-> +			user_pfn, pfn, page_size >> PAGE_SHIFT);
-> +	}
-> +
-> +out_unlock:
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
-> +}
-> +
-> +u64 vfio_iommu_iova_to_phys(struct vfio_iommu *iommu, dma_addr_t iova)
-> +{
-> +	struct vfio_domain *d;
-> +	u64 phys;
-> +
-> +	list_for_each_entry(d, &iommu->domain_list, next) {
-> +		phys =3D iommu_iova_to_phys(d->domain, iova);
-> +		if (phys)
-> +			return phys;
-> +	}
-> +	return 0;
-> +}
-> +
-> +static int vfio_iommu_type1_dma_find(void *iommu_data,
-> +					unsigned long user_pfn,
-> +					int npage, unsigned long *phys_pfn)
-> +{
-> +	struct vfio_iommu *iommu =3D iommu_data;
-> +	int i =3D 0;
-> +	struct vfio_dma *dma;
-> +	u64 phys;
-> +	dma_addr_t iova;
-> +
-> +	if (!iommu || !user_pfn)
-> +		return -EINVAL;
-> +
-> +	/* Supported for v2 version only */
-> +	if (!iommu->v2)
-> +		return -EACCES;
-> +
-> +	 mutex_lock(&iommu->lock);
-> +
-> +	iova =3D user_pfn << PAGE_SHIFT;
-> +	dma =3D vfio_find_dma(iommu, iova, PAGE_SIZE);
-> +	if (!dma)
-> +		goto unpin_exit;
-> +
-> +	if (((user_pfn + npage) << PAGE_SHIFT) <=3D (dma->iova + dma->size))
-> +		i =3D npage;
-> +	else
-> +		goto unpin_exit;
-> +
-> +	phys =3D vfio_iommu_iova_to_phys(iommu, iova);
-> +	*phys_pfn =3D phys >> PAGE_SHIFT;
-> +
-> +unpin_exit:
-> +	mutex_unlock(&iommu->lock);
-> +	return i;
-> +}
-> +
->  static int vfio_bus_type(struct device *dev, void *data)
+>  .../selftests/kvm/demand_paging_test.c        | 61 +++++++++++--------
+>  1 file changed, 37 insertions(+), 24 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+> index 4aa90a3fce99c..8ede26e088ab6 100644
+> --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> @@ -42,7 +42,6 @@
+>   */
+>  static uint64_t host_page_size;
+>  static uint64_t guest_page_size;
+> -static uint64_t guest_num_pages;
+>  
+>  static char *guest_data_prototype;
+>  
+> @@ -63,14 +62,13 @@ static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
+>   * Continuously write to the first 8 bytes of each page in the demand paging
+>   * memory region.
+>   */
+> -static void guest_code(void)
+> +static void guest_code(uint64_t gva, uint64_t pages)
 >  {
->  	struct bus_type **bus =3D data;
-> @@ -2336,6 +2486,9 @@ static int vfio_iommu_type1_unregister_notifier(voi=
-d *iommu_data,
->  	.detach_group		=3D vfio_iommu_type1_detach_group,
->  	.pin_pages		=3D vfio_iommu_type1_pin_pages,
->  	.unpin_pages		=3D vfio_iommu_type1_unpin_pages,
-> +	.mmap_pages             =3D vfio_iommu_type1_mmap_pages,
-> +	.munmap_pages           =3D vfio_iommu_type1_munmap_pages,
-> +	.dma_find		=3D vfio_iommu_type1_dma_find,
->  	.register_notifier	=3D vfio_iommu_type1_register_notifier,
->  	.unregister_notifier	=3D vfio_iommu_type1_unregister_notifier,
->  };
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index e42a711..d7df495 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -77,6 +77,15 @@ struct vfio_iommu_driver_ops {
->  				     unsigned long *phys_pfn);
->  	int		(*unpin_pages)(void *iommu_data,
->  				       unsigned long *user_pfn, int npage);
-> +	int		(*mmap_pages)(void *iommu_data,
-> +					unsigned long user_pfn,
-> +					unsigned long page_size,
-> +					int prot, unsigned long pfn);
-> +	int		(*munmap_pages)(void *iommu_data,
-> +					unsigned long user_pfn,
-> +					unsigned long page_size);
-> +	int		(*dma_find)(void *iommu_data, unsigned long user_pfn,
-> +					int npage, unsigned long *phys_pfn);
->  	int		(*register_notifier)(void *iommu_data,
->  					     unsigned long *events,
->  					     struct notifier_block *nb);
-> @@ -106,7 +115,13 @@ extern int vfio_pin_pages(struct device *dev, unsign=
-ed long *user_pfn,
->  			  int npage, int prot, unsigned long *phys_pfn);
->  extern int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn,
->  			    int npage);
-> -
-> +extern int vfio_dma_find(struct device *dev, unsigned long user_pfn, int=
- npage,
-> +			unsigned long *phys_pfn);
-> +extern int vfio_mmap_pages(struct device *dev, unsigned long user_pfn,
-> +			unsigned long page_size, int prot,
-> +			unsigned long pfn);
-> +extern int vfio_munmap_pages(struct device *dev, unsigned long user_pfn,
-> +			unsigned long page_size);
->  /* each type has independent events */
->  enum vfio_notify_type {
->  	VFIO_IOMMU_NOTIFY =3D 0,
+>  	int i;
+>  
+> -	for (i = 0; i < guest_num_pages; i++) {
+> -		uint64_t addr = guest_test_virt_mem;
+> +	for (i = 0; i < pages; i++) {
+> +		uint64_t addr = gva + (i * guest_page_size);
+>  
+> -		addr += i * guest_page_size;
+>  		addr &= ~(host_page_size - 1);
+>  		*(uint64_t *)addr = 0x0123456789ABCDEF;
+>  	}
+> @@ -82,18 +80,31 @@ static void guest_code(void)
+>  static void *host_test_mem;
+>  static uint64_t host_num_pages;
+>  
+> +struct vcpu_thread_args {
+> +	uint64_t gva;
+> +	uint64_t pages;
+> +	struct kvm_vm *vm;
+> +	int vcpu_id;
+> +};
+> +
+>  static void *vcpu_worker(void *data)
+>  {
+>  	int ret;
+> -	struct kvm_vm *vm = data;
+> +	struct vcpu_thread_args *args = (struct vcpu_thread_args *)data;
+> +	struct kvm_vm *vm = args->vm;
+> +	int vcpu_id = args->vcpu_id;
+> +	uint64_t gva = args->gva;
+> +	uint64_t pages = args->pages;
+>  	struct kvm_run *run;
+>  
+> -	run = vcpu_state(vm, VCPU_ID);
+> +	vcpu_args_set(vm, vcpu_id, 2, gva, pages);
+
+vcpu_args_set() is currently only implemented by x86, so that's a good
+reason for this to be an x86-only test for now. Well, unless this is
+switched back to using global sync.
+
+> +
+> +	run = vcpu_state(vm, vcpu_id);
+>  
+>  	/* Let the guest access its memory */
+> -	ret = _vcpu_run(vm, VCPU_ID);
+> +	ret = _vcpu_run(vm, vcpu_id);
+>  	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
+> -	if (get_ucall(vm, VCPU_ID, NULL) != UCALL_SYNC) {
+> +	if (get_ucall(vm, vcpu_id, NULL) != UCALL_SYNC) {
+>  		TEST_ASSERT(false,
+>  			    "Invalid guest sync status: exit_reason=%s\n",
+>  			    exit_reason_str(run->exit_reason));
+> @@ -269,11 +280,13 @@ static int setup_demand_paging(struct kvm_vm *vm,
+>  #define PAGE_SHIFT_4K  12
+>  
+>  static void run_test(enum vm_guest_mode mode, bool use_uffd,
+> -		     useconds_t uffd_delay, uint64_t guest_memory_bytes)
+> +		     useconds_t uffd_delay, uint64_t vcpu_wss)
+
+Not sure why guest_memory_bytes was renamed to vcpu_wss. What is wss?
+Working set size?
+
+>  {
+>  	pthread_t vcpu_thread;
+>  	pthread_t uffd_handler_thread;
+>  	struct kvm_vm *vm;
+> +	struct vcpu_thread_args vcpu_args;
+> +	uint64_t guest_num_pages;
+>  	int r;
+>  
+>  	/*
+> @@ -283,16 +296,15 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
+>  	 * number will be enough for all archs. (e.g., 64K page size guest
+>  	 * will need even less memory for page tables).
+>  	 */
+> -	vm = create_vm(mode, VCPU_ID,
+> -		       (2 * guest_memory_bytes) >> PAGE_SHIFT_4K,
+> +	vm = create_vm(mode, VCPU_ID, (2 * vcpu_wss) >> PAGE_SHIFT_4K,
+>  		       guest_code);
+>  
+>  	guest_page_size = vm_get_page_size(vm);
+>  
+> -	TEST_ASSERT(guest_memory_bytes % guest_page_size == 0,
+> +	TEST_ASSERT(vcpu_wss % guest_page_size == 0,
+>  		    "Guest memory size is not guest page size aligned.");
+>  
+> -	guest_num_pages = guest_memory_bytes / guest_page_size;
+> +	guest_num_pages = vcpu_wss / guest_page_size;
+>  
+>  #ifdef __s390x__
+>  	/* Round up to multiple of 1M (segment size) */
+> @@ -308,9 +320,9 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
+>  		    guest_num_pages, vm_get_max_gfn(vm));
+>  
+>  	host_page_size = getpagesize();
+> -	TEST_ASSERT(guest_memory_bytes % host_page_size == 0,
+> +	TEST_ASSERT(vcpu_wss % host_page_size == 0,
+>  		    "Guest memory size is not host page size aligned.");
+> -	host_num_pages = guest_memory_bytes / host_page_size;
+> +	host_num_pages = vcpu_wss / host_page_size;
+>  
+>  	guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
+>  			      guest_page_size;
+> @@ -354,10 +366,12 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
+>  	/* Export the shared variables to the guest */
+>  	sync_global_to_guest(vm, host_page_size);
+>  	sync_global_to_guest(vm, guest_page_size);
+> -	sync_global_to_guest(vm, guest_test_virt_mem);
+> -	sync_global_to_guest(vm, guest_num_pages);
+>  
+> -	pthread_create(&vcpu_thread, NULL, vcpu_worker, vm);
+> +	vcpu_args.vm = vm;
+> +	vcpu_args.vcpu_id = VCPU_ID;
+> +	vcpu_args.gva = guest_test_virt_mem;
+> +	vcpu_args.pages = guest_num_pages;
+> +	pthread_create(&vcpu_thread, NULL, vcpu_worker, &vcpu_args);
+>  
+>  	/* Wait for the vcpu thread to quit */
+>  	pthread_join(vcpu_thread, NULL);
+> @@ -404,8 +418,7 @@ static void help(char *name)
+>  	printf(" -d: add a delay in usec to the User Fault\n"
+>  	       "     FD handler to simulate demand paging\n"
+>  	       "     overheads. Ignored without -u.\n");
+> -	printf(" -b: specify the number of bytes of memory which should be\n"
+> -	       "     allocated to the guest.\n");
+> +	printf(" -b: specify the working set size, in bytes for each vCPU.\n");
+>  	puts("");
+>  	exit(0);
+>  }
+> @@ -413,7 +426,7 @@ static void help(char *name)
+>  int main(int argc, char *argv[])
+>  {
+>  	bool mode_selected = false;
+> -	uint64_t guest_memory_bytes = DEFAULT_GUEST_TEST_MEM_SIZE;
+> +	uint64_t vcpu_wss = DEFAULT_GUEST_TEST_MEM_SIZE;
+>  	unsigned int mode;
+>  	int opt, i;
+>  	bool use_uffd = false;
+> @@ -448,7 +461,7 @@ int main(int argc, char *argv[])
+>  				    "A negative UFFD delay is not supported.");
+>  			break;
+>  		case 'b':
+> -			guest_memory_bytes = strtoull(optarg, NULL, 0);
+> +			vcpu_wss = strtoull(optarg, NULL, 0);
+>  		case 'h':
+>  		default:
+>  			help(argv[0]);
+> @@ -462,7 +475,7 @@ int main(int argc, char *argv[])
+>  		TEST_ASSERT(vm_guest_mode_params[i].supported,
+>  			    "Guest mode ID %d (%s) not supported.",
+>  			    i, vm_guest_mode_string(i));
+> -		run_test(i, use_uffd, uffd_delay, guest_memory_bytes);
+> +		run_test(i, use_uffd, uffd_delay, vcpu_wss);
+>  	}
+>  
+>  	return 0;
+> -- 
+> 2.24.1.735.g03f4e72817-goog
+>
+
+Thanks,
+drew
 
