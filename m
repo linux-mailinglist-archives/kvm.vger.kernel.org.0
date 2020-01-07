@@ -2,144 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D05FC132BD0
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 17:54:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0EE0132C59
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 17:58:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728626AbgAGQy3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 11:54:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47839 "EHLO
+        id S1728358AbgAGQ64 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 11:58:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27156 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728614AbgAGQy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 11:54:27 -0500
+        with ESMTP id S1728235AbgAGQ6z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 11:58:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578416065;
+        s=mimecast20190719; t=1578416335;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NvxBS3wP3ArlR+uY1I3fF6NEpA+/gbdCJUjIk1BEp10=;
-        b=Gi/KsMhga+xWg0J0WvBQY72DJMg4RduB83uWzKXcm4YdZyWUbOgCpYyb6SRhg+WPS6hcmh
-        5YMpa6eqOvt+CHXWh7Mz6h5h89N1e2jMRNDd7xdxzeKoeycfvH8nvLZBJt+v4keAACV1QL
-        LOUs6xNVX+oYTl8fMV0NLMTt9Tha9J4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-MY1PdedVNCKULG1qmdo77g-1; Tue, 07 Jan 2020 11:54:22 -0500
-X-MC-Unique: MY1PdedVNCKULG1qmdo77g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7516DB6F;
-        Tue,  7 Jan 2020 16:54:19 +0000 (UTC)
-Received: from w520.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B51AC5D9E5;
-        Tue,  7 Jan 2020 16:54:11 +0000 (UTC)
-Date:   Tue, 7 Jan 2020 09:54:10 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com,
-        kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com,
-        yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com,
-        cohuck@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com,
-        aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com,
-        Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-        Ken.Xue@amd.com, zhi.a.wang@intel.com, yan.y.zhao@intel.com,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
- device state
-Message-ID: <20200107095410.2be5a064@w520.home>
-In-Reply-To: <20200107095740.GB2778@work-vm>
-References: <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
-        <20191216154406.023f912b@x1.home>
-        <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
-        <20191217114357.6496f748@x1.home>
-        <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
-        <20191219102706.0a316707@x1.home>
-        <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
-        <20191219140929.09fa24da@x1.home>
-        <20200102182537.GK2927@work-vm>
-        <20200106161851.07871e28@w520.home>
-        <20200107095740.GB2778@work-vm>
+        bh=5zj9aVDyJrU+2uajBZnxUthD7+2pw4B72BHNwhWinsc=;
+        b=V6/0ua3nmXc79THfoKz48X/mdjTrB77+Tl4wsRngoeOXOJxvrsOeSHAuxuVD8bxMKsaVsn
+        civgBajMIaTPsl+66uLNOv71ThgocS/jV9hkS7qJoTg1A+1IxegFX5NCR8Yyar4VupUtIQ
+        Xgr8yJ5DCgN4wOP94SXq2JUEipYOtPk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-RDSbBvHMMMm_4nZP2ZHKMQ-1; Tue, 07 Jan 2020 11:58:53 -0500
+X-MC-Unique: RDSbBvHMMMm_4nZP2ZHKMQ-1
+Received: by mail-wr1-f71.google.com with SMTP id d8so192104wrq.12
+        for <kvm@vger.kernel.org>; Tue, 07 Jan 2020 08:58:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5zj9aVDyJrU+2uajBZnxUthD7+2pw4B72BHNwhWinsc=;
+        b=ioXKhtjGNPxRCwGhix7GDuP/lQY7bJg07BcK3rIr/+ZOuM/8dTLj4Z7YJhgIexfVD/
+         YHI0Z109+vy7ujhI0JuL/GEJnIuFdjd8fjuWuLDrmaNkIl+zQkHcA4cEpJvQR4IQI+D/
+         VMquJxZMXJBzL9KBh0JLpLBJ2jKSRlT0M9bcq2k5ekAsgG6zTnYCcYCRBlTy0h0eu5Vr
+         Q9zwxXXhvSuffMucCG7lyRAwTO5pmjWJ60pqYCfnFJ24hxdFz5qpQi0V2XDTkIQ0uGKC
+         rrQU+ceoKvKhDIAt0YMciJT1TkdluhRDrqJMJPyoc18w09/6HqmEdyzjo8Ikf46U2gdH
+         jcyQ==
+X-Gm-Message-State: APjAAAXeKLCaNrIcbjzuvxYPV2d3jTZSZarg0bV+vu6dnU0qXfYccphI
+        VY90aboJ/tykYrv/QxEytzu9ESTAWPChugb6w+teM9/C2xX+1kRO1LayOnwAcvJg8htEXYvf89Y
+        8nRy9ndrO0BI+
+X-Received: by 2002:a05:600c:2488:: with SMTP id 8mr18670wms.152.1578416332695;
+        Tue, 07 Jan 2020 08:58:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz3uJQ3NHb1tVXAc5mjqhSrKn/KIp8Rr4coNewRdGnc/160g7T2qn0lms+eSffm7la/f59Nbg==
+X-Received: by 2002:a05:600c:2488:: with SMTP id 8mr18656wms.152.1578416332439;
+        Tue, 07 Jan 2020 08:58:52 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329? ([2001:b07:6468:f312:c6d:4079:b74c:e329])
+        by smtp.gmail.com with ESMTPSA id x10sm566388wrp.58.2020.01.07.08.58.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jan 2020 08:58:51 -0800 (PST)
+Subject: Re: [Newbie question] Why usage of CPU inside VM and outside VM is
+ different
+To:     Gregory Esnaud <Gregory.ESNAUD@exfo.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <8254fdfcfb7c4a82a5fc7a309152528e@exfo.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a8fb7ace-f52e-3a36-1c53-1db9468404e6@redhat.com>
+Date:   Tue, 7 Jan 2020 17:58:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <8254fdfcfb7c4a82a5fc7a309152528e@exfo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Jan 2020 09:57:40 +0000
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-
-> * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > On Thu, 2 Jan 2020 18:25:37 +0000
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >   
-> > > * Alex Williamson (alex.williamson@redhat.com) wrote:  
-> > > > On Fri, 20 Dec 2019 01:40:35 +0530
-> > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > >     
-> > > > > On 12/19/2019 10:57 PM, Alex Williamson wrote:
-> > > > > 
-> > > > > <Snip>
-> > > > >     
-> > > 
-> > > <snip>
-> > >   
-> > > > > 
-> > > > > If device state it at pre-copy state (011b).
-> > > > > Transition, i.e., write to device state as stop-and-copy state (010b) 
-> > > > > failed, then by previous state I meant device should return pre-copy 
-> > > > > state(011b), i.e. previous state which was successfully set, or as you 
-> > > > > said current state which was successfully set.    
-> > > > 
-> > > > Yes, the point I'm trying to make is that this version of the spec
-> > > > tries to tell the user what they should do upon error according to our
-> > > > current interpretation of the QEMU migration protocol.  We're not
-> > > > defining the QEMU migration protocol, we're defining something that can
-> > > > be used in a way to support that protocol.  So I think we should be
-> > > > concerned with defining our spec, for example my proposal would be: "If
-> > > > a state transition fails the user can read device_state to determine the
-> > > > current state of the device.  This should be the previous state of the
-> > > > device unless the vendor driver has encountered an internal error, in
-> > > > which case the device may report the invalid device_state 110b.  The
-> > > > user must use the device reset ioctl in order to recover the device
-> > > > from this state.  If the device is indicated in a valid device state
-> > > > via reading device_state, the user may attempt to transition the device
-> > > > to any valid state reachable from the current state."    
-> > > 
-> > > We might want to be able to distinguish between:
-> > >   a) The device has failed and needs a reset
-> > >   b) The migration has failed  
-> > 
-> > I think the above provides this.  For Kirti's example above of
-> > transitioning from pre-copy to stop-and-copy, the device could refuse
-> > to transition to stop-and-copy, generating an error on the write() of
-> > device_state.  The user re-reading device_state would allow them to
-> > determine the current device state, still in pre-copy or failed.  Only
-> > the latter would require a device reset.  
+On 07/01/20 16:57, Gregory Esnaud wrote:
 > 
-> OK - but that doesn't give you any way to figure out 'why' it failed;
-> I guess I was expecting you to then read an 'error' register to find
-> out what happened.
-> Assuming the write() to transition to stop-and-copy fails and you're
-> still in pre-copy, what's the defined thing you're supposed to do next?
-> Decide migration has failed and then do a write() to transition to running?
+> From an hypervisor (via top command) point of view our VM is
+> consuming 9 CPU (900%). This was reported by our platform provider. 
+> From a VM point of view we are consuming only 2 CPU (200%), with a
+> top also.
+> 
+> Our provider claim us to explain why we are consuming so much CPU.
+> But we cannot troubleshoot the infra as it's not our responsibility.
+> From our point of view, everything is ok.
 
-Defining semantics for an error register seems like a project on its
-own.  We do have flags, we could use them to add an error register
-later, but I think it's only going to rat hole this effort to try to
-incorporate that now.  The state machine is fairly small, so in the
-scenario you present, I think the user would assume a failure at
-pre-copy to stop-and-copy transition would fail the migration and the
-device could go back to running state.  If the device then fails to
-return to the running state, we might be stuck with a device with
-reduced performance or overhead and the user could warn about that and
-continue with the device as-is.  The vendor drivers could make use of
--EAGAIN on transition failure to indicate a temporary issue, but
-otherwise the user should probably consider it a persistent error until
-either a device reset or start of a new migration sequence (ie. return
-to running and start over).  Thanks,
+Are you using only 2 CPUs at 100%, or are you using 9 CPUs at a total of
+200%?  If the former, it is possible that you are using something like
+idle=poll, so the machine _is_ idle but still consuming 100% host CPU.
+This is something that you should know, however.
 
-Alex
+If the latter, the host is probably doing a little bit of busy waiting
+to improve your performance.  The provider can disable it using the
+kvm.halt_poll_ns=0 module parameter and there is nothing that you can do
+about it.  But it is unlikely that it causes the utilization to jump so
+much.
+
+Paolo
 
