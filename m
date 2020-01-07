@@ -2,86 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F7AB131F98
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 06:51:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 51EF7132073
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 08:28:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727335AbgAGFvo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 00:51:44 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:50062 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725267AbgAGFvn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 00:51:43 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0075oWqQ138231;
-        Tue, 7 Jan 2020 05:51:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=FX1w0gnaqOtHVlLB12KUrqDVgRh7RKvu7wXTN3xpWIs=;
- b=VikCSRTC7gD7hAyIiLEqBoe6ga15HhXlnAKDOHSlfNl2YiUbKD1NoZzpPi39PCZLT5Fn
- vL9owj0PTd7R45oEwAksU+P+GWGhH3BxcU/ldQvoelDoTh5iNMgEofi8+pS4YvIgKYM0
- E2/R4RqdLMxTkooSzj6VeLQp1anV4xMZyLS6PlGMS2zqbId9YFxcJ930dMPn015e0/gT
- LTF3Yd+fkRLljhE048kEcRI70CjAdUpMVHYW2gIejYQAoa1VL5Lf59/+5Uf3USz3Z6w4
- 8xc8Ftn0fHiDxj9MfhGOrE+CEAbHWugCoOU+CsI9JArzveYBKDz5h2qWXIql3BrGCpFJ NA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2xakbqk3nw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 07 Jan 2020 05:51:35 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 0075oSAv060346;
-        Tue, 7 Jan 2020 05:51:35 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2xcjvcc1hs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 07 Jan 2020 05:51:34 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0075pXc3009766;
-        Tue, 7 Jan 2020 05:51:33 GMT
-Received: from kadam (/129.205.23.165)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 06 Jan 2020 21:51:33 -0800
-Date:   Tue, 7 Jan 2020 08:51:26 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Julia Lawall <Julia.Lawall@inria.fr>,
-        kernel-janitors@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] vfio: vfio_pci_nvlink2: use mmgrab
-Message-ID: <20200107055126.GM3911@kadam>
-References: <1577634178-22530-1-git-send-email-Julia.Lawall@inria.fr>
- <1577634178-22530-3-git-send-email-Julia.Lawall@inria.fr>
- <20200106160505.2f962d38@w520.home>
+        id S1727298AbgAGH2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 02:28:38 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:1075 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbgAGH2h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 02:28:37 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e1432f40000>; Mon, 06 Jan 2020 23:27:48 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 06 Jan 2020 23:28:36 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 06 Jan 2020 23:28:36 -0800
+Received: from [10.40.100.83] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 7 Jan
+ 2020 07:28:26 +0000
+Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <jonathan.davies@nutanix.com>, <eauger@redhat.com>,
+        <aik@ozlabs.ru>, <pasic@linux.ibm.com>, <felipe@nutanix.com>,
+        <Zhengxiao.zx@alibaba-inc.com>, <shuangtai.tst@alibaba-inc.com>,
+        <Ken.Xue@amd.com>, <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
+ <20191216154406.023f912b@x1.home>
+ <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
+ <20191217114357.6496f748@x1.home>
+ <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
+ <20191219102706.0a316707@x1.home>
+ <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
+ <20191219140929.09fa24da@x1.home> <20200102182537.GK2927@work-vm>
+ <20200106161851.07871e28@w520.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <ce132929-64a7-9a5b-81ff-38616202b757@nvidia.com>
+Date:   Tue, 7 Jan 2020 12:58:22 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200106160505.2f962d38@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001070046
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9492 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001070046
+In-Reply-To: <20200106161851.07871e28@w520.home>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1578382068; bh=dzCb4GaxrhXuuZAVIohUXfWRe9Imjaf4D1VnoLy2doc=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=HLu+tskabfkeEqDBKF1tgEOLuVAcSMhXO68HZGX6tmPV8zmxHxnWEigSXnj9DHZKd
+         doqjIkPok9rXn6YuzZsyiWaN1GCMzi3AGtXRm/HaH7K1SvDO1EJHX7FnZPG9w3uLgN
+         6V4NT7L3r3HOsLZDja4WQuRnnNkq5Cfauis5WSuHM2+AuzajGV43+JBFd0Hj02Ph7a
+         5Qi/eGzW2mZbnW6WaQOtBJi2GowszuDTcfMSiuCiQheR6pKTpHw2cNKwl0Z8vSEdNF
+         QJio2umKX/oe1uT0z31dZLka0FJUqnas8vnC142h3f1ZcY3RO+rLnrRHNXDUm7K1dG
+         BvbKX9+Sj75bQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 06, 2020 at 04:05:05PM -0700, Alex Williamson wrote:
+
+
+On 1/7/2020 4:48 AM, Alex Williamson wrote:
+> On Thu, 2 Jan 2020 18:25:37 +0000
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 > 
-> Acked-by: Alex Williamson <alex.williamson@redhat.com>
+>> * Alex Williamson (alex.williamson@redhat.com) wrote:
+>>> On Fri, 20 Dec 2019 01:40:35 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>    
+>>>> On 12/19/2019 10:57 PM, Alex Williamson wrote:
+>>>>
+>>>> <Snip>
+>>>>    
+>>
+>> <snip>
+>>
+>>>>
+>>>> If device state it at pre-copy state (011b).
+>>>> Transition, i.e., write to device state as stop-and-copy state (010b)
+>>>> failed, then by previous state I meant device should return pre-copy
+>>>> state(011b), i.e. previous state which was successfully set, or as you
+>>>> said current state which was successfully set.
+>>>
+>>> Yes, the point I'm trying to make is that this version of the spec
+>>> tries to tell the user what they should do upon error according to our
+>>> current interpretation of the QEMU migration protocol.  We're not
+>>> defining the QEMU migration protocol, we're defining something that can
+>>> be used in a way to support that protocol.  So I think we should be
+>>> concerned with defining our spec, for example my proposal would be: "If
+>>> a state transition fails the user can read device_state to determine the
+>>> current state of the device.  This should be the previous state of the
+>>> device unless the vendor driver has encountered an internal error, in
+>>> which case the device may report the invalid device_state 110b.  The
+>>> user must use the device reset ioctl in order to recover the device
+>>> from this state.  If the device is indicated in a valid device state
+>>> via reading device_state, the user may attempt to transition the device
+>>> to any valid state reachable from the current state."
+>>
+>> We might want to be able to distinguish between:
+>>    a) The device has failed and needs a reset
+>>    b) The migration has failed
 > 
-> Thanks!  I'm assuming these will be routed via janitors tree, please
-> let me know if you intend me to grab these two vfio patches from the
-> series.  Thanks,
+> I think the above provides this.  For Kirti's example above of
+> transitioning from pre-copy to stop-and-copy, the device could refuse
+> to transition to stop-and-copy, generating an error on the write() of
+> device_state.  The user re-reading device_state would allow them to
+> determine the current device state, still in pre-copy or failed.  Only
+> the latter would require a device reset.
+> 
+>> If some part of the devices mechanics for migration fail, but the device
+>> is otherwise operational then we should be able to decide to fail the
+>> migration without taking the device down, which might be very bad for
+>> the VM.
+>> Losing a VM during migration due to a problem with migration really
+>> annoys users; it's one thing the migration failing, but taking the VM
+>> out as well really gets to them.
+>>
+>> Having the device automatically transition back to the 'running' state
+>> seems a bad idea to me; much better to tell the hypervisor and provide
+>> it with a way to clean up; for example, imagine a system with multiple
+>> devices that are being migrated, most of them have happily transitioned
+>> to stop-and-copy, but then the last device decides to fail - so now
+>> someone is going to have to take all of them back to running.
+> 
+> Right, unless I'm missing one, it seems invalid->running is the only
+> self transition the device should make, though still by way of user
+> interaction via the reset ioctl.  Thanks,
+> 
 
-There isn't a janitors tree.
+Instead of using invalid state by vendor driver on device failure, I 
+think better to reserve one bit in device state which vendor driver can 
+set on device failure. When error bit is set, other bits in device state 
+should be ignored.
 
-regards,
-dan carpenter
-
+Thanks,
+Kirti
