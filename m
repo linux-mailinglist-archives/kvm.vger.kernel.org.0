@@ -2,133 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED6AF132D14
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 18:33:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE4BD132D2A
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2020 18:36:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728407AbgAGRdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 12:33:02 -0500
-Received: from mail-bn8nam12on2056.outbound.protection.outlook.com ([40.107.237.56]:7275
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728325AbgAGRdC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 12:33:02 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d1NgiNCDqXzCkHFa81N07si8OmaBTwrd1nyuVNhkxiJ7XtgnOct0Io9UO0QkyyB98Kvtiof8GUW+/CiA5X1wrcFO7UF1FXEbZ4RnDPrVzByxU3RKn7bJtwQg3GSdY1cghI8uRMiiKf0bnkFAu5CHbIQSVZz4Q/RbM8Mn5S1O5IrVDwkAT9yQRrtmBenUMaUl1SFFBzlYOGfHKmSN+CuTAizOLgRA9GOppxZcoQNyfpxuFo0T5i/oEdeQuJltLxkCeCWZ6KoRBRPc98f3jatWbt9xrySou+Gf2lY5NSilWrwK1pCTCPNIiOucYdlKWrqFRkofg2Xyl5ukG8QjLd0abQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6C8MPxewC8lfgkjZldhk5MdPnOPvYKi/GF7vUTRU4gs=;
- b=EzRoXmwWkmQH9WhiT3dqauB8pGLvlIHGmqXWV93XyuUMFHCkuDLnK0Ces6OF8GviHUV5UCcVd80vNJ5Rv191pn1d/mZ3lFpZgPFtA62GW6gOW9/4YGOxObMxQVQntPH8u2WaanRG/BwrSchNjBPqxKGFOy1XyE063GR1DVcD2HzlG9wFnITJVi24+zq0x3364grLt3cWEc25QHEnkxsKiemH822xIN0UIASaiAo5GKOaVN50KF7uV0VGLIvI4O1U79rJdZcSV6R8pnUz5W5OTXfE7mZ8yZm9psevtDhYffwN0hNfuCaG1aRV+N4Bin0gqKgnhog8n8zLNnIdtKcfHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 81.255.187.177) smtp.rcpttodomain=redhat.com smtp.mailfrom=exfo.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=exfo.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=EXFO.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6C8MPxewC8lfgkjZldhk5MdPnOPvYKi/GF7vUTRU4gs=;
- b=jTQrsZIzTjmuIiTRWDfefI4N2IVIcaCFGxoWSZ2pjQsZRu7XoENJzPeiaMiwXisz2RWheatMXocGC9Bzuqv3MK9WBmR/Jm0yM5Pu4g0Tnco8kMAPaRATeq0+SfSh2jLdvJ+wUdjdxKRjoQexpzQpaa4b0+Vev+A9JZIxVTYjU0I=
-Received: from BN6PR11CA0053.namprd11.prod.outlook.com (2603:10b6:404:f7::15)
- by MN2PR11MB3760.namprd11.prod.outlook.com (2603:10b6:208:fa::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2602.12; Tue, 7 Jan
- 2020 17:32:58 +0000
-Received: from CO1NAM05FT003.eop-nam05.prod.protection.outlook.com
- (2a01:111:f400:7e50::200) by BN6PR11CA0053.outlook.office365.com
- (2603:10b6:404:f7::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2602.11 via Frontend
- Transport; Tue, 7 Jan 2020 17:32:58 +0000
-Authentication-Results: spf=pass (sender IP is 81.255.187.177)
- smtp.mailfrom=exfo.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=exfo.com;
-Received-SPF: Pass (protection.outlook.com: domain of exfo.com designates
- 81.255.187.177 as permitted sender) receiver=protection.outlook.com;
- client-ip=81.255.187.177; helo=ON_Mail.exfo.com;
-Received: from ON_Mail.exfo.com (81.255.187.177) by
- CO1NAM05FT003.mail.protection.outlook.com (10.152.96.108) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.2623.4 via Frontend Transport; Tue, 7 Jan 2020 17:32:57 +0000
-Received: from SPRNEXCHANGE01.exfo.com (10.50.50.95) by
- SPRNEXCHANGE01.exfo.com (10.50.50.95) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1531.3; Tue, 7 Jan 2020 18:32:56 +0100
-Received: from SPRNEXCHANGE01.exfo.com ([::1]) by SPRNEXCHANGE01.exfo.com
- ([::1]) with mapi id 15.01.1531.010; Tue, 7 Jan 2020 18:32:56 +0100
-From:   Gregory Esnaud <Gregory.ESNAUD@exfo.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S1728466AbgAGRgc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 12:36:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24256 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728266AbgAGRgb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 12:36:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578418590;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=j0BVxVyPA1Jmng3rASaLeYwHaaw23k7+8XInxcOt1F4=;
+        b=M3qIBKLW54kICtd75P5JcYynR32jViQKLzFyoEu8fK3f6r0u34/dyS9AhEqcCtTj2WNnxE
+        QIumhIbXKrNtbVDLa72RP8uTMDjSmRpFCknbQiSXyDZYkK9yUQvcicrMaGktZJSuiL3C4C
+        w/jtE4VL7EEgmv8VDP3OXx1X6jtCAOs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-mH3lz1xpPMqImZTP9GylYg-1; Tue, 07 Jan 2020 12:36:25 -0500
+X-MC-Unique: mH3lz1xpPMqImZTP9GylYg-1
+Received: by mail-wr1-f72.google.com with SMTP id r2so244427wrp.7
+        for <kvm@vger.kernel.org>; Tue, 07 Jan 2020 09:36:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=j0BVxVyPA1Jmng3rASaLeYwHaaw23k7+8XInxcOt1F4=;
+        b=pKHcnrbikBNNtrtw/FcQoIOxvd7WU8YkeYQsFY+zlc+oKzaabu1UUIaHDD9G5UnMIr
+         wPsigYpccVLv9DfslsNxB8J8tjGpPrqjk2J5h+Y6jXvaoYEFGrLUfy1dM14Z1U+MZ4pp
+         NgBKYfY0Wx9SqdcdBnMNXunrasrxTYVJbc+5hxDDGa6FNg2I+xubqSMYF42lVi044suK
+         5mTQsJ5gq/0c+arJmjAWm7tYreTOUcmn1HA6jJpr9kJpNlqJe1JAbXgFEAI5PFc0dvfd
+         AVtXI/Wtlu7VNmwWmKUrSvEt5/UgWjQThPVqIfj9QzCC7l36t1AnbsFw6uN4/soIgsaU
+         SEVg==
+X-Gm-Message-State: APjAAAUggaVOj4+h64+yK8sRKh4t3epyUK3EPz+NcuLPASLIebtNoNsU
+        1aoLhNrPw/nnEG1vJ2BuUyJwaUyymlOKkNqIFYlHnxtr6DoHuXJUQlKZJPzw5LkAYbTuRwjyPhQ
+        RvukKA1SkEXIh
+X-Received: by 2002:adf:ed83:: with SMTP id c3mr182527wro.51.1578418584036;
+        Tue, 07 Jan 2020 09:36:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyqANdMtX3lHHJxn/EmrMN5p7pw/bhzBS5mpFfBrzSC2E5KRFyuNQFHXnRGq0BKMzA7OAG7GQ==
+X-Received: by 2002:adf:ed83:: with SMTP id c3mr182509wro.51.1578418583791;
+        Tue, 07 Jan 2020 09:36:23 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329? ([2001:b07:6468:f312:c6d:4079:b74c:e329])
+        by smtp.gmail.com with ESMTPSA id a16sm671634wrt.37.2020.01.07.09.36.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jan 2020 09:36:23 -0800 (PST)
+Subject: Re: [Newbie question] Why usage of CPU inside VM and outside VM is
+ different
+To:     Gregory Esnaud <Gregory.ESNAUD@exfo.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [Newbie question] Why usage of CPU inside VM and outside VM is
- different
-Thread-Topic: [Newbie question] Why usage of CPU inside VM and outside VM is
- different
-Thread-Index: AdXFchc6k6fghFvyR2Cb2NX5qpnvFQAAUI6AAAKJVSA=
-Date:   Tue, 7 Jan 2020 17:32:55 +0000
-Message-ID: <fc4a7dfc9d344facaed8d34adcff3fc4@exfo.com>
 References: <8254fdfcfb7c4a82a5fc7a309152528e@exfo.com>
  <a8fb7ace-f52e-3a36-1c53-1db9468404e6@redhat.com>
-In-Reply-To: <a8fb7ace-f52e-3a36-1c53-1db9468404e6@redhat.com>
-Accept-Language: fr-FR, en-US
-Content-Language: fr-FR
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.72.130.123]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <fc4a7dfc9d344facaed8d34adcff3fc4@exfo.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3193f727-1031-b76b-4b3b-302316c9d058@redhat.com>
+Date:   Tue, 7 Jan 2020 18:36:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-EOPAttributedMessage: 0
-X-Forefront-Antispam-Report: CIP:81.255.187.177;IPV:CAL;SCL:-1;CTRY:FR;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(346002)(396003)(136003)(376002)(199004)(189003)(356004)(110136005)(2616005)(316002)(426003)(478600001)(24736004)(108616005)(336012)(8936002)(70206006)(70586007)(36756003)(81156014)(81166006)(8676002)(53546011)(86362001)(5660300002)(966005)(26826003)(26005)(186003)(2906002)(7696005);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR11MB3760;H:ON_Mail.exfo.com;FPR:;SPF:Pass;LANG:en;PTR:extranet.astellia.com;A:1;MX:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9b720fcd-ac48-4893-7a96-08d79397a307
-X-MS-TrafficTypeDiagnostic: MN2PR11MB3760:
-X-Microsoft-Antispam-PRVS: <MN2PR11MB376068B164774841539BFD63F43F0@MN2PR11MB3760.namprd11.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 027578BB13
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9aQyU8cA6YsKICRsuNNsJsMvaTYNwNezNCOrk39cBhhJcjHy01sCJUWrbnImtPMeFa8GvTMxig1tW5Ph8F6O1mQMyywrpSwWDbTPiV/BvjLYK7wx0oCC2QYrRFGXECZZFSijTB+xN0hIQE3jUQBQB3oqPEEFw3gKm85nVoiXd2cLBE2Pahn7fh2LVO/WFu2ti38+LNpC2hGXn5tp4p2r0/EcW2fb6Pa6z2jghrgUioDZf0N8cDycvYie6KQ++Pz2w1ZN+7n+SzKyEn0izitZwzZJp9R7UlxpP0QYFG5sw7R8nyLoyOlIlNmFYpc9OqWUib26F3eGsCzN/NEyL90gFXERSWEPxqCYagMSc8tOW/qa4KqKkRfePZx64YVKTqKGSEfOBXJ/GTzKohXFVHbjtyktJr5EprwxRnCuASr/1yQOHzIxcQ6NQX2lDVQ52qUuF9Ro4hNMWocDOWrV6lRJgspGPPvz/YlyP/+8qXBjU9w=
-X-OriginatorOrg: EXFO.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2020 17:32:57.7633
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b720fcd-ac48-4893-7a96-08d79397a307
-X-MS-Exchange-CrossTenant-Id: 1c75be0f-2569-4bcc-95f7-3ad9d904f42a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1c75be0f-2569-4bcc-95f7-3ad9d904f42a;Ip=[81.255.187.177];Helo=[ON_Mail.exfo.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB3760
+In-Reply-To: <fc4a7dfc9d344facaed8d34adcff3fc4@exfo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgUGFvbG8sDQoNClRoYW5rcyBmb3IgeW91ciBxdWljayBhbnN3ZXIuDQoNCkFyZSB5b3UgdXNp
-bmcgb25seSAyIENQVXMgYXQgMTAwJSwgb3IgYXJlIHlvdSB1c2luZyA5IENQVXMgYXQgYSB0b3Rh
-bCBvZiAyMDAlPyANCg0KSW5zaWRlIHRoZSBWTSwgYSB0b3AgY29tbWFuZCBzaG93IHRoYXQgd2Ug
-YXJlIHVzaW5nIDIgQ1BVIEAgMTAwJTogaHR0cHM6Ly9mcmFtYWRyb3Aub3JnL3IvZ05mM2VySlZm
-NiN0MkhMSXB6UEhHdHhIekhlTHJuR0dqc1JTWlpwbXY5SFBWWnQvTElJUDhzPQ0KRnJvbSB0aGUg
-aHlwZXJ2aXNvciAoaWUsICpvdXRzaWRlKiB0aGUgdm0pLCBhIHRvcCBjb21tYW5kIHNob3cgdGhh
-dCB0aGUgVk0gY29uc3VtaW5nIDkgY3B1OiBodHRwczovL2ZyYW1hZHJvcC5vcmcvci8tRm1yQmhN
-R1g1I3EvNmFaOEZxMk1udXp6Mys2Ri9wYTgzVStqelBveDFoZDk4NHR3N0RrdUE9DQoNClNvLCBp
-ZiBJJ20gdW5kZXJzdGFuZGluZyB5b3UgY29ycmVjdGx5LCBhbiBwYXJhbWV0ZXIgb2Yga2VybmVs
-IG9mIG91ciBWTSBpcyBpZGVsPXBvbGwgdGhhdCB3ZSBzaG91bGQgY2hhbmdlPw0KDQoNClRoYW5r
-cyBhZ2FpbiwNCg0KLS0tLS1NZXNzYWdlIGQnb3JpZ2luZS0tLS0tDQpEZcKgOiBQYW9sbyBCb256
-aW5pIDxwYm9uemluaUByZWRoYXQuY29tPiANCkVudm95w6nCoDogbWFyZGkgNyBqYW52aWVyIDIw
-MjAgMTc6NTkNCsOAwqA6IEdyZWdvcnkgRXNuYXVkIDxHcmVnb3J5LkVTTkFVREBleGZvLmNvbT47
-IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCk9iamV0wqA6IFJlOiBbTmV3YmllIHF1ZXN0aW9uXSBXaHkg
-dXNhZ2Ugb2YgQ1BVIGluc2lkZSBWTSBhbmQgb3V0c2lkZSBWTSBpcyBkaWZmZXJlbnQNCg0KT24g
-MDcvMDEvMjAgMTY6NTcsIEdyZWdvcnkgRXNuYXVkIHdyb3RlOg0KPiANCj4gRnJvbSBhbiBoeXBl
-cnZpc29yICh2aWEgdG9wIGNvbW1hbmQpIHBvaW50IG9mIHZpZXcgb3VyIFZNIGlzIGNvbnN1bWlu
-ZyANCj4gOSBDUFUgKDkwMCUpLiBUaGlzIHdhcyByZXBvcnRlZCBieSBvdXIgcGxhdGZvcm0gcHJv
-dmlkZXIuDQo+IEZyb20gYSBWTSBwb2ludCBvZiB2aWV3IHdlIGFyZSBjb25zdW1pbmcgb25seSAy
-IENQVSAoMjAwJSksIHdpdGggYSB0b3AgDQo+IGFsc28uDQo+IA0KPiBPdXIgcHJvdmlkZXIgY2xh
-aW0gdXMgdG8gZXhwbGFpbiB3aHkgd2UgYXJlIGNvbnN1bWluZyBzbyBtdWNoIENQVS4NCj4gQnV0
-IHdlIGNhbm5vdCB0cm91Ymxlc2hvb3QgdGhlIGluZnJhIGFzIGl0J3Mgbm90IG91ciByZXNwb25z
-aWJpbGl0eS4NCj4gRnJvbSBvdXIgcG9pbnQgb2YgdmlldywgZXZlcnl0aGluZyBpcyBvay4NCg0K
-QXJlIHlvdSB1c2luZyBvbmx5IDIgQ1BVcyBhdCAxMDAlLCBvciBhcmUgeW91IHVzaW5nIDkgQ1BV
-cyBhdCBhIHRvdGFsIG9mIDIwMCU/ICBJZiB0aGUgZm9ybWVyLCBpdCBpcyBwb3NzaWJsZSB0aGF0
-IHlvdSBhcmUgdXNpbmcgc29tZXRoaW5nIGxpa2UgaWRsZT1wb2xsLCBzbyB0aGUgbWFjaGluZSBf
-aXNfIGlkbGUgYnV0IHN0aWxsIGNvbnN1bWluZyAxMDAlIGhvc3QgQ1BVLg0KVGhpcyBpcyBzb21l
-dGhpbmcgdGhhdCB5b3Ugc2hvdWxkIGtub3csIGhvd2V2ZXIuDQoNCklmIHRoZSBsYXR0ZXIsIHRo
-ZSBob3N0IGlzIHByb2JhYmx5IGRvaW5nIGEgbGl0dGxlIGJpdCBvZiBidXN5IHdhaXRpbmcgdG8g
-aW1wcm92ZSB5b3VyIHBlcmZvcm1hbmNlLiAgVGhlIHByb3ZpZGVyIGNhbiBkaXNhYmxlIGl0IHVz
-aW5nIHRoZQ0Ka3ZtLmhhbHRfcG9sbF9ucz0wIG1vZHVsZSBwYXJhbWV0ZXIgYW5kIHRoZXJlIGlz
-IG5vdGhpbmcgdGhhdCB5b3UgY2FuIGRvIGFib3V0IGl0LiAgQnV0IGl0IGlzIHVubGlrZWx5IHRo
-YXQgaXQgY2F1c2VzIHRoZSB1dGlsaXphdGlvbiB0byBqdW1wIHNvIG11Y2guDQoNClBhb2xvDQoN
-Cg==
+On 07/01/20 18:32, Gregory Esnaud wrote:
+> Hi Paolo,
+> 
+> Thanks for your quick answer.
+> 
+> Are you using only 2 CPUs at 100%, or are you using 9 CPUs at a total of 200%? 
+> 
+> Inside the VM, a top command show that we are using 2 CPU @ 100%: https://framadrop.org/r/gNf3erJVf6#t2HLIpzPHGtxHzHeLrnGGjsRSZZpmv9HPVZt/LIIP8s=
+> From the hypervisor (ie, *outside* the vm), a top command show that the VM consuming 9 cpu: https://framadrop.org/r/-FmrBhMGX5#q/6aZ8Fq2Mnuzz3+6F/pa83U+jzPox1hd984tw7DkuA=
+> 
+> So, if I'm understanding you correctly, an parameter of kernel of our VM is idel=poll that we should change?
+> 
+
+That's a possibility.  And if it's correct, your provider is certainly
+correct in complaining. :)
+
+Paolo
+
