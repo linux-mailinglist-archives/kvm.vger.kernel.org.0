@@ -2,135 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C87971347F7
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 17:29:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B3FB1348E8
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 18:15:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727421AbgAHQ3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 11:29:03 -0500
-Received: from mga01.intel.com ([192.55.52.88]:35418 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726401AbgAHQ3D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 11:29:03 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 08:29:02 -0800
-X-IronPort-AV: E=Sophos;i="5.69,410,1571727600"; 
-   d="scan'208";a="395791419"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 08:29:02 -0800
-Message-ID: <7d17cfca5edc9b26f194b7086e4a7ef7aaedf5db.camel@linux.intel.com>
-Subject: Re: [PATCH v16 0/9] mm / virtio: Provide support for free page
- reporting
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, mgorman@techsingularity.net,
-        vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, konrad.wilk@oracle.com, david@redhat.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
-Date:   Wed, 08 Jan 2020 08:29:02 -0800
-In-Reply-To: <aebf72d6-3383-fcc5-7cea-efb930e4e245@redhat.com>
-References: <20200103210509.29237.18426.stgit@localhost.localdomain>
-         <aebf72d6-3383-fcc5-7cea-efb930e4e245@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+        id S1729672AbgAHRPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 12:15:00 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33808 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726401AbgAHRO7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jan 2020 12:14:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578503698;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vnM+x6Ssb1mcduODxbe5+uNany1GBwa/Hz6WtXlr7O4=;
+        b=YmeA2/Tm4ZHAohrrr7zr780N+A0oqIRDVUp0BVfSJZBh204y5x7NDfeSJS1eY0gpQzHbFc
+        fo8b2syCh226gpeoMaUdSym5nUmAz0LJZS9YvuAyESZCTETXb30/r2yD60aJYZ+7ltjFYB
+        ZqpX4oEBR3XW+6Pw+UVyAtSkSbYuKdA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-164-2ffBoDdmNgClB8cTyvdqZQ-1; Wed, 08 Jan 2020 12:14:57 -0500
+X-MC-Unique: 2ffBoDdmNgClB8cTyvdqZQ-1
+Received: by mail-wr1-f70.google.com with SMTP id u12so1685755wrt.15
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 09:14:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vnM+x6Ssb1mcduODxbe5+uNany1GBwa/Hz6WtXlr7O4=;
+        b=r4VC/VnNY0s0rTBapl/zlkExNiaTYCd08riOGzl1oS8wVsE94AY/IlUGkSmHkM2WuF
+         U0s7btEH7klZ9c/VXb62z/cq+Qi/NcfcrBpVw0axkWnOHRw0UOOwNywtlk/H5uIhLjZG
+         O17Xb5Lq7oikp2+TOZxK2BaLxd7/kjBBf1/QpQw52v8AgpeXTHLeP5SbpbwFmvoB5wOy
+         GxpWe/G9/xipoxqSLwvtp7HalYtBUkgLBqCjUpQvA8Kd7RlgzEjQMxe8fK/velOLpzZJ
+         +tNXjCFf9aU6/NEINQoXVnz0HPmRHvIEu1UWNTjuURv9N6LScRbBk6VzIwaX4qpkdraY
+         W2AA==
+X-Gm-Message-State: APjAAAX2cMz9AnFXPRBAXP02wb52O6+akPqR/Cx5fDimfKQdNitBEIpS
+        7vhdroLLb8YuAW/haXd1wa91TNd3F+GPsucrpGUMbwPY7jOcHIhdPgG6QMejGWzrLqTBZiZXacy
+        htf9XZNsZl3xX
+X-Received: by 2002:a1c:a9c6:: with SMTP id s189mr5225237wme.151.1578503696577;
+        Wed, 08 Jan 2020 09:14:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz6QfyCjkkc/cn5N9B3HuvF1UbjB6DCyXC1I49m1Q5gG7DdVR/OqIU5VsKS3NDGqXBnTP1SDQ==
+X-Received: by 2002:a1c:a9c6:: with SMTP id s189mr5225208wme.151.1578503696324;
+        Wed, 08 Jan 2020 09:14:56 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329? ([2001:b07:6468:f312:c6d:4079:b74c:e329])
+        by smtp.gmail.com with ESMTPSA id b21sm4680093wmd.37.2020.01.08.09.14.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jan 2020 09:14:55 -0800 (PST)
+Subject: Re: [PATCH RFC] sched/fair: Penalty the cfs task which executes
+ mwait/hlt
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        KarimAllah <karahmed@amazon.de>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+References: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
+ <20200108155040.GB2827@hirez.programming.kicks-ass.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <00d884a7-d463-74b4-82cf-9deb0aa70971@redhat.com>
+Date:   Wed, 8 Jan 2020 18:14:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
+In-Reply-To: <20200108155040.GB2827@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2020-01-08 at 02:57 -0500, Nitesh Narayan Lal wrote:
-> On 1/3/20 4:16 PM, Alexander Duyck wrote:
+On 08/01/20 16:50, Peter Zijlstra wrote:
+> On Wed, Jan 08, 2020 at 09:50:01AM +0800, Wanpeng Li wrote:
+>> From: Wanpeng Li <wanpengli@tencent.com>
+>>
+>> To deliver all of the resources of a server to instances in cloud, there are no 
+>> housekeeping cpus reserved. libvirtd, qemu main loop, kthreads, and other agent/tools 
+>> etc which can't be offloaded to other hardware like smart nic, these stuff will 
+>> contend with vCPUs even if MWAIT/HLT instructions executed in the guest.
 
-<snip>
+^^ this is the problem statement:
 
-> > Below are the results from various benchmarks. I primarily focused on two
-> > tests. The first is the will-it-scale/page_fault2 test, and the other is
-> > a modified version of will-it-scale/page_fault1 that was enabled to use
-> > THP. I did this as it allows for better visibility into different parts
-> > of the memory subsystem. The guest is running with 32G for RAM on one
-> > node of a E5-2630 v3. The host has had some features such as CPU turbo
-> > disabled in the BIOS.
-> > 
-> > Test                   page_fault1 (THP)    page_fault2
-> > Name            tasks  Process Iter  STDEV  Process Iter  STDEV
-> > Baseline            1    1012402.50  0.14%     361855.25  0.81%
-> >                    16    8827457.25  0.09%    3282347.00  0.34%
-> > 
-> > Patches Applied     1    1007897.00  0.23%     361887.00  0.26%
-> >                    16    8784741.75  0.39%    3240669.25  0.48%
-> > 
-> > Patches Enabled     1    1010227.50  0.39%     359749.25  0.56%
-> >                    16    8756219.00  0.24%    3226608.75  0.97%
-> > 
-> > Patches Enabled     1    1050982.00  4.26%     357966.25  0.14%
-> >  page shuffle      16    8672601.25  0.49%    3223177.75  0.40%
-> > 
-> > Patches Enabled     1    1003238.00  0.22%     360211.00  0.22%
-> >  shuffle w/ RFC    16    8767010.50  0.32%    3199874.00  0.71%
+He has VCPU threads which are being pinned 1:1 to physical CPUs.  He
+needs to have various housekeeping threads preempting those vCPU
+threads, but he'd rather preempt vCPU threads that are doing HLT/MWAIT
+than those that are keeping the CPU busy.
+
+>> The is no trap and yield the pCPU after we expose mwait/hlt to the guest [1][2],
+>> the top command on host still observe 100% cpu utilization since qemu process is 
+>> running even though guest who has the power management capability executes mwait. 
+>> Actually we can observe the physical cpu has already enter deeper cstate by 
+>> powertop on host.
+>>
+>> For virtualization, there is a HLT activity state in CPU VMCS field which indicates 
+>> the logical processor is inactive because it executed the HLT instruction, but 
+>> SDM 24.4.2 mentioned that execution of the MWAIT instruction may put a logical 
+>> processor into an inactive state, however, this VMCS field never reflects this 
+>> state.
 > 
-> Just to be sure that I understand your test setup correctly:
-> - You have a 32GB guest with a single node affined to a single node of your host
-> (E5-2630).
-> - You have THP in both host and the guest enabled and set to 'madvise'.
-> - On top of the default x86_64 config and other virtio config options you have
-> CONFIG_SLAB_FREELIST_RANDOM and CONFIG_SHUFFLE_PAGE_ALLOCATOR enabled for the
-> third observation (Patches Enabled page shuffle).
-> did I miss anything?
+> So far I think I can follow, however it does not explain who consumes
+> this VMCS state if it is set and how that helps. Also, this:
 
-So the only things I think you overlooked was that CPU turbo was disbled
-int eh BIOS. Without that my numbers were much more unpredictable as the
-CPUs were turboing up and down and me and giving me inconsistent results.
+I think what Wanpeng was saying is: "KVM could gather this information
+using the activity state field in the VMCS.  However, when the guest
+does MWAIT the processor can go into an inactive state without updating
+the VMCS."  Hence looking at the APERFMPERF ratio.
 
-Also one thing I forgot to mention is that I had to modify the grub kernel
-command line to include page_alloc.shuffle=Y so that the page shuffling
-was actually active.
-
-> Can you also remind me of the reason you have skipped recording the number of
-> threads count reported as part of page_fault tests? Was it because you were
-> observing different values with every fresh boot?
-
-Mainly because the threads test gave me data that was all over the place
-at higher task counts and because it doesn't scale as well as the
-processes test case. The averages between the two worked out to be about
-the same, but the standard deviation was maxing out at 7% for the baseline
-and 8% for the patches enabled case. However the differences in the
-averages is still less than 1%.
-
-So for example the same data using the threads values for Baseline vs
-Patches enabled comes out as follows:
-Baseline                1    1133900.25  0.24%     358395.25  0.30%
-                       16    5848684.75  6.96%    2181989.00  1.69%
-
-Patches Enabled         1    1132748.50  0.20%     356615.00  0.11%
-                       16    5796647.00  8.38%    2160475.50  1.84%
-
-> > The results above are for a baseline with a linux-next-20191219 kernel,
-> > that kernel with this patch set applied but page reporting disabled in
-> > virtio-balloon, the patches applied and page reporting fully enabled, the
-> > patches enabled with page shuffling enabled, and the patches applied with
-> > page shuffling enabled and an RFC patch that makes used of MADV_FREE in
-> > QEMU. These results include the deviation seen between the average value
-> > reported here versus the high and/or low value. I observed that during the
-> > test memory usage for the first three tests never dropped whereas with the
-> > patches fully enabled the VM would drop to using only a few GB of the
-> > host's memory when switching from memhog to page fault tests.
+>> This patch avoids fine granularity intercept and reschedule vCPU if MWAIT/HLT
+>> instructions executed, because it can worse the message-passing workloads which 
+>> will switch between idle and running frequently in the guest. Lets penalty the 
+>> vCPU which is long idle through tick-based sampling and preemption.
 > 
-> Do you mean that in the later case you run the page fault tests after memhog?
-> If so how much memory do you pass to memhog?
+> is just complete gibberish. And I have no idea what problem you're
+> trying to solve how.
 
-For every test I would run memhog 32g in the guest to make sure all memory
-was allocated at least once before running the page fault tests. I was
-using that to make certain that the page reporting was working before
-running the test.
+This is just explaining why MWAIT and HLT is not being trapped in his
+setup.  (Because vmexit on HLT or MWAIT is awfully expensive).
 
-That way the baseline gives more consistent results as we don't have to
-worry about there being any memory the guest has yet to fault in.
+> Also, I don't think the TSC/MPERF ratio is architected, we can't assume
+> this is true for everything that has APERFMPERF.
+
+Right, you have to look at APERF/MPERF, not TSC/MPERF.  My scheduler-fu
+is zero so I can't really help with a nicer solution.
+
+Paolo
 
