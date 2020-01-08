@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0406313408E
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 12:32:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DEB7013408A
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 12:32:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727210AbgAHLco (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 06:32:44 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9131 "EHLO huawei.com"
+        id S1726793AbgAHLcl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 06:32:41 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:34708 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727112AbgAHLcj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 06:32:39 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id A4DFF4B5853672A5E57A;
+        id S1727170AbgAHLck (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 06:32:40 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id BC598886670BA7D29E56;
         Wed,  8 Jan 2020 19:32:37 +0800 (CST)
 Received: from localhost.localdomain (10.151.151.249) by
  DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 8 Jan 2020 19:32:30 +0800
+ 14.3.439.0; Wed, 8 Jan 2020 19:32:31 +0800
 From:   Dongjiu Geng <gengdongjiu@huawei.com>
 To:     <pbonzini@redhat.com>, <gengdongjiu@huawei.com>, <mst@redhat.com>,
         <imammedo@redhat.com>, <shannon.zhaosl@gmail.com>,
@@ -26,9 +26,9 @@ To:     <pbonzini@redhat.com>, <gengdongjiu@huawei.com>, <mst@redhat.com>,
         <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
         <qemu-arm@nongnu.org>
 CC:     <zhengxiang9@huawei.com>, <linuxarm@huawei.com>
-Subject: [PATCH v22 7/9] ACPI: Record Generic Error Status Block(GESB) table
-Date:   Wed, 8 Jan 2020 19:32:21 +0800
-Message-ID: <1578483143-14905-8-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v22 8/9] target-arm: kvm64: handle SIGBUS signal from kernel or KVM
+Date:   Wed, 8 Jan 2020 19:32:22 +0800
+Message-ID: <1578483143-14905-9-git-send-email-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
 References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
@@ -41,321 +41,225 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_arch_on_sigbus_vcpu() error injection uses source_id as
-index in etc/hardware_errors to find out Error Status Data
-Block entry corresponding to error source. So supported source_id
-values should be assigned here and not be changed afterwards to
-make sure that guest will write error into expected Error Status
-Data Block even if guest was migrated to a newer QEMU.
+Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+translates the host VA delivered by host to guest PA, then fills this PA
+to guest APEI GHES memory, then notifies guest according to the SIGBUS
+type.
 
-Before QEMU writes a new error to ACPI table, it will check whether
-previous error has been acknowledged. Otherwise it will ignore the new
-error. For the errors section type, QEMU simulate it to memory section
-error.
+When guest accesses the poisoned memory, it will generate a Synchronous
+External Abort(SEA). Then host kernel gets an APEI notification and calls
+memory_failure() to unmapped the affected page in stage 2, finally
+returns to guest.
+
+Guest continues to access the PG_hwpoison page, it will trap to KVM as
+stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
+Qemu, Qemu records this error address into guest APEI GHES memory and
+notifes guest using Synchronous-External-Abort(SEA).
+
+In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
+in which we can setup the type of exception and the syndrome information.
+When switching to guest, the target vcpu will jump to the synchronous
+external abort vector table entry.
+
+The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
+ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
+not valid and hold an UNKNOWN value. These values will be set to KVM
+register structures through KVM_SET_ONE_REG IOCTL.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
 ---
- hw/acpi/ghes.c         | 224 ++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/acpi/ghes.h |   3 +
- include/qemu/uuid.h    |   5 ++
- 3 files changed, 230 insertions(+), 2 deletions(-)
+ include/sysemu/kvm.h    |  3 +--
+ target/arm/cpu.h        |  4 +++
+ target/arm/helper.c     |  2 +-
+ target/arm/internals.h  |  5 ++--
+ target/arm/kvm64.c      | 66 +++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/tlb_helper.c |  2 +-
+ target/i386/cpu.h       |  2 ++
+ 7 files changed, 78 insertions(+), 6 deletions(-)
 
-diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-index 68f4abf..f2ecffe 100644
---- a/hw/acpi/ghes.c
-+++ b/hw/acpi/ghes.c
-@@ -28,21 +28,56 @@
- #include "sysemu/sysemu.h"
- #include "qemu/error-report.h"
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 141342d..3b22504 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -379,8 +379,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
+ /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+ unsigned long kvm_arch_vcpu_id(CPUState *cpu);
  
--#include "hw/acpi/bios-linker-loader.h"
--
- #define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
- #define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
- 
- /* The max size in bytes for one error block */
- #define ACPI_GHES_MAX_RAW_DATA_LENGTH       0x400
-+
- /* Now only support ARMv8 SEA notification type error source */
- #define ACPI_GHES_ERROR_SOURCE_COUNT        1
-+
- /* Generic Hardware Error Source version 2 */
- #define ACPI_GHES_SOURCE_GENERIC_ERROR_V2   10
-+
- /* Address offset in Generic Address Structure(GAS) */
- #define GAS_ADDR_OFFSET 4
- 
- /*
-+ * The total size of Generic Error Data Entry
-+ * ACPI 6.1/6.2: 18.3.2.7.1 Generic Error Data,
-+ * Table 18-343 Generic Error Data Entry
-+ */
-+#define ACPI_GHES_DATA_LENGTH               72
-+
-+/* The memory section CPER size, UEFI 2.6: N.2.5 Memory Error Section */
-+#define ACPI_GHES_MEM_CPER_LENGTH           80
-+
-+/* Masks for block_status flags */
-+#define ACPI_GEBS_UNCORRECTABLE         1
-+
-+#define UEFI_CPER_SEC_PLATFORM_MEM                              \
-+    UUID_LE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
-+            0xED, 0x7C, 0x83, 0xB1)
-+
-+/*
-+ * Total size for Generic Error Status Block except Generic Error Data Entries
-+ * ACPI 6.2: 18.3.2.7.1 Generic Error Data,
-+ * Table 18-380 Generic Error Status Block
-+ */
-+#define ACPI_GHES_GESB_SIZE                 20
-+
-+/*
-+ * Values for error_severity field
-+ */
-+enum AcpiGenericErrorSeverity {
-+    ACPI_CPER_SEV_RECOVERABLE = 0,
-+    ACPI_CPER_SEV_FATAL = 1,
-+    ACPI_CPER_SEV_CORRECTED = 2,
-+    ACPI_CPER_SEV_NONE = 3,
-+};
-+
-+/*
-  * Hardware Error Notification
-  * ACPI 4.0: 17.3.2.7 Hardware Error Notification
-  * Composes dummy Hardware Error Notification descriptor of specified type
-@@ -73,6 +108,127 @@ static void build_ghes_hw_error_notification(GArray *table, const uint8_t type)
- }
- 
- /*
-+ * Generic Error Data Entry
-+ * ACPI 6.1: 18.3.2.7.1 Generic Error Data
-+ */
-+static void acpi_ghes_generic_error_data(GArray *table, QemuUUID section_type,
-+                uint32_t error_severity, uint8_t validation_bits, uint8_t flags,
-+                uint32_t error_data_length, QemuUUID fru_id,
-+                uint64_t time_stamp)
-+{
-+    /* Section Type */
-+    g_array_append_vals(table, section_type.data,
-+                        ARRAY_SIZE(section_type.data));
-+
-+    /* Error Severity */
-+    build_append_int_noprefix(table, error_severity, 4);
-+    /* Revision */
-+    build_append_int_noprefix(table, 0x300, 2);
-+    /* Validation Bits */
-+    build_append_int_noprefix(table, validation_bits, 1);
-+    /* Flags */
-+    build_append_int_noprefix(table, flags, 1);
-+    /* Error Data Length */
-+    build_append_int_noprefix(table, error_data_length, 4);
-+
-+    /* FRU Id */
-+    g_array_append_vals(table, fru_id.data, ARRAY_SIZE(fru_id.data));
-+
-+    /* FRU Text */
-+    build_append_int_noprefix(table, 0, 20);
-+    /* Timestamp */
-+    build_append_int_noprefix(table, time_stamp, 8);
-+}
-+
-+/*
-+ * Generic Error Status Block
-+ * ACPI 6.1: 18.3.2.7.1 Generic Error Data
-+ */
-+static void acpi_ghes_generic_error_status(GArray *table, uint32_t block_status,
-+                uint32_t raw_data_offset, uint32_t raw_data_length,
-+                uint32_t data_length, uint32_t error_severity)
-+{
-+    /* Block Status */
-+    build_append_int_noprefix(table, block_status, 4);
-+    /* Raw Data Offset */
-+    build_append_int_noprefix(table, raw_data_offset, 4);
-+    /* Raw Data Length */
-+    build_append_int_noprefix(table, raw_data_length, 4);
-+    /* Data Length */
-+    build_append_int_noprefix(table, data_length, 4);
-+    /* Error Severity */
-+    build_append_int_noprefix(table, error_severity, 4);
-+}
-+
-+/* UEFI 2.6: N.2.5 Memory Error Section */
-+static void acpi_ghes_build_append_mem_cper(GArray *table,
-+                                            uint64_t error_physical_addr)
-+{
-+    /*
-+     * Memory Error Record
-+     */
-+
-+    /* Validation Bits */
-+    build_append_int_noprefix(table,
-+                              (1ULL << 14) | /* Type Valid */
-+                              (1ULL << 1) /* Physical Address Valid */,
-+                              8);
-+    /* Error Status */
-+    build_append_int_noprefix(table, 0, 8);
-+    /* Physical Address */
-+    build_append_int_noprefix(table, error_physical_addr, 8);
-+    /* Skip all the detailed information normally found in such a record */
-+    build_append_int_noprefix(table, 0, 48);
-+    /* Memory Error Type */
-+    build_append_int_noprefix(table, 0 /* Unknown error */, 1);
-+    /* Skip all the detailed information normally found in such a record */
-+    build_append_int_noprefix(table, 0, 7);
-+}
-+
-+static int acpi_ghes_record_mem_error(uint64_t error_block_address,
-+                                      uint64_t error_physical_addr)
-+{
-+    GArray *block;
-+    /* Memory Error Section Type */
-+    QemuUUID mem_section_id_le = UEFI_CPER_SEC_PLATFORM_MEM;
-+    QemuUUID fru_id = {};
-+    uint32_t data_length;
-+
-+    block = g_array_new(false, true /* clear */, 1);
-+
-+    /* This is the length if adding a new generic error data entry*/
-+    data_length = ACPI_GHES_DATA_LENGTH + ACPI_GHES_MEM_CPER_LENGTH;
-+
-+    /*
-+     * Check whether it will run out of the preallocated memory if adding a new
-+     * generic error data entry
-+     */
-+    if ((data_length + ACPI_GHES_GESB_SIZE) > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
-+        error_report("Not enough memory to record new CPER!!!");
-+        return -1;
-+    }
-+
-+    /* Build the new generic error status block header */
-+    acpi_ghes_generic_error_status(block, ACPI_GEBS_UNCORRECTABLE,
-+        0, 0, data_length, ACPI_CPER_SEV_RECOVERABLE);
-+
-+    /* Build this new generic error data entry header */
-+    acpi_ghes_generic_error_data(block, mem_section_id_le,
-+        ACPI_CPER_SEV_RECOVERABLE, 0, 0,
-+        ACPI_GHES_MEM_CPER_LENGTH, fru_id, 0);
-+
-+    /* Build the memory section CPER for above new generic error data entry */
-+    acpi_ghes_build_append_mem_cper(block, error_physical_addr);
-+
-+    /* Write back above this new generic error data entry to guest memory */
-+    cpu_physical_memory_write(error_block_address, block->data, block->len);
-+
-+    g_array_free(block, true);
-+
-+    return 0;
-+}
-+
-+/*
-  * Build table for the hardware error fw_cfg blob.
-  * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cfg blobs.
-  * See docs/specs/acpi_hest_ghes.rst for blobs format.
-@@ -224,3 +380,67 @@ void acpi_ghes_add_fw_cfg(AcpiGhesState *ags, FWCfgState *s,
-     fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
-         NULL, &(ags->ghes_addr_le), sizeof(ags->ghes_addr_le), false);
- }
-+
-+int acpi_ghes_record_errors(uint8_t source_id, uint64_t physical_address)
-+{
-+    uint64_t error_block_addr, read_ack_register_addr, read_ack_register = 0;
-+    int loop = 0;
-+    uint64_t start_addr;
-+    bool ret = -1;
-+    AcpiGedState *acpi_ged_state;
-+    AcpiGhesState *ags;
-+
-+    assert(source_id < ACPI_HEST_SRC_ID_RESERVED);
-+
-+    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
-+                                                       NULL));
-+    if (acpi_ged_state) {
-+        ags = &acpi_ged_state->ghes_state;
-+    } else {
-+        error_report("ACPI GED device not found");
-+        return -1;
-+    }
-+
-+    start_addr = le64_to_cpu(ags->ghes_addr_le);
-+
-+    if (physical_address) {
-+
-+        if (source_id < ACPI_HEST_SRC_ID_RESERVED) {
-+            start_addr += source_id * sizeof(uint64_t);
-+        }
-+
-+        cpu_physical_memory_read(start_addr, &error_block_addr,
-+                                 sizeof(error_block_addr));
-+
-+        read_ack_register_addr = start_addr +
-+            ACPI_GHES_ERROR_SOURCE_COUNT * sizeof(uint64_t);
-+retry:
-+        cpu_physical_memory_read(read_ack_register_addr,
-+                                 &read_ack_register, sizeof(read_ack_register));
-+
-+        /* zero means OSPM does not acknowledge the error */
-+        if (!read_ack_register) {
-+            if (loop < 3) {
-+                usleep(100 * 1000);
-+                loop++;
-+                goto retry;
-+            } else {
-+                error_report("OSPM does not acknowledge previous error,"
-+                    " so can not record CPER for current error anymore");
-+            }
-+        } else if (error_block_addr) {
-+                read_ack_register = cpu_to_le64(0);
-+                /*
-+                 * Clear the Read Ack Register, OSPM will write it to 1 when
-+                 * acknowledge this error.
-+                 */
-+                cpu_physical_memory_write(read_ack_register_addr,
-+                    &read_ack_register, sizeof(uint64_t));
-+
-+                ret = acpi_ghes_record_mem_error(error_block_addr,
-+                                                 physical_address);
-+        }
-+    }
-+
-+    return ret;
-+}
-diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-index a6761e6..ab0ae33 100644
---- a/include/hw/acpi/ghes.h
-+++ b/include/hw/acpi/ghes.h
-@@ -22,6 +22,8 @@
- #ifndef ACPI_GHES_H
- #define ACPI_GHES_H
- 
-+#include "hw/acpi/bios-linker-loader.h"
-+
- /*
-  * Values for Hardware Error Notification Type field
-  */
-@@ -69,4 +71,5 @@ void acpi_build_hest(GArray *table_data, GArray *hardware_error,
-                           BIOSLinker *linker);
- void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
-                           GArray *hardware_errors);
-+int acpi_ghes_record_errors(uint8_t notify, uint64_t error_physical_addr);
+-#ifdef TARGET_I386
+-#define KVM_HAVE_MCE_INJECTION 1
++#ifdef KVM_HAVE_MCE_INJECTION
+ void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
  #endif
-diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-index 129c45f..b35e294 100644
---- a/include/qemu/uuid.h
-+++ b/include/qemu/uuid.h
-@@ -34,6 +34,11 @@ typedef struct {
-     };
- } QemuUUID;
  
-+#define UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
-+  {{{ (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
-+     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
-+     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) } } }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 5f70e9e..723bdb9 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -28,6 +28,10 @@
+ /* ARM processors have a weak memory model */
+ #define TCG_GUEST_DEFAULT_MO      (0)
+ 
++#ifdef TARGET_AARCH64
++#define KVM_HAVE_MCE_INJECTION 1
++#endif
 +
- #define UUID_FMT "%02hhx%02hhx%02hhx%02hhx-" \
-                  "%02hhx%02hhx-%02hhx%02hhx-" \
-                  "%02hhx%02hhx-" \
+ #define EXCP_UDEF            1   /* undefined instruction */
+ #define EXCP_SWI             2   /* software interrupt */
+ #define EXCP_PREFETCH_ABORT  3
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 5074b5f..05bffd3 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -3045,7 +3045,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
+              * Report exception with ESR indicating a fault due to a
+              * translation table walk for a cache maintenance instruction.
+              */
+-            syn = syn_data_abort_no_iss(current_el == target_el,
++            syn = syn_data_abort_no_iss(current_el == target_el, 0,
+                                         fi.ea, 1, fi.s1ptw, 1, fsc);
+             env->exception.vaddress = value;
+             env->exception.fsr = fsr;
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index f5313dd..28b8451 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -451,13 +451,14 @@ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
+         | ARM_EL_IL | (ea << 9) | (s1ptw << 7) | fsc;
+ }
+ 
+-static inline uint32_t syn_data_abort_no_iss(int same_el,
++static inline uint32_t syn_data_abort_no_iss(int same_el, int fnv,
+                                              int ea, int cm, int s1ptw,
+                                              int wnr, int fsc)
+ {
+     return (EC_DATAABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
+            | ARM_EL_IL
+-           | (ea << 9) | (cm << 8) | (s1ptw << 7) | (wnr << 6) | fsc;
++           | (fnv << 10) | (ea << 9) | (cm << 8) | (s1ptw << 7)
++           | (wnr << 6) | fsc;
+ }
+ 
+ static inline uint32_t syn_data_abort_with_iss(int same_el,
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 876184b..f3b05c1 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -28,6 +28,8 @@
+ #include "kvm_arm.h"
+ #include "hw/boards.h"
+ #include "internals.h"
++#include "hw/acpi/acpi.h"
++#include "hw/acpi/ghes.h"
+ 
+ static bool have_guest_debug;
+ 
+@@ -843,6 +845,30 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+     return KVM_PUT_RUNTIME_STATE;
+ }
+ 
++/* Callers must hold the iothread mutex lock */
++static void kvm_inject_arm_sea(CPUState *c)
++{
++    ARMCPU *cpu = ARM_CPU(c);
++    CPUARMState *env = &cpu->env;
++    CPUClass *cc = CPU_GET_CLASS(c);
++    uint32_t esr;
++    bool same_el;
++
++    c->exception_index = EXCP_DATA_ABORT;
++    env->exception.target_el = 1;
++
++    /*
++     * Set the DFSC to synchronous external abort and set FnV to not valid,
++     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
++     */
++    same_el = arm_current_el(env) == env->exception.target_el;
++    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
++
++    env->exception.syndrome = esr;
++
++    cc->do_interrupt(c);
++}
++
+ #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+ 
+@@ -1295,6 +1321,46 @@ int kvm_arch_get_registers(CPUState *cs)
+     return ret;
+ }
+ 
++void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
++{
++    ram_addr_t ram_addr;
++    hwaddr paddr;
++
++    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
++
++    if (acpi_enabled && addr &&
++            object_property_get_bool(qdev_get_machine(), "ras", NULL)) {
++        ram_addr = qemu_ram_addr_from_host(addr);
++        if (ram_addr != RAM_ADDR_INVALID &&
++            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
++            kvm_hwpoison_page_add(ram_addr);
++            /*
++             * Asynchronous signal will be masked by main thread, so
++             * only handle synchronous signal.
++             */
++            if (code == BUS_MCEERR_AR) {
++                kvm_cpu_synchronize_state(c);
++                if (!acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
++                    kvm_inject_arm_sea(c);
++                } else {
++                    error_report("failed to record the error");
++                    abort();
++                }
++            }
++            return;
++        }
++        if (code == BUS_MCEERR_AO) {
++            error_report("Hardware memory error at addr %p for memory used by "
++                "QEMU itself instead of guest system!", addr);
++        }
++    }
++
++    if (code == BUS_MCEERR_AR) {
++        error_report("Hardware memory error!");
++        exit(1);
++    }
++}
++
+ /* C6.6.29 BRK instruction */
+ static const uint32_t brk_insn = 0xd4200000;
+ 
+diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+index 5feb312..499672e 100644
+--- a/target/arm/tlb_helper.c
++++ b/target/arm/tlb_helper.c
+@@ -33,7 +33,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+      * ISV field.
+      */
+     if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
+-        syn = syn_data_abort_no_iss(same_el,
++        syn = syn_data_abort_no_iss(same_el, 0,
+                                     ea, 0, s1ptw, is_write, fsc);
+     } else {
+         /*
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index af28293..1a0dbc1 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -29,6 +29,8 @@
+ /* The x86 has a strong memory model with some store-after-load re-ordering */
+ #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
+ 
++#define KVM_HAVE_MCE_INJECTION 1
++
+ /* Maximum instruction code size */
+ #define TARGET_MAX_INSN_SIZE 16
+ 
 -- 
 1.8.3.1
 
