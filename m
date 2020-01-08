@@ -2,66 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 532231337E4
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 01:19:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EFF8F133869
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 02:20:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726906AbgAHATB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 19:19:01 -0500
-Received: from mga09.intel.com ([134.134.136.24]:45392 "EHLO mga09.intel.com"
+        id S1727069AbgAHBUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jan 2020 20:20:16 -0500
+Received: from mga05.intel.com ([192.55.52.43]:41392 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726537AbgAHATA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 19:19:00 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1725601AbgAHBUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jan 2020 20:20:15 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jan 2020 16:19:00 -0800
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jan 2020 17:20:15 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,407,1571727600"; 
-   d="scan'208";a="211360872"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga007.jf.intel.com with ESMTP; 07 Jan 2020 16:19:00 -0800
+X-IronPort-AV: E=Sophos;i="5.69,408,1571727600"; 
+   d="scan'208";a="271694238"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by FMSMGA003.fm.intel.com with ESMTP; 07 Jan 2020 17:20:15 -0800
+Date:   Tue, 7 Jan 2020 17:20:15 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/mmu: Fix a benign Bitwise vs. Logical OR mixup
-Date:   Tue,  7 Jan 2020 16:18:59 -0800
-Message-Id: <20200108001859.25254-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
+To:     Barret Rhoden <brho@google.com>
+Cc:     Liran Alon <liran.alon@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jason.zeng@intel.com
+Subject: Re: [PATCH v5 2/2] kvm: Use huge pages for DAX-backed files
+Message-ID: <20200108012014.GF16987@linux.intel.com>
+References: <20191212182238.46535-1-brho@google.com>
+ <20191212182238.46535-3-brho@google.com>
+ <06108004-1720-41EB-BCAB-BFA8FEBF4772@oracle.com>
+ <ED482280-CB47-4AB6-9E7E-EEE7848E0F8B@oracle.com>
+ <f8e948ff-6a2a-a6d6-9d8e-92b93003354a@google.com>
+ <65FB6CC1-3AD2-4D6F-9481-500BD7037203@oracle.com>
+ <20191213171950.GA31552@linux.intel.com>
+ <e012696f-f13e-5af1-2b14-084607d69bfa@google.com>
+ <20200107190522.GA16987@linux.intel.com>
+ <08a36944-ad5a-ca49-99b3-d3908ce0658b@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <08a36944-ad5a-ca49-99b3-d3908ce0658b@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use a Logical OR in __is_rsvd_bits_set() to combine the two reserved bit
-checks, which are obviously intended to be logical statements.  Switching
-to a Logical OR is functionally a nop, but allows the compiler to better
-optimize the checks.
+On Tue, Jan 07, 2020 at 02:19:06PM -0500, Barret Rhoden wrote:
+> On 1/7/20 2:05 PM, Sean Christopherson wrote:
+> >Hopefully you haven't put too much effort into the rework, because I want
+> >to commandeer the proposed changes and use them as the basis for a more
+> >aggressive overhaul of KVM's hugepage handling.  Ironically, there's a bug
+> >in KVM's THP handling that I _think_ can be avoided by using the DAX
+> >approach of walking the host PTEs.
+> >
+> >I'm in the process of testing, hopefully I'll get a series sent out later
+> >today.  If not, I should at least be able to provide an update.
+> 
+> Nice timing.  I was just about to get back to this, so I haven't put any
+> time in yet.  =)
+> 
+> Please CC me, and I'll try your patches out on my end.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Will do.  Barring last minute hiccups, the code is ready, just need to
+finish off a few changelogs.  Should get it out early tomorrow.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7269130ea5e2..72e845709027 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3970,7 +3970,7 @@ __is_rsvd_bits_set(struct rsvd_bits_validate *rsvd_check, u64 pte, int level)
- {
- 	int bit7 = (pte >> 7) & 1, low6 = pte & 0x3f;
- 
--	return (pte & rsvd_check->rsvd_bits_mask[bit7][level-1]) |
-+	return (pte & rsvd_check->rsvd_bits_mask[bit7][level-1]) ||
- 		((rsvd_check->bad_mt_xwr & (1ull << low6)) != 0);
- }
- 
--- 
-2.24.1
+One question that may help avoid some churn: are huge DAX pages not
+tracked as compound pages?  The comment from your/this patch is pretty
+unequivocal, but I wanted to double check that they will really return
+false for PageCompound(), as opposed to only returning false for
+PageTransCompoundMap().
 
+	/*
+	 * DAX pages do not use compound pages.  ...
+	 */
+
+Thanks!
