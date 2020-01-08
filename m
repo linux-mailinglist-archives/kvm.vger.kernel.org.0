@@ -2,49 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84BF113451E
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 15:36:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0516E13452B
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 15:38:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728294AbgAHOgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 09:36:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1318 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728226AbgAHOgC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jan 2020 09:36:02 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 008ERAWc041267
-        for <kvm@vger.kernel.org>; Wed, 8 Jan 2020 09:36:00 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xd0wk67rf-1
+        id S1728369AbgAHOi0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 09:38:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47702 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728004AbgAHOiZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jan 2020 09:38:25 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 008EbVQV043418
+        for <kvm@vger.kernel.org>; Wed, 8 Jan 2020 09:38:24 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xdfmnk5qe-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 09:36:00 -0500
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 09:38:24 -0500
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 8 Jan 2020 14:35:59 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Wed, 8 Jan 2020 14:38:22 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 8 Jan 2020 14:35:56 -0000
+        Wed, 8 Jan 2020 14:38:19 -0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 008EZt3Q64749738
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 008EcIZl59703326
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Jan 2020 14:35:55 GMT
+        Wed, 8 Jan 2020 14:38:18 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 68A4CAE045;
-        Wed,  8 Jan 2020 14:35:55 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id A0D08AE04D;
+        Wed,  8 Jan 2020 14:38:18 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34E7FAE04D;
-        Wed,  8 Jan 2020 14:35:55 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 6C9E3AE051;
+        Wed,  8 Jan 2020 14:38:18 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.155])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  8 Jan 2020 14:35:55 +0000 (GMT)
+        Wed,  8 Jan 2020 14:38:18 +0000 (GMT)
 Subject: Re: [PATCH v3] KVM: s390: Add new reset vcpu API
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, cohuck@redhat.com, linux-s390@vger.kernel.org
 References: <20191205120956.50930-1-frankja@linux.ibm.com>
  <dd724da0-9bba-079e-6b6f-756762dbc942@de.ibm.com>
+ <d0db08ef-ade9-93d4-105f-ace6fef50c81@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
  J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
@@ -88,26 +89,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 8 Jan 2020 15:35:55 +0100
+Date:   Wed, 8 Jan 2020 15:38:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <dd724da0-9bba-079e-6b6f-756762dbc942@de.ibm.com>
+In-Reply-To: <d0db08ef-ade9-93d4-105f-ace6fef50c81@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20010814-0016-0000-0000-000002DB99B1
+x-cbid: 20010814-0028-0000-0000-000003CF5905
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20010814-0017-0000-0000-0000333E14F9
-Message-Id: <3b37f523-d67f-ba6c-8e14-77183f73a58a@de.ibm.com>
+x-cbparentid: 20010814-0029-0000-0000-000024936BF4
+Message-Id: <3ddb7aa6-96d4-246f-a8ba-fdf2408a4ff0@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-01-08_03:2020-01-08,2020-01-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- suspectscore=0 spamscore=0 impostorscore=0 mlxlogscore=999
- lowpriorityscore=0 clxscore=1015 phishscore=0 mlxscore=0
- priorityscore=1501 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-2001080124
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ mlxscore=0 mlxlogscore=999 malwarescore=0 spamscore=0 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001080125
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -115,89 +116,101 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 08.01.20 15:28, Christian Borntraeger wrote:
+On 08.01.20 15:35, Janosch Frank wrote:
+> On 1/8/20 3:28 PM, Christian Borntraeger wrote:
+>>
+>>
+>> On 05.12.19 13:09, Janosch Frank wrote:
+>> [...]
+>>> +4.123 KVM_S390_CLEAR_RESET
+>>> +
+>>> +Capability: KVM_CAP_S390_VCPU_RESETS
+>>> +Architectures: s390
+>>> +Type: vcpu ioctl
+>>> +Parameters: none
+>>> +Returns: 0
+>>> +
+>>> +This ioctl resets VCPU registers and control structures that QEMU
+>>> +can't access via the kvm_run structure. The clear reset is a superset
+>>> +of the initial reset and additionally clears general, access, floating
+>>> +and vector registers.
+>>
+>> As Thomas outlined, make it more obvious that userspace does the remaining
+>> parts. I do not think that we want the kernel to do the things (unless it
+>> helps you in some way for the ultravisor guests)
 > 
-> 
-> On 05.12.19 13:09, Janosch Frank wrote:
-> [...]
->> +4.123 KVM_S390_CLEAR_RESET
->> +
->> +Capability: KVM_CAP_S390_VCPU_RESETS
->> +Architectures: s390
->> +Type: vcpu ioctl
->> +Parameters: none
->> +Returns: 0
->> +
->> +This ioctl resets VCPU registers and control structures that QEMU
->> +can't access via the kvm_run structure. The clear reset is a superset
->> +of the initial reset and additionally clears general, access, floating
->> +and vector registers.
-> 
-> As Thomas outlined, make it more obvious that userspace does the remaining
-> parts. I do not think that we want the kernel to do the things (unless it
-> helps you in some way for the ultravisor guests)
+> Ok, will do
 
-On the other hand. todays initial cpu reset DOES everything. So I guess
-the other ones should do the same. That actually makes the semantics clearer -
-when you call it it will have done whatever reset you have asked for.
-
+I changed my mind (see my other mail) but I would like Thomas, Conny or David
+to ack/nack.
 
 > 
-> [...]
+>>
+>> [...]
+>>>  
+>>> +static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	kvm_clear_async_pf_completion_queue(vcpu);
+>>> +	kvm_s390_clear_local_irqs(vcpu);
+>>> +	return 0;
+>>
+>> Shouldnt we also do 
+>>         if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
+>>                 kvm_s390_vcpu_stop(vcpu);
+>>
+>> here?
+> 
+> Isn't userspace cpu state ctrl basically a prereq anyway for getting
+> those new ioctls?
+
+I do not see a reason why we should mandate userspace cpu state for the normal
+reset. Using this if also enables the fallthrough below - which I like.
+
+> 
+>>
+>>
+>>> +}
+>>> +
+>>>  static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+>>>  {
+>>>  	kvm_s390_vcpu_initial_reset(vcpu);
+>>> @@ -4363,9 +4371,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>>  		r = kvm_arch_vcpu_ioctl_set_initial_psw(vcpu, psw);
+>>>  		break;
+>>>  	}
+>>> +
+>>> +	case KVM_S390_CLEAR_RESET:
+>>> +		/* fallthrough */
+>>>  	case KVM_S390_INITIAL_RESET:
+>>>  		r = kvm_arch_vcpu_ioctl_initial_reset(vcpu);
+>>>  		break;
+>>
+>> Then we could also do a fallthrough here and do:
+>>
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index d9e6bf3..c715ae3 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -2867,10 +2867,6 @@ static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
+>>         vcpu->arch.sie_block->pp = 0;
+>>         vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+>>         vcpu->arch.pfault_token = KVM_S390_PFAULT_TOKEN_INVALID;
+>> -       kvm_clear_async_pf_completion_queue(vcpu);
+>> -       if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
+>> -               kvm_s390_vcpu_stop(vcpu);
+>> -       kvm_s390_clear_local_irqs(vcpu);
+>>  }
 >>  
->> +static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
->> +{
->> +	kvm_clear_async_pf_completion_queue(vcpu);
->> +	kvm_s390_clear_local_irqs(vcpu);
->> +	return 0;
-> 
-> Shouldnt we also do 
->         if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
->                 kvm_s390_vcpu_stop(vcpu);
-> 
-> here?
-> 
-> 
->> +}
->> +
->>  static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
->>  {
->>  	kvm_s390_vcpu_initial_reset(vcpu);
->> @@ -4363,9 +4371,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->>  		r = kvm_arch_vcpu_ioctl_set_initial_psw(vcpu, psw);
->>  		break;
->>  	}
->> +
->> +	case KVM_S390_CLEAR_RESET:
->> +		/* fallthrough */
->>  	case KVM_S390_INITIAL_RESET:
->>  		r = kvm_arch_vcpu_ioctl_initial_reset(vcpu);
->>  		break;
-> 
-> Then we could also do a fallthrough here and do:
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index d9e6bf3..c715ae3 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2867,10 +2867,6 @@ static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
->         vcpu->arch.sie_block->pp = 0;
->         vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
->         vcpu->arch.pfault_token = KVM_S390_PFAULT_TOKEN_INVALID;
-> -       kvm_clear_async_pf_completion_queue(vcpu);
-> -       if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
-> -               kvm_s390_vcpu_stop(vcpu);
-> -       kvm_s390_clear_local_irqs(vcpu);
->  }
->  
->  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+>>  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+>>
+>>
+>>
+>>
+>>> +	case KVM_S390_NORMAL_RESET:
+>>> +		r = kvm_arch_vcpu_ioctl_normal_reset(vcpu);
+>>> +		break;
+>>>  	case KVM_SET_ONE_REG:
+>>>  	case KVM_GET_ONE_REG: {
 > 
 > 
-> 
-> 
->> +	case KVM_S390_NORMAL_RESET:
->> +		r = kvm_arch_vcpu_ioctl_normal_reset(vcpu);
->> +		break;
->>  	case KVM_SET_ONE_REG:
->>  	case KVM_GET_ONE_REG: {
 
