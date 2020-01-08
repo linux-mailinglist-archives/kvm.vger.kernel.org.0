@@ -2,137 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BA5A134017
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 12:17:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B5E2B134062
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 12:25:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727395AbgAHLRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 06:17:20 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54494 "EHLO mail.kernel.org"
+        id S1726768AbgAHLZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 06:25:04 -0500
+Received: from mga03.intel.com ([134.134.136.65]:10668 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726856AbgAHLRT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 06:17:19 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A98C520673;
-        Wed,  8 Jan 2020 11:17:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578482238;
-        bh=BOw+oxULUxi4SWAMJyt3dVvRgIUU2l4r0rjJa2+K9No=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=hQwb5ISuoPH21WTJGlGGLWwDnR2n82LROt+g1wPcEIh2MQFLHHCWO7/dB4/oekUQE
-         FsU91xjNAWVwjTIVCRYH/4aFnnEjLhUtWsU6wmQPdOnfZOrAqbQR3IHIKCN2ipbyJH
-         wMIOLhicp0mRnS6E5gFHDa5Es3C1BAz/pd2U8Jvk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1ip9Ku-0007XE-No; Wed, 08 Jan 2020 11:17:16 +0000
+        id S1726098AbgAHLZD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 06:25:03 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 03:25:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,409,1571727600"; 
+   d="scan'208";a="215923892"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 08 Jan 2020 03:25:00 -0800
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1ip9SN-0000oC-TA; Wed, 08 Jan 2020 19:24:59 +0800
+Date:   Wed, 8 Jan 2020 19:24:10 +0800
+From:   kbuild test robot <lkp@intel.com>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     kbuild-all@lists.01.org, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kevin.tian@intel.com, joro@8bytes.org,
+        peterx@redhat.com, baolu.lu@linux.intel.com,
+        Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [PATCH v4 07/12] vfio_pci: shrink vfio_pci.c
+Message-ID: <202001081944.Ax1eyQdP%lkp@intel.com>
+References: <1578398509-26453-8-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 08 Jan 2020 11:17:16 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Andrew Murray <andrew.murray@arm.com>
-Cc:     Catalin Marinas <Catalin.Marinas@arm.com>,
-        Mark Rutland <Mark.Rutland@arm.com>, will@kernel.org,
-        Sudeep Holla <Sudeep.Holla@arm.com>, kvm@vger.kernel.org,
-        kvmarm <kvmarm@lists.cs.columbia.edu>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore full
- SPE profiling buffer controls
-In-Reply-To: <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-10-andrew.murray@arm.com>
- <20191221141325.5a177343@why>
- <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
-Message-ID: <fc222fef381f4ada37966db0a1ec314a@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, Catalin.Marinas@arm.com, Mark.Rutland@arm.com, will@kernel.org, Sudeep.Holla@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1578398509-26453-8-git-send-email-yi.l.liu@intel.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-01-07 15:13, Andrew Murray wrote:
-> On Sat, Dec 21, 2019 at 02:13:25PM +0000, Marc Zyngier wrote:
->> On Fri, 20 Dec 2019 14:30:16 +0000
->> Andrew Murray <andrew.murray@arm.com> wrote:
->> 
->> [somehow managed not to do a reply all, re-sending]
->> 
->> > From: Sudeep Holla <sudeep.holla@arm.com>
->> >
->> > Now that we can save/restore the full SPE controls, we can enable it
->> > if SPE is setup and ready to use in KVM. It's supported in KVM only if
->> > all the CPUs in the system supports SPE.
->> >
->> > However to support heterogenous systems, we need to move the check if
->> > host supports SPE and do a partial save/restore.
->> 
->> No. Let's just not go down that path. For now, KVM on heterogeneous
->> systems do not get SPE.
-> 
-> At present these patches only offer the SPE feature to VCPU's where the
-> sanitised AA64DFR0 register indicates that all CPUs have this support
-> (kvm_arm_support_spe_v1) at the time of setting the attribute
-> (KVM_SET_DEVICE_ATTR).
-> 
-> Therefore if a new CPU comes online without SPE support, and an
-> existing VCPU is scheduled onto it, then bad things happen - which I 
-> guess
-> must have been the intention behind this patch.
+Hi Liu,
 
-I guess that was the intent.
+Thank you for the patch! Perhaps something to improve:
 
->> If SPE has been enabled on a guest and a CPU
->> comes up without SPE, this CPU should fail to boot (same as exposing a
->> feature to userspace).
-> 
-> I'm unclear as how to prevent this. We can set the FTR_STRICT flag on
-> the sanitised register - thus tainting the kernel if such a non-SPE CPU
-> comes online - thought that doesn't prevent KVM from blowing up. Though
-> I don't believe we can prevent a CPU coming up. At the moment this is
-> my preferred approach.
+[auto build test WARNING on v5.5-rc5]
+[also build test WARNING on next-20200106]
+[cannot apply to vfio/next]
+[if your patch is applied to the wrong git tree, please drop us a note to help
+improve the system. BTW, we also suggest to use '--base' option to specify the
+base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
 
-I'd be OK with this as a stop-gap measure. Do we know of any existing
-design where only half of the CPUs have SPE?
+url:    https://github.com/0day-ci/linux/commits/Liu-Yi-L/vfio_pci-wrap-pci-device-as-a-mediated-device/20200108-020930
+base:    c79f46a282390e0f5b306007bf7b11a46d529538
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.1-129-g341daf20-dirty
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
 
-> Looking at the vcpu_load and related code, I don't see a way of saying
-> 'don't schedule this VCPU on this CPU' or bailing in any way.
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
 
-That would actually be pretty easy to implement. In vcpu_load(), check
-that that the CPU physical has SPE. If not, raise a request for that 
-vcpu.
-In the run loop, check for that request and abort if raised, returning
-to userspace.
 
-Userspace can always check /sys/devices/arm_spe_0/cpumask and work out
-where to run that particular vcpu.
+sparse warnings: (new ones prefixed by >>)
 
-> 
-> One solution could be to allow scheduling onto non-SPE VCPUs but wrap 
-> the
-> SPE save/restore code in a macro (much like kvm_arm_spe_v1_ready) that
-> reads the non-sanitised feature register. Therefore we don't go bang, 
-> but
-> we also increase the size of any black-holes in SPE capturing. Though 
-> this
-> feels like something that will cause grief down the line.
-> 
-> Is there something else that can be done?
+>> drivers/vfio/pci/vfio_pci_common.c:201:25: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_common.c:201:43: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_common.c:201:56: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_common.c:201:65: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_common.c:206:25: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_common.c:206:44: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_common.c:206:57: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_common.c:206:66: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_common.c:214:39: sparse: sparse: restricted pci_power_t degrades to integer
+   drivers/vfio/pci/vfio_pci_common.c:214:58: sparse: sparse: restricted pci_power_t degrades to integer
 
-How does userspace deal with this? When SPE is only available on half of
-the CPUs, how does perf work in these conditions?
+vim +201 drivers/vfio/pci/vfio_pci_common.c
 
-Thanks,
+8db581db521ec0 Liu Yi L 2020-01-07  186  
+8db581db521ec0 Liu Yi L 2020-01-07  187  /*
+8db581db521ec0 Liu Yi L 2020-01-07  188   * pci_set_power_state() wrapper handling devices which perform a soft reset on
+8db581db521ec0 Liu Yi L 2020-01-07  189   * D3->D0 transition.  Save state prior to D0/1/2->D3, stash it on the vdev,
+8db581db521ec0 Liu Yi L 2020-01-07  190   * restore when returned to D0.  Saved separately from pci_saved_state for use
+8db581db521ec0 Liu Yi L 2020-01-07  191   * by PM capability emulation and separately from pci_dev internal saved state
+8db581db521ec0 Liu Yi L 2020-01-07  192   * to avoid it being overwritten and consumed around other resets.
+8db581db521ec0 Liu Yi L 2020-01-07  193   */
+8db581db521ec0 Liu Yi L 2020-01-07  194  int vfio_pci_set_power_state(struct vfio_pci_device *vdev, pci_power_t state)
+8db581db521ec0 Liu Yi L 2020-01-07  195  {
+8db581db521ec0 Liu Yi L 2020-01-07  196  	struct pci_dev *pdev = vdev->pdev;
+8db581db521ec0 Liu Yi L 2020-01-07  197  	bool needs_restore = false, needs_save = false;
+8db581db521ec0 Liu Yi L 2020-01-07  198  	int ret;
+8db581db521ec0 Liu Yi L 2020-01-07  199  
+8db581db521ec0 Liu Yi L 2020-01-07  200  	if (vdev->needs_pm_restore) {
+8db581db521ec0 Liu Yi L 2020-01-07 @201  		if (pdev->current_state < PCI_D3hot && state >= PCI_D3hot) {
+8db581db521ec0 Liu Yi L 2020-01-07  202  			pci_save_state(pdev);
+8db581db521ec0 Liu Yi L 2020-01-07  203  			needs_save = true;
+8db581db521ec0 Liu Yi L 2020-01-07  204  		}
+8db581db521ec0 Liu Yi L 2020-01-07  205  
+8db581db521ec0 Liu Yi L 2020-01-07  206  		if (pdev->current_state >= PCI_D3hot && state <= PCI_D0)
+8db581db521ec0 Liu Yi L 2020-01-07  207  			needs_restore = true;
+8db581db521ec0 Liu Yi L 2020-01-07  208  	}
+8db581db521ec0 Liu Yi L 2020-01-07  209  
+8db581db521ec0 Liu Yi L 2020-01-07  210  	ret = pci_set_power_state(pdev, state);
+8db581db521ec0 Liu Yi L 2020-01-07  211  
+8db581db521ec0 Liu Yi L 2020-01-07  212  	if (!ret) {
+8db581db521ec0 Liu Yi L 2020-01-07  213  		/* D3 might be unsupported via quirk, skip unless in D3 */
+8db581db521ec0 Liu Yi L 2020-01-07  214  		if (needs_save && pdev->current_state >= PCI_D3hot) {
+8db581db521ec0 Liu Yi L 2020-01-07  215  			vdev->pm_save = pci_store_saved_state(pdev);
+8db581db521ec0 Liu Yi L 2020-01-07  216  		} else if (needs_restore) {
+8db581db521ec0 Liu Yi L 2020-01-07  217  			pci_load_and_free_saved_state(pdev, &vdev->pm_save);
+8db581db521ec0 Liu Yi L 2020-01-07  218  			pci_restore_state(pdev);
+8db581db521ec0 Liu Yi L 2020-01-07  219  		}
+8db581db521ec0 Liu Yi L 2020-01-07  220  	}
+8db581db521ec0 Liu Yi L 2020-01-07  221  
+8db581db521ec0 Liu Yi L 2020-01-07  222  	return ret;
+8db581db521ec0 Liu Yi L 2020-01-07  223  }
+8db581db521ec0 Liu Yi L 2020-01-07  224  
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+:::::: The code at line 201 was first introduced by commit
+:::::: 8db581db521ec047e12946a9c933f085c4d680ba vfio_pci: duplicate vfio_pci.c
+
+:::::: TO: Liu Yi L <yi.l.liu@intel.com>
+:::::: CC: 0day robot <lkp@intel.com>
+
+---
+0-DAY kernel test infrastructure                 Open Source Technology Center
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org Intel Corporation
