@@ -2,314 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 49D351338A4
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 02:50:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF9B9133C87
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 08:58:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726346AbgAHBuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jan 2020 20:50:23 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:40293 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726111AbgAHBuX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jan 2020 20:50:23 -0500
-Received: by mail-pg1-f194.google.com with SMTP id k25so745749pgt.7;
-        Tue, 07 Jan 2020 17:50:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=k/xLHVr+E3Mm0ZHWLILeml/rw0rkew9DOHcx6ajd5sk=;
-        b=ZM3lGfmDx3evcWkdgiQL85j5d0lPcXoM1Q6+yAhQO2N2Uamr6u/T72rhsBCuOhlokr
-         p66L+m6lonmCQDVQA1uQi12ZbBpMWZjgmeW6liYuCqVyuRp5ueCA/EKfUttJVvwIM/El
-         6AqAJa3YmhumJ/hkEld5Y6AIjo3q1GhWHamGKkiA85nh0XPTb87txaxYJj03GrapnoAs
-         HpR4AHrljcMRB6AElLeBTnOSsAu/DpvuVFMSQy1UQYTpeNKUfBGdii74qNxwYMi5L+oi
-         52QUPUnaC/bOOl3ZZ0xeYnxvCd6hkjo9LzUd9gGBc4BMpeItOGH6GrKY2Sl7enbUm33q
-         2n1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=k/xLHVr+E3Mm0ZHWLILeml/rw0rkew9DOHcx6ajd5sk=;
-        b=Pt9JXscrESLyNG51SRACjBOsdo0PthP9F7Ci4APGveBuDv9/Ku0sWAUDZaUyHSmZxz
-         sxUGdW6maEMEI1ZU8GLMCAM9woWzPEkC6GOP6QKE3qiexMlWSJYE/P/ylmo3dRsfyl7y
-         0IsWwnYPrrZ6yizT+MaLR/lO0u1xBQ2uzJG5747kj6o8UUBOITd7eUvjHlC/mcKLJepd
-         YtqwSJGsOWRn/j0FjXUbnqC3n/qxIU+y1mSWIo97frF+0lHujNeynImF0Sgt7cpaCA8E
-         kZbY6GRt+WhTLFZeQ6jA5SzgMQOr7TluopahDwlQvyRoDdmmCnNJ9IR+tWh7pF6HfV+X
-         d5QA==
-X-Gm-Message-State: APjAAAXlkGTohXyztmD2D+bdq8bQjhOYNtezIDd9jFD+MUuUs69yX6LA
-        Pnk81atwhvHsr11MpyR/JwOKjTVo
-X-Google-Smtp-Source: APXvYqzhfG7ey2jgclGz8NpZCi23qZJLxeejPX1VOBywZUKXya5K8TE0j4F9XRbtYzi3xMa22VorQg==
-X-Received: by 2002:a62:7883:: with SMTP id t125mr2520413pfc.141.1578448222147;
-        Tue, 07 Jan 2020 17:50:22 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id w8sm825747pfn.186.2020.01.07.17.50.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 07 Jan 2020 17:50:21 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        KarimAllah <karahmed@amazon.de>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Subject: [PATCH RFC] sched/fair: Penalty the cfs task which executes mwait/hlt
-Date:   Wed,  8 Jan 2020 09:50:01 +0800
-Message-Id: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        id S1726998AbgAHH6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 02:58:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46833 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725944AbgAHH6E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 02:58:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578470282;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
+        bh=3dmWQU4K3AqhLAU0j1T/evADH+vQEyjC60UvFGd/1KI=;
+        b=ho2bOVVGnVH9uBS93BWTTus5ZabvwYPDXV96V9ULpCahshbxC3Y91rGy2a0ahfu/BHWmxf
+        hRLRVKqw4IpbZsf1ya/NbeQyXK6xY9HIwvhekCyJJOwtDIx5zC2uSlRyJ5+d6NxlGqndiK
+        ivDg8WAKkD6LmvGFOjYGt8vgXypfSDU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-I1C0wdd1NqS3LgNf2H9Tsg-1; Wed, 08 Jan 2020 02:58:01 -0500
+X-MC-Unique: I1C0wdd1NqS3LgNf2H9Tsg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E814107ACC5;
+        Wed,  8 Jan 2020 07:57:58 +0000 (UTC)
+Received: from [10.40.204.26] (ovpn-204-26.brq.redhat.com [10.40.204.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CC22E5C241;
+        Wed,  8 Jan 2020 07:57:35 +0000 (UTC)
+Subject: Re: [PATCH v16 0/9] mm / virtio: Provide support for free page
+ reporting
+To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, konrad.wilk@oracle.com, david@redhat.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com, osalvador@suse.de
+References: <20200103210509.29237.18426.stgit@localhost.localdomain>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <aebf72d6-3383-fcc5-7cea-efb930e4e245@redhat.com>
+Date:   Wed, 8 Jan 2020 02:57:31 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20200103210509.29237.18426.stgit@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
 
-To deliver all of the resources of a server to instances in cloud, there are no 
-housekeeping cpus reserved. libvirtd, qemu main loop, kthreads, and other agent/tools 
-etc which can't be offloaded to other hardware like smart nic, these stuff will 
-contend with vCPUs even if MWAIT/HLT instructions executed in the guest.
+On 1/3/20 4:16 PM, Alexander Duyck wrote:
+> This series provides an asynchronous means of reporting free guest page=
+s
+> to a hypervisor so that the memory associated with those pages can be
+> dropped and reused by other processes and/or guests on the host. Using
+> this it is possible to avoid unnecessary I/O to disk and greatly improv=
+e
+> performance in the case of memory overcommit on the host.
+>
+> When enabled we will be performing a scan of free memory every 2 second=
+s
+> while pages of sufficiently high order are being freed. In each pass at=
 
-The is no trap and yield the pCPU after we expose mwait/hlt to the guest [1][2],
-the top command on host still observe 100% cpu utilization since qemu process is 
-running even though guest who has the power management capability executes mwait. 
-Actually we can observe the physical cpu has already enter deeper cstate by 
-powertop on host.
+> least one sixteenth of each free list will be reported. By doing this w=
+e
+> avoid racing against other threads that may be causing a high amount of=
 
-For virtualization, there is a HLT activity state in CPU VMCS field which indicates 
-the logical processor is inactive because it executed the HLT instruction, but 
-SDM 24.4.2 mentioned that execution of the MWAIT instruction may put a logical 
-processor into an inactive state, however, this VMCS field never reflects this 
-state.
+> memory churn.
+>
+> The lowest page order currently scanned when reporting pages is
+> pageblock_order so that this feature will not interfere with the use of=
 
-This patch avoids fine granularity intercept and reschedule vCPU if MWAIT/HLT
-instructions executed, because it can worse the message-passing workloads which 
-will switch between idle and running frequently in the guest. Lets penalty the 
-vCPU which is long idle through tick-based sampling and preemption.
+> Transparent Huge Pages in the case of virtualization.
+>
+> Currently this is only in use by virtio-balloon however there is the ho=
+pe
+> that at some point in the future other hypervisors might be able to mak=
+e
+> use of it. In the virtio-balloon/QEMU implementation the hypervisor is
+> currently using MADV_DONTNEED to indicate to the host kernel that the p=
+age
+> is currently free. It will be zeroed and faulted back into the guest th=
+e
+> next time the page is accessed.
+>
+> To track if a page is reported or not the Uptodate flag was repurposed =
+and
+> used as a Reported flag for Buddy pages. We walk though the free list
+> isolating pages and adding them to the scatterlist until we either
+> encounter the end of the list, processed as many pages as were listed i=
+n
+> nr_free prior to us starting, or have filled the scatterlist with pages=
+ to
+> be reported. If we fill the scatterlist before we reach the end of the
+> list we rotate the list so that the first unreported page we encounter =
+is
+> moved to the head of the list as that is where we will resume after we
+> have freed the reported pages back into the tail of the list.
+>
+> Below are the results from various benchmarks. I primarily focused on t=
+wo
+> tests. The first is the will-it-scale/page_fault2 test, and the other i=
+s
+> a modified version of will-it-scale/page_fault1 that was enabled to use=
 
-Bind unixbench to one idle pCPU:
-Dhrystone 2 using register variables            26445969.1  (base)
+> THP. I did this as it allows for better visibility into different parts=
 
-Bind unixbench and one vCPU which is idle to one pCPU:
+> of the memory subsystem. The guest is running with 32G for RAM on one
+> node of a E5-2630 v3. The host has had some features such as CPU turbo
+> disabled in the BIOS.
+>
+> Test                   page_fault1 (THP)    page_fault2
+> Name            tasks  Process Iter  STDEV  Process Iter  STDEV
+> Baseline            1    1012402.50  0.14%     361855.25  0.81%
+>                    16    8827457.25  0.09%    3282347.00  0.34%
+>
+> Patches Applied     1    1007897.00  0.23%     361887.00  0.26%
+>                    16    8784741.75  0.39%    3240669.25  0.48%
+>
+> Patches Enabled     1    1010227.50  0.39%     359749.25  0.56%
+>                    16    8756219.00  0.24%    3226608.75  0.97%
+>
+> Patches Enabled     1    1050982.00  4.26%     357966.25  0.14%
+>  page shuffle      16    8672601.25  0.49%    3223177.75  0.40%
+>
+> Patches Enabled     1    1003238.00  0.22%     360211.00  0.22%
+>  shuffle w/ RFC    16    8767010.50  0.32%    3199874.00  0.71%
 
-Before patch:
+Just to be sure that I understand your test setup correctly:
+- You have a 32GB guest with a single node affined to a single node of yo=
+ur host
+(E5-2630).
+- You have THP in both host and the guest enabled and set to 'madvise'.
+- On top of the default x86_64 config and other virtio config options you=
+ have
+CONFIG_SLAB_FREELIST_RANDOM and CONFIG_SHUFFLE_PAGE_ALLOCATOR enabled for=
+ the
+third observation (Patches Enabled page shuffle).
+did I miss anything?
 
-Dhrystone 2 using register variables            21248475.1  (80% of base)
+Can you also remind me of the reason you have skipped recording the numbe=
+r of
+threads count reported as part of page_fault tests? Was it because you we=
+re
+observing different values with every fresh boot?
 
-After patch:
 
-Dhrystone 2 using register variables            24839863.6  (94% of base)
+> The results above are for a baseline with a linux-next-20191219 kernel,=
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg06794.html
-[2] https://lkml.org/lkml/2018/3/12/359
+> that kernel with this patch set applied but page reporting disabled in
+> virtio-balloon, the patches applied and page reporting fully enabled, t=
+he
+> patches enabled with page shuffling enabled, and the patches applied wi=
+th
+> page shuffling enabled and an RFC patch that makes used of MADV_FREE in=
 
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: KarimAllah <karahmed@amazon.de>
-Cc: Vincent Guittot <vincent.guittot@linaro.org>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: Ankur Arora <ankur.a.arora@oracle.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/include/asm/smp.h      |  1 +
- arch/x86/include/asm/topology.h |  7 ++++++
- arch/x86/kernel/smpboot.c       | 53 ++++++++++++++++++++++++++++++++++++++++-
- kernel/sched/core.c             |  1 +
- kernel/sched/fair.c             | 10 +++++++-
- kernel/sched/features.h         |  5 ++++
- kernel/sched/sched.h            |  7 ++++++
- 7 files changed, 82 insertions(+), 2 deletions(-)
+> QEMU. These results include the deviation seen between the average valu=
+e
+> reported here versus the high and/or low value. I observed that during =
+the
+> test memory usage for the first three tests never dropped whereas with =
+the
+> patches fully enabled the VM would drop to using only a few GB of the
+> host's memory when switching from memhog to page fault tests.
 
-diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
-index e15f364..61e5b9b 100644
---- a/arch/x86/include/asm/smp.h
-+++ b/arch/x86/include/asm/smp.h
-@@ -28,6 +28,7 @@
- DECLARE_PER_CPU_READ_MOSTLY(cpumask_var_t, cpu_llc_shared_map);
- DECLARE_PER_CPU_READ_MOSTLY(u16, cpu_llc_id);
- DECLARE_PER_CPU_READ_MOSTLY(int, cpu_number);
-+DECLARE_PER_CPU(bool, cpu_is_idle);
- 
- static inline struct cpumask *cpu_llc_shared_mask(int cpu)
- {
-diff --git a/arch/x86/include/asm/topology.h b/arch/x86/include/asm/topology.h
-index 4b14d23..13e2ffc 100644
---- a/arch/x86/include/asm/topology.h
-+++ b/arch/x86/include/asm/topology.h
-@@ -193,4 +193,11 @@ static inline void sched_clear_itmt_support(void)
- }
- #endif /* CONFIG_SCHED_MC_PRIO */
- 
-+#ifdef CONFIG_SMP
-+#include <asm/cpufeature.h>
-+
-+#define arch_scale_freq_tick arch_scale_freq_tick
-+extern void arch_scale_freq_tick(void);
-+#endif
-+
- #endif /* _ASM_X86_TOPOLOGY_H */
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index 69881b2..390534e 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -99,6 +99,9 @@
- DEFINE_PER_CPU_READ_MOSTLY(struct cpuinfo_x86, cpu_info);
- EXPORT_PER_CPU_SYMBOL(cpu_info);
- 
-+DEFINE_PER_CPU(bool, cpu_is_idle);
-+EXPORT_PER_CPU_SYMBOL(cpu_is_idle);
-+
- /* Logical package management. We might want to allocate that dynamically */
- unsigned int __max_logical_packages __read_mostly;
- EXPORT_SYMBOL(__max_logical_packages);
-@@ -147,6 +150,8 @@ static inline void smpboot_restore_warm_reset_vector(void)
- 	*((volatile u32 *)phys_to_virt(TRAMPOLINE_PHYS_LOW)) = 0;
- }
- 
-+static void set_cpu_sample(void);
-+
- /*
-  * Report back to the Boot Processor during boot time or to the caller processor
-  * during CPU online.
-@@ -183,6 +188,8 @@ static void smp_callin(void)
- 	 */
- 	set_cpu_sibling_map(raw_smp_processor_id());
- 
-+	set_cpu_sample();
-+
- 	/*
- 	 * Get our bogomips.
- 	 * Update loops_per_jiffy in cpu_data. Previous call to
-@@ -1337,7 +1344,7 @@ void __init native_smp_prepare_cpus(unsigned int max_cpus)
- 	set_sched_topology(x86_topology);
- 
- 	set_cpu_sibling_map(0);
--
-+	set_cpu_sample();
- 	smp_sanity_check();
- 
- 	switch (apic_intr_mode) {
-@@ -1764,3 +1771,47 @@ void native_play_dead(void)
- }
- 
- #endif
-+
-+static DEFINE_PER_CPU(u64, arch_prev_tsc);
-+static DEFINE_PER_CPU(u64, arch_prev_mperf);
-+
-+#include <asm/cpu_device_id.h>
-+#include <asm/intel-family.h>
-+
-+#define ICPU(model) \
-+	{ X86_VENDOR_INTEL, 6, model, X86_FEATURE_APERFMPERF, 0}
-+
-+static void set_cpu_sample(void)
-+{
-+	u64 mperf;
-+
-+	if (!boot_cpu_has(X86_FEATURE_APERFMPERF))
-+		return;
-+
-+	rdmsrl(MSR_IA32_MPERF, mperf);
-+
-+	this_cpu_write(arch_prev_tsc, rdtsc());
-+	this_cpu_write(arch_prev_mperf, mperf);
-+	this_cpu_write(cpu_is_idle, true);
-+}
-+
-+void arch_scale_freq_tick(void)
-+{
-+	u64 mperf;
-+	u64 mcnt, tsc;
-+	int result;
-+
-+	if (!static_cpu_has(X86_FEATURE_APERFMPERF))
-+		return;
-+
-+	rdmsrl(MSR_IA32_MPERF, mperf);
-+
-+	mcnt = mperf - this_cpu_read(arch_prev_mperf);
-+	tsc = rdtsc() - this_cpu_read(arch_prev_tsc);
-+	if (!mcnt)
-+		return;
-+
-+	this_cpu_write(arch_prev_tsc, rdtsc());
-+	this_cpu_write(arch_prev_mperf, mperf);
-+	this_cpu_write(cpu_is_idle, (mcnt * 100 / tsc) == 0);
-+}
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index dd05a37..e41ad01 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -3593,6 +3593,7 @@ void scheduler_tick(void)
- 	struct task_struct *curr = rq->curr;
- 	struct rq_flags rf;
- 
-+	arch_scale_freq_tick();
- 	sched_clock_tick();
- 
- 	rq_lock(rq, &rf);
-diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 83ab35e..5ff7431 100644
---- a/kernel/sched/fair.c
-+++ b/kernel/sched/fair.c
-@@ -4118,10 +4118,18 @@ static void clear_buddies(struct cfs_rq *cfs_rq, struct sched_entity *se)
- 	unsigned long ideal_runtime, delta_exec;
- 	struct sched_entity *se;
- 	s64 delta;
-+	bool resched = false;
- 
- 	ideal_runtime = sched_slice(cfs_rq, curr);
- 	delta_exec = curr->sum_exec_runtime - curr->prev_sum_exec_runtime;
--	if (delta_exec > ideal_runtime) {
-+
-+	if (sched_feat(IDLE_PENALTY) && this_cpu_read(cpu_is_idle) &&
-+		(ideal_runtime > delta_exec)) {
-+		curr->vruntime += calc_delta_fair(ideal_runtime - delta_exec, curr);
-+		update_min_vruntime(cfs_rq);
-+		resched = true;
-+	}
-+	if (delta_exec > ideal_runtime || resched) {
- 		resched_curr(rq_of(cfs_rq));
- 		/*
- 		 * The current task ran long enough, ensure it doesn't get
-diff --git a/kernel/sched/features.h b/kernel/sched/features.h
-index 2410db5..bacf59d 100644
---- a/kernel/sched/features.h
-+++ b/kernel/sched/features.h
-@@ -13,6 +13,11 @@
- SCHED_FEAT(START_DEBIT, true)
- 
- /*
-+ * Penalty the cfs task which executes mwait/hlt
-+ */
-+SCHED_FEAT(IDLE_PENALTY, true)
-+
-+/*
-  * Prefer to schedule the task we woke last (assuming it failed
-  * wakeup-preemption), since its likely going to consume data we
-  * touched, increases cache locality.
-diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
-index 0db2c1b..0fe4f2d 100644
---- a/kernel/sched/sched.h
-+++ b/kernel/sched/sched.h
-@@ -1953,6 +1953,13 @@ static inline int hrtick_enabled(struct rq *rq)
- 
- #endif /* CONFIG_SCHED_HRTICK */
- 
-+#ifndef arch_scale_freq_tick
-+static __always_inline
-+void arch_scale_freq_tick(void)
-+{
-+}
-+#endif
-+
- #ifndef arch_scale_freq_capacity
- static __always_inline
- unsigned long arch_scale_freq_capacity(int cpu)
--- 
-1.8.3.1
+Do you mean that in the later case you run the page fault tests after mem=
+hog?
+If so how much memory do you pass to memhog?
+
+--=20
+Nitesh
 
