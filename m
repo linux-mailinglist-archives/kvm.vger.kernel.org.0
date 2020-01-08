@@ -2,191 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 76DFF134A52
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 19:15:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2675134A7B
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 19:31:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728015AbgAHSPy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 13:15:54 -0500
-Received: from mail-vk1-f195.google.com ([209.85.221.195]:45088 "EHLO
-        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727507AbgAHSPy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 13:15:54 -0500
-Received: by mail-vk1-f195.google.com with SMTP id g7so1210201vkl.12
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 10:15:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PT2sy9N4j7bttbnR678lRlbR5HOc41PObNWQ4DVJkSo=;
-        b=IlN0CyxRCKl71/4BD/3CBvYFt3boYd/tHHPBcGm95upMwO5kj9GyPWNcCHBsV59gL1
-         zYmC8YHH7Ohk7UBSTn07fXeNnm6Po1bYVh6/MUePAemRFTYOFyd42JmsJsW7iFRy+HaS
-         mZm+sdKMu0byN74OUQ4Jd9UAG3bkCQ/tNna4RV7GuCtxz605AUAFQAGl/bDLbVCELcrf
-         PrjVitqVmmv1g5B6Oq2txCbsUZ+PVs9IUHAEY3ukqPY71oDwHTpUIa92bfP7+Rg/SS/t
-         nWTPm7Ssk8AAzfEhLoixO6Ii6iWYoj6jzdjPKuu0DOwKABLKYi71iWrbIQ8zqvkCMAqT
-         6/VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PT2sy9N4j7bttbnR678lRlbR5HOc41PObNWQ4DVJkSo=;
-        b=c+VXzAKXcYV5El+Tes8ZLQa0r5BlFosgAaSrHpMVIHPxbXekQ1VdeefSZV1OOpFXAE
-         W10f3nvvUChB4CD0Iw0Uu+9v5aBZMO1pxZi04isDz6TCUKd0WUrs+purvVojXTXChgBp
-         heCDHkOWVFj4L0KmyrUC2k/o5RBNWMEjr9mgb+XEArBbmx85LhAm/PN1vwElCQUp3N3P
-         4ds6TRwXVIOa0tNJlxu1/dPETLkxHa7pkPk/rBL+0WcIOGO8krPIcWNrx9ILmSxp+N78
-         hYwEM5839GAiPKia6Rpjg1hBTtKIGfgQgWTOOKqWSozJtRc9JB1+Xj/aUNjpi2+1N5eu
-         GVLg==
-X-Gm-Message-State: APjAAAXmqQR6fQQBIqFeGz/pIM0fu1rnh8BlB2ZZAfOqVvIuepGYl2KP
-        mSTtidoRgJyl9l2ag8M0SWhFs/1MgkElAlXe46LXlQ==
-X-Google-Smtp-Source: APXvYqwdreGGAZ0QLeNr00DRMEa5rhbPS7fRtLf1Ck9K5mkSfbtAYchmiihcKGdwaHU06HnTD3UxenrucdXRGU2lXGc=
-X-Received: by 2002:a1f:94c1:: with SMTP id w184mr3762369vkd.40.1578507352440;
- Wed, 08 Jan 2020 10:15:52 -0800 (PST)
+        id S1725914AbgAHSbo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 13:31:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42236 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725835AbgAHSbo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 13:31:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578508302;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k1sTdv+lfQEl+3S+0dIIJYvuUUv5pdpqUAVPVShvwcM=;
+        b=IZW+gvwRKfYu75Yi1oNznWWWFOPyGFIIpXBzKNKyPy1a0e6gnBtzYgqnbq84V9wpNOGr5O
+        Gtf/x44YVtlZyzrT/Z4mc4PU7T4RtsuNU8u4iUGSUrRp/fDXkKKn29TWUtnfXw6wLFmXSg
+        iYuNgWqjhlJsc/jg+ZZbbQJ8uLLWOhA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-tkhYS7uLM5q8LHqRZ5QgXw-1; Wed, 08 Jan 2020 13:31:41 -0500
+X-MC-Unique: tkhYS7uLM5q8LHqRZ5QgXw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8B6E107ACC7;
+        Wed,  8 Jan 2020 18:31:37 +0000 (UTC)
+Received: from w520.home (ovpn-118-62.phx2.redhat.com [10.3.118.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 937201001938;
+        Wed,  8 Jan 2020 18:31:35 +0000 (UTC)
+Date:   Wed, 8 Jan 2020 11:31:34 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, <cjia@nvidia.com>,
+        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
+        <jonathan.davies@nutanix.com>, <eauger@redhat.com>,
+        <aik@ozlabs.ru>, <pasic@linux.ibm.com>, <felipe@nutanix.com>,
+        <Zhengxiao.zx@alibaba-inc.com>, <shuangtai.tst@alibaba-inc.com>,
+        <Ken.Xue@amd.com>, <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+Message-ID: <20200108113134.05c08470@w520.home>
+In-Reply-To: <20200108155955.78e908c1.cohuck@redhat.com>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+        <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
+        <20191216154406.023f912b@x1.home>
+        <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
+        <20191217114357.6496f748@x1.home>
+        <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
+        <20191219102706.0a316707@x1.home>
+        <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
+        <20191219140929.09fa24da@x1.home>
+        <20200102182537.GK2927@work-vm>
+        <20200106161851.07871e28@w520.home>
+        <ce132929-64a7-9a5b-81ff-38616202b757@nvidia.com>
+        <20200107100923.2f7b5597@w520.home>
+        <08b7f953-6ac5-cd79-b1ff-54338da32d1e@nvidia.com>
+        <20200107115602.25156c41@w520.home>
+        <20200108155955.78e908c1.cohuck@redhat.com>
 MIME-Version: 1.0
-References: <20190926231824.149014-1-bgardon@google.com> <20190926231824.149014-17-bgardon@google.com>
- <20200108172011.GB7096@xz-x1>
-In-Reply-To: <20200108172011.GB7096@xz-x1>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 8 Jan 2020 10:15:41 -0800
-Message-ID: <CANgfPd9mjG_E9F+X6dpRgpsq=01uui2KX5JyNf_5PGgXJ9B9qw@mail.gmail.com>
-Subject: Re: [RFC PATCH 16/28] kvm: mmu: Add direct MMU page fault handler
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 8, 2020 at 9:20 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Thu, Sep 26, 2019 at 04:18:12PM -0700, Ben Gardon wrote:
->
-> [...]
->
-> > +static int handle_direct_page_fault(struct kvm_vcpu *vcpu,
-> > +             unsigned long mmu_seq, int write, int map_writable, int level,
-> > +             gpa_t gpa, gfn_t gfn, kvm_pfn_t pfn, bool prefault)
-> > +{
-> > +     struct direct_walk_iterator iter;
-> > +     struct kvm_mmu_memory_cache *pf_pt_cache = &vcpu->arch.mmu_page_cache;
-> > +     u64 *child_pt;
-> > +     u64 new_pte;
-> > +     int ret = RET_PF_RETRY;
-> > +
-> > +     direct_walk_iterator_setup_walk(&iter, vcpu->kvm,
-> > +                     kvm_arch_vcpu_memslots_id(vcpu), gpa >> PAGE_SHIFT,
-> > +                     (gpa >> PAGE_SHIFT) + 1, MMU_READ_LOCK);
-> > +     while (direct_walk_iterator_next_pte(&iter)) {
-> > +             if (iter.level == level) {
-> > +                     ret = direct_page_fault_handle_target_level(vcpu,
-> > +                                     write, map_writable, &iter, pfn,
-> > +                                     prefault);
-> > +
-> > +                     break;
-> > +             } else if (!is_present_direct_pte(iter.old_pte) ||
-> > +                        is_large_pte(iter.old_pte)) {
-> > +                     /*
-> > +                      * The leaf PTE for this fault must be mapped at a
-> > +                      * lower level, so a non-leaf PTE must be inserted into
-> > +                      * the paging structure. If the assignment below
-> > +                      * succeeds, it will add the non-leaf PTE and a new
-> > +                      * page of page table memory. Then the iterator can
-> > +                      * traverse into that new page. If the atomic compare/
-> > +                      * exchange fails, the iterator will repeat the current
-> > +                      * PTE, so the only thing this function must do
-> > +                      * differently is return the page table memory to the
-> > +                      * vCPU's fault cache.
-> > +                      */
-> > +                     child_pt = mmu_memory_cache_alloc(pf_pt_cache);
-> > +                     new_pte = generate_nonleaf_pte(child_pt, false);
-> > +
-> > +                     if (!direct_walk_iterator_set_pte(&iter, new_pte))
-> > +                             mmu_memory_cache_return(pf_pt_cache, child_pt);
-> > +             }
-> > +     }
->
-> I have a question on how this will guarantee safe concurrency...
->
-> As you mentioned previously somewhere, the design somehow mimics how
-> the core mm works with process page tables, and IIUC here the rwlock
-> works really like the mmap_sem that we have for the process mm.  So
-> with the series now we can have multiple page fault happening with
-> read lock held of the mmu_lock to reach here.
+On Wed, 8 Jan 2020 15:59:55 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Ah, I'm sorry if I put that down somewhere. I think that comparing the
-MMU rwlock in this series to the core mm mmap_sem was a mistake. I do
-not understand the ways in which the core mm uses the mmap_sem enough
-to make such a comparison. You're correct that with two faulting vCPUs
-we could have page faults on the same address range happening in
-parallel. I'll try to elaborate more on why that's safe.
+> On Tue, 7 Jan 2020 11:56:02 -0700
+> Alex Williamson <alex.williamson@redhat.com> wrote:
+> 
+> > On Tue, 7 Jan 2020 23:23:17 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:  
+> 
+> > > There are 3 invalid states:
+> > >   *  101b => Invalid state
+> > >   *  110b => Invalid state
+> > >   *  111b => Invalid state
+> > > 
+> > > why only 110b should be used to report error from vendor driver to 
+> > > report error? Aren't we adding more confusions in the interface?    
+> > 
+> > I think the only chance of confusion is poor documentation.  If we
+> > define all of the above as invalid and then say any invalid state
+> > indicates an error condition, then the burden is on the user to
+> > enumerate all the invalid states.  That's not a good idea.  Instead we
+> > could say 101b (_RESUMING|_RUNNING) is reserved, it's not currently
+> > used but it might be useful some day.  Therefore there are no valid
+> > transitions into or out of this state.  A vendor driver should fail a
+> > write(2) attempting to enter this state.
+> > 
+> > That leaves 11Xb, where we consider _RESUMING and _SAVING as mutually
+> > exclusive, so neither are likely to ever be valid states.  Logically,
+> > if the device is in a failed state such that it needs to be reset to be
+> > recovered, I would hope the device is not running, so !_RUNNING (110b)
+> > seems appropriate.  I'm not sure we need that level of detail yet
+> > though, so I was actually just assuming both 11Xb states would indicate
+> > an error state and the undefined _RUNNING bit might differentiate
+> > something in the future.
+> > 
+> > Therefore, I think we'd have:
+> > 
+> >  * 101b => Reserved
+> >  * 11Xb => Error
+> > 
+> > Where the device can only self transition into the Error state on a
+> > failed device_state transition and the only exit from the Error state
+> > is via the reset ioctl.  The Reserved state is unreachable.  The vendor
+> > driver must error on device_state writes to enter or exit the Error
+> > state and must error on writes to enter Reserved states.  Is that still
+> > confusing?  
+> 
+> I think one thing we could do is start to tie the meaning more to the
+> actual state (bit combination) and less to the individual bits. I.e.
+> 
+> - bit 0 indicates 'running',
+> - bit 1 indicates 'saving',
+> - bit 2 indicates 'resuming',
+> - bits 3-31 are reserved. [Aside: reserved-and-ignored or
+>   reserved-and-must-be-zero?]
 
-> Then I'm imagining a case where both vcpu threads faulted on the same
-> address range while when they wanted to do different things, like: (1)
-> vcpu1 thread wanted to map this as a 2M huge page, while (2) vcpu2
-> thread wanted to map this as a 4K page.
+This version specified them as:
 
-By vcpu thread, do you mean the page fault / EPT violation handler
-wants to map memory at different levels?. As far as I understand,
-vCPUs do not have any intent to map  a page at a certain level when
-they take an EPT violation. The page fault handlers could certainly
-want to map the memory at different levels. For example, if guest
-memory was backed with 2M hugepages and one vCPU tried to do an
-instruction fetch on an unmapped page while another tried to read it,
-that should result in the page fault handler for the first vCPU trying
-to map at 4K and the other trying to map at 2M, as in your example.
+	Bits 3 - 31 are reserved for future use. User should perform
+	read-modify-write operation on this field.
 
-> Then is it possible that
-> vcpu2 is faster so it firstly setup the pmd as a page table page (via
-> direct_walk_iterator_set_pte above),
+The intention is that the user should not make any assumptions about
+the state of the reserved bits, but should preserve them when changing
+known bits.  Therefore I think it's ignored but preserved.  If we
+specify them as zero, then I think we lose any chance to define them
+later.
 
-This is definitely possible
+> [Note that I don't specify what happens when a bit is set or unset.]
+> 
+> States are then defined as:
+> 000b => stopped state (not saving or resuming)
+> 001b => running state (not saving or resuming)
+> 010b => stop-and-copy state
+> 011b => pre-copy state
+> 100b => resuming state
+> 
+> [Transitions between these states defined, as before.]
+> 
+> 101b => reserved [for post-copy; no transitions defined]
+> 111b => reserved [state does not make sense; no transitions defined]
+> 110b => error state [state does not make sense per se, but it does not
+>         indicate running; transitions into this state *are* possible]
+> 
+> To a 'reserved' state, we can later assign a different meaning (we
+> could even re-use 111b for a different error state, if needed); while
+> the error state must always stay the error state.
+> 
+> We should probably use some kind of feature indication to signify
+> whether a 'reserved' state actually has a meaning. Also, maybe we also
+> should designate the states > 111b as 'reserved'.
+> 
+> Does that make sense?
 
-> then vcpu1 quickly overwrite it
-> as a huge page (via direct_page_fault_handle_target_level, level=2),
-> then I feel like the previous page table page that setup by vcpu2 can
-> be lost unnoticed.
+It seems you have an opinion to restrict this particular error state to
+110b rather than 11Xb, reserving 111b for some future error condition.
+That's fine and I think we agree that using the state with _RUNNING set
+to zero is more logical as we expect the device to be non-operational
+in this state.
 
-There are two possibilities here. 1.) vCPU2 saw vCPU1's modification
-to the PTE during its walk. In this case, vCPU2 should not map the
-memory at 2M. (I realize that in this example there is a discrepancy
-as there's no NX hugepage support in this RFC. I need to add that in
-the next version. In this case, vCPU1 would set a bit in the non-leaf
-PTE to indicate it was split to allow X on a constituent 4K entry.)
-2.) If vCPU2 did not see vCPU1's modification during its walk, it will
-indeed try to map the memory at 2M. However in this case the atomic
-cpmxchg on the PTE will fail because vCPU2 did not have the current
-value of the PTE. In this case the PTE will be re-read and the walk
-will continue or the page fault will be retried. When threads using
-the direct walk iterator change PTEs with an atomic cmpxchg, they are
-guaranteed to know what the value of the PTE was before the cmpxchg
-and so that thread is then responsible for any cleanup associated with
-the PTE modification - e.g. freeing pages of page table memory.
+I'm also thinking more of these as states, but at the same time we're
+not doing away with the bit definitions.  I think the states are much
+easier to decode and use if we think about the function of each bit,
+which leads to the logical incongruity that the 11Xb states are
+impossible and therefore must be error states.
 
-> I think general process page table does not have this issue is because
-> it has per pmd lock so anyone who changes the pmd or beneath it will
-> need to take that.  However here we don't have it, instead we only
-> depend on the atomic ops, which seems to be not enough for this?
+I took a look at drawing a state transitions diagram, but I think we're
+fully interconnected for the 6 states we're defining.  The user can
+invoke transition to any of the 5 states Connie lists above from any of
+those states and the 6th error state is only reached via failed
+transition and only exited via device reset, returning the user to the
+running state.  There are a couple transitions of questionable value,
+particularly 01Xb -> 100b (_SAVING -> _RESUMING), but I can't convince
+myself that it's worthwhile to force the user to pass through another
+state in order to restrict those.  Are there any cases I'm missing
+where the vendor driver has good reason not to support arbitrary
+transitions between the above 5 states?  Thanks,
 
-I think that atomic ops (plus rcu to ensure no use-after-free) are
-enough in this case, but I could definitely be wrong. If your concern
-about the race requires the NX hugepages stuff, I need to get on top
-of sending out those patches. If you can think of a race that doesn't
-require that, I'd be very excited to hear it.
+Alex
 
-> Thanks,
->
-> > +     direct_walk_iterator_end_traversal(&iter);
-> > +
-> > +     /* If emulating, flush this vcpu's TLB. */
-> > +     if (ret == RET_PF_EMULATE)
-> > +             kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-> > +
-> > +     return ret;
-> > +}
->
-> --
-> Peter Xu
->
