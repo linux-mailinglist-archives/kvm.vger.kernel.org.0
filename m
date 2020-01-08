@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD32A134D64
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 21:27:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C37E134D6A
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 21:27:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727078AbgAHU13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 15:27:29 -0500
-Received: from mga06.intel.com ([134.134.136.31]:45246 "EHLO mga06.intel.com"
+        id S1727490AbgAHU1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 15:27:34 -0500
+Received: from mga06.intel.com ([134.134.136.31]:45247 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727339AbgAHU1L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727348AbgAHU1L (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 Jan 2020 15:27:11 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 12:27:06 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 12:27:07 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; 
-   d="scan'208";a="211658387"
+   d="scan'208";a="211658391"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:06 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -48,9 +48,9 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Dave Jiang <dave.jiang@intel.com>,
         Liran Alon <liran.alon@oracle.com>,
         linux-nvdimm <linux-nvdimm@lists.01.org>
-Subject: [PATCH 10/14] KVM: x86/mmu: Remove obsolete gfn restoration in FNAME(fetch)
-Date:   Wed,  8 Jan 2020 12:24:44 -0800
-Message-Id: <20200108202448.9669-11-sean.j.christopherson@intel.com>
+Subject: [PATCH 11/14] KVM: x86/mmu: Zap any compound page when collapsing sptes
+Date:   Wed,  8 Jan 2020 12:24:45 -0800
+Message-Id: <20200108202448.9669-12-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
@@ -61,54 +61,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove logic to retrieve the original gfn now that HugeTLB mappings are
-are identified in FNAME(fetch), i.e. FNAME(page_fault) no longer adjusts
-the level or gfn.
+Zap any compound page, e.g. THP or HugeTLB pages, when zapping sptes
+that can potentially be converted to huge sptes after disabling dirty
+logging on the associated memslot.  Note, this approach could result in
+false positives, e.g. if a random compound page is mapped into the
+guest, but mapping non-huge compound pages into the guest is far from
+the norm, and toggling dirty logging is not a frequent operation.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/paging_tmpl.h | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 841506a55815..0560982eda8b 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -621,7 +621,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
- 	struct kvm_shadow_walk_iterator it;
- 	unsigned direct_access, access = gw->pt_access;
- 	int top_level, hlevel, ret;
--	gfn_t gfn, base_gfn;
-+	gfn_t base_gfn = gw->gfn;
- 
- 	direct_access = gw->pte_access;
- 
-@@ -666,13 +666,6 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
- 			link_shadow_page(vcpu, it.sptep, sp);
- 	}
- 
--	/*
--	 * FNAME(page_fault) might have clobbered the bottom bits of
--	 * gw->gfn, restore them from the virtual address.
--	 */
--	gfn = gw->gfn | ((addr & PT_LVL_OFFSET_MASK(gw->level)) >> PAGE_SHIFT);
--	base_gfn = gfn;
--
- 	hlevel = kvm_mmu_hugepage_adjust(vcpu, gw->gfn, max_level, &pfn);
- 
- 	trace_kvm_mmu_spte_requested(addr, gw->level, pfn);
-@@ -684,9 +677,9 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
- 		 * We cannot overwrite existing page tables with an NX
- 		 * large page, as the leaf could be executable.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 68aec984f953..f93b0c5e4170 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5956,7 +5956,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
  		 */
--		disallowed_hugepage_adjust(it, gfn, &pfn, &hlevel);
-+		disallowed_hugepage_adjust(it, gw->gfn, &pfn, &hlevel);
+ 		if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
+ 		    !kvm_is_zone_device_pfn(pfn) &&
+-		    kvm_is_transparent_hugepage(pfn)) {
++		    PageCompound(pfn_to_page(pfn))) {
+ 			pte_list_remove(rmap_head, sptep);
  
--		base_gfn = gfn & ~(KVM_PAGES_PER_HPAGE(it.level) - 1);
-+		base_gfn = gw->gfn & ~(KVM_PAGES_PER_HPAGE(it.level) - 1);
- 		if (it.level == hlevel)
- 			break;
- 
+ 			if (kvm_available_flush_tlb_with_range())
 -- 
 2.24.1
 
