@@ -2,102 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5DA41346AA
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 16:50:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FDCC1346B6
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 16:52:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728282AbgAHPuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 10:50:51 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:43552 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726186AbgAHPuv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 10:50:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=ZclNq8Gr7pU/JCTXFFTTfRWQ9njV8jVe1K8Bz3Pzsz0=; b=gzhPPRxbWxKaI0bZ0WbwrbmXR
-        xlSTgzecSP6dVTnbBkKg9qkpoHergsjs7+VQhOuVJA5yY18MfdusUj+sC1u2dmzd3fG0V4ncwLsb8
-        yLJnCGRrWQ9v5J3QN2xm8R22Kh6EW/NR93PLH/hFGYY2+0PZeb7T1R8Q5QTjZd94Tje8wUD/f+d7l
-        ongVbMqAms69fs7UDvXoOHKwVx5qtVYtSE0LsTrLZiF7/V8/wEMAiLMk+mA8ql4KJJoKWHf0D+kd0
-        iWreXHPDj0vq8sBh5hYqpY7/ti2FbxBUbBYAspjZmI8w23DD6uxivJ8guinjSEH0/HvTTYnU9Av7C
-        dAcyzKaWg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ipDbX-0002mT-5L; Wed, 08 Jan 2020 15:50:43 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 720FD30025A;
-        Wed,  8 Jan 2020 16:49:07 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 754D62B6157AC; Wed,  8 Jan 2020 16:50:40 +0100 (CET)
-Date:   Wed, 8 Jan 2020 16:50:40 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        id S1728838AbgAHPwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 10:52:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54266 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727090AbgAHPwP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 10:52:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578498734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Evzwb36HtckuGOEG5Qs7DyOdRE+yUkO/doQt26KVrXo=;
+        b=V1uJVOaFVBj08k6nvajlY/HD+Krd3WZhrepuc5StOsGvWQhWlXpFE/YogghV0H9cfyrVng
+        dgq50oaKBVUcFYhGlgf4AG7DykhWk0eABQRqgVqS4gedrMeCtqZwOm59sfcpB2j/OJLwZK
+        /qnRxS8bb6dl6aU0jPIHBVIkFhpDIt0=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-10-lGU6UUNjPaqC6ylqpY5zgQ-1; Wed, 08 Jan 2020 10:52:13 -0500
+X-MC-Unique: lGU6UUNjPaqC6ylqpY5zgQ-1
+Received: by mail-qt1-f197.google.com with SMTP id o18so2240306qtt.19
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 07:52:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Evzwb36HtckuGOEG5Qs7DyOdRE+yUkO/doQt26KVrXo=;
+        b=dRP8WYPbm2az70yWe/b8vxITG2FCU6u9cWMKYfoPX0sBhZpfS8yoFmlpqW7CSUK3GH
+         mVi7M3hS9e0/CpebS0yUeF9/0JLWnpiMgmzdacsanW9vVp47HsePTHZJOATQn6epmAlj
+         poNcZrKHq8vNge0bVPybicNbkn6uT4WqUGO/xoAuRUAp5iKIi19U46WzSVOnIYcwA5E3
+         g3dyJZSPI85Jbd9QsC++/F4vwUGXn1zL6LwTTy6QgrIERYFv6bgwl7xpMmwHiZ2EElJU
+         s/G3ltKJ5PDkPvPs5c1sGsgfPiRx+EUuabTJCGHlza37m3AxvZdohjRsxxNKy6c+GkrM
+         vqUg==
+X-Gm-Message-State: APjAAAV3v7k/HtLyUVQ+mr+dz9abmnY5MExcGUBeO5/3f66od4N+U7xa
+        BHLcWw4TUQw7DFB++eef4CBaaypefG9zx/sFYgsMk/H3LoEt1dswjzW+93U9Pru1e8blDxsJXDE
+        Q84PNAIb1XIY/
+X-Received: by 2002:ad4:40c7:: with SMTP id x7mr4822606qvp.176.1578498732895;
+        Wed, 08 Jan 2020 07:52:12 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyjS5NH4TYqHmq2a3gtG1MUvRpvaKlgnlgJSexza/h1pH4XW1r3TEGv4O2f8Ty8j7f9lGQzKQ==
+X-Received: by 2002:ad4:40c7:: with SMTP id x7mr4822581qvp.176.1578498732594;
+        Wed, 08 Jan 2020 07:52:12 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id c84sm1569751qkg.78.2020.01.08.07.52.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2020 07:52:11 -0800 (PST)
+Date:   Wed, 8 Jan 2020 10:52:10 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        KarimAllah <karahmed@amazon.de>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Subject: Re: [PATCH RFC] sched/fair: Penalty the cfs task which executes
- mwait/hlt
-Message-ID: <20200108155040.GB2827@hirez.programming.kicks-ass.net>
-References: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Lei Cao <lei.cao@stratus.com>
+Subject: Re: [PATCH RESEND v2 08/17] KVM: X86: Implement ring-based dirty
+ memory tracking
+Message-ID: <20200108155210.GA7096@xz-x1>
+References: <20191221014938.58831-1-peterx@redhat.com>
+ <20191221014938.58831-9-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191221014938.58831-9-peterx@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 08, 2020 at 09:50:01AM +0800, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> To deliver all of the resources of a server to instances in cloud, there are no 
-> housekeeping cpus reserved. libvirtd, qemu main loop, kthreads, and other agent/tools 
-> etc which can't be offloaded to other hardware like smart nic, these stuff will 
-> contend with vCPUs even if MWAIT/HLT instructions executed in the guest.
-> 
-> The is no trap and yield the pCPU after we expose mwait/hlt to the guest [1][2],
-> the top command on host still observe 100% cpu utilization since qemu process is 
-> running even though guest who has the power management capability executes mwait. 
-> Actually we can observe the physical cpu has already enter deeper cstate by 
-> powertop on host.
-> 
-> For virtualization, there is a HLT activity state in CPU VMCS field which indicates 
-> the logical processor is inactive because it executed the HLT instruction, but 
-> SDM 24.4.2 mentioned that execution of the MWAIT instruction may put a logical 
-> processor into an inactive state, however, this VMCS field never reflects this 
-> state.
+On Fri, Dec 20, 2019 at 08:49:29PM -0500, Peter Xu wrote:
+> +int kvm_dirty_ring_push(struct kvm_dirty_ring *ring, u32 slot, u64 offset)
+> +{
+> +	struct kvm_dirty_gfn *entry;
+> +	struct kvm_dirty_ring_indices *indices = ring->indices;
+> +
+> +	/*
+> +	 * Note: here we will start waiting even soft full, because we
+> +	 * can't risk making it completely full, since vcpu0 could use
+> +	 * it right after us and if vcpu0 context gets full it could
+> +	 * deadlock if wait with mmu_lock held.
+> +	 */
+> +	if (kvm_get_running_vcpu() == NULL &&
+> +	    kvm_dirty_ring_soft_full(ring))
+> +		return -EBUSY;
 
-So far I think I can follow, however it does not explain who consumes
-this VMCS state if it is set and how that helps. Also, this:
+I plan to repost next week, but before that I'd like to know whether
+there's any further (negative) feedback from design-wise, especially
+here, which is still a bit tricky to makeup the kvmgt issue.
 
-> This patch avoids fine granularity intercept and reschedule vCPU if MWAIT/HLT
-> instructions executed, because it can worse the message-passing workloads which 
-> will switch between idle and running frequently in the guest. Lets penalty the 
-> vCPU which is long idle through tick-based sampling and preemption.
+Now we still have the waitqueue but it'll only be used for
+no-vcpu-context dirtyings, so:
 
-is just complete gibberish. And I have no idea what problem you're
-trying to solve how.
+- For no-vcpu-context: thread could wait in the waitqueue if it makes
+  vcpu0's ring soft-full (note, previously it was hard-full, so here
+  we make it easier to wait so we make sure )
 
-Also, I don't think the TSC/MPERF ratio is architected, we can't assume
-this is true for everything that has APERFMPERF.
+- For with-vcpu-context: we should never wait, guaranteed by the fact
+  that KVM_RUN will return now if soft-full for that vcpu ring, and
+  above waitqueue will make sure even vcpu0's waitqueue won't be
+  filled up by kvmgt
 
-/me tries to reconstruct intent from patch
+Again this is still a workaround for kvmgt and I think it should not
+be needed after the refactoring.  It's just a way to not depend on
+that work so this should work even with current kvmgt.
 
-So what you're doing is, mark the CPU 'idle' when the MPERF/TSC ratio <
-1%, and then frob the vruntime such that it will hopefully preempt.
-That's pretty disgusting.
+> +
+> +	/* It will never gets completely full when with a vcpu context */
+> +	WARN_ON_ONCE(kvm_dirty_ring_full(ring));
+> +
+> +	entry = &ring->dirty_gfns[ring->dirty_index & (ring->size - 1)];
+> +	entry->slot = slot;
+> +	entry->offset = offset;
+> +	smp_wmb();
+> +	ring->dirty_index++;
+> +	WRITE_ONCE(indices->avail_index, ring->dirty_index);
+> +
+> +	trace_kvm_dirty_ring_push(ring, slot, offset);
+> +
+> +	return 0;
+> +}
 
-Please, write a coherent problem statement and justify the magic
-choices. This is unreviewable.
+-- 
+Peter Xu
+
