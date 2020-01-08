@@ -2,200 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F829134F8D
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 23:44:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 276AD134FB4
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 23:59:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727589AbgAHWoj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 17:44:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44713 "EHLO
+        id S1726931AbgAHW7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 17:59:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46130 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726548AbgAHWoj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 17:44:39 -0500
+        with ESMTP id S1726548AbgAHW7q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 17:59:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578523476;
+        s=mimecast20190719; t=1578524384;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2Ce7iZ/TvYsErucJW9xUbmo6R4UGv0zMfYGiP22GnZw=;
-        b=HWSGJDPoP12JdLwhPZngsHGxn3+lhKc7H6zNKUs4SxS8csl4i4Aa7RU7aGmQNjHL8+VFFg
-        HwbMC+YsYzBmhZDeIfTE3LbH4Q9lelFVjk4FJJw8wDVnunBzav8ieN62kdAQg1pRg+Z8ww
-        L9x7HhXi/+jIkBwPnzWNUlzhBuynG+c=
+        bh=OqLbt1MJpD/2l5pEoZdMNVoLWGTl0KHDQB1cd3hrBlI=;
+        b=A3V1qb9VtPPkPKrg2v09xIX/xl9IGy05Um7FjzcWXT9JYNwbq8ew8kdZmZXpGtuixBDKKK
+        TmEZ7qsJs01c71mCJw12IgMLNxKp8oQNbL/fxZKYxdYTrdaqKNanjICivMl+TS8r9QSckX
+        3zoE5y4Ig5gmZ0D+BbKJJ6I+8hU6g6w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-m9eHdCQpO628d-yNeO_pKw-1; Wed, 08 Jan 2020 17:44:33 -0500
-X-MC-Unique: m9eHdCQpO628d-yNeO_pKw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-372-5lA3Di29O3u2mxZAUm_foQ-1; Wed, 08 Jan 2020 17:59:41 -0500
+X-MC-Unique: 5lA3Di29O3u2mxZAUm_foQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 923821005502;
-        Wed,  8 Jan 2020 22:44:30 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28159107ACC4;
+        Wed,  8 Jan 2020 22:59:39 +0000 (UTC)
 Received: from w520.home (ovpn-118-62.phx2.redhat.com [10.3.118.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C87E19C58;
-        Wed,  8 Jan 2020 22:44:28 +0000 (UTC)
-Date:   Wed, 8 Jan 2020 15:44:28 -0700
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 311095C241;
+        Wed,  8 Jan 2020 22:59:37 +0000 (UTC)
+Date:   Wed, 8 Jan 2020 15:59:36 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, <cjia@nvidia.com>,
-        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
         <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
-        <jonathan.davies@nutanix.com>, <eauger@redhat.com>,
-        <aik@ozlabs.ru>, <pasic@linux.ibm.com>, <felipe@nutanix.com>,
-        <Zhengxiao.zx@alibaba-inc.com>, <shuangtai.tst@alibaba-inc.com>,
-        <Ken.Xue@amd.com>, <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
         <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
- device state
-Message-ID: <20200108154428.02bb312d@w520.home>
-In-Reply-To: <46ac2d9e-4f4e-27d5-2a96-932c444e3461@nvidia.com>
-References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
-        <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
-        <20191216154406.023f912b@x1.home>
-        <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
-        <20191217114357.6496f748@x1.home>
-        <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
-        <20191219102706.0a316707@x1.home>
-        <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
-        <20191219140929.09fa24da@x1.home>
-        <20200102182537.GK2927@work-vm>
-        <20200106161851.07871e28@w520.home>
-        <ce132929-64a7-9a5b-81ff-38616202b757@nvidia.com>
-        <20200107100923.2f7b5597@w520.home>
-        <08b7f953-6ac5-cd79-b1ff-54338da32d1e@nvidia.com>
-        <20200107115602.25156c41@w520.home>
-        <20200108155955.78e908c1.cohuck@redhat.com>
-        <20200108113134.05c08470@w520.home>
-        <46ac2d9e-4f4e-27d5-2a96-932c444e3461@nvidia.com>
+Subject: Re: [PATCH v11 Kernel 6/6] vfio: Selective dirty page tracking if
+ IOMMU backed device pins pages
+Message-ID: <20200108155936.5e725eaa@w520.home>
+In-Reply-To: <17069da7-279b-872f-db15-d9995cf46285@nvidia.com>
+References: <1576602651-15430-1-git-send-email-kwankhede@nvidia.com>
+        <1576602651-15430-7-git-send-email-kwankhede@nvidia.com>
+        <20191217171219.7cc3fc1d@x1.home>
+        <66512c1f-aedc-a718-8594-b52d266f4b60@nvidia.com>
+        <20200107170929.74c9c92e@w520.home>
+        <17069da7-279b-872f-db15-d9995cf46285@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 9 Jan 2020 02:11:11 +0530
+On Thu, 9 Jan 2020 02:22:26 +0530
 Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> On 1/9/2020 12:01 AM, Alex Williamson wrote:
-> > On Wed, 8 Jan 2020 15:59:55 +0100
-> > Cornelia Huck <cohuck@redhat.com> wrote:
+> On 1/8/2020 5:39 AM, Alex Williamson wrote:
+> > On Wed, 8 Jan 2020 02:15:01 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > >   
-> >> On Tue, 7 Jan 2020 11:56:02 -0700
-> >> Alex Williamson <alex.williamson@redhat.com> wrote:
+> >> On 12/18/2019 5:42 AM, Alex Williamson wrote:  
+> >>> On Tue, 17 Dec 2019 22:40:51 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>      
+> >>
+> >> <snip>
 > >>  
-> >>> On Tue, 7 Jan 2020 23:23:17 +0530
-> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:  
-> >>  
-> >>>> There are 3 invalid states:
-> >>>>    *  101b => Invalid state
-> >>>>    *  110b => Invalid state
-> >>>>    *  111b => Invalid state
-> >>>>
-> >>>> why only 110b should be used to report error from vendor driver to
-> >>>> report error? Aren't we adding more confusions in the interface?  
 > >>>
-> >>> I think the only chance of confusion is poor documentation.  If we
-> >>> define all of the above as invalid and then say any invalid state
-> >>> indicates an error condition, then the burden is on the user to
-> >>> enumerate all the invalid states.  That's not a good idea.  Instead we
-> >>> could say 101b (_RESUMING|_RUNNING) is reserved, it's not currently
-> >>> used but it might be useful some day.  Therefore there are no valid
-> >>> transitions into or out of this state.  A vendor driver should fail a
-> >>> write(2) attempting to enter this state.
+> >>> This will fail when there are devices within the IOMMU group that are
+> >>> not represented as vfio_devices.  My original suggestion was:
 > >>>
-> >>> That leaves 11Xb, where we consider _RESUMING and _SAVING as mutually
-> >>> exclusive, so neither are likely to ever be valid states.  Logically,
-> >>> if the device is in a failed state such that it needs to be reset to be
-> >>> recovered, I would hope the device is not running, so !_RUNNING (110b)
-> >>> seems appropriate.  I'm not sure we need that level of detail yet
-> >>> though, so I was actually just assuming both 11Xb states would indicate
-> >>> an error state and the undefined _RUNNING bit might differentiate
-> >>> something in the future.
+> >>> On Thu, 14 Nov 2019 14:06:25 -0700
+> >>> Alex Williamson <alex.williamson@redhat.com> wrote:  
+> >>>> I think it does so by pinning pages.  Is it acceptable that if the
+> >>>> vendor driver pins any pages, then from that point forward we consider
+> >>>> the IOMMU group dirty page scope to be limited to pinned pages?  There
+> >>>> are complications around non-singleton IOMMU groups, but I think we're
+> >>>> already leaning towards that being a non-worthwhile problem to solve.
+> >>>> So if we require that only singleton IOMMU groups can pin pages and we  
 > >>>
-> >>> Therefore, I think we'd have:
-> >>>
-> >>>   * 101b => Reserved
-> >>>   * 11Xb => Error
-> >>>
-> >>> Where the device can only self transition into the Error state on a
-> >>> failed device_state transition and the only exit from the Error state
-> >>> is via the reset ioctl.  The Reserved state is unreachable.  The vendor
-> >>> driver must error on device_state writes to enter or exit the Error
-> >>> state and must error on writes to enter Reserved states.  Is that still
-> >>> confusing?  
+> >>> We could tag vfio_groups as singleton at vfio_add_group_dev() time with
+> >>> an iommu_group_for_each_dev() walk so that we can cache the value on
+> >>> the struct vfio_group.  
 > >>
-> >> I think one thing we could do is start to tie the meaning more to the
-> >> actual state (bit combination) and less to the individual bits. I.e.
+> >> I don't think iommu_group_for_each_dev() is required. Checking
+> >> group->device_list in vfio_add_group_dev() if there are more than one
+> >> device should work, right?
 > >>
-> >> - bit 0 indicates 'running',
-> >> - bit 1 indicates 'saving',
-> >> - bit 2 indicates 'resuming',
-> >> - bits 3-31 are reserved. [Aside: reserved-and-ignored or
-> >>    reserved-and-must-be-zero?]  
+> >>           list_for_each_entry(vdev, &group->device_list, group_next) {
+> >>                   if (group->is_singleton) {
+> >>                           group->is_singleton = false;
+> >>                           break;
+> >>                   } else {
+> >>                           group->is_singleton = true;
+> >>                   }
+> >>           }  
 > > 
-> > This version specified them as:
+> > Hmm, I think you're taking a different approach to this than I was
+> > thinking.  Re-reading my previous comments, the fact that both vfio.c
+> > and vfio_iommu_type1.c each have their own private struct vfio_group
+> > makes things rather unclear.  I was intending to use the struct
+> > iommu_group as the object vfio.c provides to type1.c to associate the
+> > pinning.  This would require that not only the vfio view of devices in
+> > the group to be singleton, but also the actual iommu group to be
+> > singleton.  Otherwise the set of devices vfio.c has in the group might
+> > only be a subset of the group.  Maybe a merger of the approaches is
+> > easier though.
 > > 
-> > 	Bits 3 - 31 are reserved for future use. User should perform
-> > 	read-modify-write operation on this field.
-> > 
-> > The intention is that the user should not make any assumptions about
-> > the state of the reserved bits, but should preserve them when changing
-> > known bits.  Therefore I think it's ignored but preserved.  If we
-> > specify them as zero, then I think we lose any chance to define them
-> > later.
-> >   
-> >> [Note that I don't specify what happens when a bit is set or unset.]
-> >>
-> >> States are then defined as:
-> >> 000b => stopped state (not saving or resuming)
-> >> 001b => running state (not saving or resuming)
-> >> 010b => stop-and-copy state
-> >> 011b => pre-copy state
-> >> 100b => resuming state
-> >>
-> >> [Transitions between these states defined, as before.]
-> >>
-> >> 101b => reserved [for post-copy; no transitions defined]
-> >> 111b => reserved [state does not make sense; no transitions defined]
-> >> 110b => error state [state does not make sense per se, but it does not
-> >>          indicate running; transitions into this state *are* possible]
-> >>
-> >> To a 'reserved' state, we can later assign a different meaning (we
-> >> could even re-use 111b for a different error state, if needed); while
-> >> the error state must always stay the error state.
-> >>
-> >> We should probably use some kind of feature indication to signify
-> >> whether a 'reserved' state actually has a meaning. Also, maybe we also
-> >> should designate the states > 111b as 'reserved'.
-> >>
-> >> Does that make sense?  
-> > 
-> > It seems you have an opinion to restrict this particular error state to
-> > 110b rather than 11Xb, reserving 111b for some future error condition.
-> > That's fine and I think we agree that using the state with _RUNNING set
-> > to zero is more logical as we expect the device to be non-operational
-> > in this state.
-> > 
-> > I'm also thinking more of these as states, but at the same time we're
-> > not doing away with the bit definitions.  I think the states are much
-> > easier to decode and use if we think about the function of each bit,
-> > which leads to the logical incongruity that the 11Xb states are
-> > impossible and therefore must be error states.
+> > Tracking whether the vfio.c view of a group is singleton is even easier
+> > than above, we could simply add a device_count field to vfio_group,
+> > increment it in vfio_group_create_device() and decrement it in
+> > vfio_device_release().  vfio_pin_pages() could return error if
+> > device_count is not 1.  We could still add the iommu_group pointer to
+> > the type1 pin_pages callback, but perhaps type1 simply assumes that the
+> > group is singleton when pin pages is called and it's vfio.c's
+> > responsibility to maintain that group as singleton once pages have been
+> > pinned.  vfio.c would therefore also need to set a field on the
+> > vfio_group if pages have been pinned such that vfio_add_group_dev()
+> > could return error if a new device attempts to join the group.  We'd
+> > need to make sure that field is cleared when the group is released from
+> > use and pay attention to races that might occur between adding devices
+> > to a group and pinning pages.
 > >   
 > 
-> I agree on bit definition is better.
-> 
-> Ok. Should there be a defined value for error, which can be used by 
-> vendor driver for error state?
-> 
-> #define VFIO_DEVICE_STATE_ERROR			\
-> 		(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING)
+> Thinking aloud, will adding singleton check could cause issues in near 
+> future? - may be in future support for p2p and direct RDMA will be added 
+> for mdev devices. In that case the two devices should be in same 
+> iommu_domain, but should be in different iommu_group - is that 
+> understanding correct?
 
-Seems like a good idea for consistency.  Thanks,
+The ACS redirection stuff is the only thing that actually changes iommu
+grouping relative to p2p/RDMA and that's specifically for untranslated
+DMA, aiui.  If we wanted translated p2p DMA to be routed downstream of
+the IOMMU we'd need to enable ACS direct translation.  In any case,
+those are about shortening the path for p2p between devices.  We
+actually don't even need devices to be in the same iommu domain to
+allow p2p, we only need the iommu domain for each respective device to
+map the mmio spaces of the other device.  I don't think we're doing
+anything here that would cause us trouble later in this space, but it's
+also just a policy decision, we wouldn't be breaking ABI to change the
+implementation later.
+ 
+> >>> vfio_group_nb_add_dev() could update this if
+> >>> the IOMMU group composition changes.  
+> >>
+> >> I don't see vfio_group_nb_add_dev() calls vfio_add_group_dev() (?)
+> >> If checking is_singleton is taken care in vfio_group_nb_add_dev(), which
+> >> is the only place where vfio_group is allocated, that should work, I think.  
+> > 
+> > This was relative to maintaining that the iommu group itself is
+> > singleton, not just the vfio view of the group.  If we use the latter
+> > as our basis, then you're right, we should need this, but vfio.c would
+> > need to enforce that the group remains singleton if it has pinned
+> > pages.  Does that make sense?  Thanks,
+> >   
+> 
+> Which route should be taken - iommu_group view or vfio.c group view?
+
+The latter seems easier, more flexible, and lower overhead as far as I
+can see.  Thanks,
 
 Alex
 
