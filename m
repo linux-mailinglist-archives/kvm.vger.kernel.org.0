@@ -2,195 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2675134A7B
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 19:31:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B5364134A8D
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 19:40:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725914AbgAHSbo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 13:31:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42236 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725835AbgAHSbo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 13:31:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578508302;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=k1sTdv+lfQEl+3S+0dIIJYvuUUv5pdpqUAVPVShvwcM=;
-        b=IZW+gvwRKfYu75Yi1oNznWWWFOPyGFIIpXBzKNKyPy1a0e6gnBtzYgqnbq84V9wpNOGr5O
-        Gtf/x44YVtlZyzrT/Z4mc4PU7T4RtsuNU8u4iUGSUrRp/fDXkKKn29TWUtnfXw6wLFmXSg
-        iYuNgWqjhlJsc/jg+ZZbbQJ8uLLWOhA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-tkhYS7uLM5q8LHqRZ5QgXw-1; Wed, 08 Jan 2020 13:31:41 -0500
-X-MC-Unique: tkhYS7uLM5q8LHqRZ5QgXw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8B6E107ACC7;
-        Wed,  8 Jan 2020 18:31:37 +0000 (UTC)
-Received: from w520.home (ovpn-118-62.phx2.redhat.com [10.3.118.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 937201001938;
-        Wed,  8 Jan 2020 18:31:35 +0000 (UTC)
-Date:   Wed, 8 Jan 2020 11:31:34 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, <cjia@nvidia.com>,
-        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
-        <jonathan.davies@nutanix.com>, <eauger@redhat.com>,
-        <aik@ozlabs.ru>, <pasic@linux.ibm.com>, <felipe@nutanix.com>,
-        <Zhengxiao.zx@alibaba-inc.com>, <shuangtai.tst@alibaba-inc.com>,
-        <Ken.Xue@amd.com>, <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
- device state
-Message-ID: <20200108113134.05c08470@w520.home>
-In-Reply-To: <20200108155955.78e908c1.cohuck@redhat.com>
-References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
-        <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
-        <20191216154406.023f912b@x1.home>
-        <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
-        <20191217114357.6496f748@x1.home>
-        <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
-        <20191219102706.0a316707@x1.home>
-        <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
-        <20191219140929.09fa24da@x1.home>
-        <20200102182537.GK2927@work-vm>
-        <20200106161851.07871e28@w520.home>
-        <ce132929-64a7-9a5b-81ff-38616202b757@nvidia.com>
-        <20200107100923.2f7b5597@w520.home>
-        <08b7f953-6ac5-cd79-b1ff-54338da32d1e@nvidia.com>
-        <20200107115602.25156c41@w520.home>
-        <20200108155955.78e908c1.cohuck@redhat.com>
+        id S1726591AbgAHSky (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 13:40:54 -0500
+Received: from mail-dm6nam10on2054.outbound.protection.outlook.com ([40.107.93.54]:54738
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725941AbgAHSky (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 13:40:54 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jFQjH/NJXbiBDtqIDY3dyYbglN+fBe9xnunSh3oc7xGU6t0ScGgSL3ynK7X8FDb8DECsW/YZ/lDjftG+ax6pClXgAJ2mVyQrP7Rrux8Ty9IRi9jZAKw0dudljIltB4gkG7w4INFzme2OZ1XWBevlRDpUY18ax3p9oIj//JNAWs4f9lhztEsCjtuRMixWChs1IwTDLSzNkeeQer/iago6rxT/bWScWR8CW8rSsA+8o1hhN57jD8IkCdSrltq0UOGJLNJJZXwTWh6ULr5+hZ7OBXhqIX9B7MbiJp4KrUCnJUv+1BV43WeG4BY2gKbMC3syFHaEFPGQKQZhD1TwVkqoRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tGzsz3IV8YFq3xOEnx52bEb4Qddzsj9SnhSRU95OvUo=;
+ b=XWIwLyGxwDG3/K+6qtLVvhd0Tz+wIT7pOsZaMqfazA1nVB2QjKV4M5N8YKffw/ZJy/7Ge3MDAGEx+lFJJPbqMU1Q51kqI0RyJbaJ/1iAvVnlgqqHK7XorLg5SZxNlUYMR8Z8FiC4QiHZsuKXWMFcmWu7WS8ij7Da5x9Fk+fCGR3vYiXiGkdJ6+3RXdgljMsgogqXk5xsIGByUVYfaJgccTY4H8Br7OpFU1ccxpKSCQgRnlZrlpvXjumZwDmf8PMMgphPJhR+QodVrGaxoXFJ7qV81VPNkMj2Fsz3LUpW48aNzHfSFrUikceMz+ychtRb99QjlmxH/3umBk9C5K3hog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tGzsz3IV8YFq3xOEnx52bEb4Qddzsj9SnhSRU95OvUo=;
+ b=PhrqTw3CJSetQ2nKHCVusGY5D1G6k8fblQvZCf6HHs3wqpt222CLO7dmGm1Uv9hUkQdmewyKu3x9lS0L2WY2dbP/WKkPIZlbtA4x7En6JzWMY719EhKpCRwhrqgdPaziZC5MXqk+o598ojbG/rhIr+jlgTrB12gD/LhcN5JYmcU=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Thomas.Lendacky@amd.com; 
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.71.154) by
+ DM6PR12MB3179.namprd12.prod.outlook.com (20.179.104.210) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2602.12; Wed, 8 Jan 2020 18:40:38 +0000
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::a0cd:463:f444:c270]) by DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::a0cd:463:f444:c270%7]) with mapi id 15.20.2602.017; Wed, 8 Jan 2020
+ 18:40:38 +0000
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH v3] KVM: SVM: Override default MMIO mask if memory encryption is enabled
+Date:   Wed,  8 Jan 2020 12:40:16 -0600
+Message-Id: <6d2b7e37ca4dca92fadd1f3df93803fd17aa70ad.1578508816.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: SN1PR12CA0092.namprd12.prod.outlook.com
+ (2603:10b6:802:21::27) To DM6PR12MB3163.namprd12.prod.outlook.com
+ (2603:10b6:5:15e::26)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Received: from tlendack-t1.amd.com (165.204.77.1) by SN1PR12CA0092.namprd12.prod.outlook.com (2603:10b6:802:21::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2581.12 via Frontend Transport; Wed, 8 Jan 2020 18:40:37 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 35b363c4-64e0-44ec-2a73-08d7946a4185
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3179:|DM6PR12MB3179:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3179E83617B1A3AA86DADA8AEC3E0@DM6PR12MB3179.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 02760F0D1C
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(346002)(396003)(366004)(376002)(136003)(199004)(189003)(6486002)(2616005)(2906002)(4326008)(86362001)(316002)(956004)(5660300002)(54906003)(36756003)(6666004)(7696005)(52116002)(478600001)(16526019)(8676002)(81166006)(186003)(8936002)(81156014)(26005)(66476007)(66556008)(66946007);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3179;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4v6qukUTdFbQxX7khjK4rC9MTiSxWAzT+u91eJdPpbDwAkwASM2ZWx1PSeU8qSUWKl43IRdyv9buLFlGFUMfIBKE0XyxLffDBpaj9mfVg1bOvZdndAW97OQEAR8wpvdA0853BRC18APGWDz1bbqQKh9+0swGqp4oCuOE5qCYK0o5099RUzkcVlISP1stke59KOslG1kB4Uagv4XsPvaKD+Xtp4Vec/z15mSJsKT0T1XjnZjpczjaPKLKyVKCS7x7U4hWtFeXu03gES4hZ5V4c7dyFtM8GaAaS+CoVbS0PxQcHpSbsWCtr3xx0vOdAJxAAXdW3L5Ab15Z7bMkgkHq+/xiqpJ5M8Wib313soQlQD5TIWy8rzJ8jwbVjYaxfepUBbbBp/ARv5rDzc7JPhui1zszlTzDKgR1du8WgCBAhS1r9kkZCWLUIwnd3Z7famq/
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35b363c4-64e0-44ec-2a73-08d7946a4185
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2020 18:40:38.5033
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zYRlq0oa/GRlNFskQXHkANVJbvZTTVg0a1DPsKfxY/9hXriJV6dJCETHEM2KiQLyQNDZHcXEbaTBaNvzP6fa+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3179
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 Jan 2020 15:59:55 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+The KVM MMIO support uses bit 51 as the reserved bit to cause nested page
+faults when a guest performs MMIO. The AMD memory encryption support uses
+a CPUID function to define the encryption bit position. Given this, it is
+possible that these bits can conflict.
 
-> On Tue, 7 Jan 2020 11:56:02 -0700
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> > On Tue, 7 Jan 2020 23:23:17 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:  
-> 
-> > > There are 3 invalid states:
-> > >   *  101b => Invalid state
-> > >   *  110b => Invalid state
-> > >   *  111b => Invalid state
-> > > 
-> > > why only 110b should be used to report error from vendor driver to 
-> > > report error? Aren't we adding more confusions in the interface?    
-> > 
-> > I think the only chance of confusion is poor documentation.  If we
-> > define all of the above as invalid and then say any invalid state
-> > indicates an error condition, then the burden is on the user to
-> > enumerate all the invalid states.  That's not a good idea.  Instead we
-> > could say 101b (_RESUMING|_RUNNING) is reserved, it's not currently
-> > used but it might be useful some day.  Therefore there are no valid
-> > transitions into or out of this state.  A vendor driver should fail a
-> > write(2) attempting to enter this state.
-> > 
-> > That leaves 11Xb, where we consider _RESUMING and _SAVING as mutually
-> > exclusive, so neither are likely to ever be valid states.  Logically,
-> > if the device is in a failed state such that it needs to be reset to be
-> > recovered, I would hope the device is not running, so !_RUNNING (110b)
-> > seems appropriate.  I'm not sure we need that level of detail yet
-> > though, so I was actually just assuming both 11Xb states would indicate
-> > an error state and the undefined _RUNNING bit might differentiate
-> > something in the future.
-> > 
-> > Therefore, I think we'd have:
-> > 
-> >  * 101b => Reserved
-> >  * 11Xb => Error
-> > 
-> > Where the device can only self transition into the Error state on a
-> > failed device_state transition and the only exit from the Error state
-> > is via the reset ioctl.  The Reserved state is unreachable.  The vendor
-> > driver must error on device_state writes to enter or exit the Error
-> > state and must error on writes to enter Reserved states.  Is that still
-> > confusing?  
-> 
-> I think one thing we could do is start to tie the meaning more to the
-> actual state (bit combination) and less to the individual bits. I.e.
-> 
-> - bit 0 indicates 'running',
-> - bit 1 indicates 'saving',
-> - bit 2 indicates 'resuming',
-> - bits 3-31 are reserved. [Aside: reserved-and-ignored or
->   reserved-and-must-be-zero?]
+Use svm_hardware_setup() to override the MMIO mask if memory encryption
+support is enabled. Various checks are performed to ensure that the mask
+is properly defined and rsvd_bits() is used to generate the new mask (as
+was done prior to the change that necessitated this patch).
 
-This version specified them as:
+Fixes: 28a1f3ac1d0c ("kvm: x86: Set highest physical address bits in non-present/reserved SPTEs")
+Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-	Bits 3 - 31 are reserved for future use. User should perform
-	read-modify-write operation on this field.
+---
 
-The intention is that the user should not make any assumptions about
-the state of the reserved bits, but should preserve them when changing
-known bits.  Therefore I think it's ignored but preserved.  If we
-specify them as zero, then I think we lose any chance to define them
-later.
+Changes in v3:
+- Add additional checks to ensure there are no conflicts between the
+  encryption bit position and physical address setting.
+- Use rsvd_bits() generated mask (as was previously used) instead of
+  setting a single bit.
 
-> [Note that I don't specify what happens when a bit is set or unset.]
-> 
-> States are then defined as:
-> 000b => stopped state (not saving or resuming)
-> 001b => running state (not saving or resuming)
-> 010b => stop-and-copy state
-> 011b => pre-copy state
-> 100b => resuming state
-> 
-> [Transitions between these states defined, as before.]
-> 
-> 101b => reserved [for post-copy; no transitions defined]
-> 111b => reserved [state does not make sense; no transitions defined]
-> 110b => error state [state does not make sense per se, but it does not
->         indicate running; transitions into this state *are* possible]
-> 
-> To a 'reserved' state, we can later assign a different meaning (we
-> could even re-use 111b for a different error state, if needed); while
-> the error state must always stay the error state.
-> 
-> We should probably use some kind of feature indication to signify
-> whether a 'reserved' state actually has a meaning. Also, maybe we also
-> should designate the states > 111b as 'reserved'.
-> 
-> Does that make sense?
+Changes in v2:
+- Use of svm_hardware_setup() to override MMIO mask rather than adding an
+  override callback routine.
+---
+ arch/x86/kvm/svm.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-It seems you have an opinion to restrict this particular error state to
-110b rather than 11Xb, reserving 111b for some future error condition.
-That's fine and I think we agree that using the state with _RUNNING set
-to zero is more logical as we expect the device to be non-operational
-in this state.
-
-I'm also thinking more of these as states, but at the same time we're
-not doing away with the bit definitions.  I think the states are much
-easier to decode and use if we think about the function of each bit,
-which leads to the logical incongruity that the 11Xb states are
-impossible and therefore must be error states.
-
-I took a look at drawing a state transitions diagram, but I think we're
-fully interconnected for the 6 states we're defining.  The user can
-invoke transition to any of the 5 states Connie lists above from any of
-those states and the 6th error state is only reached via failed
-transition and only exited via device reset, returning the user to the
-running state.  There are a couple transitions of questionable value,
-particularly 01Xb -> 100b (_SAVING -> _RESUMING), but I can't convince
-myself that it's worthwhile to force the user to pass through another
-state in order to restrict those.  Are there any cases I'm missing
-where the vendor driver has good reason not to support arbitrary
-transitions between the above 5 states?  Thanks,
-
-Alex
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 122d4ce3b1ab..9d6bd3fc12c8 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -1307,6 +1307,55 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++/*
++ * The default MMIO mask is a single bit (excluding the present bit),
++ * which could conflict with the memory encryption bit. Check for
++ * memory encryption support and override the default MMIO masks if
++ * it is enabled.
++ */
++static __init void svm_adjust_mmio_mask(void)
++{
++	unsigned int enc_bit, mask_bit;
++	u64 msr, mask;
++
++	/* If there is no memory encryption support, use existing mask */
++	if (cpuid_eax(0x80000000) < 0x8000001f)
++		return;
++
++	/* If memory encryption is not enabled, use existing mask */
++	rdmsrl(MSR_K8_SYSCFG, msr);
++	if (!(msr & MSR_K8_SYSCFG_MEM_ENCRYPT))
++		return;
++
++	enc_bit = cpuid_ebx(0x8000001f) & 0x3f;
++	mask_bit = boot_cpu_data.x86_phys_bits;
++
++	/* Increment the mask bit if it is the same as the encryption bit */
++	if (enc_bit == mask_bit)
++		mask_bit++;
++
++	if (mask_bit > 51) {
++		/*
++		 * The mask bit is above 51, so use bit 51 without the present
++		 * bit.
++		 */
++		mask = BIT_ULL(51);
++	} else {
++		/*
++		 * Some bits above the physical addressing limit will always
++		 * be reserved, so use the rsvd_bits() function to generate
++		 * the mask. This mask, along with the present bit, will be
++		 * used to generate a page fault with PFER.RSV = 1.
++		 */
++		mask = rsvd_bits(mask_bit, 51);
++		mask |= BIT_ULL(0);
++	}
++
++	kvm_mmu_set_mmio_spte_mask(mask, mask,
++				   PT_WRITABLE_MASK |
++				   PT_USER_MASK);
++}
++
+ static __init int svm_hardware_setup(void)
+ {
+ 	int cpu;
+@@ -1361,6 +1410,8 @@ static __init int svm_hardware_setup(void)
+ 		}
+ 	}
+ 
++	svm_adjust_mmio_mask();
++
+ 	for_each_possible_cpu(cpu) {
+ 		r = svm_cpu_init(cpu);
+ 		if (r)
+-- 
+2.17.1
 
