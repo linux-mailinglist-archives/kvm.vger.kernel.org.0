@@ -2,123 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC465134D4D
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 21:27:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AC50134DC5
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 21:41:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727426AbgAHU1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 15:27:12 -0500
-Received: from mga06.intel.com ([134.134.136.31]:45246 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727388AbgAHU1L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 15:27:11 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 12:27:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; 
-   d="scan'208";a="211658401"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:07 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Barret Rhoden <brho@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Zeng <jason.zeng@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>
-Subject: [PATCH 14/14] KVM: x86/mmu: Use huge pages for DAX-backed files
-Date:   Wed,  8 Jan 2020 12:24:48 -0800
-Message-Id: <20200108202448.9669-15-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
-References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+        id S1726702AbgAHUl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 15:41:27 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:6951 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726426AbgAHUl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 15:41:27 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e163e440001>; Wed, 08 Jan 2020 12:40:36 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 08 Jan 2020 12:41:25 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 08 Jan 2020 12:41:25 -0800
+Received: from [10.40.100.122] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 8 Jan
+ 2020 20:41:16 +0000
+Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+CC:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>, <cjia@nvidia.com>,
+        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
+        <jonathan.davies@nutanix.com>, <eauger@redhat.com>,
+        <aik@ozlabs.ru>, <pasic@linux.ibm.com>, <felipe@nutanix.com>,
+        <Zhengxiao.zx@alibaba-inc.com>, <shuangtai.tst@alibaba-inc.com>,
+        <Ken.Xue@amd.com>, <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
+ <20191216154406.023f912b@x1.home>
+ <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
+ <20191217114357.6496f748@x1.home>
+ <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
+ <20191219102706.0a316707@x1.home>
+ <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
+ <20191219140929.09fa24da@x1.home> <20200102182537.GK2927@work-vm>
+ <20200106161851.07871e28@w520.home>
+ <ce132929-64a7-9a5b-81ff-38616202b757@nvidia.com>
+ <20200107100923.2f7b5597@w520.home>
+ <08b7f953-6ac5-cd79-b1ff-54338da32d1e@nvidia.com>
+ <20200107115602.25156c41@w520.home>
+ <20200108155955.78e908c1.cohuck@redhat.com>
+ <20200108113134.05c08470@w520.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <46ac2d9e-4f4e-27d5-2a96-932c444e3461@nvidia.com>
+Date:   Thu, 9 Jan 2020 02:11:11 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200108113134.05c08470@w520.home>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1578516037; bh=vCy0NZGb5fyV6lZNEnyS5+aG41GLJFmnPreZWZr2Ltw=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=k6Eay6q6LTxyG+xCT8+bs+4KMtg+gHQ8r6zofGagt5TKAZG9AV4ZIzc3R+tC9LPLj
+         uqA84sjoWd3bkAev67IT9dNEIrzms3u6ZteFHh9PHJuO57oO9SUCPeSSbfjlB7zPfW
+         wK3SXF8a4f7iKpzE9xyxXzvKd3gFEFh7+5uzu3PqPNac0KwgQ5Dyd7P5QyCQvCZCbu
+         fvWqRnu8j/O5yH9IoKlVUgchPmxBrw5UO/iLc3ha8j79pxIP+EHxLTcMq8mKKJXgI6
+         WtVlWnKJ0xsgReQ/GeN7EpE1d2ie/8cXCJ4H8mUHzoZ/bGViDjYbzI2X0lnRyBDz+c
+         C9GF4UmE5qqNg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Walk the host page tables to identify hugepage mappings for ZONE_DEVICE
-pfns, i.e. DAX pages.  Explicitly query kvm_is_zone_device_pfn() when
-deciding whether or not to bother walking the host page tables, as DAX
-pages do not set up the head/tail infrastructure, i.e. will return false
-for PageCompound() even when using huge pages.
 
-Zap ZONE_DEVICE sptes when disabling dirty logging, e.g. if live
-migration fails, to allow KVM to rebuild large pages for DAX-based
-mappings.  Presumably DAX favors large pages, and worst case scenario is
-a minor performance hit as KVM will need to re-fault all DAX-based
-pages.
 
-Suggested-by: Barret Rhoden <brho@google.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Jason Zeng <jason.zeng@intel.com>
-Cc: Dave Jiang <dave.jiang@intel.com>
-Cc: Liran Alon <liran.alon@oracle.com>
-Cc: linux-nvdimm <linux-nvdimm@lists.01.org>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+On 1/9/2020 12:01 AM, Alex Williamson wrote:
+> On Wed, 8 Jan 2020 15:59:55 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+>> On Tue, 7 Jan 2020 11:56:02 -0700
+>> Alex Williamson <alex.williamson@redhat.com> wrote:
+>>
+>>> On Tue, 7 Jan 2020 23:23:17 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>
+>>>> There are 3 invalid states:
+>>>>    *  101b => Invalid state
+>>>>    *  110b => Invalid state
+>>>>    *  111b => Invalid state
+>>>>
+>>>> why only 110b should be used to report error from vendor driver to
+>>>> report error? Aren't we adding more confusions in the interface?
+>>>
+>>> I think the only chance of confusion is poor documentation.  If we
+>>> define all of the above as invalid and then say any invalid state
+>>> indicates an error condition, then the burden is on the user to
+>>> enumerate all the invalid states.  That's not a good idea.  Instead we
+>>> could say 101b (_RESUMING|_RUNNING) is reserved, it's not currently
+>>> used but it might be useful some day.  Therefore there are no valid
+>>> transitions into or out of this state.  A vendor driver should fail a
+>>> write(2) attempting to enter this state.
+>>>
+>>> That leaves 11Xb, where we consider _RESUMING and _SAVING as mutually
+>>> exclusive, so neither are likely to ever be valid states.  Logically,
+>>> if the device is in a failed state such that it needs to be reset to be
+>>> recovered, I would hope the device is not running, so !_RUNNING (110b)
+>>> seems appropriate.  I'm not sure we need that level of detail yet
+>>> though, so I was actually just assuming both 11Xb states would indicate
+>>> an error state and the undefined _RUNNING bit might differentiate
+>>> something in the future.
+>>>
+>>> Therefore, I think we'd have:
+>>>
+>>>   * 101b => Reserved
+>>>   * 11Xb => Error
+>>>
+>>> Where the device can only self transition into the Error state on a
+>>> failed device_state transition and the only exit from the Error state
+>>> is via the reset ioctl.  The Reserved state is unreachable.  The vendor
+>>> driver must error on device_state writes to enter or exit the Error
+>>> state and must error on writes to enter Reserved states.  Is that still
+>>> confusing?
+>>
+>> I think one thing we could do is start to tie the meaning more to the
+>> actual state (bit combination) and less to the individual bits. I.e.
+>>
+>> - bit 0 indicates 'running',
+>> - bit 1 indicates 'saving',
+>> - bit 2 indicates 'resuming',
+>> - bits 3-31 are reserved. [Aside: reserved-and-ignored or
+>>    reserved-and-must-be-zero?]
+> 
+> This version specified them as:
+> 
+> 	Bits 3 - 31 are reserved for future use. User should perform
+> 	read-modify-write operation on this field.
+> 
+> The intention is that the user should not make any assumptions about
+> the state of the reserved bits, but should preserve them when changing
+> known bits.  Therefore I think it's ignored but preserved.  If we
+> specify them as zero, then I think we lose any chance to define them
+> later.
+> 
+>> [Note that I don't specify what happens when a bit is set or unset.]
+>>
+>> States are then defined as:
+>> 000b => stopped state (not saving or resuming)
+>> 001b => running state (not saving or resuming)
+>> 010b => stop-and-copy state
+>> 011b => pre-copy state
+>> 100b => resuming state
+>>
+>> [Transitions between these states defined, as before.]
+>>
+>> 101b => reserved [for post-copy; no transitions defined]
+>> 111b => reserved [state does not make sense; no transitions defined]
+>> 110b => error state [state does not make sense per se, but it does not
+>>          indicate running; transitions into this state *are* possible]
+>>
+>> To a 'reserved' state, we can later assign a different meaning (we
+>> could even re-use 111b for a different error state, if needed); while
+>> the error state must always stay the error state.
+>>
+>> We should probably use some kind of feature indication to signify
+>> whether a 'reserved' state actually has a meaning. Also, maybe we also
+>> should designate the states > 111b as 'reserved'.
+>>
+>> Does that make sense?
+> 
+> It seems you have an opinion to restrict this particular error state to
+> 110b rather than 11Xb, reserving 111b for some future error condition.
+> That's fine and I think we agree that using the state with _RUNNING set
+> to zero is more logical as we expect the device to be non-operational
+> in this state.
+> 
+> I'm also thinking more of these as states, but at the same time we're
+> not doing away with the bit definitions.  I think the states are much
+> easier to decode and use if we think about the function of each bit,
+> which leads to the logical incongruity that the 11Xb states are
+> impossible and therefore must be error states.
+> 
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1e4e0ac169a7..324e1919722f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3250,7 +3250,7 @@ static int host_pfn_mapping_level(struct kvm_vcpu *vcpu, gfn_t gfn,
- 		     PT_DIRECTORY_LEVEL != (int)PG_LEVEL_2M ||
- 		     PT_PDPE_LEVEL != (int)PG_LEVEL_1G);
- 
--	if (!PageCompound(pfn_to_page(pfn)))
-+	if (!PageCompound(pfn_to_page(pfn)) && !kvm_is_zone_device_pfn(pfn))
- 		return PT_PAGE_TABLE_LEVEL;
- 
- 	/*
-@@ -3282,8 +3282,7 @@ static int kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	if (unlikely(max_level == PT_PAGE_TABLE_LEVEL))
- 		return PT_PAGE_TABLE_LEVEL;
- 
--	if (is_error_noslot_pfn(pfn) || kvm_is_reserved_pfn(pfn) ||
--	    kvm_is_zone_device_pfn(pfn))
-+	if (is_error_noslot_pfn(pfn) || kvm_is_reserved_pfn(pfn))
- 		return PT_PAGE_TABLE_LEVEL;
- 
- 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-@@ -5910,8 +5909,8 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 		 * mapping if the indirect sp has level = 1.
- 		 */
- 		if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
--		    !kvm_is_zone_device_pfn(pfn) &&
--		    PageCompound(pfn_to_page(pfn))) {
-+		    (kvm_is_zone_device_pfn(pfn) ||
-+		     PageCompound(pfn_to_page(pfn)))) {
- 			pte_list_remove(rmap_head, sptep);
- 
- 			if (kvm_available_flush_tlb_with_range())
--- 
-2.24.1
+I agree on bit definition is better.
 
+Ok. Should there be a defined value for error, which can be used by 
+vendor driver for error state?
+
+#define VFIO_DEVICE_STATE_ERROR			\
+		(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING)
+
+Thanks,
+Kirti
+
+> I took a look at drawing a state transitions diagram, but I think we're
+> fully interconnected for the 6 states we're defining.  The user can
+> invoke transition to any of the 5 states Connie lists above from any of
+> those states and the 6th error state is only reached via failed
+> transition and only exited via device reset, returning the user to the
+> running state.  There are a couple transitions of questionable value,
+> particularly 01Xb -> 100b (_SAVING -> _RESUMING), but I can't convince
+> myself that it's worthwhile to force the user to pass through another
+> state in order to restrict those.  Are there any cases I'm missing
+> where the vendor driver has good reason not to support arbitrary
+> transitions between the above 5 states?  Thanks,
+> 
+> Alex
+> 
