@@ -2,303 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 18D7D134C43
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 21:01:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA543134C44
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 21:03:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726411AbgAHUBd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 15:01:33 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:4829 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725920AbgAHUBc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 15:01:32 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e1635090001>; Wed, 08 Jan 2020 12:01:13 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Wed, 08 Jan 2020 12:01:31 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Wed, 08 Jan 2020 12:01:31 -0800
-Received: from [10.40.100.122] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 8 Jan
- 2020 20:01:21 +0000
-Subject: Re: [PATCH v11 Kernel 3/6] vfio iommu: Implementation of ioctl to for
- dirty pages tracking.
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-References: <1576602651-15430-1-git-send-email-kwankhede@nvidia.com>
- <1576602651-15430-4-git-send-email-kwankhede@nvidia.com>
- <20191217151203.342b686a@x1.home>
- <ebd08133-e258-9f5e-5c8f-f88d7165cd7a@nvidia.com>
- <20200107150223.0dab0a85@w520.home>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <d2faa3fe-d656-5ba7-475a-9646298e3d50@nvidia.com>
-Date:   Thu, 9 Jan 2020 01:31:16 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1726318AbgAHUDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 15:03:10 -0500
+Received: from mail-io1-f71.google.com ([209.85.166.71]:37146 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726149AbgAHUDK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 15:03:10 -0500
+Received: by mail-io1-f71.google.com with SMTP id t70so2801828iof.4
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 12:03:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=QQ9jOivQ5dWlzW4Uw5qGquEM4NzrI4svewZeUOhhorU=;
+        b=GZTqUpuhl56W9x6IGYgSR6Jxes8CmL1g7zo5T+D/b1LLS2qTDpRACd+8Bijbqap1sP
+         M0QJMxyGNe4kW2i+EL2O6Bzyj8v34+WimchJJVWfVDT9T5FCOA/7mFh/uXhVBMTgiQE/
+         H+iK+E1ADdkGNtLLB9xOSvcYM5KyBad4QK8wQ+VsRfypY2/yt2PVI0+9Y81aZbbfyoa9
+         AIu5HIcK0sG+Tb53w+7FDK3Mhr0DKuj59JFYDcWA+88IcE/RCnahXXpisnZ+TN81liWO
+         FlyLm8swauB7rGXux4+MWiSdgY/cPcOIG0vNXzPVast5wQDH2PijeFc1YnnT1+m/t48t
+         OpMQ==
+X-Gm-Message-State: APjAAAXnwwsUl+D+O61n/XxuraSWx8+l5sGMx9di1OzVDtm2PIHFZe43
+        xfibKDlDyYMWlj2MtaJW8SJzC9qcl4nCnfIS4gcvKz+y4KHU
+X-Google-Smtp-Source: APXvYqz0BI05gYGVmIHHEvl+gsQDHnvqHHzmwZlsd320DiZ+LMJUChh+kqDODJf2mW1P003T7f2zAqVujnPBE/0HiLWSqTd4jZ3W
 MIME-Version: 1.0
-In-Reply-To: <20200107150223.0dab0a85@w520.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1578513673; bh=rTykfQvHrYyZEKPRHyxOkgPV3jZF1IBbSkNxe8rRI00=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=JRUkTTrODWi0sqv4gM+cKkB8qX5heeiXizMBXjXFl75h3ScFobcdf7MdoI4bo+Fev
-         E9//6AJCE3XFe3J/w162chY/fOzEmLIQfHzrGlHqbBxCw1+Gx8s9nunB1MQnGbE3Wf
-         GkmFvAjgPlK06PnWKm/mZlbigcKtcr804w443zCnGTneo4xRo4LZSvS3G3HGLaPzDo
-         CpixS4FLZnD5Yob0p/DkF9jzdhQzxDV8fl38h1XyyLiJ5Xaa1+rVKdSQyoKZi6zpDH
-         kf/dzwa8N9c3FfXMFZMLwXLwS296fd6q0jOZe4cSMce/8sHd3LiTdIMMcQiACeP1Xm
-         FcWQNKhiLTMHA==
+X-Received: by 2002:a6b:731a:: with SMTP id e26mr4600874ioh.254.1578513789740;
+ Wed, 08 Jan 2020 12:03:09 -0800 (PST)
+Date:   Wed, 08 Jan 2020 12:03:09 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b5eb9e059ba66172@google.com>
+Subject: WARNING in cleanup_srcu_struct
+From:   syzbot <syzbot+1b1043fa771618e68377@syzkaller.appspotmail.com>
+To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
+
+syzbot found the following crash on:
+
+HEAD commit:    3a562aee Merge tag 'for-5.5-rc4-tag' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13672869e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f2f3ef188b7e16cf
+dashboard link: https://syzkaller.appspot.com/bug?extid=1b1043fa771618e68377
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+1b1043fa771618e68377@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 18326 at kernel/rcu/srcutree.c:376  
+cleanup_srcu_struct+0x248/0x2d0 kernel/rcu/srcutree.c:395
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 0 PID: 18326 Comm: syz-executor.1 Not tainted 5.5.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x197/0x210 lib/dump_stack.c:118
+  panic+0x2e3/0x75c kernel/panic.c:221
+  __warn.cold+0x2f/0x3e kernel/panic.c:582
+  report_bug+0x289/0x300 lib/bug.c:195
+  fixup_bug arch/x86/kernel/traps.c:174 [inline]
+  fixup_bug arch/x86/kernel/traps.c:169 [inline]
+  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:267
+  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:286
+  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
+RIP: 0010:cleanup_srcu_struct+0x248/0x2d0 kernel/rcu/srcutree.c:376
+Code: 84 24 48 04 00 00 00 00 00 00 48 83 c4 28 5b 41 5c 41 5d 41 5e 41 5f  
+5d c3 0f 0b 48 83 c4 28 5b 41 5c 41 5d 41 5e 41 5f 5d c3 <0f> 0b e9 3c ff  
+ff ff 48 8b 7d c0 e8 48 4c 51 00 e9 bd fe ff ff 48
+RSP: 0018:ffffc900019a7b60 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: 0000000000000004 RCX: ffffc90004ed9000
+RDX: 000000000000b393 RSI: ffffffff839b22b7 RDI: 0000000000000006
+RBP: ffffc900019a7bb0 R08: ffff8880a6bdc580 R09: 0000000000000040
+R10: 0000000000000000 R11: 0000000000000000 R12: ffffc90001ee9c48
+R13: 0000000000000000 R14: ffffc90001ee19f0 R15: dffffc0000000000
+  kvm_page_track_cleanup+0x19/0x20 arch/x86/kvm/mmu/page_track.c:167
+  kvm_arch_destroy_vm+0x4aa/0x5f0 arch/x86/kvm/x86.c:9667
+  kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:758 [inline]
+  kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:3519  
+[inline]
+  kvm_dev_ioctl+0x11af/0x17d0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3571
+  vfs_ioctl fs/ioctl.c:47 [inline]
+  file_ioctl fs/ioctl.c:545 [inline]
+  do_vfs_ioctl+0x977/0x14e0 fs/ioctl.c:732
+  ksys_ioctl+0xab/0xd0 fs/ioctl.c:749
+  __do_sys_ioctl fs/ioctl.c:756 [inline]
+  __se_sys_ioctl fs/ioctl.c:754 [inline]
+  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:754
+  do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x45af49
+Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007fe9be746c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 000000000045af49
+RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000003
+RBP: 000000000075bf20 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fe9be7476d4
+R13: 00000000004c44c7 R14: 00000000004da970 R15: 00000000ffffffff
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
 
 
-On 1/8/2020 3:32 AM, Alex Williamson wrote:
-> On Wed, 8 Jan 2020 01:37:03 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-<snip>
-
->>>> +
->>>> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
->>>>    
->>>>    	if (do_accounting)
->>>>    		vfio_lock_acct(dma, -unlocked, true);
->>>> @@ -571,8 +606,12 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>>>    
->>>>    		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
->>>>    		if (vpfn) {
->>>> -			phys_pfn[i] = vpfn->pfn;
->>>> -			continue;
->>>> +			if (vpfn->unpinned)
->>>> +				vfio_remove_from_pfn_list(dma, vpfn);
->>>
->>> This seems inefficient, we have an allocated vpfn at the right places
->>> in the list, wouldn't it be better to repin the page?
->>>    
->>
->> vfio_pin_page_external() takes care of pinning and accounting as well.
-> 
-> Yes, but could we call vfio_pin_page_external() without {unlinking,
-> freeing} and {re-allocating, linking} on either side of it since it's
-> already in the list?  That's the inefficient part.  Maybe at least a
-> TODO comment?
-> 
-
-Changing it as below:
-
-                 vpfn = vfio_iova_get_vfio_pfn(dma, iova);
-                 if (vpfn) {
--                       phys_pfn[i] = vpfn->pfn;
--                       continue;
-+                       if (vpfn->ref_count > 1) {
-+                               phys_pfn[i] = vpfn->pfn;
-+                               continue;
-+                       }
-                 }
-
-                 remote_vaddr = dma->vaddr + iova - dma->iova;
-                 ret = vfio_pin_page_external(dma, remote_vaddr, 
-&phys_pfn[i],
-                                              do_accounting);
-                 if (ret)
-                         goto pin_unwind;
--
--               ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
--               if (ret) {
--                       vfio_unpin_page_external(dma, iova, do_accounting);
--                       goto pin_unwind;
--               }
-+               if (!vpfn) {
-+                       ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-+                       if (ret) {
-+                               vfio_unpin_page_external(dma, iova,
-+                                                        do_accounting, 
-false);
-+                               goto pin_unwind;
-+                       }
-+               } else
-+                       vpfn->pfn = phys_pfn[i];
-         }
-
-
-
-
->>>> +			else {
->>>> +				phys_pfn[i] = vpfn->pfn;
->>>> +				continue;
->>>> +			}
->>>>    		}
->>>>    
->>>>    		remote_vaddr = dma->vaddr + iova - dma->iova;
->>>> @@ -583,7 +622,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>>>    
->>>>    		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
->>>>    		if (ret) {
->>>> -			vfio_unpin_page_external(dma, iova, do_accounting);
->>>> +			vfio_unpin_page_external(dma, iova, do_accounting,
->>>> +						 false);
->>>>    			goto pin_unwind;
->>>>    		}
->>>>    	}
-
-<snip>
-
->>
->>>> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
->>>> +			iommu->dirty_page_tracking = true;
->>>> +			return 0;
->>>> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
->>>> +			iommu->dirty_page_tracking = false;
->>>> +
->>>> +			mutex_lock(&iommu->lock);
->>>> +			vfio_remove_unpinned_from_dma_list(iommu);
->>>> +			mutex_unlock(&iommu->lock);
->>>> +			return 0;
->>>> +
->>>> +		} else if (range.flags &
->>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
->>>> +			uint64_t iommu_pgmask;
->>>> +			unsigned long pgshift = __ffs(range.pgsize);
->>>> +			unsigned long *bitmap;
->>>> +			long bsize;
->>>> +
->>>> +			iommu_pgmask =
->>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
->>>> +
->>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
->>>> +			    (range.pgsize - 1))
->>>> +				return -EINVAL;
->>>> +
->>>> +			if (range.iova & iommu_pgmask)
->>>> +				return -EINVAL;
->>>> +			if (!range.size || range.size > SIZE_MAX)
->>>> +				return -EINVAL;
->>>> +			if (range.iova + range.size < range.iova)
->>>> +				return -EINVAL;
->>>> +
->>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
->>>> +						   range.bitmap_size);
->>>> +			if (bsize < 0)
->>>> +				return ret;
->>>> +
->>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);
->>>
->>> I think I remember mentioning previously that we cannot allocate an
->>> arbitrary buffer on behalf of the user, it's far too easy for them to
->>> kill the kernel that way.  kmalloc is also limited in what it can
->>> alloc.
->>
->> That's the reason added verify_bitmap_size(), so that size is verified
-> 
-> That's only a consistency test, it only verifies that the user claims
-> to provide a bitmap sized sufficiently for the range they're trying to
-> request.  range.size is limited to SIZE_MAX, so 2^64, divided by page
-> size for 2^52 bits, 8bits per byte for 2^49 bytes of bitmap that we'd
-> try to kmalloc (512TB).  kmalloc is good for a couple MB AIUI.
-> Meanwhile the user doesn't actually need to allocate that bitmap in
-> order to crash the kernel.
-> 
->>> Can't we use the user buffer directly or only work on a part of
->>> it at a time?
->>>    
->>
->> without copy_from_user(), how?
-> 
-> For starters, what's the benefit of copying the bitmap from the user
-> in the first place?  We presume the data is zero'd and if it's not,
-> that's the user's bug to sort out (we just need to define the API to
-> specify that).  Therefore the copy_from_user() is unnecessary anyway and
-> we really just need to copy_to_user() for any places we're setting
-> bits.  We could just walk through the range with an unsigned long
-> bitmap buffer, writing it out to userspace any time we reach the end
-> with bits set, zeroing it and shifting it as a window to the user
-> buffer.  We could improve batching by allocating a larger buffer in the
-> kernel, with a kernel defined maximum size and performing the same
-> windowing scheme.
-> 
-
-Ok removing copy_from_user().
-But AFAIK, calling copy_to_user() multiple times is not efficient in 
-terms of performance.
-
-Checked code in virt/kvm/kvm_main.c: __kvm_set_memory_region() where 
-dirty_bitmap is allocated, that has generic checks, user space address 
-check, memory overflow check and KVM_MEM_MAX_NR_PAGES as below. I'll add 
-access_ok check. I already added overflow check.
-
-         /* General sanity checks */
-         if (mem->memory_size & (PAGE_SIZE - 1))
-                 goto out;
-
-        !access_ok((void __user *)(unsigned long)mem->userspace_addr,
-                         mem->memory_size)))
-
-         if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
-                 goto out;
-
-         if (npages > KVM_MEM_MAX_NR_PAGES)
-                 goto out;
-
-
-Where KVM_MEM_MAX_NR_PAGES is:
-
-/*
-  * Some of the bitops functions do not support too long bitmaps.
-  * This number must be determined not to exceed such limits.
-  */
-#define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
-
-But we can't use KVM specific KVM_MEM_MAX_NR_PAGES check in vfio module.
-Should we define similar limit in vfio module instead of SIZE_MAX?
-
-> I don't know if there's a way to directly map the user buffer rather
-> than copy_to_user(), but I thought I'd ask in case there's some obvious
-> efficiency improvement to be had there.
-> 
->>>> +			if (!bitmap)
->>>> +				return -ENOMEM;
->>>> +
->>>> +			ret = copy_from_user(bitmap,
->>>> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
->>>> +			if (ret)
->>>> +				goto bitmap_exit;
->>>> +
->>>> +			iommu->dirty_page_tracking = false;
->>>
->>> a) This is done outside of the mutex and susceptible to races,
->>
->> moving inside lock
->>
->>> b) why is this done?
->> once bitmap is read, dirty_page_tracking should be stopped. Right?
-> 
-> Absolutely not.  Dirty bit page tracking should remain enabled until
-> the user turns it off, doing otherwise precludes both iterative and
-> partial dirty page collection from userspace.  I think both of those
-> are fundamentally required of this interface.  Thanks,
-> 
-
-OK.
-
-Thanks,
-Kirti
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
