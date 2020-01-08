@@ -2,101 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46303133F0B
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 11:14:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 99C9A133F4A
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 11:29:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727657AbgAHKNz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 05:13:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23739 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726368AbgAHKNz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 05:13:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578478433;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uVrqj6afqt7XuiTw73oIbm/4tmf2L88UQPwWRVq8vyU=;
-        b=KfsetQXJW7nwTvfuMcxFnS+ACixa9wqXN57hVHZo41okAa4BOzuncRSuGMTmfkJsXOiw06
-        XJvsLmqDitDpHPcYpRllxm0LsWKl2LHSXJhG56UPbWv2du3Qpit/hIIzc0nXjGAXGoUXFE
-        WmPa8UGTLViWnn+nM8+7+SsFT+fisXU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-sqZ8v3GuOkyMCCL1djG8Fw-1; Wed, 08 Jan 2020 05:13:51 -0500
-X-MC-Unique: sqZ8v3GuOkyMCCL1djG8Fw-1
-Received: by mail-wm1-f70.google.com with SMTP id n17so269206wmk.1
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 02:13:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=uVrqj6afqt7XuiTw73oIbm/4tmf2L88UQPwWRVq8vyU=;
-        b=bHOc/yjvIkU1W3HKPVXx9zIO/hQsc+aUDDsaxWLhA4utWFa2cw1GBDRMmfIQA+W0ad
-         JVPCO7zD2NlACdIP2Liy4R2qgh1qIemD4karRMdywgTY5ntEDezCavnEDyWa2pEyEPl4
-         ZTQJ6OLmvCSQJWscee+I4AdY6Ws3K4h2mQ/deZqSa4JaZj4e/Gh65AfQFPVftkfk+Qdt
-         JgyNIrEJUsPevQRnJ8x0N76BpDsEnUn+bFH0uHiaGWaLk8mXIa9jAxUK/yakzh9VxzlT
-         TTOjbJJrbFzzSmlCGuCPI1kM70odfk9FNy2DrsKKH9uyM6P2Y1UzMwCCzFT4IztV98kQ
-         1d2w==
-X-Gm-Message-State: APjAAAUe7NQYeFfHDnTmjK0fviWw0Niip8EDtyB0E9jdAbUYlgZpxqKs
-        Kg0Rs06d0LoR13OC2ppyqRmBrBu6nGFfkWuSqTGSaqpFtG6jxs5geM2e6F0fXcG/kF1RFzOHAR1
-        Dkg54HHfWICzf
-X-Received: by 2002:adf:e550:: with SMTP id z16mr3548219wrm.315.1578478430224;
-        Wed, 08 Jan 2020 02:13:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxRB9id3wHWWiu08oCQy3B4XNXmRQaQS6UKvo5KldVbYP8ts/jV70wGa1GYivKccPOmt1on8w==
-X-Received: by 2002:adf:e550:: with SMTP id z16mr3548210wrm.315.1578478430066;
-        Wed, 08 Jan 2020 02:13:50 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id p5sm3698498wrt.79.2020.01.08.02.13.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2020 02:13:49 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Fix a benign Bitwise vs. Logical OR mixup
-In-Reply-To: <20200108001859.25254-1-sean.j.christopherson@intel.com>
-References: <20200108001859.25254-1-sean.j.christopherson@intel.com>
-Date:   Wed, 08 Jan 2020 11:13:48 +0100
-Message-ID: <87d0bus1b7.fsf@vitty.brq.redhat.com>
+        id S1727764AbgAHK3u convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 8 Jan 2020 05:29:50 -0500
+Received: from mx2.suse.de ([195.135.220.15]:50536 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726252AbgAHK3u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 05:29:50 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 13CB7AAC2;
+        Wed,  8 Jan 2020 10:29:48 +0000 (UTC)
+From:   Nicolai Stange <nstange@suse.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Chen Wandun <chenwandun@huawei.com>, rkrcmar@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nicolai Stange <nstange@suse.de>
+Subject: Re: [PATCH next] KVM: Fix debugfs_simple_attr.cocci warnings
+References: <1577151674-67949-1-git-send-email-chenwandun@huawei.com>
+        <4f193d99-ee9b-5217-c2f6-3a8a96bf1534@redhat.com>
+Date:   Wed, 08 Jan 2020 11:29:46 +0100
+In-Reply-To: <4f193d99-ee9b-5217-c2f6-3a8a96bf1534@redhat.com> (Paolo
+        Bonzini's message of "Tue, 7 Jan 2020 15:01:54 +0100")
+Message-ID: <87h816nsv9.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> Use a Logical OR in __is_rsvd_bits_set() to combine the two reserved bit
-> checks, which are obviously intended to be logical statements.  Switching
-> to a Logical OR is functionally a nop, but allows the compiler to better
-> optimize the checks.
+> On 24/12/19 02:41, Chen Wandun wrote:
+>> Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
+>> for debugfs files.
+>> 
+>> Semantic patch information:
+>> Rationale: DEFINE_SIMPLE_ATTRIBUTE + debugfs_create_file()
+>> imposes some significant overhead as compared to
+>> DEFINE_DEBUGFS_ATTRIBUTE + debugfs_create_file_unsafe().
+>> 
+>> Signed-off-by: Chen Wandun <chenwandun@huawei.com>
 >
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> This patch was sent probably already two or three times, and every time
+> I've not been able to understand what is this significant overhead.
+
+As you correctly stated below, the overhead is one
+kmalloc(sizeof(struct file_operations)) per opened debugfs file
+(i.e. one per debugfs struct file instance). struct file_operations is
+equivalent to 33 unsigned longs, so it might not be seen as that
+"significant", but it isn't small either.
+
+
+> With DEFINE_DEBUGFS_ATTRIBUTE:
 >
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 7269130ea5e2..72e845709027 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3970,7 +3970,7 @@ __is_rsvd_bits_set(struct rsvd_bits_validate *rsvd_check, u64 pte, int level)
->  {
->  	int bit7 = (pte >> 7) & 1, low6 = pte & 0x3f;
->  
-> -	return (pte & rsvd_check->rsvd_bits_mask[bit7][level-1]) |
-> +	return (pte & rsvd_check->rsvd_bits_mask[bit7][level-1]) ||
->  		((rsvd_check->bad_mt_xwr & (1ull << low6)) != 0);
+> - the fops member is debugfs_open_proxy_file_operations, which calls
+> replace_fops so that the fops->read member is debugfs_attr_read on the
+> opened file
+>
+> - debugfs_attr_read does
+>
+>         ret = debugfs_file_get(dentry);
+>         if (unlikely(ret))
+>                 return ret;
+>         ret = simple_attr_read(file, buf, len, ppos);
+>         debugfs_file_put(dentry);
+>
+> With DEFINE_SIMPLE_ATTRIBUTE:
+>
+> - the fops member is debugfs_full_proxy_open, and after
+> __full_proxy_fops_init fops->read is initialized to full_proxy_read
+>
+> - full_proxy_read does
+>
+>         r = debugfs_file_get(dentry);
+>         if (unlikely(r))
+>                 return r;
+>         real_fops = debugfs_real_fops(filp);
+>         r = real_fops->name(args);
+>         debugfs_file_put(dentry);
+>         return r;
+>
+> where real_fops->name is again just simple_attr_read.
+>
+> So the overhead is really just one kzalloc every time the file is
+> opened.
 
-Redundant parentheses detected!
+Yes.
 
->  }
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> I could just apply the patch, but it wouldn't solve the main issue,
+> which is that there is a function with a scary name
+> ("debugfs_create_file_unsafe") that can be used in very common
+> circumstances (with DEFINE_DEBUGFS_ATTRIBUTE.
+
+Agreed, the naming is a bit poor. "debugfs_create_file_no_proxy" or the
+like would perhaps have been a better choice.
+
+
+> Therefore, we could
+> instead fix the root cause and avoid using the scary API:
+>
+> - remove from the .cocci patch the change from debugfs_create_file to
+> debugfs_create_file_unsafe.  Only switch DEFINE_SIMPLE_ATTRIBUTE to
+> DEFINE_DEBUGFS_ATTRIBUTE
+>
+> - change debugfs_create_file to automatically detect the "easy" case
+> that does not need proxying of fops; something like this:
+>
+> 	const struct file_operations *proxy_fops;
+>
+> 	/*
+> 	 * Any struct file_operations defined by means of
+> 	 * DEFINE_DEBUGFS_ATTRIBUTE() is protected against file removals
+> 	 * and thus does not need proxying of read and write fops.
+> 	 */
+> 	if (!fops ||
+> 	    (fops->llseek == no_llseek &&
+> 	     ((!fops->read && !fops->read_iter) ||
+> 	      fops->read == debugfs_attr_read) &&
+> 	     ((!fops->write && !fops->write_iter) ||
+> 	      fops->write == debugfs_attr_write) &&
+> 	     !fops->poll && !fops->unlocked_ioctl)
+> 		return debugfs_create_file_unsafe(name, mode, parent,
+> 						  data, fops);
+>
+> 	/* These are not supported by __full_proxy_fops_init.  */
+> 	WARN_ON_ONCE(fops->read_iter || fops->write_iter);
+> 	return __debugfs_create_file(name, mode, parent, data,
+> 				    &debugfs_full_proxy_file_operations,
+> 				     fops);
+>
+> CCing Nicolai Stange who first introduced debugfs_create_file_unsafe.
+
+I'm not strictly against your proposal, but I somewhat dislike the idea
+of adding runtime checks for special cases to work around a historic
+issue. Also, we'd either have to touch the ~63 existing call sites of
+debugfs_create_file_unsafe() again or had to live with inconsistent
+debugfs usage patterns.
+
+AFAICT, your approach wouldn't really put a relieve on maintainers
+wrt. patch count as the cocci check for the DEFINE_SIMPLE_ATTRIBUTE ->
+DEFINE_DEBUGFS_ATTRIBUTE conversion would still be needed.
+
+And then there's grepability: right now it would be possible to find all
+fully proxied debugfs files by means of "git grep 'debugfs_file_create('".
+I'm not saying I'm about to convert these, but in theory it could be
+done easily.
+
+How about introducing a
+  #define debugfs_create_attr debugfs_create_file_unsafe
+instead to make those
+s/DEFINE_SIMPLE_ATTRIBUTE/DEFINE_DEBUGFS_ATTRIBUTE/
+patches look less scary?
+
+Ideally, for the sake of additional safety, DEFINE_DEBUGFS_ATTRIBUTE
+could be made to wrap the file_operations within something like a
+struct debugfs_attr_file_operations and debugfs_create_attr() would
+take that instead of a plain file_operations. But again, this would
+require touching the existing users of debugfs_create_file_unsafe()...
+So I'm not sure it would be worth it.
+c
+
+Thanks,
+
+Nicolai
 
 -- 
-Vitaly
-
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
+(HRB 36809, AG Nürnberg), GF: Felix Imendörffer
