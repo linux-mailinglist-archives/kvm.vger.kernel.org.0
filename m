@@ -2,139 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BF19F134A8F
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 19:41:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EED59134B0F
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 19:58:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgAHSlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 13:41:06 -0500
-Received: from mail-dm6nam10on2055.outbound.protection.outlook.com ([40.107.93.55]:6241
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725941AbgAHSlF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 13:41:05 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NxVGWL9fciEH9/e9lNWDBXQu7cnBQJPVADzDI63GHaXkrsTznqb2qM9qT6cQHUcK9M8VwZPXI3ei3MJAFl5RtnPedDfTnbRGSrh09iOBCc0LJFMRoR4nVpikIJ4NaH8JWL6GJwg+qApMaYCRJeBmT4wtrF77njowaIbqRNuNEcKWaEjUMB64lhD6pWaPYfKf2s8iDeYXn6Z5M+joaHrD7M8bR+7j/GsbxGBPifomzpKZbFq+OVL41OEOS6MpjQprczqgiq6mTsLJ0ZfrybVAyms/zgQqGqdBW1hSJTbws23qIMCZpTm7lGoMHzbFWjCzyuE8yxvPcCGPTtfr9hK/NQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zJC6SyCN1Izu9JZRaQCPdwQVhnWLTyutTEsZXidI9Cs=;
- b=VXK9wlBeL1lZGQwGPpk9pet2g58aKyrfJZwm89iyH8St25Z8+g8PF/4tWQvfRrJwhCqyrUJZO5vDmrM6+ZFpbxVcPpV0pb2UmBtKgITmCl7Fzk1LJOc3U5vjK3wnyqzXqc8lXJOUulNoBFB3BqzlgwX8DW5RtHZBBducgECJGJpIQB1Gvev8QWh98zpFy0KYTEdJyVYdfkEzopraUAFMhtKF+9JyDsegcRHt2DTAlYH4Jp5NNyGTVIJThSEK1Cr64fGMK+YUh8r73sk07riqcLXhRuYiN7Vtdw6R/8NdbwBP4r+uuMaRXAhn6lmIhmPeDVyHh6K7/Qf/CBchwgLqEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zJC6SyCN1Izu9JZRaQCPdwQVhnWLTyutTEsZXidI9Cs=;
- b=EGDMw8mChy/a6R6BNg2rGb+MDO3RIC7Yv64PFIlXiYic2whpmTg6UjMcKtxTzGJXnAAdtI92ZmPQEImT4K7GMMqbAjIq/li66BJ1D+cHJ3r7dB82iJJ+BQfsNYcjhSAruLJXi98amYFOF162kICrvKvInlSGuZSjbhc7e7M3UKI=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Thomas.Lendacky@amd.com; 
-Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.71.154) by
- DM6PR12MB3179.namprd12.prod.outlook.com (20.179.104.210) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2602.12; Wed, 8 Jan 2020 18:41:03 +0000
-Received: from DM6PR12MB3163.namprd12.prod.outlook.com
- ([fe80::a0cd:463:f444:c270]) by DM6PR12MB3163.namprd12.prod.outlook.com
- ([fe80::a0cd:463:f444:c270%7]) with mapi id 15.20.2602.017; Wed, 8 Jan 2020
- 18:41:03 +0000
-Subject: Re: [PATCH v2] KVM: SVM: Override default MMIO mask if memory
- encryption is enabled
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <d741b3a58769749b7873fea703c027a68b8e2e3d.1577462279.git.thomas.lendacky@amd.com>
- <20200106224931.GB12879@linux.intel.com>
- <f5c2e60c-536f-e0cd-98b9-86e6da82e48f@amd.com>
- <20200106233846.GC12879@linux.intel.com>
- <a4fb7657-59b6-2a3f-1765-037a9a9cd03a@amd.com>
- <20200107222813.GB16987@linux.intel.com>
- <298352c6-7670-2929-9621-1124775bfaed@amd.com>
- <20200107233102.GC16987@linux.intel.com>
- <c60d15f2-ca10-678c-30aa-5369cf3864c7@amd.com>
- <20200108000412.GE16987@linux.intel.com>
- <e2b183a8-ffea-2df4-2929-a7f67cba8a81@amd.com>
-Message-ID: <ac5e2a0b-10dc-9750-061c-2b2e44f7d820@amd.com>
-Date:   Wed, 8 Jan 2020 12:41:01 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-In-Reply-To: <e2b183a8-ffea-2df4-2929-a7f67cba8a81@amd.com>
+        id S1729600AbgAHS6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 13:58:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36716 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729595AbgAHS6h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 13:58:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578509916;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=SttqYECqxm3uTxoSKfzrfwJdZN7awAbuMDdMNcxZWow=;
+        b=d5adkhXFWk9j9fH/pq80kBrC2hQDIM/p9P736cccoAqU2VUYume76barxTiScKlANFdF5l
+        p0LsSWIdXeCTtbVD5WsvzHSvJX0uNLwGilljBm8VnYrRT17r1E73xz6BXXMTYobx3r7j2s
+        1cjd5CI6oODSX73eNX/PQic4DIFUSmw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-266-5EMx4dMDOKiN5DlgOKDcbw-1; Wed, 08 Jan 2020 13:58:34 -0500
+X-MC-Unique: 5EMx4dMDOKiN5DlgOKDcbw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1743B800EBF;
+        Wed,  8 Jan 2020 18:58:33 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-114.ams2.redhat.com [10.36.117.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B3EA9CA3;
+        Wed,  8 Jan 2020 18:58:28 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v5 3/4] s390x: lib: add SPX and STPX
+ instruction wrapper
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+References: <20200108161317.268928-1-imbrenda@linux.ibm.com>
+ <20200108161317.268928-4-imbrenda@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <ff1041f2-0262-ed89-4c5e-386f69d21cd0@redhat.com>
+Date:   Wed, 8 Jan 2020 19:58:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200108161317.268928-4-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN6PR05CA0035.namprd05.prod.outlook.com
- (2603:10b6:805:de::48) To DM6PR12MB3163.namprd12.prod.outlook.com
- (2603:10b6:5:15e::26)
-MIME-Version: 1.0
-Received: from [10.236.30.74] (165.204.77.1) by SN6PR05CA0035.namprd05.prod.outlook.com (2603:10b6:805:de::48) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.4 via Frontend Transport; Wed, 8 Jan 2020 18:41:02 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 14b43a1a-e11a-40b2-af32-08d7946a5075
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3179:|DM6PR12MB3179:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB31791DDA78743B08A4B47E72EC3E0@DM6PR12MB3179.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 02760F0D1C
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(346002)(396003)(366004)(376002)(136003)(199004)(189003)(6486002)(2616005)(31696002)(2906002)(4326008)(31686004)(86362001)(316002)(53546011)(956004)(5660300002)(16576012)(54906003)(36756003)(52116002)(6916009)(478600001)(16526019)(8676002)(81166006)(186003)(8936002)(81156014)(26005)(66476007)(66556008)(66946007);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3179;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PeBa+kZPFPdbd0U8t1BwfcCw66z+80VheC4zLznQE6lcxiCIAoabeY0EPJDwOeuQMQGR5ewh0hhD1dg9fDqU0faLINJDG/FatB5zhhO5LYm8wtysr3xjlQmF2oMEQUyuqV80xzUhA18X5okLbme5aJJrg13XuyXKS8Yxy5l2SRMFtmKMHNnwpqygvyKj4x2O4e9YQ6ekrKtLy9N7MKZCk4LVTmShsCKWefLBGIobZ/d2FrZdYKBOFj2oaxXUdbayNBAUllb5C3gqwIKklEMrdzNv+COAeguqnvJ++ptZT4F4IKOoJd1TOO+EQxJpN8ABu795Gmi21dmFowHqOHV7BE70uoRpji2rd6+7+b739bs0Jby6E4Y+FlvoCdF+6GspgB2ZcaHLJqZayCZj3Bq5Og/dgI6v79PgVAI9EkeGza1pt+mx8Gzh8ocPKPZM3ObA
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14b43a1a-e11a-40b2-af32-08d7946a5075
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2020 18:41:03.6736
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Gq765lgufZm3zZ/73EgU+MhnCNGGj4+aHFBeQvuOuLqaN/I+TJdP2JvWhDVTz9XCmp45zcnhbbFNK+RWKBzkGQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3179
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/8/20 7:57 AM, Tom Lendacky wrote:
-> On 1/7/20 6:04 PM, Sean Christopherson wrote:
->> On Tue, Jan 07, 2020 at 05:51:51PM -0600, Tom Lendacky wrote:
->>> On 1/7/20 5:31 PM, Sean Christopherson wrote:
->>>> AIUI, using phys_bits=48, then the standard scenario is Cbit=47 and some
->>>> additional bits 46:M are reserved.  Applying that logic to phys_bits=52,
->>>> then Cbit=51 and bits 50:M are reserved, so there's a collision but it's
->>>
->>> There's no requirement that the C-bit correspond to phys_bits. So, for
->>> example, you can have C-bit=51 and phys_bits=48 and so 47:M are reserved.
->>
->> But then using blindly using x86_phys_bits would break if the PA bits
->> aren't reduced, e.g. C-bit=47 and phys_bits=47. AFAICT, there's no
->> requirement that there be reduced PA bits when there is a C-bit.  I'm
->> guessing there aren't plans to ship such CPUs, but I don't see anything
->> in the APM to prevent such a scenario.
-> 
-> I can add in extra checks to see if C-bit == phys_bits, etc. and adjust
-> with appropriate limit checking. It's in the init path, so the extra
-> checks aren't a big deal.
+On 08/01/2020 17.13, Claudio Imbrenda wrote:
+> Add a wrapper for the SET PREFIX and STORE PREFIX instructions, and
+> use it instead of using inline assembly everywhere.
 
-Just sent V3 of the patch. I believe I have all the areas we discussed
-covered. I also went back to using rsvd_bits() as was used before the
-L1TF changes. Let me know what you think.
+Either some hunks are missing in this patch, or you should update the
+patch description and remove the second part of the sentence ? ... at
+least I did not spot the changes where you "use it instead of using
+inline assembly everywhere".
 
-Thanks,
-Tom
+ Thomas
 
+
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  lib/s390x/asm/arch_def.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 > 
-> Thanks,
-> Tom
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 1a5e3c6..38c9dfa 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -284,4 +284,17 @@ static inline int servc(uint32_t command, unsigned long sccb)
+>  	return cc;
+>  }
+>  
+> +static inline void spx(uint32_t new_prefix)
+> +{
+> +	asm volatile("spx %0" : : "Q" (new_prefix) : "memory");
+> +}
+> +
+> +static inline uint32_t stpx(void)
+> +{
+> +	uint32_t prefix;
+> +
+> +	asm volatile("stpx %0" : "=Q" (prefix));
+> +	return prefix;
+> +}
+> +
+>  #endif
 > 
->>
->> Maybe the least painful approach would be to go with a version of this
->> patch and add a check that there are indeeded reserved/reduced bits?
->> Probably with a WARN_ON_ONCE if the check fails.
->>
+
