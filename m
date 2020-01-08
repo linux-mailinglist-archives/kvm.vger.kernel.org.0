@@ -2,432 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DFB41343B1
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 14:22:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28382134402
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 14:39:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727852AbgAHNWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 08:22:19 -0500
-Received: from foss.arm.com ([217.140.110.172]:44476 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727782AbgAHNWT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 08:22:19 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E07CE31B;
-        Wed,  8 Jan 2020 05:22:17 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A8FF33F703;
-        Wed,  8 Jan 2020 05:22:16 -0800 (PST)
-Subject: Re: [kvmtool RFC PATCH 4/8] riscv: Implement Guest/VM VCPU arch
- functions
-To:     Anup Patel <Anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>
-References: <20191225025945.108466-1-anup.patel@wdc.com>
- <20191225025945.108466-5-anup.patel@wdc.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <6939f485-dd09-e857-0015-1a28e05f0855@arm.com>
-Date:   Wed, 8 Jan 2020 13:22:15 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728134AbgAHNjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 08:39:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28830 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727533AbgAHNjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 08:39:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578490759;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=DB7GJD4DEj8M3x8l31EswUoIvCx/kfOnxCqzu5pIud4=;
+        b=HsHmkUHGKdXM4aIu0BmM9aOjcx/fnzABRZ5LnUXr1ebsVvhQPmH2thKiBJdJFqk37hV05X
+        G4zpjpOYQxhAu/lZnFlZSaSiVjsEHGDc44tncH4fX8weQ2VVh8/wiQnaGemF/QljcCvyU7
+        y2gYQ1Cfm+ijNMeKE/r/bV41wYCSafg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-1TiX6vWwNXaVxKQHR4wviw-1; Wed, 08 Jan 2020 08:39:18 -0500
+X-MC-Unique: 1TiX6vWwNXaVxKQHR4wviw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAC0CDBA7;
+        Wed,  8 Jan 2020 13:39:15 +0000 (UTC)
+Received: from [10.36.117.90] (ovpn-117-90.ams2.redhat.com [10.36.117.90])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 57AC160C88;
+        Wed,  8 Jan 2020 13:38:57 +0000 (UTC)
+Subject: Re: [PATCH v16 7/9] mm: Rotate free list so reported pages are moved
+ to the tail of the list
+To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com, osalvador@suse.de
+References: <20200103210509.29237.18426.stgit@localhost.localdomain>
+ <20200103211657.29237.50194.stgit@localhost.localdomain>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <1ee73115-b5b7-9de8-08b0-528035111ea8@redhat.com>
+Date:   Wed, 8 Jan 2020 14:38:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20191225025945.108466-5-anup.patel@wdc.com>
+In-Reply-To: <20200103211657.29237.50194.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 12/25/19 3:00 AM, Anup Patel wrote:
-> This patch implements kvm_cpu__<xyz> Guest/VM VCPU arch functions.
->
-> These functions mostly deal with:
-> 1. VCPU allocation and initialization
-> 2. VCPU reset
-> 3. VCPU show/dump code
-> 4. VCPU show/dump registers
->
-> We also save RISC-V ISA, XLEN, and TIMEBASE frequency for each VCPU
-> so that it can be later used for generating Guest/VM FDT.
->
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
+On 03.01.20 22:16, Alexander Duyck wrote:
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> 
+> Rather than walking over the same pages again and again to get to the pages
+> that have yet to be reported we can save ourselves a significant amount of
+> time by simply rotating the list so that when we have a full list of
+> reported pages the head of the list is pointing to the next non-reported
+> page. Doing this should save us some significant time when processing each
+> free list.
+> 
+> This doesn't gain us much in the standard case as all of the non-reported
+> pages should be near the top of the list already. However in the case of
+> page shuffling this results in a noticeable improvement. Below are the
+> will-it-scale page_fault1 w/ THP numbers for 16 tasks with and without
+> this patch.
+> 
+> Without:
+> tasks   processes       processes_idle  threads         threads_idle
+> 16      8093776.25      0.17            5393242.00      38.20
+> 
+> With:
+> tasks   processes       processes_idle  threads         threads_idle
+> 16      8283274.75      0.17            5594261.00      38.15
+> 
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > ---
->  riscv/include/kvm/kvm-cpu-arch.h |   4 +
->  riscv/kvm-cpu.c                  | 307 ++++++++++++++++++++++++++++++-
->  2 files changed, 304 insertions(+), 7 deletions(-)
->
-> diff --git a/riscv/include/kvm/kvm-cpu-arch.h b/riscv/include/kvm/kvm-cpu-arch.h
-> index 09a50e8..035965e 100644
-> --- a/riscv/include/kvm/kvm-cpu-arch.h
-> +++ b/riscv/include/kvm/kvm-cpu-arch.h
-> @@ -14,6 +14,10 @@ struct kvm_cpu {
->  
->  	unsigned long   cpu_id;
->  
-> +	unsigned long	riscv_xlen;
-> +	unsigned long	riscv_isa;
-> +	unsigned long	riscv_timebase;
-> +
->  	struct kvm	*kvm;
->  	int		vcpu_fd;
->  	struct kvm_run	*kvm_run;
-> diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
-> index e4b8fa5..1565275 100644
-> --- a/riscv/kvm-cpu.c
-> +++ b/riscv/kvm-cpu.c
-> @@ -17,10 +17,84 @@ int kvm_cpu__get_debug_fd(void)
->  	return debug_fd;
->  }
->  
-> +static __u64 __kvm_reg_id(__u64 type, __u64 idx)
-> +{
-> +	__u64 id = KVM_REG_RISCV | type | idx;
-> +
-> +	if (sizeof(unsigned long) == 8)
+>  mm/page_reporting.c |   30 ++++++++++++++++++++++--------
+>  1 file changed, 22 insertions(+), 8 deletions(-)
 
-This looks fragile. As far as I know, according to C99 the minimum width of
-unsigned long is 32 bits. Why not use __riscv_xlen instead?
+Just a minor comment while scanning over the patches (will do more
+review soon), you might want to switch to "mm/page_reporting: " styled
+subjects for these optimizations.
 
+-- 
 Thanks,
-Alex
-> +		id |= KVM_REG_SIZE_U64;
-> +	else
-> +		id |= KVM_REG_SIZE_U32;
-> +
-> +	return id;
-> +}
-> +
-> +#define RISCV_CONFIG_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CONFIG, \
-> +					     KVM_REG_RISCV_CONFIG_REG(name))
-> +
-> +#define RISCV_CORE_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CORE, \
-> +					     KVM_REG_RISCV_CORE_REG(name))
-> +
-> +#define RISCV_CSR_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CSR, \
-> +					     KVM_REG_RISCV_CSR_REG(name))
-> +
-> +#define RISCV_TIMER_REG(name)	__kvm_reg_id(KVM_REG_RISCV_TIMER, \
-> +					     KVM_REG_RISCV_TIMER_REG(name))
-> +
->  struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
->  {
-> -	/* TODO: */
-> -	return NULL;
-> +	struct kvm_cpu *vcpu;
-> +	unsigned long timebase = 0, isa = 0;
-> +	int coalesced_offset, mmap_size;
-> +	struct kvm_one_reg reg;
-> +
-> +	vcpu = calloc(1, sizeof(struct kvm_cpu));
-> +	if (!vcpu)
-> +		return NULL;
-> +
-> +	vcpu->vcpu_fd = ioctl(kvm->vm_fd, KVM_CREATE_VCPU, cpu_id);
-> +	if (vcpu->vcpu_fd < 0)
-> +		die_perror("KVM_CREATE_VCPU ioctl");
-> +
-> +	reg.id = RISCV_CONFIG_REG(isa);
-> +	reg.addr = (unsigned long)&isa;
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (config.isa)");
-> +
-> +	reg.id = RISCV_TIMER_REG(frequency);
-> +	reg.addr = (unsigned long)&timebase;
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (config.timebase)");
-> +
-> +	mmap_size = ioctl(kvm->sys_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
-> +	if (mmap_size < 0)
-> +		die_perror("KVM_GET_VCPU_MMAP_SIZE ioctl");
-> +
-> +	vcpu->kvm_run = mmap(NULL, mmap_size, PROT_RW, MAP_SHARED,
-> +			     vcpu->vcpu_fd, 0);
-> +	if (vcpu->kvm_run == MAP_FAILED)
-> +		die("unable to mmap vcpu fd");
-> +
-> +	coalesced_offset = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION,
-> +				 KVM_CAP_COALESCED_MMIO);
-> +	if (coalesced_offset)
-> +		vcpu->ring = (void *)vcpu->kvm_run +
-> +			     (coalesced_offset * PAGE_SIZE);
-> +
-> +	reg.id = RISCV_CONFIG_REG(isa);
-> +	reg.addr = (unsigned long)&isa;
-> +	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-> +		die("KVM_SET_ONE_REG failed (config.isa)");
-> +
-> +	/* Populate the vcpu structure. */
-> +	vcpu->kvm		= kvm;
-> +	vcpu->cpu_id		= cpu_id;
-> +	vcpu->riscv_isa		= isa;
-> +	vcpu->riscv_xlen	= __riscv_xlen;
-> +	vcpu->riscv_timebase	= timebase;
-> +	vcpu->is_running	= true;
-> +
-> +	return vcpu;
->  }
->  
->  void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
-> @@ -29,7 +103,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
->  
->  void kvm_cpu__delete(struct kvm_cpu *vcpu)
->  {
-> -	/* TODO: */
-> +	free(vcpu);
->  }
->  
->  bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
-> @@ -40,12 +114,43 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
->  
->  void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
->  {
-> -	/* TODO: */
->  }
->  
->  void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu)
->  {
-> -	/* TODO: */
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct kvm_mp_state mp_state;
-> +	struct kvm_one_reg reg;
-> +	unsigned long data;
-> +
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_MP_STATE, &mp_state) < 0)
-> +		die_perror("KVM_GET_MP_STATE failed");
-> +
-> +	/*
-> +	 * If MP state is stopped then it means Linux KVM RISC-V emulates
-> +	 * SBI v0.2 (or higher) with HART power managment and give VCPU
-> +	 * will power-up at boot-time by boot VCPU. For such VCPU, we
-> +	 * don't update PC, A0 and A1 here.
-> +	 */
-> +	if (mp_state.mp_state == KVM_MP_STATE_STOPPED)
-> +		return;
-> +
-> +	reg.addr = (unsigned long)&data;
-> +
-> +	data	= kvm->arch.kern_guest_start;
-> +	reg.id	= RISCV_CORE_REG(regs.pc);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-> +		die_perror("KVM_SET_ONE_REG failed (pc)");
-> +
-> +	data	= vcpu->cpu_id;
-> +	reg.id	= RISCV_CORE_REG(regs.a0);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-> +		die_perror("KVM_SET_ONE_REG failed (a0)");
-> +
-> +	data	= kvm->arch.dtb_guest_start;
-> +	reg.id	= RISCV_CORE_REG(regs.a1);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-> +		die_perror("KVM_SET_ONE_REG failed (a1)");
->  }
->  
->  int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
-> @@ -55,10 +160,198 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
->  
->  void kvm_cpu__show_code(struct kvm_cpu *vcpu)
->  {
-> -	/* TODO: */
-> +	struct kvm_one_reg reg;
-> +	unsigned long data;
-> +	int debug_fd = kvm_cpu__get_debug_fd();
-> +
-> +	reg.addr = (unsigned long)&data;
-> +
-> +	dprintf(debug_fd, "\n*PC:\n");
-> +	reg.id = RISCV_CORE_REG(regs.pc);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (show_code @ PC)");
-> +
-> +	kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
-> +
-> +	dprintf(debug_fd, "\n*RA:\n");
-> +	reg.id = RISCV_CORE_REG(regs.ra);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (show_code @ RA)");
-> +
-> +	kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
->  }
->  
->  void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
->  {
-> -	/* TODO: */
-> +	struct kvm_one_reg reg;
-> +	unsigned long data;
-> +	int debug_fd = kvm_cpu__get_debug_fd();
-> +
-> +	reg.addr = (unsigned long)&data;
-> +	dprintf(debug_fd, "\n Registers:\n");
-> +
-> +	reg.id		= RISCV_CORE_REG(mode);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (mode)");
-> +	dprintf(debug_fd, " MODE:  0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.pc);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (pc)");
-> +	dprintf(debug_fd, " PC:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.ra);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (ra)");
-> +	dprintf(debug_fd, " RA:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.sp);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (sp)");
-> +	dprintf(debug_fd, " SP:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.gp);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (gp)");
-> +	dprintf(debug_fd, " GP:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.tp);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (tp)");
-> +	dprintf(debug_fd, " TP:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.t0);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (t0)");
-> +	dprintf(debug_fd, " T0:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.t1);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (t1)");
-> +	dprintf(debug_fd, " T1:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.t2);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (t2)");
-> +	dprintf(debug_fd, " T2:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s0);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s0)");
-> +	dprintf(debug_fd, " S0:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s1);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s1)");
-> +	dprintf(debug_fd, " S1:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.a0);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (a0)");
-> +	dprintf(debug_fd, " A0:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.a1);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (a1)");
-> +	dprintf(debug_fd, " A1:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.a2);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (a2)");
-> +	dprintf(debug_fd, " A2:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.a3);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (a3)");
-> +	dprintf(debug_fd, " A3:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.a4);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (a4)");
-> +	dprintf(debug_fd, " A4:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.a5);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (a5)");
-> +	dprintf(debug_fd, " A5:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.a6);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (a6)");
-> +	dprintf(debug_fd, " A6:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.a7);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (a7)");
-> +	dprintf(debug_fd, " A7:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s2);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s2)");
-> +	dprintf(debug_fd, " S2:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s3);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s3)");
-> +	dprintf(debug_fd, " S3:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s4);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s4)");
-> +	dprintf(debug_fd, " S4:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s5);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s5)");
-> +	dprintf(debug_fd, " S5:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s6);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s6)");
-> +	dprintf(debug_fd, " S6:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s7);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s7)");
-> +	dprintf(debug_fd, " S7:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s8);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s8)");
-> +	dprintf(debug_fd, " S8:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s9);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s9)");
-> +	dprintf(debug_fd, " S9:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s10);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s10)");
-> +	dprintf(debug_fd, " S10:   0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.s11);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (s11)");
-> +	dprintf(debug_fd, " S11:   0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.t3);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (t3)");
-> +	dprintf(debug_fd, " T3:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.t4);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (t4)");
-> +	dprintf(debug_fd, " T4:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.t5);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (t5)");
-> +	dprintf(debug_fd, " T5:    0x%lx\n", data);
-> +
-> +	reg.id		= RISCV_CORE_REG(regs.t6);
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +		die("KVM_GET_ONE_REG failed (t6)");
-> +	dprintf(debug_fd, " T6:    0x%lx\n", data);
->  }
+
+David / dhildenb
+
