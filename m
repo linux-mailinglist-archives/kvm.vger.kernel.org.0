@@ -2,139 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 98F5313414A
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 12:58:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A90A313417C
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 13:16:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727290AbgAHL62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 06:58:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35664 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726098AbgAHL61 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 06:58:27 -0500
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 60C4E206DA;
-        Wed,  8 Jan 2020 11:58:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578484706;
-        bh=vw48TG6VhKIFdgjzyzo2ERgtSK1lHZF/IJpQOpT3km4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=U6CgaRzqEC7uwX/YgsDOLCpB46/uXVTTPUc/oyYmrkfgGYqhWutbtf4LXtKtxtVSj
-         OtzHDVwriyEeF9LJ6Aacoq2DL1EtSwJSczVnOd0pqx3u2snfzUvJggtStlN2pWWigE
-         pwc5yrVc6FLtGiW1dyK5CYwqWOCN7DxOzrepsBRk=
-Date:   Wed, 8 Jan 2020 11:58:17 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Murray <andrew.murray@arm.com>,
-        Catalin Marinas <Catalin.Marinas@arm.com>,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        Sudeep Holla <Sudeep.Holla@arm.com>, kvm@vger.kernel.org,
-        kvmarm <kvmarm@lists.cs.columbia.edu>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
- full SPE profiling buffer controls
-Message-ID: <20200108115816.GB15861@willie-the-truck>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-10-andrew.murray@arm.com>
- <20191221141325.5a177343@why>
- <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
- <fc222fef381f4ada37966db0a1ec314a@kernel.org>
+        id S1727314AbgAHMQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 07:16:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59723 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727212AbgAHMQw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 07:16:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578485810;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9W9sTpBkdGRsL3XuUTDPK6s4GdXG+QpcxPJ3i7Ao+xI=;
+        b=D+0RdB6GG1//ngIcbdwFUnlZipzviZd4dICH0b9pO8K3cg7J/2qlap+iaSfSr6cFU/DDAn
+        Sbkufto0ADg5RxwH0Z3L5xTg6bbI6qWCqYg4Q5xXtn1ZuuNVEDl5FMrf60ey1Gb1Z6B8Ta
+        8n8WR/fb80gyxhjZ+ZsMzvYvqLwcx0Y=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-IgseM1UQMMuO4jXdR3pCPA-1; Wed, 08 Jan 2020 07:16:49 -0500
+X-MC-Unique: IgseM1UQMMuO4jXdR3pCPA-1
+Received: by mail-wm1-f71.google.com with SMTP id l11so3977294wmi.0
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 04:16:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9W9sTpBkdGRsL3XuUTDPK6s4GdXG+QpcxPJ3i7Ao+xI=;
+        b=fvS+Ky01iRvS9lGMF2w24VHBHrDGKgkOnGAwUClfo+0VoI8gpxQdSztI5WkS3SYTKF
+         c/aDxqhTdpfdwN+w8KLnOwDZpYNqyj87hCfv4maaXR+p++uyda+tDAzTPSfNMo1QuG9h
+         7VwnnpyHRN4cffAnOCD5/+81mPbN1UlKQtUyMVR8Es2IKbtjCGbdGOwFZ6f5kD3jJZUb
+         BU+bLwN6staeb5qg21AhfAHjV8kn+ntCBBXAGnjokJeDPfFOJmKWTYT3AUtv7nqH8QP5
+         0rR5Kqj92p2+dsRhoQfq1r3+uvkITxeVrbeLaUc++3JLm2oFVJWsApyfCryPd3DmXtpt
+         fvsQ==
+X-Gm-Message-State: APjAAAW9zejUcjw+JDlwKHjmKgWsxQtKe7R4Px9tNRQ8jr8okVhHW1pw
+        1WUg241xWgpF9irWobn6SDiJcJHzu+uKxniNVg+fqwZ+L/pNuM9mBHjz3O0XyTLVjWIt8Mzw7n9
+        7nXyOhcQbKMIH
+X-Received: by 2002:a05:600c:244:: with SMTP id 4mr3399340wmj.40.1578485808577;
+        Wed, 08 Jan 2020 04:16:48 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyw8wxSZKFMV6/j733IMWOpvX8FnAcYhGDTbV2NWyiuTJEUI1+29LDk7Ozv7aZC28jGe2FpAA==
+X-Received: by 2002:a05:600c:244:: with SMTP id 4mr3399318wmj.40.1578485808380;
+        Wed, 08 Jan 2020 04:16:48 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329? ([2001:b07:6468:f312:c6d:4079:b74c:e329])
+        by smtp.gmail.com with ESMTPSA id n8sm4133584wrx.42.2020.01.08.04.16.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jan 2020 04:16:47 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 0/4] Improvements for the x86 tests
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     Drew Jones <drjones@redhat.com>
+References: <20191211094221.7030-1-thuth@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9e750f02-a1ba-aaf3-4509-dff38babf9e0@redhat.com>
+Date:   Wed, 8 Jan 2020 13:16:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc222fef381f4ada37966db0a1ec314a@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191211094221.7030-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 08, 2020 at 11:17:16AM +0000, Marc Zyngier wrote:
-> On 2020-01-07 15:13, Andrew Murray wrote:
-> > On Sat, Dec 21, 2019 at 02:13:25PM +0000, Marc Zyngier wrote:
-> > > On Fri, 20 Dec 2019 14:30:16 +0000
-> > > Andrew Murray <andrew.murray@arm.com> wrote:
-> > > 
-> > > [somehow managed not to do a reply all, re-sending]
-> > > 
-> > > > From: Sudeep Holla <sudeep.holla@arm.com>
-> > > >
-> > > > Now that we can save/restore the full SPE controls, we can enable it
-> > > > if SPE is setup and ready to use in KVM. It's supported in KVM only if
-> > > > all the CPUs in the system supports SPE.
-> > > >
-> > > > However to support heterogenous systems, we need to move the check if
-> > > > host supports SPE and do a partial save/restore.
-> > > 
-> > > No. Let's just not go down that path. For now, KVM on heterogeneous
-> > > systems do not get SPE.
-> > 
-> > At present these patches only offer the SPE feature to VCPU's where the
-> > sanitised AA64DFR0 register indicates that all CPUs have this support
-> > (kvm_arm_support_spe_v1) at the time of setting the attribute
-> > (KVM_SET_DEVICE_ATTR).
-> > 
-> > Therefore if a new CPU comes online without SPE support, and an
-> > existing VCPU is scheduled onto it, then bad things happen - which I
-> > guess
-> > must have been the intention behind this patch.
+On 11/12/19 10:42, Thomas Huth wrote:
+> QEMU recently changed the error message that it prints out when a
+> kernel could not be loaded, so we have to adjust our script in
+> kvm-unit-tests accordingly.
+> Once this is fixed, add two missing tests (setjmp and cmpxchg8b) to
+> the unittests.cfg and CI pipelines.
 > 
-> I guess that was the intent.
+> Thomas Huth (4):
+>   scripts: Fix premature_failure() check with newer versions of QEMU
+>   x86: Fix coding style in setjmp.c
+>   x86: Add the setjmp test to the CI
+>   x86: Add the cmpxchg8b test to the CI
 > 
-> > > If SPE has been enabled on a guest and a CPU
-> > > comes up without SPE, this CPU should fail to boot (same as exposing a
-> > > feature to userspace).
-> > 
-> > I'm unclear as how to prevent this. We can set the FTR_STRICT flag on
-> > the sanitised register - thus tainting the kernel if such a non-SPE CPU
-> > comes online - thought that doesn't prevent KVM from blowing up. Though
-> > I don't believe we can prevent a CPU coming up. At the moment this is
-> > my preferred approach.
+>  .gitlab-ci.yml       |  4 ++--
+>  .travis.yml          |  6 +++---
+>  scripts/runtime.bash |  2 +-
+>  x86/setjmp.c         | 22 ++++++++++------------
+>  x86/unittests.cfg    |  7 +++++++
+>  5 files changed, 23 insertions(+), 18 deletions(-)
 > 
-> I'd be OK with this as a stop-gap measure. Do we know of any existing
-> design where only half of the CPUs have SPE?
 
-No, but given how few CPUs implement SPE I'd say that this configuration
-is inevitable. I certainly went out of my way to support it in the driver.
+Applied, thanks.
 
-> > Looking at the vcpu_load and related code, I don't see a way of saying
-> > 'don't schedule this VCPU on this CPU' or bailing in any way.
-> 
-> That would actually be pretty easy to implement. In vcpu_load(), check
-> that that the CPU physical has SPE. If not, raise a request for that vcpu.
-> In the run loop, check for that request and abort if raised, returning
-> to userspace.
-> 
-> Userspace can always check /sys/devices/arm_spe_0/cpumask and work out
-> where to run that particular vcpu.
+Paolo
 
-It's also worth considering systems where there are multiple implementations
-of SPE in play. Assuming we don't want to expose this to a guest, then the
-right interface here is probably for userspace to pick one SPE
-implementation and expose that to the guest. That fits with your idea above,
-where you basically get an immediate exit if we try to schedule a vCPU onto
-a CPU that isn't part of the SPE mask.
-
-> > One solution could be to allow scheduling onto non-SPE VCPUs but wrap
-> > the
-> > SPE save/restore code in a macro (much like kvm_arm_spe_v1_ready) that
-> > reads the non-sanitised feature register. Therefore we don't go bang,
-> > but
-> > we also increase the size of any black-holes in SPE capturing. Though
-> > this
-> > feels like something that will cause grief down the line.
-> > 
-> > Is there something else that can be done?
-> 
-> How does userspace deal with this? When SPE is only available on half of
-> the CPUs, how does perf work in these conditions?
-
-Not sure about userspace, but the kernel driver works by instantiating an
-SPE PMU instance only for the CPUs that have it and then that instance
-profiles for only those CPUs. You also need to do something similar if
-you had two CPU types with SPE, since the SPE configuration is likely to be
-different between them.
-
-Will
