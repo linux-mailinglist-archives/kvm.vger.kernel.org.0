@@ -2,102 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 54BCE134B58
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 20:15:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EE32134B6F
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 20:20:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729932AbgAHTPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 14:15:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44883 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726363AbgAHTPQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 14:15:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578510915;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3z9gNLCSXB8aO3xtxIUun5FqOxfpI/aizS1bLtGDjNA=;
-        b=PAZlRLhLKEnyZzXjJsvffIp+BSjxSRGAbO7BMYRU/a2kmgfuoj+Med6AcZwciPQCv0d9v6
-        aSrR3BUGNuce9nvYM5ln5JFGcNLqxVJGWMsPySKraGyEhjWHt+7PpvmQBZU8UjUPTpjssL
-        IYBxKmw1aTixrX+InzjkMSn+bK26Xek=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-sWiGlX9POeK6WMa03KJrvA-1; Wed, 08 Jan 2020 14:15:14 -0500
-X-MC-Unique: sWiGlX9POeK6WMa03KJrvA-1
-Received: by mail-qv1-f72.google.com with SMTP id d7so2560342qvq.12
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 11:15:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3z9gNLCSXB8aO3xtxIUun5FqOxfpI/aizS1bLtGDjNA=;
-        b=QDF12sgcCGk48AE+0ElW9V4wDBLPlTSJh7aFI286snBC3+74jBR5+1X0UwcEAwfQMk
-         zqFrhjLQpotaW7g1BP47tns3pHZmRHiBDoQI9gTyGoIuDfaoHO9JyFVCGKlDqZ1gYvJ4
-         LHW7bHLHRcb+IyJvaUg7d8KVY9gVCZA8hF1s+afnyQAoH2kfPYQ3SveQXFrFd9ueBEpO
-         Eiv57X9eBf7VjntVkNE66bnszq8tBgKGfBlxJdZz1EUjPREgCxFoQVxMBFcKzIg1251P
-         7lnUOPzaH58GECKnWomx01i22OO9+UDjrTojHLTWvYlGEqY/8ESD/bIFGtnEBQQ6GnXN
-         4wFg==
-X-Gm-Message-State: APjAAAVP7K4wnOQOAbQAKICw/oimIWoSWtTdxc8qdZBvCeQ/5ynlcA7n
-        PRuir09fs2Xn37ZXDkNGPQOyJLLeoYYnHm2+dEReJaDi7wdqG3vZhO4eXfJHHyW8jX0wBiCpl5S
-        mowjY6fpdcaUD
-X-Received: by 2002:ad4:5421:: with SMTP id g1mr5431495qvt.57.1578510914190;
-        Wed, 08 Jan 2020 11:15:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzaG+N6wIv/vcQ8oG8Xb91kma1URsYhdGn0JWu2TkG83LPrJ3CDlvwx1GR3NbfXuD16HiWg5g==
-X-Received: by 2002:ad4:5421:: with SMTP id g1mr5431470qvt.57.1578510913932;
-        Wed, 08 Jan 2020 11:15:13 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id l44sm1020260qtb.48.2020.01.08.11.15.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2020 11:15:13 -0800 (PST)
-Date:   Wed, 8 Jan 2020 14:15:12 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        id S1728975AbgAHTUA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 14:20:00 -0500
+Received: from mga04.intel.com ([192.55.52.120]:45729 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727191AbgAHTUA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 14:20:00 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 11:19:59 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; 
+   d="scan'208";a="254329013"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga002.fm.intel.com with ESMTP; 08 Jan 2020 11:19:58 -0800
+Date:   Wed, 8 Jan 2020 11:19:58 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RESEND v2 03/17] KVM: X86: Don't track dirty for
- KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
-Message-ID: <20200108191512.GF7096@xz-x1>
-References: <20191221014938.58831-1-peterx@redhat.com>
- <20191221014938.58831-4-peterx@redhat.com>
- <cf232ce8-bc07-0192-580f-d08736980273@redhat.com>
- <20191223172737.GA81196@xz-x1>
- <851bd9ed-3ff3-6aef-725c-b586d819211c@redhat.com>
- <20191223201024.GB90172@xz-x1>
- <e56d4157-1a0a-3f45-0e02-ac7c10fccf96@redhat.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v3] KVM: SVM: Override default MMIO mask if memory
+ encryption is enabled
+Message-ID: <20200108191958.GA31899@linux.intel.com>
+References: <6d2b7e37ca4dca92fadd1f3df93803fd17aa70ad.1578508816.git.thomas.lendacky@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e56d4157-1a0a-3f45-0e02-ac7c10fccf96@redhat.com>
+In-Reply-To: <6d2b7e37ca4dca92fadd1f3df93803fd17aa70ad.1578508816.git.thomas.lendacky@amd.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 08, 2020 at 06:46:30PM +0100, Paolo Bonzini wrote:
-> On 23/12/19 21:10, Peter Xu wrote:
-> >> Yes, kvm->slots_lock is taken by x86_set_memory_region.  We need to move
-> >> that to the callers, of which several are already taking the lock (all
-> >> except vmx_set_tss_addr and kvm_arch_destroy_vm).
-> > OK, will do.  I'll directly replace the x86_set_memory_region() calls
-> > in kvm_arch_destroy_vm() to be __x86_set_memory_region() since IIUC
-> > the slots_lock is helpless when destroying the vm... then drop the
-> > x86_set_memory_region() helper in the next version.  Thanks,
+On Wed, Jan 08, 2020 at 12:40:16PM -0600, Tom Lendacky wrote:
+> The KVM MMIO support uses bit 51 as the reserved bit to cause nested page
+> faults when a guest performs MMIO. The AMD memory encryption support uses
+> a CPUID function to define the encryption bit position. Given this, it is
+> possible that these bits can conflict.
 > 
-> Be careful because it may cause issues with lockdep.  Better just take
-> the lock.
+> Use svm_hardware_setup() to override the MMIO mask if memory encryption
+> support is enabled. Various checks are performed to ensure that the mask
+> is properly defined and rsvd_bits() is used to generate the new mask (as
+> was done prior to the change that necessitated this patch).
+> 
+> Fixes: 28a1f3ac1d0c ("kvm: x86: Set highest physical address bits in non-present/reserved SPTEs")
+> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-But you seemed to have fixed that already? :)
+A few nits below, other than that:
 
-3898da947bba ("KVM: avoid using rcu_dereference_protected", 2017-08-02)
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-And this path is after kvm_destroy_vm() so kvm->users_count should be 0.
-Or I feel like we need to have more places to take the lock..
+> 
+> ---
+> 
+> Changes in v3:
+> - Add additional checks to ensure there are no conflicts between the
+>   encryption bit position and physical address setting.
+> - Use rsvd_bits() generated mask (as was previously used) instead of
+>   setting a single bit.
+> 
+> Changes in v2:
+> - Use of svm_hardware_setup() to override MMIO mask rather than adding an
+>   override callback routine.
+> ---
+>  arch/x86/kvm/svm.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 51 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 122d4ce3b1ab..9d6bd3fc12c8 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -1307,6 +1307,55 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> +/*
+> + * The default MMIO mask is a single bit (excluding the present bit),
+> + * which could conflict with the memory encryption bit. Check for
+> + * memory encryption support and override the default MMIO masks if
+> + * it is enabled.
+> + */
+> +static __init void svm_adjust_mmio_mask(void)
+> +{
+> +	unsigned int enc_bit, mask_bit;
+> +	u64 msr, mask;
+> +
+> +	/* If there is no memory encryption support, use existing mask */
+> +	if (cpuid_eax(0x80000000) < 0x8000001f)
+> +		return;
+> +
+> +	/* If memory encryption is not enabled, use existing mask */
+> +	rdmsrl(MSR_K8_SYSCFG, msr);
+> +	if (!(msr & MSR_K8_SYSCFG_MEM_ENCRYPT))
+> +		return;
+> +
+> +	enc_bit = cpuid_ebx(0x8000001f) & 0x3f;
+> +	mask_bit = boot_cpu_data.x86_phys_bits;
+> +
+> +	/* Increment the mask bit if it is the same as the encryption bit */
+> +	if (enc_bit == mask_bit)
+> +		mask_bit++;
 
--- 
-Peter Xu
+Nice!
 
+> +
+> +	if (mask_bit > 51) {
+> +		/*
+> +		 * The mask bit is above 51, so use bit 51 without the present
+> +		 * bit.
+> +		 */
+> +		mask = BIT_ULL(51);
+
+I don't think setting bit 51 is necessary.  Setting a reserved PA bit is
+purely to trigger the #PF, the MMIO spte itself is confirmed by the presence
+of SPTE_MMIO_MASK.
+
+AFAICT, clearing only the present bit in kvm_set_mmio_spte_mask() is an
+odd implementation quirk, i.e. it can, and arguably should, simply clear
+the mask.  It's something I'd like to clean up (in mmu.c) and would prefer
+to not propagate here.
+
+> +	} else {
+> +		/*
+> +		 * Some bits above the physical addressing limit will always
+> +		 * be reserved, so use the rsvd_bits() function to generate
+> +		 * the mask. This mask, along with the present bit, will be
+> +		 * used to generate a page fault with PFER.RSV = 1.
+> +		 */
+> +		mask = rsvd_bits(mask_bit, 51);
+> +		mask |= BIT_ULL(0);
+
+My personal preference would be to use PT_PRESENT_MASK (more crud in mmu.c
+that should be fixed).  And the brackets can be dropped if mask is set in
+a single line, e.g.:
+
+	/*
+	 * Here be a comment.
+	 */
+	if (mask_bit > 51)
+		mask = 0;
+	else
+		mask = rsvd_bits(mask_bit, 51) | PT_PRESENT_MASK;
+
+> +	}
+> +
+> +	kvm_mmu_set_mmio_spte_mask(mask, mask,
+> +				   PT_WRITABLE_MASK |
+> +				   PT_USER_MASK);
+> +}
+> +
+>  static __init int svm_hardware_setup(void)
+>  {
+>  	int cpu;
+> @@ -1361,6 +1410,8 @@ static __init int svm_hardware_setup(void)
+>  		}
+>  	}
+>  
+> +	svm_adjust_mmio_mask();
+> +
+>  	for_each_possible_cpu(cpu) {
+>  		r = svm_cpu_init(cpu);
+>  		if (r)
+> -- 
+> 2.17.1
+> 
