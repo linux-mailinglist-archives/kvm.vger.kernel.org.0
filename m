@@ -2,145 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 28382134402
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 14:39:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E836713443D
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 14:46:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728134AbgAHNjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 08:39:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28830 "EHLO
+        id S1728415AbgAHNpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 08:45:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49009 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727533AbgAHNjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 08:39:21 -0500
+        with ESMTP id S1728393AbgAHNpb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 08:45:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578490759;
+        s=mimecast20190719; t=1578491129;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=DB7GJD4DEj8M3x8l31EswUoIvCx/kfOnxCqzu5pIud4=;
-        b=HsHmkUHGKdXM4aIu0BmM9aOjcx/fnzABRZ5LnUXr1ebsVvhQPmH2thKiBJdJFqk37hV05X
-        G4zpjpOYQxhAu/lZnFlZSaSiVjsEHGDc44tncH4fX8weQ2VVh8/wiQnaGemF/QljcCvyU7
-        y2gYQ1Cfm+ijNMeKE/r/bV41wYCSafg=
+         in-reply-to:in-reply-to:references:references;
+        bh=dG3i7yuSZ3ug5whVQjbMvnjTRjDpvRHXJetJ3lD56EE=;
+        b=N3TS9AjqM8uIVPjkito7dT+fJXqhfHDfNRMjXlcPDta56ptjS5BXxqqRoPfNnHHgpVLHBB
+        lVjznGD4WDrSEerDJDaNuTuRa7+qh4qIRr0maXxUhqZ33KEM9XWnSWrZoiBq3MqKqtJCsi
+        XZzcZHW4kW2SzmE9wS8cTuZV97CpP44=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-1TiX6vWwNXaVxKQHR4wviw-1; Wed, 08 Jan 2020 08:39:18 -0500
-X-MC-Unique: 1TiX6vWwNXaVxKQHR4wviw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-227-D-99LmD1OlaSQU5Xry_7AQ-1; Wed, 08 Jan 2020 08:45:28 -0500
+X-MC-Unique: D-99LmD1OlaSQU5Xry_7AQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAC0CDBA7;
-        Wed,  8 Jan 2020 13:39:15 +0000 (UTC)
-Received: from [10.36.117.90] (ovpn-117-90.ams2.redhat.com [10.36.117.90])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 57AC160C88;
-        Wed,  8 Jan 2020 13:38:57 +0000 (UTC)
-Subject: Re: [PATCH v16 7/9] mm: Rotate free list so reported pages are moved
- to the tail of the list
-To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
-        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
-        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mgorman@techsingularity.net, vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com,
-        alexander.h.duyck@linux.intel.com, osalvador@suse.de
-References: <20200103210509.29237.18426.stgit@localhost.localdomain>
- <20200103211657.29237.50194.stgit@localhost.localdomain>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <1ee73115-b5b7-9de8-08b0-528035111ea8@redhat.com>
-Date:   Wed, 8 Jan 2020 14:38:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31D8E107ACC4;
+        Wed,  8 Jan 2020 13:45:27 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 99FC47C34A;
+        Wed,  8 Jan 2020 13:45:22 +0000 (UTC)
+Date:   Wed, 8 Jan 2020 14:45:20 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cannon Matthews <cannonmatthews@google.com>
+Subject: Re: [PATCH v3 1/8] KVM: selftests: Create a demand paging test
+Message-ID: <20200108134520.zcrg6bx6urv4zxea@kamzik.brq.redhat.com>
+References: <20191216213901.106941-1-bgardon@google.com>
+ <20191216213901.106941-2-bgardon@google.com>
+ <20200107143334.GF219677@xz-x1>
+ <20200107145608.ogi34nkyh2abdgrq@kamzik.brq.redhat.com>
+ <CANgfPd8_ei0WdF7t73TPveCAh1ifSp9p1B6BOkL32A+499nz=Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200103211657.29237.50194.stgit@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd8_ei0WdF7t73TPveCAh1ifSp9p1B6BOkL32A+499nz=Q@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.01.20 22:16, Alexander Duyck wrote:
-> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On Tue, Jan 07, 2020 at 10:41:55AM -0800, Ben Gardon wrote:
+> I'll try to implement Drew's suggestion re: syncing global variables
+> and then looking up CPU ID. If I can do that I'll upload another patch
+> set for s390, aarch64, and x86. If I can't I'll move this test to the
+> x86 subdirectory.
 > 
-> Rather than walking over the same pages again and again to get to the pages
-> that have yet to be reported we can save ourselves a significant amount of
-> time by simply rotating the list so that when we have a full list of
-> reported pages the head of the list is pointing to the next non-reported
-> page. Doing this should save us some significant time when processing each
-> free list.
-> 
-> This doesn't gain us much in the standard case as all of the non-reported
-> pages should be near the top of the list already. However in the case of
-> page shuffling this results in a noticeable improvement. Below are the
-> will-it-scale page_fault1 w/ THP numbers for 16 tasks with and without
-> this patch.
-> 
-> Without:
-> tasks   processes       processes_idle  threads         threads_idle
-> 16      8093776.25      0.17            5393242.00      38.20
-> 
-> With:
-> tasks   processes       processes_idle  threads         threads_idle
-> 16      8283274.75      0.17            5594261.00      38.15
-> 
-> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> ---
->  mm/page_reporting.c |   30 ++++++++++++++++++++++--------
->  1 file changed, 22 insertions(+), 8 deletions(-)
+> I apologize for not responding to the comments on the previous version
+> of this patch set. I'm still learning the mailing list etiquette. In
+> the future is it preferable that I reply to those comments when I
+> upload a new patch set addressing them, or should I add a note in the
+> new patch emails about the comments I addressed in that update?
 
-Just a minor comment while scanning over the patches (will do more
-review soon), you might want to switch to "mm/page_reporting: " styled
-subjects for these optimizations.
+It's typically enough to just create a changelog in the cover letter.
+E.g.
 
--- 
+v3:
+ - Added ...
+ - Dropped ...
+ - Fixed ...
+ - Picked up r-b's
+
+v2:
+ - Added ...
+ - Dropped ...
+ - Fixed ...
+ - Picked up r-b's
+
+> 
+> I don't have any aarch64 or s390 hardware handy to test on so I'll try
+> to move support for those architectures to separate commits at the end
+> of the series, and mark them untested.
+
+I'll test on aarch64, and I can also provide fixes if necessary.
+
 Thanks,
+drew
 
-David / dhildenb
+> 
+> Thank you for your quick responses!
+> 
+> On Tue, Jan 7, 2020 at 6:56 AM Andrew Jones <drjones@redhat.com> wrote:
+> >
+> > On Tue, Jan 07, 2020 at 09:33:34AM -0500, Peter Xu wrote:
+> > > On Mon, Dec 16, 2019 at 01:38:54PM -0800, Ben Gardon wrote:
+> > > > While userfaultfd, KVM's demand paging implementation, is not specific
+> > > > to KVM, having a benchmark for its performance will be useful for
+> > > > guiding performance improvements to KVM. As a first step towards creating
+> > > > a userfaultfd demand paging test, create a simple memory access test,
+> > > > based on dirty_log_test.
+> > > >
+> > > > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > >
+> > > It's fine to start with x86-only for this test, but imho it would be
+> > > better to mention that in cover letter, or reply to reviewer comments
+> > > on that you removed aarch64 from previous post.
+> >
+> > I'd also prefer that if it's x86-only that it be put in the x86_64
+> > subdirectory and drop the arch #ifdefs. The question is why is it
+> > x86-only for now though? Will it take a lot of work to port it to
+> > other architectures? Or does it just need testing by someone with
+> > the hardware?
+> >
+> > Thanks,
+> > drew
+> >
+> 
 
