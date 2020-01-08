@@ -2,103 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 88185134656
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 16:36:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5DA41346AA
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 16:50:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728949AbgAHPgI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 10:36:08 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48007 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727782AbgAHPgH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jan 2020 10:36:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578497766;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6YNW0p309KoXFtpAU4UbagX3xQXhnEerfAmOwO0Imlk=;
-        b=YAiEO1C1cfXAjw65idbOhvA+fjpjQkVFPcOgxquKwSoimh91/shLLfEILXa9w5yaCok7j/
-        jyPeuWbFkhBym9m12o7AAYcRmx5jTkHbEvpmpDgzq5jeG/Ch/28OVxnZ5dbg0YAma+Uvnw
-        0+C7bUlYKA4kN7bDhuqbj8DqfOpLY/0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-GrEnqTf5Mzyw4bp6w9TOqg-1; Wed, 08 Jan 2020 10:36:04 -0500
-X-MC-Unique: GrEnqTf5Mzyw4bp6w9TOqg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94CB010054E3;
-        Wed,  8 Jan 2020 15:36:03 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A8CC61001938;
-        Wed,  8 Jan 2020 15:36:02 +0000 (UTC)
-Date:   Wed, 8 Jan 2020 16:36:00 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3] KVM: s390: Add new reset vcpu API
-Message-ID: <20200108163600.54981741.cohuck@redhat.com>
-In-Reply-To: <d3370e31-ca33-567d-ce0e-1168f603a686@redhat.com>
-References: <20191205120956.50930-1-frankja@linux.ibm.com>
-        <dd724da0-9bba-079e-6b6f-756762dbc942@de.ibm.com>
-        <d0db08ef-ade9-93d4-105f-ace6fef50c81@linux.ibm.com>
-        <3ddb7aa6-96d4-246f-a8ba-fdf2408a4ff0@de.ibm.com>
-        <d3370e31-ca33-567d-ce0e-1168f603a686@redhat.com>
-Organization: Red Hat GmbH
+        id S1728282AbgAHPuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 10:50:51 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:43552 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726186AbgAHPuv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 10:50:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=ZclNq8Gr7pU/JCTXFFTTfRWQ9njV8jVe1K8Bz3Pzsz0=; b=gzhPPRxbWxKaI0bZ0WbwrbmXR
+        xlSTgzecSP6dVTnbBkKg9qkpoHergsjs7+VQhOuVJA5yY18MfdusUj+sC1u2dmzd3fG0V4ncwLsb8
+        yLJnCGRrWQ9v5J3QN2xm8R22Kh6EW/NR93PLH/hFGYY2+0PZeb7T1R8Q5QTjZd94Tje8wUD/f+d7l
+        ongVbMqAms69fs7UDvXoOHKwVx5qtVYtSE0LsTrLZiF7/V8/wEMAiLMk+mA8ql4KJJoKWHf0D+kd0
+        iWreXHPDj0vq8sBh5hYqpY7/ti2FbxBUbBYAspjZmI8w23DD6uxivJ8guinjSEH0/HvTTYnU9Av7C
+        dAcyzKaWg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ipDbX-0002mT-5L; Wed, 08 Jan 2020 15:50:43 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 720FD30025A;
+        Wed,  8 Jan 2020 16:49:07 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 754D62B6157AC; Wed,  8 Jan 2020 16:50:40 +0100 (CET)
+Date:   Wed, 8 Jan 2020 16:50:40 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        KarimAllah <karahmed@amazon.de>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Subject: Re: [PATCH RFC] sched/fair: Penalty the cfs task which executes
+ mwait/hlt
+Message-ID: <20200108155040.GB2827@hirez.programming.kicks-ass.net>
+References: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 Jan 2020 15:44:57 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 08/01/2020 15.38, Christian Borntraeger wrote:
-> > 
-> > 
-> > On 08.01.20 15:35, Janosch Frank wrote:  
-> >> On 1/8/20 3:28 PM, Christian Borntraeger wrote:  
-> >>>
-> >>>
-> >>> On 05.12.19 13:09, Janosch Frank wrote:
-> >>> [...]  
-> >>>> +4.123 KVM_S390_CLEAR_RESET
-> >>>> +
-> >>>> +Capability: KVM_CAP_S390_VCPU_RESETS
-> >>>> +Architectures: s390
-> >>>> +Type: vcpu ioctl
-> >>>> +Parameters: none
-> >>>> +Returns: 0
-> >>>> +
-> >>>> +This ioctl resets VCPU registers and control structures that QEMU
-> >>>> +can't access via the kvm_run structure. The clear reset is a superset
-> >>>> +of the initial reset and additionally clears general, access, floating
-> >>>> +and vector registers.  
-> >>>
-> >>> As Thomas outlined, make it more obvious that userspace does the remaining
-> >>> parts. I do not think that we want the kernel to do the things (unless it
-> >>> helps you in some way for the ultravisor guests)  
-> >>
-> >> Ok, will do  
-> > 
-> > I changed my mind (see my other mail) but I would like Thomas, Conny or David
-> > to ack/nack.  
+On Wed, Jan 08, 2020 at 09:50:01AM +0800, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
 > 
-> I don't mind too much as long as it is properly documented, but I also
-> slightly prefer to be consistent here, i.e. let the kernel clear the
-> rest here, too, just like we do it already with the initial reset.
+> To deliver all of the resources of a server to instances in cloud, there are no 
+> housekeeping cpus reserved. libvirtd, qemu main loop, kthreads, and other agent/tools 
+> etc which can't be offloaded to other hardware like smart nic, these stuff will 
+> contend with vCPUs even if MWAIT/HLT instructions executed in the guest.
+> 
+> The is no trap and yield the pCPU after we expose mwait/hlt to the guest [1][2],
+> the top command on host still observe 100% cpu utilization since qemu process is 
+> running even though guest who has the power management capability executes mwait. 
+> Actually we can observe the physical cpu has already enter deeper cstate by 
+> powertop on host.
+> 
+> For virtualization, there is a HLT activity state in CPU VMCS field which indicates 
+> the logical processor is inactive because it executed the HLT instruction, but 
+> SDM 24.4.2 mentioned that execution of the MWAIT instruction may put a logical 
+> processor into an inactive state, however, this VMCS field never reflects this 
+> state.
 
-I definitely agree with the 'properly documented' part :) It's probably
-enough to just state that the kernel resets the stuff, no need to go
-into details (and we also don't need to update this for later versions.)
+So far I think I can follow, however it does not explain who consumes
+this VMCS state if it is set and how that helps. Also, this:
 
-Q: Are we sure that we will always be able to reset everything from the
-kernel?
+> This patch avoids fine granularity intercept and reschedule vCPU if MWAIT/HLT
+> instructions executed, because it can worse the message-passing workloads which 
+> will switch between idle and running frequently in the guest. Lets penalty the 
+> vCPU which is long idle through tick-based sampling and preemption.
 
+is just complete gibberish. And I have no idea what problem you're
+trying to solve how.
+
+Also, I don't think the TSC/MPERF ratio is architected, we can't assume
+this is true for everything that has APERFMPERF.
+
+/me tries to reconstruct intent from patch
+
+So what you're doing is, mark the CPU 'idle' when the MPERF/TSC ratio <
+1%, and then frob the vruntime such that it will hopefully preempt.
+That's pretty disgusting.
+
+Please, write a coherent problem statement and justify the magic
+choices. This is unreviewable.
