@@ -2,85 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F6CA134735
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 17:08:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A744B134763
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 17:13:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729086AbgAHQH4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 11:07:56 -0500
-Received: from mga11.intel.com ([192.55.52.93]:65235 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727338AbgAHQH4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 11:07:56 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 08:07:55 -0800
-X-IronPort-AV: E=Sophos;i="5.69,410,1571727600"; 
-   d="scan'208";a="211581775"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 08:07:52 -0800
-Message-ID: <783a534b37500c36a0255b5a7615b667a89b5b76.camel@linux.intel.com>
-Subject: Re: [PATCH v16 7/9] mm: Rotate free list so reported pages are
- moved to the tail of the list
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     David Hildenbrand <david@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, mgorman@techsingularity.net,
-        vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
-Date:   Wed, 08 Jan 2020 08:07:52 -0800
-In-Reply-To: <1ee73115-b5b7-9de8-08b0-528035111ea8@redhat.com>
-References: <20200103210509.29237.18426.stgit@localhost.localdomain>
-         <20200103211657.29237.50194.stgit@localhost.localdomain>
-         <1ee73115-b5b7-9de8-08b0-528035111ea8@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+        id S1729399AbgAHQNb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 11:13:31 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51330 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729395AbgAHQNa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jan 2020 11:13:30 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 008GDPS3041702
+        for <kvm@vger.kernel.org>; Wed, 8 Jan 2020 11:13:29 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xdg1bntw0-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 11:13:27 -0500
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Wed, 8 Jan 2020 16:13:22 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 8 Jan 2020 16:13:19 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 008GDIbh47251896
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Jan 2020 16:13:18 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3FA0BAE051;
+        Wed,  8 Jan 2020 16:13:18 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 02A0DAE045;
+        Wed,  8 Jan 2020 16:13:18 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.108])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Jan 2020 16:13:17 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v5 0/4] s390x: SCLP Unit test
+Date:   Wed,  8 Jan 2020 17:13:13 +0100
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20010816-4275-0000-0000-00000395D739
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20010816-4276-0000-0000-000038A9C4E0
+Message-Id: <20200108161317.268928-1-imbrenda@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-08_04:2020-01-08,2020-01-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=1 malwarescore=0 mlxlogscore=806 bulkscore=0 impostorscore=0
+ clxscore=1015 phishscore=0 adultscore=0 mlxscore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001080133
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2020-01-08 at 14:38 +0100, David Hildenbrand wrote:
-> On 03.01.20 22:16, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > 
-> > Rather than walking over the same pages again and again to get to the pages
-> > that have yet to be reported we can save ourselves a significant amount of
-> > time by simply rotating the list so that when we have a full list of
-> > reported pages the head of the list is pointing to the next non-reported
-> > page. Doing this should save us some significant time when processing each
-> > free list.
-> > 
-> > This doesn't gain us much in the standard case as all of the non-reported
-> > pages should be near the top of the list already. However in the case of
-> > page shuffling this results in a noticeable improvement. Below are the
-> > will-it-scale page_fault1 w/ THP numbers for 16 tasks with and without
-> > this patch.
-> > 
-> > Without:
-> > tasks   processes       processes_idle  threads         threads_idle
-> > 16      8093776.25      0.17            5393242.00      38.20
-> > 
-> > With:
-> > tasks   processes       processes_idle  threads         threads_idle
-> > 16      8283274.75      0.17            5594261.00      38.15
-> > 
-> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > ---
-> >  mm/page_reporting.c |   30 ++++++++++++++++++++++--------
-> >  1 file changed, 22 insertions(+), 8 deletions(-)
-> 
-> Just a minor comment while scanning over the patches (will do more
-> review soon), you might want to switch to "mm/page_reporting: " styled
-> subjects for these optimizations.
-> 
+This patchset contains some minor cleanup, some preparatory work and
+then the SCLP unit test itself.
 
-Okay, I will update if needed for the next version.
+The unit test checks the following:
+    
+    * Correctly ignoring instruction bits that should be ignored
+    * Privileged instruction check
+    * Check for addressing exceptions
+    * Specification exceptions:
+      - SCCB size less than 8
+      - SCCB unaligned
+      - SCCB overlaps prefix or lowcore
+      - SCCB address higher than 2GB
+    * Return codes for
+      - Invalid command
+      - SCCB too short (but at least 8)
+      - SCCB page boundary violation
+
+v4 -> v5
+* updated usage of report()
+* added SPX and STPX wrappers to the library
+* improved readability
+* addressed some more comments
+v3 -> v4
+* export sclp_setup_int instead of copying it
+* add more comments
+* rename some more variables to improve readability
+* improve the prefix test
+* improved the invalid address test
+* addressed further comments received during review
+v2 -> v3
+* generally improved the naming of variables
+* added and fixed comments
+* renamed test_one_run to test_one_simple
+* added some const where needed
+* addresed many more small comments received during review
+v1 -> v2
+* fix many small issues that came up during the first round of reviews
+* add comments to each function
+* use a static buffer for the SCCP template when used
+
+Claudio Imbrenda (4):
+  s390x: export sclp_setup_int
+  s390x: sclp: add service call instruction wrapper
+  s390x: lib: add SPX and STPX instruction wrapper
+  s390x: SCLP unit test
+
+ s390x/Makefile           |   1 +
+ lib/s390x/asm/arch_def.h |  26 +++
+ lib/s390x/sclp.h         |   1 +
+ lib/s390x/sclp.c         |   9 +-
+ s390x/sclp.c             | 462 +++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   8 +
+ 6 files changed, 500 insertions(+), 7 deletions(-)
+ create mode 100644 s390x/sclp.c
+
+-- 
+2.24.1
 
