@@ -2,136 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B3FB1348E8
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 18:15:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B626134921
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 18:20:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729672AbgAHRPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 12:15:00 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33808 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726401AbgAHRO7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jan 2020 12:14:59 -0500
+        id S1729751AbgAHRUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 12:20:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55749 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728234AbgAHRUT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 12:20:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578503698;
+        s=mimecast20190719; t=1578504017;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vnM+x6Ssb1mcduODxbe5+uNany1GBwa/Hz6WtXlr7O4=;
-        b=YmeA2/Tm4ZHAohrrr7zr780N+A0oqIRDVUp0BVfSJZBh204y5x7NDfeSJS1eY0gpQzHbFc
-        fo8b2syCh226gpeoMaUdSym5nUmAz0LJZS9YvuAyESZCTETXb30/r2yD60aJYZ+7ltjFYB
-        ZqpX4oEBR3XW+6Pw+UVyAtSkSbYuKdA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-2ffBoDdmNgClB8cTyvdqZQ-1; Wed, 08 Jan 2020 12:14:57 -0500
-X-MC-Unique: 2ffBoDdmNgClB8cTyvdqZQ-1
-Received: by mail-wr1-f70.google.com with SMTP id u12so1685755wrt.15
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 09:14:57 -0800 (PST)
+        bh=Haib25FzW/d5cNo326IMvfMzkBnJAFdXTg38osZZ9z4=;
+        b=PFyV3NaCRLrMzKK1QvB24ZSYDlK998ilh+K5QgD9K2p6BlOy+MAeuUH9wYkW7t0sQPNvmi
+        JVtMwGZdb8YxLe+Zt/KNHcroxo/4U5pENM5FkeU3ZxV4VYaUf4CIjRkGCSxe05Jox1Tylg
+        QYkuGIKY8ukV1yLbo6yXHO28C/VbPTc=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-0bnYCv7yPhKeQU2sogfcRQ-1; Wed, 08 Jan 2020 12:20:14 -0500
+X-MC-Unique: 0bnYCv7yPhKeQU2sogfcRQ-1
+Received: by mail-qk1-f197.google.com with SMTP id 194so2346093qkh.18
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2020 09:20:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vnM+x6Ssb1mcduODxbe5+uNany1GBwa/Hz6WtXlr7O4=;
-        b=r4VC/VnNY0s0rTBapl/zlkExNiaTYCd08riOGzl1oS8wVsE94AY/IlUGkSmHkM2WuF
-         U0s7btEH7klZ9c/VXb62z/cq+Qi/NcfcrBpVw0axkWnOHRw0UOOwNywtlk/H5uIhLjZG
-         O17Xb5Lq7oikp2+TOZxK2BaLxd7/kjBBf1/QpQw52v8AgpeXTHLeP5SbpbwFmvoB5wOy
-         GxpWe/G9/xipoxqSLwvtp7HalYtBUkgLBqCjUpQvA8Kd7RlgzEjQMxe8fK/velOLpzZJ
-         +tNXjCFf9aU6/NEINQoXVnz0HPmRHvIEu1UWNTjuURv9N6LScRbBk6VzIwaX4qpkdraY
-         W2AA==
-X-Gm-Message-State: APjAAAX2cMz9AnFXPRBAXP02wb52O6+akPqR/Cx5fDimfKQdNitBEIpS
-        7vhdroLLb8YuAW/haXd1wa91TNd3F+GPsucrpGUMbwPY7jOcHIhdPgG6QMejGWzrLqTBZiZXacy
-        htf9XZNsZl3xX
-X-Received: by 2002:a1c:a9c6:: with SMTP id s189mr5225237wme.151.1578503696577;
-        Wed, 08 Jan 2020 09:14:56 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz6QfyCjkkc/cn5N9B3HuvF1UbjB6DCyXC1I49m1Q5gG7DdVR/OqIU5VsKS3NDGqXBnTP1SDQ==
-X-Received: by 2002:a1c:a9c6:: with SMTP id s189mr5225208wme.151.1578503696324;
-        Wed, 08 Jan 2020 09:14:56 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329? ([2001:b07:6468:f312:c6d:4079:b74c:e329])
-        by smtp.gmail.com with ESMTPSA id b21sm4680093wmd.37.2020.01.08.09.14.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jan 2020 09:14:55 -0800 (PST)
-Subject: Re: [PATCH RFC] sched/fair: Penalty the cfs task which executes
- mwait/hlt
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        KarimAllah <karahmed@amazon.de>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-References: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
- <20200108155040.GB2827@hirez.programming.kicks-ass.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <00d884a7-d463-74b4-82cf-9deb0aa70971@redhat.com>
-Date:   Wed, 8 Jan 2020 18:14:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Haib25FzW/d5cNo326IMvfMzkBnJAFdXTg38osZZ9z4=;
+        b=XVmS0aHmZHAPSXz1mbZ+4UQz4hIMwAnfgrHvIT8/Q6KSEFpV3KieRuM5xVoQIZkv8V
+         qDMNM2MaXx8E75IZBCKhkuG/Vo738CPIwRR58OPsoKYmO0ogbCUUN8qAqsV0Ueoo7hcD
+         ud9rW7nkN93u0HPsFsKbmVciHfUngMg9GzJ9b9DPF5YeMkoVIFCxwop+p4k2UZf0KDO/
+         FrieXq8XU3ZKauD/mpeHtvrC0ykEIJVo9ve4cT4eucqVZnw2Yed5oiRLKteWnpuO/QNv
+         72MR9xbefdy3DtKAnpklgIDzej2oPatJFGEXTh+XRZtAW9im71u4VAWf+MkdD4AKCyWm
+         z94w==
+X-Gm-Message-State: APjAAAUewXaXihxNIjZuDoUwp6I/PKru5aTcTD2yiH+XAlPR0dZCsQLN
+        ZphvL3ofwwIHEiG8n+MDckQPSMNx0DeD4s/L0XYJGQzeAvOVRW5Bl+wZ2JX/dpWjWVlUuctgOTQ
+        5Dj7VPClZw/vZ
+X-Received: by 2002:ac8:6697:: with SMTP id d23mr4610238qtp.350.1578504013992;
+        Wed, 08 Jan 2020 09:20:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx4HEQn28Jhy0IHzYEPaUM/06VEe3ETQAmn5BjZY/AF0r0Y9E6aOJomV65HT59SyU+zOwe5vw==
+X-Received: by 2002:ac8:6697:: with SMTP id d23mr4610215qtp.350.1578504013667;
+        Wed, 08 Jan 2020 09:20:13 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id b24sm1845763qtp.82.2020.01.08.09.20.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2020 09:20:12 -0800 (PST)
+Date:   Wed, 8 Jan 2020 12:20:11 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [RFC PATCH 16/28] kvm: mmu: Add direct MMU page fault handler
+Message-ID: <20200108172011.GB7096@xz-x1>
+References: <20190926231824.149014-1-bgardon@google.com>
+ <20190926231824.149014-17-bgardon@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20200108155040.GB2827@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20190926231824.149014-17-bgardon@google.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/01/20 16:50, Peter Zijlstra wrote:
-> On Wed, Jan 08, 2020 at 09:50:01AM +0800, Wanpeng Li wrote:
->> From: Wanpeng Li <wanpengli@tencent.com>
->>
->> To deliver all of the resources of a server to instances in cloud, there are no 
->> housekeeping cpus reserved. libvirtd, qemu main loop, kthreads, and other agent/tools 
->> etc which can't be offloaded to other hardware like smart nic, these stuff will 
->> contend with vCPUs even if MWAIT/HLT instructions executed in the guest.
+On Thu, Sep 26, 2019 at 04:18:12PM -0700, Ben Gardon wrote:
 
-^^ this is the problem statement:
+[...]
 
-He has VCPU threads which are being pinned 1:1 to physical CPUs.  He
-needs to have various housekeeping threads preempting those vCPU
-threads, but he'd rather preempt vCPU threads that are doing HLT/MWAIT
-than those that are keeping the CPU busy.
+> +static int handle_direct_page_fault(struct kvm_vcpu *vcpu,
+> +		unsigned long mmu_seq, int write, int map_writable, int level,
+> +		gpa_t gpa, gfn_t gfn, kvm_pfn_t pfn, bool prefault)
+> +{
+> +	struct direct_walk_iterator iter;
+> +	struct kvm_mmu_memory_cache *pf_pt_cache = &vcpu->arch.mmu_page_cache;
+> +	u64 *child_pt;
+> +	u64 new_pte;
+> +	int ret = RET_PF_RETRY;
+> +
+> +	direct_walk_iterator_setup_walk(&iter, vcpu->kvm,
+> +			kvm_arch_vcpu_memslots_id(vcpu), gpa >> PAGE_SHIFT,
+> +			(gpa >> PAGE_SHIFT) + 1, MMU_READ_LOCK);
+> +	while (direct_walk_iterator_next_pte(&iter)) {
+> +		if (iter.level == level) {
+> +			ret = direct_page_fault_handle_target_level(vcpu,
+> +					write, map_writable, &iter, pfn,
+> +					prefault);
+> +
+> +			break;
+> +		} else if (!is_present_direct_pte(iter.old_pte) ||
+> +			   is_large_pte(iter.old_pte)) {
+> +			/*
+> +			 * The leaf PTE for this fault must be mapped at a
+> +			 * lower level, so a non-leaf PTE must be inserted into
+> +			 * the paging structure. If the assignment below
+> +			 * succeeds, it will add the non-leaf PTE and a new
+> +			 * page of page table memory. Then the iterator can
+> +			 * traverse into that new page. If the atomic compare/
+> +			 * exchange fails, the iterator will repeat the current
+> +			 * PTE, so the only thing this function must do
+> +			 * differently is return the page table memory to the
+> +			 * vCPU's fault cache.
+> +			 */
+> +			child_pt = mmu_memory_cache_alloc(pf_pt_cache);
+> +			new_pte = generate_nonleaf_pte(child_pt, false);
+> +
+> +			if (!direct_walk_iterator_set_pte(&iter, new_pte))
+> +				mmu_memory_cache_return(pf_pt_cache, child_pt);
+> +		}
+> +	}
 
->> The is no trap and yield the pCPU after we expose mwait/hlt to the guest [1][2],
->> the top command on host still observe 100% cpu utilization since qemu process is 
->> running even though guest who has the power management capability executes mwait. 
->> Actually we can observe the physical cpu has already enter deeper cstate by 
->> powertop on host.
->>
->> For virtualization, there is a HLT activity state in CPU VMCS field which indicates 
->> the logical processor is inactive because it executed the HLT instruction, but 
->> SDM 24.4.2 mentioned that execution of the MWAIT instruction may put a logical 
->> processor into an inactive state, however, this VMCS field never reflects this 
->> state.
-> 
-> So far I think I can follow, however it does not explain who consumes
-> this VMCS state if it is set and how that helps. Also, this:
+I have a question on how this will guarantee safe concurrency...
 
-I think what Wanpeng was saying is: "KVM could gather this information
-using the activity state field in the VMCS.  However, when the guest
-does MWAIT the processor can go into an inactive state without updating
-the VMCS."  Hence looking at the APERFMPERF ratio.
+As you mentioned previously somewhere, the design somehow mimics how
+the core mm works with process page tables, and IIUC here the rwlock
+works really like the mmap_sem that we have for the process mm.  So
+with the series now we can have multiple page fault happening with
+read lock held of the mmu_lock to reach here.
 
->> This patch avoids fine granularity intercept and reschedule vCPU if MWAIT/HLT
->> instructions executed, because it can worse the message-passing workloads which 
->> will switch between idle and running frequently in the guest. Lets penalty the 
->> vCPU which is long idle through tick-based sampling and preemption.
-> 
-> is just complete gibberish. And I have no idea what problem you're
-> trying to solve how.
+Then I'm imagining a case where both vcpu threads faulted on the same
+address range while when they wanted to do different things, like: (1)
+vcpu1 thread wanted to map this as a 2M huge page, while (2) vcpu2
+thread wanted to map this as a 4K page.  Then is it possible that
+vcpu2 is faster so it firstly setup the pmd as a page table page (via
+direct_walk_iterator_set_pte above), then vcpu1 quickly overwrite it
+as a huge page (via direct_page_fault_handle_target_level, level=2),
+then I feel like the previous page table page that setup by vcpu2 can
+be lost unnoticed.
 
-This is just explaining why MWAIT and HLT is not being trapped in his
-setup.  (Because vmexit on HLT or MWAIT is awfully expensive).
+I think general process page table does not have this issue is because
+it has per pmd lock so anyone who changes the pmd or beneath it will
+need to take that.  However here we don't have it, instead we only
+depend on the atomic ops, which seems to be not enough for this?
 
-> Also, I don't think the TSC/MPERF ratio is architected, we can't assume
-> this is true for everything that has APERFMPERF.
+Thanks,
 
-Right, you have to look at APERF/MPERF, not TSC/MPERF.  My scheduler-fu
-is zero so I can't really help with a nicer solution.
+> +	direct_walk_iterator_end_traversal(&iter);
+> +
+> +	/* If emulating, flush this vcpu's TLB. */
+> +	if (ret == RET_PF_EMULATE)
+> +		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> +
+> +	return ret;
+> +}
 
-Paolo
+-- 
+Peter Xu
 
