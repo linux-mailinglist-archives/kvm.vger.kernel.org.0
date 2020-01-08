@@ -2,297 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C5FC134F65
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 23:29:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F829134F8D
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 23:44:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727518AbgAHW3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 17:29:45 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48831 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726390AbgAHW3o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jan 2020 17:29:44 -0500
+        id S1727589AbgAHWoj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 17:44:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44713 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726548AbgAHWoj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 17:44:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578522584;
+        s=mimecast20190719; t=1578523476;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eeoF1sYvyY8I9ti0kR+cfmLLTVxMhMv4ZrFm5YTgMQk=;
-        b=ZaGMBHgBDwDuymtLhAo2wdSUI+PQkYBePbgt4YXZSgTK9lyLQ7kC3LkxsCOYqNbA93Db2i
-        UFDT0MYo3hPFC8k2yt2rhGvSokiMqAJ8vOlmWKbXxDHurVzHvSJ/HeeUy/GQ6VTUQLs1bI
-        Sl9y/QAdFX2u2bWKFI5g5hYfSed3yb4=
+        bh=2Ce7iZ/TvYsErucJW9xUbmo6R4UGv0zMfYGiP22GnZw=;
+        b=HWSGJDPoP12JdLwhPZngsHGxn3+lhKc7H6zNKUs4SxS8csl4i4Aa7RU7aGmQNjHL8+VFFg
+        HwbMC+YsYzBmhZDeIfTE3LbH4Q9lelFVjk4FJJw8wDVnunBzav8ieN62kdAQg1pRg+Z8ww
+        L9x7HhXi/+jIkBwPnzWNUlzhBuynG+c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-ecyQMbROMwKXvNAabViK7g-1; Wed, 08 Jan 2020 17:29:40 -0500
-X-MC-Unique: ecyQMbROMwKXvNAabViK7g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-260-m9eHdCQpO628d-yNeO_pKw-1; Wed, 08 Jan 2020 17:44:33 -0500
+X-MC-Unique: m9eHdCQpO628d-yNeO_pKw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD7EEDBA3;
-        Wed,  8 Jan 2020 22:29:37 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 923821005502;
+        Wed,  8 Jan 2020 22:44:30 +0000 (UTC)
 Received: from w520.home (ovpn-118-62.phx2.redhat.com [10.3.118.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E55A7BA39;
-        Wed,  8 Jan 2020 22:29:35 +0000 (UTC)
-Date:   Wed, 8 Jan 2020 15:29:34 -0700
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C87E19C58;
+        Wed,  8 Jan 2020 22:44:28 +0000 (UTC)
+Date:   Wed, 8 Jan 2020 15:44:28 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, <cjia@nvidia.com>,
+        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
         <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
+        <jonathan.davies@nutanix.com>, <eauger@redhat.com>,
+        <aik@ozlabs.ru>, <pasic@linux.ibm.com>, <felipe@nutanix.com>,
+        <Zhengxiao.zx@alibaba-inc.com>, <shuangtai.tst@alibaba-inc.com>,
+        <Ken.Xue@amd.com>, <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
         <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v11 Kernel 3/6] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20200108152934.68cd0e85@w520.home>
-In-Reply-To: <d2faa3fe-d656-5ba7-475a-9646298e3d50@nvidia.com>
-References: <1576602651-15430-1-git-send-email-kwankhede@nvidia.com>
-        <1576602651-15430-4-git-send-email-kwankhede@nvidia.com>
-        <20191217151203.342b686a@x1.home>
-        <ebd08133-e258-9f5e-5c8f-f88d7165cd7a@nvidia.com>
-        <20200107150223.0dab0a85@w520.home>
-        <d2faa3fe-d656-5ba7-475a-9646298e3d50@nvidia.com>
+Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+Message-ID: <20200108154428.02bb312d@w520.home>
+In-Reply-To: <46ac2d9e-4f4e-27d5-2a96-932c444e3461@nvidia.com>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+        <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
+        <20191216154406.023f912b@x1.home>
+        <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
+        <20191217114357.6496f748@x1.home>
+        <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
+        <20191219102706.0a316707@x1.home>
+        <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
+        <20191219140929.09fa24da@x1.home>
+        <20200102182537.GK2927@work-vm>
+        <20200106161851.07871e28@w520.home>
+        <ce132929-64a7-9a5b-81ff-38616202b757@nvidia.com>
+        <20200107100923.2f7b5597@w520.home>
+        <08b7f953-6ac5-cd79-b1ff-54338da32d1e@nvidia.com>
+        <20200107115602.25156c41@w520.home>
+        <20200108155955.78e908c1.cohuck@redhat.com>
+        <20200108113134.05c08470@w520.home>
+        <46ac2d9e-4f4e-27d5-2a96-932c444e3461@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 9 Jan 2020 01:31:16 +0530
+On Thu, 9 Jan 2020 02:11:11 +0530
 Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> On 1/8/2020 3:32 AM, Alex Williamson wrote:
-> > On Wed, 8 Jan 2020 01:37:03 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> On 1/9/2020 12:01 AM, Alex Williamson wrote:
+> > On Wed, 8 Jan 2020 15:59:55 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
 > >   
-> 
-> <snip>
-> 
-> >>>> +
-> >>>> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
-> >>>>    
-> >>>>    	if (do_accounting)
-> >>>>    		vfio_lock_acct(dma, -unlocked, true);
-> >>>> @@ -571,8 +606,12 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> >>>>    
-> >>>>    		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
-> >>>>    		if (vpfn) {
-> >>>> -			phys_pfn[i] = vpfn->pfn;
-> >>>> -			continue;
-> >>>> +			if (vpfn->unpinned)
-> >>>> +				vfio_remove_from_pfn_list(dma, vpfn);  
-> >>>
-> >>> This seems inefficient, we have an allocated vpfn at the right places
-> >>> in the list, wouldn't it be better to repin the page?
-> >>>      
-> >>
-> >> vfio_pin_page_external() takes care of pinning and accounting as well.  
-> > 
-> > Yes, but could we call vfio_pin_page_external() without {unlinking,
-> > freeing} and {re-allocating, linking} on either side of it since it's
-> > already in the list?  That's the inefficient part.  Maybe at least a
-> > TODO comment?
-> >   
-> 
-> Changing it as below:
-> 
->                  vpfn = vfio_iova_get_vfio_pfn(dma, iova);
->                  if (vpfn) {
-> -                       phys_pfn[i] = vpfn->pfn;
-> -                       continue;
-> +                       if (vpfn->ref_count > 1) {
-> +                               phys_pfn[i] = vpfn->pfn;
-> +                               continue;
-> +                       }
->                  }
-> 
->                  remote_vaddr = dma->vaddr + iova - dma->iova;
->                  ret = vfio_pin_page_external(dma, remote_vaddr, 
-> &phys_pfn[i],
->                                               do_accounting);
->                  if (ret)
->                          goto pin_unwind;
-> -
-> -               ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-> -               if (ret) {
-> -                       vfio_unpin_page_external(dma, iova, do_accounting);
-> -                       goto pin_unwind;
-> -               }
-> +               if (!vpfn) {
-> +                       ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-> +                       if (ret) {
-> +                               vfio_unpin_page_external(dma, iova,
-> +                                                        do_accounting, 
-> false);
-> +                               goto pin_unwind;
-> +                       }
-> +               } else
-> +                       vpfn->pfn = phys_pfn[i];
->          }
-> 
-> 
-> 
-> 
-> >>>> +			else {
-> >>>> +				phys_pfn[i] = vpfn->pfn;
-> >>>> +				continue;
-> >>>> +			}
-> >>>>    		}
-> >>>>    
-> >>>>    		remote_vaddr = dma->vaddr + iova - dma->iova;
-> >>>> @@ -583,7 +622,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> >>>>    
-> >>>>    		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-> >>>>    		if (ret) {
-> >>>> -			vfio_unpin_page_external(dma, iova, do_accounting);
-> >>>> +			vfio_unpin_page_external(dma, iova, do_accounting,
-> >>>> +						 false);
-> >>>>    			goto pin_unwind;
-> >>>>    		}
-> >>>>    	}  
-> 
-> <snip>
-> 
+> >> On Tue, 7 Jan 2020 11:56:02 -0700
+> >> Alex Williamson <alex.williamson@redhat.com> wrote:
 > >>  
-> >>>> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> >>>> +			iommu->dirty_page_tracking = true;
-> >>>> +			return 0;
-> >>>> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> >>>> +			iommu->dirty_page_tracking = false;
-> >>>> +
-> >>>> +			mutex_lock(&iommu->lock);
-> >>>> +			vfio_remove_unpinned_from_dma_list(iommu);
-> >>>> +			mutex_unlock(&iommu->lock);
-> >>>> +			return 0;
-> >>>> +
-> >>>> +		} else if (range.flags &
-> >>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> >>>> +			uint64_t iommu_pgmask;
-> >>>> +			unsigned long pgshift = __ffs(range.pgsize);
-> >>>> +			unsigned long *bitmap;
-> >>>> +			long bsize;
-> >>>> +
-> >>>> +			iommu_pgmask =
-> >>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
-> >>>> +
-> >>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
-> >>>> +			    (range.pgsize - 1))
-> >>>> +				return -EINVAL;
-> >>>> +
-> >>>> +			if (range.iova & iommu_pgmask)
-> >>>> +				return -EINVAL;
-> >>>> +			if (!range.size || range.size > SIZE_MAX)
-> >>>> +				return -EINVAL;
-> >>>> +			if (range.iova + range.size < range.iova)
-> >>>> +				return -EINVAL;
-> >>>> +
-> >>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
-> >>>> +						   range.bitmap_size);
-> >>>> +			if (bsize < 0)
-> >>>> +				return ret;
-> >>>> +
-> >>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);  
+> >>> On Tue, 7 Jan 2020 23:23:17 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:  
+> >>  
+> >>>> There are 3 invalid states:
+> >>>>    *  101b => Invalid state
+> >>>>    *  110b => Invalid state
+> >>>>    *  111b => Invalid state
+> >>>>
+> >>>> why only 110b should be used to report error from vendor driver to
+> >>>> report error? Aren't we adding more confusions in the interface?  
 > >>>
-> >>> I think I remember mentioning previously that we cannot allocate an
-> >>> arbitrary buffer on behalf of the user, it's far too easy for them to
-> >>> kill the kernel that way.  kmalloc is also limited in what it can
-> >>> alloc.  
+> >>> I think the only chance of confusion is poor documentation.  If we
+> >>> define all of the above as invalid and then say any invalid state
+> >>> indicates an error condition, then the burden is on the user to
+> >>> enumerate all the invalid states.  That's not a good idea.  Instead we
+> >>> could say 101b (_RESUMING|_RUNNING) is reserved, it's not currently
+> >>> used but it might be useful some day.  Therefore there are no valid
+> >>> transitions into or out of this state.  A vendor driver should fail a
+> >>> write(2) attempting to enter this state.
+> >>>
+> >>> That leaves 11Xb, where we consider _RESUMING and _SAVING as mutually
+> >>> exclusive, so neither are likely to ever be valid states.  Logically,
+> >>> if the device is in a failed state such that it needs to be reset to be
+> >>> recovered, I would hope the device is not running, so !_RUNNING (110b)
+> >>> seems appropriate.  I'm not sure we need that level of detail yet
+> >>> though, so I was actually just assuming both 11Xb states would indicate
+> >>> an error state and the undefined _RUNNING bit might differentiate
+> >>> something in the future.
+> >>>
+> >>> Therefore, I think we'd have:
+> >>>
+> >>>   * 101b => Reserved
+> >>>   * 11Xb => Error
+> >>>
+> >>> Where the device can only self transition into the Error state on a
+> >>> failed device_state transition and the only exit from the Error state
+> >>> is via the reset ioctl.  The Reserved state is unreachable.  The vendor
+> >>> driver must error on device_state writes to enter or exit the Error
+> >>> state and must error on writes to enter Reserved states.  Is that still
+> >>> confusing?  
 > >>
-> >> That's the reason added verify_bitmap_size(), so that size is verified  
-> > 
-> > That's only a consistency test, it only verifies that the user claims
-> > to provide a bitmap sized sufficiently for the range they're trying to
-> > request.  range.size is limited to SIZE_MAX, so 2^64, divided by page
-> > size for 2^52 bits, 8bits per byte for 2^49 bytes of bitmap that we'd
-> > try to kmalloc (512TB).  kmalloc is good for a couple MB AIUI.
-> > Meanwhile the user doesn't actually need to allocate that bitmap in
-> > order to crash the kernel.
-> >   
-> >>> Can't we use the user buffer directly or only work on a part of
-> >>> it at a time?
-> >>>      
+> >> I think one thing we could do is start to tie the meaning more to the
+> >> actual state (bit combination) and less to the individual bits. I.e.
 > >>
-> >> without copy_from_user(), how?  
+> >> - bit 0 indicates 'running',
+> >> - bit 1 indicates 'saving',
+> >> - bit 2 indicates 'resuming',
+> >> - bits 3-31 are reserved. [Aside: reserved-and-ignored or
+> >>    reserved-and-must-be-zero?]  
 > > 
-> > For starters, what's the benefit of copying the bitmap from the user
-> > in the first place?  We presume the data is zero'd and if it's not,
-> > that's the user's bug to sort out (we just need to define the API to
-> > specify that).  Therefore the copy_from_user() is unnecessary anyway and
-> > we really just need to copy_to_user() for any places we're setting
-> > bits.  We could just walk through the range with an unsigned long
-> > bitmap buffer, writing it out to userspace any time we reach the end
-> > with bits set, zeroing it and shifting it as a window to the user
-> > buffer.  We could improve batching by allocating a larger buffer in the
-> > kernel, with a kernel defined maximum size and performing the same
-> > windowing scheme.
+> > This version specified them as:
+> > 
+> > 	Bits 3 - 31 are reserved for future use. User should perform
+> > 	read-modify-write operation on this field.
+> > 
+> > The intention is that the user should not make any assumptions about
+> > the state of the reserved bits, but should preserve them when changing
+> > known bits.  Therefore I think it's ignored but preserved.  If we
+> > specify them as zero, then I think we lose any chance to define them
+> > later.
+> >   
+> >> [Note that I don't specify what happens when a bit is set or unset.]
+> >>
+> >> States are then defined as:
+> >> 000b => stopped state (not saving or resuming)
+> >> 001b => running state (not saving or resuming)
+> >> 010b => stop-and-copy state
+> >> 011b => pre-copy state
+> >> 100b => resuming state
+> >>
+> >> [Transitions between these states defined, as before.]
+> >>
+> >> 101b => reserved [for post-copy; no transitions defined]
+> >> 111b => reserved [state does not make sense; no transitions defined]
+> >> 110b => error state [state does not make sense per se, but it does not
+> >>          indicate running; transitions into this state *are* possible]
+> >>
+> >> To a 'reserved' state, we can later assign a different meaning (we
+> >> could even re-use 111b for a different error state, if needed); while
+> >> the error state must always stay the error state.
+> >>
+> >> We should probably use some kind of feature indication to signify
+> >> whether a 'reserved' state actually has a meaning. Also, maybe we also
+> >> should designate the states > 111b as 'reserved'.
+> >>
+> >> Does that make sense?  
+> > 
+> > It seems you have an opinion to restrict this particular error state to
+> > 110b rather than 11Xb, reserving 111b for some future error condition.
+> > That's fine and I think we agree that using the state with _RUNNING set
+> > to zero is more logical as we expect the device to be non-operational
+> > in this state.
+> > 
+> > I'm also thinking more of these as states, but at the same time we're
+> > not doing away with the bit definitions.  I think the states are much
+> > easier to decode and use if we think about the function of each bit,
+> > which leads to the logical incongruity that the 11Xb states are
+> > impossible and therefore must be error states.
 > >   
 > 
-> Ok removing copy_from_user().
-> But AFAIK, calling copy_to_user() multiple times is not efficient in 
-> terms of performance.
+> I agree on bit definition is better.
+> 
+> Ok. Should there be a defined value for error, which can be used by 
+> vendor driver for error state?
+> 
+> #define VFIO_DEVICE_STATE_ERROR			\
+> 		(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING)
 
-Right, but even with a modestly sized internal buffer for batching we
-can cover quite a large address space.  128MB for a 4KB buffer, 32GB
-with 1MB buffer.  __put_user() is more lightweight than copy_to_user(),
-I wonder where the inflection point is in batching the latter versus
-more iterations of the former.
-
-> Checked code in virt/kvm/kvm_main.c: __kvm_set_memory_region() where 
-> dirty_bitmap is allocated, that has generic checks, user space address 
-> check, memory overflow check and KVM_MEM_MAX_NR_PAGES as below. I'll add 
-> access_ok check. I already added overflow check.
-> 
->          /* General sanity checks */
->          if (mem->memory_size & (PAGE_SIZE - 1))
->                  goto out;
-> 
->         !access_ok((void __user *)(unsigned long)mem->userspace_addr,
->                          mem->memory_size)))
-> 
->          if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
->                  goto out;
-> 
->          if (npages > KVM_MEM_MAX_NR_PAGES)
->                  goto out;
-> 
-> 
-> Where KVM_MEM_MAX_NR_PAGES is:
-> 
-> /*
->   * Some of the bitops functions do not support too long bitmaps.
->   * This number must be determined not to exceed such limits.
->   */
-> #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
-> 
-> But we can't use KVM specific KVM_MEM_MAX_NR_PAGES check in vfio module.
-> Should we define similar limit in vfio module instead of SIZE_MAX?
-
-If we have ranges that are up to 2^31 pages, that's still 2^28 bytes.
-Does it seem reasonable to have a kernel interface that potentially
-allocates 256MB of kernel space with kmalloc accessible to users?  That
-still seems like a DoS attack vector to me, especially since the user
-doesn't need to be able to map that much memory (8TB) to access it.
-
-I notice that KVM allocate the bitmap (kvzalloc) relative to the actual
-size of the memory slot when dirty logging is enabled, maybe that's the
-right approach rather than walking vpfn lists and maintaining unpinned
-vpfns for the purposes of tracking.  For example, when dirty logging is
-enabled, walk all vfio_dmas and allocate a dirty bitmap anywhere the
-vpfn list is not empty and walk the vpfn list to set dirty bits in the
-bitmap.  When new pages are pinned, allocate a bitmap if not already
-present and set the dirty bit.  When unpinned, update the vpfn list but
-leave the dirty bit set.  When the dirty bitmap is read, copy out the
-current bitmap to the user, memset it to zero, then re-walk the vpfn
-list to set currently dirty pages.  A vfio_dma without a dirty bitmap
-would consider the entire range dirty.  At least that way the overhead
-of the bitmap is just that, overhead rather than a future exploit.
-Does this seem like a better approach?  Thanks,
+Seems like a good idea for consistency.  Thanks,
 
 Alex
 
