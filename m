@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C0BB134D78
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 21:28:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7263134D67
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 21:27:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727546AbgAHU1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jan 2020 15:27:51 -0500
-Received: from mga06.intel.com ([134.134.136.31]:45241 "EHLO mga06.intel.com"
+        id S1727357AbgAHU1L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 15:27:11 -0500
+Received: from mga06.intel.com ([134.134.136.31]:45246 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727261AbgAHU1H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 15:27:07 -0500
+        id S1727310AbgAHU1I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 15:27:08 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 12:27:06 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; 
-   d="scan'208";a="211658374"
+   d="scan'208";a="211658377"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:06 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -48,9 +48,9 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Dave Jiang <dave.jiang@intel.com>,
         Liran Alon <liran.alon@oracle.com>,
         linux-nvdimm <linux-nvdimm@lists.01.org>
-Subject: [PATCH 06/14] KVM: x86/mmu: Refactor THP adjust to prep for changing query
-Date:   Wed,  8 Jan 2020 12:24:40 -0800
-Message-Id: <20200108202448.9669-7-sean.j.christopherson@intel.com>
+Subject: [PATCH 07/14] KVM: x86/mmu: Walk host page tables to find THP mappings
+Date:   Wed,  8 Jan 2020 12:24:41 -0800
+Message-Id: <20200108202448.9669-8-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
@@ -61,101 +61,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Refactor transparent_hugepage_adjust() in preparation for walking the
-host page tables to identify hugepage mappings, initially for THP pages,
-and eventualy for HugeTLB and DAX-backed pages as well.  The latter
-cases support 1gb pages, i.e. the adjustment logic needs access to the
-max allowed level.
+Explicitly walk the host page tables to identify THP mappings instead
+of relying solely on the metadata in struct page.  This sets the stage
+for using a common method of identifying huge mappings regardless of the
+underlying implementation (HugeTLB vs THB vs DAX), and hopefully avoids
+the pitfalls of relying on metadata to identify THP mappings, e.g. see
+commit 169226f7e0d2 ("mm: thp: handle page cache THP correctly in
+PageTransCompoundMap") and the need for KVM to explicitly check for a
+THP compound page.  KVM will also naturally work with 1gb THP pages, if
+they are ever supported.
 
+Walking the tables for THP mappings is likely marginally slower than
+querying metadata, but a future patch will reuse the walk to identify
+HugeTLB mappings, at which point eliminating the existing VMA lookup for
+HugeTLB will make this a net positive.
+
+Cc: Andrea Arcangeli <aarcange@redhat.com>
+Cc: Barret Rhoden <brho@google.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 44 +++++++++++++++++-----------------
- arch/x86/kvm/mmu/paging_tmpl.h |  3 +--
- 2 files changed, 23 insertions(+), 24 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 40 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8ca6cd04cdf1..30836899be73 100644
+index 30836899be73..4bd7f745b56d 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3329,33 +3329,34 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+@@ -3329,6 +3329,41 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
  	__direct_pte_prefetch(vcpu, sp, sptep);
  }
  
--static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu,
--					gfn_t gfn, kvm_pfn_t *pfnp,
-+static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
-+					int max_level, kvm_pfn_t *pfnp,
++static int host_pfn_mapping_level(struct kvm_vcpu *vcpu, gfn_t gfn,
++				  kvm_pfn_t pfn)
++{
++	struct kvm_memory_slot *slot;
++	unsigned long hva;
++	pte_t *pte;
++	int level;
++
++	BUILD_BUG_ON(PT_PAGE_TABLE_LEVEL != (int)PG_LEVEL_4K ||
++		     PT_DIRECTORY_LEVEL != (int)PG_LEVEL_2M ||
++		     PT_PDPE_LEVEL != (int)PG_LEVEL_1G);
++
++	if (!PageCompound(pfn_to_page(pfn)))
++		return PT_PAGE_TABLE_LEVEL;
++
++	/*
++	 * Manually do the equivalent of kvm_vcpu_gfn_to_hva() to avoid the
++	 * "writable" check in __gfn_to_hva_many(), which will always fail on
++	 * read-only memslots due to gfn_to_hva() assuming writes.  Earlier
++	 * page fault steps have already verified the guest isn't writing a
++	 * read-only memslot.
++	 */
++	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
++	if (!memslot_valid_for_gpte(slot, true))
++		return PT_PAGE_TABLE_LEVEL;
++
++	hva = __gfn_to_hva_memslot(slot, gfn);
++
++	pte = lookup_address_in_mm(vcpu->kvm->mm, hva, &level);
++	if (unlikely(!pte))
++		return PT_PAGE_TABLE_LEVEL;
++
++	return level;
++}
++
+ static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 					int max_level, kvm_pfn_t *pfnp,
  					int *levelp)
- {
- 	kvm_pfn_t pfn = *pfnp;
- 	int level = *levelp;
-+	kvm_pfn_t mask;
-+
-+	if (max_level == PT_PAGE_TABLE_LEVEL || level > PT_PAGE_TABLE_LEVEL)
-+		return;
-+
-+	if (is_error_noslot_pfn(pfn) || kvm_is_reserved_pfn(pfn) ||
-+	    kvm_is_zone_device_pfn(pfn))
-+		return;
-+
-+	if (!kvm_is_transparent_hugepage(pfn))
-+		return;
-+
-+	level = PT_DIRECTORY_LEVEL;
+@@ -3344,10 +3379,11 @@ static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 	    kvm_is_zone_device_pfn(pfn))
+ 		return;
+ 
+-	if (!kvm_is_transparent_hugepage(pfn))
++	level = host_pfn_mapping_level(vcpu, gfn, pfn);
++	if (level == PT_PAGE_TABLE_LEVEL)
+ 		return;
+ 
+-	level = PT_DIRECTORY_LEVEL;
++	level = min(level, max_level);
  
  	/*
--	 * Check if it's a transparent hugepage. If this would be an
--	 * hugetlbfs page, level wouldn't be set to
--	 * PT_PAGE_TABLE_LEVEL and there would be no adjustment done
--	 * here.
-+	 * mmu_notifier_retry() was successful and mmu_lock is held, so
-+	 * the pmd can't be split from under us.
- 	 */
--	if (!is_error_noslot_pfn(pfn) && !kvm_is_reserved_pfn(pfn) &&
--	    !kvm_is_zone_device_pfn(pfn) && level == PT_PAGE_TABLE_LEVEL &&
--	    kvm_is_transparent_hugepage(pfn)) {
--		unsigned long mask;
--
--		/*
--		 * mmu_notifier_retry() was successful and mmu_lock is held, so
--		 * the pmd can't be split from under us.
--		 */
--		*levelp = level = PT_DIRECTORY_LEVEL;
--		mask = KVM_PAGES_PER_HPAGE(level) - 1;
--		VM_BUG_ON((gfn & mask) != (pfn & mask));
--		*pfnp = pfn & ~mask;
--	}
-+	*levelp = level;
-+	mask = KVM_PAGES_PER_HPAGE(level) - 1;
-+	VM_BUG_ON((gfn & mask) != (pfn & mask));
-+	*pfnp = pfn & ~mask;
- }
- 
- static void disallowed_hugepage_adjust(struct kvm_shadow_walk_iterator it,
-@@ -3395,8 +3396,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, int write,
- 	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa)))
- 		return RET_PF_RETRY;
- 
--	if (likely(max_level > PT_PAGE_TABLE_LEVEL))
--		transparent_hugepage_adjust(vcpu, gfn, &pfn, &level);
-+	transparent_hugepage_adjust(vcpu, gfn, max_level, &pfn, &level);
- 
- 	trace_kvm_mmu_spte_requested(gpa, level, pfn);
- 	for_each_shadow_entry(vcpu, gpa, it) {
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index b53bed3c901c..0029f7870865 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -673,8 +673,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
- 	gfn = gw->gfn | ((addr & PT_LVL_OFFSET_MASK(gw->level)) >> PAGE_SHIFT);
- 	base_gfn = gfn;
- 
--	if (max_level > PT_PAGE_TABLE_LEVEL)
--		transparent_hugepage_adjust(vcpu, gw->gfn, &pfn, &hlevel);
-+	transparent_hugepage_adjust(vcpu, gw->gfn, max_level, &pfn, &hlevel);
- 
- 	trace_kvm_mmu_spte_requested(addr, gw->level, pfn);
- 
+ 	 * mmu_notifier_retry() was successful and mmu_lock is held, so
 -- 
 2.24.1
 
