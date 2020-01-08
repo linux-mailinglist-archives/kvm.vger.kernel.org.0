@@ -2,178 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 99C9A133F4A
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 11:29:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BA5A134017
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2020 12:17:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727764AbgAHK3u convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 8 Jan 2020 05:29:50 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50536 "EHLO mx2.suse.de"
+        id S1727395AbgAHLRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jan 2020 06:17:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54494 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726252AbgAHK3u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jan 2020 05:29:50 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 13CB7AAC2;
-        Wed,  8 Jan 2020 10:29:48 +0000 (UTC)
-From:   Nicolai Stange <nstange@suse.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Chen Wandun <chenwandun@huawei.com>, rkrcmar@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Nicolai Stange <nstange@suse.de>
-Subject: Re: [PATCH next] KVM: Fix debugfs_simple_attr.cocci warnings
-References: <1577151674-67949-1-git-send-email-chenwandun@huawei.com>
-        <4f193d99-ee9b-5217-c2f6-3a8a96bf1534@redhat.com>
-Date:   Wed, 08 Jan 2020 11:29:46 +0100
-In-Reply-To: <4f193d99-ee9b-5217-c2f6-3a8a96bf1534@redhat.com> (Paolo
-        Bonzini's message of "Tue, 7 Jan 2020 15:01:54 +0100")
-Message-ID: <87h816nsv9.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
+        id S1726856AbgAHLRT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jan 2020 06:17:19 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A98C520673;
+        Wed,  8 Jan 2020 11:17:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1578482238;
+        bh=BOw+oxULUxi4SWAMJyt3dVvRgIUU2l4r0rjJa2+K9No=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=hQwb5ISuoPH21WTJGlGGLWwDnR2n82LROt+g1wPcEIh2MQFLHHCWO7/dB4/oekUQE
+         FsU91xjNAWVwjTIVCRYH/4aFnnEjLhUtWsU6wmQPdOnfZOrAqbQR3IHIKCN2ipbyJH
+         wMIOLhicp0mRnS6E5gFHDa5Es3C1BAz/pd2U8Jvk=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1ip9Ku-0007XE-No; Wed, 08 Jan 2020 11:17:16 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 08 Jan 2020 11:17:16 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Murray <andrew.murray@arm.com>
+Cc:     Catalin Marinas <Catalin.Marinas@arm.com>,
+        Mark Rutland <Mark.Rutland@arm.com>, will@kernel.org,
+        Sudeep Holla <Sudeep.Holla@arm.com>, kvm@vger.kernel.org,
+        kvmarm <kvmarm@lists.cs.columbia.edu>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore full
+ SPE profiling buffer controls
+In-Reply-To: <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
+References: <20191220143025.33853-1-andrew.murray@arm.com>
+ <20191220143025.33853-10-andrew.murray@arm.com>
+ <20191221141325.5a177343@why>
+ <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
+Message-ID: <fc222fef381f4ada37966db0a1ec314a@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.8
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: andrew.murray@arm.com, Catalin.Marinas@arm.com, Mark.Rutland@arm.com, will@kernel.org, Sudeep.Holla@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 24/12/19 02:41, Chen Wandun wrote:
->> Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
->> for debugfs files.
+On 2020-01-07 15:13, Andrew Murray wrote:
+> On Sat, Dec 21, 2019 at 02:13:25PM +0000, Marc Zyngier wrote:
+>> On Fri, 20 Dec 2019 14:30:16 +0000
+>> Andrew Murray <andrew.murray@arm.com> wrote:
 >> 
->> Semantic patch information:
->> Rationale: DEFINE_SIMPLE_ATTRIBUTE + debugfs_create_file()
->> imposes some significant overhead as compared to
->> DEFINE_DEBUGFS_ATTRIBUTE + debugfs_create_file_unsafe().
+>> [somehow managed not to do a reply all, re-sending]
 >> 
->> Signed-off-by: Chen Wandun <chenwandun@huawei.com>
->
-> This patch was sent probably already two or three times, and every time
-> I've not been able to understand what is this significant overhead.
+>> > From: Sudeep Holla <sudeep.holla@arm.com>
+>> >
+>> > Now that we can save/restore the full SPE controls, we can enable it
+>> > if SPE is setup and ready to use in KVM. It's supported in KVM only if
+>> > all the CPUs in the system supports SPE.
+>> >
+>> > However to support heterogenous systems, we need to move the check if
+>> > host supports SPE and do a partial save/restore.
+>> 
+>> No. Let's just not go down that path. For now, KVM on heterogeneous
+>> systems do not get SPE.
+> 
+> At present these patches only offer the SPE feature to VCPU's where the
+> sanitised AA64DFR0 register indicates that all CPUs have this support
+> (kvm_arm_support_spe_v1) at the time of setting the attribute
+> (KVM_SET_DEVICE_ATTR).
+> 
+> Therefore if a new CPU comes online without SPE support, and an
+> existing VCPU is scheduled onto it, then bad things happen - which I 
+> guess
+> must have been the intention behind this patch.
 
-As you correctly stated below, the overhead is one
-kmalloc(sizeof(struct file_operations)) per opened debugfs file
-(i.e. one per debugfs struct file instance). struct file_operations is
-equivalent to 33 unsigned longs, so it might not be seen as that
-"significant", but it isn't small either.
+I guess that was the intent.
 
+>> If SPE has been enabled on a guest and a CPU
+>> comes up without SPE, this CPU should fail to boot (same as exposing a
+>> feature to userspace).
+> 
+> I'm unclear as how to prevent this. We can set the FTR_STRICT flag on
+> the sanitised register - thus tainting the kernel if such a non-SPE CPU
+> comes online - thought that doesn't prevent KVM from blowing up. Though
+> I don't believe we can prevent a CPU coming up. At the moment this is
+> my preferred approach.
 
-> With DEFINE_DEBUGFS_ATTRIBUTE:
->
-> - the fops member is debugfs_open_proxy_file_operations, which calls
-> replace_fops so that the fops->read member is debugfs_attr_read on the
-> opened file
->
-> - debugfs_attr_read does
->
->         ret = debugfs_file_get(dentry);
->         if (unlikely(ret))
->                 return ret;
->         ret = simple_attr_read(file, buf, len, ppos);
->         debugfs_file_put(dentry);
->
-> With DEFINE_SIMPLE_ATTRIBUTE:
->
-> - the fops member is debugfs_full_proxy_open, and after
-> __full_proxy_fops_init fops->read is initialized to full_proxy_read
->
-> - full_proxy_read does
->
->         r = debugfs_file_get(dentry);
->         if (unlikely(r))
->                 return r;
->         real_fops = debugfs_real_fops(filp);
->         r = real_fops->name(args);
->         debugfs_file_put(dentry);
->         return r;
->
-> where real_fops->name is again just simple_attr_read.
->
-> So the overhead is really just one kzalloc every time the file is
-> opened.
+I'd be OK with this as a stop-gap measure. Do we know of any existing
+design where only half of the CPUs have SPE?
 
-Yes.
+> Looking at the vcpu_load and related code, I don't see a way of saying
+> 'don't schedule this VCPU on this CPU' or bailing in any way.
 
+That would actually be pretty easy to implement. In vcpu_load(), check
+that that the CPU physical has SPE. If not, raise a request for that 
+vcpu.
+In the run loop, check for that request and abort if raised, returning
+to userspace.
 
-> I could just apply the patch, but it wouldn't solve the main issue,
-> which is that there is a function with a scary name
-> ("debugfs_create_file_unsafe") that can be used in very common
-> circumstances (with DEFINE_DEBUGFS_ATTRIBUTE.
+Userspace can always check /sys/devices/arm_spe_0/cpumask and work out
+where to run that particular vcpu.
 
-Agreed, the naming is a bit poor. "debugfs_create_file_no_proxy" or the
-like would perhaps have been a better choice.
+> 
+> One solution could be to allow scheduling onto non-SPE VCPUs but wrap 
+> the
+> SPE save/restore code in a macro (much like kvm_arm_spe_v1_ready) that
+> reads the non-sanitised feature register. Therefore we don't go bang, 
+> but
+> we also increase the size of any black-holes in SPE capturing. Though 
+> this
+> feels like something that will cause grief down the line.
+> 
+> Is there something else that can be done?
 
-
-> Therefore, we could
-> instead fix the root cause and avoid using the scary API:
->
-> - remove from the .cocci patch the change from debugfs_create_file to
-> debugfs_create_file_unsafe.  Only switch DEFINE_SIMPLE_ATTRIBUTE to
-> DEFINE_DEBUGFS_ATTRIBUTE
->
-> - change debugfs_create_file to automatically detect the "easy" case
-> that does not need proxying of fops; something like this:
->
-> 	const struct file_operations *proxy_fops;
->
-> 	/*
-> 	 * Any struct file_operations defined by means of
-> 	 * DEFINE_DEBUGFS_ATTRIBUTE() is protected against file removals
-> 	 * and thus does not need proxying of read and write fops.
-> 	 */
-> 	if (!fops ||
-> 	    (fops->llseek == no_llseek &&
-> 	     ((!fops->read && !fops->read_iter) ||
-> 	      fops->read == debugfs_attr_read) &&
-> 	     ((!fops->write && !fops->write_iter) ||
-> 	      fops->write == debugfs_attr_write) &&
-> 	     !fops->poll && !fops->unlocked_ioctl)
-> 		return debugfs_create_file_unsafe(name, mode, parent,
-> 						  data, fops);
->
-> 	/* These are not supported by __full_proxy_fops_init.  */
-> 	WARN_ON_ONCE(fops->read_iter || fops->write_iter);
-> 	return __debugfs_create_file(name, mode, parent, data,
-> 				    &debugfs_full_proxy_file_operations,
-> 				     fops);
->
-> CCing Nicolai Stange who first introduced debugfs_create_file_unsafe.
-
-I'm not strictly against your proposal, but I somewhat dislike the idea
-of adding runtime checks for special cases to work around a historic
-issue. Also, we'd either have to touch the ~63 existing call sites of
-debugfs_create_file_unsafe() again or had to live with inconsistent
-debugfs usage patterns.
-
-AFAICT, your approach wouldn't really put a relieve on maintainers
-wrt. patch count as the cocci check for the DEFINE_SIMPLE_ATTRIBUTE ->
-DEFINE_DEBUGFS_ATTRIBUTE conversion would still be needed.
-
-And then there's grepability: right now it would be possible to find all
-fully proxied debugfs files by means of "git grep 'debugfs_file_create('".
-I'm not saying I'm about to convert these, but in theory it could be
-done easily.
-
-How about introducing a
-  #define debugfs_create_attr debugfs_create_file_unsafe
-instead to make those
-s/DEFINE_SIMPLE_ATTRIBUTE/DEFINE_DEBUGFS_ATTRIBUTE/
-patches look less scary?
-
-Ideally, for the sake of additional safety, DEFINE_DEBUGFS_ATTRIBUTE
-could be made to wrap the file_operations within something like a
-struct debugfs_attr_file_operations and debugfs_create_attr() would
-take that instead of a plain file_operations. But again, this would
-require touching the existing users of debugfs_create_file_unsafe()...
-So I'm not sure it would be worth it.
-c
+How does userspace deal with this? When SPE is only available on half of
+the CPUs, how does perf work in these conditions?
 
 Thanks,
 
-Nicolai
-
+         M.
 -- 
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
-(HRB 36809, AG Nürnberg), GF: Felix Imendörffer
+Jazz is not dead. It just smells funny...
