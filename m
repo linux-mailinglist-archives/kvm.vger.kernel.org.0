@@ -2,96 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BDB21361FB
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 21:52:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C44B13623A
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 22:05:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728728AbgAIUv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 15:51:58 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23173 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726267AbgAIUv6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 15:51:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578603116;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+qu8blCRDlzm/qLVFE5UR+s1TwIN4x5NgSUj8f1EJSs=;
-        b=BnO6whRP49RZB2Jj4XBkd9cicr9ZFca/EHR90lPYfggbvHYitLrF0jDXcLHdYNlzl+ycsB
-        Cyl4MNUVxYG5+ijn9KzQu26EsusqFcSYncP8JNispc+0czfcq91ufsGMizxBy7/yvR+V2a
-        l7jrcz+vfBS/C5s2CEczOc8EEpp9OLk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-slIttvpTMMyNCREKEF2NeA-1; Thu, 09 Jan 2020 15:51:55 -0500
-X-MC-Unique: slIttvpTMMyNCREKEF2NeA-1
-Received: by mail-wm1-f70.google.com with SMTP id w205so1397714wmb.5
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 12:51:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+qu8blCRDlzm/qLVFE5UR+s1TwIN4x5NgSUj8f1EJSs=;
-        b=jeFep5fQ2ykEeBr9QUqpYsVpZSlTZ6MAEC7Vwdh70l1KY4ZrsuEQBjPtx6vbYuj0Vz
-         4YzZ9rEw7s6rLxI3qlBded5EHx9a8QCt31Hzwjo0weJR7+MUC4RltfmwqfBXGGqFWdXA
-         xGM1xM92xH+BXdXrh0jw/Q8cY7z4YjXbzfevo0RWSoDcNRm6hGd+aFi4nmrGJM0N1o59
-         NQOaimbjIc9qfCGdOP7ylfl8UT+DS0gdGj6qe3RFM2sWfEqrbv20N0CGq8kPXIKmXvka
-         fiEETrvfH+no8ttph1B0WT3uIRgWw8WXMcIGA8F0ATds7jIk5zy7zOJ1IraBEdVv/44X
-         H7Hg==
-X-Gm-Message-State: APjAAAVxxuPnoUfHvZJ535eTF7ddR98uD67gxPHrTOJPzhsjGsbTH/50
-        gQA8+N4r3k+y9DRATbCiz7z7bjaXseAXUsnxP2C0/oPMHTA4OPhzmfO91eaVFDXTBoMnGE0etjq
-        hEZJDhMzeEUCz
-X-Received: by 2002:adf:e3d0:: with SMTP id k16mr13068437wrm.241.1578603114521;
-        Thu, 09 Jan 2020 12:51:54 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwUkc1W0JH2wPGSGgsriAl9XJ5bfYNaxAfV5pQh7ajg11nbajhVxytC/uExDq3BtxUddmlSDg==
-X-Received: by 2002:adf:e3d0:: with SMTP id k16mr13068413wrm.241.1578603114251;
-        Thu, 09 Jan 2020 12:51:54 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:bc4e:7fe8:2916:6a59? ([2001:b07:6468:f312:bc4e:7fe8:2916:6a59])
-        by smtp.gmail.com with ESMTPSA id m7sm4047716wma.39.2020.01.09.12.51.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jan 2020 12:51:53 -0800 (PST)
-Subject: Re: [PATCH v3 00/21] KVM: Dirty ring interface
-To:     "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
+        id S1728140AbgAIVFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 16:05:44 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:55732 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728052AbgAIVFo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jan 2020 16:05:44 -0500
+Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1ipez7-0008OC-Ij; Thu, 09 Jan 2020 22:04:53 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 0AA1A105BCE; Thu,  9 Jan 2020 22:04:53 +0100 (CET)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-References: <20200109145729.32898-1-peterx@redhat.com>
- <20200109094711.00eb96b1@w520.home> <20200109175808.GC36997@xz-x1>
- <20200109140948-mutt-send-email-mst@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <feffe012-0407-128a-185a-42cb9d5aac5c@redhat.com>
-Date:   Thu, 9 Jan 2020 21:51:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Barret Rhoden <brho@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Zeng <jason.zeng@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>
+Subject: Re: [PATCH 05/14] x86/mm: Introduce lookup_address_in_mm()
+In-Reply-To: <20200108202448.9669-6-sean.j.christopherson@intel.com>
+References: <20200108202448.9669-1-sean.j.christopherson@intel.com> <20200108202448.9669-6-sean.j.christopherson@intel.com>
+Date:   Thu, 09 Jan 2020 22:04:53 +0100
+Message-ID: <871rs8batm.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20200109140948-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/01/20 20:13, Michael S. Tsirkin wrote:
-> That's one of the reasons I called for using something
-> resembling vring_packed_desc.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-In principle it could make sense to use the ring-wrap detection
-mechanism from vring_packed_desc instead of the producer/consumer
-indices.  However, the element address/length indirection is unnecessary.
+> diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
+> index b5e49e6bac63..400ac8da75e8 100644
+> --- a/arch/x86/include/asm/pgtable_types.h
+> +++ b/arch/x86/include/asm/pgtable_types.h
+> @@ -561,6 +561,10 @@ static inline void update_page_count(int level, unsigned long pages) { }
+>  extern pte_t *lookup_address(unsigned long address, unsigned int *level);
+>  extern pte_t *lookup_address_in_pgd(pgd_t *pgd, unsigned long address,
+>  				    unsigned int *level);
+> +
+> +struct mm_struct;
+> +pte_t *lookup_address_in_mm(struct mm_struct *mm, unsigned long address,
+> +			    unsigned int *level);
 
-Also, unlike virtio, KVM needs to know if there are N free entries (N is
-~512) before running a guest.  I'm not sure if that is possible with
-ring-wrap counters, while it's trivial with producer/consumer indices.
+Please keep the file consistent and use extern even if not required.
 
-Paolo
+Other than that:
 
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
