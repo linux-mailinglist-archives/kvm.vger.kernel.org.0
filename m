@@ -2,54 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2978F135BF9
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 15:58:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8670135C06
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 16:00:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732113AbgAIO61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 09:58:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50381 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732101AbgAIO6Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 09:58:25 -0500
+        id S1731850AbgAIO5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 09:57:37 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23351 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729136AbgAIO5h (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 09:57:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578581904;
+        s=mimecast20190719; t=1578581856;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N5/gZPNP/QItlxsKYnUSc3SUeJf7pxYxkCxufAe+9+I=;
-        b=BxajOEqEIJ7ndmuFZpDL/qhxSK08cCt+pyK/7sg3V8B6ay4Qub3mnd6275EUZUmIv5UceU
-        0CA1Nz3PYMfrVVzauLLRwIDPyDezP13fXxq1Bb0N2Oys+UtbW2c6c0n7iv8hAcFiRNj4t+
-        XVaLJI315PpXjeJ5D3ECcgEJRsdyPVE=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-QR6wYwOCPbycDbna65x-6A-1; Thu, 09 Jan 2020 09:58:24 -0500
-X-MC-Unique: QR6wYwOCPbycDbna65x-6A-1
-Received: by mail-qk1-f197.google.com with SMTP id 12so4265221qkf.20
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 06:58:23 -0800 (PST)
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dTjYPWrRS50vXb+awZBlOczchH8zUZfJ4o80FlJt42o=;
+        b=LmG0qflDS9+mBFF78IGeryXTToe5g3DYUFgajGm/nOdssoPk8ZDH8Dgn0fQA0dqMYsVVgP
+        yrbF8ENkYMkFDvb9ZoqVG7RmXuBTn/pg9rBmqcFEW72wtKQ0JrUrxQMHYXdF+1oznqMmDX
+        f8xBVe46Ody5u20J9Fdm9tTDoe42u5E=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-azuK9gvbPPyN0B6Tn0RgAA-1; Thu, 09 Jan 2020 09:57:34 -0500
+X-MC-Unique: azuK9gvbPPyN0B6Tn0RgAA-1
+Received: by mail-qt1-f200.google.com with SMTP id d18so4352372qtp.16
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 06:57:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=N5/gZPNP/QItlxsKYnUSc3SUeJf7pxYxkCxufAe+9+I=;
-        b=Et16tJPi5BIdEAOOPfuZeNfqDL/biAQotlXQi0PQxDVrrmEirC42Yj8qHheeD17hox
-         Q/ht8LTql+og+OhrNKvvdk51G4RZ15a4uDME+n5N6pSrGmeQseVot9TgpDK55mdDdw4e
-         oa/U+64W5OW/uxtu8NX8yj3j4YSzW6ZFKgDqYk1uzBiYHyw4U5mrGVP5yl5NrJG3lI99
-         xESLBjxCw2Io0u9TwBNbVJ0lTWHDk29LM7Ju/zWdzC0AIDeSeigfjLXKk3ZxfbR5gLSi
-         NfFQzUtqyT6LxUb7ZYeGAjCIloT10zDN1hOeAc5mUBAubvnvHf1x45GCa8Y/BPcsXWEo
-         p3mQ==
-X-Gm-Message-State: APjAAAV/oAIcIFEnIUD0Me6TNmDbBVdVyJSe6qyHNPLlWCdAlhCoJrmB
-        1JUq3iWsFIYkBa+vCwvn7PnX/JFqIVY3CX0nhkiXdYP9Sb60K99tQEns35HHJt9BJ4f5d74Gr2d
-        VUJh2aFzWumqC
-X-Received: by 2002:a05:620a:1108:: with SMTP id o8mr9361845qkk.118.1578581903456;
-        Thu, 09 Jan 2020 06:58:23 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwbk+PEzju7o1lLOeEMcQhDn/PrsxAenkqs3X56jNWYL+hX9tnG49Zv7cb0rnQ4BjnnJdD5RQ==
-X-Received: by 2002:a05:620a:1108:: with SMTP id o8mr9361819qkk.118.1578581903204;
-        Thu, 09 Jan 2020 06:58:23 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dTjYPWrRS50vXb+awZBlOczchH8zUZfJ4o80FlJt42o=;
+        b=N5aZlGEIxRSzHDl4msPObiG7COIeZOSCTGgDIlxuLWCGt3NAPIwm8UeqzoDs/wF7OA
+         3ohSf20bR6Z0rAbiP3s9GfRfl94pLpPV/LGQIwr1GPTYBJ6CIPA33Hod+eyP4Sij0JXf
+         DguuzSnje5aCzAxB955fJnkfgw1AiOALAMcz1zB+Vd//eoQbH0ZcIIfeRT/r5CEGmvdd
+         Jy1feDSWNbNQhNJmrvE1zvxk8pLuO9/ii8tddMv1LeGQQCxFwTOtU7DMPO7Bt4X0eD9Y
+         EGAMdVKFaXic/oyDuE3q3js/QCFCe/ze6FDvICslTB68SHOJ0nQWNu0wX59Pf3OhG/Wi
+         gg/A==
+X-Gm-Message-State: APjAAAW4oHiVJYZ9Ck4aUEfuSZJCPtJAQr7bOgGosCSrtpWkGU1LCh0f
+        r39dg8D0bDRmlTpDOmed42MKnPDD6V9I8jzPMqYhxftp2pdYP01uPJu6Vhg9QORpJ6xGuGs0NQa
+        Yk/it4bLo3cZQ
+X-Received: by 2002:ae9:f442:: with SMTP id z2mr10147929qkl.130.1578581852981;
+        Thu, 09 Jan 2020 06:57:32 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwvlKadDyijtWYeJ2Wd9k4rTi/vdyU+ZnfMwnSTOg0LZPt/qEGbYJRt3o/7E1ao7PmCs8P0Ng==
+X-Received: by 2002:ae9:f442:: with SMTP id z2mr10147895qkl.130.1578581852605;
+        Thu, 09 Jan 2020 06:57:32 -0800 (PST)
 Received: from xz-x1.yyz.redhat.com ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id q2sm3124179qkm.5.2020.01.09.06.58.21
+        by smtp.gmail.com with ESMTPSA id q2sm3124179qkm.5.2020.01.09.06.57.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2020 06:58:22 -0800 (PST)
+        Thu, 09 Jan 2020 06:57:31 -0800 (PST)
 From:   Peter Xu <peterx@redhat.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Christophe de Dinechin <dinechin@redhat.com>,
@@ -62,12 +61,10 @@ Cc:     Christophe de Dinechin <dinechin@redhat.com>,
         Kevin Kevin <kevin.tian@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>, peterx@redhat.com,
         "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: [PATCH v3 21/21] KVM: selftests: Add "-c" parameter to dirty log test
-Date:   Thu,  9 Jan 2020 09:57:29 -0500
-Message-Id: <20200109145729.32898-22-peterx@redhat.com>
+Subject: [PATCH v3 00/21] KVM: Dirty ring interface
+Date:   Thu,  9 Jan 2020 09:57:08 -0500
+Message-Id: <20200109145729.32898-1-peterx@redhat.com>
 X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200109145729.32898-1-peterx@redhat.com>
-References: <20200109145729.32898-1-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -75,70 +72,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's only used to override the existing dirty ring size/count.  If
-with a bigger ring count, we test async of dirty ring.  If with a
-smaller ring count, we test ring full code path.  Async is default.
+Branch is here: https://github.com/xzpeter/linux/tree/kvm-dirty-ring
+(based on kvm/queue)
 
-It has no use for non-dirty-ring tests.
+Please refer to either the previous cover letters, or documentation
+update in patch 12 for the big picture.  Previous posts:
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+V1: https://lore.kernel.org/kvm/20191129213505.18472-1-peterx@redhat.com
+V2: https://lore.kernel.org/kvm/20191221014938.58831-1-peterx@redhat.com
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 6da97e4a9408..fb6c33dbaf35 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -163,6 +163,7 @@ enum log_mode_t {
- /* Mode of logging.  Default is LOG_MODE_DIRTY_LOG */
- static enum log_mode_t host_log_mode;
- pthread_t vcpu_thread;
-+static uint32_t test_dirty_ring_count = TEST_DIRTY_RING_COUNT;
- 
- /* Only way to pass this to the signal handler */
- struct kvm_vm *current_vm;
-@@ -235,7 +236,7 @@ static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
- 	 */
--	vm_enable_dirty_ring(vm, TEST_DIRTY_RING_COUNT *
-+	vm_enable_dirty_ring(vm, test_dirty_ring_count *
- 			     sizeof(struct kvm_dirty_gfn));
- }
- 
-@@ -260,7 +261,7 @@ static uint32_t dirty_ring_collect_one(struct kvm_dirty_gfn *dirty_gfns,
- 	DEBUG("ring %d: fetch: 0x%x, avail: 0x%x\n", index, fetch, avail);
- 
- 	while (fetch != avail) {
--		cur = &dirty_gfns[fetch % TEST_DIRTY_RING_COUNT];
-+		cur = &dirty_gfns[fetch % test_dirty_ring_count];
- 		TEST_ASSERT(cur->pad == 0, "Padding is non-zero: 0x%x", cur->pad);
- 		TEST_ASSERT(cur->slot == slot, "Slot number didn't match: "
- 			    "%u != %u", cur->slot, slot);
-@@ -723,6 +724,9 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
-+	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
-+	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
- 	       TEST_HOST_LOOP_N);
- 	printf(" -I: specify interval in ms (default: %"PRIu64" ms)\n",
-@@ -778,8 +782,11 @@ int main(int argc, char *argv[])
- 	vm_guest_mode_params_init(VM_MODE_P40V48_4K, true, true);
- #endif
- 
--	while ((opt = getopt(argc, argv, "hi:I:p:m:M:")) != -1) {
-+	while ((opt = getopt(argc, argv, "c:hi:I:p:m:M:")) != -1) {
- 		switch (opt) {
-+		case 'c':
-+			test_dirty_ring_count = strtol(optarg, NULL, 10);
-+			break;
- 		case 'i':
- 			iterations = strtol(optarg, NULL, 10);
- 			break;
+The major change in V3 is that we dropped the whole waitqueue and the
+global lock. With that, we have clean per-vcpu ring and no default
+ring any more.  The two kvmgt refactoring patches were also included
+to show the dependency of the works.
+
+Patchset layout:
+
+Patch 1-2:         Picked up from kvmgt refactoring
+Patch 3-6:         Small patches that are not directly related,
+                   (So can be acked/nacked/picked as standalone)
+Patch 7-11:        Prepares for the dirty ring interface
+Patch 12:          Major implementation
+Patch 13-14:       Quick follow-ups for patch 8
+Patch 15-21:       Test cases
+
+V3 changelog:
+
+- fail userspace writable maps on dirty ring ranges [Jason]
+- commit message fixups [Paolo]
+- change __x86_set_memory_region to return hva [Paolo]
+- cacheline align for indices [Paolo, Jason]
+- drop waitqueue, global lock, etc., include kvmgt rework patchset
+- take lock for __x86_set_memory_region() (otherwise it triggers a
+  lockdep in latest kvm/queue) [Paolo]
+- check KVM_DIRTY_LOG_PAGE_OFFSET in kvm_vm_ioctl_enable_dirty_log_ring
+- one more patch to drop x86_set_memory_region [Paolo]
+- one more patch to remove extra srcu usage in init_rmode_identity_map()
+- add some r-bs for Paolo
+
+Please review, thanks.
+
+Paolo Bonzini (1):
+  KVM: Move running VCPU from ARM to common code
+
+Peter Xu (18):
+  KVM: Remove kvm_read_guest_atomic()
+  KVM: Add build-time error check on kvm_run size
+  KVM: X86: Change parameter for fast_page_fault tracepoint
+  KVM: X86: Don't take srcu lock in init_rmode_identity_map()
+  KVM: Cache as_id in kvm_memory_slot
+  KVM: X86: Drop x86_set_memory_region()
+  KVM: X86: Don't track dirty for KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+  KVM: Pass in kvm pointer into mark_page_dirty_in_slot()
+  KVM: X86: Implement ring-based dirty memory tracking
+  KVM: Make dirty ring exclusive to dirty bitmap log
+  KVM: Don't allocate dirty bitmap if dirty ring is enabled
+  KVM: selftests: Always clear dirty bitmap after iteration
+  KVM: selftests: Sync uapi/linux/kvm.h to tools/
+  KVM: selftests: Use a single binary for dirty/clear log test
+  KVM: selftests: Introduce after_vcpu_run hook for dirty log test
+  KVM: selftests: Add dirty ring buffer test
+  KVM: selftests: Let dirty_log_test async for dirty ring test
+  KVM: selftests: Add "-c" parameter to dirty log test
+
+Yan Zhao (2):
+  vfio: introduce vfio_iova_rw to read/write a range of IOVAs
+  drm/i915/gvt: subsitute kvm_read/write_guest with vfio_iova_rw
+
+ Documentation/virt/kvm/api.txt                |  96 ++++
+ arch/arm/include/asm/kvm_host.h               |   2 -
+ arch/arm64/include/asm/kvm_host.h             |   2 -
+ arch/x86/include/asm/kvm_host.h               |   7 +-
+ arch/x86/include/uapi/asm/kvm.h               |   1 +
+ arch/x86/kvm/Makefile                         |   3 +-
+ arch/x86/kvm/mmu/mmu.c                        |   6 +
+ arch/x86/kvm/mmutrace.h                       |   9 +-
+ arch/x86/kvm/svm.c                            |   3 +-
+ arch/x86/kvm/vmx/vmx.c                        |  86 ++--
+ arch/x86/kvm/x86.c                            |  43 +-
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  25 +-
+ drivers/vfio/vfio.c                           |  45 ++
+ drivers/vfio/vfio_iommu_type1.c               |  81 ++++
+ include/linux/kvm_dirty_ring.h                |  55 +++
+ include/linux/kvm_host.h                      |  37 +-
+ include/linux/vfio.h                          |   5 +
+ include/trace/events/kvm.h                    |  78 ++++
+ include/uapi/linux/kvm.h                      |  33 ++
+ tools/include/uapi/linux/kvm.h                |  38 ++
+ tools/testing/selftests/kvm/Makefile          |   2 -
+ .../selftests/kvm/clear_dirty_log_test.c      |   2 -
+ tools/testing/selftests/kvm/dirty_log_test.c  | 420 ++++++++++++++++--
+ .../testing/selftests/kvm/include/kvm_util.h  |   4 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  72 +++
+ .../selftests/kvm/lib/kvm_util_internal.h     |   3 +
+ virt/kvm/arm/arch_timer.c                     |   2 +-
+ virt/kvm/arm/arm.c                            |  29 --
+ virt/kvm/arm/perf.c                           |   6 +-
+ virt/kvm/arm/vgic/vgic-mmio.c                 |  15 +-
+ virt/kvm/dirty_ring.c                         | 162 +++++++
+ virt/kvm/kvm_main.c                           | 215 +++++++--
+ 32 files changed, 1379 insertions(+), 208 deletions(-)
+ create mode 100644 include/linux/kvm_dirty_ring.h
+ delete mode 100644 tools/testing/selftests/kvm/clear_dirty_log_test.c
+ create mode 100644 virt/kvm/dirty_ring.c
+
 -- 
 2.24.1
 
