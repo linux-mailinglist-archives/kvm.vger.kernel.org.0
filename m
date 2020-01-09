@@ -2,348 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F327A135EE3
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 18:08:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 164E9135EE6
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 18:09:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731527AbgAIRIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 12:08:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49162 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731395AbgAIRIv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 12:08:51 -0500
+        id S2387972AbgAIRI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 12:08:57 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44802 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2387970AbgAIRI4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 12:08:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578589730;
+        s=mimecast20190719; t=1578589735;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yIBsCtp3fW0rPPOfLb5V3w4m2bp1K36Vz4t6cH/tyWw=;
-        b=LOUGgQSWb/Rh+9PtA2NxzGuTtJHgXfn+26zEcNnA/r/o5+T9be+kWduHiqqnXDxmWx8PxX
-        Kdu0l+nhfRaeq2iwmcVHbOzd3O+DJbwYL2gW5usGc2UVrvBX2OsmZONLFY4bFTqfak9LAg
-        fYQvljTJcgGm0LnQZGj3fZjYmjzlPcc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-kctYQVKPMSKD1vDD3dXzgw-1; Thu, 09 Jan 2020 12:08:48 -0500
-X-MC-Unique: kctYQVKPMSKD1vDD3dXzgw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FDA7801F91;
-        Thu,  9 Jan 2020 17:08:47 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EFA6F80602;
-        Thu,  9 Jan 2020 17:08:43 +0000 (UTC)
-Date:   Thu, 9 Jan 2020 18:08:41 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, david@redhat.com
-Subject: Re: [PATCH v4] KVM: s390: Add new reset vcpu API
-Message-ID: <20200109180841.6843cb92.cohuck@redhat.com>
-In-Reply-To: <20200109155602.18985-1-frankja@linux.ibm.com>
-References: <20200109155602.18985-1-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=NNEsFj/o0jBF/fCYORNopN7APt59GO74aaqbRZLn7eo=;
+        b=Fywyu/96WhEDJx+zzrSUAq1Yr8ZB7MSyM7GtHydOfElpzx4XLoy3V4R/IGeKdiX1U2tXvF
+        My2utxfJ0pz+GezmgJVz/cNCZeHEKzy9+uii6XQoYJoEmZXNZPKuWxNPoIvZ0hv4K4pojN
+        okVI+Py5k2+WhtDTR4xWFrAuMHOnCao=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-347-jTm5lbTXOUSw0KCNbxoYEg-1; Thu, 09 Jan 2020 12:08:52 -0500
+X-MC-Unique: jTm5lbTXOUSw0KCNbxoYEg-1
+Received: by mail-qv1-f70.google.com with SMTP id g15so4513138qvk.11
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 09:08:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NNEsFj/o0jBF/fCYORNopN7APt59GO74aaqbRZLn7eo=;
+        b=noMrF8hLoLeKz0nuDOYqZda8eEHhgiKy9e+Xv6R9vu8puqzt01Eqr0VHKCJkLlY0Ao
+         XrK+Qo7ZLfZFBJk6GQHItXAv5Nqhr/uOb148ye1Qw2kFELHpseX/vhcXQfgrz9Mbn8iw
+         jg+WmZQi33WE+U3bPFyGRN0AXcbl9DjoLEnwPAgng/M5lwFSRh7WB9g6WkXE4PuJ2Ea/
+         ILaAE7oURmh7fhDbuldaSARwlzJDxSalRgnOb2dbfY4Du6aABoJdKeu3rgFxKwMs4aph
+         ePu7tLmSpoFPY6So0a1h4AtaNDNiMlQYYRlXiJj9U8gpo8q4k2WQdn+xMDKbAOmPcQju
+         jJnQ==
+X-Gm-Message-State: APjAAAV4aVSdSbQDLSVoDRRjbE3DgjUsPX7wSibAa5/021X8ALSzxdtO
+        ccEb2MGXzivdo8PYU83tn9hrerPYOCi3Kh9IVKXdWCjXB2rZqLjcvmGu4DXKDrvASPH1kEzLplg
+        v3i425Mcz0mzx
+X-Received: by 2002:ac8:59:: with SMTP id i25mr8915422qtg.110.1578589731670;
+        Thu, 09 Jan 2020 09:08:51 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxmi+GInpmAyf4dUoy+x6coGpcUyilqGJsYyHvmUNTmQpEgNWR+lquAycQvqlL2YFSE84UNug==
+X-Received: by 2002:ac8:59:: with SMTP id i25mr8915400qtg.110.1578589731447;
+        Thu, 09 Jan 2020 09:08:51 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id h34sm3670383qtc.62.2020.01.09.09.08.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2020 09:08:50 -0800 (PST)
+Date:   Thu, 9 Jan 2020 12:08:49 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v3 00/21] KVM: Dirty ring interface
+Message-ID: <20200109170849.GB36997@xz-x1>
+References: <20200109145729.32898-1-peterx@redhat.com>
+ <20200109105443-mutt-send-email-mst@kernel.org>
+ <20200109161742.GC15671@xz-x1>
+ <20200109113001-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200109113001-mutt-send-email-mst@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  9 Jan 2020 10:56:01 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Thu, Jan 09, 2020 at 11:40:23AM -0500, Michael S. Tsirkin wrote:
 
-> The architecture states that we need to reset local IRQs for all CPU
-> resets. Because the old reset interface did not support the normal CPU
-> reset we never did that on a normal reset.
+[...]
+
+> > > I know it's mostly relevant for huge VMs, but OTOH these
+> > > probably use huge pages.
+> > 
+> > Yes huge VMs could benefit more, especially if the dirty rate is not
+> > that high, I believe.  Though, could you elaborate on why huge pages
+> > are special here?
+> > 
+> > Thanks,
 > 
-> Let's implement an interface for the missing normal and clear resets
-> and reset all local IRQs, registers and control structures as stated
-> in the architecture.
-> 
-> Userspace might already reset the registers via the vcpu run struct,
-> but as we need the interface for the interrupt clearing part anyway,
-> we implement the resets fully and don't rely on userspace to reset the
-> rest.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
-> 
-> I dropped the reviews, as I changed quite a lot.  
-> 
-> Keep in mind, that now we'll need a new parameter in normal and
-> initial reset for protected virtualization to indicate that we need to
-> do the reset via the UV call. The Ultravisor does only accept the
-> needed reset, not any subset resets.
+> With hugetlbfs there are less bits to test: e.g. with 2M pages a single
+> bit set marks 512 pages as dirty.  We do not take advantage of this
+> but it looks like a rather obvious optimization.
 
-In the interface, or externally?
+Right, but isn't that the trade-off between granularity of dirty
+tracking and how easy it is to collect the dirty bits?  Say, it'll be
+merely impossible to migrate 1G-huge-page-backed guests if we track
+dirty bits using huge page granularity, since each touch of guest
+memory will cause another 1G memory to be transferred even if most of
+the content is the same.  2M can be somewhere in the middle, but still
+the same write amplify issue exists.
 
-[Apologies, but the details of the protected virt stuff are no longer
-in my cache.]
+PS. that seems to be another topic after all besides the dirty ring
+series because we need to change our policy first if we want to track
+it with huge pages; with that, for dirty ring we can start to leverage
+the kvm_dirty_gfn.pad to store the page size with another new kvm cap
+when we really want.
 
-> 
-> ---
->  Documentation/virt/kvm/api.txt |  46 ++++++++++++++
->  arch/s390/kvm/kvm-s390.c       | 106 +++++++++++++++++++++++----------
->  include/uapi/linux/kvm.h       |   5 ++
->  3 files changed, 127 insertions(+), 30 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> index ebb37b34dcfc..734fbe992ed6 100644
-> --- a/Documentation/virt/kvm/api.txt
-> +++ b/Documentation/virt/kvm/api.txt
-> @@ -4168,6 +4168,45 @@ This ioctl issues an ultravisor call to terminate the secure guest,
->  unpins the VPA pages and releases all the device pages that are used to
->  track the secure pages by hypervisor.
->  
-> +4.122 KVM_S390_NORMAL_RESET
-> +
-> +Capability: KVM_CAP_S390_VCPU_RESETS
-> +Architectures: s390
-> +Type: vcpu ioctl
-> +Parameters: none
-> +Returns: 0
-> +
-> +This ioctl resets VCPU registers and control structures. It is
-> +intended to be called when a normal reset is performed on the vcpu and
-> +clears local interrupts, the riccb and PSW bit 24.
+Thanks,
 
-I'm not sure you'd want to specify the actual values to be reset here;
-you'd always need to remember to update them when the architecture is
-extended... just refer to the POP instead?
-
-> +
-> +4.123 KVM_S390_INITIAL_RESET
-> +
-> +Capability: none
-> +Architectures: s390
-> +Type: vcpu ioctl
-> +Parameters: none
-> +Returns: 0
-> +
-> +This ioctl resets VCPU registers and control structures. It is
-> +intended to be called when an initial reset (which is a superset of
-> +the normal reset) is performed on the vcpu and additionally clears the
-> +psw, prefix, timing related registers, as well as setting the control
-> +registers to their initial value.
-
-Same here.
-
-> +
-> +4.124 KVM_S390_CLEAR_RESET
-> +
-> +Capability: KVM_CAP_S390_VCPU_RESETS
-> +Architectures: s390
-> +Type: vcpu ioctl
-> +Parameters: none
-> +Returns: 0
-> +
-> +This ioctl resets VCPU registers and control structures. It is
-> +intended to be called when a clear reset (which is a superset of the
-> +initial reset) is performed on the vcpu and additionally clears
-> +general, access, floating point and vector registers.
-
-And here.
-
-> +
->  5. The kvm_run structure
->  ------------------------
->  
-> @@ -5396,3 +5435,10 @@ handling by KVM (as some KVM hypercall may be mistakenly treated as TLB
->  flush hypercalls by Hyper-V) so userspace should disable KVM identification
->  in CPUID and only exposes Hyper-V identification. In this case, guest
->  thinks it's running on Hyper-V and only use Hyper-V hypercalls.
-> +
-> +8.22 KVM_CAP_S390_VCPU_RESETS
-> +
-> +Architectures: s390
-> +
-> +This capability indicates that the KVM_S390_NORMAL_RESET and
-> +KVM_S390_CLEAR_RESET ioctls are available.
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index d9e6bf3d54f0..c338a49331e5 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -529,6 +529,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_S390_CMMA_MIGRATION:
->  	case KVM_CAP_S390_AIS:
->  	case KVM_CAP_S390_AIS_MIGRATION:
-> +	case KVM_CAP_S390_VCPU_RESETS:
->  		r = 1;
->  		break;
->  	case KVM_CAP_S390_HPAGE_1M:
-> @@ -2844,35 +2845,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  
->  }
->  
-> -static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
-> -{
-> -	/* this equals initial cpu reset in pop, but we don't switch to ESA */
-> -	vcpu->arch.sie_block->gpsw.mask = 0UL;
-> -	vcpu->arch.sie_block->gpsw.addr = 0UL;
-> -	kvm_s390_set_prefix(vcpu, 0);
-> -	kvm_s390_set_cpu_timer(vcpu, 0);
-> -	vcpu->arch.sie_block->ckc       = 0UL;
-> -	vcpu->arch.sie_block->todpr     = 0;
-> -	memset(vcpu->arch.sie_block->gcr, 0, 16 * sizeof(__u64));
-> -	vcpu->arch.sie_block->gcr[0]  = CR0_UNUSED_56 |
-> -					CR0_INTERRUPT_KEY_SUBMASK |
-> -					CR0_MEASUREMENT_ALERT_SUBMASK;
-> -	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
-> -					CR14_UNUSED_33 |
-> -					CR14_EXTERNAL_DAMAGE_SUBMASK;
-> -	/* make sure the new fpc will be lazily loaded */
-> -	save_fpu_regs();
-> -	current->thread.fpu.fpc = 0;
-> -	vcpu->arch.sie_block->gbea = 1;
-> -	vcpu->arch.sie_block->pp = 0;
-> -	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
-> -	vcpu->arch.pfault_token = KVM_S390_PFAULT_TOKEN_INVALID;
-> -	kvm_clear_async_pf_completion_queue(vcpu);
-> -	if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
-> -		kvm_s390_vcpu_stop(vcpu);
-> -	kvm_s390_clear_local_irqs(vcpu);
-> -}
-> -
->  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  {
->  	mutex_lock(&vcpu->kvm->lock);
-> @@ -3287,9 +3259,76 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(struct kvm_vcpu *vcpu,
->  	return r;
->  }
->  
-> +static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.sie_block->gpsw.mask = ~PSW_MASK_RI;
-> +	vcpu->arch.pfault_token = KVM_S390_PFAULT_TOKEN_INVALID;
-> +	memset(vcpu->run->s.regs.riccb, 0, sizeof(vcpu->run->s.regs.riccb));
-> +
-> +	kvm_clear_async_pf_completion_queue(vcpu);
-> +	if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
-> +		kvm_s390_vcpu_stop(vcpu);
-> +	kvm_s390_clear_local_irqs(vcpu);
-> +
-> +	return 0;
-> +}
-> +
->  static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
->  {
-> -	kvm_s390_vcpu_initial_reset(vcpu);
-> +	/* this equals initial cpu reset in pop, but we don't switch to ESA */
-
-Maybe also mention that in the documentation?
-
-> +	vcpu->arch.sie_block->gpsw.mask = 0UL;
-> +	vcpu->arch.sie_block->gpsw.addr = 0UL;
-> +	kvm_s390_set_prefix(vcpu, 0);
-> +	kvm_s390_set_cpu_timer(vcpu, 0);
-> +	vcpu->arch.sie_block->ckc       = 0UL;
-> +	vcpu->arch.sie_block->todpr     = 0;
-> +	memset(vcpu->arch.sie_block->gcr, 0, 16 * sizeof(__u64));
-> +	vcpu->arch.sie_block->gcr[0]  = CR0_UNUSED_56 |
-> +					CR0_INTERRUPT_KEY_SUBMASK |
-> +					CR0_MEASUREMENT_ALERT_SUBMASK;
-> +	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
-> +					CR14_UNUSED_33 |
-> +					CR14_EXTERNAL_DAMAGE_SUBMASK;
-> +	/* make sure the new fpc will be lazily loaded */
-> +	save_fpu_regs();
-> +	current->thread.fpu.fpc = 0;
-> +	vcpu->arch.sie_block->gbea = 1;
-> +	vcpu->arch.sie_block->pp = 0;
-> +	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
-> +
-
-Add a comment that the remaining work will be done in normal_reset?
-
-> +	return 0;
-> +}
-> +
-> +static int kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_sync_regs *regs = &vcpu->run->s.regs;
-> +
-> +	memset(&regs->gprs, 0, sizeof(regs->gprs));
-> +	/*
-> +	 * Will be picked up via save_fpu_regs() in the initial reset
-> +	 * fallthrough.
-> +	 */
-
-This comment is a bit confusing... what does 'picked up' mean?
-
-(Maybe I'm just too tired, sorry...)
-
-> +	memset(&regs->vrs, 0, sizeof(regs->vrs));
-> +	memset(&regs->acrs, 0, sizeof(regs->acrs));
-> +
-> +	regs->etoken = 0;
-> +	regs->etoken_extension = 0;
-> +
-> +	memset(&regs->gscb, 0, sizeof(regs->gscb));
-> +	if (MACHINE_HAS_GS) {
-> +		preempt_disable();
-> +		__ctl_set_bit(2, 4);
-> +		if (current->thread.gs_cb) {
-> +			vcpu->arch.host_gscb = current->thread.gs_cb;
-> +			save_gs_cb(vcpu->arch.host_gscb);
-> +		}
-> +		if (vcpu->arch.gs_enabled) {
-> +			current->thread.gs_cb = (struct gs_cb *)
-> +				&vcpu->run->s.regs.gscb;
-> +			restore_gs_cb(current->thread.gs_cb);
-> +		}
-> +		preempt_enable();
-> +	}
-
-And here that the remaining work will be done in initial_reset and
-normal_reset?
-
->  	return 0;
->  }
->  
-> @@ -4363,8 +4402,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  		r = kvm_arch_vcpu_ioctl_set_initial_psw(vcpu, psw);
->  		break;
->  	}
-> +
-> +	case KVM_S390_CLEAR_RESET:
-> +		r = kvm_arch_vcpu_ioctl_clear_reset(vcpu);
-> +		/* fallthrough */
->  	case KVM_S390_INITIAL_RESET:
->  		r = kvm_arch_vcpu_ioctl_initial_reset(vcpu);
-> +		/* fallthrough */
-> +	case KVM_S390_NORMAL_RESET:
-> +		r = kvm_arch_vcpu_ioctl_normal_reset(vcpu);
-
-Can any of these functions return !0 when the protected virt stuff is
-done on top? If not, can we make them void and just set r=0; here?
-
->  		break;
->  	case KVM_SET_ONE_REG:
->  	case KVM_GET_ONE_REG: {
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index f0a16b4adbbd..4b95f9a31a2f 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1009,6 +1009,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 176
->  #define KVM_CAP_ARM_NISV_TO_USER 177
->  #define KVM_CAP_ARM_INJECT_EXT_DABT 178
-> +#define KVM_CAP_S390_VCPU_RESETS 179
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> @@ -1473,6 +1474,10 @@ struct kvm_enc_region {
->  /* Available with KVM_CAP_ARM_SVE */
->  #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
->  
-> +/* Available with  KVM_CAP_S390_VCPU_RESETS */
-> +#define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
-> +#define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
-> +
->  /* Secure Encrypted Virtualization command */
->  enum sev_cmd_id {
->  	/* Guest initialization commands */
+-- 
+Peter Xu
 
