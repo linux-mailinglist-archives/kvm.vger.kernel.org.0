@@ -2,150 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B0DFC136146
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 20:40:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A24813615D
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 20:47:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731424AbgAITjz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 14:39:55 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33901 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729905AbgAITjy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 14:39:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578598792;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Kb2vQrfoKpjSeL//XIyF85PILUK7bLDKHFU29Jc77FQ=;
-        b=AqqO335b4VhZUEDWQL1zh3TCZS7HDWgjkKfXkWzU6suRMFy4uxxTnPI0dK0mAs/rAvfQ8b
-        jIEr7pW5avc/rciG3IkL2kS1Lhwt84nZJYqjcNJel31NmO3quyjxxWGzRMUhUstIiQvIfZ
-        fxQzAaf2bvIAanaTXL1ivuhc/orBJ0s=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-_j1VisGOOQS3F14nrpeHaw-1; Thu, 09 Jan 2020 14:39:51 -0500
-X-MC-Unique: _j1VisGOOQS3F14nrpeHaw-1
-Received: by mail-qv1-f72.google.com with SMTP id f16so4819275qvr.7
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 11:39:51 -0800 (PST)
+        id S1732280AbgAITrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 14:47:49 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:39180 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728567AbgAITrs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jan 2020 14:47:48 -0500
+Received: by mail-pf1-f196.google.com with SMTP id q10so3849721pfs.6
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 11:47:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=tOr15WETxbkLw/hVhIIJI77xVs+gy+a9H8+1jFpIRfc=;
+        b=cG0QOwda3n2lMKGGwl2gvG+FY0g5k14CGaWhbv4nmRcoT2JX4qtut3O08AYJiZSsJ1
+         cr8cRqsI97d5/bOkzP8tKl3Tt9qtR5JvXtPKrWUCiPl4DV38hUy0eNUJDkm8kHbJEuBE
+         yaFZx1vNucRxrssnQpATjd86jpNCMGp+2Uyc8U06zuHuUL2AoQcrnZJ+y884oRxt8t+n
+         VRC8uxlGUAtadaiER22t+8Zb5vtrFxei+x4QHt8BHfVM01jX4dRRdZl9Mv3Dje2YTVYW
+         tV4Ihp6XBYA3izk3Ms3j7QY4sBnbwek7lIwiWDhHQ5xPFFbll2klVlmKSmR8wUaYCyZ9
+         y5qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Kb2vQrfoKpjSeL//XIyF85PILUK7bLDKHFU29Jc77FQ=;
-        b=s8NFq+vbE6fWxPWOwaWsK+PVLyOALX2RO6fM1Kh5JXV1nycANc26LvQ9F1VmNlYFMr
-         fUu9V1gdCcMQF0IcdHUNMa5mjQAt2h0KWodt0nTYD/PsNf17RMDnuTqKvDU+Ix7RJXcz
-         7ep7hyfS6g0yR1jZ102lFqwwNP3swx06WY/xinUiSL0qDql350mcanN42k2BoVmI0xDX
-         RINg4mndnxoFdJYqKYpcabCMUpaMKNXeooR5iAqWlfhUJkVDbPa7+tQJis2QTgYpBeDo
-         JvqtFK/gNOW/cE30hjwZ2SFe+ryd1EUoLz1IYrNBdQSYoXuFjT13tgsLqE4H6Kd24RZ2
-         lsuQ==
-X-Gm-Message-State: APjAAAUceU1/ex2TnWeENsxcx1ChiRcz49MWkMbVYa4vkNKkMyhL4VGN
-        pstxGqKJa1IHar17iMnjkfMUu6S+D5Wxfub2o3yAG6U/q5nFQfdGUFWxu0K86uExjuF55ritG5k
-        eruRRL/KM4QUU
-X-Received: by 2002:ac8:6909:: with SMTP id e9mr9449261qtr.339.1578598791415;
-        Thu, 09 Jan 2020 11:39:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwmpSTaUwBhJTP7ZOnS+KZYWFlAWfDcxzaLmcjz7WS9B1GcqzT6ZUntOllSL94XygLzXh2UZw==
-X-Received: by 2002:ac8:6909:: with SMTP id e9mr9449233qtr.339.1578598791201;
-        Thu, 09 Jan 2020 11:39:51 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id i2sm3802548qte.87.2020.01.09.11.39.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2020 11:39:50 -0800 (PST)
-Date:   Thu, 9 Jan 2020 14:39:49 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tOr15WETxbkLw/hVhIIJI77xVs+gy+a9H8+1jFpIRfc=;
+        b=jW34luFZFOxv1m2jO+gNKTF76nrZcIzN/rF9wc2nY8v4YifuZdJJEmXujx4uTV1Lhg
+         EOvipnl9jldW7ddzvmo0JjbrG5003OCIq0xi3WUIbZsi5DX3xcMi+UM5d7DjvsuPEiZt
+         R4sR3CK0uMjhTZw772a6V0d7RpShr6FHu6FiiwIg8ECCIvWrBsT2NNeY3ys2BP7vH88m
+         eEgwB3nfsGJ0UTNnRnguXzL0pRiVzoPknpHMJ05JAvhnyPHJWjZexCNo9yHQj/TI9IRo
+         jGanYtA5lDFQHqQurJBojmBL2/RXys6NJSFaNVC3noODeHr3tSS/6vi6HklCoQxSY6Kv
+         cuVA==
+X-Gm-Message-State: APjAAAWAocXRet9bcDNUyA0LnkAT82u98JsLaPvKENwXOG+vq1vT3WqI
+        4CTqW2V77eev1Y3Frt5ijR90SQ==
+X-Google-Smtp-Source: APXvYqzh23zJ0M/6YUkb1gak5IeC/b1rxGMe/2+na8ui5AM37mG7vNvlQ/Y50JVkaXV8dlCW2yJyFQ==
+X-Received: by 2002:a62:e30f:: with SMTP id g15mr235672pfh.124.1578599265739;
+        Thu, 09 Jan 2020 11:47:45 -0800 (PST)
+Received: from gnomeregan01.cam.corp.google.com ([2620:15c:6:14:50b7:ffca:29c4:6488])
+        by smtp.googlemail.com with ESMTPSA id z130sm8572761pgz.6.2020.01.09.11.47.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jan 2020 11:47:44 -0800 (PST)
+Subject: Re: [PATCH 00/14] KVM: x86/mmu: Huge page fixes, cleanup, and DAX
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3 00/21] KVM: Dirty ring interface
-Message-ID: <20200109193949.GG36997@xz-x1>
-References: <20200109145729.32898-1-peterx@redhat.com>
- <20200109105443-mutt-send-email-mst@kernel.org>
- <20200109161742.GC15671@xz-x1>
- <20200109113001-mutt-send-email-mst@kernel.org>
- <20200109170849.GB36997@xz-x1>
- <20200109133434-mutt-send-email-mst@kernel.org>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Zeng <jason.zeng@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>
+References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+From:   Barret Rhoden <brho@google.com>
+Message-ID: <e3e12d17-32e4-84ad-94da-91095d999238@google.com>
+Date:   Thu, 9 Jan 2020 14:47:41 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200109133434-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 09, 2020 at 02:08:52PM -0500, Michael S. Tsirkin wrote:
-> On Thu, Jan 09, 2020 at 12:08:49PM -0500, Peter Xu wrote:
-> > On Thu, Jan 09, 2020 at 11:40:23AM -0500, Michael S. Tsirkin wrote:
-> > 
-> > [...]
-> > 
-> > > > > I know it's mostly relevant for huge VMs, but OTOH these
-> > > > > probably use huge pages.
-> > > > 
-> > > > Yes huge VMs could benefit more, especially if the dirty rate is not
-> > > > that high, I believe.  Though, could you elaborate on why huge pages
-> > > > are special here?
-> > > > 
-> > > > Thanks,
-> > > 
-> > > With hugetlbfs there are less bits to test: e.g. with 2M pages a single
-> > > bit set marks 512 pages as dirty.  We do not take advantage of this
-> > > but it looks like a rather obvious optimization.
-> > 
-> > Right, but isn't that the trade-off between granularity of dirty
-> > tracking and how easy it is to collect the dirty bits?  Say, it'll be
-> > merely impossible to migrate 1G-huge-page-backed guests if we track
-> > dirty bits using huge page granularity, since each touch of guest
-> > memory will cause another 1G memory to be transferred even if most of
-> > the content is the same.  2M can be somewhere in the middle, but still
-> > the same write amplify issue exists.
-> >
+Hi -
+
+On 1/8/20 3:24 PM, Sean Christopherson wrote:
+> This series is a mix of bug fixes, cleanup and new support in KVM's
+> handling of huge pages.  The series initially stemmed from a syzkaller
+> bug report[1], which is fixed by patch 02, "mm: thp: KVM: Explicitly
+> check for THP when populating secondary MMU".
 > 
-> OK I see I'm unclear.
-> 
-> IIUC at the moment KVM never uses huge pages if any part of the huge page is
-> tracked.
+> While investigating options for fixing the syzkaller bug, I realized KVM
+> could reuse the approach from Barret's series to enable huge pages for DAX
+> mappings in KVM[2] for all types of huge mappings, i.e. walk the host page
+> tables instead of querying metadata (patches 05 - 09).
 
-To be more precise - I think it's per-memslot.  Say, if the memslot is
-dirty tracked, then no huge page on the host on that memslot (even if
-guest used huge page over that).
-
-> But if all parts of the page are written to then huge page
-> is used.
-
-I'm not sure of this... I think it's still in 4K granularity.
-
-> 
-> In this situation the whole huge page is dirty and needs to be migrated.
-
-Note that in QEMU we always migrate pages in 4K for x86, iiuc (please
-refer to ram_save_host_page() in QEMU).
-
-> 
-> > PS. that seems to be another topic after all besides the dirty ring
-> > series because we need to change our policy first if we want to track
-> > it with huge pages; with that, for dirty ring we can start to leverage
-> > the kvm_dirty_gfn.pad to store the page size with another new kvm cap
-> > when we really want.
-> > 
-> > Thanks,
-> 
-> Seems like leaking implementation detail to UAPI to me.
-
-I'd say it's not the only place we have an assumption at least (please
-also refer to uffd_msg.pagefault.address).  IMHO it's not something
-wrong because interfaces can be extended, but I am open to extending
-kvm_dirty_gfn to cover a length/size or make the pad larger (as long
-as Paolo is fine with this).
+Thanks, Sean.  I tested this patch series out, and it works for me. 
+(Huge KVM mappings of a DAX file, etc.).
 
 Thanks,
 
--- 
-Peter Xu
+Barret
+
+
 
