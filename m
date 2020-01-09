@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CF69A135C8C
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 16:22:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A17E135C8D
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 16:22:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732318AbgAIPWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 10:22:04 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35072 "EHLO
+        id S1732319AbgAIPWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 10:22:10 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31099 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732315AbgAIPWE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 10:22:04 -0500
+        by vger.kernel.org with ESMTP id S1730877AbgAIPWK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 10:22:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578583323;
+        s=mimecast20190719; t=1578583329;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GkPqCUD4XkIHW5a1LsjZ+v2acwoaiMCCGZAUZ9gBdJI=;
-        b=ZqIs0MvKBp3Jw6mqFNsuF4jFd0gLAmShCZq6B89inz9D1linMFjfSCGVJ/rRPx7c1tVJkn
-        aJhhjfNArdgXWVvGSZJ/pJ5G5AXrRBUJkwkurgDsVLxxhQxgDQizzlcpRjSWD9uHLIxM2d
-        ZTWtWLi9FBSOf23BMa3QbuIfH07EQv8=
+        bh=PFxwKx/EwWB9jWEmX25bQbJoh6dZfyi7mRbJMrwlqJg=;
+        b=aL/ASJTlYVVycmt7uIsgyJ0EqCN0BwdCoHjAA1N9qxJerG+WaxcDCCD8e1SCg8o/aN6fGo
+        myXFD75FiCtnESRjwF0VaX79iSUHwia4rounKKsfms8yWyqvky4keIjda+Odhdeq21F58l
+        VymrkYCoECYyzPx04y8F0SdjDb/yY8A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-Gscak5j0MSqJfyybuFHsGw-1; Thu, 09 Jan 2020 10:21:59 -0500
-X-MC-Unique: Gscak5j0MSqJfyybuFHsGw-1
+ us-mta-254-ZZvT6K0CM--HmXa-1GHyTQ-1; Thu, 09 Jan 2020 10:22:08 -0500
+X-MC-Unique: ZZvT6K0CM--HmXa-1GHyTQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAC11804910;
-        Thu,  9 Jan 2020 15:21:57 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 677F3184B1F1;
+        Thu,  9 Jan 2020 15:22:06 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-180.brq.redhat.com [10.40.204.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 44F1180608;
-        Thu,  9 Jan 2020 15:21:45 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 586DE1CB;
+        Thu,  9 Jan 2020 15:21:58 +0000 (UTC)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
@@ -47,9 +47,9 @@ Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
         Richard Henderson <rth@twiddle.net>,
         David Gibson <david@gibson.dropbear.id.au>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH 01/15] target/arm/kvm: Use CPUState::kvm_state in kvm_arm_pmu_supported()
-Date:   Thu,  9 Jan 2020 16:21:19 +0100
-Message-Id: <20200109152133.23649-2-philmd@redhat.com>
+Subject: [PATCH 02/15] hw/ppc/spapr_rtas: Use local MachineState variable
+Date:   Thu,  9 Jan 2020 16:21:20 +0100
+Message-Id: <20200109152133.23649-3-philmd@redhat.com>
 In-Reply-To: <20200109152133.23649-1-philmd@redhat.com>
 References: <20200109152133.23649-1-philmd@redhat.com>
 MIME-Version: 1.0
@@ -61,28 +61,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVMState is already accessible via CPUState::kvm_state, use it.
+Since we have the MachineState already available locally,
+ues it instead of the global current_machine.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- target/arm/kvm.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ hw/ppc/spapr_rtas.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index b87b59a02a..8d82889150 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -181,9 +181,7 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
-=20
- bool kvm_arm_pmu_supported(CPUState *cpu)
- {
--    KVMState *s =3D KVM_STATE(current_machine->accelerator);
--
--    return kvm_check_extension(s, KVM_CAP_ARM_PMU_V3);
-+    return kvm_check_extension(cpu->kvm_state, KVM_CAP_ARM_PMU_V3);
- }
-=20
- int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index 8d8d8cdfcb..e88bb1930e 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -281,7 +281,7 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU =
+*cpu,
+                                           "DesProcs=3D%d,"
+                                           "MaxPlatProcs=3D%d",
+                                           max_cpus,
+-                                          current_machine->ram_size / Mi=
+B,
++                                          ms->ram_size / MiB,
+                                           ms->smp.cpus,
+                                           max_cpus);
+         if (pcc->n_host_threads > 0) {
 --=20
 2.21.1
 
