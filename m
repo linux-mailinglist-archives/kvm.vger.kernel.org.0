@@ -2,86 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53E08135F85
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 18:43:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2C3D135F8A
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 18:44:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388235AbgAIRmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 12:42:55 -0500
-Received: from foss.arm.com ([217.140.110.172]:35130 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728724AbgAIRmz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 12:42:55 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8564328;
-        Thu,  9 Jan 2020 09:42:54 -0800 (PST)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 901EF3F703;
-        Thu,  9 Jan 2020 09:42:53 -0800 (PST)
-Date:   Thu, 9 Jan 2020 17:42:51 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Andrew Murray <andrew.murray@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 11/18] KVM: arm64: don't trap Statistical Profiling
- controls to EL2
-Message-ID: <20200109174251.GJ3112@lakrids.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-12-andrew.murray@arm.com>
- <86bls0iqv6.wl-maz@kernel.org>
- <20191223115651.GA42593@e119886-lin.cambridge.arm.com>
- <1bb190091362262021dbaf41b5fe601e@www.loen.fr>
- <20191223121042.GC42593@e119886-lin.cambridge.arm.com>
- <20200109172511.GA42593@e119886-lin.cambridge.arm.com>
+        id S2388247AbgAIRoK convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 9 Jan 2020 12:44:10 -0500
+Received: from 11.mo1.mail-out.ovh.net ([188.165.48.29]:43220 "EHLO
+        11.mo1.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728724AbgAIRoK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jan 2020 12:44:10 -0500
+X-Greylist: delayed 1270 seconds by postgrey-1.27 at vger.kernel.org; Thu, 09 Jan 2020 12:44:09 EST
+Received: from player690.ha.ovh.net (unknown [10.108.16.63])
+        by mo1.mail-out.ovh.net (Postfix) with ESMTP id EAA0819E4E6
+        for <kvm@vger.kernel.org>; Thu,  9 Jan 2020 18:44:07 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
+        (Authenticated sender: groug@kaod.org)
+        by player690.ha.ovh.net (Postfix) with ESMTPSA id 23679DEC9C13;
+        Thu,  9 Jan 2020 17:43:50 +0000 (UTC)
+Date:   Thu, 9 Jan 2020 18:43:49 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        qemu-arm@nongnu.org, Alistair Francis <alistair.francis@wdc.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [PATCH 04/15] hw/ppc/spapr_rtas: Restrict variables scope to
+ single switch case
+Message-ID: <20200109184349.1aefa074@bahia.lan>
+In-Reply-To: <20200109152133.23649-5-philmd@redhat.com>
+References: <20200109152133.23649-1-philmd@redhat.com>
+        <20200109152133.23649-5-philmd@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200109172511.GA42593@e119886-lin.cambridge.arm.com>
-User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Ovh-Tracer-Id: 7378866518583449891
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdeiuddgieelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeltddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andrew,
+On Thu,  9 Jan 2020 16:21:22 +0100
+Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
 
-On Thu, Jan 09, 2020 at 05:25:12PM +0000, Andrew Murray wrote:
-> On Mon, Dec 23, 2019 at 12:10:42PM +0000, Andrew Murray wrote:
-> > On Mon, Dec 23, 2019 at 12:05:12PM +0000, Marc Zyngier wrote:
-> > > On 2019-12-23 11:56, Andrew Murray wrote:
-> > > > My original concern in the cover letter was in how to prevent
-> > > > the guest from attempting to use these registers in the first
-> > > > place - I think the solution I was looking for is to
-> > > > trap-and-emulate ID_AA64DFR0_EL1 such that the PMSVer bits
-> > > > indicate that SPE is not emulated.
-> > > 
-> > > That, and active trapping of the SPE system registers resulting in injection
-> > > of an UNDEF into the offending guest.
-> > 
-> > Yes that's no problem.
+> We only access these variables in RTAS_SYSPARM_SPLPAR_CHARACTERISTICS
+> case, restrict their scope to avoid unnecessary initialization.
 > 
-> The spec says that 'direct access to [these registers] are UNDEFINED' - is it
-> not more correct to handle this with trap_raz_wi than an undefined instruction?
 
-The term UNDEFINED specifically means treated as an undefined
-instruction. The Glossary in ARM DDI 0487E.a says for UNDEFINED:
+I guess a decent compiler can be smart enough detect that the initialization
+isn't needed outside of the RTAS_SYSPARM_SPLPAR_CHARACTERISTICS branch...
+Anyway, reducing scope isn't bad. The only hitch I could see is that some
+people do prefer to have all variables declared upfront, but there's a nested
+param_val variable already so I guess it's okay.
 
-| Indicates cases where an attempt to execute a particular encoding bit
-| pattern generates an exception, that is taken to the current Exception
-| level, or to the default Exception level for taking exceptions if the
-| UNDEFINED encoding was executed at EL0. This applies to:
-|
-| * Any encoding that is not allocated to any instruction.
-|
-| * Any encoding that is defined as never accessible at the current
-|   Exception level.
-|
-| * Some cases where an enable, disable, or trap control means an
-|   encoding is not accessible at the current Exception level.
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/ppc/spapr_rtas.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 6f06e9d7fe..7237e5ebf2 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -267,8 +267,6 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
+>                                            uint32_t nret, target_ulong rets)
+>  {
+>      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+> -    MachineState *ms = MACHINE(spapr);
+> -    unsigned int max_cpus = ms->smp.max_cpus;
+>      target_ulong parameter = rtas_ld(args, 0);
+>      target_ulong buffer = rtas_ld(args, 1);
+>      target_ulong length = rtas_ld(args, 2);
+> @@ -276,6 +274,8 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
+>  
+>      switch (parameter) {
+>      case RTAS_SYSPARM_SPLPAR_CHARACTERISTICS: {
+> +        MachineState *ms = MACHINE(spapr);
+> +        unsigned int max_cpus = ms->smp.max_cpus;
 
-So these should trigger an UNDEFINED exception rather than behaving as
-RAZ/WI.
+The max_cpus variable used to be a global. Now that it got moved
+below ms->smp, I'm not sure it's worth keeping it IMHO. What about
+dropping it completely and do:
 
-Thanks,
-Mark.
+        char *param_val = g_strdup_printf("MaxEntCap=%d,"
+                                          "DesMem=%" PRIu64 ","
+                                          "DesProcs=%d,"
+                                          "MaxPlatProcs=%d",
+                                          ms->smp.max_cpus,
+                                          current_machine->ram_size / MiB,
+                                          ms->smp.cpus,
+                                          ms->smp.max_cpus);
+
+And maybe insert an empty line between the declaration of param_val
+and the code for a better readability ?
+
+>          char *param_val = g_strdup_printf("MaxEntCap=%d,"
+>                                            "DesMem=%" PRIu64 ","
+>                                            "DesProcs=%d,"
+
