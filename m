@@ -2,106 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 035DF135EAE
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 17:49:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D05E135EB1
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 17:50:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387869AbgAIQtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 11:49:19 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44392 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727738AbgAIQtT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 11:49:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578588558;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KrP42ZZX4/LcDQ7SYYauYYSKRhpk+Ugq3lsZdVo10WE=;
-        b=Gtb8O6vqjDvqVrv2TuZzAsJZVenFOOmpUrj6vx616xJhKT7FQ3/VrGbpjmxh2UZxF1q8fd
-        Gu8UdOz0zg0J8MT+OVNbmKZV2yTXbt7sVjZfsej4zmX6nPfQeslNzKUOzoUEU4b0CLAiq1
-        luebgsIFV9d84XJZH8rJ7ehabAkiVgo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-TIWoVtdbOIueIWQIrAFRXw-1; Thu, 09 Jan 2020 11:49:11 -0500
-X-MC-Unique: TIWoVtdbOIueIWQIrAFRXw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0FB4113FD20;
-        Thu,  9 Jan 2020 16:49:10 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C97681C2E;
-        Thu,  9 Jan 2020 16:49:07 +0000 (UTC)
-Date:   Thu, 9 Jan 2020 17:49:05 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH] KVM: s390: check if kernel irqchip is actually enabled
-Message-ID: <20200109174905.138269ca.cohuck@redhat.com>
-In-Reply-To: <dd1ea7ee-d848-63ae-8b4d-857185e32b44@de.ibm.com>
-References: <20200109134713.14755-1-cohuck@redhat.com>
-        <dd1ea7ee-d848-63ae-8b4d-857185e32b44@de.ibm.com>
-Organization: Red Hat GmbH
+        id S1731524AbgAIQug (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 11:50:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41116 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728967AbgAIQug (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 11:50:36 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 009GgM6Z049438
+        for <kvm@vger.kernel.org>; Thu, 9 Jan 2020 11:50:35 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xe5rxdkm8-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 11:50:35 -0500
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Thu, 9 Jan 2020 16:50:33 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 9 Jan 2020 16:50:30 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 009GoTx828836190
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Jan 2020 16:50:29 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1F04FA404D;
+        Thu,  9 Jan 2020 16:50:29 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C87DFA4053;
+        Thu,  9 Jan 2020 16:50:28 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.108])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Jan 2020 16:50:28 +0000 (GMT)
+Date:   Thu, 9 Jan 2020 17:50:27 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v6 3/4] s390x: lib: add SPX and STPX
+ instruction wrapper
+In-Reply-To: <5c6f563e-3d09-5274-b050-a64122097e9b@redhat.com>
+References: <20200109161625.154894-1-imbrenda@linux.ibm.com>
+        <20200109161625.154894-4-imbrenda@linux.ibm.com>
+        <5c6f563e-3d09-5274-b050-a64122097e9b@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-TM-AS-GCONF: 00
+x-cbid: 20010916-0008-0000-0000-00000347FF39
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20010916-0009-0000-0000-00004A6846B5
+Message-Id: <20200109175027.362d8440@p-imbrenda>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-09_03:2020-01-09,2020-01-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 malwarescore=0 mlxlogscore=999
+ bulkscore=0 mlxscore=0 adultscore=0 phishscore=0 spamscore=0
+ suspectscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-2001090141
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 9 Jan 2020 15:06:22 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On Thu, 9 Jan 2020 17:43:55 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-> On 09.01.20 14:47, Cornelia Huck wrote:
-> > On s390, we only allow userspace to create an in-kernel irqchip
-> > if it has first enabled the KVM_CAP_S390_IRQCHIP vm capability.
-> > Let's assume that a userspace that enabled that capability has
-> > created an irqchip as well.
+> On 09/01/2020 17.16, Claudio Imbrenda wrote:
+> > Add a wrapper for the SET PREFIX and STORE PREFIX instructions, and
+> > use it instead of using inline assembly everywhere.
 > > 
-> > Fixes: 84223598778b ("KVM: s390: irq routing for adapter interrupts.")
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > > ---
+> >  lib/s390x/asm/arch_def.h | 10 ++++++++++
+> >  s390x/intercept.c        | 33 +++++++++++++--------------------
+> >  2 files changed, 23 insertions(+), 20 deletions(-)
 > > 
-> > A more precise check would be to add a field in kvm_arch that tracks
-> > whether an irqchip has actually been created; not sure if that is
-> > really needed.  
-> 
-> I think this is semantically wrong. We always have in-kernel irq handling.
-> It is actually not possible to not use it. So I understand where you are coming
-> from but this feels kind of wrong. 
-
-You cannot actually call create_irqchip if not enabled, though... as I
-said in my other reply, the intended semantics here are a bit unclear.
-
-> 
-> > 
-> > Found while trying to hunt down QEMU crashes with kvm-irqchip=off;
-> > this is not sufficient, though. I *think* everything but irqfds
-> > should work without kvm-irqchip as well, but have not found the problem
-> > yet.
-> > 
-> > ---
-> >  arch/s390/kvm/irq.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/s390/kvm/irq.h b/arch/s390/kvm/irq.h
-> > index 484608c71dd0..30e13d031379 100644
-> > --- a/arch/s390/kvm/irq.h
-> > +++ b/arch/s390/kvm/irq.h
-> > @@ -13,7 +13,7 @@
-> >  
-> >  static inline int irqchip_in_kernel(struct kvm *kvm)
-> >  {
-> > -	return 1;
-> > +	return !!kvm->arch.use_irqchip;
+> > diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> > index 1a5e3c6..465fe0f 100644
+> > --- a/lib/s390x/asm/arch_def.h
+> > +++ b/lib/s390x/asm/arch_def.h
+> > @@ -284,4 +284,14 @@ static inline int servc(uint32_t command,
+> > unsigned long sccb) return cc;
 > >  }
 > >  
-> >  #endif
-> >   
+> > +static inline void spx(uint32_t *new_prefix)  
+> 
+> Looking at this a second time ... why is new_prefix a pointer? A
+> normal value should be sufficient here, shouldn't it?
+
+no. if you look at the code in the same patch, intercept.c at some
+points needs to pass "wrong" pointers to spx and stpx in order to test
+them, so this needs to be a pointer
+
+the instructions themselves expect pointers (base register + offset)
+
+> > +{
+> > +	asm volatile("spx %0" : : "Q" (*new_prefix) : "memory");
+> > +}
+> > +
+> > +static inline void stpx(uint32_t *current_prefix)
+> > +{
+> > +	asm volatile("stpx %0" : "=Q" (*current_prefix));
+> > +}
+> > +  
+> 
+>  Thomas
 > 
 
