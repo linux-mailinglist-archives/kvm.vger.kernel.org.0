@@ -2,274 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BFF4135C51
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 16:10:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1522135C8A
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 16:21:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732237AbgAIPJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 10:09:37 -0500
-Received: from foss.arm.com ([217.140.110.172]:60812 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732220AbgAIPJd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 10:09:33 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E08C1FB;
-        Thu,  9 Jan 2020 07:09:32 -0800 (PST)
-Received: from [10.1.27.38] (e122027.cambridge.arm.com [10.1.27.38])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 336333F534;
-        Thu,  9 Jan 2020 07:09:30 -0800 (PST)
-Subject: Re: [PATCH v2 6/6] KVM: arm64: Support the VCPU preemption check
-To:     Zengruan Ye <yezengruan@huawei.com>, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Cc:     maz@kernel.org, james.morse@arm.com, linux@armlinux.org.uk,
-        suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
-        catalin.marinas@arm.com, mark.rutland@arm.com, will@kernel.org,
-        daniel.lezcano@linaro.org
-References: <20191226135833.1052-1-yezengruan@huawei.com>
- <20191226135833.1052-7-yezengruan@huawei.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <5a1f6745-2deb-253b-7022-f2725d8d40ba@arm.com>
-Date:   Thu, 9 Jan 2020 15:09:28 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1730958AbgAIPVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 10:21:53 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28988 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727945AbgAIPVx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 10:21:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578583311;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=P5RGdQrGsYtgUOKj0M4myzDzBUaBMtcy1aS0kbUYf64=;
+        b=HlRgdg4L1OFxKuK1oL71gdPD2nLs5sEInQxTz/meMDlxcrBIgjIpGc5/87km2Q6QcKMaX6
+        8tNR0boKB1PbNvm/vL7rZqs6Bquv9gU6Dn07jOadxA4vMJPb5hB5mO99TQrft2gxW9jXA5
+        z7GY2FgOBhmKjwdp4kaglMzZYpyw1LA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-334-Z6-I5PgHMWWbDGkeCQozUg-1; Thu, 09 Jan 2020 10:21:48 -0500
+X-MC-Unique: Z6-I5PgHMWWbDGkeCQozUg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACD758C2BE1;
+        Thu,  9 Jan 2020 15:21:45 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-180.brq.redhat.com [10.40.204.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F14D27FB5C;
+        Thu,  9 Jan 2020 15:21:36 +0000 (UTC)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        qemu-ppc@nongnu.org,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH 00/15] Replace current_machine by qdev_get_machine()
+Date:   Thu,  9 Jan 2020 16:21:18 +0100
+Message-Id: <20200109152133.23649-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191226135833.1052-7-yezengruan@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/12/2019 13:58, Zengruan Ye wrote:
-> Support the vcpu_is_preempted() functionality under KVM/arm64. This will
-> enhance lock performance on overcommitted hosts (more runnable VCPUs
-> than physical CPUs in the system) as doing busy waits for preempted
-> VCPUs will hurt system performance far worse than early yielding.
-> 
-> unix benchmark result:
->    host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 CPUs
->    guest: kernel 5.5.0-rc1, 16 VCPUs
-> 
->                 test-case                |    after-patch    |   before-patch
-> ----------------------------------------+-------------------+------------------
->   Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
->   Double-Precision Whetstone             |     32856.1 MWIPS |     32849.6 MWIPS
->   Execl Throughput                       |      3662.1 lps   |      2718.0 lps
->   File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    158011.8 KBps
->   File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     37664.0 KBps
->   File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    441108.8 KBps
->   Pipe Throughput                        |   6405029.6 lps   |   6021457.6 lps
->   Pipe-based Context Switching           |    185872.7 lps   |    184255.3 lps
->   Process Creation                       |      4025.7 lps   |      3706.6 lps
->   Shell Scripts (1 concurrent)           |      6745.6 lpm   |      6436.1 lpm
->   Shell Scripts (8 concurrent)           |       998.7 lpm   |       931.1 lpm
->   System Call Overhead                   |   3913363.1 lps   |   3883287.8 lps
-> ----------------------------------------+-------------------+------------------
->   System Benchmarks Index Score          |      1835.1       |      1327.6
-> 
-> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
-> ---
->   arch/arm64/include/asm/paravirt.h |   3 +
->   arch/arm64/kernel/paravirt.c      | 117 ++++++++++++++++++++++++++++++
->   arch/arm64/kernel/setup.c         |   2 +
->   include/linux/cpuhotplug.h        |   1 +
->   4 files changed, 123 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-> index 7b1c81b544bb..ca3a2c7881f3 100644
-> --- a/arch/arm64/include/asm/paravirt.h
-> +++ b/arch/arm64/include/asm/paravirt.h
-> @@ -29,6 +29,8 @@ static inline u64 paravirt_steal_clock(int cpu)
->   
->   int __init pv_time_init(void);
->   
-> +int __init pv_lock_init(void);
-> +
->   __visible bool __native_vcpu_is_preempted(int cpu);
->   
->   static inline bool pv_vcpu_is_preempted(int cpu)
-> @@ -39,6 +41,7 @@ static inline bool pv_vcpu_is_preempted(int cpu)
->   #else
->   
->   #define pv_time_init() do {} while (0)
-> +#define pv_lock_init() do {} while (0)
->   
->   #endif // CONFIG_PARAVIRT
->   
-> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-> index d8f1ba8c22ce..bd2ad6a17a26 100644
-> --- a/arch/arm64/kernel/paravirt.c
-> +++ b/arch/arm64/kernel/paravirt.c
-> @@ -22,6 +22,7 @@
->   #include <asm/paravirt.h>
->   #include <asm/pvclock-abi.h>
->   #include <asm/smp_plat.h>
-> +#include <asm/pvlock-abi.h>
->   
->   struct static_key paravirt_steal_enabled;
->   struct static_key paravirt_steal_rq_enabled;
-> @@ -35,6 +36,10 @@ struct pv_time_stolen_time_region {
->   	struct pvclock_vcpu_stolen_time *kaddr;
->   };
->   
-> +struct pv_lock_state_region {
-> +	struct pvlock_vcpu_state *kaddr;
-> +};
-> +
->   static DEFINE_PER_CPU(struct pv_time_stolen_time_region, stolen_time_region);
->   
->   static bool steal_acc = true;
-> @@ -158,3 +163,115 @@ int __init pv_time_init(void)
->   
->   	return 0;
->   }
-> +
-> +static DEFINE_PER_CPU(struct pv_lock_state_region, lock_state_region);
-> +
-> +static bool kvm_vcpu_is_preempted(int cpu)
-> +{
-> +	struct pv_lock_state_region *reg;
-> +	__le64 preempted_le;
-> +
-> +	reg = per_cpu_ptr(&lock_state_region, cpu);
-> +	if (!reg->kaddr) {
-> +		pr_warn_once("PV lock enabled but not configured for cpu %d\n",
-> +			     cpu);
-> +		return false;
-> +	}
-> +
-> +	preempted_le = le64_to_cpu(READ_ONCE(reg->kaddr->preempted));
-> +
-> +	return !!(preempted_le & 1);
+Blurb from previous question [1]:
 
-According to the documentation preempted != 0 means preempted, but here you are checking the LSB. You need to be consistent about the ABI.
+  "hw/boards.h" declare current_machine, and vl.c defines it:
 
-> +}
-> +
-> +static int pvlock_vcpu_state_dying_cpu(unsigned int cpu)
-> +{
-> +	struct pv_lock_state_region *reg;
-> +
-> +	reg = this_cpu_ptr(&lock_state_region);
-> +	if (!reg->kaddr)
-> +		return 0;
-> +
-> +	memunmap(reg->kaddr);
-> +	memset(reg, 0, sizeof(*reg));
-> +
-> +	return 0;
-> +}
-> +
-> +static int init_pvlock_vcpu_state(unsigned int cpu)
-> +{
-> +	struct pv_lock_state_region *reg;
-> +	struct arm_smccc_res res;
-> +
-> +	reg = this_cpu_ptr(&lock_state_region);
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
-> +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED) {
-> +		pr_warn("Failed to init PV lock data structure\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	reg->kaddr = memremap(res.a0,
-> +			      sizeof(struct pvlock_vcpu_state),
-> +			      MEMREMAP_WB);
-> +
-> +	if (!reg->kaddr) {
-> +		pr_warn("Failed to map PV lock data structure\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int kvm_arm_init_pvlock(void)
-> +{
-> +	int ret;
-> +
-> +	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
-> +				"hypervisor/arm/pvlock:starting",
-> +				init_pvlock_vcpu_state,
-> +				pvlock_vcpu_state_dying_cpu);
-> +	if (ret < 0) {
-> +		pr_warn("PV-lock init failed\n");
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static bool has_kvm_pvlock(void)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	/* To detect the presence of PV lock support we require SMCCC 1.1+ */
-> +	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
-> +		return false;
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> +			     ARM_SMCCC_HV_PV_LOCK_FEATURES, &res);
+    current_machine =3D MACHINE(object_new_with_class(OBJECT_CLASS(machin=
+e_class)));
+    object_property_add_child(object_get_root(), "machine",
+                              OBJECT(current_machine), &error_abort);
 
-As mentioned previously we could do with something more robust to check that the hypervisor is actually KVM before assuming that vendor specific IDs are valid.
+  The bigger user of 'current_machine' is the accel/KVM code.
 
-Steve
+  Recently in a0628599f..cc7d44c2e0 "Replace global smp variables
+  with machine smp properties" we started to use MACHINE(qdev_get_machine=
+()).
+  Following a0628599f..cc7d44c2e0, a5e0b33119 use 'current_machine' again=
+.
 
-> +
-> +	if (res.a0 != SMCCC_RET_SUCCESS)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> +int __init pv_lock_init(void)
-> +{
-> +	int ret;
-> +
-> +	if (is_hyp_mode_available())
-> +		return 0;
-> +
-> +	if (!has_kvm_pvlock())
-> +		return 0;
-> +
-> +	ret = kvm_arm_init_pvlock();
-> +	if (ret)
-> +		return ret;
-> +
-> +	pv_ops.lock.vcpu_is_preempted = kvm_vcpu_is_preempted;
-> +	pr_info("using PV-lock preempted\n");
-> +
-> +	return 0;
-> +}
-> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> index 56f664561754..aa3a8b9e710f 100644
-> --- a/arch/arm64/kernel/setup.c
-> +++ b/arch/arm64/kernel/setup.c
-> @@ -341,6 +341,8 @@ void __init setup_arch(char **cmdline_p)
->   	smp_init_cpus();
->   	smp_build_mpidr_hash();
->   
-> +	pv_lock_init();
-> +
->   	/* Init percpu seeds for random tags after cpus are set up. */
->   	kasan_init_tags();
->   
-> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-> index e51ee772b9f5..f72ff95ab63a 100644
-> --- a/include/linux/cpuhotplug.h
-> +++ b/include/linux/cpuhotplug.h
-> @@ -138,6 +138,7 @@ enum cpuhp_state {
->   	CPUHP_AP_DUMMY_TIMER_STARTING,
->   	CPUHP_AP_ARM_XEN_STARTING,
->   	CPUHP_AP_ARM_KVMPV_STARTING,
-> +	CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
->   	CPUHP_AP_ARM_CORESIGHT_STARTING,
->   	CPUHP_AP_ARM64_ISNDEP_STARTING,
->   	CPUHP_AP_SMPCFD_DYING,
-> 
+  qdev_get_machine() resolves the machine in the QOM composition tree.
+
+Paolo answered [2]:
+
+> I would always use MACHINE(qdev_get_machine()), espeecially outside
+> vl.c.  Ideally, current_machine would be static within vl.c or even
+> unused outside the object_property_add_child() that you quote above.
+
+Let's remove the global current_machine.
+
+I am still confused by this comment:
+
+  /* qdev_get_machine() can return something that's not TYPE_MACHINE
+   * if this is one of the user-only emulators; in that case there's
+   * no need to check the ignore_memory_transaction_failures board flag.
+   */
+
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg669475.html
+[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg669493.html
+
+Philippe Mathieu-Daud=C3=A9 (15):
+  target/arm/kvm: Use CPUState::kvm_state in kvm_arm_pmu_supported()
+  hw/ppc/spapr_rtas: Use local MachineState variable
+  hw/ppc/spapr_rtas: Access MachineState via SpaprMachineState argument
+  hw/ppc/spapr_rtas: Restrict variables scope to single switch case
+  device-hotplug: Replace current_machine by qdev_get_machine()
+  migration/savevm: Replace current_machine by qdev_get_machine()
+  hw/core/machine-qmp-cmds: Replace current_machine by
+    qdev_get_machine()
+  target/arm/monitor: Replace current_machine by qdev_get_machine()
+  device_tree: Replace current_machine by qdev_get_machine()
+  memory: Replace current_machine by qdev_get_machine()
+  exec: Replace current_machine by qdev_get_machine()
+  accel: Introduce the current_accel() method
+  accel: Replace current_machine->accelerator by current_accel() method
+  accel/accel: Replace current_machine by qdev_get_machine()
+  vl: Make current_machine a local variable
+
+ include/hw/boards.h        |  2 --
+ include/sysemu/accel.h     |  2 ++
+ accel/accel.c              |  7 +++++++
+ accel/kvm/kvm-all.c        |  4 ++--
+ accel/tcg/tcg-all.c        |  2 +-
+ device-hotplug.c           |  2 +-
+ device_tree.c              |  4 +++-
+ exec.c                     | 10 ++++++----
+ hw/core/machine-qmp-cmds.c |  4 ++--
+ hw/ppc/spapr_rtas.c        |  6 +++---
+ memory.c                   |  6 ++++--
+ migration/savevm.c         | 10 +++++-----
+ target/arm/kvm.c           |  4 +---
+ target/arm/kvm64.c         |  4 ++--
+ target/arm/monitor.c       |  3 ++-
+ target/i386/kvm.c          |  2 +-
+ target/ppc/kvm.c           |  2 +-
+ vl.c                       |  6 +++---
+ 18 files changed, 46 insertions(+), 34 deletions(-)
+
+--=20
+2.21.1
 
