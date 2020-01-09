@@ -2,197 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 59868135D52
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 17:00:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 51DC9135DF5
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 17:16:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732738AbgAIQAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 11:00:02 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40509 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730796AbgAIQAC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 11:00:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578585601;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZYNwTh4Tu4Bos8ZZOeTkObg6tVBZsVtEef3Z+yMgUhs=;
-        b=ctruRUdIabNgNtgENh3luYERWQEh5ccV18qk/FujZXuiluYoj1liWROskwpmOwCrJVhm+N
-        t24uk74yKmWiydvzeLzrZKzKP9eKr7rUu9cFqtH+jHgmvAoBbhbOPCcYGCw+mqu/tCbMt3
-        ey2oJSd09TI1b5lC2fDIyoVlSMTVnDo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-jKHUHvAlOV-9lB8EmxIJPA-1; Thu, 09 Jan 2020 10:59:57 -0500
-X-MC-Unique: jKHUHvAlOV-9lB8EmxIJPA-1
-Received: by mail-qk1-f200.google.com with SMTP id j16so4433767qkk.17
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 07:59:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ZYNwTh4Tu4Bos8ZZOeTkObg6tVBZsVtEef3Z+yMgUhs=;
-        b=ct7OtWOcVHqdM5g208+4aeB4IXo2LRac9miXXxYE7CynF5n2FyxLSZWN2bTuEeNj0V
-         /jbEo9/1OQ/yimD2k8+CCijbzohL/2mWaWwLaX4RSy201JPlHlLS6tuVVjJcU186OfD0
-         /golyN5YMXOzIOieZhgTN2rfqgBP54MhV9KXBlFIt6r3zOhdxjFAFc46ER+ecAZyzreT
-         AeUlJ0lFu22ByTKN0xeDaNCXwc1uioLkmIeLDyeb3cVji8+FtZQgFSpAD33keUDdJ+u1
-         C3W6Dcl2GTmEVoNd6kmxuRvL63/iZItj6Mn0Za66Fl+lpFy6DecNY2nmCtblVboP49gz
-         CSYQ==
-X-Gm-Message-State: APjAAAUjQnUSqIx+1GK9SV9ohDkPhtDjYgwo/GGHQKjCDyrqCf/Y4Qml
-        J3MkP4y9w6y+gGF/FpZlYX5Lqq7XVtQsv+jaU1MRrGllXS7QURfSgbDQZHs0E63RwPvoK84INel
-        tidzZ0i1s0nCR
-X-Received: by 2002:aed:2e02:: with SMTP id j2mr8369187qtd.370.1578585597211;
-        Thu, 09 Jan 2020 07:59:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz3MHsanpxEwVWBpdyHyNxRs8eWkHDAm95FtF3MPWMx3s40lIzLfEwwE1x1R2+LvWrK9fIE9Q==
-X-Received: by 2002:aed:2e02:: with SMTP id j2mr8369170qtd.370.1578585596953;
-        Thu, 09 Jan 2020 07:59:56 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
-        by smtp.gmail.com with ESMTPSA id t3sm3602189qtc.8.2020.01.09.07.59.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2020 07:59:56 -0800 (PST)
-Date:   Thu, 9 Jan 2020 10:59:50 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3 00/21] KVM: Dirty ring interface
-Message-ID: <20200109105443-mutt-send-email-mst@kernel.org>
-References: <20200109145729.32898-1-peterx@redhat.com>
+        id S2387541AbgAIQQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 11:16:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52866 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387527AbgAIQQe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 11:16:34 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 009G9mxL012399
+        for <kvm@vger.kernel.org>; Thu, 9 Jan 2020 11:16:33 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xdx6k4guj-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 11:16:32 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Thu, 9 Jan 2020 16:16:29 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 9 Jan 2020 16:16:27 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 009GGPhX38732092
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Jan 2020 16:16:25 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 809494C040;
+        Thu,  9 Jan 2020 16:16:25 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 442D84C044;
+        Thu,  9 Jan 2020 16:16:25 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.108])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Jan 2020 16:16:25 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v6 0/4] s390x: SCLP Unit test
+Date:   Thu,  9 Jan 2020 17:16:21 +0100
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200109145729.32898-1-peterx@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20010916-0016-0000-0000-000002DBF725
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20010916-0017-0000-0000-0000333E76DE
+Message-Id: <20200109161625.154894-1-imbrenda@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-09_03:2020-01-09,2020-01-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 phishscore=0 priorityscore=1501 bulkscore=0
+ suspectscore=1 spamscore=0 mlxscore=0 malwarescore=0 impostorscore=0
+ mlxlogscore=901 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-2001090138
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 09, 2020 at 09:57:08AM -0500, Peter Xu wrote:
-> Branch is here: https://github.com/xzpeter/linux/tree/kvm-dirty-ring
-> (based on kvm/queue)
-> 
-> Please refer to either the previous cover letters, or documentation
-> update in patch 12 for the big picture.
+This patchset contains some minor cleanup, some preparatory work and
+then the SCLP unit test itself.
 
-I would rather you pasted it here. There's no way to respond otherwise.
+The unit test checks the following:
+    
+    * Correctly ignoring instruction bits that should be ignored
+    * Privileged instruction check
+    * Check for addressing exceptions
+    * Specification exceptions:
+      - SCCB size less than 8
+      - SCCB unaligned
+      - SCCB overlaps prefix or lowcore
+      - SCCB address higher than 2GB
+    * Return codes for
+      - Invalid command
+      - SCCB too short (but at least 8)
+      - SCCB page boundary violation
 
-For something that's presumably an optimization, isn't there
-some kind of testing that can be done to show the benefits?
-What kind of gain was observed?
+v5 -> v6
+* fixed a bug in test_addressing
+* improved comments in test_sccb_prefix
+* replaced all inline assembly usages of spx and stpx with the wrappers
+* added one more wrapper for test_one_sccb for read-only tests
+v4 -> v5
+* updated usage of report()
+* added SPX and STPX wrappers to the library
+* improved readability
+* addressed some more comments
+v3 -> v4
+* export sclp_setup_int instead of copying it
+* add more comments
+* rename some more variables to improve readability
+* improve the prefix test
+* improved the invalid address test
+* addressed further comments received during review
+v2 -> v3
+* generally improved the naming of variables
+* added and fixed comments
+* renamed test_one_run to test_one_simple
+* added some const where needed
+* addresed many more small comments received during review
+v1 -> v2
+* fix many small issues that came up during the first round of reviews
+* add comments to each function
+* use a static buffer for the SCCP template when used
 
-I know it's mostly relevant for huge VMs, but OTOH these
-probably use huge pages.
+Claudio Imbrenda (4):
+  s390x: export sclp_setup_int
+  s390x: sclp: add service call instruction wrapper
+  s390x: lib: add SPX and STPX instruction wrapper
+  s390x: SCLP unit test
 
+ s390x/Makefile           |   1 +
+ lib/s390x/asm/arch_def.h |  23 ++
+ lib/s390x/sclp.h         |   1 +
+ lib/s390x/sclp.c         |   9 +-
+ s390x/intercept.c        |  33 ++-
+ s390x/sclp.c             | 472 +++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   8 +
+ 7 files changed, 520 insertions(+), 27 deletions(-)
+ create mode 100644 s390x/sclp.c
 
-
-
->  Previous posts:
-> 
-> V1: https://lore.kernel.org/kvm/20191129213505.18472-1-peterx@redhat.com
-> V2: https://lore.kernel.org/kvm/20191221014938.58831-1-peterx@redhat.com
-> 
-> The major change in V3 is that we dropped the whole waitqueue and the
-> global lock. With that, we have clean per-vcpu ring and no default
-> ring any more.  The two kvmgt refactoring patches were also included
-> to show the dependency of the works.
-> 
-> Patchset layout:
-> 
-> Patch 1-2:         Picked up from kvmgt refactoring
-> Patch 3-6:         Small patches that are not directly related,
->                    (So can be acked/nacked/picked as standalone)
-> Patch 7-11:        Prepares for the dirty ring interface
-> Patch 12:          Major implementation
-> Patch 13-14:       Quick follow-ups for patch 8
-> Patch 15-21:       Test cases
-> 
-> V3 changelog:
-> 
-> - fail userspace writable maps on dirty ring ranges [Jason]
-> - commit message fixups [Paolo]
-> - change __x86_set_memory_region to return hva [Paolo]
-> - cacheline align for indices [Paolo, Jason]
-> - drop waitqueue, global lock, etc., include kvmgt rework patchset
-> - take lock for __x86_set_memory_region() (otherwise it triggers a
->   lockdep in latest kvm/queue) [Paolo]
-> - check KVM_DIRTY_LOG_PAGE_OFFSET in kvm_vm_ioctl_enable_dirty_log_ring
-> - one more patch to drop x86_set_memory_region [Paolo]
-> - one more patch to remove extra srcu usage in init_rmode_identity_map()
-> - add some r-bs for Paolo
-> 
-> Please review, thanks.
-> 
-> Paolo Bonzini (1):
->   KVM: Move running VCPU from ARM to common code
-> 
-> Peter Xu (18):
->   KVM: Remove kvm_read_guest_atomic()
->   KVM: Add build-time error check on kvm_run size
->   KVM: X86: Change parameter for fast_page_fault tracepoint
->   KVM: X86: Don't take srcu lock in init_rmode_identity_map()
->   KVM: Cache as_id in kvm_memory_slot
->   KVM: X86: Drop x86_set_memory_region()
->   KVM: X86: Don't track dirty for KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
->   KVM: Pass in kvm pointer into mark_page_dirty_in_slot()
->   KVM: X86: Implement ring-based dirty memory tracking
->   KVM: Make dirty ring exclusive to dirty bitmap log
->   KVM: Don't allocate dirty bitmap if dirty ring is enabled
->   KVM: selftests: Always clear dirty bitmap after iteration
->   KVM: selftests: Sync uapi/linux/kvm.h to tools/
->   KVM: selftests: Use a single binary for dirty/clear log test
->   KVM: selftests: Introduce after_vcpu_run hook for dirty log test
->   KVM: selftests: Add dirty ring buffer test
->   KVM: selftests: Let dirty_log_test async for dirty ring test
->   KVM: selftests: Add "-c" parameter to dirty log test
-> 
-> Yan Zhao (2):
->   vfio: introduce vfio_iova_rw to read/write a range of IOVAs
->   drm/i915/gvt: subsitute kvm_read/write_guest with vfio_iova_rw
-> 
->  Documentation/virt/kvm/api.txt                |  96 ++++
->  arch/arm/include/asm/kvm_host.h               |   2 -
->  arch/arm64/include/asm/kvm_host.h             |   2 -
->  arch/x86/include/asm/kvm_host.h               |   7 +-
->  arch/x86/include/uapi/asm/kvm.h               |   1 +
->  arch/x86/kvm/Makefile                         |   3 +-
->  arch/x86/kvm/mmu/mmu.c                        |   6 +
->  arch/x86/kvm/mmutrace.h                       |   9 +-
->  arch/x86/kvm/svm.c                            |   3 +-
->  arch/x86/kvm/vmx/vmx.c                        |  86 ++--
->  arch/x86/kvm/x86.c                            |  43 +-
->  drivers/gpu/drm/i915/gvt/kvmgt.c              |  25 +-
->  drivers/vfio/vfio.c                           |  45 ++
->  drivers/vfio/vfio_iommu_type1.c               |  81 ++++
->  include/linux/kvm_dirty_ring.h                |  55 +++
->  include/linux/kvm_host.h                      |  37 +-
->  include/linux/vfio.h                          |   5 +
->  include/trace/events/kvm.h                    |  78 ++++
->  include/uapi/linux/kvm.h                      |  33 ++
->  tools/include/uapi/linux/kvm.h                |  38 ++
->  tools/testing/selftests/kvm/Makefile          |   2 -
->  .../selftests/kvm/clear_dirty_log_test.c      |   2 -
->  tools/testing/selftests/kvm/dirty_log_test.c  | 420 ++++++++++++++++--
->  .../testing/selftests/kvm/include/kvm_util.h  |   4 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  72 +++
->  .../selftests/kvm/lib/kvm_util_internal.h     |   3 +
->  virt/kvm/arm/arch_timer.c                     |   2 +-
->  virt/kvm/arm/arm.c                            |  29 --
->  virt/kvm/arm/perf.c                           |   6 +-
->  virt/kvm/arm/vgic/vgic-mmio.c                 |  15 +-
->  virt/kvm/dirty_ring.c                         | 162 +++++++
->  virt/kvm/kvm_main.c                           | 215 +++++++--
->  32 files changed, 1379 insertions(+), 208 deletions(-)
->  create mode 100644 include/linux/kvm_dirty_ring.h
->  delete mode 100644 tools/testing/selftests/kvm/clear_dirty_log_test.c
->  create mode 100644 virt/kvm/dirty_ring.c
-> 
-> -- 
-> 2.24.1
+-- 
+2.24.1
 
