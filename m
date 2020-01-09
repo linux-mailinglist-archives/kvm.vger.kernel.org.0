@@ -2,102 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AF7A135B14
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 15:09:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C7CEC135B22
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 15:13:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731422AbgAIOJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 09:09:39 -0500
-Received: from mail-qv1-f48.google.com ([209.85.219.48]:43753 "EHLO
-        mail-qv1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728406AbgAIOJi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 09:09:38 -0500
-Received: by mail-qv1-f48.google.com with SMTP id p2so2971873qvo.10
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 06:09:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=8QV7o4T8Kss98lTXcXIWTfPETRl9+zSe6fXYbXvevAE=;
-        b=sVl1xfc92GZB4kAfdA95fiar9VBggNsLhQkfEKj9Q9LzM+VDUW6jhJ7k5c2KpTr6ol
-         hiYaVAOdZsSn3BszeMPd7ftyMSSGOQYfe9sSxIVJx9P6m0XfXdU2PZSmOwi4l+I8kYSl
-         YcgqGbVRQqYMBBqwa6gVj+E594Gt9alpWR9fp1ao57eHWQt5UTid3zYD7O+dUwTVCgdQ
-         LeP38UTL8FmbB48k87CBC9E6z6JrFK7jRVs/qocaIREjmH0GOVWb4aqutThiPSZwFzze
-         M9CQmSe5QCIYJVFT8wJ/VUFNYvbMxy7MqICG+rq7UBaML9G3MXPmyzdq/VXZNzTfxhQ7
-         G0Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=8QV7o4T8Kss98lTXcXIWTfPETRl9+zSe6fXYbXvevAE=;
-        b=QWGJugJjMa3I3Xa+N/mv1J5cscKjAOB6Nvze+3Sjt9FLjDP+hKb6bXEpU0htiGIb1K
-         I4DzddSPYF48D536y4/wdsUdjPwvQ6EfMFZb9KC8HAczAfrez1yMTmRfLRm0ONY1B0sg
-         u79pQ/S/q+Bf4NXzxw6ye4kk5MKc4CURabDKMCMiCN98WDzliDbVgG6lBZF1qPuzvHfj
-         K0jHj3D2THY206JQhYD/GlwgQazKaw1cHL+XuELanvPwV/TI+BQAwu/7PWaXOfC7R0O1
-         pl8iDel6XEKNBtnGfmn/6WtfyJCDuAYK0HwDonanYBxVShis8T4b27MSPZfZ5TZ6uyx7
-         aMrw==
-X-Gm-Message-State: APjAAAVTasFPOjhYrWlCD+Yzuc5SJr5egiItnrTAQ5/TIvKjCUXhjyjg
-        u2WOq/RmyPjI3lGhsLswOutHtFPFs/dnDQPh69g=
-X-Google-Smtp-Source: APXvYqx0MbY7XXKZZAhD1Uu31ENSh4p0PVArt3wjQGqvodtCD64KSLHLzPYXWV2rCkeCFoEjvHE+TDS5W3E5kMcQ2PM=
-X-Received: by 2002:a05:6214:982:: with SMTP id dt2mr8622222qvb.174.1578578977711;
- Thu, 09 Jan 2020 06:09:37 -0800 (PST)
+        id S1731551AbgAIONw convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 9 Jan 2020 09:13:52 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:40256 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728951AbgAIONw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 09:13:52 -0500
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-175-aevZXyfFPaql_ZCdCCrlLw-1; Thu, 09 Jan 2020 14:13:49 +0000
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Thu, 9 Jan 2020 14:13:48 +0000
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Thu, 9 Jan 2020 14:13:48 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Sean Christopherson' <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] KVM: x86/mmu: Fix a benign Bitwise vs. Logical OR mixup
+Thread-Topic: [PATCH] KVM: x86/mmu: Fix a benign Bitwise vs. Logical OR mixup
+Thread-Index: AQHVxbk8+XHUyW1VS0SOYvyU0+7JlafiXjig
+Date:   Thu, 9 Jan 2020 14:13:48 +0000
+Message-ID: <c716f793e22e4885a3dee3c91f93e517@AcuMS.aculab.com>
+References: <20200108001859.25254-1-sean.j.christopherson@intel.com>
+In-Reply-To: <20200108001859.25254-1-sean.j.christopherson@intel.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Thu, 9 Jan 2020 14:09:23 +0000
-Message-ID: <CAJSP0QWysOZdp88vqJSQ-7J8tPk6OdaSL2WDLetJ5+YXsNH-UA@mail.gmail.com>
-Subject: Call for Google Summer of Code 2020 project ideas
-To:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        rust-vmm@lists.opendev.org
-Cc:     =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Julia Suvorova <jusual@redhat.com>,
-        Jan Kiszka <jan.kiszka@web.de>,
-        Valentine Sinitsyn <valentine.sinitsyn@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Alberto Garcia <berto@igalia.com>,
-        Alexander Graf <agraf@csgraf.de>,
-        Alistair Francis <alistair23@gmail.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe@mathieu-daude.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Yuval Shaia <yuval.shaia@oracle.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        John Snow <jsnow@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MC-Unique: aevZXyfFPaql_ZCdCCrlLw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear QEMU, KVM, and rust-vmm community,
-QEMU will apply for Google Summer of Code
-(https://summerofcode.withgoogle.com/) again this year.  This internship
-program offers full-time, paid, 12-week, remote work internships for
-contributing to open source.  QEMU can act as an umbrella organization
-for KVM kernel and rust-vmm projects too.
+From: Sean Christopherson
+> Sent: 08 January 2020 00:19
+> 
+> Use a Logical OR in __is_rsvd_bits_set() to combine the two reserved bit
+> checks, which are obviously intended to be logical statements.  Switching
+> to a Logical OR is functionally a nop, but allows the compiler to better
+> optimize the checks.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 7269130ea5e2..72e845709027 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3970,7 +3970,7 @@ __is_rsvd_bits_set(struct rsvd_bits_validate *rsvd_check, u64 pte, int level)
+>  {
+>  	int bit7 = (pte >> 7) & 1, low6 = pte & 0x3f;
+> 
+> -	return (pte & rsvd_check->rsvd_bits_mask[bit7][level-1]) |
+> +	return (pte & rsvd_check->rsvd_bits_mask[bit7][level-1]) ||
+>  		((rsvd_check->bad_mt_xwr & (1ull << low6)) != 0);
 
-Please post project ideas on the QEMU wiki before February 1st:
-https://wiki.qemu.org/Google_Summer_of_Code_2020
+Are you sure this isn't deliberate?
+The best code almost certainly comes from also removing the '!= 0'.
+You also don't want to convert the expression result to zero.
 
-Good project ideas are suitable for 12 weeks of full-time work by a
-competent programmer who is not yet familiar with the codebase.  In
-addition, they are:
- * Well-defined - the scope is clear
- * Self-contained - there are few dependencies
- * Uncontroversial - they are acceptable to the community
- * Incremental - they produce deliverables along the way
+So:
+	return (pte & rsvd_check->rsvd_bits_mask[bit7][level-1]) | (rsvd_check->bad_mt_xwr & (1ull << low6));
+The code then doesn't have any branches to get mispredicted.
 
-Feel free to post ideas even if you are unable to mentor the project.
-It doesn't hurt to share the idea!
+	David
 
-I will review project ideas and keep you up-to-date on QEMU's
-acceptance into GSoC.
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
-For more background on QEMU internships, check out this video:
-https://www.youtube.com/watch?v=xNVCX7YMUL8
-
-Stefan
