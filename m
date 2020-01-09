@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD846135C93
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 16:22:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DEE1B135C94
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 16:23:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732339AbgAIPW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 10:22:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23454 "EHLO
+        id S1732341AbgAIPXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 10:23:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49498 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732329AbgAIPW6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 10:22:58 -0500
+        with ESMTP id S1732321AbgAIPXE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jan 2020 10:23:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578583377;
+        s=mimecast20190719; t=1578583383;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=H5HnxoPdzrltmBx4GJfO10Gs5/HVEMyNIWg08Qb03H8=;
-        b=gx+M2YOvq6X7Yjgu47VSjPOymnQH5VJep4a38gamElsj0qiJaYw7T1SkgdjmbuXoawinPo
-        v1hifi6XikgOZm66kwFEWdfP2fI5UlOOpDuX46wmD2AWHmH0gqz1TO2XA+zrlXwxYfU2eW
-        kZb7o9s6mu8Oz8kY4nU+hb8vkop6X/w=
+        bh=hzr8Edx5jAryfh/huxiAkUz4zCXuFwzT7om8QEdCtyk=;
+        b=C+6R538tDUSlBZEE7nrT6P9s3jlyEutfO1g38dDT/PTqgTKT+y6wWQG51jRT2ucriHHgww
+        3KZBVI3WjSYswOTiulbnn5gvKBihqRVDmgls9ZNti2MJHV0MYTcsjoIv94HiwKaFgUs+JM
+        Wd8jqtzLX3OjySffPMp8T1VjP5jckcw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-Hjxm58MoNNa7j3wVE--rPQ-1; Thu, 09 Jan 2020 10:22:54 -0500
-X-MC-Unique: Hjxm58MoNNa7j3wVE--rPQ-1
+ us-mta-275-_7PA0sDLPwqBnL2Z-1DRkA-1; Thu, 09 Jan 2020 10:22:59 -0500
+X-MC-Unique: _7PA0sDLPwqBnL2Z-1DRkA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 894668C4B52;
-        Thu,  9 Jan 2020 15:22:52 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18ED985EE6A;
+        Thu,  9 Jan 2020 15:22:58 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-180.brq.redhat.com [10.40.204.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D8E61CB;
-        Thu,  9 Jan 2020 15:22:43 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1FD0280608;
+        Thu,  9 Jan 2020 15:22:52 +0000 (UTC)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
@@ -47,9 +47,9 @@ Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
         Richard Henderson <rth@twiddle.net>,
         David Gibson <david@gibson.dropbear.id.au>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH 08/15] target/arm/monitor: Replace current_machine by qdev_get_machine()
-Date:   Thu,  9 Jan 2020 16:21:26 +0100
-Message-Id: <20200109152133.23649-9-philmd@redhat.com>
+Subject: [PATCH 09/15] device_tree: Replace current_machine by qdev_get_machine()
+Date:   Thu,  9 Jan 2020 16:21:27 +0100
+Message-Id: <20200109152133.23649-10-philmd@redhat.com>
 In-Reply-To: <20200109152133.23649-1-philmd@redhat.com>
 References: <20200109152133.23649-1-philmd@redhat.com>
 MIME-Version: 1.0
@@ -66,24 +66,24 @@ replace 'current_machine' by MACHINE(qdev_get_machine()).
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- target/arm/monitor.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ device_tree.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index fa054f8a36..bcbf69802d 100644
---- a/target/arm/monitor.c
-+++ b/target/arm/monitor.c
-@@ -136,7 +136,8 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(=
-CpuModelExpansionType type,
+diff --git a/device_tree.c b/device_tree.c
+index f8b46b3c73..665ea2f586 100644
+--- a/device_tree.c
++++ b/device_tree.c
+@@ -466,7 +466,9 @@ uint32_t qemu_fdt_alloc_phandle(void *fdt)
+      * which phandle id to start allocating phandles.
+      */
+     if (!phandle) {
+-        phandle =3D machine_phandle_start(current_machine);
++        MachineState *ms =3D MACHINE(qdev_get_machine());
++
++        phandle =3D machine_phandle_start(ms);
      }
 =20
-     if (kvm_enabled()) {
--        const char *cpu_type =3D current_machine->cpu_type;
-+        MachineState *ms =3D MACHINE(qdev_get_machine());
-+        const char *cpu_type =3D ms->cpu_type;
-         int len =3D strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
-         bool supported =3D false;
-=20
+     if (!phandle) {
 --=20
 2.21.1
 
