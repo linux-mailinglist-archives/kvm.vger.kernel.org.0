@@ -2,172 +2,282 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DB80135BC0
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 15:53:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69FA9135BE5
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 15:57:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731834AbgAIOxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 09:53:12 -0500
-Received: from foss.arm.com ([217.140.110.172]:60462 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730159AbgAIOxM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 09:53:12 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2267C1FB;
-        Thu,  9 Jan 2020 06:53:11 -0800 (PST)
-Received: from [10.1.27.38] (e122027.cambridge.arm.com [10.1.27.38])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 120D93F534;
-        Thu,  9 Jan 2020 06:53:08 -0800 (PST)
-Subject: Re: [PATCH v2 1/6] KVM: arm64: Document PV-lock interface
-To:     Zengruan Ye <yezengruan@huawei.com>, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Cc:     maz@kernel.org, james.morse@arm.com, linux@armlinux.org.uk,
-        suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
-        catalin.marinas@arm.com, mark.rutland@arm.com, will@kernel.org,
-        daniel.lezcano@linaro.org
-References: <20191226135833.1052-1-yezengruan@huawei.com>
- <20191226135833.1052-2-yezengruan@huawei.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <c26ebc8d-6a10-6bc4-0af8-cd4883addbf0@arm.com>
-Date:   Thu, 9 Jan 2020 14:53:08 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1731904AbgAIO5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 09:57:40 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42830 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728737AbgAIO5j (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 09:57:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578581858;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gDGiLHLaS/+Io2Phnnfgd/F37FeteIfvFFEQMfXM9RA=;
+        b=I4vxO4kvES6dyJp5GiiSzsDObNjvHp0j4hy8RSvzfW0CN1JF9lxD593H9eC98Tk2Bhe/gZ
+        +num04urfX6sZ0+n+oXUrIcUCHTRreqQDi11C1RZhsukR2gptTRjH+On0fcQYIfSdFQq7x
+        MYdTeVVX2GjllxUqGUVwGKUHEgSe7hA=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-368-JBvgo9C2MTuTk0hsVIUiFg-1; Thu, 09 Jan 2020 09:57:37 -0500
+X-MC-Unique: JBvgo9C2MTuTk0hsVIUiFg-1
+Received: by mail-qv1-f71.google.com with SMTP id v5so4250765qvn.21
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 06:57:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=gDGiLHLaS/+Io2Phnnfgd/F37FeteIfvFFEQMfXM9RA=;
+        b=H1zPXitV4HzVekxKQ/O3Kf9Oh70lxDhh0TKB4+2yB5e5dPqG7Gwl7zkT3aHJ4aqhvj
+         fCI0AvM4iZT28LXfF/Q7krgOrkjIk6TJM9Eom2Hni9A0RGfNMqrK3jc15XmIEYVxL1tU
+         boutkVjdi/LYeqSFvUrxgTQCW0xZyAoj8vWKdiDwqh4Y3Ko8x3xZ8vY+10h+Za+zl6Oc
+         y+2FWr9bcPDp6A7JbxOopNgbpzttnsqxzRf91CdDToV/D/C3MkOB9X2BpHvo+r/fhOSZ
+         KoTfjLF2boZd44Hvkh1NfdAg8dnePR6Pa8dEFw7o+FqN9o4UxgrzYWIA35+QQNfgNMKU
+         AOJw==
+X-Gm-Message-State: APjAAAWd/TkpKehRjQaJ+U39ReTkiYvIYhxHVEYOzZLlXgCzNj/eSrpE
+        98aw9W2CUmQdKSCumZKp515TDXFBHwFX6TEGvPYoCS4Dt21qZ9Z66ICc1dTcgDpz0yVdwxwaDlf
+        3sM/l+nmlJaYS
+X-Received: by 2002:a05:620a:102e:: with SMTP id a14mr9510823qkk.159.1578581855559;
+        Thu, 09 Jan 2020 06:57:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw9fW22cpWNa0ej5q9Tvxem01vg3v97AmZT7K2M9MRr1qsTUoG9MFfgUMx1bfEecySbeqsNlQ==
+X-Received: by 2002:a05:620a:102e:: with SMTP id a14mr9510799qkk.159.1578581855290;
+        Thu, 09 Jan 2020 06:57:35 -0800 (PST)
+Received: from xz-x1.yyz.redhat.com ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id q2sm3124179qkm.5.2020.01.09.06.57.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2020 06:57:33 -0800 (PST)
+From:   Peter Xu <peterx@redhat.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Christophe de Dinechin <dinechin@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, peterx@redhat.com,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: [PATCH v3 01/21] vfio: introduce vfio_iova_rw to read/write a range of IOVAs
+Date:   Thu,  9 Jan 2020 09:57:09 -0500
+Message-Id: <20200109145729.32898-2-peterx@redhat.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200109145729.32898-1-peterx@redhat.com>
+References: <20200109145729.32898-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191226135833.1052-2-yezengruan@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/12/2019 13:58, Zengruan Ye wrote:
-> Introduce a paravirtualization interface for KVM/arm64 to obtain the VCPU
-> is currently running or not.
-> 
-> The PV lock structure of the guest is allocated by user space.
-> 
-> A hypercall interface is provided for the guest to interrogate the
-> hypervisor's support for this interface and the location of the shared
-> memory structures.
-> 
-> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
-> ---
->   Documentation/virt/kvm/arm/pvlock.rst   | 63 +++++++++++++++++++++++++
->   Documentation/virt/kvm/devices/vcpu.txt | 14 ++++++
->   2 files changed, 77 insertions(+)
->   create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
-> 
-> diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
-> new file mode 100644
-> index 000000000000..58b3b8ee7537
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/arm/pvlock.rst
-> @@ -0,0 +1,63 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +Paravirtualized lock support for arm64
-> +======================================
-> +
-> +KVM/arm64 provides some hypervisor service calls to support a paravirtualized
-> +guest obtaining the VCPU is currently running or not.
-NIT:              ^ whether
+From: Yan Zhao <yan.y.zhao@intel.com>
 
-> +
-> +Two new SMCCC compatible hypercalls are defined:
-> +
-> +* PV_LOCK_FEATURES:   0xC6000020
-> +* PV_LOCK_PREEMPTED:  0xC6000021
-> +
-> +The existence of the PV_LOCK hypercall should be probed using the SMCCC 1.1
-> +ARCH_FEATURES mechanism before calling it.
+vfio_iova_rw will read/write a range of userspace memory (starting form
+device iova to iova + len -1) into a kenrel buffer without pinning the
+userspace memory.
 
-Since these are within the "vendor specific" SMCCC region ideally you should also check that you are talking to KVM. (Other hypervisors could allocate SMCCC IDs differently within this block). Will has a patch on a branch which gives an example of how this could work [1]
+TODO: vfio needs to mark the iova dirty if vfio_iova_rw(write) is
+called.
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/commit/?h=kvm/hvc&id=464f5a1741e5959c3e4d2be1966ae0093b4dce06
+Cc: Kevin Tian <kevin.tian@intel.com>
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ drivers/vfio/vfio.c             | 45 ++++++++++++++++++
+ drivers/vfio/vfio_iommu_type1.c | 81 +++++++++++++++++++++++++++++++++
+ include/linux/vfio.h            |  5 ++
+ 3 files changed, 131 insertions(+)
 
-> +
-> +PV_LOCK_FEATURES
-> +    ============= ========    ==========
-> +    Function ID:  (uint32)    0xC6000020
-> +    PV_call_id:   (uint32)    The function to query for support.
-> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
-> +                              PV-lock feature is supported by the hypervisor.
-> +    ============= ========    ==========
-> +
-> +PV_LOCK_PREEMPTED
-> +    ============= ========    ==========
-> +    Function ID:  (uint32)    0xC6000021
-> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the IPA of
-> +                              this VCPU's pv data structure is configured by
-> +                              the hypervisor.
-> +    ============= ========    ==========
-
-PV_LOCK_PREEMPTED also needs to return the address of this data structure. Either by returning this in another register, or by e.g. treating a positive return as an address and a negative value as an error.
-
-> +
-> +The IPA returned by PV_LOCK_PREEMPTED should be mapped by the guest as normal
-> +memory with inner and outer write back caching attributes, in the inner
-> +shareable domain.
-> +
-> +PV_LOCK_PREEMPTED returns the structure for the calling VCPU.
-> +
-> +PV lock state
-> +-------------
-> +
-> +The structure pointed to by the PV_LOCK_PREEMPTED hypercall is as follows:
-> +
-> ++-----------+-------------+-------------+---------------------------------+
-> +| Field     | Byte Length | Byte Offset | Description                     |
-> ++===========+=============+=============+=================================+
-> +| preempted |      8      |      0      | Indicate the VCPU who owns this |
-
-NIT: s/Indicate/Indicates that/. Also more common English would be "the VCPU *that* owns"
-
-> +|           |             |             | struct is running or not.       |
-> +|           |             |             | Non-zero values mean the VCPU   |
-> +|           |             |             | has been preempted. Zero means  |
-> +|           |             |             | the VCPU is not preempted.      |
-> ++-----------+-------------+-------------+---------------------------------+
-> +
-> +The preempted field will be updated to 1 by the hypervisor prior to scheduling
-> +a VCPU. When the VCPU is scheduled out, the preempted field will be updated
-> +to 0 by the hypervisor.
-> +
-> +The structure will be present within a reserved region of the normal memory
-> +given to the guest. The guest should not attempt to write into this memory.
-> +There is a structure per VCPU of the guest.
-
-I think it would be worth mentioning in this document that the structure is guaranteed to be 64-byte aligned.
-
-Steve
-
-> +
-> +For the user space interface see Documentation/virt/kvm/devices/vcpu.txt
-> +section "4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL".
-> diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
-> index 6f3bd64a05b0..c10a5945075b 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.txt
-> +++ b/Documentation/virt/kvm/devices/vcpu.txt
-> @@ -74,3 +74,17 @@ Specifies the base address of the stolen time structure for this VCPU. The
->   base address must be 64 byte aligned and exist within a valid guest memory
->   region. See Documentation/virt/kvm/arm/pvtime.txt for more information
->   including the layout of the stolen time structure.
-> +
-> +4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL
-> +Architectures: ARM64
-> +
-> +4.1 ATTRIBUTE: KVM_ARM_VCPU_PVLOCK_IPA
-> +Parameters: 64-bit base address
-> +Returns: -ENXIO:  PV lock not implemented
-> +         -EEXIST: Base address already set for this VCPU
-> +         -EINVAL: Base address not 64 byte aligned
-> +
-> +Specifies the base address of the PV lock structure for this VCPU. The
-> +base address must be 64 byte aligned and exist within a valid guest memory
-> +region. See Documentation/virt/kvm/arm/pvlock.rst for more information
-> +including the layout of the pv lock structure.
-> 
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index c8482624ca34..36e91e647ed5 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -1961,6 +1961,51 @@ int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn, int npage)
+ }
+ EXPORT_SYMBOL(vfio_unpin_pages);
+ 
++/*
++ * Read/Write a range of userspace IOVAs for a device into/from a kernel
++ * buffer without pinning the userspace memory
++ * @dev [in]  : device
++ * @iova [in] : base IOVA of a userspace buffer
++ * @data [in] : pointer to kernel buffer
++ * @len [in]  : kernel buffer length
++ * @write     : indicate read or write
++ * Return error on failure or 0 on success.
++ */
++int vfio_iova_rw(struct device *dev, unsigned long iova, void *data,
++		   unsigned long len, bool write)
++{
++	struct vfio_container *container;
++	struct vfio_group *group;
++	struct vfio_iommu_driver *driver;
++	int ret = 0;
++
++	if (!dev || !data || len <= 0)
++		return -EINVAL;
++
++	group = vfio_group_get_from_dev(dev);
++	if (!group)
++		return -ENODEV;
++
++	ret = vfio_group_add_container_user(group);
++	if (ret)
++		goto out;
++
++	container = group->container;
++	driver = container->iommu_driver;
++
++	if (likely(driver && driver->ops->iova_rw))
++		ret = driver->ops->iova_rw(container->iommu_data,
++					   iova, data, len, write);
++	else
++		ret = -ENOTTY;
++
++	vfio_group_try_dissolve_container(group);
++out:
++	vfio_group_put(group);
++	return ret;
++}
++EXPORT_SYMBOL(vfio_iova_rw);
++
+ static int vfio_register_iommu_notifier(struct vfio_group *group,
+ 					unsigned long *events,
+ 					struct notifier_block *nb)
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 2ada8e6cdb88..aee191077235 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -27,6 +27,7 @@
+ #include <linux/iommu.h>
+ #include <linux/module.h>
+ #include <linux/mm.h>
++#include <linux/mmu_context.h>
+ #include <linux/rbtree.h>
+ #include <linux/sched/signal.h>
+ #include <linux/sched/mm.h>
+@@ -2326,6 +2327,85 @@ static int vfio_iommu_type1_unregister_notifier(void *iommu_data,
+ 	return blocking_notifier_chain_unregister(&iommu->notifier, nb);
+ }
+ 
++static int next_segment(unsigned long len, int offset)
++{
++	if (len > PAGE_SIZE - offset)
++		return PAGE_SIZE - offset;
++	else
++		return len;
++}
++
++static int vfio_iommu_type1_rw_iova_seg(struct vfio_iommu *iommu,
++					  unsigned long iova, void *data,
++					  unsigned long seg_len,
++					  unsigned long offset,
++					  bool write)
++{
++	struct mm_struct *mm;
++	unsigned long vaddr;
++	struct vfio_dma *dma;
++	bool kthread = current->mm == NULL;
++	int ret = 0;
++
++	dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
++	if (!dma)
++		return -EINVAL;
++
++	mm = get_task_mm(dma->task);
++
++	if (!mm)
++		return -ENODEV;
++
++	if (kthread)
++		use_mm(mm);
++	else if (current->mm != mm) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	vaddr = dma->vaddr + iova - dma->iova + offset;
++
++	ret = write ? __copy_to_user((void __user *)vaddr,
++			data, seg_len) :
++		__copy_from_user(data, (void __user *)vaddr,
++				seg_len);
++	if (ret)
++		ret = -EFAULT;
++
++	if (kthread)
++		unuse_mm(mm);
++out:
++	mmput(mm);
++	return ret;
++}
++
++static int vfio_iommu_type1_iova_rw(void *iommu_data, unsigned long iova,
++				    void *data, unsigned long len, bool write)
++{
++	struct vfio_iommu *iommu = iommu_data;
++	int offset = iova & ~PAGE_MASK;
++	int seg_len;
++	int ret = 0;
++
++	iova = iova & PAGE_MASK;
++
++	mutex_lock(&iommu->lock);
++	while ((seg_len = next_segment(len, offset)) > 0) {
++		ret = vfio_iommu_type1_rw_iova_seg(iommu, iova, data,
++						   seg_len, offset, write);
++		if (ret)
++			break;
++
++		offset = 0;
++		len -= seg_len;
++		data += seg_len;
++		iova += PAGE_SIZE;
++	}
++
++	mutex_unlock(&iommu->lock);
++	return ret;
++}
++
+ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+ 	.name			= "vfio-iommu-type1",
+ 	.owner			= THIS_MODULE,
+@@ -2338,6 +2418,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+ 	.unpin_pages		= vfio_iommu_type1_unpin_pages,
+ 	.register_notifier	= vfio_iommu_type1_register_notifier,
+ 	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
++	.iova_rw		= vfio_iommu_type1_iova_rw,
+ };
+ 
+ static int __init vfio_iommu_type1_init(void)
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index e42a711a2800..7bf18a31bbcf 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -82,6 +82,8 @@ struct vfio_iommu_driver_ops {
+ 					     struct notifier_block *nb);
+ 	int		(*unregister_notifier)(void *iommu_data,
+ 					       struct notifier_block *nb);
++	int		(*iova_rw)(void *iommu_data, unsigned long iova,
++				   void *data, unsigned long len, bool write);
+ };
+ 
+ extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+@@ -107,6 +109,9 @@ extern int vfio_pin_pages(struct device *dev, unsigned long *user_pfn,
+ extern int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn,
+ 			    int npage);
+ 
++extern int vfio_iova_rw(struct device *dev, unsigned long iova, void *data,
++			unsigned long len, bool write);
++
+ /* each type has independent events */
+ enum vfio_notify_type {
+ 	VFIO_IOMMU_NOTIFY = 0,
+-- 
+2.24.1
 
