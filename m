@@ -2,155 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D12413633A
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 23:28:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CCAD136373
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2020 23:50:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728220AbgAIW2r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 17:28:47 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40908 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725807AbgAIW2q (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Jan 2020 17:28:46 -0500
+        id S1728707AbgAIWsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 17:48:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26277 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726380AbgAIWsb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jan 2020 17:48:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578608924;
+        s=mimecast20190719; t=1578610109;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yP6ZOz+k5yA79mKV5MErQ0ppXSFgMQpJyHWqxj1MuvU=;
-        b=CB7M/SfWAjcl437dCzpu+YtPTlBkpcvHy5a46chtsj93k1GNRgVXJdl9+ai05di1/EYGLA
-        dv67GPwew/zuHWyVkUnffjo44Jj1VInNRcevki2xdYQugEc10/dkdDKCce72z9t1AmhYjx
-        JNFlaFy1OhpbR/mwwf71LH0+l3wxLy4=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-uvysNUjQOligBtD2ab0I9Q-1; Thu, 09 Jan 2020 17:28:43 -0500
-X-MC-Unique: uvysNUjQOligBtD2ab0I9Q-1
-Received: by mail-qv1-f69.google.com with SMTP id l1so5083904qvu.13
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 14:28:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=yP6ZOz+k5yA79mKV5MErQ0ppXSFgMQpJyHWqxj1MuvU=;
-        b=q1VZSqK860i5goXd8wjW+R8H4yw3Xp1Jm0Q1q6vmJqBv+g0J/pzhnwtsGQKyFsblgp
-         wG9n9ZzIPKmajTWfyE93RQE/JpL24gtlOqoipKWr6Ox+gC6SaM1PpDVt4rpA896RR+hd
-         Fyymvu4qS2lXSwgaU8Y0Q89WQsdWInHnUz9VJkT2KN0CKCLZ/ULUZzjQD0pVveD+CHPh
-         tGUwu/oiaj4Oy82li2FxEnq+POYI2PtuC/tEg7WTWV1Xl0CUBxQktHOhtW/xsteluing
-         kAIbgadFqCu9Ef3ds+z4KDwkDc8AfmcGTjbOmdHilcBVAf4+j2LMtu+F6c96l4uTSG2z
-         QGww==
-X-Gm-Message-State: APjAAAWEBDTsJ46gGgWz+ePWh+7tTrbA/cW84GK4xypx9N6n9FoHWRzp
-        zorw62ALYEUnRFH2fXRJCMO1pMfFckiRp/pFND7hNkqFjlEAoZCT/N6JcazhUwuECHvbNjHFMbt
-        GepeiyotO62bh
-X-Received: by 2002:ae9:ef4b:: with SMTP id d72mr144236qkg.27.1578608923201;
-        Thu, 09 Jan 2020 14:28:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxFR4XfZTMuhobcGtdb+vjHM3K7vkFCIVeO74RUWN25HZ1Jkpn9V0d0fwI5Dt7sMPyDK0B8fA==
-X-Received: by 2002:ae9:ef4b:: with SMTP id d72mr144221qkg.27.1578608922958;
-        Thu, 09 Jan 2020 14:28:42 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
-        by smtp.gmail.com with ESMTPSA id k9sm5457qtq.75.2020.01.09.14.28.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2020 14:28:41 -0800 (PST)
-Date:   Thu, 9 Jan 2020 17:28:36 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3 00/21] KVM: Dirty ring interface
-Message-ID: <20200109172718-mutt-send-email-mst@kernel.org>
-References: <20200109145729.32898-1-peterx@redhat.com>
- <20200109105443-mutt-send-email-mst@kernel.org>
- <20200109161742.GC15671@xz-x1>
- <20200109113001-mutt-send-email-mst@kernel.org>
- <20200109170849.GB36997@xz-x1>
- <20200109133434-mutt-send-email-mst@kernel.org>
- <20200109193949.GG36997@xz-x1>
+        bh=il5z5hNDqZdHrqEbb26XbJQCZp1DVjyvlZwu0D+QADY=;
+        b=Txc6oxknxH4wQ90OhniwPLcFrAOG8XAQDuuc8Sr65CYb5dRRr5JWP5qgaCAY9hI9eIr16Z
+        rPilX0mAJd29gzGFs9XS42XyPXFdIuM6wT+3dKX5nTmPCN8IimzOak90hNhER5snVVVXK4
+        k668LxPbPFv5PvYuuNOWcweQbBE1yA0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-BtuKcgDnNJSvsYoNdNbH0w-1; Thu, 09 Jan 2020 17:48:28 -0500
+X-MC-Unique: BtuKcgDnNJSvsYoNdNbH0w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DA67800D41;
+        Thu,  9 Jan 2020 22:48:24 +0000 (UTC)
+Received: from w520.home (ovpn-116-128.phx2.redhat.com [10.3.116.128])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C86A60F82;
+        Thu,  9 Jan 2020 22:48:21 +0000 (UTC)
+Date:   Thu, 9 Jan 2020 15:48:19 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     kwankhede@nvidia.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kevin.tian@intel.com, joro@8bytes.org,
+        peterx@redhat.com, baolu.lu@linux.intel.com
+Subject: Re: [PATCH v4 03/12] vfio_pci: refine vfio_pci_driver reference in
+ vfio_pci.c
+Message-ID: <20200109154819.455f11d3@w520.home>
+In-Reply-To: <1578398509-26453-4-git-send-email-yi.l.liu@intel.com>
+References: <1578398509-26453-1-git-send-email-yi.l.liu@intel.com>
+        <1578398509-26453-4-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200109193949.GG36997@xz-x1>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 09, 2020 at 02:39:49PM -0500, Peter Xu wrote:
-> On Thu, Jan 09, 2020 at 02:08:52PM -0500, Michael S. Tsirkin wrote:
-> > On Thu, Jan 09, 2020 at 12:08:49PM -0500, Peter Xu wrote:
-> > > On Thu, Jan 09, 2020 at 11:40:23AM -0500, Michael S. Tsirkin wrote:
-> > > 
-> > > [...]
-> > > 
-> > > > > > I know it's mostly relevant for huge VMs, but OTOH these
-> > > > > > probably use huge pages.
-> > > > > 
-> > > > > Yes huge VMs could benefit more, especially if the dirty rate is not
-> > > > > that high, I believe.  Though, could you elaborate on why huge pages
-> > > > > are special here?
-> > > > > 
-> > > > > Thanks,
-> > > > 
-> > > > With hugetlbfs there are less bits to test: e.g. with 2M pages a single
-> > > > bit set marks 512 pages as dirty.  We do not take advantage of this
-> > > > but it looks like a rather obvious optimization.
-> > > 
-> > > Right, but isn't that the trade-off between granularity of dirty
-> > > tracking and how easy it is to collect the dirty bits?  Say, it'll be
-> > > merely impossible to migrate 1G-huge-page-backed guests if we track
-> > > dirty bits using huge page granularity, since each touch of guest
-> > > memory will cause another 1G memory to be transferred even if most of
-> > > the content is the same.  2M can be somewhere in the middle, but still
-> > > the same write amplify issue exists.
-> > >
-> > 
-> > OK I see I'm unclear.
-> > 
-> > IIUC at the moment KVM never uses huge pages if any part of the huge page is
-> > tracked.
-> 
-> To be more precise - I think it's per-memslot.  Say, if the memslot is
-> dirty tracked, then no huge page on the host on that memslot (even if
-> guest used huge page over that).
+On Tue,  7 Jan 2020 20:01:40 +0800
+Liu Yi L <yi.l.liu@intel.com> wrote:
 
-Yea ... so does it make sense to make this implementation detail
-leak through UAPI?
+> This patch replaces the vfio_pci_driver reference in vfio_pci.c with
+> pci_dev_driver(vdev->pdev) which is more helpful to make the functions
+> be generic to module types.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c | 34 ++++++++++++++++++----------------
+>  1 file changed, 18 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 009d2df..9140f5e5 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -1463,24 +1463,25 @@ static void vfio_pci_reflck_get(struct vfio_pci_reflck *reflck)
+>  
+>  static int vfio_pci_reflck_find(struct pci_dev *pdev, void *data)
+>  {
+> -	struct vfio_pci_reflck **preflck = data;
+> +	struct vfio_pci_device *vdev = data;
+> +	struct vfio_pci_reflck **preflck = &vdev->reflck;
+>  	struct vfio_device *device;
+> -	struct vfio_pci_device *vdev;
+> +	struct vfio_pci_device *tmp;
+>  
+>  	device = vfio_device_get_from_dev(&pdev->dev);
+>  	if (!device)
+>  		return 0;
+>  
+> -	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
+> +	if (pci_dev_driver(pdev) != pci_dev_driver(vdev->pdev)) {
+>  		vfio_device_put(device);
+>  		return 0;
+>  	}
+>  
+> -	vdev = vfio_device_data(device);
+> +	tmp = vfio_device_data(device);
+>  
+> -	if (vdev->reflck) {
+> -		vfio_pci_reflck_get(vdev->reflck);
+> -		*preflck = vdev->reflck;
+> +	if (tmp->reflck) {
+> +		vfio_pci_reflck_get(tmp->reflck);
+> +		*preflck = tmp->reflck;
 
-> > But if all parts of the page are written to then huge page
-> > is used.
-> 
-> I'm not sure of this... I think it's still in 4K granularity.
-> 
-> > 
-> > In this situation the whole huge page is dirty and needs to be migrated.
-> 
-> Note that in QEMU we always migrate pages in 4K for x86, iiuc (please
-> refer to ram_save_host_page() in QEMU).
-> 
-> > 
-> > > PS. that seems to be another topic after all besides the dirty ring
-> > > series because we need to change our policy first if we want to track
-> > > it with huge pages; with that, for dirty ring we can start to leverage
-> > > the kvm_dirty_gfn.pad to store the page size with another new kvm cap
-> > > when we really want.
-> > > 
-> > > Thanks,
-> > 
-> > Seems like leaking implementation detail to UAPI to me.
-> 
-> I'd say it's not the only place we have an assumption at least (please
-> also refer to uffd_msg.pagefault.address).  IMHO it's not something
-> wrong because interfaces can be extended, but I am open to extending
-> kvm_dirty_gfn to cover a length/size or make the pad larger (as long
-> as Paolo is fine with this).
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
+Seems we can do away with preflck entirely with this refactor, this
+simply becomes vdev->reflck = tmp->reflck.  Thanks,
+
+Alex
+
+>  		vfio_device_put(device);
+>  		return 1;
+>  	}
+> @@ -1497,7 +1498,7 @@ static int vfio_pci_reflck_attach(struct vfio_pci_device *vdev)
+>  
+>  	if (pci_is_root_bus(vdev->pdev->bus) ||
+>  	    vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_reflck_find,
+> -					  &vdev->reflck, slot) <= 0)
+> +					  vdev, slot) <= 0)
+>  		vdev->reflck = vfio_pci_reflck_alloc();
+>  
+>  	mutex_unlock(&reflck_lock);
+> @@ -1522,6 +1523,7 @@ static void vfio_pci_reflck_put(struct vfio_pci_reflck *reflck)
+>  
+>  struct vfio_devices {
+>  	struct vfio_device **devices;
+> +	struct vfio_pci_device *vdev;
+>  	int cur_index;
+>  	int max_index;
+>  };
+> @@ -1530,7 +1532,7 @@ static int vfio_pci_get_unused_devs(struct pci_dev *pdev, void *data)
+>  {
+>  	struct vfio_devices *devs = data;
+>  	struct vfio_device *device;
+> -	struct vfio_pci_device *vdev;
+> +	struct vfio_pci_device *tmp;
+>  
+>  	if (devs->cur_index == devs->max_index)
+>  		return -ENOSPC;
+> @@ -1539,15 +1541,15 @@ static int vfio_pci_get_unused_devs(struct pci_dev *pdev, void *data)
+>  	if (!device)
+>  		return -EINVAL;
+>  
+> -	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
+> +	if (pci_dev_driver(pdev) != pci_dev_driver(devs->vdev->pdev)) {
+>  		vfio_device_put(device);
+>  		return -EBUSY;
+>  	}
+>  
+> -	vdev = vfio_device_data(device);
+> +	tmp = vfio_device_data(device);
+>  
+>  	/* Fault if the device is not unused */
+> -	if (vdev->refcnt) {
+> +	if (tmp->refcnt) {
+>  		vfio_device_put(device);
+>  		return -EBUSY;
+>  	}
+> @@ -1574,7 +1576,7 @@ static int vfio_pci_get_unused_devs(struct pci_dev *pdev, void *data)
+>   */
+>  static void vfio_pci_try_bus_reset(struct vfio_pci_device *vdev)
+>  {
+> -	struct vfio_devices devs = { .cur_index = 0 };
+> +	struct vfio_devices devs = { .vdev = vdev, .cur_index = 0 };
+>  	int i = 0, ret = -EINVAL;
+>  	bool slot = false;
+>  	struct vfio_pci_device *tmp;
+> @@ -1637,7 +1639,7 @@ static void __exit vfio_pci_cleanup(void)
+>  	vfio_pci_uninit_perm_bits();
+>  }
+>  
+> -static void __init vfio_pci_fill_ids(char *ids)
+> +static void __init vfio_pci_fill_ids(char *ids, struct pci_driver *driver)
+>  {
+>  	char *p, *id;
+>  	int rc;
+> @@ -1665,7 +1667,7 @@ static void __init vfio_pci_fill_ids(char *ids)
+>  			continue;
+>  		}
+>  
+> -		rc = pci_add_dynid(&vfio_pci_driver, vendor, device,
+> +		rc = pci_add_dynid(driver, vendor, device,
+>  				   subvendor, subdevice, class, class_mask, 0);
+>  		if (rc)
+>  			pr_warn("failed to add dynamic id [%04x:%04x[%04x:%04x]] class %#08x/%08x (%d)\n",
+> @@ -1692,7 +1694,7 @@ static int __init vfio_pci_init(void)
+>  	if (ret)
+>  		goto out_driver;
+>  
+> -	vfio_pci_fill_ids(ids);
+> +	vfio_pci_fill_ids(ids, &vfio_pci_driver);
+>  
+>  	return 0;
+>  
 
