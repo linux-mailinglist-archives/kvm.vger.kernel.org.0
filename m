@@ -2,360 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ACA5A13769D
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 20:06:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADAA21376D3
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 20:18:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728898AbgAJTF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jan 2020 14:05:58 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:47810 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728853AbgAJTF5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jan 2020 14:05:57 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00AJ3xrK131913;
-        Fri, 10 Jan 2020 19:05:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2019-08-05;
- bh=KCRuAAvQAwl0rfqZGNTEjq3Xbk+5StxMV3R+zKC6+g8=;
- b=JrPCmplD9EMEh51IfNBg19dXdZpwX0YSrH0fuLXZbPtzBggR1OlVflWX3ojalVgEQ16k
- YfQESJzZDYlOWPMN2sTcqvz9ZXxYTDy32sFop2GrM41KDU3xYuc6wJ6yiPKXXPBApWZT
- xOsCwsJEfeWi1ChoY5o/CkkaxUK7gFzYpGvcUIkqT3p183iiqFmsrAFCTAYZ8Sd5r1IZ
- JgsiPMiCL0pQM/GeOjZQeEhh5n/rinDIpAy8EFAivHI1yoeAOjZ7M6YzFO0woSNnYz/A
- 8qPEjY4km8oE0MYe0GaQeAF7E4a/XDEj3UHH1SX8Ln3csinf83vsCblTS8thQ1MHXt3c /w== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2xaj4um8jn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Jan 2020 19:05:32 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00AJ3tj7183577;
-        Fri, 10 Jan 2020 19:05:31 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2xedhypv58-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Jan 2020 19:05:31 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00AJ5UBM014974;
-        Fri, 10 Jan 2020 19:05:30 GMT
-Received: from paddy.uk.oracle.com (/10.175.192.165)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 10 Jan 2020 11:05:29 -0800
-From:   Joao Martins <joao.m.martins@oracle.com>
-To:     linux-nvdimm@lists.01.org
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Liran Alon <liran.alon@oracle.com>,
-        Nikita Leshenko <nikita.leshchenko@oracle.com>,
-        Barret Rhoden <brho@google.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: [PATCH RFC 10/10] nvdimm/e820: add multiple namespaces support
-Date:   Fri, 10 Jan 2020 19:03:13 +0000
-Message-Id: <20200110190313.17144-11-joao.m.martins@oracle.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20200110190313.17144-1-joao.m.martins@oracle.com>
-References: <20200110190313.17144-1-joao.m.martins@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9496 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001100154
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9496 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001100154
+        id S1727812AbgAJTSw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jan 2020 14:18:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42478 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727769AbgAJTSw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jan 2020 14:18:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578683930;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wYy9RIEcnBRxr6Ja2Vdphx10aFgzQcnoOANAowuc2eE=;
+        b=ez3kFaMHxQ61arvvQEHhSq424D78/5ZaSD0RVifg5LbsLP0rA1ZVJbOAHnRf8SUhYDr9nx
+        DJSRdjjiyff9/tL9FKUzhrNnV77okbA3/4Uj007RjSNykovZ3hj1SswhPXuMZVi3AQNb+K
+        PC4PdT1SbMrmv0KY6170xKvzVezeF8I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-9LCGyL8kOmumK1OSKH_L4A-1; Fri, 10 Jan 2020 14:18:49 -0500
+X-MC-Unique: 9LCGyL8kOmumK1OSKH_L4A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 007C7801E7A;
+        Fri, 10 Jan 2020 19:18:47 +0000 (UTC)
+Received: from [10.3.117.16] (ovpn-117-16.phx2.redhat.com [10.3.117.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E25685DA32;
+        Fri, 10 Jan 2020 19:18:42 +0000 (UTC)
+Subject: Re: [PATCH 04/15] hw/ppc/spapr_rtas: Restrict variables scope to
+ single switch case
+To:     Greg Kurz <groug@kaod.org>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        qemu-arm@nongnu.org, Alistair Francis <alistair.francis@wdc.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Richard Henderson <rth@twiddle.net>
+References: <20200109152133.23649-1-philmd@redhat.com>
+ <20200109152133.23649-5-philmd@redhat.com>
+ <20200109184349.1aefa074@bahia.lan>
+ <9870f8ed-3fa0-1deb-860d-7481cb3db556@redhat.com>
+ <20200110105055.3e72ddf4@bahia.lan>
+From:   Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <6ad8e693-813a-26ea-73f8-319d440de1e3@redhat.com>
+Date:   Fri, 10 Jan 2020 13:18:42 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
+MIME-Version: 1.0
+In-Reply-To: <20200110105055.3e72ddf4@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-User can define regions with 'memmap=size!offset' which in turn
-creates PMEM legacy devices. But because it is a label-less
-NVDIMM device we only have one namespace for the whole device.
+On 1/10/20 3:50 AM, Greg Kurz wrote:
 
-Add support for multiple namespaces by adding ndctl control
-support, and exposing a minimal set of features:
-(ND_CMD_GET_CONFIG_SIZE, ND_CMD_GET_CONFIG_DATA,
-ND_CMD_SET_CONFIG_DATA) alongside NDD_ALIASING because we can
-store labels.
+>>> I guess a decent compiler can be smart enough detect that the initial=
+ization
+>>> isn't needed outside of the RTAS_SYSPARM_SPLPAR_CHARACTERISTICS branc=
+h...
+>>> Anyway, reducing scope isn't bad. The only hitch I could see is that =
+some
+>>> people do prefer to have all variables declared upfront, but there's =
+a nested
+>>> param_val variable already so I guess it's okay.
+>>
+>> I don't want to outsmart compilers :)
 
-Initialization is a little different: We allocate and register an
-nvdimm bus with an @nvdimm_descriptor which we use to locate
-where we are keeping our label storage area. The config data
-get/set/size operations are then simply memcpying to this area.
+Or conversely play the game of which compilers will warn about an=20
+atypical construct.
 
-Equivalent approach can also be found in the NFIT tests which
-emulate the same thing.
+>>
+>> The MACHINE() macro is not a simple cast, it does object introspection
+>> with OBJECT_CHECK(), thus is not free. Since
+>=20
+> Sure, I understand the motivation in avoiding an unneeded call
+> to calling object_dynamic_cast_assert().
+>=20
+>> object_dynamic_cast_assert() argument is not const, I'm not sure the
+>> compiler can remove the call.
+>>
+>=20
+> Not remove the call, but delay it to the branch that uses it,
+> ie. parameter =3D=3D RTAS_SYSPARM_SPLPAR_CHARACTERISTICS.
+>=20
+>> Richard, Eric, do you know?
+>>
+>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>> ---
+>>>>    hw/ppc/spapr_rtas.c | 4 ++--
+>>>>    1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>>>> index 6f06e9d7fe..7237e5ebf2 100644
+>>>> --- a/hw/ppc/spapr_rtas.c
+>>>> +++ b/hw/ppc/spapr_rtas.c
+>>>> @@ -267,8 +267,6 @@ static void rtas_ibm_get_system_parameter(PowerP=
+CCPU *cpu,
+>>>>                                              uint32_t nret, target_u=
+long rets)
+>>>>    {
+>>>>        PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+>>>> -    MachineState *ms =3D MACHINE(spapr);
+>>>> -    unsigned int max_cpus =3D ms->smp.max_cpus;
+>>>>        target_ulong parameter =3D rtas_ld(args, 0);
+>>>>        target_ulong buffer =3D rtas_ld(args, 1);
+>>>>        target_ulong length =3D rtas_ld(args, 2);
+>>>> @@ -276,6 +274,8 @@ static void rtas_ibm_get_system_parameter(PowerP=
+CCPU *cpu,
+>>>>   =20
+>>>>        switch (parameter) {
+>>>>        case RTAS_SYSPARM_SPLPAR_CHARACTERISTICS: {
+>>>> +        MachineState *ms =3D MACHINE(spapr);
+>>>> +        unsigned int max_cpus =3D ms->smp.max_cpus;
 
-Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
----
- drivers/nvdimm/e820.c | 212 +++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 191 insertions(+), 21 deletions(-)
+Declaring an initializer inside a switch statement can trigger warnings=20
+under some compilation scenarios (particularly if the variable is=20
+referenced outside of the scope where it was introduced).  But here, you=20
+are using 'case label: { ...' to create a scope, which presumably ends=20
+before the next case label, and is thus not going to trigger compiler=20
+warnings.
 
-diff --git a/drivers/nvdimm/e820.c b/drivers/nvdimm/e820.c
-index e02f60ad6c99..36fbff3d7110 100644
---- a/drivers/nvdimm/e820.c
-+++ b/drivers/nvdimm/e820.c
-@@ -7,14 +7,21 @@
- #include <linux/memory_hotplug.h>
- #include <linux/libnvdimm.h>
- #include <linux/module.h>
-+#include <linux/slab.h>
-+#include <linux/ndctl.h>
-+#include <linux/nd.h>
- 
--static int e820_pmem_remove(struct platform_device *pdev)
--{
--	struct nvdimm_bus *nvdimm_bus = platform_get_drvdata(pdev);
-+#define LABEL_SIZE SZ_128K
- 
--	nvdimm_bus_unregister(nvdimm_bus);
--	return 0;
--}
-+struct e820_descriptor {
-+	struct nd_interleave_set nd_set;
-+	struct nvdimm_bus_descriptor nd_desc;
-+	void *label;
-+	unsigned char cookie1[16];
-+	unsigned char cookie2[16];
-+	struct nvdimm_bus *nvdimm_bus;
-+	struct nvdimm *nvdimm;
-+};
- 
- #ifdef CONFIG_MEMORY_HOTPLUG
- static int e820_range_to_nid(resource_size_t addr)
-@@ -28,43 +35,206 @@ static int e820_range_to_nid(resource_size_t addr)
- }
- #endif
- 
-+static int e820_get_config_size(struct nd_cmd_get_config_size *nd_cmd,
-+				unsigned int buf_len)
-+{
-+	if (buf_len < sizeof(*nd_cmd))
-+		return -EINVAL;
-+
-+	nd_cmd->status = 0;
-+	nd_cmd->config_size = LABEL_SIZE;
-+	nd_cmd->max_xfer = SZ_4K;
-+
-+	return 0;
-+}
-+
-+static int e820_get_config_data(struct nd_cmd_get_config_data_hdr
-+		*nd_cmd, unsigned int buf_len, void *label)
-+{
-+	unsigned int len, offset = nd_cmd->in_offset;
-+	int rc;
-+
-+	if (buf_len < sizeof(*nd_cmd))
-+		return -EINVAL;
-+	if (offset >= LABEL_SIZE)
-+		return -EINVAL;
-+	if (nd_cmd->in_length + sizeof(*nd_cmd) > buf_len)
-+		return -EINVAL;
-+
-+	nd_cmd->status = 0;
-+	len = min(nd_cmd->in_length, LABEL_SIZE - offset);
-+	memcpy(nd_cmd->out_buf, label + offset, len);
-+	rc = buf_len - sizeof(*nd_cmd) - len;
-+
-+	return rc;
-+}
-+
-+static int e820_set_config_data(struct nd_cmd_set_config_hdr *nd_cmd,
-+		unsigned int buf_len, void *label)
-+{
-+	unsigned int len, offset = nd_cmd->in_offset;
-+	u32 *status;
-+	int rc;
-+
-+	if (buf_len < sizeof(*nd_cmd))
-+		return -EINVAL;
-+	if (offset >= LABEL_SIZE)
-+		return -EINVAL;
-+	if (nd_cmd->in_length + sizeof(*nd_cmd) + 4 > buf_len)
-+		return -EINVAL;
-+
-+	status = (void *)nd_cmd + nd_cmd->in_length + sizeof(*nd_cmd);
-+	*status = 0;
-+	len = min(nd_cmd->in_length, LABEL_SIZE - offset);
-+	memcpy(label + offset, nd_cmd->in_buf, len);
-+	rc = buf_len - sizeof(*nd_cmd) - (len + 4);
-+
-+	return rc;
-+}
-+
-+static struct e820_descriptor *to_e820_desc(struct nvdimm_bus_descriptor *desc)
-+{
-+	return container_of(desc, struct e820_descriptor, nd_desc);
-+}
-+
-+static int e820_ndctl(struct nvdimm_bus_descriptor *nd_desc,
-+			 struct nvdimm *nvdimm, unsigned int cmd, void *buf,
-+			 unsigned int buf_len, int *cmd_rc)
-+{
-+	struct e820_descriptor *t = to_e820_desc(nd_desc);
-+	int rc = -EINVAL;
-+
-+	switch (cmd) {
-+	case ND_CMD_GET_CONFIG_SIZE:
-+		rc = e820_get_config_size(buf, buf_len);
-+		break;
-+	case ND_CMD_GET_CONFIG_DATA:
-+		rc = e820_get_config_data(buf, buf_len, t->label);
-+		break;
-+	case ND_CMD_SET_CONFIG_DATA:
-+		rc = e820_set_config_data(buf, buf_len, t->label);
-+		break;
-+	default:
-+		return rc;
-+	}
-+
-+	return rc;
-+}
-+
-+static void e820_desc_free(struct e820_descriptor *desc)
-+{
-+	if (!desc)
-+		return;
-+
-+	nvdimm_bus_unregister(desc->nvdimm_bus);
-+	kfree(desc->label);
-+	kfree(desc);
-+}
-+
-+static struct e820_descriptor *e820_desc_alloc(struct platform_device *pdev)
-+{
-+	struct nvdimm_bus_descriptor *nd_desc;
-+	unsigned int cmd_mask, dimm_flags;
-+	struct device *dev = &pdev->dev;
-+	struct nvdimm_bus *nvdimm_bus;
-+	struct e820_descriptor *desc;
-+	struct nvdimm *nvdimm;
-+
-+	desc = kzalloc(sizeof(*desc), GFP_KERNEL);
-+	if (!desc)
-+		goto err;
-+
-+	desc->label = kzalloc(LABEL_SIZE, GFP_KERNEL);
-+	if (!desc->label)
-+		goto err;
-+
-+	nd_desc = &desc->nd_desc;
-+	nd_desc->provider_name = "e820";
-+	nd_desc->module = THIS_MODULE;
-+	nd_desc->ndctl = e820_ndctl;
-+	nvdimm_bus = nvdimm_bus_register(&pdev->dev, nd_desc);
-+	if (!nvdimm_bus) {
-+		dev_err(dev, "nvdimm bus registration failure\n");
-+		goto err;
-+	}
-+	desc->nvdimm_bus = nvdimm_bus;
-+
-+	cmd_mask = (1UL << ND_CMD_GET_CONFIG_SIZE |
-+			1UL << ND_CMD_GET_CONFIG_DATA |
-+			1UL << ND_CMD_SET_CONFIG_DATA);
-+	dimm_flags = (1UL << NDD_ALIASING);
-+	nvdimm = nvdimm_create(nvdimm_bus, pdev, NULL,
-+				dimm_flags, cmd_mask, 0, NULL);
-+	if (!nvdimm) {
-+		dev_err(dev, "nvdimm creation failure\n");
-+		goto err;
-+	}
-+	desc->nvdimm = nvdimm;
-+	return desc;
-+
-+err:
-+	e820_desc_free(desc);
-+	return NULL;
-+}
-+
- static int e820_register_one(struct resource *res, void *data)
- {
-+	struct platform_device *pdev = data;
- 	struct nd_region_desc ndr_desc;
--	struct nvdimm_bus *nvdimm_bus = data;
-+	struct nd_mapping_desc mapping;
-+	struct e820_descriptor *desc;
-+
-+	desc = e820_desc_alloc(pdev);
-+	if (!desc)
-+		return -ENOMEM;
-+
-+	mapping.nvdimm = desc->nvdimm;
-+	mapping.start = res->start;
-+	mapping.size = resource_size(res);
-+	mapping.position = 0;
-+
-+	generate_random_uuid(desc->cookie1);
-+	desc->nd_set.cookie1 = (u64) desc->cookie1;
-+	generate_random_uuid(desc->cookie2);
-+	desc->nd_set.cookie2 = (u64) desc->cookie2;
- 
- 	memset(&ndr_desc, 0, sizeof(ndr_desc));
- 	ndr_desc.res = res;
- 	ndr_desc.numa_node = e820_range_to_nid(res->start);
- 	ndr_desc.target_node = ndr_desc.numa_node;
-+	ndr_desc.mapping = &mapping;
-+	ndr_desc.num_mappings = 1;
-+	ndr_desc.nd_set = &desc->nd_set;
- 	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
--	if (!nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc))
-+	if (!nvdimm_pmem_region_create(desc->nvdimm_bus, &ndr_desc)) {
-+		e820_desc_free(desc);
-+		dev_err(&pdev->dev, "nvdimm region creation failure\n");
- 		return -ENXIO;
-+	}
-+
-+	platform_set_drvdata(pdev, desc);
-+	return 0;
-+}
-+
-+static int e820_pmem_remove(struct platform_device *pdev)
-+{
-+	struct e820_descriptor *desc = platform_get_drvdata(pdev);
-+
-+	e820_desc_free(desc);
- 	return 0;
- }
- 
- static int e820_pmem_probe(struct platform_device *pdev)
- {
--	static struct nvdimm_bus_descriptor nd_desc;
--	struct device *dev = &pdev->dev;
--	struct nvdimm_bus *nvdimm_bus;
- 	int rc = -ENXIO;
- 
--	nd_desc.provider_name = "e820";
--	nd_desc.module = THIS_MODULE;
--	nvdimm_bus = nvdimm_bus_register(dev, &nd_desc);
--	if (!nvdimm_bus)
--		goto err;
--	platform_set_drvdata(pdev, nvdimm_bus);
--
- 	rc = walk_iomem_res_desc(IORES_DESC_PERSISTENT_MEMORY_LEGACY,
--			IORESOURCE_MEM, 0, -1, nvdimm_bus, e820_register_one);
-+			IORESOURCE_MEM, 0, -1, pdev, e820_register_one);
- 	if (rc)
- 		goto err;
- 	return 0;
- err:
--	nvdimm_bus_unregister(nvdimm_bus);
--	dev_err(dev, "failed to register legacy persistent memory ranges\n");
-+	dev_err(&pdev->dev, "failed to register legacy persistent memory ranges\n");
- 	return rc;
- }
- 
--- 
-2.17.1
+An alternative is indeed leaving the declaration up front but deferring=20
+the (possibly expensive) initializer to the case label that needs it:
+
+MachineState *ms;
+switch (parameter) {
+case ...:
+   ms =3D MACHINE(spapr);
+
+and done that way, you might not even need the extra {} behind the case=20
+label (I didn't read the file to see if there is already some other=20
+reason for having introduced that sub-scope).
+
+As for whether compilers are smart enough to defer non-trivial=20
+initialization to the one case label that uses the variable, I wouldn't=20
+count on it.  If the non-trivial initialization includes a function call=20
+(which the MACHINE() macro does), it's much harder to prove whether that=20
+function call has side effects that may be needed prior to the switch=20
+statement.  So limiting the scope of the initialization (whether by=20
+dropping the declaration, or just deferring the call) DOES make sense.
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
