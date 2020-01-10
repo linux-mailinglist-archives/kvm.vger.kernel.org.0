@@ -2,459 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 13A261365C6
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 04:23:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DB4B51365DA
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 04:33:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730970AbgAJDXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 22:23:09 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:38931 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730952AbgAJDXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 22:23:09 -0500
-Received: by mail-wm1-f66.google.com with SMTP id 20so446143wmj.4
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 19:23:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZAEkX/VWTLJ8uZxbCM5wcLv0heUOqQqTWwGXwc0d0FQ=;
-        b=KQKKBb/W+s7IQNQsN7/KzhIehhnEdttuu3wopCayayvXivRHneNMXGnhrDLXKVnEs7
-         DSFwQRvqz2X8YnEb5Ji1jJtVOEpVvcVELrE6HHC0TKfitDXB1EBBNVAx10mgMrxEzRtU
-         x81mdWpE6BNGMWqzIi1z+ASDqCCNeNEbNaQMo8MbRvgF6USBrYf4Oh46roX01v0lm/zN
-         So2E2qDgZPYuvdr9KESdxAPaI2W5LlzLx/fkHqmkg+rvdNmjzkvwiT5+5ecFPLeFLbZ2
-         MHgq2xmuhbJL5/rCprJT4scbiit9eBTgTo6EEJNpFyb133T3KpH1HceR/EsUReb9FCMk
-         Ltuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZAEkX/VWTLJ8uZxbCM5wcLv0heUOqQqTWwGXwc0d0FQ=;
-        b=rP0zracNV98nzADFwl937UZIYvPbk1Uvk/YAiFsjIcZFpRqMVvTf14ISjmKpogFFz9
-         cywRcuQjatsEpE4qAIpdTaPwTQTRaOM3ZndfzWJsoSw0sKiBC46Th4zm4hwGZKO6a5Gh
-         v4+C4nWemZ/yl40ndtrlqLdPP47cFAWB8YS9FDYwPHZ6nK7AbExzWEIMMi46GbZlO+uU
-         sHcI9XME3+hgb+O+R6IjiqRabdv3y4x0bvVLRXzc+yW2l3GLjDyA9VPUad1ueH7F2U0s
-         pkRuzkrkmH+aTVieJk9HomyxCTGRxCgVrhHxS5DxaBnYIGGvYkClozLTshf6txWSyDb3
-         xDwQ==
-X-Gm-Message-State: APjAAAUOhM7rokjRyJc54DMJXV2Aw8CzsDuA4K8AwZgbIU2KMSOSuMwT
-        UIPWrn2tnO6lkEE6Be7EyRW2TrvLhOrjo1BsqespTw==
-X-Google-Smtp-Source: APXvYqxGvMr3pAaeIB49r7X8zwgfojDsIlKzeOqh8BIcm4h6d6tlfsj062er98Toobg1aI6Mrfw5yxHLCzxw+4a0avI=
-X-Received: by 2002:a7b:cf0d:: with SMTP id l13mr1252693wmg.13.1578626584384;
- Thu, 09 Jan 2020 19:23:04 -0800 (PST)
-MIME-Version: 1.0
-References: <20191225025945.108466-1-anup.patel@wdc.com> <20191225025945.108466-5-anup.patel@wdc.com>
- <6939f485-dd09-e857-0015-1a28e05f0855@arm.com>
-In-Reply-To: <6939f485-dd09-e857-0015-1a28e05f0855@arm.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Fri, 10 Jan 2020 08:52:53 +0530
-Message-ID: <CAAhSdy0pJufv5ELaojpEKOx9r1OmAj3SGZV=DVC3VEewdq2UKQ@mail.gmail.com>
-Subject: Re: [kvmtool RFC PATCH 4/8] riscv: Implement Guest/VM VCPU arch functions
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
+        id S1731108AbgAJDdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 22:33:03 -0500
+Received: from mga07.intel.com ([134.134.136.100]:55102 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731010AbgAJDdD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jan 2020 22:33:03 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jan 2020 19:33:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,415,1571727600"; 
+   d="scan'208";a="254823145"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
+  by fmsmga002.fm.intel.com with ESMTP; 09 Jan 2020 19:33:01 -0800
+Date:   Thu, 9 Jan 2020 22:24:40 -0500
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [PATCH 1/2] vfio: introduce vfio_iova_rw to read/write a range
+ of IOVAs
+Message-ID: <20200110032440.GB32421@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200103010055.4140-1-yan.y.zhao@intel.com>
+ <20200103010217.4201-1-yan.y.zhao@intel.com>
+ <20200109111636.2158b24c@w520.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200109111636.2158b24c@w520.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 8, 2020 at 6:52 PM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
-> On 12/25/19 3:00 AM, Anup Patel wrote:
-> > This patch implements kvm_cpu__<xyz> Guest/VM VCPU arch functions.
-> >
-> > These functions mostly deal with:
-> > 1. VCPU allocation and initialization
-> > 2. VCPU reset
-> > 3. VCPU show/dump code
-> > 4. VCPU show/dump registers
-> >
-> > We also save RISC-V ISA, XLEN, and TIMEBASE frequency for each VCPU
-> > so that it can be later used for generating Guest/VM FDT.
-> >
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
+On Fri, Jan 10, 2020 at 02:16:36AM +0800, Alex Williamson wrote:
+> On Thu,  2 Jan 2020 20:02:17 -0500
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> 
+> > vfio_iova_rw will read/write a range of userspace memory (starting form
+> > device iova to iova + len -1) into a kenrel buffer without pinning the
+> > userspace memory.
+> > 
+> > TODO: vfio needs to mark the iova dirty if vfio_iova_rw(write) is
+> > called.
+> > 
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 > > ---
-> >  riscv/include/kvm/kvm-cpu-arch.h |   4 +
-> >  riscv/kvm-cpu.c                  | 307 ++++++++++++++++++++++++++++++-
-> >  2 files changed, 304 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/riscv/include/kvm/kvm-cpu-arch.h b/riscv/include/kvm/kvm-cpu-arch.h
-> > index 09a50e8..035965e 100644
-> > --- a/riscv/include/kvm/kvm-cpu-arch.h
-> > +++ b/riscv/include/kvm/kvm-cpu-arch.h
-> > @@ -14,6 +14,10 @@ struct kvm_cpu {
-> >
-> >       unsigned long   cpu_id;
-> >
-> > +     unsigned long   riscv_xlen;
-> > +     unsigned long   riscv_isa;
-> > +     unsigned long   riscv_timebase;
-> > +
-> >       struct kvm      *kvm;
-> >       int             vcpu_fd;
-> >       struct kvm_run  *kvm_run;
-> > diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
-> > index e4b8fa5..1565275 100644
-> > --- a/riscv/kvm-cpu.c
-> > +++ b/riscv/kvm-cpu.c
-> > @@ -17,10 +17,84 @@ int kvm_cpu__get_debug_fd(void)
-> >       return debug_fd;
+> >  drivers/vfio/vfio.c             | 45 ++++++++++++++++++
+> >  drivers/vfio/vfio_iommu_type1.c | 81 +++++++++++++++++++++++++++++++++
+> >  include/linux/vfio.h            |  5 ++
+> >  3 files changed, 131 insertions(+)
+> > 
+> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> > index c8482624ca34..36e91e647ed5 100644
+> > --- a/drivers/vfio/vfio.c
+> > +++ b/drivers/vfio/vfio.c
+> > @@ -1961,6 +1961,51 @@ int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn, int npage)
 > >  }
-> >
-> > +static __u64 __kvm_reg_id(__u64 type, __u64 idx)
+> >  EXPORT_SYMBOL(vfio_unpin_pages);
+> >  
+> > +/*
+> > + * Read/Write a range of userspace IOVAs for a device into/from a kernel
+> > + * buffer without pinning the userspace memory
+> > + * @dev [in]  : device
+> > + * @iova [in] : base IOVA of a userspace buffer
+> > + * @data [in] : pointer to kernel buffer
+> > + * @len [in]  : kernel buffer length
+> > + * @write     : indicate read or write
+> > + * Return error on failure or 0 on success.
+> > + */
+> > +int vfio_iova_rw(struct device *dev, unsigned long iova, void *data,
+> > +		   unsigned long len, bool write)
+> 
+> Shouldn't iova be a dma_addr_t and len be a size_t?  AIUI this function
+> performs the equivalent behavior of the device itself performing a DMA.
+> Hmm, should the interface be named vfio_dma_rw()?
+>
+ok. will rename the interface to vfio_dma_rw(). thanks :)
+
 > > +{
-> > +     __u64 id = KVM_REG_RISCV | type | idx;
+> > +	struct vfio_container *container;
+> > +	struct vfio_group *group;
+> > +	struct vfio_iommu_driver *driver;
+> > +	int ret = 0;
 > > +
-> > +     if (sizeof(unsigned long) == 8)
->
-> This looks fragile. As far as I know, according to C99 the minimum width of
-> unsigned long is 32 bits. Why not use __riscv_xlen instead?
-
-Good suggestion. I will use __riscv_xlen here.
-
->
-> Thanks,
-> Alex
-> > +             id |= KVM_REG_SIZE_U64;
-> > +     else
-> > +             id |= KVM_REG_SIZE_U32;
+> > +	if (!dev || !data || len <= 0)
+> > +		return -EINVAL;
 > > +
-> > +     return id;
+> > +	group = vfio_group_get_from_dev(dev);
+> > +	if (!group)
+> > +		return -ENODEV;
+> > +
+> > +	ret = vfio_group_add_container_user(group);
+> > +	if (ret)
+> > +		goto out;
+> > +
+> > +	container = group->container;
+> > +	driver = container->iommu_driver;
+> > +
+> > +	if (likely(driver && driver->ops->iova_rw))
+> > +		ret = driver->ops->iova_rw(container->iommu_data,
+> > +					   iova, data, len, write);
+> > +	else
+> > +		ret = -ENOTTY;
+> > +
+> > +	vfio_group_try_dissolve_container(group);
+> > +out:
+> > +	vfio_group_put(group);
+> > +	return ret;
+> > +}
+> > +EXPORT_SYMBOL(vfio_iova_rw);
+> > +
+> >  static int vfio_register_iommu_notifier(struct vfio_group *group,
+> >  					unsigned long *events,
+> >  					struct notifier_block *nb)
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > index 2ada8e6cdb88..aee191077235 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -27,6 +27,7 @@
+> >  #include <linux/iommu.h>
+> >  #include <linux/module.h>
+> >  #include <linux/mm.h>
+> > +#include <linux/mmu_context.h>
+> >  #include <linux/rbtree.h>
+> >  #include <linux/sched/signal.h>
+> >  #include <linux/sched/mm.h>
+> > @@ -2326,6 +2327,85 @@ static int vfio_iommu_type1_unregister_notifier(void *iommu_data,
+> >  	return blocking_notifier_chain_unregister(&iommu->notifier, nb);
+> >  }
+> >  
+> > +static int next_segment(unsigned long len, int offset)
+> > +{
+> > +	if (len > PAGE_SIZE - offset)
+> > +		return PAGE_SIZE - offset;
+> > +	else
+> > +		return len;
 > > +}
 > > +
-> > +#define RISCV_CONFIG_REG(name)       __kvm_reg_id(KVM_REG_RISCV_CONFIG, \
-> > +                                          KVM_REG_RISCV_CONFIG_REG(name))
+> > +static int vfio_iommu_type1_rw_iova_seg(struct vfio_iommu *iommu,
+> > +					  unsigned long iova, void *data,
+> > +					  unsigned long seg_len,
+> > +					  unsigned long offset,
+> > +					  bool write)
+> > +{
+> > +	struct mm_struct *mm;
+> > +	unsigned long vaddr;
+> > +	struct vfio_dma *dma;
+> > +	bool kthread = current->mm == NULL;
+> > +	int ret = 0;
 > > +
-> > +#define RISCV_CORE_REG(name) __kvm_reg_id(KVM_REG_RISCV_CORE, \
-> > +                                          KVM_REG_RISCV_CORE_REG(name))
+> > +	dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> > +	if (!dma)
+> > +		return -EINVAL;
 > > +
-> > +#define RISCV_CSR_REG(name)  __kvm_reg_id(KVM_REG_RISCV_CSR, \
-> > +                                          KVM_REG_RISCV_CSR_REG(name))
+> > +	mm = get_task_mm(dma->task);
 > > +
-> > +#define RISCV_TIMER_REG(name)        __kvm_reg_id(KVM_REG_RISCV_TIMER, \
-> > +                                          KVM_REG_RISCV_TIMER_REG(name))
+> > +	if (!mm)
+> > +		return -ENODEV;
 > > +
-> >  struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
-> >  {
-> > -     /* TODO: */
-> > -     return NULL;
-> > +     struct kvm_cpu *vcpu;
-> > +     unsigned long timebase = 0, isa = 0;
-> > +     int coalesced_offset, mmap_size;
-> > +     struct kvm_one_reg reg;
+> > +	if (kthread)
+> > +		use_mm(mm);
+> > +	else if (current->mm != mm) {
+> > +		ret = -EINVAL;
+> > +		goto out;
+> > +	}
 > > +
-> > +     vcpu = calloc(1, sizeof(struct kvm_cpu));
-> > +     if (!vcpu)
-> > +             return NULL;
-> > +
-> > +     vcpu->vcpu_fd = ioctl(kvm->vm_fd, KVM_CREATE_VCPU, cpu_id);
-> > +     if (vcpu->vcpu_fd < 0)
-> > +             die_perror("KVM_CREATE_VCPU ioctl");
-> > +
-> > +     reg.id = RISCV_CONFIG_REG(isa);
-> > +     reg.addr = (unsigned long)&isa;
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (config.isa)");
-> > +
-> > +     reg.id = RISCV_TIMER_REG(frequency);
-> > +     reg.addr = (unsigned long)&timebase;
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (config.timebase)");
-> > +
-> > +     mmap_size = ioctl(kvm->sys_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
-> > +     if (mmap_size < 0)
-> > +             die_perror("KVM_GET_VCPU_MMAP_SIZE ioctl");
-> > +
-> > +     vcpu->kvm_run = mmap(NULL, mmap_size, PROT_RW, MAP_SHARED,
-> > +                          vcpu->vcpu_fd, 0);
-> > +     if (vcpu->kvm_run == MAP_FAILED)
-> > +             die("unable to mmap vcpu fd");
-> > +
-> > +     coalesced_offset = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION,
-> > +                              KVM_CAP_COALESCED_MMIO);
-> > +     if (coalesced_offset)
-> > +             vcpu->ring = (void *)vcpu->kvm_run +
-> > +                          (coalesced_offset * PAGE_SIZE);
-> > +
-> > +     reg.id = RISCV_CONFIG_REG(isa);
-> > +     reg.addr = (unsigned long)&isa;
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-> > +             die("KVM_SET_ONE_REG failed (config.isa)");
-> > +
-> > +     /* Populate the vcpu structure. */
-> > +     vcpu->kvm               = kvm;
-> > +     vcpu->cpu_id            = cpu_id;
-> > +     vcpu->riscv_isa         = isa;
-> > +     vcpu->riscv_xlen        = __riscv_xlen;
-> > +     vcpu->riscv_timebase    = timebase;
-> > +     vcpu->is_running        = true;
-> > +
-> > +     return vcpu;
-> >  }
-> >
-> >  void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
-> > @@ -29,7 +103,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
-> >
-> >  void kvm_cpu__delete(struct kvm_cpu *vcpu)
-> >  {
-> > -     /* TODO: */
-> > +     free(vcpu);
-> >  }
-> >
-> >  bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
-> > @@ -40,12 +114,43 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
-> >
-> >  void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
-> >  {
-> > -     /* TODO: */
-> >  }
-> >
-> >  void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu)
-> >  {
-> > -     /* TODO: */
-> > +     struct kvm *kvm = vcpu->kvm;
-> > +     struct kvm_mp_state mp_state;
-> > +     struct kvm_one_reg reg;
-> > +     unsigned long data;
-> > +
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_MP_STATE, &mp_state) < 0)
-> > +             die_perror("KVM_GET_MP_STATE failed");
-> > +
-> > +     /*
-> > +      * If MP state is stopped then it means Linux KVM RISC-V emulates
-> > +      * SBI v0.2 (or higher) with HART power managment and give VCPU
-> > +      * will power-up at boot-time by boot VCPU. For such VCPU, we
-> > +      * don't update PC, A0 and A1 here.
-> > +      */
-> > +     if (mp_state.mp_state == KVM_MP_STATE_STOPPED)
-> > +             return;
-> > +
-> > +     reg.addr = (unsigned long)&data;
-> > +
-> > +     data    = kvm->arch.kern_guest_start;
-> > +     reg.id  = RISCV_CORE_REG(regs.pc);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-> > +             die_perror("KVM_SET_ONE_REG failed (pc)");
-> > +
-> > +     data    = vcpu->cpu_id;
-> > +     reg.id  = RISCV_CORE_REG(regs.a0);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-> > +             die_perror("KVM_SET_ONE_REG failed (a0)");
-> > +
-> > +     data    = kvm->arch.dtb_guest_start;
-> > +     reg.id  = RISCV_CORE_REG(regs.a1);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-> > +             die_perror("KVM_SET_ONE_REG failed (a1)");
-> >  }
-> >
-> >  int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
-> > @@ -55,10 +160,198 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
-> >
-> >  void kvm_cpu__show_code(struct kvm_cpu *vcpu)
-> >  {
-> > -     /* TODO: */
-> > +     struct kvm_one_reg reg;
-> > +     unsigned long data;
-> > +     int debug_fd = kvm_cpu__get_debug_fd();
-> > +
-> > +     reg.addr = (unsigned long)&data;
-> > +
-> > +     dprintf(debug_fd, "\n*PC:\n");
-> > +     reg.id = RISCV_CORE_REG(regs.pc);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (show_code @ PC)");
-> > +
-> > +     kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
-> > +
-> > +     dprintf(debug_fd, "\n*RA:\n");
-> > +     reg.id = RISCV_CORE_REG(regs.ra);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (show_code @ RA)");
-> > +
-> > +     kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
-> >  }
-> >
-> >  void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
-> >  {
-> > -     /* TODO: */
-> > +     struct kvm_one_reg reg;
-> > +     unsigned long data;
-> > +     int debug_fd = kvm_cpu__get_debug_fd();
-> > +
-> > +     reg.addr = (unsigned long)&data;
-> > +     dprintf(debug_fd, "\n Registers:\n");
-> > +
-> > +     reg.id          = RISCV_CORE_REG(mode);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (mode)");
-> > +     dprintf(debug_fd, " MODE:  0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.pc);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (pc)");
-> > +     dprintf(debug_fd, " PC:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.ra);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (ra)");
-> > +     dprintf(debug_fd, " RA:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.sp);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (sp)");
-> > +     dprintf(debug_fd, " SP:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.gp);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (gp)");
-> > +     dprintf(debug_fd, " GP:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.tp);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (tp)");
-> > +     dprintf(debug_fd, " TP:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.t0);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (t0)");
-> > +     dprintf(debug_fd, " T0:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.t1);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (t1)");
-> > +     dprintf(debug_fd, " T1:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.t2);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (t2)");
-> > +     dprintf(debug_fd, " T2:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s0);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s0)");
-> > +     dprintf(debug_fd, " S0:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s1);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s1)");
-> > +     dprintf(debug_fd, " S1:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.a0);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (a0)");
-> > +     dprintf(debug_fd, " A0:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.a1);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (a1)");
-> > +     dprintf(debug_fd, " A1:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.a2);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (a2)");
-> > +     dprintf(debug_fd, " A2:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.a3);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (a3)");
-> > +     dprintf(debug_fd, " A3:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.a4);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (a4)");
-> > +     dprintf(debug_fd, " A4:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.a5);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (a5)");
-> > +     dprintf(debug_fd, " A5:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.a6);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (a6)");
-> > +     dprintf(debug_fd, " A6:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.a7);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (a7)");
-> > +     dprintf(debug_fd, " A7:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s2);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s2)");
-> > +     dprintf(debug_fd, " S2:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s3);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s3)");
-> > +     dprintf(debug_fd, " S3:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s4);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s4)");
-> > +     dprintf(debug_fd, " S4:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s5);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s5)");
-> > +     dprintf(debug_fd, " S5:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s6);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s6)");
-> > +     dprintf(debug_fd, " S6:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s7);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s7)");
-> > +     dprintf(debug_fd, " S7:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s8);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s8)");
-> > +     dprintf(debug_fd, " S8:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s9);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s9)");
-> > +     dprintf(debug_fd, " S9:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s10);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s10)");
-> > +     dprintf(debug_fd, " S10:   0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.s11);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (s11)");
-> > +     dprintf(debug_fd, " S11:   0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.t3);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (t3)");
-> > +     dprintf(debug_fd, " T3:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.t4);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (t4)");
-> > +     dprintf(debug_fd, " T4:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.t5);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (t5)");
-> > +     dprintf(debug_fd, " T5:    0x%lx\n", data);
-> > +
-> > +     reg.id          = RISCV_CORE_REG(regs.t6);
-> > +     if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> > +             die("KVM_GET_ONE_REG failed (t6)");
-> > +     dprintf(debug_fd, " T6:    0x%lx\n", data);
-> >  }
+> > +	vaddr = dma->vaddr + iova - dma->iova + offset;
+> 
+> Parenthesis here would be useful and might prevent overflow, ie:
+> 
+>   dma->vaddr + (iova - dma->iova) + offset
+>
+Yes, thanks for pointing it out!
 
-Regards,
-Anup
+> > +
+> > +	ret = write ? __copy_to_user((void __user *)vaddr,
+> > +			data, seg_len) :
+> > +		__copy_from_user(data, (void __user *)vaddr,
+> > +				seg_len);
+> > +	if (ret)
+> > +		ret = -EFAULT;
+> > +
+> > +	if (kthread)
+> > +		unuse_mm(mm);
+> > +out:
+> > +	mmput(mm);
+> > +	return ret;
+> > +}
+> > +
+> > +static int vfio_iommu_type1_iova_rw(void *iommu_data, unsigned long iova,
+> > +				    void *data, unsigned long len, bool write)
+> > +{
+> > +	struct vfio_iommu *iommu = iommu_data;
+> > +	int offset = iova & ~PAGE_MASK;
+> > +	int seg_len;
+> > +	int ret = 0;
+> > +
+> > +	iova = iova & PAGE_MASK;
+> > +
+> > +	mutex_lock(&iommu->lock);
+> > +	while ((seg_len = next_segment(len, offset)) > 0) {
+> > +		ret = vfio_iommu_type1_rw_iova_seg(iommu, iova, data,
+> > +						   seg_len, offset, write);
+> 
+> Why do we need to split operations at page boundaries?  It seems really
+> inefficient that at each page crossing we need to lookup the vfio_dma
+> again (probably the same one), switch to the mm (probably the same one),
+> and perform another copy_{to,from}_user() when potentially have
+> everything we need to perform a larger copy.  Thanks,
+>
+you are right. Maybe I can first search dma with size of 1 and then
+check the size of the found dma to perform a larger copy.
+
+Thanks
+Yan
+
+> 
+> > +		if (ret)
+> > +			break;
+> > +
+> > +		offset = 0;
+> > +		len -= seg_len;
+> > +		data += seg_len;
+> > +		iova += PAGE_SIZE;
+> > +	}
+> > +
+> > +	mutex_unlock(&iommu->lock);
+> > +	return ret;
+> > +}
+> > +
+> >  static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+> >  	.name			= "vfio-iommu-type1",
+> >  	.owner			= THIS_MODULE,
+> > @@ -2338,6 +2418,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+> >  	.unpin_pages		= vfio_iommu_type1_unpin_pages,
+> >  	.register_notifier	= vfio_iommu_type1_register_notifier,
+> >  	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
+> > +	.iova_rw		= vfio_iommu_type1_iova_rw,
+> >  };
+> >  
+> >  static int __init vfio_iommu_type1_init(void)
+> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> > index e42a711a2800..7bf18a31bbcf 100644
+> > --- a/include/linux/vfio.h
+> > +++ b/include/linux/vfio.h
+> > @@ -82,6 +82,8 @@ struct vfio_iommu_driver_ops {
+> >  					     struct notifier_block *nb);
+> >  	int		(*unregister_notifier)(void *iommu_data,
+> >  					       struct notifier_block *nb);
+> > +	int		(*iova_rw)(void *iommu_data, unsigned long iova,
+> > +				   void *data, unsigned long len, bool write);
+> >  };
+> >  
+> >  extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+> > @@ -107,6 +109,9 @@ extern int vfio_pin_pages(struct device *dev, unsigned long *user_pfn,
+> >  extern int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn,
+> >  			    int npage);
+> >  
+> > +extern int vfio_iova_rw(struct device *dev, unsigned long iova, void *data,
+> > +			unsigned long len, bool write);
+> > +
+> >  /* each type has independent events */
+> >  enum vfio_notify_type {
+> >  	VFIO_IOMMU_NOTIFY = 0,
+> 
