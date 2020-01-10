@@ -2,103 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA326136A5E
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 10:59:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DC69136AA1
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 11:09:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727367AbgAJJ73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jan 2020 04:59:29 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:34282 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727320AbgAJJ73 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jan 2020 04:59:29 -0500
-Received: by mail-lj1-f193.google.com with SMTP id z22so1525902ljg.1
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2020 01:59:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=7JlzPibRcf0IgPM6L/pRPXmRhZqX6hDwJe/LfcYdab8=;
-        b=K7Y72Csly7MWqJMzL3CkWbTrMW2/2vhNHffTGbrtgJOr8gPUiGjGjQdP0tTmzV3E0W
-         A927SweuQJqAzR2mrjN7uAfYmNhfWOTwNpnxNCla+S+3hAUTSd1bghy3J3Eq+Oj5Tc/t
-         dFHrgnGrdy96RqRknK4r6Q+9U1A11UenbliYexZsT/0+Mfpb+4xyhxTpjMzkoSNuxSsI
-         iZItbxMB3wNzTmJZBVg5WdFOJrTD67BRpKMjl5DQWe+KYfrC0XnUt0itnkYHzFox2ZJ8
-         Rxn8L0arRJ8E4EkbpshAsBDkmctDgCjcyd/XMuk6qEKmIDMx3+2eZ8/473mN98+V/Fla
-         8SNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7JlzPibRcf0IgPM6L/pRPXmRhZqX6hDwJe/LfcYdab8=;
-        b=S1Z188KNJat5K3p4nder3cHjV1CVeHAk2fQOPxQxR4xEwk1s36JpNOQFnKvKoSOgyK
-         v9mide6oFa0QHkkUhSnyfUDPQMBJ/Ex/zIF5uZ4XzV1sIFFIzZWGORZ0vkiPCtEOlZCO
-         YljaohSysBCBpPs0fGlppHKU3wpH88gUVcYMWflh9BwPdnbHG7nNSaO59F0at7uoK6d4
-         RjOEdRLw5HHHSiX8rkxXSmMe5oIWbbo9FY15QIVgEKQay9HH2skP3SQfRvS1sdPLQ1up
-         7jLSd2mV8HiZyqFaLH9I0NmQRIcaJd63QspY7DGEPXOSIyn55tlduFSC55UEOWnxq5e1
-         vIjA==
-X-Gm-Message-State: APjAAAX1qdjw0DLN+Il+6U9sq/oKNYtVT1zwxg7/7Uujp2gOKBDMzi4H
-        3Hif/vQihurjz1fO68SwDsZumXoJAuj2Jc+u0/0=
-X-Google-Smtp-Source: APXvYqxzu0M/AnGftTw+RYkbJmDaeTygSU9qN8VejwFvlXKqWRamkOK0VDxcEWbRXKmYV/ncIV+w7yjo5nHIp/WwRtA=
-X-Received: by 2002:a2e:3a13:: with SMTP id h19mr2127868lja.16.1578650367261;
- Fri, 10 Jan 2020 01:59:27 -0800 (PST)
-MIME-Version: 1.0
-References: <20200109152133.23649-1-philmd@redhat.com> <20200109152133.23649-2-philmd@redhat.com>
-In-Reply-To: <20200109152133.23649-2-philmd@redhat.com>
-From:   Alistair Francis <alistair23@gmail.com>
-Date:   Fri, 10 Jan 2020 17:59:00 +0800
-Message-ID: <CAKmqyKPe-K5omNe2wJC-vb35YQ2iiH4yJUTDgydDna+7ONnvuw@mail.gmail.com>
-Subject: Re: [PATCH 01/15] target/arm/kvm: Use CPUState::kvm_state in kvm_arm_pmu_supported()
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "open list:Overall" <kvm@vger.kernel.org>,
-        Juan Quintela <quintela@redhat.com>,
-        "open list:New World" <qemu-ppc@nongnu.org>,
+        id S1727392AbgAJKJb convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 10 Jan 2020 05:09:31 -0500
+Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:47759 "EHLO
+        2.mo178.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727352AbgAJKJb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jan 2020 05:09:31 -0500
+X-Greylist: delayed 602 seconds by postgrey-1.27 at vger.kernel.org; Fri, 10 Jan 2020 05:09:29 EST
+Received: from player688.ha.ovh.net (unknown [10.108.54.38])
+        by mo178.mail-out.ovh.net (Postfix) with ESMTP id B9A4A8A813
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2020 10:51:20 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
+        (Authenticated sender: groug@kaod.org)
+        by player688.ha.ovh.net (Postfix) with ESMTPSA id 56885DFACE0A;
+        Fri, 10 Jan 2020 09:50:58 +0000 (UTC)
+Date:   Fri, 10 Jan 2020 10:50:55 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
         Marcelo Tosatti <mtosatti@redhat.com>,
         "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        Alistair Francis <alistair.francis@wdc.com>,
+        qemu-arm@nongnu.org, Alistair Francis <alistair.francis@wdc.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         David Gibson <david@gibson.dropbear.id.au>,
-        Richard Henderson <rth@twiddle.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Richard Henderson <rth@twiddle.net>,
+        Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 04/15] hw/ppc/spapr_rtas: Restrict variables scope to
+ single switch case
+Message-ID: <20200110105055.3e72ddf4@bahia.lan>
+In-Reply-To: <9870f8ed-3fa0-1deb-860d-7481cb3db556@redhat.com>
+References: <20200109152133.23649-1-philmd@redhat.com>
+        <20200109152133.23649-5-philmd@redhat.com>
+        <20200109184349.1aefa074@bahia.lan>
+        <9870f8ed-3fa0-1deb-860d-7481cb3db556@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Ovh-Tracer-Id: 5266959766281034019
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdeifedgtdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieekkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 9, 2020 at 11:22 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> KVMState is already accessible via CPUState::kvm_state, use it.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Fri, 10 Jan 2020 10:34:07 +0100
+Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> On 1/9/20 6:43 PM, Greg Kurz wrote:
+> > On Thu,  9 Jan 2020 16:21:22 +0100
+> > Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+> > 
+> >> We only access these variables in RTAS_SYSPARM_SPLPAR_CHARACTERISTICS
+> >> case, restrict their scope to avoid unnecessary initialization.
+> >>
+> > 
+> > I guess a decent compiler can be smart enough detect that the initialization
+> > isn't needed outside of the RTAS_SYSPARM_SPLPAR_CHARACTERISTICS branch...
+> > Anyway, reducing scope isn't bad. The only hitch I could see is that some
+> > people do prefer to have all variables declared upfront, but there's a nested
+> > param_val variable already so I guess it's okay.
+> 
+> I don't want to outsmart compilers :)
+> 
+> The MACHINE() macro is not a simple cast, it does object introspection 
+> with OBJECT_CHECK(), thus is not free. Since 
 
-Alistair
+Sure, I understand the motivation in avoiding an unneeded call
+to calling object_dynamic_cast_assert().
 
-> ---
->  target/arm/kvm.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index b87b59a02a..8d82889150 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -181,9 +181,7 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
->
->  bool kvm_arm_pmu_supported(CPUState *cpu)
->  {
-> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-> -
-> -    return kvm_check_extension(s, KVM_CAP_ARM_PMU_V3);
-> +    return kvm_check_extension(cpu->kvm_state, KVM_CAP_ARM_PMU_V3);
->  }
->
->  int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
-> --
-> 2.21.1
->
->
+> object_dynamic_cast_assert() argument is not const, I'm not sure the 
+> compiler can remove the call.
+> 
+
+Not remove the call, but delay it to the branch that uses it,
+ie. parameter == RTAS_SYSPARM_SPLPAR_CHARACTERISTICS.
+
+> Richard, Eric, do you know?
+> 
+> >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> >> ---
+> >>   hw/ppc/spapr_rtas.c | 4 ++--
+> >>   1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> >> index 6f06e9d7fe..7237e5ebf2 100644
+> >> --- a/hw/ppc/spapr_rtas.c
+> >> +++ b/hw/ppc/spapr_rtas.c
+> >> @@ -267,8 +267,6 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
+> >>                                             uint32_t nret, target_ulong rets)
+> >>   {
+> >>       PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+> >> -    MachineState *ms = MACHINE(spapr);
+> >> -    unsigned int max_cpus = ms->smp.max_cpus;
+> >>       target_ulong parameter = rtas_ld(args, 0);
+> >>       target_ulong buffer = rtas_ld(args, 1);
+> >>       target_ulong length = rtas_ld(args, 2);
+> >> @@ -276,6 +274,8 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU *cpu,
+> >>   
+> >>       switch (parameter) {
+> >>       case RTAS_SYSPARM_SPLPAR_CHARACTERISTICS: {
+> >> +        MachineState *ms = MACHINE(spapr);
+> >> +        unsigned int max_cpus = ms->smp.max_cpus;
+> > 
+> > The max_cpus variable used to be a global. Now that it got moved
+> > below ms->smp, I'm not sure it's worth keeping it IMHO. What about
+> > dropping it completely and do:
+> > 
+> >          char *param_val = g_strdup_printf("MaxEntCap=%d,"
+> >                                            "DesMem=%" PRIu64 ","
+> >                                            "DesProcs=%d,"
+> >                                            "MaxPlatProcs=%d",
+> >                                            ms->smp.max_cpus,
+> >                                            current_machine->ram_size / MiB,
+> >                                            ms->smp.cpus,
+> >                                            ms->smp.max_cpus);
+> 
+> OK, good idea.
+> 
+> > And maybe insert an empty line between the declaration of param_val
+> > and the code for a better readability ?
+> > 
+> >>           char *param_val = g_strdup_printf("MaxEntCap=%d,"
+> >>                                             "DesMem=%" PRIu64 ","
+> >>                                             "DesProcs=%d,"
+> > 
+> 
+
