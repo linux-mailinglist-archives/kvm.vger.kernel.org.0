@@ -2,119 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BEBDD137446
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 17:59:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 470D11374C6
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 18:26:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728406AbgAJQ7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jan 2020 11:59:00 -0500
-Received: from mga11.intel.com ([192.55.52.93]:34768 "EHLO mga11.intel.com"
+        id S1726789AbgAJR0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jan 2020 12:26:13 -0500
+Received: from mga11.intel.com ([192.55.52.93]:37049 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725937AbgAJQ7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jan 2020 11:59:00 -0500
+        id S1726463AbgAJR0N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jan 2020 12:26:13 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Jan 2020 08:58:59 -0800
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Jan 2020 09:26:12 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,417,1571727600"; 
-   d="scan'208";a="255077476"
+   d="scan'208";a="216733954"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 10 Jan 2020 08:58:59 -0800
-Date:   Fri, 10 Jan 2020 08:58:59 -0800
+  by orsmga008.jf.intel.com with ESMTP; 10 Jan 2020 09:26:11 -0800
+Date:   Fri, 10 Jan 2020 09:26:11 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Yang Weijiang <weijiang.yang@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         pbonzini@redhat.com, jmattson@google.com,
         yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
         edwin.zhai@intel.com
-Subject: Re: [RESEND PATCH v10 02/10] vmx: spp: Add control flags for
- Sub-Page Protection(SPP)
-Message-ID: <20200110165859.GB21485@linux.intel.com>
+Subject: Re: [RESEND PATCH v10 03/10] mmu: spp: Add SPP Table setup functions
+Message-ID: <20200110172611.GC21485@linux.intel.com>
 References: <20200102061319.10077-1-weijiang.yang@intel.com>
- <20200102061319.10077-3-weijiang.yang@intel.com>
+ <20200102061319.10077-4-weijiang.yang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200102061319.10077-3-weijiang.yang@intel.com>
+In-Reply-To: <20200102061319.10077-4-weijiang.yang@intel.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 02, 2020 at 02:13:11PM +0800, Yang Weijiang wrote:
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index e3394c839dea..5713e8a6224c 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -60,6 +60,7 @@
->  #include "vmcs12.h"
->  #include "vmx.h"
->  #include "x86.h"
-> +#include "../mmu/spp.h"
+On Thu, Jan 02, 2020 at 02:13:12PM +0800, Yang Weijiang wrote:
+> SPPT is a 4-level paging structure similar to EPT, when SPP is
 
-The ".." should be unnecessary, e.g. x86.h is obviously a level up.
+How does SPP interact with 5-level EPT?
 
->  MODULE_AUTHOR("Qumranet");
->  MODULE_LICENSE("GPL");
-> @@ -111,6 +112,7 @@ module_param_named(pml, enable_pml, bool, S_IRUGO);
->  
->  static bool __read_mostly dump_invalid_vmcs = 0;
->  module_param(dump_invalid_vmcs, bool, 0644);
-> +static bool __read_mostly spp_supported = 0;
+> armed for target physical page, bit 61 of the corresponding
+> EPT entry is flaged, then SPPT is traversed with the gfn,
+> the leaf entry of SPPT contains the access bitmap of subpages
+> inside the target 4KB physical page, one bit per 128-byte subpage.
+> 
+> Co-developed-by: He Chen <he.chen@linux.intel.com>
+> Signed-off-by: He Chen <he.chen@linux.intel.com>
+> Co-developed-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
 
-s/spp_supported/enable_spp to be consistent with all the other booleans.
+...
 
-Is there a reason this isn't exposed as a module param?
-
-And if this is to be on by default, then the flag itself should be
-initialized to '1' so that it's clear to readers that the feature is
-enabled by default (if it's supported).  Looking at only this code, I would
-think that SPP is forced off and can't be enabled.
-
-That being said, turning on the enable_spp control flag should be the last
-patch in the series, i.e. it shouldn't be turned on until all the
-underlying support code is in place.  So, I would keep this as is, but
-invert the code in hardware_setup() below.  That way the flag exists and
-is checked, but can't be turned on without modifying the code.  Then when
-all is said and done, you can add a patch to introduce the module param
-and turn on the flag by default (if that's indeed what we want).
-
->  #define MSR_BITMAP_MODE_X2APIC		1
->  #define MSR_BITMAP_MODE_X2APIC_APICV	2
-> @@ -2391,6 +2393,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  			SECONDARY_EXEC_RDSEED_EXITING |
->  			SECONDARY_EXEC_RDRAND_EXITING |
->  			SECONDARY_EXEC_ENABLE_PML |
-> +			SECONDARY_EXEC_ENABLE_SPP |
->  			SECONDARY_EXEC_TSC_SCALING |
->  			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE |
->  			SECONDARY_EXEC_PT_USE_GPA |
-> @@ -4039,6 +4042,9 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
->  	if (!enable_pml)
->  		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
->  
-> +	if (!spp_supported)
-> +		exec_control &= ~SECONDARY_EXEC_ENABLE_SPP;
+> +static u64 format_spp_spte(u32 spp_wp_bitmap)
+> +{
+> +	u64 new_spte = 0;
+> +	int i = 0;
 > +
->  	if (vmx_xsaves_supported()) {
->  		/* Exposing XSAVES only when XSAVE is exposed */
->  		bool xsaves_enabled =
-> @@ -7630,6 +7636,9 @@ static __init int hardware_setup(void)
->  	if (!cpu_has_vmx_flexpriority())
->  		flexpriority_enabled = 0;
->  
-> +	if (cpu_has_vmx_ept_spp() && enable_ept)
-> +		spp_supported = 1;
+> +	/*
+> +	 * One 4K page contains 32 sub-pages, in SPP table L4E, old bits
 
-As above, invert this to disable spp when it's not supported, or when EPT
-is disabled (or not supported).
+Is this
+
+	One 4k page constains 32 sub-pages in SPP table L4E.  Old bits are...
+
+or
+	One 4k page contains 32 sub-pages.  In SPP table L4E, old bits are...
+
+or
+	???
+
+> +	 * are reserved, so we need to transfer u32 subpage write
+
+Wrap comments at 80 columns to save lines.
+
+> +	 * protect bitmap to u64 SPP L4E format.
+
+What is a "page" in "one 4k page"?  What old bits?  Why not just track a
+64-bit value?  I understand *what* the code below does, but I have no clue
+why or whether it's correct.
+
+> +	 */
+> +	while (i < 32) {
+> +		if (spp_wp_bitmap & (1ULL << i))
+> +			new_spte |= 1ULL << (i * 2);
+> +		i++;
+> +	}
+
+	for (i = 0; i < 32; i++)
+		new_spte |= (spp_wp_bitmap & BIT_ULL(i)) << i;
+
+At the very least, use a for loop.
 
 > +
->  	if (!cpu_has_virtual_nmis())
->  		enable_vnmi = 0;
->  
+> +	return new_spte;
+> +}
+> +
+> +static void spp_spte_set(u64 *sptep, u64 new_spte)
+> +{
+> +	__set_spte(sptep, new_spte);
+> +}
+> +
+> +bool is_spp_spte(struct kvm_mmu_page *sp)
+> +{
+> +	return sp->role.spp;
+> +}
+> +
+> +#define SPPT_ENTRY_PHA_MASK (0xFFFFFFFFFF << 12)
+> +
+> +int kvm_spp_setup_structure(struct kvm_vcpu *vcpu,
+> +			    u32 access_map, gfn_t gfn)
+> +{
+> +	struct kvm_shadow_walk_iterator iter;
+> +	struct kvm_mmu_page *sp;
+> +	gfn_t pseudo_gfn;
+> +	u64 old_spte, spp_spte;
+> +	int ret = -EFAULT;
+> +
+> +	/* direct_map spp start */
+> +	if (!VALID_PAGE(vcpu->kvm->arch.sppt_root))
+> +		return -EFAULT;
+> +
+> +	for_each_shadow_spp_entry(vcpu, (u64)gfn << PAGE_SHIFT, iter) {
+> +		if (iter.level == PT_PAGE_TABLE_LEVEL) {
+> +			spp_spte = format_spp_spte(access_map);
+> +			old_spte = mmu_spte_get_lockless(iter.sptep);
+> +			if (old_spte != spp_spte)
+> +				spp_spte_set(iter.sptep, spp_spte);
+> +			ret = 0;
+> +			break;
+> +		}
+> +
+> +		if (!is_shadow_present_pte(*iter.sptep)) {
+> +			u64 base_addr = iter.addr;
+> +
+> +			base_addr &= PT64_LVL_ADDR_MASK(iter.level);
+> +			pseudo_gfn = base_addr >> PAGE_SHIFT;
+> +			spp_spte = *iter.sptep;
+> +			sp = kvm_spp_get_page(vcpu, pseudo_gfn,
+> +					      iter.level - 1);
+> +			link_spp_shadow_page(vcpu, iter.sptep, sp);
+> +		} else if (iter.level == PT_DIRECTORY_LEVEL  &&
+> +			   !(spp_spte & PT_PRESENT_MASK) &&
+> +			   (spp_spte & SPPT_ENTRY_PHA_MASK)) {
+> +			spp_spte = *iter.sptep;
+> +			spp_spte |= PT_PRESENT_MASK;
+> +			spp_spte_set(iter.sptep, spp_spte);
+> +		}
+> +	}
+> +
+> +	kvm_flush_remote_tlbs(vcpu->kvm);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_spp_setup_structure);
+> +
+> +inline u64 construct_spptp(unsigned long root_hpa)
+> +{
+> +	return root_hpa & PAGE_MASK;
+> +}
+> +EXPORT_SYMBOL_GPL(construct_spptp);
+> +
+> diff --git a/arch/x86/kvm/mmu/spp.h b/arch/x86/kvm/mmu/spp.h
+> new file mode 100644
+> index 000000000000..8ef94b7a2057
+> --- /dev/null
+> +++ b/arch/x86/kvm/mmu/spp.h
+> @@ -0,0 +1,10 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __KVM_X86_VMX_SPP_H
+> +#define __KVM_X86_VMX_SPP_H
+> +
+> +bool is_spp_spte(struct kvm_mmu_page *sp);
+> +u64 construct_spptp(unsigned long root_hpa);
+> +int kvm_spp_setup_structure(struct kvm_vcpu *vcpu,
+> +			    u32 access_map, gfn_t gfn);
+> +
+> +#endif /* __KVM_X86_VMX_SPP_H */
 > -- 
 > 2.17.2
 > 
