@@ -2,324 +2,682 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 75EC8136A2D
+	by mail.lfdr.de (Postfix) with ESMTP id 9C88B136A2F
 	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 10:47:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727310AbgAJJrM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jan 2020 04:47:12 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51786 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727274AbgAJJrL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jan 2020 04:47:11 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00A9hM0H130627
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2020 04:47:10 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xea2kcdks-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2020 04:47:10 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Fri, 10 Jan 2020 09:47:08 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 10 Jan 2020 09:47:05 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00A9kGE042926480
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Jan 2020 09:46:16 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 48A1DA405C;
-        Fri, 10 Jan 2020 09:47:04 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 91641A405B;
-        Fri, 10 Jan 2020 09:47:02 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.153.163])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 10 Jan 2020 09:47:02 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, david@redhat.com, cohuck@redhat.com
-Subject: [PATCH v5] KVM: s390: Add new reset vcpu API
-Date:   Fri, 10 Jan 2020 04:46:59 -0500
-X-Mailer: git-send-email 2.20.1
+        id S1727379AbgAJJrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jan 2020 04:47:17 -0500
+Received: from foss.arm.com ([217.140.110.172]:41458 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727277AbgAJJrQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jan 2020 04:47:16 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CA9D1063;
+        Fri, 10 Jan 2020 01:47:16 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 13BE53F703;
+        Fri, 10 Jan 2020 01:47:14 -0800 (PST)
+Subject: Re: [kvmtool RFC PATCH 2/8] riscv: Initial skeletal support
+To:     Anup Patel <anup@brainfault.org>
+Cc:     Anup Patel <Anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>
+References: <20191225025945.108466-1-anup.patel@wdc.com>
+ <20191225025945.108466-3-anup.patel@wdc.com>
+ <c655ed3a-151e-0450-3439-d913ff22f5b1@arm.com>
+ <CAAhSdy1XuwQGg=o0c957YfbOL9BMgzXFY08fYt4NOdoo=3NTzQ@mail.gmail.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <70acbb6e-f076-8883-14bd-0b5df3c4fb2a@arm.com>
+Date:   Fri, 10 Jan 2020 09:47:13 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <CAAhSdy1XuwQGg=o0c957YfbOL9BMgzXFY08fYt4NOdoo=3NTzQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20011009-0012-0000-0000-0000037C308F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011009-0013-0000-0000-000021B85457
-Message-Id: <20200110094659.4118-1-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-10_01:2020-01-10,2020-01-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- malwarescore=0 suspectscore=1 spamscore=0 clxscore=1015 priorityscore=1501
- mlxlogscore=999 impostorscore=0 lowpriorityscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001100083
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The architecture states that we need to reset local IRQs for all CPU
-resets. Because the old reset interface did not support the normal CPU
-reset we never did that on a normal reset.
+Hi,
 
-Let's implement an interface for the missing normal and clear resets
-and reset all local IRQs, registers and control structures as stated
-in the architecture.
+On 1/10/20 3:30 AM, Anup Patel wrote:
+> On Wed, Jan 8, 2020 at 6:52 PM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+>> Hi,
+>>
+>> I don't know much about the RISC-V architecture, so I'm only going to comment on
+>> the more generic code.
+> Sure, no problem.
+>
+>> On 12/25/19 3:00 AM, Anup Patel wrote:
+>>> This patch adds initial skeletal KVMTOOL RISC-V support which
+>>> just compiles for RV32 and RV64 host.
+>>>
+>>> Signed-off-by: Anup Patel <anup.patel@wdc.com>
+>>> ---
+>>>  INSTALL                             |   7 +-
+>>>  Makefile                            |  15 +++-
+>>>  riscv/include/asm/kvm.h             | 127 ++++++++++++++++++++++++++++
+>>>  riscv/include/kvm/barrier.h         |  14 +++
+>>>  riscv/include/kvm/fdt-arch.h        |   4 +
+>>>  riscv/include/kvm/kvm-arch.h        |  58 +++++++++++++
+>>>  riscv/include/kvm/kvm-config-arch.h |   9 ++
+>>>  riscv/include/kvm/kvm-cpu-arch.h    |  49 +++++++++++
+>>>  riscv/ioport.c                      |  11 +++
+>>>  riscv/irq.c                         |  13 +++
+>>>  riscv/kvm-cpu.c                     |  64 ++++++++++++++
+>>>  riscv/kvm.c                         |  61 +++++++++++++
+>>>  util/update_headers.sh              |   2 +-
+>>>  13 files changed, 429 insertions(+), 5 deletions(-)
+>>>  create mode 100644 riscv/include/asm/kvm.h
+>>>  create mode 100644 riscv/include/kvm/barrier.h
+>>>  create mode 100644 riscv/include/kvm/fdt-arch.h
+>>>  create mode 100644 riscv/include/kvm/kvm-arch.h
+>>>  create mode 100644 riscv/include/kvm/kvm-config-arch.h
+>>>  create mode 100644 riscv/include/kvm/kvm-cpu-arch.h
+>>>  create mode 100644 riscv/ioport.c
+>>>  create mode 100644 riscv/irq.c
+>>>  create mode 100644 riscv/kvm-cpu.c
+>>>  create mode 100644 riscv/kvm.c
+>>>
+>>> diff --git a/INSTALL b/INSTALL
+>>> index ca8e022..951b123 100644
+>>> --- a/INSTALL
+>>> +++ b/INSTALL
+>>> @@ -26,8 +26,8 @@ For Fedora based systems:
+>>>  For OpenSUSE based systems:
+>>>       # zypper install glibc-devel-static
+>>>
+>>> -Architectures which require device tree (PowerPC, ARM, ARM64) also require
+>>> -libfdt.
+>>> +Architectures which require device tree (PowerPC, ARM, ARM64, RISC-V) also
+>>> +require libfdt.
+>>>       deb: $ sudo apt-get install libfdt-dev
+>>>       Fedora: # yum install libfdt-devel
+>>>       OpenSUSE: # zypper install libfdt1-devel
+>>> @@ -64,6 +64,7 @@ to the Linux name of the architecture. Architectures supported:
+>>>  - arm
+>>>  - arm64
+>>>  - mips
+>>> +- riscv
+>>>  If ARCH is not provided, the target architecture will be automatically
+>>>  determined by running "uname -m" on your host, resulting in a native build.
+>>>
+>>> @@ -81,7 +82,7 @@ On multiarch system you should be able to install those be appending
+>>>  the architecture name after the package (example for ARM64):
+>>>  $ sudo apt-get install libfdt-dev:arm64
+>>>
+>>> -PowerPC and ARM/ARM64 require libfdt to be installed. If you cannot use
+>>> +PowerPC, ARM/ARM64 and RISC-V require libfdt to be installed. If you cannot use
+>>>  precompiled mulitarch packages, you could either copy the required header and
+>>>  library files from an installed target system into the SYSROOT (you will need
+>>>  /usr/include/*fdt*.h and /usr/lib64/libfdt-v.v.v.so and its symlinks), or you
+>>> diff --git a/Makefile b/Makefile
+>>> index 3862112..972fa63 100644
+>>> --- a/Makefile
+>>> +++ b/Makefile
+>>> @@ -106,7 +106,8 @@ OBJS      += hw/i8042.o
+>>>
+>>>  # Translate uname -m into ARCH string
+>>>  ARCH ?= $(shell uname -m | sed -e s/i.86/i386/ -e s/ppc.*/powerpc/ \
+>>> -       -e s/armv.*/arm/ -e s/aarch64.*/arm64/ -e s/mips64/mips/)
+>>> +       -e s/armv.*/arm/ -e s/aarch64.*/arm64/ -e s/mips64/mips/ \
+>>> +       -e s/riscv64/riscv/ -e s/riscv32/riscv/)
+>>>
+>>>  ifeq ($(ARCH),i386)
+>>>       ARCH         := x86
+>>> @@ -190,6 +191,18 @@ ifeq ($(ARCH),mips)
+>>>       OBJS            += mips/kvm.o
+>>>       OBJS            += mips/kvm-cpu.o
+>>>  endif
+>>> +
+>>> +# RISC-V (RV32 and RV64)
+>>> +ifeq ($(ARCH),riscv)
+>>> +     DEFINES         += -DCONFIG_RISCV
+>>> +     ARCH_INCLUDE    := riscv/include
+>>> +     OBJS            += riscv/ioport.o
+>>> +     OBJS            += riscv/irq.o
+>>> +     OBJS            += riscv/kvm.o
+>>> +     OBJS            += riscv/kvm-cpu.o
+>>> +
+>>> +     ARCH_WANT_LIBFDT := y
+>>> +endif
+>>>  ###
+>>>
+>>>  ifeq (,$(ARCH_INCLUDE))
+>>> diff --git a/riscv/include/asm/kvm.h b/riscv/include/asm/kvm.h
+>>> new file mode 100644
+>>> index 0000000..f4274c2
+>>> --- /dev/null
+>>> +++ b/riscv/include/asm/kvm.h
+>>> @@ -0,0 +1,127 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>> +/*
+>>> + * Copyright (C) 2019 Western Digital Corporation or its affiliates.
+>>> + *
+>>> + * Authors:
+>>> + *     Anup Patel <anup.patel@wdc.com>
+>>> + */
+>>> +
+>>> +#ifndef __LINUX_KVM_RISCV_H
+>>> +#define __LINUX_KVM_RISCV_H
+>>> +
+>>> +#ifndef __ASSEMBLY__
+>>> +
+>>> +#include <linux/types.h>
+>>> +#include <asm/ptrace.h>
+>>> +
+>>> +#define __KVM_HAVE_READONLY_MEM
+>>> +
+>>> +#define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>>> +
+>>> +#define KVM_INTERRUPT_SET    -1U
+>>> +#define KVM_INTERRUPT_UNSET  -2U
+>>> +
+>>> +/* for KVM_GET_REGS and KVM_SET_REGS */
+>>> +struct kvm_regs {
+>>> +};
+>>> +
+>>> +/* for KVM_GET_FPU and KVM_SET_FPU */
+>>> +struct kvm_fpu {
+>>> +};
+>>> +
+>>> +/* KVM Debug exit structure */
+>>> +struct kvm_debug_exit_arch {
+>>> +};
+>>> +
+>>> +/* for KVM_SET_GUEST_DEBUG */
+>>> +struct kvm_guest_debug_arch {
+>>> +};
+>>> +
+>>> +/* definition of registers in kvm_run */
+>>> +struct kvm_sync_regs {
+>>> +};
+>>> +
+>>> +/* for KVM_GET_SREGS and KVM_SET_SREGS */
+>>> +struct kvm_sregs {
+>>> +};
+>>> +
+>>> +/* CONFIG registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+>>> +struct kvm_riscv_config {
+>>> +     unsigned long isa;
+>>> +};
+>>> +
+>>> +/* CORE registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+>>> +struct kvm_riscv_core {
+>>> +     struct user_regs_struct regs;
+>>> +     unsigned long mode;
+>>> +};
+>>> +
+>>> +/* Possible privilege modes for kvm_riscv_core */
+>>> +#define KVM_RISCV_MODE_S     1
+>>> +#define KVM_RISCV_MODE_U     0
+>>> +
+>>> +/* CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+>>> +struct kvm_riscv_csr {
+>>> +     unsigned long sstatus;
+>>> +     unsigned long sie;
+>>> +     unsigned long stvec;
+>>> +     unsigned long sscratch;
+>>> +     unsigned long sepc;
+>>> +     unsigned long scause;
+>>> +     unsigned long stval;
+>>> +     unsigned long sip;
+>>> +     unsigned long satp;
+>>> +};
+>>> +
+>>> +/* TIMER registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+>>> +struct kvm_riscv_timer {
+>>> +     u64 frequency;
+>>> +     u64 time;
+>>> +     u64 compare;
+>>> +     u64 state;
+>>> +};
+>>> +
+>>> +/* Possible states for kvm_riscv_timer */
+>>> +#define KVM_RISCV_TIMER_STATE_OFF    0
+>>> +#define KVM_RISCV_TIMER_STATE_ON     1
+>>> +
+>>> +#define KVM_REG_SIZE(id)             \
+>>> +     (1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
+>>> +
+>>> +/* If you need to interpret the index values, here is the key: */
+>>> +#define KVM_REG_RISCV_TYPE_MASK              0x00000000FF000000
+>>> +#define KVM_REG_RISCV_TYPE_SHIFT     24
+>>> +
+>>> +/* Config registers are mapped as type 1 */
+>>> +#define KVM_REG_RISCV_CONFIG         (0x01 << KVM_REG_RISCV_TYPE_SHIFT)
+>>> +#define KVM_REG_RISCV_CONFIG_REG(name)       \
+>>> +     (offsetof(struct kvm_riscv_config, name) / sizeof(unsigned long))
+>>> +
+>>> +/* Core registers are mapped as type 2 */
+>>> +#define KVM_REG_RISCV_CORE           (0x02 << KVM_REG_RISCV_TYPE_SHIFT)
+>>> +#define KVM_REG_RISCV_CORE_REG(name) \
+>>> +             (offsetof(struct kvm_riscv_core, name) / sizeof(unsigned long))
+>>> +
+>>> +/* Control and status registers are mapped as type 3 */
+>>> +#define KVM_REG_RISCV_CSR            (0x03 << KVM_REG_RISCV_TYPE_SHIFT)
+>>> +#define KVM_REG_RISCV_CSR_REG(name)  \
+>>> +             (offsetof(struct kvm_riscv_csr, name) / sizeof(unsigned long))
+>>> +
+>>> +/* Timer registers are mapped as type 4 */
+>>> +#define KVM_REG_RISCV_TIMER          (0x04 << KVM_REG_RISCV_TYPE_SHIFT)
+>>> +#define KVM_REG_RISCV_TIMER_REG(name)        \
+>>> +             (offsetof(struct kvm_riscv_timer, name) / sizeof(u64))
+>>> +
+>>> +/* F extension registers are mapped as type 5 */
+>>> +#define KVM_REG_RISCV_FP_F           (0x05 << KVM_REG_RISCV_TYPE_SHIFT)
+>>> +#define KVM_REG_RISCV_FP_F_REG(name) \
+>>> +             (offsetof(struct __riscv_f_ext_state, name) / sizeof(u32))
+>>> +
+>>> +/* D extension registers are mapped as type 6 */
+>>> +#define KVM_REG_RISCV_FP_D           (0x06 << KVM_REG_RISCV_TYPE_SHIFT)
+>>> +#define KVM_REG_RISCV_FP_D_REG(name) \
+>>> +             (offsetof(struct __riscv_d_ext_state, name) / sizeof(u64))
+>>> +
+>>> +#endif
+>>> +
+>>> +#endif /* __LINUX_KVM_RISCV_H */
+>>> diff --git a/riscv/include/kvm/barrier.h b/riscv/include/kvm/barrier.h
+>>> new file mode 100644
+>>> index 0000000..235f610
+>>> --- /dev/null
+>>> +++ b/riscv/include/kvm/barrier.h
+>>> @@ -0,0 +1,14 @@
+>>> +#ifndef KVM__KVM_BARRIER_H
+>>> +#define KVM__KVM_BARRIER_H
+>>> +
+>>> +#define nop()                __asm__ __volatile__ ("nop")
+>>> +
+>>> +#define RISCV_FENCE(p, s) \
+>>> +     __asm__ __volatile__ ("fence " #p "," #s : : : "memory")
+>>> +
+>>> +/* These barriers need to enforce ordering on both devices or memory. */
+>>> +#define mb()         RISCV_FENCE(iorw,iorw)
+>>> +#define rmb()                RISCV_FENCE(ir,ir)
+>>> +#define wmb()                RISCV_FENCE(ow,ow)
+>>> +
+>>> +#endif /* KVM__KVM_BARRIER_H */
+>>> diff --git a/riscv/include/kvm/fdt-arch.h b/riscv/include/kvm/fdt-arch.h
+>>> new file mode 100644
+>>> index 0000000..9450fc5
+>>> --- /dev/null
+>>> +++ b/riscv/include/kvm/fdt-arch.h
+>>> @@ -0,0 +1,4 @@
+>>> +#ifndef KVM__KVM_FDT_H
+>>> +#define KVM__KVM_FDT_H
+>>> +
+>>> +#endif /* KVM__KVM_FDT_H */
+>>> diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+>>> new file mode 100644
+>>> index 0000000..7e9c578
+>>> --- /dev/null
+>>> +++ b/riscv/include/kvm/kvm-arch.h
+>>> @@ -0,0 +1,58 @@
+>>> +#ifndef KVM__KVM_ARCH_H
+>>> +#define KVM__KVM_ARCH_H
+>>> +
+>>> +#include <stdbool.h>
+>>> +#include <linux/const.h>
+>>> +#include <linux/types.h>
+>>> +
+>>> +#define RISCV_IOPORT         0x00000000ULL
+>>> +#define RISCV_IOPORT_SIZE    0x00010000ULL
+>>> +#define RISCV_PLIC           0x0c000000ULL
+>>> +#define RISCV_PLIC_SIZE              0x04000000ULL
+>>> +#define RISCV_MMIO           0x10000000ULL
+>>> +#define RISCV_MMIO_SIZE              0x20000000ULL
+>>> +#define RISCV_PCI            0x30000000ULL
+>>> +#define RISCV_PCI_CFG_SIZE   0x10000000ULL
+>> In the DTB you're advertising the PCI node as CAM compatible, which is the right
+>> thing to do. Legacy PCI configuration space is 16MB, not 256MB (PCI Express is 256MB).
+> I was confused here so I did what was done for ARM. I will check with other
+> architectures and update like you suggested.
 
-Userspace might already reset the registers via the vcpu run struct,
-but as we need the interface for the interrupt clearing part anyway,
-we implement the resets fully and don't rely on userspace to reset the
-rest.
+For ARM, it's 16 MB (taken from arm/include/arm-common/kvm-arch.h)
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- Documentation/virt/kvm/api.txt |  45 +++++++++++++
- arch/s390/kvm/kvm-s390.c       | 111 +++++++++++++++++++++++----------
- include/uapi/linux/kvm.h       |   5 ++
- 3 files changed, 127 insertions(+), 34 deletions(-)
+#define ARM_PCI_CFG_SIZE    (1ULL << 24)
 
-diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-index ebb37b34dcfc..5203d95b1a21 100644
---- a/Documentation/virt/kvm/api.txt
-+++ b/Documentation/virt/kvm/api.txt
-@@ -4168,6 +4168,44 @@ This ioctl issues an ultravisor call to terminate the secure guest,
- unpins the VPA pages and releases all the device pages that are used to
- track the secure pages by hypervisor.
- 
-+4.122 KVM_S390_NORMAL_RESET
-+
-+Capability: KVM_CAP_S390_VCPU_RESETS
-+Architectures: s390
-+Type: vcpu ioctl
-+Parameters: none
-+Returns: 0
-+
-+This ioctl resets VCPU registers and control structures according to
-+the cpu reset definition in the POP (Principles Of Operation).
-+
-+4.123 KVM_S390_INITIAL_RESET
-+
-+Capability: none
-+Architectures: s390
-+Type: vcpu ioctl
-+Parameters: none
-+Returns: 0
-+
-+This ioctl resets VCPU registers and control structures according to
-+the initial cpu reset definition in the POP (Principles Of
-+Operation). However, the cpu is not put into ESA mode. This reset is a
-+superset of the normal reset.
-+
-+4.124 KVM_S390_CLEAR_RESET
-+
-+Capability: KVM_CAP_S390_VCPU_RESETS
-+Architectures: s390
-+Type: vcpu ioctl
-+Parameters: none
-+Returns: 0
-+
-+This ioctl resets VCPU registers and control structures according to
-+the clear cpu reset definition in the POP (Principles Of Operation).
-+However, the cpu is not put into ESA mode. This reset is a superset
-+of the initial reset.
-+
-+
- 5. The kvm_run structure
- ------------------------
- 
-@@ -5396,3 +5434,10 @@ handling by KVM (as some KVM hypercall may be mistakenly treated as TLB
- flush hypercalls by Hyper-V) so userspace should disable KVM identification
- in CPUID and only exposes Hyper-V identification. In this case, guest
- thinks it's running on Hyper-V and only use Hyper-V hypercalls.
-+
-+8.22 KVM_CAP_S390_VCPU_RESETS
-+
-+Architectures: s390
-+
-+This capability indicates that the KVM_S390_NORMAL_RESET and
-+KVM_S390_CLEAR_RESET ioctls are available.
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index d9e6bf3d54f0..7ed6dc5bd481 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -529,6 +529,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_S390_CMMA_MIGRATION:
- 	case KVM_CAP_S390_AIS:
- 	case KVM_CAP_S390_AIS_MIGRATION:
-+	case KVM_CAP_S390_VCPU_RESETS:
- 		r = 1;
- 		break;
- 	case KVM_CAP_S390_HPAGE_1M:
-@@ -2844,35 +2845,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 
- }
- 
--static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
--{
--	/* this equals initial cpu reset in pop, but we don't switch to ESA */
--	vcpu->arch.sie_block->gpsw.mask = 0UL;
--	vcpu->arch.sie_block->gpsw.addr = 0UL;
--	kvm_s390_set_prefix(vcpu, 0);
--	kvm_s390_set_cpu_timer(vcpu, 0);
--	vcpu->arch.sie_block->ckc       = 0UL;
--	vcpu->arch.sie_block->todpr     = 0;
--	memset(vcpu->arch.sie_block->gcr, 0, 16 * sizeof(__u64));
--	vcpu->arch.sie_block->gcr[0]  = CR0_UNUSED_56 |
--					CR0_INTERRUPT_KEY_SUBMASK |
--					CR0_MEASUREMENT_ALERT_SUBMASK;
--	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
--					CR14_UNUSED_33 |
--					CR14_EXTERNAL_DAMAGE_SUBMASK;
--	/* make sure the new fpc will be lazily loaded */
--	save_fpu_regs();
--	current->thread.fpu.fpc = 0;
--	vcpu->arch.sie_block->gbea = 1;
--	vcpu->arch.sie_block->pp = 0;
--	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
--	vcpu->arch.pfault_token = KVM_S390_PFAULT_TOKEN_INVALID;
--	kvm_clear_async_pf_completion_queue(vcpu);
--	if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
--		kvm_s390_vcpu_stop(vcpu);
--	kvm_s390_clear_local_irqs(vcpu);
--}
--
- void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
- {
- 	mutex_lock(&vcpu->kvm->lock);
-@@ -3287,10 +3259,74 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(struct kvm_vcpu *vcpu,
- 	return r;
- }
- 
--static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
-+static void kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
- {
--	kvm_s390_vcpu_initial_reset(vcpu);
--	return 0;
-+	vcpu->arch.sie_block->gpsw.mask = ~PSW_MASK_RI;
-+	vcpu->arch.pfault_token = KVM_S390_PFAULT_TOKEN_INVALID;
-+	memset(vcpu->run->s.regs.riccb, 0, sizeof(vcpu->run->s.regs.riccb));
-+
-+	kvm_clear_async_pf_completion_queue(vcpu);
-+	if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
-+		kvm_s390_vcpu_stop(vcpu);
-+	kvm_s390_clear_local_irqs(vcpu);
-+}
-+
-+static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
-+{
-+	/* this equals initial cpu reset in pop, but we don't switch to ESA */
-+	vcpu->arch.sie_block->gpsw.mask = 0UL;
-+	vcpu->arch.sie_block->gpsw.addr = 0UL;
-+	kvm_s390_set_prefix(vcpu, 0);
-+	kvm_s390_set_cpu_timer(vcpu, 0);
-+	vcpu->arch.sie_block->ckc       = 0UL;
-+	vcpu->arch.sie_block->todpr     = 0;
-+	memset(vcpu->arch.sie_block->gcr, 0, 16 * sizeof(__u64));
-+	vcpu->arch.sie_block->gcr[0]  = CR0_UNUSED_56 |
-+					CR0_INTERRUPT_KEY_SUBMASK |
-+					CR0_MEASUREMENT_ALERT_SUBMASK;
-+	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
-+					CR14_UNUSED_33 |
-+					CR14_EXTERNAL_DAMAGE_SUBMASK;
-+	/* make sure the new fpc will be lazily loaded */
-+	save_fpu_regs();
-+	current->thread.fpu.fpc = 0;
-+	vcpu->arch.sie_block->gbea = 1;
-+	vcpu->arch.sie_block->pp = 0;
-+	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
-+	/* remaining work needs to be done in normal reset */
-+}
-+
-+static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_sync_regs *regs = &vcpu->run->s.regs;
-+
-+	memset(&regs->gprs, 0, sizeof(regs->gprs));
-+	/*
-+	 * Will be picked up via save_fpu_regs() in the initial reset
-+	 * fallthrough.
-+	 */
-+	memset(&regs->vrs, 0, sizeof(regs->vrs));
-+	memset(&regs->acrs, 0, sizeof(regs->acrs));
-+
-+	regs->etoken = 0;
-+	regs->etoken_extension = 0;
-+
-+	memset(&regs->gscb, 0, sizeof(regs->gscb));
-+	if (MACHINE_HAS_GS) {
-+		preempt_disable();
-+		__ctl_set_bit(2, 4);
-+		if (current->thread.gs_cb) {
-+			vcpu->arch.host_gscb = current->thread.gs_cb;
-+			save_gs_cb(vcpu->arch.host_gscb);
-+		}
-+		if (vcpu->arch.gs_enabled) {
-+			current->thread.gs_cb = (struct gs_cb *)
-+				&vcpu->run->s.regs.gscb;
-+			restore_gs_cb(current->thread.gs_cb);
-+		}
-+		preempt_enable();
-+	}
-+	/* remaining work needs to be done in initial and normal reset */
- }
- 
- int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
-@@ -4344,7 +4380,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 	struct kvm_vcpu *vcpu = filp->private_data;
- 	void __user *argp = (void __user *)arg;
- 	int idx;
--	long r;
-+	long r = 0;
- 
- 	vcpu_load(vcpu);
- 
-@@ -4363,8 +4399,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		r = kvm_arch_vcpu_ioctl_set_initial_psw(vcpu, psw);
- 		break;
- 	}
-+
-+	case KVM_S390_CLEAR_RESET:
-+		kvm_arch_vcpu_ioctl_clear_reset(vcpu);
-+		/* fallthrough */
- 	case KVM_S390_INITIAL_RESET:
--		r = kvm_arch_vcpu_ioctl_initial_reset(vcpu);
-+		kvm_arch_vcpu_ioctl_initial_reset(vcpu);
-+		/* fallthrough */
-+	case KVM_S390_NORMAL_RESET:
-+		kvm_arch_vcpu_ioctl_normal_reset(vcpu);
- 		break;
- 	case KVM_SET_ONE_REG:
- 	case KVM_GET_ONE_REG: {
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f0a16b4adbbd..4b95f9a31a2f 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1009,6 +1009,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 176
- #define KVM_CAP_ARM_NISV_TO_USER 177
- #define KVM_CAP_ARM_INJECT_EXT_DABT 178
-+#define KVM_CAP_S390_VCPU_RESETS 179
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1473,6 +1474,10 @@ struct kvm_enc_region {
- /* Available with KVM_CAP_ARM_SVE */
- #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
- 
-+/* Available with  KVM_CAP_S390_VCPU_RESETS */
-+#define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
-+#define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
-+
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
- 	/* Guest initialization commands */
--- 
-2.20.1
+which was duplicated from include/kvm/pci.h:
 
+#define PCI_CFG_SIZE        (1ULL << 24)**
+
+It's not a question of what other architectures do, it's about kvmtool emulating
+the legacy PCI 3.0 protocol which uses 24 bits for device addressing. You can
+declare the PCI configuration space to be 256 MB (i.e 28 bit addresses), but
+kvmtool will only use the bottom 16MB.
+
+Thanks,
+Alex
+>
+>>> +#define RISCV_PCI_SIZE               0x50000000ULL
+>>> +#define RISCV_PCI_MMIO_SIZE  (RISCV_PCI_SIZE - RISCV_PCI_CFG_SIZE)
+>>> +
+>>> +#define RISCV_RAM            0x80000000ULL
+>> I'm not sure about the reasons for choosing RAM to start at 2GB. For arm we do the
+>> same, but qemu starts memory at 1GB and this mismatch has caused some issues in
+>> the past. For example, 32 bit kvm-unit-tests currently do not run under kvmtool
+>> because the text address is hardcoded to the qemu default value.
+> Actually in RISC-V world, it is kind of a un-documented standard that
+> RAM starts at
+> 2GB (0x80000000) for both RV32 and RV64. This is true for all existing HW,
+> QEMU RISC-V virt machine and here. This will be soon explicitly documented in
+> RISC-V Unix platform spec.
+>
+>> As a more general observation, I know that other architectures (like arm) declare
+>> the memory layout in hexadecimal numbers, but it might be a better idea to use the
+>> sizes from include/linux/sizes.h, since it makes the memory layout a lot more
+>> readable and mistakes are easier to spot.
+> Sure, I will try to use linux/sizes.h in next patch version.
+>
+>>> +
+>>> +#define RISCV_LOMAP_MAX_MEMORY       ((1ULL << 32) - RISCV_RAM)
+>>> +#define RISCV_HIMAP_MAX_MEMORY       ((1ULL << 40) - RISCV_RAM)
+>>> +
+>>> +#if __riscv_xlen == 64
+>>> +#define RISCV_MAX_MEMORY(kvm)        RISCV_HIMAP_MAX_MEMORY
+>>> +#elif __riscv_xlen == 32
+>>> +#define RISCV_MAX_MEMORY(kvm)        RISCV_LOMAP_MAX_MEMORY
+>>> +#endif
+>>> +
+>>> +#define KVM_IOPORT_AREA              RISCV_IOPORT
+>>> +#define KVM_PCI_CFG_AREA     RISCV_PCI
+>>> +#define KVM_PCI_MMIO_AREA    (KVM_PCI_CFG_AREA + RISCV_PCI_CFG_SIZE)
+>>> +#define KVM_VIRTIO_MMIO_AREA RISCV_MMIO
+>>> +
+>>> +#define KVM_IOEVENTFD_HAS_PIO        0
+>>> +
+>>> +#define KVM_IRQ_OFFSET               0
+>>> +
+>>> +#define KVM_VM_TYPE          0
+>>> +
+>>> +#define VIRTIO_DEFAULT_TRANS(kvm)    VIRTIO_MMIO
+>>> +
+>>> +#define VIRTIO_RING_ENDIAN   VIRTIO_ENDIAN_LE
+>>> +
+>>> +struct kvm;
+>>> +
+>>> +struct kvm_arch {
+>>> +};
+>>> +
+>>> +static inline bool riscv_addr_in_ioport_region(u64 phys_addr)
+>>> +{
+>>> +     u64 limit = KVM_IOPORT_AREA + RISCV_IOPORT_SIZE;
+>>> +     return phys_addr >= KVM_IOPORT_AREA && phys_addr < limit;
+>>> +}
+>>> +
+>>> +enum irq_type;
+>>> +
+>>> +#endif /* KVM__KVM_ARCH_H */
+>>> diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
+>>> new file mode 100644
+>>> index 0000000..60c7333
+>>> --- /dev/null
+>>> +++ b/riscv/include/kvm/kvm-config-arch.h
+>>> @@ -0,0 +1,9 @@
+>>> +#ifndef KVM__KVM_CONFIG_ARCH_H
+>>> +#define KVM__KVM_CONFIG_ARCH_H
+>>> +
+>>> +#include "kvm/parse-options.h"
+>>> +
+>>> +struct kvm_config_arch {
+>>> +};
+>>> +
+>>> +#endif /* KVM__KVM_CONFIG_ARCH_H */
+>>> diff --git a/riscv/include/kvm/kvm-cpu-arch.h b/riscv/include/kvm/kvm-cpu-arch.h
+>>> new file mode 100644
+>>> index 0000000..09a50e8
+>>> --- /dev/null
+>>> +++ b/riscv/include/kvm/kvm-cpu-arch.h
+>>> @@ -0,0 +1,49 @@
+>>> +#ifndef KVM__KVM_CPU_ARCH_H
+>>> +#define KVM__KVM_CPU_ARCH_H
+>>> +
+>>> +#include <linux/kvm.h>
+>>> +#include <pthread.h>
+>>> +#include <stdbool.h>
+>>> +
+>>> +#include "kvm/kvm.h"
+>>> +
+>>> +struct kvm;
+>> Shouldn't kvm.h already have a definition for struct kvm? Also, the arm
+>> corresponding header doesn't have the include here, I don't think it's needed
+>> (unless I'm missing something).
+> Sure, I will drop this forward declaration here.
+>
+> Regards,
+> Anup
+>
+>> Thanks,
+>> Alex
+>>> +
+>>> +struct kvm_cpu {
+>>> +     pthread_t       thread;
+>>> +
+>>> +     unsigned long   cpu_id;
+>>> +
+>>> +     struct kvm      *kvm;
+>>> +     int             vcpu_fd;
+>>> +     struct kvm_run  *kvm_run;
+>>> +     struct kvm_cpu_task     *task;
+>>> +
+>>> +     u8              is_running;
+>>> +     u8              paused;
+>>> +     u8              needs_nmi;
+>>> +
+>>> +     struct kvm_coalesced_mmio_ring  *ring;
+>>> +};
+>>> +
+>>> +static inline bool kvm_cpu__emulate_io(struct kvm_cpu *vcpu, u16 port,
+>>> +                                    void *data, int direction,
+>>> +                                    int size, u32 count)
+>>> +{
+>>> +     return false;
+>>> +}
+>>> +
+>>> +static inline bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr,
+>>> +                                      u8 *data, u32 len, u8 is_write)
+>>> +{
+>>> +     if (riscv_addr_in_ioport_region(phys_addr)) {
+>>> +             int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
+>>> +             u16 port = (phys_addr - KVM_IOPORT_AREA) & USHRT_MAX;
+>>> +
+>>> +             return kvm__emulate_io(vcpu, port, data, direction, len, 1);
+>>> +     }
+>>> +
+>>> +     return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
+>>> +}
+>>> +
+>>> +#endif /* KVM__KVM_CPU_ARCH_H */
+>>> diff --git a/riscv/ioport.c b/riscv/ioport.c
+>>> new file mode 100644
+>>> index 0000000..bdd30b6
+>>> --- /dev/null
+>>> +++ b/riscv/ioport.c
+>>> @@ -0,0 +1,11 @@
+>>> +#include "kvm/ioport.h"
+>>> +#include "kvm/irq.h"
+>>> +
+>>> +void ioport__setup_arch(struct kvm *kvm)
+>>> +{
+>>> +}
+>>> +
+>>> +void ioport__map_irq(u8 *irq)
+>>> +{
+>>> +     *irq = irq__alloc_line();
+>>> +}
+>>> diff --git a/riscv/irq.c b/riscv/irq.c
+>>> new file mode 100644
+>>> index 0000000..8e605ef
+>>> --- /dev/null
+>>> +++ b/riscv/irq.c
+>>> @@ -0,0 +1,13 @@
+>>> +#include "kvm/kvm.h"
+>>> +#include "kvm/kvm-cpu.h"
+>>> +#include "kvm/irq.h"
+>>> +
+>>> +void kvm__irq_line(struct kvm *kvm, int irq, int level)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +void kvm__irq_trigger(struct kvm *kvm, int irq)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
+>>> new file mode 100644
+>>> index 0000000..e4b8fa5
+>>> --- /dev/null
+>>> +++ b/riscv/kvm-cpu.c
+>>> @@ -0,0 +1,64 @@
+>>> +#include "kvm/kvm-cpu.h"
+>>> +#include "kvm/kvm.h"
+>>> +#include "kvm/virtio.h"
+>>> +#include "kvm/term.h"
+>>> +
+>>> +#include <asm/ptrace.h>
+>>> +
+>>> +static int debug_fd;
+>>> +
+>>> +void kvm_cpu__set_debug_fd(int fd)
+>>> +{
+>>> +     debug_fd = fd;
+>>> +}
+>>> +
+>>> +int kvm_cpu__get_debug_fd(void)
+>>> +{
+>>> +     return debug_fd;
+>>> +}
+>>> +
+>>> +struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+>>> +{
+>>> +     /* TODO: */
+>>> +     return NULL;
+>>> +}
+>>> +
+>>> +void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
+>>> +{
+>>> +}
+>>> +
+>>> +void kvm_cpu__delete(struct kvm_cpu *vcpu)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+>>> +{
+>>> +     /* TODO: */
+>>> +     return false;
+>>> +}
+>>> +
+>>> +void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>>> +{
+>>> +     return VIRTIO_ENDIAN_LE;
+>>> +}
+>>> +
+>>> +void kvm_cpu__show_code(struct kvm_cpu *vcpu)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> diff --git a/riscv/kvm.c b/riscv/kvm.c
+>>> new file mode 100644
+>>> index 0000000..e816ef5
+>>> --- /dev/null
+>>> +++ b/riscv/kvm.c
+>>> @@ -0,0 +1,61 @@
+>>> +#include "kvm/kvm.h"
+>>> +#include "kvm/util.h"
+>>> +#include "kvm/fdt.h"
+>>> +
+>>> +#include <linux/kernel.h>
+>>> +#include <linux/kvm.h>
+>>> +#include <linux/sizes.h>
+>>> +
+>>> +struct kvm_ext kvm_req_ext[] = {
+>>> +     { DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
+>>> +     { 0, 0 },
+>>> +};
+>>> +
+>>> +bool kvm__arch_cpu_supports_vm(void)
+>>> +{
+>>> +     /* The KVM capability check is enough. */
+>>> +     return true;
+>>> +}
+>>> +
+>>> +void kvm__init_ram(struct kvm *kvm)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +void kvm__arch_delete_ram(struct kvm *kvm)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +void kvm__arch_read_term(struct kvm *kvm)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +void kvm__arch_set_cmdline(char *cmdline, bool video)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+>>> +{
+>>> +     /* TODO: */
+>>> +}
+>>> +
+>>> +bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+>>> +                              const char *kernel_cmdline)
+>>> +{
+>>> +     /* TODO: */
+>>> +     return true;
+>>> +}
+>>> +
+>>> +bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
+>>> +{
+>>> +     /* TODO: Firmware loading to be supported later. */
+>>> +     return false;
+>>> +}
+>>> +
+>>> +int kvm__arch_setup_firmware(struct kvm *kvm)
+>>> +{
+>>> +     return 0;
+>>> +}
+>>> diff --git a/util/update_headers.sh b/util/update_headers.sh
+>>> index bf87ef6..78eba1f 100755
+>>> --- a/util/update_headers.sh
+>>> +++ b/util/update_headers.sh
+>>> @@ -36,7 +36,7 @@ copy_optional_arch () {
+>>>       fi
+>>>  }
+>>>
+>>> -for arch in arm arm64 mips powerpc x86
+>>> +for arch in arm arm64 mips powerpc riscv x86
+>>>  do
+>>>       case "$arch" in
+>>>               arm) KVMTOOL_PATH=arm/aarch32 ;;
