@@ -2,221 +2,352 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DBC0136855
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 08:35:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0850136917
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 09:43:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbgAJHfE convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 10 Jan 2020 02:35:04 -0500
-Received: from mga01.intel.com ([192.55.52.88]:29651 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726186AbgAJHfD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jan 2020 02:35:03 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jan 2020 23:35:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,415,1571727600"; 
-   d="scan'208";a="212165388"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by orsmga007.jf.intel.com with ESMTP; 09 Jan 2020 23:35:02 -0800
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 9 Jan 2020 23:35:02 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.197]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.30]) with mapi id 14.03.0439.000;
- Fri, 10 Jan 2020 15:35:00 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-Subject: RE: [PATCH v4 03/12] vfio_pci: refine vfio_pci_driver reference in
- vfio_pci.c
-Thread-Topic: [PATCH v4 03/12] vfio_pci: refine vfio_pci_driver reference in
- vfio_pci.c
-Thread-Index: AQHVxVT0YU6i0iA5BEKaqiieIB/qd6fibQCAgAEY9HA=
-Date:   Fri, 10 Jan 2020 07:35:00 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A179AB4@SHSMSX104.ccr.corp.intel.com>
-References: <1578398509-26453-1-git-send-email-yi.l.liu@intel.com>
-        <1578398509-26453-4-git-send-email-yi.l.liu@intel.com>
- <20200109154819.455f11d3@w520.home>
-In-Reply-To: <20200109154819.455f11d3@w520.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNGQyMWRlYzEtYjE2Yi00YzkwLWI4ZjctOTc2ZjU0MDJjNDVkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiMDRnVndcL0E3dHA1SytTYzRSajYxYlByN1pzQ1IxQ2pDTTJVWWNDNTFTUDFZY29KTEU5ZExlWm9SZ1l0RGFTbVQifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727145AbgAJInm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jan 2020 03:43:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4308 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727091AbgAJInm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jan 2020 03:43:42 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00A8gFdG074854
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2020 03:43:40 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2xee13cama-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2020 03:43:40 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Fri, 10 Jan 2020 08:43:38 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 10 Jan 2020 08:43:35 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00A8hYVc22216876
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Jan 2020 08:43:34 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5CE1B52051;
+        Fri, 10 Jan 2020 08:43:34 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.153.163])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 00E865204F;
+        Fri, 10 Jan 2020 08:43:33 +0000 (GMT)
+Subject: Re: [PATCH v4] KVM: s390: Add new reset vcpu API
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, david@redhat.com
+References: <20200109155602.18985-1-frankja@linux.ibm.com>
+ <20200109180841.6843cb92.cohuck@redhat.com>
+ <f79b523e-f3e8-95b8-c242-1e7ca0083012@linux.ibm.com>
+ <f18955c0-4002-c494-b14e-1b9733aad20e@redhat.com>
+ <c0049bfb-9516-a382-c69c-0693cb0fbfda@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Fri, 10 Jan 2020 09:43:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <c0049bfb-9516-a382-c69c-0693cb0fbfda@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="D97QCypl9jX0GQ2sIsVURVgaFC620wFjf"
+X-TM-AS-GCONF: 00
+x-cbid: 20011008-0020-0000-0000-0000039F7F6B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20011008-0021-0000-0000-000021F6E6A0
+Message-Id: <90f65536-c2bb-9234-aef4-7941d477369e@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-10_01:2020-01-10,2020-01-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ malwarescore=0 mlxlogscore=999 impostorscore=0 adultscore=0 phishscore=0
+ lowpriorityscore=0 mlxscore=0 spamscore=0 bulkscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-2001100073
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Friday, January 10, 2020 6:48 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [PATCH v4 03/12] vfio_pci: refine vfio_pci_driver reference in vfio_pci.c
-> 
-> On Tue,  7 Jan 2020 20:01:40 +0800
-> Liu Yi L <yi.l.liu@intel.com> wrote:
-> 
-> > This patch replaces the vfio_pci_driver reference in vfio_pci.c with
-> > pci_dev_driver(vdev->pdev) which is more helpful to make the functions
-> > be generic to module types.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci.c | 34 ++++++++++++++++++----------------
-> >  1 file changed, 18 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> > index 009d2df..9140f5e5 100644
-> > --- a/drivers/vfio/pci/vfio_pci.c
-> > +++ b/drivers/vfio/pci/vfio_pci.c
-> > @@ -1463,24 +1463,25 @@ static void vfio_pci_reflck_get(struct vfio_pci_reflck
-> *reflck)
-> >
-> >  static int vfio_pci_reflck_find(struct pci_dev *pdev, void *data)
-> >  {
-> > -	struct vfio_pci_reflck **preflck = data;
-> > +	struct vfio_pci_device *vdev = data;
-> > +	struct vfio_pci_reflck **preflck = &vdev->reflck;
-> >  	struct vfio_device *device;
-> > -	struct vfio_pci_device *vdev;
-> > +	struct vfio_pci_device *tmp;
-> >
-> >  	device = vfio_device_get_from_dev(&pdev->dev);
-> >  	if (!device)
-> >  		return 0;
-> >
-> > -	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
-> > +	if (pci_dev_driver(pdev) != pci_dev_driver(vdev->pdev)) {
-> >  		vfio_device_put(device);
-> >  		return 0;
-> >  	}
-> >
-> > -	vdev = vfio_device_data(device);
-> > +	tmp = vfio_device_data(device);
-> >
-> > -	if (vdev->reflck) {
-> > -		vfio_pci_reflck_get(vdev->reflck);
-> > -		*preflck = vdev->reflck;
-> > +	if (tmp->reflck) {
-> > +		vfio_pci_reflck_get(tmp->reflck);
-> > +		*preflck = tmp->reflck;
-> 
-> Seems we can do away with preflck entirely with this refactor, this
-> simply becomes vdev->reflck = tmp->reflck.  Thanks,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--D97QCypl9jX0GQ2sIsVURVgaFC620wFjf
+Content-Type: multipart/mixed; boundary="EHOb0zA2ovju0swjOBPjhydfEIu9lPBJ5"
 
-yes, it is. Will modify it.
+--EHOb0zA2ovju0swjOBPjhydfEIu9lPBJ5
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> Alex
+On 1/10/20 8:14 AM, Janosch Frank wrote:
+> On 1/10/20 8:03 AM, Thomas Huth wrote:
+>> On 09/01/2020 18.51, Janosch Frank wrote:
+>>> On 1/9/20 6:08 PM, Cornelia Huck wrote:
+>>>> On Thu,  9 Jan 2020 10:56:01 -0500
+>>>> Janosch Frank <frankja@linux.ibm.com> wrote:
+>>>>
+>>>>> The architecture states that we need to reset local IRQs for all CP=
+U
+>>>>> resets. Because the old reset interface did not support the normal =
+CPU
+>>>>> reset we never did that on a normal reset.
+>>>>>
+>>>>> Let's implement an interface for the missing normal and clear reset=
+s
+>>>>> and reset all local IRQs, registers and control structures as state=
+d
+>>>>> in the architecture.
+>>>>>
+>>>>> Userspace might already reset the registers via the vcpu run struct=
+,
+>>>>> but as we need the interface for the interrupt clearing part anyway=
+,
+>>>>> we implement the resets fully and don't rely on userspace to reset =
+the
+>>>>> rest.
+>>>>>
+>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>>> ---
+>>>>>
+>>>>> I dropped the reviews, as I changed quite a lot. =20
+>>>>>
+>>>>> Keep in mind, that now we'll need a new parameter in normal and
+>>>>> initial reset for protected virtualization to indicate that we need=
+ to
+>>>>> do the reset via the UV call. The Ultravisor does only accept the
+>>>>> needed reset, not any subset resets.
+>>>>
+>>>> In the interface, or externally?
+>>>
+>>> ?
+>>>
+>>>>
+>>>> [Apologies, but the details of the protected virt stuff are no longe=
+r
+>>>> in my cache.
+>>> Reworded explanation:
+>>> I can't use a fallthrough, because the UV will reject the normal rese=
+t
+>>> if we do an initial reset (same goes for the clear reset). To address=
 
-Thanks,
-Yi Liu
+>>> this issue, I added a boolean to the normal and initial reset functio=
+ns
+>>> which tells the function if it was called directly or was called beca=
+use
+>>> of the fallthrough.
+>>>
+>>> Only if called directly a UV call for the reset is done, that way we =
+can
+>>> keep the fallthrough.
+>>
+>> Sounds complicated. And do we need the fallthrough stuff here at all?
+>> What about doing something like:
+>=20
+> That would work and I thought about it, it just comes down to taste :-)=
 
-> >  		vfio_device_put(device);
-> >  		return 1;
-> >  	}
-> > @@ -1497,7 +1498,7 @@ static int vfio_pci_reflck_attach(struct vfio_pci_device
-> *vdev)
-> >
-> >  	if (pci_is_root_bus(vdev->pdev->bus) ||
-> >  	    vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_reflck_find,
-> > -					  &vdev->reflck, slot) <= 0)
-> > +					  vdev, slot) <= 0)
-> >  		vdev->reflck = vfio_pci_reflck_alloc();
-> >
-> >  	mutex_unlock(&reflck_lock);
-> > @@ -1522,6 +1523,7 @@ static void vfio_pci_reflck_put(struct vfio_pci_reflck
-> *reflck)
-> >
-> >  struct vfio_devices {
-> >  	struct vfio_device **devices;
-> > +	struct vfio_pci_device *vdev;
-> >  	int cur_index;
-> >  	int max_index;
-> >  };
-> > @@ -1530,7 +1532,7 @@ static int vfio_pci_get_unused_devs(struct pci_dev
-> *pdev, void *data)
-> >  {
-> >  	struct vfio_devices *devs = data;
-> >  	struct vfio_device *device;
-> > -	struct vfio_pci_device *vdev;
-> > +	struct vfio_pci_device *tmp;
-> >
-> >  	if (devs->cur_index == devs->max_index)
-> >  		return -ENOSPC;
-> > @@ -1539,15 +1541,15 @@ static int vfio_pci_get_unused_devs(struct pci_dev
-> *pdev, void *data)
-> >  	if (!device)
-> >  		return -EINVAL;
-> >
-> > -	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
-> > +	if (pci_dev_driver(pdev) != pci_dev_driver(devs->vdev->pdev)) {
-> >  		vfio_device_put(device);
-> >  		return -EBUSY;
-> >  	}
-> >
-> > -	vdev = vfio_device_data(device);
-> > +	tmp = vfio_device_data(device);
-> >
-> >  	/* Fault if the device is not unused */
-> > -	if (vdev->refcnt) {
-> > +	if (tmp->refcnt) {
-> >  		vfio_device_put(device);
-> >  		return -EBUSY;
-> >  	}
-> > @@ -1574,7 +1576,7 @@ static int vfio_pci_get_unused_devs(struct pci_dev
-> *pdev, void *data)
-> >   */
-> >  static void vfio_pci_try_bus_reset(struct vfio_pci_device *vdev)
-> >  {
-> > -	struct vfio_devices devs = { .cur_index = 0 };
-> > +	struct vfio_devices devs = { .vdev = vdev, .cur_index = 0 };
-> >  	int i = 0, ret = -EINVAL;
-> >  	bool slot = false;
-> >  	struct vfio_pci_device *tmp;
-> > @@ -1637,7 +1639,7 @@ static void __exit vfio_pci_cleanup(void)
-> >  	vfio_pci_uninit_perm_bits();
-> >  }
-> >
-> > -static void __init vfio_pci_fill_ids(char *ids)
-> > +static void __init vfio_pci_fill_ids(char *ids, struct pci_driver *driver)
-> >  {
-> >  	char *p, *id;
-> >  	int rc;
-> > @@ -1665,7 +1667,7 @@ static void __init vfio_pci_fill_ids(char *ids)
-> >  			continue;
-> >  		}
-> >
-> > -		rc = pci_add_dynid(&vfio_pci_driver, vendor, device,
-> > +		rc = pci_add_dynid(driver, vendor, device,
-> >  				   subvendor, subdevice, class, class_mask, 0);
-> >  		if (rc)
-> >  			pr_warn("failed to add dynamic id [%04x:%04x[%04x:%04x]]
-> class %#08x/%08x (%d)\n",
-> > @@ -1692,7 +1694,7 @@ static int __init vfio_pci_init(void)
-> >  	if (ret)
-> >  		goto out_driver;
-> >
-> > -	vfio_pci_fill_ids(ids);
-> > +	vfio_pci_fill_ids(ids, &vfio_pci_driver);
-> >
-> >  	return 0;
-> >
+> I don't have any strong feelings for a specific implementation.
+
+To be more specific:
+
+
+Commit c72db49c098bceb8b73c2e9d305caf37a41fb3bf
+Author: Janosch Frank <frankja@linux.ibm.com>
+Date:   Thu Jan 9 04:37:50 2020 -0500
+
+    KVM: s390: protvirt: Add UV cpu reset calls
+
+    For protected VMs, the VCPU resets are done by the Ultravisor, as KVM=
+
+    has no access to the VCPU registers.
+
+    As the Ultravisor will only accept a call for the reset that is
+    needed, we need to fence the UV calls when chaining resets.
+
+    Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 63dc2bd97582..d5876527e464 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -3476,8 +3476,11 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(struct
+kvm_vcpu *vcpu,
+ 	return r;
+ }
+
+-static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
++static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu, bool
+chain)
+ {
++	int rc =3D 0;
++	u32 ret;
++
+ 	vcpu->arch.sie_block->gpsw.mask =3D ~PSW_MASK_RI;
+ 	vcpu->arch.pfault_token =3D KVM_S390_PFAULT_TOKEN_INVALID;
+ 	memset(vcpu->run->s.regs.riccb, 0, sizeof(vcpu->run->s.regs.riccb));
+@@ -3487,11 +3490,21 @@ static int
+kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
+ 		kvm_s390_vcpu_stop(vcpu);
+ 	kvm_s390_clear_local_irqs(vcpu);
+
+-	return 0;
++	if (kvm_s390_pv_handle_cpu(vcpu) && !chain) {
++		rc =3D uv_cmd_nodata(kvm_s390_pv_handle_cpu(vcpu),
++				   UVC_CMD_CPU_RESET, &ret);
++		VCPU_EVENT(vcpu, 3, "PROTVIRT RESET NORMAL VCPU: cpu %d rc %x rrc %x",=
+
++			   vcpu->vcpu_id, ret >> 16, ret & 0x0000ffff);
++	}
++
++	return rc;
+ }
+
+-static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
++static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu,
+bool chain)
+ {
++	int rc =3D 0;
++	u32 ret;
++
+ 	/* this equals initial cpu reset in pop, but we don't switch to ESA */
+ 	vcpu->arch.sie_block->gpsw.mask =3D 0UL;
+ 	vcpu->arch.sie_block->gpsw.addr =3D 0UL;
+@@ -3509,16 +3522,26 @@ static int
+kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+ 	/* make sure the new fpc will be lazily loaded */
+ 	save_fpu_regs();
+ 	current->thread.fpu.fpc =3D 0;
+-	if (!kvm_s390_pv_is_protected(vcpu->kvm))
++	if (!kvm_s390_pv_handle_cpu(vcpu))
+ 		vcpu->arch.sie_block->gbea =3D 1;
+ 	vcpu->arch.sie_block->pp =3D 0;
+ 	vcpu->arch.sie_block->fpf &=3D ~FPF_BPBC;
+
+-	return 0;
++	if (kvm_s390_pv_handle_cpu(vcpu) && !chain) {
++		rc =3D uv_cmd_nodata(kvm_s390_pv_handle_cpu(vcpu),
++				   UVC_CMD_CPU_RESET_INITIAL,
++				   &ret);
++		VCPU_EVENT(vcpu, 3, "PROTVIRT RESET INITIAL VCPU: cpu %d rc %x rrc %x"=
+,
++			   vcpu->vcpu_id, ret >> 16, ret & 0x0000ffff);
++	}
++
++	return rc;
+ }
+
+ static int kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
+ {
++	int rc =3D 0;
++	u32 ret;
+ 	struct kvm_sync_regs *regs =3D &vcpu->run->s.regs;
+
+ 	memset(&regs->gprs, 0, sizeof(regs->gprs));
+@@ -3547,7 +3570,13 @@ static int kvm_arch_vcpu_ioctl_clear_reset(struct
+kvm_vcpu *vcpu)
+ 		}
+ 		preempt_enable();
+ 	}
+-	return 0;
++	if (kvm_s390_pv_handle_cpu(vcpu)) {
++		rc =3D uv_cmd_nodata(kvm_s390_pv_handle_cpu(vcpu),
++				   UVC_CMD_CPU_RESET_CLEAR, &ret);
++		VCPU_EVENT(vcpu, 3, "PROTVIRT RESET CLEAR VCPU: cpu %d rc %x rrc %x",
++			   vcpu->vcpu_id, ret >> 16, ret & 0x0000ffff);
++	}
++	return rc;
+ }
+
+ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs
+*regs)
+@@ -4738,12 +4767,16 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+
+ 	case KVM_S390_CLEAR_RESET:
+ 		r =3D kvm_arch_vcpu_ioctl_clear_reset(vcpu);
++		if (r)
++			break;
+ 		/* fallthrough */
+ 	case KVM_S390_INITIAL_RESET:
+-		r =3D kvm_arch_vcpu_ioctl_initial_reset(vcpu);
++		r =3D kvm_arch_vcpu_ioctl_initial_reset(vcpu, ioctl !=3D
+KVM_S390_INITIAL_RESET);
++		if (r)
++			break;
+ 		/* fallthrough */
+ 	case KVM_S390_NORMAL_RESET:
+-		r =3D kvm_arch_vcpu_ioctl_normal_reset(vcpu);
++		r =3D kvm_arch_vcpu_ioctl_normal_reset(vcpu, ioctl !=3D
+KVM_S390_NORMAL_RESET);
+ 		break;
+ 	case KVM_SET_ONE_REG:
+ 	case KVM_GET_ONE_REG: {
+
+
+--EHOb0zA2ovju0swjOBPjhydfEIu9lPBJ5--
+
+--D97QCypl9jX0GQ2sIsVURVgaFC620wFjf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4YOTUACgkQ41TmuOI4
+ufheQw/9FCAVgY0bCvJDnCl8gAYxC57+x2KPylEv9ad9yQMosSD+Lcg462rifabO
+5MrJQmIHJG5/tq/OksI8RC7LKiMI61FljzPNJ04nQ/H2EMUnsPnnKhmg4bS7Rhn9
+xOeXsvR6TDa7LFCWRa9BgFJWPPbNLadhgrssRTUSEIG/ld1030dAcRSWpx5hq1to
+gpb0FfJDVKcaebT6ODDGbmF9QeN5T8yrT7viheMq3GmKtg17SLH8erZM2Se5bh/R
+BQuuVFwyDXhIsNiXGxhbWJYIcvTpQkjM/WxW+0Xaz5yq0dGp7RuSUAZ8kzyfaYZQ
+ix6fEgXcRkIWSjFvwLHY9bZVv/QBXLGc1W8i8rqukMhS4KqvuO4EljIMYA7M+UFd
+ZGVQTscDySBBpBc2UBSKOO8sgdp20jYR1Uw24ZRprOFecsJV29E0Hc+LdTbDzaZg
+7sPF9WwvnyNdDOMCSjx2BOsSgNPbOvTA6N9ZFELL8CRHNBldcCTq9EQGXDmmRr8G
+fLEDWiAWMJBBXAESnSZxkdfuKaOdUY0tBvqhOtiHr7qJ5cIaimpq7NQtUIp4fDAE
+/QZgfFVzHMhO8KQ55dSepFZ78dzc4XuCo03lZ7mpsDhoGzAPa0fsnopXZrtO12Sk
+rAwf8NCZIpQLPbetp6v3yhQSVTh5O5Z8T8nPK2y6QxKIwx0n8NM=
+=4tjx
+-----END PGP SIGNATURE-----
+
+--D97QCypl9jX0GQ2sIsVURVgaFC620wFjf--
 
