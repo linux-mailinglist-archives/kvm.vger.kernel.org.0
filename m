@@ -2,214 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 09513136B2B
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 11:36:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA531136B74
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 11:54:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726697AbgAJKg4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jan 2020 05:36:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60278 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727352AbgAJKgz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jan 2020 05:36:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578652614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=wTsn85XMuUpJ5S4/MLL/kbkajYi8zCp0ZxBQzSb2F1g=;
-        b=gzVSaFRf7ZOFfAuRT5l3uqJ+ewfYakU3C/whkcYEJkfN95Yxj8a4b/uxHFklER2UP6VRHU
-        KJ6gakitZO4RTi1Vz7QSZIUqK0ftK/fVebnQ+cg2sx0WzXkn7ARtEYU5YxpocyYSCIJY0D
-        3jHET/X8Tm6WVjFijquDzp+F7oJbNME=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-54qkeP8DNMCrAC0Csd9XvQ-1; Fri, 10 Jan 2020 05:36:51 -0500
-X-MC-Unique: 54qkeP8DNMCrAC0Csd9XvQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70DEE107ACC5;
-        Fri, 10 Jan 2020 10:36:50 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-154.ams2.redhat.com [10.36.116.154])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3685687EC0;
-        Fri, 10 Jan 2020 10:36:46 +0000 (UTC)
-Subject: Re: [PATCH v6] KVM: s390: Add new reset vcpu API
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, linux-s390@vger.kernel.org,
-        david@redhat.com, cohuck@redhat.com
-References: <20200110101906.54291-1-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9b9c3e09-e3ec-0ef2-0aef-a31ff34df33b@redhat.com>
-Date:   Fri, 10 Jan 2020 11:36:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727695AbgAJKyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jan 2020 05:54:39 -0500
+Received: from foss.arm.com ([217.140.110.172]:42300 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727365AbgAJKyj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jan 2020 05:54:39 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A0C2328;
+        Fri, 10 Jan 2020 02:54:38 -0800 (PST)
+Received: from localhost (unknown [10.37.6.20])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9E5433F703;
+        Fri, 10 Jan 2020 02:54:37 -0800 (PST)
+Date:   Fri, 10 Jan 2020 10:54:36 +0000
+From:   Andrew Murray <andrew.murray@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Catalin Marinas <Catalin.Marinas@arm.com>,
+        Mark Rutland <Mark.Rutland@arm.com>, will@kernel.org,
+        Sudeep Holla <Sudeep.Holla@arm.com>, kvm@vger.kernel.org,
+        kvmarm <kvmarm@lists.cs.columbia.edu>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
+ full SPE profiling buffer controls
+Message-ID: <20200110105435.GC42593@e119886-lin.cambridge.arm.com>
+References: <20191220143025.33853-1-andrew.murray@arm.com>
+ <20191220143025.33853-10-andrew.murray@arm.com>
+ <20191221141325.5a177343@why>
 MIME-Version: 1.0
-In-Reply-To: <20200110101906.54291-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191221141325.5a177343@why>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/01/2020 11.19, Janosch Frank wrote:
-> The architecture states that we need to reset local IRQs for all CPU
-> resets. Because the old reset interface did not support the normal CPU
-> reset we never did that on a normal reset.
->=20
-> Let's implement an interface for the missing normal and clear resets
-> and reset all local IRQs, registers and control structures as stated
-> in the architecture.
->=20
-> Userspace might already reset the registers via the vcpu run struct,
-> but as we need the interface for the interrupt clearing part anyway,
-> we implement the resets fully and don't rely on userspace to reset the
-> rest.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
-[...]
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index d9e6bf3d54f0..4936f9499291 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -529,6 +529,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
-ong ext)
->  	case KVM_CAP_S390_CMMA_MIGRATION:
->  	case KVM_CAP_S390_AIS:
->  	case KVM_CAP_S390_AIS_MIGRATION:
-> +	case KVM_CAP_S390_VCPU_RESETS:
->  		r =3D 1;
->  		break;
->  	case KVM_CAP_S390_HPAGE_1M:
-> @@ -2844,35 +2845,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> =20
->  }
-> =20
-> -static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
-> -{
-> -	/* this equals initial cpu reset in pop, but we don't switch to ESA *=
-/
-> -	vcpu->arch.sie_block->gpsw.mask =3D 0UL;
-> -	vcpu->arch.sie_block->gpsw.addr =3D 0UL;
-> -	kvm_s390_set_prefix(vcpu, 0);
-> -	kvm_s390_set_cpu_timer(vcpu, 0);
-> -	vcpu->arch.sie_block->ckc       =3D 0UL;
-> -	vcpu->arch.sie_block->todpr     =3D 0;
-> -	memset(vcpu->arch.sie_block->gcr, 0, 16 * sizeof(__u64));
-> -	vcpu->arch.sie_block->gcr[0]  =3D CR0_UNUSED_56 |
-> -					CR0_INTERRUPT_KEY_SUBMASK |
-> -					CR0_MEASUREMENT_ALERT_SUBMASK;
-> -	vcpu->arch.sie_block->gcr[14] =3D CR14_UNUSED_32 |
-> -					CR14_UNUSED_33 |
-> -					CR14_EXTERNAL_DAMAGE_SUBMASK;
-> -	/* make sure the new fpc will be lazily loaded */
-> -	save_fpu_regs();
-> -	current->thread.fpu.fpc =3D 0;
-> -	vcpu->arch.sie_block->gbea =3D 1;
-> -	vcpu->arch.sie_block->pp =3D 0;
-> -	vcpu->arch.sie_block->fpf &=3D ~FPF_BPBC;
-> -	vcpu->arch.pfault_token =3D KVM_S390_PFAULT_TOKEN_INVALID;
-> -	kvm_clear_async_pf_completion_queue(vcpu);
-> -	if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
-> -		kvm_s390_vcpu_stop(vcpu);
-> -	kvm_s390_clear_local_irqs(vcpu);
-> -}
-> -
->  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  {
->  	mutex_lock(&vcpu->kvm->lock);
-> @@ -3287,10 +3259,78 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(stru=
-ct kvm_vcpu *vcpu,
->  	return r;
->  }
-> =20
-> -static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
-> +static void kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
->  {
-> -	kvm_s390_vcpu_initial_reset(vcpu);
-> -	return 0;
-> +	vcpu->arch.sie_block->gpsw.mask =3D ~PSW_MASK_RI;
-> +	vcpu->arch.pfault_token =3D KVM_S390_PFAULT_TOKEN_INVALID;
-> +	memset(vcpu->run->s.regs.riccb, 0, sizeof(vcpu->run->s.regs.riccb));
-> +
-> +	kvm_clear_async_pf_completion_queue(vcpu);
-> +	if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
-> +		kvm_s390_vcpu_stop(vcpu);
-> +	kvm_s390_clear_local_irqs(vcpu);
-> +}
-> +
-> +static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
-> +{
-> +	/* Initial reset is a superset of the normal reset */
-> +	kvm_arch_vcpu_ioctl_normal_reset(vcpu);
-> +
-> +	/* this equals initial cpu reset in pop, but we don't switch to ESA *=
-/
-> +	vcpu->arch.sie_block->gpsw.mask =3D 0UL;
-> +	vcpu->arch.sie_block->gpsw.addr =3D 0UL;
-> +	kvm_s390_set_prefix(vcpu, 0);
-> +	kvm_s390_set_cpu_timer(vcpu, 0);
-> +	vcpu->arch.sie_block->ckc       =3D 0UL;
-> +	vcpu->arch.sie_block->todpr     =3D 0;
-> +	memset(vcpu->arch.sie_block->gcr, 0, 16 * sizeof(__u64));
-> +	vcpu->arch.sie_block->gcr[0]  =3D CR0_UNUSED_56 |
-> +					CR0_INTERRUPT_KEY_SUBMASK |
-> +					CR0_MEASUREMENT_ALERT_SUBMASK;
-> +	vcpu->arch.sie_block->gcr[14] =3D CR14_UNUSED_32 |
-> +					CR14_UNUSED_33 |
-> +					CR14_EXTERNAL_DAMAGE_SUBMASK;
-> +	/* make sure the new fpc will be lazily loaded */
-> +	save_fpu_regs();
-> +	current->thread.fpu.fpc =3D 0;
-> +	vcpu->arch.sie_block->gbea =3D 1;
-> +	vcpu->arch.sie_block->pp =3D 0;
-> +	vcpu->arch.sie_block->fpf &=3D ~FPF_BPBC;
-> +}
-> +
-> +static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_sync_regs *regs =3D &vcpu->run->s.regs;
-> +
-> +	/* Clear reset is a superset of the initial reset */
-> +	kvm_arch_vcpu_ioctl_normal_reset(vcpu);
-> +
-> +	memset(&regs->gprs, 0, sizeof(regs->gprs));
-> +	/*
-> +	 * Will be picked up via save_fpu_regs() in the initial reset
-> +	 * fallthrough.
+On Sat, Dec 21, 2019 at 02:13:25PM +0000, Marc Zyngier wrote:
+> On Fri, 20 Dec 2019 14:30:16 +0000
+> Andrew Murray <andrew.murray@arm.com> wrote:
+> 
+> [somehow managed not to do a reply all, re-sending]
+> 
+> > From: Sudeep Holla <sudeep.holla@arm.com>
+> > 
+> > Now that we can save/restore the full SPE controls, we can enable it
+> > if SPE is setup and ready to use in KVM. It's supported in KVM only if
+> > all the CPUs in the system supports SPE.
+> > 
+> > However to support heterogenous systems, we need to move the check if
+> > host supports SPE and do a partial save/restore.
+> 
+> No. Let's just not go down that path. For now, KVM on heterogeneous
+> systems do not get SPE. If SPE has been enabled on a guest and a CPU
+> comes up without SPE, this CPU should fail to boot (same as exposing a
+> feature to userspace).
+> 
+> > 
+> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >  arch/arm64/kvm/hyp/debug-sr.c | 33 ++++++++++++++++-----------------
+> >  include/kvm/arm_spe.h         |  6 ++++++
+> >  2 files changed, 22 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> > index 12429b212a3a..d8d857067e6d 100644
+> > --- a/arch/arm64/kvm/hyp/debug-sr.c
+> > +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> > @@ -86,18 +86,13 @@
+> >  	}
+> >  
+> >  static void __hyp_text
+> > -__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> > +__debug_save_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> >  {
+> >  	u64 reg;
+> >  
+> >  	/* Clear pmscr in case of early return */
+> >  	ctxt->sys_regs[PMSCR_EL1] = 0;
+> >  
+> > -	/* SPE present on this CPU? */
+> > -	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> > -						  ID_AA64DFR0_PMSVER_SHIFT))
+> > -		return;
+> > -
+> >  	/* Yes; is it owned by higher EL? */
+> >  	reg = read_sysreg_s(SYS_PMBIDR_EL1);
+> >  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
+> > @@ -142,7 +137,7 @@ __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> >  }
+> >  
+> >  static void __hyp_text
+> > -__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> > +__debug_restore_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> >  {
+> >  	if (!ctxt->sys_regs[PMSCR_EL1])
+> >  		return;
+> > @@ -210,11 +205,14 @@ void __hyp_text __debug_restore_guest_context(struct kvm_vcpu *vcpu)
+> >  	struct kvm_guest_debug_arch *host_dbg;
+> >  	struct kvm_guest_debug_arch *guest_dbg;
+> >  
+> > +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > +	guest_ctxt = &vcpu->arch.ctxt;
+> > +
+> > +	__debug_restore_spe_context(guest_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> > +
+> >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+> >  		return;
+> >  
+> > -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > -	guest_ctxt = &vcpu->arch.ctxt;
+> >  	host_dbg = &vcpu->arch.host_debug_state.regs;
+> >  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> >  
+> > @@ -232,8 +230,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
+> >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> >  	guest_ctxt = &vcpu->arch.ctxt;
+> >  
+> > -	if (!has_vhe())
+> > -		__debug_restore_spe_nvhe(host_ctxt, false);
+> > +	__debug_restore_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> 
+> So you now do an unconditional save/restore on the exit path for VHE as
+> well? Even if the host isn't using the SPE HW? That's not acceptable
+> as, in most cases, only the host /or/ the guest will use SPE. Here, you
+> put a measurable overhead on each exit.
+> 
+> If the host is not using SPE, then the restore/save should happen in
+> vcpu_load/vcpu_put. Only if the host is using SPE should you do
+> something in the run loop. Of course, this only applies to VHE and
+> non-VHE must switch eagerly.
+> 
 
-The word "fallthrough" now likely should be removed from the comment.
+On VHE where SPE is used in the guest only - we save/restore in vcpu_load/put.
 
-Also, I'm not an expert in this lazy-fpu stuff, but don't you rather
-have to deal with current->thread.fpu.regs here instead?
+On VHE where SPE is used in the host only - we save/restore in the run loop.
 
-> +	 */
-> +	memset(&regs->vrs, 0, sizeof(regs->vrs));
-> +	memset(&regs->acrs, 0, sizeof(regs->acrs));
-> +
-> +	regs->etoken =3D 0;
-> +	regs->etoken_extension =3D 0;
-> +
-> +	memset(&regs->gscb, 0, sizeof(regs->gscb));
-> +	if (MACHINE_HAS_GS) {
-> +		preempt_disable();
-> +		__ctl_set_bit(2, 4);
-> +		if (current->thread.gs_cb) {
-> +			vcpu->arch.host_gscb =3D current->thread.gs_cb;
-> +			save_gs_cb(vcpu->arch.host_gscb);
-> +		}
-> +		if (vcpu->arch.gs_enabled) {
-> +			current->thread.gs_cb =3D (struct gs_cb *)
-> +				&vcpu->run->s.regs.gscb;
-> +			restore_gs_cb(current->thread.gs_cb);
-> +		}
-> +		preempt_enable();
-> +	}
->  }
+On VHE where SPE is used in guest and host - we save/restore in the run loop.
 
- Thomas
+As the guest can't trace EL2 it doesn't matter if we restore guest SPE early
+in the vcpu_load/put functions. (I assume it doesn't matter that we restore
+an EL0/EL1 profiling buffer address at this point and enable tracing given
+that there is nothing to trace until entering the guest).
 
+However the reason for moving save/restore to vcpu_load/put when the host is
+using SPE is to minimise the host EL2 black-out window.
+
+
+On nVHE we always save/restore in the run loop. For the SPE guest-use-only
+use-case we can't save/restore in vcpu_load/put - because the guest runs at
+the same ELx level as the host - and thus doing so would result in the guest
+tracing part of the host.
+
+Though if we determine that (for nVHE systems) the guest SPE is profiling only
+EL0 - then we could also save/restore in vcpu_load/put where SPE is only being
+used in the guest.
+
+Does that make sense, are my reasons correct?
+
+Thanks,
+
+Andrew Murray
+
+
+> >  
+> >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+> >  		return;
+> > @@ -249,19 +246,21 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
+> >  
+> >  void __hyp_text __debug_save_host_context(struct kvm_vcpu *vcpu)
+> >  {
+> > -	/*
+> > -	 * Non-VHE: Disable and flush SPE data generation
+> > -	 * VHE: The vcpu can run, but it can't hide.
+> > -	 */
+> >  	struct kvm_cpu_context *host_ctxt;
+> >  
+> >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> > -	if (!has_vhe())
+> > -		__debug_save_spe_nvhe(host_ctxt, false);
+> > +	if (cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> > +						 ID_AA64DFR0_PMSVER_SHIFT))
+> > +		__debug_save_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> >  }
+> >  
+> >  void __hyp_text __debug_save_guest_context(struct kvm_vcpu *vcpu)
+> >  {
+> > +	bool kvm_spe_ready = kvm_arm_spe_v1_ready(vcpu);
+> > +
+> > +	/* SPE present on this vCPU? */
+> > +	if (kvm_spe_ready)
+> > +		__debug_save_spe_context(&vcpu->arch.ctxt, kvm_spe_ready);
+> >  }
+> >  
+> >  u32 __hyp_text __kvm_get_mdcr_el2(void)
+> > diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
+> > index 48d118fdb174..30c40b1bc385 100644
+> > --- a/include/kvm/arm_spe.h
+> > +++ b/include/kvm/arm_spe.h
+> > @@ -16,4 +16,10 @@ struct kvm_spe {
+> >  	bool irq_level;
+> >  };
+> >  
+> > +#ifdef CONFIG_KVM_ARM_SPE
+> > +#define kvm_arm_spe_v1_ready(v)		((v)->arch.spe.ready)
+> > +#else
+> > +#define kvm_arm_spe_v1_ready(v)		(false)
+> > +#endif /* CONFIG_KVM_ARM_SPE */
+> > +
+> >  #endif /* __ASM_ARM_KVM_SPE_H */
+> 
+> Thanks,
+> 
+> 	M.
+> -- 
+> Jazz is not dead. It just smells funny...
