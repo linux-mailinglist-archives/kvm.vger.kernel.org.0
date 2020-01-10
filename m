@@ -2,602 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EAF813763B
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 19:41:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A3E81376A5
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 20:06:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728646AbgAJSlB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jan 2020 13:41:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59548 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728412AbgAJSlA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jan 2020 13:41:00 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00AIbIRb066605
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2020 13:40:58 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xerexcw3q-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2020 13:40:58 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
-        Fri, 10 Jan 2020 18:40:56 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 10 Jan 2020 18:40:54 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00AIeqo543909158
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Jan 2020 18:40:52 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B2AE2AE051;
-        Fri, 10 Jan 2020 18:40:52 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66DA3AE04D;
-        Fri, 10 Jan 2020 18:40:52 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.108])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 10 Jan 2020 18:40:52 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v7 4/4] s390x: SCLP unit test
-Date:   Fri, 10 Jan 2020 19:40:50 +0100
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200110184050.191506-1-imbrenda@linux.ibm.com>
-References: <20200110184050.191506-1-imbrenda@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20011018-0016-0000-0000-000002DC4DD4
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011018-0017-0000-0000-0000333ED1DF
-Message-Id: <20200110184050.191506-5-imbrenda@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-10_01:2020-01-10,2020-01-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 malwarescore=0 suspectscore=1 clxscore=1015 bulkscore=0
- mlxscore=0 adultscore=0 priorityscore=1501 phishscore=0 mlxlogscore=999
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001100150
+        id S1729056AbgAJTGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jan 2020 14:06:15 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:47948 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728963AbgAJTGJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jan 2020 14:06:09 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00AJ3QXD131594;
+        Fri, 10 Jan 2020 19:04:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2019-08-05;
+ bh=K02kkFXDrMIX6YodXiO0Fgzhx0GR3LcBWdgkuRCLUG8=;
+ b=axed6TwDxqR6ISlz7EM/dQfIM2IUtrTmNxzk4d/KRqjxctWY1PPr88tyDi//qdcLo+n1
+ ZZFC1rXW0fk0F9HnCO9x5/4nhqQoQitlLIbckoeTLgXJ6NQjAwJSeng+CZ6V8W71bw1b
+ cWV2SEttEYj3OnQqN4s6MvrMccKf/LgaAW+ePzHvEL53b3/nUUBI5YcEEtjcBL5rNAkX
+ bFmsABeWtULk0tdyJ12ZZyOKkP7AFKxBU+XVlFbmUrl/EzYNiOwNvT3PMaezXhZmOtY8
+ fBWAk6x5Z9lWu8a6sDyyFZxf1FbYN2gMToA5k26/g6ivw05wIacxFnrOtjCh8AzYUPnF Og== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2xaj4um8fc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Jan 2020 19:04:41 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00AJ3tmo183684;
+        Fri, 10 Jan 2020 19:04:40 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 2xedhyptmq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Jan 2020 19:04:40 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00AJ4bCN006586;
+        Fri, 10 Jan 2020 19:04:37 GMT
+Received: from paddy.uk.oracle.com (/10.175.192.165)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 10 Jan 2020 11:04:36 -0800
+From:   Joao Martins <joao.m.martins@oracle.com>
+To:     linux-nvdimm@lists.01.org
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Liran Alon <liran.alon@oracle.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Barret Rhoden <brho@google.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Subject: [PATCH RFC 00/10] device-dax: Support devices without PFN metadata
+Date:   Fri, 10 Jan 2020 19:03:03 +0000
+Message-Id: <20200110190313.17144-1-joao.m.martins@oracle.com>
+X-Mailer: git-send-email 2.11.0
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9496 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001100154
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9496 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001100154
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SCLP unit test. Testing the following:
+Hey,
 
-* Correctly ignoring instruction bits that should be ignored
-* Privileged instruction check
-* Check for addressing exceptions
-* Specification exceptions:
-  - SCCB size less than 8
-  - SCCB unaligned
-  - SCCB overlaps prefix or lowcore
-  - SCCB address higher than 2GB
-* Return codes for
-  - Invalid command
-  - SCCB too short (but at least 8)
-  - SCCB page boundary violation
+Presented herewith a small series which allows device-dax to work without
+struct page to be used to back KVM guests memory. It's an RFC, and there's
+still some items we're looking at (see TODO below); but wondering if folks
+would be OK carving some time out of their busy schedules to provide feedback
+direction-wise on this work.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
----
- s390x/Makefile      |   1 +
- s390x/sclp.c        | 472 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   8 +
- 3 files changed, 481 insertions(+)
- create mode 100644 s390x/sclp.c
+In virtualized environments (specially those with no kernel-backed PV
+interfaces, and just SR-IOV), memory is largelly assigned to guests: either
+persistent with NVDIMMs or volatile for regular RAM. The kernel
+(hypervisor) tracks it with 'struct page' (64b) for each 4K page. Overall
+we're spending 16GB for each 1Tb of host memory tracked that the kernel won't
+need  which could instead be used to create other guests. One of motivations of
+this series is to then get that memory used for 'struct page', when it is meant
+to solely be used by userspace. This is also useful for the case of memory
+backing guests virtual NVDIMMs. The other neat side effect is that the
+hypervisor has no virtual mapping of the guest and hence code gadgets (if
+found) are limited in their effectiveness.
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 3744372..ddb4b48 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -16,6 +16,7 @@ tests += $(TEST_DIR)/diag288.elf
- tests += $(TEST_DIR)/stsi.elf
- tests += $(TEST_DIR)/skrf.elf
- tests += $(TEST_DIR)/smp.elf
-+tests += $(TEST_DIR)/sclp.elf
- tests_binary = $(patsubst %.elf,%.bin,$(tests))
+It is expected that a smaller (instead of total) amount of host memory is
+defined for the kernel (with mem=X or memmap=X!Y). For KVM userspace VMM (e.g.
+QEMU), the main thing that is needed is a device which open + mmap + close with
+a certain alignment (4K, 2M, 1G). That made us look at device-dax which does
+just that and so the work comprised here was improving what's there and the
+interfaces it uses.
+
+The series is divided as follows:
+
+ * Patch 1 , 3: Preparatory work for patch 7 for adding support for
+	       vmf_insert_{pmd,pud} with dax pfn flags PFN_DEV|PFN_SPECIAL
+	
+ * Patch 2 , 4: Preparatory work for patch 7 for adding support for
+	       follow_pfn() to work with 2M/1G huge pages, which is
+	       what KVM uses for VM_PFNMAP.
+
+ * Patch 5 - 7: One bugfix and device-dax support for PFN_DEV|PFN_SPECIAL,
+	       which encompasses mainly dealing with the lack of devmap,
+	       and creating a VM_PFNMAP vma.
+
+ * Patch 8: PMEM support for no PFN metadata only for device-dax namespaces.
+	   At the very end of the cover letter (after scissors mark),
+	   there's a patch for ndctl to be able to create namespaces
+	   with '--mode devdax --map none'.
+
+ * Patch 9: Let VFIO handle VM_PFNMAP without relying on vm_pgoff being
+ 	    a PFN.
+
+ * Patch 10: The actual end consumer example for RAM case. The patch just adds a
+	     label storage area which consequently allows namespaces to be
+	     created. We picked PMEM legacy for starters.
+
+Thoughts, coments appreciated.
+
+	Joao
+
+P.S. As an example to try this out:
+
+ 1) add 'memmap=48G!16G' to the kernel command line, on a host with 64G,
+ and kernel has 16G.
+
+ 2) create a devdax namespace with 1G hugepages: 
+
+ $ ndctl create-namespace --verbose --mode devdax --map none --size 32G --align 1G -r 0
+ {
+  "dev":"namespace0.0",
+  "mode":"devdax",
+  "map":"none",
+  "size":"32.00 GiB (34.36 GB)",
+  "uuid":"dfdd05cd-2611-46ac-8bcd-10b6194f32d4",
+  "daxregion":{
+    "id":0,
+    "size":"32.00 GiB (34.36 GB)",
+    "align":1073741824,
+    "devices":[
+      {
+        "chardev":"dax0.0",
+        "size":"32.00 GiB (34.36 GB)",
+        "target_node":0,
+        "mode":"devdax"
+      }
+    ]
+  },
+  "align":1073741824
+ }
+
+ 3) Add this to your qemu params:
+  -m 32G 
+  -object memory-backend-file,id=mem,size=32G,mem-path=/dev/dax0.0,share=on,align=1G
+  -numa node,memdev=mem
+
+TODO:
+
+ * Discontiguous regions/namespaces: The work above is limited to max
+contiguous extent, coming from nvdimm dpa allocation heuristics -- which I take
+is because of what specs allow for persistent namespaces. But for volatile RAM
+case we would need handling of discontiguous extents (hence a region would represent
+more than a resource) to be less bound to how guests are placed on the system.
+I played around with multi-resource for device-dax, but I'm wondering about
+UABI: 1) whether nvdimm DPA allocation heuristics should be relaxed for RAM
+case (under certain nvdimm region bits); or if 2) device-dax would have it's
+own separate UABI to be used by daxctl (which would be also useful for hmem
+devices?).
+
+ * MCE handling: For contiguous regions vm_pgoff could be set to the pfn in
+device-dax, which would allow collect_procs() to find the processes solely based
+on the PFN. But for discontiguous namespaces, not sure if this would work; perhaps
+looking at the dax-region pfn range for each DAX vma.
+
+ * NUMA: For now excluded setting the target_node; while these two patches
+ are being worked on[1][2].
+
+ [1] https://lore.kernel.org/lkml/157401276776.43284.12396353118982684546.stgit@dwillia2-desk3.amr.corp.intel.com/
+ [2] https://lore.kernel.org/lkml/157401277293.43284.3805106435228534675.stgit@dwillia2-desk3.amr.corp.intel.com/
+
+
+Joao Martins (9):
+  mm: Add pmd support for _PAGE_SPECIAL
+  mm: Handle pmd entries in follow_pfn()
+  mm: Add pud support for _PAGE_SPECIAL
+  mm: Handle pud entries in follow_pfn()
+  device-dax: Do not enforce MADV_DONTFORK on mmap()
+  device-dax: Introduce pfn_flags helper
+  device-dax: Add support for PFN_SPECIAL flags
+  dax/pmem: Add device-dax support for PFN_MODE_NONE
+  nvdimm/e820: add multiple namespaces support
+
+Nikita Leshenko (1):
+  vfio/type1: Use follow_pfn for VM_FPNMAP VMAs
+
+ arch/x86/include/asm/pgtable.h  |  34 ++++-
+ drivers/dax/bus.c               |   3 +-
+ drivers/dax/device.c            |  78 ++++++++----
+ drivers/dax/pmem/core.c         |  36 +++++-
+ drivers/nvdimm/e820.c           | 212 ++++++++++++++++++++++++++++----
+ drivers/vfio/vfio_iommu_type1.c |   6 +-
+ mm/gup.c                        |   6 +
+ mm/huge_memory.c                |  15 ++-
+ mm/memory.c                     |  67 ++++++++--
+ 9 files changed, 382 insertions(+), 75 deletions(-)
+
+8>----------------
+Subject: [PATCH] ndctl: add 'devdax' support for NDCTL_PFN_LOC_NONE
+
+diff --git a/ndctl/namespace.c b/ndctl/namespace.c
+index 7fb00078646b..2568943eb207 100644
+--- a/ndctl/namespace.c
++++ b/ndctl/namespace.c
+@@ -206,6 +206,8 @@ static int set_defaults(enum device_action mode)
+ 			/* pass */;
+ 		else if (strcmp(param.map, "dev") == 0)
+ 			/* pass */;
++		else if (strcmp(param.map, "none") == 0)
++			/* pass */;
+ 		else {
+ 			error("invalid map location '%s'\n", param.map);
+ 			rc = -EINVAL;
+@@ -755,9 +757,17 @@ static int validate_namespace_options(struct ndctl_region *region,
+ 	if (param.map) {
+ 		if (!strcmp(param.map, "mem"))
+ 			p->loc = NDCTL_PFN_LOC_RAM;
++		else if (!strcmp(param.map, "none"))
++			p->loc = NDCTL_PFN_LOC_NONE;
+ 		else
+ 			p->loc = NDCTL_PFN_LOC_PMEM;
  
- all: directories test_cases test_cases_binary
-diff --git a/s390x/sclp.c b/s390x/sclp.c
-new file mode 100644
-index 0000000..10f0809
---- /dev/null
-+++ b/s390x/sclp.c
-@@ -0,0 +1,472 @@
-+/*
-+ * Service Call tests
-+ *
-+ * Copyright (c) 2019 IBM Corp
-+ *
-+ * Authors:
-+ *  Claudio Imbrenda <imbrenda@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/page.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/interrupt.h>
-+#include <sclp.h>
-+
-+#define PGM_NONE	1
-+#define PGM_BIT_SPEC	(1ULL << PGM_INT_CODE_SPECIFICATION)
-+#define PGM_BIT_ADDR	(1ULL << PGM_INT_CODE_ADDRESSING)
-+#define PGM_BIT_PRIV	(1ULL << PGM_INT_CODE_PRIVILEGED_OPERATION)
-+#define MKPTR(x) ((void *)(uint64_t)(x))
-+
-+#define LC_SIZE (2 * PAGE_SIZE)
-+
-+static uint8_t pagebuf[LC_SIZE] __attribute__((aligned(LC_SIZE)));	/* scratch pages used for some tests */
-+static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));	/* temporary lowcore for test_sccb_prefix */
-+static uint8_t sccb_template[PAGE_SIZE];				/* SCCB template to be used */
-+static uint32_t valid_code;						/* valid command code for READ SCP INFO */
-+static struct lowcore *lc;
-+
-+/**
-+ * Perform one service call, handling exceptions and interrupts.
-+ */
-+static int sclp_service_call_test(unsigned int command, void *sccb)
-+{
-+	int cc;
-+
-+	sclp_mark_busy();
-+	sclp_setup_int();
-+	cc = servc(command, __pa(sccb));
-+	if (lc->pgm_int_code) {
-+		sclp_handle_ext();
-+		return 0;
-+	}
-+	if (!cc)
-+		sclp_wait_busy();
-+	return cc;
-+}
-+
-+/**
-+ * Perform one test at the given address, optionally using the SCCB template,
-+ * checking for the expected program interrupts and return codes.
-+ *
-+ * The parameter buf_len indicates the number of bytes of the template that
-+ * should be copied to the test address, and should be 0 when the test
-+ * address is invalid, in which case nothing is copied.
-+ *
-+ * The template is used to simplify tests where the same buffer content is
-+ * used many times in a row, at different addresses.
-+ *
-+ * Returns true in case of success or false in case of failure
-+ */
-+static bool test_one_sccb(uint32_t cmd, uint8_t *addr, uint16_t buf_len, uint64_t exp_pgm, uint16_t exp_rc)
-+{
-+	SCCBHeader *h = (SCCBHeader *)addr;
-+	int res, pgm;
-+
-+	/* Copy the template to the test address if needed */
-+	if (buf_len)
-+		memcpy(addr, sccb_template, buf_len);
-+	expect_pgm_int();
-+	/* perform the actual call */
-+	res = sclp_service_call_test(cmd, h);
-+	if (res) {
-+		report_info("SCLP not ready (command %#x, address %p, cc %d)", cmd, addr, res);
-+		return false;
-+	}
-+	pgm = clear_pgm_int();
-+	/* Check if the program exception was one of the expected ones */
-+	if (!((1ULL << pgm) & exp_pgm)) {
-+		report_info("First failure at addr %p, buf_len %d, cmd %#x, pgm code %d",
-+				addr, buf_len, cmd, pgm);
-+		return false;
-+	}
-+	/* Check if the response code is the one expected */
-+	if (exp_rc && exp_rc != h->response_code) {
-+		report_info("First failure at addr %p, buf_len %d, cmd %#x, resp code %#x",
-+				addr, buf_len, cmd, h->response_code);
-+		return false;
-+	}
-+	return true;
-+}
-+
-+/**
-+ * Wrapper for test_one_sccb to be used when the template should not be
-+ * copied and the memory address should not be touched.
-+ */
-+static bool test_one_ro(uint32_t cmd, uint8_t *addr, uint64_t exp_pgm, uint16_t exp_rc)
-+{
-+	return test_one_sccb(cmd, addr, 0, exp_pgm, exp_rc);
-+}
-+
-+/**
-+ * Wrapper for test_one_sccb to set up a simple SCCB template.
-+ *
-+ * The parameter sccb_len indicates the value that will be saved in the SCCB
-+ * length field of the SCCB, buf_len indicates the number of bytes of
-+ * template that need to be copied to the actual test address. In many cases
-+ * it's enough to clear/copy the first 8 bytes of the buffer, while the SCCB
-+ * itself can be larger.
-+ *
-+ * Returns true in case of success or false in case of failure
-+ */
-+static bool test_one_simple(uint32_t cmd, uint8_t *addr, uint16_t sccb_len,
-+			uint16_t buf_len, uint64_t exp_pgm, uint16_t exp_rc)
-+{
-+	memset(sccb_template, 0, sizeof(sccb_template));
-+	((SCCBHeader *)sccb_template)->length = sccb_len;
-+	return test_one_sccb(cmd, addr, buf_len, exp_pgm, exp_rc);
-+}
-+
-+/**
-+ * Test SCCB lengths < 8.
-+ */
-+static void test_sccb_too_short(void)
-+{
-+	int len;
-+
-+	for (len = 0; len < 8; len++)
-+		if (!test_one_simple(valid_code, pagebuf, len, 8, PGM_BIT_SPEC, 0))
-+			break;
-+
-+	report(len == 8, "SCCB too short");
-+}
-+
-+/**
-+ * Test SCCBs that are not 64-bit aligned.
-+ */
-+static void test_sccb_unaligned(void)
-+{
-+	int offset;
-+
-+	for (offset = 1; offset < 8; offset++)
-+		if (!test_one_simple(valid_code, offset + pagebuf, 8, 8, PGM_BIT_SPEC, 0))
-+			break;
-+	report(offset == 8, "SCCB unaligned");
-+}
-+
-+/**
-+ * Test SCCBs whose address is in the lowcore or prefix area.
-+ */
-+static void test_sccb_prefix(void)
-+{
-+	uint8_t scratch[LC_SIZE];
-+	uint32_t prefix, new_prefix;
-+	int offset;
-+
-+	/*
-+	 * copy the current lowcore to the future new location, otherwise we
-+	 * will not have a valid lowcore after setting the new prefix.
-+	 */
-+	memcpy(prefix_buf, 0, LC_SIZE);
-+	/* save the current prefix (it's probably going to be 0) */
-+	prefix = get_prefix();
-+	/*
-+	 * save the current content of absolute pages 0 and 1, so we can
-+	 * restore them after we trash them later on
-+	 */
-+	memcpy(scratch, (void *)(intptr_t)prefix, LC_SIZE);
-+	/* set the new prefix to prefix_buf */
-+	new_prefix = (uint32_t)(intptr_t)prefix_buf;
-+	set_prefix(new_prefix);
-+
-+	/*
-+	 * testing with SCCB addresses in the lowcore; since we can't
-+	 * actually trash the lowcore (unsurprisingly, things break if we
-+	 * do), this will be a read-only test.
-+	 */
-+	for (offset = 0; offset < LC_SIZE; offset += 8)
-+		if (!test_one_ro(valid_code, MKPTR(offset), PGM_BIT_SPEC, 0))
-+			break;
-+	report(offset == LC_SIZE, "SCCB low pages");
-+
-+	/*
-+	 * the SCLP should not even touch the memory, but we will write the
-+	 * SCCBs all over the two pages starting at absolute address 0, thus
-+	 * trashing them; we will need to restore them later.
-+	 */
-+	for (offset = 0; offset < LC_SIZE; offset += 8)
-+		if (!test_one_simple(valid_code, MKPTR(new_prefix + offset), 8, 8, PGM_BIT_SPEC, 0))
-+			break;
-+	report(offset == LC_SIZE, "SCCB prefix pages");
-+
-+	/* restore the previous contents of absolute pages 0 and 1 */
-+	memcpy(prefix_buf, 0, LC_SIZE);
-+	/* restore the prefix to the original value */
-+	set_prefix(prefix);
-+}
-+
-+/**
-+ * Test SCCBs that are above 2GB. If outside of memory, an addressing
-+ * exception is also allowed.
-+ */
-+static void test_sccb_high(void)
-+{
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+	uintptr_t a[33 * 4 * 2 + 2];	/* for the list of addresses to test */
-+
-+	uint64_t maxram;
-+	int i, pgm, len = 0;
-+
-+	h->length = 8;
-+	/* addresses with 1 bit set in the first 33 bits */
-+	for (i = 0; i < 33; i++)
-+		a[len++] = 1UL << (i + 31);
-+	/* addresses with 2 consecutive bits set in the first 33 bits */
-+	for (i = 0; i < 33; i++)
-+		a[len++] = 3UL << (i + 31);
-+	/* addresses with all bits set in bits 0..N */
-+	for (i = 0; i < 33; i++)
-+		a[len++] = 0xffffffff80000000UL << i;
-+	/* addresses with all bits set in bits N..33 */
-+	a[len++] = 0x80000000;
-+	for (i = 1; i < 33; i++, len++)
-+		a[len] = a[len - 1] | (1UL << (i + 31));
-+	/* all the addresses above, but adding the offset of a valid buffer */
-+	for (i = 0; i < len; i++)
-+		a[len + i] = a[i] + (intptr_t)h;
-+	len += i;
-+	/* two more hand-crafted addresses */
-+	a[len++] = 0xdeadbeef00000000;
-+	a[len++] = 0xdeaddeadbeef0000;
-+
-+	maxram = get_ram_size();
-+	for (i = 0; i < len; i++) {
-+		pgm = PGM_BIT_SPEC | (a[i] >= maxram ? PGM_BIT_ADDR : 0);
-+		if (!test_one_ro(valid_code, (void *)a[i], pgm, 0))
-+			break;
-+	}
-+	report(i == len, "SCCB high addresses");
-+}
-+
-+/**
-+ * Test invalid commands, both invalid command detail codes and valid
-+ * ones with invalid command class code.
-+ */
-+static void test_inval(void)
-+{
-+	const uint16_t res = SCLP_RC_INVALID_SCLP_COMMAND;
-+	uint32_t cmd;
-+	int i;
-+
-+	report_prefix_push("Invalid command");
-+	for (i = 0; i < 65536; i++) {
-+		cmd = 0xdead0000 | i;
-+		if (!test_one_simple(cmd, pagebuf, PAGE_SIZE, PAGE_SIZE, PGM_NONE, res))
-+			break;
-+	}
-+	report(i == 65536, "Command detail code");
-+
-+	for (i = 0; i < 256; i++) {
-+		cmd = (valid_code & ~0xff) | i;
-+		if (cmd == valid_code)
-+			continue;
-+		if (!test_one_simple(cmd, pagebuf, PAGE_SIZE, PAGE_SIZE, PGM_NONE, res))
-+			break;
-+	}
-+	report(i == 256, "Command class code");
-+	report_prefix_pop();
-+}
-+
-+
-+/**
-+ * Test short SCCBs (but larger than 8).
-+ */
-+static void test_short(void)
-+{
-+	const uint16_t res = SCLP_RC_INSUFFICIENT_SCCB_LENGTH;
-+	int len;
-+
-+	for (len = 8; len < 144; len++)
-+		if (!test_one_simple(valid_code, pagebuf, len, len, PGM_NONE, res))
-+			break;
-+	report(len == 144, "Insufficient SCCB length (Read SCP info)");
-+
-+	for (len = 8; len < 40; len++)
-+		if (!test_one_simple(SCLP_READ_CPU_INFO, pagebuf, len, len, PGM_NONE, res))
-+			break;
-+	report(len == 40, "Insufficient SCCB length (Read CPU info)");
-+}
-+
-+/**
-+ * Test SCCB page boundary violations.
-+ */
-+static void test_boundary(void)
-+{
-+	const uint32_t cmd = SCLP_CMD_WRITE_EVENT_DATA;
-+	const uint16_t res = SCLP_RC_SCCB_BOUNDARY_VIOLATION;
-+	WriteEventData *sccb = (WriteEventData *)sccb_template;
-+	int len, offset;
-+
-+	memset(sccb_template, 0, sizeof(sccb_template));
-+	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-+	for (len = 32; len <= 4096; len++) {
-+		offset = len & 7 ? len & ~7 : len - 8;
-+		for (offset = 4096 - offset; offset < 4096; offset += 8) {
-+			sccb->h.length = len;
-+			if (!test_one_sccb(cmd, offset + pagebuf, len, PGM_NONE, res))
-+				goto out;
++		if (p->loc == NDCTL_PFN_LOC_NONE
++			&& p->mode != NDCTL_NS_MODE_DAX) {
++			debug("--map=none only valid for devdax mode namespace\n");
++			return -EINVAL;
 +		}
-+	}
-+out:
-+	report(len > 4096 && offset == 4096, "SCCB page boundary violation");
-+}
 +
-+/**
-+ * Test excessively long SCCBs.
-+ */
-+static void test_toolong(void)
-+{
-+	const uint32_t cmd = SCLP_CMD_WRITE_EVENT_DATA;
-+	const uint16_t res = SCLP_RC_SCCB_BOUNDARY_VIOLATION;
-+	WriteEventData *sccb = (WriteEventData *)sccb_template;
-+	int len;
-+
-+	memset(sccb_template, 0, sizeof(sccb_template));
-+	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-+	for (len = 4097; len < 8192; len++) {
-+		sccb->h.length = len;
-+		if (!test_one_sccb(cmd, pagebuf, PAGE_SIZE, PGM_NONE, res))
-+			break;
-+	}
-+	report(len == 8192, "SCCB bigger than 4k");
-+}
-+
-+/**
-+ * Test privileged operation.
-+ */
-+static void test_priv(void)
-+{
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+
-+	report_prefix_push("Privileged operation");
-+	h->length = 8;
-+	expect_pgm_int();
-+	enter_pstate();
-+	servc(valid_code, __pa(h));
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+/**
-+ * Test addressing exceptions. We need to test SCCB addresses between the
-+ * end of available memory and 2GB, because after 2GB a specification
-+ * exception is also allowed.
-+ * Only applicable if the VM has less than 2GB of memory
-+ */
-+static void test_addressing(void)
-+{
-+	unsigned long i, maxram = get_ram_size();
-+
-+	/* the VM has more than 2GB of memory */
-+	if (maxram >= 0x80000000) {
-+		report_skip("Invalid SCCB address");
-+		return;
-+	}
-+	/* test all possible valid addresses immediately after the end of memory
-+	 * up to 64KB after the end of memory
-+	 */
-+	for (i = 0; i < 0x10000 && i + maxram < 0x80000000; i += 8)
-+		if (!test_one_ro(valid_code, MKPTR(i + maxram), PGM_BIT_ADDR, 0))
-+			goto out;
-+	/* test more addresses until we reach 1MB after end of memory;
-+	 * increment by a prime number (times 8) in order to test all
-+	 * possible valid offsets inside pages
-+	 */
-+	for (; i < 0x100000 && i + maxram < 0x80000000 ; i += 808)
-+		if (!test_one_ro(valid_code, MKPTR(i + maxram), PGM_BIT_ADDR, 0))
-+			goto out;
-+	/* test the remaining addresses until we reach address 2GB;
-+	 * increment by a prime number (times 8) in order to test all
-+	 * possible valid offsets inside pages
-+	 */
-+	for (; i + maxram < 0x80000000; i += 800024)
-+		if (!test_one_ro(valid_code, MKPTR(i + maxram), PGM_BIT_ADDR, 0))
-+			goto out;
-+out:
-+	report(i + maxram >= 0x80000000, "Invalid SCCB address");
-+}
-+
-+/**
-+ * Test some bits in the instruction format that are specified to be ignored.
-+ */
-+static void test_instbits(void)
-+{
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+	int cc;
-+
-+	expect_pgm_int();
-+	sclp_mark_busy();
-+	h->length = 8;
-+	sclp_setup_int();
-+
-+	asm volatile(
-+		"       .insn   rre,0xb2204200,%1,%2\n"  /* servc %1,%2 */
-+		"       ipm     %0\n"
-+		"       srl     %0,28"
-+		: "=&d" (cc) : "d" (valid_code), "a" (__pa(pagebuf))
-+		: "cc", "memory");
-+	if (lc->pgm_int_code) {
-+		sclp_handle_ext();
-+		cc = 1;
-+	} else if (!cc)
-+		sclp_wait_busy();
-+	report(cc == 0, "Instruction format ignored bits");
-+}
-+
-+/**
-+ * Find a valid READ INFO command code; not all codes are always allowed, and
-+ * probing should be performed in the right order.
-+ */
-+static void find_valid_sclp_code(void)
-+{
-+	const unsigned int commands[] = { SCLP_CMDW_READ_SCP_INFO_FORCED,
-+					  SCLP_CMDW_READ_SCP_INFO };
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+	int i, cc;
-+
-+	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-+		sclp_mark_busy();
-+		memset(h, 0, sizeof(*h));
-+		h->length = 4096;
-+
-+		valid_code = commands[i];
-+		cc = sclp_service_call(commands[i], h);
-+		if (cc)
-+			break;
-+		if (h->response_code == SCLP_RC_NORMAL_READ_COMPLETION)
-+			return;
-+		if (h->response_code != SCLP_RC_INVALID_SCLP_COMMAND)
-+			break;
-+	}
-+	valid_code = 0;
-+	report_abort("READ_SCP_INFO failed");
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("sclp");
-+	find_valid_sclp_code();
-+
-+	/* Test some basic things */
-+	test_instbits();
-+	test_priv();
-+	test_addressing();
-+
-+	/* Test the specification exceptions */
-+	test_sccb_too_short();
-+	test_sccb_unaligned();
-+	test_sccb_prefix();
-+	test_sccb_high();
-+
-+	/* Test the expected response codes */
-+	test_inval();
-+	test_short();
-+	test_boundary();
-+	test_toolong();
-+
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index f1b07cd..07013b2 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -75,3 +75,11 @@ file = stsi.elf
- [smp]
- file = smp.elf
- extra_params =-smp 2
-+
-+[sclp-1g]
-+file = sclp.elf
-+extra_params = -m 1G
-+
-+[sclp-3g]
-+file = sclp.elf
-+extra_params = -m 3G
+ 		if (ndns && p->mode != NDCTL_NS_MODE_MEMORY
+ 			&& p->mode != NDCTL_NS_MODE_DAX) {
+ 			debug("%s: --map= only valid for fsdax mode namespace\n",
+
+
 -- 
-2.24.1
+2.17.1
 
