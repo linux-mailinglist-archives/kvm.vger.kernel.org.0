@@ -2,284 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A836913705D
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 15:55:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1D001370C7
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 16:11:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728475AbgAJOzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jan 2020 09:55:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43375 "EHLO
+        id S1728247AbgAJPK7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jan 2020 10:10:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31456 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728458AbgAJOzk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Jan 2020 09:55:40 -0500
+        with ESMTP id S1727855AbgAJPK7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jan 2020 10:10:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578668138;
+        s=mimecast20190719; t=1578669057;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=a23BP+daq14PCXzBJ1VBQHnFohqZ7eqS+b84+7K03gk=;
-        b=JW1RDjmpEsFJmYOLaCSZ8OHebHR2dEnrmct2dbN+aw1pweR0h8t94FonAGOiOacq10bF6C
-        pU9VhVQ4LCZ9DGMPCT2Zl3KTDhy5TLNjI9gYOEg/QQgLpyXLSGS+6uT8Ev5w3hEGEWxukN
-        axj6PP/aaR7Ct6Y6h4Hqv/E5Oma4gIE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-2xX62-pzMkGeqrj6IDdk8Q-1; Fri, 10 Jan 2020 09:55:36 -0500
-X-MC-Unique: 2xX62-pzMkGeqrj6IDdk8Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 472A91083E84;
-        Fri, 10 Jan 2020 14:55:35 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-117-108.ams2.redhat.com [10.36.117.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 615E67C3EB;
-        Fri, 10 Jan 2020 14:55:32 +0000 (UTC)
-From:   Eric Auger <eric.auger@redhat.com>
-To:     eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc:     drjones@redhat.com, andre.przywara@arm.com,
-        peter.maydell@linaro.org, yuzenghui@huawei.com,
-        alexandru.elisei@arm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 16/16] arm/arm64: ITS: pending table migration test
-Date:   Fri, 10 Jan 2020 15:54:12 +0100
-Message-Id: <20200110145412.14937-17-eric.auger@redhat.com>
-In-Reply-To: <20200110145412.14937-1-eric.auger@redhat.com>
-References: <20200110145412.14937-1-eric.auger@redhat.com>
+        bh=ltOkanThXPeot2TPJmTHUMaFNfpDV2RzAlhTkMJQWGk=;
+        b=H8T3yVFWc297hFDXa3e69ogB98nvO/F30nQqWMxtj+SgSWnZUfrBtJNaPRNmGs4WgpiFg/
+        Cdfq/7VxdNRxKZnG5aGYAWPHZKHioOjr63k+9PgMZxT0thSBNe4q00M0z01stijAtf3gYQ
+        bWbhy5LHfv6FLIL1IWi8bzZt1zoPrmE=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-X9VrFT03PSu4j2xJi0sSmQ-1; Fri, 10 Jan 2020 10:10:56 -0500
+X-MC-Unique: X9VrFT03PSu4j2xJi0sSmQ-1
+Received: by mail-qv1-f72.google.com with SMTP id di5so1345486qvb.3
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2020 07:10:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ltOkanThXPeot2TPJmTHUMaFNfpDV2RzAlhTkMJQWGk=;
+        b=rjK1zgvf34iu9QYD5jHkeAErVi87FZyQCPHI+E8VkoWq4o6+eQIqo+hGMkb+jGG2JM
+         LcL63iIQ7Tv19bkiIveybNUdq1OwfQM5zAZsPCKUTXGVj5j0bpAbBUDhbVIoiojGLTbl
+         ti1exduOnTdspN5dzBYJGamWhGkwhNfTD+1PQQs+LYlrvBTCbwqonKcjox/xZ0c860M+
+         TvtFCQ1to1QkM0I20bICnXHecgDG6TkQ+idEbeVLAFGORuKpfx21ypo8R6Gmio/lwdU/
+         xNkkH1l5VRVHs7twAeg/z7W/1Ei2HrepoBQj/zBQywV86mavGNpgYDYceUQ+eWFRe0Iz
+         lb3w==
+X-Gm-Message-State: APjAAAVoDuJNacopBx3jblcN9TCmPZfodLwU1y3SNEJPV++H/n+yAN8e
+        kUPkUcazUib6/E79gO+X88VQ3dfye/I2eD5Ryl+GC+p+bAL6/HLQC9EV2RVFuaKJlUVlgGmbN2t
+        Kp/oe1fKcQtH7
+X-Received: by 2002:aed:2bc2:: with SMTP id e60mr2811127qtd.115.1578669056113;
+        Fri, 10 Jan 2020 07:10:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwz1r1ONGXTup5Yq+eOHuTwVk4LBOmjj/SDXS4nm/iC9Ca6WSmY4fOOxfZebKAczT+NKktz5g==
+X-Received: by 2002:aed:2bc2:: with SMTP id e60mr2811109qtd.115.1578669055902;
+        Fri, 10 Jan 2020 07:10:55 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id m5sm1118351qtq.6.2020.01.10.07.10.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2020 07:10:55 -0800 (PST)
+Date:   Fri, 10 Jan 2020 10:10:53 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v3 00/21] KVM: Dirty ring interface
+Message-ID: <20200110151053.GB53397@xz-x1>
+References: <20200109145729.32898-1-peterx@redhat.com>
+ <20200109105443-mutt-send-email-mst@kernel.org>
+ <20200109161742.GC15671@xz-x1>
+ <20200109113001-mutt-send-email-mst@kernel.org>
+ <20200109170849.GB36997@xz-x1>
+ <20200109133434-mutt-send-email-mst@kernel.org>
+ <20200109193949.GG36997@xz-x1>
+ <20200109172718-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200109172718-mutt-send-email-mst@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add two new migration tests. One testing the migration of
-a topology where collection were unmapped. The second test
-checks the migration of the pending table.
+On Thu, Jan 09, 2020 at 05:28:36PM -0500, Michael S. Tsirkin wrote:
+> On Thu, Jan 09, 2020 at 02:39:49PM -0500, Peter Xu wrote:
+> > On Thu, Jan 09, 2020 at 02:08:52PM -0500, Michael S. Tsirkin wrote:
+> > > On Thu, Jan 09, 2020 at 12:08:49PM -0500, Peter Xu wrote:
+> > > > On Thu, Jan 09, 2020 at 11:40:23AM -0500, Michael S. Tsirkin wrote:
+> > > > 
+> > > > [...]
+> > > > 
+> > > > > > > I know it's mostly relevant for huge VMs, but OTOH these
+> > > > > > > probably use huge pages.
+> > > > > > 
+> > > > > > Yes huge VMs could benefit more, especially if the dirty rate is not
+> > > > > > that high, I believe.  Though, could you elaborate on why huge pages
+> > > > > > are special here?
+> > > > > > 
+> > > > > > Thanks,
+> > > > > 
+> > > > > With hugetlbfs there are less bits to test: e.g. with 2M pages a single
+> > > > > bit set marks 512 pages as dirty.  We do not take advantage of this
+> > > > > but it looks like a rather obvious optimization.
+> > > > 
+> > > > Right, but isn't that the trade-off between granularity of dirty
+> > > > tracking and how easy it is to collect the dirty bits?  Say, it'll be
+> > > > merely impossible to migrate 1G-huge-page-backed guests if we track
+> > > > dirty bits using huge page granularity, since each touch of guest
+> > > > memory will cause another 1G memory to be transferred even if most of
+> > > > the content is the same.  2M can be somewhere in the middle, but still
+> > > > the same write amplify issue exists.
+> > > >
+> > > 
+> > > OK I see I'm unclear.
+> > > 
+> > > IIUC at the moment KVM never uses huge pages if any part of the huge page is
+> > > tracked.
+> > 
+> > To be more precise - I think it's per-memslot.  Say, if the memslot is
+> > dirty tracked, then no huge page on the host on that memslot (even if
+> > guest used huge page over that).
+> 
+> Yea ... so does it make sense to make this implementation detail
+> leak through UAPI?
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/gic.c         | 148 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |  16 ++++-
- 2 files changed, 163 insertions(+), 1 deletion(-)
+I think that's not a leak of internal implementation detail, we just
+define the interface as that the address for each kvm_dirty_gfn is
+always host page aligned (by default it means no huge page) and point
+to a single host page, that's all.  Host page size is always there for
+userspace after all so imho it's fine.  Thanks,
 
-diff --git a/arm/gic.c b/arm/gic.c
-index bf4b5ba..cb976c3 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -170,6 +170,7 @@ static void lpi_handler(struct pt_regs *regs __unused=
-)
- 	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
- 	lpi_stats.observed.cpu_id =3D smp_processor_id();
- 	lpi_stats.observed.lpi_id =3D irqnr;
-+	acked[lpi_stats.observed.cpu_id]++;
- 	smp_wmb(); /* pairs with rmb in check_lpi_stats */
- }
-=20
-@@ -207,6 +208,18 @@ static void check_lpi_stats(void)
- 	}
- }
-=20
-+static void check_lpi_hits(int *expected)
-+{
-+	int i;
-+
-+	for (i =3D 0; i < nr_cpus; i++) {
-+		if (acked[i] !=3D expected[i])
-+			report(false, "expected %d LPIs on PE #%d, %d observed",
-+			       expected[i], i, acked[i]);
-+		}
-+	report(true, "check LPI on all vcpus");
-+}
-+
- static void gicv2_ipi_send_self(void)
- {
- 	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
-@@ -641,6 +654,18 @@ static int its_prerequisites(int nb_cpus)
- 	return 0;
- }
-=20
-+static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-+		    struct its_collection *col)
-+{
-+	if (!dev || !col)
-+		report_abort("wrong device or collection");
-+
-+	its_send_mapti(dev, physid, eventid, col);
-+
-+	set_lpi_config(physid, LPI_PROP_DEFAULT);
-+	its_send_invall(col);
-+}
-+
- /*
-  * Setup the configuration for those mappings:
-  * dev_id=3D2 event=3D20 -> vcpu 3, intid=3D8195
-@@ -765,6 +790,121 @@ static void test_its_migration(void)
- 	check_lpi_stats();
- }
-=20
-+static void test_migrate_unmapped_collection(void)
-+{
-+	struct its_collection *col;
-+	struct its_device *dev2, *dev7;
-+	u8 config;
-+
-+	if (its_setup1())
-+		return;
-+
-+	col =3D its_create_collection(nr_cpus - 1, nr_cpus - 1);
-+	dev2 =3D its_get_device(2);
-+	dev7 =3D its_get_device(7);
-+
-+	/* MAPTI with the collection unmapped */
-+	set_lpi(dev2, 0, 8192, col);
-+
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report(true, "Migration complete");
-+
-+	/* on the destination, map the collection */
-+	its_send_mapc(col, true);
-+
-+	lpi_stats_expect(2, 8196);
-+	its_send_int(dev7, 255);
-+	check_lpi_stats();
-+
-+	config =3D get_lpi_config(8192);
-+	report(config =3D=3D LPI_PROP_DEFAULT,
-+	       "Config of LPI 8192 was properly migrated");
-+
-+	lpi_stats_expect(nr_cpus - 1, 8192);
-+	its_send_int(dev2, 0);
-+	check_lpi_stats();
-+
-+	/* unmap the collection */
-+	its_send_mapc(col, false);
-+
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 0);
-+	check_lpi_stats();
-+
-+	/* remap event 0 onto lpiid 8193 */
-+	set_lpi(dev2, 0, 8193, col);
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 0);
-+	check_lpi_stats();
-+
-+	/* remap the collection */
-+	its_send_mapc(col, true);
-+	lpi_stats_expect(nr_cpus - 1, 8193);
-+}
-+
-+static void test_its_pending_migration(void)
-+{
-+	struct its_device *dev;
-+	struct its_collection *collection[2];
-+	int expected[NR_CPUS];
-+	u64 pendbaser;
-+	void *ptr;
-+	int i;
-+
-+	if (its_prerequisites(4))
-+		return;
-+
-+	dev =3D its_create_device(2 /* dev id */, 8 /* nb_ites */);
-+	its_send_mapd(dev, true);
-+
-+	collection[0] =3D its_create_collection(nr_cpus - 1, nr_cpus - 1);
-+	collection[1] =3D its_create_collection(nr_cpus - 2, nr_cpus - 2);
-+	its_send_mapc(collection[0], true);
-+	its_send_mapc(collection[1], true);
-+
-+	/* disable lpi at redist level */
-+	gicv3_rdist_ctrl_lpi(nr_cpus - 1, false);
-+	gicv3_rdist_ctrl_lpi(nr_cpus - 2, false);
-+
-+	/* even lpis are assigned to even cpu */
-+	for (i =3D 0; i < 256; i++) {
-+		struct its_collection *col =3D i % 2 ? collection[0] :
-+						     collection[1];
-+		int vcpu =3D col->target_address >> 16;
-+
-+		its_send_mapti(dev, 8192 + i, i, col);
-+		set_lpi_config(8192 + i, LPI_PROP_DEFAULT);
-+		set_pending_table_bit(vcpu, 8192 + i, true);
-+	}
-+	its_send_invall(collection[0]);
-+	its_send_invall(collection[1]);
-+
-+	/* Set the PTZ bit on each pendbaser */
-+
-+	expected[nr_cpus - 1] =3D 128;
-+	expected[nr_cpus - 2] =3D 128;
-+
-+	ptr =3D gicv3_data.redist_base[nr_cpus - 1] + GICR_PENDBASER;
-+	pendbaser =3D readq(ptr);
-+	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-+
-+	ptr =3D gicv3_data.redist_base[nr_cpus - 2] + GICR_PENDBASER;
-+	pendbaser =3D readq(ptr);
-+	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-+
-+	gicv3_rdist_ctrl_lpi(nr_cpus - 1, true);
-+	gicv3_rdist_ctrl_lpi(nr_cpus - 2, true);
-+
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report(true, "Migration complete");
-+
-+	mdelay(1000);
-+
-+	check_lpi_hits(expected);
-+}
-+
- int main(int argc, char **argv)
- {
- 	if (!gic_init()) {
-@@ -803,6 +943,14 @@ int main(int argc, char **argv)
- 		report_prefix_push(argv[1]);
- 		test_its_migration();
- 		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-pending-migration")) {
-+		report_prefix_push(argv[1]);
-+		test_its_pending_migration();
-+		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
-+		report_prefix_push(argv[1]);
-+		test_migrate_unmapped_collection();
-+		report_prefix_pop();
- 	} else if (strcmp(argv[1], "its-introspection") =3D=3D 0) {
- 		report_prefix_push(argv[1]);
- 		test_its_introspection();
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 29e2efc..911f0b7 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -145,7 +145,21 @@ file =3D gic.flat
- smp =3D $MAX_SMP
- accel =3D kvm
- extra_params =3D -machine gic-version=3D3 -append 'its-migration'
--groups =3D its migration
-+groups =3D migration
-+
-+[its-pending-migration]
-+file =3D gic.flat
-+smp =3D $MAX_SMP
-+accel =3D kvm
-+extra_params =3D -machine gic-version=3D3 -append 'its-pending-migration=
-'
-+groups =3D migration
-+
-+[its-migrate-unmapped-collection]
-+file =3D gic.flat
-+smp =3D $MAX_SMP
-+accel =3D kvm
-+extra_params =3D -machine gic-version=3D3 -append 'its-migrate-unmapped-=
-collection'
-+groups =3D migration
-=20
- # Test PSCI emulation
- [psci]
---=20
-2.20.1
+-- 
+Peter Xu
 
