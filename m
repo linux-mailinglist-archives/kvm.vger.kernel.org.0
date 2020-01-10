@@ -2,133 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F4B6136EE8
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 15:02:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1709C136F12
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 15:13:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbgAJOCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Jan 2020 09:02:52 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45910 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726387AbgAJOCv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Jan 2020 09:02:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578664970;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7Ks4jaOFI+hDvByk1zB8wXe4w+A95wWGsZALSmwo7SE=;
-        b=TqDfC1ugam15xa2FAlLxUHqgD3l84sgize7OBpwWcZ0F9SS6YBd9FyVtbDD5UsOi3iVute
-        iCxaa8RYYRiO5+Ma69rtD1yLngDbqttsUM8Fzvo7cx7H6uyFWBVJpt710pMmdOGMVIRUZJ
-        vz3EE9W3H/SQf/tvHdegwd0Zn21URyo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-gXCo2IavPOKzWQFXPWDP_w-1; Fri, 10 Jan 2020 09:02:47 -0500
-X-MC-Unique: gXCo2IavPOKzWQFXPWDP_w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FA7CDB22;
-        Fri, 10 Jan 2020 14:02:46 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ED05C86CCE;
-        Fri, 10 Jan 2020 14:02:42 +0000 (UTC)
-Date:   Fri, 10 Jan 2020 15:01:58 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, david@redhat.com
-Subject: Re: [PATCH] KVM: s390: Cleanup initial cpu reset
-Message-ID: <20200110150158.36ded698.cohuck@redhat.com>
-In-Reply-To: <20200110134824.37963-1-frankja@linux.ibm.com>
-References: <b01c38bf-5887-25d8-b787-271e5c2292e2@redhat.com>
-        <20200110134824.37963-1-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1727991AbgAJOM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Jan 2020 09:12:58 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:58092 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727181AbgAJOM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Jan 2020 09:12:57 -0500
+Received: from [5.158.153.52] (helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1ipv1w-0005OX-Jp; Fri, 10 Jan 2020 15:12:52 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 2EF6C105BE5; Fri, 10 Jan 2020 15:12:52 +0100 (CET)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Frederic Weisbecker <frederic@kernel.org>
+Subject: Re: [PATCH v2] sched/nohz: Optimize get_nohz_timer_target()
+In-Reply-To: <CANRm+Cw1eTNgB1r79J7U__ynio7pMSR4Xa35XuQuj-JKAQGxmg@mail.gmail.com>
+Date:   Fri, 10 Jan 2020 15:12:52 +0100
+Message-ID: <87a76v8knv.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Jan 2020 08:48:24 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Wanpeng,
 
-> The code seems to be quite old and uses lots of unneeded spaces for
-> alignment, which doesn't really help with readability.
-> 
-> Let's:
-> * Get rid of the extra spaces
-> * Remove the ULs as they are not needed on 0s
-> * Define constants for the CR 0 and 14 initial values
-> * Use the sizeof of the gcr array to memset it to 0
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
-> 
-> Something like this?
+Wanpeng Li <kernellwp@gmail.com> writes:
 
-+1, like.
+> Hi Thomas,
+> On Wed, 23 Oct 2019 at 16:29, Thomas Gleixner <tglx@linutronix.de> wrote:
+>>
+>> On Wed, 23 Oct 2019, Wanpeng Li wrote:
+>> > I didn't see your refactor to get_nohz_timer_target() which you
+>> > mentioned in IRC after four months, I can observe cyclictest drop from
+>> > 4~5us to 8us in kvm guest(we offload the lapic timer emulation to
+>> > housekeeping cpu to avoid timer fire external interrupt on the pCPU
+>> > which vCPU resident incur a vCPU vmexit) w/o this patch in the case of
+>> > there is no busy housekeeping cpu. The score can be recovered after I
+>> > give stress to create a busy housekeeping cpu.
+>> >
+>> > Could you consider applying this patch for temporary since I'm not
+>> > sure when the refactor can be ready.
+>>
+>> Yeah. It's delayed (again).... Will pick that up.
+>
+> I didn't find WIP tag for this work after ~half year since v4 was
+> posted https://lkml.org/lkml/2019/6/28/231 Could you apply this patch
+> for temporary because the completion time of refactor is not
+> deterministic.
 
-> Did I forget something?
-> 
-> ---
->  arch/s390/include/asm/kvm_host.h |  5 +++++
->  arch/s390/kvm/kvm-s390.c         | 18 +++++++-----------
->  2 files changed, 12 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 02f4c21c57f6..37747db884bd 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -122,6 +122,11 @@ struct mcck_volatile_info {
->  	__u32 reserved;
->  };
->  
-> +#define CR0_INITIAL (CR0_UNUSED_56 | CR0_INTERRUPT_KEY_SUBMASK | \
-> +		     CR0_MEASUREMENT_ALERT_SUBMASK)
-> +#define CR14_INITIAL (CR14_UNUSED_32 | CR14_UNUSED_33 | \
-> +		      CR14_EXTERNAL_DAMAGE_SUBMASK)
+Could you please repost it?
 
-Maybe CR<n>_INITIAL_MASK?
+Thanks,
 
-> +
->  #define CPUSTAT_STOPPED    0x80000000
->  #define CPUSTAT_WAIT       0x10000000
->  #define CPUSTAT_ECALL_PEND 0x08000000
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index d9e6bf3d54f0..c163311e7f3d 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2847,19 +2847,15 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
->  {
->  	/* this equals initial cpu reset in pop, but we don't switch to ESA */
-> -	vcpu->arch.sie_block->gpsw.mask = 0UL;
-> -	vcpu->arch.sie_block->gpsw.addr = 0UL;
-> +	vcpu->arch.sie_block->gpsw.mask = 0;
-> +	vcpu->arch.sie_block->gpsw.addr = 0;
->  	kvm_s390_set_prefix(vcpu, 0);
->  	kvm_s390_set_cpu_timer(vcpu, 0);
-> -	vcpu->arch.sie_block->ckc       = 0UL;
-> -	vcpu->arch.sie_block->todpr     = 0;
-> -	memset(vcpu->arch.sie_block->gcr, 0, 16 * sizeof(__u64));
-> -	vcpu->arch.sie_block->gcr[0]  = CR0_UNUSED_56 |
-> -					CR0_INTERRUPT_KEY_SUBMASK |
-> -					CR0_MEASUREMENT_ALERT_SUBMASK;
-> -	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
-> -					CR14_UNUSED_33 |
-> -					CR14_EXTERNAL_DAMAGE_SUBMASK;
-> +	vcpu->arch.sie_block->ckc = 0;
-> +	vcpu->arch.sie_block->todpr = 0;
-> +	memset(vcpu->arch.sie_block->gcr, 0, sizeof(vcpu->arch.sie_block->gcr));
-> +	vcpu->arch.sie_block->gcr[0] = CR0_INITIAL;
-> +	vcpu->arch.sie_block->gcr[14] = CR14_INITIAL;
->  	/* make sure the new fpc will be lazily loaded */
->  	save_fpu_regs();
->  	current->thread.fpu.fpc = 0;
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
+        tglx
