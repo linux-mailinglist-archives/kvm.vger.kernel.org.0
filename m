@@ -2,694 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D0AA1365CF
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 04:30:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EB88136611
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2020 05:18:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731005AbgAJDa2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Jan 2020 22:30:28 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44541 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730968AbgAJDa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Jan 2020 22:30:28 -0500
-Received: by mail-wr1-f67.google.com with SMTP id q10so382393wrm.11
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 19:30:24 -0800 (PST)
+        id S1731239AbgAJESy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Jan 2020 23:18:54 -0500
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:40379 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731105AbgAJESx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Jan 2020 23:18:53 -0500
+Received: by mail-pj1-f65.google.com with SMTP id bg7so423435pjb.5
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2020 20:18:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IBmFexq5hsZmCcDXb5pRyifIk0hSioVZ2k/p+73mz/k=;
-        b=jBF2NTBMv+sdXKnetGhGhYqASrohEgm9VExHHBSwbM+kq2XtyoyjzVdMlJv2jboygm
-         5Z9ytWeijQM7EL83oYxsg79pHMrdLO/HVf8d4NR5kJhdCR5ATebc9nNgZ5/v9C/n4iPh
-         HU9RwZb7q3S5vzItnWY6rx1C7h7dAc7BFdbdC9NFl0gYgeyQeirodfjJWoQ7KnsCx+TL
-         GShVwRRiH8+q6Ll5v1UUaSY/tZtcicWjUsvcxrvwLtmw3+kyQELFSbTxwDwo1I5+Gh7a
-         6AsicHdMnT1EmmsWb7330uqxfdly4lPeJlxKzyHI70JOZeCyxCqLWSE/QM1GTeaPJRPn
-         3NhA==
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Q6jVZnvPRYGBYGhE7TDM/MbfGG+eK0n6Cx4oFyCefbc=;
+        b=lDiHn01WaerE8wfZwdCmfGtwA04/CGAW9iQMa5EOvSFBLmtZfgmyJuxrIOO+nuYFH5
+         PP8cZJqfpQ3K8b/4InK6rI0YTAegx7SjUrQ1vSCOub+Xxop5D2hclXxA+BLm1z3T/QaD
+         nfWRSBzHpxvXFh32NRGSOB3z/tSUPGCvpVXX3P3lXC6lFnyAdjgRKZOzU2bgnSLOLltC
+         YBT1wLv6CWTn3VdPjgxppHp7IXCw2DsiumOfS9x0rRLuicaeISEu0pFcYFm9o7TMRuXA
+         qEEQKSWIu16nTNtsJTltU5JiMbyGj3Bu55nEiT+jza0yrwnFWtdco0z+YJEgIfn8BoJo
+         4Sfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IBmFexq5hsZmCcDXb5pRyifIk0hSioVZ2k/p+73mz/k=;
-        b=PgaFk0+Vip8AbnkWIZlQxRizGCHi/aSE696bBW1jLf8N/VS6B0hmH+jYk8fN2cI9v4
-         8VMReN28ZmwDYf2GqQxgRfRRj//4FI1SPljpFXJPDCWGi+NxoeyLYmD8ufarlsSQrms4
-         m9eYOYwi58luUV5bWu0eLlYkSWUeeelHfd419LIUZeCU4eMY7jWyaSttUG05dzNvgkil
-         BWRs6jATrzT8TwybjLxSZYQGHWxfN7SScyOA9Ms2SAULKZt42NTIS24wEg3lkMtqNOvf
-         vT+W9W+iE6zVfE5SeYV8ssNCwpWTCNYXW3RZ9gUnbuqeTfco9+MpUCnpnYujQ/Qu6Soh
-         pWkQ==
-X-Gm-Message-State: APjAAAXcW/Y+BelFepNoacli5EL1AdL/3TK7z/OMsd7HQUzZYD+ykgsn
-        JAFLHBh7bnIEGBzMFn/G3BssxsGlS4lX8mhCUHsqew==
-X-Google-Smtp-Source: APXvYqwmDYtnRA/vTcqfNSRNE/qc+BWJ1ohmZ4BOLfDWVAZ7pvHXd+6BtlqozKcXMxmrzXmrWQsvqeBOXWVVExoRpIo=
-X-Received: by 2002:a5d:4752:: with SMTP id o18mr810569wrs.330.1578627023334;
- Thu, 09 Jan 2020 19:30:23 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=Q6jVZnvPRYGBYGhE7TDM/MbfGG+eK0n6Cx4oFyCefbc=;
+        b=J88YJ6xciBiyDK9F1FTV6BBeuYY0OYEJj2G9UjeHe7uxSZBzCgvlfriSMTtG6ryeoA
+         AxrekKvmV5ur2aG+b0U8rb8cM4jS9nAz4ywvQelhknPG48YBjRdP2qtM2F1S86uA8G9M
+         wrdneoUqjMhKpG37fFvAu3y0C4BuuNvlHirPQHJ0Uizm1HVaUCy3M3AfTyWPLojDQtmH
+         GbNhigtXMKdYL3j2BxZUK0TF6pC28aYQ6nkXMeIB/Fr434ya0hhel7V0cw/fODNfJxEs
+         q77V65m0qweVRcc1iAzxHvMxOSq+h5x8oKfUgtdCh2PAY2rg/1p8zkPmOCOCtavIfELt
+         xuCw==
+X-Gm-Message-State: APjAAAW4ClBAccH9vhPhp4QCU9qU1thRrtgEwkWSXcOjbbOXPnNrXyOV
+        sSgJSgJlBhDmXqblb7nW663nGA==
+X-Google-Smtp-Source: APXvYqw9Ku7Hgb0SH2milCSum4sMjScfB1kw0USp18n3yMluUsx5wF+73tMY7KiES1+zzc9gFiumGw==
+X-Received: by 2002:a17:902:6b83:: with SMTP id p3mr1833383plk.284.1578629933019;
+        Thu, 09 Jan 2020 20:18:53 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id 65sm656852pfu.140.2020.01.09.20.18.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jan 2020 20:18:52 -0800 (PST)
+Subject: Re: [PATCH kernel RFC 0/4] powerpc/powenv/ioda: Allow huge DMA window
+ at 4GB
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>, kvm@vger.kernel.org,
+        Alistair Popple <alistair@popple.id.au>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Oliver O'Halloran <oohall@gmail.com>
+References: <20191202015953.127902-1-aik@ozlabs.ru>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <002b30d2-a9e4-da11-2423-b003288ce8f3@ozlabs.ru>
+Date:   Fri, 10 Jan 2020 15:18:48 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-References: <20191225025945.108466-1-anup.patel@wdc.com> <20191225025945.108466-3-anup.patel@wdc.com>
- <c655ed3a-151e-0450-3439-d913ff22f5b1@arm.com>
-In-Reply-To: <c655ed3a-151e-0450-3439-d913ff22f5b1@arm.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Fri, 10 Jan 2020 09:00:12 +0530
-Message-ID: <CAAhSdy1XuwQGg=o0c957YfbOL9BMgzXFY08fYt4NOdoo=3NTzQ@mail.gmail.com>
-Subject: Re: [kvmtool RFC PATCH 2/8] riscv: Initial skeletal support
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191202015953.127902-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 8, 2020 at 6:52 PM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
-> I don't know much about the RISC-V architecture, so I'm only going to comment on
-> the more generic code.
 
-Sure, no problem.
 
->
-> On 12/25/19 3:00 AM, Anup Patel wrote:
-> > This patch adds initial skeletal KVMTOOL RISC-V support which
-> > just compiles for RV32 and RV64 host.
-> >
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> > ---
-> >  INSTALL                             |   7 +-
-> >  Makefile                            |  15 +++-
-> >  riscv/include/asm/kvm.h             | 127 ++++++++++++++++++++++++++++
-> >  riscv/include/kvm/barrier.h         |  14 +++
-> >  riscv/include/kvm/fdt-arch.h        |   4 +
-> >  riscv/include/kvm/kvm-arch.h        |  58 +++++++++++++
-> >  riscv/include/kvm/kvm-config-arch.h |   9 ++
-> >  riscv/include/kvm/kvm-cpu-arch.h    |  49 +++++++++++
-> >  riscv/ioport.c                      |  11 +++
-> >  riscv/irq.c                         |  13 +++
-> >  riscv/kvm-cpu.c                     |  64 ++++++++++++++
-> >  riscv/kvm.c                         |  61 +++++++++++++
-> >  util/update_headers.sh              |   2 +-
-> >  13 files changed, 429 insertions(+), 5 deletions(-)
-> >  create mode 100644 riscv/include/asm/kvm.h
-> >  create mode 100644 riscv/include/kvm/barrier.h
-> >  create mode 100644 riscv/include/kvm/fdt-arch.h
-> >  create mode 100644 riscv/include/kvm/kvm-arch.h
-> >  create mode 100644 riscv/include/kvm/kvm-config-arch.h
-> >  create mode 100644 riscv/include/kvm/kvm-cpu-arch.h
-> >  create mode 100644 riscv/ioport.c
-> >  create mode 100644 riscv/irq.c
-> >  create mode 100644 riscv/kvm-cpu.c
-> >  create mode 100644 riscv/kvm.c
-> >
-> > diff --git a/INSTALL b/INSTALL
-> > index ca8e022..951b123 100644
-> > --- a/INSTALL
-> > +++ b/INSTALL
-> > @@ -26,8 +26,8 @@ For Fedora based systems:
-> >  For OpenSUSE based systems:
-> >       # zypper install glibc-devel-static
-> >
-> > -Architectures which require device tree (PowerPC, ARM, ARM64) also require
-> > -libfdt.
-> > +Architectures which require device tree (PowerPC, ARM, ARM64, RISC-V) also
-> > +require libfdt.
-> >       deb: $ sudo apt-get install libfdt-dev
-> >       Fedora: # yum install libfdt-devel
-> >       OpenSUSE: # zypper install libfdt1-devel
-> > @@ -64,6 +64,7 @@ to the Linux name of the architecture. Architectures supported:
-> >  - arm
-> >  - arm64
-> >  - mips
-> > +- riscv
-> >  If ARCH is not provided, the target architecture will be automatically
-> >  determined by running "uname -m" on your host, resulting in a native build.
-> >
-> > @@ -81,7 +82,7 @@ On multiarch system you should be able to install those be appending
-> >  the architecture name after the package (example for ARM64):
-> >  $ sudo apt-get install libfdt-dev:arm64
-> >
-> > -PowerPC and ARM/ARM64 require libfdt to be installed. If you cannot use
-> > +PowerPC, ARM/ARM64 and RISC-V require libfdt to be installed. If you cannot use
-> >  precompiled mulitarch packages, you could either copy the required header and
-> >  library files from an installed target system into the SYSROOT (you will need
-> >  /usr/include/*fdt*.h and /usr/lib64/libfdt-v.v.v.so and its symlinks), or you
-> > diff --git a/Makefile b/Makefile
-> > index 3862112..972fa63 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -106,7 +106,8 @@ OBJS      += hw/i8042.o
-> >
-> >  # Translate uname -m into ARCH string
-> >  ARCH ?= $(shell uname -m | sed -e s/i.86/i386/ -e s/ppc.*/powerpc/ \
-> > -       -e s/armv.*/arm/ -e s/aarch64.*/arm64/ -e s/mips64/mips/)
-> > +       -e s/armv.*/arm/ -e s/aarch64.*/arm64/ -e s/mips64/mips/ \
-> > +       -e s/riscv64/riscv/ -e s/riscv32/riscv/)
-> >
-> >  ifeq ($(ARCH),i386)
-> >       ARCH         := x86
-> > @@ -190,6 +191,18 @@ ifeq ($(ARCH),mips)
-> >       OBJS            += mips/kvm.o
-> >       OBJS            += mips/kvm-cpu.o
-> >  endif
-> > +
-> > +# RISC-V (RV32 and RV64)
-> > +ifeq ($(ARCH),riscv)
-> > +     DEFINES         += -DCONFIG_RISCV
-> > +     ARCH_INCLUDE    := riscv/include
-> > +     OBJS            += riscv/ioport.o
-> > +     OBJS            += riscv/irq.o
-> > +     OBJS            += riscv/kvm.o
-> > +     OBJS            += riscv/kvm-cpu.o
-> > +
-> > +     ARCH_WANT_LIBFDT := y
-> > +endif
-> >  ###
-> >
-> >  ifeq (,$(ARCH_INCLUDE))
-> > diff --git a/riscv/include/asm/kvm.h b/riscv/include/asm/kvm.h
-> > new file mode 100644
-> > index 0000000..f4274c2
-> > --- /dev/null
-> > +++ b/riscv/include/asm/kvm.h
-> > @@ -0,0 +1,127 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/*
-> > + * Copyright (C) 2019 Western Digital Corporation or its affiliates.
-> > + *
-> > + * Authors:
-> > + *     Anup Patel <anup.patel@wdc.com>
-> > + */
-> > +
-> > +#ifndef __LINUX_KVM_RISCV_H
-> > +#define __LINUX_KVM_RISCV_H
-> > +
-> > +#ifndef __ASSEMBLY__
-> > +
-> > +#include <linux/types.h>
-> > +#include <asm/ptrace.h>
-> > +
-> > +#define __KVM_HAVE_READONLY_MEM
-> > +
-> > +#define KVM_COALESCED_MMIO_PAGE_OFFSET 1
-> > +
-> > +#define KVM_INTERRUPT_SET    -1U
-> > +#define KVM_INTERRUPT_UNSET  -2U
-> > +
-> > +/* for KVM_GET_REGS and KVM_SET_REGS */
-> > +struct kvm_regs {
-> > +};
-> > +
-> > +/* for KVM_GET_FPU and KVM_SET_FPU */
-> > +struct kvm_fpu {
-> > +};
-> > +
-> > +/* KVM Debug exit structure */
-> > +struct kvm_debug_exit_arch {
-> > +};
-> > +
-> > +/* for KVM_SET_GUEST_DEBUG */
-> > +struct kvm_guest_debug_arch {
-> > +};
-> > +
-> > +/* definition of registers in kvm_run */
-> > +struct kvm_sync_regs {
-> > +};
-> > +
-> > +/* for KVM_GET_SREGS and KVM_SET_SREGS */
-> > +struct kvm_sregs {
-> > +};
-> > +
-> > +/* CONFIG registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-> > +struct kvm_riscv_config {
-> > +     unsigned long isa;
-> > +};
-> > +
-> > +/* CORE registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-> > +struct kvm_riscv_core {
-> > +     struct user_regs_struct regs;
-> > +     unsigned long mode;
-> > +};
-> > +
-> > +/* Possible privilege modes for kvm_riscv_core */
-> > +#define KVM_RISCV_MODE_S     1
-> > +#define KVM_RISCV_MODE_U     0
-> > +
-> > +/* CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-> > +struct kvm_riscv_csr {
-> > +     unsigned long sstatus;
-> > +     unsigned long sie;
-> > +     unsigned long stvec;
-> > +     unsigned long sscratch;
-> > +     unsigned long sepc;
-> > +     unsigned long scause;
-> > +     unsigned long stval;
-> > +     unsigned long sip;
-> > +     unsigned long satp;
-> > +};
-> > +
-> > +/* TIMER registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-> > +struct kvm_riscv_timer {
-> > +     u64 frequency;
-> > +     u64 time;
-> > +     u64 compare;
-> > +     u64 state;
-> > +};
-> > +
-> > +/* Possible states for kvm_riscv_timer */
-> > +#define KVM_RISCV_TIMER_STATE_OFF    0
-> > +#define KVM_RISCV_TIMER_STATE_ON     1
-> > +
-> > +#define KVM_REG_SIZE(id)             \
-> > +     (1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
-> > +
-> > +/* If you need to interpret the index values, here is the key: */
-> > +#define KVM_REG_RISCV_TYPE_MASK              0x00000000FF000000
-> > +#define KVM_REG_RISCV_TYPE_SHIFT     24
-> > +
-> > +/* Config registers are mapped as type 1 */
-> > +#define KVM_REG_RISCV_CONFIG         (0x01 << KVM_REG_RISCV_TYPE_SHIFT)
-> > +#define KVM_REG_RISCV_CONFIG_REG(name)       \
-> > +     (offsetof(struct kvm_riscv_config, name) / sizeof(unsigned long))
-> > +
-> > +/* Core registers are mapped as type 2 */
-> > +#define KVM_REG_RISCV_CORE           (0x02 << KVM_REG_RISCV_TYPE_SHIFT)
-> > +#define KVM_REG_RISCV_CORE_REG(name) \
-> > +             (offsetof(struct kvm_riscv_core, name) / sizeof(unsigned long))
-> > +
-> > +/* Control and status registers are mapped as type 3 */
-> > +#define KVM_REG_RISCV_CSR            (0x03 << KVM_REG_RISCV_TYPE_SHIFT)
-> > +#define KVM_REG_RISCV_CSR_REG(name)  \
-> > +             (offsetof(struct kvm_riscv_csr, name) / sizeof(unsigned long))
-> > +
-> > +/* Timer registers are mapped as type 4 */
-> > +#define KVM_REG_RISCV_TIMER          (0x04 << KVM_REG_RISCV_TYPE_SHIFT)
-> > +#define KVM_REG_RISCV_TIMER_REG(name)        \
-> > +             (offsetof(struct kvm_riscv_timer, name) / sizeof(u64))
-> > +
-> > +/* F extension registers are mapped as type 5 */
-> > +#define KVM_REG_RISCV_FP_F           (0x05 << KVM_REG_RISCV_TYPE_SHIFT)
-> > +#define KVM_REG_RISCV_FP_F_REG(name) \
-> > +             (offsetof(struct __riscv_f_ext_state, name) / sizeof(u32))
-> > +
-> > +/* D extension registers are mapped as type 6 */
-> > +#define KVM_REG_RISCV_FP_D           (0x06 << KVM_REG_RISCV_TYPE_SHIFT)
-> > +#define KVM_REG_RISCV_FP_D_REG(name) \
-> > +             (offsetof(struct __riscv_d_ext_state, name) / sizeof(u64))
-> > +
-> > +#endif
-> > +
-> > +#endif /* __LINUX_KVM_RISCV_H */
-> > diff --git a/riscv/include/kvm/barrier.h b/riscv/include/kvm/barrier.h
-> > new file mode 100644
-> > index 0000000..235f610
-> > --- /dev/null
-> > +++ b/riscv/include/kvm/barrier.h
-> > @@ -0,0 +1,14 @@
-> > +#ifndef KVM__KVM_BARRIER_H
-> > +#define KVM__KVM_BARRIER_H
-> > +
-> > +#define nop()                __asm__ __volatile__ ("nop")
-> > +
-> > +#define RISCV_FENCE(p, s) \
-> > +     __asm__ __volatile__ ("fence " #p "," #s : : : "memory")
-> > +
-> > +/* These barriers need to enforce ordering on both devices or memory. */
-> > +#define mb()         RISCV_FENCE(iorw,iorw)
-> > +#define rmb()                RISCV_FENCE(ir,ir)
-> > +#define wmb()                RISCV_FENCE(ow,ow)
-> > +
-> > +#endif /* KVM__KVM_BARRIER_H */
-> > diff --git a/riscv/include/kvm/fdt-arch.h b/riscv/include/kvm/fdt-arch.h
-> > new file mode 100644
-> > index 0000000..9450fc5
-> > --- /dev/null
-> > +++ b/riscv/include/kvm/fdt-arch.h
-> > @@ -0,0 +1,4 @@
-> > +#ifndef KVM__KVM_FDT_H
-> > +#define KVM__KVM_FDT_H
-> > +
-> > +#endif /* KVM__KVM_FDT_H */
-> > diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-> > new file mode 100644
-> > index 0000000..7e9c578
-> > --- /dev/null
-> > +++ b/riscv/include/kvm/kvm-arch.h
-> > @@ -0,0 +1,58 @@
-> > +#ifndef KVM__KVM_ARCH_H
-> > +#define KVM__KVM_ARCH_H
-> > +
-> > +#include <stdbool.h>
-> > +#include <linux/const.h>
-> > +#include <linux/types.h>
-> > +
-> > +#define RISCV_IOPORT         0x00000000ULL
-> > +#define RISCV_IOPORT_SIZE    0x00010000ULL
-> > +#define RISCV_PLIC           0x0c000000ULL
-> > +#define RISCV_PLIC_SIZE              0x04000000ULL
-> > +#define RISCV_MMIO           0x10000000ULL
-> > +#define RISCV_MMIO_SIZE              0x20000000ULL
-> > +#define RISCV_PCI            0x30000000ULL
-> > +#define RISCV_PCI_CFG_SIZE   0x10000000ULL
->
-> In the DTB you're advertising the PCI node as CAM compatible, which is the right
-> thing to do. Legacy PCI configuration space is 16MB, not 256MB (PCI Express is 256MB).
+On 02/12/2019 12:59, Alexey Kardashevskiy wrote:
+> Here is an attempt to support bigger DMA space for devices
+> supporting DMA masks less than 59 bits (GPUs come into mind
+> first). POWER9 PHBs have an option to map 2 windows at 0
+> and select a windows based on DMA address being below or above
+> 4GB.
+> 
+> This adds the "iommu=iommu_bypass" kernel parameter and
+> supports VFIO+pseries machine - current this requires telling
+> upstream+unmodified QEMU about this via
+> -global spapr-pci-host-bridge.dma64_win_addr=0x100000000
+> or per-phb property. 4/4 advertises the new option but
+> there is no automation around it in QEMU (should it be?).
+> 
+> For now it is either 1<<59 or 4GB mode; dynamic switching is
+> not supported (could be via sysfs).
+> 
+> This is based on sha1
+> a6ed68d6468b Linus Torvalds "Merge tag 'drm-next-2019-11-27' of git://anongit.freedesktop.org/drm/drm".
+> 
+> Please comment. Thanks.
 
-I was confused here so I did what was done for ARM. I will check with other
-architectures and update like you suggested.
 
->
-> > +#define RISCV_PCI_SIZE               0x50000000ULL
-> > +#define RISCV_PCI_MMIO_SIZE  (RISCV_PCI_SIZE - RISCV_PCI_CFG_SIZE)
-> > +
-> > +#define RISCV_RAM            0x80000000ULL
->
-> I'm not sure about the reasons for choosing RAM to start at 2GB. For arm we do the
-> same, but qemu starts memory at 1GB and this mismatch has caused some issues in
-> the past. For example, 32 bit kvm-unit-tests currently do not run under kvmtool
-> because the text address is hardcoded to the qemu default value.
+David, Alistair, ping? Thanks,
 
-Actually in RISC-V world, it is kind of a un-documented standard that
-RAM starts at
-2GB (0x80000000) for both RV32 and RV64. This is true for all existing HW,
-QEMU RISC-V virt machine and here. This will be soon explicitly documented in
-RISC-V Unix platform spec.
 
->
-> As a more general observation, I know that other architectures (like arm) declare
-> the memory layout in hexadecimal numbers, but it might be a better idea to use the
-> sizes from include/linux/sizes.h, since it makes the memory layout a lot more
-> readable and mistakes are easier to spot.
+> 
+> 
+> 
+> Alexey Kardashevskiy (4):
+>   powerpc/powernv/ioda: Rework for huge DMA window at 4GB
+>   powerpc/powernv/ioda: Allow smaller TCE table levels
+>   powerpc/powernv/phb4: Add 4GB IOMMU bypass mode
+>   vfio/spapr_tce: Advertise and allow a huge DMA windows at 4GB
+> 
+>  arch/powerpc/include/asm/iommu.h              |   1 +
+>  arch/powerpc/include/asm/opal-api.h           |  11 +-
+>  arch/powerpc/include/asm/opal.h               |   2 +
+>  arch/powerpc/platforms/powernv/pci.h          |   1 +
+>  include/uapi/linux/vfio.h                     |   2 +
+>  arch/powerpc/platforms/powernv/opal-call.c    |   2 +
+>  arch/powerpc/platforms/powernv/pci-ioda-tce.c |   4 +-
+>  arch/powerpc/platforms/powernv/pci-ioda.c     | 219 ++++++++++++++----
+>  drivers/vfio/vfio_iommu_spapr_tce.c           |  10 +-
+>  9 files changed, 202 insertions(+), 50 deletions(-)
+> 
 
-Sure, I will try to use linux/sizes.h in next patch version.
-
->
-> > +
-> > +#define RISCV_LOMAP_MAX_MEMORY       ((1ULL << 32) - RISCV_RAM)
-> > +#define RISCV_HIMAP_MAX_MEMORY       ((1ULL << 40) - RISCV_RAM)
-> > +
-> > +#if __riscv_xlen == 64
-> > +#define RISCV_MAX_MEMORY(kvm)        RISCV_HIMAP_MAX_MEMORY
-> > +#elif __riscv_xlen == 32
-> > +#define RISCV_MAX_MEMORY(kvm)        RISCV_LOMAP_MAX_MEMORY
-> > +#endif
-> > +
-> > +#define KVM_IOPORT_AREA              RISCV_IOPORT
-> > +#define KVM_PCI_CFG_AREA     RISCV_PCI
-> > +#define KVM_PCI_MMIO_AREA    (KVM_PCI_CFG_AREA + RISCV_PCI_CFG_SIZE)
-> > +#define KVM_VIRTIO_MMIO_AREA RISCV_MMIO
-> > +
-> > +#define KVM_IOEVENTFD_HAS_PIO        0
-> > +
-> > +#define KVM_IRQ_OFFSET               0
-> > +
-> > +#define KVM_VM_TYPE          0
-> > +
-> > +#define VIRTIO_DEFAULT_TRANS(kvm)    VIRTIO_MMIO
-> > +
-> > +#define VIRTIO_RING_ENDIAN   VIRTIO_ENDIAN_LE
-> > +
-> > +struct kvm;
-> > +
-> > +struct kvm_arch {
-> > +};
-> > +
-> > +static inline bool riscv_addr_in_ioport_region(u64 phys_addr)
-> > +{
-> > +     u64 limit = KVM_IOPORT_AREA + RISCV_IOPORT_SIZE;
-> > +     return phys_addr >= KVM_IOPORT_AREA && phys_addr < limit;
-> > +}
-> > +
-> > +enum irq_type;
-> > +
-> > +#endif /* KVM__KVM_ARCH_H */
-> > diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-> > new file mode 100644
-> > index 0000000..60c7333
-> > --- /dev/null
-> > +++ b/riscv/include/kvm/kvm-config-arch.h
-> > @@ -0,0 +1,9 @@
-> > +#ifndef KVM__KVM_CONFIG_ARCH_H
-> > +#define KVM__KVM_CONFIG_ARCH_H
-> > +
-> > +#include "kvm/parse-options.h"
-> > +
-> > +struct kvm_config_arch {
-> > +};
-> > +
-> > +#endif /* KVM__KVM_CONFIG_ARCH_H */
-> > diff --git a/riscv/include/kvm/kvm-cpu-arch.h b/riscv/include/kvm/kvm-cpu-arch.h
-> > new file mode 100644
-> > index 0000000..09a50e8
-> > --- /dev/null
-> > +++ b/riscv/include/kvm/kvm-cpu-arch.h
-> > @@ -0,0 +1,49 @@
-> > +#ifndef KVM__KVM_CPU_ARCH_H
-> > +#define KVM__KVM_CPU_ARCH_H
-> > +
-> > +#include <linux/kvm.h>
-> > +#include <pthread.h>
-> > +#include <stdbool.h>
-> > +
-> > +#include "kvm/kvm.h"
-> > +
-> > +struct kvm;
->
-> Shouldn't kvm.h already have a definition for struct kvm? Also, the arm
-> corresponding header doesn't have the include here, I don't think it's needed
-> (unless I'm missing something).
-
-Sure, I will drop this forward declaration here.
-
-Regards,
-Anup
-
->
-> Thanks,
-> Alex
-> > +
-> > +struct kvm_cpu {
-> > +     pthread_t       thread;
-> > +
-> > +     unsigned long   cpu_id;
-> > +
-> > +     struct kvm      *kvm;
-> > +     int             vcpu_fd;
-> > +     struct kvm_run  *kvm_run;
-> > +     struct kvm_cpu_task     *task;
-> > +
-> > +     u8              is_running;
-> > +     u8              paused;
-> > +     u8              needs_nmi;
-> > +
-> > +     struct kvm_coalesced_mmio_ring  *ring;
-> > +};
-> > +
-> > +static inline bool kvm_cpu__emulate_io(struct kvm_cpu *vcpu, u16 port,
-> > +                                    void *data, int direction,
-> > +                                    int size, u32 count)
-> > +{
-> > +     return false;
-> > +}
-> > +
-> > +static inline bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr,
-> > +                                      u8 *data, u32 len, u8 is_write)
-> > +{
-> > +     if (riscv_addr_in_ioport_region(phys_addr)) {
-> > +             int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
-> > +             u16 port = (phys_addr - KVM_IOPORT_AREA) & USHRT_MAX;
-> > +
-> > +             return kvm__emulate_io(vcpu, port, data, direction, len, 1);
-> > +     }
-> > +
-> > +     return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
-> > +}
-> > +
-> > +#endif /* KVM__KVM_CPU_ARCH_H */
-> > diff --git a/riscv/ioport.c b/riscv/ioport.c
-> > new file mode 100644
-> > index 0000000..bdd30b6
-> > --- /dev/null
-> > +++ b/riscv/ioport.c
-> > @@ -0,0 +1,11 @@
-> > +#include "kvm/ioport.h"
-> > +#include "kvm/irq.h"
-> > +
-> > +void ioport__setup_arch(struct kvm *kvm)
-> > +{
-> > +}
-> > +
-> > +void ioport__map_irq(u8 *irq)
-> > +{
-> > +     *irq = irq__alloc_line();
-> > +}
-> > diff --git a/riscv/irq.c b/riscv/irq.c
-> > new file mode 100644
-> > index 0000000..8e605ef
-> > --- /dev/null
-> > +++ b/riscv/irq.c
-> > @@ -0,0 +1,13 @@
-> > +#include "kvm/kvm.h"
-> > +#include "kvm/kvm-cpu.h"
-> > +#include "kvm/irq.h"
-> > +
-> > +void kvm__irq_line(struct kvm *kvm, int irq, int level)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +void kvm__irq_trigger(struct kvm *kvm, int irq)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
-> > new file mode 100644
-> > index 0000000..e4b8fa5
-> > --- /dev/null
-> > +++ b/riscv/kvm-cpu.c
-> > @@ -0,0 +1,64 @@
-> > +#include "kvm/kvm-cpu.h"
-> > +#include "kvm/kvm.h"
-> > +#include "kvm/virtio.h"
-> > +#include "kvm/term.h"
-> > +
-> > +#include <asm/ptrace.h>
-> > +
-> > +static int debug_fd;
-> > +
-> > +void kvm_cpu__set_debug_fd(int fd)
-> > +{
-> > +     debug_fd = fd;
-> > +}
-> > +
-> > +int kvm_cpu__get_debug_fd(void)
-> > +{
-> > +     return debug_fd;
-> > +}
-> > +
-> > +struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
-> > +{
-> > +     /* TODO: */
-> > +     return NULL;
-> > +}
-> > +
-> > +void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
-> > +{
-> > +}
-> > +
-> > +void kvm_cpu__delete(struct kvm_cpu *vcpu)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
-> > +{
-> > +     /* TODO: */
-> > +     return false;
-> > +}
-> > +
-> > +void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
-> > +{
-> > +     return VIRTIO_ENDIAN_LE;
-> > +}
-> > +
-> > +void kvm_cpu__show_code(struct kvm_cpu *vcpu)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > diff --git a/riscv/kvm.c b/riscv/kvm.c
-> > new file mode 100644
-> > index 0000000..e816ef5
-> > --- /dev/null
-> > +++ b/riscv/kvm.c
-> > @@ -0,0 +1,61 @@
-> > +#include "kvm/kvm.h"
-> > +#include "kvm/util.h"
-> > +#include "kvm/fdt.h"
-> > +
-> > +#include <linux/kernel.h>
-> > +#include <linux/kvm.h>
-> > +#include <linux/sizes.h>
-> > +
-> > +struct kvm_ext kvm_req_ext[] = {
-> > +     { DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
-> > +     { 0, 0 },
-> > +};
-> > +
-> > +bool kvm__arch_cpu_supports_vm(void)
-> > +{
-> > +     /* The KVM capability check is enough. */
-> > +     return true;
-> > +}
-> > +
-> > +void kvm__init_ram(struct kvm *kvm)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +void kvm__arch_delete_ram(struct kvm *kvm)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +void kvm__arch_read_term(struct kvm *kvm)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +void kvm__arch_set_cmdline(char *cmdline, bool video)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
-> > +{
-> > +     /* TODO: */
-> > +}
-> > +
-> > +bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
-> > +                              const char *kernel_cmdline)
-> > +{
-> > +     /* TODO: */
-> > +     return true;
-> > +}
-> > +
-> > +bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
-> > +{
-> > +     /* TODO: Firmware loading to be supported later. */
-> > +     return false;
-> > +}
-> > +
-> > +int kvm__arch_setup_firmware(struct kvm *kvm)
-> > +{
-> > +     return 0;
-> > +}
-> > diff --git a/util/update_headers.sh b/util/update_headers.sh
-> > index bf87ef6..78eba1f 100755
-> > --- a/util/update_headers.sh
-> > +++ b/util/update_headers.sh
-> > @@ -36,7 +36,7 @@ copy_optional_arch () {
-> >       fi
-> >  }
-> >
-> > -for arch in arm arm64 mips powerpc x86
-> > +for arch in arm arm64 mips powerpc riscv x86
-> >  do
-> >       case "$arch" in
-> >               arm) KVMTOOL_PATH=arm/aarch32 ;;
+-- 
+Alexey
