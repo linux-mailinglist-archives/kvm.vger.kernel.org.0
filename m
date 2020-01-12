@@ -2,52 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 647A71385B3
+	by mail.lfdr.de (Postfix) with ESMTP id D6E791385B4
 	for <lists+kvm@lfdr.de>; Sun, 12 Jan 2020 10:47:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732534AbgALJpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Jan 2020 04:45:10 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:35229 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732531AbgALJpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Jan 2020 04:45:09 -0500
-Received: by mail-lf1-f66.google.com with SMTP id 15so4727460lfr.2
-        for <kvm@vger.kernel.org>; Sun, 12 Jan 2020 01:45:08 -0800 (PST)
+        id S1732465AbgALJrf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Jan 2020 04:47:35 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:43405 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732374AbgALJrf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Jan 2020 04:47:35 -0500
+Received: by mail-lj1-f195.google.com with SMTP id a13so6714878ljm.10
+        for <kvm@vger.kernel.org>; Sun, 12 Jan 2020 01:47:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=mvEyv8WsHK+y4lyiLI8T8Cwz0UxNsAP1n8oZu5GDpas=;
-        b=EsExOqT+WaKoepgqT7oBU0FbwwVcObGIbJj0xCQa354MC9I0rlak12h/IOaCdVNjOM
-         TS9B4peK4Wy1n3LNE7VUeZeAiNxuJMTDtOlZkmLlTMxebjdYlkuArnnwDHlyNP/IgbIY
-         NE+3m9HIEl6y3exSWSEKN+obmsDn4n6eauER6SWszp2tmiqxez40m7fCaai4EScYBfzI
-         CzshAOOXWob9ahNuiw+zOgiUw5FULJnXuY+LvF6XF9nIkmJCenbXBL9D1p8t4YMmXDdC
-         hm93ccuX8jC1DQoRT3nOGwRFAxnKTMb6OsT7WPYMCJ9Rrtsmll0xv1zh+fKXXf/vNghk
-         2iwg==
+        bh=RDLnJ4qJFqQy+U2F1GzxeKsnp0OT/5UfLwjGUAO8yps=;
+        b=mngArEu9hEfT+he2g+EY39i8voXyGMVQyKHnLGrN07fzeQ1oIjuJ/uT0rE67m9W0b5
+         1B+ijvVUx/OhDdfb1W5aANqY0iG9CNXuRz5sR70kDZgbkmqHKEvaUX6gG7DOJe7HCqWk
+         EPl5PVbwgppO8o6+HhV+afhC2eeefiQdrYMxKIubn0AMyt94q4JklFzFY6iBJLZim+q+
+         lxQrbiWgNHaYT0sE8GOwUkn4je2IxgK4CHpN4LnMvnGDDZvsGKRwVruyume7Vt7D2r89
+         Tj9Cg4v2YHHE1KOUEZv6+irkvJCrwZwUBUmMEhDodr++MSsyQSgwpySIIGmBs5M8ZBjE
+         PtqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=mvEyv8WsHK+y4lyiLI8T8Cwz0UxNsAP1n8oZu5GDpas=;
-        b=W8x2KeZaVs+B50+ZOFghQqrqBaf/YQ8toV8QKWbvV61tNcgSnNsjfx2gUu7OjY0hWb
-         3H1NxhoePFZmmr6vAtoOpk5B3axXyz/vavkwejO3waeb/bPeuPe2JiGICRQXatp7EZzx
-         X/XRTuShhnmdIinZK11/KWv+Iq85igQK9NeZsg68l4oo8BJHHHdIirHKlPe1RSDnbZyL
-         XYlsJWrwfdfAY/vHN3m3lPdkJMad0s3AWv69n+skmcA7F3hMjuc3ovVq1ndjKxepDF1d
-         IKP0OWBjzzU24Jvhx+ZcLuDT/xPuepqh2YohnLb7xrQo7T69FR8J9KUT0uwHhV6iAlPs
-         KMQg==
-X-Gm-Message-State: APjAAAW39C1r1RIDpm9xsnXUvgCqX4b0YgggPxeQy4jOGonWtbnvqKBh
-        wM4sG9GeYr2B0HgqRBsvsk4byQ14+w3eUk5J+wQ=
-X-Google-Smtp-Source: APXvYqxBsmT3/S/ksEIf8xngcs0t6C+b9DJlHarA6JCrshF+M3Qvub4y4aPAefRQPsUZqr5EcjM401Rlfz38uhniS/w=
-X-Received: by 2002:ac2:5498:: with SMTP id t24mr7132155lfk.84.1578822307837;
- Sun, 12 Jan 2020 01:45:07 -0800 (PST)
+        bh=RDLnJ4qJFqQy+U2F1GzxeKsnp0OT/5UfLwjGUAO8yps=;
+        b=ekEJe0kDsnTPJoJ50Wr6oMcdZnvTPeHpKKhUPEhfr3NW5wsyQf5O5m0p8O28pW7abC
+         UzIDPfsMzO+jwIdyhUFoGE4qsai7buIZWzh6CQN+yUy9xi94bkZzE9mAhu/SSSGJfV+1
+         bodn/bEmXOffo0ybIoqtOlAiSj4nPSVifFhTIp1fiNTGLLbS/mgPtx4zs6IAjrWR4tYj
+         pqZxCuqcLVNJ3ccepEn8yWJjmgoIo1xzhK+mm4J66n2rcSI2HRkqBVGXXPz+qxkA50Y4
+         Jr9kmhi7SyfAMiO/kyZHGo22rkhcWSfgp0ZjFk+FBxxgzsnCzzLjNAjnoe6cUkUGaQqS
+         YkDg==
+X-Gm-Message-State: APjAAAVBABEG5Id9B11DoWdq5A6qmEwRf96sF4nQg/1reEQFxc1G0sOd
+        qfb7hdj+PyP2x+4Y0fTov5SJ9YkusJ2nYV0LfcY=
+X-Google-Smtp-Source: APXvYqzvRwD0wTNL3ge0fIaHzVy8ssKZyDWXWui59E3SmT+L+JPpV/KxHTsDtelWxlfc754pdzRavhGgWEDG2TwsVLU=
+X-Received: by 2002:a2e:9a51:: with SMTP id k17mr7529135ljj.206.1578822453192;
+ Sun, 12 Jan 2020 01:47:33 -0800 (PST)
 MIME-Version: 1.0
-References: <20200109152133.23649-1-philmd@redhat.com> <20200109152133.23649-8-philmd@redhat.com>
-In-Reply-To: <20200109152133.23649-8-philmd@redhat.com>
+References: <20200109152133.23649-1-philmd@redhat.com> <20200109152133.23649-9-philmd@redhat.com>
+In-Reply-To: <20200109152133.23649-9-philmd@redhat.com>
 From:   Alistair Francis <alistair23@gmail.com>
-Date:   Sun, 12 Jan 2020 17:44:40 +0800
-Message-ID: <CAKmqyKNbbkBeoVTfvyLt_krei-nCP_sGY_70GSiLFrQVOdd1Ag@mail.gmail.com>
-Subject: Re: [PATCH 07/15] hw/core/machine-qmp-cmds: Replace current_machine
- by qdev_get_machine()
+Date:   Sun, 12 Jan 2020 17:47:04 +0800
+Message-ID: <CAKmqyKMbgEhs8teVezJRYRidC4oQ-Ucq7_PXqcf9nj0taxBPdA@mail.gmail.com>
+Subject: Re: [PATCH 08/15] target/arm/monitor: Replace current_machine by qdev_get_machine()
 To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
         Peter Maydell <peter.maydell@linaro.org>,
@@ -69,12 +68,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 9, 2020 at 11:30 PM Philippe Mathieu-Daud=C3=A9
+On Thu, Jan 9, 2020 at 11:23 PM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
 > As we want to remove the global current_machine,
-> replace MACHINE_GET_CLASS(current_machine) by
-> MACHINE_GET_CLASS(qdev_get_machine()).
+> replace 'current_machine' by MACHINE(qdev_get_machine()).
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -83,25 +81,24 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/core/machine-qmp-cmds.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  target/arm/monitor.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
-> index eed5aeb2f7..5a04d00e4f 100644
-> --- a/hw/core/machine-qmp-cmds.c
-> +++ b/hw/core/machine-qmp-cmds.c
-> @@ -280,9 +280,9 @@ void qmp_cpu_add(int64_t id, Error **errp)
->  {
->      MachineClass *mc;
->
-> -    mc =3D MACHINE_GET_CLASS(current_machine);
-> +    mc =3D MACHINE_GET_CLASS(qdev_get_machine());
->      if (mc->hot_add_cpu) {
-> -        mc->hot_add_cpu(current_machine, id, errp);
-> +        mc->hot_add_cpu(MACHINE(qdev_get_machine()), id, errp);
->      } else {
->          error_setg(errp, "Not supported");
+> diff --git a/target/arm/monitor.c b/target/arm/monitor.c
+> index fa054f8a36..bcbf69802d 100644
+> --- a/target/arm/monitor.c
+> +++ b/target/arm/monitor.c
+> @@ -136,7 +136,8 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(=
+CpuModelExpansionType type,
 >      }
+>
+>      if (kvm_enabled()) {
+> -        const char *cpu_type =3D current_machine->cpu_type;
+> +        MachineState *ms =3D MACHINE(qdev_get_machine());
+> +        const char *cpu_type =3D ms->cpu_type;
+>          int len =3D strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
+>          bool supported =3D false;
+>
 > --
 > 2.21.1
 >
