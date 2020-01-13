@@ -2,184 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ACE9138F6B
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 11:42:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3751C138F72
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 11:43:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727014AbgAMKm0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 05:42:26 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21556 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726480AbgAMKm0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Jan 2020 05:42:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578912145;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=CdvxgYiMcPvvUk1BAfcNGDGtlaSwAq+byDgT1mNB4A8=;
-        b=f1u/kQ2DvkfMQAzq48SAPdsbPLgaA1eNd2pmslkOcDveWfLh91T8exUxfruwtpA9BaBD72
-        ls5GkAtxQeRUNZDKm3Dq5a/A3ejWifT8moePlYhEPqyJcFroHWFW7m4WVSwpClY3WGg60D
-        XLmYGkNf1ioc0yNaTH6NWV8mk4ndAc4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-CwaX1MElODGDfwio717J9A-1; Mon, 13 Jan 2020 05:42:21 -0500
-X-MC-Unique: CwaX1MElODGDfwio717J9A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2956218A2FF8;
-        Mon, 13 Jan 2020 10:42:20 +0000 (UTC)
-Received: from [10.36.117.201] (ovpn-117-201.ams2.redhat.com [10.36.117.201])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C730D60BE2;
-        Mon, 13 Jan 2020 10:42:18 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v7 3/4] s390x: lib: add SPX and STPX
- instruction wrapper
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-References: <20200110184050.191506-1-imbrenda@linux.ibm.com>
- <20200110184050.191506-4-imbrenda@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <81301db1-7fd1-c3ef-ded6-fd682fc24af9@redhat.com>
-Date:   Mon, 13 Jan 2020 11:42:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+        id S1728688AbgAMKn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 05:43:27 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:49794 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726127AbgAMKn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jan 2020 05:43:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=4Ui4G/63QoKUZjvMxF9EJYkI/mkrELqU9EkyXbiVp7c=; b=oNReL/5fHv4q5CIDS90mS2PoL
+        0peoh4gfvE2E6UFhJWpnJdDF3Vt1cz25k7qtz8pUHE8r70A45XrE+w7jNrpZyTmfKWEAzkYJq8LLT
+        yzgXw7VvGVN1NUR2VVJgXBCA/EzUgS3Q1sNbfHBevMhzU0kspAsYAPOoTvkY7wWtBq3wpCq7wtAXy
+        InyWVplaJrC935gDK0uDpIUcyZhD/VBnEKtMc06L1Mb4MQV4RyJLSgPZxHA9XWs5nP8TQAiiKY4Jo
+        s0X1mpV/D/j8uMbwIFx6zwtgEChqtGkvOA5n2+JFV2n99HK+UDN2HfOLjljAxmUc52MXKUwv4CD0p
+        S57qSrajg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iqxBm-0008LU-0A; Mon, 13 Jan 2020 10:43:18 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A50DB304123;
+        Mon, 13 Jan 2020 11:41:39 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id E4E3C2B66D538; Mon, 13 Jan 2020 11:43:14 +0100 (CET)
+Date:   Mon, 13 Jan 2020 11:43:14 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        KarimAllah <karahmed@amazon.de>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        christopher.s.hall@intel.com, hubert.chrzaniuk@intel.com,
+        len.brown@intel.com, thomas.lendacky@amd.com, rjw@rjwysocki.net
+Subject: Re: [PATCH RFC] sched/fair: Penalty the cfs task which executes
+ mwait/hlt
+Message-ID: <20200113104314.GU2844@hirez.programming.kicks-ass.net>
+References: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
+ <20200108155040.GB2827@hirez.programming.kicks-ass.net>
+ <00d884a7-d463-74b4-82cf-9deb0aa70971@redhat.com>
+ <CANRm+Cx0LMK1b2mJiU7edCDoRfPfGLzY1Zqr5paBEPcWFFALhQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200110184050.191506-4-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANRm+Cx0LMK1b2mJiU7edCDoRfPfGLzY1Zqr5paBEPcWFFALhQ@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10.01.20 19:40, Claudio Imbrenda wrote:
-> Add a wrapper for the SET PREFIX and STORE PREFIX instructions, and
-> use it instead of using inline assembly.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  lib/s390x/asm/arch_def.h | 13 +++++++++++++
->  s390x/intercept.c        | 23 ++++++++---------------
->  2 files changed, 21 insertions(+), 15 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 1a5e3c6..15a4d49 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -284,4 +284,17 @@ static inline int servc(uint32_t command, unsigned long sccb)
->  	return cc;
->  }
->  
-> +static inline void set_prefix(uint32_t new_prefix)
-> +{
-> +	asm volatile("	spx %0" : : "Q" (new_prefix) : "memory");
-> +}
-> +
-> +static inline uint32_t get_prefix(void)
-> +{
-> +	uint32_t current_prefix;
-> +
-> +	asm volatile("	stpx %0" : "=Q" (current_prefix));
-> +	return current_prefix;
-> +}
-> +
->  #endif
-> diff --git a/s390x/intercept.c b/s390x/intercept.c
-> index 3696e33..cd96121 100644
-> --- a/s390x/intercept.c
-> +++ b/s390x/intercept.c
-> @@ -26,13 +26,10 @@ static void test_stpx(void)
->  	uint32_t new_prefix = (uint32_t)(intptr_t)pagebuf;
->  
->  	/* Can we successfully change the prefix? */
-> -	asm volatile (
-> -		" stpx	%0\n"
-> -		" spx	%2\n"
-> -		" stpx	%1\n"
-> -		" spx	%0\n"
-> -		: "+Q"(old_prefix), "+Q"(tst_prefix)
-> -		: "Q"(new_prefix));
-> +	old_prefix = get_prefix();
-> +	set_prefix(new_prefix);
-> +	tst_prefix = get_prefix();
-> +	set_prefix(old_prefix);
->  	report(old_prefix == 0 && tst_prefix == new_prefix, "store prefix");
->  
->  	expect_pgm_int();
-> @@ -63,14 +60,10 @@ static void test_spx(void)
->  	 * some facility bits there ... at least some of them should be
->  	 * set in our buffer afterwards.
->  	 */
-> -	asm volatile (
-> -		" stpx	%0\n"
-> -		" spx	%1\n"
-> -		" stfl	0\n"
-> -		" spx	%0\n"
-> -		: "+Q"(old_prefix)
-> -		: "Q"(new_prefix)
-> -		: "memory");
-> +	old_prefix = get_prefix();
-> +	set_prefix(new_prefix);
-> +	asm volatile("	stfl 0" : : : "memory");
-> +	set_prefix(old_prefix);
->  	report(pagebuf[GEN_LC_STFL] != 0, "stfl to new prefix");
->  
->  	expect_pgm_int();
-> 
 
-Besides the comments from Janosch, looks good to me.
+Preserved most (+- edits) for the people added to Cc.
 
--- 
-Thanks,
+On Thu, Jan 09, 2020 at 07:53:51PM +0800, Wanpeng Li wrote:
+> On Thu, 9 Jan 2020 at 01:15, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > On 08/01/20 16:50, Peter Zijlstra wrote:
+> > > On Wed, Jan 08, 2020 at 09:50:01AM +0800, Wanpeng Li wrote:
+> > >> From: Wanpeng Li <wanpengli@tencent.com>
+> > >>
+> > >> To deliver all of the resources of a server to instances in cloud, there are no
+> > >> housekeeping cpus reserved. libvirtd, qemu main loop, kthreads, and other agent/tools
+> > >> etc which can't be offloaded to other hardware like smart nic, these stuff will
+> > >> contend with vCPUs even if MWAIT/HLT instructions executed in the guest.
+> >
+> > ^^ this is the problem statement:
+> >
+> > He has VCPU threads which are being pinned 1:1 to physical CPUs.  He
+> > needs to have various housekeeping threads preempting those vCPU
+> > threads, but he'd rather preempt vCPU threads that are doing HLT/MWAIT
+> > than those that are keeping the CPU busy.
+> >
+> > >> The is no trap and yield the pCPU after we expose mwait/hlt to the guest [1][2],
+> > >> the top command on host still observe 100% cpu utilization since qemu process is
+> > >> running even though guest who has the power management capability executes mwait.
+> > >> Actually we can observe the physical cpu has already enter deeper cstate by
+> > >> powertop on host.
+> > >>
+> > >> For virtualization, there is a HLT activity state in CPU VMCS field which indicates
+> > >> the logical processor is inactive because it executed the HLT instruction, but
+> > >> SDM 24.4.2 mentioned that execution of the MWAIT instruction may put a logical
+> > >> processor into an inactive state, however, this VMCS field never reflects this
+> > >> state.
+> > >
+> > > So far I think I can follow, however it does not explain who consumes
+> > > this VMCS state if it is set and how that helps. Also, this:
+> >
+> > I think what Wanpeng was saying is: "KVM could gather this information
+> > using the activity state field in the VMCS.  However, when the guest
+> > does MWAIT the processor can go into an inactive state without updating
+> > the VMCS."  Hence looking at the APERFMPERF ratio.
+> >
+> > >> This patch avoids fine granularity intercept and reschedule vCPU if MWAIT/HLT
+> > >> instructions executed, because it can worse the message-passing workloads which
+> > >> will switch between idle and running frequently in the guest. Lets penalty the
+> > >> vCPU which is long idle through tick-based sampling and preemption.
+> > >
+> > > is just complete gibberish. And I have no idea what problem you're
+> > > trying to solve how.
+> >
+> > This is just explaining why MWAIT and HLT is not being trapped in his
+> > setup.  (Because vmexit on HLT or MWAIT is awfully expensive).
+> >
+> > > Also, I don't think the TSC/MPERF ratio is architected, we can't assume
+> > > this is true for everything that has APERFMPERF.
+> >
+> > Right, you have to look at APERF/MPERF, not TSC/MPERF.
 
-David / dhildenb
+> Peterz, do you have nicer solution for this?
 
+So as you might've seen, we're going to go read the APERF/MPERF thingies
+in the tick anyway:
+
+  https://lkml.kernel.org/r/20191002122926.385-1-ggherdovich@suse.cz
+
+(your proposed patch even copied some naming off of that, so I'm
+assuming you've actually seen that)
+
+So the very first thing we need to get sorted is that MPERF/TSC ratio
+thing. TurboStat does it, but has 'funny' hacks on like:
+
+  b2b34dfe4d9a ("tools/power turbostat: KNL workaround for %Busy and Avg_MHz")
+
+and I imagine that there's going to be more exceptions there. You're
+basically going to have to get both Intel and AMD to commit to this.
+
+IFF we can get concensus on MPERF/TSC, then yes, that is a reasonable
+way to detect a VCPU being idle I suppose. I've added a bunch of people
+who seem to know about this.
+
+Anyone, what will it take to get MPERF/TSC 'working' ?
