@@ -2,94 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CA688138940
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 02:32:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A03C21389B2
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 04:24:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732415AbgAMBcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Jan 2020 20:32:18 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:43839 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727222AbgAMBcS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Jan 2020 20:32:18 -0500
-Received: by mail-oi1-f195.google.com with SMTP id p125so6821638oif.10;
-        Sun, 12 Jan 2020 17:32:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MMBytJUvPgAu+zMfgqDgk/AfX9Yfe5/T6E8UlbQLhRg=;
-        b=bavqG7BbIXENsNo9UOozQb1Br1Q21nNEU7hk7Iyb1e5fPuCq659TKTxQcBnyLyK8iN
-         VnFlSKggY1A4gcBuyqEQf1AsRpw9Z6DefQnra9k9TSquQQLmdnFuz3SYnA5sqq7kiJC9
-         rIfAZQXUmG3LNRog65z5m1zZyAjNyuD3ccecWyRVh7XWsCyeU0S0gH6c5CFkrn3citxc
-         VjfBCYx2f1Bb9sSqaUQwSnmCEg+9dhle+WZAiHosYYH/E7g7wvT8BvwDURbEAEcusB4u
-         E/SXBAGwI+00vIHETPisSrbgOqpxvmIUiUo2pL1R4A8lykgG64v0wXEPiR0yCdrBQTmZ
-         JXnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MMBytJUvPgAu+zMfgqDgk/AfX9Yfe5/T6E8UlbQLhRg=;
-        b=T3vYBf4dqyhd7l8zEfKqY9RFEYjuWfQFSDKu3XjqPSQBDa5bg6c8Ziq/+WFqEdgZLg
-         bmlYJeS90Vc/kPFFCQeGRhfxU705NuOg0H/6jWjzPxLNeiLl7Kjif3T2mOZcdvLlm+pi
-         kLttqLQ6u2TLzApuHKydJJEdkUWXg9BrJe7qp8ocjGXRX930dTfqdHe2fVbOfwyo2oQg
-         rA2N7JCYv8SrQR7sWVGQZ/8hx9WeNfbJVLR4CE2UvqmG0PQ4BiOHLXZiaw6FXHjpjeoW
-         pUSJqXuJBIQq9Ik/l2h9U2qj45fSrCNegyHCGL6/eKZdRsgMt4cRUFg5SLwGOEaD20R+
-         z2Xg==
-X-Gm-Message-State: APjAAAW2KmImYKQFI7Pn/y5WjZvD6gUUKMKVA49hfWirt50q32iaJSYd
-        X/cp+F+NOn/iLNCpEgMf//JKvsuxS9Bd7hqCI6k=
-X-Google-Smtp-Source: APXvYqwCPuqbYAG95luf4ZYYWjcaCVybJvsz8csO3YSbyw59b9EkPjN9oGmKDDBpKx1Q1quoOXGu4QhIj6WTgo+7q7g=
-X-Received: by 2002:aca:8d5:: with SMTP id 204mr10286701oii.141.1578879137785;
- Sun, 12 Jan 2020 17:32:17 -0800 (PST)
+        id S1733238AbgAMDYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Jan 2020 22:24:01 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:60779 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733020AbgAMDYB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Jan 2020 22:24:01 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 47wzTB5Mnvz9sP3; Mon, 13 Jan 2020 14:23:58 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1578885838;
+        bh=GSzB1/RoqRWSpXQnvdZLFlk4mB9lNaa5NXZOktq/Pdg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kqX/uxq7YKvFvznFeTSk2Z1zXdJ5jVrQcZGikvBIAJnmZCH6fSYKG83W0Wsa9xoy4
+         AXBbAaSyDXA9Nufd3jE7gMp7PYrdO2OOS+ECa9IeMgOd24wso2X1IBzZitintMzx27
+         2oIBwq3YGF/dpFVzhqmFMCRiLIn/JK1gCYbOJxVY=
+Date:   Mon, 13 Jan 2020 11:11:05 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Juan Quintela <quintela@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        qemu-ppc@nongnu.org,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [PATCH 02/15] hw/ppc/spapr_rtas: Use local MachineState variable
+Message-ID: <20200113011105.GA7045@umbus>
+References: <20200109152133.23649-1-philmd@redhat.com>
+ <20200109152133.23649-3-philmd@redhat.com>
 MIME-Version: 1.0
-References: <CANRm+Cw1eTNgB1r79J7U__ynio7pMSR4Xa35XuQuj-JKAQGxmg@mail.gmail.com>
- <87a76v8knv.fsf@nanos.tec.linutronix.de>
-In-Reply-To: <87a76v8knv.fsf@nanos.tec.linutronix.de>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 13 Jan 2020 09:32:06 +0800
-Message-ID: <CANRm+CyGWvY767ER14EqWAZakZu3S0KL=X5PT7Pyu=ezVZZoag@mail.gmail.com>
-Subject: Re: [PATCH v2] sched/nohz: Optimize get_nohz_timer_target()
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="pf9I7BMVVzbSWLtt"
+Content-Disposition: inline
+In-Reply-To: <20200109152133.23649-3-philmd@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Jan 2020 at 22:12, Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> Wanpeng,
->
-> Wanpeng Li <kernellwp@gmail.com> writes:
->
-> > Hi Thomas,
-> > On Wed, 23 Oct 2019 at 16:29, Thomas Gleixner <tglx@linutronix.de> wrote:
-> >>
-> >> On Wed, 23 Oct 2019, Wanpeng Li wrote:
-> >> > I didn't see your refactor to get_nohz_timer_target() which you
-> >> > mentioned in IRC after four months, I can observe cyclictest drop from
-> >> > 4~5us to 8us in kvm guest(we offload the lapic timer emulation to
-> >> > housekeeping cpu to avoid timer fire external interrupt on the pCPU
-> >> > which vCPU resident incur a vCPU vmexit) w/o this patch in the case of
-> >> > there is no busy housekeeping cpu. The score can be recovered after I
-> >> > give stress to create a busy housekeeping cpu.
-> >> >
-> >> > Could you consider applying this patch for temporary since I'm not
-> >> > sure when the refactor can be ready.
-> >>
-> >> Yeah. It's delayed (again).... Will pick that up.
-> >
-> > I didn't find WIP tag for this work after ~half year since v4 was
-> > posted https://lkml.org/lkml/2019/6/28/231 Could you apply this patch
-> > for temporary because the completion time of refactor is not
-> > deterministic.
->
-> Could you please repost it?
 
-Just repost, thanks Thomas.
+--pf9I7BMVVzbSWLtt
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-    Wanpeng
+On Thu, Jan 09, 2020 at 04:21:20PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Since we have the MachineState already available locally,
+> ues it instead of the global current_machine.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/ppc/spapr_rtas.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 8d8d8cdfcb..e88bb1930e 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -281,7 +281,7 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU =
+*cpu,
+>                                            "DesProcs=3D%d,"
+>                                            "MaxPlatProcs=3D%d",
+>                                            max_cpus,
+> -                                          current_machine->ram_size / Mi=
+B,
+> +                                          ms->ram_size / MiB,
+>                                            ms->smp.cpus,
+>                                            max_cpus);
+>          if (pcc->n_host_threads > 0) {
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--pf9I7BMVVzbSWLtt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4bw6MACgkQbDjKyiDZ
+s5J3Rg/+PcAF6N1hOCWdn3fjZ7uZ8Dc6XsXHNfrNBUKNNZR5evR3f/Uw91FbBnWU
+93bkX39mSNqucWhzHGS3AH0bryt5f//anWrTpzbBE+yYT2Zw1I9u355c5/FzJlVW
+5qfcth5UPcqmQ0QJwtq46xpwMoOi7lH8mXsM8/LTBdRqgy9jMnW+tjuUOoC9vP+2
++55HExP5h03MBB3kKMxCGPogC8wzdo6PLueDD8TSm9OXSEQGrQKmG/0kXRjVxpRb
+YUlT6u7R9P/pN+sVZ/+denw7CBYqMjrAhnu8tHP9PdGT7uRadR8VbfoUe9QEREwd
+kd7BHhyN9RtspDMwx5vUDuICtjoFZW9gsVYzo80XCgVHMHqazBtcjIJMoyCP4u0d
+jMDRCeKMX7/iXjjZ0BK4bAol/TbT/luZF+aQQRTT4uhK4H3aeQdheOanj3nsWB1t
+kMbGTwUAKvLDFRPfUnUfDGyf1QxsO31izD2XRqHUiu1kbFHn3c83zBf5IOOXE1qP
+IoD1ldQ5SMQ/anRHbvDyhhQyLHBNJlua2/baqj5U9a3J/nNKlrl1mrYCHMsShqUO
+/QymmpNf/uwMtJoInAUeCPe5m+SfZmPewDawfebcSljiNPL2JFK2ixXXSlFDNQpp
+uMusEfKsDPY8r/42sDhIerUu/TulgIa0YrDi0gf31NwV3sHaIRo=
+=tUZF
+-----END PGP SIGNATURE-----
+
+--pf9I7BMVVzbSWLtt--
