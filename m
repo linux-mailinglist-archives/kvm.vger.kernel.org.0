@@ -2,131 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C058139125
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 13:33:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D02C6139129
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 13:36:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726934AbgAMMdf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 07:33:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21212 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725832AbgAMMde (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Jan 2020 07:33:34 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00DCXBMc059790
-        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 07:33:33 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xfve8awft-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 07:33:33 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
-        Mon, 13 Jan 2020 12:33:31 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 13 Jan 2020 12:33:29 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00DCXR5n36569248
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Jan 2020 12:33:27 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C75075204F;
-        Mon, 13 Jan 2020 12:33:27 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.108])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 89D2752051;
-        Mon, 13 Jan 2020 12:33:27 +0000 (GMT)
-Date:   Mon, 13 Jan 2020 13:33:25 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v7 4/4] s390x: SCLP unit test
-In-Reply-To: <8d7fb5c4-9e2c-e28a-16c0-658afcc8178d@redhat.com>
-References: <20200110184050.191506-1-imbrenda@linux.ibm.com>
-        <20200110184050.191506-5-imbrenda@linux.ibm.com>
-        <8d7fb5c4-9e2c-e28a-16c0-658afcc8178d@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1726450AbgAMMgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 07:36:31 -0500
+Received: from merlin.infradead.org ([205.233.59.134]:33104 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726074AbgAMMga (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jan 2020 07:36:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=pJ1ajlLalSb1lnSWYzrZ3l95cR2DmPwww/lMVi/JmI8=; b=gGBpvza+J9GkHFPjo1zmKUMn+
+        anND46i/9BDOMeU7JceBSIFp5gTujs10uCYe3iG/R06NirqZMIRQDsVgmLY2AHkc4afOCqFnSh4vB
+        0Rpdp5jF4TQjAY021SKBbvURAawSBKXRrk0+vrq88VzjFhIWcD2ijHHnRFrBBhG6zQu+8QY9P/0cD
+        tx8mZDbwkRuXktfh0FpKRJAGinJoDNMkFKXUk6klwdBLzi1iLUAVIe8i6LIQOHt7ivCNipOmVLubG
+        OaTHrpXuli4LcHWKpVtzItd3N2qmBqGtCms5UVV3StB6soEF9YE8JpmYyQztuMnhUDEDIEZ74VRGX
+        iEUqhlGmw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iqyws-000416-I6; Mon, 13 Jan 2020 12:36:02 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 33C63304121;
+        Mon, 13 Jan 2020 13:34:23 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 8A4392B6B2F93; Mon, 13 Jan 2020 13:35:58 +0100 (CET)
+Date:   Mon, 13 Jan 2020 13:35:58 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        KarimAllah <karahmed@amazon.de>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        christopher.s.hall@intel.com, hubert.chrzaniuk@intel.com,
+        len.brown@intel.com, thomas.lendacky@amd.com, rjw@rjwysocki.net
+Subject: Re: [PATCH RFC] sched/fair: Penalty the cfs task which executes
+ mwait/hlt
+Message-ID: <20200113123558.GF2827@hirez.programming.kicks-ass.net>
+References: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
+ <20200108155040.GB2827@hirez.programming.kicks-ass.net>
+ <00d884a7-d463-74b4-82cf-9deb0aa70971@redhat.com>
+ <CANRm+Cx0LMK1b2mJiU7edCDoRfPfGLzY1Zqr5paBEPcWFFALhQ@mail.gmail.com>
+ <20200113104314.GU2844@hirez.programming.kicks-ass.net>
+ <ee2b6da2-be8c-2540-29e9-ffbb9fdfd3fc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20011312-4275-0000-0000-00000397208B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011312-4276-0000-0000-000038AB164E
-Message-Id: <20200113133325.417bf657@p-imbrenda>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-13_03:2020-01-13,2020-01-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 phishscore=0 impostorscore=0
- malwarescore=0 spamscore=0 bulkscore=0 suspectscore=0 mlxscore=0
- mlxlogscore=548 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-2001130104
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ee2b6da2-be8c-2540-29e9-ffbb9fdfd3fc@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Jan 2020 12:00:00 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> > +/**
-> > + * Test some bits in the instruction format that are specified to
-> > be ignored.
-> > + */
-> > +static void test_instbits(void)
-> > +{
-> > +	SCCBHeader *h = (SCCBHeader *)pagebuf;
-> > +	int cc;
-> > +
-> > +	expect_pgm_int();
-> > +	sclp_mark_busy();
-> > +	h->length = 8;
-> > +	sclp_setup_int();
-> > +
-> > +	asm volatile(
-> > +		"       .insn   rre,0xb2204200,%1,%2\n"  /* servc
-> > %1,%2 */
-> > +		"       ipm     %0\n"
-> > +		"       srl     %0,28"
-> > +		: "=&d" (cc) : "d" (valid_code), "a"
-> > (__pa(pagebuf))
-> > +		: "cc", "memory");
-> > +	if (lc->pgm_int_code) {
-> > +		sclp_handle_ext();
-> > +		cc = 1;
-> > +	} else if (!cc)
-> > +		  
+On Mon, Jan 13, 2020 at 12:52:20PM +0100, Paolo Bonzini wrote:
+> On 13/01/20 11:43, Peter Zijlstra wrote:
+> > So the very first thing we need to get sorted is that MPERF/TSC ratio
+> > thing. TurboStat does it, but has 'funny' hacks on like:
+> > 
+> >   b2b34dfe4d9a ("tools/power turbostat: KNL workaround for %Busy and Avg_MHz")
+> > 
+> > and I imagine that there's going to be more exceptions there. You're
+> > basically going to have to get both Intel and AMD to commit to this.
+> > 
+> > IFF we can get concensus on MPERF/TSC, then yes, that is a reasonable
+> > way to detect a VCPU being idle I suppose. I've added a bunch of people
+> > who seem to know about this.
+> > 
+> > Anyone, what will it take to get MPERF/TSC 'working' ?
 > 
-> I wonder if something like the following would be possible:
-> 
-> expect_pgm_int();
-> ...
-> asm volatiole();
-> ...
-> sclp_wait_busy();
-> check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> Do we really need MPERF/TSC for this use case, or can we just track
+> APERF as well and do MPERF/APERF to compute the "non-idle" time?
 
-we do not expect a specification exception, if that happens it's
-a bug and the test should rightfully fail.
+So MPERF runs at fixed frequency (when !IDLE and typically the same
+frequency as TSC), APERF runs at variable frequency (when !IDLE)
+depending on DVFS state.
 
-> We would have to clear "sclp_busy" when we get a progam interrupt on a
-> servc instruction - shouldn't be too hard to add to the program
-> exception handler.
+So APERF/MPERF gives the effective frequency of the core, but since both
+stop during IDLE, it will not be a good indication of IDLE.
 
-Sure that could be done, but is it worth it to rework the program
-interrupt handler only for one unit test?
+Otoh, TSC doesn't stop in idle (.oO this depends on
+X86_FEATURE_CONSTANT_TSC) and therefore the MPERF/TSC ratio gives how
+much !idle time there was between readings.
 
-[...]
-
-> > +	valid_code = 0;  
-> 
-> This can be dropped because ...
-> 
-> > +	report_abort("READ_SCP_INFO failed");  
-> 
-> ... you abort here.
-
-will fix 
 
