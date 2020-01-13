@@ -2,109 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53A841390DE
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 13:12:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7755113910E
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 13:27:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726336AbgAMMMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 07:12:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52768 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725832AbgAMMMs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jan 2020 07:12:48 -0500
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6A2602075B;
-        Mon, 13 Jan 2020 12:12:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578917567;
-        bh=jrKOx7fdYO/hgwOXZereFYrzknBNVlPV0cWc5JJ1418=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kE2bX48Ij3Lcc8WQScofYgYFGjjwfqDqH83qLTdcOcI2aZ5mXA2CThEiocaWgQ+V5
-         WRtPBjxDkvffPZMCQIsNDIJVhxwT+WOOVIi9qDCDwlN6nxuJt2W12nScVYpTS+8AE7
-         pVt9HDLXBQPMkGUKJ5MBkeSkRs86GPSr4a7Fkk1Q=
-Date:   Mon, 13 Jan 2020 12:12:41 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Zengruan Ye <yezengruan@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, maz@kernel.org,
-        james.morse@arm.com, linux@armlinux.org.uk, suzuki.poulose@arm.com,
-        julien.thierry.kdev@gmail.com, catalin.marinas@arm.com,
-        mark.rutland@arm.com, steven.price@arm.com,
-        daniel.lezcano@linaro.org, peterz@infradead.org
-Subject: Re: [PATCH v2 0/6] KVM: arm64: VCPU preempted check support
-Message-ID: <20200113121240.GC3260@willie-the-truck>
-References: <20191226135833.1052-1-yezengruan@huawei.com>
+        id S1728656AbgAMM1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 07:27:48 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29302 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726399AbgAMM1s (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Jan 2020 07:27:48 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00DCMYwj101753
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 07:27:47 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xfvpntuy7-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 07:27:46 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Mon, 13 Jan 2020 12:27:45 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 13 Jan 2020 12:27:41 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00DCReos56426580
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Jan 2020 12:27:40 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 39B8FAE053;
+        Mon, 13 Jan 2020 12:27:40 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F2D7FAE04D;
+        Mon, 13 Jan 2020 12:27:39 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.108])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 13 Jan 2020 12:27:39 +0000 (GMT)
+Date:   Mon, 13 Jan 2020 13:27:38 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, borntraeger@de.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v7 3/4] s390x: lib: add SPX and STPX
+ instruction wrapper
+In-Reply-To: <656129b7-68f2-d3ab-7428-91999c896ca5@linux.ibm.com>
+References: <20200110184050.191506-1-imbrenda@linux.ibm.com>
+        <20200110184050.191506-4-imbrenda@linux.ibm.com>
+        <656129b7-68f2-d3ab-7428-91999c896ca5@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191226135833.1052-1-yezengruan@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20011312-0028-0000-0000-000003D0A549
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20011312-0029-0000-0000-00002494C31A
+Message-Id: <20200113132738.3c786c63@p-imbrenda>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-13_03:2020-01-13,2020-01-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 phishscore=0
+ mlxscore=0 bulkscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
+ spamscore=0 clxscore=1015 suspectscore=0 adultscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-2001130103
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[+PeterZ]
+On Mon, 13 Jan 2020 10:42:01 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-On Thu, Dec 26, 2019 at 09:58:27PM +0800, Zengruan Ye wrote:
-> This patch set aims to support the vcpu_is_preempted() functionality
-> under KVM/arm64, which allowing the guest to obtain the VCPU is
-> currently running or not. This will enhance lock performance on
-> overcommitted hosts (more runnable VCPUs than physical CPUs in the
-> system) as doing busy waits for preempted VCPUs will hurt system
-> performance far worse than early yielding.
+> On 1/10/20 7:40 PM, Claudio Imbrenda wrote:
+> > Add a wrapper for the SET PREFIX and STORE PREFIX instructions, and
+> > use it instead of using inline assembly.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Reviewed-by: Thomas Huth <thuth@redhat.com>  
 > 
-> We have observed some performace improvements in uninx benchmark tests.
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 > 
-> unix benchmark result:
->   host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 CPUs
->   guest: kernel 5.5.0-rc1, 16 VCPUs
+> > @@ -63,14 +60,10 @@ static void test_spx(void)
+> >  	 * some facility bits there ... at least some of them
+> > should be
+> >  	 * set in our buffer afterwards.
+> >  	 */
+> > -	asm volatile (
+> > -		" stpx	%0\n"
+> > -		" spx	%1\n"
+> > -		" stfl	0\n"
+> > -		" spx	%0\n"
+> > -		: "+Q"(old_prefix)
+> > -		: "Q"(new_prefix)
+> > -		: "memory");
+> > +	old_prefix = get_prefix();
+> > +	set_prefix(new_prefix);
+> > +	asm volatile("	stfl 0" : : : "memory");  
 > 
->                test-case                |    after-patch    |   before-patch
-> ----------------------------------------+-------------------+------------------
->  Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
->  Double-Precision Whetstone             |     32856.1 MWIPS |     32849.6 MWIPS
->  Execl Throughput                       |      3662.1 lps   |      2718.0 lps
->  File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    158011.8 KBps
->  File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     37664.0 KBps
->  File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    441108.8 KBps
->  Pipe Throughput                        |   6405029.6 lps   |   6021457.6 lps
->  Pipe-based Context Switching           |    185872.7 lps   |    184255.3 lps
->  Process Creation                       |      4025.7 lps   |      3706.6 lps
->  Shell Scripts (1 concurrent)           |      6745.6 lpm   |      6436.1 lpm
->  Shell Scripts (8 concurrent)           |       998.7 lpm   |       931.1 lpm
->  System Call Overhead                   |   3913363.1 lps   |   3883287.8 lps
-> ----------------------------------------+-------------------+------------------
->  System Benchmarks Index Score          |      1835.1       |      1327.6
+> Couldn't we also use stfl from facility.h here?
+> And do we need to add a memory clobber to it?
 
-Interesting, thanks for the numbers.
+will do both
 
-So it looks like there is a decent improvement to be had from targetted vCPU
-wakeup, but I really dislike the explicit PV interface and it's already been
-shown to interact badly with the WFE-based polling in smp_cond_load_*().
+> > +	set_prefix(old_prefix);
+> >  	report(pagebuf[GEN_LC_STFL] != 0, "stfl to new prefix");
+> >  
+> >  	expect_pgm_int();
+> >   
+> 
+> 
 
-Rather than expose a divergent interface, I would instead like to explore an
-improvement to smp_cond_load_*() and see how that performs before we commit
-to something more intrusive. Marc and I looked at this very briefly in the
-past, and the basic idea is to register all of the WFE sites with the
-hypervisor, indicating which register contains the address being spun on
-and which register contains the "bad" value. That way, you don't bother
-rescheduling a vCPU if the value at the address is still bad, because you
-know it will exit immediately.
-
-Of course, the devil is in the details because when I say "address", that's
-a guest virtual address, so you need to play some tricks in the hypervisor
-so that you have a separate mapping for the lockword (it's enough to keep
-track of the physical address).
-
-Our hacks are here but we basically ran out of time to work on them beyond
-an unoptimised and hacky prototype:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy
-
-Marc -- how would you prefer to handle this?
-
-Will
