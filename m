@@ -2,106 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EDCE13906D
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 12:52:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53A841390DE
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 13:12:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726976AbgAMLwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 06:52:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26929 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726127AbgAMLwY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jan 2020 06:52:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1578916342;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fAtNK55yDbPKiBZA6iN0qoeGlR4L/c8UwxpFGcssRLE=;
-        b=cQx7m3Dw8BJ8kVpz2Bgc+gXW1QNc8KFwKGLloS7mQdGsxOXNvCz9gLcz/v0mvLy/mJcux3
-        WJ40wgxskwjEGYXfOcY46hN2N/Lf9ssBpxP4hYGcpWb1kbocykVoNzA9R8qRK01/SEU94Y
-        2Plqgnp0E82oji7Zo9s69WiIMJIfnjc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-q2jIONNSNW6_PB_nf-EuMg-1; Mon, 13 Jan 2020 06:52:21 -0500
-X-MC-Unique: q2jIONNSNW6_PB_nf-EuMg-1
-Received: by mail-wm1-f70.google.com with SMTP id p2so2434785wma.3
-        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 03:52:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fAtNK55yDbPKiBZA6iN0qoeGlR4L/c8UwxpFGcssRLE=;
-        b=p390W3U3CPPrU6yi58gBuy7yPiYoRhXHHgBBKB34V9T4dgQJb9KyFTVAztaWejnXi6
-         /rVqiuizadGksiNUfJ/DMgK8dGrtMBvmNY5QksmeOpVRXYZWdrsnHyqFOgses68lM459
-         OqWOaHO1bBlng+ICESN507OCYPdeKcXs5ib1XDhNNx0Zji+HAhNoqRMSuTLE+zDNVWjh
-         etEiQk2rocS5bBIIOMNDfdAm87+oBpVliMiuE/ezIWMjO9tkGuMPpVxGclyqr0ab7KbI
-         3kYCjVfYEYZnr9JIbgfaL96QMbtXsIMMCQcyquScIPVCIeGPo2Ud685d8J6dLWGiouN0
-         WyQA==
-X-Gm-Message-State: APjAAAW+9TQB745k+eOzdtKCOYPNRm4dsCfxipD+nQ1xlRi8BtgeJDmO
-        HSO16n08vuhPLX+wj8nDLKKUbJ4C76bfWhYLAsgFIsAO0wnLCa3Ul4YVpF/t9EfOphfP1AhC60r
-        vGZmgAVgPG7RS
-X-Received: by 2002:a1c:7f4f:: with SMTP id a76mr20060473wmd.77.1578916340368;
-        Mon, 13 Jan 2020 03:52:20 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxZg2dccxP0IdOTlGnnmh5SXAppWHgMgGLJe1d7ybkkLljLcXiIb4/SCMEl9TwTbWQUxFL5bA==
-X-Received: by 2002:a1c:7f4f:: with SMTP id a76mr20060454wmd.77.1578916340124;
-        Mon, 13 Jan 2020 03:52:20 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:1475:5c37:e2e2:68ea? ([2001:b07:6468:f312:1475:5c37:e2e2:68ea])
-        by smtp.gmail.com with ESMTPSA id u24sm14250566wml.10.2020.01.13.03.52.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jan 2020 03:52:19 -0800 (PST)
-Subject: Re: [PATCH RFC] sched/fair: Penalty the cfs task which executes
- mwait/hlt
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        KarimAllah <karahmed@amazon.de>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        christopher.s.hall@intel.com, hubert.chrzaniuk@intel.com,
-        len.brown@intel.com, thomas.lendacky@amd.com, rjw@rjwysocki.net
-References: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
- <20200108155040.GB2827@hirez.programming.kicks-ass.net>
- <00d884a7-d463-74b4-82cf-9deb0aa70971@redhat.com>
- <CANRm+Cx0LMK1b2mJiU7edCDoRfPfGLzY1Zqr5paBEPcWFFALhQ@mail.gmail.com>
- <20200113104314.GU2844@hirez.programming.kicks-ass.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ee2b6da2-be8c-2540-29e9-ffbb9fdfd3fc@redhat.com>
-Date:   Mon, 13 Jan 2020 12:52:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1726336AbgAMMMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 07:12:48 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52768 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725832AbgAMMMs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jan 2020 07:12:48 -0500
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6A2602075B;
+        Mon, 13 Jan 2020 12:12:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1578917567;
+        bh=jrKOx7fdYO/hgwOXZereFYrzknBNVlPV0cWc5JJ1418=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kE2bX48Ij3Lcc8WQScofYgYFGjjwfqDqH83qLTdcOcI2aZ5mXA2CThEiocaWgQ+V5
+         WRtPBjxDkvffPZMCQIsNDIJVhxwT+WOOVIi9qDCDwlN6nxuJt2W12nScVYpTS+8AE7
+         pVt9HDLXBQPMkGUKJ5MBkeSkRs86GPSr4a7Fkk1Q=
+Date:   Mon, 13 Jan 2020 12:12:41 +0000
+From:   Will Deacon <will@kernel.org>
+To:     Zengruan Ye <yezengruan@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, maz@kernel.org,
+        james.morse@arm.com, linux@armlinux.org.uk, suzuki.poulose@arm.com,
+        julien.thierry.kdev@gmail.com, catalin.marinas@arm.com,
+        mark.rutland@arm.com, steven.price@arm.com,
+        daniel.lezcano@linaro.org, peterz@infradead.org
+Subject: Re: [PATCH v2 0/6] KVM: arm64: VCPU preempted check support
+Message-ID: <20200113121240.GC3260@willie-the-truck>
+References: <20191226135833.1052-1-yezengruan@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200113104314.GU2844@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191226135833.1052-1-yezengruan@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/01/20 11:43, Peter Zijlstra wrote:
-> So the very first thing we need to get sorted is that MPERF/TSC ratio
-> thing. TurboStat does it, but has 'funny' hacks on like:
-> 
->   b2b34dfe4d9a ("tools/power turbostat: KNL workaround for %Busy and Avg_MHz")
-> 
-> and I imagine that there's going to be more exceptions there. You're
-> basically going to have to get both Intel and AMD to commit to this.
-> 
-> IFF we can get concensus on MPERF/TSC, then yes, that is a reasonable
-> way to detect a VCPU being idle I suppose. I've added a bunch of people
-> who seem to know about this.
-> 
-> Anyone, what will it take to get MPERF/TSC 'working' ?
+[+PeterZ]
 
-Do we really need MPERF/TSC for this use case, or can we just track
-APERF as well and do MPERF/APERF to compute the "non-idle" time?
+On Thu, Dec 26, 2019 at 09:58:27PM +0800, Zengruan Ye wrote:
+> This patch set aims to support the vcpu_is_preempted() functionality
+> under KVM/arm64, which allowing the guest to obtain the VCPU is
+> currently running or not. This will enhance lock performance on
+> overcommitted hosts (more runnable VCPUs than physical CPUs in the
+> system) as doing busy waits for preempted VCPUs will hurt system
+> performance far worse than early yielding.
+> 
+> We have observed some performace improvements in uninx benchmark tests.
+> 
+> unix benchmark result:
+>   host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 CPUs
+>   guest: kernel 5.5.0-rc1, 16 VCPUs
+> 
+>                test-case                |    after-patch    |   before-patch
+> ----------------------------------------+-------------------+------------------
+>  Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
+>  Double-Precision Whetstone             |     32856.1 MWIPS |     32849.6 MWIPS
+>  Execl Throughput                       |      3662.1 lps   |      2718.0 lps
+>  File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    158011.8 KBps
+>  File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     37664.0 KBps
+>  File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    441108.8 KBps
+>  Pipe Throughput                        |   6405029.6 lps   |   6021457.6 lps
+>  Pipe-based Context Switching           |    185872.7 lps   |    184255.3 lps
+>  Process Creation                       |      4025.7 lps   |      3706.6 lps
+>  Shell Scripts (1 concurrent)           |      6745.6 lpm   |      6436.1 lpm
+>  Shell Scripts (8 concurrent)           |       998.7 lpm   |       931.1 lpm
+>  System Call Overhead                   |   3913363.1 lps   |   3883287.8 lps
+> ----------------------------------------+-------------------+------------------
+>  System Benchmarks Index Score          |      1835.1       |      1327.6
 
-Paolo
+Interesting, thanks for the numbers.
 
+So it looks like there is a decent improvement to be had from targetted vCPU
+wakeup, but I really dislike the explicit PV interface and it's already been
+shown to interact badly with the WFE-based polling in smp_cond_load_*().
+
+Rather than expose a divergent interface, I would instead like to explore an
+improvement to smp_cond_load_*() and see how that performs before we commit
+to something more intrusive. Marc and I looked at this very briefly in the
+past, and the basic idea is to register all of the WFE sites with the
+hypervisor, indicating which register contains the address being spun on
+and which register contains the "bad" value. That way, you don't bother
+rescheduling a vCPU if the value at the address is still bad, because you
+know it will exit immediately.
+
+Of course, the devil is in the details because when I say "address", that's
+a guest virtual address, so you need to play some tricks in the hypervisor
+so that you have a separate mapping for the lockword (it's enough to keep
+track of the physical address).
+
+Our hacks are here but we basically ran out of time to work on them beyond
+an unoptimised and hacky prototype:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy
+
+Marc -- how would you prefer to handle this?
+
+Will
