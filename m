@@ -2,59 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 274A1139A95
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 21:11:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92178139AA1
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 21:16:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728682AbgAMULF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 15:11:05 -0500
-Received: from mga14.intel.com ([192.55.52.115]:21225 "EHLO mga14.intel.com"
+        id S1728766AbgAMUQL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 15:16:11 -0500
+Received: from mga01.intel.com ([192.55.52.88]:25413 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726878AbgAMULF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jan 2020 15:11:05 -0500
-X-Amp-Result: UNSCANNABLE
+        id S1726878AbgAMUQL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jan 2020 15:16:11 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Jan 2020 12:11:05 -0800
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Jan 2020 12:16:10 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,430,1571727600"; 
-   d="scan'208";a="218762103"
+   d="scan'208";a="273121191"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga007.fm.intel.com with ESMTP; 13 Jan 2020 12:11:04 -0800
-Date:   Mon, 13 Jan 2020 12:11:04 -0800
+  by FMSMGA003.fm.intel.com with ESMTP; 13 Jan 2020 12:16:10 -0800
+Date:   Mon, 13 Jan 2020 12:16:10 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     linmiaohe <linmiaohe@huawei.com>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        liran.alon@oracle.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v2] KVM: nVMX: vmread should not set rflags to specify
- success in case of #PF
-Message-ID: <20200113201103.GD2322@linux.intel.com>
-References: <1577514324-18362-1-git-send-email-linmiaohe@huawei.com>
- <20200113200942.GC2322@linux.intel.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH] KVM: VMX: Rename define to CPU_BASED_USE_TSC_OFFSETTING
+Message-ID: <20200113201610.GE2322@linux.intel.com>
+References: <20191221044513.21680-1-sean.j.christopherson@intel.com>
+ <20191221044513.21680-18-sean.j.christopherson@intel.com>
+ <20200113183228.GO13310@zn.tnic>
+ <20200113183705.GL1175@linux.intel.com>
+ <20200113183823.GP13310@zn.tnic>
+ <20200113184217.GA2216@linux.intel.com>
+ <20200113185216.GQ13310@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200113200942.GC2322@linux.intel.com>
+In-Reply-To: <20200113185216.GQ13310@zn.tnic>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 13, 2020 at 12:09:42PM -0800, Sean Christopherson wrote:
-> On Sat, Dec 28, 2019 at 02:25:24PM +0800, linmiaohe wrote:
-> > From: Miaohe Lin <linmiaohe@huawei.com>
+On Mon, Jan 13, 2020 at 07:52:16PM +0100, Borislav Petkov wrote:
+> On Mon, Jan 13, 2020 at 10:42:17AM -0800, Sean Christopherson wrote:
+> > > Doesn't bother me, I could do it in a patch ontop. But your call.
 > > 
-> > In case writing to vmread destination operand result in a #PF, vmread
-> > should not call nested_vmx_succeed() to set rflags to specify success.
-> > Similar to as done in VMPTRST (See handle_vmptrst()).
-> > 
-> > Reviewed-by: Liran Alon <liran.alon@oracle.com>
-> > Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> > No objection here.
 > 
-> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Something like this:
+> 
+> ---
+> From: Borislav Petkov <bp@suse.de>
+> 
+> ... so that "offsetting" is spelled the same as the respective VMX feature
+> bit VMX_FEATURE_TSC_OFFSETTING.
+> 
+> No functional changes.
+> 
+> Signed-off-by: Borislav Petkov <bp@suse.de>
+> ---
 
-Gah, got trigger happy.  This could also have "Cc: stable@vger.kernel.org".
-With that, my Reviewed-by stands :-).
+Reviewed-and-tested-by: Sean Christopherson <sean.j.christopherson@intel.com>
