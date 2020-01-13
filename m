@@ -2,145 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B0B9138FF8
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 12:21:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EDCE13906D
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 12:52:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728766AbgAMLVP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 06:21:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51056 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726163AbgAMLVO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jan 2020 06:21:14 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A9C962081E;
-        Mon, 13 Jan 2020 11:21:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578914472;
-        bh=MacVSu0STCJHhHc0ljONo5y6xoV7nal96sORZMm0SSc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=arrIa/WEpFeLMrHb//HLi36Tu08TB6YjYA8H+g4g+xc4jaJ8j4yheAtFN9FfH3HTH
-         Xtvpvb7DQQV57PNFlCG/Dy2IywB5ZQPZ1qsVvoik8KhBkjLGzzONiHH9bZTNOkALRE
-         lobe4VzuZIKnbUV0n1Xb0KTEfKzVSFsEccDNleEA=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1iqxmR-000307-1i; Mon, 13 Jan 2020 11:21:11 +0000
+        id S1726976AbgAMLwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 06:52:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26929 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726127AbgAMLwY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jan 2020 06:52:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1578916342;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fAtNK55yDbPKiBZA6iN0qoeGlR4L/c8UwxpFGcssRLE=;
+        b=cQx7m3Dw8BJ8kVpz2Bgc+gXW1QNc8KFwKGLloS7mQdGsxOXNvCz9gLcz/v0mvLy/mJcux3
+        WJ40wgxskwjEGYXfOcY46hN2N/Lf9ssBpxP4hYGcpWb1kbocykVoNzA9R8qRK01/SEU94Y
+        2Plqgnp0E82oji7Zo9s69WiIMJIfnjc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-66-q2jIONNSNW6_PB_nf-EuMg-1; Mon, 13 Jan 2020 06:52:21 -0500
+X-MC-Unique: q2jIONNSNW6_PB_nf-EuMg-1
+Received: by mail-wm1-f70.google.com with SMTP id p2so2434785wma.3
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 03:52:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=fAtNK55yDbPKiBZA6iN0qoeGlR4L/c8UwxpFGcssRLE=;
+        b=p390W3U3CPPrU6yi58gBuy7yPiYoRhXHHgBBKB34V9T4dgQJb9KyFTVAztaWejnXi6
+         /rVqiuizadGksiNUfJ/DMgK8dGrtMBvmNY5QksmeOpVRXYZWdrsnHyqFOgses68lM459
+         OqWOaHO1bBlng+ICESN507OCYPdeKcXs5ib1XDhNNx0Zji+HAhNoqRMSuTLE+zDNVWjh
+         etEiQk2rocS5bBIIOMNDfdAm87+oBpVliMiuE/ezIWMjO9tkGuMPpVxGclyqr0ab7KbI
+         3kYCjVfYEYZnr9JIbgfaL96QMbtXsIMMCQcyquScIPVCIeGPo2Ud685d8J6dLWGiouN0
+         WyQA==
+X-Gm-Message-State: APjAAAW+9TQB745k+eOzdtKCOYPNRm4dsCfxipD+nQ1xlRi8BtgeJDmO
+        HSO16n08vuhPLX+wj8nDLKKUbJ4C76bfWhYLAsgFIsAO0wnLCa3Ul4YVpF/t9EfOphfP1AhC60r
+        vGZmgAVgPG7RS
+X-Received: by 2002:a1c:7f4f:: with SMTP id a76mr20060473wmd.77.1578916340368;
+        Mon, 13 Jan 2020 03:52:20 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxZg2dccxP0IdOTlGnnmh5SXAppWHgMgGLJe1d7ybkkLljLcXiIb4/SCMEl9TwTbWQUxFL5bA==
+X-Received: by 2002:a1c:7f4f:: with SMTP id a76mr20060454wmd.77.1578916340124;
+        Mon, 13 Jan 2020 03:52:20 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:1475:5c37:e2e2:68ea? ([2001:b07:6468:f312:1475:5c37:e2e2:68ea])
+        by smtp.gmail.com with ESMTPSA id u24sm14250566wml.10.2020.01.13.03.52.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Jan 2020 03:52:19 -0800 (PST)
+Subject: Re: [PATCH RFC] sched/fair: Penalty the cfs task which executes
+ mwait/hlt
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        KarimAllah <karahmed@amazon.de>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        christopher.s.hall@intel.com, hubert.chrzaniuk@intel.com,
+        len.brown@intel.com, thomas.lendacky@amd.com, rjw@rjwysocki.net
+References: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
+ <20200108155040.GB2827@hirez.programming.kicks-ass.net>
+ <00d884a7-d463-74b4-82cf-9deb0aa70971@redhat.com>
+ <CANRm+Cx0LMK1b2mJiU7edCDoRfPfGLzY1Zqr5paBEPcWFFALhQ@mail.gmail.com>
+ <20200113104314.GU2844@hirez.programming.kicks-ass.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ee2b6da2-be8c-2540-29e9-ffbb9fdfd3fc@redhat.com>
+Date:   Mon, 13 Jan 2020 12:52:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20200113104314.GU2844@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Mon, 13 Jan 2020 11:21:11 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Jianyong Wu <Jianyong.Wu@arm.com>
-Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, richardcochran@gmail.com,
-        Mark Rutland <Mark.Rutland@arm.com>, will@kernel.org,
-        Suzuki Poulose <Suzuki.Poulose@arm.com>,
-        Steven Price <Steven.Price@arm.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve Capper <Steve.Capper@arm.com>,
-        Kaly Xin <Kaly.Xin@arm.com>, Justin He <Justin.He@arm.com>,
-        nd <nd@arm.com>
-Subject: Re: [RFC PATCH v9 7/8] ptp: arm64: Enable ptp_kvm for arm64
-In-Reply-To: <HE1PR0801MB16765F2905CD0F381E33AD9EF4350@HE1PR0801MB1676.eurprd08.prod.outlook.com>
-References: <20191210034026.45229-1-jianyong.wu@arm.com>
- <20191210034026.45229-8-jianyong.wu@arm.com>
- <ca162efb3a0de530e119f5237c006515@kernel.org>
- <HE1PR0801MB1676EE12CF0DB7C5BB8CC62DF4390@HE1PR0801MB1676.eurprd08.prod.outlook.com>
- <ee801dacbf4143e8d41807d5bfad1409@kernel.org>
- <HE1PR0801MB16765B52E5DCD8EA480EDABFF4380@HE1PR0801MB1676.eurprd08.prod.outlook.com>
- <a85deebc23c1fa77e6f70b6eaef22a34@kernel.org>
- <HE1PR0801MB16765F2905CD0F381E33AD9EF4350@HE1PR0801MB1676.eurprd08.prod.outlook.com>
-Message-ID: <a65143199c03230c74cb456586f75627@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: Jianyong.Wu@arm.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org, Suzuki.Poulose@arm.com, Steven.Price@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, Kaly.Xin@arm.com, Justin.He@arm.com, nd@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-01-13 10:37, Jianyong Wu wrote:
-> Hi Marc,
+On 13/01/20 11:43, Peter Zijlstra wrote:
+> So the very first thing we need to get sorted is that MPERF/TSC ratio
+> thing. TurboStat does it, but has 'funny' hacks on like:
 > 
->> -----Original Message-----
->> From: Marc Zyngier <maz@kernel.org>
->> Sent: Friday, January 10, 2020 6:35 PM
->> To: Jianyong Wu <Jianyong.Wu@arm.com>
->> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
->> tglx@linutronix.de; pbonzini@redhat.com; 
->> sean.j.christopherson@intel.com;
->> richardcochran@gmail.com; Mark Rutland <Mark.Rutland@arm.com>;
->> will@kernel.org; Suzuki Poulose <Suzuki.Poulose@arm.com>; Steven Price
->> <Steven.Price@arm.com>; linux-kernel@vger.kernel.org; linux-arm-
->> kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
->> kvm@vger.kernel.org; Steve Capper <Steve.Capper@arm.com>; Kaly Xin
->> <Kaly.Xin@arm.com>; Justin He <Justin.He@arm.com>; nd <nd@arm.com>
->> Subject: Re: [RFC PATCH v9 7/8] ptp: arm64: Enable ptp_kvm for arm64
->> 
->> Hi Jianyong,
->> 
->> On 2020-01-10 10:15, Jianyong Wu wrote:
->> > Hi Marc,
->> 
->> [...]
->> 
->> >> >> > +	ktime_overall = hvc_res.a0 << 32 | hvc_res.a1;
->> >> >> > +	*ts = ktime_to_timespec64(ktime_overall);
->> >> >> > +	*cycle = hvc_res.a2 << 32 | hvc_res.a3;
->> >> >>
->> >> >> So why isn't that just a read of the virtual counter, given that
->> >> >> what you do in the hypervisor seems to be "cntpct - cntvoff"?
->> >> >>
->> >> >> What am I missing here?
->> >> >>
->> >> > We need get clock time and counter cycle at the same time, so we
->> >> > can't just read virtual counter at guest and must get it from host.
->> >>
->> >> See my comment in my reply to patch #6: *Must* seems like a very
->> >> strong word, and you don't explain *why* that's better than just
->> >> computing the total hypercall cost. Hint: given the frequency of the
->> >> counter (in the few MHz
->> >> range) vs the frequency of a CPU (in the multiple GHz range, and with
->> >> an IPC close enough to 1), I doubt that you'll see the counter making
->> >> much progress across a hypercall.
->> >>
->> > Sorry, I will avoid to use those strong words.
->> >
->> > It's really the case that the hypercall won't across cycle in general.
->> > But sometimes, kernel preempt
->> > may happen in the middle of the hypercall which we can't assume how
->> > long before schedule back. so it's better capture them together at the
->> > same time.
->> 
->> Fair enough. Please document the rational, as I guess others will ask 
->> the
->> same questions.
->> 
-> Ok
+>   b2b34dfe4d9a ("tools/power turbostat: KNL workaround for %Busy and Avg_MHz")
 > 
->> Then the problem to solve is that of the reference counter, as you so 
->> far
->> assume the virtual counter. I guess you need to be able to let the 
->> guest
->> select the reference counter when calling the PTP service.
->> 
-> I could not come up with an idea about the point where the guest give
-> this info of counter value.
-> Where we give that interface to ptp service, as it's not a user space
-> application.
+> and I imagine that there's going to be more exceptions there. You're
+> basically going to have to get both Intel and AMD to commit to this.
+> 
+> IFF we can get concensus on MPERF/TSC, then yes, that is a reasonable
+> way to detect a VCPU being idle I suppose. I've added a bunch of people
+> who seem to know about this.
+> 
+> Anyone, what will it take to get MPERF/TSC 'working' ?
 
-Again: why don't you let the guest ask for the counter it wants as part
-of the SMC call? What is preventing this?
+Do we really need MPERF/TSC for this use case, or can we just track
+APERF as well and do MPERF/APERF to compute the "non-idle" time?
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Paolo
+
