@@ -2,131 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E13B138C3A
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 08:17:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4F98138C9C
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 09:06:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728598AbgAMHRW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 02:17:22 -0500
-Received: from ozlabs.org ([203.11.71.1]:39785 "EHLO ozlabs.org"
+        id S1728778AbgAMIGc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 03:06:32 -0500
+Received: from mga17.intel.com ([192.55.52.151]:63779 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725954AbgAMHRW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jan 2020 02:17:22 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 47x4fS2FYbz9sPn; Mon, 13 Jan 2020 18:17:20 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1578899840;
-        bh=aaWWOD+aHSxJEi2O2Vs9dFgm1buPigAQBFB1/1ut62Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=W71Totl//cINFjtMhIVRW6WMNQdvRrfxqhdWTzrYsJxfbAzzNzvD4PvtMsoMFIKl/
-         MI9mVhwOiw3rboglPy3O6t/L/rI2O37XWGyvdWRH+bsw70W9/tM1Vlp/ancQQqskw+
-         CgBVkElofU9uX4u2vscodtQKhBozqp39VCk/tApg=
-Date:   Mon, 13 Jan 2020 17:16:48 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Greg Kurz <groug@kaod.org>
-Cc:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        qemu-arm@nongnu.org, Alistair Francis <alistair.francis@wdc.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 04/15] hw/ppc/spapr_rtas: Restrict variables scope to
- single switch case
-Message-ID: <20200113071648.GF19995@umbus>
-References: <20200109152133.23649-1-philmd@redhat.com>
- <20200109152133.23649-5-philmd@redhat.com>
- <20200109184349.1aefa074@bahia.lan>
- <9870f8ed-3fa0-1deb-860d-7481cb3db556@redhat.com>
- <20200110105055.3e72ddf4@bahia.lan>
+        id S1728682AbgAMIGc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jan 2020 03:06:32 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Jan 2020 00:06:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,428,1571727600"; 
+   d="scan'208";a="224905087"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by orsmga006.jf.intel.com with ESMTP; 13 Jan 2020 00:06:29 -0800
+Date:   Mon, 13 Jan 2020 16:10:50 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com,
+        alazar@bitdefender.com, edwin.zhai@intel.com
+Subject: Re: [RESEND PATCH v10 06/10] vmx: spp: Set up SPP paging table at
+ vmentry/vmexit
+Message-ID: <20200113081050.GF12253@local-michael-cet-test.sh.intel.com>
+References: <20200102061319.10077-1-weijiang.yang@intel.com>
+ <20200102061319.10077-7-weijiang.yang@intel.com>
+ <20200110180458.GG21485@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="XIiC+We3v3zHqZ6Z"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200110105055.3e72ddf4@bahia.lan>
+In-Reply-To: <20200110180458.GG21485@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jan 10, 2020 at 10:04:59AM -0800, Sean Christopherson wrote:
+> On Thu, Jan 02, 2020 at 02:13:15PM +0800, Yang Weijiang wrote:
+> > @@ -3585,7 +3602,30 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gva_t gva, int level,
+> >  		if ((error_code & PFERR_WRITE_MASK) &&
+> >  		    spte_can_locklessly_be_made_writable(spte))
+> >  		{
+> > -			new_spte |= PT_WRITABLE_MASK;
+> > +			/*
+> > +			 * Record write protect fault caused by
+> > +			 * Sub-page Protection, let VMI decide
+> > +			 * the next step.
+> > +			 */
+> > +			if (spte & PT_SPP_MASK) {
+> > +				int len = kvm_x86_ops->get_inst_len(vcpu);
+> 
+> There's got to be a better way to handle SPP exits than adding a helper
+> to retrieve the instruction length.
+>
+The fault instruction was skipped by kvm_skip_emulated_instruction()
+before, but Paolo suggested leave the re-do or skip option to user-space
+to make it flexible for write protection or write tracking, so return
+length to user-space.
 
---XIiC+We3v3zHqZ6Z
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > +
+> > +				fault_handled = true;
+> > +				vcpu->run->exit_reason = KVM_EXIT_SPP;
+> > +				vcpu->run->spp.addr = gva;
+> > +				vcpu->run->spp.ins_len = len;
+> 
+> s/ins_len/insn_len to be consistent with other KVM nomenclature.
+> 
+OK.
 
-On Fri, Jan 10, 2020 at 10:50:55AM +0100, Greg Kurz wrote:
-> On Fri, 10 Jan 2020 10:34:07 +0100
-> Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
->=20
-> > On 1/9/20 6:43 PM, Greg Kurz wrote:
-> > > On Thu,  9 Jan 2020 16:21:22 +0100
-> > > Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
-> > >=20
-> > >> We only access these variables in RTAS_SYSPARM_SPLPAR_CHARACTERISTICS
-> > >> case, restrict their scope to avoid unnecessary initialization.
-> > >>
-> > >=20
-> > > I guess a decent compiler can be smart enough detect that the initial=
-ization
-> > > isn't needed outside of the RTAS_SYSPARM_SPLPAR_CHARACTERISTICS branc=
-h...
-> > > Anyway, reducing scope isn't bad. The only hitch I could see is that =
-some
-> > > people do prefer to have all variables declared upfront, but there's =
-a nested
-> > > param_val variable already so I guess it's okay.
-> >=20
-> > I don't want to outsmart compilers :)
-> >=20
-> > The MACHINE() macro is not a simple cast, it does object introspection=
-=20
-> > with OBJECT_CHECK(), thus is not free. Since=20
->=20
-> Sure, I understand the motivation in avoiding an unneeded call
-> to calling object_dynamic_cast_assert().
->=20
-> > object_dynamic_cast_assert() argument is not const, I'm not sure the=20
-> > compiler can remove the call.
-> >=20
->=20
-> Not remove the call, but delay it to the branch that uses it,
-> ie. parameter =3D=3D RTAS_SYSPARM_SPLPAR_CHARACTERISTICS.
+> > +				trace_kvm_spp_induced_page_fault(vcpu,
+> > +								 gva,
+> > +								 len);
+> > +				break;
+> > +			}
+> > +
+> > +			if (was_spp_armed(new_spte)) {
+> > +				restore_spp_bit(&new_spte);
+> > +				spp_protected = true;
+> > +			} else {
+> > +				new_spte |= PT_WRITABLE_MASK;
+> > +			}
+> >  
+> >  			/*
+> >  			 * Do not fix write-permission on the large spte.  Since
+> 
+> ...
+> 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 24e4e1c47f42..97d862c79124 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -200,7 +200,6 @@ static const struct {
+> >  	[VMENTER_L1D_FLUSH_EPT_DISABLED] = {"EPT disabled", false},
+> >  	[VMENTER_L1D_FLUSH_NOT_REQUIRED] = {"not required", false},
+> >  };
+> > -
+> 
+> Spurious whitepsace.
+>
+OK.
 
-I think any performance consideration here is a red herring.  This
-particular RTAS call is a handful-of-times-per-boot thing, and only
-AFAIK used by AIX guests.
+> >  #define L1D_CACHE_ORDER 4
+> >  static void *vmx_l1d_flush_pages;
+> >  
+> > @@ -2999,6 +2998,7 @@ void vmx_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+> >  	bool update_guest_cr3 = true;
+> >  	unsigned long guest_cr3;
+> >  	u64 eptp;
+> > +	u64 spptp;
+> >  
+> >  	guest_cr3 = cr3;
+> >  	if (enable_ept) {
+> > @@ -3027,6 +3027,12 @@ void vmx_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+> >  
+> >  	if (update_guest_cr3)
+> >  		vmcs_writel(GUEST_CR3, guest_cr3);
+> > +
+> > +	if (kvm->arch.spp_active && VALID_PAGE(vcpu->kvm->arch.sppt_root)) {
+> > +		spptp = construct_spptp(vcpu->kvm->arch.sppt_root);
+> > +		vmcs_write64(SPPT_POINTER, spptp);
+> > +		vmx_flush_tlb(vcpu, true);
+> 
+> Why is SPP so special that it gets to force TLB flushes?
+I double checked the code, there's a call to vmx_flush_tlb() in
+mmu_load(), so it's unnecessary here, thank you!
 
-I'm in favour of the change on the grounds of code locality and
-readability.
+> > +	}
+> >  }
+> >  
+> >  int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+> > @@ -5361,6 +5367,74 @@ static int handle_monitor_trap(struct kvm_vcpu *vcpu)
+> >  	return 1;
+> >  }
+> >  
+> > +int handle_spp(struct kvm_vcpu *vcpu)
+> 
+> Can be static.
+>
+Thanks!
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> > +{
+> > +	unsigned long exit_qualification;
+> > +	struct kvm_memory_slot *slot;
+> > +	gpa_t gpa;
+> > +	gfn_t gfn;
+> > +
+> > +	exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
+> > +
+> > +	/*
+> > +	 * SPP VM exit happened while executing iret from NMI,
+> > +	 * "blocked by NMI" bit has to be set before next VM entry.
+> > +	 * There are errata that may cause this bit to not be set:
+> > +	 * AAK134, BY25.
+> > +	 */
+> > +	if (!(to_vmx(vcpu)->idt_vectoring_info & VECTORING_INFO_VALID_MASK) &&
+> > +	    (exit_qualification & SPPT_INTR_INFO_UNBLOCK_NMI))
+> > +		vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO,
+> > +			      GUEST_INTR_STATE_NMI);
+> > +
+> > +	vcpu->arch.exit_qualification = exit_qualification;
+> 
+> 	if (WARN_ON(!(exit_qualification & SPPT_INDUCED_EXIT_TYPE)))
+> 		goto out_err;
+> 
+> 	<handle spp exit>
+> 
+> 	return 1;
+> 
+> out_err:
+> 	vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
+> 	vcpu->run->hw.hardware_exit_reason = EXIT_REASON_SPP;
+> 	return 0;
+>
+Sure, will change it.
 
---XIiC+We3v3zHqZ6Z
-Content-Type: application/pgp-signature; name="signature.asc"
+> > +	if (exit_qualification & SPPT_INDUCED_EXIT_TYPE) {
+> > +		int page_num = KVM_PAGES_PER_HPAGE(PT_DIRECTORY_LEVEL);
+> 
+> The compiler is probably clever enough to make these constants, but if
+> this logic is a fundamental property of SPP then it should be defined as
+> a macro somewhere.
+>
+OK, will change it.
 
------BEGIN PGP SIGNATURE-----
+> > +		u32 *access;
+> > +		gfn_t gfn_max;
+> > +
+> > +		/*
+> > +		 * SPPT missing
+> > +		 * We don't set SPP write access for the corresponding
+> > +		 * GPA, if we haven't setup, we need to construct
+> > +		 * SPP table here.
+> > +		 */
+> > +		gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
+> > +		gfn = gpa >> PAGE_SHIFT;
+> 
+> gpa_to_gfn()
+>
+OK.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4cGWAACgkQbDjKyiDZ
-s5IRhxAAgjwTfn6oDce64WmxrtSzdp5v8NnkSL1fO3d3+2xEQyjHrPoCNGPjgsqG
-s05hIyZ+0BwiAKsdwmFtqnxsMdtwpNWDgzESv9t7aY3qRy3hZWj7b12sVkhio7nv
-5LZ5VI0Brp0fGRv6Kw6/4KczI/rvWUKYYchMv027IyOdnK01hBLL0Le06RY4gUo4
-ouZOKyF3NolvtBSxotq72UDJzlUeCACieg/xQuYo3DB2KT3HeerdYv4ijsF/vXpe
-yHgxJleALbk8XXfVGM2iXODKOuhbPE0Q1xovdzLZtw8Gc6LyRHlqS0PB4QVqu2pN
-2W2ykFzPV52O5apL+Ythb03YgsbA15V02thgPWJgs8h3MEWaUOkkwuwmguJuZQnH
-4jYeXOIY58Lwksts5+N8TiyuSAuepQiFTXFvysM9GUjt7aSDqW05Gg0b+heDyzyJ
-C00cQD+AzUJzFeRR75A8/bBzoeA2xTG8N2+CH2uinY2H3CBMHfy9V2DnzJChDwEL
-zkPr/tk2KT00dioTwNJFTyVivvZOzTWR8GbHxsM6+uOBiF/UwvyOQiJEHYcj2g/4
-KFl9FaakjOqsjd3+tEOwyTmmIxlNNBBpphHYt+8ZKoYu344+Qp/E7brigCvhpC6+
-x/YqfPajq/dqVh2mWqGNfEZyepvxWhQO2OglVhpd5WdTGP1x99U=
-=x52C
------END PGP SIGNATURE-----
+> > +		trace_kvm_spp_induced_exit(vcpu, gpa, exit_qualification);
+> > +		/*
+> > +		 * In level 1 of SPPT, there's no PRESENT bit, all data is
+> > +		 * regarded as permission vector, so need to check from
+> > +		 * level 2 to set up the vector if target page is protected.
+> > +		 */
+> > +		spin_lock(&vcpu->kvm->mmu_lock);
+> > +		gfn &= ~(page_num - 1);
+> 
+> 
+> 
+> > +		gfn_max = gfn + page_num - 1;
+> 
+> s/gfn_max/gfn_end
+OK.
 
---XIiC+We3v3zHqZ6Z--
+> 
+> > +		for (; gfn <= gfn_max; gfn++) {
+> 
+> My preference would be to do:
+> 		gfn_end = gfn + page_num;
+> 
+> 		for ( ; gfn < gfn_end; gfn++)
+>
+Thank you!
+> > +			slot = gfn_to_memslot(vcpu->kvm, gfn);
+
