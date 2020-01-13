@@ -2,110 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6737D139BD3
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 22:47:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 868EB139C32
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2020 23:10:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728820AbgAMVrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 16:47:14 -0500
-Received: from mga14.intel.com ([192.55.52.115]:27903 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726488AbgAMVrO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jan 2020 16:47:14 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Jan 2020 13:47:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,430,1571727600"; 
-   d="scan'208";a="217534645"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga008.jf.intel.com with ESMTP; 13 Jan 2020 13:47:13 -0800
-Date:   Mon, 13 Jan 2020 13:47:13 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        jmattson@google.com, yu.c.zhang@linux.intel.com,
-        edwin.zhai@intel.com, tamas@tklengyel.com,
-        mathieu.tarral@protonmail.com
-Subject: Re: [RESEND PATCH v10 06/10] vmx: spp: Set up SPP paging table at
- vmentry/vmexit
-Message-ID: <20200113214713.GG2322@linux.intel.com>
-References: <20200102061319.10077-1-weijiang.yang@intel.com>
- <20200102061319.10077-7-weijiang.yang@intel.com>
- <20200110180458.GG21485@linux.intel.com>
- <20200113081050.GF12253@local-michael-cet-test.sh.intel.com>
- <20200113173358.GC1175@linux.intel.com>
- <15789417460.A97E650.22893@host>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <15789417460.A97E650.22893@host>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1728819AbgAMWK5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 17:10:57 -0500
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:52786 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727382AbgAMWK5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jan 2020 17:10:57 -0500
+Received: by mail-pf1-f202.google.com with SMTP id 145so7471900pfx.19
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 14:10:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=tgXHdBhTxnbggm48PWjGbR468zkVyYGw0KccqoL7rpE=;
+        b=nMOkTXEuejp7ltUHNH5PwzsoaA8hAe+3a/zcrS0wD8S2/J5Umx5O9KFmaYDfxeKiik
+         Ux9uUEvVKwo29Kvaxp/OARzzgcyr9F3EBK2dLNuKxxifrtu17aKlMZcmYOU9QLwlPolH
+         Bgr1dV2ZalUSIQ1DjUyQ1Q3uhc8/Fd1rxoNGwQm/QviERBptioRJtBbDT04+naXxgkJv
+         ePXuR757YoKbkB4VG0B+H1Jol3Jy6MWGsr34Zr9e4lZwgAltPBgo3e114UEON9Guicj7
+         t03g8Vs2Oz8k2AHzBnnG+QycgVG2S+OvvQi8X00fD/hX2f7dGNxos4EyzdQMFAFKj8z6
+         bpFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=tgXHdBhTxnbggm48PWjGbR468zkVyYGw0KccqoL7rpE=;
+        b=KEWI1ZkUn1yiLSiGsuoTBx8L6dccXTmZLV4Ncv7e04gy5cur+CdEuYcvtjOMmif+Bk
+         ufC/CogXcyPJSQ0b2Yve5U+rohwmyXqSLjOVT2eW44CH1KjgcNqr7v5U8P3PESWb9ZHL
+         TjCQOQgymz2CcANZfpV/VS459phuDOMgfX5G7Q0JVZo5j9Oz2ws/Z6mnhp5R/nCObZq/
+         UO9APYf896jzm2SKKBr8e0/omK8AOWXMy0/SMSQs+qAupE6KSto2mHfS468ooV7qXSp2
+         aoFwr5psAzslus+uYjdFxkFtrA7VC6bLw4JLAoPjfQpPMFsgN8WM16AjG5OWbM2B8bW/
+         R5qQ==
+X-Gm-Message-State: APjAAAXehvBb3pXkEGWQyoVrc0tVikGjvRlPizclSSFO/8b4/cn5rQnk
+        Z5BDn1Iq9II+RAyifzciwKhhKQMUw+bRQJpyoY/+aTyBdiSeo2p5D23zWi0qgFGo9EMelNvbgt8
+        j2EXpNhNSDJbKTLGypkK2qTeuE1iIK4Eg2UBa+QHCQ2tkYdjuQjF2sHf/og==
+X-Google-Smtp-Source: APXvYqz09qNCQFN5bt1F8eq7/D6JLu/oaru0DGVcMGilzCKvI5HYi8omESd5WpXJNj/CErdAQJKLEGA61as=
+X-Received: by 2002:a63:7944:: with SMTP id u65mr21442503pgc.298.1578953455971;
+ Mon, 13 Jan 2020 14:10:55 -0800 (PST)
+Date:   Mon, 13 Jan 2020 14:10:50 -0800
+Message-Id: <20200113221053.22053-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.rc1.283.g88dfdc4193-goog
+Subject: [PATCH 0/3] Handle monitor trap flag during instruction emulation
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 13, 2020 at 08:55:46PM +0200, Adalbert Lazăr wrote:
-> On Mon, 13 Jan 2020 09:33:58 -0800, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> > On Mon, Jan 13, 2020 at 04:10:50PM +0800, Yang Weijiang wrote:
-> > > On Fri, Jan 10, 2020 at 10:04:59AM -0800, Sean Christopherson wrote:
-> > > > On Thu, Jan 02, 2020 at 02:13:15PM +0800, Yang Weijiang wrote:
-> > > > > @@ -3585,7 +3602,30 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gva_t gva, int level,
-> > > > >  		if ((error_code & PFERR_WRITE_MASK) &&
-> > > > >  		    spte_can_locklessly_be_made_writable(spte))
-> > > > >  		{
-> > > > > -			new_spte |= PT_WRITABLE_MASK;
-> > > > > +			/*
-> > > > > +			 * Record write protect fault caused by
-> > > > > +			 * Sub-page Protection, let VMI decide
-> > > > > +			 * the next step.
-> > > > > +			 */
-> > > > > +			if (spte & PT_SPP_MASK) {
-> > > > > +				int len = kvm_x86_ops->get_inst_len(vcpu);
-> > > > 
-> > > > There's got to be a better way to handle SPP exits than adding a helper
-> > > > to retrieve the instruction length.
-> > > >
-> > > The fault instruction was skipped by kvm_skip_emulated_instruction()
-> > > before, but Paolo suggested leave the re-do or skip option to user-space
-> > > to make it flexible for write protection or write tracking, so return
-> > > length to user-space.
-> > 
-> > Sorry, my comment was unclear.  I have no objection to punting the fault
-> > to userspace, it's the mechanics of how it's done that I dislike.
-> > 
-> > Specifically, (a) using run->exit_reason to propagate the SPP exit up the
-> > stack, e.g. instead of modifying affected call stacks to play nice with
-> > any exit to userspace, (b) assuming ->get_insn_len() will always be
-> > accurate, e.g. see the various caveats in skip_emulated_instruction() for
-> > both VMX and SVM, and (c) duplicating the state capture code in every
-> > location that can encounter a SPP fault.
-> > 
-> > What I'm hoping is that it's possible to modify the call stacks to
-> > explicitly propagate an exit to userspace and/or SPP fault, and shove all
-> > the state capture into a common location, e.g. handle_ept_violation().
-> > 
-> > Side topic, assuming the userspace VMI is going to be instrospecting the
-> > faulting instruction, won't it decode the instruction?  I.e. calculate
-> > the instruction length anyways?
-> 
-> Indeed, we decode the instruction from userspace. I don't know if the
-> instruction length helps other projects. Added Tamas and Mathieu.
-> 
-> In our last VMI API proposal, the breakpoint event had the instruction
-> length sent to userspace, but I can't remember why.
+KVM already provides guests the ability to use the 'monitor trap flag'
+VM-execution control. Support for this flag is provided by the fact that
+KVM unconditionally forwards MTF VM-exits to the guest (if requested),
+as KVM doesn't utilize MTF. While this provides support during hardware
+instruction execution, it is insufficient for instruction emulation.
 
-INT3 is trap-like, i.e. the VM-Exit occurs after the instruction retires.
-It's impossible for software to know how far to unwind RIP without the
-instruction length being provided by hardware/KVM, e.g. if the guest is
-being silly and prepends ignored prefixes on the INT3.
+Should L0 emulate an instruction on the behalf of L2, L0 should also
+synthesize an MTF VM-exit into L1, should control be set.
 
-Self-aware software has a priori knowledge of what's being patched in,
-and practically speaking I don't any well-behaved sane software uses
-prefixes with INT3, but from a VMM's perspective it's legal and possible.
+The first patch fixes the handling of #DB payloads for both Intel and
+AMD. To support MTF, KVM must also populate the 'pending debug
+exceptions' field, rather than directly manipulating the debug register
+state. Additionally, the exception payload associated with #DB is said
+to be compatible with the 'pending debug exceptions' field in VMX. This
+does not map cleanly into an AMD DR6 register, requiring bit 12 (enabled
+breakpoint on Intel, reserved MBZ on AMD) to be masked off.
 
-> 
-> https://lore.kernel.org/kvm/20190809160047.8319-62-alazar@bitdefender.com/
+The second patch implements MTF under instruction emulation by adding
+vendor-specific hooks to kvm_skip_emulated_instruction(). Should any
+non-debug exception be pending before this call, MTF will follow event
+delivery. Otherwise, an MTF VM-exit may be synthesized directly into L1.
+
+Third patch introduces tests to kvm-unit-tests. These tests path both
+under virtualization and on bare-metal.
+
+Oliver Upton (2):
+  KVM: x86: Add vendor-specific #DB payload delivery
+  KVM: x86: Emulate MTF when performing instruction emulation
+
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/svm.c              | 25 +++++++++++++++++++++
+ arch/x86/kvm/vmx/nested.c       |  2 +-
+ arch/x86/kvm/vmx/nested.h       |  5 +++++
+ arch/x86/kvm/vmx/vmx.c          | 39 ++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/x86.c              | 27 ++++++-----------------
+ 6 files changed, 78 insertions(+), 22 deletions(-)
+
+-- 
+2.25.0.rc1.283.g88dfdc4193-goog
+
