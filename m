@@ -2,126 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 486D313B277
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 19:58:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5621B13B34F
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 21:01:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728734AbgANS6J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jan 2020 13:58:09 -0500
-Received: from mga04.intel.com ([192.55.52.120]:30876 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726053AbgANS6J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jan 2020 13:58:09 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jan 2020 10:58:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,319,1574150400"; 
-   d="scan'208";a="249500514"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 14 Jan 2020 10:58:08 -0800
-Date:   Tue, 14 Jan 2020 10:58:08 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
+        id S1728783AbgANUBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jan 2020 15:01:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41674 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726491AbgANUBk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jan 2020 15:01:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579032099;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=F5YGCCGIX+lIuE1xVDvMmlXX8AVAofNe88Se1/lzptk=;
+        b=bQgNSKsdn/+k6J/0nR5h6y6iw1hQLDxUY8vYTboOpK0Pxb/4uVJculfzo7aHJb+iFGd1eK
+        YByexd5sJkRxg5VbekMN/u0dNF5kSZemEXkOP1FupqINwttYzPZgp4qVAci6It9354PGnE
+        ewkdDlIOFvHXhndegUdZQi9KPzGI73E=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-BdqQVZtUO8-8ZVsXuaA3aQ-1; Tue, 14 Jan 2020 15:01:37 -0500
+X-MC-Unique: BdqQVZtUO8-8ZVsXuaA3aQ-1
+Received: by mail-qv1-f71.google.com with SMTP id z9so9421556qvo.10
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2020 12:01:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=F5YGCCGIX+lIuE1xVDvMmlXX8AVAofNe88Se1/lzptk=;
+        b=l2XiRJ+g5iAUzWoe9XhRdfTg0vyCLSDRQa/yGNPfAISlEZ0UB6J1RXJkOXBNe041Yn
+         cRtSGUcZbrGAI7dwgjdQWu19OCgw0/aczlSp0H8aLJo5B71VjOB0XtW4qfLx0/LBmJZq
+         KIX5KsH+MUvuHMGQByuQ22SlyhOjOo+5HOs+0JnFVWF5kERzOWWBMIwFXXVVHsI/4trd
+         dyPQuxTJwNhHV8kwpOemqY8e5o3GxautTQznm0GD20ZcC+v8GhJTHPc9MVLISqNyE7Z0
+         BWa72Bv+ofnRTcUTfu1K7o4NefVRcJDyj48kvURGm//R3hyQbDz1UoXyi+9q1pWVnj2g
+         /qKg==
+X-Gm-Message-State: APjAAAVi3l/FN9EoUF3ITlLZjldmzcqc3ycs4yeQ6aVyLUDGDk+g+eYB
+        totpH4EDCVh+6WF4EIN8i9W63Fw1Rad9n5fwYiBWHxL+E1opVrZy8LXMPt+alAXwG+SH+pi4kRL
+        hgIyjD5OY1Mtd
+X-Received: by 2002:ad4:51cc:: with SMTP id p12mr22091564qvq.113.1579032097454;
+        Tue, 14 Jan 2020 12:01:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxNbvJ19TaniVCvM/mX2nsCuKcnV2VokhOKt9QMPvk/ivDM+6fGWGUc2wdsUeBtEK+BAUVjqA==
+X-Received: by 2002:ad4:51cc:: with SMTP id p12mr22091536qvq.113.1579032097113;
+        Tue, 14 Jan 2020 12:01:37 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id m8sm8255953qtk.60.2020.01.14.12.01.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2020 12:01:36 -0800 (PST)
+Date:   Tue, 14 Jan 2020 15:01:34 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com,
-        yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
-        edwin.zhai@intel.com
-Subject: Re: [RESEND PATCH v10 06/10] vmx: spp: Set up SPP paging table at
- vmentry/vmexit
-Message-ID: <20200114185808.GI16784@linux.intel.com>
-References: <20200102061319.10077-1-weijiang.yang@intel.com>
- <20200102061319.10077-7-weijiang.yang@intel.com>
- <20200110180458.GG21485@linux.intel.com>
- <20200113081050.GF12253@local-michael-cet-test.sh.intel.com>
- <20200113173358.GC1175@linux.intel.com>
- <20200114030820.GA4583@local-michael-cet-test.sh.intel.com>
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Lei Cao <lei.cao@stratus.com>,
+        Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v3 12/21] KVM: X86: Implement ring-based dirty memory
+ tracking
+Message-ID: <20200114200134.GA233443@xz-x1>
+References: <20200109145729.32898-1-peterx@redhat.com>
+ <20200109145729.32898-13-peterx@redhat.com>
+ <20200109110110-mutt-send-email-mst@kernel.org>
+ <20200109191514.GD36997@xz-x1>
+ <20200109141634-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200114030820.GA4583@local-michael-cet-test.sh.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200109141634-mutt-send-email-mst@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 14, 2020 at 11:08:20AM +0800, Yang Weijiang wrote:
-> On Mon, Jan 13, 2020 at 09:33:58AM -0800, Sean Christopherson wrote:
-> > On Mon, Jan 13, 2020 at 04:10:50PM +0800, Yang Weijiang wrote:
-> > > On Fri, Jan 10, 2020 at 10:04:59AM -0800, Sean Christopherson wrote:
-> > > > On Thu, Jan 02, 2020 at 02:13:15PM +0800, Yang Weijiang wrote:
-> > > > > @@ -3585,7 +3602,30 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gva_t gva, int level,
-> > > > >  		if ((error_code & PFERR_WRITE_MASK) &&
-> > > > >  		    spte_can_locklessly_be_made_writable(spte))
-> > > > >  		{
-> > > > > -			new_spte |= PT_WRITABLE_MASK;
-> > > > > +			/*
-> > > > > +			 * Record write protect fault caused by
-> > > > > +			 * Sub-page Protection, let VMI decide
-> > > > > +			 * the next step.
-> > > > > +			 */
-> > > > > +			if (spte & PT_SPP_MASK) {
-> > > > > +				int len = kvm_x86_ops->get_inst_len(vcpu);
-> > > > 
-> > > > There's got to be a better way to handle SPP exits than adding a helper
-> > > > to retrieve the instruction length.
-> > > >
-> > > The fault instruction was skipped by kvm_skip_emulated_instruction()
-> > > before, but Paolo suggested leave the re-do or skip option to user-space
-> > > to make it flexible for write protection or write tracking, so return
-> > > length to user-space.
-> > 
-> > Sorry, my comment was unclear.  I have no objection to punting the fault
-> > to userspace, it's the mechanics of how it's done that I dislike.
-> > 
-> > Specifically, (a) using run->exit_reason to propagate the SPP exit up the
-> > stack, e.g. instead of modifying affected call stacks to play nice with
-> > any exit to userspace, (b) assuming ->get_insn_len() will always be
-> > accurate, e.g. see the various caveats in skip_emulated_instruction() for
-> > both VMX and SVM, and (c) duplicating the state capture code in every
-> > location that can encounter a SPP fault.
->
-> How about calling skip_emulated_instruction() in KVM before exit to
+On Thu, Jan 09, 2020 at 02:35:46PM -0500, Michael S. Tsirkin wrote:
+>   ``void flush_dcache_page(struct page *page)``
+> 
+>         Any time the kernel writes to a page cache page, _OR_
+>         the kernel is about to read from a page cache page and
+>         user space shared/writable mappings of this page potentially
+>         exist, this routine is called.
+> 
+> 
+> > Also, I believe this is the similar question that Jason has asked in
+> > V2.  Sorry I should mention this earlier, but I didn't address that in
+> > this series because if we need to do so we probably need to do it
+> > kvm-wise, rather than only in this series.
+> 
+> You need to document these things.
+> 
+> >  I feel like it's missing
+> > probably only because all existing KVM supported archs do not have
+> > virtual-tagged caches as you mentioned.
+> 
+> But is that a fact? ARM has such a variety of CPUs,
+> I can't really tell. Did you research this to make sure?
+> 
+> > If so, I would prefer if you
+> > can allow me to ignore that issue until KVM starts to support such an
+> > arch.
+> 
+> Document limitations pls.  Don't ignore them.
 
-I'm confused.  It sounds like KVM_EXIT_SPP provides the instruction length
-because it skips an instruction before exiting to userspace.  But if KVM
-is is emulating an instruction, it shouldn't be doing
-{kvm_}skip_emulated_instruction(), e.g. if emulation fails due to a SPP
-violation (returns KVM_EXIT_SPP) then GUEST_RIP should still point at the
-exiting instruction.  Ditto for the fast_page_fault() case, RIP shouldn't
-be advanced.
+Hi, Michael,
 
-What am I missing?
+I failed to find a good place to document about flush_dcache_page()
+for KVM.  Could you give me a suggestion?
 
-> userspace, but still return the skipped instruction length, if userspace
-> would like to re-execute the instruction, it can unwind RIP or simply
-> rely on KVM?
+And I don't know about whether there's any ARM hosts that requires
+flush_dcache_page().  I think not, because again I didn't see any
+caller of flush_dcache_page() in KVM code yet.  Otherwise I think we
+should at least call it before the kernel reading kvm_run or after
+publishing data to kvm_run.  However I'm also CCing Drew for this.
 
-I'm not convinced the instruction length needs to be provided to userspace
-for this case.  Obviously it's not difficult to provide the info, I just
-don't understand the value added by doing so.  As above, RIP shouldn't
-need to be unwound, and blindly skipping an instruction seems like an odd
-thing for a VMI engine to do.
+Thanks,
 
-> > What I'm hoping is that it's possible to modify the call stacks to
-> > explicitly propagate an exit to userspace and/or SPP fault, and shove all
-> > the state capture into a common location, e.g. handle_ept_violation().
-> >
-> The problem is, the state capture code in fast_page_fault() and
-> emulation case share different causes, the former is generic occurence
-> of SPP induced EPT violation, the latter is atually a "faked" one while
-> detecting emulation instruction is writing some SPP protected area, so I
-> seperated them.
+-- 
+Peter Xu
 
-Can we make SPP dependent on unrestricted guest so that the only entry
-point to the emulator is through handle_ept_violation()?  And thus the
-only path to triggering KVM_EXIT_SPP would also be through
-handle_ept_violation(); (I think, might be forgetting a different emulation
-path).
-
->
-> > Side topic, assuming the userspace VMI is going to be instrospecting the
-> > faulting instruction, won't it decode the instruction?  I.e. calculate
-> > the instruction length anyways?
