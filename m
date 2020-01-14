@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ABAA7139F45
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 03:00:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44DC7139F47
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 03:01:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729437AbgANCAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 21:00:24 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:36709 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729427AbgANCAY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jan 2020 21:00:24 -0500
-Received: by mail-lf1-f68.google.com with SMTP id n12so8481925lfe.3
-        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 18:00:22 -0800 (PST)
+        id S1729470AbgANCA6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 21:00:58 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:44273 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729427AbgANCA6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jan 2020 21:00:58 -0500
+Received: by mail-lf1-f67.google.com with SMTP id v201so8465738lfa.11
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 18:00:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=8TABIaesLWHDdS8DK0RdBcbOgWuOS8JDBz9kVGBhjg8=;
-        b=uRmU8IrV2Kwgz/8qAURHetLcRDt3Xpz+7Q+UEKS2zWcNKTiiWfpPHx5mdVxEnoixfX
-         36yfOm0yDR879p/RKRBHVx8EtNtQJ5qBPMyzweYPSU2w+444J8Jt9SRsRZG0wvAu9hQu
-         TauGzJurlrQNCk4DOMnvefBI8pHg2UTDjnnbZcoTeTZtYnTGE6HYxiAN5+0wQmhB3I+n
-         o4c7A5cNIUw0C+gAcNQHLOeJ9jUE9sSW0fPJgXejwbEVaD6zo5fCH+HvVYL1Jf6Of71+
-         Rjmp2ryhqLzn2vcPE2we56FnkGK8xyLaeHLN5XaF7oeaqGv5nHLLzbbx3EBoF93P34/N
-         bkxg==
+        bh=jIOw/CbzXybkeMH1o84BTHPma96iahA5s5mXf7EbPk0=;
+        b=F/2EGDDC2WMeINqtbvPOP6hek9GQs8wGt5hGy2hjzrUb+9ElYoc0NdDXkcStJx3NUM
+         dY+yg5+BJY9/galzSJ6/BnzwwDlHVHm7vY+3lCjUlap+A/NRZyB8XrhB2CbucKLr2ICo
+         NXi6qbwodf9FCH/h1Rgs5hAULbEk5h+wWwdJXAffR9ukxUykbQ0ClU687A0xvKGB0dxM
+         3GCEOgcMaPrcOjCyPGKR7kooF/lagCH882ycJtKvvAY2qhCQ1V9UdwNECGVZffPyZRqc
+         XGxqgretv6V6c/cs1s/DYMUqTDmAyTXxO6CZvHp4yBtmdAThPBr7BjDDZBwAIrbjY8Ug
+         XBNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=8TABIaesLWHDdS8DK0RdBcbOgWuOS8JDBz9kVGBhjg8=;
-        b=sm8SxzbIeb82HWHMSUYrc5tcYHJT3EEpFmQ2j7QdNZ6FG5NktugybDiFn6oMqjmVxB
-         tfix7SA82KaPKXGu8wPAoFJpkI0Hl08LhGzhG81yK7+ETWDICrntHS7K/u6FNAusIvqS
-         t95QA2EIfEWNqLIa/EJRjaek/ATFCC4QyDUXmEu947cgUkJar9DFBZ9w+60KFVfO3Ny9
-         xXtU5JrzNWzrFuK3fey3mWlL0XcQ0tlIEPQUP+y53xbM0g/SJZdaiMz5haUkTP6ukk2v
-         gU8UuogHZ9Cy1ULCoAOyK0LG82xLnop7IKtOVOf1zH4Gu/WeuH8EGQVTUaZRqB2+ZnLo
-         hA1g==
-X-Gm-Message-State: APjAAAXi7Ld0XxSc4L8WK4RtKDhO0cggXO8FSFXKvHBUqZDjOlU7n6s2
-        P1cSNk/LzmWQaOOMBOJfR74l1YA1e0GU4OQgUhU=
-X-Google-Smtp-Source: APXvYqwUIQSiQcj1gBt1vZS9VSYTqmqQ5Z0LwWrxO9JJb50ZRngJxt2wHTwfjP90rCFRNHVqaZezjew947fjp7tLGnk=
-X-Received: by 2002:ac2:5498:: with SMTP id t24mr250782lfk.84.1578967222098;
- Mon, 13 Jan 2020 18:00:22 -0800 (PST)
+        bh=jIOw/CbzXybkeMH1o84BTHPma96iahA5s5mXf7EbPk0=;
+        b=FBIzndNjcafHvOWCyQ2HelFxeK9l/6vFqUPlsBVZJOhlksgq2QnPva86/0llg+d7OW
+         2YedV36LjAc8sOfbiTmUiuoXESGy5NpZeNm0pSXtte30v7kkbS6rlS87B1WeIlpABDvj
+         mTB1xPLV0rTTgZJ9IQux0Dynw9HSuimKWfDQvM8frG/8J4xIXX46M+9awvVDP6EMjMRq
+         kqXllQwxo5gdgxno2CVzSV9/BjQmxyU7KwRy3+M9W5v5VtCS119n5EY7vgvbNs+zeWxS
+         dj+S36liJNsYueEi2oSxmLdHxkkR8pUpT5eIUh055oxu2CZdHrDXPvf0WZRwy6fwnVkv
+         bQPA==
+X-Gm-Message-State: APjAAAUKPm/KUyZydym7l1ejqNpa8EmbbVsovMozvNI0Texblo5BZVls
+        bg6r9iAjpepSXu7XgT3G6jmsjwA+nEQIjgGkWHI=
+X-Google-Smtp-Source: APXvYqy0yOxpo2ZhrAVQmvYzqkDqXbC7rHMR28Xir3J+/oJ9W0WgJXcuHpsQDEKYMEI20F51m0GHIdp0kwKp1u+TE+I=
+X-Received: by 2002:a19:4ac2:: with SMTP id x185mr215459lfa.131.1578967256625;
+ Mon, 13 Jan 2020 18:00:56 -0800 (PST)
 MIME-Version: 1.0
-References: <20200109152133.23649-1-philmd@redhat.com> <20200109152133.23649-15-philmd@redhat.com>
-In-Reply-To: <20200109152133.23649-15-philmd@redhat.com>
+References: <20200109152133.23649-1-philmd@redhat.com> <20200109152133.23649-16-philmd@redhat.com>
+In-Reply-To: <20200109152133.23649-16-philmd@redhat.com>
 From:   Alistair Francis <alistair23@gmail.com>
-Date:   Tue, 14 Jan 2020 11:59:55 +1000
-Message-ID: <CAKmqyKPa0F6B1PR3O4-Tsz64guywyLxHO5FSQVZAw4D3KNrGZA@mail.gmail.com>
-Subject: Re: [PATCH 14/15] accel/accel: Replace current_machine by qdev_get_machine()
+Date:   Tue, 14 Jan 2020 12:00:30 +1000
+Message-ID: <CAKmqyKPZ-=Njnv9KhS7yN_UE_Cij_eD=uUxdKhB5r8+dddiCyg@mail.gmail.com>
+Subject: Re: [PATCH 15/15] vl: Make current_machine a local variable
 To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
         Peter Maydell <peter.maydell@linaro.org>,
@@ -68,41 +68,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 10, 2020 at 1:40 AM Philippe Mathieu-Daud=C3=A9
+On Fri, Jan 10, 2020 at 1:34 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> As we want to remove the global current_machine,
-> replace 'current_machine' by MACHINE(qdev_get_machine()).
+> Since we now only use current_machine in vl.c, stop exporting
+> it as a global variable in "hw/board.h", and make it static
+> to vl.c.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-I feel like this could be squashed with the one that adds this
-function, but either way:
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  accel/accel.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  include/hw/boards.h | 2 --
+>  vl.c                | 4 ++--
+>  2 files changed, 2 insertions(+), 4 deletions(-)
 >
-> diff --git a/accel/accel.c b/accel/accel.c
-> index cb555e3b06..777d6ba119 100644
-> --- a/accel/accel.c
-> +++ b/accel/accel.c
-> @@ -65,7 +65,9 @@ int accel_init_machine(AccelState *accel, MachineState =
-*ms)
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 61f8bb8e5a..b0c0d4376d 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -59,8 +59,6 @@ void memory_region_allocate_system_memory(MemoryRegion =
+*mr, Object *owner,
+>  #define MACHINE_CLASS(klass) \
+>      OBJECT_CLASS_CHECK(MachineClass, (klass), TYPE_MACHINE)
 >
->  AccelState *current_accel(void)
->  {
-> -    return current_machine->accelerator;
-> +    MachineState *ms =3D MACHINE(qdev_get_machine());
+> -extern MachineState *current_machine;
+> -
+>  void machine_run_board_init(MachineState *machine);
+>  bool machine_usb(MachineState *machine);
+>  int machine_phandle_start(MachineState *machine);
+> diff --git a/vl.c b/vl.c
+> index 3ff3548183..7a69af4bef 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -214,6 +214,8 @@ static int default_sdcard =3D 1;
+>  static int default_vga =3D 1;
+>  static int default_net =3D 1;
+>
+> +static MachineState *current_machine;
 > +
-> +    return ms->accelerator;
->  }
+>  static struct {
+>      const char *driver;
+>      int *flag;
+> @@ -1164,8 +1166,6 @@ static int usb_parse(const char *cmdline)
+>  /***********************************************************/
+>  /* machine registration */
 >
->  void accel_setup_post(MachineState *ms)
+> -MachineState *current_machine;
+> -
+>  static MachineClass *find_machine(const char *name, GSList *machines)
+>  {
+>      GSList *el;
 > --
 > 2.21.1
 >
