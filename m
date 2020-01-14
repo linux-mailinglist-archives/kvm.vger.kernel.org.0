@@ -2,77 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D804013AF32
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 17:23:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97FD213AFC2
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 17:46:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727102AbgANQXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jan 2020 11:23:12 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:43694 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725904AbgANQXL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jan 2020 11:23:11 -0500
-Received: by mail-io1-f66.google.com with SMTP id n21so14437188ioo.10
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2020 08:23:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=4RbjksI4ZVf8jlMAui9QSDoZFwWF9mQNUo5m2497TSc=;
-        b=ivxeIqnDGG2IPj9/lbhO5RIgpchuTRJIBcbtiK0vCwtmMsgUCquQtt1lgRB24Rdi3U
-         433Z4zGeEF1dtED3XsNhNO4TECggm2mOYJLSz2bgeeGQAePcA8xrCdrMey7alEh+T08Z
-         uyBSIn7pi+Dvg5f5h/pOicZt1oRmaEBB87obVZ3Cxz4XMliFF9DjSPUBIBR0cCkYDXtu
-         d6C864QDoOzkX9MlLKqHwSEYVJkjGdyJGaHAvpO4ajrvtL/IrtSjV5aLb873FwjD9ou1
-         5IsTK9x5qHkJCM0MIfrtFo9Z+aBanyKN+Efhh/rAjtru4Ij5uja0ffMxT34I4BD7RtGv
-         lsHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=4RbjksI4ZVf8jlMAui9QSDoZFwWF9mQNUo5m2497TSc=;
-        b=fDQbmV2Ow6R+EBLTySUSILBI/c73B5xs8zX0v1chzgpAdBYLSY6rU+Bk/f+2ekrwkq
-         ZJyz4ltFPtX07F9qkWvMvw9AAh3kxExEE1t8C6PlcY4uyYTMBYtUNbroW9y2d5il5oDI
-         IHwDLQGtolkyMYqgGqvklN/O1UFh00uiGamxvDs99Bg5I/IhQWfh0LWV/8UOdBSfzIgO
-         wTzA7Fsk4GkZnBZ2gAtBasUN3pEknqjlXrz3JVABYtkmhEbc4NkCc/PX9mw9ytYym6iJ
-         3txwnIAPzV7dGZxl3zedJZ281ickmfi5wfMr/e5VEJa6hujktSsAJixpgFNjClhcJcgv
-         3j9A==
-X-Gm-Message-State: APjAAAVTEnTHLhFT0f2wrTxYZr7abCqgcIrFrPyhWBMZkWT4sM1sNbxZ
-        AMtVwJS1Es7qUad62eCjDeMMJl6DRdi0klC40Jw=
-X-Google-Smtp-Source: APXvYqw8FoAyu9xw6e8ZLdUILqg1lBJXWS1Bdg7P+lIfjlrLnKw89R/gpPcrpU/TYg8ySypzehsm+PTRVghC7vf3k0c=
-X-Received: by 2002:a5e:9507:: with SMTP id r7mr17073461ioj.152.1579018991200;
- Tue, 14 Jan 2020 08:23:11 -0800 (PST)
+        id S1728826AbgANQqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jan 2020 11:46:05 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42528 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728777AbgANQqE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jan 2020 11:46:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579020363;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=vOobr5Pb/jq0pC9V3IkdQmUzSf4HvxBY4jE47O36xgY=;
+        b=TE22XQuImKtHKmsAFA9fy1nXhiZ/kDSsB0nMRDznn2+uoAVHp1X1W50Q7MrK14r1riKMvt
+        24JzQLDBUpJJlhuHTCYy8XhCHuNWFs2nr3yyO62pBbJRn5DwLeCuh6bqFoEdVIj8jQRIx1
+        p4yvnKeMu6wpnjfti9twpMzaVMhFLxA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-qQP0Y50nM06M4jwiYa4rrg-1; Tue, 14 Jan 2020 11:46:00 -0500
+X-MC-Unique: qQP0Y50nM06M4jwiYa4rrg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8ADE610C5683;
+        Tue, 14 Jan 2020 16:45:57 +0000 (UTC)
+Received: from thuth.remote.csb (unknown [10.36.118.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B93235C1D6;
+        Tue, 14 Jan 2020 16:45:53 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 2/4] s390x: smp: Only use smp_cpu_setup
+ once
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, linux-s390@vger.kernel.org,
+        david@redhat.com, cohuck@redhat.com
+References: <20200114153054.77082-1-frankja@linux.ibm.com>
+ <20200114153054.77082-3-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <9db91398-0371-cd4a-9758-a185b74467a0@redhat.com>
+Date:   Tue, 14 Jan 2020 17:45:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Received: by 2002:a6b:5a0a:0:0:0:0:0 with HTTP; Tue, 14 Jan 2020 08:23:10
- -0800 (PST)
-Reply-To: aakkaavvii@gmail.com
-From:   Abraham Morrison <mrbidokeke@gmail.com>
-Date:   Tue, 14 Jan 2020 08:23:10 -0800
-Message-ID: <CADSEnMo6OUNvTLAhAVat_EReeXY1KWOwX_MxwkRnrvNNwWgO-g@mail.gmail.com>
-Subject: Good day!
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+In-Reply-To: <20200114153054.77082-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-RGVhciBGcmllbmQsDQpJIGFtIEJhcnJpc3RlciBBYnJhaGFtIE1vcnJpc29uLCBEaWQgeW91IHJl
-Y2VpdmUgbXkgcHJldmlvdXMgbWVzc2FnZQ0KdG8geW91PyBJIGhhdmUgYW4gaW1wb3J0YW50IGlu
-Zm9ybWF0aW9uIGZvciB5b3UgYWJvdXQgeW91ciBpbmhlcml0YW5jZQ0KZnVuZCB3b3J0aCBvZiAo
-JDIwLDUwMCwwMDAuMDApIE1pbGxpb24gd2hpY2ggd2FzIGxlZnQgZm9yIHlvdSBieSB5b3VyDQps
-YXRlIHJlbGF0aXZlLCBNci4gQWxleGFuZGVyLiBTbyBpZiB5b3UgYXJlIGludGVyZXN0ZWQgZ2V0
-IGJhY2sgdG8gbWUNCmZvciBtb3JlIGRldGFpbHMuDQpUaGFuayB5b3UuDQpCYXJyaXN0ZXIgQWJy
-YWhhbSBNb3JyaXNvbi4NCi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
-Li4uLi4uLi4uLi4uLi4uLi4uDQrQlNC+0YDQvtCz0L7QuSDQtNGA0YPQsywNCtCvINCR0LDRgNGA
-0LjRgdGC0LXRgCDQkNCy0YDQsNCw0Lwg0JzQvtGA0YDQuNGB0L7QvSwg0JLRiyDQv9C+0LvRg9GH
-0LjQu9C4INC80L7QtSDQv9GA0LXQtNGL0LTRg9GJ0LXQtSDRgdC+0L7QsdGJ0LXQvdC40LUg0LTQ
-u9GPDQrQstCw0YE/INCjINC80LXQvdGPINC10YHRgtGMINC00LvRjyDQstCw0YEg0LLQsNC20L3Q
-sNGPINC40L3RhNC+0YDQvNCw0YbQuNGPINC+INCy0LDRiNC10Lwg0L3QsNGB0LvQtdC00YHRgtCy
-0LXQvdC90L7QvA0K0YTQvtC90LTQtSDQsiDRgNCw0LfQvNC10YDQtSAoMjAgNTAwIDAwMCwwMCkg
-0LzQuNC70LvQuNC+0L3QvtCyINC00L7Qu9C70LDRgNC+0LIsINC+0YHRgtCw0LLQu9C10L3QvdC+
-0Lwg0LLQsNC8DQrQv9C+0LrQvtC50L3Ri9C8INGA0L7QtNGB0YLQstC10L3QvdC40LrQvtC8LCDQ
-vNC40YHRgtC10YAg0JDQu9C10LrRgdCw0L3QtNGALiDQotCw0Log0YfRgtC+LCDQtdGB0LvQuCDQ
-stGLDQrQt9Cw0LjQvdGC0LXRgNC10YHQvtCy0LDQvdGLLCDRgdCy0Y/QttC40YLQtdGB0Ywg0YHQ
-viDQvNC90L7QuSDQtNC70Y8g0LHQvtC70LXQtSDQv9C+0LTRgNC+0LHQvdC+0Lkg0LjQvdGE0L7R
-gNC80LDRhtC40LguDQrQodC/0LDRgdC40LHQvi4NCtCR0LDRgNGA0LjRgdGC0LXRgCDQkNCy0YDQ
-sNCw0Lwg0JzQvtGA0YDQuNGB0L7QvS4NCg==
+On 14/01/2020 16.30, Janosch Frank wrote:
+> Let's stop and start instead of using setup to run a function on a
+> cpu.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/smp.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
+> 
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 4dee43e..767d167 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -47,7 +47,7 @@ static void test_start(void)
+>  	psw.mask = extract_psw_mask();
+>  	psw.addr = (unsigned long)test_func;
+>  
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+>  	wait_for_flag();
+>  	report(1, "start");
+>  }
+> @@ -131,9 +131,8 @@ static void test_ecall(void)
+>  
+>  	report_prefix_push("ecall");
+>  	testflag = 0;
+> -	smp_cpu_destroy(1);
+>  
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+>  	wait_for_flag();
+>  	testflag = 0;
+>  	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
+> @@ -166,9 +165,8 @@ static void test_emcall(void)
+>  
+>  	report_prefix_push("emcall");
+>  	testflag = 0;
+> -	smp_cpu_destroy(1);
+>  
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+>  	wait_for_flag();
+>  	testflag = 0;
+>  	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
+> @@ -186,7 +184,7 @@ static void test_reset_initial(void)
+>  	psw.addr = (unsigned long)test_func;
+>  
+>  	report_prefix_push("reset initial");
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+>  
+>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+> @@ -217,7 +215,7 @@ static void test_reset(void)
+>  	psw.addr = (unsigned long)test_func;
+>  
+>  	report_prefix_push("cpu reset");
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+
+I think this also fixes a memory leak in case the code did not call
+smp_cpu_destroy() inbetween (since smp_cpu_setup() allocates new memory
+for the low-core). So as far as I can see, this is a good idea:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
