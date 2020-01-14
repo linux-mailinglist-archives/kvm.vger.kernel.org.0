@@ -2,69 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82C4713B18D
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 18:58:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFEC813B206
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 19:25:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728831AbgANR6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jan 2020 12:58:39 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:34717 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728783AbgANR6f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jan 2020 12:58:35 -0500
-Received: by mail-il1-f194.google.com with SMTP id s15so12345512iln.1
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2020 09:58:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=W0yqmoqqiQGX5X+3SmIFIDXs37Fo/K9SpA39UM1ElC0=;
-        b=ghRtCYAQQPaZ9qzmq0BODMZTzaTYbw2CZc2MtwgqKseSozW3nHj+wMLMKE4yBZKHGj
-         1r6EjlAlRKSy7M8wmBJg0LYSPDDHVzABjJyDY2T2OWc+7DpLZh9s4GpXcopCTcZIFXu0
-         r5vPpMAZgLUuL2vwDXeCiGE7ceLoi4BdG9mx0dyDymiL7XqROmZ2RQUmo33TMr2EUMyi
-         YGrQmT3+xfdymFpKDRFtX7VfQPFJvb4gzrxZ7c0bJlOv44kbilDO0ZqaNjN7k5kSolcr
-         8sRa6kBMXMGN7DKCYuUPcIEaAwlsfTCshJLUJXCoVuBwb/D6FfcHKP23V9umZOQ927ra
-         0LUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=W0yqmoqqiQGX5X+3SmIFIDXs37Fo/K9SpA39UM1ElC0=;
-        b=BaVVQgMCxJ59Q6DX+0ReY7Ria5wDZ6ln3K+J2X+Ku4dOg1Wi21R0YWlH9wc2uvzVfm
-         3hlq9WOkAdznWQ0vSB0vLxZzyOlqqwYxnXNnJcpy6YGPe+TvFuzgCvoFVFLDbQmpHqdW
-         jK6FWFjPPjiItzdwxRA3uaFZYdzENhZNct21DQ7nb2zmyf6JUHuARFSS46OIBigHXoMG
-         F/zeEfv2iVdbiEipN5B5/ngx/l2ekLjHFdHNqZ3lXxiCzHaeTMTG1klcWwv/WyM28e/j
-         Fu/19P0Xop6SRh2BT4GXikXPb958tgURs9CHGt75rqsnjNgdMh94BJtblAVu+Dt9aHVj
-         cSsg==
-X-Gm-Message-State: APjAAAU4aXWNdhip1M/wLM7bAxF/hC7UgBfUaZNgtWKfB+b9isIznpQj
-        6YaO3g/rrurZsps4WVqqwurvUP1XiMG/Coe8Ehm8MMU/
-X-Google-Smtp-Source: APXvYqwQxkwd3AtCqY4VnE9c8aMtHdj2rgYPEH36Ngsm4ontALAUNWCIewNvyq8Gu9lP0UVm+nyMb4dco4vRG5kfIrM=
-X-Received: by 2002:a92:8141:: with SMTP id e62mr4466025ild.119.1579024714237;
- Tue, 14 Jan 2020 09:58:34 -0800 (PST)
-MIME-Version: 1.0
-References: <20200113221053.22053-1-oupton@google.com> <20200113221053.22053-3-oupton@google.com>
- <20200114000517.GC14928@linux.intel.com>
-In-Reply-To: <20200114000517.GC14928@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 14 Jan 2020 09:58:22 -0800
-Message-ID: <CALMp9eR0444XUptR6a57JVZwrCSks9dndeDZcQBZ-v0NRctcZg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Emulate MTF when performing instruction emulation
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Oliver Upton <oupton@google.com>, kvm list <kvm@vger.kernel.org>,
+        id S1728774AbgANSZM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jan 2020 13:25:12 -0500
+Received: from mga04.intel.com ([192.55.52.120]:28001 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726491AbgANSZM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jan 2020 13:25:12 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jan 2020 10:25:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,319,1574150400"; 
+   d="scan'208";a="225636474"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga006.jf.intel.com with ESMTP; 14 Jan 2020 10:25:07 -0800
+Date:   Tue, 14 Jan 2020 10:25:07 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+        kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v4 16/19] KVM: Ensure validity of memslot with respect to
+ kvm_get_dirty_log()
+Message-ID: <20200114182506.GF16784@linux.intel.com>
+References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
+ <20191217204041.10815-17-sean.j.christopherson@intel.com>
+ <20191224181930.GC17176@xz-x1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191224181930.GC17176@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 13, 2020 at 4:05 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
+On Tue, Dec 24, 2019 at 01:19:30PM -0500, Peter Xu wrote:
+> On Tue, Dec 17, 2019 at 12:40:38PM -0800, Sean Christopherson wrote:
+> > +int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
+> > +		      int *is_dirty, struct kvm_memory_slot **memslot)
+> >  {
+> >  	struct kvm_memslots *slots;
+> > -	struct kvm_memory_slot *memslot;
+> >  	int i, as_id, id;
+> >  	unsigned long n;
+> >  	unsigned long any = 0;
+> >  
+> > +	*memslot = NULL;
+> > +	*is_dirty = 0;
+> > +
+> >  	as_id = log->slot >> 16;
+> >  	id = (u16)log->slot;
+> >  	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
+> >  		return -EINVAL;
+> >  
+> >  	slots = __kvm_memslots(kvm, as_id);
+> > -	memslot = id_to_memslot(slots, id);
+> > -	if (!memslot->dirty_bitmap)
+> > +	*memslot = id_to_memslot(slots, id);
+> > +	if (!(*memslot)->dirty_bitmap)
+> >  		return -ENOENT;
+> >  
+> > -	n = kvm_dirty_bitmap_bytes(memslot);
+> > +	kvm_arch_sync_dirty_log(kvm, *memslot);
+> 
+> Should this line belong to previous patch?
 
-> Another case, which may or may not be possible, is if INIT is recognized
-> on the same instruction, in which case it takes priority over MTF.  SMI
-> might also be an issue.
+No.
 
-Don't we already have a priority inversion today when INIT or SMI are
-coincident with a debug trap on the previous instruction (e.g.
-single-step trap on an emulated instruction)?
+The previous patch, "KVM: Provide common implementation for generic dirty
+log functions", is consolidating the implementation of dirty log functions
+for architectures with CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y.
+
+This code is being moved from s390's kvm_vm_ioctl_get_dirty_log(), as s390
+doesn't select KVM_GENERIC_DIRTYLOG_READ_PROTECT.  It's functionally a nop
+as kvm_arch_sync_dirty_log() is empty for PowerPC, the only other arch that
+doesn't select KVM_GENERIC_DIRTYLOG_READ_PROTECT.
+
+Arguably, the call to kvm_arch_sync_dirty_log() should be moved in a
+separate prep patch.  It can't be a follow-on patch as that would swap the
+ordering of kvm_arch_sync_dirty_log() and kvm_dirty_bitmap_bytes(), etc...
+
+My reasoning for not splitting it to a separate patch is that prior to this
+patch, the common code and arch specific code are doing separate memslot
+lookups via id_to_memslot(), i.e. moving the kvm_arch_sync_dirty_log() call
+would operate on a "different" memslot.   It can't actually be a different
+memslot because slots_lock is held, it just felt weird.
+
+All that being said, I don't have a strong opinion on moving the call to
+kvm_arch_sync_dirty_log() in a separate patch; IIRC, I vascillated between
+the two options when writing the code.  If anyone wants it to be a separate
+patch I'll happily split it out.
+
+> 
+> > +
+> > +	n = kvm_dirty_bitmap_bytes(*memslot);
+> >  
+> >  	for (i = 0; !any && i < n/sizeof(long); ++i)
+> > -		any = memslot->dirty_bitmap[i];
+> > +		any = (*memslot)->dirty_bitmap[i];
+> >  
+> > -	if (copy_to_user(log->dirty_bitmap, memslot->dirty_bitmap, n))
+> > +	if (copy_to_user(log->dirty_bitmap, (*memslot)->dirty_bitmap, n))
+> >  		return -EFAULT;
+> >  
+> >  	if (any)
+> > -- 
+> > 2.24.1
+> 
+> -- 
+> Peter Xu
+> 
