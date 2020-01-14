@@ -2,86 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC6DB13AD63
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 16:19:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E39E013ADA9
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 16:31:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728741AbgANPTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jan 2020 10:19:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52505 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726335AbgANPTI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jan 2020 10:19:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579015147;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type; bh=7Av0EBC0wUnvR4uT/GA5tywrrcCx0R1RquP+AjiCYvQ=;
-        b=I5n7FLhIwjhmTkIZ9xoSPLClzlg3Sf85z7KpjHLwY+bq9Hsa/v+e+faPhXGuUeF2NTbjuC
-        q4uwXlIOR7xkIDkDWIgIBB7rVRD3oa3EIxUVtMWjhOkZ87LDbTV6+nsp8+BXDIhmqFnxwN
-        opyoKAK1JbJEyME9rTde+jD4Vc33EDY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-w55Pz8RfMd6pfpM9iq-rKQ-1; Tue, 14 Jan 2020 10:19:06 -0500
-X-MC-Unique: w55Pz8RfMd6pfpM9iq-rKQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 080D3DB20;
-        Tue, 14 Jan 2020 15:19:05 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.118.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D62C60BE0;
-        Tue, 14 Jan 2020 15:19:04 +0000 (UTC)
-From:   Juan Quintela <quintela@redhat.com>
-To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
-Subject: KVM call minutes for 2020-01-14
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Tue, 14 Jan 2020 16:19:02 +0100
-Message-ID: <87imlecbh5.fsf@secure.laptop>
+        id S1727083AbgANPbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jan 2020 10:31:10 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47146 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726365AbgANPbK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jan 2020 10:31:10 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00EFRfuL140828
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2020 10:31:09 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xh8d3um2q-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2020 10:31:09 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Tue, 14 Jan 2020 15:31:07 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 14 Jan 2020 15:31:03 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00EFV2kU64094250
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Jan 2020 15:31:02 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A2A1911C054;
+        Tue, 14 Jan 2020 15:31:02 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 20C3111C05B;
+        Tue, 14 Jan 2020 15:31:01 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.165.115])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 14 Jan 2020 15:31:00 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, david@redhat.com, cohuck@redhat.com
+Subject: [kvm-unit-tests PATCH 0/4] s390x: smp: Improve smp code and reset checks
+Date:   Tue, 14 Jan 2020 10:30:49 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20011415-0028-0000-0000-000003D101F1
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20011415-0029-0000-0000-0000249523EE
+Message-Id: <20200114153054.77082-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-14_04:2020-01-14,2020-01-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 mlxscore=0 mlxlogscore=572 spamscore=0 bulkscore=0
+ phishscore=0 suspectscore=1 adultscore=0 impostorscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001140133
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The first two patches are badly needed cleanup for smp.c.
+The last two improve initial reset testing.
 
-Hi
+Janosch Frank (4):
+  s390x: smp: Cleanup smp.c
+  s390x: smp: Only use smp_cpu_setup once
+  s390x: smp: Test all CRs on initial reset
+  s390x: smp: Dirty fpc before initial reset test
 
-This notes are very terse because the discussion was quite technical and
-I am not familiar with this part of qemu.  Feel free to fill this.
+ s390x/smp.c | 84 ++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 58 insertions(+), 26 deletions(-)
 
-
-- libmuser:
-    * Take all the complication of implementing the device
-    * support several transport types?
-    * mediated devices
-    * tcp or rdma connection
-    * VMI vs VMF
-    * SPDK
-    * Oracle move from unix socket to muser
-    * Will we use it over kernel or over userspace?
-    * For polling we are single process
-    * How do handle recovery, outside process can have quite a bit of state
-- multi-process
-   * trying to integrate multiuser + muser
-   * look if their vision is ok with qemu expectations
-   * one continue with muser kernel module
-   * other is vfio over unix socket
-   * preferrence is going vfio over unix socket
-     this allows all implementations work
-- out of tree device
-   * problematic
-   * require to link with qemu
-   * what about dpdk and other external
-   * other appoarch: vfio with outside device
-- vfio over sockets
-   * who is doing that work?
-   * felipe prototype it long ago
-- best way to get this multiprocess in
-  * they have worked on this for a long time
-  * no idea about how to go from there
-
-Later, Juan.
+-- 
+2.20.1
 
