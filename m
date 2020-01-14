@@ -2,108 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8033913A7BB
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 11:53:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39B1613AB01
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 14:27:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729016AbgANKxd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jan 2020 05:53:33 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:44522 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725956AbgANKxc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jan 2020 05:53:32 -0500
-Received: by mail-ot1-f67.google.com with SMTP id h9so12131901otj.11;
-        Tue, 14 Jan 2020 02:53:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cn5oQa4AQw8CAHBLFyCfO9lTHCbEgvgO8kS0oRO7bOQ=;
-        b=eK2Dg5z/JYnAaAy6xwTmYeSjPvJjm0B44DIx4I1iEs+x7RetgpH2bxuRg9XU2ddA+s
-         yvJk4W4uXxtsjYY10pSPcdvwgzRXoTHfPNCjs7juDha99ypLF/CI+ZiR+1n+LF1MSI9e
-         IsUJNA/MwMJ4PjqXR7xQMKcK42h6yssTx3yuTskJ5v2NhyECfnKY9wcfTtuspvItViB+
-         xX8MeHMofmTJ4y9xpvMwrXV7olJeP/qyvpr3Ti6vgVGxlnDqDuIawEfZvrocueL5+wdk
-         5KyZ8gf//54ZLlPevCJT0IC4N6g1jXbzei+H0KkL/lOXS5WmOFrnu8M+HUuzgdONO/yt
-         kOvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cn5oQa4AQw8CAHBLFyCfO9lTHCbEgvgO8kS0oRO7bOQ=;
-        b=VJsF5j1RR+yWjtX0pzztD4y8JJihtNgn4OOHAWeN0nOYxfxINDb1a34xGbt5FANsvt
-         VZxFUQZ5j6bJKBYvDby3MHf5j2VFqzymnQ+LkT4kPnpCg9TgPgFU6Ba7pIbgdpHMaqya
-         EMDn/mxzDrmQSc2+4xJjX0qRu+sovw/80rudRUyhdMzXEBmTKcBEoJV0+u4RNN6W1Uiu
-         DHRLooGTO1ghVeD8B7LzP8v5lEHU0RjfAuZtw/NJ5DBX0BUk9afaDYGnprcQ4cyaDKZs
-         qN7s//REqU3JrObizTUFbM2RW9beDBsVSJk5bLrg4RX+zLYOhY2o+3sKnAY8uYy8+fay
-         n8SQ==
-X-Gm-Message-State: APjAAAWITXqLw5LK0grORBZkCevBK1/1MC5Phv+VtAa7LGOIilo7pePr
-        46E/3gJiRBhPPfV9BwI+CvMGC/ZWTh+S0a1MCcw=
-X-Google-Smtp-Source: APXvYqxhttxJBOc2iHCA0/wkTwR5uKcaMUnB+U6b9v/qVX340MTbr4dC/XjtB54IGpNIS77ISdOm2hRgUkn+e+kY654=
-X-Received: by 2002:a05:6830:231d:: with SMTP id u29mr2091403ote.185.1578999212027;
- Tue, 14 Jan 2020 02:53:32 -0800 (PST)
+        id S1728816AbgANN1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jan 2020 08:27:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32002 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727289AbgANN1q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jan 2020 08:27:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579008465;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EhhtFILhKtdjWEYXn99X1dEASzhcaptVYqZRtT+cK+4=;
+        b=gF2gbEXE/SLmtSR+QiFlcJEsaRCUnuCOwSrvWXe4gT3BNDyGJuWLsLKcCmmDr8Oj9+7a3A
+        DkMuq37kXBGB0q8HtGSbX7NlpjXuHYLKoq+v/WM4WHl4YqOYkECrzkFj3oefGCTgOifqXW
+        xP2je6D/lDEMMmNWcKbFihh0FiVbY24=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-K2y3wvQDPTyUR5TpzpjyeA-1; Tue, 14 Jan 2020 08:27:42 -0500
+X-MC-Unique: K2y3wvQDPTyUR5TpzpjyeA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 205081014DE0;
+        Tue, 14 Jan 2020 13:27:40 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.118.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CC4160BF1;
+        Tue, 14 Jan 2020 13:27:36 +0000 (UTC)
+From:   Juan Quintela <quintela@redhat.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        qemu-ppc@nongnu.org,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 06/15] migration/savevm: Replace current_machine by qdev_get_machine()
+In-Reply-To: <20200109152133.23649-7-philmd@redhat.com> ("Philippe
+        =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 9 Jan 2020 16:21:24
+ +0100")
+References: <20200109152133.23649-1-philmd@redhat.com>
+        <20200109152133.23649-7-philmd@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Reply-To: quintela@redhat.com
+Date:   Tue, 14 Jan 2020 14:27:34 +0100
+Message-ID: <871rs2dv7d.fsf@secure.laptop>
 MIME-Version: 1.0
-References: <1578448201-28218-1-git-send-email-wanpengli@tencent.com>
- <20200108155040.GB2827@hirez.programming.kicks-ass.net> <00d884a7-d463-74b4-82cf-9deb0aa70971@redhat.com>
- <CANRm+Cx0LMK1b2mJiU7edCDoRfPfGLzY1Zqr5paBEPcWFFALhQ@mail.gmail.com>
- <20200113104314.GU2844@hirez.programming.kicks-ass.net> <ee2b6da2-be8c-2540-29e9-ffbb9fdfd3fc@redhat.com>
- <20200113123558.GF2827@hirez.programming.kicks-ass.net>
-In-Reply-To: <20200113123558.GF2827@hirez.programming.kicks-ass.net>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 14 Jan 2020 18:53:19 +0800
-Message-ID: <CANRm+Cz10Spq1mjBBa+RvgeUtNvWEXSfPzHy49gZbD-Z8+fh2A@mail.gmail.com>
-Subject: Re: [PATCH RFC] sched/fair: Penalty the cfs task which executes mwait/hlt
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        KarimAllah <karahmed@amazon.de>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        christopher.s.hall@intel.com, hubert.chrzaniuk@intel.com,
-        Len Brown <len.brown@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 Jan 2020 at 20:36, Peter Zijlstra <peterz@infradead.org> wrote:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+> As we want to remove the global current_machine,
+> replace MACHINE_GET_CLASS(current_machine) by
+> MACHINE_GET_CLASS(qdev_get_machine()).
 >
-> On Mon, Jan 13, 2020 at 12:52:20PM +0100, Paolo Bonzini wrote:
-> > On 13/01/20 11:43, Peter Zijlstra wrote:
-> > > So the very first thing we need to get sorted is that MPERF/TSC ratio
-> > > thing. TurboStat does it, but has 'funny' hacks on like:
-> > >
-> > >   b2b34dfe4d9a ("tools/power turbostat: KNL workaround for %Busy and Avg_MHz")
-> > >
-> > > and I imagine that there's going to be more exceptions there. You're
-> > > basically going to have to get both Intel and AMD to commit to this.
-> > >
-> > > IFF we can get concensus on MPERF/TSC, then yes, that is a reasonable
-> > > way to detect a VCPU being idle I suppose. I've added a bunch of people
-> > > who seem to know about this.
-> > >
-> > > Anyone, what will it take to get MPERF/TSC 'working' ?
-> >
-> > Do we really need MPERF/TSC for this use case, or can we just track
-> > APERF as well and do MPERF/APERF to compute the "non-idle" time?
->
-> So MPERF runs at fixed frequency (when !IDLE and typically the same
-> frequency as TSC), APERF runs at variable frequency (when !IDLE)
-> depending on DVFS state.
->
-> So APERF/MPERF gives the effective frequency of the core, but since both
-> stop during IDLE, it will not be a good indication of IDLE.
->
-> Otoh, TSC doesn't stop in idle (.oO this depends on
-> X86_FEATURE_CONSTANT_TSC) and therefore the MPERF/TSC ratio gives how
-> much !idle time there was between readings.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Do you have a better solution to penalty vCPU process which mwait/hlt
-executed inside? :)
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-    Wanpeng
+by the migration bits.
+
