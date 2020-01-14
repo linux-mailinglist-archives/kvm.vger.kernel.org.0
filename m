@@ -2,72 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E142D13B139
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 18:44:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A1A613B149
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 18:47:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728688AbgANRoX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jan 2020 12:44:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36275 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726053AbgANRoX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Jan 2020 12:44:23 -0500
+        id S1726971AbgANRrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jan 2020 12:47:25 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21447 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726450AbgANRrY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jan 2020 12:47:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579023862;
+        s=mimecast20190719; t=1579024043;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cCouyPJZFQqvwQCfI2uNbIw3Dg2LO+oMcqx713KwmdU=;
-        b=FWxo0YlxlKODha+VxeOYfFUL9vrbwbFJtAH4dabhfvjmIudZ/g/GqaqzVsPLt6QM0ZXASd
-        8S7qiD6tE1ggVH5iUcQNHx/xTg2q6Qp8CI5otwnuSjNcSymQPF9JIUxouzAfLXuH0vrbto
-        xcHTGhhAn/M0DUzYWF8z3dTZVMmCnJc=
+        bh=v8MQJmmxhx6MNID9d0njZZ56kG0fOqofrJYc9sZflyI=;
+        b=RHCV3zLRvpklBCzhsrTvqIdO0qii0qRjJzouf3JGmvedsu+eGpjI/cjUqSmU/VDFqQW9Lf
+        QZk+jrkSeDSWHq95CKJ1sypsmRFQV0J+SY3rKwBbbgmrNvE+YzD6v2wtbFpMB3WN9Z8BwP
+        hpb4ZrIOfBGY01ADLH5O6irz8KrmSG4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-_9gYESG4O2uyBkJ8iOBoyg-1; Tue, 14 Jan 2020 12:44:19 -0500
-X-MC-Unique: _9gYESG4O2uyBkJ8iOBoyg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-378-0D1sLN3MMk6lAzOoeUUV8Q-1; Tue, 14 Jan 2020 12:47:22 -0500
+X-MC-Unique: 0D1sLN3MMk6lAzOoeUUV8Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA0E7109D3B1;
-        Tue, 14 Jan 2020 17:44:17 +0000 (UTC)
-Received: from gondolin (ovpn-117-161.ams2.redhat.com [10.36.117.161])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 258ED60BE0;
-        Tue, 14 Jan 2020 17:44:13 +0000 (UTC)
-Date:   Tue, 14 Jan 2020 18:44:11 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, david@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 2/4] s390x: smp: Only use smp_cpu_setup
- once
-Message-ID: <20200114184411.24909aae.cohuck@redhat.com>
-In-Reply-To: <20200114153054.77082-3-frankja@linux.ibm.com>
-References: <20200114153054.77082-1-frankja@linux.ibm.com>
-        <20200114153054.77082-3-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15BCF10120A6
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2020 17:47:21 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-74.gru2.redhat.com [10.97.116.74])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C4BC80F71;
+        Tue, 14 Jan 2020 17:47:19 +0000 (UTC)
+Subject: Re: [kvm-unit-tests] travis.yml: Prevent 'script' section from
+ premature exit
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+References: <20200113195102.44756-1-wainersm@redhat.com>
+ <59bd7e8c-8321-8868-27a9-fb8a968e1ce0@redhat.com>
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <0b4a3ecd-e12e-67bd-c1ac-2543b2aebc45@redhat.com>
+Date:   Tue, 14 Jan 2020 15:47:17 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <59bd7e8c-8321-8868-27a9-fb8a968e1ce0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 Jan 2020 10:30:51 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> Let's stop and start instead of using setup to run a function on a
-> cpu.
+On 1/14/20 2:48 PM, Thomas Huth wrote:
+> On 13/01/2020 20.51, Wainer dos Santos Moschetta wrote:
+>> The 'script' section finishes its execution prematurely whenever
+>> a shell's exit is called. If the intention is to force
+>> Travis to flag a build/test failure then the correct approach
+>> is erroring any build command. In this change, it executes a
+>> sub-shell process and exit 1, so that Travis capture the return
+>> code and interpret it as a build error.
+>>
+>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> ---
+>>   .travis.yml | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/.travis.yml b/.travis.yml
+>> index 091d071..a4405c3 100644
+>> --- a/.travis.yml
+>> +++ b/.travis.yml
+>> @@ -119,5 +119,5 @@ before_script:
+>>   script:
+>>     - make -j3
+>>     - ACCEL="${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
+>> -  - if grep -q FAIL results.txt ; then exit 1 ; fi
+>> -  - if ! grep -q PASS results.txt ; then exit 1 ; fi
+>> +  - if grep -q FAIL results.txt ; then $(exit 1) ; fi
+>> +  - if ! grep -q PASS results.txt ; then $(exit 1) ; fi
+> Basically a good idea, but I think we can even simplify these two lines
+> into:
+>
+>   grep -q PASS results.txt && ! grep -q FAIL results.txt
 
-Looking at the code, we only support active == operating state and
-!active == stopped state anyway, right?
+Indeed this is a better idea.
 
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/smp.c | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
+>
+> If you agree, could you update your patch and send a v2?
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Sure, I will send the v2 with your proposed changes. Thanks!
+
+- Wainer
+
+>
+>   Thanks,
+>    Thomas
 
