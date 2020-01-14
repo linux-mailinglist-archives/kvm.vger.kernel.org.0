@@ -2,215 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BA71139DC4
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 01:05:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 914E4139F3B
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 02:58:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729121AbgANAFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Jan 2020 19:05:19 -0500
-Received: from mga01.intel.com ([192.55.52.88]:41480 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728810AbgANAFT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Jan 2020 19:05:19 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Jan 2020 16:05:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,430,1571727600"; 
-   d="scan'208";a="424476905"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga006.fm.intel.com with ESMTP; 13 Jan 2020 16:05:18 -0800
-Date:   Mon, 13 Jan 2020 16:05:18 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Emulate MTF when performing instruction
- emulation
-Message-ID: <20200114000517.GC14928@linux.intel.com>
-References: <20200113221053.22053-1-oupton@google.com>
- <20200113221053.22053-3-oupton@google.com>
+        id S1729099AbgANB6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Jan 2020 20:58:02 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:33256 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728838AbgANB6C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Jan 2020 20:58:02 -0500
+Received: by mail-lf1-f66.google.com with SMTP id n25so8495530lfl.0
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2020 17:58:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=+BvT8R5z7QIhrFmhGPb8TBCNGrSfs2ldB6iaTKYVjHc=;
+        b=EBP5+WN8/2VsJ10DZxxFxknAhWyLbx3HEMx49tfS6QX8qty8R7NI/Yj5q6He498vMn
+         T2ttZiy10+007RwIm16xxI5Xn67nx2VvyTExubCbPG0fQ0lSZPO4bLJW+EGY6QIvtSxG
+         aUevSfGOsvm4wqI/QcARFnNkzJzDXJSFsisWoC2JmLj1yJGpdnonOVusuqG7u/JxUIFu
+         UV2xdml55hlUAjG5ZUybQvVKGpnczZEj55+nwgTSJpUqlUu0q76sasimU7IW1cnt8qX3
+         im+x0PIrhhzeIi3mgvaWmsoJc8pRu6JSJiUADU9LO7HCVpYCEHE5otRSrr487EdHJ91l
+         xoyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=+BvT8R5z7QIhrFmhGPb8TBCNGrSfs2ldB6iaTKYVjHc=;
+        b=DWiXSSBVFhQR6ok9HcABEeMCfY6iUFn1WcL15tcTA1jhCY6dKOSF+zsGLS5KeB/hVX
+         rEt3jq9ts9IbbSsn4XJJTHgmm6Hsdhuvl2A09feHA0x6Lg5XIPXTOgC/eyREo35ieQ9g
+         qBkNfd+kYImUwZ76EVyngQ/65dqN77sPyqAWxRLo5RIBwccanQakTTY85boG3VD2t1qT
+         0HB1HJ0gvtxGLcXISKrqZjbOg6tFtQBD5rqRI6UkgYSicvPXLnE4vTs6T3gCjPsJoMjT
+         nLENQPivoBmN3Y8dx7XlPBGyD0320Ww9+pto3eJOhIGc5tF1/4CDWypGZLyIs3t3Y4Q6
+         d1kA==
+X-Gm-Message-State: APjAAAVU/x2nsyvU15Y7aEpb2DvidxzwtLI7OZJf5wlAFan3mYihok97
+        aCcRUe/E1PwH4F4QTBEVkUPYF3H57tjWnCvkn6oyNzx5FcY=
+X-Google-Smtp-Source: APXvYqyJ3IXJ369ksZZpQW9lyHreYL8LIgayTmgwMEpTltOXClRRkES7MpVvmtp9/V1X4hTi3i3/BpeYaVFWohKROtQ=
+X-Received: by 2002:a19:4ac2:: with SMTP id x185mr210632lfa.131.1578967080317;
+ Mon, 13 Jan 2020 17:58:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200113221053.22053-3-oupton@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200109152133.23649-1-philmd@redhat.com> <20200109152133.23649-12-philmd@redhat.com>
+In-Reply-To: <20200109152133.23649-12-philmd@redhat.com>
+From:   Alistair Francis <alistair23@gmail.com>
+Date:   Tue, 14 Jan 2020 11:57:33 +1000
+Message-ID: <CAKmqyKO8mKt=ZDVNO6bEfGi5QTCeLbYZum_-6V4yPpmf-XH1DA@mail.gmail.com>
+Subject: Re: [PATCH 11/15] exec: Replace current_machine by qdev_get_machine()
+To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "open list:Overall" <kvm@vger.kernel.org>,
+        Juan Quintela <quintela@redhat.com>,
+        "open list:New World" <qemu-ppc@nongnu.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        qemu-arm <qemu-arm@nongnu.org>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Richard Henderson <rth@twiddle.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 13, 2020 at 02:10:52PM -0800, Oliver Upton wrote:
-> Since commit 5f3d45e7f282 ("kvm/x86: add support for
-> MONITOR_TRAP_FLAG"), KVM has allowed an L1 guest to use the monitor trap
-> flag processor-based execution control for its L2 guest. KVM simply
-> forwards any MTF VM-exits to the L1 guest, which works for normal
-> instruction execution.
-> 
-> However, when KVM needs to emulate an instruction on the behalf of an L2
-> guest, the monitor trap flag is not emulated. Add the necessary logic to
-> kvm_skip_emulated_instruction() to synthesize an MTF VM-exit to L1 upon
-> instruction emulation for L2.
+On Fri, Jan 10, 2020 at 1:37 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> As we want to remove the global current_machine,
+> replace 'current_machine' by MACHINE(qdev_get_machine()).
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-This only fixes the flows where KVM is doing "fast" emulation, or whatever
-you want to call it.  The full emulation paths are still missing proper MTF
-support.  Dunno if it makes sense to fix it all at once, e.g. if the full
-emulation is stupid complex, but at a minimum the gaps should be called out
-with a brief explanation of why they're not being addressed.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-> Fixes: 5f3d45e7f282 ("kvm/x86: add support for MONITOR_TRAP_FLAG")
-> 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
+Alistair
+
 > ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/svm.c              |  5 +++++
->  arch/x86/kvm/vmx/nested.c       |  2 +-
->  arch/x86/kvm/vmx/nested.h       |  5 +++++
->  arch/x86/kvm/vmx/vmx.c          | 19 +++++++++++++++++++
->  arch/x86/kvm/x86.c              |  6 ++++++
->  6 files changed, 37 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 4739ca11885d..89dcdc7201ae 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1092,6 +1092,7 @@ struct kvm_x86_ops {
->  	void (*run)(struct kvm_vcpu *vcpu);
->  	int (*handle_exit)(struct kvm_vcpu *vcpu);
->  	int (*skip_emulated_instruction)(struct kvm_vcpu *vcpu);
-> +	void (*emulation_complete)(struct kvm_vcpu *vcpu);
->  	void (*set_interrupt_shadow)(struct kvm_vcpu *vcpu, int mask);
->  	u32 (*get_interrupt_shadow)(struct kvm_vcpu *vcpu);
->  	void (*patch_hypercall)(struct kvm_vcpu *vcpu,
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 16ded16af997..f21eec4443d5 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -802,6 +802,10 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
->  
-> +static void svm_emulation_complete(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
->  static void svm_queue_exception(struct kvm_vcpu *vcpu)
+>  exec.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/exec.c b/exec.c
+> index d4b769d0d4..98f5b049ca 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1984,11 +1984,11 @@ static unsigned long last_ram_page(void)
+>
+>  static void qemu_ram_setup_dump(void *addr, ram_addr_t size)
 >  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -7320,6 +7324,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
->  	.run = svm_vcpu_run,
->  	.handle_exit = handle_exit,
->  	.skip_emulated_instruction = skip_emulated_instruction,
-> +	.emulation_complete = svm_emulation_complete,
->  	.set_interrupt_shadow = svm_set_interrupt_shadow,
->  	.get_interrupt_shadow = svm_get_interrupt_shadow,
->  	.patch_hypercall = svm_patch_hypercall,
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 4aea7d304beb..ee26f2d10a09 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5578,7 +5578,7 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason)
->  	case EXIT_REASON_MWAIT_INSTRUCTION:
->  		return nested_cpu_has(vmcs12, CPU_BASED_MWAIT_EXITING);
->  	case EXIT_REASON_MONITOR_TRAP_FLAG:
-> -		return nested_cpu_has(vmcs12, CPU_BASED_MONITOR_TRAP_FLAG);
-> +		return nested_cpu_has_mtf(vmcs12);
->  	case EXIT_REASON_MONITOR_INSTRUCTION:
->  		return nested_cpu_has(vmcs12, CPU_BASED_MONITOR_EXITING);
->  	case EXIT_REASON_PAUSE_INSTRUCTION:
-> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-> index fc874d4ead0f..901d2745bc93 100644
-> --- a/arch/x86/kvm/vmx/nested.h
-> +++ b/arch/x86/kvm/vmx/nested.h
-> @@ -238,6 +238,11 @@ static inline bool nested_cpu_has_save_preemption_timer(struct vmcs12 *vmcs12)
->  	    VM_EXIT_SAVE_VMX_PREEMPTION_TIMER;
->  }
->  
-> +static inline bool nested_cpu_has_mtf(struct vmcs12 *vmcs12)
-> +{
-> +	return nested_cpu_has(vmcs12, CPU_BASED_MONITOR_TRAP_FLAG);
-> +}
-> +
->  /*
->   * In nested virtualization, check if L1 asked to exit on external interrupts.
->   * For most existing hypervisors, this will always return true.
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 148696199c88..8d3b693c3d3a 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1595,6 +1595,24 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
->  
-> +static void vmx_emulation_complete(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!(is_guest_mode(vcpu) &&
-> +	      nested_cpu_has_mtf(get_vmcs12(vcpu))))
-> +		return;
-> +
-> +	/*
-> +	 * Per the SDM, MTF takes priority over debug-trap instructions. As
-
-Except for T-bit #DBs.  Thankfully KVM doesn't emulate them.  :-D
-
-> +	 * instruction emulation is completed (i.e. at the instruction
-> +	 * boundary), any #DB exception must be a trap. Emulate an MTF VM-exit
-> +	 * into L1 should there be a debug-trap exception pending or no
-> +	 * exception pending.
-> +	 */
-> +	if (!vcpu->arch.exception.pending ||
-> +	    vcpu->arch.exception.nr == DB_VECTOR)
-> +		nested_vmx_vmexit(vcpu, EXIT_REASON_MONITOR_TRAP_FLAG, 0, 0);
-
-Doing a direct nested_vmx_vmexit() in kvm_skip_emulated_instruction() feels
-like a hack.  It might work for now, i.e. while only the "fast" emulation
-paths deal with MTF, but I have a feeling that we'll want MTF handling to
-live in vmx_check_nested_events(), or possibly in a custom callback that is
-invoked from similar call sites.
-
-Actually, I thought of a case it breaks.  If HLT is passed through from
-L1->L2, this approach will process the VM-Exit prior to handling the HLT
-in L0.  KVM will record the wrong activity state in vmcs12 ("active"
-instead of "halted") and then incorrectly put L1 into KVM_MP_STATE_HALTED.
-
-Another case, which may or may not be possible, is if INIT is recognized
-on the same instruction, in which case it takes priority over MTF.  SMI
-might also be an issue.
-
-> +}
-> +
->  static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
+> -    int ret;
+> +    MachineState *ms =3D MACHINE(qdev_get_machine());
+>
+>      /* Use MADV_DONTDUMP, if user doesn't want the guest memory in the c=
+ore */
+> -    if (!machine_dump_guest_core(current_machine)) {
+> -        ret =3D qemu_madvise(addr, size, QEMU_MADV_DONTDUMP);
+> +    if (!machine_dump_guest_core(ms)) {
+> +        int ret =3D qemu_madvise(addr, size, QEMU_MADV_DONTDUMP);
+>          if (ret) {
+>              perror("qemu_madvise");
+>              fprintf(stderr, "madvise doesn't support MADV_DONTDUMP, "
+> @@ -2108,7 +2108,9 @@ size_t qemu_ram_pagesize_largest(void)
+>
+>  static int memory_try_enable_merging(void *addr, size_t len)
 >  {
->  	/*
-> @@ -7831,6 +7849,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
->  	.run = vmx_vcpu_run,
->  	.handle_exit = vmx_handle_exit,
->  	.skip_emulated_instruction = skip_emulated_instruction,
-> +	.emulation_complete = vmx_emulation_complete,
->  	.set_interrupt_shadow = vmx_set_interrupt_shadow,
->  	.get_interrupt_shadow = vmx_get_interrupt_shadow,
->  	.patch_hypercall = vmx_patch_hypercall,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c14174c033e4..d3af7a8a3c4b 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6546,6 +6546,12 @@ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
->  	 */
->  	if (unlikely(rflags & X86_EFLAGS_TF))
->  		r = kvm_vcpu_do_singlestep(vcpu);
-> +	/*
-> +	 * Allow for vendor-specific handling of completed emulation before
-> +	 * returning.
-> +	 */
-> +	if (r)
-> +		kvm_x86_ops->emulation_complete(vcpu);
->  	return r;
->  }
->  EXPORT_SYMBOL_GPL(kvm_skip_emulated_instruction);
-> -- 
-> 2.25.0.rc1.283.g88dfdc4193-goog
-> 
+> -    if (!machine_mem_merge(current_machine)) {
+> +    MachineState *ms =3D MACHINE(qdev_get_machine());
+> +
+> +    if (!machine_mem_merge(ms)) {
+>          /* disabled by the user */
+>          return 0;
+>      }
+> --
+> 2.21.1
+>
+>
