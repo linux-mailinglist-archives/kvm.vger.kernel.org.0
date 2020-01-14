@@ -2,101 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A1A613B149
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 18:47:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B7B313B15A
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2020 18:51:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726971AbgANRrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Jan 2020 12:47:25 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21447 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726450AbgANRrY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Jan 2020 12:47:24 -0500
+        id S1727014AbgANRvN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Jan 2020 12:51:13 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43745 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726053AbgANRvN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Jan 2020 12:51:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579024043;
+        s=mimecast20190719; t=1579024272;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=v8MQJmmxhx6MNID9d0njZZ56kG0fOqofrJYc9sZflyI=;
-        b=RHCV3zLRvpklBCzhsrTvqIdO0qii0qRjJzouf3JGmvedsu+eGpjI/cjUqSmU/VDFqQW9Lf
-        QZk+jrkSeDSWHq95CKJ1sypsmRFQV0J+SY3rKwBbbgmrNvE+YzD6v2wtbFpMB3WN9Z8BwP
-        hpb4ZrIOfBGY01ADLH5O6irz8KrmSG4=
+        bh=p5I9yRo4DxwJWAsieS+jn8acxGiDxwT4HgwwRtRVWx8=;
+        b=G3ZC3i2/jOUfabC8R4vouYRO/3HF1gYodIwVtx7UBjODbsuHWZhiUCunzczJpHgCihfh0e
+        zM3rOMysgxKRsdhC06MoxWcDvngVi5EBCMXfzi3usrdC8iB2zzEoX/EmYxBuRMXgOShWdr
+        RSZKFMyydnVcEX/f6w1lo1ROhNy7+94=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-0D1sLN3MMk6lAzOoeUUV8Q-1; Tue, 14 Jan 2020 12:47:22 -0500
-X-MC-Unique: 0D1sLN3MMk6lAzOoeUUV8Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-17-eZwBTe3MNm-UovYeSLzpfg-1; Tue, 14 Jan 2020 12:51:08 -0500
+X-MC-Unique: eZwBTe3MNm-UovYeSLzpfg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15BCF10120A6
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2020 17:47:21 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-74.gru2.redhat.com [10.97.116.74])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C4BC80F71;
-        Tue, 14 Jan 2020 17:47:19 +0000 (UTC)
-Subject: Re: [kvm-unit-tests] travis.yml: Prevent 'script' section from
- premature exit
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-References: <20200113195102.44756-1-wainersm@redhat.com>
- <59bd7e8c-8321-8868-27a9-fb8a968e1ce0@redhat.com>
-From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <0b4a3ecd-e12e-67bd-c1ac-2543b2aebc45@redhat.com>
-Date:   Tue, 14 Jan 2020 15:47:17 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DCAD107ACCA;
+        Tue, 14 Jan 2020 17:51:07 +0000 (UTC)
+Received: from gondolin (ovpn-117-161.ams2.redhat.com [10.36.117.161])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 80AB660BE0;
+        Tue, 14 Jan 2020 17:51:03 +0000 (UTC)
+Date:   Tue, 14 Jan 2020 18:51:01 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        borntraeger@de.ibm.com, linux-s390@vger.kernel.org,
+        david@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 3/4] s390x: smp: Test all CRs on initial
+ reset
+Message-ID: <20200114185101.1f2481c8.cohuck@redhat.com>
+In-Reply-To: <bec10775-3713-4604-1b49-27d49682db43@redhat.com>
+References: <20200114153054.77082-1-frankja@linux.ibm.com>
+        <20200114153054.77082-4-frankja@linux.ibm.com>
+        <bec10775-3713-4604-1b49-27d49682db43@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <59bd7e8c-8321-8868-27a9-fb8a968e1ce0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 14 Jan 2020 18:01:32 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-On 1/14/20 2:48 PM, Thomas Huth wrote:
-> On 13/01/2020 20.51, Wainer dos Santos Moschetta wrote:
->> The 'script' section finishes its execution prematurely whenever
->> a shell's exit is called. If the intention is to force
->> Travis to flag a build/test failure then the correct approach
->> is erroring any build command. In this change, it executes a
->> sub-shell process and exit 1, so that Travis capture the return
->> code and interpret it as a build error.
->>
->> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
->> ---
->>   .travis.yml | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/.travis.yml b/.travis.yml
->> index 091d071..a4405c3 100644
->> --- a/.travis.yml
->> +++ b/.travis.yml
->> @@ -119,5 +119,5 @@ before_script:
->>   script:
->>     - make -j3
->>     - ACCEL="${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
->> -  - if grep -q FAIL results.txt ; then exit 1 ; fi
->> -  - if ! grep -q PASS results.txt ; then exit 1 ; fi
->> +  - if grep -q FAIL results.txt ; then $(exit 1) ; fi
->> +  - if ! grep -q PASS results.txt ; then $(exit 1) ; fi
-> Basically a good idea, but I think we can even simplify these two lines
-> into:
->
->   grep -q PASS results.txt && ! grep -q FAIL results.txt
+> On 14/01/2020 16.30, Janosch Frank wrote:
+> > All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
+> > so we also need to test 1-13 and 15 for 0.
+> > 
+> > And while we're at it, let's also set some values to cr 1, 7 and 13, so
+> > we can actually be sure that they will be zeroed.
+> > 
+> > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> > ---
+> >  s390x/smp.c | 21 ++++++++++++++++++++-
+> >  1 file changed, 20 insertions(+), 1 deletion(-)
 
-Indeed this is a better idea.
+> > @@ -219,6 +237,7 @@ static void test_reset(void)
+> >  
+> >  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
+> >  	report(smp_cpu_stopped(1), "cpu stopped");
+> > +	smp_cpu_destroy(1);  
+> 
+> Shouldn't that rather be part of patch 2/4 ? I'd maybe also move this to
+> the main() function instead since you've setup the cpu there...? Also is
+> it still ok to use smp_cpu_start() in test_reset_initial() after you've
+> destroyed the CPU here in test_reset()?
 
->
-> If you agree, could you update your patch and send a v2?
+Isn't it simply wrong? I thought the pattern was supposed to be
 
-Sure, I will send the v2 with your proposed changes. Thanks!
+- setup cpu
+- do some tests, including stopping/restarting/etc.
+- destroy cpu [currently missing]
 
-- Wainer
-
->
->   Thanks,
->    Thomas
+> 
+> >  	report_prefix_pop();
+> >  }  
+> 
+>  Thomas
 
