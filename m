@@ -2,203 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC0AA13C719
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 16:12:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AAD0A13C71E
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 16:12:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729030AbgAOPMC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 10:12:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58572 "EHLO
+        id S1729121AbgAOPMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 10:12:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23165 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726562AbgAOPMC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 10:12:02 -0500
+        with ESMTP id S1726165AbgAOPMd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 10:12:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579101121;
+        s=mimecast20190719; t=1579101152;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2SYNha3X1HhMzztypPP7ZFvfrMyQgCZMN+0y5jbOdVU=;
-        b=HOmcBgFuH54zJ+9ay2+quxsRpJlWEkB3yKDFQjk6c7Rw1RimkAU7gSyg0K6vMNtM3WZRk8
-        2nbmG/RYSVI7g1HqtPHg0sDR9o9/3+61Mn00qJ2BRc9hnZaBWsJuajepnJlIMKYgSHLZW1
-        LxKElmssHhPhH61kDr36JB+i8CNZxYQ=
+        bh=QY8+0O7c2VwRb5cv2HAAJnI3AuJd5YIMsYZK7EcA7eM=;
+        b=gQ7Ovka41D1ndqnlJNXMWFZW0O5gqgk6JVeuoPHa9CpXPHtZokbn4w9LOSm0zjODhpELR8
+        VyhAn6CyuDsUV/LYJEpD62fm6uIkLjSKqYYkwNgIFV4SAq6B8xY9b/237h8o6BiaxW0hiY
+        VZK6xtcOBQi3Hw2vbjlkP2agITzYIis=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-gZgL6WPnOWKH43eLdsTxpA-1; Wed, 15 Jan 2020 10:11:57 -0500
-X-MC-Unique: gZgL6WPnOWKH43eLdsTxpA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-380-fEpNw1loObWxgDUPpaV5nQ-1; Wed, 15 Jan 2020 10:12:29 -0500
+X-MC-Unique: fEpNw1loObWxgDUPpaV5nQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70597109E3FA;
-        Wed, 15 Jan 2020 15:11:54 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E56CB5D9C9;
-        Wed, 15 Jan 2020 15:11:50 +0000 (UTC)
-Date:   Wed, 15 Jan 2020 16:11:49 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <fam@euphon.net>, <rth@twiddle.net>, <ehabkost@redhat.com>,
-        <mtosatti@redhat.com>, <xuwei5@huawei.com>,
-        <jonathan.cameron@huawei.com>, <james.morse@arm.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-        <qemu-arm@nongnu.org>, <zhengxiang9@huawei.com>,
-        <linuxarm@huawei.com>
-Subject: Re: [PATCH v22 2/9] docs: APEI GHES generation and CPER record
- description
-Message-ID: <20200115161149.19481a4a@redhat.com>
-In-Reply-To: <1578483143-14905-3-git-send-email-gengdongjiu@huawei.com>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
-        <1578483143-14905-3-git-send-email-gengdongjiu@huawei.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 041D410052E2;
+        Wed, 15 Jan 2020 15:12:28 +0000 (UTC)
+Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CB0EA84322;
+        Wed, 15 Jan 2020 15:12:24 +0000 (UTC)
+Date:   Wed, 15 Jan 2020 08:12:24 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Liu Yi L <yi.l.liu@intel.com>, kwankhede@nvidia.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kevin.tian@intel.com, joro@8bytes.org, peterx@redhat.com,
+        baolu.lu@linux.intel.com
+Subject: Re: [PATCH v4 05/12] vfio_pci: duplicate vfio_pci.c
+Message-ID: <20200115081224.215a994c@w520.home>
+In-Reply-To: <20200115120300.24874a37.cohuck@redhat.com>
+References: <1578398509-26453-1-git-send-email-yi.l.liu@intel.com>
+        <1578398509-26453-6-git-send-email-yi.l.liu@intel.com>
+        <20200115120300.24874a37.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 Jan 2020 19:32:16 +0800
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+On Wed, 15 Jan 2020 12:03:00 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> Add APEI/GHES detailed design document
+> On Tue,  7 Jan 2020 20:01:42 +0800
+> Liu Yi L <yi.l.liu@intel.com> wrote:
 > 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  docs/specs/acpi_hest_ghes.rst | 110 ++++++++++++++++++++++++++++++++++++++++++
->  docs/specs/index.rst          |   1 +
->  2 files changed, 111 insertions(+)
->  create mode 100644 docs/specs/acpi_hest_ghes.rst
+> > This patch has no code change, just a file copy. In following patches,
+> > vfio_pci_common.c will be modified to only include the common functions
+> > and related static functions in original vfio_pci.c. Meanwhile, vfio_pci.c
+> > will be modified to only include vfio-pci module specific codes.
+> > 
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_common.c | 1708 ++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 1708 insertions(+)
+> >  create mode 100644 drivers/vfio/pci/vfio_pci_common.c  
 > 
-> diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
-> new file mode 100644
-> index 0000000..7a1aa90
-> --- /dev/null
-> +++ b/docs/specs/acpi_hest_ghes.rst
-> @@ -0,0 +1,110 @@
-> +APEI tables generating and CPER record
-> +======================================
-> +
-> +..
-> +   Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
-> +
-> +   This work is licensed under the terms of the GNU GPL, version 2 or later.
-> +   See the COPYING file in the top-level directory.
-> +
-> +Design Details
-> +--------------
-> +
-> +::
-> +
-> +         etc/acpi/tables                           etc/hardware_errors
-> +      ====================                   ===============================
-> +  + +--------------------------+            +----------------------------+
-> +  | | HEST                     | +--------->|    error_block_address1    |------+
-> +  | +--------------------------+ |          +----------------------------+      |
-> +  | | GHES1                    | | +------->|    error_block_address2    |------+-+
-> +  | +--------------------------+ | |        +----------------------------+      | |
-> +  | | .................        | | |        |      ..............        |      | |
-> +  | | error_status_address-----+-+ |        -----------------------------+      | |
-> +  | | .................        |   |   +--->|    error_block_addressN    |------+-+---+
-> +  | | read_ack_register--------+-+ |   |    +----------------------------+      | |   |
-> +  | | read_ack_preserve        | +-+---+--->|     read_ack_register1     |      | |   |
-> +  | | read_ack_write           |   |   |    +----------------------------+      | |   |
-> +  + +--------------------------+   | +-+--->|     read_ack_register2     |      | |   |
-> +  | | GHES2                    |   | | |    +----------------------------+      | |   |
-> +  + +--------------------------+   | | |    |       .............        |      | |   |
-> +  | | .................        |   | | |    +----------------------------+      | |   |
-> +  | | error_status_address-----+---+ | | +->|     read_ack_registerN     |      | |   |
-> +  | | .................        |     | | |  +----------------------------+      | |   |
-> +  | | read_ack_register--------+-----+ | |  |Generic Error Status Block 1|<-----+ |   |
-> +  | | read_ack_preserve        |       | |  |-+------------------------+-+        |   |
-> +  | | read_ack_write           |       | |  | |          CPER          | |        |   |
-> +  + +--------------------------|       | |  | |          CPER          | |        |   |
-> +  | | ...............          |       | |  | |          ....          | |        |   |
-> +  + +--------------------------+       | |  | |          CPER          | |        |   |
-> +  | | GHESN                    |       | |  |-+------------------------+-|        |   |
-> +  + +--------------------------+       | |  |Generic Error Status Block 2|<-------+   |
-> +  | | .................        |       | |  |-+------------------------+-+            |
-> +  | | error_status_address-----+-------+ |  | |           CPER         | |            |
-> +  | | .................        |         |  | |           CPER         | |            |
-> +  | | read_ack_register--------+---------+  | |           ....         | |            |
-> +  | | read_ack_preserve        |            | |           CPER         | |            |
-> +  | | read_ack_write           |            +-+------------------------+-+            |
-> +  + +--------------------------+            |         ..........         |            |
-> +                                            |----------------------------+            |
-> +                                            |Generic Error Status Block N |<----------+
-> +                                            |-+-------------------------+-+
-> +                                            | |          CPER           | |
-> +                                            | |          CPER           | |
-> +                                            | |          ....           | |
-> +                                            | |          CPER           | |
-> +                                            +-+-------------------------+-+
-> +
-> +
-> +(1) QEMU generates the ACPI HEST table. This table goes in the current
-> +    "etc/acpi/tables" fw_cfg blob. Each error source has different
-> +    notification types.
-> +
-> +(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
-> +    also needs to populate this blob. The "etc/hardware_errors" fw_cfg blob
-> +    contains an address registers table and an Error Status Data Block table.
-> +
-> +(3) The address registers table contains N Error Block Address entries
-> +    and N Read Ack Register entries. The size for each entry is 8-byte.
-> +    The Error Status Data Block table contains N Error Status Data Block
-> +    entries. The size for each entry is 4096(0x1000) bytes. The total size
-> +    for the "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
-> +    N is the number of the kinds of hardware error sources.
-> +
-> +(4) QEMU generates the ACPI linker/loader script for the firmware. The
-> +    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
-> +    and copies blob contents there.
-> +
-> +(5) QEMU generates N ADD_POINTER commands, which patch addresses in the
-> +    "error_status_address" fields of the HEST table with a pointer to the
-> +    corresponding "address registers" in the "etc/hardware_errors" blob.
-> +
-> +(6) QEMU generates N ADD_POINTER commands, which patch addresses in the
-> +    "read_ack_register" fields of the HEST table with a pointer to the
-> +    corresponding "read_ack_register" within the "etc/hardware_errors" blob.
-> +
-> +(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
-> +    addresses in the "error_block_address" fields with a pointer to the
-> +    respective "Error Status Data Block" in the "etc/hardware_errors" blob.
-> +
-> +(8) QEMU defines a third and write-only fw_cfg blob which is called
-> +    "etc/hardware_errors_addr". Through that blob, the firmware can send back
-> +    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
-> +    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER command
-> +    for the firmware. The firmware will write back the start address of
-> +    "etc/hardware_errors" blob to the fw_cfg file "etc/hardware_errors_addr".
-> +
-> +(9) When QEMU gets a SIGBUS from the kernel, QEMU writes CPER into corresponding
-> +    "Error Status Data Block", guest memory, and then injects platform specific
-> +    interrupt (in case of arm/virt machine it's Synchronous External Abort) as a
-> +    notification which is necessary for notifying the guest.
-> +
-> +(10) This notification (in virtual hardware) will be handled by the guest
-> +     kernel, on receiving notification, guest APEI driver could read the CPER error
-> +     and take appropriate action.
-> +
-> +(11) kvm_arch_on_sigbus_vcpu() uses source_id as index in "etc/hardware_errors" to
-> +     find out "Error Status Data Block" entry corresponding to error source. So supported
-> +     source_id values should be assigned here and not be changed afterwards to make sure
-> +     that guest will write error into expected "Error Status Data Block" even if guest was
-> +     migrated to a newer QEMU.
-> diff --git a/docs/specs/index.rst b/docs/specs/index.rst
-> index 984ba44..3019b9c 100644
-> --- a/docs/specs/index.rst
-> +++ b/docs/specs/index.rst
-> @@ -13,3 +13,4 @@ Contents:
->     ppc-xive
->     ppc-spapr-xive
->     acpi_hw_reduced_hotplug
-> +   acpi_hest_ghes
+> This whole procedure of "let's copy the file and rip out unneeded stuff
+> later" looks very ugly to me, especially if I'd come across it in the
+> future, e.g. during a bisect. This patch only adds a file that is not
+> compiled, and later changes will be "rip out unwanted stuff from
+> vfio_pci_common.c" instead of the more positive "move common stuff to
+> vfio_pci_common.c". I think refactoring/moving interfaces/code that it
+> makes sense to share makes this more reviewable, both now and in the
+> future.
+
+I think this comes largely at my request from previous reviews.  It's
+very easy to apply this patch and diff the files to see that nothing
+has changed, then review the subsequent patch to see that code is only
+added or removed to check that there are no actual code changes.  If we
+just selectively move code then I think it's left to our inspection to
+verify nothing has changed.  Maybe this is a dummy step in a bisect,
+but I don't see that you lose any granularity.  Thanks,
+
+Alex
 
