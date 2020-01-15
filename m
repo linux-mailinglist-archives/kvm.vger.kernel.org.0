@@ -2,232 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03F1C13C36D
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 14:45:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CB4D13C466
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 14:59:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728946AbgAONnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 08:43:31 -0500
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:54164 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726088AbgAONnb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 08:43:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1579095811; x=1610631811;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=zLtXP9u67moYJgI0kcRDzsrw+pUFCjECk3TMYA8PO7Q=;
-  b=hdVqDXtuC9YqOT8TFrnnXzqIu4r8A7/JXVpmr6zJJCZSeCt/CmVift5k
-   JKbKuFgGtc/BLGyzxbt7/SMviAfQmDln4QQeiFFghz1+uUQr5rWoOlEvG
-   DQsLtxAVdW1VW0Fs/2soa+XGtvQXEMgZJmmjelw/UCGQ4Ud3P9Onb9o29
-   o=;
-IronPort-SDR: idFNB6zKcAox6Oguln3DkRDqPh+AyPXgyvXqArUndaAF9gd1pjj2DpyrfaMGXpKmvtdwi6h2uq
- M/Oitf6lnuWA==
-X-IronPort-AV: E=Sophos;i="5.70,322,1574121600"; 
-   d="scan'208";a="18876712"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 15 Jan 2020 13:43:19 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com (Postfix) with ESMTPS id 8C758A2BB4;
-        Wed, 15 Jan 2020 13:43:17 +0000 (UTC)
-Received: from EX13D27EUB004.ant.amazon.com (10.43.166.152) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 15 Jan 2020 13:43:16 +0000
-Received: from uc3ce012741425f.ant.amazon.com (10.43.161.253) by
- EX13D27EUB004.ant.amazon.com (10.43.166.152) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 15 Jan 2020 13:43:13 +0000
-From:   Milan Pandurov <milanpa@amazon.de>
-To:     <kvm@vger.kernel.org>
-CC:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <graf@amazon.de>,
-        <borntraeger@de.ibm.com>
-Subject: [PATCH 2/2] kvm: Add ioctl for gathering debug counters
-Date:   Wed, 15 Jan 2020 14:43:03 +0100
-Message-ID: <20200115134303.30668-1-milanpa@amazon.de>
-X-Mailer: git-send-email 2.17.1
+        id S1729593AbgAON7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 08:59:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50846 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729256AbgAON67 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 08:58:59 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1EF70222C3;
+        Wed, 15 Jan 2020 13:58:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579096738;
+        bh=/G/weRCXbYPuSwrN2fOcmc9IMAtSW0V+wjMZcxSDxn8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ytuEmCKm0MYbr4DkGoe+3o7uNRCJlGbBzyN9FYICsCn4CppE/loxARmvmoz3h42Zd
+         eH2gDh7+8+YPfaMiBYxAqP1E00+AMdDHCoZK7X6psiKuA0FLaczA+NAMD1rlE7dpjT
+         O23E6godf3BYjzVUVq+n0cB/xaE4WRfxm0dcYl64=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1irjCC-0000PM-CF; Wed, 15 Jan 2020 13:58:56 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.161.253]
-X-ClientProxiedBy: EX13D06UWA001.ant.amazon.com (10.43.160.220) To
- EX13D27EUB004.ant.amazon.com (10.43.166.152)
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 15 Jan 2020 13:58:56 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linmiaohe <linmiaohe@huawei.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, catalin.marinas@arm.com,
+        eric.auger@redhat.com, gregkh@linuxfoundation.org, will@kernel.org,
+        andre.przywara@arm.com, tglx@linutronix.de,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: get rid of var ret and out jump label in
+ kvm_arch_vcpu_ioctl_set_guest_debug()
+In-Reply-To: <ab61de3a04a74f74866683b062d0bab2@huawei.com>
+References: <ab61de3a04a74f74866683b062d0bab2@huawei.com>
+Message-ID: <728a5ea123bf6f55b1653e4ccac76175@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.8
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: linmiaohe@huawei.com, pbonzini@redhat.com, rkrcmar@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, christoffer.dall@arm.com, catalin.marinas@arm.com, eric.auger@redhat.com, gregkh@linuxfoundation.org, will@kernel.org, andre.przywara@arm.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM exposes debug counters through individual debugfs files.
-Monitoring these counters requires debugfs to be enabled/accessible for
-the application, which might not be always the case.
-Additionally, periodic monitoring multiple debugfs files from
-userspace requires multiple file open/read/close + atoi conversion
-operations, which is not very efficient.
+On 2020-01-14 02:20, linmiaohe wrote:
+> Friendly ping :)
 
-Let's expose new interface to userspace for garhering these
-statistics with one ioctl.
+Friendly reply:
 
-Two new ioctl methods are added:
- - KVM_GET_SUPPORTED_DEBUGFS_STAT : Returns list of available counter
- names. Names correspond to the debugfs file names
- - KVM_GET_DEBUGFS_VALUES : Returns list of u64 values each
- corresponding to a value described in KVM_GET_SUPPORTED_DEBUGFS_STAT.
+>> From: Miaohe Lin <linmiaohe@huawei.com>
+>> 
+>> The var ret and out jump label is not really needed. Clean them up.
+>> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+>> ---
+>>  arch/arm64/kvm/guest.c | 11 +++--------
+>>  1 file changed, 3 insertions(+), 8 deletions(-)
+>> 
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c index 
+>> 2fff06114a8f..3b836c91609e 100644
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+>> @@ -834,14 +834,10 @@ int kvm_arch_vcpu_ioctl_translate(struct 
+>> kvm_vcpu *vcpu,  int kvm_arch_vcpu_ioctl_set_guest_debug(struct 
+>> kvm_vcpu *vcpu,
+>>  					struct kvm_guest_debug *dbg)
+>>  {
+>> -	int ret = 0;
+>> -
+>>  	trace_kvm_set_guest_debug(vcpu, dbg->control);
+>> 
+>> -	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK) {
+>> -		ret = -EINVAL;
+>> -		goto out;
+>> -	}
+>> +	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK)
+>> +		return -EINVAL;
+>> 
+>>  	if (dbg->control & KVM_GUESTDBG_ENABLE) {
+>>  		vcpu->guest_debug = dbg->control;
+>> @@ -856,8 +852,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct 
+>> kvm_vcpu *vcpu,
+>>  		vcpu->guest_debug = 0;
+>>  	}
+>> 
+>> -out:
+>> -	return ret;
+>> +	return 0;
 
-Userspace application can read counter description once using
-KVM_GET_SUPPORTED_DEBUGFS_STAT and periodically invoke the
-KVM_GET_DEBUGFS_VALUES to get value update.
+I don't think there is anything wrong with the existing code.
+It may not be to your own taste, but is in keeping with a lot
+of the KVM code.
 
-Signed-off-by: Milan Pandurov <milanpa@amazon.de>
+If you were making changes to this code, I wouldn't object.
+But on its own, this is just churn.
 
----
-Current approach returns all available counters to userspace which might
-be an overkill. This can be further extended with an interface in which
-userspace provides indicies of counters it is interested in counters
-will be filled accordingly.
+Thanks,
 
-NOTE: This patch is placed on top of:
-https://www.spinics.net/lists/kvm/msg202599.html
----
- include/uapi/linux/kvm.h | 21 ++++++++++++
- virt/kvm/kvm_main.c      | 70 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 91 insertions(+)
-
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f0a16b4adbbd..07ad35ddc14f 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1473,6 +1473,27 @@ struct kvm_enc_region {
- /* Available with KVM_CAP_ARM_SVE */
- #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
- 
-+#define KVM_DBG_DESCR_NAME_MAX_SIZE 30
-+struct kvm_debugfs_entry_description {
-+	char name[KVM_DBG_DESCR_NAME_MAX_SIZE + 1];
-+};
-+
-+struct kvm_debugfs_entries_description {
-+	__u32 nentries;
-+	struct kvm_debugfs_entry_description entry[0];
-+};
-+
-+struct kvm_debug_stats {
-+	__u32 nentries;
-+	__u64 values[0];
-+};
-+
-+/* Get description of available debugfs counters */
-+#define KVM_GET_SUPPORTED_DEBUGFS_STATS                                        \
-+	_IOWR(KVMIO, 0xc2, struct kvm_debugfs_entries_description)
-+/* Get values from debugfs */
-+#define KVM_GET_DEBUGFS_VALUES _IOWR(KVMIO, 0xc3, struct kvm_debug_stats)
-+
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
- 	/* Guest initialization commands */
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9eb6e081da3a..66b36b7e347e 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -146,6 +146,10 @@ static void kvm_io_bus_destroy(struct kvm_io_bus *bus);
- 
- static void mark_page_dirty_in_slot(struct kvm_memory_slot *memslot, gfn_t gfn);
- 
-+static long kvm_get_debugfs_entry_description(struct kvm *kvm,
-+					      void __user *argp);
-+static long kvm_get_debugfs_values(struct kvm *kvm, void __user *argp);
-+
- __visible bool kvm_rebooting;
- EXPORT_SYMBOL_GPL(kvm_rebooting);
- 
-@@ -3452,6 +3456,12 @@ static long kvm_vm_ioctl(struct file *filp,
- 	case KVM_CHECK_EXTENSION:
- 		r = kvm_vm_ioctl_check_extension_generic(kvm, arg);
- 		break;
-+	case KVM_GET_SUPPORTED_DEBUGFS_STATS:
-+		r = kvm_get_debugfs_entry_description(kvm, argp);
-+		break;
-+	case KVM_GET_DEBUGFS_VALUES:
-+		r = kvm_get_debugfs_values(kvm, argp);
-+		break;
- 	default:
- 		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
- 	}
-@@ -4202,6 +4212,66 @@ static const struct file_operations *stat_fops[] = {
- 	[KVM_STAT_VM]   = &vm_stat_fops,
- };
- 
-+static long kvm_get_debugfs_entry_description(struct kvm *kvm,
-+					      void __user *argp)
-+{
-+	struct kvm_debugfs_entries_description *description = argp;
-+	struct kvm_stats_debugfs_item *dbgfs_item = debugfs_entries;
-+	bool should_copy = true;
-+	size_t name_length = 0;
-+	__u32 i = 0;
-+
-+	for (; dbgfs_item->name != NULL; dbgfs_item++, i++) {
-+		if (i >= description->nentries)
-+			should_copy = false;
-+
-+		if (should_copy) {
-+			name_length = strlen(dbgfs_item->name);
-+			name_length =
-+				(name_length > KVM_DBG_DESCR_NAME_MAX_SIZE) ?
-+					KVM_DBG_DESCR_NAME_MAX_SIZE :
-+					name_length;
-+
-+			copy_to_user(description->entry[i].name,
-+				     dbgfs_item->name, name_length);
-+			put_user('\0',
-+				 description->entry[i].name + name_length);
-+		}
-+	}
-+	put_user(i, &description->nentries);
-+	return (should_copy) ? 0 : -ENOMEM;
-+}
-+
-+static long kvm_get_debugfs_values(struct kvm *kvm, void __user *argp)
-+{
-+	struct kvm_debug_stats *stats = argp;
-+	struct kvm_stats_debugfs_item *dbgfs_item = debugfs_entries;
-+	bool should_copy = true;
-+	__u32 i = 0;
-+	__u64 tmp = 0;
-+
-+	for (; dbgfs_item->name != NULL; dbgfs_item++, i++) {
-+		if (i >= stats->nentries)
-+			should_copy = false;
-+
-+		if (should_copy) {
-+			switch (dbgfs_item->kind) {
-+			case KVM_STAT_VM:
-+				kvm_get_stat_per_vm(kvm, dbgfs_item->offset,
-+						    &tmp);
-+				break;
-+			case KVM_STAT_VCPU:
-+				kvm_get_stat_per_vcpu(kvm, dbgfs_item->offset,
-+						      &tmp);
-+				break;
-+			}
-+			put_user(tmp, stats->values + i);
-+		}
-+	}
-+	put_user(i, &stats->nentries);
-+	return (should_copy) ? 0 : -ENOMEM;
-+}
-+
- static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
- {
- 	struct kobj_uevent_env *env;
+         M.
 -- 
-2.17.1
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+Jazz is not dead. It just smells funny...
