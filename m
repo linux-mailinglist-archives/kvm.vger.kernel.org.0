@@ -2,169 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 369CC13C4EB
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 15:07:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1F4813C554
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 15:14:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729049AbgAOOHo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 09:07:44 -0500
-Received: from foss.arm.com ([217.140.110.172]:37790 "EHLO foss.arm.com"
+        id S1730663AbgAOOOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 09:14:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39642 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726071AbgAOOHo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 09:07:44 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C1D7B31B;
-        Wed, 15 Jan 2020 06:07:43 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB62F3F68E;
-        Wed, 15 Jan 2020 06:07:42 -0800 (PST)
-Date:   Wed, 15 Jan 2020 14:07:40 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com
-Subject: Re: [PATCH kvmtool 04/16] Check that a PCI device's memory size is
- power of two
-Message-ID: <20200115140740.40881507@donnerap.cambridge.arm.com>
-In-Reply-To: <8800ef85-045e-f83d-6a43-d62f5cc8d8dd@arm.com>
-References: <20191125103033.22694-1-alexandru.elisei@arm.com>
-        <20191125103033.22694-5-alexandru.elisei@arm.com>
-        <20191127182514.23d719ff@donnerap.cambridge.arm.com>
-        <8800ef85-045e-f83d-6a43-d62f5cc8d8dd@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1729154AbgAOOON (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 09:14:13 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B7CDC24679;
+        Wed, 15 Jan 2020 14:14:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579097651;
+        bh=CaXoAkqOajL0kmg6h715f9PHn0XAZVLVKqsyXgOXacM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=IfVjmj7KSiyixL26Y39CJZiiWPKnwpOP90yCrThZ4afM3dMYPowazyc4h9gC+j/q/
+         AW95yu14rcNeC/TEWOUi3I0du1tfRtRn00bWjyiSecTPMTfwJDnMJG09iFY87NdN1S
+         yZ3p6nWb+/NtCMwUmPpa43pUBiyDYqjj1Lq8ET1I=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1irjQw-0000fF-2L; Wed, 15 Jan 2020 14:14:10 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
+Date:   Wed, 15 Jan 2020 14:14:10 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     Zengruan Ye <yezengruan@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, james.morse@arm.com,
+        linux@armlinux.org.uk, suzuki.poulose@arm.com,
+        julien.thierry.kdev@gmail.com, catalin.marinas@arm.com,
+        mark.rutland@arm.com, steven.price@arm.com,
+        daniel.lezcano@linaro.org, peterz@infradead.org
+Subject: Re: [PATCH v2 0/6] KVM: arm64: VCPU preempted check support
+In-Reply-To: <20200113121240.GC3260@willie-the-truck>
+References: <20191226135833.1052-1-yezengruan@huawei.com>
+ <20200113121240.GC3260@willie-the-truck>
+Message-ID: <b1d23a82d6a7caa79a99597fb83472be@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.8
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: will@kernel.org, yezengruan@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-doc@vger.kernel.org, virtualization@lists.linux-foundation.org, james.morse@arm.com, linux@armlinux.org.uk, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com, catalin.marinas@arm.com, mark.rutland@arm.com, steven.price@arm.com, daniel.lezcano@linaro.org, peterz@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 15 Jan 2020 12:43:20 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-> Hi,
+On 2020-01-13 12:12, Will Deacon wrote:
+> [+PeterZ]
 > 
-> On 11/27/19 6:25 PM, Andre Przywara wrote:
-> > On Mon, 25 Nov 2019 10:30:21 +0000
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> >
-> > Hi,
-> >  
-> >> According to the PCI local bus specification [1], a device's memory size
-> >> must be a power of two. This is also implicit in the mechanism that a CPU
-> >> uses to get the memory size requirement for a PCI device.
-> >>
-> >> The vesa device requests a memory size that isn't a power of two.
-> >> According to the same spec [1], a device is allowed to consume more memory
-> >> than it actually requires. As a result, the amount of memory that the vesa
-> >> device now reserves has been increased.
-> >>
-> >> To prevent slip-ups in the future, a few BUILD_BUG_ON statements were added
-> >> in places where the memory size is known at compile time.
-> >>
-> >> [1] PCI Local Bus Specification Revision 3.0, section 6.2.5.1
-> >>
-> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >> ---
-> >>  hw/vesa.c          | 2 ++
-> >>  include/kvm/util.h | 2 ++
-> >>  include/kvm/vesa.h | 6 +++++-
-> >>  vfio/pci.c         | 5 +++++
-> >>  virtio/pci.c       | 3 +++
-> >>  5 files changed, 17 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/vesa.c b/hw/vesa.c
-> >> index f3c5114cf4fe..75670a51be5f 100644
-> >> --- a/hw/vesa.c
-> >> +++ b/hw/vesa.c
-> >> @@ -58,6 +58,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
-> >>  	char *mem;
-> >>  	int r;
-> >>  
-> >> +	BUILD_BUG_ON(!is_power_of_two(VESA_MEM_SIZE));
-> >> +
-> >>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
-> >>  		return NULL;
-> >>  
-> >> diff --git a/include/kvm/util.h b/include/kvm/util.h
-> >> index 4ca7aa9392b6..e90f1c2db39f 100644
-> >> --- a/include/kvm/util.h
-> >> +++ b/include/kvm/util.h
-> >> @@ -104,6 +104,8 @@ static inline unsigned long roundup_pow_of_two(unsigned long x)
-> >>  	return x ? 1UL << fls_long(x - 1) : 0;
-> >>  }
-> >>  
-> >> +#define is_power_of_two(x)	((x) ? ((x) & ((x) - 1)) == 0 : 0)  
-> > This gives weird results for negative values (which the kernel avoids by having this a static inline and using an unsigned type).
-> > Not sure we care, but maybe (x > 0) ? ... would fix this?  
+> On Thu, Dec 26, 2019 at 09:58:27PM +0800, Zengruan Ye wrote:
+>> This patch set aims to support the vcpu_is_preempted() functionality
+>> under KVM/arm64, which allowing the guest to obtain the VCPU is
+>> currently running or not. This will enhance lock performance on
+>> overcommitted hosts (more runnable VCPUs than physical CPUs in the
+>> system) as doing busy waits for preempted VCPUs will hurt system
+>> performance far worse than early yielding.
+>> 
+>> We have observed some performace improvements in uninx benchmark 
+>> tests.
+>> 
+>> unix benchmark result:
+>>   host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 CPUs
+>>   guest: kernel 5.5.0-rc1, 16 VCPUs
+>> 
+>>                test-case                |    after-patch    |   
+>> before-patch
+>> ----------------------------------------+-------------------+------------------
+>>  Dhrystone 2 using register variables   | 334600751.0 lps   | 
+>> 335319028.3 lps
+>>  Double-Precision Whetstone             |     32856.1 MWIPS |     
+>> 32849.6 MWIPS
+>>  Execl Throughput                       |      3662.1 lps   |      
+>> 2718.0 lps
+>>  File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    
+>> 158011.8 KBps
+>>  File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     
+>> 37664.0 KBps
+>>  File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    
+>> 441108.8 KBps
+>>  Pipe Throughput                        |   6405029.6 lps   |   
+>> 6021457.6 lps
+>>  Pipe-based Context Switching           |    185872.7 lps   |    
+>> 184255.3 lps
+>>  Process Creation                       |      4025.7 lps   |      
+>> 3706.6 lps
+>>  Shell Scripts (1 concurrent)           |      6745.6 lpm   |      
+>> 6436.1 lpm
+>>  Shell Scripts (8 concurrent)           |       998.7 lpm   |       
+>> 931.1 lpm
+>>  System Call Overhead                   |   3913363.1 lps   |   
+>> 3883287.8 lps
+>> ----------------------------------------+-------------------+------------------
+>>  System Benchmarks Index Score          |      1835.1       |      
+>> 1327.6
 > 
-> Good point, I will fix it by changing the implicit comparison against 0 at the
-> beginning with (x) > 0.
+> Interesting, thanks for the numbers.
 > 
-> >  
-> >> +
-> >>  struct kvm;
-> >>  void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
-> >>  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
-> >> diff --git a/include/kvm/vesa.h b/include/kvm/vesa.h
-> >> index 0fac11ab5a9f..e7d971343642 100644
-> >> --- a/include/kvm/vesa.h
-> >> +++ b/include/kvm/vesa.h
-> >> @@ -5,8 +5,12 @@
-> >>  #define VESA_HEIGHT	480
-> >>  
-> >>  #define VESA_MEM_ADDR	0xd0000000
-> >> -#define VESA_MEM_SIZE	(4*VESA_WIDTH*VESA_HEIGHT)
-> >>  #define VESA_BPP	32
-> >> +/*
-> >> + * We actually only need VESA_BPP/8*VESA_WIDTH*VESA_HEIGHT bytes. But the memory
-> >> + * size must be a power of 2, so we round up.
-> >> + */
-> >> +#define VESA_MEM_SIZE	(1 << 21)  
-> > I don't think it's worth calculating the value and rounding it up, but can we have a BUILD_BUG checking that VESA_MEM_SIZE is big enough to hold the framebuffer?  
+> So it looks like there is a decent improvement to be had from targetted 
+> vCPU
+> wakeup, but I really dislike the explicit PV interface and it's already 
+> been
+> shown to interact badly with the WFE-based polling in 
+> smp_cond_load_*().
 > 
-> I'm not sure what you mean. The current value of VESA_MEM_SIZE is not a power of
-> two, which breaks the spec. That's the reason for changing it. Are you suggesting
-> that we keep VESA_MEM_SIZE = 1 << 21, we remove the power_of_two check and add a
-> BUILD_BUG on VESA_MEM_SIZE < 4 * VESA_WIDTH * VESA_HEIGHT?
+> Rather than expose a divergent interface, I would instead like to 
+> explore an
+> improvement to smp_cond_load_*() and see how that performs before we 
+> commit
+> to something more intrusive. Marc and I looked at this very briefly in 
+> the
+> past, and the basic idea is to register all of the WFE sites with the
+> hypervisor, indicating which register contains the address being spun 
+> on
+> and which register contains the "bad" value. That way, you don't bother
+> rescheduling a vCPU if the value at the address is still bad, because 
+> you
+> know it will exit immediately.
+> 
+> Of course, the devil is in the details because when I say "address", 
+> that's
+> a guest virtual address, so you need to play some tricks in the 
+> hypervisor
+> so that you have a separate mapping for the lockword (it's enough to 
+> keep
+> track of the physical address).
+> 
+> Our hacks are here but we basically ran out of time to work on them 
+> beyond
+> an unoptimised and hacky prototype:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy
+> 
+> Marc -- how would you prefer to handle this?
 
-Only the latter, so keep the power_of_two check, but add the BUILD_BUG with the comparison. So that it breaks if someone increases the width or height.
+Let me try and rebase this thing to a modern kernel (I doubt it applies 
+without
+conflicts to mainline). We can then have discussion about its merit on 
+the list
+once I post it. It'd be good to have a pointer to the benchamrks that 
+have been
+used here.
 
-Cheers,
-Andre.
+Thanks,
 
-> >>  struct kvm;
-> >>  struct biosregs;
-> >> diff --git a/vfio/pci.c b/vfio/pci.c
-> >> index 76e24c156906..914732cc6897 100644
-> >> --- a/vfio/pci.c
-> >> +++ b/vfio/pci.c
-> >> @@ -831,6 +831,11 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
-> >>  	/* Ignore invalid or unimplemented regions */
-> >>  	if (!region->info.size)
-> >>  		return 0;
-> >> +	if (!is_power_of_two(region->info.size)) {
-> >> +		vfio_dev_err(vdev, "region is not power of two: 0x%llx",
-> >> +			     region->info.size);
-> >> +		return -EINVAL;
-> >> +	}
-> >>  
-> >>  	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSIX) {
-> >>  		/* Trap and emulate MSI-X table */
-> >> diff --git a/virtio/pci.c b/virtio/pci.c
-> >> index 99653cad2c0f..04e801827df9 100644
-> >> --- a/virtio/pci.c
-> >> +++ b/virtio/pci.c
-> >> @@ -435,6 +435,9 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
-> >>  	vpci->kvm = kvm;
-> >>  	vpci->dev = dev;
-> >>  
-> >> +	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
-> >> +	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
-> >> +
-> >>  	r = ioport__register(kvm, IOPORT_EMPTY, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
-> >>  	if (r < 0)
-> >>  		return r;  
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
