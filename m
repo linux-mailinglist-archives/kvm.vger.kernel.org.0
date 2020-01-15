@@ -2,172 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E4EBD13CDBE
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 21:07:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 15BDB13CDE8
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 21:17:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729809AbgAOUGz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 15:06:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29969 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729793AbgAOUGz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 15:06:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579118814;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ouETeL4IvzIbfGB9Fv8qtP6i/4HZznlTaT1Dbkur2g8=;
-        b=BR3QDKZ4vGb0G79avssm4n9uzKTcjp0FqB6mICd+27iKD0N31PpfifbpbYzGuHOlrX3Z7k
-        CUJVr72vt0pcSmFY0VRg5ui6i3QRkY14FT1PHTJcw3d08MRm3Am48HCk66hKzb+iyJ2xIN
-        oUaGyN5osk6YqMLMdjrUbROnVZk54qw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-Y5nQ-SI0N2iGLdeInMhekQ-1; Wed, 15 Jan 2020 15:06:53 -0500
-X-MC-Unique: Y5nQ-SI0N2iGLdeInMhekQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FAD01005510;
-        Wed, 15 Jan 2020 20:06:52 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8BD99675AF;
-        Wed, 15 Jan 2020 20:06:51 +0000 (UTC)
-Date:   Wed, 15 Jan 2020 13:06:51 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     zhenyuw@linux.intel.com, intel-gvt-dev@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, kevin.tian@intel.com, peterx@redhat.com
-Subject: Re: [PATCH v2 2/2] drm/i915/gvt: subsitute kvm_read/write_guest
- with vfio_dma_rw
-Message-ID: <20200115130651.29d7e9e0@w520.home>
-In-Reply-To: <20200115035455.12417-1-yan.y.zhao@intel.com>
-References: <20200115034132.2753-1-yan.y.zhao@intel.com>
-        <20200115035455.12417-1-yan.y.zhao@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S1728927AbgAOUPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 15:15:40 -0500
+Received: from mail-dm6nam10on2081.outbound.protection.outlook.com ([40.107.93.81]:37074
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726362AbgAOUPj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 15:15:39 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NFJsuwmQpi3Yxtwz6xkbuHPKkWSNRYYGNjV5oPRLzr9KSsip69sRGqLVBY5+2PTY8ZuWyADI3tMZ1zu9f8hx0PdSExo9HgCLdVBQdO8Ysd3jYAS6VICQQFwsTqzKvX7UWN6gqbrCDOuTn+Udrwu4jWrXB13H4b2J3k05too2Rs/xRd9unNqTO25mapN4ftIg0zqIFhEy1vVQsc2O2Ptem3Z0wD5LFXPy3bPBiFBjGB4aGPJrUG8JTjSDTgSvXyrbZIFHqi+Nzmxf9K1V5xxYqrFjxAEDZiy6R8G5SPLFDtnQxB9XIvFGa7NxePfTpE0KuQhGTeUjxgWR71HecPTf7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hXLV3KKkyDnoTQGl3RnmhdhFl39LZ6u/2gCnStrvHJI=;
+ b=ZaJqWzr+KCA3zozq9UWz8G3uBnh1jb5z6z4JKhYXJ4KiflvmzFo+DbXfKlwEM9eoE0dVYFj3femNwJ0+pZRxglDjZdJ4brC5BXcw4oqOa3bw7jU0M/TColT2+V4tkh/eArOO7Vp0unrQV1EFFq7+iYTDfUDkeWWyz5ltdiHcO8++mCWxwN4yvV+u8wxoIVf1DfwMgQtSpx0dvDIa0pkUHz6Du5WLNL1dLhSJcxOsnTS2lhk0JP4fEYcfK5wBWE7HUuj9hacmyI5V0T32kMiKBlJRvFCEqEGxlQjFd/vkpoWEixiH/+Uip4AO47RNcneiWoJIienhsn3eY4xIUOKeGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hXLV3KKkyDnoTQGl3RnmhdhFl39LZ6u/2gCnStrvHJI=;
+ b=ArSL4MDMRYanLxCrkyRI94r5RUXgfNMtDBiAf3KdzLyAY/mJ4A+cP+x8ohKjEOFZevzQ6duJe4V/DZ0elhLfrhkQrOuFa+d+YrS00VoJVEO24ga63a9irKxOU0kw6eqhOH15aF9fFi+NVJD2FqnXrYlQjDSzc5QiAC2SEre2BB8=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com (10.172.71.23) by
+ CY4PR12MB1702.namprd12.prod.outlook.com (10.175.61.151) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.19; Wed, 15 Jan 2020 20:15:37 +0000
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd]) by CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd%7]) with mapi id 15.20.2623.017; Wed, 15 Jan 2020
+ 20:15:37 +0000
+Subject: [kvm-unit-tests PATCH] x86: Add a kvm module parameter check for
+ vmware_backdoors test
+From:   Babu Moger <babu.moger@amd.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org
+Date:   Wed, 15 Jan 2020 14:15:35 -0600
+Message-ID: <157911933557.8219.11014260858807770513.stgit@naples-babu.amd.com>
+User-Agent: StGit/unknown-version
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-ClientProxiedBy: SN6PR04CA0106.namprd04.prod.outlook.com
+ (2603:10b6:805:f2::47) To CY4PR12MB1574.namprd12.prod.outlook.com
+ (2603:10b6:910:e::23)
+MIME-Version: 1.0
+Received: from naples-babu.amd.com (165.204.78.2) by SN6PR04CA0106.namprd04.prod.outlook.com (2603:10b6:805:f2::47) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.11 via Frontend Transport; Wed, 15 Jan 2020 20:15:36 +0000
+X-Originating-IP: [165.204.78.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 216ea564-0c11-428a-22aa-08d799f7af20
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1702:|CY4PR12MB1702:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CY4PR12MB17020E45A6A5D0409802B11995370@CY4PR12MB1702.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2089;
+X-Forefront-PRVS: 02830F0362
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(346002)(136003)(39860400002)(366004)(199004)(189003)(16526019)(2906002)(186003)(86362001)(52116002)(7696005)(26005)(55016002)(6916009)(66556008)(478600001)(4744005)(5660300002)(4326008)(103116003)(316002)(956004)(81156014)(8676002)(81166006)(8936002)(66476007)(44832011)(66946007);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR12MB1702;H:CY4PR12MB1574.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dpXZiCsVOuvJVMV3SWoWKcmxZP6IDQl3tL+dwgYf6iVtqeDlG2C+vqqPL1/OuzXVJGDwGbaqRHj0OPehqzEEd+KRam6aEQaiP0kJonJPdQ1zqmGokmBpGZzwo5ID64+2TA4eQt3+L2hO78h729RakzcmDPrLfr93RYYNKmGSM7Ag9+MctePVww3bIPc7GZjJXY/ri9MtrRXUalfMvBNWvzL4y6g0cwYVK4KpAsQ7Dz3l8kUS8WAwKUijrw0Zp5t+9nqOizXOyKmcigvQtaKbmhWwAdB4h6N2VuUL0E4qLndLJwVnsoLkcx6xb/jmRe9gM4NcYAuu2oCF6073gnF08XaZTPvHZnY8y/PY7vUfsf+0cPCncZnwpcw4l0iIdYyv7oyZsS9yTiiVa9oIvH8tv0IBLtjRN4BpSinRjiK4Xv6lb4GJJPRGzxjJ0Bp+wHVM
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 216ea564-0c11-428a-22aa-08d799f7af20
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2020 20:15:37.2164
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ie6/4ssyvfYhNxOXOrw3nE/AGCRJLBx7LC1UKM9ug9mrDHLtDsvH8fuUfZbGRmvd
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1702
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 Jan 2020 22:54:55 -0500
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+vmware_backdoors test fails if the kvm module parameter
+enable_vmware_backdoor is not set to Y. Add a check before
+running the test.
 
-> As a device model, it is better to read/write guest memory using vfio
-> interface, so that vfio is able to maintain dirty info of device IOVAs.
-> 
-> Compared to kvm interfaces kvm_read/write_guest(), vfio_dma_rw() has ~600
-> cycles more overhead on average.
-> 
-> -------------------------------------
-> |    interface     | avg cpu cycles |
-> |-----------------------------------|
-> | kvm_write_guest  |     1554       |
-> | ----------------------------------|
-> | kvm_read_guest   |     707        |
-> |-----------------------------------|
-> | vfio_dma_rw(w)   |     2274       |
-> |-----------------------------------|
-> | vfio_dma_rw(r)   |     1378       |
-> -------------------------------------
+Suggested-by: Huang2, Wei <Wei.Huang2@amd.com>
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+---
+ x86/unittests.cfg |    1 +
+ 1 file changed, 1 insertion(+)
 
-In v1 you had:
-
--------------------------------------
-|    interface     | avg cpu cycles |
-|-----------------------------------|
-| kvm_write_guest  |     1546       |
-| ----------------------------------|
-| kvm_read_guest   |     686        |
-|-----------------------------------|
-| vfio_iova_rw(w)  |     2233       |
-|-----------------------------------|
-| vfio_iova_rw(r)  |     1262       |
--------------------------------------
-
-So the kvm numbers remained within +0.5-3% while the vfio numbers are
-now +1.8-9.2%.  I would have expected the algorithm change to at least
-not be worse for small accesses and be better for accesses crossing
-page boundaries.  Do you know what happened?
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 51e4ba5..aae1523 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -164,6 +164,7 @@ check = /proc/sys/kernel/nmi_watchdog=0
+ [vmware_backdoors]
+ file = vmware_backdoors.flat
+ extra_params = -machine vmport=on -cpu host
++check = /sys/module/kvm/parameters/enable_vmware_backdoor=Y
+ arch = x86_64
  
-> Comparison of benchmarks scores are as blow:
-> ------------------------------------------------------
-> |  avg score  | kvm_read/write_guest  | vfio_dma_rw  |
-> |----------------------------------------------------|
-> |   Glmark2   |         1284          |    1296      |
-> |----------------------------------------------------|
-> |  Lightsmark |         61.24         |    61.27     |
-> |----------------------------------------------------|
-> |  OpenArena  |         140.9         |    137.4     |
-> |----------------------------------------------------|
-> |   Heaven    |          671          |     670      |
-> ------------------------------------------------------
-> No obvious performance downgrade found.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
->  drivers/gpu/drm/i915/gvt/kvmgt.c | 26 +++++++-------------------
->  1 file changed, 7 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> index bd79a9718cc7..17edc9a7ff05 100644
-> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> @@ -1966,31 +1966,19 @@ static int kvmgt_rw_gpa(unsigned long handle, unsigned long gpa,
->  			void *buf, unsigned long len, bool write)
->  {
->  	struct kvmgt_guest_info *info;
-> -	struct kvm *kvm;
-> -	int idx, ret;
-> -	bool kthread = current->mm == NULL;
-> +	int ret;
-> +	struct intel_vgpu *vgpu;
-> +	struct device *dev;
->  
->  	if (!handle_valid(handle))
->  		return -ESRCH;
->  
->  	info = (struct kvmgt_guest_info *)handle;
-> -	kvm = info->kvm;
-> -
-> -	if (kthread) {
-> -		if (!mmget_not_zero(kvm->mm))
-> -			return -EFAULT;
-> -		use_mm(kvm->mm);
-> -	}
-> -
-> -	idx = srcu_read_lock(&kvm->srcu);
-> -	ret = write ? kvm_write_guest(kvm, gpa, buf, len) :
-> -		      kvm_read_guest(kvm, gpa, buf, len);
-> -	srcu_read_unlock(&kvm->srcu, idx);
-> +	vgpu = info->vgpu;
-> +	dev = mdev_dev(vgpu->vdev.mdev);
->  
-> -	if (kthread) {
-> -		unuse_mm(kvm->mm);
-> -		mmput(kvm->mm);
-> -	}
-> +	ret = write ? vfio_dma_rw(dev, gpa, buf, len, true) :
-> +			vfio_dma_rw(dev, gpa, buf, len, false);
-
-As Paolo suggested previously, this can be simplified:
-
-ret = vfio_dma_rw(dev, gpa, buf, len, write);
-
->  
->  	return ret;
-
-Or even more simple, remove the ret variable:
-
-return vfio_dma_rw(dev, gpa, buf, len, write);
-
-Thanks,
-Alex
-
->  }
+ [port80]
 
