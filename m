@@ -2,150 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C62113C74C
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 16:21:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C14C913C769
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 16:24:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728963AbgAOPVG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 10:21:06 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47218 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726132AbgAOPVG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jan 2020 10:21:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579101664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ki7tnjd8CszgUl/v/wFasJuUFOd5ESMGpqCxJao2aME=;
-        b=UkMsGaDFhUIcKvBaDuZeweYS6jZ8LhEr7hY59z9f0ZB8VMh6nJKBZ5QnOtKRdI/5u+VEAY
-        PBdsoHhOYmkH+6TIOAQ0wzuEQEa3I4fPWgW9mhuGHya4IEDFnw6opENe9CEp4cSdHHbyXz
-        KK0bG9TtqDtZGj5KsfLoEk/33vhrfNQ=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-5OD-HfvRMpar1-bYtVZrJw-1; Wed, 15 Jan 2020 10:21:03 -0500
-X-MC-Unique: 5OD-HfvRMpar1-bYtVZrJw-1
-Received: by mail-qt1-f199.google.com with SMTP id e1so11520346qto.5
-        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 07:21:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ki7tnjd8CszgUl/v/wFasJuUFOd5ESMGpqCxJao2aME=;
-        b=oZeyA8MDBPTAoCyPdqQ/QrwnNM4uNyG1W2vUpF6GbN/vm7EzP7pUouoDEtgHT25pta
-         w2Yyi1Cv0Ad7IfGsznnMwdME0+3MomoSXYAMmcI+PYusuEI7pf9jT+G+NuWCTtaN3E+t
-         f74UeGU7K3AyonpxD1KuO0/gj79J/DpTYJ36oluBSFxqerJBza4tYooZ+MCKlgFPFy4X
-         /NSMRbbbaXUNZrPk9Xe/5F43GbuNc86PXuNfUH5NqZV8DUXdphABdtrW7NPeoZFbSSt4
-         OTPrnqCfhx21wTFupLZNvdlMmQ3SEt79HuzWe7LO3emF8gzKrL6SqiWHkCuOJMG3rvW1
-         t2pA==
-X-Gm-Message-State: APjAAAXVfzghSkXF8F28cdQrjuBx2R7ZjgNDRqWwcpXst0zOWmm7NfnJ
-        KEfyJvgeN+SScnBRqA5HV7bxDsjcQ96uDDlZfd1KibpaLHSrRY4jxzsKaVFtkseY5OgqEHUp9TU
-        vxy0Julp7FoIY
-X-Received: by 2002:a37:648c:: with SMTP id y134mr22704399qkb.175.1579101659116;
-        Wed, 15 Jan 2020 07:20:59 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxVTvtcNezjslT/T83pZqi27Oyc9HRfMsEwQ65HHw1XAmlwoI0NsNMWacRwNdOlm4NiqGw4Vw==
-X-Received: by 2002:a37:648c:: with SMTP id y134mr22704364qkb.175.1579101658828;
-        Wed, 15 Jan 2020 07:20:58 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id u52sm9782422qta.23.2020.01.15.07.20.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2020 07:20:58 -0800 (PST)
-Date:   Wed, 15 Jan 2020 10:20:55 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
+        id S1729011AbgAOPXh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 10:23:37 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:48766 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726165AbgAOPXh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 10:23:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Transfer-Encoding
+        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=XJx25SjGDNaPjSZ5TNemDMINDpbBYIW/xJOLgTsR2QM=; b=hhbgi8BJKTkNcGbj/zsunWm8Nk
+        5/QjY8sMr0mKKH9pQML6hCHgjupQSuiVpFa35irs5bk6Fyb0UXZ1Yk33/ewO5HcNonK3bLaNQlK9j
+        vKW8gUSqaVd9vEKlh6jNUdhGn+SVvs43+luv2lVS3kKMoCNgeVxJWJGs0m9STdgU4Qtt71bfJRfCg
+        Hs7bX3HZshLtu6+z7ViFzZPM/Q11Zm0+3LL1wi1u6yCjGgTKJxM/vuInUUiL02Q9vr1wQQHktXl01
+        ud7iaVtdov/flVsEByz9WQ5V6SiyJzpX3YWSsvca9IYSpvPI0fNOHBgvyQHf7/UrLeeWuISjdgkdd
+        igfjbtlQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1irkVe-0007PR-Hi; Wed, 15 Jan 2020 15:23:06 +0000
+Date:   Wed, 15 Jan 2020 07:23:06 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Lei Cao <lei.cao@stratus.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v3 12/21] KVM: X86: Implement ring-based dirty memory
- tracking
-Message-ID: <20200115152055.GF233443@xz-x1>
-References: <20200109145729.32898-1-peterx@redhat.com>
- <20200109145729.32898-13-peterx@redhat.com>
- <20200109110110-mutt-send-email-mst@kernel.org>
- <20200109191514.GD36997@xz-x1>
- <20200109141634-mutt-send-email-mst@kernel.org>
- <20200114200134.GA233443@xz-x1>
- <20200115014735-mutt-send-email-mst@kernel.org>
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v12 04/22] mm: devmap: refactor 1-based refcounting for
+ ZONE_DEVICE pages
+Message-ID: <20200115152306.GA19546@infradead.org>
+References: <20200107224558.2362728-1-jhubbard@nvidia.com>
+ <20200107224558.2362728-5-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20200115014735-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200107224558.2362728-5-jhubbard@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 15, 2020 at 01:50:08AM -0500, Michael S. Tsirkin wrote:
-> On Tue, Jan 14, 2020 at 03:01:34PM -0500, Peter Xu wrote:
-> > On Thu, Jan 09, 2020 at 02:35:46PM -0500, Michael S. Tsirkin wrote:
-> > >   ``void flush_dcache_page(struct page *page)``
-> > > 
-> > >         Any time the kernel writes to a page cache page, _OR_
-> > >         the kernel is about to read from a page cache page and
-> > >         user space shared/writable mappings of this page potentially
-> > >         exist, this routine is called.
-
-[1]
-
-> > > 
-> > > 
-> > > > Also, I believe this is the similar question that Jason has asked in
-> > > > V2.  Sorry I should mention this earlier, but I didn't address that in
-> > > > this series because if we need to do so we probably need to do it
-> > > > kvm-wise, rather than only in this series.
-> > > 
-> > > You need to document these things.
-> > > 
-> > > >  I feel like it's missing
-> > > > probably only because all existing KVM supported archs do not have
-> > > > virtual-tagged caches as you mentioned.
-> > > 
-> > > But is that a fact? ARM has such a variety of CPUs,
-> > > I can't really tell. Did you research this to make sure?
-> > > 
-> > > > If so, I would prefer if you
-> > > > can allow me to ignore that issue until KVM starts to support such an
-> > > > arch.
-> > > 
-> > > Document limitations pls.  Don't ignore them.
-> > 
-> > Hi, Michael,
-> > 
-> > I failed to find a good place to document about flush_dcache_page()
-> > for KVM.  Could you give me a suggestion?
+On Tue, Jan 07, 2020 at 02:45:40PM -0800, John Hubbard wrote:
+> An upcoming patch changes and complicates the refcounting and
+> especially the "put page" aspects of it. In order to keep
+> everything clean, refactor the devmap page release routines:
 > 
-> Maybe where the field is introduced. I posted the suggestions to the
-> relevant patch.
-
-(will reply there)
-
+> * Rename put_devmap_managed_page() to page_is_devmap_managed(),
+>   and limit the functionality to "read only": return a bool,
+>   with no side effects.
 > 
-> > And I don't know about whether there's any ARM hosts that requires
-> > flush_dcache_page().  I think not, because again I didn't see any
-> > caller of flush_dcache_page() in KVM code yet.  Otherwise I think we
-> > should at least call it before the kernel reading kvm_run or after
-> > publishing data to kvm_run.
+> * Add a new routine, put_devmap_managed_page(), to handle
+>   decrementing the refcount for ZONE_DEVICE pages.
 > 
-> But is kvm run ever accessed while VCPU is running on another CPU?
-> I always assumed no but maybe I'm missing something?
+> * Change callers (just release_pages() and put_page()) to check
+>   page_is_devmap_managed() before calling the new
+>   put_devmap_managed_page() routine. This is a performance
+>   point: put_page() is a hot path, so we need to avoid non-
+>   inline function calls where possible.
+> 
+> * Rename __put_devmap_managed_page() to free_devmap_managed_page(),
+>   and limit the functionality to unconditionally freeing a devmap
+>   page.
+> 
+> This is originally based on a separate patch by Ira Weiny, which
+> applied to an early version of the put_user_page() experiments.
+> Since then, Jérôme Glisse suggested the refactoring described above.
 
-IMHO we need to call it even if it's running on the same CPU - please
-refer to [1] above, there's no restriction on which CPU the code is
-running on.  I think it makes sense, especially the systems for
-virtually-tagged caches because even if the memory accesses happened
-on the same CPU, the virtual addresses to access the same page could
-still be different when accessed from kernel/userspace.
-
-Thanks,
-
--- 
-Peter Xu
-
+I'm really not sold on this scheme.  Note that I think it is
+particularly bad, but it also doesn't seem any better than what
+we had before, and it introduced quite a bit more code.
