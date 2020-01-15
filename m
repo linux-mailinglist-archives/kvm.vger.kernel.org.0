@@ -2,94 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AAD0A13C71E
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 16:12:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C62113C74C
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 16:21:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729121AbgAOPMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 10:12:34 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23165 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726165AbgAOPMd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 10:12:33 -0500
+        id S1728963AbgAOPVG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 10:21:06 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47218 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726132AbgAOPVG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jan 2020 10:21:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579101152;
+        s=mimecast20190719; t=1579101664;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QY8+0O7c2VwRb5cv2HAAJnI3AuJd5YIMsYZK7EcA7eM=;
-        b=gQ7Ovka41D1ndqnlJNXMWFZW0O5gqgk6JVeuoPHa9CpXPHtZokbn4w9LOSm0zjODhpELR8
-        VyhAn6CyuDsUV/LYJEpD62fm6uIkLjSKqYYkwNgIFV4SAq6B8xY9b/237h8o6BiaxW0hiY
-        VZK6xtcOBQi3Hw2vbjlkP2agITzYIis=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-fEpNw1loObWxgDUPpaV5nQ-1; Wed, 15 Jan 2020 10:12:29 -0500
-X-MC-Unique: fEpNw1loObWxgDUPpaV5nQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 041D410052E2;
-        Wed, 15 Jan 2020 15:12:28 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CB0EA84322;
-        Wed, 15 Jan 2020 15:12:24 +0000 (UTC)
-Date:   Wed, 15 Jan 2020 08:12:24 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Liu Yi L <yi.l.liu@intel.com>, kwankhede@nvidia.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kevin.tian@intel.com, joro@8bytes.org, peterx@redhat.com,
-        baolu.lu@linux.intel.com
-Subject: Re: [PATCH v4 05/12] vfio_pci: duplicate vfio_pci.c
-Message-ID: <20200115081224.215a994c@w520.home>
-In-Reply-To: <20200115120300.24874a37.cohuck@redhat.com>
-References: <1578398509-26453-1-git-send-email-yi.l.liu@intel.com>
-        <1578398509-26453-6-git-send-email-yi.l.liu@intel.com>
-        <20200115120300.24874a37.cohuck@redhat.com>
+        bh=Ki7tnjd8CszgUl/v/wFasJuUFOd5ESMGpqCxJao2aME=;
+        b=UkMsGaDFhUIcKvBaDuZeweYS6jZ8LhEr7hY59z9f0ZB8VMh6nJKBZ5QnOtKRdI/5u+VEAY
+        PBdsoHhOYmkH+6TIOAQ0wzuEQEa3I4fPWgW9mhuGHya4IEDFnw6opENe9CEp4cSdHHbyXz
+        KK0bG9TtqDtZGj5KsfLoEk/33vhrfNQ=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-5OD-HfvRMpar1-bYtVZrJw-1; Wed, 15 Jan 2020 10:21:03 -0500
+X-MC-Unique: 5OD-HfvRMpar1-bYtVZrJw-1
+Received: by mail-qt1-f199.google.com with SMTP id e1so11520346qto.5
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 07:21:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ki7tnjd8CszgUl/v/wFasJuUFOd5ESMGpqCxJao2aME=;
+        b=oZeyA8MDBPTAoCyPdqQ/QrwnNM4uNyG1W2vUpF6GbN/vm7EzP7pUouoDEtgHT25pta
+         w2Yyi1Cv0Ad7IfGsznnMwdME0+3MomoSXYAMmcI+PYusuEI7pf9jT+G+NuWCTtaN3E+t
+         f74UeGU7K3AyonpxD1KuO0/gj79J/DpTYJ36oluBSFxqerJBza4tYooZ+MCKlgFPFy4X
+         /NSMRbbbaXUNZrPk9Xe/5F43GbuNc86PXuNfUH5NqZV8DUXdphABdtrW7NPeoZFbSSt4
+         OTPrnqCfhx21wTFupLZNvdlMmQ3SEt79HuzWe7LO3emF8gzKrL6SqiWHkCuOJMG3rvW1
+         t2pA==
+X-Gm-Message-State: APjAAAXVfzghSkXF8F28cdQrjuBx2R7ZjgNDRqWwcpXst0zOWmm7NfnJ
+        KEfyJvgeN+SScnBRqA5HV7bxDsjcQ96uDDlZfd1KibpaLHSrRY4jxzsKaVFtkseY5OgqEHUp9TU
+        vxy0Julp7FoIY
+X-Received: by 2002:a37:648c:: with SMTP id y134mr22704399qkb.175.1579101659116;
+        Wed, 15 Jan 2020 07:20:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxVTvtcNezjslT/T83pZqi27Oyc9HRfMsEwQ65HHw1XAmlwoI0NsNMWacRwNdOlm4NiqGw4Vw==
+X-Received: by 2002:a37:648c:: with SMTP id y134mr22704364qkb.175.1579101658828;
+        Wed, 15 Jan 2020 07:20:58 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id u52sm9782422qta.23.2020.01.15.07.20.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2020 07:20:58 -0800 (PST)
+Date:   Wed, 15 Jan 2020 10:20:55 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Lei Cao <lei.cao@stratus.com>,
+        Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v3 12/21] KVM: X86: Implement ring-based dirty memory
+ tracking
+Message-ID: <20200115152055.GF233443@xz-x1>
+References: <20200109145729.32898-1-peterx@redhat.com>
+ <20200109145729.32898-13-peterx@redhat.com>
+ <20200109110110-mutt-send-email-mst@kernel.org>
+ <20200109191514.GD36997@xz-x1>
+ <20200109141634-mutt-send-email-mst@kernel.org>
+ <20200114200134.GA233443@xz-x1>
+ <20200115014735-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200115014735-mutt-send-email-mst@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 15 Jan 2020 12:03:00 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Wed, Jan 15, 2020 at 01:50:08AM -0500, Michael S. Tsirkin wrote:
+> On Tue, Jan 14, 2020 at 03:01:34PM -0500, Peter Xu wrote:
+> > On Thu, Jan 09, 2020 at 02:35:46PM -0500, Michael S. Tsirkin wrote:
+> > >   ``void flush_dcache_page(struct page *page)``
+> > > 
+> > >         Any time the kernel writes to a page cache page, _OR_
+> > >         the kernel is about to read from a page cache page and
+> > >         user space shared/writable mappings of this page potentially
+> > >         exist, this routine is called.
 
-> On Tue,  7 Jan 2020 20:01:42 +0800
-> Liu Yi L <yi.l.liu@intel.com> wrote:
-> 
-> > This patch has no code change, just a file copy. In following patches,
-> > vfio_pci_common.c will be modified to only include the common functions
-> > and related static functions in original vfio_pci.c. Meanwhile, vfio_pci.c
-> > will be modified to only include vfio-pci module specific codes.
+[1]
+
+> > > 
+> > > 
+> > > > Also, I believe this is the similar question that Jason has asked in
+> > > > V2.  Sorry I should mention this earlier, but I didn't address that in
+> > > > this series because if we need to do so we probably need to do it
+> > > > kvm-wise, rather than only in this series.
+> > > 
+> > > You need to document these things.
+> > > 
+> > > >  I feel like it's missing
+> > > > probably only because all existing KVM supported archs do not have
+> > > > virtual-tagged caches as you mentioned.
+> > > 
+> > > But is that a fact? ARM has such a variety of CPUs,
+> > > I can't really tell. Did you research this to make sure?
+> > > 
+> > > > If so, I would prefer if you
+> > > > can allow me to ignore that issue until KVM starts to support such an
+> > > > arch.
+> > > 
+> > > Document limitations pls.  Don't ignore them.
 > > 
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_common.c | 1708 ++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 1708 insertions(+)
-> >  create mode 100644 drivers/vfio/pci/vfio_pci_common.c  
+> > Hi, Michael,
+> > 
+> > I failed to find a good place to document about flush_dcache_page()
+> > for KVM.  Could you give me a suggestion?
 > 
-> This whole procedure of "let's copy the file and rip out unneeded stuff
-> later" looks very ugly to me, especially if I'd come across it in the
-> future, e.g. during a bisect. This patch only adds a file that is not
-> compiled, and later changes will be "rip out unwanted stuff from
-> vfio_pci_common.c" instead of the more positive "move common stuff to
-> vfio_pci_common.c". I think refactoring/moving interfaces/code that it
-> makes sense to share makes this more reviewable, both now and in the
-> future.
+> Maybe where the field is introduced. I posted the suggestions to the
+> relevant patch.
 
-I think this comes largely at my request from previous reviews.  It's
-very easy to apply this patch and diff the files to see that nothing
-has changed, then review the subsequent patch to see that code is only
-added or removed to check that there are no actual code changes.  If we
-just selectively move code then I think it's left to our inspection to
-verify nothing has changed.  Maybe this is a dummy step in a bisect,
-but I don't see that you lose any granularity.  Thanks,
+(will reply there)
 
-Alex
+> 
+> > And I don't know about whether there's any ARM hosts that requires
+> > flush_dcache_page().  I think not, because again I didn't see any
+> > caller of flush_dcache_page() in KVM code yet.  Otherwise I think we
+> > should at least call it before the kernel reading kvm_run or after
+> > publishing data to kvm_run.
+> 
+> But is kvm run ever accessed while VCPU is running on another CPU?
+> I always assumed no but maybe I'm missing something?
+
+IMHO we need to call it even if it's running on the same CPU - please
+refer to [1] above, there's no restriction on which CPU the code is
+running on.  I think it makes sense, especially the systems for
+virtually-tagged caches because even if the memory accesses happened
+on the same CPU, the virtual addresses to access the same page could
+still be different when accessed from kernel/userspace.
+
+Thanks,
+
+-- 
+Peter Xu
 
