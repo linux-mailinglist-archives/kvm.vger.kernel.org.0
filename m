@@ -2,87 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DA9613C7BC
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 16:30:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73CD913CA45
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 18:05:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728961AbgAOPam (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 10:30:42 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:50916 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726132AbgAOPal (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 10:30:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=hlxbWHBq8lfTBkbbWblALE5WfMIrcmCMtir+afT5h7g=; b=KTafuKCnLEQxrDndx0KF1DZxC
-        rnKdoLI6sypMh61W+oBSzZckG9nErVqXpqRux90/jnJHBoNxCmDRhLN16rsx5kcLMMQTzpNlRHW3V
-        Kn+EfBOj9xXDn+MMy1P1Ce1dDs4zbgiDeuR8jQgZiUt61hA4+gx5SghScUnsRQG1ziTZYHV9R9Zgf
-        pJxhgaR5AeWS3+N32IQliDA3Jqotb5XQKegSIoZaLpNN+GhynXNs1L5cGpIhmQbJynCGULBXCRnjC
-        vAgzg7hshbf2g9UxNsiPKchC1nKbZKVYFzdAbYAS/fNwV5Y2i+QhIqJe1mPDizEBhtnZaTAQECgQV
-        KQqONFysg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1irkce-0002dy-Qu; Wed, 15 Jan 2020 15:30:20 +0000
-Date:   Wed, 15 Jan 2020 07:30:20 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Mike Rapoport <rppt@linux.ibm.com>
-Subject: Re: [PATCH v12 11/22] mm/gup: introduce pin_user_pages*() and
- FOLL_PIN
-Message-ID: <20200115153020.GF19546@infradead.org>
-References: <20200107224558.2362728-1-jhubbard@nvidia.com>
- <20200107224558.2362728-12-jhubbard@nvidia.com>
+        id S1728921AbgAORFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 12:05:08 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21421 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726574AbgAORFH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jan 2020 12:05:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579107907;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oVilqwU94UuE7g+i9EgveRsLq3IMTvQzQsS+OP2ANdY=;
+        b=Ak+Z+ZvFYVy3Nz4GRupVqsu1pJ+mPmN0rACBeL34B2ge53zZSVDjY1PH0aZJz07QMBGwFq
+        Ma261nmf8OFnRUeSGQYqNwoZGCsB/CfQ23RAD7I7eyxY7cUNS/4+vg2RR89zTt//YlB50k
+        uI1/2jK4N1QdtUzPrQbapFvSw79bkRg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-87-GVl0oqNXOSOSMMHofD_XLw-1; Wed, 15 Jan 2020 12:05:03 -0500
+X-MC-Unique: GVl0oqNXOSOSMMHofD_XLw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D22C5477;
+        Wed, 15 Jan 2020 17:05:01 +0000 (UTC)
+Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B50C75D9C9;
+        Wed, 15 Jan 2020 17:04:58 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 14/16] arm/run: Allow Migration tests
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+        peter.maydell@linaro.org, yuzenghui@huawei.com,
+        alexandru.elisei@arm.com, thuth@redhat.com
+References: <20200110145412.14937-1-eric.auger@redhat.com>
+ <20200110145412.14937-15-eric.auger@redhat.com>
+ <20200113184055.tu3qqpsc72xqfw6t@kamzik.brq.redhat.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <58be5530-e8a1-633d-0d69-dd7e9e420138@redhat.com>
+Date:   Wed, 15 Jan 2020 18:04:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200107224558.2362728-12-jhubbard@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200113184055.tu3qqpsc72xqfw6t@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 07, 2020 at 02:45:47PM -0800, John Hubbard wrote:
-> Introduce pin_user_pages*() variations of get_user_pages*() calls,
-> and also pin_longterm_pages*() variations.
+Hi Drew,
+On 1/13/20 7:40 PM, Andrew Jones wrote:
+> On Fri, Jan 10, 2020 at 03:54:10PM +0100, Eric Auger wrote:
+>> Let's link getchar.o to use puts and getchar from the
+>> tests.
+>>
+>> Then allow tests belonging to the migration group to
+>> trigger the migration from the test code by putting
+>> "migrate" into the uart. Then the code can wait for the
+>> migration completion by using getchar().
+>>
+>> The __getchar implement is minimalist as it just reads the
+>> data register. It is just meant to read the single character
+>> emitted at the end of the migration by the runner script.
+>>
+>> It is not meant to read more data (FIFOs are not enabled).
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  arm/Makefile.common |  2 +-
+>>  arm/run             |  2 +-
+>>  lib/arm/io.c        | 13 +++++++++++++
+>>  3 files changed, 15 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arm/Makefile.common b/arm/Makefile.common
+>> index 7cc0f04..327f112 100644
+>> --- a/arm/Makefile.common
+>> +++ b/arm/Makefile.common
+>> @@ -32,7 +32,7 @@ CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
+>>  asm-offsets = lib/$(ARCH)/asm-offsets.h
+>>  include $(SRCDIR)/scripts/asm-offsets.mak
+>>  
+>> -cflatobjs += lib/util.o
+>> +cflatobjs += lib/util.o lib/getchar.o
+>>  cflatobjs += lib/alloc_phys.o
+>>  cflatobjs += lib/alloc_page.o
+>>  cflatobjs += lib/vmalloc.o
+>> diff --git a/arm/run b/arm/run
+>> index 277db9b..a390ca5 100755
+>> --- a/arm/run
+>> +++ b/arm/run
+>> @@ -61,6 +61,6 @@ fi
+>>  M+=",accel=$ACCEL"
+>>  command="$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testdev"
+>>  command+=" -display none -serial stdio -kernel"
+>> -command="$(timeout_cmd) $command"
+>> +command="$(migration_cmd) $(timeout_cmd) $command"
+>>  
+>>  run_qemu $command "$@"
+>> diff --git a/lib/arm/io.c b/lib/arm/io.c
+>> index 99fd315..ed89e19 100644
+>> --- a/lib/arm/io.c
+>> +++ b/lib/arm/io.c
+>> @@ -87,6 +87,19 @@ void puts(const char *s)
+>>  	spin_unlock(&uart_lock);
+>>  }
+>>  
+>> +/*
+>> + * Minimalist implementation for migration completion detection.
+>> + * Needs to be improved for more advanced Rx cases
 > 
-> For now, these are placeholder calls, until the various call sites
-> are converted to use the correct get_user_pages*() or
-> pin_user_pages*() API.
+> Please add that QEMU supports reading a maximum of 16 characters in
+> this minimal mode. We could even add a counter and then assert if
+> we try to read 16 or more.
+> 
+>> + */
+>> +int __getchar(void)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = readb(uart0_base);
+>> +	if (!ret)
+>> +		return -1;
+>> +	return ret;
+>> +}
+> 
+> What about taking the lock?
+> 
+>>  
+>>  /*
+>>   * Defining halt to take 'code' as an argument guarantees that it will
+>> -- 
+>> 2.20.1
+>>
+> 
+> What do you think of the __getchar below?
+> 
+> Thanks,
+> drew
+> 
+> 
+> diff --git a/lib/arm/io.c b/lib/arm/io.c
+> index 99fd31560084..77beb331d6b2 100644
+> --- a/lib/arm/io.c
+> +++ b/lib/arm/io.c
+> @@ -79,6 +79,31 @@ void io_init(void)
+>  	chr_testdev_init();
+>  }
+>  
+> +static int ____getchar(void)
+> +{
+> +	int c;
+> +
+> +	spin_lock(&uart_lock);
+> +	c = readb(uart0_base);
+> +	spin_unlock(&uart_lock);
+> +
+> +	return c ?: -1;
+> +}
+> +
+> +int __getchar(void)
+> +{
+> +	static int count;
+> +	int c;
+> +
+> +	if ((c = ____getchar()) != -1)
+> +		++count;
+> +
+> +	/* Without special UART initialization we can only read 16 characters. */
+> +	assert(count < 16);
+> +
+> +	return c;
+> +}
+> +
+>  void puts(const char *s)
+>  {
+>  	spin_lock(&uart_lock);
+> 
+Yep, I will take your improved version.
 
-What do the pure placeholders buy us?  The API itself looks ok,
-but until it actually is properly implemented it doesn't help at
-all, and we've had all kinds of bad experiences with these sorts
-of stub APIs.
+Thanks
+
+Eric
+
