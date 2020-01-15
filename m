@@ -2,77 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 548BF13CBEC
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 19:17:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F407D13CBEF
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 19:18:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729045AbgAOSRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 13:17:33 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44347 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728921AbgAOSRd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jan 2020 13:17:33 -0500
+        id S1728993AbgAOSSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 13:18:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53601 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728904AbgAOSSP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 13:18:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579112252;
+        s=mimecast20190719; t=1579112294;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MTOIMdw+nQ/QCfAVH0L+SryIoSP15eSfsBn1/tpu/8g=;
-        b=b2aJ78p/NxBfAHL2PMA33kWQGhYelx90fWos+qtXVBqKlEO7MIuMqki2GuE4KTf87uwHVd
-        XhtyB+Y0qQcbHDZ8rZclirgWlqFdlRe/7wB+XLRuuZBEodHlzLkY6kUcdjqsU3Km4eFv+q
-        ZGr4F8+GX0nXzUG4Ku62XN/L4quwb7Y=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-BhzG-HTrPaixDdZSBgepwQ-1; Wed, 15 Jan 2020 13:17:31 -0500
-X-MC-Unique: BhzG-HTrPaixDdZSBgepwQ-1
-Received: by mail-wr1-f70.google.com with SMTP id o6so8258920wrp.8
-        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 10:17:30 -0800 (PST)
+        bh=T1l2IaCJc8x3A4Xb+p+1AqY/vTkonHYiWw1rDR8HsKQ=;
+        b=aXVDfahALIKmV8NFOkJQdAoNjfk1m8DykAyn/BCujmUFbVKrFpcdHs5TUSyLYuKd1d9g4O
+        0rRmkvbHdegVTzUw0o+Qs/wfhPYHuVAqQFEoxwUREaInD928pyKSIqwD9HmXlUNQDpPcrj
+        XnjSYF6yDS6ffb2Hff31laVCk78o65E=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-Pn2gloq5NZy7hkVWOaVcPg-1; Wed, 15 Jan 2020 13:18:13 -0500
+X-MC-Unique: Pn2gloq5NZy7hkVWOaVcPg-1
+Received: by mail-wm1-f69.google.com with SMTP id g26so123060wmk.6
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 10:18:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=MTOIMdw+nQ/QCfAVH0L+SryIoSP15eSfsBn1/tpu/8g=;
-        b=lnsGQJbOCDufgXWzaz6coKNCmYKSTHR8EtlOrm0kUJKYj5WtEdqcpsUd63MrUVkduV
-         d6aBaxHWv+Z+U4FQRIinv5r6VaaalSiObVs1N7tmHBgGbIwbQ3ZOCVPUlvU4ra7N/+qx
-         vklbunyxGs+RMBMzf8sIkdK6EOX5ezwOhHQyjp1EItvh1XK5I2sgpQlpe4dzDzOnKxgV
-         a6Ba39qHzDh4ymfAjYf5SFPjnmHUsWo/fuhuODKwMOmNkG+5LGHdJ0sX5FFxXLRZ8agh
-         nz6k4MUnRX2sJH4d9d+3QScrSEW1nzWFGaTEVyE+ncov3d/gJnU4hWbFdq/EMX7MlLKg
-         YxSA==
-X-Gm-Message-State: APjAAAURQiw/Xb2v7vjKNl2xjVNSLSFVpqA9MuIVdgdADrouU/+u0fJO
-        yFiI/c8Pl2koxNkTBFY0+DDfsOrKtjwSdlIKBE8WX0iTx3tIiMyQmC5tJG+GLYBkrGPy9JkSlLh
-        64pu3UiFaUaLf
-X-Received: by 2002:a05:600c:2c08:: with SMTP id q8mr1231100wmg.45.1579112249940;
-        Wed, 15 Jan 2020 10:17:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzztdIBb2gpjavGfEL7Yhh3wdfSdVaRcFOFyEfxNfeJzsz4JhL1QN6fYW1ZxvEuy8od6HLJqA==
-X-Received: by 2002:a05:600c:2c08:: with SMTP id q8mr1231084wmg.45.1579112249757;
-        Wed, 15 Jan 2020 10:17:29 -0800 (PST)
+        bh=T1l2IaCJc8x3A4Xb+p+1AqY/vTkonHYiWw1rDR8HsKQ=;
+        b=PALk9XDQUezs4cCfAhXcCPRgiXPu/JKsblOp7H+5xT624MyauM4mB3fgAnnEILzsQz
+         0ZMOGXJtOMm9TZBPrUUyCUik7utk1FnVEXThU98dz+626PqOJhm6MR5pzQBVZoKrKZq4
+         UGvlxRdqdxYboF8NhbVpv6nTfpDcjZKH82cTLDnRzCBT4xMYIXlCU3ZtsRof77J3H8Ho
+         dqj9yeBKuJ+kTF3Ai17UjYN6EjHZ8tkziwp6/gTON40O56GJNSdvipZc1rhuwbXpOB5k
+         TVhqsotmxM/rjnwSsSr8Q20b92g39E23SvEW5NTs1BSs/Xayicj6DWkehW9ZgFZ1xNJv
+         6tTA==
+X-Gm-Message-State: APjAAAXF8HnyWs0rmB2dWBzpbHqO+7Ol6Pwcpn1HmxCzc0Sd6d2ch9H+
+        DpFYxv/QG9mSwGqnexa/8I1httlo5HisDzmrSkBqgBzyN084xVV2ldJtYFlWt1j7cL/FAi8liHR
+        Dq9m3s9GnOsrn
+X-Received: by 2002:a1c:a382:: with SMTP id m124mr1300990wme.90.1579112291792;
+        Wed, 15 Jan 2020 10:18:11 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxBVFhQpDtas7p6reCH+kqo20jIbm0fibecd2WNuUARhRD91nkW5xhG2OY4Crq9r+f3v1Rb3g==
+X-Received: by 2002:a1c:a382:: with SMTP id m124mr1300961wme.90.1579112291587;
+        Wed, 15 Jan 2020 10:18:11 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:436:e17d:1fd9:d92a? ([2001:b07:6468:f312:436:e17d:1fd9:d92a])
-        by smtp.gmail.com with ESMTPSA id j12sm25880146wrt.55.2020.01.15.10.17.28
+        by smtp.gmail.com with ESMTPSA id u18sm25235793wrt.26.2020.01.15.10.18.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jan 2020 10:17:29 -0800 (PST)
-Subject: Re: [PATCH v2 2/2] KVM: x86/mmu: Micro-optimize nEPT's bad
- memptype/XWR checks
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        David Laight <David.Laight@ACULAB.COM>,
-        Arvind Sankar <nivedita@alum.mit.edu>
-References: <20200109230640.29927-1-sean.j.christopherson@intel.com>
- <20200109230640.29927-3-sean.j.christopherson@intel.com>
- <878smfr18i.fsf@vitty.brq.redhat.com>
- <20200110160453.GA21485@linux.intel.com>
+        Wed, 15 Jan 2020 10:18:10 -0800 (PST)
+Subject: Re: [PATCH v2] KVM: nVMX: vmread should not set rflags to specify
+ success in case of #PF
+To:     linmiaohe <linmiaohe@huawei.com>, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Cc:     liran.alon@oracle.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+References: <1577514324-18362-1-git-send-email-linmiaohe@huawei.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f23a2801-d33d-4c2d-290e-60b0fa142cb5@redhat.com>
-Date:   Wed, 15 Jan 2020 19:17:27 +0100
+Message-ID: <10e98b1b-773f-5b8b-6e30-84b167944d12@redhat.com>
+Date:   Wed, 15 Jan 2020 19:18:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200110160453.GA21485@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1577514324-18362-1-git-send-email-linmiaohe@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -80,27 +75,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/01/20 17:04, Sean Christopherson wrote:
-> Ya, I don't love the code, but it was the least awful of the options I
-> tried, in that it's the most readable without being too obnoxious.
+On 28/12/19 07:25, linmiaohe wrote:
+> From: Miaohe Lin <linmiaohe@huawei.com>
 > 
+> In case writing to vmread destination operand result in a #PF, vmread
+> should not call nested_vmx_succeed() to set rflags to specify success.
+> Similar to as done in VMPTRST (See handle_vmptrst()).
 > 
-> Similar to your suggestion, but it avoids evaluating __is_bad_mt_xwr() if
-> reserved bits are set, which is admittedly rare.
+> Reviewed-by: Liran Alon <liran.alon@oracle.com>
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+> v2:
+> 	rephrase commit title & message
+> ---
+>  arch/x86/kvm/vmx/nested.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> 	return __is_rsvd_bits_set(&mmu->guest_rsvd_check, gpte, level)
-> #if PTTYPE == PTTYPE_EPT
-> 	       || __is_bad_mt_xwr(&mmu->guest_rsvd_check, gpte)
-> #endif
-> 	       ;
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 8edefdc9c0cb..c1ec9f25a417 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -4799,8 +4799,10 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+>  					instr_info, true, len, &gva))
+>  			return 1;
+>  		/* _system ok, nested_vmx_check_permission has verified cpl=0 */
+> -		if (kvm_write_guest_virt_system(vcpu, gva, &value, len, &e))
+> +		if (kvm_write_guest_virt_system(vcpu, gva, &value, len, &e)) {
+>  			kvm_inject_page_fault(vcpu, &e);
+> +			return 1;
+> +		}
+>  	}
+>  
+>  	return nested_vmx_succeed(vcpu);
 > 
-> Or macrofying the call to keep the call site clean, but IMO this obfuscates
-> things too much.
-> 
-> 	return __is_rsvd_bits_set(&mmu->guest_rsvd_check, gpte, level) ||
-> 	       IS_BAD_MT_XWR(&mmu->guest_rsvd_check, gpte);
-
-I think what you posted is the best (David's comes second).
 
 Queued, thanks.
 
