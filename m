@@ -2,48 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E914813BA7C
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 08:50:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B07A13BA8C
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 08:57:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729143AbgAOHu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 02:50:28 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50324 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726018AbgAOHu2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jan 2020 02:50:28 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00F7gTTv020176
-        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 02:50:27 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xhbprvpn7-1
+        id S1728931AbgAOH5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 02:57:37 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40998 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726088AbgAOH5h (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jan 2020 02:57:37 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00F7vKad115771
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 02:57:36 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xfvq7d2em-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 02:50:26 -0500
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 02:57:35 -0500
 Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 15 Jan 2020 07:50:25 -0000
+        Wed, 15 Jan 2020 07:57:33 -0000
 Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 15 Jan 2020 07:50:23 -0000
+        Wed, 15 Jan 2020 07:57:30 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00F7oME150790576
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00F7vT9m63176814
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Jan 2020 07:50:22 GMT
+        Wed, 15 Jan 2020 07:57:29 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2DC435204E;
-        Wed, 15 Jan 2020 07:50:22 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 46A6252059;
+        Wed, 15 Jan 2020 07:57:29 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.31.155])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id BEE4952051;
-        Wed, 15 Jan 2020 07:50:21 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 2/4] s390x: smp: Only use smp_cpu_setup
- once
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, linux-s390@vger.kernel.org,
-        david@redhat.com, cohuck@redhat.com
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id ECE8A52050;
+        Wed, 15 Jan 2020 07:57:28 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH 3/4] s390x: smp: Test all CRs on initial
+ reset
+To:     Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, cohuck@redhat.com
 References: <20200114153054.77082-1-frankja@linux.ibm.com>
- <20200114153054.77082-3-frankja@linux.ibm.com>
- <9db91398-0371-cd4a-9758-a185b74467a0@redhat.com>
+ <20200114153054.77082-4-frankja@linux.ibm.com>
+ <2f190b0a-e403-51e6-27da-7f8f1f6289ac@de.ibm.com>
+ <f120ad03-aab1-a863-636b-b11898d634f5@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -87,139 +89,98 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Wed, 15 Jan 2020 08:50:21 +0100
+Date:   Wed, 15 Jan 2020 08:57:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <9db91398-0371-cd4a-9758-a185b74467a0@redhat.com>
+In-Reply-To: <f120ad03-aab1-a863-636b-b11898d634f5@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="97w2nfovMSVWyv80OK2EJ22C0b2QWNq3E"
+ boundary="vBBbXmGcok3QF50FuB84aEgrJ7w3XsN9e"
 X-TM-AS-GCONF: 00
-x-cbid: 20011507-0028-0000-0000-000003D130B0
+x-cbid: 20011507-0012-0000-0000-0000037D755F
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011507-0029-0000-0000-0000249554A1
-Message-Id: <5c880248-bd35-a5f8-0526-80defc5864e5@linux.ibm.com>
+x-cbparentid: 20011507-0013-0000-0000-000021B9A504
+Message-Id: <3ee92240-56dc-69af-4fca-a4a2156e7749@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-01-14_06:2020-01-14,2020-01-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- impostorscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
- suspectscore=0 malwarescore=0 priorityscore=1501 adultscore=0 spamscore=0
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001150063
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ clxscore=1015 adultscore=0 priorityscore=1501 impostorscore=0 spamscore=0
+ malwarescore=0 bulkscore=0 suspectscore=0 mlxlogscore=974
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001150065
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---97w2nfovMSVWyv80OK2EJ22C0b2QWNq3E
-Content-Type: multipart/mixed; boundary="kudNxptmPkuI8tcyCsnTcY4cP4belrBle"
+--vBBbXmGcok3QF50FuB84aEgrJ7w3XsN9e
+Content-Type: multipart/mixed; boundary="AFAUkDHrXccdbAl0TboW8fxUjDYvGY1Q1"
 
---kudNxptmPkuI8tcyCsnTcY4cP4belrBle
+--AFAUkDHrXccdbAl0TboW8fxUjDYvGY1Q1
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 1/14/20 5:45 PM, Thomas Huth wrote:
-> On 14/01/2020 16.30, Janosch Frank wrote:
->> Let's stop and start instead of using setup to run a function on a
->> cpu.
+On 1/15/20 7:17 AM, Thomas Huth wrote:
+> On 14/01/2020 19.42, Christian Borntraeger wrote:
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  s390x/smp.c | 19 ++++++++++++-------
->>  1 file changed, 12 insertions(+), 7 deletions(-)
 >>
->> diff --git a/s390x/smp.c b/s390x/smp.c
->> index 4dee43e..767d167 100644
->> --- a/s390x/smp.c
->> +++ b/s390x/smp.c
->> @@ -47,7 +47,7 @@ static void test_start(void)
->>  	psw.mask =3D extract_psw_mask();
->>  	psw.addr =3D (unsigned long)test_func;
->> =20
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
->>  	wait_for_flag();
->>  	report(1, "start");
->>  }
->> @@ -131,9 +131,8 @@ static void test_ecall(void)
->> =20
->>  	report_prefix_push("ecall");
->>  	testflag =3D 0;
->> -	smp_cpu_destroy(1);
->> =20
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
->>  	wait_for_flag();
->>  	testflag =3D 0;
->>  	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
->> @@ -166,9 +165,8 @@ static void test_emcall(void)
->> =20
->>  	report_prefix_push("emcall");
->>  	testflag =3D 0;
->> -	smp_cpu_destroy(1);
->> =20
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
->>  	wait_for_flag();
->>  	testflag =3D 0;
->>  	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
->> @@ -186,7 +184,7 @@ static void test_reset_initial(void)
->>  	psw.addr =3D (unsigned long)test_func;
->> =20
->>  	report_prefix_push("reset initial");
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
->> =20
->>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
->>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
->> @@ -217,7 +215,7 @@ static void test_reset(void)
->>  	psw.addr =3D (unsigned long)test_func;
->> =20
->>  	report_prefix_push("cpu reset");
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
+>> On 14.01.20 16:30, Janosch Frank wrote:
+>>> All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
+>>> so we also need to test 1-13 and 15 for 0.
+>>>
+>>> And while we're at it, let's also set some values to cr 1, 7 and 13, =
+so
+>>> we can actually be sure that they will be zeroed.
+>>
+>> While it does not hurt to have it here, I think the register check for=
+ the reset
+>> would be better in a kselftest. This allows to check userspace AND gue=
+st at the
+>> same time.
 >=20
-> I think this also fixes a memory leak in case the code did not call
-> smp_cpu_destroy() inbetween (since smp_cpu_setup() allocates new memory=
+> Agreed. Especially it also allows to test the kernel ioctl on its own,
+> without QEMU in between (which might also clear some registers), so for=
 
-> for the low-core). So as far as I can see, this is a good idea:
+> getting the new reset ioctls right, the selftests are certainly the
+> better place.
 
-Well, if the cpu is active, we should just return in the setup function.
-But I have another patch in the queue which cleans up lowcore allocation.=
+Selftests are in development and will be up for discussion this week if
+all goes well...
+
+While the selftest leaves QEMU out of the picture, we're still using
+kernel APIs to fetch and reset data, so actually getting guests'
+register values requires some fiddling in the guest code. So I rather
+have a test that tells me if KVM + QEMU are correct at the beginning of
+testing, since that's what most people are using anyways.
 
 
->=20
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
->=20
 
+--AFAUkDHrXccdbAl0TboW8fxUjDYvGY1Q1--
 
-
---kudNxptmPkuI8tcyCsnTcY4cP4belrBle--
-
---97w2nfovMSVWyv80OK2EJ22C0b2QWNq3E
+--vBBbXmGcok3QF50FuB84aEgrJ7w3XsN9e
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4exD0ACgkQ41TmuOI4
-ufgCOw//eZPLhJYGZ0W9au+moydeJ710NZT8ZL21dhQAeZGDUUBWQzUM3UnupULU
-ycMqgoj2clqm3VKSNsM5EkwVaBicmCq4OUD/phCp4hY7G657fgLhUvkWyH1EeVUH
-cDovPHFvc9zSqfLaskT01E+59mNmczl99gjrFxBJjYp6aRLHKoC5KGB2ti7eiwya
-oNhaUJk3XKzvgBNRx2IS6OjSV6du1zAMsKKn0ly1Dze+evQoBm4+w6Hwv/pXMTxw
-8MghDk5Op+uvEYuQL3mCERlyXh7IMYT+0JCb0+WHTDYzPTASijTUfg8OrVJHMGR3
-NZj+O0t+CzxsHbgFtrR53IUqrBMeovW6ZYn6l++vKEvFBOQ2/HH7R/Uj/BCR+XTY
-jXK9pvESisLNr6u6Yzt9Xuf86eeW5TzcWlXpkM0AjRa8Ee1Pj1YSDNPQT0kQad1R
-edfdoPLjEa97YF6IYrLfOmQ9S89j9ZenWmH/fTXuazX67wNz1fJ+YePUcOhWBPeV
-ohErsl3ALrzp2lHT6ZkEov9GLhGilwFLyrNs5weXztI2hoopib7BYoD5yDwYl6yH
-MaPP8piOTAg7yeEnAz4Ys2yY4ml52jJljwzi9dvYbjr2h/C3Got55OQYSZbg/44h
-9xMJSosXp9ZTwbrBmJl2miwpJInUtYFEP3YG7FvNOXLaPRUGSLk=
-=n5ay
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4exegACgkQ41TmuOI4
+ufjYLA/+NNuT0cVRCYpHl1I5cZ9RScsSBF7Nwg5DlhFADBp2wmnAiJ3cBWuKxPA7
+J1vb1HVI2KGjAw7xbLMbxh0cZRkogM/6oJG7wfnBPwYxCHD/K4uYiuaEdAQ/9C7a
+Y+0TUVJM0fpvZourC1s7QooQTIsoLXwdexYEhlfVjYRfAJDJ0bCUJvk2R2W7LdeF
+8qBdB0mb8UNqhlKvZw/Ey4hfykOEgAfrNLc/cGmg1UWtpYr8M0p5Z6W7Df96zBVG
+Y3zIiBOX5gFLpdz5LLey0wdWtu5c3mNrAoR+6EN3s+nwmxBm0ueIrxCSKL288vAK
+hNXto970AZgiN4I3yvOzvgvFg6PXK57CPbjO1T+enXpsLouwgNPWz9a1Cz7wKRrv
+JNClvOmJ09Jy4liFC9ZcDP1Fi32+yWGaYzznV52sXDOMHFjouxH3L0V9MO5nHSCL
+5RqbsDGdWam8m4/cZtah3FA6BEgeHBoFg8erCVFHagiyYJGTwujEyp8rGOEyteHD
+VqDRbyp6QHWLmF70gNeXqSpzYxVs6NJ1xpOhBGRXR8Ki8aYPjhQbAR1AfLSSF7PA
+UDD7WAfwks9cjGIYQMuXzwc2E0POk0B8giJCpoP4xOUTpqWgCBDAb1gyAk6/XqjS
+Lwq9XYvkfAH6s0vxSM+x2t9gezIuB0rjJ7F8pCUeHclNdlYo46w=
+=4inW
 -----END PGP SIGNATURE-----
 
---97w2nfovMSVWyv80OK2EJ22C0b2QWNq3E--
+--vBBbXmGcok3QF50FuB84aEgrJ7w3XsN9e--
 
