@@ -2,94 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C43B713CC28
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 19:34:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2CDE13CC2E
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 19:36:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729085AbgAOSdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 13:33:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45647 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729045AbgAOSdy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 13:33:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579113233;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=va5ZZWbJX4SIzlOtIXmCKn6cD0Cw7eHyuV0gMLwZJ6Y=;
-        b=QJ4OWQ2L/O8Y01kVtY7+VUP9UB86TUNlqpX/BgofzPtboIf8UCOYmx9cnqLZgVuukclZkB
-        vHVVSSVYJO16vHFePrIasWcLESuzqXf22NOhFxT7/ugfULiQ2hyUIJ6lIWY896aBHmF7t6
-        zttaP5F8glf8p62DEKwljHOb1gi+VEs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-uXYO3pIvONCbYwABvvUPmg-1; Wed, 15 Jan 2020 13:33:52 -0500
-X-MC-Unique: uXYO3pIvONCbYwABvvUPmg-1
-Received: by mail-wr1-f72.google.com with SMTP id v17so8270328wrm.17
-        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 10:33:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=va5ZZWbJX4SIzlOtIXmCKn6cD0Cw7eHyuV0gMLwZJ6Y=;
-        b=X2/P9sbvGO5krHC1/juR9pIEGxywtRmhgQWACKTI+Znr98i3hnYbsNj9gUTuMhAHGU
-         ZTjrrjjP+Ysg5XARQXWZKjjGA3VI16lvQIQoQzLt8Wr92PVYiHzi28bJ9rM0V8YmxKUm
-         ODCBwtGr8Moneh0+EnaACpvPl1Xd3vJ5L/+HQ94FZW4DF+OygCSVgInhW4q17V2kAsHq
-         61LZlw6cE+odGyeZSOOM0k/mK6PsgCPcxHENUn3s7ZS//skqXU8xcoUhP0T+dCr4/Pt+
-         Q50Hb85gANga8rEonBYhBsdUPnIHMCf1T2ktUPP0b/UM9lCARDrYXKHoc6jifYsBKEL9
-         EW8w==
-X-Gm-Message-State: APjAAAURDqqHIeqiECyyeueuSKUOHuVkweorBUClVo3TT5zpSqxOxIKw
-        7CFazPQsSV3GQkXBMk/8J5kn5o6H95RrgjJDNU2etadunDVgUizwvjj1mqPKbrv9CFw+6pYdEIO
-        Na6a/VQUTkThO
-X-Received: by 2002:a05:600c:2503:: with SMTP id d3mr1330107wma.84.1579113231226;
-        Wed, 15 Jan 2020 10:33:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqztcB/kOoiO34HAkrYeLeRQT3xoOdqzZnz5pLsFhD3p5EtSAPbc8H6Dz1r3rQxrhzuHO0RdNQ==
-X-Received: by 2002:a05:600c:2503:: with SMTP id d3mr1330076wma.84.1579113231023;
-        Wed, 15 Jan 2020 10:33:51 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:436:e17d:1fd9:d92a? ([2001:b07:6468:f312:436:e17d:1fd9:d92a])
-        by smtp.gmail.com with ESMTPSA id c17sm25545608wrr.87.2020.01.15.10.33.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jan 2020 10:33:50 -0800 (PST)
-Subject: Re: [PATCH v5 1/2] mm: make dev_pagemap_mapping_shift() externally
- visible
-To:     Barret Rhoden <brho@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jason.zeng@intel.com
-References: <20191212182238.46535-1-brho@google.com>
- <20191212182238.46535-2-brho@google.com>
- <20191213174702.GB31552@linux.intel.com>
- <e004e742-f755-c22c-57bb-acfe30971c7d@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <207bd03c-df82-f27b-bdb8-1aef33429dd7@redhat.com>
-Date:   Wed, 15 Jan 2020 19:33:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1729240AbgAOSgI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 13:36:08 -0500
+Received: from mga02.intel.com ([134.134.136.20]:49268 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729157AbgAOSgI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 13:36:08 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jan 2020 10:36:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,323,1574150400"; 
+   d="scan'208";a="220100394"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by fmsmga008.fm.intel.com with ESMTP; 15 Jan 2020 10:36:07 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: Perform non-canonical checks in 32-bit KVM
+Date:   Wed, 15 Jan 2020 10:36:05 -0800
+Message-Id: <20200115183605.15413-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <e004e742-f755-c22c-57bb-acfe30971c7d@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/12/19 18:59, Barret Rhoden wrote:
-> Does KVM-x86 need its own names for the levels?  If not, I could convert
-> the PT_PAGE_TABLE_* stuff to PG_LEVEL_* stuff.
+Remove the CONFIG_X86_64 condition from the low level non-canonical
+helpers to effectively enable non-canonical checks on 32-bit KVM.
+Non-canonical checks are performed by hardware if the CPU *supports*
+64-bit mode, whether or not the CPU is actually in 64-bit mode is
+irrelevant.
 
-Yes, please do.  For the 2M/4M case, it's only incorrect to use 2M here:
+For the most part, skipping non-canonical checks on 32-bit KVM is ok-ish
+because 32-bit KVM always (hopefully) drops bits 63:32 of whatever value
+it's checking before propagating it to hardware, and architecturally,
+the expected behavior for the guest is a bit of a grey area since the
+vCPU itself doesn't support 64-bit mode.  I.e. a 32-bit KVM guest can
+observe the missed checks in several paths, e.g. INVVPID and VM-Enter,
+but it's debatable whether or not the missed checks constitute a bug
+because technically the vCPU doesn't support 64-bit mode.
 
-        if (PTTYPE == 32 && walker->level == PT_DIRECTORY_LEVEL && is_cpuid_PSE36())
-                gfn += pse36_gfn_delta(pte);
+The primary motivation for enabling the non-canonical checks is defense
+in depth.  As mentioned above, a guest can trigger a missed check via
+INVVPID or VM-Enter.  INVVPID is straightforward as it takes a 64-bit
+virtual address as part of its 128-bit INVVPID descriptor and fails if
+the address is non-canonical, even if INVVPID is executed in 32-bit PM.
+Nested VM-Enter is a bit more convoluted as it requires the guest to
+write natural width VMCS fields via memory accesses and then VMPTRLD the
+VMCS, but it's still possible.  In both cases, KVM is saved from a true
+bug only because its flows that propagate values to hardware (correctly)
+take "unsigned long" parameters and so drop bits 63:32 of the bad value.
 
-And for that you can even use "> PG_LEVEL_4K" if you think it's nicer.
+Explicitly performing the non-canonical checks makes it less likely that
+a bad value will be propagated to hardware, e.g. in the INVVPID case,
+if __invvpid() didn't implicitly drop bits 63:32 then KVM would BUG() on
+the resulting unexpected INVVPID failure due to hardware rejecting the
+non-canonical address.
 
-Paolo
+The only downside to enabling the non-canonical checks is that it adds a
+relatively small amount of overhead, but the affected flows are not hot
+paths, i.e. the overhead is negligible.
+
+Note, KVM technically could gate the non-canonical checks on 32-bit KVM
+with static_cpu_has(X86_FEATURE_LM), but on bare metal that's an even
+bigger waste of code for everyone except the 0.00000000000001% of the
+population running on Yonah, and nested 32-bit on 64-bit already fudges
+things with respect to 64-bit CPU behavior.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/x86.h | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index cab5e71f0f0f..3ff590ec0238 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -166,21 +166,13 @@ static inline u64 get_canonical(u64 la, u8 vaddr_bits)
+ 
+ static inline bool is_noncanonical_address(u64 la, struct kvm_vcpu *vcpu)
+ {
+-#ifdef CONFIG_X86_64
+ 	return get_canonical(la, vcpu_virt_addr_bits(vcpu)) != la;
+-#else
+-	return false;
+-#endif
+ }
+ 
+ static inline bool emul_is_noncanonical_address(u64 la,
+ 						struct x86_emulate_ctxt *ctxt)
+ {
+-#ifdef CONFIG_X86_64
+ 	return get_canonical(la, ctxt_virt_addr_bits(ctxt)) != la;
+-#else
+-	return false;
+-#endif
+ }
+ 
+ static inline void vcpu_cache_mmio_info(struct kvm_vcpu *vcpu,
+-- 
+2.24.1
 
