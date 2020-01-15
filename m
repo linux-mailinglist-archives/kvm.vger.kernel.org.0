@@ -2,39 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C1A213C6D3
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 16:01:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9354313C6FA
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 16:08:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728901AbgAOPBB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 10:01:01 -0500
-Received: from foss.arm.com ([217.140.110.172]:38654 "EHLO foss.arm.com"
+        id S1729026AbgAOPIn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 10:08:43 -0500
+Received: from foss.arm.com ([217.140.110.172]:38726 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726248AbgAOPBB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 10:01:01 -0500
+        id S1729015AbgAOPIm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 10:08:42 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C86A31B;
-        Wed, 15 Jan 2020 07:01:00 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 716B031B;
+        Wed, 15 Jan 2020 07:08:42 -0800 (PST)
 Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8C953F718;
-        Wed, 15 Jan 2020 07:00:59 -0800 (PST)
-Subject: Re: [PATCH kvmtool 04/16] Check that a PCI device's memory size is
- power of two
-To:     Andre Przywara <andre.przywara@arm.com>
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 717783F718;
+        Wed, 15 Jan 2020 07:08:41 -0800 (PST)
+Subject: Re: [PATCH kvmtool 09/16] arm/pci: Do not use first PCI IO space
+ bytes for devices
+To:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
 Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com
+        julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
+        sami.mujawar@arm.com
 References: <20191125103033.22694-1-alexandru.elisei@arm.com>
- <20191125103033.22694-5-alexandru.elisei@arm.com>
- <20191127182514.23d719ff@donnerap.cambridge.arm.com>
- <8800ef85-045e-f83d-6a43-d62f5cc8d8dd@arm.com>
- <20200115140740.40881507@donnerap.cambridge.arm.com>
+ <20191125103033.22694-10-alexandru.elisei@arm.com>
+ <20191202121500.GA4770@e121166-lin.cambridge.arm.com>
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <ed7b9194-0ff3-cfc5-2e28-6770425a97ea@arm.com>
-Date:   Wed, 15 Jan 2020 15:00:58 +0000
+Message-ID: <5986fb48-5df3-c106-4f25-68bb8039f695@arm.com>
+Date:   Wed, 15 Jan 2020 15:08:40 +0000
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200115140740.40881507@donnerap.cambridge.arm.com>
+In-Reply-To: <20191202121500.GA4770@e121166-lin.cambridge.arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -45,132 +43,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi,
 
-On 1/15/20 2:07 PM, Andre Przywara wrote:
-> On Wed, 15 Jan 2020 12:43:20 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On 12/2/19 12:15 PM, Lorenzo Pieralisi wrote:
+>> Just allocate those bytes to prevent future allocation assigning it to
+>> devices.
+> I do not understand what this means; if the kernel reassigns IO BARs
+> within the IO window kvmtool provides (through DT host controller
+> bindings - ranges property) this patch should not be needed.
 >
->> Hi,
->>
->> On 11/27/19 6:25 PM, Andre Przywara wrote:
->>> On Mon, 25 Nov 2019 10:30:21 +0000
->>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->>>
->>> Hi,
->>>  
->>>> According to the PCI local bus specification [1], a device's memory size
->>>> must be a power of two. This is also implicit in the mechanism that a CPU
->>>> uses to get the memory size requirement for a PCI device.
->>>>
->>>> The vesa device requests a memory size that isn't a power of two.
->>>> According to the same spec [1], a device is allowed to consume more memory
->>>> than it actually requires. As a result, the amount of memory that the vesa
->>>> device now reserves has been increased.
->>>>
->>>> To prevent slip-ups in the future, a few BUILD_BUG_ON statements were added
->>>> in places where the memory size is known at compile time.
->>>>
->>>> [1] PCI Local Bus Specification Revision 3.0, section 6.2.5.1
->>>>
->>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>>> ---
->>>>  hw/vesa.c          | 2 ++
->>>>  include/kvm/util.h | 2 ++
->>>>  include/kvm/vesa.h | 6 +++++-
->>>>  vfio/pci.c         | 5 +++++
->>>>  virtio/pci.c       | 3 +++
->>>>  5 files changed, 17 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/vesa.c b/hw/vesa.c
->>>> index f3c5114cf4fe..75670a51be5f 100644
->>>> --- a/hw/vesa.c
->>>> +++ b/hw/vesa.c
->>>> @@ -58,6 +58,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
->>>>  	char *mem;
->>>>  	int r;
->>>>  
->>>> +	BUILD_BUG_ON(!is_power_of_two(VESA_MEM_SIZE));
->>>> +
->>>>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
->>>>  		return NULL;
->>>>  
->>>> diff --git a/include/kvm/util.h b/include/kvm/util.h
->>>> index 4ca7aa9392b6..e90f1c2db39f 100644
->>>> --- a/include/kvm/util.h
->>>> +++ b/include/kvm/util.h
->>>> @@ -104,6 +104,8 @@ static inline unsigned long roundup_pow_of_two(unsigned long x)
->>>>  	return x ? 1UL << fls_long(x - 1) : 0;
->>>>  }
->>>>  
->>>> +#define is_power_of_two(x)	((x) ? ((x) & ((x) - 1)) == 0 : 0)  
->>> This gives weird results for negative values (which the kernel avoids by having this a static inline and using an unsigned type).
->>> Not sure we care, but maybe (x > 0) ? ... would fix this?  
->> Good point, I will fix it by changing the implicit comparison against 0 at the
->> beginning with (x) > 0.
->>
->>>  
->>>> +
->>>>  struct kvm;
->>>>  void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
->>>>  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
->>>> diff --git a/include/kvm/vesa.h b/include/kvm/vesa.h
->>>> index 0fac11ab5a9f..e7d971343642 100644
->>>> --- a/include/kvm/vesa.h
->>>> +++ b/include/kvm/vesa.h
->>>> @@ -5,8 +5,12 @@
->>>>  #define VESA_HEIGHT	480
->>>>  
->>>>  #define VESA_MEM_ADDR	0xd0000000
->>>> -#define VESA_MEM_SIZE	(4*VESA_WIDTH*VESA_HEIGHT)
->>>>  #define VESA_BPP	32
->>>> +/*
->>>> + * We actually only need VESA_BPP/8*VESA_WIDTH*VESA_HEIGHT bytes. But the memory
->>>> + * size must be a power of 2, so we round up.
->>>> + */
->>>> +#define VESA_MEM_SIZE	(1 << 21)  
->>> I don't think it's worth calculating the value and rounding it up, but can we have a BUILD_BUG checking that VESA_MEM_SIZE is big enough to hold the framebuffer?  
->> I'm not sure what you mean. The current value of VESA_MEM_SIZE is not a power of
->> two, which breaks the spec. That's the reason for changing it. Are you suggesting
->> that we keep VESA_MEM_SIZE = 1 << 21, we remove the power_of_two check and add a
->> BUILD_BUG on VESA_MEM_SIZE < 4 * VESA_WIDTH * VESA_HEIGHT?
-> Only the latter, so keep the power_of_two check, but add the BUILD_BUG with the comparison. So that it breaks if someone increases the width or height.
+> Furthermore I don't think there should be any dependency in kvmtool
+> to the Linux PCIBIOS_MIN_IO offset (which happens to be 0x1000 but
+> kvmtool must not rely on that).
+>
+> To sum it up: kvmtool should assign sensible IO ports default values
+> to BARs (even though that's *not* mandatory) and let the OS reassign
+> values according to the IO port windows provided through DT bindings
+> (ie ranges property).
+>
+> It is likely there is something I am missing in this patch logic,
+> apologies for asking but I don't think this patch should be required.
 
-Makes sense, I'll do that.
+This patch was needed because we advertise the PCI node as 'linux,pci-probe-only'.
+Any ioports below PCIBIOS_MIN_IO that kvmtool allocates are not accessible by a
+Linux guest.
+
+However, once we have support for reassignable BARs, you are indeed correct in
+saying that this patch will no longer be needed. I'll drop it from the series.
 
 Thanks,
 Alex
 >
-> Cheers,
-> Andre.
+> Thanks,
+> Lorenzo
 >
->>>>  struct kvm;
->>>>  struct biosregs;
->>>> diff --git a/vfio/pci.c b/vfio/pci.c
->>>> index 76e24c156906..914732cc6897 100644
->>>> --- a/vfio/pci.c
->>>> +++ b/vfio/pci.c
->>>> @@ -831,6 +831,11 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
->>>>  	/* Ignore invalid or unimplemented regions */
->>>>  	if (!region->info.size)
->>>>  		return 0;
->>>> +	if (!is_power_of_two(region->info.size)) {
->>>> +		vfio_dev_err(vdev, "region is not power of two: 0x%llx",
->>>> +			     region->info.size);
->>>> +		return -EINVAL;
->>>> +	}
->>>>  
->>>>  	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSIX) {
->>>>  		/* Trap and emulate MSI-X table */
->>>> diff --git a/virtio/pci.c b/virtio/pci.c
->>>> index 99653cad2c0f..04e801827df9 100644
->>>> --- a/virtio/pci.c
->>>> +++ b/virtio/pci.c
->>>> @@ -435,6 +435,9 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->>>>  	vpci->kvm = kvm;
->>>>  	vpci->dev = dev;
->>>>  
->>>> +	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
->>>> +	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
->>>> +
->>>>  	r = ioport__register(kvm, IOPORT_EMPTY, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
->>>>  	if (r < 0)
->>>>  		return r;  
