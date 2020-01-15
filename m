@@ -2,50 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A7C813CF71
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 22:52:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F16E013CF72
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 22:53:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730310AbgAOVw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 16:52:58 -0500
-Received: from mga12.intel.com ([192.55.52.136]:42266 "EHLO mga12.intel.com"
+        id S1730320AbgAOVxB convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 15 Jan 2020 16:53:01 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51236 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728925AbgAOVw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 16:52:57 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jan 2020 13:52:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,323,1574150400"; 
-   d="scan'208,223";a="425235727"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga006.fm.intel.com with ESMTP; 15 Jan 2020 13:52:56 -0800
-Date:   Wed, 15 Jan 2020 13:52:56 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     bugzilla-daemon@bugzilla.kernel.org
-Cc:     kvm@vger.kernel.org, Derek Yerger <derek@djy.llc>
-Subject: Re: [Bug 206215] New: QEMU guest crash due to random 'general
- protection fault' since kernel 5.2.5 on i7-3517UE
-Message-ID: <20200115215256.GE30449@linux.intel.com>
-References: <bug-206215-28872@https.bugzilla.kernel.org/>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="CE+1k2dSO48ffgeK"
-Content-Disposition: inline
+        id S1728925AbgAOVxA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 16:53:00 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206215] QEMU guest crash due to random 'general protection
+ fault' since kernel 5.2.5 on i7-3517UE
+Date:   Wed, 15 Jan 2020 21:52:58 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: sean.j.christopherson@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206215-28872-3gxqP1CQJM@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-206215-28872@https.bugzilla.kernel.org/>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <bug-206215-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=206215
 
---CE+1k2dSO48ffgeK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
+--- Comment #1 from Sean Christopherson (sean.j.christopherson@intel.com) ---
 +cc Derek, who is hitting the same thing.
 
-On Wed, Jan 15, 2020 at 09:18:56PM +0000, bugzilla-daemon@bugzilla.kernel.org wrote:
+On Wed, Jan 15, 2020 at 09:18:56PM +0000, bugzilla-daemon@bugzilla.kernel.org
+wrote:
 > https://bugzilla.kernel.org/show_bug.cgi?id=206215
 > 
 >             Bug ID: 206215
@@ -72,7 +78,8 @@ On Wed, Jan 15, 2020 at 09:18:56PM +0000, bugzilla-daemon@bugzilla.kernel.org wr
 > Since kernel 5.2.5 any qemu guest fail to start due to "general protection
 > fault"
 > 
-> [  188.533545] traps: gsd-wacom[1855] general protection fault ip:7fed39b5e7b0
+> [  188.533545] traps: gsd-wacom[1855] general protection fault
+> ip:7fed39b5e7b0
 > sp:7fff3e349620 error:0 in libglib-2.0.so.0.6200.1[7fed39ae3000+83000]
 > [  192.002357] traps: gvfs-fuse-sub[1560] general protection fault
 > ip:7f9cd88100b2 sp:7f9cd5db0bf0 error:0 in
@@ -132,12 +139,15 @@ fpu state crash in kvm guest"), which is commit e751732486eb upstream.
 2. Assuming the answer is yes, on a buggy kernel, can you run with the
    attached patch to try get debug info?
 
-> [   49.533714] Modules linked in: vhost_net vhost tap tun xfrm4_tunnel tunnel4
+> [   49.533714] Modules linked in: vhost_net vhost tap tun xfrm4_tunnel
+> tunnel4
 > ipcomp xfrm_ipcomp esp4 ah4 af_key ebtable_filter ebtables ip6table_filter
 > ip6_tables bridge stp llc nf_log_ipv4 nf_log_common xt_LOG ipt_REJECT
 > nf_reject_ipv4 iptable_filter iptable_security iptable_raw xt_state
-> xt_conntrack xt_DSCP xt_multiport iptable_mangle xt_TCPMSS xt_tcpmss xt_policy
-> xt_nat iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 intel_rapl
+> xt_conntrack xt_DSCP xt_multiport iptable_mangle xt_TCPMSS xt_tcpmss
+> xt_policy
+> xt_nat iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
+> intel_rapl
 > x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel sunrpc kvm vfat fat
 > mei_hdcp mei_wdt snd_hda_codec_hdmi iTCO_wdt irqbypass iTCO_vendor_support
 > snd_hda_codec_realtek snd_hda_codec_generic crct10dif_pclmul crc32_pclmul
@@ -153,7 +163,8 @@ fpu state crash in kvm guest"), which is commit e751732486eb upstream.
 > IPC_2.2.400.5 X64 03/15/2018
 > [   49.533784] RIP: 0010:kvm_arch_vcpu_ioctl_run+0x1927/0x1ce0 [kvm]
 > [   49.533786] Code: 4c 89 e7 e8 1b 0b ff ff 4c 89 e7 e8 d3 8c fe ff 41 83 a4
-> 24 e8 36 00 00 fb e9 bd ed ff ff f0 41 80 4c 24 31 10 e9 a5 ee ff ff <0f> 0b e9
+> 24 e8 36 00 00 fb e9 bd ed ff ff f0 41 80 4c 24 31 10 e9 a5 ee ff ff <0f> 0b
+> e9
 > 74 ed ff ff 49 8b 84 24 c8 02 00 00 a9 00 00 01 00 0f 84
 > [   49.533787] RSP: 0018:ffffbe4e423ffd30 EFLAGS: 00010002
 > [   49.533789] RAX: 0000000000004b00 RBX: 0000000000000000 RCX:
@@ -184,7 +195,8 @@ fpu state crash in kvm guest"), which is commit e751732486eb upstream.
 > [   49.533842]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
 > [   49.533844] RIP: 0033:0x7f117d1fb34b
 > [   49.533845] Code: 0f 1e fa 48 8b 05 3d 9b 0c 00 64 c7 00 26 00 00 00 48 c7
-> c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01
+> c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d
+> 01
 > f0 ff ff 73 01 c3 48 8b 0d 0d 9b 0c 00 f7 d8 64 89 01 48
 > [   49.533846] RSP: 002b:00007f117953e698 EFLAGS: 00000246 ORIG_RAX:
 > 0000000000000010
@@ -221,14 +233,19 @@ fpu state crash in kvm guest"), which is commit e751732486eb upstream.
 > fpu_exception   : yes
 > cpuid level     : 13
 > wp              : yes
-> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov
-> pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm
+> flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+> cmov
+> pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp
+> lm
 > constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid
-> aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr
+> aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16
+> xtpr
 > pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes xsave avx f16c
-> rdrand lahf_lm cpuid_fault epb pti ibrs ibpb stibp tpr_shadow vnmi flexpriority
+> rdrand lahf_lm cpuid_fault epb pti ibrs ibpb stibp tpr_shadow vnmi
+> flexpriority
 > ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
-> bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds
+> bugs            : cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf
+> mds
 > bogomips        : 4389.89
 > clflush size    : 64
 > cache_alignment : 64
@@ -239,72 +256,6 @@ fpu state crash in kvm guest"), which is commit e751732486eb upstream.
 > You are receiving this mail because:
 > You are watching the assignee of the bug.
 
---CE+1k2dSO48ffgeK
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="0001-thread_info-Add-a-debug-hook-to-detect-FPU-changes-w.patch"
-
-From 6288031dacbe753b84515d330f62c1f8ed31d932 Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-Date: Wed, 20 Nov 2019 10:12:56 -0800
-Subject: [PATCH] thread_info: Add a debug hook to detect FPU changes while a
- vCPU is loaded
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/include/asm/thread_info.h | 2 ++
- arch/x86/kvm/x86.c                 | 4 ++++
- include/linux/thread_info.h        | 1 +
- 3 files changed, 7 insertions(+)
-
-diff --git a/arch/x86/include/asm/thread_info.h b/arch/x86/include/asm/thread_info.h
-index f9453536f9bb..7b697005cc51 100644
---- a/arch/x86/include/asm/thread_info.h
-+++ b/arch/x86/include/asm/thread_info.h
-@@ -56,6 +56,8 @@ struct task_struct;
- struct thread_info {
- 	unsigned long		flags;		/* low level flags */
- 	u32			status;		/* thread synchronous flags */
-+	bool			vcpu_loaded;
-+
- };
- 
- #define INIT_THREAD_INFO(tsk)			\
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a8ad3a4d86b1..3d9c049e749e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3303,6 +3303,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	}
- 
- 	kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
-+
-+	current_thread_info()->vcpu_loaded = 1;
- }
- 
- static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
-@@ -3322,6 +3324,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	int idx;
- 
-+	current_thread_info()->vcpu_loaded = 0;
-+
- 	if (vcpu->preempted)
- 		vcpu->arch.preempted_in_kernel = !kvm_x86_ops->get_cpl(vcpu);
- 
-diff --git a/include/linux/thread_info.h b/include/linux/thread_info.h
-index 8d8821b3689a..016c2c887354 100644
---- a/include/linux/thread_info.h
-+++ b/include/linux/thread_info.h
-@@ -52,6 +52,7 @@ enum {
- 
- static inline void set_ti_thread_flag(struct thread_info *ti, int flag)
- {
-+	WARN_ON_ONCE(ti->vcpu_loaded && flag == TIF_NEED_FPU_LOAD);
- 	set_bit(flag, (unsigned long *)&ti->flags);
- }
- 
 -- 
-2.24.0
-
-
---CE+1k2dSO48ffgeK--
+You are receiving this mail because:
+You are watching the assignee of the bug.
