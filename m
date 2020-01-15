@@ -2,118 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D23C13C4DC
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 15:05:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 369CC13C4EB
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2020 15:07:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728884AbgAOOEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 09:04:30 -0500
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:65165 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726165AbgAOOE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 09:04:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1579097068; x=1610633068;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=mD134d1dhAL2wTm6GBiSo5X+tf1YR1o2BkcpCUOTDOs=;
-  b=S2TF2yR3OTH2YeutfsUCHy73Mraf7aofuQ5JQy25kpeoV0bfjUuT047x
-   ICt9B0TLkzlRUt1X066vnwKIoKh480I4wC6ua/0d8r6rlOwV40mcHb8Uq
-   Mzsv3KrU6vyK0YzNwVzrw/mkCQIpj+rcOr3T4MfGJYU5k2TgAuAANTeS+
-   w=;
-IronPort-SDR: Nsog/85Rs1RO/q67ac3JqaAmsvYoVcLz0je9tcakeK1cuuftCcLbhf8VcXj1eI/2QEyd4Dwy4t
- pbCjcEsWf01A==
-X-IronPort-AV: E=Sophos;i="5.70,322,1574121600"; 
-   d="scan'208";a="11652016"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 15 Jan 2020 14:04:27 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com (Postfix) with ESMTPS id 068E6A3834;
-        Wed, 15 Jan 2020 14:04:26 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 15 Jan 2020 14:04:26 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.253) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 15 Jan 2020 14:04:24 +0000
-Subject: Re: [PATCH 2/2] kvm: Add ioctl for gathering debug counters
-To:     Milan Pandurov <milanpa@amazon.de>, <kvm@vger.kernel.org>
-CC:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <borntraeger@de.ibm.com>
-References: <20200115134303.30668-1-milanpa@amazon.de>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <18820df0-273a-9592-5018-c50a85a75205@amazon.de>
-Date:   Wed, 15 Jan 2020 15:04:22 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.3.1
+        id S1729049AbgAOOHo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 09:07:44 -0500
+Received: from foss.arm.com ([217.140.110.172]:37790 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726071AbgAOOHo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 09:07:44 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C1D7B31B;
+        Wed, 15 Jan 2020 06:07:43 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB62F3F68E;
+        Wed, 15 Jan 2020 06:07:42 -0800 (PST)
+Date:   Wed, 15 Jan 2020 14:07:40 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com
+Subject: Re: [PATCH kvmtool 04/16] Check that a PCI device's memory size is
+ power of two
+Message-ID: <20200115140740.40881507@donnerap.cambridge.arm.com>
+In-Reply-To: <8800ef85-045e-f83d-6a43-d62f5cc8d8dd@arm.com>
+References: <20191125103033.22694-1-alexandru.elisei@arm.com>
+        <20191125103033.22694-5-alexandru.elisei@arm.com>
+        <20191127182514.23d719ff@donnerap.cambridge.arm.com>
+        <8800ef85-045e-f83d-6a43-d62f5cc8d8dd@arm.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200115134303.30668-1-milanpa@amazon.de>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.253]
-X-ClientProxiedBy: EX13D34UWC001.ant.amazon.com (10.43.162.112) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAxNS4wMS4yMCAxNDo0MywgTWlsYW4gUGFuZHVyb3Ygd3JvdGU6Cj4gS1ZNIGV4cG9zZXMg
-ZGVidWcgY291bnRlcnMgdGhyb3VnaCBpbmRpdmlkdWFsIGRlYnVnZnMgZmlsZXMuCj4gTW9uaXRv
-cmluZyB0aGVzZSBjb3VudGVycyByZXF1aXJlcyBkZWJ1Z2ZzIHRvIGJlIGVuYWJsZWQvYWNjZXNz
-aWJsZSBmb3IKPiB0aGUgYXBwbGljYXRpb24sIHdoaWNoIG1pZ2h0IG5vdCBiZSBhbHdheXMgdGhl
-IGNhc2UuCj4gQWRkaXRpb25hbGx5LCBwZXJpb2RpYyBtb25pdG9yaW5nIG11bHRpcGxlIGRlYnVn
-ZnMgZmlsZXMgZnJvbQo+IHVzZXJzcGFjZSByZXF1aXJlcyBtdWx0aXBsZSBmaWxlIG9wZW4vcmVh
-ZC9jbG9zZSArIGF0b2kgY29udmVyc2lvbgo+IG9wZXJhdGlvbnMsIHdoaWNoIGlzIG5vdCB2ZXJ5
-IGVmZmljaWVudC4KPiAKPiBMZXQncyBleHBvc2UgbmV3IGludGVyZmFjZSB0byB1c2Vyc3BhY2Ug
-Zm9yIGdhcmhlcmluZyB0aGVzZQo+IHN0YXRpc3RpY3Mgd2l0aCBvbmUgaW9jdGwuCj4gCj4gVHdv
-IG5ldyBpb2N0bCBtZXRob2RzIGFyZSBhZGRlZDoKPiAgIC0gS1ZNX0dFVF9TVVBQT1JURURfREVC
-VUdGU19TVEFUIDogUmV0dXJucyBsaXN0IG9mIGF2YWlsYWJsZSBjb3VudGVyCj4gICBuYW1lcy4g
-TmFtZXMgY29ycmVzcG9uZCB0byB0aGUgZGVidWdmcyBmaWxlIG5hbWVzCj4gICAtIEtWTV9HRVRf
-REVCVUdGU19WQUxVRVMgOiBSZXR1cm5zIGxpc3Qgb2YgdTY0IHZhbHVlcyBlYWNoCj4gICBjb3Jy
-ZXNwb25kaW5nIHRvIGEgdmFsdWUgZGVzY3JpYmVkIGluIEtWTV9HRVRfU1VQUE9SVEVEX0RFQlVH
-RlNfU1RBVC4KPiAKPiBVc2Vyc3BhY2UgYXBwbGljYXRpb24gY2FuIHJlYWQgY291bnRlciBkZXNj
-cmlwdGlvbiBvbmNlIHVzaW5nCj4gS1ZNX0dFVF9TVVBQT1JURURfREVCVUdGU19TVEFUIGFuZCBw
-ZXJpb2RpY2FsbHkgaW52b2tlIHRoZQo+IEtWTV9HRVRfREVCVUdGU19WQUxVRVMgdG8gZ2V0IHZh
-bHVlIHVwZGF0ZS4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBNaWxhbiBQYW5kdXJvdiA8bWlsYW5wYUBh
-bWF6b24uZGU+CgpUaGFua3MgYSBsb3QhIEkgcmVhbGx5IGxvdmUgdGhlIGlkZWEgdG8gZ2V0IHN0
-YXRzIGRpcmVjdGx5IGZyb20gdGhlIGt2bSAKdm0gZmQgb3duZXIuIFRoaXMgaXMgc28gbXVjaCBi
-ZXR0ZXIgdGhhbiBwb2tpbmcgYXQgZmlsZXMgZnJvbSBhIHJhbmRvbSAKdW5yZWxhdGVkIGRlYnVn
-IG9yIHN0YXQgZmlsZSBzeXN0ZW0uCgpJIGhhdmUgYSBmZXcgY29tbWVudHMgb3ZlcmFsbCB0aG91
-Z2g6CgoKMSkKClRoaXMgaXMgYW4gaW50ZXJmYWNlIHRoYXQgcmVxdWlyZXMgYSBsb3Qgb2YgbG9n
-aWMgYW5kIGJ1ZmZlcnMgZnJvbSB1c2VyIApzcGFjZSB0byByZXRyaWV2ZSBpbmRpdmlkdWFsLCBl
-eHBsaWNpdCBjb3VudGVycy4gV2hhdCBpZiBJIGp1c3Qgd2FudGVkIAp0byBtb25pdG9yIHRoZSBu
-dW1iZXIgb2YgZXhpdHMgb24gZXZlcnkgdXNlciBzcGFjZSBleGl0PwoKQWxzbywgd2UncmUgc3Vk
-ZGVubHkgbWFraW5nIHRoZSBkZWJ1Z2ZzIG5hbWVzIGEgZnVsbCBBQkksIGJlY2F1c2UgCnRocm91
-Z2ggdGhpcyBpbnRlcmZhY2Ugd2Ugb25seSBpZGVudGlmeSB0aGUgaW5kaXZpZHVhbCBzdGF0cyB0
-aHJvdWdoIAp0aGVpciBuYW1lcy4gVGhhdCBtZWFucyB3ZSBjYW4gbm90IHJlbW92ZSBzdGF0cyBv
-ciBjaGFuZ2UgdGhlaXIgbmFtZXMsIApiZWNhdXNlIHBlb3BsZSBtYXkgcmVseSBvbiB0aGVtLCBu
-bz8gVGhpbmluZyBhYm91dCB0aGlzIGFnYWluLCBtYXliZSAKdGhleSBhbHJlYWR5IGFyZSBhbiBB
-QkkgYmVjYXVzZSBwZW9wbGUgcmVseSBvbiB0aGVtIGluIGRlYnVnZnMgdGhvdWdoPwoKSSBzZWUg
-dHdvIGFsdGVybmF0aXZlcyB0byB0aGlzIGFwcHJvYWNoIGhlcmU6CgphKSBPTkVfUkVHCgpXZSBj
-YW4ganVzdCBhZGQgYSBuZXcgREVCVUcgYXJjaCBpbiBPTkVfUkVHIGFuZCBleHBvc2UgT05FX1JF
-RyBwZXIgVk0gYXMgCndlbGwgKGlmIHdlIHJlYWxseSBoYXZlIHRvPykuIFRoYXQgZ2l2ZXMgdXMg
-ZXhwbGljaXQgaWRlbnRpZmllcnMgZm9yIAplYWNoIHN0YXQgd2l0aCBhbiBleHBsaWNpdCBwYXRo
-IHRvIGludHJvZHVjZSBuZXcgb25lcyB3aXRoIHZlcnkgdW5pcXVlIAppZGVudGlmaWVycy4KClRo
-YXQgd291bGQgZ2l2ZSB1cyBhIHZlcnkgZWFzaWx5IHN0cnVjdHVyZWQgYXBwcm9hY2ggdG8gcmV0
-cmlldmUgCmluZGl2aWR1YWwgY291bnRlcnMuCgpiKSBwYXJ0IG9mIHRoZSBtbWFwJ2VkIHZjcHUg
-c3RydWN0CgpXZSBjb3VsZCBzaW1wbHkgbW92ZSB0aGUgY291bnRlcnMgaW50byB0aGUgc2hhcmVk
-IHN0cnVjdCB0aGF0IHdlIGV4cG9zZSAKdG8gdXNlciBzcGFjZSB2aWEgbW1hcC4gSUlSQyB3ZSBv
-bmx5IGhhdmUgdGhhdCBwZXItdmNwdSwgYnV0IHRoZW4gYWdhaW4gCm1vc3QgY291bnRlcnMgYXJl
-IHBlci12Y3B1IGFueXdheSwgc28gd2Ugd291bGQgcHVzaCB0aGUgYWdncmVnYXRpb24gdG8gCnVz
-ZXIgc3BhY2UuCgpGb3IgcGVyLXZtIG9uZXMsIG1heWJlIHdlIGNhbiBqdXN0IGFkZCBhbm90aGVy
-IG1tYXAnZWQgc2hhcmVkIHBhZ2UgZm9yIAp0aGUgdm0gZmQ/CgoKMikgdmNwdSBjb3VudGVycwoK
-TW9zdCBvZiB0aGUgY291bnRlcnMgY291bnQgb24gdmNwdSBncmFudWxhcml0eSwgYnV0IGRlYnVn
-ZnMgb25seSBnaXZlcyAKdXMgYSBmdWxsIFZNIHZpZXcuIFdoYXRldmVyIHdlIGRvIHRvIGltcHJv
-dmUgdGhlIHNpdHVhdGlvbiwgd2Ugc2hvdWxkIApkZWZpbml0ZWx5IHRyeSB0byBidWlsZCBzb21l
-dGhpbmcgdGhhdCBhbGxvd3MgdXMgdG8gZ2V0IHRoZSBjb3VudGVycyBwZXIgCnZjcHUgKGFzIHdl
-bGwpLgoKVGhlIG1haW4gcHVycG9zZSBvZiB0aGVzZSBjb3VudGVycyBpcyBtb25pdG9yaW5nLiBJ
-dCBjYW4gYmUgcXVpdGUgCmltcG9ydGFudCB0byBrbm93IHRoYXQgb25seSBhIHNpbmdsZSB2Q1BV
-IGlzIGdvaW5nIHdpbGQsIGNvbXBhcmVkIHRvIGFsbCAKb2YgdGhlbSBmb3IgZXhhbXBsZS4KCgpU
-aGFua3MsCgpBbGV4CgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICkty
-YXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBT
-Y2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJs
-b3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkg
-MjM3IDg3OQoKCg==
+On Wed, 15 Jan 2020 12:43:20 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+
+> Hi,
+> 
+> On 11/27/19 6:25 PM, Andre Przywara wrote:
+> > On Mon, 25 Nov 2019 10:30:21 +0000
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >
+> > Hi,
+> >  
+> >> According to the PCI local bus specification [1], a device's memory size
+> >> must be a power of two. This is also implicit in the mechanism that a CPU
+> >> uses to get the memory size requirement for a PCI device.
+> >>
+> >> The vesa device requests a memory size that isn't a power of two.
+> >> According to the same spec [1], a device is allowed to consume more memory
+> >> than it actually requires. As a result, the amount of memory that the vesa
+> >> device now reserves has been increased.
+> >>
+> >> To prevent slip-ups in the future, a few BUILD_BUG_ON statements were added
+> >> in places where the memory size is known at compile time.
+> >>
+> >> [1] PCI Local Bus Specification Revision 3.0, section 6.2.5.1
+> >>
+> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >> ---
+> >>  hw/vesa.c          | 2 ++
+> >>  include/kvm/util.h | 2 ++
+> >>  include/kvm/vesa.h | 6 +++++-
+> >>  vfio/pci.c         | 5 +++++
+> >>  virtio/pci.c       | 3 +++
+> >>  5 files changed, 17 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/vesa.c b/hw/vesa.c
+> >> index f3c5114cf4fe..75670a51be5f 100644
+> >> --- a/hw/vesa.c
+> >> +++ b/hw/vesa.c
+> >> @@ -58,6 +58,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+> >>  	char *mem;
+> >>  	int r;
+> >>  
+> >> +	BUILD_BUG_ON(!is_power_of_two(VESA_MEM_SIZE));
+> >> +
+> >>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
+> >>  		return NULL;
+> >>  
+> >> diff --git a/include/kvm/util.h b/include/kvm/util.h
+> >> index 4ca7aa9392b6..e90f1c2db39f 100644
+> >> --- a/include/kvm/util.h
+> >> +++ b/include/kvm/util.h
+> >> @@ -104,6 +104,8 @@ static inline unsigned long roundup_pow_of_two(unsigned long x)
+> >>  	return x ? 1UL << fls_long(x - 1) : 0;
+> >>  }
+> >>  
+> >> +#define is_power_of_two(x)	((x) ? ((x) & ((x) - 1)) == 0 : 0)  
+> > This gives weird results for negative values (which the kernel avoids by having this a static inline and using an unsigned type).
+> > Not sure we care, but maybe (x > 0) ? ... would fix this?  
+> 
+> Good point, I will fix it by changing the implicit comparison against 0 at the
+> beginning with (x) > 0.
+> 
+> >  
+> >> +
+> >>  struct kvm;
+> >>  void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
+> >>  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
+> >> diff --git a/include/kvm/vesa.h b/include/kvm/vesa.h
+> >> index 0fac11ab5a9f..e7d971343642 100644
+> >> --- a/include/kvm/vesa.h
+> >> +++ b/include/kvm/vesa.h
+> >> @@ -5,8 +5,12 @@
+> >>  #define VESA_HEIGHT	480
+> >>  
+> >>  #define VESA_MEM_ADDR	0xd0000000
+> >> -#define VESA_MEM_SIZE	(4*VESA_WIDTH*VESA_HEIGHT)
+> >>  #define VESA_BPP	32
+> >> +/*
+> >> + * We actually only need VESA_BPP/8*VESA_WIDTH*VESA_HEIGHT bytes. But the memory
+> >> + * size must be a power of 2, so we round up.
+> >> + */
+> >> +#define VESA_MEM_SIZE	(1 << 21)  
+> > I don't think it's worth calculating the value and rounding it up, but can we have a BUILD_BUG checking that VESA_MEM_SIZE is big enough to hold the framebuffer?  
+> 
+> I'm not sure what you mean. The current value of VESA_MEM_SIZE is not a power of
+> two, which breaks the spec. That's the reason for changing it. Are you suggesting
+> that we keep VESA_MEM_SIZE = 1 << 21, we remove the power_of_two check and add a
+> BUILD_BUG on VESA_MEM_SIZE < 4 * VESA_WIDTH * VESA_HEIGHT?
+
+Only the latter, so keep the power_of_two check, but add the BUILD_BUG with the comparison. So that it breaks if someone increases the width or height.
+
+Cheers,
+Andre.
+
+> >>  struct kvm;
+> >>  struct biosregs;
+> >> diff --git a/vfio/pci.c b/vfio/pci.c
+> >> index 76e24c156906..914732cc6897 100644
+> >> --- a/vfio/pci.c
+> >> +++ b/vfio/pci.c
+> >> @@ -831,6 +831,11 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
+> >>  	/* Ignore invalid or unimplemented regions */
+> >>  	if (!region->info.size)
+> >>  		return 0;
+> >> +	if (!is_power_of_two(region->info.size)) {
+> >> +		vfio_dev_err(vdev, "region is not power of two: 0x%llx",
+> >> +			     region->info.size);
+> >> +		return -EINVAL;
+> >> +	}
+> >>  
+> >>  	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSIX) {
+> >>  		/* Trap and emulate MSI-X table */
+> >> diff --git a/virtio/pci.c b/virtio/pci.c
+> >> index 99653cad2c0f..04e801827df9 100644
+> >> --- a/virtio/pci.c
+> >> +++ b/virtio/pci.c
+> >> @@ -435,6 +435,9 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+> >>  	vpci->kvm = kvm;
+> >>  	vpci->dev = dev;
+> >>  
+> >> +	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
+> >> +	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
+> >> +
+> >>  	r = ioport__register(kvm, IOPORT_EMPTY, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
+> >>  	if (r < 0)
+> >>  		return r;  
 
