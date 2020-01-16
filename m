@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8319413D9C2
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 13:17:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8718113D9C6
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 13:18:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726189AbgAPMRc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 07:17:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52561 "EHLO
+        id S1726329AbgAPMSw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 07:18:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38996 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726084AbgAPMRc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 07:17:32 -0500
+        with ESMTP id S1726018AbgAPMSw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 07:18:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579177050;
+        s=mimecast20190719; t=1579177130;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=df5hkxyz3FBnzAx2I73RfIL+T7ZkGIc6gZqWAb0LJQo=;
-        b=WWMgKt7+DgFameT3D1u94gEPxKWph3qMsekfJDGEdz+owo8bGswDUAYZ6ps4ponhAFI6Wg
-        gsXz810MAKf2yFAUoxgoxiT2IbpDI1IFOwkz2wD4Gci5Z08JzURu7N+2jYGoUI/nDYYP5Y
-        OMeYblp//VINxfU0/QP8F+sqR0MHozQ=
+        bh=oiEOiRbRsPm8KcTq/P7c2avyYBgFUTPmLlCZGLv1LjQ=;
+        b=hmQY6B4DyEZxcaaWWSFJb1bjomU4887kxt6+tJZ74eo5ewZEJcIyTfBSKRLm4l30Zub3zg
+        VEKz9imGQ/VPf/KONqIZGYDivk92HaQ1A40V2s9WK+VxycDpcrShyMwMRz3LPICylHkgV5
+        DKoY6k5k9HRV2wMuW9yx0qeNZTIEUFg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-pyOrIhqVNqWOrdwyF2ohGg-1; Thu, 16 Jan 2020 07:17:26 -0500
-X-MC-Unique: pyOrIhqVNqWOrdwyF2ohGg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-253-Z4cKPBiVMvyqYmIRpxbfEw-1; Thu, 16 Jan 2020 07:18:46 -0500
+X-MC-Unique: Z4cKPBiVMvyqYmIRpxbfEw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 753DB8018A5;
-        Thu, 16 Jan 2020 12:17:25 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29FB51005512;
+        Thu, 16 Jan 2020 12:18:45 +0000 (UTC)
 Received: from [10.36.116.136] (ovpn-116-136.ams2.redhat.com [10.36.116.136])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1C92F5DA32;
-        Thu, 16 Jan 2020 12:17:23 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 3/7] s390x: Add cpu id to interrupt
- error prints
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C955050A8F;
+        Thu, 16 Jan 2020 12:18:43 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 2/7] s390x: smp: Only use smp_cpu_setup
+ once
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
         linux-s390@vger.kernel.org, cohuck@redhat.com
 References: <20200116120513.2244-1-frankja@linux.ibm.com>
- <20200116120513.2244-4-frankja@linux.ibm.com>
+ <20200116120513.2244-3-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -85,91 +85,117 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <1bf32ccd-4047-7676-2ef4-a3327bf3995f@redhat.com>
-Date:   Thu, 16 Jan 2020 13:17:23 +0100
+Message-ID: <9847c5e8-2950-add1-e86b-0d14f0aca0bd@redhat.com>
+Date:   Thu, 16 Jan 2020 13:18:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200116120513.2244-4-frankja@linux.ibm.com>
+In-Reply-To: <20200116120513.2244-3-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 16.01.20 13:05, Janosch Frank wrote:
-> It's good to know which cpu broke the test.
+> Let's stop and start instead of using setup to run a function on a
+> cpu.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  lib/s390x/interrupt.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
+>  s390x/smp.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
 > 
-> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-> index 05f30be..773752a 100644
-> --- a/lib/s390x/interrupt.c
-> +++ b/lib/s390x/interrupt.c
-> @@ -107,8 +107,8 @@ static void fixup_pgm_int(void)
->  void handle_pgm_int(void)
->  {
->  	if (!pgm_int_expected)
-> -		report_abort("Unexpected program interrupt: %d at %#lx, ilen %d\n",
-> -			     lc->pgm_int_code, lc->pgm_old_psw.addr,
-> +		report_abort("Unexpected program interrupt: %d on cpu %d at %#lx, ilen %d\n",
-> +			     lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
->  			     lc->pgm_int_id);
-
-nit: "cpu: %d"
-
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 02204fd..d430638 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -47,7 +47,7 @@ static void test_start(void)
+>  	psw.mask = extract_psw_mask();
+>  	psw.addr = (unsigned long)test_func;
 >  
->  	pgm_int_expected = false;
-> @@ -119,8 +119,8 @@ void handle_ext_int(void)
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+>  	wait_for_flag();
+>  	report(1, "start");
+>  }
+> @@ -132,9 +132,8 @@ static void test_ecall(void)
+>  
+>  	report_prefix_push("ecall");
+>  	testflag = 0;
+> -	smp_cpu_destroy(1);
+>  
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+>  	wait_for_flag();
+>  	testflag = 0;
+>  	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
+> @@ -167,9 +166,8 @@ static void test_emcall(void)
+>  
+>  	report_prefix_push("emcall");
+>  	testflag = 0;
+> -	smp_cpu_destroy(1);
+>  
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+>  	wait_for_flag();
+>  	testflag = 0;
+>  	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
+> @@ -187,7 +185,7 @@ static void test_reset_initial(void)
+>  	psw.addr = (unsigned long)test_func;
+>  
+>  	report_prefix_push("reset initial");
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+>  
+>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+> @@ -218,7 +216,7 @@ static void test_reset(void)
+>  	psw.addr = (unsigned long)test_func;
+>  
+>  	report_prefix_push("cpu reset");
+> -	smp_cpu_setup(1, psw);
+> +	smp_cpu_start(1, psw);
+>  
+>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
+>  	report(smp_cpu_stopped(1), "cpu stopped");
+> @@ -227,6 +225,7 @@ static void test_reset(void)
+>  
+>  int main(void)
 >  {
->  	if (!ext_int_expected &&
->  	    lc->ext_int_code != EXT_IRQ_SERVICE_SIG) {
-> -		report_abort("Unexpected external call interrupt (code %#x): at %#lx",
-> -			     lc->ext_int_code, lc->ext_old_psw.addr);
-> +		report_abort("Unexpected external call interrupt (code %#x): on cpu %d at %#lx",
-> +			     stap(), lc->ext_int_code, lc->ext_old_psw.addr);
-
-nit: "(code %#x) on cpu: %d" ...
-
-Same comment for the ones below
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
->  		return;
+> +	struct psw psw;
+>  	report_prefix_push("smp");
+>  
+>  	if (smp_query_num_cpus() == 1) {
+> @@ -234,6 +233,12 @@ int main(void)
+>  		goto done;
 >  	}
 >  
-> @@ -137,18 +137,18 @@ void handle_ext_int(void)
+> +	/* Setting up the cpu to give it a stack and lowcore */
+> +	psw.mask = extract_psw_mask();
+> +	psw.addr = (unsigned long)cpu_loop;
+> +	smp_cpu_setup(1, psw);
+> +	smp_cpu_stop(1);
+> +
+>  	test_start();
+>  	test_stop();
+>  	test_stop_store_status();
+> @@ -242,6 +247,7 @@ int main(void)
+>  	test_emcall();
+>  	test_reset();
+>  	test_reset_initial();
+> +	smp_cpu_destroy(1);
 >  
->  void handle_mcck_int(void)
->  {
-> -	report_abort("Unexpected machine check interrupt: at %#lx",
-> -		     lc->mcck_old_psw.addr);
-> +	report_abort("Unexpected machine check interrupt: on cpu %d at %#lx",
-> +		     stap(), lc->mcck_old_psw.addr);
->  }
->  
->  void handle_io_int(void)
->  {
-> -	report_abort("Unexpected io interrupt: at %#lx",
-> -		     lc->io_old_psw.addr);
-> +	report_abort("Unexpected io interrupt: on cpu %d at %#lx",
-> +		     stap(), lc->io_old_psw.addr);
->  }
->  
->  void handle_svc_int(void)
->  {
-> -	report_abort("Unexpected supervisor call interrupt: at %#lx",
-> -		     lc->svc_old_psw.addr);
-> +	report_abort("Unexpected supervisor call interrupt: on cpu %d at %#lx",
-> +		     stap(), lc->svc_old_psw.addr);
->  }
+>  done:
+>  	report_prefix_pop();
 > 
+
+Acked-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
