@@ -2,176 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 982D813D408
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 07:00:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B437C13D40E
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 07:03:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728899AbgAPF6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 00:58:55 -0500
-Received: from mga03.intel.com ([134.134.136.65]:46766 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726366AbgAPF6y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 00:58:54 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jan 2020 21:58:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,325,1574150400"; 
-   d="scan'208";a="218408846"
-Received: from unknown (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga008.jf.intel.com with ESMTP; 15 Jan 2020 21:58:51 -0800
-Date:   Thu, 16 Jan 2020 00:49:41 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
+        id S1729546AbgAPGDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 01:03:15 -0500
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:51715 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727026AbgAPGDP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 01:03:15 -0500
+Received: by mail-pj1-f67.google.com with SMTP id d15so1024902pjw.1;
+        Wed, 15 Jan 2020 22:03:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=dPqB30Bque1a9xdQca0yHVUONu8Rkkk23AZbtBFoqN0=;
+        b=Jl3n9t2/YTDOuYoiVgGPHFsJsyZ3+fU3dIIf8t9Iwil/iQtRl6iU+ydPdNETEDxZXQ
+         S0mZAwv2gG7bTooBUzPiH+qTTdpUAwmAJEOL8weqbTj9F50Bh1AmkwTQ6uFurcp5Ewzc
+         NIKhfnXGn/p2m+FAs59d+4f+Un+V0WomKNDHt2aRbOvGUNwHS3kMo6+4z9dmTCjroJ50
+         knbv2fpyA2lYn4IU3OKYMd+Qz9FkwPzCVyruxkfHGZxTgRKux5R17NfoSdBJx4yEcuki
+         f8UDl7GSNPArYDNtaK4T4XIyePvR49+MOIAspG1jsChLqP7rEOMZUVzCRXmvTGpDzC1M
+         xYfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=dPqB30Bque1a9xdQca0yHVUONu8Rkkk23AZbtBFoqN0=;
+        b=RZWh6WrnvRLxGDJ7zFaLlg70O8+1WloBnI+erZxwVhYZGYDAiBoHySS6FlscQGROSj
+         h7loU8yAnFtxbgbEEKzTkGlzc93V+Wl7i6LN0fvNa46b2neh7J7SDNLa386RIr8sYZeb
+         KsykIYsuKIymb87fa0GhO+JC7jH+uULa9a/zinaTty/+VJmbJNpyez2+9yPbDSIJ80/K
+         3+09zcr3B/QQzQ/rmGYmr5P6+wIOkucJ/VogdreYqRKbqA5crx4oh2iykwDyOpcmQBTB
+         zzrP5ipA6OnNpwGOCsgRy/rHJ1d5SdRpNbjBxHGdQbgva+GTlfaniiQQpceHQR19iQ9D
+         tg7Q==
+X-Gm-Message-State: APjAAAX3XC4+joGzzpHVTorzfjWr84QOdxjlSyDdMAXCCwkiX4wgtQn1
+        IPyun4s9Km7t9UNOW9qq/g==
+X-Google-Smtp-Source: APXvYqz3LduDxHDVbF5g2WN3h6iZ3dA8WNbXYcZfN0VJe6IA8uAo9nRsS6DW76p0g3x2WMGQiak9lg==
+X-Received: by 2002:a17:90a:b30b:: with SMTP id d11mr4723790pjr.22.1579154594426;
+        Wed, 15 Jan 2020 22:03:14 -0800 (PST)
+Received: from [127.0.0.1] ([103.7.29.9])
+        by smtp.gmail.com with ESMTPSA id q6sm23636677pfh.127.2020.01.15.22.03.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jan 2020 22:03:13 -0800 (PST)
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>
-Subject: Re: [PATCH v2 2/2] drm/i915/gvt: subsitute kvm_read/write_guest with
- vfio_dma_rw
-Message-ID: <20200116054941.GB1759@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200115034132.2753-1-yan.y.zhao@intel.com>
- <20200115035455.12417-1-yan.y.zhao@intel.com>
- <20200115130651.29d7e9e0@w520.home>
+        "x86@kernel.org" <x86@kernel.org>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>, bp@alien8.de,
+        "hpa@zytor.com" <hpa@zytor.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Subject: [PATCH] KVM: Adding 'else' to reduce checking.
+Message-ID: <2a1a3b72-acc5-4977-5621-439aac53f243@gmail.com>
+Date:   Thu, 16 Jan 2020 14:03:04 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200115130651.29d7e9e0@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 16, 2020 at 04:06:51AM +0800, Alex Williamson wrote:
-> On Tue, 14 Jan 2020 22:54:55 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > As a device model, it is better to read/write guest memory using vfio
-> > interface, so that vfio is able to maintain dirty info of device IOVAs.
-> > 
-> > Compared to kvm interfaces kvm_read/write_guest(), vfio_dma_rw() has ~600
-> > cycles more overhead on average.
-> > 
-> > -------------------------------------
-> > |    interface     | avg cpu cycles |
-> > |-----------------------------------|
-> > | kvm_write_guest  |     1554       |
-> > | ----------------------------------|
-> > | kvm_read_guest   |     707        |
-> > |-----------------------------------|
-> > | vfio_dma_rw(w)   |     2274       |
-> > |-----------------------------------|
-> > | vfio_dma_rw(r)   |     1378       |
-> > -------------------------------------
-> 
-> In v1 you had:
-> 
-> -------------------------------------
-> |    interface     | avg cpu cycles |
-> |-----------------------------------|
-> | kvm_write_guest  |     1546       |
-> | ----------------------------------|
-> | kvm_read_guest   |     686        |
-> |-----------------------------------|
-> | vfio_iova_rw(w)  |     2233       |
-> |-----------------------------------|
-> | vfio_iova_rw(r)  |     1262       |
-> -------------------------------------
-> 
-> So the kvm numbers remained within +0.5-3% while the vfio numbers are
-> now +1.8-9.2%.  I would have expected the algorithm change to at least
-> not be worse for small accesses and be better for accesses crossing
-> page boundaries.  Do you know what happened?
->
-I only tested the 4 interfaces in GVT's environment, where most of the
-guest memory accesses are less than one page.
-And the different fluctuations should be caused by the locks.
-vfio_dma_rw contends locks with other vfio accesses which are assumed to
-be abundant in the case of GVT.
+ From 4e19436679a97e3cee73b4ae613ff91580c721d2 Mon Sep 17 00:00:00 2001
+From: Haiwei Li <lihaiwei@tencent.com>
+Date: Thu, 16 Jan 2020 13:51:03 +0800
+Subject: [PATCH] Adding 'else' to reduce checking.
 
-> > Comparison of benchmarks scores are as blow:
-> > ------------------------------------------------------
-> > |  avg score  | kvm_read/write_guest  | vfio_dma_rw  |
-> > |----------------------------------------------------|
-> > |   Glmark2   |         1284          |    1296      |
-> > |----------------------------------------------------|
-> > |  Lightsmark |         61.24         |    61.27     |
-> > |----------------------------------------------------|
-> > |  OpenArena  |         140.9         |    137.4     |
-> > |----------------------------------------------------|
-> > |   Heaven    |          671          |     670      |
-> > ------------------------------------------------------
-> > No obvious performance downgrade found.
-> > 
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  drivers/gpu/drm/i915/gvt/kvmgt.c | 26 +++++++-------------------
-> >  1 file changed, 7 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> > index bd79a9718cc7..17edc9a7ff05 100644
-> > --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> > +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> > @@ -1966,31 +1966,19 @@ static int kvmgt_rw_gpa(unsigned long handle, unsigned long gpa,
-> >  			void *buf, unsigned long len, bool write)
-> >  {
-> >  	struct kvmgt_guest_info *info;
-> > -	struct kvm *kvm;
-> > -	int idx, ret;
-> > -	bool kthread = current->mm == NULL;
-> > +	int ret;
-> > +	struct intel_vgpu *vgpu;
-> > +	struct device *dev;
-> >  
-> >  	if (!handle_valid(handle))
-> >  		return -ESRCH;
-> >  
-> >  	info = (struct kvmgt_guest_info *)handle;
-> > -	kvm = info->kvm;
-> > -
-> > -	if (kthread) {
-> > -		if (!mmget_not_zero(kvm->mm))
-> > -			return -EFAULT;
-> > -		use_mm(kvm->mm);
-> > -	}
-> > -
-> > -	idx = srcu_read_lock(&kvm->srcu);
-> > -	ret = write ? kvm_write_guest(kvm, gpa, buf, len) :
-> > -		      kvm_read_guest(kvm, gpa, buf, len);
-> > -	srcu_read_unlock(&kvm->srcu, idx);
-> > +	vgpu = info->vgpu;
-> > +	dev = mdev_dev(vgpu->vdev.mdev);
-> >  
-> > -	if (kthread) {
-> > -		unuse_mm(kvm->mm);
-> > -		mmput(kvm->mm);
-> > -	}
-> > +	ret = write ? vfio_dma_rw(dev, gpa, buf, len, true) :
-> > +			vfio_dma_rw(dev, gpa, buf, len, false);
-> 
-> As Paolo suggested previously, this can be simplified:
-> 
-> ret = vfio_dma_rw(dev, gpa, buf, len, write);
->
-> >  
-> >  	return ret;
-> 
-> Or even more simple, remove the ret variable:
-> 
-> return vfio_dma_rw(dev, gpa, buf, len, write);
-> 
-oh, it seems that I missed Paolo's mail. will change it. thank you!
+These two conditions are in conflict, adding 'else' to reduce checking.
 
-Thanks
-Yan
-> 
-> >  }
-> 
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+  arch/x86/kvm/lapic.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 679692b..ef5802f 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1573,7 +1573,7 @@ static void 
+kvm_apic_inject_pending_timer_irqs(struct kvm_lapic *apic)
+         kvm_apic_local_deliver(apic, APIC_LVTT);
+         if (apic_lvtt_tscdeadline(apic))
+                 ktimer->tscdeadline = 0;
+-       if (apic_lvtt_oneshot(apic)) {
++       else if (apic_lvtt_oneshot(apic)) {
+                 ktimer->tscdeadline = 0;
+                 ktimer->target_expiration = 0;
+         }
+--
+1.8.3.1
