@@ -2,149 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C33513D18B
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 02:31:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DDF213D194
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 02:36:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729631AbgAPBbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 20:31:39 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:34838 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729590AbgAPBbi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 20:31:38 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00G1URI0050883;
-        Thu, 16 Jan 2020 01:31:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2019-08-05;
- bh=Sd9+nNWGjenWHpvPXIl4HnAkoueVByOhAHQjv8aEkKc=;
- b=VCbxjASwHlZZXr5TeTWjhJ5cAj7WPfVmN0RU5ByL2N6bEPeFrI+lJKbMe0sBf+1cCmV0
- B+0CVn50Rb/nhFpZgnYZZ+iWOFyhfgQ3d0OVXc32LvZxQQ/8rpcvw7vFg/V7lXIymjHq
- op9EtAmcW700cPbitWbT4WMT/5jDO+zoobsDhz9DXKJ2b/3yXiYqzWe3LGz8nvPnhTGA
- 9j8pVo/yFPNZERi69JtCmaKL3rQJJzyjHcQmK5GDdGTnqMtoBaKn71EJTbx1uB3c2kWA
- m1vzXEYSgMbXe8xJk+OocYxU7E+pPAh+2TOfZkbJErQA9PKrmxpI3ktZTKUnZRX8gZMj aQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2xf74sfnkc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Jan 2020 01:31:34 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00G1UhoC131583;
-        Thu, 16 Jan 2020 01:31:34 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2xj61kq0b3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Jan 2020 01:31:33 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00G1VWER019781;
-        Thu, 16 Jan 2020 01:31:32 GMT
-Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 15 Jan 2020 17:31:32 -0800
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+        id S1730040AbgAPBga convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 15 Jan 2020 20:36:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55808 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729195AbgAPBga (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Jan 2020 20:36:30 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com
-Subject: [PATCH 2/2 v3] kvm-unit-test: nVMX: Test GUEST_DR7 on vmentry of nested guests
-Date:   Wed, 15 Jan 2020 19:54:33 -0500
-Message-Id: <20200116005433.5242-3-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116005433.5242-1-krish.sadhukhan@oracle.com>
-References: <20200116005433.5242-1-krish.sadhukhan@oracle.com>
+Subject: [Bug 206215] QEMU guest crash due to random 'general protection
+ fault' since kernel 5.2.5 on i7-3517UE
+Date:   Thu, 16 Jan 2020 01:36:29 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: kernel@najdan.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206215-28872-Oa24nnXTGv@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206215-28872@https.bugzilla.kernel.org/>
+References: <bug-206215-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9501 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=13 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=954
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001160010
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9501 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=13 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001160010
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to section "Checks on Guest Control Registers, Debug Registers, and
-and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
-of nested guests:
+https://bugzilla.kernel.org/show_bug.cgi?id=206215
 
-   If the "load debug controls" VM-entry control is 1,
+--- Comment #4 from kernel@najdan.com ---
+(In reply to derek from comment #3)
+> On 1/15/20 4:52 PM, Sean Christopherson wrote:
+> > +cc Derek, who is hitting the same thing.
+> >
+> > On Wed, Jan 15, 2020 at 09:18:56PM +0000,
+> bugzilla-daemon@bugzilla.kernel.org
+> > wrote:
+> >> https://bugzilla.kernel.org/show_bug.cgi?id=206215
+> > *snip*
+> > that's a big smoking gun pointing at commit ca7e6b286333 ("KVM: X86: Fix
+> > fpu state crash in kvm guest"), which is commit e751732486eb upstream.
+> >
+> > 1. Can you verify reverting ca7e6b286333 (or e751732486eb in upstream)
+> >     solves the issue?
+> >
+> > 2. Assuming the answer is yes, on a buggy kernel, can you run with the
+> >     attached patch to try get debug info?
+> I did these out of order since I had 5.3.11 built with the patch, ready to
+> go
 
-      - bits 63:32 in the DR7 field must be 0.
+Sean,
+I'm not familiar with rebuilding the kernel, nor applying a patch but I'm
+working on it right now so I can provide feedback.
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Co-developed-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- x86/vmx_tests.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+> for weeks now, waiting for an opportunity to test.
+> 
+> Win10 guest immediately BSOD'ed with:
+> 
+> WARNING: CPU: 2 PID: 9296 at include/linux/thread_info.h:55 
+> kernel_fpu_begin+0x6b/0xc0
+> 
+> Then stashed the patch, reverted ca7e6b286333, compile, reboot.
+> 
+> Guest is running stable now on 5.3.11. Did test my CAD under the guest, did
+> not 
+> experience the crashes that had me stuck at 5.1.
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index fce773c..b773872 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -7442,6 +7442,49 @@ static void vmx_host_state_area_test(void)
- 	test_load_host_perf_global_ctrl();
- }
- 
-+/*
-+ * If the "load debug controls" VM-entry control is 1, bits 63:32 in
-+ * the DR7 field must be 0.
-+ *
-+ * [Intel SDM]
-+ */
-+static void test_guest_dr7(void)
-+{
-+	u32 ent_saved = vmcs_read(ENT_CONTROLS);
-+	u64 dr7_saved = vmcs_read(GUEST_DR7);
-+	u64 val;
-+	int i;
-+
-+	if (ctrl_enter_rev.set & ENT_LOAD_DBGCTLS) {
-+		vmcs_clear_bits(ENT_CONTROLS, ENT_LOAD_DBGCTLS);
-+		for (i = 0; i < 64; i++) {
-+			val = 1ull << i;
-+			vmcs_write(GUEST_DR7, val);
-+			enter_guest();
-+			report_guest_state_test("ENT_LOAD_DBGCTLS disabled",
-+						VMX_VMCALL, val, "GUEST_DR7");
-+		}
-+	}
-+	if (ctrl_enter_rev.clr & ENT_LOAD_DBGCTLS) {
-+		vmcs_set_bits(ENT_CONTROLS, ENT_LOAD_DBGCTLS);
-+		for (i = 0; i < 64; i++) {
-+			val = 1ull << i;
-+			vmcs_write(GUEST_DR7, val);
-+			if (i < 32)
-+				enter_guest();
-+			else
-+				enter_guest_with_invalid_guest_state();
-+			report_guest_state_test("ENT_LOAD_DBGCTLS enabled",
-+						i < 32 ? VMX_VMCALL :
-+						VMX_ENTRY_FAILURE |
-+						VMX_FAIL_STATE,
-+						val, "GUEST_DR7");
-+		}
-+	}
-+	vmcs_write(GUEST_DR7, dr7_saved);
-+	vmcs_write(ENT_CONTROLS, ent_saved);
-+}
-+
- /*
-  *  If the "load IA32_PAT" VM-entry control is 1, the value of the field
-  *  for the IA32_PAT MSR must be one that could be written by WRMSR
-@@ -7480,6 +7523,7 @@ static void vmx_guest_state_area_test(void)
- 	test_canonical(GUEST_SYSENTER_ESP, "GUEST_SYSENTER_ESP", false);
- 	test_canonical(GUEST_SYSENTER_EIP, "GUEST_SYSENTER_EIP", false);
- 
-+	test_guest_dr7();
- 	test_load_guest_pat();
- 	test_guest_efer();
- 	test_load_guest_perf_global_ctrl();
+> I did these out of order since I had 5.3.11 built with the patch, ready to
+> go 
+> for weeks now, waiting for an opportunity to test.
+> 
+> Win10 guest immediately BSOD'ed with:
+> 
+> WARNING: CPU: 2 PID: 9296 at include/linux/thread_info.h:55 
+> kernel_fpu_begin+0x6b/0xc0
+> 
+> Then stashed the patch, reverted ca7e6b286333, compile, reboot.
+> 
+> Guest is running stable now on 5.3.11. Did test my CAD under the guest, did
+> not 
+> experience the crashes that had me stuck at 5.1.
+
+Derek,
+
+Thanks for the update.
+
+I'm still curious about the hypervisor CPU model you have.
+
+On Windows I did exprecience a different behavior though.
+The OS did boot but the spice/VNC screen did freeze randomly.
+One of my windows VM did end up being corrupted as an update ehich tried to
+install just failed miserably.
+
+Anyways, I will try to provide debug details asap from the patch that Sean
+provided...
+
+To be continued ...
+
 -- 
-2.20.1
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
