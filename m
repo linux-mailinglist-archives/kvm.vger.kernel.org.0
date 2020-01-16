@@ -2,110 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EDB113E0F3
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 17:46:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 403DA13E1B4
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 17:51:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729827AbgAPQql (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 11:46:41 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:34822 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729078AbgAPQqk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:46:40 -0500
-Received: by mail-oi1-f193.google.com with SMTP id k4so19464495oik.2
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:46:40 -0800 (PST)
+        id S1728600AbgAPQvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 11:51:10 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:39991 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727008AbgAPQvK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 11:51:10 -0500
+Received: by mail-pg1-f193.google.com with SMTP id k25so10168566pgt.7
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:51:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wxJhezyPbBA8aRyd5KsJxa8feriOk3RYl1VYt4xENS8=;
-        b=sPboryS+Y1MX0Z77vZGatNjzHp3t0nXB9UjJ04h3Q7e37bVjWw8WeIDTigI78YP6Rw
-         JR0W8JiMRf1BJov7xZH9ZRdZXHJcQMofX6DX7Nm0oHmtAXwI8BJG0qV6zveLrERCUMTd
-         P/5eOAdosZYZ/K4u2yshpSueAaX3h1QtwCnWf/A7SrZOkYHn4sTcQlnrc7NF/jEICOhZ
-         TOAagZ0tuKM4i1xIPyRH51xx3xUsHofWpTxQQrJtddgoJsS1Rb1HHGyQeZxLtTKrBlQU
-         YO0fLCOfgIXm05581uWKd/s83c4Bbi8MTvsPinv5e9dWhVq8YOGBIp4x/Av/4NZ8wOGy
-         tEQw==
+        d=google.com; s=20161025;
+        h=date:from:subject:cc:to:in-reply-to:references:message-id
+         :mime-version:content-transfer-encoding;
+        bh=WX8RB1wfJCliH8/zi+tgub32ZBfKjuIQgKJ9j2z+hKk=;
+        b=kv/rnQJpRXl8xuYnke8mUPEG7MMS88JHDJvb4E6uV0XFinTRPPD5C/d39TE0W1yLGg
+         IveHIwSKvWqF8GWIAVXys0ek01P0zlslB1NhEkYuOQTobMKrpWAalExl/JFK7yyU0Yq0
+         RN4d7oM83AIzhO/LQ+k2eKOtqcDgfMqR5K2BBoTBgPPcCQKjQY1vZxVsvLeeVpRJOZmD
+         eRQROKW+eN7NWuqRF8n1g54NyVDjBhvST3om4ni5PwBSIHk02pNmz2QDJ3oaBuELwJCe
+         7fXGPGZ2gXBewewkWEIYT5M6hJVT30iUAhLwPdqGbI+xXXqAP3MBupENf9wLl5FFPuhq
+         48fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wxJhezyPbBA8aRyd5KsJxa8feriOk3RYl1VYt4xENS8=;
-        b=NpKGmhPut76PRR5ZJ5AaJKFmad8oJQZOVVxWgl5Id4lxHaZ9R4W1icmO5iUmRmIrE9
-         ZWH+AVwLMe5dpVlRGf7EooZ/HOq90Q1ar9BChahDgy6oo/z3lFDpldaJCRKpoHJRTId1
-         VDVZtjKMKzAE9RLiM+o9MwdBW57eFvdFWp1peAebp4Jt1px8rtwocMa4fvELZsmbpCVy
-         vuZjxYG8kiutXaUlTXh9q3BUSvuZpdPtOUG2zNSyLZaur9+yGUXiMci21Jl1I38OOqRe
-         PWPXcFIsMFZEuo9Xb9tUUFXIlKX1cPxwrcXYYCOAYgr2blwwtrZ5GisdnjvKn2VEAkQF
-         0Eqw==
-X-Gm-Message-State: APjAAAWi5SP80PxB8MVZlZc4L1kv4F4u7RhC62CdCLnONEzw6VzrQFZh
-        P8t9qwVzLmPzrLl8kwvUxBJENYECDZlU6IJailIs7Q==
-X-Google-Smtp-Source: APXvYqzuSJa2ft4QBFw8JQgFAeiMrfvJSe3POoFV1RWg4NU1w13QbrmXUN23jsB4YutJckZJ+XkLKg+TjG9q253LEjM=
-X-Received: by 2002:aca:d78b:: with SMTP id o133mr4869620oig.163.1579193199671;
- Thu, 16 Jan 2020 08:46:39 -0800 (PST)
-MIME-Version: 1.0
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com> <1578483143-14905-10-git-send-email-gengdongjiu@huawei.com>
-In-Reply-To: <1578483143-14905-10-git-send-email-gengdongjiu@huawei.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 16 Jan 2020 16:46:28 +0000
-Message-ID: <CAFEAcA-mLgD8rQ211ep44nd8oxTKSnxc7YmY+nPtADpKZk5asA@mail.gmail.com>
-Subject: Re: [PATCH v22 9/9] MAINTAINERS: Add ACPI/HEST/GHES entries
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Fam Zheng <fam@euphon.net>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "xuwei (O)" <xuwei5@huawei.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
-        Zheng Xiang <zhengxiang9@huawei.com>,
-        Linuxarm <linuxarm@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
+         :message-id:mime-version:content-transfer-encoding;
+        bh=WX8RB1wfJCliH8/zi+tgub32ZBfKjuIQgKJ9j2z+hKk=;
+        b=IqF7+mwdrW2VOsMYLoS14J1NtUX3xMl/SiwgzRZFn4LHfN23+AlZaoX3bXEcarmOMm
+         HErr2gRA2j0NIgFH5OngkK6tDQWSNoYGgEJww+LonrwA15Rn76I2azyynTMKEDxhRiES
+         Ozhgc9ihMFuW2sV9oDjjM42LsZ5GhaqtYLOzXka7Xyuxi+mfBFnXqaFTutKkVDGw9EWF
+         189q36pKx6wxAT32qr3FpZutcqTcD8pHCO/1e3u2jpbL+SKVgzXbNrjxVEhvlmsL2SeK
+         AQvRBSgZVEKJ28ST5U2EsKBfxaCJJyuiAc+4VOE0Qs7Ds0fSaB620csUvdRtfVes46nm
+         +KBA==
+X-Gm-Message-State: APjAAAV3YSJw6e1is6wcKb6Jk+xySvrBnaY5WIhFNW4GgOXGO/XWVvhX
+        WDGzME4ggP1LaqI+UAxFwsj59A==
+X-Google-Smtp-Source: APXvYqy27Y/ZAUAQAnIzlxv1ajCi6HqFGtLCh8M57hfohNhgC3bsmthRFBrHGcYWEFQ5TfRZ98IBsQ==
+X-Received: by 2002:a65:530d:: with SMTP id m13mr40368954pgq.351.1579193469245;
+        Thu, 16 Jan 2020 08:51:09 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
+        by smtp.gmail.com with ESMTPSA id s1sm24561586pgv.87.2020.01.16.08.51.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2020 08:51:08 -0800 (PST)
+Date:   Thu, 16 Jan 2020 08:51:08 -0800 (PST)
+X-Google-Original-Date: Thu, 16 Jan 2020 08:34:33 PST (-0800)
+From:   Palmer Dabbelt <palmerdabbelt@google.com>
+X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
+Subject:     Re: [PATCH v10 01/19] RISC-V: Export riscv_cpuid_to_hartid_mask() API
+CC:     Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu,
+        pbonzini@redhat.com, rkrcmar@redhat.com, graf@amazon.com,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@lst.de>, anup@brainfault.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Anup Patel <Anup.Patel@wdc.com>
+To:     Anup Patel <Anup.Patel@wdc.com>
+In-Reply-To: <20191223113443.68969-2-anup.patel@wdc.com>
+References: <20191223113443.68969-2-anup.patel@wdc.com>
+  <20191223113443.68969-1-anup.patel@wdc.com>
+Message-ID: <mhng-81eb8962-4c58-4e5b-9ee1-0e6c0afb2c00@palmerdabbelt-glaptop>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 Jan 2020 at 11:32, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+On Mon, 23 Dec 2019 03:35:19 PST (-0800), Anup Patel wrote:
+> The riscv_cpuid_to_hartid_mask() API should be exported to allow
+> building KVM RISC-V as loadable module.
 >
-> I and Xiang are willing to review the APEI-related patches and
-> volunteer as the reviewers for the HEST/GHES part.
->
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> Signed-off-by: Anup Patel <anup.patel@wdc.com>
 > ---
->  MAINTAINERS | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  arch/riscv/kernel/smp.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 387879a..5af70a5 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1423,6 +1423,15 @@ F: tests/bios-tables-test.c
->  F: tests/acpi-utils.[hc]
->  F: tests/data/acpi/
->
-> +ACPI/HEST/GHES
-> +R: Dongjiu Geng <gengdongjiu@huawei.com>
-> +R: Xiang Zheng <zhengxiang9@huawei.com>
-> +L: qemu-arm@nongnu.org
-> +S: Maintained
-> +F: hw/acpi/ghes.c
-> +F: include/hw/acpi/ghes.h
-> +F: docs/specs/acpi_hest_ghes.rst
-> +
->  ppc4xx
->  M: David Gibson <david@gibson.dropbear.id.au>
->  L: qemu-ppc@nongnu.org
-> --
+> diff --git a/arch/riscv/kernel/smp.c b/arch/riscv/kernel/smp.c
+> index eb878abcaaf8..6fc7828d41e4 100644
+> --- a/arch/riscv/kernel/smp.c
+> +++ b/arch/riscv/kernel/smp.c
+> @@ -10,6 +10,7 @@
+>  
+>  #include <linux/cpu.h>
+>  #include <linux/interrupt.h>
+> +#include <linux/module.h>
+>  #include <linux/profile.h>
+>  #include <linux/smp.h>
+>  #include <linux/sched.h>
+> @@ -63,6 +64,7 @@ void riscv_cpuid_to_hartid_mask(const struct cpumask *in, struct cpumask *out)
+>  	for_each_cpu(cpu, in)
+>  		cpumask_set_cpu(cpuid_to_hartid_map(cpu), out);
+>  }
+> +EXPORT_SYMBOL_GPL(riscv_cpuid_to_hartid_mask);
+>  
+>  bool arch_match_cpu_phys_id(int cpu, u64 phys_id)
+>  {
+> -- 
+> 2.17.1
 
-Michael, Igor: since this new MAINTAINERS section is
-moving files out of the 'ACPI/SMBIOS' section that you're
-currently responsible for, do you want to provide an
-acked-by: that you think this division of files makes sense?
-
-thanks
--- PMM
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
