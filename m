@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BBCD13DA80
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 13:49:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6519513DA79
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 13:49:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727026AbgAPMrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 07:47:01 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9639 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726752AbgAPMq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726973AbgAPMq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 16 Jan 2020 07:46:58 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id B12F5C83404AD649F118;
+Received: from szxga06-in.huawei.com ([45.249.212.32]:60358 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726513AbgAPMq5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 07:46:57 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id C0D6D10B7A71FDDEFD05;
         Thu, 16 Jan 2020 20:46:54 +0800 (CST)
 Received: from DESKTOP-1NISPDV.china.huawei.com (10.173.221.248) by
  DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 16 Jan 2020 20:46:45 +0800
+ 14.3.439.0; Thu, 16 Jan 2020 20:46:46 +0800
 From:   Zengruan Ye <yezengruan@huawei.com>
 To:     <linux-kernel@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
@@ -29,9 +29,9 @@ CC:     <yezengruan@huawei.com>, <maz@kernel.org>, <james.morse@arm.com>,
         <mark.rutland@arm.com>, <will@kernel.org>, <steven.price@arm.com>,
         <daniel.lezcano@linaro.org>, <wanghaibin.wang@huawei.com>,
         <peterz@infradead.org>, <longman@redhat.com>
-Subject: [PATCH v3 1/8] KVM: arm64: Document PV-lock interface
-Date:   Thu, 16 Jan 2020 20:46:19 +0800
-Message-ID: <20200116124626.1155-2-yezengruan@huawei.com>
+Subject: [PATCH v3 2/8] arm64: Probe for the presence of KVM hypervisor services during boot
+Date:   Thu, 16 Jan 2020 20:46:20 +0800
+Message-ID: <20200116124626.1155-3-yezengruan@huawei.com>
 X-Mailer: git-send-email 2.23.0.windows.1
 In-Reply-To: <20200116124626.1155-1-yezengruan@huawei.com>
 References: <20200116124626.1155-1-yezengruan@huawei.com>
@@ -45,118 +45,158 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a paravirtualization interface for KVM/arm64 to obtain the vCPU
-that is currently running or not.
+From: Will Deacon <will@kernel.org>
 
-The PV lock structure of the guest is allocated by user space.
+Although the SMCCC specification provides some limited functionality for
+describing the presence of hypervisor and firmware services, this is
+generally applicable only to functions designated as "Arm Architecture
+Service Functions" and no portable discovery mechanism is provided for
+standard hypervisor services, despite having a designated range of
+function identifiers reserved by the specification.
 
-A hypercall interface is provided for the guest to interrogate the
-hypervisor's support for this interface and the location of the shared
-memory structures.
+In an attempt to avoid the need for additional firmware changes every
+time a new function is added, introduce a UID to identify the service
+provider as being compatible with KVM. Once this has been established,
+additional services can be discovered via a feature bitmap.
 
-Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
+Signed-off-by: Will Deacon <will@kernel.org>
+[yezengruan@huawei.com: rebased]
 ---
- Documentation/virt/kvm/arm/pvlock.rst   | 68 +++++++++++++++++++++++++
- Documentation/virt/kvm/devices/vcpu.txt | 14 +++++
- 2 files changed, 82 insertions(+)
- create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
+ arch/arm64/include/asm/hypervisor.h | 11 +++++++++
+ arch/arm64/kernel/setup.c           | 35 +++++++++++++++++++++++++++++
+ include/linux/arm-smccc.h           | 26 +++++++++++++++++++++
+ 3 files changed, 72 insertions(+)
 
-diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
-new file mode 100644
-index 000000000000..11776273c0a4
---- /dev/null
-+++ b/Documentation/virt/kvm/arm/pvlock.rst
-@@ -0,0 +1,68 @@
-+.. SPDX-License-Identifier: GPL-2.0
+diff --git a/arch/arm64/include/asm/hypervisor.h b/arch/arm64/include/asm/hypervisor.h
+index f9cc1d021791..91e4bd890819 100644
+--- a/arch/arm64/include/asm/hypervisor.h
++++ b/arch/arm64/include/asm/hypervisor.h
+@@ -2,6 +2,17 @@
+ #ifndef _ASM_ARM64_HYPERVISOR_H
+ #define _ASM_ARM64_HYPERVISOR_H
+ 
++#include <linux/arm-smccc.h>
+ #include <asm/xen/hypervisor.h>
+ 
++static inline bool kvm_arm_hyp_service_available(u32 func_id)
++{
++	extern DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS);
 +
-+Paravirtualized lock support for arm64
-+======================================
++	if (func_id >= ARM_SMCCC_KVM_NUM_FUNCS)
++		return -EINVAL;
 +
-+KVM/arm64 provides some hypervisor service calls to support a paravirtualized
-+guest obtaining whether the vCPU is currently running or not.
++	return test_bit(func_id, __kvm_arm_hyp_services);
++}
 +
-+Two new SMCCC compatible hypercalls are defined:
-+* ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID:  0x86000001
-+  - KVM_PV_LOCK_FEATURES   0
-+  - KVM_PV_LOCK_PREEMPTED  1
+ #endif
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index 56f664561754..ad595c30ded0 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -7,6 +7,7 @@
+  */
+ 
+ #include <linux/acpi.h>
++#include <linux/arm-smccc.h>
+ #include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/stddef.h>
+@@ -275,6 +276,39 @@ static int __init reserve_memblock_reserved_regions(void)
+ arch_initcall(reserve_memblock_reserved_regions);
+ 
+ u64 __cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = INVALID_HWID };
++DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) = { };
 +
-+The existence of the PV_LOCK hypercall should be probed using the SMCCC 1.1
-+ARCH_FEATURES mechanism and the hypervisor should be KVM before calling it.
++static void __init kvm_init_hyp_services(void)
++{
++	int i;
++	struct arm_smccc_res res;
 +
-+KVM_PV_LOCK_FEATURES
-+    ============= ========    ==========
-+    Function ID:  (uint32)    0x86000001
-+    PV_call_id:   (uint32)    0
-+    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
-+                              PV-lock feature is supported by the hypervisor.
-+    ============= ========    ==========
++	if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
++		return;
 +
-+KVM_PV_LOCK_PREEMPTED
-+    ============= ========    ==========
-+    Function ID:  (uint32)    0x86000001
-+    PV_call_id:   (uint32)    1
-+    Return value: (int64)     IPA of the PV-lock data structure for this vCPU.
-+                              On failure:
-+                              NOT_SUPPORTED (-1)
-+    ============= ========    ==========
++	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
++	if (res.a0 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 ||
++	    res.a1 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 ||
++	    res.a2 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 ||
++	    res.a3 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3)
++		return;
 +
-+The IPA returned by KVM_PV_LOCK_PREEMPTED should be mapped by the guest as
-+normal memory with inner and outer write back caching attributes, in the inner
-+shareable domain.
++	memset(&res, 0, sizeof(res));
++	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID, &res);
++	for (i = 0; i < 32; ++i) {
++		if (res.a0 & (i))
++			set_bit(i + (32 * 0), __kvm_arm_hyp_services);
++		if (res.a1 & (i))
++			set_bit(i + (32 * 1), __kvm_arm_hyp_services);
++		if (res.a2 & (i))
++			set_bit(i + (32 * 2), __kvm_arm_hyp_services);
++		if (res.a3 & (i))
++			set_bit(i + (32 * 3), __kvm_arm_hyp_services);
++	}
 +
-+KVM_PV_LOCK_PREEMPTED returns the structure for the calling vCPU.
++	pr_info("KVM hypervisor services detected (0x%08lx 0x%08lx 0x%08lx 0x%08lx)\n",
++		res.a3, res.a2, res.a1, res.a0);
++}
+ 
+ void __init setup_arch(char **cmdline_p)
+ {
+@@ -337,6 +371,7 @@ void __init setup_arch(char **cmdline_p)
+ 	else
+ 		psci_acpi_init();
+ 
++	kvm_init_hyp_services();
+ 	cpu_read_bootcpu_ops();
+ 	smp_init_cpus();
+ 	smp_build_mpidr_hash();
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 59494df0f55b..2b2c295c9109 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -46,11 +46,14 @@
+ #define ARM_SMCCC_OWNER_OEM		3
+ #define ARM_SMCCC_OWNER_STANDARD	4
+ #define ARM_SMCCC_OWNER_STANDARD_HYP	5
++#define ARM_SMCCC_OWNER_VENDOR_HYP	6
+ #define ARM_SMCCC_OWNER_TRUSTED_APP	48
+ #define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
+ #define ARM_SMCCC_OWNER_TRUSTED_OS	50
+ #define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
+ 
++#define ARM_SMCCC_FUNC_QUERY_CALL_UID	0xff01
 +
-+PV lock state
-+-------------
+ #define ARM_SMCCC_QUIRK_NONE		0
+ #define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
+ 
+@@ -377,5 +380,28 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
+ 			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+ 			   0x21)
+ 
++#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
 +
-+The structure pointed to by the KVM_PV_LOCK_PREEMPTED hypercall is as follows:
++/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
 +
-++-----------+-------------+-------------+-----------------------------------+
-+| Field     | Byte Length | Byte Offset | Description                       |
-++===========+=============+=============+===================================+
-+| preempted |      8      |      0      | Indicates that the vCPU that owns |
-+|           |             |             | this struct is running or not.    |
-+|           |             |             | Non-zero values mean the vCPU has |
-+|           |             |             | been preempted. Zero means the    |
-+|           |             |             | vCPU is not preempted.            |
-++-----------+-------------+-------------+-----------------------------------+
++/* KVM "vendor specific" services */
++#define ARM_SMCCC_KVM_FUNC_FEATURES		0
++#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
++#define ARM_SMCCC_KVM_NUM_FUNCS			128
 +
-+The preempted field will be updated to 1 by the hypervisor prior to scheduling
-+a vCPU. When the vCPU is scheduled out, the preempted field will be updated
-+to 0 by the hypervisor.
++#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_FEATURES)
 +
-+The structure will be present within a reserved region of the normal memory
-+given to the guest. The guest should not attempt to write into this memory.
-+There is a structure per vCPU of the guest.
-+
-+It is advisable that one or more 64k pages are set aside for the purpose of
-+these structures and not used for other purposes, this enables the guest to map
-+the region using 64k pages and avoids conflicting attributes with other memory.
-+
-+For the user space interface see Documentation/virt/kvm/devices/vcpu.txt
-+section "4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL".
-diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
-index 6f3bd64a05b0..2c68d9a0f644 100644
---- a/Documentation/virt/kvm/devices/vcpu.txt
-+++ b/Documentation/virt/kvm/devices/vcpu.txt
-@@ -74,3 +74,17 @@ Specifies the base address of the stolen time structure for this VCPU. The
- base address must be 64 byte aligned and exist within a valid guest memory
- region. See Documentation/virt/kvm/arm/pvtime.txt for more information
- including the layout of the stolen time structure.
-+
-+4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL
-+Architectures: ARM64
-+
-+4.1 ATTRIBUTE: KVM_ARM_VCPU_PVLOCK_IPA
-+Parameters: 64-bit base address
-+Returns: -ENXIO:  PV lock not implemented
-+         -EEXIST: Base address already set for this vCPU
-+         -EINVAL: Base address not 64 byte aligned
-+
-+Specifies the base address of the PV lock structure for this vCPU. The
-+base address must be 64 byte aligned and exist within a valid guest memory
-+region. See Documentation/virt/kvm/arm/pvlock.rst for more information
-+including the layout of the pv lock structure.
+ #endif /*__ASSEMBLY__*/
+ #endif /*__LINUX_ARM_SMCCC_H*/
 -- 
 2.19.1
 
