@@ -2,149 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6ACF813EE64
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 19:09:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EBC613EFE4
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 19:18:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395047AbgAPSIy convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 16 Jan 2020 13:08:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45272 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2395046AbgAPSIu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 13:08:50 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 206215] QEMU guest crash due to random 'general protection
- fault' since kernel 5.2.5 on i7-3517UE
-Date:   Thu, 16 Jan 2020 18:08:49 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: sean.j.christopherson@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-206215-28872-ppTHYf6H3E@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-206215-28872@https.bugzilla.kernel.org/>
-References: <bug-206215-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S2387958AbgAPSSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 13:18:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36775 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2404253AbgAPSR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 13:17:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579198676;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=t3VlM5eWHxNK3W2wSrtp5Pl0J5UynFugOHYM0lHZotI=;
+        b=MCMP8aKtmhJ9hHoIca3ND1Foz/tXeXOu3vJpf3Uua8HkjxSKtroeAvvUrtGLr+wyvmxZzk
+        nuFaor1SwiOCTY3ZGmxQoXnHfJtvALgdZVlv7CoKBArg68UmVkPKIXw7qxqOhlYYrJls0b
+        nnKHkk9zoSZGI1Gqp4+9x0PcmFbbqek=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-276-aZJcF4RYP-a0nsHacWQwpA-1; Thu, 16 Jan 2020 13:17:53 -0500
+X-MC-Unique: aZJcF4RYP-a0nsHacWQwpA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FD4C18C35A0;
+        Thu, 16 Jan 2020 18:17:52 +0000 (UTC)
+Received: from gimli.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A8AC5C241;
+        Thu, 16 Jan 2020 18:17:49 +0000 (UTC)
+Subject: [RFC PATCH 0/3] vfio/type1: Reduce vfio_iommu.lock contention
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     yan.y.zhao@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Thu, 16 Jan 2020 11:17:49 -0700
+Message-ID: <157919849533.21002.4782774695733669879.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=206215
+Hi Yan,
 
---- Comment #6 from Sean Christopherson (sean.j.christopherson@intel.com) ---
-On Thu, Jan 16, 2020 at 07:38:54AM -0800, Sean Christopherson wrote:
-> On Wed, Jan 15, 2020 at 08:08:32PM -0500, Derek Yerger wrote:
-> > On 1/15/20 4:52 PM, Sean Christopherson wrote:
-> > >+cc Derek, who is hitting the same thing.
-> > >
-> > >On Wed, Jan 15, 2020 at 09:18:56PM +0000,
-> bugzilla-daemon@bugzilla.kernel.org wrote:
-> > >>https://bugzilla.kernel.org/show_bug.cgi?id=206215
-> > >*snip*
-> > >that's a big smoking gun pointing at commit ca7e6b286333 ("KVM: X86: Fix
-> > >fpu state crash in kvm guest"), which is commit e751732486eb upstream.
-> > >
-> > >1. Can you verify reverting ca7e6b286333 (or e751732486eb in upstream)
-> > >    solves the issue?
-> > >
-> > >2. Assuming the answer is yes, on a buggy kernel, can you run with the
-> > >    attached patch to try get debug info?
-> > I did these out of order since I had 5.3.11 built with the patch, ready to
-> > go for weeks now, waiting for an opportunity to test.
-> > 
-> > Win10 guest immediately BSOD'ed with:
-> > 
-> > WARNING: CPU: 2 PID: 9296 at include/linux/thread_info.h:55
-> > kernel_fpu_begin+0x6b/0xc0
-> 
-> Can you provide the full stack trace of the WARN?  I'm hoping that will
-> provide a hint as to what's going wrong.
+I wonder if this might reduce the lock contention you're seeing in the
+vfio_dma_rw series.  These are only compile tested on my end, so I hope
+they're not too broken to test.  Thanks,
 
-Aha!  I found at least two cases where TIF_NEED_FPU_LOAD could be set
-without the vCPU being preempted.
+Alex
 
-The comment on fpregs_lock() states that softirq can set TIF_NEED_FPU_LOAD,
-which would not be handled by the preempt notifier.
+---
 
-  /*
-   * Use fpregs_lock() while editing CPU's FPU registers or fpu->state.
-   * A context switch will (and softirq might) save CPU's FPU registers to
-                           ^^^^^^^^^^^^^^^^^^^
-   * fpu->state and set TIF_NEED_FPU_LOAD leaving CPU's FPU registers in
-   * a random state.
-   */
-  static inline void fpregs_lock(void)
+Alex Williamson (3):
+      vfio/type1: Convert vfio_iommu.lock from mutex to rwsem
+      vfio/type1: Replace obvious read lock instances
+      vfio/type1: Introduce pfn_list mutex
 
-The other scenario is from a stack trace from commit f775b13eedee ("x86,kvm:
-move qemu/guest FPU switching out to vcpu_run"), which clearly shows that
-kernel_fpu_begin() can be invoked without KVM being preempted.
 
-  __warn+0xcb/0xf0
-  warn_slowpath_null+0x1d/0x20
-  kernel_fpu_disable+0x3f/0x50
-  __kernel_fpu_begin+0x49/0x100
-  kernel_fpu_begin+0xe/0x10
-  crc32c_pcl_intel_update+0x84/0xb0
-  crypto_shash_update+0x3f/0x110
-  crc32c+0x63/0x8a [libcrc32c]
-  dm_bm_checksum+0x1b/0x20 [dm_persistent_data]
-  node_prepare_for_write+0x44/0x70 [dm_persistent_data]
-  dm_block_manager_write_callback+0x41/0x50 [dm_persistent_data]
-  submit_io+0x170/0x1b0 [dm_bufio]
-  __write_dirty_buffer+0x89/0x90 [dm_bufio]
-  __make_buffer_clean+0x4f/0x80 [dm_bufio]
-  __try_evict_buffer+0x42/0x60 [dm_bufio]
-  dm_bufio_shrink_scan+0xc0/0x130 [dm_bufio]
-  shrink_slab.part.40+0x1f5/0x420
-  shrink_node+0x22c/0x320
-  do_try_to_free_pages+0xf5/0x330
-  try_to_free_pages+0xe9/0x190
-  __alloc_pages_slowpath+0x40f/0xba0
-  __alloc_pages_nodemask+0x209/0x260
-  alloc_pages_vma+0x1f1/0x250
-  do_huge_pmd_anonymous_page+0x123/0x660
-  handle_mm_fault+0xfd3/0x1330
-  __get_user_pages+0x113/0x640
-  get_user_pages+0x4f/0x60
-  __gfn_to_pfn_memslot+0x120/0x3f0 [kvm]
-  try_async_pf+0x66/0x230 [kvm]
-  tdp_page_fault+0x130/0x280 [kvm]
-  kvm_mmu_page_fault+0x60/0x120 [kvm]
-  handle_ept_violation+0x91/0x170 [kvm_intel]
-  vmx_handle_exit+0x1ca/0x1400 [kvm_intel]
+ drivers/vfio/vfio_iommu_type1.c |   67 ++++++++++++++++++++++++---------------
+ 1 file changed, 41 insertions(+), 26 deletions(-)
 
-Either of the above explains why pre-e751732486eb code waited until IRQs
-are disabled by vcpu_enter_guest() to do switch_fpu_return().
-
-Properly fixing soley within KVM is going to be somewhat painful.  The
-most common case, vcpu_enter_guest(), which is being hit here, is easy
-to handle by restoring the switch_fpu_return() that was removed by commit
-e751732486eb.  The other obvious case I see is emulator's access of guest
-fpu state, which will effectively require reverting commit 6ab0b9feb82a
-("x86,kvm: remove KVM emulator get_fpu / put_fpu") along with new
-implementations of the hooks to handle TIF_NEED_FPU_LOAD.
-
-> > Then stashed the patch, reverted ca7e6b286333, compile, reboot.
-> > 
-> > Guest is running stable now on 5.3.11. Did test my CAD under the guest, did
-> > not experience the crashes that had me stuck at 5.1.
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
