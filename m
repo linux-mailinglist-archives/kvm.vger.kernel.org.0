@@ -2,160 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 65E1713F994
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 20:32:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FDD313F9C5
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 20:48:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733138AbgAPTcr convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 16 Jan 2020 14:32:47 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60692 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729010AbgAPTcr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 14:32:47 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 206215] QEMU guest crash due to random 'general protection
- fault' since kernel 5.2.5 on i7-3517UE
-Date:   Thu, 16 Jan 2020 19:32:45 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: sean.j.christopherson@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-206215-28872-e0skJbXyc4@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-206215-28872@https.bugzilla.kernel.org/>
-References: <bug-206215-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1729538AbgAPTru (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 14:47:50 -0500
+Received: from mail-eopbgr760081.outbound.protection.outlook.com ([40.107.76.81]:20804
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729485AbgAPTru (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 14:47:50 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VkaC7PD3r8IRDgD4DdTThxOEhrUvHApymGMixLNsUkMxzlbJkf4FSJ1eigbg4i+RiQsUYf21bAetyZRcDphYsTYTRuZN/x5X3vZJ7oAWIsdlwwDSYdxUCSJlZr4A6oV6e2BYmT/KxaUrlm5+TYJ8Pr3j4DbbrMFsLDd+0zU7Lmxf/nRJSDfjjh9bdBuOTU68KC1vq0kPBeLYZbhIRDcdiZNclVI/xqRJ5Kfa/rcBZerB3ymzZrK84uWxPiQ9Zxs1tCE8UQqwsSO7Uk2CuEW2PzQqL2syXzJlbu06+5+ikm7KL5mUyzXztI0Lxqvhe18Lm8zjS2EP9Rgxdlc5c/NfVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ofDM2olXIfCyrBbqaAPvqsScVB5fJMiXCWaadGsq018=;
+ b=IgETSF0AXMDx+oY9CS50ypYI85QEu/AtkBNswHEHeRKoA94iKE+3G7W7HbmYbmZTiqTjYFXUgkNCWFU47hEFlOnPmK4L/qPh9xsMM3MiVsML4svudzOs4X6llO/V+u2Ir82kSslDx+svGHRuUS13/wCaaYEuVVquugMWr/lMWbXUkUyhl3papvIfOF2rPIa4yeGjw5EbfK2YoFtQDCYGq1vvf5XCszY6VIbiwRu32hLx5XwmgsnAUDXJFdKW61b50ODU4EWtaaE3VS4MX47jsiuaJqcM+GUjRHwHi5quQByPJphplRd8R5ULRdC6BYnOtOakMwiFQpcHxIhJWxQRzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ofDM2olXIfCyrBbqaAPvqsScVB5fJMiXCWaadGsq018=;
+ b=icdPi1ZKTwIGLBV0HeDrQ7yzFYrZSDfSeF9L5yNvMztGwRQFzS3ejr+sVPpGiUYfG9YL8FnaBwYNCFz/ZdkCpLbcE14dbeV3yYmw1GiI5tqGIW5g/UvlYOgQ/Fx/s7rXwHI8lCtYroSgkOXnAG7EuqmUYPapZc7VhAz4k5BCTDM=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com (10.172.71.23) by
+ CY4PR12MB1799.namprd12.prod.outlook.com (10.175.60.9) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.19; Thu, 16 Jan 2020 19:47:47 +0000
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd]) by CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd%7]) with mapi id 15.20.2644.015; Thu, 16 Jan 2020
+ 19:47:47 +0000
+Subject: [kvm-unit-tests PATCH v2] x86: Add a kvm module parameter check for
+ vmware_backdoors test
+From:   Babu Moger <babu.moger@amd.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org
+Date:   Thu, 16 Jan 2020 13:47:46 -0600
+Message-ID: <157920400074.15031.16850091609715260458.stgit@naples-babu.amd.com>
+User-Agent: StGit/unknown-version
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN1PR12CA0072.namprd12.prod.outlook.com
+ (2603:10b6:802:20::43) To CY4PR12MB1574.namprd12.prod.outlook.com
+ (2603:10b6:910:e::23)
 MIME-Version: 1.0
+Received: from naples-babu.amd.com (165.204.78.2) by SN1PR12CA0072.namprd12.prod.outlook.com (2603:10b6:802:20::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.9 via Frontend Transport; Thu, 16 Jan 2020 19:47:46 +0000
+X-Originating-IP: [165.204.78.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: a0cbe64c-9472-4cba-d3e5-08d79abcf637
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1799:|CY4PR12MB1799:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CY4PR12MB17993C2D898840B29ADA00B395360@CY4PR12MB1799.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2089;
+X-Forefront-PRVS: 02843AA9E0
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(136003)(346002)(396003)(366004)(376002)(189003)(199004)(956004)(81166006)(6916009)(316002)(26005)(52116002)(103116003)(81156014)(7696005)(8676002)(2906002)(186003)(66556008)(86362001)(4326008)(8936002)(66476007)(478600001)(16526019)(44832011)(5660300002)(4744005)(66946007)(55016002);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR12MB1799;H:CY4PR12MB1574.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7S6WSiAtg82tegA/A1gQilNxG/YbDZWmWn1yr/6rPXlWUyYq6GxdwKYpSfEFDD5tivxvjU9Bu9lFgY2yZVoH0nC5fh6fYGTBuy2onLzLrGTdmZyfwCVmVA8N7HPbVVgAfuJK45/W08OREszNbCkm2D8dvu/hLKDmNA7HBnb2Q6zvKq2ZOCr3t7t1bKp1yskNSn6awCKwHjR5uBwCu58rMFrgFuadarR7rkwG9O0OUZtpY82RsADgmLjpbvKhFrBIrrtXb7jM4LwvLvFK5MYtpejTaMmgvT4LaJ9F2HB32IpcTzIDrsp0cAb0J2n+mMA1CcaulzEz3UypTFiRGtsPnUvOURYL4uZ1WCicaaKwIOJmkLWDXjH8NKaT9+u2M7yRzMBwdh57vZhhTxXezEDaoY41x0PV2sCegnf/iJ9iJRi3MghYAuCKjyOUvawrwW+1
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a0cbe64c-9472-4cba-d3e5-08d79abcf637
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2020 19:47:47.3596
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /Fw7y35/sbnIqmkaVF6Kc3Iyz6BYIemqZwrRJc1/VBgD1VsAbu9p+eNR2+GcoWya
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1799
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=206215
+vmware_backdoors test fails if the kvm module parameter
+enable_vmware_backdoor is not set to Y. Add a check before
+running the test.
 
---- Comment #8 from Sean Christopherson (sean.j.christopherson@intel.com) ---
-On Thu, Jan 16, 2020 at 02:21:25PM -0500, Derek Yerger wrote:
->  <IRQ>
->  gcmaes_crypt_by_sg.constprop.12+0x26e/0x660
->  ? 0xffffffffc024547d
->  ? __qdisc_run+0x83/0x510
->  ? __dev_queue_xmit+0x45e/0x990
->  ? ip_finish_output2+0x1a8/0x570
->  ? fib4_rule_action+0x61/0x70
->  ? fib4_rule_action+0x70/0x70
->  ? fib_rules_lookup+0x13f/0x1c0
->  ? helper_rfc4106_decrypt+0x82/0xa0
->  ? crypto_aead_decrypt+0x40/0x70
->  ? crypto_aead_decrypt+0x40/0x70
->  ? crypto_aead_decrypt+0x40/0x70
->  ? esp_output_tail+0x8f4/0xa5a [esp4]
->  ? skb_ext_add+0xd3/0x170
->  ? xfrm_input+0x7a6/0x12c0
->  ? xfrm4_rcv_encap+0xae/0xd0
->  ? xfrm4_transport_finish+0x200/0x200
->  ? udp_queue_rcv_one_skb+0x1ba/0x460
->  ? udp_unicast_rcv_skb.isra.63+0x72/0x90
->  ? __udp4_lib_rcv+0x51b/0xb00
->  ? ip_protocol_deliver_rcu+0xd2/0x1c0
->  ? ip_local_deliver_finish+0x44/0x50
->  ? ip_local_deliver+0xe0/0xf0
->  ? ip_protocol_deliver_rcu+0x1c0/0x1c0
->  ? ip_rcv+0xbc/0xd0
->  ? ip_rcv_finish_core.isra.19+0x380/0x380
->  ? __netif_receive_skb_one_core+0x7e/0x90
->  ? netif_receive_skb_internal+0x3d/0xb0
->  ? napi_gro_receive+0xed/0x150
->  ? 0xffffffffc0243c77
->  ? net_rx_action+0x149/0x3b0
->  ? __do_softirq+0xe4/0x2f8
+Suggested-by: Wei Huang <Wei.Huang2@amd.com>
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+---
+v2: Fixed Wei's name.
+    Added reviwed by Liran Alon.
 
-Bingo!  Thanks Derek!
+ x86/unittests.cfg |    1 +
+ 1 file changed, 1 insertion(+)
 
->  ? handle_irq_event_percpu+0x6a/0x80
->  ? irq_exit+0xe6/0xf0
->  ? do_IRQ+0x7f/0xd0
->  ? common_interrupt+0xf/0xf
->  </IRQ>
->  ? irq_entries_start+0x20/0x660
->  ? vmx_get_interrupt_shadow+0x2f0/0x710 [kvm_intel]
->  ? kvm_set_msr_common+0xfc7/0x2380 [kvm]
->  ? recalibrate_cpu_khz+0x10/0x10
->  ? ktime_get+0x3a/0xa0
->  ? kvm_arch_vcpu_ioctl_run+0x107/0x560 [kvm]
->  ? kvm_init+0x6bf/0xd00 [kvm]
->  ? __seccomp_filter+0x7a/0x680
->  ? do_vfs_ioctl+0xa4/0x630
->  ? security_file_ioctl+0x32/0x50
->  ? ksys_ioctl+0x60/0x90
->  ? __x64_sys_ioctl+0x16/0x20
->  ? do_syscall_64+0x5f/0x1a0
->  ? entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> ---[ end trace 9564a1ccad733a90 ]---
-> WARNING: CPU: 2 PID: 9296 at arch/x86/kvm/x86.c:8060
-> kvm_set_msr_common+0x2230/0x2380 [kvm]
-> Modules linked in: vhost_net(E) vhost(E) macvtap(E) macvlan(E) tap(E)
-> esp4(E) xt_CHECKSUM(E) xt_MASQUERADE(E) tun(E) bridge(E) stp(E) llc(E)
-> ip6t_rpfilter(E) nf_log_ipv6(E) ip6t_REJECT(E) nf_reject_ipv6>
->  mei_hdcp(E) kvm(E) intel_cstate(E) intel_uncore(E) intel_rapl_perf(E)
-> eeepc_wmi(E) asus_wmi(E) sparse_keymap(E) rfkill(E) snd_hda_codec_generic(E)
-> pcspkr(E) wmi_bmof(E) ledtrig_audio(E) i2c_i801(E) snd>
-> CPU: 2 PID: 9296 Comm: CPU 1/KVM Tainted: P        W  OE     5.3.11+ #16
-> Hardware name: System manufacturer System Product Name/Z170-K, BIOS 3805
-> 05/16/2018
-> RIP: 0010:kvm_set_msr_common+0x2230/0x2380 [kvm]
-> Code: b0 26 00 00 e8 91 9f b5 ce 66 90 bf 06 00 00 00 48 8b b3 88 26 00 00
-> e8 7e 9f b5 ce 66 90 83 a3 60 26 00 00 fb e9 e9 ec ff ff <0f> 0b e9 d2 ec ff
-> ff f0 80 4b 31 10 e9 32 ee ff ff 48 8b 83 98 02
-> RSP: 0018:ffffb42e03d17d30 EFLAGS: 00010002
-> RAX: 0000000080004b20 RBX: ffff98f1783abf40 RCX: ffff98f17757f000
-> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-> RBP: ffffb42e03d17db0 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffff98f1783abf70
-> R13: 0000000000000000 R14: 0000000000000000 R15: ffff98f1d8bc6c00
-> FS:  00007f02faffd700(0000) GS:ffff98f286a80000(0000) knlGS:000000f0dd174000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000001f8249cd000 CR3: 000000043d3dc003 CR4: 00000000003626e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  ? recalibrate_cpu_khz+0x10/0x10
->  ? ktime_get+0x3a/0xa0
->  kvm_arch_vcpu_ioctl_run+0x107/0x560 [kvm]
->  kvm_init+0x6bf/0xd00 [kvm]
->  ? __seccomp_filter+0x7a/0x680
->  do_vfs_ioctl+0xa4/0x630
->  ? security_file_ioctl+0x32/0x50
->  ksys_ioctl+0x60/0x90
->  __x64_sys_ioctl+0x16/0x20
->  do_syscall_64+0x5f/0x1a0
->  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> RIP: 0033:0x7f0302457d4b
-> Code: 0f 1e fa 48 8b 05 3d b1 0c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff
-> ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff
-> 73 01 c3 48 8b 0d 0d b1 0c 00 f7 d8 64 89 01 48
-> RSP: 002b:00007f02faffc6c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 00007f03005fd001 RCX: 00007f0302457d4b
-> RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000020
-> RBP: 0000000000000001 R08: 0000564efe32fa50 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000246 R12: 0000564efe3129c0
-> R13: 0000000000000000 R14: 00007f03005fc000 R15: 0000564f00123300
-> ---[ end trace 9564a1ccad733a91 ]---
->
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 51e4ba5..aae1523 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -164,6 +164,7 @@ check = /proc/sys/kernel/nmi_watchdog=0
+ [vmware_backdoors]
+ file = vmware_backdoors.flat
+ extra_params = -machine vmport=on -cpu host
++check = /sys/module/kvm/parameters/enable_vmware_backdoor=Y
+ arch = x86_64
+ 
+ [port80]
 
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
