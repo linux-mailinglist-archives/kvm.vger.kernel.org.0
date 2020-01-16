@@ -2,100 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B437C13D40E
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 07:03:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D41F13D5A2
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 09:07:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729546AbgAPGDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 01:03:15 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:51715 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727026AbgAPGDP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 01:03:15 -0500
-Received: by mail-pj1-f67.google.com with SMTP id d15so1024902pjw.1;
-        Wed, 15 Jan 2020 22:03:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=dPqB30Bque1a9xdQca0yHVUONu8Rkkk23AZbtBFoqN0=;
-        b=Jl3n9t2/YTDOuYoiVgGPHFsJsyZ3+fU3dIIf8t9Iwil/iQtRl6iU+ydPdNETEDxZXQ
-         S0mZAwv2gG7bTooBUzPiH+qTTdpUAwmAJEOL8weqbTj9F50Bh1AmkwTQ6uFurcp5Ewzc
-         NIKhfnXGn/p2m+FAs59d+4f+Un+V0WomKNDHt2aRbOvGUNwHS3kMo6+4z9dmTCjroJ50
-         knbv2fpyA2lYn4IU3OKYMd+Qz9FkwPzCVyruxkfHGZxTgRKux5R17NfoSdBJx4yEcuki
-         f8UDl7GSNPArYDNtaK4T4XIyePvR49+MOIAspG1jsChLqP7rEOMZUVzCRXmvTGpDzC1M
-         xYfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=dPqB30Bque1a9xdQca0yHVUONu8Rkkk23AZbtBFoqN0=;
-        b=RZWh6WrnvRLxGDJ7zFaLlg70O8+1WloBnI+erZxwVhYZGYDAiBoHySS6FlscQGROSj
-         h7loU8yAnFtxbgbEEKzTkGlzc93V+Wl7i6LN0fvNa46b2neh7J7SDNLa386RIr8sYZeb
-         KsykIYsuKIymb87fa0GhO+JC7jH+uULa9a/zinaTty/+VJmbJNpyez2+9yPbDSIJ80/K
-         3+09zcr3B/QQzQ/rmGYmr5P6+wIOkucJ/VogdreYqRKbqA5crx4oh2iykwDyOpcmQBTB
-         zzrP5ipA6OnNpwGOCsgRy/rHJ1d5SdRpNbjBxHGdQbgva+GTlfaniiQQpceHQR19iQ9D
-         tg7Q==
-X-Gm-Message-State: APjAAAX3XC4+joGzzpHVTorzfjWr84QOdxjlSyDdMAXCCwkiX4wgtQn1
-        IPyun4s9Km7t9UNOW9qq/g==
-X-Google-Smtp-Source: APXvYqz3LduDxHDVbF5g2WN3h6iZ3dA8WNbXYcZfN0VJe6IA8uAo9nRsS6DW76p0g3x2WMGQiak9lg==
-X-Received: by 2002:a17:90a:b30b:: with SMTP id d11mr4723790pjr.22.1579154594426;
-        Wed, 15 Jan 2020 22:03:14 -0800 (PST)
-Received: from [127.0.0.1] ([103.7.29.9])
-        by smtp.gmail.com with ESMTPSA id q6sm23636677pfh.127.2020.01.15.22.03.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jan 2020 22:03:13 -0800 (PST)
-To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>, bp@alien8.de,
-        "hpa@zytor.com" <hpa@zytor.com>
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-Subject: [PATCH] KVM: Adding 'else' to reduce checking.
-Message-ID: <2a1a3b72-acc5-4977-5621-439aac53f243@gmail.com>
-Date:   Thu, 16 Jan 2020 14:03:04 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.3.1
+        id S1726406AbgAPIGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 03:06:25 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41264 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726082AbgAPIGY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 03:06:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579161983;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=T6hutKtjaQ1lNx4PJ3aLb67/cBy7jWlVyp/OF4XcnLo=;
+        b=PUDuyi0lXrKtbT6WBYpooyUgCwTW7BX9Of8BcX8x24O4SPVncl8jpq7YFd+RcdZoJ7LD8C
+        eSdzcNMQPExVe42quMABNRklrmP2S+egnFDUU03E4QwPPOI17Nmb8hBdDHPOioZPDZPtOq
+        bDNgxlvbCMhP0lo1S193qhnwt119s5g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-CiYYQcitPImWik046IWKbw-1; Thu, 16 Jan 2020 03:06:18 -0500
+X-MC-Unique: CiYYQcitPImWik046IWKbw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAA35800D55;
+        Thu, 16 Jan 2020 08:06:16 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EDB1C5DA70;
+        Thu, 16 Jan 2020 08:06:11 +0000 (UTC)
+Date:   Thu, 16 Jan 2020 09:06:09 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+        peter.maydell@linaro.org, yuzenghui@huawei.com,
+        alexandru.elisei@arm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 13/16] arm/arm64: ITS: INT functional
+ tests
+Message-ID: <20200116080609.thwiyi36rttnezxd@kamzik.brq.redhat.com>
+References: <20200110145412.14937-1-eric.auger@redhat.com>
+ <20200110145412.14937-14-eric.auger@redhat.com>
+ <20200113181701.jit3ywxoifduipew@kamzik.brq.redhat.com>
+ <1c046216-b873-a4c1-4a7a-374f10947d59@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c046216-b873-a4c1-4a7a-374f10947d59@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
- From 4e19436679a97e3cee73b4ae613ff91580c721d2 Mon Sep 17 00:00:00 2001
-From: Haiwei Li <lihaiwei@tencent.com>
-Date: Thu, 16 Jan 2020 13:51:03 +0800
-Subject: [PATCH] Adding 'else' to reduce checking.
+On Wed, Jan 15, 2020 at 06:11:23PM +0100, Auger Eric wrote:
+> >> +static int its_prerequisites(int nb_cpus)
+> >> +{
+> >> +	int cpu;
+> >> +
+> >> +	if (!gicv3_its_base()) {
+> >> +		report_skip("No ITS, skip ...");
+> >> +		return -1;
+> >> +	}
+> >> +
+> >> +	if (nr_cpus < 4) {
+> >> +		report_skip("Test requires at least %d vcpus", nb_cpus);
+> >> +		return -1;
+> > 
+> > We have nr_cpu_check() in arm/gic.c that does a report_abort for this
+> > case. Is there a reason to do report_skip instead of report_abort?
+> Why should we mandate 4 vcpus?
 
-These two conditions are in conflict, adding 'else' to reduce checking.
+I don't know. It's your test :-) afaict if there aren't 4 vcpus then you
+skip this test and exit, which is the same thing as report_abort'ing.
+If you intend to run multiple tests and only want to skip a few when there
+aren't enough vcpus, then I agree report_skip makes some sense.
 
-Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
----
-  arch/x86/kvm/lapic.c | 2 +-
-  1 file changed, 1 insertion(+), 1 deletion(-)
+On a related note, so far I've always tried to write tests that require
+more than one vcpu to be testable with only two, but then test even more
+if more are provided. Do you really need four for this test?
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 679692b..ef5802f 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1573,7 +1573,7 @@ static void 
-kvm_apic_inject_pending_timer_irqs(struct kvm_lapic *apic)
-         kvm_apic_local_deliver(apic, APIC_LVTT);
-         if (apic_lvtt_tscdeadline(apic))
-                 ktimer->tscdeadline = 0;
--       if (apic_lvtt_oneshot(apic)) {
-+       else if (apic_lvtt_oneshot(apic)) {
-                 ktimer->tscdeadline = 0;
-                 ktimer->target_expiration = 0;
-         }
---
-1.8.3.1
+Thanks,
+drew
+
