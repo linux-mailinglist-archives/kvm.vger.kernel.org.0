@@ -2,109 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FDD313F9C5
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 20:48:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A935613F9FE
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 20:52:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729538AbgAPTru (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 14:47:50 -0500
-Received: from mail-eopbgr760081.outbound.protection.outlook.com ([40.107.76.81]:20804
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729485AbgAPTru (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 14:47:50 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VkaC7PD3r8IRDgD4DdTThxOEhrUvHApymGMixLNsUkMxzlbJkf4FSJ1eigbg4i+RiQsUYf21bAetyZRcDphYsTYTRuZN/x5X3vZJ7oAWIsdlwwDSYdxUCSJlZr4A6oV6e2BYmT/KxaUrlm5+TYJ8Pr3j4DbbrMFsLDd+0zU7Lmxf/nRJSDfjjh9bdBuOTU68KC1vq0kPBeLYZbhIRDcdiZNclVI/xqRJ5Kfa/rcBZerB3ymzZrK84uWxPiQ9Zxs1tCE8UQqwsSO7Uk2CuEW2PzQqL2syXzJlbu06+5+ikm7KL5mUyzXztI0Lxqvhe18Lm8zjS2EP9Rgxdlc5c/NfVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ofDM2olXIfCyrBbqaAPvqsScVB5fJMiXCWaadGsq018=;
- b=IgETSF0AXMDx+oY9CS50ypYI85QEu/AtkBNswHEHeRKoA94iKE+3G7W7HbmYbmZTiqTjYFXUgkNCWFU47hEFlOnPmK4L/qPh9xsMM3MiVsML4svudzOs4X6llO/V+u2Ir82kSslDx+svGHRuUS13/wCaaYEuVVquugMWr/lMWbXUkUyhl3papvIfOF2rPIa4yeGjw5EbfK2YoFtQDCYGq1vvf5XCszY6VIbiwRu32hLx5XwmgsnAUDXJFdKW61b50ODU4EWtaaE3VS4MX47jsiuaJqcM+GUjRHwHi5quQByPJphplRd8R5ULRdC6BYnOtOakMwiFQpcHxIhJWxQRzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1730900AbgAPTvn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 14:51:43 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:40085 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730733AbgAPTvm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 14:51:42 -0500
+Received: by mail-pl1-f193.google.com with SMTP id s21so8783359plr.7
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 11:51:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ofDM2olXIfCyrBbqaAPvqsScVB5fJMiXCWaadGsq018=;
- b=icdPi1ZKTwIGLBV0HeDrQ7yzFYrZSDfSeF9L5yNvMztGwRQFzS3ejr+sVPpGiUYfG9YL8FnaBwYNCFz/ZdkCpLbcE14dbeV3yYmw1GiI5tqGIW5g/UvlYOgQ/Fx/s7rXwHI8lCtYroSgkOXnAG7EuqmUYPapZc7VhAz4k5BCTDM=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Babu.Moger@amd.com; 
-Received: from CY4PR12MB1574.namprd12.prod.outlook.com (10.172.71.23) by
- CY4PR12MB1799.namprd12.prod.outlook.com (10.175.60.9) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.19; Thu, 16 Jan 2020 19:47:47 +0000
-Received: from CY4PR12MB1574.namprd12.prod.outlook.com
- ([fe80::610a:6908:1e18:49fd]) by CY4PR12MB1574.namprd12.prod.outlook.com
- ([fe80::610a:6908:1e18:49fd%7]) with mapi id 15.20.2644.015; Thu, 16 Jan 2020
- 19:47:47 +0000
-Subject: [kvm-unit-tests PATCH v2] x86: Add a kvm module parameter check for
- vmware_backdoors test
-From:   Babu Moger <babu.moger@amd.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org
-Date:   Thu, 16 Jan 2020 13:47:46 -0600
-Message-ID: <157920400074.15031.16850091609715260458.stgit@naples-babu.amd.com>
-User-Agent: StGit/unknown-version
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN1PR12CA0072.namprd12.prod.outlook.com
- (2603:10b6:802:20::43) To CY4PR12MB1574.namprd12.prod.outlook.com
- (2603:10b6:910:e::23)
-MIME-Version: 1.0
-Received: from naples-babu.amd.com (165.204.78.2) by SN1PR12CA0072.namprd12.prod.outlook.com (2603:10b6:802:20::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.9 via Frontend Transport; Thu, 16 Jan 2020 19:47:46 +0000
-X-Originating-IP: [165.204.78.2]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: a0cbe64c-9472-4cba-d3e5-08d79abcf637
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1799:|CY4PR12MB1799:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR12MB17993C2D898840B29ADA00B395360@CY4PR12MB1799.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2089;
-X-Forefront-PRVS: 02843AA9E0
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(136003)(346002)(396003)(366004)(376002)(189003)(199004)(956004)(81166006)(6916009)(316002)(26005)(52116002)(103116003)(81156014)(7696005)(8676002)(2906002)(186003)(66556008)(86362001)(4326008)(8936002)(66476007)(478600001)(16526019)(44832011)(5660300002)(4744005)(66946007)(55016002);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR12MB1799;H:CY4PR12MB1574.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7S6WSiAtg82tegA/A1gQilNxG/YbDZWmWn1yr/6rPXlWUyYq6GxdwKYpSfEFDD5tivxvjU9Bu9lFgY2yZVoH0nC5fh6fYGTBuy2onLzLrGTdmZyfwCVmVA8N7HPbVVgAfuJK45/W08OREszNbCkm2D8dvu/hLKDmNA7HBnb2Q6zvKq2ZOCr3t7t1bKp1yskNSn6awCKwHjR5uBwCu58rMFrgFuadarR7rkwG9O0OUZtpY82RsADgmLjpbvKhFrBIrrtXb7jM4LwvLvFK5MYtpejTaMmgvT4LaJ9F2HB32IpcTzIDrsp0cAb0J2n+mMA1CcaulzEz3UypTFiRGtsPnUvOURYL4uZ1WCicaaKwIOJmkLWDXjH8NKaT9+u2M7yRzMBwdh57vZhhTxXezEDaoY41x0PV2sCegnf/iJ9iJRi3MghYAuCKjyOUvawrwW+1
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0cbe64c-9472-4cba-d3e5-08d79abcf637
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2020 19:47:47.3596
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /Fw7y35/sbnIqmkaVF6Kc3Iyz6BYIemqZwrRJc1/VBgD1VsAbu9p+eNR2+GcoWya
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1799
+        d=google.com; s=20161025;
+        h=date:from:subject:cc:to:in-reply-to:references:message-id;
+        bh=g60WNasJ7Z271ktE5244YPkyrntxLxFVIdNescBp9z4=;
+        b=TyP2e5KsTPJw/bqBRc5c9WnVyrhciZJnzvKBfi349Enmd/eVjQkK8tBcSn4I7KTYS0
+         h0iSXw+dCYj59gpz2+8PvuUFMpd22OwCcb9Jj1UaOtS/3can81xVzLtlpGaJ5hnpkoQ4
+         6VDFcROmb6HoXkzN5HqsT0XIxrSe2OnQYMdJuNy/Ef0MPSapd3dww8vwwkzeJeiBJPqu
+         3tQIKXX6J0LV0BKQyy8hLyRD6DL33fLdYME0jElBeJGsUoqan5p5QXO0NvfzolxE8gEu
+         cYerInxxCkDfI6zMScGn3j5Pm2pqJRA4zZsBI+8O+HJxsPw//oTDVSiU+tXrGUdFVfjw
+         krIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
+         :message-id;
+        bh=g60WNasJ7Z271ktE5244YPkyrntxLxFVIdNescBp9z4=;
+        b=fPoqUUAvsvLV7Xa9CRMfBmeXH2nF7pLeDUXd3WZjiLcyuV29TQcMcRFqUKxutIdwvf
+         klh0plRegT96aU2rIYz+IgKXbuu8rtz37Fyi7aQFYHx2BWc5LAznIxFn89sxIAHhY480
+         S1ghDZFGDfT6TanjGo/XH0y/YhKp78TsOFtYjo8OxND0Q2f4TUxTLwHzCAMYqeqNkT8W
+         Ot0MFcIJ5afTgq/OyVKkqXWK+xnEPDqAisxD758M/CtrmpArieyB3l7lHNQzIPTu//Uj
+         OeTAPUFk81u4is651B4Wgn9KgBl7+nLv7XH0uyGEpfvdYK1tV0j3vCVcLGjeEvrinuEg
+         H9jg==
+X-Gm-Message-State: APjAAAVVjNhfocXnjJUdDBk5HB1rRDgNb2cRi2v1yjS6wPbfrEbWTLR1
+        45a3g7MfI50AqR31YbPOV8/YuQ==
+X-Google-Smtp-Source: APXvYqym6i53VUu8ggCl15lqU29XS7/GTsjQdgdYLUwbbasUkynvicTtqBqTIBuUeVaZu00lOGlruw==
+X-Received: by 2002:a17:902:407:: with SMTP id 7mr33015308ple.226.1579204301567;
+        Thu, 16 Jan 2020 11:51:41 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
+        by smtp.gmail.com with ESMTPSA id m22sm26593404pgn.8.2020.01.16.11.51.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2020 11:51:41 -0800 (PST)
+Date:   Thu, 16 Jan 2020 11:51:41 -0800 (PST)
+X-Google-Original-Date: Thu, 16 Jan 2020 10:41:32 PST (-0800)
+From:   Palmer Dabbelt <palmerdabbelt@google.com>
+X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
+Subject:     Re: [PATCH v10 02/19] RISC-V: Add bitmap reprensenting ISA features common across CPUs
+CC:     Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu,
+        pbonzini@redhat.com, rkrcmar@redhat.com, graf@amazon.com,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@lst.de>, anup@brainfault.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Anup Patel <Anup.Patel@wdc.com>
+To:     Anup Patel <Anup.Patel@wdc.com>
+In-Reply-To: <20191223113443.68969-3-anup.patel@wdc.com>
+References: <20191223113443.68969-3-anup.patel@wdc.com>
+  <20191223113443.68969-1-anup.patel@wdc.com>
+Message-ID: <mhng-24b22694-82f4-467b-b6a9-0fb2e186d3f2@palmerdabbelt-glaptop>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vmware_backdoors test fails if the kvm module parameter
-enable_vmware_backdoor is not set to Y. Add a check before
-running the test.
+On Mon, 23 Dec 2019 03:35:26 PST (-0800), Anup Patel wrote:
+> This patch adds riscv_isa bitmap which represents Host ISA features
+> common across all Host CPUs. The riscv_isa is not same as elf_hwcap
+> because elf_hwcap will only have ISA features relevant for user-space
+> apps whereas riscv_isa will have ISA features relevant to both kernel
+> and user-space apps.
+>
+> One of the use-case for riscv_isa bitmap is in KVM hypervisor where
+> we will use it to do following operations:
+>
+> 1. Check whether hypervisor extension is available
+> 2. Find ISA features that need to be virtualized (e.g. floating
+>    point support, vector extension, etc.)
+>
+> Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> Signed-off-by: Atish Patra <atish.patra@wdc.com>
+> Reviewed-by: Alexander Graf <graf@amazon.com>
+> ---
+>  arch/riscv/include/asm/hwcap.h | 22 +++++++++
+>  arch/riscv/kernel/cpufeature.c | 83 ++++++++++++++++++++++++++++++++--
+>  2 files changed, 102 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> index 1bb0cd04aec3..5589c012e004 100644
+> --- a/arch/riscv/include/asm/hwcap.h
+> +++ b/arch/riscv/include/asm/hwcap.h
+> @@ -8,6 +8,7 @@
+>  #ifndef _ASM_RISCV_HWCAP_H
+>  #define _ASM_RISCV_HWCAP_H
+>  
+> +#include <linux/bits.h>
+>  #include <uapi/asm/hwcap.h>
+>  
+>  #ifndef __ASSEMBLY__
+> @@ -22,6 +23,27 @@ enum {
+>  };
+>  
+>  extern unsigned long elf_hwcap;
+> +
+> +#define RISCV_ISA_EXT_a		('a' - 'a')
+> +#define RISCV_ISA_EXT_c		('c' - 'a')
+> +#define RISCV_ISA_EXT_d		('d' - 'a')
+> +#define RISCV_ISA_EXT_f		('f' - 'a')
+> +#define RISCV_ISA_EXT_h		('h' - 'a')
+> +#define RISCV_ISA_EXT_i		('i' - 'a')
+> +#define RISCV_ISA_EXT_m		('m' - 'a')
+> +#define RISCV_ISA_EXT_s		('s' - 'a')
+> +#define RISCV_ISA_EXT_u		('u' - 'a')
 
-Suggested-by: Wei Huang <Wei.Huang2@amd.com>
-Signed-off-by: Babu Moger <babu.moger@amd.com>
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
----
-v2: Fixed Wei's name.
-    Added reviwed by Liran Alon.
+Unfortunately the ISA doesn't really work this way any more: the single-letter
+extensions are just aliases for longer extension strings, each of which
+represents a single instruction.  I know we're saddled with some ABI that looks
+this way, but I really don't want to add new code that depends on these defunct
+assumptions -- there isn't that much in Linux right now, but there's a lot in
+the FSF toolchain and getting that all out is going to be a long project.
 
- x86/unittests.cfg |    1 +
- 1 file changed, 1 insertion(+)
+> +
+> +#define RISCV_ISA_EXT_MAX	256
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 51e4ba5..aae1523 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -164,6 +164,7 @@ check = /proc/sys/kernel/nmi_watchdog=0
- [vmware_backdoors]
- file = vmware_backdoors.flat
- extra_params = -machine vmport=on -cpu host
-+check = /sys/module/kvm/parameters/enable_vmware_backdoor=Y
- arch = x86_64
- 
- [port80]
+Why so big?  It looks like the rest of the code just touches the first word,
+and most of that is explicit.
 
+> +
+> +unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap);
+> +
+> +#define riscv_isa_extension_mask(ext) BIT_MASK(RISCV_ISA_EXT_##ext)
+> +
+> +bool __riscv_isa_extension_available(const unsigned long *isa_bitmap, int bit);
+> +#define riscv_isa_extension_available(isa_bitmap, ext)	\
+> +	__riscv_isa_extension_available(isa_bitmap, RISCV_ISA_EXT_##ext)
+> +
+>  #endif
+>  
+>  #endif /* _ASM_RISCV_HWCAP_H */
+> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> index 0b40705567b7..e172a2322b34 100644
+> --- a/arch/riscv/kernel/cpufeature.c
+> +++ b/arch/riscv/kernel/cpufeature.c
+> @@ -6,6 +6,7 @@
+>   * Copyright (C) 2017 SiFive
+>   */
+>  
+> +#include <linux/bitmap.h>
+>  #include <linux/of.h>
+>  #include <asm/processor.h>
+>  #include <asm/hwcap.h>
+> @@ -13,15 +14,57 @@
+>  #include <asm/switch_to.h>
+>  
+>  unsigned long elf_hwcap __read_mostly;
+> +
+> +/* Host ISA bitmap */
+> +static DECLARE_BITMAP(riscv_isa, RISCV_ISA_EXT_MAX) __read_mostly;
+> +
+>  #ifdef CONFIG_FPU
+>  bool has_fpu __read_mostly;
+>  #endif
+>  
+> +/**
+> + * riscv_isa_extension_base() - Get base extension word
+> + *
+> + * @isa_bitmap: ISA bitmap to use
+> + * Return: base extension word as unsigned long value
+> + *
+> + * NOTE: If isa_bitmap is NULL then Host ISA bitmap will be used.
+> + */
+> +unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap)
+> +{
+> +	if (!isa_bitmap)
+> +		return riscv_isa[0];
+> +	return isa_bitmap[0];
+> +}
+> +EXPORT_SYMBOL_GPL(riscv_isa_extension_base);
+
+This isn't used, which makes it hard to review.  Can you please split out the
+changes that don't depend on the V extension to come out of draft?  That would
+make it easier to take some of the code early, which lets us keep around less
+diff.
+
+> +
+> +/**
+> + * __riscv_isa_extension_available() - Check whether given extension
+> + * is available or not
+> + *
+> + * @isa_bitmap: ISA bitmap to use
+> + * @bit: bit position of the desired extension
+> + * Return: true or false
+> + *
+> + * NOTE: If isa_bitmap is NULL then Host ISA bitmap will be used.
+> + */
+> +bool __riscv_isa_extension_available(const unsigned long *isa_bitmap, int bit)
+> +{
+> +	const unsigned long *bmap = (isa_bitmap) ? isa_bitmap : riscv_isa;
+> +
+> +	if (bit >= RISCV_ISA_EXT_MAX)
+> +		return false;
+> +
+> +	return test_bit(bit, bmap) ? true : false;
+> +}
+> +EXPORT_SYMBOL_GPL(__riscv_isa_extension_available);
+> +
+>  void riscv_fill_hwcap(void)
+>  {
+>  	struct device_node *node;
+>  	const char *isa;
+> -	size_t i;
+> +	char print_str[BITS_PER_LONG + 1];
+> +	size_t i, j, isa_len;
+>  	static unsigned long isa2hwcap[256] = {0};
+>  
+>  	isa2hwcap['i'] = isa2hwcap['I'] = COMPAT_HWCAP_ISA_I;
+> @@ -33,8 +76,11 @@ void riscv_fill_hwcap(void)
+>  
+>  	elf_hwcap = 0;
+>  
+> +	bitmap_zero(riscv_isa, RISCV_ISA_EXT_MAX);
+> +
+>  	for_each_of_cpu_node(node) {
+>  		unsigned long this_hwcap = 0;
+> +		unsigned long this_isa = 0;
+>  
+>  		if (riscv_of_processor_hartid(node) < 0)
+>  			continue;
+> @@ -42,8 +88,24 @@ void riscv_fill_hwcap(void)
+>  		if (riscv_read_check_isa(node, &isa) < 0)
+>  			continue;
+>  
+> -		for (i = 0; i < strlen(isa); ++i)
+> +		i = 0;
+> +		isa_len = strlen(isa);
+> +#if IS_ENABLED(CONFIG_32BIT)
+> +		if (!strncmp(isa, "rv32", 4))
+> +			i += 4;
+> +#elif IS_ENABLED(CONFIG_64BIT)
+> +		if (!strncmp(isa, "rv64", 4))
+> +			i += 4;
+
+We shouldn't be accepting arbitrary inputs and attempting to correct them, just
+enforce that an actual ISA string is provided and check it against what the
+kernel can support.
+
+> +#endif
+> +		for (; i < isa_len; ++i) {
+>  			this_hwcap |= isa2hwcap[(unsigned char)(isa[i])];
+> +			/*
+> +			 * TODO: X, Y and Z extension parsing for Host ISA
+> +			 * bitmap will be added in-future.
+> +			 */
+> +			if ('a' <= isa[i] && isa[i] < 'x')
+> +				this_isa |= (1UL << (isa[i] - 'a'));
+> +		}
+>  
+>  		/*
+>  		 * All "okay" hart should have same isa. Set HWCAP based on
+> @@ -54,6 +116,11 @@ void riscv_fill_hwcap(void)
+>  			elf_hwcap &= this_hwcap;
+>  		else
+>  			elf_hwcap = this_hwcap;
+> +
+> +		if (riscv_isa[0])
+> +			riscv_isa[0] &= this_isa;
+> +		else
+> +			riscv_isa[0] = this_isa;
+>  	}
+>  
+>  	/* We don't support systems with F but without D, so mask those out
+> @@ -63,7 +130,17 @@ void riscv_fill_hwcap(void)
+>  		elf_hwcap &= ~COMPAT_HWCAP_ISA_F;
+>  	}
+>  
+> -	pr_info("elf_hwcap is 0x%lx\n", elf_hwcap);
+> +	memset(print_str, 0, sizeof(print_str));
+> +	for (i = 0, j = 0; i < BITS_PER_LONG; i++)
+> +		if (riscv_isa[0] & BIT_MASK(i))
+> +			print_str[j++] = (char)('a' + i);
+> +	pr_info("riscv: ISA extensions %s\n", print_str);
+> +
+> +	memset(print_str, 0, sizeof(print_str));
+> +	for (i = 0, j = 0; i < BITS_PER_LONG; i++)
+> +		if (elf_hwcap & BIT_MASK(i))
+> +			print_str[j++] = (char)('a' + i);
+> +	pr_info("riscv: ELF capabilities %s\n", print_str);
+>  
+>  #ifdef CONFIG_FPU
+>  	if (elf_hwcap & (COMPAT_HWCAP_ISA_F | COMPAT_HWCAP_ISA_D))
+> -- 
+> 2.17.1
