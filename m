@@ -2,128 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24A1613E9E3
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 18:40:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6870613EC66
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 18:56:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393667AbgAPRkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 12:40:43 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49489 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2405569AbgAPRkm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 12:40:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579196441;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=h8Hp5LsVsY8iyzznMU6rRN7uhlbtTR0PHM4cQMPZpIY=;
-        b=Y+7rz+19Tgj8RmHnXY+d0qjWEjk/ZmuqMYKYJyh8aMuq1hSx7EmCjdwKj4xidcMNW18ye/
-        aiz9tfA90F/P3oLTYW+CkUt7sf/drDrPzhVWBAQ8FLHjCGeX8ywiRfHbCPTL6ZtTpNWZ3e
-        f4+eQ1fhkGZQvqkJvL4/DmHH5jlbGbw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-MDoAMc0ONGSci6jpwrEnvg-1; Thu, 16 Jan 2020 12:40:39 -0500
-X-MC-Unique: MDoAMc0ONGSci6jpwrEnvg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2406223AbgAPR4c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 12:56:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34420 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2394018AbgAPRnx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:43:53 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AA36DB33;
-        Thu, 16 Jan 2020 17:40:38 +0000 (UTC)
-Received: from gondolin (unknown [10.36.117.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C0F12101F942;
-        Thu, 16 Jan 2020 17:40:30 +0000 (UTC)
-Date:   Thu, 16 Jan 2020 18:40:27 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: Re: [PATCH v4 11/12] samples: add vfio-mdev-pci driver
-Message-ID: <20200116184027.2954c3f5.cohuck@redhat.com>
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A184041@SHSMSX104.ccr.corp.intel.com>
-References: <1578398509-26453-1-git-send-email-yi.l.liu@intel.com>
-        <1578398509-26453-12-git-send-email-yi.l.liu@intel.com>
-        <20200115133027.228452fd.cohuck@redhat.com>
-        <A2975661238FB949B60364EF0F2C25743A184041@SHSMSX104.ccr.corp.intel.com>
-Organization: Red Hat GmbH
+        by mail.kernel.org (Postfix) with ESMTPSA id 8B0F62469C;
+        Thu, 16 Jan 2020 17:43:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579196633;
+        bh=rO9MRv8YhSyyoMyG5psAWUEUdC5BhENMela2iZyySFM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=OdW3audGyD4SAepaIpUtVm8seXjSXCMX7pRabt5ri8HWERWHErCHAYXtt43f1+UHK
+         BaZHmN7K0D0rYkA3bt4AuvSX3eaklx2h3JNJwi1K6tCZWTMJIa3nK5qfwntQZ2OnH+
+         Ab2wu9dWGZmFdheMM7Fqf8TwtnJZgQ2sfJ/1fs7c=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.4 046/174] vfio_pci: Enable memory accesses before calling pci_map_rom
+Date:   Thu, 16 Jan 2020 12:40:43 -0500
+Message-Id: <20200116174251.24326-46-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200116174251.24326-1-sashal@kernel.org>
+References: <20200116174251.24326-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 16 Jan 2020 13:23:28 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+From: Eric Auger <eric.auger@redhat.com>
 
-> > From: Cornelia Huck [mailto:cohuck@redhat.com]
-> > Sent: Wednesday, January 15, 2020 8:30 PM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [PATCH v4 11/12] samples: add vfio-mdev-pci driver
-> > 
-> > On Tue,  7 Jan 2020 20:01:48 +0800
-> > Liu Yi L <yi.l.liu@intel.com> wrote:
+[ Upstream commit 0cfd027be1d6def4a462cdc180c055143af24069 ]
 
-> > > diff --git a/samples/Kconfig b/samples/Kconfig
-> > > index 9d236c3..50d207c 100644
-> > > --- a/samples/Kconfig
-> > > +++ b/samples/Kconfig
-> > > @@ -190,5 +190,15 @@ config SAMPLE_INTEL_MEI
-> > >  	help
-> > >  	  Build a sample program to work with mei device.
-> > >
-> > > +config SAMPLE_VFIO_MDEV_PCI
-> > > +	tristate "Sample driver for wrapping PCI device as a mdev"
-> > > +	select VFIO_PCI_COMMON
-> > > +	select VFIO_PCI  
-> > 
-> > Why does this still need to select VFIO_PCI? Shouldn't all needed
-> > infrastructure rather be covered by VFIO_PCI_COMMON already?  
-> 
-> VFIO_PCI_COMMON is supposed to be the dependency of both VFIO_PCI and
-> SAMPLE_VFIO_MDEV_PCI. However, the source code of VFIO_PCI_COMMON are
-> under drivers/vfio/pci which is compiled per the configuration of VFIO_PCI.
-> Besides of letting SAMPLE_VFIO_MDEV_PCI select VFIO_PCI, I can also add
-> a line in drivers/vfio/Makefile to make the source code under drivers/vfio/pci
-> to be compiled when either VFIO_PCI or VFIO_PCI_COMMON are configed. But
-> I'm afraid it is a bit ugly. So I choose to let SAMPLE_VFIO_MDEV_PCI select
-> VFIO_PCI. If you have other idea, I would be pleased to
-> know it. :-)
+pci_map_rom/pci_get_rom_size() performs memory access in the ROM.
+In case the Memory Space accesses were disabled, readw() is likely
+to trigger a synchronous external abort on some platforms.
 
-Shouldn't building drivers/vfio/pci/ for CONFIG_VFIO_PCI_COMMON already
-be enough (the Makefile changes look fine to me)? Or am I missing
-something obvious?
+In case memory accesses were disabled, re-enable them before the
+call and disable them back again just after.
 
-> 
-> >   
-> > > +	depends on VFIO_MDEV && VFIO_MDEV_DEVICE  
-> > 
-> > VFIO_MDEV_DEVICE already depends on VFIO_MDEV. But maybe also make this
-> > depend on PCI?
-> >   
-> > > +	help
-> > > +	  Sample driver for wrapping a PCI device as a mdev. Once bound to
-> > > +	  this driver, device passthru should through mdev path.  
-> > 
-> > "A PCI device bound to this driver will be assigned through the
-> > mediated device framework."
-> > 
-> > ?  
-> 
-> Maybe I should have mentioned it as "A PCI device bound to this
-> sample driver should follow the passthru steps for mdevs as showed
-> in Documentation/driver-api/vfio-mediated-device.rst."
-> 
-> Does it make more sense?
+Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/vfio/pci/vfio_pci.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-Yes, it does :)
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 4b62eb3b5923..7a82735d5308 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -496,6 +496,7 @@ static long vfio_pci_ioctl(void *device_data,
+ 		{
+ 			void __iomem *io;
+ 			size_t size;
++			u16 orig_cmd;
+ 
+ 			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+ 			info.flags = 0;
+@@ -505,15 +506,23 @@ static long vfio_pci_ioctl(void *device_data,
+ 			if (!info.size)
+ 				break;
+ 
+-			/* Is it really there? */
++			/*
++			 * Is it really there?  Enable memory decode for
++			 * implicit access in pci_map_rom().
++			 */
++			pci_read_config_word(pdev, PCI_COMMAND, &orig_cmd);
++			pci_write_config_word(pdev, PCI_COMMAND,
++					      orig_cmd | PCI_COMMAND_MEMORY);
++
+ 			io = pci_map_rom(pdev, &size);
+-			if (!io || !size) {
++			if (io) {
++				info.flags = VFIO_REGION_INFO_FLAG_READ;
++				pci_unmap_rom(pdev, io);
++			} else {
+ 				info.size = 0;
+-				break;
+ 			}
+-			pci_unmap_rom(pdev, io);
+ 
+-			info.flags = VFIO_REGION_INFO_FLAG_READ;
++			pci_write_config_word(pdev, PCI_COMMAND, orig_cmd);
+ 			break;
+ 		}
+ 		case VFIO_PCI_VGA_REGION_INDEX:
+-- 
+2.20.1
 
