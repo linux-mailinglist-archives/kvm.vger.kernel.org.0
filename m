@@ -2,115 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D89FA13DFD6
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 17:21:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BD2413E00B
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 17:27:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbgAPQVE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 11:21:04 -0500
-Received: from mga07.intel.com ([134.134.136.100]:43485 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726151AbgAPQVE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:21:04 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jan 2020 08:21:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,326,1574150400"; 
-   d="scan'208";a="219732066"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga007.fm.intel.com with ESMTP; 16 Jan 2020 08:21:02 -0800
-Date:   Thu, 16 Jan 2020 08:21:02 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Liran Alon <liran.alon@oracle.com>, kvm@vger.kernel.org,
+        id S1726726AbgAPQ1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 11:27:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22551 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726088AbgAPQ1L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 11:27:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579192030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WC8Z8j4wZiM+iDNfePn8Q6kPV/b9KT3V2XFsUH+aPzw=;
+        b=GbE4vh/JHsKALNaqvFMhPLR+DE7dONNxRVlug3ERhx2ABPi2nAJtqXjIx9/VCakMSVZYtc
+        Ium343YEfYdMauZ5kecFNj61gH+nm4R2meQvIXdMTlAj+ytZ9V0+nn4GwJzp+NV70s7ewX
+        2fEXOS5yzlE7bjph8D0WKMCLKaKsqRw=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-VBkUSBC7NnCf6DcB8C11FQ-1; Thu, 16 Jan 2020 11:27:06 -0500
+X-MC-Unique: VBkUSBC7NnCf6DcB8C11FQ-1
+Received: by mail-qk1-f200.google.com with SMTP id i135so13297243qke.14
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:27:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WC8Z8j4wZiM+iDNfePn8Q6kPV/b9KT3V2XFsUH+aPzw=;
+        b=pfoNwbJVxUQtXX4bpceUanhSwe/2OPwYmm3Hqetn0un16/wMBwErRsHCU0el1rGd/c
+         pckLrKSI+bEU2wjvgC0XJLNLTaztRTazs/aNTyIcSAv3SpWMAhL+7aKyX3KAyvcCve/s
+         gq66dYFy16WKmXhZ0sKLw7u+ZU+JeoxiSCi07p9/Rmz40aLkuwjeJZ37/K/ilpAjEfRY
+         ax5flOTKC0siUA8c4MU35yQG7KFLzAj5ucZUpXRGfrOfdi4A8uMxXafkMSElQLlEA9JH
+         pONTmYCb8Yl85DMkXNSV+YIlAoi6o6WfLAVGMVKW4vRjrpQ8nFdg8KshYConaKDxvrDy
+         kzAw==
+X-Gm-Message-State: APjAAAXXqFV0sGUtv43kYJ4LLHX8bm2D1kUY0joxtdWyQ3HNNj5nKGEr
+        iFMRr1s5ZPsD2jzburTM42zxjLZK6x2TSqIHIXZ02rYTqqU6cDCnvM0yZhknGxFw8D45urTAZit
+        BO5WN3bdhxz4o
+X-Received: by 2002:a37:8ac4:: with SMTP id m187mr29027926qkd.277.1579192025790;
+        Thu, 16 Jan 2020 08:27:05 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxYtk2Bh02F1YEqXqx8bwti4pMx8sbu0T6IbdlxQJ1t7qPkHRZYDmYJaMmrkINO8rf3duc41Q==
+X-Received: by 2002:a37:8ac4:: with SMTP id m187mr29027901qkd.277.1579192025558;
+        Thu, 16 Jan 2020 08:27:05 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id k29sm11420492qtu.54.2020.01.16.08.27.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2020 08:27:04 -0800 (PST)
+Date:   Thu, 16 Jan 2020 11:27:03 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christophe de Dinechin <dinechin@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Roman Kagan <rkagan@virtuozzo.com>
-Subject: Re: [PATCH RFC 3/3] x86/kvm/hyper-v: don't allow to turn on
- unsupported VMX controls for nested guests
-Message-ID: <20200116162101.GD20561@linux.intel.com>
-References: <20200115171014.56405-1-vkuznets@redhat.com>
- <20200115171014.56405-4-vkuznets@redhat.com>
- <CF37ED31-4ED0-45C2-A309-3E1E2C2E54F8@oracle.com>
- <874kwvixuq.fsf@vitty.brq.redhat.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Lei Cao <lei.cao@stratus.com>
+Subject: Re: [PATCH v3 12/21] KVM: X86: Implement ring-based dirty memory
+ tracking
+Message-ID: <20200116162703.GA344339@xz-x1>
+References: <20200109145729.32898-1-peterx@redhat.com>
+ <20200109145729.32898-13-peterx@redhat.com>
+ <20200116033725-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <874kwvixuq.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200116033725-mutt-send-email-mst@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 16, 2020 at 09:55:57AM +0100, Vitaly Kuznetsov wrote:
-> Liran Alon <liran.alon@oracle.com> writes:
+On Thu, Jan 16, 2020 at 03:38:21AM -0500, Michael S. Tsirkin wrote:
+> On Thu, Jan 09, 2020 at 09:57:20AM -0500, Peter Xu wrote:
+> > +	/* If to map any writable page within dirty ring, fail it */
+> > +	if ((kvm_page_in_dirty_ring(vcpu->kvm, vma->vm_pgoff) ||
+> > +	     kvm_page_in_dirty_ring(vcpu->kvm, vma->vm_pgoff + pages - 1)) &&
+> > +	    vma->vm_flags & VM_WRITE)
+> > +		return -EINVAL;
 > 
-> >> On 15 Jan 2020, at 19:10, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >> 
-> >> Sane L1 hypervisors are not supposed to turn any of the unsupported VMX
-> >> controls on for its guests and nested_vmx_check_controls() checks for
-> >> that. This is, however, not the case for the controls which are supported
-> >> on the host but are missing in enlightened VMCS and when eVMCS is in use.
-> >> 
-> >> It would certainly be possible to add these missing checks to
-> >> nested_check_vm_execution_controls()/_vm_exit_controls()/.. but it seems
-> >> preferable to keep eVMCS-specific stuff in eVMCS and reduce the impact on
-> >> non-eVMCS guests by doing less unrelated checks. Create a separate
-> >> nested_evmcs_check_controls() for this purpose.
-> >> 
-> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >> ---
-> >> arch/x86/kvm/vmx/evmcs.c  | 56 ++++++++++++++++++++++++++++++++++++++-
-> >> arch/x86/kvm/vmx/evmcs.h  |  1 +
-> >> arch/x86/kvm/vmx/nested.c |  3 +++
-> >> 3 files changed, 59 insertions(+), 1 deletion(-)
-> >> 
-> >> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-> >> index b5d6582ba589..88f462866396 100644
-> >> --- a/arch/x86/kvm/vmx/evmcs.c
-> >> +++ b/arch/x86/kvm/vmx/evmcs.c
-> >> @@ -4,9 +4,11 @@
-> >> #include <linux/smp.h>
-> >> 
-> >> #include "../hyperv.h"
-> >> -#include "evmcs.h"
-> >> #include "vmcs.h"
-> >> +#include "vmcs12.h"
-> >> +#include "evmcs.h"
-> >> #include "vmx.h"
-> >> +#include "trace.h"
-> >> 
-> >> DEFINE_STATIC_KEY_FALSE(enable_evmcs);
-> >> 
-> >> @@ -378,6 +380,58 @@ void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata)
-> >> 	*pdata = ctl_low | ((u64)ctl_high << 32);
-> >> }
-> >> 
-> >> +int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
-> >> +{
-> >> +	int ret = 0;
-> >> +	u32 unsupp_ctl;
-> >> +
-> >> +	unsupp_ctl = vmcs12->pin_based_vm_exec_control &
-> >> +		EVMCS1_UNSUPPORTED_PINCTRL;
-> >> +	if (unsupp_ctl) {
-> >> +		trace_kvm_nested_vmenter_failed(
-> >> +			"eVMCS: unsupported pin-based VM-execution controls",
-> >> +			unsupp_ctl);
-> >
-> > Why not move "CC” macro from nested.c to nested.h and use it here as-well instead of replicating it’s logic?
-> >
-> 
-> Because error messages I add are both human readable and conform to SDM!
-> :-)
-> 
-> On a more serious not yes, we should probably do that. We may even want
-> to use it in non-nesting (and non VMX) code in KVM.
+> Worth thinking about other flags. Do we want to force VM_SHARED?
+> Disable VM_EXEC?
 
-No, the CC() macro is short for Consistency Check, i.e. specific to nVMX.
-Even if KVM ends up adding nested_evmcs_check_controls(), which I'm hoping
-can be avoided, I'd still be hesitant to expose CC() in nested.h.
+Makes sense to me.  I think it worths a standalone patch since they
+should apply for the whole per-vcpu mmaped regions rather than only
+for the dirty ring buffers.
+
+(Should include KVM_PIO_PAGE_OFFSET, KVM_COALESCED_MMIO_PAGE_OFFSET,
+ KVM_S390_SIE_PAGE_OFFSET, kvm_run, and this new one)
+
+Thanks,
+
+-- 
+Peter Xu
+
