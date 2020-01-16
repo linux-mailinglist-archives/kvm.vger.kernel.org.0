@@ -2,142 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5698D13DE44
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 16:07:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08B0B13DEA8
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 16:24:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726892AbgAPPF7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 10:05:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52865 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726160AbgAPPF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 10:05:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579187156;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kOmwz01mePXBYnhHcPG/iYv5hOVqKYDvyGKmU7ezAzA=;
-        b=g+ARaspYq/yEOK+w3myQugj3lAkJ34Pbd612zRxxReNEFtNdSWvsXz+JxrIw6e0V8ISgcy
-        nVtZuHCRJM5qTnw3VDtMRKOh11kUyP2jDr/y8tz8ExFrEnAOMhzxakLoUOqE/wSkv/zpJo
-        cqrrYvnwGVUqG6ON/phLI4lYQBTNg6I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295--MG8eiINP0KTyi1ma6Rk6g-1; Thu, 16 Jan 2020 10:05:52 -0500
-X-MC-Unique: -MG8eiINP0KTyi1ma6Rk6g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B603D8010C1;
-        Thu, 16 Jan 2020 15:05:49 +0000 (UTC)
-Received: from gondolin (unknown [10.36.117.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D64F05D9C9;
-        Thu, 16 Jan 2020 15:05:45 +0000 (UTC)
-Date:   Thu, 16 Jan 2020 16:05:43 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, david@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 4/7] s390x: smp: Rework cpu start and
- active tracking
-Message-ID: <20200116160543.70f52cb2.cohuck@redhat.com>
-In-Reply-To: <4e4587a6-efba-6f40-306b-3704e53aafc3@linux.ibm.com>
-References: <20200116120513.2244-1-frankja@linux.ibm.com>
-        <20200116120513.2244-5-frankja@linux.ibm.com>
-        <20200116151453.186cbf94.cohuck@redhat.com>
-        <4e4587a6-efba-6f40-306b-3704e53aafc3@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1728904AbgAPPWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 10:22:17 -0500
+Received: from mail-vi1eur05on2042.outbound.protection.outlook.com ([40.107.21.42]:43217
+        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726371AbgAPPWR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 10:22:17 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=d6mCaLfU0wivgp8sKJANYROLtNpfswyW4i4fhxR+11BJAckQhMZzcz1g6ysf5nkUDaN5yy2MVJVw1TujiuWtKFYxK+JDakOBbG9Etbr9ZN5DUta9m4a+a9VfYRvLqEOTf4SSX1xOgTv2IzFaTzglvKVPYTjxI7UKblOU9Yg7WBXkWBY94ayVZ/PywqvFQMMSwT7ldjJLQ6F7x9ikCIjC9J1x2bI2tywncHWC21Iq+p5hYcMzq3r6ccj4LFGBXbERc/CuU+zbTE53YiDUYGkWkMos6d5WtunzcBPEjsz0C4LDUtgx+4UpDqigwY69jwV3ChjQtrWIEwd3OTfvHY7Fvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HUrxsts3paAh+K7ZNfpj6JIHdNvRmGe7stdH5seGYr0=;
+ b=Yk/iwmMV/cuDmFVIZQ4aUXsj1OWvOrSkh9LFAxDYOAgrutHnBLOYRYQn699enuTNiVzw3fAXSuFm1lNXNPwZIppo8aD+PVW/OC8NENkeyEG5IcNZr6rdZpKzefFCslG/Naurvx4x5MqUqSeeCaFSxBZTJuWBYMq+Bkeiru/pJKfK+zwO0bSOi2vjkupjQe1cj/XHRsCZujr26A8PvZk3HnA25iuP52KTFz272f+WLkAT+GQBTkXL1nJocOyzibXduclC/Iyk4Rqrv6ae0CkR3riGVEuIBeve1jFZkV1g+agRhFE1pCzOB709ckSVmrxhgaFF+xTZKvAyZldUdzAuJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HUrxsts3paAh+K7ZNfpj6JIHdNvRmGe7stdH5seGYr0=;
+ b=cS9r9RiNBcwrwITnqko156U1SljxmV8eWkIMg5WKyNM5fQE7yD0H27YaJIIj9uKB8HTo5/M4hULDtqdPSAd8ODihJdY3rXz/35jxZqlpGDuONH/BM4XNmT5Dkghi+cUU0mIkhcd6B1lCVno02DfK8nICFYZB2r+t1ZF+bx0IgOw=
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
+ VI1PR05MB4672.eurprd05.prod.outlook.com (20.176.7.10) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.18; Thu, 16 Jan 2020 15:22:13 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2644.015; Thu, 16 Jan 2020
+ 15:22:13 +0000
+Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR14CA0018.namprd14.prod.outlook.com (2603:10b6:208:23e::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.20 via Frontend Transport; Thu, 16 Jan 2020 15:22:12 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1is6yH-0005cJ-Kf; Thu, 16 Jan 2020 11:22:09 -0400
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>
+CC:     "mst@redhat.com" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "aadam@redhat.com" <aadam@redhat.com>,
+        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
+Thread-Topic: [PATCH 3/5] vDPA: introduce vDPA bus
+Thread-Index: AQHVzGqUgTlkW8H4N0+zRVK4Lh0XAKftaJqA
+Date:   Thu, 16 Jan 2020 15:22:12 +0000
+Message-ID: <20200116152209.GH20978@mellanox.com>
+References: <20200116124231.20253-1-jasowang@redhat.com>
+ <20200116124231.20253-4-jasowang@redhat.com>
+In-Reply-To: <20200116124231.20253-4-jasowang@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: MN2PR14CA0018.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::23) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [142.68.57.212]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 2bb7f725-6a53-4627-299e-08d79a97dc78
+x-ms-traffictypediagnostic: VI1PR05MB4672:|VI1PR05MB4672:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR05MB467220B344972E3D56BF53E7CF360@VI1PR05MB4672.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 02843AA9E0
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(39860400002)(346002)(136003)(366004)(199004)(189003)(86362001)(66446008)(54906003)(66946007)(5660300002)(9746002)(4326008)(316002)(66556008)(33656002)(64756008)(36756003)(71200400001)(2616005)(8936002)(26005)(81166006)(6666004)(81156014)(186003)(6916009)(1076003)(2906002)(52116002)(7416002)(9786002)(478600001)(8676002)(66476007)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB4672;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: LEZjD8mBedcmyZdfu5ZK7O9nmIyyuBfEipKziYJM/lEt5t4g7qhdHvoRR2sl8NykjWPuCAXtTEHuid9B+JewKFsvwEt6/UARk/UWq0XFaqo8O0Up5F2q065mJcW/2fxUMoK2ugxGCdMkGGY7AlHWrKA7zsuStl6S5lDAoAFzlZpgpEg7HnNUOTZD2w0hTiXS9Qfuhtid35ORyBfgiQuTEnEJsM8MYYGCLCVdS5bvIjL+TE4VuR7wunqwLWO+vCnkVI0RFQZYNeu8Su/trlMSIcr+ll/UYtOXL5pssT8wyEiTW611VpeFF+ExwNtjKTqaTL5If2vhDRUcxtXDQwU+O/ekwDJwvtRGAa7Zi32UL/2gzkSL98LRcz9g2+5aZ7s6SUA4WqcMyN9u5iuYx4gSf2oyirVmimvMTiVvF6hiO/MJoKK38pXWiMMMkxh8onhrCpcP1+63d9G+bYDH//UfgT/vDq8FbyBXdqcvk9dtJzbkEtfn8jGbDqIhqXW+PUf4
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <20CB0C9B575F27429AFD01BABED3A9C5@eurprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/edF2O_rEm1wXQnnHeEgIQQj";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2bb7f725-6a53-4627-299e-08d79a97dc78
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2020 15:22:12.8434
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6xt20MfOs+vFPWMh78+DoIVCiHSlKInLIUkS7D+osczidBCZDm/xCiLEzBKaxDm+CqhF3EWDZ1pUiXQlbYQmJw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4672
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/edF2O_rEm1wXQnnHeEgIQQj
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 16 Jan 2020 15:44:24 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> On 1/16/20 3:14 PM, Cornelia Huck wrote:
-> > On Thu, 16 Jan 2020 07:05:10 -0500
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> >> +static int smp_cpu_restart_nolock(uint16_t addr, struct psw *psw)
-> >> +{
-> >> +=09int rc;
-> >> +=09struct cpu *cpu =3D smp_cpu_from_addr(addr);
-> >> +
-> >> +=09if (!cpu)
-> >> +=09=09return -1;
-> >> +=09if (psw) {
-> >> +=09=09cpu->lowcore->restart_new_psw.mask =3D psw->mask;
-> >> +=09=09cpu->lowcore->restart_new_psw.addr =3D psw->addr;
-> >> +=09}
-> >> +=09rc =3D sigp(addr, SIGP_RESTART, 0, NULL);
-> >> +=09if (rc)
-> >> +=09=09return rc;
-> >> +=09while (!smp_cpu_running(addr)) { mb(); } =20
-> >=20
-> > Maybe split this statement? Also, maybe add a comment =20
+On Thu, Jan 16, 2020 at 08:42:29PM +0800, Jason Wang wrote:
+> vDPA device is a device that uses a datapath which complies with the
+> virtio specifications with vendor specific control path. vDPA devices
+> can be both physically located on the hardware or emulated by
+> software. vDPA hardware devices are usually implemented through PCIE
+> with the following types:
 >=20
-> /* Wait until the target cpu is running */
-> ?
+> - PF (Physical Function) - A single Physical Function
+> - VF (Virtual Function) - Device that supports single root I/O
+>   virtualization (SR-IOV). Its Virtual Function (VF) represents a
+>   virtualized instance of the device that can be assigned to different
+>   partitions
 
-Fine with me as well :)
+> - VDEV (Virtual Device) - With technologies such as Intel Scalable
+>   IOV, a virtual device composed by host OS utilizing one or more
+>   ADIs.
+> - SF (Sub function) - Vendor specific interface to slice the Physical
+>   Function to multiple sub functions that can be assigned to different
+>   partitions as virtual devices.
 
->=20
-> This is not QEMU with two line ifs taking up 3 lines :)
+I really hope we don't end up with two different ways to spell this
+same thing.
 
-Heh, it's just the style I'm used to :)
+> @@ -0,0 +1,2 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +obj-$(CONFIG_VDPA) +=3D vdpa.o
+> diff --git a/drivers/virtio/vdpa/vdpa.c b/drivers/virtio/vdpa/vdpa.c
+> new file mode 100644
+> index 000000000000..2b0e4a9f105d
+> +++ b/drivers/virtio/vdpa/vdpa.c
+> @@ -0,0 +1,141 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * vDPA bus.
+> + *
+> + * Copyright (c) 2019, Red Hat. All rights reserved.
+> + *     Author: Jason Wang <jasowang@redhat.com>
 
->=20
-> >=20
-> > /*
-> >  * The order has been accepted, but the actual restart may not
-> >  * have been performed yet, so wait until the cpu is running.
-> >  */
-> >=20
-> > ?
-> >  =20
-> >> +=09cpu->active =3D true;
-> >> +=09return 0;
-> >> +} =20
-> >=20
-> > The changes look good to me AFAICS.
-> >=20
-> > Reviewed-by: Cornelia Huck <cohuck@redhat.com> =20
->=20
-> Thanks!
->=20
->=20
+2020 tests days
 
+> + *
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/idr.h>
+> +#include <linux/vdpa.h>
+> +
+> +#define MOD_VERSION  "0.1"
 
---Sig_/edF2O_rEm1wXQnnHeEgIQQj
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+I think module versions are discouraged these days
 
------BEGIN PGP SIGNATURE-----
+> +#define MOD_DESC     "vDPA bus"
+> +#define MOD_AUTHOR   "Jason Wang <jasowang@redhat.com>"
+> +#define MOD_LICENSE  "GPL v2"
+> +
+> +static DEFINE_IDA(vdpa_index_ida);
+> +
+> +struct device *vdpa_get_parent(struct vdpa_device *vdpa)
+> +{
+> +	return vdpa->dev.parent;
+> +}
+> +EXPORT_SYMBOL(vdpa_get_parent);
+> +
+> +void vdpa_set_parent(struct vdpa_device *vdpa, struct device *parent)
+> +{
+> +	vdpa->dev.parent =3D parent;
+> +}
+> +EXPORT_SYMBOL(vdpa_set_parent);
+> +
+> +struct vdpa_device *dev_to_vdpa(struct device *_dev)
+> +{
+> +	return container_of(_dev, struct vdpa_device, dev);
+> +}
+> +EXPORT_SYMBOL_GPL(dev_to_vdpa);
+> +
+> +struct device *vdpa_to_dev(struct vdpa_device *vdpa)
+> +{
+> +	return &vdpa->dev;
+> +}
+> +EXPORT_SYMBOL_GPL(vdpa_to_dev);
 
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl4ge8cACgkQ3s9rk8bw
-L6+ffA//dmfYUxNJy7AWz/pDhnlAUYTWjuVjyNWTtA2QOrrfuTNqwtluEHwd1+jV
-6mB/24dhB1ItAnPY7cvdNrotGDDI5fsIPbX4Am02H1fTVFbR7yH72vMuiGzclJSG
-bW2Cml07cVMYUKqjEmE9MzB9sM5dta9k6wV1i4WkjF+rNXDpKBDPDbb9fi00Hozq
-s1km3hclXtZVwwiFAdvMKFpX2MjpLR9vEkQCCMgHSS/KEO1O9pJQi+GwIBpnaSEe
-kpt2DfHpmkTzeEYEZbFlYrydN0HZT+3o8nfWfq1IZwm/mDsoLgcqU2VM/em98BpL
-b//VtTHxKIKz0h9z754QQS/ENRP6V5R6ReWlJo2ddzdlLniIf3B8Vdb4UgLRo3bi
-JucKJDECd3TxCd4g1zQ7BlADt0oqq+16wb1Jhm3wFjQkoFNYVd7Ad3kuHORtVpI+
-yfw4AJjWdzf9nUppCnLYm7toHqks5fos/JdfQH+95ItH/SzO+YNonar9nSjvyaT2
-98y75kIcJ+qsjEWtmgSuTJzDgJVLdbLogjJGx4FFJgK1KYigML6JVPJCsTE/Ph1M
-lo3wm5E798fheX6+Kw4obQBwR4lfbyKm5SqzILFiykvuWHsy6qpkc/UJl3PSRpur
-S1u4xEBtGiTXJpqNv5evsUqVfR107k+8j75gauKscY/GLYmFXHY=
-=I70c
------END PGP SIGNATURE-----
+Why these trivial assessors? Seems unnecessary, or should at least be
+static inlines in a header
 
---Sig_/edF2O_rEm1wXQnnHeEgIQQj--
+> +int register_vdpa_device(struct vdpa_device *vdpa)
+> +{
 
+Usually we want to see symbols consistently prefixed with vdpa_*, is
+there a reason why register/unregister are swapped?
+
+> +	int err;
+> +
+> +	if (!vdpa_get_parent(vdpa))
+> +		return -EINVAL;
+> +
+> +	if (!vdpa->config)
+> +		return -EINVAL;
+> +
+> +	err =3D ida_simple_get(&vdpa_index_ida, 0, 0, GFP_KERNEL);
+> +	if (err < 0)
+> +		return -EFAULT;
+> +
+> +	vdpa->dev.bus =3D &vdpa_bus;
+> +	device_initialize(&vdpa->dev);
+
+IMHO device_initialize should not be called inside something called
+register, toooften we find out that the caller drivers need the device
+to be initialized earlier, ie to use the kref, or something.
+
+I find the best flow is to have some init function that does the
+device_initialize and sets the device_name that the driver can call
+early.
+
+Shouldn't there be a device/driver matching process of some kind?
+
+Jason
