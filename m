@@ -2,52 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 44FA913F8EF
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 20:21:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D380F13F8EC
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 20:21:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437821AbgAPTVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 14:21:39 -0500
-Received: from mta-08-3.privateemail.com ([198.54.127.61]:7658 "EHLO
-        MTA-08-3.privateemail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437794AbgAPTV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 14:21:28 -0500
-X-Greylist: delayed 65573 seconds by postgrey-1.27 at vger.kernel.org; Thu, 16 Jan 2020 14:21:27 EST
-Received: from MTA-08.privateemail.com (localhost [127.0.0.1])
-        by MTA-08.privateemail.com (Postfix) with ESMTP id 554C160046;
-        Thu, 16 Jan 2020 14:21:26 -0500 (EST)
-Received: from zetta.local (unknown [10.20.151.212])
-        by MTA-08.privateemail.com (Postfix) with ESMTPA id DEA1B6004A;
-        Thu, 16 Jan 2020 19:21:25 +0000 (UTC)
-Subject: Re: [Bug 206215] New: QEMU guest crash due to random 'general
- protection fault' since kernel 5.2.5 on i7-3517UE
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     bugzilla-daemon@bugzilla.kernel.org, kvm@vger.kernel.org
+        id S2437813AbgAPTVb convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 16 Jan 2020 14:21:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:46914 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2437799AbgAPTV3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 14:21:29 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206215] QEMU guest crash due to random 'general protection
+ fault' since kernel 5.2.5 on i7-3517UE
+Date:   Thu, 16 Jan 2020 19:21:27 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: derek@djy.llc
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206215-28872-MfHNY69hVs@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206215-28872@https.bugzilla.kernel.org/>
 References: <bug-206215-28872@https.bugzilla.kernel.org/>
- <20200115215256.GE30449@linux.intel.com>
- <e6ec4418-4ac1-e619-7402-18c085bc340d@djy.llc>
- <20200116153854.GA20561@linux.intel.com>
-From:   Derek Yerger <derek@djy.llc>
-Message-ID: <e2045e6f-f069-c396-c080-cb85919bda0e@djy.llc>
-Date:   Thu, 16 Jan 2020 14:21:25 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <20200116153854.GA20561@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=206215
+
+--- Comment #7 from derek@djy.llc ---
 On 1/16/20 10:38 AM, Sean Christopherson wrote:
 > On Wed, Jan 15, 2020 at 08:08:32PM -0500, Derek Yerger wrote:
 >> On 1/15/20 4:52 PM, Sean Christopherson wrote:
 >>> +cc Derek, who is hitting the same thing.
 >>>
->>> On Wed, Jan 15, 2020 at 09:18:56PM +0000, bugzilla-daemon@bugzilla.kernel.org wrote:
+>>> On Wed, Jan 15, 2020 at 09:18:56PM +0000,
+>>> bugzilla-daemon@bugzilla.kernel.org wrote:
 >>>> https://bugzilla.kernel.org/show_bug.cgi?id=206215
 >>> *snip*
 >>> that's a big smoking gun pointing at commit ca7e6b286333 ("KVM: X86: Fix
@@ -76,9 +83,11 @@ nf_log_ipv6(E) ip6t_REJECT(E) nf_reject_ipv6>
 eeepc_wmi(E) asus_wmi(E) sparse_keymap(E) rfkill(E) snd_hda_codec_generic(E) 
 pcspkr(E) wmi_bmof(E) ledtrig_audio(E) i2c_i801(E) snd>
 CPU: 2 PID: 9296 Comm: CPU 1/KVM Tainted: P           OE     5.3.11+ #16
-Hardware name: System manufacturer System Product Name/Z170-K, BIOS 3805 05/16/2018
+Hardware name: System manufacturer System Product Name/Z170-K, BIOS 3805
+05/16/2018
 RIP: 0010:kernel_fpu_begin+0x6b/0xc0
-Code: f6 40 26 20 75 08 48 8b 10 80 e6 40 74 16 65 48 c7 05 b5 27 fe 70 00 00 00 
+Code: f6 40 26 20 75 08 48 8b 10 80 e6 40 74 16 65 48 c7 05 b5 27 fe 70 00 00
+00 
 00 c3 65 8a 05 a5 27 fe 70 eb c4 80 78 0c 00 74 02 <0f> 0b 48 83 c0 01 f0 80 08 
 40 65 48 8b 0c 25 c0 6b 01 00 0f 1f 44
 RSP: 0018:ffffb42e0014c7f8 EFLAGS: 00010202
@@ -155,9 +164,11 @@ nf_log_ipv6(E) ip6t_REJECT(E) nf_reject_ipv6>
 eeepc_wmi(E) asus_wmi(E) sparse_keymap(E) rfkill(E) snd_hda_codec_generic(E) 
 pcspkr(E) wmi_bmof(E) ledtrig_audio(E) i2c_i801(E) snd>
 CPU: 2 PID: 9296 Comm: CPU 1/KVM Tainted: P        W  OE     5.3.11+ #16
-Hardware name: System manufacturer System Product Name/Z170-K, BIOS 3805 05/16/2018
+Hardware name: System manufacturer System Product Name/Z170-K, BIOS 3805
+05/16/2018
 RIP: 0010:kvm_set_msr_common+0x2230/0x2380 [kvm]
-Code: b0 26 00 00 e8 91 9f b5 ce 66 90 bf 06 00 00 00 48 8b b3 88 26 00 00 e8 7e 
+Code: b0 26 00 00 e8 91 9f b5 ce 66 90 bf 06 00 00 00 48 8b b3 88 26 00 00 e8
+7e 
 9f b5 ce 66 90 83 a3 60 26 00 00 fb e9 e9 ec ff ff <0f> 0b e9 d2 ec ff ff f0 80 
 4b 31 10 e9 32 ee ff ff 48 8b 83 98 02
 RSP: 0018:ffffb42e03d17d30 EFLAGS: 00010002
@@ -184,7 +195,8 @@ Call Trace:
   do_syscall_64+0x5f/0x1a0
   entry_SYSCALL_64_after_hwframe+0x44/0xa9
 RIP: 0033:0x7f0302457d4b
-Code: 0f 1e fa 48 8b 05 3d b1 0c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 
+Code: 0f 1e fa 48 8b 05 3d b1 0c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff
+c3 
 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 
 48 8b 0d 0d b1 0c 00 f7 d8 64 89 01 48
 RSP: 002b:00007f02faffc6c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
@@ -195,3 +207,6 @@ R10: 0000000000000001 R11: 0000000000000246 R12: 0000564efe3129c0
 R13: 0000000000000000 R14: 00007f03005fc000 R15: 0000564f00123300
 ---[ end trace 9564a1ccad733a91 ]---
 
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
