@@ -2,134 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 26C1C13D12A
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 01:32:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 694EF13D162
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 02:08:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729366AbgAPAcM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Jan 2020 19:32:12 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:47430 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729110AbgAPAcM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Jan 2020 19:32:12 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00G0DCSG195884;
-        Thu, 16 Jan 2020 00:32:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=fZoA3Mkurgsgn5osZjIdYEva/h4cuaGBHzs43O+G62c=;
- b=jKAoGBCl2/rJWCFOHinuxG3gGo2+EWH+bkhMpf4XbrYA+s0pqtOXgqbcJ2MNosY9qIla
- 09X/HOptUUcGklN3avfcq8KHbdrQvssdfnPmELCrNpRiPYNzoJ9P24Qtn695rT05Fhlz
- BdqQwkvUtaJae8tNyRF3IxFBzh4IYHk0i6RmpI1SeKxxuODaKnRdHBNOnVKEBlyOsU57
- QmW/41nRAXgciuYQA/m/nwhbK4+ZEtKGNmx8NlP575+NRjYlfhYEEtqh2ShVkpYNd0YY
- +Vpvz/V5N8221IDnQkdsn/T8fWCrCW2zFFoTJKnCmUNAv6ol1Rzsr2KeQbdSnFLOzvLb Uw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 2xf74sfgcy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Jan 2020 00:32:07 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00G0TVSt177405;
-        Thu, 16 Jan 2020 00:32:07 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2xj1ps3nas-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Jan 2020 00:32:07 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00G0W6SY000756;
-        Thu, 16 Jan 2020 00:32:06 GMT
-Received: from [192.168.14.112] (/109.66.225.253)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 15 Jan 2020 16:32:06 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH] kvm: x86: Don't dirty guest memory on every vcpu_put()
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20200116001635.174948-1-jmattson@google.com>
-Date:   Thu, 16 Jan 2020 02:32:02 +0200
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Kevin Mcgaire <kevinmcgaire@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FE5AE42B-107F-4D7E-B728-E33780743434@oracle.com>
-References: <20200116001635.174948-1-jmattson@google.com>
-To:     Jim Mattson <jmattson@google.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9501 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001160001
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9501 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001160000
+        id S1729019AbgAPBIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Jan 2020 20:08:35 -0500
+Received: from h2.fbrelay.privateemail.com ([131.153.2.43]:39119 "EHLO
+        h2.fbrelay.privateemail.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726587AbgAPBIf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Jan 2020 20:08:35 -0500
+Received: from MTA-06-3.privateemail.com (mta-06.privateemail.com [68.65.122.16])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by h1.fbrelay.privateemail.com (Postfix) with ESMTPS id 4F27880821
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2020 20:08:34 -0500 (EST)
+Received: from MTA-06.privateemail.com (localhost [127.0.0.1])
+        by MTA-06.privateemail.com (Postfix) with ESMTP id 3007E6003D;
+        Wed, 15 Jan 2020 20:08:33 -0500 (EST)
+Received: from zetta.local (unknown [10.20.151.220])
+        by MTA-06.privateemail.com (Postfix) with ESMTPA id BD0B860043;
+        Thu, 16 Jan 2020 01:08:32 +0000 (UTC)
+Subject: Re: [Bug 206215] New: QEMU guest crash due to random 'general
+ protection fault' since kernel 5.2.5 on i7-3517UE
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        bugzilla-daemon@bugzilla.kernel.org
+Cc:     kvm@vger.kernel.org
+References: <bug-206215-28872@https.bugzilla.kernel.org/>
+ <20200115215256.GE30449@linux.intel.com>
+From:   Derek Yerger <derek@djy.llc>
+Message-ID: <e6ec4418-4ac1-e619-7402-18c085bc340d@djy.llc>
+Date:   Wed, 15 Jan 2020 20:08:32 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <20200115215256.GE30449@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 1/15/20 4:52 PM, Sean Christopherson wrote:
+> +cc Derek, who is hitting the same thing.
+>
+> On Wed, Jan 15, 2020 at 09:18:56PM +0000, bugzilla-daemon@bugzilla.kernel.org wrote:
+>> https://bugzilla.kernel.org/show_bug.cgi?id=206215
+> *snip*
+> that's a big smoking gun pointing at commit ca7e6b286333 ("KVM: X86: Fix
+> fpu state crash in kvm guest"), which is commit e751732486eb upstream.
+>
+> 1. Can you verify reverting ca7e6b286333 (or e751732486eb in upstream)
+>     solves the issue?
+>
+> 2. Assuming the answer is yes, on a buggy kernel, can you run with the
+>     attached patch to try get debug info?
+I did these out of order since I had 5.3.11 built with the patch, ready to go 
+for weeks now, waiting for an opportunity to test.
 
+Win10 guest immediately BSOD'ed with:
 
-> On 16 Jan 2020, at 2:16, Jim Mattson <jmattson@google.com> wrote:
->=20
-> Beginning with commit 0b9f6c4615c99 ("x86/kvm: Support the vCPU
-> preemption check"), the KVM_VCPU_PREEMPTED flag is set in the guest
-> copy of the kvm_steal_time struct on every call to vcpu_put(). As a
-> result, guest memory is dirtied on every call to vcpu_put(), even when
-> the VM is quiescent.
->=20
-> To avoid dirtying guest memory unnecessarily, don't bother setting the
-> flag in the guest copy of the struct if it is already set in the
-> kernel copy of the struct.
+WARNING: CPU: 2 PID: 9296 at include/linux/thread_info.h:55 
+kernel_fpu_begin+0x6b/0xc0
 
-I suggest adding this comment to code as-well.
+Then stashed the patch, reverted ca7e6b286333, compile, reboot.
 
->=20
-> If a different vCPU thread clears the guest copy of the flag, it will
-> no longer get reset on the next call to vcpu_put, but it's not clear
-> that resetting the flag in this case was intentional to begin with.
-
-I agree=E2=80=A6 I find it hard to believe that guest vCPU is allowed to =
-clear the flag
-and expect host to set it again on the next vcpu_put() call. Doesn=E2=80=99=
-t really make sense.
-
->=20
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Tested-by: Kevin Mcgaire <kevinmcgaire@google.com>
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> Reviewed-by: Oliver Upton <oupton@google.com>
-
-Good catch.
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-
--Liran
-
->=20
-> ---
-> arch/x86/kvm/x86.c | 3 +++
-> 1 file changed, 3 insertions(+)
->=20
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index cf917139de6b..3dc17b173f88 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3504,6 +3504,9 @@ static void kvm_steal_time_set_preempted(struct =
-kvm_vcpu *vcpu)
-> 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
-> 		return;
->=20
-> +	if (vcpu->arch.st.steal.preempted & KVM_VCPU_PREEMPTED)
-> +		return;
-> +
-> 	vcpu->arch.st.steal.preempted =3D KVM_VCPU_PREEMPTED;
->=20
-> 	kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.st.stime,
-> --=20
-> 2.25.0.rc1.283.g88dfdc4193-goog
->=20
-
+Guest is running stable now on 5.3.11. Did test my CAD under the guest, did not 
+experience the crashes that had me stuck at 5.1.
