@@ -2,53 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 04E0313E051
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 17:41:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7749C13E091
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 17:45:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726897AbgAPQkN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 11:40:13 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:43977 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726706AbgAPQkN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:40:13 -0500
-Received: by mail-ot1-f67.google.com with SMTP id p8so19901044oth.10
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:40:12 -0800 (PST)
+        id S1729276AbgAPQoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 11:44:12 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:46186 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729261AbgAPQoL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 11:44:11 -0500
+Received: by mail-oi1-f193.google.com with SMTP id 13so19395241oij.13
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:44:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=nYAUE2nnyeDshvTu7pIzpU64iJrg7qrenO7ys1Dxxjw=;
-        b=woYkD56TT4VCIBc2vrqR+aUhpmqUXOPywHLUbQE8IDLw8Ne8bFBNNiIDStDHO92/Mw
-         OAKZmwTTwde7sQUxx6xfA57WzItiAmlyjhOtolgvJnpNR6p8JGYPpQNYwh+1g8lMKdx3
-         wfFNwNOLXi54UWK3roQaPN9ydHyIem3V2IUsetxsMeY0yphOUZW5GxzD3HdTTi5iYObA
-         g4OXDIAGacflRUUce6S3FXSlnu52xNQjnNDEBdogFYwMfVdpGIm9eAJpvU51kIu2UudN
-         6QDYmNF4cT8aRFyPTqTou8oX8p7ATScsqEkY/ybU71fhxxg/BEhfmQAn/GOqDjb/GPmw
-         ya6Q==
+        bh=nbt9ZpWqqdD6vIQRKy1qyLMQca6b/HxDSA+FsokmcTw=;
+        b=Ze19MaB/y1XsL4yRJAYS7+aOJ29PUXv+3+2hmEqRDnag03+g1ye3cgUk7xQcL0z7Pf
+         TlNX68znKCEYKCfow5hxU6VaTzw1i6KdPA/nB9h2H2P8z8BO0CncLNsMvxjdPU8QI0Cu
+         AWKu15pI+kuTXZKA9AJtmfk6xPJIOrxvOsMA+ATDNwHDvqT8BxqsAN1uo0ANE/q6gWzY
+         ANkjYzCzeq7V/JsFD8tay9ko/THXZO6gxV8rxKD4BZ1Jp+dISbjr1Sn9LfpfCZK3E1Pu
+         7gXzmonJl+xa8QW281fmbxr9EhWik8NrHPvDiIkmm8AxdxGUfP6Ffg2qpDOtLbCI5RO0
+         Ii5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=nYAUE2nnyeDshvTu7pIzpU64iJrg7qrenO7ys1Dxxjw=;
-        b=YrRsOzNfd8FYlZ0I1gz72fvFAFyG9/Krwmtnlv57o390uV7AoLe398b/u82pEcmyrF
-         R+7jBdYn5zJ5SL+Jj+2DwVOZcejmpI1BInm6CCdbKWLIipzfccg5Z5ss9IlIsYn2wTnI
-         p/itcx7qnNZO8BvhhkdvyLbOQsFz4u8hZ786k84Pyr+t4zmJ4IXURP05TBKMpB40sXp/
-         7o2yankrZApjSp1O4kMD1dHdZlm1h2zq9TNf8YFzybYcVeudD2tdta3xlftkAWSqINxN
-         k6FCdyxwiB/cfOFnZ5R4xGN90Br1Zls6Cb1G4p2RN3P/iBWNPhCNZ5r7dABUyQpnOWT9
-         bQRA==
-X-Gm-Message-State: APjAAAVKD1+ey71o+LjjG3j4mB5lo656X98tyhSxqVP3/aKJzCRNWZ29
-        y6z0qd2j6icabALadrSGA8/uGCaYyURBVbzxN8xrgw==
-X-Google-Smtp-Source: APXvYqx/emCu+rrCc6WG6o6dKNsnHDt6h8pMhVbFZ6t7fFuXEEJhoMyAfWCqWNoLl5KtNLC8zD9IL7H2fgVXXxDJ9qs=
-X-Received: by 2002:a05:6830:1586:: with SMTP id i6mr2574132otr.221.1579192812062;
- Thu, 16 Jan 2020 08:40:12 -0800 (PST)
+        bh=nbt9ZpWqqdD6vIQRKy1qyLMQca6b/HxDSA+FsokmcTw=;
+        b=U4Ztko0DbEboqIE3yllaM/K8k0iurpzpTA+EmDkhHxmOFukzGfMhVYLXwCMXeA5kT1
+         ZaWgWaDoA8KLwxCJNpFg5DpSTTvqRl96MO9WRxCCRzZ/gTWGBK6AeuGoXR2Bi3V8gJfy
+         0ZbwtaAOtXG2YseeDt0Es93XZDheW7ejPzkLsK1aBwXuQeSDFdAvY3wIcxU7TccZiqrP
+         nDwzAXp9jkxnUHa70aTKy6Chvz4awPgCq42gCytHFXy8BEFzmumvJEHHEzNCO9gDLgRC
+         9lQ2f6Bey0I7MTDpUmbRRGVVUnxmCjUHcb6wLjIsdXCYe32qaZGMfGHhU0NvhHghIEiv
+         653w==
+X-Gm-Message-State: APjAAAXf68s2xcnfJf4NFK2SbLL4EXTO8AZ0OI3MjOS+4AAflWXH96yE
+        wsUgJUQq2qfEyNLIXfnScdL48lLcvZk2EbSc5piINg==
+X-Google-Smtp-Source: APXvYqy2Ea0ZSpaXvRx0kSDWa4cAPhZR203J8lHCxJ4EET5zN+o2QBNrDh+pFMTnItNoG/JnqzuXjV62Cr3+/XULQqo=
+X-Received: by 2002:aca:d78b:: with SMTP id o133mr4860165oig.163.1579193051335;
+ Thu, 16 Jan 2020 08:44:11 -0800 (PST)
 MIME-Version: 1.0
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-9-git-send-email-gengdongjiu@huawei.com> <CAFEAcA_=PgkrWjwPxD89fCi85XPpcTHssXkSmE04Ctoj7AX0kA@mail.gmail.com>
-In-Reply-To: <CAFEAcA_=PgkrWjwPxD89fCi85XPpcTHssXkSmE04Ctoj7AX0kA@mail.gmail.com>
+References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com> <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
 From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 16 Jan 2020 16:40:01 +0000
-Message-ID: <CAFEAcA9tFcsMrX8_VQwh1P4h3BcwpLoo2h6COHBdQaK=0CoL5g@mail.gmail.com>
-Subject: Re: [PATCH v22 8/9] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
+Date:   Thu, 16 Jan 2020 16:44:00 +0000
+Message-ID: <CAFEAcA9z9KDHmvh6WsrCPj_FTvNmOfhatxNQDftNG+ZKZN0wAA@mail.gmail.com>
+Subject: Re: [PATCH v22 5/9] ACPI: Record the Generic Error Status Block address
 To:     Dongjiu Geng <gengdongjiu@huawei.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
@@ -71,41 +69,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 16 Jan 2020 at 16:28, Peter Maydell <peter.maydell@linaro.org> wrote:
-> This function (kvm_arch_on_sigbus_vcpu()) will be called in two contexts:
+On Wed, 8 Jan 2020 at 11:33, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 >
-> (1) in the vcpu thread:
->   * the real SIGBUS handler sigbus_handler() sets a flag and arranges
->     for an immediate vcpu exit
->   * the vcpu thread reads the flag on exit from KVM_RUN and
->     calls kvm_arch_on_sigbus_vcpu() directly
->   * the error could be MCEERR_AR or MCEERR_AO
-> (2) MCE errors on other threads:
->   * here SIGBUS is blocked, so MCEERR_AR (action-required)
->     errors will cause the kernel to just kill the QEMU process
->   * MCEERR_AO errors will be handled via the iothread's use
->     of signalfd(), so kvm_on_sigbus() will get called from
->     the main thread, and it will call kvm_arch_on_sigbus_vcpu()
->   * in this case the passed in CPUState will (arbitrarily) be that
->     for the first vCPU
+> Record the GHEB address via fw_cfg file, when recording
+> a error to CPER, it will use this address to find out
+> Generic Error Data Entries and write the error.
 >
-> For MCEERR_AR, the code here looks correct -- we know this is
-> only going to happen for the relevant vCPU so we can go ahead
-> and do the "record it in the ACPI table and tell the guest" bit.
+> Make the HEST GHES to a GED device.
 >
-> But shouldn't we be doing something with the MCEERR_AO too?
-> That of course will be trickier because we're not necessarily
-> in the vcpu thread, but it would be nice to let the guest
-> know about it.
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> ---
+>  hw/acpi/generic_event_device.c         | 15 ++++++++++++++-
+>  hw/acpi/ghes.c                         | 16 ++++++++++++++++
+>  hw/arm/virt-acpi-build.c               | 13 ++++++++++++-
+>  include/hw/acpi/generic_event_device.h |  2 ++
+>  include/hw/acpi/ghes.h                 |  6 ++++++
+>  5 files changed, 50 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+> index 9cee90c..9bf37e4 100644
+> --- a/hw/acpi/generic_event_device.c
+> +++ b/hw/acpi/generic_event_device.c
+> @@ -234,12 +234,25 @@ static const VMStateDescription vmstate_ged_state = {
+>      }
+>  };
+>
+> +static const VMStateDescription vmstate_ghes_state = {
+> +    .name = "acpi-ghes-state",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields      = (VMStateField[]) {
+> +        VMSTATE_UINT64(ghes_addr_le, AcpiGhesState),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_acpi_ged = {
+>      .name = "acpi-ged",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_STRUCT(ged_state, AcpiGedState, 1, vmstate_ged_state, GEDState),
+> +        VMSTATE_STRUCT(ged_state, AcpiGedState, 1,
+> +                       vmstate_ged_state, GEDState),
+> +        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
+> +                       vmstate_ghes_state, AcpiGhesState),
+>          VMSTATE_END_OF_LIST(),
+>      },
+>      .subsections = (const VMStateDescription * []) {
 
-An IRC discussion with Paolo came to the conclusion that
-the nicest approach here would be for kvm_on_sigbus() to
-use run_on_cpu() to call the whole of kvm_arch_on_sigbus_vcpu()
-in the vcpu thread for the cpu it gets passed. Then the code
-here would not have to worry about the "not on the right thread"
-case. This would be a refactoring of the x86 code, which currently
-does the run_on_cpu inside its implementation, in
-cpu_x86_inject_mce().
+You can't just add fields to an existing VMStateDescription
+like this -- it will break migration compatibility. Instead you
+need to add a new subsection to this vmstate, with a '.needed'
+function which indicates when the subsection should be present.
 
 thanks
 -- PMM
