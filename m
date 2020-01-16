@@ -2,52 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 060B013EE61
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 19:09:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6ACF813EE64
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 19:09:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395041AbgAPSIp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 13:08:45 -0500
-Received: from mga01.intel.com ([192.55.52.88]:3401 "EHLO mga01.intel.com"
+        id S2395047AbgAPSIy convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 16 Jan 2020 13:08:54 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45272 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2395038AbgAPSIm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 13:08:42 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jan 2020 10:08:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,327,1574150400"; 
-   d="scan'208";a="257468475"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 16 Jan 2020 10:08:41 -0800
-Date:   Thu, 16 Jan 2020 10:08:41 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Derek Yerger <derek@djy.llc>
-Cc:     bugzilla-daemon@bugzilla.kernel.org, kvm@vger.kernel.org
-Subject: Re: [Bug 206215] New: QEMU guest crash due to random 'general
- protection fault' since kernel 5.2.5 on i7-3517UE
-Message-ID: <20200116180841.GE20561@linux.intel.com>
+        id S2395046AbgAPSIu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 13:08:50 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206215] QEMU guest crash due to random 'general protection
+ fault' since kernel 5.2.5 on i7-3517UE
+Date:   Thu, 16 Jan 2020 18:08:49 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: sean.j.christopherson@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206215-28872-ppTHYf6H3E@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206215-28872@https.bugzilla.kernel.org/>
 References: <bug-206215-28872@https.bugzilla.kernel.org/>
- <20200115215256.GE30449@linux.intel.com>
- <e6ec4418-4ac1-e619-7402-18c085bc340d@djy.llc>
- <20200116153854.GA20561@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200116153854.GA20561@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=206215
+
+--- Comment #6 from Sean Christopherson (sean.j.christopherson@intel.com) ---
 On Thu, Jan 16, 2020 at 07:38:54AM -0800, Sean Christopherson wrote:
 > On Wed, Jan 15, 2020 at 08:08:32PM -0500, Derek Yerger wrote:
 > > On 1/15/20 4:52 PM, Sean Christopherson wrote:
 > > >+cc Derek, who is hitting the same thing.
 > > >
-> > >On Wed, Jan 15, 2020 at 09:18:56PM +0000, bugzilla-daemon@bugzilla.kernel.org wrote:
+> > >On Wed, Jan 15, 2020 at 09:18:56PM +0000,
+> bugzilla-daemon@bugzilla.kernel.org wrote:
 > > >>https://bugzilla.kernel.org/show_bug.cgi?id=206215
 > > >*snip*
 > > >that's a big smoking gun pointing at commit ca7e6b286333 ("KVM: X86: Fix
@@ -74,7 +81,7 @@ without the vCPU being preempted.
 
 The comment on fpregs_lock() states that softirq can set TIF_NEED_FPU_LOAD,
 which would not be handled by the preempt notifier.
- 
+
   /*
    * Use fpregs_lock() while editing CPU's FPU registers or fpu->state.
    * A context switch will (and softirq might) save CPU's FPU registers to
@@ -121,7 +128,7 @@ kernel_fpu_begin() can be invoked without KVM being preempted.
   kvm_mmu_page_fault+0x60/0x120 [kvm]
   handle_ept_violation+0x91/0x170 [kvm_intel]
   vmx_handle_exit+0x1ca/0x1400 [kvm_intel]
-  
+
 Either of the above explains why pre-e751732486eb code waited until IRQs
 are disabled by vcpu_enter_guest() to do switch_fpu_return().
 
@@ -137,3 +144,7 @@ implementations of the hooks to handle TIF_NEED_FPU_LOAD.
 > > 
 > > Guest is running stable now on 5.3.11. Did test my CAD under the guest, did
 > > not experience the crashes that had me stuck at 5.1.
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
