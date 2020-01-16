@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 293AE13DB03
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 14:02:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6AEB13DB0E
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 14:04:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbgAPNCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 08:02:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32104 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726730AbgAPNCB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 08:02:01 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00GCwDIS138205
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:02:00 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xhgs7wj58-1
+        id S1726440AbgAPNEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 08:04:45 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4376 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726329AbgAPNEo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 08:04:44 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00GD2j43097470
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:04:44 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xh8d666kj-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:01:59 -0500
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:04:43 -0500
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 16 Jan 2020 13:01:58 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 16 Jan 2020 13:04:41 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 16 Jan 2020 13:01:54 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00GD1r1Z55640250
+        Thu, 16 Jan 2020 13:04:38 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00GD3mse47055268
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Jan 2020 13:01:53 GMT
+        Thu, 16 Jan 2020 13:03:48 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4BE7442067;
-        Thu, 16 Jan 2020 13:01:53 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id B5B8042052;
+        Thu, 16 Jan 2020 13:04:37 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0C8FC42059;
-        Thu, 16 Jan 2020 13:01:53 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 7E72242049;
+        Thu, 16 Jan 2020 13:04:37 +0000 (GMT)
 Received: from dyn-9-152-224-123.boeblingen.de.ibm.com (unknown [9.152.224.123])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 16 Jan 2020 13:01:52 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 2/7] s390x: smp: Only use smp_cpu_setup
- once
+        Thu, 16 Jan 2020 13:04:37 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 3/7] s390x: Add cpu id to interrupt
+ error prints
 To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
         linux-s390@vger.kernel.org, cohuck@redhat.com
 References: <20200116120513.2244-1-frankja@linux.ibm.com>
- <20200116120513.2244-3-frankja@linux.ibm.com>
- <9847c5e8-2950-add1-e86b-0d14f0aca0bd@redhat.com>
+ <20200116120513.2244-4-frankja@linux.ibm.com>
+ <1bf32ccd-4047-7676-2ef4-a3327bf3995f@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -90,164 +90,147 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Thu, 16 Jan 2020 14:01:52 +0100
+Date:   Thu, 16 Jan 2020 14:04:37 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <9847c5e8-2950-add1-e86b-0d14f0aca0bd@redhat.com>
+In-Reply-To: <1bf32ccd-4047-7676-2ef4-a3327bf3995f@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="As5EVDSvI2DGATtmvewUXZi6Cy0hoLowM"
+ boundary="1EIMA5zOdNR3WrE45vaiaflsfcihjlQs3"
 X-TM-AS-GCONF: 00
-x-cbid: 20011613-0020-0000-0000-000003A1319F
+x-cbid: 20011613-0016-0000-0000-000002DDDD6D
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011613-0021-0000-0000-000021F8B05C
-Message-Id: <7334c5fc-a125-9db3-877a-31c70c91429e@linux.ibm.com>
+x-cbparentid: 20011613-0017-0000-0000-000033407537
+Message-Id: <95c0a6af-7334-1825-226e-5973a639035a@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-01-16_04:2020-01-16,2020-01-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- malwarescore=0 suspectscore=3 mlxlogscore=999 impostorscore=0 spamscore=0
- bulkscore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001160110
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 mlxscore=0 mlxlogscore=999 spamscore=0 bulkscore=0
+ phishscore=0 suspectscore=3 adultscore=0 impostorscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001160111
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---As5EVDSvI2DGATtmvewUXZi6Cy0hoLowM
-Content-Type: multipart/mixed; boundary="vhzBqbftFTjQqqSnMyrjueRgEpghAnWOC"
+--1EIMA5zOdNR3WrE45vaiaflsfcihjlQs3
+Content-Type: multipart/mixed; boundary="HkNbuUB7EFq4VChJCVCmTB7lbaCxR4ims"
 
---vhzBqbftFTjQqqSnMyrjueRgEpghAnWOC
+--HkNbuUB7EFq4VChJCVCmTB7lbaCxR4ims
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 1/16/20 1:18 PM, David Hildenbrand wrote:
+On 1/16/20 1:17 PM, David Hildenbrand wrote:
 > On 16.01.20 13:05, Janosch Frank wrote:
->> Let's stop and start instead of using setup to run a function on a
->> cpu.
+>> It's good to know which cpu broke the test.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 >> ---
->>  s390x/smp.c | 20 +++++++++++++-------
->>  1 file changed, 13 insertions(+), 7 deletions(-)
+>>  lib/s390x/interrupt.c | 20 ++++++++++----------
+>>  1 file changed, 10 insertions(+), 10 deletions(-)
 >>
->> diff --git a/s390x/smp.c b/s390x/smp.c
->> index 02204fd..d430638 100644
->> --- a/s390x/smp.c
->> +++ b/s390x/smp.c
->> @@ -47,7 +47,7 @@ static void test_start(void)
->>  	psw.mask =3D extract_psw_mask();
->>  	psw.addr =3D (unsigned long)test_func;
->> =20
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
->>  	wait_for_flag();
->>  	report(1, "start");
->>  }
->> @@ -132,9 +132,8 @@ static void test_ecall(void)
->> =20
->>  	report_prefix_push("ecall");
->>  	testflag =3D 0;
->> -	smp_cpu_destroy(1);
->> =20
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
->>  	wait_for_flag();
->>  	testflag =3D 0;
->>  	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
->> @@ -167,9 +166,8 @@ static void test_emcall(void)
->> =20
->>  	report_prefix_push("emcall");
->>  	testflag =3D 0;
->> -	smp_cpu_destroy(1);
->> =20
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
->>  	wait_for_flag();
->>  	testflag =3D 0;
->>  	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
->> @@ -187,7 +185,7 @@ static void test_reset_initial(void)
->>  	psw.addr =3D (unsigned long)test_func;
->> =20
->>  	report_prefix_push("reset initial");
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
->> =20
->>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
->>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
->> @@ -218,7 +216,7 @@ static void test_reset(void)
->>  	psw.addr =3D (unsigned long)test_func;
->> =20
->>  	report_prefix_push("cpu reset");
->> -	smp_cpu_setup(1, psw);
->> +	smp_cpu_start(1, psw);
->> =20
->>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
->>  	report(smp_cpu_stopped(1), "cpu stopped");
->> @@ -227,6 +225,7 @@ static void test_reset(void)
->> =20
->>  int main(void)
+>> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+>> index 05f30be..773752a 100644
+>> --- a/lib/s390x/interrupt.c
+>> +++ b/lib/s390x/interrupt.c
+>> @@ -107,8 +107,8 @@ static void fixup_pgm_int(void)
+>>  void handle_pgm_int(void)
 >>  {
->> +	struct psw psw;
->>  	report_prefix_push("smp");
+>>  	if (!pgm_int_expected)
+>> -		report_abort("Unexpected program interrupt: %d at %#lx, ilen %d\n",=
+
+>> -			     lc->pgm_int_code, lc->pgm_old_psw.addr,
+>> +		report_abort("Unexpected program interrupt: %d on cpu %d at %#lx, i=
+len %d\n",
+>> +			     lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
+>>  			     lc->pgm_int_id);
+>=20
+> nit: "cpu: %d"
+>=20
 >> =20
->>  	if (smp_query_num_cpus() =3D=3D 1) {
->> @@ -234,6 +233,12 @@ int main(void)
->>  		goto done;
+>>  	pgm_int_expected =3D false;
+>> @@ -119,8 +119,8 @@ void handle_ext_int(void)
+>>  {
+>>  	if (!ext_int_expected &&
+>>  	    lc->ext_int_code !=3D EXT_IRQ_SERVICE_SIG) {
+>> -		report_abort("Unexpected external call interrupt (code %#x): at %#l=
+x",
+>> -			     lc->ext_int_code, lc->ext_old_psw.addr);
+>> +		report_abort("Unexpected external call interrupt (code %#x): on cpu=
+ %d at %#lx",
+>> +			     stap(), lc->ext_int_code, lc->ext_old_psw.addr);
+>=20
+> nit: "(code %#x) on cpu: %d" ...
+
+So, should I move the old : or add a second one?
+
+>=20
+> Same comment for the ones below
+>=20
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+>=20
+>>  		return;
 >>  	}
 >> =20
->> +	/* Setting up the cpu to give it a stack and lowcore */
->> +	psw.mask =3D extract_psw_mask();
->> +	psw.addr =3D (unsigned long)cpu_loop;
->> +	smp_cpu_setup(1, psw);
->> +	smp_cpu_stop(1);
->> +
->>  	test_start();
->>  	test_stop();
->>  	test_stop_store_status();
->> @@ -242,6 +247,7 @@ int main(void)
->>  	test_emcall();
->>  	test_reset();
->>  	test_reset_initial();
->> +	smp_cpu_destroy(1);
+>> @@ -137,18 +137,18 @@ void handle_ext_int(void)
 >> =20
->>  done:
->>  	report_prefix_pop();
+>>  void handle_mcck_int(void)
+>>  {
+>> -	report_abort("Unexpected machine check interrupt: at %#lx",
+>> -		     lc->mcck_old_psw.addr);
+>> +	report_abort("Unexpected machine check interrupt: on cpu %d at %#lx"=
+,
+>> +		     stap(), lc->mcck_old_psw.addr);
+>>  }
+>> =20
+>>  void handle_io_int(void)
+>>  {
+>> -	report_abort("Unexpected io interrupt: at %#lx",
+>> -		     lc->io_old_psw.addr);
+>> +	report_abort("Unexpected io interrupt: on cpu %d at %#lx",
+>> +		     stap(), lc->io_old_psw.addr);
+>>  }
+>> =20
+>>  void handle_svc_int(void)
+>>  {
+>> -	report_abort("Unexpected supervisor call interrupt: at %#lx",
+>> -		     lc->svc_old_psw.addr);
+>> +	report_abort("Unexpected supervisor call interrupt: on cpu %d at %#l=
+x",
+>> +		     stap(), lc->svc_old_psw.addr);
+>>  }
 >>
 >=20
-> Acked-by: David Hildenbrand <david@redhat.com>
-Thanks!
 
 
 
---vhzBqbftFTjQqqSnMyrjueRgEpghAnWOC--
+--HkNbuUB7EFq4VChJCVCmTB7lbaCxR4ims--
 
---As5EVDSvI2DGATtmvewUXZi6Cy0hoLowM
+--1EIMA5zOdNR3WrE45vaiaflsfcihjlQs3
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4gXsAACgkQ41TmuOI4
-ufgPCQ//WTFS96qyoWLLs2cBlIGaav4M7BcJ2KmFBRk0RIy4Ai4baRrNpMGwze6+
-0X0jl7vsy2Y7D74iTTs7hiM+j6iLaTqGJ2RnQSs3XPUWVVpQ6HaycS9rFC9ol6IO
-rnDGUsDegutgZm0usZXcrgGYu3X56/G1xU1B/CXv4WMr0+XJBn/5ci2r0SoLm7oD
-GV2LLN8KkWoIWQ662fpmtHptLcfJlHcULhczVdiHYwmFKiMrtaApgFjDD08oAnjq
-WBglAJngkvCRtvVy6flsKrAZD9XBn6+nxNLy4aJXymEmA/BmtBI22qjlo4NBTJ0Q
-XxiX2eq+K26aW8NzYXnEEhHBfv0VKJosjokRuPItVmR5xTlWkoJNOZg+KRwXCToB
-5iLXsFdwjJqNfJkWO+mrfAf2NZ5uvb3xBDdusz26PqkktnjK3b8GkmsbeIppfX7H
-BzslwpBn8U5DtScBtNf5TxCPlSTV+EoD5kFeEREvRE+N9uhDnPFL3IM/ZguFhY8O
-t6qmbiH1g33cD8bbuMIOs/q9PrDIVmGXL9fObwjC9gPr7WkalHfa4slbkjOx0Udh
-gqfQ5Y8CgOE6KRfOg4x6gpX/OrOGCB/5xi7ByWJ33/W/sKpCKFyG2WI5ncF2AfP2
-WFuGtf7/vIqM8KYLSWewLwNZXgw4zlTrefwa4VVpNBjsQmRWEBk=
-=LZ4i
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4gX2UACgkQ41TmuOI4
+ufjJfw//ZmW6d3TfJG9vmT0VnjupaIzWsXGfU8pc3Vr72kIw+bLYk3N7R4qnIxfU
+Z2GzIEkXKhlZeHMER4UUM7KUzK3O3TuskjXF/AfKYQ27TFoyrsE00mk6041/jbI6
+1t1AGlnRoo8Da+DOs9Zgtfqv42r5Sjs1BvuKsCDjji9GXzKeVNMSclA3Yr4Inu/y
+hYgqrYIYnDO6qBLtvBqCPdeRdp1OjpEEDXoVCfkifuSjLo98u1EExzkN0hPJS1EQ
+1/6/ZyO0CG4M0JCh77r6ShLKSfEMwSiuhwxC05wPm6Gkc7OS8kEq6qvJVwy+1lyy
+wyQ278MWVMjS+SpPcD9BLGLPSA0nlvlZ3xLDKoMCl6ZoJderOlrqty3MvQajiNB9
+1WMi4YrRuUZS4rGZ1r3kbBDWo8JA7hFT7DAYI2SrcsFHkik+XSyQSwq3b948JcWc
+rNUbDJ4znZoVb+8RrYZep/fPSFFdFTair46CFdn30YkJvDZtSB4OsBFGmKpo2Wr2
+Gfc5DE/XzA60s4iTVsC00gnlejyMTcLWQTiK5okzRWYDZyzdeiWfplofHao0bBIx
+uE0yXvltdy4cq2YJUmp+Kn/rckkkBtwPTBM5sPY0/NcJ4EyRmKxR7y5Wd7/5oe0V
+KZgvpAnXjzPKBWRmJemGYk2Mw0kmuv45qFWPpqDvIqTAPEiH744=
+=XxUq
 -----END PGP SIGNATURE-----
 
---As5EVDSvI2DGATtmvewUXZi6Cy0hoLowM--
+--1EIMA5zOdNR3WrE45vaiaflsfcihjlQs3--
 
