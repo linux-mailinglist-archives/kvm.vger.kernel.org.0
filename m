@@ -2,117 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7308D13E444
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 18:07:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24A1613E9E3
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 18:40:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388310AbgAPRHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 12:07:06 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38328 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389069AbgAPRHE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:07:04 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S2393667AbgAPRkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 12:40:43 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49489 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2405569AbgAPRkm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 12:40:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579196441;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=h8Hp5LsVsY8iyzznMU6rRN7uhlbtTR0PHM4cQMPZpIY=;
+        b=Y+7rz+19Tgj8RmHnXY+d0qjWEjk/ZmuqMYKYJyh8aMuq1hSx7EmCjdwKj4xidcMNW18ye/
+        aiz9tfA90F/P3oLTYW+CkUt7sf/drDrPzhVWBAQ8FLHjCGeX8ywiRfHbCPTL6ZtTpNWZ3e
+        f4+eQ1fhkGZQvqkJvL4/DmHH5jlbGbw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-MDoAMc0ONGSci6jpwrEnvg-1; Thu, 16 Jan 2020 12:40:39 -0500
+X-MC-Unique: MDoAMc0ONGSci6jpwrEnvg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E5219217F4;
-        Thu, 16 Jan 2020 17:07:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579194424;
-        bh=HEfK2KpxI9JcRyxK58/DnvyfOIJxDZIR/FRlXyEiOzA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yokt7zvL/+Qvceze6btHtsNcO+mkUpqtXhMJxw2dsm92BoRw8GFAxSP+cYMjC2O9C
-         wNNDMm/B3+JY9vee7ztAxCcN0O22VxUHNYiNWkkhdf4FCpOR9NYTyuVS2PBmnzFoL4
-         mFo5uNxAqr/8DDUb8gl3/vx2M157FYRRSiw0DXXE=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Parav Pandit <parav@mellanox.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 342/671] vfio/mdev: Fix aborting mdev child device removal if one fails
-Date:   Thu, 16 Jan 2020 11:59:40 -0500
-Message-Id: <20200116170509.12787-79-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116170509.12787-1-sashal@kernel.org>
-References: <20200116170509.12787-1-sashal@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AA36DB33;
+        Thu, 16 Jan 2020 17:40:38 +0000 (UTC)
+Received: from gondolin (unknown [10.36.117.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C0F12101F942;
+        Thu, 16 Jan 2020 17:40:30 +0000 (UTC)
+Date:   Thu, 16 Jan 2020 18:40:27 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: Re: [PATCH v4 11/12] samples: add vfio-mdev-pci driver
+Message-ID: <20200116184027.2954c3f5.cohuck@redhat.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A184041@SHSMSX104.ccr.corp.intel.com>
+References: <1578398509-26453-1-git-send-email-yi.l.liu@intel.com>
+        <1578398509-26453-12-git-send-email-yi.l.liu@intel.com>
+        <20200115133027.228452fd.cohuck@redhat.com>
+        <A2975661238FB949B60364EF0F2C25743A184041@SHSMSX104.ccr.corp.intel.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Parav Pandit <parav@mellanox.com>
+On Thu, 16 Jan 2020 13:23:28 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-[ Upstream commit 6093e348a5e2475c5bb2e571346460f939998670 ]
+> > From: Cornelia Huck [mailto:cohuck@redhat.com]
+> > Sent: Wednesday, January 15, 2020 8:30 PM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [PATCH v4 11/12] samples: add vfio-mdev-pci driver
+> > 
+> > On Tue,  7 Jan 2020 20:01:48 +0800
+> > Liu Yi L <yi.l.liu@intel.com> wrote:
 
-device_for_each_child() stops executing callback function for remaining
-child devices, if callback hits an error.
-Each child mdev device is independent of each other.
-While unregistering parent device, mdev core must remove all child mdev
-devices.
-Therefore, mdev_device_remove_cb() always returns success so that
-device_for_each_child doesn't abort if one child removal hits error.
+> > > diff --git a/samples/Kconfig b/samples/Kconfig
+> > > index 9d236c3..50d207c 100644
+> > > --- a/samples/Kconfig
+> > > +++ b/samples/Kconfig
+> > > @@ -190,5 +190,15 @@ config SAMPLE_INTEL_MEI
+> > >  	help
+> > >  	  Build a sample program to work with mei device.
+> > >
+> > > +config SAMPLE_VFIO_MDEV_PCI
+> > > +	tristate "Sample driver for wrapping PCI device as a mdev"
+> > > +	select VFIO_PCI_COMMON
+> > > +	select VFIO_PCI  
+> > 
+> > Why does this still need to select VFIO_PCI? Shouldn't all needed
+> > infrastructure rather be covered by VFIO_PCI_COMMON already?  
+> 
+> VFIO_PCI_COMMON is supposed to be the dependency of both VFIO_PCI and
+> SAMPLE_VFIO_MDEV_PCI. However, the source code of VFIO_PCI_COMMON are
+> under drivers/vfio/pci which is compiled per the configuration of VFIO_PCI.
+> Besides of letting SAMPLE_VFIO_MDEV_PCI select VFIO_PCI, I can also add
+> a line in drivers/vfio/Makefile to make the source code under drivers/vfio/pci
+> to be compiled when either VFIO_PCI or VFIO_PCI_COMMON are configed. But
+> I'm afraid it is a bit ugly. So I choose to let SAMPLE_VFIO_MDEV_PCI select
+> VFIO_PCI. If you have other idea, I would be pleased to
+> know it. :-)
 
-While at it, improve remove and unregister functions for below simplicity.
+Shouldn't building drivers/vfio/pci/ for CONFIG_VFIO_PCI_COMMON already
+be enough (the Makefile changes look fine to me)? Or am I missing
+something obvious?
 
-There isn't need to pass forced flag pointer during mdev parent
-removal which invokes mdev_device_remove(). So simplify the flow.
+> 
+> >   
+> > > +	depends on VFIO_MDEV && VFIO_MDEV_DEVICE  
+> > 
+> > VFIO_MDEV_DEVICE already depends on VFIO_MDEV. But maybe also make this
+> > depend on PCI?
+> >   
+> > > +	help
+> > > +	  Sample driver for wrapping a PCI device as a mdev. Once bound to
+> > > +	  this driver, device passthru should through mdev path.  
+> > 
+> > "A PCI device bound to this driver will be assigned through the
+> > mediated device framework."
+> > 
+> > ?  
+> 
+> Maybe I should have mentioned it as "A PCI device bound to this
+> sample driver should follow the passthru steps for mdevs as showed
+> in Documentation/driver-api/vfio-mediated-device.rst."
+> 
+> Does it make more sense?
 
-mdev_device_remove() is called from two paths.
-1. mdev_unregister_driver()
-     mdev_device_remove_cb()
-       mdev_device_remove()
-2. remove_store()
-     mdev_device_remove()
-
-Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Parav Pandit <parav@mellanox.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/vfio/mdev/mdev_core.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 8cfa71230877..e052f62fdea7 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -150,10 +150,10 @@ static int mdev_device_remove_ops(struct mdev_device *mdev, bool force_remove)
- 
- static int mdev_device_remove_cb(struct device *dev, void *data)
- {
--	if (!dev_is_mdev(dev))
--		return 0;
-+	if (dev_is_mdev(dev))
-+		mdev_device_remove(dev, true);
- 
--	return mdev_device_remove(dev, data ? *(bool *)data : true);
-+	return 0;
- }
- 
- /*
-@@ -241,7 +241,6 @@ EXPORT_SYMBOL(mdev_register_device);
- void mdev_unregister_device(struct device *dev)
- {
- 	struct mdev_parent *parent;
--	bool force_remove = true;
- 
- 	mutex_lock(&parent_list_lock);
- 	parent = __find_parent_device(dev);
-@@ -255,8 +254,7 @@ void mdev_unregister_device(struct device *dev)
- 	list_del(&parent->next);
- 	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
- 
--	device_for_each_child(dev, (void *)&force_remove,
--			      mdev_device_remove_cb);
-+	device_for_each_child(dev, NULL, mdev_device_remove_cb);
- 
- 	parent_remove_sysfs_files(parent);
- 
--- 
-2.20.1
+Yes, it does :)
 
