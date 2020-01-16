@@ -2,102 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BD2413E00B
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 17:27:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D702A13E013
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 17:28:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726726AbgAPQ1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 11:27:12 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22551 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726088AbgAPQ1L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:27:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579192030;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WC8Z8j4wZiM+iDNfePn8Q6kPV/b9KT3V2XFsUH+aPzw=;
-        b=GbE4vh/JHsKALNaqvFMhPLR+DE7dONNxRVlug3ERhx2ABPi2nAJtqXjIx9/VCakMSVZYtc
-        Ium343YEfYdMauZ5kecFNj61gH+nm4R2meQvIXdMTlAj+ytZ9V0+nn4GwJzp+NV70s7ewX
-        2fEXOS5yzlE7bjph8D0WKMCLKaKsqRw=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-VBkUSBC7NnCf6DcB8C11FQ-1; Thu, 16 Jan 2020 11:27:06 -0500
-X-MC-Unique: VBkUSBC7NnCf6DcB8C11FQ-1
-Received: by mail-qk1-f200.google.com with SMTP id i135so13297243qke.14
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:27:06 -0800 (PST)
+        id S1726812AbgAPQ2q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 11:28:46 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:41817 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726370AbgAPQ2q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 11:28:46 -0500
+Received: by mail-ot1-f67.google.com with SMTP id r27so19878729otc.8
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:28:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8WJbhTsTM0l8OxSV/uIB4OR8tInBfjFfl18OnoFr1k8=;
+        b=CZIpFWNKSSkddyHn0xfkX3f+epSDDAvMbHfRBWgvdlTV3XTp32GimGfWhltlCnH5dg
+         zwNWVLC8ODcUw0hnJ7BUb6N/6WFyzmvmTI4fxkj6+kAucL0VINZBHy/ZQPRa5LDRCIFg
+         5tTMkPMIYlWcxAD/Fa1hh4uMi7e5Dzy7Tmgd0XWPEWSa8yrwHLIxEBAUGYLzgCZmU2MD
+         o7p5q+c1i/Pv/OHbR9HGRgLomkRrfxiEjzMOZ6xHSbvpdYxzsDEO+Unn7aisMtITaPVf
+         j0KgID6jEvnxsROKVz3yvnET9ScJc4RjaFDEsB2os6A93rD2YXDjXzFxcqBIp/2HRM2v
+         Kn5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WC8Z8j4wZiM+iDNfePn8Q6kPV/b9KT3V2XFsUH+aPzw=;
-        b=pfoNwbJVxUQtXX4bpceUanhSwe/2OPwYmm3Hqetn0un16/wMBwErRsHCU0el1rGd/c
-         pckLrKSI+bEU2wjvgC0XJLNLTaztRTazs/aNTyIcSAv3SpWMAhL+7aKyX3KAyvcCve/s
-         gq66dYFy16WKmXhZ0sKLw7u+ZU+JeoxiSCi07p9/Rmz40aLkuwjeJZ37/K/ilpAjEfRY
-         ax5flOTKC0siUA8c4MU35yQG7KFLzAj5ucZUpXRGfrOfdi4A8uMxXafkMSElQLlEA9JH
-         pONTmYCb8Yl85DMkXNSV+YIlAoi6o6WfLAVGMVKW4vRjrpQ8nFdg8KshYConaKDxvrDy
-         kzAw==
-X-Gm-Message-State: APjAAAXXqFV0sGUtv43kYJ4LLHX8bm2D1kUY0joxtdWyQ3HNNj5nKGEr
-        iFMRr1s5ZPsD2jzburTM42zxjLZK6x2TSqIHIXZ02rYTqqU6cDCnvM0yZhknGxFw8D45urTAZit
-        BO5WN3bdhxz4o
-X-Received: by 2002:a37:8ac4:: with SMTP id m187mr29027926qkd.277.1579192025790;
-        Thu, 16 Jan 2020 08:27:05 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxYtk2Bh02F1YEqXqx8bwti4pMx8sbu0T6IbdlxQJ1t7qPkHRZYDmYJaMmrkINO8rf3duc41Q==
-X-Received: by 2002:a37:8ac4:: with SMTP id m187mr29027901qkd.277.1579192025558;
-        Thu, 16 Jan 2020 08:27:05 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id k29sm11420492qtu.54.2020.01.16.08.27.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2020 08:27:04 -0800 (PST)
-Date:   Thu, 16 Jan 2020 11:27:03 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Lei Cao <lei.cao@stratus.com>
-Subject: Re: [PATCH v3 12/21] KVM: X86: Implement ring-based dirty memory
- tracking
-Message-ID: <20200116162703.GA344339@xz-x1>
-References: <20200109145729.32898-1-peterx@redhat.com>
- <20200109145729.32898-13-peterx@redhat.com>
- <20200116033725-mutt-send-email-mst@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8WJbhTsTM0l8OxSV/uIB4OR8tInBfjFfl18OnoFr1k8=;
+        b=WCNR2WP+Wcq8baqWavwGBcuSYCg9NdnN9frW86toVsEKRatMGB0hKRqoweOZ6IQqqt
+         2dCViQoK0kekkKkCsnqMxi1OPHdD5IqTq4O9jn2lcxgl9+ma+qxRi+gLRZx5stRhpnhA
+         1/bt5BbuoHYtceLJFjXfBwkZ3d/gGy7ptSPk8Pt75wIUp9kr0BJFkFsVuCS+eDGIirPl
+         Q0jRBoB0Dt/ngSmou4CIIQD2E5iyJOlsyrcWYu4oJ/rkMJf4TyoYmBcU2ufDM1BJS5pZ
+         BAMlKU+iKyw6K5l1u32VmAallsY6hNpPThiMRozhjdVC8kRG59dGlFilQyRoswHB0TXM
+         NsUg==
+X-Gm-Message-State: APjAAAVayntZjaRRE5iBQzdJkkMcP1Lp5rX/E2dWZft2GZHtQAJ9oYBB
+        l/lIyxIb0OgldYAfmGnGIKvHNvDKWhtIroQ3+TmW3Q==
+X-Google-Smtp-Source: APXvYqzVRHK6rAR/t7eQ6rK72kuegcol5aP6HpRQ6XN1d8kQUY49Ip/TiPMoQmY8K+2LVdsvUCVlgzE6SjuScdy75g4=
+X-Received: by 2002:a05:6830:1586:: with SMTP id i6mr2528446otr.221.1579192125156;
+ Thu, 16 Jan 2020 08:28:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200116033725-mutt-send-email-mst@kernel.org>
+References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com> <1578483143-14905-9-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1578483143-14905-9-git-send-email-gengdongjiu@huawei.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu, 16 Jan 2020 16:28:34 +0000
+Message-ID: <CAFEAcA_=PgkrWjwPxD89fCi85XPpcTHssXkSmE04Ctoj7AX0kA@mail.gmail.com>
+Subject: Re: [PATCH v22 8/9] target-arm: kvm64: handle SIGBUS signal from
+ kernel or KVM
+To:     Dongjiu Geng <gengdongjiu@huawei.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Fam Zheng <fam@euphon.net>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "xuwei (O)" <xuwei5@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+        Zheng Xiang <zhengxiang9@huawei.com>,
+        Linuxarm <linuxarm@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 16, 2020 at 03:38:21AM -0500, Michael S. Tsirkin wrote:
-> On Thu, Jan 09, 2020 at 09:57:20AM -0500, Peter Xu wrote:
-> > +	/* If to map any writable page within dirty ring, fail it */
-> > +	if ((kvm_page_in_dirty_ring(vcpu->kvm, vma->vm_pgoff) ||
-> > +	     kvm_page_in_dirty_ring(vcpu->kvm, vma->vm_pgoff + pages - 1)) &&
-> > +	    vma->vm_flags & VM_WRITE)
-> > +		return -EINVAL;
-> 
-> Worth thinking about other flags. Do we want to force VM_SHARED?
-> Disable VM_EXEC?
+On Wed, 8 Jan 2020 at 11:33, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 
-Makes sense to me.  I think it worths a standalone patch since they
-should apply for the whole per-vcpu mmaped regions rather than only
-for the dirty ring buffers.
+> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+> +{
+> +    ram_addr_t ram_addr;
+> +    hwaddr paddr;
+> +
+> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+> +
+> +    if (acpi_enabled && addr &&
+> +            object_property_get_bool(qdev_get_machine(), "ras", NULL)) {
+> +        ram_addr = qemu_ram_addr_from_host(addr);
+> +        if (ram_addr != RAM_ADDR_INVALID &&
+> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+> +            kvm_hwpoison_page_add(ram_addr);
+> +            /*
+> +             * Asynchronous signal will be masked by main thread, so
+> +             * only handle synchronous signal.
+> +             */
 
-(Should include KVM_PIO_PAGE_OFFSET, KVM_COALESCED_MMIO_PAGE_OFFSET,
- KVM_S390_SIE_PAGE_OFFSET, kvm_run, and this new one)
+I don't understand this comment. (I think we've had discussions
+about it before, but it's still not clear to me.)
 
-Thanks,
+This function (kvm_arch_on_sigbus_vcpu()) will be called in two contexts:
 
--- 
-Peter Xu
+(1) in the vcpu thread:
+  * the real SIGBUS handler sigbus_handler() sets a flag and arranges
+    for an immediate vcpu exit
+  * the vcpu thread reads the flag on exit from KVM_RUN and
+    calls kvm_arch_on_sigbus_vcpu() directly
+  * the error could be MCEERR_AR or MCEERR_AO
+(2) MCE errors on other threads:
+  * here SIGBUS is blocked, so MCEERR_AR (action-required)
+    errors will cause the kernel to just kill the QEMU process
+  * MCEERR_AO errors will be handled via the iothread's use
+    of signalfd(), so kvm_on_sigbus() will get called from
+    the main thread, and it will call kvm_arch_on_sigbus_vcpu()
+  * in this case the passed in CPUState will (arbitrarily) be that
+    for the first vCPU
 
+For MCEERR_AR, the code here looks correct -- we know this is
+only going to happen for the relevant vCPU so we can go ahead
+and do the "record it in the ACPI table and tell the guest" bit.
+
+But shouldn't we be doing something with the MCEERR_AO too?
+That of course will be trickier because we're not necessarily
+in the vcpu thread, but it would be nice to let the guest
+know about it.
+
+One comment that would work with the current code would be:
+
+/*
+ * If this is a BUS_MCEERR_AR, we know we have been called
+ * synchronously from the vCPU thread, so we can easily
+ * synchronize the state and inject an error.
+ *
+ * TODO: we currently don't tell the guest at all about BUS_MCEERR_AO.
+ * In that case we might either be being called synchronously from
+ * the vCPU thread, or a bit later from the main thread, so doing
+ * the injection of the error would be more complicated.
+ */
+
+but I don't know if that's what you meant to say/implement...
+
+> +            if (code == BUS_MCEERR_AR) {
+> +                kvm_cpu_synchronize_state(c);
+> +                if (!acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
+> +                    kvm_inject_arm_sea(c);
+> +                } else {
+> +                    error_report("failed to record the error");
+> +                    abort();
+> +                }
+> +            }
+> +            return;
+> +        }
+> +        if (code == BUS_MCEERR_AO) {
+> +            error_report("Hardware memory error at addr %p for memory used by "
+> +                "QEMU itself instead of guest system!", addr);
+> +        }
+> +    }
+> +
+> +    if (code == BUS_MCEERR_AR) {
+> +        error_report("Hardware memory error!");
+> +        exit(1);
+> +    }
+> +}
+>
+
+thanks
+-- PMM
