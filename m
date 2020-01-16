@@ -2,139 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 25F6513D640
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 09:56:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C55F313D65A
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 10:04:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729619AbgAPI4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 03:56:03 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42104 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726370AbgAPI4D (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 03:56:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579164961;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=afuWeP9r07izvBy00eHnBoGUT4XeV+C8WTzPNKhb2Kk=;
-        b=aWpk/Qnm4V3Lm817/h89fANgV+R2IE4oOxmQ7BupWBy/MnLd/YVcY9GTTZ+u7FBrAComsW
-        R03NuENPPirO1sImwfPsiA9xOWJbm/Qzd6nSuklvIbil9R+whwbZzXKTRaNdpPJsyEnhGG
-        SD7Oxduy04MzIq4DepevfbLF+oxLBNA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-c9mnLw6dP8KctFxdrjWjbQ-1; Thu, 16 Jan 2020 03:56:00 -0500
-X-MC-Unique: c9mnLw6dP8KctFxdrjWjbQ-1
-Received: by mail-wm1-f72.google.com with SMTP id q26so402946wmq.8
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 00:56:00 -0800 (PST)
+        id S1730523AbgAPJEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 04:04:07 -0500
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:35320 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725973AbgAPJEH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 04:04:07 -0500
+Received: by mail-pj1-f67.google.com with SMTP id s7so1281783pjc.0;
+        Thu, 16 Jan 2020 01:04:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=U+3BCSnWn4TsegpodIg+CCuuc8hYDYmEd54pNj+hQe8=;
+        b=umn+IqrAkUg8Lczfv/av+jmNOPAaBCCOriIQM0WcqEyLpzjtkocNVLbEa7HftEDRCp
+         ZXrgkUD/Q8sbt85K9wh9BNGjWywMrU348smx5dZlr7zow7tbxh81IZg9j6v3yfsbWOab
+         r6o+KuBm8NxqDy3DaRLejhSGZ5oR9PGwbL3n5sY5WG0g7DnpcE6hxt1YdENgv5vsQopZ
+         kC5zM/ktRUwjGnmlKrT4/zl87zRwnno7CzLsYApMSABEJYU9o1glLtqbYhAKssFDYJk8
+         OrD7gC9jgvYm6xZLBRn96UidFDSwYaCjiUnXuUeHE4261LVOm1JiyWYfnUbuIpnve7fr
+         AOQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=afuWeP9r07izvBy00eHnBoGUT4XeV+C8WTzPNKhb2Kk=;
-        b=oZKa8zgfIkZFurqoXnYTy4ACtvHFy7UdZzdR/hPKwMPegTos00wKZNPkch8BIsFs7h
-         1bvcOVyHlvzw7+EFGem1uJaX5uYl4ow/qcwcrUB+lRnPduhvpkzvs+R2jXQkizExzc4J
-         D4+Mev7pEM+qKphi3akyy7fX6I5DUL/lE6HIX2AJHvCLfzabOKQYvARHJEodPtETzJrn
-         1lbTMbR1k2u3ZSxS8BFjPKtqLFLqdezdnqHZsirT7BfmtgJ/FdQmepIn6S33aZKVENqc
-         C0v5AvqGyZnBAD5eoaBXH3bN4M86R/N6R/ThVRah0Y/oArncxFdzdt8ausyX/PhbOsA8
-         VHlA==
-X-Gm-Message-State: APjAAAWfrrfXSbWYfnnZjD1tgNGioEZWBLtWZJJwcyIDH45kx8OBliEK
-        GS2XCqVtKD4KQN9xYII5xF7EjQOUsC2ONxgkWb2pWQfJNkI24zwPIz+srpVcJKKkDCSj3gstR+4
-        cBXtOGKzKFMqN
-X-Received: by 2002:a05:600c:220e:: with SMTP id z14mr4955234wml.114.1579164959365;
-        Thu, 16 Jan 2020 00:55:59 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwRaWqnsW99WiiG+BDNvBNCn+Q0DEidIbuHNwvDxAG1uCDbQ3SHAGRWFyXtx+LQ5jeXz51LhA==
-X-Received: by 2002:a05:600c:220e:: with SMTP id z14mr4955216wml.114.1579164959178;
-        Thu, 16 Jan 2020 00:55:59 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id 5sm28507830wrh.5.2020.01.16.00.55.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2020 00:55:58 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=U+3BCSnWn4TsegpodIg+CCuuc8hYDYmEd54pNj+hQe8=;
+        b=ge7tcrX56Da29lm7zsrVSlvS6o6jutM3CBVSfu0U1uUUokGGvS64ihWdS/oXvRqDpP
+         v9OorUlPNLbDj8vT+NOyHY0k9io4jRC5+t/Ug37uv83Y6oWu9AajHKXjuTHjvHQogixE
+         TWeMi+wUkB+nHWK76hn+bAFjP0XS8zwXKg+eQu7aSt8zIfdjh9S32HB62a0XHox00Zeb
+         WbamovQw4blHKkWZeWRvfW25Gy2QhCj2hbd6FdP+JeK/O2lgdGXu1+z/Qoqp5OtPFC8m
+         /pMq5Mvj2XwAxhyY7UvNw8fVuosskWQba8aD2ScbsdtWMhLb6vieJf6GlDUPXlhzNKsJ
+         VPTA==
+X-Gm-Message-State: APjAAAWq+szGLfqqrmxWu+Qlxk03glccqwqA4r/T2SSeP4hmX/taB0Kw
+        bUdNGd8t/WEsV44XmcW0/Q==
+X-Google-Smtp-Source: APXvYqzw0XcAtZanZ7artcVDGxxVLV/xsH+qbe+U725HIgRi07bmtp2XMXD8Wos42K2GvIsNfJAESA==
+X-Received: by 2002:a17:90b:2286:: with SMTP id kx6mr5562347pjb.95.1579165446729;
+        Thu, 16 Jan 2020 01:04:06 -0800 (PST)
+Received: from [127.0.0.1] ([103.7.29.6])
+        by smtp.gmail.com with ESMTPSA id 3sm2646801pjg.27.2020.01.16.01.04.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jan 2020 01:04:06 -0800 (PST)
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Roman Kagan <rkagan@virtuozzo.com>
-Subject: Re: [PATCH RFC 3/3] x86/kvm/hyper-v: don't allow to turn on unsupported VMX controls for nested guests
-In-Reply-To: <CF37ED31-4ED0-45C2-A309-3E1E2C2E54F8@oracle.com>
-References: <20200115171014.56405-1-vkuznets@redhat.com> <20200115171014.56405-4-vkuznets@redhat.com> <CF37ED31-4ED0-45C2-A309-3E1E2C2E54F8@oracle.com>
-Date:   Thu, 16 Jan 2020 09:55:57 +0100
-Message-ID: <874kwvixuq.fsf@vitty.brq.redhat.com>
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Subject: [PATCH v2] KVM: Adding 'else' to reduce checking.
+Message-ID: <abea81a5-266f-7e0d-558a-b4b7aa49d3d4@gmail.com>
+Date:   Thu, 16 Jan 2020 17:03:56 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Liran Alon <liran.alon@oracle.com> writes:
+ From 009bfba9b6f6b41018708323d9ca651ae2075900 Mon Sep 17 00:00:00 2001
+From: Haiwei Li <lihaiwei@tencent.com>
+Date: Thu, 16 Jan 2020 16:50:21 +0800
+Subject: [PATCH] Adding 'else' to reduce checking.
 
->> On 15 Jan 2020, at 19:10, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->> 
->> Sane L1 hypervisors are not supposed to turn any of the unsupported VMX
->> controls on for its guests and nested_vmx_check_controls() checks for
->> that. This is, however, not the case for the controls which are supported
->> on the host but are missing in enlightened VMCS and when eVMCS is in use.
->> 
->> It would certainly be possible to add these missing checks to
->> nested_check_vm_execution_controls()/_vm_exit_controls()/.. but it seems
->> preferable to keep eVMCS-specific stuff in eVMCS and reduce the impact on
->> non-eVMCS guests by doing less unrelated checks. Create a separate
->> nested_evmcs_check_controls() for this purpose.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->> arch/x86/kvm/vmx/evmcs.c  | 56 ++++++++++++++++++++++++++++++++++++++-
->> arch/x86/kvm/vmx/evmcs.h  |  1 +
->> arch/x86/kvm/vmx/nested.c |  3 +++
->> 3 files changed, 59 insertions(+), 1 deletion(-)
->> 
->> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
->> index b5d6582ba589..88f462866396 100644
->> --- a/arch/x86/kvm/vmx/evmcs.c
->> +++ b/arch/x86/kvm/vmx/evmcs.c
->> @@ -4,9 +4,11 @@
->> #include <linux/smp.h>
->> 
->> #include "../hyperv.h"
->> -#include "evmcs.h"
->> #include "vmcs.h"
->> +#include "vmcs12.h"
->> +#include "evmcs.h"
->> #include "vmx.h"
->> +#include "trace.h"
->> 
->> DEFINE_STATIC_KEY_FALSE(enable_evmcs);
->> 
->> @@ -378,6 +380,58 @@ void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata)
->> 	*pdata = ctl_low | ((u64)ctl_high << 32);
->> }
->> 
->> +int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
->> +{
->> +	int ret = 0;
->> +	u32 unsupp_ctl;
->> +
->> +	unsupp_ctl = vmcs12->pin_based_vm_exec_control &
->> +		EVMCS1_UNSUPPORTED_PINCTRL;
->> +	if (unsupp_ctl) {
->> +		trace_kvm_nested_vmenter_failed(
->> +			"eVMCS: unsupported pin-based VM-execution controls",
->> +			unsupp_ctl);
->
-> Why not move "CC” macro from nested.c to nested.h and use it here as-well instead of replicating it’s logic?
->
+These two conditions are in conflict, adding 'else' to reduce checking.
 
-Because error messages I add are both human readable and conform to SDM!
-:-)
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
+---
+  arch/x86/kvm/lapic.c | 4 ++--
+  1 file changed, 2 insertions(+), 2 deletions(-)
 
-On a more serious not yes, we should probably do that. We may even want
-to use it in non-nesting (and non VMX) code in KVM.
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 679692b..f1cfb94 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1571,9 +1571,9 @@ static void 
+kvm_apic_inject_pending_timer_irqs(struct kvm_lapic *apic)
+         struct kvm_timer *ktimer = &apic->lapic_timer;
 
-Thanks,
-
--- 
-Vitaly
-
+         kvm_apic_local_deliver(apic, APIC_LVTT);
+-       if (apic_lvtt_tscdeadline(apic))
++       if (apic_lvtt_tscdeadline(apic)) {
+                 ktimer->tscdeadline = 0;
+-       if (apic_lvtt_oneshot(apic)) {
++       } else if (apic_lvtt_oneshot(apic)) {
+                 ktimer->tscdeadline = 0;
+                 ktimer->target_expiration = 0;
+         }
+--
+1.8.3.1
