@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 47ED213DB4C
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 14:18:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5D5E13DB52
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 14:19:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726574AbgAPNSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 08:18:15 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35570 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726278AbgAPNSO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 08:18:14 -0500
+        id S1726936AbgAPNTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 08:19:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59097 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726329AbgAPNTK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 08:19:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579180692;
+        s=mimecast20190719; t=1579180748;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=O395KjYIMW2kqDbprnzaPzuDeY8Bv3brLv3s5wVMkAI=;
-        b=E9tsZW6J+pPXpn8Bv0JL1vo31JeTCH1QiQGatUEvBG9OKaG6Woij0ufeDzQsbUxga2vVf7
-        p+IBJ+5Ea2eNWoDoRdnfXxz/P8rA8zWtRNdDjipJYuI76zBjujRJQv+AyWTCxmyXBaGXOj
-        1glviub/oovft00LKHvTqm3ddOpMWUo=
+        bh=jUiVf1t1cYqlfoTbfu4dhXpndKVGjRWHQHnM5OwDE3k=;
+        b=XJ6XIMakcydLButOD9U6tS0luI/bUgdLY/sAGn3TImqNIDwikqkFMX0d3mdV6tF98TQ/9W
+        TliOpnHUl8tTtUxG5tHOZrV7rBAz+tFP8Q4QjS5urs1EaymD0oR7nsYR5JxQlZeMstZ6lv
+        h1/umtgEm44zg0+1EAt+hkn1g4GLYkY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-GUX1q-dHMN-A_cN94iDuEQ-1; Thu, 16 Jan 2020 08:18:11 -0500
-X-MC-Unique: GUX1q-dHMN-A_cN94iDuEQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-325-exSnYEDEMGKqlf9z0vbb5Q-1; Thu, 16 Jan 2020 08:19:04 -0500
+X-MC-Unique: exSnYEDEMGKqlf9z0vbb5Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 289B31902EB6;
-        Thu, 16 Jan 2020 13:18:10 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94BD51083212;
+        Thu, 16 Jan 2020 13:19:03 +0000 (UTC)
 Received: from [10.36.116.136] (ovpn-116-136.ams2.redhat.com [10.36.116.136])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C2AD56106F;
-        Thu, 16 Jan 2020 13:18:06 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 6/7] s390x: smp: Test all CRs on initial
- reset
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3763F396;
+        Thu, 16 Jan 2020 13:19:02 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 3/7] s390x: Add cpu id to interrupt
+ error prints
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
         linux-s390@vger.kernel.org, cohuck@redhat.com
 References: <20200116120513.2244-1-frankja@linux.ibm.com>
- <20200116120513.2244-7-frankja@linux.ibm.com>
- <7e85ec92-4d0a-f673-00c8-a9ab9a22118c@redhat.com>
- <400dc0d2-86bc-cdc8-ec8a-7d1148ebd5fa@linux.ibm.com>
+ <20200116120513.2244-4-frankja@linux.ibm.com>
+ <1bf32ccd-4047-7676-2ef4-a3327bf3995f@redhat.com>
+ <95c0a6af-7334-1825-226e-5973a639035a@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -87,70 +87,65 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <6f2c30a7-78a6-ef85-20dd-865e3087cdd0@redhat.com>
-Date:   Thu, 16 Jan 2020 14:18:05 +0100
+Message-ID: <7308d55c-eaa8-3b43-12b2-86af7641514a@redhat.com>
+Date:   Thu, 16 Jan 2020 14:19:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <400dc0d2-86bc-cdc8-ec8a-7d1148ebd5fa@linux.ibm.com>
+In-Reply-To: <95c0a6af-7334-1825-226e-5973a639035a@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16.01.20 14:07, Janosch Frank wrote:
-> On 1/16/20 1:24 PM, David Hildenbrand wrote:
+On 16.01.20 14:04, Janosch Frank wrote:
+> On 1/16/20 1:17 PM, David Hildenbrand wrote:
 >> On 16.01.20 13:05, Janosch Frank wrote:
->>> All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
->>> so we also need to test 1-13 and 15 for 0.
->>>
->>> And while we're at it, let's also set some values to cr 1, 7 and 13, so
->>> we can actually be sure that they will be zeroed.
+>>> It's good to know which cpu broke the test.
 >>>
 >>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >>> ---
->>>  s390x/smp.c | 19 ++++++++++++++++++-
->>>  1 file changed, 18 insertions(+), 1 deletion(-)
+>>>  lib/s390x/interrupt.c | 20 ++++++++++----------
+>>>  1 file changed, 10 insertions(+), 10 deletions(-)
 >>>
->>> diff --git a/s390x/smp.c b/s390x/smp.c
->>> index d430638..ce3215d 100644
->>> --- a/s390x/smp.c
->>> +++ b/s390x/smp.c
->>> @@ -176,16 +176,31 @@ static void test_emcall(void)
->>>  	report_prefix_pop();
->>>  }
+>>> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+>>> index 05f30be..773752a 100644
+>>> --- a/lib/s390x/interrupt.c
+>>> +++ b/lib/s390x/interrupt.c
+>>> @@ -107,8 +107,8 @@ static void fixup_pgm_int(void)
+>>>  void handle_pgm_int(void)
+>>>  {
+>>>  	if (!pgm_int_expected)
+>>> -		report_abort("Unexpected program interrupt: %d at %#lx, ilen %d\n",
+>>> -			     lc->pgm_int_code, lc->pgm_old_psw.addr,
+>>> +		report_abort("Unexpected program interrupt: %d on cpu %d at %#lx, ilen %d\n",
+>>> +			     lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
+>>>  			     lc->pgm_int_id);
+>>
+>> nit: "cpu: %d"
+>>
 >>>  
->>> +/* Used to dirty registers of cpu #1 before it is reset */
->>> +static void test_func_initial(void)
->>> +{
->>> +	lctlg(1, 0x42000UL);
->>> +	lctlg(7, 0x43000UL);
->>> +	lctlg(13, 0x44000UL);
->>> +	testflag = 1;
->>> +	mb();
->>> +	cpu_loop();
+>>>  	pgm_int_expected = false;
+>>> @@ -119,8 +119,8 @@ void handle_ext_int(void)
+>>>  {
+>>>  	if (!ext_int_expected &&
+>>>  	    lc->ext_int_code != EXT_IRQ_SERVICE_SIG) {
+>>> -		report_abort("Unexpected external call interrupt (code %#x): at %#lx",
+>>> -			     lc->ext_int_code, lc->ext_old_psw.addr);
+>>> +		report_abort("Unexpected external call interrupt (code %#x): on cpu %d at %#lx",
+>>> +			     stap(), lc->ext_int_code, lc->ext_old_psw.addr);
 >>
->> Can we make cpu_loop() the default when this function returns? (IOW, an
->> endless loop whenever a cpu finished executing the function?)
+>> nit: "(code %#x) on cpu: %d" ...
 > 
-> So adding it to cstart64.S after the br 14?
+> So, should I move the old : or add a second one?
 
-Yes I think so.
+No strong feelings, whatever you prefer. (you can also keep it
+unchanged, it's just a test error output after all)
 
-> 
->>
->> Do we need the mb() here?
-> 
-> Would the compiler reorder the lctlcg and testflag if it could?
-
-lctlg() does not have a "memory" constraint, so I guess it would be
-valid if it would reorder.
-
-I assume the mb() would have to be moved in front of the testflag=1?
 
 -- 
 Thanks,
