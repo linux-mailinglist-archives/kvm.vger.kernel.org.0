@@ -2,199 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7265713F1E4
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 19:32:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7DC513F6C0
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 20:06:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391839AbgAPRY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 12:24:58 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23267 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2391820AbgAPRY4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 12:24:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579195495;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rJXCaurapNQ3l0l2gppkZEC8B+0gvsSxNTKA5/PN+5k=;
-        b=UCN+paU/wQyQ6BTwPFumvC9JIx0Ubm1/ikweKV4QQMKD1tHx8Vk2Mqc52IGh6rXmeRjEYt
-        v663eqs+wmRTbXzDuq/3M0xbFsdFs/wOfL00SesM61/4zBhU9YbFfLdKen3jwgLujlovSp
-        h14kqg7JFrAAjhEIsmWYfbRNhCmzGIQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-D6q33l1yOH-_YtBkUiFYyg-1; Thu, 16 Jan 2020 12:24:53 -0500
-X-MC-Unique: D6q33l1yOH-_YtBkUiFYyg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2388096AbgAPRB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 12:01:26 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52490 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388082AbgAPRBZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:01:25 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BD63477;
-        Thu, 16 Jan 2020 17:24:52 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-117-242.ams2.redhat.com [10.36.117.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A6405C1D8;
-        Thu, 16 Jan 2020 17:24:48 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     davem@davemloft.net, netdev@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-hyperv@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Dexuan Cui <decui@microsoft.com>
-Subject: [PATCH net-next 3/3] vhost/vsock: use netns of process that opens the vhost-vsock device
-Date:   Thu, 16 Jan 2020 18:24:28 +0100
-Message-Id: <20200116172428.311437-4-sgarzare@redhat.com>
-In-Reply-To: <20200116172428.311437-1-sgarzare@redhat.com>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 2881E2464B;
+        Thu, 16 Jan 2020 17:01:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579194084;
+        bh=Ax2ffis9kznwGy7kUOrBcp+PGfdjZDSEq2lQ9R9XU+E=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=H7IoOYfGweEINme15bYodpm3de8r4Us2ScfK6Op5BO/0uPdcD33tvjLx9PqFVXYct
+         rr3td3PhP8EY7aRUMkxY8XVccZmEAXMsn5jd4gH5nK2MNY+AjWQvJ5RLqIht3bppAQ
+         Evratd6lc/hqvQCKTQFg55YceygLb1OPGOmEqrzk=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 189/671] vfio_pci: Enable memory accesses before calling pci_map_rom
+Date:   Thu, 16 Jan 2020 11:51:38 -0500
+Message-Id: <20200116165940.10720-72-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200116165940.10720-1-sashal@kernel.org>
+References: <20200116165940.10720-1-sashal@kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch assigns the network namespace of the process that opened
-vhost-vsock device (e.g. VMM) to the packets coming from the guest,
-allowing only host sockets in the same network namespace to
-communicate with the guest.
+From: Eric Auger <eric.auger@redhat.com>
 
-This patch also allows having different VMs, running in different
-network namespace, with the same CID.
+[ Upstream commit 0cfd027be1d6def4a462cdc180c055143af24069 ]
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+pci_map_rom/pci_get_rom_size() performs memory access in the ROM.
+In case the Memory Space accesses were disabled, readw() is likely
+to trigger a synchronous external abort on some platforms.
+
+In case memory accesses were disabled, re-enable them before the
+call and disable them back again just after.
+
+Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-RFC -> v1
- * used 'vsock_net_eq()' insted of 'net_eq()'
----
- drivers/vhost/vsock.c | 30 +++++++++++++++++++++---------
- 1 file changed, 21 insertions(+), 9 deletions(-)
+ drivers/vfio/pci/vfio_pci.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index f1d39939d5e4..8b0169105559 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -40,6 +40,7 @@ static DEFINE_READ_MOSTLY_HASHTABLE(vhost_vsock_hash, 8=
-);
- struct vhost_vsock {
- 	struct vhost_dev dev;
- 	struct vhost_virtqueue vqs[2];
-+	struct net *net;
-=20
- 	/* Link to global vhost_vsock_hash, writes use vhost_vsock_mutex */
- 	struct hlist_node hash;
-@@ -61,7 +62,7 @@ static u32 vhost_transport_get_local_cid(void)
- /* Callers that dereference the return value must hold vhost_vsock_mutex=
- or the
-  * RCU read lock.
-  */
--static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
-+static struct vhost_vsock *vhost_vsock_get(u32 guest_cid, struct net *ne=
-t)
- {
- 	struct vhost_vsock *vsock;
-=20
-@@ -72,7 +73,7 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_ci=
-d)
- 		if (other_cid =3D=3D 0)
- 			continue;
-=20
--		if (other_cid =3D=3D guest_cid)
-+		if (other_cid =3D=3D guest_cid && vsock_net_eq(net, vsock->net))
- 			return vsock;
-=20
- 	}
-@@ -245,7 +246,7 @@ vhost_transport_send_pkt(struct virtio_vsock_pkt *pkt=
-)
- 	rcu_read_lock();
-=20
- 	/* Find the vhost_vsock according to guest context id  */
--	vsock =3D vhost_vsock_get(le64_to_cpu(pkt->hdr.dst_cid));
-+	vsock =3D vhost_vsock_get(le64_to_cpu(pkt->hdr.dst_cid), pkt->net);
- 	if (!vsock) {
- 		rcu_read_unlock();
- 		virtio_transport_free_pkt(pkt);
-@@ -277,7 +278,8 @@ vhost_transport_cancel_pkt(struct vsock_sock *vsk)
- 	rcu_read_lock();
-=20
- 	/* Find the vhost_vsock according to guest context id  */
--	vsock =3D vhost_vsock_get(vsk->remote_addr.svm_cid);
-+	vsock =3D vhost_vsock_get(vsk->remote_addr.svm_cid,
-+				sock_net(sk_vsock(vsk)));
- 	if (!vsock)
- 		goto out;
-=20
-@@ -474,7 +476,7 @@ static void vhost_vsock_handle_tx_kick(struct vhost_w=
-ork *work)
- 			continue;
- 		}
-=20
--		pkt->net =3D vsock_default_net();
-+		pkt->net =3D vsock->net;
- 		len =3D pkt->len;
-=20
- 		/* Deliver to monitoring devices all received packets */
-@@ -608,7 +610,14 @@ static int vhost_vsock_dev_open(struct inode *inode,=
- struct file *file)
- 	vqs =3D kmalloc_array(ARRAY_SIZE(vsock->vqs), sizeof(*vqs), GFP_KERNEL)=
-;
- 	if (!vqs) {
- 		ret =3D -ENOMEM;
--		goto out;
-+		goto out_vsock;
-+	}
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 0a6eb53e79fb..66783a37f450 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -696,6 +696,7 @@ static long vfio_pci_ioctl(void *device_data,
+ 		{
+ 			void __iomem *io;
+ 			size_t size;
++			u16 orig_cmd;
+ 
+ 			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+ 			info.flags = 0;
+@@ -711,15 +712,23 @@ static long vfio_pci_ioctl(void *device_data,
+ 					break;
+ 			}
+ 
+-			/* Is it really there? */
++			/*
++			 * Is it really there?  Enable memory decode for
++			 * implicit access in pci_map_rom().
++			 */
++			pci_read_config_word(pdev, PCI_COMMAND, &orig_cmd);
++			pci_write_config_word(pdev, PCI_COMMAND,
++					      orig_cmd | PCI_COMMAND_MEMORY);
 +
-+	/* Derive the network namespace from the pid opening the device */
-+	vsock->net =3D get_net_ns_by_pid(current->pid);
-+	if (IS_ERR(vsock->net)) {
-+		ret =3D PTR_ERR(vsock->net);
-+		goto out_vqs;
- 	}
-=20
- 	vsock->guest_cid =3D 0; /* no CID assigned yet */
-@@ -630,7 +639,9 @@ static int vhost_vsock_dev_open(struct inode *inode, =
-struct file *file)
- 	vhost_work_init(&vsock->send_pkt_work, vhost_transport_send_pkt_work);
- 	return 0;
-=20
--out:
-+out_vqs:
-+	kfree(vqs);
-+out_vsock:
- 	vhost_vsock_free(vsock);
- 	return ret;
- }
-@@ -655,7 +666,7 @@ static void vhost_vsock_reset_orphans(struct sock *sk=
-)
- 	 */
-=20
- 	/* If the peer is still valid, no need to reset connection */
--	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
-+	if (vhost_vsock_get(vsk->remote_addr.svm_cid, sock_net(sk)))
- 		return;
-=20
- 	/* If the close timeout is pending, let it expire.  This avoids races
-@@ -703,6 +714,7 @@ static int vhost_vsock_dev_release(struct inode *inod=
-e, struct file *file)
- 	spin_unlock_bh(&vsock->send_pkt_list_lock);
-=20
- 	vhost_dev_cleanup(&vsock->dev);
-+	put_net(vsock->net);
- 	kfree(vsock->dev.vqs);
- 	vhost_vsock_free(vsock);
- 	return 0;
-@@ -729,7 +741,7 @@ static int vhost_vsock_set_cid(struct vhost_vsock *vs=
-ock, u64 guest_cid)
-=20
- 	/* Refuse if CID is already in use */
- 	mutex_lock(&vhost_vsock_mutex);
--	other =3D vhost_vsock_get(guest_cid);
-+	other =3D vhost_vsock_get(guest_cid, vsock->net);
- 	if (other && other !=3D vsock) {
- 		mutex_unlock(&vhost_vsock_mutex);
- 		return -EADDRINUSE;
---=20
-2.24.1
+ 			io = pci_map_rom(pdev, &size);
+-			if (!io || !size) {
++			if (io) {
++				info.flags = VFIO_REGION_INFO_FLAG_READ;
++				pci_unmap_rom(pdev, io);
++			} else {
+ 				info.size = 0;
+-				break;
+ 			}
+-			pci_unmap_rom(pdev, io);
+ 
+-			info.flags = VFIO_REGION_INFO_FLAG_READ;
++			pci_write_config_word(pdev, PCI_COMMAND, orig_cmd);
+ 			break;
+ 		}
+ 		case VFIO_PCI_VGA_REGION_INDEX:
+-- 
+2.20.1
 
