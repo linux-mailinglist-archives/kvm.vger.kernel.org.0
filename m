@@ -2,144 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D32413E2D6
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 17:58:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7308D13E444
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 18:07:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732459AbgAPQ6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 11:58:39 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46891 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1733222AbgAPQ5l (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 11:57:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579193859;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NL2NSi1XWLGU3r+xrG79oV00EN+7idfCniN3jKXSuTs=;
-        b=P5uqVFk4sAQSdYZHMe1Iczzmj6JgMmXfHnQn3JcD+vPbS4Cqo83OVJzSfhR259/ss9Ufuq
-        +O53cOPxzZ0YeabF/WKxmLAGT6I2eKQBDYOq1gozNmHBJVdiDyB+wx+B4WNmEiq6wanwC1
-        i0LLSaubAXmsq4U8ik/tuS2GR+jdboQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-6Fd8WRHhOVeSYI76B0QUXg-1; Thu, 16 Jan 2020 11:57:35 -0500
-X-MC-Unique: 6Fd8WRHhOVeSYI76B0QUXg-1
-Received: by mail-wr1-f72.google.com with SMTP id y7so9501661wrm.3
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:57:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=NL2NSi1XWLGU3r+xrG79oV00EN+7idfCniN3jKXSuTs=;
-        b=iSLZlGSB0aA2RZ4syDN0R1mpB2zZTk7Zbtk6uGoWj+AUuUfMpU8+yDQYxSHHNl0nI7
-         WhvzBr34IU3vMxSCKqsFe9hkUbCdMd/fk6cKi3/4pD/qazEpIODluhPNZnOc7r2OjwPf
-         yVE85dzF3L3sLYisbciWOat0FBdLdDMb9fmMKSbr+fp8Oe1LmtXciK4eO7WF+r96UQwX
-         +ZWuAgAddIw6SI+RI5FahD5NNeE+alq6dkosBhjYmWZPB7FlOkogHqXs34I7FmlseyU7
-         AlEOyihFO3phjIYM8p2dhp4y1zRLYKH9UWqnSr4yhLc1X9sa0Zna7uroj7yWQJT3OV6P
-         aQYw==
-X-Gm-Message-State: APjAAAXi45YH4N+SWzzeo6/kkg4xDn7gRE0UwBRth6jjc8THoLQelGKa
-        oYcBaNDk639izKiRh3aq4fBx5P2H3Vt2cElgI+e27BcONuc1JNcszqrPjZhtp429VykyWpP2RK5
-        u8FIJPtIpUycm
-X-Received: by 2002:a05:600c:1003:: with SMTP id c3mr8949wmc.120.1579193853995;
-        Thu, 16 Jan 2020 08:57:33 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxgb+xpT3o5iuo3KQIaczTCpPBwxe0nKRKV4XX4+9W7V2XQaL7x9/ponSvixwnMk5Cph4hYxg==
-X-Received: by 2002:a05:600c:1003:: with SMTP id c3mr8935wmc.120.1579193853782;
-        Thu, 16 Jan 2020 08:57:33 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id n189sm1680407wme.33.2020.01.16.08.57.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2020 08:57:33 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Liran Alon <liran.alon@oracle.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Roman Kagan <rkagan@virtuozzo.com>
-Subject: Re: [PATCH RFC 2/3] x86/kvm/hyper-v: move VMX controls sanitization out of nested_enable_evmcs()
-In-Reply-To: <20200116161928.GC20561@linux.intel.com>
-References: <20200115171014.56405-1-vkuznets@redhat.com> <20200115171014.56405-3-vkuznets@redhat.com> <20200115232738.GB18268@linux.intel.com> <C6C4003E-0ADD-42A5-A580-09E06806E160@oracle.com> <877e1riy1o.fsf@vitty.brq.redhat.com> <20200116161928.GC20561@linux.intel.com>
-Date:   Thu, 16 Jan 2020 17:57:31 +0100
-Message-ID: <87o8v3gwzo.fsf@vitty.brq.redhat.com>
+        id S2388310AbgAPRHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 12:07:06 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38328 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389069AbgAPRHE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:07:04 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E5219217F4;
+        Thu, 16 Jan 2020 17:07:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579194424;
+        bh=HEfK2KpxI9JcRyxK58/DnvyfOIJxDZIR/FRlXyEiOzA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=yokt7zvL/+Qvceze6btHtsNcO+mkUpqtXhMJxw2dsm92BoRw8GFAxSP+cYMjC2O9C
+         wNNDMm/B3+JY9vee7ztAxCcN0O22VxUHNYiNWkkhdf4FCpOR9NYTyuVS2PBmnzFoL4
+         mFo5uNxAqr/8DDUb8gl3/vx2M157FYRRSiw0DXXE=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Parav Pandit <parav@mellanox.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 342/671] vfio/mdev: Fix aborting mdev child device removal if one fails
+Date:   Thu, 16 Jan 2020 11:59:40 -0500
+Message-Id: <20200116170509.12787-79-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200116170509.12787-1-sashal@kernel.org>
+References: <20200116170509.12787-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+From: Parav Pandit <parav@mellanox.com>
 
-> On Thu, Jan 16, 2020 at 09:51:47AM +0100, Vitaly Kuznetsov wrote:
->> Liran Alon <liran.alon@oracle.com> writes:
->> 
->> >> On 16 Jan 2020, at 1:27, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
->> >> 
->> >> On Wed, Jan 15, 2020 at 06:10:13PM +0100, Vitaly Kuznetsov wrote:
->> >>> With fine grained VMX feature enablement QEMU>=4.2 tries to do KVM_SET_MSRS
->> >>> with default (matching CPU model) values and in case eVMCS is also enabled,
->> >>> fails.
->> >> 
->> >> As in, Qemu is blindly throwing values at KVM and complains on failure?
->> >> That seems like a Qemu bug, especially since Qemu needs to explicitly do
->> >> KVM_CAP_HYPERV_ENLIGHTENED_VMCS to enable eVMCS.
->> >
->> > See: https://patchwork.kernel.org/patch/11316021/
->> > For more context.
->> 
->> Ya,
->> 
->> while it would certainly be possible to require that userspace takes
->> into account KVM_CAP_HYPERV_ENLIGHTENED_VMCS (which is an opt-in) when
->> doing KVM_SET_MSRS there doesn't seem to be an existing (easy) way to
->> figure out which VMX controls were filtered out after enabling
->> KVM_CAP_HYPERV_ENLIGHTENED_VMCS: KVM_GET_MSRS returns global
->> &vmcs_config.nested values for VMX MSRs (vmx_get_msr_feature()).
->
-> Ah, I was looking at the call to vmx_get_vmx_msr(&vmx->nested.msrs, ...)
-> in vmx_get_msr().
->
-> Why not just do this in Qemu?  IMO that's not a major ask, e.g. Qemu is
-> doing a decent amount of manual adjustment anyways.  And Qemu isn't even
-> using the result of KVM_GET_MSRS so I don't think it's fair to say this is
-> solely KVM's fault.
->
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 1d10046a6c..6545bb323e 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -2623,6 +2623,23 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
->               MSR_VMX_EPT_UC | MSR_VMX_EPT_WB : 0);
->      uint64_t fixed_vmx_ept_vpid = kvm_vmx_ept_vpid & fixed_vmx_ept_mask;
->
-> +    /* Hyper-V's eVMCS does't support certain features, adjust accordingly. */
-> +    if (cpu->hyperv_evmcs) {
-> +        f[FEAT_VMX_PINBASED_CTLS] &= ~(VMX_PIN_BASED_VMX_PREEMPTION_TIMER |
-> +                                       VMX_PIN_BASED_POSTED_INTR);
-> +        f[FEAT_VMX_EXIT_CTLS] &= ~VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +        f[FEAT_VMX_ENTRY_CTLS] &= ~VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +        f[FEAT_VMX_SECONDARY_CTLS] &= ~(VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-> +                                        VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +                                        VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +                                        VMX_SECONDARY_EXEC_ENABLE_PML |
-> +                                        VMX_SECONDARY_EXEC_ENABLE_VMFUNC |
-> +                                        VMX_SECONDARY_EXEC_SHADOW_VMCS |
-> +                                        /* VMX_SECONDARY_EXEC_TSC_SCALING | */
-> +                                        VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING);
-> +        f[FEAT_VMX_VMFUNC]         &= ~MSR_VMX_VMFUNC_EPT_SWITCHING;
-> +    }
-> +
->      kvm_msr_entry_add(cpu, MSR_IA32_VMX_TRUE_PROCBASED_CTLS,
->                        make_vmx_msr_value(MSR_IA32_VMX_TRUE_PROCBASED_CTLS,
->                                           f[FEAT_VMX_PROCBASED_CTLS]));
->
+[ Upstream commit 6093e348a5e2475c5bb2e571346460f939998670 ]
 
-I accuse you of not reading my PATCH0 :-)
+device_for_each_child() stops executing callback function for remaining
+child devices, if callback hits an error.
+Each child mdev device is independent of each other.
+While unregistering parent device, mdev core must remove all child mdev
+devices.
+Therefore, mdev_device_remove_cb() always returns success so that
+device_for_each_child doesn't abort if one child removal hits error.
 
-https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg00123.html
-does exactly this :-) 
+While at it, improve remove and unregister functions for below simplicity.
 
-P.S. I expect Paolo to comment on which hack he hates less :-)
+There isn't need to pass forced flag pointer during mdev parent
+removal which invokes mdev_device_remove(). So simplify the flow.
 
+mdev_device_remove() is called from two paths.
+1. mdev_unregister_driver()
+     mdev_device_remove_cb()
+       mdev_device_remove()
+2. remove_store()
+     mdev_device_remove()
+
+Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Parav Pandit <parav@mellanox.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/vfio/mdev/mdev_core.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+index 8cfa71230877..e052f62fdea7 100644
+--- a/drivers/vfio/mdev/mdev_core.c
++++ b/drivers/vfio/mdev/mdev_core.c
+@@ -150,10 +150,10 @@ static int mdev_device_remove_ops(struct mdev_device *mdev, bool force_remove)
+ 
+ static int mdev_device_remove_cb(struct device *dev, void *data)
+ {
+-	if (!dev_is_mdev(dev))
+-		return 0;
++	if (dev_is_mdev(dev))
++		mdev_device_remove(dev, true);
+ 
+-	return mdev_device_remove(dev, data ? *(bool *)data : true);
++	return 0;
+ }
+ 
+ /*
+@@ -241,7 +241,6 @@ EXPORT_SYMBOL(mdev_register_device);
+ void mdev_unregister_device(struct device *dev)
+ {
+ 	struct mdev_parent *parent;
+-	bool force_remove = true;
+ 
+ 	mutex_lock(&parent_list_lock);
+ 	parent = __find_parent_device(dev);
+@@ -255,8 +254,7 @@ void mdev_unregister_device(struct device *dev)
+ 	list_del(&parent->next);
+ 	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
+ 
+-	device_for_each_child(dev, (void *)&force_remove,
+-			      mdev_device_remove_cb);
++	device_for_each_child(dev, NULL, mdev_device_remove_cb);
+ 
+ 	parent_remove_sysfs_files(parent);
+ 
 -- 
-Vitaly
+2.20.1
 
