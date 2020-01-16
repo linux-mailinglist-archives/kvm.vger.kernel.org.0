@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D499313F0E4
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 19:25:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E9E613EEDD
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 19:12:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392382AbgAPR1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 12:27:01 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36366 "EHLO mail.kernel.org"
+        id S2395275AbgAPSLr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 13:11:47 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52658 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392321AbgAPR1A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:27:00 -0500
+        id S2405344AbgAPRhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:37:25 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8F419246D4;
-        Thu, 16 Jan 2020 17:26:58 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6C999246D8;
+        Thu, 16 Jan 2020 17:37:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579195619;
-        bh=HEfK2KpxI9JcRyxK58/DnvyfOIJxDZIR/FRlXyEiOzA=;
+        s=default; t=1579196244;
+        bh=I8H1dOQ/vR2IPX/HY2tX2riadGC5KACiQPgoFzmeVPs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=M+wcKfGfHxIpgRUcx6UgklASu+0dSS1r6y7UE9XUsOiB1JA3uG92WyL9USu8kDTpE
-         zHKB6ptp9Pyhw/lRe/6N3ZePXitdfXR2yaDH3IXjID3pK7n9cfZvCTSUrkf6nfdxys
-         WH7s5WDXkjbgvQwZM3eYIJkZADPtl7Hn3ELmW9S4=
+        b=zFkhjNAF9fKuuEb3FzvMnlPrOS5iPR8vLUKVjhJERXOxXuTP7N+qhcuCaMHyQo8hf
+         ChyTfu+2JAguXdIeDh9ppteRugu/jMUpXW6zeZLr73Yuj3WG30B6CG7D76TNzNY5jL
+         +wn0/dBglvHlSA8VmgvwtoZCPvH3q31MebvdHoNo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Parav Pandit <parav@mellanox.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
+Cc:     Eric Auger <eric.auger@redhat.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 191/371] vfio/mdev: Fix aborting mdev child device removal if one fails
-Date:   Thu, 16 Jan 2020 12:21:03 -0500
-Message-Id: <20200116172403.18149-134-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 073/251] vfio_pci: Enable memory accesses before calling pci_map_rom
+Date:   Thu, 16 Jan 2020 12:33:42 -0500
+Message-Id: <20200116173641.22137-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116172403.18149-1-sashal@kernel.org>
-References: <20200116172403.18149-1-sashal@kernel.org>
+In-Reply-To: <20200116173641.22137-1-sashal@kernel.org>
+References: <20200116173641.22137-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -44,75 +43,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Parav Pandit <parav@mellanox.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-[ Upstream commit 6093e348a5e2475c5bb2e571346460f939998670 ]
+[ Upstream commit 0cfd027be1d6def4a462cdc180c055143af24069 ]
 
-device_for_each_child() stops executing callback function for remaining
-child devices, if callback hits an error.
-Each child mdev device is independent of each other.
-While unregistering parent device, mdev core must remove all child mdev
-devices.
-Therefore, mdev_device_remove_cb() always returns success so that
-device_for_each_child doesn't abort if one child removal hits error.
+pci_map_rom/pci_get_rom_size() performs memory access in the ROM.
+In case the Memory Space accesses were disabled, readw() is likely
+to trigger a synchronous external abort on some platforms.
 
-While at it, improve remove and unregister functions for below simplicity.
+In case memory accesses were disabled, re-enable them before the
+call and disable them back again just after.
 
-There isn't need to pass forced flag pointer during mdev parent
-removal which invokes mdev_device_remove(). So simplify the flow.
-
-mdev_device_remove() is called from two paths.
-1. mdev_unregister_driver()
-     mdev_device_remove_cb()
-       mdev_device_remove()
-2. remove_store()
-     mdev_device_remove()
-
-Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Parav Pandit <parav@mellanox.com>
+Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/mdev/mdev_core.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ drivers/vfio/pci/vfio_pci.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 8cfa71230877..e052f62fdea7 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -150,10 +150,10 @@ static int mdev_device_remove_ops(struct mdev_device *mdev, bool force_remove)
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index da3f0ed18c76..c94167d87178 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -729,6 +729,7 @@ static long vfio_pci_ioctl(void *device_data,
+ 		{
+ 			void __iomem *io;
+ 			size_t size;
++			u16 orig_cmd;
  
- static int mdev_device_remove_cb(struct device *dev, void *data)
- {
--	if (!dev_is_mdev(dev))
--		return 0;
-+	if (dev_is_mdev(dev))
-+		mdev_device_remove(dev, true);
+ 			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+ 			info.flags = 0;
+@@ -744,15 +745,23 @@ static long vfio_pci_ioctl(void *device_data,
+ 					break;
+ 			}
  
--	return mdev_device_remove(dev, data ? *(bool *)data : true);
-+	return 0;
- }
+-			/* Is it really there? */
++			/*
++			 * Is it really there?  Enable memory decode for
++			 * implicit access in pci_map_rom().
++			 */
++			pci_read_config_word(pdev, PCI_COMMAND, &orig_cmd);
++			pci_write_config_word(pdev, PCI_COMMAND,
++					      orig_cmd | PCI_COMMAND_MEMORY);
++
+ 			io = pci_map_rom(pdev, &size);
+-			if (!io || !size) {
++			if (io) {
++				info.flags = VFIO_REGION_INFO_FLAG_READ;
++				pci_unmap_rom(pdev, io);
++			} else {
+ 				info.size = 0;
+-				break;
+ 			}
+-			pci_unmap_rom(pdev, io);
  
- /*
-@@ -241,7 +241,6 @@ EXPORT_SYMBOL(mdev_register_device);
- void mdev_unregister_device(struct device *dev)
- {
- 	struct mdev_parent *parent;
--	bool force_remove = true;
- 
- 	mutex_lock(&parent_list_lock);
- 	parent = __find_parent_device(dev);
-@@ -255,8 +254,7 @@ void mdev_unregister_device(struct device *dev)
- 	list_del(&parent->next);
- 	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
- 
--	device_for_each_child(dev, (void *)&force_remove,
--			      mdev_device_remove_cb);
-+	device_for_each_child(dev, NULL, mdev_device_remove_cb);
- 
- 	parent_remove_sysfs_files(parent);
- 
+-			info.flags = VFIO_REGION_INFO_FLAG_READ;
++			pci_write_config_word(pdev, PCI_COMMAND, orig_cmd);
+ 			break;
+ 		}
+ 		case VFIO_PCI_VGA_REGION_INDEX:
 -- 
 2.20.1
 
