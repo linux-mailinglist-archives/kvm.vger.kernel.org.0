@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6AEB13DB0E
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 14:04:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FA2E13DB20
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 14:07:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726440AbgAPNEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 08:04:45 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4376 "EHLO
+        id S1726566AbgAPNH1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 08:07:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29688 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726329AbgAPNEo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 08:04:44 -0500
+        by vger.kernel.org with ESMTP id S1726018AbgAPNH0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 08:07:26 -0500
 Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00GD2j43097470
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:04:44 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xh8d666kj-1
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00GD7FOH005479
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:07:25 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xh8d669jq-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:04:43 -0500
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 08:07:21 -0500
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 16 Jan 2020 13:04:41 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 16 Jan 2020 13:07:17 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 16 Jan 2020 13:04:38 -0000
+        Thu, 16 Jan 2020 13:07:15 -0000
 Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00GD3mse47055268
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00GD7Enw47448512
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Jan 2020 13:03:48 GMT
+        Thu, 16 Jan 2020 13:07:14 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B5B8042052;
-        Thu, 16 Jan 2020 13:04:37 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 6BEBF42056;
+        Thu, 16 Jan 2020 13:07:14 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E72242049;
-        Thu, 16 Jan 2020 13:04:37 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 305AE42061;
+        Thu, 16 Jan 2020 13:07:14 +0000 (GMT)
 Received: from dyn-9-152-224-123.boeblingen.de.ibm.com (unknown [9.152.224.123])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 16 Jan 2020 13:04:37 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 3/7] s390x: Add cpu id to interrupt
- error prints
+        Thu, 16 Jan 2020 13:07:14 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 6/7] s390x: smp: Test all CRs on initial
+ reset
 To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
         linux-s390@vger.kernel.org, cohuck@redhat.com
 References: <20200116120513.2244-1-frankja@linux.ibm.com>
- <20200116120513.2244-4-frankja@linux.ibm.com>
- <1bf32ccd-4047-7676-2ef4-a3327bf3995f@redhat.com>
+ <20200116120513.2244-7-frankja@linux.ibm.com>
+ <7e85ec92-4d0a-f673-00c8-a9ab9a22118c@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -90,147 +90,143 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Thu, 16 Jan 2020 14:04:37 +0100
+Date:   Thu, 16 Jan 2020 14:07:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1bf32ccd-4047-7676-2ef4-a3327bf3995f@redhat.com>
+In-Reply-To: <7e85ec92-4d0a-f673-00c8-a9ab9a22118c@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="1EIMA5zOdNR3WrE45vaiaflsfcihjlQs3"
+ boundary="8XDH7mI6QSSZ8DwtB4XqTYuIGbQIVRJnp"
 X-TM-AS-GCONF: 00
-x-cbid: 20011613-0016-0000-0000-000002DDDD6D
+x-cbid: 20011613-0028-0000-0000-000003D19B4C
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011613-0017-0000-0000-000033407537
-Message-Id: <95c0a6af-7334-1825-226e-5973a639035a@linux.ibm.com>
+x-cbparentid: 20011613-0029-0000-0000-00002495C393
+Message-Id: <400dc0d2-86bc-cdc8-ec8a-7d1148ebd5fa@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-01-16_04:2020-01-16,2020-01-15 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
  malwarescore=0 mlxscore=0 mlxlogscore=999 spamscore=0 bulkscore=0
  phishscore=0 suspectscore=3 adultscore=0 impostorscore=0 clxscore=1015
  priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001160111
+ engine=8.12.0-1910280000 definitions=main-2001160112
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1EIMA5zOdNR3WrE45vaiaflsfcihjlQs3
-Content-Type: multipart/mixed; boundary="HkNbuUB7EFq4VChJCVCmTB7lbaCxR4ims"
+--8XDH7mI6QSSZ8DwtB4XqTYuIGbQIVRJnp
+Content-Type: multipart/mixed; boundary="7coQ9ksdeHYirCVdNkLo49dtMkX2UHpIj"
 
---HkNbuUB7EFq4VChJCVCmTB7lbaCxR4ims
+--7coQ9ksdeHYirCVdNkLo49dtMkX2UHpIj
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 1/16/20 1:17 PM, David Hildenbrand wrote:
+On 1/16/20 1:24 PM, David Hildenbrand wrote:
 > On 16.01.20 13:05, Janosch Frank wrote:
->> It's good to know which cpu broke the test.
+>> All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
+>> so we also need to test 1-13 and 15 for 0.
+>>
+>> And while we're at it, let's also set some values to cr 1, 7 and 13, s=
+o
+>> we can actually be sure that they will be zeroed.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>  lib/s390x/interrupt.c | 20 ++++++++++----------
->>  1 file changed, 10 insertions(+), 10 deletions(-)
+>>  s390x/smp.c | 19 ++++++++++++++++++-
+>>  1 file changed, 18 insertions(+), 1 deletion(-)
 >>
->> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
->> index 05f30be..773752a 100644
->> --- a/lib/s390x/interrupt.c
->> +++ b/lib/s390x/interrupt.c
->> @@ -107,8 +107,8 @@ static void fixup_pgm_int(void)
->>  void handle_pgm_int(void)
->>  {
->>  	if (!pgm_int_expected)
->> -		report_abort("Unexpected program interrupt: %d at %#lx, ilen %d\n",=
-
->> -			     lc->pgm_int_code, lc->pgm_old_psw.addr,
->> +		report_abort("Unexpected program interrupt: %d on cpu %d at %#lx, i=
-len %d\n",
->> +			     lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
->>  			     lc->pgm_int_id);
->=20
-> nit: "cpu: %d"
->=20
->> =20
->>  	pgm_int_expected =3D false;
->> @@ -119,8 +119,8 @@ void handle_ext_int(void)
->>  {
->>  	if (!ext_int_expected &&
->>  	    lc->ext_int_code !=3D EXT_IRQ_SERVICE_SIG) {
->> -		report_abort("Unexpected external call interrupt (code %#x): at %#l=
-x",
->> -			     lc->ext_int_code, lc->ext_old_psw.addr);
->> +		report_abort("Unexpected external call interrupt (code %#x): on cpu=
- %d at %#lx",
->> +			     stap(), lc->ext_int_code, lc->ext_old_psw.addr);
->=20
-> nit: "(code %#x) on cpu: %d" ...
-
-So, should I move the old : or add a second one?
-
->=20
-> Same comment for the ones below
->=20
-> Reviewed-by: David Hildenbrand <david@redhat.com>
->=20
->>  		return;
->>  	}
->> =20
->> @@ -137,18 +137,18 @@ void handle_ext_int(void)
->> =20
->>  void handle_mcck_int(void)
->>  {
->> -	report_abort("Unexpected machine check interrupt: at %#lx",
->> -		     lc->mcck_old_psw.addr);
->> +	report_abort("Unexpected machine check interrupt: on cpu %d at %#lx"=
-,
->> +		     stap(), lc->mcck_old_psw.addr);
+>> diff --git a/s390x/smp.c b/s390x/smp.c
+>> index d430638..ce3215d 100644
+>> --- a/s390x/smp.c
+>> +++ b/s390x/smp.c
+>> @@ -176,16 +176,31 @@ static void test_emcall(void)
+>>  	report_prefix_pop();
 >>  }
 >> =20
->>  void handle_io_int(void)
+>> +/* Used to dirty registers of cpu #1 before it is reset */
+>> +static void test_func_initial(void)
+>> +{
+>> +	lctlg(1, 0x42000UL);
+>> +	lctlg(7, 0x43000UL);
+>> +	lctlg(13, 0x44000UL);
+>> +	testflag =3D 1;
+>> +	mb();
+>> +	cpu_loop();
+>=20
+> Can we make cpu_loop() the default when this function returns? (IOW, an=
+
+> endless loop whenever a cpu finished executing the function?)
+
+So adding it to cstart64.S after the br 14?
+
+>=20
+> Do we need the mb() here?
+
+Would the compiler reorder the lctlcg and testflag if it could?
+
+>=20
+>> +}
+>> +
+>>  static void test_reset_initial(void)
 >>  {
->> -	report_abort("Unexpected io interrupt: at %#lx",
->> -		     lc->io_old_psw.addr);
->> +	report_abort("Unexpected io interrupt: on cpu %d at %#lx",
->> +		     stap(), lc->io_old_psw.addr);
->>  }
+>>  	struct cpu_status *status =3D alloc_pages(0);
+>> +	uint64_t nullp[12] =3D {};
+>>  	struct psw psw;
 >> =20
->>  void handle_svc_int(void)
->>  {
->> -	report_abort("Unexpected supervisor call interrupt: at %#lx",
->> -		     lc->svc_old_psw.addr);
->> +	report_abort("Unexpected supervisor call interrupt: on cpu %d at %#l=
-x",
->> +		     stap(), lc->svc_old_psw.addr);
->>  }
+>>  	psw.mask =3D extract_psw_mask();
+>> -	psw.addr =3D (unsigned long)test_func;
+>> +	psw.addr =3D (unsigned long)test_func_initial;
+>> =20
+>>  	report_prefix_push("reset initial");
+>> +	testflag =3D 0;
+>> +	mb();
+>>  	smp_cpu_start(1, psw);
+>> +	wait_for_flag();
+>> =20
+>>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+>>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+>> @@ -196,6 +211,8 @@ static void test_reset_initial(void)
+>>  	report(!status->fpc, "fpc");
+>>  	report(!status->cputm, "cpu timer");
+>>  	report(!status->todpr, "todpr");
+>> +	report(!memcmp(&status->crs[1], nullp, sizeof(status->crs[1]) * 12),=
+ "cr1-13 =3D=3D 0");
+>> +	report(status->crs[15] =3D=3D 0, "cr15 =3D=3D 0");
+>>  	report_prefix_pop();
+>> =20
+>>  	report_prefix_push("initialized");
 >>
 >=20
+>=20
 
 
 
---HkNbuUB7EFq4VChJCVCmTB7lbaCxR4ims--
+--7coQ9ksdeHYirCVdNkLo49dtMkX2UHpIj--
 
---1EIMA5zOdNR3WrE45vaiaflsfcihjlQs3
+--8XDH7mI6QSSZ8DwtB4XqTYuIGbQIVRJnp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4gX2UACgkQ41TmuOI4
-ufjJfw//ZmW6d3TfJG9vmT0VnjupaIzWsXGfU8pc3Vr72kIw+bLYk3N7R4qnIxfU
-Z2GzIEkXKhlZeHMER4UUM7KUzK3O3TuskjXF/AfKYQ27TFoyrsE00mk6041/jbI6
-1t1AGlnRoo8Da+DOs9Zgtfqv42r5Sjs1BvuKsCDjji9GXzKeVNMSclA3Yr4Inu/y
-hYgqrYIYnDO6qBLtvBqCPdeRdp1OjpEEDXoVCfkifuSjLo98u1EExzkN0hPJS1EQ
-1/6/ZyO0CG4M0JCh77r6ShLKSfEMwSiuhwxC05wPm6Gkc7OS8kEq6qvJVwy+1lyy
-wyQ278MWVMjS+SpPcD9BLGLPSA0nlvlZ3xLDKoMCl6ZoJderOlrqty3MvQajiNB9
-1WMi4YrRuUZS4rGZ1r3kbBDWo8JA7hFT7DAYI2SrcsFHkik+XSyQSwq3b948JcWc
-rNUbDJ4znZoVb+8RrYZep/fPSFFdFTair46CFdn30YkJvDZtSB4OsBFGmKpo2Wr2
-Gfc5DE/XzA60s4iTVsC00gnlejyMTcLWQTiK5okzRWYDZyzdeiWfplofHao0bBIx
-uE0yXvltdy4cq2YJUmp+Kn/rckkkBtwPTBM5sPY0/NcJ4EyRmKxR7y5Wd7/5oe0V
-KZgvpAnXjzPKBWRmJemGYk2Mw0kmuv45qFWPpqDvIqTAPEiH744=
-=XxUq
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4gYAEACgkQ41TmuOI4
+ufjcixAArqxzA6JhVk4CN7MukoAuAi/NpK9BWYY3Y1jDMkK9kWlOYxpKUIPD8JX4
+vbjrtUjYh6PSdJad6WRf+GJc6Uzw2wJP3v45DS/RfMpVSQN13/IoZPh4pK3/bm7L
+YgSJf1+QHFwyPeTCAPLnRwG0Xm9ogDwC3mkzmMef0XzrY04hw7MgRFD+WQhjYAW1
+8sC+hmaUtnjZ1PCJi9SEPxTd02JmRemXoei2M0KX4bqzP4VN2TYNxZDDWnlUFb/K
+QnPMCzr27pnNYTYOq7sw6NouU4ZXEDzcWPwx6dzXx/amrMbTCUDsiPMlC/KkyN9S
+lQHLmsmHDHezRdlIbnf64GSweI+BwlIzKgI6iXbFkCid/1Plz1RMjLmxiZ3KOxsK
+IB/Sd5NpEh+oBXqH4nqyLXa+MDhQNfp6Ae4c9JewhlwJP0P1Ygouzbj+QvZm4TOY
+4FvYiPVNq63KdTYdZCnAKz18PtBoGzEROZ/AqtPVWCDJX8hVHb8z7TWvsRDAFpbO
+GjFvDKmZ7Uzd1XryFjMKJPZC452tGR6/PWU0iD4Dqs59G0m+LdoHTsKpk+GsDLgg
+8/G/iWOu/TQU4D1ysbZrkWhtLVAvTxufLBJm+3luAwcR9fsm1PnOJfaLoBkxGgvt
+aoY5YP3SOSSGqbKXGEmF3QyC2lbW9mPQqEy/0d5tHs2wIsLI9RU=
+=84BG
 -----END PGP SIGNATURE-----
 
---1EIMA5zOdNR3WrE45vaiaflsfcihjlQs3--
+--8XDH7mI6QSSZ8DwtB4XqTYuIGbQIVRJnp--
 
