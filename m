@@ -2,131 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7967313FAB0
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 21:33:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39BC513FB47
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 22:21:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731035AbgAPUdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 15:33:24 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:3910 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729067AbgAPUdY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 15:33:24 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e20c8570000>; Thu, 16 Jan 2020 12:32:23 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Thu, 16 Jan 2020 12:33:20 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Thu, 16 Jan 2020 12:33:20 -0800
-Received: from [10.2.160.8] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 16 Jan
- 2020 20:33:19 +0000
-Subject: Re: [PATCH v12 04/22] mm: devmap: refactor 1-based refcounting for
- ZONE_DEVICE pages
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20200107224558.2362728-1-jhubbard@nvidia.com>
- <20200107224558.2362728-5-jhubbard@nvidia.com>
- <20200115152306.GA19546@infradead.org>
- <4707f191-86f8-db4a-c3de-0a84b415b658@nvidia.com>
- <20200116093712.GA11011@infradead.org>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <ccf2723a-dcce-57d3-f63d-ee96dbf6653a@nvidia.com>
-Date:   Thu, 16 Jan 2020 12:30:26 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S2388836AbgAPVVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 16:21:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58134 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731198AbgAPVVA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Jan 2020 16:21:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579209659;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CnJdiWKNpePsvTLrp2v2Ngi9pPBH1s+lxHBCjP93pVU=;
+        b=cGSRaHV94MznzED05+ncUOGt4Dj7KHiXAuNu4RSCVLgDKdSGYwQkGWnTt+SamdFZ9VBRV0
+        aiLMWnvRDxh3N5xu+0tcFUuXptq1BSzGjyheJ6dz1YGRi5We5tSlgq31xasOtQf4vZkB2E
+        d50PTD5ENmM0vJ0lSG/iq9xYVatmzMM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-clv3_kXAM9uJgUL_ipgtYQ-1; Thu, 16 Jan 2020 16:20:58 -0500
+X-MC-Unique: clv3_kXAM9uJgUL_ipgtYQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52F821800D48
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 21:20:57 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-88.gru2.redhat.com [10.97.116.88])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 188D588867;
+        Thu, 16 Jan 2020 21:20:55 +0000 (UTC)
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+Subject: [kvm-unit-tests] README: fix markdown formatting and general improvements
+Date:   Thu, 16 Jan 2020 18:20:54 -0300
+Message-Id: <20200116212054.4041-1-wainersm@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200116093712.GA11011@infradead.org>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1579206743; bh=EQpRDmAadXrYPrWI0G8MSYR7uqZas3jC8zZTGB2Hfnk=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=B3a+nJMY1e/PvYKAT7LBGlwa/kugx+AfoqbMvj/EyT3hxrpeJ7sQMsWMdJQlxzKho
-         jy2YJ47pzKLca9QqrMI2qpXvMA46wU1dfzb3yzBY8NTIGraOJl+bg0Pq/59xdUBLNS
-         /bnG7fSxkcGgsGNzlzCgQWOOUXWSDOgkuZxsp+8IlbnfinKUcliv6MqWXSulEsNyXv
-         EIh2GmNEud9hkIp72ZuHMkWrhgwhMDnw4xjgxdJ2+W90cT6UoDxxzOl8PDPrjhQ9p0
-         IklTRq4Mlrg+UVduRNOxi7jCeWI/98S5JYFUwVk8qaaNzULyUj0q2zlHy86g76FXcR
-         ZxTytDejWJDcw==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/16/20 1:37 AM, Christoph Hellwig wrote:
-> On Wed, Jan 15, 2020 at 01:19:41PM -0800, John Hubbard wrote:
->> On 1/15/20 7:23 AM, Christoph Hellwig wrote:
->> ...
->>>
->>> I'm really not sold on this scheme.  Note that I think it is
->>> particularly bad, but it also doesn't seem any better than what
->>> we had before, and it introduced quite a bit more code.
->>>
->>
->> Hi Christoph,
->>
->> All by itself, yes. But the very next patch (which needs a little
->> rework for other reasons, so not included here) needs to reuse some of
->> these functions within __unpin_devmap_managed_user_page():
-> 
-> Well, then combine it with the series that actually does the change.
+There are some formatting fixes on this change:
+- Some blocks weren't indented correctly;
+- Some statements needed escape.
 
+Also the text is improved in some ways:
+- Variables and options are bold now;
+- Files path are set to italic;
+- Inline commands are marked;
+- Added a section about the tests configuration file.
 
-OK, that makes sense. I just double-checked with a quick test run, that it
-doesn't have dependencies with the rest of this series, and it came out clean,
-so:
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+---
+ See the results here: https://github.com/wainersm/kvm-unit-tests/tree/do=
+cs
 
-Andrew, could you please remove just this one patch from mmotm and linux-next?
+ README.md | 100 ++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 55 insertions(+), 45 deletions(-)
 
+diff --git a/README.md b/README.md
+index 1a9a4ab..07c5a82 100644
+--- a/README.md
++++ b/README.md
+@@ -13,12 +13,11 @@ To create the test images do:
+     ./configure
+     make
+=20
+-in this directory. Test images are created in ./<ARCH>/*.flat
++in this directory. Test images are created in *./\<ARCH\>/\*.flat*
+=20
+ ## Standalone tests
+=20
+-The tests can be built as standalone
+-To create and use standalone tests do:
++The tests can be built as standalone. To create and use standalone tests=
+ do:
+=20
+     ./configure
+     make standalone
+@@ -26,8 +25,8 @@ To create and use standalone tests do:
+     (go to somewhere)
+     ./some-test
+=20
+-'make install' will install all tests in PREFIX/share/kvm-unit-tests/tes=
+ts,
+-each as a standalone test.
++They are created in *./tests*. Or run `make install` to install all test=
+s in
++*PREFIX/share/kvm-unit-tests/tests*, each as a standalone test.
+=20
+=20
+ # Running the tests
+@@ -42,85 +41,96 @@ or:
+=20
+ to run them all.
+=20
+-To select a specific qemu binary, specify the QEMU=3D<path>
++By default the runner script searches for a suitable qemu binary in the =
+system.
++To select a specific qemu binary though, specify the **QEMU=3D\<path\>**
+ environment variable:
+=20
+     QEMU=3D/tmp/qemu/x86_64-softmmu/qemu-system-x86_64 ./x86-run ./x86/m=
+sr.flat
+=20
+ To select an accelerator, for example "kvm" or "tcg", specify the
+-ACCEL=3D<name> environment variable:
++**ACCEL=3D\<name\>** environment variable:
+=20
+     ACCEL=3Dkvm ./x86-run ./x86/msr.flat
+=20
+-# Unit test inputs
++# Tests suite configuration
+=20
+-Unit tests use QEMU's '-append <args...>' parameter for command line
+-inputs, i.e. all args will be available as argv strings in main().
+-Additionally a file of the form
++Given that each test case may need specific runtime configurations as, f=
+or
++example, extra QEMU parameters and limited time to execute, the
++runner script reads those information from a configuration file found
++at *./\<ARCH\>/unittests.cfg*. This file also contain the group of tests=
+ which
++can be ran with the script's **-g** option.
++
++## Unit test inputs
+=20
+-KEY=3DVAL
+-KEY2=3DVAL
+-...
++Unit tests use QEMU's **-append \<args...\>** parameter for command line
++inputs, i.e. all args will be available as *argv* strings in *main()*.
++Additionally a file of the form
+=20
+-may be passed with '-initrd <file>' to become the unit test's environ,
+-which can then be accessed in the usual ways, e.g. VAL =3D getenv("KEY")
+-Any key=3Dval strings can be passed, but some have reserved meanings in
+-the framework. The list of reserved environment variables is below
++    KEY=3DVAL
++    KEY2=3DVAL
++    ...
+=20
+- QEMU_ACCEL            ... either kvm or tcg
+- QEMU_VERSION_STRING   ... string of the form `qemu -h | head -1`
+- KERNEL_VERSION_STRING ... string of the form `uname -r`
++may be passed with **-initrd \<file\>** to become the unit test's enviro=
+n,
++which can then be accessed in the usual ways, e.g. `VAL =3D getenv("KEY"=
+)`.
++ Any *key=3Dval* strings can be passed, but some have reserved meanings =
+in
++the framework. The list of reserved environment variables is:
+=20
+-Additionally these self-explanatory variables are reserved
++    QEMU_ACCEL                   either kvm or tcg
++    QEMU_VERSION_STRING          string of the form `qemu -h | head -1`
++    KERNEL_VERSION_STRING        string of the form `uname -r`
+=20
+- QEMU_MAJOR, QEMU_MINOR, QEMU_MICRO, KERNEL_VERSION, KERNEL_PATCHLEVEL,
+- KERNEL_SUBLEVEL, KERNEL_EXTRAVERSION
++Additionally these self-explanatory variables are reserved: *QEMU\_MAJOR=
+*, *QEMU\_MINOR*, *QEMU\_MICRO*, *KERNEL\_VERSION*, *KERNEL\_PATCHLEVEL*,=
+ *KERNEL\_SUBLEVEL*, *KERNEL\_EXTRAVERSION*.
+=20
+ # Guarding unsafe tests
+=20
+ Some tests are not safe to run by default, as they may crash the
+ host. kvm-unit-tests provides two ways to handle tests like those.
+=20
+- 1) Adding 'nodefault' to the groups field for the unit test in the
+-    unittests.cfg file. When a unit test is in the nodefault group
++ 1) Adding **nodefault** to the groups field for the unit test in the
++    *unittests.cfg* file. When a unit test is in the *nodefault* group
+     it is only run when invoked
+=20
+-    a) independently, arch-run arch/test
+-    b) by specifying any other non-nodefault group it is in,
+-       groups =3D nodefault,mygroup : ./run_tests.sh -g mygroup
+-    c) by specifying all tests should be run, ./run_tests.sh -a
++     a. independently, `<ARCH>-run <ARCH>/<TEST>.flat`
++
++     b. by specifying any other non-nodefault group it is in,
++        *groups =3D nodefault,mygroup* : `./run_tests.sh -g mygroup`
++
++     c. by specifying all tests should be run, `./run_tests.sh -a`
+=20
+  2) Making the test conditional on errata in the code,
++    ```
+     if (ERRATA(abcdef012345)) {
+         do_unsafe_test();
+     }
+-
++    ```
+     With the errata condition the unsafe unit test is only run
+     when
+=20
+-    a) the ERRATA_abcdef012345 environ variable is provided and 'y'
+-    b) the ERRATA_FORCE environ variable is provided and 'y'
+-    c) by specifying all tests should be run, ./run_tests.sh -a
+-       (The -a switch ensures the ERRATA_FORCE is provided and set
++    a) the *ERRATA\_abcdef012345* environment variable is provided and '=
+y'
++
++    b) the **ERRATA_FORCE** environment variable is provided and 'y'
++
++    c) by specifying all tests should be run, `./run_tests.sh -a`
++       (The **-a** switch ensures the **ERRATA_FORCE** is provided and s=
+et
+         to 'y'.)
+=20
+-The errata.txt file provides a mapping of the commits needed by errata
++The *./errata.txt* file provides a mapping of the commits needed by erra=
+ta
+ conditionals to their respective minimum kernel versions. By default,
+ when the user does not provide an environ, then an environ generated
+-from the errata.txt file and the host's kernel version is provided to
++from the *./errata.txt* file and the host's kernel version is provided t=
+o
+ all unit tests.
+=20
+ # Contributing
+=20
+ ## Directory structure
+=20
+-    .:				configure script, top-level Makefile, and run_tests.sh
+-    ./scripts:		helper scripts for building and running tests
+-    ./lib:			general architecture neutral services for the tests
+-    ./lib/<ARCH>:	architecture dependent services for the tests
+-    ./<ARCH>:		the sources of the tests and the created objects/images
++    .:                  configure script, top-level Makefile, and run_te=
+sts.sh
++    ./scripts:          helper scripts for building and running tests
++    ./lib:              general architecture neutral services for the te=
+sts
++    ./lib/<ARCH>:       architecture dependent services for the tests
++    ./<ARCH>:           the sources of the tests and the created objects=
+/images
+=20
+-See <ARCH>/README for architecture specific documentation.
++See *./\<ARCH\>/README* for architecture specific documentation.
+=20
+ ## Style
+=20
+@@ -129,7 +139,7 @@ existing files should be consistent with the existing=
+ style. For new
+ files:
+=20
+   - C: please use standard linux-with-tabs, see Linux kernel
+-    doc Documentation/process/coding-style.rst
++    doc *Documentation/process/coding-style.rst*
+   - Shell: use TABs for indentation
+=20
+ Exceptions:
+@@ -142,7 +152,7 @@ Patches are welcome at the KVM mailing list <kvm@vger=
+.kernel.org>.
+=20
+ Please prefix messages with: [kvm-unit-tests PATCH]
+=20
+-You can add the following to .git/config to do this automatically for yo=
+u:
++You can add the following to *.git/config* to do this automatically for =
+you:
+=20
+     [format]
+         subjectprefix =3D kvm-unit-tests PATCH
+--=20
+2.23.0
 
-> 
-> Also my vaguely recollection is that we had some idea on how to get rid
-> of the off by one refcounting for the zone device pages, which would be
-> a much better outcome.
-> 
-
-Yes, I recall that Dan Williams mentioned it, but I don't think he provided
-any details yet.
-
-
-thanks,
--- 
-John Hubbard
-NVIDIA
