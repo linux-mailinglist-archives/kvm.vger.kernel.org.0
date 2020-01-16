@@ -2,108 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4627D13F1E8
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 19:32:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1494113F237
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 19:34:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391861AbgAPRZC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 12:25:02 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60398 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391675AbgAPRZB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:25:01 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S2436739AbgAPSdw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 13:33:52 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51082 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2403805AbgAPRYq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 12:24:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579195485;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=L1usH87y9Hi/ZiYHMXoHuhdmW1E/8d47ArLsZBDzX7o=;
+        b=XJinJ0kCHyHfEdMKr9DwZZk5Js+UaAI/mIyiqZFM7u+NaTHK0Gp9c8GYI/bKEw3ftfisH4
+        Tomc0I9edkmGHe3lL1XoUx7YOn42wgRqabaQzsWz/zHet9DZabRo/JzqNrEqwHAkkMYLqw
+        MmMwUVWa3qCol1gNEMzhsOG0tFeEthQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-dO0yLECUNPe09s1O855Low-1; Thu, 16 Jan 2020 12:24:44 -0500
+X-MC-Unique: dO0yLECUNPe09s1O855Low-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1B3E5246B2;
-        Thu, 16 Jan 2020 17:25:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579195500;
-        bh=0YGQp/F2sJJuMbnncmCpycXLQIXk9mXxVpEpR5J7qPY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PRitjyXunnyxJBMdMTdw9cv7heDjOOQgPVy50r6x2YUmNlWB4+/aDX1TqKGbGQDN8
-         aqRB3h5QY8DVH1uIo/WeQRaSc0M1Nj3Oo5dwm0a5A6qFELLBodPBGPaZSQvGxOkRoP
-         Q3DG30NBwq3NAxbIqBYAMVddmS/He8A3yNtGXV54=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 101/371] vfio_pci: Enable memory accesses before calling pci_map_rom
-Date:   Thu, 16 Jan 2020 12:19:33 -0500
-Message-Id: <20200116172403.18149-44-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116172403.18149-1-sashal@kernel.org>
-References: <20200116172403.18149-1-sashal@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 397941137843;
+        Thu, 16 Jan 2020 17:24:42 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-117-242.ams2.redhat.com [10.36.117.242])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ACF8C5C28F;
+        Thu, 16 Jan 2020 17:24:30 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     davem@davemloft.net, netdev@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-hyperv@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Dexuan Cui <decui@microsoft.com>
+Subject: [PATCH net-next 0/3] vsock: support network namespace
+Date:   Thu, 16 Jan 2020 18:24:25 +0100
+Message-Id: <20200116172428.311437-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Eric Auger <eric.auger@redhat.com>
+RFC -> v1:
+ * added 'netns' module param to vsock.ko to enable the
+   network namespace support (disabled by default)
+ * added 'vsock_net_eq()' to check the "net" assigned to a socket
+   only when 'netns' support is enabled
 
-[ Upstream commit 0cfd027be1d6def4a462cdc180c055143af24069 ]
+RFC: https://patchwork.ozlabs.org/cover/1202235/
 
-pci_map_rom/pci_get_rom_size() performs memory access in the ROM.
-In case the Memory Space accesses were disabled, readw() is likely
-to trigger a synchronous external abort on some platforms.
+Now that we have multi-transport upstream, I started to take a look to
+support network namespace in vsock.
 
-In case memory accesses were disabled, re-enable them before the
-call and disable them back again just after.
+As we partially discussed in the multi-transport proposal [1], it could
+be nice to support network namespace in vsock to reach the following
+goals:
+- isolate host applications from guest applications using the same ports
+  with CID_ANY
+- assign the same CID of VMs running in different network namespaces
+- partition VMs between VMMs or at finer granularity
 
-Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/vfio/pci/vfio_pci.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+This new feature is disabled by default, because it changes vsock's
+behavior with network namespaces and could break existing applications.
+It can be enabled with the new 'netns' module parameter of vsock.ko.
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 9bd3e7911af2..550ab7707b57 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -717,6 +717,7 @@ static long vfio_pci_ioctl(void *device_data,
- 		{
- 			void __iomem *io;
- 			size_t size;
-+			u16 orig_cmd;
- 
- 			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 			info.flags = 0;
-@@ -732,15 +733,23 @@ static long vfio_pci_ioctl(void *device_data,
- 					break;
- 			}
- 
--			/* Is it really there? */
-+			/*
-+			 * Is it really there?  Enable memory decode for
-+			 * implicit access in pci_map_rom().
-+			 */
-+			pci_read_config_word(pdev, PCI_COMMAND, &orig_cmd);
-+			pci_write_config_word(pdev, PCI_COMMAND,
-+					      orig_cmd | PCI_COMMAND_MEMORY);
-+
- 			io = pci_map_rom(pdev, &size);
--			if (!io || !size) {
-+			if (io) {
-+				info.flags = VFIO_REGION_INFO_FLAG_READ;
-+				pci_unmap_rom(pdev, io);
-+			} else {
- 				info.size = 0;
--				break;
- 			}
--			pci_unmap_rom(pdev, io);
- 
--			info.flags = VFIO_REGION_INFO_FLAG_READ;
-+			pci_write_config_word(pdev, PCI_COMMAND, orig_cmd);
- 			break;
- 		}
- 		case VFIO_PCI_VGA_REGION_INDEX:
--- 
-2.20.1
+This implementation provides the following behavior:
+- packets received from the host (received by G2H transports) are
+  assigned to the default netns (init_net)
+- packets received from the guest (received by H2G - vhost-vsock) are
+  assigned to the netns of the process that opens /dev/vhost-vsock
+  (usually the VMM, qemu in my tests, opens the /dev/vhost-vsock)
+    - for vmci I need some suggestions, because I don't know how to do
+      and test the same in the vmci driver, for now vmci uses the
+      init_net
+- loopback packets are exchanged only in the same netns
+
+I tested the series in this way:
+l0_host$ qemu-system-x86_64 -m 4G -M accel=3Dkvm -smp 4 \
+            -drive file=3D/tmp/vsockvm0.img,if=3Dvirtio --nographic \
+            -device vhost-vsock-pci,guest-cid=3D3
+
+l1_vm$ echo 1 > /sys/module/vsock/parameters/netns
+
+l1_vm$ ip netns add ns1
+l1_vm$ ip netns add ns2
+ # same CID on different netns
+l1_vm$ ip netns exec ns1 qemu-system-x86_64 -m 1G -M accel=3Dkvm -smp 2 \
+            -drive file=3D/tmp/vsockvm1.img,if=3Dvirtio --nographic \
+            -device vhost-vsock-pci,guest-cid=3D4
+l1_vm$ ip netns exec ns2 qemu-system-x86_64 -m 1G -M accel=3Dkvm -smp 2 \
+            -drive file=3D/tmp/vsockvm2.img,if=3Dvirtio --nographic \
+            -device vhost-vsock-pci,guest-cid=3D4
+
+ # all iperf3 listen on CID_ANY and port 5201, but in different netns
+l1_vm$ ./iperf3 --vsock -s # connection from l0 or guests started
+                           # on default netns (init_net)
+l1_vm$ ip netns exec ns1 ./iperf3 --vsock -s
+l1_vm$ ip netns exec ns1 ./iperf3 --vsock -s
+
+l0_host$ ./iperf3 --vsock -c 3
+l2_vm1$ ./iperf3 --vsock -c 2
+l2_vm2$ ./iperf3 --vsock -c 2
+
+[1] https://www.spinics.net/lists/netdev/msg575792.html
+
+Stefano Garzarella (3):
+  vsock: add network namespace support
+  vsock/virtio_transport_common: handle netns of received packets
+  vhost/vsock: use netns of process that opens the vhost-vsock device
+
+ drivers/vhost/vsock.c                   | 29 ++++++++++++-----
+ include/linux/virtio_vsock.h            |  2 ++
+ include/net/af_vsock.h                  |  7 +++--
+ net/vmw_vsock/af_vsock.c                | 41 +++++++++++++++++++------
+ net/vmw_vsock/hyperv_transport.c        |  5 +--
+ net/vmw_vsock/virtio_transport.c        |  2 ++
+ net/vmw_vsock/virtio_transport_common.c | 12 ++++++--
+ net/vmw_vsock/vmci_transport.c          |  5 +--
+ 8 files changed, 78 insertions(+), 25 deletions(-)
+
+--=20
+2.24.1
 
