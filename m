@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 01C9B13D9CC
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 13:21:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D909713D9DC
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2020 13:25:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726552AbgAPMUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 07:20:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52917 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726082AbgAPMUD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 07:20:03 -0500
+        id S1726406AbgAPMZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Jan 2020 07:25:10 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31838 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726018AbgAPMZK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Jan 2020 07:25:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579177202;
+        s=mimecast20190719; t=1579177508;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=cuGDwW3NbMtrmy7VqgFLbRcKJwcplCxWFYqoPZabR1E=;
-        b=HUJBNA+ffv4xwNqx2gckjbEx45Jw7VvPPXzAtsEgTRmSN5+qGLtiTJtlx533Hu/Cuh+I+H
-        NCbuC1ABQyyhifGo28ykntFgh7qq5Unha4Bd67cweAl8bIsCQr5pTlB5YL52rQS4ltyNQB
-        kMhAcSbu/Acc5OJ7qOR4w1c9Forsay4=
+        bh=oRw1oFVTBkG+mkI1t5i+7XlL4V9vDYs/IIFzjDmIHQA=;
+        b=eimFcCTKb3JCDFuw8ur8sVgNJRwLohJOF2aZRtd5Qz314IK5H3D/gYN7fwjBwd4hu4JiPH
+        WnRWNdp0ZYPzJVnDhmP4THY7Rxpk6UpriuQ8E1bfIkPWEr+59gfJZKutS5ZRi2IaieDFl4
+        n0XOT37vrJG3gWo0kP4G0o/BrXda+ro=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-gNyhm760OJO0BpoPmW13ug-1; Thu, 16 Jan 2020 07:19:59 -0500
-X-MC-Unique: gNyhm760OJO0BpoPmW13ug-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-309-kkOjYqoiMZqbmZlYlx-nYg-1; Thu, 16 Jan 2020 07:25:02 -0500
+X-MC-Unique: kkOjYqoiMZqbmZlYlx-nYg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 045AA8D7622;
-        Thu, 16 Jan 2020 12:19:58 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00D301005510;
+        Thu, 16 Jan 2020 12:25:01 +0000 (UTC)
 Received: from [10.36.116.136] (ovpn-116-136.ams2.redhat.com [10.36.116.136])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CDC51000329;
-        Thu, 16 Jan 2020 12:19:56 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 5/7] s390x: smp: Wait for cpu setup to
- finish
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A129388893;
+        Thu, 16 Jan 2020 12:24:59 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 6/7] s390x: smp: Test all CRs on initial
+ reset
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
         linux-s390@vger.kernel.org, cohuck@redhat.com
 References: <20200116120513.2244-1-frankja@linux.ibm.com>
- <20200116120513.2244-6-frankja@linux.ibm.com>
+ <20200116120513.2244-7-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -85,65 +85,87 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <1a0cc6bf-07ad-2020-aee7-84df693b5317@redhat.com>
-Date:   Thu, 16 Jan 2020 13:19:55 +0100
+Message-ID: <7e85ec92-4d0a-f673-00c8-a9ab9a22118c@redhat.com>
+Date:   Thu, 16 Jan 2020 13:24:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200116120513.2244-6-frankja@linux.ibm.com>
+In-Reply-To: <20200116120513.2244-7-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 16.01.20 13:05, Janosch Frank wrote:
-> We store the user provided psw address into restart new, so a psw
-> restart does not lead us through setup again.
+> All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
+> so we also need to test 1-13 and 15 for 0.
 > 
-> Also we wait on smp_cpu_setup() until the cpu has finished setup
-> before returning. This is necessary for z/VM and LPAR where sigp is
-> asynchronous.
+> And while we're at it, let's also set some values to cr 1, 7 and 13, so
+> we can actually be sure that they will be zeroed.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  lib/s390x/smp.c  | 2 ++
->  s390x/cstart64.S | 2 ++
->  2 files changed, 4 insertions(+)
+>  s390x/smp.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
 > 
-> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> index f984a34..0a0bc1c 100644
-> --- a/lib/s390x/smp.c
-> +++ b/lib/s390x/smp.c
-> @@ -199,6 +199,8 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index d430638..ce3215d 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -176,16 +176,31 @@ static void test_emcall(void)
+>  	report_prefix_pop();
+>  }
 >  
->  	/* Start processing */
->  	smp_cpu_restart_nolock(addr, NULL);
-> +	/* Wait until the cpu has finished setup and started the provided psw */
-> +	while (lc->restart_new_psw.addr != psw.addr) { mb(); }
->  out:
->  	spin_unlock(&lock);
->  	return rc;
-> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index 86dd4c4..9af6bb3 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/cstart64.S
-> @@ -159,6 +159,8 @@ smp_cpu_setup_state:
->  	xgr	%r1, %r1
->  	lmg     %r0, %r15, GEN_LC_SW_INT_GRS
->  	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
-> +	/* We should only go once through cpu setup and not for every restart */
-> +	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
->  	br	%r14
+> +/* Used to dirty registers of cpu #1 before it is reset */
+> +static void test_func_initial(void)
+> +{
+> +	lctlg(1, 0x42000UL);
+> +	lctlg(7, 0x43000UL);
+> +	lctlg(13, 0x44000UL);
+> +	testflag = 1;
+> +	mb();
+> +	cpu_loop();
+
+Can we make cpu_loop() the default when this function returns? (IOW, an
+endless loop whenever a cpu finished executing the function?)
+
+Do we need the mb() here?
+
+> +}
+> +
+>  static void test_reset_initial(void)
+>  {
+>  	struct cpu_status *status = alloc_pages(0);
+> +	uint64_t nullp[12] = {};
+>  	struct psw psw;
 >  
->  pgm_int:
+>  	psw.mask = extract_psw_mask();
+> -	psw.addr = (unsigned long)test_func;
+> +	psw.addr = (unsigned long)test_func_initial;
+>  
+>  	report_prefix_push("reset initial");
+> +	testflag = 0;
+> +	mb();
+>  	smp_cpu_start(1, psw);
+> +	wait_for_flag();
+>  
+>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+> @@ -196,6 +211,8 @@ static void test_reset_initial(void)
+>  	report(!status->fpc, "fpc");
+>  	report(!status->cputm, "cpu timer");
+>  	report(!status->todpr, "todpr");
+> +	report(!memcmp(&status->crs[1], nullp, sizeof(status->crs[1]) * 12), "cr1-13 == 0");
+> +	report(status->crs[15] == 0, "cr15 == 0");
+>  	report_prefix_pop();
+>  
+>  	report_prefix_push("initialized");
 > 
 
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
