@@ -2,81 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 861281402EA
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 05:16:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4CC51403FA
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 07:27:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730056AbgAQEQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Jan 2020 23:16:43 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:40046 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729044AbgAQEQn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Jan 2020 23:16:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=7VKPSEClUB+tWGnzrvYaTHzOiMMd/kHZruURBfe+vnQ=; b=jN2CClEPnQYyeT9d4eZTEly4Q
-        PmwTMa1GHHZMQDhhZRvpnenpCM+rSaUkDkHg9autZMAAJpClo7O5UAqHwrHQKv/LSHvOW4UneLkhU
-        wraVQkBqdWv1Dqpqj3dCFu/beIIEmY9sihhuvTCdUBqWPiRQGDci7Tb7nA9aDHA9aypkuViytEkRH
-        R8pUNv8riHnvy75XurQR54VLLrlZMdUyVdBRlk7bqrSAAoaNmWCmNlsa0akoYdVs0zOeNBcwRauAH
-        zaC2oppm1GNAs7Rr9GTaLjn1OsNufPITzOKDd+jhVoUdR0Kp98KiUxM9rFuW/cdsMOvXqdj/rnWl1
-        D0kYByIPw==;
-Received: from [2601:1c0:6280:3f0::ed68]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1isJ3i-0008MQ-Gv; Fri, 17 Jan 2020 04:16:34 +0000
-Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     tiwei.bie@intel.com, jgg@mellanox.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, lingshan.zhu@intel.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        kevin.tian@intel.com, stefanha@redhat.com, hch@infradead.org,
-        aadam@redhat.com, jakub.kicinski@netronome.com, jiri@mellanox.com,
-        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
-References: <20200116124231.20253-1-jasowang@redhat.com>
- <20200116124231.20253-4-jasowang@redhat.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <3d0951af-a854-3b4a-99e4-d501a7fa7a9c@infradead.org>
-Date:   Thu, 16 Jan 2020 20:16:32 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1729093AbgAQG07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jan 2020 01:26:59 -0500
+Received: from mga17.intel.com ([192.55.52.151]:14600 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726479AbgAQG0j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jan 2020 01:26:39 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jan 2020 22:26:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,329,1574150400"; 
+   d="scan'208";a="424342466"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by fmsmga005.fm.intel.com with ESMTP; 16 Jan 2020 22:26:29 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Derek Yerger <derek@djy.llc>,
+        kernel@najdan.com, Thomas Lambertz <mail@thomaslambertz.de>,
+        Rik van Riel <riel@surriel.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Borislav Petkov <bp@suse.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH 0/4] KVM: x86: TIF_NEED_FPU_LOAD bug fixes
+Date:   Thu, 16 Jan 2020 22:26:24 -0800
+Message-Id: <20200117062628.6233-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200116124231.20253-4-jasowang@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/16/20 4:42 AM, Jason Wang wrote:
-> diff --git a/drivers/virtio/vdpa/Kconfig b/drivers/virtio/vdpa/Kconfig
-> new file mode 100644
-> index 000000000000..3032727b4d98
-> --- /dev/null
-> +++ b/drivers/virtio/vdpa/Kconfig
-> @@ -0,0 +1,9 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +config VDPA
-> +	tristate
-> +        default n
-> +        help
-> +          Enable this module to support vDPA device that uses a
+Three bug fixes related to deferring FPU loading to return to userspace,
+or in this case, deferring to entering a KVM guest.  And a cleanup patch I
+couldn't resist throwing on top.
 
-	                                        devices
+The crux of the matter is that TIF_FPU_NEED_LOAD can be set any time
+control is transferred out of KVM, e.g. via IRQ->softirq, not just when
+KVM is preempted.  The previous attempt to fix the underlying bug(s)
+by handling TIF_FPU_NEED_LOAD during kvm_sched_in() only made the bug(s)
+harder to hit, i.e. it resolved the preemption case but only shrunk the
+window where a softirq could corrupt state.
 
-> +          datapath which complies with virtio specifications with
-> +          vendor specific control path.
-> +
+Paolo, patch 01 will conflict with commit 95145c25a78c ("KVM: x86: Add a
+WARN on TIF_NEED_FPU_LOAD in kvm_load_guest_fpu()") that is sitting in
+kvm/queue.  The kvm/queue commit should simply be dropped.
 
-Use tab + 2 spaces for Kconfig indentation.
+Patch 01 fixes the original underlying bug, which is that KVM doesn't
+handle TIF_FPU_NEED_LOAD when swapping between guest and userspace FPU
+state.
+
+Patch 02 fixes (unconfirmed) issues similar to the reported bug where KVM
+doesn't ensure CPU FPU state is fresh when accessing it during emulation.
+This patch is smoke tested only (via kvm-unit-tests' emulator tests).
+
+Patch 03 reverts the preemption bug fix, which simultaneously restores the
+handling of TIF_FPU_NEED_LOAD in vcpu_enter_guest() to fix the reported
+bugs[1][2] and removes the now-unnecessary preemption workaround.
+
+Alternatively, the handling of TIF_NEED_FPU_LOAD in the kvm_sched_in()
+path could be left in place, i.e it doesn't cause immediate damage, but
+as stated before, restoring FPU state after KVM is preempted only makes
+it harder to find the actual bugs.  Case in point, I originally split
+the revert into two separate patches (so that removing the kvm_sched_in()
+call wouldn't be tagged for stable), but that only hid the underlying
+kvm_put_guest_fpu() bug until I fully reverted the commit.
+
+Patch 04 removes an unused emulator context param from several of the
+functions that are fixed in patch 02.  The param was left behind during
+a previous KVM FPU state rework.
+
+Tested via Thomas Lambertz's mprime reproducer[3], which detected issues
+with buggy KVMs on my system in under a minute.  Ran clean for ~30 minutes
+on each of the first two patches and several hours with all three patches
+applied.
+
+[1] https://lore.kernel.org/kvm/1e525b08-6204-3238-5d56-513f82f1d7fb@djy.llc
+[2] https://lore.kernel.org/kvm/bug-206215-28872@https.bugzilla.kernel.org%2F
+[3] https://lore.kernel.org/lkml/217248af-e980-9cb0-ff0d-9773413b9d38@thomaslambertz.de
+
+Sean Christopherson (4):
+  KVM: x86: Handle TIF_NEED_FPU_LOAD in kvm_{load,put}_guest_fpu()
+  KVM: x86: Ensure guest's FPU state is loaded when accessing for
+    emulation
+  KVM: x86: Revert "KVM: X86: Fix fpu state crash in kvm guest"
+  KVM: x86: Remove unused ctxt param from emulator's FPU accessors
+
+ arch/x86/kvm/emulate.c | 67 ++++++++++++++++++++++++++++++++----------
+ arch/x86/kvm/x86.c     | 36 +++++++++++++++++------
+ 2 files changed, 79 insertions(+), 24 deletions(-)
 
 -- 
-~Randy
+2.24.1
 
