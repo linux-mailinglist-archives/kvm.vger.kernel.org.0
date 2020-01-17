@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CE871403F7
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 07:26:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5E4A1403F3
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 07:26:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728512AbgAQG0j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jan 2020 01:26:39 -0500
+        id S1729016AbgAQG0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jan 2020 01:26:43 -0500
 Received: from mga17.intel.com ([192.55.52.151]:14600 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727126AbgAQG0j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jan 2020 01:26:39 -0500
+        id S1727126AbgAQG0l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jan 2020 01:26:41 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
   by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jan 2020 22:26:38 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,329,1574150400"; 
-   d="scan'208";a="424342478"
+   d="scan'208";a="424342481"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga005.fm.intel.com with ESMTP; 16 Jan 2020 22:26:31 -0800
+  by fmsmga005.fm.intel.com with ESMTP; 16 Jan 2020 22:26:32 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -34,9 +34,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Borislav Petkov <bp@suse.de>,
         Dave Hansen <dave.hansen@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH 3/4] KVM: x86: Revert "KVM: X86: Fix fpu state crash in kvm guest"
-Date:   Thu, 16 Jan 2020 22:26:27 -0800
-Message-Id: <20200117062628.6233-4-sean.j.christopherson@intel.com>
+Subject: [PATCH 4/4] KVM: x86: Remove unused ctxt param from emulator's FPU accessors
+Date:   Thu, 16 Jan 2020 22:26:28 -0800
+Message-Id: <20200117062628.6233-5-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200117062628.6233-1-sean.j.christopherson@intel.com>
 References: <20200117062628.6233-1-sean.j.christopherson@intel.com>
@@ -47,132 +47,117 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reload the current thread's FPU state, which contains the guest's FPU
-state, to the CPU registers if necessary during vcpu_enter_guest().
-TIF_NEED_FPU_LOAD can be set any time control is transferred out of KVM,
-e.g. if I/O is triggered during a KVM call to get_user_pages() or if a
-softirq occurs while KVM is scheduled in.
+Remove an unused struct x86_emulate_ctxt * param from low level helpers
+used to access guest FPU state.  The unused param was left behind by
+commit 6ab0b9feb82a ("x86,kvm: remove KVM emulator get_fpu / put_fpu").
 
-Moving the handling of TIF_NEED_FPU_LOAD from vcpu_enter_guest() to
-kvm_arch_vcpu_load(), effectively kvm_sched_in(), papered over a bug
-where kvm_put_guest_fpu() failed to account for TIF_NEED_FPU_LOAD.  The
-easiest way to the kvm_put_guest_fpu() bug was to run with involuntary
-preemption enable, thus handling TIF_NEED_FPU_LOAD during kvm_sched_in()
-made the bug go away.  But, removing the handling in vcpu_enter_guest()
-exposed KVM to the rare case of a softirq triggering kernel_fpu_begin()
-between vcpu_load() and vcpu_enter_guest().
+No functional change intended.
 
-Now that kvm_{load,put}_guest_fpu() correctly handle TIF_NEED_FPU_LOAD,
-revert the commit to both restore the vcpu_enter_guest() behavior and
-eliminate the superfluous switch_fpu_return() in kvm_arch_vcpu_load().
-
-Note, leaving the handling in kvm_arch_vcpu_load() isn't wrong per se,
-but it is unnecessary, and most critically, makes it extremely difficult
-to find bugs such as the kvm_put_guest_fpu() issue due to shrinking the
-window where a softirq can corrupt state.
-
-A sample trace triggered by warning if TIF_NEED_FPU_LOAD is set while
-vcpu state is loaded:
-
- <IRQ>
-  gcmaes_crypt_by_sg.constprop.12+0x26e/0x660
-  ? 0xffffffffc024547d
-  ? __qdisc_run+0x83/0x510
-  ? __dev_queue_xmit+0x45e/0x990
-  ? ip_finish_output2+0x1a8/0x570
-  ? fib4_rule_action+0x61/0x70
-  ? fib4_rule_action+0x70/0x70
-  ? fib_rules_lookup+0x13f/0x1c0
-  ? helper_rfc4106_decrypt+0x82/0xa0
-  ? crypto_aead_decrypt+0x40/0x70
-  ? crypto_aead_decrypt+0x40/0x70
-  ? crypto_aead_decrypt+0x40/0x70
-  ? esp_output_tail+0x8f4/0xa5a [esp4]
-  ? skb_ext_add+0xd3/0x170
-  ? xfrm_input+0x7a6/0x12c0
-  ? xfrm4_rcv_encap+0xae/0xd0
-  ? xfrm4_transport_finish+0x200/0x200
-  ? udp_queue_rcv_one_skb+0x1ba/0x460
-  ? udp_unicast_rcv_skb.isra.63+0x72/0x90
-  ? __udp4_lib_rcv+0x51b/0xb00
-  ? ip_protocol_deliver_rcu+0xd2/0x1c0
-  ? ip_local_deliver_finish+0x44/0x50
-  ? ip_local_deliver+0xe0/0xf0
-  ? ip_protocol_deliver_rcu+0x1c0/0x1c0
-  ? ip_rcv+0xbc/0xd0
-  ? ip_rcv_finish_core.isra.19+0x380/0x380
-  ? __netif_receive_skb_one_core+0x7e/0x90
-  ? netif_receive_skb_internal+0x3d/0xb0
-  ? napi_gro_receive+0xed/0x150
-  ? 0xffffffffc0243c77
-  ? net_rx_action+0x149/0x3b0
-  ? __do_softirq+0xe4/0x2f8
-  ? handle_irq_event_percpu+0x6a/0x80
-  ? irq_exit+0xe6/0xf0
-  ? do_IRQ+0x7f/0xd0
-  ? common_interrupt+0xf/0xf
-  </IRQ>
-  ? irq_entries_start+0x20/0x660
-  ? vmx_get_interrupt_shadow+0x2f0/0x710 [kvm_intel]
-  ? kvm_set_msr_common+0xfc7/0x2380 [kvm]
-  ? recalibrate_cpu_khz+0x10/0x10
-  ? ktime_get+0x3a/0xa0
-  ? kvm_arch_vcpu_ioctl_run+0x107/0x560 [kvm]
-  ? kvm_init+0x6bf/0xd00 [kvm]
-  ? __seccomp_filter+0x7a/0x680
-  ? do_vfs_ioctl+0xa4/0x630
-  ? security_file_ioctl+0x32/0x50
-  ? ksys_ioctl+0x60/0x90
-  ? __x64_sys_ioctl+0x16/0x20
-  ? do_syscall_64+0x5f/0x1a0
-  ? entry_SYSCALL_64_after_hwframe+0x44/0xa9
----[ end trace 9564a1ccad733a90 ]---
-
-This reverts commit e751732486eb3f159089a64d1901992b1357e7cc.
-
-Fixes: e751732486eb3 ("KVM: X86: Fix fpu state crash in kvm guest")
-Reported-by: Derek Yerger <derek@djy.llc>
-Reported-by: kernel@najdan.com
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Thomas Lambertz <mail@thomaslambertz.de>
-Cc: Rik van Riel <riel@surriel.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Dave Hansen <dave.hansen@intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/x86.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ arch/x86/kvm/emulate.c | 28 +++++++++++++---------------
+ 1 file changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0c7211491f98..ac290b7cc4d7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3458,10 +3458,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 2a5bed60ce50..3e3b3cd60cce 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -1090,7 +1090,7 @@ static void emulator_put_fpu(void)
+ 	fpregs_unlock();
+ }
  
- 	kvm_x86_ops->vcpu_load(vcpu, cpu);
+-static void read_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data, int reg)
++static void read_sse_reg(sse128_t *data, int reg)
+ {
+ 	emulator_get_fpu();
+ 	switch (reg) {
+@@ -1117,8 +1117,7 @@ static void read_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data, int reg)
+ 	emulator_put_fpu();
+ }
  
--	fpregs_assert_state_consistent();
--	if (test_thread_flag(TIF_NEED_FPU_LOAD))
--		switch_fpu_return();
--
- 	/* Apply any externally detected TSC adjustments (due to suspend) */
- 	if (unlikely(vcpu->arch.tsc_offset_adjustment)) {
- 		adjust_tsc_offset_host(vcpu, vcpu->arch.tsc_offset_adjustment);
-@@ -8198,8 +8194,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	trace_kvm_entry(vcpu->vcpu_id);
- 	guest_enter_irqoff();
+-static void write_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data,
+-			  int reg)
++static void write_sse_reg(sse128_t *data, int reg)
+ {
+ 	emulator_get_fpu();
+ 	switch (reg) {
+@@ -1145,7 +1144,7 @@ static void write_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data,
+ 	emulator_put_fpu();
+ }
  
--	/* The preempt notifier should have taken care of the FPU already.  */
--	WARN_ON_ONCE(test_thread_flag(TIF_NEED_FPU_LOAD));
-+	fpregs_assert_state_consistent();
-+	if (test_thread_flag(TIF_NEED_FPU_LOAD))
-+		switch_fpu_return();
+-static void read_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
++static void read_mmx_reg(u64 *data, int reg)
+ {
+ 	emulator_get_fpu();
+ 	switch (reg) {
+@@ -1162,7 +1161,7 @@ static void read_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
+ 	emulator_put_fpu();
+ }
  
- 	if (unlikely(vcpu->arch.switch_db_regs)) {
- 		set_debugreg(0, 7);
+-static void write_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
++static void write_mmx_reg(u64 *data, int reg)
+ {
+ 	emulator_get_fpu();
+ 	switch (reg) {
+@@ -1234,7 +1233,7 @@ static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
+ 		op->type = OP_XMM;
+ 		op->bytes = 16;
+ 		op->addr.xmm = reg;
+-		read_sse_reg(ctxt, &op->vec_val, reg);
++		read_sse_reg(&op->vec_val, reg);
+ 		return;
+ 	}
+ 	if (ctxt->d & Mmx) {
+@@ -1285,7 +1284,7 @@ static int decode_modrm(struct x86_emulate_ctxt *ctxt,
+ 			op->type = OP_XMM;
+ 			op->bytes = 16;
+ 			op->addr.xmm = ctxt->modrm_rm;
+-			read_sse_reg(ctxt, &op->vec_val, ctxt->modrm_rm);
++			read_sse_reg(&op->vec_val, ctxt->modrm_rm);
+ 			return rc;
+ 		}
+ 		if (ctxt->d & Mmx) {
+@@ -1862,10 +1861,10 @@ static int writeback(struct x86_emulate_ctxt *ctxt, struct operand *op)
+ 				       op->bytes * op->count);
+ 		break;
+ 	case OP_XMM:
+-		write_sse_reg(ctxt, &op->vec_val, op->addr.xmm);
++		write_sse_reg(&op->vec_val, op->addr.xmm);
+ 		break;
+ 	case OP_MM:
+-		write_mmx_reg(ctxt, &op->mm_val, op->addr.mm);
++		write_mmx_reg(&op->mm_val, op->addr.mm);
+ 		break;
+ 	case OP_NONE:
+ 		/* no writeback */
+@@ -5495,11 +5494,10 @@ static int flush_pending_x87_faults(struct x86_emulate_ctxt *ctxt)
+ 	return X86EMUL_CONTINUE;
+ }
+ 
+-static void fetch_possible_mmx_operand(struct x86_emulate_ctxt *ctxt,
+-				       struct operand *op)
++static void fetch_possible_mmx_operand(struct operand *op)
+ {
+ 	if (op->type == OP_MM)
+-		read_mmx_reg(ctxt, &op->mm_val, op->addr.mm);
++		read_mmx_reg(&op->mm_val, op->addr.mm);
+ }
+ 
+ static int fastop(struct x86_emulate_ctxt *ctxt, void (*fop)(struct fastop *))
+@@ -5578,10 +5576,10 @@ int x86_emulate_insn(struct x86_emulate_ctxt *ctxt)
+ 			 * Now that we know the fpu is exception safe, we can fetch
+ 			 * operands from it.
+ 			 */
+-			fetch_possible_mmx_operand(ctxt, &ctxt->src);
+-			fetch_possible_mmx_operand(ctxt, &ctxt->src2);
++			fetch_possible_mmx_operand(&ctxt->src);
++			fetch_possible_mmx_operand(&ctxt->src2);
+ 			if (!(ctxt->d & Mov))
+-				fetch_possible_mmx_operand(ctxt, &ctxt->dst);
++				fetch_possible_mmx_operand(&ctxt->dst);
+ 		}
+ 
+ 		if (unlikely(emul_flags & X86EMUL_GUEST_MASK) && ctxt->intercept) {
 -- 
 2.24.1
 
