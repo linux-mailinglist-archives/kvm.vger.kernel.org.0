@@ -2,91 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2DC61407F1
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 11:29:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF988140811
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 11:36:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726554AbgAQK3R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jan 2020 05:29:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56999 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726085AbgAQK3R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jan 2020 05:29:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579256956;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=PMWDPnJBobkxIlXLC91KDzXsOyrhs8751trToJX9l5E=;
-        b=KoJI9XtZa7d/VyUzII6IskXo7XxHFnAn5AxUgyBoNoHk8qyUhChqljp8ELjpF7Ju0hyHy+
-        UZ4IMjLaJLbg7R42FHm5Biob1aXancQuKJEm805x5OtX0XoC1mdeHgUe22ZPK+vNisV0S6
-        zV6U1CRT3UcO+i9CfMm3667oUtx2aik=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-8yHHzf8yPeayvUUmCe0mKQ-1; Fri, 17 Jan 2020 05:29:13 -0500
-X-MC-Unique: 8yHHzf8yPeayvUUmCe0mKQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D461107ACC7;
-        Fri, 17 Jan 2020 10:29:12 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-212.ams2.redhat.com [10.36.116.212])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6108C5D9CD;
-        Fri, 17 Jan 2020 10:29:08 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 7/7] s390x: smp: Dirty fpc before
- initial reset test
-To:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, linux-s390@vger.kernel.org,
-        cohuck@redhat.com
-References: <20200116120513.2244-1-frankja@linux.ibm.com>
- <20200116120513.2244-8-frankja@linux.ibm.com>
- <0ddfb1ce-16e4-017f-078b-80146bfa29a6@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <3f034419-2342-0571-ea68-0474d45ba552@redhat.com>
-Date:   Fri, 17 Jan 2020 11:29:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726596AbgAQKgt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jan 2020 05:36:49 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:53064 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726085AbgAQKgt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jan 2020 05:36:49 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 14ED5F094E649266C5B6;
+        Fri, 17 Jan 2020 18:36:48 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Fri, 17 Jan 2020
+ 18:36:39 +0800
+Subject: Re: [PATCH v22 5/9] ACPI: Record the Generic Error Status Block
+ address
+To:     Peter Maydell <peter.maydell@linaro.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Fam Zheng <fam@euphon.net>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "xuwei (O)" <xuwei5@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        "QEMU Developers" <qemu-devel@nongnu.org>,
+        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+        Zheng Xiang <zhengxiang9@huawei.com>,
+        Linuxarm <linuxarm@huawei.com>
+References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
+ <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
+ <CAFEAcA9z9KDHmvh6WsrCPj_FTvNmOfhatxNQDftNG+ZKZN0wAA@mail.gmail.com>
+From:   gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <9110de9c-7522-2823-22be-4ba9212026fb@huawei.com>
+Date:   Fri, 17 Jan 2020 18:36:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-In-Reply-To: <0ddfb1ce-16e4-017f-078b-80146bfa29a6@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA9z9KDHmvh6WsrCPj_FTvNmOfhatxNQDftNG+ZKZN0wAA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/01/2020 11.20, David Hildenbrand wrote:
-> On 16.01.20 13:05, Janosch Frank wrote:
->> Let's dirty the fpc, before we test if the initial reset sets it to 0.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->> ---
->>  s390x/smp.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/s390x/smp.c b/s390x/smp.c
->> index ce3215d..97a9dda 100644
->> --- a/s390x/smp.c
->> +++ b/s390x/smp.c
->> @@ -179,6 +179,9 @@ static void test_emcall(void)
->>  /* Used to dirty registers of cpu #1 before it is reset */
->>  static void test_func_initial(void)
->>  {
->> +	asm volatile(
->> +		"	sfpc	%0\n"
->> +		: : "d" (0x11) : );
-> 
-> FWIW, I'd make this one easier to read
-> 
-> asm volatile("sfpc %0\n" :: "d" (0x11));
+On 2020/1/17 0:44, Peter Maydell wrote:
+>>      .minimum_version_id = 1,
+>>      .fields = (VMStateField[]) {
+>> -        VMSTATE_STRUCT(ged_state, AcpiGedState, 1, vmstate_ged_state, GEDState),
+>> +        VMSTATE_STRUCT(ged_state, AcpiGedState, 1,
+>> +                       vmstate_ged_state, GEDState),
+>> +        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
+>> +                       vmstate_ghes_state, AcpiGhesState),
+>>          VMSTATE_END_OF_LIST(),
+>>      },
+>>      .subsections = (const VMStateDescription * []) {
+> You can't just add fields to an existing VMStateDescription
+> like this -- it will break migration compatibility. Instead you
+> need to add a new subsection to this vmstate, with a '.needed'
+> function which indicates when the subsection should be present.
+Thanks Peter's pointing out. I will change it.
 
-By the way, since it's only one line, you can also drop the \n here.
 
- Thomas
+> 
+> thanks
+> -- PMM
+> .
+> 
 
