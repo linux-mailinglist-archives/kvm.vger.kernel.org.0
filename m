@@ -2,28 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 716F41410FE
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 19:43:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 165ED1411DD
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 20:36:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729174AbgAQSnf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jan 2020 13:43:35 -0500
-Received: from mga12.intel.com ([192.55.52.136]:35316 "EHLO mga12.intel.com"
+        id S1729360AbgAQTeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jan 2020 14:34:37 -0500
+Received: from mga18.intel.com ([134.134.136.126]:18185 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726897AbgAQSnf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jan 2020 13:43:35 -0500
-X-Amp-Result: UNSCANNABLE
+        id S1726761AbgAQTeh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jan 2020 14:34:37 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jan 2020 10:43:34 -0800
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jan 2020 11:30:54 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,331,1574150400"; 
-   d="scan'208";a="257916106"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 17 Jan 2020 10:43:34 -0800
-Date:   Fri, 17 Jan 2020 10:43:34 -0800
+   d="scan'208";a="274474188"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by FMSMGA003.fm.intel.com with ESMTP; 17 Jan 2020 11:30:53 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -33,107 +32,86 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Rik van Riel <riel@surriel.com>,
         Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
         Borislav Petkov <bp@suse.de>,
+        Dave Hansen <dave.hansen@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH 1/4] KVM: x86: Handle TIF_NEED_FPU_LOAD in
- kvm_{load,put}_guest_fpu()
-Message-ID: <20200117184333.GF7175@linux.intel.com>
-References: <20200117062628.6233-1-sean.j.christopherson@intel.com>
- <20200117062628.6233-2-sean.j.christopherson@intel.com>
- <4d5dca91-8dbc-9ff3-b67a-2fa963da29cf@intel.com>
+Subject: [PATCH v2 0/4] KVM: x86: TIF_NEED_FPU_LOAD bug fixes
+Date:   Fri, 17 Jan 2020 11:30:48 -0800
+Message-Id: <20200117193052.1339-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4d5dca91-8dbc-9ff3-b67a-2fa963da29cf@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 17, 2020 at 10:31:53AM -0800, Dave Hansen wrote:
-> On 1/16/20 10:26 PM, Sean Christopherson wrote:
-> > Handle TIF_NEED_FPU_LOAD similar to how fpu__copy() handles the flag
-> > when duplicating FPU state to a new task struct.  TIF_NEED_FPU_LOAD can
-> > be set any time control is transferred out of KVM, be it voluntarily,
-> > e.g. if I/O is triggered during a KVM call to get_user_pages, or
-> > involuntarily, e.g. if softirq runs after an IRQ occurs.  Therefore,
-> > KVM must account for TIF_NEED_FPU_LOAD whenever it is (potentially)
-> > accessing CPU FPU state.
-> > 
-> > Fixes: 5f409e20b7945 ("x86/fpu: Defer FPU state load until return to userspace")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 27 ++++++++++++++++++++++++---
-> >  1 file changed, 24 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index cf917139de6b..0c7211491f98 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -8476,8 +8476,20 @@ static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
-> >  {
-> >  	fpregs_lock();
-> >  
-> > -	copy_fpregs_to_fpstate(vcpu->arch.user_fpu);
-> > -	/* PKRU is separately restored in kvm_x86_ops->run.  */
-> > +	/*
-> > +	 * If userspace's FPU state is not resident in the CPU registers, just
-> > +	 * memcpy() from current, else save CPU state directly to user_fpu.
-> > +	 */
-> > +	if (test_thread_flag(TIF_NEED_FPU_LOAD))
-> > +		memcpy(&vcpu->arch.user_fpu->state, &current->thread.fpu.state,
-> > +		       fpu_kernel_xstate_size);
-> > +	else
-> > +		copy_fpregs_to_fpstate(vcpu->arch.user_fpu);
-> > +
-> > +	/*
-> > +	 * Load guest's FPU state to the CPU registers.  PKRU is separately
-> > +	 * loaded in kvm_x86_ops->run.
-> > +	 */
-> >  	__copy_kernel_to_fpregs(&vcpu->arch.guest_fpu->state,
-> >  				~XFEATURE_MASK_PKRU);
-> 
-> Nit: it took me a minute to realize that there is both:
-> 
-> 	vcpu->arch.user_fpu
-> and
-> 	vcpu->arch.guest_fpu
-> 
-> It might help readability to have local variables for those, or at least
-> a comment to help differentiate the two.
+Apologies for the quick v2, I'm hoping the fixes can squeak into 5.5 and
+I'm about to go offline for a long weekend.
 
-Or even better, add a helper to wrap the logic instead of copy+paste, e.g.:
+v2: Add a helper to handle TIF_NEED_FPU_LOAD when saving from the current
+    FPU to the guest/userspace FPU (patch 01). [Dave]
 
-static void kvm_save_current_fpu(struct fpu *fpu)
-{
-	if (test_thread_flag(TIF_NEED_FPU_LOAD))
-		memcpy(&fpu->state, &current->thread.fpu.state,
-		       fpu_kernel_xstate_size);
-	else
-		copy_fpregs_to_fpstate(fpu);
-}
+*** v1 cover letter ***
 
-> 
-> 
-> > @@ -8492,7 +8504,16 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
-> >  {
-> >  	fpregs_lock();
-> >  
-> > -	copy_fpregs_to_fpstate(vcpu->arch.guest_fpu);
-> > +	/*
-> > +	 * If guest's FPU state is not resident in the CPU registers, just
-> > +	 * memcpy() from current, else save CPU state directly to guest_fpu.
-> > +	 */
-> > +	if (test_thread_flag(TIF_NEED_FPU_LOAD))
-> > +		memcpy(&vcpu->arch.guest_fpu->state, &current->thread.fpu.state,
-> > +		       fpu_kernel_xstate_size);
-> > +	else
-> > +		copy_fpregs_to_fpstate(vcpu->arch.guest_fpu);
-> > +
-> >  	copy_kernel_to_fpregs(&vcpu->arch.user_fpu->state);
-> >  
-> >  	fpregs_mark_activate();
-> 
-> This also makes me wonder if we want to have copy_fpregs_to_fpstate()
-> check for TIF_NEED_FPU_LOAD and complain if it's set.
+Three bug fixes related to deferring FPU loading to return to userspace,
+or in this case, deferring to entering a KVM guest.  And a cleanup patch I
+couldn't resist throwing on top.
+
+The crux of the matter is that TIF_FPU_NEED_LOAD can be set any time
+control is transferred out of KVM, e.g. via IRQ->softirq, not just when
+KVM is preempted.  The previous attempt to fix the underlying bug(s)
+by handling TIF_FPU_NEED_LOAD during kvm_sched_in() only made the bug(s)
+harder to hit, i.e. it resolved the preemption case but only shrunk the
+window where a softirq could corrupt state.
+
+Paolo, patch 01 will conflict with commit 95145c25a78c ("KVM: x86: Add a
+WARN on TIF_NEED_FPU_LOAD in kvm_load_guest_fpu()") that is sitting in
+kvm/queue.  The kvm/queue commit should simply be dropped.
+
+Patch 01 fixes the original underlying bug, which is that KVM doesn't
+handle TIF_FPU_NEED_LOAD when swapping between guest and userspace FPU
+state.
+
+Patch 02 fixes (unconfirmed) issues similar to the reported bug where KVM
+doesn't ensure CPU FPU state is fresh when accessing it during emulation.
+This patch is smoke tested only (via kvm-unit-tests' emulator tests).
+
+Patch 03 reverts the preemption bug fix, which simultaneously restores the
+handling of TIF_FPU_NEED_LOAD in vcpu_enter_guest() to fix the reported
+bugs[1][2] and removes the now-unnecessary preemption workaround.
+
+Alternatively, the handling of TIF_NEED_FPU_LOAD in the kvm_sched_in()
+path could be left in place, i.e it doesn't cause immediate damage, but
+as stated before, restoring FPU state after KVM is preempted only makes
+it harder to find the actual bugs.  Case in point, I originally split
+the revert into two separate patches (so that removing the kvm_sched_in()
+call wouldn't be tagged for stable), but that only hid the underlying
+kvm_put_guest_fpu() bug until I fully reverted the commit.
+
+Patch 04 removes an unused emulator context param from several of the
+functions that are fixed in patch 02.  The param was left behind during
+a previous KVM FPU state rework.
+
+Tested via Thomas Lambertz's mprime reproducer[3], which detected issues
+with buggy KVMs on my system in under a minute.  Ran clean for ~30 minutes
+on each of the first two patches and several hours with all three patches
+applied.
+
+[1] https://lore.kernel.org/kvm/1e525b08-6204-3238-5d56-513f82f1d7fb@djy.llc
+[2] https://lore.kernel.org/kvm/bug-206215-28872@https.bugzilla.kernel.org%2F
+[3] https://lore.kernel.org/lkml/217248af-e980-9cb0-ff0d-9773413b9d38@thomaslambertz.de
+
+Sean Christopherson (4):
+  KVM: x86: Handle TIF_NEED_FPU_LOAD in kvm_{load,put}_guest_fpu()
+  KVM: x86: Ensure guest's FPU state is loaded when accessing for
+    emulation
+  KVM: x86: Revert "KVM: X86: Fix fpu state crash in kvm guest"
+  KVM: x86: Remove unused ctxt param from emulator's FPU accessors
+
+ arch/x86/kvm/emulate.c | 67 ++++++++++++++++++++++++++++++++----------
+ arch/x86/kvm/x86.c     | 28 +++++++++++++-----
+ 2 files changed, 72 insertions(+), 23 deletions(-)
+
+-- 
+2.24.1
+
