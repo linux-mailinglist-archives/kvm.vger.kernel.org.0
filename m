@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CAAF1411E0
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 20:36:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45CA81411D7
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 20:34:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729640AbgAQTet (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jan 2020 14:34:49 -0500
+        id S1729578AbgAQTei (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jan 2020 14:34:38 -0500
 Received: from mga18.intel.com ([134.134.136.126]:18185 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726897AbgAQTeh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jan 2020 14:34:37 -0500
+        id S1726761AbgAQTei (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jan 2020 14:34:38 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jan 2020 11:30:54 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,331,1574150400"; 
-   d="scan'208";a="274474192"
+   d="scan'208";a="274474197"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Jan 2020 11:30:53 -0800
+  by FMSMGA003.fm.intel.com with ESMTP; 17 Jan 2020 11:30:54 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -34,9 +34,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Borislav Petkov <bp@suse.de>,
         Dave Hansen <dave.hansen@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH v2 1/4] KVM: x86: Handle TIF_NEED_FPU_LOAD in kvm_{load,put}_guest_fpu()
-Date:   Fri, 17 Jan 2020 11:30:49 -0800
-Message-Id: <20200117193052.1339-2-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 2/4] KVM: x86: Ensure guest's FPU state is loaded when accessing for emulation
+Date:   Fri, 17 Jan 2020 11:30:50 -0800
+Message-Id: <20200117193052.1339-3-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200117193052.1339-1-sean.j.christopherson@intel.com>
 References: <20200117193052.1339-1-sean.j.christopherson@intel.com>
@@ -47,63 +47,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Handle TIF_NEED_FPU_LOAD similar to how fpu__copy() handles the flag
-when duplicating FPU state to a new task struct.  TIF_NEED_FPU_LOAD can
-be set any time control is transferred out of KVM, be it voluntarily,
-e.g. if I/O is triggered during a KVM call to get_user_pages, or
-involuntarily, e.g. if softirq runs after an IRQ occurs.  Therefore,
-KVM must account for TIF_NEED_FPU_LOAD whenever it is (potentially)
-accessing CPU FPU state.
+Lock the FPU regs and reload the current thread's FPU state, which holds
+the guest's FPU state, to the CPU registers if necessary prior to
+accessing guest FPU state as part of emulation.  kernel_fpu_begin() can
+be called from softirq context, therefore KVM must ensure softirqs are
+disabled (locking the FPU regs disables softirqs) when touching CPU FPU
+state.
+
+Note, for all intents and purposes this reverts commit 6ab0b9feb82a7
+("x86,kvm: remove KVM emulator get_fpu / put_fpu"), but at the time it
+was applied, removing get/put_fpu() was correct.  The re-introduction
+of {get,put}_fpu() is necessitated by the deferring of FPU state load.
 
 Fixes: 5f409e20b7945 ("x86/fpu: Defer FPU state load until return to userspace")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/x86.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ arch/x86/kvm/emulate.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index cf917139de6b..0bbf0110bef7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8471,12 +8471,26 @@ static int complete_emulated_mmio(struct kvm_vcpu *vcpu)
- 	return 0;
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 952d1a4f4d7e..2a5bed60ce50 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -22,6 +22,7 @@
+ #include "kvm_cache_regs.h"
+ #include <asm/kvm_emulate.h>
+ #include <linux/stringify.h>
++#include <asm/fpu/api.h>
+ #include <asm/debugreg.h>
+ #include <asm/nospec-branch.h>
+ 
+@@ -1075,8 +1076,23 @@ static void fetch_register_operand(struct operand *op)
+ 	}
  }
  
-+static void kvm_save_current_fpu(struct fpu *fpu)
++static void emulator_get_fpu(void)
 +{
-+	/*
-+	 * If the target FPU state is not resident in the CPU registers, just
-+	 * memcpy() from current, else save CPU state directly to the target.
-+	 */
++	fpregs_lock();
++
++	fpregs_assert_state_consistent();
 +	if (test_thread_flag(TIF_NEED_FPU_LOAD))
-+		memcpy(&fpu->state, &current->thread.fpu.state,
-+		       fpu_kernel_xstate_size);
-+	else
-+		copy_fpregs_to_fpstate(fpu);
++		switch_fpu_return();
 +}
 +
- /* Swap (qemu) user FPU context for the guest FPU context. */
- static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
- {
- 	fpregs_lock();
- 
--	copy_fpregs_to_fpstate(vcpu->arch.user_fpu);
-+	kvm_save_current_fpu(vcpu->arch.user_fpu);
++static void emulator_put_fpu(void)
++{
++	fpregs_unlock();
++}
 +
- 	/* PKRU is separately restored in kvm_x86_ops->run.  */
- 	__copy_kernel_to_fpregs(&vcpu->arch.guest_fpu->state,
- 				~XFEATURE_MASK_PKRU);
-@@ -8492,7 +8506,8 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
+ static void read_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data, int reg)
  {
- 	fpregs_lock();
++	emulator_get_fpu();
+ 	switch (reg) {
+ 	case 0: asm("movdqa %%xmm0, %0" : "=m"(*data)); break;
+ 	case 1: asm("movdqa %%xmm1, %0" : "=m"(*data)); break;
+@@ -1098,11 +1114,13 @@ static void read_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data, int reg)
+ #endif
+ 	default: BUG();
+ 	}
++	emulator_put_fpu();
+ }
  
--	copy_fpregs_to_fpstate(vcpu->arch.guest_fpu);
-+	kvm_save_current_fpu(vcpu->arch.guest_fpu);
+ static void write_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data,
+ 			  int reg)
+ {
++	emulator_get_fpu();
+ 	switch (reg) {
+ 	case 0: asm("movdqa %0, %%xmm0" : : "m"(*data)); break;
+ 	case 1: asm("movdqa %0, %%xmm1" : : "m"(*data)); break;
+@@ -1124,10 +1142,12 @@ static void write_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data,
+ #endif
+ 	default: BUG();
+ 	}
++	emulator_put_fpu();
+ }
+ 
+ static void read_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
+ {
++	emulator_get_fpu();
+ 	switch (reg) {
+ 	case 0: asm("movq %%mm0, %0" : "=m"(*data)); break;
+ 	case 1: asm("movq %%mm1, %0" : "=m"(*data)); break;
+@@ -1139,10 +1159,12 @@ static void read_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
+ 	case 7: asm("movq %%mm7, %0" : "=m"(*data)); break;
+ 	default: BUG();
+ 	}
++	emulator_put_fpu();
+ }
+ 
+ static void write_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
+ {
++	emulator_get_fpu();
+ 	switch (reg) {
+ 	case 0: asm("movq %0, %%mm0" : : "m"(*data)); break;
+ 	case 1: asm("movq %0, %%mm1" : : "m"(*data)); break;
+@@ -1154,6 +1176,7 @@ static void write_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
+ 	case 7: asm("movq %0, %%mm7" : : "m"(*data)); break;
+ 	default: BUG();
+ 	}
++	emulator_put_fpu();
+ }
+ 
+ static int em_fninit(struct x86_emulate_ctxt *ctxt)
+@@ -1161,7 +1184,9 @@ static int em_fninit(struct x86_emulate_ctxt *ctxt)
+ 	if (ctxt->ops->get_cr(ctxt, 0) & (X86_CR0_TS | X86_CR0_EM))
+ 		return emulate_nm(ctxt);
+ 
++	emulator_get_fpu();
+ 	asm volatile("fninit");
++	emulator_put_fpu();
+ 	return X86EMUL_CONTINUE;
+ }
+ 
+@@ -1172,7 +1197,9 @@ static int em_fnstcw(struct x86_emulate_ctxt *ctxt)
+ 	if (ctxt->ops->get_cr(ctxt, 0) & (X86_CR0_TS | X86_CR0_EM))
+ 		return emulate_nm(ctxt);
+ 
++	emulator_get_fpu();
+ 	asm volatile("fnstcw %0": "+m"(fcw));
++	emulator_put_fpu();
+ 
+ 	ctxt->dst.val = fcw;
+ 
+@@ -1186,7 +1213,9 @@ static int em_fnstsw(struct x86_emulate_ctxt *ctxt)
+ 	if (ctxt->ops->get_cr(ctxt, 0) & (X86_CR0_TS | X86_CR0_EM))
+ 		return emulate_nm(ctxt);
+ 
++	emulator_get_fpu();
+ 	asm volatile("fnstsw %0": "+m"(fsw));
++	emulator_put_fpu();
+ 
+ 	ctxt->dst.val = fsw;
+ 
+@@ -4092,8 +4121,12 @@ static int em_fxsave(struct x86_emulate_ctxt *ctxt)
+ 	if (rc != X86EMUL_CONTINUE)
+ 		return rc;
+ 
++	emulator_get_fpu();
 +
- 	copy_kernel_to_fpregs(&vcpu->arch.user_fpu->state);
+ 	rc = asm_safe("fxsave %[fx]", , [fx] "+m"(fx_state));
  
- 	fpregs_mark_activate();
++	emulator_put_fpu();
++
+ 	if (rc != X86EMUL_CONTINUE)
+ 		return rc;
+ 
+@@ -4136,6 +4169,8 @@ static int em_fxrstor(struct x86_emulate_ctxt *ctxt)
+ 	if (rc != X86EMUL_CONTINUE)
+ 		return rc;
+ 
++	emulator_get_fpu();
++
+ 	if (size < __fxstate_size(16)) {
+ 		rc = fxregs_fixup(&fx_state, size);
+ 		if (rc != X86EMUL_CONTINUE)
+@@ -4151,6 +4186,8 @@ static int em_fxrstor(struct x86_emulate_ctxt *ctxt)
+ 		rc = asm_safe("fxrstor %[fx]", : [fx] "m"(fx_state));
+ 
+ out:
++	emulator_put_fpu();
++
+ 	return rc;
+ }
+ 
+@@ -5448,7 +5485,9 @@ static int flush_pending_x87_faults(struct x86_emulate_ctxt *ctxt)
+ {
+ 	int rc;
+ 
++	emulator_get_fpu();
+ 	rc = asm_safe("fwait");
++	emulator_put_fpu();
+ 
+ 	if (unlikely(rc != X86EMUL_CONTINUE))
+ 		return emulate_exception(ctxt, MF_VECTOR, 0, false);
 -- 
 2.24.1
 
