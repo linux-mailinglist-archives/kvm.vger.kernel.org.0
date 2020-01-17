@@ -2,247 +2,359 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 687F9140481
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 08:39:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30F40140609
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 10:33:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729100AbgAQHjV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jan 2020 02:39:21 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54889 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726675AbgAQHjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jan 2020 02:39:21 -0500
+        id S1726785AbgAQJc7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jan 2020 04:32:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53070 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726371AbgAQJc6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jan 2020 04:32:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579246758;
+        s=mimecast20190719; t=1579253576;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Nh7yv0mjswrLZeLywZrBbXl5YC5cViXMUU6z3ixDojA=;
-        b=Ul89oCHrM4CM8CEqkZzLZC2s/jpppsrx6efgA9A7DpYotMspApkU5s/d18JX4biIfq8bkX
-        t4jdZwn3kzP6xEBg9NuuZh04fwhGigtiwEg/b9Xzu3wSAdL2qFZU5S9xZqOrrRHH4kEiXU
-        +6eSQF8j3t5J7EcmjTioycV6gax7HUI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-_urAG-ntNZqAF-51rOfJnA-1; Fri, 17 Jan 2020 02:39:17 -0500
-X-MC-Unique: _urAG-ntNZqAF-51rOfJnA-1
-Received: by mail-wr1-f72.google.com with SMTP id f17so10233703wrt.19
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 23:39:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Nh7yv0mjswrLZeLywZrBbXl5YC5cViXMUU6z3ixDojA=;
-        b=tQSvz/FwPgD3JyjiZTpZCZ8YC17PBGN0d22KLWLxDQ6fVnrAavLME5p5i6S58kN5vX
-         TUcaJDDo88fDaF5V2XNuKsvm3//DDI1d45PppWBZtZlIMVPuFWdLU+2zBVtnNFB/x4WJ
-         48LJQhCjqleXKK0dOSAi7MQk33kgOVzWWAhWenO66becojX45Db7mQB2n9OXukFHdoo+
-         sqDKN6pdhCCntTpLWvnQ7ty/ON2kId1XdxeHTI/0VxJz7t5LtpPqMplBnzm8DPUmqC+L
-         3wKo4XurndEr/OaPd4JoCu4RrUwZiRS3qLAkJKTeUc/E5CJ21XdcBQ4MnGN8ukvcxUvT
-         ogCQ==
-X-Gm-Message-State: APjAAAWsdcB6xIRPswbc+Ow3MCI1ACbZKDP4JWHbrElYw5IIrvZcPBnl
-        keczOXH5Idz0kasri+e8MbFhheBC66V5WPniy9Wz0bL8PgE/Lx+gddbs/FIyUUJ9oKfHSHiH9jD
-        Fot5pskj2jgvT
-X-Received: by 2002:a05:600c:507:: with SMTP id i7mr3170069wmc.135.1579246755464;
-        Thu, 16 Jan 2020 23:39:15 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwRVFnR13Fkw0BE1sDnOhJiDJN/oCQphmpWIBvF0NM2QbH26ylIP418+RxRX4md8J07H6jY0Q==
-X-Received: by 2002:a05:600c:507:: with SMTP id i7mr3170057wmc.135.1579246755221;
-        Thu, 16 Jan 2020 23:39:15 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net. [83.57.172.113])
-        by smtp.gmail.com with ESMTPSA id c2sm32946759wrp.46.2020.01.16.23.39.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Jan 2020 23:39:14 -0800 (PST)
-Subject: Re: [PATCH v22 5/9] ACPI: Record the Generic Error Status Block
- address
-To:     Dongjiu Geng <gengdongjiu@huawei.com>, pbonzini@redhat.com,
-        mst@redhat.com, imammedo@redhat.com, shannon.zhaosl@gmail.com,
-        peter.maydell@linaro.org, fam@euphon.net, rth@twiddle.net,
-        ehabkost@redhat.com, mtosatti@redhat.com, xuwei5@huawei.com,
-        jonathan.cameron@huawei.com, james.morse@arm.com,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org
-Cc:     zhengxiang9@huawei.com, linuxarm@huawei.com
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <11c62b51-7a94-5e34-39c6-60c5e989a63b@redhat.com>
-Date:   Fri, 17 Jan 2020 08:39:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        bh=GjodTc+NxXpXZK3ZFiQXvOKJvfATQRwDI15WnbNFZWs=;
+        b=Bun+1DGxMtQJfpxe5pzM5vzfgQLvL0cx4U50Z+73bHnw03xdZlkIvKRGRJTtyL6K4qmSub
+        CpUhCBR/GxA0wCRw3mY0rhbvP9YzLUQbDxQizRrnD+vrwelzkqo5JBtPIvniC2YlYA4zOP
+        hk2ozEYWusWN18Bg8cTrNqUrU+jsXko=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-130-_HQSAA8RM6efHyvV5nrALA-1; Fri, 17 Jan 2020 04:32:55 -0500
+X-MC-Unique: _HQSAA8RM6efHyvV5nrALA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9BDD477;
+        Fri, 17 Jan 2020 09:32:52 +0000 (UTC)
+Received: from [10.72.12.168] (ovpn-12-168.pek2.redhat.com [10.72.12.168])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DD49738B;
+        Fri, 17 Jan 2020 09:32:36 +0000 (UTC)
+Subject: Re: [PATCH 4/5] virtio: introduce a vDPA based transport
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     "mst@redhat.com" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "aadam@redhat.com" <aadam@redhat.com>,
+        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+References: <20200116124231.20253-1-jasowang@redhat.com>
+ <20200116124231.20253-5-jasowang@redhat.com>
+ <20200116153807.GI20978@mellanox.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <8e8aa4b7-4948-5719-9618-e28daffba1a5@redhat.com>
+Date:   Fri, 17 Jan 2020 17:32:35 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20200116153807.GI20978@mellanox.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/8/20 12:32 PM, Dongjiu Geng wrote:
-> Record the GHEB address via fw_cfg file, when recording
-> a error to CPER, it will use this address to find out
-> Generic Error Data Entries and write the error.
-> 
-> Make the HEST GHES to a GED device.
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> ---
->   hw/acpi/generic_event_device.c         | 15 ++++++++++++++-
->   hw/acpi/ghes.c                         | 16 ++++++++++++++++
->   hw/arm/virt-acpi-build.c               | 13 ++++++++++++-
->   include/hw/acpi/generic_event_device.h |  2 ++
->   include/hw/acpi/ghes.h                 |  6 ++++++
->   5 files changed, 50 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> index 9cee90c..9bf37e4 100644
-> --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -234,12 +234,25 @@ static const VMStateDescription vmstate_ged_state = {
->       }
->   };
->   
-> +static const VMStateDescription vmstate_ghes_state = {
-> +    .name = "acpi-ghes-state",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_UINT64(ghes_addr_le, AcpiGhesState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->   static const VMStateDescription vmstate_acpi_ged = {
->       .name = "acpi-ged",
->       .version_id = 1,
->       .minimum_version_id = 1,
->       .fields = (VMStateField[]) {
-> -        VMSTATE_STRUCT(ged_state, AcpiGedState, 1, vmstate_ged_state, GEDState),
-> +        VMSTATE_STRUCT(ged_state, AcpiGedState, 1,
-> +                       vmstate_ged_state, GEDState),
-> +        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
-> +                       vmstate_ghes_state, AcpiGhesState),
->           VMSTATE_END_OF_LIST(),
->       },
->       .subsections = (const VMStateDescription * []) {
-> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-> index 9d37798..68f4abf 100644
-> --- a/hw/acpi/ghes.c
-> +++ b/hw/acpi/ghes.c
-> @@ -23,6 +23,7 @@
->   #include "hw/acpi/acpi.h"
->   #include "hw/acpi/ghes.h"
->   #include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/generic_event_device.h"
->   #include "hw/nvram/fw_cfg.h"
->   #include "sysemu/sysemu.h"
->   #include "qemu/error-report.h"
-> @@ -208,3 +209,18 @@ void acpi_build_hest(GArray *table_data, GArray *hardware_errors,
->       build_header(linker, table_data, (void *)(table_data->data + hest_start),
->           "HEST", table_data->len - hest_start, 1, NULL, "");
->   }
-> +
-> +void acpi_ghes_add_fw_cfg(AcpiGhesState *ags, FWCfgState *s,
-> +                            GArray *hardware_error)
-> +{
-> +    size_t size = 2 * sizeof(uint64_t) + ACPI_GHES_MAX_RAW_DATA_LENGTH;
-> +    size_t request_block_size = ACPI_GHES_ERROR_SOURCE_COUNT * size;
-> +
-> +    /* Create a read-only fw_cfg file for GHES */
-> +    fw_cfg_add_file(s, ACPI_GHES_ERRORS_FW_CFG_FILE, hardware_error->data,
-> +                    request_block_size);
-> +
-> +    /* Create a read-write fw_cfg file for Address */
-> +    fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
-> +        NULL, &(ags->ghes_addr_le), sizeof(ags->ghes_addr_le), false);
-> +}
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 837bbf9..c8aa94d 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -797,6 +797,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->       unsigned dsdt, xsdt;
->       GArray *tables_blob = tables->table_data;
->       MachineState *ms = MACHINE(vms);
-> +    AcpiGedState *acpi_ged_state;
->   
->       table_offsets = g_array_new(false, true /* clear */,
->                                           sizeof(uint32_t));
-> @@ -831,7 +832,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->       acpi_add_table(table_offsets, tables_blob);
->       build_spcr(tables_blob, tables->linker, vms);
->   
-> -    if (vms->ras) {
-> +    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
-> +                                                       NULL));
 
-Testing vms->ras first is cheaper than calling 
-object_resolve_path_type(). Since some people are spending lot of time 
-to reduce VM boot time, it might be worth considering.
+On 2020/1/16 =E4=B8=8B=E5=8D=8811:38, Jason Gunthorpe wrote:
+> On Thu, Jan 16, 2020 at 08:42:30PM +0800, Jason Wang wrote:
+>> diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa=
+.c
+>> new file mode 100644
+>> index 000000000000..86936e5e7ec3
+>> +++ b/drivers/virtio/virtio_vdpa.c
+>> @@ -0,0 +1,400 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * VIRTIO based driver for vDPA device
+>> + *
+>> + * Copyright (c) 2020, Red Hat. All rights reserved.
+>> + *     Author: Jason Wang <jasowang@redhat.com>
+>> + *
+>> + */
+>> +
+>> +#include <linux/init.h>
+>> +#include <linux/module.h>
+>> +#include <linux/device.h>
+>> +#include <linux/kernel.h>
+>> +#include <linux/slab.h>
+>> +#include <linux/uuid.h>
+>> +#include <linux/virtio.h>
+>> +#include <linux/vdpa.h>
+>> +#include <linux/virtio_config.h>
+>> +#include <linux/virtio_ring.h>
+>> +
+>> +#define MOD_VERSION  "0.1"
+>> +#define MOD_AUTHOR   "Jason Wang <jasowang@redhat.com>"
+>> +#define MOD_DESC     "vDPA bus driver for virtio devices"
+>> +#define MOD_LICENSE  "GPL v2"
+>> +
+>> +#define to_virtio_vdpa_device(dev) \
+>> +	container_of(dev, struct virtio_vdpa_device, vdev)
+> Should be a static function
 
-> +    if (acpi_ged_state &&  vms->ras) {
->           acpi_add_table(table_offsets, tables_blob);
->           build_ghes_error_table(tables->hardware_errors, tables->linker);
->           acpi_build_hest(tables_blob, tables->hardware_errors,
-> @@ -925,6 +928,7 @@ void virt_acpi_setup(VirtMachineState *vms)
->   {
->       AcpiBuildTables tables;
->       AcpiBuildState *build_state;
-> +    AcpiGedState *acpi_ged_state;
->   
->       if (!vms->fw_cfg) {
->           trace_virt_acpi_setup();
-> @@ -955,6 +959,13 @@ void virt_acpi_setup(VirtMachineState *vms)
->       fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
->                       acpi_data_len(tables.tcpalog));
->   
-> +    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
-> +                                                       NULL));
-> +    if (acpi_ged_state && vms->ras) {
-> +        acpi_ghes_add_fw_cfg(&acpi_ged_state->ghes_state,
-> +                             vms->fw_cfg, tables.hardware_errors);
-> +    }
-> +
->       build_state->rsdp_mr = acpi_add_rom_blob(virt_acpi_build_update,
->                                                build_state, tables.rsdp,
->                                                ACPI_BUILD_RSDP_FILE, 0);
-> diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-> index d157eac..037d2b5 100644
-> --- a/include/hw/acpi/generic_event_device.h
-> +++ b/include/hw/acpi/generic_event_device.h
-> @@ -61,6 +61,7 @@
->   
->   #include "hw/sysbus.h"
->   #include "hw/acpi/memory_hotplug.h"
-> +#include "hw/acpi/ghes.h"
->   
->   #define ACPI_POWER_BUTTON_DEVICE "PWRB"
->   
-> @@ -95,6 +96,7 @@ typedef struct AcpiGedState {
->       GEDState ged_state;
->       uint32_t ged_event_bitmap;
->       qemu_irq irq;
-> +    AcpiGhesState ghes_state;
->   } AcpiGedState;
->   
->   void build_ged_aml(Aml *table, const char* name, HotplugHandler *hotplug_dev,
-> diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-> index 09a7f86..a6761e6 100644
-> --- a/include/hw/acpi/ghes.h
-> +++ b/include/hw/acpi/ghes.h
-> @@ -60,7 +60,13 @@ enum {
->       ACPI_HEST_SRC_ID_RESERVED,
->   };
->   
-> +typedef struct AcpiGhesState {
-> +    uint64_t ghes_addr_le;
-> +} AcpiGhesState;
-> +
->   void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
->   void acpi_build_hest(GArray *table_data, GArray *hardware_error,
->                             BIOSLinker *linker);
-> +void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
-> +                          GArray *hardware_errors);
->   #endif
-> 
+
+Ok.
+
+
+>
+>> +struct virtio_vdpa_device {
+>> +	struct virtio_device vdev;
+>> +	struct vdpa_device *vdpa;
+>> +	u64 features;
+>> +
+>> +	/* The lock to protect virtqueue list */
+>> +	spinlock_t lock;
+>> +	/* List of virtio_vdpa_vq_info */
+>> +	struct list_head virtqueues;
+>> +};
+>> +
+>> +struct virtio_vdpa_vq_info {
+>> +	/* the actual virtqueue */
+>> +	struct virtqueue *vq;
+>> +
+>> +	/* the list node for the virtqueues list */
+>> +	struct list_head node;
+>> +};
+>> +
+>> +static struct vdpa_device *vd_get_vdpa(struct virtio_device *vdev)
+>> +{
+>> +	struct virtio_vdpa_device *vd_dev =3D to_virtio_vdpa_device(vdev);
+>> +	struct vdpa_device *vdpa =3D vd_dev->vdpa;
+>> +
+>> +	return vdpa;
+> Bit of a long way to say
+>
+>    return to_virtio_vdpa_device(vdev)->vdpa
+>
+> ?
+
+
+Right.
+
+
+>
+>> +err_vq:
+>> +	vring_del_virtqueue(vq);
+>> +error_new_virtqueue:
+>> +	ops->set_vq_ready(vdpa, index, 0);
+>> +	WARN_ON(ops->get_vq_ready(vdpa, index));
+> A warn_on during error unwind? Sketchy, deserves a comment I think
+
+
+Yes, it's a hint of bug in the vDPA driver. Will add a comment.
+
+
+>
+>> +static void virtio_vdpa_release_dev(struct device *_d)
+>> +{
+>> +	struct virtio_device *vdev =3D
+>> +	       container_of(_d, struct virtio_device, dev);
+>> +	struct virtio_vdpa_device *vd_dev =3D
+>> +	       container_of(vdev, struct virtio_vdpa_device, vdev);
+>> +	struct vdpa_device *vdpa =3D vd_dev->vdpa;
+>> +
+>> +	devm_kfree(&vdpa->dev, vd_dev);
+>> +}
+> It is unusual for the release function to not be owned by the
+> subsystem, through the class.
+
+
+This is how virtio_pci and virtio_mmio work now. Virtio devices may have=20
+different transports which require different release functions. I think=20
+this is the reason why virtio
+
+
+> I'm not sure there are enough module ref
+> counts to ensure that this function is not unloaded?
+
+
+Let me double check this.
+
+
+>
+> Usually to make this all work sanely the subsytem provides some
+> allocation function
+>
+>   vdpa_dev =3D vdpa_alloc_dev(parent, ops, sizeof(struct virtio_vdpa_de=
+vice))
+>   struct virtio_vdpa_device *priv =3D vdpa_priv(vdpa_dev)
+>
+> Then the subsystem naturally owns all the memory.
+>
+> Otherwise it gets tricky to ensure that the module doesn't unload
+> before all the krefs are put.
+
+
+I see.
+
+
+>
+>> +
+>> +static int virtio_vdpa_probe(struct device *dev)
+>> +{
+>> +	struct vdpa_device *vdpa =3D dev_to_vdpa(dev);
+> The probe function for a class should accept the classes type already,
+> no casting.
+
+
+Right.
+
+
+>
+>> +	const struct vdpa_config_ops *ops =3D vdpa->config;
+>> +	struct virtio_vdpa_device *vd_dev;
+>> +	int rc;
+>> +
+>> +	vd_dev =3D devm_kzalloc(dev, sizeof(*vd_dev), GFP_KERNEL);
+>> +	if (!vd_dev)
+>> +		return -ENOMEM;
+> This is not right, the struct device lifetime is controled by a kref,
+> not via devm. If you want to use a devm unwind then the unwind is
+> put_device, not devm_kfree.
+
+
+I'm not sure I get the point here. The lifetime is bound to underlying=20
+vDPA device and devres allow to be freed before the vpda device is=20
+released. But I agree using devres of underlying vdpa device looks wired.
+
+
+>
+> In this simple situation I don't see a reason to use devm.
+>
+>> +	vd_dev->vdev.dev.parent =3D &vdpa->dev;
+>> +	vd_dev->vdev.dev.release =3D virtio_vdpa_release_dev;
+>> +	vd_dev->vdev.config =3D &virtio_vdpa_config_ops;
+>> +	vd_dev->vdpa =3D vdpa;
+>> +	INIT_LIST_HEAD(&vd_dev->virtqueues);
+>> +	spin_lock_init(&vd_dev->lock);
+>> +
+>> +	vd_dev->vdev.id.device =3D ops->get_device_id(vdpa);
+>> +	if (vd_dev->vdev.id.device =3D=3D 0)
+>> +		return -ENODEV;
+>> +
+>> +	vd_dev->vdev.id.vendor =3D ops->get_vendor_id(vdpa);
+>> +	rc =3D register_virtio_device(&vd_dev->vdev);
+>> +	if (rc)
+>> +		put_device(dev);
+> And a ugly unwind like this is why you want to have device_initialize()
+> exposed to the driver,
+
+
+In this context, which "driver" did you mean here? (Note, virtio-vdpa is=20
+the driver for vDPA bus here).
+
+
+>   so there is a clear pairing that calling
+> device_initialize() must be followed by put_device. This should also
+> use the goto unwind style
+>
+>> +	else
+>> +		dev_set_drvdata(dev, vd_dev);
+>> +
+>> +	return rc;
+>> +}
+>> +
+>> +static void virtio_vdpa_remove(struct device *dev)
+>> +{
+> Remove should also already accept the right type
+
+
+Yes.
+
+
+>
+>> +	struct virtio_vdpa_device *vd_dev =3D dev_get_drvdata(dev);
+>> +
+>> +	unregister_virtio_device(&vd_dev->vdev);
+>> +}
+>> +
+>> +static struct vdpa_driver virtio_vdpa_driver =3D {
+>> +	.drv =3D {
+>> +		.name	=3D "virtio_vdpa",
+>> +	},
+>> +	.probe	=3D virtio_vdpa_probe,
+>> +	.remove =3D virtio_vdpa_remove,
+>> +};
+> Still a little unclear on binding, is this supposed to bind to all
+> vdpa devices?
+
+
+Yes, it expected to drive all vDPA devices.
+
+
+>
+> Where is the various THIS_MODULE's I expect to see in a scheme like
+> this?
+>
+> All function pointers must be protected by a held module reference
+> count, ie the above probe/remove and all the pointers in ops.
+
+
+Will double check, since I don't see this in other virtio transport=20
+drivers (PCI or MMIO).
+
+
+>
+>> +static int __init virtio_vdpa_init(void)
+>> +{
+>> +	return register_vdpa_driver(&virtio_vdpa_driver);
+>> +}
+>> +
+>> +static void __exit virtio_vdpa_exit(void)
+>> +{
+>> +	unregister_vdpa_driver(&virtio_vdpa_driver);
+>> +}
+>> +
+>> +module_init(virtio_vdpa_init)
+>> +module_exit(virtio_vdpa_exit)
+> Best to provide the usual 'module_pci_driver' like scheme for this
+> boiler plate.
+
+
+Ok.
+
+
+>
+>> +MODULE_VERSION(MOD_VERSION);
+>> +MODULE_LICENSE(MOD_LICENSE);
+>> +MODULE_AUTHOR(MOD_AUTHOR);
+>> +MODULE_DESCRIPTION(MOD_DESC);
+> Why the indirection with 2nd defines?
+
+
+Will fix.
+
+Thanks
+
+
+>
+> Jason
+>
 
