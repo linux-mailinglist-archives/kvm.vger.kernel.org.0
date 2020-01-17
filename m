@@ -2,162 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 364F61411D9
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 20:34:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42CE7141383
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 22:44:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729497AbgAQTek (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jan 2020 14:34:40 -0500
-Received: from mga18.intel.com ([134.134.136.126]:18185 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729559AbgAQTej (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jan 2020 14:34:39 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jan 2020 11:30:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,331,1574150400"; 
-   d="scan'208";a="274474207"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Jan 2020 11:30:55 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Derek Yerger <derek@djy.llc>,
-        kernel@najdan.com, Thomas Lambertz <mail@thomaslambertz.de>,
-        Rik van Riel <riel@surriel.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Borislav Petkov <bp@suse.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH v2 4/4] KVM: x86: Remove unused ctxt param from emulator's FPU accessors
-Date:   Fri, 17 Jan 2020 11:30:52 -0800
-Message-Id: <20200117193052.1339-5-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200117193052.1339-1-sean.j.christopherson@intel.com>
-References: <20200117193052.1339-1-sean.j.christopherson@intel.com>
+        id S1729037AbgAQVoL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jan 2020 16:44:11 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:39408 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728978AbgAQVoL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jan 2020 16:44:11 -0500
+Received: by mail-io1-f66.google.com with SMTP id c16so27568917ioh.6
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2020 13:44:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Y/x7YEfXTnu7y4p8C/lAV2TQ+Hnzrje2loXceAXbcf8=;
+        b=hhoIC6uB/1xM6ya14QQe8JMPIJ9i9FaU+91tiqQcvrWAYepLT1hVgMD3guAZvM22qA
+         2tfA99pLQXH0BeFhZqKkFhTcJSH/D5mm2SlX5pMmhWrVcMTmsOrUMBUVCKsgauFPUEhv
+         wiVQgHSRNXPekuMm4Qsqs0mwySVvTW2EB0Uu2hV4DN2ZpAO+3a/VYdmEvQtH00NOUOC8
+         qykuss+5p3r8jo72AW1jEhqBZqjqZZX0F+4oTW3zFQkSq4t34MrnW4XIFBheKY8vfDF3
+         TMyO/SMqKxnY9qn1ulPTzr4cMNs+7zVZv2f1byhoAhKgAaVsLrbAy1AbXHqskr7A5wcX
+         uvNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Y/x7YEfXTnu7y4p8C/lAV2TQ+Hnzrje2loXceAXbcf8=;
+        b=i79RTulZItb+81lHxYBPFdJAoLuaKdJzGKwC8rGGJJxsiwXbJ6pNdZgkToE2VSertK
+         CCY0O8f6tvu04wg8bzmiMMfZULGJsdXN3/THsXFvVE23JMZVeQWXPMfsM3cy9PJJBVFN
+         JqdMvifQFWsz4RcZ3yE4lsn/pdwikL2D2yi5ZcvVZqKIaDgd2OMKgfDlnQ1ICm5n3TlG
+         1zIHFAYemMsYwY3L6O+UUl09ognjOsGLuy5aPJjYuNMstyqjdflQzAmG1mxn0is0c+Iz
+         zNzy6w2p4OQLDwItsPgFfDZuH69rDhqtQLIhlSD7x0i7q/rlyAtC7ny+8dNhLusVJ3fx
+         hKBA==
+X-Gm-Message-State: APjAAAVRGKZl8bPl3B3Tr0g9wUldzpPG6r8A40qZtasfs8M5OrnjsE+h
+        w+ubrSwJI48y4yTfsNlGArcoVVBqVzLd9cF4P2q8pw==
+X-Google-Smtp-Source: APXvYqy5pBbKqV841ruxH9nDvJZCLkW85jHOK3n1lveSgX0KX8tWnAde4jw5orrzYoUIQco+Egg+JcLnyh6Q9ix+XIo=
+X-Received: by 2002:a5e:8e4c:: with SMTP id r12mr32018340ioo.119.1579297450141;
+ Fri, 17 Jan 2020 13:44:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200113221053.22053-1-oupton@google.com> <20200113221053.22053-3-oupton@google.com>
+ <20200114000517.GC14928@linux.intel.com> <CALMp9eR0444XUptR6a57JVZwrCSks9dndeDZcQBZ-v0NRctcZg@mail.gmail.com>
+ <20200114182843.GG16784@linux.intel.com>
+In-Reply-To: <20200114182843.GG16784@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 17 Jan 2020 13:43:59 -0800
+Message-ID: <CALMp9eR5YA3D000497csjXBa43bNyNSGCCQV2ammwwF=ztAtSQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Emulate MTF when performing instruction emulation
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Oliver Upton <oupton@google.com>, kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove an unused struct x86_emulate_ctxt * param from low level helpers
-used to access guest FPU state.  The unused param was left behind by
-commit 6ab0b9feb82a ("x86,kvm: remove KVM emulator get_fpu / put_fpu").
+On Tue, Jan 14, 2020 at 10:28 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Tue, Jan 14, 2020 at 09:58:22AM -0800, Jim Mattson wrote:
+> > On Mon, Jan 13, 2020 at 4:05 PM Sean Christopherson
+> > <sean.j.christopherson@intel.com> wrote:
+> >
+> > > Another case, which may or may not be possible, is if INIT is recognized
+> > > on the same instruction, in which case it takes priority over MTF.  SMI
+> > > might also be an issue.
+> >
+> > Don't we already have a priority inversion today when INIT or SMI are
+> > coincident with a debug trap on the previous instruction (e.g.
+> > single-step trap on an emulated instruction)?
+>
+> Liran fixed the INIT issue in commit 4b9852f4f389 ("KVM: x86: Fix INIT
+> signal handling in various CPU states").
+>
+> SMI still appears to be inverted.
 
-No functional change intended.
+I find the callgraph for vmx_check_nested_events very confusing. It's
+called as many as three times per call to vcpu_enter_guest():
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/emulate.c | 28 +++++++++++++---------------
- 1 file changed, 13 insertions(+), 15 deletions(-)
+    1. From kvm_vcpu_running(), before the call to vcpu_enter_guest().
+    2. From inject_pending_event(), in vcpu_enter_guest(), after all
+of the calls to kvm_check_request().
+    3. From inject_pending_event(), after injecting (but not
+reinjecting) an event, but not if we've processed an SMI or an NMI.
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 2a5bed60ce50..3e3b3cd60cce 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -1090,7 +1090,7 @@ static void emulator_put_fpu(void)
- 	fpregs_unlock();
- }
- 
--static void read_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data, int reg)
-+static void read_sse_reg(sse128_t *data, int reg)
- {
- 	emulator_get_fpu();
- 	switch (reg) {
-@@ -1117,8 +1117,7 @@ static void read_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data, int reg)
- 	emulator_put_fpu();
- }
- 
--static void write_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data,
--			  int reg)
-+static void write_sse_reg(sse128_t *data, int reg)
- {
- 	emulator_get_fpu();
- 	switch (reg) {
-@@ -1145,7 +1144,7 @@ static void write_sse_reg(struct x86_emulate_ctxt *ctxt, sse128_t *data,
- 	emulator_put_fpu();
- }
- 
--static void read_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
-+static void read_mmx_reg(u64 *data, int reg)
- {
- 	emulator_get_fpu();
- 	switch (reg) {
-@@ -1162,7 +1161,7 @@ static void read_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
- 	emulator_put_fpu();
- }
- 
--static void write_mmx_reg(struct x86_emulate_ctxt *ctxt, u64 *data, int reg)
-+static void write_mmx_reg(u64 *data, int reg)
- {
- 	emulator_get_fpu();
- 	switch (reg) {
-@@ -1234,7 +1233,7 @@ static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
- 		op->type = OP_XMM;
- 		op->bytes = 16;
- 		op->addr.xmm = reg;
--		read_sse_reg(ctxt, &op->vec_val, reg);
-+		read_sse_reg(&op->vec_val, reg);
- 		return;
- 	}
- 	if (ctxt->d & Mmx) {
-@@ -1285,7 +1284,7 @@ static int decode_modrm(struct x86_emulate_ctxt *ctxt,
- 			op->type = OP_XMM;
- 			op->bytes = 16;
- 			op->addr.xmm = ctxt->modrm_rm;
--			read_sse_reg(ctxt, &op->vec_val, ctxt->modrm_rm);
-+			read_sse_reg(&op->vec_val, ctxt->modrm_rm);
- 			return rc;
- 		}
- 		if (ctxt->d & Mmx) {
-@@ -1862,10 +1861,10 @@ static int writeback(struct x86_emulate_ctxt *ctxt, struct operand *op)
- 				       op->bytes * op->count);
- 		break;
- 	case OP_XMM:
--		write_sse_reg(ctxt, &op->vec_val, op->addr.xmm);
-+		write_sse_reg(&op->vec_val, op->addr.xmm);
- 		break;
- 	case OP_MM:
--		write_mmx_reg(ctxt, &op->mm_val, op->addr.mm);
-+		write_mmx_reg(&op->mm_val, op->addr.mm);
- 		break;
- 	case OP_NONE:
- 		/* no writeback */
-@@ -5495,11 +5494,10 @@ static int flush_pending_x87_faults(struct x86_emulate_ctxt *ctxt)
- 	return X86EMUL_CONTINUE;
- }
- 
--static void fetch_possible_mmx_operand(struct x86_emulate_ctxt *ctxt,
--				       struct operand *op)
-+static void fetch_possible_mmx_operand(struct operand *op)
- {
- 	if (op->type == OP_MM)
--		read_mmx_reg(ctxt, &op->mm_val, op->addr.mm);
-+		read_mmx_reg(&op->mm_val, op->addr.mm);
- }
- 
- static int fastop(struct x86_emulate_ctxt *ctxt, void (*fop)(struct fastop *))
-@@ -5578,10 +5576,10 @@ int x86_emulate_insn(struct x86_emulate_ctxt *ctxt)
- 			 * Now that we know the fpu is exception safe, we can fetch
- 			 * operands from it.
- 			 */
--			fetch_possible_mmx_operand(ctxt, &ctxt->src);
--			fetch_possible_mmx_operand(ctxt, &ctxt->src2);
-+			fetch_possible_mmx_operand(&ctxt->src);
-+			fetch_possible_mmx_operand(&ctxt->src2);
- 			if (!(ctxt->d & Mov))
--				fetch_possible_mmx_operand(ctxt, &ctxt->dst);
-+				fetch_possible_mmx_operand(&ctxt->dst);
- 		}
- 
- 		if (unlikely(emul_flags & X86EMUL_GUEST_MASK) && ctxt->intercept) {
--- 
-2.24.1
+Can this possibly respect the architected priorities? I'm skeptical.
 
+Within the body of vmx_check_nested_events(), the following priorities
+are imposed:
+
+1. INIT
+2. Intercepted fault or trap on previous instruction
+3. VMX preemption timer
+4. NMI
+5. External interrupt
+
+(2) is appropriately placed for "traps on the previous instruction,"
+but it looks like there is a priority inversion between INIT and an
+intercepted fault on the previous instruction. In fact, because of the
+first two calls to vmx_check_nested_events() listed above, there is a
+priority inversion between an *unintercepted* fault on the previous
+instruction and any of {INIT, VMX preemption timer, NMI, external
+interrupt}.
+
+Or is there some subtlety here that I'm missing?
