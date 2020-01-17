@@ -2,218 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C948214045F
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 08:14:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 572A314046F
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2020 08:22:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729188AbgAQHOT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Jan 2020 02:14:19 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35761 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726675AbgAQHOT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Jan 2020 02:14:19 -0500
-Received: by mail-wm1-f65.google.com with SMTP id p17so6433457wmb.0
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 23:14:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Vd6rya/rtfsC3Wyfx6Rmnt5QEoiw12dxt+6jkc+paaw=;
-        b=QGUwlYXDLXWES33BIFuIGaGp80Y7BWGxf6pngN3nJbYm/zIZOmRgwWHsrff1QaOBOV
-         PJ4yUHpcyZeRSrxPrvu/OHeBEfNhgxCz/B748ptvmpk7G8cnve0iU5sdp1v837eKN8wK
-         aXSGYFlDHWKZnFy948wEkljBxCYsf658B24kddAhVMFib/DZSu46Fc+wRveJ5IrpeSXP
-         PS6ylQCfM7gNAraQJEwxV+evX93iodElkw4HVEEDxGjppjmu194KZ9JgTeeecHce6gw6
-         d9XFSBC0VrakXCIR7KFgY0qhWdXaxWtyN8z/17omCaogg/A/+Et5vkR4SNixhCFZaiU0
-         g7kA==
+        id S1729021AbgAQHWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Jan 2020 02:22:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32058 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726675AbgAQHWu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Jan 2020 02:22:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579245769;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=y3RcHw06IWFshCmwxf/kgJpylqKRRJYyaQ6ieJjtjws=;
+        b=Vfv3rfn1WqELM74pSMZnOVgqI0avTfc+BpfzF/KISDEgdP6gYDMl7TvUngxbFPpoQYbT+/
+        aRL4rXpB1/X7IkU7/JF6GgiaoNcQ8CYevsv/qbLX2dS+8whhV59WgwU6vNhj3sWqzItN7i
+        e2ci88poh/vpmdep+airE5ber3lN4NU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-202-38kSFjW8MjuiOC6Jj1vXtg-1; Fri, 17 Jan 2020 02:22:48 -0500
+X-MC-Unique: 38kSFjW8MjuiOC6Jj1vXtg-1
+Received: by mail-wm1-f72.google.com with SMTP id h130so1916364wme.7
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2020 23:22:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Vd6rya/rtfsC3Wyfx6Rmnt5QEoiw12dxt+6jkc+paaw=;
-        b=QORMhtgrzQrv/RD0f+DydzSfUmt73Rcew4IHlQXvmxvRGJmOCTmjgPvlsni04m4tjL
-         pjAv9UyDJuOYDgpC1MukJ+1s7HsYYOwuQ3PZ3XgC36xnCYfp8EHOrn8ZYIzlJnQdh6Dc
-         pExjV8u18UNVjwzhZnYRpTANXpubWkLH1RLT6cwktp98BDZjiTuyoXx59mXp+l+6jc7+
-         Hqpk3zYePTaOPz8Piccc8NCnOGDxl1MhX5Rkpy1iCt0CJHSHEv8QPefXRpSAYZarzn0S
-         +051lLDzhFDgFBqHZO6vkg0ECW+lqZ1VpIfx/f8qFXONNILBBypal+1c/KAOQikCnkdP
-         CW1Q==
-X-Gm-Message-State: APjAAAWnmWu89wmEI8S4KlQhEvlEO6X0x2pVPQGj3DNQemSrO5BVkldh
-        xwDh8TsP7iklD6VnWCIKraDINVkbgOBsB1bFJ09ajQ==
-X-Google-Smtp-Source: APXvYqx7M57ySyAAZEwSM21uzVMFDfIJEJJM8TqsVpW2U6GFYtKAk2CxR4HjFMIaquj1wyJaqZVcJoNO0ddd7/rny08=
-X-Received: by 2002:a05:600c:10cd:: with SMTP id l13mr3094596wmd.102.1579245256835;
- Thu, 16 Jan 2020 23:14:16 -0800 (PST)
-MIME-Version: 1.0
-References: <20191223113443.68969-1-anup.patel@wdc.com> <20191223113443.68969-4-anup.patel@wdc.com>
- <mhng-1c0b8288-1b2b-4172-b224-5277a9d3fcaa@palmerdabbelt-glaptop>
-In-Reply-To: <mhng-1c0b8288-1b2b-4172-b224-5277a9d3fcaa@palmerdabbelt-glaptop>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Fri, 17 Jan 2020 12:44:06 +0530
-Message-ID: <CAAhSdy1UPS=mfoQHbsZBEAVECCtEES+x1ys63+YXNkcb8ogoSQ@mail.gmail.com>
-Subject: Re: [PATCH v10 03/19] RISC-V: Add hypervisor extension related CSR defines
-To:     Palmer Dabbelt <palmerdabbelt@google.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=y3RcHw06IWFshCmwxf/kgJpylqKRRJYyaQ6ieJjtjws=;
+        b=H+52vk/pGFJfODzoA2XpoCPILDqrAf4nouWuc3t4kZZ5/TxWfEiJCIhBZr3xghUUwQ
+         SKfy56hAs09ls+HhkabzFo4bEUjztNADjZVhQgCoGMopXAkeVMflL96POssFghoJNh2o
+         A7DcgHKirB7+kevgfnot0tDkJ+nu3d+sUD2q8Bvgif+sXxDV4cbMFP/31jMTEz3hqplO
+         v3Rzve8qJfOGa3Wqf/kTUWHHnQP6yzv66yLVAKase09tJHqAMx3URNsd3UyR/RNx81zb
+         JmYXYy0iMTq7i2Xq9l1sIceGkG0bsGrte+2Yg74cO+Mdq/dDibiSf1NHqiyQPPFcuAAw
+         5HCw==
+X-Gm-Message-State: APjAAAXwxdaNKHdvbMJfnVEzSLxvcsH99cKLU5n+YAv9KKCCF5CVXfIH
+        9UVhw6HA7NKJ6wr6sLCapLcBZLrRHWEvtHHFjZCSYLL+BEiKs29lzOfAdwSfa0rhmH+MoDACmCX
+        aS3LO5gJ+S+27
+X-Received: by 2002:adf:cf12:: with SMTP id o18mr1505118wrj.361.1579245767227;
+        Thu, 16 Jan 2020 23:22:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyhVu92f0rPbMXkhVzlAmmh1h6VA7J+gWqDV5WIKA8NY6FR45MKwm6SeR4kPdGNcBnws6v4QA==
+X-Received: by 2002:adf:cf12:: with SMTP id o18mr1505101wrj.361.1579245766968;
+        Thu, 16 Jan 2020 23:22:46 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net. [83.57.172.113])
+        by smtp.gmail.com with ESMTPSA id x7sm31918244wrq.41.2020.01.16.23.22.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jan 2020 23:22:46 -0800 (PST)
+Subject: Re: [PATCH v22 9/9] MAINTAINERS: Add ACPI/HEST/GHES entries
+To:     Peter Maydell <peter.maydell@linaro.org>,
+        Dongjiu Geng <gengdongjiu@huawei.com>
+Cc:     Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        Linuxarm <linuxarm@huawei.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Zheng Xiang <zhengxiang9@huawei.com>,
+        qemu-arm <qemu-arm@nongnu.org>,
+        James Morse <james.morse@arm.com>,
+        "xuwei (O)" <xuwei5@huawei.com>,
+        Igor Mammedov <imammedo@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>, Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Richard Henderson <rth@twiddle.net>
+References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
+ <1578483143-14905-10-git-send-email-gengdongjiu@huawei.com>
+ <CAFEAcA-mLgD8rQ211ep44nd8oxTKSnxc7YmY+nPtADpKZk5asA@mail.gmail.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1c45a8b4-1ea4-ddfd-cce3-c42699d2b3b9@redhat.com>
+Date:   Fri, 17 Jan 2020 08:22:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-mLgD8rQ211ep44nd8oxTKSnxc7YmY+nPtADpKZk5asA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 17, 2020 at 1:21 AM Palmer Dabbelt <palmerdabbelt@google.com> wrote:
->
-> On Mon, 23 Dec 2019 03:35:33 PST (-0800), Anup Patel wrote:
-> > This patch extends asm/csr.h by adding RISC-V hypervisor extension
-> > related defines.
-> >
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Reviewed-by: Alexander Graf <graf@amazon.com>
-> > ---
-> >  arch/riscv/include/asm/csr.h | 78 ++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 75 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-> > index 0a62d2d68455..afb6733475c2 100644
-> > --- a/arch/riscv/include/asm/csr.h
-> > +++ b/arch/riscv/include/asm/csr.h
-> > @@ -30,6 +30,8 @@
-> >  #define SR_XS_CLEAN  _AC(0x00010000, UL)
-> >  #define SR_XS_DIRTY  _AC(0x00018000, UL)
-> >
-> > +#define SR_MXR               _AC(0x00080000, UL)
-> > +
-> >  #ifndef CONFIG_64BIT
-> >  #define SR_SD                _AC(0x80000000, UL) /* FS/XS dirty */
-> >  #else
-> > @@ -51,26 +53,74 @@
-> >  #define CAUSE_IRQ_FLAG               (_AC(1, UL) << (__riscv_xlen - 1))
-> >
-> >  /* Interrupt causes (minus the high bit) */
-> > -#define IRQ_U_SOFT           0
-> >  #define IRQ_S_SOFT           1
-> > +#define IRQ_VS_SOFT          2
->
-> Again: please don't mix up cleanups with the KVM port.  It's reasonable to
-> remove the N extension cruft as it's still in draft and we probably won't
-> implement it in Linux, but that shouldn't be mixed up with the KVM
-> implementation.
+Hi Peter,
 
-Sure, I will send separate patch for removing IRQ_U_xyz defines
-and have only H-extension related defines here.
+On 1/16/20 5:46 PM, Peter Maydell wrote:
+> On Wed, 8 Jan 2020 at 11:32, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>>
+>> I and Xiang are willing to review the APEI-related patches and
+>> volunteer as the reviewers for the HEST/GHES part.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+>> ---
+>>   MAINTAINERS | 9 +++++++++
+>>   1 file changed, 9 insertions(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 387879a..5af70a5 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -1423,6 +1423,15 @@ F: tests/bios-tables-test.c
+>>   F: tests/acpi-utils.[hc]
+>>   F: tests/data/acpi/
+>>
+>> +ACPI/HEST/GHES
+>> +R: Dongjiu Geng <gengdongjiu@huawei.com>
+>> +R: Xiang Zheng <zhengxiang9@huawei.com>
+>> +L: qemu-arm@nongnu.org
+>> +S: Maintained
+>> +F: hw/acpi/ghes.c
+>> +F: include/hw/acpi/ghes.h
+>> +F: docs/specs/acpi_hest_ghes.rst
+>> +
+>>   ppc4xx
+>>   M: David Gibson <david@gibson.dropbear.id.au>
+>>   L: qemu-ppc@nongnu.org
+>> --
+> 
+> Michael, Igor: since this new MAINTAINERS section is
+> moving files out of the 'ACPI/SMBIOS' section that you're
+> currently responsible for, do you want to provide an
+> acked-by: that you think this division of files makes sense?
 
-Regards,
-Anup
+The files are not 'moved out', Michael and Igor are still the 
+maintainers of the supported ACPI/SMBIOS subsystem:
 
->
-> >  #define IRQ_M_SOFT           3
-> > -#define IRQ_U_TIMER          4
-> >  #define IRQ_S_TIMER          5
-> > +#define IRQ_VS_TIMER         6
-> >  #define IRQ_M_TIMER          7
-> > -#define IRQ_U_EXT            8
-> >  #define IRQ_S_EXT            9
-> > +#define IRQ_VS_EXT           10
-> >  #define IRQ_M_EXT            11
-> >
-> >  /* Exception causes */
-> >  #define EXC_INST_MISALIGNED  0
-> >  #define EXC_INST_ACCESS              1
-> > +#define EXC_INST_ILLEGAL     2
-> >  #define EXC_BREAKPOINT               3
-> >  #define EXC_LOAD_ACCESS              5
-> >  #define EXC_STORE_ACCESS     7
-> >  #define EXC_SYSCALL          8
-> > +#define EXC_HYPERVISOR_SYSCALL       9
-> > +#define EXC_SUPERVISOR_SYSCALL       10
-> >  #define EXC_INST_PAGE_FAULT  12
-> >  #define EXC_LOAD_PAGE_FAULT  13
-> >  #define EXC_STORE_PAGE_FAULT 15
-> > +#define EXC_INST_GUEST_PAGE_FAULT    20
-> > +#define EXC_LOAD_GUEST_PAGE_FAULT    21
-> > +#define EXC_STORE_GUEST_PAGE_FAULT   23
-> > +
-> > +/* HSTATUS flags */
-> > +#define HSTATUS_VTSR         _AC(0x00400000, UL)
-> > +#define HSTATUS_VTVM         _AC(0x00100000, UL)
-> > +#define HSTATUS_SP2V         _AC(0x00000200, UL)
-> > +#define HSTATUS_SP2P         _AC(0x00000100, UL)
-> > +#define HSTATUS_SPV          _AC(0x00000080, UL)
-> > +#define HSTATUS_SPRV         _AC(0x00000001, UL)
-> > +
-> > +/* HGATP flags */
-> > +#define HGATP_MODE_OFF               _AC(0, UL)
-> > +#define HGATP_MODE_SV32X4    _AC(1, UL)
-> > +#define HGATP_MODE_SV39X4    _AC(8, UL)
-> > +#define HGATP_MODE_SV48X4    _AC(9, UL)
-> > +
-> > +#define HGATP32_MODE_SHIFT   31
-> > +#define HGATP32_VMID_SHIFT   22
-> > +#define HGATP32_VMID_MASK    _AC(0x1FC00000, UL)
-> > +#define HGATP32_PPN          _AC(0x003FFFFF, UL)
-> > +
-> > +#define HGATP64_MODE_SHIFT   60
-> > +#define HGATP64_VMID_SHIFT   44
-> > +#define HGATP64_VMID_MASK    _AC(0x03FFF00000000000, UL)
-> > +#define HGATP64_PPN          _AC(0x00000FFFFFFFFFFF, UL)
-> > +
-> > +#ifdef CONFIG_64BIT
-> > +#define HGATP_PPN            HGATP64_PPN
-> > +#define HGATP_VMID_SHIFT     HGATP64_VMID_SHIFT
-> > +#define HGATP_VMID_MASK              HGATP64_VMID_MASK
-> > +#define HGATP_MODE           (HGATP_MODE_SV39X4 << HGATP64_MODE_SHIFT)
-> > +#else
-> > +#define HGATP_PPN            HGATP32_PPN
-> > +#define HGATP_VMID_SHIFT     HGATP32_VMID_SHIFT
-> > +#define HGATP_VMID_MASK              HGATP32_VMID_MASK
-> > +#define HGATP_MODE           (HGATP_MODE_SV32X4 << HGATP32_MODE_SHIFT)
-> > +#endif
-> > +
-> > +/* VSIP & HIP relation */
-> > +#define VSIP_TO_HIP_SHIFT    (IRQ_VS_SOFT - IRQ_S_SOFT)
-> > +#define VSIP_VALID_MASK              ((_AC(1, UL) << IRQ_S_SOFT) | \
-> > +                              (_AC(1, UL) << IRQ_S_TIMER) | \
-> > +                              (_AC(1, UL) << IRQ_S_EXT))
-> >
-> >  /* symbolic CSR names: */
-> >  #define CSR_CYCLE            0xc00
-> > @@ -91,6 +141,28 @@
-> >  #define CSR_SIP                      0x144
-> >  #define CSR_SATP             0x180
-> >
-> > +#define CSR_VSSTATUS         0x200
-> > +#define CSR_VSIE             0x204
-> > +#define CSR_VSTVEC           0x205
-> > +#define CSR_VSSCRATCH                0x240
-> > +#define CSR_VSEPC            0x241
-> > +#define CSR_VSCAUSE          0x242
-> > +#define CSR_VSTVAL           0x243
-> > +#define CSR_VSIP             0x244
-> > +#define CSR_VSATP            0x280
-> > +
-> > +#define CSR_HSTATUS          0x600
-> > +#define CSR_HEDELEG          0x602
-> > +#define CSR_HIDELEG          0x603
-> > +#define CSR_HIE                      0x604
-> > +#define CSR_HTIMEDELTA               0x605
-> > +#define CSR_HTIMEDELTAH              0x615
-> > +#define CSR_HCOUNTERNEN              0x606
-> > +#define CSR_HTVAL            0x643
-> > +#define CSR_HIP                      0x644
-> > +#define CSR_HTINST           0x64a
-> > +#define CSR_HGATP            0x680
-> > +
-> >  #define CSR_MSTATUS          0x300
-> >  #define CSR_MISA             0x301
-> >  #define CSR_MIE                      0x304
-> > --
-> > 2.17.1
+ACPI/SMBIOS
+M: Michael S. Tsirkin <mst@redhat.com>
+M: Igor Mammedov <imammedo@redhat.com>
+S: Supported
+F: include/hw/acpi/*
+F: hw/acpi/*
+
+Dongjiu and Xiang only add themselves as reviewers to get notified on 
+changes on these specific files. The more eyes the better :)
+
+The docs/specs/acpi_hest_ghes.rst document has no maintainer, as these 
+others too:
+
+- docs/specs/acpi_cpu_hotplug.txt
+- docs/specs/acpi_hw_reduced_hotplug.rst
+- docs/specs/acpi_mem_hotplug.txt
+- docs/specs/acpi_nvdimm.txt
+
+The only ACPI file reported as maintained in docs/specs/ is 
+acpi_pci_hotplug.txt, from this entry:
+
+PCI
+M: Michael S. Tsirkin <mst@redhat.com>
+M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+S: Supported
+F: docs/specs/*pci*
+
+FWIW:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
