@@ -2,125 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CECF4141CF4
-	for <lists+kvm@lfdr.de>; Sun, 19 Jan 2020 09:20:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E66F141D06
+	for <lists+kvm@lfdr.de>; Sun, 19 Jan 2020 09:57:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726857AbgASIUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Jan 2020 03:20:05 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9664 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726444AbgASIUF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Jan 2020 03:20:05 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 6B101EBA86C3279E3455;
-        Sun, 19 Jan 2020 16:20:02 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Sun, 19 Jan 2020
- 16:19:54 +0800
-Subject: Re: [PATCH v22 9/9] MAINTAINERS: Add ACPI/HEST/GHES entries
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>
-CC:     Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Zheng Xiang <zhengxiang9@huawei.com>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        James Morse <james.morse@arm.com>,
-        "xuwei (O)" <xuwei5@huawei.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-10-git-send-email-gengdongjiu@huawei.com>
- <CAFEAcA-mLgD8rQ211ep44nd8oxTKSnxc7YmY+nPtADpKZk5asA@mail.gmail.com>
- <1c45a8b4-1ea4-ddfd-cce3-c42699d2b3b9@redhat.com>
- <CAFEAcA_QO1t10EJySQ5tbOHNuXgzQnJrN28n7fmZt_7aP=hvzA@mail.gmail.com>
- <724fbf58-19df-593c-b665-2c2e9fe71189@redhat.com>
-From:   gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <ebf18e13-4f7e-9002-6774-5977a243fca7@huawei.com>
-Date:   Sun, 19 Jan 2020 16:19:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+        id S1726811AbgASI5A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Jan 2020 03:57:00 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39631 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726538AbgASI47 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 19 Jan 2020 03:56:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579424217;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XYiSqZsoUxk59GYwuuinpJvpzr3CUrQGX17TAVKUd9M=;
+        b=A1y/VT3Yl1i6wWESiR37hNHMSb3iWDaH5fcBkefnGTa/l98L3ca2zPCqTR+6fEGs1Ng9w1
+        oYDsw9daHwD0UTCfYhjdGw4s2b+I/Uv5dhqAgSVmSgYCcT3u6dfVwobTsdoeAa3D4CJfv6
+        hlIFYonf8HuVQTcilBsvNoDaOmAZ1zY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-nuAaLx2NOaimQ1bXWQYzjA-1; Sun, 19 Jan 2020 03:56:56 -0500
+X-MC-Unique: nuAaLx2NOaimQ1bXWQYzjA-1
+Received: by mail-wr1-f70.google.com with SMTP id d8so12538712wrq.12
+        for <kvm@vger.kernel.org>; Sun, 19 Jan 2020 00:56:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XYiSqZsoUxk59GYwuuinpJvpzr3CUrQGX17TAVKUd9M=;
+        b=tFVFiQyQTz9OCVlZ1FEtUifXggmQ8ccfUib++nL4lsDqDMILEKbxMsEJJ/eTGQ2ADK
+         t1i5lvtMS7DphuxepHQdtMiKpbbDSa8wATiy7J43tLvENgbRVt/iMuNC/sOEN5hiilyy
+         pIVfoWqvBxeKP19509UiyPV+ujJFJA5unZxpdlH2+YJLkcZfxrMK490FxN8PEUSRejbn
+         z7EHrKAwPY4hO+ErSzuzvbYWy1OkdPHg4gO0Qa/e+sZ2BuE8oeC7NetUq3l2+gq1NDD5
+         9JBTc0ZJIvmCs4cWKIml9fu7xSN6zKGvd5TP5zpG14xHCjGsTIOwWU0XE+ds9o3T9V2e
+         Qulg==
+X-Gm-Message-State: APjAAAWmfBA1RMJsrr9wJrHSwESYzKveERZUAL6Ms4CyEtg6bt5W05QE
+        1JX1IX1m9HU5llssOrhG09VHPw9z48xyPc37a4ioTl34x+p8pI/Jaw5RiHohXDKP5Y1vMQwvOvU
+        e7IBbHuU5WUoS
+X-Received: by 2002:adf:f382:: with SMTP id m2mr12511195wro.163.1579424214878;
+        Sun, 19 Jan 2020 00:56:54 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy3hpEI4LdGbyyH/gPG8rwa4h0D4DwMMEfXfH8wq9gklCIDI9UZ6ixaqsOjHzN9nRy9aKqi1w==
+X-Received: by 2002:adf:f382:: with SMTP id m2mr12511177wro.163.1579424214481;
+        Sun, 19 Jan 2020 00:56:54 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id o4sm42040694wrw.97.2020.01.19.00.56.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 19 Jan 2020 00:56:53 -0800 (PST)
+Subject: Re: [PATCH RFC 2/3] x86/kvm/hyper-v: move VMX controls sanitization
+ out of nested_enable_evmcs()
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
+        Roman Kagan <rkagan@virtuozzo.com>
+References: <20200115171014.56405-1-vkuznets@redhat.com>
+ <20200115171014.56405-3-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6c4bdb57-08fb-2c2d-9234-b7efffeb72ed@redhat.com>
+Date:   Sun, 19 Jan 2020 09:54:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <724fbf58-19df-593c-b665-2c2e9fe71189@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200115171014.56405-3-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/1/17 19:22, Philippe Mathieu-Daudé wrote:
-> On 1/17/20 12:09 PM, Peter Maydell wrote:
->> On Fri, 17 Jan 2020 at 07:22, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>>
->>> Hi Peter,
->>>
->>> On 1/16/20 5:46 PM, Peter Maydell wrote:
->>>> On Wed, 8 Jan 2020 at 11:32, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->>>>>
->>>>> I and Xiang are willing to review the APEI-related patches and
->>>>> volunteer as the reviewers for the HEST/GHES part.
->>>>>
->>>>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->>>>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->>>>> ---
->>>>>    MAINTAINERS | 9 +++++++++
->>>>>    1 file changed, 9 insertions(+)
->>>>>
->>>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>>> index 387879a..5af70a5 100644
->>>>> --- a/MAINTAINERS
->>>>> +++ b/MAINTAINERS
->>>>> @@ -1423,6 +1423,15 @@ F: tests/bios-tables-test.c
->>>>>    F: tests/acpi-utils.[hc]
->>>>>    F: tests/data/acpi/
->>>>>
->>>>> +ACPI/HEST/GHES
->>>>> +R: Dongjiu Geng <gengdongjiu@huawei.com>
->>>>> +R: Xiang Zheng <zhengxiang9@huawei.com>
->>>>> +L: qemu-arm@nongnu.org
->>>>> +S: Maintained
->>>>> +F: hw/acpi/ghes.c
->>>>> +F: include/hw/acpi/ghes.h
->>>>> +F: docs/specs/acpi_hest_ghes.rst
->>>>> +
->>>>>    ppc4xx
->>>>>    M: David Gibson <david@gibson.dropbear.id.au>
->>>>>    L: qemu-ppc@nongnu.org
->>>>> -- 
->>>>
->>>> Michael, Igor: since this new MAINTAINERS section is
->>>> moving files out of the 'ACPI/SMBIOS' section that you're
->>>> currently responsible for, do you want to provide an
->>>> acked-by: that you think this division of files makes sense?
->>>
->>> The files are not 'moved out', Michael and Igor are still the
->>> maintainers of the supported ACPI/SMBIOS subsystem: 
+On 15/01/20 18:10, Vitaly Kuznetsov wrote:
+> With fine grained VMX feature enablement QEMU>=4.2 tries to do KVM_SET_MSRS
+> with default (matching CPU model) values and in case eVMCS is also enabled,
+> fails.
+> 
+> It would be possible to drop VMX feature filtering completely and make
+> this a guest's responsibility: if it decides to use eVMCS it should know
+> which fields are available and which are not. Hyper-V mostly complies to
+> this, however, there is at least one problematic control:
+> SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES
+> which Hyper-V enables. As there is no 'apic_addr_field' in eVMCS, we
+> fail to handle this properly in KVM. It is unclear how this is supposed
+> to work, genuine Hyper-V doesn't expose the control so it is possible that
+> this is just a bug (in Hyper-V).
 
-In fact, I am willing to maintain with others to the new added files , I see some new added files in "hw/acpi" folders are moved out, such as NVDIMM/vmgenid.
+Yes, it most likely is and it would be nice if Microsoft fixed it, but I
+guess we're stuck with it for existing Windows versions.  Well, for one
+we found a bug in Hyper-V and not the converse. :)
 
-NVDIMM
-M: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-S: Maintained
-F: hw/acpi/nvdimm.c
-F: hw/mem/nvdimm.c
-F: include/hw/mem/nvdimm.h
-F: docs/nvdimm.txt
+There is a problem with this approach, in that we're stuck with it
+forever due to live migration.  But I guess if in the future eVMCS v2
+adds an apic_address field we can limit the hack to eVMCS v1.  Another
+possibility is to use the quirks mechanism but it's overkill for now.
 
-VM Generation ID
-M: Ben Warren <ben@skyportsystems.com>
-S: Maintained
-F: hw/acpi/vmgenid.c
-F: include/hw/acpi/vmgenid.h
-F: docs/specs/vmgenid.txt
-F: tests/vmgenid-test.c
-F: stubs/vmgenid.c
+Unless there are objections, I plan to apply these patches.
+
+Paolo
+
+
+> Move VMX controls sanitization from nested_enable_evmcs() to vmx_get_msr(),
+> this allows userspace to keep setting controls it wants and at the same
+> time hides them from the guest.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/evmcs.c | 38 ++++++++++++++++++++++++++++++++------
+>  arch/x86/kvm/vmx/evmcs.h |  1 +
+>  arch/x86/kvm/vmx/vmx.c   | 10 ++++++++--
+>  3 files changed, 41 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
+> index 89c3e0caf39f..b5d6582ba589 100644
+> --- a/arch/x86/kvm/vmx/evmcs.c
+> +++ b/arch/x86/kvm/vmx/evmcs.c
+> @@ -346,6 +346,38 @@ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu)
+>         return 0;
+>  }
+>  
+> +void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata)
+> +{
+> +	u32 ctl_low = (u32)*pdata, ctl_high = (u32)(*pdata >> 32);
+> +	/*
+> +	 * Enlightened VMCS doesn't have certain fields, make sure we don't
+> +	 * expose unsupported controls to L1.
+> +	 */
+> +
+> +	switch (msr_index) {
+> +	case MSR_IA32_VMX_PINBASED_CTLS:
+> +	case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
+> +		ctl_high &= ~EVMCS1_UNSUPPORTED_PINCTRL;
+> +		break;
+> +	case MSR_IA32_VMX_EXIT_CTLS:
+> +	case MSR_IA32_VMX_TRUE_EXIT_CTLS:
+> +		ctl_high &= ~EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
+> +		break;
+> +	case MSR_IA32_VMX_ENTRY_CTLS:
+> +	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+> +		ctl_high &= ~EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
+> +		break;
+> +	case MSR_IA32_VMX_PROCBASED_CTLS2:
+> +		ctl_high &= ~EVMCS1_UNSUPPORTED_2NDEXEC;
+> +		break;
+> +	case MSR_IA32_VMX_VMFUNC:
+> +		ctl_low &= ~EVMCS1_UNSUPPORTED_VMFUNC;
+> +		break;
+> +	}
+> +
+> +	*pdata = ctl_low | ((u64)ctl_high << 32);
+> +}
+> +
+>  int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+>  			uint16_t *vmcs_version)
+>  {
+> @@ -356,11 +388,5 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+>  	if (vmcs_version)
+>  		*vmcs_version = nested_get_evmcs_version(vcpu);
+>  
+> -	vmx->nested.msrs.pinbased_ctls_high &= ~EVMCS1_UNSUPPORTED_PINCTRL;
+> -	vmx->nested.msrs.entry_ctls_high &= ~EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
+> -	vmx->nested.msrs.exit_ctls_high &= ~EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
+> -	vmx->nested.msrs.secondary_ctls_high &= ~EVMCS1_UNSUPPORTED_2NDEXEC;
+> -	vmx->nested.msrs.vmfunc_controls &= ~EVMCS1_UNSUPPORTED_VMFUNC;
+> -
+>  	return 0;
+>  }
+> diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
+> index 07ebf6882a45..b88d9807a796 100644
+> --- a/arch/x86/kvm/vmx/evmcs.h
+> +++ b/arch/x86/kvm/vmx/evmcs.h
+> @@ -201,5 +201,6 @@ bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmcs_gpa);
+>  uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
+>  int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+>  			uint16_t *vmcs_version);
+> +void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata);
+>  
+>  #endif /* __KVM_X86_VMX_EVMCS_H */
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index e3394c839dea..8eb74618b8d8 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1849,8 +1849,14 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
+>  		if (!nested_vmx_allowed(vcpu))
+>  			return 1;
+> -		return vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
+> -				       &msr_info->data);
+> +		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
+> +				    &msr_info->data))
+> +			return 1;
+> +		if (!msr_info->host_initiated &&
+> +		    vmx->nested.enlightened_vmcs_enabled)
+> +			nested_evmcs_filter_control_msr(msr_info->index,
+> +							&msr_info->data);
+> +		break;
+>  	case MSR_IA32_RTIT_CTL:
+>  		if (pt_mode != PT_MODE_HOST_GUEST)
+>  			return 1;
+> 
 
