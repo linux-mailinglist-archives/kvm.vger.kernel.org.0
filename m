@@ -2,116 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CFE7142A61
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 13:17:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA618142BC3
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 14:09:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727829AbgATMRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 07:17:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51334 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726958AbgATMRj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jan 2020 07:17:39 -0500
+        id S1726954AbgATNIb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 08:08:31 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31128 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726798AbgATNIa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 08:08:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579522657;
+        s=mimecast20190719; t=1579525709;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8L+ILVTS7iEVpEf9FQ7Niyp0BU3VQIiebmcN8SzOcl8=;
-        b=Q8jJfz8kyQyUMTq+IqvBSU4xbhlSH9LCcDAIZk5+hsFJTxy9yMXVXtc0X/wvSkx+ykf66Q
-        ttNo9gVr8SXSpg3wS/nySmKhQEqoIUSAVzraxC/kXD8JBTvYO2H/vDUGf32YfZJhNU2vRM
-        uXaJUloQwg1Pf7GxPEsxVZJDV9WTUDs=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-0F_-xcQDOQSV35bnbG0xnw-1; Mon, 20 Jan 2020 07:17:36 -0500
-X-MC-Unique: 0F_-xcQDOQSV35bnbG0xnw-1
-Received: by mail-qt1-f198.google.com with SMTP id m8so21013203qta.20
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 04:17:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8L+ILVTS7iEVpEf9FQ7Niyp0BU3VQIiebmcN8SzOcl8=;
-        b=r3eDLOjl6IBuDty9mN7yPBH2p633Euo2O0Zwyh5PR5eyr2Po/ScOhJsc3p/7amf/bY
-         1Fly3fLTe8p3dJ/PjK3/MtePmvmXhWQ/S62266FPMdHPM73G3iP60R8aT+Au8O591IJW
-         UVlrLNFyokM1aZfTJuevE5aeoE+YYSdL0UxR8HOB3PvrQzfiDwHC1rINGMC6/vIJXHHx
-         ptb0rbcM7joi17RU3acfAeSo66T6wjtaqBSD1sYkwxY9Eurw/LO+LZFaxySKBJZnRzWj
-         VAEs0vmPWbD4TU2vqINgFAyfqP/N5RhhT5uroxRCI5CCkAa6qCW273STf2mIWl1M262C
-         GUUQ==
-X-Gm-Message-State: APjAAAWUEipMNQBL+QE+HFrZfMgn315etk6e/lUtON/v+yaMBWYlUCYW
-        XM5fEyD2/MB3RM4aI3WzGGSGY2GZCGyK9ZNGrk4RceTuSRJrjVtYHUHEKfmNvaul37khqXJQCrh
-        wXv+C1R6X4EDX
-X-Received: by 2002:ac8:784:: with SMTP id l4mr19850108qth.286.1579522656239;
-        Mon, 20 Jan 2020 04:17:36 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwNA60FKJeMn0/BVl0tQjIyzqQrUvdMi0GrHZyiN0uIGAcUXWQkWAFroQqD7gDCIK6n3lBLSQ==
-X-Received: by 2002:ac8:784:: with SMTP id l4mr19850095qth.286.1579522655996;
-        Mon, 20 Jan 2020 04:17:35 -0800 (PST)
-Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
-        by smtp.gmail.com with ESMTPSA id y26sm17884235qtc.94.2020.01.20.04.17.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2020 04:17:34 -0800 (PST)
-Date:   Mon, 20 Jan 2020 07:17:26 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Gunthorpe <jgg@mellanox.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "aadam@redhat.com" <aadam@redhat.com>,
-        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>
-Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
-Message-ID: <20200120071406-mutt-send-email-mst@kernel.org>
-References: <20200116124231.20253-1-jasowang@redhat.com>
- <20200116124231.20253-4-jasowang@redhat.com>
- <20200116152209.GH20978@mellanox.com>
- <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
- <20200117135435.GU20978@mellanox.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=b6DMbPH+ad8np/5lLxTXgCNi4TM1mHo6rbFScT/ddvI=;
+        b=EWgc6agGin2T3f6wD0ua68RoM36xiJY4fJq2GfNfA/GgbIHMUGQnPoAuE4db+U1j0tJQat
+        G/aCnVLzF7p3iIi7qxEO5MBDbbWQ73DDm2F5IB+8sXHDQRfx5KKSuMB2dVhZU0swvW4iqC
+        4CcnLnUYWzuRM808OP249jzRJl5z5EA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28-LJvWDoqpPTOWOevsIS2Ryw-1; Mon, 20 Jan 2020 08:08:28 -0500
+X-MC-Unique: LJvWDoqpPTOWOevsIS2Ryw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1161A0CC7;
+        Mon, 20 Jan 2020 13:08:27 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 91C4560BF7;
+        Mon, 20 Jan 2020 13:08:26 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     Marc Zyngier <maz@kernel.org>
+Subject: [PATCH] arm64: KVM: Add XXX UAPI notes for swapped registers
+Date:   Mon, 20 Jan 2020 14:08:25 +0100
+Message-Id: <20200120130825.28838-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200117135435.GU20978@mellanox.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 17, 2020 at 01:54:42PM +0000, Jason Gunthorpe wrote:
-> > 1) "virtio" vs "vhost", I implemented matching method for this in mdev
-> > series, but it looks unnecessary for vDPA device driver to know about this.
-> > Anyway we can use sysfs driver bind/unbind to switch drivers
-> > 2) virtio device id and vendor id. I'm not sure we need this consider the
-> > two drivers so far (virtio/vhost) are all bus drivers.
-> 
-> As we seem to be contemplating some dynamic creation of vdpa devices I
-> think upon creation time it should be specified what mode they should
-> run it and then all driver binding and autoloading should happen
-> automatically. Telling the user to bind/unbind is a very poor
-> experience.
+Two UAPI system register IDs do not derive their values from the
+ARM system register encodings. This is because their values were
+accidentally swapped. As the IDs are API, they cannot be changed.
+Add XXX notes to point them out.
 
-Maybe but OTOH it's an existing interface. I think we can reasonably
-start with bind/unbind and then add ability to specify
-the mode later. bind/unbind come from core so they will be
-maintained anyway.
--- 
-MST
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ Documentation/virt/kvm/api.txt    |  8 ++++++++
+ arch/arm64/include/uapi/asm/kvm.h | 11 +++++++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.=
+txt
+index ebb37b34dcfc..11556fc457c3 100644
+--- a/Documentation/virt/kvm/api.txt
++++ b/Documentation/virt/kvm/api.txt
+@@ -2196,6 +2196,14 @@ arm64 CCSIDR registers are demultiplexed by CSSELR=
+ value:
+ arm64 system registers have the following id bit patterns:
+   0x6030 0000 0013 <op0:2> <op1:3> <crn:4> <crm:4> <op2:3>
+=20
++XXX: Two system register IDs do not follow the specified pattern.  These
++     are KVM_REG_ARM_TIMER_CVAL and KVM_REG_ARM_TIMER_CNT, which map to
++     system registers CNTV_CVAL_EL0 and CNTVCT_EL0 respectively.  These
++     two had their values accidentally swapped, which means TIMER_CVAL i=
+s
++     derived from the register encoding for CNTVCT_EL0 and TIMER_CNT is
++     derived from the register encoding for CNTV_CVAL_EL0.  As this is
++     API, it must remain this way.
++
+ arm64 firmware pseudo-registers have the following bit pattern:
+   0x6030 0000 0014 <regno:16>
+=20
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/=
+asm/kvm.h
+index 820e5751ada7..c72387e48851 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -220,10 +220,17 @@ struct kvm_vcpu_events {
+ #define KVM_REG_ARM_PTIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 2, 2)
+ #define KVM_REG_ARM_PTIMER_CNT		ARM64_SYS_REG(3, 3, 14, 0, 1)
+=20
+-/* EL0 Virtual Timer Registers */
++/*
++ * EL0 Virtual Timer Registers
++ *
++ * XXX: KVM_REG_ARM_TIMER_CVAL and KVM_REG_ARM_TIMER_CNT are not defined
++ *      with the appropriate register encodings.  Their values have been
++ *      accidentally swapped.  As this is set API, the definitions here
++ *      must be used, rather than ones derived from the encodings.
++ */
+ #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
+-#define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
+ #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
++#define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
+=20
+ /* KVM-as-firmware specific pseudo-registers */
+ #define KVM_REG_ARM_FW			(0x0014 << KVM_REG_ARM_COPROC_SHIFT)
+--=20
+2.21.1
 
