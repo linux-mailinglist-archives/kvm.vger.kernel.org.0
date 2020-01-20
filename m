@@ -2,143 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BF99142469
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 08:48:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C55A0142475
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 08:50:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726843AbgATHr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 02:47:56 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46208 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726130AbgATHrz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 02:47:55 -0500
+        id S1726586AbgATHuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 02:50:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55411 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726039AbgATHuc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jan 2020 02:50:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579506474;
+        s=mimecast20190719; t=1579506631;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DRxgwdNfsPjpaqCnob500hqCEgh7ZacCIxaAxxV7tMc=;
-        b=c2xx9xwp97A/zMFgxKPYh1DKvQXS0ikdjkYImvirfX1tgWNswLiuq5EXfnONQsiH15bo7W
-        P1PgFbLtbM8Tu74IABd2UAdLuLvF3uIHnGSRv8BP0qIM7r029cCavzxRMnW9GdUIH6yynB
-        wkDoeSp5XUhgiS45dee/OlE29aN0nFY=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-bbaNcVdUMJOaVe-mtF_PMA-1; Mon, 20 Jan 2020 02:47:53 -0500
-X-MC-Unique: bbaNcVdUMJOaVe-mtF_PMA-1
-Received: by mail-qk1-f197.google.com with SMTP id m13so19952428qka.9
-        for <kvm@vger.kernel.org>; Sun, 19 Jan 2020 23:47:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DRxgwdNfsPjpaqCnob500hqCEgh7ZacCIxaAxxV7tMc=;
-        b=W2cNu8f2etS0wRuDh6k82CKAw/UdkcPNYIqkvMPDLwFjxdRqtwoXrrEVpUOnkiX7ch
-         qppNz2YecUVJs6jYlRAy6GAi1BBLqOO54hgMnexuc3txmvww+euCQvIlb3AOJzb/MHls
-         tXpYRIFpjMueYfB/l8F1BFmn5QjLyo5QoRZXlRzP2wZjypaPgFVSUE4L2YZ4luSRcPth
-         4rVht7PYa2gGXQD7+iDz7ryCu7T8pG3iqEvhP0c1BibjLpSOBlkQn1MIUGs8IM4FHt2O
-         SbA6PdsBeU+Ed0bMIG7iP3QoqRfHRpQymxTM0gI8FoXnTgnCFNOc8Nij/nXuhsbnuHxd
-         kpsg==
-X-Gm-Message-State: APjAAAUEWS0rCiY9up2pdhX3yT+CoVNouDyiEK1X9urtjpzV609V1siA
-        LqiXVi2tiMSFUFegsQL5LVfMrREPNpPu46gNbB4O7ldbzfvY4GU/qfCD57OfnUZRw7rya2lxwMJ
-        oGp90esBD1XSU
-X-Received: by 2002:ad4:52cb:: with SMTP id p11mr19032839qvs.40.1579506473110;
-        Sun, 19 Jan 2020 23:47:53 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxEtY1SIzk7pMswk1YUQyizl2SeTF2C4wWLaIi1wnQRoKNrV6mfhMbDyW+/x5CqEr86nb11+g==
-X-Received: by 2002:ad4:52cb:: with SMTP id p11mr19032827qvs.40.1579506472874;
-        Sun, 19 Jan 2020 23:47:52 -0800 (PST)
-Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
-        by smtp.gmail.com with ESMTPSA id q126sm15453824qkd.21.2020.01.19.23.47.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Jan 2020 23:47:52 -0800 (PST)
-Date:   Mon, 20 Jan 2020 02:47:46 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Lei Cao <lei.cao@stratus.com>
-Subject: Re: [PATCH v3 12/21] KVM: X86: Implement ring-based dirty memory
- tracking
-Message-ID: <20200120024717-mutt-send-email-mst@kernel.org>
-References: <20200109145729.32898-1-peterx@redhat.com>
- <20200109145729.32898-13-peterx@redhat.com>
- <20200109110110-mutt-send-email-mst@kernel.org>
- <20200109191514.GD36997@xz-x1>
- <22bcd5fc-338c-6b72-2bda-47ba38d7e8ef@redhat.com>
- <20200119051145-mutt-send-email-mst@kernel.org>
- <20200120072915.GD380565@xz-x1>
+        bh=U004lfJPbgC8DDvgY0vYrnnQi6voPmz5PbAj1bvuBr0=;
+        b=WHFUwt/1xYWgox8NL8DpKdh7AARRj+DDNhEiPPIqz/4jgUQDy36BRzxOW6+RbOV1SHEqBH
+        ZPj2D2JOg2BXlorJvMwrEIABnl9/kvFqyHDoeKqGKy6MyWzejYbwfJum75Ii0wSFyOFAo8
+        jZReMH4sVGHYQPwCBzAR1gCbNoRpUz0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-113-8P1DRx1hN7GiWnnH17Bchg-1; Mon, 20 Jan 2020 02:50:28 -0500
+X-MC-Unique: 8P1DRx1hN7GiWnnH17Bchg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CCE4F10054E3;
+        Mon, 20 Jan 2020 07:50:25 +0000 (UTC)
+Received: from [10.72.12.173] (ovpn-12-173.pek2.redhat.com [10.72.12.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 23C8E84DB4;
+        Mon, 20 Jan 2020 07:50:02 +0000 (UTC)
+Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     "mst@redhat.com" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "aadam@redhat.com" <aadam@redhat.com>,
+        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+References: <20200116124231.20253-1-jasowang@redhat.com>
+ <20200116124231.20253-4-jasowang@redhat.com>
+ <20200116152209.GH20978@mellanox.com>
+ <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
+ <20200117135435.GU20978@mellanox.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <ea4639ba-d991-c95c-8cb1-48588e5b42c0@redhat.com>
+Date:   Mon, 20 Jan 2020 15:50:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200120072915.GD380565@xz-x1>
+In-Reply-To: <20200117135435.GU20978@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 20, 2020 at 03:29:15PM +0800, Peter Xu wrote:
-> On Sun, Jan 19, 2020 at 05:12:35AM -0500, Michael S. Tsirkin wrote:
-> > On Sun, Jan 19, 2020 at 10:09:53AM +0100, Paolo Bonzini wrote:
-> > > On 09/01/20 20:15, Peter Xu wrote:
-> > > > Regarding dropping the indices: I feel like it can be done, though we
-> > > > probably need two extra bits for each GFN entry, for example:
-> > > > 
-> > > >   - Bit 0 of the GFN address to show whether this is a valid publish
-> > > >     of dirty gfn
-> > > > 
-> > > >   - Bit 1 of the GFN address to show whether this is collected by the
-> > > >     user
-> > > 
-> > > We can use bit 62 and 63 of the GFN.
-> > 
-> > If we are short on bits we can just use 1 bit. E.g. set if
-> > userspace has collected the GFN.
-> 
-> I'm still unsure whether we can use only one bit for this.  Say,
-> otherwise how does the userspace knows the entry is valid?  For
-> example, the entry with all zeros ({.slot = 0, gfn = 0}) could be
-> recognized as a valid dirty page on slot 0 gfn 0, even if it's
-> actually an unused entry.
 
-So I guess the reverse: valid entry has bit set, userspace sets it to
-0 when it collects it?
+On 2020/1/17 =E4=B8=8B=E5=8D=889:54, Jason Gunthorpe wrote:
+> On Fri, Jan 17, 2020 at 11:03:12AM +0800, Jason Wang wrote:
+>> On 2020/1/16 =E4=B8=8B=E5=8D=8811:22, Jason Gunthorpe wrote:
+>>> On Thu, Jan 16, 2020 at 08:42:29PM +0800, Jason Wang wrote:
+>>>> vDPA device is a device that uses a datapath which complies with the
+>>>> virtio specifications with vendor specific control path. vDPA device=
+s
+>>>> can be both physically located on the hardware or emulated by
+>>>> software. vDPA hardware devices are usually implemented through PCIE
+>>>> with the following types:
+>>>>
+>>>> - PF (Physical Function) - A single Physical Function
+>>>> - VF (Virtual Function) - Device that supports single root I/O
+>>>>     virtualization (SR-IOV). Its Virtual Function (VF) represents a
+>>>>     virtualized instance of the device that can be assigned to diffe=
+rent
+>>>>     partitions
+>>>> - VDEV (Virtual Device) - With technologies such as Intel Scalable
+>>>>     IOV, a virtual device composed by host OS utilizing one or more
+>>>>     ADIs.
+>>>> - SF (Sub function) - Vendor specific interface to slice the Physica=
+l
+>>>>     Function to multiple sub functions that can be assigned to diffe=
+rent
+>>>>     partitions as virtual devices.
+>>> I really hope we don't end up with two different ways to spell this
+>>> same thing.
+>> I think you meant ADI vs SF. It looks to me that ADI is limited to the=
+ scope
+>> of scalable IOV but SF not.
+> I think if one looks carefully you'd find that SF and ADI are using
+> very similar techiniques. For instance we'd also like to use the code
+> reorg of the MSIX vector setup with SFs that Intel is calling IMS.
+>
+> Really SIOV is simply a bundle of pre-existing stuff under a tidy
+> name, whatever code skeleton we come up with for SFs should be re-used
+> for ADI.
 
 
-> > 
-> > > I think this can be done in a secure way.  Later in the thread you say:
-> > > 
-> > > > We simply check fetch_index (sorry I
-> > > > meant this when I said reset_index, anyway it's the only index that we
-> > > > expose to userspace) to make sure:
-> > > > 
-> > > >   reset_index <= fetch_index <= dirty_index
-> > > 
-> > > So this means that KVM_RESET_DIRTY_RINGS should only test the "collected
-> > > by user" flag on dirty ring entries between reset_index and dirty_index.
-> > > 
-> > > Also I would make it
-> > > 
-> > >    00b (invalid GFN) ->
-> > >      01b (valid gfn published by kernel, which is dirty) ->
-> > >        1*b (gfn dirty page collected by userspace) ->
-> > >          00b (gfn reset by kernel, so goes back to invalid gfn)
-> > > That is 10b and 11b are equivalent.  The kernel doesn't read that bit if
-> > > userspace has collected the page.
-> 
-> Yes "1*b" is good too (IMHO as long as we can define three states for
-> an entry).  However do you want me to change to that?  Note that I
-> still think we need to read the rest of the field (in this case,
-> "slot" and "gfn") besides the two bits to do re-protect.  Should we
-> trust that unconditionally if writable?
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
+Ok, but do you prefer to mention ADI only for the next version?
+
+
+>
+>>> Shouldn't there be a device/driver matching process of some kind?
+>>
+>> The question is what do we want do match here.
+>>
+>> 1) "virtio" vs "vhost", I implemented matching method for this in mdev
+>> series, but it looks unnecessary for vDPA device driver to know about =
+this.
+>> Anyway we can use sysfs driver bind/unbind to switch drivers
+>> 2) virtio device id and vendor id. I'm not sure we need this consider =
+the
+>> two drivers so far (virtio/vhost) are all bus drivers.
+> As we seem to be contemplating some dynamic creation of vdpa devices I
+> think upon creation time it should be specified what mode they should
+> run it and then all driver binding and autoloading should happen
+> automatically. Telling the user to bind/unbind is a very poor
+> experience.
+>
+> Jason
+
+
+Ok, I will add the type (virtio vs vhost) and driver matching method back=
+.
+
+Thanks
 
