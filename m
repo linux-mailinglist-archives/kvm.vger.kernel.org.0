@@ -2,137 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8705F1429F8
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 13:02:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 503441429FB
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 13:03:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726780AbgATMCm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 07:02:42 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21711 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726573AbgATMCl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 07:02:41 -0500
+        id S1726867AbgATMDa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 07:03:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57538 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726798AbgATMDa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jan 2020 07:03:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579521760;
+        s=mimecast20190719; t=1579521809;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=TT6B4ywTP9/B+XzxEnf0uhL7PvAprhmASVoLOJaAr70=;
-        b=Hpmr1+0PJ0nkmUjSS+dJeHcwxSHiW+mD/YNuoNB6joyJi0F8yg70kI/bADQuO3xXttsBlO
-        HgEHKJNOrIrCGRq9euBacB8vcDpUjUW0wufTtDSmt0XVKwxVN98kpRcCyZaj3IUT2+upTL
-        8NPgCjM1HEsuDvXWpn+BuQRXEbSnenk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-iMVzU6PTOzeGAbihTX1T6Q-1; Mon, 20 Jan 2020 07:02:38 -0500
-X-MC-Unique: iMVzU6PTOzeGAbihTX1T6Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 792FF2F2A;
-        Mon, 20 Jan 2020 12:02:37 +0000 (UTC)
-Received: from [10.36.118.34] (unknown [10.36.118.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F45C5C1BB;
-        Mon, 20 Jan 2020 12:02:35 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 1/9] s390x: smp: Cleanup smp.c
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, cohuck@redhat.com
-References: <20200117104640.1983-1-frankja@linux.ibm.com>
- <20200117104640.1983-2-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <7b41b492-efb0-b695-0cd7-4f82bc2db143@redhat.com>
-Date:   Mon, 20 Jan 2020 13:02:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+         in-reply-to:in-reply-to:references:references;
+        bh=i0FYwpPvJVwXX6WibGdKe3t8GmO0Q/BB/ry3XOYj5v4=;
+        b=WJS8HB1MwKu4ra39GjmNVVbOKhp+CQ93svNMvRi49/CEbf5IUm272ey48bxukyq3Uhr0Xj
+        n/IPNUZJpTz1VlbdP6ih2CVzgNoOwnt8/zovVjtWWTfmrCzlCZZBioH3NGrW5RZ/ePK+GX
+        hyb/mTh5QhOhAICGAMD0hLmfaxY4/co=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-377-wh_GBNC2P0SGpx7lEXTgow-1; Mon, 20 Jan 2020 07:03:28 -0500
+X-MC-Unique: wh_GBNC2P0SGpx7lEXTgow-1
+Received: by mail-qt1-f197.google.com with SMTP id d9so21039923qtq.13
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 04:03:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=i0FYwpPvJVwXX6WibGdKe3t8GmO0Q/BB/ry3XOYj5v4=;
+        b=mXH4Xds53Thrh4UvrIdDoVHJQhdRduPcagNj+BCiJrOCbyePPXfKFobn0BLsZ3Ja/Z
+         JpZMtN4ByFylpJ4ur5iwXjAfMzkX5PnoVfFEBHTAir6fhNJcZO+bIEBg8ybHwwpEmDXd
+         yMFaMGUU2FN5uSVu/AYzaB6hifRXSuD1xu+/Su3reToX+cLgr7LhGbo7+Dj/mSuIHno5
+         koEzK4ObaWgXPo67RqlUljdjSaGfvE91VsrBvO4N+ruBARFLZNORLNTH3SGEFYUU7srt
+         Qhh3I2/pp0CjpRR4FKiz1WEA64m891wvnUPPBe73fI1n3VO+aaFrtT+Xw1P7GStPVjMZ
+         guGA==
+X-Gm-Message-State: APjAAAVT2IUHTFibReXFLaFZReJgztge3xgY8PS47jGWapWCghyYZ2HP
+        BopcDqq8VkAJJeDl8eQK+muIR9BzNxT+/wm5Zc04gL4J2gpPJJXssHkW1m/f6IeFnuj1LsxZljZ
+        VDH6vBHO2+BIw
+X-Received: by 2002:ac8:2c7d:: with SMTP id e58mr20372313qta.196.1579521807754;
+        Mon, 20 Jan 2020 04:03:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwBOvpzVbluzRk2PBevjR+yTn5PHKpCN1mkjbfx/S5QQmnZyFB/1WiP+Ct1GD9bo9yvXG9y7A==
+X-Received: by 2002:ac8:2c7d:: with SMTP id e58mr20372288qta.196.1579521807486;
+        Mon, 20 Jan 2020 04:03:27 -0800 (PST)
+Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
+        by smtp.gmail.com with ESMTPSA id h8sm17044762qtm.51.2020.01.20.04.03.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jan 2020 04:03:26 -0800 (PST)
+Date:   Mon, 20 Jan 2020 07:03:20 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     David Miller <davem@davemloft.net>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jhansen@vmware.com,
+        jasowang@redhat.com, kvm@vger.kernel.org, stefanha@redhat.com,
+        virtualization@lists.linux-foundation.org,
+        linux-hyperv@vger.kernel.org, decui@microsoft.com
+Subject: Re: [PATCH net-next 1/3] vsock: add network namespace support
+Message-ID: <20200120060601-mutt-send-email-mst@kernel.org>
+References: <20200116172428.311437-1-sgarzare@redhat.com>
+ <20200116172428.311437-2-sgarzare@redhat.com>
+ <20200120.100610.546818167633238909.davem@davemloft.net>
+ <20200120101735.uyh4o64gb4njakw5@steredhat>
 MIME-Version: 1.0
-In-Reply-To: <20200117104640.1983-2-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200120101735.uyh4o64gb4njakw5@steredhat>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17.01.20 11:46, Janosch Frank wrote:
-> Let's remove a lot of badly formatted code by introducing the
-> wait_for_flag() function.
+On Mon, Jan 20, 2020 at 11:17:35AM +0100, Stefano Garzarella wrote:
+> On Mon, Jan 20, 2020 at 10:06:10AM +0100, David Miller wrote:
+> > From: Stefano Garzarella <sgarzare@redhat.com>
+> > Date: Thu, 16 Jan 2020 18:24:26 +0100
+> > 
+> > > This patch adds 'netns' module param to enable this new feature
+> > > (disabled by default), because it changes vsock's behavior with
+> > > network namespaces and could break existing applications.
+> > 
+> > Sorry, no.
+> > 
+> > I wonder if you can even design a legitimate, reasonable, use case
+> > where these netns changes could break things.
 > 
-> Also let's remove some stray spaces.
+> I forgot to mention the use case.
+> I tried the RFC with Kata containers and we found that Kata shim-v1
+> doesn't work (Kata shim-v2 works as is) because there are the following
+> processes involved:
+> - kata-runtime (runs in the init_netns) opens /dev/vhost-vsock and
+>   passes it to qemu
+> - kata-shim (runs in a container) wants to talk with the guest but the
+>   vsock device is assigned to the init_netns and kata-shim runs in a
+>   different netns, so the communication is not allowed
+> But, as you said, this could be a wrong design, indeed they already
+> found a fix, but I was not sure if others could have the same issue.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  s390x/smp.c | 42 +++++++++++++++++++++++-------------------
->  1 file changed, 23 insertions(+), 19 deletions(-)
+> In this case, do you think it is acceptable to make this change in
+> the vsock's behavior with netns and ask the user to change the design?
+
+David's question is what would be a usecase that's broken
+(as opposed to fixed) by enabling this by default.
+
+If it does exist, you need a way for userspace to opt-in,
+module parameter isn't that.
+
 > 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index ab7e46c..8d8e3a5 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -22,6 +22,13 @@
->  
->  static int testflag = 0;
->  
-> +static void wait_for_flag(void)
-> +{
-> +	while (!testflag) {
-> +		mb();
-> +	}
-
-No need for the {}
-
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
+> > 
+> > I am totally against adding a module parameter for this, it's
+> > incredibly confusing for users and will create a test scenerio
+> > that is strongly less likely to be covered.
+> > 
+> 
+> Got it, I'll remove the module parameter!
+> 
+> Thanks,
+> Stefano
 
