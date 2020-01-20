@@ -2,147 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 43A33143051
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 17:53:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 654701430B2
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 18:17:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729293AbgATQxr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 11:53:47 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60754 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728842AbgATQxr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 11:53:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579539225;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=z9t8MR+UrzdM1k7Ra8u+CTe/uTutPMJ8BLRkLhrkm60=;
-        b=OBtZBg9hYdjFTD+s6OxWM6MAqfOpoPOCK0BoUesD/oF7S62bRoP2Ge1DEnrrP+luosyzeG
-        C+quOX5cEVteTpRrWKUT1Jgz7ISIwwkYdUM6ZVjMTi2AOW2Czb3YeGQnTvf9kKlxYqeo0H
-        PwoY9XuZmL5jDPOXAPhvB962HRpYxso=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-EkgIHiNtPX61sTy2VcZTEg-1; Mon, 20 Jan 2020 11:53:44 -0500
-X-MC-Unique: EkgIHiNtPX61sTy2VcZTEg-1
-Received: by mail-wr1-f70.google.com with SMTP id y7so69722wrm.3
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 08:53:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=z9t8MR+UrzdM1k7Ra8u+CTe/uTutPMJ8BLRkLhrkm60=;
-        b=tYYBrRzIsYEiEHtOl4zBcYmmpmhgmXI4DEwID9cc+3T6XABswiLrWT+N20V8FGGm3I
-         8KT+vmiOi9IqftHj9yFgKpuLiZaFU2RZPZGiKTLa2+7mdl98WWrwvkrypXquztklg7CA
-         k3MdXYtqZyWpUyLE3u5k7KYQUUhLOoq4l8ThJshaAo+E74IeBVwj62MWgvoLoXeVGHyB
-         HVLmJ8MNlOvnrgmiB92d9PmOLKNq7KyjWgvKgA+BYlNB0G7VYeSVpsf0mVZH0GU6Kn2Y
-         9W/FP+uEhw0MMWz/uxlwHBa5+SQCWTmUraXhanbEP7VwGmWlxX2Jm/7e9F44biEtzLMe
-         Nq1g==
-X-Gm-Message-State: APjAAAU+Pag3c92n2DIm0Qte79fve9D3GZnHoIb2xr9xBulYxySgvFCs
-        jlkVWcGIqB4vxuLEFVNQJCQJXXdQBwWZ0XNDyHP/+LCuqMfva/NUm12wMa3IdGWzVVgqSW+yIbA
-        kRd29y3yQ/QfU
-X-Received: by 2002:adf:ea0f:: with SMTP id q15mr440741wrm.324.1579539222680;
-        Mon, 20 Jan 2020 08:53:42 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyNW66fPRfK7FwpLegFkuWKTwV9qDnkpodkOYc0ad9mcsdyNY8eyfpyGVBQ2vBixbwS4shXCg==
-X-Received: by 2002:adf:ea0f:: with SMTP id q15mr440720wrm.324.1579539222372;
-        Mon, 20 Jan 2020 08:53:42 -0800 (PST)
-Received: from steredhat (host84-49-dynamic.31-79-r.retail.telecomitalia.it. [79.31.49.84])
-        by smtp.gmail.com with ESMTPSA id c2sm48389367wrp.46.2020.01.20.08.53.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2020 08:53:41 -0800 (PST)
-Date:   Mon, 20 Jan 2020 17:53:39 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     David Miller <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
-        Jason Wang <jasowang@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>
-Subject: Re: [PATCH net-next 1/3] vsock: add network namespace support
-Message-ID: <CAGxU2F5=DQJ56sH4BUqp_7rvaXSF9bFHp4QkpLApJQK0bmd4MA@mail.gmail.com>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
- <20200116172428.311437-2-sgarzare@redhat.com>
- <20200120.100610.546818167633238909.davem@davemloft.net>
- <20200120101735.uyh4o64gb4njakw5@steredhat>
- <20200120060601-mutt-send-email-mst@kernel.org>
- <CAGxU2F6VH8Eb5UH_9KjN6MONbZEo1D7EHAiocVVus6jW55BJDg@mail.gmail.com>
- <20200120110319-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200120110319-mutt-send-email-mst@kernel.org>
+        id S1726988AbgATRQr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 12:16:47 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:54596 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726642AbgATRQr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jan 2020 12:16:47 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00KHDgJT190805;
+        Mon, 20 Jan 2020 17:16:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=LCQ5bPAGIkg/GqnXK6log4muedwz0XwjY4OpzWodpiw=;
+ b=WxiJPe9ZPQv9qIUoARsSFzPY8yccoA9sc9XkISkEGZkPQ6K+1qdaGkH3rYcKeceNCU6Q
+ dCLzrxANBo7gmTm/hjliEdtoIanls1Qp+62rfDW8d5Pw5/zybtPQe/I3i4IgfCkTeGPU
+ Izt/X0yrnTrQJ7bTydPnS8zvaUsgQOMGLiAyuD0vsqRUet3SLcbl2ktNun6L6bV59KqC
+ LxJuNYeU4oKO8KMNdcUXXuLR5H4GyZFCa8I1IiIvN1h1EpktDW8MMaKt4+eRxfbtNm3E
+ HCcIJ8WuF6XubZQ2Jp32Gn6oZsQtRSCzV4TExF56rKp45aYBh4x0oLUjMpglPCOXSU/z Cw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2xksyq0ks7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Jan 2020 17:16:42 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00KHEFu7023649;
+        Mon, 20 Jan 2020 17:16:41 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2xmc5ky5yh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Jan 2020 17:16:41 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00KHGe7B024006;
+        Mon, 20 Jan 2020 17:16:40 GMT
+Received: from [10.74.126.30] (/10.74.126.30)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 20 Jan 2020 09:16:39 -0800
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [RFC] Revert "kvm: nVMX: Restrict VMX capability MSR changes"
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <30525d58-10de-abb4-8dad-228da766ff82@redhat.com>
+Date:   Mon, 20 Jan 2020 19:16:34 +0200
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <232F8FDD-D53E-4FA4-95A5-8BC06BCB6685@oracle.com>
+References: <20200120151141.227254-1-vkuznets@redhat.com>
+ <30525d58-10de-abb4-8dad-228da766ff82@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9506 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=871
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001200145
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9506 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=932 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001200145
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 20, 2020 at 5:04 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Mon, Jan 20, 2020 at 02:58:01PM +0100, Stefano Garzarella wrote:
-> > On Mon, Jan 20, 2020 at 1:03 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > On Mon, Jan 20, 2020 at 11:17:35AM +0100, Stefano Garzarella wrote:
-> > > > On Mon, Jan 20, 2020 at 10:06:10AM +0100, David Miller wrote:
-> > > > > From: Stefano Garzarella <sgarzare@redhat.com>
-> > > > > Date: Thu, 16 Jan 2020 18:24:26 +0100
-> > > > >
-> > > > > > This patch adds 'netns' module param to enable this new feature
-> > > > > > (disabled by default), because it changes vsock's behavior with
-> > > > > > network namespaces and could break existing applications.
-> > > > >
-> > > > > Sorry, no.
-> > > > >
-> > > > > I wonder if you can even design a legitimate, reasonable, use case
-> > > > > where these netns changes could break things.
-> > > >
-> > > > I forgot to mention the use case.
-> > > > I tried the RFC with Kata containers and we found that Kata shim-v1
-> > > > doesn't work (Kata shim-v2 works as is) because there are the following
-> > > > processes involved:
-> > > > - kata-runtime (runs in the init_netns) opens /dev/vhost-vsock and
-> > > >   passes it to qemu
-> > > > - kata-shim (runs in a container) wants to talk with the guest but the
-> > > >   vsock device is assigned to the init_netns and kata-shim runs in a
-> > > >   different netns, so the communication is not allowed
-> > > > But, as you said, this could be a wrong design, indeed they already
-> > > > found a fix, but I was not sure if others could have the same issue.
-> > > >
-> > > > In this case, do you think it is acceptable to make this change in
-> > > > the vsock's behavior with netns and ask the user to change the design?
-> > >
-> > > David's question is what would be a usecase that's broken
-> > > (as opposed to fixed) by enabling this by default.
-> >
-> > Yes, I got that. Thanks for clarifying.
-> > I just reported a broken example that can be fixed with a different
-> > design (due to the fact that before this series, vsock devices were
-> > accessible to all netns).
-> >
-> > >
-> > > If it does exist, you need a way for userspace to opt-in,
-> > > module parameter isn't that.
-> >
-> > Okay, but I honestly can't find a case that can't be solved.
-> > So I don't know whether to add an option (ioctl, sysfs ?) or wait for
-> > a real case to come up.
-> >
-> > I'll try to see better if there's any particular case where we need
-> > to disable netns in vsock.
-> >
-> > Thanks,
-> > Stefano
->
-> Me neither. so what did you have in mind when you wrote:
-> "could break existing applications"?
 
-I had in mind:
-1. the Kata case. It is fixable (the fix is not merged on kata), but
-   older versions will not work with newer Linux.
 
-2. a single process running on init_netns that wants to communicate with
-   VMs handled by VMMs running in different netns, but this case can be
-   solved opening the /dev/vhost-vsock in the same netns of the process
-   that wants to communicate with the VMs (init_netns in this case), and
-   passig it to the VMM.
+> On 20 Jan 2020, at 17:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+> On 20/01/20 16:11, Vitaly Kuznetsov wrote:
+>> 
+>> RFC. I think the check for vmx->nested.vmxon is legitimate for everything
+>> but restore so removing it (what I do with the revert) is likely a no-go.
+>> I'd like to gather opinions on the proper fix: should we somehow check
+>> that the vCPU is in 'restore' start (has never being run) and make
+>> KVM_SET_MSRS pass or should we actually mandate that KVM_SET_NESTED_STATE
+>> is run after KVM_SET_MSRS by userspace?
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> 
+> I think this should be fixed in QEMU, by doing KVM_SET_MSRS for feature
+> MSRs way earlier.  
 
-These cases can work with vsock+netns, but they require changes because
-I'm modifying the vsock behavior with netns.
+I agree.
+
+> I'll do it since I'm currently working on a patch to
+> add a KVM_SET_MSR for the microcode revision.
+
+Please Cc me.
+
+Thanks,
+-Liran
 
