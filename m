@@ -2,148 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE60F143117
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 18:51:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C255E14311C
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 18:53:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727573AbgATRvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 12:51:00 -0500
-Received: from mail-eopbgr80053.outbound.protection.outlook.com ([40.107.8.53]:19623
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726897AbgATRu7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jan 2020 12:50:59 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y88J61tvUvsYHT+zp0d8awILIoGOslFNjl2LRGrbk1JrQtElU81N3rc/z4v2VHiyz6hmC/cNye4AsxzTP2dKNi3D0ZQru/dxtGlTEP1r6rK78RCGwCH7mCI2dKBjZrgT5HZRAhN6RveI/mlGq5KEsL0jQVEqLsDI2HuH4UqS7pBs5wYh64lChes+YibIYlPkDtClLIzdHntGBoZ/uhqCaX4ItyLKuIGMKqPTcJa1Mk8GUwQv2ZAtor53ln5aqotQHw2dQfukpwhDIAXcuYihWSep7Ke7eEGDeFTZwBjVodK4HFRb+MxdZasDjZ2nVuugHXm7txD2/v2z5y6yDbC8Dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ECTrdlo1fv2Az2UVjPfINeLkgTGxScjZODiR+1ocQhs=;
- b=Zl3SxnyMhzoKCf3zN/QChiVSx7d791ML3geGracbIRM/EbbTkSi7t3TaOCebtQotb3lN9gX04x/pkLlPzXVhJp2mOrmqPOwhQfS+iLz31/S0LDz0ut4SUeIt8CM3OzJOLQ8I9x0t6NZEGHdikey+RIituG3XQrJivPr7xKkpW7JUphWmoWh9/cICUohoY40nkJi+Af6/BEcu0Qoskt+04923wF7eOUhasCqWTLwOtjnr2C1andGVNR1/IHb18qzBb8hiqAyt5PNwQdhb0yf/4cJb6BoWv0n8k/9g88fo9rDwbF/+JXXJpqC4MNBFWcelgpfC8MkmUOArO6QADDxuOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ECTrdlo1fv2Az2UVjPfINeLkgTGxScjZODiR+1ocQhs=;
- b=lam6MJCSd+leIXdfH/K0k8h2LbVUztlkgDEdk7vPTjd8T3gE9+lxgsOkK5nMoVJhk9v8elPkAuyBMNJ6m07tu3V/A6FTJUuM6Ke2VaEw5vF71G3Qbyj4jRVyGKqY4TmVoEBntJpDJnNF3iLbKtKeiGj3B6Jue0Smibrpomye4VY=
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
- VI1PR05MB5741.eurprd05.prod.outlook.com (20.178.122.141) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.20; Mon, 20 Jan 2020 17:50:55 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2644.024; Mon, 20 Jan 2020
- 17:50:55 +0000
-Received: from mlx.ziepe.ca (208.176.44.194) by SN4PR0501CA0116.namprd05.prod.outlook.com (2603:10b6:803:42::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2665.16 via Frontend Transport; Mon, 20 Jan 2020 17:50:55 +0000
-Received: from jgg by jggl.ziepe.ca with local (Exim 4.90_1)    (envelope-from <jgg@mellanox.com>)      id 1itbCM-0001JG-5d; Mon, 20 Jan 2020 13:50:50 -0400
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Jason Wang <jasowang@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "aadam@redhat.com" <aadam@redhat.com>,
-        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>
-Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
-Thread-Topic: [PATCH 3/5] vDPA: introduce vDPA bus
-Thread-Index: AQHVzGqUgTlkW8H4N0+zRVK4Lh0XAKftaJqAgADD3wCAALX/gIAEm9kAgABdJwA=
-Date:   Mon, 20 Jan 2020 17:50:55 +0000
-Message-ID: <20200120175050.GC3891@mellanox.com>
-References: <20200116124231.20253-1-jasowang@redhat.com>
- <20200116124231.20253-4-jasowang@redhat.com>
- <20200116152209.GH20978@mellanox.com>
- <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
- <20200117135435.GU20978@mellanox.com>
- <20200120071406-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200120071406-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN4PR0501CA0116.namprd05.prod.outlook.com
- (2603:10b6:803:42::33) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [208.176.44.194]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: bc36fa4c-0687-44f2-a263-08d79dd14c59
-x-ms-traffictypediagnostic: VI1PR05MB5741:|VI1PR05MB5741:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR05MB57413F64EA4F6545AACC3AD5CF320@VI1PR05MB5741.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 0288CD37D9
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39860400002)(136003)(366004)(376002)(346002)(199004)(189003)(66946007)(2906002)(6916009)(66446008)(64756008)(33656002)(478600001)(66476007)(66556008)(316002)(2616005)(7416002)(4326008)(81156014)(8676002)(81166006)(26005)(5660300002)(1076003)(71200400001)(8936002)(52116002)(9786002)(9746002)(36756003)(86362001)(186003)(54906003)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB5741;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0sY72fP6ctyCUyiXZchkrdpHohJf2eebdSMO14QUlKS528P/QUD467ZPIX0eISDyBG9kxWvr4Qk7QUrv9CwtO6rizI5IyEVNrQf8jMW8jHFZNb/P4f3ZXRQRmStytN5hkx3HS0J0LXHP2uWD5r5q4pOrKSRPqJF0R/YEWZKjb90mglH8I2g60vrzYOL3Wpc7LZplOUdNriox+FQ3Pi9DLSEJ6KE6+sAfSsbQgQ7U5iQbCeV55JvWerJudM48hNxiDj1dMGUIr83NkpcbM3L16HMtpOlnLDnjHapbPJ84/7z1LiLUUs1QXjjF+z6njT4izGmPnhOoTCGAR4jqMkAZEaCnsnAZI/7M+gL/RHmrnOUSE1bRVgM6hm66QpwwpSPJCGsUDFiBek27oAi93vpMEVcHZps8WytGIR0ohTYF3PSqsXhfcFivx7rIWUp7A2ifKrTDlHmFO/4fOwxe03+774SBX0r3jhjFeGLCFc/qMaETXDwpFSXi45UkGvunJ6Cj
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <94C3646DE8533A4083A9EE4FD962ED2C@eurprd05.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S1726991AbgATRx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 12:53:29 -0500
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:32973 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726642AbgATRx3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jan 2020 12:53:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1579542809; x=1611078809;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=kLR56pBeoIQIBwhJEVejIEs3Zg5AXV/xpQO01Xxpq9U=;
+  b=TM0Uw1uiTvtEBSwvPx88ULvbQowT1nKxjBk7ak8WPD6+zIkjWAtrHB//
+   8uyZ0qOrbRG8iKTYcuEwE4XsHNUbxTzsxxwmoAC4TArcJ/PFoxJfsKRge
+   4WlBxeXJEff4dhVkW14zx/2v6rEou8l6meNELiCAgRWVgqe1f6WnBdywO
+   8=;
+IronPort-SDR: etF+2bH1TcpFfv0q4gTrPc7NHaeM1CeeJicDZhaO4/Fsp3nCOT5fJrCcVZkpp1OQZPFjwrPjgk
+ 72sy4I21Qs9w==
+X-IronPort-AV: E=Sophos;i="5.70,342,1574121600"; 
+   d="scan'208";a="19823839"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 20 Jan 2020 17:53:17 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS id A5582A22FE;
+        Mon, 20 Jan 2020 17:53:14 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Mon, 20 Jan 2020 17:53:13 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.161.205) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Mon, 20 Jan 2020 17:53:12 +0000
+Subject: Re: [PATCH 2/2] kvm: Add ioctl for gathering debug counters
+To:     Paolo Bonzini <pbonzini@redhat.com>, <milanpa@amazon.com>,
+        Milan Pandurov <milanpa@amazon.de>, <kvm@vger.kernel.org>
+CC:     <rkrcmar@redhat.com>, <borntraeger@de.ibm.com>
+References: <20200115134303.30668-1-milanpa@amazon.de>
+ <18820df0-273a-9592-5018-c50a85a75205@amazon.de>
+ <8584d6c2-323c-14e2-39c0-21a47a91bbda@amazon.com>
+ <ab84ee05-7e2b-e0cc-6994-fc485012a51a@amazon.de>
+ <668ea6d3-06ae-4586-9818-cdea094419fe@redhat.com>
+From:   Alexander Graf <graf@amazon.de>
+Message-ID: <e77a2477-6010-ae1d-0afd-0c5498ba2117@amazon.de>
+Date:   Mon, 20 Jan 2020 18:53:10 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.3.1
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc36fa4c-0687-44f2-a263-08d79dd14c59
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2020 17:50:55.3991
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ruGe0LtPNv5tp2ujgoY7rn6JGws9N72/MxY08xUWBcAD32eJ6btjMSEZDDYuIoktszlK10aisF12vBWUQP2lfw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5741
+In-Reply-To: <668ea6d3-06ae-4586-9818-cdea094419fe@redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.205]
+X-ClientProxiedBy: EX13D18UWC002.ant.amazon.com (10.43.162.88) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 20, 2020 at 07:17:26AM -0500, Michael S. Tsirkin wrote:
-> On Fri, Jan 17, 2020 at 01:54:42PM +0000, Jason Gunthorpe wrote:
-> > > 1) "virtio" vs "vhost", I implemented matching method for this in mde=
-v
-> > > series, but it looks unnecessary for vDPA device driver to know about=
- this.
-> > > Anyway we can use sysfs driver bind/unbind to switch drivers
-> > > 2) virtio device id and vendor id. I'm not sure we need this consider=
- the
-> > > two drivers so far (virtio/vhost) are all bus drivers.
-> >=20
-> > As we seem to be contemplating some dynamic creation of vdpa devices I
-> > think upon creation time it should be specified what mode they should
-> > run it and then all driver binding and autoloading should happen
-> > automatically. Telling the user to bind/unbind is a very poor
-> > experience.
->=20
-> Maybe but OTOH it's an existing interface. I think we can reasonably
-> start with bind/unbind and then add ability to specify
-> the mode later. bind/unbind come from core so they will be
-> maintained anyway.
+CgpPbiAxOC4wMS4yMCAwMDozOCwgUGFvbG8gQm9uemluaSB3cm90ZToKPiBPbiAxNS8wMS8yMCAx
+NTo1OSwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+IE9uIDE1LjAxLjIwIDE1OjQzLCBtaWxhbnBh
+QGFtYXpvbi5jb20gd3JvdGU6Cj4+Pj4+IExldCdzIGV4cG9zZSBuZXcgaW50ZXJmYWNlIHRvIHVz
+ZXJzcGFjZSBmb3IgZ2FyaGVyaW5nIHRoZXNlCj4+Pj4+IHN0YXRpc3RpY3Mgd2l0aCBvbmUgaW9j
+dGwuCj4+Pj4+Cj4+Pj4+IFVzZXJzcGFjZSBhcHBsaWNhdGlvbiBjYW4gcmVhZCBjb3VudGVyIGRl
+c2NyaXB0aW9uIG9uY2UgdXNpbmcKPj4+Pj4gS1ZNX0dFVF9TVVBQT1JURURfREVCVUdGU19TVEFU
+IGFuZCBwZXJpb2RpY2FsbHkgaW52b2tlIHRoZQo+Pj4+PiBLVk1fR0VUX0RFQlVHRlNfVkFMVUVT
+IHRvIGdldCB2YWx1ZSB1cGRhdGUuCj4+Pj4KPj4+PiBUaGlzIGlzIGFuIGludGVyZmFjZSB0aGF0
+IHJlcXVpcmVzIGEgbG90IG9mIGxvZ2ljIGFuZCBidWZmZXJzIGZyb20KPj4+PiB1c2VyIHNwYWNl
+IHRvIHJldHJpZXZlIGluZGl2aWR1YWwsIGV4cGxpY2l0IGNvdW50ZXJzLiBXaGF0IGlmIEkganVz
+dAo+Pj4+IHdhbnRlZCB0byBtb25pdG9yIHRoZSBudW1iZXIgb2YgZXhpdHMgb24gZXZlcnkgdXNl
+ciBzcGFjZSBleGl0Pwo+Pj4KPj4+IEluIGNhc2Ugd2Ugd2FudCB0byBjb3ZlciBzdWNoIGxhdGVu
+Y3kgc2Vuc2l0aXZlIHVzZSBjYXNlcyBzb2x1dGlvbiBiKSwKPj4+IHdpdGggbW1hcCdlZCBzdHJ1
+Y3RzIHlvdSBzdWdnZXN0ZWQsIHdvdWxkIGJlIGEgd2F5IHRvIGdvLCBJTU8uCj4+Pgo+Pj4+IEFs
+c28sIHdlJ3JlIHN1ZGRlbmx5IG1ha2luZyB0aGUgZGVidWdmcyBuYW1lcyBhIGZ1bGwgQUJJLCBi
+ZWNhdXNlCj4+Pj4gdGhyb3VnaCB0aGlzIGludGVyZmFjZSB3ZSBvbmx5IGlkZW50aWZ5IHRoZSBp
+bmRpdmlkdWFsIHN0YXRzIHRocm91Z2gKPj4+PiB0aGVpciBuYW1lcy4gVGhhdCBtZWFucyB3ZSBj
+YW4gbm90IHJlbW92ZSBzdGF0cyBvciBjaGFuZ2UgdGhlaXIKPj4+PiBuYW1lcywgYmVjYXVzZSBw
+ZW9wbGUgbWF5IHJlbHkgb24gdGhlbSwgbm8/IFRoaW5pbmcgYWJvdXQgdGhpcyBhZ2FpbiwKPj4+
+PiBtYXliZSB0aGV5IGFscmVhZHkgYXJlIGFuIEFCSSBiZWNhdXNlIHBlb3BsZSByZWx5IG9uIHRo
+ZW0gaW4gZGVidWdmcwo+Pj4+IHRob3VnaD8KPiAKPiBJbiB0aGVvcnkgbm90LCBpbiBwcmFjdGlj
+ZSBJIGhhdmUgdHJlYXRlZCB0aGVtIGFzIGEga2luZCBvZiAic29mdCIgQUJJOgo+IGlmIHRoZSBt
+ZWFuaW5nIGNoYW5nZXMgeW91IHNob3VsZCByZW5hbWUgdGhlbSwgYW5kIHJlbW92aW5nIHRoZW0g
+aXMKPiBmaW5lLCBidXQgeW91IHNob3VsZG4ndCBmb3IgZXhhbXBsZSBjaGFuZ2UgdGhlIHVuaXQg
+b2YgbWVhc3VyZSAod2hpY2ggaXMKPiBub3QgaGFyZCBzaW5jZSB0aGV5IGFyZSBhbGwgY291bnRl
+cnMgOikgYnV0IHBlcmhhcHMgeW91IGNvdWxkIGhhdmUKPiBuYW5vc2Vjb25kcyB2cyBUU0MgY3lj
+bGVzIGluIHRoZSBmdXR1cmUgZm9yIHNvbWUgY291bnRlcnMpLgo+IAo+Pj4+IEkgc2VlIHR3byBh
+bHRlcm5hdGl2ZXMgdG8gdGhpcyBhcHByb2FjaCBoZXJlOgo+Pj4+Cj4+Pj4gYSkgT05FX1JFRwo+
+Pj4+Cj4+Pj4gV2UgY2FuIGp1c3QgYWRkIGEgbmV3IERFQlVHIGFyY2ggaW4gT05FX1JFRyBhbmQg
+ZXhwb3NlIE9ORV9SRUcgcGVyIFZNCj4+Pj4gYXMgd2VsbCAoaWYgd2UgcmVhbGx5IGhhdmUgdG8/
+KS4gVGhhdCBnaXZlcyB1cyBleHBsaWNpdCBpZGVudGlmaWVycwo+Pj4+IGZvciBlYWNoIHN0YXQg
+d2l0aCBhbiBleHBsaWNpdCBwYXRoIHRvIGludHJvZHVjZSBuZXcgb25lcyB3aXRoIHZlcnkKPj4+
+PiB1bmlxdWUgaWRlbnRpZmllcnMuCj4gT05FX1JFRyB3b3VsZCBmb3JjZSB1cyB0byBkZWZpbmUg
+Y29uc3RhbnRzIGZvciBlYWNoIGNvdW50ZXIsIGFuZCB3b3VsZAo+IG1ha2UgaXQgaGFyZCB0byBy
+ZXRpcmUgdGhlbS4gIEkgZG9uJ3QgbGlrZSB0aGlzLgoKV2h5IGRvZXMgaXQgbWFrZSBpdCBoYXJk
+IHRvIHJldGlyZSB0aGVtPyBXZSB3b3VsZCBqdXN0IHJldHVybiAtRUlOVkFMIG9uIApyZXRyaWV2
+YWwsIGxpa2Ugd2UgZG8gZm9yIGFueSBvdGhlciBub24tc3VwcG9ydGVkIE9ORV9SRUcuCgpJdCdz
+IHRoZSBzYW1lIGFzIGEgZmlsZSBub3QgZXhpc3RpbmcgaW4gZGVidWdmcy9zdGF0ZnMuIE9yIGFu
+IGVudHJ5IGluIAp0aGUgYXJyYXkgb2YgdGhpcyBwYXRjaCB0byBkaXNhcHBlYXIuCgo+IAo+Pj4+
+IGIpIHBhcnQgb2YgdGhlIG1tYXAnZWQgdmNwdSBzdHJ1Y3QKPiAKPiBTYW1lIGhlcmUuICBFdmVu
+IGlmIHdlIHNheSB0aGUgc2VtYW50aWNzIG9mIHRoZSBzdHJ1Y3Qgd291bGQgYmUgZXhwb3NlZAo+
+IHRvIHVzZXJzcGFjZSB2aWEgS1ZNX0dFVF9TVVBQT1JURURfREVCVUdGU19TVEFULCBzb21lb25l
+IG1pZ2h0IGVuZCB1cAo+IGdldHRpbmcgdGhpcyB3cm9uZyBhbmQgZXhwZWN0aW5nIGEgcGFydGlj
+dWxhciBsYXlvdXQuICBNaWxhbidzIHByb3Bvc2VkCj4gQVBJIGhhcyB0aGUgYmlnIGFkdmFudGFn
+ZSBvZiBiZWluZyBoYXJkIHRvIGdldCB3cm9uZyBmb3IgdXNlcnNwYWNlLiAgQW5kCj4gcHVzaGlu
+ZyB0aGUgYWdncmVnYXRpb24gdG8gdXNlcnNwYWNlIGlzIG5vdCBhIGh1Z2UgY2hvcmUsIGJ1dCBp
+dCdzIHN0aWxsCj4gYSBjaG9yZS4KPiAKPiBTbyB1bmxlc3Mgc29tZW9uZSBoYXMgYSB1c2VjYXNl
+IGZvciBsYXRlbmN5LXNlbnNpdGl2ZSBtb25pdG9yaW5nIEknZAo+IHByZWZlciB0byBrZWVwIGl0
+IHNpbXBsZSAodXN1YWxseSB0aGVzZSBraW5kIG9mIHN0YXRzIGNhbiBldmVuIG1ha2UKPiBzZW5z
+ZSBpZiB5b3UgZ2F0aGVyIHRoZW0gb3ZlciByZWxhdGl2ZWx5IGxhcmdlIHBlcmlvZCBvZiB0aW1l
+LCBiZWNhdXNlCj4gdGhlbiB5b3UnbGwgcHJvYmFibHkgdXNlIHNvbWV0aGluZyBlbHNlIGxpa2Ug
+dHJhY2Vwb2ludHMgdG8gYWN0dWFsbHkKPiBwaW5wb2ludCB3aGF0J3MgZ29pbmcgb24pLgoKSSB0
+ZW5kIHRvIGFncmVlLiBGZXRjaGluZyB0aGVtIHZpYSBhbiBleHBsaWNpdCBjYWxsIGludG8gdGhl
+IGtlcm5lbCBpcyAKZGVmaW5pdGVseSB0aGUgc2FmZXIgcm91dGUuCgo+IAo+Pj4+IDIpIHZjcHUg
+Y291bnRlcnMKPj4+Pgo+Pj4+IE1vc3Qgb2YgdGhlIGNvdW50ZXJzIGNvdW50IG9uIHZjcHUgZ3Jh
+bnVsYXJpdHksIGJ1dCBkZWJ1Z2ZzIG9ubHkKPj4+PiBnaXZlcyB1cyBhIGZ1bGwgVk0gdmlldy4g
+V2hhdGV2ZXIgd2UgZG8gdG8gaW1wcm92ZSB0aGUgc2l0dWF0aW9uLCB3ZQo+Pj4+IHNob3VsZCBk
+ZWZpbml0ZWx5IHRyeSB0byBidWlsZCBzb21ldGhpbmcgdGhhdCBhbGxvd3MgdXMgdG8gZ2V0IHRo
+ZQo+Pj4+IGNvdW50ZXJzIHBlciB2Y3B1IChhcyB3ZWxsKS4KPj4+Pgo+Pj4+IFRoZSBtYWluIHB1
+cnBvc2Ugb2YgdGhlc2UgY291bnRlcnMgaXMgbW9uaXRvcmluZy4gSXQgY2FuIGJlIHF1aXRlCj4+
+Pj4gaW1wb3J0YW50IHRvIGtub3cgdGhhdCBvbmx5IGEgc2luZ2xlIHZDUFUgaXMgZ29pbmcgd2ls
+ZCwgY29tcGFyZWQgdG8KPj4+PiBhbGwgb2YgdGhlbSBmb3IgZXhhbXBsZS4KPj4+Cj4+PiBJIGFn
+cmVlLCBleHBvc2luZyBwZXIgdmNwdSBjb3VudGVycyBjYW4gYmUgdXNlZnVsLiBJIGd1ZXNzIGl0
+IGRpZG4ndAo+Pj4gbWFrZSBtdWNoIHNlbnNlIGV4cG9zaW5nIHRoZW0gdGhyb3VnaCBkZWJ1Z2Zz
+IHNvIGFnZ3JlZ2F0aW9uIHdhcyBkb25lCj4+PiBpbiBrZXJuZWwuIEhvd2V2ZXIgaWYgd2UgY2hv
+c2UgdG8gZ28gd2l0aCBhcHByb2FjaCAxLWIpIG1tYXAgY291bnRlcnMKPj4+IHN0cnVjdCBpbiB1
+c2Vyc3BhY2UsIHdlIGNvdWxkIGRvIHRoaXMuCj4+Cj4+IFRoZSByZWFzb24gSSBkaXNsaWtlIHRo
+ZSBkZWJ1Z2ZzL3N0YXRmcyBhcHByb2FjaCBpcyB0aGF0IGl0IGdlbmVyYXRlcyBhCj4+IGNvbXBs
+ZXRlbHkgc2VwYXJhdGUgcGVybWlzc2lvbiBhbmQgYWNjZXNzIHBhdGhzIHRvIHRoZSBzdGF0cy4g
+VGhhdCdzCj4+IGdyZWF0IGZvciBmdWxsIHN5c3RlbSBtb25pdG9yaW5nLCBidXQgcmVhbGx5IGJh
+ZCB3aGVuIHlvdSBoYXZlIG11bHRpcGxlCj4+IGluZGl2aWR1YWwgdGVuYW50cyBvbiBhIHNpbmds
+ZSBob3N0Lgo+IAo+IEkgYWdyZWUsIGFueXRoaW5nIGluIHN5c2ZzIGlzIGNvbXBsZW1lbnRhcnkg
+dG8gdm1mZC92Y3B1ZmQgYWNjZXNzLgoKQ29vbCA6KS4KClNvIHdlIG9ubHkgbmVlZCB0byBhZ3Jl
+ZSBvbiBPTkVfUkVHIHZzLiB0aGlzIHBhdGNoIG1vc3RseT8KCgpBbGV4CgoKCkFtYXpvbiBEZXZl
+bG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpH
+ZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVp
+bmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMg
+QgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
 
-Existing where? For vfio? vfio is the only thing I am aware doing
-that, and this is not vfio..
-
-Jason
