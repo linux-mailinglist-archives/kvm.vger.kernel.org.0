@@ -2,44 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BD006142A0D
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 13:07:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24929142A12
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 13:08:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727026AbgATMHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 07:07:17 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46370 "EHLO
+        id S1727049AbgATMIJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 07:08:09 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32764 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726860AbgATMHR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 07:07:17 -0500
+        by vger.kernel.org with ESMTP id S1726573AbgATMIJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 07:08:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579522036;
+        s=mimecast20190719; t=1579522088;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=H0zyAdUpLDhBcJ07apUG7QRvustGtdZT7LclWP0MJA8=;
-        b=M9HepcGX0Zd+VNewRPK0OMklCFFWlBfZiPUb0BPhq9t1epjiJEfhWAOe7PHCzkN9AZUjdJ
-        36728PHPs6xjUuo1z1qgEQaKnx6pOrlbZOdg0vFD60NF+0maiyXWcpHohjmoHMh8dgx57y
-        77OmQoPyn3h10KGuohSoAQMw4AU8Htg=
+        bh=zAm/vzvQtJp5hQ6HzX9EcwVQYJSncZU7qOkaoy15jF8=;
+        b=Zimgv4FydXkZrnJa7M11J/llHIjtpG/909g65/CcSL/HqlRZDZHascmiQh8uip1N1M6Tlv
+        8TRBwKaWCX8kZIt9gNW88TEK/yRFWYNIK8wg5VANybMka8ntShaUqjrQXz1yCvs5thK8rD
+        FcSnPrpgxDUa87YPY+3BmR/FnAwoEn0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-bI6p-dAxPwKGEPBZL8hxnw-1; Mon, 20 Jan 2020 07:07:12 -0500
-X-MC-Unique: bI6p-dAxPwKGEPBZL8hxnw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-269-CSdlhBZBP7OtkmYG29MHrQ-1; Mon, 20 Jan 2020 07:08:04 -0500
+X-MC-Unique: CSdlhBZBP7OtkmYG29MHrQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2044C800D5E;
-        Mon, 20 Jan 2020 12:07:11 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C1CEA899D1;
+        Mon, 20 Jan 2020 12:08:03 +0000 (UTC)
 Received: from [10.36.118.34] (unknown [10.36.118.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA13885787;
-        Mon, 20 Jan 2020 12:07:09 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 5/9] s390x: smp: Wait for cpu setup to
- finish
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, cohuck@redhat.com
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 33F828644A;
+        Mon, 20 Jan 2020 12:07:59 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 6/9] s390x: smp: Loop if secondary cpu
+ returns into cpu setup again
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org
 References: <20200117104640.1983-1-frankja@linux.ibm.com>
- <20200117104640.1983-6-frankja@linux.ibm.com>
+ <20200117104640.1983-7-frankja@linux.ibm.com>
+ <20200120122743.68170875.cohuck@redhat.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -85,50 +87,53 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <5943555a-7f77-06f5-bf0d-b0fd246eb5c6@redhat.com>
-Date:   Mon, 20 Jan 2020 13:07:08 +0100
+Message-ID: <5d915473-f36e-0310-11a5-69eae79649a7@redhat.com>
+Date:   Mon, 20 Jan 2020 13:07:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200117104640.1983-6-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200120122743.68170875.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17.01.20 11:46, Janosch Frank wrote:
-> We store the user provided psw address into restart new, so a psw
-> restart does not lead us through setup again.
+On 20.01.20 12:27, Cornelia Huck wrote:
+> On Fri, 17 Jan 2020 05:46:37 -0500
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 > 
-> Also we wait on smp_cpu_setup() until the cpu has finished setup
-> before returning. This is necessary for z/VM and LPAR where sigp is
-> asynchronous.
+>> Up to now a secondary cpu could have returned from the function it was
+>> executing and ending up somewhere in cstart64.S. This was mostly
+>> circumvented by an endless loop in the function that it executed.
+>>
+>> Let's add a loop to the end of the cpu setup, so we don't have to rely
+>> on added loops in the tests.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  s390x/cstart64.S | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+>> index 9af6bb3..5fd8d2f 100644
+>> --- a/s390x/cstart64.S
+>> +++ b/s390x/cstart64.S
+>> @@ -162,6 +162,8 @@ smp_cpu_setup_state:
+>>  	/* We should only go once through cpu setup and not for every restart */
+>>  	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
+>>  	br	%r14
+>> +	/* If the function returns, just loop here */
+>> +0:	j	0
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
->  lib/s390x/smp.c  | 2 ++
->  s390x/cstart64.S | 2 ++
->  2 files changed, 4 insertions(+)
-> 
-> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> index 84e681d..9dad146 100644
-> --- a/lib/s390x/smp.c
-> +++ b/lib/s390x/smp.c
-> @@ -204,6 +204,8 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
->  
->  	/* Start processing */
->  	smp_cpu_restart_nolock(addr, NULL);
-> +	/* Wait until the cpu has finished setup and started the provided psw */
-> +	while (lc->restart_new_psw.addr != psw.addr) { mb(); }
+> Would it make sense to e.g. load a disabled wait psw instead? Or does
+> that mess things up elsewhere?
 
-while (lc->restart_new_psw.addr != psw.addr)
-	mb();
-
+I think we can keep it like that for now (simpler than loading a PSW).
+Overall, I don't care about burning CPU cycles here :)
 
 
 -- 
