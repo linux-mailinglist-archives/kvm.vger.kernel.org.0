@@ -2,146 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F1E1142F58
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 17:11:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E3A6142F71
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 17:20:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729112AbgATQLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 11:11:36 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55650 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726642AbgATQLg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 11:11:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579536695;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bl+1iGldLlL9HIjXDtMvMtEhk3VAYwXfuuCijWXWUGw=;
-        b=dPwkD8VfUg7BO2l44IAt+PC6GzdHQZj+pTmnDQoGPkojGkh7EuLlMd6cI8ng387tCO+fEd
-        jcmAINWOsekB7S947EaypKfcnpaaSbL7IvoXdl36+biONUxITlQh9Kw6bs6qsQIP2dsgJB
-        rdvL8fTtbyFr3I/l5r6PqLAA4CmpxSI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-nm9F78hLPPGSvmyDfycHbg-1; Mon, 20 Jan 2020 11:11:31 -0500
-X-MC-Unique: nm9F78hLPPGSvmyDfycHbg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96861477;
-        Mon, 20 Jan 2020 16:11:30 +0000 (UTC)
-Received: from gondolin (ovpn-205-161.brq.redhat.com [10.40.205.161])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 311B65C299;
-        Mon, 20 Jan 2020 16:11:25 +0000 (UTC)
-Date:   Mon, 20 Jan 2020 17:11:13 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, david@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 7/9] s390x: smp: Remove unneeded cpu
- loops
-Message-ID: <20200120171113.02a9b807.cohuck@redhat.com>
-In-Reply-To: <97f7f794-e0be-3984-99b2-ba229212fd3e@linux.ibm.com>
-References: <20200117104640.1983-1-frankja@linux.ibm.com>
-        <20200117104640.1983-8-frankja@linux.ibm.com>
-        <20200120122956.6879d159.cohuck@redhat.com>
-        <97f7f794-e0be-3984-99b2-ba229212fd3e@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1727289AbgATQU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 11:20:27 -0500
+Received: from foss.arm.com ([217.140.110.172]:34192 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726885AbgATQU1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jan 2020 11:20:27 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EF6831B;
+        Mon, 20 Jan 2020 08:20:26 -0800 (PST)
+Received: from [10.1.194.52] (e112269-lin.cambridge.arm.com [10.1.194.52])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 25ECF3F6C4;
+        Mon, 20 Jan 2020 08:20:24 -0800 (PST)
+Subject: Re: [PATCH v3 1/8] KVM: arm64: Document PV-lock interface
+To:     Zengruan Ye <yezengruan@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Cc:     maz@kernel.org, james.morse@arm.com, linux@armlinux.org.uk,
+        suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
+        catalin.marinas@arm.com, mark.rutland@arm.com, will@kernel.org,
+        daniel.lezcano@linaro.org, wanghaibin.wang@huawei.com,
+        peterz@infradead.org, longman@redhat.com
+References: <20200116124626.1155-1-yezengruan@huawei.com>
+ <20200116124626.1155-2-yezengruan@huawei.com>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <35fea56c-b501-2163-2c95-62f918738167@arm.com>
+Date:   Mon, 20 Jan 2020 16:20:22 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/lQlNoXBwsVuSB1_YPmt0e/f";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <20200116124626.1155-2-yezengruan@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/lQlNoXBwsVuSB1_YPmt0e/f
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Zengruan,
 
-On Mon, 20 Jan 2020 15:41:52 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Given Marc and Will's thread[1] about a possible alternative way of
+handling this I won't do a thorough review as this might not be the best
+way of handling the underlying problem, but there's some comments below
+for you to consider.
 
-> On 1/20/20 12:29 PM, Cornelia Huck wrote:
-> > On Fri, 17 Jan 2020 05:46:38 -0500
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >  =20
-> >> Now that we have a loop which is executed after we return from the
-> >> main function of a secondary cpu, we can remove the surplus loops.
-> >>
-> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >> ---
-> >>  s390x/smp.c | 8 +-------
-> >>  1 file changed, 1 insertion(+), 7 deletions(-)
-> >>
-> >> diff --git a/s390x/smp.c b/s390x/smp.c
-> >> index 555ed72..c12a3db 100644
-> >> --- a/s390x/smp.c
-> >> +++ b/s390x/smp.c
-> >> @@ -29,15 +29,9 @@ static void wait_for_flag(void)
-> >>  =09}
-> >>  }
-> >> =20
-> >> -static void cpu_loop(void)
-> >> -{
-> >> -=09for (;;) {}
-> >> -}
-> >> -
-> >>  static void test_func(void)
-> >>  {
-> >>  =09testflag =3D 1;
-> >> -=09cpu_loop();
-> >>  }
-> >> =20
-> >>  static void test_start(void)
-> >> @@ -234,7 +228,7 @@ int main(void)
-> >> =20
-> >>  =09/* Setting up the cpu to give it a stack and lowcore */
-> >>  =09psw.mask =3D extract_psw_mask();
-> >> -=09psw.addr =3D (unsigned long)cpu_loop;
-> >> +=09psw.addr =3D (unsigned long)test_func; =20
-> >=20
-> > Before, you did not set testflag here... intended change? =20
->=20
-> Yes
-> It is set to 0 before the first test, so it shouldn't matter.
+[1] http://lkml.kernel.org/r/b1d23a82d6a7caa79a99597fb83472be%40kernel.org
 
-Hm... I got a bit lost in all those changes, so I checked your branch
-on github, and I don't see it being set to 0 before test_start() is
-called?
+On 16/01/2020 12:46, Zengruan Ye wrote:
+> Introduce a paravirtualization interface for KVM/arm64 to obtain the vCPU
+> that is currently running or not.
+> 
+> The PV lock structure of the guest is allocated by user space.
+> 
+> A hypercall interface is provided for the guest to interrogate the
+> hypervisor's support for this interface and the location of the shared
+> memory structures.
+> 
+> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
+> ---
+>  Documentation/virt/kvm/arm/pvlock.rst   | 68 +++++++++++++++++++++++++
+>  Documentation/virt/kvm/devices/vcpu.txt | 14 +++++
+>  2 files changed, 82 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
+> 
+> diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
+> new file mode 100644
+> index 000000000000..11776273c0a4
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/arm/pvlock.rst
+> @@ -0,0 +1,68 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +Paravirtualized lock support for arm64
+> +======================================
+> +
+> +KVM/arm64 provides some hypervisor service calls to support a paravirtualized
+> +guest obtaining whether the vCPU is currently running or not.
+> +
+> +Two new SMCCC compatible hypercalls are defined:
 
->=20
-> >  =20
-> >>  =09smp_cpu_setup(1, psw);
-> >>  =09smp_cpu_stop(1);
-> >>   =20
-> >  =20
->=20
->=20
+NIT: As defined this is now only a single (multiplexed) hypercall.
 
+> +* ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID:  0x86000001
 
---Sig_/lQlNoXBwsVuSB1_YPmt0e/f
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+You appear to have changed the SMC32/SMC64 bit on the ID, so this is now
+a 32-bit SMC, but the calling convention below (returning an int64)
+seems to rely on the guest being 64-bit. Any reason for this change?
+Given the implementation doesn't accept 32-bit clients and the calling
+convention requires returning a 64-bit value for 64-bit guests this
+seems wrong to me.
 
------BEGIN PGP SIGNATURE-----
+> +  - KVM_PV_LOCK_FEATURES   0
+> +  - KVM_PV_LOCK_PREEMPTED  1
+> +
+> +The existence of the PV_LOCK hypercall should be probed using the SMCCC 1.1
+> +ARCH_FEATURES mechanism and the hypervisor should be KVM before calling it.
+> +
+> +KVM_PV_LOCK_FEATURES
+> +    ============= ========    ==========
+> +    Function ID:  (uint32)    0x86000001
+> +    PV_call_id:   (uint32)    0
+> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+> +                              PV-lock feature is supported by the hypervisor.
+> +    ============= ========    ==========
 
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl4l0SEACgkQ3s9rk8bw
-L6/7/g/7BaNIie/wuhSrCVnh3mvFbOnUGyG8MdBp3hh5/dRo6LLKPvSn78lmhXXA
-B62uO4hUtS3hmBbchQ8XDNB1/XOlc020Hl3EufE4AmG7kdmWGZQi27I2jtv67o6y
-uqW7Uy544g1lhU/q+UaXwi+/dMMzcQ4svEuvriMX0A7n3WFrU+t/K5YonhBXJsio
-4sK1fWJce6V9TU5VvoES4ESkwyROIL+qMVOj/UIMJOh8+SR9Xo4v+h1F5AiFwKI4
-GKZlYYgL2K0MdPX61k3M3SN3vzJNdQQrSHmxVn+9vGMxs7be7R1c/6LmlMfnKMVr
-WGutFp32s4nEN0c5iWTH6SnyHn+j+IM6VhTpwRUgvVNZ8khIklMfB4AwG/3q3JYr
-xF1N56dg3ryorsu7OUXC1OfAKwO7NpGfh/L+wAkeLbq/s4OVjTOIk+N5E26yg5vj
-rmtl53GbSj0WpI0klTWmfAHrJyHCGMDhn3WK/ke9GbbRpdT21UcHsBZnZrq9r0+U
-ekFBJw1yCLvu0Hu7gHlKxutda+TG0fWuDB8ZRYKyYv93pLRkjz32O9NsbWzZr6hR
-icZp+tydoF3fy+wdi2H6nd5iC8EuWQ5PVkSCP56AYMqgQuJuQKO5nDaw+bCsWR52
-CFndzm2r5oNueFIJaf8ovbPZlYjJmxlAQJzLXwq6W5RnsqKirvM=
-=a9Us
------END PGP SIGNATURE-----
+Because you are now multiplexing the two functions you've lost the
+parameter which previously was for "The function to query for support".
+Which makes this _FEATURES operation fairly pointless (you might as well
+just call KVM_PV_LOCK_PREEMPTED and handle the NOT_SUPPORTED error return).
 
---Sig_/lQlNoXBwsVuSB1_YPmt0e/f--
+Steve
+
+> +
+> +KVM_PV_LOCK_PREEMPTED
+> +    ============= ========    ==========
+> +    Function ID:  (uint32)    0x86000001
+> +    PV_call_id:   (uint32)    1
+> +    Return value: (int64)     IPA of the PV-lock data structure for this vCPU.
+> +                              On failure:
+> +                              NOT_SUPPORTED (-1)
+> +    ============= ========    ==========
+> +
+> +The IPA returned by KVM_PV_LOCK_PREEMPTED should be mapped by the guest as
+> +normal memory with inner and outer write back caching attributes, in the inner
+> +shareable domain.
+> +
+> +KVM_PV_LOCK_PREEMPTED returns the structure for the calling vCPU.
+> +
+> +PV lock state
+> +-------------
+> +
+> +The structure pointed to by the KVM_PV_LOCK_PREEMPTED hypercall is as follows:
+> +
+> ++-----------+-------------+-------------+-----------------------------------+
+> +| Field     | Byte Length | Byte Offset | Description                       |
+> ++===========+=============+=============+===================================+
+> +| preempted |      8      |      0      | Indicates that the vCPU that owns |
+> +|           |             |             | this struct is running or not.    |
+> +|           |             |             | Non-zero values mean the vCPU has |
+> +|           |             |             | been preempted. Zero means the    |
+> +|           |             |             | vCPU is not preempted.            |
+> ++-----------+-------------+-------------+-----------------------------------+
+> +
+> +The preempted field will be updated to 1 by the hypervisor prior to scheduling
+> +a vCPU. When the vCPU is scheduled out, the preempted field will be updated
+> +to 0 by the hypervisor.
+> +
+> +The structure will be present within a reserved region of the normal memory
+> +given to the guest. The guest should not attempt to write into this memory.
+> +There is a structure per vCPU of the guest.
+> +
+> +It is advisable that one or more 64k pages are set aside for the purpose of
+> +these structures and not used for other purposes, this enables the guest to map
+> +the region using 64k pages and avoids conflicting attributes with other memory.
+> +
+> +For the user space interface see Documentation/virt/kvm/devices/vcpu.txt
+> +section "4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL".
+> diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
+> index 6f3bd64a05b0..2c68d9a0f644 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.txt
+> +++ b/Documentation/virt/kvm/devices/vcpu.txt
+> @@ -74,3 +74,17 @@ Specifies the base address of the stolen time structure for this VCPU. The
+>  base address must be 64 byte aligned and exist within a valid guest memory
+>  region. See Documentation/virt/kvm/arm/pvtime.txt for more information
+>  including the layout of the stolen time structure.
+> +
+> +4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL
+> +Architectures: ARM64
+> +
+> +4.1 ATTRIBUTE: KVM_ARM_VCPU_PVLOCK_IPA
+> +Parameters: 64-bit base address
+> +Returns: -ENXIO:  PV lock not implemented
+> +         -EEXIST: Base address already set for this vCPU
+> +         -EINVAL: Base address not 64 byte aligned
+> +
+> +Specifies the base address of the PV lock structure for this vCPU. The
+> +base address must be 64 byte aligned and exist within a valid guest memory
+> +region. See Documentation/virt/kvm/arm/pvlock.rst for more information
+> +including the layout of the pv lock structure.
+> 
 
