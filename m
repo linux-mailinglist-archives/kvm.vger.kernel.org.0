@@ -2,123 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DA6B142A1B
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 13:09:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 63BBE142A25
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 13:10:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726890AbgATMJU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 07:09:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53041 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726650AbgATMJU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jan 2020 07:09:20 -0500
+        id S1727422AbgATMKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 07:10:18 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38842 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727011AbgATMKQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 07:10:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579522159;
+        s=mimecast20190719; t=1579522215;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ils+V+DNAQCUc++KUaM/zwaIHOd66hKtcZoyoJKDxck=;
-        b=GCe3QNDJRURITeOgI1NabtNtvMz8orHIofX34AArN+lgV3sWaxgxt4DTnAGyrPh1aADYjn
-        aawpz8iNZ07iMoXGnsXdxVu35gmunh540+gt1ivhRoo22UplJHXZeu7IW0I8TeBFMZlHjo
-        WgSfsE2wUSPtq5/aaveLvPZg/oHbkfQ=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-PFJD11nJPhect7L26oyk6Q-1; Mon, 20 Jan 2020 07:09:18 -0500
-X-MC-Unique: PFJD11nJPhect7L26oyk6Q-1
-Received: by mail-qk1-f198.google.com with SMTP id i135so20264011qke.14
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 04:09:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=ils+V+DNAQCUc++KUaM/zwaIHOd66hKtcZoyoJKDxck=;
-        b=FsZTMaxmGljX/2bFfhc6zDldPC3lUJ60YxUSVOOwJsRPZuzH4DPx1QUVX69rfvXcv4
-         gq3Cvq/Xp2tEztxlwFQjcRUkOnJA0nCcQtISPfi2GDA6x3mSshK1+BPzfPB3FYHCrxXs
-         1W/Nv4IRjdS9jNa69ajmAbQcYI6XnPyLqPweRc/ld/qfe8MtVMjzC/gL/qbEgFWVxEJE
-         SVUDROesWHmn1CfuogJG1oFzw1pb6lde2fE1VKpuAN611B+b89iKmT7/9TMDqC1u0l2P
-         KJvPVy/p9jTeyFQmo7uIHnsi4oS4OGK8rn3gcX0GWSI9prMe1MHn+z03ALJsuALzVEHy
-         kW2Q==
-X-Gm-Message-State: APjAAAWI3rAUzytX5zxbt2t3yq/C7abZYJhGanNWSPKNEyukD0G0DVfT
-        dfL7f7nGAGNmD/geGoRp/QY4zCgthnsmXnQkMBDFmYTdsKgbKvRk3w+JzH0ijGSLeYH2R2Zck++
-        Zow/lDQstwxLQ
-X-Received: by 2002:ac8:747:: with SMTP id k7mr20536097qth.120.1579522157153;
-        Mon, 20 Jan 2020 04:09:17 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyPRlGSUNQNiKSICSXdcPuLibX0Cl/JMb+oCpOV4CRtRfGtUmRXGfQQVE1MHMBhude5c31BGg==
-X-Received: by 2002:ac8:747:: with SMTP id k7mr20536064qth.120.1579522156954;
-        Mon, 20 Jan 2020 04:09:16 -0800 (PST)
-Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
-        by smtp.gmail.com with ESMTPSA id t2sm15467285qkc.31.2020.01.20.04.09.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2020 04:09:15 -0800 (PST)
-Date:   Mon, 20 Jan 2020 07:09:07 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Shahaf Shuler <shahafs@mellanox.com>,
-        Rob Miller <rob.miller@broadcom.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Netdev <netdev@vger.kernel.org>,
-        "Bie, Tiwei" <tiwei.bie@intel.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "Liang, Cunming" <cunming.liang@intel.com>,
-        "Wang, Zhihong" <zhihong.wang@intel.com>,
-        "Wang, Xiao W" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Ariel Adam <aadam@redhat.com>,
-        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>
-Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
-Message-ID: <20200120070710-mutt-send-email-mst@kernel.org>
-References: <20200116124231.20253-1-jasowang@redhat.com>
- <20200116124231.20253-4-jasowang@redhat.com>
- <20200117070324-mutt-send-email-mst@kernel.org>
- <239b042c-2d9e-0eec-a1ef-b03b7e2c5419@redhat.com>
- <CAJPjb1+fG9L3=iKbV4Vn13VwaeDZZdcfBPvarogF_Nzhk+FnKg@mail.gmail.com>
- <AM0PR0502MB379553984D0D55FDE25426F6C3330@AM0PR0502MB3795.eurprd05.prod.outlook.com>
- <20200119045849-mutt-send-email-mst@kernel.org>
- <d4e7fc56-c9d8-f01f-1504-dd49d5658037@redhat.com>
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=UhHLymzxzVIkwa649V6G8DQXNVGjVGrCVxDRGJ0fWG8=;
+        b=ZN3/BgdN2dhog6h9qPOJPrFjjG/tLWCUgOiw6E2b2TlgWn3xePmR9IRTek1rVuI4YJJxd7
+        UPWqabM7TddCQk6zFaFPdM3/n6ayoJQn0sx2QKVoE/lF1Qe/sYg/BKpm04XO6Ljc2Fatnb
+        /9JxJ+Gem1WCTZPDroV2lQgmmq6P49k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-32-4yuIIhKcOfmYwrRZTVO7VQ-1; Mon, 20 Jan 2020 07:10:11 -0500
+X-MC-Unique: 4yuIIhKcOfmYwrRZTVO7VQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89B9E96F6F;
+        Mon, 20 Jan 2020 12:10:10 +0000 (UTC)
+Received: from [10.36.118.34] (unknown [10.36.118.34])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2BF1C84791;
+        Mon, 20 Jan 2020 12:10:09 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 8/9] s390x: smp: Test all CRs on initial
+ reset
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, cohuck@redhat.com
+References: <20200117104640.1983-1-frankja@linux.ibm.com>
+ <20200117104640.1983-9-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <15f8b733-1b81-4a1b-22fe-53099878c013@redhat.com>
+Date:   Mon, 20 Jan 2020 13:10:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d4e7fc56-c9d8-f01f-1504-dd49d5658037@redhat.com>
+In-Reply-To: <20200117104640.1983-9-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 20, 2020 at 04:44:34PM +0800, Jason Wang wrote:
+On 17.01.20 11:46, Janosch Frank wrote:
+> All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
+> so we also need to test 1-13 and 15 for 0.
 > 
-> On 2020/1/19 下午5:59, Michael S. Tsirkin wrote:
-> > On Sun, Jan 19, 2020 at 09:07:09AM +0000, Shahaf Shuler wrote:
-> > > > Technically, we can keep the incremental API
-> > > > here and let the vendor vDPA drivers to record the full mapping
-> > > > internally which may slightly increase the complexity of vendor driver.
-> > > What will be the trigger for the driver to know it received the last mapping on this series and it can now push it to the on-chip IOMMU?
-> > Some kind of invalidate API?
-> > 
+> And while we're at it, let's also set some values to cr 1, 7 and 13, so
+> we can actually be sure that they will be zeroed.
 > 
-> The problem is how to deal with the case of vIOMMU. When vIOMMU is enabling
-> there's no concept of last mapping.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/smp.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
 > 
-> Thanks
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index c12a3db..1385488 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -169,16 +169,30 @@ static void test_emcall(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +/* Used to dirty registers of cpu #1 before it is reset */
+> +static void test_func_initial(void)
+> +{
+> +	lctlg(1, 0x42000UL);
+> +	lctlg(7, 0x43000UL);
+> +	lctlg(13, 0x44000UL);
+> +	mb();
+> +	testflag = 1;
+> +}
+> +
+>  static void test_reset_initial(void)
+>  {
+>  	struct cpu_status *status = alloc_pages(0);
+> +	uint64_t nullp[12] = {};
+>  	struct psw psw;
+>  
+>  	psw.mask = extract_psw_mask();
+> -	psw.addr = (unsigned long)test_func;
+> +	psw.addr = (unsigned long)test_func_initial;
+>  
+>  	report_prefix_push("reset initial");
+> +	testflag = 0;
+> +	mb();
 
-Most IOMMUs have a translation cache so have an invalidate API too.
+maybe use a  set_flag() function like
+
+mb();
+testflag = val;
+mb();
+
+and use it everywhere you set the flag? (e.g., in test_func_initial())
+
+Apart from that
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+>  	smp_cpu_start(1, psw);
+> +	wait_for_flag();
+>  
+>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+> @@ -189,6 +203,8 @@ static void test_reset_initial(void)
+>  	report(!status->fpc, "fpc");
+>  	report(!status->cputm, "cpu timer");
+>  	report(!status->todpr, "todpr");
+> +	report(!memcmp(&status->crs[1], nullp, sizeof(status->crs[1]) * 12), "cr1-13 == 0");
+> +	report(status->crs[15] == 0, "cr15 == 0");
+>  	report_prefix_pop();
+>  
+>  	report_prefix_push("initialized");
+> 
+
 
 -- 
-MST
+Thanks,
+
+David / dhildenb
 
