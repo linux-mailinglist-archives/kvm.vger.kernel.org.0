@@ -2,195 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B120142A50
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 13:15:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CFE7142A61
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 13:17:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726951AbgATMPd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 07:15:33 -0500
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:35811 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726589AbgATMPd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jan 2020 07:15:33 -0500
-Received: by mail-oi1-f196.google.com with SMTP id k4so28349338oik.2
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 04:15:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=BIh9YR7ribtNKqpS6WraqY8c5jxqIOOYDe80jRm6D5Y=;
-        b=FcURgP6eMlNurFWWH0M/cmGAdX7g4MN5esyjZ2BW6LmDfqoZ7ssWNnjUE97HpCwB3c
-         RSTxpl3HEmglPoC+OxTBnRWGuVgVBsV4FTEvxmotsEWN378omvwyG5E1o08x1Dv5x4i/
-         2un7yJA1KOgptV5UKJ+CfnXUD2L8uFnoBOUazZz27bL+fUprysSWGJwLv9vXTbOBnPnb
-         Kc02QeVOHnOhxZ768hFVopM7gcISKRr4H0aWrwclnfogteqGLJWdVOWBjUzWYXIMhkCR
-         zG5Y9USo6weLRoi2DySC2egUK3AJqrD2KSA4Msf7jUDL+79ign5yW0q1sEmqk/Y5y13q
-         1waA==
+        id S1727829AbgATMRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 07:17:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51334 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726958AbgATMRj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jan 2020 07:17:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579522657;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8L+ILVTS7iEVpEf9FQ7Niyp0BU3VQIiebmcN8SzOcl8=;
+        b=Q8jJfz8kyQyUMTq+IqvBSU4xbhlSH9LCcDAIZk5+hsFJTxy9yMXVXtc0X/wvSkx+ykf66Q
+        ttNo9gVr8SXSpg3wS/nySmKhQEqoIUSAVzraxC/kXD8JBTvYO2H/vDUGf32YfZJhNU2vRM
+        uXaJUloQwg1Pf7GxPEsxVZJDV9WTUDs=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-0F_-xcQDOQSV35bnbG0xnw-1; Mon, 20 Jan 2020 07:17:36 -0500
+X-MC-Unique: 0F_-xcQDOQSV35bnbG0xnw-1
+Received: by mail-qt1-f198.google.com with SMTP id m8so21013203qta.20
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 04:17:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=BIh9YR7ribtNKqpS6WraqY8c5jxqIOOYDe80jRm6D5Y=;
-        b=sbym4S7JiNsvE6pSfceV5KrmlQyBmKXEgGjRZ7yS4ysLHQXIFOMdTFx4oiKv5Dpkjc
-         0Y6T0URo7Ie8GlWQVyEu0vrPJPGqWKLkGAcgjJEzDzI/pvrHWId1TClzARuqDPKD0S9c
-         au6IMnHCfrr3+9FE3Z6s0kj5H2nhG9+MjGKFF8x5mQkMEPiSJIC5auTlP4ubxNGMsq9p
-         T31VExTLi6ClND+PFS3z708Joj2f0QDV108s4f0YfQ7SL9cICVr1BaXUXEbmWbpemk6Y
-         8vtZmeLu2PedhiQ5pohMl/qmQ7+8qXa7PLoOKKDsR97INQIE7Xh/7Mr6AB+lUqu9+hOT
-         Zahg==
-X-Gm-Message-State: APjAAAXFGgVyZFK6447Xr9hrh5g/5dpNZVW6SDA18uRSq8RE03g0GJEQ
-        hKKmfRoydmcl9FaoWjdZqK5/1254RjR1Cz85HG7ziA==
-X-Google-Smtp-Source: APXvYqyBKgwLpMs7bERGUIwh2DFIPid0XT0le4cFbQV9y9pbq7lnssLrYEOl9FwUv8peTTYFE/m+KzgjFil7u+Gwle0=
-X-Received: by 2002:aca:3182:: with SMTP id x124mr12795563oix.170.1579522532051;
- Mon, 20 Jan 2020 04:15:32 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8L+ILVTS7iEVpEf9FQ7Niyp0BU3VQIiebmcN8SzOcl8=;
+        b=r3eDLOjl6IBuDty9mN7yPBH2p633Euo2O0Zwyh5PR5eyr2Po/ScOhJsc3p/7amf/bY
+         1Fly3fLTe8p3dJ/PjK3/MtePmvmXhWQ/S62266FPMdHPM73G3iP60R8aT+Au8O591IJW
+         UVlrLNFyokM1aZfTJuevE5aeoE+YYSdL0UxR8HOB3PvrQzfiDwHC1rINGMC6/vIJXHHx
+         ptb0rbcM7joi17RU3acfAeSo66T6wjtaqBSD1sYkwxY9Eurw/LO+LZFaxySKBJZnRzWj
+         VAEs0vmPWbD4TU2vqINgFAyfqP/N5RhhT5uroxRCI5CCkAa6qCW273STf2mIWl1M262C
+         GUUQ==
+X-Gm-Message-State: APjAAAWUEipMNQBL+QE+HFrZfMgn315etk6e/lUtON/v+yaMBWYlUCYW
+        XM5fEyD2/MB3RM4aI3WzGGSGY2GZCGyK9ZNGrk4RceTuSRJrjVtYHUHEKfmNvaul37khqXJQCrh
+        wXv+C1R6X4EDX
+X-Received: by 2002:ac8:784:: with SMTP id l4mr19850108qth.286.1579522656239;
+        Mon, 20 Jan 2020 04:17:36 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwNA60FKJeMn0/BVl0tQjIyzqQrUvdMi0GrHZyiN0uIGAcUXWQkWAFroQqD7gDCIK6n3lBLSQ==
+X-Received: by 2002:ac8:784:: with SMTP id l4mr19850095qth.286.1579522655996;
+        Mon, 20 Jan 2020 04:17:35 -0800 (PST)
+Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
+        by smtp.gmail.com with ESMTPSA id y26sm17884235qtc.94.2020.01.20.04.17.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jan 2020 04:17:34 -0800 (PST)
+Date:   Mon, 20 Jan 2020 07:17:26 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "aadam@redhat.com" <aadam@redhat.com>,
+        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
+Message-ID: <20200120071406-mutt-send-email-mst@kernel.org>
+References: <20200116124231.20253-1-jasowang@redhat.com>
+ <20200116124231.20253-4-jasowang@redhat.com>
+ <20200116152209.GH20978@mellanox.com>
+ <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
+ <20200117135435.GU20978@mellanox.com>
 MIME-Version: 1.0
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-9-git-send-email-gengdongjiu@huawei.com>
- <CAFEAcA_=PgkrWjwPxD89fCi85XPpcTHssXkSmE04Ctoj7AX0kA@mail.gmail.com> <c89db331-cb94-8e0b-edf8-25bfb64f826d@huawei.com>
-In-Reply-To: <c89db331-cb94-8e0b-edf8-25bfb64f826d@huawei.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon, 20 Jan 2020 12:15:21 +0000
-Message-ID: <CAFEAcA_Qs3p=iEU+D5iqjyZYpPQO0D16AWvjp0wcvbvRNdGAGg@mail.gmail.com>
-Subject: Re: [PATCH v22 8/9] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
-To:     gengdongjiu <gengdongjiu@huawei.com>
-Cc:     Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Zheng Xiang <zhengxiang9@huawei.com>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        James Morse <james.morse@arm.com>,
-        "xuwei (O)" <xuwei5@huawei.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200117135435.GU20978@mellanox.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Jan 2020 at 10:05, gengdongjiu <gengdongjiu@huawei.com> wrote:
->
-> On 2020/1/17 0:28, Peter Maydell wrote:
-> > On Wed, 8 Jan 2020 at 11:33, Dongjiu Geng <gengdongjiu@huawei.com> wrot=
-e:
-> >
-> >> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-> >> +{
-> >> +    ram_addr_t ram_addr;
-> >> +    hwaddr paddr;
-> >> +
-> >> +    assert(code =3D=3D BUS_MCEERR_AR || code =3D=3D BUS_MCEERR_AO);
-> >> +
-> >> +    if (acpi_enabled && addr &&
-> >> +            object_property_get_bool(qdev_get_machine(), "ras", NULL)=
-) {
-> >> +        ram_addr =3D qemu_ram_addr_from_host(addr);
-> >> +        if (ram_addr !=3D RAM_ADDR_INVALID &&
-> >> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &p=
-addr)) {
-> >> +            kvm_hwpoison_page_add(ram_addr);
-> >> +            /*
-> >> +             * Asynchronous signal will be masked by main thread, so
-> >> +             * only handle synchronous signal.
-> >> +             */
-> >
-> > I don't understand this comment. (I think we've had discussions
-> > about it before, but it's still not clear to me.)
-> >
-> > This function (kvm_arch_on_sigbus_vcpu()) will be called in two context=
-s:
-> >
-> > (1) in the vcpu thread:
-> >   * the real SIGBUS handler sigbus_handler() sets a flag and arranges
-> >     for an immediate vcpu exit
-> >   * the vcpu thread reads the flag on exit from KVM_RUN and
-> >     calls kvm_arch_on_sigbus_vcpu() directly
-> >   * the error could be MCEERR_AR or MCEERR_AOFor the vcpu thread, the e=
-rror can be MCEERR_AR or MCEERR_AO,
-> but kernel/KVM usually uses MCEERR_AR(action required) instead of MCEERR_=
-AO, because it needs do action immediately. For MCEERR_AO error, the action=
- is optional and the error can be ignored.
-> At least I do not find Linux kernel/KVM deliver MCEERR_AO in the vcpu thr=
-eads.
->
-> > (2) MCE errors on other threads:
-> >   * here SIGBUS is blocked, so MCEERR_AR (action-required)
-> >     errors will cause the kernel to just kill the QEMU process
-> >   * MCEERR_AO errors will be handled via the iothread's use
-> >     of signalfd(), so kvm_on_sigbus() will get called from
-> >     the main thread, and it will call kvm_arch_on_sigbus_vcpu()
-> >   * in this case the passed in CPUState will (arbitrarily) be that
-> >     for the first vCPU
->
-> For the MCE errors on other threads, it can only handle MCEERR_AO. If it =
-is MCEERR_AR, the QEMU will assert and exit[2].
->
-> Case1: Other APP indeed can send MCEERR_AO to QEMU=EF=BC=8C QEMU handle i=
-t via the iothread's use of signalfd() through above path.
-> Case2: But if the MCEERR_AO is delivered by kernel, I see QEMU ignore it =
-because SIGBUS is masked in main thread[3], for this case, I do not see QEM=
-U handle it via signalfd() for MCEERR_AO errors from my test.
+On Fri, Jan 17, 2020 at 01:54:42PM +0000, Jason Gunthorpe wrote:
+> > 1) "virtio" vs "vhost", I implemented matching method for this in mdev
+> > series, but it looks unnecessary for vDPA device driver to know about this.
+> > Anyway we can use sysfs driver bind/unbind to switch drivers
+> > 2) virtio device id and vendor id. I'm not sure we need this consider the
+> > two drivers so far (virtio/vhost) are all bus drivers.
+> 
+> As we seem to be contemplating some dynamic creation of vdpa devices I
+> think upon creation time it should be specified what mode they should
+> run it and then all driver binding and autoloading should happen
+> automatically. Telling the user to bind/unbind is a very poor
+> experience.
 
-SIGBUS is blocked in the main thread because we use signalfd().
-The function sigfd_handler() should be called and it will then
-manually invoke the correct function for the signal.
+Maybe but OTOH it's an existing interface. I think we can reasonably
+start with bind/unbind and then add ability to specify
+the mode later. bind/unbind come from core so they will be
+maintained anyway.
+-- 
+MST
 
-> For Case1=EF=BC=8CI think we should not let guest know it, because it is =
-not triggered by guest. only other APP send SIGBUS to tell QEMU do somethin=
-gs.
-
-I don't understand what you mean here by "other app" or
-"guest" triggering of MCEERR. I thought that an MCEERR meant
-"the hardware has detected that there is a problem with the
-RAM". If there's a problem with the RAM and it's the RAM that's
-being used as guest RAM, we need to tell the guest, surely ?
-
-> For Case2=EF=BC=8Cit does not call call kvm_arch_on_sigbus_vcpu().
-
-It should do. The code you quote calls that function
-for that case:
-
-> [1]:
-> /* Called synchronously (via signalfd) in main thread.  */
-> int kvm_on_sigbus(int code, void *addr)
-> {
-> #ifdef KVM_HAVE_MCE_INJECTION
->     /* Action required MCE kills the process if SIGBUS is blocked.  Becau=
-se
->      * that's what happens in the I/O thread, where we handle MCE via sig=
-nalfd,
->      * we can only get action optional here.
->      */
-> [2]: assert(code !=3D BUS_MCEERR_AR);
->     kvm_arch_on_sigbus_vcpu(first_cpu, code, addr);
->     return 0;
-> #else
->     return 1;
-> #endif
-> }
-
-
-> Above all, from my test, for MCEERR_AO error which is triggered by guest,=
- it not call
-kvm_arch_on_sigbus_vcpu().
-
-I'm not sure what you mean by "triggered by guest". I assume that
-exactly what kind of errors the kernel can report and when will
-depend to some extent on the underlying hardware/firmware
-implementation of reporting of memory errors, but in principle
-the ABI allows the kernel to send SIGBUS_(BUS_MCEERR_AO) to the
-main thread, the signal should be handled by signalfd, our code
-for working with multiple fds should mean that the main thread
-calls sigfd_handler() to deal with reading bytes from the signalfd
-fd, and that function should then call sigbus_handler(), which
-calls kvm_on_sigbus(), which calls kvm_arch_on_sigbus_vcpu().
-If something in that code path is not working then we need to
-find out what it is.
-
-thanks
--- PMM
