@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C55A0142475
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 08:50:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 632D3142483
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 08:52:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726586AbgATHuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 02:50:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55411 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726039AbgATHuc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jan 2020 02:50:32 -0500
+        id S1726915AbgATHwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 02:52:37 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60450 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726573AbgATHwf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 02:52:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579506631;
+        s=mimecast20190719; t=1579506754;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=U004lfJPbgC8DDvgY0vYrnnQi6voPmz5PbAj1bvuBr0=;
-        b=WHFUwt/1xYWgox8NL8DpKdh7AARRj+DDNhEiPPIqz/4jgUQDy36BRzxOW6+RbOV1SHEqBH
-        ZPj2D2JOg2BXlorJvMwrEIABnl9/kvFqyHDoeKqGKy6MyWzejYbwfJum75Ii0wSFyOFAo8
-        jZReMH4sVGHYQPwCBzAR1gCbNoRpUz0=
+        bh=3Xx+mxni9g3kJmMk8VLxLFhFg3PBDXCnjO5BOpqt3H0=;
+        b=UA1QDNUVQly7XoDuWJlN9R3A3004NmgXsvNVRyerM/t6Z5+8e9aD1BJe+lvBDEOo6r6H0H
+        E5TPJ6x/WD4jmIIqt65sUtMeO2vvljTkHEeDE8Ns6oHAOopUA5GztR6RvdjD7RdHG1OHzY
+        oow/bWze2nCLiOGke4V/54kVvtAPCSE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-8P1DRx1hN7GiWnnH17Bchg-1; Mon, 20 Jan 2020 02:50:28 -0500
-X-MC-Unique: 8P1DRx1hN7GiWnnH17Bchg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-264-Qvj0d9jqMumidG240IG4qw-1; Mon, 20 Jan 2020 02:52:33 -0500
+X-MC-Unique: Qvj0d9jqMumidG240IG4qw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CCE4F10054E3;
-        Mon, 20 Jan 2020 07:50:25 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8ABE10054E3;
+        Mon, 20 Jan 2020 07:52:30 +0000 (UTC)
 Received: from [10.72.12.173] (ovpn-12-173.pek2.redhat.com [10.72.12.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 23C8E84DB4;
-        Mon, 20 Jan 2020 07:50:02 +0000 (UTC)
-Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 901428BE07;
+        Mon, 20 Jan 2020 07:52:13 +0000 (UTC)
+Subject: Re: [PATCH 4/5] virtio: introduce a vDPA based transport
 To:     Jason Gunthorpe <jgg@mellanox.com>
 Cc:     "mst@redhat.com" <mst@redhat.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -63,20 +63,20 @@ Cc:     "mst@redhat.com" <mst@redhat.com>,
         "hanand@xilinx.com" <hanand@xilinx.com>,
         "mhabets@solarflare.com" <mhabets@solarflare.com>
 References: <20200116124231.20253-1-jasowang@redhat.com>
- <20200116124231.20253-4-jasowang@redhat.com>
- <20200116152209.GH20978@mellanox.com>
- <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
- <20200117135435.GU20978@mellanox.com>
+ <20200116124231.20253-5-jasowang@redhat.com>
+ <20200116153807.GI20978@mellanox.com>
+ <8e8aa4b7-4948-5719-9618-e28daffba1a5@redhat.com>
+ <20200117140013.GV20978@mellanox.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <ea4639ba-d991-c95c-8cb1-48588e5b42c0@redhat.com>
-Date:   Mon, 20 Jan 2020 15:50:01 +0800
+Message-ID: <bff37791-9640-39e0-5e93-c905ebfb5d2b@redhat.com>
+Date:   Mon, 20 Jan 2020 15:52:12 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200117135435.GU20978@mellanox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200117140013.GV20978@mellanox.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -84,71 +84,87 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2020/1/17 =E4=B8=8B=E5=8D=889:54, Jason Gunthorpe wrote:
-> On Fri, Jan 17, 2020 at 11:03:12AM +0800, Jason Wang wrote:
->> On 2020/1/16 =E4=B8=8B=E5=8D=8811:22, Jason Gunthorpe wrote:
->>> On Thu, Jan 16, 2020 at 08:42:29PM +0800, Jason Wang wrote:
->>>> vDPA device is a device that uses a datapath which complies with the
->>>> virtio specifications with vendor specific control path. vDPA device=
-s
->>>> can be both physically located on the hardware or emulated by
->>>> software. vDPA hardware devices are usually implemented through PCIE
->>>> with the following types:
->>>>
->>>> - PF (Physical Function) - A single Physical Function
->>>> - VF (Virtual Function) - Device that supports single root I/O
->>>>     virtualization (SR-IOV). Its Virtual Function (VF) represents a
->>>>     virtualized instance of the device that can be assigned to diffe=
-rent
->>>>     partitions
->>>> - VDEV (Virtual Device) - With technologies such as Intel Scalable
->>>>     IOV, a virtual device composed by host OS utilizing one or more
->>>>     ADIs.
->>>> - SF (Sub function) - Vendor specific interface to slice the Physica=
-l
->>>>     Function to multiple sub functions that can be assigned to diffe=
-rent
->>>>     partitions as virtual devices.
->>> I really hope we don't end up with two different ways to spell this
->>> same thing.
->> I think you meant ADI vs SF. It looks to me that ADI is limited to the=
- scope
->> of scalable IOV but SF not.
-> I think if one looks carefully you'd find that SF and ADI are using
-> very similar techiniques. For instance we'd also like to use the code
-> reorg of the MSIX vector setup with SFs that Intel is calling IMS.
+On 2020/1/17 =E4=B8=8B=E5=8D=8810:00, Jason Gunthorpe wrote:
+> On Fri, Jan 17, 2020 at 05:32:35PM +0800, Jason Wang wrote:
+>>>> +	const struct vdpa_config_ops *ops =3D vdpa->config;
+>>>> +	struct virtio_vdpa_device *vd_dev;
+>>>> +	int rc;
+>>>> +
+>>>> +	vd_dev =3D devm_kzalloc(dev, sizeof(*vd_dev), GFP_KERNEL);
+>>>> +	if (!vd_dev)
+>>>> +		return -ENOMEM;
+>>> This is not right, the struct device lifetime is controled by a kref,
+>>> not via devm. If you want to use a devm unwind then the unwind is
+>>> put_device, not devm_kfree.
+>> I'm not sure I get the point here. The lifetime is bound to underlying=
+ vDPA
+>> device and devres allow to be freed before the vpda device is released=
+. But
+>> I agree using devres of underlying vdpa device looks wired.
+> Once device_initialize is called the only way to free a struct device
+> is via put_device, while here you have a devm trigger that will
+> unconditionally do kfree on a struct device without respecting the
+> reference count.
 >
-> Really SIOV is simply a bundle of pre-existing stuff under a tidy
-> name, whatever code skeleton we come up with for SFs should be re-used
-> for ADI.
+> reference counted memory must never be allocated with devm.
 
 
-Ok, but do you prefer to mention ADI only for the next version?
+Right, fixed.
 
 
 >
->>> Shouldn't there be a device/driver matching process of some kind?
->>
->> The question is what do we want do match here.
->>
->> 1) "virtio" vs "vhost", I implemented matching method for this in mdev
->> series, but it looks unnecessary for vDPA device driver to know about =
-this.
->> Anyway we can use sysfs driver bind/unbind to switch drivers
->> 2) virtio device id and vendor id. I'm not sure we need this consider =
-the
->> two drivers so far (virtio/vhost) are all bus drivers.
-> As we seem to be contemplating some dynamic creation of vdpa devices I
-> think upon creation time it should be specified what mode they should
-> run it and then all driver binding and autoloading should happen
-> automatically. Telling the user to bind/unbind is a very poor
-> experience.
+>>>> +	vd_dev->vdev.dev.release =3D virtio_vdpa_release_dev;
+>>>> +	vd_dev->vdev.config =3D &virtio_vdpa_config_ops;
+>>>> +	vd_dev->vdpa =3D vdpa;
+>>>> +	INIT_LIST_HEAD(&vd_dev->virtqueues);
+>>>> +	spin_lock_init(&vd_dev->lock);
+>>>> +
+>>>> +	vd_dev->vdev.id.device =3D ops->get_device_id(vdpa);
+>>>> +	if (vd_dev->vdev.id.device =3D=3D 0)
+>>>> +		return -ENODEV;
+>>>> +
+>>>> +	vd_dev->vdev.id.vendor =3D ops->get_vendor_id(vdpa);
+>>>> +	rc =3D register_virtio_device(&vd_dev->vdev);
+>>>> +	if (rc)
+>>>> +		put_device(dev);
+>>> And a ugly unwind like this is why you want to have device_initialize=
+()
+>>> exposed to the driver,
+>> In this context, which "driver" did you mean here? (Note, virtio-vdpa =
+is the
+>> driver for vDPA bus here).
+> 'driver' is the thing using the 'core' library calls to implement a
+> device, so here the 'vd_dev' is the driver and
+> 'register_virtio_device' is the core
+
+
+Ok.
+
+
+>
+>>> Where is the various THIS_MODULE's I expect to see in a scheme like
+>>> this?
+>>>
+>>> All function pointers must be protected by a held module reference
+>>> count, ie the above probe/remove and all the pointers in ops.
+>> Will double check, since I don't see this in other virtio transport dr=
+ivers
+>> (PCI or MMIO).
+> pci_register_driver is a macro that provides a THIS_MODULE, and the
+> pci core code sets driver.owner, then the rest of the stuff related to
+> driver ops is supposed to work against that to protect the driver ops.
+>
+> For the device module refcounting you either need to ensure that
+> 'unregister' is a strong fence and guanentees that no device ops are
+> called past unregister (noting that this is impossible for release),
+> or you need to hold the module lock until release.
+>
+> It is common to see non-core subsystems get this stuff wrong.
 >
 > Jason
 
 
-Ok, I will add the type (virtio vs vhost) and driver matching method back=
-.
+Ok. I see.
 
 Thanks
 
