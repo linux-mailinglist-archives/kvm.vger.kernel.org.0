@@ -2,604 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 891171431B7
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 19:43:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2D521431DC
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 19:57:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726982AbgATSnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 13:43:06 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53162 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726874AbgATSnG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 13:43:06 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00KIcrAu090477
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 13:43:04 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xmgdk8qph-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 13:43:04 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
-        Mon, 20 Jan 2020 18:43:02 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 20 Jan 2020 18:43:00 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00KIgxKp48824484
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Jan 2020 18:42:59 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 282C14C040;
-        Mon, 20 Jan 2020 18:42:59 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D12824C044;
-        Mon, 20 Jan 2020 18:42:58 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.108])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 20 Jan 2020 18:42:58 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v8 6/6] s390x: SCLP unit test
-Date:   Mon, 20 Jan 2020 19:42:56 +0100
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200120184256.188698-1-imbrenda@linux.ibm.com>
-References: <20200120184256.188698-1-imbrenda@linux.ibm.com>
+        id S1726607AbgATS5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 13:57:51 -0500
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:26509 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726112AbgATS5v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jan 2020 13:57:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1579546670; x=1611082670;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=3sMDWN5G6D/QuQBJ0VgfeTIvmE0X+lMVeKLu7CBD/Rg=;
+  b=UrRoaABDrYhGBtvNjOVqaC9pjDo2TdtKokHr/Dw5/CDHJg/s7A8SMUHx
+   0p1Jodg74neoBfywOcrXhqqyhBRIUNNI3C2r5LgRTfOXhWSufcB62A3zY
+   7MP2qsmWUu5CaPFRGJ1L2jDXDKblNIxkul2ynngC6fg6H1YwS+syBvawk
+   Y=;
+IronPort-SDR: QfGyADq3OjaZ7nKN52ZPQkHLow2/ycAQBbOf6wKPdXHbPPoEv0Q1WYkdTyYPq2M7BclNe3Zf3N
+ tPGYLLltKrBg==
+X-IronPort-AV: E=Sophos;i="5.70,343,1574121600"; 
+   d="scan'208";a="21207713"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-f14f4a47.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 20 Jan 2020 18:57:35 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-f14f4a47.us-west-2.amazon.com (Postfix) with ESMTPS id 69A5AA2B23;
+        Mon, 20 Jan 2020 18:57:34 +0000 (UTC)
+Received: from EX13D27EUB002.ant.amazon.com (10.43.166.103) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1236.3; Mon, 20 Jan 2020 18:57:34 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
+ EX13D27EUB002.ant.amazon.com (10.43.166.103) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Mon, 20 Jan 2020 18:57:33 +0000
+Received: from uc3ce012741425f.ant.amazon.com (10.28.84.89) by
+ mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS) id
+ 15.0.1367.3 via Frontend Transport; Mon, 20 Jan 2020 18:57:31 +0000
+Subject: Re: [PATCH 2/2] kvm: Add ioctl for gathering debug counters
+To:     Alexander Graf <graf@amazon.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Milan Pandurov <milanpa@amazon.de>, <kvm@vger.kernel.org>
+CC:     <rkrcmar@redhat.com>, <borntraeger@de.ibm.com>
+References: <20200115134303.30668-1-milanpa@amazon.de>
+ <18820df0-273a-9592-5018-c50a85a75205@amazon.de>
+ <8584d6c2-323c-14e2-39c0-21a47a91bbda@amazon.com>
+ <ab84ee05-7e2b-e0cc-6994-fc485012a51a@amazon.de>
+ <668ea6d3-06ae-4586-9818-cdea094419fe@redhat.com>
+ <e77a2477-6010-ae1d-0afd-0c5498ba2117@amazon.de>
+From:   <milanpa@amazon.com>
+Message-ID: <30358a22-084c-6b0b-ae67-acfb7e69ba8e@amazon.com>
+Date:   Mon, 20 Jan 2020 19:57:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20012018-0016-0000-0000-000002DF2711
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012018-0017-0000-0000-00003341CC1D
-Message-Id: <20200120184256.188698-7-imbrenda@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-20_08:2020-01-20,2020-01-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- bulkscore=0 suspectscore=1 mlxlogscore=999 lowpriorityscore=0 spamscore=0
- adultscore=0 malwarescore=0 impostorscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001200156
+In-Reply-To: <e77a2477-6010-ae1d-0afd-0c5498ba2117@amazon.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SCLP unit test. Testing the following:
-
-* Correctly ignoring instruction bits that should be ignored
-* Privileged instruction check
-* Check for addressing exceptions
-* Specification exceptions:
-  - SCCB size less than 8
-  - SCCB unaligned
-  - SCCB overlaps prefix or lowcore
-  - SCCB address higher than 2GB
-* Return codes for
-  - Invalid command
-  - SCCB too short (but at least 8)
-  - SCCB page boundary violation
-
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
----
- s390x/Makefile      |   1 +
- s390x/sclp.c        | 474 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   8 +
- 3 files changed, 483 insertions(+)
- create mode 100644 s390x/sclp.c
-
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 3744372..ddb4b48 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -16,6 +16,7 @@ tests += $(TEST_DIR)/diag288.elf
- tests += $(TEST_DIR)/stsi.elf
- tests += $(TEST_DIR)/skrf.elf
- tests += $(TEST_DIR)/smp.elf
-+tests += $(TEST_DIR)/sclp.elf
- tests_binary = $(patsubst %.elf,%.bin,$(tests))
- 
- all: directories test_cases test_cases_binary
-diff --git a/s390x/sclp.c b/s390x/sclp.c
-new file mode 100644
-index 0000000..215347e
---- /dev/null
-+++ b/s390x/sclp.c
-@@ -0,0 +1,474 @@
-+/*
-+ * Service Call tests
-+ *
-+ * Copyright (c) 2019 IBM Corp
-+ *
-+ * Authors:
-+ *  Claudio Imbrenda <imbrenda@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/page.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/interrupt.h>
-+#include <sclp.h>
-+
-+#define PGM_NONE	1
-+#define PGM_BIT_SPEC	(1ULL << PGM_INT_CODE_SPECIFICATION)
-+#define PGM_BIT_ADDR	(1ULL << PGM_INT_CODE_ADDRESSING)
-+#define PGM_BIT_PRIV	(1ULL << PGM_INT_CODE_PRIVILEGED_OPERATION)
-+#define MKPTR(x) ((void *)(uint64_t)(x))
-+
-+#define LC_SIZE (2 * PAGE_SIZE)
-+
-+static uint8_t pagebuf[LC_SIZE] __attribute__((aligned(LC_SIZE)));	/* scratch pages used for some tests */
-+static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));	/* temporary lowcore for test_sccb_prefix */
-+static uint8_t sccb_template[PAGE_SIZE];				/* SCCB template to be used */
-+static uint32_t valid_code;						/* valid command code for READ SCP INFO */
-+static struct lowcore *lc;
-+
-+/**
-+ * Perform one service call, handling exceptions and interrupts.
-+ */
-+static int sclp_service_call_test(unsigned int command, void *sccb)
-+{
-+	int cc;
-+
-+	sclp_mark_busy();
-+	sclp_setup_int();
-+	cc = servc(command, __pa(sccb));
-+	if (lc->pgm_int_code) {
-+		sclp_handle_ext();
-+		return 0;
-+	}
-+	if (!cc)
-+		sclp_wait_busy();
-+	return cc;
-+}
-+
-+/**
-+ * Perform one test at the given address, optionally using the SCCB template,
-+ * checking for the expected program interrupts and return codes.
-+ *
-+ * The parameter buf_len indicates the number of bytes of the template that
-+ * should be copied to the test address, and should be 0 when the test
-+ * address is invalid, in which case nothing is copied.
-+ *
-+ * The template is used to simplify tests where the same buffer content is
-+ * used many times in a row, at different addresses.
-+ *
-+ * Returns true in case of success or false in case of failure
-+ */
-+static bool test_one_sccb(uint32_t cmd, uint8_t *addr, uint16_t buf_len, uint64_t exp_pgm, uint16_t exp_rc)
-+{
-+	SCCBHeader *h = (SCCBHeader *)addr;
-+	int res, pgm;
-+
-+	/* Copy the template to the test address if needed */
-+	if (buf_len)
-+		memcpy(addr, sccb_template, buf_len);
-+	if (exp_pgm != PGM_NONE)
-+		expect_pgm_int();
-+	/* perform the actual call */
-+	res = sclp_service_call_test(cmd, h);
-+	if (res) {
-+		report_info("SCLP not ready (command %#x, address %p, cc %d)", cmd, addr, res);
-+		return false;
-+	}
-+	pgm = clear_pgm_int();
-+	/* Check if the program exception was one of the expected ones */
-+	if (!((1ULL << pgm) & exp_pgm)) {
-+		report_info("First failure at addr %p, buf_len %d, cmd %#x, pgm code %d",
-+				addr, buf_len, cmd, pgm);
-+		return false;
-+	}
-+	/* Check if the response code is the one expected */
-+	if (exp_rc && exp_rc != h->response_code) {
-+		report_info("First failure at addr %p, buf_len %d, cmd %#x, resp code %#x",
-+				addr, buf_len, cmd, h->response_code);
-+		return false;
-+	}
-+	return true;
-+}
-+
-+/**
-+ * Wrapper for test_one_sccb to be used when the template should not be
-+ * copied and the memory address should not be touched.
-+ */
-+static bool test_one_ro(uint32_t cmd, uint8_t *addr, uint64_t exp_pgm, uint16_t exp_rc)
-+{
-+	return test_one_sccb(cmd, addr, 0, exp_pgm, exp_rc);
-+}
-+
-+/**
-+ * Wrapper for test_one_sccb to set up a simple SCCB template.
-+ *
-+ * The parameter sccb_len indicates the value that will be saved in the SCCB
-+ * length field of the SCCB, buf_len indicates the number of bytes of
-+ * template that need to be copied to the actual test address. In many cases
-+ * it's enough to clear/copy the first 8 bytes of the buffer, while the SCCB
-+ * itself can be larger.
-+ *
-+ * Returns true in case of success or false in case of failure
-+ */
-+static bool test_one_simple(uint32_t cmd, uint8_t *addr, uint16_t sccb_len,
-+			uint16_t buf_len, uint64_t exp_pgm, uint16_t exp_rc)
-+{
-+	memset(sccb_template, 0, sizeof(sccb_template));
-+	((SCCBHeader *)sccb_template)->length = sccb_len;
-+	return test_one_sccb(cmd, addr, buf_len, exp_pgm, exp_rc);
-+}
-+
-+/**
-+ * Test SCCB lengths < 8.
-+ */
-+static void test_sccb_too_short(void)
-+{
-+	int len;
-+
-+	for (len = 0; len < 8; len++)
-+		if (!test_one_simple(valid_code, pagebuf, len, 8, PGM_BIT_SPEC, 0))
-+			break;
-+
-+	report(len == 8, "SCCB too short");
-+}
-+
-+/**
-+ * Test SCCBs that are not 64-bit aligned.
-+ */
-+static void test_sccb_unaligned(void)
-+{
-+	int offset;
-+
-+	for (offset = 1; offset < 8; offset++)
-+		if (!test_one_simple(valid_code, offset + pagebuf, 8, 8, PGM_BIT_SPEC, 0))
-+			break;
-+	report(offset == 8, "SCCB unaligned");
-+}
-+
-+/**
-+ * Test SCCBs whose address is in the lowcore or prefix area.
-+ */
-+static void test_sccb_prefix(void)
-+{
-+	uint8_t scratch[LC_SIZE];
-+	uint32_t prefix, new_prefix;
-+	int offset;
-+
-+	/*
-+	 * copy the current lowcore to the future new location, otherwise we
-+	 * will not have a valid lowcore after setting the new prefix.
-+	 */
-+	memcpy(prefix_buf, 0, LC_SIZE);
-+	/* save the current prefix (it's probably going to be 0) */
-+	prefix = get_prefix();
-+	/*
-+	 * save the current content of absolute pages 0 and 1, so we can
-+	 * restore them after we trash them later on
-+	 */
-+	memcpy(scratch, (void *)(intptr_t)prefix, LC_SIZE);
-+	/* set the new prefix to prefix_buf */
-+	new_prefix = (uint32_t)(intptr_t)prefix_buf;
-+	set_prefix(new_prefix);
-+
-+	/*
-+	 * testing with SCCB addresses in the lowcore; since we can't
-+	 * actually trash the lowcore (unsurprisingly, things break if we
-+	 * do), this will be a read-only test.
-+	 */
-+	for (offset = 0; offset < LC_SIZE; offset += 8)
-+		if (!test_one_ro(valid_code, MKPTR(offset), PGM_BIT_SPEC, 0))
-+			break;
-+	report(offset == LC_SIZE, "SCCB low pages");
-+
-+	/*
-+	 * the SCLP should not even touch the memory, but we will write the
-+	 * SCCBs all over the two pages starting at absolute address 0, thus
-+	 * trashing them; we will need to restore them later.
-+	 */
-+	for (offset = 0; offset < LC_SIZE; offset += 8)
-+		if (!test_one_simple(valid_code, MKPTR(new_prefix + offset), 8, 8, PGM_BIT_SPEC, 0))
-+			break;
-+	report(offset == LC_SIZE, "SCCB prefix pages");
-+
-+	/* restore the previous contents of absolute pages 0 and 1 */
-+	memcpy(prefix_buf, 0, LC_SIZE);
-+	/* restore the prefix to the original value */
-+	set_prefix(prefix);
-+}
-+
-+/**
-+ * Test SCCBs that are above 2GB. If outside of memory, an addressing
-+ * exception is also allowed.
-+ */
-+static void test_sccb_high(void)
-+{
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+	uintptr_t a[33 * 4 * 2 + 2];	/* for the list of addresses to test */
-+
-+	uint64_t maxram;
-+	int i, pgm, len = 0;
-+
-+	h->length = 8;
-+	/* addresses with 1 bit set in the first 33 bits */
-+	for (i = 0; i < 33; i++)
-+		a[len++] = 1UL << (i + 31);
-+	/* addresses with 2 consecutive bits set in the first 33 bits */
-+	for (i = 0; i < 33; i++)
-+		a[len++] = 3UL << (i + 31);
-+	/* addresses with all bits set in bits 0..N */
-+	for (i = 0; i < 33; i++)
-+		a[len++] = 0xffffffff80000000UL << i;
-+	/* addresses with all bits set in bits N..33 */
-+	a[len++] = 0x80000000;
-+	for (i = 1; i < 33; i++, len++)
-+		a[len] = a[len - 1] | (1UL << (i + 31));
-+	/* all the addresses above, but adding the offset of a valid buffer */
-+	for (i = 0; i < len; i++)
-+		a[len + i] = a[i] + (intptr_t)h;
-+	len += i;
-+	/* two more hand-crafted addresses */
-+	a[len++] = 0xdeadbeef00000000;
-+	a[len++] = 0xdeaddeadbeef0000;
-+
-+	maxram = get_ram_size();
-+	for (i = 0; i < len; i++) {
-+		pgm = PGM_BIT_SPEC | (a[i] >= maxram ? PGM_BIT_ADDR : 0);
-+		if (!test_one_ro(valid_code, (void *)a[i], pgm, 0))
-+			break;
-+	}
-+	report(i == len, "SCCB high addresses");
-+}
-+
-+/**
-+ * Test invalid commands, both invalid command detail codes and valid
-+ * ones with invalid command class code.
-+ */
-+static void test_inval(void)
-+{
-+	const uint16_t res = SCLP_RC_INVALID_SCLP_COMMAND;
-+	uint32_t cmd;
-+	int i;
-+
-+	report_prefix_push("Invalid command");
-+	for (i = 0; i < 65536; i++) {
-+		cmd = 0xdead0000 | i;
-+		if (!test_one_simple(cmd, pagebuf, PAGE_SIZE, PAGE_SIZE, PGM_NONE, res))
-+			break;
-+	}
-+	report(i == 65536, "Command detail code");
-+
-+	for (i = 0; i < 256; i++) {
-+		cmd = (valid_code & ~0xff) | i;
-+		if (cmd == valid_code)
-+			continue;
-+		if (!test_one_simple(cmd, pagebuf, PAGE_SIZE, PAGE_SIZE, PGM_NONE, res))
-+			break;
-+	}
-+	report(i == 256, "Command class code");
-+	report_prefix_pop();
-+}
-+
-+
-+/**
-+ * Test short SCCBs (but larger than 8).
-+ */
-+static void test_short(void)
-+{
-+	const uint16_t res = SCLP_RC_INSUFFICIENT_SCCB_LENGTH;
-+	int len;
-+
-+	for (len = 8; len < 144; len++)
-+		if (!test_one_simple(valid_code, pagebuf, len, len, PGM_NONE, res))
-+			break;
-+	report(len == 144, "Insufficient SCCB length (Read SCP info)");
-+
-+	for (len = 8; len < 40; len++)
-+		if (!test_one_simple(SCLP_READ_CPU_INFO, pagebuf, len, len, PGM_NONE, res))
-+			break;
-+	report(len == 40, "Insufficient SCCB length (Read CPU info)");
-+}
-+
-+/**
-+ * Test SCCB page boundary violations.
-+ */
-+static void test_boundary(void)
-+{
-+	const uint32_t cmd = SCLP_CMD_WRITE_EVENT_DATA;
-+	const uint16_t res = SCLP_RC_SCCB_BOUNDARY_VIOLATION;
-+	WriteEventData *sccb = (WriteEventData *)sccb_template;
-+	int len, offset;
-+
-+	memset(sccb_template, 0, sizeof(sccb_template));
-+	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-+	for (len = 32; len <= 4096; len++) {
-+		offset = len & 7 ? len & ~7 : len - 8;
-+		for (offset = 4096 - offset; offset < 4096; offset += 8) {
-+			sccb->h.length = len;
-+			if (!test_one_sccb(cmd, offset + pagebuf, len, PGM_NONE, res))
-+				goto out;
-+		}
-+	}
-+out:
-+	report(len > 4096 && offset == 4096, "SCCB page boundary violation");
-+}
-+
-+/**
-+ * Test excessively long SCCBs.
-+ */
-+static void test_toolong(void)
-+{
-+	const uint32_t cmd = SCLP_CMD_WRITE_EVENT_DATA;
-+	const uint16_t res = SCLP_RC_SCCB_BOUNDARY_VIOLATION;
-+	WriteEventData *sccb = (WriteEventData *)sccb_template;
-+	int len;
-+
-+	memset(sccb_template, 0, sizeof(sccb_template));
-+	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-+	for (len = 4097; len < 8192; len++) {
-+		sccb->h.length = len;
-+		if (!test_one_sccb(cmd, pagebuf, PAGE_SIZE, PGM_NONE, res))
-+			break;
-+	}
-+	report(len == 8192, "SCCB bigger than 4k");
-+}
-+
-+/**
-+ * Test privileged operation.
-+ */
-+static void test_priv(void)
-+{
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+
-+	report_prefix_push("Privileged operation");
-+	h->length = 8;
-+	expect_pgm_int();
-+	enter_pstate();
-+	servc(valid_code, __pa(h));
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+/**
-+ * Test addressing exceptions. We need to test SCCB addresses between the
-+ * end of available memory and 2GB, because after 2GB a specification
-+ * exception is also allowed.
-+ * Only applicable if the VM has less than 2GB of memory
-+ */
-+static void test_addressing(void)
-+{
-+	unsigned long i, maxram = get_ram_size();
-+
-+	/* the VM has more than 2GB of memory */
-+	if (maxram >= 0x80000000) {
-+		report_skip("Invalid SCCB address");
-+		return;
-+	}
-+	/* test all possible valid addresses immediately after the end of memory
-+	 * up to 64KB after the end of memory
-+	 */
-+	for (i = 0; i < 0x10000 && i + maxram < 0x80000000; i += 8)
-+		if (!test_one_ro(valid_code, MKPTR(i + maxram), PGM_BIT_ADDR, 0))
-+			goto out;
-+	/* test more addresses until we reach 1MB after end of memory;
-+	 * increment by a prime number (times 8) in order to test all
-+	 * possible valid offsets inside pages
-+	 */
-+	for (; i < 0x100000 && i + maxram < 0x80000000 ; i += 808)
-+		if (!test_one_ro(valid_code, MKPTR(i + maxram), PGM_BIT_ADDR, 0))
-+			goto out;
-+	/* test the remaining addresses until we reach address 2GB;
-+	 * increment by a prime number (times 8) in order to test all
-+	 * possible valid offsets inside pages
-+	 */
-+	for (; i + maxram < 0x80000000; i += 800024)
-+		if (!test_one_ro(valid_code, MKPTR(i + maxram), PGM_BIT_ADDR, 0))
-+			goto out;
-+out:
-+	report(i + maxram >= 0x80000000, "Invalid SCCB address");
-+}
-+
-+/**
-+ * Test some bits in the instruction format that are specified to be ignored.
-+ */
-+static void test_instbits(void)
-+{
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+	int cc;
-+
-+	sclp_mark_busy();
-+	h->length = 8;
-+	sclp_setup_int();
-+
-+	asm volatile(
-+		"       .insn   rre,0xb2204200,%1,%2\n"  /* servc %1,%2 */
-+		"       ipm     %0\n"
-+		"       srl     %0,28"
-+		: "=&d" (cc) : "d" (valid_code), "a" (__pa(pagebuf))
-+		: "cc", "memory");
-+	/* No exception, but also no command accepted, so no interrupt is
-+	 * expected. We need to clear the flag manually otherwise we will
-+	 * loop forever when we try to report failure.
-+	 */
-+	if (cc)
-+		sclp_handle_ext();
-+	else
-+		sclp_wait_busy();
-+	report(cc == 0, "Instruction format ignored bits");
-+}
-+
-+/**
-+ * Find a valid READ INFO command code; not all codes are always allowed, and
-+ * probing should be performed in the right order.
-+ */
-+static void find_valid_sclp_code(void)
-+{
-+	const unsigned int commands[] = { SCLP_CMDW_READ_SCP_INFO_FORCED,
-+					  SCLP_CMDW_READ_SCP_INFO };
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+	int i, cc;
-+
-+	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-+		sclp_mark_busy();
-+		memset(h, 0, sizeof(*h));
-+		h->length = 4096;
-+
-+		valid_code = commands[i];
-+		cc = sclp_service_call(commands[i], h);
-+		if (cc)
-+			break;
-+		if (h->response_code == SCLP_RC_NORMAL_READ_COMPLETION)
-+			return;
-+		if (h->response_code != SCLP_RC_INVALID_SCLP_COMMAND)
-+			break;
-+	}
-+	report_abort("READ_SCP_INFO failed");
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("sclp");
-+	find_valid_sclp_code();
-+
-+	/* Test some basic things */
-+	test_instbits();
-+	test_priv();
-+	test_addressing();
-+
-+	/* Test the specification exceptions */
-+	test_sccb_too_short();
-+	test_sccb_unaligned();
-+	test_sccb_prefix();
-+	test_sccb_high();
-+
-+	/* Test the expected response codes */
-+	test_inval();
-+	test_short();
-+	test_boundary();
-+	test_toolong();
-+
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index f1b07cd..07013b2 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -75,3 +75,11 @@ file = stsi.elf
- [smp]
- file = smp.elf
- extra_params =-smp 2
-+
-+[sclp-1g]
-+file = sclp.elf
-+extra_params = -m 1G
-+
-+[sclp-3g]
-+file = sclp.elf
-+extra_params = -m 3G
--- 
-2.24.1
+T24gMS8yMC8yMCA2OjUzIFBNLCBBbGV4YW5kZXIgR3JhZiB3cm90ZToKPgo+Cj4gT24gMTguMDEu
+MjAgMDA6MzgsIFBhb2xvIEJvbnppbmkgd3JvdGU6Cj4+IE9uIDE1LzAxLzIwIDE1OjU5LCBBbGV4
+YW5kZXIgR3JhZiB3cm90ZToKPj4+IE9uIDE1LjAxLjIwIDE1OjQzLCBtaWxhbnBhQGFtYXpvbi5j
+b20gd3JvdGU6Cj4+Pj4+PiBMZXQncyBleHBvc2UgbmV3IGludGVyZmFjZSB0byB1c2Vyc3BhY2Ug
+Zm9yIGdhcmhlcmluZyB0aGVzZQo+Pj4+Pj4gc3RhdGlzdGljcyB3aXRoIG9uZSBpb2N0bC4KPj4+
+Pj4+Cj4+Pj4+PiBVc2Vyc3BhY2UgYXBwbGljYXRpb24gY2FuIHJlYWQgY291bnRlciBkZXNjcmlw
+dGlvbiBvbmNlIHVzaW5nCj4+Pj4+PiBLVk1fR0VUX1NVUFBPUlRFRF9ERUJVR0ZTX1NUQVQgYW5k
+IHBlcmlvZGljYWxseSBpbnZva2UgdGhlCj4+Pj4+PiBLVk1fR0VUX0RFQlVHRlNfVkFMVUVTIHRv
+IGdldCB2YWx1ZSB1cGRhdGUuCj4+Pj4+Cj4+Pj4+IFRoaXMgaXMgYW4gaW50ZXJmYWNlIHRoYXQg
+cmVxdWlyZXMgYSBsb3Qgb2YgbG9naWMgYW5kIGJ1ZmZlcnMgZnJvbQo+Pj4+PiB1c2VyIHNwYWNl
+IHRvIHJldHJpZXZlIGluZGl2aWR1YWwsIGV4cGxpY2l0IGNvdW50ZXJzLiBXaGF0IGlmIEkganVz
+dAo+Pj4+PiB3YW50ZWQgdG8gbW9uaXRvciB0aGUgbnVtYmVyIG9mIGV4aXRzIG9uIGV2ZXJ5IHVz
+ZXIgc3BhY2UgZXhpdD8KPj4+Pgo+Pj4+IEluIGNhc2Ugd2Ugd2FudCB0byBjb3ZlciBzdWNoIGxh
+dGVuY3kgc2Vuc2l0aXZlIHVzZSBjYXNlcyBzb2x1dGlvbiBiKSwKPj4+PiB3aXRoIG1tYXAnZWQg
+c3RydWN0cyB5b3Ugc3VnZ2VzdGVkLCB3b3VsZCBiZSBhIHdheSB0byBnbywgSU1PLgo+Pj4+Cj4+
+Pj4+IEFsc28sIHdlJ3JlIHN1ZGRlbmx5IG1ha2luZyB0aGUgZGVidWdmcyBuYW1lcyBhIGZ1bGwg
+QUJJLCBiZWNhdXNlCj4+Pj4+IHRocm91Z2ggdGhpcyBpbnRlcmZhY2Ugd2Ugb25seSBpZGVudGlm
+eSB0aGUgaW5kaXZpZHVhbCBzdGF0cyB0aHJvdWdoCj4+Pj4+IHRoZWlyIG5hbWVzLiBUaGF0IG1l
+YW5zIHdlIGNhbiBub3QgcmVtb3ZlIHN0YXRzIG9yIGNoYW5nZSB0aGVpcgo+Pj4+PiBuYW1lcywg
+YmVjYXVzZSBwZW9wbGUgbWF5IHJlbHkgb24gdGhlbSwgbm8/IFRoaW5pbmcgYWJvdXQgdGhpcyBh
+Z2FpbiwKPj4+Pj4gbWF5YmUgdGhleSBhbHJlYWR5IGFyZSBhbiBBQkkgYmVjYXVzZSBwZW9wbGUg
+cmVseSBvbiB0aGVtIGluIGRlYnVnZnMKPj4+Pj4gdGhvdWdoPwo+Pgo+PiBJbiB0aGVvcnkgbm90
+LCBpbiBwcmFjdGljZSBJIGhhdmUgdHJlYXRlZCB0aGVtIGFzIGEga2luZCBvZiAic29mdCIgQUJJ
+Ogo+PiBpZiB0aGUgbWVhbmluZyBjaGFuZ2VzIHlvdSBzaG91bGQgcmVuYW1lIHRoZW0sIGFuZCBy
+ZW1vdmluZyB0aGVtIGlzCj4+IGZpbmUsIGJ1dCB5b3Ugc2hvdWxkbid0IGZvciBleGFtcGxlIGNo
+YW5nZSB0aGUgdW5pdCBvZiBtZWFzdXJlICh3aGljaCBpcwo+PiBub3QgaGFyZCBzaW5jZSB0aGV5
+IGFyZSBhbGwgY291bnRlcnMgOikgYnV0IHBlcmhhcHMgeW91IGNvdWxkIGhhdmUKPj4gbmFub3Nl
+Y29uZHMgdnMgVFNDIGN5Y2xlcyBpbiB0aGUgZnV0dXJlIGZvciBzb21lIGNvdW50ZXJzKS4KPj4K
+Pj4+Pj4gSSBzZWUgdHdvIGFsdGVybmF0aXZlcyB0byB0aGlzIGFwcHJvYWNoIGhlcmU6Cj4+Pj4+
+Cj4+Pj4+IGEpIE9ORV9SRUcKPj4+Pj4KPj4+Pj4gV2UgY2FuIGp1c3QgYWRkIGEgbmV3IERFQlVH
+IGFyY2ggaW4gT05FX1JFRyBhbmQgZXhwb3NlIE9ORV9SRUcgcGVyIFZNCj4+Pj4+IGFzIHdlbGwg
+KGlmIHdlIHJlYWxseSBoYXZlIHRvPykuIFRoYXQgZ2l2ZXMgdXMgZXhwbGljaXQgaWRlbnRpZmll
+cnMKPj4+Pj4gZm9yIGVhY2ggc3RhdCB3aXRoIGFuIGV4cGxpY2l0IHBhdGggdG8gaW50cm9kdWNl
+IG5ldyBvbmVzIHdpdGggdmVyeQo+Pj4+PiB1bmlxdWUgaWRlbnRpZmllcnMuCj4+IE9ORV9SRUcg
+d291bGQgZm9yY2UgdXMgdG8gZGVmaW5lIGNvbnN0YW50cyBmb3IgZWFjaCBjb3VudGVyLCBhbmQg
+d291bGQKPj4gbWFrZSBpdCBoYXJkIHRvIHJldGlyZSB0aGVtLsKgIEkgZG9uJ3QgbGlrZSB0aGlz
+Lgo+Cj4gV2h5IGRvZXMgaXQgbWFrZSBpdCBoYXJkIHRvIHJldGlyZSB0aGVtPyBXZSB3b3VsZCBq
+dXN0IHJldHVybiAtRUlOVkFMIAo+IG9uIHJldHJpZXZhbCwgbGlrZSB3ZSBkbyBmb3IgYW55IG90
+aGVyIG5vbi1zdXBwb3J0ZWQgT05FX1JFRy4KPgo+IEl0J3MgdGhlIHNhbWUgYXMgYSBmaWxlIG5v
+dCBleGlzdGluZyBpbiBkZWJ1Z2ZzL3N0YXRmcy4gT3IgYW4gZW50cnkgaW4gCj4gdGhlIGFycmF5
+IG9mIHRoaXMgcGF0Y2ggdG8gZGlzYXBwZWFyLgo+Cj4+Cj4+Pj4+IGIpIHBhcnQgb2YgdGhlIG1t
+YXAnZWQgdmNwdSBzdHJ1Y3QKPj4KPj4gU2FtZSBoZXJlLsKgIEV2ZW4gaWYgd2Ugc2F5IHRoZSBz
+ZW1hbnRpY3Mgb2YgdGhlIHN0cnVjdCB3b3VsZCBiZSBleHBvc2VkCj4+IHRvIHVzZXJzcGFjZSB2
+aWEgS1ZNX0dFVF9TVVBQT1JURURfREVCVUdGU19TVEFULCBzb21lb25lIG1pZ2h0IGVuZCB1cAo+
+PiBnZXR0aW5nIHRoaXMgd3JvbmcgYW5kIGV4cGVjdGluZyBhIHBhcnRpY3VsYXIgbGF5b3V0LsKg
+IE1pbGFuJ3MgcHJvcG9zZWQKPj4gQVBJIGhhcyB0aGUgYmlnIGFkdmFudGFnZSBvZiBiZWluZyBo
+YXJkIHRvIGdldCB3cm9uZyBmb3IgdXNlcnNwYWNlLsKgIEFuZAo+PiBwdXNoaW5nIHRoZSBhZ2dy
+ZWdhdGlvbiB0byB1c2Vyc3BhY2UgaXMgbm90IGEgaHVnZSBjaG9yZSwgYnV0IGl0J3Mgc3RpbGwK
+Pj4gYSBjaG9yZS4KPj4KPj4gU28gdW5sZXNzIHNvbWVvbmUgaGFzIGEgdXNlY2FzZSBmb3IgbGF0
+ZW5jeS1zZW5zaXRpdmUgbW9uaXRvcmluZyBJJ2QKPj4gcHJlZmVyIHRvIGtlZXAgaXQgc2ltcGxl
+ICh1c3VhbGx5IHRoZXNlIGtpbmQgb2Ygc3RhdHMgY2FuIGV2ZW4gbWFrZQo+PiBzZW5zZSBpZiB5
+b3UgZ2F0aGVyIHRoZW0gb3ZlciByZWxhdGl2ZWx5IGxhcmdlIHBlcmlvZCBvZiB0aW1lLCBiZWNh
+dXNlCj4+IHRoZW4geW91J2xsIHByb2JhYmx5IHVzZSBzb21ldGhpbmcgZWxzZSBsaWtlIHRyYWNl
+cG9pbnRzIHRvIGFjdHVhbGx5Cj4+IHBpbnBvaW50IHdoYXQncyBnb2luZyBvbikuCj4KPiBJIHRl
+bmQgdG8gYWdyZWUuIEZldGNoaW5nIHRoZW0gdmlhIGFuIGV4cGxpY2l0IGNhbGwgaW50byB0aGUg
+a2VybmVsIGlzIAo+IGRlZmluaXRlbHkgdGhlIHNhZmVyIHJvdXRlLgo+Cj4+Cj4+Pj4+IDIpIHZj
+cHUgY291bnRlcnMKPj4+Pj4KPj4+Pj4gTW9zdCBvZiB0aGUgY291bnRlcnMgY291bnQgb24gdmNw
+dSBncmFudWxhcml0eSwgYnV0IGRlYnVnZnMgb25seQo+Pj4+PiBnaXZlcyB1cyBhIGZ1bGwgVk0g
+dmlldy4gV2hhdGV2ZXIgd2UgZG8gdG8gaW1wcm92ZSB0aGUgc2l0dWF0aW9uLCB3ZQo+Pj4+PiBz
+aG91bGQgZGVmaW5pdGVseSB0cnkgdG8gYnVpbGQgc29tZXRoaW5nIHRoYXQgYWxsb3dzIHVzIHRv
+IGdldCB0aGUKPj4+Pj4gY291bnRlcnMgcGVyIHZjcHUgKGFzIHdlbGwpLgo+Pj4+Pgo+Pj4+PiBU
+aGUgbWFpbiBwdXJwb3NlIG9mIHRoZXNlIGNvdW50ZXJzIGlzIG1vbml0b3JpbmcuIEl0IGNhbiBi
+ZSBxdWl0ZQo+Pj4+PiBpbXBvcnRhbnQgdG8ga25vdyB0aGF0IG9ubHkgYSBzaW5nbGUgdkNQVSBp
+cyBnb2luZyB3aWxkLCBjb21wYXJlZCB0bwo+Pj4+PiBhbGwgb2YgdGhlbSBmb3IgZXhhbXBsZS4K
+Pj4+Pgo+Pj4+IEkgYWdyZWUsIGV4cG9zaW5nIHBlciB2Y3B1IGNvdW50ZXJzIGNhbiBiZSB1c2Vm
+dWwuIEkgZ3Vlc3MgaXQgZGlkbid0Cj4+Pj4gbWFrZSBtdWNoIHNlbnNlIGV4cG9zaW5nIHRoZW0g
+dGhyb3VnaCBkZWJ1Z2ZzIHNvIGFnZ3JlZ2F0aW9uIHdhcyBkb25lCj4+Pj4gaW4ga2VybmVsLiBI
+b3dldmVyIGlmIHdlIGNob3NlIHRvIGdvIHdpdGggYXBwcm9hY2ggMS1iKSBtbWFwIGNvdW50ZXJz
+Cj4+Pj4gc3RydWN0IGluIHVzZXJzcGFjZSwgd2UgY291bGQgZG8gdGhpcy4KPj4+Cj4+PiBUaGUg
+cmVhc29uIEkgZGlzbGlrZSB0aGUgZGVidWdmcy9zdGF0ZnMgYXBwcm9hY2ggaXMgdGhhdCBpdCBn
+ZW5lcmF0ZXMgYQo+Pj4gY29tcGxldGVseSBzZXBhcmF0ZSBwZXJtaXNzaW9uIGFuZCBhY2Nlc3Mg
+cGF0aHMgdG8gdGhlIHN0YXRzLiBUaGF0J3MKPj4+IGdyZWF0IGZvciBmdWxsIHN5c3RlbSBtb25p
+dG9yaW5nLCBidXQgcmVhbGx5IGJhZCB3aGVuIHlvdSBoYXZlIG11bHRpcGxlCj4+PiBpbmRpdmlk
+dWFsIHRlbmFudHMgb24gYSBzaW5nbGUgaG9zdC4KPj4KPj4gSSBhZ3JlZSwgYW55dGhpbmcgaW4g
+c3lzZnMgaXMgY29tcGxlbWVudGFyeSB0byB2bWZkL3ZjcHVmZCBhY2Nlc3MuCj4KPiBDb29sIDop
+Lgo+Cj4gU28gd2Ugb25seSBuZWVkIHRvIGFncmVlIG9uIE9ORV9SRUcgdnMuIHRoaXMgcGF0Y2gg
+bW9zdGx5PwoKV2hhdCBhYm91dCBleHRlbmRpbmcgS1ZNX0dFVF9TVVBQT1JURURfREVCVUdGU19T
+VEFUIHdpdGggc29tZSBhZGRpdGlvbmFsIAppbmZvcm1hdGlvbiBsaWtlIHRoZSBkYXRhIHR5cGUg
+YW5kIHVuaXQ/IE9ORV9SRUcgZXhwb3NlcyBhZGRpdGlvbmFsIApzZW1hbnRpY3MgYWJvdXQgZGF0
+YS4KCj4KPiBBbGV4CgoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgK
+S3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFu
+IFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hh
+cmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4
+OSAyMzcgODc5CgoK
 
