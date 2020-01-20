@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91BE214223F
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 04:56:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AEC93142247
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 05:04:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729095AbgATD4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Jan 2020 22:56:51 -0500
-Received: from ozlabs.org ([203.11.71.1]:56027 "EHLO ozlabs.org"
+        id S1729099AbgATEEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Jan 2020 23:04:20 -0500
+Received: from ozlabs.org ([203.11.71.1]:51483 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729011AbgATD4v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 Jan 2020 22:56:51 -0500
+        id S1729011AbgATEEU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Jan 2020 23:04:20 -0500
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 481Hsr4GqVz9sRK; Mon, 20 Jan 2020 14:56:48 +1100 (AEDT)
+        id 481J2T5VvKz9sRQ; Mon, 20 Jan 2020 15:04:17 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1579492608; bh=lAGKBdtognRp9MuKBdR+5b2SjLz9x55FpMJWqSfQ6qY=;
+        t=1579493057; bh=GlIncoWYmOYv5Dni23RSwo6uZojZl918YWnmGeGzyJI=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dUAKAq0v+fVttWJxioZvNG0BtMhcZUat99t698VbzX1F/zlmSKB330Etdpr8dhc76
-         LgQ0zJdbhuyR1H/vR0aYkaoRDTWcKoSWaqcXj6ErDly+Tn2yz7PSXHSNyMImPMl9tP
-         xyavDDW3J6vU7xLt0EzjiAP8W7GOt+xqqQHnwlIoIwKSt8mNIQuX2kFmVUUOR/AB+1
-         223kTr75BFvJJpA2PeWzgxHtia7sYccOJwK6fdQs+TGCFIgaTI9QqAo127pLrxO2BS
-         vw/3QB56iD9jMWi9IFVNiAA2HJNbXbWM7qMcFTfg7AwfcraXsEohfC0CAqwPxUayYv
-         d19QF6AMoz1qQ==
-Date:   Mon, 20 Jan 2020 14:56:44 +1100
+        b=V/Pa+sHEae+jG71OR9r2A404DaS5UBDnEl6W5GR08hXip3iEYMnPJKOgSS38mznMS
+         QFzFYRElYmpf39vGFlmcBXqAVGdMsLFjm/U25lpx6q0fNhotMfBPwIAqSNRKv/jocP
+         A5kGrOXz8juIsyZkgL8m65HZO5Fh3mx4+Y9Ux1ecPuIMT+sYjoMy+YSKDxMsJPTVPp
+         HQfIaljJGxLrxk3xUQeJAE38M8fGC3e1O4wLIfYvDRR2aZSLUNac6unBI8qCtwWfOb
+         HgwP/Q9WG5+8ApO9XCFy1bxiLQ13UNNmnGOK8PeEgB/i16xsXwKAaVRbebZ2djABCZ
+         zP8/aQGwqo1nw==
+Date:   Mon, 20 Jan 2020 15:04:12 +1100
 From:   Paul Mackerras <paulus@ozlabs.org>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
@@ -42,44 +42,50 @@ Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
         linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v2 15/45] KVM: PPC: Move kvm_vcpu_init() invocation to
- common code
-Message-ID: <20200120035644.GE14307@blackberry>
+Subject: Re: [PATCH v2 12/45] KVM: PPC: Allocate vcpu struct in common PPC
+ code
+Message-ID: <20200120040412.GF14307@blackberry>
 References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
- <20191218215530.2280-16-sean.j.christopherson@intel.com>
+ <20191218215530.2280-13-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20191218215530.2280-16-sean.j.christopherson@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191218215530.2280-13-sean.j.christopherson@intel.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 18, 2019 at 01:55:00PM -0800, Sean Christopherson wrote:
-> Move the kvm_cpu_{un}init() calls to common PPC code as an intermediate
-> step towards removing kvm_cpu_{un}init() altogether.
+On Wed, Dec 18, 2019 at 01:54:57PM -0800, Sean Christopherson wrote:
+> Move allocation of all flavors of PPC vCPUs to common PPC code.  All
+> variants either allocate 'struct kvm_vcpu' directly, or require that
+> the embedded 'struct kvm_vcpu' member be located at offset 0, i.e.
+> guarantee that the allocation can be directly interpreted as a 'struct
+> kvm_vcpu' object.
 > 
-> No functional change intended.
+> Remove the message from the build-time assertion regarding placement of
+> the struct, as compatibility with the arch usercopy region is no longer
+> the sole dependent on 'struct kvm_vcpu' being at offset zero.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Another error to fix:
+This fails to compile for Book E configs:
 
-> diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-> index 047c9f707704..dd7440e50c7a 100644
-> --- a/arch/powerpc/kvm/booke.c
-> +++ b/arch/powerpc/kvm/booke.c
-> @@ -2114,10 +2114,9 @@ int kvmppc_core_init_vm(struct kvm *kvm)
->  	return kvm->arch.kvm_ops->init_vm(kvm);
->  }
->  
-> -int kvmppc_core_vcpu_create(struct kvm *kvm, struct kvm_vcpu *vcpu,
-> -			    unsigned int id)
-> +int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu)
->  {
-> -	return kvm->arch.kvm_ops->vcpu_create(kvm, vcpu, id);
-> +	return kvm->arch.kvm_ops->vcpu_create(vcpu);
+  CC      arch/powerpc/kvm/e500.o
+/home/paulus/kernel/kvm/arch/powerpc/kvm/e500.c: In function ‘kvmppc_core_vcpu_create_e500’:
+/home/paulus/kernel/kvm/arch/powerpc/kvm/e500.c:464:9: error: return makes integer from pointer without a cast [-Werror=int-conversion]
+  return vcpu;
+         ^
+cc1: all warnings being treated as errors
+make[3]: *** [/home/paulus/kernel/kvm/scripts/Makefile.build:266: arch/powerpc/kvm/e500.o] Error 1
 
-This also needs s/kvm/vcpu->kvm/.
+There is a "return vcpu" statement in kvmppc_core_vcpu_create_e500(),
+and another in kvmppc_core_vcpu_create_e500mc(), which both need to be
+changed to "return 0".
+
+(By the way, I do appreciate you fixing the PPC code, even if there
+are some errors.)
 
 Paul.
