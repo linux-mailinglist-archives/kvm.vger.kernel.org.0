@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4999E142E1A
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 15:53:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02FF6142E23
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 15:53:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727130AbgATOxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 09:53:35 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42787 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726642AbgATOxe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jan 2020 09:53:34 -0500
+        id S1729043AbgATOx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 09:53:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29466 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726860AbgATOx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jan 2020 09:53:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579532013;
+        s=mimecast20190719; t=1579532035;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=XkocBLMnb0YNTqmPBF4dRwFEEPyltwHnwoY1bhcfxPQ=;
-        b=QXUMnY1Y8hemAnGMAH+FfGLLu7e1qUXwXeLqFqQioaP4DlCWrwNf6K7BK+EQ6R8IUFo0u0
-        Fn+OjRBl1DZkBJdky8LZ8BeQmdF4PN0kxRMu1NUE274gdu+tr8ZJI+261gpEGZ1Y86VhSH
-        mM04JAhOBu4EM8UklsTDV+8XzHKVU9s=
+        bh=aeTfZsXs9GwVzzfLNT0qAzQAtVyjfhZPBGaVoMKrngQ=;
+        b=GjEujBSPlqN8mRsbEgnmAcW3SHKrpe70Mysy9gQekowjXF2NKzFpJpgVqq4X1hwgruilRU
+        gPBtPN7cdzo+qdwIAzym+awL3pIY17UNQlWIeWX/W+ApjIN4r1EarvAql72yfNaLEsgflq
+        IqzHFO41/fnr4gla7GICzq/hmtbBwW8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-EYH_PyAzMt6stOl7Q_X2Cw-1; Mon, 20 Jan 2020 09:53:30 -0500
-X-MC-Unique: EYH_PyAzMt6stOl7Q_X2Cw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-258-mIPJGWstMX-IBVhY86JDtQ-1; Mon, 20 Jan 2020 09:53:51 -0500
+X-MC-Unique: mIPJGWstMX-IBVhY86JDtQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFBDB800D4E;
-        Mon, 20 Jan 2020 14:53:28 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C413DB61;
+        Mon, 20 Jan 2020 14:53:50 +0000 (UTC)
 Received: from [10.36.118.34] (unknown [10.36.118.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7FEFE858BE;
-        Mon, 20 Jan 2020 14:53:27 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 4/9] s390x: smp: Rework cpu start and
- active tracking
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 383AF5D9C5;
+        Mon, 20 Jan 2020 14:53:49 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 8/9] s390x: smp: Test all CRs on initial
+ reset
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
         linux-s390@vger.kernel.org, cohuck@redhat.com
 References: <20200117104640.1983-1-frankja@linux.ibm.com>
- <20200117104640.1983-5-frankja@linux.ibm.com>
- <0f9984f0-9768-dba8-5e36-8e667bc05c88@redhat.com>
- <22cbcc9d-1d32-a5c9-4f3f-7892e28bc705@linux.ibm.com>
+ <20200117104640.1983-9-frankja@linux.ibm.com>
+ <15f8b733-1b81-4a1b-22fe-53099878c013@redhat.com>
+ <d866273e-5108-e634-4e92-93aa66bbed57@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -87,45 +87,79 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <66fde098-e238-e590-a9c5-44c552e1a32b@redhat.com>
-Date:   Mon, 20 Jan 2020 15:53:26 +0100
+Message-ID: <87b89c08-bd94-967a-f61b-18a9cdfa7453@redhat.com>
+Date:   Mon, 20 Jan 2020 15:53:48 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <22cbcc9d-1d32-a5c9-4f3f-7892e28bc705@linux.ibm.com>
+In-Reply-To: <d866273e-5108-e634-4e92-93aa66bbed57@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Well, I have restarts in the smp test and I don't want to always pass a
-> psw if I know what the last restart psw was.
-> Simply restarting into test_func or wait_for_flag is certainly no problem.
-> 
+On 20.01.20 15:49, Janosch Frank wrote:
+> On 1/20/20 1:10 PM, David Hildenbrand wrote:
+>> On 17.01.20 11:46, Janosch Frank wrote:
+>>> All CRs are set to 0 and CRs 0 and 14 are set to pre-defined values,
+>>> so we also need to test 1-13 and 15 for 0.
+>>>
+>>> And while we're at it, let's also set some values to cr 1, 7 and 13, so
+>>> we can actually be sure that they will be zeroed.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> ---
+>>>  s390x/smp.c | 18 +++++++++++++++++-
+>>>  1 file changed, 17 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/s390x/smp.c b/s390x/smp.c
+>>> index c12a3db..1385488 100644
+>>> --- a/s390x/smp.c
+>>> +++ b/s390x/smp.c
+>>> @@ -169,16 +169,30 @@ static void test_emcall(void)
+>>>  	report_prefix_pop();
+>>>  }
+>>>  
+>>> +/* Used to dirty registers of cpu #1 before it is reset */
+>>> +static void test_func_initial(void)
+>>> +{
+>>> +	lctlg(1, 0x42000UL);
+>>> +	lctlg(7, 0x43000UL);
+>>> +	lctlg(13, 0x44000UL);
+>>> +	mb();
+>>> +	testflag = 1;
+>>> +}
+>>> +
+>>>  static void test_reset_initial(void)
+>>>  {
+>>>  	struct cpu_status *status = alloc_pages(0);
+>>> +	uint64_t nullp[12] = {};
+>>>  	struct psw psw;
+>>>  
+>>>  	psw.mask = extract_psw_mask();
+>>> -	psw.addr = (unsigned long)test_func;
+>>> +	psw.addr = (unsigned long)test_func_initial;
+>>>  
+>>>  	report_prefix_push("reset initial");
+>>> +	testflag = 0;
+>>> +	mb();
 >>
-
-Makes sense.
-
->>> +	rc = sigp(addr, SIGP_RESTART, 0, NULL);
->>> +	if (rc)
->>> +		return rc;
->>> +	/*
->>> +	 * The order has been accepted, but the actual restart may not
->>> +	 * have been performed yet, so wait until the cpu is running.
->>> +	 */
->>> +	while (!smp_cpu_running(addr))
->>> +		mb();
+>> maybe use a  set_flag() function like
 >>
->> Should you make sure to stop the CPU before issuing the restart?
->> Otherwise you will get false positives if it is still running (but
->> hasn't processed the RESTART yet)
+>> mb();
+>> testflag = val;
+>> mb();
+>>
+>> and use it everywhere you set the flag? (e.g., in test_func_initial())
 > 
-> Good point
-> 
+> Hmm, so basically a set_test_flag() function in a new patch :)
+> Ok, I'll have a look.
+
+Sorry that this patch set keeps exploding :)
 
 
 -- 
