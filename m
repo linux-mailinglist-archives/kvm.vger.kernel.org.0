@@ -2,110 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B6B2142E80
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 16:11:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 86CDA142EAD
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 16:22:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729188AbgATPLr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 10:11:47 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50590 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726642AbgATPLr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 10:11:47 -0500
+        id S1727688AbgATPWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 10:22:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23134 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726626AbgATPWB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Jan 2020 10:22:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579533105;
+        s=mimecast20190719; t=1579533719;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Jl75FyV2eKAuNVkPFCRLduCG2Tj/ztsoq3xLT8s1OKA=;
-        b=K7Q8MY/KgiUi7P93izqgMkTW1FW03GC3wYq+6yrfeaKLqxa6kQgAESG3OWN5H1+TdBCa83
-        +zVt5VFsF53FGYdrfo0vPdjx2USDLX9bNpyGCQZ/hirenYeWFhj0Ef1jwGKqFr9bzJTCbV
-        zm0TcnyG2MDVFPdJsK1//moXCdY0GEg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-QI0UbABzNy28ZPMzfKuWqA-1; Mon, 20 Jan 2020 10:11:44 -0500
-X-MC-Unique: QI0UbABzNy28ZPMzfKuWqA-1
-Received: by mail-wr1-f71.google.com with SMTP id f17so14284201wrt.19
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 07:11:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Jl75FyV2eKAuNVkPFCRLduCG2Tj/ztsoq3xLT8s1OKA=;
-        b=IvXWOHSbQj/KdkrdhkrJoyhNEhAyS6vxtgYfVc4bK+UngDhOl7OQNIAllAD9oQHQQ5
-         u+F9vK89Asi+nBl1ulke2vHyjYAy+TA/ACqCOlAbhG3Vli8XydMCwF1tpYuu6q0OLQJ3
-         n/Z5M5bUeblmREabSo1qGRbSVAhIImugJQI4Y+z00pkSsGqgxzXuDnXa+/JMeEeLLsjS
-         OOqCPLH11xfVsBqt7W5HGRib6zQiBv5/9+bNVW1iNbehjoVqlg9imp9nzTQpXjrgpRDp
-         +gjNUr93p9DRVybXhEkDEAJoKt0xv9KWTWZ6398jYc0PKPKeYuEFsEyH/esuaNEyzl6p
-         Pj8w==
-X-Gm-Message-State: APjAAAW6DUgm0HK9Tns0n+v1/65E2LVT9jM6JUVyU02gTLSOs72ZDt3U
-        /JR8b1KD5Mbnh5OvIE/D0MoQm8hWtxnh830wIFx9O2amAizde+1NftcGbWMRexxCSLQLg8DK7DI
-        YiqSLqbVyx28S
-X-Received: by 2002:a5d:6144:: with SMTP id y4mr18472334wrt.15.1579533103594;
-        Mon, 20 Jan 2020 07:11:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwozBAXQphYzllCmalCwNBWOVy6u0dZCaSjZL8FjTnS+D47H1/1MzPh9W3DbIpfjfStE25Mbw==
-X-Received: by 2002:a5d:6144:: with SMTP id y4mr18472310wrt.15.1579533103369;
-        Mon, 20 Jan 2020 07:11:43 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id y20sm833707wmi.25.2020.01.20.07.11.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2020 07:11:42 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Liran Alon <liran.alon@oracle.com>
-Subject: [RFC] Revert "kvm: nVMX: Restrict VMX capability MSR changes"
-Date:   Mon, 20 Jan 2020 16:11:41 +0100
-Message-Id: <20200120151141.227254-1-vkuznets@redhat.com>
-X-Mailer: git-send-email 2.24.1
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AJZJhXCB46iDYru9xLh7kIZlEDf+CyxVIFvvA/vRJmM=;
+        b=Uq6chPN5dY666XDjv5+tmiZYqpGwH8zEpKFkXUj1VPTVB56dwyW4swJLUSkCd0bnC+IIFZ
+        gqX/ayf5HZVQ3P4Y0fDW1CcdHFhhQDsaoe5xTDFfJufT9Ik55QQZpdMxenizxxE63aiX/1
+        faT4jBANnlAHoRBo+eRZEQVn20s9Q3E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-5o4GEv3bMU6LGmnSwfNOcw-1; Mon, 20 Jan 2020 10:21:57 -0500
+X-MC-Unique: 5o4GEv3bMU6LGmnSwfNOcw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A9B61034AE5
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 15:21:56 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-78.gru2.redhat.com [10.97.116.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E7B36860EC;
+        Mon, 20 Jan 2020 15:21:53 +0000 (UTC)
+Subject: Re: [kvm-unit-tests] README: fix markdown formatting and general
+ improvements
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+References: <20200116212054.4041-1-wainersm@redhat.com>
+ <20200117131029.ymicng7vj2zebsik@kamzik.brq.redhat.com>
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <e403d30a-32af-db43-fa2b-a527b4a6e439@redhat.com>
+Date:   Mon, 20 Jan 2020 13:21:52 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200117131029.ymicng7vj2zebsik@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This reverts commit a943ac50d10aac96dca63d0460365a699d41fdd0.
 
-Fine-grained VMX feature enablement in QEMU broke live migration with
-nested guest:
+On 1/17/20 11:10 AM, Andrew Jones wrote:
+> On Thu, Jan 16, 2020 at 06:20:54PM -0300, Wainer dos Santos Moschetta wrote:
+>> There are some formatting fixes on this change:
+>> - Some blocks weren't indented correctly;
+>> - Some statements needed escape.
+>>
+>> Also the text is improved in some ways:
+>> - Variables and options are bold now;
+>> - Files path are set to italic;
+> I'd rather not do that. All the *'s and \'s make reading more difficult.
 
- (qemu) qemu-kvm: error: failed to set MSR 0x48e to 0xfff9fffe04006172
+I made those changes thinking on the developer reading the doc in a 
+browser. Indeed, on cmd line it would not be a nice experience.
 
-The problem is that QEMU does KVM_SET_NESTED_STATE before KVM_SET_MSRS,
-although it can probably be changed.
+>
+>> - Inline commands are marked;
+>> - Added a section about the tests configuration file.
+> Adding new content should be done as a separate patch.
 
-RFC. I think the check for vmx->nested.vmxon is legitimate for everything
-but restore so removing it (what I do with the revert) is likely a no-go.
-I'd like to gather opinions on the proper fix: should we somehow check
-that the vCPU is in 'restore' start (has never being run) and make
-KVM_SET_MSRS pass or should we actually mandate that KVM_SET_NESTED_STATE
-is run after KVM_SET_MSRS by userspace?
+I will send as separate patch in v2.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/vmx/nested.c | 7 -------
- 1 file changed, 7 deletions(-)
+>
+> Thanks for the cleanups, but I think we can keep the markup minimal and
+> still format the content neatly.
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 4aea7d304beb..bb8afe0c5e7f 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1321,13 +1321,6 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
--	/*
--	 * Don't allow changes to the VMX capability MSRs while the vCPU
--	 * is in VMX operation.
--	 */
--	if (vmx->nested.vmxon)
--		return -EBUSY;
--
- 	switch (msr_index) {
- 	case MSR_IA32_VMX_BASIC:
- 		return vmx_restore_vmx_basic(vmx, data);
--- 
-2.24.1
+Yeah, agree. On v2 I will try to keep markup minimal.
+
+Thanks for the nice review.
+
+- Wainer
+
+>
+> drew
+>
+>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> ---
+>>   See the results here: https://github.com/wainersm/kvm-unit-tests/tree/docs
+>>
+>>   README.md | 100 ++++++++++++++++++++++++++++++------------------------
+>>   1 file changed, 55 insertions(+), 45 deletions(-)
+>>
+>> diff --git a/README.md b/README.md
+>> index 1a9a4ab..07c5a82 100644
+>> --- a/README.md
+>> +++ b/README.md
+>> @@ -13,12 +13,11 @@ To create the test images do:
+>>       ./configure
+>>       make
+>>   
+>> -in this directory. Test images are created in ./<ARCH>/*.flat
+>> +in this directory. Test images are created in *./\<ARCH\>/\*.flat*
+>>   
+>>   ## Standalone tests
+>>   
+>> -The tests can be built as standalone
+>> -To create and use standalone tests do:
+>> +The tests can be built as standalone. To create and use standalone tests do:
+>>   
+>>       ./configure
+>>       make standalone
+>> @@ -26,8 +25,8 @@ To create and use standalone tests do:
+>>       (go to somewhere)
+>>       ./some-test
+>>   
+>> -'make install' will install all tests in PREFIX/share/kvm-unit-tests/tests,
+>> -each as a standalone test.
+>> +They are created in *./tests*. Or run `make install` to install all tests in
+>> +*PREFIX/share/kvm-unit-tests/tests*, each as a standalone test.
+>>   
+>>   
+>>   # Running the tests
+>> @@ -42,85 +41,96 @@ or:
+>>   
+>>   to run them all.
+>>   
+>> -To select a specific qemu binary, specify the QEMU=<path>
+>> +By default the runner script searches for a suitable qemu binary in the system.
+>> +To select a specific qemu binary though, specify the **QEMU=\<path\>**
+>>   environment variable:
+>>   
+>>       QEMU=/tmp/qemu/x86_64-softmmu/qemu-system-x86_64 ./x86-run ./x86/msr.flat
+>>   
+>>   To select an accelerator, for example "kvm" or "tcg", specify the
+>> -ACCEL=<name> environment variable:
+>> +**ACCEL=\<name\>** environment variable:
+>>   
+>>       ACCEL=kvm ./x86-run ./x86/msr.flat
+>>   
+>> -# Unit test inputs
+>> +# Tests suite configuration
+>>   
+>> -Unit tests use QEMU's '-append <args...>' parameter for command line
+>> -inputs, i.e. all args will be available as argv strings in main().
+>> -Additionally a file of the form
+>> +Given that each test case may need specific runtime configurations as, for
+>> +example, extra QEMU parameters and limited time to execute, the
+>> +runner script reads those information from a configuration file found
+>> +at *./\<ARCH\>/unittests.cfg*. This file also contain the group of tests which
+>> +can be ran with the script's **-g** option.
+>> +
+>> +## Unit test inputs
+>>   
+>> -KEY=VAL
+>> -KEY2=VAL
+>> -...
+>> +Unit tests use QEMU's **-append \<args...\>** parameter for command line
+>> +inputs, i.e. all args will be available as *argv* strings in *main()*.
+>> +Additionally a file of the form
+>>   
+>> -may be passed with '-initrd <file>' to become the unit test's environ,
+>> -which can then be accessed in the usual ways, e.g. VAL = getenv("KEY")
+>> -Any key=val strings can be passed, but some have reserved meanings in
+>> -the framework. The list of reserved environment variables is below
+>> +    KEY=VAL
+>> +    KEY2=VAL
+>> +    ...
+>>   
+>> - QEMU_ACCEL            ... either kvm or tcg
+>> - QEMU_VERSION_STRING   ... string of the form `qemu -h | head -1`
+>> - KERNEL_VERSION_STRING ... string of the form `uname -r`
+>> +may be passed with **-initrd \<file\>** to become the unit test's environ,
+>> +which can then be accessed in the usual ways, e.g. `VAL = getenv("KEY")`.
+>> + Any *key=val* strings can be passed, but some have reserved meanings in
+>> +the framework. The list of reserved environment variables is:
+>>   
+>> -Additionally these self-explanatory variables are reserved
+>> +    QEMU_ACCEL                   either kvm or tcg
+>> +    QEMU_VERSION_STRING          string of the form `qemu -h | head -1`
+>> +    KERNEL_VERSION_STRING        string of the form `uname -r`
+>>   
+>> - QEMU_MAJOR, QEMU_MINOR, QEMU_MICRO, KERNEL_VERSION, KERNEL_PATCHLEVEL,
+>> - KERNEL_SUBLEVEL, KERNEL_EXTRAVERSION
+>> +Additionally these self-explanatory variables are reserved: *QEMU\_MAJOR*, *QEMU\_MINOR*, *QEMU\_MICRO*, *KERNEL\_VERSION*, *KERNEL\_PATCHLEVEL*, *KERNEL\_SUBLEVEL*, *KERNEL\_EXTRAVERSION*.
+>>   
+>>   # Guarding unsafe tests
+>>   
+>>   Some tests are not safe to run by default, as they may crash the
+>>   host. kvm-unit-tests provides two ways to handle tests like those.
+>>   
+>> - 1) Adding 'nodefault' to the groups field for the unit test in the
+>> -    unittests.cfg file. When a unit test is in the nodefault group
+>> + 1) Adding **nodefault** to the groups field for the unit test in the
+>> +    *unittests.cfg* file. When a unit test is in the *nodefault* group
+>>       it is only run when invoked
+>>   
+>> -    a) independently, arch-run arch/test
+>> -    b) by specifying any other non-nodefault group it is in,
+>> -       groups = nodefault,mygroup : ./run_tests.sh -g mygroup
+>> -    c) by specifying all tests should be run, ./run_tests.sh -a
+>> +     a. independently, `<ARCH>-run <ARCH>/<TEST>.flat`
+>> +
+>> +     b. by specifying any other non-nodefault group it is in,
+>> +        *groups = nodefault,mygroup* : `./run_tests.sh -g mygroup`
+>> +
+>> +     c. by specifying all tests should be run, `./run_tests.sh -a`
+>>   
+>>    2) Making the test conditional on errata in the code,
+>> +    ```
+>>       if (ERRATA(abcdef012345)) {
+>>           do_unsafe_test();
+>>       }
+>> -
+>> +    ```
+>>       With the errata condition the unsafe unit test is only run
+>>       when
+>>   
+>> -    a) the ERRATA_abcdef012345 environ variable is provided and 'y'
+>> -    b) the ERRATA_FORCE environ variable is provided and 'y'
+>> -    c) by specifying all tests should be run, ./run_tests.sh -a
+>> -       (The -a switch ensures the ERRATA_FORCE is provided and set
+>> +    a) the *ERRATA\_abcdef012345* environment variable is provided and 'y'
+>> +
+>> +    b) the **ERRATA_FORCE** environment variable is provided and 'y'
+>> +
+>> +    c) by specifying all tests should be run, `./run_tests.sh -a`
+>> +       (The **-a** switch ensures the **ERRATA_FORCE** is provided and set
+>>           to 'y'.)
+>>   
+>> -The errata.txt file provides a mapping of the commits needed by errata
+>> +The *./errata.txt* file provides a mapping of the commits needed by errata
+>>   conditionals to their respective minimum kernel versions. By default,
+>>   when the user does not provide an environ, then an environ generated
+>> -from the errata.txt file and the host's kernel version is provided to
+>> +from the *./errata.txt* file and the host's kernel version is provided to
+>>   all unit tests.
+>>   
+>>   # Contributing
+>>   
+>>   ## Directory structure
+>>   
+>> -    .:				configure script, top-level Makefile, and run_tests.sh
+>> -    ./scripts:		helper scripts for building and running tests
+>> -    ./lib:			general architecture neutral services for the tests
+>> -    ./lib/<ARCH>:	architecture dependent services for the tests
+>> -    ./<ARCH>:		the sources of the tests and the created objects/images
+>> +    .:                  configure script, top-level Makefile, and run_tests.sh
+>> +    ./scripts:          helper scripts for building and running tests
+>> +    ./lib:              general architecture neutral services for the tests
+>> +    ./lib/<ARCH>:       architecture dependent services for the tests
+>> +    ./<ARCH>:           the sources of the tests and the created objects/images
+>>   
+>> -See <ARCH>/README for architecture specific documentation.
+>> +See *./\<ARCH\>/README* for architecture specific documentation.
+>>   
+>>   ## Style
+>>   
+>> @@ -129,7 +139,7 @@ existing files should be consistent with the existing style. For new
+>>   files:
+>>   
+>>     - C: please use standard linux-with-tabs, see Linux kernel
+>> -    doc Documentation/process/coding-style.rst
+>> +    doc *Documentation/process/coding-style.rst*
+>>     - Shell: use TABs for indentation
+>>   
+>>   Exceptions:
+>> @@ -142,7 +152,7 @@ Patches are welcome at the KVM mailing list <kvm@vger.kernel.org>.
+>>   
+>>   Please prefix messages with: [kvm-unit-tests PATCH]
+>>   
+>> -You can add the following to .git/config to do this automatically for you:
+>> +You can add the following to *.git/config* to do this automatically for you:
+>>   
+>>       [format]
+>>           subjectprefix = kvm-unit-tests PATCH
+>> -- 
+>> 2.23.0
+>>
 
