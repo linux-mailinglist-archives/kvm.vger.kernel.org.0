@@ -2,143 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C255E14311C
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 18:53:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF1A31431B6
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2020 19:43:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726991AbgATRx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Jan 2020 12:53:29 -0500
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:32973 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726642AbgATRx3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Jan 2020 12:53:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1579542809; x=1611078809;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=kLR56pBeoIQIBwhJEVejIEs3Zg5AXV/xpQO01Xxpq9U=;
-  b=TM0Uw1uiTvtEBSwvPx88ULvbQowT1nKxjBk7ak8WPD6+zIkjWAtrHB//
-   8uyZ0qOrbRG8iKTYcuEwE4XsHNUbxTzsxxwmoAC4TArcJ/PFoxJfsKRge
-   4WlBxeXJEff4dhVkW14zx/2v6rEou8l6meNELiCAgRWVgqe1f6WnBdywO
-   8=;
-IronPort-SDR: etF+2bH1TcpFfv0q4gTrPc7NHaeM1CeeJicDZhaO4/Fsp3nCOT5fJrCcVZkpp1OQZPFjwrPjgk
- 72sy4I21Qs9w==
-X-IronPort-AV: E=Sophos;i="5.70,342,1574121600"; 
-   d="scan'208";a="19823839"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 20 Jan 2020 17:53:17 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS id A5582A22FE;
-        Mon, 20 Jan 2020 17:53:14 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 20 Jan 2020 17:53:13 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.205) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 20 Jan 2020 17:53:12 +0000
-Subject: Re: [PATCH 2/2] kvm: Add ioctl for gathering debug counters
-To:     Paolo Bonzini <pbonzini@redhat.com>, <milanpa@amazon.com>,
-        Milan Pandurov <milanpa@amazon.de>, <kvm@vger.kernel.org>
-CC:     <rkrcmar@redhat.com>, <borntraeger@de.ibm.com>
-References: <20200115134303.30668-1-milanpa@amazon.de>
- <18820df0-273a-9592-5018-c50a85a75205@amazon.de>
- <8584d6c2-323c-14e2-39c0-21a47a91bbda@amazon.com>
- <ab84ee05-7e2b-e0cc-6994-fc485012a51a@amazon.de>
- <668ea6d3-06ae-4586-9818-cdea094419fe@redhat.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <e77a2477-6010-ae1d-0afd-0c5498ba2117@amazon.de>
-Date:   Mon, 20 Jan 2020 18:53:10 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.3.1
+        id S1726951AbgATSnF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Jan 2020 13:43:05 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58910 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726752AbgATSnF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Jan 2020 13:43:05 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00KIcjrY165777
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 13:43:04 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xkxhx7u0q-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2020 13:43:04 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Mon, 20 Jan 2020 18:43:01 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 20 Jan 2020 18:42:58 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00KIgvpE50724958
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Jan 2020 18:42:57 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A3C44C059;
+        Mon, 20 Jan 2020 18:42:57 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E10294C04E;
+        Mon, 20 Jan 2020 18:42:56 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.108])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 20 Jan 2020 18:42:56 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v8 0/6] s390x: SCLP Unit test
+Date:   Mon, 20 Jan 2020 19:42:50 +0100
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <668ea6d3-06ae-4586-9818-cdea094419fe@redhat.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.205]
-X-ClientProxiedBy: EX13D18UWC002.ant.amazon.com (10.43.162.88) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20012018-0012-0000-0000-0000037F2437
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012018-0013-0000-0000-000021BB6205
+Message-Id: <20200120184256.188698-1-imbrenda@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-20_08:2020-01-20,2020-01-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ phishscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=1
+ priorityscore=1501 bulkscore=0 adultscore=0 mlxscore=0 mlxlogscore=698
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001200156
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAxOC4wMS4yMCAwMDozOCwgUGFvbG8gQm9uemluaSB3cm90ZToKPiBPbiAxNS8wMS8yMCAx
-NTo1OSwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+IE9uIDE1LjAxLjIwIDE1OjQzLCBtaWxhbnBh
-QGFtYXpvbi5jb20gd3JvdGU6Cj4+Pj4+IExldCdzIGV4cG9zZSBuZXcgaW50ZXJmYWNlIHRvIHVz
-ZXJzcGFjZSBmb3IgZ2FyaGVyaW5nIHRoZXNlCj4+Pj4+IHN0YXRpc3RpY3Mgd2l0aCBvbmUgaW9j
-dGwuCj4+Pj4+Cj4+Pj4+IFVzZXJzcGFjZSBhcHBsaWNhdGlvbiBjYW4gcmVhZCBjb3VudGVyIGRl
-c2NyaXB0aW9uIG9uY2UgdXNpbmcKPj4+Pj4gS1ZNX0dFVF9TVVBQT1JURURfREVCVUdGU19TVEFU
-IGFuZCBwZXJpb2RpY2FsbHkgaW52b2tlIHRoZQo+Pj4+PiBLVk1fR0VUX0RFQlVHRlNfVkFMVUVT
-IHRvIGdldCB2YWx1ZSB1cGRhdGUuCj4+Pj4KPj4+PiBUaGlzIGlzIGFuIGludGVyZmFjZSB0aGF0
-IHJlcXVpcmVzIGEgbG90IG9mIGxvZ2ljIGFuZCBidWZmZXJzIGZyb20KPj4+PiB1c2VyIHNwYWNl
-IHRvIHJldHJpZXZlIGluZGl2aWR1YWwsIGV4cGxpY2l0IGNvdW50ZXJzLiBXaGF0IGlmIEkganVz
-dAo+Pj4+IHdhbnRlZCB0byBtb25pdG9yIHRoZSBudW1iZXIgb2YgZXhpdHMgb24gZXZlcnkgdXNl
-ciBzcGFjZSBleGl0Pwo+Pj4KPj4+IEluIGNhc2Ugd2Ugd2FudCB0byBjb3ZlciBzdWNoIGxhdGVu
-Y3kgc2Vuc2l0aXZlIHVzZSBjYXNlcyBzb2x1dGlvbiBiKSwKPj4+IHdpdGggbW1hcCdlZCBzdHJ1
-Y3RzIHlvdSBzdWdnZXN0ZWQsIHdvdWxkIGJlIGEgd2F5IHRvIGdvLCBJTU8uCj4+Pgo+Pj4+IEFs
-c28sIHdlJ3JlIHN1ZGRlbmx5IG1ha2luZyB0aGUgZGVidWdmcyBuYW1lcyBhIGZ1bGwgQUJJLCBi
-ZWNhdXNlCj4+Pj4gdGhyb3VnaCB0aGlzIGludGVyZmFjZSB3ZSBvbmx5IGlkZW50aWZ5IHRoZSBp
-bmRpdmlkdWFsIHN0YXRzIHRocm91Z2gKPj4+PiB0aGVpciBuYW1lcy4gVGhhdCBtZWFucyB3ZSBj
-YW4gbm90IHJlbW92ZSBzdGF0cyBvciBjaGFuZ2UgdGhlaXIKPj4+PiBuYW1lcywgYmVjYXVzZSBw
-ZW9wbGUgbWF5IHJlbHkgb24gdGhlbSwgbm8/IFRoaW5pbmcgYWJvdXQgdGhpcyBhZ2FpbiwKPj4+
-PiBtYXliZSB0aGV5IGFscmVhZHkgYXJlIGFuIEFCSSBiZWNhdXNlIHBlb3BsZSByZWx5IG9uIHRo
-ZW0gaW4gZGVidWdmcwo+Pj4+IHRob3VnaD8KPiAKPiBJbiB0aGVvcnkgbm90LCBpbiBwcmFjdGlj
-ZSBJIGhhdmUgdHJlYXRlZCB0aGVtIGFzIGEga2luZCBvZiAic29mdCIgQUJJOgo+IGlmIHRoZSBt
-ZWFuaW5nIGNoYW5nZXMgeW91IHNob3VsZCByZW5hbWUgdGhlbSwgYW5kIHJlbW92aW5nIHRoZW0g
-aXMKPiBmaW5lLCBidXQgeW91IHNob3VsZG4ndCBmb3IgZXhhbXBsZSBjaGFuZ2UgdGhlIHVuaXQg
-b2YgbWVhc3VyZSAod2hpY2ggaXMKPiBub3QgaGFyZCBzaW5jZSB0aGV5IGFyZSBhbGwgY291bnRl
-cnMgOikgYnV0IHBlcmhhcHMgeW91IGNvdWxkIGhhdmUKPiBuYW5vc2Vjb25kcyB2cyBUU0MgY3lj
-bGVzIGluIHRoZSBmdXR1cmUgZm9yIHNvbWUgY291bnRlcnMpLgo+IAo+Pj4+IEkgc2VlIHR3byBh
-bHRlcm5hdGl2ZXMgdG8gdGhpcyBhcHByb2FjaCBoZXJlOgo+Pj4+Cj4+Pj4gYSkgT05FX1JFRwo+
-Pj4+Cj4+Pj4gV2UgY2FuIGp1c3QgYWRkIGEgbmV3IERFQlVHIGFyY2ggaW4gT05FX1JFRyBhbmQg
-ZXhwb3NlIE9ORV9SRUcgcGVyIFZNCj4+Pj4gYXMgd2VsbCAoaWYgd2UgcmVhbGx5IGhhdmUgdG8/
-KS4gVGhhdCBnaXZlcyB1cyBleHBsaWNpdCBpZGVudGlmaWVycwo+Pj4+IGZvciBlYWNoIHN0YXQg
-d2l0aCBhbiBleHBsaWNpdCBwYXRoIHRvIGludHJvZHVjZSBuZXcgb25lcyB3aXRoIHZlcnkKPj4+
-PiB1bmlxdWUgaWRlbnRpZmllcnMuCj4gT05FX1JFRyB3b3VsZCBmb3JjZSB1cyB0byBkZWZpbmUg
-Y29uc3RhbnRzIGZvciBlYWNoIGNvdW50ZXIsIGFuZCB3b3VsZAo+IG1ha2UgaXQgaGFyZCB0byBy
-ZXRpcmUgdGhlbS4gIEkgZG9uJ3QgbGlrZSB0aGlzLgoKV2h5IGRvZXMgaXQgbWFrZSBpdCBoYXJk
-IHRvIHJldGlyZSB0aGVtPyBXZSB3b3VsZCBqdXN0IHJldHVybiAtRUlOVkFMIG9uIApyZXRyaWV2
-YWwsIGxpa2Ugd2UgZG8gZm9yIGFueSBvdGhlciBub24tc3VwcG9ydGVkIE9ORV9SRUcuCgpJdCdz
-IHRoZSBzYW1lIGFzIGEgZmlsZSBub3QgZXhpc3RpbmcgaW4gZGVidWdmcy9zdGF0ZnMuIE9yIGFu
-IGVudHJ5IGluIAp0aGUgYXJyYXkgb2YgdGhpcyBwYXRjaCB0byBkaXNhcHBlYXIuCgo+IAo+Pj4+
-IGIpIHBhcnQgb2YgdGhlIG1tYXAnZWQgdmNwdSBzdHJ1Y3QKPiAKPiBTYW1lIGhlcmUuICBFdmVu
-IGlmIHdlIHNheSB0aGUgc2VtYW50aWNzIG9mIHRoZSBzdHJ1Y3Qgd291bGQgYmUgZXhwb3NlZAo+
-IHRvIHVzZXJzcGFjZSB2aWEgS1ZNX0dFVF9TVVBQT1JURURfREVCVUdGU19TVEFULCBzb21lb25l
-IG1pZ2h0IGVuZCB1cAo+IGdldHRpbmcgdGhpcyB3cm9uZyBhbmQgZXhwZWN0aW5nIGEgcGFydGlj
-dWxhciBsYXlvdXQuICBNaWxhbidzIHByb3Bvc2VkCj4gQVBJIGhhcyB0aGUgYmlnIGFkdmFudGFn
-ZSBvZiBiZWluZyBoYXJkIHRvIGdldCB3cm9uZyBmb3IgdXNlcnNwYWNlLiAgQW5kCj4gcHVzaGlu
-ZyB0aGUgYWdncmVnYXRpb24gdG8gdXNlcnNwYWNlIGlzIG5vdCBhIGh1Z2UgY2hvcmUsIGJ1dCBp
-dCdzIHN0aWxsCj4gYSBjaG9yZS4KPiAKPiBTbyB1bmxlc3Mgc29tZW9uZSBoYXMgYSB1c2VjYXNl
-IGZvciBsYXRlbmN5LXNlbnNpdGl2ZSBtb25pdG9yaW5nIEknZAo+IHByZWZlciB0byBrZWVwIGl0
-IHNpbXBsZSAodXN1YWxseSB0aGVzZSBraW5kIG9mIHN0YXRzIGNhbiBldmVuIG1ha2UKPiBzZW5z
-ZSBpZiB5b3UgZ2F0aGVyIHRoZW0gb3ZlciByZWxhdGl2ZWx5IGxhcmdlIHBlcmlvZCBvZiB0aW1l
-LCBiZWNhdXNlCj4gdGhlbiB5b3UnbGwgcHJvYmFibHkgdXNlIHNvbWV0aGluZyBlbHNlIGxpa2Ug
-dHJhY2Vwb2ludHMgdG8gYWN0dWFsbHkKPiBwaW5wb2ludCB3aGF0J3MgZ29pbmcgb24pLgoKSSB0
-ZW5kIHRvIGFncmVlLiBGZXRjaGluZyB0aGVtIHZpYSBhbiBleHBsaWNpdCBjYWxsIGludG8gdGhl
-IGtlcm5lbCBpcyAKZGVmaW5pdGVseSB0aGUgc2FmZXIgcm91dGUuCgo+IAo+Pj4+IDIpIHZjcHUg
-Y291bnRlcnMKPj4+Pgo+Pj4+IE1vc3Qgb2YgdGhlIGNvdW50ZXJzIGNvdW50IG9uIHZjcHUgZ3Jh
-bnVsYXJpdHksIGJ1dCBkZWJ1Z2ZzIG9ubHkKPj4+PiBnaXZlcyB1cyBhIGZ1bGwgVk0gdmlldy4g
-V2hhdGV2ZXIgd2UgZG8gdG8gaW1wcm92ZSB0aGUgc2l0dWF0aW9uLCB3ZQo+Pj4+IHNob3VsZCBk
-ZWZpbml0ZWx5IHRyeSB0byBidWlsZCBzb21ldGhpbmcgdGhhdCBhbGxvd3MgdXMgdG8gZ2V0IHRo
-ZQo+Pj4+IGNvdW50ZXJzIHBlciB2Y3B1IChhcyB3ZWxsKS4KPj4+Pgo+Pj4+IFRoZSBtYWluIHB1
-cnBvc2Ugb2YgdGhlc2UgY291bnRlcnMgaXMgbW9uaXRvcmluZy4gSXQgY2FuIGJlIHF1aXRlCj4+
-Pj4gaW1wb3J0YW50IHRvIGtub3cgdGhhdCBvbmx5IGEgc2luZ2xlIHZDUFUgaXMgZ29pbmcgd2ls
-ZCwgY29tcGFyZWQgdG8KPj4+PiBhbGwgb2YgdGhlbSBmb3IgZXhhbXBsZS4KPj4+Cj4+PiBJIGFn
-cmVlLCBleHBvc2luZyBwZXIgdmNwdSBjb3VudGVycyBjYW4gYmUgdXNlZnVsLiBJIGd1ZXNzIGl0
-IGRpZG4ndAo+Pj4gbWFrZSBtdWNoIHNlbnNlIGV4cG9zaW5nIHRoZW0gdGhyb3VnaCBkZWJ1Z2Zz
-IHNvIGFnZ3JlZ2F0aW9uIHdhcyBkb25lCj4+PiBpbiBrZXJuZWwuIEhvd2V2ZXIgaWYgd2UgY2hv
-c2UgdG8gZ28gd2l0aCBhcHByb2FjaCAxLWIpIG1tYXAgY291bnRlcnMKPj4+IHN0cnVjdCBpbiB1
-c2Vyc3BhY2UsIHdlIGNvdWxkIGRvIHRoaXMuCj4+Cj4+IFRoZSByZWFzb24gSSBkaXNsaWtlIHRo
-ZSBkZWJ1Z2ZzL3N0YXRmcyBhcHByb2FjaCBpcyB0aGF0IGl0IGdlbmVyYXRlcyBhCj4+IGNvbXBs
-ZXRlbHkgc2VwYXJhdGUgcGVybWlzc2lvbiBhbmQgYWNjZXNzIHBhdGhzIHRvIHRoZSBzdGF0cy4g
-VGhhdCdzCj4+IGdyZWF0IGZvciBmdWxsIHN5c3RlbSBtb25pdG9yaW5nLCBidXQgcmVhbGx5IGJh
-ZCB3aGVuIHlvdSBoYXZlIG11bHRpcGxlCj4+IGluZGl2aWR1YWwgdGVuYW50cyBvbiBhIHNpbmds
-ZSBob3N0Lgo+IAo+IEkgYWdyZWUsIGFueXRoaW5nIGluIHN5c2ZzIGlzIGNvbXBsZW1lbnRhcnkg
-dG8gdm1mZC92Y3B1ZmQgYWNjZXNzLgoKQ29vbCA6KS4KClNvIHdlIG9ubHkgbmVlZCB0byBhZ3Jl
-ZSBvbiBPTkVfUkVHIHZzLiB0aGlzIHBhdGNoIG1vc3RseT8KCgpBbGV4CgoKCkFtYXpvbiBEZXZl
-bG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpH
-ZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVp
-bmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMg
-QgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
+This patchset contains some minor cleanup, some preparatory work and
+then the SCLP unit test itself.
+
+The unit test checks the following:
+    
+    * Correctly ignoring instruction bits that should be ignored
+    * Privileged instruction check
+    * Check for addressing exceptions
+    * Specification exceptions:
+      - SCCB size less than 8
+      - SCCB unaligned
+      - SCCB overlaps prefix or lowcore
+      - SCCB address higher than 2GB
+    * Return codes for
+      - Invalid command
+      - SCCB too short (but at least 8)
+      - SCCB page boundary violation
+
+v7 -> v8
+* fixed existing stfl asm wrapper
+* now using stfl asm wrapper in intercept.c
+* patched the program interrupt handler to clear the sclp_busy bit
+* removed now unnecessary expect_pgm_int from the unit test
+v6 -> v7
+* renamed spx() and stpx() wrappers to set_prefix and get_prefix
+* set_prefix now takes a value and get_prefix now returns a value
+* put back some inline assembly for spx and stpx as a consequence
+* used LC_SIZE instead of 2 * PAGE_SIZE everywhere in the unit test
+v5 -> v6
+* fixed a bug in test_addressing
+* improved comments in test_sccb_prefix
+* replaced all inline assembly usages of spx and stpx with the wrappers
+* added one more wrapper for test_one_sccb for read-only tests
+v4 -> v5
+* updated usage of report()
+* added SPX and STPX wrappers to the library
+* improved readability
+* addressed some more comments
+v3 -> v4
+* export sclp_setup_int instead of copying it
+* add more comments
+* rename some more variables to improve readability
+* improve the prefix test
+* improved the invalid address test
+* addressed further comments received during review
+v2 -> v3
+* generally improved the naming of variables
+* added and fixed comments
+* renamed test_one_run to test_one_simple
+* added some const where needed
+* addresed many more small comments received during review
+v1 -> v2
+* fix many small issues that came up during the first round of reviews
+* add comments to each function
+* use a static buffer for the SCCP template when used
+
+Claudio Imbrenda (6):
+  s390x: export sclp_setup_int
+  s390x: sclp: add service call instruction wrapper
+  s390x: lib: fix stfl wrapper asm
+  s390x: lib: add SPX and STPX instruction wrapper
+  s390x: lib: fix program interrupt handler if sclp_busy was set
+  s390x: SCLP unit test
+
+ s390x/Makefile           |   1 +
+ lib/s390x/asm/arch_def.h |  26 +++
+ lib/s390x/asm/facility.h |   2 +-
+ lib/s390x/sclp.h         |   1 +
+ lib/s390x/interrupt.c    |   5 +-
+ lib/s390x/sclp.c         |   9 +-
+ s390x/intercept.c        |  24 +-
+ s390x/sclp.c             | 474 +++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   8 +
+ 9 files changed, 526 insertions(+), 24 deletions(-)
+ create mode 100644 s390x/sclp.c
+
+-- 
+2.24.1
 
