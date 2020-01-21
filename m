@@ -2,224 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B03E143824
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 09:21:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32523143814
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 09:15:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727800AbgAUIVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 03:21:23 -0500
-Received: from mga07.intel.com ([134.134.136.100]:55315 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725789AbgAUIVW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 03:21:22 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Jan 2020 00:21:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,345,1574150400"; 
-   d="scan'208";a="215459015"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga007.jf.intel.com with ESMTP; 21 Jan 2020 00:21:19 -0800
-Date:   Tue, 21 Jan 2020 03:12:07 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        id S1727453AbgAUIP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 03:15:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57408 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726729AbgAUIP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 03:15:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579594555;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LDZZx/Gnj5ZRM82WjxYSmYyaFueti+mk2d2ohpv+jeI=;
+        b=YSlJP+OuHEsfvx0Qe2cYsmzBSL9sRbJbG8j7AbIn0+2OeG0juRr6le7jYZxtUzeiJy8HHd
+        eg3dC25id+/aPD4QYhaa8CibBHkMpDfOUD3cuXPbNR1uY6Z22bgboDlzByLy4qq4KL+LOI
+        g6y84rSSPPqNypEbuTwxt8lTiMDSF6o=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-166-7hrXMzzJP6-If3kMMiPJAw-1; Tue, 21 Jan 2020 03:15:54 -0500
+X-MC-Unique: 7hrXMzzJP6-If3kMMiPJAw-1
+Received: by mail-qt1-f198.google.com with SMTP id b7so1375234qtg.23
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 00:15:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=LDZZx/Gnj5ZRM82WjxYSmYyaFueti+mk2d2ohpv+jeI=;
+        b=JNH0CxYGElgz4UkJfR3ZTQoX2WyUKMdbrXhUI234/95ChBjmVMeMQgvO7MJTlcophY
+         mbBX5BK/kLrD+xT0qG5hWAfOGNje5Xli3BfsDbFtta/SLjn9A0+xBoIjJ5ag52lBANj4
+         4qh69Ffd+09zzhye5ZQLEdj2KoglVCek3N/CdFxhksMNc6/dhCB5ZKl5CyOQvCbSxHRJ
+         K8/8D0tvmJ+ZYa3lEgC+zkue0Hz62AsrI8Lo5uCYArlTX23iT15KwKXAf8bXkhxAy+IO
+         6ntCgL9OTZv4UQdI22mT6tElD8pe1Wk3sQsWhB9JlW6YNeFisrj4nK39i8NrpKq6R1IW
+         /a9Q==
+X-Gm-Message-State: APjAAAVqTUmgNDYE1WkL8pdTUGiFNjdvUiYZGX0ExbOda3sjxtt13qPO
+        zP9E9ZHt21hPX272on8MghKzGqoeGYiCD/L6dS6M+DBBrYefZgsm3gjvSpR2Q+0qD4dL6cW3Xzn
+        LOfao82y5X6Fe
+X-Received: by 2002:a37:4792:: with SMTP id u140mr3527893qka.100.1579594553679;
+        Tue, 21 Jan 2020 00:15:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxdkjBVx/UGOKVK94Xs4SyAvooIxcojAHiVS5/OG5oUdaH/4DoRhuXXCGIK/jBUqS0IK043lw==
+X-Received: by 2002:a37:4792:: with SMTP id u140mr3527856qka.100.1579594553353;
+        Tue, 21 Jan 2020 00:15:53 -0800 (PST)
+Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
+        by smtp.gmail.com with ESMTPSA id z3sm18825316qtm.5.2020.01.21.00.15.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2020 00:15:52 -0800 (PST)
+Date:   Tue, 21 Jan 2020 03:15:43 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Jason Gunthorpe <jgg@mellanox.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
+        Rob Miller <rob.miller@broadcom.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>
-Subject: Re: [PATCH v2 2/2] drm/i915/gvt: subsitute kvm_read/write_guest with
- vfio_dma_rw
-Message-ID: <20200121081207.GE1759@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200115034132.2753-1-yan.y.zhao@intel.com>
- <20200115035455.12417-1-yan.y.zhao@intel.com>
- <20200115130651.29d7e9e0@w520.home>
- <20200116054941.GB1759@joy-OptiPlex-7040>
- <20200116083729.40983f38@w520.home>
- <20200119100637.GD1759@joy-OptiPlex-7040>
- <20200120130157.0ee7042d@w520.home>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "Bie, Tiwei" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "Liang, Cunming" <cunming.liang@intel.com>,
+        "Wang, Zhihong" <zhihong.wang@intel.com>,
+        "Wang, Xiao W" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Ariel Adam <aadam@redhat.com>,
+        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
+Message-ID: <20200121031506-mutt-send-email-mst@kernel.org>
+References: <20200116124231.20253-4-jasowang@redhat.com>
+ <20200117070324-mutt-send-email-mst@kernel.org>
+ <239b042c-2d9e-0eec-a1ef-b03b7e2c5419@redhat.com>
+ <CAJPjb1+fG9L3=iKbV4Vn13VwaeDZZdcfBPvarogF_Nzhk+FnKg@mail.gmail.com>
+ <AM0PR0502MB379553984D0D55FDE25426F6C3330@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+ <d69918ca-8af4-44b2-9652-633530d4c113@redhat.com>
+ <20200120174933.GB3891@mellanox.com>
+ <2a324cec-2863-58f4-c58a-2414ee32c930@redhat.com>
+ <20200121004047-mutt-send-email-mst@kernel.org>
+ <b9ad744e-c4cd-82f9-f56a-1ecc185e9cd7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200120130157.0ee7042d@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b9ad744e-c4cd-82f9-f56a-1ecc185e9cd7@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 21, 2020 at 04:01:57AM +0800, Alex Williamson wrote:
-> On Sun, 19 Jan 2020 05:06:37 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Tue, Jan 21, 2020 at 04:00:38PM +0800, Jason Wang wrote:
 > 
-> > On Thu, Jan 16, 2020 at 11:37:29PM +0800, Alex Williamson wrote:
-> > > On Thu, 16 Jan 2020 00:49:41 -0500
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > On Thu, Jan 16, 2020 at 04:06:51AM +0800, Alex Williamson wrote:  
-> > > > > On Tue, 14 Jan 2020 22:54:55 -0500
-> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > >     
-> > > > > > As a device model, it is better to read/write guest memory using vfio
-> > > > > > interface, so that vfio is able to maintain dirty info of device IOVAs.
-> > > > > > 
-> > > > > > Compared to kvm interfaces kvm_read/write_guest(), vfio_dma_rw() has ~600
-> > > > > > cycles more overhead on average.
-> > > > > > 
-> > > > > > -------------------------------------
-> > > > > > |    interface     | avg cpu cycles |
-> > > > > > |-----------------------------------|
-> > > > > > | kvm_write_guest  |     1554       |
-> > > > > > | ----------------------------------|
-> > > > > > | kvm_read_guest   |     707        |
-> > > > > > |-----------------------------------|
-> > > > > > | vfio_dma_rw(w)   |     2274       |
-> > > > > > |-----------------------------------|
-> > > > > > | vfio_dma_rw(r)   |     1378       |
-> > > > > > -------------------------------------    
+> On 2020/1/21 下午1:47, Michael S. Tsirkin wrote:
+> > On Tue, Jan 21, 2020 at 12:00:57PM +0800, Jason Wang wrote:
+> > > On 2020/1/21 上午1:49, Jason Gunthorpe wrote:
+> > > > On Mon, Jan 20, 2020 at 04:43:53PM +0800, Jason Wang wrote:
+> > > > > This is similar to the design of platform IOMMU part of vhost-vdpa. We
+> > > > > decide to send diffs to platform IOMMU there. If it's ok to do that in
+> > > > > driver, we can replace set_map with incremental API like map()/unmap().
 > > > > > 
-> > > > > In v1 you had:
-> > > > > 
-> > > > > -------------------------------------
-> > > > > |    interface     | avg cpu cycles |
-> > > > > |-----------------------------------|
-> > > > > | kvm_write_guest  |     1546       |
-> > > > > | ----------------------------------|
-> > > > > | kvm_read_guest   |     686        |
-> > > > > |-----------------------------------|
-> > > > > | vfio_iova_rw(w)  |     2233       |
-> > > > > |-----------------------------------|
-> > > > > | vfio_iova_rw(r)  |     1262       |
-> > > > > -------------------------------------
-> > > > > 
-> > > > > So the kvm numbers remained within +0.5-3% while the vfio numbers are
-> > > > > now +1.8-9.2%.  I would have expected the algorithm change to at least
-> > > > > not be worse for small accesses and be better for accesses crossing
-> > > > > page boundaries.  Do you know what happened?
-> > > > >    
-> > > > I only tested the 4 interfaces in GVT's environment, where most of the
-> > > > guest memory accesses are less than one page.
-> > > > And the different fluctuations should be caused by the locks.
-> > > > vfio_dma_rw contends locks with other vfio accesses which are assumed to
-> > > > be abundant in the case of GVT.  
+> > > > > Then driver need to maintain rbtree itself.
+> > > > I think we really need to see two modes, one where there is a fixed
+> > > > translation without dynamic vIOMMU driven changes and one that
+> > > > supports vIOMMU.
 > > > 
-> > > Hmm, so maybe it's time to convert vfio_iommu.lock from a mutex to a
-> > > rwsem?  Thanks,
-> > >   
+> > > I think in this case, you meant the method proposed by Shahaf that sends
+> > > diffs of "fixed translation" to device?
+> > > 
+> > > It would be kind of tricky to deal with the following case for example:
+> > > 
+> > > old map [4G, 16G) new map [4G, 8G)
+> > > 
+> > > If we do
+> > > 
+> > > 1) flush [4G, 16G)
+> > > 2) add [4G, 8G)
+> > > 
+> > > There could be a window between 1) and 2).
+> > > 
+> > > It requires the IOMMU that can do
+> > > 
+> > > 1) remove [8G, 16G)
+> > > 2) flush [8G, 16G)
+> > > 3) change [4G, 8G)
+> > > 
+> > > ....
+> > Basically what I had in mind is something like qemu memory api
 > > 
-> > hi Alex
-> > I tested your rwsem patches at (https://lkml.org/lkml/2020/1/16/1869).
-> > They works without any runtime error at my side. :) 
-> > However, I found out that the previous fluctuation may be because I didn't
-> > take read/write counts in to account.
-> > For example. though the two tests have different avg read/write cycles,
-> > their average cycles are almost the same.
-> >  ______________________________________________________________________
-> > |        | avg read |            | avg write |            |            |
-> > |        | cycles   | read cnt   | cycles    | write cnt  | avg cycles |
-> > |----------------------------------------------------------------------|
-> > | test 1 |   1339   | 29,587,120 |  2258     | 17,098,364 |    1676    |
-> > | test 2 |   1340   | 28,454,262 |  2238     | 16,501,788 |    1670    |
-> >  ----------------------------------------------------------------------
-> > 
-> > After measuring the exact read/write cnt and cycles of a specific workload,
-> > I get below findings:
-> > 
-> > (1) with single VM running glmark2 inside.
-> > glmark2: 40M+ read+write cnt, among which 63% is read.
-> > among reads, 48% is of PAGE_SIZE, the rest is less than a page.
-> > among writes, 100% is less than a page.
-> > 
-> >  __________________________________________________
-> > |       cycles         | read | write |  avg | inc |
-> > |--------------------------------------------------|
-> > | kvm_read/write_page  |  694 |  1506 |  993 |  /  |
-> > |--------------------------------------------------|
-> > |  vfio_dma_rw(mutex)  | 1340 |  2248 | 1673 | 680 |
-> > |--------------------------------------------------|
-> > | vfio_dma_rw(rwsem r) | 1323 |  2198 | 1645 | 653 |
-> >  ---------------------------------------------------
-> > 
-> > so vfio_dma_rw generally has 650+ more cycles per each read/write.
-> > While kvm->srcu is of 160 cycles on average with one vm is running, the
-> > cycles spending on locks for vfio_dma_rw spread like this:
-> >  ___________________________
-> > |        cycles       | avg |
-> > |---------------------------|
-> > |     iommu->lock     | 117 |
-> > |---------------------------|
-> > |   vfio.group_lock   | 108 |
-> > |---------------------------|
-> > | group->unbound_lock | 114 |
-> > |---------------------------|
-> > |  group->device_lock | 115 |
-> > |---------------------------|
-> > |     group->mutex    | 113 |
-> >  ---------------------------
-> > 
-> > I measured the cycles for a mutex without any contention is 104 cycles
-> > on average (including time for get_cycles() and measured in the same way
-> > as other locks). So the contention of a single lock in a single vm
-> > environment is light. probably because there's a vgpu lock hold in GVT already.
-> > 
-> > (2) with two VMs each running glmark2 inside.
-> > The contention increases a little.
-> > 
-> >  ___________________________________________________
-> > |       cycles         | read | write |  avg | inc  |
-> > |---------------------------------------------------|
-> > | kvm_read/write_page  | 1035 |  1832 | 1325 |  /   |
-> > |---------------------------------------------------|
-> > |  vfio_dma_rw(mutex)  | 2104 |  2886 | 2390 | 1065 |
-> > |---------------------------------------------------|
-> > | vfio_dma_rw(rwsem r) | 1965 |  2778 | 2260 | 935  |
-> >  ---------------------------------------------------
-> > 
-> > 
-> >  -----------------------------------------------
-> > |     avg cycles       |   one VM   |  two VMs  |
-> > |-----------------------------------------------|
-> > |  iommu lock (mutex)  |     117    |   150     |
-> > |-----------------------------------|-----------|
-> > | iommu lock (rwsem r) |     117    |   156     |
-> > |-----------------------------------|-----------|
-> > |   kvm->srcu          |     160    |   213     |
-> >  -----------------------------------------------
-> > 
-> > In the kvm case, avg cycles increased 332 cycles, while kvm->srcu only costed
-> > 213 cycles. The rest 109 cycles may be spent on atomic operations.
-> > But I didn't measure them, as get_cycles() operation itself would influence final
-> > cycles by ~20 cycles.
+> > 0. begin
+> > 1. remove [8G, 16G)
+> > 2. add [4G, 8G)
+> > 3. commit
 > 
-> It seems like we need to extend the vfio external user interface so
-> that GVT-g can hold the group and container user references across
-> multiple calls.  For instance if we had a
-> vfio_group_get_external_user_from_dev() (based on
-> vfio_group_get_external_user()) then i915 could get an opaque
-> vfio_group pointer which it could use to call vfio_group_dma_rw() which
-> would leave us with only the iommu rw_sem locking.  i915 would release
-> the reference with vfio_group_put_external_user() when the device is
-> released.  The same could be done with the pin pages interface to
-> streamline that as well.  Thoughts?  Thanks,
->
-hi Alex,
-it works!
-now the average vfio_dma_rw cycles can reduced to 1198. 
-one thing I want to propose is that, in sight of dma->task is always user
-space process, instead of calling get_task_mm(dma->task), can we just use
-"mmget_not_zero(dma->task->mm)"? in this way, the avg cycles can
-further reduce to 1051.
+> 
+> This sounds more flexible e.g driver may choose to implement static mapping
+> one through commit. But a question here, it looks to me this still requires
+> the DMA to be synced with at least commit here. Otherwise device may get DMA
+> fault? Or device is expected to be paused DMA during begin?
+> 
+> Thanks
 
-Thanks
-Yan
+For example, commit might switch one set of tables for another,
+without need to pause DMA.
 
 > 
-> _______________________________________________
-> intel-gvt-dev mailing list
-> intel-gvt-dev@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+> > 
+> > Anyway, I'm fine with a one-shot API for now, we can
+> > improve it later.
+> > 
+> > > > There are different optimization goals in the drivers for these two
+> > > > configurations.
+> > > > 
+> > > > > > If the first one, then I think memory hotplug is a heavy flow
+> > > > > > regardless. Do you think the extra cycles for the tree traverse
+> > > > > > will be visible in any way?
+> > > > > I think if the driver can pause the DMA during the time for setting up new
+> > > > > mapping, it should be fine.
+> > > > This is very tricky for any driver if the mapping change hits the
+> > > > virtio rings. :(
+> > > > 
+> > > > Even a IOMMU using driver is going to have problems with that..
+> > > > 
+> > > > Jason
+> > > 
+> > > Or I wonder whether ATS/PRI can help here. E.g during I/O page fault,
+> > > driver/device can wait for the new mapping to be set and then replay the
+> > > DMA.
+> > > 
+> > > Thanks
+> > > 
+> > 
+
