@@ -2,211 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 14DA2143F93
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 15:31:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBF40143FC9
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 15:40:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729300AbgAUOby (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 09:31:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21572 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728779AbgAUObx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 09:31:53 -0500
+        id S1729476AbgAUOku (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 09:40:50 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26896 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727508AbgAUOku (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 09:40:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579617110;
+        s=mimecast20190719; t=1579617648;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9mF7S/CElHcPOzBiJE5ZLHPm54JjJRyvMZy7fUQh3+o=;
-        b=PnfvGpfxYRvbhkPqNrx3joUS9FakYCTzylczL8g4Dnv9zGl1sh9ECQT6+NM+DyqJo5w4lN
-        2lhDCXwnLFa4joDUqYL4qkcG4MvETJD5KijIBNVmuAk0VCJYzbvKJewiQCDEGQ0VcrYSq/
-        fMDugmQ/rZHOeScIjbGRIeufcOXZoSg=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-Z8_ruC7mP_q9X22jhWCeEA-1; Tue, 21 Jan 2020 09:31:49 -0500
-X-MC-Unique: Z8_ruC7mP_q9X22jhWCeEA-1
-Received: by mail-qt1-f199.google.com with SMTP id b7so1988471qtg.23
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 06:31:49 -0800 (PST)
+        bh=JSSit0Wm+RQr1Jgst7x5naV4XKUyLXD3AhAyDv7TiYs=;
+        b=Tj7tj63hMPU19wrJcoj1TH8CGkiDyBpUV3lfXKpgy2kY8apxYkEalVoHqja4B886ckbsla
+        +UrtKNn3GJ1fSQym3X5fbjorDKM6/GCXAXtUvWlvrlsa02kmH+/vbw1UsKo+MhYL9VMKoa
+        qtADOhqfqaNDHHfMIPqDxYy9/nL2ugM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-rVfezA-IM9yoEyaDz31ZXg-1; Tue, 21 Jan 2020 09:40:46 -0500
+X-MC-Unique: rVfezA-IM9yoEyaDz31ZXg-1
+Received: by mail-wr1-f72.google.com with SMTP id c6so1382878wrm.18
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 06:40:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9mF7S/CElHcPOzBiJE5ZLHPm54JjJRyvMZy7fUQh3+o=;
-        b=HxjXoa5FGdaoE47hadkB3IQUFvaglN+NN76of3TyvrXr9OuvX1aYjSG1n6EUPZXLae
-         /gJ2iSE+zCtBSny6UdHeY+DwXVAWoow8Tp5hFU2Bj91gLHkH/n74ElH17fUF7quVq8ud
-         e0bLpOtciSFYFc+usNcvaS7dSadQNM/KM9dOTl+zIMK1TPG/vbSlR31ZAA2F1Ccl4f/T
-         lZnCf/iKH12AktQLLKcVImtAVqp+shgOD9epyA/M7EAQsGEHPqlRfFWs+QSVJxNBnvrZ
-         l9Rw69PLjTGa7zDI6SAv6vbmIdsJn68iNRFQLMzkdeKw7HCFyvCRYt1/zp5UnfAsSeOG
-         gpRA==
-X-Gm-Message-State: APjAAAWmmzSTmT0yneeC6QZkU0iPwN4cGQwSzOdUMbmkGDOSGNqudCYt
-        JIi6D+mIte/uBGmTg8KGZHPQKGIwTwbCe+CLnrL9AIERLAwPzZV50iYpEvjECfBCirSK/cPEyAR
-        4gEsCH2NLuc0y
-X-Received: by 2002:ac8:461a:: with SMTP id p26mr4497787qtn.317.1579617108763;
-        Tue, 21 Jan 2020 06:31:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwrIvrhaYu107gr5LRu833/t8f+udWCCk91EWLM5wPQlcLIaM9dNSDXl+N4W9nnEJsWqmVhTQ==
-X-Received: by 2002:ac8:461a:: with SMTP id p26mr4497751qtn.317.1579617108435;
-        Tue, 21 Jan 2020 06:31:48 -0800 (PST)
-Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
-        by smtp.gmail.com with ESMTPSA id h13sm142713qtu.23.2020.01.21.06.31.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2020 06:31:47 -0800 (PST)
-Date:   Tue, 21 Jan 2020 09:31:42 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Stefano Garzarella <sgarzare@redhat.com>,
-        David Miller <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
-        Jason Wang <jasowang@redhat.com>, kvm <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>
-Subject: Re: [PATCH net-next 1/3] vsock: add network namespace support
-Message-ID: <20200121093104-mutt-send-email-mst@kernel.org>
-References: <20200116172428.311437-2-sgarzare@redhat.com>
- <20200120.100610.546818167633238909.davem@davemloft.net>
- <20200120101735.uyh4o64gb4njakw5@steredhat>
- <20200120060601-mutt-send-email-mst@kernel.org>
- <CAGxU2F6VH8Eb5UH_9KjN6MONbZEo1D7EHAiocVVus6jW55BJDg@mail.gmail.com>
- <20200120110319-mutt-send-email-mst@kernel.org>
- <CAGxU2F5=DQJ56sH4BUqp_7rvaXSF9bFHp4QkpLApJQK0bmd4MA@mail.gmail.com>
- <20200120170120-mutt-send-email-mst@kernel.org>
- <CAGxU2F4uW7FNe5xC0sb3Xxr_GABSXuu1Z9n5M=Ntq==T7MaaVw@mail.gmail.com>
- <20200121135907.GA641751@stefanha-x1.localdomain>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JSSit0Wm+RQr1Jgst7x5naV4XKUyLXD3AhAyDv7TiYs=;
+        b=ckNNqd1KHLbhPi/gXJbjQ09lSZLu5ogWHPAxU4cA2y64hz7cyBT8bHYxPaN9kGjY6F
+         zKWnky5aB8YIIU7VQg6gno7JWonPfi0wNgaWKWdESaVusoS6KERaUuPYZnW3yb9i1Ama
+         k1VtpQ81usmjKp5RDzRwJG7X++rzwQ1xHC5DqPTRS8QxNeacpPoGvQq7F/lrM5+n6RTZ
+         dg44K1nqUX6Fdn5HCSm7jmgBNOlDeRbWB5ENcRoahE0uxV3gsq9QJP1dcTRty/pe7aW5
+         7M2EAVeXkjZByMcNOzCTCY6jD0XBOZfUcgXRkTOHjd9mD+wi0JBN2ewDbhLPIWxD0asH
+         QMIQ==
+X-Gm-Message-State: APjAAAUMCTL08duazqVfq25SgARoZai0Eew0SXfSBaHUCzUfM7UgWRXc
+        Sn/ygfFwOpeh+wVUpIfrTVmSBtFob0wOXfnA2G3TmkXK34Aj1QiKzJAb7z10Q7suWGv43AIhNha
+        Mhz5wBReWq550
+X-Received: by 2002:a7b:c851:: with SMTP id c17mr4596874wml.71.1579617645321;
+        Tue, 21 Jan 2020 06:40:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyUkg5d8MSonCO4Ge0L397jZ+4TsON4lVJzpAggAw2WjkJCWhAHkQt1Jw0IPvgT93BvWQD3aw==
+X-Received: by 2002:a7b:c851:: with SMTP id c17mr4596848wml.71.1579617645022;
+        Tue, 21 Jan 2020 06:40:45 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
+        by smtp.gmail.com with ESMTPSA id b67sm4417502wmc.38.2020.01.21.06.40.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jan 2020 06:40:44 -0800 (PST)
+Subject: Re: [PATCH 07/14] KVM: x86/mmu: Walk host page tables to find THP
+ mappings
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Barret Rhoden <brho@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Zeng <jason.zeng@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>
+References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+ <20200108202448.9669-8-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6e9987a2-c34f-362d-a123-7dc4849811d1@redhat.com>
+Date:   Tue, 21 Jan 2020 15:40:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200121135907.GA641751@stefanha-x1.localdomain>
+In-Reply-To: <20200108202448.9669-8-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 21, 2020 at 01:59:07PM +0000, Stefan Hajnoczi wrote:
-> On Tue, Jan 21, 2020 at 10:07:06AM +0100, Stefano Garzarella wrote:
-> > On Mon, Jan 20, 2020 at 11:02 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > On Mon, Jan 20, 2020 at 05:53:39PM +0100, Stefano Garzarella wrote:
-> > > > On Mon, Jan 20, 2020 at 5:04 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > On Mon, Jan 20, 2020 at 02:58:01PM +0100, Stefano Garzarella wrote:
-> > > > > > On Mon, Jan 20, 2020 at 1:03 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > > > On Mon, Jan 20, 2020 at 11:17:35AM +0100, Stefano Garzarella wrote:
-> > > > > > > > On Mon, Jan 20, 2020 at 10:06:10AM +0100, David Miller wrote:
-> > > > > > > > > From: Stefano Garzarella <sgarzare@redhat.com>
-> > > > > > > > > Date: Thu, 16 Jan 2020 18:24:26 +0100
-> > > > > > > > >
-> > > > > > > > > > This patch adds 'netns' module param to enable this new feature
-> > > > > > > > > > (disabled by default), because it changes vsock's behavior with
-> > > > > > > > > > network namespaces and could break existing applications.
-> > > > > > > > >
-> > > > > > > > > Sorry, no.
-> > > > > > > > >
-> > > > > > > > > I wonder if you can even design a legitimate, reasonable, use case
-> > > > > > > > > where these netns changes could break things.
-> > > > > > > >
-> > > > > > > > I forgot to mention the use case.
-> > > > > > > > I tried the RFC with Kata containers and we found that Kata shim-v1
-> > > > > > > > doesn't work (Kata shim-v2 works as is) because there are the following
-> > > > > > > > processes involved:
-> > > > > > > > - kata-runtime (runs in the init_netns) opens /dev/vhost-vsock and
-> > > > > > > >   passes it to qemu
-> > > > > > > > - kata-shim (runs in a container) wants to talk with the guest but the
-> > > > > > > >   vsock device is assigned to the init_netns and kata-shim runs in a
-> > > > > > > >   different netns, so the communication is not allowed
-> > > > > > > > But, as you said, this could be a wrong design, indeed they already
-> > > > > > > > found a fix, but I was not sure if others could have the same issue.
-> > > > > > > >
-> > > > > > > > In this case, do you think it is acceptable to make this change in
-> > > > > > > > the vsock's behavior with netns and ask the user to change the design?
-> > > > > > >
-> > > > > > > David's question is what would be a usecase that's broken
-> > > > > > > (as opposed to fixed) by enabling this by default.
-> > > > > >
-> > > > > > Yes, I got that. Thanks for clarifying.
-> > > > > > I just reported a broken example that can be fixed with a different
-> > > > > > design (due to the fact that before this series, vsock devices were
-> > > > > > accessible to all netns).
-> > > > > >
-> > > > > > >
-> > > > > > > If it does exist, you need a way for userspace to opt-in,
-> > > > > > > module parameter isn't that.
-> > > > > >
-> > > > > > Okay, but I honestly can't find a case that can't be solved.
-> > > > > > So I don't know whether to add an option (ioctl, sysfs ?) or wait for
-> > > > > > a real case to come up.
-> > > > > >
-> > > > > > I'll try to see better if there's any particular case where we need
-> > > > > > to disable netns in vsock.
-> > > > > >
-> > > > > > Thanks,
-> > > > > > Stefano
-> > > > >
-> > > > > Me neither. so what did you have in mind when you wrote:
-> > > > > "could break existing applications"?
-> > > >
-> > > > I had in mind:
-> > > > 1. the Kata case. It is fixable (the fix is not merged on kata), but
-> > > >    older versions will not work with newer Linux.
-> > >
-> > > meaning they will keep not working, right?
-> > 
-> > Right, I mean without this series they work, with this series they work
-> > only if the netns support is disabled or with a patch proposed but not
-> > merged in kata.
-> > 
-> > >
-> > > > 2. a single process running on init_netns that wants to communicate with
-> > > >    VMs handled by VMMs running in different netns, but this case can be
-> > > >    solved opening the /dev/vhost-vsock in the same netns of the process
-> > > >    that wants to communicate with the VMs (init_netns in this case), and
-> > > >    passig it to the VMM.
-> > >
-> > > again right now they just don't work, right?
-> > 
-> > Right, as above.
-> > 
-> > What do you recommend I do?
-> 
-> Existing userspace applications must continue to work.
-> 
-> Guests are fine because G2H transports are always in the initial network
-> namespace.
-> 
-> On the host side we have a real case where Kata Containers and other
-> vsock users break.  Existing applications run in other network
-> namespaces and assume they can communicate over vsock (it's only
-> available in the initial network namespace by default).
-> 
-> It seems we cannot isolate new network namespaces from the initial
-> network namespace by default because it will break existing
-> applications.  That's a bummer.
-> 
-> There is one solution that maintains compatibility:
-> 
-> Introduce a per-namespace vsock isolation flag that can only transition
-> from false to true.  Once it becomes true it cannot be reset to false
-> anymore (for security).
-> 
-> When vsock isolation is false the initial network namespace is used for
-> <CID, port> addressing.
-> 
-> When vsock isolation is true the current namespace is used for <CID,
-> port> addressing.
-> 
-> I guess the vsock isolation flag would be set via a rtnetlink message,
-> but I haven't checked.
-> 
-> The upshot is: existing software doesn't benefit from namespaces for
-> vsock isolation but it continues to work!  New software makes 1 special
-> call after creating the namespace to opt in to vsock isolation.
-> 
-> This approach is secure because whoever sets up namespaces can
-> transition the flag from false to true and know that it can never be
-> reset to false anymore.
-> 
-> Does this make sense to everyone?
-> 
-> Stefan
+On 08/01/20 21:24, Sean Christopherson wrote:
+> +
+> +	/*
+> +	 * Manually do the equivalent of kvm_vcpu_gfn_to_hva() to avoid the
+> +	 * "writable" check in __gfn_to_hva_many(), which will always fail on
+> +	 * read-only memslots due to gfn_to_hva() assuming writes.  Earlier
+> +	 * page fault steps have already verified the guest isn't writing a
+> +	 * read-only memslot.
+> +	 */
+> +	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+> +	if (!memslot_valid_for_gpte(slot, true))
+> +		return PT_PAGE_TABLE_LEVEL;
+> +
+> +	hva = __gfn_to_hva_memslot(slot, gfn);
+> +
 
-Anything wrong with a separate device? whoever opens it decides
-whether netns will work ...
+Using gfn_to_memslot_dirty_bitmap is also a good excuse to avoid
+kvm_vcpu_gfn_to_hva.
 
--- 
-MST
++	slot = gfn_to_memslot_dirty_bitmap(vcpu, gfn, true);
++	if (!slot)
++		return PT_PAGE_TABLE_LEVEL;
++
++	hva = __gfn_to_hva_memslot(slot, gfn);
+
+(I am planning to remove gfn_to_hva_memslot so that __gfn_to_hva_memslot
+can lose the annoying underscores).
+
+Paolo
 
