@@ -2,176 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08601143BAB
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 12:08:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29443143BB3
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 12:09:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729022AbgAULIK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 06:08:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34159 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726052AbgAULIJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 06:08:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579604888;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x7jZw/H2y5zeqQuje6kJm5arA3TA0C7bKtuRivqDv8Y=;
-        b=dnx/oI1NWRxcJ2id1dUMESv02248w/DxvySQ6qqjedGoS6+7AgawIg5cb9Iq8wZZkAB8hp
-        +UVeIMlipvUHon8i8FQoRu2AU4aSS86lLDXToN25PCs8BvQbE+SUVRr5RU68JyWaUqInMI
-        Zoz14LFjk0O4g5cQYLNJUNVm1kACA3U=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-SVfhep2OPZWO4jeMT54J1A-1; Tue, 21 Jan 2020 06:08:05 -0500
-X-MC-Unique: SVfhep2OPZWO4jeMT54J1A-1
-Received: by mail-wr1-f71.google.com with SMTP id k18so1160950wrw.9
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 03:08:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=x7jZw/H2y5zeqQuje6kJm5arA3TA0C7bKtuRivqDv8Y=;
-        b=JFrhNQRoVqb4MBOZYue6kq7nSZsvZ/ZhXhMhG9e6cWRKT5N994Yyxc93DuXDrWfNpr
-         AELXr8GVnKAj40LdwGXW9V0AaonaZRBI5p7YdY7Q4Xjk8SC3v/bB/MTDZcn4IWH7ZsPo
-         Svg/hCv7o3P4zYchjxpVDvLzhp+P1GIw8cW2f55MZnU1k9awebE1oMfLTnpZPb8bdEp2
-         RdT+MYhAyLa52yRmZvoc0tySstZEbN4xd5+GDHqoQzl7N9MCNILy8scgoUHO92pZ6TVs
-         HG7omizqvoEEa3qR4vebuTsMCA7844UcjeDrJm3d1hRDlUQSb72BykYKMjv94/Y1L+4Q
-         TMzw==
-X-Gm-Message-State: APjAAAUZFAjJQ0/mqj/7KX3WFFsntEh32EcqnFqZDyFEP3Ov7nYBYSlz
-        ziwi0ul4W144hli5EA+0cABayf5ZhifQ+NsmX65LQECWGNjzE/HALZDG6BRSZ7SrfNE3qcVFhYt
-        tKH1tf3+rzjOQ
-X-Received: by 2002:a5d:5091:: with SMTP id a17mr4584302wrt.362.1579604884296;
-        Tue, 21 Jan 2020 03:08:04 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyrSJw1xVD8KtI/DVSDHhO4SUvtdN2Xqf5CmpjkIe8Jj2CEEstdjLnJnkKwuFepClVNL9qC7A==
-X-Received: by 2002:a5d:5091:: with SMTP id a17mr4584254wrt.362.1579604883939;
-        Tue, 21 Jan 2020 03:08:03 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
-        by smtp.gmail.com with ESMTPSA id l15sm49716775wrv.39.2020.01.21.03.08.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2020 03:08:03 -0800 (PST)
-Subject: Re: [PATCH v2 15/45] KVM: PPC: Move kvm_vcpu_init() invocation to
- common code
-To:     Paul Mackerras <paulus@ozlabs.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Greg Kurz <groug@kaod.org>
-References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
- <20191218215530.2280-16-sean.j.christopherson@intel.com>
- <20200120033402.GC14307@blackberry>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <07329402-25a3-874a-5e79-d35900668f1d@redhat.com>
-Date:   Tue, 21 Jan 2020 12:08:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20200120033402.GC14307@blackberry>
-Content-Type: text/plain; charset=utf-8
+        id S1728988AbgAULJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 06:09:44 -0500
+Received: from mail-eopbgr10065.outbound.protection.outlook.com ([40.107.1.65]:9486
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728682AbgAULJn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 06:09:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PRK2YYheXLHyiMZc4fbBiotvxyRgjdCPOGrGXrLhka5XPGVRIeULqIs1EjyJLmpuV3SFr/jt1kLZ3H5+QmhIFELurr+Smn9QZpGhd+RNbVxF29lSO2w5jjeDnKzUpTkmd17/MCadq7AXOR/sYZLwWx2owO3w2Q5WSEDrWCUX9wU/QA5XNWnIAZ4+HzFON1yv1JLvuh39314TLvSvVMzFsTVRM9n+uHCp3510+TbODl7KjbYbKgIhFjWF5s2Qbun6WhUlZAxoUcVj1tIXYURrP02iAnHr91dVp8dnf2tu1MlUHa5AWvk16S6l6g+yATDOhFg+IDggvO24l7C0VrERQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=neth5gLM83BZv/fNkBNYM4JVn29F2kOnzF5Ddr4vBbU=;
+ b=V+5MlPefQ/wOt9CaAtNasBrZ+HCU6pgVTpapzL89z+dVqy0bw/S+L2vIdIfU3oJe1kndimLsh+LNQCnP3WTOnBuyWOhd6XaE/xMCEExwhSN/HfsPPtZ4Tzte0QPFds6p83sNDDpddmVLQRJ8vbKv+i5RmuProW9yTNxf0bnF1v/iWIWepIKhPkTy5Nekf2PMsIQn7opXpKp4rE7BncVRWrlDpU2Q9quneOIH+ptbNo5prl+061FiwxiNVDE/UKJ+ljnujUBF3kPKOvMf0eG66IJBcQmelYH1TZi+kZop8vXg93ysbaZ9KTG+40WnwoVHKotocp+p85NfQmcGiocfag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=neth5gLM83BZv/fNkBNYM4JVn29F2kOnzF5Ddr4vBbU=;
+ b=V3JfRHvY7TI0uBnxBZ4gg7imM5RCquY4lrp5/Iws2llcrfSnEeVFeLGxdOi9vLaqvzGRGFz5+OQZ2wlggZjONdC85xa5QR/PVHVSY4Gma/zEXIDVe0lG5PITmydsp/iggEzcEGvGK2eiAbrfYz9udf8EQcGnxeEn1r/MESal9Es=
+Received: from AM0PR0502MB3795.eurprd05.prod.outlook.com (52.133.45.150) by
+ AM0PR0502MB3858.eurprd05.prod.outlook.com (52.133.48.12) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.20; Tue, 21 Jan 2020 11:09:38 +0000
+Received: from AM0PR0502MB3795.eurprd05.prod.outlook.com
+ ([fe80::d862:228a:d87f:99bb]) by AM0PR0502MB3795.eurprd05.prod.outlook.com
+ ([fe80::d862:228a:d87f:99bb%7]) with mapi id 15.20.2644.026; Tue, 21 Jan 2020
+ 11:09:38 +0000
+From:   Shahaf Shuler <shahafs@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+CC:     Jason Gunthorpe <jgg@mellanox.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "Bie, Tiwei" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "Liang, Cunming" <cunming.liang@intel.com>,
+        "Wang, Zhihong" <zhihong.wang@intel.com>,
+        "Wang, Xiao W" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Ariel Adam <aadam@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+Subject: RE: [PATCH 3/5] vDPA: introduce vDPA bus
+Thread-Topic: [PATCH 3/5] vDPA: introduce vDPA bus
+Thread-Index: AQHVzGqTFJN2iC19r0STv/0Uj4sDPafuxkEAgAAbnwCAAAWygIACyO6wgAGSJ4CAAJh8gIAAqsyAgAAds4CAACVEAIAABDeAgAAFhICAACp/MA==
+Date:   Tue, 21 Jan 2020 11:09:38 +0000
+Message-ID: <AM0PR0502MB37956A8D6690B190EEA713A5C30D0@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+References: <20200116124231.20253-4-jasowang@redhat.com>
+ <20200117070324-mutt-send-email-mst@kernel.org>
+ <239b042c-2d9e-0eec-a1ef-b03b7e2c5419@redhat.com>
+ <CAJPjb1+fG9L3=iKbV4Vn13VwaeDZZdcfBPvarogF_Nzhk+FnKg@mail.gmail.com>
+ <AM0PR0502MB379553984D0D55FDE25426F6C3330@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+ <d69918ca-8af4-44b2-9652-633530d4c113@redhat.com>
+ <20200120174933.GB3891@mellanox.com>
+ <2a324cec-2863-58f4-c58a-2414ee32c930@redhat.com>
+ <20200121004047-mutt-send-email-mst@kernel.org>
+ <b9ad744e-c4cd-82f9-f56a-1ecc185e9cd7@redhat.com>
+ <20200121031506-mutt-send-email-mst@kernel.org>
+ <028ed448-a948-79d9-f224-c325029b17ab@redhat.com>
+In-Reply-To: <028ed448-a948-79d9-f224-c325029b17ab@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=shahafs@mellanox.com; 
+x-originating-ip: [31.154.10.105]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: f1bcbfc4-ac8e-4113-cd06-08d79e626811
+x-ms-traffictypediagnostic: AM0PR0502MB3858:|AM0PR0502MB3858:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR0502MB38583E2177221B0D32C070D0C30D0@AM0PR0502MB3858.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0289B6431E
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(136003)(396003)(346002)(39860400002)(376002)(189003)(199004)(186003)(8676002)(26005)(33656002)(9686003)(8936002)(478600001)(81156014)(76116006)(81166006)(6506007)(55016002)(2906002)(86362001)(4326008)(54906003)(7696005)(71200400001)(5660300002)(52536014)(7416002)(316002)(110136005)(64756008)(66556008)(66946007)(66476007)(66446008);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR0502MB3858;H:AM0PR0502MB3795.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Wxk2lC8hsqJRGoiMqMyPF1xMvF4gopGBaMw0/fqJIyb0EwJ+bHUvKF1NawwZaYcsKwoMIGKGdLiXdeDEmup2kThm8xEShEL9E9sg4qa/RFK2mhaIwRQFgVtfgAxlk2al9ACnUXvX8VP8hIZsj9hAG0Kz9G+JrlFXee4m7tIPK9Ce5muYWN3APDUe/MQMF4o2t1WEwmk03L78+7JEC0SOWvU9lNufwwcIOVA0MBdmh/4QEd+O+dG/amw8G7F76YPzGdG1v8VUofLpUSpWqt/4JnrCZ/IRDh+LABfs6bs2PvpXqfWBMlH7H4qHEtIcQIfhb5bGtWEvTxfC5f2XXCEni+MwiFSaGraPoFIzV12AyPPc+lGMlFMf7fBBSyX4N8HGp+uBlsb0konZGHm+WTF7dku8Ld3ecj1HE+p4Px2q3FBEuWgqfb3qyvFyeCwA/Jp/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f1bcbfc4-ac8e-4113-cd06-08d79e626811
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2020 11:09:38.4336
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: j2yqRWFF3Ez2kS6W4Pq2wujJ2IdrgvILR6g/ccL808eAcd46L+7cdJEzyRU7XoRvQOCNbvdKLPNksj0vIjoQHg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR0502MB3858
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/01/20 04:34, Paul Mackerras wrote:
-> On Wed, Dec 18, 2019 at 01:55:00PM -0800, Sean Christopherson wrote:
->> Move the kvm_cpu_{un}init() calls to common PPC code as an intermediate
->> step towards removing kvm_cpu_{un}init() altogether.
->>
->> No functional change intended.
->>
->> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> This doesn't compile:
-> 
->   CC [M]  arch/powerpc/kvm/book3s.o
-> /home/paulus/kernel/kvm/arch/powerpc/kvm/book3s.c: In function ‘kvmppc_core_vcpu_create’:
-> /home/paulus/kernel/kvm/arch/powerpc/kvm/book3s.c:794:9: error: ‘kvm’ undeclared (first use in this function)
->   return kvm->arch.kvm_ops->vcpu_create(vcpu);
->          ^
-> /home/paulus/kernel/kvm/arch/powerpc/kvm/book3s.c:794:9: note: each undeclared identifier is reported only once for each function it appears in
-> /home/paulus/kernel/kvm/arch/powerpc/kvm/book3s.c:795:1: warning: control reaches end of non-void function [-Wreturn-type]
->  }
->  ^
-> make[3]: *** [/home/paulus/kernel/kvm/scripts/Makefile.build:266: arch/powerpc/kvm/book3s.o] Error 1
-> 
->> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
->> index 13385656b90d..5ad20fc0c6a1 100644
->> --- a/arch/powerpc/kvm/book3s.c
->> +++ b/arch/powerpc/kvm/book3s.c
->> @@ -789,10 +789,9 @@ void kvmppc_decrementer_func(struct kvm_vcpu *vcpu)
->>  	kvm_vcpu_kick(vcpu);
->>  }
->>  
->> -int kvmppc_core_vcpu_create(struct kvm *kvm, struct kvm_vcpu *vcpu,
->> -			    unsigned int id)
->> +int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu)
->>  {
->> -	return kvm->arch.kvm_ops->vcpu_create(kvm, vcpu, id);
->> +	return kvm->arch.kvm_ops->vcpu_create(vcpu);
-> 
-> Needs s/kvm/vcpu->kvm/ here.
-> 
-> You also need to change the declaration of the vcpu_create function
-> pointer in the kvmppc_ops struct in kvm_ppc.h to have just the vcpu
-> parameter instead of 3 parameters.
-
-Squashed:
-
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index 374e4b835ff0..bc2494e5710a 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -273,8 +273,7 @@ struct kvmppc_ops {
- 	void (*inject_interrupt)(struct kvm_vcpu *vcpu, int vec, u64 srr1_flags);
- 	void (*set_msr)(struct kvm_vcpu *vcpu, u64 msr);
- 	int (*vcpu_run)(struct kvm_run *run, struct kvm_vcpu *vcpu);
--	int (*vcpu_create)(struct kvm *kvm, struct kvm_vcpu *vcpu,
--			   unsigned int id);
-+	int (*vcpu_create)(struct kvm_vcpu *vcpu);
- 	void (*vcpu_free)(struct kvm_vcpu *vcpu);
- 	int (*check_requests)(struct kvm_vcpu *vcpu);
- 	int (*get_dirty_log)(struct kvm *kvm, struct kvm_dirty_log *log);
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 5ad20fc0c6a1..3f7adcb0ff63 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -791,7 +791,7 @@ void kvmppc_decrementer_func(struct kvm_vcpu *vcpu)
- 
- int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu)
- {
--	return kvm->arch.kvm_ops->vcpu_create(vcpu);
-+	return vcpu->kvm->arch.kvm_ops->vcpu_create(vcpu);
- }
- 
- void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu)
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index dd7440e50c7a..d41765157f0e 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -2116,7 +2116,7 @@ int kvmppc_core_init_vm(struct kvm *kvm)
- 
- int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu)
- {
--	return kvm->arch.kvm_ops->vcpu_create(vcpu);
-+	return vcpu->kvm->arch.kvm_ops->vcpu_create(vcpu);
- }
- 
- void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu)
-
+VHVlc2RheSwgSmFudWFyeSAyMSwgMjAyMCAxMDozNSBBTSwgSmFzb24gV2FuZzoNCj4gU3ViamVj
+dDogUmU6IFtQQVRDSCAzLzVdIHZEUEE6IGludHJvZHVjZSB2RFBBIGJ1cw0KPiANCj4gDQo+IE9u
+IDIwMjAvMS8yMSDkuIvljYg0OjE1LCBNaWNoYWVsIFMuIFRzaXJraW4gd3JvdGU6DQo+ID4gT24g
+VHVlLCBKYW4gMjEsIDIwMjAgYXQgMDQ6MDA6MzhQTSArMDgwMCwgSmFzb24gV2FuZyB3cm90ZToN
+Cj4gPj4gT24gMjAyMC8xLzIxIOS4i+WNiDE6NDcsIE1pY2hhZWwgUy4gVHNpcmtpbiB3cm90ZToN
+Cj4gPj4+IE9uIFR1ZSwgSmFuIDIxLCAyMDIwIGF0IDEyOjAwOjU3UE0gKzA4MDAsIEphc29uIFdh
+bmcgd3JvdGU6DQo+ID4+Pj4gT24gMjAyMC8xLzIxIOS4iuWNiDE6NDksIEphc29uIEd1bnRob3Jw
+ZSB3cm90ZToNCj4gPj4+Pj4gT24gTW9uLCBKYW4gMjAsIDIwMjAgYXQgMDQ6NDM6NTNQTSArMDgw
+MCwgSmFzb24gV2FuZyB3cm90ZToNCj4gPj4+Pj4+IFRoaXMgaXMgc2ltaWxhciB0byB0aGUgZGVz
+aWduIG9mIHBsYXRmb3JtIElPTU1VIHBhcnQgb2YNCj4gPj4+Pj4+IHZob3N0LXZkcGEuIFdlIGRl
+Y2lkZSB0byBzZW5kIGRpZmZzIHRvIHBsYXRmb3JtIElPTU1VIHRoZXJlLiBJZg0KPiA+Pj4+Pj4g
+aXQncyBvayB0byBkbyB0aGF0IGluIGRyaXZlciwgd2UgY2FuIHJlcGxhY2Ugc2V0X21hcCB3aXRo
+IGluY3JlbWVudGFsDQo+IEFQSSBsaWtlIG1hcCgpL3VubWFwKCkuDQo+ID4+Pj4+Pg0KPiA+Pj4+
+Pj4gVGhlbiBkcml2ZXIgbmVlZCB0byBtYWludGFpbiByYnRyZWUgaXRzZWxmLg0KPiA+Pj4+PiBJ
+IHRoaW5rIHdlIHJlYWxseSBuZWVkIHRvIHNlZSB0d28gbW9kZXMsIG9uZSB3aGVyZSB0aGVyZSBp
+cyBhDQo+ID4+Pj4+IGZpeGVkIHRyYW5zbGF0aW9uIHdpdGhvdXQgZHluYW1pYyB2SU9NTVUgZHJp
+dmVuIGNoYW5nZXMgYW5kIG9uZQ0KPiA+Pj4+PiB0aGF0IHN1cHBvcnRzIHZJT01NVS4NCj4gPj4+
+PiBJIHRoaW5rIGluIHRoaXMgY2FzZSwgeW91IG1lYW50IHRoZSBtZXRob2QgcHJvcG9zZWQgYnkg
+U2hhaGFmIHRoYXQNCj4gPj4+PiBzZW5kcyBkaWZmcyBvZiAiZml4ZWQgdHJhbnNsYXRpb24iIHRv
+IGRldmljZT8NCj4gPj4+Pg0KPiA+Pj4+IEl0IHdvdWxkIGJlIGtpbmQgb2YgdHJpY2t5IHRvIGRl
+YWwgd2l0aCB0aGUgZm9sbG93aW5nIGNhc2UgZm9yIGV4YW1wbGU6DQo+ID4+Pj4NCj4gPj4+PiBv
+bGQgbWFwIFs0RywgMTZHKSBuZXcgbWFwIFs0RywgOEcpDQo+ID4+Pj4NCj4gPj4+PiBJZiB3ZSBk
+bw0KPiA+Pj4+DQo+ID4+Pj4gMSkgZmx1c2ggWzRHLCAxNkcpDQo+ID4+Pj4gMikgYWRkIFs0Rywg
+OEcpDQo+ID4+Pj4NCj4gPj4+PiBUaGVyZSBjb3VsZCBiZSBhIHdpbmRvdyBiZXR3ZWVuIDEpIGFu
+ZCAyKS4NCj4gPj4+Pg0KPiA+Pj4+IEl0IHJlcXVpcmVzIHRoZSBJT01NVSB0aGF0IGNhbiBkbw0K
+PiA+Pj4+DQo+ID4+Pj4gMSkgcmVtb3ZlIFs4RywgMTZHKQ0KPiA+Pj4+IDIpIGZsdXNoIFs4Rywg
+MTZHKQ0KPiA+Pj4+IDMpIGNoYW5nZSBbNEcsIDhHKQ0KPiA+Pj4+DQo+ID4+Pj4gLi4uLg0KPiA+
+Pj4gQmFzaWNhbGx5IHdoYXQgSSBoYWQgaW4gbWluZCBpcyBzb21ldGhpbmcgbGlrZSBxZW11IG1l
+bW9yeSBhcGkNCj4gPj4+DQo+ID4+PiAwLiBiZWdpbg0KPiA+Pj4gMS4gcmVtb3ZlIFs4RywgMTZH
+KQ0KPiA+Pj4gMi4gYWRkIFs0RywgOEcpDQo+ID4+PiAzLiBjb21taXQNCj4gPj4NCj4gPj4gVGhp
+cyBzb3VuZHMgbW9yZSBmbGV4aWJsZSBlLmcgZHJpdmVyIG1heSBjaG9vc2UgdG8gaW1wbGVtZW50
+IHN0YXRpYw0KPiA+PiBtYXBwaW5nIG9uZSB0aHJvdWdoIGNvbW1pdC4gQnV0IGEgcXVlc3Rpb24g
+aGVyZSwgaXQgbG9va3MgdG8gbWUgdGhpcw0KPiA+PiBzdGlsbCByZXF1aXJlcyB0aGUgRE1BIHRv
+IGJlIHN5bmNlZCB3aXRoIGF0IGxlYXN0IGNvbW1pdCBoZXJlLg0KPiA+PiBPdGhlcndpc2UgZGV2
+aWNlIG1heSBnZXQgRE1BIGZhdWx0PyBPciBkZXZpY2UgaXMgZXhwZWN0ZWQgdG8gYmUgcGF1c2Vk
+DQo+IERNQSBkdXJpbmcgYmVnaW4/DQo+ID4+DQo+ID4+IFRoYW5rcw0KPiA+IEZvciBleGFtcGxl
+LCBjb21taXQgbWlnaHQgc3dpdGNoIG9uZSBzZXQgb2YgdGFibGVzIGZvciBhbm90aGVyLA0KPiA+
+IHdpdGhvdXQgbmVlZCB0byBwYXVzZSBETUEuDQo+IA0KPiANCj4gWWVzLCBJIHRoaW5rIHRoYXQg
+d29ya3MgYnV0IG5lZWQgY29uZmlybWF0aW9uIGZyb20gU2hhaGFmIG9yIEphc29uLg0KDQpGcm9t
+IG15IHNpZGUsIGFzIEkgd3JvdGUsIEkgd291bGQgbGlrZSB0byBzZWUgdGhlIHN1Z2dlc3RlZCBm
+dW5jdGlvbiBwcm90b3R5cGUgYWxvbmcgdy8gdGhlIGRlZmluaXRpb24gb2YgdGhlIGV4cGVjdGF0
+aW9uIGZyb20gZHJpdmVyIHVwb24gY2FsbGluZyB0aG9zZS4gDQpJdCBpcyBub3QgMTAwJSBjbGVh
+ciB0byBtZSB3aGF0IHNob3VsZCBiZSB0aGUgb3V0Y29tZSBvZiByZW1vdmUvZmx1c2gvY2hhbmdl
+L2NvbW1pdA0KDQo+IA0KPiBUaGFua3MNCj4gDQo+IA0KPiANCj4gPg0KPiA+Pj4gQW55d2F5LCBJ
+J20gZmluZSB3aXRoIGEgb25lLXNob3QgQVBJIGZvciBub3csIHdlIGNhbiBpbXByb3ZlIGl0DQo+
+ID4+PiBsYXRlci4NCj4gPj4+DQo+ID4+Pj4+IFRoZXJlIGFyZSBkaWZmZXJlbnQgb3B0aW1pemF0
+aW9uIGdvYWxzIGluIHRoZSBkcml2ZXJzIGZvciB0aGVzZQ0KPiA+Pj4+PiB0d28gY29uZmlndXJh
+dGlvbnMuDQo+ID4+Pj4+DQo+ID4+Pj4+Pj4gSWYgdGhlIGZpcnN0IG9uZSwgdGhlbiBJIHRoaW5r
+IG1lbW9yeSBob3RwbHVnIGlzIGEgaGVhdnkgZmxvdw0KPiA+Pj4+Pj4+IHJlZ2FyZGxlc3MuIERv
+IHlvdSB0aGluayB0aGUgZXh0cmEgY3ljbGVzIGZvciB0aGUgdHJlZSB0cmF2ZXJzZQ0KPiA+Pj4+
+Pj4+IHdpbGwgYmUgdmlzaWJsZSBpbiBhbnkgd2F5Pw0KPiA+Pj4+Pj4gSSB0aGluayBpZiB0aGUg
+ZHJpdmVyIGNhbiBwYXVzZSB0aGUgRE1BIGR1cmluZyB0aGUgdGltZSBmb3INCj4gPj4+Pj4+IHNl
+dHRpbmcgdXAgbmV3IG1hcHBpbmcsIGl0IHNob3VsZCBiZSBmaW5lLg0KPiA+Pj4+PiBUaGlzIGlz
+IHZlcnkgdHJpY2t5IGZvciBhbnkgZHJpdmVyIGlmIHRoZSBtYXBwaW5nIGNoYW5nZSBoaXRzIHRo
+ZQ0KPiA+Pj4+PiB2aXJ0aW8gcmluZ3MuIDooDQo+ID4+Pj4+DQo+ID4+Pj4+IEV2ZW4gYSBJT01N
+VSB1c2luZyBkcml2ZXIgaXMgZ29pbmcgdG8gaGF2ZSBwcm9ibGVtcyB3aXRoIHRoYXQuLg0KPiA+
+Pj4+Pg0KPiA+Pj4+PiBKYXNvbg0KPiA+Pj4+IE9yIEkgd29uZGVyIHdoZXRoZXIgQVRTL1BSSSBj
+YW4gaGVscCBoZXJlLiBFLmcgZHVyaW5nIEkvTyBwYWdlDQo+ID4+Pj4gZmF1bHQsIGRyaXZlci9k
+ZXZpY2UgY2FuIHdhaXQgZm9yIHRoZSBuZXcgbWFwcGluZyB0byBiZSBzZXQgYW5kDQo+ID4+Pj4g
+dGhlbiByZXBsYXkgdGhlIERNQS4NCj4gPj4+Pg0KPiA+Pj4+IFRoYW5rcw0KPiA+Pj4+DQoNCg==
