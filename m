@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EAD8143F70
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 15:24:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A58FB143F7A
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 15:26:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729129AbgAUOYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 09:24:42 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37358 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726968AbgAUOYl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 09:24:41 -0500
+        id S1729182AbgAUO0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 09:26:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43073 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727255AbgAUO0f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 09:26:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579616680;
+        s=mimecast20190719; t=1579616793;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iietA04mTbBj3y8KEP1nE87RzCPxCIolbi4wDz4ohvY=;
-        b=h9olVkrBMpXSUk4fbMIGFl8Qtd95ggkE4VUWihSjGq+lnWftqFKwE0qIgIeiIfUrucATX/
-        QjK8TmM7O5dElxzsZE9hwy8ccG+cppB0rVmRfheXZzgLPIEMAioO90Vnybu73IyAtTDm7s
-        sVrHYgRScfePHvcnsGIaXIriOBbIb24=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-vcab4kLnMZWG9lrl2Hj_yA-1; Tue, 21 Jan 2020 09:24:38 -0500
-X-MC-Unique: vcab4kLnMZWG9lrl2Hj_yA-1
-Received: by mail-wm1-f71.google.com with SMTP id 18so676840wmp.0
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 06:24:38 -0800 (PST)
+        bh=wB7oBUxPFMMo41Dhy/A6/q8IlRImdTJH/qsnmSwn8s8=;
+        b=SkNEywdQxA2MNtBg974Sn0ZydviqoFf7LucDrjpzy39Tsk8ub9HgZig3tiUC1+XV8YjbVC
+        dTZMVC1+cXJQ0Y9JvlxcvsQVNTw2JT79hjDojprlb9ehkrPWMN4i5j+ONb6/mm5FEXWbh0
+        xgCF491KvV5JkAxjJhjWm2briBhiIR8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-P7ihbnXFMq25UN9HpFPNhA-1; Tue, 21 Jan 2020 09:26:31 -0500
+X-MC-Unique: P7ihbnXFMq25UN9HpFPNhA-1
+Received: by mail-wr1-f69.google.com with SMTP id r2so1376061wrp.7
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 06:26:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=iietA04mTbBj3y8KEP1nE87RzCPxCIolbi4wDz4ohvY=;
-        b=nibz0S0q1LKWM6e1JyyJLG9QuWtZ8sObODcMqIoRnfLDlyQD101o7IyN7Z0+bnaGYf
-         R14ZcTOq/3zNbCFNusS7CxPMpjfn9R43DYacVqY3VjI3HrvFaPcQtC8U9q++fxLl2D/D
-         6ucK1aWDtHZrZakW8A4z0XE5QBnKAsmsPK+Irmv8PrymVdhKXnHrEnG8CMNyj6tZjnz6
-         ozC3Eb1z5sy1wA3F61gFDwHQeE3hNr2RA9Guxylc9VzAgOT7cpN4LBQ6PDqkCBZwNS2K
-         Hadr2V/zdTtb/PHK//LT+ZptndXLoJgzpyMQz779uk7w/wu46Spix9zhXTRpSU10ijj/
-         hp0A==
-X-Gm-Message-State: APjAAAWMyEnZbxzBzR1aykINYH8w/demEFgvLUJNKB1Y51gdUku9WhKi
-        g0+B5b9hADi3T8A4hZ6gTk+pilg8S8SpfDSiwkhZjXANcg+ohScXcRXjsw8PAjsN3N/6TnWuToe
-        vOdjdvpzoTF2A
-X-Received: by 2002:a5d:4d06:: with SMTP id z6mr5440090wrt.339.1579616673969;
-        Tue, 21 Jan 2020 06:24:33 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyTZsEeiVXo1aYXs9MoGNtX19umLmm3R/ZbsXqxiGO2rVQCtL37lQcA37U+6PdsUBw/nSKlMg==
-X-Received: by 2002:a5d:4d06:: with SMTP id z6mr5440056wrt.339.1579616673641;
-        Tue, 21 Jan 2020 06:24:33 -0800 (PST)
+        bh=wB7oBUxPFMMo41Dhy/A6/q8IlRImdTJH/qsnmSwn8s8=;
+        b=cle3657uAv6uZBozen3bFh25/zA4GUcXNuP1rqN+PY1jwE1IYh0GmtGy4ghq2UrBiy
+         23Uw8fo4fh9CUsXwxfdWEFDwWHbhGjll0Te2Ic018Q1crY8QqosajHDDAw0bpPcfo0Zp
+         iKJbU4mSqySwaMpVOJwM0xYnast0i2UmJl80z//SIVlqw80C8r0NtqbgSaS4utbYZ4SY
+         5T9iPWk2GeyCf8uzMqf7+ZSKfL0YC/iwXFEkStyIO/gwbmJJzAspC3vJLfBTdkkIVl6z
+         nPLL23Iu23BsZOkrjPdRAytVGWTeezkcK+LDTIp1TOvAAJ0MIQs/Au92pAHqoIV4HxvQ
+         uoDQ==
+X-Gm-Message-State: APjAAAXMinNxwirTBuWZ6NQ8PfD0RkXJ3owKxQDVHCR4lEVBvT+eRdNx
+        DQSxjt617uL4NpePBtleCPnvNIfFMV7K3hARFvEEAvnetQ3teEvdC95nfS0hBwuSrOMtnXeTenF
+        RhHvs5FLGL3Vz
+X-Received: by 2002:a5d:6089:: with SMTP id w9mr5614954wrt.228.1579616790218;
+        Tue, 21 Jan 2020 06:26:30 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxWjz4Oe+H/gSHDnoSQ5o2pah30WIinDPbt454AQ/QK4v/OQZOFatnXxkc9zEh4soAyNb9f2w==
+X-Received: by 2002:a5d:6089:: with SMTP id w9mr5614921wrt.228.1579616789896;
+        Tue, 21 Jan 2020 06:26:29 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
-        by smtp.gmail.com with ESMTPSA id m3sm51279088wrs.53.2020.01.21.06.24.31
+        by smtp.gmail.com with ESMTPSA id q68sm4727432wme.14.2020.01.21.06.26.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2020 06:24:33 -0800 (PST)
-Subject: Re: [PATCH 04/14] KVM: Play nice with read-only memslots when
- querying host page size
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+        Tue, 21 Jan 2020 06:26:29 -0800 (PST)
+Subject: Re: [PATCH 05/14] x86/mm: Introduce lookup_address_in_mm()
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -80,14 +80,15 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Liran Alon <liran.alon@oracle.com>,
         linux-nvdimm <linux-nvdimm@lists.01.org>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
- <20200108202448.9669-5-sean.j.christopherson@intel.com>
+ <20200108202448.9669-6-sean.j.christopherson@intel.com>
+ <871rs8batm.fsf@nanos.tec.linutronix.de>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2c091d40-8e32-1e55-2eff-27a4b43e0674@redhat.com>
-Date:   Tue, 21 Jan 2020 15:24:29 +0100
+Message-ID: <175cef39-1e0e-d1b7-69bc-95a3a2a651a7@redhat.com>
+Date:   Tue, 21 Jan 2020 15:26:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200108202448.9669-5-sean.j.christopherson@intel.com>
+In-Reply-To: <871rs8batm.fsf@nanos.tec.linutronix.de>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -96,45 +97,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/01/20 21:24, Sean Christopherson wrote:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 5f7f06824c2b..d9aced677ddd 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1418,15 +1418,23 @@ EXPORT_SYMBOL_GPL(kvm_is_visible_gfn);
->  
->  unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn)
->  {
-> +	struct kvm_memory_slot *slot;
->  	struct vm_area_struct *vma;
->  	unsigned long addr, size;
->  
->  	size = PAGE_SIZE;
->  
-> -	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
-> -	if (kvm_is_error_hva(addr))
-> +	/*
-> +	 * Manually do the equivalent of kvm_vcpu_gfn_to_hva() to avoid the
-> +	 * "writable" check in __gfn_to_hva_many(), which will always fail on
-> +	 * read-only memslots due to gfn_to_hva() assuming writes.
-> +	 */
-> +	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-> +	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
->  		return PAGE_SIZE;
->  
-> +	addr = __gfn_to_hva_memslot(slot, gfn);
-> +
->  	down_read(&current->mm->mmap_sem);
->  	vma = find_vma(current->mm, addr);
->  	if (!vma)
+On 09/01/20 22:04, Thomas Gleixner wrote:
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> 
+>> diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
+>> index b5e49e6bac63..400ac8da75e8 100644
+>> --- a/arch/x86/include/asm/pgtable_types.h
+>> +++ b/arch/x86/include/asm/pgtable_types.h
+>> @@ -561,6 +561,10 @@ static inline void update_page_count(int level, unsigned long pages) { }
+>>  extern pte_t *lookup_address(unsigned long address, unsigned int *level);
+>>  extern pte_t *lookup_address_in_pgd(pgd_t *pgd, unsigned long address,
+>>  				    unsigned int *level);
+>> +
+>> +struct mm_struct;
+>> +pte_t *lookup_address_in_mm(struct mm_struct *mm, unsigned long address,
+>> +			    unsigned int *level);
+> 
+> Please keep the file consistent and use extern even if not required.
+> 
+> Other than that:
+> 
+> Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 > 
 
-Even simpler: use kvm_vcpu_gfn_to_hva_prot
-
--	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
-+	addr = kvm_vcpu_gfn_to_hva_prot(vcpu, gfn, NULL);
-
-"You are in a maze of twisty little functions, all alike".
+Adjusted, thanks for the review.
 
 Paolo
 
