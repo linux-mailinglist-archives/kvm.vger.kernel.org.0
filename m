@@ -2,263 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F2461439B0
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 10:41:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFA6E143AE8
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 11:25:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729091AbgAUJlt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 04:41:49 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49285 "EHLO
+        id S1729351AbgAUKZC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 05:25:02 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31770 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728139AbgAUJls (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 04:41:48 -0500
+        by vger.kernel.org with ESMTP id S1728931AbgAUKZC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 05:25:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579599707;
+        s=mimecast20190719; t=1579602301;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jTqvJDIcTrY113uWw5YXK41fhJwgqvlsVFz5t0ig+QY=;
-        b=hZZVSc8KAIFScH8yXHeileAPvV2I5UF/B4tmQB8wgRGghXbkxTcLB6Eht3xkHB8g1r6HUw
-        Ty8b15K2VMRSzF5Yz1ZOlJ9TgsJ34U/CS8ngn5l0Fd6cxgmi7SBj4WQ9iSzq2Mc5BCXNo5
-        JJiJL8qE2cfi1PcFGu1MyTLKIg0ylqE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-Ao7DZCFKMUuELGaw65FIEw-1; Tue, 21 Jan 2020 04:41:43 -0500
-X-MC-Unique: Ao7DZCFKMUuELGaw65FIEw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73B3618B639A;
-        Tue, 21 Jan 2020 09:41:40 +0000 (UTC)
-Received: from [10.72.12.103] (ovpn-12-103.pek2.redhat.com [10.72.12.103])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C6FFD19C6A;
-        Tue, 21 Jan 2020 09:41:22 +0000 (UTC)
-Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@mellanox.com>
-Cc:     "mst@redhat.com" <mst@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "Bie, Tiwei" <tiwei.bie@intel.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "Liang, Cunming" <cunming.liang@intel.com>,
-        "Wang, Zhihong" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "Wang, Xiao W" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "aadam@redhat.com" <aadam@redhat.com>,
-        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>
-References: <20200116124231.20253-1-jasowang@redhat.com>
- <20200116124231.20253-4-jasowang@redhat.com>
- <20200116152209.GH20978@mellanox.com>
- <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D73EBA4@SHSMSX104.ccr.corp.intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <f27d59b7-1c91-5870-55f5-e21311fcef99@redhat.com>
-Date:   Tue, 21 Jan 2020 17:41:21 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        bh=aCi48PVWkDA8UrXfSnL/5YO1GyZMOjomyxZveXaEvec=;
+        b=WwHvZOpnY0H3PNYv0oKS3hnvVT2syxRnfRtbnTMCjbxOn//7iO7JtFz1cJe5vplJ0kRzAJ
+        E6GMYn9TMp6lsn02a4XOf9C2s8OOeJQkttTmPsFiFhPBkjoGGHF1KWWTp3/UJ8ufJJmvHw
+        JX6V4mWC8jbM3FAtc9yPLT1eeC8afMw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-f0fi1GpoPL6mfoEAE8bIwA-1; Tue, 21 Jan 2020 05:24:59 -0500
+X-MC-Unique: f0fi1GpoPL6mfoEAE8bIwA-1
+Received: by mail-wr1-f70.google.com with SMTP id r2so1108665wrp.7
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 02:24:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aCi48PVWkDA8UrXfSnL/5YO1GyZMOjomyxZveXaEvec=;
+        b=AYwJ/oLX6hHihRohQdCMw4dSLhjF/rh9bWCu5OCvU7FtHIeYJFT9W2xl1MzENn63ux
+         Ck4rRDY9LnQGl00ujHIsLq2PEHXZWWhO9QiNfI+s3iEiLl6FgzQHb5BbBGXk1DH6wZIZ
+         uZrSbMwFEw5ZBqmOfNU+PJY1kBKuxLkB7oTRmaqnX0rjcLUjgJ1g0Yr1vyydXyOIokGB
+         d4qtD2NjZDkZ8rUtoBIeCUlAilns5Nb7Fm0RIzkkZGad15L/gb/e8UUFZ0SPTuH/Qgfh
+         lSW2go194VmY884ZLei8YLX++BkJjz17nixwVkfm1q+7woojQavYgUIBQT8sr0EOlGVX
+         htQg==
+X-Gm-Message-State: APjAAAXRQJe+uLKRAxw/YnCCl4k1IFt9V/8kZyE3Q79+W1SAXQqy9lKz
+        oeT2EktQN95NnOsVebQJGKCo7AiYA5GBwK/aziStzvHA/sgtNGQ0JRHnwhvqfLvvRrVa5JP5jOx
+        HKCz3uYX6k5Rc
+X-Received: by 2002:a05:600c:2c7:: with SMTP id 7mr3522406wmn.87.1579602298806;
+        Tue, 21 Jan 2020 02:24:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwwbUM3KKi/8PzBPn0yJAulXWiBEnPnllYFTZSqZ130XUc0JnR6nrnpLeUYhWl6VLYPSf8ejA==
+X-Received: by 2002:a05:600c:2c7:: with SMTP id 7mr3522380wmn.87.1579602298497;
+        Tue, 21 Jan 2020 02:24:58 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
+        by smtp.gmail.com with ESMTPSA id c17sm51703396wrr.87.2020.01.21.02.24.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jan 2020 02:24:57 -0800 (PST)
+Subject: Re: [PATCH v3 12/21] KVM: X86: Implement ring-based dirty memory
+ tracking
+To:     Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Lei Cao <lei.cao@stratus.com>
+References: <20200109145729.32898-1-peterx@redhat.com>
+ <20200109145729.32898-13-peterx@redhat.com>
+ <20200109110110-mutt-send-email-mst@kernel.org>
+ <20200109191514.GD36997@xz-x1>
+ <22bcd5fc-338c-6b72-2bda-47ba38d7e8ef@redhat.com>
+ <20200119051145-mutt-send-email-mst@kernel.org>
+ <20200120072915.GD380565@xz-x1>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4e75a275-6687-2efc-0595-9b993ec300be@redhat.com>
+Date:   Tue, 21 Jan 2020 11:24:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D73EBA4@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200120072915.GD380565@xz-x1>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/1/21 =E4=B8=8B=E5=8D=884:40, Tian, Kevin wrote:
->> From: Jason Wang <jasowang@redhat.com>
->> Sent: Friday, January 17, 2020 11:03 AM
->>
->>
->> On 2020/1/16 =E4=B8=8B=E5=8D=8811:22, Jason Gunthorpe wrote:
->>> On Thu, Jan 16, 2020 at 08:42:29PM +0800, Jason Wang wrote:
->>>> vDPA device is a device that uses a datapath which complies with the
->>>> virtio specifications with vendor specific control path. vDPA device=
-s
->>>> can be both physically located on the hardware or emulated by
->>>> software. vDPA hardware devices are usually implemented through PCIE
->>>> with the following types:
->>>>
->>>> - PF (Physical Function) - A single Physical Function
->>>> - VF (Virtual Function) - Device that supports single root I/O
->>>>     virtualization (SR-IOV). Its Virtual Function (VF) represents a
->>>>     virtualized instance of the device that can be assigned to diffe=
-rent
->>>>     partitions
->>>> - VDEV (Virtual Device) - With technologies such as Intel Scalable
->>>>     IOV, a virtual device composed by host OS utilizing one or more
->>>>     ADIs.
-> the concept of VDEV includes both software bits and ADIs. If you
-> only take about hardware types, using ADI is more accurate.
-
-
-Ok.
-
-
->
->>>> - SF (Sub function) - Vendor specific interface to slice the Physica=
-l
->>>>     Function to multiple sub functions that can be assigned to diffe=
-rent
->>>>     partitions as virtual devices.
->>> I really hope we don't end up with two different ways to spell this
->>> same thing.
->>
->> I think you meant ADI vs SF. It looks to me that ADI is limited to the
->> scope of scalable IOV but SF not.
-> ADI is just a term for minimally assignable resource in Scalable IOV.
-> 'assignable' implies several things, e.g. the resource can be independe=
-ntly
-> mapped to/accessed by user space or guest, DMAs between two
-> ADIs are isolated, operating one ADI doesn't affecting another ADI,
-> etc.  I'm not clear about  other vendor specific interfaces, but suppos=
-ing
-> they need match the similar requirements. Then do we really want to
-> differentiate ADI vs. SF? What about merging them with ADI as just
-> one example of finer-grained slicing?
-
-
-I think so. That what Jason G want as well.
-
-Thanks
-
-
->
->>
->>>> @@ -0,0 +1,2 @@
->>>> +# SPDX-License-Identifier: GPL-2.0
->>>> +obj-$(CONFIG_VDPA) +=3D vdpa.o
->>>> diff --git a/drivers/virtio/vdpa/vdpa.c b/drivers/virtio/vdpa/vdpa.c
->>>> new file mode 100644
->>>> index 000000000000..2b0e4a9f105d
->>>> +++ b/drivers/virtio/vdpa/vdpa.c
->>>> @@ -0,0 +1,141 @@
->>>> +// SPDX-License-Identifier: GPL-2.0-only
->>>> +/*
->>>> + * vDPA bus.
->>>> + *
->>>> + * Copyright (c) 2019, Red Hat. All rights reserved.
->>>> + *     Author: Jason Wang <jasowang@redhat.com>
->>> 2020 tests days
->>
->> Will fix.
->>
->>
->>>> + *
->>>> + */
->>>> +
->>>> +#include <linux/module.h>
->>>> +#include <linux/idr.h>
->>>> +#include <linux/vdpa.h>
->>>> +
->>>> +#define MOD_VERSION  "0.1"
->>> I think module versions are discouraged these days
->>
->> Will remove.
->>
->>
->>>> +#define MOD_DESC     "vDPA bus"
->>>> +#define MOD_AUTHOR   "Jason Wang <jasowang@redhat.com>"
->>>> +#define MOD_LICENSE  "GPL v2"
->>>> +
->>>> +static DEFINE_IDA(vdpa_index_ida);
->>>> +
->>>> +struct device *vdpa_get_parent(struct vdpa_device *vdpa)
->>>> +{
->>>> +	return vdpa->dev.parent;
->>>> +}
->>>> +EXPORT_SYMBOL(vdpa_get_parent);
->>>> +
->>>> +void vdpa_set_parent(struct vdpa_device *vdpa, struct device *paren=
-t)
->>>> +{
->>>> +	vdpa->dev.parent =3D parent;
->>>> +}
->>>> +EXPORT_SYMBOL(vdpa_set_parent);
->>>> +
->>>> +struct vdpa_device *dev_to_vdpa(struct device *_dev)
->>>> +{
->>>> +	return container_of(_dev, struct vdpa_device, dev);
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(dev_to_vdpa);
->>>> +
->>>> +struct device *vdpa_to_dev(struct vdpa_device *vdpa)
->>>> +{
->>>> +	return &vdpa->dev;
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(vdpa_to_dev);
->>> Why these trivial assessors? Seems unnecessary, or should at least be
->>> static inlines in a header
->>
->> Will fix.
->>
->>
->>>> +int register_vdpa_device(struct vdpa_device *vdpa)
->>>> +{
->>> Usually we want to see symbols consistently prefixed with vdpa_*, is
->>> there a reason why register/unregister are swapped?
->>
->> I follow the name from virtio. I will switch to vdpa_*.
->>
->>
->>>> +	int err;
->>>> +
->>>> +	if (!vdpa_get_parent(vdpa))
->>>> +		return -EINVAL;
->>>> +
->>>> +	if (!vdpa->config)
->>>> +		return -EINVAL;
->>>> +
->>>> +	err =3D ida_simple_get(&vdpa_index_ida, 0, 0, GFP_KERNEL);
->>>> +	if (err < 0)
->>>> +		return -EFAULT;
->>>> +
->>>> +	vdpa->dev.bus =3D &vdpa_bus;
->>>> +	device_initialize(&vdpa->dev);
->>> IMHO device_initialize should not be called inside something called
->>> register, toooften we find out that the caller drivers need the devic=
-e
->>> to be initialized earlier, ie to use the kref, or something.
+On 20/01/20 08:29, Peter Xu wrote:
 >>>
->>> I find the best flow is to have some init function that does the
->>> device_initialize and sets the device_name that the driver can call
->>> early.
->>
->> Ok, will do.
->>
->>
->>> Shouldn't there be a device/driver matching process of some kind?
->>
->> The question is what do we want do match here.
->>
->> 1) "virtio" vs "vhost", I implemented matching method for this in mdev
->> series, but it looks unnecessary for vDPA device driver to know about
->> this. Anyway we can use sysfs driver bind/unbind to switch drivers
->> 2) virtio device id and vendor id. I'm not sure we need this consider
->> the two drivers so far (virtio/vhost) are all bus drivers.
->>
->> Thanks
->>
->>
->>> Jason
->>>
+>>>    00b (invalid GFN) ->
+>>>      01b (valid gfn published by kernel, which is dirty) ->
+>>>        1*b (gfn dirty page collected by userspace) ->
+>>>          00b (gfn reset by kernel, so goes back to invalid gfn)
+>>> That is 10b and 11b are equivalent.  The kernel doesn't read that bit if
+>>> userspace has collected the page.
+> Yes "1*b" is good too (IMHO as long as we can define three states for
+> an entry).  However do you want me to change to that?  Note that I
+> still think we need to read the rest of the field (in this case,
+> "slot" and "gfn") besides the two bits to do re-protect.  Should we
+> trust that unconditionally if writable?
+
+I think that userspace would only hurt itself if they do so.  As long as
+the kernel has a trusted copy of the indices, it's okay.
+
+We have plenty of bits--x86 limits GFNs to 40 bits (52 bits maximum
+physical address).  However, even on other architectures GFNs are
+limited to address space size - page shift (64-12).
+
+Paolo
 
