@@ -2,128 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BDE8143F23
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 15:15:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0D8E143F2A
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 15:16:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729098AbgAUOP3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 09:15:29 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58313 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727255AbgAUOP2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 09:15:28 -0500
+        id S1729211AbgAUOQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 09:16:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54388 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728794AbgAUOQP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 09:16:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579616127;
+        s=mimecast20190719; t=1579616173;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=W0ISVuuIVoP4ewOzYniLTSVuw4vxN7wzv55HQyIkjTg=;
-        b=CXnO8mIcUfZpJHPglE62MT8/3SB9SlKnO1rQlWH4ic3gVjx4VANHmzqTNC+Hjekkvecvw2
-        UiiQ2DCC487ff4njEqeYR/wCGO0jWSmn+C6AkR18P9ZWQjQEYpWDRtoj8Wsbovs00ZB1wY
-        zplB8EWgpuVan1wih92HPJD5orXaV7Y=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-VP7ZhgBIPuSmc-v7M1dJKg-1; Tue, 21 Jan 2020 09:15:26 -0500
-X-MC-Unique: VP7ZhgBIPuSmc-v7M1dJKg-1
-Received: by mail-qv1-f72.google.com with SMTP id r9so1640270qvs.19
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 06:15:26 -0800 (PST)
+        bh=OtPQLFnT52uoZGzAoyi/3S949ctnhGBbphedOmgQ5wE=;
+        b=GMeUgo3xwSSqZFQVVCqem8PJakgboLjfmxp/buNGEGqtVTg6oKkI8UwL91xh8ICJ9Nwsr3
+        s5xr6kh3onHZeuPrC4de1YrVBoa+2GMTgShecEjSLL/SJtHKSPZNM9urWi+S6bhSYboeY9
+        SPn9pufD3m04dR9Ea1iztAD5llImJ0M=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-wiUETwfINwq_Ur61A2p_Bg-1; Tue, 21 Jan 2020 09:16:12 -0500
+X-MC-Unique: wiUETwfINwq_Ur61A2p_Bg-1
+Received: by mail-qv1-f69.google.com with SMTP id c1so1637553qvw.17
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 06:16:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=W0ISVuuIVoP4ewOzYniLTSVuw4vxN7wzv55HQyIkjTg=;
-        b=FWoirwJN0+zAc2bt2RgDyFxg0cGZCyj8QiZZ49HXKUuPYikpqojFq7N6326vFrfT7F
-         i1E1KFhl5T0UE1Y5Oyno1rFJZab/dwi6RrMoyv6F3q12U0Go3v211+UEsbrNN1pHJvvr
-         sqk0mUEPWnFi6NR3Goe4V52TugiMH3C/K1JZIJGZtf4bYrvU0LHtWuAmkAgeFvhCrtjx
-         AHo4SmPfNVgBi8lG4kbLOfpx7GdrcEv1N1f9h3Bnue9Sp0rmtFjplhGm/wIFbP5t8iiB
-         sy/Yf6+PK8fwdxt0kp9dIMkOJoIOJlyyS1Wzp5+Qd3o1xgS10qhGZA2H8VM2ZTXfYZlj
-         Dq/A==
-X-Gm-Message-State: APjAAAVnTv6yBaI0IHcKm05NhV4Y689z0jKOQ7PaosoN0fVgk6rnEPIe
-        t5ieCvF8o4yQj9x+P1esbBuh6msUUPgm+9/3rGkDlrtzto+jxH4hCU20CgyIOzegRMivOyEROpA
-        LS+M2PPkLmcyG
-X-Received: by 2002:a05:6214:1907:: with SMTP id er7mr4996764qvb.199.1579616126358;
-        Tue, 21 Jan 2020 06:15:26 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy8AFk0N0aDDxiY+h2t6Rh1k1ou2Ux/pEPzCq29EZUwXk9nLKkey+jnpSszBH9mQmuAKQMoKA==
-X-Received: by 2002:a05:6214:1907:: with SMTP id er7mr4996599qvb.199.1579616125108;
-        Tue, 21 Jan 2020 06:15:25 -0800 (PST)
+        bh=OtPQLFnT52uoZGzAoyi/3S949ctnhGBbphedOmgQ5wE=;
+        b=QCICa958aGuNZM0FCPA+OZi7W4Ky1br9AxTbxO/EQHNRZ/97jsWoQlIqJb3go2W0bU
+         b2ssP6wQqGQdAVDOYL2qUizkhL2OrDBILZ2sfjeizPp0GquLFW+YoVuuwKClA/iVzAf1
+         SoJEXBwc91qbWcVsvNdiZjWx+3peRqrLDirHO/sFnEvbSAlpl9qXPJV9rJJROCupWjjA
+         1nr3FEKgEsGZa8iloW91yliAi2j9TDX3ycAXtYler5XCRdjp5Dz7HT4amjhVFlGe2yNE
+         RVXHSFwNwUL4TP2UBrAascHK2ohjD0hdOl2FQr+1BqZ/s70KTy8Mqcd5cb4zqlSpSOjC
+         VWsQ==
+X-Gm-Message-State: APjAAAUFDOjzX+i64KYOoZg6kVBtUb4GxV3nFSokaz7wx63XQXpEePUH
+        n2FiK4e+EsFMaHzEs6vMwoZCIG+mIi9F1DkNLyiw1MWYIWtj9EzZnu+UwekB8I1sCcPqXoT3rhy
+        tGQXTsSMcMe7v
+X-Received: by 2002:a37:4f8d:: with SMTP id d135mr4735784qkb.455.1579616172184;
+        Tue, 21 Jan 2020 06:16:12 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyQgYijZdgXt853mYL5TwvzVQ8pujRfHDSMvSEtlc0v2iUY5t9/9HUHWxN10Q3Sbj5SYLpKCg==
+X-Received: by 2002:a37:4f8d:: with SMTP id d135mr4735725qkb.455.1579616171759;
+        Tue, 21 Jan 2020 06:16:11 -0800 (PST)
 Received: from redhat.com (bzq-79-179-85-180.red.bezeqint.net. [79.179.85.180])
-        by smtp.gmail.com with ESMTPSA id o16sm17323139qkj.91.2020.01.21.06.15.16
+        by smtp.gmail.com with ESMTPSA id u55sm19847250qtc.28.2020.01.21.06.16.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2020 06:15:23 -0800 (PST)
-Date:   Tue, 21 Jan 2020 09:15:14 -0500
+        Tue, 21 Jan 2020 06:16:11 -0800 (PST)
+Date:   Tue, 21 Jan 2020 09:16:02 -0500
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Gunthorpe <jgg@mellanox.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
+Cc:     Shahaf Shuler <shahafs@mellanox.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Rob Miller <rob.miller@broadcom.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
+        Netdev <netdev@vger.kernel.org>,
+        "Bie, Tiwei" <tiwei.bie@intel.com>,
         "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "Liang, Cunming" <cunming.liang@intel.com>,
+        "Wang, Zhihong" <zhihong.wang@intel.com>,
+        "Wang, Xiao W" <xiao.w.wang@intel.com>,
         "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
         "eperezma@redhat.com" <eperezma@redhat.com>,
         "lulu@redhat.com" <lulu@redhat.com>,
         Parav Pandit <parav@mellanox.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
         "stefanha@redhat.com" <stefanha@redhat.com>,
         "rdunlap@infradead.org" <rdunlap@infradead.org>,
         "hch@infradead.org" <hch@infradead.org>,
-        "aadam@redhat.com" <aadam@redhat.com>,
+        Ariel Adam <aadam@redhat.com>,
         "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
         Jiri Pirko <jiri@mellanox.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
         "hanand@xilinx.com" <hanand@xilinx.com>,
         "mhabets@solarflare.com" <mhabets@solarflare.com>
 Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
-Message-ID: <20200121091456-mutt-send-email-mst@kernel.org>
-References: <20200116124231.20253-1-jasowang@redhat.com>
- <20200116124231.20253-4-jasowang@redhat.com>
- <20200116152209.GH20978@mellanox.com>
- <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
- <20200117135435.GU20978@mellanox.com>
- <20200120071406-mutt-send-email-mst@kernel.org>
- <20200120175050.GC3891@mellanox.com>
- <20200120164916-mutt-send-email-mst@kernel.org>
- <20200121141200.GC12330@mellanox.com>
+Message-ID: <20200121091540-mutt-send-email-mst@kernel.org>
+References: <20200116124231.20253-4-jasowang@redhat.com>
+ <20200117070324-mutt-send-email-mst@kernel.org>
+ <239b042c-2d9e-0eec-a1ef-b03b7e2c5419@redhat.com>
+ <CAJPjb1+fG9L3=iKbV4Vn13VwaeDZZdcfBPvarogF_Nzhk+FnKg@mail.gmail.com>
+ <AM0PR0502MB379553984D0D55FDE25426F6C3330@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+ <d69918ca-8af4-44b2-9652-633530d4c113@redhat.com>
+ <20200120174933.GB3891@mellanox.com>
+ <AM0PR0502MB3795C92485338180FC8059CFC3320@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+ <20200120162449-mutt-send-email-mst@kernel.org>
+ <20200121140755.GB12330@mellanox.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200121141200.GC12330@mellanox.com>
+In-Reply-To: <20200121140755.GB12330@mellanox.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 21, 2020 at 02:12:05PM +0000, Jason Gunthorpe wrote:
-> On Mon, Jan 20, 2020 at 04:56:06PM -0500, Michael S. Tsirkin wrote:
-> > > For vfio? vfio is the only thing I am aware doing
-> > > that, and this is not vfio..
+On Tue, Jan 21, 2020 at 02:07:59PM +0000, Jason Gunthorpe wrote:
+> On Mon, Jan 20, 2020 at 04:25:23PM -0500, Michael S. Tsirkin wrote:
+> > On Mon, Jan 20, 2020 at 08:51:43PM +0000, Shahaf Shuler wrote:
+> > > Monday, January 20, 2020 7:50 PM, Jason Gunthorpe:
+> > > > Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
+> > > > 
+> > > > On Mon, Jan 20, 2020 at 04:43:53PM +0800, Jason Wang wrote:
+> > > > > This is similar to the design of platform IOMMU part of vhost-vdpa. We
+> > > > > decide to send diffs to platform IOMMU there. If it's ok to do that in
+> > > > > driver, we can replace set_map with incremental API like map()/unmap().
+> > > > >
+> > > > > Then driver need to maintain rbtree itself.
+> > > > 
+> > > > I think we really need to see two modes, one where there is a fixed
+> > > > translation without dynamic vIOMMU driven changes and one that supports
+> > > > vIOMMU.
+> > > > 
+> > > > There are different optimization goals in the drivers for these two
+> > > > configurations.
+> > > 
+> > > +1.
+> > > It will be best to have one API for static config (i.e. mapping can be
+> > > set only before virtio device gets active), and one API for dynamic
+> > > changes that can be set after the virtio device is active. 
 > > 
-> > vfio is not doing anything. anyone can use a combination
-> > of unbind and driver_override to attach a driver to a device.
-> > 
-> > It's not a great interface but it's there without any code,
-> > and it will stay there without maintainance overhead
-> > if we later add a nicer one.
+> > Frankly I don't see when we'd use the static one.
+> > Memory hotplug is enabled for most guests...
 > 
-> Well, it is not a great interface, and it is only really used in
-> normal cases by vfio.
-> 
-> I don't think it is a good idea to design new subsystems with that
-> idea in mind, particularly since detatching the vdpa driver would not
-> trigger destruction of the underlying dynamic resource (ie the SF).
-> 
-> We need a way to trigger that destruction..
-> 
-> Jason 
+> If someone wants to run a full performance application, like dpdk,
+> then they may wish to trade memory hotplug in that VM for more
+> performance.
 
-You wanted a netlink command for this, right?
+Right. But let let's get basic functionality working first.
 
--- 
-MST
+> Perhaps Shahaf can quantify the performance delta?
+> 
+> Jason
 
