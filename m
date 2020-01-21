@@ -2,275 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E571B144717
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 23:20:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8C761447BC
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 23:33:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728829AbgAUWTx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 17:19:53 -0500
-Received: from mga06.intel.com ([134.134.136.31]:14445 "EHLO mga06.intel.com"
+        id S1726590AbgAUWcD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 17:32:03 -0500
+Received: from mga14.intel.com ([192.55.52.115]:1733 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727847AbgAUWTx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 17:19:53 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1725876AbgAUWcD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 17:32:03 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Jan 2020 14:19:52 -0800
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Jan 2020 14:32:02 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,347,1574150400"; 
-   d="scan'208";a="259235085"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by fmsmga002.fm.intel.com with ESMTP; 21 Jan 2020 14:19:50 -0800
-Date:   Tue, 21 Jan 2020 17:10:38 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>
-Subject: Re: [PATCH v2 2/2] drm/i915/gvt: subsitute kvm_read/write_guest with
- vfio_dma_rw
-Message-ID: <20200121221038.GH1759@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200115034132.2753-1-yan.y.zhao@intel.com>
- <20200115035455.12417-1-yan.y.zhao@intel.com>
- <20200115130651.29d7e9e0@w520.home>
- <20200116054941.GB1759@joy-OptiPlex-7040>
- <20200116083729.40983f38@w520.home>
- <20200119100637.GD1759@joy-OptiPlex-7040>
- <20200120130157.0ee7042d@w520.home>
- <20200121081207.GE1759@joy-OptiPlex-7040>
- <20200121095116.05eeae14@w520.home>
+   d="scan'208";a="244845094"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by orsmga002.jf.intel.com with ESMTP; 21 Jan 2020 14:32:02 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: [PATCH v5 00/19] KVM: Dynamically size memslot arrays
+Date:   Tue, 21 Jan 2020 14:31:38 -0800
+Message-Id: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200121095116.05eeae14@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 22, 2020 at 12:51:16AM +0800, Alex Williamson wrote:
-> On Tue, 21 Jan 2020 03:12:07 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Tue, Jan 21, 2020 at 04:01:57AM +0800, Alex Williamson wrote:
-> > > On Sun, 19 Jan 2020 05:06:37 -0500
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > On Thu, Jan 16, 2020 at 11:37:29PM +0800, Alex Williamson wrote:  
-> > > > > On Thu, 16 Jan 2020 00:49:41 -0500
-> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > >     
-> > > > > > On Thu, Jan 16, 2020 at 04:06:51AM +0800, Alex Williamson wrote:    
-> > > > > > > On Tue, 14 Jan 2020 22:54:55 -0500
-> > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > >       
-> > > > > > > > As a device model, it is better to read/write guest memory using vfio
-> > > > > > > > interface, so that vfio is able to maintain dirty info of device IOVAs.
-> > > > > > > > 
-> > > > > > > > Compared to kvm interfaces kvm_read/write_guest(), vfio_dma_rw() has ~600
-> > > > > > > > cycles more overhead on average.
-> > > > > > > > 
-> > > > > > > > -------------------------------------
-> > > > > > > > |    interface     | avg cpu cycles |
-> > > > > > > > |-----------------------------------|
-> > > > > > > > | kvm_write_guest  |     1554       |
-> > > > > > > > | ----------------------------------|
-> > > > > > > > | kvm_read_guest   |     707        |
-> > > > > > > > |-----------------------------------|
-> > > > > > > > | vfio_dma_rw(w)   |     2274       |
-> > > > > > > > |-----------------------------------|
-> > > > > > > > | vfio_dma_rw(r)   |     1378       |
-> > > > > > > > -------------------------------------      
-> > > > > > > 
-> > > > > > > In v1 you had:
-> > > > > > > 
-> > > > > > > -------------------------------------
-> > > > > > > |    interface     | avg cpu cycles |
-> > > > > > > |-----------------------------------|
-> > > > > > > | kvm_write_guest  |     1546       |
-> > > > > > > | ----------------------------------|
-> > > > > > > | kvm_read_guest   |     686        |
-> > > > > > > |-----------------------------------|
-> > > > > > > | vfio_iova_rw(w)  |     2233       |
-> > > > > > > |-----------------------------------|
-> > > > > > > | vfio_iova_rw(r)  |     1262       |
-> > > > > > > -------------------------------------
-> > > > > > > 
-> > > > > > > So the kvm numbers remained within +0.5-3% while the vfio numbers are
-> > > > > > > now +1.8-9.2%.  I would have expected the algorithm change to at least
-> > > > > > > not be worse for small accesses and be better for accesses crossing
-> > > > > > > page boundaries.  Do you know what happened?
-> > > > > > >      
-> > > > > > I only tested the 4 interfaces in GVT's environment, where most of the
-> > > > > > guest memory accesses are less than one page.
-> > > > > > And the different fluctuations should be caused by the locks.
-> > > > > > vfio_dma_rw contends locks with other vfio accesses which are assumed to
-> > > > > > be abundant in the case of GVT.    
-> > > > > 
-> > > > > Hmm, so maybe it's time to convert vfio_iommu.lock from a mutex to a
-> > > > > rwsem?  Thanks,
-> > > > >     
-> > > > 
-> > > > hi Alex
-> > > > I tested your rwsem patches at (https://lkml.org/lkml/2020/1/16/1869).
-> > > > They works without any runtime error at my side. :) 
-> > > > However, I found out that the previous fluctuation may be because I didn't
-> > > > take read/write counts in to account.
-> > > > For example. though the two tests have different avg read/write cycles,
-> > > > their average cycles are almost the same.
-> > > >  ______________________________________________________________________
-> > > > |        | avg read |            | avg write |            |            |
-> > > > |        | cycles   | read cnt   | cycles    | write cnt  | avg cycles |
-> > > > |----------------------------------------------------------------------|
-> > > > | test 1 |   1339   | 29,587,120 |  2258     | 17,098,364 |    1676    |
-> > > > | test 2 |   1340   | 28,454,262 |  2238     | 16,501,788 |    1670    |
-> > > >  ----------------------------------------------------------------------
-> > > > 
-> > > > After measuring the exact read/write cnt and cycles of a specific workload,
-> > > > I get below findings:
-> > > > 
-> > > > (1) with single VM running glmark2 inside.
-> > > > glmark2: 40M+ read+write cnt, among which 63% is read.
-> > > > among reads, 48% is of PAGE_SIZE, the rest is less than a page.
-> > > > among writes, 100% is less than a page.
-> > > > 
-> > > >  __________________________________________________
-> > > > |       cycles         | read | write |  avg | inc |
-> > > > |--------------------------------------------------|
-> > > > | kvm_read/write_page  |  694 |  1506 |  993 |  /  |
-> > > > |--------------------------------------------------|
-> > > > |  vfio_dma_rw(mutex)  | 1340 |  2248 | 1673 | 680 |
-> > > > |--------------------------------------------------|
-> > > > | vfio_dma_rw(rwsem r) | 1323 |  2198 | 1645 | 653 |
-> > > >  ---------------------------------------------------
-> > > > 
-> > > > so vfio_dma_rw generally has 650+ more cycles per each read/write.
-> > > > While kvm->srcu is of 160 cycles on average with one vm is running, the
-> > > > cycles spending on locks for vfio_dma_rw spread like this:
-> > > >  ___________________________
-> > > > |        cycles       | avg |
-> > > > |---------------------------|
-> > > > |     iommu->lock     | 117 |
-> > > > |---------------------------|
-> > > > |   vfio.group_lock   | 108 |
-> > > > |---------------------------|
-> > > > | group->unbound_lock | 114 |
-> > > > |---------------------------|
-> > > > |  group->device_lock | 115 |
-> > > > |---------------------------|
-> > > > |     group->mutex    | 113 |
-> > > >  ---------------------------
-> > > > 
-> > > > I measured the cycles for a mutex without any contention is 104 cycles
-> > > > on average (including time for get_cycles() and measured in the same way
-> > > > as other locks). So the contention of a single lock in a single vm
-> > > > environment is light. probably because there's a vgpu lock hold in GVT already.
-> > > > 
-> > > > (2) with two VMs each running glmark2 inside.
-> > > > The contention increases a little.
-> > > > 
-> > > >  ___________________________________________________
-> > > > |       cycles         | read | write |  avg | inc  |
-> > > > |---------------------------------------------------|
-> > > > | kvm_read/write_page  | 1035 |  1832 | 1325 |  /   |
-> > > > |---------------------------------------------------|
-> > > > |  vfio_dma_rw(mutex)  | 2104 |  2886 | 2390 | 1065 |
-> > > > |---------------------------------------------------|
-> > > > | vfio_dma_rw(rwsem r) | 1965 |  2778 | 2260 | 935  |
-> > > >  ---------------------------------------------------
-> > > > 
-> > > > 
-> > > >  -----------------------------------------------
-> > > > |     avg cycles       |   one VM   |  two VMs  |
-> > > > |-----------------------------------------------|
-> > > > |  iommu lock (mutex)  |     117    |   150     |
-> > > > |-----------------------------------|-----------|
-> > > > | iommu lock (rwsem r) |     117    |   156     |
-> > > > |-----------------------------------|-----------|
-> > > > |   kvm->srcu          |     160    |   213     |
-> > > >  -----------------------------------------------
-> > > > 
-> > > > In the kvm case, avg cycles increased 332 cycles, while kvm->srcu only costed
-> > > > 213 cycles. The rest 109 cycles may be spent on atomic operations.
-> > > > But I didn't measure them, as get_cycles() operation itself would influence final
-> > > > cycles by ~20 cycles.  
-> > > 
-> > > It seems like we need to extend the vfio external user interface so
-> > > that GVT-g can hold the group and container user references across
-> > > multiple calls.  For instance if we had a
-> > > vfio_group_get_external_user_from_dev() (based on
-> > > vfio_group_get_external_user()) then i915 could get an opaque
-> > > vfio_group pointer which it could use to call vfio_group_dma_rw() which
-> > > would leave us with only the iommu rw_sem locking.  i915 would release
-> > > the reference with vfio_group_put_external_user() when the device is
-> > > released.  The same could be done with the pin pages interface to
-> > > streamline that as well.  Thoughts?  Thanks,
-> > >  
-> > hi Alex,
-> > it works!
-> 
-> Hurrah!
-> 
-> > now the average vfio_dma_rw cycles can reduced to 1198. 
-> > one thing I want to propose is that, in sight of dma->task is always user
-> > space process, instead of calling get_task_mm(dma->task), can we just use
-> > "mmget_not_zero(dma->task->mm)"? in this way, the avg cycles can
-> > further reduce to 1051.
-> 
-> I'm not an expert there.  As noted in the type1 code we hold a
-> reference to the task because it's not advised to hold a long term
-> reference to the mm, so do we know we can look at task->mm without
-> acquiring task_lock()?  It's possible this is safe, but it's not
-> abundantly obvious to me.  Please research further and provide
-> justification if you think it's correct.  Thanks,
-> 
-in get_task_mm, 
-struct mm_struct *get_task_mm(struct task_struct *task)
-{
-        struct mm_struct *mm;
+I'd love to get this into 5.6 if possible.  The rebase to kvm/queue only
+had a single superficial conflict with 668effb63de8 ("KVM: Fix some wrong
+function names in comment"), and s390 (Christian) and arm64 (Marc) both
+got smoke tested in v4.
 
-        task_lock(task);
-        mm = task->mm;
-        if (mm) {
-                if (task->flags & PF_KTHREAD)
-                        mm = NULL;
-                else
-                        mmget(mm);
-        }
-        task_unlock(task);
-        return mm;
-}
-task lock is hold only during the call, so the purpose of it is to
-ensure task->flags and task->mm is not changed or gone before mmget(mm)
-or function return.
-so, if we know for sure the task always has no flag PF_THREAD,
-then we only need to ensure mm is not gone before mmget(mm) is done.
+Thanks!
 
-static inline void mmget(struct mm_struct *mm)
-{
-        atomic_inc(&mm->mm_users);
-}
+v5:
+  - Make the selftest x86-only. [Christian].
+  - Collect tags. [Peter]
+  - Rebase to kvm/queue, fb0c5f8fb698 ("KVM: x86: inline memslot_...").
 
-static inline bool mmget_not_zero(struct mm_struct *mm)
-{
-        return atomic_inc_not_zero(&mm->mm_users);
-}
+v4:
+  - Add patch 01 to fix an x86 rmap/lpage bug, and patches 10 and 11 to
+    resolve hidden conflicts with the bug fix.
+  - Collect tags [Christian, Marc, Philippe].
+  - Rebase to kvm/queue, commit e41a90be9659 ("KVM: x86/mmu: WARN if
+    root_hpa is invalid when handling a page fault").
+v3:
+  - Fix build errors on PPC and MIPS due to missed params during
+    refactoring [kbuild test robot].
+  - Rename the helpers for update_memslots() and add comments describing
+    the new algorithm and how it interacts with searching [Paolo].
+  - Remove the unnecessary and obnoxious warning regarding memslots being
+    a flexible array [Paolo].
+  - Fix typos in the changelog of patch 09/15 [Christoffer].
+  - Collect tags [Christoffer].
 
-the atomic_inc_not_zero() in  mmget_not_zero can ensure mm is not gone
-before its ref count inc.
+v2:
+  - Split "Drop kvm_arch_create_memslot()" into three patches to move
+    minor functional changes to standalone patches [Janosch].
+  - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
+  - Collect an Acked-by and a Reviewed-by
 
-So, I think the only thing we need to make sure is dma->task is not a
-kernel thread.
-Do you think I can make this assumption?
+*** v1 cover letter ***
 
-Thanks
-Yan
+The end goal of this series is to dynamically size the memslot array so
+that KVM allocates memory based on the number of memslots in use, as
+opposed to unconditionally allocating memory for the maximum number of
+memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
+spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
+the memory footprint from 90k to ~2.6k bytes.
 
+The changes required to support dynamic sizing are relatively small,
+e.g. are essentially contained in patches 17/19 and 18/19.
+
+Patches 2-16 clean up the memslot code, which has gotten quite crusty,
+especially __kvm_set_memory_region().  The clean up is likely not strictly
+necessary to switch to dynamic sizing, but I didn't have a remotely
+reasonable level of confidence in the correctness of the dynamic sizing
+without first doing the clean up.
+
+The only functional change in v4 is the addition of an x86-specific bug
+fix in x86's handling of KVM_MR_MOVE.  The bug fix is not directly related
+to dynamically allocating memslots, but it has subtle and hidden conflicts
+with the cleanup patches, and the fix is higher priority than anything
+else in the series, i.e. should be merged first.
+
+On non-x86 architectures, v3 and v4 should be functionally equivalent,
+the only non-x86 change in v4 is the dropping of a "const" in
+kvm_arch_commit_memory_region().
+
+Sean Christopherson (19):
+  KVM: x86: Allocate new rmap and large page tracking when moving
+    memslot
+  KVM: Reinstall old memslots if arch preparation fails
+  KVM: Don't free new memslot if allocation of said memslot fails
+  KVM: PPC: Move memslot memory allocation into prepare_memory_region()
+  KVM: x86: Allocate memslot resources during prepare_memory_region()
+  KVM: Drop kvm_arch_create_memslot()
+  KVM: Explicitly free allocated-but-unused dirty bitmap
+  KVM: Refactor error handling for setting memory region
+  KVM: Move setting of memslot into helper routine
+  KVM: Drop "const" attribute from old memslot in commit_memory_region()
+  KVM: x86: Free arrays for old memslot when moving memslot's base gfn
+  KVM: Move memslot deletion to helper function
+  KVM: Simplify kvm_free_memslot() and all its descendents
+  KVM: Clean up local variable usage in __kvm_set_memory_region()
+  KVM: Provide common implementation for generic dirty log functions
+  KVM: Ensure validity of memslot with respect to kvm_get_dirty_log()
+  KVM: Terminate memslot walks via used_slots
+  KVM: Dynamically size memslot array based on number of used slots
+  KVM: selftests: Add test for KVM_SET_USER_MEMORY_REGION
+
+ arch/mips/include/asm/kvm_host.h              |   2 +-
+ arch/mips/kvm/mips.c                          |  71 +-
+ arch/powerpc/include/asm/kvm_ppc.h            |  17 +-
+ arch/powerpc/kvm/book3s.c                     |  22 +-
+ arch/powerpc/kvm/book3s_hv.c                  |  36 +-
+ arch/powerpc/kvm/book3s_pr.c                  |  20 +-
+ arch/powerpc/kvm/booke.c                      |  17 +-
+ arch/powerpc/kvm/powerpc.c                    |  15 +-
+ arch/s390/include/asm/kvm_host.h              |   2 +-
+ arch/s390/kvm/kvm-s390.c                      |  23 +-
+ arch/x86/include/asm/kvm_page_track.h         |   3 +-
+ arch/x86/kvm/mmu/page_track.c                 |  15 +-
+ arch/x86/kvm/x86.c                            | 114 +---
+ include/linux/kvm_host.h                      |  48 +-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  30 +
+ .../kvm/x86_64/set_memory_region_test.c       | 142 ++++
+ virt/kvm/arm/arm.c                            |  48 +-
+ virt/kvm/arm/mmu.c                            |  20 +-
+ virt/kvm/kvm_main.c                           | 621 ++++++++++++------
+ 22 files changed, 734 insertions(+), 535 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
+
+-- 
+2.24.1
 
