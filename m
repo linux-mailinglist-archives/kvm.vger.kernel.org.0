@@ -2,220 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DF54143E28
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 14:41:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C50FC143E4E
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 14:43:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728925AbgAUNlB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 08:41:01 -0500
-Received: from foss.arm.com ([217.140.110.172]:43352 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726968AbgAUNlB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 08:41:01 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF7EB30E;
-        Tue, 21 Jan 2020 05:41:00 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4FCA83F52E;
-        Tue, 21 Jan 2020 05:41:00 -0800 (PST)
-Subject: Re: [PATCH kvm-unit-tests 3/3] arm/arm64: selftest: Add prefetch
- abort test
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     pbonzini@redhat.com
-References: <20200121131745.7199-1-drjones@redhat.com>
- <20200121131745.7199-4-drjones@redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <afceda4b-e610-a92c-9b4c-5c4a8142a269@arm.com>
-Date:   Tue, 21 Jan 2020 13:40:58 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1729112AbgAUNnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 08:43:18 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48558 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726968AbgAUNnS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 08:43:18 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00LDgYPg053571
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 08:43:16 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2xp1v599tg-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 08:43:16 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Tue, 21 Jan 2020 13:43:14 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 21 Jan 2020 13:43:12 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00LDhBqP54657158
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Jan 2020 13:43:11 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1BC4DA4065;
+        Tue, 21 Jan 2020 13:43:11 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 23889A4054;
+        Tue, 21 Jan 2020 13:43:10 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.152.224.211])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 21 Jan 2020 13:43:09 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, david@redhat.com, cohuck@redhat.com
+Subject: [kvm-unit-tests PATCH v4 0/9] s390x: smp: Improve smp code and reset checks
+Date:   Tue, 21 Jan 2020 08:42:45 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200121131745.7199-4-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20012113-0016-0000-0000-000002DF61D5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012113-0017-0000-0000-0000334209A0
+Message-Id: <20200121134254.4570-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-21_04:2020-01-21,2020-01-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=385 mlxscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001210114
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Let's extend sigp reset testing and clean up the smp library as well.
 
-On 1/21/20 1:17 PM, Andrew Jones wrote:
-> When a guest tries to execute code from an invalid physical address
-> KVM should inject an external abort. This test is based on a test
-> originally posted by Alexandru Elisei. This version avoids hard
-> coding the invalid physical address used.
->
-> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  arm/selftest.c      | 94 +++++++++++++++++++++++++++++++++++++++++++++
->  lib/arm64/asm/esr.h |  3 ++
->  2 files changed, 97 insertions(+)
->
-> diff --git a/arm/selftest.c b/arm/selftest.c
-> index 6d74fa1fa4c4..4495b161cdd5 100644
-> --- a/arm/selftest.c
-> +++ b/arm/selftest.c
-> @@ -8,6 +8,7 @@
->  #include <libcflat.h>
->  #include <util.h>
->  #include <devicetree.h>
-> +#include <vmalloc.h>
->  #include <asm/setup.h>
->  #include <asm/ptrace.h>
->  #include <asm/asm-offsets.h>
-> @@ -15,6 +16,7 @@
->  #include <asm/thread_info.h>
->  #include <asm/psci.h>
->  #include <asm/smp.h>
-> +#include <asm/mmu.h>
->  #include <asm/barrier.h>
->  
->  static cpumask_t ready, valid;
-> @@ -65,9 +67,43 @@ static void check_setup(int argc, char **argv)
->  		report_abort("missing input");
->  }
->  
-> +unsigned long check_pabt_invalid_paddr;
-> +static bool check_pabt_init(void)
-> +{
-> +	phys_addr_t highest_end = 0;
-> +	unsigned long vaddr;
-> +	struct mem_region *r;
-> +
-> +	/*
-> +	 * We need a physical address that isn't backed by anything. Without
-> +	 * fully parsing the device tree there's no way to be certain of any
-> +	 * address, but an unknown address immediately following the highest
-> +	 * memory region has a reasonable chance. This is because we can
-> +	 * assume that that memory region could have been larger, if the user
-> +	 * had configured more RAM, and therefore no MMIO region should be
-> +	 * there.
-> +	 */
-> +	for (r = mem_regions; r->end; ++r) {
-> +		if (r->flags & MR_F_IO)
-> +			continue;
-> +		if (r->end > highest_end)
-> +			highest_end = PAGE_ALIGN(r->end);
-> +	}
-> +
-> +	if (mem_region_get_flags(highest_end) != MR_F_UNKNOWN)
-> +		return false;
-> +
-> +	vaddr = (unsigned long)vmap(highest_end, PAGE_SIZE);
-> +	mmu_clear_user(current_thread_info()->pgtable, vaddr);
-> +	check_pabt_invalid_paddr = vaddr;
-> +
-> +	return true;
-> +}
-> +
->  static struct pt_regs expected_regs;
->  static bool und_works;
->  static bool svc_works;
-> +static bool pabt_works;
->  #if defined(__arm__)
->  /*
->   * Capture the current register state and execute an instruction
-> @@ -166,6 +202,30 @@ static bool check_svc(void)
->  	return svc_works;
->  }
->  
-> +static void pabt_handler(struct pt_regs *regs)
-> +{
-> +	expected_regs.ARM_lr = expected_regs.ARM_pc;
-> +	expected_regs.ARM_pc = expected_regs.ARM_r9;
-> +
-> +	pabt_works = check_regs(regs);
-> +
-> +	regs->ARM_pc = regs->ARM_lr;
-> +}
-> +
-> +static bool check_pabt(void)
-> +{
-> +	install_exception_handler(EXCPTN_PABT, pabt_handler);
-> +
-> +	test_exception("ldr	r9, =check_pabt_invalid_paddr\n"
-> +		       "ldr	r9, [r9]\n",
-> +		       "blx	r9\n",
-> +		       "", "r9", "lr");
-> +
-> +	install_exception_handler(EXCPTN_PABT, NULL);
-> +
-> +	return pabt_works;
-> +}
-> +
->  static void user_psci_system_off(struct pt_regs *regs)
->  {
->  	__user_psci_system_off();
-> @@ -285,6 +345,35 @@ static bool check_svc(void)
->  	return svc_works;
->  }
->  
-> +static void pabt_handler(struct pt_regs *regs, unsigned int esr)
-> +{
-> +	bool is_extabt = (esr & ESR_EL1_FSC_MASK) == ESR_EL1_FSC_EXTABT;
-> +
-> +	expected_regs.regs[30] = expected_regs.pc + 4;
-> +	expected_regs.pc = expected_regs.regs[9];
-> +
-> +	pabt_works = check_regs(regs) && is_extabt;
-> +
-> +	regs->pc = regs->regs[30];
-> +}
-> +
-> +static bool check_pabt(void)
-> +{
-> +	enum vector v = check_vector_prep();
-> +
-> +	install_exception_handler(v, ESR_EL1_EC_IABT_EL1, pabt_handler);
-> +
-> +	test_exception("adrp	x9, check_pabt_invalid_paddr\n"
-> +		       "add	x9, x9, :lo12:check_pabt_invalid_paddr\n"
-> +		       "ldr	x9, [x9]\n",
-> +		       "blr	x9\n",
-> +		       "", "x9", "x30");
-> +
-> +	install_exception_handler(v, ESR_EL1_EC_IABT_EL1, NULL);
-> +
-> +	return pabt_works;
-> +}
-> +
->  static void user_psci_system_off(struct pt_regs *regs, unsigned int esr)
->  {
->  	__user_psci_system_off();
-> @@ -302,6 +391,11 @@ static void check_vectors(void *arg __unused)
->  		install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_UNKNOWN,
->  					  user_psci_system_off);
->  #endif
-> +	} else {
-> +		if (!check_pabt_init())
-> +			report_skip("Couldn't guess an invalid physical address");
-> +		else
-> +			report(check_pabt(), "pabt");
->  	}
->  	exit(report_summary());
->  }
-> diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
-> index 8e5af4d90767..8c351631b0a0 100644
-> --- a/lib/arm64/asm/esr.h
-> +++ b/lib/arm64/asm/esr.h
-> @@ -44,4 +44,7 @@
->  #define ESR_EL1_EC_BKPT32	(0x38)
->  #define ESR_EL1_EC_BRK64	(0x3C)
->  
-> +#define ESR_EL1_FSC_MASK	(0x3F)
-> +#define ESR_EL1_FSC_EXTABT	(0x10)
-> +
->  #endif /* _ASMARM64_ESR_H_ */
+GIT: https://github.com/frankjaa/kvm-unit-tests/tree/smp_cleanup
 
-Sorry, this series has been on my TODO list since you posted it, but something
-else came up. The patches look fine, I like how you return back to the function
-that triggered the PABT, it looks much better than my version. I also ran a quick
-test, so:
+V4:
+	* Introduce set_flag() for manipulating testflag
+	* Cleanup of stray braces and mb()s
 
-Acked-by: Alexandru Elisei <alexandru.elisei@arm.com>
+v3:
+	* Added patch to introduce cpu loop in cpu setup
+	* Added patch that removes cpu loops in favor of the previously introduced one
+	* Fixed inline assembly for fpc dirtying
+	* Moved cpu stop hunk from first into the second patch
+	* Reworked patch #4 commit message and added a comment when waiting for PU
 
-Thanks,
-Alex
+v2:
+	* Added cpu stop to test_store_status()
+	* Added smp_cpu_destroy() to the end of smp.c main()
+	* New patch that prints cpu id on interrupt errors
+	* New patch that reworks cpu start in the smp library (needed for lpar)
+	* nullp is now an array
+
+
+Janosch Frank (9):
+  s390x: smp: Cleanup smp.c
+  s390x: smp: Only use smp_cpu_setup once
+  s390x: Add cpu id to interrupt error prints
+  s390x: smp: Rework cpu start and active tracking
+  s390x: smp: Wait for cpu setup to finish
+  s390x: smp: Loop if secondary cpu returns into cpu setup again
+  s390x: smp: Remove unneeded cpu loops
+  s390x: smp: Test all CRs on initial reset
+  s390x: smp: Dirty fpc before initial reset test
+
+ lib/s390x/interrupt.c | 20 +++++-----
+ lib/s390x/smp.c       | 53 ++++++++++++++----------
+ s390x/cstart64.S      |  4 ++
+ s390x/smp.c           | 93 ++++++++++++++++++++++++++++---------------
+ 4 files changed, 106 insertions(+), 64 deletions(-)
+
+-- 
+2.20.1
+
