@@ -2,105 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B5F871441C0
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 17:11:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 757411441C3
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 17:11:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729037AbgAUQLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 11:11:05 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:45091 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726555AbgAUQLF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 11:11:05 -0500
-Received: by mail-wr1-f66.google.com with SMTP id j42so3823091wrj.12;
-        Tue, 21 Jan 2020 08:11:04 -0800 (PST)
+        id S1729398AbgAUQLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 11:11:11 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39879 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726555AbgAUQLL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 11:11:11 -0500
+Received: by mail-wm1-f66.google.com with SMTP id 20so3714930wmj.4;
+        Tue, 21 Jan 2020 08:11:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=cEr4BWLn2p/pqLCf/UdrHd/9NDMtfKcezkWAo2kyLx8=;
-        b=Hf/MOqfv+5cVe4ENG6tOBbFYEaa3uuETBmTH8Ez1+4Sqyh8fZ0P/sjK/VtDQv+srKR
-         1h15GfkXfW28dpL7hmJKoDDidFMjRBBztIPvFkS8T9ORn/lRine2u4Vg2FYz1OTvb+vy
-         jBy98yGh1oXOBbEOhajZEIiKsp20RFE284UlKyf9+Pplv2g1T3edsIOz86PGS5eV9JXG
-         C1aQLh+6YhCQmZ9DLzTit1uUYMLrVCg9i8Ot0ButQz5N7+PxwNEQ5BvganAcXcO5x3Vi
-         7U1f0gyRXJ+icMcIlVynGpo30EWmbJ9UBsFuaID1Tc6pHAwGZ8l1GQOT2sLKF1XZ0IAg
-         y4YA==
+        h=sender:from:to:subject:date:message-id;
+        bh=0r9HTQo0HlkDjaCMRvg6avAGNtQXXo1BGS+PSpMF/rg=;
+        b=o8ADRwszU8umz6tgcM1h3UdSiPzo+mhb6aukx2pasJOBSGTU3zMsRqdHVJfIWBiqX1
+         Bfw46uRQ2EmUosxSyJeoOPjE5Hxwdf0sSEo7MiU1EBQMaHEVDpHLVWgmIIVzcsyZB8tr
+         91Rwk0x9EFfNnh4Df39hN9XK1G+loTMHr7mq0xldzz655I3T3j84pQwX7cjkxHTsOexB
+         laYIDvmaqat3QODRpUAaJs1lwcVK+YCf+DccwGh6qKa4OjXfgQ7TgrHYAlZOkqIZJRO/
+         eq115/iNAA/75Cq/VpNQ1/c4KQuFg/rVaXbSPH6r9KSTuR7YMdWIliJKgUu+TKGkappr
+         D8Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=cEr4BWLn2p/pqLCf/UdrHd/9NDMtfKcezkWAo2kyLx8=;
-        b=IVCp+nMAWtIyPCu1HmOkZVS749EWMiRjfvwn/VIAO3enjWRiB8f0+sWa1Swn8z4NV6
-         BcFAXZrPqDE9/KnSfWHR36NeuZbL6gd3vI9+I/gDsMQm09N68DxNu73Z/Sf6ObvK7WCW
-         kfw7T27n9H4W3JfUBLsF2D9fNbZMXIbUSIdWMJbHmcdmDAWJN81NhyNknoRp1ZD0Wsb/
-         Wm3DoorDWWvkqZ6kJgZwdugp5BSRaAKNUjNbBn9voa7tMoB3kuYfr5ouTc5fveVn2gzV
-         KJ4LrtdF1LZNXk9lwkfuLFSeO5Q92szbKw6fI4mmUOH8IrVMwU0GSkcEZ8LszPKf5OcW
-         bWAw==
-X-Gm-Message-State: APjAAAVshAH1yNi8Hb15ATYjfLHQiqLJ0QDUQ2XIdnpME1T975/ogfYk
-        dxu+YciRhpk3SHrv3lALlsndlluv
-X-Google-Smtp-Source: APXvYqwE/Z+q/9o7JJLQM99fbmsXu0/Hhy4yrgNDn1lvUXCMIqIUWWpau4XkB0Ki3Gn/WvkZM1aHSg==
-X-Received: by 2002:adf:f5cb:: with SMTP id k11mr6221918wrp.71.1579623063434;
-        Tue, 21 Jan 2020 08:11:03 -0800 (PST)
+        h=x-gm-message-state:sender:from:to:subject:date:message-id;
+        bh=0r9HTQo0HlkDjaCMRvg6avAGNtQXXo1BGS+PSpMF/rg=;
+        b=feRnbM+KNpzjrtdUJdVg3oRubF7NyQT5eaTFsrb8Qz3/MRNHggFvsHF1hCADNYCt9Q
+         Lv272LMEg8GcMO07AVeb4k/15MIojcSCa0pBt5ul+7EFdy56C9AtUOrTuOWOSAJMzwxL
+         BsnaHm6wtCZNYTymLH8gOiLML6LEC380s81cb88GrvUqaTsJrah5f5ulQw8nIARGzCcQ
+         bDePtEvT/8NhTcfQEITOw+cBdXdUU2ZS3C5dcA6IWLWOrVfbv7ue6Qc2gEinGOfgjdHV
+         T4GJF4duHKuH6HWECgsjpVVO+nC6n9ZunXN2aUFNESbSOJnmmk2OR0dRWaw7/HbnEPgm
+         eHMQ==
+X-Gm-Message-State: APjAAAXYW8N8wiG4XU4i8g5Tva+/FETD2l7054wx/AjmH4tdTZe6QaXb
+        44sWRLM9StBlY9yC8MJSH+tYJ9vZ
+X-Google-Smtp-Source: APXvYqzVexiF8edJY6JhT2eTC61P3ZXm04IQoJfkwi4v0wI6o/A9Rh/EFnhCXkqXNUYu13FSve02nw==
+X-Received: by 2002:a05:600c:298:: with SMTP id 24mr4931157wmk.141.1579623068933;
+        Tue, 21 Jan 2020 08:11:08 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id p17sm4372742wmk.30.2020.01.21.08.11.02
+        by smtp.gmail.com with ESMTPSA id l6sm4648584wmf.21.2020.01.21.08.11.08
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 21 Jan 2020 08:11:02 -0800 (PST)
+        Tue, 21 Jan 2020 08:11:08 -0800 (PST)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        bgardon@google.com
-Subject: [PATCH] KVM: x86: fix overlap between SPTE_MMIO_MASK and generation
-Date:   Tue, 21 Jan 2020 17:11:01 +0100
-Message-Id: <1579623061-47141-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH] KVM: x86: inline memslot_valid_for_gpte
+Date:   Tue, 21 Jan 2020 17:11:07 +0100
+Message-Id: <1579623067-47221-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The SPTE_MMIO_MASK overlaps with the bits used to track MMIO
-generation number.  A high enough generation number would overwrite the
-SPTE_SPECIAL_MASK region and cause the MMIO SPTE to be misinterpreted;
-likewise, setting bits 52 and 53 would also cause an incorrect generation
-number to be read from the PTE.
+The function now has a single caller, so there is no point
+in keeping it separate.
 
-Fixes: 6eeb4ef049e7 ("KVM: x86: assign two bits to track SPTE kinds")
-Reported-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 17 ++++-------------
+ 1 file changed, 4 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 57e4dbddba72..e34ca43d9166 100644
+index 7a17591b28d2..497c9384acf9 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -418,22 +418,25 @@ static inline bool is_access_track_spte(u64 spte)
-  * requires a full MMU zap).  The flag is instead explicitly queried when
-  * checking for MMIO spte cache hits.
-  */
--#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(18, 0)
-+#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(17, 0)
+@@ -1267,17 +1267,6 @@ static void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 	list_del(&sp->lpage_disallowed_link);
+ }
  
- #define MMIO_SPTE_GEN_LOW_START		3
- #define MMIO_SPTE_GEN_LOW_END		11
- #define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
- 						    MMIO_SPTE_GEN_LOW_START)
+-static inline bool memslot_valid_for_gpte(struct kvm_memory_slot *slot,
+-					  bool no_dirty_log)
+-{
+-	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
+-		return false;
+-	if (no_dirty_log && slot->dirty_bitmap)
+-		return false;
+-
+-	return true;
+-}
+-
+ static struct kvm_memory_slot *
+ gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 			    bool no_dirty_log)
+@@ -1285,8 +1274,10 @@ static inline bool memslot_valid_for_gpte(struct kvm_memory_slot *slot,
+ 	struct kvm_memory_slot *slot;
  
--#define MMIO_SPTE_GEN_HIGH_START	52
--#define MMIO_SPTE_GEN_HIGH_END		61
-+/* Leave room for SPTE_SPECIAL_MASK.  */
-+#define MMIO_SPTE_GEN_HIGH_START	54
-+#define MMIO_SPTE_GEN_HIGH_END		62
- #define MMIO_SPTE_GEN_HIGH_MASK		GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
- 						    MMIO_SPTE_GEN_HIGH_START)
-+
- static u64 generation_mmio_spte_mask(u64 gen)
- {
- 	u64 mask;
+ 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+-	if (!memslot_valid_for_gpte(slot, no_dirty_log))
+-		slot = NULL;
++	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
++		return NULL;
++	if (no_dirty_log && slot->dirty_bitmap)
++		return NULL;
  
- 	WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
-+	BUILD_BUG_ON(MMIO_SPTE_GEN_HIGH_START < PT64_SECOND_AVAIL_BITS_SHIFT);
- 
- 	mask = (gen << MMIO_SPTE_GEN_LOW_START) & MMIO_SPTE_GEN_LOW_MASK;
- 	mask |= (gen << MMIO_SPTE_GEN_HIGH_START) & MMIO_SPTE_GEN_HIGH_MASK;
+ 	return slot;
+ }
 -- 
 1.8.3.1
 
