@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D5F6144364
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 18:37:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78680144370
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 18:40:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729130AbgAURhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 12:37:00 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57521 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729106AbgAURhA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 12:37:00 -0500
+        id S1729157AbgAURkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 12:40:10 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33266 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728186AbgAURkK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 12:40:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579628219;
+        s=mimecast20190719; t=1579628409;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=JND9bt3Wtq505Q7CIfvPRXT9tGFW8wAjy0IzaoGUSpo=;
-        b=FHMZMYVKx+PiCIZsjK0Kd0DCGOeoyZgXNfRRwjSoZqAptAiwakE2bt+KOPqUl21D7Er9dk
-        xsgo71Qd2rAuwz9pu6WNVfn6UpDhuFOof5SbXvzbc+0Um28nsMHHSMMBYMQXDkjHZ0Pd/p
-        znF/InBWMRQCugW9xYJvJtV/pmQ3BqY=
+        bh=hd0UrP0RiUO1kqoo1KKLgYkWaWczO/JtAB9GvpoNQWQ=;
+        b=PoYET2cg2P4Ab/5/wyBorDDpwjd+2Q8sHIpA3oZxaiyypcpoXxUns7ryu2pbjrwAhQk75H
+        ZiEQAKHMJZ935AHw4Bu1flA+K1VTTncd/mamkht1ljsJnUIQPnXzF6HyBt8h0sB8FJOkVX
+        TdEFjugsy3kyVaiebG7cX0x/HadNt1Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-a7heQpWGPpW7kJYRYyt2Uw-1; Tue, 21 Jan 2020 12:36:55 -0500
-X-MC-Unique: a7heQpWGPpW7kJYRYyt2Uw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-161-QqzGKGoDNgCir_OgejQUVg-1; Tue, 21 Jan 2020 12:40:03 -0500
+X-MC-Unique: QqzGKGoDNgCir_OgejQUVg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC4261902EA7;
-        Tue, 21 Jan 2020 17:36:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A263477;
+        Tue, 21 Jan 2020 17:40:02 +0000 (UTC)
 Received: from [10.36.118.56] (unknown [10.36.118.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5ADF25C1C3;
-        Tue, 21 Jan 2020 17:36:51 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v4 7/9] s390x: smp: Remove unneeded cpu
- loops
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E846C1C94F;
+        Tue, 21 Jan 2020 17:40:00 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v4 4/9] s390x: smp: Rework cpu start and
+ active tracking
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
         linux-s390@vger.kernel.org, cohuck@redhat.com
 References: <20200121134254.4570-1-frankja@linux.ibm.com>
- <20200121134254.4570-8-frankja@linux.ibm.com>
+ <20200121134254.4570-5-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -85,62 +85,78 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <a6ad0ea1-f6de-208e-86e3-6818144be33f@redhat.com>
-Date:   Tue, 21 Jan 2020 18:36:50 +0100
+Message-ID: <bf356a2c-702e-0ecd-d24c-f7a1b7c18d2a@redhat.com>
+Date:   Tue, 21 Jan 2020 18:40:00 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200121134254.4570-8-frankja@linux.ibm.com>
+In-Reply-To: <20200121134254.4570-5-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 21.01.20 14:42, Janosch Frank wrote:
-> Now that we have a loop which is executed after we return from the
-> main function of a secondary cpu, we can remove the surplus loops.
+> The architecture specifies that processing sigp orders may be
+> asynchronous, and this is indeed the case on some hypervisors, so we
+> need to wait until the cpu runs before we return from the setup/start
+> function.
+> 
+> As there was a lot of duplicate code, a common function for cpu
+> restarts has been introduced.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  s390x/smp.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
+>  lib/s390x/smp.c | 50 ++++++++++++++++++++++++++++---------------------
+>  1 file changed, 29 insertions(+), 21 deletions(-)
 > 
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> index 3e8cf3e..45f1d80 100644
-> --- a/s390x/smp.c
-> +++ b/s390x/smp.c
-> @@ -35,15 +35,9 @@ static void set_flag(int val)
->  	mb();
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index f57f420..84e681d 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -104,35 +104,46 @@ int smp_cpu_stop_store_status(uint16_t addr)
+>  	return rc;
 >  }
 >  
-> -static void cpu_loop(void)
-> -{
-> -	for (;;) {}
-> -}
-> -
->  static void test_func(void)
->  {
->  	set_flag(1);
-> -	cpu_loop();
->  }
->  
->  static void test_start(void)
-> @@ -241,7 +235,7 @@ int main(void)
->  
->  	/* Setting up the cpu to give it a stack and lowcore */
->  	psw.mask = extract_psw_mask();
-> -	psw.addr = (unsigned long)cpu_loop;
-> +	psw.addr = (unsigned long)test_func;
->  	smp_cpu_setup(1, psw);
->  	smp_cpu_stop(1);
->  
-> 
+> +static int smp_cpu_restart_nolock(uint16_t addr, struct psw *psw)
+> +{
+> +	int rc;
+> +	struct cpu *cpu = smp_cpu_from_addr(addr);
+> +
+> +	if (!cpu)
+> +		return -1;
+> +	if (psw) {
+> +		cpu->lowcore->restart_new_psw.mask = psw->mask;
+> +		cpu->lowcore->restart_new_psw.addr = psw->addr;
+> +	}
+> +	rc = sigp(addr, SIGP_RESTART, 0, NULL);
+> +	if (rc)
+> +		return rc;
+> +	/*
+> +	 * The order has been accepted, but the actual restart may not
+> +	 * have been performed yet, so wait until the cpu is running.
+> +	 */
+> +	while (!smp_cpu_running(addr))
+> +		mb();
+> +	cpu->active = true;
+> +	return 0;
+> +}
+> +
 
-Acked-by: David Hildenbrand <david@redhat.com>
+Just wondering what happened to my comment
+
+"Should you make sure to stop the CPU before issuing the restart?
+Otherwise you will get false positives if it is still running (but
+hasn't processed the RESTART yet)"
+
+?
+
+IOW, should we have a SIGP_STOP before issuing the SIGP_RESTART?
 
 -- 
 Thanks,
