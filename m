@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F92F14479F
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 23:33:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AFDFB1447AD
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 23:33:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728863AbgAUWcF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 17:32:05 -0500
-Received: from mga14.intel.com ([192.55.52.115]:1733 "EHLO mga14.intel.com"
+        id S1728609AbgAUWcE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 17:32:04 -0500
+Received: from mga14.intel.com ([192.55.52.115]:1735 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726796AbgAUWcE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726889AbgAUWcE (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 21 Jan 2020 17:32:04 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Jan 2020 14:32:02 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Jan 2020 14:32:03 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,347,1574150400"; 
-   d="scan'208";a="244845098"
+   d="scan'208";a="244845105"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by orsmga002.jf.intel.com with ESMTP; 21 Jan 2020 14:32:02 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -41,9 +41,9 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Christoffer Dall <christoffer.dall@arm.com>,
         Peter Xu <peterx@redhat.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH v5 01/19] KVM: x86: Allocate new rmap and large page tracking when moving memslot
-Date:   Tue, 21 Jan 2020 14:31:39 -0800
-Message-Id: <20200121223157.15263-2-sean.j.christopherson@intel.com>
+Subject: [PATCH v5 02/19] KVM: Reinstall old memslots if arch preparation fails
+Date:   Tue, 21 Jan 2020 14:31:40 -0800
+Message-Id: <20200121223157.15263-3-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200121223157.15263-1-sean.j.christopherson@intel.com>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
@@ -54,97 +54,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reallocate a rmap array and recalcuate large page compatibility when
-moving an existing memslot to correctly handle the alignment properties
-of the new memslot.  The number of rmap entries required at each level
-is dependent on the alignment of the memslot's base gfn with respect to
-that level, e.g. moving a large-page aligned memslot so that it becomes
-unaligned will increase the number of rmap entries needed at the now
-unaligned level.
+Reinstall the old memslots if preparing the new memory region fails
+after invalidating a to-be-{re}moved memslot.
 
-Not updating the rmap array is the most obvious bug, as KVM accesses
-garbage data beyond the end of the rmap.  KVM interprets the bad data as
-pointers, leading to non-canonical #GPs, unexpected #PFs, etc...
+Remove the superfluous 'old_memslots' variable so that it's somewhat
+clear that the error handling path needs to free the unused memslots,
+not simply the 'old' memslots.
 
-  general protection fault: 0000 [#1] SMP
-  CPU: 0 PID: 1909 Comm: move_memory_reg Not tainted 5.4.0-rc7+ #139
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
-  RIP: 0010:rmap_get_first+0x37/0x50 [kvm]
-  Code: <48> 8b 3b 48 85 ff 74 ec e8 6c f4 ff ff 85 c0 74 e3 48 89 d8 5b c3
-  RSP: 0018:ffffc9000021bbc8 EFLAGS: 00010246
-  RAX: ffff00617461642e RBX: ffff00617461642e RCX: 0000000000000012
-  RDX: ffff88827400f568 RSI: ffffc9000021bbe0 RDI: ffff88827400f570
-  RBP: 0010000000000000 R08: ffffc9000021bd00 R09: ffffc9000021bda8
-  R10: ffffc9000021bc48 R11: 0000000000000000 R12: 0030000000000000
-  R13: 0000000000000000 R14: ffff88827427d700 R15: ffffc9000021bce8
-  FS:  00007f7eda014700(0000) GS:ffff888277a00000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 00007f7ed9216ff8 CR3: 0000000274391003 CR4: 0000000000162eb0
-  Call Trace:
-   kvm_mmu_slot_set_dirty+0xa1/0x150 [kvm]
-   __kvm_set_memory_region.part.64+0x559/0x960 [kvm]
-   kvm_set_memory_region+0x45/0x60 [kvm]
-   kvm_vm_ioctl+0x30f/0x920 [kvm]
-   do_vfs_ioctl+0xa1/0x620
-   ksys_ioctl+0x66/0x70
-   __x64_sys_ioctl+0x16/0x20
-   do_syscall_64+0x4c/0x170
-   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-  RIP: 0033:0x7f7ed9911f47
-  Code: <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 21 6f 2c 00 f7 d8 64 89 01 48
-  RSP: 002b:00007ffc00937498 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-  RAX: ffffffffffffffda RBX: 0000000001ab0010 RCX: 00007f7ed9911f47
-  RDX: 0000000001ab1350 RSI: 000000004020ae46 RDI: 0000000000000004
-  RBP: 000000000000000a R08: 0000000000000000 R09: 00007f7ed9214700
-  R10: 00007f7ed92149d0 R11: 0000000000000246 R12: 00000000bffff000
-  R13: 0000000000000003 R14: 00007f7ed9215000 R15: 0000000000000000
-  Modules linked in: kvm_intel kvm irqbypass
-  ---[ end trace 0c5f570b3358ca89 ]---
-
-The disallow_lpage tracking is more subtle.  Failure to update results
-in KVM creating large pages when it shouldn't, either due to stale data
-or again due to indexing beyond the end of the metadata arrays, which
-can lead to memory corruption and/or leaking data to guest/userspace.
-
-Note, the arrays for the old memslot are freed by the unconditional call
-to kvm_free_memslot() in __kvm_set_memory_region().
-
-Fixes: 05da45583de9b ("KVM: MMU: large page support")
-Cc: stable@vger.kernel.org
+Fixes: bc6678a33d9b9 ("KVM: introduce kvm->srcu and convert kvm_set_memory_region to SRCU update")
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/x86.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ virt/kvm/kvm_main.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4c30ebe74e5d..1953c71c52f2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9793,6 +9793,13 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
- {
- 	int i;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index eb3709d55139..1429d8b726ea 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -998,7 +998,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	unsigned long npages;
+ 	struct kvm_memory_slot *slot;
+ 	struct kvm_memory_slot old, new;
+-	struct kvm_memslots *slots = NULL, *old_memslots;
++	struct kvm_memslots *slots;
+ 	int as_id, id;
+ 	enum kvm_mr_change change;
  
-+	/*
-+	 * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
-+	 * old arrays will be freed by __kvm_set_memory_region() if installing
-+	 * the new memslot is successful.
-+	 */
-+	memset(&slot->arch, 0, sizeof(slot->arch));
-+
- 	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
- 		struct kvm_lpage_info *linfo;
- 		unsigned long ugfn;
-@@ -9867,6 +9874,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				const struct kvm_userspace_memory_region *mem,
- 				enum kvm_mr_change change)
- {
-+	if (change == KVM_MR_MOVE)
-+		return kvm_arch_create_memslot(kvm, memslot,
-+					       mem->memory_size >> PAGE_SHIFT);
-+
+@@ -1106,7 +1106,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		slot = id_to_memslot(slots, id);
+ 		slot->flags |= KVM_MEMSLOT_INVALID;
+ 
+-		old_memslots = install_new_memslots(kvm, as_id, slots);
++		/*
++		 * We can re-use the old memslots, the only difference from the
++		 * newly installed memslots is the invalid flag, which will get
++		 * dropped by update_memslots anyway.  We'll also revert to the
++		 * old memslots if preparing the new memory region fails.
++		 */
++		slots = install_new_memslots(kvm, as_id, slots);
+ 
+ 		/* From this point no new shadow pages pointing to a deleted,
+ 		 * or moved, memslot will be created.
+@@ -1116,13 +1122,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		 *	- kvm_is_visible_gfn (mmu_check_root)
+ 		 */
+ 		kvm_arch_flush_shadow_memslot(kvm, slot);
+-
+-		/*
+-		 * We can re-use the old_memslots from above, the only difference
+-		 * from the currently installed memslots is the invalid flag.  This
+-		 * will get overwritten by update_memslots anyway.
+-		 */
+-		slots = old_memslots;
+ 	}
+ 
+ 	r = kvm_arch_prepare_memory_region(kvm, &new, mem, change);
+@@ -1136,15 +1135,17 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	}
+ 
+ 	update_memslots(slots, &new, change);
+-	old_memslots = install_new_memslots(kvm, as_id, slots);
++	slots = install_new_memslots(kvm, as_id, slots);
+ 
+ 	kvm_arch_commit_memory_region(kvm, mem, &old, &new, change);
+ 
+ 	kvm_free_memslot(kvm, &old, &new);
+-	kvfree(old_memslots);
++	kvfree(slots);
  	return 0;
- }
  
+ out_slots:
++	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
++		slots = install_new_memslots(kvm, as_id, slots);
+ 	kvfree(slots);
+ out_free:
+ 	kvm_free_memslot(kvm, &new, &old);
 -- 
 2.24.1
 
