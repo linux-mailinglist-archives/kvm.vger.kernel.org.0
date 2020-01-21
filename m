@@ -2,123 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 22711144321
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 18:24:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3859144362
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 18:36:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729238AbgAURYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 12:24:20 -0500
-Received: from mail-vk1-f195.google.com ([209.85.221.195]:36687 "EHLO
-        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729108AbgAURYU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 12:24:20 -0500
-Received: by mail-vk1-f195.google.com with SMTP id i4so1124221vkc.3
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 09:24:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tmdQR2X4duHrdLuoSZ/99xX/Rb3XYACDrTpOQDSPPpk=;
-        b=N8TlBVJ+RMFuLiUDyVPR+fK0vFsRsKWj9y3/4PyfmN2wTHga8WAUwT9hKbEJx1on9V
-         SvRUI52PCTIHdKxIRNdClQosLyJJ0UQhkhEk+eGrvXKyPRyz4AX6C9V1970RYoJZE16A
-         /zkjiXW+SuelLVZtQYh02zwAJ3SQgPGM2oRZ//PkRpTb3o4/RVE/db1Su7P86+zKbtz1
-         4PLuBDedh50fkg8wg9Bz3P1P2iiaVq9izsWYAiSArq56jDESMXHk1lww89VpYQVCmOlp
-         /DfUlTujPrkMTB2NI1lqqZbnlCDYdMT3LLuS+FOOgjTREIfesBjVL24O1CLnZyHTpR/W
-         fD0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tmdQR2X4duHrdLuoSZ/99xX/Rb3XYACDrTpOQDSPPpk=;
-        b=B5m11858tUVCiTr7CBaPU8dco+GPkan7MDLJTtX1mxYMQQQ6W1x1E2KHbrZ7SDke7+
-         cjzEcxvstzMcgzMmjs65bdOMeo8HWLhNHoE7UExZXjYiWg9pqTTqgvPwCoHh+97gEwOC
-         jYnaWQaX7g8dUMOSWnsrLByLaPr0OybiQvVxTryeQq2zHLE0uWMxPGXIxOQB1MkViV+I
-         WMM4GqUJPE39lWTNpE6IGhCYa9hh2JombZCgKfnJew8LaaNieemLba/mrs/OM02jdJiz
-         ARvWDQcfbGWuUe/tEFfD+evI7uql/y5t0olMxtz+dU4vH8kHcJ0qJQS1KOQHOUlGPzGA
-         FJ5w==
-X-Gm-Message-State: APjAAAUrQFna5MsBzUjQWT6sGRaZfqa2F1VuMeZIOhBuE08n8mRz/hiJ
-        e3ExDJuaJp8CLbRGmsg9OXFkuk/9tWQQ3zM+a+Lvaw==
-X-Google-Smtp-Source: APXvYqx2UBGD7SVo9IfIYzSF7rmUWtk38deKTni6PIDPPto8tFZLFhFMv7Tcu6XYMHG0ayL8XaGVVbosi7qBmrDNogo=
-X-Received: by 2002:a1f:434b:: with SMTP id q72mr3398984vka.53.1579627458543;
- Tue, 21 Jan 2020 09:24:18 -0800 (PST)
+        id S1728904AbgAURgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 12:36:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30510 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728186AbgAURgq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 12:36:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579628205;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=VYmT7wpWTHpfgCypHIluoVAlq4BZBY0iRNBZ3wLlmag=;
+        b=btlnwP1O8va1OJpKL3FmIIFhk1SctiExyWgo8n0tUDepi37MTDYgADeEmjdwzaqtI8645X
+        3lTvv3/TES2sWo8+fgQU3KVtp+qxhbVdSr8Cl9APC+6XvksdhImwhiP6pm4Po20s6KzFxU
+        sho8CBxq4JUi7CqRR7OrJNbziDmqtmc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-87-tGAAdU3xOseVZ-LSUJLodw-1; Tue, 21 Jan 2020 12:36:40 -0500
+X-MC-Unique: tGAAdU3xOseVZ-LSUJLodw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBEF51005513;
+        Tue, 21 Jan 2020 17:36:38 +0000 (UTC)
+Received: from [10.36.118.56] (unknown [10.36.118.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 92C6E845C7;
+        Tue, 21 Jan 2020 17:36:37 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v4 6/9] s390x: smp: Loop if secondary cpu
+ returns into cpu setup again
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, cohuck@redhat.com
+References: <20200121134254.4570-1-frankja@linux.ibm.com>
+ <20200121134254.4570-7-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMFCQlmAYAGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl3pImkCGQEACgkQTd4Q
+ 9wD/g1o+VA//SFvIHUAvul05u6wKv/pIR6aICPdpF9EIgEU448g+7FfDgQwcEny1pbEzAmiw
+ zAXIQ9H0NZh96lcq+yDLtONnXk/bEYWHHUA014A1wqcYNRY8RvY1+eVHb0uu0KYQoXkzvu+s
+ Dncuguk470XPnscL27hs8PgOP6QjG4jt75K2LfZ0eAqTOUCZTJxA8A7E9+XTYuU0hs7QVrWJ
+ jQdFxQbRMrYz7uP8KmTK9/Cnvqehgl4EzyRaZppshruKMeyheBgvgJd5On1wWq4ZUV5PFM4x
+ II3QbD3EJfWbaJMR55jI9dMFa+vK7MFz3rhWOkEx/QR959lfdRSTXdxs8V3zDvChcmRVGN8U
+ Vo93d1YNtWnA9w6oCW1dnDZ4kgQZZSBIjp6iHcA08apzh7DPi08jL7M9UQByeYGr8KuR4i6e
+ RZI6xhlZerUScVzn35ONwOC91VdYiQgjemiVLq1WDDZ3B7DIzUZ4RQTOaIWdtXBWb8zWakt/
+ ztGhsx0e39Gvt3391O1PgcA7ilhvqrBPemJrlb9xSPPRbaNAW39P8ws/UJnzSJqnHMVxbRZC
+ Am4add/SM+OCP0w3xYss1jy9T+XdZa0lhUvJfLy7tNcjVG/sxkBXOaSC24MFPuwnoC9WvCVQ
+ ZBxouph3kqc4Dt5X1EeXVLeba+466P1fe1rC8MbcwDkoUo65Ag0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAGJAiUEGAECAA8FAlXLn5ECGwwFCQlmAYAACgkQTd4Q
+ 9wD/g1qA6w/+M+ggFv+JdVsz5+ZIc6MSyGUozASX+bmIuPeIecc9UsFRatc91LuJCKMkD9Uv
+ GOcWSeFpLrSGRQ1Z7EMzFVU//qVs6uzhsNk0RYMyS0B6oloW3FpyQ+zOVylFWQCzoyyf227y
+ GW8HnXunJSC+4PtlL2AY4yZjAVAPLK2l6mhgClVXTQ/S7cBoTQKP+jvVJOoYkpnFxWE9pn4t
+ H5QIFk7Ip8TKr5k3fXVWk4lnUi9MTF/5L/mWqdyIO1s7cjharQCstfWCzWrVeVctpVoDfJWp
+ 4LwTuQ5yEM2KcPeElLg5fR7WB2zH97oI6/Ko2DlovmfQqXh9xWozQt0iGy5tWzh6I0JrlcxJ
+ ileZWLccC4XKD1037Hy2FLAjzfoWgwBLA6ULu0exOOdIa58H4PsXtkFPrUF980EEibUp0zFz
+ GotRVekFAceUaRvAj7dh76cToeZkfsjAvBVb4COXuhgX6N4pofgNkW2AtgYu1nUsPAo+NftU
+ CxrhjHtLn4QEBpkbErnXQyMjHpIatlYGutVMS91XTQXYydCh5crMPs7hYVsvnmGHIaB9ZMfB
+ njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
+ FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
+Organization: Red Hat GmbH
+Message-ID: <2e601bc3-dd4e-9883-4c4d-e107ffcd84f7@redhat.com>
+Date:   Tue, 21 Jan 2020 18:36:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-References: <1579623061-47141-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1579623061-47141-1-git-send-email-pbonzini@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 21 Jan 2020 09:24:07 -0800
-Message-ID: <CANgfPd8fq7pWe00fKm7QEiOAVFuubSQ-jJxEM1sCKzqJk9rSzw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: fix overlap between SPTE_MMIO_MASK and generation
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200121134254.4570-7-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 21, 2020 at 8:11 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The SPTE_MMIO_MASK overlaps with the bits used to track MMIO
-> generation number.  A high enough generation number would overwrite the
-> SPTE_SPECIAL_MASK region and cause the MMIO SPTE to be misinterpreted;
-> likewise, setting bits 52 and 53 would also cause an incorrect generation
-> number to be read from the PTE.
->
-> Fixes: 6eeb4ef049e7 ("KVM: x86: assign two bits to track SPTE kinds")
-> Reported-by: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 21.01.20 14:42, Janosch Frank wrote:
+> Up to now a secondary cpu could have returned from the function it was
+> executing and ending up somewhere in cstart64.S. This was mostly
+> circumvented by an endless loop in the function that it executed.
+> 
+> Let's add a loop to the end of the cpu setup, so we don't have to rely
+> on added loops in the tests.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 57e4dbddba72..e34ca43d9166 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -418,22 +418,25 @@ static inline bool is_access_track_spte(u64 spte)
->   * requires a full MMU zap).  The flag is instead explicitly queried when
->   * checking for MMIO spte cache hits.
->   */
-> -#define MMIO_SPTE_GEN_MASK             GENMASK_ULL(18, 0)
-> +#define MMIO_SPTE_GEN_MASK             GENMASK_ULL(17, 0)
+>  s390x/cstart64.S | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 9af6bb3..5fd8d2f 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -162,6 +162,8 @@ smp_cpu_setup_state:
+>  	/* We should only go once through cpu setup and not for every restart */
+>  	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
+>  	br	%r14
+> +	/* If the function returns, just loop here */
+> +0:	j	0
+>  
+>  pgm_int:
+>  	SAVE_REGS
+> 
 
-I see you're shifting the MMIO high gen mask region to avoid having to
-shift it by 2. Looking at the SDM, I believe using bit 62 for the
-generation number is safe, but I don't recall why it wasn't used
-before.
+Acked-by: David Hildenbrand <david@redhat.com>
 
->
->  #define MMIO_SPTE_GEN_LOW_START                3
->  #define MMIO_SPTE_GEN_LOW_END          11
->  #define MMIO_SPTE_GEN_LOW_MASK         GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
->                                                     MMIO_SPTE_GEN_LOW_START)
->
-> -#define MMIO_SPTE_GEN_HIGH_START       52
-> -#define MMIO_SPTE_GEN_HIGH_END         61
-> +/* Leave room for SPTE_SPECIAL_MASK.  */
-> +#define MMIO_SPTE_GEN_HIGH_START       54
-> +#define MMIO_SPTE_GEN_HIGH_END         62
->  #define MMIO_SPTE_GEN_HIGH_MASK                GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
->                                                     MMIO_SPTE_GEN_HIGH_START)
-> +
->  static u64 generation_mmio_spte_mask(u64 gen)
->  {
->         u64 mask;
->
->         WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
-> +       BUILD_BUG_ON(MMIO_SPTE_GEN_HIGH_START < PT64_SECOND_AVAIL_BITS_SHIFT);
+-- 
+Thanks,
 
-Would it be worth defining the MMIO_SPTE_GEN masks, SPTE_SPECIAL_MASK,
-SPTE_AD masks, and SPTE_MMIO_MASK in terms of
-PT64_SECOND_AVAIL_BITS_SHIFT? It seems like that might be a more
-robust assertion here.
+David / dhildenb
 
-Alternatively, BUILD_BUG_ON((MMIO_SPTE_GEN_HIGH_MASK |
-MMIO_SPTE_GEN_LOW_MASK) & SPTE_(MMIO and/or SPECIAL)_MASK)
-
->
->         mask = (gen << MMIO_SPTE_GEN_LOW_START) & MMIO_SPTE_GEN_LOW_MASK;
->         mask |= (gen << MMIO_SPTE_GEN_HIGH_START) & MMIO_SPTE_GEN_HIGH_MASK;
-> --
-> 1.8.3.1
->
