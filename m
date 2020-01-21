@@ -2,100 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 757411441C3
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 17:11:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB3FC1441D0
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 17:14:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729398AbgAUQLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 11:11:11 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:39879 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726555AbgAUQLL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 11:11:11 -0500
-Received: by mail-wm1-f66.google.com with SMTP id 20so3714930wmj.4;
-        Tue, 21 Jan 2020 08:11:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id;
-        bh=0r9HTQo0HlkDjaCMRvg6avAGNtQXXo1BGS+PSpMF/rg=;
-        b=o8ADRwszU8umz6tgcM1h3UdSiPzo+mhb6aukx2pasJOBSGTU3zMsRqdHVJfIWBiqX1
-         Bfw46uRQ2EmUosxSyJeoOPjE5Hxwdf0sSEo7MiU1EBQMaHEVDpHLVWgmIIVzcsyZB8tr
-         91Rwk0x9EFfNnh4Df39hN9XK1G+loTMHr7mq0xldzz655I3T3j84pQwX7cjkxHTsOexB
-         laYIDvmaqat3QODRpUAaJs1lwcVK+YCf+DccwGh6qKa4OjXfgQ7TgrHYAlZOkqIZJRO/
-         eq115/iNAA/75Cq/VpNQ1/c4KQuFg/rVaXbSPH6r9KSTuR7YMdWIliJKgUu+TKGkappr
-         D8Bw==
+        id S1729252AbgAUQOM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 11:14:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24859 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728904AbgAUQOL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 11:14:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579623249;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IqGKWE4vljjAcPx0vpPhn72zDnBvqdvK17Xs6yePlDY=;
+        b=T+J8gUvRUR79f0ylxzBAq9c+kHpfP3Jd6Ccy/dp+WgeqFQBiFg1bAC9RMtUotQoRlxf8DM
+        o81Y9b/zAyuQlyXuOgC8whzoD67NVzUhQWvRujGOb/tr7KtmQSmKszD12ttrB7josByHGk
+        98cFg3E28nw/l/taiXlLFRze2XNlMYo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-ExTeveONMFOjb2BzYvVY1Q-1; Tue, 21 Jan 2020 11:14:05 -0500
+X-MC-Unique: ExTeveONMFOjb2BzYvVY1Q-1
+Received: by mail-wr1-f69.google.com with SMTP id f10so1526778wro.14
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 08:14:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id;
-        bh=0r9HTQo0HlkDjaCMRvg6avAGNtQXXo1BGS+PSpMF/rg=;
-        b=feRnbM+KNpzjrtdUJdVg3oRubF7NyQT5eaTFsrb8Qz3/MRNHggFvsHF1hCADNYCt9Q
-         Lv272LMEg8GcMO07AVeb4k/15MIojcSCa0pBt5ul+7EFdy56C9AtUOrTuOWOSAJMzwxL
-         BsnaHm6wtCZNYTymLH8gOiLML6LEC380s81cb88GrvUqaTsJrah5f5ulQw8nIARGzCcQ
-         bDePtEvT/8NhTcfQEITOw+cBdXdUU2ZS3C5dcA6IWLWOrVfbv7ue6Qc2gEinGOfgjdHV
-         T4GJF4duHKuH6HWECgsjpVVO+nC6n9ZunXN2aUFNESbSOJnmmk2OR0dRWaw7/HbnEPgm
-         eHMQ==
-X-Gm-Message-State: APjAAAXYW8N8wiG4XU4i8g5Tva+/FETD2l7054wx/AjmH4tdTZe6QaXb
-        44sWRLM9StBlY9yC8MJSH+tYJ9vZ
-X-Google-Smtp-Source: APXvYqzVexiF8edJY6JhT2eTC61P3ZXm04IQoJfkwi4v0wI6o/A9Rh/EFnhCXkqXNUYu13FSve02nw==
-X-Received: by 2002:a05:600c:298:: with SMTP id 24mr4931157wmk.141.1579623068933;
-        Tue, 21 Jan 2020 08:11:08 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id l6sm4648584wmf.21.2020.01.21.08.11.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 21 Jan 2020 08:11:08 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IqGKWE4vljjAcPx0vpPhn72zDnBvqdvK17Xs6yePlDY=;
+        b=qU2/TPWZV62tN5tJRjiRsaGcLhsk4b7RDrWge0lLBgVyKIElrxSu3PElw+Ov7ypuQb
+         IZci/rncDFkgXwGNUy8RdEi31mHfwe0FTudkS54tObbq8Wf+FQABDi5apqzehWXWVwb2
+         yDMD32l9dNycOa2ed05LpvhqKGv8t4u8OWxpsvwlCgegU3zF1VOFyCKy7np9B3/Q37LS
+         tXokAcG5peZzz6dwoH6gBlY3xAVfkkxQkS0udJIBOTk28/4qNQBoEgIwH5Cwyj2uKogc
+         9Lp/I9at6tNCpeEZLmgrx7PmF0g1kIkAM/+edjADbSpqrYt+aE0j611IMU/LCq7DO4gO
+         rLCw==
+X-Gm-Message-State: APjAAAU6hKibc/ZXqTGuWoH91/LmMnyqLqOLDYnpujtz5AaYYRlJeC5x
+        2dlCc23anhQZJrWqPakjyLxYXVqbOQ3bETmOsdM01SWpcRx5Y7vZGUWG5TFzMh2V/l5XnrtK4He
+        wyl0Mw4A9Dnbz
+X-Received: by 2002:a05:600c:cd:: with SMTP id u13mr4971794wmm.24.1579623244196;
+        Tue, 21 Jan 2020 08:14:04 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyLcl/lYmcft/LqZTO4NiEq6Lyk5s/oCPqY3EBAJJlr/q/iZw7reeRokvq1TEUD+WfWoLmTWA==
+X-Received: by 2002:a05:600c:cd:: with SMTP id u13mr4971768wmm.24.1579623243901;
+        Tue, 21 Jan 2020 08:14:03 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
+        by smtp.gmail.com with ESMTPSA id t8sm53079354wrp.69.2020.01.21.08.14.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jan 2020 08:14:03 -0800 (PST)
+Subject: Re: [PATCH v3 09/21] KVM: X86: Don't track dirty for
+ KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Xu <peterx@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200109145729.32898-1-peterx@redhat.com>
+ <20200109145729.32898-10-peterx@redhat.com>
+ <20200121155657.GA7923@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] KVM: x86: inline memslot_valid_for_gpte
-Date:   Tue, 21 Jan 2020 17:11:07 +0100
-Message-Id: <1579623067-47221-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Message-ID: <c2f556fa-8562-f2d3-37a0-220af33732cd@redhat.com>
+Date:   Tue, 21 Jan 2020 17:14:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20200121155657.GA7923@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The function now has a single caller, so there is no point
-in keeping it separate.
+On 21/01/20 16:56, Sean Christopherson wrote:
+> This code also needs to be tested by doing unrestricted_guest=0 when
+> loading kvm_intel, because it's obviously broken.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu/mmu.c | 17 ++++-------------
- 1 file changed, 4 insertions(+), 13 deletions(-)
+... as I had just found out after starting tests on kvm/queue.  Unqueued
+this patch.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7a17591b28d2..497c9384acf9 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1267,17 +1267,6 @@ static void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
- 	list_del(&sp->lpage_disallowed_link);
- }
- 
--static inline bool memslot_valid_for_gpte(struct kvm_memory_slot *slot,
--					  bool no_dirty_log)
--{
--	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
--		return false;
--	if (no_dirty_log && slot->dirty_bitmap)
--		return false;
--
--	return true;
--}
--
- static struct kvm_memory_slot *
- gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu, gfn_t gfn,
- 			    bool no_dirty_log)
-@@ -1285,8 +1274,10 @@ static inline bool memslot_valid_for_gpte(struct kvm_memory_slot *slot,
- 	struct kvm_memory_slot *slot;
- 
- 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
--	if (!memslot_valid_for_gpte(slot, no_dirty_log))
--		slot = NULL;
-+	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
-+		return NULL;
-+	if (no_dirty_log && slot->dirty_bitmap)
-+		return NULL;
- 
- 	return slot;
- }
--- 
-1.8.3.1
+Paolo
+
+> __x86_set_memory_region()
+> takes an "unsigned long *", interpreted as a "pointer to a usersepace
+> address", i.e. a "void __user **".  But the callers are treating the param
+> as a "unsigned long in userpace", e.g. init_rmode_identity_map() declares
+> uaddr as an "unsigned long *", when really it should be declaring a
+> straight "unsigned long" and passing "&uaddr".  The only thing that saves
+> KVM from dereferencing a bad pointer in __x86_set_memory_region() is that
+> uaddr is initialized to NULL 
 
