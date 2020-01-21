@@ -2,70 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D54F143CA1
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 13:17:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52E6B143CA7
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 13:20:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729596AbgAUMRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 07:17:34 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50920 "EHLO
+        id S1728760AbgAUMUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 07:20:49 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44373 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729449AbgAUMRe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 07:17:34 -0500
+        by vger.kernel.org with ESMTP id S1727817AbgAUMUs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 07:20:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579609053;
+        s=mimecast20190719; t=1579609247;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=++aOhMKuJnCXz0lh4xlX2vreaMatcfxy2SRwFiY0O7M=;
-        b=JE/hK63hum/v7nJGsONjVCH0C5u0lGAFyhZYRH7RoAlCPsSs3PcPbH7JidqZQFmYQON+N1
-        VuTqlmyZQHSL/5AfxHJv0plyRjDA7LIVXBRoT4g/OYCMQXJpj/059lBbJhWyIJzIUg6VUt
-        yEH3AWtmN0k7jVpnK4WIP1mZwN54zmM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-T4o_5Zh6N1uO3zvvQCDDtQ-1; Tue, 21 Jan 2020 07:17:31 -0500
-X-MC-Unique: T4o_5Zh6N1uO3zvvQCDDtQ-1
-Received: by mail-wr1-f70.google.com with SMTP id r2so1227844wrp.7
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 04:17:31 -0800 (PST)
+        bh=lBZ+inyQ+++w+9TWTNYwvJFiFZJEnd4G9PneIHAZ4Zo=;
+        b=OihuDbxNLtjWIfflbvFEFUBNFXPmzU1ZP2McpMHJHtC9PF9zJEQXTWR1kHodTvsKdr72L7
+        wA/X/Ki5OZXgwWk1uIBXlyTtBH2tF7qcE2MlRBA6dkG1jvBZgbtPasnIZUDJC16TwHMVBZ
+        NS3vC9cVrWddqXOsxq8YW5EfK/3g7Zg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-7-zoD1MQP861TzBVWmbMsA-1; Tue, 21 Jan 2020 07:20:46 -0500
+X-MC-Unique: 7-zoD1MQP861TzBVWmbMsA-1
+Received: by mail-wm1-f70.google.com with SMTP id g26so347711wmk.6
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 04:20:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=++aOhMKuJnCXz0lh4xlX2vreaMatcfxy2SRwFiY0O7M=;
-        b=Aj+eGUkrU3cyeEAhyayY3MeLu/WdFJjiI7tEbQ9Mv3fYDlWjzRXKKqov3XV/To4QuJ
-         6jS3iPFfc+DOuNdyRcffre4MM+YDo4fllDMl6yHnpAU9NX5kHnHE1mMwzfA6nFI8L6z4
-         1A2bE3ci1djVOp6t1q5VcYUYXqCQmlHGbzI0lS3v1e8YiqWTemEplAa1s6YtqPBB6xxt
-         qUIowqhdskxIVqeCHA6sBz4xN86Tiz5D7BSHQRxSnhgY8sRDANgLYKvW4oU+o+i90QVh
-         OWOrAozeoQSy8m2/XJYyu+pjr0bLxDA0vEImzGPSO25Ew++REacMDlbkHqtCQ3xrlpcO
-         shRw==
-X-Gm-Message-State: APjAAAXq+AQmoG3xG7A8tKmaeMddbvf49rlyaWxmRFQQWz642TyW77X0
-        jiWQuw2RK/bJT5ceES5qZdH6ZLJiXK3IeB74ykoFv7kKEWJgZFonL2L35HEQaxwz8hSxbmX4a7n
-        DOZPqbXALoIcw
-X-Received: by 2002:a1c:7d8b:: with SMTP id y133mr4172646wmc.165.1579609050523;
-        Tue, 21 Jan 2020 04:17:30 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwh3izfydfXQQHoAxmjudVBVICUhx93cIF7FIn9lfmUPgTUiP3yymysVQ/I9JAl5sJ9yJ4zlw==
-X-Received: by 2002:a1c:7d8b:: with SMTP id y133mr4172612wmc.165.1579609050230;
-        Tue, 21 Jan 2020 04:17:30 -0800 (PST)
+        bh=lBZ+inyQ+++w+9TWTNYwvJFiFZJEnd4G9PneIHAZ4Zo=;
+        b=BQ225qCnYfGFXzRyIHZicdKS/BVTp/rfksyOl9nWc+/VkKL6zjlQizykFnnLHA4yiV
+         oq9efZL5mu4pmspbKViFWA5sg7pa5DuwGrhYy8WMvToOIQXBUyxeRuXZwpCYxD6JDHcG
+         i8D0W+oGXIjWQqg7FUhinYDRlX3MZ5Bb1Q8ztIdxm6DOPaSrYIfrbvjpSalCXsi9dFFc
+         E2Qq+sIsa2+HGrsIFeE1UOMve1nfdMLb4XRxMDEorxJU7hfFhcxBjSFqP0lxlPNZivic
+         u2WQybWLvo0UrYU87jkYATmJxBLnlQ10leEtbxy+QglNSeWylK57IWeoks4T+UNbN9N1
+         HxLw==
+X-Gm-Message-State: APjAAAVNjzWemJVdPBwOwQMeYL0sFFMliw3EiD/8FTIc49KadutNYMTC
+        Vl8SkwWuY0kZujmijgD4+PRUd7pk85vPjIyGRIqPiEQ79nA4zuDvPH38j6pM11Ipn+maLujnLEZ
+        VgI7ubJfskxqw
+X-Received: by 2002:a5d:6a10:: with SMTP id m16mr4907975wru.411.1579609245045;
+        Tue, 21 Jan 2020 04:20:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz21yMxycJbSGWJJqHST4KZlDHZfAsrVBs8QsprBfaoVfWMU+edgU+bPicmH1fkjBl0AfT37A==
+X-Received: by 2002:a5d:6a10:: with SMTP id m16mr4907949wru.411.1579609244714;
+        Tue, 21 Jan 2020 04:20:44 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
-        by smtp.gmail.com with ESMTPSA id f1sm53644157wro.85.2020.01.21.04.17.29
+        by smtp.gmail.com with ESMTPSA id w83sm3697720wmb.42.2020.01.21.04.20.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2020 04:17:29 -0800 (PST)
-Subject: Re: [PATCH] KVM: VMX: remove duplicated segment cache clear
-To:     Miaohe Lin <linmiaohe@huawei.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-References: <20200121151518.27530-1-linmiaohe@huawei.com>
+        Tue, 21 Jan 2020 04:20:44 -0800 (PST)
+Subject: Re: [kvm-unit-tests v2 1/2] README: Fix markdown formatting
+To:     Andrew Jones <drjones@redhat.com>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20200120194310.3942-1-wainersm@redhat.com>
+ <20200120194310.3942-2-wainersm@redhat.com>
+ <20200121091838.caxeirc4aymxdnwc@kamzik.brq.redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c43b3126-64c8-216c-41e3-14417ced0175@redhat.com>
-Date:   Tue, 21 Jan 2020 13:17:29 +0100
+Message-ID: <a130d934-e562-02e2-14c1-f3b60126ff7e@redhat.com>
+Date:   Tue, 21 Jan 2020 13:20:44 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200121151518.27530-1-linmiaohe@huawei.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200121091838.caxeirc4aymxdnwc@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -73,31 +73,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/01/20 16:15, Miaohe Lin wrote:
-> vmx_set_segment() clears segment cache unconditionally, so we should not
-> clear it again by calling vmx_segment_cache_clear().
+On 21/01/20 10:18, Andrew Jones wrote:
+> Besides the space before 'Any' this patch is fine, which is why I gave the
+> r-b. I can do a reformatting patch on top of this myself for my other
+> comments. However if you're going to respin this, then please consider
+> reformatting the line lengths and the sentence punctuation. Also please
+> changing occurrences of "qemu" and "kvm" to "QEMU" and "KVM" when they are
+> being used as names, rather than parts of paths. E.g.
 > 
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index b5a0c2e05825..b32236e6b513 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2688,8 +2688,6 @@ static void enter_pmode(struct kvm_vcpu *vcpu)
->  
->  	vmx->rmode.vm86_active = 0;
->  
-> -	vmx_segment_cache_clear(vmx);
-> -
->  	vmx_set_segment(vcpu, &vmx->rmode.segs[VCPU_SREG_TR], VCPU_SREG_TR);
->  
->  	flags = vmcs_readl(GUEST_RFLAGS);
-> 
+>  The KVM test suite is in kvm-unit-tests.
+>  We can run QEMU with qemu-system-x86_64.
 
-Queued, thanks.
+Applied the suggested tweaks and queued, thanks to both of you!
 
 Paolo
 
