@@ -2,183 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CBA03143861
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 09:36:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE323143875
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 09:40:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729031AbgAUIfx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 03:35:53 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25766 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725789AbgAUIfx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 03:35:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579595751;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N7dpAEkIwYs7qlTREqwW6WdsBkWtgFDA0vfOaVMiY7c=;
-        b=J90SFnPaoC+Z+0CeBym/O2aFOCBXsUpeCj1zzkIyd7cWux3LPvCrr0ELxh0YCXvD/Q8cnM
-        y823NBaHy0e/4Cn611n/Lm95m2CxKztLoYFaWwS8myKK1EFU9+1J8oGAyoRKdxNCVgfEBL
-        Hj/z6GdsN2gyUlvxoBfNGXTxA57cvsU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-bBs492L5PM6Oe7SbmYwpXw-1; Tue, 21 Jan 2020 03:35:50 -0500
-X-MC-Unique: bBs492L5PM6Oe7SbmYwpXw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80F95107ACC4;
-        Tue, 21 Jan 2020 08:35:47 +0000 (UTC)
-Received: from [10.72.12.103] (ovpn-12-103.pek2.redhat.com [10.72.12.103])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0429F63148;
-        Tue, 21 Jan 2020 08:35:28 +0000 (UTC)
-Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Gunthorpe <jgg@mellanox.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
-        Rob Miller <rob.miller@broadcom.com>,
+        id S1728855AbgAUIkL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 03:40:11 -0500
+Received: from mga04.intel.com ([192.55.52.120]:18252 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728093AbgAUIkL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 03:40:11 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Jan 2020 00:40:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,345,1574150400"; 
+   d="scan'208";a="426980307"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by fmsmga006.fm.intel.com with ESMTP; 21 Jan 2020 00:40:10 -0800
+Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 21 Jan 2020 00:40:09 -0800
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 21 Jan 2020 00:40:09 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.197]) by
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.28]) with mapi id 14.03.0439.000;
+ Tue, 21 Jan 2020 16:40:07 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Wang <jasowang@redhat.com>,
+        Jason Gunthorpe <jgg@mellanox.com>
+CC:     "mst@redhat.com" <mst@redhat.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
-        Netdev <netdev@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         "Bie, Tiwei" <tiwei.bie@intel.com>,
         "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
         "Liang, Cunming" <cunming.liang@intel.com>,
         "Wang, Zhihong" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
         "Wang, Xiao W" <xiao.w.wang@intel.com>,
         "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
         "Zhu, Lingshan" <lingshan.zhu@intel.com>,
         "eperezma@redhat.com" <eperezma@redhat.com>,
         "lulu@redhat.com" <lulu@redhat.com>,
         Parav Pandit <parav@mellanox.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
         "stefanha@redhat.com" <stefanha@redhat.com>,
         "rdunlap@infradead.org" <rdunlap@infradead.org>,
         "hch@infradead.org" <hch@infradead.org>,
-        Ariel Adam <aadam@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
+        "aadam@redhat.com" <aadam@redhat.com>,
+        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
         "hanand@xilinx.com" <hanand@xilinx.com>,
         "mhabets@solarflare.com" <mhabets@solarflare.com>
-References: <20200116124231.20253-4-jasowang@redhat.com>
- <20200117070324-mutt-send-email-mst@kernel.org>
- <239b042c-2d9e-0eec-a1ef-b03b7e2c5419@redhat.com>
- <CAJPjb1+fG9L3=iKbV4Vn13VwaeDZZdcfBPvarogF_Nzhk+FnKg@mail.gmail.com>
- <AM0PR0502MB379553984D0D55FDE25426F6C3330@AM0PR0502MB3795.eurprd05.prod.outlook.com>
- <d69918ca-8af4-44b2-9652-633530d4c113@redhat.com>
- <20200120174933.GB3891@mellanox.com>
- <2a324cec-2863-58f4-c58a-2414ee32c930@redhat.com>
- <20200121004047-mutt-send-email-mst@kernel.org>
- <b9ad744e-c4cd-82f9-f56a-1ecc185e9cd7@redhat.com>
- <20200121031506-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <028ed448-a948-79d9-f224-c325029b17ab@redhat.com>
-Date:   Tue, 21 Jan 2020 16:35:27 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20200121031506-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Subject: RE: [PATCH 3/5] vDPA: introduce vDPA bus
+Thread-Topic: [PATCH 3/5] vDPA: introduce vDPA bus
+Thread-Index: AQHVzGqWKPTi/OFGjEKwu/LvhcJvQafs4oEAgADD3ACAByi08A==
+Date:   Tue, 21 Jan 2020 08:40:07 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D73EBA4@SHSMSX104.ccr.corp.intel.com>
+References: <20200116124231.20253-1-jasowang@redhat.com>
+ <20200116124231.20253-4-jasowang@redhat.com>
+ <20200116152209.GH20978@mellanox.com>
+ <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
+In-Reply-To: <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzU2MDNiODYtZmY4MC00MDZjLTg2NGYtOWNkZWZjNWFlZmEwIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiaHNIbmwxWVBLb1A1M1prQ0hNdmtzSW51VUVLNitwcldLTnJJK2lSNUE4RG42d2VDQlpEbUhoNmhPa0F3K1ZvbCJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/1/21 =E4=B8=8B=E5=8D=884:15, Michael S. Tsirkin wrote:
-> On Tue, Jan 21, 2020 at 04:00:38PM +0800, Jason Wang wrote:
->> On 2020/1/21 =E4=B8=8B=E5=8D=881:47, Michael S. Tsirkin wrote:
->>> On Tue, Jan 21, 2020 at 12:00:57PM +0800, Jason Wang wrote:
->>>> On 2020/1/21 =E4=B8=8A=E5=8D=881:49, Jason Gunthorpe wrote:
->>>>> On Mon, Jan 20, 2020 at 04:43:53PM +0800, Jason Wang wrote:
->>>>>> This is similar to the design of platform IOMMU part of vhost-vdpa=
-. We
->>>>>> decide to send diffs to platform IOMMU there. If it's ok to do tha=
-t in
->>>>>> driver, we can replace set_map with incremental API like map()/unm=
-ap().
->>>>>>
->>>>>> Then driver need to maintain rbtree itself.
->>>>> I think we really need to see two modes, one where there is a fixed
->>>>> translation without dynamic vIOMMU driven changes and one that
->>>>> supports vIOMMU.
->>>> I think in this case, you meant the method proposed by Shahaf that s=
-ends
->>>> diffs of "fixed translation" to device?
->>>>
->>>> It would be kind of tricky to deal with the following case for examp=
-le:
->>>>
->>>> old map [4G, 16G) new map [4G, 8G)
->>>>
->>>> If we do
->>>>
->>>> 1) flush [4G, 16G)
->>>> 2) add [4G, 8G)
->>>>
->>>> There could be a window between 1) and 2).
->>>>
->>>> It requires the IOMMU that can do
->>>>
->>>> 1) remove [8G, 16G)
->>>> 2) flush [8G, 16G)
->>>> 3) change [4G, 8G)
->>>>
->>>> ....
->>> Basically what I had in mind is something like qemu memory api
->>>
->>> 0. begin
->>> 1. remove [8G, 16G)
->>> 2. add [4G, 8G)
->>> 3. commit
->>
->> This sounds more flexible e.g driver may choose to implement static ma=
-pping
->> one through commit. But a question here, it looks to me this still req=
-uires
->> the DMA to be synced with at least commit here. Otherwise device may g=
-et DMA
->> fault? Or device is expected to be paused DMA during begin?
->>
->> Thanks
-> For example, commit might switch one set of tables for another,
-> without need to pause DMA.
-
-
-Yes, I think that works but need confirmation from Shahaf or Jason.
-
-Thanks
-
-
-
->
->>> Anyway, I'm fine with a one-shot API for now, we can
->>> improve it later.
->>>
->>>>> There are different optimization goals in the drivers for these two
->>>>> configurations.
->>>>>
->>>>>>> If the first one, then I think memory hotplug is a heavy flow
->>>>>>> regardless. Do you think the extra cycles for the tree traverse
->>>>>>> will be visible in any way?
->>>>>> I think if the driver can pause the DMA during the time for settin=
-g up new
->>>>>> mapping, it should be fine.
->>>>> This is very tricky for any driver if the mapping change hits the
->>>>> virtio rings. :(
->>>>>
->>>>> Even a IOMMU using driver is going to have problems with that..
->>>>>
->>>>> Jason
->>>> Or I wonder whether ATS/PRI can help here. E.g during I/O page fault=
-,
->>>> driver/device can wait for the new mapping to be set and then replay=
- the
->>>> DMA.
->>>>
->>>> Thanks
->>>>
-
+PiBGcm9tOiBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KPiBTZW50OiBGcmlkYXks
+IEphbnVhcnkgMTcsIDIwMjAgMTE6MDMgQU0NCj4gDQo+IA0KPiBPbiAyMDIwLzEvMTYg5LiL5Y2I
+MTE6MjIsIEphc29uIEd1bnRob3JwZSB3cm90ZToNCj4gPiBPbiBUaHUsIEphbiAxNiwgMjAyMCBh
+dCAwODo0MjoyOVBNICswODAwLCBKYXNvbiBXYW5nIHdyb3RlOg0KPiA+PiB2RFBBIGRldmljZSBp
+cyBhIGRldmljZSB0aGF0IHVzZXMgYSBkYXRhcGF0aCB3aGljaCBjb21wbGllcyB3aXRoIHRoZQ0K
+PiA+PiB2aXJ0aW8gc3BlY2lmaWNhdGlvbnMgd2l0aCB2ZW5kb3Igc3BlY2lmaWMgY29udHJvbCBw
+YXRoLiB2RFBBIGRldmljZXMNCj4gPj4gY2FuIGJlIGJvdGggcGh5c2ljYWxseSBsb2NhdGVkIG9u
+IHRoZSBoYXJkd2FyZSBvciBlbXVsYXRlZCBieQ0KPiA+PiBzb2Z0d2FyZS4gdkRQQSBoYXJkd2Fy
+ZSBkZXZpY2VzIGFyZSB1c3VhbGx5IGltcGxlbWVudGVkIHRocm91Z2ggUENJRQ0KPiA+PiB3aXRo
+IHRoZSBmb2xsb3dpbmcgdHlwZXM6DQo+ID4+DQo+ID4+IC0gUEYgKFBoeXNpY2FsIEZ1bmN0aW9u
+KSAtIEEgc2luZ2xlIFBoeXNpY2FsIEZ1bmN0aW9uDQo+ID4+IC0gVkYgKFZpcnR1YWwgRnVuY3Rp
+b24pIC0gRGV2aWNlIHRoYXQgc3VwcG9ydHMgc2luZ2xlIHJvb3QgSS9PDQo+ID4+ICAgIHZpcnR1
+YWxpemF0aW9uIChTUi1JT1YpLiBJdHMgVmlydHVhbCBGdW5jdGlvbiAoVkYpIHJlcHJlc2VudHMg
+YQ0KPiA+PiAgICB2aXJ0dWFsaXplZCBpbnN0YW5jZSBvZiB0aGUgZGV2aWNlIHRoYXQgY2FuIGJl
+IGFzc2lnbmVkIHRvIGRpZmZlcmVudA0KPiA+PiAgICBwYXJ0aXRpb25zDQo+ID4+IC0gVkRFViAo
+VmlydHVhbCBEZXZpY2UpIC0gV2l0aCB0ZWNobm9sb2dpZXMgc3VjaCBhcyBJbnRlbCBTY2FsYWJs
+ZQ0KPiA+PiAgICBJT1YsIGEgdmlydHVhbCBkZXZpY2UgY29tcG9zZWQgYnkgaG9zdCBPUyB1dGls
+aXppbmcgb25lIG9yIG1vcmUNCj4gPj4gICAgQURJcy4NCg0KdGhlIGNvbmNlcHQgb2YgVkRFViBp
+bmNsdWRlcyBib3RoIHNvZnR3YXJlIGJpdHMgYW5kIEFESXMuIElmIHlvdQ0Kb25seSB0YWtlIGFi
+b3V0IGhhcmR3YXJlIHR5cGVzLCB1c2luZyBBREkgaXMgbW9yZSBhY2N1cmF0ZS4NCg0KPiA+PiAt
+IFNGIChTdWIgZnVuY3Rpb24pIC0gVmVuZG9yIHNwZWNpZmljIGludGVyZmFjZSB0byBzbGljZSB0
+aGUgUGh5c2ljYWwNCj4gPj4gICAgRnVuY3Rpb24gdG8gbXVsdGlwbGUgc3ViIGZ1bmN0aW9ucyB0
+aGF0IGNhbiBiZSBhc3NpZ25lZCB0byBkaWZmZXJlbnQNCj4gPj4gICAgcGFydGl0aW9ucyBhcyB2
+aXJ0dWFsIGRldmljZXMuDQo+ID4gSSByZWFsbHkgaG9wZSB3ZSBkb24ndCBlbmQgdXAgd2l0aCB0
+d28gZGlmZmVyZW50IHdheXMgdG8gc3BlbGwgdGhpcw0KPiA+IHNhbWUgdGhpbmcuDQo+IA0KPiAN
+Cj4gSSB0aGluayB5b3UgbWVhbnQgQURJIHZzIFNGLiBJdCBsb29rcyB0byBtZSB0aGF0IEFESSBp
+cyBsaW1pdGVkIHRvIHRoZQ0KPiBzY29wZSBvZiBzY2FsYWJsZSBJT1YgYnV0IFNGIG5vdC4NCg0K
+QURJIGlzIGp1c3QgYSB0ZXJtIGZvciBtaW5pbWFsbHkgYXNzaWduYWJsZSByZXNvdXJjZSBpbiBT
+Y2FsYWJsZSBJT1YuIA0KJ2Fzc2lnbmFibGUnIGltcGxpZXMgc2V2ZXJhbCB0aGluZ3MsIGUuZy4g
+dGhlIHJlc291cmNlIGNhbiBiZSBpbmRlcGVuZGVudGx5IA0KbWFwcGVkIHRvL2FjY2Vzc2VkIGJ5
+IHVzZXIgc3BhY2Ugb3IgZ3Vlc3QsIERNQXMgYmV0d2VlbiB0d28NCkFESXMgYXJlIGlzb2xhdGVk
+LCBvcGVyYXRpbmcgb25lIEFESSBkb2Vzbid0IGFmZmVjdGluZyBhbm90aGVyIEFESSwNCmV0Yy4g
+IEknbSBub3QgY2xlYXIgYWJvdXQgIG90aGVyIHZlbmRvciBzcGVjaWZpYyBpbnRlcmZhY2VzLCBi
+dXQgc3VwcG9zaW5nDQp0aGV5IG5lZWQgbWF0Y2ggdGhlIHNpbWlsYXIgcmVxdWlyZW1lbnRzLiBU
+aGVuIGRvIHdlIHJlYWxseSB3YW50IHRvDQpkaWZmZXJlbnRpYXRlIEFESSB2cy4gU0Y/IFdoYXQg
+YWJvdXQgbWVyZ2luZyB0aGVtIHdpdGggQURJIGFzIGp1c3QNCm9uZSBleGFtcGxlIG9mIGZpbmVy
+LWdyYWluZWQgc2xpY2luZz8NCg0KPiANCj4gDQo+ID4NCj4gPj4gQEAgLTAsMCArMSwyIEBADQo+
+ID4+ICsjIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wDQo+ID4+ICtvYmotJChDT05G
+SUdfVkRQQSkgKz0gdmRwYS5vDQo+ID4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnRpby92ZHBh
+L3ZkcGEuYyBiL2RyaXZlcnMvdmlydGlvL3ZkcGEvdmRwYS5jDQo+ID4+IG5ldyBmaWxlIG1vZGUg
+MTAwNjQ0DQo+ID4+IGluZGV4IDAwMDAwMDAwMDAwMC4uMmIwZTRhOWYxMDVkDQo+ID4+ICsrKyBi
+L2RyaXZlcnMvdmlydGlvL3ZkcGEvdmRwYS5jDQo+ID4+IEBAIC0wLDAgKzEsMTQxIEBADQo+ID4+
+ICsvLyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1vbmx5DQo+ID4+ICsvKg0KPiA+
+PiArICogdkRQQSBidXMuDQo+ID4+ICsgKg0KPiA+PiArICogQ29weXJpZ2h0IChjKSAyMDE5LCBS
+ZWQgSGF0LiBBbGwgcmlnaHRzIHJlc2VydmVkLg0KPiA+PiArICogICAgIEF1dGhvcjogSmFzb24g
+V2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT4NCj4gPiAyMDIwIHRlc3RzIGRheXMNCj4gDQo+IA0K
+PiBXaWxsIGZpeC4NCj4gDQo+IA0KPiA+DQo+ID4+ICsgKg0KPiA+PiArICovDQo+ID4+ICsNCj4g
+Pj4gKyNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4NCj4gPj4gKyNpbmNsdWRlIDxsaW51eC9pZHIu
+aD4NCj4gPj4gKyNpbmNsdWRlIDxsaW51eC92ZHBhLmg+DQo+ID4+ICsNCj4gPj4gKyNkZWZpbmUg
+TU9EX1ZFUlNJT04gICIwLjEiDQo+ID4gSSB0aGluayBtb2R1bGUgdmVyc2lvbnMgYXJlIGRpc2Nv
+dXJhZ2VkIHRoZXNlIGRheXMNCj4gDQo+IA0KPiBXaWxsIHJlbW92ZS4NCj4gDQo+IA0KPiA+DQo+
+ID4+ICsjZGVmaW5lIE1PRF9ERVNDICAgICAidkRQQSBidXMiDQo+ID4+ICsjZGVmaW5lIE1PRF9B
+VVRIT1IgICAiSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT4iDQo+ID4+ICsjZGVmaW5l
+IE1PRF9MSUNFTlNFICAiR1BMIHYyIg0KPiA+PiArDQo+ID4+ICtzdGF0aWMgREVGSU5FX0lEQSh2
+ZHBhX2luZGV4X2lkYSk7DQo+ID4+ICsNCj4gPj4gK3N0cnVjdCBkZXZpY2UgKnZkcGFfZ2V0X3Bh
+cmVudChzdHJ1Y3QgdmRwYV9kZXZpY2UgKnZkcGEpDQo+ID4+ICt7DQo+ID4+ICsJcmV0dXJuIHZk
+cGEtPmRldi5wYXJlbnQ7DQo+ID4+ICt9DQo+ID4+ICtFWFBPUlRfU1lNQk9MKHZkcGFfZ2V0X3Bh
+cmVudCk7DQo+ID4+ICsNCj4gPj4gK3ZvaWQgdmRwYV9zZXRfcGFyZW50KHN0cnVjdCB2ZHBhX2Rl
+dmljZSAqdmRwYSwgc3RydWN0IGRldmljZSAqcGFyZW50KQ0KPiA+PiArew0KPiA+PiArCXZkcGEt
+PmRldi5wYXJlbnQgPSBwYXJlbnQ7DQo+ID4+ICt9DQo+ID4+ICtFWFBPUlRfU1lNQk9MKHZkcGFf
+c2V0X3BhcmVudCk7DQo+ID4+ICsNCj4gPj4gK3N0cnVjdCB2ZHBhX2RldmljZSAqZGV2X3RvX3Zk
+cGEoc3RydWN0IGRldmljZSAqX2RldikNCj4gPj4gK3sNCj4gPj4gKwlyZXR1cm4gY29udGFpbmVy
+X29mKF9kZXYsIHN0cnVjdCB2ZHBhX2RldmljZSwgZGV2KTsNCj4gPj4gK30NCj4gPj4gK0VYUE9S
+VF9TWU1CT0xfR1BMKGRldl90b192ZHBhKTsNCj4gPj4gKw0KPiA+PiArc3RydWN0IGRldmljZSAq
+dmRwYV90b19kZXYoc3RydWN0IHZkcGFfZGV2aWNlICp2ZHBhKQ0KPiA+PiArew0KPiA+PiArCXJl
+dHVybiAmdmRwYS0+ZGV2Ow0KPiA+PiArfQ0KPiA+PiArRVhQT1JUX1NZTUJPTF9HUEwodmRwYV90
+b19kZXYpOw0KPiA+IFdoeSB0aGVzZSB0cml2aWFsIGFzc2Vzc29ycz8gU2VlbXMgdW5uZWNlc3Nh
+cnksIG9yIHNob3VsZCBhdCBsZWFzdCBiZQ0KPiA+IHN0YXRpYyBpbmxpbmVzIGluIGEgaGVhZGVy
+DQo+IA0KPiANCj4gV2lsbCBmaXguDQo+IA0KPiANCj4gPg0KPiA+PiAraW50IHJlZ2lzdGVyX3Zk
+cGFfZGV2aWNlKHN0cnVjdCB2ZHBhX2RldmljZSAqdmRwYSkNCj4gPj4gK3sNCj4gPiBVc3VhbGx5
+IHdlIHdhbnQgdG8gc2VlIHN5bWJvbHMgY29uc2lzdGVudGx5IHByZWZpeGVkIHdpdGggdmRwYV8q
+LCBpcw0KPiA+IHRoZXJlIGEgcmVhc29uIHdoeSByZWdpc3Rlci91bnJlZ2lzdGVyIGFyZSBzd2Fw
+cGVkPw0KPiANCj4gDQo+IEkgZm9sbG93IHRoZSBuYW1lIGZyb20gdmlydGlvLiBJIHdpbGwgc3dp
+dGNoIHRvIHZkcGFfKi4NCj4gDQo+IA0KPiA+DQo+ID4+ICsJaW50IGVycjsNCj4gPj4gKw0KPiA+
+PiArCWlmICghdmRwYV9nZXRfcGFyZW50KHZkcGEpKQ0KPiA+PiArCQlyZXR1cm4gLUVJTlZBTDsN
+Cj4gPj4gKw0KPiA+PiArCWlmICghdmRwYS0+Y29uZmlnKQ0KPiA+PiArCQlyZXR1cm4gLUVJTlZB
+TDsNCj4gPj4gKw0KPiA+PiArCWVyciA9IGlkYV9zaW1wbGVfZ2V0KCZ2ZHBhX2luZGV4X2lkYSwg
+MCwgMCwgR0ZQX0tFUk5FTCk7DQo+ID4+ICsJaWYgKGVyciA8IDApDQo+ID4+ICsJCXJldHVybiAt
+RUZBVUxUOw0KPiA+PiArDQo+ID4+ICsJdmRwYS0+ZGV2LmJ1cyA9ICZ2ZHBhX2J1czsNCj4gPj4g
+KwlkZXZpY2VfaW5pdGlhbGl6ZSgmdmRwYS0+ZGV2KTsNCj4gPiBJTUhPIGRldmljZV9pbml0aWFs
+aXplIHNob3VsZCBub3QgYmUgY2FsbGVkIGluc2lkZSBzb21ldGhpbmcgY2FsbGVkDQo+ID4gcmVn
+aXN0ZXIsIHRvb29mdGVuIHdlIGZpbmQgb3V0IHRoYXQgdGhlIGNhbGxlciBkcml2ZXJzIG5lZWQg
+dGhlIGRldmljZQ0KPiA+IHRvIGJlIGluaXRpYWxpemVkIGVhcmxpZXIsIGllIHRvIHVzZSB0aGUg
+a3JlZiwgb3Igc29tZXRoaW5nLg0KPiA+DQo+ID4gSSBmaW5kIHRoZSBiZXN0IGZsb3cgaXMgdG8g
+aGF2ZSBzb21lIGluaXQgZnVuY3Rpb24gdGhhdCBkb2VzIHRoZQ0KPiA+IGRldmljZV9pbml0aWFs
+aXplIGFuZCBzZXRzIHRoZSBkZXZpY2VfbmFtZSB0aGF0IHRoZSBkcml2ZXIgY2FuIGNhbGwNCj4g
+PiBlYXJseS4NCj4gDQo+IA0KPiBPaywgd2lsbCBkby4NCj4gDQo+IA0KPiA+DQo+ID4gU2hvdWxk
+bid0IHRoZXJlIGJlIGEgZGV2aWNlL2RyaXZlciBtYXRjaGluZyBwcm9jZXNzIG9mIHNvbWUga2lu
+ZD8NCj4gDQo+IA0KPiBUaGUgcXVlc3Rpb24gaXMgd2hhdCBkbyB3ZSB3YW50IGRvIG1hdGNoIGhl
+cmUuDQo+IA0KPiAxKSAidmlydGlvIiB2cyAidmhvc3QiLCBJIGltcGxlbWVudGVkIG1hdGNoaW5n
+IG1ldGhvZCBmb3IgdGhpcyBpbiBtZGV2DQo+IHNlcmllcywgYnV0IGl0IGxvb2tzIHVubmVjZXNz
+YXJ5IGZvciB2RFBBIGRldmljZSBkcml2ZXIgdG8ga25vdyBhYm91dA0KPiB0aGlzLiBBbnl3YXkg
+d2UgY2FuIHVzZSBzeXNmcyBkcml2ZXIgYmluZC91bmJpbmQgdG8gc3dpdGNoIGRyaXZlcnMNCj4g
+MikgdmlydGlvIGRldmljZSBpZCBhbmQgdmVuZG9yIGlkLiBJJ20gbm90IHN1cmUgd2UgbmVlZCB0
+aGlzIGNvbnNpZGVyDQo+IHRoZSB0d28gZHJpdmVycyBzbyBmYXIgKHZpcnRpby92aG9zdCkgYXJl
+IGFsbCBidXMgZHJpdmVycy4NCj4gDQo+IFRoYW5rcw0KPiANCj4gDQo+ID4NCj4gPiBKYXNvbg0K
+PiA+DQoNCg==
