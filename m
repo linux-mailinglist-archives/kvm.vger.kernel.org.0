@@ -2,243 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C1108144276
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 17:51:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22711144321
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 18:24:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729043AbgAUQv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 11:51:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40807 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726555AbgAUQv0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 11:51:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579625484;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EjvJWmMVkTkKHvCbaLCn1U9z/2+sQWLEI67UmyKeHPQ=;
-        b=ieTwsU6jngiSpJZvcSKb2zytspleFGpNnlpNxeVV4zJSrJcxhHeMxt7hiFVbfRpKV0I0hO
-        BvA04DimGj0MOdzgMGHjT8+9vM6wX/nApK889RF0crpb5PnjyAQrk+qS7+ku1+hJlh//UG
-        VIiZZ2Dp3OH9VPbcImOuxGuS/jB2Jpg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-mGPtqRNuO6GvhvLjFt50eg-1; Tue, 21 Jan 2020 11:51:21 -0500
-X-MC-Unique: mGPtqRNuO6GvhvLjFt50eg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31AE98024D2;
-        Tue, 21 Jan 2020 16:51:20 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ED21410027A9;
-        Tue, 21 Jan 2020 16:51:16 +0000 (UTC)
-Date:   Tue, 21 Jan 2020 09:51:16 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>
-Subject: Re: [PATCH v2 2/2] drm/i915/gvt: subsitute kvm_read/write_guest
- with vfio_dma_rw
-Message-ID: <20200121095116.05eeae14@w520.home>
-In-Reply-To: <20200121081207.GE1759@joy-OptiPlex-7040>
-References: <20200115034132.2753-1-yan.y.zhao@intel.com>
-        <20200115035455.12417-1-yan.y.zhao@intel.com>
-        <20200115130651.29d7e9e0@w520.home>
-        <20200116054941.GB1759@joy-OptiPlex-7040>
-        <20200116083729.40983f38@w520.home>
-        <20200119100637.GD1759@joy-OptiPlex-7040>
-        <20200120130157.0ee7042d@w520.home>
-        <20200121081207.GE1759@joy-OptiPlex-7040>
+        id S1729238AbgAURYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 12:24:20 -0500
+Received: from mail-vk1-f195.google.com ([209.85.221.195]:36687 "EHLO
+        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729108AbgAURYU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 12:24:20 -0500
+Received: by mail-vk1-f195.google.com with SMTP id i4so1124221vkc.3
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 09:24:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tmdQR2X4duHrdLuoSZ/99xX/Rb3XYACDrTpOQDSPPpk=;
+        b=N8TlBVJ+RMFuLiUDyVPR+fK0vFsRsKWj9y3/4PyfmN2wTHga8WAUwT9hKbEJx1on9V
+         SvRUI52PCTIHdKxIRNdClQosLyJJ0UQhkhEk+eGrvXKyPRyz4AX6C9V1970RYoJZE16A
+         /zkjiXW+SuelLVZtQYh02zwAJ3SQgPGM2oRZ//PkRpTb3o4/RVE/db1Su7P86+zKbtz1
+         4PLuBDedh50fkg8wg9Bz3P1P2iiaVq9izsWYAiSArq56jDESMXHk1lww89VpYQVCmOlp
+         /DfUlTujPrkMTB2NI1lqqZbnlCDYdMT3LLuS+FOOgjTREIfesBjVL24O1CLnZyHTpR/W
+         fD0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tmdQR2X4duHrdLuoSZ/99xX/Rb3XYACDrTpOQDSPPpk=;
+        b=B5m11858tUVCiTr7CBaPU8dco+GPkan7MDLJTtX1mxYMQQQ6W1x1E2KHbrZ7SDke7+
+         cjzEcxvstzMcgzMmjs65bdOMeo8HWLhNHoE7UExZXjYiWg9pqTTqgvPwCoHh+97gEwOC
+         jYnaWQaX7g8dUMOSWnsrLByLaPr0OybiQvVxTryeQq2zHLE0uWMxPGXIxOQB1MkViV+I
+         WMM4GqUJPE39lWTNpE6IGhCYa9hh2JombZCgKfnJew8LaaNieemLba/mrs/OM02jdJiz
+         ARvWDQcfbGWuUe/tEFfD+evI7uql/y5t0olMxtz+dU4vH8kHcJ0qJQS1KOQHOUlGPzGA
+         FJ5w==
+X-Gm-Message-State: APjAAAUrQFna5MsBzUjQWT6sGRaZfqa2F1VuMeZIOhBuE08n8mRz/hiJ
+        e3ExDJuaJp8CLbRGmsg9OXFkuk/9tWQQ3zM+a+Lvaw==
+X-Google-Smtp-Source: APXvYqx2UBGD7SVo9IfIYzSF7rmUWtk38deKTni6PIDPPto8tFZLFhFMv7Tcu6XYMHG0ayL8XaGVVbosi7qBmrDNogo=
+X-Received: by 2002:a1f:434b:: with SMTP id q72mr3398984vka.53.1579627458543;
+ Tue, 21 Jan 2020 09:24:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <1579623061-47141-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1579623061-47141-1-git-send-email-pbonzini@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 21 Jan 2020 09:24:07 -0800
+Message-ID: <CANgfPd8fq7pWe00fKm7QEiOAVFuubSQ-jJxEM1sCKzqJk9rSzw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: fix overlap between SPTE_MMIO_MASK and generation
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 21 Jan 2020 03:12:07 -0500
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Tue, Jan 21, 2020 at 8:11 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The SPTE_MMIO_MASK overlaps with the bits used to track MMIO
+> generation number.  A high enough generation number would overwrite the
+> SPTE_SPECIAL_MASK region and cause the MMIO SPTE to be misinterpreted;
+> likewise, setting bits 52 and 53 would also cause an incorrect generation
+> number to be read from the PTE.
+>
+> Fixes: 6eeb4ef049e7 ("KVM: x86: assign two bits to track SPTE kinds")
+> Reported-by: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 57e4dbddba72..e34ca43d9166 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -418,22 +418,25 @@ static inline bool is_access_track_spte(u64 spte)
+>   * requires a full MMU zap).  The flag is instead explicitly queried when
+>   * checking for MMIO spte cache hits.
+>   */
+> -#define MMIO_SPTE_GEN_MASK             GENMASK_ULL(18, 0)
+> +#define MMIO_SPTE_GEN_MASK             GENMASK_ULL(17, 0)
 
-> On Tue, Jan 21, 2020 at 04:01:57AM +0800, Alex Williamson wrote:
-> > On Sun, 19 Jan 2020 05:06:37 -0500
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >   
-> > > On Thu, Jan 16, 2020 at 11:37:29PM +0800, Alex Williamson wrote:  
-> > > > On Thu, 16 Jan 2020 00:49:41 -0500
-> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > >     
-> > > > > On Thu, Jan 16, 2020 at 04:06:51AM +0800, Alex Williamson wrote:    
-> > > > > > On Tue, 14 Jan 2020 22:54:55 -0500
-> > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > >       
-> > > > > > > As a device model, it is better to read/write guest memory using vfio
-> > > > > > > interface, so that vfio is able to maintain dirty info of device IOVAs.
-> > > > > > > 
-> > > > > > > Compared to kvm interfaces kvm_read/write_guest(), vfio_dma_rw() has ~600
-> > > > > > > cycles more overhead on average.
-> > > > > > > 
-> > > > > > > -------------------------------------
-> > > > > > > |    interface     | avg cpu cycles |
-> > > > > > > |-----------------------------------|
-> > > > > > > | kvm_write_guest  |     1554       |
-> > > > > > > | ----------------------------------|
-> > > > > > > | kvm_read_guest   |     707        |
-> > > > > > > |-----------------------------------|
-> > > > > > > | vfio_dma_rw(w)   |     2274       |
-> > > > > > > |-----------------------------------|
-> > > > > > > | vfio_dma_rw(r)   |     1378       |
-> > > > > > > -------------------------------------      
-> > > > > > 
-> > > > > > In v1 you had:
-> > > > > > 
-> > > > > > -------------------------------------
-> > > > > > |    interface     | avg cpu cycles |
-> > > > > > |-----------------------------------|
-> > > > > > | kvm_write_guest  |     1546       |
-> > > > > > | ----------------------------------|
-> > > > > > | kvm_read_guest   |     686        |
-> > > > > > |-----------------------------------|
-> > > > > > | vfio_iova_rw(w)  |     2233       |
-> > > > > > |-----------------------------------|
-> > > > > > | vfio_iova_rw(r)  |     1262       |
-> > > > > > -------------------------------------
-> > > > > > 
-> > > > > > So the kvm numbers remained within +0.5-3% while the vfio numbers are
-> > > > > > now +1.8-9.2%.  I would have expected the algorithm change to at least
-> > > > > > not be worse for small accesses and be better for accesses crossing
-> > > > > > page boundaries.  Do you know what happened?
-> > > > > >      
-> > > > > I only tested the 4 interfaces in GVT's environment, where most of the
-> > > > > guest memory accesses are less than one page.
-> > > > > And the different fluctuations should be caused by the locks.
-> > > > > vfio_dma_rw contends locks with other vfio accesses which are assumed to
-> > > > > be abundant in the case of GVT.    
-> > > > 
-> > > > Hmm, so maybe it's time to convert vfio_iommu.lock from a mutex to a
-> > > > rwsem?  Thanks,
-> > > >     
-> > > 
-> > > hi Alex
-> > > I tested your rwsem patches at (https://lkml.org/lkml/2020/1/16/1869).
-> > > They works without any runtime error at my side. :) 
-> > > However, I found out that the previous fluctuation may be because I didn't
-> > > take read/write counts in to account.
-> > > For example. though the two tests have different avg read/write cycles,
-> > > their average cycles are almost the same.
-> > >  ______________________________________________________________________
-> > > |        | avg read |            | avg write |            |            |
-> > > |        | cycles   | read cnt   | cycles    | write cnt  | avg cycles |
-> > > |----------------------------------------------------------------------|
-> > > | test 1 |   1339   | 29,587,120 |  2258     | 17,098,364 |    1676    |
-> > > | test 2 |   1340   | 28,454,262 |  2238     | 16,501,788 |    1670    |
-> > >  ----------------------------------------------------------------------
-> > > 
-> > > After measuring the exact read/write cnt and cycles of a specific workload,
-> > > I get below findings:
-> > > 
-> > > (1) with single VM running glmark2 inside.
-> > > glmark2: 40M+ read+write cnt, among which 63% is read.
-> > > among reads, 48% is of PAGE_SIZE, the rest is less than a page.
-> > > among writes, 100% is less than a page.
-> > > 
-> > >  __________________________________________________
-> > > |       cycles         | read | write |  avg | inc |
-> > > |--------------------------------------------------|
-> > > | kvm_read/write_page  |  694 |  1506 |  993 |  /  |
-> > > |--------------------------------------------------|
-> > > |  vfio_dma_rw(mutex)  | 1340 |  2248 | 1673 | 680 |
-> > > |--------------------------------------------------|
-> > > | vfio_dma_rw(rwsem r) | 1323 |  2198 | 1645 | 653 |
-> > >  ---------------------------------------------------
-> > > 
-> > > so vfio_dma_rw generally has 650+ more cycles per each read/write.
-> > > While kvm->srcu is of 160 cycles on average with one vm is running, the
-> > > cycles spending on locks for vfio_dma_rw spread like this:
-> > >  ___________________________
-> > > |        cycles       | avg |
-> > > |---------------------------|
-> > > |     iommu->lock     | 117 |
-> > > |---------------------------|
-> > > |   vfio.group_lock   | 108 |
-> > > |---------------------------|
-> > > | group->unbound_lock | 114 |
-> > > |---------------------------|
-> > > |  group->device_lock | 115 |
-> > > |---------------------------|
-> > > |     group->mutex    | 113 |
-> > >  ---------------------------
-> > > 
-> > > I measured the cycles for a mutex without any contention is 104 cycles
-> > > on average (including time for get_cycles() and measured in the same way
-> > > as other locks). So the contention of a single lock in a single vm
-> > > environment is light. probably because there's a vgpu lock hold in GVT already.
-> > > 
-> > > (2) with two VMs each running glmark2 inside.
-> > > The contention increases a little.
-> > > 
-> > >  ___________________________________________________
-> > > |       cycles         | read | write |  avg | inc  |
-> > > |---------------------------------------------------|
-> > > | kvm_read/write_page  | 1035 |  1832 | 1325 |  /   |
-> > > |---------------------------------------------------|
-> > > |  vfio_dma_rw(mutex)  | 2104 |  2886 | 2390 | 1065 |
-> > > |---------------------------------------------------|
-> > > | vfio_dma_rw(rwsem r) | 1965 |  2778 | 2260 | 935  |
-> > >  ---------------------------------------------------
-> > > 
-> > > 
-> > >  -----------------------------------------------
-> > > |     avg cycles       |   one VM   |  two VMs  |
-> > > |-----------------------------------------------|
-> > > |  iommu lock (mutex)  |     117    |   150     |
-> > > |-----------------------------------|-----------|
-> > > | iommu lock (rwsem r) |     117    |   156     |
-> > > |-----------------------------------|-----------|
-> > > |   kvm->srcu          |     160    |   213     |
-> > >  -----------------------------------------------
-> > > 
-> > > In the kvm case, avg cycles increased 332 cycles, while kvm->srcu only costed
-> > > 213 cycles. The rest 109 cycles may be spent on atomic operations.
-> > > But I didn't measure them, as get_cycles() operation itself would influence final
-> > > cycles by ~20 cycles.  
-> > 
-> > It seems like we need to extend the vfio external user interface so
-> > that GVT-g can hold the group and container user references across
-> > multiple calls.  For instance if we had a
-> > vfio_group_get_external_user_from_dev() (based on
-> > vfio_group_get_external_user()) then i915 could get an opaque
-> > vfio_group pointer which it could use to call vfio_group_dma_rw() which
-> > would leave us with only the iommu rw_sem locking.  i915 would release
-> > the reference with vfio_group_put_external_user() when the device is
-> > released.  The same could be done with the pin pages interface to
-> > streamline that as well.  Thoughts?  Thanks,
-> >  
-> hi Alex,
-> it works!
+I see you're shifting the MMIO high gen mask region to avoid having to
+shift it by 2. Looking at the SDM, I believe using bit 62 for the
+generation number is safe, but I don't recall why it wasn't used
+before.
 
-Hurrah!
+>
+>  #define MMIO_SPTE_GEN_LOW_START                3
+>  #define MMIO_SPTE_GEN_LOW_END          11
+>  #define MMIO_SPTE_GEN_LOW_MASK         GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
+>                                                     MMIO_SPTE_GEN_LOW_START)
+>
+> -#define MMIO_SPTE_GEN_HIGH_START       52
+> -#define MMIO_SPTE_GEN_HIGH_END         61
+> +/* Leave room for SPTE_SPECIAL_MASK.  */
+> +#define MMIO_SPTE_GEN_HIGH_START       54
+> +#define MMIO_SPTE_GEN_HIGH_END         62
+>  #define MMIO_SPTE_GEN_HIGH_MASK                GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
+>                                                     MMIO_SPTE_GEN_HIGH_START)
+> +
+>  static u64 generation_mmio_spte_mask(u64 gen)
+>  {
+>         u64 mask;
+>
+>         WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
+> +       BUILD_BUG_ON(MMIO_SPTE_GEN_HIGH_START < PT64_SECOND_AVAIL_BITS_SHIFT);
 
-> now the average vfio_dma_rw cycles can reduced to 1198. 
-> one thing I want to propose is that, in sight of dma->task is always user
-> space process, instead of calling get_task_mm(dma->task), can we just use
-> "mmget_not_zero(dma->task->mm)"? in this way, the avg cycles can
-> further reduce to 1051.
+Would it be worth defining the MMIO_SPTE_GEN masks, SPTE_SPECIAL_MASK,
+SPTE_AD masks, and SPTE_MMIO_MASK in terms of
+PT64_SECOND_AVAIL_BITS_SHIFT? It seems like that might be a more
+robust assertion here.
 
-I'm not an expert there.  As noted in the type1 code we hold a
-reference to the task because it's not advised to hold a long term
-reference to the mm, so do we know we can look at task->mm without
-acquiring task_lock()?  It's possible this is safe, but it's not
-abundantly obvious to me.  Please research further and provide
-justification if you think it's correct.  Thanks,
+Alternatively, BUILD_BUG_ON((MMIO_SPTE_GEN_HIGH_MASK |
+MMIO_SPTE_GEN_LOW_MASK) & SPTE_(MMIO and/or SPECIAL)_MASK)
 
-Alex
-
+>
+>         mask = (gen << MMIO_SPTE_GEN_LOW_START) & MMIO_SPTE_GEN_LOW_MASK;
+>         mask |= (gen << MMIO_SPTE_GEN_HIGH_START) & MMIO_SPTE_GEN_HIGH_MASK;
+> --
+> 1.8.3.1
+>
