@@ -2,121 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA1C5143C9A
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 13:15:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DE90143CA0
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 13:17:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728831AbgAUMPh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 07:15:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35857 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728655AbgAUMPh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 07:15:37 -0500
+        id S1729416AbgAUMRX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 07:17:23 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22824 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728760AbgAUMRU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 07:17:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579608936;
+        s=mimecast20190719; t=1579609038;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=K7uxOa/zMccI1hlwQjdK023gkBaUsZFJKD86fyOIwdY=;
-        b=U3wWQRl6TMbLae1Hka2E+hBZA5DcnLwJDAFjL4Q+oq1KF52j5NQiK7y2NZqGapK0qzCgOd
-        SUlBH83UrpqKp0gOCuyu6mNEpAww2bp9X9gtTlbgrcresstiyHcEn7mvQX+9TMvQgfA9jl
-        jnHSGH+OgxBij3FcCB+Lz9HzojO1jvk=
+        bh=C9ocdms8YQdaluyA27aUHa1CM8I9Y3XHULzORwIWhX4=;
+        b=csT5DPkBfQOI1vRiQGYCf4hqOVec/OxEQKsuDD7Siz/QwMvlNY7Z5yXixfE87diev+DiZ7
+        hf+VdN+zPQFTTHBs+20sIBeQzer45Fcl9yeY24BJlVq1vl2wIlbU0K8z1i+HwvbFxvLT+w
+        fTHKaA9OGZSPZ/9Z/fPBp/mdMAqev+I=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-3vOaJ-VYMoyYOdatJl2x6Q-1; Tue, 21 Jan 2020 07:15:35 -0500
-X-MC-Unique: 3vOaJ-VYMoyYOdatJl2x6Q-1
-Received: by mail-wr1-f69.google.com with SMTP id z10so1213505wrt.21
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 04:15:35 -0800 (PST)
+ us-mta-274-snx_aib1N2moKDB8uK7KbA-1; Tue, 21 Jan 2020 07:17:17 -0500
+X-MC-Unique: snx_aib1N2moKDB8uK7KbA-1
+Received: by mail-wr1-f69.google.com with SMTP id h30so1232001wrh.5
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 04:17:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=K7uxOa/zMccI1hlwQjdK023gkBaUsZFJKD86fyOIwdY=;
-        b=a2gxLfE1q+zZA2NHq/xpX3awS1ctszLMvjVfn86jmNQEHnNkHHd92rW9b6MvAQDV38
-         ij9rEspzmQyAh2hcTPbHCC+XStIJ84dtao/9bH2TKC72QB+kqeFnQ/5JtQcbabtNy+RH
-         QpQ9Kb2T5XiyyG15Urc2Y5uh192a9jgt7LSL2qpKtdgR9qjY86rSR4jpHKw0D6q59rEo
-         z1yYIJnw6Qfdw+nAZBPGvN+rATQwLOoSOzDfbqpRlzn6Cfg9JAlE3wzJNyQlTlo8sLzA
-         x/K94Xku9wcyH3Fvk8rXo11FLTvrWPzE9TmtmCv2bCJk/6m6UmSUNLBqNbKzuMeRcrcq
-         +OYQ==
-X-Gm-Message-State: APjAAAXlvgUBNiPBcuUZ4Soenkg5hzVyOTl/YaJMfwS+qcEyPZqg9BeV
-        Gpb9uqLDXtr82rrPlOMIN9D4gtJyuivX/GBvojExUUxGmQP49VBl35LsEPHb/5F9Tq55Rm+hnS2
-        kk6r8fivPCapO
-X-Received: by 2002:a5d:6406:: with SMTP id z6mr4954840wru.294.1579608933893;
-        Tue, 21 Jan 2020 04:15:33 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyVbq65dVzapzaZwnuI8J74z85tvEX9mBSp5IwckHTxpR5vFcgnPbOoJoVjP/9/uvX9ZxZzMQ==
-X-Received: by 2002:a5d:6406:: with SMTP id z6mr4954809wru.294.1579608933585;
-        Tue, 21 Jan 2020 04:15:33 -0800 (PST)
+        bh=C9ocdms8YQdaluyA27aUHa1CM8I9Y3XHULzORwIWhX4=;
+        b=rykIUf3UqYRhv1c05YjvXr8UvG8DFO+806Z1Vzn0W8TcKhjMVYNjsf2tVizc286m9L
+         XhRxll18Gaa2HSNmd1zwbo47NysrjEWormhIyQuvlZzN9Y4XTTjAaBcuNF0k7pco/1zR
+         LW9gC4M+n0Ut2mb2cuSwhiBjjgpuyiAYJmS7em3htUUrC2t3qZZ/lTuwNX8jXEE/G3fr
+         aMwUJJPszzlj66p72qQhTZcw8oa7OjxlLcWjYZl9bLowBUybUgf6GMU1zXCcw7R11kdP
+         5M/GnccSS5i5PcEpy+McAWF+dvkgAokHCj5oDcxof+LIcz63U3W1AipT8rbAO/U2tQd9
+         6Nmw==
+X-Gm-Message-State: APjAAAW7N4r3jhBNsufta6piAEY6MncnBgPA19wBiSDb6/xmBhPhTvti
+        QhCiMZUnYsZw7SHMvZg29YgUSGzfQzMi4J8Ugxw6BCnkKyNw4EFfKBhivTtIB6Uuw4NRsd855lY
+        /z0MXUBNsBlgX
+X-Received: by 2002:a05:600c:210e:: with SMTP id u14mr4006437wml.28.1579609035980;
+        Tue, 21 Jan 2020 04:17:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyjBmRSqaH7Hafu7I3Qvl9yQQESxj6q6oJyTXTzXfCwxSIMyeZy0TLITSzLFAXsYe6bR+nUbQ==
+X-Received: by 2002:a05:600c:210e:: with SMTP id u14mr4006409wml.28.1579609035662;
+        Tue, 21 Jan 2020 04:17:15 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
-        by smtp.gmail.com with ESMTPSA id g18sm3451669wmh.48.2020.01.21.04.15.32
+        by smtp.gmail.com with ESMTPSA id j12sm53192472wrt.55.2020.01.21.04.17.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2020 04:15:33 -0800 (PST)
-Subject: Re: [PATCH v2] KVM: Adding 'else' to reduce checking.
-To:     Haiwei Li <lihaiwei.kernel@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
-References: <abea81a5-266f-7e0d-558a-b4b7aa49d3d4@gmail.com>
+        Tue, 21 Jan 2020 04:17:15 -0800 (PST)
+Subject: Re: [PATCH] selftests: KVM: AMD Nested SVM test infrastructure
+To:     Auger Eric <eric.auger@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     thuth@redhat.com, drjones@redhat.com, eric.auger.pro@gmail.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20200117173753.21434-1-eric.auger@redhat.com>
+ <87pnfeflgb.fsf@vitty.brq.redhat.com>
+ <a288001b-56a6-363b-18c0-18a1e1876ccc@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <68afcc3a-f32c-0e0e-5c2d-5fddfc98d1fd@redhat.com>
-Date:   Tue, 21 Jan 2020 13:15:32 +0100
+Message-ID: <f156e2e0-6c75-30c2-c295-b87ee1b36600@redhat.com>
+Date:   Tue, 21 Jan 2020 13:17:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <abea81a5-266f-7e0d-558a-b4b7aa49d3d4@gmail.com>
+In-Reply-To: <a288001b-56a6-363b-18c0-18a1e1876ccc@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/01/20 10:03, Haiwei Li wrote:
-> From 009bfba9b6f6b41018708323d9ca651ae2075900 Mon Sep 17 00:00:00 2001
-> From: Haiwei Li <lihaiwei@tencent.com>
-> Date: Thu, 16 Jan 2020 16:50:21 +0800
-> Subject: [PATCH] Adding 'else' to reduce checking.
-> 
-> These two conditions are in conflict, adding 'else' to reduce checking.
-> 
-> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  arch/x86/kvm/lapic.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 679692b..f1cfb94 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1571,9 +1571,9 @@ static void
-> kvm_apic_inject_pending_timer_irqs(struct kvm_lapic *apic)
->         struct kvm_timer *ktimer = &apic->lapic_timer;
-> 
->         kvm_apic_local_deliver(apic, APIC_LVTT);
-> -       if (apic_lvtt_tscdeadline(apic))
-> +       if (apic_lvtt_tscdeadline(apic)) {
->                 ktimer->tscdeadline = 0;
-> -       if (apic_lvtt_oneshot(apic)) {
-> +       } else if (apic_lvtt_oneshot(apic)) {
->                 ktimer->tscdeadline = 0;
->                 ktimer->target_expiration = 0;
->         }
-> -- 
-> 1.8.3.1
-> 
+On 21/01/20 12:12, Auger Eric wrote:
+>>> +
+>>> +static struct test tests[] = {
+>>> +	/* name, supported, custom setup, l2 code, exit code, custom check, finished */
+>>> +	{"vmmcall", NULL, NULL, l2_vmcall, SVM_EXIT_VMMCALL},
+>>> +	{"vmrun", NULL, NULL, l2_vmrun, SVM_EXIT_VMRUN},
+>>> +	{"CR3 read intercept", NULL, prepare_cr3_intercept, l2_cr3_read, SVM_EXIT_READ_CR3},
+>>> +};
+>> selftests are usualy not that well structured :-) E.g. we don't have
+>> sub-tests and a way to specify which one to run so there is a single
+>> flow when everything is being executed. I'd suggest to keep things as
+>> simple as possibe (especially in the basic 'svm' test).
+> In this case the differences between the tests is very tiny. One line on
+> L2 and one line on L1 to check the exit status. I wondered whether it
+> deserves to have separate test files for that. I did not intend to run
+> the subtests separately nor to add many more subtests but rather saw all
+> of them as a single basic test. More complex tests would be definitively
+> separate.
 
-Queued, thanks.
+I would just leave this deeper kind of test to kvm-unit-tests and keep
+selftests for API tests.  So this would mean basically only keep (and
+inline) the vmmcall test.
 
 Paolo
 
