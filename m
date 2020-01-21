@@ -2,72 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A20E14407E
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 16:28:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4888D144082
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 16:29:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729187AbgAUP2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 10:28:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51782 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727508AbgAUP2n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 10:28:43 -0500
+        id S1729061AbgAUP34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 10:29:56 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31010 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727508AbgAUP3z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 10:29:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579620521;
+        s=mimecast20190719; t=1579620594;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SHCZsRvQttcw8XgkTQh99Ct42XqmYq4StjtF6QwKxoc=;
-        b=T0gvoQrj2mHeJUnbM5xl52laOiquJ24LmI9KgNQgIuah1kNbAQVdYk4n8W5LjVB+X/C50J
-        kNjmBQBTCbBdHeA0Z9oE3Db0AFKNGpMrCqp5c6WcLtgfNGcKI0fULO+/kedG2qlcIhrn/p
-        TO7vlAT43HraV+HfHmMhyXN7VQtzS0Y=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-jcp_SHWlOnWdSluxd0b68Q-1; Tue, 21 Jan 2020 10:28:40 -0500
-X-MC-Unique: jcp_SHWlOnWdSluxd0b68Q-1
-Received: by mail-wr1-f70.google.com with SMTP id r2so1457619wrp.7
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 07:28:39 -0800 (PST)
+        bh=drluyyJgvZU1MSvZk9nVX/INIds5bPQT7NFflzdSLzQ=;
+        b=N8ykmREkLPcMC7F7vqMnLSroew9xhCBbuCGObElSM9wC85oR23MJnOoItEuLAjUCorXukn
+        wqBNWJHQ04RPVF4orskkzEYZ0EO9naBRhCPI9qLdkBYvHgBVlEYgOwqrdqemb/Ekuccelj
+        +FQKp7p7EDI3M1uNJvFK72K40raq/6k=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-KLO0wXPjMuivgZmhlvrcMQ-1; Tue, 21 Jan 2020 10:29:50 -0500
+X-MC-Unique: KLO0wXPjMuivgZmhlvrcMQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 18so755943wmp.0
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 07:29:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=SHCZsRvQttcw8XgkTQh99Ct42XqmYq4StjtF6QwKxoc=;
-        b=g1HDpoz2f+1A/3LPBJcJFSqtkwnmZ/j5MhKSgEBLViJxo/Ci3AI4Eqnr4HQutV9OWv
-         YxC8BshA5e8vHDLHabmrHUEGLh+RwDCjEavi1Fh/7urkO5+toXwkQjZ56fNJWEGwr06N
-         gi6MclQqZWgybpjyC91GzNNP5S/5AF0e9qPzKGqek85fYReBlk42L2XVwx2TBYwbc0F5
-         2344beoOG+OWK0myGsj1YX6XnwtW4hyPskNGQALJAtNnjcRW0JpBy+KHBJuY6QC8+KDM
-         esQrDhIMgAL98kv8spPZuDXstDvDBZEBQ/1WCaLBwvgoktJQb+5Iy9tJsmYwj8vdan5o
-         FvZA==
-X-Gm-Message-State: APjAAAVVxzoa/7nmIVnDVjJMeaLiudNko8yz6Gwof2/ItdCYx6hJvuso
-        HRB1+IjmTaN+w9Yech45oOPGFjFUHmdTm9RfKyGV6foHzVsN+kWJUxGVwMlEV8BI1taXNzB7Rwv
-        QSbxNa9rZUp7D
-X-Received: by 2002:a5d:494b:: with SMTP id r11mr5779952wrs.184.1579620518755;
-        Tue, 21 Jan 2020 07:28:38 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx822hIl7/7gYrCFnOYKsHrSSH86F2HvIZKXHH8DNrhdRU+SRL5EutNges8vGhbNi+m2vJRyg==
-X-Received: by 2002:a5d:494b:: with SMTP id r11mr5779930wrs.184.1579620518451;
-        Tue, 21 Jan 2020 07:28:38 -0800 (PST)
+        bh=drluyyJgvZU1MSvZk9nVX/INIds5bPQT7NFflzdSLzQ=;
+        b=Oq3Z44yR3A0NnsoCr6CmUZgOtd6Dwvt9KReHicYmd5M1SwHTRZrbVXrvFkURk4YDnC
+         tC8DjXnZoT+w9hdm0K9hmjLJRIWdMEvRu06wdVZEo9t3JRExTG7LY/JHuFwvexWAQKQ4
+         5pnjc0mUt532io9kX5P67H982hhQvjAAjpUCUsDHg6PP65uSR05NmPPkAvu5RQS7qnwh
+         5UBL3qdfy2iy+FYTtB0K2DHJKZM/0+uETtAEzljPK7Ol7p7sfWJReMrqD8JaXU1uZ1L4
+         bdDZ4vLEebYBoW3PCZcHEZDCyWZ3xFeVw0RFSiAKJ2Iz2ZNb0ef++etAXQqU5UjROQux
+         tbhA==
+X-Gm-Message-State: APjAAAW39tgQ0KSaxn0ZUPfYGbn6ZXdoYPbq+X/mbA58xAwVvG57B92F
+        Vxolihlz4aqGOhQcby5ccOCDSXp7oqvlwVQnTM49UtCSukgW94jS/nF+jaOSqGn31akmYJTgqDN
+        64GKRGVOzfWkn
+X-Received: by 2002:a7b:cb0a:: with SMTP id u10mr4986298wmj.165.1579620588915;
+        Tue, 21 Jan 2020 07:29:48 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzv1AiZkeRHvYhkTqdyoDwaDda+xt9Gb+5IDcg8qw+ja8rw8ozohTnvztIc5tRcztih3xCz/Q==
+X-Received: by 2002:a7b:cb0a:: with SMTP id u10mr4986279wmj.165.1579620588629;
+        Tue, 21 Jan 2020 07:29:48 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
-        by smtp.gmail.com with ESMTPSA id a14sm56577192wrx.81.2020.01.21.07.28.37
+        by smtp.gmail.com with ESMTPSA id p17sm52810460wrx.20.2020.01.21.07.29.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2020 07:28:37 -0800 (PST)
-Subject: Re: [PATCH 2/3] KVM: x86: Emulate MTF when performing instruction
- emulation
-To:     Oliver Upton <oupton@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>
-References: <20200113221053.22053-1-oupton@google.com>
- <20200113221053.22053-3-oupton@google.com>
- <20200114000517.GC14928@linux.intel.com> <20200115225154.GA63061@google.com>
+        Tue, 21 Jan 2020 07:29:48 -0800 (PST)
+Subject: Re: [PULL kvm-unit-tests 0/3] arm/arm64: Add prefetch abort test
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     alexandru.elisei@arm.com
+References: <20200121131745.7199-1-drjones@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <41f2f408-bc3e-b28a-7645-8b9b6939ecf6@redhat.com>
-Date:   Tue, 21 Jan 2020 16:28:36 +0100
+Message-ID: <0b3033da-f347-f393-b7b0-3482a52a9185@redhat.com>
+Date:   Tue, 21 Jan 2020 16:29:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200115225154.GA63061@google.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200121131745.7199-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -75,15 +71,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/01/20 23:51, Oliver Upton wrote:
-> Good point. I'm instead inclined to call the hook to emulation_complete
-> (will rename as appropriate) from kvm_vcpu_do_singlestep(), as it
-> appears this is how x86_emulate_instruction processes the trap flag.
-> Need to take a deeper look + test to ensure this change will fix MTF for
-> full instruction emulation.
+On 21/01/20 14:17, Andrew Jones wrote:
+>   https://github.com/rhdrjones/kvm-unit-tests arm/queue
 
-Cool, I was going to suggest the same.  You can use the forced emulation
-prefix to send your testcase down the x86_emulate_instruction path.
+Pulled, thanks.  It may take until tomorrow before I push because I'm
+testing 100-odd x86 patches. :)
 
 Paolo
 
