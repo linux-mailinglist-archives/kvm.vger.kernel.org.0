@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C3859144362
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 18:36:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D5F6144364
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 18:37:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728904AbgAURgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 12:36:46 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30510 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728186AbgAURgq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 12:36:46 -0500
+        id S1729130AbgAURhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 12:37:00 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57521 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729106AbgAURhA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 12:37:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579628205;
+        s=mimecast20190719; t=1579628219;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=VYmT7wpWTHpfgCypHIluoVAlq4BZBY0iRNBZ3wLlmag=;
-        b=btlnwP1O8va1OJpKL3FmIIFhk1SctiExyWgo8n0tUDepi37MTDYgADeEmjdwzaqtI8645X
-        3lTvv3/TES2sWo8+fgQU3KVtp+qxhbVdSr8Cl9APC+6XvksdhImwhiP6pm4Po20s6KzFxU
-        sho8CBxq4JUi7CqRR7OrJNbziDmqtmc=
+        bh=JND9bt3Wtq505Q7CIfvPRXT9tGFW8wAjy0IzaoGUSpo=;
+        b=FHMZMYVKx+PiCIZsjK0Kd0DCGOeoyZgXNfRRwjSoZqAptAiwakE2bt+KOPqUl21D7Er9dk
+        xsgo71Qd2rAuwz9pu6WNVfn6UpDhuFOof5SbXvzbc+0Um28nsMHHSMMBYMQXDkjHZ0Pd/p
+        znF/InBWMRQCugW9xYJvJtV/pmQ3BqY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-tGAAdU3xOseVZ-LSUJLodw-1; Tue, 21 Jan 2020 12:36:40 -0500
-X-MC-Unique: tGAAdU3xOseVZ-LSUJLodw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-2-a7heQpWGPpW7kJYRYyt2Uw-1; Tue, 21 Jan 2020 12:36:55 -0500
+X-MC-Unique: a7heQpWGPpW7kJYRYyt2Uw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBEF51005513;
-        Tue, 21 Jan 2020 17:36:38 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC4261902EA7;
+        Tue, 21 Jan 2020 17:36:53 +0000 (UTC)
 Received: from [10.36.118.56] (unknown [10.36.118.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 92C6E845C7;
-        Tue, 21 Jan 2020 17:36:37 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v4 6/9] s390x: smp: Loop if secondary cpu
- returns into cpu setup again
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5ADF25C1C3;
+        Tue, 21 Jan 2020 17:36:51 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v4 7/9] s390x: smp: Remove unneeded cpu
+ loops
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
         linux-s390@vger.kernel.org, cohuck@redhat.com
 References: <20200121134254.4570-1-frankja@linux.ibm.com>
- <20200121134254.4570-7-frankja@linux.ibm.com>
+ <20200121134254.4570-8-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -85,47 +85,59 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <2e601bc3-dd4e-9883-4c4d-e107ffcd84f7@redhat.com>
-Date:   Tue, 21 Jan 2020 18:36:36 +0100
+Message-ID: <a6ad0ea1-f6de-208e-86e3-6818144be33f@redhat.com>
+Date:   Tue, 21 Jan 2020 18:36:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200121134254.4570-7-frankja@linux.ibm.com>
+In-Reply-To: <20200121134254.4570-8-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 21.01.20 14:42, Janosch Frank wrote:
-> Up to now a secondary cpu could have returned from the function it was
-> executing and ending up somewhere in cstart64.S. This was mostly
-> circumvented by an endless loop in the function that it executed.
-> 
-> Let's add a loop to the end of the cpu setup, so we don't have to rely
-> on added loops in the tests.
+> Now that we have a loop which is executed after we return from the
+> main function of a secondary cpu, we can remove the surplus loops.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  s390x/cstart64.S | 2 ++
->  1 file changed, 2 insertions(+)
+>  s390x/smp.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
 > 
-> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index 9af6bb3..5fd8d2f 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/cstart64.S
-> @@ -162,6 +162,8 @@ smp_cpu_setup_state:
->  	/* We should only go once through cpu setup and not for every restart */
->  	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
->  	br	%r14
-> +	/* If the function returns, just loop here */
-> +0:	j	0
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index 3e8cf3e..45f1d80 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -35,15 +35,9 @@ static void set_flag(int val)
+>  	mb();
+>  }
 >  
->  pgm_int:
->  	SAVE_REGS
+> -static void cpu_loop(void)
+> -{
+> -	for (;;) {}
+> -}
+> -
+>  static void test_func(void)
+>  {
+>  	set_flag(1);
+> -	cpu_loop();
+>  }
+>  
+>  static void test_start(void)
+> @@ -241,7 +235,7 @@ int main(void)
+>  
+>  	/* Setting up the cpu to give it a stack and lowcore */
+>  	psw.mask = extract_psw_mask();
+> -	psw.addr = (unsigned long)cpu_loop;
+> +	psw.addr = (unsigned long)test_func;
+>  	smp_cpu_setup(1, psw);
+>  	smp_cpu_stop(1);
+>  
 > 
 
 Acked-by: David Hildenbrand <david@redhat.com>
