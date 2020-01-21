@@ -2,145 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AE2AE143EFD
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 15:12:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 512C1143F21
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 15:15:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729009AbgAUOMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 09:12:13 -0500
-Received: from mail-eopbgr80058.outbound.protection.outlook.com ([40.107.8.58]:54286
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727508AbgAUOMN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 Jan 2020 09:12:13 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nV+xZ2xxbNyiaDV5Tzs8zPgEh0ev2Yz1BzHFWJ+WzIXJt/+Ju7suACgf8bh1FBBBNph2HJjzXOlOTundKZo62VF8+xOHHbcJeWQbQMpE79DyYToRc1LwMj1DJ4sl1EqjzUCKs3lWePyhqIyDftRc9DKxT4RAMm1UQOvpLjdpleOL0Df/Njr6ALKvBnNK9JX2fusOO9SagQNW/UMtkbkovDkZfupHDUVmYukWCKdC04PwLjSVhgenHOFUQxo8oJB7oVBd/tay2MlrsZvZN4h2yrQlTpFFp1wURNsRrEVyUPsxtSP/yy64I4y39fP+oVcBGU28CdzbtBJvf7XZ34RyBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JgSIX5Rej5Ob9G+61C5OGPSNuPeBILHSNLndvnJWpCI=;
- b=m0iil/UFUo/T7urjLhc2jMvYETCMVi7LmVfJTiTKkVWBS0jadNciIZhGY7kIxEEzu9EH5r6zsrggT5Kj3ezxm2dfRLDZ3fq9DHHG/E5bwFR0SuDGoaShGbYqqr+eykB1f1/dxPtAqzVxjDD4QENKfBxAcCootu2P+D+uGaomLXt1CHUe0qMNIUvdImy0/O9APr36gs7dd3H9S+ITItyDN4VruDkYABZMZDEDxxlWCucs9furtv3b8N1N5p7J2qPiMPyhZ5Atpsr+PQ+hwRNDk3mYO7RdTI/jqKKlFDCkK4bWYhsiHTEVGg6+MURJB+i/hmD+zEC2ZXnK8ndu7RbgSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JgSIX5Rej5Ob9G+61C5OGPSNuPeBILHSNLndvnJWpCI=;
- b=XNXkH6ScmAcQgV4/Cphx55LdWCvdAyjmofAygO6R5GC2MYGFphhw0nHyY5EfVT+EVjW9oMfKIzhPogLr+JnIzp5JQHjiaiIIltNe5fTz3N2sIr+f/DBuW+VCHbVRlBkpFirJbvredPY2cjxz0hnrtuX9YHKYXXZnWsGrocZbRrU=
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
- VI1PR05MB6126.eurprd05.prod.outlook.com (20.178.205.92) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.23; Tue, 21 Jan 2020 14:12:05 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2644.027; Tue, 21 Jan 2020
- 14:12:05 +0000
-Received: from mlx.ziepe.ca (12.231.255.114) by SN4PR0701CA0039.namprd07.prod.outlook.com (2603:10b6:803:2d::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.18 via Frontend Transport; Tue, 21 Jan 2020 14:12:05 +0000
-Received: from jgg by jggl.ziepe.ca with local (Exim 4.90_1)    (envelope-from <jgg@mellanox.com>)      id 1ituG8-00033E-CM; Tue, 21 Jan 2020 10:12:00 -0400
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Jason Wang <jasowang@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "aadam@redhat.com" <aadam@redhat.com>,
-        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>
-Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
-Thread-Topic: [PATCH 3/5] vDPA: introduce vDPA bus
-Thread-Index: AQHVzGqUgTlkW8H4N0+zRVK4Lh0XAKftaJqAgADD3wCAALX/gIAEm9kAgABdJwCAAESHAIABEKoA
-Date:   Tue, 21 Jan 2020 14:12:05 +0000
-Message-ID: <20200121141200.GC12330@mellanox.com>
-References: <20200116124231.20253-1-jasowang@redhat.com>
- <20200116124231.20253-4-jasowang@redhat.com>
- <20200116152209.GH20978@mellanox.com>
- <03cfbcc2-fef0-c9d8-0b08-798b2a293b8c@redhat.com>
- <20200117135435.GU20978@mellanox.com>
- <20200120071406-mutt-send-email-mst@kernel.org>
- <20200120175050.GC3891@mellanox.com>
- <20200120164916-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200120164916-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN4PR0701CA0039.namprd07.prod.outlook.com
- (2603:10b6:803:2d::28) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [12.231.255.114]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: fc192fcb-d9e4-47f8-e8bf-08d79e7be4d2
-x-ms-traffictypediagnostic: VI1PR05MB6126:|VI1PR05MB6126:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR05MB612633D15B57B70EBD5E9DDCCF0D0@VI1PR05MB6126.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0289B6431E
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(366004)(396003)(376002)(136003)(346002)(199004)(189003)(26005)(81156014)(86362001)(7416002)(6916009)(71200400001)(52116002)(8936002)(186003)(1076003)(478600001)(33656002)(4744005)(81166006)(8676002)(2616005)(5660300002)(4326008)(9746002)(66556008)(36756003)(66476007)(66946007)(9786002)(64756008)(66446008)(54906003)(2906002)(316002)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB6126;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: AkQT1Jvn7vb1mlkKQ70NhJBVP3lvAQ1BXMCNDIrqYDYT1ifl6hcQBTBYKgHwfm0770Ulz3HgleTHxUaSBR8Ze77cOcICPhIrqhQ0Ak10NJrI0M87xygRwjl7aKyIKLSXM0trdhG7hEC0ilDoS7EPcNFSkM3gZH5AyZ40d7KHt7EJCRmzXUGqJuZdiScwUx4xn5VJdxNCYl2A48vioe5zGX8zrDkUhSkf8ZWuNwsjY5hFPZ9att+KzlCyOs4/7wb3nSlpdMckMxZ5JyJwzV83m9AX8eWPV23jDbahkw44z4iflUM2GPz6bqwKfET82zyYBKMSCqtuVXKWNwPVtWOq/Bk7ASks/UUOTI61fjSLZxug3abbEeWdIvgx4iGTu8K86h9C9ztxzkaowPgO580Q8lMmGXHrSHmIir0ihLD6RHBPKmWginE2NgpQxeMVV477bezBDlAJ/JGheyFHOigoSmMFgj2fEtVK9jSzfn2cKxgadf1ThjaoqBngjn76lQJl
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <94EE7557C61D6249B42BBC493D5A18F4@eurprd05.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S1729195AbgAUOOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 09:14:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28197 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727255AbgAUOOp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 Jan 2020 09:14:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579616084;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DQ31pQ6K/s0UNFG5JNDkqQ8k3Ifm3vetwfPhGftFwbs=;
+        b=YBW22NjvABTAIqKCTK8Bospj3dhNkUL5g9e4NmpOCqUmlxUzFzNqylgF465gn9O5ys5/H+
+        8A64zMGv31EaLap4SbwozZVl7tbyLonD2SFeBu+uoJF333sFvA60ATD+sY8BGEPeqS9NXt
+        cDoiUkIRICsGeF8G+4DeUpPOvI8ENfk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-_ChvgpwCM2m7GKy-2j75ag-1; Tue, 21 Jan 2020 09:14:41 -0500
+X-MC-Unique: _ChvgpwCM2m7GKy-2j75ag-1
+Received: by mail-wm1-f70.google.com with SMTP id w205so663407wmb.5
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 06:14:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DQ31pQ6K/s0UNFG5JNDkqQ8k3Ifm3vetwfPhGftFwbs=;
+        b=br5rooBZrSbqvtIUuEfBc9mB0a1qWmzECMwP1Hked4W6MboVyT6MMeNsl3vHHL3xDQ
+         8iqOv8bxBZv+PdlD702kQ0uJN3x8iodo81xvPsLzGcMOebOaHv8ssS8XG32YhTQo/pH+
+         ksfXhDe1DCtLndW81h73ye2ZZlXvKxPrjtEaM0cfymnm4/jjOTLcKWGI9MtfDjlN4+oZ
+         zOen11bopHalVYrmupdKKvmfLOL3MF3EPoudLDhG2HkW2LTIgmI2YFxoxKO6qg0MjAmQ
+         ZklyE67yIwkJQACyWtq/MZfZ+Brbk+dA1j5SFLyiF1cOOomLhNcjCUPBGLtzo+oIVWus
+         i9Tw==
+X-Gm-Message-State: APjAAAVS9kmXyp1M9CiXBYOBrsSIj9d3+QlorIHmRBLmOs0QslfIsGJ2
+        xKC1n25HDBTbazodkCO38NtLdsHAuJ+aCQe8wHi/HqOMq9nfEF7YN0vlDpGM4CLVywFAwuaJJKR
+        78Gdlepc/Y3ps
+X-Received: by 2002:a05:600c:211:: with SMTP id 17mr4557542wmi.60.1579616080493;
+        Tue, 21 Jan 2020 06:14:40 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzmQNd6Xh5t04lNELXN8HOSVTkFien80RItl+KAQNTRyeAzyC9Sukn1Pl3DvEeDCSZvMzCMlQ==
+X-Received: by 2002:a05:600c:211:: with SMTP id 17mr4557510wmi.60.1579616080183;
+        Tue, 21 Jan 2020 06:14:40 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a? ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
+        by smtp.gmail.com with ESMTPSA id b68sm4162860wme.6.2020.01.21.06.14.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jan 2020 06:14:39 -0800 (PST)
+Subject: Re: [RESEND PATCH v10 06/10] vmx: spp: Set up SPP paging table at
+ vmentry/vmexit
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jmattson@google.com, yu.c.zhang@linux.intel.com,
+        alazar@bitdefender.com, edwin.zhai@intel.com
+References: <20200102061319.10077-1-weijiang.yang@intel.com>
+ <20200102061319.10077-7-weijiang.yang@intel.com>
+ <20200110180458.GG21485@linux.intel.com>
+ <20200113081050.GF12253@local-michael-cet-test.sh.intel.com>
+ <20200113173358.GC1175@linux.intel.com>
+ <20200114030820.GA4583@local-michael-cet-test.sh.intel.com>
+ <20200114185808.GI16784@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5d4118d9-c501-6c59-82cc-50e317be195c@redhat.com>
+Date:   Tue, 21 Jan 2020 15:14:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc192fcb-d9e4-47f8-e8bf-08d79e7be4d2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2020 14:12:05.5056
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: aV75+HY1W3XMM5wwesld8kaLEunXJ6LpK1HZEnE3lxjdvZvWvYWRIbX9sAfZCZ7YeWiWtH82yIMu5IIBnhJtsw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB6126
+In-Reply-To: <20200114185808.GI16784@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 20, 2020 at 04:56:06PM -0500, Michael S. Tsirkin wrote:
-> > For vfio? vfio is the only thing I am aware doing
-> > that, and this is not vfio..
->=20
-> vfio is not doing anything. anyone can use a combination
-> of unbind and driver_override to attach a driver to a device.
->=20
-> It's not a great interface but it's there without any code,
-> and it will stay there without maintainance overhead
-> if we later add a nicer one.
+On 14/01/20 19:58, Sean Christopherson wrote:
+> I'm not convinced the instruction length needs to be provided to userspace
+> for this case.  Obviously it's not difficult to provide the info, I just
+> don't understand the value added by doing so.  As above, RIP shouldn't
+> need to be unwound, and blindly skipping an instruction seems like an odd
+> thing for a VMI engine to do.
+> 
 
-Well, it is not a great interface, and it is only really used in
-normal cases by vfio.
+The reason to introduce the instruction length was so that userspace
+could blindly use SPP to emulate ROM behavior.  Weijiang's earlier
+patches in fact _only_ provided that behavior, and I asked him to change
+it so that, by default, using SPP and not handling it will basically
+cause an infinite loop of SPP violations.
 
-I don't think it is a good idea to design new subsystems with that
-idea in mind, particularly since detatching the vdpa driver would not
-trigger destruction of the underlying dynamic resource (ie the SF).
+One possibility to clean things up is to change "fault_handled" and
+fast_page_fault's return value from bool to RET_PF* (false becomes
+RET_PF_INVALID, true becomes RET_PF_RETRY).  direct_page_fault would
+also have to do something like
 
-We need a way to trigger that destruction..
+	r = fast_page_fault(vcpu, gpa, level, error_code))
+	if (r != RET_PF_INVALID)
+		return r;
 
-Jason=20
+Then fast_page_fault can just return RET_PF_USERSPACE, and this ugly
+case can go away.
+
++		if (vcpu->run->exit_reason == KVM_EXIT_SPP)
++			r = RET_PF_USERSPACE;
++
+
+Thanks,
+
+Paolo
+
