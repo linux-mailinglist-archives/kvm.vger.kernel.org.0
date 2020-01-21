@@ -2,49 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C80E143D0C
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 13:42:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7BF4143D39
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2020 13:47:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729064AbgAUMmq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 Jan 2020 07:42:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13680 "EHLO
+        id S1728139AbgAUMq7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 Jan 2020 07:46:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6726 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727059AbgAUMmq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 07:42:46 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00LCRgVl111296
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 07:42:44 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xmg3ay6p7-1
+        by vger.kernel.org with ESMTP id S1727350AbgAUMq7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 Jan 2020 07:46:59 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00LCTmOU060202
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 07:46:58 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2xmfy1rcms-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 07:42:44 -0500
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 07:46:57 -0500
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Tue, 21 Jan 2020 12:42:42 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Tue, 21 Jan 2020 12:46:56 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 21 Jan 2020 12:42:40 -0000
+        Tue, 21 Jan 2020 12:46:52 -0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00LCgcnl59965626
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00LCkpuM51118112
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Jan 2020 12:42:38 GMT
+        Tue, 21 Jan 2020 12:46:51 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A2CDF11C04A;
-        Tue, 21 Jan 2020 12:42:38 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id ABF4811C050;
+        Tue, 21 Jan 2020 12:46:51 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6446D11C04C;
-        Tue, 21 Jan 2020 12:42:38 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 721EA11C052;
+        Tue, 21 Jan 2020 12:46:51 +0000 (GMT)
 Received: from dyn-9-152-224-211.boeblingen.de.ibm.com (unknown [9.152.224.211])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 21 Jan 2020 12:42:38 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v8 3/6] s390x: lib: fix stfl wrapper asm
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        borntraeger@de.ibm.com
-References: <20200120184256.188698-1-imbrenda@linux.ibm.com>
- <20200120184256.188698-4-imbrenda@linux.ibm.com>
+        Tue, 21 Jan 2020 12:46:51 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v3 7/9] s390x: smp: Remove unneeded cpu
+ loops
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, david@redhat.com
+References: <20200117104640.1983-1-frankja@linux.ibm.com>
+ <20200117104640.1983-8-frankja@linux.ibm.com>
+ <20200120122956.6879d159.cohuck@redhat.com>
+ <97f7f794-e0be-3984-99b2-ba229212fd3e@linux.ibm.com>
+ <20200120171113.02a9b807.cohuck@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -88,90 +92,132 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Tue, 21 Jan 2020 13:42:37 +0100
+Date:   Tue, 21 Jan 2020 13:46:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200120184256.188698-4-imbrenda@linux.ibm.com>
+In-Reply-To: <20200120171113.02a9b807.cohuck@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="quuTmsiBH6EGIWg18aiIsx07wsRB3U10r"
+ boundary="W0FeYeQbJOc90i17tKgI0b0QtsLm6T50y"
 X-TM-AS-GCONF: 00
-x-cbid: 20012112-0020-0000-0000-000003A2AC4F
+x-cbid: 20012112-4275-0000-0000-00000399970D
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012112-0021-0000-0000-000021FA3BFD
-Message-Id: <935179b9-1f06-18b9-1481-57cad01e4c8a@linux.ibm.com>
+x-cbparentid: 20012112-4276-0000-0000-000038AD9F72
+Message-Id: <f0f17e60-29b6-12b1-6692-5da745cbe60a@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-01-21_03:2020-01-21,2020-01-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- impostorscore=0 phishscore=0 malwarescore=0 suspectscore=3
- lowpriorityscore=0 adultscore=0 mlxscore=0 priorityscore=1501
- mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-2001210105
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ phishscore=0 spamscore=0 adultscore=0 bulkscore=0 impostorscore=0
+ clxscore=1015 mlxlogscore=999 suspectscore=3 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001210105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---quuTmsiBH6EGIWg18aiIsx07wsRB3U10r
-Content-Type: multipart/mixed; boundary="qLpyjib2fOG3ywvbbscXu9cUwLiJsazD4"
+--W0FeYeQbJOc90i17tKgI0b0QtsLm6T50y
+Content-Type: multipart/mixed; boundary="2obZLeHEFGbIEYSJ5w5MORXo2z9xHzW9W"
 
---qLpyjib2fOG3ywvbbscXu9cUwLiJsazD4
-Content-Type: text/plain; charset=utf-8
+--2obZLeHEFGbIEYSJ5w5MORXo2z9xHzW9W
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 1/20/20 7:42 PM, Claudio Imbrenda wrote:
-> the stfl wrapper in lib/s390x/asm/facility.h was lacking the "memory"
-> clobber in the inline asm.
+On 1/20/20 5:11 PM, Cornelia Huck wrote:
+> On Mon, 20 Jan 2020 15:41:52 +0100
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 >=20
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  lib/s390x/asm/facility.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>> On 1/20/20 12:29 PM, Cornelia Huck wrote:
+>>> On Fri, 17 Jan 2020 05:46:38 -0500
+>>> Janosch Frank <frankja@linux.ibm.com> wrote:
+>>>  =20
+>>>> Now that we have a loop which is executed after we return from the
+>>>> main function of a secondary cpu, we can remove the surplus loops.
+>>>>
+>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>> ---
+>>>>  s390x/smp.c | 8 +-------
+>>>>  1 file changed, 1 insertion(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/s390x/smp.c b/s390x/smp.c
+>>>> index 555ed72..c12a3db 100644
+>>>> --- a/s390x/smp.c
+>>>> +++ b/s390x/smp.c
+>>>> @@ -29,15 +29,9 @@ static void wait_for_flag(void)
+>>>>  	}
+>>>>  }
+>>>> =20
+>>>> -static void cpu_loop(void)
+>>>> -{
+>>>> -	for (;;) {}
+>>>> -}
+>>>> -
+>>>>  static void test_func(void)
+>>>>  {
+>>>>  	testflag =3D 1;
+>>>> -	cpu_loop();
+>>>>  }
+>>>> =20
+>>>>  static void test_start(void)
+>>>> @@ -234,7 +228,7 @@ int main(void)
+>>>> =20
+>>>>  	/* Setting up the cpu to give it a stack and lowcore */
+>>>>  	psw.mask =3D extract_psw_mask();
+>>>> -	psw.addr =3D (unsigned long)cpu_loop;
+>>>> +	psw.addr =3D (unsigned long)test_func; =20
+>>>
+>>> Before, you did not set testflag here... intended change? =20
+>>
+>> Yes
+>> It is set to 0 before the first test, so it shouldn't matter.
 >=20
-> diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
-> index 5103dd4..e34dc2c 100644
-> --- a/lib/s390x/asm/facility.h
-> +++ b/lib/s390x/asm/facility.h
-> @@ -24,7 +24,7 @@ static inline bool test_facility(int nr)
-> =20
->  static inline void stfl(void)
->  {
-> -	asm volatile("	stfl	0(0)\n");
-> +	asm volatile("	stfl	0(0)\n" : : : "memory");
->  }
-> =20
->  static inline void stfle(uint8_t *fac, unsigned int len)
+> Hm... I got a bit lost in all those changes, so I checked your branch
+> on github, and I don't see it being set to 0 before test_start() is
+> called?
+
+Well, that's because test_start doesn't care about the flag.
+ecall and emcall are the first users, and they set it to 0 before using i=
+t.
+
+>=20
+>>
+>>>  =20
+>>>>  	smp_cpu_setup(1, psw);
+>>>>  	smp_cpu_stop(1);
+>>>>   =20
+>>>  =20
+>>
+>>
 >=20
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
 
---qLpyjib2fOG3ywvbbscXu9cUwLiJsazD4--
+--2obZLeHEFGbIEYSJ5w5MORXo2z9xHzW9W--
 
---quuTmsiBH6EGIWg18aiIsx07wsRB3U10r
+--W0FeYeQbJOc90i17tKgI0b0QtsLm6T50y
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4m8b0ACgkQ41TmuOI4
-ufhmphAAvbCTR5yj2K8oNOQBQLM9WBEEZMYKhTx09aXThbqDl/E2YXQSxKQ0j3gj
-mMcJHBYAN966H1XypnGhZC9ix0ANM0h3RZYZ5JX04yGvdLIEOBB4aJ7tYgxaxmqH
-RxMMXgNr6u3w9wAa1iCnt68Gz2953XOUQEP2hzZAc7cRr+3EBFI1l/7wxtbDGK05
-AiQ74skPKxdBrhwJjTfxBw7I/+g0gNwMnLxgKmuDmiA8TiZqRliRnUGvwS2Vf/5E
-NZ8jWuvedkHNFPaserT0ofLJvBbkZ7F/lvu+2Y2l6B36bhfSLjH5Qf2G7uoLUDQe
-zH7JIDPLR26uBRSJmLQj9oFc70J3FrXAdxQ6ClfhpjAwnBf+5JkrAkYGJwTaSepS
-WzEeod2nrwMJ951koPWWi2dQvK3bL/3zNTQwjDxB0RHPP67gIzzSAskxUjH17Fot
-UXtAta6fYNuJ1bgYpL+ZRCPSyVWlS/MlGl2BeLN7FsWefysRJroUkTm666/To8ov
-vdM0u64nlnlLWeHIktnNf/oVSnJw1YJqy5HwunhBLRjL4z1xmvfJOo0l3kMdjKqI
-LVwwAFtMmAIq7BxF8zGisAs1ewwnSiFJx5P8mhPrpnm/OXDtvLKRJvYBTyekLKeo
-u7YGwmUek3TTi/QMzi0Kd2hcoxCFS2PQv3WoPYlgZqj19+UBp/8=
-=FPfz
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4m8rsACgkQ41TmuOI4
+ufjmEw/9EyUyYDgM0vPtUOVnW2hxoHPSwlfKZCRgqqdycxfNCtG9mlAhEXVywKGS
+p5J6pygHIyjEHFVJT9wbQjjL6N26htl0h1FkMiSgYH9GmK76XbAUdw4u7fWe6w++
+6ByxTeLkX6FRW+cRCMMIkFTlmA5UXcJB0sVwe0cDWaGuPLcGm0CUpjUtZ6xm1PyP
+5MykTSDIiR3sjq5EZ3oVf7GPgnEtq81Kc1CajxQOn4oqZLTA/rZlKzWTWD33nFq4
+KxaqT/JVxZngXfdJP/bF3LGc/VxOUJ6IoBf/OPjRfGi5G/KyPjkzP5xU/4cm1zR9
+wqXF9SESqsy6CqvKwNePtGPU+fPAdQwHOZwtoesW5J1RbLFDTwduOnlfo7YYOdXG
+FnF7rd2eyfu9+ujwJRnPxBYx8dQHKgjj2Tq3SZF7Gahe+8RRLWwDvtZrnGKDb9wv
+kBNEwbSIR1aKJ97pq+P8hNhDv2p3Bnxel4a3ZBEpS96GESyoVJYtuHQhW0TsJ5wq
+0UGhX0s2OyDJeagi0QwXsh+lOE153rD5F/wTpHFJN6442V+/HTNhrZhVaH7ythvv
+R5mYyNYKSG88JTcaI7mXQRSM99NN6w5KmPKZD54zvg7uNkiyQFei0z8PeKCpqVFL
+PhEngMfztW4zDH3byqjZGXKhnh8xgyL+3jN4qkKEUF7OnZdRQcc=
+=S44S
 -----END PGP SIGNATURE-----
 
---quuTmsiBH6EGIWg18aiIsx07wsRB3U10r--
+--W0FeYeQbJOc90i17tKgI0b0QtsLm6T50y--
 
