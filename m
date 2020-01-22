@@ -2,197 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BF5C145969
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 17:08:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C4D314597C
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 17:09:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729058AbgAVQIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jan 2020 11:08:32 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22474 "EHLO
+        id S1726181AbgAVQJ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jan 2020 11:09:58 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20289 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728655AbgAVQIN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Jan 2020 11:08:13 -0500
+        by vger.kernel.org with ESMTP id S1725989AbgAVQJ5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Jan 2020 11:09:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579709291;
+        s=mimecast20190719; t=1579709396;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=P+KDRGIU4sIqYrTCFGRumDg7Ht4/WtmtQGbhXNlfXQ0=;
-        b=Wqn01jhUXTl24hBQZ1iIpfETXJz2LdTJKNodIpaT6vI3Vi+Swha1jKCh1SGX1AkUVKJGHl
-        auLXlz07yzIFaLdZg9PuXJ2dWVDoHFTBIiSE14wo45hg0O3a2N9HMbs7ne9wJS2L88VdWV
-        +ZdOfw4Bu7yuasIwvFUvhTjCD0In4pA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-JxM0FDyyPyyBLCihAE47iQ-1; Wed, 22 Jan 2020 11:08:08 -0500
-X-MC-Unique: JxM0FDyyPyyBLCihAE47iQ-1
-Received: by mail-wr1-f70.google.com with SMTP id w6so3300267wrm.16
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 08:08:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=P+KDRGIU4sIqYrTCFGRumDg7Ht4/WtmtQGbhXNlfXQ0=;
-        b=TS+QCsdIFSGQeVsixVmbLwG+oGEL/1Dl4lKgcpY+//ybE2648h3hrairlMNAxfzz2R
-         HLJMgA9brzYDyE589qQkZtnnTuypgKaUiEMrYTqz1wicFGol+kfT72eOeuxdqnkfluUR
-         GQ5VXAUBvjQ/pVUj62pbe33n5aSeJwrgaAdGpepUFk015C6wTt0Y64I2NLQslGDu4DDD
-         CBVaGxz6ye4yPbwo1ZBOY4UZrhFAqwaF8YCLQWOZiudh85qDTbaHqi4DM3RafrVNLc+n
-         NpQXfKo1dIIcoab6m7xB3xOP4XE7irP2bERnQ2QZTOw6gl/Aw14kI3w2MansXebrNRhr
-         v9Qg==
-X-Gm-Message-State: APjAAAWAF5oFInETPIYNHtz9AoFc/+OzWlXRpT/DFd43aS147PxDanfB
-        zT/I0yHMTza2jwWvzzrGxbuSqT24TQJ+2ZYle8tDnL0RLIutKd9g0jQUQMiWDZU2FZaBrYNiwvd
-        DaTnVabQzhvpF
-X-Received: by 2002:a5d:4847:: with SMTP id n7mr11892307wrs.30.1579709287247;
-        Wed, 22 Jan 2020 08:08:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx1jrFrBWzdZZ+bxB+IeNrbAk/kSCOdz3k+GgU9ykZ+OKOTuhLTPyedfuGR5bYJvxBe4XTTAQ==
-X-Received: by 2002:a5d:4847:: with SMTP id n7mr11892272wrs.30.1579709286789;
-        Wed, 22 Jan 2020 08:08:06 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:b8fe:679e:87eb:c059? ([2001:b07:6468:f312:b8fe:679e:87eb:c059])
-        by smtp.gmail.com with ESMTPSA id i11sm59447911wrs.10.2020.01.22.08.08.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jan 2020 08:08:06 -0800 (PST)
-Subject: Re: [PATCH v5 00/18] kvm: x86: Support AMD SVM AVIC w/ in-kernel
- irqchip mode
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, joro@8bytes.org, vkuznets@redhat.com,
-        rkagan@virtuozzo.com, graf@amazon.com, jschoenh@amazon.de,
-        karahmed@amazon.de, rimasluk@amazon.com, jon.grimm@amd.com
-References: <1573762520-80328-1-git-send-email-suravee.suthikulpanit@amd.com>
- <9e3e9692-d786-844e-c625-62b69505d2c9@amd.com>
- <b4fa2422-f479-e1e4-11c6-5a4dfda53b74@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aeed73a9-5ef0-4c11-48cd-c36837536e51@redhat.com>
-Date:   Wed, 22 Jan 2020 17:08:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+         content-transfer-encoding:content-transfer-encoding;
+        bh=vG9YtgnEg9fUpGzN49dJA/kQOLEXuZAYvw61FY32mRA=;
+        b=OGsqUEjPPO5C+cK6zaebBS7LT9O5tE3hdkSe3UyUL9BAKH6cgmN5XbR/TJvRlSU/zXQWy8
+        +UpircdxkmQiXy8+1vP8HZiqEAJpAucVoC05hU9qdQ9lrq9bYpt4zjuVGeIIJsAArAqgwU
+        3hWm9IM5ulnmm6qUq5iPyD7/O2FlaL0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-ZeYO0t_aO8KbM9gYXKyjVg-1; Wed, 22 Jan 2020 11:09:52 -0500
+X-MC-Unique: ZeYO0t_aO8KbM9gYXKyjVg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCE81100550E
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 16:09:51 +0000 (UTC)
+Received: from thuth.com (ovpn-116-176.ams2.redhat.com [10.36.116.176])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 415CB9CA3;
+        Wed, 22 Jan 2020 16:09:48 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Drew Jones <drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH] Fixes for the umip test
+Date:   Wed, 22 Jan 2020 17:09:44 +0100
+Message-Id: <20200122160944.29750-1-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b4fa2422-f479-e1e4-11c6-5a4dfda53b74@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/01/20 07:16, Suravee Suthikulpanit wrote:
-> Ping
-> 
-> Thanks
-> Suravee
+When compiling umip.c with -O2 instead of -O1, there are currently
+two problems. First, the compiler complains:
 
-Queued it, finally.  Sorry for the wait.
+ x86/umip.c: In function =E2=80=98do_ring3=E2=80=99:
+ x86/umip.c:162:37: error: array subscript 4096 is above array bounds of
+    =E2=80=98unsigned char[4096]=E2=80=99 [-Werror=3Darray-bounds]
+       [user_stack_top]"m"(user_stack[sizeof user_stack]),
+                           ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
 
-Paolo
+This can be fixed by initializing the stack to point to one of the last
+bytes of the array instead.
 
-> On 1/2/20 5:17 PM, Suravee Suthikulpanit wrote:
->> Paolo,
->>
->> Ping. Would you please let me know your feedback when you get a chance
->> to review this series
->>
->> Thanks,
->> Suravee
->>
->> On 11/15/19 3:15 AM, Suravee Suthikulpanit wrote:
->>> The 'commit 67034bb9dd5e ("KVM: SVM: Add irqchip_split() checks before
->>> enabling AVIC")' was introduced to fix miscellaneous boot-hang issues
->>> when enable AVIC. This is mainly due to AVIC hardware doest not #vmexit
->>> on write to LAPIC EOI register resulting in-kernel PIC and IOAPIC to
->>> wait and do not inject new interrupts (e.g. PIT, RTC).
->>>
->>> This limits AVIC to only work with kernel_irqchip=split mode, which is
->>> not currently enabled by default, and also required user-space to
->>> support split irqchip model, which might not be the case.
->>>
->>> The goal of this series is to enable AVIC to work in both irqchip modes,
->>> by allowing AVIC to be deactivated temporarily during runtime, and
->>> fallback
->>> to legacy interrupt injection mode (w/ vINTR and interrupt windows)
->>> when needed, and then re-enabled subsequently (a.k.a Dynamic APICv).
->>>
->>> Similar approach is also used to handle Hyper-V SynIC in the
->>> 'commit 5c919412fe61 ("kvm/x86: Hyper-V synthetic interrupt
->>> controller")',
->>> where APICv is permanently disabled at runtime (currently broken for
->>> AVIC, and fixed by this series).
->>>
->>> This series contains several parts:
->>>    * Part 1: patch 1,2
->>>      Code clean up, refactor, and introduce helper functions
->>>
->>>    * Part 2: patch 3
->>>      Introduce APICv deactivate bits to keep track of APICv state
->>>      for each vm.
->>>    * Part 3: patch 4-10
->>>      Add support for activate/deactivate APICv at runtime
->>>
->>>    * Part 4: patch 11-14:
->>>      Add support for various cases where APICv needs to
->>>      be deactivated
->>>
->>>    * Part 5: patch 15-17:
->>>      Introduce in-kernel IOAPIC workaround for AVIC EOI
->>>
->>>    * Part 6: path 18
->>>      Allow enable AVIC w/ kernel_irqchip=on
->>>
->>> Pre-requisite Patch:
->>>    * commit b9c6ff94e43a ("iommu/amd: Re-factor guest virtual APIC
->>> (de-)activation code")
->>>     
->>> (https://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu.git/commit/
->>>       ?h=next&id=b9c6ff94e43a0ee053e0c1d983fba1ac4953b762)
->>>
->>> This series has been tested against v5.3 as following:
->>>    * Booting Linux, FreeBSD, and Windows Server 2019 VMs upto 240 vcpus
->>>      w/ qemu option "kernel-irqchip=on" and "-no-hpet".
->>>    * Pass-through Intel 10GbE NIC and run netperf in the VM.
->>>
->>> Changes from V4: (https://lkml.org/lkml/2019/11/1/764)
->>>    * Rename APICV_DEACT_BIT_xxx to APICV_INHIBIT_REASON_xxxx
->>>    * Introduce kvm_x86_ops.check_apicv_inhibit_reasons hook
->>>      to allow vendors to specify which APICv inhibit reason bits
->>>      to support (patch 08/18).
->>>    * Update comment on kvm_request_apicv_update() no-lock requirement.
->>>      (patch 04/18)
->>>
->>> Suravee Suthikulpanit (18):
->>>    kvm: x86: Modify kvm_x86_ops.get_enable_apicv() to use struct kvm
->>>      parameter
->>>    kvm: lapic: Introduce APICv update helper function
->>>    kvm: x86: Introduce APICv inhibit reason bits
->>>    kvm: x86: Add support for dynamic APICv
->>>    kvm: x86: Add APICv (de)activate request trace points
->>>    kvm: x86: svm: Add support to (de)activate posted interrupts
->>>    svm: Add support for setup/destroy virutal APIC backing page for AVIC
->>>    kvm: x86: Introduce APICv x86 ops for checking APIC inhibit reasons
->>>    kvm: x86: Introduce x86 ops hook for pre-update APICv
->>>    svm: Add support for dynamic APICv
->>>    kvm: x86: hyperv: Use APICv update request interface
->>>    svm: Deactivate AVIC when launching guest with nested SVM support
->>>    svm: Temporary deactivate AVIC during ExtINT handling
->>>    kvm: i8254: Deactivate APICv when using in-kernel PIT re-injection
->>>      mode.
->>>    kvm: lapic: Clean up APIC predefined macros
->>>    kvm: ioapic: Refactor kvm_ioapic_update_eoi()
->>>    kvm: ioapic: Lazy update IOAPIC EOI
->>>    svm: Allow AVIC with in-kernel irqchip mode
->>>
->>>   arch/x86/include/asm/kvm_host.h |  19 ++++-
->>>   arch/x86/kvm/hyperv.c           |   5 +-
->>>   arch/x86/kvm/i8254.c            |  12 +++
->>>   arch/x86/kvm/ioapic.c           | 149
->>> +++++++++++++++++++++++-------------
->>>   arch/x86/kvm/lapic.c            |  35 +++++----
->>>   arch/x86/kvm/lapic.h            |   2 +
->>>   arch/x86/kvm/svm.c              | 164
->>> +++++++++++++++++++++++++++++++++++-----
->>>   arch/x86/kvm/trace.h            |  19 +++++
->>>   arch/x86/kvm/vmx/vmx.c          |  12 ++-
->>>   arch/x86/kvm/x86.c              |  71 ++++++++++++++---
->>>   10 files changed, 385 insertions(+), 103 deletions(-)
->>>
-> 
+The second problem is that some tests are failing - and this is due
+to the fact that the GP_ASM macro uses inline asm without the "volatile"
+keyword - so that the compiler reorders this code in certain cases
+where it should not. Fix it by adding "volatile" here.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ x86/umip.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/x86/umip.c b/x86/umip.c
+index 7eee294..834668c 100644
+--- a/x86/umip.c
++++ b/x86/umip.c
+@@ -22,7 +22,8 @@ static void gp_handler(struct ex_regs *regs)
+=20
+=20
+ #define GP_ASM(stmt, in, clobber)                  \
+-     asm ("mov" W " $1f, %[expected_rip]\n\t"      \
++    asm volatile (                                 \
++          "mov" W " $1f, %[expected_rip]\n\t"      \
+           "movl $2f-1f, %[skip_count]\n\t"         \
+           "1: " stmt "\n\t"                        \
+           "2: "                                    \
+@@ -159,7 +160,7 @@ static int do_ring3(void (*fn)(const char *), const c=
+har *arg)
+ 		  : [ret] "=3D&a" (ret)
+ 		  : [user_ds] "i" (USER_DS),
+ 		    [user_cs] "i" (USER_CS),
+-		    [user_stack_top]"m"(user_stack[sizeof user_stack]),
++		    [user_stack_top]"m"(user_stack[sizeof user_stack - 2]),
+ 		    [fn]"r"(fn),
+ 		    [arg]"D"(arg),
+ 		    [kernel_ds]"i"(KERNEL_DS),
+--=20
+2.18.1
 
