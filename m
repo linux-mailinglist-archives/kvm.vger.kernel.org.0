@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B34C14510C
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 10:51:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B35C145092
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 10:48:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732442AbgAVJhW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jan 2020 04:37:22 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58400 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731652AbgAVJhW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Jan 2020 04:37:22 -0500
+        id S1729946AbgAVJrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jan 2020 04:47:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40719 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730667AbgAVJre (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jan 2020 04:47:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579685841;
+        s=mimecast20190719; t=1579686453;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=W6yEULGDzE/nInvw9JSJB7gTt3H5wvwQ6ls0gr1oQVY=;
-        b=SvmGk5WlMLWfQLkF/+RzIovZcGgR0Qjo9YEdO1llr0BXpjTv49PDHbalxDwJqgnmR1mvcp
-        DbkN9zsCPGlwdsd73sKnA+nh5sVb51H4c5cX7HSAtQfqZfFKKdJu1BSmVRQIv5tCxbi8mm
-        o9RYM5cO17YWOiu8ZIUM63A58S1Vwv8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-SCmBQj6fPcC2mxAwHVSUCg-1; Wed, 22 Jan 2020 04:37:19 -0500
-X-MC-Unique: SCmBQj6fPcC2mxAwHVSUCg-1
-Received: by mail-wm1-f71.google.com with SMTP id b133so276446wmb.2
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 01:37:19 -0800 (PST)
+        bh=8ZWQytKe+Nrv18x1TGeK1echwJbunum5JCWbmDqOWpU=;
+        b=aY+MgOLq6WjwzVJNSJBlKI7BUZawMhtRgV7pOfR0dB+VI8r282n2D6nCYL5Ywl3cKGnvFb
+        AEfAFGWhSxlrvLs6Jf/KDwY1xnU21lCcMJ4MkWvzRsj/YoZIeWM9Lv6KnKX0skAjOOa+ks
+        EAEmLDe6xdj/bWVxqMGU2EO2c5ZzmTw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-nSH_mAo7OVi28ePd-FWXBg-1; Wed, 22 Jan 2020 04:47:31 -0500
+X-MC-Unique: nSH_mAo7OVi28ePd-FWXBg-1
+Received: by mail-wm1-f69.google.com with SMTP id b133so284746wmb.2
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 01:47:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=W6yEULGDzE/nInvw9JSJB7gTt3H5wvwQ6ls0gr1oQVY=;
-        b=SiNI+3K8kDH0vLpdRBK3J5uAwR/qoHoP0k57wwoJAlqA0z4FhLhgUckEUWHLecBHxZ
-         fXMYs9F5gxtIY0RAZESPUcjoxj+saLcnKgvNl/m4HOAPd70izH5U85qTUStYJIoM32KB
-         Qjoe6w+MZ4BR8pxmlxLJQf6gksU72EE4lfDFEu2D6W6wIJ3ANokUNe20L0nYPsHVvNGR
-         1ckdgNdDfbAgpxEhAaLOZUa8GMp45kZaNUbL/5WgHRl+DjMqxU1gjw/L1/zeFrm6ffVq
-         l8pSQw6kDJ8OgehGvfAPD1ptHpnUYlzbpDu9hO/eHxw1zYPLAG/3thMlW3pEC1VCMgLu
-         +MWQ==
-X-Gm-Message-State: APjAAAVbhz/W8/YP/5vEvczeEozL+b2nielxZZTWjuC8ltYI1M2vzwxt
-        4u8D21bHKm4ZEq+E6hytT+/j6LqVIEtOY/xWx0+o5FZ4SIqj+KHrExqtODvuktmHMh41ET6/zdy
-        ZHwzIrB1+/zyj
-X-Received: by 2002:adf:d846:: with SMTP id k6mr9578101wrl.337.1579685838123;
-        Wed, 22 Jan 2020 01:37:18 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzqWhY53TzrvajxcRumOsfe7V0LUooFHe3j3uQkZe4Gzh7e9aIgcb7kzXkxzrsSylqS9LEr5Q==
-X-Received: by 2002:adf:d846:: with SMTP id k6mr9578074wrl.337.1579685837856;
-        Wed, 22 Jan 2020 01:37:17 -0800 (PST)
+        bh=8ZWQytKe+Nrv18x1TGeK1echwJbunum5JCWbmDqOWpU=;
+        b=ZRNLsSofGpvC91OunbWFicHoLB3zQV0ovefiW41Yg2SgBOtNzWPIhd6nd8P1QBTxxg
+         +T598NsTDxC25AMOD8oX6f4Fz2MlQXu7CnYWGFklg/m+g1tYHW+Hj7tpBYWLTzXslvY5
+         TeUkAlDzsOfZiL8teNL6+b5/Oq0tXPK57IdJUmuPxf7tB20Ai5+gkt6YQESH2pByCWPX
+         p1N0v2fYpe9pZLz61qAlD9M9Y7Y76IJ1r//l226IbFTE1IG5q3W+yCA2RLJ0DWy2IZAz
+         X+SLs8/yLt8T/6+YYppADm0eafcPvnOR7YHgetNRSI2Nx4x/JZjLOzNHyp268AwEfbcN
+         qujQ==
+X-Gm-Message-State: APjAAAX2ZtCmYCu+3LvvEmEOFnPsAkmOUpUMfz4JYdeiJLDUJOJ+C7U9
+        RUGrHKBxm6dOluoEI5h5huyv0nhVS3aRIv7QDpAj7q63E/xQ5En5j0j1Jx1zEJhSu8FVxAggOMC
+        n59fcoaFqQnyf
+X-Received: by 2002:a5d:6144:: with SMTP id y4mr9957001wrt.367.1579686450564;
+        Wed, 22 Jan 2020 01:47:30 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxHsmIdjnLbiCnRSA2R0yh874Z4YYndqKS0L914Rmdlb4Y42Yr5Jws35ypmLWm9J3TVULIPxg==
+X-Received: by 2002:a5d:6144:: with SMTP id y4mr9956974wrt.367.1579686450243;
+        Wed, 22 Jan 2020 01:47:30 -0800 (PST)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id b17sm57898390wrx.15.2020.01.22.01.37.16
+        by smtp.gmail.com with ESMTPSA id c17sm56451592wrr.87.2020.01.22.01.47.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2020 01:37:16 -0800 (PST)
+        Wed, 22 Jan 2020 01:47:29 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
-        Roman Kagan <rkagan@virtuozzo.com>
-Subject: Re: [PATCH RFC 2/3] x86/kvm/hyper-v: move VMX controls sanitization out of nested_enable_evmcs()
-In-Reply-To: <20200122054724.GD18513@linux.intel.com>
-References: <20200115171014.56405-1-vkuznets@redhat.com> <20200115171014.56405-3-vkuznets@redhat.com> <6c4bdb57-08fb-2c2d-9234-b7efffeb72ed@redhat.com> <20200122054724.GD18513@linux.intel.com>
-Date:   Wed, 22 Jan 2020 10:37:16 +0100
-Message-ID: <87zhefsugj.fsf@vitty.brq.redhat.com>
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: VMX: Check preconditions for RDTSC test
+In-Reply-To: <20200122073959.192050-1-oupton@google.com>
+References: <20200122073959.192050-1-oupton@google.com>
+Date:   Wed, 22 Jan 2020 10:47:28 +0100
+Message-ID: <87wo9jstzj.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -67,56 +67,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+Oliver Upton <oupton@google.com> writes:
 
-> On Sat, Jan 18, 2020 at 10:42:31PM +0100, Paolo Bonzini wrote:
->> IMHO the features should stay available in case the guest chooses not to
->> use eVMCS.  A guest that uses eVMCS should know which features it cannot
->> use and not enable them.
+> The RDTSC VM-exit test requires the 'use TSC offsetting' processor-based
+> VM-execution control be allowed on the host. Check this precondition
+> before running the test rather than asserting it later on to avoid
+> erroneous failures on a host without TSC offsetting.
 >
-> Makes sense, wasn't thinking about the scenario where the guest doesn't
-> support eVMCS or doesn't want to use it for whatever reason.
+> Cc: Aaron Lewis <aaronlewis@google.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  x86/vmx_tests.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 >
-> Rather than update vmx->nested.msrs or filter vmx_get_msr(), what about
-> manually adding eVMCS consistency checks on the disallowed bits and handle
-> SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES as a one-off case by simply
-> clearing it from the eVMCS?
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 3b150323b325..de9a931216e2 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -9161,9 +9161,6 @@ static void vmx_vmcs_shadow_test(void)
+>   */
+>  static void reset_guest_tsc_to_zero(void)
+>  {
+> -	TEST_ASSERT_MSG(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET,
+> -			"Expected support for 'use TSC offsetting'");
+> -
+>  	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_USE_TSC_OFFSET);
+>  	vmcs_write(TSC_OFFSET, -rdtsc());
+>  }
+> @@ -9210,6 +9207,11 @@ static void rdtsc_vmexit_diff_test(void)
+>  	int fail = 0;
+>  	int i;
+>  
+> +	if (!(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET)) {
+> +		printf("CPU doesn't support the 'use TSC offsetting' processor-based VM-execution control.\n");
+> +		return;
+> +	}
+> +
 
-Unfortunately, this doesn't work because ... Windows. Not only Hyper-V
-enables SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES, it actually expects it
-to work (somehow) so when I do
+Can we use test_skip() instead, something like
 
-diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-index 72359709cdc1..e6c30eec2817 100644
---- a/arch/x86/kvm/vmx/evmcs.c
-+++ b/arch/x86/kvm/vmx/evmcs.c
-@@ -361,11 +361,5 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
-        if (evmcs_already_enabled)
-                return 0;
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index dd32b3aef08b..bfecf36d37ef 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -9166,6 +9166,9 @@ static void rdtsc_vmexit_diff_test(void)
+        int fail = 0;
+        int i;
  
--       vmx->nested.msrs.pinbased_ctls_high &= ~EVMCS1_UNSUPPORTED_PINCTRL;
--       vmx->nested.msrs.entry_ctls_high &= ~EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
--       vmx->nested.msrs.exit_ctls_high &= ~EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
--       vmx->nested.msrs.secondary_ctls_high &= ~EVMCS1_UNSUPPORTED_2NDEXEC;
--       vmx->nested.msrs.vmfunc_controls &= ~EVMCS1_UNSUPPORTED_VMFUNC;
--
-        return 0;
- }
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bb8afe0c5e7f..cd1f5a1c884b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1590,7 +1590,7 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx)
-                        evmcs->pin_based_vm_exec_control;
-                vmcs12->vm_exit_controls = evmcs->vm_exit_controls;
-                vmcs12->secondary_vm_exec_control =
--                       evmcs->secondary_vm_exec_control;
-+                       evmcs->secondary_vm_exec_control & ~SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES;
-        }
++       if (!(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET))
++               test_skip("CPU doesn't support the 'use TSC offsetting' processor-based VM-execution control.\n");
++
+        test_set_guest(rdtsc_vmexit_diff_test_guest);
  
-        if (unlikely(!(evmcs->hv_clean_fields &
+        reset_guest_tsc_to_zero();
 
-Hyper-V 2016 with > 1 vCPU fails to boot :-(
+?
+
+>  	test_set_guest(rdtsc_vmexit_diff_test_guest);
+>  
+>  	reset_guest_tsc_to_zero();
 
 -- 
 Vitaly
