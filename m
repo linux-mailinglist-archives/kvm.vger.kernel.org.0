@@ -2,180 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 188FF1459F0
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 17:32:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B47C1459FD
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 17:39:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726207AbgAVQcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jan 2020 11:32:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31501 "EHLO
+        id S1726234AbgAVQjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jan 2020 11:39:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21647 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725911AbgAVQcR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jan 2020 11:32:17 -0500
+        with ESMTP id S1725836AbgAVQjb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jan 2020 11:39:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579710735;
+        s=mimecast20190719; t=1579711170;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pJapYNAcxbRlzEJ21pZkklZIrAl5YRRL98gWAs4LZrQ=;
-        b=VXr+eDpGmwyRqnX43lp8qEcSMjSgjKqMXBIrHwKIMjZDc9m1Zzl/TiaqEAXTsuqCmQrEbw
-        KVBfHr9JcpHiFYZllCCWNBdn3MJY4Wlp4MPX7dM/U5nYiet6xEnIof7gL7Q2HhYOT3js1w
-        1zP2AD6orZ27ibjhMiXSNFiiIRqX2KE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-eO0IjofBM_eqPI7Ywqitaw-1; Wed, 22 Jan 2020 11:32:11 -0500
-X-MC-Unique: eO0IjofBM_eqPI7Ywqitaw-1
-Received: by mail-wr1-f71.google.com with SMTP id k18so63599wrw.9
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 08:32:11 -0800 (PST)
+        bh=obKMnllOTeVNCbIlpV+M2BPU1gZPbnF90Mtc2utjq7Q=;
+        b=Kt0nvMDBQq/OKTtH1ZzeSRBJZExHfBgl05URvpGjE7SOOngabXyou5vDNl1pidXLqKgCBt
+        TBHkS6YVce5+DbPHEHCeEeOXBp+o6HTC8mlXk4TdKfpTQCkzABbnXt56omRv2LqCtKrPVL
+        Mm2NLGIghalDfT1rpWmJ7UgCu94yjwo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-313-2m-KnUbwMCGpWKNtgycPiA-1; Wed, 22 Jan 2020 11:39:28 -0500
+X-MC-Unique: 2m-KnUbwMCGpWKNtgycPiA-1
+Received: by mail-wr1-f69.google.com with SMTP id d8so75230wrq.12
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 08:39:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pJapYNAcxbRlzEJ21pZkklZIrAl5YRRL98gWAs4LZrQ=;
-        b=mQfHacS3phm6r1ef/qq6V+S0blSF1y77LTIse7INB/xXdwwjjx6bgRF4tHuelNcw4A
-         PcjU63suChI5m8qLCWWGVwzyUExvposcWTwcj1tHU/WmnnHmH0NK0l3MN+2RSaJIp+vM
-         A+Vx4eSFDToBMStv3dP9gWc+peSbtvLKfH6A/2GiEtAhvCa04P0ivPcPiSWjffxFxz83
-         nYgFwOw76YnPgPYV3XRZ46nlZb/s64FHzvNh+lSAg+AzWB7dR5QPKSRtgtg9GaulFOUd
-         bNF/LD/y4SwEMPpHYvPMfAipIenPl22k1vXPlcQljAM76GIAAHcs2b9Q415Tw4tdZ1R/
-         6z7A==
-X-Gm-Message-State: APjAAAVkXJ4c3bp3Ymnv2GOb/U/davlx2QArjzDOokOosjKjRGgSZ2YM
-        48ncsR9DSYP5LvlGDQJuRN85ySFA0QhFiD4VMTNXIERH0XvkGBEYD/E0ED2j3PGIuB2kHpCgloz
-        kdK/2Ttzz22ub
-X-Received: by 2002:a05:600c:244:: with SMTP id 4mr3995325wmj.40.1579710730412;
-        Wed, 22 Jan 2020 08:32:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzl1j5jQgSqqV247GTkvpdF8xkuaCliY5K+4X+O4msjIFvEkPbiQAFHkSHJ1V2Z9iwMwQwQow==
-X-Received: by 2002:a05:600c:244:: with SMTP id 4mr3995297wmj.40.1579710730026;
-        Wed, 22 Jan 2020 08:32:10 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:b8fe:679e:87eb:c059? ([2001:b07:6468:f312:b8fe:679e:87eb:c059])
-        by smtp.gmail.com with ESMTPSA id k16sm60390183wru.0.2020.01.22.08.32.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jan 2020 08:32:09 -0800 (PST)
-Subject: Re: [PATCH v5 13/18] svm: Temporary deactivate AVIC during ExtINT
- handling
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        KVM list <kvm@vger.kernel.org>
-References: <1573762520-80328-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1573762520-80328-14-git-send-email-suravee.suthikulpanit@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ec0d2d77-6c74-3c6e-5157-bc6b73a0b4bd@redhat.com>
-Date:   Wed, 22 Jan 2020 17:32:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=obKMnllOTeVNCbIlpV+M2BPU1gZPbnF90Mtc2utjq7Q=;
+        b=cyo8ZF1kt1edIxYoSy/YlwLFjpbk/xipPgdIuN1Y5ctIcYBVoo2+DhK1UvkfF8BWuW
+         XnUdthnIbEg3aq/ygYbaLVj6kG/DdBrx55Pvi4RMoWry7sImWisQE3YsZxG+sB/zCLb0
+         r03Rsy2kurV/v4ns337GduhgTV+aJwdS1N2TtDgl1yCOHtgRZFpxBscqDx/RDYl4OfLk
+         yoLw1ROgnLZ4wgVjzz9PTCSeCTH9N0xn9tXdDblADEIOnXN/ANP0Md3SU7pyQ+rlgqg1
+         pz0GCJBxCwvuVbWP/e3xOigxLzfoCb0GJpvtoyd/OmHEnyRpJQNke6L+5g/bitUNyLsg
+         YuvQ==
+X-Gm-Message-State: APjAAAX/9JaCHW0VZMxugZMZEmPbE/tv2b+450iEI5bsNmsxXcBF6Y8V
+        QMuY7r5xZBkLzyHsbHxzLS9rZ8tN6yzqwoF7WdwJ++w+Es6pRGxEkXCA66krO8EZyWj/rIEYCyv
+        Uq0ZhX8zcpWTq
+X-Received: by 2002:a1c:151:: with SMTP id 78mr3655904wmb.182.1579711167093;
+        Wed, 22 Jan 2020 08:39:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxKnxLY/OdJ5TzPFEsLazViCypSLttAjaiiLTf1Ele9UbQ3mhpXTWpIVHQUqS3d3LhK1NpYVQ==
+X-Received: by 2002:a1c:151:: with SMTP id 78mr3655890wmb.182.1579711166909;
+        Wed, 22 Jan 2020 08:39:26 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id f17sm4792984wmc.8.2020.01.22.08.39.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jan 2020 08:39:26 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     David Hildenbrand <david@redhat.com>,
+        Drew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] Fixes for the umip test
+In-Reply-To: <20200122160944.29750-1-thuth@redhat.com>
+References: <20200122160944.29750-1-thuth@redhat.com>
+Date:   Wed, 22 Jan 2020 17:39:25 +0100
+Message-ID: <878slzsawy.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1573762520-80328-14-git-send-email-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/11/19 21:15, Suravee Suthikulpanit wrote:
-> +	if (svm_get_enable_apicv(svm->vcpu.kvm))
-> +		svm_request_update_avic(&svm->vcpu, true);
+Thomas Huth <thuth@redhat.com> writes:
 
-> +		if (kvm_vcpu_apicv_active(vcpu))
-> +			svm_request_update_avic(vcpu, false);
+> When compiling umip.c with -O2 instead of -O1, there are currently
+> two problems. First, the compiler complains:
+>
+>  x86/umip.c: In function ‘do_ring3’:
+>  x86/umip.c:162:37: error: array subscript 4096 is above array bounds of
+>     ‘unsigned char[4096]’ [-Werror=array-bounds]
+>        [user_stack_top]"m"(user_stack[sizeof user_stack]),
+>                            ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+>
+> This can be fixed by initializing the stack to point to one of the last
+> bytes of the array instead.
+>
+> The second problem is that some tests are failing - and this is due
+> to the fact that the GP_ASM macro uses inline asm without the "volatile"
+> keyword - so that the compiler reorders this code in certain cases
+> where it should not. Fix it by adding "volatile" here.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  x86/umip.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/x86/umip.c b/x86/umip.c
+> index 7eee294..834668c 100644
+> --- a/x86/umip.c
+> +++ b/x86/umip.c
+> @@ -22,7 +22,8 @@ static void gp_handler(struct ex_regs *regs)
+>  
+>  
+>  #define GP_ASM(stmt, in, clobber)                  \
+> -     asm ("mov" W " $1f, %[expected_rip]\n\t"      \
+> +    asm volatile (                                 \
+> +          "mov" W " $1f, %[expected_rip]\n\t"      \
+>            "movl $2f-1f, %[skip_count]\n\t"         \
+>            "1: " stmt "\n\t"                        \
+>            "2: "                                    \
+> @@ -159,7 +160,7 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
+>  		  : [ret] "=&a" (ret)
+>  		  : [user_ds] "i" (USER_DS),
+>  		    [user_cs] "i" (USER_CS),
+> -		    [user_stack_top]"m"(user_stack[sizeof user_stack]),
+> +		    [user_stack_top]"m"(user_stack[sizeof user_stack -  2]),
 
-In both cases, "if (avic)" is the right condition to test to ensure that 
-the bit is kept in sync with whether we are or not in the interrupt 
-window.  kvm_request_apicv_update will check whether APICv is already 
-active or not.
+My eyes would definitely appreciate the missing parentheses and the
+absense of the redundant space:
 
-In fact, the condition can be moved to svm_request_update_avic.  Putting
-everything together, we get:
+  sizeof(user_stack) - 2
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 375352d08545..7c316c4716f9 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -878,6 +878,7 @@ enum kvm_irqchip_mode {
- #define APICV_INHIBIT_REASON_DISABLE    0
- #define APICV_INHIBIT_REASON_HYPERV     1
- #define APICV_INHIBIT_REASON_NESTED     2
-+#define APICV_INHIBIT_REASON_IRQWIN     3
- 
- struct kvm_arch {
- 	unsigned long n_used_mmu_pages;
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index af90f83d7123..6d300c16d756 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -387,6 +387,7 @@ struct amd_svm_iommu_ir {
- static void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
- static void svm_flush_tlb(struct kvm_vcpu *vcpu, bool invalidate_gpa);
- static void svm_complete_interrupts(struct vcpu_svm *svm);
-+static void svm_toggle_avic_for_irq_window(struct kvm_vcpu *vcpu, bool activate);
- static inline void avic_post_state_restore(struct kvm_vcpu *vcpu);
- 
- static int nested_svm_exit_handled(struct vcpu_svm *svm);
-@@ -4461,6 +4462,14 @@ static int interrupt_window_interception(struct vcpu_svm *svm)
- {
- 	kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
- 	svm_clear_vintr(svm);
-+
-+	/*
-+	 * For AVIC, the only reason to end up here is ExtINTs.
-+	 * In this case AVIC was temporarily disabled for
-+	 * requesting the IRQ window and we have to re-enable it.
-+	 */
-+	svm_toggle_avic_for_irq_window(&svm->vcpu, true);
-+
- 	svm->vmcb->control.int_ctl &= ~V_IRQ_MASK;
- 	mark_dirty(svm->vmcb, VMCB_INTR);
- 	++svm->vcpu.stat.irq_window_exits;
-@@ -5164,6 +5173,17 @@ static void svm_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
- {
- }
- 
-+static void svm_toggle_avic_for_irq_window(struct kvm_vcpu *vcpu, bool activate)
-+{
-+	if (!avic || !lapic_in_kernel(vcpu))
-+		return;
-+
-+	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
-+	kvm_request_apicv_update(vcpu->kvm, activate,
-+				 APICV_INHIBIT_REASON_IRQWIN);
-+	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-+}
-+
- static int svm_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
- {
- 	int ret = 0;
-@@ -5504,9 +5524,6 @@ static void enable_irq_window(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
--	if (kvm_vcpu_apicv_active(vcpu))
--		return;
--
- 	/*
- 	 * In case GIF=0 we can't rely on the CPU to tell us when GIF becomes
- 	 * 1, because that's a separate STGI/VMRUN intercept.  The next time we
-@@ -5516,6 +5533,13 @@ static void enable_irq_window(struct kvm_vcpu *vcpu)
- 	 * window under the assumption that the hardware will set the GIF.
- 	 */
- 	if ((vgif_enabled(svm) || gif_set(svm)) && nested_svm_intr(svm)) {
-+		/*
-+		 * IRQ window is not needed when AVIC is enabled,
-+		 * unless we have pending ExtINT since it cannot be injected
-+		 * via AVIC. In such case, we need to temporarily disable AVIC,
-+		 * and fallback to injecting IRQ via V_IRQ.
-+		 */
-+		svm_toggle_avic_for_irq_window(vcpu, false);
- 		svm_set_vintr(svm);
- 		svm_inject_irq(svm, 0x0);
- 	}
-@@ -7328,7 +7352,8 @@ static bool svm_check_apicv_inhibit_reasons(ulong bit)
- {
- 	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
- 			  BIT(APICV_INHIBIT_REASON_HYPERV) |
--			  BIT(APICV_INHIBIT_REASON_NESTED);
-+			  BIT(APICV_INHIBIT_REASON_NESTED) |
-+			  BIT(APICV_INHIBIT_REASON_IRQWIN);
- 
- 	return supported & BIT(bit);
- }
+>  		    [fn]"r"(fn),
+>  		    [arg]"D"(arg),
+>  		    [kernel_ds]"i"(KERNEL_DS),
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
