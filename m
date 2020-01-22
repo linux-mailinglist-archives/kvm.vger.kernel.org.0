@@ -2,89 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF94B144B6D
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 06:47:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D348144BA6
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 07:18:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726049AbgAVFrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jan 2020 00:47:25 -0500
-Received: from mga02.intel.com ([134.134.136.20]:27602 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725796AbgAVFrZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jan 2020 00:47:25 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Jan 2020 21:47:24 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,348,1574150400"; 
-   d="scan'208";a="221136424"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga007.fm.intel.com with ESMTP; 21 Jan 2020 21:47:24 -0800
-Date:   Tue, 21 Jan 2020 21:47:24 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
-        Roman Kagan <rkagan@virtuozzo.com>
-Subject: Re: [PATCH RFC 2/3] x86/kvm/hyper-v: move VMX controls sanitization
- out of nested_enable_evmcs()
-Message-ID: <20200122054724.GD18513@linux.intel.com>
-References: <20200115171014.56405-1-vkuznets@redhat.com>
- <20200115171014.56405-3-vkuznets@redhat.com>
- <6c4bdb57-08fb-2c2d-9234-b7efffeb72ed@redhat.com>
+        id S1726081AbgAVGS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jan 2020 01:18:28 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31650 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725871AbgAVGS1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Jan 2020 01:18:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579673905;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=46Fyq8DajrI/VyojMmIDzfpBih5cCQHJwjUiK8iJUVM=;
+        b=Wn5QGTxLd1d4T+nvQ1/tbd8pOdgc1gV7cxWM7/f5R+P8aM/ai/mzhws4hkncNceXwY8mzQ
+        tyDOTyLz8wUCY6NLE13esPXRH87H6Ns8vQyrelWP0QYg5FMNTE7Wd8whb6ox5jkUyM5ert
+        kZkPbLwQi36fA8FrqpOlvMGBOJzSd1Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-koa7asbiOJCyfjv1xRzSyw-1; Wed, 22 Jan 2020 01:18:24 -0500
+X-MC-Unique: koa7asbiOJCyfjv1xRzSyw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED1991902EA0;
+        Wed, 22 Jan 2020 06:18:20 +0000 (UTC)
+Received: from [10.72.12.103] (ovpn-12-103.pek2.redhat.com [10.72.12.103])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 957EB5D9E2;
+        Wed, 22 Jan 2020 06:18:02 +0000 (UTC)
+Subject: Re: [PATCH 3/5] vDPA: introduce vDPA bus
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Gunthorpe <jgg@mellanox.com>
+Cc:     Shahaf Shuler <shahafs@mellanox.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "Bie, Tiwei" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "Liang, Cunming" <cunming.liang@intel.com>,
+        "Wang, Zhihong" <zhihong.wang@intel.com>,
+        "Wang, Xiao W" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Ariel Adam <aadam@redhat.com>,
+        "jakub.kicinski@netronome.com" <jakub.kicinski@netronome.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+References: <239b042c-2d9e-0eec-a1ef-b03b7e2c5419@redhat.com>
+ <CAJPjb1+fG9L3=iKbV4Vn13VwaeDZZdcfBPvarogF_Nzhk+FnKg@mail.gmail.com>
+ <AM0PR0502MB379553984D0D55FDE25426F6C3330@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+ <d69918ca-8af4-44b2-9652-633530d4c113@redhat.com>
+ <20200120174933.GB3891@mellanox.com>
+ <2a324cec-2863-58f4-c58a-2414ee32c930@redhat.com>
+ <20200121004047-mutt-send-email-mst@kernel.org>
+ <b9ad744e-c4cd-82f9-f56a-1ecc185e9cd7@redhat.com>
+ <20200121031506-mutt-send-email-mst@kernel.org>
+ <20200121140456.GA12330@mellanox.com>
+ <20200121091636-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <26fa6211-6625-6dc6-f5df-7a124d8c53ae@redhat.com>
+Date:   Wed, 22 Jan 2020 14:18:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6c4bdb57-08fb-2c2d-9234-b7efffeb72ed@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200121091636-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jan 19, 2020 at 09:54:44AM +0100, Paolo Bonzini wrote:
-> On 15/01/20 18:10, Vitaly Kuznetsov wrote:
-> > With fine grained VMX feature enablement QEMU>=4.2 tries to do KVM_SET_MSRS
-> > with default (matching CPU model) values and in case eVMCS is also enabled,
-> > fails.
-> > 
-> > It would be possible to drop VMX feature filtering completely and make
-> > this a guest's responsibility: if it decides to use eVMCS it should know
-> > which fields are available and which are not. Hyper-V mostly complies to
-> > this, however, there is at least one problematic control:
-> > SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES
-> > which Hyper-V enables. As there is no 'apic_addr_field' in eVMCS, we
-> > fail to handle this properly in KVM. It is unclear how this is supposed
-> > to work, genuine Hyper-V doesn't expose the control so it is possible that
-> > this is just a bug (in Hyper-V).
-> 
-> Yes, it most likely is and it would be nice if Microsoft fixed it, but I
-> guess we're stuck with it for existing Windows versions.  Well, for one
-> we found a bug in Hyper-V and not the converse. :)
-> 
-> There is a problem with this approach, in that we're stuck with it
-> forever due to live migration.  But I guess if in the future eVMCS v2
-> adds an apic_address field we can limit the hack to eVMCS v1.  Another
-> possibility is to use the quirks mechanism but it's overkill for now.
-> 
-> Unless there are objections, I plan to apply these patches.
 
-Doesn't applying this patch contradict your earlier opinion?  This patch
-would still hide the affected controls from the guest because the host
-controls enlightened_vmcs_enabled.
+On 2020/1/21 =E4=B8=8B=E5=8D=8810:17, Michael S. Tsirkin wrote:
+> On Tue, Jan 21, 2020 at 02:05:04PM +0000, Jason Gunthorpe wrote:
+>> On Tue, Jan 21, 2020 at 03:15:43AM -0500, Michael S. Tsirkin wrote:
+>>>> This sounds more flexible e.g driver may choose to implement static =
+mapping
+>>>> one through commit. But a question here, it looks to me this still r=
+equires
+>>>> the DMA to be synced with at least commit here. Otherwise device may=
+ get DMA
+>>>> fault? Or device is expected to be paused DMA during begin?
+>>>>
+>>>> Thanks
+>>> For example, commit might switch one set of tables for another,
+>>> without need to pause DMA.
+>> I'm not aware of any hardware that can do something like this
+>> completely atomically..
+> FWIW VTD can do this atomically.
+>
+>> Any mapping change API has to be based around add/remove regions
+>> without any active DMA (ie active DMA is a guest error the guest can
+>> be crashed if it does this)
+>>
+>> Jason
+> Right, lots of cases are well served by only changing parts of
+> mapping that aren't in active use. Memory hotplug is such a case.
+> That's not the same as a completely static mapping.
 
-On Sat, Jan 18, 2020 at 10:42:31PM +0100, Paolo Bonzini wrote:
-> IMHO the features should stay available in case the guest chooses not to
-> use eVMCS.  A guest that uses eVMCS should know which features it cannot
-> use and not enable them.
 
-Makes sense, wasn't thinking about the scenario where the guest doesn't
-support eVMCS or doesn't want to use it for whatever reason.
+For hotplug it should be fine with current Qemu since it belongs to=20
+different memory regions. So each dimm should have its own dedicated map=20
+entries in IOMMU.
 
-Rather than update vmx->nested.msrs or filter vmx_get_msr(), what about
-manually adding eVMCS consistency checks on the disallowed bits and handle
-SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES as a one-off case by simply
-clearing it from the eVMCS?  Or alternatively, squashing all the disallowed
-bits.
+But I'm not sure if the merging logic in current vhost memory listener=20
+may cause any trouble, we may need to disable it.
+
+Thanks
+
+
+>
+
