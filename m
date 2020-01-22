@@ -2,292 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3922A145C33
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 20:04:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64414145C7E
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 20:32:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728779AbgAVTEk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jan 2020 14:04:40 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:37575 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725884AbgAVTEk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jan 2020 14:04:40 -0500
-Received: by mail-pg1-f194.google.com with SMTP id q127so42314pga.4
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 11:04:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:subject:cc:to:in-reply-to:references:message-id
-         :mime-version:content-transfer-encoding;
-        bh=0dIYIQ6Ta05mma/Ewu5gaFGi/nH4knzT9Odj9DRLZBE=;
-        b=FZw1Hk8B8vQGLvzhFW6E/YKZrNWQLi3Q2MHUuiH5BUmxks2t4I4h+XV9fKrT4w1etK
-         jd13qbCOREwLBDUw6Vd0yBGZjvikx5ia1yckH7iPmShYp+Z7zNKhHGaB2zRzCIBM4ULF
-         xPckVN/U8NngMG+4Mp/tffR+f6HD5QRggAyaWYiDVxJIKg5ONQBdMHr6H6VjadGUKHnH
-         oXMWFCaptGZR1NATwrcm/CW48pkFLR/oeikBDelJTGrtmxrqrA+/5kTywK4Hux3mVns7
-         j39FA2T0WQzdVIA9TG/ktCnWoKwUZoXhv4qzaSfCzfaD/oADMFqFz0Lgv9JUFSTOHYGB
-         V3eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
-         :message-id:mime-version:content-transfer-encoding;
-        bh=0dIYIQ6Ta05mma/Ewu5gaFGi/nH4knzT9Odj9DRLZBE=;
-        b=tFErOHZnjY1iZFhtYWzMzSJFJGkMBcakD20eKQ96DNhQYIqg8dLc1RtGxYUAWXnGqN
-         2eLfiMzMNqoResEjAmYg65PmI263W1X4l4y1ksX5eQlTXQeCzUZqCFTOAmCPOO/UtPME
-         eBsgfTEYCDcnDv79gb57PH+StGyAZxmoRxFlO3EEJwnNSMfRyRM5Z9YHcZV3TD0hQo4Q
-         /qnnB8k+dbiOTkHeMUVJnO/YYwEbYcpGeMHe4g+z0bX1BHru4ZcXG1UeKdNAku+I1RT0
-         U4TD6pXR4P0jmv3hPFkggcc0w4N/iBhOWI+KOW9t+3dg+EgTwnT2mMbmzK4pIllkJGFT
-         pJQQ==
-X-Gm-Message-State: APjAAAXle5YmTsnIPCW+cn8bB0qy+ZSBI76Uah7TVZx0S+SUvWXMNxIZ
-        7y0MGpmA2OU3VGlTeYnx6trKmA==
-X-Google-Smtp-Source: APXvYqzZt4KvUk7b6wsCtX4ZKWFznEZq0B+74pTWZfzxHWBmsYVzJaLYasTmR5s/oY61YtsMI7mIQA==
-X-Received: by 2002:aa7:864a:: with SMTP id a10mr3982379pfo.233.1579719879036;
-        Wed, 22 Jan 2020 11:04:39 -0800 (PST)
-Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
-        by smtp.gmail.com with ESMTPSA id j20sm47705279pfe.168.2020.01.22.11.04.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2020 11:04:38 -0800 (PST)
-Date:   Wed, 22 Jan 2020 11:04:38 -0800 (PST)
-X-Google-Original-Date: Wed, 22 Jan 2020 11:04:31 PST (-0800)
-From:   Palmer Dabbelt <palmerdabbelt@google.com>
-X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
-Subject:     Re: [PATCH v10 05/19] RISC-V: KVM: Implement VCPU create, init and destroy functions
-CC:     Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu,
-        pbonzini@redhat.com, rkrcmar@redhat.com, graf@amazon.com,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@lst.de>, anup@brainfault.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Anup Patel <Anup.Patel@wdc.com>
-To:     Anup Patel <Anup.Patel@wdc.com>
-In-Reply-To: <20191223113443.68969-6-anup.patel@wdc.com>
-References: <20191223113443.68969-6-anup.patel@wdc.com>
-  <20191223113443.68969-1-anup.patel@wdc.com>
-Message-ID: <mhng-0ada7fd5-2e39-48ff-80fd-32b91b96282f@palmerdabbelt-glaptop>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S1726584AbgAVTca (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jan 2020 14:32:30 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10116 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726026AbgAVTc3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 Jan 2020 14:32:29 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00MJS3qU129254
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 14:32:28 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xp4gjx9p2-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 14:32:28 -0500
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Wed, 22 Jan 2020 19:32:26 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 22 Jan 2020 19:32:23 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00MJWMp951970252
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Jan 2020 19:32:22 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3C43F4C04E;
+        Wed, 22 Jan 2020 19:32:22 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C616E4C050;
+        Wed, 22 Jan 2020 19:32:21 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.160.236])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 22 Jan 2020 19:32:21 +0000 (GMT)
+Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
+ crashes in KVM guests after reboot
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>
+References: <c022e1d6-0d57-ae07-5e6b-8e40d3b01f4b@de.ibm.com>
+ <20191218100926-mutt-send-email-mst@kernel.org>
+ <2ffdbd95-e375-a627-55a1-6990b0a0e37a@de.ibm.com>
+ <20200106054041-mutt-send-email-mst@kernel.org>
+ <08ae8d28-3d8c-04e8-bdeb-0117d06c6dc7@de.ibm.com>
+ <20200107042401-mutt-send-email-mst@kernel.org>
+ <c6795e53-d12c-0709-c2e9-e35d9af1f693@de.ibm.com>
+ <20200107065434-mutt-send-email-mst@kernel.org>
+ <fe6e7e90-3004-eb7a-9ed8-b53a7667959f@de.ibm.com>
+ <20200120012724-mutt-send-email-mst@kernel.org>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
+ J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
+ CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
+ 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
+ 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
+ +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
+ T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
+ OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
+ /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
+ IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABzUNDaHJpc3RpYW4g
+ Qm9ybnRyYWVnZXIgKDJuZCBJQk0gYWRkcmVzcykgPGJvcm50cmFlZ2VyQGxpbnV4LmlibS5j
+ b20+wsF5BBMBAgAjBQJdP/hMAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQEXu8
+ gLWmHHy/pA/+JHjpEnd01A0CCyfVnb5fmcOlQ0LdmoKWLWPvU840q65HycCBFTt6V62cDljB
+ kXFFxMNA4y/2wqU0H5/CiL963y3gWIiJsZa4ent+KrHl5GK1nIgbbesfJyA7JqlB0w/E/SuY
+ NRQwIWOo/uEvOgXnk/7+rtvBzNaPGoGiiV1LZzeaxBVWrqLtmdi1iulW/0X/AlQPuF9dD1Px
+ hx+0mPjZ8ClLpdSp5d0yfpwgHtM1B7KMuQPQZGFKMXXTUd3ceBUGGczsgIMipZWJukqMJiJj
+ QIMH0IN7XYErEnhf0GCxJ3xAn/J7iFpPFv8sFZTvukntJXSUssONnwiKuld6ttUaFhSuSoQg
+ OFYR5v7pOfinM0FcScPKTkrRsB5iUvpdthLq5qgwdQjmyINt3cb+5aSvBX2nNN135oGOtlb5
+ tf4dh00kUR8XFHRrFxXx4Dbaw4PKgV3QLIHKEENlqnthH5t0tahDygQPnSucuXbVQEcDZaL9
+ WgJqlRAAj0pG8M6JNU5+2ftTFXoTcoIUbb0KTOibaO9zHVeGegwAvPLLNlKHiHXcgLX1tkjC
+ DrvE2Z0e2/4q7wgZgn1kbvz7ZHQZB76OM2mjkFu7QNHlRJ2VXJA8tMXyTgBX6kq1cYMmd/Hl
+ OhFrAU3QO1SjCsXA2CDk9MM1471mYB3CTXQuKzXckJnxHkHOwU0ETpw8+AEQAJjyNXvMQdJN
+ t07BIPDtbAQk15FfB0hKuyZVs+0lsjPKBZCamAAexNRk11eVGXK/YrqwjChkk60rt3q5i42u
+ PpNMO9aS8cLPOfVft89Y654Qd3Rs1WRFIQq9xLjdLfHh0i0jMq5Ty+aiddSXpZ7oU6E+ud+X
+ Czs3k5RAnOdW6eV3+v10sUjEGiFNZwzN9Udd6PfKET0J70qjnpY3NuWn5Sp1ZEn6lkq2Zm+G
+ 9G3FlBRVClT30OWeiRHCYB6e6j1x1u/rSU4JiNYjPwSJA8EPKnt1s/Eeq37qXXvk+9DYiHdT
+ PcOa3aNCSbIygD3jyjkg6EV9ZLHibE2R/PMMid9FrqhKh/cwcYn9FrT0FE48/2IBW5mfDpAd
+ YvpawQlRz3XJr2rYZJwMUm1y+49+1ZmDclaF3s9dcz2JvuywNq78z/VsUfGz4Sbxy4ShpNpG
+ REojRcz/xOK+FqNuBk+HoWKw6OxgRzfNleDvScVmbY6cQQZfGx/T7xlgZjl5Mu/2z+ofeoxb
+ vWWM1YCJAT91GFvj29Wvm8OAPN/+SJj8LQazd9uGzVMTz6lFjVtH7YkeW/NZrP6znAwv5P1a
+ DdQfiB5F63AX++NlTiyA+GD/ggfRl68LheSskOcxDwgI5TqmaKtX1/8RkrLpnzO3evzkfJb1
+ D5qh3wM1t7PZ+JWTluSX8W25ABEBAAHCwV8EGAECAAkFAk6cPPgCGwwACgkQEXu8gLWmHHz8
+ 2w//VjRlX+tKF3szc0lQi4X0t+pf88uIsvR/a1GRZpppQbn1jgE44hgF559K6/yYemcvTR7r
+ 6Xt7cjWGS4wfaR0+pkWV+2dbw8Xi4DI07/fN00NoVEpYUUnOnupBgychtVpxkGqsplJZQpng
+ v6fauZtyEcUK3dLJH3TdVQDLbUcL4qZpzHbsuUnTWsmNmG4Vi0NsEt1xyd/Wuw+0kM/oFEH1
+ 4BN6X9xZcG8GYUbVUd8+bmio8ao8m0tzo4pseDZFo4ncDmlFWU6hHnAVfkAs4tqA6/fl7RLN
+ JuWBiOL/mP5B6HDQT9JsnaRdzqF73FnU2+WrZPjinHPLeE74istVgjbowvsgUqtzjPIG5pOj
+ cAsKoR0M1womzJVRfYauWhYiW/KeECklci4TPBDNx7YhahSUlexfoftltJA8swRshNA/M90/
+ i9zDo9ySSZHwsGxG06ZOH5/MzG6HpLja7g8NTgA0TD5YaFm/oOnsQVsf2DeAGPS2xNirmknD
+ jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
+ ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Wed, 22 Jan 2020 20:32:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
+MIME-Version: 1.0
+In-Reply-To: <20200120012724-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20012219-0008-0000-0000-0000034BCDE0
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012219-0009-0000-0000-00004A6C37EA
+Message-Id: <2a63b15f-8cf5-5868-550c-42e2cfd92c60@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-22_08:2020-01-22,2020-01-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ clxscore=1015 impostorscore=0 phishscore=0 mlxscore=0 suspectscore=0
+ spamscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001220165
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 Dec 2019 03:35:55 PST (-0800), Anup Patel wrote:
-> This patch implements VCPU create, init and destroy functions
-> required by generic KVM module. We don't have much dynamic
-> resources in struct kvm_vcpu_arch so these functions are quite
-> simple for KVM RISC-V.
->
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Alexander Graf <graf@amazon.com>
-> ---
->  arch/riscv/include/asm/kvm_host.h | 68 +++++++++++++++++++++++++++++++
->  arch/riscv/kvm/vcpu.c             | 68 +++++++++++++++++++++++++++++--
->  2 files changed, 132 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> index e0b633f616a4..297431660be6 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -53,7 +53,75 @@ struct kvm_arch {
->  	phys_addr_t pgd_phys;
->  };
->  
-> +struct kvm_cpu_context {
-> +	unsigned long zero;
-> +	unsigned long ra;
-> +	unsigned long sp;
-> +	unsigned long gp;
-> +	unsigned long tp;
-> +	unsigned long t0;
-> +	unsigned long t1;
-> +	unsigned long t2;
-> +	unsigned long s0;
-> +	unsigned long s1;
-> +	unsigned long a0;
-> +	unsigned long a1;
-> +	unsigned long a2;
-> +	unsigned long a3;
-> +	unsigned long a4;
-> +	unsigned long a5;
-> +	unsigned long a6;
-> +	unsigned long a7;
-> +	unsigned long s2;
-> +	unsigned long s3;
-> +	unsigned long s4;
-> +	unsigned long s5;
-> +	unsigned long s6;
-> +	unsigned long s7;
-> +	unsigned long s8;
-> +	unsigned long s9;
-> +	unsigned long s10;
-> +	unsigned long s11;
-> +	unsigned long t3;
-> +	unsigned long t4;
-> +	unsigned long t5;
-> +	unsigned long t6;
-> +	unsigned long sepc;
-> +	unsigned long sstatus;
-> +	unsigned long hstatus;
-> +};
 
-Looks like pretty much everyone else is putting 'struct kvm_regs' at the start
-of 'struct kvm_cpu_context', which I'm assuming avoids duplication when
-implementing KVM_{GET,SET}_REGS.  That would probably be cleaner, but if I
-think it'd be best to just have this match our mcontext.
 
-> +
-> +struct kvm_vcpu_csr {
-> +	unsigned long vsstatus;
-> +	unsigned long hie;
-> +	unsigned long vstvec;
-> +	unsigned long vsscratch;
-> +	unsigned long vsepc;
-> +	unsigned long vscause;
-> +	unsigned long vstval;
-> +	unsigned long hip;
-> +	unsigned long vsatp;
-> +};
-> +
->  struct kvm_vcpu_arch {
-> +	/* VCPU ran atleast once */
-> +	bool ran_atleast_once;
-> +
-> +	/* ISA feature bits (similar to MISA) */
-> +	unsigned long isa;
-> +
-> +	/* CPU context of Guest VCPU */
-> +	struct kvm_cpu_context guest_context;
-> +
-> +	/* CPU CSR context of Guest VCPU */
-> +	struct kvm_vcpu_csr guest_csr;
+On 20.01.20 07:27, Michael S. Tsirkin wrote:
+> On Tue, Jan 07, 2020 at 01:16:50PM +0100, Christian Borntraeger wrote:
+>> On 07.01.20 12:55, Michael S. Tsirkin wrote:
+>>
+>>>
+>>> I pushed batched-v3 - same head but bisect should work now.
+>>>
+>>
+>> With 
+>> commit 38ced0208491103b50f1056f0d1c8f28e2e13d08 (HEAD)
+>> Author:     Michael S. Tsirkin <mst@redhat.com>
+>> AuthorDate: Wed Dec 11 12:19:26 2019 -0500
+>> Commit:     Michael S. Tsirkin <mst@redhat.com>
+>> CommitDate: Tue Jan 7 06:52:42 2020 -0500
+>>
+>>     vhost: use batched version by default
+>>
+>>
+>> I have exactly one successful ping and then the network inside the guest is broken (no packet
+>> anymore).
+> 
+> Does anything appear in host's dmesg when this happens?
 
-It looks like other architectures either put the entire CPU state in 'struct
-kvm_cpu_context' (arm64, for example) or inline all the definitions (mips, for
-example).  I'd lean the arm64 way here, but I haven't gotten sufficiently far
-until the user ABI to figure out if this would help in a meaningful fashion.
+I think there was nothing, but I am not sure. I would need to redo the test if this is important to know.
 
-> +	/* CPU context upon Guest VCPU reset */
-> +	struct kvm_cpu_context guest_reset_context;
-> +
-> +	/* CPU CSR context upon Guest VCPU reset */
-> +	struct kvm_vcpu_csr guest_reset_csr;
-> +
->  	/* Don't run the VCPU (blocked) */
->  	bool pause;
->  
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index bd7d6b154f61..cf8ca8d4a9ea 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -31,10 +31,48 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
->  	{ NULL }
->  };
->  
-> +#define KVM_RISCV_ISA_ALLOWED	(riscv_isa_extension_mask(a) | \
-> +				 riscv_isa_extension_mask(c) | \
-> +				 riscv_isa_extension_mask(d) | \
-> +				 riscv_isa_extension_mask(f) | \
-> +				 riscv_isa_extension_mask(i) | \
-> +				 riscv_isa_extension_mask(m) | \
-> +				 riscv_isa_extension_mask(s) | \
-> +				 riscv_isa_extension_mask(u))
-> +
-> +static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-> +	struct kvm_vcpu_csr *reset_csr = &vcpu->arch.guest_reset_csr;
-> +	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
-> +	struct kvm_cpu_context *reset_cntx = &vcpu->arch.guest_reset_context;
-> +
-> +	memcpy(csr, reset_csr, sizeof(*csr));
-> +
-> +	memcpy(cntx, reset_cntx, sizeof(*cntx));
-> +}
-> +
->  struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id)
->  {
-> -	/* TODO: */
-> -	return NULL;
-> +	int err;
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
-> +	if (!vcpu) {
-> +		err = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	err = kvm_vcpu_init(vcpu, kvm, id);
-> +	if (err)
-> +		goto free_vcpu;
-> +
-> +	return vcpu;
-> +
-> +free_vcpu:
-> +	kmem_cache_free(kvm_vcpu_cache, vcpu);
-> +out:
-> +	return ERR_PTR(err);
->  }
->  
->  int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
-> @@ -48,13 +86,32 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  
->  int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
->  {
-> -	/* TODO: */
-> +	struct kvm_cpu_context *cntx;
-> +
-> +	/* Mark this VCPU never ran */
-> +	vcpu->arch.ran_atleast_once = false;
-> +
-> +	/* Setup ISA features available to VCPU */
-> +	vcpu->arch.isa = riscv_isa_extension_base(NULL) & KVM_RISCV_ISA_ALLOWED;
-> +
-> +	/* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
-> +	cntx = &vcpu->arch.guest_reset_context;
-> +	cntx->sstatus = SR_SPP | SR_SPIE;
-> +	cntx->hstatus = 0;
-> +	cntx->hstatus |= HSTATUS_SP2V;
-> +	cntx->hstatus |= HSTATUS_SP2P;
-> +	cntx->hstatus |= HSTATUS_SPV;
-> +
-> +	/* Reset VCPU */
-> +	kvm_riscv_reset_vcpu(vcpu);
-> +
->  	return 0;
->  }
->  
->  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  {
-> -	/* TODO: */
-> +	kvm_riscv_stage2_flush_cache(vcpu);
+> 
+> 
+>> So you could consider this commit broken (but in a different way and also without any
+>> guest reboot necessary).
+>>
+>>
+>> bisect log:
+>> git bisect start
+>> # bad: [d2f6175f52062ee51ee69754a6925608213475d2] vhost: use vhost_desc instead of vhost_log
+>> git bisect bad d2f6175f52062ee51ee69754a6925608213475d2
+>> # good: [d1281e3a562ec6a08f944a876481dd043ba739b9] virtio-blk: remove VIRTIO_BLK_F_SCSI support
+>> git bisect good d1281e3a562ec6a08f944a876481dd043ba739b9
+>> # good: [fac7c0f46996e32d996f5c46121df24a6b95ec3b] vhost: option to fetch descriptors through an independent struct
+>> git bisect good fac7c0f46996e32d996f5c46121df24a6b95ec3b
+>> # bad: [539eb9d738f048cd7be61f404e8f9c7d9d2ff3cc] vhost: batching fetches
+>> git bisect bad 539eb9d738f048cd7be61f404e8f9c7d9d2ff3cc
+> 
 
-There needs to be a comment as to why there's a flush here.
-
-The definition of kvm_riscv_stage2_flush_cache() should also have a comment
-describing what it actually does.
-
-> +	kmem_cache_free(kvm_vcpu_cache, vcpu);
->  }
->  
->  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
-> @@ -199,6 +256,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	int ret;
->  	unsigned long scause, stval, htval, htinst;
->  
-> +	/* Mark this VCPU ran atleast once */
-> +	vcpu->arch.ran_atleast_once = true;
-
-I'm having some trouble figuring out how this doesn't have a race condition,
-but that's probably more applicable to the patch that uses it.  Also, a bit of
-a nit pick: "at least" is two words.  I don't care that much about the variable
-name, but the comments should use real words.
-
-> +
->  	vcpu->arch.srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
->  
->  	/* Process MMIO value returned from user-space */
-> -- 
-> 2.17.1
