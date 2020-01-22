@@ -2,43 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 047B81451A8
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 10:55:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 258291451C9
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 10:56:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730964AbgAVJzl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jan 2020 04:55:41 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29432 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730909AbgAVJzi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Jan 2020 04:55:38 -0500
+        id S1729836AbgAVJ4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jan 2020 04:56:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30825 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730066AbgAVJ4B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jan 2020 04:56:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579686937;
+        s=mimecast20190719; t=1579686960;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=hA2D1tp1MOUaMC+SN1Z7aKOoMcsKz5S+HslIWa3G9WA=;
-        b=CCXZxofDDIi4J6u/0RwbbAQRPAWs2cF+xliSdJkbf2NEjasCxm+fgxSb5YajpGhrSSYT8Z
-        l5tz6RhDxEiN4BKWkY4OuIQ02Ungp7UOAP8k/jJQLF2snxKOr9jqmTaZu63cYwBe07mN1V
-        QlDQe3mdnyKf9W3gw4zd6a7/5CsEMYk=
+        bh=Ol12bxLaxjZjjZifWSUGPDedjg9pM6vcBGOAy/CgTjM=;
+        b=h1VNze6m1cVuCqV8EiLn5fTVWur6VB6ycjSeo146n8auCj8wnG0w/hPe3t5Vve/b7S1T0p
+        34Z0FCRJTHcGBU4PUO9CrN5CvUuuDO96IiFmUQxaBqz+4mnOPxRiNOl6jG5ULvTkFN1qFm
+        Tt2LtnBUXivn2cGXnDZq9FlYC9tx/Qg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-zR5UNPvxMhurcPNGP3qg8A-1; Wed, 22 Jan 2020 04:55:32 -0500
-X-MC-Unique: zR5UNPvxMhurcPNGP3qg8A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-291-U4T8zvTrOiSuk60pSxVzUQ-1; Wed, 22 Jan 2020 04:55:56 -0500
+X-MC-Unique: U4T8zvTrOiSuk60pSxVzUQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46380190D341;
-        Wed, 22 Jan 2020 09:55:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68706800D53;
+        Wed, 22 Jan 2020 09:55:55 +0000 (UTC)
 Received: from [10.36.117.205] (ovpn-117-205.ams2.redhat.com [10.36.117.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DF00F60BE0;
-        Wed, 22 Jan 2020 09:55:29 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v8 6/6] s390x: SCLP unit test
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 10EF05C28D;
+        Wed, 22 Jan 2020 09:55:53 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v8 0/6] s390x: SCLP Unit test
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
         borntraeger@de.ibm.com, frankja@linux.ibm.com
 References: <20200120184256.188698-1-imbrenda@linux.ibm.com>
- <20200120184256.188698-7-imbrenda@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -84,82 +83,106 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <58aa7974-2b03-494a-63c3-f8db1faff749@redhat.com>
-Date:   Wed, 22 Jan 2020 10:55:29 +0100
+Message-ID: <b47c3b26-398a-1791-802d-8f6f6abf3498@redhat.com>
+Date:   Wed, 22 Jan 2020 10:55:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200120184256.188698-7-imbrenda@linux.ibm.com>
+In-Reply-To: <20200120184256.188698-1-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[...]
+On 20.01.20 19:42, Claudio Imbrenda wrote:
+> This patchset contains some minor cleanup, some preparatory work and
+> then the SCLP unit test itself.
+> 
+> The unit test checks the following:
+>     
+>     * Correctly ignoring instruction bits that should be ignored
+>     * Privileged instruction check
+>     * Check for addressing exceptions
+>     * Specification exceptions:
+>       - SCCB size less than 8
+>       - SCCB unaligned
+>       - SCCB overlaps prefix or lowcore
+>       - SCCB address higher than 2GB
+>     * Return codes for
+>       - Invalid command
+>       - SCCB too short (but at least 8)
+>       - SCCB page boundary violation
+> 
+> v7 -> v8
+> * fixed existing stfl asm wrapper
+> * now using stfl asm wrapper in intercept.c
+> * patched the program interrupt handler to clear the sclp_busy bit
+> * removed now unnecessary expect_pgm_int from the unit test
+> v6 -> v7
+> * renamed spx() and stpx() wrappers to set_prefix and get_prefix
+> * set_prefix now takes a value and get_prefix now returns a value
+> * put back some inline assembly for spx and stpx as a consequence
+> * used LC_SIZE instead of 2 * PAGE_SIZE everywhere in the unit test
+> v5 -> v6
+> * fixed a bug in test_addressing
+> * improved comments in test_sccb_prefix
+> * replaced all inline assembly usages of spx and stpx with the wrappers
+> * added one more wrapper for test_one_sccb for read-only tests
+> v4 -> v5
+> * updated usage of report()
+> * added SPX and STPX wrappers to the library
+> * improved readability
+> * addressed some more comments
+> v3 -> v4
+> * export sclp_setup_int instead of copying it
+> * add more comments
+> * rename some more variables to improve readability
+> * improve the prefix test
+> * improved the invalid address test
+> * addressed further comments received during review
+> v2 -> v3
+> * generally improved the naming of variables
+> * added and fixed comments
+> * renamed test_one_run to test_one_simple
+> * added some const where needed
+> * addresed many more small comments received during review
+> v1 -> v2
+> * fix many small issues that came up during the first round of reviews
+> * add comments to each function
+> * use a static buffer for the SCCP template when used
+> 
+> Claudio Imbrenda (6):
+>   s390x: export sclp_setup_int
+>   s390x: sclp: add service call instruction wrapper
+>   s390x: lib: fix stfl wrapper asm
+>   s390x: lib: add SPX and STPX instruction wrapper
+>   s390x: lib: fix program interrupt handler if sclp_busy was set
+>   s390x: SCLP unit test
+> 
+>  s390x/Makefile           |   1 +
+>  lib/s390x/asm/arch_def.h |  26 +++
+>  lib/s390x/asm/facility.h |   2 +-
+>  lib/s390x/sclp.h         |   1 +
+>  lib/s390x/interrupt.c    |   5 +-
+>  lib/s390x/sclp.c         |   9 +-
+>  s390x/intercept.c        |  24 +-
+>  s390x/sclp.c             | 474 +++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg      |   8 +
+>  9 files changed, 526 insertions(+), 24 deletions(-)
+>  create mode 100644 s390x/sclp.c
+> 
 
->  all: directories test_cases test_cases_binary
-> diff --git a/s390x/sclp.c b/s390x/sclp.c
-> new file mode 100644
-> index 0000000..215347e
-> --- /dev/null
-> +++ b/s390x/sclp.c
-> @@ -0,0 +1,474 @@
-> +/*
-> + * Service Call tests
-> + *
-> + * Copyright (c) 2019 IBM Corp
+Queued to
 
-Should be 2020 now. Will fix that up.
+https://github.com/davidhildenbrand/qemu.git s390-tcg-next
 
-[...]
 
-> +/**
-> + * Perform one test at the given address, optionally using the SCCB te=
-mplate,
-> + * checking for the expected program interrupts and return codes.
-> + *
-> + * The parameter buf_len indicates the number of bytes of the template=
- that
-> + * should be copied to the test address, and should be 0 when the test
-> + * address is invalid, in which case nothing is copied.
-> + *
-> + * The template is used to simplify tests where the same buffer conten=
-t is
-> + * used many times in a row, at different addresses.
-> + *
-> + * Returns true in case of success or false in case of failure
-> + */
-> +static bool test_one_sccb(uint32_t cmd, uint8_t *addr, uint16_t buf_le=
-n, uint64_t exp_pgm, uint16_t exp_rc)
-> +{
-> +	SCCBHeader *h =3D (SCCBHeader *)addr;
-> +	int res, pgm;
-> +
-> +	/* Copy the template to the test address if needed */
-> +	if (buf_len)
-> +		memcpy(addr, sccb_template, buf_len);
-> +	if (exp_pgm !=3D PGM_NONE)
-> +		expect_pgm_int();
-
-I still dislike the handling here. Any caller can simply do a
-
-expect_pgm_int();
-test_one_sccb(...)
-check_pgm_int_code(PGM_);
-
-Same thing goes for exp_rc. We really should drop exp_rc and exp_pgm
-handling from the function completely and handle it in the caller. That
-makes the tests actually readable.
-
-But I feel like I am repeating myself. I'll queue this patch with the
-2020 fixed up and might send a fixup myself (if I find some spare minutes=
-).
-
---=20
+Thanks!
+-- 
 Thanks,
 
 David / dhildenb
