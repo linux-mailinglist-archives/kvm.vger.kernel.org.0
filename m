@@ -2,184 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FC451459EA
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 17:30:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 188FF1459F0
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 17:32:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727590AbgAVQ34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 Jan 2020 11:29:56 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22407 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725989AbgAVQ34 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 Jan 2020 11:29:56 -0500
+        id S1726207AbgAVQcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jan 2020 11:32:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31501 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725911AbgAVQcR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jan 2020 11:32:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579710595;
+        s=mimecast20190719; t=1579710735;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6BGjEFlP6pk9AzCr9C2dlngFIJXwo7QBelNQ/yQKuPQ=;
-        b=LVwIC2RCEbI4vlxv/NhglLmr/WWTfmAE0ztgYcUPFHfULrVbbCOOV9DzFY7src33I0Ps18
-        4FzfggqDFOsIyy0UrNpvh4vXy92/MGZj3f2bXRT/zPVQRpglyT5K0K90kyfJsEpKiOxSci
-        gPllc6rNH9HF17Q3t0E3JWQ9hD62e5I=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-AFJfIFzSPGiBs1OnZDHKbA-1; Wed, 22 Jan 2020 11:29:52 -0500
-X-MC-Unique: AFJfIFzSPGiBs1OnZDHKbA-1
-Received: by mail-wm1-f69.google.com with SMTP id l11so1748619wmi.0
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 08:29:52 -0800 (PST)
+        bh=pJapYNAcxbRlzEJ21pZkklZIrAl5YRRL98gWAs4LZrQ=;
+        b=VXr+eDpGmwyRqnX43lp8qEcSMjSgjKqMXBIrHwKIMjZDc9m1Zzl/TiaqEAXTsuqCmQrEbw
+        KVBfHr9JcpHiFYZllCCWNBdn3MJY4Wlp4MPX7dM/U5nYiet6xEnIof7gL7Q2HhYOT3js1w
+        1zP2AD6orZ27ibjhMiXSNFiiIRqX2KE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-eO0IjofBM_eqPI7Ywqitaw-1; Wed, 22 Jan 2020 11:32:11 -0500
+X-MC-Unique: eO0IjofBM_eqPI7Ywqitaw-1
+Received: by mail-wr1-f71.google.com with SMTP id k18so63599wrw.9
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2020 08:32:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=6BGjEFlP6pk9AzCr9C2dlngFIJXwo7QBelNQ/yQKuPQ=;
-        b=kFT1QutNQQVavcRAhs9CP4MtOjGZQpgYZnzOyaFMytA5Uh7tThdsHfg39o2cINFGTp
-         Tp8jAmpg+B51IjkY1qoixSRBNz0GIw5OebUTf7xWxxFr0Tvf2xalpFQyrABDXtMtviUa
-         GuiqeVg6D8aQenoAK09OTdmH5QIhWYbItU9Xh5A0LcfzONLIOdrMDHDbLBh6uH0JdGfm
-         sbQmCbAvl1zCVYshoK2pUxQGex1rF8pJwwT1BYEv8aECvETTJ5t2b8aIBvHLehCmb6lR
-         vz4cxgz6czwqM41FXp72chku7/cGT4oc+sxAnYs9JHil83Wy49g6r6bGD2ekfHsXdUSO
-         kWWQ==
-X-Gm-Message-State: APjAAAUVtpEMRCn41tLj3GgE/09G4Y9c2uFyvomITtaGGiDt3xKXmIDI
-        m9Et9zNT2bCbvA1pgbLWd3SXmj/ZGzJkqow7yBTdbZuHVrc5saSiWnWHzn+W+J2OsZBkCh0eVmN
-        HzEo7yG+Y8PAN
-X-Received: by 2002:a1c:4d18:: with SMTP id o24mr3757544wmh.35.1579710591507;
-        Wed, 22 Jan 2020 08:29:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxJ9K+QUU3PyMuDPQmAXoLfW9PNaH+1/vdD5DvvoouU9WHRc25Mbc4JtVXKf0S7RK9ZS+ZKmg==
-X-Received: by 2002:a1c:4d18:: with SMTP id o24mr3757517wmh.35.1579710591259;
-        Wed, 22 Jan 2020 08:29:51 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id v3sm57516171wru.32.2020.01.22.08.29.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2020 08:29:50 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
-        Roman Kagan <rkagan@virtuozzo.com>
-Subject: Re: [PATCH RFC 2/3] x86/kvm/hyper-v: move VMX controls sanitization out of nested_enable_evmcs()
-In-Reply-To: <20200122155108.GA7201@linux.intel.com>
-References: <20200115171014.56405-1-vkuznets@redhat.com> <20200115171014.56405-3-vkuznets@redhat.com> <6c4bdb57-08fb-2c2d-9234-b7efffeb72ed@redhat.com> <20200122054724.GD18513@linux.intel.com> <9c126d75-225b-3b1b-d97a-bcec1f189e02@redhat.com> <87eevrsf3s.fsf@vitty.brq.redhat.com> <20200122155108.GA7201@linux.intel.com>
-Date:   Wed, 22 Jan 2020 17:29:49 +0100
-Message-ID: <87blqvsbcy.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pJapYNAcxbRlzEJ21pZkklZIrAl5YRRL98gWAs4LZrQ=;
+        b=mQfHacS3phm6r1ef/qq6V+S0blSF1y77LTIse7INB/xXdwwjjx6bgRF4tHuelNcw4A
+         PcjU63suChI5m8qLCWWGVwzyUExvposcWTwcj1tHU/WmnnHmH0NK0l3MN+2RSaJIp+vM
+         A+Vx4eSFDToBMStv3dP9gWc+peSbtvLKfH6A/2GiEtAhvCa04P0ivPcPiSWjffxFxz83
+         nYgFwOw76YnPgPYV3XRZ46nlZb/s64FHzvNh+lSAg+AzWB7dR5QPKSRtgtg9GaulFOUd
+         bNF/LD/y4SwEMPpHYvPMfAipIenPl22k1vXPlcQljAM76GIAAHcs2b9Q415Tw4tdZ1R/
+         6z7A==
+X-Gm-Message-State: APjAAAVkXJ4c3bp3Ymnv2GOb/U/davlx2QArjzDOokOosjKjRGgSZ2YM
+        48ncsR9DSYP5LvlGDQJuRN85ySFA0QhFiD4VMTNXIERH0XvkGBEYD/E0ED2j3PGIuB2kHpCgloz
+        kdK/2Ttzz22ub
+X-Received: by 2002:a05:600c:244:: with SMTP id 4mr3995325wmj.40.1579710730412;
+        Wed, 22 Jan 2020 08:32:10 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzl1j5jQgSqqV247GTkvpdF8xkuaCliY5K+4X+O4msjIFvEkPbiQAFHkSHJ1V2Z9iwMwQwQow==
+X-Received: by 2002:a05:600c:244:: with SMTP id 4mr3995297wmj.40.1579710730026;
+        Wed, 22 Jan 2020 08:32:10 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:b8fe:679e:87eb:c059? ([2001:b07:6468:f312:b8fe:679e:87eb:c059])
+        by smtp.gmail.com with ESMTPSA id k16sm60390183wru.0.2020.01.22.08.32.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Jan 2020 08:32:09 -0800 (PST)
+Subject: Re: [PATCH v5 13/18] svm: Temporary deactivate AVIC during ExtINT
+ handling
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        KVM list <kvm@vger.kernel.org>
+References: <1573762520-80328-1-git-send-email-suravee.suthikulpanit@amd.com>
+ <1573762520-80328-14-git-send-email-suravee.suthikulpanit@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ec0d2d77-6c74-3c6e-5157-bc6b73a0b4bd@redhat.com>
+Date:   Wed, 22 Jan 2020 17:32:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1573762520-80328-14-git-send-email-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On 14/11/19 21:15, Suravee Suthikulpanit wrote:
+> +	if (svm_get_enable_apicv(svm->vcpu.kvm))
+> +		svm_request_update_avic(&svm->vcpu, true);
 
-> On Wed, Jan 22, 2020 at 04:08:55PM +0100, Vitaly Kuznetsov wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->> 
->> > On 22/01/20 06:47, Sean Christopherson wrote:
->> >>> Yes, it most likely is and it would be nice if Microsoft fixed it, but I
->> >>> guess we're stuck with it for existing Windows versions.  Well, for one
->> >>> we found a bug in Hyper-V and not the converse. :)
->> >>>
->> >>> There is a problem with this approach, in that we're stuck with it
->> >>> forever due to live migration.  But I guess if in the future eVMCS v2
->> >>> adds an apic_address field we can limit the hack to eVMCS v1.  Another
->> >>> possibility is to use the quirks mechanism but it's overkill for now.
->> >>>
->> >>> Unless there are objections, I plan to apply these patches.
->> >> Doesn't applying this patch contradict your earlier opinion?  This patch
->> >> would still hide the affected controls from the guest because the host
->> >> controls enlightened_vmcs_enabled.
->> >
->> > It does.  Unfortunately the key sentence is "we're stuck with it for
->> > existing Windows versions". :(
->
-> Ah, I didn't understand what "it" referred to :-)
->
->> >> Rather than update vmx->nested.msrs or filter vmx_get_msr(), what about
->> >> manually adding eVMCS consistency checks on the disallowed bits and handle
->> >> SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES as a one-off case by simply
->> >> clearing it from the eVMCS?  Or alternatively, squashing all the disallowed
->> >> bits.
->> >
->> > Hmm, that is also a possibility.  It's a very hacky one, but I guess
->> > adding APIC virtualization to eVMCS would require bumping the version to
->> > 2.  Vitaly, what do you think?
->> 
->> As I already replied to Sean I like the idea to filter out unsupported
->> controls from eVMCS but unfortunately it doesn't work: Hyper-V actually
->> expects APIC virtualization to work when it enables
->> SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES (I have no idea how without
->> apic_access_addr field but). I checked and at least Hyper-V 2016 doesn't
->> boot (when >1 vCPU).
->
-> Nice.
->
-> I still don't see what we gain from applying this patch.  Once eVMCS is
-> enabled by userspace, which presumably happens before the guest is launched,
-> the guest will see the eVMCS-unfriendly controls as being unsupported, both
-> for eVMCS and regular VMCS.  AFAICT, we're adding a fairly ugly hack to KVM
-> just so that KVM can lie to userspace about what controls will be exposed to
-> the guest.
->
-> Can we extend the API to use cap->args[1] to control whether or not the
-> unsupported controls are removed from vmx->nested.msrs?  Userspace could
-> pass '1' to leave the controls untouched and then surgically hide the
-> controls that the guest is too dumb to know it shouldn't use by writing the
-> appropriate MSRs.  Assuming existing userspace is expected/required to zero
-> out args[1..3], this would be fully backwards compatible.
+> +		if (kvm_vcpu_apicv_active(vcpu))
+> +			svm_request_update_avic(vcpu, false);
 
-Yes, in case we're back to the idea to filter things out in QEMU we can
-do this. What I don't like is that every other userspace which decides
-to enable eVMCS will have to perform the exact same surgery as in case
-it sets allow_unsupported_controls=0 it'll have to know (hardcode) the
-filtering (or KVM_SET_MSRS will fail) and in case it opts for
-allow_unsupported_controls=1 Windows guests just won't boot without the
-filtering.
+In both cases, "if (avic)" is the right condition to test to ensure that 
+the bit is kept in sync with whether we are or not in the interrupt 
+window.  kvm_request_apicv_update will check whether APICv is already 
+active or not.
 
-It seems to be 1:1, eVMCSv1 requires the filter.
+In fact, the condition can be moved to svm_request_update_avic.  Putting
+everything together, we get:
 
->
->
-> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-> index 72359709cdc1..241a769be738 100644
-> --- a/arch/x86/kvm/vmx/evmcs.c
-> +++ b/arch/x86/kvm/vmx/evmcs.c
-> @@ -346,8 +346,8 @@ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu)
->         return 0;
->  }
->
-> -int nested_enable_evmcs(struct kvm_vcpu *vcpu,
-> -                       uint16_t *vmcs_version)
-> +int nested_enable_evmcs(struct kvm_vcpu *vcpu, uint16_t *vmcs_version,
-> +                       bool allow_unsupported_controls)
-
-Personally, I'd call it 'keep_unsupported_controls'.
-
->  {
->         struct vcpu_vmx *vmx = to_vmx(vcpu);
->         bool evmcs_already_enabled = vmx->nested.enlightened_vmcs_enabled;
-> @@ -358,7 +358,7 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
->                 *vmcs_version = nested_get_evmcs_version(vcpu);
->
->         /* We don't support disabling the feature for simplicity. */
-> -       if (evmcs_already_enabled)
-> +       if (evmcs_already_enabled || allow_unsupported_controls)
->                 return 0;
->
->         vmx->nested.msrs.pinbased_ctls_high &= ~EVMCS1_UNSUPPORTED_PINCTRL;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 0cccc52e2d0a..5e1b8d51277b 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4005,7 +4005,8 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
->         case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
->                 if (!kvm_x86_ops->nested_enable_evmcs)
->                         return -ENOTTY;
-> -               r = kvm_x86_ops->nested_enable_evmcs(vcpu, &vmcs_version);
-> +               r = kvm_x86_ops->nested_enable_evmcs(vcpu, &vmcs_version,
-> +                                                    cap->args[1]);
->                 if (!r) {
->                         user_ptr = (void __user *)(uintptr_t)cap->args[0];
->                         if (copy_to_user(user_ptr, &vmcs_version,
->
-
--- 
-Vitaly
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 375352d08545..7c316c4716f9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -878,6 +878,7 @@ enum kvm_irqchip_mode {
+ #define APICV_INHIBIT_REASON_DISABLE    0
+ #define APICV_INHIBIT_REASON_HYPERV     1
+ #define APICV_INHIBIT_REASON_NESTED     2
++#define APICV_INHIBIT_REASON_IRQWIN     3
+ 
+ struct kvm_arch {
+ 	unsigned long n_used_mmu_pages;
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index af90f83d7123..6d300c16d756 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -387,6 +387,7 @@ struct amd_svm_iommu_ir {
+ static void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
+ static void svm_flush_tlb(struct kvm_vcpu *vcpu, bool invalidate_gpa);
+ static void svm_complete_interrupts(struct vcpu_svm *svm);
++static void svm_toggle_avic_for_irq_window(struct kvm_vcpu *vcpu, bool activate);
+ static inline void avic_post_state_restore(struct kvm_vcpu *vcpu);
+ 
+ static int nested_svm_exit_handled(struct vcpu_svm *svm);
+@@ -4461,6 +4462,14 @@ static int interrupt_window_interception(struct vcpu_svm *svm)
+ {
+ 	kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+ 	svm_clear_vintr(svm);
++
++	/*
++	 * For AVIC, the only reason to end up here is ExtINTs.
++	 * In this case AVIC was temporarily disabled for
++	 * requesting the IRQ window and we have to re-enable it.
++	 */
++	svm_toggle_avic_for_irq_window(&svm->vcpu, true);
++
+ 	svm->vmcb->control.int_ctl &= ~V_IRQ_MASK;
+ 	mark_dirty(svm->vmcb, VMCB_INTR);
+ 	++svm->vcpu.stat.irq_window_exits;
+@@ -5164,6 +5173,17 @@ static void svm_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
+ {
+ }
+ 
++static void svm_toggle_avic_for_irq_window(struct kvm_vcpu *vcpu, bool activate)
++{
++	if (!avic || !lapic_in_kernel(vcpu))
++		return;
++
++	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
++	kvm_request_apicv_update(vcpu->kvm, activate,
++				 APICV_INHIBIT_REASON_IRQWIN);
++	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
++}
++
+ static int svm_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
+ {
+ 	int ret = 0;
+@@ -5504,9 +5524,6 @@ static void enable_irq_window(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
+-	if (kvm_vcpu_apicv_active(vcpu))
+-		return;
+-
+ 	/*
+ 	 * In case GIF=0 we can't rely on the CPU to tell us when GIF becomes
+ 	 * 1, because that's a separate STGI/VMRUN intercept.  The next time we
+@@ -5516,6 +5533,13 @@ static void enable_irq_window(struct kvm_vcpu *vcpu)
+ 	 * window under the assumption that the hardware will set the GIF.
+ 	 */
+ 	if ((vgif_enabled(svm) || gif_set(svm)) && nested_svm_intr(svm)) {
++		/*
++		 * IRQ window is not needed when AVIC is enabled,
++		 * unless we have pending ExtINT since it cannot be injected
++		 * via AVIC. In such case, we need to temporarily disable AVIC,
++		 * and fallback to injecting IRQ via V_IRQ.
++		 */
++		svm_toggle_avic_for_irq_window(vcpu, false);
+ 		svm_set_vintr(svm);
+ 		svm_inject_irq(svm, 0x0);
+ 	}
+@@ -7328,7 +7352,8 @@ static bool svm_check_apicv_inhibit_reasons(ulong bit)
+ {
+ 	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
+ 			  BIT(APICV_INHIBIT_REASON_HYPERV) |
+-			  BIT(APICV_INHIBIT_REASON_NESTED);
++			  BIT(APICV_INHIBIT_REASON_NESTED) |
++			  BIT(APICV_INHIBIT_REASON_IRQWIN);
+ 
+ 	return supported & BIT(bit);
+ }
 
