@@ -2,72 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CFBC144BE4
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 07:45:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C7E1144C88
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2020 08:40:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725946AbgAVGpU convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 22 Jan 2020 01:45:20 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2933 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725862AbgAVGpT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 Jan 2020 01:45:19 -0500
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id 54629633CB77996C62F7;
-        Wed, 22 Jan 2020 14:45:16 +0800 (CST)
-Received: from dggeme766-chm.china.huawei.com (10.3.19.112) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 22 Jan 2020 14:45:16 +0800
-Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme766-chm.china.huawei.com (10.3.19.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Wed, 22 Jan 2020 14:45:15 +0800
-Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
- dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Wed, 22 Jan 2020 14:45:15 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1726078AbgAVHkF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 Jan 2020 02:40:05 -0500
+Received: from mail-vs1-f74.google.com ([209.85.217.74]:43028 "EHLO
+        mail-vs1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725883AbgAVHkF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 Jan 2020 02:40:05 -0500
+Received: by mail-vs1-f74.google.com with SMTP id j8so482711vsm.10
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2020 23:40:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Z571meg0eiiQxxoTP0BBBQ9SBLJ25qlGL+t6+g4n4iI=;
+        b=UsQS5RxTjA06dw7M1OmdUOdvKBp7v8qg5OSEvcasBXyuL58IWM9a2gGVb3VcaOUMwW
+         nR6kdxSAFuWw8NLRMkOxGOPdCSA8hkxNBPWeoav5pBQEWZ3SL+mRPh3h4Ax9u7k2UV9O
+         DudaKmtb1XD7BruasrfvzCPy9U3nVyrIV7kJQhtx/W1GihnpncxzBVtiTGaFqbpdRzC2
+         GhjqZdpe2zJtdFzPFGocrSHruNL3V+1AhD70i5UX5YSB70RNX8mICuSP/cyuu0W+YCDS
+         fEAsIuSxyUwMIW1zN8zd/2pXlTyszirsPxuozkP/PgzK/zZuXcvQ/yEjFpMURsmvdeHO
+         vLIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Z571meg0eiiQxxoTP0BBBQ9SBLJ25qlGL+t6+g4n4iI=;
+        b=IQJdzAgEVvgV5Sl8o4gDtBJ1/0roP3NY7jL/WpJ2S6CYXODrhe6CYJdt7cFa7tHs6H
+         QokovdHPlfZmPsHixZ7D9CUduINNfZTyXgpgjneVPekAQAKDS+tGLH0omv+8caH3gk0t
+         tzeIsUWKX3shfemqYgGgIQN+xQ9mOlEGDhao9bfaOj7HHlJZmPMXlWkYB25Lw5MM3Z+n
+         NuD4XaXLmQ2JlpRKZqgx8oc1AkwSDhh6rnJrQkWccu4a+ZsUehAZie3iLbpZiHIIUn7g
+         k7bJurnrpldaOsPt7Wvdo4xmI7/trMMeU+Ncu/nS6NHlHqLxm5SmZfEAx8CHYsH8epfp
+         U7QQ==
+X-Gm-Message-State: APjAAAX4+lLvYc6f8LaymwUtw6c6ei6CAo6I8okqe4oTpbX8nlFIFB3A
+        zIVqtHr7qBNLN2zDN/c8JzZi9++ce+c75l7BiRPJJZWa6qr5/75AF0iFhvQ6z7kEXh14UnMQF8p
+        aAvmo5lHcjpt6MtPRSKyHP4Jmcbc1SpuX9neaXFl4xhXktZvrKtN8jghTVw==
+X-Google-Smtp-Source: APXvYqzPUW3RAtQTN19/aaPWJ3VyhXGw3aRLwGp1ojJWcCU6sV8JJI+Vqa5cT6BqHnVokuA2y5Lwl1HsFFw=
+X-Received: by 2002:a67:6842:: with SMTP id d63mr1846521vsc.171.1579678804266;
+ Tue, 21 Jan 2020 23:40:04 -0800 (PST)
+Date:   Tue, 21 Jan 2020 23:39:59 -0800
+Message-Id: <20200122073959.192050-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+Subject: [kvm-unit-tests PATCH] x86: VMX: Check preconditions for RDTSC test
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 02/01] KVM: x86: Use a typedef for fastop functions
-Thread-Topic: [PATCH 02/01] KVM: x86: Use a typedef for fastop functions
-Thread-Index: AdXQ7wQO7gfXyaigQEuRUqZCmOrVqQ==
-Date:   Wed, 22 Jan 2020 06:45:15 +0000
-Message-ID: <03a3ae65df7d45338ad0a82f96bb6ecb@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.158]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+        Oliver Upton <oupton@google.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi:
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> Add a typedef to for the fastop function prototype to make the code more readable.
->
-> No functional change intended.
->
-> Cc: Miaohe Lin <linmiaohe@huawei.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->
-> Applies on top of Miaohe's patch.  Feel free to squash this.
->
-> arch/x86/kvm/emulate.c | 14 +++++++-------
+The RDTSC VM-exit test requires the 'use TSC offsetting' processor-based
+VM-execution control be allowed on the host. Check this precondition
+before running the test rather than asserting it later on to avoid
+erroneous failures on a host without TSC offsetting.
 
-Thanks for making the code more readable and clean.
+Cc: Aaron Lewis <aaronlewis@google.com>
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ x86/vmx_tests.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
-
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 3b150323b325..de9a931216e2 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -9161,9 +9161,6 @@ static void vmx_vmcs_shadow_test(void)
+  */
+ static void reset_guest_tsc_to_zero(void)
+ {
+-	TEST_ASSERT_MSG(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET,
+-			"Expected support for 'use TSC offsetting'");
+-
+ 	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_USE_TSC_OFFSET);
+ 	vmcs_write(TSC_OFFSET, -rdtsc());
+ }
+@@ -9210,6 +9207,11 @@ static void rdtsc_vmexit_diff_test(void)
+ 	int fail = 0;
+ 	int i;
+ 
++	if (!(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET)) {
++		printf("CPU doesn't support the 'use TSC offsetting' processor-based VM-execution control.\n");
++		return;
++	}
++
+ 	test_set_guest(rdtsc_vmexit_diff_test_guest);
+ 
+ 	reset_guest_tsc_to_zero();
+-- 
+2.25.0.341.g760bfbb309-goog
 
