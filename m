@@ -2,51 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 31062147058
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 19:05:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48F9214705A
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 19:05:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729299AbgAWSE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jan 2020 13:04:59 -0500
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:42711 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729276AbgAWSE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jan 2020 13:04:59 -0500
-Received: by mail-pf1-f202.google.com with SMTP id i20so2090900pfo.9
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 10:04:58 -0800 (PST)
+        id S1729325AbgAWSFM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jan 2020 13:05:12 -0500
+Received: from mail-qk1-f201.google.com ([209.85.222.201]:43189 "EHLO
+        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729327AbgAWSFB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jan 2020 13:05:01 -0500
+Received: by mail-qk1-f201.google.com with SMTP id f22so2186778qka.10
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 10:05:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=zQsk+O6KeZ1NWUkCto7Wkzwr5mCAi8+GMe3pWZCtfx8=;
-        b=D3gvjm8Hkjs/fWfSh6hd6ba41HjLwDycYiddKOlsYEF6zj+FGkMXQJQc0JmNr6VTUz
-         NGK3/iIJEQyCffEaFO+BW+BxznvvpQs7Lu2JWgirdMxaptDvO+csVJpsebDPQNV6BAqC
-         a6SLSg9LMxrJlf+nW4uQ4WC2+1Pu1W0R0tgrhvvVSpRmOuL7QywtaevwMvMu4mHojDm0
-         OCGNRT1lVxP2RXK2JXBDucXxizNqM3wiWr5de2ivVUfxLZsqolidtIFuV2vY/PB1bK9z
-         73vedQ2wKGzIS770ADhiR6jVpPx/ERuhasYk/QkZm9ZkrPBGJifPNf57ZHs+5ihmGESF
-         6XpQ==
+        bh=UdYBz3AD49871PUkNPj4Uebf8Il0FeRd7J00v5oi04U=;
+        b=n+Pcpr5wOrgmU2c65Sgk80FsAlBLVRmkLo0XbwUrvO9lDOhlDLvWFp2fHgsz+gjvvb
+         9lx4qvrnQ8p0/CkVzkNSU4oXoXO4CMa9BtSrE3crfGshR1UTDh0RwJK+DOwDma3gFbB8
+         F2dNcvr12Zzft48S7piu2oUTIsarWn5vyptyDl6Z6M0aEf95Ms8tdNZBCUyhPXA4tfav
+         D2CILGxOu/uL0cyVXZztwjdsLpDRa641IIbvddCDN9ZqBeb5/T0uxvaWjoTO+YiCRWmn
+         e+kv/mrOHQAq2kqUGToqJpMknvIq8Zd00f9/JSuXKO3dmmwH4r909as/b2CLtB0pcfrn
+         Sxow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=zQsk+O6KeZ1NWUkCto7Wkzwr5mCAi8+GMe3pWZCtfx8=;
-        b=RSR4GMaylsdrhCQG5t/YphDnZ19JdBgJ/CaNieg/YnvQUGvi5DwIAxVy3e/T6jgduY
-         7NHfbZ15fNudJbdfkdKNzwpBAdBZhlg0JYic8d65FX3s4sC2hBc7RSLbTdBeb6wBacce
-         As8Lurm8UKLr6TVxqHfxilDfEqyEcUSPsdfy+STwRTBe2DDimxwALlnzoBwmmsNsG1AL
-         X7mWLgCsnCCxWGsK21NrbLwTdVMrfNcEwhp71Zr3LI4VEWWS9h7iXmZg8/sZtLob3AFt
-         ljy0NzCb2D7ssjAppF1EW394fekwQM8Tzo4dHrbWlW/jqOuJiovWyrFe6d5q7b0l+Ok+
-         u3gw==
-X-Gm-Message-State: APjAAAX0eLcxweDVbzud44BDqKq1pSCFc+KufWmLs3Mxjq2WEzKrSUq4
-        xuytE3j5rHfwXuVgLj0K0HQFwD2m7YSP
-X-Google-Smtp-Source: APXvYqybxeibSo2GtbUigxYXRUWl5nVrUrZ2sWGnT63r8bM/diDvzZiwn87GrhTSWXC/GK8UOe4Z/8U1Lpgn
-X-Received: by 2002:a63:6d0e:: with SMTP id i14mr34255pgc.12.1579802698334;
- Thu, 23 Jan 2020 10:04:58 -0800 (PST)
-Date:   Thu, 23 Jan 2020 10:04:34 -0800
+        bh=UdYBz3AD49871PUkNPj4Uebf8Il0FeRd7J00v5oi04U=;
+        b=fkcLFgmXKcmDeT2gjqU9CVgp8pKRbv8koOl7Asw6HR4XJBzWST2U1dMsp2GExkEPV4
+         scyMxYlv7fazqCpBdfykMzEFXRJzQikTsGfnxUurVyMqRn7DPqW9hc0Jmjl5O54ftKaI
+         DOx0wt9W4Mdiv4n2zbJks0gFoJTqtMHTgiQ0FpiUk494QVJBvIhsAFqJx1x/jzKgzTuC
+         rLNQU1JcmOfNDBp2JySgQTbSErxHhanadfOagKogPuQ7OelGqe72s3qFiQH7wP0o6hzL
+         dVyTSeSrIakseJsoQQ5mB9XqHBwZKVot31QixFoLJVVIfbjnldVyagCkAsn8/wj47Eo1
+         Mtng==
+X-Gm-Message-State: APjAAAUJlQZLaKJPwfzgKVK+k6aB+SFWJTm03JwYI5liAxwa6Ynctfaq
+        pS4Bwa6cuO1Nl4+mrmlqXOln2rvBl2P/
+X-Google-Smtp-Source: APXvYqw/mRdsaZ41fljNpl0GCv0XtJYfDahhtiR1QNY/cSbWhanCWfktv1CfZhgA95ua8wi2fyuKZN0sD5DP
+X-Received: by 2002:a37:a881:: with SMTP id r123mr5611982qke.275.1579802700645;
+ Thu, 23 Jan 2020 10:05:00 -0800 (PST)
+Date:   Thu, 23 Jan 2020 10:04:35 -0800
 In-Reply-To: <20200123180436.99487-1-bgardon@google.com>
-Message-Id: <20200123180436.99487-9-bgardon@google.com>
+Message-Id: <20200123180436.99487-10-bgardon@google.com>
 Mime-Version: 1.0
 References: <20200123180436.99487-1-bgardon@google.com>
 X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
-Subject: [PATCH v4 08/10] KVM: selftests: Time guest demand paging
+Subject: [PATCH v4 09/10] KVM: selftests: Stop memslot creation in KVM
+ internal memslot region
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -63,182 +64,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to quantify demand paging performance, time guest execution
-during demand paging.
+KVM creates internal memslots covering the region between 3G and 4G in
+the guest physical address space, when the first vCPU is created.
+Mapping this region before creation of the first vCPU causes vCPU
+creation to fail. Prohibit tests from creating such a memslot and fail
+with a helpful warning when they try to.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- .../selftests/kvm/demand_paging_test.c        | 68 +++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ tools/testing/selftests/kvm/lib/kvm_util.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index 2002032df32cc..0dc5d04718678 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -32,6 +32,12 @@
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 41cf45416060f..5b971c04f1643 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -113,6 +113,8 @@ const char * const vm_guest_mode_string[] = {
+ _Static_assert(sizeof(vm_guest_mode_string)/sizeof(char *) == NUM_VM_MODES,
+ 	       "Missing new mode strings?");
  
- #define DEFAULT_GUEST_TEST_MEM_SIZE (1 << 30) /* 1G */
++#define KVM_INTERNAL_MEMSLOTS_START_PADDR (3UL << 30)
++#define KVM_INTERNAL_MEMSLOTS_END_PADDR (4UL << 30)
+ /*
+  * VM Create
+  *
+@@ -593,6 +595,20 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+ 		"  vm->max_gfn: 0x%lx vm->page_size: 0x%x",
+ 		guest_paddr, npages, vm->max_gfn, vm->page_size);
  
-+#ifdef PRINT_PER_PAGE_UPDATES
-+#define PER_PAGE_DEBUG(...) DEBUG(__VA_ARGS__)
-+#else
-+#define PER_PAGE_DEBUG(...)
-+#endif
++	/*
++	 * Check that this region does not overlap with KVM internal memslots
++	 * which are created when the first vCPU is created.
++	 */
++	TEST_ASSERT(guest_paddr >= KVM_INTERNAL_MEMSLOTS_END_PADDR ||
++		    guest_paddr + npages < KVM_INTERNAL_MEMSLOTS_START_PADDR,
++		    "Memslot overlapps with region mapped by internal KVM\n"
++		    "memslots:\n"
++		    "  Requested paddr range:      [0x%lx, 0x%lx)\n"
++		    "  KVM internal memslot range: [0x%lx, 0x%lx)\n",
++		    guest_paddr, guest_paddr + npages,
++		    KVM_INTERNAL_MEMSLOTS_START_PADDR,
++		    KVM_INTERNAL_MEMSLOTS_END_PADDR);
 +
- #ifdef PRINT_PER_VCPU_UPDATES
- #define PER_VCPU_DEBUG(...) DEBUG(__VA_ARGS__)
- #else
-@@ -64,6 +70,26 @@ static uint64_t guest_test_phys_mem;
-  */
- static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
- 
-+int64_t to_ns(struct timespec ts)
-+{
-+	return (int64_t)ts.tv_nsec + 1000000000LL * (int64_t)ts.tv_sec;
-+}
-+
-+struct timespec diff(struct timespec start, struct  timespec end)
-+{
-+	struct   timespec temp;
-+
-+	if ((end.tv_nsec-start.tv_nsec) < 0) {
-+		temp.tv_sec = end.tv_sec - start.tv_sec - 1;
-+		temp.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
-+	} else {
-+		temp.tv_sec = end.tv_sec - start.tv_sec;
-+		temp.tv_nsec = end.tv_nsec - start.tv_nsec;
-+	}
-+
-+	return temp;
-+}
-+
- struct vcpu_args {
- 	uint64_t gva;
- 	uint64_t pages;
-@@ -109,10 +135,14 @@ static void *vcpu_worker(void *data)
- 	struct kvm_vm *vm = args->vm;
- 	int vcpu_id = args->vcpu_id;
- 	struct kvm_run *run;
-+	struct timespec start;
-+	struct timespec end;
- 
- 	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
- 	run = vcpu_state(vm, vcpu_id);
- 
-+	clock_gettime(CLOCK_MONOTONIC, &start);
-+
- 	/* Let the guest access its memory */
- 	ret = _vcpu_run(vm, vcpu_id);
- 	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-@@ -122,6 +152,11 @@ static void *vcpu_worker(void *data)
- 			    exit_reason_str(run->exit_reason));
- 	}
- 
-+	clock_gettime(CLOCK_MONOTONIC, &end);
-+	PER_VCPU_DEBUG("vCPU %d execution time: %lld.%.9lds\n", vcpu_id,
-+		       (long long)(diff(start, end).tv_sec),
-+		       diff(start, end).tv_nsec);
-+
- 	return NULL;
- }
- 
-@@ -158,6 +193,8 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, int vcpus,
- static int handle_uffd_page_request(int uffd, uint64_t addr)
- {
- 	pid_t tid;
-+	struct timespec start;
-+	struct timespec end;
- 	struct uffdio_copy copy;
- 	int r;
- 
-@@ -168,6 +205,8 @@ static int handle_uffd_page_request(int uffd, uint64_t addr)
- 	copy.len = host_page_size;
- 	copy.mode = 0;
- 
-+	clock_gettime(CLOCK_MONOTONIC, &start);
-+
- 	r = ioctl(uffd, UFFDIO_COPY, &copy);
- 	if (r == -1) {
- 		DEBUG("Failed Paged in 0x%lx from thread %d with errno: %d\n",
-@@ -175,6 +214,13 @@ static int handle_uffd_page_request(int uffd, uint64_t addr)
- 		return r;
- 	}
- 
-+	clock_gettime(CLOCK_MONOTONIC, &end);
-+
-+	PER_PAGE_DEBUG("UFFDIO_COPY %d \t%lld ns\n", tid,
-+		       (long long)to_ns(diff(start, end)));
-+	PER_PAGE_DEBUG("Paged in %ld bytes at 0x%lx from thread %d\n",
-+		       host_page_size, addr, tid);
-+
- 	return 0;
- }
- 
-@@ -193,7 +239,10 @@ static void *uffd_handler_thread_fn(void *arg)
- 	int pipefd = uffd_args->pipefd;
- 	useconds_t delay = uffd_args->delay;
- 	int64_t pages = 0;
-+	struct timespec start;
-+	struct timespec end;
- 
-+	clock_gettime(CLOCK_MONOTONIC, &start);
- 	while (!quit_uffd_thread) {
- 		struct uffd_msg msg;
- 		struct pollfd pollfd[2];
-@@ -261,6 +310,13 @@ static void *uffd_handler_thread_fn(void *arg)
- 		pages++;
- 	}
- 
-+	clock_gettime(CLOCK_MONOTONIC, &end);
-+	PER_VCPU_DEBUG("userfaulted %ld pages over %lld.%.9lds. (%f/sec)\n",
-+		       pages, (long long)(diff(start, end).tv_sec),
-+		       diff(start, end).tv_nsec, pages /
-+		       ((double)diff(start, end).tv_sec +
-+			(double)diff(start, end).tv_nsec / 100000000.0));
-+
- 	return NULL;
- }
- 
-@@ -325,6 +381,8 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
- 	uint64_t guest_num_pages;
- 	int vcpu_id;
- 	int r;
-+	struct timespec start;
-+	struct timespec end;
- 
- 	vm = create_vm(mode, vcpus, vcpu_memory_bytes);
- 
-@@ -449,6 +507,8 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
- 
- 	DEBUG("Finished creating vCPUs and starting uffd threads\n");
- 
-+	clock_gettime(CLOCK_MONOTONIC, &start);
-+
- 	for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++) {
- 		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
- 			       &vcpu_args[vcpu_id]);
-@@ -464,6 +524,8 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
- 
- 	DEBUG("All vCPU threads joined\n");
- 
-+	clock_gettime(CLOCK_MONOTONIC, &end);
-+
- 	if (use_uffd) {
- 		char c;
- 
-@@ -476,6 +538,12 @@ static void run_test(enum vm_guest_mode mode, bool use_uffd,
- 		}
- 	}
- 
-+	DEBUG("Total guest execution time: %lld.%.9lds\n",
-+	      (long long)(diff(start, end).tv_sec), diff(start, end).tv_nsec);
-+	DEBUG("Overall demand paging rate: %f pgs/sec\n",
-+	      guest_num_pages / ((double)diff(start, end).tv_sec +
-+	      (double)diff(start, end).tv_nsec / 100000000.0));
-+
- 	ucall_uninit(vm);
- 	kvm_vm_free(vm);
- 
+ 	/*
+ 	 * Confirm a mem region with an overlapping address doesn't
+ 	 * already exist.
 -- 
 2.25.0.341.g760bfbb309-goog
 
