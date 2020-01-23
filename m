@@ -2,96 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E887D1470AA
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 19:22:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0AFB1470CC
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 19:32:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728939AbgAWSWg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jan 2020 13:22:36 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:44880 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728901AbgAWSWg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jan 2020 13:22:36 -0500
-Received: by mail-il1-f196.google.com with SMTP id f16so1793046ilk.11
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 10:22:36 -0800 (PST)
+        id S1728831AbgAWScP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jan 2020 13:32:15 -0500
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:34004 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726792AbgAWScP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jan 2020 13:32:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=U8clo8dXG42zIL/L9nZL9Dx9XAGs9mrDLfnthhdfY8Y=;
-        b=V+Sjm1R1nhL0npwIMsw08M2uOWP2QfGRS14RPBDTz1HEgswva+ntVT2eXOtui8fRNy
-         NCFOqtf0cvErUsF7f97XV69guOe8TT24ZNf6Zi/1gX4Bqbi8+tmnD0/GsH0/fjJeYenJ
-         besrC7mHrghalQX8hPFwTkWSeSAc2LZZa/mZJokhx6TEbgMFLVqGzCc+FxpGqTaD86aa
-         G8FMlPcuJqDDfB7PC2NQrqQHqH4dou8KisqYDKqmCbq9uDiTAJ7PPpmZhHvTNPBIknGB
-         /Fk/rwD3x/Ao8Az2ws4HSX6N++/TXTOqwRGAF5b1wBSrVHaRqcZObNq24D3rHg24D3Xu
-         p5Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=U8clo8dXG42zIL/L9nZL9Dx9XAGs9mrDLfnthhdfY8Y=;
-        b=Xmx+Op+/90uDF4IH57Myt6A8JzuqMjF0vM1kCRcYC/ei1mcEwHtXlCSuE8KB5rBWBu
-         dSfWppUXedt0GMuobQrFguntVEiXMwW4UsPYT2lmjrUknhz+Mj01v3sS5e/+cCIMfrI3
-         jRP4EUGvzstBq3LZa8X42yb2cvnJ6Wvuta3eQvuHktotHLdxOFhzXeMadvVekx+2wsuJ
-         6mV7cah+eLVQDkOIj3jnkDpNL8O+o7BhB0FvK4OKgUreatMP6CvT+r+lJdPi6qQHz4o3
-         iDQaIc0iU4v03VFFuHixmrLoH1aIqzr8fPiikKcWOlTDfJXCgEReLmcF45NvDe+CQi69
-         qOhg==
-X-Gm-Message-State: APjAAAX228Fh/c6pUYrG/OIFSTFDDoYShp8OYr8ZOyJKlNzhYUryVg4V
-        EyrDrMqABpyRNx0lzHIlM3ekTgiH3vOwcKetZVcIpUv7
-X-Google-Smtp-Source: APXvYqzt9yyKrwX6qDon/KVWTbyRb5RYOyonsWZO6Z1k1vq4AHaWPOnc83kRw1cSE+bKh4+oY69Ric6NljkOVgt3JtE=
-X-Received: by 2002:a92:8458:: with SMTP id l85mr13969531ild.296.1579803755413;
- Thu, 23 Jan 2020 10:22:35 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1579804334; x=1611340334;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=2xa9r2C+xBeeJ86aG/9m7hfIYKWMIFAuiJ/h8jAAxYE=;
+  b=HtzG7D29ooctDLQ1zqtIwppscx9rA42b6YqMjMdf6AzDrJnY2sb3RTPp
+   sYetkIQZEynNNOZhkMenLdSi3hU+B+bMlKB2VEzaWmdkORFLbYOEbwFve
+   c+OyzMHrV5k3QIegl9Z3SnRrmQeLK8QS4aCLSlehccGoNx9HFgTMkAaTY
+   M=;
+IronPort-SDR: +2L0xmRrWbvTKQlyaG2z/heQkMzyNdb/uJcJK+pzTnAlUOG9H1za64NWyeaTHG5X0ZMIdkr0M/
+ /iRkIh4f4ORg==
+X-IronPort-AV: E=Sophos;i="5.70,354,1574121600"; 
+   d="scan'208";a="20650102"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 23 Jan 2020 18:31:58 +0000
+Received: from EX13MTAUWA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com (Postfix) with ESMTPS id B237728251D;
+        Thu, 23 Jan 2020 18:31:56 +0000 (UTC)
+Received: from EX13D20UWA001.ant.amazon.com (10.43.160.34) by
+ EX13MTAUWA001.ant.amazon.com (10.43.160.58) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 23 Jan 2020 18:31:56 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (10.43.161.207) by
+ EX13D20UWA001.ant.amazon.com (10.43.160.34) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 23 Jan 2020 18:31:55 +0000
+Received: from uc3ce012741425f.ant.amazon.com (10.28.84.89) by
+ mail-relay.amazon.com (10.43.161.249) with Microsoft SMTP Server (TLS) id
+ 15.0.1367.3 via Frontend Transport; Thu, 23 Jan 2020 18:31:54 +0000
+Subject: Re: [PATCH 2/2] kvm: Add ioctl for gathering debug counters
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Alexander Graf <graf@amazon.de>,
+        Milan Pandurov <milanpa@amazon.de>, <kvm@vger.kernel.org>
+CC:     <rkrcmar@redhat.com>, <borntraeger@de.ibm.com>
+References: <20200115134303.30668-1-milanpa@amazon.de>
+ <18820df0-273a-9592-5018-c50a85a75205@amazon.de>
+ <8584d6c2-323c-14e2-39c0-21a47a91bbda@amazon.com>
+ <ab84ee05-7e2b-e0cc-6994-fc485012a51a@amazon.de>
+ <668ea6d3-06ae-4586-9818-cdea094419fe@redhat.com>
+ <e77a2477-6010-ae1d-0afd-0c5498ba2117@amazon.de>
+ <30358a22-084c-6b0b-ae67-acfb7e69ba8e@amazon.com>
+ <7f206904-be2b-7901-1a88-37ed033b4de3@amazon.de>
+ <7e6093f1-1d80-8278-c843-b4425ce098bf@redhat.com>
+ <6f13c197-b242-90a5-3f53-b75aa8a0e5aa@amazon.de>
+ <b69546be-a25c-bbea-7e37-c07f019dcf85@redhat.com>
+ <c3b61fff-b40e-07f8-03c4-b177fbaab1a3@amazon.de>
+ <3d3d9374-a92b-0be0-1d6c-82b39fe7ef16@redhat.com>
+ <25821210-50c4-93f4-2daf-5b572f0bcf31@amazon.de>
+ <2e2cd423-ab6c-87ec-b856-2c7ca191d809@redhat.com>
+ <01dc5863-91b4-6ee0-2985-8c2bf41e73e9@amazon.com>
+ <f71763ad-2336-0436-39fc-bb476b559eee@redhat.com>
+From:   <milanpa@amazon.com>
+Message-ID: <45329483-5a7c-089e-fa85-4b3ada231493@amazon.com>
+Date:   Thu, 23 Jan 2020 19:31:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <1579749241-712-1-git-send-email-linmiaohe@huawei.com>
- <8736c6sga7.fsf@vitty.brq.redhat.com> <1a083ac8-3b01-fd2d-d867-2b3956cdef6d@redhat.com>
- <87wo9iqzfa.fsf@vitty.brq.redhat.com> <ee7d815f-750f-3d0e-2def-1631be66a483@redhat.com>
-In-Reply-To: <ee7d815f-750f-3d0e-2def-1631be66a483@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 23 Jan 2020 10:22:24 -0800
-Message-ID: <CALMp9eRRUY6a_QzbG-rHoZi5zc1YWHLk243=V2VBSQa=HL-Dpw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: set rflags to specify success in
- handle_invvpid() default case
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linmiaohe <linmiaohe@huawei.com>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <f71763ad-2336-0436-39fc-bb476b559eee@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 23, 2020 at 1:54 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 23/01/20 10:45, Vitaly Kuznetsov wrote:
-> >>> SDM says that "If an
-> >>> unsupported INVVPID type is specified, the instruction fails." and this
-> >>> is similar to INVEPT and I decided to check what handle_invept()
-> >>> does. Well, it does BUG_ON().
-> >>>
-> >>> Are we doing the right thing in any of these cases?
-> >>
-> >> Yes, both INVEPT and INVVPID catch this earlier.
-> >>
-> >> So I'm leaning towards not applying Miaohe's patch.
-> >
-> > Well, we may at least want to converge on BUG_ON() for both
-> > handle_invvpid()/handle_invept(), there's no need for them to differ.
->
-> WARN_ON_ONCE + nested_vmx_failValid would probably be better, if we
-> really want to change this.
->
-> Paolo
+T24gMS8yMy8yMCA1OjE1IFBNLCBQYW9sbyBCb256aW5pIHdyb3RlOgo+IE9uIDIzLzAxLzIwIDE2
+OjI3LCBtaWxhbnBhQGFtYXpvbi5jb20gd3JvdGU6Cj4+Pgo+Pj4gUGFvbG8KPj4+Cj4+IEkgYWdy
+ZWUsIGV4dGVuZGluZyB0aGUgQVBJIHdpdGggR0VUX0FWQUlMQUJMRV9PTkVfUkVHUyAoYW5kIHBv
+c3NpYmx5IGEKPj4gYml0bWFzayBhcmd1bWVudCB0byBuYXJyb3cgZG93biB3aGljaCB0eXBlIG9m
+IHJlZ2lzdGVycyB1c2Vyc3BhY2UgaXMKPj4gaW50ZXJlc3RlZCBpbikgaXMgYSBjbGVhbiBzb2x1
+dGlvbi4gV2Ugd29uJ3QgcmVxdWlyZSB1c2Vyc3BhY2UgdG8gcmVseQo+PiBvbiBjb25zdGFudHMg
+aW4gY29tcGlsZSB0aW1lIGlmIGl0IGRvZXNuJ3QgbmVlZCB0by4KPj4KPj4gT25seSBjb25jZXJu
+IGlzIHRoYXQgbm93IHdlIG5lZWQgdG8gaGF2ZSBzb21lIGtpbmQgb2YgZGF0YXN0cnVjdHVyZSBm
+b3IKPj4ga2VlcGluZyB0aGUgbWFwcGluZ3MgYmV0d2VlbiBhbGwgYXZhaWxhYmxlIE9ORV9SRUcg
+SURzIGFuZCB0aGVpcgo+PiBzdHJpbmdzL2Rlc2NyaXB0aW9ucy4gQWRkaXRpb25hbGx5IGVuZm9y
+Y2luZyB0aGF0IG5ld2x5IGFkZGVkIE9ORV9SRUdzCj4+IGFsd2F5cyBnZXQgYWRkZWQgdG8gdGhh
+dCBtYXBwaW5nLCBpcyBhbHNvIG5lY2Vzc2FyeS4KPiBGb3Igbm93IGp1c3QgZG8gdGhlIGltcGxl
+bWVudGF0aW9uIGZvciBWTSBPTkVfUkVHcy4gIFdlJ2xsIHdvcnJ5IGFib3V0Cj4gdGhlIGV4aXN0
+aW5nIFZDUFUgcmVnaXN0ZXJzIGxhdGVyLgo+Cj4gUGFvbG8KPgpTb3VuZHMgZ29vZC4KClRoYW5r
+cyBmb3IgdGhlIGhlbHAsIEkgd2lsbCB1cGRhdGUgdGhlIHBhdGNoIHNvb24uCgpNaWxhbgoKCgoK
+QW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAx
+MTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRo
+YW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIg
+SFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
 
-In both cases, something is seriously wrong. The only plausible
-explanations are compiler error or hardware failure. It would be nice
-to handle *all* such failures with a KVM_INTERNAL_ERROR exit to
-userspace. (I'm also thinking of situations like getting a VM-exit for
-INIT.)
