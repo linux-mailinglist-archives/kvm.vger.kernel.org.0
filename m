@@ -2,225 +2,312 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2090D14654A
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 11:02:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D18DB146566
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 11:11:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726240AbgAWKCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jan 2020 05:02:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50636 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726170AbgAWKCP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jan 2020 05:02:15 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00N9v8En069513
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 05:02:14 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xp4gkm9bw-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 05:02:14 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 23 Jan 2020 10:02:11 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 23 Jan 2020 10:02:09 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00NA28d034734314
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jan 2020 10:02:08 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 570D94C059;
-        Thu, 23 Jan 2020 10:02:08 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 203A64C046;
-        Thu, 23 Jan 2020 10:02:08 +0000 (GMT)
-Received: from dyn-9-152-224-146.boeblingen.de.ibm.com (unknown [9.152.224.146])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Jan 2020 10:02:08 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 3/9] s390x: Add cpu id to interrupt
- error prints
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, david@redhat.com, cohuck@redhat.com
-References: <20200121134254.4570-1-frankja@linux.ibm.com>
- <20200121134254.4570-4-frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Thu, 23 Jan 2020 11:02:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1726442AbgAWKLn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jan 2020 05:11:43 -0500
+Received: from mga05.intel.com ([192.55.52.43]:59628 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726188AbgAWKLn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jan 2020 05:11:43 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Jan 2020 02:11:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,353,1574150400"; 
+   d="scan'208";a="400293430"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga005.jf.intel.com with ESMTP; 23 Jan 2020 02:11:40 -0800
+Date:   Thu, 23 Jan 2020 05:02:27 -0500
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>
+Subject: Re: [PATCH v2 2/2] drm/i915/gvt: subsitute kvm_read/write_guest with
+ vfio_dma_rw
+Message-ID: <20200123100227.GJ1759@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200115035455.12417-1-yan.y.zhao@intel.com>
+ <20200115130651.29d7e9e0@w520.home>
+ <20200116054941.GB1759@joy-OptiPlex-7040>
+ <20200116083729.40983f38@w520.home>
+ <20200119100637.GD1759@joy-OptiPlex-7040>
+ <20200120130157.0ee7042d@w520.home>
+ <20200121081207.GE1759@joy-OptiPlex-7040>
+ <20200121095116.05eeae14@w520.home>
+ <20200121221038.GH1759@joy-OptiPlex-7040>
+ <20200122030758.GI1759@joy-OptiPlex-7040>
 MIME-Version: 1.0
-In-Reply-To: <20200121134254.4570-4-frankja@linux.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="QuKMEoGgLNLkEZq3WdAd9WQRmY1XwXkkP"
-X-TM-AS-GCONF: 00
-x-cbid: 20012310-0008-0000-0000-0000034BF861
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012310-0009-0000-0000-00004A6C643E
-Message-Id: <0eb69c66-5aa7-1609-9de0-c3d0efaed30a@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-23_01:2020-01-23,2020-01-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- clxscore=1015 impostorscore=0 phishscore=0 mlxscore=0 suspectscore=5
- spamscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001230085
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200122030758.GI1759@joy-OptiPlex-7040>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QuKMEoGgLNLkEZq3WdAd9WQRmY1XwXkkP
-Content-Type: multipart/mixed; boundary="cHoknl57HwFFjRuAxHcNlg9v4ZhoKdgtr"
+On Wed, Jan 22, 2020 at 11:07:58AM +0800, Yan Zhao wrote:
+> On Wed, Jan 22, 2020 at 06:10:38AM +0800, Yan Zhao wrote:
+> > On Wed, Jan 22, 2020 at 12:51:16AM +0800, Alex Williamson wrote:
+> > > On Tue, 21 Jan 2020 03:12:07 -0500
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > 
+> > > > On Tue, Jan 21, 2020 at 04:01:57AM +0800, Alex Williamson wrote:
+> > > > > On Sun, 19 Jan 2020 05:06:37 -0500
+> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > >   
+> > > > > > On Thu, Jan 16, 2020 at 11:37:29PM +0800, Alex Williamson wrote:  
+> > > > > > > On Thu, 16 Jan 2020 00:49:41 -0500
+> > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > >     
+> > > > > > > > On Thu, Jan 16, 2020 at 04:06:51AM +0800, Alex Williamson wrote:    
+> > > > > > > > > On Tue, 14 Jan 2020 22:54:55 -0500
+> > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > > > >       
+> > > > > > > > > > As a device model, it is better to read/write guest memory using vfio
+> > > > > > > > > > interface, so that vfio is able to maintain dirty info of device IOVAs.
+> > > > > > > > > > 
+> > > > > > > > > > Compared to kvm interfaces kvm_read/write_guest(), vfio_dma_rw() has ~600
+> > > > > > > > > > cycles more overhead on average.
+> > > > > > > > > > 
+> > > > > > > > > > -------------------------------------
+> > > > > > > > > > |    interface     | avg cpu cycles |
+> > > > > > > > > > |-----------------------------------|
+> > > > > > > > > > | kvm_write_guest  |     1554       |
+> > > > > > > > > > | ----------------------------------|
+> > > > > > > > > > | kvm_read_guest   |     707        |
+> > > > > > > > > > |-----------------------------------|
+> > > > > > > > > > | vfio_dma_rw(w)   |     2274       |
+> > > > > > > > > > |-----------------------------------|
+> > > > > > > > > > | vfio_dma_rw(r)   |     1378       |
+> > > > > > > > > > -------------------------------------      
+> > > > > > > > > 
+> > > > > > > > > In v1 you had:
+> > > > > > > > > 
+> > > > > > > > > -------------------------------------
+> > > > > > > > > |    interface     | avg cpu cycles |
+> > > > > > > > > |-----------------------------------|
+> > > > > > > > > | kvm_write_guest  |     1546       |
+> > > > > > > > > | ----------------------------------|
+> > > > > > > > > | kvm_read_guest   |     686        |
+> > > > > > > > > |-----------------------------------|
+> > > > > > > > > | vfio_iova_rw(w)  |     2233       |
+> > > > > > > > > |-----------------------------------|
+> > > > > > > > > | vfio_iova_rw(r)  |     1262       |
+> > > > > > > > > -------------------------------------
+> > > > > > > > > 
+> > > > > > > > > So the kvm numbers remained within +0.5-3% while the vfio numbers are
+> > > > > > > > > now +1.8-9.2%.  I would have expected the algorithm change to at least
+> > > > > > > > > not be worse for small accesses and be better for accesses crossing
+> > > > > > > > > page boundaries.  Do you know what happened?
+> > > > > > > > >      
+> > > > > > > > I only tested the 4 interfaces in GVT's environment, where most of the
+> > > > > > > > guest memory accesses are less than one page.
+> > > > > > > > And the different fluctuations should be caused by the locks.
+> > > > > > > > vfio_dma_rw contends locks with other vfio accesses which are assumed to
+> > > > > > > > be abundant in the case of GVT.    
+> > > > > > > 
+> > > > > > > Hmm, so maybe it's time to convert vfio_iommu.lock from a mutex to a
+> > > > > > > rwsem?  Thanks,
+> > > > > > >     
+> > > > > > 
+> > > > > > hi Alex
+> > > > > > I tested your rwsem patches at (https://lkml.org/lkml/2020/1/16/1869).
+> > > > > > They works without any runtime error at my side. :) 
+> > > > > > However, I found out that the previous fluctuation may be because I didn't
+> > > > > > take read/write counts in to account.
+> > > > > > For example. though the two tests have different avg read/write cycles,
+> > > > > > their average cycles are almost the same.
+> > > > > >  ______________________________________________________________________
+> > > > > > |        | avg read |            | avg write |            |            |
+> > > > > > |        | cycles   | read cnt   | cycles    | write cnt  | avg cycles |
+> > > > > > |----------------------------------------------------------------------|
+> > > > > > | test 1 |   1339   | 29,587,120 |  2258     | 17,098,364 |    1676    |
+> > > > > > | test 2 |   1340   | 28,454,262 |  2238     | 16,501,788 |    1670    |
+> > > > > >  ----------------------------------------------------------------------
+> > > > > > 
+> > > > > > After measuring the exact read/write cnt and cycles of a specific workload,
+> > > > > > I get below findings:
+> > > > > > 
+> > > > > > (1) with single VM running glmark2 inside.
+> > > > > > glmark2: 40M+ read+write cnt, among which 63% is read.
+> > > > > > among reads, 48% is of PAGE_SIZE, the rest is less than a page.
+> > > > > > among writes, 100% is less than a page.
+> > > > > > 
+> > > > > >  __________________________________________________
+> > > > > > |       cycles         | read | write |  avg | inc |
+> > > > > > |--------------------------------------------------|
+> > > > > > | kvm_read/write_page  |  694 |  1506 |  993 |  /  |
+> > > > > > |--------------------------------------------------|
+> > > > > > |  vfio_dma_rw(mutex)  | 1340 |  2248 | 1673 | 680 |
+> > > > > > |--------------------------------------------------|
+> > > > > > | vfio_dma_rw(rwsem r) | 1323 |  2198 | 1645 | 653 |
+> > > > > >  ---------------------------------------------------
+> > > > > > 
+> > > > > > so vfio_dma_rw generally has 650+ more cycles per each read/write.
+> > > > > > While kvm->srcu is of 160 cycles on average with one vm is running, the
+> > > > > > cycles spending on locks for vfio_dma_rw spread like this:
+> > > > > >  ___________________________
+> > > > > > |        cycles       | avg |
+> > > > > > |---------------------------|
+> > > > > > |     iommu->lock     | 117 |
+> > > > > > |---------------------------|
+> > > > > > |   vfio.group_lock   | 108 |
+> > > > > > |---------------------------|
+> > > > > > | group->unbound_lock | 114 |
+> > > > > > |---------------------------|
+> > > > > > |  group->device_lock | 115 |
+> > > > > > |---------------------------|
+> > > > > > |     group->mutex    | 113 |
+> > > > > >  ---------------------------
+> > > > > > 
+> > > > > > I measured the cycles for a mutex without any contention is 104 cycles
+> > > > > > on average (including time for get_cycles() and measured in the same way
+> > > > > > as other locks). So the contention of a single lock in a single vm
+> > > > > > environment is light. probably because there's a vgpu lock hold in GVT already.
+> > > > > > 
+> > > > > > (2) with two VMs each running glmark2 inside.
+> > > > > > The contention increases a little.
+> > > > > > 
+> > > > > >  ___________________________________________________
+> > > > > > |       cycles         | read | write |  avg | inc  |
+> > > > > > |---------------------------------------------------|
+> > > > > > | kvm_read/write_page  | 1035 |  1832 | 1325 |  /   |
+> > > > > > |---------------------------------------------------|
+> > > > > > |  vfio_dma_rw(mutex)  | 2104 |  2886 | 2390 | 1065 |
+> > > > > > |---------------------------------------------------|
+> > > > > > | vfio_dma_rw(rwsem r) | 1965 |  2778 | 2260 | 935  |
+> > > > > >  ---------------------------------------------------
+> > > > > > 
+> > > > > > 
+> > > > > >  -----------------------------------------------
+> > > > > > |     avg cycles       |   one VM   |  two VMs  |
+> > > > > > |-----------------------------------------------|
+> > > > > > |  iommu lock (mutex)  |     117    |   150     |
+> > > > > > |-----------------------------------|-----------|
+> > > > > > | iommu lock (rwsem r) |     117    |   156     |
+> > > > > > |-----------------------------------|-----------|
+> > > > > > |   kvm->srcu          |     160    |   213     |
+> > > > > >  -----------------------------------------------
+> > > > > > 
+> > > > > > In the kvm case, avg cycles increased 332 cycles, while kvm->srcu only costed
+> > > > > > 213 cycles. The rest 109 cycles may be spent on atomic operations.
+> > > > > > But I didn't measure them, as get_cycles() operation itself would influence final
+> > > > > > cycles by ~20 cycles.  
+> > > > > 
+> > > > > It seems like we need to extend the vfio external user interface so
+> > > > > that GVT-g can hold the group and container user references across
+> > > > > multiple calls.  For instance if we had a
+> > > > > vfio_group_get_external_user_from_dev() (based on
+> > > > > vfio_group_get_external_user()) then i915 could get an opaque
+> > > > > vfio_group pointer which it could use to call vfio_group_dma_rw() which
+> > > > > would leave us with only the iommu rw_sem locking.  i915 would release
+> > > > > the reference with vfio_group_put_external_user() when the device is
+> > > > > released.  The same could be done with the pin pages interface to
+> > > > > streamline that as well.  Thoughts?  Thanks,
+> > > > >  
+> > > > hi Alex,
+> > > > it works!
+> > > 
+> > > Hurrah!
+> > > 
+> > > > now the average vfio_dma_rw cycles can reduced to 1198. 
+> > > > one thing I want to propose is that, in sight of dma->task is always user
+> > > > space process, instead of calling get_task_mm(dma->task), can we just use
+> > > > "mmget_not_zero(dma->task->mm)"? in this way, the avg cycles can
+> > > > further reduce to 1051.
+> > > 
+> > > I'm not an expert there.  As noted in the type1 code we hold a
+> > > reference to the task because it's not advised to hold a long term
+> > > reference to the mm, so do we know we can look at task->mm without
+> > > acquiring task_lock()?  It's possible this is safe, but it's not
+> > > abundantly obvious to me.  Please research further and provide
+> > > justification if you think it's correct.  Thanks,
+> > > 
+> > in get_task_mm, 
+> > struct mm_struct *get_task_mm(struct task_struct *task)
+> > {
+> >         struct mm_struct *mm;
+> > 
+> >         task_lock(task);
+> >         mm = task->mm;
+> >         if (mm) {
+> >                 if (task->flags & PF_KTHREAD)
+> >                         mm = NULL;
+> >                 else
+> >                         mmget(mm);
+> >         }
+> >         task_unlock(task);
+> >         return mm;
+> > }
+> > task lock is hold only during the call, so the purpose of it is to
+> > ensure task->flags and task->mm is not changed or gone before mmget(mm)
+> > or function return.
+> > so, if we know for sure the task always has no flag PF_THREAD,
+> > then we only need to ensure mm is not gone before mmget(mm) is done.
+> > 
+> > static inline void mmget(struct mm_struct *mm)
+> > {
+> >         atomic_inc(&mm->mm_users);
+> > }
+> > 
+> > static inline bool mmget_not_zero(struct mm_struct *mm)
+> > {
+> >         return atomic_inc_not_zero(&mm->mm_users);
+> > }
+> > 
+> > the atomic_inc_not_zero() in  mmget_not_zero can ensure mm is not gone
+> > before its ref count inc.
+> > 
+> > So, I think the only thing we need to make sure is dma->task is not a
+> > kernel thread.
+> > Do you think I can make this assumption?
+> > 
+> hi Alex
+> Maybe I can still test PF_KTHREAD without holding task_lock
+> (task->alloc_lock), as it is only used to protect
+> "->fs, ->files, ->mm, ->group_info, ->comm, keyring
+> subscriptions and synchronises with wait4().  Also used in procfs.  Also
+> pins the final release of task.io_context.  Also protects ->cpuset and 
+> ->cgroup.subsys[]. And ->vfork_done."
+> 
+> I checked elsewhere in kernel, e.g.
+> try_to_wake_up
+> 	|->select_task_rq
+> 		|->is_per_cpu_kthread
+> 			|->if (!(p->flags & PF_KTHREAD))
+> task->alloc_lock is not hold there.
+> 
+> So, I would replace get_task_mm(dma->task) into two steps:
+> (1) check dma->task->flags & PF_KTHREAD, and (2) mmget_not_zero(mm).
+> 
+> I'll do more tests and send out new patches after Chinese new year.
+> 
+> Thanks
+> Yan
+>
+hi Alex
+after a second thought, I find out that the task->alloc_lock cannot be
+dropped, as there are chances that dma->task->mm is set to null between
+checking "dma->task->mm != NULL" and "mmget_not_zero(dma->task->mm)".
 
---cHoknl57HwFFjRuAxHcNlg9v4ZhoKdgtr
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+The chances of this condition can be increased by adding a msleep in-between
+the two lines of code to mimic possible task schedule. Then it was proved that
+dma->task->mm could be set to NULL in exit_mm() by killing QEMU.
 
-On 1/21/20 2:42 PM, Janosch Frank wrote:
-> It's good to know which cpu broke the test.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  lib/s390x/interrupt.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
->=20
-> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-> index 05f30be..773752a 100644
-> --- a/lib/s390x/interrupt.c
-> +++ b/lib/s390x/interrupt.c
-> @@ -107,8 +107,8 @@ static void fixup_pgm_int(void)
->  void handle_pgm_int(void)
->  {
->  	if (!pgm_int_expected)
-> -		report_abort("Unexpected program interrupt: %d at %#lx, ilen %d\n",
-> -			     lc->pgm_int_code, lc->pgm_old_psw.addr,
-> +		report_abort("Unexpected program interrupt: %d on cpu %d at %#lx, il=
-en %d\n",
-> +			     lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
->  			     lc->pgm_int_id);
-> =20
->  	pgm_int_expected =3D false;
-> @@ -119,8 +119,8 @@ void handle_ext_int(void)
->  {
->  	if (!ext_int_expected &&
->  	    lc->ext_int_code !=3D EXT_IRQ_SERVICE_SIG) {
-> -		report_abort("Unexpected external call interrupt (code %#x): at %#lx=
-",
-> -			     lc->ext_int_code, lc->ext_old_psw.addr);
-> +		report_abort("Unexpected external call interrupt (code %#x): on cpu =
-%d at %#lx",
-> +			     stap(), lc->ext_int_code, lc->ext_old_psw.addr);
+So I have to keep the call to get_task_mm().  :)
 
-The arguments are in the wrong order, stap() should come after the int
-code...
+Thanks
+Yan
 
-
->  		return;
->  	}
-> =20
-> @@ -137,18 +137,18 @@ void handle_ext_int(void)
-> =20
->  void handle_mcck_int(void)
->  {
-> -	report_abort("Unexpected machine check interrupt: at %#lx",
-> -		     lc->mcck_old_psw.addr);
-> +	report_abort("Unexpected machine check interrupt: on cpu %d at %#lx",=
-
-> +		     stap(), lc->mcck_old_psw.addr);
->  }
-> =20
->  void handle_io_int(void)
->  {
-> -	report_abort("Unexpected io interrupt: at %#lx",
-> -		     lc->io_old_psw.addr);
-> +	report_abort("Unexpected io interrupt: on cpu %d at %#lx",
-> +		     stap(), lc->io_old_psw.addr);
->  }
-> =20
->  void handle_svc_int(void)
->  {
-> -	report_abort("Unexpected supervisor call interrupt: at %#lx",
-> -		     lc->svc_old_psw.addr);
-> +	report_abort("Unexpected supervisor call interrupt: on cpu %d at %#lx=
-",
-> +		     stap(), lc->svc_old_psw.addr);
->  }
->=20
-
-
-
---cHoknl57HwFFjRuAxHcNlg9v4ZhoKdgtr--
-
---QuKMEoGgLNLkEZq3WdAd9WQRmY1XwXkkP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4pbx8ACgkQ41TmuOI4
-ufgJCRAAkMV085Xgr4bBJawmFm39u79utTIgPYZ8If25YhhqIirHAMRE9uUJMlEG
-L3uY9aX814Knu6sJT2/j8Z+06oqTqIDmcQ5k7uXSEsLA7++t3RUqlGdqaBXqEfKd
-gkOQKoYEu05YOmHND9QNlKxvCxC3BEl3xScQqVVSDGydkvSh/wPtqQTNSKlmL8Se
-yZZV589OXxFYWwzqZDiU2iLdpwhlwWGXKHW46jo3H/2sZcR08BtGUbOWCHsUXz9a
-+L7PflwGMT86MKLBgPRSEWWmuULeBfVqDPkr8d2HLpuMrJPEj5XPxMXKFiThpm7r
-BB48m+sdSNHqtPn6gbMbvt1DeDhmdlqrWbmRBNa45+0fROBieJNY6+Vmcbe5Ap4d
-X4Z7QfC2XIedk/IZTLPmASCBt37bmfcuh4qMi3jITNYvjKvpVqKBAF6ZA0EQChZ9
-tcWbMFKFJvQvhS5uTzrfGfCPFKD2EZjRUMQOFbxjRcjF66HxOVD6IQYKUMIf9LIp
-HLBQR4TYsEgW5CYyVBdts5f7eJjjfxCHuwldTjg17RpGOrLzWhebKruaiNERMHGx
-RupbreYViEA8Joo4mfXW3rfuNrlt5mL0jgo5TI3Tlf6+x/IzHWUdLfEEjyv4oGE8
-KbXh/Ol8uD9QESGlcCvgHRK7qsGVBOLu/adrbmCCOMxbUjSqsD8=
-=8lNe
------END PGP SIGNATURE-----
-
---QuKMEoGgLNLkEZq3WdAd9WQRmY1XwXkkP--
 
