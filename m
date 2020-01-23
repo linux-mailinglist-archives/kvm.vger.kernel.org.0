@@ -2,171 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ABA2146437
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 10:14:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A867214643A
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 10:15:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726188AbgAWJOo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jan 2020 04:14:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41832 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725785AbgAWJOo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jan 2020 04:14:44 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00N9DCbK050516
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 04:14:43 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xp3u88m55-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 04:14:42 -0500
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 23 Jan 2020 09:14:40 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 23 Jan 2020 09:14:38 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00N9EbWQ60293258
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jan 2020 09:14:37 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 41C84A4066;
-        Thu, 23 Jan 2020 09:14:37 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55D8EA4054;
-        Thu, 23 Jan 2020 09:14:36 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.152.224.146])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 23 Jan 2020 09:14:36 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, david@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH] s390x: smp: Rework cpu start and active tracking
-Date:   Thu, 23 Jan 2020 04:14:21 -0500
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <bf356a2c-702e-0ecd-d24c-f7a1b7c18d2a@redhat.com>
-References: <bf356a2c-702e-0ecd-d24c-f7a1b7c18d2a@redhat.com>
+        id S1726240AbgAWJPq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jan 2020 04:15:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59652 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726205AbgAWJPq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 Jan 2020 04:15:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579770945;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=12B39Xg1ujbGmC2fcxyE3VvGdS8Z63MnFzgGD9DRUo4=;
+        b=erQqhVwjCLb2swKBiZkT8YZCeKfsT1Ti+0aJevA+yQjvH/57dgD46jWS+sRntcLJHC1Orr
+        bSLKtH+YoNmxZsgWhI80pad+SeJhi7FxsP5c1YdZOlaRl0LGYli3QkdV7TueR8HJNTEYmq
+        CRKOykeDhitLttGXCwvTPtun91YF7xk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-xrojZcrHPQWkWvgVBE9OEQ-1; Thu, 23 Jan 2020 04:15:44 -0500
+X-MC-Unique: xrojZcrHPQWkWvgVBE9OEQ-1
+Received: by mail-wm1-f69.google.com with SMTP id t17so341822wmi.7
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 01:15:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=12B39Xg1ujbGmC2fcxyE3VvGdS8Z63MnFzgGD9DRUo4=;
+        b=eWDYIH4L4ybrSrXiJR5HOIQ8qtFG6/e6MESX30wsocFNooYc1cAVDjlvwFQKjW/U1Y
+         ymTB2t3KnHERhUUJC30QyWRYZTtBAxJ/PwmGY1fUwTRnydFezkuk2aq0MG9sOMNTqwAB
+         qdTHRdcjud4TCTRWaCQyUL55Kw37ehY1XIs+zmkRFh9MCSJMh2v7zY6mlqGPqhvvHhpL
+         h3sETvk+GPqfwtp9IsSgHQIoX5GFTHuQOxe5gu7EtgbF5msMhOMvSGulFSsJ/CAU8pli
+         OBjJfTt85wwJQxFbZmApWUwSnkuX1qjXIPMmT8UrEZJkXfPwTZU/ZOS40TOAS/5OfjHR
+         07Ww==
+X-Gm-Message-State: APjAAAUjRB+GnQdtRYD88VXpT30awqB8UNAmCiacNcHxvGX1ngRyrqlr
+        53IFDc3RWDa6Y1GAxXfzp8l4IN/VRGcBDat0PMXR3nWZwMNAsl5V9LKv2v3N1HcNmm7FZXL5PG9
+        kWnAkdsHkV5MF
+X-Received: by 2002:a05:600c:290b:: with SMTP id i11mr3036722wmd.27.1579770943286;
+        Thu, 23 Jan 2020 01:15:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwexsQSodRXMekzwFz0uAi8G31zz2yRchJWLCfe5ZB2s6Sa5TKDasgwMQb5tuntXRoVZkEIHA==
+X-Received: by 2002:a05:600c:290b:: with SMTP id i11mr3036695wmd.27.1579770943050;
+        Thu, 23 Jan 2020 01:15:43 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id b68sm1919858wme.6.2020.01.23.01.15.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2020 01:15:42 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
+        Roman Kagan <rkagan@virtuozzo.com>
+Subject: Re: [PATCH RFC 2/3] x86/kvm/hyper-v: move VMX controls sanitization out of nested_enable_evmcs()
+In-Reply-To: <f15d9e98-25e9-2031-2db5-6aaa6c78c0eb@redhat.com>
+References: <20200115171014.56405-1-vkuznets@redhat.com> <20200115171014.56405-3-vkuznets@redhat.com> <6c4bdb57-08fb-2c2d-9234-b7efffeb72ed@redhat.com> <20200122054724.GD18513@linux.intel.com> <9c126d75-225b-3b1b-d97a-bcec1f189e02@redhat.com> <87eevrsf3s.fsf@vitty.brq.redhat.com> <20200122155108.GA7201@linux.intel.com> <87blqvsbcy.fsf@vitty.brq.redhat.com> <f15d9e98-25e9-2031-2db5-6aaa6c78c0eb@redhat.com>
+Date:   Thu, 23 Jan 2020 10:15:41 +0100
+Message-ID: <87zheer0si.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20012309-0020-0000-0000-000003A33EDD
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012309-0021-0000-0000-000021FAD773
-Message-Id: <20200123091421.3409-1-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-23_01:2020-01-23,2020-01-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- adultscore=0 mlxlogscore=881 lowpriorityscore=0 mlxscore=0 spamscore=0
- malwarescore=0 priorityscore=1501 impostorscore=0 suspectscore=1
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001230079
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The architecture specifies that processing sigp orders may be
-asynchronous, and this is indeed the case on some hypervisors, so we
-need to wait until the cpu runs before we return from the setup/start
-function.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-As there was a lot of duplicate code, a common function for cpu
-restarts has been introduced.
+> On 22/01/20 17:29, Vitaly Kuznetsov wrote:
+>> Yes, in case we're back to the idea to filter things out in QEMU we can
+>> do this. What I don't like is that every other userspace which decides
+>> to enable eVMCS will have to perform the exact same surgery as in case
+>> it sets allow_unsupported_controls=0 it'll have to know (hardcode) the
+>> filtering (or KVM_SET_MSRS will fail) and in case it opts for
+>> allow_unsupported_controls=1 Windows guests just won't boot without the
+>> filtering.
+>> 
+>> It seems to be 1:1, eVMCSv1 requires the filter.
+>
+> Yes, that's the point.  It *is* a hack in KVM, but it is generally
+> preferrable to have an easier API for userspace, if there's only one way
+> to do it.
+>
+> Though we could be a bit more "surgical" and only remove
+> SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES---thus minimizing the impact on
+> non-eVMCS guests.  Vitaly, can you prepare a v2 that does that and adds
+> a huge "hack alert" comment that explains the discussion?
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- lib/s390x/smp.c | 56 ++++++++++++++++++++++++++++++-------------------
- 1 file changed, 35 insertions(+), 21 deletions(-)
+Yes, sure. I'd like to do more testing to make sure filtering out
+SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES is enough for other Hyper-V
+versions too (who knows how many bugs are there :-)
 
-diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-index f57f420..4578003 100644
---- a/lib/s390x/smp.c
-+++ b/lib/s390x/smp.c
-@@ -104,35 +104,52 @@ int smp_cpu_stop_store_status(uint16_t addr)
- 	return rc;
- }
- 
-+static int smp_cpu_restart_nolock(uint16_t addr, struct psw *psw)
-+{
-+	int rc;
-+	struct cpu *cpu = smp_cpu_from_addr(addr);
-+
-+	if (!cpu)
-+		return -1;
-+	if (psw) {
-+		cpu->lowcore->restart_new_psw.mask = psw->mask;
-+		cpu->lowcore->restart_new_psw.addr = psw->addr;
-+	}
-+	/*
-+	 * Stop the cpu, so we don't have a race between a running cpu
-+	 * and the restart in the test that checks if the cpu is
-+	 * running after the restart.
-+	 */
-+	smp_cpu_stop_nolock(addr, false);
-+	rc = sigp(addr, SIGP_RESTART, 0, NULL);
-+	if (rc)
-+		return rc;
-+	/*
-+	 * The order has been accepted, but the actual restart may not
-+	 * have been performed yet, so wait until the cpu is running.
-+	 */
-+	while (!smp_cpu_running(addr))
-+		mb();
-+	cpu->active = true;
-+	return 0;
-+}
-+
- int smp_cpu_restart(uint16_t addr)
- {
--	int rc = -1;
--	struct cpu *cpu;
-+	int rc;
- 
- 	spin_lock(&lock);
--	cpu = smp_cpu_from_addr(addr);
--	if (cpu) {
--		rc = sigp(addr, SIGP_RESTART, 0, NULL);
--		cpu->active = true;
--	}
-+	rc = smp_cpu_restart_nolock(addr, NULL);
- 	spin_unlock(&lock);
- 	return rc;
- }
- 
- int smp_cpu_start(uint16_t addr, struct psw psw)
- {
--	int rc = -1;
--	struct cpu *cpu;
--	struct lowcore *lc;
-+	int rc;
- 
- 	spin_lock(&lock);
--	cpu = smp_cpu_from_addr(addr);
--	if (cpu) {
--		lc = cpu->lowcore;
--		lc->restart_new_psw.mask = psw.mask;
--		lc->restart_new_psw.addr = psw.addr;
--		rc = sigp(addr, SIGP_RESTART, 0, NULL);
--	}
-+	rc = smp_cpu_restart_nolock(addr, &psw);
- 	spin_unlock(&lock);
- 	return rc;
- }
-@@ -192,10 +209,7 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
- 	lc->sw_int_crs[0] = 0x0000000000040000UL;
- 
- 	/* Start processing */
--	rc = sigp_retry(cpu->addr, SIGP_RESTART, 0, NULL);
--	if (!rc)
--		cpu->active = true;
--
-+	smp_cpu_restart_nolock(addr, NULL);
- out:
- 	spin_unlock(&lock);
- 	return rc;
 -- 
-2.20.1
+Vitaly
 
