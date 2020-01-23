@@ -2,106 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B12F0146FB3
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 18:30:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 662B2146FFD
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 18:47:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729012AbgAWRaM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jan 2020 12:30:12 -0500
-Received: from mout02.posteo.de ([185.67.36.66]:39953 "EHLO mout02.posteo.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727296AbgAWRaK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jan 2020 12:30:10 -0500
-Received: from submission (posteo.de [89.146.220.130]) 
-        by mout02.posteo.de (Postfix) with ESMTPS id 1BAB92400FE
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 18:30:08 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.de; s=2017;
-        t=1579800608; bh=jswBLxzmjtwYk5Kuv4nAGpKgQNsVvBOU2fXHpQ4y5Gs=;
-        h=From:To:Cc:Subject:Date:From;
-        b=B/+QAD5PeIhk8ZzLMAIJLIf3n/rKfM3CU3W8F4FslYtVshYN8F+1kpTEn7+IrqA5G
-         XJ05YHac7uYguFVgEP8OF8ksjX8QCn9s+VvzFPGRTqV8mQQ+bEpH2aM7QVXcEGdMYE
-         YO/PZX68RhqNtZ9MZove5GVY2KaQinsMXLqFulaoewxct1IC3U5rRFUO9McT53dRN+
-         IRSGC2FM/w5Pkgh7RVn0PHy4BwA0RB9dQcWRuKNGuZvVrZCA2NJZNscR8wH25TZKCJ
-         LLCzB6WdzmxLOWK3LGRCEOr0+f89yBqt+rlmXnKhs9D/oI53YAznDfawUaqL4wmzKg
-         30VhPiBrLuEEQ==
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 483Tmv4HFFz9rxM;
-        Thu, 23 Jan 2020 18:30:07 +0100 (CET)
-From:   Benjamin Thiel <b.thiel@posteo.de>
-To:     kvm@vger.kernel.org
-Cc:     X86 ML <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        id S1728984AbgAWRrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jan 2020 12:47:42 -0500
+Received: from mail-vk1-f193.google.com ([209.85.221.193]:34419 "EHLO
+        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728767AbgAWRrm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jan 2020 12:47:42 -0500
+Received: by mail-vk1-f193.google.com with SMTP id w67so1243062vkf.1
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 09:47:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Et+LlALPC760oEaRKFNCAz514PMTpmENsjL59cORzxs=;
+        b=Yg8WNVHpsQMcCvRhz3/dXR6PXPJY0KcG3v22GFQFEr+PJVg9hMZ4bvlywMwtQmtaz4
+         w/QMYp4bBgOnV5ltO0fM+DrFOT2DJPBtRJAUAqrGTjfg7anSY/tSyrywIw1KiUMECYUO
+         7xo8lXzri4JuvaqX0SBzfYPJT+Ph/TVID2bECWCi9gU0kk+IhztVbcDtGvOgao+Xj5/O
+         ojQDYehkgGIyQ4N3tf7j30XXUXcYWcykarDx87/pbrbCsh/JcK8DGega++OS9XUJ3Erf
+         1OOdjciGIxbE0skEDX8OoyVV4p0jA9fJJqZ7aRwio/C5DFBvH/iT0GhA/LVQLdtxt1a6
+         QFDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Et+LlALPC760oEaRKFNCAz514PMTpmENsjL59cORzxs=;
+        b=SenECVurDuoK7Zhs/qjrhhuddAUfcGCQ+N82E/rAHa6Dc6cXI8HWicuS9vDK7KNSXV
+         9boaiXkfZAD7ZjI+oDQc7uMc4ApSULvfNU+vsWGavc9nIdd1iEPgWS2mi/MBZ7u2STM0
+         LedStj1MrfAPrkh+rcMZ7Sfmh+W5yYKdcZuDJGl7GvDnZQrcPBN1BoMjqXmrwQ2YaRj5
+         ET81ShXpcvOTtq/1aJlxDpZCWR1kzKwoO/l8u8axFhCMHv3gPR+XxiwObNKL94Ahj4Qf
+         bYKlHze+hQWgzNz83mmgDWxk65WCibt+arjGz3U30EFIAaQX3l4468CuMh5V4LKbdjiD
+         cJ8A==
+X-Gm-Message-State: APjAAAVzZTy7rYF3Z9EBxsIDCAIJ6Crb5mLDZCeBJ5REYRlJ1eybYsnY
+        k5VgXMxo/dEnAAgviPiN6Mlr90dRBmfD/3noMA7BqtJJ
+X-Google-Smtp-Source: APXvYqwfTatdEjDSunaT13x4k7lhQ2MYD/2QP+0OJQj1cHdRpQBCSZo2x/ojkpyKiwJE/khU0AODgZc9burCbevj9Og=
+X-Received: by 2002:a1f:db81:: with SMTP id s123mr10783192vkg.45.1579801660728;
+ Thu, 23 Jan 2020 09:47:40 -0800 (PST)
+MIME-Version: 1.0
+References: <1579769442-13698-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1579769442-13698-1-git-send-email-pbonzini@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 23 Jan 2020 09:47:28 -0800
+Message-ID: <CANgfPd-jqh+BFhFdiNNfx+dS69v02kGucWX=6yMOgUMquHddXA@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: x86: fix overlap between SPTE_MMIO_MASK and generation
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Benjamin Thiel <b.thiel@posteo.de>
-Subject: [PATCH v2] x86/cpu: Move prototype for get_umwait_control_msr() to global location
-Date:   Thu, 23 Jan 2020 18:29:45 +0100
-Message-Id: <20200123172945.7235-1-b.thiel@posteo.de>
-X-Mailer: git-send-email 2.17.1
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-.. in order to fix a -Wmissing-prototype warning.
+On Thu, Jan 23, 2020 at 12:50 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The SPTE_MMIO_MASK overlaps with the bits used to track MMIO
+> generation number.  A high enough generation number would overwrite the
+> SPTE_SPECIAL_MASK region and cause the MMIO SPTE to be misinterpreted.
+>
+> Likewise, setting bits 52 and 53 would also cause an incorrect generation
+> number to be read from the PTE, though this was partially mitigated by the
+> (useless if it weren't for the bug) removal of SPTE_SPECIAL_MASK from
+> the spte in get_mmio_spte_generation.  Drop that removal, and replace
+> it with a compile-time assertion.
+>
+> Fixes: 6eeb4ef049e7 ("KVM: x86: assign two bits to track SPTE kinds")
+> Reported-by: Ben Gardon <bgardon@google.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
-No functional change.
-
-Signed-off-by: Benjamin Thiel <b.thiel@posteo.de>
----
- arch/x86/include/asm/mwait.h | 2 ++
- arch/x86/kernel/cpu/umwait.c | 1 +
- arch/x86/kvm/vmx/vmx.c       | 1 +
- arch/x86/kvm/vmx/vmx.h       | 2 --
- 4 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/include/asm/mwait.h b/arch/x86/include/asm/mwait.h
-index 9d5252c9685c..b809f117f3f4 100644
---- a/arch/x86/include/asm/mwait.h
-+++ b/arch/x86/include/asm/mwait.h
-@@ -23,6 +23,8 @@
- #define MWAITX_MAX_LOOPS		((u32)-1)
- #define MWAITX_DISABLE_CSTATES		0xf0
- 
-+u32 get_umwait_control_msr(void);
-+
- static inline void __monitor(const void *eax, unsigned long ecx,
- 			     unsigned long edx)
- {
-diff --git a/arch/x86/kernel/cpu/umwait.c b/arch/x86/kernel/cpu/umwait.c
-index c222f283b456..300e3fd5ade3 100644
---- a/arch/x86/kernel/cpu/umwait.c
-+++ b/arch/x86/kernel/cpu/umwait.c
-@@ -4,6 +4,7 @@
- #include <linux/cpu.h>
- 
- #include <asm/msr.h>
-+#include <asm/mwait.h>
- 
- #define UMWAIT_C02_ENABLE	0
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e3394c839dea..11cd0242479b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -41,6 +41,7 @@
- #include <asm/mce.h>
- #include <asm/mmu_context.h>
- #include <asm/mshyperv.h>
-+#include <asm/mwait.h>
- #include <asm/spec-ctrl.h>
- #include <asm/virtext.h>
- #include <asm/vmx.h>
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index a4f7f737c5d4..db947076bf68 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -14,8 +14,6 @@
- extern const u32 vmx_msr_index[];
- extern u64 host_efer;
- 
--extern u32 get_umwait_control_msr(void);
--
- #define MSR_TYPE_R	1
- #define MSR_TYPE_W	2
- #define MSR_TYPE_RW	3
--- 
-2.17.1
-
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 57e4dbddba72..b9052c7ba43d 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -418,22 +418,24 @@ static inline bool is_access_track_spte(u64 spte)
+>   * requires a full MMU zap).  The flag is instead explicitly queried when
+>   * checking for MMIO spte cache hits.
+>   */
+> -#define MMIO_SPTE_GEN_MASK             GENMASK_ULL(18, 0)
+> +#define MMIO_SPTE_GEN_MASK             GENMASK_ULL(17, 0)
+>
+>  #define MMIO_SPTE_GEN_LOW_START                3
+>  #define MMIO_SPTE_GEN_LOW_END          11
+>  #define MMIO_SPTE_GEN_LOW_MASK         GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
+>                                                     MMIO_SPTE_GEN_LOW_START)
+>
+> -#define MMIO_SPTE_GEN_HIGH_START       52
+> -#define MMIO_SPTE_GEN_HIGH_END         61
+> +#define MMIO_SPTE_GEN_HIGH_START       PT64_SECOND_AVAIL_BITS_SHIFT
+> +#define MMIO_SPTE_GEN_HIGH_END         62
+>  #define MMIO_SPTE_GEN_HIGH_MASK                GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
+>                                                     MMIO_SPTE_GEN_HIGH_START)
+> +
+>  static u64 generation_mmio_spte_mask(u64 gen)
+>  {
+>         u64 mask;
+>
+>         WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
+> +       BUILD_BUG_ON((MMIO_SPTE_GEN_HIGH_MASK | MMIO_SPTE_GEN_LOW_MASK) & SPTE_SPECIAL_MASK);
+>
+>         mask = (gen << MMIO_SPTE_GEN_LOW_START) & MMIO_SPTE_GEN_LOW_MASK;
+>         mask |= (gen << MMIO_SPTE_GEN_HIGH_START) & MMIO_SPTE_GEN_HIGH_MASK;
+> @@ -444,8 +446,6 @@ static u64 get_mmio_spte_generation(u64 spte)
+>  {
+>         u64 gen;
+>
+> -       spte &= ~shadow_mmio_mask;
+> -
+>         gen = (spte & MMIO_SPTE_GEN_LOW_MASK) >> MMIO_SPTE_GEN_LOW_START;
+>         gen |= (spte & MMIO_SPTE_GEN_HIGH_MASK) >> MMIO_SPTE_GEN_HIGH_START;
+>         return gen;
+> --
+> 1.8.3.1
+>
