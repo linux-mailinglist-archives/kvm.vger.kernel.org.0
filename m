@@ -2,146 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 95FC614680B
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 13:32:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1E78146924
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 14:32:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726772AbgAWMca (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jan 2020 07:32:30 -0500
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:65435 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726026AbgAWMc3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jan 2020 07:32:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1579782749; x=1611318749;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=zbv5Zue7z8NnHDQtWrh6+1k3Ib34YhMvbUVQtQ3SZfY=;
-  b=G6S4juGj3TJynGTv77CzuiMZ13E2Tr2pOIFtNULPx7fii9D3odn/dNzw
-   nPvOJthtHReB+X6raupxcwtOb7IJ86ayzkT2uSxyw9MfZrPYcQDLAs7Dv
-   m/6JiaqLodgDqfpV2auAe/3Z8dZ3iSYnWN6wseyrxgeovCk8sddZ8S1B6
-   0=;
-IronPort-SDR: jKOp/oNCOFQ5ubVUqMZ++zqNMP6UQlUah3EOjtdc2x2KIj6JO0sVIW1TkeW2GpQ6vQYa1xt4tG
- MtAmp61+aoGw==
-X-IronPort-AV: E=Sophos;i="5.70,353,1574121600"; 
-   d="scan'208";a="21945785"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-55156cd4.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 23 Jan 2020 12:32:18 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-55156cd4.us-west-2.amazon.com (Postfix) with ESMTPS id AD697A2812;
-        Thu, 23 Jan 2020 12:32:17 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 23 Jan 2020 12:32:17 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.160.18) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 23 Jan 2020 12:32:15 +0000
-Subject: Re: [PATCH 2/2] kvm: Add ioctl for gathering debug counters
-To:     Paolo Bonzini <pbonzini@redhat.com>, <milanpa@amazon.com>,
-        Milan Pandurov <milanpa@amazon.de>, <kvm@vger.kernel.org>
-CC:     <rkrcmar@redhat.com>, <borntraeger@de.ibm.com>
-References: <20200115134303.30668-1-milanpa@amazon.de>
- <18820df0-273a-9592-5018-c50a85a75205@amazon.de>
- <8584d6c2-323c-14e2-39c0-21a47a91bbda@amazon.com>
- <ab84ee05-7e2b-e0cc-6994-fc485012a51a@amazon.de>
- <668ea6d3-06ae-4586-9818-cdea094419fe@redhat.com>
- <e77a2477-6010-ae1d-0afd-0c5498ba2117@amazon.de>
- <30358a22-084c-6b0b-ae67-acfb7e69ba8e@amazon.com>
- <7f206904-be2b-7901-1a88-37ed033b4de3@amazon.de>
- <7e6093f1-1d80-8278-c843-b4425ce098bf@redhat.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <6f13c197-b242-90a5-3f53-b75aa8a0e5aa@amazon.de>
-Date:   Thu, 23 Jan 2020 13:32:13 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.3.1
+        id S1726761AbgAWNcX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jan 2020 08:32:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28645 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726232AbgAWNcW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jan 2020 08:32:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579786341;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=Y0WNxxezezM4locPIv338v0JHx8L8ALDPsAmFY4GNSI=;
+        b=A/IYhXughLeajGwfYQrNbBXTwAjiRbQ1C7nPStQAHRqpcoJneWDNthBZ02hzKRAQKTfrNX
+        0zVlkNzohiMtvPuI6HJ3MQvCfH0RHvdGo+BThZTBCwvBT1XXMN8JVFfQDFlCxcxCxy8ggn
+        VtL9+Aiwt5y8P7EJoD/jKvOrVeE6TDM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-6T8PhYlpO0azCzO4zpBs0Q-1; Thu, 23 Jan 2020 08:32:17 -0500
+X-MC-Unique: 6T8PhYlpO0azCzO4zpBs0Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89DB98017CC;
+        Thu, 23 Jan 2020 13:32:16 +0000 (UTC)
+Received: from [10.36.117.56] (ovpn-117-56.ams2.redhat.com [10.36.117.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 34FF16106A;
+        Thu, 23 Jan 2020 13:32:15 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v4 6/9] s390x: smp: Loop if secondary cpu
+ returns into cpu setup again
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, cohuck@redhat.com
+References: <20200121134254.4570-1-frankja@linux.ibm.com>
+ <20200121134254.4570-7-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <73f8c5f6-327a-8ff5-c4e7-b1db46e3490f@redhat.com>
+Date:   Thu, 23 Jan 2020 14:32:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <7e6093f1-1d80-8278-c843-b4425ce098bf@redhat.com>
+In-Reply-To: <20200121134254.4570-7-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Originating-IP: [10.43.160.18]
-X-ClientProxiedBy: EX13D35UWC004.ant.amazon.com (10.43.162.180) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyMy4wMS4yMCAxMzowOCwgUGFvbG8gQm9uemluaSB3cm90ZToKPiBPbiAyMS8wMS8yMCAx
-NjozOCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+Pj4+IE9ORV9SRUcgd291bGQgZm9yY2UgdXMg
-dG8gZGVmaW5lIGNvbnN0YW50cyBmb3IgZWFjaCBjb3VudGVyLCBhbmQgd291bGQKPj4+Pj4gbWFr
-ZSBpdCBoYXJkIHRvIHJldGlyZSB0aGVtLsKgIEkgZG9uJ3QgbGlrZSB0aGlzLgo+Pj4+Cj4+Pj4g
-V2h5IGRvZXMgaXQgbWFrZSBpdCBoYXJkIHRvIHJldGlyZSB0aGVtPyBXZSB3b3VsZCBqdXN0IHJl
-dHVybiAtRUlOVkFMCj4+Pj4gb24gcmV0cmlldmFsLCBsaWtlIHdlIGRvIGZvciBhbnkgb3RoZXIg
-bm9uLXN1cHBvcnRlZCBPTkVfUkVHLgo+Pj4+Cj4+Pj4gSXQncyB0aGUgc2FtZSBhcyBhIGZpbGUg
-bm90IGV4aXN0aW5nIGluIGRlYnVnZnMvc3RhdGZzLiBPciBhbiBlbnRyeQo+Pj4+IGluIHRoZSBh
-cnJheSBvZiB0aGlzIHBhdGNoIHRvIGRpc2FwcGVhci4KPiAKPiBUaGUgZGV2aWwgaXMgaW4gdGhl
-IGRldGFpbHMuICBGb3IgZXhhbXBsZSwgd291bGQgeW91IHJldGlyZSB1YXBpLwo+IGNvbnN0YW50
-cyBhbmQgY2F1c2UgcHJvZ3JhbXMgdG8gZmFpbCBjb21waWxhdGlvbj8gIE9yIGRvIHlvdSBrZWVw
-IHRoZQo+IG9ic29sZXRlIGNvbnN0YW50cyBmb3JldmVyPyAgQWxzbywgZml4aW5nIHRoZSBtYXBw
-aW5nIGZyb20gT05FX1JFRwo+IG51bWJlciB0byBzdGF0IHdvdWxkIG1lYW4gYSBzd2l0Y2ggc3Rh
-dGVtZW50IChvciBsb29wIG9mIHNvbWUga2luZC0tLWEKPiBzd2l0Y2ggc3RhdGVtZW50IGlzIGJh
-c2ljYWxseSBhbiB1bnJvbGxlZCBiaW5hcnkgc2VhcmNoKSB0byBhY2Nlc3MgdGhlCj4gc3RhdHMu
-ICBJbnN0ZWFkIHJldHVybmluZyB0aGUgaWQgaW4gS1ZNX0dFVF9TVVBQT1JURURfREVCVUdGU19T
-VEFUIHdvdWxkCj4gc2ltcGxpZnkgcmV0dXJuaW5nIHRoZSBzdGF0cyB0byBhIHNpbXBsZSBjb3B5
-X3RvX3VzZXIuCgpJZiB5b3UgbG9vayBhdCB0aGUgd2F5IFJJU0MtViBpbXBsZW1lbnRlZCBPTkVf
-UkVHLCBJIHRoaW5rIHdlIGNhbiBhZ3JlZSAKdGhhdCBpdCdzIHBvc3NpYmxlIHdpdGggY29uc3Rh
-bnQgaWRlbnRpZmllcnMgYXMgd2VsbCA6KS4gVGhlIG9ubHkgCmRvd25zaWRlIGlzIG9mIGNvdXJz
-ZSB0aGF0IHlvdSBtYXkgcG90ZW50aWFsbHkgZW5kIHVwIHdpdGggYW4gaWRlbnRpZmllciAKYXJy
-YXkgdG8gbWFwIGZyb20gIk9ORV9SRUcgaWQiIHRvICJvZmZzZXQgaW4gdmNwdS92bSBzdHJ1Y3Qi
-LiBJIGZhaWwgdG8gCnNlZSBob3cgdGhhdCdzIHdvcnNlIHRoYW4gdGhlIHN0cnVjdCBrdm1fc3Rh
-dHNfZGVidWdmc19pdGVtW10gd2UgaGF2ZSB0b2RheS4KCj4gT2YgY291cnNlLCBzb21lIG9mIHRo
-ZSBjb21wbGV4aXR5IHdvdWxkIGJlIHB1bnRlZCB0byB1c2Vyc3BhY2UuICBCdXQKPiB1c2Vyc3Bh
-Y2UgaXMgbXVjaCBjbG9zZXIgdG8gdGhlIGh1bWFucyB0aGF0IHVsdGltYXRlbHkgbG9vayBhdCB0
-aGUKPiBzdGF0cywgc28gdGhlIHF1ZXN0aW9uIGlzOiBkb2VzIHVzZXJzcGFjZSByZWFsbHkgY2Fy
-ZSBhYm91dCBrbm93aW5nCj4gd2hpY2ggc3RhdCBpcyB3aGljaCwgb3IgZG8gdGhleSBqdXN0IGNh
-cmUgYWJvdXQgaGF2aW5nIGEgbmFtZSB0aGF0IHdpbGwKPiB1bHRpbWF0ZWx5IGJlIGNvbnN1bWVk
-IGJ5IGh1bWFucyBkb3duIHRoZSBwaXBlPyAgSWYgdGhlIGxhdHRlciAod2hpY2ggaXMKPiBhbHNv
-IG15IGd1dCBmZWVsaW5nKSwgdGhhdCBpcyBhbHNvIGEgcG9pbnQgYWdhaW5zdCBPTkVfUkVHLgo+
-IAo+PiBJdCdzIG5vdCBhIHByb2JsZW0gb2YgZXhwb3NpbmcgdGhlIHR5cGUgaW5mb3JtYXRpb24g
-LSB3ZSBoYXZlIHRoYXQgdG9kYXkKPj4gYnkgaW1wbGljaXRseSBzYXlpbmcgImV2ZXJ5IGNvdW50
-ZXIgaXMgNjRiaXQiLgo+Pgo+PiBUaGUgdGhpbmcgSSdtIHdvcnJpZWQgYWJvdXQgaXMgdGhhdCB3
-ZSBrZWVwIGludmVudGluZyB0aGVzZSBzcGVjaWFsCj4+IHB1cnBvc2UgaW50ZXJmYWNlcyB0aGF0
-IHJlYWxseSBkbyBub3RoaW5nIGJ1dCB0cmFuc2ZlciBudW1iZXJzIGluIG9uZQo+PiB3YXkgb3Ig
-YW5vdGhlci4gT05FX1JFRydzIHB1cnBvc2Ugd2FzIHRvIHVuaWZ5IHRoZW0uIERlYnVnIGNvdW50
-ZXJzCj4+IHJlYWxseSBhcmUgdGhlIHNhbWUgc3RvcnkuCj4gCj4gU2VlIGFib3ZlOiBJIGFtIG5v
-dCBzdXJlIHRoZXkgYXJlIHRoZSBzYW1lIHN0b3J5IGJlY2F1c2UgdGhlaXIgY29uc3VtZXJzCj4g
-bWlnaHQgYmUgdmVyeSBkaWZmZXJlbnQgZnJvbSByZWdpc3RlcnMuICBSZWdpc3RlcnMgYXJlIGdl
-bmVyYWxseQo+IGNvbnN1bWVkIGJ5IHByb2dyYW1zICh0byBtaWdyYXRlIFZNcywgZm9yIGV4YW1w
-bGUpIGFuZCBvbmx5IG9jY2FzaW9uYWxseQo+IGJ5IGh1bWFucywgd2hpbGUgc3RhdHMgYXJlIG1l
-YW50IHRvIGJlIGNvbnN1bWVkIGJ5IGh1bWFucy4gIFdlIG1heQo+IGRpc2FncmVlIG9uIHdoZXRo
-ZXIgdGhpcyBqdXN0aWZpZXMgYSBjb21wbGV0ZWx5IGRpZmZlcmVudCBBUEkuLi4KCkkgZG9uJ3Qg
-ZnVsbHkgYWdyZWUgb24gdGhlICJodW1hbiIgcGFydCBoZXJlLiBBdCB0aGUgZW5kIG9mIHRoZSBk
-YXksIHlvdSAKd2FudCBzdGF0cyBiZWNhdXNlIHlvdSB3YW50IHRvIGFjdCBvbiBzdGF0cy4gSWRl
-YWxseSwgeW91IHdhbnQgdG8gZG8gCnRoYXQgZnVsbHkgYXV0b21hdGljYWxseS4gTGV0IG1lIGdp
-dmUgeW91IGEgZmV3IGV4YW1wbGVzOgoKMSkgaW5zbl9lbXVsYXRpb25fZmFpbCB0cmlnZ2VycwoK
-WW91IG1heSB3YW50IHRvIGZlZWQgYWxsIHRoZSBmYWlsdXJlcyBpbnRvIGEgZGF0YWJhc2UgdG8g
-Y2hlY2sgd2hldGhlciAKdGhlcmUgaXMgc29tZXRoaW5nIHdyb25nIGluIHRoZSBlbXVsYXRvci4K
-CjIpIChyZW1vdGVfKXRsYl9mbHVzaCBiZXlvbmQgY2VydGFpbiB0aHJlc2hvbGQKCklmIHlvdSBz
-ZWUgdGhhdCB5b3UncmUgY29uc3RhbnRseSBmbHVzaGluZyByZW1vdGUgVExCcywgdGhlcmUncyBh
-IGdvb2QgCmNoYW5jZSB0aGF0IHlvdSBmb3VuZCBhIHdvcmtsb2FkIHRoYXQgbWF5IG5lZWQgdHVu
-aW5nIGluIEtWTS4gWW91IHdhbnQgCnRvIGdhdGhlciB0aG9zZSBzdGF0cyBhY3Jvc3MgeW91ciBm
-dWxsIGZsZWV0IG9mIGhvc3RzLCBzbyB0aGF0IGZvciB0aGUgCmZldyBvY2Nhc2lvbnMgd2hlbiB5
-b3UgaGl0IGl0LCB5b3UgY2FuIHdvcmsgd2l0aCB0aGUgYWN0dWFsIFZNIG93bmVycyB0byAKcG90
-ZW50aWFsbHkgaW1wcm92ZSB0aGVpciBwZXJmb3JtYW5jZQoKMykgZXhpdHMgYmV5b25kIGNlcnRh
-aW4gdGhyZXNob2xkCgpZb3Uga25vdyByb3VnaGx5IGhvdyBtYW55IGV4aXRzIHlvdXIgZmxlZXQg
-d291bGQgdXN1YWxseSBzZWUsIHNvIHlvdSBjYW4gCmNvbmZpZ3VyZSBhbiB1cHBlciB0aHJlc2hv
-bGQgb24gdGhhdC4gV2hlbiB5b3Ugbm93IGhhdmUgYW4gYXV0b21hdGVkIHdheSAKdG8gbm90aWZ5
-IHlvdSB3aGVuIHRoZSB0aHJlc2hvbGQgaXMgZXhjZWVkZWQsIHlvdSBjYW4gY2hlY2sgd2hhdCB0
-aGF0IApwYXJ0aWN1bGFyIGd1ZXN0IGRpZCB0byByYWlzZSBzbyBtYW55IGV4aXRzLgoKCi4uLiBh
-bmQgSSdtIHN1cmUgdGhlcmUncyByb29tIGZvciBhIGxvdCBtb3JlIHBvdGVudGlhbCBzdGF0cyB0
-aGF0IGNvdWxkIApiZSB1c2VmdWwgdG8gZ2F0aGVyIHRvIGRldGVybWluZSB0aGUgaGVhbHRoIG9m
-IGEgS1ZNIGVudmlyb25tZW50LCBzdWNoIAphcyBhICJ2Y3B1IHN0ZWFsIHRpbWUiIG9uZSBvciBh
-ICJtYXhpbXVtIHRpbWUgYmV0d2VlbiB0d28gVk1FTlRFUlMgd2hpbGUgCnRoZSBndWVzdCB3YXMg
-aW4gcnVubmluZyBzdGF0ZSIuCgpBbGwgb2YgdGhlc2Ugc2hvdWxkIGV2ZW50dWFsbHkgZmVlZCBp
-bnRvIHNvbWV0aGluZyBiaWdnZXIgdGhhdCBjb2xsZWN0cyAKdGhlIG51bWJlcnMgYWNyb3NzIHlv
-dXIgZnVsbCBWTSBmbGVldCwgc28gdGhhdCBhIGh1bWFuIGNhbiB0YWtlIGFjdGlvbnMgCmJhc2Vk
-IG9uIHRoZW0uIEhvd2V2ZXIsIHRoYXQgbWVhbnMgdGhlIHZhbHVlcyBhcmUgbm8gbG9uZ2VyIGRp
-cmVjdGx5IAppbXBhY3RpbmcgYSBodW1hbiwgdGhleSBuZWVkIHRvIGZlZWQgaW50byBtYWNoaW5l
-cy4gQW5kIGZvciB0aGF0LCBleGFjdCwgCmNvbnN0YW50IGlkZW50aWZpZXJzIG1ha2UgbXVjaCBt
-b3JlIHNlbnNlIDopCgoKQWxleAoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkg
-R21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJp
-c3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNo
-dCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDog
-REUgMjg5IDIzNyA4NzkKCgo=
+On 21.01.20 14:42, Janosch Frank wrote:
+> Up to now a secondary cpu could have returned from the function it was
+> executing and ending up somewhere in cstart64.S. This was mostly
+> circumvented by an endless loop in the function that it executed.
+> 
+> Let's add a loop to the end of the cpu setup, so we don't have to rely
+> on added loops in the tests.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/cstart64.S | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 9af6bb3..5fd8d2f 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -162,6 +162,8 @@ smp_cpu_setup_state:
+>  	/* We should only go once through cpu setup and not for every restart */
+>  	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
+>  	br	%r14
+> +	/* If the function returns, just loop here */
+> +0:	j	0
+>  
+>  pgm_int:
+>  	SAVE_REGS
+> 
+
+This patch collides with a patch I have still queued
+
+Author: Janosch Frank <frankja@linux.ibm.com>
+Date:   Wed Dec 11 06:59:22 2019 -0500
+
+    s390x: smp: Use full PSW to bringup new cpu
+    
+    Up to now we ignored the psw mask and only used the psw address when
+    bringing up a new cpu. For DAT we need to also load the mask, so let's
+    do that.
+    
+    Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+    Reviewed-by: David Hildenbrand <david@redhat.com>
+    Message-Id: <20191211115923.9191-2-frankja@linux.ibm.com>
+    Signed-off-by: David Hildenbrand <david@redhat.com>
+
+
+In that patch we use a lpswe to jump to the target code, not a br. So the
+return address will no longer be stored in %14 and this code here would stop working
+AFAIKS.
+
+Shall I drop that patch for now?
+
+-- 
+Thanks,
+
+David / dhildenb
 
