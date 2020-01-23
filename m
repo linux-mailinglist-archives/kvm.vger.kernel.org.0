@@ -2,124 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 662B2146FFD
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 18:47:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92EAE147048
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 19:04:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728984AbgAWRrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jan 2020 12:47:42 -0500
-Received: from mail-vk1-f193.google.com ([209.85.221.193]:34419 "EHLO
-        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728767AbgAWRrm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jan 2020 12:47:42 -0500
-Received: by mail-vk1-f193.google.com with SMTP id w67so1243062vkf.1
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 09:47:41 -0800 (PST)
+        id S1729031AbgAWSEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jan 2020 13:04:42 -0500
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:55609 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728767AbgAWSEl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jan 2020 13:04:41 -0500
+Received: by mail-pg1-f201.google.com with SMTP id v30so2196213pga.22
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 10:04:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Et+LlALPC760oEaRKFNCAz514PMTpmENsjL59cORzxs=;
-        b=Yg8WNVHpsQMcCvRhz3/dXR6PXPJY0KcG3v22GFQFEr+PJVg9hMZ4bvlywMwtQmtaz4
-         w/QMYp4bBgOnV5ltO0fM+DrFOT2DJPBtRJAUAqrGTjfg7anSY/tSyrywIw1KiUMECYUO
-         7xo8lXzri4JuvaqX0SBzfYPJT+Ph/TVID2bECWCi9gU0kk+IhztVbcDtGvOgao+Xj5/O
-         ojQDYehkgGIyQ4N3tf7j30XXUXcYWcykarDx87/pbrbCsh/JcK8DGega++OS9XUJ3Erf
-         1OOdjciGIxbE0skEDX8OoyVV4p0jA9fJJqZ7aRwio/C5DFBvH/iT0GhA/LVQLdtxt1a6
-         QFDQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=kn8HZu/EyvR9ymq67hLBoXpwH5gJWxf8SifOgi6S8zE=;
+        b=gayc+oHAI9zN5b0/03xCzShBxN/WC8D2wZUQzrvrA4a8Ok5/cCHnf7ocuW/udyqRq4
+         qNvLtjz/r0qjh1yMl+DIt1S4o06FzUbNUdkF38Z+c8RTEvh1cChTO05OT/w5Lz9tGbrO
+         wclRK3FhRL9yqoFyuLusmCJ5xdoWnB5shFaIEtDQ4LRKbKzCZndBeju/xwFnze+oxnI5
+         RZC4MZ6u+xrlAxJXHTDlPLLAyt12nO7334cKIbKC5AihX2UgL+VvIipsoK88othnIzKa
+         ZYl515ugP/UefCp2y1q2ADAgQ7RVyxOJETooXL13wpPg57v1hwY/SXmLoKN4fSflTDVI
+         Wjag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Et+LlALPC760oEaRKFNCAz514PMTpmENsjL59cORzxs=;
-        b=SenECVurDuoK7Zhs/qjrhhuddAUfcGCQ+N82E/rAHa6Dc6cXI8HWicuS9vDK7KNSXV
-         9boaiXkfZAD7ZjI+oDQc7uMc4ApSULvfNU+vsWGavc9nIdd1iEPgWS2mi/MBZ7u2STM0
-         LedStj1MrfAPrkh+rcMZ7Sfmh+W5yYKdcZuDJGl7GvDnZQrcPBN1BoMjqXmrwQ2YaRj5
-         ET81ShXpcvOTtq/1aJlxDpZCWR1kzKwoO/l8u8axFhCMHv3gPR+XxiwObNKL94Ahj4Qf
-         bYKlHze+hQWgzNz83mmgDWxk65WCibt+arjGz3U30EFIAaQX3l4468CuMh5V4LKbdjiD
-         cJ8A==
-X-Gm-Message-State: APjAAAVzZTy7rYF3Z9EBxsIDCAIJ6Crb5mLDZCeBJ5REYRlJ1eybYsnY
-        k5VgXMxo/dEnAAgviPiN6Mlr90dRBmfD/3noMA7BqtJJ
-X-Google-Smtp-Source: APXvYqwfTatdEjDSunaT13x4k7lhQ2MYD/2QP+0OJQj1cHdRpQBCSZo2x/ojkpyKiwJE/khU0AODgZc9burCbevj9Og=
-X-Received: by 2002:a1f:db81:: with SMTP id s123mr10783192vkg.45.1579801660728;
- Thu, 23 Jan 2020 09:47:40 -0800 (PST)
-MIME-Version: 1.0
-References: <1579769442-13698-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1579769442-13698-1-git-send-email-pbonzini@redhat.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=kn8HZu/EyvR9ymq67hLBoXpwH5gJWxf8SifOgi6S8zE=;
+        b=tVe3TZ9+XkfDQ/pALY0QVSYcN/XuYbEDvOHrm52yF325ZeeM8RV/8uMgY8JSe5Mi/+
+         p8IyYeJPdNQMtDjtmWG/FbrSBF8VlDVAI8meesHGh5i0qouxosSP2EJ5+Ma+oKz9nGMr
+         S+HqztsOHtSCWJGTV+IHZZY/r/wgYYvvgIcetNW1b6qtkOGL4ILwy/ELXf3YAMgAL7JW
+         MjDsUCY2bmVyjp2h8e/nXRkdhG+7IUdthHLRS7DWaBuXHR/7MOFYiqGFTQSBmSd4MLZo
+         sGnbPn3iwZ98+xLHUotYK5qLkwoEpWi3vzsLJmQ83Q4+z9+O0qvkQSwNK6fGQpfPqM2R
+         ebsQ==
+X-Gm-Message-State: APjAAAWqo69JebGbykSHPHjAif2FoKq/mlJHJDzzr2AvbstI9NX9qrIx
+        T0zqFYMmM4I32r1OlecR+THE+YLxjuxk
+X-Google-Smtp-Source: APXvYqxqrRXE16kM6yIDMn+KPoeZ2CKFEsGQZqIPRn2ZutzCuwTTppZzgh96c6OwNyyUAmd6AOoMidiREkQL
+X-Received: by 2002:a63:3cb:: with SMTP id 194mr5353607pgd.123.1579802681044;
+ Thu, 23 Jan 2020 10:04:41 -0800 (PST)
+Date:   Thu, 23 Jan 2020 10:04:26 -0800
+Message-Id: <20200123180436.99487-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+Subject: [PATCH v4 00/10] Create a userfaultfd demand paging test
 From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 23 Jan 2020 09:47:28 -0800
-Message-ID: <CANgfPd-jqh+BFhFdiNNfx+dS69v02kGucWX=6yMOgUMquHddXA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86: fix overlap between SPTE_MMIO_MASK and generation
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 23, 2020 at 12:50 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The SPTE_MMIO_MASK overlaps with the bits used to track MMIO
-> generation number.  A high enough generation number would overwrite the
-> SPTE_SPECIAL_MASK region and cause the MMIO SPTE to be misinterpreted.
->
-> Likewise, setting bits 52 and 53 would also cause an incorrect generation
-> number to be read from the PTE, though this was partially mitigated by the
-> (useless if it weren't for the bug) removal of SPTE_SPECIAL_MASK from
-> the spte in get_mmio_spte_generation.  Drop that removal, and replace
-> it with a compile-time assertion.
->
-> Fixes: 6eeb4ef049e7 ("KVM: x86: assign two bits to track SPTE kinds")
-> Reported-by: Ben Gardon <bgardon@google.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
+When handling page faults for many vCPUs during demand paging, KVM's MMU
+lock becomes highly contended. This series creates a test with a naive
+userfaultfd based demand paging implementation to demonstrate that
+contention. This test serves both as a functional test of userfaultfd
+and a microbenchmark of demand paging performance with a variable number
+of vCPUs and memory per vCPU.
 
-> ---
->  arch/x86/kvm/mmu/mmu.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 57e4dbddba72..b9052c7ba43d 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -418,22 +418,24 @@ static inline bool is_access_track_spte(u64 spte)
->   * requires a full MMU zap).  The flag is instead explicitly queried when
->   * checking for MMIO spte cache hits.
->   */
-> -#define MMIO_SPTE_GEN_MASK             GENMASK_ULL(18, 0)
-> +#define MMIO_SPTE_GEN_MASK             GENMASK_ULL(17, 0)
->
->  #define MMIO_SPTE_GEN_LOW_START                3
->  #define MMIO_SPTE_GEN_LOW_END          11
->  #define MMIO_SPTE_GEN_LOW_MASK         GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
->                                                     MMIO_SPTE_GEN_LOW_START)
->
-> -#define MMIO_SPTE_GEN_HIGH_START       52
-> -#define MMIO_SPTE_GEN_HIGH_END         61
-> +#define MMIO_SPTE_GEN_HIGH_START       PT64_SECOND_AVAIL_BITS_SHIFT
-> +#define MMIO_SPTE_GEN_HIGH_END         62
->  #define MMIO_SPTE_GEN_HIGH_MASK                GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
->                                                     MMIO_SPTE_GEN_HIGH_START)
-> +
->  static u64 generation_mmio_spte_mask(u64 gen)
->  {
->         u64 mask;
->
->         WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
-> +       BUILD_BUG_ON((MMIO_SPTE_GEN_HIGH_MASK | MMIO_SPTE_GEN_LOW_MASK) & SPTE_SPECIAL_MASK);
->
->         mask = (gen << MMIO_SPTE_GEN_LOW_START) & MMIO_SPTE_GEN_LOW_MASK;
->         mask |= (gen << MMIO_SPTE_GEN_HIGH_START) & MMIO_SPTE_GEN_HIGH_MASK;
-> @@ -444,8 +446,6 @@ static u64 get_mmio_spte_generation(u64 spte)
->  {
->         u64 gen;
->
-> -       spte &= ~shadow_mmio_mask;
-> -
->         gen = (spte & MMIO_SPTE_GEN_LOW_MASK) >> MMIO_SPTE_GEN_LOW_START;
->         gen |= (spte & MMIO_SPTE_GEN_HIGH_MASK) >> MMIO_SPTE_GEN_HIGH_START;
->         return gen;
-> --
-> 1.8.3.1
->
+The test creates N userfaultfd threads, N vCPUs, and a region of memory
+with M pages per vCPU. The N userfaultfd polling threads are each set up
+to serve faults on a region of memory corresponding to one of the vCPUs.
+Each of the vCPUs is then started, and touches each page of its disjoint
+memory region, sequentially. In response to faults, the userfaultfd
+threads copy a static buffer into the guest's memory. This creates a
+worst case for MMU lock contention as we have removed most of the
+contention between the userfaultfd threads and there is no time required
+to fetch the contents of guest memory.
+
+This test was run successfully on Intel Haswell, Broadwell, and
+Cascadelake hosts with a variety of vCPU counts and memory sizes.
+
+This test was adapted from the dirty_log_test.
+
+The series can also be viewed in Gerrit here:
+https://linux-review.googlesource.com/c/virt/kvm/kvm/+/1464
+(Thanks to Dmitry Vyukov <dvyukov@google.com> for setting up the Gerrit
+instance)
+
+v4 (Responding to feedback from Andrew Jones, Peter Xu, and Peter Shier):
+- Tested this revision by running
+  demand_paging_test
+  at each commit in the series on an Intel Haswell machine. Ran
+  demand_paging_test -u -v 8 -b 8M -d 10
+  on the same machine at the last commit in the series.
+- Readded partial aarch64 support, though aarch64 and s390 remain
+  untested
+- Implemented pipefd polling to reduce UFFD thread exit latency
+- Added variable unit input for memory size so users can pass command
+  line arguments of the form -b 24M instead of the raw number or bytes
+- Moved a missing break from a patch later in the series to an earlier
+  one
+- Moved to syncing per-vCPU global variables to guest and looking up
+  per-vcpu arguments based on a single CPU ID passed to each guest
+  vCPU. This allows for future patches to pass more than the supported
+  number of arguments for each arch to the vCPUs.
+- Implemented vcpu_args_set for s390 and aarch64 [UNTESTED]
+- Changed vm_create to always allocate memslot 0 at 4G instead of only
+  when the number of pages required is large.
+- Changed vcpu_wss to vcpu_memory_size for clarity.
+
+Ben Gardon (10):
+  KVM: selftests: Create a demand paging test
+  KVM: selftests: Add demand paging content to the demand paging test
+  KVM: selftests: Add configurable demand paging delay
+  KVM: selftests: Add memory size parameter to the demand paging test
+  KVM: selftests: Pass args to vCPU in global vCPU args struct
+  KVM: selftests: Add support for vcpu_args_set to aarch64 and s390x
+  KVM: selftests: Support multiple vCPUs in demand paging test
+  KVM: selftests: Time guest demand paging
+  KVM: selftests: Stop memslot creation in KVM internal memslot region
+  KVM: selftests: Move memslot 0 above KVM internal memslots
+
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   5 +-
+ .../selftests/kvm/demand_paging_test.c        | 680 ++++++++++++++++++
+ .../testing/selftests/kvm/include/test_util.h |   2 +
+ .../selftests/kvm/lib/aarch64/processor.c     |  33 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  27 +-
+ .../selftests/kvm/lib/s390x/processor.c       |  35 +
+ tools/testing/selftests/kvm/lib/test_util.c   |  61 ++
+ 8 files changed, 839 insertions(+), 5 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/demand_paging_test.c
+ create mode 100644 tools/testing/selftests/kvm/lib/test_util.c
+
+-- 
+2.25.0.341.g760bfbb309-goog
+
