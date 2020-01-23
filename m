@@ -2,97 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0AFB1470CC
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 19:32:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A2DD1470D5
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 19:33:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728831AbgAWScP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jan 2020 13:32:15 -0500
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:34004 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726792AbgAWScP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jan 2020 13:32:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1579804334; x=1611340334;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=2xa9r2C+xBeeJ86aG/9m7hfIYKWMIFAuiJ/h8jAAxYE=;
-  b=HtzG7D29ooctDLQ1zqtIwppscx9rA42b6YqMjMdf6AzDrJnY2sb3RTPp
-   sYetkIQZEynNNOZhkMenLdSi3hU+B+bMlKB2VEzaWmdkORFLbYOEbwFve
-   c+OyzMHrV5k3QIegl9Z3SnRrmQeLK8QS4aCLSlehccGoNx9HFgTMkAaTY
-   M=;
-IronPort-SDR: +2L0xmRrWbvTKQlyaG2z/heQkMzyNdb/uJcJK+pzTnAlUOG9H1za64NWyeaTHG5X0ZMIdkr0M/
- /iRkIh4f4ORg==
-X-IronPort-AV: E=Sophos;i="5.70,354,1574121600"; 
-   d="scan'208";a="20650102"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 23 Jan 2020 18:31:58 +0000
-Received: from EX13MTAUWA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com (Postfix) with ESMTPS id B237728251D;
-        Thu, 23 Jan 2020 18:31:56 +0000 (UTC)
-Received: from EX13D20UWA001.ant.amazon.com (10.43.160.34) by
- EX13MTAUWA001.ant.amazon.com (10.43.160.58) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 23 Jan 2020 18:31:56 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (10.43.161.207) by
- EX13D20UWA001.ant.amazon.com (10.43.160.34) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 23 Jan 2020 18:31:55 +0000
-Received: from uc3ce012741425f.ant.amazon.com (10.28.84.89) by
- mail-relay.amazon.com (10.43.161.249) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Thu, 23 Jan 2020 18:31:54 +0000
-Subject: Re: [PATCH 2/2] kvm: Add ioctl for gathering debug counters
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Graf <graf@amazon.de>,
-        Milan Pandurov <milanpa@amazon.de>, <kvm@vger.kernel.org>
-CC:     <rkrcmar@redhat.com>, <borntraeger@de.ibm.com>
-References: <20200115134303.30668-1-milanpa@amazon.de>
- <18820df0-273a-9592-5018-c50a85a75205@amazon.de>
- <8584d6c2-323c-14e2-39c0-21a47a91bbda@amazon.com>
- <ab84ee05-7e2b-e0cc-6994-fc485012a51a@amazon.de>
- <668ea6d3-06ae-4586-9818-cdea094419fe@redhat.com>
- <e77a2477-6010-ae1d-0afd-0c5498ba2117@amazon.de>
- <30358a22-084c-6b0b-ae67-acfb7e69ba8e@amazon.com>
- <7f206904-be2b-7901-1a88-37ed033b4de3@amazon.de>
- <7e6093f1-1d80-8278-c843-b4425ce098bf@redhat.com>
- <6f13c197-b242-90a5-3f53-b75aa8a0e5aa@amazon.de>
- <b69546be-a25c-bbea-7e37-c07f019dcf85@redhat.com>
- <c3b61fff-b40e-07f8-03c4-b177fbaab1a3@amazon.de>
- <3d3d9374-a92b-0be0-1d6c-82b39fe7ef16@redhat.com>
- <25821210-50c4-93f4-2daf-5b572f0bcf31@amazon.de>
- <2e2cd423-ab6c-87ec-b856-2c7ca191d809@redhat.com>
- <01dc5863-91b4-6ee0-2985-8c2bf41e73e9@amazon.com>
- <f71763ad-2336-0436-39fc-bb476b559eee@redhat.com>
-From:   <milanpa@amazon.com>
-Message-ID: <45329483-5a7c-089e-fa85-4b3ada231493@amazon.com>
-Date:   Thu, 23 Jan 2020 19:31:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1728792AbgAWSdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jan 2020 13:33:39 -0500
+Received: from mga11.intel.com ([192.55.52.93]:12374 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726792AbgAWSdj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jan 2020 13:33:39 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Jan 2020 10:33:38 -0800
+X-IronPort-AV: E=Sophos;i="5.70,354,1574150400"; 
+   d="scan'208";a="220753681"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Jan 2020 10:33:38 -0800
+Message-ID: <3e24a8ad7afe7c2f6ec8ffe7260a3e31bbe41651.camel@linux.intel.com>
+Subject: Re: [PATCH v16.1 0/9] mm / virtio: Provide support for free page
+ reporting
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     Alexander Graf <graf@amazon.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        david@redhat.com, pagupta@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, dave.hansen@intel.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, osalvador@suse.de,
+        "Paterson-Jones, Roland" <rolandp@amazon.com>, hannes@cmpxchg.org,
+        hare@suse.com
+Date:   Thu, 23 Jan 2020 10:33:37 -0800
+In-Reply-To: <ad73c0c8-3a9c-8ffd-9a31-7e9a5cd5f246@amazon.com>
+References: <20200122173040.6142.39116.stgit@localhost.localdomain>
+         <914aa4c3-c814-45e0-830b-02796b00b762@amazon.com>
+         <af0b12780092e0007ec9e6dbfc92bc15b604b8f4.camel@linux.intel.com>
+         <ad73c0c8-3a9c-8ffd-9a31-7e9a5cd5f246@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
 MIME-Version: 1.0
-In-Reply-To: <f71763ad-2336-0436-39fc-bb476b559eee@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMS8yMy8yMCA1OjE1IFBNLCBQYW9sbyBCb256aW5pIHdyb3RlOgo+IE9uIDIzLzAxLzIwIDE2
-OjI3LCBtaWxhbnBhQGFtYXpvbi5jb20gd3JvdGU6Cj4+Pgo+Pj4gUGFvbG8KPj4+Cj4+IEkgYWdy
-ZWUsIGV4dGVuZGluZyB0aGUgQVBJIHdpdGggR0VUX0FWQUlMQUJMRV9PTkVfUkVHUyAoYW5kIHBv
-c3NpYmx5IGEKPj4gYml0bWFzayBhcmd1bWVudCB0byBuYXJyb3cgZG93biB3aGljaCB0eXBlIG9m
-IHJlZ2lzdGVycyB1c2Vyc3BhY2UgaXMKPj4gaW50ZXJlc3RlZCBpbikgaXMgYSBjbGVhbiBzb2x1
-dGlvbi4gV2Ugd29uJ3QgcmVxdWlyZSB1c2Vyc3BhY2UgdG8gcmVseQo+PiBvbiBjb25zdGFudHMg
-aW4gY29tcGlsZSB0aW1lIGlmIGl0IGRvZXNuJ3QgbmVlZCB0by4KPj4KPj4gT25seSBjb25jZXJu
-IGlzIHRoYXQgbm93IHdlIG5lZWQgdG8gaGF2ZSBzb21lIGtpbmQgb2YgZGF0YXN0cnVjdHVyZSBm
-b3IKPj4ga2VlcGluZyB0aGUgbWFwcGluZ3MgYmV0d2VlbiBhbGwgYXZhaWxhYmxlIE9ORV9SRUcg
-SURzIGFuZCB0aGVpcgo+PiBzdHJpbmdzL2Rlc2NyaXB0aW9ucy4gQWRkaXRpb25hbGx5IGVuZm9y
-Y2luZyB0aGF0IG5ld2x5IGFkZGVkIE9ORV9SRUdzCj4+IGFsd2F5cyBnZXQgYWRkZWQgdG8gdGhh
-dCBtYXBwaW5nLCBpcyBhbHNvIG5lY2Vzc2FyeS4KPiBGb3Igbm93IGp1c3QgZG8gdGhlIGltcGxl
-bWVudGF0aW9uIGZvciBWTSBPTkVfUkVHcy4gIFdlJ2xsIHdvcnJ5IGFib3V0Cj4gdGhlIGV4aXN0
-aW5nIFZDUFUgcmVnaXN0ZXJzIGxhdGVyLgo+Cj4gUGFvbG8KPgpTb3VuZHMgZ29vZC4KClRoYW5r
-cyBmb3IgdGhlIGhlbHAsIEkgd2lsbCB1cGRhdGUgdGhlIHBhdGNoIHNvb24uCgpNaWxhbgoKCgoK
-QW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAx
-MTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRo
-YW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIg
-SFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On Thu, 2020-01-23 at 17:54 +0100, Alexander Graf wrote:
+> 
+> On 23.01.20 17:26, Alexander Duyck wrote:
+> > On Thu, 2020-01-23 at 11:20 +0100, Alexander Graf wrote:
+> > > Hi Alex,
+> > > 
+> > > On 22.01.20 18:43, Alexander Duyck wrote:
+> [...]
+> > > > The overall guest size is kept fairly small to only a few GB while the test
+> > > > is running. If the host memory were oversubscribed this patch set should
+> > > > result in a performance improvement as swapping memory in the host can be
+> > > > avoided.
+> > > 
+> > > I really like the approach overall. Voluntarily propagating free memory
+> > > from a guest to the host has been a sore point ever since KVM was
+> > > around. This solution looks like a very elegant way to do so.
+> > > 
+> > > The big piece I'm missing is the page cache. Linux will by default try
+> > > to keep the free list as small as it can in favor of page cache, so most
+> > > of the benefit of this patch set will be void in real world scenarios.
+> > 
+> > Agreed. This is a the next piece of this I plan to work on once this is
+> > accepted. For now the quick and dirty approach is to essentially make use
+> > of the /proc/sys/vm/drop_caches interface in the guest by either putting
+> > it in a cronjob somewhere or to have it after memory intensive workloads.
+> > 
+> > > Traditionally, this was solved by creating pressure from the host
+> > > through virtio-balloon: Exactly the piece that this patch set gets away
+> > > with. I never liked "ballooning", because the host has very limited
+> > > visibility into the actual memory utility of its guests. So leaving the
+> > > decision on how much memory is actually needed at a given point in time
+> > > should ideally stay with the guest.
+> > > 
+> > > What would keep us from applying the page hinting approach to inactive,
+> > > clean page cache pages? With writeback in place as well, we would slowly
+> > > propagate pages from
+> > > 
+> > >     dirty -> clean -> clean, inactive -> free -> host owned
+> > > 
+> > > which gives a guest a natural path to give up "not important" memory.
+> > 
+> > I considered something similar. Basically one thought I had was to
+> > essentially look at putting together some sort of epoch. When the host is
+> > under memory pressure it would need to somehow notify the guest and then
+> > the guest would start moving the epoch forward so that we start evicting
+> > pages out of the page cache when the host is under memory pressure.
+> 
+> I think we want to consider an interface in which the host actively asks 
+> guests to purge pages to be on the same line as swapping: The last line 
+> of defense.
+
+I suppose. The only reason I was thinking that we may want to look at
+doing something like that was to avoid putting pressure on the guest when
+the host doesn't need us to.
+
+> In the normal mode of operation, you still want to shrink down 
+> voluntarily, so that everyone cooperatively tries to make free for new 
+> guests you could potentially run on the same host.
+> 
+> If you start to apply pressure to guests to find out of they might have 
+> some pages to spare, we're almost back to the old style ballooning approach.
+
+Thats true. In addition we avoid possible issues with us trying to flush
+out a bunch of memory from multiple guests as once since they would be
+proactively freeing the memory.
+
+I'm thinking the inactive state could be something similar to MADV_FREE in
+terms of behavior.  If it sits in the queue for long enough we decide
+nobody is using it anymore so it is freed, but if it is accessed it is
+cheap for us to just put it back without much in the way of overhead.
+
+> Btw, have you ever looked at CMM2 [1]? With that, the host can 
+> essentially just "steal" pages from the guest when it needs any, without 
+> the need to execute the guest meanwhile. That means inside the host 
+> swapping path, CMM2 can just evict guest page cache pages as easily as 
+> we evict host page cache pages. To me, that's even more attractive in 
+> the swap / emergency case than an interface which requires the guest to 
+> proactively execute while we are in a low mem situation.
+
+<snip>
+
+> [1] https://www.kernel.org/doc/ols/2006/ols2006v2-pages-321-336.pdf
+
+I hadn't read through this before. If nothing else the verbiage is useful
+since what we are discussing is essentially how to deal with the
+"volatile" pages within the system, the "unused" pages are the ones we
+have reported to the host with the page reporting, and the "stable" pages
+are those pages that have been faulted back into the guest when it
+accessed them.
+
+I can see there would be some advantages to CMM2, however it seems like it
+is adding a significant amount of state to pages since it has to support a
+fairly significant number of states and then there is the added complexity
+for all the transitions in and out of stable from the various states
+depending on how things are being changed.
+
+Do you happen to know if anyone has done any research into how much
+overhead is added with CMM2 enabled? I'd be curious since it seems like
+the paper mentions having to track a signficant number of state
+transitions for the memory throughout the kernel.
 
