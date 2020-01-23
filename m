@@ -2,188 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2130146588
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 11:20:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03F321466C0
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2020 12:32:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727847AbgAWKUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 Jan 2020 05:20:31 -0500
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:32978 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726188AbgAWKUb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 Jan 2020 05:20:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1579774830; x=1611310830;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=P+o6yTH2FOy0MjrPim0GvktpNq0l7p1JzAFu5x01uj8=;
-  b=U9zEmA2kcg5v7EUOGiB1bSGut5lJ9YpHMsPna3jZVWP8B8041t7z9hkj
-   0XEtySHaH8JJYEa1bRVSVrb03VZ1FlkoNB2GJNc3onQeKUNDZoq4flK99
-   I0eSQlafSg78ayg+gUYDv9J9i2IFwX7v20PJEef+RLvPK7a3K3D0TfEBW
-   4=;
-IronPort-SDR: 8GLFTpISfk1UajXOHLhRh1Orm3IHU27tvsEn+qSqrXnmtYmSwQnjmKw+IDFqEWyn6MeBznAHz6
- McE5c0V1+A2A==
-X-IronPort-AV: E=Sophos;i="5.70,353,1574121600"; 
-   d="scan'208";a="12158218"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-22cc717f.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 23 Jan 2020 10:20:18 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2a-22cc717f.us-west-2.amazon.com (Postfix) with ESMTPS id 55612A26ED;
-        Thu, 23 Jan 2020 10:20:16 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 23 Jan 2020 10:20:16 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.176) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 23 Jan 2020 10:20:10 +0000
-Subject: Re: [PATCH v16.1 0/9] mm / virtio: Provide support for free page
- reporting
-To:     Alexander Duyck <alexander.duyck@gmail.com>, <kvm@vger.kernel.org>,
-        <mst@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <willy@infradead.org>, <mhocko@kernel.org>, <linux-mm@kvack.org>,
-        <akpm@linux-foundation.org>, <mgorman@techsingularity.net>,
-        <vbabka@suse.cz>
-CC:     <yang.zhang.wz@gmail.com>, <nitesh@redhat.com>,
-        <konrad.wilk@oracle.com>, <david@redhat.com>, <pagupta@redhat.com>,
-        <riel@surriel.com>, <lcapitulino@redhat.com>,
-        <dave.hansen@intel.com>, <wei.w.wang@intel.com>,
-        <aarcange@redhat.com>, <pbonzini@redhat.com>,
-        <dan.j.williams@intel.com>, <alexander.h.duyck@linux.intel.com>,
-        <osalvador@suse.de>, "Paterson-Jones, Roland" <rolandp@amazon.com>,
-        <hannes@cmpxchg.org>, <hare@suse.com>
-References: <20200122173040.6142.39116.stgit@localhost.localdomain>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <914aa4c3-c814-45e0-830b-02796b00b762@amazon.com>
-Date:   Thu, 23 Jan 2020 11:20:07 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.3.1
+        id S1726590AbgAWLcx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 Jan 2020 06:32:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57436 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726026AbgAWLcw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 Jan 2020 06:32:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579779170;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8xpwabDUT9AeCxzSh2+fjHnI/NjiznPGltneNwagA8c=;
+        b=ieoPRZ0cVZ3EBIJs0Yp2N7yfvuM+I21mfgJ/zGFS9N11+NomZppRQL3r4ou/CK+JcoDf+e
+        WF7td8DhkT3jvKgATEBNuv+6ycGNP+U2wlP7FiX78VNlWW+UMYXywkL1pqYV1rA6mCPFyj
+        TkqIuDpAcTPsGL6qgtB/fN8xTo0+dc8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-9Fm77iSQNKihYoPSgfhODA-1; Thu, 23 Jan 2020 06:32:49 -0500
+X-MC-Unique: 9Fm77iSQNKihYoPSgfhODA-1
+Received: by mail-wm1-f71.google.com with SMTP id n17so466636wmk.1
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2020 03:32:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=8xpwabDUT9AeCxzSh2+fjHnI/NjiznPGltneNwagA8c=;
+        b=tBk8tATfS8n612Q6Pb07+W5la2FTUMEAn+ZOHuwpOKSqrT/funEGA0GWtArbnYnKv6
+         Z0isonPqQh6vIySBVgjts4bziFvceW/VpZ5Gtk4hHkDAsqJ/LipQNgZVPxhPTV+IQUV0
+         TkhfaQ+K71GNRKMX1oLvG+SHS81XxUehIMi199A2gMbY5DlcLLHCeY8vpefVjZKkXSQn
+         zQ+27QxL5iiR1uXjMEKGn1tNrhjMpGPS8nYIcnHabyIEh8MSQ/TsdcsWKvEKY5pE05+R
+         GE6KkpMmsPDNhdwN7cxdmFbzalsGVmZaL3CoepF5fjr/Zv+ue5B0RHBRUpGgmQkhEmRp
+         /VPQ==
+X-Gm-Message-State: APjAAAVUd9JVD/SOCf7xFaOX/Hc9mxGxu341FFIiXKVQd+nNS/Ne5ZT3
+        5GByFAqd5K+CZzfeHIGaR5mzWUb0kJN2y1V1cvIG81HiXQnznUMsArCcYIR5FLS1DefLUaegS1/
+        nhPv0LbQYHS+r
+X-Received: by 2002:adf:fa50:: with SMTP id y16mr16312017wrr.183.1579779167459;
+        Thu, 23 Jan 2020 03:32:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwjx4XjBbNEv6xdmfv7CxRtTLPUvw+HlKG7WH2EnglXtX4rCtufRGwWlTXAZQdTM6mGq1DQjA==
+X-Received: by 2002:adf:fa50:: with SMTP id y16mr16311990wrr.183.1579779167185;
+        Thu, 23 Jan 2020 03:32:47 -0800 (PST)
+Received: from vitty.brq.redhat.com (cst-prg-91-164.cust.vodafone.cz. [46.135.91.164])
+        by smtp.gmail.com with ESMTPSA id o16sm2627249wmc.18.2020.01.23.03.32.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2020 03:32:46 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     mtosatti@redhat.com, stable@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: x86: reorganize pvclock_gtod_data members
+In-Reply-To: <1579702953-24184-2-git-send-email-pbonzini@redhat.com>
+References: <1579702953-24184-1-git-send-email-pbonzini@redhat.com> <1579702953-24184-2-git-send-email-pbonzini@redhat.com>
+Date:   Thu, 23 Jan 2020 12:32:44 +0100
+Message-ID: <87tv4mqug3.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200122173040.6142.39116.stgit@localhost.localdomain>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.176]
-X-ClientProxiedBy: EX13D33UWC003.ant.amazon.com (10.43.162.132) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgQWxleCwKCk9uIDIyLjAxLjIwIDE4OjQzLCBBbGV4YW5kZXIgRHV5Y2sgd3JvdGU6Cj4gVGhp
-cyBzZXJpZXMgcHJvdmlkZXMgYW4gYXN5bmNocm9ub3VzIG1lYW5zIG9mIHJlcG9ydGluZyBmcmVl
-IGd1ZXN0IHBhZ2VzCj4gdG8gYSBoeXBlcnZpc29yIHNvIHRoYXQgdGhlIG1lbW9yeSBhc3NvY2lh
-dGVkIHdpdGggdGhvc2UgcGFnZXMgY2FuIGJlCj4gZHJvcHBlZCBhbmQgcmV1c2VkIGJ5IG90aGVy
-IHByb2Nlc3NlcyBhbmQvb3IgZ3Vlc3RzIG9uIHRoZSBob3N0LiBVc2luZwo+IHRoaXMgaXQgaXMg
-cG9zc2libGUgdG8gYXZvaWQgdW5uZWNlc3NhcnkgSS9PIHRvIGRpc2sgYW5kIGdyZWF0bHkgaW1w
-cm92ZQo+IHBlcmZvcm1hbmNlIGluIHRoZSBjYXNlIG9mIG1lbW9yeSBvdmVyY29tbWl0IG9uIHRo
-ZSBob3N0Lgo+IAo+IFdoZW4gZW5hYmxlZCB3ZSB3aWxsIGJlIHBlcmZvcm1pbmcgYSBzY2FuIG9m
-IGZyZWUgbWVtb3J5IGV2ZXJ5IDIgc2Vjb25kcwo+IHdoaWxlIHBhZ2VzIG9mIHN1ZmZpY2llbnRs
-eSBoaWdoIG9yZGVyIGFyZSBiZWluZyBmcmVlZC4gSW4gZWFjaCBwYXNzIGF0Cj4gbGVhc3Qgb25l
-IHNpeHRlZW50aCBvZiBlYWNoIGZyZWUgbGlzdCB3aWxsIGJlIHJlcG9ydGVkLiBCeSBkb2luZyB0
-aGlzIHdlCj4gYXZvaWQgcmFjaW5nIGFnYWluc3Qgb3RoZXIgdGhyZWFkcyB0aGF0IG1heSBiZSBj
-YXVzaW5nIGEgaGlnaCBhbW91bnQgb2YKPiBtZW1vcnkgY2h1cm4uCj4gCj4gVGhlIGxvd2VzdCBw
-YWdlIG9yZGVyIGN1cnJlbnRseSBzY2FubmVkIHdoZW4gcmVwb3J0aW5nIHBhZ2VzIGlzCj4gcGFn
-ZWJsb2NrX29yZGVyIHNvIHRoYXQgdGhpcyBmZWF0dXJlIHdpbGwgbm90IGludGVyZmVyZSB3aXRo
-IHRoZSB1c2Ugb2YKPiBUcmFuc3BhcmVudCBIdWdlIFBhZ2VzIGluIHRoZSBjYXNlIG9mIHZpcnR1
-YWxpemF0aW9uLgo+IAo+IEN1cnJlbnRseSB0aGlzIGlzIG9ubHkgaW4gdXNlIGJ5IHZpcnRpby1i
-YWxsb29uIGhvd2V2ZXIgdGhlcmUgaXMgdGhlIGhvcGUKPiB0aGF0IGF0IHNvbWUgcG9pbnQgaW4g
-dGhlIGZ1dHVyZSBvdGhlciBoeXBlcnZpc29ycyBtaWdodCBiZSBhYmxlIHRvIG1ha2UKPiB1c2Ug
-b2YgaXQuIEluIHRoZSB2aXJ0aW8tYmFsbG9vbi9RRU1VIGltcGxlbWVudGF0aW9uIHRoZSBoeXBl
-cnZpc29yIGlzCj4gY3VycmVudGx5IHVzaW5nIE1BRFZfRE9OVE5FRUQgdG8gaW5kaWNhdGUgdG8g
-dGhlIGhvc3Qga2VybmVsIHRoYXQgdGhlIHBhZ2UKPiBpcyBjdXJyZW50bHkgZnJlZS4gSXQgd2ls
-bCBiZSB6ZXJvZWQgYW5kIGZhdWx0ZWQgYmFjayBpbnRvIHRoZSBndWVzdCB0aGUKPiBuZXh0IHRp
-bWUgdGhlIHBhZ2UgaXMgYWNjZXNzZWQuCj4gCj4gVG8gdHJhY2sgaWYgYSBwYWdlIGlzIHJlcG9y
-dGVkIG9yIG5vdCB0aGUgVXB0b2RhdGUgZmxhZyB3YXMgcmVwdXJwb3NlZCBhbmQKPiB1c2VkIGFz
-IGEgUmVwb3J0ZWQgZmxhZyBmb3IgQnVkZHkgcGFnZXMuIFdlIHdhbGsgdGhvdWdoIHRoZSBmcmVl
-IGxpc3QKPiBpc29sYXRpbmcgcGFnZXMgYW5kIGFkZGluZyB0aGVtIHRvIHRoZSBzY2F0dGVybGlz
-dCB1bnRpbCB3ZSBlaXRoZXIKPiBlbmNvdW50ZXIgdGhlIGVuZCBvZiB0aGUgbGlzdCwgcHJvY2Vz
-c2VkIGFzIG1hbnkgcGFnZXMgYXMgd2VyZSBsaXN0ZWQgaW4KPiBucl9mcmVlIHByaW9yIHRvIHVz
-IHN0YXJ0aW5nLCBvciBoYXZlIGZpbGxlZCB0aGUgc2NhdHRlcmxpc3Qgd2l0aCBwYWdlcyB0bwo+
-IGJlIHJlcG9ydGVkLiBJZiB3ZSBmaWxsIHRoZSBzY2F0dGVybGlzdCBiZWZvcmUgd2UgcmVhY2gg
-dGhlIGVuZCBvZiB0aGUKPiBsaXN0IHdlIHJvdGF0ZSB0aGUgbGlzdCBzbyB0aGF0IHRoZSBmaXJz
-dCB1bnJlcG9ydGVkIHBhZ2Ugd2UgZW5jb3VudGVyIGlzCj4gbW92ZWQgdG8gdGhlIGhlYWQgb2Yg
-dGhlIGxpc3QgYXMgdGhhdCBpcyB3aGVyZSB3ZSB3aWxsIHJlc3VtZSBhZnRlciB3ZQo+IGhhdmUg
-ZnJlZWQgdGhlIHJlcG9ydGVkIHBhZ2VzIGJhY2sgaW50byB0aGUgdGFpbCBvZiB0aGUgbGlzdC4K
-PiAKPiBCZWxvdyBhcmUgdGhlIHJlc3VsdHMgZnJvbSB2YXJpb3VzIGJlbmNobWFya3MuIEkgcHJp
-bWFyaWx5IGZvY3VzZWQgb24gdHdvCj4gdGVzdHMuIFRoZSBmaXJzdCBpcyB0aGUgd2lsbC1pdC1z
-Y2FsZS9wYWdlX2ZhdWx0MiB0ZXN0LCBhbmQgdGhlIG90aGVyIGlzCj4gYSBtb2RpZmllZCB2ZXJz
-aW9uIG9mIHdpbGwtaXQtc2NhbGUvcGFnZV9mYXVsdDEgdGhhdCB3YXMgZW5hYmxlZCB0byB1c2UK
-PiBUSFAuIEkgZGlkIHRoaXMgYXMgaXQgYWxsb3dzIGZvciBiZXR0ZXIgdmlzaWJpbGl0eSBpbnRv
-IGRpZmZlcmVudCBwYXJ0cwo+IG9mIHRoZSBtZW1vcnkgc3Vic3lzdGVtLiBUaGUgZ3Vlc3QgaXMg
-cnVubmluZyB3aXRoIDMyRyBmb3IgUkFNIG9uIG9uZQo+IG5vZGUgb2YgYSBFNS0yNjMwIHYzLiBU
-aGUgaG9zdCBoYXMgaGFkIHNvbWUgZmVhdHVyZXMgc3VjaCBhcyBDUFUgdHVyYm8KPiBkaXNhYmxl
-ZCBpbiB0aGUgQklPUy4KPiAKPiBUZXN0ICAgICAgICAgICAgICAgICAgIHBhZ2VfZmF1bHQxIChU
-SFApICAgIHBhZ2VfZmF1bHQyCj4gTmFtZSAgICAgICAgICAgIHRhc2tzICBQcm9jZXNzIEl0ZXIg
-IFNUREVWICBQcm9jZXNzIEl0ZXIgIFNUREVWCj4gQmFzZWxpbmUgICAgICAgICAgICAxICAgIDEw
-MTI0MDIuNTAgIDAuMTQlICAgICAzNjE4NTUuMjUgIDAuODElCj4gICAgICAgICAgICAgICAgICAg
-ICAxNiAgICA4ODI3NDU3LjI1ICAwLjA5JSAgICAzMjgyMzQ3LjAwICAwLjM0JQo+IAo+IFBhdGNo
-ZXMgQXBwbGllZCAgICAgMSAgICAxMDA3ODk3LjAwICAwLjIzJSAgICAgMzYxODg3LjAwICAwLjI2
-JQo+ICAgICAgICAgICAgICAgICAgICAgMTYgICAgODc4NDc0MS43NSAgMC4zOSUgICAgMzI0MDY2
-OS4yNSAgMC40OCUKPiAKPiBQYXRjaGVzIEVuYWJsZWQgICAgIDEgICAgMTAxMDIyNy41MCAgMC4z
-OSUgICAgIDM1OTc0OS4yNSAgMC41NiUKPiAgICAgICAgICAgICAgICAgICAgIDE2ICAgIDg3NTYy
-MTkuMDAgIDAuMjQlICAgIDMyMjY2MDguNzUgIDAuOTclCj4gCj4gUGF0Y2hlcyBFbmFibGVkICAg
-ICAxICAgIDEwNTA5ODIuMDAgIDQuMjYlICAgICAzNTc5NjYuMjUgIDAuMTQlCj4gICBwYWdlIHNo
-dWZmbGUgICAgICAxNiAgICA4NjcyNjAxLjI1ICAwLjQ5JSAgICAzMjIzMTc3Ljc1ICAwLjQwJQo+
-IAo+IFBhdGNoZXMgZW5hYmxlZCAgICAgMSAgICAxMDAzMjM4LjAwICAwLjIyJSAgICAgMzYwMjEx
-LjAwICAwLjIyJQo+ICAgc2h1ZmZsZSB3LyBSRkMgICAgMTYgICAgODc2NzAxMC41MCAgMC4zMiUg
-ICAgMzE5OTg3NC4wMCAgMC43MSUKPiAKPiBUaGUgcmVzdWx0cyBhYm92ZSBhcmUgZm9yIGEgYmFz
-ZWxpbmUgd2l0aCBhIGxpbnV4LW5leHQtMjAxOTEyMTkga2VybmVsLAo+IHRoYXQga2VybmVsIHdp
-dGggdGhpcyBwYXRjaCBzZXQgYXBwbGllZCBidXQgcGFnZSByZXBvcnRpbmcgZGlzYWJsZWQgaW4K
-PiB2aXJ0aW8tYmFsbG9vbiwgdGhlIHBhdGNoZXMgYXBwbGllZCBhbmQgcGFnZSByZXBvcnRpbmcg
-ZnVsbHkgZW5hYmxlZCwgdGhlCj4gcGF0Y2hlcyBlbmFibGVkIHdpdGggcGFnZSBzaHVmZmxpbmcg
-ZW5hYmxlZCwgYW5kIHRoZSBwYXRjaGVzIGFwcGxpZWQgd2l0aAo+IHBhZ2Ugc2h1ZmZsaW5nIGVu
-YWJsZWQgYW5kIGFuIFJGQyBwYXRjaCB0aGF0IG1ha2VzIHVzZWQgb2YgTUFEVl9GUkVFIGluCj4g
-UUVNVS4gVGhlc2UgcmVzdWx0cyBpbmNsdWRlIHRoZSBkZXZpYXRpb24gc2VlbiBiZXR3ZWVuIHRo
-ZSBhdmVyYWdlIHZhbHVlCj4gcmVwb3J0ZWQgaGVyZSB2ZXJzdXMgdGhlIGhpZ2ggYW5kL29yIGxv
-dyB2YWx1ZS4gSSBvYnNlcnZlZCB0aGF0IGR1cmluZyB0aGUKPiB0ZXN0IG1lbW9yeSB1c2FnZSBm
-b3IgdGhlIGZpcnN0IHRocmVlIHRlc3RzIG5ldmVyIGRyb3BwZWQgd2hlcmVhcyB3aXRoIHRoZQo+
-IHBhdGNoZXMgZnVsbHkgZW5hYmxlZCB0aGUgVk0gd291bGQgZHJvcCB0byB1c2luZyBvbmx5IGEg
-ZmV3IEdCIG9mIHRoZQo+IGhvc3QncyBtZW1vcnkgd2hlbiBzd2l0Y2hpbmcgZnJvbSBtZW1ob2cg
-dG8gcGFnZSBmYXVsdCB0ZXN0cy4KPiAKPiBBbnkgb2YgdGhlIG92ZXJoZWFkIHZpc2libGUgd2l0
-aCB0aGlzIHBhdGNoIHNldCBlbmFibGVkIHNlZW1zIGR1ZSB0byBwYWdlCj4gZmF1bHRzIGNhdXNl
-ZCBieSBhY2Nlc3NpbmcgdGhlIHJlcG9ydGVkIHBhZ2VzIGFuZCB0aGUgaG9zdCB6ZXJvaW5nIHRo
-ZSBwYWdlCj4gYmVmb3JlIGdpdmluZyBpdCBiYWNrIHRvIHRoZSBndWVzdC4gVGhpcyBvdmVyaGVh
-ZCBpcyBtdWNoIG1vcmUgdmlzaWJsZSB3aGVuCj4gdXNpbmcgVEhQIHRoYW4gd2l0aCBzdGFuZGFy
-ZCA0SyBwYWdlcy4gSW4gYWRkaXRpb24gcGFnZSBzaHVmZmxpbmcgc2VlbWVkIHRvCj4gaW5jcmVh
-c2UgdGhlIGFtb3VudCBvZiBmYXVsdHMgZ2VuZXJhdGVkIGR1ZSB0byBhbiBpbmNyZWFzZSBpbiBt
-ZW1vcnkgY2h1cm4uCj4gVGhlIG92ZXJoZWFkIGlzIHJlZHVjZWQgd2hlbiB1c2luZyBNQURWX0ZS
-RUUgYXMgd2UgY2FuIGF2b2lkIHRoZSBleHRyYQo+IHplcm9pbmcgb2YgdGhlIHBhZ2VzIHdoZW4g
-dGhleSBhcmUgcmVpbnRyb2R1Y2VkIHRvIHRoZSBob3N0LCBhcyBjYW4gYmUgc2Vlbgo+IHdoZW4g
-dGhlIFJGQyBpcyBhcHBsaWVkIHdpdGggc2h1ZmZsaW5nIGVuYWJsZWQuCj4gCj4gVGhlIG92ZXJh
-bGwgZ3Vlc3Qgc2l6ZSBpcyBrZXB0IGZhaXJseSBzbWFsbCB0byBvbmx5IGEgZmV3IEdCIHdoaWxl
-IHRoZSB0ZXN0Cj4gaXMgcnVubmluZy4gSWYgdGhlIGhvc3QgbWVtb3J5IHdlcmUgb3ZlcnN1YnNj
-cmliZWQgdGhpcyBwYXRjaCBzZXQgc2hvdWxkCj4gcmVzdWx0IGluIGEgcGVyZm9ybWFuY2UgaW1w
-cm92ZW1lbnQgYXMgc3dhcHBpbmcgbWVtb3J5IGluIHRoZSBob3N0IGNhbiBiZQo+IGF2b2lkZWQu
-CgoKSSByZWFsbHkgbGlrZSB0aGUgYXBwcm9hY2ggb3ZlcmFsbC4gVm9sdW50YXJpbHkgcHJvcGFn
-YXRpbmcgZnJlZSBtZW1vcnkgCmZyb20gYSBndWVzdCB0byB0aGUgaG9zdCBoYXMgYmVlbiBhIHNv
-cmUgcG9pbnQgZXZlciBzaW5jZSBLVk0gd2FzIAphcm91bmQuIFRoaXMgc29sdXRpb24gbG9va3Mg
-bGlrZSBhIHZlcnkgZWxlZ2FudCB3YXkgdG8gZG8gc28uCgpUaGUgYmlnIHBpZWNlIEknbSBtaXNz
-aW5nIGlzIHRoZSBwYWdlIGNhY2hlLiBMaW51eCB3aWxsIGJ5IGRlZmF1bHQgdHJ5IAp0byBrZWVw
-IHRoZSBmcmVlIGxpc3QgYXMgc21hbGwgYXMgaXQgY2FuIGluIGZhdm9yIG9mIHBhZ2UgY2FjaGUs
-IHNvIG1vc3QgCm9mIHRoZSBiZW5lZml0IG9mIHRoaXMgcGF0Y2ggc2V0IHdpbGwgYmUgdm9pZCBp
-biByZWFsIHdvcmxkIHNjZW5hcmlvcy4KClRyYWRpdGlvbmFsbHksIHRoaXMgd2FzIHNvbHZlZCBi
-eSBjcmVhdGluZyBwcmVzc3VyZSBmcm9tIHRoZSBob3N0IAp0aHJvdWdoIHZpcnRpby1iYWxsb29u
-OiBFeGFjdGx5IHRoZSBwaWVjZSB0aGF0IHRoaXMgcGF0Y2ggc2V0IGdldHMgYXdheSAKd2l0aC4g
-SSBuZXZlciBsaWtlZCAiYmFsbG9vbmluZyIsIGJlY2F1c2UgdGhlIGhvc3QgaGFzIHZlcnkgbGlt
-aXRlZCAKdmlzaWJpbGl0eSBpbnRvIHRoZSBhY3R1YWwgbWVtb3J5IHV0aWxpdHkgb2YgaXRzIGd1
-ZXN0cy4gU28gbGVhdmluZyB0aGUgCmRlY2lzaW9uIG9uIGhvdyBtdWNoIG1lbW9yeSBpcyBhY3R1
-YWxseSBuZWVkZWQgYXQgYSBnaXZlbiBwb2ludCBpbiB0aW1lIApzaG91bGQgaWRlYWxseSBzdGF5
-IHdpdGggdGhlIGd1ZXN0LgoKV2hhdCB3b3VsZCBrZWVwIHVzIGZyb20gYXBwbHlpbmcgdGhlIHBh
-Z2UgaGludGluZyBhcHByb2FjaCB0byBpbmFjdGl2ZSwgCmNsZWFuIHBhZ2UgY2FjaGUgcGFnZXM/
-IFdpdGggd3JpdGViYWNrIGluIHBsYWNlIGFzIHdlbGwsIHdlIHdvdWxkIHNsb3dseSAKcHJvcGFn
-YXRlIHBhZ2VzIGZyb20KCiAgIGRpcnR5IC0+IGNsZWFuIC0+IGNsZWFuLCBpbmFjdGl2ZSAtPiBm
-cmVlIC0+IGhvc3Qgb3duZWQKCndoaWNoIGdpdmVzIGEgZ3Vlc3QgYSBuYXR1cmFsIHBhdGggdG8g
-Z2l2ZSB1cCAibm90IGltcG9ydGFudCIgbWVtb3J5LgoKVGhlIGJpZyBwcm9ibGVtIEkgc2VlIGlz
-IHRoYXQgd2hhdCBJIHJlYWxseSB3YW50IGZyb20gYSB1c2VyJ3MgcG9pbnQgb2YgCnZpZXcgaXMg
-YSB0dW5lYWJsZSB0aGF0IHNheXMgIkF1dG9tYXRpY2FsbHkgZnJlZSBjbGVhbiBwYWdlIGNhY2hl
-IHBhZ2VzIAp0aGF0IHdlcmUgbm90IGFjY2Vzc2VkIGluIHRoZSBsYXN0IFggbWludXRlcyIuIE90
-aGVyd2lzZSB3ZSBtYXkgcnVuIGludG8gCnRoZSByaXNrIG9mIGV2aWN0aW5nIHNvbWUgdGltZXMg
-aW4gdXNlIHBhZ2UgY2FjaGUgcGFnZXMuCgpJIGhhdmUgYSBoYXJkIHRpbWUgZ3Jhc3BpbmcgdGhl
-IG1tIGNvZGUgdG8gdW5kZXJzdGFuZCBob3cgaGFyZCB0aGF0IAp3b3VsZCBiZSB0byBpbXBsZW1l
-bnQgdGhhdCB0aG91Z2ggOikuCgoKQWxleAoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdl
-cm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5n
-OiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRz
-Z2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVz
-dC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> We will need a copy of tk->offs_boot in the next patch.  Store it and
+> cleanup the struct: instead of storing tk->tkr_xxx.base with the tk->offs_boot
+> included, store the raw value in struct pvclock_clock and sum tk->offs_boot
+> in do_monotonic_raw and do_realtime.   tk->tkr_xxx.xtime_nsec also moves
+> to struct pvclock_clock.
+>
+> While at it, fix a (usually harmless) typo in do_monotonic_raw, which
+> was using gtod->clock.shift instead of gtod->raw_clock.shift.
+>
+> Fixes: 53fafdbb8b21f ("KVM: x86: switch KVMCLOCK base to monotonic raw clock")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 29 ++++++++++++-----------------
+>  1 file changed, 12 insertions(+), 17 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 89621025577a..1b4273cce63c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1532,6 +1532,8 @@ struct pvclock_clock {
+>  	u64 mask;
+>  	u32 mult;
+>  	u32 shift;
+> +	u64 base_cycles;
+> +	u64 offset;
+>  };
+>  
+>  struct pvclock_gtod_data {
+> @@ -1540,11 +1542,8 @@ struct pvclock_gtod_data {
+>  	struct pvclock_clock clock; /* extract of a clocksource struct */
+>  	struct pvclock_clock raw_clock; /* extract of a clocksource struct */
+>  
+> -	u64		boot_ns_raw;
+> -	u64		boot_ns;
+> -	u64		nsec_base;
+> +	ktime_t		offs_boot;
+>  	u64		wall_time_sec;
+> -	u64		monotonic_raw_nsec;
+>  };
+>  
+>  static struct pvclock_gtod_data pvclock_gtod_data;
+> @@ -1552,10 +1551,6 @@ struct pvclock_gtod_data {
+>  static void update_pvclock_gtod(struct timekeeper *tk)
+>  {
+>  	struct pvclock_gtod_data *vdata = &pvclock_gtod_data;
+> -	u64 boot_ns, boot_ns_raw;
+> -
+> -	boot_ns = ktime_to_ns(ktime_add(tk->tkr_mono.base, tk->offs_boot));
+> -	boot_ns_raw = ktime_to_ns(ktime_add(tk->tkr_raw.base, tk->offs_boot));
+>  
+>  	write_seqcount_begin(&vdata->seq);
+>  
+> @@ -1565,20 +1560,20 @@ static void update_pvclock_gtod(struct timekeeper *tk)
+>  	vdata->clock.mask		= tk->tkr_mono.mask;
+>  	vdata->clock.mult		= tk->tkr_mono.mult;
+>  	vdata->clock.shift		= tk->tkr_mono.shift;
+> +	vdata->clock.base_cycles	= tk->tkr_mono.xtime_nsec;
+> +	vdata->clock.offset		= tk->tkr_mono.base;
+>  
+>  	vdata->raw_clock.vclock_mode	= tk->tkr_raw.clock->archdata.vclock_mode;
+>  	vdata->raw_clock.cycle_last	= tk->tkr_raw.cycle_last;
+>  	vdata->raw_clock.mask		= tk->tkr_raw.mask;
+>  	vdata->raw_clock.mult		= tk->tkr_raw.mult;
+>  	vdata->raw_clock.shift		= tk->tkr_raw.shift;
+> -
+> -	vdata->boot_ns			= boot_ns;
+> -	vdata->nsec_base		= tk->tkr_mono.xtime_nsec;
+> +	vdata->raw_clock.base_cycles	= tk->tkr_raw.xtime_nsec;
+> +	vdata->raw_clock.offset		= tk->tkr_raw.base;
+
+Likely a personal preference but the suggested naming is a bit
+confusing: we use 'base_cycles' to keep 'xtime_nsec' and 'offset' to
+keep ... 'base'. Not that I think that 'struct timekeeper' is perfect
+but at least it is documented. Should we maybe just stick to it (and
+name 'struct pvclock_clock' fields accordingly?)
+
+>  
+>  	vdata->wall_time_sec            = tk->xtime_sec;
+>  
+> -	vdata->boot_ns_raw		= boot_ns_raw;
+> -	vdata->monotonic_raw_nsec	= tk->tkr_raw.xtime_nsec;
+> +	vdata->offs_boot		= tk->offs_boot;
+>  
+>  	write_seqcount_end(&vdata->seq);
+>  }
+> @@ -2048,10 +2043,10 @@ static int do_monotonic_raw(s64 *t, u64 *tsc_timestamp)
+>  
+>  	do {
+>  		seq = read_seqcount_begin(&gtod->seq);
+> -		ns = gtod->monotonic_raw_nsec;
+> +		ns = gtod->raw_clock.base_cycles;
+>  		ns += vgettsc(&gtod->raw_clock, tsc_timestamp, &mode);
+> -		ns >>= gtod->clock.shift;
+> -		ns += gtod->boot_ns_raw;
+> +		ns >>= gtod->raw_clock.shift;
+> +		ns += ktime_to_ns(ktime_add(gtod->raw_clock.offset, gtod->offs_boot));
+>  	} while (unlikely(read_seqcount_retry(&gtod->seq, seq)));
+>  	*t = ns;
+>  
+> @@ -2068,7 +2063,7 @@ static int do_realtime(struct timespec64 *ts, u64 *tsc_timestamp)
+>  	do {
+>  		seq = read_seqcount_begin(&gtod->seq);
+>  		ts->tv_sec = gtod->wall_time_sec;
+> -		ns = gtod->nsec_base;
+> +		ns = gtod->clock.base_cycles;
+>  		ns += vgettsc(&gtod->clock, tsc_timestamp, &mode);
+>  		ns >>= gtod->clock.shift;
+>  	} while (unlikely(read_seqcount_retry(&gtod->seq, seq)));
+
+FWIW,
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
