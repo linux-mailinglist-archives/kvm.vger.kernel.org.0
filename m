@@ -2,247 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E33FD148BA9
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 17:08:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18473148BEA
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 17:20:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731628AbgAXQIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jan 2020 11:08:19 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21140 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727306AbgAXQIS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jan 2020 11:08:18 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00OFw3ZM048390;
-        Fri, 24 Jan 2020 11:08:17 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xqmjtneb4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jan 2020 11:08:17 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 00OFxr42054486;
-        Fri, 24 Jan 2020 11:08:16 -0500
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xqmjtneab-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jan 2020 11:08:16 -0500
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00OG5D5k028844;
-        Fri, 24 Jan 2020 16:08:15 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma04wdc.us.ibm.com with ESMTP id 2xksn77vwd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 24 Jan 2020 16:08:15 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00OG8EPo55640498
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Jan 2020 16:08:14 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0EE8D6E04E;
-        Fri, 24 Jan 2020 16:08:14 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3D8C86E050;
-        Fri, 24 Jan 2020 16:08:13 +0000 (GMT)
-Received: from [9.160.39.16] (unknown [9.160.39.16])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 24 Jan 2020 16:08:12 +0000 (GMT)
-Subject: Re: [PATCH v1 1/1] vfio-ccw: Don't free channel programs for
- unrelated interrupts
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        "Jason J . Herne" <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200124145455.51181-1-farman@linux.ibm.com>
- <20200124145455.51181-2-farman@linux.ibm.com>
- <20200124163305.3d6f0d47.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <50a0fe00-a7c1-50e4-12f5-412ee7a0e522@linux.ibm.com>
-Date:   Fri, 24 Jan 2020 11:08:12 -0500
+        id S2390327AbgAXQUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jan 2020 11:20:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24582 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388057AbgAXQUa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jan 2020 11:20:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579882828;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=brz54vRaQ0/yHXZ/qNT1DPv+N2eYASm4IBhoPhiL4CI=;
+        b=NT9sfgD+KsW7p9il0wU2RFRClB8KNwnicu9RHlk6MNIG0Q3VkZCVOzTJHqXY5sc6EAxEMH
+        +0mEiWN59P4M+NJJXymIXc4+LRcr5N26eTy8yyKPrqJ3ElE1Sk0mc9Olf8t+mL6pM2nE3F
+        QMacV8kK47WKMv8RYsO/g1/Bltfk/ik=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-186-r2_ovX2VP0e4xPpNy3KAqA-1; Fri, 24 Jan 2020 11:20:24 -0500
+X-MC-Unique: r2_ovX2VP0e4xPpNy3KAqA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D27BF186925C;
+        Fri, 24 Jan 2020 16:20:20 +0000 (UTC)
+Received: from [10.36.116.39] (ovpn-116-39.ams2.redhat.com [10.36.116.39])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9785E10016E8;
+        Fri, 24 Jan 2020 16:20:01 +0000 (UTC)
+Subject: Re: [PATCH v16.1 0/9] mm / virtio: Provide support for free page
+ reporting
+From:   David Hildenbrand <david@redhat.com>
+To:     Alexander Graf <graf@amazon.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com, osalvador@suse.de,
+        "Paterson-Jones, Roland" <rolandp@amazon.com>, hannes@cmpxchg.org,
+        hare@suse.com
+References: <20200122173040.6142.39116.stgit@localhost.localdomain>
+ <914aa4c3-c814-45e0-830b-02796b00b762@amazon.com>
+ <0e2d04a8-af74-e2db-cab0-c67286e33a2a@redhat.com>
+ <5d2daec8-985c-c0a4-4832-8e5493316306@amazon.com>
+ <86dfc549-c5bc-e8b2-644d-4baceb8dc746@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <811dbba2-f542-04da-1a7f-00c3785a39d0@redhat.com>
+Date:   Fri, 24 Jan 2020 17:20:00 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200124163305.3d6f0d47.cohuck@redhat.com>
+In-Reply-To: <86dfc549-c5bc-e8b2-644d-4baceb8dc746@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-24_05:2020-01-24,2020-01-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- clxscore=1015 mlxlogscore=999 suspectscore=2 phishscore=0 adultscore=0
- lowpriorityscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001240130
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/24/20 10:33 AM, Cornelia Huck wrote:
-> On Fri, 24 Jan 2020 15:54:55 +0100
-> Eric Farman <farman@linux.ibm.com> wrote:
+On 24.01.20 14:25, David Hildenbrand wrote:
+> On 23.01.20 15:52, Alexander Graf wrote:
+>>
+>>
+>> On 23.01.20 15:05, David Hildenbrand wrote:
+>>> On 23.01.20 11:20, Alexander Graf wrote:
+>>>> Hi Alex,
+>>>>
+>>>> On 22.01.20 18:43, Alexander Duyck wrote:
+>>>>> This series provides an asynchronous means of reporting free guest pages
+>>>>> to a hypervisor so that the memory associated with those pages can be
+>>>>> dropped and reused by other processes and/or guests on the host. Using
+>>>>> this it is possible to avoid unnecessary I/O to disk and greatly improve
+>>>>> performance in the case of memory overcommit on the host.
+>>>>>
+>>>>> When enabled we will be performing a scan of free memory every 2 seconds
+>>>>> while pages of sufficiently high order are being freed. In each pass at
+>>>>> least one sixteenth of each free list will be reported. By doing this we
+>>>>> avoid racing against other threads that may be causing a high amount of
+>>>>> memory churn.
+>>>>>
+>>>>> The lowest page order currently scanned when reporting pages is
+>>>>> pageblock_order so that this feature will not interfere with the use of
+>>>>> Transparent Huge Pages in the case of virtualization.
+>>>>>
+>>>>> Currently this is only in use by virtio-balloon however there is the hope
+>>>>> that at some point in the future other hypervisors might be able to make
+>>>>> use of it. In the virtio-balloon/QEMU implementation the hypervisor is
+>>>>> currently using MADV_DONTNEED to indicate to the host kernel that the page
+>>>>> is currently free. It will be zeroed and faulted back into the guest the
+>>>>> next time the page is accessed.
+>>>>>
+>>>>> To track if a page is reported or not the Uptodate flag was repurposed and
+>>>>> used as a Reported flag for Buddy pages. We walk though the free list
+>>>>> isolating pages and adding them to the scatterlist until we either
+>>>>> encounter the end of the list, processed as many pages as were listed in
+>>>>> nr_free prior to us starting, or have filled the scatterlist with pages to
+>>>>> be reported. If we fill the scatterlist before we reach the end of the
+>>>>> list we rotate the list so that the first unreported page we encounter is
+>>>>> moved to the head of the list as that is where we will resume after we
+>>>>> have freed the reported pages back into the tail of the list.
+>>>>>
+>>>>> Below are the results from various benchmarks. I primarily focused on two
+>>>>> tests. The first is the will-it-scale/page_fault2 test, and the other is
+>>>>> a modified version of will-it-scale/page_fault1 that was enabled to use
+>>>>> THP. I did this as it allows for better visibility into different parts
+>>>>> of the memory subsystem. The guest is running with 32G for RAM on one
+>>>>> node of a E5-2630 v3. The host has had some features such as CPU turbo
+>>>>> disabled in the BIOS.
+>>>>>
+>>>>> Test                   page_fault1 (THP)    page_fault2
+>>>>> Name            tasks  Process Iter  STDEV  Process Iter  STDEV
+>>>>> Baseline            1    1012402.50  0.14%     361855.25  0.81%
+>>>>>                      16    8827457.25  0.09%    3282347.00  0.34%
+>>>>>
+>>>>> Patches Applied     1    1007897.00  0.23%     361887.00  0.26%
+>>>>>                      16    8784741.75  0.39%    3240669.25  0.48%
+>>>>>
+>>>>> Patches Enabled     1    1010227.50  0.39%     359749.25  0.56%
+>>>>>                      16    8756219.00  0.24%    3226608.75  0.97%
+>>>>>
+>>>>> Patches Enabled     1    1050982.00  4.26%     357966.25  0.14%
+>>>>>    page shuffle      16    8672601.25  0.49%    3223177.75  0.40%
+>>>>>
+>>>>> Patches enabled     1    1003238.00  0.22%     360211.00  0.22%
+>>>>>    shuffle w/ RFC    16    8767010.50  0.32%    3199874.00  0.71%
+>>>>>
+>>>>> The results above are for a baseline with a linux-next-20191219 kernel,
+>>>>> that kernel with this patch set applied but page reporting disabled in
+>>>>> virtio-balloon, the patches applied and page reporting fully enabled, the
+>>>>> patches enabled with page shuffling enabled, and the patches applied with
+>>>>> page shuffling enabled and an RFC patch that makes used of MADV_FREE in
+>>>>> QEMU. These results include the deviation seen between the average value
+>>>>> reported here versus the high and/or low value. I observed that during the
+>>>>> test memory usage for the first three tests never dropped whereas with the
+>>>>> patches fully enabled the VM would drop to using only a few GB of the
+>>>>> host's memory when switching from memhog to page fault tests.
+>>>>>
+>>>>> Any of the overhead visible with this patch set enabled seems due to page
+>>>>> faults caused by accessing the reported pages and the host zeroing the page
+>>>>> before giving it back to the guest. This overhead is much more visible when
+>>>>> using THP than with standard 4K pages. In addition page shuffling seemed to
+>>>>> increase the amount of faults generated due to an increase in memory churn.
+>>>>> The overhead is reduced when using MADV_FREE as we can avoid the extra
+>>>>> zeroing of the pages when they are reintroduced to the host, as can be seen
+>>>>> when the RFC is applied with shuffling enabled.
+>>>>>
+>>>>> The overall guest size is kept fairly small to only a few GB while the test
+>>>>> is running. If the host memory were oversubscribed this patch set should
+>>>>> result in a performance improvement as swapping memory in the host can be
+>>>>> avoided.
+>>>>
+>>>>
+>>>> I really like the approach overall. Voluntarily propagating free memory
+>>>> from a guest to the host has been a sore point ever since KVM was
+>>>> around. This solution looks like a very elegant way to do so.
+>>>>
+>>>> The big piece I'm missing is the page cache. Linux will by default try
+>>>> to keep the free list as small as it can in favor of page cache, so most
+>>>> of the benefit of this patch set will be void in real world scenarios.
+>>>
+>>> One approach is to move (parts of) the page cache from the guest to the
+>>> hypervisor - e.g., using emulated NVDIMM or virtio-pmem.
+>>
+>> Whether you can do that depends heavily on your virtualization 
+>> environment. On a host with single tenant VMs, that's definitely 
+>> feasible. In a Kubernetes environment, it might also be feasible.
 > 
->> With the addition of asynchronous channel programs (HALT or CLEAR
->> SUBCHANNEL instructions), the hardware can receive interrupts that
->> are not related to any channel program currently active.  An attempt
->> is made to ensure that only associated resources are freed, but the
->> host can fail in unpleasant ways:
->>
->> [ 1051.330289] Unable to handle kernel pointer dereference in virtual kernel address space
->> [ 1051.330360] Failing address: c880003d16572000 TEID: c880003d16572803
->> [ 1051.330365] Fault in home space mode while using kernel ASCE.
->> [ 1051.330372] AS:00000000fde9c007 R3:0000000000000024
->> ...snip...
->> [ 1051.330539]  [<00000000fccbd33e>] __kmalloc+0xd6/0x3d8
->> [ 1051.330543] ([<00000000fccbd514>] __kmalloc+0x2ac/0x3d8)
->> [ 1051.330550]  [<000003ff801452b4>] cp_prefetch+0xc4/0x3b8 [vfio_ccw]
->> [ 1051.330554]  [<000003ff801471e4>] fsm_io_request+0x2d4/0x7b8 [vfio_ccw]
->> [ 1051.330559]  [<000003ff80145d9c>] vfio_ccw_mdev_write+0x17c/0x300 [vfio_ccw]
->> [ 1051.330564]  [<00000000fccf0d20>] vfs_write+0xb0/0x1b8
->> [ 1051.330568]  [<00000000fccf1236>] ksys_pwrite64+0x7e/0xb8
->> [ 1051.330574]  [<00000000fd4524c0>] system_call+0xdc/0x2d8
->>
->> The problem is corruption of the dma-kmalloc-8 slab [1], if an interrupt
->> occurs for a CLEAR or HALT that is not obviously associated with the
->> current channel program.  If the channel_program struct is freed AND
->> another interrupt for that I/O occurs, then this may occur:
->>
->> 583.612967 00          cp_prefetch  NEW SSCH
->> 583.613180 03 vfio_ccw_sch_io_todo  orb.cpa=03012690 irb.cpa=03012698
->>                                     ccw=2704004203015600 *cda=1955d8fb8
->>                                     irb: fctl=4 actl=0 stctl=7
->> 587.039292 04          cp_prefetch  NEW SSCH
->> 587.039296 01 vfio_ccw_sch_io_todo  orb.cpa=7fe209f0 irb.cpa=03012698
->>                                     ccw=3424000c030a4068 *cda=1999e9cf0
->>                                     irb: fctl=2 actl=0 stctl=1
->> 587.039505 01 vfio_ccw_sch_io_todo  orb.cpa=7fe209f0 irb.cpa=7fe209f8
->>                                     ccw=3424000c030a4068 *cda=0030a4070
->>                                     irb: fctl=4 actl=0 stctl=7
->>
->> Note how the last vfio_ccw_sch_io_todo() call has a ccw.cda that is
->> right next to its supposed IDAW, compared to the previous one?  That
->> is the result of the previous one freeing the cp (and its IDAL), and
->> kfree writing the next available address at the beginning of the
->> newly released memory.  When the channel goes to store data, it
->> believes the IDAW is valid and overwrites that pointer and causes
->> kmalloc to fail some time later.
->>
->> Since the vfio-ccw interrupt handler walks the list of ccwchain structs
->> to determine if the guest SCSW needs to be updated, it can be changed
->> to indicate whether the interrupt points within the channel_program.
->> If yes, then the channel_program is valid and its resources can be freed.
->> It not, then another interrupt is expected to do that later.
->>
->> [1] It could be other dma-kmalloc-xxx slabs; this just happens to be the
->> one driven most frequently in my testing.
->>
->> Fixes: f4c9939433bd ("vfio-ccw: Don't call cp_free if we are processing a channel program")
->> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->> ---
->>  drivers/s390/cio/vfio_ccw_cp.c  | 11 +++++++++--
->>  drivers/s390/cio/vfio_ccw_cp.h  |  2 +-
->>  drivers/s390/cio/vfio_ccw_drv.c |  4 ++--
->>  3 files changed, 12 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
->> index 3645d1720c4b..2d942433baf9 100644
->> --- a/drivers/s390/cio/vfio_ccw_cp.c
->> +++ b/drivers/s390/cio/vfio_ccw_cp.c
->> @@ -803,15 +803,19 @@ union orb *cp_get_orb(struct channel_program *cp, u32 intparm, u8 lpm)
->>   *
->>   * This function updates @scsw->cpa to its coressponding guest physical
->>   * address.
->> + *
->> + * Returns true if the channel program address in the irb was found
->> + * within the chain of CCWs for this channel program.
->>   */
->> -void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
->> +bool cp_update_scsw(struct channel_program *cp, union scsw *scsw)
->>  {
->>  	struct ccwchain *chain;
->>  	u32 cpa = scsw->cmd.cpa;
->>  	u32 ccw_head;
->> +	bool within_chain = false;
->>  
->>  	if (!cp->initialized)
->> -		return;
->> +		return false;
->>  
->>  	/*
->>  	 * LATER:
->> @@ -833,11 +837,14 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
->>  			 * head gets us the guest cpa.
->>  			 */
->>  			cpa = chain->ch_iova + (cpa - ccw_head);
->> +			within_chain = true;
->>  			break;
->>  		}
->>  	}
->>  
->>  	scsw->cmd.cpa = cpa;
-> 
-> Looking at this, I'm wondering why we would want to update the cpa if
-> !within_chain. But I'm probably too tired to review this properly
-> today...
+> I would be interesting in which environments this is an actual problem
+> that can't be solved in the hypervisor (e.g., see below).
 
-We probably don't, it's just what happens today and I didn't want to be
-too disruptive (yet)  :)
+Okay, as Alex told me offline, (somewhat obvious) environments are where
+the hypervisor page cache is not involved (e.g., vfio etc.)
 
-> 
->> +
->> +	return within_chain;
->>  }
->>  
->>  /**
->> diff --git a/drivers/s390/cio/vfio_ccw_cp.h b/drivers/s390/cio/vfio_ccw_cp.h
->> index ba31240ce965..a4cb6527bd4e 100644
->> --- a/drivers/s390/cio/vfio_ccw_cp.h
->> +++ b/drivers/s390/cio/vfio_ccw_cp.h
->> @@ -47,7 +47,7 @@ extern int cp_init(struct channel_program *cp, struct device *mdev,
->>  extern void cp_free(struct channel_program *cp);
->>  extern int cp_prefetch(struct channel_program *cp);
->>  extern union orb *cp_get_orb(struct channel_program *cp, u32 intparm, u8 lpm);
->> -extern void cp_update_scsw(struct channel_program *cp, union scsw *scsw);
->> +extern bool cp_update_scsw(struct channel_program *cp, union scsw *scsw);
->>  extern bool cp_iova_pinned(struct channel_program *cp, u64 iova);
->>  
->>  #endif
->> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
->> index e401a3d0aa57..a8ab256a217b 100644
->> --- a/drivers/s390/cio/vfio_ccw_drv.c
->> +++ b/drivers/s390/cio/vfio_ccw_drv.c
->> @@ -90,8 +90,8 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
->>  	is_final = !(scsw_actl(&irb->scsw) &
->>  		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
->>  	if (scsw_is_solicited(&irb->scsw)) {
->> -		cp_update_scsw(&private->cp, &irb->scsw);
->> -		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
->> +		if (cp_update_scsw(&private->cp, &irb->scsw) &&
->> +		    is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
-> 
-> ...but I still wonder why is_final is not catching non-ssch related
-> interrupts, as I thought it would. We might want to adapt that check,
-> instead. (Or was the scsw_is_solicited() check supposed to catch that?
-> As said, too tired right now...)
+-- 
+Thanks,
 
-I had looked at the (un)solicited bits at one point, and saw very few
-unsolicited interrupts.  The ones that did show up didn't appear to
-affect things in the way that would cause the problems I'm seeing.
+David / dhildenb
 
-As for is_final...  That POPS table states that for "status pending
-[alone] after termination of HALT or CLEAR ... cpa is unpredictable",
-which is what happens here.  In the example above, the cpa is the same
-as the previous (successful) interrupt, and thus unrelated to the
-current chain.  Perhaps is_final needs to check that the function
-control in the interrupt is for a start?
-
-I will keep pondering the bit-checking before I hit my end of day.  Have
-a fine weekend!
-
-> 
->>  			cp_free(&private->cp);
->>  	}
->>  	mutex_lock(&private->io_mutex);
-> 
