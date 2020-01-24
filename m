@@ -2,155 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 368C41479F5
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 10:03:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3EC3147AA0
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 10:37:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730155AbgAXJDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jan 2020 04:03:34 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41269 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730154AbgAXJDd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jan 2020 04:03:33 -0500
+        id S1729714AbgAXJf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jan 2020 04:35:58 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37133 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726080AbgAXJf6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jan 2020 04:35:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579856612;
+        s=mimecast20190719; t=1579858556;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cGV03so4TJUVNxTHBPjUgBHf9u2Qt26G8+DPtD3dDMU=;
-        b=hf4Zu9Ak8MxJ2PtzIsoKG/ZCw/SynLVpQ8rUYBXouyLLCsc6VzjdUsBrjiiKExUl5b2sla
-        6a1+RwAmvAuorztGm4ysSmquhP8fU7RGPtAy5dVQtJKRnYBahekvyMvdq7nRUbdH+6EDuR
-        9YJM2lyAuW5ehVaOcCfmyzlQGphcAGE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-KpipDcIeMPqE0I6OtTwmuQ-1; Fri, 24 Jan 2020 04:03:27 -0500
-X-MC-Unique: KpipDcIeMPqE0I6OtTwmuQ-1
-Received: by mail-wr1-f70.google.com with SMTP id i9so860343wru.1
-        for <kvm@vger.kernel.org>; Fri, 24 Jan 2020 01:03:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cGV03so4TJUVNxTHBPjUgBHf9u2Qt26G8+DPtD3dDMU=;
-        b=m8Uvqbo/8sQFodl9XxVY/8JW0U/A9waEv7Gp/s1IU37rqKDd3gXn2QMMTegAZUDrXC
-         UQ95VJJ9iW3ffZB0TapQmimyJdVRuq4TMc9NPbDhu9xxvnYgXENc8jJ5XAwUH6p1goO1
-         pQJkzvzFZ4wwiXmvEubpLTnKhgleXXbief18ppXrS0zjwMg/DnMle86MVWGjsJdmA89p
-         farkLZUNpjc5UxgpsUwj6Zwi21n8qQY/vUWuI7nxLu85gko9eSPzLYPYsWgtpGSeM9Zi
-         6Bo0mzpT2XIhHeY5SXkAJE2Tgo7Or4TeLQ3ofJfxb64QeXbfymOeOdsNUmXDhUmUS8Hp
-         Ih+A==
-X-Gm-Message-State: APjAAAUo42LqPPThStgEqvkQbFUygIp+iAxfj0TXT+rHI3PEwj5ymTf6
-        JQSpRUNW+Tblk0SFvzxsBKgbOXhHtBhYMOdPAqK07+w2R+WSkwzMrK7NCdMMEtJRZIyfWnZf6k7
-        fs0dixGB+L+Uf
-X-Received: by 2002:adf:e984:: with SMTP id h4mr3097041wrm.275.1579856606061;
-        Fri, 24 Jan 2020 01:03:26 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwVym38FHLzxAKJjxh+pY7fa6l2PaOb5xGqMX5YB5NZ26ONISPMQJkKezf+m5gpTKXuBthv+A==
-X-Received: by 2002:adf:e984:: with SMTP id h4mr3097015wrm.275.1579856605784;
-        Fri, 24 Jan 2020 01:03:25 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:b8fe:679e:87eb:c059? ([2001:b07:6468:f312:b8fe:679e:87eb:c059])
-        by smtp.gmail.com with ESMTPSA id x10sm6418162wrv.60.2020.01.24.01.03.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Jan 2020 01:03:25 -0800 (PST)
-Subject: Re: [PATCH v4 00/10] Create a userfaultfd demand paging test
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc:     Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>
+        bh=KkR9XsyYszWewqqmOrVzZ1ik4TqqddD7Z9JTAAFoEcA=;
+        b=IBmc5q1wcP1F7aKhwG108GEyx/J3ix5QqeSus0dGe1VzSQ9lmiknffAu8PyEhMcXLo9VF+
+        CO5cQLsyJUetR6XRFfcHttpYnC/21kUdLMwL55wu85GFtNqt0WstnlRe8NcTmV75D60kds
+        YNQ6O6gVK0XFOrGsObg5a+l14lEIEvo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-OIjQAVdYPbepnMZWON9ngw-1; Fri, 24 Jan 2020 04:35:52 -0500
+X-MC-Unique: OIjQAVdYPbepnMZWON9ngw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84FB28C5C9B;
+        Fri, 24 Jan 2020 09:35:50 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EA1A6863BC;
+        Fri, 24 Jan 2020 09:35:45 +0000 (UTC)
+Date:   Fri, 24 Jan 2020 10:35:43 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Marc Zyngier <Marc.Zyngier@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: Re: [PATCH v4 06/10] KVM: selftests: Add support for vcpu_args_set
+ to aarch64 and s390x
+Message-ID: <20200124093543.m5oqo7fnjnc2scko@kamzik.brq.redhat.com>
 References: <20200123180436.99487-1-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b00b37f7-ab2e-ce8a-da7e-7530f74ce3f4@redhat.com>
-Date:   Fri, 24 Jan 2020 10:03:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ <20200123180436.99487-7-bgardon@google.com>
+ <4dbb6d1b-3162-d9b3-4ebb-5e4061776bb6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200123180436.99487-1-bgardon@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4dbb6d1b-3162-d9b3-4ebb-5e4061776bb6@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/01/20 19:04, Ben Gardon wrote:
-> When handling page faults for many vCPUs during demand paging, KVM's MMU
-> lock becomes highly contended. This series creates a test with a naive
-> userfaultfd based demand paging implementation to demonstrate that
-> contention. This test serves both as a functional test of userfaultfd
-> and a microbenchmark of demand paging performance with a variable number
-> of vCPUs and memory per vCPU.
+On Fri, Jan 24, 2020 at 10:03:08AM +0100, Paolo Bonzini wrote:
+> CCing Marc, Conny and Christian (plus Thomas and Drew who were already
+> in the list) for review.
 > 
-> The test creates N userfaultfd threads, N vCPUs, and a region of memory
-> with M pages per vCPU. The N userfaultfd polling threads are each set up
-> to serve faults on a region of memory corresponding to one of the vCPUs.
-> Each of the vCPUs is then started, and touches each page of its disjoint
-> memory region, sequentially. In response to faults, the userfaultfd
-> threads copy a static buffer into the guest's memory. This creates a
-> worst case for MMU lock contention as we have removed most of the
-> contention between the userfaultfd threads and there is no time required
-> to fetch the contents of guest memory.
+> Thanks,
 > 
-> This test was run successfully on Intel Haswell, Broadwell, and
-> Cascadelake hosts with a variety of vCPU counts and memory sizes.
+> Paolo
 > 
-> This test was adapted from the dirty_log_test.
-> 
-> The series can also be viewed in Gerrit here:
-> https://linux-review.googlesource.com/c/virt/kvm/kvm/+/1464
-> (Thanks to Dmitry Vyukov <dvyukov@google.com> for setting up the Gerrit
-> instance)
-> 
-> v4 (Responding to feedback from Andrew Jones, Peter Xu, and Peter Shier):
-> - Tested this revision by running
->   demand_paging_test
->   at each commit in the series on an Intel Haswell machine. Ran
->   demand_paging_test -u -v 8 -b 8M -d 10
->   on the same machine at the last commit in the series.
-> - Readded partial aarch64 support, though aarch64 and s390 remain
->   untested
-> - Implemented pipefd polling to reduce UFFD thread exit latency
-> - Added variable unit input for memory size so users can pass command
->   line arguments of the form -b 24M instead of the raw number or bytes
-> - Moved a missing break from a patch later in the series to an earlier
->   one
-> - Moved to syncing per-vCPU global variables to guest and looking up
->   per-vcpu arguments based on a single CPU ID passed to each guest
->   vCPU. This allows for future patches to pass more than the supported
->   number of arguments for each arch to the vCPUs.
-> - Implemented vcpu_args_set for s390 and aarch64 [UNTESTED]
-> - Changed vm_create to always allocate memslot 0 at 4G instead of only
->   when the number of pages required is large.
-> - Changed vcpu_wss to vcpu_memory_size for clarity.
-> 
-> Ben Gardon (10):
->   KVM: selftests: Create a demand paging test
->   KVM: selftests: Add demand paging content to the demand paging test
->   KVM: selftests: Add configurable demand paging delay
->   KVM: selftests: Add memory size parameter to the demand paging test
->   KVM: selftests: Pass args to vCPU in global vCPU args struct
->   KVM: selftests: Add support for vcpu_args_set to aarch64 and s390x
->   KVM: selftests: Support multiple vCPUs in demand paging test
->   KVM: selftests: Time guest demand paging
->   KVM: selftests: Stop memslot creation in KVM internal memslot region
->   KVM: selftests: Move memslot 0 above KVM internal memslots
-> 
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   5 +-
->  .../selftests/kvm/demand_paging_test.c        | 680 ++++++++++++++++++
->  .../testing/selftests/kvm/include/test_util.h |   2 +
->  .../selftests/kvm/lib/aarch64/processor.c     |  33 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  27 +-
->  .../selftests/kvm/lib/s390x/processor.c       |  35 +
->  tools/testing/selftests/kvm/lib/test_util.c   |  61 ++
->  8 files changed, 839 insertions(+), 5 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/demand_paging_test.c
->  create mode 100644 tools/testing/selftests/kvm/lib/test_util.c
-> 
+> On 23/01/20 19:04, Ben Gardon wrote:
+> > Currently vcpu_args_set is only implemented for x86. This makes writing
+> > tests with multiple vCPUs difficult as each guest vCPU must either a.)
+> > do the same thing or b.) derive some kind of unique token from it's
+> > registers or the architecture. To simplify the process of writing tests
+> > with multiple vCPUs for s390 and aarch64, add set args functions for
+> > those architectures.
 
-Queued patches 1-9, thanks.
+It'd be nice to keep the separate architecture changes in separate
+patches. Otherwise I can't really give an r-b.
 
-Paolo
+> > 
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > ---
+> >  .../selftests/kvm/lib/aarch64/processor.c     | 33 +++++++++++++++++
+> >  .../selftests/kvm/lib/s390x/processor.c       | 35 +++++++++++++++++++
+> >  2 files changed, 68 insertions(+)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> > index 86036a59a668e..a2ff90a75f326 100644
+> > --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> > @@ -333,3 +333,36 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+> >  {
+> >  	aarch64_vcpu_add_default(vm, vcpuid, NULL, guest_code);
+> >  }
+> > +
+> > +/* VM VCPU Args Set
+> > + *
+> > + * Input Args:
+> > + *   vm - Virtual Machine
+> > + *   vcpuid - VCPU ID
+> > + *   num - number of arguments
+> > + *   ... - arguments, each of type uint64_t
+> > + *
+> > + * Output Args: None
+> > + *
+> > + * Return: None
+> > + *
+> > + * Sets the first num function input arguments to the values
+> > + * given as variable args.  Each of the variable args is expected to
+> > + * be of type uint64_t. The registers set by this function are r0-r7.
+> > + */
+
+lib/aarch64/processor.c so far doesn't have big function headers like
+this. Also, since this function is common for all architectures [now],
+I feel like the documentation should be in common code - so in the header
+file.
+
+> > +void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
+> > +{
+> > +	va_list ap;
+> > +
+> > +	TEST_ASSERT(num >= 1 && num <= 8, "Unsupported number of args,\n"
+> > +		    "  num: %u\n",
+> > +		    num);
+
+Weird line breaking. I see it came from the x86 implementation, but it's
+weird there too... Personally I'd just put it all on one line, because
+my vt100 died two decades ago.
+
+> > +
+> > +	va_start(ap, num);
+> > +
+> > +	for (i = 0; i < num; i++)
+> > +		set_reg(vm, vcpuid, ARM64_CORE_REG(regs.regs[num]),
+                                                             ^^ should be 'i'
+
+> > +			va_arg(ap, uint64_t));
+
+nit: I'd use {} because of the line break. Or just not break the line and
+bust the 80 char "limit" (RIP vt100).
+
+Thanks,
+drew
+
+> > +
+> > +	va_end(ap);
+> > +}
+> > diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
+> > index 32a02360b1eb0..680f37be9dbc9 100644
+> > --- a/tools/testing/selftests/kvm/lib/s390x/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
+> > @@ -269,6 +269,41 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+> >  	run->psw_addr = (uintptr_t)guest_code;
+> >  }
+> >  
+> > +/* VM VCPU Args Set
+> > + *
+> > + * Input Args:
+> > + *   vm - Virtual Machine
+> > + *   vcpuid - VCPU ID
+> > + *   num - number of arguments
+> > + *   ... - arguments, each of type uint64_t
+> > + *
+> > + * Output Args: None
+> > + *
+> > + * Return: None
+> > + *
+> > + * Sets the first num function input arguments to the values
+> > + * given as variable args.  Each of the variable args is expected to
+> > + * be of type uint64_t. The registers set by this function are r2-r6.
+> > + */
+> > +void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
+> > +{
+> > +	va_list ap;
+> > +	struct kvm_regs regs;
+> > +
+> > +	TEST_ASSERT(num >= 1 && num <= 5, "Unsupported number of args,\n"
+> > +		    "  num: %u\n",
+> > +		    num);
+> > +
+> > +	va_start(ap, num);
+> > +	vcpu_regs_get(vm, vcpuid, &regs);
+> > +
+> > +	for (i = 0; i < num; i++)
+> > +		regs.gprs[i + 2] = va_arg(ap, uint64_t);
+> > +
+> > +	vcpu_regs_set(vm, vcpuid, &regs);
+> > +	va_end(ap);
+> > +}
+> > +
+> >  void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
+> >  {
+> >  	struct vcpu *vcpu = vm->vcpu_head;
+> > 
+> 
 
