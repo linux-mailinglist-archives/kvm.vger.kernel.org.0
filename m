@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A54A147965
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 09:28:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C971514797B
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 09:38:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729366AbgAXI2H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jan 2020 03:28:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55004 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725843AbgAXI2H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jan 2020 03:28:07 -0500
+        id S1729384AbgAXIiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jan 2020 03:38:13 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48853 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725843AbgAXIiN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jan 2020 03:38:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579854485;
+        s=mimecast20190719; t=1579855091;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=XysGKl8wSy3ACF+TGJ2RQ77WThxpttNsPExhz9CTm5Q=;
-        b=IMaohlhhsjtEl5vapXD1JmO4EkwnL1une3LKM+K/SG6r8ml+A5mU8aAmqgLVSWPWaHIOaZ
-        //blxslI+4LR339+0mLk0zA/VhORHfYvDmGQQqgKzqc6C+6NRUQqDrzosrjdtwzKtNu+8S
-        O729BAIxFceY1mwnK37s93dHuMc0al8=
+        bh=vE6mP/lD7oC8QHJwMnhuQZpixan3XCyVM2MFPi6yK7M=;
+        b=FVoJlNmBhfh9TCuq4V7onDGb2yzj6i723aJ1dQ9NWhmuisbGk/W9OrN+82wHlU4yx0p1Zb
+        2ANiPCxcD1v2eIJC4WhHRSNmIPp3NWewBJG/bLXcyY6Ox/IQ0vNRmFN9pNENamZBrwhY/x
+        E2kycnDhi57c+ijGnWtbi/lRL3RvVfA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-dThhH9DwN16VXoHCqI7Y4g-1; Fri, 24 Jan 2020 03:28:04 -0500
-X-MC-Unique: dThhH9DwN16VXoHCqI7Y4g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-151-zO7VIg5tMG2ovu90z1tKlA-1; Fri, 24 Jan 2020 03:38:09 -0500
+X-MC-Unique: zO7VIg5tMG2ovu90z1tKlA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25F2D18C35A0;
-        Fri, 24 Jan 2020 08:28:03 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 635B714E3;
+        Fri, 24 Jan 2020 08:38:08 +0000 (UTC)
 Received: from [10.36.117.150] (ovpn-117-150.ams2.redhat.com [10.36.117.150])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A51728996;
-        Fri, 24 Jan 2020 08:28:01 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 06DC185784;
+        Fri, 24 Jan 2020 08:38:06 +0000 (UTC)
 Subject: Re: [kvm-unit-tests PATCH v4 2/9] s390x: smp: Only use smp_cpu_setup
  once
 From:   David Hildenbrand <david@redhat.com>
@@ -44,6 +44,7 @@ References: <20200121134254.4570-1-frankja@linux.ibm.com>
  <ef7894ff-4179-6730-ce28-c48e7730eff8@redhat.com>
  <e09c42a7-279a-7e8b-8241-26c69940cdd0@linux.ibm.com>
  <9a17ce2d-bfce-0a1f-dfa7-3d798af4d5ab@redhat.com>
+ <b16cbc73-20b2-4955-52a7-1b133aa33cc4@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -88,194 +89,220 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <b16cbc73-20b2-4955-52a7-1b133aa33cc4@redhat.com>
-Date:   Fri, 24 Jan 2020 09:28:00 +0100
+Message-ID: <8deec98c-d384-bc2e-2790-7b47fcfd2d62@redhat.com>
+Date:   Fri, 24 Jan 2020 09:38:06 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <9a17ce2d-bfce-0a1f-dfa7-3d798af4d5ab@redhat.com>
+In-Reply-To: <b16cbc73-20b2-4955-52a7-1b133aa33cc4@redhat.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23.01.20 14:56, David Hildenbrand wrote:
-> On 23.01.20 14:54, Janosch Frank wrote:
->> On 1/23/20 2:45 PM, David Hildenbrand wrote:
->>> On 21.01.20 14:42, Janosch Frank wrote:
->>>> Let's stop and start instead of using setup to run a function on a
->>>> cpu.
+On 24.01.20 09:28, David Hildenbrand wrote:
+> On 23.01.20 14:56, David Hildenbrand wrote:
+>> On 23.01.20 14:54, Janosch Frank wrote:
+>>> On 1/23/20 2:45 PM, David Hildenbrand wrote:
+>>>> On 21.01.20 14:42, Janosch Frank wrote:
+>>>>> Let's stop and start instead of using setup to run a function on a
+>>>>> cpu.
+>>>>>
+>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>>>> Acked-by: David Hildenbrand <david@redhat.com>
+>>>>> ---
+>>>>>  s390x/smp.c | 21 ++++++++++++++-------
+>>>>>  1 file changed, 14 insertions(+), 7 deletions(-)
+>>>>>
+>>>>> diff --git a/s390x/smp.c b/s390x/smp.c
+>>>>> index e37eb56..3e8cf3e 100644
+>>>>> --- a/s390x/smp.c
+>>>>> +++ b/s390x/smp.c
+>>>>> @@ -53,7 +53,7 @@ static void test_start(void)
+>>>>>  	psw.addr =3D (unsigned long)test_func;
+>>>>> =20
+>>>>>  	set_flag(0);
+>>>>> -	smp_cpu_setup(1, psw);
+>>>>> +	smp_cpu_start(1, psw);
+>>>>>  	wait_for_flag();
+>>>>>  	report(1, "start");
+>>>>>  }
+>>>>> @@ -109,6 +109,7 @@ static void test_store_status(void)
+>>>>>  	report(1, "status written");
+>>>>>  	free_pages(status, PAGE_SIZE * 2);
+>>>>>  	report_prefix_pop();
+>>>>> +	smp_cpu_stop(1);
+>>>>> =20
+>>>>>  	report_prefix_pop();
+>>>>>  }
+>>>>> @@ -137,9 +138,8 @@ static void test_ecall(void)
+>>>>> =20
+>>>>>  	report_prefix_push("ecall");
+>>>>>  	set_flag(0);
+>>>>> -	smp_cpu_destroy(1);
+>>>>> =20
+>>>>> -	smp_cpu_setup(1, psw);
+>>>>> +	smp_cpu_start(1, psw);
+>>>>>  	wait_for_flag();
+>>>>>  	set_flag(0);
+>>>>>  	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
+>>>>> @@ -172,9 +172,8 @@ static void test_emcall(void)
+>>>>> =20
+>>>>>  	report_prefix_push("emcall");
+>>>>>  	set_flag(0);
+>>>>> -	smp_cpu_destroy(1);
+>>>>> =20
+>>>>> -	smp_cpu_setup(1, psw);
+>>>>> +	smp_cpu_start(1, psw);
+>>>>>  	wait_for_flag();
+>>>>>  	set_flag(0);
+>>>>>  	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
+>>>>> @@ -192,7 +191,7 @@ static void test_reset_initial(void)
+>>>>>  	psw.addr =3D (unsigned long)test_func;
+>>>>> =20
+>>>>>  	report_prefix_push("reset initial");
+>>>>> -	smp_cpu_setup(1, psw);
+>>>>> +	smp_cpu_start(1, psw);
+>>>>> =20
+>>>>>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+>>>>>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+>>>>> @@ -223,7 +222,7 @@ static void test_reset(void)
+>>>>>  	psw.addr =3D (unsigned long)test_func;
+>>>>> =20
+>>>>>  	report_prefix_push("cpu reset");
+>>>>> -	smp_cpu_setup(1, psw);
+>>>>> +	smp_cpu_start(1, psw);
+>>>>> =20
+>>>>>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
+>>>>>  	report(smp_cpu_stopped(1), "cpu stopped");
+>>>>> @@ -232,6 +231,7 @@ static void test_reset(void)
+>>>>> =20
+>>>>>  int main(void)
+>>>>>  {
+>>>>> +	struct psw psw;
+>>>>>  	report_prefix_push("smp");
+>>>>> =20
+>>>>>  	if (smp_query_num_cpus() =3D=3D 1) {
+>>>>> @@ -239,6 +239,12 @@ int main(void)
+>>>>>  		goto done;
+>>>>>  	}
+>>>>> =20
+>>>>> +	/* Setting up the cpu to give it a stack and lowcore */
+>>>>> +	psw.mask =3D extract_psw_mask();
+>>>>> +	psw.addr =3D (unsigned long)cpu_loop;
+>>>>> +	smp_cpu_setup(1, psw);
+>>>>> +	smp_cpu_stop(1);
+>>>>> +
+>>>>>  	test_start();
+>>>>>  	test_stop();
+>>>>>  	test_stop_store_status();
+>>>>> @@ -247,6 +253,7 @@ int main(void)
+>>>>>  	test_emcall();
+>>>>>  	test_reset();
+>>>>>  	test_reset_initial();
+>>>>> +	smp_cpu_destroy(1);
+>>>>> =20
+>>>>>  done:
+>>>>>  	report_prefix_pop();
+>>>>>
 >>>>
->>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->>>> Acked-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  s390x/smp.c | 21 ++++++++++++++-------
->>>>  1 file changed, 14 insertions(+), 7 deletions(-)
+>>>> With this patch, I get timeouts under TCG. Seems to loop forever.
 >>>>
->>>> diff --git a/s390x/smp.c b/s390x/smp.c
->>>> index e37eb56..3e8cf3e 100644
->>>> --- a/s390x/smp.c
->>>> +++ b/s390x/smp.c
->>>> @@ -53,7 +53,7 @@ static void test_start(void)
->>>>  	psw.addr = (unsigned long)test_func;
->>>>  
->>>>  	set_flag(0);
->>>> -	smp_cpu_setup(1, psw);
->>>> +	smp_cpu_start(1, psw);
->>>>  	wait_for_flag();
->>>>  	report(1, "start");
->>>>  }
->>>> @@ -109,6 +109,7 @@ static void test_store_status(void)
->>>>  	report(1, "status written");
->>>>  	free_pages(status, PAGE_SIZE * 2);
->>>>  	report_prefix_pop();
->>>> +	smp_cpu_stop(1);
->>>>  
->>>>  	report_prefix_pop();
->>>>  }
->>>> @@ -137,9 +138,8 @@ static void test_ecall(void)
->>>>  
->>>>  	report_prefix_push("ecall");
->>>>  	set_flag(0);
->>>> -	smp_cpu_destroy(1);
->>>>  
->>>> -	smp_cpu_setup(1, psw);
->>>> +	smp_cpu_start(1, psw);
->>>>  	wait_for_flag();
->>>>  	set_flag(0);
->>>>  	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
->>>> @@ -172,9 +172,8 @@ static void test_emcall(void)
->>>>  
->>>>  	report_prefix_push("emcall");
->>>>  	set_flag(0);
->>>> -	smp_cpu_destroy(1);
->>>>  
->>>> -	smp_cpu_setup(1, psw);
->>>> +	smp_cpu_start(1, psw);
->>>>  	wait_for_flag();
->>>>  	set_flag(0);
->>>>  	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
->>>> @@ -192,7 +191,7 @@ static void test_reset_initial(void)
->>>>  	psw.addr = (unsigned long)test_func;
->>>>  
->>>>  	report_prefix_push("reset initial");
->>>> -	smp_cpu_setup(1, psw);
->>>> +	smp_cpu_start(1, psw);
->>>>  
->>>>  	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
->>>>  	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
->>>> @@ -223,7 +222,7 @@ static void test_reset(void)
->>>>  	psw.addr = (unsigned long)test_func;
->>>>  
->>>>  	report_prefix_push("cpu reset");
->>>> -	smp_cpu_setup(1, psw);
->>>> +	smp_cpu_start(1, psw);
->>>>  
->>>>  	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
->>>>  	report(smp_cpu_stopped(1), "cpu stopped");
->>>> @@ -232,6 +231,7 @@ static void test_reset(void)
->>>>  
->>>>  int main(void)
->>>>  {
->>>> +	struct psw psw;
->>>>  	report_prefix_push("smp");
->>>>  
->>>>  	if (smp_query_num_cpus() == 1) {
->>>> @@ -239,6 +239,12 @@ int main(void)
->>>>  		goto done;
->>>>  	}
->>>>  
->>>> +	/* Setting up the cpu to give it a stack and lowcore */
->>>> +	psw.mask = extract_psw_mask();
->>>> +	psw.addr = (unsigned long)cpu_loop;
->>>> +	smp_cpu_setup(1, psw);
->>>> +	smp_cpu_stop(1);
->>>> +
->>>>  	test_start();
->>>>  	test_stop();
->>>>  	test_stop_store_status();
->>>> @@ -247,6 +253,7 @@ int main(void)
->>>>  	test_emcall();
->>>>  	test_reset();
->>>>  	test_reset_initial();
->>>> +	smp_cpu_destroy(1);
->>>>  
->>>>  done:
->>>>  	report_prefix_pop();
->>>>
->>>
->>> With this patch, I get timeouts under TCG. Seems to loop forever.
->>>
->> The branch works on lpar and kvm without a problem.
-> 
-> Which could mean that either TCG is broken or your test is broken (e.g.,
-> a race condition that does not trigger under LPAR because it's faster,
-> or some undocumented/not guaranteed behavior).
-> 
+>>> The branch works on lpar and kvm without a problem.
+>>
+>> Which could mean that either TCG is broken or your test is broken (e.g=
+.,
+>> a race condition that does not trigger under LPAR because it's faster,
+>> or some undocumented/not guaranteed behavior).
+>>
+>=20
+> So, the test works every now and then under TCG.
+>=20
+> It seems to work very reliably with "-smp 2"
+>=20
+> With smp 8, it sometimes works, sometimes not.
+>=20
+> t480s: ~/git/kvm-unit-tests (kein Branch, Rebase von s390x-prep) $
+> ./s390x-run s390x/smp.elf -smp 8
+> /home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x -nodefaults
+> -nographic -machine s390-ccw-virtio,accel=3Dtcg -chardev stdio,id=3Dcon=
+0
+> -device sclpconsole,chardev=3Dcon0 -kernel s390x/smp.elf -smp 8 # -init=
+rd
+> /tmp/tmp.UL9ZaqoKBW
+> SMP: Initializing, found 8 cpus
+> PASS: smp: start
+> PASS: smp: stop
+> PASS: smp: stop store status: prefix
+> PASS: smp: stop store status: stack
+> PASS: smp: store status at address: running: incorrect state
+> PASS: smp: store status at address: running: status not written
+> PASS: smp: store status at address: stopped: status written
+> PASS: smp: ecall: ecall
+> PASS: smp: emcall: ecall
+> PASS: smp: cpu reset: cpu stopped
+> PASS: smp: reset initial: clear: psw
+> PASS: smp: reset initial: clear: prefix
+> PASS: smp: reset initial: clear: fpc
+> PASS: smp: reset initial: clear: cpu timer
+> PASS: smp: reset initial: clear: todpr
+> PASS: smp: reset initial: initialized: cr0 =3D=3D 0xE0
+> PASS: smp: reset initial: initialized: cr14 =3D=3D 0xC2000000
+> PASS: smp: reset initial: cpu stopped
+> SUMMARY: 18 tests
+>=20
+> EXIT: STATUS=3D1
+>=20
+> t480s: ~/git/kvm-unit-tests (kein Branch, Rebase von s390x-prep) $
+> ./s390x-run s390x/smp.elf -smp 8
+> /home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x -nodefaults
+> -nographic -machine s390-ccw-virtio,accel=3Dtcg -chardev stdio,id=3Dcon=
+0
+> -device sclpconsole,chardev=3Dcon0 -kernel s390x/smp.elf -smp 8 # -init=
+rd
+> /tmp/tmp.csifrEDgnC
+> SMP: Initializing, found 8 cpus
+> PASS: smp: start
+> PASS: smp: stop
+> PASS: smp: stop store status: prefix
+> FAIL: smp: stop store status: stack
+> PASS: smp: store status at address: running: incorrect state
+> PASS: smp: store status at address: running: status not written
+> PASS: smp: store status at address: stopped: status written
+> [... hang]
+>=20
+>=20
+> Note that there is a previous failure for "smp: stop store status:
+> stack" whenever the test will hang later.
+>=20
+>=20
 
-So, the test works every now and then under TCG.
+In smp_cpu_stop_nolock(), when you do a SIGP_STOP_AND_STORE_STATUS, you
+wait until the target CPU is stopped.
 
-It seems to work very reliably with "-smp 2"
+This does, however, not guarantee that the state has already been stored
+- especially not if the target CPU is already stopped.
 
-With smp 8, it sometimes works, sometimes not.
+Stop and Store Status
+The addressed CPU performs the stop function, fol-
+lowed by the store-status operation (see =93Store Sta-
+tus=94 on page 4-82). The CPU does not necessarily
+complete the operation, or even enter the stopped
+state, during the execution of SIGNAL PROCES-
+SOR ..."
 
-t480s: ~/git/kvm-unit-tests (kein Branch, Rebase von s390x-prep) $
-./s390x-run s390x/smp.elf -smp 8
-/home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x -nodefaults
--nographic -machine s390-ccw-virtio,accel=tcg -chardev stdio,id=con0
--device sclpconsole,chardev=con0 -kernel s390x/smp.elf -smp 8 # -initrd
-/tmp/tmp.UL9ZaqoKBW
-SMP: Initializing, found 8 cpus
-PASS: smp: start
-PASS: smp: stop
-PASS: smp: stop store status: prefix
-PASS: smp: stop store status: stack
-PASS: smp: store status at address: running: incorrect state
-PASS: smp: store status at address: running: status not written
-PASS: smp: store status at address: stopped: status written
-PASS: smp: ecall: ecall
-PASS: smp: emcall: ecall
-PASS: smp: cpu reset: cpu stopped
-PASS: smp: reset initial: clear: psw
-PASS: smp: reset initial: clear: prefix
-PASS: smp: reset initial: clear: fpc
-PASS: smp: reset initial: clear: cpu timer
-PASS: smp: reset initial: clear: todpr
-PASS: smp: reset initial: initialized: cr0 == 0xE0
-PASS: smp: reset initial: initialized: cr14 == 0xC2000000
-PASS: smp: reset initial: cpu stopped
-SUMMARY: 18 tests
+So there is a race in your code. I do wonder how you can test if the
+order on the target CPU has been executed, without issuing another SIGP
+operation (e.g., restart) or by testing if the content to be stored was
+all changed ...
 
-EXIT: STATUS=1
-
-t480s: ~/git/kvm-unit-tests (kein Branch, Rebase von s390x-prep) $
-./s390x-run s390x/smp.elf -smp 8
-/home/dhildenb/git/qemu/s390x-softmmu/qemu-system-s390x -nodefaults
--nographic -machine s390-ccw-virtio,accel=tcg -chardev stdio,id=con0
--device sclpconsole,chardev=con0 -kernel s390x/smp.elf -smp 8 # -initrd
-/tmp/tmp.csifrEDgnC
-SMP: Initializing, found 8 cpus
-PASS: smp: start
-PASS: smp: stop
-PASS: smp: stop store status: prefix
-FAIL: smp: stop store status: stack
-PASS: smp: store status at address: running: incorrect state
-PASS: smp: store status at address: running: status not written
-PASS: smp: store status at address: stopped: status written
-[... hang]
-
-
-Note that there is a previous failure for "smp: stop store status:
-stack" whenever the test will hang later.
-
-
--- 
+--=20
 Thanks,
 
 David / dhildenb
