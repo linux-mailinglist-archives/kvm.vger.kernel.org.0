@@ -2,104 +2,327 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 63F50148561
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 13:47:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9D69148605
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 14:26:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388812AbgAXMrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jan 2020 07:47:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47721 "EHLO
+        id S2387847AbgAXN0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jan 2020 08:26:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50849 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2387709AbgAXMrH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jan 2020 07:47:07 -0500
+        with ESMTP id S2387647AbgAXN0L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jan 2020 08:26:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579870026;
+        s=mimecast20190719; t=1579872369;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ChLDmdrX0uO5zFp9WY4jkSOIQvobAH+yrFsmG1ZcUzY=;
-        b=hNHEMZ0+PN70xguWEiqziOzBvyNrYjAxa29q0nwKgBWYTu5Gqd2haMN18bRhabjZvHb4OU
-        dA7N23m01qaR27qz6+V6GhaFLITuz8PVpOGVye6qM63GvagW+jHseehghHssyR9cJSpguB
-        95kTpl4SlG0xX3oAwNee2YmbjBkeDlQ=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=Qe0LQugW/GnaOz9RxYsj86LQN62jq+eXDQ8oE0JxwCw=;
+        b=YvneEsZ2ZgEa+oxbMHoyA/r7mIoLPO1lRAWHKskIbhASTvA4MHnCesWjIdNyaeqh8Rg4OY
+        ebYzCuBVcNPza2uDNCbUJqg58qKz16Ka05ah9Aer+0ZZg6ovh+/wGIXcGvEOArbPQKlca8
+        ecXKgUG6TBXOl5aVN3kyuUfDzIhqD3g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-X_TKEVurOSKMwFWtWgpp3A-1; Fri, 24 Jan 2020 07:47:05 -0500
-X-MC-Unique: X_TKEVurOSKMwFWtWgpp3A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-359-69bd0HlXMS2mmhh6nw6yzw-1; Fri, 24 Jan 2020 08:26:05 -0500
+X-MC-Unique: 69bd0HlXMS2mmhh6nw6yzw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 173BA800D41
-        for <kvm@vger.kernel.org>; Fri, 24 Jan 2020 12:47:04 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 40B6819C69;
-        Fri, 24 Jan 2020 12:47:03 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-Subject: [PATCH] kvm: selftests: aarch64: dirty_log_test: Remove unnecessary ifdefs
-Date:   Fri, 24 Jan 2020 13:47:01 +0100
-Message-Id: <20200124124701.32688-1-drjones@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 730A218CA241;
+        Fri, 24 Jan 2020 13:26:01 +0000 (UTC)
+Received: from [10.36.116.39] (ovpn-116-39.ams2.redhat.com [10.36.116.39])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 498D65DA2C;
+        Fri, 24 Jan 2020 13:25:45 +0000 (UTC)
+Subject: Re: [PATCH v16.1 0/9] mm / virtio: Provide support for free page
+ reporting
+To:     Alexander Graf <graf@amazon.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com, osalvador@suse.de,
+        "Paterson-Jones, Roland" <rolandp@amazon.com>, hannes@cmpxchg.org,
+        hare@suse.com
+References: <20200122173040.6142.39116.stgit@localhost.localdomain>
+ <914aa4c3-c814-45e0-830b-02796b00b762@amazon.com>
+ <0e2d04a8-af74-e2db-cab0-c67286e33a2a@redhat.com>
+ <5d2daec8-985c-c0a4-4832-8e5493316306@amazon.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <86dfc549-c5bc-e8b2-644d-4baceb8dc746@redhat.com>
+Date:   Fri, 24 Jan 2020 14:25:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <5d2daec8-985c-c0a4-4832-8e5493316306@amazon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 21 +++++++++-----------
- 1 file changed, 9 insertions(+), 12 deletions(-)
+On 23.01.20 15:52, Alexander Graf wrote:
+>=20
+>=20
+> On 23.01.20 15:05, David Hildenbrand wrote:
+>> On 23.01.20 11:20, Alexander Graf wrote:
+>>> Hi Alex,
+>>>
+>>> On 22.01.20 18:43, Alexander Duyck wrote:
+>>>> This series provides an asynchronous means of reporting free guest p=
+ages
+>>>> to a hypervisor so that the memory associated with those pages can b=
+e
+>>>> dropped and reused by other processes and/or guests on the host. Usi=
+ng
+>>>> this it is possible to avoid unnecessary I/O to disk and greatly imp=
+rove
+>>>> performance in the case of memory overcommit on the host.
+>>>>
+>>>> When enabled we will be performing a scan of free memory every 2 sec=
+onds
+>>>> while pages of sufficiently high order are being freed. In each pass=
+ at
+>>>> least one sixteenth of each free list will be reported. By doing thi=
+s we
+>>>> avoid racing against other threads that may be causing a high amount=
+ of
+>>>> memory churn.
+>>>>
+>>>> The lowest page order currently scanned when reporting pages is
+>>>> pageblock_order so that this feature will not interfere with the use=
+ of
+>>>> Transparent Huge Pages in the case of virtualization.
+>>>>
+>>>> Currently this is only in use by virtio-balloon however there is the=
+ hope
+>>>> that at some point in the future other hypervisors might be able to =
+make
+>>>> use of it. In the virtio-balloon/QEMU implementation the hypervisor =
+is
+>>>> currently using MADV_DONTNEED to indicate to the host kernel that th=
+e page
+>>>> is currently free. It will be zeroed and faulted back into the guest=
+ the
+>>>> next time the page is accessed.
+>>>>
+>>>> To track if a page is reported or not the Uptodate flag was repurpos=
+ed and
+>>>> used as a Reported flag for Buddy pages. We walk though the free lis=
+t
+>>>> isolating pages and adding them to the scatterlist until we either
+>>>> encounter the end of the list, processed as many pages as were liste=
+d in
+>>>> nr_free prior to us starting, or have filled the scatterlist with pa=
+ges to
+>>>> be reported. If we fill the scatterlist before we reach the end of t=
+he
+>>>> list we rotate the list so that the first unreported page we encount=
+er is
+>>>> moved to the head of the list as that is where we will resume after =
+we
+>>>> have freed the reported pages back into the tail of the list.
+>>>>
+>>>> Below are the results from various benchmarks. I primarily focused o=
+n two
+>>>> tests. The first is the will-it-scale/page_fault2 test, and the othe=
+r is
+>>>> a modified version of will-it-scale/page_fault1 that was enabled to =
+use
+>>>> THP. I did this as it allows for better visibility into different pa=
+rts
+>>>> of the memory subsystem. The guest is running with 32G for RAM on on=
+e
+>>>> node of a E5-2630 v3. The host has had some features such as CPU tur=
+bo
+>>>> disabled in the BIOS.
+>>>>
+>>>> Test                   page_fault1 (THP)    page_fault2
+>>>> Name            tasks  Process Iter  STDEV  Process Iter  STDEV
+>>>> Baseline            1    1012402.50  0.14%     361855.25  0.81%
+>>>>                      16    8827457.25  0.09%    3282347.00  0.34%
+>>>>
+>>>> Patches Applied     1    1007897.00  0.23%     361887.00  0.26%
+>>>>                      16    8784741.75  0.39%    3240669.25  0.48%
+>>>>
+>>>> Patches Enabled     1    1010227.50  0.39%     359749.25  0.56%
+>>>>                      16    8756219.00  0.24%    3226608.75  0.97%
+>>>>
+>>>> Patches Enabled     1    1050982.00  4.26%     357966.25  0.14%
+>>>>    page shuffle      16    8672601.25  0.49%    3223177.75  0.40%
+>>>>
+>>>> Patches enabled     1    1003238.00  0.22%     360211.00  0.22%
+>>>>    shuffle w/ RFC    16    8767010.50  0.32%    3199874.00  0.71%
+>>>>
+>>>> The results above are for a baseline with a linux-next-20191219 kern=
+el,
+>>>> that kernel with this patch set applied but page reporting disabled =
+in
+>>>> virtio-balloon, the patches applied and page reporting fully enabled=
+, the
+>>>> patches enabled with page shuffling enabled, and the patches applied=
+ with
+>>>> page shuffling enabled and an RFC patch that makes used of MADV_FREE=
+ in
+>>>> QEMU. These results include the deviation seen between the average v=
+alue
+>>>> reported here versus the high and/or low value. I observed that duri=
+ng the
+>>>> test memory usage for the first three tests never dropped whereas wi=
+th the
+>>>> patches fully enabled the VM would drop to using only a few GB of th=
+e
+>>>> host's memory when switching from memhog to page fault tests.
+>>>>
+>>>> Any of the overhead visible with this patch set enabled seems due to=
+ page
+>>>> faults caused by accessing the reported pages and the host zeroing t=
+he page
+>>>> before giving it back to the guest. This overhead is much more visib=
+le when
+>>>> using THP than with standard 4K pages. In addition page shuffling se=
+emed to
+>>>> increase the amount of faults generated due to an increase in memory=
+ churn.
+>>>> The overhead is reduced when using MADV_FREE as we can avoid the ext=
+ra
+>>>> zeroing of the pages when they are reintroduced to the host, as can =
+be seen
+>>>> when the RFC is applied with shuffling enabled.
+>>>>
+>>>> The overall guest size is kept fairly small to only a few GB while t=
+he test
+>>>> is running. If the host memory were oversubscribed this patch set sh=
+ould
+>>>> result in a performance improvement as swapping memory in the host c=
+an be
+>>>> avoided.
+>>>
+>>>
+>>> I really like the approach overall. Voluntarily propagating free memo=
+ry
+>>> from a guest to the host has been a sore point ever since KVM was
+>>> around. This solution looks like a very elegant way to do so.
+>>>
+>>> The big piece I'm missing is the page cache. Linux will by default tr=
+y
+>>> to keep the free list as small as it can in favor of page cache, so m=
+ost
+>>> of the benefit of this patch set will be void in real world scenarios=
+.
+>>
+>> One approach is to move (parts of) the page cache from the guest to th=
+e
+>> hypervisor - e.g., using emulated NVDIMM or virtio-pmem.
+>=20
+> Whether you can do that depends heavily on your virtualization=20
+> environment. On a host with single tenant VMs, that's definitely=20
+> feasible. In a Kubernetes environment, it might also be feasible.
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing=
-/selftests/kvm/dirty_log_test.c
-index 5614222a6628..3146302ac563 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -341,9 +341,7 @@ static void run_test(enum vm_guest_mode mode, unsigne=
-d long iterations,
- #ifdef __x86_64__
- 	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
- #endif
--#ifdef __aarch64__
- 	ucall_init(vm, NULL);
--#endif
-=20
- 	/* Export the shared variables to the guest */
- 	sync_global_to_guest(vm, host_page_size);
-@@ -433,9 +431,6 @@ int main(int argc, char *argv[])
- 	uint64_t phys_offset =3D 0;
- 	unsigned int mode;
- 	int opt, i;
--#ifdef __aarch64__
--	unsigned int host_ipa_limit;
--#endif
-=20
- #ifdef USE_CLEAR_DIRTY_LOG
- 	if (!kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2)) {
-@@ -450,13 +445,15 @@ int main(int argc, char *argv[])
- #ifdef __aarch64__
- 	vm_guest_mode_params_init(VM_MODE_P40V48_4K, true, true);
- 	vm_guest_mode_params_init(VM_MODE_P40V48_64K, true, true);
--
--	host_ipa_limit =3D kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
--	if (host_ipa_limit >=3D 52)
--		vm_guest_mode_params_init(VM_MODE_P52V48_64K, true, true);
--	if (host_ipa_limit >=3D 48) {
--		vm_guest_mode_params_init(VM_MODE_P48V48_4K, true, true);
--		vm_guest_mode_params_init(VM_MODE_P48V48_64K, true, true);
-+	{
-+		unsigned int limit =3D kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
-+
-+		if (limit >=3D 52)
-+			vm_guest_mode_params_init(VM_MODE_P52V48_64K, true, true);
-+		if (limit >=3D 48) {
-+			vm_guest_mode_params_init(VM_MODE_P48V48_4K, true, true);
-+			vm_guest_mode_params_init(VM_MODE_P48V48_64K, true, true);
-+		}
- 	}
- #endif
- #ifdef __s390x__
+I would be interesting in which environments this is an actual problem
+that can't be solved in the hypervisor (e.g., see below).
+
+>=20
+> But when you have VMs that assume that the host is interfering with the=
+m=20
+> as little as possible, it becomes harder:
+
+... then you don't want free page reporting or even ballooning I suppose =
+:)
+
+>=20
+> How do you ensure fairness across different VMs' page cache that is=20
+> munged into a single big host one?
+
+Interesting question. I would assume that this problem (e.g.,
+partitioning the page cache/priorities/etc..) either
+
+a) Already has been solved in the kernel for different processes/process
+groups/containers. So for VMs as well.
+b) Still is an open problem to solve for all these units.
+
+But: Not a cgroup/pagecache expert
+
+>=20
+> Do you even have host page cache or are you using SR-IOV / mdev for=20
+> storage for performance reasons?
+
+E.g., with virtio-mem, a file-backed file will be mmaped into your VM
+just like a NVDIMM. So there will be host page cache. But I am -
+unfortunately - not an expert on that matter as well (and not sure if it
+answers your question) :)
+
+>=20
+>=20
+> The puzzle is still incomplete, even with NVDIMM exposure to the guest=20
+> as an option unfortunately :).
+
+I think it is worth to note that free page reporting won't apply to all
+environments either way. There is a steady overhead to do the reporting
+and reporting only happens on >=3D 2MB chunks. There are setups where
+virtio-balloon might still be desirable.
+
+(e.g., fragmented guest, no runtime overhead, ...)
+
+All this fiddeling with the guest page cache feels wrong to me ... but
+there seem to be interesting approaches being discussed.
+
+So I do agree that the puzzle is still incomplete for some use cases /
+environments.
+
 --=20
-2.18.2
+Thanks,
+
+David / dhildenb
 
