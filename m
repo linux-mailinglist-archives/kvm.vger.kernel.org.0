@@ -2,74 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A52B14797D
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 09:38:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CDE71479AA
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 09:51:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729934AbgAXIiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jan 2020 03:38:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30507 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725821AbgAXIiW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jan 2020 03:38:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579855100;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=zuxoiB89F7iHmYYDwyKPYXsYZnkYEDIqPpOF7XcBnXc=;
-        b=SbpZy8EsNwx8gxaS+ShxdHCW8YAkYJoYImBxyX2pSLRkpBRH6mOvd2nIdAqh7ENcazk6UY
-        PB2UAbNR2XueJYLtNZY2/JLvY3iDfpzQrEGFpeBwC75SjI12rG5vYRY4DaW9SqUK8XstPs
-        0p+XKgMtKO+TepPSRAou6DjSgscRAV8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-3wjOihLnOuO2opsNeyU95Q-1; Fri, 24 Jan 2020 03:38:19 -0500
-X-MC-Unique: 3wjOihLnOuO2opsNeyU95Q-1
-Received: by mail-wr1-f69.google.com with SMTP id f17so813661wrt.19
-        for <kvm@vger.kernel.org>; Fri, 24 Jan 2020 00:38:18 -0800 (PST)
+        id S1729921AbgAXIvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jan 2020 03:51:09 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:33807 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726173AbgAXIvJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jan 2020 03:51:09 -0500
+Received: by mail-wm1-f68.google.com with SMTP id s144so3592721wme.1;
+        Fri, 24 Jan 2020 00:51:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=kKTpSe2SaSEyXCdh9QLkR7mYGqSy34t2TTsozXj1tMk=;
+        b=PLx6tZ7BRNarGA3y/pH+yOQV5kK1Owzj4nw505iXbHyr3X0mjfTyFH5Jfw/TOi/gNX
+         dyIneGCvmIQks9TCpcP7VIwaYxL3d1qvKHkGPz/DiNZXbR6Aj7W6dTOHd3cp7ij53fHa
+         m+uLZ7p6AYP9gsGA1gsFEkby+386mNHbW7KewXlCkhokcJDMNGlMwlWjNuE9275EzW2t
+         l/L/2pHBVLQutILiIcCj4i7sCh2C+ctlst7FiWiXvip/knCTCRgdlhzqaGgQ/PBTONlN
+         cH3ocibrMfKJGcyRyHlyWWXda8godZJpfB9zKNSfwAMIvXj/Zix/icgt2ZWpwUJ+dIdC
+         CulQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=zuxoiB89F7iHmYYDwyKPYXsYZnkYEDIqPpOF7XcBnXc=;
-        b=N/HLbxF/DUp+V7edKFBgdT6qQ3+gSG81vanHgsEoG1ubd1ZSbpJ2Ka1EimzVna5b1Z
-         Rn8Z2l9a/TiTNiAr/VZgqiogSoaQg6XlOz4udfeThkZTjL3JeE6wvgINEQyF7kDQE9cP
-         28xnp5ZjnL7KvNaLXdEKGHzY8XDZHoh7YMCSBK9bedzc1sk8iHgUSMa5AYUykBKn9TJi
-         yLtRio/ifGO8hWiBrePSwlUaPLhrLAsVssaEWSwU3ekYTIPYxZ14+iKbwcHjTKgDt94j
-         TRfHr5Lz+zkM5l/j7o1vwJgKGHlBdvO+PQi40jtvRZ01JvEYR0rDe53gD9ebUrtqitB5
-         G2RQ==
-X-Gm-Message-State: APjAAAV3dKAu1T8pb+VN1F/c8wTsqInAuZAZkohZyB2tRE4Ow4+DpE1W
-        bhZBqHeH49UkKVx3w7HFQQIqCyywF3qbm6fHlD3ea83EIzzaluUz/u+8ypY/+2kJydTIS1M81Ma
-        3jTKHzp/HU6jk
-X-Received: by 2002:a5d:44cd:: with SMTP id z13mr2997993wrr.104.1579855097745;
-        Fri, 24 Jan 2020 00:38:17 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxbo2SJcpmWhbW1dujaUSsFzqmTYzf3WTvglH9Huj/Wofx6Qvt/1Kc0Cm3aMBZlgTo8iDRQRQ==
-X-Received: by 2002:a5d:44cd:: with SMTP id z13mr2997970wrr.104.1579855097468;
-        Fri, 24 Jan 2020 00:38:17 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:b8fe:679e:87eb:c059? ([2001:b07:6468:f312:b8fe:679e:87eb:c059])
-        by smtp.gmail.com with ESMTPSA id b17sm6596026wrx.15.2020.01.24.00.38.16
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Jan 2020 00:38:16 -0800 (PST)
-X-Mozilla-News-Host: news://lore.kernel.org:119
-To:     KVM list <kvm@vger.kernel.org>
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=kKTpSe2SaSEyXCdh9QLkR7mYGqSy34t2TTsozXj1tMk=;
+        b=rnHYfrvIZhWrq42a2Ed6pFG3Mg8+2hOlrj2OCF5lMUWS6mCXN8TwBoKr9YAbjKwTP7
+         tT1fhDyTw+KaxmTFb+BBvcoDaffQv3reAU7Oy6LyecbVMwxnW+Rv5O4IJ/WwzcADevj2
+         LvXKOSs2yCpAcizsYos2bLZWHY51BRcymHp3cPNZGZ2JUWsqWwPKMXAhCX+2HdQiTYhu
+         SGXh3f+gHLqeYhy9E4xmDdsDWjQoG04d0FSgwNU7nohZx0hiMa3tjYPEYCTuXfx/kc/W
+         J6KdYVvbD5SuuURoRKrI8c54c1TaTJfR7LrKfBwT4gR9ovzDOPkNLXHNWGLkGudQbHRv
+         xaaQ==
+X-Gm-Message-State: APjAAAU6OmFxQ35jNGbbTAUyWT0B2Df0Txhaa5MNxFpr86WqsnHjFt2h
+        pC2wm7HshyU4612bfIXkZMhDsd13
+X-Google-Smtp-Source: APXvYqxZD/4yDV+ILxmbPxnChfFi60uvl3bEnm7jADz9aXBbfHBmAxOEoeXg246AukJzSe4m7QhDwQ==
+X-Received: by 2002:a1c:7d93:: with SMTP id y141mr2226507wmc.111.1579855866591;
+        Fri, 24 Jan 2020 00:51:06 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id s139sm5933048wme.35.2020.01.24.00.51.05
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 24 Jan 2020 00:51:05 -0800 (PST)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: force push to kvm/next coming
-Message-ID: <8f43bd04-9f4e-5c06-8d1d-cb84bba40278@redhat.com>
-Date:   Fri, 24 Jan 2020 09:38:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Shuah Khan <skhan@linuxfoundation.org>
+Subject: [PATCH] selftests: use $(MAKE) instead of "make"
+Date:   Fri, 24 Jan 2020 09:51:03 +0100
+Message-Id: <1579855863-56484-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linux-next merge reported some bad mistakes on my part, so I'm
-force-pushing kvm/next.  Since it was pushed only yesterday and the code
-is the same except for two changed lines, it shouldn't be a big deal.
+This avoids a warning:
 
-Paolo
+    make[1]: warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.
+
+Cc: Shuah Khan <skhan@linuxfoundation.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tools/testing/selftests/lib.mk | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
+index 1c8a1963d03f..99c25dcbdfb0 100644
+--- a/tools/testing/selftests/lib.mk
++++ b/tools/testing/selftests/lib.mk
+@@ -47,9 +47,9 @@ ARCH		?= $(SUBARCH)
+ khdr:
+ ifndef KSFT_KHDR_INSTALL_DONE
+ ifeq (1,$(DEFAULT_INSTALL_HDR_PATH))
+-	make --no-builtin-rules ARCH=$(ARCH) -C $(top_srcdir) headers_install
++	$(MAKE) --no-builtin-rules ARCH=$(ARCH) -C $(top_srcdir) headers_install
+ else
+-	make --no-builtin-rules INSTALL_HDR_PATH=$$OUTPUT/usr \
++	$(MAKE) --no-builtin-rules INSTALL_HDR_PATH=$$OUTPUT/usr \
+ 		ARCH=$(ARCH) -C $(top_srcdir) headers_install
+ endif
+ endif
+-- 
+1.8.3.1
 
