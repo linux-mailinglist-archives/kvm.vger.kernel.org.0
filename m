@@ -2,115 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E97B3148E18
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 19:54:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 287FE148F6F
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 21:36:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391758AbgAXSyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jan 2020 13:54:10 -0500
-Received: from mail-vk1-f194.google.com ([209.85.221.194]:41339 "EHLO
-        mail-vk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389872AbgAXSyK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jan 2020 13:54:10 -0500
-Received: by mail-vk1-f194.google.com with SMTP id p191so841002vkf.8
-        for <kvm@vger.kernel.org>; Fri, 24 Jan 2020 10:54:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=k9IbFX230h+2YJkS//36Bone21Vlk4mvmv7ukUtwlrg=;
-        b=DAXjtZMQxree0LJO6fobOGURErQ0ju/inC8/fsZF0REb/T72vFjS7K0OhD0Y+lf2gK
-         lMPRw+NUBnFlszUuo1F/uLO7RoYDcq6CWVZ5BnXUxTgouURwMS2+PEcc6JnpM+rHv1lO
-         Q+wAY4Fvcu1Tt5CmyotNaXTNXtiYUbF2NVpmLkfbcJaUW2KVvuXLwarJvxsy/CmqxCzc
-         lF0yf3bRXw9OsO6bwUqmrWWhymuzSbWXcS4C1Yxq5LfRRbxfXuwQcB+KudGLC8h6tVTk
-         XaEai9+ATEb46ZczpqDbhaWNgUERSjbEX/rDpyXjd+8ejWhSyzbE4tkDbrAZZHxu2to0
-         jFjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=k9IbFX230h+2YJkS//36Bone21Vlk4mvmv7ukUtwlrg=;
-        b=DvTqfKV2iynm8zP3eGDAQCT/V+NvHRBjCoYHYsyzKjhwneGI4TllYDSwBO7Z1B5cr0
-         1IO2aLJ7xRke14zzjGgQeXdy3LGCQS2Zm4xWPNeveZ9/QtIDMPvXBFbZA75Q+V62W5k9
-         bOFaNlQ+dk05aufsl/AO4MLL4XG1D1zX1tYYjEm0VU5RxAU0Rs0fnCqnrngDXvJclWKq
-         JvAq1rkN09T5nzDIkxIWaiyC5v+XY3+rsjUJgU4XgDlVXvDZdbrYUmdjZwqFHf68N/QQ
-         oHhjM2PFH+BCTmWhxlPAzA+6oR7oUph+eUaJsVwOLRmSWKV5a5PXgVeZaO1nduiE8EAj
-         JuqQ==
-X-Gm-Message-State: APjAAAWjfS8Aw0xVDBlmjsnBFz1fc/s1nTN65S97J9t83oVGa/dNvQKf
-        c4uppCt8r6NSsM5pvWTOacF94O4T4vU4fDyLyDE8Zg==
-X-Google-Smtp-Source: APXvYqw2YjgP0ld3PdNvgZHc2Qrs2rZ5eSmsUx2bHhYUETj9IyOKKofaCjFO6+esQ4rua8ianeDtcJVIAImimd5dRp4=
-X-Received: by 2002:a1f:db81:: with SMTP id s123mr2936809vkg.45.1579892048933;
- Fri, 24 Jan 2020 10:54:08 -0800 (PST)
-MIME-Version: 1.0
-References: <20200123180436.99487-1-bgardon@google.com> <20200123180436.99487-11-bgardon@google.com>
- <aaf2afbb-1613-cc78-8b4f-6a7318acb22a@redhat.com>
-In-Reply-To: <aaf2afbb-1613-cc78-8b4f-6a7318acb22a@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Fri, 24 Jan 2020 10:53:57 -0800
-Message-ID: <CANgfPd-cj4Bau4fYRoQY3hW0K4w19LaFr=6RjgyZGO65fZuq9g@mail.gmail.com>
-Subject: Re: [PATCH v4 10/10] KVM: selftests: Move memslot 0 above KVM
- internal memslots
+        id S2404318AbgAXUgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jan 2020 15:36:48 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27563 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725710AbgAXUgr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jan 2020 15:36:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579898206;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wYPFnForP5DW9b9y/S2cEuNSkYqUwYPt/8FCorq3d2E=;
+        b=T9XHfqfXRbwgoGc9W+hxypeoFOeivMIgxgCKrtW+6gytlpUYmqWDVtbVFhnA8EiB900NHt
+        j6GV6rb+hyAXYSnTvY1wmiMCNO21P6AWL0NPp3DHiE5T46PT1yNupinGrR7BAG5qxx09em
+        hbjuRc7LRJQIbnsxJAjLbSgAcyWOQlY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-SakrKCg8Pc2g8uEbqAzK0w-1; Fri, 24 Jan 2020 15:36:45 -0500
+X-MC-Unique: SakrKCg8Pc2g8uEbqAzK0w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03E91800D41;
+        Fri, 24 Jan 2020 20:36:44 +0000 (UTC)
+Received: from fuller.cnet (ovpn-116-59.gru2.redhat.com [10.97.116.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C05F4867E3;
+        Fri, 24 Jan 2020 20:36:43 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 2755C418CC03; Fri, 24 Jan 2020 17:36:30 -0300 (-03)
+Date:   Fri, 24 Jan 2020 17:36:30 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 0/2] KVM: x86: do not mix raw and monotonic clocks in
+ kvmclock
+Message-ID: <20200124203630.GA28074@fuller.cnet>
+References: <1579702953-24184-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1579702953-24184-1-git-send-email-pbonzini@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 24, 2020 at 1:01 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 23/01/20 19:04, Ben Gardon wrote:
-> > KVM creates internal memslots between 3 and 4 GiB paddrs on the first
-> > vCPU creation. If memslot 0 is large enough it collides with these
-> > memslots an causes vCPU creation to fail. Instead of creating memslot 0
-> > at paddr 0, start it 4G into the guest physical address space.
-> >
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/lib/kvm_util.c | 11 +++++++----
-> >  1 file changed, 7 insertions(+), 4 deletions(-)
->
-> This breaks all tests for me:
->
->    $ ./state_test
->    Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
->    Guest physical address width detected: 46
->    ==== Test Assertion Failure ====
->   lib/x86_64/processor.c:580: false
->   pid=4873 tid=4873 - Success
->      1  0x0000000000409996: addr_gva2gpa at processor.c:579
->      2  0x0000000000406a38: addr_gva2hva at kvm_util.c:1636
->      3  0x000000000041036c: kvm_vm_elf_load at elf.c:192
->      4  0x0000000000409ea9: vm_create_default at processor.c:829
->      5  0x0000000000400f6f: main at state_test.c:132
->      6  0x00007f21bdf90494: ?? ??:0
->      7  0x0000000000401287: _start at ??:?
->   No mapping for vm virtual address, gva: 0x400000
-
-Uh oh, I obviously did not test this patch adequately. My apologies.
-I'll send another version of this patch after I've had time to test it
-better. The memslots between 3G and 4G are also somewhat x86 specific,
-so maybe this code should be elsewhere.
-
->
-> Memslot 0 should not be too large, so this patch should not be needed.
-
-I found that 3GB was not sufficient for memslot zero in my testing
-because it needs to contain both the stack for every vCPU and the page
-tables for the VM. When I ran with 416 vCPUs and of 1.6TB of total
-ram, memslot zero needed to be substantially larger than 3G. Just the
-4K guest PTEs required to map 4G per-vCPU for 416 vCPUs require (((416
-* (4<<30)) / 4096) * 8) / (1<<30) = 3.25GB of memory.
-I suppose another slot could be used for the page tables, but that
-would complicate the implementation of any tests that want to run
-large VMs substantially.
-
->
+On Wed, Jan 22, 2020 at 03:22:31PM +0100, Paolo Bonzini wrote:
+> Commit 53fafdbb8b21f ("KVM: x86: switch KVMCLOCK base to monotonic raw
+> clock") changed kvmclock to use tkr_raw instead of tkr_mono.  However,
+> the default kvmclock_offset for the VM was still based on the monotonic
+> clock and, if the raw clock drifted enough from the monotonic clock,
+> this could cause a negative system_time to be written to the guest's
+> struct pvclock.  RHEL5 does not like it and (if it boots fast enough to
+> observe a negative time value) it hangs.
+> 
+> This series fixes the issue by using the raw clock everywhere.
+> 
+> (And this, ladies and gentlemen, is why I was not applying patches to
+> the KVM tree.  I saw this before Christmas and could only reproduce it
+> today, since it requires almost 2 weeks of uptime to reproduce on my
+> machine.  Of course, once you have the reproducer the fix is relatively
+> easy to come up with).
+> 
 > Paolo
->
+> 
+> Paolo Bonzini (2):
+>   KVM: x86: reorganize pvclock_gtod_data members
+>   KVM: x86: use raw clock values consistently
+> 
+>  arch/x86/kvm/x86.c | 67 ++++++++++++++++++++++++++++--------------------------
+>  1 file changed, 35 insertions(+), 32 deletions(-)
+> 
+> -- 
+> 1.8.3.1
+
+Reviewed-by: Marcelo Tosatti <mtosatti@redhat.com>
+
+BTW, should switch both masterclock and non-masterclock cases
+to raw clock base. Do you see any problem with that? 
+
+Using the same reasoning as raw clock for master, ntpd in 
+the guest should correct the difference.
+
+Could probably simplify things.
+
