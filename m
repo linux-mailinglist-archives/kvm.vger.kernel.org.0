@@ -2,93 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 287FE148F6F
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 21:36:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34E6F148FCC
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 21:51:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404318AbgAXUgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jan 2020 15:36:48 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27563 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725710AbgAXUgr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jan 2020 15:36:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579898206;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wYPFnForP5DW9b9y/S2cEuNSkYqUwYPt/8FCorq3d2E=;
-        b=T9XHfqfXRbwgoGc9W+hxypeoFOeivMIgxgCKrtW+6gytlpUYmqWDVtbVFhnA8EiB900NHt
-        j6GV6rb+hyAXYSnTvY1wmiMCNO21P6AWL0NPp3DHiE5T46PT1yNupinGrR7BAG5qxx09em
-        hbjuRc7LRJQIbnsxJAjLbSgAcyWOQlY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-SakrKCg8Pc2g8uEbqAzK0w-1; Fri, 24 Jan 2020 15:36:45 -0500
-X-MC-Unique: SakrKCg8Pc2g8uEbqAzK0w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03E91800D41;
-        Fri, 24 Jan 2020 20:36:44 +0000 (UTC)
-Received: from fuller.cnet (ovpn-116-59.gru2.redhat.com [10.97.116.59])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C05F4867E3;
-        Fri, 24 Jan 2020 20:36:43 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id 2755C418CC03; Fri, 24 Jan 2020 17:36:30 -0300 (-03)
-Date:   Fri, 24 Jan 2020 17:36:30 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: x86: do not mix raw and monotonic clocks in
- kvmclock
-Message-ID: <20200124203630.GA28074@fuller.cnet>
-References: <1579702953-24184-1-git-send-email-pbonzini@redhat.com>
+        id S1729719AbgAXUvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jan 2020 15:51:48 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:40434 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725767AbgAXUvs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jan 2020 15:51:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=FwREgydDWTl0lQurue8lUof7m5LIZcaBwElWWmm89gA=; b=b/0DNAeAJS+nDvbt3wDRcnA32
+        1H4DWcGQTha7XXhJ5+Zhu0O4ywluj7AcsEMQ1NUcriBNyvblnE2dwPumIFCDERk+3/e2K9cDbZErv
+        8cW4p7QGjG7rFKaTjHEDJJnR5CSkOGhhHXQauVQKHBRpwI9W86o6U1og2zdT1KLVxf6ZxZgcvfsHe
+        W/7/j7xgm6QhXHRn8088MUZv+KfTcwMVE4oPra1YJ6VWQWl/2EAUoZT8H8sWiYbp+JXJ/OS2x+P4+
+        SPffvg8Ml15waloWyfFuoeJBdO7R0d0PemoHSF+jlSFhwMTj40Os/GI9cqZsCZFMaMlvvw4LzzcoF
+        Xa4gwsicA==;
+Received: from [2601:1c0:6280:3f0::ed68]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iv5vS-0004HL-5n; Fri, 24 Jan 2020 20:51:34 +0000
+Subject: Re: linux-next: Tree for Jan 24 (kvm)
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM <kvm@vger.kernel.org>
+References: <20200124173302.2c3228b2@canb.auug.org.au>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <38d53302-b700-b162-e766-2e2a461fc569@infradead.org>
+Date:   Fri, 24 Jan 2020 12:51:31 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1579702953-24184-1-git-send-email-pbonzini@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200124173302.2c3228b2@canb.auug.org.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 22, 2020 at 03:22:31PM +0100, Paolo Bonzini wrote:
-> Commit 53fafdbb8b21f ("KVM: x86: switch KVMCLOCK base to monotonic raw
-> clock") changed kvmclock to use tkr_raw instead of tkr_mono.  However,
-> the default kvmclock_offset for the VM was still based on the monotonic
-> clock and, if the raw clock drifted enough from the monotonic clock,
-> this could cause a negative system_time to be written to the guest's
-> struct pvclock.  RHEL5 does not like it and (if it boots fast enough to
-> observe a negative time value) it hangs.
+On 1/23/20 10:33 PM, Stephen Rothwell wrote:
+> Hi all,
 > 
-> This series fixes the issue by using the raw clock everywhere.
+> Changes since 20200123:
 > 
-> (And this, ladies and gentlemen, is why I was not applying patches to
-> the KVM tree.  I saw this before Christmas and could only reproduce it
-> today, since it requires almost 2 weeks of uptime to reproduce on my
-> machine.  Of course, once you have the reproducer the fix is relatively
-> easy to come up with).
+> The kvm tree gained a conflict against Linus' tree.
 > 
-> Paolo
-> 
-> Paolo Bonzini (2):
->   KVM: x86: reorganize pvclock_gtod_data members
->   KVM: x86: use raw clock values consistently
-> 
->  arch/x86/kvm/x86.c | 67 ++++++++++++++++++++++++++++--------------------------
->  1 file changed, 35 insertions(+), 32 deletions(-)
-> 
-> -- 
-> 1.8.3.1
 
-Reviewed-by: Marcelo Tosatti <mtosatti@redhat.com>
+on i386:
 
-BTW, should switch both masterclock and non-masterclock cases
-to raw clock base. Do you see any problem with that? 
+../arch/x86/kvm/x86.h:363:16: warning: right shift count >= width of type [-Wshift-count-overflow]
 
-Using the same reasoning as raw clock for master, ntpd in 
-the guest should correct the difference.
 
-Could probably simplify things.
-
+-- 
+~Randy
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
