@@ -2,162 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D7D9E148CE4
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 18:25:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D239148DD5
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2020 19:33:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388283AbgAXRZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jan 2020 12:25:14 -0500
-Received: from mga12.intel.com ([192.55.52.136]:30597 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388028AbgAXRZO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jan 2020 12:25:14 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jan 2020 09:25:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,358,1574150400"; 
-   d="scan'208";a="308178111"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga001.jf.intel.com with ESMTP; 24 Jan 2020 09:25:12 -0800
-Date:   Fri, 24 Jan 2020 09:25:12 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
-        Roman Kagan <rkagan@virtuozzo.com>
-Subject: Re: [PATCH RFC 2/3] x86/kvm/hyper-v: move VMX controls sanitization
- out of nested_enable_evmcs()
-Message-ID: <20200124172512.GJ2109@linux.intel.com>
-References: <20200115171014.56405-3-vkuznets@redhat.com>
- <6c4bdb57-08fb-2c2d-9234-b7efffeb72ed@redhat.com>
- <20200122054724.GD18513@linux.intel.com>
- <9c126d75-225b-3b1b-d97a-bcec1f189e02@redhat.com>
- <87eevrsf3s.fsf@vitty.brq.redhat.com>
- <20200122155108.GA7201@linux.intel.com>
- <87blqvsbcy.fsf@vitty.brq.redhat.com>
- <f15d9e98-25e9-2031-2db5-6aaa6c78c0eb@redhat.com>
- <87zheer0si.fsf@vitty.brq.redhat.com>
- <87lfpyq9bk.fsf@vitty.brq.redhat.com>
+        id S2391418AbgAXSds (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jan 2020 13:33:48 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44104 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389612AbgAXSds (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 Jan 2020 13:33:48 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00OIXkxM117599
+        for <kvm@vger.kernel.org>; Fri, 24 Jan 2020 13:33:47 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xqmjtqvc6-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 24 Jan 2020 13:33:47 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Fri, 24 Jan 2020 18:33:33 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 24 Jan 2020 18:33:28 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00OIXR5w30998886
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 Jan 2020 18:33:28 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D8ABF52050;
+        Fri, 24 Jan 2020 18:33:27 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.41])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6BB0A5204E;
+        Fri, 24 Jan 2020 18:33:27 +0000 (GMT)
+Subject: Re: [PATCH v4 06/10] KVM: selftests: Add support for vcpu_args_set to
+ aarch64 and s390x
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc:     Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Marc Zyngier <Marc.Zyngier@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20200123180436.99487-1-bgardon@google.com>
+ <20200123180436.99487-7-bgardon@google.com>
+ <4dbb6d1b-3162-d9b3-4ebb-5e4061776bb6@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Fri, 24 Jan 2020 19:33:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87lfpyq9bk.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <4dbb6d1b-3162-d9b3-4ebb-5e4061776bb6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20012418-0016-0000-0000-000002E062EB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012418-0017-0000-0000-000033431925
+Message-Id: <f1a56d20-823b-e878-e903-ff87b3c51229@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-24_06:2020-01-24,2020-01-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ phishscore=0 adultscore=0 spamscore=0 mlxlogscore=908 suspectscore=0
+ mlxscore=0 impostorscore=0 lowpriorityscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001240151
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 23, 2020 at 08:09:03PM +0100, Vitaly Kuznetsov wrote:
-> Vitaly Kuznetsov <vkuznets@redhat.com> writes:
-> 
-> > Paolo Bonzini <pbonzini@redhat.com> writes:
-> >
-> >> On 22/01/20 17:29, Vitaly Kuznetsov wrote:
-> >>> Yes, in case we're back to the idea to filter things out in QEMU we can
-> >>> do this. What I don't like is that every other userspace which decides
-> >>> to enable eVMCS will have to perform the exact same surgery as in case
-> >>> it sets allow_unsupported_controls=0 it'll have to know (hardcode) the
-> >>> filtering (or KVM_SET_MSRS will fail) and in case it opts for
-> >>> allow_unsupported_controls=1 Windows guests just won't boot without the
-> >>> filtering.
-> >>> 
-> >>> It seems to be 1:1, eVMCSv1 requires the filter.
-> >>
-> >> Yes, that's the point.  It *is* a hack in KVM, but it is generally
-> >> preferrable to have an easier API for userspace, if there's only one way
-> >> to do it.
-> >>
-> >> Though we could be a bit more "surgical" and only remove
-> >> SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES---thus minimizing the impact on
-> >> non-eVMCS guests.  Vitaly, can you prepare a v2 that does that and adds
-> >> a huge "hack alert" comment that explains the discussion?
-> >
-> > Yes, sure. I'd like to do more testing to make sure filtering out
-> > SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES is enough for other Hyper-V
-> > versions too (who knows how many bugs are there :-)
-> 
-> ... and the answer is -- more than one :-)
-> 
-> I've tested Hyper-V 2016/2019 BIOS and UEFI-booted and the minimal
-> viable set seems to be:
-> 
-> MSR_IA32_VMX_PROCBASED_CTLS2: 
-> 	~SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES
-> 
-> MSR_IA32_VMX_ENTRY_CTLS/MSR_IA32_VMX_TRUE_ENTRY_CTLS:
-> 	~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL
-> 
-> MSR_IA32_VMX_EXIT_CTLS/MSR_IA32_VMX_TRUE_EXIT_CTLS:
-> 	~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL
->  
-> with these filtered out all 4 versions are at least able to boot with >1
-> vCPU and run a nested guest (different from Windows management
-> partition).
-> 
-> This still feels a bit fragile as who knows under which circumstances
-> Hyper-V might want to enable additional (missing) controls.
 
-No strong opinion, I'm good either way.
 
-> If there are no objections and if we still think it would be beneficial
-> to minimize the list of controls we filter out (and not go with the full
-> set like my RFC suggests), I'll prepare v2. (v1, actually, this was RFC).
+On 24.01.20 10:03, Paolo Bonzini wrote:
+> CCing Marc, Conny and Christian (plus Thomas and Drew who were already
+> in the list) for review.
 
-One last idea, can we keep the MSR filtering as is and add the hack in
-vmx_restore_control_msr()?  That way the (userspace) host and guest see
-the same values when reading the affected MSRs, and eVMCS wouldn't need
-it's own hook to do consistency checks.
+CC Thomas Huth,
 
-@@ -1181,28 +1181,38 @@ static int
- vmx_restore_control_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
- {
-        u64 supported;
--       u32 *lowp, *highp;
-+       u32 *lowp, *highp, evmcs_unsupported;
+> 
+> Thanks,
+> 
+> Paolo
+> 
+> On 23/01/20 19:04, Ben Gardon wrote:
+>> Currently vcpu_args_set is only implemented for x86. This makes writing
+>> tests with multiple vCPUs difficult as each guest vCPU must either a.)
+>> do the same thing or b.) derive some kind of unique token from it's
+>> registers or the architecture. To simplify the process of writing tests
+>> with multiple vCPUs for s390 and aarch64, add set args functions for
+>> those architectures.
+[...]
+>>  .../selftests/kvm/lib/s390x/processor.c       | 35 +++++++++++++++++++
+[...]
+>> --- a/tools/testing/selftests/kvm/lib/s390x/processor.c
+>> +++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
+>> @@ -269,6 +269,41 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+>>  	run->psw_addr = (uintptr_t)guest_code;
+>>  }
+>>  
+>> +/* VM VCPU Args Set
+>> + *
+>> + * Input Args:
+>> + *   vm - Virtual Machine
+>> + *   vcpuid - VCPU ID
+>> + *   num - number of arguments
+>> + *   ... - arguments, each of type uint64_t
+>> + *
+>> + * Output Args: None
+>> + *
+>> + * Return: None
+>> + *
+>> + * Sets the first num function input arguments to the values
+>> + * given as variable args.  Each of the variable args is expected to
+>> + * be of type uint64_t. The registers set by this function are r2-r6.
+>> + */
+>> +void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
+>> +{
+>> +	va_list ap;
+>> +	struct kvm_regs regs;
+>> +
+>> +	TEST_ASSERT(num >= 1 && num <= 5, "Unsupported number of args,\n"
+>> +		    "  num: %u\n",
+>> +		    num);
+>> +
+>> +	va_start(ap, num);
+>> +	vcpu_regs_get(vm, vcpuid, &regs);
+>> +
+>> +	for (i = 0; i < num; i++)
+>> +		regs.gprs[i + 2] = va_arg(ap, uint64_t);
+>> +
+>> +	vcpu_regs_set(vm, vcpuid, &regs);
+>> +	va_end(ap);
+>> +}
+>> +
+>>  void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
+>>  {
+>>  	struct vcpu *vcpu = vm->vcpu_head;
+>>
+> 
 
-        switch (msr_index) {
-        case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
-                lowp = &vmx->nested.msrs.pinbased_ctls_low;
-                highp = &vmx->nested.msrs.pinbased_ctls_high;
-+               if (vmx->nested.enlightened_vmcs_enabled)
-+                       evmcs_unsupported = EVMCS1_UNSUPPORTED_PINCTRL;
-                break;
-        case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
-                lowp = &vmx->nested.msrs.procbased_ctls_low;
-                highp = &vmx->nested.msrs.procbased_ctls_high;
-+               if (vmx->nested.enlightened_vmcs_enabled)
-+                       evmcs_unsupported = 0;
-                break;
-        case MSR_IA32_VMX_TRUE_EXIT_CTLS:
-                lowp = &vmx->nested.msrs.exit_ctls_low;
-                highp = &vmx->nested.msrs.exit_ctls_high;
-+               if (vmx->nested.enlightened_vmcs_enabled)
-+                       evmcs_unsupported = EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
-                break;
-        case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
-                lowp = &vmx->nested.msrs.entry_ctls_low;
-                highp = &vmx->nested.msrs.entry_ctls_high;
-+               if (vmx->nested.enlightened_vmcs_enabled)
-+                       evmcs_unsupported = EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
-                break;
-        case MSR_IA32_VMX_PROCBASED_CTLS2:
-                lowp = &vmx->nested.msrs.secondary_ctls_low;
-                highp = &vmx->nested.msrs.secondary_ctls_high;
-+               if (vmx->nested.enlightened_vmcs_enabled)
-+                       evmcs_unsupported = EVMCS1_UNSUPPORTED_2NDEXEC;
-                break;
-        default:
-                BUG();
-@@ -1210,6 +1220,9 @@ vmx_restore_control_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
-
-        supported = vmx_control_msr(*lowp, *highp);
-
-+       /* HACK! */
-+       data &= ~(u64)evmcs_unsupported << 32;
-+
-        /* Check must-be-1 bits are still 1. */
-        if (!is_bitwise_subset(data, supported, GENMASK_ULL(31, 0)))
+Untested but the logic looks sane according to the ELF ABI. 
 
