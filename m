@@ -2,73 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CEA0C149425
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2020 10:32:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1185C14942B
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2020 10:34:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727925AbgAYJcJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Jan 2020 04:32:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47271 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726518AbgAYJcI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Jan 2020 04:32:08 -0500
+        id S1728173AbgAYJeW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Jan 2020 04:34:22 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46068 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725945AbgAYJeW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 25 Jan 2020 04:34:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579944727;
+        s=mimecast20190719; t=1579944860;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4aVPwT+ullXbV9ZGelAsF2ZlUzo01e9ol8SPKMVndpw=;
-        b=Of2AhvTnZpik7dhPmb37Ryh2IrPZ2XH6xNPAEgxDeW1jEuVGNdjkuiE6kS6BCmcpmRDQvs
-        xvhvMb9TLArRxFmNf2pnNZM5TYQSe7OjlYt0nkxKhTeuf/MibS26/P3QNmz7KiQKQ/QPvp
-        BZJIk/iPg/CInRAMqoHOoUxjKUoWR+Q=
+        bh=799m6qKMV18ggbdbpJL4lidbUmQPUZ2uqN90WWxnXDE=;
+        b=S5AEux1EhbcpuBAEHkgWWnOXSjZ1S6Vgq5x6b/i0bLkzzHismxg6iPkPgUs3dCMMXUPny1
+        NKrAfJ3cQcqCBZ6FDEZ1tAZ4bV5mPRkyfqRT+wYTNjRwKyaTEJhRZGRlanxwukeJGQpG4c
+        M2QQ+Y6N6RDHxf3pUOTx4+fWglN9pdE=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-elHhnXMtM9mPmiJNIdHQeg-1; Sat, 25 Jan 2020 04:32:05 -0500
-X-MC-Unique: elHhnXMtM9mPmiJNIdHQeg-1
-Received: by mail-wr1-f70.google.com with SMTP id j4so2746733wrs.13
-        for <kvm@vger.kernel.org>; Sat, 25 Jan 2020 01:32:05 -0800 (PST)
+ us-mta-413-26xB-fy-PcehP4wOi4bg1A-1; Sat, 25 Jan 2020 04:34:18 -0500
+X-MC-Unique: 26xB-fy-PcehP4wOi4bg1A-1
+Received: by mail-wr1-f70.google.com with SMTP id u12so2745089wrt.15
+        for <kvm@vger.kernel.org>; Sat, 25 Jan 2020 01:34:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=4aVPwT+ullXbV9ZGelAsF2ZlUzo01e9ol8SPKMVndpw=;
-        b=WjxqzR+kVUsOdqpFarfNIc1sM78800WkPcffAXpyFN/JFAH5OsT92hsrZPJizYt9Di
-         +0cnfHPVbs4Q5ZGBqZzxjk5wzWjaWc28DJ6I6XPi2Nt9zj2JMP1pN7jERczetBAboc0S
-         VRPXQX/K/SkqMmpNFCKieFq2BrOQjqVDkPIB0gOLCYZGfQpgfm/jrofJBIZG95/hSNFW
-         mhDdYVpMiNVLlBVI0Xh6BGBKcuprdVAUq88DpAMmOrIrFFzTAIczqiqWrvglMvULB5+5
-         fIYFdmW+vgSBRgJnmYkRRdGBbOP9KZEAx8N5SAHgGYPnRJT/0ItV6itZLmJp8DG6OOZh
-         sRhw==
-X-Gm-Message-State: APjAAAXmTzMNdj+ZPKL3wc5zh9U7GJLQc6LFaF6X6+p9oRPdS6kTzF2y
-        FALWwouqkJLVwPF5C/tVVqNF9bL4tWP3+7AxCXiIdXHRnYWrqYm1VkKtyYbZ07W9zu9KGbR29ah
-        mpMCIXiRFR/RR
-X-Received: by 2002:a05:6000:11c3:: with SMTP id i3mr9377041wrx.244.1579944724475;
-        Sat, 25 Jan 2020 01:32:04 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy6XvOgjU6V9Wv3zn93Ex1jpxLzeOnJ89MIAzXJBVajO5ULnjaciehkCA0EPTt32FXxUHMtbg==
-X-Received: by 2002:a05:6000:11c3:: with SMTP id i3mr9377021wrx.244.1579944724231;
-        Sat, 25 Jan 2020 01:32:04 -0800 (PST)
+        bh=799m6qKMV18ggbdbpJL4lidbUmQPUZ2uqN90WWxnXDE=;
+        b=kIahptu/WIfpLCVu1dJGSlD1gjaPGk8WrdTHpBtBnk2Yl2Z/8CDvAHK/JWwMfmzqbq
+         HaaiNQJodM52xnyJyZnXaI9Fi2X/O3V+LCzFcx7ZgF3aOKs887Xd8vZwFcdybKksJl8w
+         xNUZDoviQZ/Bn2pAaMcBMdOptHT45SLaWfXFZNy2qqHY2ZbPken9Si5mCBh+wzpA+gP5
+         aai9ttwF81rBY5D5EGiswB1a2w4g32GIn43vy3B8u7afDsLv/D6K09YRv+g7GVgOe7BW
+         SqmtRY2/lPY+tBpT184hAspDsAp5AwM+A8IQ//XV8JmHzzw1fxht6hoI7pzyCfM/ni8S
+         ZsGw==
+X-Gm-Message-State: APjAAAUc8A9queclNDPWKeFojY9sDl8D6xQEuyFndywDzjoGgX55vwaQ
+        a8G+LDq9cXvxOrjPP8ck5I4HNmLkFMiIil1Bi84kd0MY9L8EGh5Qc+Dvhoy7Aow1kaXDtvdRiPa
+        Cc0LWATcMGdtR
+X-Received: by 2002:adf:f308:: with SMTP id i8mr9489201wro.42.1579944857316;
+        Sat, 25 Jan 2020 01:34:17 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzV+U0Zk/vBr3PYTOy2NS/UOEJyzbyAI9oNA0HJiFpizgJq7/yGvYaD+zj50Eu2svel6qBslw==
+X-Received: by 2002:adf:f308:: with SMTP id i8mr9489175wro.42.1579944857009;
+        Sat, 25 Jan 2020 01:34:17 -0800 (PST)
 Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id b67sm10500968wmc.38.2020.01.25.01.32.02
+        by smtp.gmail.com with ESMTPSA id f16sm11253860wrm.65.2020.01.25.01.34.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Jan 2020 01:32:03 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: Take a u64 when checking for a valid dr7 value
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Randy Dunlap <rdunlap@infradead.org>
-References: <20200124230722.8964-1-sean.j.christopherson@intel.com>
+        Sat, 25 Jan 2020 01:34:16 -0800 (PST)
+Subject: Re: [PATCH v4 06/10] KVM: selftests: Add support for vcpu_args_set to
+ aarch64 and s390x
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc:     Cannon Matthews <cannonmatthews@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>
+References: <20200123180436.99487-1-bgardon@google.com>
+ <20200123180436.99487-7-bgardon@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <118ad0a6-b190-80ee-98fa-615466d2bf12@redhat.com>
-Date:   Sat, 25 Jan 2020 10:32:02 +0100
+Message-ID: <6061cd22-59bb-c191-bd98-f14d7cd274ae@redhat.com>
+Date:   Sat, 25 Jan 2020 10:34:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200124230722.8964-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200123180436.99487-7-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -76,45 +77,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/01/20 00:07, Sean Christopherson wrote:
-> Take a u64 instead of an unsigned long in kvm_dr7_valid() to fix a build
-> warning on i386 due to right-shifting a 32-bit value by 32 when checking
-> for bits being set in dr7[63:32].
+On 23/01/20 19:04, Ben Gardon wrote:
+> Currently vcpu_args_set is only implemented for x86. This makes writing
+> tests with multiple vCPUs difficult as each guest vCPU must either a.)
+> do the same thing or b.) derive some kind of unique token from it's
+> registers or the architecture. To simplify the process of writing tests
+> with multiple vCPUs for s390 and aarch64, add set args functions for
+> those architectures.
 > 
-> Alternatively, the warning could be resolved by rewriting the check to
-> use an i386-friendly method, but taking a u64 fixes another oddity on
-> 32-bit KVM.  Beause KVM implements natural width VMCS fields as u64s to
-> avoid layout issues between 32-bit and 64-bit, a devious guest can stuff
-> vmcs12->guest_dr7 with a 64-bit value even when both the guest and host
-> are 32-bit kernels.  KVM eventually drops vmcs12->guest_dr7[63:32] when
-> propagating vmcs12->guest_dr7 to vmcs02, but ideally KVM would not rely
-> on that behavior for correctness.
-> 
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Fixes: ecb697d10f70 ("KVM: nVMX: Check GUEST_DR7 on vmentry of nested guests")
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Ben Gardon <bgardon@google.com>
 > ---
->  arch/x86/kvm/x86.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  .../selftests/kvm/lib/aarch64/processor.c     | 33 +++++++++++++++++
+>  .../selftests/kvm/lib/s390x/processor.c       | 35 +++++++++++++++++++
+>  2 files changed, 68 insertions(+)
 > 
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 2d2ff855773b..3624665acee4 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -357,7 +357,7 @@ static inline bool kvm_pat_valid(u64 data)
->  	return (data | ((data & 0x0202020202020202ull) << 1)) == data;
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 86036a59a668e..a2ff90a75f326 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -333,3 +333,36 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+>  {
+>  	aarch64_vcpu_add_default(vm, vcpuid, NULL, guest_code);
+>  }
+> +
+> +/* VM VCPU Args Set
+> + *
+> + * Input Args:
+> + *   vm - Virtual Machine
+> + *   vcpuid - VCPU ID
+> + *   num - number of arguments
+> + *   ... - arguments, each of type uint64_t
+> + *
+> + * Output Args: None
+> + *
+> + * Return: None
+> + *
+> + * Sets the first num function input arguments to the values
+> + * given as variable args.  Each of the variable args is expected to
+> + * be of type uint64_t. The registers set by this function are r0-r7.
+> + */
+> +void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
+> +{
+> +	va_list ap;
+> +
+> +	TEST_ASSERT(num >= 1 && num <= 8, "Unsupported number of args,\n"
+> +		    "  num: %u\n",
+> +		    num);
+> +
+> +	va_start(ap, num);
+> +
+> +	for (i = 0; i < num; i++)
+> +		set_reg(vm, vcpuid, ARM64_CORE_REG(regs.regs[num]),
+> +			va_arg(ap, uint64_t));
+> +
+> +	va_end(ap);
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
+> index 32a02360b1eb0..680f37be9dbc9 100644
+> --- a/tools/testing/selftests/kvm/lib/s390x/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
+> @@ -269,6 +269,41 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+>  	run->psw_addr = (uintptr_t)guest_code;
 >  }
 >  
-> -static inline bool kvm_dr7_valid(unsigned long data)
-> +static inline bool kvm_dr7_valid(u64 data)
+> +/* VM VCPU Args Set
+> + *
+> + * Input Args:
+> + *   vm - Virtual Machine
+> + *   vcpuid - VCPU ID
+> + *   num - number of arguments
+> + *   ... - arguments, each of type uint64_t
+> + *
+> + * Output Args: None
+> + *
+> + * Return: None
+> + *
+> + * Sets the first num function input arguments to the values
+> + * given as variable args.  Each of the variable args is expected to
+> + * be of type uint64_t. The registers set by this function are r2-r6.
+> + */
+> +void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
+> +{
+> +	va_list ap;
+> +	struct kvm_regs regs;
+> +
+> +	TEST_ASSERT(num >= 1 && num <= 5, "Unsupported number of args,\n"
+> +		    "  num: %u\n",
+> +		    num);
+> +
+> +	va_start(ap, num);
+> +	vcpu_regs_get(vm, vcpuid, &regs);
+> +
+> +	for (i = 0; i < num; i++)
+> +		regs.gprs[i + 2] = va_arg(ap, uint64_t);
+> +
+> +	vcpu_regs_set(vm, vcpuid, &regs);
+> +	va_end(ap);
+> +}
+> +
+>  void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
 >  {
->  	/* Bits [63:32] are reserved */
->  	return !(data >> 32);
+>  	struct vcpu *vcpu = vm->vcpu_head;
 > 
 
-Queued, thanks.
+Squashing this:
+
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index a2ff90a75f32..839a76c96f01 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -353,6 +353,7 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
+ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
+ {
+ 	va_list ap;
++	int i;
+ 
+ 	TEST_ASSERT(num >= 1 && num <= 8, "Unsupported number of args,\n"
+ 		    "  num: %u\n",
+diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
+index 680f37be9dbc..a0b84235c848 100644
+--- a/tools/testing/selftests/kvm/lib/s390x/processor.c
++++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
+@@ -289,6 +289,7 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
+ {
+ 	va_list ap;
+ 	struct kvm_regs regs;
++	int i;
+ 
+ 	TEST_ASSERT(num >= 1 && num <= 5, "Unsupported number of args,\n"
+ 		    "  num: %u\n",
 
 Paolo
 
