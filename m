@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BD31149548
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2020 12:31:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8DC814954C
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2020 12:33:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726181AbgAYLbo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Jan 2020 06:31:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44088 "EHLO
+        id S1728809AbgAYLd3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Jan 2020 06:33:29 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1682 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725767AbgAYLbn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 25 Jan 2020 06:31:43 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00PBOUWi086733
-        for <kvm@vger.kernel.org>; Sat, 25 Jan 2020 06:31:42 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xrjq4akmp-1
+        by vger.kernel.org with ESMTP id S1726194AbgAYLd3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 25 Jan 2020 06:33:29 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00PBOF7n053319
+        for <kvm@vger.kernel.org>; Sat, 25 Jan 2020 06:33:28 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xrk2ca699-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Sat, 25 Jan 2020 06:31:42 -0500
+        for <kvm@vger.kernel.org>; Sat, 25 Jan 2020 06:33:27 -0500
 Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Sat, 25 Jan 2020 11:31:40 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Sat, 25 Jan 2020 11:33:25 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Sat, 25 Jan 2020 11:31:39 -0000
+        Sat, 25 Jan 2020 11:33:23 -0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00PBVcXD52625450
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00PBXMwE54263892
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 25 Jan 2020 11:31:38 GMT
+        Sat, 25 Jan 2020 11:33:23 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 60B8F4C04A;
-        Sat, 25 Jan 2020 11:31:38 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E1D634C040;
+        Sat, 25 Jan 2020 11:33:22 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 28D5F4C044;
-        Sat, 25 Jan 2020 11:31:38 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 9D8734C044;
+        Sat, 25 Jan 2020 11:33:22 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.95.133])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sat, 25 Jan 2020 11:31:38 +0000 (GMT)
+        Sat, 25 Jan 2020 11:33:22 +0000 (GMT)
 Subject: Re: force push to kvm/next coming
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         KVM list <kvm@vger.kernel.org>,
@@ -90,7 +90,7 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Sat, 25 Jan 2020 12:31:37 +0100
+Date:   Sat, 25 Jan 2020 12:33:22 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
@@ -99,16 +99,16 @@ Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20012511-0028-0000-0000-000003D44632
+x-cbid: 20012511-0020-0000-0000-000003A3DC1B
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012511-0029-0000-0000-00002498869E
-Message-Id: <a275a861-1893-6c4c-bf93-b117dd920a34@de.ibm.com>
+x-cbparentid: 20012511-0021-0000-0000-000021FB7C3C
+Message-Id: <c173b40f-d8b3-1b97-ab51-43e2e3e6e360@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-01-25_03:2020-01-24,2020-01-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 bulkscore=0 adultscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 mlxscore=0 clxscore=1015 phishscore=0 impostorscore=0
- suspectscore=2 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ lowpriorityscore=0 impostorscore=0 malwarescore=0 suspectscore=0
+ mlxscore=0 adultscore=0 bulkscore=0 mlxlogscore=889 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1911200001 definitions=main-2001250099
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -147,65 +147,7 @@ On 25.01.20 10:31, Paolo Bonzini wrote:
 >> Is this part of the fixup that you will do or another issue?
 > 
 > Nope, I trusted Conny's review on that. :(
-> 
-> Is this enough?
-> 
 
-Nope
-
-There is another kvm instance in that function.
-Something like the following does the trick.
-
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 0f475af84c0a..8646c99217f2 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -3061,8 +3061,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-                        goto out_free_sie_block;
-        }
- 
--       VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", vcpu->vcpu_id, vcpu,
--                vcpu->arch.sie_block);
-+       VM_EVENT(vcpu->kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK",
-+                vcpu->vcpu_id, vcpu, vcpu->arch.sie_block);
-        trace_kvm_s390_create_vcpu(vcpu->vcpu_id, vcpu, vcpu->arch.sie_block);
- 
-        rc = kvm_s390_vcpu_setup(vcpu);
-
-
-It is still compiling, test will take a while. But please push the fixup. This will help with our
-automation that picks up linux-next.
-
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index c059b86aacd4..0f475af84c0a 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -3023,9 +3023,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	vcpu->arch.sie_block->mso = 0;
->  	vcpu->arch.sie_block->msl = sclp.hamax;
->  
-> -	vcpu->arch.sie_block->icpua = id;
-> +	vcpu->arch.sie_block->icpua = vcpu->vcpu_id;
->  	spin_lock_init(&vcpu->arch.local_int.lock);
-> -	vcpu->arch.sie_block->gd = (u32)(u64)kvm->arch.gisa_int.origin;
-> +	vcpu->arch.sie_block->gd = (u32)(u64)vcpu->kvm->arch.gisa_int.origin;
->  	if (vcpu->arch.sie_block->gd && sclp.has_gisaf)
->  		vcpu->arch.sie_block->gd |= GISA_FORMAT1;
->  	seqcount_init(&vcpu->arch.cputm_seqcount);
-> @@ -3061,9 +3061,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  			goto out_free_sie_block;
->  	}
->  
-> -	VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", id, vcpu,
-> +	VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", vcpu->vcpu_id, vcpu,
->  		 vcpu->arch.sie_block);
-> -	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
-> +	trace_kvm_s390_create_vcpu(vcpu->vcpu_id, vcpu, vcpu->arch.sie_block);
->  
->  	rc = kvm_s390_vcpu_setup(vcpu);
->  	if (rc)
-> 
-> 
-> Paolo
-> 
+FWIW, I did test an earlier version of Seans patch set. So something must have gone wrong during one of the other fixups.
+Good news is that this was detected within a day by automated tools.
 
