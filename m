@@ -2,137 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 327E6149423
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2020 10:31:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEA0C149425
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2020 10:32:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726146AbgAYJbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 Jan 2020 04:31:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48263 "EHLO
+        id S1727925AbgAYJcJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 Jan 2020 04:32:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47271 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725710AbgAYJbf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 Jan 2020 04:31:35 -0500
+        with ESMTP id S1726518AbgAYJcI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 Jan 2020 04:32:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579944693;
+        s=mimecast20190719; t=1579944727;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=w3C93BinbxusfGVr43P81s4F7SqajmswbJ4wW+45gJM=;
-        b=a1hQoCLpgUfwfQs+K81zKHYMs3o3WOV6ft7qtOTuCmMWVqtmPUe7LbCBym4pZCDmxVgn5J
-        HXrUPedJI0/iyCLLMimTLlPiDr3BlY/r1kTlqae0iEogJOFj8vc1jGABmn382X1OSssS65
-        0Uubi+ktJulHT3TS4Nal/tlnhr3qN3A=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-3Gn-WL8PO1-xQwAahBuEBQ-1; Sat, 25 Jan 2020 04:31:29 -0500
-X-MC-Unique: 3Gn-WL8PO1-xQwAahBuEBQ-1
-Received: by mail-wr1-f72.google.com with SMTP id u12so2742553wrt.15
-        for <kvm@vger.kernel.org>; Sat, 25 Jan 2020 01:31:29 -0800 (PST)
+        bh=4aVPwT+ullXbV9ZGelAsF2ZlUzo01e9ol8SPKMVndpw=;
+        b=Of2AhvTnZpik7dhPmb37Ryh2IrPZ2XH6xNPAEgxDeW1jEuVGNdjkuiE6kS6BCmcpmRDQvs
+        xvhvMb9TLArRxFmNf2pnNZM5TYQSe7OjlYt0nkxKhTeuf/MibS26/P3QNmz7KiQKQ/QPvp
+        BZJIk/iPg/CInRAMqoHOoUxjKUoWR+Q=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-elHhnXMtM9mPmiJNIdHQeg-1; Sat, 25 Jan 2020 04:32:05 -0500
+X-MC-Unique: elHhnXMtM9mPmiJNIdHQeg-1
+Received: by mail-wr1-f70.google.com with SMTP id j4so2746733wrs.13
+        for <kvm@vger.kernel.org>; Sat, 25 Jan 2020 01:32:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=w3C93BinbxusfGVr43P81s4F7SqajmswbJ4wW+45gJM=;
-        b=pHI4Z0/EEuJpnbptwecwoF504dmDPJHNSzeJGzNJSJpQzb82Ib5F48Hz0qJSSVG8bU
-         936Tr4OOvCa5yYXmKgJlJUqOVtjksqmf+g1CkdqgbAddlSLQwr2IIvAxC+lO7DCRtLiW
-         jFk9rmrquI9+qdmoLIaeqcjnkVcgs05b+7TeSmVF8UO5Z5Qp6eOkhsHkvgL1H6tL0iTY
-         tNynv754jXUL6vCtiqvLxwfEiaAHcmtkGtgQ4WEPnsaHgyP9I5+EHI5sFQV3EQMiUCJu
-         pcxziGB153y1Yvn87tBIg2oabdFdpi2/ezWQggJbJogXecerCPAeGxN1eWEdG7iOYtC9
-         X48Q==
-X-Gm-Message-State: APjAAAWuRuUMiMkPAn6K6dOVI7HYTDTAab8Rw0geUAaZOB6XqJRz7qqj
-        2LkInzmcJvFsnLtKHGBceyW/OYD4/R2HtW4AbQB2Nf/JUYTkZj6CU68zt2hVitV+xvhXr+QYulZ
-        m7QNWklZASTvw
-X-Received: by 2002:a1c:5f41:: with SMTP id t62mr3678202wmb.42.1579944688821;
-        Sat, 25 Jan 2020 01:31:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzyprNWPjj4kgM+zsDK8Mgyr5Qqe6eHHBA7DOiGFoXymjDrIwWn8EYy9Fvp3LLyGttP5TIM9Q==
-X-Received: by 2002:a1c:5f41:: with SMTP id t62mr3678176wmb.42.1579944688587;
-        Sat, 25 Jan 2020 01:31:28 -0800 (PST)
+        bh=4aVPwT+ullXbV9ZGelAsF2ZlUzo01e9ol8SPKMVndpw=;
+        b=WjxqzR+kVUsOdqpFarfNIc1sM78800WkPcffAXpyFN/JFAH5OsT92hsrZPJizYt9Di
+         +0cnfHPVbs4Q5ZGBqZzxjk5wzWjaWc28DJ6I6XPi2Nt9zj2JMP1pN7jERczetBAboc0S
+         VRPXQX/K/SkqMmpNFCKieFq2BrOQjqVDkPIB0gOLCYZGfQpgfm/jrofJBIZG95/hSNFW
+         mhDdYVpMiNVLlBVI0Xh6BGBKcuprdVAUq88DpAMmOrIrFFzTAIczqiqWrvglMvULB5+5
+         fIYFdmW+vgSBRgJnmYkRRdGBbOP9KZEAx8N5SAHgGYPnRJT/0ItV6itZLmJp8DG6OOZh
+         sRhw==
+X-Gm-Message-State: APjAAAXmTzMNdj+ZPKL3wc5zh9U7GJLQc6LFaF6X6+p9oRPdS6kTzF2y
+        FALWwouqkJLVwPF5C/tVVqNF9bL4tWP3+7AxCXiIdXHRnYWrqYm1VkKtyYbZ07W9zu9KGbR29ah
+        mpMCIXiRFR/RR
+X-Received: by 2002:a05:6000:11c3:: with SMTP id i3mr9377041wrx.244.1579944724475;
+        Sat, 25 Jan 2020 01:32:04 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy6XvOgjU6V9Wv3zn93Ex1jpxLzeOnJ89MIAzXJBVajO5ULnjaciehkCA0EPTt32FXxUHMtbg==
+X-Received: by 2002:a05:6000:11c3:: with SMTP id i3mr9377021wrx.244.1579944724231;
+        Sat, 25 Jan 2020 01:32:04 -0800 (PST)
 Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id b16sm11176356wrj.23.2020.01.25.01.31.27
+        by smtp.gmail.com with ESMTPSA id b67sm10500968wmc.38.2020.01.25.01.32.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Jan 2020 01:31:28 -0800 (PST)
-Subject: Re: force push to kvm/next coming
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <8f43bd04-9f4e-5c06-8d1d-cb84bba40278@redhat.com>
- <c1564d41-0925-f0fd-c145-bea67a8b100e@de.ibm.com>
+        Sat, 25 Jan 2020 01:32:03 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: Take a u64 when checking for a valid dr7 value
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Randy Dunlap <rdunlap@infradead.org>
+References: <20200124230722.8964-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6b568513-5646-29ae-2165-95dbeb185697@redhat.com>
-Date:   Sat, 25 Jan 2020 10:31:27 +0100
+Message-ID: <118ad0a6-b190-80ee-98fa-615466d2bf12@redhat.com>
+Date:   Sat, 25 Jan 2020 10:32:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <c1564d41-0925-f0fd-c145-bea67a8b100e@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200124230722.8964-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/01/20 09:29, Christian Borntraeger wrote:
+On 25/01/20 00:07, Sean Christopherson wrote:
+> Take a u64 instead of an unsigned long in kvm_dr7_valid() to fix a build
+> warning on i386 due to right-shifting a 32-bit value by 32 when checking
+> for bits being set in dr7[63:32].
 > 
+> Alternatively, the warning could be resolved by rewriting the check to
+> use an i386-friendly method, but taking a u64 fixes another oddity on
+> 32-bit KVM.  Beause KVM implements natural width VMCS fields as u64s to
+> avoid layout issues between 32-bit and 64-bit, a devious guest can stuff
+> vmcs12->guest_dr7 with a 64-bit value even when both the guest and host
+> are 32-bit kernels.  KVM eventually drops vmcs12->guest_dr7[63:32] when
+> propagating vmcs12->guest_dr7 to vmcs02, but ideally KVM would not rely
+> on that behavior for correctness.
 > 
-> On 24.01.20 09:38, Paolo Bonzini wrote:
->> Linux-next merge reported some bad mistakes on my part, so I'm
->> force-pushing kvm/next.  Since it was pushed only yesterday and the code
->> is the same except for two changed lines, it shouldn't be a big deal.
->>
->> Paolo
->>
-> current KVM/next has the following compile error (due to Seans rework).
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Fixes: ecb697d10f70 ("KVM: nVMX: Check GUEST_DR7 on vmentry of nested guests")
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/x86.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->   CC [M]  arch/s390/kvm/kvm-s390.o
-> arch/s390/kvm/kvm-s390.c: In function ‘kvm_arch_vcpu_create’:
-> arch/s390/kvm/kvm-s390.c:3026:32: error: ‘id’ undeclared (first use in this function); did you mean ‘fd’?
->  3026 |  vcpu->arch.sie_block->icpua = id;
->       |                                ^~
->       |                                fd
-> arch/s390/kvm/kvm-s390.c:3026:32: note: each undeclared identifier is reported only once for each function it appears in
-> arch/s390/kvm/kvm-s390.c:3028:39: error: ‘kvm’ undeclared (first use in this function)
->  3028 |  vcpu->arch.sie_block->gd = (u32)(u64)kvm->arch.gisa_int.origin;
->       |                                       ^~~
-> make[2]: *** [scripts/Makefile.build:266: arch/s390/kvm/kvm-s390.o] Error 1
-> make[1]: *** [scripts/Makefile.build:503: arch/s390/kvm] Error 2
-> make: *** [Makefile:1693: arch/s390] Error 2
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 2d2ff855773b..3624665acee4 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -357,7 +357,7 @@ static inline bool kvm_pat_valid(u64 data)
+>  	return (data | ((data & 0x0202020202020202ull) << 1)) == data;
+>  }
+>  
+> -static inline bool kvm_dr7_valid(unsigned long data)
+> +static inline bool kvm_dr7_valid(u64 data)
+>  {
+>  	/* Bits [63:32] are reserved */
+>  	return !(data >> 32);
 > 
-> Is this part of the fixup that you will do or another issue?
 
-Nope, I trusted Conny's review on that. :(
-
-Is this enough?
-
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index c059b86aacd4..0f475af84c0a 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -3023,9 +3023,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.sie_block->mso = 0;
- 	vcpu->arch.sie_block->msl = sclp.hamax;
- 
--	vcpu->arch.sie_block->icpua = id;
-+	vcpu->arch.sie_block->icpua = vcpu->vcpu_id;
- 	spin_lock_init(&vcpu->arch.local_int.lock);
--	vcpu->arch.sie_block->gd = (u32)(u64)kvm->arch.gisa_int.origin;
-+	vcpu->arch.sie_block->gd = (u32)(u64)vcpu->kvm->arch.gisa_int.origin;
- 	if (vcpu->arch.sie_block->gd && sclp.has_gisaf)
- 		vcpu->arch.sie_block->gd |= GISA_FORMAT1;
- 	seqcount_init(&vcpu->arch.cputm_seqcount);
-@@ -3061,9 +3061,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 			goto out_free_sie_block;
- 	}
- 
--	VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", id, vcpu,
-+	VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", vcpu->vcpu_id, vcpu,
- 		 vcpu->arch.sie_block);
--	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
-+	trace_kvm_s390_create_vcpu(vcpu->vcpu_id, vcpu, vcpu->arch.sie_block);
- 
- 	rc = kvm_s390_vcpu_setup(vcpu);
- 	if (rc)
-
+Queued, thanks.
 
 Paolo
 
