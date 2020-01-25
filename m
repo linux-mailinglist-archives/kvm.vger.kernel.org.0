@@ -2,88 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C35A149221
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2020 00:46:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 624CC14923E
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2020 01:06:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729557AbgAXXqK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 Jan 2020 18:46:10 -0500
-Received: from mga07.intel.com ([134.134.136.100]:55675 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729147AbgAXXqK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 Jan 2020 18:46:10 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jan 2020 15:46:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,359,1574150400"; 
-   d="scan'208";a="251443288"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 24 Jan 2020 15:46:09 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: [kvm-unit-tests PATCH] x86: nVMX: Print more (accurate) info if RDTSC diff test fails
-Date:   Fri, 24 Jan 2020 15:46:08 -0800
-Message-Id: <20200124234608.10754-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S2387531AbgAYAGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 Jan 2020 19:06:45 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:44644 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387419AbgAYAGo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 Jan 2020 19:06:44 -0500
+Received: by mail-pf1-f193.google.com with SMTP id 62so1862180pfu.11
+        for <kvm@vger.kernel.org>; Fri, 24 Jan 2020 16:06:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=nhglXtwmeZl3KuhK/rxAwnOBAeX9EG+lzc/qU82Ybtg=;
+        b=Y65AZ8uCoollRGoV/zWI2qyPzx42ehugu9t1ispHF5tK0AXAZH3ItGTIeX8NRHui8z
+         vEixWO6P7dAFEm9haStQWFcUnInXvzcwmognmx45zvFoo4XSS0XfFWizthJE8LK/9Bkt
+         TGO+zVuYR6DXOtr/NK3ZKKNEjseMg+bAMRlq7NwwhOuZx55qbwNy7OLlSINYVnoeh1Dw
+         FWbBeD8cGCzvzw3wUxQmgIftxwOta0BFLGON99CDSeOMaK18vBjm20Jb+OAjr43EwGwp
+         pt2mwLsZcnYAmIm+ZthTA4foVRGb+gS8AXtfrkMZukA0R9uczAxW3uYj33nqO1uEiodc
+         gxUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=nhglXtwmeZl3KuhK/rxAwnOBAeX9EG+lzc/qU82Ybtg=;
+        b=CfU0Ir/VUzAqVEeGOYYFKZ6Hd71PK34N81ZjCNw6TVF7UG3lLsyBcCxCa9kbTBVrs3
+         z3xlqss+EeAERRysamwOSRjfN9M7cvPbVWQwqaryEh0UbgjnZDlCiz02qEVU6n+auJNS
+         on6v3fzs0Q/z8WBooTCmk/V3SdzMguV3y81In9iAUyL7pBEDZw0Dp9m/lLnDr6IAHTOU
+         FHVvF7lqpIBfoUczpupCctsmwD1AM4q7ZUge9bOUzF7P2UaxQ4DPptGBU8CMW0AbWZgz
+         V8Yi0fG6K1i9MbN9p6dN12LMz9WBpGPRBA+5iWE/yJHgoP5nHcqLopdKZCYe3nuh4v8+
+         MFtw==
+X-Gm-Message-State: APjAAAVsvYiIr1Gbx5L80FFRC9DLtuJy1YD2eSmUNYz8vTmt4kEWaidn
+        FWesr6o5S5H1gn0zqZ+Q5lo=
+X-Google-Smtp-Source: APXvYqxU9G7QPJB0zBTtTwPcN4rtPomC0/eYEfIgQSVpneCA78nQvzo8r+zxa5f1sA5o+A2HdRf88A==
+X-Received: by 2002:a65:488f:: with SMTP id n15mr7368725pgs.61.1579910803970;
+        Fri, 24 Jan 2020 16:06:43 -0800 (PST)
+Received: from [10.2.129.203] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id 6sm7763643pgh.0.2020.01.24.16.06.42
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 24 Jan 2020 16:06:43 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [kvm-unit-tests PATCH v3] x86: Add RDTSC test
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20200124233835.GT2109@linux.intel.com>
+Date:   Fri, 24 Jan 2020 16:06:40 -0800
+Cc:     Aaron Lewis <aaronlewis@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <1A882E15-4F22-463E-AD03-460FA9251489@gmail.com>
+References: <20191202204356.250357-1-aaronlewis@google.com>
+ <4EFDEFF2-D1CD-4AF3-9EF8-5F160A4D93CD@gmail.com>
+ <20200124233835.GT2109@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Snapshot the delta of the last run and display it in the report if the
-test fails.  Abort the run loop as soon as the threshold is reached so
-that the displayed delta is guaranteed to a failed delta.  Displaying
-the delta helps triage failures, e.g. is my system completely broken or
-did I get unlucky, and aborting the loop early saves 99900 runs when
-the system is indeed broken.
+> On Jan 24, 2020, at 3:38 PM, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> On Fri, Jan 24, 2020 at 03:13:44PM -0800, Nadav Amit wrote:
+>>> On Dec 2, 2019, at 12:43 PM, Aaron Lewis <aaronlewis@google.com> =
+wrote:
+>>>=20
+>>> Verify that the difference between a guest RDTSC instruction and the
+>>> IA32_TIME_STAMP_COUNTER MSR value stored in the VMCS12's VM-exit
+>>> MSR-store list is less than 750 cycles, 99.9% of the time.
+>>>=20
+>>> 662f1d1d1931 ("KVM: nVMX: Add support for capturing highest =
+observable L2 TSC=E2=80=9D)
+>>>=20
+>>> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+>>> Reviewed-by: Jim Mattson <jmattson@google.com>
+>>=20
+>> Running this test on bare-metal I get:
+>>=20
+>>  Test suite: rdtsc_vmexit_diff_test
+>>  FAIL: RDTSC to VM-exit delta too high in 117 of 100000 iterations
+>>=20
+>> Any idea why? Should I just play with the 750 cycles magic number?
+>=20
+> Argh, this reminds me that I have a patch for this test to improve the
+> error message to makes things easier to debug.  Give me a few minutes =
+to
+> get it sent out, might help a bit.
 
-Cc: Nadav Amit <nadav.amit@gmail.com>
-Cc: Aaron Lewis <aaronlewis@google.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- x86/vmx_tests.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Thanks for the quick response. With this patch I get on my bare-metal =
+Skylake:
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index b31c360..4049dec 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -9204,6 +9204,7 @@ static unsigned long long rdtsc_vmexit_diff_test_iteration(void)
- 
- static void rdtsc_vmexit_diff_test(void)
- {
-+	unsigned long long delta;
- 	int fail = 0;
- 	int i;
- 
-@@ -9226,17 +9227,17 @@ static void rdtsc_vmexit_diff_test(void)
- 	vmcs_write(EXI_MSR_ST_CNT, 1);
- 	vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(exit_msr_store));
- 
--	for (i = 0; i < RDTSC_DIFF_ITERS; i++) {
--		if (rdtsc_vmexit_diff_test_iteration() >=
--		    HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
-+	for (i = 0; i < RDTSC_DIFF_ITERS && fail < RDTSC_DIFF_FAILS; i++) {
-+		delta = rdtsc_vmexit_diff_test_iteration();
-+		if (delta >= HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
- 			fail++;
- 	}
- 
- 	enter_guest();
- 
- 	report(fail < RDTSC_DIFF_FAILS,
--	       "RDTSC to VM-exit delta too high in %d of %d iterations",
--	       fail, RDTSC_DIFF_ITERS);
-+	       "RDTSC to VM-exit delta too high in %d of %d iterations, last = %llu",
-+	       fail, i, delta);
- }
- 
- static int invalid_msr_init(struct vmcs *vmcs)
--- 
-2.24.1
+FAIL: RDTSC to VM-exit delta too high in 100 of 49757 iterations, last =3D=
+ 1152
+FAIL: Guest didn't run to completion.
+
+I=E2=80=99ll try to raise the delta and see what happens.
+
+Sorry for my laziness - it is just that like ~30% of the tests that are
+added fail on bare-metal :(
 
