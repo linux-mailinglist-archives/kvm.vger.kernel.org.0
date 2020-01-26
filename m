@@ -2,126 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EE6B14997F
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2020 08:16:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F807149984
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2020 08:28:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726481AbgAZHQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Jan 2020 02:16:34 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:50740 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726390AbgAZHQd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Jan 2020 02:16:33 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00Q7CuM5079638;
-        Sun, 26 Jan 2020 07:16:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=inoBrWCVL73MVCmEAR1Tf3fI1s+fcj3Ln2fJ4cwMoGA=;
- b=h4tOEH+xf0x5JJG4WFJA4+VlzcqwWdJJYQiaozesSDZvYeBLI/EtBo4ygcwLRwpbJs/H
- vRK24c9eZt5iNxuRoNJ69lrPQyaQAicFBhuIv8RU+1r4qZnok894/xt5OBCC6OSM5HG0
- xXgwK2G2Wrg6YjYP0Xa/MvJa3QXe6zjwxDJiBC6NYzQ3IpVtlGbHA+YdFp6AhMhhHbvu
- GuATH4HB36XZtk396nD9R6Z2Gj85erSuqq8VSfV3nzQWUi+cccyXZ5PcqKcLKvqlTQsX
- B9G0rSNLFpLJcZHPpYw6xrWm7ZqqC53PM66U4ggGXhEik5vAIZQ43Kkb5IEu5IJgJ0mQ ag== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2xrdmq2ydq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 26 Jan 2020 07:16:26 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00Q7EAnf141775;
-        Sun, 26 Jan 2020 07:16:25 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2xrytmkawp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 26 Jan 2020 07:16:25 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00Q7GOkD003689;
-        Sun, 26 Jan 2020 07:16:24 GMT
-Received: from localhost.localdomain (/10.159.134.59)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sat, 25 Jan 2020 23:16:24 -0800
-Subject: Re: [kvm-unit-tests PATCH] x86: nVMX: Print more (accurate) info if
- RDTSC diff test fails
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Aaron Lewis <aaronlewis@google.com>
-References: <20200124234608.10754-1-sean.j.christopherson@intel.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <705151e0-6a8b-1e15-934d-dd96f419dcd8@oracle.com>
-Date:   Sat, 25 Jan 2020 23:16:23 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1729107AbgAZH2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 Jan 2020 02:28:55 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56496 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726654AbgAZH2y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 26 Jan 2020 02:28:54 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00Q7OhNO047549
+        for <kvm@vger.kernel.org>; Sun, 26 Jan 2020 02:28:53 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2xrffxb80y-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Sun, 26 Jan 2020 02:28:53 -0500
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Sun, 26 Jan 2020 07:28:52 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Sun, 26 Jan 2020 07:28:49 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00Q7RvwD47645126
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 26 Jan 2020 07:27:57 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CDE6BA4053;
+        Sun, 26 Jan 2020 07:28:48 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9A99DA4040;
+        Sun, 26 Jan 2020 07:28:48 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.60.109])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sun, 26 Jan 2020 07:28:48 +0000 (GMT)
+Subject: Re: force push to kvm/next coming
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <8f43bd04-9f4e-5c06-8d1d-cb84bba40278@redhat.com>
+ <c1564d41-0925-f0fd-c145-bea67a8b100e@de.ibm.com>
+ <6b568513-5646-29ae-2165-95dbeb185697@redhat.com>
+ <a275a861-1893-6c4c-bf93-b117dd920a34@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Sun, 26 Jan 2020 08:28:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200124234608.10754-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <a275a861-1893-6c4c-bf93-b117dd920a34@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9511 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001260063
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9511 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001260063
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20012607-4275-0000-0000-0000039AF62E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20012607-4276-0000-0000-000038AF0889
+Message-Id: <195c2ca3-a87b-d2c3-4dc1-267d85467794@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-25_09:2020-01-24,2020-01-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ malwarescore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
+ phishscore=0 mlxscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
+ suspectscore=2 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2001260064
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 1/24/20 3:46 PM, Sean Christopherson wrote:
-> Snapshot the delta of the last run and display it in the report if the
-> test fails.  Abort the run loop as soon as the threshold is reached so
-> that the displayed delta is guaranteed to a failed delta.  Displaying
-> the delta helps triage failures, e.g. is my system completely broken or
-> did I get unlucky, and aborting the loop early saves 99900 runs when
-> the system is indeed broken.
->
-> Cc: Nadav Amit <nadav.amit@gmail.com>
-> Cc: Aaron Lewis <aaronlewis@google.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   x86/vmx_tests.c | 11 ++++++-----
->   1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index b31c360..4049dec 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -9204,6 +9204,7 @@ static unsigned long long rdtsc_vmexit_diff_test_iteration(void)
->   
->   static void rdtsc_vmexit_diff_test(void)
->   {
-> +	unsigned long long delta;
->   	int fail = 0;
->   	int i;
->   
-> @@ -9226,17 +9227,17 @@ static void rdtsc_vmexit_diff_test(void)
->   	vmcs_write(EXI_MSR_ST_CNT, 1);
->   	vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(exit_msr_store));
->   
-> -	for (i = 0; i < RDTSC_DIFF_ITERS; i++) {
-> -		if (rdtsc_vmexit_diff_test_iteration() >=
-> -		    HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
-> +	for (i = 0; i < RDTSC_DIFF_ITERS && fail < RDTSC_DIFF_FAILS; i++) {
-> +		delta = rdtsc_vmexit_diff_test_iteration();
-> +		if (delta >= HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
->   			fail++;
->   	}
->   
->   	enter_guest();
->   
->   	report(fail < RDTSC_DIFF_FAILS,
-> -	       "RDTSC to VM-exit delta too high in %d of %d iterations",
-> -	       fail, RDTSC_DIFF_ITERS);
-> +	       "RDTSC to VM-exit delta too high in %d of %d iterations, last = %llu",
-> +	       fail, i, delta);
->   }
->   
->   static int invalid_msr_init(struct vmcs *vmcs)
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+
+On 25.01.20 12:31, Christian Borntraeger wrote:
+[..]
+> Nope
+> 
+> There is another kvm instance in that function.
+> Something like the following does the trick.
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 0f475af84c0a..8646c99217f2 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3061,8 +3061,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>                         goto out_free_sie_block;
+>         }
+>  
+> -       VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", vcpu->vcpu_id, vcpu,
+> -                vcpu->arch.sie_block);
+> +       VM_EVENT(vcpu->kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK",
+> +                vcpu->vcpu_id, vcpu, vcpu->arch.sie_block);
+>         trace_kvm_s390_create_vcpu(vcpu->vcpu_id, vcpu, vcpu->arch.sie_block);
+>  
+>         rc = kvm_s390_vcpu_setup(vcpu);
+> 
+> 
+> It is still compiling, test will take a while. But please push the fixup. This will help with our
+> automation that picks up linux-next.
+
+The quick sniff with this fixup on top of your fixup looks good.
+
