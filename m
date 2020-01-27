@@ -2,151 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D539149F6F
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 09:05:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27671149F81
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 09:10:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727349AbgA0IFJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 03:05:09 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15358 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725991AbgA0IFJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jan 2020 03:05:09 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00R7utim095689
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 03:05:08 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xrj710euc-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 03:05:07 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 27 Jan 2020 08:05:04 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 27 Jan 2020 08:05:02 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00R8519t24903944
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Jan 2020 08:05:01 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6B787AE064;
-        Mon, 27 Jan 2020 08:05:01 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 35769AE051;
-        Mon, 27 Jan 2020 08:05:01 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.41])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Jan 2020 08:05:01 +0000 (GMT)
-Subject: Re: [PATCH v7] KVM: s390: Add new reset vcpu API
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com,
-        cohuck@redhat.com
-References: <20200110114540.90713-1-frankja@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 27 Jan 2020 09:05:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1728262AbgA0IKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 03:10:04 -0500
+Received: from merlin.infradead.org ([205.233.59.134]:56232 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725955AbgA0IKE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 03:10:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=NSkXKOkLVFSqskr8Fv8C50qKSUgO0Fch8+tEjDsF97E=; b=F4hAZJLK7Fe2reLHo/KcRVnHz
+        0Z8pBkj5nWzXnOz7AKhokwWpIjmIr+RMt6mUxbe1naCa2WJE5MDnXarGvxwFNNinfvMQqbrjEcXjy
+        nLRoVrupuxBlAXhn/0MiqkhQ1G1NiDaj7IwcCKW/0JlURpDfwNnZxwfpMpZ8kRvF1fWhcuOmynjPE
+        NcEFeH37cjRNaUhPuN7GBOmhQ8/sAiPatuige+3tUyGRoLMCG2qg2wESc1KELSf0u8NDu1ZhXylb/
+        kmdqyd7feqDD/2g5BzYWwC9oKl1t30bva3v5s2XRn+NNWzKLVL4yqOoLrqhVS7jVngUj0xo7V+tsq
+        0aqGhlCrw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ivzSk-0004Vq-1F; Mon, 27 Jan 2020 08:09:38 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 437B2300F4B;
+        Mon, 27 Jan 2020 09:07:54 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 08180203CF5D4; Mon, 27 Jan 2020 09:09:36 +0100 (CET)
+Date:   Mon, 27 Jan 2020 09:09:36 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Nick Desaulniers <nick.desaulniers@gmail.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+Subject: Re: [PATCH] dynamically allocate struct cpumask
+Message-ID: <20200127080935.GH14914@hirez.programming.kicks-ass.net>
+References: <20200127071602.11460-1-nick.desaulniers@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200110114540.90713-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20012708-0016-0000-0000-000002E0F770
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012708-0017-0000-0000-00003343B273
-Message-Id: <5a26e1af-ecdc-b815-248e-ee93a7c51ff5@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-27_02:2020-01-24,2020-01-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- malwarescore=0 mlxlogscore=742 impostorscore=0 phishscore=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 spamscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2001270068
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200127071602.11460-1-nick.desaulniers@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Jan 26, 2020 at 11:16:02PM -0800, Nick Desaulniers wrote:
+> This helps avoid avoid a potentially large stack allocation.
+> 
+> When building with:
+> $ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
+> The following warning is observed:
+> arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
+> function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
+> static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
+> vector)
+>             ^
+> Debugging with:
+> https://github.com/ClangBuiltLinux/frame-larger-than
+> via:
+> $ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
+>   kvm_send_ipi_mask_allbutself
+> points to the stack allocated `struct cpumask newmask` in
+> `kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
+> potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
+> the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
+> 8192, making a single instance of a `struct cpumask` 1024 B.
+> 
+> Signed-off-by: Nick Desaulniers <nick.desaulniers@gmail.com>
+> ---
+>  arch/x86/kernel/kvm.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 32ef1ee733b7..d41c0a0d62a2 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -494,13 +494,15 @@ static void kvm_send_ipi_mask(const struct cpumask *mask, int vector)
+>  static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int vector)
+>  {
+>  	unsigned int this_cpu = smp_processor_id();
+> -	struct cpumask new_mask;
 
+Right, on stack cpumask is definitely dodgy.
 
-On 10.01.20 12:45, Janosch Frank wrote:
-[...]
-> +static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_sync_regs *regs = &vcpu->run->s.regs;
-> +
-> +	/* Clear reset is a superset of the initial reset */
-> +	kvm_arch_vcpu_ioctl_normal_reset(vcpu);
-> +
-> +	memset(&regs->gprs, 0, sizeof(regs->gprs));
+> +	struct cpumask *new_mask;
+>  	const struct cpumask *local_mask;
+>  
+> -	cpumask_copy(&new_mask, mask);
+> -	cpumask_clear_cpu(this_cpu, &new_mask);
+> -	local_mask = &new_mask;
+> +	new_mask = kmalloc(sizeof(*new_mask), GFP_KERNEL);
+> +	cpumask_copy(new_mask, mask);
+> +	cpumask_clear_cpu(this_cpu, new_mask);
+> +	local_mask = new_mask;
+>  	__send_ipi_mask(local_mask, vector);
+> +	kfree(new_mask);
+>  }
 
-
-
-> +	/* Will be picked up because of save_fpu_regs() in the initial reset */
-> +	memset(&current->thread.fpu.vxrs, 0, sizeof(current->thread.fpu.vxrs));
-
-So I checked with a userspace that sets f8(call-saved) to 0x123 during this ioctl.
-f8 is 0 afterwards. The guest f8 is also correct, just because QEMU does clear out
-its copy of the fprs and syncs that back via synv regs.
-
-So this must be
-
-	/* we have not synced the registers from kvm_run to the thread
-	   structure. We must clear out kvm_run*/
-	memset(&regs->vrs, 0, sizeof(regs->vrs));
-
-
-> +	memset(&regs->acrs, 0, sizeof(regs->acrs));
-> +
-> +	regs->etoken = 0;
-> +	regs->etoken_extension = 0;
-> +
-> +	memset(&regs->gscb, 0, sizeof(regs->gscb));
-[....]
-
+One alternative approach is adding the inverse of cpu_bit_bitmap. I'm
+not entirely sure how often we need the all-but-self mask, but ISTR
+there were other places too.
