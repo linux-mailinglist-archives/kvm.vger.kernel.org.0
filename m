@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AB4514A3FF
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 13:36:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3404E14A400
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 13:36:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730582AbgA0MgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 07:36:13 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:4529 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729868AbgA0MgN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jan 2020 07:36:13 -0500
+        id S1730722AbgA0MgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 07:36:18 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:45051 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730628AbgA0MgR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 07:36:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1580128572; x=1611664572;
+  t=1580128578; x=1611664578;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=FG1pjLRzFSIbSk8VxxvqUyBnuCH4QCr5VvPItyWjAZY=;
-  b=puSq09XzhcfIBE3aw8NjIJS7mMSU3TYEWto+FpDpMEd/L/Nu9BCUDJ+c
-   c/9JfpQyOuef2Vj70398AGM+PML/MTbkJZ0fLiD4djvpp1ZLLInyZSsuw
-   394HmUba7O+XdXvh3l/hLbPR9wbdgLxLsT8YlM8ka1U7fBpB7B1PerI6M
-   krk1a1iwbcBpHr7fcpm/tZbhHn2Fv6u3E+E7FAs++pK/GpEUik1g9a3mA
-   lAbqkNZKgNIBAy0BZX/NxcnC+IuIY+dvTCz2GVV/zidwIKMVkC/HfwzFn
-   eHf/4XAVGyoQhROvpy72HwbfcM8H74anCKc7nZzXMNTOLEr4NSebN8QXx
-   g==;
-IronPort-SDR: 8Xarib120AphJAvHWTjbdE+XZskwKf/r9CjvbPZCK/dj0tbyJwUEaTRY/Fxw0doZZ87B4UKcyc
- pnMzjiOFuV4AJrHqscQr1/dF9G4UgZ+Wze78iBMnifPd3H5U2e5un3v/ZaztIuQmurbhTqoRFK
- UuAqH6qMstZVG/A5ZIkRx1WfjP1P1biYw+WObZxysiofPQp6bKW1qMcCrYgRXhw0SONpZ5ZF6T
- IJ2B22IYBqOMZKOGr9fVLnICgTaw2UkxMOR5YBFYyaCO2l0ehW2a6N1ztGOzEg78Pgllm7MGAV
- xPY=
+  bh=k5KQ2PTdzLoy/DM8odM6j0b0hj/ekFquF7HI+weSs68=;
+  b=PRoYeJ1jfp1xDcpYh5rVqPn31U36nfib5zR8KdGDbl4LwesrZSGgV+Oq
+   W4xWl35HBYsDre2omKjw2JNHrXPMZAWxtlmmQdRJqfMn1Ih0Q4HB47LpN
+   YPxbRwi/v/0TKW1/f6pRUbN4W4Ge735pd3q/K3W0tl7+RzKu4+0LL9Arn
+   4kejFRV95lOHORL7v4Ii4Xm+7m3ydUk0lzhHyNDIL4igJJgy/RG2rAQTk
+   nx+iMwy0qQ3d5AuTsVzwZohPhTbLeGblfwfE+/H4y8pHTYRXcWTobi1/n
+   cZC9cUAkcSvTm/ju33/ZZ2qla4tqJkXOigVL2Svo89tmkMOiIDkDXA9IY
+   A==;
+IronPort-SDR: bzH0XTGtHyFg3QsxbDPRne9Laf33sRbv8bEuYhtFHLPOmMlBBfStPa5mIl6RcORccjLXf+6g/N
+ zLJcWg27Lo0Kw7gU4MJo3CwhslgQPX6pZ9DS6vTw6qOkt9bHj8AwwKL7bhwDHMRcsm/euYCfiO
+ zbPVJytfeFsHJdvPAUi4rHXlaukS3uaM+uHZT52nV2T8IdUiBveeVRg+K2zWB7eb8WVC8O3jEC
+ 7VoE/dZyREQjsOCNLLd+weaDyNvX30yjtWMgaUKDEUu/W8xvlSYvl2dPBuaSKGYE8QOMUJ9Vuk
+ Fyg=
 X-IronPort-AV: E=Sophos;i="5.70,369,1574092800"; 
-   d="scan'208";a="128476111"
-Received: from mail-bn8nam12lp2168.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.168])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Jan 2020 20:36:11 +0800
+   d="scan'208";a="129052157"
+Received: from mail-mw2nam10lp2103.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.103])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jan 2020 20:36:17 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KI/5ZbsLZnpj7ZSIRZblG2SxxWTY3MNXu/AGft8O6N9skqwJM8zfSVYiA7VgZoATfOd0G1CeXZKjErYUxm+ac5rwedXBN8BqjorO4UyTrEpn4/O+ta4PbB1zSxn/lBbIhFTnSfKASgAafL28bYJuv0ycyUWxvs7zAURfo77Uj+Mu0dX8/pwHr4ZdOA9QsQhej8h81/koaliemGiyknjCHuBhP1hPesQKN7+W25gaVsgENX31dEavIkbDKMktgIslg+dR7P43rT9fVfKwdIuMlALdjRBKf9fJGZD7uA4p4cuZFvSB03bbJvYTRskf8jIRSSCzCWW2LFT+4kLLAdL3Eg==
+ b=AuPAluwQhUe5WZghaXzTTaZu78nePdFlt14xDFeYcl5CoOjX+xcEAIm1dzYQr5OoDIbtDBnsG4IlWCIeu7GitaSm8/3euyZKQfWldqQNWBQU9olj/EaRDcI/MlQqZx9CNnATopaRkVJ/cBp9Co2Ze2OD0wO10LUqiXMIyRSVMGjOzxt3lyqgVWb6/1H2Z2d91ucIKzeoiKn7WTPvlPtxIelONrWnzEUuYW11cnSSkU+jOVcGBK5TEd7kxyqrA0b0E3guUAtD94Pcm8Snc3Ay5sS3oto7Vpn2k2FAMhFlrYt470f9UCyWwvUxQAYhJhPpFmIuXjKZZozlLsUGWUOhTw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YglYYcKuhQDkuQ0pIhEsmt6tHFkeynrIHF/Dayk4N20=;
- b=eyhC6mV/r/Eo+AH1xGtVFRpEBad41nK1SWTCEgRRyVgxMWOhTCWMWovT6DTE8Ha6BnXEu6h6XD1rJT6/uNhiZQ40hKQ5TWAZ5A9HwlGO0r56gBnql6uP2f3ryX6cOmET8NGpmsQDImZajo56a1WTJOBXJvLoZW2EZRZoxfRXsU4w+O18TTY35WWG3g6BrNtqYMJD7nY/Fqqs9cLMrA4Fsaou0SwqIETqtqqK4KBrMhcPSzw9tamEUJIppel7yywC2jChSGvbF7PGcYEVJGyfkXcubRZjNdWpza6M89WV6fWnB3q6xh1SpoyzoyUibRDX/vhMpBAOwFd0Dp72wT9SOw==
+ bh=go2EhmsJzCzq/Go9gWrpDYtpor9kYS+VKhvR6bogtJ4=;
+ b=oPWzBC331vL0FM3dCSNAW7QcWxvmHrdt7p2IV+zDku0Zgfi4+DPYuFTS4w+2KiMNgRYhPcSBIUoGGR9fHUDAgB7owjEIQNKNR4oygLyLbj4PfeCnKr3obLZxUs/Q+jZ801oc5Jl+aVA9MEeJa97Ua3HULcOM+YUP30M3Dav/WN5CLwHGEQlW4cwHteHbipw8/gkdrlS2LUcjGYEe8THS6X3QfFW3i1e+oNrtT6//aKv7Xc0gqsXXk44Th2Ts8h0WNlvmiv4/YsWGfKauQYvLchKS0pAfHx1+61Y/Ree5NQAKpJxeOe9pr32jGVQpkX7dLMYFCwVd6ddyUAhBufx87A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YglYYcKuhQDkuQ0pIhEsmt6tHFkeynrIHF/Dayk4N20=;
- b=qdqTodL3GO/vUuWQgHZXQJErOOFaF1+tGWntSB/2NO05hkbcYe4Wcd1nFiorF8MO/vbUkri9BfH9cOFlvtWSgLT23VPuHxw151EJ7eApRFz4R9nf6gjako1EqEKGMRT/bafl40dEt4H8fvT3QLvnxnnooEieTziAFHbe30dbPtM=
+ bh=go2EhmsJzCzq/Go9gWrpDYtpor9kYS+VKhvR6bogtJ4=;
+ b=KTU5XEXitOyb10jSjJTB9AFnH/QCfJ+iSawSwJvg1amnYOCVvR18Ac7cTaSweAp1xSNEoAslJj9937WMCzp7vF8lqzGzDCrJPG8M55IzWJDSRaIU06RwzgwvxfzsHOqCmxTlljLQY+zevDu9TYWhzXytbijBfF5TJmofT56wY84=
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
  MN2PR04MB6816.namprd04.prod.outlook.com (10.186.145.79) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2665.22; Mon, 27 Jan 2020 12:36:10 +0000
+ 15.20.2665.22; Mon, 27 Jan 2020 12:36:15 +0000
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::a9a0:3ffa:371f:ad89]) by MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::a9a0:3ffa:371f:ad89%7]) with mapi id 15.20.2665.017; Mon, 27 Jan 2020
- 12:36:10 +0000
-Received: from wdc.com (49.207.48.168) by MA1PR01CA0095.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:1::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2665.22 via Frontend Transport; Mon, 27 Jan 2020 12:36:06 +0000
+ 12:36:15 +0000
+Received: from wdc.com (49.207.48.168) by MA1PR01CA0095.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:1::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2665.22 via Frontend Transport; Mon, 27 Jan 2020 12:36:11 +0000
 From:   Anup Patel <Anup.Patel@wdc.com>
 To:     Will Deacon <will.deacon@arm.com>
 CC:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -66,12 +66,13 @@ CC:     Paolo Bonzini <pbonzini@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
         Anup Patel <Anup.Patel@wdc.com>
-Subject: [kvmtool RFC PATCH v2 3/8] riscv: Implement Guest/VM arch functions
-Thread-Topic: [kvmtool RFC PATCH v2 3/8] riscv: Implement Guest/VM arch
+Subject: [kvmtool RFC PATCH v2 4/8] riscv: Implement Guest/VM VCPU arch
  functions
-Thread-Index: AQHV1Q5aS4dNVduMv0Sx5YtsqhfBQQ==
-Date:   Mon, 27 Jan 2020 12:36:10 +0000
-Message-ID: <20200127123527.106825-4-anup.patel@wdc.com>
+Thread-Topic: [kvmtool RFC PATCH v2 4/8] riscv: Implement Guest/VM VCPU arch
+ functions
+Thread-Index: AQHV1Q5dZTJTZ88F6UiYtHeM3xmjIQ==
+Date:   Mon, 27 Jan 2020 12:36:14 +0000
+Message-ID: <20200127123527.106825-5-anup.patel@wdc.com>
 References: <20200127123527.106825-1-anup.patel@wdc.com>
 In-Reply-To: <20200127123527.106825-1-anup.patel@wdc.com>
 Accept-Language: en-US
@@ -88,244 +89,415 @@ x-mailer: git-send-email 2.17.1
 x-originating-ip: [49.207.48.168]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 6a6a94d1-a34f-4c5b-026d-08d7a3257cfe
+x-ms-office365-filtering-correlation-id: 60da060f-61cd-4bdf-d581-08d7a3257fa7
 x-ms-traffictypediagnostic: MN2PR04MB6816:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB6816362CB2ED2C090D998D158D0B0@MN2PR04MB6816.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <MN2PR04MB6816643453068E3E1F4249468D0B0@MN2PR04MB6816.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
 x-forefront-prvs: 02951C14DC
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(39860400002)(396003)(366004)(346002)(376002)(189003)(199004)(44832011)(5660300002)(2906002)(55236004)(54906003)(86362001)(7696005)(4326008)(55016002)(478600001)(2616005)(81156014)(956004)(8676002)(52116002)(81166006)(1076003)(8886007)(8936002)(71200400001)(66946007)(26005)(1006002)(6666004)(66476007)(6916009)(66556008)(64756008)(16526019)(316002)(66446008)(36756003)(186003);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB6816;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(39860400002)(396003)(366004)(346002)(376002)(189003)(199004)(44832011)(5660300002)(2906002)(55236004)(54906003)(86362001)(7696005)(4326008)(55016002)(478600001)(2616005)(81156014)(956004)(8676002)(52116002)(81166006)(1076003)(8886007)(8936002)(71200400001)(66946007)(26005)(1006002)(66476007)(6916009)(66556008)(30864003)(64756008)(16526019)(316002)(66446008)(36756003)(186003);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB6816;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: jP0h6rO/6jSMNSh/B4Qo+XJVOvfohD25bbT4L20Oc1KqXMd3K7FRwRh3QgJyyNzwzLtaIWhmIrMVUG1dRuMIvrgN7T5exQFUeY3jA7DsfpKoVF9j14Vg94fzLg2Bauia+O2LcMOVa7dVQlIUc0W48KGlRgf/QCX0c3Glpnr33K+DoppbnaV9LWv03TuyS0Ym2OBBq9NfQs14bmyBW0To0cC/3y7yphkS/Oo+8ZiyGSdRpe2KgxqrFqKFH8DyTP8ct9T4UEeaOEoi1pjoJMrO9ySVYEx7NhKdVizxjNRU0PtgribdHPBdgY1SWYEWrZxtw539Q2SOxyZq5iOM5t7evugxymAi7A0SFexez0Bnpk4mQw8wu8wNoc4MKmR1Qqt9TWdyjtgC6N58PP8fkIp5VW6al5fIvVDYG/66QlHL5a+MxZWll5Kr+E6ABjZuTd8K
-x-ms-exchange-antispam-messagedata: XtDwG0A4c73h9pD1Ul+qakzbFPscFgjFTX1VfL+Dii+eKqVW1YE3GQ3aAVmvH9W9I+ZYV48zG8BTgM/kyCKel0gHEQi0kee/Px8gtuf8jXufcKwsnKRQjqfvINIxpDpyJaHUq2hkNPCdkIgboL4veg==
+x-microsoft-antispam-message-info: F8I2UUn2epWhGp5zwb81ArfTpPkklzCMhpAJbt08qee2K3ydBZ7fbuy5RR9pjwKEEe3gviSqtey5Z3uvLCQGu97rIp8qiPZgdbFq08a8mv/0/49r4R7Frt4IQwTo/888vxUV2FI/F/se5LUXbU/ry5o5dqhNtAga5fI+oEA5cWkyM5+YP5OWe5BNTNMjIYpHX6RliVIoll2D6uLrIbKsk2H58J3gE1bRF6Vff0mlTN/1Y0jIoG7RBOcH59CJJmeSMGYZGPh/p6QWO9Pytd5d+JOy6jX64lUZPXjLgbalUf63EtnRP+6ZTCCqEyX7sp0YwF5BL2TP87XcT4o1CRgHjVviK92lb0dYzEdLLl8j5GcvoumfM9qbIDg2342/cVPV8NF0etcmxWwQvS9ORXgBSVamyCsCIhC6bv+OVvgxHnQY27TiqLOQUGG+ALcUQkwr
+x-ms-exchange-antispam-messagedata: AMgiOzow3/PezwU6RojkhpjuwOLuZd3whEB4k6f0pSj1A1gKCK54LcbJ8vhuJsEEx+VmVYWtpiNnuBDZXLpHjMDW7yNYuQV+5vtRZ4UmirfD2jHK8x10K7scjhbDXSc+G0mQmW9klXwaH6QH0WExlw==
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a6a94d1-a34f-4c5b-026d-08d7a3257cfe
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jan 2020 12:36:10.3742
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60da060f-61cd-4bdf-d581-08d7a3257fa7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jan 2020 12:36:14.9176
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 42dKTAwEqmFagisGM3ZVIRw0n7RjN7wD95pQLFn1nQBKVT26eR2RBTnz3tU/bp+cev+fSAiy382yLIWuJSzuFw==
+X-MS-Exchange-CrossTenant-userprincipalname: Y3VM+AqKCKdSZlYxc9h2rqKYZdJYogaTqrl5juo6s5oD7baNozK4qUUjpX0LH4Bb5hHFQwXnkLhruEFRuxNFiA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6816
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch implements all kvm__arch_<xyz> Guest/VM arch functions.
+This patch implements kvm_cpu__<xyz> Guest/VM VCPU arch functions.
 
 These functions mostly deal with:
-1. Guest/VM RAM initialization
-2. Updating terminals on character read
-3. Loading kernel and initrd images
+1. VCPU allocation and initialization
+2. VCPU reset
+3. VCPU show/dump code
+4. VCPU show/dump registers
 
-Firmware loading is not implemented currently because initially we
-will be booting kernel directly without any bootloader. In future,
-we will certainly support firmware loading.
+We also save RISC-V ISA, XLEN, and TIMEBASE frequency for each VCPU
+so that it can be later used for generating Guest/VM FDT.
 
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 ---
- riscv/include/kvm/kvm-arch.h |  15 +++++
- riscv/kvm.c                  | 125 +++++++++++++++++++++++++++++++++--
- 2 files changed, 134 insertions(+), 6 deletions(-)
+ riscv/include/kvm/kvm-cpu-arch.h |   4 +
+ riscv/kvm-cpu.c                  | 307 ++++++++++++++++++++++++++++++-
+ 2 files changed, 304 insertions(+), 7 deletions(-)
 
-diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-index 6ab93cb..6f64f55 100644
---- a/riscv/include/kvm/kvm-arch.h
-+++ b/riscv/include/kvm/kvm-arch.h
-@@ -51,6 +51,21 @@
- struct kvm;
+diff --git a/riscv/include/kvm/kvm-cpu-arch.h b/riscv/include/kvm/kvm-cpu-a=
+rch.h
+index ae6ae0a..78fcd01 100644
+--- a/riscv/include/kvm/kvm-cpu-arch.h
++++ b/riscv/include/kvm/kvm-cpu-arch.h
+@@ -12,6 +12,10 @@ struct kvm_cpu {
 =20
- struct kvm_arch {
+ 	unsigned long   cpu_id;
+=20
++	unsigned long	riscv_xlen;
++	unsigned long	riscv_isa;
++	unsigned long	riscv_timebase;
++
+ 	struct kvm	*kvm;
+ 	int		vcpu_fd;
+ 	struct kvm_run	*kvm_run;
+diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
+index e4b8fa5..cca192f 100644
+--- a/riscv/kvm-cpu.c
++++ b/riscv/kvm-cpu.c
+@@ -17,10 +17,84 @@ int kvm_cpu__get_debug_fd(void)
+ 	return debug_fd;
+ }
+=20
++static __u64 __kvm_reg_id(__u64 type, __u64 idx)
++{
++	__u64 id =3D KVM_REG_RISCV | type | idx;
++
++	if (__riscv_xlen =3D=3D 64)
++		id |=3D KVM_REG_SIZE_U64;
++	else
++		id |=3D KVM_REG_SIZE_U32;
++
++	return id;
++}
++
++#define RISCV_CONFIG_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CONFIG, \
++					     KVM_REG_RISCV_CONFIG_REG(name))
++
++#define RISCV_CORE_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CORE, \
++					     KVM_REG_RISCV_CORE_REG(name))
++
++#define RISCV_CSR_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CSR, \
++					     KVM_REG_RISCV_CSR_REG(name))
++
++#define RISCV_TIMER_REG(name)	__kvm_reg_id(KVM_REG_RISCV_TIMER, \
++					     KVM_REG_RISCV_TIMER_REG(name))
++
+ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ {
+-	/* TODO: */
+-	return NULL;
++	struct kvm_cpu *vcpu;
++	unsigned long timebase =3D 0, isa =3D 0;
++	int coalesced_offset, mmap_size;
++	struct kvm_one_reg reg;
++
++	vcpu =3D calloc(1, sizeof(struct kvm_cpu));
++	if (!vcpu)
++		return NULL;
++
++	vcpu->vcpu_fd =3D ioctl(kvm->vm_fd, KVM_CREATE_VCPU, cpu_id);
++	if (vcpu->vcpu_fd < 0)
++		die_perror("KVM_CREATE_VCPU ioctl");
++
++	reg.id =3D RISCV_CONFIG_REG(isa);
++	reg.addr =3D (unsigned long)&isa;
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (config.isa)");
++
++	reg.id =3D RISCV_TIMER_REG(frequency);
++	reg.addr =3D (unsigned long)&timebase;
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (config.timebase)");
++
++	mmap_size =3D ioctl(kvm->sys_fd, KVM_GET_VCPU_MMAP_SIZE, 0);
++	if (mmap_size < 0)
++		die_perror("KVM_GET_VCPU_MMAP_SIZE ioctl");
++
++	vcpu->kvm_run =3D mmap(NULL, mmap_size, PROT_RW, MAP_SHARED,
++			     vcpu->vcpu_fd, 0);
++	if (vcpu->kvm_run =3D=3D MAP_FAILED)
++		die("unable to mmap vcpu fd");
++
++	coalesced_offset =3D ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION,
++				 KVM_CAP_COALESCED_MMIO);
++	if (coalesced_offset)
++		vcpu->ring =3D (void *)vcpu->kvm_run +
++			     (coalesced_offset * PAGE_SIZE);
++
++	reg.id =3D RISCV_CONFIG_REG(isa);
++	reg.addr =3D (unsigned long)&isa;
++	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
++		die("KVM_SET_ONE_REG failed (config.isa)");
++
++	/* Populate the vcpu structure. */
++	vcpu->kvm		=3D kvm;
++	vcpu->cpu_id		=3D cpu_id;
++	vcpu->riscv_isa		=3D isa;
++	vcpu->riscv_xlen	=3D __riscv_xlen;
++	vcpu->riscv_timebase	=3D timebase;
++	vcpu->is_running	=3D true;
++
++	return vcpu;
+ }
+=20
+ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
+@@ -29,7 +103,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
+=20
+ void kvm_cpu__delete(struct kvm_cpu *vcpu)
+ {
+-	/* TODO: */
++	free(vcpu);
+ }
+=20
+ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+@@ -40,12 +114,43 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+=20
+ void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
+ {
+-	/* TODO: */
+ }
+=20
+ void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu)
+ {
+-	/* TODO: */
++	struct kvm *kvm =3D vcpu->kvm;
++	struct kvm_mp_state mp_state;
++	struct kvm_one_reg reg;
++	unsigned long data;
++
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_MP_STATE, &mp_state) < 0)
++		die_perror("KVM_GET_MP_STATE failed");
++
 +	/*
-+	 * We may have to align the guest memory for virtio, so keep the
-+	 * original pointers here for munmap.
++	 * If MP state is stopped then it means Linux KVM RISC-V emulates
++	 * SBI v0.2 (or higher) with HART power managment and give VCPU
++	 * will power-up at boot-time by boot VCPU. For such VCPU, we
++	 * don't update PC, A0 and A1 here.
 +	 */
-+	void	*ram_alloc_start;
-+	u64	ram_alloc_size;
++	if (mp_state.mp_state =3D=3D KVM_MP_STATE_STOPPED)
++		return;
 +
-+	/*
-+	 * Guest addresses for memory layout.
-+	 */
-+	u64	memory_guest_start;
-+	u64	kern_guest_start;
-+	u64	initrd_guest_start;
-+	u64	initrd_size;
-+	u64	dtb_guest_start;
- };
-=20
- static inline bool riscv_addr_in_ioport_region(u64 phys_addr)
-diff --git a/riscv/kvm.c b/riscv/kvm.c
-index e816ef5..84e0277 100644
---- a/riscv/kvm.c
-+++ b/riscv/kvm.c
-@@ -1,5 +1,7 @@
- #include "kvm/kvm.h"
- #include "kvm/util.h"
-+#include "kvm/8250-serial.h"
-+#include "kvm/virtio-console.h"
- #include "kvm/fdt.h"
-=20
- #include <linux/kernel.h>
-@@ -19,33 +21,144 @@ bool kvm__arch_cpu_supports_vm(void)
-=20
- void kvm__init_ram(struct kvm *kvm)
- {
--	/* TODO: */
-+	int err;
-+	u64 phys_start, phys_size;
-+	void *host_mem;
++	reg.addr =3D (unsigned long)&data;
 +
-+	phys_start	=3D RISCV_RAM;
-+	phys_size	=3D kvm->ram_size;
-+	host_mem	=3D kvm->ram_start;
++	data	=3D kvm->arch.kern_guest_start;
++	reg.id	=3D RISCV_CORE_REG(regs.pc);
++	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
++		die_perror("KVM_SET_ONE_REG failed (pc)");
 +
-+	err =3D kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-+	if (err)
-+		die("Failed to register %lld bytes of memory at physical "
-+		    "address 0x%llx [err %d]", phys_size, phys_start, err);
++	data	=3D vcpu->cpu_id;
++	reg.id	=3D RISCV_CORE_REG(regs.a0);
++	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
++		die_perror("KVM_SET_ONE_REG failed (a0)");
 +
-+	kvm->arch.memory_guest_start =3D phys_start;
++	data	=3D kvm->arch.dtb_guest_start;
++	reg.id	=3D RISCV_CORE_REG(regs.a1);
++	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
++		die_perror("KVM_SET_ONE_REG failed (a1)");
  }
 =20
- void kvm__arch_delete_ram(struct kvm *kvm)
+ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+@@ -55,10 +160,198 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+=20
+ void kvm_cpu__show_code(struct kvm_cpu *vcpu)
  {
 -	/* TODO: */
-+	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
++	struct kvm_one_reg reg;
++	unsigned long data;
++	int debug_fd =3D kvm_cpu__get_debug_fd();
++
++	reg.addr =3D (unsigned long)&data;
++
++	dprintf(debug_fd, "\n*PC:\n");
++	reg.id =3D RISCV_CORE_REG(regs.pc);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (show_code @ PC)");
++
++	kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
++
++	dprintf(debug_fd, "\n*RA:\n");
++	reg.id =3D RISCV_CORE_REG(regs.ra);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (show_code @ RA)");
++
++	kvm__dump_mem(vcpu->kvm, data, 32, debug_fd);
  }
 =20
- void kvm__arch_read_term(struct kvm *kvm)
+ void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
  {
 -	/* TODO: */
-+	serial8250__update_consoles(kvm);
-+	virtio_console__inject_interrupt(kvm);
++	struct kvm_one_reg reg;
++	unsigned long data;
++	int debug_fd =3D kvm_cpu__get_debug_fd();
++
++	reg.addr =3D (unsigned long)&data;
++	dprintf(debug_fd, "\n Registers:\n");
++
++	reg.id		=3D RISCV_CORE_REG(mode);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (mode)");
++	dprintf(debug_fd, " MODE:  0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.pc);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (pc)");
++	dprintf(debug_fd, " PC:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.ra);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (ra)");
++	dprintf(debug_fd, " RA:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.sp);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (sp)");
++	dprintf(debug_fd, " SP:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.gp);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (gp)");
++	dprintf(debug_fd, " GP:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.tp);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (tp)");
++	dprintf(debug_fd, " TP:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.t0);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (t0)");
++	dprintf(debug_fd, " T0:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.t1);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (t1)");
++	dprintf(debug_fd, " T1:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.t2);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (t2)");
++	dprintf(debug_fd, " T2:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s0);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s0)");
++	dprintf(debug_fd, " S0:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s1);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s1)");
++	dprintf(debug_fd, " S1:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.a0);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (a0)");
++	dprintf(debug_fd, " A0:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.a1);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (a1)");
++	dprintf(debug_fd, " A1:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.a2);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (a2)");
++	dprintf(debug_fd, " A2:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.a3);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (a3)");
++	dprintf(debug_fd, " A3:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.a4);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (a4)");
++	dprintf(debug_fd, " A4:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.a5);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (a5)");
++	dprintf(debug_fd, " A5:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.a6);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (a6)");
++	dprintf(debug_fd, " A6:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.a7);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (a7)");
++	dprintf(debug_fd, " A7:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s2);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s2)");
++	dprintf(debug_fd, " S2:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s3);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s3)");
++	dprintf(debug_fd, " S3:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s4);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s4)");
++	dprintf(debug_fd, " S4:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s5);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s5)");
++	dprintf(debug_fd, " S5:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s6);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s6)");
++	dprintf(debug_fd, " S6:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s7);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s7)");
++	dprintf(debug_fd, " S7:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s8);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s8)");
++	dprintf(debug_fd, " S8:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s9);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s9)");
++	dprintf(debug_fd, " S9:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s10);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s10)");
++	dprintf(debug_fd, " S10:   0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.s11);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (s11)");
++	dprintf(debug_fd, " S11:   0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.t3);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (t3)");
++	dprintf(debug_fd, " T3:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.t4);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (t4)");
++	dprintf(debug_fd, " T4:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.t5);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (t5)");
++	dprintf(debug_fd, " T5:    0x%lx\n", data);
++
++	reg.id		=3D RISCV_CORE_REG(regs.t6);
++	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++		die("KVM_GET_ONE_REG failed (t6)");
++	dprintf(debug_fd, " T6:    0x%lx\n", data);
  }
-=20
- void kvm__arch_set_cmdline(char *cmdline, bool video)
- {
--	/* TODO: */
- }
-=20
- void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_s=
-ize)
- {
--	/* TODO: */
-+	/*
-+	 * Allocate guest memory. We must align our buffer to 64K to
-+	 * correlate with the maximum guest page size for virtio-mmio.
-+	 * If using THP, then our minimal alignment becomes 2M.
-+	 * 2M trumps 64K, so let's go with that.
-+	 */
-+	kvm->ram_size =3D min(ram_size, (u64)RISCV_MAX_MEMORY(kvm));
-+	kvm->arch.ram_alloc_size =3D kvm->ram_size + SZ_2M;
-+	kvm->arch.ram_alloc_start =3D mmap_anon_or_hugetlbfs(kvm, hugetlbfs_path,
-+						kvm->arch.ram_alloc_size);
-+
-+	if (kvm->arch.ram_alloc_start =3D=3D MAP_FAILED)
-+		die("Failed to map %lld bytes for guest memory (%d)",
-+		    kvm->arch.ram_alloc_size, errno);
-+
-+	kvm->ram_start =3D (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start=
-,
-+					SZ_2M);
-+
-+	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-+		MADV_MERGEABLE);
-+
-+	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-+		MADV_HUGEPAGE);
- }
-=20
-+#define FDT_ALIGN	SZ_4M
-+#define INITRD_ALIGN	8
- bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_in=
-itrd,
- 				 const char *kernel_cmdline)
- {
--	/* TODO: */
-+	void *pos, *kernel_end, *limit;
-+	unsigned long guest_addr, kernel_offset;
-+	ssize_t file_size;
-+
-+	/*
-+	 * Linux requires the initrd and dtb to be mapped inside lowmem,
-+	 * so we can't just place them at the top of memory.
-+	 */
-+	limit =3D kvm->ram_start + min(kvm->ram_size, (u64)SZ_256M) - 1;
-+
-+#if __riscv_xlen =3D=3D 64
-+	/* Linux expects to be booted at 2M boundary for RV64 */
-+	kernel_offset =3D 0x200000;
-+#else
-+	/* Linux expects to be booted at 4M boundary for RV32 */
-+	kernel_offset =3D 0x400000;
-+#endif
-+
-+	pos =3D kvm->ram_start + kernel_offset;
-+	kvm->arch.kern_guest_start =3D host_to_guest_flat(kvm, pos);
-+	file_size =3D read_file(fd_kernel, pos, limit - pos);
-+	if (file_size < 0) {
-+		if (errno =3D=3D ENOMEM)
-+			die("kernel image too big to fit in guest memory.");
-+
-+		die_perror("kernel read");
-+	}
-+	kernel_end =3D pos + file_size;
-+	pr_debug("Loaded kernel to 0x%llx (%zd bytes)",
-+		 kvm->arch.kern_guest_start, file_size);
-+
-+	/* Place FDT just after kernel at FDT_ALIGN address */
-+	pos =3D kernel_end + FDT_ALIGN;
-+	guest_addr =3D ALIGN(host_to_guest_flat(kvm, pos), FDT_ALIGN);
-+	pos =3D guest_flat_to_host(kvm, guest_addr);
-+	if (pos < kernel_end)
-+		die("fdt overlaps with kernel image.");
-+
-+	kvm->arch.dtb_guest_start =3D guest_addr;
-+	pr_debug("Placing fdt at 0x%llx - 0x%llx",
-+		 kvm->arch.dtb_guest_start,
-+		 host_to_guest_flat(kvm, limit));
-+
-+	/* ... and finally the initrd, if we have one. */
-+	if (fd_initrd !=3D -1) {
-+		struct stat sb;
-+		unsigned long initrd_start;
-+
-+		if (fstat(fd_initrd, &sb))
-+			die_perror("fstat");
-+
-+		pos =3D limit - (sb.st_size + INITRD_ALIGN);
-+		guest_addr =3D ALIGN(host_to_guest_flat(kvm, pos), INITRD_ALIGN);
-+		pos =3D guest_flat_to_host(kvm, guest_addr);
-+		if (pos < kernel_end)
-+			die("initrd overlaps with kernel image.");
-+
-+		initrd_start =3D guest_addr;
-+		file_size =3D read_file(fd_initrd, pos, limit - pos);
-+		if (file_size =3D=3D -1) {
-+			if (errno =3D=3D ENOMEM)
-+				die("initrd too big to fit in guest memory.");
-+
-+			die_perror("initrd read");
-+		}
-+
-+		kvm->arch.initrd_guest_start =3D initrd_start;
-+		kvm->arch.initrd_size =3D file_size;
-+		pr_debug("Loaded initrd to 0x%llx (%llu bytes)",
-+			 kvm->arch.initrd_guest_start,
-+			 kvm->arch.initrd_size);
-+	} else {
-+		kvm->arch.initrd_size =3D 0;
-+	}
-+
- 	return true;
- }
-=20
 --=20
 2.17.1
 
