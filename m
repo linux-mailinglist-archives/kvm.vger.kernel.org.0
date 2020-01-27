@@ -2,150 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 574E3149E80
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 05:37:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 72AF5149EE9
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 07:04:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726911AbgA0Egp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 Jan 2020 23:36:45 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37649 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726670AbgA0Egp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 Jan 2020 23:36:45 -0500
-Received: by mail-pg1-f193.google.com with SMTP id q127so4510708pga.4
-        for <kvm@vger.kernel.org>; Sun, 26 Jan 2020 20:36:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=hs4icqW9+CWif0uw7jJ56lx+lcBIZUJndIqpWnQjpW8=;
-        b=mnTX65vZ1x+LYk5kfUU2SdrZM1XiNPn0DUTaZ5y5+vgi3xh7v1On2ixbot6Euv8CNQ
-         v3uBpB0XxpUbTI5R3zVfOwn/23kPuqx7iCDvqxp0dC4XKvvTGm4tlAKX65YhRYZdyFd0
-         hvc8gPVKxQsYDH+rLtREZOPa/w4VpMjX3YVRAYdXpZ5gE4YCdZPCOFLQw+UnD4HUcewg
-         mk4Cg5FR3CamMS9orBXDbgH1I0vjSpGLtJg38TtPO6N3SVYIQ6MUHSptR8R4O22AQsJp
-         0gpMr5N9ccAJZZBIkXASVnjexGXsCeNV2o8IHS0HJzV0kQfZSn6jZ3v7bcbT6k2Zxwat
-         GaFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=hs4icqW9+CWif0uw7jJ56lx+lcBIZUJndIqpWnQjpW8=;
-        b=cwh8uitCFRiuSRaIj5oSg2A8JZwCRZuxWJVeauO5+emC4o9Nsy0p0TkOUYIngrhQJ0
-         wvrd92F0xH3QJRQaWN5aT/8pn4CmYD8Fuvb4nxzjZaGXRGzuhxAEPkrjhcAP9R0tkfTG
-         EI9A39Vbf7r+1ACstEd0/uQ2r960wDFBIoGbo393XQdgJ8bvIyHEk/CODwssjuWkcx8B
-         HGfgkiA/8jVOpuPbrL+g7vh9pUva4Nm/tLGt9L8ZN2PoVmUiAcCl0nqEA1BCAln6Jc60
-         obLofgiM1dMs7Ts+H4axVkHagCzjUaA4WCLq6sMKe9ky1xyefiPhlSirGmRrQ6PQwMop
-         JpLA==
-X-Gm-Message-State: APjAAAXi3HgSElEBG99rVReldeFTD5m93vdCQ2T2AMeUYRVrAeOnATcs
-        wzaVVzIitOK3GwCEVo4qsX8=
-X-Google-Smtp-Source: APXvYqxqo3W/ZGlsAFCvuqFI6uEtwGTiVl4dOpuaG4YTGrPHOw2ov/2OyYC/S36UWWr8ZEnE78EqnA==
-X-Received: by 2002:a63:ba45:: with SMTP id l5mr17306261pgu.380.1580099804037;
-        Sun, 26 Jan 2020 20:36:44 -0800 (PST)
-Received: from ?IPv6:2601:647:4700:9b2:a49d:e6a2:2049:7767? ([2601:647:4700:9b2:a49d:e6a2:2049:7767])
-        by smtp.gmail.com with ESMTPSA id r145sm3411012pfr.5.2020.01.26.20.36.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 26 Jan 2020 20:36:43 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [kvm-unit-tests PATCH v3] x86: Add RDTSC test
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <CALMp9eTXVhCA=-t1S-bVn-5ZVyh7UkR2Kqe26b8c5gfxW11F+Q@mail.gmail.com>
-Date:   Sun, 26 Jan 2020 20:36:40 -0800
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <436117EB-5017-4FF0-A89B-16B206951804@gmail.com>
-References: <20191202204356.250357-1-aaronlewis@google.com>
- <4EFDEFF2-D1CD-4AF3-9EF8-5F160A4D93CD@gmail.com>
- <20200124233835.GT2109@linux.intel.com>
- <1A882E15-4F22-463E-AD03-460FA9251489@gmail.com>
- <CALMp9eTXVhCA=-t1S-bVn-5ZVyh7UkR2Kqe26b8c5gfxW11F+Q@mail.gmail.com>
-To:     Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
+        id S1725830AbgA0GEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 01:04:35 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:45282 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725763AbgA0GEe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 01:04:34 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00R634Yg111279;
+        Mon, 27 Jan 2020 06:04:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2019-08-05;
+ bh=lz3HdoGZUpuAH1u0ythHySoMBqzCFy3wPQCnEkmdTHY=;
+ b=hwpaZM12mKEUFBXosQ1jgQP0wa12aKtxH0H0Vu95JNRF5cksLJhwEBBQ9J2S5oRCN6ue
+ Ou+aXrS3hC/EYeDJtX2nEom+Bv2DC2vU5rJ/kO4gFdCm6kjeE1sxH4hTJqT1wxvcsy3L
+ Y41bXOTnXmuvMhDQZ5QowCsStFYNomMbxDMd0cVSwmLe5A4YI71gczrlCW5QPXovGcDe
+ 9amV8esJE/4H6OB6NPdx8v7nHUGofkk8YOVX4BQEo0Jhn1FHioHJYUhkf7C6viCalBOq
+ QiEdCIY7JsLifyE+0c8jXmVia0ycGdpfp7VeDqPzAuZDFyRKjaXZNTcIKFebIJHVLquy Bw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2xrdmq589t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Jan 2020 06:04:31 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00R63fWL088375;
+        Mon, 27 Jan 2020 06:04:31 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2xry6qny1k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 Jan 2020 06:04:30 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00R64T4o008856;
+        Mon, 27 Jan 2020 06:04:29 GMT
+Received: from kili.mountain (/129.205.23.165)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 26 Jan 2020 22:04:28 -0800
+Date:   Mon, 27 Jan 2020 09:04:22 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org
+Subject: [bug report] KVM: x86: avoid incorrect writes to host
+ MSR_IA32_SPEC_CTRL
+Message-ID: <20200127060305.jlq5uv6tu67tsbv4@kili.mountain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9512 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=666
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001270052
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9512 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=721 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001270052
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jan 26, 2020, at 2:06 PM, Jim Mattson <jmattson@google.com> wrote:
->=20
-> If I had to guess, you probably have SMM malware on your host. Remove
-> the malware, and the test should pass.
+Hello Paolo Bonzini,
 
-Well, malware will always be an option, but I doubt this is the case.
+The patch e71ae535bc24: "KVM: x86: avoid incorrect writes to host
+MSR_IA32_SPEC_CTRL" from Jan 20, 2020, leads to the following static
+checker warning:
 
-Interestingly, in the last few times the failure did not reproduce. Yet,
-thinking about it made me concerned about MTRRs configuration, and that
-perhaps performance is affected by memory marked as UC after boot, since
-kvm-unit-test does not reset MTRRs.
+	arch/x86/kvm/vmx/vmx.c:2001 vmx_set_msr()
+	warn: maybe use && instead of &
 
-Reading the variable range MTRRs, I do see some ranges marked as UC =
-(most of
-the range 2GB-4GB, if I read the MTRRs correctly):
+arch/x86/kvm/vmx/vmx.c
+  1994                  vmx->msr_ia32_umwait_control = data;
+  1995                  break;
+  1996          case MSR_IA32_SPEC_CTRL:
+  1997                  if (!msr_info->host_initiated &&
+  1998                      !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
+  1999                          return 1;
+  2000  
+  2001                  if (data & ~kvm_spec_ctrl_valid_bits(vcpu))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  MSR 0x200 =3D 0x80000000
-  MSR 0x201 =3D 0x3fff80000800
-  MSR 0x202 =3D 0xff000005
-  MSR 0x203 =3D 0x3fffff000800
-  MSR 0x204 =3D 0x38000000000
-  MSR 0x205 =3D 0x3f8000000800
+This seems wrong.  kvm_spec_ctrl_valid_bits() returns a bool so this
+is either 0xffffffff or 0xfffffffe.  data is a u64.
 
-Do you think we should set the MTRRs somehow in KVM-unit-tests? If yes, =
-can
-you suggest a reasonable configuration?
+  2002                          return 1;
+  2003  
+  2004                  vmx->spec_ctrl = data;
+  2005                  if (!data)
+  2006                          break;
+  2007  
+  2008                  /*
+  2009                   * For non-nested:
 
-Thanks,
-Nadav
-
-
->=20
-> On Fri, Jan 24, 2020 at 4:06 PM Nadav Amit <nadav.amit@gmail.com> =
-wrote:
->>> On Jan 24, 2020, at 3:38 PM, Sean Christopherson =
-<sean.j.christopherson@intel.com> wrote:
->>>=20
->>> On Fri, Jan 24, 2020 at 03:13:44PM -0800, Nadav Amit wrote:
->>>>> On Dec 2, 2019, at 12:43 PM, Aaron Lewis <aaronlewis@google.com> =
-wrote:
->>>>>=20
->>>>> Verify that the difference between a guest RDTSC instruction and =
-the
->>>>> IA32_TIME_STAMP_COUNTER MSR value stored in the VMCS12's VM-exit
->>>>> MSR-store list is less than 750 cycles, 99.9% of the time.
->>>>>=20
->>>>> 662f1d1d1931 ("KVM: nVMX: Add support for capturing highest =
-observable L2 TSC=E2=80=9D)
->>>>>=20
->>>>> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
->>>>> Reviewed-by: Jim Mattson <jmattson@google.com>
->>>>=20
->>>> Running this test on bare-metal I get:
->>>>=20
->>>> Test suite: rdtsc_vmexit_diff_test
->>>> FAIL: RDTSC to VM-exit delta too high in 117 of 100000 iterations
->>>>=20
->>>> Any idea why? Should I just play with the 750 cycles magic number?
->>>=20
->>> Argh, this reminds me that I have a patch for this test to improve =
-the
->>> error message to makes things easier to debug.  Give me a few =
-minutes to
->>> get it sent out, might help a bit.
->>=20
->> Thanks for the quick response. With this patch I get on my bare-metal =
-Skylake:
->>=20
->> FAIL: RDTSC to VM-exit delta too high in 100 of 49757 iterations, =
-last =3D 1152
->> FAIL: Guest didn't run to completion.
->>=20
->> I=E2=80=99ll try to raise the delta and see what happens.
->>=20
->> Sorry for my laziness - it is just that like ~30% of the tests that =
-are
->> added fail on bare-metal :(
-
-
+regards,
+dan carpenter
