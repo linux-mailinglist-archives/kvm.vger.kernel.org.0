@@ -2,116 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E53814A61D
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 15:30:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 299F414A70E
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 16:21:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729182AbgA0OaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 09:30:25 -0500
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:35082 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725828AbgA0OaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jan 2020 09:30:25 -0500
-Received: by mail-ed1-f67.google.com with SMTP id f8so10991769edv.2
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 06:30:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6n2FVnJSrtqOR/mD8fQNayBm0ZsvU1cvMkwwhNiZ1es=;
-        b=CY/B7kCgSEayoIN8UYccu1TxhFtfLxfxYAEltI7kKfNJQwuh8wqSrsllC3HGJzdT3t
-         QAMUjKlLnE3pbAByQeY62G2gQ9m8X54h7dqEnKqkxtwFumx40aqMeamaPBvedSlBBZy1
-         hDt7FK0f4I6mKrzktyGJm4ElOjUfnH0nyQ2G6z5uT3ys2iWIK+uQqch6zoq324eznrK5
-         2hPzAdMrlzrfEFAkSTBL7miTL7m3XnOcMT9z+uU7a0G9UWDVyU9U7XnPNfh2j4dfJMbv
-         im4rGDIGKUhV5Sm9RVaxXR3X5xkMKQdyeVagSKNJQnyia7C9R9oZDs/Rzqk6vVvVjGAE
-         XJFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6n2FVnJSrtqOR/mD8fQNayBm0ZsvU1cvMkwwhNiZ1es=;
-        b=kxmsGObxe16FzcTCn3H754R3HYuUqQIBQM/gedGOoobrv41s//GFgx1eMdPxkPI0xe
-         L7To/J/qbWomkPboC8+cSWzE6jWPOD4FrTaDDCuJ842qFl85SYgRlCT8ETKQQuAfgXm7
-         nFA4j712eDJMc/tVTSJErzqevSGQKGNT33kAbYAN7QpWplclRW1IAZxLYPDhTyhlp035
-         xUOxppfck9PPLiYqrjG4Hi1wF8PzWVpQDLb8V2w4bt15t0CFyW4oNA8PwFV0qBiJK/yq
-         osn3mEM9Hfp7RRfITbkmrDP++6G1Wy3b9SDIXmbWd0ux1myB777rMYHAwm5t0IKqpZ+I
-         EokA==
-X-Gm-Message-State: APjAAAWDdANIP+MYgbNTTXQhfvC9eAT5DeR9H7k8sqII2O7q72NGzLYf
-        dwAmBcnGJnftm0UgqyBAT98SYktmuRy6qY/tUPyuug==
-X-Google-Smtp-Source: APXvYqxMeuUsAnCmf+avVRPtdQmVPrt5z58pk6xDNeK6XlB8NYS9HpEeXny9hy9QJb/7xkVLZPMrLyQAjBTiQj+8GxU=
-X-Received: by 2002:a17:906:3746:: with SMTP id e6mr8271145ejc.165.1580135422726;
- Mon, 27 Jan 2020 06:30:22 -0800 (PST)
+        id S1729399AbgA0PUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 10:20:51 -0500
+Received: from foss.arm.com ([217.140.110.172]:46056 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729335AbgA0PUv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 10:20:51 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BFD9D31B;
+        Mon, 27 Jan 2020 07:20:49 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF9EB3F67D;
+        Mon, 27 Jan 2020 07:20:48 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH] arm: expand the timer tests
+To:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>
+References: <20200110160511.17821-1-alex.bennee@linaro.org>
+ <8455cdf6-e5c3-bd84-5b85-33ffad581d0e@arm.com> <871rs3ntok.fsf@linaro.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <c5b006e9-bff9-1d92-e1f9-98287a0cebcc@arm.com>
+Date:   Mon, 27 Jan 2020 15:20:47 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20200124234608.10754-1-sean.j.christopherson@intel.com> <705151e0-6a8b-1e15-934d-dd96f419dcd8@oracle.com>
-In-Reply-To: <705151e0-6a8b-1e15-934d-dd96f419dcd8@oracle.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Mon, 27 Jan 2020 06:30:11 -0800
-Message-ID: <CAAAPnDEA4u0YRLtW7OsWtL-Uy=5paDmrxx7EScDFsH5aqG6QJA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: nVMX: Print more (accurate) info if
- RDTSC diff test fails
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Nadav Amit <nadav.amit@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <871rs3ntok.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 25, 2020 at 11:16 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
->
-> On 1/24/20 3:46 PM, Sean Christopherson wrote:
-> > Snapshot the delta of the last run and display it in the report if the
-> > test fails.  Abort the run loop as soon as the threshold is reached so
-> > that the displayed delta is guaranteed to a failed delta.  Displaying
-> > the delta helps triage failures, e.g. is my system completely broken or
-> > did I get unlucky, and aborting the loop early saves 99900 runs when
-> > the system is indeed broken.
-> >
-> > Cc: Nadav Amit <nadav.amit@gmail.com>
-> > Cc: Aaron Lewis <aaronlewis@google.com>
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >   x86/vmx_tests.c | 11 ++++++-----
-> >   1 file changed, 6 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> > index b31c360..4049dec 100644
-> > --- a/x86/vmx_tests.c
-> > +++ b/x86/vmx_tests.c
-> > @@ -9204,6 +9204,7 @@ static unsigned long long rdtsc_vmexit_diff_test_iteration(void)
-> >
-> >   static void rdtsc_vmexit_diff_test(void)
-> >   {
-> > +     unsigned long long delta;
-> >       int fail = 0;
-> >       int i;
-> >
-> > @@ -9226,17 +9227,17 @@ static void rdtsc_vmexit_diff_test(void)
-> >       vmcs_write(EXI_MSR_ST_CNT, 1);
-> >       vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(exit_msr_store));
-> >
-> > -     for (i = 0; i < RDTSC_DIFF_ITERS; i++) {
-> > -             if (rdtsc_vmexit_diff_test_iteration() >=
-> > -                 HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
-> > +     for (i = 0; i < RDTSC_DIFF_ITERS && fail < RDTSC_DIFF_FAILS; i++) {
-> > +             delta = rdtsc_vmexit_diff_test_iteration();
-> > +             if (delta >= HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
-> >                       fail++;
-> >       }
-> >
-> >       enter_guest();
-> >
-> >       report(fail < RDTSC_DIFF_FAILS,
-> > -            "RDTSC to VM-exit delta too high in %d of %d iterations",
-> > -            fail, RDTSC_DIFF_ITERS);
-> > +            "RDTSC to VM-exit delta too high in %d of %d iterations, last = %llu",
-> > +            fail, i, delta);
-> >   }
-> >
-> >   static int invalid_msr_init(struct vmcs *vmcs)
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Hi,
 
-Reviewed-by: Aaron Lewis <aaronlewis@google.com>
+CC'ing the arm maintainer)
+
+Sorry for the late reply, got distracted by something else.
+
+On 1/13/20 5:38 PM, Alex Bennée wrote:
+> Alexandru Elisei <alexandru.elisei@arm.com> writes:
+>
+>> Hi,
+>>
+>> On 1/10/20 4:05 PM, Alex Bennée wrote:
+>>> This was an attempt to replicate a QEMU bug. However to trigger the
+>>> bug you need to have an offset set in EL2 which kvm-unit-tests is
+>>> unable to do. However it does exercise some more corner cases.
+>>>
+>>> Bug: https://bugs.launchpad.net/bugs/1859021
+>> I'm not aware of any Bug: tags in the Linux kernel. If you want people to follow
+>> the link to the bug, how about referencing something like this:
+>>
+>> "This was an attempt to replicate a QEMU bug [1]. [..]
+>>
+>> [1] https://bugs.launchpad.net/qemu/+bug/1859021"
+> OK, I'll fix that in v2.
+>
+>> Also, are launchpad bug reports permanent? Will the link still work in
+>> a years' time?
+> They should be - they are a unique id and we use them in the QEMU source
+> tree.
+>
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> ---
+>>>  arm/timer.c | 27 ++++++++++++++++++++++++++-
+>>>  1 file changed, 26 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arm/timer.c b/arm/timer.c
+>>> index f390e8e..ae1d299 100644
+>>> --- a/arm/timer.c
+>>> +++ b/arm/timer.c
+>>> @@ -214,21 +214,46 @@ static void test_timer(struct timer_info *info)
+>>>  	 * still read the pending state even if it's disabled. */
+>>>  	set_timer_irq_enabled(info, false);
+>>>  
+>>> +	/* Verify count goes up */
+>>> +	report(info->read_counter() >= now, "counter increments");
+>>> +
+>>>  	/* Enable the timer, but schedule it for much later */
+>>>  	info->write_cval(later);
+>>>  	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+>>>  	isb();
+>>> -	report(!gic_timer_pending(info), "not pending before");
+>>> +	report(!gic_timer_pending(info), "not pending before 10s");
+>>> +
+>>> +	/* Check with a maximum possible cval */
+>>> +	info->write_cval(UINT64_MAX);
+>>> +	isb();
+>>> +	report(!gic_timer_pending(info), "not pending before UINT64_MAX");
+
+This check alone was enough for me to trigger the qemu bug. Would you mind
+explaining the reason for performing the test again, but with the timer interrupt
+enabled at the GIC level? Did the fix have something to do with the interrupt?
+
+>>> +
+>>> +	/* also by setting tval */
+>> All the comments in this file seem to start with a capital letter.
+>>
+>>> +	info->write_tval(time_10s);
+>>> +	isb();
+>>> +	report(!gic_timer_pending(info), "not pending before 10s (via tval)");
+>> You can remove the "(via tval)" part - the message is unique enough to figure out
+>> which part of the test it refers to.
+> I added it to differentiate with the message a little further above.
+
+You're right, I didn't notice that we already have the exact same message.
+
+But I thought some more about this test, and I'm not really sure we can do it
+reliably. I ran your patch on an AMD Seattle, where the timer frequency is
+0xee6b280, which multiplied by 10 gives us 0x9502f900, which will be interpreted
+as a negative value because TimerValue is a **signed** 32-bit integer. That means
+that we're actually programming the timer to fire in the **past**, so this test
+fails. Let's say we limit the value that we're writing to TVAL to INT32_MAX, but
+because of a high timer frequency, the time window before the interrupt is
+asserted could be too small, and, depending on the environment and how Linux
+schedules tasks, this check might randomly fail.
+
+>
+>>> +	report_info("TVAL is %d (delta CVAL %ld) ticks",
+>>> +		    info->read_tval(), info->read_cval() - info->read_counter());
+>> I'm not sure what you are trying to achieve with this. You can transform it to
+>> check that TVAL is indeed positive and (almost) equal to cval - cntpct, something
+>> like this:
+>>
+>> +	s32 tval = info->read_tval();
+>> +	report(tval > 0 && tval <= info->read_cval() -
+>> info->read_counter(), "TVAL measures time to next interrupt");
+> Yes it was purely informational to say tval decrements towards the next
+> IRQ. I can make it a pure test.
+>
+>>>  
+>>> +        /* check pending once cval is before now */
+>> This comment adds nothing to the test.
+> dropped.
+>
+>>>  	info->write_cval(now - 1);
+>>>  	isb();
+>>>  	report(gic_timer_pending(info), "interrupt signal pending");
+>>> +	report_info("TVAL is %d ticks", info->read_tval());
+>> You can test that TVAL is negative here instead of printing the value.
+> ok.
+>
+>>>  
+>>>  	/* Disable the timer again and prepare to take interrupts */
+>>>  	info->write_ctl(0);
+>>>  	set_timer_irq_enabled(info, true);
+>>>  	report(!gic_timer_pending(info), "interrupt signal no longer pending");
+>>>  
+>>> +	/* QEMU bug when cntvoff_el2 > 0
+>>> +	 * https://bugs.launchpad.net/bugs/1859021 */
+>> This looks confusing to me. From the commit message, I got that kvm-unit-tests
+>> needs qemu to set a special value for CNTVOFF_EL2. But the comments seems to
+>> suggest that kvm-unit-tests can trigger the bug without qemu doing anything
+>> special. Can you elaborate under which condition kvm-unit-tests can
+>> trigger the bug?
+> It can't without some sort of mechanism to set the hypervisor registers
+> before running the test. The QEMU bug is an overflow when cval of UINT64_MAX
+> with a non-zero CNTVOFF_EL2.
+>
+> Running under KVM the host kernel will have likely set CNTVOFF_EL2 to
+> some sort of value with:
+>
+> 	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
+
+I was able to replicate the bug by running KVM under qemu with virtualization=on,
+thanks.
+
+>
+>>> +	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+>>> +	info->write_cval(UINT64_MAX);
+>> The order is wrong - you write CVAL first, *then* enable to timer. Otherwise you
+>> might get an interrupt because of the previous CVAL value.
+>>
+>> The previous value for CVAL was now -1, so your change triggers an unwanted
+>> interrupt after enabling the timer. The interrupt handler masks the timer
+>> interrupt at the timer level, which means that as far as the gic is concerned the
+>> interrupt is not pending, making the report call afterwards useless.
+>>
+>>> +	isb();
+>>> +	report(!gic_timer_pending(info), "not pending before UINT64_MAX (irqs on)");
+>> This check can be improved. You want to check the timer CTL.ISTATUS here, not the
+>> gic. A device (in this case, the timer) can assert the interrupt, but the gic does
+>> not sample it immediately. Come to think of it, the entire timer test is wrong
+>> because of this.
+> Is it worth still checking the GIC or just replacing everything with
+> calls to:
+>
+>   static bool timer_pending(struct timer_info *info)
+>   {
+>           return info->read_ctl() & ARCH_TIMER_CTL_ISTATUS;
+>   }
+
+We should still check that the GIC sees the interrupt as pending, because we need
+it to inject interrupts in a guest. I'm already working on improving that [1].
+
+[1] https://www.spinics.net/lists/kvm/msg203609.html
+
+Thanks,
+Alex
+>
+>> Thanks,
+>> Alex
+>>> +	info->write_ctl(0);
+>>> +
+>>>  	report(test_cval_10msec(info), "latency within 10 ms");
+>>>  	report(info->irq_received, "interrupt received");
+>>>  
+>
