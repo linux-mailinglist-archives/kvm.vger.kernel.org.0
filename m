@@ -2,198 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E7EAC14ABA1
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 22:28:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DEF614ABC5
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 22:52:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726293AbgA0V2W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 16:28:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22372 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725955AbgA0V2V (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jan 2020 16:28:21 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00RLEZQa091041;
-        Mon, 27 Jan 2020 16:28:21 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xrhv0wxnf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jan 2020 16:28:21 -0500
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 00RLHwu8133892;
-        Mon, 27 Jan 2020 16:28:20 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xrhv0wxmy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jan 2020 16:28:20 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00RLE994012293;
-        Mon, 27 Jan 2020 21:28:19 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02dal.us.ibm.com with ESMTP id 2xrda69auq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 27 Jan 2020 21:28:19 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00RLSI9246072310
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Jan 2020 21:28:19 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E2C05124052;
-        Mon, 27 Jan 2020 21:28:18 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7BD79124055;
-        Mon, 27 Jan 2020 21:28:18 +0000 (GMT)
-Received: from [9.160.17.65] (unknown [9.160.17.65])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Jan 2020 21:28:18 +0000 (GMT)
-From:   Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH v1 1/1] vfio-ccw: Don't free channel programs for
- unrelated interrupts
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        "Jason J . Herne" <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200124145455.51181-1-farman@linux.ibm.com>
- <20200124145455.51181-2-farman@linux.ibm.com>
- <20200124163305.3d6f0d47.cohuck@redhat.com>
- <50a0fe00-a7c1-50e4-12f5-412ee7a0e522@linux.ibm.com>
- <20200127135235.1f783f1b.cohuck@redhat.com>
-Message-ID: <eb3f3887-50f2-ef4d-0b98-b25936047a49@linux.ibm.com>
-Date:   Mon, 27 Jan 2020 16:28:18 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1726181AbgA0Vwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 16:52:30 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45105 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726080AbgA0Vw3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jan 2020 16:52:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580161948;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=55UOneL2ms6DRqRkSC42nE9sElCV4+6dsT8xJuc/F90=;
+        b=V1JT0i37/WeBVMyaF3+WiSS4aoni8rwOXrilPfRv9zopwvOHLwOjcWCqVSCa6geLqgtToa
+        nZ3ABSIKGrCGgWruOYrQ1GR/yNOA/xVcDPbh4Gpu04Qg5LXevxIc22H2beyNHoO0t0O1Lw
+        t1uSETkrVwrvDPbhwN0xL2tDXbFUlgo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-9pXfDR-ANReB5CFho_NrcQ-1; Mon, 27 Jan 2020 16:52:27 -0500
+X-MC-Unique: 9pXfDR-ANReB5CFho_NrcQ-1
+Received: by mail-wr1-f69.google.com with SMTP id c17so6911188wrp.10
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 13:52:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=55UOneL2ms6DRqRkSC42nE9sElCV4+6dsT8xJuc/F90=;
+        b=LWmzWQZt3mEBErljd8pUZQKpEJvqy5TY8+CpMQfesHzKqwRJYFRkZikoT5gHPIxzit
+         n9rBYLJUptmrIfzRvrD85NgKT3mSslAqCuBHxKK9YepvOQ6fVPPmIp5lRY06BkwLLVNS
+         YXmD0bmuh7K2Wsp4pam0e4d1HDtjuvEY0fmhXxcCMy3vVezpYc+rVipeGESYu2bduK01
+         mfUqNVKoeOrWL9K1VB+M+sOQAPPnLw+XE63Gxp8fykji8fhw/mxn1v+lK4t6XQTXSiei
+         lMW+LQXyQhv5h3ZkpErM4QSej5tWx0L7hO91w5IljN4TsjO4r6H4+lfMN1zl/iOc7day
+         LpNQ==
+X-Gm-Message-State: APjAAAXaSxzNq3UtltmM1fjoCtjPKup5KU9vSEK1V1SSV8eV3PVsD5Ir
+        vCu0IX4BJZ2sYCd/KWR2/LGiy1prrOwxONSHM/bwO6/DcoPZfiF1EseK6icQsE+I0WCS+FAEYuC
+        AtahGEosSeUnB
+X-Received: by 2002:adf:f491:: with SMTP id l17mr26182316wro.149.1580161946252;
+        Mon, 27 Jan 2020 13:52:26 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwW8T//Ne2f8Is87AT0Y5y0DKFSDxo9Fc+kgWX8pRXRYg+owSNawJWD3LvoveF6z4qyBIIsTA==
+X-Received: by 2002:adf:f491:: with SMTP id l17mr26182296wro.149.1580161945983;
+        Mon, 27 Jan 2020 13:52:25 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id n28sm23292967wra.48.2020.01.27.13.52.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jan 2020 13:52:25 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
+        Roman Kagan <rkagan@virtuozzo.com>
+Subject: Re: [PATCH RFC 2/3] x86/kvm/hyper-v: move VMX controls sanitization out of nested_enable_evmcs()
+In-Reply-To: <437c2710-7148-a675-8945-71dc7a90f7dd@redhat.com>
+References: <20200115171014.56405-3-vkuznets@redhat.com> <6c4bdb57-08fb-2c2d-9234-b7efffeb72ed@redhat.com> <20200122054724.GD18513@linux.intel.com> <9c126d75-225b-3b1b-d97a-bcec1f189e02@redhat.com> <87eevrsf3s.fsf@vitty.brq.redhat.com> <20200122155108.GA7201@linux.intel.com> <87blqvsbcy.fsf@vitty.brq.redhat.com> <f15d9e98-25e9-2031-2db5-6aaa6c78c0eb@redhat.com> <87zheer0si.fsf@vitty.brq.redhat.com> <87lfpyq9bk.fsf@vitty.brq.redhat.com> <20200124172512.GJ2109@linux.intel.com> <875zgwnc3w.fsf@vitty.brq.redhat.com> <437c2710-7148-a675-8945-71dc7a90f7dd@redhat.com>
+Date:   Mon, 27 Jan 2020 22:52:24 +0100
+Message-ID: <87tv4glg87.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200127135235.1f783f1b.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-27_07:2020-01-24,2020-01-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 mlxlogscore=999 clxscore=1015 phishscore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 malwarescore=0 mlxscore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2001270168
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
+> On 27/01/20 16:38, Vitaly Kuznetsov wrote:
+>>>> If there are no objections and if we still think it would be beneficial
+>>>> to minimize the list of controls we filter out (and not go with the full
+>>>> set like my RFC suggests), I'll prepare v2. (v1, actually, this was RFC).
+>>> One last idea, can we keep the MSR filtering as is and add the hack in
+>>> vmx_restore_control_msr()?  That way the (userspace) host and guest see
+>>> the same values when reading the affected MSRs, and eVMCS wouldn't need
+>>> it's own hook to do consistency checks.
+>> Yes but (if I'm not mistaken) we'll have then to keep the filtering we
+>> currently do in nested_enable_evmcs(): if userspace doesn't do
+>> KVM_SET_MSR for VMX MSRs (QEMU<4.2) then the filtering in
+>> vmx_restore_control_msr() won't happen and the guest will see the
+>> unfiltered set of controls...
+>> 
+>
+> Indeed.  The place you used in the RFC is the best we can do, I am afraid.
+>
 
-On 1/27/20 7:52 AM, Cornelia Huck wrote:
-> On Fri, 24 Jan 2020 11:08:12 -0500
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> On 1/24/20 10:33 AM, Cornelia Huck wrote:
->>> On Fri, 24 Jan 2020 15:54:55 +0100
->>> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->>>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
->>>> index e401a3d0aa57..a8ab256a217b 100644
->>>> --- a/drivers/s390/cio/vfio_ccw_drv.c
->>>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
->>>> @@ -90,8 +90,8 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
->>>>  	is_final = !(scsw_actl(&irb->scsw) &
->>>>  		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
->>>>  	if (scsw_is_solicited(&irb->scsw)) {
->>>> -		cp_update_scsw(&private->cp, &irb->scsw);
->>>> -		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
->>>> +		if (cp_update_scsw(&private->cp, &irb->scsw) &&
->>>> +		    is_final && private->state == VFIO_CCW_STATE_CP_PENDING)  
->>>
->>> ...but I still wonder why is_final is not catching non-ssch related
->>> interrupts, as I thought it would. We might want to adapt that check,
->>> instead. (Or was the scsw_is_solicited() check supposed to catch that?
->>> As said, too tired right now...)  
->>
->> I had looked at the (un)solicited bits at one point, and saw very few
->> unsolicited interrupts.  The ones that did show up didn't appear to
->> affect things in the way that would cause the problems I'm seeing.
-> 
-> Ok, so that check is hopefully fine.
-> 
->>
->> As for is_final...  That POPS table states that for "status pending
->> [alone] after termination of HALT or CLEAR ... cpa is unpredictable",
->> which is what happens here.  In the example above, the cpa is the same
->> as the previous (successful) interrupt, and thus unrelated to the
->> current chain.  Perhaps is_final needs to check that the function
->> control in the interrupt is for a start?
-> 
-> I think our reasoning last time we discussed this function was that we
-> only are in CP_PENDING if we actually did a ssch previously. Now, if we
+In case we decide to filter out the full set of unsupported stuff
+there's basically nothing to change, feel free to just treat the RFC as
+non-RFC :-) (and personally, I'd prefer to keep the 'full set' in the
+filter as it is less fragile; the 'short list' I came up with is the
+result of my experiments on one hardware host only and I'm not sure what
+may make Hyper-V behave differently).
 
-I spent a little time looking at the conversations on the patch that
-added the CP_PENDING check.  Sadly, those patches hit the list when I
-left for holiday so I came late to those discussions and there appears
-some loose ends that I should've chased down at the time.  Sorry.
+I can re-submit, of course, if needed.
 
-But yes, we should only be in CP_PENDING because of the SSCH, but the
-only check of the interrupt here is the "is_final" check, and not that
-the interrupt was for a start function.
+-- 
+Vitaly
 
-> do a hsch/csch before we got final status for the program started by
-> the ssch, we don't move out of the CP_PENDING, but the cpa still might
-> not be what we're looking for. 
-
-As long as we get an interrupt that's "is_final" then don't we come out
-of CP_PENDING state at the end of this routine, regardless of whether or
-not it does the cp_free() call?  I think your original diagnosis [1] was
-that even if the cpa is invalid, calling cp_update_scsw() is okay
-because garbage-in-garbage-out.  This patch makes that part of the
-criteria for doing the cp_free(), so maybe that's too heavy?  After all,
-it does mean that we may leave private->cp "initialized", but reset the
-state back to IDLE.  (More on that in a minute.)
-
-> So, we should probably check that we
-> have only the start function indicated in the fctl.
-
-For the call to cp_update_scsw() or cp_free()?  Or both?
-
-> 
-> But if we do that, we still have a chain allocated for something that
-> has already been terminated... how do we find the right chain to clean
-> up, if needed?
-
-Don't we free all/none of the chains?  Ideally, since we only have one
-set of chains per cp (and thus, per SSCH), they should either all be
-freed or ignored.
-
-But regardless, this patch is at least not complete, if not incorrect.
-I left a test running for the weekend and while I don't see the storage
-damage I saw before, there's a lot of unreleased memory because of stuff
-like this:
-
-950.541644 06 ...sch_io_todo sch 09c5: state=3 orb.cpa=7f586f48
-                                               irb.w0=00001001
-                                               irb.cpa=02e35d58
-                                               irb.w2=0000000c
-                                               ccw=0
-                                               *cda=0
-950.541837 06 ...sch_io_todo sch 09c5: state=2 orb.cpa=030ec750
-                                               irb.w0=00c04007
-                                               irb.cpa=7f586f50
-                                               irb.w2=0c000000
-                                               ccw=3424000c030ea840
-                                               *cda=190757ef0
-
-(I was only tracing instances where vfio-ccw did NOT call cp_free() on
-the interrupt path; so I don't have a complete history of what happened.)
-
-The orb.cpa address in the first trace looks like something which came
-from the guest, rather than something built by vfio-ccw.  The irb.cpa
-address in the second trace is 8 bytes after the first orb.cpa address.
-And the storage referenced by both the CP and IDAL referenced in trace 2
-are still active when I started poking at the state of things.
-
-There's a lot just to unravel just with this instance.  Like why a guest
-CPA is in orb, and thus an irb.  Or why cp_prefetch() checks that
-!cp->initialized, but cp_init() does no such thing.  I guess I'll put in
-a check to see how that helps this particular situation, while I sort
-out the other problems here.
-
-> 
-
-[1] https://lore.kernel.org/kvm/20190702115134.790f8891.cohuck@redhat.com/
