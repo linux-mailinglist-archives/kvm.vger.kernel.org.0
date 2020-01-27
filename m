@@ -2,80 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2576114A971
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 19:08:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9699F14A980
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 19:12:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726205AbgA0SIL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 13:08:11 -0500
-Received: from foss.arm.com ([217.140.110.172]:47822 "EHLO foss.arm.com"
+        id S1726145AbgA0SM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 13:12:57 -0500
+Received: from mga03.intel.com ([134.134.136.65]:33692 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726173AbgA0SIL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jan 2020 13:08:11 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2832A30E;
-        Mon, 27 Jan 2020 10:08:11 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F2023F67D;
-        Mon, 27 Jan 2020 10:08:10 -0800 (PST)
-Date:   Mon, 27 Jan 2020 18:08:07 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-Subject: Re: [PATCH v2 kvmtool 06/30] arm/pci: Advertise only PCI bus 0 in
- the DT
-Message-ID: <20200127180807.3fd3162b@donnerap.cambridge.arm.com>
-In-Reply-To: <20200123134805.1993-7-alexandru.elisei@arm.com>
-References: <20200123134805.1993-1-alexandru.elisei@arm.com>
-        <20200123134805.1993-7-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1725828AbgA0SM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 13:12:57 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jan 2020 10:12:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,370,1574150400"; 
+   d="scan'208";a="221811110"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga008.jf.intel.com with ESMTP; 27 Jan 2020 10:12:56 -0800
+Date:   Mon, 27 Jan 2020 10:12:56 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [bug report] KVM: x86: avoid incorrect writes to host
+ MSR_IA32_SPEC_CTRL
+Message-ID: <20200127181255.GA2523@linux.intel.com>
+References: <20200127060305.jlq5uv6tu67tsbv4@kili.mountain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200127060305.jlq5uv6tu67tsbv4@kili.mountain>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jan 2020 13:47:41 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-Hi,
-
-> The "bus-range" property encodes the PCI bus number of the PCI
-> controller and the largest bus number of any PCI buses that are
-> subordinate to this node [1]. kvmtool emulates only PCI bus 0.
-
-I am wondering if that ever becomes a limitation, but in the current context it looks like the right thing to do.
-
-> Advertise this in the PCI DT node by setting "bus-range" to <0,0>.
+On Mon, Jan 27, 2020 at 09:04:22AM +0300, Dan Carpenter wrote:
+> Hello Paolo Bonzini,
 > 
-> [1] IEEE Std 1275-1994, Section 3 "Bus Nodes Properties and Methods"
+> The patch e71ae535bc24: "KVM: x86: avoid incorrect writes to host
+> MSR_IA32_SPEC_CTRL" from Jan 20, 2020, leads to the following static
+> checker warning:
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre
-
-> ---
->  arm/pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> 	arch/x86/kvm/vmx/vmx.c:2001 vmx_set_msr()
+> 	warn: maybe use && instead of &
 > 
-> diff --git a/arm/pci.c b/arm/pci.c
-> index 557cfa98938d..ed325fa4a811 100644
-> --- a/arm/pci.c
-> +++ b/arm/pci.c
-> @@ -30,7 +30,7 @@ void pci__generate_fdt_nodes(void *fdt)
->  	struct of_interrupt_map_entry irq_map[OF_PCI_IRQ_MAP_MAX];
->  	unsigned nentries = 0;
->  	/* Bus range */
-> -	u32 bus_range[] = { cpu_to_fdt32(0), cpu_to_fdt32(1), };
-> +	u32 bus_range[] = { cpu_to_fdt32(0), cpu_to_fdt32(0), };
->  	/* Configuration Space */
->  	u64 cfg_reg_prop[] = { cpu_to_fdt64(KVM_PCI_CFG_AREA),
->  			       cpu_to_fdt64(ARM_PCI_CFG_SIZE), };
+> arch/x86/kvm/vmx/vmx.c
+>   1994                  vmx->msr_ia32_umwait_control = data;
+>   1995                  break;
+>   1996          case MSR_IA32_SPEC_CTRL:
+>   1997                  if (!msr_info->host_initiated &&
+>   1998                      !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
+>   1999                          return 1;
+>   2000  
+>   2001                  if (data & ~kvm_spec_ctrl_valid_bits(vcpu))
+>                                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> This seems wrong.  kvm_spec_ctrl_valid_bits() returns a bool so this
+> is either 0xffffffff or 0xfffffffe.  data is a u64.
+> 
+>   2002                          return 1;
+>   2003  
+>   2004                  vmx->spec_ctrl = data;
+>   2005                  if (!data)
+>   2006                          break;
+>   2007  
+>   2008                  /*
+>   2009                   * For non-nested:
 
+Paolo already had to put on the cone of shame for this one :-)
+
+https://lkml.kernel.org/r/6b725990-f0c2-6577-be7e-44e101e540b5@redhat.com
