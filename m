@@ -2,199 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E6BC14A137
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 10:52:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4FB314A34C
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 12:54:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729473AbgA0Jwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 04:52:43 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55224 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727816AbgA0Jwn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jan 2020 04:52:43 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00R9aZkX068070
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 04:52:41 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xrgqdhy86-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 04:52:41 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Mon, 27 Jan 2020 09:52:39 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 27 Jan 2020 09:52:37 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00R9pjGT48431604
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 Jan 2020 09:51:45 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6976E4C04E;
-        Mon, 27 Jan 2020 09:52:36 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 121264C044;
-        Mon, 27 Jan 2020 09:52:36 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.5.135])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 27 Jan 2020 09:52:35 +0000 (GMT)
-Subject: Re: [PATCH v7] KVM: s390: Add new reset vcpu API
-To:     Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, linux-s390@vger.kernel.org, david@redhat.com,
-        cohuck@redhat.com
-References: <20200110114540.90713-1-frankja@linux.ibm.com>
- <5a26e1af-ecdc-b815-248e-ee93a7c51ff5@de.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Mon, 27 Jan 2020 10:52:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1729607AbgA0Lyu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 06:54:50 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:50895 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729106AbgA0Lyt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 06:54:49 -0500
+Received: by mail-wm1-f66.google.com with SMTP id a5so6505405wmb.0
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 03:54:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uwtjzAWfEDSlWJZX5R1nJkn64OYKp/XtUeiInUaiy1I=;
+        b=JfGQDLhBFfAQS5g9M2jJBvb5RwF6NNd0X2IBwUBGfR3ItT8gawaMJ2eN0gMCXoONRK
+         1DM3A+9qhfqApMiVlt7iairbpCMMNe6OLS92S9JL4+PH1EQpGyEHX/SPid2Vvlcd9Pwo
+         p3VDhbVWJOkPJTovGGPcuPA+ohO19AfHDjLnfEJ7c0istG8wSix6FxDoCDehBPSsQlu7
+         eV3Mr0KQq1wA19HAoYrTi1t9GnROsFTAwuUY1bSy+sXB47NNjpkdgqKDtCpEJNV1yM5w
+         6IpRXc9/QzXTkwLiTzFRujwG6cZyigNGgK4eKO1og8BVnzJvGq9fFAESZoTrrgqJxsSF
+         DCzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uwtjzAWfEDSlWJZX5R1nJkn64OYKp/XtUeiInUaiy1I=;
+        b=VBJxkALfEpl35rvtJklhw+UCoLKzdxfn6ty1+w4E0wm3d5w2Ak3ly7iASe7mqmpaQ9
+         InN/YcaV0pJ4ET/h0wJor65YXnGf/sGEA4fIiaKAiluUmjcJB8YAWXU3NRyyn17Ylb5w
+         WV4gSygdR6vKs2TPebAzlGcu7cXewreDVfYdR95/BZLC+YlMkGBX8UM3MMijd89In9he
+         Juu4RZDzFaagXgoTdFYgU9risJZg7qrupz7uWU1hgq9nE8mFD2KjjEor/HKozryjFRpy
+         5k7Xm4sv17E0VX/QbbA67fBB2GRyF+Sff7cYJOg/v99mETOnqXdqONxmloQ70ldyncz2
+         SvMQ==
+X-Gm-Message-State: APjAAAWE8aiUsn4GXw3qgNlnwBjpdraKv4KZ3llhsKXRc4M+449YIsVO
+        S3jRnfEvuKWaLQryykiC67wJscfscuMYjMD1UOd16cCT
+X-Google-Smtp-Source: APXvYqx+DVxlFf17InsnfyT+rYEePDKjliLklJeEvJ7+5u0Pp4ueBzk/XNA/pUwtmOFzdBJtBnRQzzAWUVtaj4SD58c=
+X-Received: by 2002:a1c:6246:: with SMTP id w67mr13076771wmb.141.1580126087216;
+ Mon, 27 Jan 2020 03:54:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <5a26e1af-ecdc-b815-248e-ee93a7c51ff5@de.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="g4OvIP98IRpDGBfv6m5cnR3O6RSIZEFCA"
-X-TM-AS-GCONF: 00
-x-cbid: 20012709-0008-0000-0000-0000034D066F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012709-0009-0000-0000-00004A6D7B28
-Message-Id: <db6d8d0f-8a5e-8c4a-bfbb-027102a21213@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-27_02:2020-01-24,2020-01-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 bulkscore=0 clxscore=1015 phishscore=0 mlxlogscore=999
- priorityscore=1501 impostorscore=0 malwarescore=0 adultscore=0 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2001270082
+References: <20191225025945.108466-1-anup.patel@wdc.com> <20191225025945.108466-4-anup.patel@wdc.com>
+ <cb49e776-0673-d6cf-d4dc-ec89a946e5b0@arm.com>
+In-Reply-To: <cb49e776-0673-d6cf-d4dc-ec89a946e5b0@arm.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Mon, 27 Jan 2020 17:24:35 +0530
+Message-ID: <CAAhSdy1+qV=i3JnCaJ39QPiJ+94hfVNByUrMNiMVZ+fT4RHCpw@mail.gmail.com>
+Subject: Re: [kvmtool RFC PATCH 3/8] riscv: Implement Guest/VM arch functions
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Anup Patel <Anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---g4OvIP98IRpDGBfv6m5cnR3O6RSIZEFCA
-Content-Type: multipart/mixed; boundary="02iP0sB2oxB1TW2ZyRm2TC88btekSx4Xo"
+On Wed, Jan 8, 2020 at 6:52 PM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hello,
+>
+> On 12/25/19 3:00 AM, Anup Patel wrote:
+> > This patch implements all kvm__arch_<xyz> Guest/VM arch functions.
+> >
+> > These functions mostly deal with:
+> > 1. Guest/VM RAM initialization
+> > 2. Updating terminals on character read
+> > 3. Loading kernel and initrd images
+> >
+> > Firmware loading is not implemented currently because initially we
+> > will be booting kernel directly without any bootloader. In future,
+> > we will certainly support firmware loading.
+> >
+> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> > ---
+> >  riscv/include/kvm/kvm-arch.h |  15 +++++
+> >  riscv/kvm.c                  | 126 +++++++++++++++++++++++++++++++++--
+> >  2 files changed, 135 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+> > index 7e9c578..b3ec2d6 100644
+> > --- a/riscv/include/kvm/kvm-arch.h
+> > +++ b/riscv/include/kvm/kvm-arch.h
+> > @@ -45,6 +45,21 @@
+> >  struct kvm;
+> >
+> >  struct kvm_arch {
+> > +     /*
+> > +      * We may have to align the guest memory for virtio, so keep the
+> > +      * original pointers here for munmap.
+> > +      */
+> > +     void    *ram_alloc_start;
+> > +     u64     ram_alloc_size;
+> > +
+> > +     /*
+> > +      * Guest addresses for memory layout.
+> > +      */
+> > +     u64     memory_guest_start;
+> > +     u64     kern_guest_start;
+> > +     u64     initrd_guest_start;
+> > +     u64     initrd_size;
+> > +     u64     dtb_guest_start;
+> >  };
+> >
+> >  static inline bool riscv_addr_in_ioport_region(u64 phys_addr)
+> > diff --git a/riscv/kvm.c b/riscv/kvm.c
+> > index e816ef5..c0d3639 100644
+> > --- a/riscv/kvm.c
+> > +++ b/riscv/kvm.c
+> > @@ -1,5 +1,7 @@
+> >  #include "kvm/kvm.h"
+> >  #include "kvm/util.h"
+> > +#include "kvm/8250-serial.h"
+> > +#include "kvm/virtio-console.h"
+> >  #include "kvm/fdt.h"
+> >
+> >  #include <linux/kernel.h>
+> > @@ -19,33 +21,145 @@ bool kvm__arch_cpu_supports_vm(void)
+> >
+> >  void kvm__init_ram(struct kvm *kvm)
+> >  {
+> > -     /* TODO: */
+> > +     int err;
+> > +     u64 phys_start, phys_size;
+> > +     void *host_mem;
+> > +
+> > +     phys_start      = RISCV_RAM;
+> > +     phys_size       = kvm->ram_size;
+> > +     host_mem        = kvm->ram_start;
+> > +
+> > +     err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
+> > +     if (err)
+> > +             die("Failed to register %lld bytes of memory at physical "
+> > +                 "address 0x%llx [err %d]", phys_size, phys_start, err);
+> > +
+> > +     kvm->arch.memory_guest_start = phys_start;
+> >  }
+> >
+> >  void kvm__arch_delete_ram(struct kvm *kvm)
+> >  {
+> > -     /* TODO: */
+> > +     munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
+> >  }
+> >
+> >  void kvm__arch_read_term(struct kvm *kvm)
+> >  {
+> > -     /* TODO: */
+> > +     serial8250__update_consoles(kvm);
+> > +     virtio_console__inject_interrupt(kvm);
+> >  }
+> >
+> >  void kvm__arch_set_cmdline(char *cmdline, bool video)
+> >  {
+> > -     /* TODO: */
+> >  }
+> >
+> >  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+> >  {
+> > -     /* TODO: */
+> > +     /*
+> > +      * Allocate guest memory. We must align our buffer to 64K to
+> > +      * correlate with the maximum guest page size for virtio-mmio.
+> > +      * If using THP, then our minimal alignment becomes 2M.
+> > +      * 2M trumps 64K, so let's go with that.
+> > +      */
+> > +     kvm->ram_size = min(ram_size, (u64)RISCV_MAX_MEMORY(kvm));
+> > +     kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
+> > +     kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, hugetlbfs_path,
+> > +                                             kvm->arch.ram_alloc_size);
+> > +
+> > +     if (kvm->arch.ram_alloc_start == MAP_FAILED)
+> > +             die("Failed to map %lld bytes for guest memory (%d)",
+> > +                 kvm->arch.ram_alloc_size, errno);
+> > +
+> > +     kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
+> > +                                     SZ_2M);
+> > +
+> > +     madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+> > +             MADV_MERGEABLE);
+> > +
+> > +     madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+> > +             MADV_HUGEPAGE);
+> >  }
+> >
+> > +#define FDT_ALIGN    SZ_4M
+> > +#define INITRD_ALIGN 4
+> >  bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+> >                                const char *kernel_cmdline)
+> >  {
+> > -     /* TODO: */
+> > +     void *pos, *kernel_end, *limit;
+> > +     unsigned long guest_addr, kernel_offset;
+> > +     ssize_t file_size;
+> > +
+> > +     /*
+> > +      * Linux requires the initrd and dtb to be mapped inside lowmem,
+> > +      * so we can't just place them at the top of memory.
+> > +      */
+> > +     limit = kvm->ram_start + min(kvm->ram_size, (u64)SZ_256M) - 1;
+> > +
+> > +#if __riscv_xlen == 64
+> > +     /* Linux expects to be booted at 2M boundary for RV64 */
+> > +     kernel_offset = 0x200000;
+> > +#else
+> > +     /* Linux expects to be booted at 4M boundary for RV32 */
+> > +     kernel_offset = 0x400000;
+> > +#endif
+> > +
+> > +     pos = kvm->ram_start + kernel_offset;
+> > +     kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
+> > +     file_size = read_file(fd_kernel, pos, limit - pos);
+> > +     if (file_size < 0) {
+> > +             if (errno == ENOMEM)
+> > +                     die("kernel image too big to fit in guest memory.");
+> > +
+> > +             die_perror("kernel read");
+> > +     }
+> > +     kernel_end = pos + file_size;
+> > +     pr_debug("Loaded kernel to 0x%llx (%zd bytes)",
+> > +              kvm->arch.kern_guest_start, file_size);
+> > +
+> > +     /* Place FDT just after kernel at FDT_ALIGN address */
+> > +     pos = kernel_end + FDT_ALIGN;
+> > +     guest_addr = ALIGN(host_to_guest_flat(kvm, pos), FDT_ALIGN);
+> > +     pos = guest_flat_to_host(kvm, guest_addr);
+> > +     if (pos < kernel_end)
+> > +             die("fdt overlaps with kernel image.");
+> > +
+> > +     kvm->arch.dtb_guest_start = guest_addr;
+> > +     pr_debug("Placing fdt at 0x%llx - 0x%llx",
+> > +              kvm->arch.dtb_guest_start,
+> > +              host_to_guest_flat(kvm, limit));
+> > +     limit = pos;
+>
+> This doesn't look right. pos points to the start of the DTB, not to the top of
+> free memory. You probably want to delete the line.
 
---02iP0sB2oxB1TW2ZyRm2TC88btekSx4Xo
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Actually, we are trying to place INITRD between kernel and DTB.
 
-On 1/27/20 9:05 AM, Christian Borntraeger wrote:
->=20
->=20
-> On 10.01.20 12:45, Janosch Frank wrote:
-> [...]
->> +static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm_sync_regs *regs =3D &vcpu->run->s.regs;
->> +
->> +	/* Clear reset is a superset of the initial reset */
->> +	kvm_arch_vcpu_ioctl_normal_reset(vcpu);
->> +
->> +	memset(&regs->gprs, 0, sizeof(regs->gprs));
->=20
->=20
->=20
->> +	/* Will be picked up because of save_fpu_regs() in the initial reset=
- */
->> +	memset(&current->thread.fpu.vxrs, 0, sizeof(current->thread.fpu.vxrs=
-));
->=20
-> So I checked with a userspace that sets f8(call-saved) to 0x123 during =
-this ioctl.
-> f8 is 0 afterwards. The guest f8 is also correct, just because QEMU doe=
-s clear out
-> its copy of the fprs and syncs that back via synv regs.
->=20
-> So this must be
->=20
-> 	/* we have not synced the registers from kvm_run to the thread
-> 	   structure. We must clear out kvm_run*/
-> 	memset(&regs->vrs, 0, sizeof(regs->vrs));
+Having looked at it again, I think this is not right approach we should
+place INITRD after DTB otherwise a bigger INITRD can easily get
+corrupted by DTB creation.
 
-Great, thanks!
-Meanwhile I had a look at the missing pieces and the guarded storage rese=
-ts.
+>
+> > +
+> > +     /* ... and finally the initrd, if we have one. */
+> > +     if (fd_initrd != -1) {
+> > +             struct stat sb;
+> > +             unsigned long initrd_start;
+> > +
+> > +             if (fstat(fd_initrd, &sb))
+> > +                     die_perror("fstat");
+> > +
+> > +             pos -= (sb.st_size + INITRD_ALIGN);
+>
+> This too doesn't look right. You're overwriting the DTB and most likely the kernel
+> with the initrd.
 
->=20
->=20
->> +	memset(&regs->acrs, 0, sizeof(regs->acrs));
->> +
->> +	regs->etoken =3D 0;
->> +	regs->etoken_extension =3D 0;
->> +
->> +	memset(&regs->gscb, 0, sizeof(regs->gscb));
-> [....]
->=20
+Sure, I will fix the placement of DTB and INITRD.
 
+Regards,
+Anup
 
-
---02iP0sB2oxB1TW2ZyRm2TC88btekSx4Xo--
-
---g4OvIP98IRpDGBfv6m5cnR3O6RSIZEFCA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4usuMACgkQ41TmuOI4
-ufjCwQ/+LQARNMZP0wkIZDaccxY9c3rXw2pEet7nb2i3nWW62BOYl0kYYJrGffgC
-J1GnuW8wrJj/7LZ3ULkHlvW67Tsup5EAuUgJ/AomZclaeoetDeq7i7gRBSsKVd3d
-LNqwLKwQ5AU1v5vSV6igIB7PLZxniZiQojkJMbxpOW74BK/Fb+v/y3raP2MINiWC
-8rZAOVwAAoeku8quNHb1tFi4anQtEcvJOxX0z8d+R9CgFQdkXxPgu5X5FV6+5gAB
-HJpT1S282PQUVYcbI9zt1fW2il/8gZp1CzyV8HKWAyvyC8KBIBqsuFaQr1b7bvN2
-n/OQBpiNn0IVA89gZjc5+TVSrgNe+AZDr6G3ZQEHImTPF1FX2StqJ0l4gNaQB3rm
-NwsMb6y5QdKBf8f7rnuvAtZCvOQvECaELn3mN7m/QSjFUuzh2xobFKG3faK+47n1
-36ojml6/JeUjbMFAE1Hyesv+9nqtJAfkEHLPDm/S336dP+p+68Yli5CiFJD814qT
-k1pYkxVCV8R4DWY0XL9rqmsa7jnDBhTVAl1mU+Sv5oI9ovtry2JIJNTvC0iPHMnW
-duCBqJMls8zta9DO51D00lkDxNOEy7nxLecwk1TiUN1o5y96EnO8jhYFtaRxRmzS
-GNL6CubZzeSiMVhjbt//TNbnNJ3U/VTmcndh98AMZxigPduAM/o=
-=UQ9y
------END PGP SIGNATURE-----
-
---g4OvIP98IRpDGBfv6m5cnR3O6RSIZEFCA--
-
+>
+> Thanks,
+> Alex
+> > +             guest_addr = ALIGN(host_to_guest_flat(kvm, pos), INITRD_ALIGN);
+> > +             pos = guest_flat_to_host(kvm, guest_addr);
+> > +             if (pos < kernel_end)
+> > +                     die("initrd overlaps with kernel image.");
+> > +
+> > +             initrd_start = guest_addr;
+> > +             file_size = read_file(fd_initrd, pos, limit - pos);
+> > +             if (file_size == -1) {
+> > +                     if (errno == ENOMEM)
+> > +                             die("initrd too big to fit in guest memory.");
+> > +
+> > +                     die_perror("initrd read");
+> > +             }
+> > +
+> > +             kvm->arch.initrd_guest_start = initrd_start;
+> > +             kvm->arch.initrd_size = file_size;
+> > +             pr_debug("Loaded initrd to 0x%llx (%llu bytes)",
+> > +                      kvm->arch.initrd_guest_start,
+> > +                      kvm->arch.initrd_size);
+> > +     } else {
+> > +             kvm->arch.initrd_size = 0;
+> > +     }
+> > +
+> >       return true;
+> >  }
+> >
