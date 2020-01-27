@@ -2,109 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 988D914A42A
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 13:52:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E53814A61D
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 15:30:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730070AbgA0Mwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 07:52:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38095 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729213AbgA0Mwq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jan 2020 07:52:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580129565;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jtFiStN3jJBNXacY8WaepFR9Wi9jKNBZsK7Z7DnkvA4=;
-        b=UAhuioKjuwd1ivZcccKigEmsOb8PZ00EzXELaR242HGf6+CJl8Ru0TRwLYi9+sNAblV12Q
-        NF/hnkUpElikCETgywKrR2gRfBOl2lDTTzPClnIsrGxTxfmds6/N8+uh/3uQi0jbEkIC9E
-        YEN6aKVm99sTqj95wWr5C+CkOlaN6pc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-Hj67WDbpNaOD4F_DYdj7qQ-1; Mon, 27 Jan 2020 07:52:40 -0500
-X-MC-Unique: Hj67WDbpNaOD4F_DYdj7qQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A07313E2;
-        Mon, 27 Jan 2020 12:52:39 +0000 (UTC)
-Received: from gondolin (ovpn-116-220.ams2.redhat.com [10.36.116.220])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D7A145C219;
-        Mon, 27 Jan 2020 12:52:37 +0000 (UTC)
-Date:   Mon, 27 Jan 2020 13:52:35 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        "Jason J . Herne" <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v1 1/1] vfio-ccw: Don't free channel programs for
- unrelated interrupts
-Message-ID: <20200127135235.1f783f1b.cohuck@redhat.com>
-In-Reply-To: <50a0fe00-a7c1-50e4-12f5-412ee7a0e522@linux.ibm.com>
-References: <20200124145455.51181-1-farman@linux.ibm.com>
-        <20200124145455.51181-2-farman@linux.ibm.com>
-        <20200124163305.3d6f0d47.cohuck@redhat.com>
-        <50a0fe00-a7c1-50e4-12f5-412ee7a0e522@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1729182AbgA0OaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 09:30:25 -0500
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:35082 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725828AbgA0OaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 09:30:25 -0500
+Received: by mail-ed1-f67.google.com with SMTP id f8so10991769edv.2
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 06:30:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6n2FVnJSrtqOR/mD8fQNayBm0ZsvU1cvMkwwhNiZ1es=;
+        b=CY/B7kCgSEayoIN8UYccu1TxhFtfLxfxYAEltI7kKfNJQwuh8wqSrsllC3HGJzdT3t
+         QAMUjKlLnE3pbAByQeY62G2gQ9m8X54h7dqEnKqkxtwFumx40aqMeamaPBvedSlBBZy1
+         hDt7FK0f4I6mKrzktyGJm4ElOjUfnH0nyQ2G6z5uT3ys2iWIK+uQqch6zoq324eznrK5
+         2hPzAdMrlzrfEFAkSTBL7miTL7m3XnOcMT9z+uU7a0G9UWDVyU9U7XnPNfh2j4dfJMbv
+         im4rGDIGKUhV5Sm9RVaxXR3X5xkMKQdyeVagSKNJQnyia7C9R9oZDs/Rzqk6vVvVjGAE
+         XJFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6n2FVnJSrtqOR/mD8fQNayBm0ZsvU1cvMkwwhNiZ1es=;
+        b=kxmsGObxe16FzcTCn3H754R3HYuUqQIBQM/gedGOoobrv41s//GFgx1eMdPxkPI0xe
+         L7To/J/qbWomkPboC8+cSWzE6jWPOD4FrTaDDCuJ842qFl85SYgRlCT8ETKQQuAfgXm7
+         nFA4j712eDJMc/tVTSJErzqevSGQKGNT33kAbYAN7QpWplclRW1IAZxLYPDhTyhlp035
+         xUOxppfck9PPLiYqrjG4Hi1wF8PzWVpQDLb8V2w4bt15t0CFyW4oNA8PwFV0qBiJK/yq
+         osn3mEM9Hfp7RRfITbkmrDP++6G1Wy3b9SDIXmbWd0ux1myB777rMYHAwm5t0IKqpZ+I
+         EokA==
+X-Gm-Message-State: APjAAAWDdANIP+MYgbNTTXQhfvC9eAT5DeR9H7k8sqII2O7q72NGzLYf
+        dwAmBcnGJnftm0UgqyBAT98SYktmuRy6qY/tUPyuug==
+X-Google-Smtp-Source: APXvYqxMeuUsAnCmf+avVRPtdQmVPrt5z58pk6xDNeK6XlB8NYS9HpEeXny9hy9QJb/7xkVLZPMrLyQAjBTiQj+8GxU=
+X-Received: by 2002:a17:906:3746:: with SMTP id e6mr8271145ejc.165.1580135422726;
+ Mon, 27 Jan 2020 06:30:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20200124234608.10754-1-sean.j.christopherson@intel.com> <705151e0-6a8b-1e15-934d-dd96f419dcd8@oracle.com>
+In-Reply-To: <705151e0-6a8b-1e15-934d-dd96f419dcd8@oracle.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Mon, 27 Jan 2020 06:30:11 -0800
+Message-ID: <CAAAPnDEA4u0YRLtW7OsWtL-Uy=5paDmrxx7EScDFsH5aqG6QJA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: nVMX: Print more (accurate) info if
+ RDTSC diff test fails
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Nadav Amit <nadav.amit@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 24 Jan 2020 11:08:12 -0500
-Eric Farman <farman@linux.ibm.com> wrote:
+On Sat, Jan 25, 2020 at 11:16 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+>
+> On 1/24/20 3:46 PM, Sean Christopherson wrote:
+> > Snapshot the delta of the last run and display it in the report if the
+> > test fails.  Abort the run loop as soon as the threshold is reached so
+> > that the displayed delta is guaranteed to a failed delta.  Displaying
+> > the delta helps triage failures, e.g. is my system completely broken or
+> > did I get unlucky, and aborting the loop early saves 99900 runs when
+> > the system is indeed broken.
+> >
+> > Cc: Nadav Amit <nadav.amit@gmail.com>
+> > Cc: Aaron Lewis <aaronlewis@google.com>
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >   x86/vmx_tests.c | 11 ++++++-----
+> >   1 file changed, 6 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> > index b31c360..4049dec 100644
+> > --- a/x86/vmx_tests.c
+> > +++ b/x86/vmx_tests.c
+> > @@ -9204,6 +9204,7 @@ static unsigned long long rdtsc_vmexit_diff_test_iteration(void)
+> >
+> >   static void rdtsc_vmexit_diff_test(void)
+> >   {
+> > +     unsigned long long delta;
+> >       int fail = 0;
+> >       int i;
+> >
+> > @@ -9226,17 +9227,17 @@ static void rdtsc_vmexit_diff_test(void)
+> >       vmcs_write(EXI_MSR_ST_CNT, 1);
+> >       vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(exit_msr_store));
+> >
+> > -     for (i = 0; i < RDTSC_DIFF_ITERS; i++) {
+> > -             if (rdtsc_vmexit_diff_test_iteration() >=
+> > -                 HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
+> > +     for (i = 0; i < RDTSC_DIFF_ITERS && fail < RDTSC_DIFF_FAILS; i++) {
+> > +             delta = rdtsc_vmexit_diff_test_iteration();
+> > +             if (delta >= HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
+> >                       fail++;
+> >       }
+> >
+> >       enter_guest();
+> >
+> >       report(fail < RDTSC_DIFF_FAILS,
+> > -            "RDTSC to VM-exit delta too high in %d of %d iterations",
+> > -            fail, RDTSC_DIFF_ITERS);
+> > +            "RDTSC to VM-exit delta too high in %d of %d iterations, last = %llu",
+> > +            fail, i, delta);
+> >   }
+> >
+> >   static int invalid_msr_init(struct vmcs *vmcs)
+> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 
-> On 1/24/20 10:33 AM, Cornelia Huck wrote:
-> > On Fri, 24 Jan 2020 15:54:55 +0100
-> > Eric Farman <farman@linux.ibm.com> wrote:
-
-> >> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-> >> index e401a3d0aa57..a8ab256a217b 100644
-> >> --- a/drivers/s390/cio/vfio_ccw_drv.c
-> >> +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> >> @@ -90,8 +90,8 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
-> >>  	is_final = !(scsw_actl(&irb->scsw) &
-> >>  		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
-> >>  	if (scsw_is_solicited(&irb->scsw)) {
-> >> -		cp_update_scsw(&private->cp, &irb->scsw);
-> >> -		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
-> >> +		if (cp_update_scsw(&private->cp, &irb->scsw) &&
-> >> +		    is_final && private->state == VFIO_CCW_STATE_CP_PENDING)  
-> > 
-> > ...but I still wonder why is_final is not catching non-ssch related
-> > interrupts, as I thought it would. We might want to adapt that check,
-> > instead. (Or was the scsw_is_solicited() check supposed to catch that?
-> > As said, too tired right now...)  
-> 
-> I had looked at the (un)solicited bits at one point, and saw very few
-> unsolicited interrupts.  The ones that did show up didn't appear to
-> affect things in the way that would cause the problems I'm seeing.
-
-Ok, so that check is hopefully fine.
-
-> 
-> As for is_final...  That POPS table states that for "status pending
-> [alone] after termination of HALT or CLEAR ... cpa is unpredictable",
-> which is what happens here.  In the example above, the cpa is the same
-> as the previous (successful) interrupt, and thus unrelated to the
-> current chain.  Perhaps is_final needs to check that the function
-> control in the interrupt is for a start?
-
-I think our reasoning last time we discussed this function was that we
-only are in CP_PENDING if we actually did a ssch previously. Now, if we
-do a hsch/csch before we got final status for the program started by
-the ssch, we don't move out of the CP_PENDING, but the cpa still might
-not be what we're looking for. So, we should probably check that we
-have only the start function indicated in the fctl.
-
-But if we do that, we still have a chain allocated for something that
-has already been terminated... how do we find the right chain to clean
-up, if needed?
-
+Reviewed-by: Aaron Lewis <aaronlewis@google.com>
