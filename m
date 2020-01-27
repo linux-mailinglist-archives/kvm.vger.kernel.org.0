@@ -2,89 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4713B14A77A
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 16:48:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2914F14A88A
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 18:04:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729518AbgA0Psk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 10:48:40 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33671 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728783AbgA0Psk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jan 2020 10:48:40 -0500
+        id S1726099AbgA0REO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 12:04:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52488 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725845AbgA0REO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 12:04:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580140118;
+        s=mimecast20190719; t=1580144653;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ev2DavOVeAfQ+Vr264Gj58ZrieELq0AxbNA2pCfvoOE=;
-        b=BqrlSLP8xnuv4ZR1wDAuiDZcH/tZ1BPPDSGMFtvYD6jJT9xW1paQJcELmVg2BpN+fLHNKz
-        uehnrHXUF7fD4zRf/kjqtDzzYRa8R30GGGYZk47qTPNoWKzA2YJCWor7jwCA6+ZfVlthB5
-        htyTzkVqdLfaynBrZnRgWNJEpYuuns8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-p7oRtRRNN1S0dy9g8eSEVw-1; Mon, 27 Jan 2020 10:48:37 -0500
-X-MC-Unique: p7oRtRRNN1S0dy9g8eSEVw-1
-Received: by mail-wm1-f70.google.com with SMTP id g26so1478210wmk.6
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 07:48:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ev2DavOVeAfQ+Vr264Gj58ZrieELq0AxbNA2pCfvoOE=;
-        b=NNtUtADjuZP2JR9ZyRjvkND8YLPnAAKPkpXdyKXd3zgn7Zij+jKbinblGyJSDob5BL
-         yTRb+OZj2hDF/dGIsQFEGNhYMPMyDNO2ZAdBhF4IyBss5eVNg6SxwM0T2PzWQ5Vm0P6b
-         fnI6Fwau8FuRCyCdzTPOWY4NMb9jg0P8DnhNzmgechW7QovCdDnoDTmniqsgv/mdacXz
-         v3FLUAKeiOVC+F+x9H6unfyFA7N9QK48QijCY8bNE/eCIBpZoXPXi4rwtM3eUiTkLvw7
-         UFKb+OgSO6Y8bYgaB/n7K8Eun99p91xwPt9gcn+z/+wcmA1SL72+T9DrYnoXcVdWLyFW
-         WsZw==
-X-Gm-Message-State: APjAAAWUS9klC0STnUWGMs7jcamfYnkQVkSpssZRkze0jsxtCzKQd2MP
-        wroW5S42daMUCo6erRqauMhP3yv4YpslxfqfYzq/Z+uQT7FsdEeWvzw0VFhkoDDG3VN18i0wliF
-        EXIXWKXMtUBX2
-X-Received: by 2002:a7b:c19a:: with SMTP id y26mr15306297wmi.152.1580140115579;
-        Mon, 27 Jan 2020 07:48:35 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyz7Ff2a08B/s8P5i+xjyQx3D2QYf/6C1n6kzVc+oMGzILnnFPXnRX3sq5VnGumfLVmxX4BYQ==
-X-Received: by 2002:a7b:c19a:: with SMTP id y26mr15306280wmi.152.1580140115405;
-        Mon, 27 Jan 2020 07:48:35 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id w13sm21846893wru.38.2020.01.27.07.48.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2020 07:48:34 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 0/3] KVM: x86: VM alloc bug fix and cleanup
-In-Reply-To: <20200127004113.25615-1-sean.j.christopherson@intel.com>
-References: <20200127004113.25615-1-sean.j.christopherson@intel.com>
-Date:   Mon, 27 Jan 2020 16:48:34 +0100
-Message-ID: <87zhe8lx2l.fsf@vitty.brq.redhat.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MZLoh5Tjj+Hm+iXUIZGeRq3iuD5be54ScqNixZPGvlE=;
+        b=U/7/WaBzq/JYHMNEOwA8oUOO/YEtzxpKe3gJRuUqbRDK8GkID+ipcPuUlnvAyXxnrNFfA7
+        hwPtxVQHKP/q+4yoRhR9QzqjjCVNBBBVQHBJ7vmxluOK/81zaT7mwn3RYgYoEFxjwPO+aE
+        vPXGQNe/gDepVlc8WuZkcLnLrw0F8uU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-399-W3tzF6zhOj2dqWmbncTGJg-1; Mon, 27 Jan 2020 12:04:09 -0500
+X-MC-Unique: W3tzF6zhOj2dqWmbncTGJg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62CB218C8C30;
+        Mon, 27 Jan 2020 17:04:08 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3EC4710018FF;
+        Mon, 27 Jan 2020 17:04:07 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, thuth@redhat.com, bgardon@google.com
+Subject: [PATCH] kvm: selftests: Introduce num-pages conversion utilities
+Date:   Mon, 27 Jan 2020 18:04:05 +0100
+Message-Id: <20200127170405.17503-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+Guests and hosts don't have to have the same page size. This means
+calculations are necessary when selecting the number of guest pages
+to allocate in order to ensure the number is compatible with the
+host. Provide utilities to help with those calculations.
 
-> Fix a (fairly) long standing NULL pointer dereference if VM allocation
-> fails, and do a bit of clean up on top.
->
-> I would have preferred to omit patch 01, i.e. fix the bug via patch 02,
-> but unfortunately (long term support) kernel 4.19 doesn't have the
-> accounting changes, which would make backporting the fix extra annoying
-> for no real benefit.
->
-> Sean Christopherson (3):
->   KVM: x86: Gracefully handle __vmalloc() failure during VM allocation
->   KVM: x86: Directly return __vmalloc() result in ->vm_alloc()
->   KVM: x86: Consolidate VM allocation and free for VMX and SVM
->
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ tools/testing/selftests/kvm/dirty_log_test.c  |  3 +--
+ .../testing/selftests/kvm/include/kvm_util.h  |  3 +++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 26 +++++++++++++++++++
+ 3 files changed, 30 insertions(+), 2 deletions(-)
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing=
+/selftests/kvm/dirty_log_test.c
+index 5614222a6628..c2bc4e4c91ec 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -295,8 +295,7 @@ static void run_test(enum vm_guest_mode mode, unsigne=
+d long iterations,
+ 	guest_num_pages =3D (guest_num_pages + 0xff) & ~0xffUL;
+ #endif
+ 	host_page_size =3D getpagesize();
+-	host_num_pages =3D (guest_num_pages * guest_page_size) / host_page_size=
+ +
+-			 !!((guest_num_pages * guest_page_size) % host_page_size);
++	host_num_pages =3D vm_num_host_pages(vm, guest_num_pages);
+=20
+ 	if (!phys_offset) {
+ 		guest_test_phys_mem =3D (vm_get_max_gfn(vm) -
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testi=
+ng/selftests/kvm/include/kvm_util.h
+index 29cccaf96baf..0d05ade3022c 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -158,6 +158,9 @@ unsigned int vm_get_page_size(struct kvm_vm *vm);
+ unsigned int vm_get_page_shift(struct kvm_vm *vm);
+ unsigned int vm_get_max_gfn(struct kvm_vm *vm);
+=20
++unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest=
+_pages);
++unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host=
+_pages);
++
+ struct kvm_userspace_memory_region *
+ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
+ 				 uint64_t end);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
+elftests/kvm/lib/kvm_util.c
+index 41cf45416060..5af9d7b1b7fc 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1667,3 +1667,29 @@ unsigned int vm_get_max_gfn(struct kvm_vm *vm)
+ {
+ 	return vm->max_gfn;
+ }
++
++static unsigned int vm_calc_num_pages(unsigned int num_pages,
++				      unsigned int page_shift,
++				      unsigned int new_page_shift)
++{
++	unsigned int n =3D 1 << (new_page_shift - page_shift);
++
++	if (page_shift >=3D new_page_shift)
++		return num_pages * (1 << (page_shift - new_page_shift));
++
++	return num_pages / n + !!(num_pages % n);
++}
++
++unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest=
+_pages)
++{
++	return vm_calc_num_pages(num_guest_pages,
++				 vm_get_page_shift(vm),
++				 __builtin_ffs(getpagesize()) - 1);
++}
++
++unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host=
+_pages)
++{
++	return vm_calc_num_pages(num_host_pages,
++				 __builtin_ffs(getpagesize()) - 1,
++				 vm_get_page_shift(vm));
++}
+--=20
+2.21.1
 
