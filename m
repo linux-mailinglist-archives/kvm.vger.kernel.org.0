@@ -2,117 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A4E1B149F28
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 08:16:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20893149F63
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 09:02:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726670AbgA0HQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 02:16:18 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:44622 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725840AbgA0HQS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 Jan 2020 02:16:18 -0500
-Received: by mail-ot1-f66.google.com with SMTP id h9so7404093otj.11;
-        Sun, 26 Jan 2020 23:16:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=ZTshCe94WzSsfXve6ziu+qTyps0fLQU+BDDkCbT6Bso=;
-        b=tsfuDBGTQVhy70maJJPR3yaIKX8BjW23nAIzNWcWsDqNiB/oBXDoWDJ1whQefG8H5T
-         qA+zgESqYPhbL05359SxdqjN7XPsc4ZCVcF60/E3vAaWD8dyjnpXX28Bw5HW44X/bShJ
-         IspH7PC33TbNJdg9v4cXf5eQGf0WRNIbH5gI0DPlFwQAM2ZU/+tQtoN+KcJK15Uw4zgj
-         AX5NwHYvM2nrcqgjzy2uOE8dE1NndLkC3lfJU+MUH4T9vVKIR5yoBQYrclHpQuUBjq5A
-         MMAZ4I80FDACK65hhPDSWN3aS18HSk1chsTDXMUCsJy4Dh/Ppk5sCK+P9WP6kjloGkb6
-         Lu+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=ZTshCe94WzSsfXve6ziu+qTyps0fLQU+BDDkCbT6Bso=;
-        b=oE35V4duXWT75m32qjpdodBvoe5fnRW5N+jSjPEmxTV8U1U2LQmzbWUMVJE1Kwb7vA
-         Thc4hvMFWlaITAwG0KwPdEqVmXvuCcVJFOlrU+JiwAhJ6ny3KKbL1e7e4WnCIC1oBM0/
-         mL8L+Hyb4GNO+dMi5571Z+tOchCy+Ehv//R/cuk+rfVLpjspUWsAjxZsMmpgIhhytvsR
-         198qC9qmrOBhhREaCthwP2tElnn+myfv7uZQQanKdBEA+qST+l54uGSPo/SnlcO5Phfk
-         QyHqC4UC9mDn5Hej9lsJHFZ8Z/blrzHD2VGJl/fLpGZcvzX9FtnUSzK1NSMSkREn62oi
-         h8qA==
-X-Gm-Message-State: APjAAAVqM5TAOgHE3z7rJpqmHcIqs0kKlAiz0hCIEyABkolwCylB0EUN
-        p0TO5upCK9q6IgseX5jB8UI=
-X-Google-Smtp-Source: APXvYqyBvsPV5HUfCbEOF6ZmFCmj7SSgxfXyaKHBatxbogtKM0leCRK+ExTQvjrYuSeo/zgeV0umsQ==
-X-Received: by 2002:a9d:729c:: with SMTP id t28mr8584637otj.66.1580109377176;
-        Sun, 26 Jan 2020 23:16:17 -0800 (PST)
-Received: from nick-Blade-Stealth.attlocal.net (23-121-157-107.lightspeed.sntcca.sbcglobal.net. [23.121.157.107])
-        by smtp.googlemail.com with ESMTPSA id n25sm4500248oic.6.2020.01.26.23.16.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Jan 2020 23:16:16 -0800 (PST)
-From:   Nick Desaulniers <nick.desaulniers@gmail.com>
-To:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de
-Cc:     Nick Desaulniers <nick.desaulniers@gmail.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH] dynamically allocate struct cpumask
-Date:   Sun, 26 Jan 2020 23:16:02 -0800
-Message-Id: <20200127071602.11460-1-nick.desaulniers@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726296AbgA0ICN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 03:02:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45285 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726191AbgA0ICN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 03:02:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580112133;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=L0QENZKK5dUzUUb2dkjcWSCrsRRVFKQaiKNvctVwRUg=;
+        b=NIqWSx9v/ajszTSFi7Ko/VvaVec4bJ/T+Vea530CxXKmrqZJdieokYUsKdzw6nheW4WAyC
+        BC1agGb11nTt6iy+kSdziAyZsi6fjIsmjFZDQU+j56IcgtJj7nvBoneHWMTGOKrM5AJj8O
+        e5PG2J7HnhsNpw5jqsKbhAAHwxO3VZw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-066bo0a1MneNHz2UyyYlcQ-1; Mon, 27 Jan 2020 03:02:09 -0500
+X-MC-Unique: 066bo0a1MneNHz2UyyYlcQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A651DBA6;
+        Mon, 27 Jan 2020 08:02:08 +0000 (UTC)
+Received: from gondolin (ovpn-116-220.ams2.redhat.com [10.36.116.220])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 058FB863A3;
+        Mon, 27 Jan 2020 08:02:06 +0000 (UTC)
+Date:   Mon, 27 Jan 2020 09:02:04 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: force push to kvm/next coming
+Message-ID: <20200127090204.33b7c0a6.cohuck@redhat.com>
+In-Reply-To: <6b568513-5646-29ae-2165-95dbeb185697@redhat.com>
+References: <8f43bd04-9f4e-5c06-8d1d-cb84bba40278@redhat.com>
+        <c1564d41-0925-f0fd-c145-bea67a8b100e@de.ibm.com>
+        <6b568513-5646-29ae-2165-95dbeb185697@redhat.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This helps avoid avoid a potentially large stack allocation.
+On Sat, 25 Jan 2020 10:31:27 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-When building with:
-$ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
-The following warning is observed:
-arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
-function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
-static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
-vector)
-            ^
-Debugging with:
-https://github.com/ClangBuiltLinux/frame-larger-than
-via:
-$ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
-  kvm_send_ipi_mask_allbutself
-points to the stack allocated `struct cpumask newmask` in
-`kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
-potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
-the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
-8192, making a single instance of a `struct cpumask` 1024 B.
+> On 25/01/20 09:29, Christian Borntraeger wrote:
+> >=20
+> >=20
+> > On 24.01.20 09:38, Paolo Bonzini wrote: =20
+> >> Linux-next merge reported some bad mistakes on my part, so I'm
+> >> force-pushing kvm/next.  Since it was pushed only yesterday and the co=
+de
+> >> is the same except for two changed lines, it shouldn't be a big deal.
+> >>
+> >> Paolo
+> >> =20
+> > current KVM/next has the following compile error (due to Seans rework).
+> >=20
+> >   CC [M]  arch/s390/kvm/kvm-s390.o
+> > arch/s390/kvm/kvm-s390.c: In function =E2=80=98kvm_arch_vcpu_create=E2=
+=80=99:
+> > arch/s390/kvm/kvm-s390.c:3026:32: error: =E2=80=98id=E2=80=99 undeclare=
+d (first use in this function); did you mean =E2=80=98fd=E2=80=99?
+> >  3026 |  vcpu->arch.sie_block->icpua =3D id;
+> >       |                                ^~
+> >       |                                fd
+> > arch/s390/kvm/kvm-s390.c:3026:32: note: each undeclared identifier is r=
+eported only once for each function it appears in
+> > arch/s390/kvm/kvm-s390.c:3028:39: error: =E2=80=98kvm=E2=80=99 undeclar=
+ed (first use in this function)
+> >  3028 |  vcpu->arch.sie_block->gd =3D (u32)(u64)kvm->arch.gisa_int.orig=
+in;
+> >       |                                       ^~~
+> > make[2]: *** [scripts/Makefile.build:266: arch/s390/kvm/kvm-s390.o] Err=
+or 1
+> > make[1]: *** [scripts/Makefile.build:503: arch/s390/kvm] Error 2
+> > make: *** [Makefile:1693: arch/s390] Error 2
+> >=20
+> > Is this part of the fixup that you will do or another issue? =20
+>=20
+> Nope, I trusted Conny's review on that. :(
 
-Signed-off-by: Nick Desaulniers <nick.desaulniers@gmail.com>
----
- arch/x86/kernel/kvm.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Sorry about missing that, reviewed too late in the year :(
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 32ef1ee733b7..d41c0a0d62a2 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -494,13 +494,15 @@ static void kvm_send_ipi_mask(const struct cpumask *mask, int vector)
- static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int vector)
- {
- 	unsigned int this_cpu = smp_processor_id();
--	struct cpumask new_mask;
-+	struct cpumask *new_mask;
- 	const struct cpumask *local_mask;
- 
--	cpumask_copy(&new_mask, mask);
--	cpumask_clear_cpu(this_cpu, &new_mask);
--	local_mask = &new_mask;
-+	new_mask = kmalloc(sizeof(*new_mask), GFP_KERNEL);
-+	cpumask_copy(new_mask, mask);
-+	cpumask_clear_cpu(this_cpu, new_mask);
-+	local_mask = new_mask;
- 	__send_ipi_mask(local_mask, vector);
-+	kfree(new_mask);
- }
- 
- /*
--- 
-2.17.1
+[If I actually test something, I'm usually explicitly mentioning that.]
 
