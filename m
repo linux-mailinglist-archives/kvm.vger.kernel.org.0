@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D97C14BC33
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:51:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9ACB314BC13
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:51:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726783AbgA1Ova (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 09:51:30 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:58458 "EHLO
+        id S1727439AbgA1Ou6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 09:50:58 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:58474 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726541AbgA1N6p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1726557AbgA1N6p (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 28 Jan 2020 08:58:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
@@ -17,18 +17,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=c3O1qU0BaMW0VdPESODOU6k7pCSNM7sfr+uBlXdB8Yc=; b=lQHC2mTvqddMIlJFDkKRR0OVts
-        q/bN8rxHqwIJuNjVvYzMwXlnqNDuaJ83M+53U3tDfnvS1yasGoYIZIek2a2a35NksTaI6r246R9MQ
-        dRDn1JcV655Qyod4IzHI/UnGGHyJlflklB3unGke1Z6b2kt/liERpZN+eeBVOMAhgALzsdocy8MCS
-        SdRGniaO4EOtFUz3gpl3bQ/Qk89S+u6CNXBNKIVwfyl3RUk8woQ5l8mF3+kW9HvD7Hai6OvZdWxym
-        Gr/PPp2DvgNkhowlyjzzVeqg920r17JtPPM6XxtM83WAbglAVW27wwVYn8PGkmcDhQb6v8+5CsmyD
-        yvzz7lhw==;
+        bh=dAo4MTL8JFdzXH3mr7nnacHwuW8dPHCRz9vjZt/hWIQ=; b=Cq2FFDAxQMQA3FsjTZb1MeJOxO
+        h1//oxs2MGBvgWnpvYllEWdaTMgz0cE9NWcsczLXn3Lf9/0aG6sTuagQpdXZaIqlMHW8/8FRMto9T
+        Oynzyb7s9CGgjALYTsVYJQbtPktfCQQWoDptjOdzdCwQMXcC4W8o7Oowyj7C7XX1GFQKfuUrMTsOZ
+        JIDStqh9oMDNBVSow15oz0E8PXd+5J6RcIx8jek7NU6WKxJ0DjrhIK4skas/8OX5fzQ4B42SwyZj6
+        le8op2jFq0WdpX7n/hYQcF7xLBPC83+OzCttCRZ7k5QqPZVuzfwdWOvausjkB8PzffX8h39dVzf04
+        EMgMV75g==;
 Received: from [177.41.103.99] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iwRO7-0006Hy-31; Tue, 28 Jan 2020 13:58:43 +0000
+        id 1iwRO7-0006I0-Bk; Tue, 28 Jan 2020 13:58:43 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iwRNq-001BKP-Of; Tue, 28 Jan 2020 14:58:26 +0100
+        id 1iwRNq-001BKU-QI; Tue, 28 Jan 2020 14:58:26 +0100
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Media Mailing List <linux-media@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
@@ -36,9 +36,9 @@ Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
-Subject: [PATCH 19/27] docs: kvm: arm/psci.txt: convert to ReST
-Date:   Tue, 28 Jan 2020 14:58:15 +0100
-Message-Id: <cfd61af2a61678bbde6394dc5bcfe2e82bc26da4.1580219586.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 20/27] docs: kvm: Convert hypercalls.txt to ReST format
+Date:   Tue, 28 Jan 2020 14:58:16 +0100
+Message-Id: <c9badaa7b7a0473ef75d6117a19a1bf8e98bc13f.1580219586.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <cover.1580219586.git.mchehab+huawei@kernel.org>
 References: <cover.1580219586.git.mchehab+huawei@kernel.org>
@@ -49,100 +49,227 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-- Add a title for the document;
-- Adjust whitespaces for it to be properly formatted after
-  parsed.
+- Use document title and chapter markups;
+- Convert tables;
+- Add markups for literal blocks;
+- use :field: for field descriptions;
+- Add blank lines and adjust indentation
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- Documentation/virt/kvm/arm/index.rst          |  1 +
- .../virt/kvm/arm/{psci.txt => psci.rst}       | 44 ++++++++++++-------
- 2 files changed, 30 insertions(+), 15 deletions(-)
- rename Documentation/virt/kvm/arm/{psci.txt => psci.rst} (61%)
+ .../kvm/{hypercalls.txt => hypercalls.rst}    | 127 ++++++++++--------
+ Documentation/virt/kvm/index.rst              |   2 +
+ 2 files changed, 73 insertions(+), 56 deletions(-)
+ rename Documentation/virt/kvm/{hypercalls.txt => hypercalls.rst} (55%)
 
-diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-index 134fa5fa77e5..3e2b2aba90fc 100644
---- a/Documentation/virt/kvm/arm/index.rst
-+++ b/Documentation/virt/kvm/arm/index.rst
-@@ -8,4 +8,5 @@ ARM
-    :maxdepth: 2
+diff --git a/Documentation/virt/kvm/hypercalls.txt b/Documentation/virt/kvm/hypercalls.rst
+similarity index 55%
+rename from Documentation/virt/kvm/hypercalls.txt
+rename to Documentation/virt/kvm/hypercalls.rst
+index 5f6d291bd004..fb4ccaf8641a 100644
+--- a/Documentation/virt/kvm/hypercalls.txt
++++ b/Documentation/virt/kvm/hypercalls.rst
+@@ -1,5 +1,7 @@
+-Linux KVM Hypercall:
+ ===================
++Linux KVM Hypercall
++===================
++
+ X86:
+  KVM Hypercalls have a three-byte sequence of either the vmcall or the vmmcall
+  instruction. The hypervisor can replace it with instructions that are
+@@ -20,7 +22,7 @@ S390:
+   For further information on the S390 diagnose call as supported by KVM,
+   refer to Documentation/virt/kvm/s390-diag.txt.
  
-    hyp-abi
-+   psci
-    pvtime
-diff --git a/Documentation/virt/kvm/arm/psci.txt b/Documentation/virt/kvm/arm/psci.rst
-similarity index 61%
-rename from Documentation/virt/kvm/arm/psci.txt
-rename to Documentation/virt/kvm/arm/psci.rst
-index 559586fc9d37..5cdf8fb86779 100644
---- a/Documentation/virt/kvm/arm/psci.txt
-+++ b/Documentation/virt/kvm/arm/psci.rst
-@@ -1,3 +1,7 @@
-+=========================================
-+Power State Coordination Interface (PSCI)
-+=========================================
-+
- KVM implements the PSCI (Power State Coordination Interface)
- specification in order to provide services such as CPU on/off, reset
- and power-off to the guest.
-@@ -30,32 +34,42 @@ The following register is defined:
-   - Affects the whole VM (even if the register view is per-vcpu)
+- PowerPC:
++PowerPC:
+   It uses R3-R10 and hypercall number in R11. R4-R11 are used as output registers.
+   Return value is placed in R3.
  
- * KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
--  Holds the state of the firmware support to mitigate CVE-2017-5715, as
--  offered by KVM to the guest via a HVC call. The workaround is described
--  under SMCCC_ARCH_WORKAROUND_1 in [1].
-+    Holds the state of the firmware support to mitigate CVE-2017-5715, as
-+    offered by KVM to the guest via a HVC call. The workaround is described
-+    under SMCCC_ARCH_WORKAROUND_1 in [1].
-+
-   Accepted values are:
--    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL: KVM does not offer
-+
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL:
-+      KVM does not offer
-       firmware support for the workaround. The mitigation status for the
-       guest is unknown.
--    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL: The workaround HVC call is
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL:
-+      The workaround HVC call is
-       available to the guest and required for the mitigation.
--    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_REQUIRED: The workaround HVC call
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_REQUIRED:
-+      The workaround HVC call
-       is available to the guest, but it is not needed on this VCPU.
+@@ -34,7 +36,8 @@ MIPS:
+   the return value is placed in $2 (v0).
  
- * KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
--  Holds the state of the firmware support to mitigate CVE-2018-3639, as
--  offered by KVM to the guest via a HVC call. The workaround is described
--  under SMCCC_ARCH_WORKAROUND_2 in [1].
-+    Holds the state of the firmware support to mitigate CVE-2018-3639, as
-+    offered by KVM to the guest via a HVC call. The workaround is described
-+    under SMCCC_ARCH_WORKAROUND_2 in [1]_.
+ KVM Hypercalls Documentation
+-===========================
++============================
 +
-   Accepted values are:
--    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL: A workaround is not
-+
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL:
-+      A workaround is not
-       available. KVM does not offer firmware support for the workaround.
--    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN: The workaround state is
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN:
-+      The workaround state is
-       unknown. KVM does not offer firmware support for the workaround.
--    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL: The workaround is available,
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL:
-+      The workaround is available,
-       and can be disabled by a vCPU. If
-       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED is set, it is active for
-       this vCPU.
--    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED: The workaround is
--      always active on this vCPU or it is not needed.
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED:
-+      The workaround is always active on this vCPU or it is not needed.
+ The template for each hypercall is:
+ 1. Hypercall name.
+ 2. Architecture(s)
+@@ -43,56 +46,64 @@ The template for each hypercall is:
  
--[1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
-+.. [1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
+ 1. KVM_HC_VAPIC_POLL_IRQ
+ ------------------------
+-Architecture: x86
+-Status: active
+-Purpose: Trigger guest exit so that the host can check for pending
+-interrupts on reentry.
++
++:Architecture: x86
++:Status: active
++:Purpose: Trigger guest exit so that the host can check for pending
++          interrupts on reentry.
+ 
+ 2. KVM_HC_MMU_OP
+-------------------------
+-Architecture: x86
+-Status: deprecated.
+-Purpose: Support MMU operations such as writing to PTE,
+-flushing TLB, release PT.
++----------------
++
++:Architecture: x86
++:Status: deprecated.
++:Purpose: Support MMU operations such as writing to PTE,
++          flushing TLB, release PT.
+ 
+ 3. KVM_HC_FEATURES
+-------------------------
+-Architecture: PPC
+-Status: active
+-Purpose: Expose hypercall availability to the guest. On x86 platforms, cpuid
+-used to enumerate which hypercalls are available. On PPC, either device tree
+-based lookup ( which is also what EPAPR dictates) OR KVM specific enumeration
+-mechanism (which is this hypercall) can be used.
++------------------
++
++:Architecture: PPC
++:Status: active
++:Purpose: Expose hypercall availability to the guest. On x86 platforms, cpuid
++          used to enumerate which hypercalls are available. On PPC, either
++	  device tree based lookup ( which is also what EPAPR dictates)
++	  OR KVM specific enumeration mechanism (which is this hypercall)
++	  can be used.
+ 
+ 4. KVM_HC_PPC_MAP_MAGIC_PAGE
+-------------------------
+-Architecture: PPC
+-Status: active
+-Purpose: To enable communication between the hypervisor and guest there is a
+-shared page that contains parts of supervisor visible register state.
+-The guest can map this shared page to access its supervisor register through
+-memory using this hypercall.
++----------------------------
++
++:Architecture: PPC
++:Status: active
++:Purpose: To enable communication between the hypervisor and guest there is a
++	  shared page that contains parts of supervisor visible register state.
++	  The guest can map this shared page to access its supervisor register
++	  through memory using this hypercall.
+ 
+ 5. KVM_HC_KICK_CPU
+-------------------------
+-Architecture: x86
+-Status: active
+-Purpose: Hypercall used to wakeup a vcpu from HLT state
+-Usage example : A vcpu of a paravirtualized guest that is busywaiting in guest
+-kernel mode for an event to occur (ex: a spinlock to become available) can
+-execute HLT instruction once it has busy-waited for more than a threshold
+-time-interval. Execution of HLT instruction would cause the hypervisor to put
+-the vcpu to sleep until occurrence of an appropriate event. Another vcpu of the
+-same guest can wakeup the sleeping vcpu by issuing KVM_HC_KICK_CPU hypercall,
+-specifying APIC ID (a1) of the vcpu to be woken up. An additional argument (a0)
+-is used in the hypercall for future use.
++------------------
++
++:Architecture: x86
++:Status: active
++:Purpose: Hypercall used to wakeup a vcpu from HLT state
++:Usage example:
++  A vcpu of a paravirtualized guest that is busywaiting in guest
++  kernel mode for an event to occur (ex: a spinlock to become available) can
++  execute HLT instruction once it has busy-waited for more than a threshold
++  time-interval. Execution of HLT instruction would cause the hypervisor to put
++  the vcpu to sleep until occurrence of an appropriate event. Another vcpu of the
++  same guest can wakeup the sleeping vcpu by issuing KVM_HC_KICK_CPU hypercall,
++  specifying APIC ID (a1) of the vcpu to be woken up. An additional argument (a0)
++  is used in the hypercall for future use.
+ 
+ 
+ 6. KVM_HC_CLOCK_PAIRING
+-------------------------
+-Architecture: x86
+-Status: active
+-Purpose: Hypercall used to synchronize host and guest clocks.
++-----------------------
++:Architecture: x86
++:Status: active
++:Purpose: Hypercall used to synchronize host and guest clocks.
++
+ Usage:
+ 
+ a0: guest physical address where host copies
+@@ -101,6 +112,8 @@ a0: guest physical address where host copies
+ a1: clock_type, ATM only KVM_CLOCK_PAIRING_WALLCLOCK (0)
+ is supported (corresponding to the host's CLOCK_REALTIME clock).
+ 
++       ::
++
+ 		struct kvm_clock_pairing {
+ 			__s64 sec;
+ 			__s64 nsec;
+@@ -123,15 +136,16 @@ Returns KVM_EOPNOTSUPP if the host does not use TSC clocksource,
+ or if clock type is different than KVM_CLOCK_PAIRING_WALLCLOCK.
+ 
+ 6. KVM_HC_SEND_IPI
+-------------------------
+-Architecture: x86
+-Status: active
+-Purpose: Send IPIs to multiple vCPUs.
++------------------
+ 
+-a0: lower part of the bitmap of destination APIC IDs
+-a1: higher part of the bitmap of destination APIC IDs
+-a2: the lowest APIC ID in bitmap
+-a3: APIC ICR
++:Architecture: x86
++:Status: active
++:Purpose: Send IPIs to multiple vCPUs.
++
++- a0: lower part of the bitmap of destination APIC IDs
++- a1: higher part of the bitmap of destination APIC IDs
++- a2: the lowest APIC ID in bitmap
++- a3: APIC ICR
+ 
+ The hypercall lets a guest send multicast IPIs, with at most 128
+ 128 destinations per hypercall in 64-bit mode and 64 vCPUs per
+@@ -143,12 +157,13 @@ corresponds to the APIC ID a2+1, and so on.
+ Returns the number of CPUs to which the IPIs were delivered successfully.
+ 
+ 7. KVM_HC_SCHED_YIELD
+-------------------------
+-Architecture: x86
+-Status: active
+-Purpose: Hypercall used to yield if the IPI target vCPU is preempted
++---------------------
++
++:Architecture: x86
++:Status: active
++:Purpose: Hypercall used to yield if the IPI target vCPU is preempted
+ 
+ a0: destination APIC ID
+ 
+-Usage example: When sending a call-function IPI-many to vCPUs, yield if
+-any of the IPI target vCPUs was preempted.
++:Usage example: When sending a call-function IPI-many to vCPUs, yield if
++	        any of the IPI target vCPUs was preempted.
+diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
+index 6fe79185b9bc..ac83bc588f7e 100644
+--- a/Documentation/virt/kvm/index.rst
++++ b/Documentation/virt/kvm/index.rst
+@@ -11,8 +11,10 @@ KVM
+    amd-memory-encryption
+    cpuid
+    halt-polling
++   hypercalls
+    msr
+    vcpu-requests
+ 
+    arm/index
++
+    devices/index
 -- 
 2.24.1
 
