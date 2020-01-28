@@ -2,118 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BB2314BF0D
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 18:59:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3BF114BF4D
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 19:12:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726266AbgA1R75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 12:59:57 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:43766 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726066AbgA1R75 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jan 2020 12:59:57 -0500
-Received: by mail-il1-f196.google.com with SMTP id o13so10845328ilg.10
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2020 09:59:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NSU7vmLhak1r7gudqkZPk9FBjlT+75EpT7LmQFfKUAQ=;
-        b=Ll3WUucWBY4iIeiEzYrjg0GfRoD8UJYsuRUkNwfIzJnh8t20A5l2/IHyb4zZ2/D7pY
-         BYBG9ZqbAka2MYh6W4hh5t3Yjh8kVWdfWM0APW90DSO88HtjqmjIBD1UfPIixOhfFAaA
-         I9Ur5gm6AC4d1ZNlnIaYhr7X2IWk9NdOVPNyehOpdM0M1ylDV/Ddch54K+clHwlmPJbo
-         CgvhmeOOfma935QvOcY3LCYA0J19XztpTqfw1mm0X9NBtzacCews81tZzm/p/PnM2t3+
-         LGG+PDojpaAP8Y67y5DjTB3Q3/jh1LUY6AuEpiLmw56dq1dDpyXAYAvzxkYnf5eeRdKd
-         ooAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NSU7vmLhak1r7gudqkZPk9FBjlT+75EpT7LmQFfKUAQ=;
-        b=MgcnZNUpuk2mBMFU/hXESHpXoMgT4pzpIzDp51iWfH9jaWXn9kM1uHDnmd7wsBLsUv
-         n+6zFJwutRRTgtYn2nt7DeFLnWtDWFa4HEkodIox9XUizJsnvTrgCY5BiEBaAxWtEVXZ
-         dmgWhAN7hplB8J3rRCFTTJq9Mg/Vxl+RhEBtCSVhO6xGcfby6kIW/7UR0qsJTNn8SsFD
-         6tB1vIZFuF41cA1ZifwvH/yq6oG7Vuxdy6v/ia3AoPl8F2Y158Oh1uRHFKH6xyQCAEj9
-         oELynU8vv+jEP+8m7AG5KheHkn2N/qUc8CpZout93pLmmQ4LF78iW0hOGm81bK5hj57Y
-         N3HQ==
-X-Gm-Message-State: APjAAAVinErZU0LLovv8ZKoqKW6hvlN9nskMHqfh6/Oh1pYKzfPvb4UP
-        E8z/q1timpbuWcd0Kx5UcopS6XPaPnZuCVEB7M9n01w3
-X-Google-Smtp-Source: APXvYqyDkGI8EJ1VC6McjGoAI0IFgythK7OAxCHP1kpYC2xtRh8j1xl9M9NIn8W6foV2pqZgLrj1X4MlhhknBeUbgOQ=
-X-Received: by 2002:a92:8141:: with SMTP id e62mr20733283ild.119.1580234396231;
- Tue, 28 Jan 2020 09:59:56 -0800 (PST)
-MIME-Version: 1.0
-References: <20191202204356.250357-1-aaronlewis@google.com>
- <4EFDEFF2-D1CD-4AF3-9EF8-5F160A4D93CD@gmail.com> <20200124233835.GT2109@linux.intel.com>
- <1A882E15-4F22-463E-AD03-460FA9251489@gmail.com> <CALMp9eTXVhCA=-t1S-bVn-5ZVyh7UkR2Kqe26b8c5gfxW11F+Q@mail.gmail.com>
- <436117EB-5017-4FF0-A89B-16B206951804@gmail.com> <CALMp9eQYS3W5_PB8wP36UBBGHRHSoJmBDUEJ95AUcXYQ1sC9mQ@mail.gmail.com>
- <20200127205606.GC2523@linux.intel.com>
-In-Reply-To: <20200127205606.GC2523@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 28 Jan 2020 09:59:45 -0800
-Message-ID: <CALMp9eRrE5onJT4HgfCqrxMYYVjaeVMDT4YKVA2mr4jfT7jkaA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v3] x86: Add RDTSC test
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Nadav Amit <nadav.amit@gmail.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        kvm list <kvm@vger.kernel.org>,
+        id S1726681AbgA1SMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 13:12:05 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51086 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726557AbgA1SMF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Jan 2020 13:12:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580235123;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GFLzf10TgdyLAS21kd5LMRW5WkwaF17ngeycggVXre0=;
+        b=MbGl3nDruxGUc0/XxLYM4MoWfStz+lk9i80Mlqf7IK05plAlxXI7d9mlA5JtAPyIavhFAW
+        E92sw+GQJ+U1wHI26SpyltiKgIVTJBQhnOi30rLIKYQ92iA6XqMz9UVek3Gq0qeB8UCduM
+        YE4NpZxwt+Mm8It35QnpUM5LR2TdPLM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-e92z4M5qO3GlcI3dHkgyxg-1; Tue, 28 Jan 2020 13:12:01 -0500
+X-MC-Unique: e92z4M5qO3GlcI3dHkgyxg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 790C518C43C4;
+        Tue, 28 Jan 2020 18:12:00 +0000 (UTC)
+Received: from gondolin (ovpn-116-186.ams2.redhat.com [10.36.116.186])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D9B1A5DA7E;
+        Tue, 28 Jan 2020 18:11:58 +0000 (UTC)
+Date:   Tue, 28 Jan 2020 19:11:56 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: Re: [PATCH 11/27] docs: kvm: convert devices/s390_flic.txt to ReST
+Message-ID: <20200128191156.6bfb0b9b.cohuck@redhat.com>
+In-Reply-To: <12634be89f4a8b662bf4bc0a0c7baef42675548f.1580219586.git.mchehab+huawei@kernel.org>
+References: <cover.1580219586.git.mchehab+huawei@kernel.org>
+        <12634be89f4a8b662bf4bc0a0c7baef42675548f.1580219586.git.mchehab+huawei@kernel.org>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 27, 2020 at 12:56 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Mon, Jan 27, 2020 at 11:24:31AM -0800, Jim Mattson wrote:
-> > On Sun, Jan 26, 2020 at 8:36 PM Nadav Amit <nadav.amit@gmail.com> wrote:
-> > >
-> > > > On Jan 26, 2020, at 2:06 PM, Jim Mattson <jmattson@google.com> wrote:
-> > > >
-> > > > If I had to guess, you probably have SMM malware on your host. Remove
-> > > > the malware, and the test should pass.
-> > >
-> > > Well, malware will always be an option, but I doubt this is the case.
-> >
-> > Was my innuendo too subtle? I consider any code executing in SMM to be malware.
->
-> SMI complications seem unlikely.  The straw that broke the camel's back
-> was a 1152 cyle delta, presumably the other failing runs had similar deltas.
-> I've never benchmarked SMI+RSM, but I highly doubt it comes anywhere close
-> to VM-Enter/VM-Exit's super optimized ~400 cycle round trip.  E.g. I
-> wouldn't be surprised if just SMI+RSM is over 1500 cycles.
+On Tue, 28 Jan 2020 14:58:07 +0100
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
 
-Good point. What generation of hardware are you running on, Nadav?
+> - Use standard markup for document title;
+> - Adjust indentation and add blank lines as needed;
+> - use the notes markup;
+> - mark code blocks as such.
+> 
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
+>  Documentation/virt/kvm/devices/index.rst      |  1 +
+>  .../devices/{s390_flic.txt => s390_flic.rst}  | 68 +++++++++++--------
+>  2 files changed, 39 insertions(+), 30 deletions(-)
+>  rename Documentation/virt/kvm/devices/{s390_flic.txt => s390_flic.rst} (88%)
 
-> > > Interestingly, in the last few times the failure did not reproduce. Yet,
-> > > thinking about it made me concerned about MTRRs configuration, and that
-> > > perhaps performance is affected by memory marked as UC after boot, since
-> > > kvm-unit-test does not reset MTRRs.
-> > >
-> > > Reading the variable range MTRRs, I do see some ranges marked as UC (most of
-> > > the range 2GB-4GB, if I read the MTRRs correctly):
-> > >
-> > >   MSR 0x200 = 0x80000000
-> > >   MSR 0x201 = 0x3fff80000800
-> > >   MSR 0x202 = 0xff000005
-> > >   MSR 0x203 = 0x3fffff000800
-> > >   MSR 0x204 = 0x38000000000
-> > >   MSR 0x205 = 0x3f8000000800
-> > >
-> > > Do you think we should set the MTRRs somehow in KVM-unit-tests? If yes, can
-> > > you suggest a reasonable configuration?
-> >
-> > I would expect MTRR issues to result in repeatable failures. For
-> > instance, if your VMCS ended up in UC memory, that might slow things
-> > down quite a bit. But, I would expect the VMCS to end up at the same
-> > address each time the test is run.
->
-> Agreed on the repeatable failures part, but putting the VMCS in UC memory
-> shouldn't affect this type of test.  The CPU's internal VMCS cache isn't
-> coherent, and IIRC isn't disabled if the MTRRs for the VMCS happen to be
-> UC.
+Looks sane to me.
 
-But the internal VMCS cache only contains selected fields, doesn't it?
-Uncached fields would have to be written to memory on VM-exit. Or are
-all of the mutable fields in the internal VMCS cache?
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
