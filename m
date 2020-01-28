@@ -2,270 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B52C14B1BE
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 10:27:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65AA814B1CD
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 10:34:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726024AbgA1J1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 04:27:40 -0500
-Received: from mail-pf1-f201.google.com ([209.85.210.201]:42890 "EHLO
-        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725977AbgA1J1k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jan 2020 04:27:40 -0500
-Received: by mail-pf1-f201.google.com with SMTP id z26so90646pfr.9
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2020 01:27:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=YURPBE5ARW7OYIGG4d7Fs2AlCTzDPiK6ygILDqAYQdw=;
-        b=wM7pV8blQxy505Le2miTTLzfX6MBm6/ZNgEiDb9pBlVnTCbStSHPz28bmMjDRyeNyN
-         MH64cu0dc+4OKu5p6mngJjNfvt9P5/mqoPtOYFjyZGwHcBipNmug/G7Tm97/80Ce0WYc
-         UjkMkQN7n2nFxPG+uziZArLTMBqCl3UC7w8Id+6oy4mVRYK5Xg8RsHja7C1Lrc7wj7tk
-         NoWpsmVgQuiMPsQngIF633eYbkFDPST9nw44bgb6DR4QQjAlG4wMDgkC+gyX3LiW978m
-         RJCKuUU5pM8ID5l8mElskPKD913xJMsOyv+yVbF5AIiweJ0LtWAx2kABR3+F3V7/9t6L
-         fiBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=YURPBE5ARW7OYIGG4d7Fs2AlCTzDPiK6ygILDqAYQdw=;
-        b=ctdvkET6ypKo4viF9BFPV0Ol3CoykMoJM4NZmDWsb6mXt+I7dRiFuC8Y07GlSaVxWN
-         C6Q/pF6tiYjC/KO6QwjpeShGLrO19GZ2ovu2zaJzJWzSH5vyL6BFSPWTo1aDfx9JK+ua
-         a1K0NYMFodfe4bKB8HIrrlhu3HSK5oowD/CvG2WDfrPRyxz30z4DQ5juDFTkiCE1bZNB
-         xtaeiA8a8lV3x5SEezipBdi4NnH+UD8MUb0j6XqBTRKTmskkc4lFPb7O8RSBHv7PE7yp
-         mqjXc3CmVaiUFlYiUKDy03D7llCg+vqREo/PrLVFeqNOCsAFgSGnI3FDbhf77KHtiRhv
-         XLcg==
-X-Gm-Message-State: APjAAAVWF3kptxaiE0Ayazx0EFgvp5DFNt/9OSoKrAasxPGfxWBqFq2C
-        ERPP4u4AOz+ZV7AWfG+56rd0JWbFRs+DfVm/omKhZmbSSs3sCXcMfs+yzyUO47vw9EQvki5dofc
-        UPjTqamQv8ivxl2ZwO8VJDXmFtNq9HY7+qajiHflp0WIikBaNiVYywgC1CA==
-X-Google-Smtp-Source: APXvYqzld6o8WgRrweIoLEAG1K5ay89zmqZwbXfs6J7rRgiGG2Jo2RuC6ItgY/oxz9Ug/s1wuGMt5fZUzw8=
-X-Received: by 2002:a65:6916:: with SMTP id s22mr23065962pgq.244.1580203659171;
- Tue, 28 Jan 2020 01:27:39 -0800 (PST)
-Date:   Tue, 28 Jan 2020 01:27:15 -0800
-In-Reply-To: <20200128092715.69429-1-oupton@google.com>
-Message-Id: <20200128092715.69429-6-oupton@google.com>
-Mime-Version: 1.0
-References: <20200128092715.69429-1-oupton@google.com>
-X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
-Subject: [kvm-unit-tests PATCH v2 5/5] x86: VMX: Add tests for monitor trap flag
-From:   Oliver Upton <oupton@google.com>
+        id S1725903AbgA1Jev (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 04:34:51 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39274 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725853AbgA1Jev (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 Jan 2020 04:34:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580204089;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=p1cuTqBpAu7dAS53tDA9Lq4+9PX3cIAy2MQULa5xpEQ=;
+        b=STdYTK24uz6gMt5puqlaK0Lem8Y1ERAQl40Sg38kSwIKNqUh4+CMIAAb1i57AQhRtxPZUu
+        QHmbDKWCgLYy5+HzNbFF4YA72Z1Xx66eXuS5Tm8YCj9t3A2xxI0Xlu7dWq6J+1dZe7n+WH
+        GC3wIkhdFb+42CrhWVQjM8+6RQhfxqY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-EWIXQv4wOgynUEChqEiFrg-1; Tue, 28 Jan 2020 04:34:47 -0500
+X-MC-Unique: EWIXQv4wOgynUEChqEiFrg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6051E800EBB;
+        Tue, 28 Jan 2020 09:34:46 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 302F788821;
+        Tue, 28 Jan 2020 09:34:45 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     pbonzini@redhat.com, thuth@redhat.com, bgardon@google.com
+Subject: [PATCH v2] kvm: selftests: Introduce num-pages conversion utilities
+Date:   Tue, 28 Jan 2020 10:34:43 +0100
+Message-Id: <20200128093443.25414-1-drjones@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test to verify that MTF VM-exits into host are synthesized when the
-'monitor trap flag' processor-based VM-execution control is set under
-various conditions.
+Guests and hosts don't have to have the same page size. This means
+calculations are necessary when selecting the number of guest pages
+to allocate in order to ensure the number is compatible with the
+host. Provide utilities to help with those calculations.
 
-Expect an MTF VM-exit if instruction execution produces no events other
-than MTF. Should instruction execution produce a concurrent debug-trap
-and MTF event, expect an MTF VM-exit with the 'pending debug exceptions'
-VMCS field set. Expect an MTF VM-exit to follow event delivery should
-instruction execution generate a higher-priority event, such as a
-general-protection fault. Lastly, expect an MTF VM-exit to follow
-delivery of a debug-trap software exception (INT1/INT3/INTO/INT n).
-
-Signed-off-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- x86/vmx.h       |   1 +
- x86/vmx_tests.c | 157 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 158 insertions(+)
+ tools/testing/selftests/kvm/dirty_log_test.c  | 10 ++++----
+ .../testing/selftests/kvm/include/kvm_util.h  |  3 +++
+ .../testing/selftests/kvm/include/test_util.h |  2 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 24 +++++++++++++++++++
+ 4 files changed, 33 insertions(+), 6 deletions(-)
 
-diff --git a/x86/vmx.h b/x86/vmx.h
-index 6214400f2b53..6adf0916564b 100644
---- a/x86/vmx.h
-+++ b/x86/vmx.h
-@@ -399,6 +399,7 @@ enum Ctrl0 {
- 	CPU_NMI_WINDOW		= 1ul << 22,
- 	CPU_IO			= 1ul << 24,
- 	CPU_IO_BITMAP		= 1ul << 25,
-+	CPU_MTF			= 1ul << 27,
- 	CPU_MSR_BITMAP		= 1ul << 28,
- 	CPU_MONITOR		= 1ul << 29,
- 	CPU_PAUSE		= 1ul << 30,
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index b31c360c5f3c..0e2c2f8a7d34 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -4970,6 +4970,162 @@ static void test_vmx_preemption_timer(void)
- 	vmcs_write(EXI_CONTROLS, saved_exit);
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing=
+/selftests/kvm/dirty_log_test.c
+index 5614222a6628..2383c55a1a1a 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -178,12 +178,11 @@ static void *vcpu_worker(void *data)
+ 	return NULL;
  }
- 
-+extern unsigned char test_mtf1;
-+extern unsigned char test_mtf2;
-+extern unsigned char test_mtf3;
+=20
+-static void vm_dirty_log_verify(unsigned long *bmap)
++static void vm_dirty_log_verify(struct kvm_vm *vm, unsigned long *bmap)
+ {
++	uint64_t step =3D vm_num_host_pages(vm, 1);
+ 	uint64_t page;
+ 	uint64_t *value_ptr;
+-	uint64_t step =3D host_page_size >=3D guest_page_size ? 1 :
+-				guest_page_size / host_page_size;
+=20
+ 	for (page =3D 0; page < host_num_pages; page +=3D step) {
+ 		value_ptr =3D host_test_mem + page * host_page_size;
+@@ -295,8 +294,7 @@ static void run_test(enum vm_guest_mode mode, unsigne=
+d long iterations,
+ 	guest_num_pages =3D (guest_num_pages + 0xff) & ~0xffUL;
+ #endif
+ 	host_page_size =3D getpagesize();
+-	host_num_pages =3D (guest_num_pages * guest_page_size) / host_page_size=
+ +
+-			 !!((guest_num_pages * guest_page_size) % host_page_size);
++	host_num_pages =3D vm_num_host_pages(vm, guest_num_pages);
+=20
+ 	if (!phys_offset) {
+ 		guest_test_phys_mem =3D (vm_get_max_gfn(vm) -
+@@ -369,7 +367,7 @@ static void run_test(enum vm_guest_mode mode, unsigne=
+d long iterations,
+ 		kvm_vm_clear_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap, 0,
+ 				       host_num_pages);
+ #endif
+-		vm_dirty_log_verify(bmap);
++		vm_dirty_log_verify(vm, bmap);
+ 		iteration++;
+ 		sync_global_to_guest(vm, iteration);
+ 	}
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testi=
+ng/selftests/kvm/include/kvm_util.h
+index 29cccaf96baf..0d05ade3022c 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -158,6 +158,9 @@ unsigned int vm_get_page_size(struct kvm_vm *vm);
+ unsigned int vm_get_page_shift(struct kvm_vm *vm);
+ unsigned int vm_get_max_gfn(struct kvm_vm *vm);
+=20
++unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest=
+_pages);
++unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host=
+_pages);
 +
-+__attribute__((noclone)) static void test_mtf_guest(void)
+ struct kvm_userspace_memory_region *
+ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
+ 				 uint64_t end);
+diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/test=
+ing/selftests/kvm/include/test_util.h
+index a41db6fb7e24..25c27739e085 100644
+--- a/tools/testing/selftests/kvm/include/test_util.h
++++ b/tools/testing/selftests/kvm/include/test_util.h
+@@ -19,6 +19,8 @@
+ #include <fcntl.h>
+ #include "kselftest.h"
+=20
++#define getpageshift() (__builtin_ffs(getpagesize()) - 1)
++
+ ssize_t test_write(int fd, const void *buf, size_t count);
+ ssize_t test_read(int fd, void *buf, size_t count);
+ int test_seq_read(const char *path, char **bufp, size_t *sizep);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
+elftests/kvm/lib/kvm_util.c
+index 41cf45416060..d9bca2f1cc95 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1667,3 +1667,27 @@ unsigned int vm_get_max_gfn(struct kvm_vm *vm)
+ {
+ 	return vm->max_gfn;
+ }
++
++static unsigned int vm_calc_num_pages(unsigned int num_pages,
++				      unsigned int page_shift,
++				      unsigned int new_page_shift)
 +{
-+	asm ("vmcall;\n\t"
-+	     "out %al, $0x80;\n\t"
-+	     "test_mtf1:\n\t"
-+	     "vmcall;\n\t"
-+	     "out %al, $0x80;\n\t"
-+	     "test_mtf2:\n\t"
-+	     /*
-+	      * Prepare for the 'MOV CR3' test. Attempt to induce a
-+	      * general-protection fault by moving a non-canonical address into
-+	      * CR3. The 'MOV CR3' instruction does not take an imm64 operand,
-+	      * so we must MOV the desired value into a register first.
-+	      *
-+	      * MOV RAX is done before the VMCALL such that MTF is only enabled
-+	      * for the instruction under test.
-+	      */
-+	     "mov $0x8000000000000000, %rax;\n\t"
-+	     "vmcall;\n\t"
-+	     "mov %rax, %cr3;\n\t"
-+	     "test_mtf3:\n\t"
-+	     "vmcall;\n\t"
-+	     /*
-+	      * ICEBP/INT1 instruction. Though the instruction is now
-+	      * documented, don't rely on assemblers enumerating the
-+	      * instruction. Resort to hand assembly.
-+	      */
-+	     ".byte 0xf1;\n\t");
++	unsigned int n =3D 1 << (new_page_shift - page_shift);
++
++	if (page_shift >=3D new_page_shift)
++		return num_pages * (1 << (page_shift - new_page_shift));
++
++	return num_pages / n + !!(num_pages % n);
 +}
 +
-+static void test_mtf_gp_handler(struct ex_regs *regs)
++unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest=
+_pages)
 +{
-+	regs->rip = (unsigned long) &test_mtf3;
++	return vm_calc_num_pages(num_guest_pages, vm_get_page_shift(vm),
++				 getpageshift());
 +}
 +
-+static void test_mtf_db_handler(struct ex_regs *regs)
++unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host=
+_pages)
 +{
++	return vm_calc_num_pages(num_host_pages, getpageshift(),
++				 vm_get_page_shift(vm));
 +}
-+
-+static void enable_mtf(void)
-+{
-+	u32 ctrl0 = vmcs_read(CPU_EXEC_CTRL0);
-+
-+	vmcs_write(CPU_EXEC_CTRL0, ctrl0 | CPU_MTF);
-+}
-+
-+static void disable_mtf(void)
-+{
-+	u32 ctrl0 = vmcs_read(CPU_EXEC_CTRL0);
-+
-+	vmcs_write(CPU_EXEC_CTRL0, ctrl0 & ~CPU_MTF);
-+}
-+
-+static void enable_tf(void)
-+{
-+	unsigned long rflags = vmcs_read(GUEST_RFLAGS);
-+
-+	vmcs_write(GUEST_RFLAGS, rflags | X86_EFLAGS_TF);
-+}
-+
-+static void disable_tf(void)
-+{
-+	unsigned long rflags = vmcs_read(GUEST_RFLAGS);
-+
-+	vmcs_write(GUEST_RFLAGS, rflags & ~X86_EFLAGS_TF);
-+}
-+
-+static void report_mtf(const char *insn_name, unsigned long exp_rip)
-+{
-+	unsigned long rip = vmcs_read(GUEST_RIP);
-+
-+	assert_exit_reason(VMX_MTF);
-+	report(rip == exp_rip, "MTF VM-exit after %s instruction. RIP: 0x%lx (expected 0x%lx)",
-+	       insn_name, rip, exp_rip);
-+}
-+
-+static void vmx_mtf_test(void)
-+{
-+	unsigned long pending_dbg;
-+	handler old_gp, old_db;
-+
-+	if (!(ctrl_cpu_rev[0].clr & CPU_MTF)) {
-+		printf("CPU does not support the 'monitor trap flag' processor-based VM-execution control.\n");
-+		return;
-+	}
-+
-+	test_set_guest(test_mtf_guest);
-+
-+	/* Expect an MTF VM-exit after OUT instruction */
-+	enter_guest();
-+	skip_exit_vmcall();
-+
-+	enable_mtf();
-+	enter_guest();
-+	report_mtf("OUT", (unsigned long) &test_mtf1);
-+	disable_mtf();
-+
-+	/*
-+	 * Concurrent #DB trap and MTF on instruction boundary. Expect MTF
-+	 * VM-exit with populated 'pending debug exceptions' VMCS field.
-+	 */
-+	enter_guest();
-+	skip_exit_vmcall();
-+
-+	enable_mtf();
-+	enable_tf();
-+
-+	enter_guest();
-+	report_mtf("OUT", (unsigned long) &test_mtf2);
-+	pending_dbg = vmcs_read(GUEST_PENDING_DEBUG);
-+	report(pending_dbg & DR_STEP,
-+               "'pending debug exceptions' field after MTF VM-exit: 0x%lx (expected 0x%lx)",
-+	       pending_dbg, (unsigned long) DR_STEP);
-+
-+	disable_mtf();
-+	disable_tf();
-+	vmcs_write(GUEST_PENDING_DEBUG, 0);
-+
-+	/*
-+	 * #GP exception takes priority over MTF. Expect MTF VM-exit with RIP
-+	 * advanced to first instruction of #GP handler.
-+	 */
-+	enter_guest();
-+	skip_exit_vmcall();
-+
-+	old_gp = handle_exception(GP_VECTOR, test_mtf_gp_handler);
-+
-+	enable_mtf();
-+	enter_guest();
-+	report_mtf("MOV CR3", (unsigned long) get_idt_addr(&boot_idt[GP_VECTOR]));
-+	disable_mtf();
-+
-+	/*
-+	 * Concurrent MTF and privileged software exception (i.e. ICEBP/INT1).
-+	 * MTF should follow the delivery of #DB trap, though the SDM doesn't
-+	 * provide clear indication of the relative priority.
-+	 */
-+	enter_guest();
-+	skip_exit_vmcall();
-+
-+	handle_exception(GP_VECTOR, old_gp);
-+	old_db = handle_exception(DB_VECTOR, test_mtf_db_handler);
-+
-+	enable_mtf();
-+	enter_guest();
-+	report_mtf("INT1", (unsigned long) get_idt_addr(&boot_idt[DB_VECTOR]));
-+	disable_mtf();
-+
-+	enter_guest();
-+	handle_exception(DB_VECTOR, old_db);
-+}
-+
- /*
-  * Tests for VM-execution control fields
-  */
-@@ -9505,5 +9661,6 @@ struct vmx_test vmx_tests[] = {
- 	TEST(atomic_switch_max_msrs_test),
- 	TEST(atomic_switch_overflow_msrs_test),
- 	TEST(rdtsc_vmexit_diff_test),
-+	TEST(vmx_mtf_test),
- 	{ NULL, NULL, NULL, NULL, NULL, {0} },
- };
--- 
-2.25.0.341.g760bfbb309-goog
+--=20
+2.21.1
 
