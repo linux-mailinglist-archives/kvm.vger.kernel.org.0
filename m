@@ -2,46 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0423814B592
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 14:59:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C50A14B5DE
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:01:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726655AbgA1N6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 08:58:48 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:58556 "EHLO
+        id S1727321AbgA1OAs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 09:00:48 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:59316 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726598AbgA1N6p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jan 2020 08:58:45 -0500
+        with ESMTP id S1727298AbgA1OAq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jan 2020 09:00:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=RPG23Q5VInCW2/dcxso2308vuKWS9qa+8lTMVckj8OQ=; b=eg5ZPQ+jkf5/TY0Rys9EIBpi9w
-        lpGsfmLgEdCaNAhDfz2ektRx2hLoN3Y/S1gMneYm1BwNvGnBZEXXPr0KbiY7Rz7LVscOv8wwT6ZjZ
-        WThohdGrbyxcS0EhgISXN0vgqw8DjXWt0hcCRAHH6k6XavK5A2pbxUM4ZPT0MW+JKziSvERBknhlD
-        2gOD6WrQ/Rg4lFYv7LJ0J3Yqi8UCdZm7QKfZ+xn+G5OA4/VM7RT0vSjMKmbI0Ao3EU93HGOYWEbOf
-        VgNp5d5jhN7geEmpW9XagwrYN/e6JBmx16uCe8jVM1qgvvMXq8tyiP86eIamWutjku2bTx34Q1JnY
-        3uH8HWvQ==;
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=DXSED2YLe82h5LjexvdXkjf3Ix9TaTo2l6rYLelz1VU=; b=kB9R/0m6RyesZFlW3txEtEd1A
+        olQ2YuBFW2vHq3owokfOnlDabx+GnkIsCH6lhxAL3Pwl5HKvRNZlEq2FWEKIq44o7uJO3+YFp7TK8
+        3xIxWcqxJz2IBeqs5C13Y/h715HeTOuJpXU3JDe7Xgb5r6WGMgdC7oVTCeam7LW8jWxsgvYBMGBVX
+        tFBoIefn0BUhKdMT1QDKm+0CM6Qk+OcsL0gnbM56YnRo2ZnQicscNgcDiDDJTBIJkqXFbxCEDplQO
+        YZbC0C7JpXcACqrITWycMHZIH1HjQmKmAd7IcmT7LGTj0VIzX+Vyi03n8AOjnflysoG8WxNeZmt/U
+        U4byvpgWA==;
 Received: from [177.41.103.99] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iwRO8-0006Kb-Ja; Tue, 28 Jan 2020 13:58:45 +0000
+        id 1iwRQ5-0007ia-UW; Tue, 28 Jan 2020 14:00:45 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iwRNq-001BJx-GA; Tue, 28 Jan 2020 14:58:26 +0100
+        id 1iwRPp-001BND-5V; Tue, 28 Jan 2020 15:00:29 +0100
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Media Mailing List <linux-media@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Mauro Carvalho Chehab <mchehab@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: [PATCH 12/27] docs: kvm: convert devices/vcpu.txt to ReST
-Date:   Tue, 28 Jan 2020 14:58:08 +0100
-Message-Id: <10cb8731b167ee8f0bbec245a9f89af3842bc279.1580219586.git.mchehab+huawei@kernel.org>
+        linux-um@lists.infradead.org, linux-doc@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH 00/27] docs: virt: convert text documents to ReST format
+Date:   Tue, 28 Jan 2020 15:00:01 +0100
+Message-Id: <cover.1580219586.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
-In-Reply-To: <cover.1580219586.git.mchehab+huawei@kernel.org>
-References: <cover.1580219586.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -49,230 +50,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-- Use title markups;
-- adjust indentation and add blank lines as needed;
-- adjust tables to match ReST accepted formats;
-- use :field: markups;
-- mark code blocks as such.
+Manually convert the documentation under Documentation/virt to ReST,
+minimizing the usage of uneeded markups and preserving the documentation
+writer's style.
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- Documentation/virt/kvm/devices/index.rst |   1 +
- Documentation/virt/kvm/devices/vcpu.rst  | 112 +++++++++++++++++++++++
- Documentation/virt/kvm/devices/vcpu.txt  |  76 ---------------
- 3 files changed, 113 insertions(+), 76 deletions(-)
+PS.: Patches are against docs-next tree.
+
+Mauro Carvalho Chehab (27):
+  docs: kvm: add arm/pvtime.rst to index.rst
+  docs: virt: convert UML documentation to ReST
+  docs: virt: user_mode_linux.rst: update compiling instructions
+  docs: virt: user_mode_linux.rst: fix URL references
+  docs: virt: convert halt-polling.txt to ReST format
+  docs: virt: Convert msr.txt to ReST format
+  docs: kvm: devices/arm-vgic-its.txt to ReST format
+  docs: kvm: devices/arm-vgit-v3.txt to ReST
+  docs: kvm: convert devices/arm-vgit.txt to ReST
+  docs: kvm: convert devices/mpic.txt to ReST
+  docs: kvm: convert devices/s390_flic.txt to ReST
+  docs: kvm: convert devices/vcpu.txt to ReST
+  docs: kvm: convert devices/vcpu.txt to ReST
+  docs: kvm: convert devices/vm.txt to ReST
+  docs: kvm: convert devices/xics.txt to ReST
+  docs: kvm: convert devices/xive.txt to ReST
+  docs: kvm: Convert api.txt to ReST format
+  docs: kvm: convert arm/hyp-abi.txt to ReST
+  docs: kvm: arm/psci.txt: convert to ReST
+  docs: kvm: Convert hypercalls.txt to ReST format
+  docs: kvm: Convert locking.txt to ReST format
+  docs: kvm: Convert mmu.txt to ReST format
+  docs: kvm: Convert nested-vmx.txt to ReST format
+  docs: kvm: Convert ppc-pv.txt to ReST format
+  docs: kvm: Convert s390-diag.txt to ReST format
+  docs: kvm: Convert timekeeping.txt to ReST format
+  docs: kvm: review-checklist.txt: rename to ReST
+
+ Documentation/virt/index.rst                  |    1 +
+ Documentation/virt/kvm/{api.txt => api.rst}   | 3343 ++++++++++-------
+ .../virt/kvm/arm/{hyp-abi.txt => hyp-abi.rst} |   26 +-
+ Documentation/virt/kvm/arm/index.rst          |   12 +
+ .../virt/kvm/arm/{psci.txt => psci.rst}       |   44 +-
+ .../{arm-vgic-its.txt => arm-vgic-its.rst}    |  104 +-
+ .../{arm-vgic-v3.txt => arm-vgic-v3.rst}      |  130 +-
+ .../devices/{arm-vgic.txt => arm-vgic.rst}    |   87 +-
+ Documentation/virt/kvm/devices/index.rst      |   19 +
+ .../virt/kvm/devices/{mpic.txt => mpic.rst}   |    9 +-
+ .../devices/{s390_flic.txt => s390_flic.rst}  |   68 +-
+ Documentation/virt/kvm/devices/vcpu.rst       |  112 +
+ Documentation/virt/kvm/devices/vcpu.txt       |   76 -
+ .../virt/kvm/devices/{vfio.txt => vfio.rst}   |   23 +-
+ .../virt/kvm/devices/{vm.txt => vm.rst}       |  204 +-
+ .../virt/kvm/devices/{xics.txt => xics.rst}   |   26 +-
+ .../virt/kvm/devices/{xive.txt => xive.rst}   |  146 +-
+ .../{halt-polling.txt => halt-polling.rst}    |   84 +-
+ .../kvm/{hypercalls.txt => hypercalls.rst}    |  127 +-
+ Documentation/virt/kvm/index.rst              |   16 +
+ .../virt/kvm/{locking.txt => locking.rst}     |  109 +-
+ Documentation/virt/kvm/{mmu.txt => mmu.rst}   |   60 +-
+ Documentation/virt/kvm/{msr.txt => msr.rst}   |  145 +-
+ .../kvm/{nested-vmx.txt => nested-vmx.rst}    |   35 +-
+ .../virt/kvm/{ppc-pv.txt => ppc-pv.rst}       |   24 +-
+ ...iew-checklist.txt => review-checklist.rst} |    1 +
+ .../virt/kvm/{s390-diag.txt => s390-diag.rst} |   11 +-
+ .../kvm/{timekeeping.txt => timekeeping.rst}  |  221 +-
+ ...odeLinux-HOWTO.txt => user_mode_linux.rst} | 1812 ++++-----
+ 29 files changed, 3954 insertions(+), 3121 deletions(-)
+ rename Documentation/virt/kvm/{api.txt => api.rst} (71%)
+ rename Documentation/virt/kvm/arm/{hyp-abi.txt => hyp-abi.rst} (80%)
+ create mode 100644 Documentation/virt/kvm/arm/index.rst
+ rename Documentation/virt/kvm/arm/{psci.txt => psci.rst} (61%)
+ rename Documentation/virt/kvm/devices/{arm-vgic-its.txt => arm-vgic-its.rst} (71%)
+ rename Documentation/virt/kvm/devices/{arm-vgic-v3.txt => arm-vgic-v3.rst} (77%)
+ rename Documentation/virt/kvm/devices/{arm-vgic.txt => arm-vgic.rst} (66%)
+ create mode 100644 Documentation/virt/kvm/devices/index.rst
+ rename Documentation/virt/kvm/devices/{mpic.txt => mpic.rst} (92%)
+ rename Documentation/virt/kvm/devices/{s390_flic.txt => s390_flic.rst} (88%)
  create mode 100644 Documentation/virt/kvm/devices/vcpu.rst
  delete mode 100644 Documentation/virt/kvm/devices/vcpu.txt
+ rename Documentation/virt/kvm/devices/{vfio.txt => vfio.rst} (74%)
+ rename Documentation/virt/kvm/devices/{vm.txt => vm.rst} (61%)
+ rename Documentation/virt/kvm/devices/{xics.txt => xics.rst} (85%)
+ rename Documentation/virt/kvm/devices/{xive.txt => xive.rst} (63%)
+ rename Documentation/virt/kvm/{halt-polling.txt => halt-polling.rst} (64%)
+ rename Documentation/virt/kvm/{hypercalls.txt => hypercalls.rst} (55%)
+ rename Documentation/virt/kvm/{locking.txt => locking.rst} (79%)
+ rename Documentation/virt/kvm/{mmu.txt => mmu.rst} (94%)
+ rename Documentation/virt/kvm/{msr.txt => msr.rst} (75%)
+ rename Documentation/virt/kvm/{nested-vmx.txt => nested-vmx.rst} (90%)
+ rename Documentation/virt/kvm/{ppc-pv.txt => ppc-pv.rst} (91%)
+ rename Documentation/virt/kvm/{review-checklist.txt => review-checklist.rst} (97%)
+ rename Documentation/virt/kvm/{s390-diag.txt => s390-diag.rst} (91%)
+ rename Documentation/virt/kvm/{timekeeping.txt => timekeeping.rst} (85%)
+ rename Documentation/virt/uml/{UserModeLinux-HOWTO.txt => user_mode_linux.rst} (74%)
 
-diff --git a/Documentation/virt/kvm/devices/index.rst b/Documentation/virt/kvm/devices/index.rst
-index e6caccc36623..5a61838f0e61 100644
---- a/Documentation/virt/kvm/devices/index.rst
-+++ b/Documentation/virt/kvm/devices/index.rst
-@@ -12,3 +12,4 @@ Devices
-    arm-vgic-v3
-    mpic
-    s390_flic
-+   vcpu
-diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-new file mode 100644
-index 000000000000..1270fd7f2cff
---- /dev/null
-+++ b/Documentation/virt/kvm/devices/vcpu.rst
-@@ -0,0 +1,112 @@
-+======================
-+Generic vcpu interface
-+======================
-+
-+The virtual cpu "device" also accepts the ioctls KVM_SET_DEVICE_ATTR,
-+KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
-+kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
-+
-+The groups and attributes per virtual cpu, if any, are architecture specific.
-+
-+1. GROUP: KVM_ARM_VCPU_PMU_V3_CTRL
-+==================================
-+
-+:Architectures: ARM64
-+
-+1.1. ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_IRQ
-+---------------------------------------
-+
-+:Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
-+	     pointer to an int
-+
-+Returns:
-+
-+	 =======  ========================================================
-+	 -EBUSY   The PMU overflow interrupt is already set
-+	 -ENXIO   The overflow interrupt not set when attempting to get it
-+	 -ENODEV  PMUv3 not supported
-+	 -EINVAL  Invalid PMU overflow interrupt number supplied or
-+		  trying to set the IRQ number without using an in-kernel
-+		  irqchip.
-+	 =======  ========================================================
-+
-+A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
-+number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
-+type must be same for each vcpu. As a PPI, the interrupt number is the same for
-+all vcpus, while as an SPI it must be a separate number per vcpu.
-+
-+1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
-+---------------------------------------
-+
-+:Parameters: no additional parameter in kvm_device_attr.addr
-+
-+Returns:
-+
-+	 =======  ======================================================
-+	 -ENODEV  PMUv3 not supported or GIC not initialized
-+	 -ENXIO   PMUv3 not properly configured or in-kernel irqchip not
-+		  configured as required prior to calling this attribute
-+	 -EBUSY   PMUv3 already initialized
-+	 =======  ======================================================
-+
-+Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
-+virtual GIC implementation, this must be done after initializing the in-kernel
-+irqchip.
-+
-+
-+2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
-+=================================
-+
-+:Architectures: ARM,ARM64
-+
-+2.1. ATTRIBUTES: KVM_ARM_VCPU_TIMER_IRQ_VTIMER, KVM_ARM_VCPU_TIMER_IRQ_PTIMER
-+-----------------------------------------------------------------------------
-+
-+:Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
-+	     pointer to an int
-+
-+Returns:
-+
-+	 =======  =================================
-+	 -EINVAL  Invalid timer interrupt number
-+	 -EBUSY   One or more VCPUs has already run
-+	 =======  =================================
-+
-+A value describing the architected timer interrupt number when connected to an
-+in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  Setting the
-+attribute overrides the default values (see below).
-+
-+=============================  ==========================================
-+KVM_ARM_VCPU_TIMER_IRQ_VTIMER  The EL1 virtual timer intid (default: 27)
-+KVM_ARM_VCPU_TIMER_IRQ_PTIMER  The EL1 physical timer intid (default: 30)
-+=============================  ==========================================
-+
-+Setting the same PPI for different timers will prevent the VCPUs from running.
-+Setting the interrupt number on a VCPU configures all VCPUs created at that
-+time to use the number provided for a given timer, overwriting any previously
-+configured values on other VCPUs.  Userspace should configure the interrupt
-+numbers on at least one VCPU after creating all VCPUs and before running any
-+VCPUs.
-+
-+3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
-+==================================
-+
-+:Architectures: ARM64
-+
-+3.1 ATTRIBUTE: KVM_ARM_VCPU_PVTIME_IPA
-+--------------------------------------
-+
-+:Parameters: 64-bit base address
-+
-+Returns:
-+
-+	 =======  ======================================
-+	 -ENXIO   Stolen time not implemented
-+	 -EEXIST  Base address already set for this VCPU
-+	 -EINVAL  Base address not 64 byte aligned
-+	 =======  ======================================
-+
-+Specifies the base address of the stolen time structure for this VCPU. The
-+base address must be 64 byte aligned and exist within a valid guest memory
-+region. See Documentation/virt/kvm/arm/pvtime.txt for more information
-+including the layout of the stolen time structure.
-diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
-deleted file mode 100644
-index 6f3bd64a05b0..000000000000
---- a/Documentation/virt/kvm/devices/vcpu.txt
-+++ /dev/null
-@@ -1,76 +0,0 @@
--Generic vcpu interface
--====================================
--
--The virtual cpu "device" also accepts the ioctls KVM_SET_DEVICE_ATTR,
--KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
--kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
--
--The groups and attributes per virtual cpu, if any, are architecture specific.
--
--1. GROUP: KVM_ARM_VCPU_PMU_V3_CTRL
--Architectures: ARM64
--
--1.1. ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_IRQ
--Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
--            pointer to an int
--Returns: -EBUSY: The PMU overflow interrupt is already set
--         -ENXIO: The overflow interrupt not set when attempting to get it
--         -ENODEV: PMUv3 not supported
--         -EINVAL: Invalid PMU overflow interrupt number supplied or
--                  trying to set the IRQ number without using an in-kernel
--                  irqchip.
--
--A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
--number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
--type must be same for each vcpu. As a PPI, the interrupt number is the same for
--all vcpus, while as an SPI it must be a separate number per vcpu.
--
--1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
--Parameters: no additional parameter in kvm_device_attr.addr
--Returns: -ENODEV: PMUv3 not supported or GIC not initialized
--         -ENXIO: PMUv3 not properly configured or in-kernel irqchip not
--                 configured as required prior to calling this attribute
--         -EBUSY: PMUv3 already initialized
--
--Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
--virtual GIC implementation, this must be done after initializing the in-kernel
--irqchip.
--
--
--2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
--Architectures: ARM,ARM64
--
--2.1. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_VTIMER
--2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_PTIMER
--Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
--            pointer to an int
--Returns: -EINVAL: Invalid timer interrupt number
--         -EBUSY:  One or more VCPUs has already run
--
--A value describing the architected timer interrupt number when connected to an
--in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  Setting the
--attribute overrides the default values (see below).
--
--KVM_ARM_VCPU_TIMER_IRQ_VTIMER: The EL1 virtual timer intid (default: 27)
--KVM_ARM_VCPU_TIMER_IRQ_PTIMER: The EL1 physical timer intid (default: 30)
--
--Setting the same PPI for different timers will prevent the VCPUs from running.
--Setting the interrupt number on a VCPU configures all VCPUs created at that
--time to use the number provided for a given timer, overwriting any previously
--configured values on other VCPUs.  Userspace should configure the interrupt
--numbers on at least one VCPU after creating all VCPUs and before running any
--VCPUs.
--
--3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
--Architectures: ARM64
--
--3.1 ATTRIBUTE: KVM_ARM_VCPU_PVTIME_IPA
--Parameters: 64-bit base address
--Returns: -ENXIO:  Stolen time not implemented
--         -EEXIST: Base address already set for this VCPU
--         -EINVAL: Base address not 64 byte aligned
--
--Specifies the base address of the stolen time structure for this VCPU. The
--base address must be 64 byte aligned and exist within a valid guest memory
--region. See Documentation/virt/kvm/arm/pvtime.txt for more information
--including the layout of the stolen time structure.
 -- 
 2.24.1
+
 
