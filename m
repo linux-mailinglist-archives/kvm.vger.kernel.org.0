@@ -2,136 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E45F514B1A7
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 10:18:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8012514B1B8
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 10:27:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725882AbgA1JSj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 04:18:39 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37051 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725848AbgA1JSj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Jan 2020 04:18:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580203118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ey0MsIeFmyzpawSGgwopK9Syi8SizcNQrb3ID79L2OA=;
-        b=Q6m/8nnzjeC6cotuTgDopKIBigaobeCPdm3IahzFNq8V1HrBRWYNHzGEyNrzddShjovNNR
-        I40hk2BsYQkg8YlwThTE7ieeBGJSaVP8KNPSUuVxZOrNMu2Muo0u6zvoxMw0WKuwPjsz3W
-        Sc4PtSvomQU/M71Y0t3EnxjrNX+xuhM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-YfQ9pnZRMoWGlsEIFqxGvg-1; Tue, 28 Jan 2020 04:18:34 -0500
-X-MC-Unique: YfQ9pnZRMoWGlsEIFqxGvg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A19F9100550E;
-        Tue, 28 Jan 2020 09:18:33 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A61C519C58;
-        Tue, 28 Jan 2020 09:18:32 +0000 (UTC)
-Date:   Tue, 28 Jan 2020 10:18:30 +0100
-From:   Andrew Jones <drjones@redhat.com>
+        id S1725919AbgA1J13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 04:27:29 -0500
+Received: from mail-yb1-f202.google.com ([209.85.219.202]:43644 "EHLO
+        mail-yb1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725271AbgA1J12 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jan 2020 04:27:28 -0500
+Received: by mail-yb1-f202.google.com with SMTP id g11so9672739ybc.10
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2020 01:27:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=1D2HqKC9xNZbgrwgnAL8n/SPKL7jL4ZkZkoq8tmp9b8=;
+        b=JDNWLBhBFWoJl6jiprEuB62OWWTC69IaEjDtsRF8/NeuXZ/Dxss6EZoBeC+L+C9U+x
+         lMczqXsg7XLlbPdDCme2pDMFv1UcsJiZ92eW4tJa/hdpX1PPTNzYb97GJBgelqVvv2f3
+         BN5uxg+st9AQplCR3XccdgVx7ZW0ysjAk5fFE1JWwNzOcwF3a3OtIW23enJckYoqrbo8
+         81/PfFHh0mM6+wTbXyCRnvE9jK5Ds0OYTm/XeK3Pdn+grDR7RXOlEzLwqD02ByER2jWV
+         JqGZp1GwBueV51DUjB3NAK2d2xUfaUcFSxAZNedRWWn5RSBRzkT+pSbUWlNCy/LmF6s5
+         HbsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=1D2HqKC9xNZbgrwgnAL8n/SPKL7jL4ZkZkoq8tmp9b8=;
+        b=W56dUtJ62FA/PYv0fqwcZe/1tkfTSKULFxTCJqrGKGBchvIWRzMJefL8ItkqjXQm8E
+         GWy2Raa0SSK7b95S6iLzZbFkiq+TPSzYjZpH259IqCn9FqjQ3M28bOJR/Go6KOOuYZba
+         CVva0bFrdgtgsHEB08nGEPOdSdSbDdWQfDj4rsrFudmuKQWggAkHnDg5lAXg1tx0Rp7i
+         7P3YrA3MCMzbC74bBiLm5zQ9ieKdXE5YhiTdxd882rjg981XxjpzqlDw1rvMGN5OhcNl
+         rg4e7f8YVCrvnlUTpqL0+ZkqLC1ZOC7c8HqDYjD53S0CKZqJfBNU+yKFuYUrP/nat6xR
+         TtMQ==
+X-Gm-Message-State: APjAAAVbRTpBrkPchUaXisDPkUZdCOx/132HyvBQ/K4YndLGINGp4NXO
+        Rsad73ZZQZyWyu/hydJOo1jis4Dl9e/D2r3+9jASOZeG/96hjHBBak/XCEApaUSkWX3ydi29PL6
+        29epXePZ4tcLTwHB/iwOZlbQbSBOeeysz0ZODKDM4TBzOtmbof62N1Cgs4g==
+X-Google-Smtp-Source: APXvYqwRqeqGcIzZ8xLebgJnllx3kBwi/LiQU8PzrVDYXD1fiD8XhLCPgXdFIcmN3K+Y75RUgYm5+YDOFn8=
+X-Received: by 2002:a81:6d17:: with SMTP id i23mr16153448ywc.58.1580203647427;
+ Tue, 28 Jan 2020 01:27:27 -0800 (PST)
+Date:   Tue, 28 Jan 2020 01:27:10 -0800
+Message-Id: <20200128092715.69429-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+Subject: [PATCH v2 0/5] Handle monitor trap flag during instruction emulation
+From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, thuth@redhat.com, bgardon@google.com
-Subject: Re: [PATCH] kvm: selftests: Introduce num-pages conversion utilities
-Message-ID: <20200128091830.sbcba2ybu6hgrkv2@kamzik.brq.redhat.com>
-References: <20200127170405.17503-1-drjones@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200127170405.17503-1-drjones@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 27, 2020 at 06:04:05PM +0100, Andrew Jones wrote:
-> Guests and hosts don't have to have the same page size. This means
-> calculations are necessary when selecting the number of guest pages
-> to allocate in order to ensure the number is compatible with the
-> host. Provide utilities to help with those calculations.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  tools/testing/selftests/kvm/dirty_log_test.c  |  3 +--
->  .../testing/selftests/kvm/include/kvm_util.h  |  3 +++
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 26 +++++++++++++++++++
->  3 files changed, 30 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> index 5614222a6628..c2bc4e4c91ec 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> @@ -295,8 +295,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
->  	guest_num_pages = (guest_num_pages + 0xff) & ~0xffUL;
->  #endif
->  	host_page_size = getpagesize();
-> -	host_num_pages = (guest_num_pages * guest_page_size) / host_page_size +
-> -			 !!((guest_num_pages * guest_page_size) % host_page_size);
-> +	host_num_pages = vm_num_host_pages(vm, guest_num_pages);
->  
->  	if (!phys_offset) {
->  		guest_test_phys_mem = (vm_get_max_gfn(vm) -
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 29cccaf96baf..0d05ade3022c 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -158,6 +158,9 @@ unsigned int vm_get_page_size(struct kvm_vm *vm);
->  unsigned int vm_get_page_shift(struct kvm_vm *vm);
->  unsigned int vm_get_max_gfn(struct kvm_vm *vm);
->  
-> +unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest_pages);
-> +unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host_pages);
-> +
->  struct kvm_userspace_memory_region *
->  kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
->  				 uint64_t end);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 41cf45416060..5af9d7b1b7fc 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1667,3 +1667,29 @@ unsigned int vm_get_max_gfn(struct kvm_vm *vm)
->  {
->  	return vm->max_gfn;
->  }
-> +
-> +static unsigned int vm_calc_num_pages(unsigned int num_pages,
-> +				      unsigned int page_shift,
-> +				      unsigned int new_page_shift)
-> +{
-> +	unsigned int n = 1 << (new_page_shift - page_shift);
-> +
-> +	if (page_shift >= new_page_shift)
-> +		return num_pages * (1 << (page_shift - new_page_shift));
-> +
-> +	return num_pages / n + !!(num_pages % n);
-> +}
-> +
-> +unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest_pages)
-> +{
-> +	return vm_calc_num_pages(num_guest_pages,
-> +				 vm_get_page_shift(vm),
-> +				 __builtin_ffs(getpagesize()) - 1);
-> +}
-> +
-> +unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host_pages)
-> +{
-> +	return vm_calc_num_pages(num_host_pages,
-> +				 __builtin_ffs(getpagesize()) - 1,
-> +				 vm_get_page_shift(vm));
-> +}
-> -- 
-> 2.21.1
->
+v1: http://lore.kernel.org/r/20200113221053.22053-1-oupton@google.com
 
-I'm going to send a v2 because there's another place in dirty_log_test.c
-that I can apply this new utility. I'm also going to wrap the
-'__builtin_ffs(getpagesize()) - 1' into a new getpageshift() macro.
+v1 => v2:
+ - Don't split the #DB delivery by vendors. Unconditionally injecting
+   #DB payloads into the 'pending debug exceptions' field will cause KVM
+   to get stuck in a loop. Per the SDM, when hardware injects an event
+   resulting from this field's value, it is checked against the
+   exception interception bitmap.
+ - Address Sean's comments by injecting the VM-exit into L1 from
+   vmx_check_nested_events().
+ - Added fix for nested INIT VM-exits + 'pending debug exceptions' field
+   as it was noticed in implementing v2.
+ - Drop Peter + Jim's Reviewed-by tags, as the patch set has changed
+   since v1.
 
-Thanks,
-drew
+KVM already provides guests the ability to use the 'monitor trap flag'
+VM-execution control. Support for this flag is provided by the fact that
+KVM unconditionally forwards MTF VM-exits to the guest (if requested),
+as KVM doesn't utilize MTF. While this provides support during hardware
+instruction execution, it is insufficient for instruction emulation.
+
+Should L0 emulate an instruction on the behalf of L2, L0 should also
+synthesize an MTF VM-exit into L1, should control be set.
+
+The first patch corrects a nuanced difference between the definition of
+a #DB exception payload field and DR6 register. Mask off bit 12 which is
+defined in the 'pending debug exceptions' field when applying to DR6,
+since the payload field is said to be compatible with the aforementioned
+VMCS field.
+
+The second patch sets the 'pending debug exceptions' VMCS field when
+delivering an INIT signal VM-exit to L1, as described in the SDM. This
+patch also introduces helpers for setting the 'pending debug exceptions'
+VMCS field.
+
+The third patch massages KVM's handling of exception payloads with
+regard to API compatibility. Rather than immediately injecting the
+payload w/o opt-in, instead defer the payload + immediately inject
+before completing a KVM_GET_VCPU_EVENTS. This maintains API
+compatibility whilst correcting #DB behavior with regard to higher
+priority VM-exit events.
+
+Fourth patch introduces MTF implementation for emulated instructions.
+Identify if an MTF is due on an instruction boundary from
+kvm_vcpu_do_singlestep(), however only deliver this VM-exit from
+vmx_check_nested_events() to respect the relative prioritization to
+other VM-exits. Since this augments the nested state, introduce a new
+flag for (de)serialization.
+
+Last patch adds tests to kvm-unit-tests to assert the correctness of MTF
+under several conditions (concurrent #DB trap, #DB fault, etc). These
+tests pass under virtualization with this series as well as on
+bare-metal.
+
+Oliver Upton (4):
+  KVM: x86: Mask off reserved bit from #DB exception payload
+  KVM: nVMX: Handle pending #DB when injecting INIT VM-exit
+  KVM: x86: Deliver exception payload on KVM_GET_VCPU_EVENTS
+  KVM: nVMX: Emulate MTF when performing instruction emulation
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/include/uapi/asm/kvm.h |  1 +
+ arch/x86/kvm/svm.c              |  1 +
+ arch/x86/kvm/vmx/nested.c       | 60 ++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/nested.h       |  5 +++
+ arch/x86/kvm/vmx/vmx.c          | 22 ++++++++++++
+ arch/x86/kvm/vmx/vmx.h          |  3 ++
+ arch/x86/kvm/x86.c              | 52 +++++++++++++++++-----------
+ 8 files changed, 125 insertions(+), 20 deletions(-)
+
+-- 
+2.25.0.341.g760bfbb309-goog
 
