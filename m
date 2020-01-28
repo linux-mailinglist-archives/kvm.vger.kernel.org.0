@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B9D2214BC0F
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:51:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BA6814BC36
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:51:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727400AbgA1Ou5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 09:50:57 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:58484 "EHLO
+        id S1727201AbgA1Ove (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 09:51:34 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:58550 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726558AbgA1N6p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1726594AbgA1N6p (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 28 Jan 2020 08:58:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
@@ -17,18 +17,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=MfbPPBfVOsZ1ekqbduEWSsRYBXTtAjqiqdXfPqQdPuI=; b=CCjM22PSEzorvo4GHpNnagyNlq
-        xBF/1TnUeLHMrOXFIX3fMm1RwvQOO4zFvYqePgwGLe/Cem7R4uqdDpHy7K9Uf8V5Nkl+BLluP2KVt
-        txv+OkPOX8vF4MVUJlIgv1UgI4trEZK0Re3tsLVDAcqOx5hkT2x7evYnKCl1N5MwcPDv+0XMFF8gu
-        0TSI5GUho3EUIGJRRR2uDYn+wUivA6+yUyVyEd9ySL/9atfdPUv+ENB6vGJidVfLe2eUUDpG7jqhs
-        cZ8LA94GQ5Nrgl/avCTaQdjspTdJ2q05wwrbdG2m/oLw1XS5m7mf6rRZuSXIzeFdP0PViDwHh7B4p
-        8Msmfmjg==;
+        bh=XbGNFtogCQRMXF01dSGrQnNJXmqzkuMVFSbrbXMmdyA=; b=izc/MeBw2M/SAC8sFYlvzeozUv
+        t7ZGCho5eyTTPnZI3qdcGO+3Zh+9YEhnN8ze83vTeI2lX0vHsXFBd0HAXM+TGswgMIQQWTsVOGa2f
+        7ZB+MnmtaHB06v4elfGLacy6LmJq0gEC3Jp0EQXJjcEV+7AimpHK1Yft+rjCEQnbvmv9XXeqJL2Pj
+        oj7GE0Iek9teyxhMGK5UZBKnEp+Z/xAFsTiTMyori3CSBG4p33HcB0hl+osJYOKIKPQziOn4LM4rf
+        hj4gJi5/Rze2jfltGUsVmxWF9YjbkRdD/TiKZCrBf0K+GKznuvS0xW3U5L106NJ3Xnd9iHWMlrAUC
+        C4x1weaQ==;
 Received: from [177.41.103.99] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iwRO8-0006KS-1K; Tue, 28 Jan 2020 13:58:44 +0000
+        id 1iwRO7-0006KT-UX; Tue, 28 Jan 2020 13:58:45 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iwRNq-001BK1-H7; Tue, 28 Jan 2020 14:58:26 +0100
+        id 1iwRNq-001BK5-IG; Tue, 28 Jan 2020 14:58:26 +0100
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Media Mailing List <linux-media@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
@@ -36,9 +36,9 @@ Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
-Subject: [PATCH 13/27] docs: kvm: convert devices/vcpu.txt to ReST
-Date:   Tue, 28 Jan 2020 14:58:09 +0100
-Message-Id: <b53d6dcb4e2e8f705750379b339bd534770cfd7d.1580219586.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 14/27] docs: kvm: convert devices/vm.txt to ReST
+Date:   Tue, 28 Jan 2020 14:58:10 +0100
+Message-Id: <11ebca7843c1fd54a328e9260c552fe2d2cc5503.1580219586.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <cover.1580219586.git.mchehab+huawei@kernel.org>
 References: <cover.1580219586.git.mchehab+huawei@kernel.org>
@@ -49,70 +49,405 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-- Use standard title markup;
-- adjust lists;
+- Use title markups;
+- adjust indentation and add blank lines as needed;
+- use :field: markups;
+- Use cross-references;
 - mark code blocks as such.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- Documentation/virt/kvm/devices/index.rst      |  1 +
- .../virt/kvm/devices/{vfio.txt => vfio.rst}   | 23 +++++++++++--------
- 2 files changed, 14 insertions(+), 10 deletions(-)
- rename Documentation/virt/kvm/devices/{vfio.txt => vfio.rst} (74%)
+ Documentation/virt/kvm/devices/index.rst      |   1 +
+ .../virt/kvm/devices/{vm.txt => vm.rst}       | 204 +++++++++++-------
+ 2 files changed, 125 insertions(+), 80 deletions(-)
+ rename Documentation/virt/kvm/devices/{vm.txt => vm.rst} (61%)
 
 diff --git a/Documentation/virt/kvm/devices/index.rst b/Documentation/virt/kvm/devices/index.rst
-index 5a61838f0e61..cbbadda080d0 100644
+index cbbadda080d0..29f8ecdf7fa0 100644
 --- a/Documentation/virt/kvm/devices/index.rst
 +++ b/Documentation/virt/kvm/devices/index.rst
-@@ -13,3 +13,4 @@ Devices
-    mpic
+@@ -14,3 +14,4 @@ Devices
     s390_flic
     vcpu
-+   vfio
-diff --git a/Documentation/virt/kvm/devices/vfio.txt b/Documentation/virt/kvm/devices/vfio.rst
-similarity index 74%
-rename from Documentation/virt/kvm/devices/vfio.txt
-rename to Documentation/virt/kvm/devices/vfio.rst
-index 528c77c8022c..07a1acde25e4 100644
---- a/Documentation/virt/kvm/devices/vfio.txt
-+++ b/Documentation/virt/kvm/devices/vfio.rst
-@@ -1,8 +1,10 @@
-+===================
- VFIO virtual device
- ===================
+    vfio
++   vm
+diff --git a/Documentation/virt/kvm/devices/vm.txt b/Documentation/virt/kvm/devices/vm.rst
+similarity index 61%
+rename from Documentation/virt/kvm/devices/vm.txt
+rename to Documentation/virt/kvm/devices/vm.rst
+index 4ffb82b02468..4bcbc730265f 100644
+--- a/Documentation/virt/kvm/devices/vm.txt
++++ b/Documentation/virt/kvm/devices/vm.rst
+@@ -1,5 +1,6 @@
++====================
+ Generic vm interface
+-====================================
++====================
  
- Device types supported:
--  KVM_DEV_TYPE_VFIO
+ The virtual machine "device" also accepts the ioctls KVM_SET_DEVICE_ATTR,
+ KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same
+@@ -10,30 +11,38 @@ The groups and attributes per virtual machine, if any, are architecture
+ specific.
+ 
+ 1. GROUP: KVM_S390_VM_MEM_CTRL
+-Architectures: s390
++==============================
 +
-+  - KVM_DEV_TYPE_VFIO
++:Architectures: s390
  
- Only one VFIO instance may be created per VM.  The created device
- tracks VFIO groups in use by the VM and features of those groups
-@@ -23,14 +25,15 @@ KVM_DEV_VFIO_GROUP attributes:
- 	for the VFIO group.
-   KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE: attaches a guest visible TCE table
- 	allocated by sPAPR KVM.
--	kvm_device_attr.addr points to a struct:
-+	kvm_device_attr.addr points to a struct::
- 
--	struct kvm_vfio_spapr_tce {
--		__s32	groupfd;
--		__s32	tablefd;
--	};
-+		struct kvm_vfio_spapr_tce {
-+			__s32	groupfd;
-+			__s32	tablefd;
-+		};
- 
--	where
--	@groupfd is a file descriptor for a VFIO group;
--	@tablefd is a file descriptor for a TCE table allocated via
--		KVM_CREATE_SPAPR_TCE.
-+	where:
+ 1.1. ATTRIBUTE: KVM_S390_VM_MEM_ENABLE_CMMA
+-Parameters: none
+-Returns: -EBUSY if a vcpu is already defined, otherwise 0
++-------------------------------------------
 +
-+	- @groupfd is a file descriptor for a VFIO group;
-+	- @tablefd is a file descriptor for a TCE table allocated via
-+	  KVM_CREATE_SPAPR_TCE.
++:Parameters: none
++:Returns: -EBUSY if a vcpu is already defined, otherwise 0
+ 
+ Enables Collaborative Memory Management Assist (CMMA) for the virtual machine.
+ 
+ 1.2. ATTRIBUTE: KVM_S390_VM_MEM_CLR_CMMA
+-Parameters: none
+-Returns: -EINVAL if CMMA was not enabled
+-         0 otherwise
++----------------------------------------
++
++:Parameters: none
++:Returns: -EINVAL if CMMA was not enabled;
++	  0 otherwise
+ 
+ Clear the CMMA status for all guest pages, so any pages the guest marked
+ as unused are again used any may not be reclaimed by the host.
+ 
+ 1.3. ATTRIBUTE KVM_S390_VM_MEM_LIMIT_SIZE
+-Parameters: in attr->addr the address for the new limit of guest memory
+-Returns: -EFAULT if the given address is not accessible
+-         -EINVAL if the virtual machine is of type UCONTROL
+-         -E2BIG if the given guest memory is to big for that machine
+-         -EBUSY if a vcpu is already defined
+-         -ENOMEM if not enough memory is available for a new shadow guest mapping
+-          0 otherwise
++-----------------------------------------
++
++:Parameters: in attr->addr the address for the new limit of guest memory
++:Returns: -EFAULT if the given address is not accessible;
++	  -EINVAL if the virtual machine is of type UCONTROL;
++	  -E2BIG if the given guest memory is to big for that machine;
++	  -EBUSY if a vcpu is already defined;
++	  -ENOMEM if not enough memory is available for a new shadow guest mapping;
++	  0 otherwise.
+ 
+ Allows userspace to query the actual limit and set a new limit for
+ the maximum guest memory size. The limit will be rounded up to
+@@ -42,78 +51,92 @@ the number of page table levels. In the case that there is no limit we will set
+ the limit to KVM_S390_NO_MEM_LIMIT (U64_MAX).
+ 
+ 2. GROUP: KVM_S390_VM_CPU_MODEL
+-Architectures: s390
++===============================
++
++:Architectures: s390
+ 
+ 2.1. ATTRIBUTE: KVM_S390_VM_CPU_MACHINE (r/o)
++---------------------------------------------
+ 
+-Allows user space to retrieve machine and kvm specific cpu related information:
++Allows user space to retrieve machine and kvm specific cpu related information::
+ 
+-struct kvm_s390_vm_cpu_machine {
++  struct kvm_s390_vm_cpu_machine {
+        __u64 cpuid;           # CPUID of host
+        __u32 ibc;             # IBC level range offered by host
+        __u8  pad[4];
+        __u64 fac_mask[256];   # set of cpu facilities enabled by KVM
+        __u64 fac_list[256];   # set of cpu facilities offered by host
+-}
++  }
+ 
+-Parameters: address of buffer to store the machine related cpu data
+-            of type struct kvm_s390_vm_cpu_machine*
+-Returns:    -EFAULT if the given address is not accessible from kernel space
+-	    -ENOMEM if not enough memory is available to process the ioctl
+-	    0 in case of success
++:Parameters: address of buffer to store the machine related cpu data
++	     of type struct kvm_s390_vm_cpu_machine*
++:Returns:   -EFAULT if the given address is not accessible from kernel space;
++	    -ENOMEM if not enough memory is available to process the ioctl;
++	    0 in case of success.
+ 
+ 2.2. ATTRIBUTE: KVM_S390_VM_CPU_PROCESSOR (r/w)
++===============================================
+ 
+-Allows user space to retrieve or request to change cpu related information for a vcpu:
++Allows user space to retrieve or request to change cpu related information for a vcpu::
+ 
+-struct kvm_s390_vm_cpu_processor {
++  struct kvm_s390_vm_cpu_processor {
+        __u64 cpuid;           # CPUID currently (to be) used by this vcpu
+        __u16 ibc;             # IBC level currently (to be) used by this vcpu
+        __u8  pad[6];
+        __u64 fac_list[256];   # set of cpu facilities currently (to be) used
+-                              # by this vcpu
+-}
++			      # by this vcpu
++  }
+ 
+ KVM does not enforce or limit the cpu model data in any form. Take the information
+ retrieved by means of KVM_S390_VM_CPU_MACHINE as hint for reasonable configuration
+ setups. Instruction interceptions triggered by additionally set facility bits that
+ are not handled by KVM need to by imlemented in the VM driver code.
+ 
+-Parameters: address of buffer to store/set the processor related cpu
+-	    data of type struct kvm_s390_vm_cpu_processor*.
+-Returns:    -EBUSY in case 1 or more vcpus are already activated (only in write case)
+-	    -EFAULT if the given address is not accessible from kernel space
+-	    -ENOMEM if not enough memory is available to process the ioctl
+-	    0 in case of success
++:Parameters: address of buffer to store/set the processor related cpu
++	     data of type struct kvm_s390_vm_cpu_processor*.
++:Returns:  -EBUSY in case 1 or more vcpus are already activated (only in write case);
++	   -EFAULT if the given address is not accessible from kernel space;
++	   -ENOMEM if not enough memory is available to process the ioctl;
++	   0 in case of success.
++
++.. _KVM_S390_VM_CPU_MACHINE_FEAT:
+ 
+ 2.3. ATTRIBUTE: KVM_S390_VM_CPU_MACHINE_FEAT (r/o)
++--------------------------------------------------
+ 
+ Allows user space to retrieve available cpu features. A feature is available if
+ provided by the hardware and supported by kvm. In theory, cpu features could
+ even be completely emulated by kvm.
+ 
+-struct kvm_s390_vm_cpu_feat {
+-        __u64 feat[16]; # Bitmap (1 = feature available), MSB 0 bit numbering
+-};
++::
+ 
+-Parameters: address of a buffer to load the feature list from.
+-Returns:    -EFAULT if the given address is not accessible from kernel space.
+-	    0 in case of success.
++  struct kvm_s390_vm_cpu_feat {
++	__u64 feat[16]; # Bitmap (1 = feature available), MSB 0 bit numbering
++  };
++
++:Parameters: address of a buffer to load the feature list from.
++:Returns:  -EFAULT if the given address is not accessible from kernel space;
++	   0 in case of success.
+ 
+ 2.4. ATTRIBUTE: KVM_S390_VM_CPU_PROCESSOR_FEAT (r/w)
++----------------------------------------------------
+ 
+ Allows user space to retrieve or change enabled cpu features for all VCPUs of a
+ VM. Features that are not available cannot be enabled.
+ 
+-See 2.3. for a description of the parameter struct.
++See :ref:`KVM_S390_VM_CPU_MACHINE_FEAT` for
++a description of the parameter struct.
+ 
+-Parameters: address of a buffer to store/load the feature list from.
+-Returns:    -EFAULT if the given address is not accessible from kernel space.
+-	    -EINVAL if a cpu feature that is not available is to be enabled.
+-	    -EBUSY if at least one VCPU has already been defined.
++:Parameters: address of a buffer to store/load the feature list from.
++:Returns:   -EFAULT if the given address is not accessible from kernel space;
++	    -EINVAL if a cpu feature that is not available is to be enabled;
++	    -EBUSY if at least one VCPU has already been defined;
+ 	    0 in case of success.
+ 
++.. _KVM_S390_VM_CPU_MACHINE_SUBFUNC:
++
+ 2.5. ATTRIBUTE: KVM_S390_VM_CPU_MACHINE_SUBFUNC (r/o)
++-----------------------------------------------------
+ 
+ Allows user space to retrieve available cpu subfunctions without any filtering
+ done by a set IBC. These subfunctions are indicated to the guest VCPU via
+@@ -126,7 +149,9 @@ contained in the returned struct. If the affected instruction
+ indicates subfunctions via a "test bit" mechanism, the subfunction codes are
+ contained in the returned struct in MSB 0 bit numbering.
+ 
+-struct kvm_s390_vm_cpu_subfunc {
++::
++
++  struct kvm_s390_vm_cpu_subfunc {
+        u8 plo[32];           # always valid (ESA/390 feature)
+        u8 ptff[16];          # valid with TOD-clock steering
+        u8 kmac[16];          # valid with Message-Security-Assist
+@@ -143,13 +168,14 @@ struct kvm_s390_vm_cpu_subfunc {
+        u8 kma[16];           # valid with Message-Security-Assist-Extension 8
+        u8 kdsa[16];          # valid with Message-Security-Assist-Extension 9
+        u8 reserved[1792];    # reserved for future instructions
+-};
++  };
+ 
+-Parameters: address of a buffer to load the subfunction blocks from.
+-Returns:    -EFAULT if the given address is not accessible from kernel space.
++:Parameters: address of a buffer to load the subfunction blocks from.
++:Returns:   -EFAULT if the given address is not accessible from kernel space;
+ 	    0 in case of success.
+ 
+ 2.6. ATTRIBUTE: KVM_S390_VM_CPU_PROCESSOR_SUBFUNC (r/w)
++-------------------------------------------------------
+ 
+ Allows user space to retrieve or change cpu subfunctions to be indicated for
+ all VCPUs of a VM. This attribute will only be available if kernel and
+@@ -164,107 +190,125 @@ As long as no data has been written, a read will fail. The IBC will be used
+ to determine available subfunctions in this case, this will guarantee backward
+ compatibility.
+ 
+-See 2.5. for a description of the parameter struct.
++See :ref:`KVM_S390_VM_CPU_MACHINE_SUBFUNC` for a
++description of the parameter struct.
+ 
+-Parameters: address of a buffer to store/load the subfunction blocks from.
+-Returns:    -EFAULT if the given address is not accessible from kernel space.
+-	    -EINVAL when reading, if there was no write yet.
+-	    -EBUSY if at least one VCPU has already been defined.
++:Parameters: address of a buffer to store/load the subfunction blocks from.
++:Returns:   -EFAULT if the given address is not accessible from kernel space;
++	    -EINVAL when reading, if there was no write yet;
++	    -EBUSY if at least one VCPU has already been defined;
+ 	    0 in case of success.
+ 
+ 3. GROUP: KVM_S390_VM_TOD
+-Architectures: s390
++=========================
++
++:Architectures: s390
+ 
+ 3.1. ATTRIBUTE: KVM_S390_VM_TOD_HIGH
++------------------------------------
+ 
+ Allows user space to set/get the TOD clock extension (u8) (superseded by
+ KVM_S390_VM_TOD_EXT).
+ 
+-Parameters: address of a buffer in user space to store the data (u8) to
+-Returns:    -EFAULT if the given address is not accessible from kernel space
++:Parameters: address of a buffer in user space to store the data (u8) to
++:Returns:   -EFAULT if the given address is not accessible from kernel space;
+ 	    -EINVAL if setting the TOD clock extension to != 0 is not supported
+ 
+ 3.2. ATTRIBUTE: KVM_S390_VM_TOD_LOW
++-----------------------------------
+ 
+ Allows user space to set/get bits 0-63 of the TOD clock register as defined in
+ the POP (u64).
+ 
+-Parameters: address of a buffer in user space to store the data (u64) to
+-Returns:    -EFAULT if the given address is not accessible from kernel space
++:Parameters: address of a buffer in user space to store the data (u64) to
++:Returns:    -EFAULT if the given address is not accessible from kernel space
+ 
+ 3.3. ATTRIBUTE: KVM_S390_VM_TOD_EXT
++-----------------------------------
++
+ Allows user space to set/get bits 0-63 of the TOD clock register as defined in
+ the POP (u64). If the guest CPU model supports the TOD clock extension (u8), it
+ also allows user space to get/set it. If the guest CPU model does not support
+ it, it is stored as 0 and not allowed to be set to a value != 0.
+ 
+-Parameters: address of a buffer in user space to store the data
+-            (kvm_s390_vm_tod_clock) to
+-Returns:    -EFAULT if the given address is not accessible from kernel space
++:Parameters: address of a buffer in user space to store the data
++	     (kvm_s390_vm_tod_clock) to
++:Returns:   -EFAULT if the given address is not accessible from kernel space;
+ 	    -EINVAL if setting the TOD clock extension to != 0 is not supported
+ 
+ 4. GROUP: KVM_S390_VM_CRYPTO
+-Architectures: s390
++============================
++
++:Architectures: s390
+ 
+ 4.1. ATTRIBUTE: KVM_S390_VM_CRYPTO_ENABLE_AES_KW (w/o)
++------------------------------------------------------
+ 
+ Allows user space to enable aes key wrapping, including generating a new
+ wrapping key.
+ 
+-Parameters: none
+-Returns:    0
++:Parameters: none
++:Returns:    0
+ 
+ 4.2. ATTRIBUTE: KVM_S390_VM_CRYPTO_ENABLE_DEA_KW (w/o)
++------------------------------------------------------
+ 
+ Allows user space to enable dea key wrapping, including generating a new
+ wrapping key.
+ 
+-Parameters: none
+-Returns:    0
++:Parameters: none
++:Returns:    0
+ 
+ 4.3. ATTRIBUTE: KVM_S390_VM_CRYPTO_DISABLE_AES_KW (w/o)
++-------------------------------------------------------
+ 
+ Allows user space to disable aes key wrapping, clearing the wrapping key.
+ 
+-Parameters: none
+-Returns:    0
++:Parameters: none
++:Returns:    0
+ 
+ 4.4. ATTRIBUTE: KVM_S390_VM_CRYPTO_DISABLE_DEA_KW (w/o)
++-------------------------------------------------------
+ 
+ Allows user space to disable dea key wrapping, clearing the wrapping key.
+ 
+-Parameters: none
+-Returns:    0
++:Parameters: none
++:Returns:    0
+ 
+ 5. GROUP: KVM_S390_VM_MIGRATION
+-Architectures: s390
++===============================
++
++:Architectures: s390
+ 
+ 5.1. ATTRIBUTE: KVM_S390_VM_MIGRATION_STOP (w/o)
++------------------------------------------------
+ 
+ Allows userspace to stop migration mode, needed for PGSTE migration.
+ Setting this attribute when migration mode is not active will have no
+ effects.
+ 
+-Parameters: none
+-Returns:    0
++:Parameters: none
++:Returns:    0
+ 
+ 5.2. ATTRIBUTE: KVM_S390_VM_MIGRATION_START (w/o)
++-------------------------------------------------
+ 
+ Allows userspace to start migration mode, needed for PGSTE migration.
+ Setting this attribute when migration mode is already active will have
+ no effects.
+ 
+-Parameters: none
+-Returns:    -ENOMEM if there is not enough free memory to start migration mode
+-	    -EINVAL if the state of the VM is invalid (e.g. no memory defined)
++:Parameters: none
++:Returns:   -ENOMEM if there is not enough free memory to start migration mode;
++	    -EINVAL if the state of the VM is invalid (e.g. no memory defined);
+ 	    0 in case of success.
+ 
+ 5.3. ATTRIBUTE: KVM_S390_VM_MIGRATION_STATUS (r/o)
++--------------------------------------------------
+ 
+ Allows userspace to query the status of migration mode.
+ 
+-Parameters: address of a buffer in user space to store the data (u64) to;
+-	    the data itself is either 0 if migration mode is disabled or 1
+-	    if it is enabled
+-Returns:    -EFAULT if the given address is not accessible from kernel space
++:Parameters: address of a buffer in user space to store the data (u64) to;
++	     the data itself is either 0 if migration mode is disabled or 1
++	     if it is enabled
++:Returns:   -EFAULT if the given address is not accessible from kernel space;
+ 	    0 in case of success.
 -- 
 2.24.1
 
