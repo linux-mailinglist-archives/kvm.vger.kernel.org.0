@@ -2,173 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B56B614BFA8
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 19:27:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1701C14BFE9
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 19:32:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727025AbgA1S05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 13:26:57 -0500
-Received: from foss.arm.com ([217.140.110.172]:33450 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726885AbgA1S0z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jan 2020 13:26:55 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 68849328;
-        Tue, 28 Jan 2020 10:26:54 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7D9FF3F52E;
-        Tue, 28 Jan 2020 10:26:53 -0800 (PST)
-Date:   Tue, 28 Jan 2020 18:26:50 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com
-Subject: Re: [PATCH kvmtool 07/16] pci: Fix ioport allocation size
-Message-ID: <20200128182650.12b4430b@donnerap.cambridge.arm.com>
-In-Reply-To: <20191125103033.22694-8-alexandru.elisei@arm.com>
-References: <20191125103033.22694-1-alexandru.elisei@arm.com>
-        <20191125103033.22694-8-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1726869AbgA1Scj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 13:32:39 -0500
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:38226 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726676AbgA1Scj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jan 2020 13:32:39 -0500
+Received: by mail-pj1-f65.google.com with SMTP id j17so630950pjz.3
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2020 10:32:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=WodcJpWVZbO4g1u0/wCvmEoR70ko/sm4LwMAucejRls=;
+        b=FKjw17QAJ2C5aMZ8I2VYzd9uly3973g2BQTH2df4+fWxwE3qZllE3tkNINIyKegv/T
+         ghSqIcuutAVfI0ExFBHYyo9anwdYVYD5T2eummj23dBAM/EhC787yd4ZKXGQ9kYY5dEP
+         J43E6RHrdnqr6ioMbWhlcvST53B+Dp5mtlHhsGTt5h65slrFKU+VJN/biNO2NNVmtRap
+         UTBkrMQ47JX+aY8WWWM7m/knP3CMsCCrA3ikvZoB5qBMyA9ZHqJUz1G1n30/9a7t8mLT
+         8CyCAULulbEGa/2m2ZMmashbkZHfgjUxgIdfsgoYWQhW0Jw04FCL3qfnClF9h6fhZcjQ
+         pmfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=WodcJpWVZbO4g1u0/wCvmEoR70ko/sm4LwMAucejRls=;
+        b=CirDps+Dtk/QROecU6wB7dHXX9rRmrJvheNjdTbXQDtpVp+UQA+zOv7oDePRhKK7OS
+         VPwD6HJCPoh830p6XqQJQ3VOUkmMAR8QLIM+lknryWvHPjno34MS5Uqo474zgDZHbnsP
+         mGzyEK6jONhMIsK7yo6f9HZKjTdcBbib4TvuFyEeTOdRlWuqUSx0jUacIHAxJ13f5oJa
+         pWSCPnqN3Sy+zmz+jkL3Ld8RpCCVHax5kqeVh7nyMt8k1ThsVY/6kW89TBKbWx9mRGVb
+         CldID39qp+NZxp9gl988R9MRPzxkqd74Pd9TxU6lQLECHxpowCFjHiwYFyh9rgvPvAbz
+         FZCw==
+X-Gm-Message-State: APjAAAUpf2J5SuKsCY8ehOqwNPrNx2fn8+0YjztWDsuO7QqtN+Jln8YN
+        +ZUpsXmOMQ/f9v9DUi3qyMg=
+X-Google-Smtp-Source: APXvYqzo8O3jsse+rjMnqyhW5avmp8YN+er4F6CTpw00IkbjFGDzl0utB0Gqrs+hNsnfwM6v1BnkqA==
+X-Received: by 2002:a17:902:be06:: with SMTP id r6mr21951006pls.99.1580236358553;
+        Tue, 28 Jan 2020 10:32:38 -0800 (PST)
+Received: from [10.2.129.203] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id u7sm20435255pfh.128.2020.01.28.10.32.36
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 28 Jan 2020 10:32:37 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [kvm-unit-tests PATCH v3] x86: Add RDTSC test
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <CALMp9eRrE5onJT4HgfCqrxMYYVjaeVMDT4YKVA2mr4jfT7jkaA@mail.gmail.com>
+Date:   Tue, 28 Jan 2020 10:32:36 -0800
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <6E9D4FAF-D484-49FD-8AAB-29470F8966CC@gmail.com>
+References: <20191202204356.250357-1-aaronlewis@google.com>
+ <4EFDEFF2-D1CD-4AF3-9EF8-5F160A4D93CD@gmail.com>
+ <20200124233835.GT2109@linux.intel.com>
+ <1A882E15-4F22-463E-AD03-460FA9251489@gmail.com>
+ <CALMp9eTXVhCA=-t1S-bVn-5ZVyh7UkR2Kqe26b8c5gfxW11F+Q@mail.gmail.com>
+ <436117EB-5017-4FF0-A89B-16B206951804@gmail.com>
+ <CALMp9eQYS3W5_PB8wP36UBBGHRHSoJmBDUEJ95AUcXYQ1sC9mQ@mail.gmail.com>
+ <20200127205606.GC2523@linux.intel.com>
+ <CALMp9eRrE5onJT4HgfCqrxMYYVjaeVMDT4YKVA2mr4jfT7jkaA@mail.gmail.com>
+To:     Jim Mattson <jmattson@google.com>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Nov 2019 10:30:24 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> On Jan 28, 2020, at 9:59 AM, Jim Mattson <jmattson@google.com> wrote:
+>=20
+> On Mon, Jan 27, 2020 at 12:56 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+>> On Mon, Jan 27, 2020 at 11:24:31AM -0800, Jim Mattson wrote:
+>>> On Sun, Jan 26, 2020 at 8:36 PM Nadav Amit <nadav.amit@gmail.com> =
+wrote:
+>>>>> On Jan 26, 2020, at 2:06 PM, Jim Mattson <jmattson@google.com> =
+wrote:
+>>>>>=20
+>>>>> If I had to guess, you probably have SMM malware on your host. =
+Remove
+>>>>> the malware, and the test should pass.
+>>>>=20
+>>>> Well, malware will always be an option, but I doubt this is the =
+case.
+>>>=20
+>>> Was my innuendo too subtle? I consider any code executing in SMM to =
+be malware.
+>>=20
+>> SMI complications seem unlikely.  The straw that broke the camel's =
+back
+>> was a 1152 cyle delta, presumably the other failing runs had similar =
+deltas.
+>> I've never benchmarked SMI+RSM, but I highly doubt it comes anywhere =
+close
+>> to VM-Enter/VM-Exit's super optimized ~400 cycle round trip.  E.g. I
+>> wouldn't be surprised if just SMI+RSM is over 1500 cycles.
+>=20
+> Good point. What generation of hardware are you running on, Nadav?
+>=20
+>>>> Interestingly, in the last few times the failure did not reproduce. =
+Yet,
+>>>> thinking about it made me concerned about MTRRs configuration, and =
+that
+>>>> perhaps performance is affected by memory marked as UC after boot, =
+since
+>>>> kvm-unit-test does not reset MTRRs.
+>>>>=20
+>>>> Reading the variable range MTRRs, I do see some ranges marked as UC =
+(most of
+>>>> the range 2GB-4GB, if I read the MTRRs correctly):
+>>>>=20
+>>>>  MSR 0x200 =3D 0x80000000
+>>>>  MSR 0x201 =3D 0x3fff80000800
+>>>>  MSR 0x202 =3D 0xff000005
+>>>>  MSR 0x203 =3D 0x3fffff000800
+>>>>  MSR 0x204 =3D 0x38000000000
+>>>>  MSR 0x205 =3D 0x3f8000000800
+>>>>=20
+>>>> Do you think we should set the MTRRs somehow in KVM-unit-tests? If =
+yes, can
+>>>> you suggest a reasonable configuration?
+>>>=20
+>>> I would expect MTRR issues to result in repeatable failures. For
+>>> instance, if your VMCS ended up in UC memory, that might slow things
+>>> down quite a bit. But, I would expect the VMCS to end up at the same
+>>> address each time the test is run.
+>>=20
+>> Agreed on the repeatable failures part, but putting the VMCS in UC =
+memory
+>> shouldn't affect this type of test.  The CPU's internal VMCS cache =
+isn't
+>> coherent, and IIRC isn't disabled if the MTRRs for the VMCS happen to =
+be
+>> UC.
+>=20
+> But the internal VMCS cache only contains selected fields, doesn't it?
+> Uncached fields would have to be written to memory on VM-exit. Or are
+> all of the mutable fields in the internal VMCS cache?
 
-Hi,
+In that regard, the SDM says that "To ensure proper behavior in VMX
+operation, software should maintain the VMCS region and related =
+structures
+(enumerated in Section 24.11.4) in writeback cacheable memory.=E2=80=9D
 
-> From: Julien Thierry <julien.thierry@arm.com>
-> 
-> The PCI Local Bus Specification, Rev. 3.0, Section 6.2.5.1. "Address Maps"
-> states: "Devices that map control functions into I/O Space must not consume
-> more than 256 bytes per I/O Base Address register."
-> 
-> Yet all the PCI devices allocate IO ports of IOPORT_SIZE (= 1024 bytes).
-> 
-> Fix this by having PCI devices use 256 bytes ports for IO BARs.
-> 
-> There is no hard requirement on the size of the memory region described
-> by memory BARs. However, the region must be big enough to hold the
-> virtio common interface described in [1], which is 20 bytes, and other
-> MSI-X and/or device specific configuration. To be consistent, let's also
-> limit the memory region described by BAR1 to 256. This is the same size
-> used by BAR2 for each of the two MSI-X vectors.
+Is it relevant? This means the MTRRs should be set up regardless of the
+RDTSC test failure.
 
-So the I/O port size is surely fine, QEMU seems to get away with 64 or even 32 bytes.
-But QEMU also reports a memory region size of 4K, is that something we need to consider?
- 
-> [1] VIRTIO Version 1.0 Committee Specification 04, section 4.4.8.
-
-I think that should read section 4.1.4.8.
-
-The rest looks OK.
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre
-
-> Cc: julien.thierry.kdev@gmail.com
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-> [Added rationale for changing BAR1 size to PCI_IO_SIZE]
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  hw/vesa.c            |  4 ++--
->  include/kvm/ioport.h |  1 -
->  pci.c                |  2 +-
->  virtio/pci.c         | 15 +++++++--------
->  4 files changed, 10 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/vesa.c b/hw/vesa.c
-> index 70ab59974f76..0191e9264666 100644
-> --- a/hw/vesa.c
-> +++ b/hw/vesa.c
-> @@ -62,8 +62,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
->  
->  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
->  		return NULL;
-> -	r = pci_get_io_port_block(IOPORT_SIZE);
-> -	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
-> +	r = pci_get_io_port_block(PCI_IO_SIZE);
-> +	r = ioport__register(kvm, r, &vesa_io_ops, PCI_IO_SIZE, NULL);
->  	if (r < 0)
->  		return ERR_PTR(r);
->  
-> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> index b10fcd5b4412..8c86b7151f25 100644
-> --- a/include/kvm/ioport.h
-> +++ b/include/kvm/ioport.h
-> @@ -14,7 +14,6 @@
->  
->  /* some ports we reserve for own use */
->  #define IOPORT_DBG			0xe0
-> -#define IOPORT_SIZE			0x400
->  
->  struct kvm;
->  
-> diff --git a/pci.c b/pci.c
-> index 32a07335a765..b4677434c50c 100644
-> --- a/pci.c
-> +++ b/pci.c
-> @@ -20,7 +20,7 @@ static u16 io_port_blocks		= PCI_IOPORT_START;
->  
->  u16 pci_get_io_port_block(u32 size)
->  {
-> -	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
-> +	u16 port = ALIGN(io_port_blocks, PCI_IO_SIZE);
->  
->  	io_port_blocks = port + size;
->  	return port;
-> diff --git a/virtio/pci.c b/virtio/pci.c
-> index d73414abde05..eeb5b5efa6e1 100644
-> --- a/virtio/pci.c
-> +++ b/virtio/pci.c
-> @@ -421,7 +421,7 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
->  {
->  	struct virtio_pci *vpci = ptr;
->  	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
-> -	u16 port = vpci->port_addr + (addr & (IOPORT_SIZE - 1));
-> +	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
->  
->  	kvm__emulate_io(vcpu, port, data, direction, len, 1);
->  }
-> @@ -435,17 +435,16 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  	vpci->kvm = kvm;
->  	vpci->dev = dev;
->  
-> -	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
->  	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
->  
-> -	r = pci_get_io_port_block(IOPORT_SIZE);
-> -	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
-> +	r = pci_get_io_port_block(PCI_IO_SIZE);
-> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, PCI_IO_SIZE, vdev);
->  	if (r < 0)
->  		return r;
->  	vpci->port_addr = (u16)r;
->  
-> -	vpci->mmio_addr = pci_get_mmio_block(IOPORT_SIZE);
-> -	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
-> +	vpci->mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
-> +	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
->  			       virtio_pci__io_mmio_callback, vpci);
->  	if (r < 0)
->  		goto free_ioport;
-> @@ -475,8 +474,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  							| PCI_BASE_ADDRESS_SPACE_MEMORY),
->  		.status			= cpu_to_le16(PCI_STATUS_CAP_LIST),
->  		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
-> -		.bar_size[0]		= cpu_to_le32(IOPORT_SIZE),
-> -		.bar_size[1]		= cpu_to_le32(IOPORT_SIZE),
-> +		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
-> +		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
->  		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
->  	};
->  
+I did not have time to further investigate this issue yet. I did =
+encounter
+additional strange failures (EPT A/D and PML test failures, which are
+persistent) due to Paolo=E2=80=99s patch that allows memory above 4GB to =
+be used, so
+I need to see if these issues are somehow related.
 
