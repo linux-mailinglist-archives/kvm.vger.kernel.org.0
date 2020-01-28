@@ -2,100 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DEF614ABC5
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2020 22:52:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 057AA14AE6E
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 04:33:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726181AbgA0Vwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 Jan 2020 16:52:30 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45105 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726080AbgA0Vw3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 Jan 2020 16:52:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580161948;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=55UOneL2ms6DRqRkSC42nE9sElCV4+6dsT8xJuc/F90=;
-        b=V1JT0i37/WeBVMyaF3+WiSS4aoni8rwOXrilPfRv9zopwvOHLwOjcWCqVSCa6geLqgtToa
-        nZ3ABSIKGrCGgWruOYrQ1GR/yNOA/xVcDPbh4Gpu04Qg5LXevxIc22H2beyNHoO0t0O1Lw
-        t1uSETkrVwrvDPbhwN0xL2tDXbFUlgo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-9pXfDR-ANReB5CFho_NrcQ-1; Mon, 27 Jan 2020 16:52:27 -0500
-X-MC-Unique: 9pXfDR-ANReB5CFho_NrcQ-1
-Received: by mail-wr1-f69.google.com with SMTP id c17so6911188wrp.10
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2020 13:52:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=55UOneL2ms6DRqRkSC42nE9sElCV4+6dsT8xJuc/F90=;
-        b=LWmzWQZt3mEBErljd8pUZQKpEJvqy5TY8+CpMQfesHzKqwRJYFRkZikoT5gHPIxzit
-         n9rBYLJUptmrIfzRvrD85NgKT3mSslAqCuBHxKK9YepvOQ6fVPPmIp5lRY06BkwLLVNS
-         YXmD0bmuh7K2Wsp4pam0e4d1HDtjuvEY0fmhXxcCMy3vVezpYc+rVipeGESYu2bduK01
-         mfUqNVKoeOrWL9K1VB+M+sOQAPPnLw+XE63Gxp8fykji8fhw/mxn1v+lK4t6XQTXSiei
-         lMW+LQXyQhv5h3ZkpErM4QSej5tWx0L7hO91w5IljN4TsjO4r6H4+lfMN1zl/iOc7day
-         LpNQ==
-X-Gm-Message-State: APjAAAXaSxzNq3UtltmM1fjoCtjPKup5KU9vSEK1V1SSV8eV3PVsD5Ir
-        vCu0IX4BJZ2sYCd/KWR2/LGiy1prrOwxONSHM/bwO6/DcoPZfiF1EseK6icQsE+I0WCS+FAEYuC
-        AtahGEosSeUnB
-X-Received: by 2002:adf:f491:: with SMTP id l17mr26182316wro.149.1580161946252;
-        Mon, 27 Jan 2020 13:52:26 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwW8T//Ne2f8Is87AT0Y5y0DKFSDxo9Fc+kgWX8pRXRYg+owSNawJWD3LvoveF6z4qyBIIsTA==
-X-Received: by 2002:adf:f491:: with SMTP id l17mr26182296wro.149.1580161945983;
-        Mon, 27 Jan 2020 13:52:25 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id n28sm23292967wra.48.2020.01.27.13.52.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2020 13:52:25 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
-        Roman Kagan <rkagan@virtuozzo.com>
-Subject: Re: [PATCH RFC 2/3] x86/kvm/hyper-v: move VMX controls sanitization out of nested_enable_evmcs()
-In-Reply-To: <437c2710-7148-a675-8945-71dc7a90f7dd@redhat.com>
-References: <20200115171014.56405-3-vkuznets@redhat.com> <6c4bdb57-08fb-2c2d-9234-b7efffeb72ed@redhat.com> <20200122054724.GD18513@linux.intel.com> <9c126d75-225b-3b1b-d97a-bcec1f189e02@redhat.com> <87eevrsf3s.fsf@vitty.brq.redhat.com> <20200122155108.GA7201@linux.intel.com> <87blqvsbcy.fsf@vitty.brq.redhat.com> <f15d9e98-25e9-2031-2db5-6aaa6c78c0eb@redhat.com> <87zheer0si.fsf@vitty.brq.redhat.com> <87lfpyq9bk.fsf@vitty.brq.redhat.com> <20200124172512.GJ2109@linux.intel.com> <875zgwnc3w.fsf@vitty.brq.redhat.com> <437c2710-7148-a675-8945-71dc7a90f7dd@redhat.com>
-Date:   Mon, 27 Jan 2020 22:52:24 +0100
-Message-ID: <87tv4glg87.fsf@vitty.brq.redhat.com>
+        id S1726569AbgA1Ddp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 Jan 2020 22:33:45 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:38514 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726164AbgA1Ddp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 Jan 2020 22:33:45 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00S3S5Ns001927;
+        Tue, 28 Jan 2020 03:33:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type : in-reply-to;
+ s=corp-2019-08-05; bh=Nr7BQpdUONE47IibUeMZ7q+ndlt/7dgoh1WHBUaOUEE=;
+ b=Mq0qwbm+JIcGdVF1wAk4kMmoNoIJQGo8DLETTDyojDh/2SvOjCv5q44ISCYRQDnivZ4X
+ hc89sY8knzZGDkhBQNkH8RD53WBqjy5/jB35ppGP3NPA3vVyLM9KkQEUkKfAbOqjlZtY
+ wVgdatpJqcHozD61VIo4CZm9xXNLI0YzdLWH9aGhIWt55/wdCBIGoMWxxA/IKMHqwNew
+ 9qAVRWTTgL+yCumVzJrCnk0M/DgikpZWUyhRUoTEcAV0PUNfOFpKDjcTZHYzG8IeTBHD
+ da/2rHL/P4X7WShZDRUsBfHu1W+pFJPmGzWJyZHODHuFTnV/yKmYb8uOg82oLRzgr3V7 nw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2xrd3u3db6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Jan 2020 03:33:01 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00S3SgiB022942;
+        Tue, 28 Jan 2020 03:33:00 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2xryuar7cx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 Jan 2020 03:33:00 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00S3WuGE008383;
+        Tue, 28 Jan 2020 03:32:56 GMT
+Received: from kadam (/129.205.23.165)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 27 Jan 2020 19:32:52 -0800
+Date:   Tue, 28 Jan 2020 06:32:15 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     kbuild@lists.01.org, Jason Wang <jasowang@redhat.com>
+Cc:     kbuild-all@lists.01.org, mst@redhat.com, jasowang@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        tiwei.bie@intel.com, jgg@mellanox.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
+        hch@infradead.org, aadam@redhat.com, jakub.kicinski@netronome.com,
+        jiri@mellanox.com, shahafs@mellanox.com, hanand@xilinx.com,
+        mhabets@solarflare.com
+Subject: Re: [PATCH 5/5] vdpasim: vDPA device simulator
+Message-ID: <20200128033215.GO1870@kadam>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200116124231.20253-6-jasowang@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9513 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001280026
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9513 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001280026
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Hi Jason,
 
-> On 27/01/20 16:38, Vitaly Kuznetsov wrote:
->>>> If there are no objections and if we still think it would be beneficial
->>>> to minimize the list of controls we filter out (and not go with the full
->>>> set like my RFC suggests), I'll prepare v2. (v1, actually, this was RFC).
->>> One last idea, can we keep the MSR filtering as is and add the hack in
->>> vmx_restore_control_msr()?  That way the (userspace) host and guest see
->>> the same values when reading the affected MSRs, and eVMCS wouldn't need
->>> it's own hook to do consistency checks.
->> Yes but (if I'm not mistaken) we'll have then to keep the filtering we
->> currently do in nested_enable_evmcs(): if userspace doesn't do
->> KVM_SET_MSR for VMX MSRs (QEMU<4.2) then the filtering in
->> vmx_restore_control_msr() won't happen and the guest will see the
->> unfiltered set of controls...
->> 
->
-> Indeed.  The place you used in the RFC is the best we can do, I am afraid.
->
+url:    https://github.com/0day-ci/linux/commits/Jason-Wang/vDPA-support/20200117-170243
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
 
-In case we decide to filter out the full set of unsupported stuff
-there's basically nothing to change, feel free to just treat the RFC as
-non-RFC :-) (and personally, I'd prefer to keep the 'full set' in the
-filter as it is less fragile; the 'short list' I came up with is the
-result of my experiments on one hardware host only and I'm not sure what
-may make Hyper-V behave differently).
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-I can re-submit, of course, if needed.
+smatch warnings:
+drivers/virtio/vdpa/vdpa_sim.c:288 vdpasim_alloc_coherent() warn: returning freed memory 'addr'
 
--- 
-Vitaly
+# https://github.com/0day-ci/linux/commit/55047769b3e974d68b2aab5ce0022459b172a23f
+git remote add linux-review https://github.com/0day-ci/linux
+git remote update linux-review
+git checkout 55047769b3e974d68b2aab5ce0022459b172a23f
+vim +/addr +288 drivers/virtio/vdpa/vdpa_sim.c
 
+55047769b3e974 Jason Wang 2020-01-16  263  static void *vdpasim_alloc_coherent(struct device *dev, size_t size,
+55047769b3e974 Jason Wang 2020-01-16  264  				    dma_addr_t *dma_addr, gfp_t flag,
+55047769b3e974 Jason Wang 2020-01-16  265  				    unsigned long attrs)
+55047769b3e974 Jason Wang 2020-01-16  266  {
+55047769b3e974 Jason Wang 2020-01-16  267  	struct vdpa_device *vdpa = dev_to_vdpa(dev);
+55047769b3e974 Jason Wang 2020-01-16  268  	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+55047769b3e974 Jason Wang 2020-01-16  269  	struct vhost_iotlb *iommu = vdpasim->iommu;
+55047769b3e974 Jason Wang 2020-01-16  270  	void *addr = kmalloc(size, flag);
+55047769b3e974 Jason Wang 2020-01-16  271  	int ret;
+55047769b3e974 Jason Wang 2020-01-16  272  
+55047769b3e974 Jason Wang 2020-01-16  273  	if (!addr)
+55047769b3e974 Jason Wang 2020-01-16  274  		*dma_addr = DMA_MAPPING_ERROR;
+55047769b3e974 Jason Wang 2020-01-16  275  	else {
+55047769b3e974 Jason Wang 2020-01-16  276  		u64 pa = virt_to_phys(addr);
+55047769b3e974 Jason Wang 2020-01-16  277  
+55047769b3e974 Jason Wang 2020-01-16  278  		ret = vhost_iotlb_add_range(iommu, (u64)pa,
+55047769b3e974 Jason Wang 2020-01-16  279  					    (u64)pa + size - 1,
+55047769b3e974 Jason Wang 2020-01-16  280  					    pa, VHOST_MAP_RW);
+55047769b3e974 Jason Wang 2020-01-16  281  		if (ret) {
+55047769b3e974 Jason Wang 2020-01-16  282  			kfree(addr);
+                                                                ^^^^^^^^^^^
+55047769b3e974 Jason Wang 2020-01-16  283  			*dma_addr = DMA_MAPPING_ERROR;
+55047769b3e974 Jason Wang 2020-01-16  284  		} else
+55047769b3e974 Jason Wang 2020-01-16  285  			*dma_addr = (dma_addr_t)pa;
+55047769b3e974 Jason Wang 2020-01-16  286  	}
+55047769b3e974 Jason Wang 2020-01-16  287  
+55047769b3e974 Jason Wang 2020-01-16 @288  	return addr;
+                                                ^^^^^^^^^^^^
+55047769b3e974 Jason Wang 2020-01-16  289  }
+
+---
+0-DAY kernel test infrastructure                 Open Source Technology Center
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org Intel Corporation
