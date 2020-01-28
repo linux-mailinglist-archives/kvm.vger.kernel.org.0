@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C85914B5E0
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:01:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E102B14B5E4
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:01:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727348AbgA1OAt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 09:00:49 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:59418 "EHLO
+        id S1726438AbgA1OAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 09:00:50 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:59430 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727306AbgA1OAr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1727310AbgA1OAr (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 28 Jan 2020 09:00:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
@@ -17,18 +17,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=47knvKP2hkOqYj0lWrn/u5a+ztvae81C4pMTyKp2WE4=; b=qv6nbjlQmpV9D0gQtQlJLKkXio
-        klniMlQpj/3q2O56PvvRtTdG6KxobJfOEPbh+CMHI2Jhj6LdDOaXPtx8fk8PO40Ay1KgzD4dqWhC2
-        wvjOjOUwYskxfjmL2yGzI7kiX++7xVYxeKfwxG0hMBf5jgPSYp3thtaEHJxgwF1ZqQt8M/wko5efC
-        wvTzI+8L2UNbCh4Kb88/vbF1kft4wUiyxOfGkkykfnTIHyknpn1CC4TSBe2+eC5B9NcxCkrgcAa2j
-        dhwn1vaTYhQgcHOXU2WwOgPjUr7IgpQ4CCVjjDm77YQ4JUP9enL+gCCt3vMpwHvHJsqb2Q8yUf82v
-        X5LV+RNA==;
+        bh=RPG23Q5VInCW2/dcxso2308vuKWS9qa+8lTMVckj8OQ=; b=Jm/mS4979PllP7wiC6ArM0x9ZV
+        R/hEEfHUbGbhrxuRhyGKFrRsFMP+gybu6Pv+8uF+TlTAEKL62nKtR7gfbpr3m/ACN/Fpp4teRdEvM
+        93YF8FHsWuq6xYxW6eHfbsnsUz4eVjCqnWqx85lU1eVVNaIykphUd1elb9X0CTlvyeFWt142uLd31
+        G9q+5uiSACyQHnuIpaqweYOVCTmWAuLEnCYpruPLuAGnKkxZ/AlGXm48+tIq8nyrSjjl1+cK0rc0C
+        NF6jy6R8gU/hIU8lTRR5dhiJW4yjkne0XFwptReZZgLVPEAyiP50+I9rKP7ikVBZLdaro+4eLKPXE
+        LgdZgfGg==;
 Received: from [177.41.103.99] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iwRQ5-0007if-Ey; Tue, 28 Jan 2020 14:00:46 +0000
+        id 1iwRQ6-0007is-91; Tue, 28 Jan 2020 14:00:46 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iwRPp-001BNp-EV; Tue, 28 Jan 2020 15:00:29 +0100
+        id 1iwRPp-001BO9-Iz; Tue, 28 Jan 2020 15:00:29 +0100
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Media Mailing List <linux-media@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
@@ -36,9 +36,9 @@ Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
-Subject: [PATCH 08/27] docs: kvm: devices/arm-vgit-v3.txt to ReST
-Date:   Tue, 28 Jan 2020 15:00:09 +0100
-Message-Id: <20d4b1a9338c37ef127e3d1801c1d14f8353b9f0.1580219586.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 12/27] docs: kvm: convert devices/vcpu.txt to ReST
+Date:   Tue, 28 Jan 2020 15:00:13 +0100
+Message-Id: <10cb8731b167ee8f0bbec245a9f89af3842bc279.1580219586.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <cover.1580219586.git.mchehab+huawei@kernel.org>
 References: <cover.1580219586.git.mchehab+huawei@kernel.org>
@@ -50,279 +50,229 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 - Use title markups;
-- change indent to match ReST syntax;
-- use proper table markups;
-- use literal block markups.
+- adjust indentation and add blank lines as needed;
+- adjust tables to match ReST accepted formats;
+- use :field: markups;
+- mark code blocks as such.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- .../{arm-vgic-v3.txt => arm-vgic-v3.rst}      | 130 +++++++++++-------
- Documentation/virt/kvm/devices/index.rst      |   1 +
- 2 files changed, 85 insertions(+), 46 deletions(-)
- rename Documentation/virt/kvm/devices/{arm-vgic-v3.txt => arm-vgic-v3.rst} (77%)
+ Documentation/virt/kvm/devices/index.rst |   1 +
+ Documentation/virt/kvm/devices/vcpu.rst  | 112 +++++++++++++++++++++++
+ Documentation/virt/kvm/devices/vcpu.txt  |  76 ---------------
+ 3 files changed, 113 insertions(+), 76 deletions(-)
+ create mode 100644 Documentation/virt/kvm/devices/vcpu.rst
+ delete mode 100644 Documentation/virt/kvm/devices/vcpu.txt
 
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.txt b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-similarity index 77%
-rename from Documentation/virt/kvm/devices/arm-vgic-v3.txt
-rename to Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index ff290b43c8e5..1a64644d1a43 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.txt
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -1,9 +1,10 @@
-+==============================================================
- ARM Virtual Generic Interrupt Controller v3 and later (VGICv3)
- ==============================================================
- 
- 
- Device types supported:
--  KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
-+  - KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
- 
- Only one VGIC instance may be instantiated through this API.  The created VGIC
- will act as the VM interrupt controller, requiring emulated user-space devices
-@@ -15,7 +16,8 @@ Creating a guest GICv3 device requires a host GICv3 as well.
- 
- Groups:
-   KVM_DEV_ARM_VGIC_GRP_ADDR
--  Attributes:
-+   Attributes:
-+
-     KVM_VGIC_V3_ADDR_TYPE_DIST (rw, 64-bit)
-       Base address in the guest physical address space of the GICv3 distributor
-       register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-@@ -29,21 +31,25 @@ Groups:
-       This address needs to be 64K aligned.
- 
-     KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
--      The attribute data pointed to by kvm_device_attr.addr is a __u64 value:
--      bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
--      values:   |     count      |       base      |  flags   | index
-+      The attribute data pointed to by kvm_device_attr.addr is a __u64 value::
-+
-+        bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
-+        values:   |     count      |       base      |  flags   | index
-+
-       - index encodes the unique redistributor region index
-       - flags: reserved for future use, currently 0
-       - base field encodes bits [51:16] of the guest physical base address
-         of the first redistributor in the region.
-       - count encodes the number of redistributors in the region. Must be
-         greater than 0.
-+
-       There are two 64K pages for each redistributor in the region and
-       redistributors are laid out contiguously within the region. Regions
-       are filled with redistributors in the index order. The sum of all
-       region count fields must be greater than or equal to the number of
-       VCPUs. Redistributor regions must be registered in the incremental
-       index order, starting from index 0.
-+
-       The characteristics of a specific redistributor region can be read
-       by presetting the index field in the attr data.
-       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-@@ -52,23 +58,27 @@ Groups:
-   KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attributes.
- 
-   Errors:
--    -E2BIG:  Address outside of addressable IPA range
--    -EINVAL: Incorrectly aligned address, bad redistributor region
-+
-+    =======  =============================================================
-+    -E2BIG   Address outside of addressable IPA range
-+    -EINVAL  Incorrectly aligned address, bad redistributor region
-              count/index, mixed redistributor region attribute usage
--    -EEXIST: Address already configured
--    -ENOENT: Attempt to read the characteristics of a non existing
-+    -EEXIST  Address already configured
-+    -ENOENT  Attempt to read the characteristics of a non existing
-              redistributor region
--    -ENXIO:  The group or attribute is unknown/unsupported for this device
-+    -ENXIO   The group or attribute is unknown/unsupported for this device
-              or hardware support is missing.
--    -EFAULT: Invalid user pointer for attr->addr.
-+    -EFAULT  Invalid user pointer for attr->addr.
-+    =======  =============================================================
- 
- 
--  KVM_DEV_ARM_VGIC_GRP_DIST_REGS
--  KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
--  Attributes:
--    The attr field of kvm_device_attr encodes two values:
--    bits:     | 63   ....  32  |  31   ....    0 |
--    values:   |      mpidr     |      offset     |
-+  KVM_DEV_ARM_VGIC_GRP_DIST_REGS, KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
-+   Attributes:
-+
-+    The attr field of kvm_device_attr encodes two values::
-+
-+      bits:     | 63   ....  32  |  31   ....    0 |
-+      values:   |      mpidr     |      offset     |
- 
-     All distributor regs are (rw, 32-bit) and kvm_device_attr.addr points to a
-     __u32 value.  64-bit registers must be accessed by separately accessing the
-@@ -93,7 +103,8 @@ Groups:
-     redistributor is accessed.  The mpidr is ignored for the distributor.
- 
-     The mpidr encoding is based on the affinity information in the
--    architecture defined MPIDR, and the field is encoded as follows:
-+    architecture defined MPIDR, and the field is encoded as follows::
-+
-       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
- 
-@@ -148,24 +159,30 @@ Groups:
-     ignored.
- 
-   Errors:
--    -ENXIO: Getting or setting this register is not yet supported
--    -EBUSY: One or more VCPUs are running
-+
-+    ======  =====================================================
-+    -ENXIO  Getting or setting this register is not yet supported
-+    -EBUSY  One or more VCPUs are running
-+    ======  =====================================================
- 
- 
-   KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
--  Attributes:
--    The attr field of kvm_device_attr encodes two values:
--    bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
--    values:   |         mpidr         |      RES     |    instr    |
-+   Attributes:
-+
-+    The attr field of kvm_device_attr encodes two values::
-+
-+      bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
-+      values:   |         mpidr         |      RES     |    instr    |
- 
-     The mpidr field encodes the CPU ID based on the affinity information in the
--    architecture defined MPIDR, and the field is encoded as follows:
-+    architecture defined MPIDR, and the field is encoded as follows::
-+
-       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
- 
-     The instr field encodes the system register to access based on the fields
-     defined in the A64 instruction set encoding for system register access
--    (RES means the bits are reserved for future use and should be zero):
-+    (RES means the bits are reserved for future use and should be zero)::
- 
-       | 15 ... 14 | 13 ... 11 | 10 ... 7 | 6 ... 3 | 2 ... 0 |
-       |   Op 0    |    Op1    |    CRn   |   CRm   |   Op2   |
-@@ -178,26 +195,35 @@ Groups:
- 
-     CPU interface registers access is not implemented for AArch32 mode.
-     Error -ENXIO is returned when accessed in AArch32 mode.
-+
-   Errors:
--    -ENXIO: Getting or setting this register is not yet supported
--    -EBUSY: VCPU is running
--    -EINVAL: Invalid mpidr or register value supplied
-+
-+    =======  =====================================================
-+    -ENXIO   Getting or setting this register is not yet supported
-+    -EBUSY   VCPU is running
-+    -EINVAL  Invalid mpidr or register value supplied
-+    =======  =====================================================
- 
- 
-   KVM_DEV_ARM_VGIC_GRP_NR_IRQS
--  Attributes:
-+   Attributes:
-+
-     A value describing the number of interrupts (SGI, PPI and SPI) for
-     this GIC instance, ranging from 64 to 1024, in increments of 32.
- 
-     kvm_device_attr.addr points to a __u32 value.
- 
-   Errors:
--    -EINVAL: Value set is out of the expected range
--    -EBUSY: Value has already be set.
-+
-+    =======  ======================================
-+    -EINVAL  Value set is out of the expected range
-+    -EBUSY   Value has already be set.
-+    =======  ======================================
- 
- 
-   KVM_DEV_ARM_VGIC_GRP_CTRL
--  Attributes:
-+   Attributes:
-+
-     KVM_DEV_ARM_VGIC_CTRL_INIT
-       request the initialization of the VGIC, no additional parameter in
-       kvm_device_attr.addr.
-@@ -205,20 +231,26 @@ Groups:
-       save all LPI pending bits into guest RAM pending tables.
- 
-       The first kB of the pending table is not altered by this operation.
-+
-   Errors:
--    -ENXIO: VGIC not properly configured as required prior to calling
--     this attribute
--    -ENODEV: no online VCPU
--    -ENOMEM: memory shortage when allocating vgic internal data
--    -EFAULT: Invalid guest ram access
--    -EBUSY:  One or more VCPUS are running
-+
-+    =======  ========================================================
-+    -ENXIO   VGIC not properly configured as required prior to calling
-+             this attribute
-+    -ENODEV  no online VCPU
-+    -ENOMEM  memory shortage when allocating vgic internal data
-+    -EFAULT  Invalid guest ram access
-+    -EBUSY   One or more VCPUS are running
-+    =======  ========================================================
- 
- 
-   KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
--  Attributes:
--    The attr field of kvm_device_attr encodes the following values:
--    bits:     | 63      ....       32 | 31   ....    10 | 9  ....  0 |
--    values:   |         mpidr         |      info       |   vINTID   |
-+   Attributes:
-+
-+    The attr field of kvm_device_attr encodes the following values::
-+
-+      bits:     | 63      ....       32 | 31   ....    10 | 9  ....  0 |
-+      values:   |         mpidr         |      info       |   vINTID   |
- 
-     The vINTID specifies which set of IRQs is reported on.
- 
-@@ -228,6 +260,7 @@ Groups:
-       VGIC_LEVEL_INFO_LINE_LEVEL:
- 	Get/Set the input level of the IRQ line for a set of 32 contiguously
- 	numbered interrupts.
-+
- 	vINTID must be a multiple of 32.
- 
- 	kvm_device_attr.addr points to a __u32 value which will contain a
-@@ -243,9 +276,14 @@ Groups:
-     reported with the same value regardless of the mpidr specified.
- 
-     The mpidr field encodes the CPU ID based on the affinity information in the
--    architecture defined MPIDR, and the field is encoded as follows:
-+    architecture defined MPIDR, and the field is encoded as follows::
-+
-       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
-+
-   Errors:
--    -EINVAL: vINTID is not multiple of 32 or
--     info field is not VGIC_LEVEL_INFO_LINE_LEVEL
-+
-+    =======  =============================================
-+    -EINVAL  vINTID is not multiple of 32 or info field is
-+	     not VGIC_LEVEL_INFO_LINE_LEVEL
-+    =======  =============================================
 diff --git a/Documentation/virt/kvm/devices/index.rst b/Documentation/virt/kvm/devices/index.rst
-index 2aad8d426097..80c1e0e225f4 100644
+index e6caccc36623..5a61838f0e61 100644
 --- a/Documentation/virt/kvm/devices/index.rst
 +++ b/Documentation/virt/kvm/devices/index.rst
-@@ -8,3 +8,4 @@ Devices
-    :maxdepth: 2
- 
-    arm-vgic-its
-+   arm-vgic-v3
+@@ -12,3 +12,4 @@ Devices
+    arm-vgic-v3
+    mpic
+    s390_flic
++   vcpu
+diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+new file mode 100644
+index 000000000000..1270fd7f2cff
+--- /dev/null
++++ b/Documentation/virt/kvm/devices/vcpu.rst
+@@ -0,0 +1,112 @@
++======================
++Generic vcpu interface
++======================
++
++The virtual cpu "device" also accepts the ioctls KVM_SET_DEVICE_ATTR,
++KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
++kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
++
++The groups and attributes per virtual cpu, if any, are architecture specific.
++
++1. GROUP: KVM_ARM_VCPU_PMU_V3_CTRL
++==================================
++
++:Architectures: ARM64
++
++1.1. ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_IRQ
++---------------------------------------
++
++:Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
++	     pointer to an int
++
++Returns:
++
++	 =======  ========================================================
++	 -EBUSY   The PMU overflow interrupt is already set
++	 -ENXIO   The overflow interrupt not set when attempting to get it
++	 -ENODEV  PMUv3 not supported
++	 -EINVAL  Invalid PMU overflow interrupt number supplied or
++		  trying to set the IRQ number without using an in-kernel
++		  irqchip.
++	 =======  ========================================================
++
++A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
++number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
++type must be same for each vcpu. As a PPI, the interrupt number is the same for
++all vcpus, while as an SPI it must be a separate number per vcpu.
++
++1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
++---------------------------------------
++
++:Parameters: no additional parameter in kvm_device_attr.addr
++
++Returns:
++
++	 =======  ======================================================
++	 -ENODEV  PMUv3 not supported or GIC not initialized
++	 -ENXIO   PMUv3 not properly configured or in-kernel irqchip not
++		  configured as required prior to calling this attribute
++	 -EBUSY   PMUv3 already initialized
++	 =======  ======================================================
++
++Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
++virtual GIC implementation, this must be done after initializing the in-kernel
++irqchip.
++
++
++2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
++=================================
++
++:Architectures: ARM,ARM64
++
++2.1. ATTRIBUTES: KVM_ARM_VCPU_TIMER_IRQ_VTIMER, KVM_ARM_VCPU_TIMER_IRQ_PTIMER
++-----------------------------------------------------------------------------
++
++:Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
++	     pointer to an int
++
++Returns:
++
++	 =======  =================================
++	 -EINVAL  Invalid timer interrupt number
++	 -EBUSY   One or more VCPUs has already run
++	 =======  =================================
++
++A value describing the architected timer interrupt number when connected to an
++in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  Setting the
++attribute overrides the default values (see below).
++
++=============================  ==========================================
++KVM_ARM_VCPU_TIMER_IRQ_VTIMER  The EL1 virtual timer intid (default: 27)
++KVM_ARM_VCPU_TIMER_IRQ_PTIMER  The EL1 physical timer intid (default: 30)
++=============================  ==========================================
++
++Setting the same PPI for different timers will prevent the VCPUs from running.
++Setting the interrupt number on a VCPU configures all VCPUs created at that
++time to use the number provided for a given timer, overwriting any previously
++configured values on other VCPUs.  Userspace should configure the interrupt
++numbers on at least one VCPU after creating all VCPUs and before running any
++VCPUs.
++
++3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
++==================================
++
++:Architectures: ARM64
++
++3.1 ATTRIBUTE: KVM_ARM_VCPU_PVTIME_IPA
++--------------------------------------
++
++:Parameters: 64-bit base address
++
++Returns:
++
++	 =======  ======================================
++	 -ENXIO   Stolen time not implemented
++	 -EEXIST  Base address already set for this VCPU
++	 -EINVAL  Base address not 64 byte aligned
++	 =======  ======================================
++
++Specifies the base address of the stolen time structure for this VCPU. The
++base address must be 64 byte aligned and exist within a valid guest memory
++region. See Documentation/virt/kvm/arm/pvtime.txt for more information
++including the layout of the stolen time structure.
+diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
+deleted file mode 100644
+index 6f3bd64a05b0..000000000000
+--- a/Documentation/virt/kvm/devices/vcpu.txt
++++ /dev/null
+@@ -1,76 +0,0 @@
+-Generic vcpu interface
+-====================================
+-
+-The virtual cpu "device" also accepts the ioctls KVM_SET_DEVICE_ATTR,
+-KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
+-kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
+-
+-The groups and attributes per virtual cpu, if any, are architecture specific.
+-
+-1. GROUP: KVM_ARM_VCPU_PMU_V3_CTRL
+-Architectures: ARM64
+-
+-1.1. ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_IRQ
+-Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
+-            pointer to an int
+-Returns: -EBUSY: The PMU overflow interrupt is already set
+-         -ENXIO: The overflow interrupt not set when attempting to get it
+-         -ENODEV: PMUv3 not supported
+-         -EINVAL: Invalid PMU overflow interrupt number supplied or
+-                  trying to set the IRQ number without using an in-kernel
+-                  irqchip.
+-
+-A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
+-number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
+-type must be same for each vcpu. As a PPI, the interrupt number is the same for
+-all vcpus, while as an SPI it must be a separate number per vcpu.
+-
+-1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
+-Parameters: no additional parameter in kvm_device_attr.addr
+-Returns: -ENODEV: PMUv3 not supported or GIC not initialized
+-         -ENXIO: PMUv3 not properly configured or in-kernel irqchip not
+-                 configured as required prior to calling this attribute
+-         -EBUSY: PMUv3 already initialized
+-
+-Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
+-virtual GIC implementation, this must be done after initializing the in-kernel
+-irqchip.
+-
+-
+-2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+-Architectures: ARM,ARM64
+-
+-2.1. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_VTIMER
+-2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_IRQ_PTIMER
+-Parameters: in kvm_device_attr.addr the address for the timer interrupt is a
+-            pointer to an int
+-Returns: -EINVAL: Invalid timer interrupt number
+-         -EBUSY:  One or more VCPUs has already run
+-
+-A value describing the architected timer interrupt number when connected to an
+-in-kernel virtual GIC.  These must be a PPI (16 <= intid < 32).  Setting the
+-attribute overrides the default values (see below).
+-
+-KVM_ARM_VCPU_TIMER_IRQ_VTIMER: The EL1 virtual timer intid (default: 27)
+-KVM_ARM_VCPU_TIMER_IRQ_PTIMER: The EL1 physical timer intid (default: 30)
+-
+-Setting the same PPI for different timers will prevent the VCPUs from running.
+-Setting the interrupt number on a VCPU configures all VCPUs created at that
+-time to use the number provided for a given timer, overwriting any previously
+-configured values on other VCPUs.  Userspace should configure the interrupt
+-numbers on at least one VCPU after creating all VCPUs and before running any
+-VCPUs.
+-
+-3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
+-Architectures: ARM64
+-
+-3.1 ATTRIBUTE: KVM_ARM_VCPU_PVTIME_IPA
+-Parameters: 64-bit base address
+-Returns: -ENXIO:  Stolen time not implemented
+-         -EEXIST: Base address already set for this VCPU
+-         -EINVAL: Base address not 64 byte aligned
+-
+-Specifies the base address of the stolen time structure for this VCPU. The
+-base address must be 64 byte aligned and exist within a valid guest memory
+-region. See Documentation/virt/kvm/arm/pvtime.txt for more information
+-including the layout of the stolen time structure.
 -- 
 2.24.1
 
