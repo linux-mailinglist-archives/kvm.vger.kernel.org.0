@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40D5D14BC1F
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:51:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA75914BC2D
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:51:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbgA1OvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 09:51:05 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:58526 "EHLO
+        id S1727491AbgA1OvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 09:51:19 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:58446 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726571AbgA1N6p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1726540AbgA1N6p (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 28 Jan 2020 08:58:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
@@ -17,18 +17,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=47knvKP2hkOqYj0lWrn/u5a+ztvae81C4pMTyKp2WE4=; b=QJYiTjxtAAmbkWqTWQP9EO54ep
-        SzEiM1P8/e4rE+P5+fd70bP1rRZ2etVqtt66ktAqUaGZbSpxf6oV1uaQDAZzY8YdHnx6lRQi/qbh6
-        TOppg8ivj7BoW8w4sgXh3JK9EV3AOSUYy5Bi0xYQxwrRIPhz692EgUw//gKc6c8EiDNvYbS4ahJp0
-        109vE39X7QnBAtWmyEc7lgPnZ7axL4H13oEVpwvZYKpmMGdmqVa6jWj0WayQynXMNzqdyCTF4zv0Y
-        HrqkrP/yg1XfpAKSqnfhRNWCx+ZdqmZyZUuEt5Bjn+Z8+WjA1F8IsAbN90lRN2lIhWtbjofC4lF9j
-        pRFmG9tw==;
+        bh=BCH2exYpaTXxc+kQslPFBsbgIXC7remIkotVPujXUxc=; b=OyxUASrievcKblYUzjYi7v48TW
+        K/1rh+dFD1DkcrTujxzgt22qn/CrwWjrXzJJRK57Nmh89HsbC2WyYS0FPuhTQieXFArDUr1SpqhqO
+        jL6xBYwdGbO9sQWZIJpo7RDIMrC92QBlZVPxg+l1IzOTG3iiJA10LF9Guye3/7tyQJVeIVczQFysE
+        PKTxO4uqRIDz8Rfo15mqR6rA8RGKES9XM3rLZUcB5a6VBRcES2Yib1lpGA12f1hE/qkPXOQPI70qF
+        scQyeeesvv1ZZgP6Xn0FOCLSxaKXexhPgjp4zuEgk+TRtbYCtD1PdO1NCt8Qey87HZmfTdKPVBcOv
+        etPR0Cxg==;
 Received: from [177.41.103.99] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iwRO7-0006JN-Mh; Tue, 28 Jan 2020 13:58:45 +0000
+        id 1iwRO6-0006Hs-N9; Tue, 28 Jan 2020 13:58:42 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iwRNq-001BJh-Bf; Tue, 28 Jan 2020 14:58:26 +0100
+        id 1iwRNq-001BJl-Cd; Tue, 28 Jan 2020 14:58:26 +0100
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Media Mailing List <linux-media@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
@@ -36,9 +36,9 @@ Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
-Subject: [PATCH 08/27] docs: kvm: devices/arm-vgit-v3.txt to ReST
-Date:   Tue, 28 Jan 2020 14:58:04 +0100
-Message-Id: <20d4b1a9338c37ef127e3d1801c1d14f8353b9f0.1580219586.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 09/27] docs: kvm: convert devices/arm-vgit.txt to ReST
+Date:   Tue, 28 Jan 2020 14:58:05 +0100
+Message-Id: <f54d732903825b889626cfff48384c9b293a5b86.1580219586.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <cover.1580219586.git.mchehab+huawei@kernel.org>
 References: <cover.1580219586.git.mchehab+huawei@kernel.org>
@@ -56,174 +56,118 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- .../{arm-vgic-v3.txt => arm-vgic-v3.rst}      | 130 +++++++++++-------
- Documentation/virt/kvm/devices/index.rst      |   1 +
- 2 files changed, 85 insertions(+), 46 deletions(-)
- rename Documentation/virt/kvm/devices/{arm-vgic-v3.txt => arm-vgic-v3.rst} (77%)
+ .../devices/{arm-vgic.txt => arm-vgic.rst}    | 87 ++++++++++++-------
+ Documentation/virt/kvm/devices/index.rst      |  1 +
+ 2 files changed, 58 insertions(+), 30 deletions(-)
+ rename Documentation/virt/kvm/devices/{arm-vgic.txt => arm-vgic.rst} (66%)
 
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.txt b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-similarity index 77%
-rename from Documentation/virt/kvm/devices/arm-vgic-v3.txt
-rename to Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index ff290b43c8e5..1a64644d1a43 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.txt
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -1,9 +1,10 @@
-+==============================================================
- ARM Virtual Generic Interrupt Controller v3 and later (VGICv3)
- ==============================================================
- 
+diff --git a/Documentation/virt/kvm/devices/arm-vgic.txt b/Documentation/virt/kvm/devices/arm-vgic.rst
+similarity index 66%
+rename from Documentation/virt/kvm/devices/arm-vgic.txt
+rename to Documentation/virt/kvm/devices/arm-vgic.rst
+index 97b6518148f8..882a7ecf317e 100644
+--- a/Documentation/virt/kvm/devices/arm-vgic.txt
++++ b/Documentation/virt/kvm/devices/arm-vgic.rst
+@@ -1,8 +1,10 @@
++==================================================
+ ARM Virtual Generic Interrupt Controller v2 (VGIC)
+ ==================================================
  
  Device types supported:
--  KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
-+  - KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
+-  KVM_DEV_TYPE_ARM_VGIC_V2     ARM Generic Interrupt Controller v2.0
++
++  - KVM_DEV_TYPE_ARM_VGIC_V2     ARM Generic Interrupt Controller v2.0
  
- Only one VGIC instance may be instantiated through this API.  The created VGIC
- will act as the VM interrupt controller, requiring emulated user-space devices
-@@ -15,7 +16,8 @@ Creating a guest GICv3 device requires a host GICv3 as well.
+ Only one VGIC instance may be instantiated through either this API or the
+ legacy KVM_CREATE_IRQCHIP API.  The created VGIC will act as the VM interrupt
+@@ -17,7 +19,8 @@ create both a GICv3 and GICv2 device on the same VM.
  
  Groups:
    KVM_DEV_ARM_VGIC_GRP_ADDR
 -  Attributes:
 +   Attributes:
 +
-     KVM_VGIC_V3_ADDR_TYPE_DIST (rw, 64-bit)
-       Base address in the guest physical address space of the GICv3 distributor
-       register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-@@ -29,21 +31,25 @@ Groups:
-       This address needs to be 64K aligned.
- 
-     KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
--      The attribute data pointed to by kvm_device_attr.addr is a __u64 value:
--      bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
--      values:   |     count      |       base      |  flags   | index
-+      The attribute data pointed to by kvm_device_attr.addr is a __u64 value::
+     KVM_VGIC_V2_ADDR_TYPE_DIST (rw, 64-bit)
+       Base address in the guest physical address space of the GIC distributor
+       register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V2.
+@@ -27,19 +30,25 @@ Groups:
+       Base address in the guest physical address space of the GIC virtual cpu
+       interface register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V2.
+       This address needs to be 4K aligned and the region covers 4 KByte.
 +
-+        bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
-+        values:   |     count      |       base      |  flags   | index
-+
-       - index encodes the unique redistributor region index
-       - flags: reserved for future use, currently 0
-       - base field encodes bits [51:16] of the guest physical base address
-         of the first redistributor in the region.
-       - count encodes the number of redistributors in the region. Must be
-         greater than 0.
-+
-       There are two 64K pages for each redistributor in the region and
-       redistributors are laid out contiguously within the region. Regions
-       are filled with redistributors in the index order. The sum of all
-       region count fields must be greater than or equal to the number of
-       VCPUs. Redistributor regions must be registered in the incremental
-       index order, starting from index 0.
-+
-       The characteristics of a specific redistributor region can be read
-       by presetting the index field in the attr data.
-       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-@@ -52,23 +58,27 @@ Groups:
-   KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attributes.
- 
    Errors:
 -    -E2BIG:  Address outside of addressable IPA range
--    -EINVAL: Incorrectly aligned address, bad redistributor region
+-    -EINVAL: Incorrectly aligned address
+-    -EEXIST: Address already configured
+-    -ENXIO:  The group or attribute is unknown/unsupported for this device
 +
 +    =======  =============================================================
 +    -E2BIG   Address outside of addressable IPA range
-+    -EINVAL  Incorrectly aligned address, bad redistributor region
-              count/index, mixed redistributor region attribute usage
--    -EEXIST: Address already configured
--    -ENOENT: Attempt to read the characteristics of a non existing
++    -EINVAL  Incorrectly aligned address
 +    -EEXIST  Address already configured
-+    -ENOENT  Attempt to read the characteristics of a non existing
-              redistributor region
--    -ENXIO:  The group or attribute is unknown/unsupported for this device
 +    -ENXIO   The group or attribute is unknown/unsupported for this device
               or hardware support is missing.
 -    -EFAULT: Invalid user pointer for attr->addr.
 +    -EFAULT  Invalid user pointer for attr->addr.
 +    =======  =============================================================
  
- 
--  KVM_DEV_ARM_VGIC_GRP_DIST_REGS
--  KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
+   KVM_DEV_ARM_VGIC_GRP_DIST_REGS
 -  Attributes:
 -    The attr field of kvm_device_attr encodes two values:
--    bits:     | 63   ....  32  |  31   ....    0 |
--    values:   |      mpidr     |      offset     |
-+  KVM_DEV_ARM_VGIC_GRP_DIST_REGS, KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
+-    bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
+-    values:   |    reserved   | vcpu_index |      offset     |
 +   Attributes:
 +
 +    The attr field of kvm_device_attr encodes two values::
 +
-+      bits:     | 63   ....  32  |  31   ....    0 |
-+      values:   |      mpidr     |      offset     |
++      bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
++      values:   |    reserved   | vcpu_index |      offset     |
  
-     All distributor regs are (rw, 32-bit) and kvm_device_attr.addr points to a
-     __u32 value.  64-bit registers must be accessed by separately accessing the
-@@ -93,7 +103,8 @@ Groups:
-     redistributor is accessed.  The mpidr is ignored for the distributor.
+     All distributor regs are (rw, 32-bit)
  
-     The mpidr encoding is based on the affinity information in the
--    architecture defined MPIDR, and the field is encoded as follows:
-+    architecture defined MPIDR, and the field is encoded as follows::
+@@ -58,16 +67,22 @@ Groups:
+     KVM_DEV_ARM_VGIC_GRP_DIST_REGS and KVM_DEV_ARM_VGIC_GRP_CPU_REGS) to ensure
+     the expected behavior. Unless GICD_IIDR has been set from userspace, writes
+     to the interrupt group registers (GICD_IGROUPR) are ignored.
 +
-       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
+   Errors:
+-    -ENXIO: Getting or setting this register is not yet supported
+-    -EBUSY: One or more VCPUs are running
+-    -EINVAL: Invalid vcpu_index supplied
++
++    =======  =====================================================
++    -ENXIO   Getting or setting this register is not yet supported
++    -EBUSY   One or more VCPUs are running
++    -EINVAL  Invalid vcpu_index supplied
++    =======  =====================================================
  
-@@ -148,24 +159,30 @@ Groups:
-     ignored.
+   KVM_DEV_ARM_VGIC_GRP_CPU_REGS
+-  Attributes:
+-    The attr field of kvm_device_attr encodes two values:
+-    bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
+-    values:   |    reserved   | vcpu_index |      offset     |
++   Attributes:
++
++    The attr field of kvm_device_attr encodes two values::
++
++      bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
++      values:   |    reserved   | vcpu_index |      offset     |
+ 
+     All CPU interface regs are (rw, 32-bit)
+ 
+@@ -101,27 +116,39 @@ Groups:
+     value left by 3 places to obtain the actual priority mask level.
  
    Errors:
 -    -ENXIO: Getting or setting this register is not yet supported
 -    -EBUSY: One or more VCPUs are running
-+
-+    ======  =====================================================
-+    -ENXIO  Getting or setting this register is not yet supported
-+    -EBUSY  One or more VCPUs are running
-+    ======  =====================================================
- 
- 
-   KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
--  Attributes:
--    The attr field of kvm_device_attr encodes two values:
--    bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
--    values:   |         mpidr         |      RES     |    instr    |
-+   Attributes:
-+
-+    The attr field of kvm_device_attr encodes two values::
-+
-+      bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
-+      values:   |         mpidr         |      RES     |    instr    |
- 
-     The mpidr field encodes the CPU ID based on the affinity information in the
--    architecture defined MPIDR, and the field is encoded as follows:
-+    architecture defined MPIDR, and the field is encoded as follows::
-+
-       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
- 
-     The instr field encodes the system register to access based on the fields
-     defined in the A64 instruction set encoding for system register access
--    (RES means the bits are reserved for future use and should be zero):
-+    (RES means the bits are reserved for future use and should be zero)::
- 
-       | 15 ... 14 | 13 ... 11 | 10 ... 7 | 6 ... 3 | 2 ... 0 |
-       |   Op 0    |    Op1    |    CRn   |   CRm   |   Op2   |
-@@ -178,26 +195,35 @@ Groups:
- 
-     CPU interface registers access is not implemented for AArch32 mode.
-     Error -ENXIO is returned when accessed in AArch32 mode.
-+
-   Errors:
--    -ENXIO: Getting or setting this register is not yet supported
--    -EBUSY: VCPU is running
--    -EINVAL: Invalid mpidr or register value supplied
+-    -EINVAL: Invalid vcpu_index supplied
 +
 +    =======  =====================================================
 +    -ENXIO   Getting or setting this register is not yet supported
-+    -EBUSY   VCPU is running
-+    -EINVAL  Invalid mpidr or register value supplied
++    -EBUSY   One or more VCPUs are running
++    -EINVAL  Invalid vcpu_index supplied
 +    =======  =====================================================
- 
  
    KVM_DEV_ARM_VGIC_GRP_NR_IRQS
 -  Attributes:
@@ -232,97 +176,47 @@ index ff290b43c8e5..1a64644d1a43 100644
      A value describing the number of interrupts (SGI, PPI and SPI) for
      this GIC instance, ranging from 64 to 1024, in increments of 32.
  
-     kvm_device_attr.addr points to a __u32 value.
- 
    Errors:
 -    -EINVAL: Value set is out of the expected range
--    -EBUSY: Value has already be set.
+-    -EBUSY: Value has already be set, or GIC has already been initialized
+-            with default values.
 +
-+    =======  ======================================
++    =======  =============================================================
 +    -EINVAL  Value set is out of the expected range
-+    -EBUSY   Value has already be set.
-+    =======  ======================================
- 
++    -EBUSY   Value has already be set, or GIC has already been initialized
++             with default values.
++    =======  =============================================================
  
    KVM_DEV_ARM_VGIC_GRP_CTRL
 -  Attributes:
 +   Attributes:
 +
      KVM_DEV_ARM_VGIC_CTRL_INIT
-       request the initialization of the VGIC, no additional parameter in
-       kvm_device_attr.addr.
-@@ -205,20 +231,26 @@ Groups:
-       save all LPI pending bits into guest RAM pending tables.
- 
-       The first kB of the pending table is not altered by this operation.
+       request the initialization of the VGIC or ITS, no additional parameter
+       in kvm_device_attr.addr.
 +
    Errors:
 -    -ENXIO: VGIC not properly configured as required prior to calling
 -     this attribute
 -    -ENODEV: no online VCPU
 -    -ENOMEM: memory shortage when allocating vgic internal data
--    -EFAULT: Invalid guest ram access
--    -EBUSY:  One or more VCPUS are running
 +
-+    =======  ========================================================
++    =======  =========================================================
 +    -ENXIO   VGIC not properly configured as required prior to calling
 +             this attribute
 +    -ENODEV  no online VCPU
 +    -ENOMEM  memory shortage when allocating vgic internal data
-+    -EFAULT  Invalid guest ram access
-+    -EBUSY   One or more VCPUS are running
-+    =======  ========================================================
- 
- 
-   KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
--  Attributes:
--    The attr field of kvm_device_attr encodes the following values:
--    bits:     | 63      ....       32 | 31   ....    10 | 9  ....  0 |
--    values:   |         mpidr         |      info       |   vINTID   |
-+   Attributes:
-+
-+    The attr field of kvm_device_attr encodes the following values::
-+
-+      bits:     | 63      ....       32 | 31   ....    10 | 9  ....  0 |
-+      values:   |         mpidr         |      info       |   vINTID   |
- 
-     The vINTID specifies which set of IRQs is reported on.
- 
-@@ -228,6 +260,7 @@ Groups:
-       VGIC_LEVEL_INFO_LINE_LEVEL:
- 	Get/Set the input level of the IRQ line for a set of 32 contiguously
- 	numbered interrupts.
-+
- 	vINTID must be a multiple of 32.
- 
- 	kvm_device_attr.addr points to a __u32 value which will contain a
-@@ -243,9 +276,14 @@ Groups:
-     reported with the same value regardless of the mpidr specified.
- 
-     The mpidr field encodes the CPU ID based on the affinity information in the
--    architecture defined MPIDR, and the field is encoded as follows:
-+    architecture defined MPIDR, and the field is encoded as follows::
-+
-       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
-+
-   Errors:
--    -EINVAL: vINTID is not multiple of 32 or
--     info field is not VGIC_LEVEL_INFO_LINE_LEVEL
-+
-+    =======  =============================================
-+    -EINVAL  vINTID is not multiple of 32 or info field is
-+	     not VGIC_LEVEL_INFO_LINE_LEVEL
-+    =======  =============================================
++    =======  =========================================================
 diff --git a/Documentation/virt/kvm/devices/index.rst b/Documentation/virt/kvm/devices/index.rst
-index 2aad8d426097..80c1e0e225f4 100644
+index 80c1e0e225f4..7eabce80c61e 100644
 --- a/Documentation/virt/kvm/devices/index.rst
 +++ b/Documentation/virt/kvm/devices/index.rst
-@@ -8,3 +8,4 @@ Devices
+@@ -8,4 +8,5 @@ Devices
     :maxdepth: 2
  
     arm-vgic-its
-+   arm-vgic-v3
++   arm-vgic
+    arm-vgic-v3
 -- 
 2.24.1
 
