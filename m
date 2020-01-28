@@ -2,48 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8012514B1B8
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 10:27:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FB6C14B1B9
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 10:27:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725919AbgA1J13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 04:27:29 -0500
-Received: from mail-yb1-f202.google.com ([209.85.219.202]:43644 "EHLO
-        mail-yb1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725271AbgA1J12 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 Jan 2020 04:27:28 -0500
-Received: by mail-yb1-f202.google.com with SMTP id g11so9672739ybc.10
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2020 01:27:28 -0800 (PST)
+        id S1725953AbgA1J1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 04:27:31 -0500
+Received: from mail-pj1-f73.google.com ([209.85.216.73]:44855 "EHLO
+        mail-pj1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725922AbgA1J1a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 Jan 2020 04:27:30 -0500
+Received: by mail-pj1-f73.google.com with SMTP id c31so1128595pje.9
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2020 01:27:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=1D2HqKC9xNZbgrwgnAL8n/SPKL7jL4ZkZkoq8tmp9b8=;
-        b=JDNWLBhBFWoJl6jiprEuB62OWWTC69IaEjDtsRF8/NeuXZ/Dxss6EZoBeC+L+C9U+x
-         lMczqXsg7XLlbPdDCme2pDMFv1UcsJiZ92eW4tJa/hdpX1PPTNzYb97GJBgelqVvv2f3
-         BN5uxg+st9AQplCR3XccdgVx7ZW0ysjAk5fFE1JWwNzOcwF3a3OtIW23enJckYoqrbo8
-         81/PfFHh0mM6+wTbXyCRnvE9jK5Ds0OYTm/XeK3Pdn+grDR7RXOlEzLwqD02ByER2jWV
-         JqGZp1GwBueV51DUjB3NAK2d2xUfaUcFSxAZNedRWWn5RSBRzkT+pSbUWlNCy/LmF6s5
-         HbsQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=nioYHgWtzuJX0bGGHSnAcIx7clPoYS+RyTzHFfHLiC0=;
+        b=k4wersvPQpScFKgypDDZhrTlz2Tiv91+qRRQMaNpNlAHjISZCuXpObMYK6G8w4xJ9U
+         77ZWAhVxTCXsoMsx6kkhPFBAQNLE5EyJcHJpTw8KlHyoSwZK9lNsLFOkpM0GgNuWlilC
+         DJbXzCjv+/ux8RyJP+p3CcVQXGcLwx6A7OFKG/du4GJehbgZkYahCD7vIiF/esJOO7s9
+         IbxIjkmqmuETjqHytNnsoxUHAqxYBiXrn/8mq//XMeqzl96BiWT5Ns8d7M150bNCzuOj
+         D8kVvv+azEBzZNX+xAnvTPGPCbB0p2qRp5sqrgFh+FyYCCNtzE4Eh9EvigzEk07zRWLV
+         +Fag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=1D2HqKC9xNZbgrwgnAL8n/SPKL7jL4ZkZkoq8tmp9b8=;
-        b=W56dUtJ62FA/PYv0fqwcZe/1tkfTSKULFxTCJqrGKGBchvIWRzMJefL8ItkqjXQm8E
-         GWy2Raa0SSK7b95S6iLzZbFkiq+TPSzYjZpH259IqCn9FqjQ3M28bOJR/Go6KOOuYZba
-         CVva0bFrdgtgsHEB08nGEPOdSdSbDdWQfDj4rsrFudmuKQWggAkHnDg5lAXg1tx0Rp7i
-         7P3YrA3MCMzbC74bBiLm5zQ9ieKdXE5YhiTdxd882rjg981XxjpzqlDw1rvMGN5OhcNl
-         rg4e7f8YVCrvnlUTpqL0+ZkqLC1ZOC7c8HqDYjD53S0CKZqJfBNU+yKFuYUrP/nat6xR
-         TtMQ==
-X-Gm-Message-State: APjAAAVbRTpBrkPchUaXisDPkUZdCOx/132HyvBQ/K4YndLGINGp4NXO
-        Rsad73ZZQZyWyu/hydJOo1jis4Dl9e/D2r3+9jASOZeG/96hjHBBak/XCEApaUSkWX3ydi29PL6
-        29epXePZ4tcLTwHB/iwOZlbQbSBOeeysz0ZODKDM4TBzOtmbof62N1Cgs4g==
-X-Google-Smtp-Source: APXvYqwRqeqGcIzZ8xLebgJnllx3kBwi/LiQU8PzrVDYXD1fiD8XhLCPgXdFIcmN3K+Y75RUgYm5+YDOFn8=
-X-Received: by 2002:a81:6d17:: with SMTP id i23mr16153448ywc.58.1580203647427;
- Tue, 28 Jan 2020 01:27:27 -0800 (PST)
-Date:   Tue, 28 Jan 2020 01:27:10 -0800
-Message-Id: <20200128092715.69429-1-oupton@google.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=nioYHgWtzuJX0bGGHSnAcIx7clPoYS+RyTzHFfHLiC0=;
+        b=qanlwMKinkAOKSphOQKrZ9QOnrx272CeIhnEFDSNH/cCx6wHqG5DvyyJYVAC8ppnVo
+         sN28GrKOdRow6tRyospkjgPEqL0dUfpi+Y9NQYFfJ7kyyIBDmANIOTcXnpE8p7eAqMXA
+         mFdCet8IyKEdeUyKO/jTssaCzvNBKImYUNZv6aHhC2Ps/NwaLyLcfIDGStAabKhJSPqP
+         i7wLmfM/A1ifqKGmtdkgPILlAMXOspLNPOvQ1g5GPdFYmMordLFjkN4YzAXjelMdwSJY
+         GG5ymOf7a8CXAz/HsnENzodO+QX89PQ0yKEc07qO9+A2VgnPuYvs8oPo3IrrqAl0Zjpf
+         LScw==
+X-Gm-Message-State: APjAAAW/fRhooOip+I3lgZFtf+tfIkxBThYl1r6pQVodLSK7wCw5dUmj
+        SLDyRiFflUQJEMc8YciHZOdpq8uJ+j8yxWQP7qjrtYcO7QyMSxxokk/Dyl8a+shtqySWiF4vWyW
+        NWTrtB04AA15FrzXUVixlR4WOMJO1HvUQcpyt+ygBf4y435pNFQ3T/z1SSA==
+X-Google-Smtp-Source: APXvYqy0cehjxUbWNumChAd1siL4XK+9M6zowjeV4zuou3ingY61ee2Z+Hjbqozv2qBQZ4wdtqm9RR46lmc=
+X-Received: by 2002:a63:78b:: with SMTP id 133mr23439750pgh.379.1580203649548;
+ Tue, 28 Jan 2020 01:27:29 -0800 (PST)
+Date:   Tue, 28 Jan 2020 01:27:11 -0800
+In-Reply-To: <20200128092715.69429-1-oupton@google.com>
+Message-Id: <20200128092715.69429-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20200128092715.69429-1-oupton@google.com>
 X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
-Subject: [PATCH v2 0/5] Handle monitor trap flag during instruction emulation
+Subject: [PATCH v2 1/5] KVM: x86: Mask off reserved bit from #DB exception payload
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -57,76 +61,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-v1: http://lore.kernel.org/r/20200113221053.22053-1-oupton@google.com
+KVM defines the #DB payload as compatible with the 'pending debug
+exceptions' field under VMX, not DR6. Mask off bit 12 when applying the
+payload to DR6, as it is reserved on DR6 but not the 'pending debug
+exceptions' field.
 
-v1 => v2:
- - Don't split the #DB delivery by vendors. Unconditionally injecting
-   #DB payloads into the 'pending debug exceptions' field will cause KVM
-   to get stuck in a loop. Per the SDM, when hardware injects an event
-   resulting from this field's value, it is checked against the
-   exception interception bitmap.
- - Address Sean's comments by injecting the VM-exit into L1 from
-   vmx_check_nested_events().
- - Added fix for nested INIT VM-exits + 'pending debug exceptions' field
-   as it was noticed in implementing v2.
- - Drop Peter + Jim's Reviewed-by tags, as the patch set has changed
-   since v1.
+Fixes: f10c729ff965 ("kvm: vmx: Defer setting of DR6 until #DB delivery")
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ arch/x86/kvm/x86.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-KVM already provides guests the ability to use the 'monitor trap flag'
-VM-execution control. Support for this flag is provided by the fact that
-KVM unconditionally forwards MTF VM-exits to the guest (if requested),
-as KVM doesn't utilize MTF. While this provides support during hardware
-instruction execution, it is insufficient for instruction emulation.
-
-Should L0 emulate an instruction on the behalf of L2, L0 should also
-synthesize an MTF VM-exit into L1, should control be set.
-
-The first patch corrects a nuanced difference between the definition of
-a #DB exception payload field and DR6 register. Mask off bit 12 which is
-defined in the 'pending debug exceptions' field when applying to DR6,
-since the payload field is said to be compatible with the aforementioned
-VMCS field.
-
-The second patch sets the 'pending debug exceptions' VMCS field when
-delivering an INIT signal VM-exit to L1, as described in the SDM. This
-patch also introduces helpers for setting the 'pending debug exceptions'
-VMCS field.
-
-The third patch massages KVM's handling of exception payloads with
-regard to API compatibility. Rather than immediately injecting the
-payload w/o opt-in, instead defer the payload + immediately inject
-before completing a KVM_GET_VCPU_EVENTS. This maintains API
-compatibility whilst correcting #DB behavior with regard to higher
-priority VM-exit events.
-
-Fourth patch introduces MTF implementation for emulated instructions.
-Identify if an MTF is due on an instruction boundary from
-kvm_vcpu_do_singlestep(), however only deliver this VM-exit from
-vmx_check_nested_events() to respect the relative prioritization to
-other VM-exits. Since this augments the nested state, introduce a new
-flag for (de)serialization.
-
-Last patch adds tests to kvm-unit-tests to assert the correctness of MTF
-under several conditions (concurrent #DB trap, #DB fault, etc). These
-tests pass under virtualization with this series as well as on
-bare-metal.
-
-Oliver Upton (4):
-  KVM: x86: Mask off reserved bit from #DB exception payload
-  KVM: nVMX: Handle pending #DB when injecting INIT VM-exit
-  KVM: x86: Deliver exception payload on KVM_GET_VCPU_EVENTS
-  KVM: nVMX: Emulate MTF when performing instruction emulation
-
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/include/uapi/asm/kvm.h |  1 +
- arch/x86/kvm/svm.c              |  1 +
- arch/x86/kvm/vmx/nested.c       | 60 ++++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/nested.h       |  5 +++
- arch/x86/kvm/vmx/vmx.c          | 22 ++++++++++++
- arch/x86/kvm/vmx/vmx.h          |  3 ++
- arch/x86/kvm/x86.c              | 52 +++++++++++++++++-----------
- 8 files changed, 125 insertions(+), 20 deletions(-)
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7e118883d8f1..7a341c0c978a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -437,6 +437,14 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu)
+ 		 * for #DB exceptions under VMX.
+ 		 */
+ 		vcpu->arch.dr6 ^= payload & DR6_RTM;
++
++		/*
++		 * The #DB payload is defined as compatible with the 'pending
++		 * debug exceptions' field under VMX, not DR6. While bit 12 is
++		 * defined in the 'pending debug exceptions' field (enabled
++		 * breakpoint), it is reserved and must be zero in DR6.
++		 */
++		vcpu->arch.dr6 &= ~BIT(12);
+ 		break;
+ 	case PF_VECTOR:
+ 		vcpu->arch.cr2 = payload;
 -- 
 2.25.0.341.g760bfbb309-goog
 
