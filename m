@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AEB514BBEE
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:51:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40D5D14BC1F
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2020 15:51:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726641AbgA1N6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Jan 2020 08:58:46 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:58502 "EHLO
+        id S1726939AbgA1OvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 Jan 2020 09:51:05 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:58526 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726565AbgA1N6p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1726571AbgA1N6p (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 28 Jan 2020 08:58:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
@@ -17,18 +17,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=cLewyjoNlj0NAqOJ/2/JgEHHKOKhNDS+TNzq9GjVM+s=; b=nTrKyZyOKvC9033xyphppKHFro
-        6XoM91ErVnMiyDNqsEV3YbJfSnI0s9lMV9yu7W9YXMRnfBpMJ0HpjuZ92qEcoxTH4BhmLe9akbhTb
-        9fJVqos2+peiG9R/dN67fqEBlGpzkpVwj/PlwqXLuW63ecbFt+7P71Y62UJbxR3v3GMIbUFfKMbDl
-        FI8dI2zz4Q740SNHIQhtx1HVlYCTLDR3HoSTdgP5QJsJ3L+KoxVxw2COra8fffNXNPzR9YNlL6ufE
-        sVnpgxaYYiP1yAtq0OrlMADnEyn1YcgfUrS2fIKBay5JOVP7p35XlDo9gG4pNDwlOVsirEy3r/PkM
-        K0kgXBUQ==;
+        bh=47knvKP2hkOqYj0lWrn/u5a+ztvae81C4pMTyKp2WE4=; b=QJYiTjxtAAmbkWqTWQP9EO54ep
+        SzEiM1P8/e4rE+P5+fd70bP1rRZ2etVqtt66ktAqUaGZbSpxf6oV1uaQDAZzY8YdHnx6lRQi/qbh6
+        TOppg8ivj7BoW8w4sgXh3JK9EV3AOSUYy5Bi0xYQxwrRIPhz692EgUw//gKc6c8EiDNvYbS4ahJp0
+        109vE39X7QnBAtWmyEc7lgPnZ7axL4H13oEVpwvZYKpmMGdmqVa6jWj0WayQynXMNzqdyCTF4zv0Y
+        HrqkrP/yg1XfpAKSqnfhRNWCx+ZdqmZyZUuEt5Bjn+Z8+WjA1F8IsAbN90lRN2lIhWtbjofC4lF9j
+        pRFmG9tw==;
 Received: from [177.41.103.99] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iwRO7-0006I6-U6; Tue, 28 Jan 2020 13:58:44 +0000
+        id 1iwRO7-0006JN-Mh; Tue, 28 Jan 2020 13:58:45 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iwRNq-001BJd-Af; Tue, 28 Jan 2020 14:58:26 +0100
+        id 1iwRNq-001BJh-Bf; Tue, 28 Jan 2020 14:58:26 +0100
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Media Mailing List <linux-media@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
@@ -36,9 +36,9 @@ Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
-Subject: [PATCH 07/27] docs: kvm: devices/arm-vgic-its.txt to ReST format
-Date:   Tue, 28 Jan 2020 14:58:03 +0100
-Message-Id: <5681dbc80e10388917107f3d0b33eb90e2e4b5a3.1580219586.git.mchehab+huawei@kernel.org>
+Subject: [PATCH 08/27] docs: kvm: devices/arm-vgit-v3.txt to ReST
+Date:   Tue, 28 Jan 2020 14:58:04 +0100
+Message-Id: <20d4b1a9338c37ef127e3d1801c1d14f8353b9f0.1580219586.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <cover.1580219586.git.mchehab+huawei@kernel.org>
 References: <cover.1580219586.git.mchehab+huawei@kernel.org>
@@ -49,247 +49,280 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-- Fix document title to match ReST format
-- Convert the table to be properly recognized
-- use proper markups for literal blocks
-- Some indentation fixes to match ReST
-
-While here, add an index for kvm devices.
+- Use title markups;
+- change indent to match ReST syntax;
+- use proper table markups;
+- use literal block markups.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- .../{arm-vgic-its.txt => arm-vgic-its.rst}    | 104 +++++++++++-------
- Documentation/virt/kvm/devices/index.rst      |  10 ++
- Documentation/virt/kvm/index.rst              |   1 +
- 3 files changed, 76 insertions(+), 39 deletions(-)
- rename Documentation/virt/kvm/devices/{arm-vgic-its.txt => arm-vgic-its.rst} (71%)
- create mode 100644 Documentation/virt/kvm/devices/index.rst
+ .../{arm-vgic-v3.txt => arm-vgic-v3.rst}      | 130 +++++++++++-------
+ Documentation/virt/kvm/devices/index.rst      |   1 +
+ 2 files changed, 85 insertions(+), 46 deletions(-)
+ rename Documentation/virt/kvm/devices/{arm-vgic-v3.txt => arm-vgic-v3.rst} (77%)
 
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-its.txt b/Documentation/virt/kvm/devices/arm-vgic-its.rst
-similarity index 71%
-rename from Documentation/virt/kvm/devices/arm-vgic-its.txt
-rename to Documentation/virt/kvm/devices/arm-vgic-its.rst
-index eeaa95b893a8..4197d9d6a870 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-its.txt
-+++ b/Documentation/virt/kvm/devices/arm-vgic-its.rst
-@@ -1,3 +1,4 @@
-+===============================================
- ARM Virtual Interrupt Translation Service (ITS)
- ===============================================
- 
-@@ -12,22 +13,32 @@ There can be multiple ITS controllers per guest, each of them has to have
- a separate, non-overlapping MMIO region.
+diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.txt b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+similarity index 77%
+rename from Documentation/virt/kvm/devices/arm-vgic-v3.txt
+rename to Documentation/virt/kvm/devices/arm-vgic-v3.rst
+index ff290b43c8e5..1a64644d1a43 100644
+--- a/Documentation/virt/kvm/devices/arm-vgic-v3.txt
++++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+@@ -1,9 +1,10 @@
++==============================================================
+ ARM Virtual Generic Interrupt Controller v3 and later (VGICv3)
+ ==============================================================
  
  
--Groups:
--  KVM_DEV_ARM_VGIC_GRP_ADDR
-+Groups
-+======
+ Device types supported:
+-  KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
++  - KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
+ 
+ Only one VGIC instance may be instantiated through this API.  The created VGIC
+ will act as the VM interrupt controller, requiring emulated user-space devices
+@@ -15,7 +16,8 @@ Creating a guest GICv3 device requires a host GICv3 as well.
+ 
+ Groups:
+   KVM_DEV_ARM_VGIC_GRP_ADDR
+-  Attributes:
++   Attributes:
 +
-+KVM_DEV_ARM_VGIC_GRP_ADDR
-+-------------------------
+     KVM_VGIC_V3_ADDR_TYPE_DIST (rw, 64-bit)
+       Base address in the guest physical address space of the GICv3 distributor
+       register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+@@ -29,21 +31,25 @@ Groups:
+       This address needs to be 64K aligned.
+ 
+     KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION (rw, 64-bit)
+-      The attribute data pointed to by kvm_device_attr.addr is a __u64 value:
+-      bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
+-      values:   |     count      |       base      |  flags   | index
++      The attribute data pointed to by kvm_device_attr.addr is a __u64 value::
 +
-   Attributes:
-     KVM_VGIC_ITS_ADDR_TYPE (rw, 64-bit)
-       Base address in the guest physical address space of the GICv3 ITS
-       control register frame.
-       This address needs to be 64K aligned and the region covers 128K.
++        bits:     | 63   ....  52  |  51   ....   16 | 15 - 12  |11 - 0
++        values:   |     count      |       base      |  flags   | index
 +
+       - index encodes the unique redistributor region index
+       - flags: reserved for future use, currently 0
+       - base field encodes bits [51:16] of the guest physical base address
+         of the first redistributor in the region.
+       - count encodes the number of redistributors in the region. Must be
+         greater than 0.
++
+       There are two 64K pages for each redistributor in the region and
+       redistributors are laid out contiguously within the region. Regions
+       are filled with redistributors in the index order. The sum of all
+       region count fields must be greater than or equal to the number of
+       VCPUs. Redistributor regions must be registered in the incremental
+       index order, starting from index 0.
++
+       The characteristics of a specific redistributor region can be read
+       by presetting the index field in the attr data.
+       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+@@ -52,23 +58,27 @@ Groups:
+   KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attributes.
+ 
    Errors:
 -    -E2BIG:  Address outside of addressable IPA range
--    -EINVAL: Incorrectly aligned address
--    -EEXIST: Address already configured
--    -EFAULT: Invalid user pointer for attr->addr.
--    -ENODEV: Incorrect attribute or the ITS is not supported.
- 
-+    =======  =================================================
+-    -EINVAL: Incorrectly aligned address, bad redistributor region
++
++    =======  =============================================================
 +    -E2BIG   Address outside of addressable IPA range
-+    -EINVAL  Incorrectly aligned address
++    -EINVAL  Incorrectly aligned address, bad redistributor region
+              count/index, mixed redistributor region attribute usage
+-    -EEXIST: Address already configured
+-    -ENOENT: Attempt to read the characteristics of a non existing
 +    -EEXIST  Address already configured
++    -ENOENT  Attempt to read the characteristics of a non existing
+              redistributor region
+-    -ENXIO:  The group or attribute is unknown/unsupported for this device
++    -ENXIO   The group or attribute is unknown/unsupported for this device
+              or hardware support is missing.
+-    -EFAULT: Invalid user pointer for attr->addr.
 +    -EFAULT  Invalid user pointer for attr->addr.
-+    -ENODEV  Incorrect attribute or the ITS is not supported.
-+    =======  =================================================
-+
-+
-+KVM_DEV_ARM_VGIC_GRP_CTRL
-+-------------------------
++    =======  =============================================================
  
--  KVM_DEV_ARM_VGIC_GRP_CTRL
-   Attributes:
-     KVM_DEV_ARM_VGIC_CTRL_INIT
-       request the initialization of the ITS, no additional parameter in
-@@ -58,16 +69,21 @@ Groups:
-       "ITS Restore Sequence".
+ 
+-  KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+-  KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
+-  Attributes:
+-    The attr field of kvm_device_attr encodes two values:
+-    bits:     | 63   ....  32  |  31   ....    0 |
+-    values:   |      mpidr     |      offset     |
++  KVM_DEV_ARM_VGIC_GRP_DIST_REGS, KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
++   Attributes:
++
++    The attr field of kvm_device_attr encodes two values::
++
++      bits:     | 63   ....  32  |  31   ....    0 |
++      values:   |      mpidr     |      offset     |
+ 
+     All distributor regs are (rw, 32-bit) and kvm_device_attr.addr points to a
+     __u32 value.  64-bit registers must be accessed by separately accessing the
+@@ -93,7 +103,8 @@ Groups:
+     redistributor is accessed.  The mpidr is ignored for the distributor.
+ 
+     The mpidr encoding is based on the affinity information in the
+-    architecture defined MPIDR, and the field is encoded as follows:
++    architecture defined MPIDR, and the field is encoded as follows::
++
+       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
+       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
+ 
+@@ -148,24 +159,30 @@ Groups:
+     ignored.
  
    Errors:
--    -ENXIO:  ITS not properly configured as required prior to setting
+-    -ENXIO: Getting or setting this register is not yet supported
+-    -EBUSY: One or more VCPUs are running
 +
-+    =======  ==========================================================
-+     -ENXIO  ITS not properly configured as required prior to setting
-              this attribute
--    -ENOMEM: Memory shortage when allocating ITS internal data
--    -EINVAL: Inconsistent restored data
++    ======  =====================================================
++    -ENXIO  Getting or setting this register is not yet supported
++    -EBUSY  One or more VCPUs are running
++    ======  =====================================================
+ 
+ 
+   KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS
+-  Attributes:
+-    The attr field of kvm_device_attr encodes two values:
+-    bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
+-    values:   |         mpidr         |      RES     |    instr    |
++   Attributes:
++
++    The attr field of kvm_device_attr encodes two values::
++
++      bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
++      values:   |         mpidr         |      RES     |    instr    |
+ 
+     The mpidr field encodes the CPU ID based on the affinity information in the
+-    architecture defined MPIDR, and the field is encoded as follows:
++    architecture defined MPIDR, and the field is encoded as follows::
++
+       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
+       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
+ 
+     The instr field encodes the system register to access based on the fields
+     defined in the A64 instruction set encoding for system register access
+-    (RES means the bits are reserved for future use and should be zero):
++    (RES means the bits are reserved for future use and should be zero)::
+ 
+       | 15 ... 14 | 13 ... 11 | 10 ... 7 | 6 ... 3 | 2 ... 0 |
+       |   Op 0    |    Op1    |    CRn   |   CRm   |   Op2   |
+@@ -178,26 +195,35 @@ Groups:
+ 
+     CPU interface registers access is not implemented for AArch32 mode.
+     Error -ENXIO is returned when accessed in AArch32 mode.
++
+   Errors:
+-    -ENXIO: Getting or setting this register is not yet supported
+-    -EBUSY: VCPU is running
+-    -EINVAL: Invalid mpidr or register value supplied
++
++    =======  =====================================================
++    -ENXIO   Getting or setting this register is not yet supported
++    -EBUSY   VCPU is running
++    -EINVAL  Invalid mpidr or register value supplied
++    =======  =====================================================
+ 
+ 
+   KVM_DEV_ARM_VGIC_GRP_NR_IRQS
+-  Attributes:
++   Attributes:
++
+     A value describing the number of interrupts (SGI, PPI and SPI) for
+     this GIC instance, ranging from 64 to 1024, in increments of 32.
+ 
+     kvm_device_attr.addr points to a __u32 value.
+ 
+   Errors:
+-    -EINVAL: Value set is out of the expected range
+-    -EBUSY: Value has already be set.
++
++    =======  ======================================
++    -EINVAL  Value set is out of the expected range
++    -EBUSY   Value has already be set.
++    =======  ======================================
+ 
+ 
+   KVM_DEV_ARM_VGIC_GRP_CTRL
+-  Attributes:
++   Attributes:
++
+     KVM_DEV_ARM_VGIC_CTRL_INIT
+       request the initialization of the VGIC, no additional parameter in
+       kvm_device_attr.addr.
+@@ -205,20 +231,26 @@ Groups:
+       save all LPI pending bits into guest RAM pending tables.
+ 
+       The first kB of the pending table is not altered by this operation.
++
+   Errors:
+-    -ENXIO: VGIC not properly configured as required prior to calling
+-     this attribute
+-    -ENODEV: no online VCPU
+-    -ENOMEM: memory shortage when allocating vgic internal data
 -    -EFAULT: Invalid guest ram access
 -    -EBUSY:  One or more VCPUS are running
--    -EACCES: The virtual ITS is backed by a physical GICv4 ITS, and the
-+    -ENOMEM  Memory shortage when allocating ITS internal data
-+    -EINVAL  Inconsistent restored data
++
++    =======  ========================================================
++    -ENXIO   VGIC not properly configured as required prior to calling
++             this attribute
++    -ENODEV  no online VCPU
++    -ENOMEM  memory shortage when allocating vgic internal data
 +    -EFAULT  Invalid guest ram access
 +    -EBUSY   One or more VCPUS are running
-+    -EACCES  The virtual ITS is backed by a physical GICv4 ITS, and the
- 	     state is not available
-+    =======  ==========================================================
++    =======  ========================================================
+ 
+ 
+   KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO
+-  Attributes:
+-    The attr field of kvm_device_attr encodes the following values:
+-    bits:     | 63      ....       32 | 31   ....    10 | 9  ....  0 |
+-    values:   |         mpidr         |      info       |   vINTID   |
++   Attributes:
 +
-+KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-+-----------------------------
- 
--  KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-   Attributes:
-       The attr field of kvm_device_attr encodes the offset of the
-       ITS register, relative to the ITS control frame base address
-@@ -78,6 +94,7 @@ Groups:
-       be accessed with full length.
- 
-       Writes to read-only registers are ignored by the kernel except for:
++    The attr field of kvm_device_attr encodes the following values::
 +
-       - GITS_CREADR. It must be restored otherwise commands in the queue
-         will be re-executed after restoring CWRITER. GITS_CREADR must be
-         restored before restoring the GITS_CTLR which is likely to enable the
-@@ -91,30 +108,36 @@ Groups:
++      bits:     | 63      ....       32 | 31   ....    10 | 9  ....  0 |
++      values:   |         mpidr         |      info       |   vINTID   |
  
-       For other registers, getting or setting a register has the same
-       effect as reading/writing the register on real hardware.
+     The vINTID specifies which set of IRQs is reported on.
+ 
+@@ -228,6 +260,7 @@ Groups:
+       VGIC_LEVEL_INFO_LINE_LEVEL:
+ 	Get/Set the input level of the IRQ line for a set of 32 contiguously
+ 	numbered interrupts.
++
+ 	vINTID must be a multiple of 32.
+ 
+ 	kvm_device_attr.addr points to a __u32 value which will contain a
+@@ -243,9 +276,14 @@ Groups:
+     reported with the same value regardless of the mpidr specified.
+ 
+     The mpidr field encodes the CPU ID based on the affinity information in the
+-    architecture defined MPIDR, and the field is encoded as follows:
++    architecture defined MPIDR, and the field is encoded as follows::
++
+       | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
+       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
 +
    Errors:
--    -ENXIO: Offset does not correspond to any supported register
--    -EFAULT: Invalid user pointer for attr->addr
--    -EINVAL: Offset is not 64-bit aligned
--    -EBUSY: one or more VCPUS are running
- 
-- ITS Restore Sequence:
-- -------------------------
-+    =======  ====================================================
-+    -ENXIO   Offset does not correspond to any supported register
-+    -EFAULT  Invalid user pointer for attr->addr
-+    -EINVAL  Offset is not 64-bit aligned
-+    -EBUSY   one or more VCPUS are running
-+    =======  ====================================================
+-    -EINVAL: vINTID is not multiple of 32 or
+-     info field is not VGIC_LEVEL_INFO_LINE_LEVEL
 +
-+ITS Restore Sequence:
-+---------------------
- 
- The following ordering must be followed when restoring the GIC and the ITS:
-+
- a) restore all guest memory and create vcpus
- b) restore all redistributors
- c) provide the ITS base address
-    (KVM_DEV_ARM_VGIC_GRP_ADDR)
- d) restore the ITS in the following order:
--   1. Restore GITS_CBASER
--   2. Restore all other GITS_ registers, except GITS_CTLR!
--   3. Load the ITS table data (KVM_DEV_ARM_ITS_RESTORE_TABLES)
--   4. Restore GITS_CTLR
-+
-+     1. Restore GITS_CBASER
-+     2. Restore all other ``GITS_`` registers, except GITS_CTLR!
-+     3. Load the ITS table data (KVM_DEV_ARM_ITS_RESTORE_TABLES)
-+     4. Restore GITS_CTLR
- 
- Then vcpus can be started.
- 
-- ITS Table ABI REV0:
-- -------------------
-+ITS Table ABI REV0:
-+-------------------
- 
-  Revision 0 of the ABI only supports the features of a virtual GICv3, and does
-  not support a virtual GICv4 with support for direct injection of virtual
-@@ -125,12 +148,13 @@ Then vcpus can be started.
-  entries in the collection are listed in no particular order.
-  All entries are 8 bytes.
- 
-- Device Table Entry (DTE):
-+ Device Table Entry (DTE)::
- 
-- bits:     | 63| 62 ... 49 | 48 ... 5 | 4 ... 0 |
-- values:   | V |   next    | ITT_addr |  Size   |
-+   bits:     | 63| 62 ... 49 | 48 ... 5 | 4 ... 0 |
-+   values:   | V |   next    | ITT_addr |  Size   |
-+
-+ where:
- 
-- where;
-  - V indicates whether the entry is valid. If not, other fields
-    are not meaningful.
-  - next: equals to 0 if this entry is the last one; otherwise it
-@@ -140,32 +164,34 @@ Then vcpus can be started.
-  - Size specifies the supported number of bits for the EventID,
-    minus one
- 
-- Collection Table Entry (CTE):
-+ Collection Table Entry (CTE)::
- 
-- bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
-- values:   | V |    RES0    |  RDBase   |    ICID     |
-+   bits:     | 63| 62 ..  52  | 51 ... 16 | 15  ...   0 |
-+   values:   | V |    RES0    |  RDBase   |    ICID     |
- 
-  where:
-+
-  - V indicates whether the entry is valid. If not, other fields are
-    not meaningful.
-  - RES0: reserved field with Should-Be-Zero-or-Preserved behavior.
-  - RDBase is the PE number (GICR_TYPER.Processor_Number semantic),
-  - ICID is the collection ID
- 
-- Interrupt Translation Entry (ITE):
-+ Interrupt Translation Entry (ITE)::
- 
-- bits:     | 63 ... 48 | 47 ... 16 | 15 ... 0 |
-- values:   |    next   |   pINTID  |  ICID    |
-+   bits:     | 63 ... 48 | 47 ... 16 | 15 ... 0 |
-+   values:   |    next   |   pINTID  |  ICID    |
- 
-  where:
-+
-  - next: equals to 0 if this entry is the last one; otherwise it corresponds
-    to the EventID offset to the next ITE capped by 2^16 -1.
-  - pINTID is the physical LPI ID; if zero, it means the entry is not valid
-    and other fields are not meaningful.
-  - ICID is the collection ID
- 
-- ITS Reset State:
-- ----------------
-+ITS Reset State:
-+----------------
- 
- RESET returns the ITS to the same state that it was when first created and
- initialized. When the RESET command returns, the following things are
++    =======  =============================================
++    -EINVAL  vINTID is not multiple of 32 or info field is
++	     not VGIC_LEVEL_INFO_LINE_LEVEL
++    =======  =============================================
 diff --git a/Documentation/virt/kvm/devices/index.rst b/Documentation/virt/kvm/devices/index.rst
-new file mode 100644
-index 000000000000..2aad8d426097
---- /dev/null
+index 2aad8d426097..80c1e0e225f4 100644
+--- a/Documentation/virt/kvm/devices/index.rst
 +++ b/Documentation/virt/kvm/devices/index.rst
-@@ -0,0 +1,10 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=======
-+Devices
-+=======
-+
-+.. toctree::
-+   :maxdepth: 2
-+
-+   arm-vgic-its
-diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
-index cc6dde47b267..24d1076ec680 100644
---- a/Documentation/virt/kvm/index.rst
-+++ b/Documentation/virt/kvm/index.rst
-@@ -14,3 +14,4 @@ KVM
-    vcpu-requests
+@@ -8,3 +8,4 @@ Devices
+    :maxdepth: 2
  
-    arm/index
-+   devices/index
+    arm-vgic-its
++   arm-vgic-v3
 -- 
 2.24.1
 
