@@ -2,34 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E67E14D03D
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 19:16:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC02914D03E
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 19:16:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727407AbgA2SQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 13:16:43 -0500
-Received: from foss.arm.com ([217.140.110.172]:44512 "EHLO foss.arm.com"
+        id S1727423AbgA2SQy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 13:16:54 -0500
+Received: from foss.arm.com ([217.140.110.172]:44524 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727188AbgA2SQn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jan 2020 13:16:43 -0500
+        id S1727188AbgA2SQy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jan 2020 13:16:54 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7D176328;
-        Wed, 29 Jan 2020 10:16:42 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B917B328;
+        Wed, 29 Jan 2020 10:16:53 -0800 (PST)
 Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 619D43F67D;
-        Wed, 29 Jan 2020 10:16:41 -0800 (PST)
-Date:   Wed, 29 Jan 2020 18:16:38 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B8ADF3F67D;
+        Wed, 29 Jan 2020 10:16:52 -0800 (PST)
+Date:   Wed, 29 Jan 2020 18:16:50 +0000
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     kvm@vger.kernel.org, will@kernel.org,
         julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org,
-        Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v2 kvmtool 10/30] virtio/pci: Make memory and IO BARs
- independent
-Message-ID: <20200129181638.6cbfc8f1@donnerap.cambridge.arm.com>
-In-Reply-To: <20200123134805.1993-11-alexandru.elisei@arm.com>
+        lorenzo.pieralisi@arm.com, maz@kernel.org
+Subject: Re: [PATCH v2 kvmtool 11/30] vfio/pci: Allocate correct size for
+ MSIX table and PBA BARs
+Message-ID: <20200129181650.5ce2669e@donnerap.cambridge.arm.com>
+In-Reply-To: <20200123134805.1993-12-alexandru.elisei@arm.com>
 References: <20200123134805.1993-1-alexandru.elisei@arm.com>
-        <20200123134805.1993-11-alexandru.elisei@arm.com>
+        <20200123134805.1993-12-alexandru.elisei@arm.com>
 Organization: ARM
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
@@ -40,211 +39,195 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jan 2020 13:47:45 +0000
+On Thu, 23 Jan 2020 13:47:46 +0000
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
 Hi,
 
-> From: Julien Thierry <julien.thierry@arm.com>
-> 
-> Currently, callbacks for memory BAR 1 call the IO port emulation.  This
-> means that the memory BAR needs I/O Space to be enabled whenever Memory
-> Space is enabled.
-> 
-> Refactor the code so the two type of  BARs are independent. Also, unify
-> ioport/mmio callback arguments so that they all receive a virtio_device.
+> kvmtool assumes that the BAR that holds the address for the MSIX table
+> and PBA structure has a size which is equal to their total size and it
+> allocates memory from MMIO space accordingly.  However, when
+> initializing the BARs, the BAR size is set to the region size reported
+> by VFIO. When the physical BAR size is greater than the mmio space that
+> kvmtool allocates, we can have a situation where the BAR overlaps with
+> another BAR, in which case kvmtool will fail to map the memory. This was
+> found when trying to do PCI passthrough with a PCIe Realtek r8168 NIC,
+> when the guest was also using virtio-block and virtio-net devices:
 
-That's a nice cleanup, I like that it avoids shoehorning everything as legacy I/O into the emulation.
+Good catch!
 
-Just a nit below, but nevertheless:
- 
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+> 
+> [..]
+> [    0.197926] PCI: OF: PROBE_ONLY enabled
+> [    0.198454] pci-host-generic 40000000.pci: host bridge /pci ranges:
+> [    0.199291] pci-host-generic 40000000.pci:    IO 0x00007000..0x0000ffff -> 0x00007000
+> [    0.200331] pci-host-generic 40000000.pci:   MEM 0x41000000..0x7fffffff -> 0x41000000
+> [    0.201480] pci-host-generic 40000000.pci: ECAM at [mem 0x40000000-0x40ffffff] for [bus 00]
+> [    0.202635] pci-host-generic 40000000.pci: PCI host bridge to bus 0000:00
+> [    0.203535] pci_bus 0000:00: root bus resource [bus 00]
+> [    0.204227] pci_bus 0000:00: root bus resource [io  0x0000-0x8fff] (bus address [0x7000-0xffff])
+> [    0.205483] pci_bus 0000:00: root bus resource [mem 0x41000000-0x7fffffff]
+> [    0.206456] pci 0000:00:00.0: [10ec:8168] type 00 class 0x020000
+> [    0.207399] pci 0000:00:00.0: reg 0x10: [io  0x0000-0x00ff]
+> [    0.208252] pci 0000:00:00.0: reg 0x18: [mem 0x41002000-0x41002fff]
+> [    0.209233] pci 0000:00:00.0: reg 0x20: [mem 0x41000000-0x41003fff]
+> [    0.210481] pci 0000:00:01.0: [1af4:1000] type 00 class 0x020000
+> [    0.211349] pci 0000:00:01.0: reg 0x10: [io  0x0100-0x01ff]
+> [    0.212118] pci 0000:00:01.0: reg 0x14: [mem 0x41003000-0x410030ff]
+> [    0.212982] pci 0000:00:01.0: reg 0x18: [mem 0x41003200-0x410033ff]
+> [    0.214247] pci 0000:00:02.0: [1af4:1001] type 00 class 0x018000
+> [    0.215096] pci 0000:00:02.0: reg 0x10: [io  0x0200-0x02ff]
+> [    0.215863] pci 0000:00:02.0: reg 0x14: [mem 0x41003400-0x410034ff]
+> [    0.216723] pci 0000:00:02.0: reg 0x18: [mem 0x41003600-0x410037ff]
+> [    0.218105] pci 0000:00:00.0: can't claim BAR 4 [mem 0x41000000-0x41003fff]: address conflict with 0000:00:00.0 [mem 0x41002000-0x41002fff]
+> [..]
+> 
+> Guest output of lspci -vv:
+> 
+> 00:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev 06)
+> 	Subsystem: TP-LINK Technologies Co., Ltd. TG-3468 Gigabit PCI Express Network Adapter
+> 	Control: I/O+ Mem+ BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx-
+> 	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+> 	Interrupt: pin A routed to IRQ 16
+> 	Region 0: I/O ports at 0000 [size=256]
+> 	Region 2: Memory at 41002000 (64-bit, non-prefetchable) [size=4K]
+> 	Region 4: Memory at 41000000 (64-bit, prefetchable) [size=16K]
+> 	Capabilities: [50] MSI: Enable- Count=1/1 Maskable- 64bit+
+> 		Address: 0000000000000000  Data: 0000
+> 	Capabilities: [b0] MSI-X: Enable- Count=4 Masked-
+> 		Vector table: BAR=4 offset=00000000
+> 		PBA: BAR=4 offset=00001000
+> 
+> Let's fix this by allocating an amount of MMIO memory equal to the size
+> of the BAR that contains the MSIX table and/or PBA.
+> 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Looks alright to me:
 
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-> ---
->  virtio/pci.c | 71 +++++++++++++++++++++++++++++++++++-----------------
->  1 file changed, 48 insertions(+), 23 deletions(-)
-> 
-> diff --git a/virtio/pci.c b/virtio/pci.c
-> index eeb5b5efa6e1..6723a1f3a84d 100644
-> --- a/virtio/pci.c
-> +++ b/virtio/pci.c
-> @@ -87,8 +87,8 @@ static inline bool virtio_pci__msix_enabled(struct virtio_pci *vpci)
->  	return vpci->pci_hdr.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE);
->  }
->  
-> -static bool virtio_pci__specific_io_in(struct kvm *kvm, struct virtio_device *vdev, u16 port,
-> -					void *data, int size, int offset)
-> +static bool virtio_pci__specific_data_in(struct kvm *kvm, struct virtio_device *vdev,
-> +					 void *data, int size, unsigned long offset)
->  {
->  	u32 config_offset;
->  	struct virtio_pci *vpci = vdev->virtio;
-> @@ -117,20 +117,17 @@ static bool virtio_pci__specific_io_in(struct kvm *kvm, struct virtio_device *vd
->  	return false;
->  }
->  
-> -static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> +static bool virtio_pci__data_in(struct kvm_cpu *vcpu, struct virtio_device *vdev,
-> +				unsigned long offset, void *data, int size)
->  {
-> -	unsigned long offset;
->  	bool ret = true;
-> -	struct virtio_device *vdev;
->  	struct virtio_pci *vpci;
->  	struct virt_queue *vq;
->  	struct kvm *kvm;
->  	u32 val;
->  
->  	kvm = vcpu->kvm;
-> -	vdev = ioport->priv;
->  	vpci = vdev->virtio;
-> -	offset = port - vpci->port_addr;
->  
->  	switch (offset) {
->  	case VIRTIO_PCI_HOST_FEATURES:
-> @@ -154,13 +151,26 @@ static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 p
->  		vpci->isr = VIRTIO_IRQ_LOW;
->  		break;
->  	default:
-> -		ret = virtio_pci__specific_io_in(kvm, vdev, port, data, size, offset);
-> +		ret = virtio_pci__specific_data_in(kvm, vdev, data, size, offset);
->  		break;
->  	};
->  
->  	return ret;
->  }
->  
-> +static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> +{
-> +	unsigned long offset;
-> +	struct virtio_device *vdev;
-> +	struct virtio_pci *vpci;
-> +
-> +	vdev = ioport->priv;
-> +	vpci = vdev->virtio;
-> +	offset = port - vpci->port_addr;
-
-You could initialise the variables directly at their declaration, which looks nicer and underlines that they are just helper variables.
-Same below.
-
 Cheers,
-Andre.
+Andre
 
-> +
-> +	return virtio_pci__data_in(vcpu, vdev, offset, data, size);
-> +}
-> +
->  static void update_msix_map(struct virtio_pci *vpci,
->  			    struct msix_table *msix_entry, u32 vecnum)
->  {
-> @@ -185,8 +195,8 @@ static void update_msix_map(struct virtio_pci *vpci,
->  	irq__update_msix_route(vpci->kvm, gsi, &msix_entry->msg);
+> ---
+>  vfio/pci.c | 68 +++++++++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 52 insertions(+), 16 deletions(-)
+> 
+> diff --git a/vfio/pci.c b/vfio/pci.c
+> index 8e5d8572bc0c..bbb8469c8d93 100644
+> --- a/vfio/pci.c
+> +++ b/vfio/pci.c
+> @@ -715,17 +715,44 @@ static int vfio_pci_fixup_cfg_space(struct vfio_device *vdev)
+>  	return 0;
 >  }
 >  
-> -static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *vdev, u16 port,
-> -					void *data, int size, int offset)
-> +static bool virtio_pci__specific_data_out(struct kvm *kvm, struct virtio_device *vdev,
-> +					  void *data, int size, unsigned long offset)
->  {
->  	struct virtio_pci *vpci = vdev->virtio;
->  	u32 config_offset, vec;
-> @@ -259,19 +269,16 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
->  	return false;
->  }
->  
-> -static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> +static bool virtio_pci__data_out(struct kvm_cpu *vcpu, struct virtio_device *vdev,
-> +				 unsigned long offset, void *data, int size)
->  {
-> -	unsigned long offset;
->  	bool ret = true;
-> -	struct virtio_device *vdev;
->  	struct virtio_pci *vpci;
->  	struct kvm *kvm;
->  	u32 val;
->  
->  	kvm = vcpu->kvm;
-> -	vdev = ioport->priv;
->  	vpci = vdev->virtio;
-> -	offset = port - vpci->port_addr;
->  
->  	switch (offset) {
->  	case VIRTIO_PCI_GUEST_FEATURES:
-> @@ -304,13 +311,26 @@ static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16
->  		virtio_notify_status(kvm, vdev, vpci->dev, vpci->status);
->  		break;
->  	default:
-> -		ret = virtio_pci__specific_io_out(kvm, vdev, port, data, size, offset);
-> +		ret = virtio_pci__specific_data_out(kvm, vdev, data, size, offset);
->  		break;
->  	};
->  
->  	return ret;
->  }
->  
-> +static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> -static int vfio_pci_create_msix_table(struct kvm *kvm,
+> -				      struct vfio_pci_device *pdev)
+> +static int vfio_pci_get_region_info(struct vfio_device *vdev, u32 index,
+> +				    struct vfio_region_info *info)
 > +{
-> +	unsigned long offset;
-> +	struct virtio_device *vdev;
-> +	struct virtio_pci *vpci;
+> +	int ret;
 > +
-> +	vdev = ioport->priv;
-> +	vpci = vdev->virtio;
-> +	offset = port - vpci->port_addr;
+> +	*info = (struct vfio_region_info) {
+> +		.argsz = sizeof(*info),
+> +		.index = index,
+> +	};
 > +
-> +	return virtio_pci__data_out(vcpu, vdev, offset, data, size);
+> +	ret = ioctl(vdev->fd, VFIO_DEVICE_GET_REGION_INFO, info);
+> +	if (ret) {
+> +		ret = -errno;
+> +		vfio_dev_err(vdev, "cannot get info for BAR %u", index);
+> +		return ret;
+> +	}
+> +
+> +	if (info->size && !is_power_of_two(info->size)) {
+> +		vfio_dev_err(vdev, "region is not power of two: 0x%llx",
+> +				info->size);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
 > +}
 > +
->  static struct ioport_operations virtio_pci__io_ops = {
->  	.io_in	= virtio_pci__io_in,
->  	.io_out	= virtio_pci__io_out,
-> @@ -320,7 +340,8 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
->  					   u64 addr, u8 *data, u32 len,
->  					   u8 is_write, void *ptr)
+> +static int vfio_pci_create_msix_table(struct kvm *kvm, struct vfio_device *vdev)
 >  {
-> -	struct virtio_pci *vpci = ptr;
-> +	struct virtio_device *vdev = ptr;
-> +	struct virtio_pci *vpci = vdev->virtio;
->  	struct msix_table *table;
->  	int vecnum;
->  	size_t offset;
-> @@ -419,11 +440,15 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
->  					 u64 addr, u8 *data, u32 len,
->  					 u8 is_write, void *ptr)
->  {
-> -	struct virtio_pci *vpci = ptr;
-> -	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
-> -	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
-> +	struct virtio_device *vdev = ptr;
-> +	struct virtio_pci *vpci = vdev->virtio;
+>  	int ret;
+>  	size_t i;
+> -	size_t mmio_size;
+> +	size_t map_size;
+>  	size_t nr_entries;
+>  	struct vfio_pci_msi_entry *entries;
+> +	struct vfio_pci_device *pdev = &vdev->pci;
+>  	struct vfio_pci_msix_pba *pba = &pdev->msix_pba;
+>  	struct vfio_pci_msix_table *table = &pdev->msix_table;
+>  	struct msix_cap *msix = PCI_CAP(&pdev->hdr, pdev->msix.pos);
+> +	struct vfio_region_info info;
 >  
-> -	kvm__emulate_io(vcpu, port, data, direction, len, 1);
-> +	if (!is_write)
-> +		virtio_pci__data_in(vcpu, vdev, addr - vpci->mmio_addr,
-> +				    data, len);
-> +	else
-> +		virtio_pci__data_out(vcpu, vdev, addr - vpci->mmio_addr,
-> +				     data, len);
->  }
+>  	table->bar = msix->table_offset & PCI_MSIX_TABLE_BIR;
+>  	pba->bar = msix->pba_offset & PCI_MSIX_TABLE_BIR;
+> @@ -744,15 +771,31 @@ static int vfio_pci_create_msix_table(struct kvm *kvm,
+>  	for (i = 0; i < nr_entries; i++)
+>  		entries[i].config.ctrl = PCI_MSIX_ENTRY_CTRL_MASKBIT;
 >  
->  int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
-> @@ -445,13 +470,13 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+> +	ret = vfio_pci_get_region_info(vdev, table->bar, &info);
+> +	if (ret)
+> +		return ret;
+> +	if (!info.size)
+> +		return -EINVAL;
+> +	map_size = info.size;
+> +
+> +	if (table->bar != pba->bar) {
+> +		ret = vfio_pci_get_region_info(vdev, pba->bar, &info);
+> +		if (ret)
+> +			return ret;
+> +		if (!info.size)
+> +			return -EINVAL;
+> +		map_size += info.size;
+> +	}
+> +
+>  	/*
+>  	 * To ease MSI-X cap configuration in case they share the same BAR,
+>  	 * collapse table and pending array. The size of the BAR regions must be
+>  	 * powers of two.
+>  	 */
+> -	mmio_size = roundup_pow_of_two(table->size + pba->size);
+> -	table->guest_phys_addr = pci_get_mmio_block(mmio_size);
+> +	map_size = ALIGN(map_size, PAGE_SIZE);
+> +	table->guest_phys_addr = pci_get_mmio_block(map_size);
+>  	if (!table->guest_phys_addr) {
+> -		pr_err("cannot allocate IO space");
+> +		pr_err("cannot allocate MMIO space");
+>  		ret = -ENOMEM;
+>  		goto out_free;
+>  	}
+> @@ -816,17 +859,10 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
 >  
->  	vpci->mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
->  	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
-> -			       virtio_pci__io_mmio_callback, vpci);
-> +			       virtio_pci__io_mmio_callback, vdev);
->  	if (r < 0)
->  		goto free_ioport;
+>  	region->vdev = vdev;
+>  	region->is_ioport = !!(bar & PCI_BASE_ADDRESS_SPACE_IO);
+> -	region->info = (struct vfio_region_info) {
+> -		.argsz = sizeof(region->info),
+> -		.index = nr,
+> -	};
 >  
->  	vpci->msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
->  	r = kvm__register_mmio(kvm, vpci->msix_io_block, PCI_IO_SIZE * 2, false,
-> -			       virtio_pci__msix_mmio_callback, vpci);
-> +			       virtio_pci__msix_mmio_callback, vdev);
->  	if (r < 0)
->  		goto free_mmio;
+> -	ret = ioctl(vdev->fd, VFIO_DEVICE_GET_REGION_INFO, &region->info);
+> -	if (ret) {
+> -		ret = -errno;
+> -		vfio_dev_err(vdev, "cannot get info for BAR %zu", nr);
+> +	ret = vfio_pci_get_region_info(vdev, nr, &region->info);
+> +	if (ret)
+>  		return ret;
+> -	}
 >  
+>  	/* Ignore invalid or unimplemented regions */
+>  	if (!region->info.size)
+> @@ -871,7 +907,7 @@ static int vfio_pci_configure_dev_regions(struct kvm *kvm,
+>  		return ret;
+>  
+>  	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSIX) {
+> -		ret = vfio_pci_create_msix_table(kvm, pdev);
+> +		ret = vfio_pci_create_msix_table(kvm, vdev);
+>  		if (ret)
+>  			return ret;
+>  	}
 
