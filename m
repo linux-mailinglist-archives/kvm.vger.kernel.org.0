@@ -2,191 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D40F14D1B2
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 21:03:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 106A914D35E
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 00:14:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727385AbgA2UDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 15:03:36 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52094 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726672AbgA2UDg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jan 2020 15:03:36 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00TJtMpx042608
-        for <kvm@vger.kernel.org>; Wed, 29 Jan 2020 15:03:34 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xttnu240e-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 29 Jan 2020 15:03:34 -0500
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 29 Jan 2020 20:03:32 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 29 Jan 2020 20:03:30 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00TK3T7R35258472
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 Jan 2020 20:03:29 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B778E11C052;
-        Wed, 29 Jan 2020 20:03:29 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2F5B011C04A;
-        Wed, 29 Jan 2020 20:03:28 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.2.173])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 29 Jan 2020 20:03:27 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org
-Subject: [PATCH v8 4/4] selftests: KVM: testing the local IRQs resets
-Date:   Wed, 29 Jan 2020 15:03:12 -0500
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200129200312.3200-1-frankja@linux.ibm.com>
-References: <20200129200312.3200-1-frankja@linux.ibm.com>
+        id S1726906AbgA2XOX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 18:14:23 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34721 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726618AbgA2XOX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jan 2020 18:14:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580339660;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Mhg3VSz4wWW1QtCbVzRa6h8LKr6U3LR5/uzOvBT52V0=;
+        b=Zw+BOV2hfotsCz9UJjxZVXiU+SLG6kTG2Ve9ejWWu1/Kp0drg/VSZZ4lywB+zpA9f75/23
+        UqGtumVyoCD7YDLy9Ewn2ObQT5vMxyH81g0TlHcFOhvyvyozBlaoPdgpcXqrOKu0eCAtOc
+        /0xbrbfm7YjDIaT69AA5xjhED1WsZ2c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-MnuQyI4UOVCxI4O02kjjow-1; Wed, 29 Jan 2020 18:14:16 -0500
+X-MC-Unique: MnuQyI4UOVCxI4O02kjjow-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E962477;
+        Wed, 29 Jan 2020 23:14:15 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 949B85DA7E;
+        Wed, 29 Jan 2020 23:14:04 +0000 (UTC)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+        Kevin Wolf <kwolf@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Cleber Rosa <crosa@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Max Reitz <mreitz@redhat.com>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Fam Zheng <fam@euphon.net>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        qemu-block@nongnu.org,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: [PATCH 00/10] python: Explicit usage of Python 3
+Date:   Thu, 30 Jan 2020 00:13:52 +0100
+Message-Id: <20200129231402.23384-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20012920-0020-0000-0000-000003A52B52
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20012920-0021-0000-0000-000021FCDD92
-Message-Id: <20200129200312.3200-5-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-29_06:2020-01-28,2020-01-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- spamscore=0 impostorscore=0 phishscore=0 bulkscore=0 suspectscore=3
- adultscore=0 priorityscore=1501 mlxlogscore=999 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2001290154
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Pierre Morel <pmorel@linux.ibm.com>
+Hello,
 
-Local IRQs are reset by a normal cpu reset.  The initial cpu reset and
-the clear cpu reset, as superset of the normal reset, both clear the
-IRQs too.
+These are mechanical sed patches used to convert the
+code base to Python 3, as suggested on this thread:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg675024.html
 
-Let's inject an interrupt to a vCPU before calling a reset and see if
-it is gone after the reset.
+Regards,
 
-We choose to inject only an emergency interrupt at this point and can
-extend the test to other types of IRQs later.
+Phil.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/resets.c | 57 ++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+Philippe Mathieu-Daud=C3=A9 (10):
+  scripts: Explicit usage of Python 3
+  tests/qemu-iotests: Explicit usage of Python 3
+  tests: Explicit usage of Python 3
+  scripts/minikconf: Explicit usage of Python 3
+  tests/acceptance: Remove shebang header
+  scripts/tracetool: Remove shebang header
+  tests/vm: Remove shebang header
+  tests/qemu-iotests: Explicit usage of Python 3
+  scripts: Explicit usage of Python 3
+  tests/qemu-iotests/check: Update to match Python 3 interpreter
 
-diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing/selftests/kvm/s390x/resets.c
-index 2b2378cc9e80..299c1686f98c 100644
---- a/tools/testing/selftests/kvm/s390x/resets.c
-+++ b/tools/testing/selftests/kvm/s390x/resets.c
-@@ -14,6 +14,9 @@
- #include "kvm_util.h"
- 
- #define VCPU_ID 3
-+#define LOCAL_IRQS 32
-+
-+struct kvm_s390_irq buf[VCPU_ID + LOCAL_IRQS];
- 
- struct kvm_vm *vm;
- struct kvm_run *run;
-@@ -52,6 +55,29 @@ static void test_one_reg(uint64_t id, uint64_t value)
- 	TEST_ASSERT(eval_reg == value, "value == %s", value);
- }
- 
-+static void assert_noirq(void)
-+{
-+	struct kvm_s390_irq_state irq_state;
-+	int irqs;
-+
-+	if (!(kvm_check_cap(KVM_CAP_S390_INJECT_IRQ) &&
-+	    kvm_check_cap(KVM_CAP_S390_IRQ_STATE)))
-+		return;
-+
-+	irq_state.len = sizeof(buf);
-+	irq_state.buf = (unsigned long)buf;
-+	irqs = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_GET_IRQ_STATE, &irq_state);
-+	/*
-+	 * irqs contains the number of retrieved interrupts, apart from the
-+	 * emergency call that should be cleared by the resets, there should be
-+	 * none.
-+	 */
-+	if (irqs < 0)
-+		printf("Error by getting IRQ: errno %d\n", errno);
-+
-+	TEST_ASSERT(!irqs, "IRQ pending");
-+}
-+
- static void assert_clear(void)
- {
- 	struct kvm_sregs sregs;
-@@ -93,6 +119,31 @@ static void assert_initial(void)
- static void assert_normal(void)
- {
- 	test_one_reg(KVM_REG_S390_PFTOKEN, KVM_S390_PFAULT_TOKEN_INVALID);
-+	assert_noirq();
-+}
-+
-+static int inject_irq(int cpu_id)
-+{
-+	struct kvm_s390_irq_state irq_state;
-+	struct kvm_s390_irq *irq = &buf[0];
-+	int irqs;
-+
-+	if (!(kvm_check_cap(KVM_CAP_S390_INJECT_IRQ) &&
-+	    kvm_check_cap(KVM_CAP_S390_IRQ_STATE)))
-+		return 0;
-+
-+	/* Inject IRQ */
-+	irq_state.len = sizeof(struct kvm_s390_irq);
-+	irq_state.buf = (unsigned long)buf;
-+	irq->type = KVM_S390_INT_EMERGENCY;
-+	irq->u.emerg.code = cpu_id;
-+	irqs = _vcpu_ioctl(vm, cpu_id, KVM_S390_SET_IRQ_STATE, &irq_state);
-+	if (irqs < 0) {
-+		printf("Error by injecting INT_EMERGENCY: errno %d\n", errno);
-+		return errno;
-+	}
-+
-+	return 0;
- }
- 
- static void test_normal(void)
-@@ -105,6 +156,8 @@ static void test_normal(void)
- 
- 	_vcpu_run(vm, VCPU_ID);
- 
-+	inject_irq(VCPU_ID);
-+
- 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_NORMAL_RESET, 0);
- 	assert_normal();
- 	kvm_vm_free(vm);
-@@ -122,6 +175,8 @@ static int test_initial(void)
- 
- 	rv = _vcpu_run(vm, VCPU_ID);
- 
-+	inject_irq(VCPU_ID);
-+
- 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_INITIAL_RESET, 0);
- 	assert_normal();
- 	assert_initial();
-@@ -141,6 +196,8 @@ static int test_clear(void)
- 
- 	rv = _vcpu_run(vm, VCPU_ID);
- 
-+	inject_irq(VCPU_ID);
-+
- 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_CLEAR_RESET, 0);
- 	assert_normal();
- 	assert_initial();
--- 
-2.20.1
+ scripts/analyse-9p-simpletrace.py                | 2 +-
+ scripts/analyse-locks-simpletrace.py             | 2 +-
+ scripts/decodetree.py                            | 2 +-
+ scripts/device-crash-test                        | 2 +-
+ scripts/kvm/kvm_flightrecorder                   | 2 +-
+ scripts/minikconf.py                             | 1 +
+ scripts/qapi-gen.py                              | 2 +-
+ scripts/qmp/qemu-ga-client                       | 2 +-
+ scripts/qmp/qmp                                  | 2 +-
+ scripts/qmp/qmp-shell                            | 2 +-
+ scripts/qmp/qom-fuse                             | 2 +-
+ scripts/render_block_graph.py                    | 2 +-
+ scripts/replay-dump.py                           | 2 +-
+ scripts/simpletrace.py                           | 2 +-
+ scripts/tracetool.py                             | 2 +-
+ scripts/tracetool/__init__.py                    | 1 -
+ scripts/tracetool/backend/__init__.py            | 1 -
+ scripts/tracetool/backend/dtrace.py              | 1 -
+ scripts/tracetool/backend/ftrace.py              | 1 -
+ scripts/tracetool/backend/log.py                 | 1 -
+ scripts/tracetool/backend/simple.py              | 1 -
+ scripts/tracetool/backend/syslog.py              | 1 -
+ scripts/tracetool/backend/ust.py                 | 1 -
+ scripts/tracetool/format/__init__.py             | 1 -
+ scripts/tracetool/format/c.py                    | 1 -
+ scripts/tracetool/format/d.py                    | 1 -
+ scripts/tracetool/format/h.py                    | 1 -
+ scripts/tracetool/format/log_stap.py             | 1 -
+ scripts/tracetool/format/simpletrace_stap.py     | 1 -
+ scripts/tracetool/format/stap.py                 | 1 -
+ scripts/tracetool/format/tcg_h.py                | 1 -
+ scripts/tracetool/format/tcg_helper_c.py         | 1 -
+ scripts/tracetool/format/tcg_helper_h.py         | 1 -
+ scripts/tracetool/format/tcg_helper_wrapper_h.py | 1 -
+ scripts/tracetool/format/ust_events_c.py         | 1 -
+ scripts/tracetool/format/ust_events_h.py         | 1 -
+ scripts/tracetool/transform.py                   | 1 -
+ scripts/tracetool/vcpu.py                        | 1 -
+ scripts/vmstate-static-checker.py                | 2 +-
+ tests/acceptance/virtio_seg_max_adjust.py        | 1 -
+ tests/acceptance/x86_cpu_model_versions.py       | 1 -
+ tests/docker/travis.py                           | 2 +-
+ tests/qapi-schema/test-qapi.py                   | 2 +-
+ tests/qemu-iotests/030                           | 2 +-
+ tests/qemu-iotests/040                           | 2 +-
+ tests/qemu-iotests/041                           | 2 +-
+ tests/qemu-iotests/044                           | 2 +-
+ tests/qemu-iotests/045                           | 2 +-
+ tests/qemu-iotests/055                           | 2 +-
+ tests/qemu-iotests/056                           | 2 +-
+ tests/qemu-iotests/057                           | 2 +-
+ tests/qemu-iotests/065                           | 2 +-
+ tests/qemu-iotests/093                           | 2 +-
+ tests/qemu-iotests/096                           | 2 +-
+ tests/qemu-iotests/118                           | 2 +-
+ tests/qemu-iotests/124                           | 2 +-
+ tests/qemu-iotests/129                           | 2 +-
+ tests/qemu-iotests/132                           | 2 +-
+ tests/qemu-iotests/136                           | 2 +-
+ tests/qemu-iotests/139                           | 2 +-
+ tests/qemu-iotests/147                           | 2 +-
+ tests/qemu-iotests/148                           | 2 +-
+ tests/qemu-iotests/149                           | 2 +-
+ tests/qemu-iotests/151                           | 2 +-
+ tests/qemu-iotests/152                           | 2 +-
+ tests/qemu-iotests/155                           | 2 +-
+ tests/qemu-iotests/163                           | 2 +-
+ tests/qemu-iotests/165                           | 2 +-
+ tests/qemu-iotests/169                           | 2 +-
+ tests/qemu-iotests/194                           | 2 +-
+ tests/qemu-iotests/196                           | 2 +-
+ tests/qemu-iotests/199                           | 2 +-
+ tests/qemu-iotests/202                           | 2 +-
+ tests/qemu-iotests/203                           | 2 +-
+ tests/qemu-iotests/205                           | 2 +-
+ tests/qemu-iotests/206                           | 2 +-
+ tests/qemu-iotests/207                           | 2 +-
+ tests/qemu-iotests/208                           | 2 +-
+ tests/qemu-iotests/209                           | 2 +-
+ tests/qemu-iotests/210                           | 2 +-
+ tests/qemu-iotests/211                           | 2 +-
+ tests/qemu-iotests/212                           | 2 +-
+ tests/qemu-iotests/213                           | 2 +-
+ tests/qemu-iotests/216                           | 2 +-
+ tests/qemu-iotests/218                           | 2 +-
+ tests/qemu-iotests/219                           | 2 +-
+ tests/qemu-iotests/222                           | 2 +-
+ tests/qemu-iotests/224                           | 2 +-
+ tests/qemu-iotests/228                           | 2 +-
+ tests/qemu-iotests/234                           | 2 +-
+ tests/qemu-iotests/235                           | 2 +-
+ tests/qemu-iotests/236                           | 2 +-
+ tests/qemu-iotests/237                           | 2 +-
+ tests/qemu-iotests/238                           | 2 +-
+ tests/qemu-iotests/242                           | 2 +-
+ tests/qemu-iotests/245                           | 2 +-
+ tests/qemu-iotests/246                           | 2 +-
+ tests/qemu-iotests/248                           | 2 +-
+ tests/qemu-iotests/254                           | 2 +-
+ tests/qemu-iotests/255                           | 2 +-
+ tests/qemu-iotests/256                           | 2 +-
+ tests/qemu-iotests/257                           | 2 +-
+ tests/qemu-iotests/258                           | 2 +-
+ tests/qemu-iotests/260                           | 2 +-
+ tests/qemu-iotests/262                           | 2 +-
+ tests/qemu-iotests/264                           | 2 +-
+ tests/qemu-iotests/266                           | 2 +-
+ tests/qemu-iotests/277                           | 2 +-
+ tests/qemu-iotests/280                           | 2 +-
+ tests/qemu-iotests/281                           | 2 +-
+ tests/qemu-iotests/check                         | 2 +-
+ tests/qemu-iotests/nbd-fault-injector.py         | 2 +-
+ tests/qemu-iotests/qcow2.py                      | 2 +-
+ tests/qemu-iotests/qed.py                        | 2 +-
+ tests/vm/basevm.py                               | 1 -
+ tests/vm/centos                                  | 2 +-
+ tests/vm/fedora                                  | 2 +-
+ tests/vm/freebsd                                 | 2 +-
+ tests/vm/netbsd                                  | 2 +-
+ tests/vm/openbsd                                 | 2 +-
+ tests/vm/ubuntu.i386                             | 2 +-
+ 121 files changed, 95 insertions(+), 120 deletions(-)
+ mode change 100755 =3D> 100644 tests/acceptance/virtio_seg_max_adjust.py
+ mode change 100755 =3D> 100644 tests/vm/basevm.py
+
+--=20
+2.21.1
 
