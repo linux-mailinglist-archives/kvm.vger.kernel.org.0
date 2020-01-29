@@ -2,218 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24ACD14CF89
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 18:20:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD3B714D039
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 19:16:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727141AbgA2RUq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 12:20:46 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30756 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726906AbgA2RUq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jan 2020 12:20:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580318442;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=CDEy69IL/eMYtpmDS3XjUwKwXrl7W0ck1hqzenez+2c=;
-        b=gdkONAdzy+pd4yBkwcpuqpZLD1tKOLuPAfVsUnlWO7rcuC1kTdGJKLdue/bsmp/OY7xuYs
-        5cFgLjxxDhHJ1+JIjQMxTbQuH9riVpH97zM1ktcYGcOhHaTyfjwadxP5SNI/i5/7XhPWd8
-        CXIujZGQTeQw/kl/4HEv7DpiMnb0mNY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-IuDla0bKOH2KmPPH79RJLw-1; Wed, 29 Jan 2020 12:20:20 -0500
-X-MC-Unique: IuDla0bKOH2KmPPH79RJLw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46763477;
-        Wed, 29 Jan 2020 17:20:19 +0000 (UTC)
-Received: from localhost (ovpn-117-180.ams2.redhat.com [10.36.117.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D7B5F5DE53;
-        Wed, 29 Jan 2020 17:20:11 +0000 (UTC)
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     linux-fsdevel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Avi Kivity <avi@scylladb.com>,
-        Davide Libenzi <davidel@xmailserver.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: [RFC] eventfd: add EFD_AUTORESET flag
-Date:   Wed, 29 Jan 2020 17:20:10 +0000
-Message-Id: <20200129172010.162215-1-stefanha@redhat.com>
+        id S1727386AbgA2SQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 13:16:29 -0500
+Received: from foss.arm.com ([217.140.110.172]:44496 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726245AbgA2SQ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jan 2020 13:16:29 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA24E328;
+        Wed, 29 Jan 2020 10:16:28 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8572A3F67D;
+        Wed, 29 Jan 2020 10:16:27 -0800 (PST)
+Date:   Wed, 29 Jan 2020 18:16:24 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com, maz@kernel.org,
+        Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v2 kvmtool 09/30] arm/pci: Fix PCI IO region
+Message-ID: <20200129181624.5f723196@donnerap.cambridge.arm.com>
+In-Reply-To: <20200123134805.1993-10-alexandru.elisei@arm.com>
+References: <20200123134805.1993-1-alexandru.elisei@arm.com>
+        <20200123134805.1993-10-alexandru.elisei@arm.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some applications simply use eventfd for inter-thread notifications
-without requiring counter or semaphore semantics.  They wait for the
-eventfd to become readable using poll(2)/select(2) and then call read(2)
-to reset the counter.
+On Thu, 23 Jan 2020 13:47:44 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-This patch adds the EFD_AUTORESET flag to reset the counter when
-f_ops->poll() finds the eventfd is readable, eliminating the need to
-call read(2) to reset the counter.
+Hi,
 
-This results in a small but measurable 1% performance improvement with
-QEMU virtio-blk emulation.  Each read(2) takes 1 microsecond execution
-time in the event loop according to perf.
+> From: Julien Thierry <julien.thierry@arm.com>
+> 
+> Current PCI IO region that is exposed through the DT contains ports that
+> are reserved by non-PCI devices.
+> 
+> Use the proper PCI IO start so that the region exposed through DT can
+> actually be used to reassign device BARs.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-Does this look like a reasonable thing to do?  I'm not very familiar
-with f_ops->poll() or the eventfd internals, so maybe I'm overlooking a
-design flaw.
+I guess the majority of the patch is about that the current allocation starts at 0x6200, which is not 4K aligned?
+It would be nice if we could mention this in the commit message.
 
-I've tested this with QEMU and it works fine:
-https://github.com/stefanha/qemu/commits/eventfd-autoreset
----
- fs/eventfd.c            | 99 +++++++++++++++++++++++++----------------
- include/linux/eventfd.h |  3 +-
- 2 files changed, 62 insertions(+), 40 deletions(-)
+Actually, silly question: It seems like this 0x6200 is rather arbitrary, can't we just change that to a 4K aligned value and drop that patch here?
+If something on the x86 side relies on that value, it should rather be explicit than by chance.
+(Because while this patch here seems correct, it's also quite convoluted.)
 
-diff --git a/fs/eventfd.c b/fs/eventfd.c
-index 8aa0ea8c55e8..208f6b9e2234 100644
---- a/fs/eventfd.c
-+++ b/fs/eventfd.c
-@@ -116,45 +116,62 @@ static __poll_t eventfd_poll(struct file *file, pol=
-l_table *wait)
-=20
- 	poll_wait(file, &ctx->wqh, wait);
-=20
--	/*
--	 * All writes to ctx->count occur within ctx->wqh.lock.  This read
--	 * can be done outside ctx->wqh.lock because we know that poll_wait
--	 * takes that lock (through add_wait_queue) if our caller will sleep.
--	 *
--	 * The read _can_ therefore seep into add_wait_queue's critical
--	 * section, but cannot move above it!  add_wait_queue's spin_lock acts
--	 * as an acquire barrier and ensures that the read be ordered properly
--	 * against the writes.  The following CAN happen and is safe:
--	 *
--	 *     poll                               write
--	 *     -----------------                  ------------
--	 *     lock ctx->wqh.lock (in poll_wait)
--	 *     count =3D ctx->count
--	 *     __add_wait_queue
--	 *     unlock ctx->wqh.lock
--	 *                                        lock ctx->qwh.lock
--	 *                                        ctx->count +=3D n
--	 *                                        if (waitqueue_active)
--	 *                                          wake_up_locked_poll
--	 *                                        unlock ctx->qwh.lock
--	 *     eventfd_poll returns 0
--	 *
--	 * but the following, which would miss a wakeup, cannot happen:
--	 *
--	 *     poll                               write
--	 *     -----------------                  ------------
--	 *     count =3D ctx->count (INVALID!)
--	 *                                        lock ctx->qwh.lock
--	 *                                        ctx->count +=3D n
--	 *                                        **waitqueue_active is false**
--	 *                                        **no wake_up_locked_poll!**
--	 *                                        unlock ctx->qwh.lock
--	 *     lock ctx->wqh.lock (in poll_wait)
--	 *     __add_wait_queue
--	 *     unlock ctx->wqh.lock
--	 *     eventfd_poll returns 0
--	 */
--	count =3D READ_ONCE(ctx->count);
-+	if (ctx->flags & EFD_AUTORESET) {
-+		unsigned long flags;
-+		__poll_t requested =3D poll_requested_events(wait);
-+
-+		spin_lock_irqsave(&ctx->wqh.lock, flags);
-+		count =3D ctx->count;
-+
-+		/* Reset counter if caller is polling for read */
-+		if (count !=3D 0 && (requested & EPOLLIN)) {
-+			ctx->count =3D 0;
-+			events |=3D EPOLLOUT;
-+			/* TODO is a EPOLLOUT wakeup necessary here? */
-+		}
-+
-+		spin_unlock_irqrestore(&ctx->wqh.lock, flags);
-+	} else {
-+		/*
-+		 * All writes to ctx->count occur within ctx->wqh.lock.  This read
-+		 * can be done outside ctx->wqh.lock because we know that poll_wait
-+		 * takes that lock (through add_wait_queue) if our caller will sleep.
-+		 *
-+		 * The read _can_ therefore seep into add_wait_queue's critical
-+		 * section, but cannot move above it!  add_wait_queue's spin_lock acts
-+		 * as an acquire barrier and ensures that the read be ordered properly
-+		 * against the writes.  The following CAN happen and is safe:
-+		 *
-+		 *     poll                               write
-+		 *     -----------------                  ------------
-+		 *     lock ctx->wqh.lock (in poll_wait)
-+		 *     count =3D ctx->count
-+		 *     __add_wait_queue
-+		 *     unlock ctx->wqh.lock
-+		 *                                        lock ctx->qwh.lock
-+		 *                                        ctx->count +=3D n
-+		 *                                        if (waitqueue_active)
-+		 *                                          wake_up_locked_poll
-+		 *                                        unlock ctx->qwh.lock
-+		 *     eventfd_poll returns 0
-+		 *
-+		 * but the following, which would miss a wakeup, cannot happen:
-+		 *
-+		 *     poll                               write
-+		 *     -----------------                  ------------
-+		 *     count =3D ctx->count (INVALID!)
-+		 *                                        lock ctx->qwh.lock
-+		 *                                        ctx->count +=3D n
-+		 *                                        **waitqueue_active is false*=
-*
-+		 *                                        **no wake_up_locked_poll!**
-+		 *                                        unlock ctx->qwh.lock
-+		 *     lock ctx->wqh.lock (in poll_wait)
-+		 *     __add_wait_queue
-+		 *     unlock ctx->wqh.lock
-+		 *     eventfd_poll returns 0
-+		 */
-+		count =3D READ_ONCE(ctx->count);
-+	}
-=20
- 	if (count > 0)
- 		events |=3D EPOLLIN;
-@@ -400,6 +417,10 @@ static int do_eventfd(unsigned int count, int flags)
- 	if (flags & ~EFD_FLAGS_SET)
- 		return -EINVAL;
-=20
-+	/* Semaphore semantics don't make sense when autoreset is enabled */
-+	if ((flags & EFD_SEMAPHORE) && (flags & EFD_AUTORESET))
-+		return -EINVAL;
-+
- 	ctx =3D kmalloc(sizeof(*ctx), GFP_KERNEL);
- 	if (!ctx)
- 		return -ENOMEM;
-diff --git a/include/linux/eventfd.h b/include/linux/eventfd.h
-index ffcc7724ca21..27577fafc553 100644
---- a/include/linux/eventfd.h
-+++ b/include/linux/eventfd.h
-@@ -21,11 +21,12 @@
-  * shared O_* flags.
-  */
- #define EFD_SEMAPHORE (1 << 0)
-+#define EFD_AUTORESET (1 << 6) /* aliases O_CREAT */
- #define EFD_CLOEXEC O_CLOEXEC
- #define EFD_NONBLOCK O_NONBLOCK
-=20
- #define EFD_SHARED_FCNTL_FLAGS (O_CLOEXEC | O_NONBLOCK)
--#define EFD_FLAGS_SET (EFD_SHARED_FCNTL_FLAGS | EFD_SEMAPHORE)
-+#define EFD_FLAGS_SET (EFD_SHARED_FCNTL_FLAGS | EFD_SEMAPHORE | EFD_AUTO=
-RESET)
-=20
- struct eventfd_ctx;
- struct file;
---=20
-2.24.1
+Cheers,
+Andre.
+
+> 
+> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/include/arm-common/pci.h |  1 +
+>  arm/kvm.c                    |  3 +++
+>  arm/pci.c                    | 21 ++++++++++++++++++---
+>  3 files changed, 22 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arm/include/arm-common/pci.h b/arm/include/arm-common/pci.h
+> index 9008a0ed072e..aea42b8895e9 100644
+> --- a/arm/include/arm-common/pci.h
+> +++ b/arm/include/arm-common/pci.h
+> @@ -1,6 +1,7 @@
+>  #ifndef ARM_COMMON__PCI_H
+>  #define ARM_COMMON__PCI_H
+>  
+> +void pci__arm_init(struct kvm *kvm);
+>  void pci__generate_fdt_nodes(void *fdt);
+>  
+>  #endif /* ARM_COMMON__PCI_H */
+> diff --git a/arm/kvm.c b/arm/kvm.c
+> index 1f85fc60588f..5c30ec1e0515 100644
+> --- a/arm/kvm.c
+> +++ b/arm/kvm.c
+> @@ -6,6 +6,7 @@
+>  #include "kvm/fdt.h"
+>  
+>  #include "arm-common/gic.h"
+> +#include "arm-common/pci.h"
+>  
+>  #include <linux/kernel.h>
+>  #include <linux/kvm.h>
+> @@ -86,6 +87,8 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+>  	/* Create the virtual GIC. */
+>  	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+>  		die("Failed to create virtual GIC");
+> +
+> +	pci__arm_init(kvm);
+>  }
+>  
+>  #define FDT_ALIGN	SZ_2M
+> diff --git a/arm/pci.c b/arm/pci.c
+> index ed325fa4a811..1c0949a22408 100644
+> --- a/arm/pci.c
+> +++ b/arm/pci.c
+> @@ -1,3 +1,5 @@
+> +#include "linux/sizes.h"
+> +
+>  #include "kvm/devices.h"
+>  #include "kvm/fdt.h"
+>  #include "kvm/kvm.h"
+> @@ -7,6 +9,11 @@
+>  
+>  #include "arm-common/pci.h"
+>  
+> +#define ARM_PCI_IO_START ALIGN(PCI_IOPORT_START, SZ_4K)
+> +
+> +/* Must be a multiple of 4k */
+> +#define ARM_PCI_IO_SIZE ((ARM_MMIO_AREA - ARM_PCI_IO_START) & ~(SZ_4K - 1))
+> +
+>  /*
+>   * An entry in the interrupt-map table looks like:
+>   * <pci unit address> <pci interrupt pin> <gic phandle> <gic interrupt>
+> @@ -24,6 +31,14 @@ struct of_interrupt_map_entry {
+>  	struct of_gic_irq		gic_irq;
+>  } __attribute__((packed));
+>  
+> +void pci__arm_init(struct kvm *kvm)
+> +{
+> +	u32 align_pad = ARM_PCI_IO_START - PCI_IOPORT_START;
+> +
+> +	/* Make PCI port allocation start at a properly aligned address */
+> +	pci_get_io_port_block(align_pad);
+> +}
+> +
+>  void pci__generate_fdt_nodes(void *fdt)
+>  {
+>  	struct device_header *dev_hdr;
+> @@ -40,10 +55,10 @@ void pci__generate_fdt_nodes(void *fdt)
+>  			.pci_addr = {
+>  				.hi	= cpu_to_fdt32(of_pci_b_ss(OF_PCI_SS_IO)),
+>  				.mid	= 0,
+> -				.lo	= 0,
+> +				.lo	= cpu_to_fdt32(ARM_PCI_IO_START),
+>  			},
+> -			.cpu_addr	= cpu_to_fdt64(KVM_IOPORT_AREA),
+> -			.length		= cpu_to_fdt64(ARM_IOPORT_SIZE),
+> +			.cpu_addr	= cpu_to_fdt64(ARM_PCI_IO_START),
+> +			.length		= cpu_to_fdt64(ARM_PCI_IO_SIZE),
+>  		},
+>  		{
+>  			.pci_addr = {
 
