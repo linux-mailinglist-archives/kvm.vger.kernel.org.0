@@ -2,114 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C8C914C8C9
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 11:36:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C55214C94D
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 12:11:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726330AbgA2KgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 05:36:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30907 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726116AbgA2KgN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jan 2020 05:36:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580294172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=J2ELfdfmeOLb/CT6GrrCevIO+CxmbSz5WWZ5pC+6QHI=;
-        b=X+Ds/bEPpfQgjnDjkVOUaN2gQChyR7rSwXrN72Jk2OOg2+grnbYyltGygpDcVCmnnOcP6l
-        Y4WLC8YmOILiBBrYW6WMxxhUCRKaGYjdH/olfdF0aBPtshGd8wUWC2VzJy3IT6wXPFWBzg
-        Ol/ocwlF37L6feNDzbFnmADwzbmftNM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-7D92Wv5INA26rUST7q5yGQ-1; Wed, 29 Jan 2020 05:36:10 -0500
-X-MC-Unique: 7D92Wv5INA26rUST7q5yGQ-1
-Received: by mail-wr1-f71.google.com with SMTP id f17so9863421wrt.19
-        for <kvm@vger.kernel.org>; Wed, 29 Jan 2020 02:36:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=J2ELfdfmeOLb/CT6GrrCevIO+CxmbSz5WWZ5pC+6QHI=;
-        b=XN/zXIYhasag3IhFY0owbpCaZaGLzePFoDExdoRLwmSqZwi+Rec0hNz13zsweVsQue
-         eW/fKGwPufPduAyByOUdOdUhJIQcn/XSFJ5g8WBaSnhrkta/v5XMVWcOliXYCGWiJvsd
-         ybQBI06smHpl8e4OjLlLkUYvZV+/p4I6i/9D5UZMySK/egd1XG7ISFdy18s2T0Qw+cVW
-         Abb3iqqbow9lka85luAWiBSapFFsKsW5BuuRhYIfrC24nYsXANhWINYS6aSuVMpsxxJb
-         y/R5pZGnUpzwA8BCdXZV0jFNzF+gx60veJHwJu5YJeSqrCTNhp4ZFBfsSyAb3Exk8g4j
-         LcBA==
-X-Gm-Message-State: APjAAAWoNQVWeSIVwiSiLyT7lOejNIU2UYhiCpv4sNY9ZnIPRUpjVFA/
-        1t9h6uqbjmS+yebZd/AByViBHCfzPUM/p4Lmd/JpGtXKKNaKGgErTDMTiArZspuZdKKvzIR6Ho6
-        0NECntBEIH8iR
-X-Received: by 2002:adf:e448:: with SMTP id t8mr6809316wrm.224.1580294169568;
-        Wed, 29 Jan 2020 02:36:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwyGUSnZ951MOEhC0vpWncAdy7BLZiUBINFhZRmdX3WwGLbYkpXpkpM5qyjRh4C9RpFDiLfIg==
-X-Received: by 2002:adf:e448:: with SMTP id t8mr6809295wrm.224.1580294169324;
-        Wed, 29 Jan 2020 02:36:09 -0800 (PST)
-Received: from [10.200.153.153] ([213.175.37.12])
-        by smtp.gmail.com with ESMTPSA id z19sm1684563wmi.35.2020.01.29.02.36.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jan 2020 02:36:08 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: Fix perfctr WRMSR for running counters
-To:     Eric Hankland <ehankland@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20200127212256.194310-1-ehankland@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2a394c6d-c453-6559-bf33-f654af7922bd@redhat.com>
-Date:   Wed, 29 Jan 2020 11:36:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1726157AbgA2LLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 06:11:25 -0500
+Received: from foss.arm.com ([217.140.110.172]:39524 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726067AbgA2LLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jan 2020 06:11:25 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 89A821FB;
+        Wed, 29 Jan 2020 03:11:24 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90E463F67D;
+        Wed, 29 Jan 2020 03:11:23 -0800 (PST)
+Subject: Re: [PATCH kvmtool 07/16] pci: Fix ioport allocation size
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com
+References: <20191125103033.22694-1-alexandru.elisei@arm.com>
+ <20191125103033.22694-8-alexandru.elisei@arm.com>
+ <20200128182650.12b4430b@donnerap.cambridge.arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <11dad8aa-6805-7ffe-c2f9-09db852a6134@arm.com>
+Date:   Wed, 29 Jan 2020 11:11:21 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200127212256.194310-1-ehankland@google.com>
+In-Reply-To: <20200128182650.12b4430b@donnerap.cambridge.arm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/01/20 22:22, Eric Hankland wrote:
-> Correct the logic in intel_pmu_set_msr() for fixed and general purpose
-> counters. This was recently changed to set pmc->counter without taking
-> in to account the value of pmc_read_counter() which will be incorrect if
-> the counter is currently running and non-zero; this changes back to the
-> old logic which accounted for the value of currently running counters.
-> 
-> Signed-off-by: Eric Hankland <ehankland@google.com>
-> ---
->  arch/x86/kvm/vmx/pmu_intel.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 34a3a17bb6d7..9bdbe05b599c 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -264,9 +264,10 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  				pmc->counter = data;
->  			else
->  				pmc->counter = (s32)data;
-> +			pmc->counter += pmc->counter - pmc_read_counter(pmc);
+Hi,
 
-I think this best written as it was before commit 2924b52117:
+On 1/28/20 6:26 PM, Andre Przywara wrote:
+> On Mon, 25 Nov 2019 10:30:24 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+>> From: Julien Thierry <julien.thierry@arm.com>
+>>
+>> The PCI Local Bus Specification, Rev. 3.0, Section 6.2.5.1. "Address Maps"
+>> states: "Devices that map control functions into I/O Space must not consume
+>> more than 256 bytes per I/O Base Address register."
+>>
+>> Yet all the PCI devices allocate IO ports of IOPORT_SIZE (= 1024 bytes).
+>>
+>> Fix this by having PCI devices use 256 bytes ports for IO BARs.
+>>
+>> There is no hard requirement on the size of the memory region described
+>> by memory BARs. However, the region must be big enough to hold the
+>> virtio common interface described in [1], which is 20 bytes, and other
+>> MSI-X and/or device specific configuration. To be consistent, let's also
+>> limit the memory region described by BAR1 to 256. This is the same size
+>> used by BAR2 for each of the two MSI-X vectors.
+> So the I/O port size is surely fine, QEMU seems to get away with 64 or even 32 bytes.
+> But QEMU also reports a memory region size of 4K, is that something we need to consider?
 
-			if (!msr_info->host_initiated)
-				data = (s64)(s32)data;
-			pmc->counter += data - pmc_read_counter(pmc);
+BAR 1 (memory BAR) maps the same control functions that BAR 0 (io BAR) maps, so it
+made sense to me for them to have the same size. I think QEMU reports the BAR size
+as 4K because of this recommendation p[1]:
 
-Do you have a testcase?
+" Devices are free to consume more address space than required, but decoding down
+to a 4 KB space for memory is suggested for devices that need less than that amount"
 
-Paolo
+We also don't follow this recommendation for BAR 2 which maps the MSIX capability
+table and PBA.
 
->  			return 0;
->  		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
-> -			pmc->counter = data;
-> +			pmc->counter += data - pmc_read_counter(pmc);
->  			return 0;
->  		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
->  			if (data == pmc->eventsel)
-> 
+[1] PCI Local Bus Specification, Revision 3.0, page 226.
 
+>  
+>> [1] VIRTIO Version 1.0 Committee Specification 04, section 4.4.8.
+> I think that should read section 4.1.4.8.
+
+Oops, that's true, I'll fix it in the next iteration of the patch.
+
+Thanks,
+Alex
+>
+> The rest looks OK.
+>
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+>
+> Cheers,
+> Andre
+>
+>> Cc: julien.thierry.kdev@gmail.com
+>> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+>> [Added rationale for changing BAR1 size to PCI_IO_SIZE]
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  hw/vesa.c            |  4 ++--
+>>  include/kvm/ioport.h |  1 -
+>>  pci.c                |  2 +-
+>>  virtio/pci.c         | 15 +++++++--------
+>>  4 files changed, 10 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/hw/vesa.c b/hw/vesa.c
+>> index 70ab59974f76..0191e9264666 100644
+>> --- a/hw/vesa.c
+>> +++ b/hw/vesa.c
+>> @@ -62,8 +62,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>>  
+>>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
+>>  		return NULL;
+>> -	r = pci_get_io_port_block(IOPORT_SIZE);
+>> -	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
+>> +	r = pci_get_io_port_block(PCI_IO_SIZE);
+>> +	r = ioport__register(kvm, r, &vesa_io_ops, PCI_IO_SIZE, NULL);
+>>  	if (r < 0)
+>>  		return ERR_PTR(r);
+>>  
+>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+>> index b10fcd5b4412..8c86b7151f25 100644
+>> --- a/include/kvm/ioport.h
+>> +++ b/include/kvm/ioport.h
+>> @@ -14,7 +14,6 @@
+>>  
+>>  /* some ports we reserve for own use */
+>>  #define IOPORT_DBG			0xe0
+>> -#define IOPORT_SIZE			0x400
+>>  
+>>  struct kvm;
+>>  
+>> diff --git a/pci.c b/pci.c
+>> index 32a07335a765..b4677434c50c 100644
+>> --- a/pci.c
+>> +++ b/pci.c
+>> @@ -20,7 +20,7 @@ static u16 io_port_blocks		= PCI_IOPORT_START;
+>>  
+>>  u16 pci_get_io_port_block(u32 size)
+>>  {
+>> -	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
+>> +	u16 port = ALIGN(io_port_blocks, PCI_IO_SIZE);
+>>  
+>>  	io_port_blocks = port + size;
+>>  	return port;
+>> diff --git a/virtio/pci.c b/virtio/pci.c
+>> index d73414abde05..eeb5b5efa6e1 100644
+>> --- a/virtio/pci.c
+>> +++ b/virtio/pci.c
+>> @@ -421,7 +421,7 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+>>  {
+>>  	struct virtio_pci *vpci = ptr;
+>>  	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
+>> -	u16 port = vpci->port_addr + (addr & (IOPORT_SIZE - 1));
+>> +	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
+>>  
+>>  	kvm__emulate_io(vcpu, port, data, direction, len, 1);
+>>  }
+>> @@ -435,17 +435,16 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>>  	vpci->kvm = kvm;
+>>  	vpci->dev = dev;
+>>  
+>> -	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
+>>  	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
+>>  
+>> -	r = pci_get_io_port_block(IOPORT_SIZE);
+>> -	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
+>> +	r = pci_get_io_port_block(PCI_IO_SIZE);
+>> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, PCI_IO_SIZE, vdev);
+>>  	if (r < 0)
+>>  		return r;
+>>  	vpci->port_addr = (u16)r;
+>>  
+>> -	vpci->mmio_addr = pci_get_mmio_block(IOPORT_SIZE);
+>> -	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
+>> +	vpci->mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
+>> +	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
+>>  			       virtio_pci__io_mmio_callback, vpci);
+>>  	if (r < 0)
+>>  		goto free_ioport;
+>> @@ -475,8 +474,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>>  							| PCI_BASE_ADDRESS_SPACE_MEMORY),
+>>  		.status			= cpu_to_le16(PCI_STATUS_CAP_LIST),
+>>  		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
+>> -		.bar_size[0]		= cpu_to_le32(IOPORT_SIZE),
+>> -		.bar_size[1]		= cpu_to_le32(IOPORT_SIZE),
+>> +		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
+>> +		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
+>>  		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
+>>  	};
+>>  
