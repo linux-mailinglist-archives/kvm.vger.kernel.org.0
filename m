@@ -2,93 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CBBDB14D36F
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 00:15:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A5BB14D3C1
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 00:47:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727097AbgA2XPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 18:15:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26276 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727096AbgA2XPb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jan 2020 18:15:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580339730;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2iIh/NXtnGBQVzIdZ7KJnnwXZo7tGxQ4WxqBfUKd3fI=;
-        b=SZVdGNHSwC7B0d0WI/wZJFaHsWAKAi6oRaA0NE/OrYNOwguqHD7iz9rWVVxNzgxZhQn5ka
-        vnHhrhlbEK5VGBqd+7JyKA2CFRGnLqxIf1kzPcgaCaNk+gCJJajyNvWBsBS0Keh2/1Pmvv
-        6V5N/B65WxLZpQNjyNbXAf3Dp2EvbTw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-Wje8MnAhPomzt9-tun-nvg-1; Wed, 29 Jan 2020 18:15:28 -0500
-X-MC-Unique: Wje8MnAhPomzt9-tun-nvg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2126E18C43C0;
-        Wed, 29 Jan 2020 23:15:27 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 811D85DA7E;
-        Wed, 29 Jan 2020 23:15:22 +0000 (UTC)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
-        Kevin Wolf <kwolf@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Cleber Rosa <crosa@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Max Reitz <mreitz@redhat.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Fam Zheng <fam@euphon.net>,
-        Michael Roth <mdroth@linux.vnet.ibm.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-        qemu-block@nongnu.org,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: [PATCH 10/10] tests/qemu-iotests/check: Update to match Python 3 interpreter
-Date:   Thu, 30 Jan 2020 00:14:02 +0100
-Message-Id: <20200129231402.23384-11-philmd@redhat.com>
-In-Reply-To: <20200129231402.23384-1-philmd@redhat.com>
-References: <20200129231402.23384-1-philmd@redhat.com>
+        id S1727096AbgA2Xqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 18:46:46 -0500
+Received: from mga06.intel.com ([134.134.136.31]:46688 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726401AbgA2Xqp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jan 2020 18:46:45 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jan 2020 15:46:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,379,1574150400"; 
+   d="scan'208";a="309551694"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by orsmga001.jf.intel.com with ESMTP; 29 Jan 2020 15:46:43 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 00/26] KVM: x86: Purge kvm_x86_ops->*_supported()
+Date:   Wed, 29 Jan 2020 15:46:14 -0800
+Message-Id: <20200129234640.8147-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All the iotests Python scripts have been converted to search for
-the Python 3 interpreter. Update the ./check script accordingly.
+Our benevolent dictator decreed that "all *_supported() should be removed,
+and the code moved from __do_cpuid_func() to set_supported_cpuid"[*].
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- tests/qemu-iotests/check | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+To make that happen, move CPUID and MSR checks from x86 into SVM/VMX via
+the existing ->set_supported_cpuid() and a ->new has_virtualized_msr() ops
+respectively.
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 2890785a10..2e7d29d570 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -825,7 +825,7 @@ do
-=20
-         start=3D$(_wallclock)
-=20
--        if [ "$(head -n 1 "$source_iotests/$seq")" =3D=3D "#!/usr/bin/en=
-v python" ]; then
-+        if [ "$(head -n 1 "$source_iotests/$seq")" =3D=3D "#!/usr/bin/en=
-v python3" ]; then
-             if $python_usable; then
-                 run_command=3D"$PYTHON $seq"
-             else
---=20
-2.21.1
+As usual, there's a fair amount of cleanup in between the mechanical
+changes.  Most notable is the introduction of cpuid entry accessors and
+mutators to replace all of the code to manipulate individual feature bits
+in cpuid entries, which is error prone and annoying.  MPX (*sigh*) also
+gets a healthly dose of cleanup.
+
+I don't love every patch in this series.  Specifically, adding an extra
+call to ->set_supported_cpuid() to handle XSAVES is ugly.  But, I do like
+that it purges all ->*_supported() hooks.  And practically speaking, odds
+are good that CPUID 0xD.1 will get more feature bits, i.e. keeping
+->xsaves_supported() would likely lead to another ->*_supported() hook.
+
+Paolo also expressed a dislike for clearing bits in set_supported_cpuid().
+I don't have a strong opinion regarding clearing bits, but the alternative
+approach, i.e. leave the bits clear and then set them in vendor code,
+gets quite kludgy because the vendor code (mostly VMX) would need to
+manually recheck boot_cpu_data to ensure it wasn't advertising a feature
+that the user/kernel expressly disabled.  IMO, forcing manual checks is
+more likely to introduce errors and provides less insight into why VMX
+needs to adjust the advertised CPUID values (VMCS != CPUID).
+
+Tested on Intel by verifying the output of KVM_GET_SUPPORTED_CPUID is
+identical before and after (on almost every patch) on a Haswell and Coffee
+Lake.  The big untested pieces are PKU and PT on Intel, and everything AMD.
+
+[*] https://lkml.kernel.org/r/8a77e3b9-049e-e622-9332-9bebb829bc3d@redhat.com
+
+Sean Christopherson (26):
+  KVM: x86: Remove superfluous brackets from case statement
+  KVM: x86: Take an unsigned 32-bit int for has_emulated_msr()'s index
+  KVM: x86: Snapshot MSR index in a local variable when processing lists
+  KVM: x86: Add a kvm_x86_ops hook to query virtualized MSR support
+  KVM: x86: Move MSR_TSC_AUX existence checks into vendor code
+  KVM: x86: Move MSR_IA32_BNDCFGS existence checks into vendor code
+  KVM: VMX: Add helpers to query Intel PT mode
+  KVM: x86: Move RTIT (Intel PT) MSR existence checks into vendor code
+  KVM: x86: Calculate the supported xcr0 mask at load time
+  KVM: x86: Use supported_xcr0 to detect MPX support
+  KVM: x86: Make kvm_mpx_supported() an inline function
+  KVM: x86: Drop explicit @func param from ->set_supported_cpuid()
+  KVM: x86: Use u32 for holding CPUID register value in helpers
+  KVM: x86: Introduce cpuid_entry_{get,has}() accessors
+  KVM: x86: Introduce cpuid_entry_{change,set,clear}() mutators
+  KVM: x86: Add Kconfig-controlled auditing of reverse CPUID lookups
+  KVM: x86: Handle MPX CPUID adjustment in vendor code
+  KVM: x86: Handle INVPCID CPUID adjustment in vendor code
+  KVM: x86: Handle UMIP emulation CPUID adjustment in VMX code
+  KVM: x86: Handle PKU CPUID adjustment in SVM code
+  KVM: x86: Handle RDTSCP CPUID adjustment in VMX code
+  KVM: x86: Handle XSAVES CPUID adjustment in VMX code
+  KVM: x86: Handle Intel PT CPUID adjustment in vendor code
+  KVM: x86: Clear output regs for CPUID 0x14 if PT isn't exposed to
+    guest
+  KVM: x86: Handle main Intel PT CPUID leaf in vendor code
+  KVM: VMX: Directly query Intel PT mode when refreshing PMUs
+
+ arch/x86/include/asm/kvm_host.h |  12 +--
+ arch/x86/kvm/Kconfig            |  10 +++
+ arch/x86/kvm/cpuid.c            | 147 +++++++++++++-------------------
+ arch/x86/kvm/cpuid.h            |  85 +++++++++++++++---
+ arch/x86/kvm/svm.c              |  88 ++++++++++---------
+ arch/x86/kvm/vmx/capabilities.h |  25 ++++--
+ arch/x86/kvm/vmx/nested.c       |   2 +-
+ arch/x86/kvm/vmx/pmu_intel.c    |   2 +-
+ arch/x86/kvm/vmx/vmx.c          | 119 ++++++++++++++++++--------
+ arch/x86/kvm/vmx/vmx.h          |   4 +-
+ arch/x86/kvm/x86.c              |  76 +++++++----------
+ arch/x86/kvm/x86.h              |  10 +--
+ 12 files changed, 331 insertions(+), 249 deletions(-)
+
+-- 
+2.24.1
 
