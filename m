@@ -2,193 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C55214C94D
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 12:11:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33A2E14C9EB
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 12:51:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726157AbgA2LLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 06:11:25 -0500
-Received: from foss.arm.com ([217.140.110.172]:39524 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726067AbgA2LLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jan 2020 06:11:25 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 89A821FB;
-        Wed, 29 Jan 2020 03:11:24 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90E463F67D;
-        Wed, 29 Jan 2020 03:11:23 -0800 (PST)
-Subject: Re: [PATCH kvmtool 07/16] pci: Fix ioport allocation size
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com
-References: <20191125103033.22694-1-alexandru.elisei@arm.com>
- <20191125103033.22694-8-alexandru.elisei@arm.com>
- <20200128182650.12b4430b@donnerap.cambridge.arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <11dad8aa-6805-7ffe-c2f9-09db852a6134@arm.com>
-Date:   Wed, 29 Jan 2020 11:11:21 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726246AbgA2Lvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 06:51:32 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53321 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726067AbgA2Lvc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jan 2020 06:51:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580298691;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=H6jaW2S+odlaQy0KIFqAU+bpuLsglbrvaxzUp7pUckY=;
+        b=Q5xLQJL17rL0BnyBsSd0nn7/VNu3HN0gdlwLMp7wHfo2CS2N4yrvZtx18vUJ9u1t1DQ4GW
+        ViEuPLTpf3lVsLYrA8XWkBr3Yjo7VdndBLy7mlodGtfph3Q6boaDqx2ufifYNpi5AVp7C+
+        3R+l780tYYxcrvyKF4zFDJckWmtiAMA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-mn4g7pguNBicsBokMMELLw-1; Wed, 29 Jan 2020 06:51:27 -0500
+X-MC-Unique: mn4g7pguNBicsBokMMELLw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAC2C13E2;
+        Wed, 29 Jan 2020 11:51:26 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id ADAE45D9C5;
+        Wed, 29 Jan 2020 11:51:25 +0000 (UTC)
+Date:   Wed, 29 Jan 2020 12:51:23 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        thuth@redhat.com
+Subject: Re: [PATCH v2] kvm: selftests: Introduce num-pages conversion
+ utilities
+Message-ID: <20200129115123.kswbeza33atbfk47@kamzik.brq.redhat.com>
+References: <20200128093443.25414-1-drjones@redhat.com>
+ <CANgfPd-xYX5Y=ajjP62z-jwKepeFaRVwSMQKq3N1oc1zO57mRg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200128182650.12b4430b@donnerap.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd-xYX5Y=ajjP62z-jwKepeFaRVwSMQKq3N1oc1zO57mRg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 1/28/20 6:26 PM, Andre Przywara wrote:
-> On Mon, 25 Nov 2019 10:30:24 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Tue, Jan 28, 2020 at 09:37:21AM -0800, Ben Gardon wrote:
+> On Tue, Jan 28, 2020 at 1:34 AM Andrew Jones <drjones@redhat.com> wrote:
+> >
+> > Guests and hosts don't have to have the same page size. This means
+> > calculations are necessary when selecting the number of guest pages
+> > to allocate in order to ensure the number is compatible with the
+> > host. Provide utilities to help with those calculations.
+> >
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/dirty_log_test.c  | 10 ++++----
+> >  .../testing/selftests/kvm/include/kvm_util.h  |  3 +++
+> >  .../testing/selftests/kvm/include/test_util.h |  2 ++
+> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 24 +++++++++++++++++++
+> >  4 files changed, 33 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+> > index 5614222a6628..2383c55a1a1a 100644
+> > --- a/tools/testing/selftests/kvm/dirty_log_test.c
+> > +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+> > @@ -178,12 +178,11 @@ static void *vcpu_worker(void *data)
+> >         return NULL;
+> >  }
+> >
+> > -static void vm_dirty_log_verify(unsigned long *bmap)
+> > +static void vm_dirty_log_verify(struct kvm_vm *vm, unsigned long *bmap)
+> >  {
+> > +       uint64_t step = vm_num_host_pages(vm, 1);
+> >         uint64_t page;
+> >         uint64_t *value_ptr;
+> > -       uint64_t step = host_page_size >= guest_page_size ? 1 :
+> > -                               guest_page_size / host_page_size;
+> >
+> >         for (page = 0; page < host_num_pages; page += step) {
+> >                 value_ptr = host_test_mem + page * host_page_size;
+> > @@ -295,8 +294,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+> >         guest_num_pages = (guest_num_pages + 0xff) & ~0xffUL;
+> >  #endif
+> >         host_page_size = getpagesize();
+> > -       host_num_pages = (guest_num_pages * guest_page_size) / host_page_size +
+> > -                        !!((guest_num_pages * guest_page_size) % host_page_size);
+> > +       host_num_pages = vm_num_host_pages(vm, guest_num_pages);
+> >
+> >         if (!phys_offset) {
+> >                 guest_test_phys_mem = (vm_get_max_gfn(vm) -
+> > @@ -369,7 +367,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+> >                 kvm_vm_clear_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap, 0,
+> >                                        host_num_pages);
+> >  #endif
+> > -               vm_dirty_log_verify(bmap);
+> > +               vm_dirty_log_verify(vm, bmap);
+> >                 iteration++;
+> >                 sync_global_to_guest(vm, iteration);
+> >         }
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> > index 29cccaf96baf..0d05ade3022c 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -158,6 +158,9 @@ unsigned int vm_get_page_size(struct kvm_vm *vm);
+> >  unsigned int vm_get_page_shift(struct kvm_vm *vm);
+> >  unsigned int vm_get_max_gfn(struct kvm_vm *vm);
+> >
+> > +unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest_pages);
+> > +unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host_pages);
+> > +
+> >  struct kvm_userspace_memory_region *
+> >  kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
+> >                                  uint64_t end);
+> > diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+> > index a41db6fb7e24..25c27739e085 100644
+> > --- a/tools/testing/selftests/kvm/include/test_util.h
+> > +++ b/tools/testing/selftests/kvm/include/test_util.h
+> > @@ -19,6 +19,8 @@
+> >  #include <fcntl.h>
+> >  #include "kselftest.h"
+> >
+> > +#define getpageshift() (__builtin_ffs(getpagesize()) - 1)
+> > +
+> >  ssize_t test_write(int fd, const void *buf, size_t count);
+> >  ssize_t test_read(int fd, void *buf, size_t count);
+> >  int test_seq_read(const char *path, char **bufp, size_t *sizep);
+> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > index 41cf45416060..d9bca2f1cc95 100644
+> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > @@ -1667,3 +1667,27 @@ unsigned int vm_get_max_gfn(struct kvm_vm *vm)
+> >  {
+> >         return vm->max_gfn;
+> >  }
+> > +
+> > +static unsigned int vm_calc_num_pages(unsigned int num_pages,
+> > +                                     unsigned int page_shift,
+> > +                                     unsigned int new_page_shift)
+> > +{
+> > +       unsigned int n = 1 << (new_page_shift - page_shift);
+> > +
+> > +       if (page_shift >= new_page_shift)
+> > +               return num_pages * (1 << (page_shift - new_page_shift));
+> > +
+> > +       return num_pages / n + !!(num_pages % n);
+> > +}
+> > +
+> > +unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest_pages)
+> > +{
+> > +       return vm_calc_num_pages(num_guest_pages, vm_get_page_shift(vm),
+> > +                                getpageshift());
+> > +}
+> > +
+> > +unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host_pages)
+> > +{
+> > +       return vm_calc_num_pages(num_host_pages, getpageshift(),
+> > +                                vm_get_page_shift(vm));
+> > +}
+> 
+> This function appears to be unused. I don't have any opposition to
+> adding it since it is simple, unlikely to bitrot, and seems like a
+> useful utility.
 >
-> Hi,
->
->> From: Julien Thierry <julien.thierry@arm.com>
->>
->> The PCI Local Bus Specification, Rev. 3.0, Section 6.2.5.1. "Address Maps"
->> states: "Devices that map control functions into I/O Space must not consume
->> more than 256 bytes per I/O Base Address register."
->>
->> Yet all the PCI devices allocate IO ports of IOPORT_SIZE (= 1024 bytes).
->>
->> Fix this by having PCI devices use 256 bytes ports for IO BARs.
->>
->> There is no hard requirement on the size of the memory region described
->> by memory BARs. However, the region must be big enough to hold the
->> virtio common interface described in [1], which is 20 bytes, and other
->> MSI-X and/or device specific configuration. To be consistent, let's also
->> limit the memory region described by BAR1 to 256. This is the same size
->> used by BAR2 for each of the two MSI-X vectors.
-> So the I/O port size is surely fine, QEMU seems to get away with 64 or even 32 bytes.
-> But QEMU also reports a memory region size of 4K, is that something we need to consider?
 
-BAR 1 (memory BAR) maps the same control functions that BAR 0 (io BAR) maps, so it
-made sense to me for them to have the same size. I think QEMU reports the BAR size
-as 4K because of this recommendation p[1]:
+Yeah, I was thinking it might be useful for tests to calculate the
+number of guest pages from a given memory size
 
-" Devices are free to consume more address space than required, but decoding down
-to a 4 KB space for memory is suggested for devices that need less than that amount"
+  num_host_pages = DIV_ROUND_UP(memory_size, getpagesize());
+  num_guest_pages = vm_num_guest_pages(vm, num_host_pages);
 
-We also don't follow this recommendation for BAR 2 which maps the MSIX capability
-table and PBA.
-
-[1] PCI Local Bus Specification, Revision 3.0, page 226.
-
->  
->> [1] VIRTIO Version 1.0 Committee Specification 04, section 4.4.8.
-> I think that should read section 4.1.4.8.
-
-Oops, that's true, I'll fix it in the next iteration of the patch.
+But now I see we need a v3 of this patch. When calculating the
+number of guest pages from host pages we should round down, not
+up. Also, I should have used DIV_ROUND_UP() which is defined in
+tools/include/linux/kernel.h. I see it's even defined in
+lib/kvm_util_internal.h too, but we can delete it from there
+and just use linux/kernel.h. I'll do the deleting as a separate
+cleanup patch though.
 
 Thanks,
-Alex
->
-> The rest looks OK.
->
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
->
-> Cheers,
-> Andre
->
->> Cc: julien.thierry.kdev@gmail.com
->> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
->> [Added rationale for changing BAR1 size to PCI_IO_SIZE]
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  hw/vesa.c            |  4 ++--
->>  include/kvm/ioport.h |  1 -
->>  pci.c                |  2 +-
->>  virtio/pci.c         | 15 +++++++--------
->>  4 files changed, 10 insertions(+), 12 deletions(-)
->>
->> diff --git a/hw/vesa.c b/hw/vesa.c
->> index 70ab59974f76..0191e9264666 100644
->> --- a/hw/vesa.c
->> +++ b/hw/vesa.c
->> @@ -62,8 +62,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
->>  
->>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
->>  		return NULL;
->> -	r = pci_get_io_port_block(IOPORT_SIZE);
->> -	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
->> +	r = pci_get_io_port_block(PCI_IO_SIZE);
->> +	r = ioport__register(kvm, r, &vesa_io_ops, PCI_IO_SIZE, NULL);
->>  	if (r < 0)
->>  		return ERR_PTR(r);
->>  
->> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
->> index b10fcd5b4412..8c86b7151f25 100644
->> --- a/include/kvm/ioport.h
->> +++ b/include/kvm/ioport.h
->> @@ -14,7 +14,6 @@
->>  
->>  /* some ports we reserve for own use */
->>  #define IOPORT_DBG			0xe0
->> -#define IOPORT_SIZE			0x400
->>  
->>  struct kvm;
->>  
->> diff --git a/pci.c b/pci.c
->> index 32a07335a765..b4677434c50c 100644
->> --- a/pci.c
->> +++ b/pci.c
->> @@ -20,7 +20,7 @@ static u16 io_port_blocks		= PCI_IOPORT_START;
->>  
->>  u16 pci_get_io_port_block(u32 size)
->>  {
->> -	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
->> +	u16 port = ALIGN(io_port_blocks, PCI_IO_SIZE);
->>  
->>  	io_port_blocks = port + size;
->>  	return port;
->> diff --git a/virtio/pci.c b/virtio/pci.c
->> index d73414abde05..eeb5b5efa6e1 100644
->> --- a/virtio/pci.c
->> +++ b/virtio/pci.c
->> @@ -421,7 +421,7 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
->>  {
->>  	struct virtio_pci *vpci = ptr;
->>  	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
->> -	u16 port = vpci->port_addr + (addr & (IOPORT_SIZE - 1));
->> +	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
->>  
->>  	kvm__emulate_io(vcpu, port, data, direction, len, 1);
->>  }
->> @@ -435,17 +435,16 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->>  	vpci->kvm = kvm;
->>  	vpci->dev = dev;
->>  
->> -	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
->>  	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
->>  
->> -	r = pci_get_io_port_block(IOPORT_SIZE);
->> -	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
->> +	r = pci_get_io_port_block(PCI_IO_SIZE);
->> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, PCI_IO_SIZE, vdev);
->>  	if (r < 0)
->>  		return r;
->>  	vpci->port_addr = (u16)r;
->>  
->> -	vpci->mmio_addr = pci_get_mmio_block(IOPORT_SIZE);
->> -	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
->> +	vpci->mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
->> +	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
->>  			       virtio_pci__io_mmio_callback, vpci);
->>  	if (r < 0)
->>  		goto free_ioport;
->> @@ -475,8 +474,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->>  							| PCI_BASE_ADDRESS_SPACE_MEMORY),
->>  		.status			= cpu_to_le16(PCI_STATUS_CAP_LIST),
->>  		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
->> -		.bar_size[0]		= cpu_to_le32(IOPORT_SIZE),
->> -		.bar_size[1]		= cpu_to_le32(IOPORT_SIZE),
->> +		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
->> +		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
->>  		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
->>  	};
->>  
+drew
+
