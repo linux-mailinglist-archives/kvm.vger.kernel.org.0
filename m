@@ -2,203 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8555B14CEAE
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 17:48:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24ACD14CF89
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 18:20:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726773AbgA2Qsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 11:48:40 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7024 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726498AbgA2Qsk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jan 2020 11:48:40 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00TGdPVg012590;
-        Wed, 29 Jan 2020 11:48:38 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xttntvjg2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 29 Jan 2020 11:48:38 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 00TGfDIA022437;
-        Wed, 29 Jan 2020 11:48:38 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xttntvjfw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 29 Jan 2020 11:48:38 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00TGl8NN008498;
-        Wed, 29 Jan 2020 16:48:37 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma02wdc.us.ibm.com with ESMTP id 2xrda6uh0m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 29 Jan 2020 16:48:37 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00TGmbn033554910
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 Jan 2020 16:48:37 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4278EB205F;
-        Wed, 29 Jan 2020 16:48:37 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD67FB2066;
-        Wed, 29 Jan 2020 16:48:36 +0000 (GMT)
-Received: from [9.160.91.145] (unknown [9.160.91.145])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 29 Jan 2020 16:48:36 +0000 (GMT)
-Subject: Re: [PATCH v1 1/1] vfio-ccw: Don't free channel programs for
- unrelated interrupts
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        "Jason J . Herne" <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200124145455.51181-1-farman@linux.ibm.com>
- <20200124145455.51181-2-farman@linux.ibm.com>
- <20200124163305.3d6f0d47.cohuck@redhat.com>
- <50a0fe00-a7c1-50e4-12f5-412ee7a0e522@linux.ibm.com>
- <20200127135235.1f783f1b.cohuck@redhat.com>
- <eb3f3887-50f2-ef4d-0b98-b25936047a49@linux.ibm.com>
- <20200128105820.081a4b79.cohuck@redhat.com>
- <6661ad52-0108-e2ae-be19-46ee95e9aa0e@linux.ibm.com>
- <9635c45f-4652-c837-d256-46f426737a5e@linux.ibm.com>
- <20200129130048.39e1b898.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <a3a759ab-89de-c805-ac03-ddb42023a246@linux.ibm.com>
-Date:   Wed, 29 Jan 2020 11:48:36 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1727141AbgA2RUq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 12:20:46 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30756 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726906AbgA2RUq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jan 2020 12:20:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580318442;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CDEy69IL/eMYtpmDS3XjUwKwXrl7W0ck1hqzenez+2c=;
+        b=gdkONAdzy+pd4yBkwcpuqpZLD1tKOLuPAfVsUnlWO7rcuC1kTdGJKLdue/bsmp/OY7xuYs
+        5cFgLjxxDhHJ1+JIjQMxTbQuH9riVpH97zM1ktcYGcOhHaTyfjwadxP5SNI/i5/7XhPWd8
+        CXIujZGQTeQw/kl/4HEv7DpiMnb0mNY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-IuDla0bKOH2KmPPH79RJLw-1; Wed, 29 Jan 2020 12:20:20 -0500
+X-MC-Unique: IuDla0bKOH2KmPPH79RJLw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46763477;
+        Wed, 29 Jan 2020 17:20:19 +0000 (UTC)
+Received: from localhost (ovpn-117-180.ams2.redhat.com [10.36.117.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D7B5F5DE53;
+        Wed, 29 Jan 2020 17:20:11 +0000 (UTC)
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Avi Kivity <avi@scylladb.com>,
+        Davide Libenzi <davidel@xmailserver.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: [RFC] eventfd: add EFD_AUTORESET flag
+Date:   Wed, 29 Jan 2020 17:20:10 +0000
+Message-Id: <20200129172010.162215-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200129130048.39e1b898.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-29_04:2020-01-28,2020-01-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- spamscore=0 impostorscore=0 phishscore=0 bulkscore=0 suspectscore=2
- adultscore=0 priorityscore=1501 mlxlogscore=999 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2001290136
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Some applications simply use eventfd for inter-thread notifications
+without requiring counter or semaphore semantics.  They wait for the
+eventfd to become readable using poll(2)/select(2) and then call read(2)
+to reset the counter.
 
+This patch adds the EFD_AUTORESET flag to reset the counter when
+f_ops->poll() finds the eventfd is readable, eliminating the need to
+call read(2) to reset the counter.
 
-On 1/29/20 7:00 AM, Cornelia Huck wrote:
-> On Tue, 28 Jan 2020 23:13:30 -0500
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> On 1/28/20 9:42 AM, Eric Farman wrote:
->>>
->>>
->>> On 1/28/20 4:58 AM, Cornelia Huck wrote:  
->>>> On Mon, 27 Jan 2020 16:28:18 -0500  
->>
->> ...snip...
->>
->>>>
->>>> cp_init checking cp->initialized would probably be good to catch
->>>> errors, in any case. (Maybe put a trace there, just to see if it fires?)  
->>>
->>> I did this last night, and got frustrated.  The unfortunate thing was
->>> that once it fires, we end up flooding our trace buffers with errors as
->>> the guest continually retries.  So I need to either make a smarter trace
->>> that is rate limited or just crash my host once this condition occurs.
->>> Will try to do that between meetings today.
->>>   
->>
->> I reverted the subject patch, and simply triggered
->> BUG_ON(cp->initialized) in cp_init().  It sprung VERY quickly (all
->> traces are for the same device):
->>
->> 366.399682 03 ...sch_io_todo state=4 o.cpa=03017810
->>                              i.w0=00c04007 i.cpa=03017818 i.w2=0c000000
->> 366.399832 03 ...sch_io_todo state=3 o.cpa=7f53dd30 UNSOLICITED
->>                              i.w0=00c00011 i.cpa=03017818 i.w2=85000000
->> 366.400086 03 ...sch_io_todo state=2 o.cpa=03017930
->>                              i.w0=00c04007 i.cpa=03017938 i.w2=0c000000
->> 366.400313 03 ...sch_io_todo state=3 o.cpa=03017930
->>                              i.w0=00001001 i.cpa=03017938 i.w2=00000000
->>
->> Ah, of course...  Unsolicited interrupts DO reset private->state back to
->> idle, but leave cp->initialized and any channel_program struct remains
->> allocated.  So there's one problem (a memory leak), and an easy one to
->> rectify.
-> 
-> For a moment, I suspected a deferred condition code here, but it seems
-> to be a pure unsolicited interrupt.
-> 
-> But that got me thinking: If we get an unsolicited interrupt while
-> building the cp, it means that the guest is currently executing ssch.
-> We need to get the unsolicited interrupt to the guest, while not
-> executing the ssch. So maybe we need to do the following:
-> 
-> - deliver the unsolicited interrupt to the guest
-> - make sure we don't execute the ssch, but relay a cc 1 for it back to
->   the guest
-> - clean up the cp
-> 
-> Maybe not avoiding issuing the ssch is what gets us in that pickle? We
-> either leak memory or free too much, it seems.
+This results in a small but measurable 1% performance improvement with
+QEMU virtio-blk emulation.  Each read(2) takes 1 microsecond execution
+time in the event loop according to perf.
 
-It's possible...  I'll try hacking at that for a bit.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+Does this look like a reasonable thing to do?  I'm not very familiar
+with f_ops->poll() or the eventfd internals, so maybe I'm overlooking a
+design flaw.
 
-> 
->>
->> After more than a few silly rabbit holes, I had this trace:
->>
->> 429.928480 07 ...sch_io_todo state=4 init=1 o.cpa=7fed8e10
->>                              i.w0=00001001 i.cpa=7fed8e18 i.w2=00000000
->> 429.929132 07 ...sch_io_todo state=4 init=1 o.cpa=0305aed0
->>                              i.w0=00c04007 i.cpa=0305aed8 i.w2=0c000000
->> 429.929538 07 ...sch_io_todo state=4 init=1 o.cpa=0305af30
->>                              i.w0=00c04007 i.cpa=0305af38 i.w2=0c000000
->> 467.339389 07   ...chp_event mask=0x80 event=1
->> 467.339865 03 ...sch_io_todo state=3 init=0 o.cpa=01814548
->>                              i.w0=00c02001 i.cpa=0305af38 i.w2=00000000
->>
->> So my trace is at the beginning of vfio_ccw_sch_io_todo(), but the
->> BUG_ON() is at the end of that function where private->state is
->> (possibly) updated.  Looking at the contents of the vfio_ccw_private
->> struct in the dump, the failing device is currently state=4 init=1
->> instead of 3/0 as in the above trace.  So an I/O was being built in
->> parallel here, and there's no serializing action within the stacked
->> vfio_ccw_sch_io_todo() call to ensure they don't stomp on one another.
->> The io_mutex handles the region changes, and the subchannel lock handles
->> the start/halt/clear subchannel instructions, but nothing on the
->> interrupt side, nor contention between them.  Sigh.
-> 
-> I feel we've been here a few times already, and never seem to come up
-> with a complete solution :(
-> 
-> There had been some changes by Pierre regarding locking the fsm; maybe
-> that's what's needed here?
+I've tested this with QEMU and it works fine:
+https://github.com/stefanha/qemu/commits/eventfd-autoreset
+---
+ fs/eventfd.c            | 99 +++++++++++++++++++++++++----------------
+ include/linux/eventfd.h |  3 +-
+ 2 files changed, 62 insertions(+), 40 deletions(-)
 
-Hrm...  I'd forgotten all about those.  I found them on
-patchwork.kernel.org; will see what they encompass.
+diff --git a/fs/eventfd.c b/fs/eventfd.c
+index 8aa0ea8c55e8..208f6b9e2234 100644
+--- a/fs/eventfd.c
++++ b/fs/eventfd.c
+@@ -116,45 +116,62 @@ static __poll_t eventfd_poll(struct file *file, pol=
+l_table *wait)
+=20
+ 	poll_wait(file, &ctx->wqh, wait);
+=20
+-	/*
+-	 * All writes to ctx->count occur within ctx->wqh.lock.  This read
+-	 * can be done outside ctx->wqh.lock because we know that poll_wait
+-	 * takes that lock (through add_wait_queue) if our caller will sleep.
+-	 *
+-	 * The read _can_ therefore seep into add_wait_queue's critical
+-	 * section, but cannot move above it!  add_wait_queue's spin_lock acts
+-	 * as an acquire barrier and ensures that the read be ordered properly
+-	 * against the writes.  The following CAN happen and is safe:
+-	 *
+-	 *     poll                               write
+-	 *     -----------------                  ------------
+-	 *     lock ctx->wqh.lock (in poll_wait)
+-	 *     count =3D ctx->count
+-	 *     __add_wait_queue
+-	 *     unlock ctx->wqh.lock
+-	 *                                        lock ctx->qwh.lock
+-	 *                                        ctx->count +=3D n
+-	 *                                        if (waitqueue_active)
+-	 *                                          wake_up_locked_poll
+-	 *                                        unlock ctx->qwh.lock
+-	 *     eventfd_poll returns 0
+-	 *
+-	 * but the following, which would miss a wakeup, cannot happen:
+-	 *
+-	 *     poll                               write
+-	 *     -----------------                  ------------
+-	 *     count =3D ctx->count (INVALID!)
+-	 *                                        lock ctx->qwh.lock
+-	 *                                        ctx->count +=3D n
+-	 *                                        **waitqueue_active is false**
+-	 *                                        **no wake_up_locked_poll!**
+-	 *                                        unlock ctx->qwh.lock
+-	 *     lock ctx->wqh.lock (in poll_wait)
+-	 *     __add_wait_queue
+-	 *     unlock ctx->wqh.lock
+-	 *     eventfd_poll returns 0
+-	 */
+-	count =3D READ_ONCE(ctx->count);
++	if (ctx->flags & EFD_AUTORESET) {
++		unsigned long flags;
++		__poll_t requested =3D poll_requested_events(wait);
++
++		spin_lock_irqsave(&ctx->wqh.lock, flags);
++		count =3D ctx->count;
++
++		/* Reset counter if caller is polling for read */
++		if (count !=3D 0 && (requested & EPOLLIN)) {
++			ctx->count =3D 0;
++			events |=3D EPOLLOUT;
++			/* TODO is a EPOLLOUT wakeup necessary here? */
++		}
++
++		spin_unlock_irqrestore(&ctx->wqh.lock, flags);
++	} else {
++		/*
++		 * All writes to ctx->count occur within ctx->wqh.lock.  This read
++		 * can be done outside ctx->wqh.lock because we know that poll_wait
++		 * takes that lock (through add_wait_queue) if our caller will sleep.
++		 *
++		 * The read _can_ therefore seep into add_wait_queue's critical
++		 * section, but cannot move above it!  add_wait_queue's spin_lock acts
++		 * as an acquire barrier and ensures that the read be ordered properly
++		 * against the writes.  The following CAN happen and is safe:
++		 *
++		 *     poll                               write
++		 *     -----------------                  ------------
++		 *     lock ctx->wqh.lock (in poll_wait)
++		 *     count =3D ctx->count
++		 *     __add_wait_queue
++		 *     unlock ctx->wqh.lock
++		 *                                        lock ctx->qwh.lock
++		 *                                        ctx->count +=3D n
++		 *                                        if (waitqueue_active)
++		 *                                          wake_up_locked_poll
++		 *                                        unlock ctx->qwh.lock
++		 *     eventfd_poll returns 0
++		 *
++		 * but the following, which would miss a wakeup, cannot happen:
++		 *
++		 *     poll                               write
++		 *     -----------------                  ------------
++		 *     count =3D ctx->count (INVALID!)
++		 *                                        lock ctx->qwh.lock
++		 *                                        ctx->count +=3D n
++		 *                                        **waitqueue_active is false*=
+*
++		 *                                        **no wake_up_locked_poll!**
++		 *                                        unlock ctx->qwh.lock
++		 *     lock ctx->wqh.lock (in poll_wait)
++		 *     __add_wait_queue
++		 *     unlock ctx->wqh.lock
++		 *     eventfd_poll returns 0
++		 */
++		count =3D READ_ONCE(ctx->count);
++	}
+=20
+ 	if (count > 0)
+ 		events |=3D EPOLLIN;
+@@ -400,6 +417,10 @@ static int do_eventfd(unsigned int count, int flags)
+ 	if (flags & ~EFD_FLAGS_SET)
+ 		return -EINVAL;
+=20
++	/* Semaphore semantics don't make sense when autoreset is enabled */
++	if ((flags & EFD_SEMAPHORE) && (flags & EFD_AUTORESET))
++		return -EINVAL;
++
+ 	ctx =3D kmalloc(sizeof(*ctx), GFP_KERNEL);
+ 	if (!ctx)
+ 		return -ENOMEM;
+diff --git a/include/linux/eventfd.h b/include/linux/eventfd.h
+index ffcc7724ca21..27577fafc553 100644
+--- a/include/linux/eventfd.h
++++ b/include/linux/eventfd.h
+@@ -21,11 +21,12 @@
+  * shared O_* flags.
+  */
+ #define EFD_SEMAPHORE (1 << 0)
++#define EFD_AUTORESET (1 << 6) /* aliases O_CREAT */
+ #define EFD_CLOEXEC O_CLOEXEC
+ #define EFD_NONBLOCK O_NONBLOCK
+=20
+ #define EFD_SHARED_FCNTL_FLAGS (O_CLOEXEC | O_NONBLOCK)
+-#define EFD_FLAGS_SET (EFD_SHARED_FCNTL_FLAGS | EFD_SEMAPHORE)
++#define EFD_FLAGS_SET (EFD_SHARED_FCNTL_FLAGS | EFD_SEMAPHORE | EFD_AUTO=
+RESET)
+=20
+ struct eventfd_ctx;
+ struct file;
+--=20
+2.24.1
 
-> 
->>
->> My brain hurts.  I re-applied this patch (with some validation that the
->> cpa is valid) to my current franken-code, and will let it run overnight.
->>  I think it's going to be racing other CPUs and I'll find a dead system
->> by morning, but who knows.  Maybe not.  :)
->>
-> 
-> I can relate to the brain hurting part :)
-> 
-
-:)
-
-My system crashed after about six hours, but not because of the BUG_ON()
-traps I placed.  Rather, dma-kmalloc-8 got clobbered again with what
-looks like x100 bytes of data from one of the other CCWs.  Of course, I
-didn't trace the CCW/IDA data this time, so I don't know when the memory
-in question was allocated/released/used.  But, there are 35 deferred
-cc=1 interrupts in the trace though, so I'll give some some thought to
-the ideas above while re-running with the full traces in place.
-
-Thanks!
