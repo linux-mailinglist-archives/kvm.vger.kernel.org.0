@@ -2,190 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33A2E14C9EB
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 12:51:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD23814CA06
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 13:01:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726246AbgA2Lvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 06:51:32 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53321 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726067AbgA2Lvc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jan 2020 06:51:32 -0500
+        id S1726252AbgA2MBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 07:01:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36787 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726145AbgA2MBG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jan 2020 07:01:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580298691;
+        s=mimecast20190719; t=1580299265;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=H6jaW2S+odlaQy0KIFqAU+bpuLsglbrvaxzUp7pUckY=;
-        b=Q5xLQJL17rL0BnyBsSd0nn7/VNu3HN0gdlwLMp7wHfo2CS2N4yrvZtx18vUJ9u1t1DQ4GW
-        ViEuPLTpf3lVsLYrA8XWkBr3Yjo7VdndBLy7mlodGtfph3Q6boaDqx2ufifYNpi5AVp7C+
-        3R+l780tYYxcrvyKF4zFDJckWmtiAMA=
+        bh=o9z6AABaHoKdCY+CLXyFSVRKIUfvIU0jBPZ3wtNvswY=;
+        b=MCao+GJ5GXv9OeqAuxuNfAfWMpywEJ0zUddvpZIWliUDeiS4QyQCmr/Mby5ES2cYiKC+xo
+        PoQ0MZQqMTfDR9s2dId1klSRza5F5CygU78RkkI6W2IuW/V84XZIyFvY1OwVu+n6DnYdKJ
+        pHys6ZFm1jmU8KrDWVsLp/ioxmMwmcI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-mn4g7pguNBicsBokMMELLw-1; Wed, 29 Jan 2020 06:51:27 -0500
-X-MC-Unique: mn4g7pguNBicsBokMMELLw-1
+ us-mta-422-_l7HGGuMOpGbbSYShriwwQ-1; Wed, 29 Jan 2020 07:00:53 -0500
+X-MC-Unique: _l7HGGuMOpGbbSYShriwwQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAC2C13E2;
-        Wed, 29 Jan 2020 11:51:26 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ADAE45D9C5;
-        Wed, 29 Jan 2020 11:51:25 +0000 (UTC)
-Date:   Wed, 29 Jan 2020 12:51:23 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        thuth@redhat.com
-Subject: Re: [PATCH v2] kvm: selftests: Introduce num-pages conversion
- utilities
-Message-ID: <20200129115123.kswbeza33atbfk47@kamzik.brq.redhat.com>
-References: <20200128093443.25414-1-drjones@redhat.com>
- <CANgfPd-xYX5Y=ajjP62z-jwKepeFaRVwSMQKq3N1oc1zO57mRg@mail.gmail.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C15B13E5;
+        Wed, 29 Jan 2020 12:00:52 +0000 (UTC)
+Received: from gondolin (ovpn-116-225.ams2.redhat.com [10.36.116.225])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 01C525D9C5;
+        Wed, 29 Jan 2020 12:00:50 +0000 (UTC)
+Date:   Wed, 29 Jan 2020 13:00:48 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        "Jason J . Herne" <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v1 1/1] vfio-ccw: Don't free channel programs for
+ unrelated interrupts
+Message-ID: <20200129130048.39e1b898.cohuck@redhat.com>
+In-Reply-To: <9635c45f-4652-c837-d256-46f426737a5e@linux.ibm.com>
+References: <20200124145455.51181-1-farman@linux.ibm.com>
+        <20200124145455.51181-2-farman@linux.ibm.com>
+        <20200124163305.3d6f0d47.cohuck@redhat.com>
+        <50a0fe00-a7c1-50e4-12f5-412ee7a0e522@linux.ibm.com>
+        <20200127135235.1f783f1b.cohuck@redhat.com>
+        <eb3f3887-50f2-ef4d-0b98-b25936047a49@linux.ibm.com>
+        <20200128105820.081a4b79.cohuck@redhat.com>
+        <6661ad52-0108-e2ae-be19-46ee95e9aa0e@linux.ibm.com>
+        <9635c45f-4652-c837-d256-46f426737a5e@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd-xYX5Y=ajjP62z-jwKepeFaRVwSMQKq3N1oc1zO57mRg@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 28, 2020 at 09:37:21AM -0800, Ben Gardon wrote:
-> On Tue, Jan 28, 2020 at 1:34 AM Andrew Jones <drjones@redhat.com> wrote:
-> >
-> > Guests and hosts don't have to have the same page size. This means
-> > calculations are necessary when selecting the number of guest pages
-> > to allocate in order to ensure the number is compatible with the
-> > host. Provide utilities to help with those calculations.
-> >
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/dirty_log_test.c  | 10 ++++----
-> >  .../testing/selftests/kvm/include/kvm_util.h  |  3 +++
-> >  .../testing/selftests/kvm/include/test_util.h |  2 ++
-> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 24 +++++++++++++++++++
-> >  4 files changed, 33 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> > index 5614222a6628..2383c55a1a1a 100644
-> > --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> > +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> > @@ -178,12 +178,11 @@ static void *vcpu_worker(void *data)
-> >         return NULL;
-> >  }
-> >
-> > -static void vm_dirty_log_verify(unsigned long *bmap)
-> > +static void vm_dirty_log_verify(struct kvm_vm *vm, unsigned long *bmap)
-> >  {
-> > +       uint64_t step = vm_num_host_pages(vm, 1);
-> >         uint64_t page;
-> >         uint64_t *value_ptr;
-> > -       uint64_t step = host_page_size >= guest_page_size ? 1 :
-> > -                               guest_page_size / host_page_size;
-> >
-> >         for (page = 0; page < host_num_pages; page += step) {
-> >                 value_ptr = host_test_mem + page * host_page_size;
-> > @@ -295,8 +294,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
-> >         guest_num_pages = (guest_num_pages + 0xff) & ~0xffUL;
-> >  #endif
-> >         host_page_size = getpagesize();
-> > -       host_num_pages = (guest_num_pages * guest_page_size) / host_page_size +
-> > -                        !!((guest_num_pages * guest_page_size) % host_page_size);
-> > +       host_num_pages = vm_num_host_pages(vm, guest_num_pages);
-> >
-> >         if (!phys_offset) {
-> >                 guest_test_phys_mem = (vm_get_max_gfn(vm) -
-> > @@ -369,7 +367,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
-> >                 kvm_vm_clear_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap, 0,
-> >                                        host_num_pages);
-> >  #endif
-> > -               vm_dirty_log_verify(bmap);
-> > +               vm_dirty_log_verify(vm, bmap);
-> >                 iteration++;
-> >                 sync_global_to_guest(vm, iteration);
-> >         }
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > index 29cccaf96baf..0d05ade3022c 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > @@ -158,6 +158,9 @@ unsigned int vm_get_page_size(struct kvm_vm *vm);
-> >  unsigned int vm_get_page_shift(struct kvm_vm *vm);
-> >  unsigned int vm_get_max_gfn(struct kvm_vm *vm);
-> >
-> > +unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest_pages);
-> > +unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host_pages);
-> > +
-> >  struct kvm_userspace_memory_region *
-> >  kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
-> >                                  uint64_t end);
-> > diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-> > index a41db6fb7e24..25c27739e085 100644
-> > --- a/tools/testing/selftests/kvm/include/test_util.h
-> > +++ b/tools/testing/selftests/kvm/include/test_util.h
-> > @@ -19,6 +19,8 @@
-> >  #include <fcntl.h>
-> >  #include "kselftest.h"
-> >
-> > +#define getpageshift() (__builtin_ffs(getpagesize()) - 1)
-> > +
-> >  ssize_t test_write(int fd, const void *buf, size_t count);
-> >  ssize_t test_read(int fd, void *buf, size_t count);
-> >  int test_seq_read(const char *path, char **bufp, size_t *sizep);
-> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > index 41cf45416060..d9bca2f1cc95 100644
-> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -1667,3 +1667,27 @@ unsigned int vm_get_max_gfn(struct kvm_vm *vm)
-> >  {
-> >         return vm->max_gfn;
-> >  }
-> > +
-> > +static unsigned int vm_calc_num_pages(unsigned int num_pages,
-> > +                                     unsigned int page_shift,
-> > +                                     unsigned int new_page_shift)
-> > +{
-> > +       unsigned int n = 1 << (new_page_shift - page_shift);
-> > +
-> > +       if (page_shift >= new_page_shift)
-> > +               return num_pages * (1 << (page_shift - new_page_shift));
-> > +
-> > +       return num_pages / n + !!(num_pages % n);
-> > +}
-> > +
-> > +unsigned int vm_num_host_pages(struct kvm_vm *vm, unsigned int num_guest_pages)
-> > +{
-> > +       return vm_calc_num_pages(num_guest_pages, vm_get_page_shift(vm),
-> > +                                getpageshift());
-> > +}
-> > +
-> > +unsigned int vm_num_guest_pages(struct kvm_vm *vm, unsigned int num_host_pages)
-> > +{
-> > +       return vm_calc_num_pages(num_host_pages, getpageshift(),
-> > +                                vm_get_page_shift(vm));
-> > +}
+On Tue, 28 Jan 2020 23:13:30 -0500
+Eric Farman <farman@linux.ibm.com> wrote:
+
+> On 1/28/20 9:42 AM, Eric Farman wrote:
+> > 
+> > 
+> > On 1/28/20 4:58 AM, Cornelia Huck wrote:  
+> >> On Mon, 27 Jan 2020 16:28:18 -0500  
 > 
-> This function appears to be unused. I don't have any opposition to
-> adding it since it is simple, unlikely to bitrot, and seems like a
-> useful utility.
->
+> ...snip...
+> 
+> >>
+> >> cp_init checking cp->initialized would probably be good to catch
+> >> errors, in any case. (Maybe put a trace there, just to see if it fires?)  
+> > 
+> > I did this last night, and got frustrated.  The unfortunate thing was
+> > that once it fires, we end up flooding our trace buffers with errors as
+> > the guest continually retries.  So I need to either make a smarter trace
+> > that is rate limited or just crash my host once this condition occurs.
+> > Will try to do that between meetings today.
+> >   
+> 
+> I reverted the subject patch, and simply triggered
+> BUG_ON(cp->initialized) in cp_init().  It sprung VERY quickly (all
+> traces are for the same device):
+> 
+> 366.399682 03 ...sch_io_todo state=4 o.cpa=03017810
+>                              i.w0=00c04007 i.cpa=03017818 i.w2=0c000000
+> 366.399832 03 ...sch_io_todo state=3 o.cpa=7f53dd30 UNSOLICITED
+>                              i.w0=00c00011 i.cpa=03017818 i.w2=85000000
+> 366.400086 03 ...sch_io_todo state=2 o.cpa=03017930
+>                              i.w0=00c04007 i.cpa=03017938 i.w2=0c000000
+> 366.400313 03 ...sch_io_todo state=3 o.cpa=03017930
+>                              i.w0=00001001 i.cpa=03017938 i.w2=00000000
+> 
+> Ah, of course...  Unsolicited interrupts DO reset private->state back to
+> idle, but leave cp->initialized and any channel_program struct remains
+> allocated.  So there's one problem (a memory leak), and an easy one to
+> rectify.
 
-Yeah, I was thinking it might be useful for tests to calculate the
-number of guest pages from a given memory size
+For a moment, I suspected a deferred condition code here, but it seems
+to be a pure unsolicited interrupt.
 
-  num_host_pages = DIV_ROUND_UP(memory_size, getpagesize());
-  num_guest_pages = vm_num_guest_pages(vm, num_host_pages);
+But that got me thinking: If we get an unsolicited interrupt while
+building the cp, it means that the guest is currently executing ssch.
+We need to get the unsolicited interrupt to the guest, while not
+executing the ssch. So maybe we need to do the following:
 
-But now I see we need a v3 of this patch. When calculating the
-number of guest pages from host pages we should round down, not
-up. Also, I should have used DIV_ROUND_UP() which is defined in
-tools/include/linux/kernel.h. I see it's even defined in
-lib/kvm_util_internal.h too, but we can delete it from there
-and just use linux/kernel.h. I'll do the deleting as a separate
-cleanup patch though.
+- deliver the unsolicited interrupt to the guest
+- make sure we don't execute the ssch, but relay a cc 1 for it back to
+  the guest
+- clean up the cp
 
-Thanks,
-drew
+Maybe not avoiding issuing the ssch is what gets us in that pickle? We
+either leak memory or free too much, it seems.
+
+> 
+> After more than a few silly rabbit holes, I had this trace:
+> 
+> 429.928480 07 ...sch_io_todo state=4 init=1 o.cpa=7fed8e10
+>                              i.w0=00001001 i.cpa=7fed8e18 i.w2=00000000
+> 429.929132 07 ...sch_io_todo state=4 init=1 o.cpa=0305aed0
+>                              i.w0=00c04007 i.cpa=0305aed8 i.w2=0c000000
+> 429.929538 07 ...sch_io_todo state=4 init=1 o.cpa=0305af30
+>                              i.w0=00c04007 i.cpa=0305af38 i.w2=0c000000
+> 467.339389 07   ...chp_event mask=0x80 event=1
+> 467.339865 03 ...sch_io_todo state=3 init=0 o.cpa=01814548
+>                              i.w0=00c02001 i.cpa=0305af38 i.w2=00000000
+> 
+> So my trace is at the beginning of vfio_ccw_sch_io_todo(), but the
+> BUG_ON() is at the end of that function where private->state is
+> (possibly) updated.  Looking at the contents of the vfio_ccw_private
+> struct in the dump, the failing device is currently state=4 init=1
+> instead of 3/0 as in the above trace.  So an I/O was being built in
+> parallel here, and there's no serializing action within the stacked
+> vfio_ccw_sch_io_todo() call to ensure they don't stomp on one another.
+> The io_mutex handles the region changes, and the subchannel lock handles
+> the start/halt/clear subchannel instructions, but nothing on the
+> interrupt side, nor contention between them.  Sigh.
+
+I feel we've been here a few times already, and never seem to come up
+with a complete solution :(
+
+There had been some changes by Pierre regarding locking the fsm; maybe
+that's what's needed here?
+
+> 
+> My brain hurts.  I re-applied this patch (with some validation that the
+> cpa is valid) to my current franken-code, and will let it run overnight.
+>  I think it's going to be racing other CPUs and I'll find a dead system
+> by morning, but who knows.  Maybe not.  :)
+> 
+
+I can relate to the brain hurting part :)
 
