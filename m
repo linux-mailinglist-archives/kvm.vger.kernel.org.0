@@ -2,203 +2,332 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 55D8414C89D
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 11:14:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 363FC14C8BC
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 11:29:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726548AbgA2KOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 05:14:39 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56260 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726010AbgA2KOj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jan 2020 05:14:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580292877;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rlt0kehN3QF2KGB6VErLQgpui21PKLAlCENcJk6yot4=;
-        b=TYCTvlFYF0tTGqpxmRBA8NVSCzlvTncNmPA679NGqnMKPbsrHI8P8SZ8BlswvwZQ3BQdOL
-        HyKTHo27TfPPTmZCyxmVE24L1Yvqt/WiR5sHdcs3TUYr/w+r5v3DR+m0F+gXUrQPs1ENeX
-        H0UZUm5epSH80kB5fW6kwP1pJw5RL9E=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-QzDeija1MyOx9PIRLzE3WA-1; Wed, 29 Jan 2020 05:14:33 -0500
-X-MC-Unique: QzDeija1MyOx9PIRLzE3WA-1
-Received: by mail-qt1-f199.google.com with SMTP id a13so10508774qtp.8
-        for <kvm@vger.kernel.org>; Wed, 29 Jan 2020 02:14:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Rlt0kehN3QF2KGB6VErLQgpui21PKLAlCENcJk6yot4=;
-        b=HPqcbZ95rzQvLnDZLoCBhz+TaexRTxzKh4w6i2rc2JKwHmr9GMSyOOADd5LkDYc2n8
-         tTDIcFoWWx1j3IdXma4zE/9mNZRMBWxXPlp+IA5lPs7OTqbePck5X9cnu+LxXtxRK0nC
-         2A+jLVvqnd83wOU+VZe8m8Vy6OshO9WmtmlBpsVghDo/+lRkSoE82b01D/WYeCsy7gbX
-         /8stmWPwWM7Dqlwiw/676TPcIDVq4qjCGtpNgzGyTRbYsDEBnx83tl/BTQ2rq9ZimEOQ
-         B87uuRD3SOFY4p1AVotN/ZnG8XfBklIlvS1+U4htrCCpqHNm+jDP9fiaZG1Za78+ckYN
-         1KOA==
-X-Gm-Message-State: APjAAAVbhJtk4hA+eVB/2DonyxYQ8K+mDd9fVkf2vvcBS3B7DVnYu95y
-        lB5NUFwRTMKSBEFp4Mn/S4TM8uWCu/nAKvzPg5wKL2pfdeZ+G5OXkKOnPfr1MtqId06AVHlxZF4
-        B7MZ0S2C38vOB
-X-Received: by 2002:a05:620a:9d9:: with SMTP id y25mr26921920qky.41.1580292872798;
-        Wed, 29 Jan 2020 02:14:32 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzu2nrf6QYNHZGHQeM1OSuRlOKDi4U7WT8rVBHghm4Kw8Lp8BSj2CHDFz+AxJ5ac8HvLU21LA==
-X-Received: by 2002:a05:620a:9d9:: with SMTP id y25mr26921890qky.41.1580292872381;
-        Wed, 29 Jan 2020 02:14:32 -0800 (PST)
-Received: from redhat.com (bzq-109-64-11-187.red.bezeqint.net. [109.64.11.187])
-        by smtp.gmail.com with ESMTPSA id a24sm714862qkl.82.2020.01.29.02.14.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2020 02:14:31 -0800 (PST)
-Date:   Wed, 29 Jan 2020 05:14:26 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jing Liu <jing2.liu@linux.intel.com>
-Cc:     virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Liu Jiang <gerry@linux.alibaba.com>,
-        Zha Bin <zhabin@linux.alibaba.com>
-Subject: Re: [virtio-dev] [PATCH v2 5/5] virtio-mmio: MSI vector and event
- mapping
-Message-ID: <20200129051247-mutt-send-email-mst@kernel.org>
-References: <1579614873-21907-1-git-send-email-jing2.liu@linux.intel.com>
- <1579614873-21907-6-git-send-email-jing2.liu@linux.intel.com>
+        id S1726139AbgA2K36 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 05:29:58 -0500
+Received: from foss.arm.com ([217.140.110.172]:38990 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726067AbgA2K35 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jan 2020 05:29:57 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 531C21FB;
+        Wed, 29 Jan 2020 02:29:56 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C5693F52E;
+        Wed, 29 Jan 2020 02:29:55 -0800 (PST)
+Date:   Wed, 29 Jan 2020 10:29:52 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com
+Subject: Re: [PATCH kvmtool 06/16] ioport: pci: Move port allocations to PCI
+ devices
+Message-ID: <20200129102952.141f96a2@donnerap.cambridge.arm.com>
+In-Reply-To: <1aaa4ac8-679a-ea8d-cf9a-1c8ed0b94c55@arm.com>
+References: <20191125103033.22694-1-alexandru.elisei@arm.com>
+        <20191125103033.22694-7-alexandru.elisei@arm.com>
+        <20200128182514.52a6095b@donnerap.cambridge.arm.com>
+        <1aaa4ac8-679a-ea8d-cf9a-1c8ed0b94c55@arm.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1579614873-21907-6-git-send-email-jing2.liu@linux.intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 21, 2020 at 09:54:33PM +0800, Jing Liu wrote:
-> Bit 1 msi_sharing reported in the MsiState register indicates the mapping mode
-> device uses.
-> 
-> Bit 1 is 0 - device uses MSI non-sharing mode. This indicates vector per event and
-> fixed static vectors and events relationship. This fits for devices with a high interrupt
-> rate and best performance;
-> Bit 1 is 1 - device uses MSI sharing mode. This indicates vectors and events
-> dynamic mapping and fits for devices not requiring a high interrupt rate.
+On Wed, 29 Jan 2020 10:07:00 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-It seems that sharing mode is a superset of non-sharing mode.
-Isn't that right? E.g. with sharing mode drivers
-can still avoid sharing if they like.
+> Hi,
+> 
+> There's a newer version of the patches available, version 2, you were reviewing it
+> a few days ago ;)
 
-Maybe it should just be a hint to drivers whether to share
-interrupts, instead of a completely different layout?
+Ouch, thanks for the heads up! I now deleted the old series from my Review folder.
 
-> Co-developed-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Liu Jiang <gerry@linux.alibaba.com>
-> Signed-off-by: Liu Jiang <gerry@linux.alibaba.com>
-> Co-developed-by: Zha Bin <zhabin@linux.alibaba.com>
-> Signed-off-by: Zha Bin <zhabin@linux.alibaba.com>
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
-> ---
->  content.tex | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
->  msi-state.c |  3 ++-
->  2 files changed, 49 insertions(+), 2 deletions(-)
+> On 1/28/20 6:25 PM, Andre Przywara wrote:
+> > On Mon, 25 Nov 2019 10:30:23 +0000
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >
+> > Hi,
+> >  
+> >> From: Julien Thierry <julien.thierry@arm.com>
+> >>
+> >> The dynamic ioport allocation with IOPORT_EMPTY is currently only used
+> >> by PCI devices. Other devices use fixed ports for which they request
+> >> registration to the ioport API.
+> >>
+> >> PCI ports need to be in the PCI IO space and there is no reason ioport
+> >> API should know a PCI port is being allocated and needs to be placed in
+> >> PCI IO space. This currently just happens to be the case.
+> >>
+> >> Move the responsability of dynamic allocation of ioports from the ioport
+> >> API to PCI.
+> >>
+> >> In the future, if other types of devices also need dynamic ioport
+> >> allocation, they'll have to figure out the range of ports they are
+> >> allowed to use.  
+> > That looks alright to me, just one question:
+> > The old ioport__find_free_port() routine used a mutex to prevent concurrent execution.
+> > Why don't we need this anymore? Are we sure that there is only one thread of execution calling this function?  
 > 
-> diff --git a/content.tex b/content.tex
-> index dcf6c71..2fd1686 100644
-> --- a/content.tex
-> +++ b/content.tex
-> @@ -1770,7 +1770,8 @@ \subsection{MMIO Device Register Layout}\label{sec:Virtio Transport Options / Vi
->    \hline
->    \mmioreg{MsiState}{MSI state}{0x0c4}{R}{%
->      When VIRTIO_F_MMIO_MSI has been negotiated, reading
-> -    from this register returns the global MSI enable/disable status.
-> +    from this register returns the global MSI enable/disable status
-> +    and whether device uses MSI sharing mode.
->      \lstinputlisting{msi-state.c}
->    }
->    \hline
-> @@ -1926,12 +1927,18 @@ \subsubsection{Device Initialization}\label{sec:Virtio Transport Options / Virti
->  mask and unmask the MSI vector applying to the one selected by writing
->  to \field{MsiVecSel}.
->  
-> +VIRTIO_MMIO_MSI_CMD_MAP_CONFIG command is to set the configuration event and MSI vector
-> +mapping. VIRTIO_MMIO_MSI_CMD_MAP_QUEUE is to set the queue event and MSI vector
-> +mapping. They SHOULD only be used in MSI sharing mode.
-> +
->  \begin{lstlisting}
->  #define  VIRTIO_MMIO_MSI_CMD_ENABLE           0x1
->  #define  VIRTIO_MMIO_MSI_CMD_DISABLE          0x2
->  #define  VIRTIO_MMIO_MSI_CMD_CONFIGURE        0x3
->  #define  VIRTIO_MMIO_MSI_CMD_MASK             0x4
->  #define  VIRTIO_MMIO_MSI_CMD_UNMASK           0x5
-> +#define  VIRTIO_MMIO_MSI_CMD_MAP_CONFIG       0x6
-> +#define  VIRTIO_MMIO_MSI_CMD_MAP_QUEUE        0x7
->  \end{lstlisting}
->  
->  Setting a special NO_VECTOR value means disabling an interrupt for an event type.
-> @@ -1941,10 +1948,49 @@ \subsubsection{Device Initialization}\label{sec:Virtio Transport Options / Virti
->  #define VIRTIO_MMIO_MSI_NO_VECTOR             0xffffffff
->  \end{lstlisting}
->  
-> +\subparagraph{MSI Vector and Event Mapping}\label{sec:Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / Device Initialization / MSI Vector Configuration}
-> +The reported \field{msi_sharing} bit in the \field{MsiState} return value shows
-> +the MSI sharing mode that device uses.
-> +
-> +When \field{msi_sharing} bit is 0, it indicates the device uses non-sharing mode
-> +and vector per event fixed static relationship is used. The first vector is for device
-> +configuraiton change event, the second vector is for virtqueue 1, the third vector
-> +is for virtqueue 2 and so on.
-> +
-> +When \field{msi_sharing} bit is 1, it indicates the device uses MSI sharing mode,
-> +and the vector and event mapping is dynamic. Writing \field{MsiVecSel}
-> +followed by writing VIRTIO_MMIO_MSI_CMD_MAP_CONFIG/VIRTIO_MMIO_MSI_CMD_MAP_QUEUE command
-> +maps interrupts triggered by the configuration change/selected queue events respectively
-> +to the corresponding MSI vector.
-> +
-> +\devicenormative{\subparagraph}{MSI Vector Configuration}{Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / MSI Vector Configuration}
-> +
-> +When the device reports \field{msi_sharing} bit as 0, it SHOULD support a number of
-> +vectors that greater than the maximum number of virtqueues.
-> +Device MUST report the number of vectors supported in \field{MsiVecNum}.
-> +
-> +When the device reports \field{msi_sharing} bit as 1, it SHOULD support at least
-> +2 MSI vectors and MUST report in \field{MsiVecNum}. Device SHOULD support mapping any
-> +event type to any vector under \field{MsiVecNum}.
-> +
-> +Device MUST support unmapping any event type (NO_VECTOR).
-> +
-> +The device SHOULD restrict the reported \field{msi_sharing} and \field{MsiVecNum}
-> +to a value that might benefit system performance.
-> +
-> +\begin{note}
-> +For example, a device which does not expect to send interrupts at a high rate might
-> +return \field{msi_sharing} bit as 1.
-> +\end{note}
-> +
->  \drivernormative{\subparagraph}{MSI Vector Configuration}{Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / MSI Vector Configuration}
->  When VIRTIO_F_MMIO_MSI has been negotiated, driver should try to configure
->  and enable MSI.
->  
-> +To set up the event and vector mapping for MSI sharing mode, driver SHOULD
-> +write a valid \field{MsiVecSel} followed by VIRTIO_MMIO_MSI_CMD_MAP_CONFIG/VIRTIO_MMIO_MSI_CMD_MAP_QUEUE
-> +command to map the configuration change/selected queue events respectively.
-> +
->  To configure MSI vector, driver SHOULD firstly specify the MSI vector index by
->  writing to \field{MsiVecSel}.
->  Then notify the MSI address and data by writing to \field{MsiAddrLow}, \field{MsiAddrHigh},
-> diff --git a/msi-state.c b/msi-state.c
-> index b1fa0c1..d470be4 100644
-> --- a/msi-state.c
-> +++ b/msi-state.c
-> @@ -1,4 +1,5 @@
->  le32 {
->      msi_enabled : 1;
-> -    reserved : 31;
-> +    msi_sharing: 1;
-> +    reserved : 30;
->  };
-> -- 
-> 2.7.4
+> If I'm not mistaken, ioport/mmio space allocation is only executed when the
+> virtual machine is created, which is done by the main thread (the one that creates
+> the VCPU threads when the VM is run). After the VM is running, we don't do any
+> allocation, it's the guest's responsibility to manage these resources.
 > 
-> 
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> The function was added in commit c132a6d4c259 ("kvm tools: Add basic ioport
+> dynamic allocation") from 2011, and as far as I can tell it was designed to be
+> used directly by virtio devices to do dynamic ioport allocations (see ebe9ac191d6a
+> "kvm tools: Use ioport context to control blk devices"). Nowadays that's done by
+> virtio/pci.c, and the init functions are called sequentially (see init_list__init).
+
+Thanks for the analysis, I was thinking the same, was just too lazy to go down the rabbit hole and chase that down ;-)
+I agree that since the actual allocation has moved outside of ioport__register(), it should be safe now.
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+
+Cheers,
+Andre
+
+> >> Cc: julien.thierry.kdev@gmail.com
+> >> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+> >> [Renamed functions for clarity]
+> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >> ---
+> >>  hw/vesa.c                      |  4 ++--
+> >>  include/kvm/ioport.h           |  3 ---
+> >>  include/kvm/pci.h              |  4 +++-
+> >>  ioport.c                       | 18 ------------------
+> >>  pci.c                          | 17 +++++++++++++----
+> >>  powerpc/include/kvm/kvm-arch.h |  2 +-
+> >>  vfio/core.c                    |  6 ++++--
+> >>  vfio/pci.c                     |  4 ++--
+> >>  virtio/pci.c                   |  7 ++++---
+> >>  x86/include/kvm/kvm-arch.h     |  2 +-
+> >>  10 files changed, 30 insertions(+), 37 deletions(-)
+> >>
+> >> diff --git a/hw/vesa.c b/hw/vesa.c
+> >> index 75670a51be5f..70ab59974f76 100644
+> >> --- a/hw/vesa.c
+> >> +++ b/hw/vesa.c
+> >> @@ -62,8 +62,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+> >>  
+> >>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
+> >>  		return NULL;
+> >> -
+> >> -	r = ioport__register(kvm, IOPORT_EMPTY, &vesa_io_ops, IOPORT_SIZE, NULL);
+> >> +	r = pci_get_io_port_block(IOPORT_SIZE);
+> >> +	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
+> >>  	if (r < 0)
+> >>  		return ERR_PTR(r);
+> >>  
+> >> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+> >> index db52a479742b..b10fcd5b4412 100644
+> >> --- a/include/kvm/ioport.h
+> >> +++ b/include/kvm/ioport.h
+> >> @@ -14,11 +14,8 @@
+> >>  
+> >>  /* some ports we reserve for own use */
+> >>  #define IOPORT_DBG			0xe0
+> >> -#define IOPORT_START			0x6200
+> >>  #define IOPORT_SIZE			0x400
+> >>  
+> >> -#define IOPORT_EMPTY			USHRT_MAX
+> >> -
+> >>  struct kvm;
+> >>  
+> >>  struct ioport {
+> >> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
+> >> index a86c15a70e6d..ccb155e3e8fe 100644
+> >> --- a/include/kvm/pci.h
+> >> +++ b/include/kvm/pci.h
+> >> @@ -19,6 +19,7 @@
+> >>  #define PCI_CONFIG_DATA		0xcfc
+> >>  #define PCI_CONFIG_BUS_FORWARD	0xcfa
+> >>  #define PCI_IO_SIZE		0x100
+> >> +#define PCI_IOPORT_START	0x6200
+> >>  #define PCI_CFG_SIZE		(1ULL << 24)
+> >>  
+> >>  struct kvm;
+> >> @@ -152,7 +153,8 @@ struct pci_device_header {
+> >>  int pci__init(struct kvm *kvm);
+> >>  int pci__exit(struct kvm *kvm);
+> >>  struct pci_device_header *pci__find_dev(u8 dev_num);
+> >> -u32 pci_get_io_space_block(u32 size);
+> >> +u32 pci_get_mmio_block(u32 size);
+> >> +u16 pci_get_io_port_block(u32 size);
+> >>  void pci__assign_irq(struct device_header *dev_hdr);
+> >>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size);
+> >>  void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size);
+> >> diff --git a/ioport.c b/ioport.c
+> >> index a6dc65e3e6c6..a72e4035881a 100644
+> >> --- a/ioport.c
+> >> +++ b/ioport.c
+> >> @@ -16,24 +16,8 @@
+> >>  
+> >>  #define ioport_node(n) rb_entry(n, struct ioport, node)
+> >>  
+> >> -DEFINE_MUTEX(ioport_mutex);
+> >> -
+> >> -static u16			free_io_port_idx; /* protected by ioport_mutex */
+> >> -
+> >>  static struct rb_root		ioport_tree = RB_ROOT;
+> >>  
+> >> -static u16 ioport__find_free_port(void)
+> >> -{
+> >> -	u16 free_port;
+> >> -
+> >> -	mutex_lock(&ioport_mutex);
+> >> -	free_port = IOPORT_START + free_io_port_idx * IOPORT_SIZE;
+> >> -	free_io_port_idx++;
+> >> -	mutex_unlock(&ioport_mutex);
+> >> -
+> >> -	return free_port;
+> >> -}
+> >> -
+> >>  static struct ioport *ioport_search(struct rb_root *root, u64 addr)
+> >>  {
+> >>  	struct rb_int_node *node;
+> >> @@ -85,8 +69,6 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
+> >>  	int r;
+> >>  
+> >>  	br_write_lock(kvm);
+> >> -	if (port == IOPORT_EMPTY)
+> >> -		port = ioport__find_free_port();
+> >>  
+> >>  	entry = ioport_search(&ioport_tree, port);
+> >>  	if (entry) {
+> >> diff --git a/pci.c b/pci.c
+> >> index e1b57325bdeb..32a07335a765 100644
+> >> --- a/pci.c
+> >> +++ b/pci.c
+> >> @@ -15,15 +15,24 @@ static u32 pci_config_address_bits;
+> >>   * (That's why it can still 32bit even with 64bit guests-- 64bit
+> >>   * PCI isn't currently supported.)
+> >>   */
+> >> -static u32 io_space_blocks		= KVM_PCI_MMIO_AREA;
+> >> +static u32 mmio_blocks			= KVM_PCI_MMIO_AREA;
+> >> +static u16 io_port_blocks		= PCI_IOPORT_START;
+> >> +
+> >> +u16 pci_get_io_port_block(u32 size)
+> >> +{
+> >> +	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
+> >> +
+> >> +	io_port_blocks = port + size;
+> >> +	return port;
+> >> +}
+> >>  
+> >>  /*
+> >>   * BARs must be naturally aligned, so enforce this in the allocator.
+> >>   */
+> >> -u32 pci_get_io_space_block(u32 size)
+> >> +u32 pci_get_mmio_block(u32 size)
+> >>  {
+> >> -	u32 block = ALIGN(io_space_blocks, size);
+> >> -	io_space_blocks = block + size;
+> >> +	u32 block = ALIGN(mmio_blocks, size);
+> >> +	mmio_blocks = block + size;
+> >>  	return block;
+> >>  }
+> >>  
+> >> diff --git a/powerpc/include/kvm/kvm-arch.h b/powerpc/include/kvm/kvm-arch.h
+> >> index 8126b96cb66a..26d440b22bdd 100644
+> >> --- a/powerpc/include/kvm/kvm-arch.h
+> >> +++ b/powerpc/include/kvm/kvm-arch.h
+> >> @@ -34,7 +34,7 @@
+> >>  #define KVM_MMIO_START			PPC_MMIO_START
+> >>  
+> >>  /*
+> >> - * This is the address that pci_get_io_space_block() starts allocating
+> >> + * This is the address that pci_get_io_port_block() starts allocating
+> >>   * from.  Note that this is a PCI bus address.
+> >>   */
+> >>  #define KVM_IOPORT_AREA			0x0
+> >> diff --git a/vfio/core.c b/vfio/core.c
+> >> index 17b5b0cfc9ac..0ed1e6fee6bf 100644
+> >> --- a/vfio/core.c
+> >> +++ b/vfio/core.c
+> >> @@ -202,8 +202,10 @@ static int vfio_setup_trap_region(struct kvm *kvm, struct vfio_device *vdev,
+> >>  				  struct vfio_region *region)
+> >>  {
+> >>  	if (region->is_ioport) {
+> >> -		int port = ioport__register(kvm, IOPORT_EMPTY, &vfio_ioport_ops,
+> >> -					    region->info.size, region);
+> >> +		int port = pci_get_io_port_block(region->info.size);
+> >> +
+> >> +		port = ioport__register(kvm, port, &vfio_ioport_ops,
+> >> +					region->info.size, region);
+> >>  		if (port < 0)
+> >>  			return port;
+> >>  
+> >> diff --git a/vfio/pci.c b/vfio/pci.c
+> >> index 914732cc6897..bc5a6d452f7a 100644
+> >> --- a/vfio/pci.c
+> >> +++ b/vfio/pci.c
+> >> @@ -750,7 +750,7 @@ static int vfio_pci_create_msix_table(struct kvm *kvm,
+> >>  	 * powers of two.
+> >>  	 */
+> >>  	mmio_size = roundup_pow_of_two(table->size + pba->size);
+> >> -	table->guest_phys_addr = pci_get_io_space_block(mmio_size);
+> >> +	table->guest_phys_addr = pci_get_mmio_block(mmio_size);
+> >>  	if (!table->guest_phys_addr) {
+> >>  		pr_err("cannot allocate IO space");
+> >>  		ret = -ENOMEM;
+> >> @@ -851,7 +851,7 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
+> >>  	if (!region->is_ioport) {
+> >>  		/* Grab some MMIO space in the guest */
+> >>  		map_size = ALIGN(region->info.size, PAGE_SIZE);
+> >> -		region->guest_phys_addr = pci_get_io_space_block(map_size);
+> >> +		region->guest_phys_addr = pci_get_mmio_block(map_size);
+> >>  	}
+> >>  
+> >>  	/* Map the BARs into the guest or setup a trap region. */
+> >> diff --git a/virtio/pci.c b/virtio/pci.c
+> >> index 04e801827df9..d73414abde05 100644
+> >> --- a/virtio/pci.c
+> >> +++ b/virtio/pci.c
+> >> @@ -438,18 +438,19 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+> >>  	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
+> >>  	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
+> >>  
+> >> -	r = ioport__register(kvm, IOPORT_EMPTY, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
+> >> +	r = pci_get_io_port_block(IOPORT_SIZE);
+> >> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
+> >>  	if (r < 0)
+> >>  		return r;
+> >>  	vpci->port_addr = (u16)r;
+> >>  
+> >> -	vpci->mmio_addr = pci_get_io_space_block(IOPORT_SIZE);
+> >> +	vpci->mmio_addr = pci_get_mmio_block(IOPORT_SIZE);
+> >>  	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
+> >>  			       virtio_pci__io_mmio_callback, vpci);
+> >>  	if (r < 0)
+> >>  		goto free_ioport;
+> >>  
+> >> -	vpci->msix_io_block = pci_get_io_space_block(PCI_IO_SIZE * 2);
+> >> +	vpci->msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
+> >>  	r = kvm__register_mmio(kvm, vpci->msix_io_block, PCI_IO_SIZE * 2, false,
+> >>  			       virtio_pci__msix_mmio_callback, vpci);
+> >>  	if (r < 0)
+> >> diff --git a/x86/include/kvm/kvm-arch.h b/x86/include/kvm/kvm-arch.h
+> >> index bfdd3438a9de..85cd336c7577 100644
+> >> --- a/x86/include/kvm/kvm-arch.h
+> >> +++ b/x86/include/kvm/kvm-arch.h
+> >> @@ -16,7 +16,7 @@
+> >>  
+> >>  #define KVM_MMIO_START		KVM_32BIT_GAP_START
+> >>  
+> >> -/* This is the address that pci_get_io_space_block() starts allocating
+> >> +/* This is the address that pci_get_io_port_block() starts allocating
+> >>   * from.  Note that this is a PCI bus address (though same on x86).
+> >>   */
+> >>  #define KVM_IOPORT_AREA		0x0  
 
