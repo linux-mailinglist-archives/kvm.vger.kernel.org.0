@@ -2,78 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF2EE14CBFF
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 15:03:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD26D14CCF9
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 16:08:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726186AbgA2ODn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 09:03:43 -0500
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21127 "EHLO
-        sender4-of-o51.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726140AbgA2ODn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jan 2020 09:03:43 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1580305704162174.85070197272853; Wed, 29 Jan 2020 05:48:24 -0800 (PST)
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
-Subject: Re: [RFC v3 00/25] intel_iommu: expose Shared Virtual Addressing to VMs
-Message-ID: <158030570300.2504.13309596574427255696@a1bbccc8075a>
+        id S1726836AbgA2PIj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 10:08:39 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58332 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726261AbgA2PIg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Jan 2020 10:08:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580310514;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VLaqf7yP7bdIce/kL3zR7k5oqbUaX9ZjKFr0PkLcpeY=;
+        b=i7wuk3zIzRTFJP4mMjdbLC2dBI7yxpAqXkz91WTVJjCXV62fTQph4skKohX1nH9MHRQ9Ug
+        EH3oG3GQOAuXRi00NxFNj5nG9QrK0XRjoxRdGtG7+gYE7yWuHzNbFGx7HFe8ygE0hWNd5z
+        uKmDlSO7xvA1nEe1rdNNOxAIDYgYVgc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-ZZUCwXdpOeaPgG2D_R5F7A-1; Wed, 29 Jan 2020 10:08:32 -0500
+X-MC-Unique: ZZUCwXdpOeaPgG2D_R5F7A-1
+Received: by mail-wr1-f72.google.com with SMTP id s13so2809097wru.7
+        for <kvm@vger.kernel.org>; Wed, 29 Jan 2020 07:08:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=VLaqf7yP7bdIce/kL3zR7k5oqbUaX9ZjKFr0PkLcpeY=;
+        b=XWV80wDDkpFp+0LQ7JPME9uezOjRkATLcA9TRu3krXqvndKO3pAEsg5h1qPfFV3FAt
+         oBhFP4v/FWYy55qngvJHFcMPRag5ZgQxEbD+0Z1tqCW4Vd6Uih6sZmIwR74QibKL0QCb
+         ErmLVtKbLhr7BTykrhg8wJtZK82qwEMK0ETuC+lbNDk0E3laYQTiQXf6TaHtnm1RqsYe
+         jrEylSKWeoD5Zhi7KdMwgvSARcU69ZHOwFSeYuR+jJClqK6VYMZSY0270G4UtKrcaYwQ
+         aYt2nEybIwtnLd+mQT7wIaNcCVispC12VoOQklpx6LN/GUTYMRAonK4xwd3EEfN5Tk8y
+         q03g==
+X-Gm-Message-State: APjAAAWfhCYpppAIJWsjIU14wI+h6Jm2ScR6N72IsoE6FgYX2pIDmc3a
+        CJBCKnw1EgLbivPjEVSfF2J/EBIGMIQ9+9NQ26XlfNTJL/tqQt/2AxlLE0pEYXHp+EB2V4hBt5U
+        4Ox5spv6kWnpY
+X-Received: by 2002:a1c:3b0a:: with SMTP id i10mr12809540wma.177.1580310511003;
+        Wed, 29 Jan 2020 07:08:31 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxd7v/TEekwH/byRnpgvATju+em8Xhl75IgAQQp0nHiS9nxjrgubYvBWuwl6+TdY5xHEk2Eyw==
+X-Received: by 2002:a1c:3b0a:: with SMTP id i10mr12809521wma.177.1580310510755;
+        Wed, 29 Jan 2020 07:08:30 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id a184sm2663689wmf.29.2020.01.29.07.08.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jan 2020 07:08:30 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: x86: Mark CR4.UMIP as reserved based on associated CPUID bit
+In-Reply-To: <20200128235344.29581-1-sean.j.christopherson@intel.com>
+References: <20200128235344.29581-1-sean.j.christopherson@intel.com>
+Date:   Wed, 29 Jan 2020 16:08:29 +0100
+Message-ID: <87a7669u6q.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     yi.l.liu@intel.com
-Cc:     qemu-devel@nongnu.org, david@gibson.dropbear.id.au,
-        pbonzini@redhat.com, alex.williamson@redhat.com, peterx@redhat.com,
-        kevin.tian@intel.com, yi.l.liu@intel.com, kvm@vger.kernel.org,
-        mst@redhat.com, jun.j.tian@intel.com, eric.auger@redhat.com,
-        yi.y.sun@intel.com, hao.wu@intel.com
-Date:   Wed, 29 Jan 2020 05:48:24 -0800 (PST)
-X-ZohoMailClient: External
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTgwMzAwMjE2LTg2MTcyLTEt
-Z2l0LXNlbmQtZW1haWwteWkubC5saXVAaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhl
-IHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9j
-a2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2Vu
-dG9zNyBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNI
-T1dfRU5WPTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAg
-ICBody9wY2kvcGNpX2hvc3QubwogIENDICAgICAgaHcvcGNpL3BjaWUubwovdG1wL3FlbXUtdGVz
-dC9zcmMvaHcvcGNpLWhvc3QvZGVzaWdud2FyZS5jOiBJbiBmdW5jdGlvbiAnZGVzaWdud2FyZV9w
-Y2llX2hvc3RfcmVhbGl6ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9wY2ktaG9zdC9kZXNpZ253
-YXJlLmM6NjkzOjU6IGVycm9yOiBpbmNvbXBhdGlibGUgdHlwZSBmb3IgYXJndW1lbnQgMiBvZiAn
-cGNpX3NldHVwX2lvbW11JwogICAgIHBjaV9zZXR1cF9pb21tdShwY2ktPmJ1cywgZGVzaWdud2Fy
-ZV9pb21tdV9vcHMsIHMpOwogICAgIF4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10
-ZXN0L3NyYy9pbmNsdWRlL2h3L3BjaS9tc2kuaDoyNDowLAotLS0KL3RtcC9xZW11LXRlc3Qvc3Jj
-L2luY2x1ZGUvaHcvcGNpL3BjaS5oOjQ5OTo2OiBub3RlOiBleHBlY3RlZCAnY29uc3Qgc3RydWN0
-IFBDSUlPTU1VT3BzIConIGJ1dCBhcmd1bWVudCBpcyBvZiB0eXBlICdQQ0lJT01NVU9wcycKIHZv
-aWQgcGNpX3NldHVwX2lvbW11KFBDSUJ1cyAqYnVzLCBjb25zdCBQQ0lJT01NVU9wcyAqaW9tbXVf
-b3BzLCB2b2lkICpvcGFxdWUpOwogICAgICBeCm1ha2U6ICoqKiBbaHcvcGNpLWhvc3QvZGVzaWdu
-d2FyZS5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4u
-CnJtIHRlc3RzL3FlbXUtaW90ZXN0cy9zb2NrZXRfc2NtX2hlbHBlci5vClRyYWNlYmFjayAobW9z
-dCByZWNlbnQgY2FsbCBsYXN0KToKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0
-Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRv
-JywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51
-dWlkPTA4ZmNjYzI1OGY1MjQxYjg4NmZmODljY2Y0M2U4OTI2JywgJy11JywgJzEwMDEnLCAnLS1z
-ZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VU
-X0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScs
-ICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNI
-RV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUt
-ZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3
-LXRlc3Rlci10bXAteHJuaG83cm0vc3JjL2RvY2tlci1zcmMuMjAyMC0wMS0yOS0wOC40Ni4xMC4y
-OTc0MjovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3FlbXUv
-cnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmls
-dGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MDhmY2NjMjU4ZjUyNDFi
-ODg2ZmY4OWNjZjQzZTg5MjYKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2Vb
-MV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAteHJuaG83
-cm0vc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAy
-CgpyZWFsICAgIDJtMTMuMjYzcwp1c2VyICAgIDBtOC4yNjlzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
-YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTgwMzAwMjE2LTg2MTcyLTEtZ2l0
-LXNlbmQtZW1haWwteWkubC5saXVAaW50ZWwuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRv
-czcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
+
+> Re-add code to mark CR4.UMIP as reserved if UMIP is not supported by the
+> host.  The UMIP handling was unintentionally dropped during a recent
+> refactoring.
+>
+> Not flagging CR4.UMIP allows the guest to set its CR4.UMIP regardless of
+> host support or userspace desires.  On CPUs with UMIP support, including
+> emulated UMIP, this allows the guest to enable UMIP against the wishes
+> of the userspace VMM.  On CPUs without any form of UMIP, this results in
+> a failed VM-Enter due to invalid guest state.
+>
+> Fixes: 345599f9a2928 ("KVM: x86: Add macro to ensure reserved cr4 bits checks stay in sync")
+
+This one in only in kvm/next so just in case another force-push is
+around the corner I'd suggest we squash this change in :-)
+
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7e3f1d937224..e70d1215638a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -898,6 +898,8 @@ EXPORT_SYMBOL_GPL(kvm_set_xcr);
+>  		__reserved_bits |= X86_CR4_PKE;		\
+>  	if (!__cpu_has(__c, X86_FEATURE_LA57))		\
+>  		__reserved_bits |= X86_CR4_LA57;	\
+> +	if (!__cpu_has(__c, X86_FEATURE_UMIP))		\
+> +		__reserved_bits |= X86_CR4_UMIP;	\
+>  	__reserved_bits;				\
+>  })
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
+
