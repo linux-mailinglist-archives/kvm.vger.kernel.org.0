@@ -2,323 +2,363 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7157C14C87E
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 11:07:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29C0814C88F
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2020 11:12:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726114AbgA2KHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 05:07:06 -0500
-Received: from foss.arm.com ([217.140.110.172]:38810 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726010AbgA2KHF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jan 2020 05:07:05 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 992901FB;
-        Wed, 29 Jan 2020 02:07:04 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D2AA23F52E;
-        Wed, 29 Jan 2020 02:07:02 -0800 (PST)
-Subject: Re: [PATCH kvmtool 06/16] ioport: pci: Move port allocations to PCI
- devices
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com
-References: <20191125103033.22694-1-alexandru.elisei@arm.com>
- <20191125103033.22694-7-alexandru.elisei@arm.com>
- <20200128182514.52a6095b@donnerap.cambridge.arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <1aaa4ac8-679a-ea8d-cf9a-1c8ed0b94c55@arm.com>
-Date:   Wed, 29 Jan 2020 10:07:00 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726373AbgA2KMt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 05:12:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38411 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726067AbgA2KMt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jan 2020 05:12:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580292767;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mB15bcSS1+9wToP/4V851ez/NpDYolnlJSkxIQhHUfM=;
+        b=YN7L/gHrWW6cLTrQ8L4ygu5KqUA8E6qQ40OPHHrxZeZUK0J6gyHgjlH/8YWIgW2iJIY3gq
+        W5MZbwaLk6oye4m3QAmM5tWBep3cltTxgm6HnucllpXgZ6E9X8tIzAEFie9T98E5YYpMrn
+        r2wZ2/nIGJAYuB0oOndl2MmHiNcZCtk=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-ZAUuL4OlOf6sxBfVnZC3qQ-1; Wed, 29 Jan 2020 05:12:45 -0500
+X-MC-Unique: ZAUuL4OlOf6sxBfVnZC3qQ-1
+Received: by mail-qt1-f200.google.com with SMTP id o24so10452702qtr.17
+        for <kvm@vger.kernel.org>; Wed, 29 Jan 2020 02:12:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mB15bcSS1+9wToP/4V851ez/NpDYolnlJSkxIQhHUfM=;
+        b=NsvaWDN24uNWPVpuWGeCaZ/BHtx6pmMlTYzdUvkmoYNJDjob7zjvet+k4WP+3Zfc2c
+         AKLAEtesh3YMJf5ZjOe/zwZjWSUFKtlydDv+BhBcvHJiReylHz/X0BeLVMRDYuyaiShZ
+         Wl92gp70INdFJnFrwnUqpctEyttLp5a58mU6EcVgUnFxoC9vec9IkqzZ4a1bt3qrzz4D
+         2hXi9sMYA81/l06VSFmuP3pnb1VoxaJiDXHgRRkyJHrfXBJEtbiGLvaV1Fy+t2Oe+a4f
+         O2H7gunyPCuCzyMm5hfdN11Dbby2GO1kBdwIJV/3Y9xj6uzt8zbB2SQq5W5fqwoS9+0V
+         +Keg==
+X-Gm-Message-State: APjAAAWR9e27SPjk3J06lRDdSlWjbI4kDyWPRdCKZLP1Zn83nET1ABsM
+        kXhVgB/Cvos2gyxcI0pN400CoMdLliNYC2R7qs0pTikpm3uJvfIcDmUvv7NiggzdOwhgYs8eJAS
+        yIRaiOkOHjgc3
+X-Received: by 2002:a37:6292:: with SMTP id w140mr27865109qkb.65.1580292764938;
+        Wed, 29 Jan 2020 02:12:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwwAUx/KsP1PhEUG8vlmwKOKv2NV+8JdzpSrvGpOKuShPyiwUHW4zdi2JXEvQB0tphbgjSQMg==
+X-Received: by 2002:a37:6292:: with SMTP id w140mr27865076qkb.65.1580292764463;
+        Wed, 29 Jan 2020 02:12:44 -0800 (PST)
+Received: from redhat.com (bzq-109-64-11-187.red.bezeqint.net. [109.64.11.187])
+        by smtp.gmail.com with ESMTPSA id i28sm842769qtc.57.2020.01.29.02.12.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jan 2020 02:12:43 -0800 (PST)
+Date:   Wed, 29 Jan 2020 05:12:38 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jing Liu <jing2.liu@linux.intel.com>
+Cc:     virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Liu Jiang <gerry@linux.alibaba.com>,
+        Zha Bin <zhabin@linux.alibaba.com>
+Subject: Re: [virtio-dev] [PATCH v2 4/5] virtio-mmio: Introduce MSI details
+Message-ID: <20200129050656-mutt-send-email-mst@kernel.org>
+References: <1579614873-21907-1-git-send-email-jing2.liu@linux.intel.com>
+ <1579614873-21907-5-git-send-email-jing2.liu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200128182514.52a6095b@donnerap.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1579614873-21907-5-git-send-email-jing2.liu@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Tue, Jan 21, 2020 at 09:54:32PM +0800, Jing Liu wrote:
+> With VIRTIO_F_MMIO_MSI feature bit offered, the Message Signal
+> Interrupts (MSI) is supported as first priority. For any reason it
+> fails to use MSI, it need use the single dedicated interrupt as before.
+> 
+> For MSI vectors and events mapping relationship, introduce in next patch.
+> 
+> Co-developed-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Co-developed-by: Liu Jiang <gerry@linux.alibaba.com>
+> Signed-off-by: Liu Jiang <gerry@linux.alibaba.com>
+> Co-developed-by: Zha Bin <zhabin@linux.alibaba.com>
+> Signed-off-by: Zha Bin <zhabin@linux.alibaba.com>
+> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
 
-There's a newer version of the patches available, version 2, you were reviewing it
-a few days ago ;)
 
-On 1/28/20 6:25 PM, Andre Przywara wrote:
-> On Mon, 25 Nov 2019 10:30:23 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
->> From: Julien Thierry <julien.thierry@arm.com>
->>
->> The dynamic ioport allocation with IOPORT_EMPTY is currently only used
->> by PCI devices. Other devices use fixed ports for which they request
->> registration to the ioport API.
->>
->> PCI ports need to be in the PCI IO space and there is no reason ioport
->> API should know a PCI port is being allocated and needs to be placed in
->> PCI IO space. This currently just happens to be the case.
->>
->> Move the responsability of dynamic allocation of ioports from the ioport
->> API to PCI.
->>
->> In the future, if other types of devices also need dynamic ioport
->> allocation, they'll have to figure out the range of ports they are
->> allowed to use.
-> That looks alright to me, just one question:
-> The old ioport__find_free_port() routine used a mutex to prevent concurrent execution.
-> Why don't we need this anymore? Are we sure that there is only one thread of execution calling this function?
+So we have a concept of "MSI vectors" here, which can be
+selected and configured and which in the
+following patch are mapped to VQs either 1:1 or dynamically.
 
-If I'm not mistaken, ioport/mmio space allocation is only executed when the
-virtual machine is created, which is done by the main thread (the one that creates
-the VCPU threads when the VM is run). After the VM is running, we don't do any
-allocation, it's the guest's responsibility to manage these resources.
 
-The function was added in commit c132a6d4c259 ("kvm tools: Add basic ioport
-dynamic allocation") from 2011, and as far as I can tell it was designed to be
-used directly by virtio devices to do dynamic ioport allocations (see ebe9ac191d6a
-"kvm tools: Use ioport context to control blk devices"). Nowadays that's done by
-virtio/pci.c, and the init functions are called sequentially (see init_list__init).
+My question is, do we need this indirection?
 
-Thanks,
-Alex
->
-> Cheers,
-> Andre.
->
->> Cc: julien.thierry.kdev@gmail.com
->> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
->> [Renamed functions for clarity]
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  hw/vesa.c                      |  4 ++--
->>  include/kvm/ioport.h           |  3 ---
->>  include/kvm/pci.h              |  4 +++-
->>  ioport.c                       | 18 ------------------
->>  pci.c                          | 17 +++++++++++++----
->>  powerpc/include/kvm/kvm-arch.h |  2 +-
->>  vfio/core.c                    |  6 ++++--
->>  vfio/pci.c                     |  4 ++--
->>  virtio/pci.c                   |  7 ++++---
->>  x86/include/kvm/kvm-arch.h     |  2 +-
->>  10 files changed, 30 insertions(+), 37 deletions(-)
->>
->> diff --git a/hw/vesa.c b/hw/vesa.c
->> index 75670a51be5f..70ab59974f76 100644
->> --- a/hw/vesa.c
->> +++ b/hw/vesa.c
->> @@ -62,8 +62,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
->>  
->>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
->>  		return NULL;
->> -
->> -	r = ioport__register(kvm, IOPORT_EMPTY, &vesa_io_ops, IOPORT_SIZE, NULL);
->> +	r = pci_get_io_port_block(IOPORT_SIZE);
->> +	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
->>  	if (r < 0)
->>  		return ERR_PTR(r);
->>  
->> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
->> index db52a479742b..b10fcd5b4412 100644
->> --- a/include/kvm/ioport.h
->> +++ b/include/kvm/ioport.h
->> @@ -14,11 +14,8 @@
->>  
->>  /* some ports we reserve for own use */
->>  #define IOPORT_DBG			0xe0
->> -#define IOPORT_START			0x6200
->>  #define IOPORT_SIZE			0x400
->>  
->> -#define IOPORT_EMPTY			USHRT_MAX
->> -
->>  struct kvm;
->>  
->>  struct ioport {
->> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
->> index a86c15a70e6d..ccb155e3e8fe 100644
->> --- a/include/kvm/pci.h
->> +++ b/include/kvm/pci.h
->> @@ -19,6 +19,7 @@
->>  #define PCI_CONFIG_DATA		0xcfc
->>  #define PCI_CONFIG_BUS_FORWARD	0xcfa
->>  #define PCI_IO_SIZE		0x100
->> +#define PCI_IOPORT_START	0x6200
->>  #define PCI_CFG_SIZE		(1ULL << 24)
->>  
->>  struct kvm;
->> @@ -152,7 +153,8 @@ struct pci_device_header {
->>  int pci__init(struct kvm *kvm);
->>  int pci__exit(struct kvm *kvm);
->>  struct pci_device_header *pci__find_dev(u8 dev_num);
->> -u32 pci_get_io_space_block(u32 size);
->> +u32 pci_get_mmio_block(u32 size);
->> +u16 pci_get_io_port_block(u32 size);
->>  void pci__assign_irq(struct device_header *dev_hdr);
->>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size);
->>  void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size);
->> diff --git a/ioport.c b/ioport.c
->> index a6dc65e3e6c6..a72e4035881a 100644
->> --- a/ioport.c
->> +++ b/ioport.c
->> @@ -16,24 +16,8 @@
->>  
->>  #define ioport_node(n) rb_entry(n, struct ioport, node)
->>  
->> -DEFINE_MUTEX(ioport_mutex);
->> -
->> -static u16			free_io_port_idx; /* protected by ioport_mutex */
->> -
->>  static struct rb_root		ioport_tree = RB_ROOT;
->>  
->> -static u16 ioport__find_free_port(void)
->> -{
->> -	u16 free_port;
->> -
->> -	mutex_lock(&ioport_mutex);
->> -	free_port = IOPORT_START + free_io_port_idx * IOPORT_SIZE;
->> -	free_io_port_idx++;
->> -	mutex_unlock(&ioport_mutex);
->> -
->> -	return free_port;
->> -}
->> -
->>  static struct ioport *ioport_search(struct rb_root *root, u64 addr)
->>  {
->>  	struct rb_int_node *node;
->> @@ -85,8 +69,6 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
->>  	int r;
->>  
->>  	br_write_lock(kvm);
->> -	if (port == IOPORT_EMPTY)
->> -		port = ioport__find_free_port();
->>  
->>  	entry = ioport_search(&ioport_tree, port);
->>  	if (entry) {
->> diff --git a/pci.c b/pci.c
->> index e1b57325bdeb..32a07335a765 100644
->> --- a/pci.c
->> +++ b/pci.c
->> @@ -15,15 +15,24 @@ static u32 pci_config_address_bits;
->>   * (That's why it can still 32bit even with 64bit guests-- 64bit
->>   * PCI isn't currently supported.)
->>   */
->> -static u32 io_space_blocks		= KVM_PCI_MMIO_AREA;
->> +static u32 mmio_blocks			= KVM_PCI_MMIO_AREA;
->> +static u16 io_port_blocks		= PCI_IOPORT_START;
->> +
->> +u16 pci_get_io_port_block(u32 size)
->> +{
->> +	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
->> +
->> +	io_port_blocks = port + size;
->> +	return port;
->> +}
->>  
->>  /*
->>   * BARs must be naturally aligned, so enforce this in the allocator.
->>   */
->> -u32 pci_get_io_space_block(u32 size)
->> +u32 pci_get_mmio_block(u32 size)
->>  {
->> -	u32 block = ALIGN(io_space_blocks, size);
->> -	io_space_blocks = block + size;
->> +	u32 block = ALIGN(mmio_blocks, size);
->> +	mmio_blocks = block + size;
->>  	return block;
->>  }
->>  
->> diff --git a/powerpc/include/kvm/kvm-arch.h b/powerpc/include/kvm/kvm-arch.h
->> index 8126b96cb66a..26d440b22bdd 100644
->> --- a/powerpc/include/kvm/kvm-arch.h
->> +++ b/powerpc/include/kvm/kvm-arch.h
->> @@ -34,7 +34,7 @@
->>  #define KVM_MMIO_START			PPC_MMIO_START
->>  
->>  /*
->> - * This is the address that pci_get_io_space_block() starts allocating
->> + * This is the address that pci_get_io_port_block() starts allocating
->>   * from.  Note that this is a PCI bus address.
->>   */
->>  #define KVM_IOPORT_AREA			0x0
->> diff --git a/vfio/core.c b/vfio/core.c
->> index 17b5b0cfc9ac..0ed1e6fee6bf 100644
->> --- a/vfio/core.c
->> +++ b/vfio/core.c
->> @@ -202,8 +202,10 @@ static int vfio_setup_trap_region(struct kvm *kvm, struct vfio_device *vdev,
->>  				  struct vfio_region *region)
->>  {
->>  	if (region->is_ioport) {
->> -		int port = ioport__register(kvm, IOPORT_EMPTY, &vfio_ioport_ops,
->> -					    region->info.size, region);
->> +		int port = pci_get_io_port_block(region->info.size);
->> +
->> +		port = ioport__register(kvm, port, &vfio_ioport_ops,
->> +					region->info.size, region);
->>  		if (port < 0)
->>  			return port;
->>  
->> diff --git a/vfio/pci.c b/vfio/pci.c
->> index 914732cc6897..bc5a6d452f7a 100644
->> --- a/vfio/pci.c
->> +++ b/vfio/pci.c
->> @@ -750,7 +750,7 @@ static int vfio_pci_create_msix_table(struct kvm *kvm,
->>  	 * powers of two.
->>  	 */
->>  	mmio_size = roundup_pow_of_two(table->size + pba->size);
->> -	table->guest_phys_addr = pci_get_io_space_block(mmio_size);
->> +	table->guest_phys_addr = pci_get_mmio_block(mmio_size);
->>  	if (!table->guest_phys_addr) {
->>  		pr_err("cannot allocate IO space");
->>  		ret = -ENOMEM;
->> @@ -851,7 +851,7 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
->>  	if (!region->is_ioport) {
->>  		/* Grab some MMIO space in the guest */
->>  		map_size = ALIGN(region->info.size, PAGE_SIZE);
->> -		region->guest_phys_addr = pci_get_io_space_block(map_size);
->> +		region->guest_phys_addr = pci_get_mmio_block(map_size);
->>  	}
->>  
->>  	/* Map the BARs into the guest or setup a trap region. */
->> diff --git a/virtio/pci.c b/virtio/pci.c
->> index 04e801827df9..d73414abde05 100644
->> --- a/virtio/pci.c
->> +++ b/virtio/pci.c
->> @@ -438,18 +438,19 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->>  	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
->>  	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
->>  
->> -	r = ioport__register(kvm, IOPORT_EMPTY, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
->> +	r = pci_get_io_port_block(IOPORT_SIZE);
->> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
->>  	if (r < 0)
->>  		return r;
->>  	vpci->port_addr = (u16)r;
->>  
->> -	vpci->mmio_addr = pci_get_io_space_block(IOPORT_SIZE);
->> +	vpci->mmio_addr = pci_get_mmio_block(IOPORT_SIZE);
->>  	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
->>  			       virtio_pci__io_mmio_callback, vpci);
->>  	if (r < 0)
->>  		goto free_ioport;
->>  
->> -	vpci->msix_io_block = pci_get_io_space_block(PCI_IO_SIZE * 2);
->> +	vpci->msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
->>  	r = kvm__register_mmio(kvm, vpci->msix_io_block, PCI_IO_SIZE * 2, false,
->>  			       virtio_pci__msix_mmio_callback, vpci);
->>  	if (r < 0)
->> diff --git a/x86/include/kvm/kvm-arch.h b/x86/include/kvm/kvm-arch.h
->> index bfdd3438a9de..85cd336c7577 100644
->> --- a/x86/include/kvm/kvm-arch.h
->> +++ b/x86/include/kvm/kvm-arch.h
->> @@ -16,7 +16,7 @@
->>  
->>  #define KVM_MMIO_START		KVM_32BIT_GAP_START
->>  
->> -/* This is the address that pci_get_io_space_block() starts allocating
->> +/* This is the address that pci_get_io_port_block() starts allocating
->>   * from.  Note that this is a PCI bus address (though same on x86).
->>   */
->>  #define KVM_IOPORT_AREA		0x0
+In fact an MSI vector is just an address/data pair.
+
+So it seems that instead, we could just have commands specifying
+MSI address/data pairs for each VQ, and separately for config changes.
+
+It is useful to have hypervisor hint to guest how many different
+pairs should be allocated, and that could be the RO max value.
+
+
+> ---
+>  content.tex | 171 ++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+>  msi-state.c |   4 ++
+>  2 files changed, 159 insertions(+), 16 deletions(-)
+>  create mode 100644 msi-state.c
+> 
+> diff --git a/content.tex b/content.tex
+> index ff151ba..dcf6c71 100644
+> --- a/content.tex
+> +++ b/content.tex
+> @@ -1687,7 +1687,8 @@ \subsection{MMIO Device Register Layout}\label{sec:Virtio Transport Options / Vi
+>    \hline 
+>    \mmioreg{InterruptStatus}{Interrupt status}{0x60}{R}{%
+>      Reading from this register returns a bit mask of events that
+> -    caused the device interrupt to be asserted.
+> +    caused the device interrupt to be asserted. This is only used
+> +    when MSI is not enabled.
+>      The following events are possible:
+>      \begin{description}
+>        \item[Used Buffer Notification] - bit 0 - the interrupt was asserted
+> @@ -1701,7 +1702,7 @@ \subsection{MMIO Device Register Layout}\label{sec:Virtio Transport Options / Vi
+>    \mmioreg{InterruptACK}{Interrupt acknowledge}{0x064}{W}{%
+>      Writing a value with bits set as defined in \field{InterruptStatus}
+>      to this register notifies the device that events causing
+> -    the interrupt have been handled.
+> +    the interrupt have been handled. This is only used when MSI is not enabled.
+>    }
+>    \hline 
+>    \mmioreg{Status}{Device status}{0x070}{RW}{%
+> @@ -1760,6 +1761,47 @@ \subsection{MMIO Device Register Layout}\label{sec:Virtio Transport Options / Vi
+>      \field{SHMSel} is unused) results in a base address of
+>      0xffffffffffffffff.
+>    }
+> +  \hline
+> +  \mmioreg{MsiVecNum}{MSI max vector number}{0x0c0}{R}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, reading
+> +    from this register returns the maximum MSI vector number
+> +    that device supports.
+> +  }
+> +  \hline
+> +  \mmioreg{MsiState}{MSI state}{0x0c4}{R}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, reading
+> +    from this register returns the global MSI enable/disable status.
+> +    \lstinputlisting{msi-state.c}
+> +  }
+> +  \hline
+> +  \mmioreg{MsiCmd}{MSI command}{0x0c8}{W}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, writing
+> +    to this register executes the corresponding command to device.
+> +    Part of this applies to the MSI vector selected by writing to \field{MsiVecSel}.
+> +    See \ref{sec:Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / Device Initialization / MSI Vector Configuration}
+> +    for using details.
+> +  }
+> +  \hline
+> +  \mmioreg{MsiVecSel}{MSI vector index}{0x0d0}{W}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, writing
+> +    to this register selects the MSI vector index that the following operations
+> +    on \field{MsiAddrLow}, \field{MsiAddrHigh}, \field{MsiData} and part of
+> +    \field{MsiCmd} commands specified in \ref{sec:Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / Device Initialization / MSI Vector Configuration}
+> +    apply to. The index number of the first vector is zero (0x0).
+> +  }
+> +  \hline
+> +  \mmiodreg{MsiAddrLow}{MsiAddrHigh}{MSI 64 bit address}{0x0d4}{0x0d8}{W}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, writing
+> +    to these two registers (lower 32 bits of the address to \field{MsiAddrLow},
+> +    higher 32 bits to \field{MsiAddrHigh}) notifies the device about the
+> +    MSI address. This applies to the MSI vector selected by writing to \field{MsiVecSel}.
+> +  }
+> +  \hline
+> +  \mmioreg{MsiData}{MSI 32 bit data}{0x0dc}{W}{%
+> +    When VIRTIO_F_MMIO_MSI has been negotiated, writing
+> +    to this register notifies the device about the MSI data.
+> +    This applies to the MSI vector selected by writing to \field{MsiVecSel}.
+> +  }
+>    \hline 
+>    \mmioreg{ConfigGeneration}{Configuration atomicity value}{0x0fc}{R}{
+>      Reading from this register returns a value describing a version of the device-specific configuration space (see \field{Config}).
+> @@ -1783,10 +1825,16 @@ \subsection{MMIO Device Register Layout}\label{sec:Virtio Transport Options / Vi
+>  
+>  The device MUST return value 0x2 in \field{Version}.
+>  
+> -The device MUST present each event by setting the corresponding bit in \field{InterruptStatus} from the
+> +When MSI is disabled, the device MUST present each event by setting the
+> +corresponding bit in \field{InterruptStatus} from the
+>  moment it takes place, until the driver acknowledges the interrupt
+> -by writing a corresponding bit mask to the \field{InterruptACK} register.  Bits which
+> -do not represent events which took place MUST be zero.
+> +by writing a corresponding bit mask to the \field{InterruptACK} register.
+> +Bits which do not represent events which took place MUST be zero.
+> +
+> +When MSI is enabled, the device MUST NOT set \field{InterruptStatus} and MUST
+> +ignore \field{InterruptACK}.
+> +
+> +Upon reset, the device MUST clear \field{msi_enabled} bit in \field{MsiState}.
+>  
+>  Upon reset, the device MUST clear all bits in \field{InterruptStatus} and ready bits in the
+>  \field{QueueReady} register for all queues in the device.
+> @@ -1835,7 +1883,12 @@ \subsection{MMIO Device Register Layout}\label{sec:Virtio Transport Options / Vi
+>  
+>  The driver MUST ignore undefined bits in \field{InterruptStatus}.
+>  
+> -The driver MUST write a value with a bit mask describing events it handled into \field{InterruptACK} when
+> +The driver MUST ignore undefined bits in the return value of reading \field{MsiState}.
+> +
+> +When MSI is enabled, the driver MUST NOT access \field{InterruptStatus} and MUST NOT write to \field{InterruptACK}.
+> +
+> +When MSI is disabled, the driver MUST write a value with a bit mask
+> +describing events it handled into \field{InterruptACK} when
+>  it finishes handling an interrupt and MUST NOT set any of the undefined bits in the value.
+>  
+>  \subsection{MMIO-specific Initialization And Device Operation}\label{sec:Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation}
+> @@ -1856,6 +1909,63 @@ \subsubsection{Device Initialization}\label{sec:Virtio Transport Options / Virti
+>  Further initialization MUST follow the procedure described in
+>  \ref{sec:General Initialization And Device Operation / Device Initialization}~\nameref{sec:General Initialization And Device Operation / Device Initialization}.
+>  
+> +\paragraph{MSI Vector Configuration}\label{sec:Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / Device Initialization / MSI Vector Configuration}
+> +The VIRTIO_F_MMIO_MSI feature bit offered by device shows the capability
+> +using MSI vectors for virtqueue and configuration events.
+> +
+> +When VIRTIO_F_MMIO_MSI has been negotiated,
+> +writing \field{MsiCmd} executes a corresponding command to the device:
+> +
+> +VIRTIO_MMIO_MSI_CMD_ENABLE and VIRTIO_MMIO_MSI_CMD_DISABLE commands set global
+> +MSI enable and disable status.
+> +
+> +VIRTIO_MMIO_MSI_CMD_CONFIGURE is used to configure the MSI vector
+> +applying to the one selected by writing to \field{MsiVecSel}.
+> +
+> +VIRTIO_MMIO_MSI_CMD_MASK and VIRTIO_MMIO_MSI_CMD_UNMASK commands are used to
+> +mask and unmask the MSI vector applying to the one selected by writing
+> +to \field{MsiVecSel}.
+> +
+> +\begin{lstlisting}
+> +#define  VIRTIO_MMIO_MSI_CMD_ENABLE           0x1
+> +#define  VIRTIO_MMIO_MSI_CMD_DISABLE          0x2
+> +#define  VIRTIO_MMIO_MSI_CMD_CONFIGURE        0x3
+> +#define  VIRTIO_MMIO_MSI_CMD_MASK             0x4
+> +#define  VIRTIO_MMIO_MSI_CMD_UNMASK           0x5
+> +\end{lstlisting}
+> +
+> +Setting a special NO_VECTOR value means disabling an interrupt for an event type.
+> +
+> +\begin{lstlisting}
+> +/* Vector value used to disable MSI for event */
+> +#define VIRTIO_MMIO_MSI_NO_VECTOR             0xffffffff
+> +\end{lstlisting}
+> +
+> +\drivernormative{\subparagraph}{MSI Vector Configuration}{Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / MSI Vector Configuration}
+> +When VIRTIO_F_MMIO_MSI has been negotiated, driver should try to configure
+> +and enable MSI.
+> +
+> +To configure MSI vector, driver SHOULD firstly specify the MSI vector index by
+> +writing to \field{MsiVecSel}.
+> +Then notify the MSI address and data by writing to \field{MsiAddrLow}, \field{MsiAddrHigh},
+> +and \field{MsiData}, and immediately follow a \field{MsiCmd} write operation
+> +using VIRTIO_MMIO_MSI_CMD_CONFIGURE to device for configuring an event to
+> +this MSI vector.
+> +
+> +After all MSI vectors are configured, driver SHOULD set global MSI enabled
+> +by writing to \field{MsiCmd} using VIRTIO_MMIO_MSI_CMD_ENABLE.
+> +
+> +Driver should use VIRTIO_MMIO_MSI_CMD_DISABLE when disabling MSI.
+> +
+> +Driver should use VIRTIO_MMIO_MSI_CMD_MASK with an MSI index \field{MsiVecSel}
+> +to prohibit the event from the corresponding interrupt source.
+> +
+> +Driver should use VIRTIO_MMIO_MSI_CMD_UNMASK with an MSI index \field{MsiVecSel}
+> +to recover the event from the corresponding interrupt source.
+> +
+> +If driver fails to setup any event with a vector,
+> +it MUST disable MSI by \field{MsiCmd} and use the single dedicated interrupt for device.
+> +
+>  \subsubsection{Notification Structure Layout}\label{sec:Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / Notification Structure Layout}
+>  
+>  When VIRTIO_F_MMIO_NOTIFICATION has been negotiated, the notification location is calculated
+> @@ -1908,6 +2018,12 @@ \subsubsection{Virtqueue Configuration}\label{sec:Virtio Transport Options / Vir
+>     \field{QueueDriverLow}/\field{QueueDriverHigh} and
+>     \field{QueueDeviceLow}/\field{QueueDeviceHigh} register pairs.
+>  
+> +\item Write MSI address \field{MsiAddrLow}/\field{MsiAddrHigh},
+> +MSI data \field{MsiData} and MSI update command \field{MsiCtrlStat} with corresponding
+> +virtqueue index to update
+> +MSI configuration for device requesting interrupts triggered by
+> +virtqueue events.
+> +
+>  \item Write 0x1 to \field{QueueReady}.
+>  \end{enumerate}
+>  
+> @@ -1932,20 +2048,43 @@ \subsubsection{Available Buffer Notifications}\label{sec:Virtio Transport Option
+>  
+>  \subsubsection{Notifications From The Device}\label{sec:Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / Notifications From The Device}
+>  
+> -The memory mapped virtio device is using a single, dedicated
+> +If MSI is enabled, the memory mapped virtio
+> +device uses appropriate MSI interrupt message
+> +for configuration change notification and used buffer notification which are
+> +configured by \field{MsiAddrLow}, \field{MsoAddrHigh} and \field{MsiData}.
+> +
+> +If MSI is not enabled, the memory mapped virtio device
+> +uses a single, dedicated
+>  interrupt signal, which is asserted when at least one of the
+>  bits described in the description of \field{InterruptStatus}
+> -is set. This is how the device sends a used buffer notification
+> -or a configuration change notification to the device.
+> +is set.
+>  
+>  \drivernormative{\paragraph}{Notifications From The Device}{Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / Notifications From The Device}
+> -After receiving an interrupt, the driver MUST read
+> -\field{InterruptStatus} to check what caused the interrupt (see the
+> -register description).  The used buffer notification bit being set
+> -SHOULD be interpreted as a used buffer notification for each active
+> -virtqueue.  After the interrupt is handled, the driver MUST acknowledge
+> -it by writing a bit mask corresponding to the handled events to the
+> -InterruptACK register.
+> +A driver MUST handle the case where MSI is disabled, which uses the same interrupt indicating both device configuration
+> +space change and one or more virtqueues being used.
+> +
+> +\subsubsection{Driver Handling Interrupts}\label{sec:Virtio Transport Options / Virtio Over MMIO / MMIO-specific Initialization And Device Operation / Driver Handling Interrupts}
+> +
+> +The driver interrupt handler would typically:
+> +
+> +\begin{itemize}
+> +  \item If MSI is enabled:
+> +    \begin{itemize}
+> +      \item
+> +        Figure out the virtqueue mapped to that MSI vector for the
+> +        device, to see if any progress has been made by the device
+> +        which requires servicing.
+> +      \item
+> +        If the interrupt belongs to configuration space changing signal,
+> +        re-examine the configuration space to see what changed.
+> +    \end{itemize}
+> +  \item If MSI is disabled:
+> +    \begin{itemize}
+> +      \item Read \field{InterruptStatus} to check what caused the interrupt.
+> +      \item Acknowledge the interrupt by writing a bit mask corresponding
+> +            to the handled events to the InterruptACK register.
+> +    \end{itemize}
+> +\end{itemize}
+>  
+>  \subsection{Legacy interface}\label{sec:Virtio Transport Options / Virtio Over MMIO / Legacy interface}
+>  
+> diff --git a/msi-state.c b/msi-state.c
+> new file mode 100644
+> index 0000000..b1fa0c1
+> --- /dev/null
+> +++ b/msi-state.c
+> @@ -0,0 +1,4 @@
+> +le32 {
+> +    msi_enabled : 1;
+> +    reserved : 31;
+> +};
+> -- 
+> 2.7.4
+> 
+> 
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+
