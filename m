@@ -2,70 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EBA5D14D4EE
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 02:10:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4BEB14D635
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 06:44:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727218AbgA3BKI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 20:10:08 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:39469 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727112AbgA3BKI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jan 2020 20:10:08 -0500
-Received: by mail-il1-f195.google.com with SMTP id f70so1628361ill.6
-        for <kvm@vger.kernel.org>; Wed, 29 Jan 2020 17:10:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UIJpdZf8sX5VGl+nHmaWeHVqzqy84GuWYzpeHSNvIXI=;
-        b=hU3t0iZGT8HwRfOP4zVuOtz3kV3jIt0WgWHzgIDdGnlNgCp2nYKcn+PWAwp0+7+h83
-         k6hawullwibiw+XqN8pcm0jM9t2ArylW9tcCDveOXk1XlqbZNNWlEbjmFQ5HZTnSe7Oj
-         paRNmprpKbjxC7/90mZKVcKjuottHjnImoHu/Jjn88XL4aWriRPZ7Ia98oMNt2Q9mpow
-         dxm2faq1/WbfnRi/a1JWHBBFg8RHhuLIZpNs2M7fXpjCciWplsUDV4jftN7WKi3VGreR
-         XVruQn4izyIRR/eFIBzf2aldBBRjtZSLOIeDs2rD/9PDkgN1EyMgmGUq1RbcAgz9stut
-         uF8Q==
+        id S1726469AbgA3FoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 00:44:16 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57398 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725873AbgA3FoP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 00:44:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580363054;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=b8PEF8AVAWODPDupJea+4sWEJHHfwQkjaA/7qcZmag4=;
+        b=Y6R00qTGMkNZUDTi9Bjzix9BllX0aNbcel38FTI/KrI0Gy8ohOqOO1Bo+f8ANxQ1udmsI+
+        9gc93iPBE/sR02iBoU12Jc/3Qc6eX62uUl1dMn9j+vUyG+JNRIzIuJRkCkDUz+nQ7AQlt3
+        2i8of8hMPtwPYKMTBmpP5X7h+dsdlcs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-368-47UrOtCqP9u-T_G9MYz_gg-1; Thu, 30 Jan 2020 00:44:12 -0500
+X-MC-Unique: 47UrOtCqP9u-T_G9MYz_gg-1
+Received: by mail-wr1-f70.google.com with SMTP id v17so1204228wrm.17
+        for <kvm@vger.kernel.org>; Wed, 29 Jan 2020 21:44:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UIJpdZf8sX5VGl+nHmaWeHVqzqy84GuWYzpeHSNvIXI=;
-        b=P1cCWiMrasuAJVgvoXDeSmVW0kgn6yEmegUCpaeHilCidvI7rAQNmWdgs4BSRVG3hP
-         fWBxcKkq+54uREpC64tQ8itYUuNyyg1EOfqs/PBOZY6mTiCrELXjciJpyR86Xmhx5WHk
-         nph62Ro90RSwxcWGVJLRiGWEjwgbYvc/LP/MvCNIkCp/8nQDdZBovca0xptBqgEt0rcP
-         BGiWPqM2pk+SI+dH8SoMsvKkAEdqgYIMaZGbJYwzPy1jpcG2HLTzdCOi3QHhDxH1Z4Fb
-         /zXR5/5ygIzzyzNaGs4tEVDMjE2RSLBKBcMeYm8/8hmSYqCHYdf5I1rDM0knqbGI96QF
-         Gj0A==
-X-Gm-Message-State: APjAAAXSLJkvj+El5/Bji1WFr7bE3/I/YHh/GU5NuR+OdboxZC1RRYD1
-        0/IIlx6YUJOlzOfjMVeC07bo634eSjxjk1zeHVg9kA==
-X-Google-Smtp-Source: APXvYqxeC2m+iJmgHRACDG+z4g1eKAVmZhd7mzp1zuHnIt8LZ9jcHC+HxeAx2fW8ozb59EBiY9KxDpxdcJvvmiuP1a8=
-X-Received: by 2002:a92:8c9c:: with SMTP id s28mr1981527ill.248.1580346607859;
- Wed, 29 Jan 2020 17:10:07 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=b8PEF8AVAWODPDupJea+4sWEJHHfwQkjaA/7qcZmag4=;
+        b=tAiNFMPHWP88vE1R4vSltsIOQ+a4rjmBIIREEC9JN/LHUy5Gd8uisHaRGe692G970f
+         qqUcdjBUnygFstnvX8kazfTj+7PLcuNWsoADWsHK3olYBEGQRu8wObJUv1voUJPYNndJ
+         gzLrgTRYe1xA7ezD6Jou5yHMhCWrqOhJuI479GSEalsRk8qZnV+xgJqHiKwq0ueAClTE
+         PCxLsxtJtxJuIb4kfTpNOOFtLbY8xwtattjwRwJKV5o5PwuEdiNoKvpnyk2UQDcDducf
+         2y7yTE3QlZKfxjUIjZiuiT+x/x3LqeNaVZuU2evZRE5EC4bSINTSvwWOAAVRZNZsVnQh
+         JaGA==
+X-Gm-Message-State: APjAAAVH3rD177FnF+6Mae7XGvsJwqbHthHdjPa6BL9Txop41jwstnkf
+        LToZM1t/mLdhHo3PmoRuWmy3czM4Lj9DY1UNFnwM0eLTVM+AR8vXB7X8qsF3RP+4y0Q1tAb+Inh
+        auj73PHMiSovL
+X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr3175365wmi.21.1580363051209;
+        Wed, 29 Jan 2020 21:44:11 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxvrtUyXEqgq8iYKVpAB/LAj4fC31bOc+VOTWRDvsFWxjJ6sWsl8qJGadVTcya+7iE6vbimVA==
+X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr3175335wmi.21.1580363050959;
+        Wed, 29 Jan 2020 21:44:10 -0800 (PST)
+Received: from [10.1.251.141] ([80.188.125.198])
+        by smtp.gmail.com with ESMTPSA id 4sm4795049wmg.22.2020.01.29.21.44.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Jan 2020 21:44:10 -0800 (PST)
+Subject: Re: [PATCH 5/5] KVM: x86: Set kvm_x86_ops only after
+ ->hardware_setup() completes
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+References: <20200130001023.24339-1-sean.j.christopherson@intel.com>
+ <20200130001023.24339-6-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <44e0c550-7dcc-bfed-07c4-907e61d476a1@redhat.com>
+Date:   Thu, 30 Jan 2020 06:44:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20200127212256.194310-1-ehankland@google.com> <2a394c6d-c453-6559-bf33-f654af7922bd@redhat.com>
-In-Reply-To: <2a394c6d-c453-6559-bf33-f654af7922bd@redhat.com>
-From:   Eric Hankland <ehankland@google.com>
-Date:   Wed, 29 Jan 2020 17:09:56 -0800
-Message-ID: <CAOyeoRVaV3Dh=M4ioiT3DU+p5ZnQGRcy9_PssJZ=a36MhL-xHQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Fix perfctr WRMSR for running counters
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200130001023.24339-6-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sorry - I forgot to switch to plain text mode on my first reply.
+On 30/01/20 01:10, Sean Christopherson wrote:
+> Set kvm_x86_ops with the vendor's ops only after ->hardware_setup()
+> completes to "prevent" using kvm_x86_ops before they are ready, i.e. to
+> generate a null pointer fault instead of silently consuming unconfigured
+> state.
 
-> I think this best written as it was before commit 2924b52117:
->
->                         if (!msr_info->host_initiated)
->                                 data = (s64)(s32)data;
->                         pmc->counter += data - pmc_read_counter(pmc);
-Sounds good to me.
+What about even copying kvm_x86_ops by value, so that they can be
+accessed with "kvm_x86_ops.callback()" and save one memory access?
 
-> Do you have a testcase?
-I added a testcase to kvm-unit-tests/x86/pmu.c that fails without this
-patch and passes with it.
-Should I send out that patch now?
+Paolo
+
