@@ -2,95 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1195D14D46D
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 01:10:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF66714D4BA
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 01:39:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727281AbgA3AKd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 19:10:33 -0500
-Received: from mga06.intel.com ([134.134.136.31]:48394 "EHLO mga06.intel.com"
+        id S1726990AbgA3AjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 19:39:06 -0500
+Received: from mga06.intel.com ([134.134.136.31]:50326 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727218AbgA3AKc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jan 2020 19:10:32 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1726401AbgA3AjF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jan 2020 19:39:05 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jan 2020 16:10:30 -0800
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jan 2020 16:38:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,379,1574150400"; 
-   d="scan'208";a="261990367"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 29 Jan 2020 16:10:30 -0800
+   d="scan'208";a="229788654"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga003.jf.intel.com with ESMTP; 29 Jan 2020 16:38:40 -0800
+Date:   Wed, 29 Jan 2020 16:38:40 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: [PATCH 5/5] KVM: x86: Set kvm_x86_ops only after ->hardware_setup() completes
-Date:   Wed, 29 Jan 2020 16:10:23 -0800
-Message-Id: <20200130001023.24339-6-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200130001023.24339-1-sean.j.christopherson@intel.com>
-References: <20200130001023.24339-1-sean.j.christopherson@intel.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 25/26] KVM: x86: Handle main Intel PT CPUID leaf in
+ vendor code
+Message-ID: <20200130003840.GA24606@linux.intel.com>
+References: <20200129234640.8147-1-sean.j.christopherson@intel.com>
+ <20200129234640.8147-26-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200129234640.8147-26-sean.j.christopherson@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set kvm_x86_ops with the vendor's ops only after ->hardware_setup()
-completes to "prevent" using kvm_x86_ops before they are ready, i.e. to
-generate a null pointer fault instead of silently consuming unconfigured
-state.
+On Wed, Jan 29, 2020 at 03:46:39PM -0800, Sean Christopherson wrote:
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index d06fb54c9c0d..ca766c460318 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -409,7 +409,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>  	unsigned f_gbpages = 0;
+>  	unsigned f_lm = 0;
+>  #endif
+> -	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
+>  
+>  	/* cpuid 1.edx */
+>  	const u32 kvm_cpuid_1_edx_x86_features =
+> @@ -648,22 +647,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>  		break;
+>  	}
+>  	/* Intel PT */
+> -	case 0x14: {
+> -		int t, times = entry->eax;
+> -
+> -		if (!f_intel_pt) {
+> -			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+> -			break;
+> -		}
+> -
+> -		for (t = 1; t <= times; ++t) {
+> -			if (*nent >= maxnent)
+> -				goto out;
+> -			do_host_cpuid(&entry[t], function, t);
+> -			++*nent;
+> -		}
+> +	case 0x14:
+>  		break;
+> -	}
+>  	case KVM_CPUID_SIGNATURE: {
+>  		static const char signature[12] = "KVMKVMKVM\0\0";
+>  		const u32 *sigptr = (const u32 *)signature;
+> @@ -778,6 +763,21 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>  
+>  	kvm_x86_ops->set_supported_cpuid(entry);
+>  
+> +	/*
+> +	 * Add feature-dependent sub-leafs after ->set_supported_cpuid() to
+> +	 * properly handle the feature being disabled by SVM/VMX.
+> +	 */
+> +	if (function == 0x14) {
+> +		int t, times = entry->eax;
+> +
+> +		for (t = 1; t <= times; ++t) {
+> +			if (*nent >= maxnent)
+> +				goto out;
+> +			do_host_cpuid(&entry[t], function, t);
+> +			++*nent;
+> +		}
+> +	}
+> +
+>  	r = 0;
 
-An alternative implementation would be to have ->hardware_setup()
-return the vendor's ops, but that would require non-trivial refactoring,
-and would arguably result in less readable code, e.g. ->hardware_setup()
-would need to use ERR_PTR() in multiple locations, and each vendor's
-declaration of the runtime ops would be less obvious.
+I belatedly thought of an alternative that I think I like better.  Instead
+of adding the sub-leafs in common code, introduce a new kvm_x86_ops hook to
+add vendor specific sub-leafs, e.g.:
 
-No functional change intended.
+        kvm_x86_ops->set_supported_cpuid(entry);
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/x86.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+        r = kvm_x86_ops->add_cpuid_sub_leafs(entry, nent, maxent,
+					     do_host_cpuid);
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index eb36762aa2ce..a9f733c4ca28 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7326,8 +7326,6 @@ int kvm_arch_init(void *opaque)
- 	if (r)
- 		goto out_free_percpu;
- 
--	kvm_x86_ops = ops->runtime_ops;
--
- 	kvm_mmu_set_mask_ptes(PT_USER_MASK, PT_ACCESSED_MASK,
- 			PT_DIRTY_MASK, PT64_NX_MASK, 0,
- 			PT_PRESENT_MASK, 0, sme_me_mask);
-@@ -9588,6 +9586,8 @@ int kvm_arch_hardware_setup(void *opaque)
- 	if (r != 0)
- 		return r;
- 
-+	kvm_x86_ops = ops->runtime_ops;
-+
- 	cr4_reserved_bits = kvm_host_cr4_reserved_bits(&boot_cpu_data);
- 
- 	if (kvm_has_tsc_control) {
--- 
-2.24.1
-
+That gets Intel PT (and SGX if/when it gets merged) sub-leafs out of the
+common x86 code without polluting ->set_supported_cpuid with the extra
+params and return value.  The other hiccup is that SGX will want access to
+cpuid_mask(), but I don't see an issue with moving that to cpuid.h.
