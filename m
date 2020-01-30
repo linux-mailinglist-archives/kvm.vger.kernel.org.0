@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F75314D9D7
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 12:32:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF26214D9DB
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 12:33:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727205AbgA3LcT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 06:32:19 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10330 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727149AbgA3LcT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 06:32:19 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00UBPBCF090749
-        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 06:32:16 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xtfh1usye-1
+        id S1727128AbgA3LdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 06:33:10 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53040 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727103AbgA3LdK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 06:33:10 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00UBNnLx051549
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 06:33:09 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xuagnwdqg-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 06:32:16 -0500
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 06:33:08 -0500
 Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 30 Jan 2020 11:32:14 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 30 Jan 2020 11:33:06 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 30 Jan 2020 11:32:12 -0000
+        Thu, 30 Jan 2020 11:33:02 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00UBWBra49479778
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00UBX1Ew53805178
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Jan 2020 11:32:11 GMT
+        Thu, 30 Jan 2020 11:33:01 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6F13AA405F;
-        Thu, 30 Jan 2020 11:32:11 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 6C447A405C;
+        Thu, 30 Jan 2020 11:33:01 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 328F3A4060;
-        Thu, 30 Jan 2020 11:32:11 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 292E8A4054;
+        Thu, 30 Jan 2020 11:33:01 +0000 (GMT)
 Received: from dyn-9-152-224-44.boeblingen.de.ibm.com (unknown [9.152.224.44])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 30 Jan 2020 11:32:11 +0000 (GMT)
-Subject: Re: [PATCH v8 3/4] selftests: KVM: s390x: Add reset tests
+        Thu, 30 Jan 2020 11:33:01 +0000 (GMT)
+Subject: Re: [PATCH v8 4/4] selftests: KVM: testing the local IRQs resets
 To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
 Cc:     borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
         linux-s390@vger.kernel.org
 References: <20200129200312.3200-1-frankja@linux.ibm.com>
- <20200129200312.3200-4-frankja@linux.ibm.com>
- <e0f72503-d292-edc4-67e1-abe1cbab3f96@redhat.com>
+ <20200129200312.3200-5-frankja@linux.ibm.com>
+ <a9fd8939-503e-bf11-7f5e-bb83a79a1bf9@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -89,25 +89,25 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Thu, 30 Jan 2020 12:32:10 +0100
+Date:   Thu, 30 Jan 2020 12:33:00 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <e0f72503-d292-edc4-67e1-abe1cbab3f96@redhat.com>
+In-Reply-To: <a9fd8939-503e-bf11-7f5e-bb83a79a1bf9@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="aV2kLhZXopzXtRlUaYnXzoa4HARRRtF3a"
+ boundary="DGrWTHLfQc3psSj5x8Y8XRQnJsi3gXgi4"
 X-TM-AS-GCONF: 00
-x-cbid: 20013011-4275-0000-0000-0000039C641B
+x-cbid: 20013011-0028-0000-0000-000003D5DF03
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20013011-4276-0000-0000-000038B081B1
-Message-Id: <0993d789-5cfd-d4c3-a39e-28d22d82dd43@linux.ibm.com>
+x-cbparentid: 20013011-0029-0000-0000-0000249A2D7A
+Message-Id: <cf61103b-86b0-5bc2-51a2-46ff6485c632@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-01-30_03:2020-01-28,2020-01-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- lowpriorityscore=0 suspectscore=13 mlxlogscore=999 bulkscore=0
- malwarescore=0 spamscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ mlxlogscore=999 malwarescore=0 phishscore=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 suspectscore=3 bulkscore=0 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1911200001 definitions=main-2001300084
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -115,281 +115,151 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aV2kLhZXopzXtRlUaYnXzoa4HARRRtF3a
-Content-Type: multipart/mixed; boundary="oPhuGBJpkO1xZu8AhwW788Csh2zwgGIOS"
+--DGrWTHLfQc3psSj5x8Y8XRQnJsi3gXgi4
+Content-Type: multipart/mixed; boundary="kVu9UrRZ7yB5bsQzRiige4JyIPQv9Levn"
 
---oPhuGBJpkO1xZu8AhwW788Csh2zwgGIOS
+--kVu9UrRZ7yB5bsQzRiige4JyIPQv9Levn
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 1/30/20 11:51 AM, Thomas Huth wrote:
+On 1/30/20 12:10 PM, Thomas Huth wrote:
 > On 29/01/2020 21.03, Janosch Frank wrote:
->> Test if the registers end up having the correct values after a normal,=
+>> From: Pierre Morel <pmorel@linux.ibm.com>
+>>
+>> Local IRQs are reset by a normal cpu reset.  The initial cpu reset and=
 
->> initial and clear reset.
+>> the clear cpu reset, as superset of the normal reset, both clear the
+>> IRQs too.
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Let's inject an interrupt to a vCPU before calling a reset and see if
+>> it is gone after the reset.
+>>
+>> We choose to inject only an emergency interrupt at this point and can
+>> extend the test to other types of IRQs later.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 >> ---
->>  tools/testing/selftests/kvm/Makefile       |   1 +
->>  tools/testing/selftests/kvm/s390x/resets.c | 165 ++++++++++++++++++++=
+>>  tools/testing/selftests/kvm/s390x/resets.c | 57 +++++++++++++++++++++=
 +
->>  2 files changed, 166 insertions(+)
->>  create mode 100644 tools/testing/selftests/kvm/s390x/resets.c
+>>  1 file changed, 57 insertions(+)
 >>
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/self=
-tests/kvm/Makefile
->> index 3138a916574a..fe1ea294730c 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -36,6 +36,7 @@ TEST_GEN_PROGS_aarch64 +=3D kvm_create_max_vcpus
->> =20
->>  TEST_GEN_PROGS_s390x =3D s390x/memop
->>  TEST_GEN_PROGS_s390x +=3D s390x/sync_regs_test
->> +TEST_GEN_PROGS_s390x +=3D s390x/resets
->>  TEST_GEN_PROGS_s390x +=3D dirty_log_test
->>  TEST_GEN_PROGS_s390x +=3D kvm_create_max_vcpus
->> =20
 >> diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testin=
 g/selftests/kvm/s390x/resets.c
->> new file mode 100644
->> index 000000000000..2b2378cc9e80
->> --- /dev/null
+>> index 2b2378cc9e80..299c1686f98c 100644
+>> --- a/tools/testing/selftests/kvm/s390x/resets.c
 >> +++ b/tools/testing/selftests/kvm/s390x/resets.c
->> @@ -0,0 +1,165 @@
->> +// SPDX-License-Identifier: GPL-2.0-or-later
->> +/*
->> + * Test for s390x CPU resets
->> + *
->> + * Copyright (C) 2020, IBM
->> + */
+>> @@ -14,6 +14,9 @@
+>>  #include "kvm_util.h"
+>> =20
+>>  #define VCPU_ID 3
+>> +#define LOCAL_IRQS 32
 >> +
->> +#include <stdio.h>
->> +#include <stdlib.h>
->> +#include <string.h>
->> +#include <sys/ioctl.h>
->> +
->> +#include "test_util.h"
->> +#include "kvm_util.h"
->> +
->> +#define VCPU_ID 3
->> +
->> +struct kvm_vm *vm;
->> +struct kvm_run *run;
->> +struct kvm_sync_regs *regs;
->> +static uint64_t regs_null[16];
->> +
->> +static uint64_t crs[16] =3D { 0x40000ULL,
->> +			    0x42000ULL,
->> +			    0, 0, 0, 0, 0,
->> +			    0x43000ULL,
->> +			    0, 0, 0, 0, 0,
->> +			    0x44000ULL,
->> +			    0, 0
->> +};
->> +
->> +static void guest_code_initial(void)
+>> +struct kvm_s390_irq buf[VCPU_ID + LOCAL_IRQS];
+>> =20
+>>  struct kvm_vm *vm;
+>>  struct kvm_run *run;
+>> @@ -52,6 +55,29 @@ static void test_one_reg(uint64_t id, uint64_t valu=
+e)
+>>  	TEST_ASSERT(eval_reg =3D=3D value, "value =3D=3D %s", value);
+>>  }
+>> =20
+>> +static void assert_noirq(void)
 >> +{
->> +	/* Round toward 0 */
->> +	uint32_t fpc =3D 0x11;
+>> +	struct kvm_s390_irq_state irq_state;
+>> +	int irqs;
 >> +
->> +	/* Dirty registers */
->> +	asm volatile (
->> +		"	lctlg	0,15,%0\n"
->> +		"	sfpc	%1\n"
->> +		: : "Q" (crs), "d" (fpc));
->=20
-> I'd recommend to add a GUEST_SYNC(0) here ... otherwise the guest code
-> tries to return from this function and will cause a crash - which will
-> also finish execution of the guest, but might have unexpected side effe=
-cts.
-
-Ok
-
->=20
+>> +	if (!(kvm_check_cap(KVM_CAP_S390_INJECT_IRQ) &&
+>> +	    kvm_check_cap(KVM_CAP_S390_IRQ_STATE)))
+>> +		return;
+>> +
+>> +	irq_state.len =3D sizeof(buf);
+>> +	irq_state.buf =3D (unsigned long)buf;
+>> +	irqs =3D _vcpu_ioctl(vm, VCPU_ID, KVM_S390_GET_IRQ_STATE, &irq_state=
+);
+>> +	/*
+>> +	 * irqs contains the number of retrieved interrupts, apart from the
+>> +	 * emergency call that should be cleared by the resets, there should=
+ be
+>> +	 * none.
+>> +	 */
+>> +	if (irqs < 0)
+>> +		printf("Error by getting IRQ: errno %d\n", errno);
+>> +
+>> +	TEST_ASSERT(!irqs, "IRQ pending");
 >> +}
 >> +
->> +static void test_one_reg(uint64_t id, uint64_t value)
->> +{
->> +	struct kvm_one_reg reg;
->> +	uint64_t eval_reg;
->> +
->> +	reg.addr =3D (uintptr_t)&eval_reg;
->> +	reg.id =3D id;
->> +	vcpu_get_reg(vm, VCPU_ID, &reg);
->> +	TEST_ASSERT(eval_reg =3D=3D value, "value =3D=3D %s", value);
+>>  static void assert_clear(void)
+>>  {
+>>  	struct kvm_sregs sregs;
+>> @@ -93,6 +119,31 @@ static void assert_initial(void)
+>>  static void assert_normal(void)
+>>  {
+>>  	test_one_reg(KVM_REG_S390_PFTOKEN, KVM_S390_PFAULT_TOKEN_INVALID);
+>> +	assert_noirq();
 >> +}
 >> +
->> +static void assert_clear(void)
+>> +static int inject_irq(int cpu_id)
 >> +{
->> +	struct kvm_sregs sregs;
->> +	struct kvm_regs regs;
->> +	struct kvm_fpu fpu;
+>> +	struct kvm_s390_irq_state irq_state;
+>> +	struct kvm_s390_irq *irq =3D &buf[0];
+>> +	int irqs;
 >> +
->> +	vcpu_regs_get(vm, VCPU_ID, &regs);
->> +	TEST_ASSERT(!memcmp(&regs.gprs, regs_null, sizeof(regs.gprs)), "grs =
-=3D=3D 0");
+>> +	if (!(kvm_check_cap(KVM_CAP_S390_INJECT_IRQ) &&
+>> +	    kvm_check_cap(KVM_CAP_S390_IRQ_STATE)))
+>> +		return 0;
 >> +
->> +	vcpu_sregs_get(vm, VCPU_ID, &sregs);
->> +	TEST_ASSERT(!memcmp(&sregs.acrs, regs_null, sizeof(sregs.acrs)), "ac=
-rs =3D=3D 0");
->> +
->> +	vcpu_fpu_get(vm, VCPU_ID, &fpu);
->> +	TEST_ASSERT(!memcmp(&fpu.fprs, regs_null, sizeof(fpu.fprs)), "fprs =3D=
-=3D 0");
->> +}
->> +
->> +static void assert_initial(void)
->> +{
->> +	struct kvm_sregs sregs;
->> +	struct kvm_fpu fpu;
->> +
->> +	vcpu_sregs_get(vm, VCPU_ID, &sregs);
->> +	TEST_ASSERT(sregs.crs[0] =3D=3D 0xE0UL, "cr0 =3D=3D 0xE0");
->> +	TEST_ASSERT(sregs.crs[14] =3D=3D 0xC2000000UL, "cr14 =3D=3D 0xC20000=
-00");
->> +	TEST_ASSERT(!memcmp(&sregs.crs[1], regs_null, sizeof(sregs.crs[1]) *=
- 12),
->> +		    "cr1-13 =3D=3D 0");
->> +	TEST_ASSERT(sregs.crs[15] =3D=3D 0, "cr15 =3D=3D 0");
->> +
->> +	vcpu_fpu_get(vm, VCPU_ID, &fpu);
->> +	TEST_ASSERT(!fpu.fpc, "fpc =3D=3D 0");
->> +
->> +	test_one_reg(KVM_REG_S390_GBEA, 1);
->> +	test_one_reg(KVM_REG_S390_PP, 0);
->> +	test_one_reg(KVM_REG_S390_TODPR, 0);
->> +	test_one_reg(KVM_REG_S390_CPU_TIMER, 0);
->> +	test_one_reg(KVM_REG_S390_CLOCK_COMP, 0);
->> +}
->> +
->> +static void assert_normal(void)
->> +{
->> +	test_one_reg(KVM_REG_S390_PFTOKEN, KVM_S390_PFAULT_TOKEN_INVALID);
->> +}
->> +
->> +static void test_normal(void)
->> +{
->> +	printf("Testing notmal reset\n");
->> +	/* Create VM */
->> +	vm =3D vm_create_default(VCPU_ID, 0, guest_code_initial);
->> +	run =3D vcpu_state(vm, VCPU_ID);
->> +	regs =3D &run->s.regs;
->> +
->> +	_vcpu_run(vm, VCPU_ID);
->=20
-> Could you use vcpu_run() instead of _vcpu_run() ?
-
-Done.
-
->=20
->> +	vcpu_ioctl(vm, VCPU_ID, KVM_S390_NORMAL_RESET, 0);
->> +	assert_normal();
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +static int test_initial(void)
->> +{
->> +	int rv;
->> +
->> +	printf("Testing initial reset\n");
->> +	/* Create VM */
->> +	vm =3D vm_create_default(VCPU_ID, 0, guest_code_initial);
->> +	run =3D vcpu_state(vm, VCPU_ID);
->> +	regs =3D &run->s.regs;
->> +
->> +	rv =3D _vcpu_run(vm, VCPU_ID);
->=20
-> Extra bonus points if you check here that the registers contain the
-> values that have been set by the guest ;-)
-
-I started working on that yesterday
-
->=20
->> +	vcpu_ioctl(vm, VCPU_ID, KVM_S390_INITIAL_RESET, 0);
->> +	assert_normal();
->> +	assert_initial();
->> +	kvm_vm_free(vm);
->> +	return rv;
->> +}
->> +
->> +static int test_clear(void)
->> +{
->> +	int rv;
->> +
->> +	printf("Testing clear reset\n");
->> +	/* Create VM */
->> +	vm =3D vm_create_default(VCPU_ID, 0, guest_code_initial);
->> +	run =3D vcpu_state(vm, VCPU_ID);
->> +	regs =3D &run->s.regs;
->> +
->> +	rv =3D _vcpu_run(vm, VCPU_ID);
->> +
->> +	vcpu_ioctl(vm, VCPU_ID, KVM_S390_CLEAR_RESET, 0);
->> +	assert_normal();
->> +	assert_initial();
->> +	assert_clear();
->> +	kvm_vm_free(vm);
->> +	return rv;
->> +}
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +	int addl_resets;
->> +
->> +	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
->> +	addl_resets =3D kvm_check_cap(KVM_CAP_S390_VCPU_RESETS);
->> +
->> +	test_initial();
->> +	if (addl_resets) {
->=20
-> I think you could still fit this into one line, without the need to
-> declare the addl_resets variable:
-
-The other question is if we still need to check that if the test is
-bundled with the kernel anyway?
-
->=20
-> 	if (kvm_check_cap(KVM_CAP_S390_VCPU_RESETS)) {
->=20
->> +		test_normal();
->> +		test_clear();
+>> +	/* Inject IRQ */
+>> +	irq_state.len =3D sizeof(struct kvm_s390_irq);
+>> +	irq_state.buf =3D (unsigned long)buf;
+>> +	irq->type =3D KVM_S390_INT_EMERGENCY;
+>> +	irq->u.emerg.code =3D cpu_id;
+>> +	irqs =3D _vcpu_ioctl(vm, cpu_id, KVM_S390_SET_IRQ_STATE, &irq_state)=
+;
+>> +	if (irqs < 0) {
+>> +		printf("Error by injecting INT_EMERGENCY: errno %d\n", errno);
+>> +		return errno;
 >> +	}
->> +	return 0;
->> +}
 >=20
-> Apart from the nits, this looks pretty good already, thanks for putting=
+> Can you turn this into a TEST_ASSERT() instead? Otherwise the printf()
+> error might go unnoticed.
 
-> it together!
+I've converted both error checks into asserts (set/get irq) and made the
+function void.
+
+
+>=20
+> Apart from that (and the nits that Cornelia already mentioned), the
+> patch looks fine to me.
 >=20
 >  Thomas
 >=20
 
 
 
---oPhuGBJpkO1xZu8AhwW788Csh2zwgGIOS--
+--kVu9UrRZ7yB5bsQzRiige4JyIPQv9Levn--
 
---aV2kLhZXopzXtRlUaYnXzoa4HARRRtF3a
+--DGrWTHLfQc3psSj5x8Y8XRQnJsi3gXgi4
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4yvroACgkQ41TmuOI4
-ufjVdw/6Ak0HntjpU+nvOCG45/ZpEdaqXHHpWuZicHdSY+d37tfSt7DEfY4VxLcA
-t/ZYUVSjbQjcZJVJKQ7gy1DH9uYSxDroFuu8SpVl5VlGk45WQXGSsEwq/KKc2SRN
-TShaPStZnOInopdP9WROFux2WLZtUrxvnE3ySDVRS2fFh1CETgvp3eJtyy8yB9DP
-qKCVvcLGP7DqcAYbh9axpWWUc2CZri/7CCc45HMazgTmRteJqsxqsa4GrFJ4r315
-TWXTRiLodg0Nja7aU8BuiQMciZd/y3ywh44o8FywO6oZ2T64ZfsHD5SOxyqfOEQr
-tkNH7tsO3DU77ZtOs7Gsg/vmzR3r3bhcEWe69mlCs2dC52UTORqCHbIdipmRNL5x
-cvk18zYCOmjkexxsyYC998YcRhX8/QvrNv/RhbL9stE9iOllJyBhO4MVv2eccXaK
-iQ+tWNfMHwtLzU8P4229QWt0ULTzOJOja8afETcmsJxs+kjpnNAyijUFLTqKvYm9
-MN7lJrCezVMMY54HN4iKuoV0fmaX0GYgCA64HoU6uvSOS2X3lwhKMjyMilw/NLgX
-Xq3L/xtXZYozisWDut6m33DoZv6Zq1MdhxbkzGR4kUpXJyDO52KIi3B5/meUXO26
-WDIRdSD/VqME/CiaZ9xUl0seopOV6g+V/8pl3pP8Ab5mtg7JdOs=
-=A3gx
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl4yvuwACgkQ41TmuOI4
+ufgszA/+Jcbj2JR9uFmPxNi7uBD83MYOr1fJXmEMpOeMchd0vfpPIkb5Hbh9WbYD
+N4Qrw6tqZZEQU8IYdMra9RAzUgMyZWLkrDMp/BQzGwSX/GcwYzdlmUrXxISo2a4g
+A+m9ua07x0PxxEm8b9TztcY8B30rQutKQZMgVXGBpeLtkRgF25qggx8GXW6CWAy6
+BZTinrczp7ZQICtKWxrEtur3z59azZOdduaII3xa9tlvYKf26b870I7n5kXUUNxk
+GKxWQBdTFgshXgbszfn4iqf+loVTRbDb2JW8E8r7S6J4Dpw3C8gMKYqqzm9cfRz+
+hKwIIvFhy7iqts03oZTgUFTuEc6zrijIH2L9f9YNVlHqfHCjCtpy1NtROqTCImjL
+raCmvr9U2h8DTPPtJZhdBAhCYtI8YL4a+G3Zjnq/MNQmrC0tI+oZN8FermTfyGM5
+Kxr1jChgNptPp4EDOnzPRkcHfQRw8Ql6JvZlj94SkDWU2cqRU4Ml4B01jkTuYGeW
+4P6ZEHxIO2UrRP/FIKiP0ysdnpydT9NoGUAhIL29MhyXyXKCmpo0U0/wMuNpG+7o
+01sQ3iV8BBuKrW85rgtfhgg+afg3XqaIqc2jHNMUIUgJwgpjOmikWqwIV293fSIK
+fmnFOKf2lLH3f7MOvjSQacfJQOJDCsEN9UCAiQpOWuTgWBfNHcA=
+=MHpG
 -----END PGP SIGNATURE-----
 
---aV2kLhZXopzXtRlUaYnXzoa4HARRRtF3a--
+--DGrWTHLfQc3psSj5x8Y8XRQnJsi3gXgi4--
 
