@@ -2,122 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B128E14DBCB
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 14:29:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3617214DC0E
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 14:35:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727426AbgA3N3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 08:29:20 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48210 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727417AbgA3N3U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 08:29:20 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 52977214D8;
-        Thu, 30 Jan 2020 13:29:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1580390959;
-        bh=dh8dergRizxwfhKXTRtQc9cB5ErpuOCTez5+NklVjS8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Z+nIVy8Wl+yoeXRp7CAA4BKuc7kQqPHaPC+7dti3zJ3PBhMjCVP07saX/qvMMy4sL
-         Z8GqJruaedRUhtDWRSGi715OylUKb+piEIZQhfVhjX4cL+fm09mWNtWPv820OFOYRS
-         e9CwBVjz2HW1zkr8iRr3ZVduXJgUBecTJik/sjNI=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1ix9q7-002BmW-97; Thu, 30 Jan 2020 13:26:35 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Murray <andrew.murray@arm.com>,
-        Beata Michalska <beata.michalska@linaro.org>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Haibin Wang <wanghaibin.wang@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Shannon Zhao <shannon.zhao@linux.alibaba.com>,
-        Steven Price <steven.price@arm.com>,
-        Will Deacon <will@kernel.org>,
-        YueHaibing <yuehaibing@huawei.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Subject: [PATCH 23/23] KVM: arm64: Treat emulated TVAL TimerValue as a signed 32-bit integer
-Date:   Thu, 30 Jan 2020 13:25:58 +0000
-Message-Id: <20200130132558.10201-24-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200130132558.10201-1-maz@kernel.org>
-References: <20200130132558.10201-1-maz@kernel.org>
+        id S1727310AbgA3NfI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 08:35:08 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50077 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726948AbgA3NfI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 08:35:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580391306;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qgWZmuhOKMFfk4VlYLuSzsR74+izZ4gtbxwoXtULvz0=;
+        b=I1xmranOQAvwF+xwbgRv0FjdJwdL2veOXbAeXXVi6hU+T8iHqus245QKINa3jl6COCfRHo
+        7XDODFRd8I80D0p2mcCG0IURzfhxJ1XIlz70BfnEvjIzG7pkNYy7PZcs1fAr6Izd7fHci0
+        YmkbRdT3GRNEP92GgSjtNSD/WfuxFhs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-347-3XKzX1SGNHyTdcA7RbkEIQ-1; Thu, 30 Jan 2020 08:34:59 -0500
+X-MC-Unique: 3XKzX1SGNHyTdcA7RbkEIQ-1
+Received: by mail-wr1-f70.google.com with SMTP id c6so1701532wrm.18
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 05:34:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qgWZmuhOKMFfk4VlYLuSzsR74+izZ4gtbxwoXtULvz0=;
+        b=Rccpiow65tP2RqFTDIV1g85gzbfbmE/aU3oDYByarVIBCPyhDD/EiiwvkgY7r1aDiK
+         h/gzFxty1c50LOr5IcAROYCzlnDc2chV09uEm/fJHrj3kDpbzosrbKfOLlkQIwqbIQcs
+         9/2aIwToGguRK5U1nS5SiwxnkkHQtWnzgmkAtzdRGjeRqdxQI6/moDi+KIXJZqdcIK1E
+         iql+RB+/fViKdp6scKQTJoYkP2olydAZc9jlcWSeWX+stNehnjDbwjWcaR+JE99QY4lA
+         u/sHVbfFnBu/6XdymU4b7AY0qkWGR4KQjWRhUk05uBrrUgL3CQnWYT3JYpsCHA6/WSo8
+         h0SQ==
+X-Gm-Message-State: APjAAAWdOt7dtTU0puerCyQVhEtPeb91hWE51xR3KdSHBLcrwDbT+UHX
+        GecPm8EChintzIvvX5APPd+H1NsxOS+mpD812/OeJ3fYa+xcm761Kk9bunpKkmx14dzkMSSf0sK
+        /kIMNLGbBUCeV
+X-Received: by 2002:a7b:c216:: with SMTP id x22mr5990206wmi.51.1580391298539;
+        Thu, 30 Jan 2020 05:34:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzaK3e7+tI1ynJ6nZWf6xjV+JfROJgFKfNjftS9fcCTVFysf2JJkQdFIT9TmVxClGHNFy2SMw==
+X-Received: by 2002:a7b:c216:: with SMTP id x22mr5990189wmi.51.1580391298345;
+        Thu, 30 Jan 2020 05:34:58 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net. [83.57.172.113])
+        by smtp.gmail.com with ESMTPSA id r6sm4272192wrp.95.2020.01.30.05.34.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jan 2020 05:34:57 -0800 (PST)
+Subject: Re: [PATCH 10/10] tests/qemu-iotests/check: Update to match Python 3
+ interpreter
+To:     Kevin Wolf <kwolf@redhat.com>
+Cc:     qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        kvm@vger.kernel.org, Juan Quintela <quintela@redhat.com>,
+        Cleber Rosa <crosa@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Max Reitz <mreitz@redhat.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Fam Zheng <fam@euphon.net>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        qemu-block@nongnu.org,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200129231402.23384-1-philmd@redhat.com>
+ <20200129231402.23384-11-philmd@redhat.com>
+ <20200130105839.GB6438@linux.fritz.box>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f20bd922-f5b7-7acd-fcc8-9326b282a36c@redhat.com>
+Date:   Thu, 30 Jan 2020 14:34:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <20200130105839.GB6438@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, andrew.murray@arm.com, beata.michalska@linaro.org, christoffer.dall@arm.com, eric.auger@redhat.com, gshan@redhat.com, wanghaibin.wang@huawei.com, james.morse@arm.com, broonie@kernel.org, mark.rutland@arm.com, rmk+kernel@armlinux.org.uk, shannon.zhao@linux.alibaba.com, steven.price@arm.com, will@kernel.org, yuehaibing@huawei.com, yuzenghui@huawei.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+On 1/30/20 11:58 AM, Kevin Wolf wrote:
+> Am 30.01.2020 um 00:14 hat Philippe Mathieu-Daudé geschrieben:
+>> All the iotests Python scripts have been converted to search for
+>> the Python 3 interpreter. Update the ./check script accordingly.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+>> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+>> index 2890785a10..2e7d29d570 100755
+>> --- a/tests/qemu-iotests/check
+>> +++ b/tests/qemu-iotests/check
+>> @@ -825,7 +825,7 @@ do
+>>   
+>>           start=$(_wallclock)
+>>   
+>> -        if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
+>> +        if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python3" ]; then
+>>               if $python_usable; then
+>>                   run_command="$PYTHON $seq"
+>>               else
+> 
+> Changing some test cases in patch 2 and only updating ./check now breaks
+> bisectability.
+> 
+> I'm not sure why you separated patch 2 and 8. I think the easiest way
+> would be to change all qemu-iotests cases in the same patch and also
+> update ./check in that patch.
 
-According to the ARM ARM, registers CNT{P,V}_TVAL_EL0 have bits [63:32]
-RES0 [1]. When reading the register, the value is truncated to the least
-significant 32 bits [2], and on writes, TimerValue is treated as a signed
-32-bit integer [1, 2].
+Tests in patch 2 use: if __name__ == "__main__", while tests in patch 8 
+don't. If I add the check I have to re-indent the patches, some lines 
+don't fit the 80char limit and require manual fixup... This doesn't look 
+worthwhile.
 
-When the guest behaves correctly and writes 32-bit values, treating TVAL
-as an unsigned 64 bit register works as expected. However, things start
-to break down when the guest writes larger values, because
-(u64)0x1_ffff_ffff = 8589934591. but (s32)0x1_ffff_ffff = -1, and the
-former will cause the timer interrupt to be asserted in the future, but
-the latter will cause it to be asserted now.  Let's treat TVAL as a
-signed 32-bit register on writes, to match the behaviour described in
-the architecture, and the behaviour experimentally exhibited by the
-virtual timer on a non-vhe host.
+> 
+> Otherwise, you'd have to change ./check in patch 2 to accept both
+> versions and could possibly remove the "python" version again here.
 
-[1] Arm DDI 0487E.a, section D13.8.18
-[2] Arm DDI 0487E.a, section D11.2.4
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-[maz: replaced the read-side mask with lower_32_bits]
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Fixes: 8fa761624871 ("KVM: arm/arm64: arch_timer: Fix CNTP_TVAL calculation")
-Link: https://lore.kernel.org/r/20200127103652.2326-1-alexandru.elisei@arm.com
----
- virt/kvm/arm/arch_timer.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index f182b2380345..c6c2a9dde00c 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -805,6 +805,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
- 	switch (treg) {
- 	case TIMER_REG_TVAL:
- 		val = timer->cnt_cval - kvm_phys_timer_read() + timer->cntvoff;
-+		val &= lower_32_bits(val);
- 		break;
- 
- 	case TIMER_REG_CTL:
-@@ -850,7 +851,7 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
- {
- 	switch (treg) {
- 	case TIMER_REG_TVAL:
--		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + val;
-+		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + (s32)val;
- 		break;
- 
- 	case TIMER_REG_CTL:
--- 
-2.20.1
+OK.
 
