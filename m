@@ -2,225 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AC3314E00F
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 18:40:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E156C14E068
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 19:02:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727496AbgA3RkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 12:40:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59014 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727158AbgA3RkI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 12:40:08 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 080372083E;
-        Thu, 30 Jan 2020 17:40:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1580406007;
-        bh=yR5hJFQwhragqRNRWC6IRUDBK/JgRFAWVTPBd2ZK8Fs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=zOLUGBxh2CAVvpQxtgUHTJKkCLMZRiL7+WVv9Z0DKdt0Tnw2Y8/os0NqKsl1jtXUw
-         JNA3QNmVRkYAzTiAIjR/nkY+GOgYdec/FmFBomNnMYPWf/ClJFtJJcGKToCF/i0ZjI
-         rhPrXLxKPLwRslWJ3vlYKh0UpK/UMVEhH04/7Hrc=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1ixDnR-002ENP-Ap; Thu, 30 Jan 2020 17:40:05 +0000
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 30 Jan 2020 17:40:05 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
-        andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests RFC PATCH v3 5/7] lib: arm64: Add support for
- disabling and re-enabling VHE
-In-Reply-To: <1577972806-16184-6-git-send-email-alexandru.elisei@arm.com>
-References: <1577972806-16184-1-git-send-email-alexandru.elisei@arm.com>
- <1577972806-16184-6-git-send-email-alexandru.elisei@arm.com>
-Message-ID: <ad46bedcc585d03399576ecfce4c17c0@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com, andre.przywara@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        id S1727695AbgA3SCC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 13:02:02 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54613 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727686AbgA3SCC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 13:02:02 -0500
+Received: by mail-wm1-f68.google.com with SMTP id g1so4791567wmh.4;
+        Thu, 30 Jan 2020 10:02:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=SYieBB/2kuVcsp1riYZ+n5BLf07jGwls7F2V1rzJ3UY=;
+        b=VHjvC2MDwl9sh5TlMQ3R5zp7aZFDa04ymIQepWEvPED2hYwGw7b3vcuccjQUp8lBqO
+         x+cdljjnRAdkNRpmK+lCja97sGD21n4hd4ykycwRlQUMkOmLvro7sy90mGIRtsC5IFHG
+         Sq7jBV/CVeY1HM3mvflTltaTMk6JroxMPeod8/ur1g3sZVL5vCBqzBP/lXHzjPiEv45u
+         KT54Vp2rvIGOcnlaQpcwTLgJESDbjMr6EEyYyAsMLCeGl7gTmlS9D5h1a8JwzaIyTyVP
+         iUbZu6Se09ZsuCJQCWzZfDtNLsC0Nns2u0DtoZzyryz+tJhSC6yXT9Q2A0Xka3SelWQX
+         e1yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=SYieBB/2kuVcsp1riYZ+n5BLf07jGwls7F2V1rzJ3UY=;
+        b=D3rnpkegRRqT5q7tBEtQU7K+dRGP3iQVCMLKdzSt7tOl7wEWemDg4NBvZfsoaz3BBM
+         eyy4lxuzPKc/E88btZb82shkULu500QDoRE7lXvK63iZGUE0FqWNlLTZtuu8Tj5WXJor
+         nF9UY07Pe26qTTKWO/T36eNzUR5NjroVUheqg2vlPAXu5ejnNmRu0uz2vhyZQ8XQjLtU
+         rj2BGugzcb8hR0NTyOA1gl8dAXtoGTfLSkdV8U0etLW7Dc5pZvj5M3xXCrBMKYU3DiWf
+         BIquK5Vm1N3g/nyQMcgNNVR6U/aDCBQi3lAN3+TNO+UZkDeUm6dsKWanuuoHOyimeOKm
+         nXNQ==
+X-Gm-Message-State: APjAAAW7IO5KPeA96bixCWLeDNDImOyUClDyULXygz+NKa/lWb/CPvx8
+        +j3xlYpf7Uf2fVDovTjlTP/+E6vPsPE=
+X-Google-Smtp-Source: APXvYqwk+4/JCgeGyjZ/mpDE7Vgne7VBWyta/l9CF3RrDc5EnDtWTmoFxk0VhAYlbmyR7r+tGxyimw==
+X-Received: by 2002:a7b:cbd6:: with SMTP id n22mr7161001wmi.118.1580407320372;
+        Thu, 30 Jan 2020 10:02:00 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id w19sm6956878wmc.22.2020.01.30.10.01.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 30 Jan 2020 10:01:59 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Subject: [FYI PATCH 0/5] Missing TLB flushes
+Date:   Thu, 30 Jan 2020 19:01:51 +0100
+Message-Id: <1580407316-11391-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alexandru,
+From: Boris Ostrovsky <boris.ostrovsky@oracle.com>
 
-On 2020-01-02 13:46, Alexandru Elisei wrote:
-> Add a function to disable VHE and another one to re-enable VHE. Both
-> functions work under the assumption that the CPU had VHE mode enabled 
-> at
-> boot.
-> 
-> Minimal support to run with VHE has been added to the TLB invalidate
-> functions and to the exception handling code.
-> 
-> Since we're touch the assembly enable/disable MMU code, let's take this
-> opportunity to replace a magic number with the proper define.
+The KVM hypervisor may provide a guest with ability to defer remote TLB
+flush when the remote VCPU is not running. When this feature is used,
+the TLB flush will happen only when the remote VPCU is scheduled to run
+again. This will avoid unnecessary (and expensive) IPIs.
 
-I've been using this test case to debug my NV code... only to realize
-after a few hours of banging my head on the wall that it is the test
-that needed debugging, see below... ;-)
+Under certain circumstances, when a guest initiates such deferred action,
+the hypervisor may miss the request. It is also possible that the guest
+may mistakenly assume that it has already marked remote VCPU as needing
+a flush when in fact that request had already been processed by the
+hypervisor. In both cases this will result in an invalid translation
+being present in a vCPU, potentially allowing accesses to memory locations
+in that guest's address space that should not be accessible.
 
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  lib/arm64/asm/mmu.h           |  11 ++-
->  lib/arm64/asm/pgtable-hwdef.h |  53 ++++++++---
->  lib/arm64/asm/processor.h     |  19 +++-
->  lib/arm64/processor.c         |  37 +++++++-
->  arm/cstart64.S                | 204 
-> ++++++++++++++++++++++++++++++++++++++++--
->  5 files changed, 300 insertions(+), 24 deletions(-)
+Note that only intra-guest memory is vulnerable.
 
-[...]
+The attached patches address both of these problems:
+1. The first patch makes sure the hypervisor doesn't accidentally clear
+guest's remote flush request
+2. The rest of the patches prevent the race between hypervisor
+acknowledging a remote flush request and guest issuing a new one.
 
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -104,6 +104,13 @@ exceptions_init:
-> 
->  .text
-> 
-> +exceptions_init_nvhe:
-> +	adrp	x0, vector_table_nvhe
-> +	add	x0, x0, :lo12:vector_table_nvhe
-> +	msr	vbar_el2, x0
-> +	isb
-> +	ret
-> +
->  .globl get_mmu_off
->  get_mmu_off:
->  	adrp	x0, auxinfo
-> @@ -203,7 +210,7 @@ asm_mmu_enable:
->  		     TCR_IRGN_WBWA | TCR_ORGN_WBWA |	\
->  		     TCR_SHARED
->  	mrs	x2, id_aa64mmfr0_el1
-> -	bfi	x1, x2, #32, #3
-> +	bfi	x1, x2, #TCR_EL1_IPS_SHIFT, #3
->  	msr	tcr_el1, x1
-> 
->  	/* MAIR */
-> @@ -228,6 +235,41 @@ asm_mmu_enable:
-> 
->  	ret
-> 
-> +asm_mmu_enable_nvhe:
+Boris Ostrovsky (5):
+  x86/kvm: Be careful not to clear KVM_VCPU_FLUSH_TLB bit
+  x86/kvm: Introduce kvm_(un)map_gfn()
+  x86/kvm: Cache gfn to pfn translation
+  x86/KVM: Make sure KVM_VCPU_FLUSH_TLB flag is not missed
+  x86/KVM: Clean up host's steal time structure
 
-Note the "_nvhe" suffix, which implies that...
+ arch/x86/include/asm/kvm_host.h |   4 +-
+ arch/x86/kvm/x86.c              |  69 +++++++++++++++---------
+ include/linux/kvm_host.h        |   5 ++
+ include/linux/kvm_types.h       |   9 +++-
+ virt/kvm/kvm_main.c             | 113 ++++++++++++++++++++++++++++++++++------
+ 5 files changed, 154 insertions(+), 46 deletions(-)
 
-> +	tlbi    alle2
-> +	dsb     nsh
-> +
-> +        /* TCR */
-> +	ldr	x1, =TCR_EL2_RES1 | 			\
-> +		     TCR_T0SZ(VA_BITS) |		\
-> +		     TCR_TG0_64K |                      \
-> +		     TCR_IRGN0_WBWA | TCR_ORGN0_WBWA |	\
-> +		     TCR_SH0_IS
-> +	mrs	x2, id_aa64mmfr0_el1
-> +	bfi	x1, x2, #TCR_EL2_PS_SHIFT, #3
-> +	msr	tcr_el2, x1
-> +
-> +	/* Same MAIR and TTBR0 as in VHE mode */
-> +	ldr	x1, =MAIR(0x00, MT_DEVICE_nGnRnE) |	\
-> +		     MAIR(0x04, MT_DEVICE_nGnRE) |	\
-> +		     MAIR(0x0c, MT_DEVICE_GRE) |	\
-> +		     MAIR(0x44, MT_NORMAL_NC) |		\
-> +		     MAIR(0xff, MT_NORMAL)
-> +	msr	mair_el1, x1
-
-... this should be mair_el2...
-
-> +
-> +	msr	ttbr0_el1, x0
-
-... and this should be ttbr0_el2.
-
-> +	isb
-> +
-> +	/* SCTLR */
-> +	ldr	x1, =SCTLR_EL2_RES1 |			\
-> +		     SCTLR_EL2_C | 			\
-> +		     SCTLR_EL2_I | 			\
-> +		     SCTLR_EL2_M
-> +	msr	sctlr_el2, x1
-> +	isb
-> +
-> +	ret
-> +
->  /* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
->  .macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
->  	adrp	\tmp1, dcache_line_size
-> @@ -242,21 +284,61 @@ asm_mmu_enable:
->  	dsb	\domain
->  .endm
-> 
-> +clean_inval_cache:
-> +	adrp	x0, __phys_offset
-> +	ldr	x0, [x0, :lo12:__phys_offset]
-> +	adrp	x1, __phys_end
-> +	ldr	x1, [x1, :lo12:__phys_end]
-> +	dcache_by_line_op civac, sy, x0, x1, x2, x3
-> +	isb
-> +	ret
-> +
->  .globl asm_mmu_disable
->  asm_mmu_disable:
->  	mrs	x0, sctlr_el1
->  	bic	x0, x0, SCTLR_EL1_M
->  	msr	sctlr_el1, x0
->  	isb
-> +	b	clean_inval_cache
-> 
-> -	/* Clean + invalidate the entire memory */
-> -	adrp	x0, __phys_offset
-> -	ldr	x0, [x0, :lo12:__phys_offset]
-> -	adrp	x1, __phys_end
-> -	ldr	x1, [x1, :lo12:__phys_end]
-> -	dcache_by_line_op civac, sy, x0, x1, x2, x3
-> +asm_mmu_disable_nvhe:
-> +	mrs	x0, sctlr_el2
-> +	bic	x0, x0, SCTLR_EL2_M
-> +	msr	sctlr_el2, x0
-> +	isb
-> +	b	clean_inval_cache
-> +
-> +.globl asm_disable_vhe
-> +asm_disable_vhe:
-> +	str	x30, [sp, #-16]!
-> +
-> +	bl	asm_mmu_disable
-> +	msr	hcr_el2, xzr
-> +	isb
-
-At this stage, VHE is off...
-
-> +	bl	exceptions_init_nvhe
-> +	/* Make asm_mmu_enable_nvhe happy by having TTBR0 value in x0. */
-> +	mrs	x0, ttbr0_el1
-
-... so this is going to sample the wrong TTBR. It really should be
-TTBR0_EL2!
-
-> +	isb
-
-nit: this ISB is useless, as you will have a dependency on x0 anyway.
-
-With these fixes (and a few more terrible hacks to synchronize HCR_EL2
-on ARMv8.4-NV), I can run this test reliably.
-
-Thanks,
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+1.8.3.1
+
