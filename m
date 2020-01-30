@@ -2,138 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F63314DCA4
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 15:15:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5863414DCC9
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 15:30:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727228AbgA3OPE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 09:15:04 -0500
-Received: from mail.kernel.org ([198.145.29.99]:32938 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726902AbgA3OPE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 09:15:04 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727311AbgA3OaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 09:30:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32732 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726902AbgA3OaT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 09:30:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580394618;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MmFjQUn1Ue6YRCUcLyi97h4ijUQwqoRRnn2vYcYKHfA=;
+        b=NklC7d3OR2ugxcbtqdnoC/foCvaxcwXofXBxqwzq2Nf7vFDkU9BZvNK06vjZNBrcNIgmLg
+        4g6zS0YeMN6u1kIhPwfIhI3cK21s02e4V7OghucBtXBStL6fCDYAAfE8im8i/wHPtS5bxY
+        bvBdSoRlRJ8nwIOeHCwUF95qMz4LAOI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-221-VJsETo63MZ-6f4Qiaap_zA-1; Thu, 30 Jan 2020 09:30:16 -0500
+X-MC-Unique: VJsETo63MZ-6f4Qiaap_zA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 53C3420658;
-        Thu, 30 Jan 2020 14:15:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1580393703;
-        bh=fLFS4MsI4Xqb1q1b9ZZYwHXmgmXnIzhWE8jaSJpBJnw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=zawswnw40D17Q1KUd03C6hPxIndcJI5s2TZeJo6VFYYy5ucA3alcao9/hf6EqGLYR
-         PjJsxO5AE8c/e8qs94nzYRBolHmEkXUlAEotO/IWphwKKXx6bKdk6HpLEWoTBezxnH
-         yQesQwLUpAVuVw5/aKKSdzdx/IoP/veeZ1lFuBy8=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1ixAaz-002CVK-JM; Thu, 30 Jan 2020 14:15:01 +0000
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 679F1107ACC5;
+        Thu, 30 Jan 2020 14:30:15 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE1051001B09;
+        Thu, 30 Jan 2020 14:30:10 +0000 (UTC)
+Date:   Thu, 30 Jan 2020 15:30:08 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v8 2/4] selftests: KVM: Add fpu and one reg set/get
+ library functions
+Message-ID: <20200130143008.xy6lrnrrwer6xkdp@kamzik.brq.redhat.com>
+References: <20200129200312.3200-1-frankja@linux.ibm.com>
+ <20200129200312.3200-3-frankja@linux.ibm.com>
+ <72ff36e1-9170-dfb0-4050-f398f9a467eb@redhat.com>
+ <20200130135512.diyyu3wvwqlwpqlx@kamzik.brq.redhat.com>
+ <9d9e0e7a-b006-98b1-6bf0-8c46006835bc@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 30 Jan 2020 14:15:01 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Murray <andrew.murray@arm.com>,
-        Beata Michalska <beata.michalska@linaro.org>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Haibin Wang <wanghaibin.wang@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Shannon Zhao <shannon.zhao@linux.alibaba.com>,
-        Steven Price <steven.price@arm.com>,
-        Will Deacon <will@kernel.org>,
-        YueHaibing <yuehaibing@huawei.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 23/23] KVM: arm64: Treat emulated TVAL TimerValue as a
- signed 32-bit integer
-In-Reply-To: <aec2c75e-24d0-8157-14bd-72883a9df6bf@arm.com>
-References: <20200130132558.10201-1-maz@kernel.org>
- <20200130132558.10201-24-maz@kernel.org>
- <aec2c75e-24d0-8157-14bd-72883a9df6bf@arm.com>
-Message-ID: <6898d36c8453756418924bf4718219fd@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, pbonzini@redhat.com, drjones@redhat.com, andrew.murray@arm.com, beata.michalska@linaro.org, christoffer.dall@arm.com, eric.auger@redhat.com, gshan@redhat.com, wanghaibin.wang@huawei.com, james.morse@arm.com, broonie@kernel.org, mark.rutland@arm.com, rmk+kernel@armlinux.org.uk, shannon.zhao@linux.alibaba.com, steven.price@arm.com, will@kernel.org, yuehaibing@huawei.com, yuzenghui@huawei.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9d9e0e7a-b006-98b1-6bf0-8c46006835bc@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-01-30 14:11, Alexandru Elisei wrote:
-> Hi,
-> 
-> On 1/30/20 1:25 PM, Marc Zyngier wrote:
->> From: Alexandru Elisei <alexandru.elisei@arm.com>
->> 
->> According to the ARM ARM, registers CNT{P,V}_TVAL_EL0 have bits 
->> [63:32]
->> RES0 [1]. When reading the register, the value is truncated to the 
->> least
->> significant 32 bits [2], and on writes, TimerValue is treated as a 
->> signed
->> 32-bit integer [1, 2].
->> 
->> When the guest behaves correctly and writes 32-bit values, treating 
->> TVAL
->> as an unsigned 64 bit register works as expected. However, things 
->> start
->> to break down when the guest writes larger values, because
->> (u64)0x1_ffff_ffff = 8589934591. but (s32)0x1_ffff_ffff = -1, and the
->> former will cause the timer interrupt to be asserted in the future, 
->> but
->> the latter will cause it to be asserted now.  Let's treat TVAL as a
->> signed 32-bit register on writes, to match the behaviour described in
->> the architecture, and the behaviour experimentally exhibited by the
->> virtual timer on a non-vhe host.
->> 
->> [1] Arm DDI 0487E.a, section D13.8.18
->> [2] Arm DDI 0487E.a, section D11.2.4
->> 
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> [maz: replaced the read-side mask with lower_32_bits]
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> Fixes: 8fa761624871 ("KVM: arm/arm64: arch_timer: Fix CNTP_TVAL 
->> calculation")
->> Link: 
->> https://lore.kernel.org/r/20200127103652.2326-1-alexandru.elisei@arm.com
->> ---
->>  virt/kvm/arm/arch_timer.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->> 
->> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->> index f182b2380345..c6c2a9dde00c 100644
->> --- a/virt/kvm/arm/arch_timer.c
->> +++ b/virt/kvm/arm/arch_timer.c
->> @@ -805,6 +805,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu 
->> *vcpu,
->>  	switch (treg) {
->>  	case TIMER_REG_TVAL:
->>  		val = timer->cnt_cval - kvm_phys_timer_read() + timer->cntvoff;
->> +		val &= lower_32_bits(val);
-> 
-> This is correct, but how about making it val = lower_32_bits(val) for 
-> more
-> clarity? Apologies for not spotting it earlier :(
+On Thu, Jan 30, 2020 at 03:10:55PM +0100, Janosch Frank wrote:
+> On 1/30/20 2:55 PM, Andrew Jones wrote:
+> > On Thu, Jan 30, 2020 at 11:36:21AM +0100, Thomas Huth wrote:
+> >> On 29/01/2020 21.03, Janosch Frank wrote:
+> >>> Add library access to more registers.
+> >>>
+> >>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >>> ---
+> >>>  .../testing/selftests/kvm/include/kvm_util.h  |  6 +++
+> >>>  tools/testing/selftests/kvm/lib/kvm_util.c    | 48 +++++++++++++++++++
+> >>>  2 files changed, 54 insertions(+)
+> >>>
+> >>> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> >>> index 29cccaf96baf..ae0d14c2540a 100644
+> >>> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> >>> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> >>> @@ -125,6 +125,12 @@ void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+> >>>  		    struct kvm_sregs *sregs);
+> >>>  int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+> >>>  		    struct kvm_sregs *sregs);
+> >>> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid,
+> >>> +		  struct kvm_fpu *fpu);
+> >>> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid,
+> >>> +		  struct kvm_fpu *fpu);
 
-That's what it should have been, but I obviously typoed it. As it passed
-all my tests, I didn't notice the issue. I'll queue a cleanup once Paolo
-has a chance to pull this.
+nit: no need for the above line breaks. We don't even get to 80 char.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+> >>> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+> >>> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+> >>>  #ifdef __KVM_HAVE_VCPU_EVENTS
+> >>>  void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
+> >>>  		     struct kvm_vcpu_events *events);
+> >>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> >>> index 41cf45416060..dae117728ec6 100644
+> >>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> >>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> >>> @@ -1373,6 +1373,54 @@ int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
+> >>>  	return ioctl(vcpu->fd, KVM_SET_SREGS, sregs);
+> >>>  }
+> >>>  
+> >>> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+> >>> +{
+> >>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> >>> +	int ret;
+> >>> +
+> >>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> >>> +
+> >>> +	ret = ioctl(vcpu->fd, KVM_GET_FPU, fpu);
+> >>> +	TEST_ASSERT(ret == 0, "KVM_GET_FPU failed, rc: %i errno: %i",
+> >>> +		    ret, errno);
+> >>> +}
+> >>> +
+> >>> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+> >>> +{
+> >>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> >>> +	int ret;
+> >>> +
+> >>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> >>> +
+> >>> +	ret = ioctl(vcpu->fd, KVM_SET_FPU, fpu);
+> >>> +	TEST_ASSERT(ret == 0, "KVM_SET_FPU failed, rc: %i errno: %i",
+> >>> +		    ret, errno);
+> >>> +}
+> >>> +
+> >>> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+> >>> +{
+> >>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> >>> +	int ret;
+> >>> +
+> >>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> >>> +
+> >>> +	ret = ioctl(vcpu->fd, KVM_GET_ONE_REG, reg);
+> >>> +	TEST_ASSERT(ret == 0, "KVM_GET_ONE_REG failed, rc: %i errno: %i",
+> >>> +		    ret, errno);
+> >>> +}
+> >>> +
+> >>> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+> >>> +{
+> >>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> >>> +	int ret;
+> >>> +
+> >>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> >>> +
+> >>> +	ret = ioctl(vcpu->fd, KVM_SET_ONE_REG, reg);
+> >>> +	TEST_ASSERT(ret == 0, "KVM_SET_ONE_REG failed, rc: %i errno: %i",
+> >>> +		    ret, errno);
+> >>> +}
+> >>> +
+> >>>  /*
+> >>>   * VCPU Ioctl
+> >>>   *
+> >>>
+> >>
+> >> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >>
+> > 
+> > How about what's below instead. It should be equivalent.
+> 
+> With your proposed changes we loose a bit verbosity in the error
+> messages. I need to think about which I like more.
+
+Looks like both error messages are missing something. The ones above are
+missing the string version of errno. The ones below are missing the string
+version of cmd. It's easy to add the string version of errno, which is
+an argument for keeping the functions above (but we could at least use
+_vcpu_ioctl to avoid duplicating the vcpu_find and vcpu!=NULL assert).
+Or, we could consider adding a kvm_ioctl_cmd_to_string() function,
+which might be nice for other ioctl wrappers now and in the future.
+It shouldn't be too bad to generate a string table from kvm.h, but of
+course we'd have to keep it maintained.
+
+Thanks,
+drew
+
+> 
+> > 
+> > Thanks,
+> > drew
+> > 
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> > index 29cccaf96baf..d96a072e69bf 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -125,6 +125,31 @@ void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+> >  		    struct kvm_sregs *sregs);
+> >  int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+> >  		    struct kvm_sregs *sregs);
+> > +
+> > +static inline void
+> > +vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+> > +{
+> > +	vcpu_ioctl(vm, vcpuid, KVM_GET_FPU, fpu);
+> > +}
+> > +
+> > +static inline void
+> > +vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+> > +{
+> > +	vcpu_ioctl(vm, vcpuid, KVM_SET_FPU, fpu);
+> > +}
+> > +
+> > +static inline void
+> > +vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+> > +{
+> > +	vcpu_ioctl(vm, vcpuid, KVM_GET_ONE_REG, reg);
+> > +}
+> > +
+> > +static inline void
+> > +vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+> > +{
+> > +	vcpu_ioctl(vm, vcpuid, KVM_SET_ONE_REG, reg);
+> > +}
+> > +
+> >  #ifdef __KVM_HAVE_VCPU_EVENTS
+> >  void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
+> >  		     struct kvm_vcpu_events *events);
+> > 
+> 
+> 
+
+
+
