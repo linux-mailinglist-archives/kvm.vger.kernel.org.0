@@ -2,75 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3918914D7E4
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 09:43:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 752FA14D7FE
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 09:55:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726881AbgA3Ink (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 03:43:40 -0500
-Received: from mail-qt1-f172.google.com ([209.85.160.172]:41523 "EHLO
-        mail-qt1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726865AbgA3Inj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 03:43:39 -0500
-Received: by mail-qt1-f172.google.com with SMTP id l19so1815676qtq.8
-        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 00:43:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=KJTZMhxSYbKog3q3QunAoOxfir5NefkAvc0Wc1DUW10=;
-        b=LMhl1CzhWteprbNFlrJ8l439XOCil8NzH7d4KBsBWs4e7q8CxZ6DjaPR+iF4LjHHtt
-         nr/FPXLqrdIvEG5GRAt3Zioqitjx2InyNhx3scDMCgZBp1f1JG3um3NSmXg6SGOEHR8y
-         lygf2bJ4dHmXVO0NdXNHNW6yUuBJXVgWfrfBtSTKNND7m/nKA8MJlhDQDps9NQ61rKSI
-         BbXLbWFUzNVdeGJTx6h3lNsArT57WuDcun7y0wCvCzSusfgGIAa/22pLULMTyNaYikEG
-         4DGUavnkvltNf1cAhSjEgB1Ns0LPl+SWqiASlQWGED8uQ2nrmVIMvfeoVVkKjaSzHcIJ
-         trVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=KJTZMhxSYbKog3q3QunAoOxfir5NefkAvc0Wc1DUW10=;
-        b=iSnF6CSr4W2TDKQxC8nYNapeKSbsI+S8pCxm2NBhtls0xqys0YY7EYt2V4lEzj6YY1
-         /9zR/VU1PxN+IybfJT+rQwNmIJik7eLwn96Zbws84sMFTeDdogW94WBeyzyYs39upFFs
-         TilfvU53uwIxp5Sc5AxIyyH8G+VsGFwx/y5209EDC/14r6w7HaXOWXeGzVLpfKFQp19V
-         be5GeRrB9g9WPSKrBAzwgo3BZtXBTS6DNADcG8+q09XffXOOPxI19cujTsoU9Rk0KN7+
-         ZjBY4M24mJyY7Rt3B7xQ6CbPFW7jsRD99Si/YrDgkgdOCeG+yUeSRWRuJ5d7naDsyRPy
-         9oYw==
-X-Gm-Message-State: APjAAAUKc6OjI4xi4wlEd0QWWC34Eqzua3Y7TkjfxJDU+Ts/mPM3X0UV
-        FSjWGmhqA16u8gNVjo5dcJoPFMsaBVgeqct/OHEOlcdY
-X-Google-Smtp-Source: APXvYqzU6EnC7YHgL2F7mwFlcDxztnSIuRfb1ysW8NFlma5PTb/286Ic7T5SPPnmNtSmeN6QDRLD/enlfeQDz9RpKls=
-X-Received: by 2002:ac8:145:: with SMTP id f5mr3618660qtg.194.1580373818543;
- Thu, 30 Jan 2020 00:43:38 -0800 (PST)
-MIME-Version: 1.0
-From:   Stefan Bauer <cubewerk@gmail.com>
-Date:   Thu, 30 Jan 2020 09:43:27 +0100
-Message-ID: <CAJWMQtBraWfbDQuVXMsmvG9QN3+i18sv7g1qWe1jQotBBBLpWA@mail.gmail.com>
-Subject: Node not reachable on vlan, after vlan is used by virtual machine
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S1727167AbgA3IzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 03:55:07 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34802 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727132AbgA3IzH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 03:55:07 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00U8sfh2025080;
+        Thu, 30 Jan 2020 03:55:06 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xttw843wj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Jan 2020 03:55:05 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 00U8t5dq025970;
+        Thu, 30 Jan 2020 03:55:05 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xttw843vj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Jan 2020 03:55:05 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 00U8qoYh012061;
+        Thu, 30 Jan 2020 08:55:04 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma02wdc.us.ibm.com with ESMTP id 2xrda72fev-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Jan 2020 08:55:04 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00U8t3Dr51118382
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 30 Jan 2020 08:55:03 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CF9C2112064;
+        Thu, 30 Jan 2020 08:55:03 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6C89112065;
+        Thu, 30 Jan 2020 08:55:02 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.41])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 30 Jan 2020 08:55:02 +0000 (GMT)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     frankja@linux.ibm.com
+Cc:     borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        stable@kernel.org
+Subject: [PATCH/FIXUP FOR STABLE BEFORE THIS SERIES] KVM: s390: do not clobber user space fpc during guest reset
+Date:   Thu, 30 Jan 2020 09:55:00 +0100
+Message-Id: <1580374500-31247-1-git-send-email-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <20200129200312.3200-2-frankja@linux.ibm.com>
+References: <20200129200312.3200-2-frankja@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-30_02:2020-01-28,2020-01-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=1
+ lowpriorityscore=0 adultscore=0 malwarescore=0 phishscore=0
+ priorityscore=1501 spamscore=0 mlxlogscore=852 impostorscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2001300063
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+The initial CPU reset currently clobbers the userspace fpc. This was an
+oversight during a fixup for the lazy fpu reloading rework.  The reset
+calls are only done from userspace ioctls. No CPU context is loaded, so
+we can (and must) act directly on the sync regs, not on the thread
+context. Otherwise the fpu restore call will restore the zeroes fpc to
+userspace.
 
-i have a strange behavior on my linux system and can not explain it.
-Help would be greatly appreciated.
+Cc: stable@kernel.org
+Fixes: 9abc2a08a7d6 ("KVM: s390: fix memory overwrites when vx is disabled")
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ arch/s390/kvm/kvm-s390.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-host proxmox1 with a trunk/bond interface to Cisco-Switch.
-proxmox1 has mgmt in vlan100 on same bond:
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index c059b86..eb789cd 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2824,8 +2824,7 @@ static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
+ 					CR14_UNUSED_33 |
+ 					CR14_EXTERNAL_DAMAGE_SUBMASK;
+-	/* make sure the new fpc will be lazily loaded */
+-	save_fpu_regs();
++	vcpu->run->s.regs.fpc = 0;
+ 	current->thread.fpu.fpc = 0;
+ 	vcpu->arch.sie_block->gbea = 1;
+ 	vcpu->arch.sie_block->pp = 0;
+-- 
+1.8.3.1
 
-bond1.100@bond1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc
-noqueue state UP group default qlen 1000
-link/ether 3c:fd:fc:9a:7d:cc brd ff:ff:ff:ff:ff:ff
-inet 10.64.253.203/24 brd 10.64.253.255 scope global bond1.100
-
-All is fine and proxmox1 is reachable from other machines through vlan 100.
-
-The routing between the vlans, is done by a pfsense firewall on
-_another_ proxmox-node.
-
-Now instantly when i move the firewall to proxmox1-host, the proxmox1
-host is not reachable through mgmt-vlan 100 anymore.
-
-Ideas?
-
-Thank you
