@@ -2,136 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ED8014D42A
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 00:57:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40CB214D478
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 01:11:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727207AbgA2X46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Jan 2020 18:56:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31606 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727093AbgA2X46 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Jan 2020 18:56:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580342217;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YWdRpM1kcQ6PLj0ocD77Ak3FkfzKXOacBKoKAVuuAfg=;
-        b=SVL7viY7t8k7Ce2NHtfhkCFziGpWWiniL1kNW4i0XOFUrxThq6fnlj/W2jvuAySGD3TDFo
-        c5kpGjxx44zpeKRXvIZschbKER6td/JVFGLXGOSyE7Bl68GKEcCLF8Fkh91ovfaJOy8Jb2
-        zLIxd24JI2iEfSVcTrISJIYnYKyinEE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-6U95WgCEN6uGY4yXsZpQvw-1; Wed, 29 Jan 2020 18:56:55 -0500
-X-MC-Unique: 6U95WgCEN6uGY4yXsZpQvw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AB738017CC;
-        Wed, 29 Jan 2020 23:56:54 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4546184D8B;
-        Wed, 29 Jan 2020 23:56:50 +0000 (UTC)
-Date:   Wed, 29 Jan 2020 16:56:49 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     eric.auger@redhat.com, kevin.tian@intel.com,
-        jacob.jun.pan@linux.intel.com, joro@8bytes.org,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe.brucker@arm.com, peterx@redhat.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC v3 4/8] vfio/type1: Add
- VFIO_NESTING_GET_IOMMU_UAPI_VERSION
-Message-ID: <20200129165649.43008300@w520.home>
-In-Reply-To: <1580299912-86084-5-git-send-email-yi.l.liu@intel.com>
-References: <1580299912-86084-1-git-send-email-yi.l.liu@intel.com>
-        <1580299912-86084-5-git-send-email-yi.l.liu@intel.com>
+        id S1726992AbgA3AK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Jan 2020 19:10:26 -0500
+Received: from mga06.intel.com ([134.134.136.31]:48383 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726671AbgA3AK0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Jan 2020 19:10:26 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jan 2020 16:10:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,379,1574150400"; 
+   d="scan'208";a="261990342"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by fmsmga002.fm.intel.com with ESMTP; 29 Jan 2020 16:10:24 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/5] KVM: Move x86 init ops to separate struct
+Date:   Wed, 29 Jan 2020 16:10:18 -0800
+Message-Id: <20200130001023.24339-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 29 Jan 2020 04:11:48 -0800
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+The non-x86 part of this series is wholly contained in patch 01.  Compared
+to other recent kvm-wide changes, this one is very straightforward (famous
+last words).
 
-> From: Liu Yi L <yi.l.liu@intel.com>
-> 
-> In Linux Kernel, the IOMMU nesting translation (a.k.a. IOMMU dual stage
-> translation capability) is abstracted in uapi/iommu.h, in which the uAPIs
-> like bind_gpasid/iommu_cache_invalidate/fault_report/pgreq_resp are defined.
-> 
-> VFIO_TYPE1_NESTING_IOMMU stands for the vfio iommu type which is backed by
-> IOMMU nesting translation capability. VFIO exposes the nesting capability
-> to userspace and also exposes uAPIs (will be added in later patches) to user
-> space for setting up nesting translation from userspace. Thus applications
-> like QEMU could support vIOMMU for pass-through devices with IOMMU nesting
-> translation capability.
-> 
-> As VFIO expose the nesting IOMMU programming to userspace, it also needs to
-> provide an API for the uapi/iommu.h version check to ensure compatibility.
-> This patch reports the iommu uapi version to userspace. Applications could
-> use this API to do version check before further using the nesting uAPIs.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/vfio.c       |  3 +++
->  include/uapi/linux/vfio.h | 10 ++++++++++
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index 425d60a..9087ad4 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -1170,6 +1170,9 @@ static long vfio_fops_unl_ioctl(struct file *filep,
->  	case VFIO_GET_API_VERSION:
->  		ret = VFIO_API_VERSION;
->  		break;
-> +	case VFIO_NESTING_GET_IOMMU_UAPI_VERSION:
-> +		ret = iommu_get_uapi_version();
-> +		break;
+Like a few other architectures, e.g. PPC, x86 uses a set of global hooks
+to call back into vendor code on demand.  A handlful of the x86 hooks are
+used only within the scope of kvm_init().  This series moves the init-only
+hooks to a separate struct, partly to clean up the code a bit, but mainly
+so that the runtime hooks can be made available only after the x86 vendor
+has completed its ->hardware_setup().  While working on a different series
+I spent a fair bit of time scratching my as to why a kvm_x86_ops wasn't
+working, and eventually realized VMX's callback wasn't "ready" because the
+vmcs_config hadn't yet been populated.
 
-Shouldn't the type1 backend report this?  It doesn't make much sense
-that the spapr backend reports a version for something it doesn't
-support.  Better yet, provide this info gratuitously in the
-VFIO_IOMMU_GET_INFO ioctl return like you do with nesting in the next
-patch, then it can help the user figure out if this support is present.
-Thanks,
+Due to lack of a cross-compiling setup, the non-x86 changes in patch 01
+are untested.
 
-Alex
+The SVM changes in patch 02 are fairly well tested, e.g. fudged things
+enough to ensure KVM didn't explode on a null pointer.
 
->  	case VFIO_CHECK_EXTENSION:
->  		ret = vfio_ioctl_check_extension(container, arg);
->  		break;
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index d4bf415..62113be 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -857,6 +857,16 @@ struct vfio_iommu_type1_pasid_quota {
->   */
->  #define VFIO_IOMMU_SET_PASID_QUOTA	_IO(VFIO_TYPE, VFIO_BASE + 23)
->  
-> +/**
-> + * VFIO_NESTING_GET_IOMMU_UAPI_VERSION - _IO(VFIO_TYPE, VFIO_BASE + 24)
-> + *
-> + * Report the version of the IOMMU UAPI when dual stage IOMMU is supported.
-> + * In VFIO, it is needed for VFIO_TYPE1_NESTING_IOMMU.
-> + * Availability: Always.
-> + * Return: IOMMU UAPI version
-> + */
-> +#define VFIO_NESTING_GET_IOMMU_UAPI_VERSION	_IO(VFIO_TYPE, VFIO_BASE + 24)
-> +
->  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->  
->  /*
+Patch 05 is a bit scary as a rogue dereference of kvm_x86_ops before
+->hardware_setup() will crash KVM (maybe the kernel?).  I didn't find any
+obvious ways to use kvm_x86_ops on AMD, and tested on a few different
+Intel CPUs, so I'm reasonably confident that there are no existing
+violations.
+
+Sean Christopherson (5):
+  KVM: Pass kvm_init()'s opaque param to additional arch funcs
+  KVM: x86: Move init-only kvm_x86_ops to separate struct
+  KVM: VMX: Move hardware_setup() definition below vmx_x86_ops
+  KVM: VMX: Configure runtime hooks using vmx_x86_ops
+  KVM: x86: Set kvm_x86_ops only after ->hardware_setup() completes
+
+ arch/mips/kvm/mips.c            |   4 +-
+ arch/powerpc/kvm/powerpc.c      |   4 +-
+ arch/s390/kvm/kvm-s390.c        |   4 +-
+ arch/x86/include/asm/kvm_host.h |  13 +-
+ arch/x86/kvm/svm.c              |  15 +-
+ arch/x86/kvm/vmx/nested.c       |  15 +-
+ arch/x86/kvm/vmx/nested.h       |   3 +-
+ arch/x86/kvm/vmx/vmx.c          | 345 ++++++++++++++++----------------
+ arch/x86/kvm/x86.c              |  16 +-
+ include/linux/kvm_host.h        |   4 +-
+ virt/kvm/arm/arm.c              |   4 +-
+ virt/kvm/kvm_main.c             |  18 +-
+ 12 files changed, 238 insertions(+), 207 deletions(-)
+
+-- 
+2.24.1
 
