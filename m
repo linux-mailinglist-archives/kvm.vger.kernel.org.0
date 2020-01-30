@@ -2,45 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ECC9E14D9A3
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 12:25:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89C7814D9A5
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 12:25:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726967AbgA3LZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 06:25:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23293 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726902AbgA3LZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 06:25:28 -0500
+        id S1727093AbgA3LZb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 06:25:31 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21941 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726980AbgA3LZb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 06:25:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580383527;
+        s=mimecast20190719; t=1580383530;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=RD3+Ld7Dxp10D8lHwl6kiXjd9vd6HKHz9XGO3ilgvRk=;
-        b=TW7uZIfh8x7YozKJ/q2QERwpQ0NiE+LIF72kO8rJI8JasWJ+OtCt2hnjIv5N3EuCGvCQG5
-        5s0ACZamqFe9S/Hhm3AfsoU4gFJJHLKhX3o9sr9SePHrrmbVfsCHFUHTl3munfHwnx1da7
-        xD21hF/ucjVVrqEsMzdX3Q4o7RiW+8I=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5QgGQR5lmCzHdU2tw8u26Dp0LVz138MaKuXfv7AyzLc=;
+        b=IxK3372jjIT44H9oQ/ZeKfZ4p6iyhzQZ8Xqx9qNkUzoV8DcTqE61E+xVU/0HYRaEamhb7t
+        wT10g7wJ8BDrSMlu6p6eT9EuGvjL/BZSUk49uSehAcmwQZ5Wh6l2xGqZnTK2/AjPiRsr8B
+        2vpDGLr9d1vQP7OUPovCPSrNyMADw4A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-Z7hfLdmJPPalT3OyO1uCZg-1; Thu, 30 Jan 2020 06:25:23 -0500
-X-MC-Unique: Z7hfLdmJPPalT3OyO1uCZg-1
+ us-mta-126-cMBhXBiuMBGb8VIjkEFuNw-1; Thu, 30 Jan 2020 06:25:28 -0500
+X-MC-Unique: cMBhXBiuMBGb8VIjkEFuNw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB762100551B;
-        Thu, 30 Jan 2020 11:25:21 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35C8210054E3;
+        Thu, 30 Jan 2020 11:25:27 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 02B211001B05;
-        Thu, 30 Jan 2020 11:25:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 715341001B05;
+        Thu, 30 Jan 2020 11:25:22 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc:     drjones@redhat.com, andrew.murray@arm.com, andre.przywara@arm.com,
         peter.maydell@linaro.org, alexandru.elisei@arm.com
-Subject: [kvm-unit-tests PATCH v2 0/9] KVM: arm64: PMUv3 Event Counter Tests
-Date:   Thu, 30 Jan 2020 12:25:01 +0100
-Message-Id: <20200130112510.15154-1-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 1/9] arm64: Provide read/write_sysreg_s
+Date:   Thu, 30 Jan 2020 12:25:02 +0100
+Message-Id: <20200130112510.15154-2-eric.auger@redhat.com>
+In-Reply-To: <20200130112510.15154-1-eric.auger@redhat.com>
+References: <20200130112510.15154-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Content-Transfer-Encoding: quoted-printable
@@ -49,80 +52,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series implements tests exercising the PMUv3 event counters.
-It tests both the 32-bit and 64-bit versions. Overflow interrupts
-also are checked. Those tests only are written for arm64.
+From: Andrew Jones <drjones@redhat.com>
 
-It allowed to reveal some issues related to SW_INCR implementation
-(esp. related to 64-bit implementation), some problems related to
-32-bit <-> 64-bit transitions and consistency of enabled states
-of odd and event counters (See [1]).
+Sometimes we need to test access to system registers which are
+missing assembler mnemonics.
 
-Overflow interrupt testing relies of one patch from Andre
-("arm: gic: Provide per-IRQ helper functions") to enable the
-PPI 23, coming from "arm: gic: Test SPIs and interrupt groups"
-(https://patchwork.kernel.org/cover/11234975/). Drew kindly
-provided "arm64: Provide read/write_sysreg_s".
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ lib/arm64/asm/sysreg.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-All PMU tests can be launched with:
-./run_tests.sh -g pmu
-Tests also can be launched individually. For example:
-./arm-run arm/pmu.flat -append 'chained-sw-incr'
-
-With KVM:
-- chain-promotion and chained-sw-incr are known to be failing.
-  [1] proposed a fix.
-- On TX2, I have some random failures due to MEM_ACCESS event
-  measured with a great disparity. This is not observed on
-  other machines I have access to.
-With TCG:
-- all new tests are skipped
-
-The series can be found at:
-https://github.com/eauger/kut/tree/pmu_event_counters_v2
-
-References:
-[1] [PATCH 0/4] KVM/ARM: Misc PMU fixes
-(https://www.spinics.net/lists/kvm-arm/msg38886.html)
-
-History:
-- Took into account Andre's comments except I did not
-  use cnbz in the mem_access_loop() and I did not use
-  @loop directly. Those changes had side effects I
-  cannot explain on the tests. Anyway I think this can
-  be improved later on.
-- removed [kvm-unit-tests PATCH 09/10] arm/arm64: gic:
-  Introduce setup_irq() helper
-
-RFC -> v1:
-- Use new report() proto
-- Style cleanup
-- do not warn about ARM spec recommendations
-- add a comment about PMCEID0/1 splits
-
-Andre Przywara (1):
-  arm: gic: Provide per-IRQ helper functions
-
-Andrew Jones (1):
-  arm64: Provide read/write_sysreg_s
-
-Eric Auger (7):
-  arm: pmu: Let pmu tests take a sub-test parameter
-  arm: pmu: Add a pmu struct
-  arm: pmu: Check Required Event Support
-  arm: pmu: Basic event counter Tests
-  arm: pmu: Test chained counter
-  arm: pmu: test 32-bit <-> 64-bit transitions
-  arm: pmu: Test overflow interrupts
-
- arm/pmu.c              | 786 ++++++++++++++++++++++++++++++++++++++++-
- arm/unittests.cfg      |  55 ++-
- lib/arm/asm/gic-v3.h   |   2 +
- lib/arm/asm/gic.h      |   9 +
- lib/arm/gic.c          |  90 +++++
- lib/arm64/asm/sysreg.h |  11 +
- 6 files changed, 936 insertions(+), 17 deletions(-)
-
+diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+index a03830b..a45eebd 100644
+--- a/lib/arm64/asm/sysreg.h
++++ b/lib/arm64/asm/sysreg.h
+@@ -38,6 +38,17 @@
+ 	asm volatile("msr " xstr(r) ", %x0" : : "rZ" (__val));	\
+ } while (0)
+=20
++#define read_sysreg_s(r) ({					\
++	u64 __val;						\
++	asm volatile("mrs_s %0, " xstr(r) : "=3Dr" (__val));	\
++	__val;							\
++})
++
++#define write_sysreg_s(v, r) do {				\
++	u64 __val =3D (u64)v;					\
++	asm volatile("msr_s " xstr(r) ", %x0" : : "rZ" (__val));\
++} while (0)
++
+ asm(
+ "	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23=
+,24,25,26,27,28,29,30\n"
+ "	.equ	.L__reg_num_x\\num, \\num\n"
 --=20
 2.20.1
 
