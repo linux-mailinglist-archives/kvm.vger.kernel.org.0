@@ -2,218 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5863414DCC9
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 15:30:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27F6714DCD7
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 15:34:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727311AbgA3OaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 09:30:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32732 "EHLO
+        id S1727398AbgA3Oee (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 09:34:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36783 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726902AbgA3OaT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 09:30:19 -0500
+        with ESMTP id S1727139AbgA3Oee (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 09:34:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580394618;
+        s=mimecast20190719; t=1580394873;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MmFjQUn1Ue6YRCUcLyi97h4ijUQwqoRRnn2vYcYKHfA=;
-        b=NklC7d3OR2ugxcbtqdnoC/foCvaxcwXofXBxqwzq2Nf7vFDkU9BZvNK06vjZNBrcNIgmLg
-        4g6zS0YeMN6u1kIhPwfIhI3cK21s02e4V7OghucBtXBStL6fCDYAAfE8im8i/wHPtS5bxY
-        bvBdSoRlRJ8nwIOeHCwUF95qMz4LAOI=
+        bh=vPSUVb6MzaF6rprazc+hsrUDCKr9uya0+zR9zr3B0wk=;
+        b=E3mdIMdg/YvyTvSU43KKEpLaQkhrimf7Oj4gO4bIns201dbhOpF2H7mmKF8qgvv0fkrO0R
+        XYpcQBvxLt1fxki84lehZOQakQyT+Ie6ZWop1psM58KkAedSvPQ1C5KbR3VvbnEnFjDQfD
+        UcnM7pCOQTV0l9c5N1FTKzaFYleUrmc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-VJsETo63MZ-6f4Qiaap_zA-1; Thu, 30 Jan 2020 09:30:16 -0500
-X-MC-Unique: VJsETo63MZ-6f4Qiaap_zA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-223-O69FqmQHMeSNV4gB8-ZL2g-1; Thu, 30 Jan 2020 09:34:31 -0500
+X-MC-Unique: O69FqmQHMeSNV4gB8-ZL2g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 679F1107ACC5;
-        Thu, 30 Jan 2020 14:30:15 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE1051001B09;
-        Thu, 30 Jan 2020 14:30:10 +0000 (UTC)
-Date:   Thu, 30 Jan 2020 15:30:08 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v8 2/4] selftests: KVM: Add fpu and one reg set/get
- library functions
-Message-ID: <20200130143008.xy6lrnrrwer6xkdp@kamzik.brq.redhat.com>
-References: <20200129200312.3200-1-frankja@linux.ibm.com>
- <20200129200312.3200-3-frankja@linux.ibm.com>
- <72ff36e1-9170-dfb0-4050-f398f9a467eb@redhat.com>
- <20200130135512.diyyu3wvwqlwpqlx@kamzik.brq.redhat.com>
- <9d9e0e7a-b006-98b1-6bf0-8c46006835bc@linux.ibm.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89489801E6C;
+        Thu, 30 Jan 2020 14:34:29 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-40.gru2.redhat.com [10.97.116.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 039F460C85;
+        Thu, 30 Jan 2020 14:34:03 +0000 (UTC)
+Subject: Re: [PATCH 05/10] tests/acceptance: Remove shebang header
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Juan Quintela <quintela@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Max Reitz <mreitz@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Cleber Rosa <crosa@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+References: <20200129231402.23384-1-philmd@redhat.com>
+ <20200129231402.23384-6-philmd@redhat.com>
+From:   Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <838bf1fc-d607-7d0f-6d7c-40c4ce0bdba2@redhat.com>
+Date:   Thu, 30 Jan 2020 12:34:01 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9d9e0e7a-b006-98b1-6bf0-8c46006835bc@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200129231402.23384-6-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 30, 2020 at 03:10:55PM +0100, Janosch Frank wrote:
-> On 1/30/20 2:55 PM, Andrew Jones wrote:
-> > On Thu, Jan 30, 2020 at 11:36:21AM +0100, Thomas Huth wrote:
-> >> On 29/01/2020 21.03, Janosch Frank wrote:
-> >>> Add library access to more registers.
-> >>>
-> >>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >>> ---
-> >>>  .../testing/selftests/kvm/include/kvm_util.h  |  6 +++
-> >>>  tools/testing/selftests/kvm/lib/kvm_util.c    | 48 +++++++++++++++++++
-> >>>  2 files changed, 54 insertions(+)
-> >>>
-> >>> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> >>> index 29cccaf96baf..ae0d14c2540a 100644
-> >>> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> >>> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> >>> @@ -125,6 +125,12 @@ void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
-> >>>  		    struct kvm_sregs *sregs);
-> >>>  int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
-> >>>  		    struct kvm_sregs *sregs);
-> >>> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid,
-> >>> +		  struct kvm_fpu *fpu);
-> >>> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid,
-> >>> +		  struct kvm_fpu *fpu);
 
-nit: no need for the above line breaks. We don't even get to 80 char.
-
-> >>> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
-> >>> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
-> >>>  #ifdef __KVM_HAVE_VCPU_EVENTS
-> >>>  void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
-> >>>  		     struct kvm_vcpu_events *events);
-> >>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> >>> index 41cf45416060..dae117728ec6 100644
-> >>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> >>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> >>> @@ -1373,6 +1373,54 @@ int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
-> >>>  	return ioctl(vcpu->fd, KVM_SET_SREGS, sregs);
-> >>>  }
-> >>>  
-> >>> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
-> >>> +{
-> >>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-> >>> +	int ret;
-> >>> +
-> >>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
-> >>> +
-> >>> +	ret = ioctl(vcpu->fd, KVM_GET_FPU, fpu);
-> >>> +	TEST_ASSERT(ret == 0, "KVM_GET_FPU failed, rc: %i errno: %i",
-> >>> +		    ret, errno);
-> >>> +}
-> >>> +
-> >>> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
-> >>> +{
-> >>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-> >>> +	int ret;
-> >>> +
-> >>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
-> >>> +
-> >>> +	ret = ioctl(vcpu->fd, KVM_SET_FPU, fpu);
-> >>> +	TEST_ASSERT(ret == 0, "KVM_SET_FPU failed, rc: %i errno: %i",
-> >>> +		    ret, errno);
-> >>> +}
-> >>> +
-> >>> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
-> >>> +{
-> >>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-> >>> +	int ret;
-> >>> +
-> >>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
-> >>> +
-> >>> +	ret = ioctl(vcpu->fd, KVM_GET_ONE_REG, reg);
-> >>> +	TEST_ASSERT(ret == 0, "KVM_GET_ONE_REG failed, rc: %i errno: %i",
-> >>> +		    ret, errno);
-> >>> +}
-> >>> +
-> >>> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
-> >>> +{
-> >>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-> >>> +	int ret;
-> >>> +
-> >>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
-> >>> +
-> >>> +	ret = ioctl(vcpu->fd, KVM_SET_ONE_REG, reg);
-> >>> +	TEST_ASSERT(ret == 0, "KVM_SET_ONE_REG failed, rc: %i errno: %i",
-> >>> +		    ret, errno);
-> >>> +}
-> >>> +
-> >>>  /*
-> >>>   * VCPU Ioctl
-> >>>   *
-> >>>
-> >>
-> >> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> >>
-> > 
-> > How about what's below instead. It should be equivalent.
-> 
-> With your proposed changes we loose a bit verbosity in the error
-> messages. I need to think about which I like more.
-
-Looks like both error messages are missing something. The ones above are
-missing the string version of errno. The ones below are missing the string
-version of cmd. It's easy to add the string version of errno, which is
-an argument for keeping the functions above (but we could at least use
-_vcpu_ioctl to avoid duplicating the vcpu_find and vcpu!=NULL assert).
-Or, we could consider adding a kvm_ioctl_cmd_to_string() function,
-which might be nice for other ioctl wrappers now and in the future.
-It shouldn't be too bad to generate a string table from kvm.h, but of
-course we'd have to keep it maintained.
-
-Thanks,
-drew
-
-> 
-> > 
-> > Thanks,
-> > drew
-> > 
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > index 29cccaf96baf..d96a072e69bf 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > @@ -125,6 +125,31 @@ void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
-> >  		    struct kvm_sregs *sregs);
-> >  int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
-> >  		    struct kvm_sregs *sregs);
-> > +
-> > +static inline void
-> > +vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
-> > +{
-> > +	vcpu_ioctl(vm, vcpuid, KVM_GET_FPU, fpu);
-> > +}
-> > +
-> > +static inline void
-> > +vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
-> > +{
-> > +	vcpu_ioctl(vm, vcpuid, KVM_SET_FPU, fpu);
-> > +}
-> > +
-> > +static inline void
-> > +vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
-> > +{
-> > +	vcpu_ioctl(vm, vcpuid, KVM_GET_ONE_REG, reg);
-> > +}
-> > +
-> > +static inline void
-> > +vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
-> > +{
-> > +	vcpu_ioctl(vm, vcpuid, KVM_SET_ONE_REG, reg);
-> > +}
-> > +
-> >  #ifdef __KVM_HAVE_VCPU_EVENTS
-> >  void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
-> >  		     struct kvm_vcpu_events *events);
-> > 
-> 
-> 
+On 1/29/20 9:13 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Patch created mechanically by running:
+>
+>    $ chmod 644 $(git grep -lF '#!/usr/bin/env python' | xargs grep -L '=
+if __name__.*__main__')
+>    $ sed -i "/^#\!\/usr\/bin\/\(env\ \)\?python.\?$/d" $(git grep -lF '=
+#!/usr/bin/env python' | xargs grep -L 'if __name__.*__main__')
+>
+> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>   tests/acceptance/virtio_seg_max_adjust.py  | 1 -
+>   tests/acceptance/x86_cpu_model_versions.py | 1 -
+>   2 files changed, 2 deletions(-)
+>   mode change 100755 =3D> 100644 tests/acceptance/virtio_seg_max_adjust=
+.py
 
 
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+
+
+>
+> diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptan=
+ce/virtio_seg_max_adjust.py
+> old mode 100755
+> new mode 100644
+> index 5458573138..8d4f24da49
+> --- a/tests/acceptance/virtio_seg_max_adjust.py
+> +++ b/tests/acceptance/virtio_seg_max_adjust.py
+> @@ -1,4 +1,3 @@
+> -#!/usr/bin/env python
+>   #
+>   # Test virtio-scsi and virtio-blk queue settings for all machine type=
+s
+>   #
+> diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/accepta=
+nce/x86_cpu_model_versions.py
+> index 90558d9a71..01ff614ec2 100644
+> --- a/tests/acceptance/x86_cpu_model_versions.py
+> +++ b/tests/acceptance/x86_cpu_model_versions.py
+> @@ -1,4 +1,3 @@
+> -#!/usr/bin/env python
+>   #
+>   # Basic validation of x86 versioned CPU models and CPU model aliases
+>   #
 
