@@ -2,122 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4036614DFB4
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 18:17:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AC3314E00F
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 18:40:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727357AbgA3RQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 12:16:57 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:35221 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727247AbgA3RQ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 12:16:57 -0500
-Received: by mail-pj1-f67.google.com with SMTP id q39so1624314pjc.0
-        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 09:16:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=YMQtJsos2o5a2vGvBs3zHzY0eygzY9U697OHegfTvFc=;
-        b=hBShpIRUTwGCaXYoFQeYK9qnnNLEeYM92PmRzUd57ii9Zy3Ta4U2KCs6AGkI+T4e5O
-         14FiaV+fceomlbaUlZFgHMPTv7Lj37OYe9QY9WDQyq+YkL0tpA0laR5/a14J+vcQrRU1
-         /X1Cub8NBxNTEFy04TtMySnqbXD3jcUlxyySjY66YtN+0Vd5evEoH0/NUpeqWEytLfH8
-         AreO5PN1Fp0U0d6twdnzzAgEWMc0c4ps/AnpBBidMBwjVvFQofPKGQR28VyLXYbzI2R+
-         cbm7h+cUqqI48iD/V/niVL7N2EXpzjqTez3ze3FexeSRUjAPCJLpBwKo8AR/h7YeMuKq
-         Bk4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=YMQtJsos2o5a2vGvBs3zHzY0eygzY9U697OHegfTvFc=;
-        b=Y51iToSNLyiEan4OtC1rIJCalC3TFPcbQO22Zs/lRckweZQJcxkyQ91s2fFSH7FrR8
-         rdP4mFLQDU2RruFGMKWmDUPr6yDA1FgA2D6NaxwhDuknq9gf48v4oDztv8rT3moCd/b7
-         u7pOzZDzToisqmnfljp6P6nMmvefUPKhvKfs+0U4dOml+cLllhqwU43NjfufCSyLJiQ7
-         WN9UVKWcptq+pNHr7RHgiOfRmdnRrnrVTaGRFMTe3LnlClJuOLB3ajBYTg2xwnyeaQM0
-         UhGT/Pu5a2wyIk84cnWM+iQNhIr35xaQmL0rhXObqiTvbvFRXBHlv2o9QIniyASPqkbP
-         43Rw==
-X-Gm-Message-State: APjAAAU6329+aOFbGBy4OD5T0tmUyzyKyrUYdWtOo82F+cAr24UPdNZ0
-        NVS9lIs0IrmR7qL77Y+dKqdUNQ==
-X-Google-Smtp-Source: APXvYqz/HanZumE0+gOaDZtoRCZJgLmyvi/x1M0d911Rrv0gRMWU2PPbezu3EhVerXEDMCBuRijzIw==
-X-Received: by 2002:a17:90a:ead8:: with SMTP id ev24mr6958304pjb.91.1580404616562;
-        Thu, 30 Jan 2020 09:16:56 -0800 (PST)
-Received: from ?IPv6:2600:1010:b010:9631:69c2:3ecc:ab84:f45c? ([2600:1010:b010:9631:69c2:3ecc:ab84:f45c])
-        by smtp.gmail.com with ESMTPSA id d3sm6838195pfn.113.2020.01.30.09.16.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jan 2020 09:16:55 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 2/2] KVM: VMX: Extend VMX's #AC handding
-Date:   Thu, 30 Jan 2020 09:16:54 -0800
-Message-Id: <A2E4B0E3-EDDF-46FD-8CE9-62A2E2E4BF20@amacapital.net>
-References: <cf79eeeb-e107-bdff-13a8-c52288d0d123@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-In-Reply-To: <cf79eeeb-e107-bdff-13a8-c52288d0d123@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-X-Mailer: iPhone Mail (17C54)
+        id S1727496AbgA3RkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 12:40:08 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59014 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727158AbgA3RkI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 12:40:08 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 080372083E;
+        Thu, 30 Jan 2020 17:40:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1580406007;
+        bh=yR5hJFQwhragqRNRWC6IRUDBK/JgRFAWVTPBd2ZK8Fs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=zOLUGBxh2CAVvpQxtgUHTJKkCLMZRiL7+WVv9Z0DKdt0Tnw2Y8/os0NqKsl1jtXUw
+         JNA3QNmVRkYAzTiAIjR/nkY+GOgYdec/FmFBomNnMYPWf/ClJFtJJcGKToCF/i0ZjI
+         rhPrXLxKPLwRslWJ3vlYKh0UpK/UMVEhH04/7Hrc=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1ixDnR-002ENP-Ap; Thu, 30 Jan 2020 17:40:05 +0000
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 30 Jan 2020 17:40:05 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        andre.przywara@arm.com
+Subject: Re: [kvm-unit-tests RFC PATCH v3 5/7] lib: arm64: Add support for
+ disabling and re-enabling VHE
+In-Reply-To: <1577972806-16184-6-git-send-email-alexandru.elisei@arm.com>
+References: <1577972806-16184-1-git-send-email-alexandru.elisei@arm.com>
+ <1577972806-16184-6-git-send-email-alexandru.elisei@arm.com>
+Message-ID: <ad46bedcc585d03399576ecfce4c17c0@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.8
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com, andre.przywara@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Alexandru,
 
+On 2020-01-02 13:46, Alexandru Elisei wrote:
+> Add a function to disable VHE and another one to re-enable VHE. Both
+> functions work under the assumption that the CPU had VHE mode enabled 
+> at
+> boot.
+> 
+> Minimal support to run with VHE has been added to the TLB invalidate
+> functions and to the exception handling code.
+> 
+> Since we're touch the assembly enable/disable MMU code, let's take this
+> opportunity to replace a magic number with the proper define.
 
-> On Jan 30, 2020, at 8:30 AM, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->=20
-> =EF=BB=BFOn 1/30/2020 11:18 PM, Andy Lutomirski wrote:
->>>> On Jan 30, 2020, at 4:24 AM, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->>>=20
->>> =EF=BB=BFThere are two types of #AC can be generated in Intel CPUs:
->>> 1. legacy alignment check #AC;
->>> 2. split lock #AC;
->>>=20
->>> Legacy alignment check #AC can be injected to guest if guest has enabled=
+I've been using this test case to debug my NV code... only to realize
+after a few hours of banging my head on the wall that it is the test
+that needed debugging, see below... ;-)
 
->>> alignemnet check.
->>>=20
->>> When host enables split lock detection, i.e., split_lock_detect!=3Doff,
->>> guest will receive an unexpected #AC when there is a split_lock happens i=
-n
->>> guest since KVM doesn't virtualize this feature to guest.
->>>=20
->>> Since the old guests lack split_lock #AC handler and may have split lock=
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  lib/arm64/asm/mmu.h           |  11 ++-
+>  lib/arm64/asm/pgtable-hwdef.h |  53 ++++++++---
+>  lib/arm64/asm/processor.h     |  19 +++-
+>  lib/arm64/processor.c         |  37 +++++++-
+>  arm/cstart64.S                | 204 
+> ++++++++++++++++++++++++++++++++++++++++--
+>  5 files changed, 300 insertions(+), 24 deletions(-)
 
->>> buges. To make guest survive from split lock, applying the similar polic=
-y
->>> as host's split lock detect configuration:
->>> - host split lock detect is sld_warn:
->>>   warning the split lock happened in guest, and disabling split lock
->>>   detect around VM-enter;
->>> - host split lock detect is sld_fatal:
->>>   forwarding #AC to userspace. (Usually userspace dump the #AC
->>>   exception and kill the guest).
->> A correct userspace implementation should, with a modern guest kernel, fo=
-rward the exception. Otherwise you=E2=80=99re introducing a DoS into the gue=
-st if the guest kernel is fine but guest userspace is buggy.
->=20
-> To prevent DoS in guest, the better solution is virtualizing and advertisi=
-ng this feature to guest, so guest can explicitly enable it by setting split=
-_lock_detect=3Dfatal, if it's a latest linux guest.
->=20
-> However, it's another topic, I'll send out the patches later.
->=20
+[...]
 
-Can we get a credible description of how this would work? I suggest:
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -104,6 +104,13 @@ exceptions_init:
+> 
+>  .text
+> 
+> +exceptions_init_nvhe:
+> +	adrp	x0, vector_table_nvhe
+> +	add	x0, x0, :lo12:vector_table_nvhe
+> +	msr	vbar_el2, x0
+> +	isb
+> +	ret
+> +
+>  .globl get_mmu_off
+>  get_mmu_off:
+>  	adrp	x0, auxinfo
+> @@ -203,7 +210,7 @@ asm_mmu_enable:
+>  		     TCR_IRGN_WBWA | TCR_ORGN_WBWA |	\
+>  		     TCR_SHARED
+>  	mrs	x2, id_aa64mmfr0_el1
+> -	bfi	x1, x2, #32, #3
+> +	bfi	x1, x2, #TCR_EL1_IPS_SHIFT, #3
+>  	msr	tcr_el1, x1
+> 
+>  	/* MAIR */
+> @@ -228,6 +235,41 @@ asm_mmu_enable:
+> 
+>  	ret
+> 
+> +asm_mmu_enable_nvhe:
 
-Intel adds and documents a new CPUID bit or core capability bit that means =E2=
-=80=9Csplit lock detection is forced on=E2=80=9D.  If this bit is set, the M=
-SR bit controlling split lock detection is still writable, but split lock de=
-tection is on regardless of the value.  Operating systems are expected to se=
-t the bit to 1 to indicate to a hypervisor, if present, that they understand=
- that split lock detection is on.
+Note the "_nvhe" suffix, which implies that...
 
-This would be an SDM-only change, but it would also be a commitment to certa=
-in behavior for future CPUs that don=E2=80=99t implement split locks.
+> +	tlbi    alle2
+> +	dsb     nsh
+> +
+> +        /* TCR */
+> +	ldr	x1, =TCR_EL2_RES1 | 			\
+> +		     TCR_T0SZ(VA_BITS) |		\
+> +		     TCR_TG0_64K |                      \
+> +		     TCR_IRGN0_WBWA | TCR_ORGN0_WBWA |	\
+> +		     TCR_SH0_IS
+> +	mrs	x2, id_aa64mmfr0_el1
+> +	bfi	x1, x2, #TCR_EL2_PS_SHIFT, #3
+> +	msr	tcr_el2, x1
+> +
+> +	/* Same MAIR and TTBR0 as in VHE mode */
+> +	ldr	x1, =MAIR(0x00, MT_DEVICE_nGnRnE) |	\
+> +		     MAIR(0x04, MT_DEVICE_nGnRE) |	\
+> +		     MAIR(0x0c, MT_DEVICE_GRE) |	\
+> +		     MAIR(0x44, MT_NORMAL_NC) |		\
+> +		     MAIR(0xff, MT_NORMAL)
+> +	msr	mair_el1, x1
 
-Can one of you Intel folks ask the architecture team about this?=
+... this should be mair_el2...
+
+> +
+> +	msr	ttbr0_el1, x0
+
+... and this should be ttbr0_el2.
+
+> +	isb
+> +
+> +	/* SCTLR */
+> +	ldr	x1, =SCTLR_EL2_RES1 |			\
+> +		     SCTLR_EL2_C | 			\
+> +		     SCTLR_EL2_I | 			\
+> +		     SCTLR_EL2_M
+> +	msr	sctlr_el2, x1
+> +	isb
+> +
+> +	ret
+> +
+>  /* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
+>  .macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
+>  	adrp	\tmp1, dcache_line_size
+> @@ -242,21 +284,61 @@ asm_mmu_enable:
+>  	dsb	\domain
+>  .endm
+> 
+> +clean_inval_cache:
+> +	adrp	x0, __phys_offset
+> +	ldr	x0, [x0, :lo12:__phys_offset]
+> +	adrp	x1, __phys_end
+> +	ldr	x1, [x1, :lo12:__phys_end]
+> +	dcache_by_line_op civac, sy, x0, x1, x2, x3
+> +	isb
+> +	ret
+> +
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+>  	mrs	x0, sctlr_el1
+>  	bic	x0, x0, SCTLR_EL1_M
+>  	msr	sctlr_el1, x0
+>  	isb
+> +	b	clean_inval_cache
+> 
+> -	/* Clean + invalidate the entire memory */
+> -	adrp	x0, __phys_offset
+> -	ldr	x0, [x0, :lo12:__phys_offset]
+> -	adrp	x1, __phys_end
+> -	ldr	x1, [x1, :lo12:__phys_end]
+> -	dcache_by_line_op civac, sy, x0, x1, x2, x3
+> +asm_mmu_disable_nvhe:
+> +	mrs	x0, sctlr_el2
+> +	bic	x0, x0, SCTLR_EL2_M
+> +	msr	sctlr_el2, x0
+> +	isb
+> +	b	clean_inval_cache
+> +
+> +.globl asm_disable_vhe
+> +asm_disable_vhe:
+> +	str	x30, [sp, #-16]!
+> +
+> +	bl	asm_mmu_disable
+> +	msr	hcr_el2, xzr
+> +	isb
+
+At this stage, VHE is off...
+
+> +	bl	exceptions_init_nvhe
+> +	/* Make asm_mmu_enable_nvhe happy by having TTBR0 value in x0. */
+> +	mrs	x0, ttbr0_el1
+
+... so this is going to sample the wrong TTBR. It really should be
+TTBR0_EL2!
+
+> +	isb
+
+nit: this ISB is useless, as you will have a dependency on x0 anyway.
+
+With these fixes (and a few more terrible hacks to synchronize HCR_EL2
+on ARMv8.4-NV), I can run this test reliably.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
