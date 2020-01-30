@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9146314DF34
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 17:33:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D548B14DF35
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 17:33:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727392AbgA3Qdf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 11:33:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20952 "EHLO
+        id S1727404AbgA3Qdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 11:33:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49115 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727378AbgA3Qdf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 11:33:35 -0500
+        with ESMTP id S1727402AbgA3Qdj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 11:33:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580402015;
+        s=mimecast20190719; t=1580402018;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Tl+Yh/nsfcb/XxIVsapr7K9sgBQAjDanHTGoCcXw5jc=;
-        b=PZIeBcMNPXjm2sl3hGtwIp1FO2njKvtsBDAxOpyadOJuS44f3FEXSCXPot7sXR0IMTxtUp
-        zKzwqI4rzhF0D/S/7U2Ql3okCJ/A61XKF2xBb0eO7Yniy5OruY5uldoplnPDpYS2z9ePBh
-        RzY91CSeggb5ADtallq+G1PPr9k83Ls=
+        bh=Vatf1cy30VQPVaui3AotPMnF2QHFo5F8BgR6ROFVBWw=;
+        b=CiMJuNmo+o8+1bOe9FK9ff2qylnn5q5Wrk6vplLLDWAQeZ5II4ENKHog4vNzEaG51aiROk
+        SYSrWvGMKAKPMZT7gM9CBxZviwk6wpq0cV8H2kNwYHFw9pvUxruT7ZkwMANyM3oujSq5gX
+        nSchYtyIaPNqxagScgZGmE/R2Y23G8Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-Grbo7aG9OYCjo1HDnDT5hA-1; Thu, 30 Jan 2020 11:33:30 -0500
-X-MC-Unique: Grbo7aG9OYCjo1HDnDT5hA-1
+ us-mta-432-nS_TdMLaOhKfNs6crHtG7w-1; Thu, 30 Jan 2020 11:33:36 -0500
+X-MC-Unique: nS_TdMLaOhKfNs6crHtG7w-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B2F018CA246;
-        Thu, 30 Jan 2020 16:33:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D0578010D0;
+        Thu, 30 Jan 2020 16:33:34 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 072E35E241;
-        Thu, 30 Jan 2020 16:33:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 967A65DA75;
+        Thu, 30 Jan 2020 16:33:29 +0000 (UTC)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Richard Henderson <rth@twiddle.net>,
@@ -52,9 +52,9 @@ Cc:     Richard Henderson <rth@twiddle.net>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
         Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
         kvm@vger.kernel.org
-Subject: [PATCH v2 04/12] tests: Explicit usage of Python 3
-Date:   Thu, 30 Jan 2020 17:32:24 +0100
-Message-Id: <20200130163232.10446-5-philmd@redhat.com>
+Subject: [PATCH v2 05/12] scripts: Explicit usage of Python 3 (scripts with __main__)
+Date:   Thu, 30 Jan 2020 17:32:25 +0100
+Message-Id: <20200130163232.10446-6-philmd@redhat.com>
 In-Reply-To: <20200130163232.10446-1-philmd@redhat.com>
 References: <20200130163232.10446-1-philmd@redhat.com>
 MIME-Version: 1.0
@@ -76,100 +76,171 @@ Patch created mechanically by running:
 Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/docker/travis.py         | 2 +-
- tests/qapi-schema/test-qapi.py | 2 +-
- tests/vm/centos                | 2 +-
- tests/vm/fedora                | 2 +-
- tests/vm/freebsd               | 2 +-
- tests/vm/netbsd                | 2 +-
- tests/vm/openbsd               | 2 +-
- tests/vm/ubuntu.i386           | 2 +-
- 8 files changed, 8 insertions(+), 8 deletions(-)
+ scripts/analyse-locks-simpletrace.py | 2 +-
+ scripts/decodetree.py                | 2 +-
+ scripts/device-crash-test            | 2 +-
+ scripts/kvm/kvm_flightrecorder       | 2 +-
+ scripts/qapi-gen.py                  | 2 +-
+ scripts/qmp/qemu-ga-client           | 2 +-
+ scripts/qmp/qmp                      | 2 +-
+ scripts/qmp/qmp-shell                | 2 +-
+ scripts/qmp/qom-fuse                 | 2 +-
+ scripts/render_block_graph.py        | 2 +-
+ scripts/replay-dump.py               | 2 +-
+ scripts/simpletrace.py               | 2 +-
+ scripts/tracetool.py                 | 2 +-
+ scripts/vmstate-static-checker.py    | 2 +-
+ 14 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/tests/docker/travis.py b/tests/docker/travis.py
-index e1433012bd..62fccc5ebb 100755
---- a/tests/docker/travis.py
-+++ b/tests/docker/travis.py
+diff --git a/scripts/analyse-locks-simpletrace.py b/scripts/analyse-locks=
+-simpletrace.py
+index 7d9b574300..9c263d6e79 100755
+--- a/scripts/analyse-locks-simpletrace.py
++++ b/scripts/analyse-locks-simpletrace.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ #
+ # Analyse lock events and compute statistics
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index d8c59cab60..2a8f2b6e06 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # Copyright (c) 2018 Linaro Limited
+ #
+ # This library is free software; you can redistribute it and/or
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index 15f213a6cd..25ee968b66 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env python
 +#!/usr/bin/env python3
  #
- # Travis YAML config parser
+ #  Copyright (c) 2017 Red Hat Inc
  #
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index bad14edb47..503fb8ad25 100755
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
+diff --git a/scripts/kvm/kvm_flightrecorder b/scripts/kvm/kvm_flightrecor=
+der
+index 54a56745e4..1391a84409 100755
+--- a/scripts/kvm/kvm_flightrecorder
++++ b/scripts/kvm/kvm_flightrecorder
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env python
 +#!/usr/bin/env python3
  #
- # QAPI parser test harness
+ # KVM Flight Recorder - ring buffer tracing script
  #
-diff --git a/tests/vm/centos b/tests/vm/centos
-index f2f0befd84..a41ff109eb 100755
---- a/tests/vm/centos
-+++ b/tests/vm/centos
+diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+index f93f3c7c23..c7b0070db2 100755
+--- a/scripts/qapi-gen.py
++++ b/scripts/qapi-gen.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # QAPI generator
+ #
+ # This work is licensed under the terms of the GNU GPL, version 2 or lat=
+er.
+diff --git a/scripts/qmp/qemu-ga-client b/scripts/qmp/qemu-ga-client
+index 30cf8a9a0d..e4568aff68 100755
+--- a/scripts/qmp/qemu-ga-client
++++ b/scripts/qmp/qemu-ga-client
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+=20
+ # QEMU Guest Agent Client
+ #
+diff --git a/scripts/qmp/qmp b/scripts/qmp/qmp
+index 6cb46fdae2..f85a14a627 100755
+--- a/scripts/qmp/qmp
++++ b/scripts/qmp/qmp
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ #
+ # QMP command line tool
+ #
+diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+index f1cddeafbc..9e122ad0c6 100755
+--- a/scripts/qmp/qmp-shell
++++ b/scripts/qmp/qmp-shell
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ #
+ # Low-level QEMU shell on top of QMP.
+ #
+diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
+index 4d85970a78..6bada2c33d 100755
+--- a/scripts/qmp/qom-fuse
++++ b/scripts/qmp/qom-fuse
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ ##
+ # QEMU Object Model test tools
+ #
+diff --git a/scripts/render_block_graph.py b/scripts/render_block_graph.p=
+y
+index 656f0388ad..409b4321f2 100755
+--- a/scripts/render_block_graph.py
++++ b/scripts/render_block_graph.py
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env python
 +#!/usr/bin/env python3
  #
- # CentOS image
+ # Render Qemu Block Graph
  #
-diff --git a/tests/vm/fedora b/tests/vm/fedora
-index 8e270fc0f0..4d7d6049f4 100755
---- a/tests/vm/fedora
-+++ b/tests/vm/fedora
+diff --git a/scripts/replay-dump.py b/scripts/replay-dump.py
+index ee7fda2638..0cdae879b7 100755
+--- a/scripts/replay-dump.py
++++ b/scripts/replay-dump.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ #
+ # Dump the contents of a recorded execution stream
+diff --git a/scripts/simpletrace.py b/scripts/simpletrace.py
+index 45485b864b..2bc043112a 100755
+--- a/scripts/simpletrace.py
++++ b/scripts/simpletrace.py
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env python
 +#!/usr/bin/env python3
  #
- # Fedora VM image
+ # Pretty-printer for simple trace backend binary trace files
  #
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-index 33a736298a..fb54334696 100755
---- a/tests/vm/freebsd
-+++ b/tests/vm/freebsd
+diff --git a/scripts/tracetool.py b/scripts/tracetool.py
+index 3beaa66bd8..264cc9eecc 100755
+--- a/scripts/tracetool.py
++++ b/scripts/tracetool.py
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env python
 +#!/usr/bin/env python3
- #
- # FreeBSD VM image
- #
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index ec6f3563b2..c5069a45f4 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
+ # -*- coding: utf-8 -*-
+=20
+ """
+diff --git a/scripts/vmstate-static-checker.py b/scripts/vmstate-static-c=
+hecker.py
+index f8b7b8f772..d44dedd9e9 100755
+--- a/scripts/vmstate-static-checker.py
++++ b/scripts/vmstate-static-checker.py
 @@ -1,4 +1,4 @@
--#!/usr/bin/env python
+-#!/usr/bin/python
 +#!/usr/bin/env python3
  #
- # NetBSD VM image
- #
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-index d6173506f7..22cd9513dd 100755
---- a/tests/vm/openbsd
-+++ b/tests/vm/openbsd
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # OpenBSD VM image
- #
-diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-index 3834cd7a8d..48e9cb1ad3 100755
---- a/tests/vm/ubuntu.i386
-+++ b/tests/vm/ubuntu.i386
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Ubuntu i386 image
- #
+ # Compares vmstate information stored in JSON format, obtained from
+ # the -dump-vmstate QEMU command.
 --=20
 2.21.1
 
