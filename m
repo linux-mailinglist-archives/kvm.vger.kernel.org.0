@@ -2,125 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6454014DD7C
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 16:04:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F384214DD80
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 16:04:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727232AbgA3PE0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 10:04:26 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31334 "EHLO
+        id S1727327AbgA3PEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 10:04:51 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20505 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726948AbgA3PEZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 10:04:25 -0500
+        by vger.kernel.org with ESMTP id S1727235AbgA3PEv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 10:04:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580396665;
+        s=mimecast20190719; t=1580396689;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=H+pA3NLtlRLp/xXGeaDKzY9dGlJ8lliR+4HjYXaDfcw=;
-        b=jJcdUcnSbKoWMxs9ozeHBKT/IhptD3NlPdCfxwRUi4rMQOEWt5q1uVd+swk1nCAjW/WO5T
-        CCgwycN712xtkG8PnTccYunegHzeaG0Dx3OA8DNsdzrXVJB+QnkEXwTI5uxOqppZwKO3/L
-        mmSfQ80g/ctwfPSCNfkIBHbga5cP/RA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-zhVUWzObNji3gCQ03TabJQ-1; Thu, 30 Jan 2020 10:04:08 -0500
-X-MC-Unique: zhVUWzObNji3gCQ03TabJQ-1
-Received: by mail-wr1-f70.google.com with SMTP id 50so958726wrc.2
-        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 07:04:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=H+pA3NLtlRLp/xXGeaDKzY9dGlJ8lliR+4HjYXaDfcw=;
-        b=YVd95LvfHjjSfO9ZMB0DfAYF/GLiGdVT1ekO7kwIJEBoh+Iv0+ey6ONO6enX9k4RVH
-         mIyrxKUcC1GqsXDr8et+VaQdH7XEI3r5D9E7I+NKUsUDgaUHuBMxI1HeA4Lza7quR3bA
-         RX7z+99USxo7KGXaaQGArbyvRN4cv5P0dmTV0+7Cdw7LqFjhbeMqbezO3BjBg4CVW+Uw
-         mBYc8HskiukVIES1A89VRab/NAR0KCurLXpK9vKsj40UBkl0w+pzRyVpiILW4Nzi+i8J
-         8R70i/ZFaLOooJLNXKav17gWk2aFqXl1Pbsb3IGzMFOJtEk9/hRUpjFUp5LVprPDp7UO
-         CltQ==
-X-Gm-Message-State: APjAAAUKe/fiWQtbdfdQWm7TLmL130ujdg+JF7MgJkHIAbhJ/ylSqScT
-        nSPPmYS7sYzyAIMYiwlKTPIp4iTfXkPBAK9uhOcCnlwWKVmXC/2FxZVB7OiMjnNes7KOd4M8kgx
-        AiotxjJ2Nwz9R
-X-Received: by 2002:a5d:610a:: with SMTP id v10mr5959389wrt.267.1580396647549;
-        Thu, 30 Jan 2020 07:04:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyKd8yaN6Raqr8KT6xqQ2scRw/p2O+KF9xHnhwrBF0+vxeB4t7HGXk3dHQMXFcRtXNZS03LOw==
-X-Received: by 2002:a5d:610a:: with SMTP id v10mr5959349wrt.267.1580396647092;
-        Thu, 30 Jan 2020 07:04:07 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net. [83.57.172.113])
-        by smtp.gmail.com with ESMTPSA id v14sm7826521wrm.28.2020.01.30.07.04.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jan 2020 07:04:06 -0800 (PST)
-Subject: Re: [PATCH 00/10] python: Explicit usage of Python 3
-To:     Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        qemu-devel@nongnu.org
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
-        Kevin Wolf <kwolf@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Cleber Rosa <crosa@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Max Reitz <mreitz@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Fam Zheng <fam@euphon.net>,
-        Michael Roth <mdroth@linux.vnet.ibm.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        qemu-block@nongnu.org,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20200129231402.23384-1-philmd@redhat.com>
- <0a858225-685d-3ffd-845c-6c1f8a438307@virtuozzo.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c90ce40e-428a-ed5e-531f-b2ca99121dfc@redhat.com>
-Date:   Thu, 30 Jan 2020 16:04:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        bh=pkKUmWSBGVMkw8A8eSlIsd2aP5R5ZuYhA/V7G0cG+Nw=;
+        b=RO2vkensDjgB+ZH343D1Mm3mzMNjd7pKMKLkJFjRRQAVL3iQfu9DWo/LMOy8VgbRadQ/1C
+        HFt/qhfm/e6141p+/g5yTau1HVmJnfm+3XdLAIY55MliEqBZkwuuHbhnYm5ZB9nvP2AkpF
+        H3eDUjhj+x/cQ9glJIy9A4zdbjjzoQU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-qh2pb6naMdu8VDrXMC_umQ-1; Thu, 30 Jan 2020 10:04:41 -0500
+X-MC-Unique: qh2pb6naMdu8VDrXMC_umQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 774FB8010CB;
+        Thu, 30 Jan 2020 15:04:40 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9989B5C1B2;
+        Thu, 30 Jan 2020 15:04:36 +0000 (UTC)
+Date:   Thu, 30 Jan 2020 16:04:34 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v8 2/4] selftests: KVM: Add fpu and one reg set/get
+ library functions
+Message-ID: <20200130150434.6ktug57ypdutbwew@kamzik.brq.redhat.com>
+References: <20200129200312.3200-1-frankja@linux.ibm.com>
+ <20200129200312.3200-3-frankja@linux.ibm.com>
+ <72ff36e1-9170-dfb0-4050-f398f9a467eb@redhat.com>
+ <20200130135512.diyyu3wvwqlwpqlx@kamzik.brq.redhat.com>
+ <9d9e0e7a-b006-98b1-6bf0-8c46006835bc@linux.ibm.com>
+ <20200130143008.xy6lrnrrwer6xkdp@kamzik.brq.redhat.com>
+ <8095f321-0d31-1285-7fa5-a751aeb6e56f@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <0a858225-685d-3ffd-845c-6c1f8a438307@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8095f321-0d31-1285-7fa5-a751aeb6e56f@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/30/20 3:02 PM, Vladimir Sementsov-Ogievskiy wrote:
-> First, thanks for handling this!
+On Thu, Jan 30, 2020 at 03:58:46PM +0100, Janosch Frank wrote:
+> On 1/30/20 3:30 PM, Andrew Jones wrote:
+> > On Thu, Jan 30, 2020 at 03:10:55PM +0100, Janosch Frank wrote:
+> >> On 1/30/20 2:55 PM, Andrew Jones wrote:
+> >>> On Thu, Jan 30, 2020 at 11:36:21AM +0100, Thomas Huth wrote:
+> >>>> On 29/01/2020 21.03, Janosch Frank wrote:
+> >>>>> Add library access to more registers.
+> >>>>>
+> >>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >>>>> ---
+> >>>>>  .../testing/selftests/kvm/include/kvm_util.h  |  6 +++
+> >>>>>  tools/testing/selftests/kvm/lib/kvm_util.c    | 48 +++++++++++++++++++
+> >>>>>  2 files changed, 54 insertions(+)
+> >>>>>
+> >>>>> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> >>>>> index 29cccaf96baf..ae0d14c2540a 100644
+> >>>>> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> >>>>> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> >>>>> @@ -125,6 +125,12 @@ void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+> >>>>>  		    struct kvm_sregs *sregs);
+> >>>>>  int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+> >>>>>  		    struct kvm_sregs *sregs);
+> >>>>> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid,
+> >>>>> +		  struct kvm_fpu *fpu);
+> >>>>> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid,
+> >>>>> +		  struct kvm_fpu *fpu);
+> > 
+> > nit: no need for the above line breaks. We don't even get to 80 char.
+> > 
+> >>>>> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+> >>>>> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+> >>>>>  #ifdef __KVM_HAVE_VCPU_EVENTS
+> >>>>>  void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
+> >>>>>  		     struct kvm_vcpu_events *events);
+> >>>>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> >>>>> index 41cf45416060..dae117728ec6 100644
+> >>>>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> >>>>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> >>>>> @@ -1373,6 +1373,54 @@ int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
+> >>>>>  	return ioctl(vcpu->fd, KVM_SET_SREGS, sregs);
+> >>>>>  }
+> >>>>>  
+> >>>>> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+> >>>>> +{
+> >>>>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> >>>>> +	int ret;
+> >>>>> +
+> >>>>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> >>>>> +
+> >>>>> +	ret = ioctl(vcpu->fd, KVM_GET_FPU, fpu);
+> >>>>> +	TEST_ASSERT(ret == 0, "KVM_GET_FPU failed, rc: %i errno: %i",
+> >>>>> +		    ret, errno);
+> >>>>> +}
+> >>>>> +
+> >>>>> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+> >>>>> +{
+> >>>>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> >>>>> +	int ret;
+> >>>>> +
+> >>>>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> >>>>> +
+> >>>>> +	ret = ioctl(vcpu->fd, KVM_SET_FPU, fpu);
+> >>>>> +	TEST_ASSERT(ret == 0, "KVM_SET_FPU failed, rc: %i errno: %i",
+> >>>>> +		    ret, errno);
+> >>>>> +}
+> >>>>> +
+> >>>>> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+> >>>>> +{
+> >>>>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> >>>>> +	int ret;
+> >>>>> +
+> >>>>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> >>>>> +
+> >>>>> +	ret = ioctl(vcpu->fd, KVM_GET_ONE_REG, reg);
+> >>>>> +	TEST_ASSERT(ret == 0, "KVM_GET_ONE_REG failed, rc: %i errno: %i",
+> >>>>> +		    ret, errno);
+> >>>>> +}
+> >>>>> +
+> >>>>> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+> >>>>> +{
+> >>>>> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> >>>>> +	int ret;
+> >>>>> +
+> >>>>> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> >>>>> +
+> >>>>> +	ret = ioctl(vcpu->fd, KVM_SET_ONE_REG, reg);
+> >>>>> +	TEST_ASSERT(ret == 0, "KVM_SET_ONE_REG failed, rc: %i errno: %i",
+> >>>>> +		    ret, errno);
+> >>>>> +}
+> >>>>> +
+> >>>>>  /*
+> >>>>>   * VCPU Ioctl
+> >>>>>   *
+> >>>>>
+> >>>>
+> >>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >>>>
+> >>>
+> >>> How about what's below instead. It should be equivalent.
+> >>
+> >> With your proposed changes we loose a bit verbosity in the error
+> >> messages. I need to think about which I like more.
+> > 
+> > Looks like both error messages are missing something. The ones above are
+> > missing the string version of errno. The ones below are missing the string
+> > version of cmd. It's easy to add the string version of errno, which is
+> > an argument for keeping the functions above (but we could at least use
+> > _vcpu_ioctl to avoid duplicating the vcpu_find and vcpu!=NULL assert).
 > 
-> 30.01.2020 2:13, Philippe Mathieu-Daudé wrote:
->> Hello,
->>
->> These are mechanical sed patches used to convert the
->> code base to Python 3, as suggested on this thread:
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675024.html
->>
->> Regards,
->>
->> Phil.
->>
->> Philippe Mathieu-Daudé (10):
->>    scripts: Explicit usage of Python 3
->>    tests/qemu-iotests: Explicit usage of Python 3
->>    tests: Explicit usage of Python 3
->>    scripts/minikconf: Explicit usage of Python 3
->>    tests/acceptance: Remove shebang header
->>    scripts/tracetool: Remove shebang header
->>    tests/vm: Remove shebang header
->>    tests/qemu-iotests: Explicit usage of Python 3
->>    scripts: Explicit usage of Python 3
->>    tests/qemu-iotests/check: Update to match Python 3 interpreter
->>
+> Will do
 > 
-> Could you please not use same subject for different patches? Such things 
-> are hard to manage during patch porting from version to version.
-
-I can change but I'm not understanding what you want.
-
+> > Or, we could consider adding a kvm_ioctl_cmd_to_string() function,
+> > which might be nice for other ioctl wrappers now and in the future.
+> > It shouldn't be too bad to generate a string table from kvm.h, but of
+> > course we'd have to keep it maintained.
 > 
-> Also, will you update checkpatch.pl, to avoid appearing unversioned 
-> python again?
+> I'm currently occupied with managing a lot of patches, so something like
+> that is not very high on my todo list.
 
-I'm not sure I can because checkpatch.pl is written in Perl, but I'll try.
+Yeah, no worries. We can go with a patch like this for now. I'll
+experiment with a table generator when I get a chance in order to
+see how ugly it gets. If it's too ugly I'll drop it too.
+
+Thanks,
+drew
 
