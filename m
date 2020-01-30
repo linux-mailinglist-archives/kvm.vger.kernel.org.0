@@ -2,98 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4BEB14D635
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 06:44:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3918914D7E4
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 09:43:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726469AbgA3FoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 00:44:16 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57398 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725873AbgA3FoP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 00:44:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580363054;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=b8PEF8AVAWODPDupJea+4sWEJHHfwQkjaA/7qcZmag4=;
-        b=Y6R00qTGMkNZUDTi9Bjzix9BllX0aNbcel38FTI/KrI0Gy8ohOqOO1Bo+f8ANxQ1udmsI+
-        9gc93iPBE/sR02iBoU12Jc/3Qc6eX62uUl1dMn9j+vUyG+JNRIzIuJRkCkDUz+nQ7AQlt3
-        2i8of8hMPtwPYKMTBmpP5X7h+dsdlcs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-47UrOtCqP9u-T_G9MYz_gg-1; Thu, 30 Jan 2020 00:44:12 -0500
-X-MC-Unique: 47UrOtCqP9u-T_G9MYz_gg-1
-Received: by mail-wr1-f70.google.com with SMTP id v17so1204228wrm.17
-        for <kvm@vger.kernel.org>; Wed, 29 Jan 2020 21:44:12 -0800 (PST)
+        id S1726881AbgA3Ink (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 03:43:40 -0500
+Received: from mail-qt1-f172.google.com ([209.85.160.172]:41523 "EHLO
+        mail-qt1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726865AbgA3Inj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 03:43:39 -0500
+Received: by mail-qt1-f172.google.com with SMTP id l19so1815676qtq.8
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 00:43:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=KJTZMhxSYbKog3q3QunAoOxfir5NefkAvc0Wc1DUW10=;
+        b=LMhl1CzhWteprbNFlrJ8l439XOCil8NzH7d4KBsBWs4e7q8CxZ6DjaPR+iF4LjHHtt
+         nr/FPXLqrdIvEG5GRAt3Zioqitjx2InyNhx3scDMCgZBp1f1JG3um3NSmXg6SGOEHR8y
+         lygf2bJ4dHmXVO0NdXNHNW6yUuBJXVgWfrfBtSTKNND7m/nKA8MJlhDQDps9NQ61rKSI
+         BbXLbWFUzNVdeGJTx6h3lNsArT57WuDcun7y0wCvCzSusfgGIAa/22pLULMTyNaYikEG
+         4DGUavnkvltNf1cAhSjEgB1Ns0LPl+SWqiASlQWGED8uQ2nrmVIMvfeoVVkKjaSzHcIJ
+         trVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=b8PEF8AVAWODPDupJea+4sWEJHHfwQkjaA/7qcZmag4=;
-        b=tAiNFMPHWP88vE1R4vSltsIOQ+a4rjmBIIREEC9JN/LHUy5Gd8uisHaRGe692G970f
-         qqUcdjBUnygFstnvX8kazfTj+7PLcuNWsoADWsHK3olYBEGQRu8wObJUv1voUJPYNndJ
-         gzLrgTRYe1xA7ezD6Jou5yHMhCWrqOhJuI479GSEalsRk8qZnV+xgJqHiKwq0ueAClTE
-         PCxLsxtJtxJuIb4kfTpNOOFtLbY8xwtattjwRwJKV5o5PwuEdiNoKvpnyk2UQDcDducf
-         2y7yTE3QlZKfxjUIjZiuiT+x/x3LqeNaVZuU2evZRE5EC4bSINTSvwWOAAVRZNZsVnQh
-         JaGA==
-X-Gm-Message-State: APjAAAVH3rD177FnF+6Mae7XGvsJwqbHthHdjPa6BL9Txop41jwstnkf
-        LToZM1t/mLdhHo3PmoRuWmy3czM4Lj9DY1UNFnwM0eLTVM+AR8vXB7X8qsF3RP+4y0Q1tAb+Inh
-        auj73PHMiSovL
-X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr3175365wmi.21.1580363051209;
-        Wed, 29 Jan 2020 21:44:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxvrtUyXEqgq8iYKVpAB/LAj4fC31bOc+VOTWRDvsFWxjJ6sWsl8qJGadVTcya+7iE6vbimVA==
-X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr3175335wmi.21.1580363050959;
-        Wed, 29 Jan 2020 21:44:10 -0800 (PST)
-Received: from [10.1.251.141] ([80.188.125.198])
-        by smtp.gmail.com with ESMTPSA id 4sm4795049wmg.22.2020.01.29.21.44.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jan 2020 21:44:10 -0800 (PST)
-Subject: Re: [PATCH 5/5] KVM: x86: Set kvm_x86_ops only after
- ->hardware_setup() completes
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-References: <20200130001023.24339-1-sean.j.christopherson@intel.com>
- <20200130001023.24339-6-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <44e0c550-7dcc-bfed-07c4-907e61d476a1@redhat.com>
-Date:   Thu, 30 Jan 2020 06:44:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=KJTZMhxSYbKog3q3QunAoOxfir5NefkAvc0Wc1DUW10=;
+        b=iSnF6CSr4W2TDKQxC8nYNapeKSbsI+S8pCxm2NBhtls0xqys0YY7EYt2V4lEzj6YY1
+         /9zR/VU1PxN+IybfJT+rQwNmIJik7eLwn96Zbws84sMFTeDdogW94WBeyzyYs39upFFs
+         TilfvU53uwIxp5Sc5AxIyyH8G+VsGFwx/y5209EDC/14r6w7HaXOWXeGzVLpfKFQp19V
+         be5GeRrB9g9WPSKrBAzwgo3BZtXBTS6DNADcG8+q09XffXOOPxI19cujTsoU9Rk0KN7+
+         ZjBY4M24mJyY7Rt3B7xQ6CbPFW7jsRD99Si/YrDgkgdOCeG+yUeSRWRuJ5d7naDsyRPy
+         9oYw==
+X-Gm-Message-State: APjAAAUKc6OjI4xi4wlEd0QWWC34Eqzua3Y7TkjfxJDU+Ts/mPM3X0UV
+        FSjWGmhqA16u8gNVjo5dcJoPFMsaBVgeqct/OHEOlcdY
+X-Google-Smtp-Source: APXvYqzU6EnC7YHgL2F7mwFlcDxztnSIuRfb1ysW8NFlma5PTb/286Ic7T5SPPnmNtSmeN6QDRLD/enlfeQDz9RpKls=
+X-Received: by 2002:ac8:145:: with SMTP id f5mr3618660qtg.194.1580373818543;
+ Thu, 30 Jan 2020 00:43:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200130001023.24339-6-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From:   Stefan Bauer <cubewerk@gmail.com>
+Date:   Thu, 30 Jan 2020 09:43:27 +0100
+Message-ID: <CAJWMQtBraWfbDQuVXMsmvG9QN3+i18sv7g1qWe1jQotBBBLpWA@mail.gmail.com>
+Subject: Node not reachable on vlan, after vlan is used by virtual machine
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/01/20 01:10, Sean Christopherson wrote:
-> Set kvm_x86_ops with the vendor's ops only after ->hardware_setup()
-> completes to "prevent" using kvm_x86_ops before they are ready, i.e. to
-> generate a null pointer fault instead of silently consuming unconfigured
-> state.
+Hi,
 
-What about even copying kvm_x86_ops by value, so that they can be
-accessed with "kvm_x86_ops.callback()" and save one memory access?
+i have a strange behavior on my linux system and can not explain it.
+Help would be greatly appreciated.
 
-Paolo
+host proxmox1 with a trunk/bond interface to Cisco-Switch.
+proxmox1 has mgmt in vlan100 on same bond:
 
+bond1.100@bond1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc
+noqueue state UP group default qlen 1000
+link/ether 3c:fd:fc:9a:7d:cc brd ff:ff:ff:ff:ff:ff
+inet 10.64.253.203/24 brd 10.64.253.255 scope global bond1.100
+
+All is fine and proxmox1 is reachable from other machines through vlan 100.
+
+The routing between the vlans, is done by a pfsense firewall on
+_another_ proxmox-node.
+
+Now instantly when i move the firewall to proxmox1-host, the proxmox1
+host is not reachable through mgmt-vlan 100 anymore.
+
+Ideas?
+
+Thank you
