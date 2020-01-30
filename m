@@ -2,45 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB57614DAC3
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 13:39:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23F7B14DAC9
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 13:39:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727027AbgA3MjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 07:39:01 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27640 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726948AbgA3MjB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 07:39:01 -0500
+        id S1727110AbgA3Mjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 07:39:42 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29420 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727089AbgA3Mjm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 07:39:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580387939;
+        s=mimecast20190719; t=1580387981;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=yT8Rpbh0wWsq9joOARErUJEQvL/SkU+LSX6lnujvpX8=;
-        b=W8djrSBIXhTp7e0fhU5RwWQTXW6T9+aooZPanoDQMZb9ZLxiuIfjNxns9bJQNadLT90m7K
-        zb11md5SNLoYo3qTHmWK5XNKrMNaxChSuR4aecB8BbWxO2LRqy7cZLIDOn8Mg6fnzJQlUC
-        MdMaA7Iy2YZY5SvlW+UJ4WhJJgY3rhQ=
+        bh=RFtwoQTH1jGshj9rS16EmuQQvtSs5Hv5LHVvFBDGejs=;
+        b=SWaFWsxADp5KQ7kD/rFTWi0dahfmeddiL0ZrtmSC4WaPIjhSL/QqftqP0gYLNfY3ESo8TC
+        m7ajHaaFybdqhUUBV8g9Ahe1f3rH9w++dmNHLIpbnL6Miw9MsWOm588R6GA+H5VBVz81hz
+        dGCW2Hl3rMp2UycHDuKqj0BYzdPsL2E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297--1p4fRIlPvmlHG6IQF1J4A-1; Thu, 30 Jan 2020 07:38:57 -0500
-X-MC-Unique: -1p4fRIlPvmlHG6IQF1J4A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-7-T8ie6nCIM3ejchA1tt8KUA-1; Thu, 30 Jan 2020 07:39:36 -0500
+X-MC-Unique: T8ie6nCIM3ejchA1tt8KUA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E6FB100550E;
-        Thu, 30 Jan 2020 12:38:56 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18761190D34B;
+        Thu, 30 Jan 2020 12:39:35 +0000 (UTC)
 Received: from [10.36.117.219] (ovpn-117-219.ams2.redhat.com [10.36.117.219])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 703D587B14;
-        Thu, 30 Jan 2020 12:38:54 +0000 (UTC)
-Subject: Re: [PATCH v2] KVM: s390: do not clobber user space registers during
- guest reset/store status
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     cohuck@redhat.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, stable@kernel.org, thuth@redhat.com
-References: <7d031d9c-e2f6-73bf-c4d6-6e2753d9102f@de.ibm.com>
- <1580384552-7964-1-git-send-email-borntraeger@de.ibm.com>
- <8120c228-2935-07d4-38b9-3b9c5cb8b92c@de.ibm.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A796A5C290;
+        Thu, 30 Jan 2020 12:39:31 +0000 (UTC)
+Subject: Re: [PATCH v9 1/6] KVM: s390: do not clobber registers during guest
+ reset/store status
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+References: <20200130123434.68129-1-frankja@linux.ibm.com>
+ <20200130123434.68129-2-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -86,83 +85,61 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <e60fae4b-0c9a-18a7-309b-a38d4c169b04@redhat.com>
-Date:   Thu, 30 Jan 2020 13:38:53 +0100
+Message-ID: <a8d55fbd-402d-6ee5-b0b4-a47b32b8f0cf@redhat.com>
+Date:   Thu, 30 Jan 2020 13:39:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <8120c228-2935-07d4-38b9-3b9c5cb8b92c@de.ibm.com>
+In-Reply-To: <20200130123434.68129-2-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30.01.20 13:01, Christian Borntraeger wrote:
+On 30.01.20 13:34, Janosch Frank wrote:
+> From: Christian Borntraeger <borntraeger@de.ibm.com>
 > 
+> The initial CPU reset clobbers the userspace fpc and the store status
+> ioctl clobbers the guest acrs + fpr.  As these calls are only done via
+> ioctl (and not via vcpu_run), no CPU context is loaded, so we can (and
+> must) act directly on the sync regs, not on the thread context.
 > 
-> On 30.01.20 12:42, Christian Borntraeger wrote:
->> The two ioctls for initial CPU reset and store status currently clobber
->> the userspace fpc and potentially access registers. This was an
->> oversight during a fixup for the lazy fpu reloading rework.  The reset
->> calls are only done from userspace ioctls.  No CPU context is loaded, so
->> we can (and must) act directly on the sync regs, not on the thread
->> context. Otherwise the fpu restore call will restore the zeroes fpc to
->> userspace.
+> Cc: stable@kernel.org
+> Fixes: e1788bb995be ("KVM: s390: handle floating point registers in the run ioctl not in vcpu_put/load")
+> Fixes: 31d8b8d41a7e ("KVM: s390: handle access registers in the run ioctl not in vcpu_put/load")
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 > 
-> New patch description:
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index c059b86aacd4..328dee666b24 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2824,8 +2824,7 @@ static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
+>  					CR14_UNUSED_33 |
+>  					CR14_EXTERNAL_DAMAGE_SUBMASK;
+> -	/* make sure the new fpc will be lazily loaded */
+> -	save_fpu_regs();
+> +	vcpu->run->s.regs.fpc = 0;
+>  	current->thread.fpu.fpc = 0;
+>  	vcpu->arch.sie_block->gbea = 1;
+>  	vcpu->arch.sie_block->pp = 0;
+> @@ -4343,7 +4342,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  	switch (ioctl) {
+>  	case KVM_S390_STORE_STATUS:
+>  		idx = srcu_read_lock(&vcpu->kvm->srcu);
+> -		r = kvm_s390_vcpu_store_status(vcpu, arg);
+> +		r = kvm_s390_store_status_unloaded(vcpu, arg);
+>  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>  		break;
+>  	case KVM_S390_SET_INITIAL_PSW: {
 > 
->     KVM: s390: do not clobber registers during guest reset/store status
->     
->     The initial CPU reset clobbers the userspace fpc and the store status
->     ioctl clobbers the guest acrs + fpr.  As these calls are only done via
->     ioctl (and not via vcpu_run), no CPU context is loaded, so we can (and
->     must) act directly on the sync regs, not on the thread context.
->     
->     Cc: stable@kernel.org
->     Fixes: e1788bb995be ("KVM: s390: handle floating point registers in the run ioctl not in vcpu_put/load")
->     Fixes: 31d8b8d41a7e ("KVM: s390: handle access registers in the run ioctl not in vcpu_put/load")
->     Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> 
->>
->> Cc: stable@kernel.org
->> Fixes: e1788bb995be ("KVM: s390: handle floating point registers in the run ioctl not in vcpu_put/load")
->> Fixes: 31d8b8d41a7e ("KVM: s390: handle access registers in the run ioctl not in vcpu_put/load")
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  arch/s390/kvm/kvm-s390.c | 5 ++---
->>  1 file changed, 2 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index c059b86..936415b 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -2824,8 +2824,7 @@ static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
->>  	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
->>  					CR14_UNUSED_33 |
->>  					CR14_EXTERNAL_DAMAGE_SUBMASK;
->> -	/* make sure the new fpc will be lazily loaded */
->> -	save_fpu_regs();
->> +	vcpu->run->s.regs.fpc = 0;
->>  	current->thread.fpu.fpc = 0;
->>  	vcpu->arch.sie_block->gbea = 1;
->>  	vcpu->arch.sie_block->pp = 0;
->> @@ -4343,7 +4342,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->>  	switch (ioctl) {
->>  	case KVM_S390_STORE_STATUS:
->>  		idx = srcu_read_lock(&vcpu->kvm->srcu);
->> -		r = kvm_s390_vcpu_store_status(vcpu, arg);
->> +		r = kvm_s390_vcpu_store_status_unloaded(vcpu, arg);
->>  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
->>  		break;
->>  	case KVM_S390_SET_INITIAL_PSW: {
->>
-> 
-
-With new description + fixed up call
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
