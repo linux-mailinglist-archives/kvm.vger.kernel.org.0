@@ -2,48 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36F1D14D96A
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 12:01:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A569714D979
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 12:07:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727077AbgA3LBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 06:01:24 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29862 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726902AbgA3LBY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 06:01:24 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00UB0HQA040962
-        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 06:01:23 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xubct955d-1
+        id S1726893AbgA3LHy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 06:07:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23946 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726902AbgA3LHy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 06:07:54 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00UB7FuS130359
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 06:07:53 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xu6ss81vp-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 06:01:23 -0500
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2020 06:07:52 -0500
 Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 30 Jan 2020 11:01:21 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 30 Jan 2020 11:07:50 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 30 Jan 2020 11:01:18 -0000
+        Thu, 30 Jan 2020 11:07:47 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00UB1Hvh49152052
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00UB7k4D60424238
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Jan 2020 11:01:17 GMT
+        Thu, 30 Jan 2020 11:07:46 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9395152054;
-        Thu, 30 Jan 2020 11:01:17 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D617652051;
+        Thu, 30 Jan 2020 11:07:46 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.41])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5043652051;
-        Thu, 30 Jan 2020 11:01:17 +0000 (GMT)
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 972D45204F;
+        Thu, 30 Jan 2020 11:07:46 +0000 (GMT)
 Subject: Re: [PATCH/FIXUP FOR STABLE BEFORE THIS SERIES] KVM: s390: do not
  clobber user space fpc during guest reset
-To:     David Hildenbrand <david@redhat.com>, frankja@linux.ibm.com
-Cc:     cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        thuth@redhat.com, stable@kernel.org
+To:     Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     frankja@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, stable@kernel.org
 References: <20200129200312.3200-2-frankja@linux.ibm.com>
  <1580374500-31247-1-git-send-email-borntraeger@de.ibm.com>
  <7b40856d-8153-ad3f-bea8-110fa6e1aea6@redhat.com>
+ <20200130113941.78e4bf2e.cohuck@redhat.com>
+ <336905ea-dc59-3118-9329-fc29c8386c52@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -88,25 +91,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Thu, 30 Jan 2020 12:01:17 +0100
+Date:   Thu, 30 Jan 2020 12:07:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <7b40856d-8153-ad3f-bea8-110fa6e1aea6@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <336905ea-dc59-3118-9329-fc29c8386c52@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20013011-4275-0000-0000-0000039C5FEF
+x-cbid: 20013011-0020-0000-0000-000003A57119
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20013011-4276-0000-0000-000038B07D72
-Message-Id: <7711b8a0-f126-aedd-f22b-748fa62cd437@de.ibm.com>
+x-cbparentid: 20013011-0021-0000-0000-000021FD25FD
+Message-Id: <5231e3da-e705-66f8-7426-fdf51cd4600e@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-01-30_03:2020-01-28,2020-01-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=935
- clxscore=1015 adultscore=0 phishscore=0 suspectscore=0 malwarescore=0
- priorityscore=1501 spamscore=0 mlxscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ priorityscore=1501 phishscore=0 lowpriorityscore=0 suspectscore=0
+ mlxscore=0 adultscore=0 impostorscore=0 malwarescore=0 mlxlogscore=999
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1911200001 definitions=main-2001300080
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -115,43 +118,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 30.01.20 10:49, David Hildenbrand wrote:
-> On 30.01.20 09:55, Christian Borntraeger wrote:
->> The initial CPU reset currently clobbers the userspace fpc. This was an
->> oversight during a fixup for the lazy fpu reloading rework.  The reset
->> calls are only done from userspace ioctls. No CPU context is loaded, so
->> we can (and must) act directly on the sync regs, not on the thread
->> context. Otherwise the fpu restore call will restore the zeroes fpc to
->> userspace.
+On 30.01.20 11:56, Thomas Huth wrote:
+> On 30/01/2020 11.39, Cornelia Huck wrote:
+>> On Thu, 30 Jan 2020 10:49:35 +0100
+>> David Hildenbrand <david@redhat.com> wrote:
 >>
->> Cc: stable@kernel.org
->> Fixes: 9abc2a08a7d6 ("KVM: s390: fix memory overwrites when vx is disabled")
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  arch/s390/kvm/kvm-s390.c | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>> On 30.01.20 09:55, Christian Borntraeger wrote:
+>>>> The initial CPU reset currently clobbers the userspace fpc. This was an
+>>>> oversight during a fixup for the lazy fpu reloading rework.  The reset
+>>>> calls are only done from userspace ioctls. No CPU context is loaded, so
+>>>> we can (and must) act directly on the sync regs, not on the thread
+>>>> context. Otherwise the fpu restore call will restore the zeroes fpc to
+>>>> userspace.
+>>>>
+>>>> Cc: stable@kernel.org
+>>>> Fixes: 9abc2a08a7d6 ("KVM: s390: fix memory overwrites when vx is disabled")
+>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>> ---
+>>>>  arch/s390/kvm/kvm-s390.c | 3 +--
+>>>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>>> index c059b86..eb789cd 100644
+>>>> --- a/arch/s390/kvm/kvm-s390.c
+>>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>>> @@ -2824,8 +2824,7 @@ static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
+>>>>  	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
+>>>>  					CR14_UNUSED_33 |
+>>>>  					CR14_EXTERNAL_DAMAGE_SUBMASK;
+>>>> -	/* make sure the new fpc will be lazily loaded */
+>>>> -	save_fpu_regs();
+>>>> +	vcpu->run->s.regs.fpc = 0;
+>>>>  	current->thread.fpu.fpc = 0;
+>>>>  	vcpu->arch.sie_block->gbea = 1;
+>>>>  	vcpu->arch.sie_block->pp = 0;
+>>>>   
+>>>
+>>> kvm_arch_vcpu_ioctl() does a vcpu_load(vcpu), followed by the call to
+>>> kvm_arch_vcpu_ioctl_initial_reset(), followed by a vcpu_put().
+>>>
+>>> What am I missing?
 >>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index c059b86..eb789cd 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -2824,8 +2824,7 @@ static void kvm_s390_vcpu_initial_reset(struct kvm_vcpu *vcpu)
->>  	vcpu->arch.sie_block->gcr[14] = CR14_UNUSED_32 |
->>  					CR14_UNUSED_33 |
->>  					CR14_EXTERNAL_DAMAGE_SUBMASK;
->> -	/* make sure the new fpc will be lazily loaded */
->> -	save_fpu_regs();
->> +	vcpu->run->s.regs.fpc = 0;
->>  	current->thread.fpu.fpc = 0;
->>  	vcpu->arch.sie_block->gbea = 1;
->>  	vcpu->arch.sie_block->pp = 0;
->>
+>> I have been staring at this patch for some time now, and I fear I'm
+>> missing something as well. Can we please get more explanation?
 > 
-> kvm_arch_vcpu_ioctl() does a vcpu_load(vcpu), followed by the call to
-> kvm_arch_vcpu_ioctl_initial_reset(), followed by a vcpu_put().
-> 
-> What am I missing?
+> Could we please get a test for this issue in the kvm selftests, too?
+> I.e. host sets a value in its FPC, then calls the INITIAL_RESET ioctl
+> and then checks that the value in its FPC is still there?
 
-vcpu_load/put does no longer reload the registers lazily. We moved that out into the
-vcpu_run ioctl itself. (this avoids register reloading during schedule).
+Yes, that will come as a later addon patch. (But I am still going to apply
+this series soon and do not wait for that. I have a private hack in qemu that
+does this checking, but this test code is too ugly to see the world).
 
