@@ -2,101 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8053A14DF23
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 17:30:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB23E14DF2F
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 17:32:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727276AbgA3QaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 11:30:01 -0500
-Received: from mga12.intel.com ([192.55.52.136]:18032 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727191AbgA3QaB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 11:30:01 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Jan 2020 08:30:01 -0800
-X-IronPort-AV: E=Sophos;i="5.70,382,1574150400"; 
-   d="scan'208";a="222842003"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.168.169]) ([10.249.168.169])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 30 Jan 2020 08:29:58 -0800
-Subject: Re: [PATCH 2/2] KVM: VMX: Extend VMX's #AC handding
-To:     Andy Lutomirski <luto@amacapital.net>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+        id S1727266AbgA3Qc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 11:32:57 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22563 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727191AbgA3Qc5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Jan 2020 11:32:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580401976;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=O+P0Tz8NZRB9Hi7OjfGryLokEBLJcJzSqJTk8bv6+vQ=;
+        b=J93ZCXZ9Y62z4ghXHy/a0w1cyUaoY5X/savmx2I22rXr64jAAkJVeDqym8nGgPC8O1/PYb
+        /zE+0U5foVN5204yQtWmYTMd9FO1aPW7NVS+XhX2afv6aNcdjSA6PRK/9c1BIgGZ3p0WbM
+        rPpxT8gawoATPYgsJwvCQeHMdDiTAH0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-71-Up64THfAPlK0--ObGnnmcA-1; Thu, 30 Jan 2020 11:32:49 -0500
+X-MC-Unique: Up64THfAPlK0--ObGnnmcA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6678018CA241;
+        Thu, 30 Jan 2020 16:32:47 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 94C525DA8C;
+        Thu, 30 Jan 2020 16:32:34 +0000 (UTC)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Richard Henderson <rth@twiddle.net>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Cleber Rosa <crosa@redhat.com>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Max Reitz <mreitz@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20200130121939.22383-3-xiaoyao.li@intel.com>
- <4A8E14B3-1914-4D0C-A43A-234717179408@amacapital.net>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <cf79eeeb-e107-bdff-13a8-c52288d0d123@intel.com>
-Date:   Fri, 31 Jan 2020 00:29:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+        kvm@vger.kernel.org
+Subject: [PATCH v2 00/12] python: Explicit usage of Python 3
+Date:   Thu, 30 Jan 2020 17:32:20 +0100
+Message-Id: <20200130163232.10446-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4A8E14B3-1914-4D0C-A43A-234717179408@amacapital.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/30/2020 11:18 PM, Andy Lutomirski wrote:
-> 
-> 
->> On Jan 30, 2020, at 4:24 AM, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->>
->> ﻿There are two types of #AC can be generated in Intel CPUs:
->> 1. legacy alignment check #AC;
->> 2. split lock #AC;
->>
->> Legacy alignment check #AC can be injected to guest if guest has enabled
->> alignemnet check.
->>
->> When host enables split lock detection, i.e., split_lock_detect!=off,
->> guest will receive an unexpected #AC when there is a split_lock happens in
->> guest since KVM doesn't virtualize this feature to guest.
->>
->> Since the old guests lack split_lock #AC handler and may have split lock
->> buges. To make guest survive from split lock, applying the similar policy
->> as host's split lock detect configuration:
->> - host split lock detect is sld_warn:
->>    warning the split lock happened in guest, and disabling split lock
->>    detect around VM-enter;
->> - host split lock detect is sld_fatal:
->>    forwarding #AC to userspace. (Usually userspace dump the #AC
->>    exception and kill the guest).
-> 
-> A correct userspace implementation should, with a modern guest kernel, forward the exception. Otherwise you’re introducing a DoS into the guest if the guest kernel is fine but guest userspace is buggy.
+Hello,
 
-To prevent DoS in guest, the better solution is virtualizing and 
-advertising this feature to guest, so guest can explicitly enable it by 
-setting split_lock_detect=fatal, if it's a latest linux guest.
+These are mechanical sed patches used to convert the
+code base to Python 3, as suggested on this thread:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg675024.html
 
-However, it's another topic, I'll send out the patches later.
+Since v1:
+- new checkpatch.pl patch
+- addressed Kevin and Vladimir review comments
+- added R-b/A-b tags
 
-> What’s the intended behavior here?
-> 
-It's for old guests. Below I quote what Paolo said in
-https://lore.kernel.org/kvm/57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com/
+Regards,
 
-"So for an old guest, as soon as the guest kernel happens to do a split 
-lock, it gets an unexpected #AC and crashes and burns.  And then, after 
-much googling and gnashing of teeth, people proceed to disable split 
-lock detection.
+Phil.
 
-(Old guests are the common case: you're a cloud provider and your
-customers run old stuff; it's a workstation and you want to play that
-game that requires an old version of Windows; etc.).
+Philippe Mathieu-Daud=C3=A9 (12):
+  scripts/checkpatch.pl: Only allow Python 3 interpreter
+  tests/qemu-iotests/check: Allow use of python3 interpreter
+  tests/qemu-iotests: Explicit usage of Python 3 (scripts with __main__)
+  tests: Explicit usage of Python 3
+  scripts: Explicit usage of Python 3 (scripts with __main__)
+  scripts/minikconf: Explicit usage of Python 3
+  tests/acceptance: Remove shebang header
+  scripts/tracetool: Remove shebang header
+  tests/vm: Remove shebang header
+  tests/qemu-iotests: Explicit usage of Python3 (scripts without
+    __main__)
+  scripts: Explicit usage of Python 3 (scripts without __main__)
+  tests/qemu-iotests/check: Only check for Python 3 interpreter
 
-To save them the googling and gnashing of teeth, I guess we can do a
-pr_warn_ratelimited on the first split lock encountered by a guest.  (It
-has to be ratelimited because userspace could create an arbitrary amount
-of guests to spam the kernel logs).  But the end result is the same,
-split lock detection is disabled by the user."
+ scripts/analyse-9p-simpletrace.py                | 2 +-
+ scripts/analyse-locks-simpletrace.py             | 2 +-
+ scripts/checkpatch.pl                            | 6 ++++++
+ scripts/decodetree.py                            | 2 +-
+ scripts/device-crash-test                        | 2 +-
+ scripts/kvm/kvm_flightrecorder                   | 2 +-
+ scripts/minikconf.py                             | 1 +
+ scripts/qapi-gen.py                              | 2 +-
+ scripts/qmp/qemu-ga-client                       | 2 +-
+ scripts/qmp/qmp                                  | 2 +-
+ scripts/qmp/qmp-shell                            | 2 +-
+ scripts/qmp/qom-fuse                             | 2 +-
+ scripts/render_block_graph.py                    | 2 +-
+ scripts/replay-dump.py                           | 2 +-
+ scripts/simpletrace.py                           | 2 +-
+ scripts/tracetool.py                             | 2 +-
+ scripts/tracetool/__init__.py                    | 1 -
+ scripts/tracetool/backend/__init__.py            | 1 -
+ scripts/tracetool/backend/dtrace.py              | 1 -
+ scripts/tracetool/backend/ftrace.py              | 1 -
+ scripts/tracetool/backend/log.py                 | 1 -
+ scripts/tracetool/backend/simple.py              | 1 -
+ scripts/tracetool/backend/syslog.py              | 1 -
+ scripts/tracetool/backend/ust.py                 | 1 -
+ scripts/tracetool/format/__init__.py             | 1 -
+ scripts/tracetool/format/c.py                    | 1 -
+ scripts/tracetool/format/d.py                    | 1 -
+ scripts/tracetool/format/h.py                    | 1 -
+ scripts/tracetool/format/log_stap.py             | 1 -
+ scripts/tracetool/format/simpletrace_stap.py     | 1 -
+ scripts/tracetool/format/stap.py                 | 1 -
+ scripts/tracetool/format/tcg_h.py                | 1 -
+ scripts/tracetool/format/tcg_helper_c.py         | 1 -
+ scripts/tracetool/format/tcg_helper_h.py         | 1 -
+ scripts/tracetool/format/tcg_helper_wrapper_h.py | 1 -
+ scripts/tracetool/format/ust_events_c.py         | 1 -
+ scripts/tracetool/format/ust_events_h.py         | 1 -
+ scripts/tracetool/transform.py                   | 1 -
+ scripts/tracetool/vcpu.py                        | 1 -
+ scripts/vmstate-static-checker.py                | 2 +-
+ tests/acceptance/virtio_seg_max_adjust.py        | 1 -
+ tests/acceptance/x86_cpu_model_versions.py       | 1 -
+ tests/docker/travis.py                           | 2 +-
+ tests/qapi-schema/test-qapi.py                   | 2 +-
+ tests/qemu-iotests/030                           | 2 +-
+ tests/qemu-iotests/040                           | 2 +-
+ tests/qemu-iotests/041                           | 2 +-
+ tests/qemu-iotests/044                           | 2 +-
+ tests/qemu-iotests/045                           | 2 +-
+ tests/qemu-iotests/055                           | 2 +-
+ tests/qemu-iotests/056                           | 2 +-
+ tests/qemu-iotests/057                           | 2 +-
+ tests/qemu-iotests/065                           | 2 +-
+ tests/qemu-iotests/093                           | 2 +-
+ tests/qemu-iotests/096                           | 2 +-
+ tests/qemu-iotests/118                           | 2 +-
+ tests/qemu-iotests/124                           | 2 +-
+ tests/qemu-iotests/129                           | 2 +-
+ tests/qemu-iotests/132                           | 2 +-
+ tests/qemu-iotests/136                           | 2 +-
+ tests/qemu-iotests/139                           | 2 +-
+ tests/qemu-iotests/147                           | 2 +-
+ tests/qemu-iotests/148                           | 2 +-
+ tests/qemu-iotests/149                           | 2 +-
+ tests/qemu-iotests/151                           | 2 +-
+ tests/qemu-iotests/152                           | 2 +-
+ tests/qemu-iotests/155                           | 2 +-
+ tests/qemu-iotests/163                           | 2 +-
+ tests/qemu-iotests/165                           | 2 +-
+ tests/qemu-iotests/169                           | 2 +-
+ tests/qemu-iotests/194                           | 2 +-
+ tests/qemu-iotests/196                           | 2 +-
+ tests/qemu-iotests/199                           | 2 +-
+ tests/qemu-iotests/202                           | 2 +-
+ tests/qemu-iotests/203                           | 2 +-
+ tests/qemu-iotests/205                           | 2 +-
+ tests/qemu-iotests/206                           | 2 +-
+ tests/qemu-iotests/207                           | 2 +-
+ tests/qemu-iotests/208                           | 2 +-
+ tests/qemu-iotests/209                           | 2 +-
+ tests/qemu-iotests/210                           | 2 +-
+ tests/qemu-iotests/211                           | 2 +-
+ tests/qemu-iotests/212                           | 2 +-
+ tests/qemu-iotests/213                           | 2 +-
+ tests/qemu-iotests/216                           | 2 +-
+ tests/qemu-iotests/218                           | 2 +-
+ tests/qemu-iotests/219                           | 2 +-
+ tests/qemu-iotests/222                           | 2 +-
+ tests/qemu-iotests/224                           | 2 +-
+ tests/qemu-iotests/228                           | 2 +-
+ tests/qemu-iotests/234                           | 2 +-
+ tests/qemu-iotests/235                           | 2 +-
+ tests/qemu-iotests/236                           | 2 +-
+ tests/qemu-iotests/237                           | 2 +-
+ tests/qemu-iotests/238                           | 2 +-
+ tests/qemu-iotests/242                           | 2 +-
+ tests/qemu-iotests/245                           | 2 +-
+ tests/qemu-iotests/246                           | 2 +-
+ tests/qemu-iotests/248                           | 2 +-
+ tests/qemu-iotests/254                           | 2 +-
+ tests/qemu-iotests/255                           | 2 +-
+ tests/qemu-iotests/256                           | 2 +-
+ tests/qemu-iotests/257                           | 2 +-
+ tests/qemu-iotests/258                           | 2 +-
+ tests/qemu-iotests/260                           | 2 +-
+ tests/qemu-iotests/262                           | 2 +-
+ tests/qemu-iotests/264                           | 2 +-
+ tests/qemu-iotests/266                           | 2 +-
+ tests/qemu-iotests/277                           | 2 +-
+ tests/qemu-iotests/280                           | 2 +-
+ tests/qemu-iotests/281                           | 2 +-
+ tests/qemu-iotests/check                         | 2 +-
+ tests/qemu-iotests/nbd-fault-injector.py         | 2 +-
+ tests/qemu-iotests/qcow2.py                      | 2 +-
+ tests/qemu-iotests/qed.py                        | 2 +-
+ tests/vm/basevm.py                               | 1 -
+ tests/vm/centos                                  | 2 +-
+ tests/vm/fedora                                  | 2 +-
+ tests/vm/freebsd                                 | 2 +-
+ tests/vm/netbsd                                  | 2 +-
+ tests/vm/openbsd                                 | 2 +-
+ tests/vm/ubuntu.i386                             | 2 +-
+ 122 files changed, 101 insertions(+), 120 deletions(-)
+ mode change 100755 =3D> 100644 tests/acceptance/virtio_seg_max_adjust.py
+ mode change 100755 =3D> 100644 tests/vm/basevm.py
 
-
+--=20
+2.21.1
 
