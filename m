@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3300A14DD4F
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 15:51:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CDF614DD50
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2020 15:52:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727297AbgA3OvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 09:51:25 -0500
-Received: from foss.arm.com ([217.140.110.172]:53962 "EHLO foss.arm.com"
+        id S1727315AbgA3OwC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 09:52:02 -0500
+Received: from foss.arm.com ([217.140.110.172]:53976 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727107AbgA3OvZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 09:51:25 -0500
+        id S1727240AbgA3OwB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 09:52:01 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42D8A31B;
-        Thu, 30 Jan 2020 06:51:24 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 644F931B;
+        Thu, 30 Jan 2020 06:52:00 -0800 (PST)
 Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 443CB3F68E;
-        Thu, 30 Jan 2020 06:51:23 -0800 (PST)
-Date:   Thu, 30 Jan 2020 14:51:20 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 654553F68E;
+        Thu, 30 Jan 2020 06:51:59 -0800 (PST)
+Date:   Thu, 30 Jan 2020 14:51:56 +0000
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     kvm@vger.kernel.org, will@kernel.org,
         julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
         lorenzo.pieralisi@arm.com, maz@kernel.org
-Subject: Re: [PATCH v2 kvmtool 15/30] virtio: Don't ignore initialization
- failures
-Message-ID: <20200130145120.0cad4a14@donnerap.cambridge.arm.com>
-In-Reply-To: <20200123134805.1993-16-alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2 kvmtool 16/30] Don't ignore errors registering a
+ device, ioport or mmio emulation
+Message-ID: <20200130145156.3437ea6c@donnerap.cambridge.arm.com>
+In-Reply-To: <20200123134805.1993-17-alexandru.elisei@arm.com>
 References: <20200123134805.1993-1-alexandru.elisei@arm.com>
-        <20200123134805.1993-16-alexandru.elisei@arm.com>
+        <20200123134805.1993-17-alexandru.elisei@arm.com>
 Organization: ARM
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
@@ -39,373 +39,371 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jan 2020 13:47:50 +0000
+On Thu, 23 Jan 2020 13:47:51 +0000
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
 Hi,
 
-> Don't ignore an error in the bus specific initialization function in
-> virtio_init; don't ignore the result of virtio_init; and don't return 0
-> in virtio_blk__init and virtio_scsi__init when we encounter an error.
-> Hopefully this will save some developer's time debugging faulty virtio
-> devices in a guest.
-
-Seems like the right thing to do, but I was wondering how you triggered this? AFAICS virtio_init only fails when calloc() fails or you pass an illegal transport, with the latter looking like being hard coded to one of the two supported.
-
-One minor thing below ...
-
+> An error returned by device__register, kvm__register_mmio and
+> ioport__register means that the device will
+> not be emulated properly. Annotate the functions with __must_check, so we
+> get a compiler warning when this error is ignored.
 > 
-> To take advantage of the cleanup function virtio_blk__exit, we have
-> moved appending the new device to the list before the call to
-> virtio_init.
-> 
-> To safeguard against this in the future, virtio_init has been annoted
-> with the compiler attribute warn_unused_result.
+> And fix several instances where the caller returns 0 even if the
+> function failed.
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Looks alright, one minor nit below, with that fixed:
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
 > ---
->  include/kvm/kvm.h        |  1 +
->  include/kvm/virtio.h     |  7 ++++---
->  include/linux/compiler.h |  2 +-
->  virtio/9p.c              |  9 ++++++---
->  virtio/balloon.c         | 10 +++++++---
->  virtio/blk.c             | 14 +++++++++-----
->  virtio/console.c         | 11 ++++++++---
->  virtio/core.c            |  9 +++++----
->  virtio/net.c             | 32 ++++++++++++++++++--------------
->  virtio/scsi.c            | 14 +++++++++-----
->  10 files changed, 68 insertions(+), 41 deletions(-)
+>  arm/ioport.c          |  3 +-
+>  hw/i8042.c            | 12 ++++++--
+>  hw/vesa.c             |  4 ++-
+>  include/kvm/devices.h |  3 +-
+>  include/kvm/ioport.h  |  6 ++--
+>  include/kvm/kvm.h     |  6 ++--
+>  ioport.c              | 23 ++++++++-------
+>  mips/kvm.c            |  3 +-
+>  powerpc/ioport.c      |  3 +-
+>  virtio/mmio.c         | 13 +++++++--
+>  x86/ioport.c          | 66 ++++++++++++++++++++++++++++++++-----------
+>  11 files changed, 100 insertions(+), 42 deletions(-)
 > 
-> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> index 7a738183d67a..c6dc6ef72d11 100644
-> --- a/include/kvm/kvm.h
-> +++ b/include/kvm/kvm.h
-> @@ -8,6 +8,7 @@
+> diff --git a/arm/ioport.c b/arm/ioport.c
+> index bdd30b6fe812..2f0feb9ab69f 100644
+> --- a/arm/ioport.c
+> +++ b/arm/ioport.c
+> @@ -1,8 +1,9 @@
+>  #include "kvm/ioport.h"
+>  #include "kvm/irq.h"
 >  
->  #include <stdbool.h>
+> -void ioport__setup_arch(struct kvm *kvm)
+> +int ioport__setup_arch(struct kvm *kvm)
+>  {
+> +	return 0;
+>  }
+>  
+>  void ioport__map_irq(u8 *irq)
+> diff --git a/hw/i8042.c b/hw/i8042.c
+> index 2d8c96e9c7e6..37a99a2dc6b8 100644
+> --- a/hw/i8042.c
+> +++ b/hw/i8042.c
+> @@ -349,10 +349,18 @@ static struct ioport_operations kbd_ops = {
+>  
+>  int kbd__init(struct kvm *kvm)
+>  {
+> +	int r;
+> +
+>  	kbd_reset();
+>  	state.kvm = kvm;
+> -	ioport__register(kvm, I8042_DATA_REG, &kbd_ops, 2, NULL);
+> -	ioport__register(kvm, I8042_COMMAND_REG, &kbd_ops, 2, NULL);
+> +	r = ioport__register(kvm, I8042_DATA_REG, &kbd_ops, 2, NULL);
+> +	if (r < 0)
+> +		return r;
+> +	r = ioport__register(kvm, I8042_COMMAND_REG, &kbd_ops, 2, NULL);
+> +	if (r < 0) {
+> +		ioport__unregister(kvm, I8042_DATA_REG);
+> +		return r;
+> +	}
+>  
+>  	return 0;
+>  }
+> diff --git a/hw/vesa.c b/hw/vesa.c
+> index d8d91aa9c873..b92cc990b730 100644
+> --- a/hw/vesa.c
+> +++ b/hw/vesa.c
+> @@ -70,7 +70,9 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>  
+>  	vesa_base_addr			= (u16)r;
+>  	vesa_pci_device.bar[0]		= cpu_to_le32(vesa_base_addr | PCI_BASE_ADDRESS_SPACE_IO);
+> -	device__register(&vesa_device);
+> +	r = device__register(&vesa_device);
+> +	if (r < 0)
+> +		return ERR_PTR(r);
+>  
+>  	mem = mmap(NULL, VESA_MEM_SIZE, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
+>  	if (mem == MAP_FAILED)
+> diff --git a/include/kvm/devices.h b/include/kvm/devices.h
+> index 405f19521977..e445db6f56b1 100644
+> --- a/include/kvm/devices.h
+> +++ b/include/kvm/devices.h
+> @@ -3,6 +3,7 @@
+>  
+>  #include <linux/rbtree.h>
 >  #include <linux/types.h>
 > +#include <linux/compiler.h>
->  #include <time.h>
->  #include <signal.h>
->  #include <sys/prctl.h>
-> diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-> index 19b913732cd5..3a311f54f2a5 100644
-> --- a/include/kvm/virtio.h
-> +++ b/include/kvm/virtio.h
-> @@ -7,6 +7,7 @@
->  #include <linux/virtio_pci.h>
 >  
->  #include <linux/types.h>
-> +#include <linux/compiler.h>
->  #include <linux/virtio_config.h>
->  #include <sys/uio.h>
->  
-> @@ -204,9 +205,9 @@ struct virtio_ops {
->  	int (*reset)(struct kvm *kvm, struct virtio_device *vdev);
+>  enum device_bus_type {
+>  	DEVICE_BUS_PCI,
+> @@ -18,7 +19,7 @@ struct device_header {
+>  	struct rb_node		node;
 >  };
 >  
-> -int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
-> -		struct virtio_ops *ops, enum virtio_trans trans,
-> -		int device_id, int subsys_id, int class);
-> +int __must_check virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
-> +			     struct virtio_ops *ops, enum virtio_trans trans,
-> +			     int device_id, int subsys_id, int class);
->  int virtio_compat_add_message(const char *device, const char *config);
->  const char* virtio_trans_name(enum virtio_trans trans);
+> -int device__register(struct device_header *dev);
+> +int __must_check device__register(struct device_header *dev);
+>  void device__unregister(struct device_header *dev);
+>  struct device_header *device__find_dev(enum device_bus_type bus_type,
+>  				       u8 dev_num);
+> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+> index 8c86b7151f25..62a719327e3f 100644
+> --- a/include/kvm/ioport.h
+> +++ b/include/kvm/ioport.h
+> @@ -33,11 +33,11 @@ struct ioport_operations {
+>  							    enum irq_type));
+>  };
 >  
-> diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-> index 898420b81aec..a662ba0a5c68 100644
-> --- a/include/linux/compiler.h
-> +++ b/include/linux/compiler.h
-> @@ -14,7 +14,7 @@
->  #define __packed	__attribute__((packed))
->  #define __iomem
->  #define __force
-> -#define __must_check
-> +#define __must_check	__attribute__((warn_unused_result))
->  #define unlikely
+> -void ioport__setup_arch(struct kvm *kvm);
+> +int ioport__setup_arch(struct kvm *kvm);
+>  void ioport__map_irq(u8 *irq);
 >  
->  #endif
-> diff --git a/virtio/9p.c b/virtio/9p.c
-> index ac70dbc31207..b78f2b3f0e09 100644
-> --- a/virtio/9p.c
-> +++ b/virtio/9p.c
-> @@ -1551,11 +1551,14 @@ int virtio_9p_img_name_parser(const struct option *opt, const char *arg, int uns
->  int virtio_9p__init(struct kvm *kvm)
->  {
->  	struct p9_dev *p9dev;
-> +	int r;
->  
->  	list_for_each_entry(p9dev, &devs, list) {
-> -		virtio_init(kvm, p9dev, &p9dev->vdev, &p9_dev_virtio_ops,
-> -			    VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_9P,
-> -			    VIRTIO_ID_9P, PCI_CLASS_9P);
-> +		r = virtio_init(kvm, p9dev, &p9dev->vdev, &p9_dev_virtio_ops,
-> +				VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_9P,
-> +				VIRTIO_ID_9P, PCI_CLASS_9P);
-> +		if (r < 0)
-> +			return r;
->  	}
->  
->  	return 0;
-> diff --git a/virtio/balloon.c b/virtio/balloon.c
-> index 0bd16703dfee..8e8803fed607 100644
-> --- a/virtio/balloon.c
-> +++ b/virtio/balloon.c
-> @@ -264,6 +264,8 @@ struct virtio_ops bln_dev_virtio_ops = {
->  
->  int virtio_bln__init(struct kvm *kvm)
->  {
-> +	int r;
-> +
->  	if (!kvm->cfg.balloon)
->  		return 0;
->  
-> @@ -273,9 +275,11 @@ int virtio_bln__init(struct kvm *kvm)
->  	bdev.stat_waitfd	= eventfd(0, 0);
->  	memset(&bdev.config, 0, sizeof(struct virtio_balloon_config));
->  
-> -	virtio_init(kvm, &bdev, &bdev.vdev, &bln_dev_virtio_ops,
-> -		    VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_BLN,
-> -		    VIRTIO_ID_BALLOON, PCI_CLASS_BLN);
-> +	r = virtio_init(kvm, &bdev, &bdev.vdev, &bln_dev_virtio_ops,
-> +			VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_BLN,
-> +			VIRTIO_ID_BALLOON, PCI_CLASS_BLN);
-> +	if (r < 0)
-> +		return r;
->  
->  	if (compat_id == -1)
->  		compat_id = virtio_compat_add_message("virtio-balloon", "CONFIG_VIRTIO_BALLOON");
-> diff --git a/virtio/blk.c b/virtio/blk.c
-> index f267be1563dc..4d02d101af81 100644
-> --- a/virtio/blk.c
-> +++ b/virtio/blk.c
-> @@ -306,6 +306,7 @@ static struct virtio_ops blk_dev_virtio_ops = {
->  static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
->  {
->  	struct blk_dev *bdev;
-> +	int r;
->  
->  	if (!disk)
->  		return -EINVAL;
-> @@ -323,12 +324,14 @@ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
->  		.kvm			= kvm,
->  	};
->  
-> -	virtio_init(kvm, bdev, &bdev->vdev, &blk_dev_virtio_ops,
-> -		    VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_BLK,
-> -		    VIRTIO_ID_BLOCK, PCI_CLASS_BLK);
-> -
->  	list_add_tail(&bdev->list, &bdevs);
->  
-> +	r = virtio_init(kvm, bdev, &bdev->vdev, &blk_dev_virtio_ops,
-> +			VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_BLK,
-> +			VIRTIO_ID_BLOCK, PCI_CLASS_BLK);
-> +	if (r < 0)
-> +		return r;
-> +
->  	disk_image__set_callback(bdev->disk, virtio_blk_complete);
->  
->  	if (compat_id == -1)
-> @@ -359,7 +362,8 @@ int virtio_blk__init(struct kvm *kvm)
->  
->  	return 0;
->  cleanup:
-> -	return virtio_blk__exit(kvm);
-> +	virtio_blk__exit(kvm);
-> +	return r;
->  }
->  virtio_dev_init(virtio_blk__init);
->  
-> diff --git a/virtio/console.c b/virtio/console.c
-> index f1be02549222..e0b98df37965 100644
-> --- a/virtio/console.c
-> +++ b/virtio/console.c
-> @@ -230,12 +230,17 @@ static struct virtio_ops con_dev_virtio_ops = {
->  
->  int virtio_console__init(struct kvm *kvm)
->  {
-> +	int r;
-> +
->  	if (kvm->cfg.active_console != CONSOLE_VIRTIO)
->  		return 0;
->  
-> -	virtio_init(kvm, &cdev, &cdev.vdev, &con_dev_virtio_ops,
-> -		    VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_CONSOLE,
-> -		    VIRTIO_ID_CONSOLE, PCI_CLASS_CONSOLE);
-> +	r = virtio_init(kvm, &cdev, &cdev.vdev, &con_dev_virtio_ops,
-> +			VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_CONSOLE,
-> +			VIRTIO_ID_CONSOLE, PCI_CLASS_CONSOLE);
-> +	if (r < 0)
-> +		return r;
-> +
->  	if (compat_id == -1)
->  		compat_id = virtio_compat_add_message("virtio-console", "CONFIG_VIRTIO_CONSOLE");
->  
-> diff --git a/virtio/core.c b/virtio/core.c
-> index e10ec362e1ea..f5b3c07fc100 100644
-> --- a/virtio/core.c
-> +++ b/virtio/core.c
-> @@ -259,6 +259,7 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  		int device_id, int subsys_id, int class)
->  {
->  	void *virtio;
-> +	int r;
->  
->  	switch (trans) {
->  	case VIRTIO_PCI:
-> @@ -272,7 +273,7 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  		vdev->ops->init			= virtio_pci__init;
->  		vdev->ops->exit			= virtio_pci__exit;
->  		vdev->ops->reset		= virtio_pci__reset;
-> -		vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
-> +		r = vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
->  		break;
->  	case VIRTIO_MMIO:
->  		virtio = calloc(sizeof(struct virtio_mmio), 1);
-> @@ -285,13 +286,13 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  		vdev->ops->init			= virtio_mmio_init;
->  		vdev->ops->exit			= virtio_mmio_exit;
->  		vdev->ops->reset		= virtio_mmio_reset;
-> -		vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
-> +		r = vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
->  		break;
->  	default:
-> -		return -1;
-> +		r = -1;
->  	};
->  
-> -	return 0;
-> +	return r;
+> -int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
+> -			int count, void *param);
+> +int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
+> +				  int count, void *param);
+>  int ioport__unregister(struct kvm *kvm, u16 port);
+>  int ioport__init(struct kvm *kvm);
+>  int ioport__exit(struct kvm *kvm);
+> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> index c6dc6ef72d11..50119a8672eb 100644
+> --- a/include/kvm/kvm.h
+> +++ b/include/kvm/kvm.h
+> @@ -128,9 +128,9 @@ static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
+>  				 KVM_MEM_TYPE_RESERVED);
 >  }
 >  
->  int virtio_compat_add_message(const char *device, const char *config)
-> diff --git a/virtio/net.c b/virtio/net.c
-> index 091406912a24..425c13ba1136 100644
-> --- a/virtio/net.c
-> +++ b/virtio/net.c
-> @@ -910,7 +910,7 @@ done:
+> -int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
+> -		       void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
+> -			void *ptr);
+> +int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
+> +				    void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
+> +				    void *ptr);
+>  bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr);
+>  void kvm__reboot(struct kvm *kvm);
+>  void kvm__pause(struct kvm *kvm);
+> diff --git a/ioport.c b/ioport.c
+> index a72e4035881a..d224819c6e43 100644
+> --- a/ioport.c
+> +++ b/ioport.c
+> @@ -91,16 +91,21 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
+>  	};
 >  
->  static int virtio_net__init_one(struct virtio_net_params *params)
->  {
-> -	int i, err;
-> +	int i, r;
->  	struct net_dev *ndev;
->  	struct virtio_ops *ops;
->  	enum virtio_trans trans = VIRTIO_DEFAULT_TRANS(params->kvm);
-> @@ -920,10 +920,8 @@ static int virtio_net__init_one(struct virtio_net_params *params)
->  		return -ENOMEM;
->  
->  	ops = malloc(sizeof(*ops));
-> -	if (ops == NULL) {
-> -		err = -ENOMEM;
-> -		goto err_free_ndev;
+>  	r = ioport_insert(&ioport_tree, entry);
+> -	if (r < 0) {
+> -		free(entry);
+> -		br_write_unlock(kvm);
+> -		return r;
 > -	}
-> +	if (ops == NULL)
-> +		return -ENOMEM;
+> -
+> -	device__register(&entry->dev_hdr);
+> +	if (r < 0)
+> +		goto out_free;
+> +	r = device__register(&entry->dev_hdr);
+> +	if (r < 0)
+> +		goto out_erase;
+>  	br_write_unlock(kvm);
+>  
+>  	return port;
+> +
+> +out_erase:
+> +	rb_int_erase(&ioport_tree, &entry->node);
 
-Doesn't that leave struct net_dev allocated? I am happy with removing the goto, but we should free(ndev) before we return, I think.
+To keep the abstraction, shouldn't that rather be ioport_remove() instead?
 
 Cheers,
 Andre.
 
->  
->  	list_add_tail(&ndev->list, &ndevs);
->  
-> @@ -969,8 +967,10 @@ static int virtio_net__init_one(struct virtio_net_params *params)
->  				   virtio_trans_name(trans));
->  	}
->  
-> -	virtio_init(params->kvm, ndev, &ndev->vdev, ops, trans,
-> -		    PCI_DEVICE_ID_VIRTIO_NET, VIRTIO_ID_NET, PCI_CLASS_NET);
-> +	r = virtio_init(params->kvm, ndev, &ndev->vdev, ops, trans,
-> +			PCI_DEVICE_ID_VIRTIO_NET, VIRTIO_ID_NET, PCI_CLASS_NET);
-> +	if (r < 0)
-> +		return r;
->  
->  	if (params->vhost)
->  		virtio_net__vhost_init(params->kvm, ndev);
-> @@ -979,19 +979,17 @@ static int virtio_net__init_one(struct virtio_net_params *params)
->  		compat_id = virtio_compat_add_message("virtio-net", "CONFIG_VIRTIO_NET");
->  
->  	return 0;
-> -
-> -err_free_ndev:
-> -	free(ndev);
-> -	return err;
->  }
->  
->  int virtio_net__init(struct kvm *kvm)
->  {
-> -	int i;
-> +	int i, r;
->  
->  	for (i = 0; i < kvm->cfg.num_net_devices; i++) {
->  		kvm->cfg.net_params[i].kvm = kvm;
-> -		virtio_net__init_one(&kvm->cfg.net_params[i]);
-> +		r = virtio_net__init_one(&kvm->cfg.net_params[i]);
-> +		if (r < 0)
-> +			goto cleanup;
->  	}
->  
->  	if (kvm->cfg.num_net_devices == 0 && kvm->cfg.no_net == 0) {
-> @@ -1007,10 +1005,16 @@ int virtio_net__init(struct kvm *kvm)
->  		str_to_mac(kvm->cfg.guest_mac, net_params.guest_mac);
->  		str_to_mac(kvm->cfg.host_mac, net_params.host_mac);
->  
-> -		virtio_net__init_one(&net_params);
-> +		r = virtio_net__init_one(&net_params);
-> +		if (r < 0)
-> +			goto cleanup;
->  	}
->  
->  	return 0;
-> +
-> +cleanup:
-> +	virtio_net__exit(kvm);
+> +out_free:
+> +	free(entry);
+> +	br_write_unlock(kvm);
 > +	return r;
 >  }
->  virtio_dev_init(virtio_net__init);
 >  
-> diff --git a/virtio/scsi.c b/virtio/scsi.c
-> index 1ec78fe0945a..16a86cb7e0e6 100644
-> --- a/virtio/scsi.c
-> +++ b/virtio/scsi.c
-> @@ -234,6 +234,7 @@ static void virtio_scsi_vhost_init(struct kvm *kvm, struct scsi_dev *sdev)
->  static int virtio_scsi_init_one(struct kvm *kvm, struct disk_image *disk)
+>  int ioport__unregister(struct kvm *kvm, u16 port)
+> @@ -196,9 +201,7 @@ out:
+>  
+>  int ioport__init(struct kvm *kvm)
 >  {
->  	struct scsi_dev *sdev;
+> -	ioport__setup_arch(kvm);
+> -
+> -	return 0;
+> +	return ioport__setup_arch(kvm);
+>  }
+>  dev_base_init(ioport__init);
+>  
+> diff --git a/mips/kvm.c b/mips/kvm.c
+> index 211770da0d85..26355930d3b6 100644
+> --- a/mips/kvm.c
+> +++ b/mips/kvm.c
+> @@ -100,8 +100,9 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
+>  		die_perror("KVM_IRQ_LINE ioctl");
+>  }
+>  
+> -void ioport__setup_arch(struct kvm *kvm)
+> +int ioport__setup_arch(struct kvm *kvm)
+>  {
+> +	return 0;
+>  }
+>  
+>  bool kvm__arch_cpu_supports_vm(void)
+> diff --git a/powerpc/ioport.c b/powerpc/ioport.c
+> index 58dc625c54fe..0c188b61a51a 100644
+> --- a/powerpc/ioport.c
+> +++ b/powerpc/ioport.c
+> @@ -12,9 +12,10 @@
+>  
+>  #include <stdlib.h>
+>  
+> -void ioport__setup_arch(struct kvm *kvm)
+> +int ioport__setup_arch(struct kvm *kvm)
+>  {
+>  	/* PPC has no legacy ioports to set up */
+> +	return 0;
+>  }
+>  
+>  void ioport__map_irq(u8 *irq)
+> diff --git a/virtio/mmio.c b/virtio/mmio.c
+> index 03cecc366292..5537c39367d6 100644
+> --- a/virtio/mmio.c
+> +++ b/virtio/mmio.c
+> @@ -292,13 +292,16 @@ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  		     int device_id, int subsys_id, int class)
+>  {
+>  	struct virtio_mmio *vmmio = vdev->virtio;
 > +	int r;
 >  
->  	if (!disk)
->  		return -EINVAL;
-> @@ -260,12 +261,14 @@ static int virtio_scsi_init_one(struct kvm *kvm, struct disk_image *disk)
->  	strlcpy((char *)&sdev->target.vhost_wwpn, disk->wwpn, sizeof(sdev->target.vhost_wwpn));
->  	sdev->target.vhost_tpgt = strtol(disk->tpgt, NULL, 0);
+>  	vmmio->addr	= virtio_mmio_get_io_space_block(VIRTIO_MMIO_IO_SIZE);
+>  	vmmio->kvm	= kvm;
+>  	vmmio->dev	= dev;
 >  
-> -	virtio_init(kvm, sdev, &sdev->vdev, &scsi_dev_virtio_ops,
-> -		    VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_SCSI,
-> -		    VIRTIO_ID_SCSI, PCI_CLASS_BLK);
-> -
->  	list_add_tail(&sdev->list, &sdevs);
+> -	kvm__register_mmio(kvm, vmmio->addr, VIRTIO_MMIO_IO_SIZE,
+> -			   false, virtio_mmio_mmio_callback, vdev);
+> +	r = kvm__register_mmio(kvm, vmmio->addr, VIRTIO_MMIO_IO_SIZE,
+> +			       false, virtio_mmio_mmio_callback, vdev);
+> +	if (r < 0)
+> +		return r;
 >  
-> +	r = virtio_init(kvm, sdev, &sdev->vdev, &scsi_dev_virtio_ops,
-> +			VIRTIO_DEFAULT_TRANS(kvm), PCI_DEVICE_ID_VIRTIO_SCSI,
-> +			VIRTIO_ID_SCSI, PCI_CLASS_BLK);
+>  	vmmio->hdr = (struct virtio_mmio_hdr) {
+>  		.magic		= {'v', 'i', 'r', 't'},
+> @@ -313,7 +316,11 @@ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  		.data		= generate_virtio_mmio_fdt_node,
+>  	};
+>  
+> -	device__register(&vmmio->dev_hdr);
+> +	r = device__register(&vmmio->dev_hdr);
+> +	if (r < 0) {
+> +		kvm__deregister_mmio(kvm, vmmio->addr);
+> +		return r;
+> +	}
+>  
+>  	/*
+>  	 * Instantiate guest virtio-mmio devices using kernel command line
+> diff --git a/x86/ioport.c b/x86/ioport.c
+> index 8572c758ed4f..7ad7b8f3f497 100644
+> --- a/x86/ioport.c
+> +++ b/x86/ioport.c
+> @@ -69,50 +69,84 @@ void ioport__map_irq(u8 *irq)
+>  {
+>  }
+>  
+> -void ioport__setup_arch(struct kvm *kvm)
+> +int ioport__setup_arch(struct kvm *kvm)
+>  {
+> +	int r;
+> +
+>  	/* Legacy ioport setup */
+>  
+>  	/* 0000 - 001F - DMA1 controller */
+> -	ioport__register(kvm, 0x0000, &dummy_read_write_ioport_ops, 32, NULL);
+> +	r = ioport__register(kvm, 0x0000, &dummy_read_write_ioport_ops, 32, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* 0x0020 - 0x003F - 8259A PIC 1 */
+> -	ioport__register(kvm, 0x0020, &dummy_read_write_ioport_ops, 2, NULL);
+> +	r = ioport__register(kvm, 0x0020, &dummy_read_write_ioport_ops, 2, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* PORT 0040-005F - PIT - PROGRAMMABLE INTERVAL TIMER (8253, 8254) */
+> -	ioport__register(kvm, 0x0040, &dummy_read_write_ioport_ops, 4, NULL);
+> +	r = ioport__register(kvm, 0x0040, &dummy_read_write_ioport_ops, 4, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* 0092 - PS/2 system control port A */
+> -	ioport__register(kvm, 0x0092, &ps2_control_a_ops, 1, NULL);
+> +	r = ioport__register(kvm, 0x0092, &ps2_control_a_ops, 1, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* 0x00A0 - 0x00AF - 8259A PIC 2 */
+> -	ioport__register(kvm, 0x00A0, &dummy_read_write_ioport_ops, 2, NULL);
+> +	r = ioport__register(kvm, 0x00A0, &dummy_read_write_ioport_ops, 2, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* 00C0 - 001F - DMA2 controller */
+> -	ioport__register(kvm, 0x00C0, &dummy_read_write_ioport_ops, 32, NULL);
+> +	r = ioport__register(kvm, 0x00C0, &dummy_read_write_ioport_ops, 32, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* PORT 00E0-00EF are 'motherboard specific' so we use them for our
+>  	   internal debugging purposes.  */
+> -	ioport__register(kvm, IOPORT_DBG, &debug_ops, 1, NULL);
+> +	r = ioport__register(kvm, IOPORT_DBG, &debug_ops, 1, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* PORT 00ED - DUMMY PORT FOR DELAY??? */
+> -	ioport__register(kvm, 0x00ED, &dummy_write_only_ioport_ops, 1, NULL);
+> +	r = ioport__register(kvm, 0x00ED, &dummy_write_only_ioport_ops, 1, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* 0x00F0 - 0x00FF - Math co-processor */
+> -	ioport__register(kvm, 0x00F0, &dummy_write_only_ioport_ops, 2, NULL);
+> +	r = ioport__register(kvm, 0x00F0, &dummy_write_only_ioport_ops, 2, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* PORT 0278-027A - PARALLEL PRINTER PORT (usually LPT1, sometimes LPT2) */
+> -	ioport__register(kvm, 0x0278, &dummy_read_write_ioport_ops, 3, NULL);
+> +	r = ioport__register(kvm, 0x0278, &dummy_read_write_ioport_ops, 3, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* PORT 0378-037A - PARALLEL PRINTER PORT (usually LPT2, sometimes LPT3) */
+> -	ioport__register(kvm, 0x0378, &dummy_read_write_ioport_ops, 3, NULL);
+> +	r = ioport__register(kvm, 0x0378, &dummy_read_write_ioport_ops, 3, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* PORT 03D4-03D5 - COLOR VIDEO - CRT CONTROL REGISTERS */
+> -	ioport__register(kvm, 0x03D4, &dummy_read_write_ioport_ops, 1, NULL);
+> -	ioport__register(kvm, 0x03D5, &dummy_write_only_ioport_ops, 1, NULL);
+> +	r = ioport__register(kvm, 0x03D4, &dummy_read_write_ioport_ops, 1, NULL);
+> +	if (r < 0)
+> +		return r;
+> +	r = ioport__register(kvm, 0x03D5, &dummy_write_only_ioport_ops, 1, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+> -	ioport__register(kvm, 0x402, &seabios_debug_ops, 1, NULL);
+> +	r = ioport__register(kvm, 0x402, &seabios_debug_ops, 1, NULL);
+> +	if (r < 0)
+> +		return r;
+>  
+>  	/* 0510 - QEMU BIOS configuration register */
+> -	ioport__register(kvm, 0x510, &dummy_read_write_ioport_ops, 2, NULL);
+> +	r = ioport__register(kvm, 0x510, &dummy_read_write_ioport_ops, 2, NULL);
 > +	if (r < 0)
 > +		return r;
 > +
->  	virtio_scsi_vhost_init(kvm, sdev);
->  
->  	if (compat_id == -1)
-> @@ -302,7 +305,8 @@ int virtio_scsi_init(struct kvm *kvm)
->  
->  	return 0;
->  cleanup:
-> -	return virtio_scsi_exit(kvm);
-> +	virtio_scsi_exit(kvm);
-> +	return r;
+> +	return 0;
 >  }
->  virtio_dev_init(virtio_scsi_init);
->  
 
