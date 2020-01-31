@@ -2,266 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6493D14EBDE
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 12:43:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E40C14EBDF
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 12:44:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728489AbgAaLnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 06:43:40 -0500
-Received: from foss.arm.com ([217.140.110.172]:34576 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728400AbgAaLnk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 06:43:40 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BCE7B1063;
-        Fri, 31 Jan 2020 03:43:39 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0EAA53F67D;
-        Fri, 31 Jan 2020 03:43:38 -0800 (PST)
-Subject: Re: [kvm-unit-tests RFC PATCH v3 5/7] lib: arm64: Add support for
- disabling and re-enabling VHE
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
-        andre.przywara@arm.com
-References: <1577972806-16184-1-git-send-email-alexandru.elisei@arm.com>
- <1577972806-16184-6-git-send-email-alexandru.elisei@arm.com>
- <ad46bedcc585d03399576ecfce4c17c0@kernel.org>
- <aa243b68-8fb5-d002-2d89-5865fe4dfd3f@arm.com>
- <0ffad077a14887b91eda082ef4893dd5@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <122ed399-c06a-60e1-3880-5cf07f4ce7b3@arm.com>
-Date:   Fri, 31 Jan 2020 11:43:37 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728496AbgAaLn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 06:43:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53520 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728490AbgAaLn7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jan 2020 06:43:59 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00VBhUGu051881
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 06:43:58 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xv7deg2vn-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 06:43:57 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Fri, 31 Jan 2020 11:43:56 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 31 Jan 2020 11:43:52 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00VBgxkg49938784
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 31 Jan 2020 11:42:59 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A9CF742049;
+        Fri, 31 Jan 2020 11:43:51 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6ACDD42041;
+        Fri, 31 Jan 2020 11:43:51 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.41])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 31 Jan 2020 11:43:51 +0000 (GMT)
+Subject: Re: [PATCH v10 4/6] selftests: KVM: Add fpu and one reg set/get
+ library functions
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+References: <20200131100205.74720-1-frankja@linux.ibm.com>
+ <20200131100205.74720-5-frankja@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Fri, 31 Jan 2020 12:43:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <0ffad077a14887b91eda082ef4893dd5@kernel.org>
+In-Reply-To: <20200131100205.74720-5-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20013111-0016-0000-0000-000002E280A5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20013111-0017-0000-0000-000033454FED
+Message-Id: <6a990f23-832b-86f7-28bf-761e84fd33fb@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-31_03:2020-01-31,2020-01-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ phishscore=0 mlxscore=0 clxscore=1015 malwarescore=0 bulkscore=0
+ priorityscore=1501 mlxlogscore=999 spamscore=0 impostorscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2001310104
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Paolo,
 
-On 1/31/20 11:26 AM, Marc Zyngier wrote:
-> Hi Alex,
->
-> On 2020-01-31 09:52, Alexandru Elisei wrote:
->> Hi,
->>
->> Thank you for testing the patches!
->>
->> On 1/30/20 5:40 PM, Marc Zyngier wrote:
->>> Hi Alexandru,
->>>
->>> On 2020-01-02 13:46, Alexandru Elisei wrote:
->>>> Add a function to disable VHE and another one to re-enable VHE. Both
->>>> functions work under the assumption that the CPU had VHE mode enabled at
->>>> boot.
->>>>
->>>> Minimal support to run with VHE has been added to the TLB invalidate
->>>> functions and to the exception handling code.
->>>>
->>>> Since we're touch the assembly enable/disable MMU code, let's take this
->>>> opportunity to replace a magic number with the proper define.
->>>
->>> I've been using this test case to debug my NV code... only to realize
->>> after a few hours of banging my head on the wall that it is the test
->>> that needed debugging, see below... ;-)
->>>
->>>>
->>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>>> ---
->>>>  lib/arm64/asm/mmu.h           |  11 ++-
->>>>  lib/arm64/asm/pgtable-hwdef.h |  53 ++++++++---
->>>>  lib/arm64/asm/processor.h     |  19 +++-
->>>>  lib/arm64/processor.c         |  37 +++++++-
->>>>  arm/cstart64.S                | 204 ++++++++++++++++++++++++++++++++++++++++--
->>>>  5 files changed, 300 insertions(+), 24 deletions(-)
->>>
->>> [...]
->>>
->>>> --- a/arm/cstart64.S
->>>> +++ b/arm/cstart64.S
->>>> @@ -104,6 +104,13 @@ exceptions_init:
->>>>
->>>>  .text
->>>>
->>>> +exceptions_init_nvhe:
->>>> +    adrp    x0, vector_table_nvhe
->>>> +    add    x0, x0, :lo12:vector_table_nvhe
->>>> +    msr    vbar_el2, x0
->>>> +    isb
->>>> +    ret
->>>> +
->>>>  .globl get_mmu_off
->>>>  get_mmu_off:
->>>>      adrp    x0, auxinfo
->>>> @@ -203,7 +210,7 @@ asm_mmu_enable:
->>>>               TCR_IRGN_WBWA | TCR_ORGN_WBWA |    \
->>>>               TCR_SHARED
->>>>      mrs    x2, id_aa64mmfr0_el1
->>>> -    bfi    x1, x2, #32, #3
->>>> +    bfi    x1, x2, #TCR_EL1_IPS_SHIFT, #3
->>>>      msr    tcr_el1, x1
->>>>
->>>>      /* MAIR */
->>>> @@ -228,6 +235,41 @@ asm_mmu_enable:
->>>>
->>>>      ret
->>>>
->>>> +asm_mmu_enable_nvhe:
->>>
->>> Note the "_nvhe" suffix, which implies that...
->>>
->>>> +    tlbi    alle2
->>>> +    dsb     nsh
->>>> +
->>>> +        /* TCR */
->>>> +    ldr    x1, =TCR_EL2_RES1 |             \
->>>> +             TCR_T0SZ(VA_BITS) |        \
->>>> +             TCR_TG0_64K |                      \
->>>> +             TCR_IRGN0_WBWA | TCR_ORGN0_WBWA |    \
->>>> +             TCR_SH0_IS
->>>> +    mrs    x2, id_aa64mmfr0_el1
->>>> +    bfi    x1, x2, #TCR_EL2_PS_SHIFT, #3
->>>> +    msr    tcr_el2, x1
->>>> +
->>>> +    /* Same MAIR and TTBR0 as in VHE mode */
->>>> +    ldr    x1, =MAIR(0x00, MT_DEVICE_nGnRnE) |    \
->>>> +             MAIR(0x04, MT_DEVICE_nGnRE) |    \
->>>> +             MAIR(0x0c, MT_DEVICE_GRE) |    \
->>>> +             MAIR(0x44, MT_NORMAL_NC) |        \
->>>> +             MAIR(0xff, MT_NORMAL)
->>>> +    msr    mair_el1, x1
->>>
->>> ... this should be mair_el2...
->>>
->>>> +
->>>> +    msr    ttbr0_el1, x0
->>>
->>> ... and this should be ttbr0_el2.
->>
->> The code is definitely confusing, but not because it's wrong, but because it's
->> doing something useless. From DDI 04876E.a, page D13-3374, the pseudocode for
->> writing to ttbr0_el1:
->>
->> [..] elsif PSTATE.EL == EL2 then     if HCR_EL2.E2H == '1' then
->>         TTBR0_EL2
->> = X[t];
->>
->>     else         TTBR0_EL1 = X[t]; [..]
->>
->> We want to use the same ttbr0_el2 and mair_el2 values that we were
->> using when VHE
->> was on. We programmed those values when VHE was on, so we actually wrote them to
->> ttbr0_el2 and mair_el2. We don't need to write them again now, in fact, all the
->> previous versions of the series didn't even have the above useless writes (I
->> assume it was a copy-and-paste mistake when I split the fixes from the
->> el2 patches).
->
-> Fair enough. You're just propagating a dummy value, which is going to
-> bite you later.
+are you ok with me taking this patch for my s390 pull request to you?
+Ideally still for 5.6?
 
-You're correct, I'm going to remove the dummy writes to EL1 registers.
 
->
->>
->>>
->>>> +    isb
->>>> +
->>>> +    /* SCTLR */
->>>> +    ldr    x1, =SCTLR_EL2_RES1 |            \
->>>> +             SCTLR_EL2_C |             \
->>>> +             SCTLR_EL2_I |             \
->>>> +             SCTLR_EL2_M
->>>> +    msr    sctlr_el2, x1
->>>> +    isb
->>>> +
->>>> +    ret
->>>> +
->>>>  /* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
->>>>  .macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
->>>>      adrp    \tmp1, dcache_line_size
->>>> @@ -242,21 +284,61 @@ asm_mmu_enable:
->>>>      dsb    \domain
->>>>  .endm
->>>>
->>>> +clean_inval_cache:
->>>> +    adrp    x0, __phys_offset
->>>> +    ldr    x0, [x0, :lo12:__phys_offset]
->>>> +    adrp    x1, __phys_end
->>>> +    ldr    x1, [x1, :lo12:__phys_end]
->>>> +    dcache_by_line_op civac, sy, x0, x1, x2, x3
->>>> +    isb
->>>> +    ret
->>>> +
->>>>  .globl asm_mmu_disable
->>>>  asm_mmu_disable:
->>>>      mrs    x0, sctlr_el1
->>>>      bic    x0, x0, SCTLR_EL1_M
->>>>      msr    sctlr_el1, x0
->>>>      isb
->>>> +    b    clean_inval_cache
->>>>
->>>> -    /* Clean + invalidate the entire memory */
->>>> -    adrp    x0, __phys_offset
->>>> -    ldr    x0, [x0, :lo12:__phys_offset]
->>>> -    adrp    x1, __phys_end
->>>> -    ldr    x1, [x1, :lo12:__phys_end]
->>>> -    dcache_by_line_op civac, sy, x0, x1, x2, x3
->>>> +asm_mmu_disable_nvhe:
->>>> +    mrs    x0, sctlr_el2
->>>> +    bic    x0, x0, SCTLR_EL2_M
->>>> +    msr    sctlr_el2, x0
->>>> +    isb
->>>> +    b    clean_inval_cache
->>>> +
->>>> +.globl asm_disable_vhe
->>>> +asm_disable_vhe:
->>>> +    str    x30, [sp, #-16]!
->>>> +
->>>> +    bl    asm_mmu_disable
->>>> +    msr    hcr_el2, xzr
->>>> +    isb
->>>
->>> At this stage, VHE is off...
->>>
->>>> +    bl    exceptions_init_nvhe
->>>> +    /* Make asm_mmu_enable_nvhe happy by having TTBR0 value in x0. */
->>>> +    mrs    x0, ttbr0_el1
->>>
->>> ... so this is going to sample the wrong TTBR. It really should be
->>> TTBR0_EL2!
->>
->> Not really, asm_mmu_enable has one parameter, the PA for the
->> translation tables in
->> register x0, and we are going to use the same translation tables with
->> VHE off that
->> we were using with VHE on. Hence the read.//It could have easily been mrs
->> x0,ttbr0_el2, since they have the same value, which we want to reuse.
->
-> I'm sorry, but if your reasoning that above that VHE's TTBR0_EL1 is the
-> same as nVHE's TTBR0_EL2 appears correct (they are accessing the same HW
-> register), this particular read of TTBR0_EL1 is *not* an EL2 register at
-> all. VHE is off, and you are reading an uninitialized EL1 register (and
-> it's easy to spot in KVM, as it has the magic poison value).
+On 31.01.20 11:02, Janosch Frank wrote:
+> Add library access to more registers.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  |  6 ++++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 36 +++++++++++++++++++
+>  2 files changed, 42 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 29cccaf96baf..ae0d14c2540a 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -125,6 +125,12 @@ void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+>  		    struct kvm_sregs *sregs);
+>  int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+>  		    struct kvm_sregs *sregs);
+> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid,
+> +		  struct kvm_fpu *fpu);
+> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid,
+> +		  struct kvm_fpu *fpu);
+> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+>  #ifdef __KVM_HAVE_VCPU_EVENTS
+>  void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
+>  		     struct kvm_vcpu_events *events);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 41cf45416060..a6dd0401eb50 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1373,6 +1373,42 @@ int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
+>  	return ioctl(vcpu->fd, KVM_SET_SREGS, sregs);
+>  }
+> 
+> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+> +{
+> +	int ret;
+> +
+> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_GET_FPU, fpu);
+> +	TEST_ASSERT(ret == 0, "KVM_GET_FPU failed, rc: %i errno: %i (%s)",
+> +		    ret, errno, strerror(errno));
+> +}
+> +
+> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+> +{
+> +	int ret;
+> +
+> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_SET_FPU, fpu);
+> +	TEST_ASSERT(ret == 0, "KVM_SET_FPU failed, rc: %i errno: %i (%s)",
+> +		    ret, errno, strerror(errno));
+> +}
+> +
+> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+> +{
+> +	int ret;
+> +
+> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_GET_ONE_REG, reg);
+> +	TEST_ASSERT(ret == 0, "KVM_GET_ONE_REG failed, rc: %i errno: %i (%s)",
+> +		    ret, errno, strerror(errno));
+> +}
+> +
+> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+> +{
+> +	int ret;
+> +
+> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_SET_ONE_REG, reg);
+> +	TEST_ASSERT(ret == 0, "KVM_SET_ONE_REG failed, rc: %i errno: %i (%s)",
+> +		    ret, errno, strerror(errno));
+> +}
+> +
+>  /*
+>   * VCPU Ioctl
+>   *
+> 
 
-You're totally right here, I'm reading an EL1 register with VHE off, so I'm
-definitely going to get a garbage value.The instruction should be mrs x0,ttbr0_el2.
-
-Thanks,
-Alex
->
->> I think this confusion stems from the fact that I'm trying to write
->> the registers
->> again in asm_mmu_enable_nvhe, when we don't have to. And writing to the wrong
->> registers makes the confusion even worse.
->
-> I don't mind the extra writes, or even the confusion. But the above looks
-> totally wrong.
->
-> Thanks,
->
->         M.
