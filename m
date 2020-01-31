@@ -2,95 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92FCA14E7B9
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 04:57:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06C4814E7D3
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 05:19:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727989AbgAaD44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 22:56:56 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:36472 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727909AbgAaD44 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 22:56:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=5AiRNNR3E4corHChDgT2p0fKB/v898YA69onJ2mDDvw=; b=ZT77gvY6Brb8nwO28+W+PgGME
-        1oHALqs7edfA5cAXt2DkOj2ED02hIyZk7cqJZUEQ6g9u6JxtsI2no2cLY87s/Gw8YqdFaGe7neSG3
-        TnzE4fI058xHpmkMFgn4T9ST8cE/wBnMz1TXttpMowzC/81zyT7NbUQTDs6rp5VjWDP34tBDwvi0d
-        4SaOhBuvujCcPwav2o9u7mZZb9KWuycxO2j08+HV/qBzJPjTSlJgoSlyF8xoM+eO3fEq2SeyS3Wfz
-        FvLanvkTO7oNyZKJHaSODqEIHL/RVYgxErYSycYFySL+vareq71eeVKPboLj6qLAvpnhaSsRKFbhj
-        Jp6aKukPQ==;
-Received: from [2601:1c0:6280:3f0:897c:6038:c71d:ecac]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ixNQD-0003II-6X; Fri, 31 Jan 2020 03:56:45 +0000
-Subject: Re: [PATCH] vhost: introduce vDPA based backend
-To:     Tiwei Bie <tiwei.bie@intel.com>, mst@redhat.com,
-        jasowang@redhat.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        shahafs@mellanox.com, jgg@mellanox.com, rob.miller@broadcom.com,
-        haotian.wang@sifive.com, eperezma@redhat.com, lulu@redhat.com,
-        parav@mellanox.com, hch@infradead.org, jiri@mellanox.com,
-        hanand@xilinx.com, mhabets@solarflare.com,
-        maxime.coquelin@redhat.com, lingshan.zhu@intel.com,
-        dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
-References: <20200131033651.103534-1-tiwei.bie@intel.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <43aeecb4-4c08-df3d-1c1d-699ec4c494bd@infradead.org>
-Date:   Thu, 30 Jan 2020 19:56:43 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1728003AbgAaETG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 23:19:06 -0500
+Received: from ozlabs.org ([203.11.71.1]:49389 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727933AbgAaETG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 23:19:06 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4883rR4R0jz9sRQ; Fri, 31 Jan 2020 15:19:03 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1580444343;
+        bh=S8HBFAr+JEPEt6RudSE2u2FRnvTK1cgTyXZx/iPTRdU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=OhPkwtwZM+eUMobCQtW4UNn1sRRPuk4Ul6MdQXX3oLy3SY58Z2wldCSIRs6reItaU
+         nja5hiA6LgM/70Rcm/u69f+eBIaen+w5Let/iSr+4BfZGJ0Gcp60Im2Mhvm1ExI8oq
+         jY+3WwXgVRhzQqEFvLZQtcxlxCkf43oQVIT0/cS0=
+Date:   Fri, 31 Jan 2020 14:59:14 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com,
+        alex.williamson@redhat.com, peterx@redhat.com, mst@redhat.com,
+        eric.auger@redhat.com, kevin.tian@intel.com, jun.j.tian@intel.com,
+        yi.y.sun@intel.com, kvm@vger.kernel.org, hao.wu@intel.com,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: Re: [RFC v3 02/25] hw/iommu: introduce DualStageIOMMUObject
+Message-ID: <20200131035914.GF15210@umbus.fritz.box>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-3-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200131033651.103534-1-tiwei.bie@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="B0nZA57HJSoPbsHY"
+Content-Disposition: inline
+In-Reply-To: <1580300216-86172-3-git-send-email-yi.l.liu@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-On 1/30/20 7:36 PM, Tiwei Bie wrote:
-> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> index f21c45aa5e07..13e6a94d0243 100644
-> --- a/drivers/vhost/Kconfig
-> +++ b/drivers/vhost/Kconfig
-> @@ -34,6 +34,18 @@ config VHOST_VSOCK
->  	To compile this driver as a module, choose M here: the module will be called
->  	vhost_vsock.
->  
-> +config VHOST_VDPA
-> +	tristate "Vhost driver for vDPA based backend"
-> +	depends on EVENTFD && VDPA
-> +	select VHOST
-> +	default n
-> +	---help---
-> +	This kernel module can be loaded in host kernel to accelerate
-> +	guest virtio devices with the vDPA based backends.
+--B0nZA57HJSoPbsHY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-	                              vDPA-based
+On Wed, Jan 29, 2020 at 04:16:33AM -0800, Liu, Yi L wrote:
+> From: Liu Yi L <yi.l.liu@intel.com>
+>=20
+> Currently, many platform vendors provide the capability of dual stage
+> DMA address translation in hardware. For example, nested translation
+> on Intel VT-d scalable mode, nested stage translation on ARM SMMUv3,
+> and etc. In dual stage DMA address translation, there are two stages
+> address translation, stage-1 (a.k.a first-level) and stage-2 (a.k.a
+> second-level) translation structures. Stage-1 translation results are
+> also subjected to stage-2 translation structures. Take vSVA (Virtual
+> Shared Virtual Addressing) as an example, guest IOMMU driver owns
+> stage-1 translation structures (covers GVA->GPA translation), and host
+> IOMMU driver owns stage-2 translation structures (covers GPA->HPA
+> translation). VMM is responsible to bind stage-1 translation structures
+> to host, thus hardware could achieve GVA->GPA and then GPA->HPA
+> translation. For more background on SVA, refer the below links.
+>  - https://www.youtube.com/watch?v=3DKq_nfGK5MwQ
+>  - https://events19.lfasiallc.com/wp-content/uploads/2017/11/\
+> Shared-Virtual-Memory-in-KVM_Yi-Liu.pdf
+>=20
+> As above, dual stage DMA translation offers two stage address mappings,
+> which could have better DMA address translation support for passthru
+> devices. This is also what vIOMMU developers are doing so far. Efforts
+> includes vSVA enabling from Yi Liu and SMMUv3 Nested Stage Setup from
+> Eric Auger.
+> https://www.spinics.net/lists/kvm/msg198556.html
+> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02842.html
+>=20
+> Both efforts are aiming to expose a vIOMMU with dual stage hardware
+> backed. As so, QEMU needs to have an explicit object to stand for
+> the dual stage capability from hardware. Such object offers abstract
+> for the dual stage DMA translation related operations, like:
+>=20
+>  1) PASID allocation (allow host to intercept in PASID allocation)
+>  2) bind stage-1 translation structures to host
+>  3) propagate stage-1 cache invalidation to host
+>  4) DMA address translation fault (I/O page fault) servicing etc.
+>=20
+> This patch introduces DualStageIOMMUObject to stand for the hardware
+> dual stage DMA translation capability. PASID allocation/free are the
+> first operation included in it, in future, there will be more operations
+> like bind_stage1_pgtbl and invalidate_stage1_cache and etc.
+>=20
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 
-> +
-> +	To compile this driver as a module, choose M here: the module
-> +	will be called vhost_vdpa.
-> +
+Several overall queries about this:
 
-The preferred Kconfig style nowadays is
-(a) use "help" instead of "---help---"
-(b) indent the help text with one tab + 2 spaces
+1) Since it's explicitly handling PASIDs, this seems a lot more
+   specific to SVM than the name suggests.  I'd suggest a rename.
 
-and don't use "default n" since that is already the default.
+2) Why are you hand rolling structures of pointers, rather than making
+   this a QOM class or interface and putting those things into methods?
 
->  config VHOST
->  	tristate
->          depends on VHOST_IOTLB
+3) It's not really clear to me if this is for the case where both
+   stages of translation are visible to the guest, or only one of
+   them.
 
-thanks.
--- 
-~Randy
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--B0nZA57HJSoPbsHY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4zphIACgkQbDjKyiDZ
+s5IQYg/+LAuO22iNHumMZpGs30DHJ8l/gPm+BizzzE4S4QHRwO5Pe8etzEUWfcRw
+ZlVfNTPtgKLOmgfJFk3kZt53UCuogwq4bodiNhTZ6ykCuq5LlADFMVhiaUJoUr8l
+vfcOfD7QhQw0zCG8vPoMh+hn1eBd6KfcoyW9TW8vK0/OzNBYhj8mg0vVcjrDOSQS
+Lzs/x8Pl8gnppwxgKqYBP8PATVeMOgnFPEfUaejvxW6/Dqg0Bwe55KF4ze/flAyA
+PQbdHeX/c/9tGjqjJ2bVDTGylgCyFIIqaXgdSR3xUniSWf7ttwRM9b7VJrHT86wQ
+D9NXjKIHQnhbgYOnsz3iI809oX3JFo8DKj2WvCvwWtLZO+ZyG1qR/SOEQZlGCe1S
+w5ItoN1T5Bdq21OVDifi3iVsr20RJsMgwzwbG3YJu2jW9w3iH7tvjAsjT4sVuS62
+YvhonQBiLpKr0FJsic9bgbTVnDDfQE9Nsm/cfnXrKIp505ELTFhl7BpLeit3TyCy
+PNqf2r0ICn5ZoxsZ1sK2MbBAm8K+rYKXmINk3R4vBfw8Cve1K5HZZWpoCqkCF1tb
+CUcwU/3B1Nem2hOGfI7JJIDXOf2BQuKnLVrTKuPOSO+ibYGWQO+BGmgoTG7ofZcf
+gfkkOAWSvkaOHu1w2GM/DudhRC/rRPdOcEPldvhE9V8dVn8c8HU=
+=YSYx
+-----END PGP SIGNATURE-----
+
+--B0nZA57HJSoPbsHY--
