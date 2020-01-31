@@ -2,122 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC90414F3C6
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 22:30:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3975014F3CF
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 22:33:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726180AbgAaVa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 16:30:27 -0500
-Received: from mga06.intel.com ([134.134.136.31]:14646 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726109AbgAaVa1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 16:30:27 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Jan 2020 13:29:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,387,1574150400"; 
-   d="scan'208";a="223270217"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga008.jf.intel.com with ESMTP; 31 Jan 2020 13:29:29 -0800
-Date:   Fri, 31 Jan 2020 13:29:28 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3 09/21] KVM: X86: Don't track dirty for
- KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
-Message-ID: <20200131212928.GH18946@linux.intel.com>
-References: <20200109145729.32898-1-peterx@redhat.com>
- <20200109145729.32898-10-peterx@redhat.com>
- <20200121155657.GA7923@linux.intel.com>
- <20200128055005.GB662081@xz-x1>
- <20200128182402.GA18652@linux.intel.com>
- <20200131150832.GA740148@xz-x1>
- <20200131193301.GC18946@linux.intel.com>
- <20200131202824.GA7063@xz-x1>
- <20200131203622.GF18946@linux.intel.com>
- <20200131205550.GB7063@xz-x1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200131205550.GB7063@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1726239AbgAaVdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 16:33:23 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:33114 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726109AbgAaVdW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 16:33:22 -0500
+Received: by mail-pl1-f195.google.com with SMTP id ay11so3263728plb.0
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 13:33:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=v0cY8r600PZeMMg003zbfyKoArFu5BkniPYK/6FLwIM=;
+        b=DB34FYS0GbdREz9MgbfN6GuhgdDTZlKITxD0isHLtPED+4N8iQRLPGGtlunQ0K4Ob+
+         NWPbi9TxN1YqENBQKIifltqOpSzi4F+U6/mEVXYtuKxZlh0U/eL6omVSAS9R98bOTolz
+         yg0XC8KBPGgb6NZcpOiEpVi/9NALs3R97S4//yxss0Lnb/6RPxcy4a14Hv0R/Crsxhg+
+         Fma29ZkKatlSvg/biTbuUo/sPAvkwG8Xm0NHuhbDEZDzRoOXXkYMtshnPho8eF7fyuRy
+         r824XGik5cjUwfxU/DsZkZGwtO98sb30s8v3UprW8aUPV/HQud1sPFWrAmQHjlPbnMoP
+         J/XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=v0cY8r600PZeMMg003zbfyKoArFu5BkniPYK/6FLwIM=;
+        b=RsL1KdvzpMQM57yI49hqnPx6vmKE3Xm9njl7QVQrKSPwnnnjhAXzAo7Zu9d5FPQ8SE
+         7LxNrjHSxSHid3chf8SuNBxa6UbZQsH/3rNzGn2HF6gZ0Y9sglnlomxRegwv2iyHJ3wZ
+         K2nonTSQkYbq8UsRZ6W7Z7StO4u1CwR5j8xaPSi/IKcaOjv/Qut2YBrQ3fMWIdIeS4Kj
+         GvTHHD3wpvE2XxKZmaoLB2fnDUr9TClJVbhYU2pim+DMj7YlHCgCDiHkR9nAB4rIORJC
+         YKwBstwB/nVS17kenTzDkfz6EYu62VtRTZ7r5WPcOQbkAT1zTVnantwsse6NUGiZiRfi
+         7KsA==
+X-Gm-Message-State: APjAAAVfMGKgixihsTELfmC9AVZFUlY9QYUh/YDQsOE+R+gz3KrylB+W
+        pkWm2K2hPacCAXhxIlO5Y6SmcjQO2I0=
+X-Google-Smtp-Source: APXvYqxUZPWDZetpRBZGKWvETiPTJY3F2228m8xWzfN+cNxLwgMODZHx1RESWs9RO0c/orFHJv/Dkg==
+X-Received: by 2002:a17:902:bd90:: with SMTP id q16mr12159154pls.34.1580506402075;
+        Fri, 31 Jan 2020 13:33:22 -0800 (PST)
+Received: from ?IPv6:2600:1010:b010:9631:69c2:3ecc:ab84:f45c? ([2600:1010:b010:9631:69c2:3ecc:ab84:f45c])
+        by smtp.gmail.com with ESMTPSA id m22sm12003610pgn.8.2020.01.31.13.33.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Jan 2020 13:33:21 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 2/2] KVM: VMX: Extend VMX's #AC handding
+Date:   Fri, 31 Jan 2020 13:33:17 -0800
+Message-Id: <E1F9CE39-7D61-43E1-B871-6D4BFA4B6D66@amacapital.net>
+References: <20200131210424.GG18946@linux.intel.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+In-Reply-To: <20200131210424.GG18946@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: iPhone Mail (17C54)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 31, 2020 at 03:55:50PM -0500, Peter Xu wrote:
-> On Fri, Jan 31, 2020 at 12:36:22PM -0800, Sean Christopherson wrote:
-> > On Fri, Jan 31, 2020 at 03:28:24PM -0500, Peter Xu wrote:
-> > > On Fri, Jan 31, 2020 at 11:33:01AM -0800, Sean Christopherson wrote:
-> > > > For the same reason we don't take mmap_sem, it gains us nothing, i.e. KVM
-> > > > still has to use copy_{to,from}_user().
-> > > > 
-> > > > In the proposed __x86_set_memory_region() refactor, vmx_set_tss_addr()
-> > > > would be provided the hva of the memory region.  Since slots_lock and SRCU
-> > > > only protect gfn->hva, why would KVM take slots_lock since it already has
-> > > > the hva?
-> > > 
-> > > OK so you're suggesting to unlock the lock earlier to not cover
-> > > init_rmode_tss() rather than dropping the whole lock...  Yes it looks
-> > > good to me.  I think that's the major confusion I got.
-> > 
-> > Ya.  And I missed where the -EEXIST was coming from.  I think we're on the
-> > same page.
-> 
-> Good to know.  Btw, for me I would still prefer to keep the lock be
-> after the __copy_to_user()s because "HVA is valid without lock" is
-> only true for these private memslots.
 
-No.  From KVM's perspective, the HVA is *never* valid.  Even if you rewrote
-this statement to say "the gfn->hva translation is valid without lock" it
-would still be incorrect. 
 
-KVM is *always* using HVAs without holding lock, e.g. every time it enters
-the guest it is deferencing a memslot because the translations stored in
-the TLB are effectively gfn->hva->hpa.  Obviously KVM ensures that it won't
-dereference a memslot that has been deleted/moved, but it's a lot more
-subtle than simply holding a lock.
+> On Jan 31, 2020, at 1:04 PM, Sean Christopherson <sean.j.christopherson@in=
+tel.com> wrote:
+>=20
+> =EF=BB=BFOn Fri, Jan 31, 2020 at 12:57:51PM -0800, Andy Lutomirski wrote:
+>>=20
+>>>> On Jan 31, 2020, at 12:18 PM, Sean Christopherson <sean.j.christopherso=
+n@intel.com> wrote:
+>>>=20
+>>> This is essentially what I proposed a while back.  KVM would allow enabl=
+ing
+>>> split-lock #AC in the guest if and only if SMT is disabled or the enable=
+ bit
+>>> is per-thread, *or* the host is in "warn" mode (can live with split-lock=
+ #AC
+>>> being randomly disabled/enabled) and userspace has communicated to KVM t=
+hat
+>>> it is pinning vCPUs.
+>>=20
+>> How about covering the actual sensible case: host is set to fatal?  In th=
+is
+>> mode, the guest gets split lock detection whether it wants it or not. How=
+ do
+>> we communicate this to the guest?
+>=20
+> KVM doesn't advertise split-lock #AC to the guest and returns -EFAULT to t=
+he
+> userspace VMM if the guest triggers a split-lock #AC.
+>=20
+> Effectively the same behavior as any other userspace process, just that KV=
+M
+> explicitly returns -EFAULT instead of the process getting a SIGBUS.
 
-> After all this is super slow path so I wouldn't mind to take the lock
-> for some time longer.
 
-Holding the lock doesn't affect this super slow vmx_set_tss_addr(), it
-affects everything else that wants slots_lock.  Now, admittedly it's
-extremely unlikely userspace is going to do KVM_SET_USER_MEMORY_REGION in
-parallel, but that's not the point and it's not why I'm objecting to
-holding the lock.
+Which helps how if the guest is actually SLD-aware?
 
-Holding the lock implies protection that is *not* provided.  You and I know
-it's not needed for copy_{to,from}_user(), but look how long it's taken us
-to get on the same page.  A future KVM developer comes along, sees this
-code, and thinks "oh, I need to hold slots_lock to dereference a gfn", and
-propagates the unnecessary locking to some other code.
+I suppose we could make the argument that, if an SLD-aware guest gets #AC at=
+ CPL0, it=E2=80=99s a bug, but it still seems rather nicer to forward the #A=
+C to the guest instead of summarily killing it.
 
-> Or otherwise if you really like the unlock() to
-> be earlier I can comment above the unlock:
-> 
->   /*
->    * We can unlock before using the HVA only because this KVM private
->    * memory slot will never change until the end of VM lifecycle.
->    */
-
-How about:
-
-	/*
-	 * No need to hold slots_lock while filling the TSS, the TSS private
-	 * memslot is guaranteed to be valid until the VM is destroyed, i.e.
-	 * there is no danger of corrupting guest memory by consuming a stale
-	 * gfn->hva lookup.
-	 */
+ISTM, on an SLD-fatal host with an SLD-aware guest, the host should tell the=
+ guest =E2=80=9Chey, you may not do split locks =E2=80=94 SLD is forced on=E2=
+=80=9D and the guest should somehow acknowledge it so that it sees the archi=
+tectural behavior instead of something we made up.  Hence my suggestion.=
