@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1275214F0A9
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 17:38:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF3E514F0AA
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 17:38:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726712AbgAaQiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 11:38:11 -0500
-Received: from foss.arm.com ([217.140.110.172]:37326 "EHLO foss.arm.com"
+        id S1726743AbgAaQiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 11:38:12 -0500
+Received: from foss.arm.com ([217.140.110.172]:37336 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726139AbgAaQiL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 11:38:11 -0500
+        id S1726139AbgAaQiM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 11:38:12 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0C8FFEC;
-        Fri, 31 Jan 2020 08:38:10 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D80A211D4;
+        Fri, 31 Jan 2020 08:38:11 -0800 (PST)
 Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A00093F68E;
-        Fri, 31 Jan 2020 08:38:09 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D6BF73F68E;
+        Fri, 31 Jan 2020 08:38:10 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, drjones@redhat.com, maz@kernel.org,
         andre.przywara@arm.com, vladimir.murzin@arm.com,
         mark.rutland@arm.com
-Subject: [kvm-unit-tests PATCH v4 02/10] arm/arm64: psci: Don't run C code without stack or vectors
-Date:   Fri, 31 Jan 2020 16:37:20 +0000
-Message-Id: <20200131163728.5228-3-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v4 03/10] arm64: timer: Add ISB after register writes
+Date:   Fri, 31 Jan 2020 16:37:21 +0000
+Message-Id: <20200131163728.5228-4-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200131163728.5228-1-alexandru.elisei@arm.com>
 References: <20200131163728.5228-1-alexandru.elisei@arm.com>
@@ -35,84 +35,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The psci test performs a series of CPU_ON/CPU_OFF cycles for CPU 1. This is
-done by setting the entry point for the CPU_ON call to the physical address
-of the C function cpu_psci_cpu_die.
+From ARM DDI 0487E.a glossary, the section "Context synchronization
+event":
 
-The compiler is well within its rights to use the stack when generating
-code for cpu_psci_cpu_die.  However, because no stack initialization has
-been done, the stack pointer is zero, as set by KVM when creating the VCPU.
-This causes a data abort without a change in exception level. The VBAR_EL1
-register is also zero (the KVM reset value for VBAR_EL1), the MMU is off,
-and we end up trying to fetch instructions from address 0x200.
+"All direct and indirect writes to System registers that are made before
+the Context synchronization event affect any instruction, including a
+direct read, that appears in program order after the instruction causing
+the Context synchronization event."
 
-At this point, a stage 2 instruction abort is generated which is taken to
-KVM. KVM interprets this as an instruction fetch from an I/O region, and
-injects a prefetch abort into the guest. Prefetch abort is a synchronous
-exception, and on guest return the VCPU PC will be set to VBAR_EL1 + 0x200,
-which is...  0x200. The VCPU ends up in an infinite loop causing a prefetch
-abort while fetching the instruction to service the said abort.
+The ISB instruction is a context synchronization event [1]. Add an ISB
+after all register writes, to make sure that the writes have been
+completed when we try to test their effects.
 
-To avoid all of this, lets use the assembly function halt as the CPU_ON
-entry address. Also, expand the check to test that we only get
-PSCI_RET_SUCCESS exactly once, as we're never offlining the CPU during the
-test.
+[1] ARM DDI 0487E.a, section C6.2.96
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/psci.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ arm/timer.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arm/psci.c b/arm/psci.c
-index 5c1accb6cea4..ffc09a2e9858 100644
---- a/arm/psci.c
-+++ b/arm/psci.c
-@@ -79,13 +79,14 @@ static void cpu_on_secondary_entry(void)
- 	cpumask_set_cpu(cpu, &cpu_on_ready);
- 	while (!cpu_on_start)
- 		cpu_relax();
--	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(cpu_psci_cpu_die));
-+	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(halt));
- 	cpumask_set_cpu(cpu, &cpu_on_done);
- }
- 
- static bool psci_cpu_on_test(void)
+diff --git a/arm/timer.c b/arm/timer.c
+index f390e8e65d31..c6ea108cfa4b 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -41,6 +41,7 @@ static u64 read_vtimer_cval(void)
+ static void write_vtimer_cval(u64 val)
  {
- 	bool failed = false;
-+	int ret_success = 0;
- 	int cpu;
- 
- 	cpumask_set_cpu(1, &cpu_on_ready);
-@@ -104,7 +105,7 @@ static bool psci_cpu_on_test(void)
- 	cpu_on_start = 1;
- 	smp_mb();
- 
--	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(cpu_psci_cpu_die));
-+	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(halt));
- 	cpumask_set_cpu(0, &cpu_on_done);
- 
- 	while (!cpumask_full(&cpu_on_done))
-@@ -113,12 +114,19 @@ static bool psci_cpu_on_test(void)
- 	for_each_present_cpu(cpu) {
- 		if (cpu == 1)
- 			continue;
--		if (cpu_on_ret[cpu] != PSCI_RET_SUCCESS && cpu_on_ret[cpu] != PSCI_RET_ALREADY_ON) {
-+		if (cpu_on_ret[cpu] == PSCI_RET_SUCCESS) {
-+			ret_success++;
-+		} else if (cpu_on_ret[cpu] != PSCI_RET_ALREADY_ON) {
- 			report_info("unexpected cpu_on return value: caller=CPU%d, ret=%d", cpu, cpu_on_ret[cpu]);
- 			failed = true;
- 		}
- 	}
- 
-+	if (ret_success != 1) {
-+		report_info("got %d CPU_ON success", ret_success);
-+		failed = true;
-+	}
-+
- 	return !failed;
+ 	write_sysreg(val, cntv_cval_el0);
++	isb();
  }
  
+ static s32 read_vtimer_tval(void)
+@@ -51,6 +52,7 @@ static s32 read_vtimer_tval(void)
+ static void write_vtimer_tval(s32 val)
+ {
+ 	write_sysreg(val, cntv_tval_el0);
++	isb();
+ }
+ 
+ static u64 read_vtimer_ctl(void)
+@@ -61,6 +63,7 @@ static u64 read_vtimer_ctl(void)
+ static void write_vtimer_ctl(u64 val)
+ {
+ 	write_sysreg(val, cntv_ctl_el0);
++	isb();
+ }
+ 
+ static u64 read_ptimer_counter(void)
+@@ -76,6 +79,7 @@ static u64 read_ptimer_cval(void)
+ static void write_ptimer_cval(u64 val)
+ {
+ 	write_sysreg(val, cntp_cval_el0);
++	isb();
+ }
+ 
+ static s32 read_ptimer_tval(void)
+@@ -86,6 +90,7 @@ static s32 read_ptimer_tval(void)
+ static void write_ptimer_tval(s32 val)
+ {
+ 	write_sysreg(val, cntp_tval_el0);
++	isb();
+ }
+ 
+ static u64 read_ptimer_ctl(void)
+@@ -96,6 +101,7 @@ static u64 read_ptimer_ctl(void)
+ static void write_ptimer_ctl(u64 val)
+ {
+ 	write_sysreg(val, cntp_ctl_el0);
++	isb();
+ }
+ 
+ struct timer_info {
+@@ -181,7 +187,6 @@ static bool test_cval_10msec(struct timer_info *info)
+ 	before_timer = info->read_counter();
+ 	info->write_cval(before_timer + time_10ms);
+ 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+-	isb();
+ 
+ 	/* Wait for the timer to fire */
+ 	while (!(info->read_ctl() & ARCH_TIMER_CTL_ISTATUS))
+@@ -217,11 +222,9 @@ static void test_timer(struct timer_info *info)
+ 	/* Enable the timer, but schedule it for much later */
+ 	info->write_cval(later);
+ 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+-	isb();
+ 	report(!gic_timer_pending(info), "not pending before");
+ 
+ 	info->write_cval(now - 1);
+-	isb();
+ 	report(gic_timer_pending(info), "interrupt signal pending");
+ 
+ 	/* Disable the timer again and prepare to take interrupts */
 -- 
 2.20.1
 
