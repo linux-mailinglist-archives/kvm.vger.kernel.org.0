@@ -2,178 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A505B14F377
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 21:55:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9F3D14F382
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 21:58:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726138AbgAaUz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 15:55:56 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51704 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726102AbgAaUz4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jan 2020 15:55:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580504155;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ut6romTePPKAlxPx0bm/6CAtIIIuPyUqVjspVOVMDwY=;
-        b=WnNmfhRhQCrsoaIb4PTxQ55LmY7ddzg1jEKxBy+RT05XfD398zgU3CI/jQcNTH7pCs0gjr
-        weGYIjNs0saxYKyU12M1a8o9yH+P+WOgUttRg8cPvGI/IOe+d8MOxuCMiCjhq5tph4WWRH
-        oj7RpAqPsZ9VlnmA6D8PbMAqQCPfkOM=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-SWtUYQ7pOIiYq-4rj1cZSQ-1; Fri, 31 Jan 2020 15:55:53 -0500
-X-MC-Unique: SWtUYQ7pOIiYq-4rj1cZSQ-1
-Received: by mail-qk1-f197.google.com with SMTP id t195so4900539qke.23
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 12:55:53 -0800 (PST)
+        id S1726794AbgAaU55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 15:57:57 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:39810 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726105AbgAaU54 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 15:57:56 -0500
+Received: by mail-pf1-f195.google.com with SMTP id 84so3945861pfy.6
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 12:57:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=axXyWq+/1ENk7nWGOr0BDelZPbmUAfFhUOKXYN/D26I=;
+        b=G0JGgN2vuQgLYNTNbcGJW2bbCdiQWVlU/lEC62HHj9aIpCdNfKqDNPA7DsP7Yl1sW2
+         6Dg3DhrOj/9YzOAC/Rn2/4LTXZMbueyw81Mt6hqb4MXpj+eo1BrB5oFy7YU3iEmvNkOn
+         yiE2HYPpTVF2/UhXplea49PE+hFdcbFnrd6YvtzfsqA08h/htYGvh7qk9EjC6BCqY8P0
+         n5vfTtk59ria8j04K3e+rZFu+aH4F4u4xXwBR9j+ftAa99TmOIhl+1GUpndmNAyUmiaI
+         o6EfsIIH2+c2fUKh0fQdpY2ou65nRxaPxmIct9WaITwluSztBoqrADf7Lf5P73zm8ntt
+         ydjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ut6romTePPKAlxPx0bm/6CAtIIIuPyUqVjspVOVMDwY=;
-        b=qmtuJbsYak+n+pRwgWyL+BRuh7e/KJttRpPepU9ngcxfP41UmueIZVZmJDAWRZpCEH
-         lZYqzClNI4Q693rK2CsLZjmg0KHpC8xqi9v9UAjii+HzlatDzSdXLrONuUqIQzuEnnl6
-         3WRhXc50So051SfLG5ZuI6R6IZqsevhx9d67E6qFenfDZd2Dc5RvfKVzgg72pXdxTBjd
-         lUTU0T97KOgkTTZYRKf/B9UKc1NZdnqtshLjgs5kV+svNCaVASvjENccwAZNb56nfwRr
-         wxQt/4DMUX8J9+HsWQ9XP3C12T+uXheKw8YD3YwqnohA10PD/2E+LiU9oxamMLGJH4uE
-         hWyg==
-X-Gm-Message-State: APjAAAX8jyI1O+fN1pvvCtxZsYcTEcvqKK4dLfnaOqjEY5x+hINIh/qV
-        uJkb1OU6BdRkidxs/sKw0oIo4xj+KTUCsANUIFLwRWjhvo6t97/pLquw8/scKJKaHBOx6eE5kOz
-        AjxevYx+AUlmT
-X-Received: by 2002:ac8:2afb:: with SMTP id c56mr13088641qta.112.1580504153160;
-        Fri, 31 Jan 2020 12:55:53 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyaA7bAFg1JFtB0SyHo7ynkFLIiM6zJ2BC1R4vbGlAt1l1DTroAhqPEKc24L2YMfsbwGA0UAw==
-X-Received: by 2002:ac8:2afb:: with SMTP id c56mr13088615qta.112.1580504152755;
-        Fri, 31 Jan 2020 12:55:52 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id b9sm5049656qkh.83.2020.01.31.12.55.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jan 2020 12:55:52 -0800 (PST)
-Date:   Fri, 31 Jan 2020 15:55:50 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3 09/21] KVM: X86: Don't track dirty for
- KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
-Message-ID: <20200131205550.GB7063@xz-x1>
-References: <20200109145729.32898-1-peterx@redhat.com>
- <20200109145729.32898-10-peterx@redhat.com>
- <20200121155657.GA7923@linux.intel.com>
- <20200128055005.GB662081@xz-x1>
- <20200128182402.GA18652@linux.intel.com>
- <20200131150832.GA740148@xz-x1>
- <20200131193301.GC18946@linux.intel.com>
- <20200131202824.GA7063@xz-x1>
- <20200131203622.GF18946@linux.intel.com>
-MIME-Version: 1.0
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=axXyWq+/1ENk7nWGOr0BDelZPbmUAfFhUOKXYN/D26I=;
+        b=fi69jnUs2/4guGrgCC/IY1NvwlOr2eZ7kFVsd0jAhwpD1n4SoNmVAQU2YZks6aElKr
+         blHkyP9MEKAJWYq470396Vkb+EhRthjx7fmoAI3KviJ5iD34qUDw8B+Yg44VwLztkUc/
+         FxuMdzMMBJH/SckhywOqIbz24PhF8IxuBB6VkznH5kTxiN9hQA9PnVSu/0rLz2s1MZvx
+         V+6BD653SUODJNWyfRXFdNlo5ACoJruT4mPDKtu9uIM8A8koVPVWsmrRzCHRwpVKNrJI
+         qIebqVyfwMko0/VEZjPgtxvBF4Wn8q6YHfL3V9U0NFiGhDIHpXc0SJDcZVa86Yqsud9t
+         HEsA==
+X-Gm-Message-State: APjAAAVkOf01/tUqfVSIiuY3MU5sJCO2g/qWjC6ZU9U9mFTj8ZMf7Gj0
+        /Y6qiQw++9ldGOZzhdTuQC7Nsg==
+X-Google-Smtp-Source: APXvYqymQmzrxcl6ZY9/7pXTcbIxf0wn5OwbTW1qGSMIgJZOpPb0A3yJKDDjtXd+A1frFQz+qU319w==
+X-Received: by 2002:a63:4b49:: with SMTP id k9mr12264866pgl.269.1580504275824;
+        Fri, 31 Jan 2020 12:57:55 -0800 (PST)
+Received: from ?IPv6:2600:1010:b010:9631:69c2:3ecc:ab84:f45c? ([2600:1010:b010:9631:69c2:3ecc:ab84:f45c])
+        by smtp.gmail.com with ESMTPSA id i68sm11455978pfe.173.2020.01.31.12.57.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Jan 2020 12:57:54 -0800 (PST)
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200131203622.GF18946@linux.intel.com>
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 2/2] KVM: VMX: Extend VMX's #AC handding
+Date:   Fri, 31 Jan 2020 12:57:51 -0800
+Message-Id: <5CD544A4-291A-47A1-80D1-F77FE0444925@amacapital.net>
+References: <20200131201743.GE18946@linux.intel.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+In-Reply-To: <20200131201743.GE18946@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: iPhone Mail (17C54)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 31, 2020 at 12:36:22PM -0800, Sean Christopherson wrote:
-> On Fri, Jan 31, 2020 at 03:28:24PM -0500, Peter Xu wrote:
-> > On Fri, Jan 31, 2020 at 11:33:01AM -0800, Sean Christopherson wrote:
-> > > For the same reason we don't take mmap_sem, it gains us nothing, i.e. KVM
-> > > still has to use copy_{to,from}_user().
-> > > 
-> > > In the proposed __x86_set_memory_region() refactor, vmx_set_tss_addr()
-> > > would be provided the hva of the memory region.  Since slots_lock and SRCU
-> > > only protect gfn->hva, why would KVM take slots_lock since it already has
-> > > the hva?
-> > 
-> > OK so you're suggesting to unlock the lock earlier to not cover
-> > init_rmode_tss() rather than dropping the whole lock...  Yes it looks
-> > good to me.  I think that's the major confusion I got.
-> 
-> Ya.  And I missed where the -EEXIST was coming from.  I think we're on the
-> same page.
 
-Good to know.  Btw, for me I would still prefer to keep the lock be
-after the __copy_to_user()s because "HVA is valid without lock" is
-only true for these private memslots.  After all this is super slow
-path so I wouldn't mind to take the lock for some time longer.  Or
-otherwise if you really like the unlock() to be earlier I can comment
-above the unlock:
 
-  /*
-   * We can unlock before using the HVA only because this KVM private
-   * memory slot will never change until the end of VM lifecycle.
-   */
 
-> 
-> > > Returning -EEXIST is an ABI change, e.g. userspace can currently call
-> > > KVM_SET_TSS_ADDR any number of times, it just needs to ensure proper
-> > > serialization between calls.
-> > > 
-> > > If you want to change the ABI, then submit a patch to do exactly that.
-> > > But don't bury an ABI change under the pretense that it's a bug fix.
-> > 
-> > Could you explain what do you mean by "ABI change"?
-> > 
-> > I was talking about the original code, not after applying the
-> > patchset.  To be explicit, I mean [a] below:
-> > 
-> > int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size,
-> > 			    unsigned long *uaddr)
-> > {
-> > 	int i, r;
-> > 	unsigned long hva;
-> > 	struct kvm_memslots *slots = kvm_memslots(kvm);
-> > 	struct kvm_memory_slot *slot, old;
-> > 
-> > 	/* Called with kvm->slots_lock held.  */
-> > 	if (WARN_ON(id >= KVM_MEM_SLOTS_NUM))
-> > 		return -EINVAL;
-> > 
-> > 	slot = id_to_memslot(slots, id);
-> > 	if (size) {
-> > 		if (slot->npages)
-> > 			return -EEXIST;  <------------------------ [a]
-> >         }
-> >         ...
-> > }
-> 
-> Doh, I completely forgot that the second __x86_set_memory_region() would
-> fail.  Sorry :-(
-> 
-> > > > Yes, but as I mentioned, I don't think it's an issue to be considered
-> > > > by KVM, otherwise we should have the same issue all over the places
-> > > > when we fetch the cached userspace_addr from any user slots.
-> > > 
-> > > Huh?  Of course it's an issue that needs to be considered by KVM, e.g.
-> > > kvm_{read,write}_guest_cached() aren't using __copy_{to,}from_user() for
-> > > giggles.
-> > 
-> > The cache is for the GPA->HVA translation (struct gfn_to_hva_cache),
-> > we still use __copy_{to,}from_user() upon the HVAs, no?
-> 
-> I'm still lost on this one.  I'm pretty sure I'm incorrectly interpreting:
->   
->   I don't think it's an issue to be considered by KVM, otherwise we should
->   have the same issue all over the places when we fetch the cached
->   userspace_addr from any user slots.
-> 
-> What is the issue to which you are referring?
+> On Jan 31, 2020, at 12:18 PM, Sean Christopherson <sean.j.christopherson@i=
+ntel.com> wrote:
+>=20
+> =EF=BB=BFOn Sat, Feb 01, 2020 at 01:47:10AM +0800, Xiaoyao Li wrote:
+>>> On 1/31/2020 11:37 PM, Andy Lutomirski wrote:
+>>>=20
+>>>> On Jan 30, 2020, at 11:22 PM, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>>>=20
+>>>> On 1/31/2020 1:16 AM, Andy Lutomirski wrote:
+>=20
+> ...
+>=20
+>>>>> Can we get a credible description of how this would work? I suggest: I=
+ntel
+>>>>> adds and documents a new CPUID bit or core capability bit that means
+>>>>> =E2=80=9Csplit lock detection is forced on=E2=80=9D.  If this bit is s=
+et, the MSR bit
+>>>>> controlling split lock detection is still writable, but split lock
+>>>>> detection is on regardless of the value.  Operating systems are expect=
+ed
+>>>>> to set the bit to 1 to indicate to a hypervisor, if present, that they=
 
-The issue I was referring to is "HVA can be unmapped by the userspace
-without KVM's notice".  I think actually we're on the same page too
-here, my follow-up question is really a pure question for when you say
-"kvm_{read,write}_guest_cached() aren't using __copy_{to,}from_user()"
-above - because that's against my understanding.
+>>>>> understand that split lock detection is on.  This would be an SDM-only=
 
--- 
-Peter Xu
+>>>>> change, but it would also be a commitment to certain behavior for futu=
+re
+>>>>> CPUs that don=E2=80=99t implement split locks.
+>>>>=20
+>>>> It sounds a PV solution for virtualization that it doesn't need to be
+>>>> defined in Intel-SDM but in KVM document.
+>>>>=20
+>>>> As you suggested, we can define new bit in KVM_CPUID_FEATURES (0x400000=
+01)
+>>>> as KVM_FEATURE_SLD_FORCED and reuse MSR_TEST_CTL or use a new virtualiz=
+ed
+>>>> MSR for guest to tell hypervisor it understand split lock detection is
+>>>> forced on.
+>>>=20
+>>> Of course KVM can do this. But this missed the point. Intel added a new C=
+PU
+>>> feature, complete with an enumeration mechanism, that cannot be correctl=
+y
+>>> used if a hypervisor is present.
+>>=20
+>> Why it cannot be correctly used if a hypervisor is present? Because it ne=
+eds
+>> to disable split lock detection when running a vcpu for guest as this pat=
+ch
+>> wants to do?
+>=20
+> Because SMT.  Unless vCPUs are pinned 1:1 with pCPUs, and the guest is
+> given an accurate topology, disabling/enabling split-lock #AC may (or may
+> not) also disable/enable split-lock #AC on a random vCPU in the guest.
+>=20
+>>> As it stands, without specific hypervisor and guest support of a non-Int=
+el
+>>> interface, it is *impossible* to give architecturally correct behavior t=
+o a
+>>> guest. If KVM implements your suggestion, *Windows* guests will still
+>>> malfunction on Linux.
+>>=20
+>> Actually, KVM don't need to implement my suggestion. It can just virtuali=
+ze
+>> and expose this feature (MSR_IA32_CORE_CAPABILITIES and MSR_TEST_CTRL) to=
 
+>> guest, (but it may have some requirement that HT is disabled and host is
+>> sld_off) then guest can use it architecturally.
+>=20
+> This is essentially what I proposed a while back.  KVM would allow enablin=
+g
+> split-lock #AC in the guest if and only if SMT is disabled or the enable b=
+it
+> is per-thread, *or* the host is in "warn" mode (can live with split-lock #=
+AC
+> being randomly disabled/enabled) and userspace has communicated to KVM tha=
+t
+> it is pinning vCPUs.
+
+How about covering the actual sensible case: host is set to fatal?  In this m=
+ode, the guest gets split lock detection whether it wants it or not. How do w=
+e communicate this to the guest?=
