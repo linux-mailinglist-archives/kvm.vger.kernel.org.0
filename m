@@ -2,189 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E0D9314EF0B
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 16:04:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41F6714EF2B
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 16:08:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729226AbgAaPD7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 10:03:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32214 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729111AbgAaPD7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jan 2020 10:03:59 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00VF152R056840
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 10:03:58 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xvfy985t1-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 10:03:57 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 31 Jan 2020 15:03:55 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 31 Jan 2020 15:03:52 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00VF3pMP27656204
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 31 Jan 2020 15:03:51 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC85F42041;
-        Fri, 31 Jan 2020 15:03:51 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9488542045;
-        Fri, 31 Jan 2020 15:03:51 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 31 Jan 2020 15:03:51 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 538D6E03BC; Fri, 31 Jan 2020 16:03:51 +0100 (CET)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: [GIT PULL 7/7] selftests: KVM: testing the local IRQs resets
-Date:   Fri, 31 Jan 2020 16:03:48 +0100
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200131150348.73360-1-borntraeger@de.ibm.com>
-References: <20200131150348.73360-1-borntraeger@de.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 20013115-0016-0000-0000-000002E28F3D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20013115-0017-0000-0000-000033455F3A
-Message-Id: <20200131150348.73360-8-borntraeger@de.ibm.com>
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S1729220AbgAaPIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 10:08:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42854 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729064AbgAaPIk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 10:08:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580483318;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ao5KrNXtNkM/tF29re2/qinnBa2LAW0IsXBS+tc1J3M=;
+        b=QtmjQxlX6R1ilVSip2cpgnN+SFX7vM50OrfAe8XTDiaDT3gkQu0P8EbSeOO8qDnEupRvGJ
+        8sVgyspsHeX9rPZc3GJQ6rgmjv+vuw9Y5pa8MsbqiPhrnDyVY9hRjsJMrXKqTRit4idQsz
+        XjN3aHEvanUCyCCr0yGfittYGbaxdQU=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-b_xOqkj-PrKjV3IFEZMuVw-1; Fri, 31 Jan 2020 10:08:36 -0500
+X-MC-Unique: b_xOqkj-PrKjV3IFEZMuVw-1
+Received: by mail-qv1-f69.google.com with SMTP id e10so4532983qvq.18
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 07:08:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ao5KrNXtNkM/tF29re2/qinnBa2LAW0IsXBS+tc1J3M=;
+        b=lCPOUZwMmlsrEah4IgI+fPGvWR0c9KAjYyFTFMwx83gZ/b4wU2kfUSXE3I9lr9BbtI
+         2SyI/uc3u4D6LjQXr92yT0A32aS+zAARZx6ISm2/6EMN1PhflvGphzRpD2ZODIfdRozb
+         7d0+8JTi5lbhxlrs7Aa2jC0HilvaRjSfzqL9cuNDr1Vqlr8zza+5ACsU+AOkN4cCbyXQ
+         lIXpiQBU69qEvyQ+xkjvD/14RN8d6K7iuWZSpKZJml+T6bdVBj/Sc7ZbeAuFpT0siMkZ
+         mMfupVGvHF7wkJraO5xzr6MK2bK6nzBIPTCGGxBPjd1EHISjyyx3EqjRbReAuMdf8Roh
+         jouQ==
+X-Gm-Message-State: APjAAAUFZuSOy3sKvtjLkCblloptWtmCpzfWtwU2om3r8+yZnh7GJNaz
+        v4suwvCY/3NKEb8f6YSLBfBFJhx+lK/q5nJGw+sivNSTRFnbVoCKNc9VJobeH0/ucKSaXKChBBq
+        uTRhECGnejD/3
+X-Received: by 2002:a05:620a:2050:: with SMTP id d16mr11206400qka.473.1580483316157;
+        Fri, 31 Jan 2020 07:08:36 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy4dWlHCI+GWoFvd6CMrReascKHMPXtyM7CmlPjhpmhjbOmlW6CuUmZbV3doAAOjs9vT2Z0bQ==
+X-Received: by 2002:a05:620a:2050:: with SMTP id d16mr11206356qka.473.1580483315741;
+        Fri, 31 Jan 2020 07:08:35 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+        by smtp.gmail.com with ESMTPSA id m68sm4462082qke.17.2020.01.31.07.08.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Jan 2020 07:08:35 -0800 (PST)
+Date:   Fri, 31 Jan 2020 10:08:32 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v3 09/21] KVM: X86: Don't track dirty for
+ KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+Message-ID: <20200131150832.GA740148@xz-x1>
+References: <20200109145729.32898-1-peterx@redhat.com>
+ <20200109145729.32898-10-peterx@redhat.com>
+ <20200121155657.GA7923@linux.intel.com>
+ <20200128055005.GB662081@xz-x1>
+ <20200128182402.GA18652@linux.intel.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-31_03:2020-01-31,2020-01-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- mlxscore=0 mlxlogscore=999 priorityscore=1501 phishscore=0 spamscore=0
- lowpriorityscore=0 suspectscore=0 clxscore=1015 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2001310126
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200128182402.GA18652@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Pierre Morel <pmorel@linux.ibm.com>
+On Tue, Jan 28, 2020 at 10:24:03AM -0800, Sean Christopherson wrote:
+> On Tue, Jan 28, 2020 at 01:50:05PM +0800, Peter Xu wrote:
+> > On Tue, Jan 21, 2020 at 07:56:57AM -0800, Sean Christopherson wrote:
+> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > > index c4d3972dcd14..ff97782b3919 100644
+> > > > --- a/arch/x86/kvm/x86.c
+> > > > +++ b/arch/x86/kvm/x86.c
+> > > > @@ -9584,7 +9584,15 @@ void kvm_arch_sync_events(struct kvm *kvm)
+> > > >  	kvm_free_pit(kvm);
+> > > >  }
+> > > >  
+> > > > -int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+> > > > +/*
+> > > > + * If `uaddr' is specified, `*uaddr' will be returned with the
+> > > > + * userspace address that was just allocated.  `uaddr' is only
+> > > > + * meaningful if the function returns zero, and `uaddr' will only be
+> > > > + * valid when with either the slots_lock or with the SRCU read lock
+> > > > + * held.  After we release the lock, the returned `uaddr' will be invalid.
+> > > 
+> > > This is all incorrect.  Neither of those locks has any bearing on the
+> > > validity of the hva.  slots_lock does as the name suggests and prevents
+> > > concurrent writes to the memslots.  The SRCU lock ensures the implicit
+> > > memslots lookup in kvm_clear_guest_page() won't result in a use-after-free
+> > > due to derefencing old memslots.
+> > > 
+> > > Neither of those has anything to do with the userspace address, they're
+> > > both fully tied to KVM's gfn->hva lookup.  As Paolo pointed out, KVM's
+> > > mapping is instead tied to the lifecycle of the VM.  Note, even *that* has
+> > > no bearing on the validity of the mapping or address as KVM only increments
+> > > mm_count, not mm_users, i.e. guarantees the mm struct itself won't be freed
+> > > but doesn't ensure the vmas or associated pages tables are valid.
+> > > 
+> > > Which is the entire point of using __copy_{to,from}_user(), as they
+> > > gracefully handle the scenario where the process has not valid mapping
+> > > and/or translation for the address.
+> > 
+> > Sorry I don't understand.
+> > 
+> > I do think either the slots_lock or SRCU would protect at least the
+> > existing kvm.memslots, and if so at least the previous vm_mmap()
+> > return value should still be valid.
+> 
+> Nope.  kvm->slots_lock only protects gfn->hva lookups, e.g. userspace can
+> munmap() the range at any time.
 
-Local IRQs are reset by a normal cpu reset.  The initial cpu reset and
-the clear cpu reset, as superset of the normal reset, both clear the
-IRQs too.
+Do we need to consider that?  If the userspace did this then it'll
+corrupt itself, and imho private memory slot is not anything special
+here comparing to the user memory slots.  For example, the userspace
+can unmap any region after KVM_SET_USER_MEMORY_REGION ioctl even if
+the region is filled into some of the userspace_addr of
+kvm_userspace_memory_region, so the cached userspace_addr can be
+invalid, then kvm_write_guest_page() can fail too with the same
+reason.  IMHO kvm only need to make sure it handles the failure path
+then it's perfectly fine.
 
-Let's inject an interrupt to a vCPU before calling a reset and see if
-it is gone after the reset.
+> 
+> > I agree that __copy_to_user() will protect us from many cases from process
+> > mm pov (which allows page faults inside), but again if the kvm.memslots is
+> > changed underneath us then it's another story, IMHO, and that's why we need
+> > either the lock or SRCU.
+> 
+> No, again, slots_lock and SRCU only protect gfn->hva lookups.
 
-We choose to inject only an emergency interrupt at this point and can
-extend the test to other types of IRQs later.
+Yes, then could you further explain why do you think we don't need the
+slot lock?  
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-[minor fixups]
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Link: https://lore.kernel.org/r/20200131100205.74720-7-frankja@linux.ibm.com
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- tools/testing/selftests/kvm/s390x/resets.c | 42 ++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+> 
+> > Or are you assuming that (1) __x86_set_memory_region() is only for the
+> > 3 private kvm memslots, 
+> 
+> It's not an assumption, the entire purpose of __x86_set_memory_region()
+> is to provide support for private KVM memslots.
+> 
+> > and (2) currently the kvm private memory slots will never change after VM
+> > is created and before VM is destroyed?
+> 
+> No, I'm not assuming the private memslots are constant, e.g. the flow in
+> question, vmx_set_tss_addr() is directly tied to an unprotected ioctl().
 
-diff --git a/tools/testing/selftests/kvm/s390x/resets.c b/tools/testing/selftests/kvm/s390x/resets.c
-index fb8e976943a9..1485bc6c8999 100644
---- a/tools/testing/selftests/kvm/s390x/resets.c
-+++ b/tools/testing/selftests/kvm/s390x/resets.c
-@@ -14,6 +14,9 @@
- #include "kvm_util.h"
- 
- #define VCPU_ID 3
-+#define LOCAL_IRQS 32
-+
-+struct kvm_s390_irq buf[VCPU_ID + LOCAL_IRQS];
- 
- struct kvm_vm *vm;
- struct kvm_run *run;
-@@ -53,6 +56,23 @@ static void test_one_reg(uint64_t id, uint64_t value)
- 	TEST_ASSERT(eval_reg == value, "value == %s", value);
- }
- 
-+static void assert_noirq(void)
-+{
-+	struct kvm_s390_irq_state irq_state;
-+	int irqs;
-+
-+	irq_state.len = sizeof(buf);
-+	irq_state.buf = (unsigned long)buf;
-+	irqs = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_GET_IRQ_STATE, &irq_state);
-+	/*
-+	 * irqs contains the number of retrieved interrupts. Any interrupt
-+	 * (notably, the emergency call interrupt we have injected) should
-+	 * be cleared by the resets, so this should be 0.
-+	 */
-+	TEST_ASSERT(irqs >= 0, "Could not fetch IRQs: errno %d\n", errno);
-+	TEST_ASSERT(!irqs, "IRQ pending");
-+}
-+
- static void assert_clear(void)
- {
- 	struct kvm_sregs sregs;
-@@ -94,6 +114,22 @@ static void assert_initial(void)
- static void assert_normal(void)
- {
- 	test_one_reg(KVM_REG_S390_PFTOKEN, KVM_S390_PFAULT_TOKEN_INVALID);
-+	assert_noirq();
-+}
-+
-+static void inject_irq(int cpu_id)
-+{
-+	struct kvm_s390_irq_state irq_state;
-+	struct kvm_s390_irq *irq = &buf[0];
-+	int irqs;
-+
-+	/* Inject IRQ */
-+	irq_state.len = sizeof(struct kvm_s390_irq);
-+	irq_state.buf = (unsigned long)buf;
-+	irq->type = KVM_S390_INT_EMERGENCY;
-+	irq->u.emerg.code = cpu_id;
-+	irqs = _vcpu_ioctl(vm, cpu_id, KVM_S390_SET_IRQ_STATE, &irq_state);
-+	TEST_ASSERT(irqs >= 0, "Error injecting EMERGENCY IRQ errno %d\n", errno);
- }
- 
- static void test_normal(void)
-@@ -106,6 +142,8 @@ static void test_normal(void)
- 
- 	vcpu_run(vm, VCPU_ID);
- 
-+	inject_irq(VCPU_ID);
-+
- 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_NORMAL_RESET, 0);
- 	assert_normal();
- 	kvm_vm_free(vm);
-@@ -120,6 +158,8 @@ static void test_initial(void)
- 
- 	vcpu_run(vm, VCPU_ID);
- 
-+	inject_irq(VCPU_ID);
-+
- 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_INITIAL_RESET, 0);
- 	assert_normal();
- 	assert_initial();
-@@ -135,6 +175,8 @@ static void test_clear(void)
- 
- 	vcpu_run(vm, VCPU_ID);
- 
-+	inject_irq(VCPU_ID);
-+
- 	vcpu_ioctl(vm, VCPU_ID, KVM_S390_CLEAR_RESET, 0);
- 	assert_normal();
- 	assert_initial();
+Why it's unprotected?  Now vmx_set_tss_add() is protected by the slots
+lock so concurrent operation is safe, also it'll return -EEXIST if
+called for more than once.
+
+[1]
+
+> 
+> KVM's sole responsible for vmx_set_tss_addr() is to not crash the kernel.
+> Userspace is responsible for ensuring it doesn't break its guests, e.g.
+> that multiple calls to KVM_SET_TSS_ADDR are properly serialized.
+> 
+> In the existing code, KVM ensures it doesn't crash by holding the SRCU lock
+> for the duration of init_rmode_tss() so that the gfn->hva lookups in
+> kvm_clear_guest_page() don't dereference a stale memslots array.
+
+Here in the current master branch we have both the RCU lock and the
+slot lock held, that's why I think we can safely remove the RCU lock
+as long as we're still holding the slots lock.  We can't do the
+reverse because otherwise multiple KVM_SET_TSS_ADDR could race.
+
+> In no way
+> does that ensure the validity of the resulting hva,
+
+Yes, but as I mentioned, I don't think it's an issue to be considered
+by KVM, otherwise we should have the same issue all over the places
+when we fetch the cached userspace_addr from any user slots.
+
+> e.g. multiple calls to
+> KVM_SET_TSS_ADDR would race to set vmx->tss_addr and so init_rmode_tss()
+> could be operating on a stale gpa.
+
+Please refer to [1].
+
+I just want to double-confirm on what we're discussing now. Are you
+sure you're suggesting that we should remove the slot lock in
+init_rmode_tss()?  Asked because you discussed quite a bit on how the
+slot lock should protect GPA->HVA, about concurrency and so on, then
+I'm even more comfused...
+
+Thanks,
+
 -- 
-2.21.0
+Peter Xu
 
