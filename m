@@ -2,144 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 561FF14ECDD
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 14:04:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 023DD14EE11
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 14:59:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728590AbgAaNEg convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 31 Jan 2020 08:04:36 -0500
-Received: from mga17.intel.com ([192.55.52.151]:56888 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728514AbgAaNEg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 08:04:36 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Jan 2020 05:04:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,385,1574150400"; 
-   d="scan'208";a="402650842"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga005.jf.intel.com with ESMTP; 31 Jan 2020 05:04:35 -0800
-Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 31 Jan 2020 05:04:34 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.197]) by
- SHSMSX153.ccr.corp.intel.com ([169.254.12.97]) with mapi id 14.03.0439.000;
- Fri, 31 Jan 2020 21:04:12 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC v3 4/8] vfio/type1: Add VFIO_NESTING_GET_IOMMU_UAPI_VERSION
-Thread-Topic: [RFC v3 4/8] vfio/type1: Add
- VFIO_NESTING_GET_IOMMU_UAPI_VERSION
-Thread-Index: AQHV1pyVzTVYYyC090Ow388f+bA35qgBzDSAgALuTFA=
-Date:   Fri, 31 Jan 2020 13:04:11 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A1994A2@SHSMSX104.ccr.corp.intel.com>
-References: <1580299912-86084-1-git-send-email-yi.l.liu@intel.com>
-        <1580299912-86084-5-git-send-email-yi.l.liu@intel.com>
- <20200129165649.43008300@w520.home>
-In-Reply-To: <20200129165649.43008300@w520.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYTgxNzM5ZWQtYTU3Mi00MjE4LThlNjQtYzE3YmQ3NmRiZGU1IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiaXE0Skp3bEs4ZGJhdmNWd0dYY3F2VWdpamZjN1FNcHpvZ2pMM2JYZzkxSzR3VVBkSjJpc1Z5TXNOcFBCZ1crSyJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1728738AbgAaN7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 08:59:10 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55826 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728719AbgAaN7K (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jan 2020 08:59:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580479149;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hNUw6IPOMIG9KQCYecqbcrytZM2fmwuWhPjigAsREIk=;
+        b=aVb8MSEHuCoDbdMtlMsRsLP/beBJtQB5WU5Hmyz6GvLUXmOGQVKCwgte6Id+cobLvcvv7d
+        FfgOD2146ZItf3oiDjzvaWhhug/mV7/8CzQducW2AhiwVniEGD9M/Vd+cYl0JIFyFaUUrt
+        /S4XRy5fR/lwWo76fBCGlcavdvve3fo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-BZzrYi48M5q1Mp2Uh8_ngg-1; Fri, 31 Jan 2020 08:59:07 -0500
+X-MC-Unique: BZzrYi48M5q1Mp2Uh8_ngg-1
+Received: by mail-wr1-f69.google.com with SMTP id j13so3372137wrr.20
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 05:59:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=hNUw6IPOMIG9KQCYecqbcrytZM2fmwuWhPjigAsREIk=;
+        b=ZXdjVi35ho7wp1U/hfnOk31mt1z+jYnVTNivJsc9s7LiIWyJvJihRQZDrPvda1dThO
+         Kln58GVM67QgX1wYdmR0rUYCi5DYZJrCYyIMs2ph9tpTbUumB/Ud59lMJkEhbJdtpcQE
+         keOsYjzvWj1VgrtY6vfyN23OZ+NbjxlPJFDR9Z2wMkMIKwZIctauilMUDCYk4opvdyRL
+         KbP6NrNn07p0UDzZPrVuRnsPscUpMsjmXHFr1ABsgFNnn+SlSJcCdP4uZF652/hkeVn0
+         0OJfc8lUVVs/wpZ8lwOI+CuQrhiETQlNQRBah0MDFfKOYu7RFj9Lu9NTHz2K742U65eq
+         mZCQ==
+X-Gm-Message-State: APjAAAV+omZmlYG+Q0X5v+Tjrxi8BFRwH7n2pnQTMyLuQgnLq8rFJdnj
+        50u21wP/eRd9+nlIqdQoZv82yRXwNvcnHLwi/BuhHWGEulkUznoPmy2H2xkvdr3UPbPm8PyO041
+        yFow2fXfGVs0e
+X-Received: by 2002:a5d:52c4:: with SMTP id r4mr12340678wrv.368.1580479145891;
+        Fri, 31 Jan 2020 05:59:05 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwq6gOWcudtpzerMxP8Ia/73h2By2Dmg/cNUGGxc6rZe83zEVp6sBSb5DIRUdVUqL6tDXWh3w==
+X-Received: by 2002:a5d:52c4:: with SMTP id r4mr12340659wrv.368.1580479145631;
+        Fri, 31 Jan 2020 05:59:05 -0800 (PST)
+Received: from [192.168.43.81] (93-33-14-103.ip42.fastwebnet.it. [93.33.14.103])
+        by smtp.gmail.com with ESMTPSA id b18sm12162460wru.50.2020.01.31.05.59.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Jan 2020 05:59:05 -0800 (PST)
+Subject: Re: [PATCH v10 4/6] selftests: KVM: Add fpu and one reg set/get
+ library functions
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+References: <20200131100205.74720-1-frankja@linux.ibm.com>
+ <20200131100205.74720-5-frankja@linux.ibm.com>
+ <6a990f23-832b-86f7-28bf-761e84fd33fb@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <75bddb63-fb5a-90b0-64bf-2de1d53f2b82@redhat.com>
+Date:   Fri, 31 Jan 2020 14:59:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
+In-Reply-To: <6a990f23-832b-86f7-28bf-761e84fd33fb@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
-
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Thursday, January 30, 2020 7:57 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [RFC v3 4/8] vfio/type1: Add
-> VFIO_NESTING_GET_IOMMU_UAPI_VERSION
+On 31/01/20 12:43, Christian Borntraeger wrote:
+> Paolo,
 > 
-> On Wed, 29 Jan 2020 04:11:48 -0800
-> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> are you ok with me taking this patch for my s390 pull request to you?
+> Ideally still for 5.6?
+
+Yes to both questions, of course.
+
+Paolo
+
+> On 31.01.20 11:02, Janosch Frank wrote:
+>> Add library access to more registers.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
+>>  .../testing/selftests/kvm/include/kvm_util.h  |  6 ++++
+>>  tools/testing/selftests/kvm/lib/kvm_util.c    | 36 +++++++++++++++++++
+>>  2 files changed, 42 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+>> index 29cccaf96baf..ae0d14c2540a 100644
+>> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+>> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+>> @@ -125,6 +125,12 @@ void vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+>>  		    struct kvm_sregs *sregs);
+>>  int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid,
+>>  		    struct kvm_sregs *sregs);
+>> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid,
+>> +		  struct kvm_fpu *fpu);
+>> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid,
+>> +		  struct kvm_fpu *fpu);
+>> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+>> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+>>  #ifdef __KVM_HAVE_VCPU_EVENTS
+>>  void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
+>>  		     struct kvm_vcpu_events *events);
+>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+>> index 41cf45416060..a6dd0401eb50 100644
+>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+>> @@ -1373,6 +1373,42 @@ int _vcpu_sregs_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_sregs *sregs)
+>>  	return ioctl(vcpu->fd, KVM_SET_SREGS, sregs);
+>>  }
+>>
+>> +void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_GET_FPU, fpu);
+>> +	TEST_ASSERT(ret == 0, "KVM_GET_FPU failed, rc: %i errno: %i (%s)",
+>> +		    ret, errno, strerror(errno));
+>> +}
+>> +
+>> +void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_SET_FPU, fpu);
+>> +	TEST_ASSERT(ret == 0, "KVM_SET_FPU failed, rc: %i errno: %i (%s)",
+>> +		    ret, errno, strerror(errno));
+>> +}
+>> +
+>> +void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_GET_ONE_REG, reg);
+>> +	TEST_ASSERT(ret == 0, "KVM_GET_ONE_REG failed, rc: %i errno: %i (%s)",
+>> +		    ret, errno, strerror(errno));
+>> +}
+>> +
+>> +void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_SET_ONE_REG, reg);
+>> +	TEST_ASSERT(ret == 0, "KVM_SET_ONE_REG failed, rc: %i errno: %i (%s)",
+>> +		    ret, errno, strerror(errno));
+>> +}
+>> +
+>>  /*
+>>   * VCPU Ioctl
+>>   *
+>>
 > 
-> > From: Liu Yi L <yi.l.liu@intel.com>
-> >
-> > In Linux Kernel, the IOMMU nesting translation (a.k.a. IOMMU dual stage
-> > translation capability) is abstracted in uapi/iommu.h, in which the uAPIs
-> > like bind_gpasid/iommu_cache_invalidate/fault_report/pgreq_resp are defined.
-> >
-> > VFIO_TYPE1_NESTING_IOMMU stands for the vfio iommu type which is backed by
-> > IOMMU nesting translation capability. VFIO exposes the nesting capability
-> > to userspace and also exposes uAPIs (will be added in later patches) to user
-> > space for setting up nesting translation from userspace. Thus applications
-> > like QEMU could support vIOMMU for pass-through devices with IOMMU nesting
-> > translation capability.
-> >
-> > As VFIO expose the nesting IOMMU programming to userspace, it also needs to
-> > provide an API for the uapi/iommu.h version check to ensure compatibility.
-> > This patch reports the iommu uapi version to userspace. Applications could
-> > use this API to do version check before further using the nesting uAPIs.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  drivers/vfio/vfio.c       |  3 +++
-> >  include/uapi/linux/vfio.h | 10 ++++++++++
-> >  2 files changed, 13 insertions(+)
-> >
-> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> > index 425d60a..9087ad4 100644
-> > --- a/drivers/vfio/vfio.c
-> > +++ b/drivers/vfio/vfio.c
-> > @@ -1170,6 +1170,9 @@ static long vfio_fops_unl_ioctl(struct file *filep,
-> >  	case VFIO_GET_API_VERSION:
-> >  		ret = VFIO_API_VERSION;
-> >  		break;
-> > +	case VFIO_NESTING_GET_IOMMU_UAPI_VERSION:
-> > +		ret = iommu_get_uapi_version();
-> > +		break;
-> 
-> Shouldn't the type1 backend report this?  It doesn't make much sense
-> that the spapr backend reports a version for something it doesn't
-> support.  Better yet, provide this info gratuitously in the
-> VFIO_IOMMU_GET_INFO ioctl return like you do with nesting in the next
-> patch, then it can help the user figure out if this support is present.
 
-yeah, it would be better to report it by type1 backed. However,
-it is kind of issue when QEMU using it.
-
-My series "hooks" vSVA supports on VFIO_TYPE1_NESTING_IOMMU type.
-[RFC v3 09/25] vfio: check VFIO_TYPE1_NESTING_IOMMU support
-https://www.spinics.net/lists/kvm/msg205197.html
-
-In QEMU, it will determine the iommu type firstly and then invoke
-VFIO_SET_IOMMU. I think before selecting VFIO_TYPE1_NESTING_IOMMU,
-QEMU needs to check the IOMMU uAPI version. If IOMMU uAPI is incompatible,
-QEMU should not use VFIO_TYPE1_NESTING_IOMMU type. If
-VFIO_NESTING_GET_IOMMU_UAPI_VERSION is available after set iommu, then it
-may be an issue. That's why this series reports the version in vfio layer
-instead of type1 backend.
-
-Regards,
-Yi Liu
