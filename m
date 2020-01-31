@@ -2,82 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 64A1314EBE3
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 12:44:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CF6514EBEE
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 12:47:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728499AbgAaLoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 06:44:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34254 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728428AbgAaLoR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 06:44:17 -0500
+        id S1728431AbgAaLrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 06:47:47 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29452 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728408AbgAaLrq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jan 2020 06:47:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580471056;
+        s=mimecast20190719; t=1580471265;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=qQon9H8oirA0BfQXr/ZQWuhlqVRCE1JMZ5FOC58Vsj8=;
-        b=bQvNBK2M0lruF/RafwwUc9ztrVj/BmhlNP5hHbycFszS5/2JjQ5gCwocH3pCgTXPHLx4Xm
-        9dD+eD33AHhouYzNiwyxB78Sd25VjJioVQsEzzZDK80WGlUtr2tUVvtEXwKvqxF39eWfgJ
-        6bj3wqrKbm/Ns/bLs4YP5MtxliFuRnw=
+        bh=R6Rt5/B9CnVWzD/y2yfe5Frqkxpb+qB2Xh0vRDea+6c=;
+        b=fzu97AJe/1wK05v2DGEnoBtpU6QVVtx6FsjXaxTbkO3wlDDWK72M3mg7XDsEjvW7Ijhz2E
+        Kaj85b/Xf57xNCKi11n3K1SJjAMTneLi/B5g026Tf9/aLYwbbnHwsETvv112ehZxup7LiM
+        IxUN9D12bBqnsU7klED/TKucmyg51pQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-Bxrlac-vONe8hpsGwbdSQA-1; Fri, 31 Jan 2020 06:44:12 -0500
-X-MC-Unique: Bxrlac-vONe8hpsGwbdSQA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-29-PXCR6itROBO0-owMW2gZZQ-1; Fri, 31 Jan 2020 06:47:41 -0500
+X-MC-Unique: PXCR6itROBO0-owMW2gZZQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0CB4800D48;
-        Fri, 31 Jan 2020 11:44:10 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 622C9801FA0;
+        Fri, 31 Jan 2020 11:47:40 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-176.ams2.redhat.com [10.36.116.176])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2AE4ACFC1;
-        Fri, 31 Jan 2020 11:44:06 +0000 (UTC)
-Subject: Re: [PATCH v10 3/6] KVM: s390: Add new reset vcpu API
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 84E9A89A7A;
+        Fri, 31 Jan 2020 11:47:34 +0000 (UTC)
+Subject: Re: [PATCH v10 6/6] selftests: KVM: testing the local IRQs resets
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
         linux-s390@vger.kernel.org
 References: <20200131100205.74720-1-frankja@linux.ibm.com>
- <20200131100205.74720-4-frankja@linux.ibm.com>
+ <20200131100205.74720-7-frankja@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <7e36cbd4-3f37-8509-400e-c2c708281aeb@redhat.com>
-Date:   Fri, 31 Jan 2020 12:44:05 +0100
+Message-ID: <b72b4119-913b-9bed-069f-18c0eb4c910f@redhat.com>
+Date:   Fri, 31 Jan 2020 12:47:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200131100205.74720-4-frankja@linux.ibm.com>
+In-Reply-To: <20200131100205.74720-7-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 31/01/2020 11.02, Janosch Frank wrote:
-> The architecture states that we need to reset local IRQs for all CPU
-> resets. Because the old reset interface did not support the normal CPU
-> reset we never did that on a normal reset.
+> From: Pierre Morel <pmorel@linux.ibm.com>
 > 
-> Let's implement an interface for the missing normal and clear resets
-> and reset all local IRQs, registers and control structures as stated
-> in the architecture.
+> Local IRQs are reset by a normal cpu reset.  The initial cpu reset and
+> the clear cpu reset, as superset of the normal reset, both clear the
+> IRQs too.
 > 
-> Userspace might already reset the registers via the vcpu run struct,
-> but as we need the interface for the interrupt clearing part anyway,
-> we implement the resets fully and don't rely on userspace to reset the
-> rest.
+> Let's inject an interrupt to a vCPU before calling a reset and see if
+> it is gone after the reset.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> We choose to inject only an emergency interrupt at this point and can
+> extend the test to other types of IRQs later.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>[minor fixups]
 > ---
->  Documentation/virt/kvm/api.txt | 43 +++++++++++++++++
->  arch/s390/kvm/kvm-s390.c       | 84 +++++++++++++++++++++++-----------
->  include/uapi/linux/kvm.h       |  5 ++
->  3 files changed, 105 insertions(+), 27 deletions(-)
+>  tools/testing/selftests/kvm/s390x/resets.c | 42 ++++++++++++++++++++++
+>  1 file changed, 42 insertions(+)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
