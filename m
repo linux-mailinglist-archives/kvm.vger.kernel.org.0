@@ -2,67 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C3F0314F273
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 19:55:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2D3D14F27E
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 20:03:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726469AbgAaSzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 13:55:35 -0500
-Received: from mga18.intel.com ([134.134.136.126]:30623 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725939AbgAaSze (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 13:55:34 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Jan 2020 10:55:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,386,1574150400"; 
-   d="scan'208";a="253419672"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 31 Jan 2020 10:55:32 -0800
-Date:   Fri, 31 Jan 2020 10:55:32 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5/5] KVM: x86: Set kvm_x86_ops only after
- ->hardware_setup() completes
-Message-ID: <20200131185531.GB18946@linux.intel.com>
-References: <20200130001023.24339-1-sean.j.christopherson@intel.com>
- <20200130001023.24339-6-sean.j.christopherson@intel.com>
- <44e0c550-7dcc-bfed-07c4-907e61d476a1@redhat.com>
+        id S1726174AbgAaTDh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 14:03:37 -0500
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:39045 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725978AbgAaTDh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 14:03:37 -0500
+Received: by mail-lj1-f194.google.com with SMTP id o15so2652248ljg.6
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 11:03:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4VxK/MMCQW+dDkX8QecLocFy8dYcEu2g9dKlDlJzkls=;
+        b=Q9Evdpky0V2PYOXzxUeE+Z0wqX2lKAGCp3nVViRW/lRXQ5YgmyuYZxzqoAY8Wyhmwm
+         dQUvSnIuv5+2JkLzQBDvrI9/mHezfih4rZs5oNUSWIgveXLWll3Xv8Ze288fwOVtZRfN
+         97QULoaV14HQwzYfA78+hJCh/lzyKFL4WmevU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4VxK/MMCQW+dDkX8QecLocFy8dYcEu2g9dKlDlJzkls=;
+        b=PXdUIyiJQC2rm6kjP4UwhhpMXz0funJPXofZDtcVgxrkoAvXykczgidIEPsJTX/ZEp
+         kbFZcLP5rV3R1AdMHBmv/osaMZXl1fT52m/NMGysLivwOGLz1qWGnVP7Sgd2PhdIHKi5
+         ejbOVcsJ4tmBPHsYCQnNC4vYE6AZRy66v6deeB+vdLz4YzkUYOz9uwnfaBeLoP/a0Dr1
+         BdF3Ed/iADuhU7KZ4lStt4vduYvUD+1MddtAkiuErubZrfrXwtelbkrKY9tlwzfpAH5Z
+         3fk9wK6nLI4B9BWncONw/YGZdB0y3fqv3vUPoKku3Gtd0rdte0dsssaso/44XaNh1r8G
+         PWWw==
+X-Gm-Message-State: APjAAAUC/esY0wzbSDLGFBnzSQD6b/iKtJmhmTdCJULaC0z7N9KOHz2B
+        MOfVcMLgSyXiUiYyZL3U9o4wIJ5O7ag=
+X-Google-Smtp-Source: APXvYqzCTz/jWuQfZpo64icvkrtetX2t9rj8t/ooPxv1EHNFxmmvPbH8E5zgwf/k6bqFVlZm4kvwJg==
+X-Received: by 2002:a2e:8490:: with SMTP id b16mr6802808ljh.282.1580497414675;
+        Fri, 31 Jan 2020 11:03:34 -0800 (PST)
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com. [209.85.208.180])
+        by smtp.gmail.com with ESMTPSA id p9sm5130283ljg.55.2020.01.31.11.03.33
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Jan 2020 11:03:33 -0800 (PST)
+Received: by mail-lj1-f180.google.com with SMTP id w1so8210324ljh.5
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 11:03:33 -0800 (PST)
+X-Received: by 2002:a2e:461a:: with SMTP id t26mr6842099lja.204.1580497413314;
+ Fri, 31 Jan 2020 11:03:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <44e0c550-7dcc-bfed-07c4-907e61d476a1@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <1580408442-23916-1-git-send-email-pbonzini@redhat.com>
+ <CAHk-=wjZTUq8u0HZUJ1mKZjb-haBFhX+mKcUv3Kdh9LQb8rg4g@mail.gmail.com> <20200131185341.GA18946@linux.intel.com>
+In-Reply-To: <20200131185341.GA18946@linux.intel.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 31 Jan 2020 11:03:17 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wjoLqJ+zQQq2S3EmoAjOsY700GAPTCkna-RUG0T+4wYqA@mail.gmail.com>
+Message-ID: <CAHk-=wjoLqJ+zQQq2S3EmoAjOsY700GAPTCkna-RUG0T+4wYqA@mail.gmail.com>
+Subject: Re: [GIT PULL] First batch of KVM changes for 5.6 merge window
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@suse.de>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 30, 2020 at 06:44:09AM +0100, Paolo Bonzini wrote:
-> On 30/01/20 01:10, Sean Christopherson wrote:
-> > Set kvm_x86_ops with the vendor's ops only after ->hardware_setup()
-> > completes to "prevent" using kvm_x86_ops before they are ready, i.e. to
-> > generate a null pointer fault instead of silently consuming unconfigured
-> > state.
-> 
-> What about even copying kvm_x86_ops by value, so that they can be
-> accessed with "kvm_x86_ops.callback()" and save one memory access?
+On Fri, Jan 31, 2020 at 10:53 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> I assume the easiest thing would be send a cleanup patch for vmxfeatures.h
+> and route it through the KVM tree?
 
-Oooh, I like that idea.  And {svm,vmx}_x86_ops could be marked __initdata
-to save a few bytes and force all the runtime stuff through kvm_x86_ops.
+Probably. The KVM side is the only thing that seems to use the
+defines, so any names changes should impact only them (we do have that
+mkcapflags.sh script, but that should react automatically to any
+changes in the #define names)
+
+And this is obviously not a big deal, I just noticed the discrepancies
+when doing that resolution.
+
+                    Linus
