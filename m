@@ -2,125 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E59B14F1C2
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 19:02:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 032DE14F26C
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 19:53:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727226AbgAaSB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 13:01:59 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:40891 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726803AbgAaSB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 13:01:58 -0500
-Received: by mail-lj1-f193.google.com with SMTP id n18so7987816ljo.7
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 10:01:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=c9j/+yOHRUYs86/r1vUBwGlUumkt31a+ZC51irf1zwo=;
-        b=D9gep9Su+ciFsa7BYxm54ROJPrkIkuAtNGvFFM0CHhn8lLDZwftjQmXQrAcYf+J5GE
-         y5q/J6r9VpK0aNs1wGqnQ3vuOS6I79HcguOHRwiQZ7YGR5sIFAs1gaICq2ZZ9TzJ9r+A
-         Tsy00vCgGmCl5idF1c6WC4PhCg2ur+3fvg0Bc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=c9j/+yOHRUYs86/r1vUBwGlUumkt31a+ZC51irf1zwo=;
-        b=e5YlNiyDGfx9xwNWRoEWMtcvWAytBIzEjmdtjZ8hit/nV6MVGZFarKc94RpsHggBZS
-         mkjEk2nQsMwbmuDHtSlMedfcBFNJS5jOfOoF7hukrNgSS8E26HVA80vqQ2hVvunH//Gp
-         AGFWizZ73kSgZCRuQ0ILDr3uzju14Ny1gtudgvdxeIruLEqTGXo+MSe0t3OlVyMZDapD
-         VtKqo+MVtZ3BGbjkGRxPUrADYJyiTGxdX9TXHDzwdWwOIn/MkNtX2EqtAdp/CN0oIVmP
-         0VNdqnc9Z2pGXq9RGccOeMzc3sXeFU9rESQMTuTx2Upl14+xICNGYhLifObriJlj/dTY
-         lPFQ==
-X-Gm-Message-State: APjAAAWxcLRzTflRpRVHxs/6GX4Xs79x4tu+/RlMhuooVD44vznmDcx2
-        u7v66y7QCI/hjMZkVzpGwsthh7oI4Nk=
-X-Google-Smtp-Source: APXvYqzHSp/4dfqPCfLERaGhEUoI9e13Rga1FHDb4c42pxi7fLwbgPzCF/2RlysdHcjrGHEN271g+w==
-X-Received: by 2002:a2e:9a51:: with SMTP id k17mr6261313ljj.206.1580493715695;
-        Fri, 31 Jan 2020 10:01:55 -0800 (PST)
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com. [209.85.167.54])
-        by smtp.gmail.com with ESMTPSA id s22sm5192176ljm.41.2020.01.31.10.01.54
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 31 Jan 2020 10:01:55 -0800 (PST)
-Received: by mail-lf1-f54.google.com with SMTP id f24so5510326lfh.3
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 10:01:54 -0800 (PST)
-X-Received: by 2002:ac2:43a7:: with SMTP id t7mr6129965lfl.125.1580493713847;
- Fri, 31 Jan 2020 10:01:53 -0800 (PST)
-MIME-Version: 1.0
-References: <1580408442-23916-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1580408442-23916-1-git-send-email-pbonzini@redhat.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 31 Jan 2020 10:01:37 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wjZTUq8u0HZUJ1mKZjb-haBFhX+mKcUv3Kdh9LQb8rg4g@mail.gmail.com>
-Message-ID: <CAHk-=wjZTUq8u0HZUJ1mKZjb-haBFhX+mKcUv3Kdh9LQb8rg4g@mail.gmail.com>
-Subject: Re: [GIT PULL] First batch of KVM changes for 5.6 merge window
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Borislav Petkov <bp@suse.de>, Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        id S1726262AbgAaSxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 13:53:43 -0500
+Received: from mga18.intel.com ([134.134.136.126]:30492 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725939AbgAaSxn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 13:53:43 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Jan 2020 10:53:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,386,1574150400"; 
+   d="scan'208";a="324625965"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga001.fm.intel.com with ESMTP; 31 Jan 2020 10:53:42 -0800
+Date:   Fri, 31 Jan 2020 10:53:42 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@suse.de>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         KVM list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [GIT PULL] First batch of KVM changes for 5.6 merge window
+Message-ID: <20200131185341.GA18946@linux.intel.com>
+References: <1580408442-23916-1-git-send-email-pbonzini@redhat.com>
+ <CAHk-=wjZTUq8u0HZUJ1mKZjb-haBFhX+mKcUv3Kdh9LQb8rg4g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wjZTUq8u0HZUJ1mKZjb-haBFhX+mKcUv3Kdh9LQb8rg4g@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 30, 2020 at 10:20 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> Xiaoyao Li (3):
->       KVM: VMX: Rename INTERRUPT_PENDING to INTERRUPT_WINDOW
->       KVM: VMX: Rename NMI_PENDING to NMI_WINDOW
->       KVM: VMX: Fix the spelling of CPU_BASED_USE_TSC_OFFSETTING
+On Fri, Jan 31, 2020 at 10:01:37AM -0800, Linus Torvalds wrote:
+> On Thu, Jan 30, 2020 at 10:20 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > Xiaoyao Li (3):
+> >       KVM: VMX: Rename INTERRUPT_PENDING to INTERRUPT_WINDOW
+> >       KVM: VMX: Rename NMI_PENDING to NMI_WINDOW
+> >       KVM: VMX: Fix the spelling of CPU_BASED_USE_TSC_OFFSETTING
+> 
+> So in the meantime, on the x86 merge window side, we have this:
+> 
+>   b39033f504a7 ("KVM: VMX: Use VMX_FEATURE_* flags to define VMCS control bits")
+> 
+> and while the above results in a conflict, that's not a problem. The
+> conflict was trivial to fix up.
+> 
+> HOWEVER.
+> 
+> It most definitely shows that the above renaming now means that the
+> names don't match. It didn't match 100% before either, but now the
+> differences are even bigger. The VMX_FEATURE_xyz bits have different
+> names than the CPU_BASED_xyz bits, and that seems a bit questionable.
+> 
+> So I'm not convinced about the renaming. The spelling fix is good: it
+> actually now more closely resembles the VMCS_FEATURE bit that already
+> had OFFSETTING with two T's.
+> 
+> But even that one isn't really the same even then. The CPU_BASED_xyz
+> thing has "USE_TSC_OFFSETTING", while the VMCS_FEATURE_xyz bit doesn't
+> have the "USE" part.
+> 
+> And the actual renaming means that now we basically have
+> 
+>   CPU_BASED_INTR_WINDOW_EXITING
+>   VMX_FEATURE_VIRTUAL_INTR_PENDING
+> 
+> and
+> 
+>   CPU_BASED_NMI_WINDOW_EXITING
+>   VMX_FEATURE_VIRTUAL_NMI_PENDING
+> 
+> for the same bit definitions (yeah, the VMX_FEATURE bits obviously
+> have the offset in them, so it's not the same _value_, but it's a 1:1
+> relationship between them).
+> 
+> There are other (pre-existing) differences, but while fixing up the
+> merge conflict I really got the feeling that it's confusing and wrong
+> to basically use different naming for these things when they are about
+> the same bit.
+> 
+> I don't care much which way it goes (maybe the VMX_FATURE_xyz bits
+> should be renamed instead of the other way around?) and I wonder what
+> the official documentation names are? Is there some standard here or
+> are people just picking names at random?
+> 
+> The two commits both came from intel.com addresses, so hopefully there
+> can be some intel-sanctioned resolution on the naming? Please?
 
-So in the meantime, on the x86 merge window side, we have this:
+Hrm.
 
-  b39033f504a7 ("KVM: VMX: Use VMX_FEATURE_* flags to define VMCS control bits")
+For *_WINDOW_EXITING versus VIRTUAL_*_PENDING, VMX_FEATURE_* should be
+renamed to use *_WINDOW_EXITING, as that's the nomenclature used by the
+SDM.  I added the VMX_FEATURE_* names while KVM was still using
+VIRTUAL_*_PENDING, and neglected to go back and update the series, probably
+because I was in denial after lobbying to keep the non-SDM names[1] and
+getting overruled[2] :-).
 
-and while the above results in a conflict, that's not a problem. The
-conflict was trivial to fix up.
+As for USE_TSC_OFFSETTING vs TSC_OFFSETTING, I'd like to keep the minor
+differences.  VMX_FEATURES is intended to reflect the capabilities of the
+CPU, whereas the CPU_BASED/EXEC masks are effectively "commands" from
+software to hardware, e.g. "CPU has TSC offsetting" vs. "CPU, use TSC
+offsetting".
 
-HOWEVER.
+Re-reading vmxfeatures.h, I botched a few names:
 
-It most definitely shows that the above renaming now means that the
-names don't match. It didn't match 100% before either, but now the
-differences are even bigger. The VMX_FEATURE_xyz bits have different
-names than the CPU_BASED_xyz bits, and that seems a bit questionable.
+  USE_IO_BITMAPS and USE_MSR_BITMAPS shouldn't have the USE_ prefix, by my
+  own capability vs. command argument.
 
-So I'm not convinced about the renaming. The spelling fix is good: it
-actually now more closely resembles the VMCS_FEATURE bit that already
-had OFFSETTING with two T's.
+  PAGE_MOD_LOGGING should simply be PML.  I have no idea why I chose to
+  (partially) expand the acronym.
 
-But even that one isn't really the same even then. The CPU_BASED_xyz
-thing has "USE_TSC_OFFSETTING", while the VMCS_FEATURE_xyz bit doesn't
-have the "USE" part.
+I assume the easiest thing would be send a cleanup patch for vmxfeatures.h
+and route it through the KVM tree?
 
-And the actual renaming means that now we basically have
-
-  CPU_BASED_INTR_WINDOW_EXITING
-  VMX_FEATURE_VIRTUAL_INTR_PENDING
-
-and
-
-  CPU_BASED_NMI_WINDOW_EXITING
-  VMX_FEATURE_VIRTUAL_NMI_PENDING
-
-for the same bit definitions (yeah, the VMX_FEATURE bits obviously
-have the offset in them, so it's not the same _value_, but it's a 1:1
-relationship between them).
-
-There are other (pre-existing) differences, but while fixing up the
-merge conflict I really got the feeling that it's confusing and wrong
-to basically use different naming for these things when they are about
-the same bit.
-
-I don't care much which way it goes (maybe the VMX_FATURE_xyz bits
-should be renamed instead of the other way around?) and I wonder what
-the official documentation names are? Is there some standard here or
-are people just picking names at random?
-
-The two commits both came from intel.com addresses, so hopefully there
-can be some intel-sanctioned resolution on the naming? Please?
-
-Hmm?
-
-                  Linus
+[1] https://lkml.kernel.org/r/20191206204747.GD5433@linux.intel.com/
+[2] https://lkml.kernel.org/r/2beeb1fb-7d3a-d829-38e0-ddf76b65bd3c@redhat.com/
