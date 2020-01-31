@@ -2,243 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AB5A14EA45
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 10:52:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8936E14EA5E
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 11:02:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728285AbgAaJwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 04:52:43 -0500
-Received: from foss.arm.com ([217.140.110.172]:33574 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728160AbgAaJwm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 04:52:42 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 250B81063;
-        Fri, 31 Jan 2020 01:52:42 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C8023F68E;
-        Fri, 31 Jan 2020 01:52:41 -0800 (PST)
-Subject: Re: [kvm-unit-tests RFC PATCH v3 5/7] lib: arm64: Add support for
- disabling and re-enabling VHE
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
-        andre.przywara@arm.com
-References: <1577972806-16184-1-git-send-email-alexandru.elisei@arm.com>
- <1577972806-16184-6-git-send-email-alexandru.elisei@arm.com>
- <ad46bedcc585d03399576ecfce4c17c0@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <aa243b68-8fb5-d002-2d89-5865fe4dfd3f@arm.com>
-Date:   Fri, 31 Jan 2020 09:52:36 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728352AbgAaKCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 05:02:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10038 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728160AbgAaKCT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 31 Jan 2020 05:02:19 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00V9vehj046984
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 05:02:18 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xvfy8vnfp-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 05:02:17 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Fri, 31 Jan 2020 10:02:15 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 31 Jan 2020 10:02:12 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00VA1JrI46465344
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 31 Jan 2020 10:01:19 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7262F11C04A;
+        Fri, 31 Jan 2020 10:02:11 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C63E011C052;
+        Fri, 31 Jan 2020 10:02:09 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.11.63])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 31 Jan 2020 10:02:09 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org
+Subject: [PATCH v10 0/6] KVM: s390: Add new reset vcpu API
+Date:   Fri, 31 Jan 2020 05:01:59 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <ad46bedcc585d03399576ecfce4c17c0@kernel.org>
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 20013110-0016-0000-0000-000002E2799C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20013110-0017-0000-0000-00003345486D
+Message-Id: <20200131100205.74720-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-31_02:2020-01-30,2020-01-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ mlxscore=0 mlxlogscore=689 priorityscore=1501 phishscore=0 spamscore=0
+ lowpriorityscore=0 suspectscore=1 clxscore=1015 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2001310088
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Let's implement the remaining resets, namely the normal and clear
+reset to improve architectural compliance.
 
-Thank you for testing the patches!
+While we're at it, let's also start testing the new API.
+Those tests are not yet complete, but will be extended in the future.
 
-On 1/30/20 5:40 PM, Marc Zyngier wrote:
-> Hi Alexandru,
->
-> On 2020-01-02 13:46, Alexandru Elisei wrote:
->> Add a function to disable VHE and another one to re-enable VHE. Both
->> functions work under the assumption that the CPU had VHE mode enabled at
->> boot.
->>
->> Minimal support to run with VHE has been added to the TLB invalidate
->> functions and to the exception handling code.
->>
->> Since we're touch the assembly enable/disable MMU code, let's take this
->> opportunity to replace a magic number with the proper define.
->
-> I've been using this test case to debug my NV code... only to realize
-> after a few hours of banging my head on the wall that it is the test
-> that needed debugging, see below... ;-)
->
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  lib/arm64/asm/mmu.h           |  11 ++-
->>  lib/arm64/asm/pgtable-hwdef.h |  53 ++++++++---
->>  lib/arm64/asm/processor.h     |  19 +++-
->>  lib/arm64/processor.c         |  37 +++++++-
->>  arm/cstart64.S                | 204 ++++++++++++++++++++++++++++++++++++++++--
->>  5 files changed, 300 insertions(+), 24 deletions(-)
->
-> [...]
->
->> --- a/arm/cstart64.S
->> +++ b/arm/cstart64.S
->> @@ -104,6 +104,13 @@ exceptions_init:
->>
->>  .text
->>
->> +exceptions_init_nvhe:
->> +    adrp    x0, vector_table_nvhe
->> +    add    x0, x0, :lo12:vector_table_nvhe
->> +    msr    vbar_el2, x0
->> +    isb
->> +    ret
->> +
->>  .globl get_mmu_off
->>  get_mmu_off:
->>      adrp    x0, auxinfo
->> @@ -203,7 +210,7 @@ asm_mmu_enable:
->>               TCR_IRGN_WBWA | TCR_ORGN_WBWA |    \
->>               TCR_SHARED
->>      mrs    x2, id_aa64mmfr0_el1
->> -    bfi    x1, x2, #32, #3
->> +    bfi    x1, x2, #TCR_EL1_IPS_SHIFT, #3
->>      msr    tcr_el1, x1
->>
->>      /* MAIR */
->> @@ -228,6 +235,41 @@ asm_mmu_enable:
->>
->>      ret
->>
->> +asm_mmu_enable_nvhe:
->
-> Note the "_nvhe" suffix, which implies that...
->
->> +    tlbi    alle2
->> +    dsb     nsh
->> +
->> +        /* TCR */
->> +    ldr    x1, =TCR_EL2_RES1 |             \
->> +             TCR_T0SZ(VA_BITS) |        \
->> +             TCR_TG0_64K |                      \
->> +             TCR_IRGN0_WBWA | TCR_ORGN0_WBWA |    \
->> +             TCR_SH0_IS
->> +    mrs    x2, id_aa64mmfr0_el1
->> +    bfi    x1, x2, #TCR_EL2_PS_SHIFT, #3
->> +    msr    tcr_el2, x1
->> +
->> +    /* Same MAIR and TTBR0 as in VHE mode */
->> +    ldr    x1, =MAIR(0x00, MT_DEVICE_nGnRnE) |    \
->> +             MAIR(0x04, MT_DEVICE_nGnRE) |    \
->> +             MAIR(0x0c, MT_DEVICE_GRE) |    \
->> +             MAIR(0x44, MT_NORMAL_NC) |        \
->> +             MAIR(0xff, MT_NORMAL)
->> +    msr    mair_el1, x1
->
-> ... this should be mair_el2...
->
->> +
->> +    msr    ttbr0_el1, x0
->
-> ... and this should be ttbr0_el2.
+v10:
+	* Cleared up the test patch and added strerror information
+	* Removed capability checks from irq test
+	* Fixed clobber patch
 
-The code is definitely confusing, but not because it's wrong, but because it's
-doing something useless. From DDI 04876E.a, page D13-3374, the pseudocode for
-writing to ttbr0_el1:
+Christian Borntraeger (1):
+  KVM: s390: do not clobber registers during guest reset/store status
 
-[..] elsif PSTATE.EL == EL2 then     if HCR_EL2.E2H == '1' then         TTBR0_EL2
-= X[t];
+Janosch Frank (4):
+  KVM: s390: Cleanup initial cpu reset
+  KVM: s390: Add new reset vcpu API
+  selftests: KVM: Add fpu and one reg set/get library functions
+  selftests: KVM: s390x: Add reset tests
 
-    else         TTBR0_EL1 = X[t]; [..]
+Pierre Morel (1):
+  selftests: KVM: testing the local IRQs resets
 
-We want to use the same ttbr0_el2 and mair_el2 values that we were using when VHE
-was on. We programmed those values when VHE was on, so we actually wrote them to
-ttbr0_el2 and mair_el2. We don't need to write them again now, in fact, all the
-previous versions of the series didn't even have the above useless writes (I
-assume it was a copy-and-paste mistake when I split the fixes from the el2 patches).
+ Documentation/virt/kvm/api.txt                |  43 ++++
+ arch/s390/include/asm/kvm_host.h              |   5 +
+ arch/s390/kvm/kvm-s390.c                      |  92 +++++---
+ include/uapi/linux/kvm.h                      |   5 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   6 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  36 ++++
+ tools/testing/selftests/kvm/s390x/resets.c    | 197 ++++++++++++++++++
+ 8 files changed, 351 insertions(+), 34 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/s390x/resets.c
 
->
->> +    isb
->> +
->> +    /* SCTLR */
->> +    ldr    x1, =SCTLR_EL2_RES1 |            \
->> +             SCTLR_EL2_C |             \
->> +             SCTLR_EL2_I |             \
->> +             SCTLR_EL2_M
->> +    msr    sctlr_el2, x1
->> +    isb
->> +
->> +    ret
->> +
->>  /* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
->>  .macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
->>      adrp    \tmp1, dcache_line_size
->> @@ -242,21 +284,61 @@ asm_mmu_enable:
->>      dsb    \domain
->>  .endm
->>
->> +clean_inval_cache:
->> +    adrp    x0, __phys_offset
->> +    ldr    x0, [x0, :lo12:__phys_offset]
->> +    adrp    x1, __phys_end
->> +    ldr    x1, [x1, :lo12:__phys_end]
->> +    dcache_by_line_op civac, sy, x0, x1, x2, x3
->> +    isb
->> +    ret
->> +
->>  .globl asm_mmu_disable
->>  asm_mmu_disable:
->>      mrs    x0, sctlr_el1
->>      bic    x0, x0, SCTLR_EL1_M
->>      msr    sctlr_el1, x0
->>      isb
->> +    b    clean_inval_cache
->>
->> -    /* Clean + invalidate the entire memory */
->> -    adrp    x0, __phys_offset
->> -    ldr    x0, [x0, :lo12:__phys_offset]
->> -    adrp    x1, __phys_end
->> -    ldr    x1, [x1, :lo12:__phys_end]
->> -    dcache_by_line_op civac, sy, x0, x1, x2, x3
->> +asm_mmu_disable_nvhe:
->> +    mrs    x0, sctlr_el2
->> +    bic    x0, x0, SCTLR_EL2_M
->> +    msr    sctlr_el2, x0
->> +    isb
->> +    b    clean_inval_cache
->> +
->> +.globl asm_disable_vhe
->> +asm_disable_vhe:
->> +    str    x30, [sp, #-16]!
->> +
->> +    bl    asm_mmu_disable
->> +    msr    hcr_el2, xzr
->> +    isb
->
-> At this stage, VHE is off...
->
->> +    bl    exceptions_init_nvhe
->> +    /* Make asm_mmu_enable_nvhe happy by having TTBR0 value in x0. */
->> +    mrs    x0, ttbr0_el1
->
-> ... so this is going to sample the wrong TTBR. It really should be
-> TTBR0_EL2!
+-- 
+2.20.1
 
-Not really, asm_mmu_enable has one parameter, the PA for the translation tables in
-register x0, and we are going to use the same translation tables with VHE off that
-we were using with VHE on. Hence the read.//It could have easily been mrs
-x0,ttbr0_el2, since they have the same value, which we want to reuse.
-
-I think this confusion stems from the fact that I'm trying to write the registers
-again in asm_mmu_enable_nvhe, when we don't have to. And writing to the wrong
-registers makes the confusion even worse.
-
->
->> +    isb
->
-> nit: this ISB is useless, as you will have a dependency on x0 anyway.
-
-True, I'll remove it.
-
-Thanks,
-Alex
->
-> With these fixes (and a few more terrible hacks to synchronize HCR_EL2
-> on ARMv8.4-NV), I can run this test reliably.
->
-> Thanks,
->
->         M.
