@@ -2,95 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DD0214F3BE
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 22:27:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC90414F3C6
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 22:30:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726202AbgAaV1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 16:27:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24589 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726109AbgAaV1d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 16:27:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580506052;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FU2nxODLdOz7Yi+32+hHI/RXv+nZoblPZOI/rmsa0cA=;
-        b=P2ypfFLqk1lw11BlnG/iuI5LWyVQibZOnIQbkkUKLHW4v9/V8KDpRhaZ/VbQdAsn06GO+c
-        KwxRVtp/uX2qqtI0GlIh8tW8nGn69VyXZv8XO1vv/z4j5Rsm8lYjiUILmNq9qvOUnTSczp
-        Kq0do7DtG95tcF4VdDG3fi5lYtJbdko=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-233-bAYmRwJqNHaOcnYtzwrq3A-1; Fri, 31 Jan 2020 16:27:28 -0500
-X-MC-Unique: bAYmRwJqNHaOcnYtzwrq3A-1
-Received: by mail-wm1-f71.google.com with SMTP id b133so2582749wmb.2
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2020 13:27:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FU2nxODLdOz7Yi+32+hHI/RXv+nZoblPZOI/rmsa0cA=;
-        b=TxMKvFQR9CzVlpADWAtJaUh7/nC1bwA7NbqsDUs99G/v/f1W9duGSW4bk/NAO72vmp
-         +YQ9YqkgFykcnAPUG/kC7/wc7KBw9RI/eG581FArz1VOOY+um6tcEzn8cwhpNqJTDYxT
-         tRuak0zQONe3xc/z3r1W/WpQ9/+KWTMbAVERPLt2nR035wFerYtKBtwYGDg0pJydaV5k
-         XTWtWn0zaBwZ1S0mFSBhiU15TsoxXtrbbyxUQB3qd7VxVVAfZLKy5cUs+zUbeYONxLGz
-         cbbg23bJC7pVUDiri4xbICJsIcSanVBFegYbMvEIYXaBidhZ/slwFYxD1UdPJHwi52jn
-         jT3Q==
-X-Gm-Message-State: APjAAAWnI7LCvQL0PuVuV/0zpgDT3ns87trgw1P4Yv2x2F+BxGcll36z
-        w89bwkliYuqULMJpdT+QHlv6XyYWnlDQSLhKdFCG+c/ERy+Lt4m/d6BRuhjWtWe90J5jyg2Ha1t
-        UBfMdMVLQ+SPS
-X-Received: by 2002:a1c:9e89:: with SMTP id h131mr13985470wme.161.1580506047670;
-        Fri, 31 Jan 2020 13:27:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzDuT1Hr2oALN/34Ebj0g8Dpq0xQbqotT/kxpAEYNH3SraZ1fzxVmsS+FAPdBhXC0oAT3CUXQ==
-X-Received: by 2002:a1c:9e89:: with SMTP id h131mr13985457wme.161.1580506047457;
-        Fri, 31 Jan 2020 13:27:27 -0800 (PST)
-Received: from [192.168.42.35] (93-33-8-199.ip42.fastwebnet.it. [93.33.8.199])
-        by smtp.gmail.com with ESMTPSA id s8sm12589059wrt.57.2020.01.31.13.27.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 31 Jan 2020 13:27:27 -0800 (PST)
-Subject: Re: [GIT PULL] First batch of KVM changes for 5.6 merge window
-To:     Borislav Petkov <bp@suse.de>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>
-References: <1580408442-23916-1-git-send-email-pbonzini@redhat.com>
- <CAHk-=wjZTUq8u0HZUJ1mKZjb-haBFhX+mKcUv3Kdh9LQb8rg4g@mail.gmail.com>
- <a7038958-bbab-4c53-72f0-ece46dc99b4d@redhat.com>
- <20200131212404.GD14851@zn.tnic>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d0e15553-e8b6-0624-3978-d2ac02a4d06f@redhat.com>
-Date:   Fri, 31 Jan 2020 22:27:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1726180AbgAaVa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 16:30:27 -0500
+Received: from mga06.intel.com ([134.134.136.31]:14646 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726109AbgAaVa1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 16:30:27 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Jan 2020 13:29:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,387,1574150400"; 
+   d="scan'208";a="223270217"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga008.jf.intel.com with ESMTP; 31 Jan 2020 13:29:29 -0800
+Date:   Fri, 31 Jan 2020 13:29:28 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Kevin <kevin.tian@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v3 09/21] KVM: X86: Don't track dirty for
+ KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+Message-ID: <20200131212928.GH18946@linux.intel.com>
+References: <20200109145729.32898-1-peterx@redhat.com>
+ <20200109145729.32898-10-peterx@redhat.com>
+ <20200121155657.GA7923@linux.intel.com>
+ <20200128055005.GB662081@xz-x1>
+ <20200128182402.GA18652@linux.intel.com>
+ <20200131150832.GA740148@xz-x1>
+ <20200131193301.GC18946@linux.intel.com>
+ <20200131202824.GA7063@xz-x1>
+ <20200131203622.GF18946@linux.intel.com>
+ <20200131205550.GB7063@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20200131212404.GD14851@zn.tnic>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200131205550.GB7063@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/01/20 22:24, Borislav Petkov wrote:
->> I was supposed to get a topic branch and fix everything up so that both
->> CPU_BASED_ and VMX_FEATURE_ constants would get the new naming.  When
->> Boris alerted me of the conflict and I said "thanks I'll sort it out",
->> he probably interpreted it as me not needing the topic branch anymore.
->> I then forgot to remind him, and here we are.
->
-> Damn, that was a misunderstanding. I actually had a topic branch:
-> tip:x86/cpu and was assuming that you'll see it from the tip-bot
-> notifications. But they went to lkml and you weren't CCed. And
-> regardless, I should've told you explicitly which one it is, sorry about
-> that. I'll be more explicit next time.
+On Fri, Jan 31, 2020 at 03:55:50PM -0500, Peter Xu wrote:
+> On Fri, Jan 31, 2020 at 12:36:22PM -0800, Sean Christopherson wrote:
+> > On Fri, Jan 31, 2020 at 03:28:24PM -0500, Peter Xu wrote:
+> > > On Fri, Jan 31, 2020 at 11:33:01AM -0800, Sean Christopherson wrote:
+> > > > For the same reason we don't take mmap_sem, it gains us nothing, i.e. KVM
+> > > > still has to use copy_{to,from}_user().
+> > > > 
+> > > > In the proposed __x86_set_memory_region() refactor, vmx_set_tss_addr()
+> > > > would be provided the hva of the memory region.  Since slots_lock and SRCU
+> > > > only protect gfn->hva, why would KVM take slots_lock since it already has
+> > > > the hva?
+> > > 
+> > > OK so you're suggesting to unlock the lock earlier to not cover
+> > > init_rmode_tss() rather than dropping the whole lock...  Yes it looks
+> > > good to me.  I think that's the major confusion I got.
+> > 
+> > Ya.  And I missed where the -EEXIST was coming from.  I think we're on the
+> > same page.
+> 
+> Good to know.  Btw, for me I would still prefer to keep the lock be
+> after the __copy_to_user()s because "HVA is valid without lock" is
+> only true for these private memslots.
 
-No problem, it's fair to say that we both did our best to mess this up. :)
+No.  From KVM's perspective, the HVA is *never* valid.  Even if you rewrote
+this statement to say "the gfn->hva translation is valid without lock" it
+would still be incorrect. 
 
-Paolo
+KVM is *always* using HVAs without holding lock, e.g. every time it enters
+the guest it is deferencing a memslot because the translations stored in
+the TLB are effectively gfn->hva->hpa.  Obviously KVM ensures that it won't
+dereference a memslot that has been deleted/moved, but it's a lot more
+subtle than simply holding a lock.
 
+> After all this is super slow path so I wouldn't mind to take the lock
+> for some time longer.
+
+Holding the lock doesn't affect this super slow vmx_set_tss_addr(), it
+affects everything else that wants slots_lock.  Now, admittedly it's
+extremely unlikely userspace is going to do KVM_SET_USER_MEMORY_REGION in
+parallel, but that's not the point and it's not why I'm objecting to
+holding the lock.
+
+Holding the lock implies protection that is *not* provided.  You and I know
+it's not needed for copy_{to,from}_user(), but look how long it's taken us
+to get on the same page.  A future KVM developer comes along, sees this
+code, and thinks "oh, I need to hold slots_lock to dereference a gfn", and
+propagates the unnecessary locking to some other code.
+
+> Or otherwise if you really like the unlock() to
+> be earlier I can comment above the unlock:
+> 
+>   /*
+>    * We can unlock before using the HVA only because this KVM private
+>    * memory slot will never change until the end of VM lifecycle.
+>    */
+
+How about:
+
+	/*
+	 * No need to hold slots_lock while filling the TSS, the TSS private
+	 * memslot is guaranteed to be valid until the VM is destroyed, i.e.
+	 * there is no danger of corrupting guest memory by consuming a stale
+	 * gfn->hva lookup.
+	 */
