@@ -2,795 +2,874 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D32D014E736
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 03:35:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3607A14E7A1
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 04:37:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727953AbgAaCfZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Jan 2020 21:35:25 -0500
-Received: from mga05.intel.com ([192.55.52.43]:1707 "EHLO mga05.intel.com"
+        id S1727927AbgAaDhf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Jan 2020 22:37:35 -0500
+Received: from mga14.intel.com ([192.55.52.115]:16207 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727787AbgAaCfZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Jan 2020 21:35:25 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1727448AbgAaDhf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Jan 2020 22:37:35 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Jan 2020 18:35:24 -0800
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Jan 2020 19:37:33 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,384,1574150400"; 
-   d="scan'208";a="218483700"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga007.jf.intel.com with ESMTP; 30 Jan 2020 18:35:21 -0800
-Date:   Thu, 30 Jan 2020 21:26:06 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: Re: [PATCH v4 11/12] samples: add vfio-mdev-pci driver
-Message-ID: <20200131022606.GK1759@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200109154831.4c43564f@w520.home>
- <A2975661238FB949B60364EF0F2C25743A183EB3@SHSMSX104.ccr.corp.intel.com>
- <20200116142418.6ca1b6b2@w520.home>
- <A2975661238FB949B60364EF0F2C25743A1887A5@SHSMSX104.ccr.corp.intel.com>
- <20200120140748.33fa0b0a@w520.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D73EAC0@SHSMSX104.ccr.corp.intel.com>
- <20200121084351.GF1759@joy-OptiPlex-7040>
- <20200121130438.685fc6cb@w520.home>
- <20200121215445.GG1759@joy-OptiPlex-7040>
- <20200123163322.2376da37@w520.home>
+   d="scan'208";a="309898450"
+Received: from dpdk-virtio-tbie-2.sh.intel.com ([10.67.104.74])
+  by orsmga001.jf.intel.com with ESMTP; 30 Jan 2020 19:37:28 -0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     mst@redhat.com, jasowang@redhat.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        shahafs@mellanox.com, jgg@mellanox.com, rob.miller@broadcom.com,
+        haotian.wang@sifive.com, eperezma@redhat.com, lulu@redhat.com,
+        parav@mellanox.com, rdunlap@infradead.org, hch@infradead.org,
+        jiri@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com,
+        maxime.coquelin@redhat.com, lingshan.zhu@intel.com,
+        dan.daly@intel.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, tiwei.bie@intel.com
+Subject: [PATCH] vhost: introduce vDPA based backend
+Date:   Fri, 31 Jan 2020 11:36:51 +0800
+Message-Id: <20200131033651.103534-1-tiwei.bie@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200123163322.2376da37@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 24, 2020 at 07:33:22AM +0800, Alex Williamson wrote:
-> On Tue, 21 Jan 2020 16:54:45 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Wed, Jan 22, 2020 at 04:04:38AM +0800, Alex Williamson wrote:
-> > > On Tue, 21 Jan 2020 03:43:51 -0500
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > On Tue, Jan 21, 2020 at 03:43:02PM +0800, Tian, Kevin wrote:  
-> > > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > > Sent: Tuesday, January 21, 2020 5:08 AM
-> > > > > > 
-> > > > > > On Sat, 18 Jan 2020 14:25:11 +0000
-> > > > > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> > > > > >     
-> > > > > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > > > > > Sent: Friday, January 17, 2020 5:24 AM
-> > > > > > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > > > > > Subject: Re: [PATCH v4 11/12] samples: add vfio-mdev-pci driver
-> > > > > > > >
-> > > > > > > > On Thu, 16 Jan 2020 12:33:06 +0000
-> > > > > > > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> > > > > > > >    
-> > > > > > > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > > > > > > > Sent: Friday, January 10, 2020 6:49 AM
-> > > > > > > > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > > > > > > > Subject: Re: [PATCH v4 11/12] samples: add vfio-mdev-pci driver
-> > > > > > > > > >
-> > > > > > > > > > On Tue,  7 Jan 2020 20:01:48 +0800
-> > > > > > > > > > Liu Yi L <yi.l.liu@intel.com> wrote:
-> > > > > > > > > >    
-> > > > > > > > > > > This patch adds sample driver named vfio-mdev-pci. It is to wrap
-> > > > > > > > > > > a PCI device as a mediated device. For a pci device, once bound
-> > > > > > > > > > > to vfio-mdev-pci driver, user space access of this device will
-> > > > > > > > > > > go through vfio mdev framework. The usage of the device follows
-> > > > > > > > > > > mdev management method. e.g. user should create a mdev before
-> > > > > > > > > > > exposing the device to user-space.
-> > > > > > > > > > >
-> > > > > > > > > > > Benefit of this new driver would be acting as a sample driver
-> > > > > > > > > > > for recent changes from "vfio/mdev: IOMMU aware mediated    
-> > > > > > device"    
-> > > > > > > > > > > patchset. Also it could be a good experiment driver for future
-> > > > > > > > > > > device specific mdev migration support. This sample driver only
-> > > > > > > > > > > supports singleton iommu groups, for non-singleton iommu groups,
-> > > > > > > > > > > this sample driver doesn't work. It will fail when trying to assign
-> > > > > > > > > > > the non-singleton iommu group to VMs.
-> > > > > > > > > > >
-> > > > > > > > > > > To use this driver:
-> > > > > > > > > > > a) build and load vfio-mdev-pci.ko module
-> > > > > > > > > > >    execute "make menuconfig" and config    
-> > > > > > CONFIG_SAMPLE_VFIO_MDEV_PCI    
-> > > > > > > > > > >    then load it with following command:    
-> > > > > > > > > > >    > sudo modprobe vfio
-> > > > > > > > > > >    > sudo modprobe vfio-pci
-> > > > > > > > > > >    > sudo insmod samples/vfio-mdev-pci/vfio-mdev-pci.ko    
-> > > > > > > > > > >
-> > > > > > > > > > > b) unbind original device driver
-> > > > > > > > > > >    e.g. use following command to unbind its original driver    
-> > > > > > > > > > >    > echo $dev_bdf > /sys/bus/pci/devices/$dev_bdf/driver/unbind    
-> > > > > > > > > > >
-> > > > > > > > > > > c) bind vfio-mdev-pci driver to the physical device    
-> > > > > > > > > > >    > echo $vend_id $dev_id > /sys/bus/pci/drivers/vfio-mdev-    
-> > > > > > pci/new_id    
-> > > > > > > > > > >
-> > > > > > > > > > > d) check the supported mdev instances    
-> > > > > > > > > > >    > ls /sys/bus/pci/devices/$dev_bdf/mdev_supported_types/    
-> > > > > > > > > > >      vfio-mdev-pci-type_name    
-> > > > > > > > > > >    > ls /sys/bus/pci/devices/$dev_bdf/mdev_supported_types/\    
-> > > > > > > > > > >      vfio-mdev-pci-type_name/
-> > > > > > > > > > >      available_instances  create  device_api  devices  name
-> > > > > > > > > > >
-> > > > > > > > > > > e)  create mdev on this physical device (only 1 instance)    
-> > > > > > > > > > >    > echo "83b8f4f2-509f-382f-3c1e-e6bfe0fa1003" > \    
-> > > > > > > > > > >      /sys/bus/pci/devices/$dev_bdf/mdev_supported_types/\
-> > > > > > > > > > >      vfio-mdev-pci-type_name/create
-> > > > > > > > > > >
-> > > > > > > > > > > f) passthru the mdev to guest
-> > > > > > > > > > >    add the following line in QEMU boot command
-> > > > > > > > > > >     -device vfio-pci,\
-> > > > > > > > > > >      sysfsdev=/sys/bus/mdev/devices/83b8f4f2-509f-382f-3c1e-    
-> > > > > > e6bfe0fa1003    
-> > > > > > > > > > >
-> > > > > > > > > > > g) destroy mdev    
-> > > > > > > > > > >    > echo 1 > /sys/bus/mdev/devices/83b8f4f2-509f-382f-3c1e-    
-> > > > > > e6bfe0fa1003/\    
-> > > > > > > > > > >      remove
-> > > > > > > > > > >
-> > > > > > > > > > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > > > > > > > > > Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> > > > > > > > > > > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> > > > > > > > > > > Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-> > > > > > > > > > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > > > > > > > > > ---
-> > > > > > > > > > >  samples/Kconfig                       |  10 +
-> > > > > > > > > > >  samples/Makefile                      |   1 +
-> > > > > > > > > > >  samples/vfio-mdev-pci/Makefile        |   4 +
-> > > > > > > > > > >  samples/vfio-mdev-pci/vfio_mdev_pci.c | 397    
-> > > > > > > > > > ++++++++++++++++++++++++++++++++++    
-> > > > > > > > > > >  4 files changed, 412 insertions(+)
-> > > > > > > > > > >  create mode 100644 samples/vfio-mdev-pci/Makefile
-> > > > > > > > > > >  create mode 100644 samples/vfio-mdev-pci/vfio_mdev_pci.c
-> > > > > > > > > > >
-> > > > > > > > > > > diff --git a/samples/Kconfig b/samples/Kconfig
-> > > > > > > > > > > index 9d236c3..50d207c 100644
-> > > > > > > > > > > --- a/samples/Kconfig
-> > > > > > > > > > > +++ b/samples/Kconfig
-> > > > > > > > > > > @@ -190,5 +190,15 @@ config SAMPLE_INTEL_MEI
-> > > > > > > > > > >  	help
-> > > > > > > > > > >  	  Build a sample program to work with mei device.
-> > > > > > > > > > >
-> > > > > > > > > > > +config SAMPLE_VFIO_MDEV_PCI
-> > > > > > > > > > > +	tristate "Sample driver for wrapping PCI device as a mdev"
-> > > > > > > > > > > +	select VFIO_PCI_COMMON
-> > > > > > > > > > > +	select VFIO_PCI
-> > > > > > > > > > > +	depends on VFIO_MDEV && VFIO_MDEV_DEVICE
-> > > > > > > > > > > +	help
-> > > > > > > > > > > +	  Sample driver for wrapping a PCI device as a mdev. Once    
-> > > > > > bound to    
-> > > > > > > > > > > +	  this driver, device passthru should through mdev path.
-> > > > > > > > > > > +
-> > > > > > > > > > > +	  If you don't know what to do here, say N.
-> > > > > > > > > > >
-> > > > > > > > > > >  endif # SAMPLES
-> > > > > > > > > > > diff --git a/samples/Makefile b/samples/Makefile
-> > > > > > > > > > > index 5ce50ef..84faced 100644
-> > > > > > > > > > > --- a/samples/Makefile
-> > > > > > > > > > > +++ b/samples/Makefile
-> > > > > > > > > > > @@ -21,5 +21,6 @@ obj-$(CONFIG_SAMPLE_FTRACE_DIRECT)    
-> > > > > > 	+= ftrace/    
-> > > > > > > > > > >  obj-$(CONFIG_SAMPLE_TRACE_ARRAY)	+= ftrace/
-> > > > > > > > > > >  obj-$(CONFIG_VIDEO_PCI_SKELETON)	+= v4l/
-> > > > > > > > > > >  obj-y					+= vfio-mdev/
-> > > > > > > > > > > +obj-y					+= vfio-mdev-pci/    
-> > > > > > > > > >
-> > > > > > > > > > I think we could just lump this into vfio-mdev rather than making
-> > > > > > > > > > another directory.    
-> > > > > > > > >
-> > > > > > > > > sure. will move it. :-)
-> > > > > > > > >    
-> > > > > > > > > >    
-> > > > > > > > > > >  subdir-$(CONFIG_SAMPLE_VFS)		+= vfs
-> > > > > > > > > > >  obj-$(CONFIG_SAMPLE_INTEL_MEI)		+= mei/
-> > > > > > > > > > > diff --git a/samples/vfio-mdev-pci/Makefile b/samples/vfio-mdev-    
-> > > > > > pci/Makefile    
-> > > > > > > > > > > new file mode 100644
-> > > > > > > > > > > index 0000000..41b2139
-> > > > > > > > > > > --- /dev/null
-> > > > > > > > > > > +++ b/samples/vfio-mdev-pci/Makefile
-> > > > > > > > > > > @@ -0,0 +1,4 @@
-> > > > > > > > > > > +# SPDX-License-Identifier: GPL-2.0-only
-> > > > > > > > > > > +vfio-mdev-pci-y := vfio_mdev_pci.o
-> > > > > > > > > > > +
-> > > > > > > > > > > +obj-$(CONFIG_SAMPLE_VFIO_MDEV_PCI) += vfio-mdev-pci.o
-> > > > > > > > > > > diff --git a/samples/vfio-mdev-pci/vfio_mdev_pci.c b/samples/vfio-    
-> > > > > > mdev-    
-> > > > > > > > > > pci/vfio_mdev_pci.c    
-> > > > > > > > > > > new file mode 100644
-> > > > > > > > > > > index 0000000..b180356
-> > > > > > > > > > > --- /dev/null
-> > > > > > > > > > > +++ b/samples/vfio-mdev-pci/vfio_mdev_pci.c
-> > > > > > > > > > > @@ -0,0 +1,397 @@
-> > > > > > > > > > > +/*
-> > > > > > > > > > > + * Copyright © 2020 Intel Corporation.
-> > > > > > > > > > > + *     Author: Liu Yi L <yi.l.liu@intel.com>
-> > > > > > > > > > > + *
-> > > > > > > > > > > + * This program is free software; you can redistribute it and/or    
-> > > > > > modify    
-> > > > > > > > > > > + * it under the terms of the GNU General Public License version 2 as
-> > > > > > > > > > > + * published by the Free Software Foundation.
-> > > > > > > > > > > + *
-> > > > > > > > > > > + * Derived from original vfio_pci.c:
-> > > > > > > > > > > + * Copyright (C) 2012 Red Hat, Inc.  All rights reserved.
-> > > > > > > > > > > + *     Author: Alex Williamson <alex.williamson@redhat.com>
-> > > > > > > > > > > + *
-> > > > > > > > > > > + * Derived from original vfio:
-> > > > > > > > > > > + * Copyright 2010 Cisco Systems, Inc.  All rights reserved.
-> > > > > > > > > > > + * Author: Tom Lyon, pugs@cisco.com
-> > > > > > > > > > > + */
-> > > > > > > > > > > +
-> > > > > > > > > > > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> > > > > > > > > > > +
-> > > > > > > > > > > +#include <linux/device.h>
-> > > > > > > > > > > +#include <linux/eventfd.h>
-> > > > > > > > > > > +#include <linux/file.h>
-> > > > > > > > > > > +#include <linux/interrupt.h>
-> > > > > > > > > > > +#include <linux/iommu.h>
-> > > > > > > > > > > +#include <linux/module.h>
-> > > > > > > > > > > +#include <linux/mutex.h>
-> > > > > > > > > > > +#include <linux/notifier.h>
-> > > > > > > > > > > +#include <linux/pci.h>
-> > > > > > > > > > > +#include <linux/pm_runtime.h>
-> > > > > > > > > > > +#include <linux/slab.h>
-> > > > > > > > > > > +#include <linux/types.h>
-> > > > > > > > > > > +#include <linux/uaccess.h>
-> > > > > > > > > > > +#include <linux/vfio.h>
-> > > > > > > > > > > +#include <linux/vgaarb.h>
-> > > > > > > > > > > +#include <linux/nospec.h>
-> > > > > > > > > > > +#include <linux/mdev.h>
-> > > > > > > > > > > +#include <linux/vfio_pci_common.h>
-> > > > > > > > > > > +
-> > > > > > > > > > > +#define DRIVER_VERSION  "0.1"
-> > > > > > > > > > > +#define DRIVER_AUTHOR   "Liu Yi L <yi.l.liu@intel.com>"
-> > > > > > > > > > > +#define DRIVER_DESC     "VFIO Mdev PCI - Sample driver for PCI    
-> > > > > > device as a    
-> > > > > > > > > > mdev"    
-> > > > > > > > > > > +
-> > > > > > > > > > > +#define VFIO_MDEV_PCI_NAME  "vfio-mdev-pci"
-> > > > > > > > > > > +
-> > > > > > > > > > > +static char ids[1024] __initdata;
-> > > > > > > > > > > +module_param_string(ids, ids, sizeof(ids), 0);
-> > > > > > > > > > > +MODULE_PARM_DESC(ids, "Initial PCI IDs to add to the vfio-mdev-    
-> > > > > > pci driver,    
-> > > > > > > > > > format is    
-> > > > > > \"vendor:device[:subvendor[:subdevice[:class[:class_mask]]]]\" and    
-> > > > > > > > > > multiple comma separated entries can be specified");    
-> > > > > > > > > > > +
-> > > > > > > > > > > +static bool nointxmask;
-> > > > > > > > > > > +module_param_named(nointxmask, nointxmask, bool, S_IRUGO |    
-> > > > > > S_IWUSR);    
-> > > > > > > > > > > +MODULE_PARM_DESC(nointxmask,
-> > > > > > > > > > > +		  "Disable support for PCI 2.3 style INTx masking.  If    
-> > > > > > this resolves    
-> > > > > > > > > > problems for specific devices, report lspci -vvvxxx to linux-    
-> > > > > > pci@vger.kernel.org    
-> > > > > > > > so    
-> > > > > > > > > > the device can be fixed automatically via the broken_intx_masking    
-> > > > > > flag.");    
-> > > > > > > > > > > +
-> > > > > > > > > > > +#ifdef CONFIG_VFIO_PCI_VGA
-> > > > > > > > > > > +static bool disable_vga;
-> > > > > > > > > > > +module_param(disable_vga, bool, S_IRUGO);
-> > > > > > > > > > > +MODULE_PARM_DESC(disable_vga, "Disable VGA resource access    
-> > > > > > through    
-> > > > > > > > vfio-    
-> > > > > > > > > > mdev-pci");    
-> > > > > > > > > > > +#endif
-> > > > > > > > > > > +
-> > > > > > > > > > > +static bool disable_idle_d3;
-> > > > > > > > > > > +module_param(disable_idle_d3, bool, S_IRUGO | S_IWUSR);
-> > > > > > > > > > > +MODULE_PARM_DESC(disable_idle_d3,
-> > > > > > > > > > > +		 "Disable using the PCI D3 low power state for idle,    
-> > > > > > unused devices");    
-> > > > > > > > > > > +
-> > > > > > > > > > > +static struct pci_driver vfio_mdev_pci_driver;
-> > > > > > > > > > > +
-> > > > > > > > > > > +static ssize_t
-> > > > > > > > > > > +name_show(struct kobject *kobj, struct device *dev, char *buf)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	return sprintf(buf, "%s-type1\n", dev_name(dev));
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +MDEV_TYPE_ATTR_RO(name);
-> > > > > > > > > > > +
-> > > > > > > > > > > +static ssize_t
-> > > > > > > > > > > +available_instances_show(struct kobject *kobj, struct device *dev,    
-> > > > > > char *buf)    
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	return sprintf(buf, "%d\n", 1);
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +MDEV_TYPE_ATTR_RO(available_instances);
-> > > > > > > > > > > +
-> > > > > > > > > > > +static ssize_t device_api_show(struct kobject *kobj, struct device    
-> > > > > > *dev,    
-> > > > > > > > > > > +		char *buf)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +MDEV_TYPE_ATTR_RO(device_api);
-> > > > > > > > > > > +
-> > > > > > > > > > > +static struct attribute *vfio_mdev_pci_types_attrs[] = {
-> > > > > > > > > > > +	&mdev_type_attr_name.attr,
-> > > > > > > > > > > +	&mdev_type_attr_device_api.attr,
-> > > > > > > > > > > +	&mdev_type_attr_available_instances.attr,
-> > > > > > > > > > > +	NULL,
-> > > > > > > > > > > +};
-> > > > > > > > > > > +
-> > > > > > > > > > > +static struct attribute_group vfio_mdev_pci_type_group1 = {
-> > > > > > > > > > > +	.name  = "type1",
-> > > > > > > > > > > +	.attrs = vfio_mdev_pci_types_attrs,
-> > > > > > > > > > > +};
-> > > > > > > > > > > +
-> > > > > > > > > > > +struct attribute_group *vfio_mdev_pci_type_groups[] = {
-> > > > > > > > > > > +	&vfio_mdev_pci_type_group1,
-> > > > > > > > > > > +	NULL,
-> > > > > > > > > > > +};
-> > > > > > > > > > > +
-> > > > > > > > > > > +struct vfio_mdev_pci {
-> > > > > > > > > > > +	struct vfio_pci_device *vdev;
-> > > > > > > > > > > +	struct mdev_device *mdev;
-> > > > > > > > > > > +	unsigned long handle;
-> > > > > > > > > > > +};
-> > > > > > > > > > > +
-> > > > > > > > > > > +static int vfio_mdev_pci_create(struct kobject *kobj, struct    
-> > > > > > mdev_device    
-> > > > > > > > *mdev)    
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	struct device *pdev;
-> > > > > > > > > > > +	struct vfio_pci_device *vdev;
-> > > > > > > > > > > +	struct vfio_mdev_pci *pmdev;
-> > > > > > > > > > > +	int ret;
-> > > > > > > > > > > +
-> > > > > > > > > > > +	pdev = mdev_parent_dev(mdev);
-> > > > > > > > > > > +	vdev = dev_get_drvdata(pdev);
-> > > > > > > > > > > +	pmdev = kzalloc(sizeof(struct vfio_mdev_pci), GFP_KERNEL);
-> > > > > > > > > > > +	if (pmdev == NULL) {
-> > > > > > > > > > > +		ret = -EBUSY;
-> > > > > > > > > > > +		goto out;
-> > > > > > > > > > > +	}
-> > > > > > > > > > > +
-> > > > > > > > > > > +	pmdev->mdev = mdev;
-> > > > > > > > > > > +	pmdev->vdev = vdev;
-> > > > > > > > > > > +	mdev_set_drvdata(mdev, pmdev);
-> > > > > > > > > > > +	ret = mdev_set_iommu_device(mdev_dev(mdev), pdev);
-> > > > > > > > > > > +	if (ret) {
-> > > > > > > > > > > +		pr_info("%s, failed to config iommu isolation for    
-> > > > > > mdev: %s on    
-> > > > > > > > > > pf: %s\n",    
-> > > > > > > > > > > +			__func__, dev_name(mdev_dev(mdev)),    
-> > > > > > dev_name(pdev));    
-> > > > > > > > > > > +		goto out;
-> > > > > > > > > > > +	}
-> > > > > > > > > > > +
-> > > > > > > > > > > +	pr_info("%s, creation succeeded for mdev: %s\n", __func__,
-> > > > > > > > > > > +		     dev_name(mdev_dev(mdev)));
-> > > > > > > > > > > +out:
-> > > > > > > > > > > +	return ret;
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +static int vfio_mdev_pci_remove(struct mdev_device *mdev)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	struct vfio_mdev_pci *pmdev = mdev_get_drvdata(mdev);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	kfree(pmdev);
-> > > > > > > > > > > +	pr_info("%s, succeeded for mdev: %s\n", __func__,
-> > > > > > > > > > > +		     dev_name(mdev_dev(mdev)));
-> > > > > > > > > > > +
-> > > > > > > > > > > +	return 0;
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +static int vfio_mdev_pci_open(struct mdev_device *mdev)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	struct vfio_mdev_pci *pmdev = mdev_get_drvdata(mdev);
-> > > > > > > > > > > +	struct vfio_pci_device *vdev = pmdev->vdev;
-> > > > > > > > > > > +	int ret = 0;
-> > > > > > > > > > > +
-> > > > > > > > > > > +	if (!try_module_get(THIS_MODULE))
-> > > > > > > > > > > +		return -ENODEV;
-> > > > > > > > > > > +
-> > > > > > > > > > > +	vfio_pci_refresh_config(vdev, nointxmask, disable_idle_d3);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	mutex_lock(&vdev->reflck->lock);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	if (!vdev->refcnt) {
-> > > > > > > > > > > +		ret = vfio_pci_enable(vdev);
-> > > > > > > > > > > +		if (ret)
-> > > > > > > > > > > +			goto error;
-> > > > > > > > > > > +
-> > > > > > > > > > > +		vfio_spapr_pci_eeh_open(vdev->pdev);
-> > > > > > > > > > > +	}
-> > > > > > > > > > > +	vdev->refcnt++;
-> > > > > > > > > > > +error:
-> > > > > > > > > > > +	mutex_unlock(&vdev->reflck->lock);
-> > > > > > > > > > > +	if (!ret)
-> > > > > > > > > > > +		pr_info("Succeeded to open mdev: %s on pf: %s\n",
-> > > > > > > > > > > +		dev_name(mdev_dev(mdev)), dev_name(&pmdev-    
-> > > > > > >vdev->pdev-    
-> > > > > > > > > > >dev));
-> > > > > > > > > > > +	else {
-> > > > > > > > > > > +		pr_info("Failed to open mdev: %s on pf: %s\n",
-> > > > > > > > > > > +		dev_name(mdev_dev(mdev)), dev_name(&pmdev-    
-> > > > > > >vdev->pdev-    
-> > > > > > > > > > >dev));
-> > > > > > > > > > > +		module_put(THIS_MODULE);
-> > > > > > > > > > > +	}
-> > > > > > > > > > > +	return ret;
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +static void vfio_mdev_pci_release(struct mdev_device *mdev)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	struct vfio_mdev_pci *pmdev = mdev_get_drvdata(mdev);
-> > > > > > > > > > > +	struct vfio_pci_device *vdev = pmdev->vdev;
-> > > > > > > > > > > +
-> > > > > > > > > > > +	pr_info("Release mdev: %s on pf: %s\n",
-> > > > > > > > > > > +		dev_name(mdev_dev(mdev)), dev_name(&pmdev-    
-> > > > > > >vdev->pdev-    
-> > > > > > > > > > >dev));
-> > > > > > > > > > > +
-> > > > > > > > > > > +	mutex_lock(&vdev->reflck->lock);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	if (!(--vdev->refcnt)) {
-> > > > > > > > > > > +		vfio_spapr_pci_eeh_release(vdev->pdev);
-> > > > > > > > > > > +		vfio_pci_disable(vdev);
-> > > > > > > > > > > +	}
-> > > > > > > > > > > +
-> > > > > > > > > > > +	mutex_unlock(&vdev->reflck->lock);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	module_put(THIS_MODULE);
-> > > > > > > > > > > +}    
-> > > > > > > > > >
-> > > > > > > > > > open() and release() here are almost identical between vfio_pci and
-> > > > > > > > > > vfio_mdev_pci, which suggests maybe there should be common    
-> > > > > > functions to    
-> > > > > > > > > > call into like we do for the below.    
-> > > > > > > > >
-> > > > > > > > > yes, let me have more study and do better abstract in next version. :-)
-> > > > > > > > >    
-> > > > > > > > > > > +static long vfio_mdev_pci_ioctl(struct mdev_device *mdev,    
-> > > > > > unsigned int cmd,    
-> > > > > > > > > > > +			     unsigned long arg)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	struct vfio_mdev_pci *pmdev = mdev_get_drvdata(mdev);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	return vfio_pci_ioctl(pmdev->vdev, cmd, arg);
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +static int vfio_mdev_pci_mmap(struct mdev_device *mdev,
-> > > > > > > > > > > +				struct vm_area_struct *vma)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	struct vfio_mdev_pci *pmdev = mdev_get_drvdata(mdev);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	return vfio_pci_mmap(pmdev->vdev, vma);
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +static ssize_t vfio_mdev_pci_read(struct mdev_device *mdev, char    
-> > > > > > __user    
-> > > > > > > > *buf,    
-> > > > > > > > > > > +			size_t count, loff_t *ppos)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	struct vfio_mdev_pci *pmdev = mdev_get_drvdata(mdev);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	return vfio_pci_read(pmdev->vdev, buf, count, ppos);
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +static ssize_t vfio_mdev_pci_write(struct mdev_device *mdev,
-> > > > > > > > > > > +				const char __user *buf,
-> > > > > > > > > > > +				size_t count, loff_t *ppos)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	struct vfio_mdev_pci *pmdev = mdev_get_drvdata(mdev);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	return vfio_pci_write(pmdev->vdev, (char __user *)buf,    
-> > > > > > count, ppos);    
-> > > > > > > > > > > +}
-> > > > > > > > > > > +
-> > > > > > > > > > > +static const struct mdev_parent_ops vfio_mdev_pci_ops = {
-> > > > > > > > > > > +	.supported_type_groups	=    
-> > > > > > vfio_mdev_pci_type_groups,    
-> > > > > > > > > > > +	.create			= vfio_mdev_pci_create,
-> > > > > > > > > > > +	.remove			= vfio_mdev_pci_remove,
-> > > > > > > > > > > +
-> > > > > > > > > > > +	.open			= vfio_mdev_pci_open,
-> > > > > > > > > > > +	.release		= vfio_mdev_pci_release,
-> > > > > > > > > > > +
-> > > > > > > > > > > +	.read			= vfio_mdev_pci_read,
-> > > > > > > > > > > +	.write			= vfio_mdev_pci_write,
-> > > > > > > > > > > +	.mmap			= vfio_mdev_pci_mmap,
-> > > > > > > > > > > +	.ioctl			= vfio_mdev_pci_ioctl,
-> > > > > > > > > > > +};
-> > > > > > > > > > > +
-> > > > > > > > > > > +static int vfio_mdev_pci_driver_probe(struct pci_dev *pdev,
-> > > > > > > > > > > +				       const struct pci_device_id *id)
-> > > > > > > > > > > +{
-> > > > > > > > > > > +	struct vfio_pci_device *vdev;
-> > > > > > > > > > > +	int ret;
-> > > > > > > > > > > +
-> > > > > > > > > > > +	if (pdev->hdr_type != PCI_HEADER_TYPE_NORMAL)
-> > > > > > > > > > > +		return -EINVAL;
-> > > > > > > > > > > +
-> > > > > > > > > > > +	/*
-> > > > > > > > > > > +	 * Prevent binding to PFs with VFs enabled, this too easily    
-> > > > > > allows    
-> > > > > > > > > > > +	 * userspace instance with VFs and PFs from the same device,    
-> > > > > > which    
-> > > > > > > > > > > +	 * cannot work.  Disabling SR-IOV here would initiate    
-> > > > > > removing the    
-> > > > > > > > > > > +	 * VFs, which would unbind the driver, which is prone to    
-> > > > > > blocking    
-> > > > > > > > > > > +	 * if that VF is also in use by vfio-pci or vfio-mdev-pci. Just
-> > > > > > > > > > > +	 * reject these PFs and let the user sort it out.
-> > > > > > > > > > > +	 */
-> > > > > > > > > > > +	if (pci_num_vf(pdev)) {
-> > > > > > > > > > > +		pci_warn(pdev, "Cannot bind to PF with SR-IOV    
-> > > > > > enabled\n");    
-> > > > > > > > > > > +		return -EBUSY;
-> > > > > > > > > > > +	}
-> > > > > > > > > > > +
-> > > > > > > > > > > +	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
-> > > > > > > > > > > +	if (!vdev)
-> > > > > > > > > > > +		return -ENOMEM;
-> > > > > > > > > > > +
-> > > > > > > > > > > +	vdev->pdev = pdev;
-> > > > > > > > > > > +	vdev->irq_type = VFIO_PCI_NUM_IRQS;
-> > > > > > > > > > > +	mutex_init(&vdev->igate);
-> > > > > > > > > > > +	spin_lock_init(&vdev->irqlock);
-> > > > > > > > > > > +	mutex_init(&vdev->ioeventfds_lock);
-> > > > > > > > > > > +	INIT_LIST_HEAD(&vdev->ioeventfds_list);
-> > > > > > > > > > > +	vdev->nointxmask = nointxmask;
-> > > > > > > > > > > +#ifdef CONFIG_VFIO_PCI_VGA
-> > > > > > > > > > > +	vdev->disable_vga = disable_vga;
-> > > > > > > > > > > +#endif
-> > > > > > > > > > > +	vdev->disable_idle_d3 = disable_idle_d3;
-> > > > > > > > > > > +
-> > > > > > > > > > > +	pci_set_drvdata(pdev, vdev);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	ret = vfio_pci_reflck_attach(vdev);
-> > > > > > > > > > > +	if (ret) {
-> > > > > > > > > > > +		pci_set_drvdata(pdev, NULL);
-> > > > > > > > > > > +		kfree(vdev);
-> > > > > > > > > > > +		return ret;
-> > > > > > > > > > > +	}
-> > > > > > > > > > > +
-> > > > > > > > > > > +	if (vfio_pci_is_vga(pdev)) {
-> > > > > > > > > > > +		vga_client_register(pdev, vdev, NULL,    
-> > > > > > vfio_pci_set_vga_decode);    
-> > > > > > > > > > > +		vga_set_legacy_decoding(pdev,
-> > > > > > > > > > > +    
-> > > > > > 	vfio_pci_set_vga_decode(vdev, false));    
-> > > > > > > > > > > +	}
-> > > > > > > > > > > +
-> > > > > > > > > > > +	vfio_pci_probe_power_state(vdev);
-> > > > > > > > > > > +
-> > > > > > > > > > > +	if (!vdev->disable_idle_d3) {
-> > > > > > > > > > > +		/*
-> > > > > > > > > > > +		 * pci-core sets the device power state to an    
-> > > > > > unknown value at    
-> > > > > > > > > > > +		 * bootup and after being removed from a driver.    
-> > > > > > The only    
-> > > > > > > > > > > +		 * transition it allows from this unknown state is to    
-> > > > > > D0, which    
-> > > > > > > > > > > +		 * typically happens when a driver calls    
-> > > > > > pci_enable_device().    
-> > > > > > > > > > > +		 * We're not ready to enable the device yet, but we    
-> > > > > > do want to    
-> > > > > > > > > > > +		 * be able to get to D3.  Therefore first do a D0    
-> > > > > > transition    
-> > > > > > > > > > > +		 * before going to D3.
-> > > > > > > > > > > +		 */
-> > > > > > > > > > > +		vfio_pci_set_power_state(vdev, PCI_D0);
-> > > > > > > > > > > +		vfio_pci_set_power_state(vdev, PCI_D3hot);
-> > > > > > > > > > > +	}    
-> > > > > > > > > >
-> > > > > > > > > > Ditto here and remove below, this seems like boilerplate that    
-> > > > > > shouldn't    
-> > > > > > > > > > be duplicated per leaf module.  Thanks,    
-> > > > > > > > >
-> > > > > > > > > Sure, the code snippet above may also be abstracted to be a common    
-> > > > > > API    
-> > > > > > > > > provided by vfio-pci-common.ko. :-)
-> > > > > > > > >
-> > > > > > > > > I have a confusion which may need confirm with you. Do you also want    
-> > > > > > the    
-> > > > > > > > > below code snippet be placed in the vfio-pci-common.ko and exposed    
-> > > > > > out    
-> > > > > > > > > as a wrapped API? Thus it can be used by sample driver and other    
-> > > > > > future    
-> > > > > > > > > drivers which want to wrap PCI device as a mdev. May be I    
-> > > > > > misundstood    
-> > > > > > > > > your comment. :-(    
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > I think some sort of vfio_pci_common_{probe,remove}() would be a
-> > > > > > > > reasonable starting point where the respective module _{probe,remove}
-> > > > > > > > functions would call into these and add their module specific code
-> > > > > > > > around it.  That would at least give us a point to cleanup things that
-> > > > > > > > are only used by the common code in the common code.    
-> > > > > > >
-> > > > > > > sure, I can start from here if we are still going with this direction. :-)
-> > > > > > >    
-> > > > > > > > I'm still struggling how we make this user consumable should we accept
-> > > > > > > > this and progress beyond a proof of concept sample driver though.  For
-> > > > > > > > example, if a vendor actually implements an mdev wrapper driver or    
-> > > > > > even    
-> > > > > > > > just a device specific vfio-pci wrapper, to enable for example
-> > > > > > > > migration support, how does a user know which driver to use for each
-> > > > > > > > particular feature?  The best I can come up with so far is something
-> > > > > > > > like was done for vfio-platform reset modules.  For instance a module
-> > > > > > > > that extends features for a given device in vfio-pci might register an
-> > > > > > > > ops structure and id table with vfio-pci, along with creating a module
-> > > > > > > > alias (or aliases) for the devices it supports.  When a device is
-> > > > > > > > probed by vfio-pci it could try to match against registered id tables
-> > > > > > > > to find a device specific ops structure, if one is not found it could
-> > > > > > > > do a request_module using the PCI vendor and device IDs and some    
-> > > > > > unique    
-> > > > > > > > vfio-pci string, check again, and use the default ops if device
-> > > > > > > > specific ops are still not present.  That would solve the problem on
-> > > > > > > > the vfio-pci side.    
-> > > > > > >
-> > > > > > > yeah, this is letting vfio-pci to invoke the ops from vendor drivers/modules.
-> > > > > > > I think this is what Yan is trying to do.    
-> > > > > > 
-> > > > > > I think I'm suggesting a callback ops structure a level above what Yan
-> > > > > > previously proposed.  For example, could we have device specific
-> > > > > > vfio_device_ops where the vendor module can call out to common code
-> > > > > > rather than requiring common code to test for and optionally call out
-> > > > > > to device specific code.
-> > > > > >     
-> > > > > > > > For mdevs, I tend to assume that this vfio-mdev-pci
-> > > > > > > > meta driver is an anomaly only for the purpose of creating a generic
-> > > > > > > > test device for IOMMU backed mdevs and that "real" mdev vendor
-> > > > > > > > drivers will just be mdev enlightened host drivers, like i915 and
-> > > > > > > > nvidia are now.  Thanks,    
-> > > > > > >
-> > > > > > > yes, this vfio-mdev-pci meta driver is just creating a test device.
-> > > > > > > Do we still go with the current direction, or find any other way
-> > > > > > > which may be easier for adding this meta driver?    
-> > > > > > 
-> > > > > > I think if the code split allows us to create an environment where
-> > > > > > vendor drivers can re-use much of vfio-pci while creating a
-> > > > > > vfio_device_ops that supports additional features for their device and
-> > > > > > we bring that all together with a request module interface and module
-> > > > > > aliases to make that work seamlessly, then it has value.  A concern I
-> > > > > > have in only doing this split in order to create the vfio-mdev-pci
-> > > > > > module is that it leaves open the question and groundwork for forking
-> > > > > > vfio-pci into multiple vendor specific modules that would become a mess
-> > > > > > for user's to mange.
-> > > > > >     
-> > > > > > > Compared with the "real" mdev vendor drivers, it is like a
-> > > > > > > "vfio-pci + dummy mdev ops" driver. dummy mdev ops means
-> > > > > > > no vendor specific handling and passthru to vfio-pci codes directly.
-> > > > > > >
-> > > > > > > I think this meta driver is even lighter than the "real" mdev vendor
-> > > > > > > drivers. right? Is it possible to let this driver follow the way of
-> > > > > > > registering ops structure and id table with vfio-pci? The obstacle
-> > > > > > > I can see is the meta driver is a generic driver, which means it has
-> > > > > > > no id table... For the "real" mdev vendor drivers, they naturally have
-> > > > > > > such info. If vfio-mdev-pci can also get the id info without binding
-> > > > > > > to a device, it may be possible. thoughts? :-)    
-> > > > > > 
-> > > > > > IDs could be provided via a module option or potentially with
-> > > > > > build-time options.  That might allow us to test all aspects of the
-> > > > > > above proposal, ie. allowing sub-modules to provide vfio_device_ops for
-> > > > > > specific devices, allowing those vendor vfio_device_ops to re-use much
-> > > > > > of the existing vfio-pci code in that implementation, and a mechanism
-> > > > > > for generically testing IOMMU backed mdevs.  That's starting to sound a
-> > > > > > lot more worthwhile than moving a bunch of code around only to
-> > > > > > implement a sample driver for the latter.  Thoughts?  Thanks,
-> > > > > >     
-> > > > > 
-> > > > > sounds a good idea. If feasible suppose Yan's mediate_ops series
-> > > > > can be also largely avoided. The vendor driver can directly register its
-> > > > > own vfio_device_ops and selectively introduces proprietary logic 
-> > > > > (e.g. for tracking dirty pages) on top of the generic vfio_pci code.    
-> > > > 
-> > > > hi Alex
-> > > > as our previously discussed, I'm preparing to implement my v2 as this
-> > > > way:
-> > > > 
-> > > > 1. on vfio-pci binding to a device, it will modprobe modules of alias
-> > > > "vfio-pci-(vendorid)-(deviceid)", as a way to notify vendor drivers of
-> > > > registering their vendor ops. (I renamed mediate_ops to vendor_ops in
-> > > > v2)
-> > > > 2. in a module aliasing to "vfio-pci-(vendor_id)-(devivce_id)", in its
-> > > > module_init, it will register a vendor ops to vfio-pci.
-> > > > If there are two modules of the same alias and both registering vendor
-> > > > ops at the same time, they are chained according to the prio in
-> > > > its vendor ops.
-> > > > 3. vfio-pci would ask for region_infos for all vendor ops of a vdev in
-> > > > vfio_pci_open, and init regions for vendor drivers. Current code in
-> > > > vfio_pci_igd.c, vfio_pci_nvlink2.c, vfio_pci_nvlink2.c would all be
-> > > > wrapped into separate modules. so current vfio_pci_register_dev_region()
-> > > > would be removed accordingly. vfio_pci_rw would now be direct to 
-> > > > vendor_ops->region[i].rw. higher priority module's ops wins.
-> > > > For example, module vfio_pci_igd may register to regions of index 10,
-> > > > 11, 12 for its opregion, and two cfg regions. still, vendor driver can
-> > > > provide a module named i915_migration to register for regions of index 0
-> > > > and 13 for BAR0 and migration.  
-> > > 
-> > > My major complaint with the previous version was that sprinkling random
-> > > vendor ops call-outs everywhere in vfio-pci is ugly and hard to
-> > > maintain.  The idea I'm proposing here is that sub-modules (loaded via
-> > > alias) would provide the entire vfio_device_ops for a device.  Yi's
-> > > series here would split out common code to make it trivial for vendor
-> > > modules to implement those device ops using pieces of vfio-pci if they
-> > > wish to do so.  Having multiple modules implement features of a device
-> > > based on their loading priority sounds powerful, but also difficult to
-> > > maintain and debug.  Do we need that functionality if a vendor
-> > > vfio_device_ops can implement it themselves in a handful of lines of
-> > > code?  Thanks,  
-> > 
-> > The main purpose of providing multiple modules is to enable each module
-> > to focus on implementing regions of their own interest. If vendor module
-> > has to provide vfio_device_ops, I don't think it's only a handful of
-> > lines of code for them.
-> > For example. in vfio_device_ops.open(), they at least have to hold the
-> > &vdev->reflck->lock and call vfio_pci_enable and
-> > vfio_spapr_pci_eeh_open. Also, vdev is private inside vfio_pci, do we
-> > really want to export this structure?
-> > The same to vfio_device_ops.ioctl(). if vendor driver has to implement a
-> > little different than vfio_pci_ioctl(), e.g. init a new region, it has
-> > to decode region index and knows inside vdev->region[i].
-> > when it comes to vfio_device_ops.remove(), in Yi's code, it even has to
-> > free each lock and region... in vdev.
-> 
-> You make some good points, replacing vfio_device_ops altogether per
-> vendor module might be too simplistic.  However, we also can't create a
-> special case for vendor module handling on every interface.  For
-> example, why would vfio_pci_rw() test for and call out to
-> mediate_ops->rw() when we've already got per region rw() handlers via
-> vfio_pci_regops?  Seems we need to make use of vfio_pci_regops
-> ubiquitous for all regions and create an API for a vendor module to
-> register new regions with ops (ie. expose vfio_pci_register_dev_region)
-> and also manipulate the ops of existing regions.  When a vendor module
-> registers, it might just need to provide an open function callback and
-> an id table, and perhaps everything else is handled via registering new
-> regions and dynamically changing existing regions when we call the open
-> callback for a device.  Something about that series needs to change, I
-> can't handle the proposed mediated device ops being tested and called
-> everywhere.
->  
-> > Besides that, one thing I don't understand is that, Yi's sample code is
-> > a mdev driver, so rather than binding to vfio-pci, a pci device would
-> > bind to Yi's driver directly. Then, how this registering to vfio-pci way
-> > work for him?
-> 
-> It wouldn't, I was trying to justify the code rework that Yi is trying
-> to do as also usable to these vfio-pci vendor extension modules.  You
-> may have poked a hole in that proposal though, which again puts in
-> doubt whether we should really pursue it for a sample driver.  Thanks,
->
+This patch introduces a vDPA based vhost backend. This
+backend is built on top of the same interface defined
+in virtio-vDPA and provides a generic vhost interface
+for userspace to accelerate the virtio devices in guest.
 
-hi Alex
-I've sent v2 of introducing vendor_ops to vfio-pci.
-(https://lkml.org/lkml/2020/1/30/956)
-By making vfio_pci_device partly public and incorporating vendor driver
-data, it is now able to let vendor driver register their own
-vfio_device_ops and calling vfio_pci_ops as default implementations.
+This backend is implemented as a vDPA device driver on
+top of the same ops used in virtio-vDPA. It will create
+char device entry named vhost-vdpa/$vdpa_device_index
+for userspace to use. Userspace can use vhost ioctls on
+top of this char device to setup the backend.
 
-Making use of vfio_pci_regops ubiquitous for all regions and create an API
-for a vendor module to register new regions with ops is also a good idea,
-but its drawback is that the usage is only limited to region customization.
-I'd like to send my current v2 implementation to you first and see if you
-think it's good.
+Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+---
+This patch depends on below series:
+https://lkml.org/lkml/2020/1/16/353
 
-Thanks
-Yan
+Please note that _SET_MEM_TABLE isn't fully supported yet.
+Comments would be appreciated!
+
+Changes since last patch (https://lkml.org/lkml/2019/11/18/1068)
+- Switch to the vDPA bus;
+- Switch to vhost's own chardev;
+
+ drivers/vhost/Kconfig            |  12 +
+ drivers/vhost/Makefile           |   3 +
+ drivers/vhost/vdpa.c             | 705 +++++++++++++++++++++++++++++++
+ include/uapi/linux/vhost.h       |  21 +
+ include/uapi/linux/vhost_types.h |   8 +
+ 5 files changed, 749 insertions(+)
+ create mode 100644 drivers/vhost/vdpa.c
+
+diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+index f21c45aa5e07..13e6a94d0243 100644
+--- a/drivers/vhost/Kconfig
++++ b/drivers/vhost/Kconfig
+@@ -34,6 +34,18 @@ config VHOST_VSOCK
+ 	To compile this driver as a module, choose M here: the module will be called
+ 	vhost_vsock.
+ 
++config VHOST_VDPA
++	tristate "Vhost driver for vDPA based backend"
++	depends on EVENTFD && VDPA
++	select VHOST
++	default n
++	---help---
++	This kernel module can be loaded in host kernel to accelerate
++	guest virtio devices with the vDPA based backends.
++
++	To compile this driver as a module, choose M here: the module
++	will be called vhost_vdpa.
++
+ config VHOST
+ 	tristate
+         depends on VHOST_IOTLB
+diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
+index df99756fbb26..a65e9f4a2c0a 100644
+--- a/drivers/vhost/Makefile
++++ b/drivers/vhost/Makefile
+@@ -10,6 +10,9 @@ vhost_vsock-y := vsock.o
+ 
+ obj-$(CONFIG_VHOST_RING) += vringh.o
+ 
++obj-$(CONFIG_VHOST_VDPA) += vhost_vdpa.o
++vhost_vdpa-y := vdpa.o
++
+ obj-$(CONFIG_VHOST)	+= vhost.o
+ 
+ obj-$(CONFIG_VHOST_IOTLB) += vhost_iotlb.o
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+new file mode 100644
+index 000000000000..631d994d37ac
+--- /dev/null
++++ b/drivers/vhost/vdpa.c
+@@ -0,0 +1,705 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2018-2020 Intel Corporation.
++ *
++ * Author: Tiwei Bie <tiwei.bie@intel.com>
++ *
++ * Thanks to Jason Wang and Michael S. Tsirkin for the valuable
++ * comments and suggestions.  And thanks to Cunming Liang and
++ * Zhihong Wang for all their supports.
++ */
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/cdev.h>
++#include <linux/device.h>
++#include <linux/uuid.h>
++#include <linux/vdpa.h>
++#include <linux/nospec.h>
++#include <linux/vhost.h>
++#include <linux/virtio_net.h>
++
++#include "vhost.h"
++
++enum {
++	VHOST_VDPA_FEATURES =
++		(1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
++		(1ULL << VIRTIO_F_ANY_LAYOUT) |
++		(1ULL << VIRTIO_F_VERSION_1) |
++		(1ULL << VIRTIO_F_IOMMU_PLATFORM) |
++		(1ULL << VIRTIO_F_RING_PACKED) |
++		(1ULL << VIRTIO_F_ORDER_PLATFORM) |
++		(1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
++		(1ULL << VIRTIO_RING_F_EVENT_IDX),
++
++	VHOST_VDPA_NET_FEATURES = VHOST_VDPA_FEATURES |
++		(1ULL << VIRTIO_NET_F_CSUM) |
++		(1ULL << VIRTIO_NET_F_GUEST_CSUM) |
++		(1ULL << VIRTIO_NET_F_MTU) |
++		(1ULL << VIRTIO_NET_F_MAC) |
++		(1ULL << VIRTIO_NET_F_GUEST_TSO4) |
++		(1ULL << VIRTIO_NET_F_GUEST_TSO6) |
++		(1ULL << VIRTIO_NET_F_GUEST_ECN) |
++		(1ULL << VIRTIO_NET_F_GUEST_UFO) |
++		(1ULL << VIRTIO_NET_F_HOST_TSO4) |
++		(1ULL << VIRTIO_NET_F_HOST_TSO6) |
++		(1ULL << VIRTIO_NET_F_HOST_ECN) |
++		(1ULL << VIRTIO_NET_F_HOST_UFO) |
++		(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
++		(1ULL << VIRTIO_NET_F_STATUS) |
++		(1ULL << VIRTIO_NET_F_SPEED_DUPLEX),
++};
++
++/* Currently, only network backend w/o multiqueue is supported. */
++#define VHOST_VDPA_VQ_MAX	2
++
++struct vhost_vdpa {
++	/* The lock is to protect this structure. */
++	struct mutex mutex;
++	struct vhost_dev vdev;
++	struct vhost_virtqueue *vqs;
++	struct vdpa_device *vdpa;
++	struct device *dev;
++	atomic_t opened;
++	int nvqs;
++	int virtio_id;
++	int minor;
++};
++
++static struct {
++	/* The lock is to protect this structure. */
++	struct mutex mutex;
++	struct class *class;
++	struct idr idr;
++	struct cdev cdev;
++	dev_t devt;
++	wait_queue_head_t release_q;
++} vhost_vdpa;
++
++static const u64 vhost_vdpa_features[] = {
++	[VIRTIO_ID_NET] = VHOST_VDPA_NET_FEATURES,
++};
++
++static int vhost_vdpa_alloc_minor(struct vhost_vdpa *v)
++{
++	return idr_alloc(&vhost_vdpa.idr, v, 0, MINORMASK + 1,
++			 GFP_KERNEL);
++}
++
++static void vhost_vdpa_free_minor(int minor)
++{
++	idr_remove(&vhost_vdpa.idr, minor);
++}
++
++static struct vhost_vdpa *vhost_vdpa_get_from_minor(int minor)
++{
++	struct vhost_vdpa *v;
++
++	mutex_lock(&vhost_vdpa.mutex);
++	v = idr_find(&vhost_vdpa.idr, minor);
++	mutex_unlock(&vhost_vdpa.mutex);
++
++	return v;
++}
++
++static void handle_vq_kick(struct vhost_work *work)
++{
++	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
++						  poll.work);
++	struct vhost_vdpa *v = container_of(vq->dev, struct vhost_vdpa, vdev);
++	const struct vdpa_config_ops *ops = v->vdpa->config;
++
++	ops->kick_vq(v->vdpa, vq - v->vqs);
++}
++
++static irqreturn_t vhost_vdpa_virtqueue_cb(void *private)
++{
++	struct vhost_virtqueue *vq = private;
++	struct eventfd_ctx *call_ctx = vq->call_ctx;
++
++	if (call_ctx)
++		eventfd_signal(call_ctx, 1);
++
++	return IRQ_HANDLED;
++}
++
++static void vhost_vdpa_reset(struct vhost_vdpa *v)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++
++	ops->set_status(vdpa, 0);
++}
++
++static long vhost_vdpa_get_device_id(struct vhost_vdpa *v, u8 __user *argp)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	u32 device_id;
++
++	device_id = ops->get_device_id(vdpa);
++
++	if (copy_to_user(argp, &device_id, sizeof(device_id)))
++		return -EFAULT;
++
++	return 0;
++}
++
++static long vhost_vdpa_get_status(struct vhost_vdpa *v, u8 __user *statusp)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	u8 status;
++
++	status = ops->get_status(vdpa);
++
++	if (copy_to_user(statusp, &status, sizeof(status)))
++		return -EFAULT;
++
++	return 0;
++}
++
++static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	u8 status;
++
++	if (copy_from_user(&status, statusp, sizeof(status)))
++		return -EFAULT;
++
++	/*
++	 * Userspace shouldn't remove status bits unless reset the
++	 * status to 0.
++	 */
++	if (status != 0 && (ops->get_status(vdpa) & ~status) != 0)
++		return -EINVAL;
++
++	ops->set_status(vdpa, status);
++
++	return 0;
++}
++
++static int vhost_vdpa_config_validate(struct vhost_vdpa *v,
++				      struct vhost_vdpa_config *c)
++{
++	long size = 0;
++
++	switch (v->virtio_id) {
++	case VIRTIO_ID_NET:
++		size = sizeof(struct virtio_net_config);
++		break;
++	}
++
++	if (c->len == 0)
++		return -EINVAL;
++
++	if (c->len > size - c->off)
++		return -E2BIG;
++
++	return 0;
++}
++
++static long vhost_vdpa_get_config(struct vhost_vdpa *v,
++				  struct vhost_vdpa_config __user *c)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	struct vhost_vdpa_config config;
++	unsigned long size = offsetof(struct vhost_vdpa_config, buf);
++	u8 *buf;
++
++	if (copy_from_user(&config, c, size))
++		return -EFAULT;
++	if (vhost_vdpa_config_validate(v, &config))
++		return -EINVAL;
++	buf = kvzalloc(config.len, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	ops->get_config(vdpa, config.off, buf, config.len);
++
++	if (copy_to_user(c->buf, buf, config.len)) {
++		kvfree(buf);
++		return -EFAULT;
++	}
++
++	kvfree(buf);
++	return 0;
++}
++
++static long vhost_vdpa_set_config(struct vhost_vdpa *v,
++				  struct vhost_vdpa_config __user *c)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	struct vhost_vdpa_config config;
++	unsigned long size = offsetof(struct vhost_vdpa_config, buf);
++	u8 *buf;
++
++	if (copy_from_user(&config, c, size))
++		return -EFAULT;
++	if (vhost_vdpa_config_validate(v, &config))
++		return -EINVAL;
++	buf = kvzalloc(config.len, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	if (copy_from_user(buf, c->buf, config.len)) {
++		kvfree(buf);
++		return -EFAULT;
++	}
++
++	ops->set_config(vdpa, config.off, buf, config.len);
++
++	kvfree(buf);
++	return 0;
++}
++
++static long vhost_vdpa_get_features(struct vhost_vdpa *v, u64 __user *featurep)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	u64 features;
++
++	features = ops->get_features(vdpa);
++	features &= vhost_vdpa_features[v->virtio_id];
++
++	if (copy_to_user(featurep, &features, sizeof(features)))
++		return -EFAULT;
++
++	return 0;
++}
++
++static long vhost_vdpa_set_features(struct vhost_vdpa *v, u64 __user *featurep)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	u64 features;
++
++	/*
++	 * It's not allowed to change the features after they have
++	 * been negotiated.
++	 */
++	if (ops->get_status(vdpa) & VIRTIO_CONFIG_S_FEATURES_OK)
++		return -EBUSY;
++
++	if (copy_from_user(&features, featurep, sizeof(features)))
++		return -EFAULT;
++
++	if (features & ~vhost_vdpa_features[v->virtio_id])
++		return -EINVAL;
++
++	if (ops->set_features(vdpa, features))
++		return -EINVAL;
++
++	return 0;
++}
++
++static long vhost_vdpa_get_vring_num(struct vhost_vdpa *v, u16 __user *argp)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	u16 num;
++
++	num = ops->get_vq_num_max(vdpa);
++
++	if (copy_to_user(argp, &num, sizeof(num)))
++		return -EFAULT;
++
++	return 0;
++}
++
++static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
++				   void __user *argp)
++{
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	struct vdpa_callback cb;
++	struct vhost_virtqueue *vq;
++	struct vhost_vring_state s;
++	u8 status;
++	u32 idx;
++	long r;
++
++	r = get_user(idx, (u32 __user *)argp);
++	if (r < 0)
++		return r;
++	if (idx >= v->nvqs)
++		return -ENOBUFS;
++
++	idx = array_index_nospec(idx, v->nvqs);
++	vq = &v->vqs[idx];
++
++	status = ops->get_status(vdpa);
++
++	/*
++	 * It's not allowed to detect and program vqs before
++	 * features negotiation or after enabling driver.
++	 */
++	if (!(status & VIRTIO_CONFIG_S_FEATURES_OK) ||
++	    (status & VIRTIO_CONFIG_S_DRIVER_OK))
++		return -EBUSY;
++
++	if (cmd == VHOST_VDPA_SET_VRING_ENABLE) {
++		if (copy_from_user(&s, argp, sizeof(s)))
++			return -EFAULT;
++		ops->set_vq_ready(vdpa, idx, s.num);
++		return 0;
++	}
++
++	/*
++	 * It's not allowed to detect and program vqs with
++	 * vqs enabled.
++	 */
++	if (ops->get_vq_ready(vdpa, idx))
++		return -EBUSY;
++
++	if (cmd == VHOST_GET_VRING_BASE)
++		vq->last_avail_idx = ops->get_vq_state(v->vdpa, idx);
++
++	r = vhost_vring_ioctl(&v->vdev, cmd, argp);
++	if (r)
++		return r;
++
++	switch (cmd) {
++	case VHOST_SET_VRING_ADDR:
++		if (ops->set_vq_address(vdpa, idx, (u64)vq->desc,
++					(u64)vq->avail, (u64)vq->used))
++			r = -EINVAL;
++		break;
++
++	case VHOST_SET_VRING_BASE:
++		if (ops->set_vq_state(vdpa, idx, vq->last_avail_idx))
++			r = -EINVAL;
++		break;
++
++	case VHOST_SET_VRING_CALL:
++		if (vq->call_ctx) {
++			cb.callback = vhost_vdpa_virtqueue_cb;
++			cb.private = vq;
++		} else {
++			cb.callback = NULL;
++			cb.private = NULL;
++		}
++		ops->set_vq_cb(vdpa, idx, &cb);
++		break;
++
++	case VHOST_SET_VRING_NUM:
++		ops->set_vq_num(vdpa, idx, vq->num);
++		break;
++	}
++
++	return r;
++}
++
++static long vhost_vdpa_do_dma_mapping(struct vhost_vdpa *v)
++{
++	/* TODO: fix this */
++	return -ENOTSUPP;
++}
++
++static int vhost_vdpa_open(struct inode *inode, struct file *filep)
++{
++	struct vhost_vdpa *v;
++	struct vhost_dev *dev;
++	struct vhost_virtqueue **vqs;
++	int nvqs, i, r, opened;
++
++	v = vhost_vdpa_get_from_minor(iminor(inode));
++	if (!v)
++		return -ENODEV;
++
++	opened = atomic_cmpxchg(&v->opened, 0, 1);
++	if (opened) {
++		r = -EBUSY;
++		goto err;
++	}
++
++	nvqs = v->nvqs;
++	vhost_vdpa_reset(v);
++
++	vqs = kmalloc_array(nvqs, sizeof(*vqs), GFP_KERNEL);
++	if (!vqs) {
++		r = -ENOMEM;
++		goto err;
++	}
++
++	dev = &v->vdev;
++	for (i = 0; i < nvqs; i++) {
++		vqs[i] = &v->vqs[i];
++		vqs[i]->handle_kick = handle_vq_kick;
++	}
++	vhost_dev_init(dev, vqs, nvqs, 0, 0, 0);
++
++	filep->private_data = v;
++
++	return 0;
++
++err:
++	atomic_dec(&v->opened);
++	return r;
++}
++
++static int vhost_vdpa_release(struct inode *inode, struct file *filep)
++{
++	struct vhost_vdpa *v = filep->private_data;
++
++	mutex_lock(&v->mutex);
++	filep->private_data = NULL;
++	vhost_vdpa_reset(v);
++	vhost_dev_stop(&v->vdev);
++	vhost_dev_cleanup(&v->vdev);
++	kfree(v->vdev.vqs);
++	mutex_unlock(&v->mutex);
++
++	atomic_dec(&v->opened);
++	wake_up(&vhost_vdpa.release_q);
++
++	return 0;
++}
++
++static long vhost_vdpa_unlocked_ioctl(struct file *filep,
++				      unsigned int cmd, unsigned long arg)
++{
++	struct vhost_vdpa *v = filep->private_data;
++	struct vdpa_device *vdpa = v->vdpa;
++	const struct vdpa_config_ops *ops = vdpa->config;
++	void __user *argp = (void __user *)arg;
++	long r;
++
++	mutex_lock(&v->mutex);
++
++	switch (cmd) {
++	case VHOST_VDPA_GET_DEVICE_ID:
++		r = vhost_vdpa_get_device_id(v, argp);
++		break;
++	case VHOST_VDPA_GET_STATUS:
++		r = vhost_vdpa_get_status(v, argp);
++		break;
++	case VHOST_VDPA_SET_STATUS:
++		r = vhost_vdpa_set_status(v, argp);
++		break;
++	case VHOST_VDPA_GET_CONFIG:
++		r = vhost_vdpa_get_config(v, argp);
++		break;
++	case VHOST_VDPA_SET_CONFIG:
++		r = vhost_vdpa_set_config(v, argp);
++		break;
++	case VHOST_GET_FEATURES:
++		r = vhost_vdpa_get_features(v, argp);
++		break;
++	case VHOST_SET_FEATURES:
++		r = vhost_vdpa_set_features(v, argp);
++		break;
++	case VHOST_VDPA_GET_VRING_NUM:
++		r = vhost_vdpa_get_vring_num(v, argp);
++		break;
++	case VHOST_SET_LOG_BASE:
++	case VHOST_SET_LOG_FD:
++		r = -ENOIOCTLCMD;
++		break;
++	default:
++		mutex_lock(&v->vdev.mutex);
++		r = vhost_dev_ioctl(&v->vdev, cmd, argp);
++		if (r == -ENOIOCTLCMD)
++			r = vhost_vdpa_vring_ioctl(v, cmd, argp);
++		mutex_unlock(&v->vdev.mutex);
++		break;
++	}
++
++	if (r)
++		goto out;
++
++	switch (cmd) {
++	case VHOST_SET_MEM_TABLE:
++		if (ops->set_map)
++			r = ops->set_map(vdpa, v->vdev.umem);
++		else
++			r = vhost_vdpa_do_dma_mapping(v);
++		break;
++	}
++
++out:
++	mutex_unlock(&v->mutex);
++	return r;
++}
++
++static const struct file_operations vhost_vdpa_fops = {
++	.owner		= THIS_MODULE,
++	.open		= vhost_vdpa_open,
++	.release	= vhost_vdpa_release,
++	.unlocked_ioctl	= vhost_vdpa_unlocked_ioctl,
++	.compat_ioctl	= compat_ptr_ioctl,
++};
++
++static int vhost_vdpa_probe(struct device *dev)
++{
++	struct vdpa_device *vdpa = dev_to_vdpa(dev);
++	const struct vdpa_config_ops *ops = vdpa->config;
++	struct vhost_vdpa *v;
++	struct device *d;
++	int minor, nvqs;
++	int r;
++
++	/* Currently, we only accept the network devices. */
++	if (ops->get_device_id(vdpa) != VIRTIO_ID_NET) {
++		r = -ENOTSUPP;
++		goto err;
++	}
++
++	v = kzalloc(sizeof(*v), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
++	if (!v) {
++		r = -ENOMEM;
++		goto err;
++	}
++
++	nvqs = VHOST_VDPA_VQ_MAX;
++
++	v->vqs = kmalloc_array(nvqs, sizeof(struct vhost_virtqueue),
++			       GFP_KERNEL);
++	if (!v->vqs) {
++		r = -ENOMEM;
++		goto err_alloc_vqs;
++	}
++
++	mutex_init(&v->mutex);
++	atomic_set(&v->opened, 0);
++
++	v->vdpa = vdpa;
++	v->nvqs = nvqs;
++	v->virtio_id = ops->get_device_id(vdpa);
++
++	mutex_lock(&vhost_vdpa.mutex);
++
++	minor = vhost_vdpa_alloc_minor(v);
++	if (minor < 0) {
++		r = minor;
++		goto err_alloc_minor;
++	}
++
++	d = device_create(vhost_vdpa.class, NULL,
++			  MKDEV(MAJOR(vhost_vdpa.devt), minor),
++			  v, "%d", vdpa->index);
++	if (IS_ERR(d)) {
++		r = PTR_ERR(d);
++		goto err_device_create;
++	}
++
++	mutex_unlock(&vhost_vdpa.mutex);
++
++	v->dev = d;
++	v->minor = minor;
++	dev_set_drvdata(dev, v);
++
++	return 0;
++
++err_device_create:
++	vhost_vdpa_free_minor(minor);
++err_alloc_minor:
++	mutex_unlock(&vhost_vdpa.mutex);
++	kfree(v->vqs);
++err_alloc_vqs:
++	kfree(v);
++err:
++	return r;
++}
++
++static void vhost_vdpa_remove(struct device *dev)
++{
++	DEFINE_WAIT_FUNC(wait, woken_wake_function);
++	struct vhost_vdpa *v = dev_get_drvdata(dev);
++	int opened;
++
++	add_wait_queue(&vhost_vdpa.release_q, &wait);
++
++	do {
++		opened = atomic_cmpxchg(&v->opened, 0, 1);
++		if (!opened)
++			break;
++		wait_woken(&wait, TASK_UNINTERRUPTIBLE, HZ * 10);
++	} while (1);
++
++	remove_wait_queue(&vhost_vdpa.release_q, &wait);
++
++	mutex_lock(&vhost_vdpa.mutex);
++	device_destroy(vhost_vdpa.class,
++		       MKDEV(MAJOR(vhost_vdpa.devt), v->minor));
++	vhost_vdpa_free_minor(v->minor);
++	mutex_unlock(&vhost_vdpa.mutex);
++	kfree(v->vqs);
++	kfree(v);
++}
++
++static struct vdpa_driver vhost_vdpa_driver = {
++	.drv = {
++		.name	= "vhost_vdpa",
++	},
++	.probe	= vhost_vdpa_probe,
++	.remove	= vhost_vdpa_remove,
++};
++
++static char *vhost_vdpa_devnode(struct device *dev, umode_t *mode)
++{
++	return kasprintf(GFP_KERNEL, "vhost-vdpa/%s", dev_name(dev));
++}
++
++static int __init vhost_vdpa_init(void)
++{
++	int r;
++
++	idr_init(&vhost_vdpa.idr);
++	mutex_init(&vhost_vdpa.mutex);
++	init_waitqueue_head(&vhost_vdpa.release_q);
++
++	/* /dev/vhost-vdpa/$vdpa_device_index */
++	vhost_vdpa.class = class_create(THIS_MODULE, "vhost-vdpa");
++	if (IS_ERR(vhost_vdpa.class)) {
++		r = PTR_ERR(vhost_vdpa.class);
++		goto err_class;
++	}
++
++	vhost_vdpa.class->devnode = vhost_vdpa_devnode;
++
++	r = alloc_chrdev_region(&vhost_vdpa.devt, 0, MINORMASK + 1,
++				"vhost-vdpa");
++	if (r)
++		goto err_alloc_chrdev;
++
++	cdev_init(&vhost_vdpa.cdev, &vhost_vdpa_fops);
++	r = cdev_add(&vhost_vdpa.cdev, vhost_vdpa.devt, MINORMASK + 1);
++	if (r)
++		goto err_cdev_add;
++
++	r = register_vdpa_driver(&vhost_vdpa_driver);
++	if (r)
++		goto err_register_vdpa_driver;
++
++	return 0;
++
++err_register_vdpa_driver:
++	cdev_del(&vhost_vdpa.cdev);
++err_cdev_add:
++	unregister_chrdev_region(vhost_vdpa.devt, MINORMASK + 1);
++err_alloc_chrdev:
++	class_destroy(vhost_vdpa.class);
++err_class:
++	idr_destroy(&vhost_vdpa.idr);
++	return r;
++}
++module_init(vhost_vdpa_init);
++
++static void __exit vhost_vdpa_exit(void)
++{
++	unregister_vdpa_driver(&vhost_vdpa_driver);
++	cdev_del(&vhost_vdpa.cdev);
++	unregister_chrdev_region(vhost_vdpa.devt, MINORMASK + 1);
++	class_destroy(vhost_vdpa.class);
++	idr_destroy(&vhost_vdpa.idr);
++}
++module_exit(vhost_vdpa_exit);
++
++MODULE_VERSION("0.0.1");
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Intel Corporation");
++MODULE_DESCRIPTION("vDPA based vhost backend for virtio");
+diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+index 40d028eed645..23f6db2106f5 100644
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@ -116,4 +116,25 @@
+ #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
+ #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
+ 
++/* VHOST_VDPA specific defines */
++
++/* Get the device id. The device ids follow the same definition of
++ * the device id defined in virtio-spec. */
++#define VHOST_VDPA_GET_DEVICE_ID	_IOR(VHOST_VIRTIO, 0x70, __u32)
++/* Get and set the status. The status bits follow the same definition
++ * of the device status defined in virtio-spec. */
++#define VHOST_VDPA_GET_STATUS		_IOR(VHOST_VIRTIO, 0x71, __u8)
++#define VHOST_VDPA_SET_STATUS		_IOW(VHOST_VIRTIO, 0x72, __u8)
++/* Get and set the device config. The device config follows the same
++ * definition of the device config defined in virtio-spec. */
++#define VHOST_VDPA_GET_CONFIG		_IOR(VHOST_VIRTIO, 0x73, \
++					     struct vhost_vdpa_config)
++#define VHOST_VDPA_SET_CONFIG		_IOW(VHOST_VIRTIO, 0x74, \
++					     struct vhost_vdpa_config)
++/* Enable/disable the ring. */
++#define VHOST_VDPA_SET_VRING_ENABLE	_IOW(VHOST_VIRTIO, 0x75, \
++					     struct vhost_vring_state)
++/* Get the max ring size. */
++#define VHOST_VDPA_GET_VRING_NUM	_IOR(VHOST_VIRTIO, 0x76, __u16)
++
+ #endif
+diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+index c907290ff065..669457ce5c48 100644
+--- a/include/uapi/linux/vhost_types.h
++++ b/include/uapi/linux/vhost_types.h
+@@ -119,6 +119,14 @@ struct vhost_scsi_target {
+ 	unsigned short reserved;
+ };
+ 
++/* VHOST_VDPA specific definitions */
++
++struct vhost_vdpa_config {
++	__u32 off;
++	__u32 len;
++	__u8 buf[0];
++};
++
+ /* Feature bits */
+ /* Log all write descriptors. Can be changed while device is active. */
+ #define VHOST_F_LOG_ALL 26
+-- 
+2.24.1
 
