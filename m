@@ -2,168 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34F4314EBD7
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 12:42:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6493D14EBDE
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 12:43:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728268AbgAaLmR convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 31 Jan 2020 06:42:17 -0500
-Received: from mga06.intel.com ([134.134.136.31]:39335 "EHLO mga06.intel.com"
+        id S1728489AbgAaLnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 06:43:40 -0500
+Received: from foss.arm.com ([217.140.110.172]:34576 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728417AbgAaLmR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 06:42:17 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Jan 2020 03:42:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,385,1574150400"; 
-   d="scan'208";a="233379445"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by orsmga006.jf.intel.com with ESMTP; 31 Jan 2020 03:42:16 -0800
-Received: from fmsmsx122.amr.corp.intel.com (10.18.125.37) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 31 Jan 2020 03:42:16 -0800
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- fmsmsx122.amr.corp.intel.com (10.18.125.37) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 31 Jan 2020 03:42:16 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.197]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.30]) with mapi id 14.03.0439.000;
- Fri, 31 Jan 2020 19:42:14 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: RE: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
-Thread-Topic: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
-Thread-Index: AQHV1p1ISlCEZJtKwkqCei/mecuDIagDpFsAgADzWWA=
-Date:   Fri, 31 Jan 2020 11:42:13 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A199306@SHSMSX104.ccr.corp.intel.com>
-References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-4-git-send-email-yi.l.liu@intel.com>
- <20200131040644.GG15210@umbus.fritz.box>
-In-Reply-To: <20200131040644.GG15210@umbus.fritz.box>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiN2JhM2VjZTItYTc3Zi00M2NiLTg3YWItODUyNDhkOGY2ZDk3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoib0lGeGU1N2lWSFdxeGdjUFc0eTI3UUxsYXRMbGV0Z1wvdFlQSWRkSTB5c3lSOVJGNXZRczlzSFhiVVRnVzhKXC9PIn0=
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1728400AbgAaLnk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 06:43:40 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BCE7B1063;
+        Fri, 31 Jan 2020 03:43:39 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0EAA53F67D;
+        Fri, 31 Jan 2020 03:43:38 -0800 (PST)
+Subject: Re: [kvm-unit-tests RFC PATCH v3 5/7] lib: arm64: Add support for
+ disabling and re-enabling VHE
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        andre.przywara@arm.com
+References: <1577972806-16184-1-git-send-email-alexandru.elisei@arm.com>
+ <1577972806-16184-6-git-send-email-alexandru.elisei@arm.com>
+ <ad46bedcc585d03399576ecfce4c17c0@kernel.org>
+ <aa243b68-8fb5-d002-2d89-5865fe4dfd3f@arm.com>
+ <0ffad077a14887b91eda082ef4893dd5@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <122ed399-c06a-60e1-3880-5cf07f4ce7b3@arm.com>
+Date:   Fri, 31 Jan 2020 11:43:37 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <0ffad077a14887b91eda082ef4893dd5@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
+Hi,
 
-> From: David Gibson [mailto:david@gibson.dropbear.id.au]
-> Sent: Friday, January 31, 2020 12:07 PM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
-> 
-> On Wed, Jan 29, 2020 at 04:16:34AM -0800, Liu, Yi L wrote:
-> > From: Peter Xu <peterx@redhat.com>
-> >
-> > Currently, many platform vendors provide the capability of dual stage
-> > DMA address translation in hardware. For example, nested translation
-> > on Intel VT-d scalable mode, nested stage translation on ARM SMMUv3,
-> > and etc. Also there are efforts to make QEMU vIOMMU be backed by dual
-> > stage DMA address translation capability provided by hardware to have
-> > better address translation support for passthru devices.
-> >
-> > As so, making vIOMMU be backed by dual stage translation capability
-> > requires QEMU vIOMMU to have a way to get aware of such hardware
-> > capability and also require a way to receive DMA address translation
-> > faults (e.g. I/O page request) from host as guest owns stage-1 translation
-> > structures in dual stage DAM address translation.
-> >
-> > This patch adds IOMMUContext as an abstract of vIOMMU related operations.
-> > Like provide a way for passthru modules (e.g. VFIO) to register
-> > DualStageIOMMUObject instances. And in future, it is expected to offer
-> > support for receiving host DMA translation faults happened on stage-1
-> > translation.
-> >
-> > For more backgrounds, may refer to the discussion below, while there
-> > is also difference between the current implementation and original
-> > proposal. This patch introduces the IOMMUContext as an abstract layer
-> > for passthru module (e.g. VFIO) calls into vIOMMU. The first introduced
-> > interface is to make QEMU vIOMMU be aware of dual stage translation
-> > capability.
-> >
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg05022.html
-> 
-> Again, is there a reason for not making this a QOM class or interface?
+On 1/31/20 11:26 AM, Marc Zyngier wrote:
+> Hi Alex,
+>
+> On 2020-01-31 09:52, Alexandru Elisei wrote:
+>> Hi,
+>>
+>> Thank you for testing the patches!
+>>
+>> On 1/30/20 5:40 PM, Marc Zyngier wrote:
+>>> Hi Alexandru,
+>>>
+>>> On 2020-01-02 13:46, Alexandru Elisei wrote:
+>>>> Add a function to disable VHE and another one to re-enable VHE. Both
+>>>> functions work under the assumption that the CPU had VHE mode enabled at
+>>>> boot.
+>>>>
+>>>> Minimal support to run with VHE has been added to the TLB invalidate
+>>>> functions and to the exception handling code.
+>>>>
+>>>> Since we're touch the assembly enable/disable MMU code, let's take this
+>>>> opportunity to replace a magic number with the proper define.
+>>>
+>>> I've been using this test case to debug my NV code... only to realize
+>>> after a few hours of banging my head on the wall that it is the test
+>>> that needed debugging, see below... ;-)
+>>>
+>>>>
+>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>> ---
+>>>>  lib/arm64/asm/mmu.h           |  11 ++-
+>>>>  lib/arm64/asm/pgtable-hwdef.h |  53 ++++++++---
+>>>>  lib/arm64/asm/processor.h     |  19 +++-
+>>>>  lib/arm64/processor.c         |  37 +++++++-
+>>>>  arm/cstart64.S                | 204 ++++++++++++++++++++++++++++++++++++++++--
+>>>>  5 files changed, 300 insertions(+), 24 deletions(-)
+>>>
+>>> [...]
+>>>
+>>>> --- a/arm/cstart64.S
+>>>> +++ b/arm/cstart64.S
+>>>> @@ -104,6 +104,13 @@ exceptions_init:
+>>>>
+>>>>  .text
+>>>>
+>>>> +exceptions_init_nvhe:
+>>>> +    adrp    x0, vector_table_nvhe
+>>>> +    add    x0, x0, :lo12:vector_table_nvhe
+>>>> +    msr    vbar_el2, x0
+>>>> +    isb
+>>>> +    ret
+>>>> +
+>>>>  .globl get_mmu_off
+>>>>  get_mmu_off:
+>>>>      adrp    x0, auxinfo
+>>>> @@ -203,7 +210,7 @@ asm_mmu_enable:
+>>>>               TCR_IRGN_WBWA | TCR_ORGN_WBWA |    \
+>>>>               TCR_SHARED
+>>>>      mrs    x2, id_aa64mmfr0_el1
+>>>> -    bfi    x1, x2, #32, #3
+>>>> +    bfi    x1, x2, #TCR_EL1_IPS_SHIFT, #3
+>>>>      msr    tcr_el1, x1
+>>>>
+>>>>      /* MAIR */
+>>>> @@ -228,6 +235,41 @@ asm_mmu_enable:
+>>>>
+>>>>      ret
+>>>>
+>>>> +asm_mmu_enable_nvhe:
+>>>
+>>> Note the "_nvhe" suffix, which implies that...
+>>>
+>>>> +    tlbi    alle2
+>>>> +    dsb     nsh
+>>>> +
+>>>> +        /* TCR */
+>>>> +    ldr    x1, =TCR_EL2_RES1 |             \
+>>>> +             TCR_T0SZ(VA_BITS) |        \
+>>>> +             TCR_TG0_64K |                      \
+>>>> +             TCR_IRGN0_WBWA | TCR_ORGN0_WBWA |    \
+>>>> +             TCR_SH0_IS
+>>>> +    mrs    x2, id_aa64mmfr0_el1
+>>>> +    bfi    x1, x2, #TCR_EL2_PS_SHIFT, #3
+>>>> +    msr    tcr_el2, x1
+>>>> +
+>>>> +    /* Same MAIR and TTBR0 as in VHE mode */
+>>>> +    ldr    x1, =MAIR(0x00, MT_DEVICE_nGnRnE) |    \
+>>>> +             MAIR(0x04, MT_DEVICE_nGnRE) |    \
+>>>> +             MAIR(0x0c, MT_DEVICE_GRE) |    \
+>>>> +             MAIR(0x44, MT_NORMAL_NC) |        \
+>>>> +             MAIR(0xff, MT_NORMAL)
+>>>> +    msr    mair_el1, x1
+>>>
+>>> ... this should be mair_el2...
+>>>
+>>>> +
+>>>> +    msr    ttbr0_el1, x0
+>>>
+>>> ... and this should be ttbr0_el2.
+>>
+>> The code is definitely confusing, but not because it's wrong, but because it's
+>> doing something useless. From DDI 04876E.a, page D13-3374, the pseudocode for
+>> writing to ttbr0_el1:
+>>
+>> [..] elsif PSTATE.EL == EL2 then     if HCR_EL2.E2H == '1' then
+>>         TTBR0_EL2
+>> = X[t];
+>>
+>>     else         TTBR0_EL1 = X[t]; [..]
+>>
+>> We want to use the same ttbr0_el2 and mair_el2 values that we were
+>> using when VHE
+>> was on. We programmed those values when VHE was on, so we actually wrote them to
+>> ttbr0_el2 and mair_el2. We don't need to write them again now, in fact, all the
+>> previous versions of the series didn't even have the above useless writes (I
+>> assume it was a copy-and-paste mistake when I split the fixes from the
+>> el2 patches).
+>
+> Fair enough. You're just propagating a dummy value, which is going to
+> bite you later.
 
-I guess it is enough to make a simple abstract layer as explained in prior
-email. IOMMUContext is to provide explicit method for VFIO to call into
-vIOMMU emulators.
+You're correct, I'm going to remove the dummy writes to EL1 registers.
 
-> 
-> I'm not very clear on the relationship betwen an IOMMUContext and a
-> DualStageIOMMUObject.  Can there be many IOMMUContexts to a
-> DualStageIOMMUOBject?  The other way around?  Or is it just
-> zero-or-one DualStageIOMMUObjects to an IOMMUContext?
+>
+>>
+>>>
+>>>> +    isb
+>>>> +
+>>>> +    /* SCTLR */
+>>>> +    ldr    x1, =SCTLR_EL2_RES1 |            \
+>>>> +             SCTLR_EL2_C |             \
+>>>> +             SCTLR_EL2_I |             \
+>>>> +             SCTLR_EL2_M
+>>>> +    msr    sctlr_el2, x1
+>>>> +    isb
+>>>> +
+>>>> +    ret
+>>>> +
+>>>>  /* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
+>>>>  .macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
+>>>>      adrp    \tmp1, dcache_line_size
+>>>> @@ -242,21 +284,61 @@ asm_mmu_enable:
+>>>>      dsb    \domain
+>>>>  .endm
+>>>>
+>>>> +clean_inval_cache:
+>>>> +    adrp    x0, __phys_offset
+>>>> +    ldr    x0, [x0, :lo12:__phys_offset]
+>>>> +    adrp    x1, __phys_end
+>>>> +    ldr    x1, [x1, :lo12:__phys_end]
+>>>> +    dcache_by_line_op civac, sy, x0, x1, x2, x3
+>>>> +    isb
+>>>> +    ret
+>>>> +
+>>>>  .globl asm_mmu_disable
+>>>>  asm_mmu_disable:
+>>>>      mrs    x0, sctlr_el1
+>>>>      bic    x0, x0, SCTLR_EL1_M
+>>>>      msr    sctlr_el1, x0
+>>>>      isb
+>>>> +    b    clean_inval_cache
+>>>>
+>>>> -    /* Clean + invalidate the entire memory */
+>>>> -    adrp    x0, __phys_offset
+>>>> -    ldr    x0, [x0, :lo12:__phys_offset]
+>>>> -    adrp    x1, __phys_end
+>>>> -    ldr    x1, [x1, :lo12:__phys_end]
+>>>> -    dcache_by_line_op civac, sy, x0, x1, x2, x3
+>>>> +asm_mmu_disable_nvhe:
+>>>> +    mrs    x0, sctlr_el2
+>>>> +    bic    x0, x0, SCTLR_EL2_M
+>>>> +    msr    sctlr_el2, x0
+>>>> +    isb
+>>>> +    b    clean_inval_cache
+>>>> +
+>>>> +.globl asm_disable_vhe
+>>>> +asm_disable_vhe:
+>>>> +    str    x30, [sp, #-16]!
+>>>> +
+>>>> +    bl    asm_mmu_disable
+>>>> +    msr    hcr_el2, xzr
+>>>> +    isb
+>>>
+>>> At this stage, VHE is off...
+>>>
+>>>> +    bl    exceptions_init_nvhe
+>>>> +    /* Make asm_mmu_enable_nvhe happy by having TTBR0 value in x0. */
+>>>> +    mrs    x0, ttbr0_el1
+>>>
+>>> ... so this is going to sample the wrong TTBR. It really should be
+>>> TTBR0_EL2!
+>>
+>> Not really, asm_mmu_enable has one parameter, the PA for the
+>> translation tables in
+>> register x0, and we are going to use the same translation tables with
+>> VHE off that
+>> we were using with VHE on. Hence the read.//It could have easily been mrs
+>> x0,ttbr0_el2, since they have the same value, which we want to reuse.
+>
+> I'm sorry, but if your reasoning that above that VHE's TTBR0_EL1 is the
+> same as nVHE's TTBR0_EL2 appears correct (they are accessing the same HW
+> register), this particular read of TTBR0_EL1 is *not* an EL2 register at
+> all. VHE is off, and you are reading an uninitialized EL1 register (and
+> it's easy to spot in KVM, as it has the magic poison value).
 
-It is possible. As the below patch shows, DualStageIOMMUObject is per vfio
-container. IOMMUContext can be either per-device or shared across devices,
-it depends on vendor specific vIOMMU emulators.
-[RFC v3 10/25] vfio: register DualStageIOMMUObject to vIOMMU
-https://www.spinics.net/lists/kvm/msg205198.html
-
-Take Intel vIOMMU as an example, there is a per device structure which
-includes IOMMUContext instance and a DualStageIOMMUObject pointer.
-
-+struct VTDIOMMUContext {
-+    VTDBus *vtd_bus;
-+    uint8_t devfn;
-+    IOMMUContext iommu_context;
-+    DualStageIOMMUObject *dsi_obj;
-+    IntelIOMMUState *iommu_state;
-+};
-https://www.spinics.net/lists/kvm/msg205196.html
-
-I think this would leave space for vendor specific vIOMMU emulators to
-design their own relationship between an IOMMUContext and a
-DualStageIOMMUObject.
-
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-
-[...]
-
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "hw/iommu/iommu_context.h"
-> > +
-> > +int iommu_context_register_ds_iommu(IOMMUContext *iommu_ctx,
-> > +                                    DualStageIOMMUObject *dsi_obj)
-> > +{
-> > +    if (!iommu_ctx || !dsi_obj) {
-> 
-> Would this ever happen apart from a bug in the caller?  If not it
-> should be an assert().
-
-Got it, thanks, I'll check all other alike in this series and fix them in
-next version.
+You're totally right here, I'm reading an EL1 register with VHE off, so I'm
+definitely going to get a garbage value.The instruction should be mrs x0,ttbr0_el2.
 
 Thanks,
-Yi Liu
+Alex
+>
+>> I think this confusion stems from the fact that I'm trying to write
+>> the registers
+>> again in asm_mmu_enable_nvhe, when we don't have to. And writing to the wrong
+>> registers makes the confusion even worse.
+>
+> I don't mind the extra writes, or even the confusion. But the above looks
+> totally wrong.
+>
+> Thanks,
+>
+>         M.
