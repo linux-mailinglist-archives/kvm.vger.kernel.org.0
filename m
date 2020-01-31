@@ -2,104 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A76F14E826
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 06:13:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA30514E885
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 06:52:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726193AbgAaFNS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 00:13:18 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:41240 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725263AbgAaFNS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 00:13:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:References:Cc:To:From:
-        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=NVnsA3lgQnOxibe1eLWi6OoL2Yp9oede8aVfjqOqlkI=; b=RgvO7YDRDIlWCO4ilKNIMWyKB
-        HXTP4o0SsAe8lqyFLX7AKBfa492GccM8ZfS7h/OPo0C4Ijhl8QomF2PI2NhL11/fyj5OzuYGwDDra
-        vL6xYE1ZwmC8EudMZX0/EIMfunxANPM10WilPgnqE0wUjZUnoV9GvWImPfGYEZ0a7al5a7tnwribn
-        tGJYL8wL4sWvPzr9AnjnA/0ZK6AJxJfZQtnyU0cdSOtJ725kJKLopNeLRipXOeT8pTg/URCNAOxlL
-        AHnllLkOc1BOAtFbNz/MGmzr8t1B9667HWssRnzW3PNr2ZXP8kq+FHnOkG5fzaGKq0DMPw6M48HXb
-        00ahJVGVg==;
-Received: from [2601:1c0:6280:3f0:897c:6038:c71d:ecac]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ixOc0-0004Dv-Fr; Fri, 31 Jan 2020 05:13:00 +0000
+        id S1726804AbgAaFwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 00:52:25 -0500
+Received: from mga12.intel.com ([192.55.52.136]:45524 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726023AbgAaFwZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 00:52:25 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Jan 2020 21:52:24 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,384,1574150400"; 
+   d="scan'208";a="430265359"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.74])
+  by fmsmga006.fm.intel.com with ESMTP; 30 Jan 2020 21:52:21 -0800
+Date:   Fri, 31 Jan 2020 13:52:13 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     mst@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, shahafs@mellanox.com, jgg@mellanox.com,
+        rob.miller@broadcom.com, haotian.wang@sifive.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        hch@infradead.org, jiri@mellanox.com, hanand@xilinx.com,
+        mhabets@solarflare.com, maxime.coquelin@redhat.com,
+        lingshan.zhu@intel.com, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com
 Subject: Re: [PATCH] vhost: introduce vDPA based backend
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     Tiwei Bie <tiwei.bie@intel.com>, mst@redhat.com,
-        jasowang@redhat.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        shahafs@mellanox.com, jgg@mellanox.com, rob.miller@broadcom.com,
-        haotian.wang@sifive.com, eperezma@redhat.com, lulu@redhat.com,
-        parav@mellanox.com, hch@infradead.org, jiri@mellanox.com,
-        hanand@xilinx.com, mhabets@solarflare.com,
-        maxime.coquelin@redhat.com, lingshan.zhu@intel.com,
-        dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
+Message-ID: <20200131055213.GA111365@___>
 References: <20200131033651.103534-1-tiwei.bie@intel.com>
  <43aeecb4-4c08-df3d-1c1d-699ec4c494bd@infradead.org>
-Message-ID: <05e21ed9-d5af-b57c-36cd-50b34915e82d@infradead.org>
-Date:   Thu, 30 Jan 2020 21:12:57 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <43aeecb4-4c08-df3d-1c1d-699ec4c494bd@infradead.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <43aeecb4-4c08-df3d-1c1d-699ec4c494bd@infradead.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/30/20 7:56 PM, Randy Dunlap wrote:
+On Thu, Jan 30, 2020 at 07:56:43PM -0800, Randy Dunlap wrote:
 > Hi,
 > 
 > On 1/30/20 7:36 PM, Tiwei Bie wrote:
->> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
->> index f21c45aa5e07..13e6a94d0243 100644
->> --- a/drivers/vhost/Kconfig
->> +++ b/drivers/vhost/Kconfig
->> @@ -34,6 +34,18 @@ config VHOST_VSOCK
->>  	To compile this driver as a module, choose M here: the module will be called
->>  	vhost_vsock.
->>  
->> +config VHOST_VDPA
->> +	tristate "Vhost driver for vDPA based backend"
-
-oops, missed this one:
-	                           vDPA-based
-
->> +	depends on EVENTFD && VDPA
->> +	select VHOST
->> +	default n
->> +	---help---
->> +	This kernel module can be loaded in host kernel to accelerate
->> +	guest virtio devices with the vDPA based backends.
+> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > index f21c45aa5e07..13e6a94d0243 100644
+> > --- a/drivers/vhost/Kconfig
+> > +++ b/drivers/vhost/Kconfig
+> > @@ -34,6 +34,18 @@ config VHOST_VSOCK
+> >  	To compile this driver as a module, choose M here: the module will be called
+> >  	vhost_vsock.
+> >  
+> > +config VHOST_VDPA
+> > +	tristate "Vhost driver for vDPA based backend"
+> > +	depends on EVENTFD && VDPA
+> > +	select VHOST
+> > +	default n
+> > +	---help---
+> > +	This kernel module can be loaded in host kernel to accelerate
+> > +	guest virtio devices with the vDPA based backends.
 > 
 > 	                              vDPA-based
+
+Will fix this and other similar ones in the patch. Thanks!
+
 > 
->> +
->> +	To compile this driver as a module, choose M here: the module
->> +	will be called vhost_vdpa.
->> +
+> > +
+> > +	To compile this driver as a module, choose M here: the module
+> > +	will be called vhost_vdpa.
+> > +
 > 
 > The preferred Kconfig style nowadays is
 > (a) use "help" instead of "---help---"
 > (b) indent the help text with one tab + 2 spaces
 > 
 > and don't use "default n" since that is already the default.
+
+Will fix in the next version.
+
+Thanks,
+Tiwei
+
 > 
->>  config VHOST
->>  	tristate
->>          depends on VHOST_IOTLB
+> >  config VHOST
+> >  	tristate
+> >          depends on VHOST_IOTLB
 > 
 > thanks.
+> -- 
+> ~Randy
 > 
-
-
--- 
-~Randy
-
