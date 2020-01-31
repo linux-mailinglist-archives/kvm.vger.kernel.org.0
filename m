@@ -2,30 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE3D214F0A7
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 17:38:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56A8C14F0A8
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 17:38:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726347AbgAaQiI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 11:38:08 -0500
-Received: from foss.arm.com ([217.140.110.172]:37306 "EHLO foss.arm.com"
+        id S1726590AbgAaQiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 Jan 2020 11:38:10 -0500
+Received: from foss.arm.com ([217.140.110.172]:37316 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726139AbgAaQiI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 11:38:08 -0500
+        id S1726139AbgAaQiK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 Jan 2020 11:38:10 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C036FFEC;
-        Fri, 31 Jan 2020 08:38:07 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6DC6211B3;
+        Fri, 31 Jan 2020 08:38:09 -0800 (PST)
 Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id BCDE33F68E;
-        Fri, 31 Jan 2020 08:38:06 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id F37393F68E;
+        Fri, 31 Jan 2020 08:38:07 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, drjones@redhat.com, maz@kernel.org,
         andre.przywara@arm.com, vladimir.murzin@arm.com,
-        mark.rutland@arm.com
-Subject: [kvm-unit-tests PATCH v4 00/10] arm/arm64: Various fixes
-Date:   Fri, 31 Jan 2020 16:37:18 +0000
-Message-Id: <20200131163728.5228-1-alexandru.elisei@arm.com>
+        mark.rutland@arm.com, Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v4 01/10] Makefile: Use no-stack-protector compiler options
+Date:   Fri, 31 Jan 2020 16:37:19 +0000
+Message-Id: <20200131163728.5228-2-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200131163728.5228-1-alexandru.elisei@arm.com>
+References: <20200131163728.5228-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -33,68 +38,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These are the patches that were left unmerged from the previous version of
-the series, plus a few new patches. Patch #1 "Makefile: Use
-no-stack-protector compiler options" is straightforward and came about
-because of a compile error I experienced on RockPro64.
+Let's fix the typos so that the -fno-stack-protector and
+-fno-stack-protector-all compiler options are actually used.
 
-Patches #3 and #5 are the result of Andre's comments on the previous
-version. When adding ISBs after register writes I noticed in the ARM ARM
-that a read of the timer counter value can be reordered, and patch #4
-tries to avoid that.
+Tested by compiling for arm64, x86_64 and ppc64 little endian. Before the
+patch, the arguments were missing from the gcc invocation; after the patch,
+they were present. Also fixes a compilation error that I was seeing with
+aarch64 gcc version 9.2.0, where the linker was complaining about an
+undefined reference to the symbol __stack_chk_guard.
 
-Patch #7 is also the result of a review comment. For the GIC tests, we wait
-up to 5 seconds for the interrupt to be asserted. However, the GIC tests
-can use more than one CPU, which is not the case with the timer test. And
-waiting for the GIC to assert the interrupt can happen up to 6 times (8
-times after patch #9), so I figured that a timeout of 10 seconds for the
-test is acceptable.
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Drew Jones <drjones@redhat.com>
+CC: Laurent Vivier <lvivier@redhat.com>
+CC: Thomas Huth <thuth@redhat.com>
+CC: David Hildenbrand <david@redhat.com>
+CC: Janosch Frank <frankja@linux.ibm.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Patch #8 tries to improve the way we test how the timer generates the
-interrupt. If the GIC asserts the timer interrupt, but the device itself is
-not generating it, that's a pretty big problem.
-
-Ran the same tests as before:
-
-- with kvmtool, on an arm64 host kernel: 64 and 32 bit tests, with GICv3
-  (on an Ampere eMAG) and GICv2 (on a AMD Seattle box).
-
-- with qemu, on an arm64 host kernel:
-    a. with accel=kvm, 64 and 32 bit tests, with GICv3 (Ampere eMAG) and
-       GICv2 (Seattle).
-    b. with accel=tcg, 64 and 32 bit tests, on the Ampere eMAG machine.
-
-Changes:
-* Patches #1, #3, #4, #5, #7, #8 are new.
-* For patch #2, as per Drew's suggestion, I changed the entry point to halt
-  because the test is supposed to test if CPU_ON is successful.
-* Removed the ISB from patch #6 because that was fixed by #3.
-* Moved the architecture dependent function init_dcache_line_size to
-  cpu_init in lib/arm/setup.c as per Drew's suggestion.
-
-Alexandru Elisei (10):
-  Makefile: Use no-stack-protector compiler options
-  arm/arm64: psci: Don't run C code without stack or vectors
-  arm64: timer: Add ISB after register writes
-  arm64: timer: Add ISB before reading the counter value
-  arm64: timer: Make irq_received volatile
-  arm64: timer: EOIR the interrupt after masking the timer
-  arm64: timer: Wait for the GIC to sample timer interrupt state
-  arm64: timer: Check the timer interrupt state
-  arm64: timer: Test behavior when timer disabled or masked
-  arm/arm64: Perform dcache clean + invalidate after turning MMU off
-
- Makefile                  |  4 +-
- lib/arm/asm/processor.h   | 13 +++++++
- lib/arm64/asm/processor.h | 12 ++++++
- lib/arm/setup.c           |  8 ++++
- arm/cstart.S              | 22 +++++++++++
- arm/cstart64.S            | 23 ++++++++++++
- arm/psci.c                | 15 ++++++--
- arm/timer.c               | 79 ++++++++++++++++++++++++++++++++-------
- arm/unittests.cfg         |  2 +-
- 9 files changed, 158 insertions(+), 20 deletions(-)
-
+diff --git a/Makefile b/Makefile
+index 767b6c6a51d0..754ed65ecd2f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -55,8 +55,8 @@ COMMON_CFLAGS += -Wignored-qualifiers -Werror
+ 
+ frame-pointer-flag=-f$(if $(KEEP_FRAME_POINTER),no-,)omit-frame-pointer
+ fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
+-fnostack_protector := $(call cc-option, -fno-stack-protector, "")
+-fnostack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
++fno_stack_protector := $(call cc-option, -fno-stack-protector, "")
++fno_stack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
+ wno_frame_address := $(call cc-option, -Wno-frame-address, "")
+ fno_pic := $(call cc-option, -fno-pic, "")
+ no_pie := $(call cc-option, -no-pie, "")
 -- 
 2.20.1
 
