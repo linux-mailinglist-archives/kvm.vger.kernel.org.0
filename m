@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BB4014F9D1
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 19:55:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5767514F9CF
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 19:55:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727669AbgBASzS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Feb 2020 13:55:18 -0500
-Received: from mga02.intel.com ([134.134.136.20]:11286 "EHLO mga02.intel.com"
+        id S1727644AbgBASzR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Feb 2020 13:55:17 -0500
+Received: from mga02.intel.com ([134.134.136.20]:11279 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727185AbgBASwb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727191AbgBASwb (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 1 Feb 2020 13:52:31 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Feb 2020 10:52:27 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,390,1574150400"; 
-   d="scan'208";a="248075517"
+   d="scan'208";a="248075520"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by orsmga002.jf.intel.com with ESMTP; 01 Feb 2020 10:52:25 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -28,9 +28,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 29/61] KVM: x86: Add Kconfig-controlled auditing of reverse CPUID lookups
-Date:   Sat,  1 Feb 2020 10:51:46 -0800
-Message-Id: <20200201185218.24473-30-sean.j.christopherson@intel.com>
+Subject: [PATCH 30/61] KVM: x86: Handle MPX CPUID adjustment in VMX code
+Date:   Sat,  1 Feb 2020 10:51:47 -0800
+Message-Id: <20200201185218.24473-31-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200201185218.24473-1-sean.j.christopherson@intel.com>
 References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
@@ -41,57 +41,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add WARNs in the low level __cpuid_entry_get_reg() to assert that the
-function and index of the CPUID entry and reverse CPUID entry match.
-Wrap the WARNs in a new Kconfig, KVM_CPUID_AUDIT, as the checks add
-almost no value in a production environment, i.e. will only detect
-blatant KVM bugs and fatal hardware errors.  Add a Kconfig instead of
-simply wrapping the WARNs with an off-by-default #ifdef so that syzbot
-and other automated testing can enable the auditing.
+Move the MPX CPUID adjustments into VMX to eliminate an instance of the
+undesirable "unsigned f_* = *_supported ? F(*) : 0" pattern in the
+common CPUID handling code.
+
+Note, VMX must manually check for kernel support via
+boot_cpu_has(X86_FEATURE_MPX).
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/Kconfig | 10 ++++++++++
- arch/x86/kvm/cpuid.h |  5 +++++
- 2 files changed, 15 insertions(+)
+ arch/x86/kvm/cpuid.c   |  3 +--
+ arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++--
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 840e12583b85..bbbc3258358e 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -96,6 +96,16 @@ config KVM_MMU_AUDIT
- 	 This option adds a R/W kVM module parameter 'mmu_audit', which allows
- 	 auditing of KVM MMU events at runtime.
- 
-+config KVM_CPUID_AUDIT
-+	bool "Audit KVM reverse CPUID lookups"
-+	depends on KVM
-+	help
-+	 This option enables runtime checking of reverse CPUID lookups in KVM
-+	 to verify the function and index of the referenced X86_FEATURE_* match
-+	 the function and index of the CPUID entry being accessed.
-+
-+	 If unsure, say N.
-+
- # OK, it's a little counter-intuitive to do this, but it puts it neatly under
- # the virtualization menu.
- source "drivers/vhost/Kconfig"
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index 51f19eade5a0..41ff94a7d3e0 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -98,6 +98,11 @@ static __always_inline struct cpuid_reg x86_feature_cpuid(unsigned x86_feature)
- static __always_inline u32 *__cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry,
- 						  const struct cpuid_reg *cpuid)
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index cb5870a323cc..09e24d1d731c 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -340,7 +340,6 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
+ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
  {
-+#ifdef CONFIG_KVM_CPUID_AUDIT
-+	WARN_ON_ONCE(entry->function != cpuid->function);
-+	WARN_ON_ONCE(entry->index != cpuid->index);
-+#endif
-+
- 	switch (cpuid->reg) {
- 	case CPUID_EAX:
- 		return &entry->eax;
+ 	unsigned f_invpcid = kvm_x86_ops->invpcid_supported() ? F(INVPCID) : 0;
+-	unsigned f_mpx = kvm_mpx_supported() ? F(MPX) : 0;
+ 	unsigned f_umip = kvm_x86_ops->umip_emulated() ? F(UMIP) : 0;
+ 	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
+ 	unsigned f_la57;
+@@ -349,7 +348,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
+ 	/* cpuid 7.0.ebx */
+ 	const u32 kvm_cpuid_7_0_ebx_x86_features =
+ 		F(FSGSBASE) | F(BMI1) | F(HLE) | F(AVX2) | F(SMEP) |
+-		F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | f_mpx | F(RDSEED) |
++		F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | 0 /*MPX*/ | F(RDSEED) |
+ 		F(ADX) | F(SMAP) | F(AVX512IFMA) | F(AVX512F) | F(AVX512PF) |
+ 		F(AVX512ER) | F(AVX512CD) | F(CLFLUSHOPT) | F(CLWB) | F(AVX512DQ) |
+ 		F(SHA_NI) | F(AVX512BW) | F(AVX512VL) | f_intel_pt;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 3ff830e2258e..143193fc178e 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7106,8 +7106,18 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+ 
+ static void vmx_set_supported_cpuid(struct kvm_cpuid_entry2 *entry)
+ {
+-	if (entry->function == 1 && nested)
+-		entry->ecx |= feature_bit(VMX);
++	switch (entry->function) {
++	case 0x1:
++		if (nested)
++			cpuid_entry_set(entry, X86_FEATURE_VMX);
++		break;
++	case 0x7:
++		if (boot_cpu_has(X86_FEATURE_MPX) && kvm_mpx_supported())
++			cpuid_entry_set(entry, X86_FEATURE_MPX);
++		break;
++	default:
++		break;
++	}
+ }
+ 
+ static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
 -- 
 2.24.1
 
