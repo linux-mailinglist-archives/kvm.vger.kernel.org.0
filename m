@@ -2,144 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 904F514F9AB
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 19:54:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B14B114F9A5
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 19:53:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727174AbgBASxv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Feb 2020 13:53:51 -0500
-Received: from mga02.intel.com ([134.134.136.20]:11294 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727281AbgBASwe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Feb 2020 13:52:34 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Feb 2020 10:52:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,390,1574150400"; 
-   d="scan'208";a="248075612"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga002.jf.intel.com with ESMTP; 01 Feb 2020 10:52:26 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 61/61] KVM: x86: Move VMX's host_efer to common x86 code
-Date:   Sat,  1 Feb 2020 10:52:18 -0800
-Message-Id: <20200201185218.24473-62-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200201185218.24473-1-sean.j.christopherson@intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
+        id S1727552AbgBASxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Feb 2020 13:53:13 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46692 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727275AbgBASxL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Feb 2020 13:53:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580583190;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=ynlbcXZn/fV5UG3J/76c5au0G0a+9DOQ/IKDe2dfkAo=;
+        b=OHhLIgWCmEPGu6RNE6oza+HbFNIWI9JeqXX6MEOQi88Lh89ci7VWxU+xj/iSwnWBWaueD3
+        ZpVY9fL07AeOLXUgR4/qwW22xOJnmIVcy9YddpuzFLnJj+I9F2U5lxLDtEzOcg7MI0zjwp
+        kxys8q3ADpPFAbWw2iNWNazBPt095l8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-Rr3ImzIBPuSaMD7uug9DYQ-1; Sat, 01 Feb 2020 13:53:08 -0500
+X-MC-Unique: Rr3ImzIBPuSaMD7uug9DYQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 371D8107ACC7;
+        Sat,  1 Feb 2020 18:53:07 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-27.ams2.redhat.com [10.36.116.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C6968642B;
+        Sat,  1 Feb 2020 18:53:03 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v5 2/7] s390x: smp: Fix ecall and emcall
+ report strings
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, linux-s390@vger.kernel.org,
+        david@redhat.com, cohuck@redhat.com
+References: <20200201152851.82867-1-frankja@linux.ibm.com>
+ <20200201152851.82867-3-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <15009dae-26eb-e6f6-25c6-c1dc9f0ee170@redhat.com>
+Date:   Sat, 1 Feb 2020 19:53:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200201152851.82867-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move host_efer to common x86 code and use it for CPUID's is_efer_nx() to
-avoid constantly re-reading the MSR.
+On 01/02/2020 16.28, Janosch Frank wrote:
+> Instead of "smp: ecall: ecall" we now get "smp: ecall: received".
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/smp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> index e37eb56..93a9594 100644
+> --- a/s390x/smp.c
+> +++ b/s390x/smp.c
+> @@ -125,7 +125,7 @@ static void ecall(void)
+>  	load_psw_mask(mask);
+>  	set_flag(1);
+>  	while (lc->ext_int_code != 0x1202) { mb(); }
+> -	report(1, "ecall");
+> +	report(1, "received");
+>  	set_flag(1);
+>  }
+>  
+> @@ -160,7 +160,7 @@ static void emcall(void)
+>  	load_psw_mask(mask);
+>  	set_flag(1);
+>  	while (lc->ext_int_code != 0x1201) { mb(); }
+> -	report(1, "ecall");
+> +	report(1, "received");
+>  	set_flag(1);
+>  }
 
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/include/asm/kvm_host.h | 2 ++
- arch/x86/kvm/cpuid.c            | 5 +----
- arch/x86/kvm/vmx/vmx.c          | 3 ---
- arch/x86/kvm/vmx/vmx.h          | 1 -
- arch/x86/kvm/x86.c              | 5 +++++
- 5 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4165d3ef11e4..a2a091d328c6 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1257,6 +1257,8 @@ struct kvm_arch_async_pf {
- 	bool direct_map;
- };
- 
-+extern u64 __read_mostly host_efer;
-+
- extern struct kvm_x86_ops *kvm_x86_ops;
- extern struct kmem_cache *x86_fpu_cache;
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 3d287fc6eb6e..e8beb1e542a8 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -134,10 +134,7 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
- 
- static int is_efer_nx(void)
- {
--	unsigned long long efer = 0;
--
--	rdmsrl_safe(MSR_EFER, &efer);
--	return efer & EFER_NX;
-+	return host_efer & EFER_NX;
- }
- 
- static void cpuid_fix_nx_cap(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e349689ac0cf..0009066e2009 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -433,7 +433,6 @@ static const struct kvm_vmx_segment_field {
- 	VMX_SEGMENT_FIELD(LDTR),
- };
- 
--u64 host_efer;
- static unsigned long host_idt_base;
- 
- /*
-@@ -7577,8 +7576,6 @@ static __init int hardware_setup(void)
- 	struct desc_ptr dt;
- 	int r, i, ept_lpage_level;
- 
--	rdmsrl_safe(MSR_EFER, &host_efer);
--
- 	store_idt(&dt);
- 	host_idt_base = dt.address;
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 70eafa88876a..0e50fbcb8413 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -12,7 +12,6 @@
- #include "vmcs.h"
- 
- extern const u32 vmx_msr_index[];
--extern u64 host_efer;
- 
- extern u32 get_umwait_control_msr(void);
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b40488fd2969..2103101eca78 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -185,6 +185,9 @@ static struct kvm_shared_msrs __percpu *shared_msrs;
- 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
- 				| XFEATURE_MASK_PKRU)
- 
-+u64 __read_mostly host_efer;
-+EXPORT_SYMBOL_GPL(host_efer);
-+
- static u64 __read_mostly host_xss;
- 
- struct kvm_stats_debugfs_item debugfs_entries[] = {
-@@ -9590,6 +9593,8 @@ int kvm_arch_hardware_setup(void)
- {
- 	int r;
- 
-+	rdmsrl_safe(MSR_EFER, &host_efer);
-+
- 	kvm_set_cpu_caps();
- 
- 	r = kvm_x86_ops->hardware_setup();
--- 
-2.24.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
