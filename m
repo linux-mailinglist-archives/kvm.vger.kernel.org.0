@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 638CA14F99A
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 19:53:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08F7914F9C0
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 19:55:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727340AbgBASwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Feb 2020 13:52:37 -0500
-Received: from mga02.intel.com ([134.134.136.20]:11294 "EHLO mga02.intel.com"
+        id S1727598AbgBASyc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Feb 2020 13:54:32 -0500
+Received: from mga02.intel.com ([134.134.136.20]:11283 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727240AbgBASwc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727242AbgBASwc (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 1 Feb 2020 13:52:32 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Feb 2020 10:52:28 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,390,1574150400"; 
-   d="scan'208";a="248075571"
+   d="scan'208";a="248075574"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by orsmga002.jf.intel.com with ESMTP; 01 Feb 2020 10:52:26 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -28,9 +28,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 47/61] KVM: x86: Squash CPUID 0x2.0 insanity for modern CPUs
-Date:   Sat,  1 Feb 2020 10:52:04 -0800
-Message-Id: <20200201185218.24473-48-sean.j.christopherson@intel.com>
+Subject: [PATCH 48/61] KVM: x86: Do host CPUID at load time to mask KVM cpu caps
+Date:   Sat,  1 Feb 2020 10:52:05 -0800
+Message-Id: <20200201185218.24473-49-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200201185218.24473-1-sean.j.christopherson@intel.com>
 References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
@@ -41,120 +41,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rework CPUID 0x2.0 to be a normal CPUID leaf if it returns "01" in AL,
-i.e. EAX & 0xff.
+Mask kvm_cpu_caps based on host CPUID in preparation for overriding the
+CPUID results during KVM_GET_SUPPORTED_CPUID instead of doing the
+masking at runtime.
 
-Long ago, Intel documented CPUID 0x2.0 as being a stateful leaf, e.g. a
-version of the SDM circa 1995 states:
+Note, masking may or may not be necessary, e.g. the kernel rarely, if
+ever, sets real CPUID bits that are not supported by hardware.  But, the
+code is cheap and only runs once at load, so an abundance of caution is
+warranted.
 
-  The least-significant byte in register EAX (register AL) indicates the
-  number of times the CPUID instruction must be executed with an input
-  value of 2 to get a complete description of the processors's caches
-  and TLBs.  The Pentium Pro family of processors will return a 1.
-
-A 2000 version of the SDM only updated the paragraph to reference
-Intel's new processory family:
-
-  The first member of the family of Pentium 4 processors will return a 1.
-
-Fast forward to the present, and Intel's SDM now states:
-
-  The least-significant byte in register EAX (register AL) will always
-  return 01H.  Software should ignore this value and not interpret it as
-  an information descriptor.
-
-AMD's APM simply states that CPUID 0x2 is reserved.
-
-Given that CPUID itself was introduced in the Pentium, odds are good
-that the only Intel CPU family that *maybe* implemented a stateful CPUID
-was the P5.  Which obviously did not support VMX, or KVM.
-
-In other words, KVM's emulation of a stateful CPUID 0x2.0 has likely
-been dead code from the day it was introduced.  This is backed up by
-commit 0fdf8e59faa5c ("KVM: Fix cpuid iteration on multiple leaves per
-eac"), whichs show that the stateful iteration code was completely
-broken when it was introduced by commit 0771671749b59 ("KVM: Enhance
-guest cpuid management"), i.e. not actually tested.
-
-Although it's _extremely_ tempting to yank KVM's stateful code, leave it
-in for now but annotate all its code paths as "unlikely".  The code is
-relatively contained, and if by some miracle there is someone running KVM
-on a CPU with a stateful CPUID 0x2, more power to 'em.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/cpuid.c | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+ arch/x86/kvm/cpuid.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 47f61f4497fb..ab2a34337588 100644
+index ab2a34337588..4416f2422321 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -405,9 +405,6 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
- 		    &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
+@@ -272,8 +272,22 @@ static __always_inline void cpuid_entry_mask(struct kvm_cpuid_entry2 *entry,
  
- 	switch (function) {
--	case 2:
--		entry->flags |= KVM_CPUID_FLAG_STATEFUL_FUNC;
--		break;
- 	case 4:
- 	case 7:
- 	case 0xb:
-@@ -483,17 +480,31 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		 * it since we emulate x2apic in software */
- 		cpuid_entry_set(entry, X86_FEATURE_X2APIC);
- 		break;
--	/* function 2 entries are STATEFUL. That is, repeated cpuid commands
--	 * may return different values. This forces us to get_cpu() before
--	 * issuing the first command, and also to emulate this annoying behavior
--	 * in kvm_emulate_cpuid() using KVM_CPUID_FLAG_STATE_READ_NEXT */
- 	case 2:
-+		/*
-+		 * On ancient CPUs, function 2 entries are STATEFUL.  That is,
-+		 * CPUID(function=2, index=0) may return different results each
-+		 * time, with the least-significant byte in EAX enumerating the
-+		 * number of times software should do CPUID(2, 0).
-+		 *
-+		 * Modern CPUs (quite likely every CPU KVM has *ever* run on)
-+		 * are less idiotic.  Intel's SDM states that EAX & 0xff "will
-+		 * always return 01H. Software should ignore this value and not
-+		 * interpret it as an informational descriptor", while AMD's
-+		 * APM states that CPUID(2) is reserved.
-+		 */
-+		max_idx = entry->eax & 0xff;
-+		if (likely(max_idx <= 1))
-+			break;
+ static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
+ {
++	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
++	struct kvm_cpuid_entry2 entry;
 +
-+		entry->flags |= KVM_CPUID_FLAG_STATEFUL_FUNC;
- 		entry->flags |= KVM_CPUID_FLAG_STATE_READ_NEXT;
+ 	reverse_cpuid_check(leaf);
+ 	kvm_cpu_caps[leaf] &= mask;
++
++#ifdef CONFIG_KVM_CPUID_AUDIT
++	/* Entry needs to be fully populated when auditing is enabled. */
++	entry.function = cpuid.function;
++	entry.index = cpuid.index;
++#endif
++
++	cpuid_count(cpuid.function, cpuid.index,
++		    &entry.eax, &entry.ebx, &entry.ecx, &entry.edx);
++
++	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, &cpuid);
+ }
  
--		for (i = 1, max_idx = entry->eax & 0xff; i < max_idx; ++i) {
-+		for (i = 1; i < max_idx; ++i) {
- 			entry = do_host_cpuid(array, 2, 0);
- 			if (!entry)
- 				goto out;
-+			entry->flags |= KVM_CPUID_FLAG_STATEFUL_FUNC;
- 		}
- 		break;
- 	/* functions 4 and 0x8000001d have additional index. */
-@@ -903,7 +914,7 @@ static int is_matching_cpuid_entry(struct kvm_cpuid_entry2 *e,
- 		return 0;
- 	if ((e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) && e->index != index)
- 		return 0;
--	if ((e->flags & KVM_CPUID_FLAG_STATEFUL_FUNC) &&
-+	if (unlikely(e->flags & KVM_CPUID_FLAG_STATEFUL_FUNC) &&
- 	    !(e->flags & KVM_CPUID_FLAG_STATE_READ_NEXT))
- 		return 0;
- 	return 1;
-@@ -920,7 +931,7 @@ struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
- 
- 		e = &vcpu->arch.cpuid_entries[i];
- 		if (is_matching_cpuid_entry(e, function, index)) {
--			if (e->flags & KVM_CPUID_FLAG_STATEFUL_FUNC)
-+			if (unlikely(e->flags & KVM_CPUID_FLAG_STATEFUL_FUNC))
- 				move_to_next_stateful_cpuid_entry(vcpu, i);
- 			best = e;
- 			break;
+ void kvm_set_cpu_caps(void)
 -- 
 2.24.1
 
