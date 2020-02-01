@@ -2,85 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BF7114F6C7
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 06:54:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA84B14F86E
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 16:29:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726297AbgBAFxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Feb 2020 00:53:43 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:35678 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726133AbgBAFxn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Feb 2020 00:53:43 -0500
-Received: by mail-oi1-f194.google.com with SMTP id b18so9614212oie.2;
-        Fri, 31 Jan 2020 21:53:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nn6Z1K4Ig+lUl4xv40lMeq9rx7gNTQqV1fkouNx1AkE=;
-        b=qMfELv6gCVDzyWoHrI8dxesUDXE3M1cw7AJY/HgtTJBDZi6hj8nL+jyu8fNQ7ic8H0
-         QCzkCGzeYtjWkO52gQOjFg2trtO7759pyuei63RbVGekUibOimrDGpULjZhUg4Z9qxrl
-         /Xno4xQb5ARDonX9l9GFqB2cqd6Y4VD2xRLytPuwlvP8/qJsIvZJCZDsqGViAgNzOpIt
-         orUKRghnQw3ykbGoHXbNg2NefxIUp6p3+oVGzhn57X30H83e0VHsaJy5+aCROgTHBO45
-         L+EQQ9UNdaLzStCxTM0bgDq5CBZ6BAztuiUcS60FmtjeF6JF/HeyKuYBD589Th9foDja
-         WKoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nn6Z1K4Ig+lUl4xv40lMeq9rx7gNTQqV1fkouNx1AkE=;
-        b=P6YzzvdG9pm7G54CaJHZOOcP5+M6mCQ50Ksr/ACOtORfjSo6TX0fEWvFLdPaDJNq8Y
-         VsUZfhpe918N+nvNC8CgAxuBxUpxNgvGRTBXn258aloknc/1W/vG9ewrmMycpuUq5a6V
-         mS3BuolSOqfGO5EpHw/0IiyZ2E3H0t6ngd0F7DA8VXdUJEHP0KII+tsFGPqYs7iGtT3H
-         YSkj/Fuq4B+ToE3wVix3HiRXw5IhaAkXRLcKVBY5tyZ5hpMn5xaINaboB2fw0eby7oYp
-         jDPMM16Uvipu1E7RHb6CAKtdWuCshKnhSBJCN3NqX7Dd+XXEk0ocIMJ63dYxY03TjOzH
-         TbhQ==
-X-Gm-Message-State: APjAAAUmaWiDS8vveUjR+5M++nbtQlISOiTR3WOhEZWBW5GtN73Da8Sm
-        zM7GRdGzPigBB4IQHupqFQ3T9gBMAbPI/aziA7R1RwNg
-X-Google-Smtp-Source: APXvYqwE113qFxAd9XWoPRNc6FEbRgUVY3TmHCvX+OR1Antl3haNngqyvW5T6CXiyN3NEGfJfubK/rC+j6aAjMntRwE=
-X-Received: by 2002:aca:8d5:: with SMTP id 204mr8370686oii.141.1580536422319;
- Fri, 31 Jan 2020 21:53:42 -0800 (PST)
+        id S1726722AbgBAP3E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Feb 2020 10:29:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25782 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726593AbgBAP3E (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 1 Feb 2020 10:29:04 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 011FJaFE109299
+        for <kvm@vger.kernel.org>; Sat, 1 Feb 2020 10:29:03 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xwa7ujf67-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Sat, 01 Feb 2020 10:29:03 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Sat, 1 Feb 2020 15:29:01 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Sat, 1 Feb 2020 15:28:57 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 011FSu6S59113634
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 1 Feb 2020 15:28:56 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C04B852051;
+        Sat,  1 Feb 2020 15:28:56 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.30.110])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E33E85204E;
+        Sat,  1 Feb 2020 15:28:55 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, david@redhat.com, cohuck@redhat.com
+Subject: [kvm-unit-tests PATCH v5 0/7] s390x: smp: Improve smp code and reset checks
+Date:   Sat,  1 Feb 2020 10:28:44 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <1580407316-11391-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1580407316-11391-1-git-send-email-pbonzini@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Sat, 1 Feb 2020 13:53:31 +0800
-Message-ID: <CANRm+CyyuWUOAj81Sg8UH_jMybZWmvZxWPWZ_twMvFnPxKD3hQ@mail.gmail.com>
-Subject: Re: [FYI PATCH 0/5] Missing TLB flushes
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20020115-0020-0000-0000-000003A61C0A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20020115-0021-0000-0000-000021FDD8E7
+Message-Id: <20200201152851.82867-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-01_03:2020-01-31,2020-02-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 adultscore=0 clxscore=1015 impostorscore=0 spamscore=0
+ mlxlogscore=373 lowpriorityscore=0 bulkscore=0 mlxscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2002010113
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 31 Jan 2020 at 02:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> From: Boris Ostrovsky <boris.ostrovsky@oracle.com>
->
-> The KVM hypervisor may provide a guest with ability to defer remote TLB
-> flush when the remote VCPU is not running. When this feature is used,
-> the TLB flush will happen only when the remote VPCU is scheduled to run
-> again. This will avoid unnecessary (and expensive) IPIs.
->
-> Under certain circumstances, when a guest initiates such deferred action,
-> the hypervisor may miss the request. It is also possible that the guest
-> may mistakenly assume that it has already marked remote VCPU as needing
-> a flush when in fact that request had already been processed by the
-> hypervisor. In both cases this will result in an invalid translation
-> being present in a vCPU, potentially allowing accesses to memory locations
-> in that guest's address space that should not be accessible.
->
-> Note that only intra-guest memory is vulnerable.
->
-> The attached patches address both of these problems:
-> 1. The first patch makes sure the hypervisor doesn't accidentally clear
-> guest's remote flush request
-> 2. The rest of the patches prevent the race between hypervisor
-> acknowledging a remote flush request and guest issuing a new one.
+Let's cleanup the smp library and smp tests.
 
-Looks good, thanks for the patchset.
+GIT: https://github.com/frankjaa/kvm-unit-tests/tree/smp_cleanup
 
-    Wanpeng
+v5:
+	* Split up series into three parts to make review easier
+	* Greetings from FOSDEM :-)
+
+V4:
+	* Introduce set_flag() for manipulating testflag
+	* Cleanup of stray braces and mb()s
+
+v3:
+	* Added patch to introduce cpu loop in cpu setup
+	* Added patch that removes cpu loops in favor of the previously introduced one
+	* Fixed inline assembly for fpc dirtying
+	* Moved cpu stop hunk from first into the second patch
+	* Reworked patch #4 commit message and added a comment when waiting for PU
+
+v2:
+	* Added cpu stop to test_store_status()
+	* Added smp_cpu_destroy() to the end of smp.c main()
+	* New patch that prints cpu id on interrupt errors
+	* New patch that reworks cpu start in the smp library (needed for lpar)
+	* nullp is now an array
+
+Janosch Frank (7):
+  s390x: smp: Cleanup smp.c
+  s390x: smp: Fix ecall and emcall report strings
+  s390x: Stop the cpu that is executing exit()
+  s390x: Add cpu id to interrupt error prints
+  s390x: smp: Only use smp_cpu_setup once
+  s390x: smp: Rework cpu start and active tracking
+  s390x: smp: Wait for cpu setup to finish
+
+ lib/s390x/interrupt.c | 20 +++++------
+ lib/s390x/io.c        |  2 +-
+ lib/s390x/smp.c       | 59 +++++++++++++++++++------------
+ s390x/cstart64.S      |  2 ++
+ s390x/smp.c           | 80 ++++++++++++++++++++++++++-----------------
+ 5 files changed, 100 insertions(+), 63 deletions(-)
+
+-- 
+2.20.1
+
