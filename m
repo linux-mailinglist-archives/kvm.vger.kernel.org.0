@@ -2,160 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E77414F93B
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 18:56:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C584114FA0B
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 19:58:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726530AbgBAR4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Feb 2020 12:56:18 -0500
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:37519 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726195AbgBAR4R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Feb 2020 12:56:17 -0500
-Received: by mail-pj1-f68.google.com with SMTP id m13so4478985pjb.2
-        for <kvm@vger.kernel.org>; Sat, 01 Feb 2020 09:56:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=GoT2Xza8HTa8YW9t0YeNg2CkziwyhPIP52r/Avd3w9Q=;
-        b=IuUqXEdZlIY+2Jd9WBKsI1VPg1zazke3iNT4V1tgpzFxPSZjpOjif5kf+6NI890RST
-         7/B1G8DjK9ELIx73WVhf6/Cc3RmtwC4+t5CXl3Vvd7DFgw9PGfU3PO1E2jq+Lg/UrC3x
-         IF6Vkr3ng+6Rdjv4tM3mu+b4qN3iWqxJ1TihpeZfjeSbQGsxyf3rYCBPQfhTG9NQ6L4Z
-         CINGPXS/f+Y7iI9+0l4GV3YjtFgd2RvC+NJxnzt6S9hNNKpsMyZiVM7p9dYQrYy0N35g
-         BzOPz2BgR9j/phRmm5WfeizF2dyEZIXQBckDsBCioIIhXxMM6fuoyS4LThd+OFJannJA
-         5iJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=GoT2Xza8HTa8YW9t0YeNg2CkziwyhPIP52r/Avd3w9Q=;
-        b=f89ONrOEYRNNliMpC12Gtn0tWTyA8kvguRzSZyWPp1QoePM80BuQ2iUmmjjsGgubbG
-         XEGjbFGNLvyVUGhh6mh0lPdQCW5xacDnzMW4ReZR/mN3K/nhN3d6CV4alRaBaSqDHB/d
-         7VgHdunAqj+EVL512m5ovagRDGhauo26tQxgsHDnrbuuO7nCIo2xg6h5ecr39JaBpz6J
-         QLcShBWK2zfmVKq2DPnDM87zSZLuQDR2/1Oe4DNqDIXtN6qN8xwldoXN2jvb3BgJW1K6
-         MOSf0GKYZHLpm0sW7KBXk3aAo9DCHH4InvAokf+euxnQ2FjvIbb8GcQPw2pdr6ktNlHn
-         PaoA==
-X-Gm-Message-State: APjAAAXZz2I9mljCgnb33S9VazReFj0kvMRsYY1FR9s+IQKus1ZiW0iJ
-        CNCBgiWvSTuf2wznNkqofWvRmQ==
-X-Google-Smtp-Source: APXvYqwuVBJe0yuRW97unT6n4U4keypU3fR3mGbvE89pdgIUrkvOFFujmOrb6/HGbZ1oRV6zWiCXpQ==
-X-Received: by 2002:a17:90a:8008:: with SMTP id b8mr19588079pjn.37.1580579776661;
-        Sat, 01 Feb 2020 09:56:16 -0800 (PST)
-Received: from ?IPv6:2601:646:c200:1ef2:45d6:e4ad:bc82:ed68? ([2601:646:c200:1ef2:45d6:e4ad:bc82:ed68])
-        by smtp.gmail.com with ESMTPSA id q21sm14405957pff.105.2020.02.01.09.56.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Feb 2020 09:56:15 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 2/2] KVM: VMX: Extend VMX's #AC handding
-Date:   Sat, 1 Feb 2020 09:56:11 -0800
-Message-Id: <A2622E15-756D-434D-AF64-4F67781C0A74@amacapital.net>
-References: <b2e2310d-2228-45c2-8174-048e18a46bb6@intel.com>
+        id S1726670AbgBASw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Feb 2020 13:52:26 -0500
+Received: from mga05.intel.com ([192.55.52.43]:37509 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726354AbgBASw0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Feb 2020 13:52:26 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Feb 2020 10:52:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,390,1574150400"; 
+   d="scan'208";a="248075430"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by orsmga002.jf.intel.com with ESMTP; 01 Feb 2020 10:52:25 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-In-Reply-To: <b2e2310d-2228-45c2-8174-048e18a46bb6@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-X-Mailer: iPhone Mail (17C54)
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 00/61] KVM: x86: Introduce KVM cpu caps
+Date:   Sat,  1 Feb 2020 10:51:17 -0800
+Message-Id: <20200201185218.24473-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Introduce what is effectively a KVM-specific copy of the x86_capabilities
+array in boot_cpu_data, kvm_cpu_caps.  kvm_cpu_caps is initialized by
+copying boot_cpu_data.x86_capabilities before ->hardware_setup().  It is
+then updated by KVM's CPUID logic (both common x86 and VMX/SVM specific)
+to adjust the caps to reflect the CPU that KVM will expose to the guest.
 
+Super cool things:
+  - Kills off 8 kvm_x86_ops hooks.
+  - Eliminates a retpoline from pretty much every page fault, and more
+    retpolines throughout KVM.
+  - Automagically handles selecting the appropriate eax/ebx/ecx/edx
+    registers when updating CPUID feature bits.
+  - Adds an auditing capability to double check that the function and
+    index of a CPUID entry are correct during reverse CPUID lookup.
 
-> On Feb 1, 2020, at 8:58 AM, Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->=20
-> =EF=BB=BFOn 2/1/2020 5:33 AM, Andy Lutomirski wrote:
->>>> On Jan 31, 2020, at 1:04 PM, Sean Christopherson <sean.j.christopherson=
-@intel.com> wrote:
->>>=20
->>> =EF=BB=BFOn Fri, Jan 31, 2020 at 12:57:51PM -0800, Andy Lutomirski wrote=
-:
->>>>=20
->>>>>> On Jan 31, 2020, at 12:18 PM, Sean Christopherson <sean.j.christopher=
-son@intel.com> wrote:
->>>>>=20
->>>>> This is essentially what I proposed a while back.  KVM would allow ena=
-bling
->>>>> split-lock #AC in the guest if and only if SMT is disabled or the enab=
-le bit
->>>>> is per-thread, *or* the host is in "warn" mode (can live with split-lo=
-ck #AC
->>>>> being randomly disabled/enabled) and userspace has communicated to KVM=
- that
->>>>> it is pinning vCPUs.
->>>>=20
->>>> How about covering the actual sensible case: host is set to fatal?  In t=
-his
->>>> mode, the guest gets split lock detection whether it wants it or not. H=
-ow do
->>>> we communicate this to the guest?
->>>=20
->>> KVM doesn't advertise split-lock #AC to the guest and returns -EFAULT to=
- the
->>> userspace VMM if the guest triggers a split-lock #AC.
->>>=20
->>> Effectively the same behavior as any other userspace process, just that K=
-VM
->>> explicitly returns -EFAULT instead of the process getting a SIGBUS.
->> Which helps how if the guest is actually SLD-aware?
->> I suppose we could make the argument that, if an SLD-aware guest gets #AC=
- at CPL0, it=E2=80=99s a bug, but it still seems rather nicer to forward the=
- #AC to the guest instead of summarily killing it.
->=20
-> If KVM does advertise split-lock detection to the guest, then kvm/host can=
- know whether a guest is SLD-aware by checking guest's MSR_TEST_CTRL.SPLIT_L=
-OCK_DETECT bit.
->=20
-> - If guest's MSR_TEST_CTRL.SPLIT_LOCK_DETECT is set, it indicates guest is=
- SLD-aware so KVM forwards #AC to guest.
->=20
+This is sort of a v2 of "KVM: x86: Purge kvm_x86_ops->*_supported()"[*],
+but only a handful of the 26 patches from that series are carried forward
+as is, and this series is obviously much more ambitiuous in scope.  And
+unlike that series, there isn't a single patch in here that makes me go
+"eww", and the end result is pretty awesome :-)
 
-I disagree. If you advertise split-lock detection with the current core capa=
-bility bit, it should *work*.  And it won=E2=80=99t.  The choices you=E2=80=99=
-re actually giving the guest are:
+Quick synopsis:
+  1. Refactor the KVM_GET_SUPPORTED_CPUID stack to consolidate code,
+     remove crustiness, and set the stage for introducing kvm_cpu_caps.
 
-a) Guest understands SLD and wants it on.  The guest gets the same behavior a=
-s in bare metal.
+  2. Introduce cpuid_entry_*() accessors/mutators to automatically
+     handle retrieving the correct reg from a CPUID entry, and to audit
+     that the entry matches the reserve CPUID lookup entry.  The
+     cpuid_entry_*() helpers make moving the code from common x86 to
+     vendor code much less risky.
 
-b) Guest does not understand. Guest gets killed if it screws up as described=
- below.
+  3. Move CPUID adjustments to vendor code in preparation for kvm_cpu_caps,
+     which will be initialized at load time before the kvm_x86_ops hooks
+     are ready to be used, i.e. before ->hardware_setup().
 
-> - If not set. It may be a old guest or a malicious guest or a guest withou=
-t SLD support, and we cannot figure it out. So we have to kill the guest whe=
-n host is SLD-fatal, and let guest survive when SLD-WARN for old sane buggy g=
-uest.
+  4. Introduce kvm_cpu_caps and move all the CPUID code over to kvm_cpu_caps.
 
-All true, but the result of running a Linux guest in SLD-warn mode will be b=
-roken.
+  5. Use kvm_cpu_cap_has() to kill off a bunch of ->*_supported() hooks.
 
->=20
-> In a word, all the above is on the condition that KVM advertise split-lock=
- detection to guest. But this patch doesn't do this. Maybe I should add that=
- part in v2.
+  6. Additional cleanup in tangentially related areas to kill off even more
+     ->*_supported() hooks.
 
-I think you should think the details all the way through, and I think you=E2=
-=80=99re likely to determine that the Intel architecture team needs to do *s=
-omething* to clean up this mess.
+  7. Profit!
 
-There are two independent problems here.  First, SLD *can=E2=80=99t* be virt=
-ualized sanely because it=E2=80=99s per-core not per-thread. Second, most us=
-ers *won=E2=80=99t want* to virtualize it correctly even if they could: if a=
- guest is allowed to do split locks, it can DoS the system.
+Some of (6) could maybe be moved to a different series, but there would
+likely be a number of minor conflicts.  I dropped as many arbitrary cleanup
+patches as I could without letting any of the ->*_supported() hooks live,
+and without losing confidence in the correctness of the refactoring.
 
-So I think there should be an architectural way to tell a guest that SLD is o=
-n whether it likes it or not. And the guest, if booted with sld=3Dwarn, can p=
-rint a message saying =E2=80=9Chaha, actually SLD is fatal=E2=80=9D and carr=
-y on.
+Tested by verifying the output of KVM_GET_SUPPORTED_CPUID is identical
+before and after on every patch on a Haswell and Coffee Lake.  Verified
+correctness when hiding features via Qemu (running this version of KVM
+in L1), e.g. that UMIP is correctly emulated for L2 when it's hidden from
+L1, on relevant patches.
 
->=20
->> ISTM, on an SLD-fatal host with an SLD-aware guest, the host should tell t=
-he guest =E2=80=9Chey, you may not do split locks =E2=80=94 SLD is forced on=
-=E2=80=9D and the guest should somehow acknowledge it so that it sees the ar=
-chitectural behavior instead of something we made up.  Hence my suggestion.
->=20
+Boot tested and ran kvm-unit-tests at key points, e.g. large page handling.
+
+The big untested pieces are PKU, XSAVES and PT on Intel, and everything AMD.
+
+[*] https://lkml.kernel.org/r/20200129234640.8147-1-sean.j.christopherson@intel.com
+
+Sean Christopherson (61):
+  KVM: x86: Return -E2BIG when KVM_GET_SUPPORTED_CPUID hits max entries
+  KVM: x86: Refactor loop around do_cpuid_func() to separate helper
+  KVM: x86: Simplify handling of Centaur CPUID leafs
+  KVM: x86: Clean up error handling in kvm_dev_ioctl_get_cpuid()
+  KVM: x86: Check userapce CPUID array size after validating sub-leaf
+  KVM: x86: Move CPUID 0xD.1 handling out of the index>0 loop
+  KVM: x86: Check for CPUID 0xD.N support before validating array size
+  KVM: x86: Warn on zero-size save state for valid CPUID 0xD.N sub-leaf
+  KVM: x86: Refactor CPUID 0xD.N sub-leaf entry creation
+  KVM: x86: Clean up CPUID 0x7 sub-leaf loop
+  KVM: x86: Drop the explicit @index from do_cpuid_7_mask()
+  KVM: x86: Drop redundant boot cpu checks on SSBD feature bits
+  KVM: x86: Consolidate CPUID array max num entries checking
+  KVM: x86: Hoist loop counter and terminator to top of
+    __do_cpuid_func()
+  KVM: x86: Refactor CPUID 0x4 and 0x8000001d handling
+  KVM: x86: Encapsulate CPUID entries and metadata in struct
+  KVM: x86: Drop redundant array size check
+  KVM: x86: Use common loop iterator when handling CPUID 0xD.N
+  KVM: VMX: Add helpers to query Intel PT mode
+  KVM: x86: Calculate the supported xcr0 mask at load time
+  KVM: x86: Use supported_xcr0 to detect MPX support
+  KVM: x86: Make kvm_mpx_supported() an inline function
+  KVM: x86: Clear output regs for CPUID 0x14 if PT isn't exposed to
+    guest
+  KVM: x86: Drop explicit @func param from ->set_supported_cpuid()
+  KVM: x86: Use u32 for holding CPUID register value in helpers
+  KVM: x86: Introduce cpuid_entry_{get,has}() accessors
+  KVM: x86: Introduce cpuid_entry_{change,set,clear}() mutators
+  KVM: x86: Refactor cpuid_mask() to auto-retrieve the register
+  KVM: x86: Add Kconfig-controlled auditing of reverse CPUID lookups
+  KVM: x86: Handle MPX CPUID adjustment in VMX code
+  KVM: x86: Handle INVPCID CPUID adjustment in VMX code
+  KVM: x86: Handle UMIP emulation CPUID adjustment in VMX code
+  KVM: x86: Handle PKU CPUID adjustment in VMX code
+  KVM: x86: Handle RDTSCP CPUID adjustment in VMX code
+  KVM: x86: Handle Intel PT CPUID adjustment in VMX code
+  KVM: x86: Handle GBPAGE CPUID adjustment for EPT in VMX code
+  KVM: x86: Refactor handling of XSAVES CPUID adjustment
+  KVM: x86: Introduce kvm_cpu_caps to replace runtime CPUID masking
+  KVM: SVM: Convert feature updates from CPUID to KVM cpu caps
+  KVM: VMX: Convert feature updates from CPUID to KVM cpu caps
+  KVM: x86: Move XSAVES CPUID adjust to VMX's KVM cpu cap update
+  KVM: x86: Add a helper to check kernel support when setting cpu cap
+  KVM: x86: Use KVM cpu caps to mark CR4.LA57 as not-reserved
+  KVM: x86: Use KVM cpu caps to track UMIP emulation
+  KVM: x86: Fold CPUID 0x7 masking back into __do_cpuid_func()
+  KVM: x86: Remove the unnecessary loop on CPUID 0x7 sub-leafs
+  KVM: x86: Squash CPUID 0x2.0 insanity for modern CPUs
+  KVM: x86: Do host CPUID at load time to mask KVM cpu caps
+  KVM: x86: Override host CPUID results with kvm_cpu_caps
+  KVM: x86: Set emulated/transmuted feature bits via kvm_cpu_caps
+  KVM: x86: Use kvm_cpu_caps to detect Intel PT support
+  KVM: x86: Use KVM cpu caps to detect MSR_TSC_AUX virt support
+  KVM: VMX: Directly use VMX capabilities helper to detect RDTSCP
+    support
+  KVM: x86: Check for Intel PT MSR virtualization using KVM cpu caps
+  KVM: VMX: Directly query Intel PT mode when refreshing PMUs
+  KVM: SVM: Refactor logging of NPT enabled/disabled
+  KVM: x86/mmu: Merge kvm_{enable,disable}_tdp() into a common function
+  KVM: x86/mmu: Configure max page level during hardware setup
+  KVM: x86: Don't propagate MMU lpage support to memslot.disallow_lpage
+  KVM: Drop largepages_enabled and its accessor/mutator
+  KVM: x86: Move VMX's host_efer to common x86 code
+
+ arch/x86/include/asm/kvm_host.h |  15 +-
+ arch/x86/kvm/Kconfig            |  10 +
+ arch/x86/kvm/cpuid.c            | 771 +++++++++++++++-----------------
+ arch/x86/kvm/cpuid.h            | 123 ++++-
+ arch/x86/kvm/mmu/mmu.c          |  22 +-
+ arch/x86/kvm/svm.c              | 117 ++---
+ arch/x86/kvm/vmx/capabilities.h |  25 +-
+ arch/x86/kvm/vmx/nested.c       |   2 +-
+ arch/x86/kvm/vmx/pmu_intel.c    |   2 +-
+ arch/x86/kvm/vmx/vmx.c          | 125 +++---
+ arch/x86/kvm/vmx/vmx.h          |   5 +-
+ arch/x86/kvm/x86.c              |  48 +-
+ arch/x86/kvm/x86.h              |  10 +-
+ include/linux/kvm_host.h        |   2 -
+ virt/kvm/kvm_main.c             |  13 -
+ 15 files changed, 662 insertions(+), 628 deletions(-)
+
+-- 
+2.24.1
+
