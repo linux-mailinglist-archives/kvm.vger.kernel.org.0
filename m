@@ -2,117 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4E4D14F498
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2020 23:20:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BF7114F6C7
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 06:54:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726246AbgAaWUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 Jan 2020 17:20:55 -0500
-Received: from mga09.intel.com ([134.134.136.24]:55797 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726180AbgAaWUz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 Jan 2020 17:20:55 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Jan 2020 14:20:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,387,1574150400"; 
-   d="scan'208";a="223281824"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga008.jf.intel.com with ESMTP; 31 Jan 2020 14:20:53 -0800
-Date:   Fri, 31 Jan 2020 14:20:53 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Kevin <kevin.tian@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3 09/21] KVM: X86: Don't track dirty for
- KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
-Message-ID: <20200131222053.GI18946@linux.intel.com>
-References: <20200121155657.GA7923@linux.intel.com>
- <20200128055005.GB662081@xz-x1>
- <20200128182402.GA18652@linux.intel.com>
- <20200131150832.GA740148@xz-x1>
- <20200131193301.GC18946@linux.intel.com>
- <20200131202824.GA7063@xz-x1>
- <20200131203622.GF18946@linux.intel.com>
- <20200131205550.GB7063@xz-x1>
- <20200131212928.GH18946@linux.intel.com>
- <20200131221637.GC7063@xz-x1>
+        id S1726297AbgBAFxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Feb 2020 00:53:43 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:35678 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726133AbgBAFxn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Feb 2020 00:53:43 -0500
+Received: by mail-oi1-f194.google.com with SMTP id b18so9614212oie.2;
+        Fri, 31 Jan 2020 21:53:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nn6Z1K4Ig+lUl4xv40lMeq9rx7gNTQqV1fkouNx1AkE=;
+        b=qMfELv6gCVDzyWoHrI8dxesUDXE3M1cw7AJY/HgtTJBDZi6hj8nL+jyu8fNQ7ic8H0
+         QCzkCGzeYtjWkO52gQOjFg2trtO7759pyuei63RbVGekUibOimrDGpULjZhUg4Z9qxrl
+         /Xno4xQb5ARDonX9l9GFqB2cqd6Y4VD2xRLytPuwlvP8/qJsIvZJCZDsqGViAgNzOpIt
+         orUKRghnQw3ykbGoHXbNg2NefxIUp6p3+oVGzhn57X30H83e0VHsaJy5+aCROgTHBO45
+         L+EQQ9UNdaLzStCxTM0bgDq5CBZ6BAztuiUcS60FmtjeF6JF/HeyKuYBD589Th9foDja
+         WKoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nn6Z1K4Ig+lUl4xv40lMeq9rx7gNTQqV1fkouNx1AkE=;
+        b=P6YzzvdG9pm7G54CaJHZOOcP5+M6mCQ50Ksr/ACOtORfjSo6TX0fEWvFLdPaDJNq8Y
+         VsUZfhpe918N+nvNC8CgAxuBxUpxNgvGRTBXn258aloknc/1W/vG9ewrmMycpuUq5a6V
+         mS3BuolSOqfGO5EpHw/0IiyZ2E3H0t6ngd0F7DA8VXdUJEHP0KII+tsFGPqYs7iGtT3H
+         YSkj/Fuq4B+ToE3wVix3HiRXw5IhaAkXRLcKVBY5tyZ5hpMn5xaINaboB2fw0eby7oYp
+         jDPMM16Uvipu1E7RHb6CAKtdWuCshKnhSBJCN3NqX7Dd+XXEk0ocIMJ63dYxY03TjOzH
+         TbhQ==
+X-Gm-Message-State: APjAAAUmaWiDS8vveUjR+5M++nbtQlISOiTR3WOhEZWBW5GtN73Da8Sm
+        zM7GRdGzPigBB4IQHupqFQ3T9gBMAbPI/aziA7R1RwNg
+X-Google-Smtp-Source: APXvYqwE113qFxAd9XWoPRNc6FEbRgUVY3TmHCvX+OR1Antl3haNngqyvW5T6CXiyN3NEGfJfubK/rC+j6aAjMntRwE=
+X-Received: by 2002:aca:8d5:: with SMTP id 204mr8370686oii.141.1580536422319;
+ Fri, 31 Jan 2020 21:53:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200131221637.GC7063@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <1580407316-11391-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1580407316-11391-1-git-send-email-pbonzini@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Sat, 1 Feb 2020 13:53:31 +0800
+Message-ID: <CANRm+CyyuWUOAj81Sg8UH_jMybZWmvZxWPWZ_twMvFnPxKD3hQ@mail.gmail.com>
+Subject: Re: [FYI PATCH 0/5] Missing TLB flushes
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 31, 2020 at 05:16:37PM -0500, Peter Xu wrote:
-> On Fri, Jan 31, 2020 at 01:29:28PM -0800, Sean Christopherson wrote:
-> > On Fri, Jan 31, 2020 at 03:55:50PM -0500, Peter Xu wrote:
-> > > On Fri, Jan 31, 2020 at 12:36:22PM -0800, Sean Christopherson wrote:
-> > > > On Fri, Jan 31, 2020 at 03:28:24PM -0500, Peter Xu wrote:
-> > > > > On Fri, Jan 31, 2020 at 11:33:01AM -0800, Sean Christopherson wrote:
-> > > > > > For the same reason we don't take mmap_sem, it gains us nothing, i.e. KVM
-> > > > > > still has to use copy_{to,from}_user().
-> > > > > > 
-> > > > > > In the proposed __x86_set_memory_region() refactor, vmx_set_tss_addr()
-> > > > > > would be provided the hva of the memory region.  Since slots_lock and SRCU
-> > > > > > only protect gfn->hva, why would KVM take slots_lock since it already has
-> > > > > > the hva?
-> > > > > 
-> > > > > OK so you're suggesting to unlock the lock earlier to not cover
-> > > > > init_rmode_tss() rather than dropping the whole lock...  Yes it looks
-> > > > > good to me.  I think that's the major confusion I got.
-> > > > 
-> > > > Ya.  And I missed where the -EEXIST was coming from.  I think we're on the
-> > > > same page.
-> > > 
-> > > Good to know.  Btw, for me I would still prefer to keep the lock be
-> > > after the __copy_to_user()s because "HVA is valid without lock" is
-> > > only true for these private memslots.
-> > 
-> > No.  From KVM's perspective, the HVA is *never* valid.  Even if you rewrote
-> > this statement to say "the gfn->hva translation is valid without lock" it
-> > would still be incorrect. 
-> > 
-> > KVM is *always* using HVAs without holding lock, e.g. every time it enters
-> > the guest it is deferencing a memslot because the translations stored in
-> > the TLB are effectively gfn->hva->hpa.  Obviously KVM ensures that it won't
-> > dereference a memslot that has been deleted/moved, but it's a lot more
-> > subtle than simply holding a lock.
-> > 
-> > > After all this is super slow path so I wouldn't mind to take the lock
-> > > for some time longer.
-> > 
-> > Holding the lock doesn't affect this super slow vmx_set_tss_addr(), it
-> > affects everything else that wants slots_lock.  Now, admittedly it's
-> > extremely unlikely userspace is going to do KVM_SET_USER_MEMORY_REGION in
-> > parallel, but that's not the point and it's not why I'm objecting to
-> > holding the lock.
-> > 
-> > Holding the lock implies protection that is *not* provided.  You and I know
-> > it's not needed for copy_{to,from}_user(), but look how long it's taken us
-> > to get on the same page.  A future KVM developer comes along, sees this
-> > code, and thinks "oh, I need to hold slots_lock to dereference a gfn", and
-> > propagates the unnecessary locking to some other code.
-> 
-> At least for a user memory slot, we "need to hold slots_lock to
-> dereference a gfn" (or srcu), right?
+On Fri, 31 Jan 2020 at 02:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> From: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+>
+> The KVM hypervisor may provide a guest with ability to defer remote TLB
+> flush when the remote VCPU is not running. When this feature is used,
+> the TLB flush will happen only when the remote VPCU is scheduled to run
+> again. This will avoid unnecessary (and expensive) IPIs.
+>
+> Under certain circumstances, when a guest initiates such deferred action,
+> the hypervisor may miss the request. It is also possible that the guest
+> may mistakenly assume that it has already marked remote VCPU as needing
+> a flush when in fact that request had already been processed by the
+> hypervisor. In both cases this will result in an invalid translation
+> being present in a vCPU, potentially allowing accesses to memory locations
+> in that guest's address space that should not be accessible.
+>
+> Note that only intra-guest memory is vulnerable.
+>
+> The attached patches address both of these problems:
+> 1. The first patch makes sure the hypervisor doesn't accidentally clear
+> guest's remote flush request
+> 2. The rest of the patches prevent the race between hypervisor
+> acknowledging a remote flush request and guest issuing a new one.
 
-Gah, that was supposed to be "dereference a hva".  Yes, a gfn->hva lookup
-requires slots_lock or SRCU read lock.
+Looks good, thanks for the patchset.
 
-> You know I'm suffering from a jetlag today, I thought I was still
-> fine, now I start to doubt it. :-)
-
-Unintentional gaslighting.  Or was it?  :-D
+    Wanpeng
