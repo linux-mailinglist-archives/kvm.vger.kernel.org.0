@@ -2,110 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C9DB14F87D
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 16:29:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D23E314F90D
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2020 17:59:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727053AbgBAP3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Feb 2020 10:29:10 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60296 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726998AbgBAP3J (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 1 Feb 2020 10:29:09 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 011FExb2182032
-        for <kvm@vger.kernel.org>; Sat, 1 Feb 2020 10:29:08 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xw7qdeam7-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Sat, 01 Feb 2020 10:29:08 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Sat, 1 Feb 2020 15:29:06 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Sat, 1 Feb 2020 15:29:04 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 011FT3Pt5505172
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 1 Feb 2020 15:29:03 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5092A52051;
-        Sat,  1 Feb 2020 15:29:03 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.30.110])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8C0205204E;
-        Sat,  1 Feb 2020 15:29:02 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org, david@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v5 7/7] s390x: smp: Wait for cpu setup to finish
-Date:   Sat,  1 Feb 2020 10:28:51 -0500
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200201152851.82867-1-frankja@linux.ibm.com>
-References: <20200201152851.82867-1-frankja@linux.ibm.com>
+        id S1726814AbgBAQ6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Feb 2020 11:58:21 -0500
+Received: from mga07.intel.com ([134.134.136.100]:37934 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726670AbgBAQ6U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Feb 2020 11:58:20 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Feb 2020 08:58:20 -0800
+X-IronPort-AV: E=Sophos;i="5.70,390,1574150400"; 
+   d="scan'208";a="218922079"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.174.29]) ([10.249.174.29])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 01 Feb 2020 08:58:17 -0800
+Subject: Re: [PATCH 2/2] KVM: VMX: Extend VMX's #AC handding
+To:     Andy Lutomirski <luto@amacapital.net>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20200131210424.GG18946@linux.intel.com>
+ <E1F9CE39-7D61-43E1-B871-6D4BFA4B6D66@amacapital.net>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <b2e2310d-2228-45c2-8174-048e18a46bb6@intel.com>
+Date:   Sun, 2 Feb 2020 00:58:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <E1F9CE39-7D61-43E1-B871-6D4BFA4B6D66@amacapital.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20020115-4275-0000-0000-0000039D0ED6
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020115-4276-0000-0000-000038B1311E
-Message-Id: <20200201152851.82867-8-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-01_03:2020-01-31,2020-02-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=1
- phishscore=0 mlxlogscore=999 priorityscore=1501 mlxscore=0 bulkscore=0
- clxscore=1015 lowpriorityscore=0 spamscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2002010113
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We store the user provided psw address into restart new, so a psw
-restart does not lead us through setup again.
+On 2/1/2020 5:33 AM, Andy Lutomirski wrote:
+> 
+> 
+>> On Jan 31, 2020, at 1:04 PM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+>>
+>> ﻿On Fri, Jan 31, 2020 at 12:57:51PM -0800, Andy Lutomirski wrote:
+>>>
+>>>>> On Jan 31, 2020, at 12:18 PM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+>>>>
+>>>> This is essentially what I proposed a while back.  KVM would allow enabling
+>>>> split-lock #AC in the guest if and only if SMT is disabled or the enable bit
+>>>> is per-thread, *or* the host is in "warn" mode (can live with split-lock #AC
+>>>> being randomly disabled/enabled) and userspace has communicated to KVM that
+>>>> it is pinning vCPUs.
+>>>
+>>> How about covering the actual sensible case: host is set to fatal?  In this
+>>> mode, the guest gets split lock detection whether it wants it or not. How do
+>>> we communicate this to the guest?
+>>
+>> KVM doesn't advertise split-lock #AC to the guest and returns -EFAULT to the
+>> userspace VMM if the guest triggers a split-lock #AC.
+>>
+>> Effectively the same behavior as any other userspace process, just that KVM
+>> explicitly returns -EFAULT instead of the process getting a SIGBUS.
+> 
+> 
+> Which helps how if the guest is actually SLD-aware?
+> 
+> I suppose we could make the argument that, if an SLD-aware guest gets #AC at CPL0, it’s a bug, but it still seems rather nicer to forward the #AC to the guest instead of summarily killing it.
 
-Also we wait on smp_cpu_setup() until the cpu has finished setup
-before returning. This is necessary for z/VM and LPAR where sigp is
-asynchronous.
+If KVM does advertise split-lock detection to the guest, then kvm/host 
+can know whether a guest is SLD-aware by checking guest's 
+MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- lib/s390x/smp.c  | 3 +++
- s390x/cstart64.S | 2 ++
- 2 files changed, 5 insertions(+)
+  - If guest's MSR_TEST_CTRL.SPLIT_LOCK_DETECT is set, it indicates 
+guest is SLD-aware so KVM forwards #AC to guest.
 
-diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-index 4578003..3f86243 100644
---- a/lib/s390x/smp.c
-+++ b/lib/s390x/smp.c
-@@ -210,6 +210,9 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
- 
- 	/* Start processing */
- 	smp_cpu_restart_nolock(addr, NULL);
-+	/* Wait until the cpu has finished setup and started the provided psw */
-+	while (lc->restart_new_psw.addr != psw.addr)
-+		mb();
- out:
- 	spin_unlock(&lock);
- 	return rc;
-diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-index 86dd4c4..9af6bb3 100644
---- a/s390x/cstart64.S
-+++ b/s390x/cstart64.S
-@@ -159,6 +159,8 @@ smp_cpu_setup_state:
- 	xgr	%r1, %r1
- 	lmg     %r0, %r15, GEN_LC_SW_INT_GRS
- 	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
-+	/* We should only go once through cpu setup and not for every restart */
-+	stg	%r14, GEN_LC_RESTART_NEW_PSW + 8
- 	br	%r14
- 
- pgm_int:
--- 
-2.20.1
+  - If not set. It may be a old guest or a malicious guest or a guest 
+without SLD support, and we cannot figure it out. So we have to kill the 
+guest when host is SLD-fatal, and let guest survive when SLD-WARN for 
+old sane buggy guest.
+
+In a word, all the above is on the condition that KVM advertise 
+split-lock detection to guest. But this patch doesn't do this. Maybe I 
+should add that part in v2.
+
+> ISTM, on an SLD-fatal host with an SLD-aware guest, the host should tell the guest “hey, you may not do split locks — SLD is forced on” and the guest should somehow acknowledge it so that it sees the architectural behavior instead of something we made up.  Hence my suggestion.
+> 
 
