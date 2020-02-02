@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E1B6614FB86
-	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2020 06:06:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ED2E14FC5E
+	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2020 10:10:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725957AbgBBFED (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Feb 2020 00:04:03 -0500
-Received: from mail-eopbgr1320085.outbound.protection.outlook.com ([40.107.132.85]:53856
+        id S1726044AbgBBJJt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Feb 2020 04:09:49 -0500
+Received: from mail-eopbgr1320050.outbound.protection.outlook.com ([40.107.132.50]:8864
         "EHLO APC01-PU1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725811AbgBBFED (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Feb 2020 00:04:03 -0500
+        id S1725942AbgBBJJt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Feb 2020 04:09:49 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jP7SxK75XQudXgbVGITcFmHEpbvjsi8q9rOLFjgldIoogOWPrlkogzIR0oupRyRwnmNjSAbn1o/r6wp+baos7Tv3d9mJyGQBpu+i/sQANhSR+R2rYvdS8zVZ/dZWEFKZYz2qCfMNDnC9PCpxalS3biplptHb9zopl3xx0oiC2+xV+z7YJH0z/fkCP2ixzjbajxJcW3efgxtHVqiOoskKGHvtVwPYNJp9gjQyJ80+YNVM3UwK361Yuw0Y9gl+6OcAQpoePDxN9/rO5fgN8qYsiqpiOqyNthrZsGW4egL14b9dEW8UNrA6xdIogJJumWjUkASp811r3QuyONJNl8LEJQ==
+ b=NdRmn2d6pikNXQJ5cyiVjhxSyU0iKtfPSoQz4HfPN3QVbkN4zOHgAyRLy8txkK79hZsicFjcC5M0U00Vtn6kjgzC1UxVM2VVV7z8CkktHtY+RIk4++YKUPQBe3HmKIRV7yJe9UlqSdjkm2mknJ/5elHLa/6m44NLMkcajNaEqzMrJkvIHYtcSeGB9VlJRiwdGWG1+UZlOKeLqye7MMIvBBOQ8y52OKMP8IgX1usyy5jgdaiEfgpx8UpxWDa3t8iTvjw950p9obGszsJYvx7/lPQAfhcyWpPsqbQw6kskj8aqwAMJVkNc0klHk28WXG6SGDCvsyfhHzoacwa7noztNg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SpHnLRg7rTiJakTTl7yC9M8Uu2kzA0Tica4EZdi5R4g=;
- b=EnNiBRSYMmmR5HDaIkEbCSbaJbS1snOT0yl7j3ZKXtQ2YrTS4+80yiwO+BVlCpnCS0bH9lzqCWC2w7rtKQn2mePdc3GFqO16/YQ1c8q97/ihn4FFxgPAfjSeKaiX/+1sZtzVREQGlK5lWlI49q1+p8KcxpAivCmm0FSnWusUr87dXfdIMScihjqDtfwvTWaxLoMzBdQl4vS049Vj7m+iKgcgvve1aDSwMbaoSe54iT/AUiGZMF6oGljktBEfZ1mV6lXaoM3JzF56UBN9+nRZI0uAhvB2XAZAVVGd4IOHXjyLPEniTap9uOY3o8eZcsyczSFpComEfNUyjQOzIdKsuA==
+ bh=s3FrGhmsQBuDqlJbJoxrg8R6wk4ZV0OEMIeKyO8E14o=;
+ b=jXn2DT9kMDsmXADXBatQdiZUCMNhBxouhZZS2h3wCBCeTL5u318AQTkEzECzAv/AexpNZn8QKGYUlDgZ+hyt1tX4LRYSg3/NJthCxkd/15gqYlLTXxxvcQp8X8aSsNSnZ2py1pJu6WkagctJCJs6f9pDUXBvyrCFf0tmvwiRanDZLZiDs+AcY/XdhEQUdrgsN9PJU9fT409BV1LSWkesGFVla3OiYCWhqdOoSYBWpLwzf6jI+mHLghAJeJe32JhwzBr/0cspgSQTY2yzONcAGKbPJRLRul0UbVi9YS7tbFsXpH5b1Z2ARhLR/aPiQsSSCB5nBWRdX8LYjWeSifMQ/g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=teo-en-ming-corp.com; dmarc=pass action=none
  header.from=teo-en-ming-corp.com; dkim=pass header.d=teo-en-ming-corp.com;
@@ -26,66 +26,66 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=teoenmingcorp.onmicrosoft.com; s=selector2-teoenmingcorp-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SpHnLRg7rTiJakTTl7yC9M8Uu2kzA0Tica4EZdi5R4g=;
- b=Xvcm0HtAFHiKaAQMkJYx5ZnHRkYkggFJH9B8fNHfjIaLTzZKri598qIPiX6evjEJhc3u5E9xWLQxd4BVu4EcXy7FvqyYlQ3uaGB36eWe3gNVMNENm0g9DfK59vTuU2g4lhtDoYHdkKTzuzDI9cOZq3CtXHO8johWuqy/csMGIT0=
+ bh=s3FrGhmsQBuDqlJbJoxrg8R6wk4ZV0OEMIeKyO8E14o=;
+ b=Mw67RfPh8d9X0IDEYvhZGTAn0ijJC3naFJn7X+yiAwi/QQAY2mIg8YZBOnpEvF5Wri6fSKqPVGdaZ8h7YeN+RanX/PvkphOZDvTmTdxDWMCBE9+1BDxNk12A5JrIIL8G1snb/7LiJxcTNx5BYJ7D0HvWWarokzqlm8xkqWqmtao=
 Received: from SG2PR01MB2141.apcprd01.prod.exchangelabs.com (10.170.143.19) by
- SG2PR01MB2236.apcprd01.prod.exchangelabs.com (20.177.84.142) with Microsoft
+ SG2PR01MB3224.apcprd01.prod.exchangelabs.com (20.178.152.203) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.32; Sun, 2 Feb 2020 05:03:56 +0000
+ 15.20.2686.32; Sun, 2 Feb 2020 09:09:37 +0000
 Received: from SG2PR01MB2141.apcprd01.prod.exchangelabs.com
  ([fe80::81e9:67b1:74eb:2853]) by SG2PR01MB2141.apcprd01.prod.exchangelabs.com
  ([fe80::81e9:67b1:74eb:2853%3]) with mapi id 15.20.2686.031; Sun, 2 Feb 2020
- 05:03:56 +0000
+ 09:09:37 +0000
 From:   Turritopsis Dohrnii Teo En Ming <ceo@teo-en-ming-corp.com>
 To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 CC:     Turritopsis Dohrnii Teo En Ming <ceo@teo-en-ming-corp.com>
 Subject: [FAILURE] GPU/VGA Passthrough of NVidia GeForce GTX1650 to Windows 10
- VM using Linux KVM on Ubuntu 18.04.3 LTS Desktop Edition
+ VM using Linux KVM on Ubuntu 18.04.3 LTS Desktop Edition PART 2
 Thread-Topic: [FAILURE] GPU/VGA Passthrough of NVidia GeForce GTX1650 to
- Windows 10 VM using Linux KVM on Ubuntu 18.04.3 LTS Desktop Edition
-Thread-Index: AdXZhhLHhr0frOJ0RsOpWYfRzEZzzA==
-Date:   Sun, 2 Feb 2020 05:03:56 +0000
-Message-ID: <SG2PR01MB21418932F80B7A21AF48779B87010@SG2PR01MB2141.apcprd01.prod.exchangelabs.com>
+ Windows 10 VM using Linux KVM on Ubuntu 18.04.3 LTS Desktop Edition PART 2
+Thread-Index: AdXZZWDACXzxiwWkS0GsZknSd9G+8Q==
+Date:   Sun, 2 Feb 2020 09:09:37 +0000
+Message-ID: <SG2PR01MB2141225C615B0E32696647F987010@SG2PR01MB2141.apcprd01.prod.exchangelabs.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 authentication-results: spf=none (sender IP is )
  smtp.mailfrom=ceo@teo-en-ming-corp.com; 
-x-originating-ip: [2401:7400:c802:de67:f090:52:a7e0:3c9b]
+x-originating-ip: [118.189.211.120]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c5b5eae9-ab21-4cf7-8692-08d7a79d4eb3
-x-ms-traffictypediagnostic: SG2PR01MB2236:
+x-ms-office365-filtering-correlation-id: f66dda0b-663d-4256-c479-08d7a7bfa0fe
+x-ms-traffictypediagnostic: SG2PR01MB3224:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SG2PR01MB22366F06574E4513D812741B87010@SG2PR01MB2236.apcprd01.prod.exchangelabs.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-microsoft-antispam-prvs: <SG2PR01MB3224CABDCBDFE066C062D27F87010@SG2PR01MB3224.apcprd01.prod.exchangelabs.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
 x-forefront-prvs: 0301360BF5
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(6029001)(396003)(136003)(376002)(39830400003)(366004)(346002)(199004)(189003)(8676002)(966005)(508600001)(71200400001)(186003)(7696005)(316002)(5660300002)(81166006)(81156014)(8936002)(33656002)(16799955002)(52536014)(76116006)(2906002)(66446008)(66556008)(66476007)(64756008)(66946007)(6916009)(4326008)(6506007)(45080400002)(30864003)(55016002)(9686003)(86362001)(107886003)(21314003)(473944003)(6606295002);DIR:OUT;SFP:1101;SCL:1;SRVR:SG2PR01MB2236;H:SG2PR01MB2141.apcprd01.prod.exchangelabs.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(6029001)(396003)(136003)(39830400003)(376002)(366004)(346002)(199004)(189003)(186003)(16799955002)(4326008)(55016002)(9686003)(316002)(71200400001)(30864003)(2906002)(6506007)(33656002)(107886003)(66476007)(76116006)(8676002)(5660300002)(52536014)(81166006)(81156014)(6916009)(66946007)(45080400002)(966005)(26005)(86362001)(7696005)(66556008)(64756008)(508600001)(8936002)(66446008)(21314003)(569006);DIR:OUT;SFP:1101;SCL:1;SRVR:SG2PR01MB3224;H:SG2PR01MB2141.apcprd01.prod.exchangelabs.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 received-spf: None (protection.outlook.com: teo-en-ming-corp.com does not
  designate permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: dlx6UjcVwcRVcBMzIAmHgu5cK/7sy9Puu1wNVoGDjzRAoRFVWYnBZpSiw7R3ZnYMlK/VUnXR1kiops9cbIXgVb9u33LS6UAaXt83ZdvlOTKYTxoyEtyS9iHjXlfMJ9FDQhjdPYNMbJBtfqw+v7zy84UxkV5vw3YD/26VZqVPmEScb7a+PgU3mQ2LmqqpDUk/GtmGn5p0xfcBPKeNa546ka6KUXUT+JWv+BcYN+Zj5hQPNsp7N90jikTyPwx2ZAA4/zeVvzfmQrZkXFlszn6xsI1v7mctDEnQov80nr7jUKPmuJia4fmbWV2PIY2ZRf9+pzqAy9k1MSfjzG92akar1z6HxljFqHReXqM32dwcz9x2XHMt4hKJLwgZYqb5PosquGH4FZUA3ZdGm6LRzeI/mMMyJogOwa3BJR44NAxVEXL/GARx8XqrowJC1hLdYkdPLGYh5C9tbonNVsnGSvp6utZ4MSmbgWgfkmtNJnOZY4IzUct6L6MbTxPudrCj95Tj4YraNLIPMT1zp2yM6dMCcruasGGKQzaGQTnsy05T8dKhKvH3vgj38NEDsm7PTGkk/JRt0nrL6rl5HvXj96jgWhRUepVjkxtz59YX5J7QM9+gsdIdh+kpxkGvFxlzKHIX
-x-ms-exchange-antispam-messagedata: ku+35xIqHpJkgeFiVURHg6TWAgzK0MvZAsOA3oXvkoVPxDn+ODF5zHQwkpzG6qt9WY+xbH6y6POgxpyuSfOO8yn+03hbvjMiELCml4H31mMzKE8/vF8jcLkvQi5MxvbQ1pRZkWRFXzNFKJetLj7BxAKJEc7SvoJVtrnI9LDIl8M+iBrc0+mbEsrpe7XaTCaYXoM/U2zCJp7MYcloY2MAnw==
+x-microsoft-antispam-message-info: wWa8qcsP/Bi6qc8raqRZl2t6knK1alKScK2OtJZnVpVtV9xKkA9kyyA4RiksHNkEuTeX2tv3/5f9SsOW0UaKZxdOHIrg5sVAya/4ImwTigCfq6XhJSx/qr3pxQ03suq617q7VnrgzrvN2RR+CJvyN07LOlW2CRBOlWrOWM1tJgT3875OQjfmXTboqaUpSP0CYAIHKPjbL01RyaFxnjQjjxOOR++xDILHPcZHBbtnZu3fPR4Y0/1mOno+7LpYoBlkE+I/JnQG0oA9FWziGrmEdB0IMkpzmQVP8c/2Ltq/cZk138FTyMnOjcxm3D+3t0bYh+9IE5AxE82MCRiP6EUCU9JZsiqPzofkniciyEKsVpKhHtpnrQ82Oq8LkExny4HZEna94ogbyj9a48hkUsAQosnDa5lntdLWeIxdKr6J33UVXnAqr5BRGFjBYCVQ/dLN4ttboTvoHiJo+tqzLZZ1EB5FOUNB2eYd35fV645cNfXjYS4SbRvu/4NKut6vkYMH1zCA6KBg6EltRUgxgP/Jrn0N8j1p+4OVWHRAE2ZjsFpdotBCocN9ECNhm8xM39yCEhZkHqMPYNRB5x3I0ODntw==
+x-ms-exchange-antispam-messagedata: 72+1lBJ+0eoV0N0YjvrRZh5VvqGKTPdm8T+cWCKqhaXrp/Ed9nBrM3CaEvvyTP68D7kgqhx4gEjcIoWrLH9oIcvlHQtNnLhRzY1fkyvwjgTrt2Tl8QiXQWtsim7mOI8A2lITKE+IWoD4Y1NMMm5NcQ==
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: teo-en-ming-corp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5b5eae9-ab21-4cf7-8692-08d7a79d4eb3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Feb 2020 05:03:56.6617
+X-MS-Exchange-CrossTenant-Network-Message-Id: f66dda0b-663d-4256-c479-08d7a7bfa0fe
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Feb 2020 09:09:37.5848
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 23b3f6ae-c453-4b93-aec9-f17508e5885c
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IOGdfXOxl256YjtjVlnf4wHwgyQsPSlnAq10P4q0b04+28dHKf78GgdgxE67/eK0Epetbhg//iOTUCZL0KVWvbyr8MHessbEYoC+EnJziJI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2PR01MB2236
+X-MS-Exchange-CrossTenant-userprincipalname: cbnq5M67Oo0NI7INrZHzrbQ7wae3v9ufFh5U4kDN3w+mlHE0jzFDvzA/Ryo/Ob3GjSAo6j2IOb19ETFTYPpGtgt4403WNdGrT3CxPKli3G4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2PR01MB3224
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Primary Subject: [FAILURE] GPU/VGA Passthrough of NVidia GeForce GTX1650 to=
- Windows 10 VM using Linux KVM on Ubuntu 18.04.3 LTS Desktop Edition
+ Windows 10 VM using Linux KVM on Ubuntu 18.04.3 LTS Desktop Edition PART 2
 
 Secondary Subject: Mr. Turritopsis Dohrnii Teo En Ming's Linux KVM GPU Pass=
 through Project, Started 1st Feb 2020 Saturday late night before midnight
@@ -613,6 +613,383 @@ Thank you very much!
 
 Stopped troubleshooting at 5.19 AM Singapore Time on 2 Feb 2020 Sunday and =
 went to sleep.
+
+Resumed troubleshooting at around 12 noon Singapore Time on 2 Feb 2020 Sund=
+ay.
+
+Upgraded motherboard BIOS to version F50 using Q-Flash.
+
+Linux command: sudo ./windows10vm.sh
+
+Output:
+
+qemu-system-x86_64: -balloon none: warning: This option is deprecated. Use =
+'--device virtio-balloon' to enable the balloon device.
+qemu-system-x86_64: -device vfio-pci,host=3D01:00.0,multifunction=3Don: vfi=
+o error: 0000:01:00.0: group 0 is not viable
+Please ensure all devices within the iommu_group are bound to their vfio bu=
+s driver.
+
+Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
+e | sort --version-sort
+
+Output:
+
+/sys/kernel/iommu_groups/0/devices/0000:00:01.0
+/sys/kernel/iommu_groups/0/devices/0000:00:01.1
+/sys/kernel/iommu_groups/0/devices/0000:00:01.2
+/sys/kernel/iommu_groups/0/devices/0000:01:00.0
+/sys/kernel/iommu_groups/0/devices/0000:01:00.1
+/sys/kernel/iommu_groups/0/devices/0000:02:00.0
+/sys/kernel/iommu_groups/0/devices/0000:02:00.1
+/sys/kernel/iommu_groups/0/devices/0000:02:00.2
+/sys/kernel/iommu_groups/0/devices/0000:03:00.0
+/sys/kernel/iommu_groups/0/devices/0000:03:01.0
+/sys/kernel/iommu_groups/0/devices/0000:03:04.0
+/sys/kernel/iommu_groups/0/devices/0000:05:00.0
+/sys/kernel/iommu_groups/0/devices/0000:06:00.0
+/sys/kernel/iommu_groups/1/devices/0000:00:08.0
+/sys/kernel/iommu_groups/1/devices/0000:00:08.1
+/sys/kernel/iommu_groups/1/devices/0000:00:08.2
+/sys/kernel/iommu_groups/1/devices/0000:07:00.0
+/sys/kernel/iommu_groups/1/devices/0000:07:00.1
+/sys/kernel/iommu_groups/1/devices/0000:07:00.2
+/sys/kernel/iommu_groups/1/devices/0000:07:00.3
+/sys/kernel/iommu_groups/1/devices/0000:07:00.4
+/sys/kernel/iommu_groups/1/devices/0000:07:00.6
+/sys/kernel/iommu_groups/1/devices/0000:08:00.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.0
+/sys/kernel/iommu_groups/3/devices/0000:00:18.1
+/sys/kernel/iommu_groups/3/devices/0000:00:18.2
+/sys/kernel/iommu_groups/3/devices/0000:00:18.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.4
+/sys/kernel/iommu_groups/3/devices/0000:00:18.5
+/sys/kernel/iommu_groups/3/devices/0000:00:18.6
+/sys/kernel/iommu_groups/3/devices/0000:00:18.7
+
+Linux command: sudo apt install inxi
+
+Linux command: inxi -S
+
+Output:
+
+System:    Host: ubuntu18043 Kernel: 5.3.0-28-generic x86_64 bits: 64 Deskt=
+op: Gnome 3.28.4
+           Distro: Ubuntu 18.04.3 LTS
+
+REFERENCE
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Link: https://phoenixnap.com/kb/how-to-update-kernel-ubuntu
+
+Linux command: sudo apt-add-repository ppa:teejee2008/ppa
+
+Linux command: sudo apt-get update
+
+Linux command: sudo apt-get install ukuu
+
+Linux command: sudo ukuu-gtk
+
+Ukuu: Ubuntu Kernel Update Utility
+
+Installed Linux kernel 5.5.1 using Ukuu.
+
+Linux command: uname -a
+
+Output:
+
+Linux ubuntu18043 5.5.1-050501-generic #202002011032 SMP Sat Feb 1 10:34:22=
+ UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+
+Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
+e | sort --version-sort
+
+/sys/kernel/iommu_groups/0/devices/0000:00:01.0
+/sys/kernel/iommu_groups/0/devices/0000:00:01.1
+/sys/kernel/iommu_groups/0/devices/0000:00:01.2
+/sys/kernel/iommu_groups/0/devices/0000:01:00.0
+/sys/kernel/iommu_groups/0/devices/0000:01:00.1
+/sys/kernel/iommu_groups/0/devices/0000:02:00.0
+/sys/kernel/iommu_groups/0/devices/0000:02:00.1
+/sys/kernel/iommu_groups/0/devices/0000:02:00.2
+/sys/kernel/iommu_groups/0/devices/0000:03:00.0
+/sys/kernel/iommu_groups/0/devices/0000:03:01.0
+/sys/kernel/iommu_groups/0/devices/0000:03:04.0
+/sys/kernel/iommu_groups/0/devices/0000:05:00.0
+/sys/kernel/iommu_groups/0/devices/0000:06:00.0
+/sys/kernel/iommu_groups/1/devices/0000:00:08.0
+/sys/kernel/iommu_groups/1/devices/0000:00:08.1
+/sys/kernel/iommu_groups/1/devices/0000:00:08.2
+/sys/kernel/iommu_groups/1/devices/0000:07:00.0
+/sys/kernel/iommu_groups/1/devices/0000:07:00.1
+/sys/kernel/iommu_groups/1/devices/0000:07:00.2
+/sys/kernel/iommu_groups/1/devices/0000:07:00.3
+/sys/kernel/iommu_groups/1/devices/0000:07:00.4
+/sys/kernel/iommu_groups/1/devices/0000:07:00.6
+/sys/kernel/iommu_groups/1/devices/0000:08:00.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.0
+/sys/kernel/iommu_groups/3/devices/0000:00:18.1
+/sys/kernel/iommu_groups/3/devices/0000:00:18.2
+/sys/kernel/iommu_groups/3/devices/0000:00:18.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.4
+/sys/kernel/iommu_groups/3/devices/0000:00:18.5
+/sys/kernel/iommu_groups/3/devices/0000:00:18.6
+/sys/kernel/iommu_groups/3/devices/0000:00:18.7
+
+REFERENCE
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+https://queuecumber.gitlab.io/linux-acs-override/
+
+Linux command: cd Downloads
+
+Linux command: unzip artifacts.zip
+
+Linux command: sudo dpkg -i linux-headers-5.4.10-acso_5.4.10-acso-1_amd64.d=
+eb
+
+Linux command: sudo dpkg -i linux-image-5.4.10-acso_5.4.10-acso-1_amd64.deb
+
+Linux command: sudo dpkg -i linux-libc-dev_5.4.10-acso-1_amd64.deb
+
+Linux command: sudo reboot
+
+Linux command: uname -a
+
+Output:
+
+Linux ubuntu18043 5.4.10-acso #1 SMP Thu Jan 9 10:30:12 UTC 2020 x86_64 x86=
+_64 x86_64 GNU/Linux
+
+Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
+e | sort --version-sort
+
+Output:
+
+/sys/kernel/iommu_groups/0/devices/0000:00:01.0
+/sys/kernel/iommu_groups/0/devices/0000:00:01.1
+/sys/kernel/iommu_groups/0/devices/0000:00:01.2
+/sys/kernel/iommu_groups/0/devices/0000:01:00.0
+/sys/kernel/iommu_groups/0/devices/0000:01:00.1
+/sys/kernel/iommu_groups/0/devices/0000:02:00.0
+/sys/kernel/iommu_groups/0/devices/0000:02:00.1
+/sys/kernel/iommu_groups/0/devices/0000:02:00.2
+/sys/kernel/iommu_groups/0/devices/0000:03:00.0
+/sys/kernel/iommu_groups/0/devices/0000:03:01.0
+/sys/kernel/iommu_groups/0/devices/0000:03:04.0
+/sys/kernel/iommu_groups/0/devices/0000:05:00.0
+/sys/kernel/iommu_groups/0/devices/0000:06:00.0
+/sys/kernel/iommu_groups/1/devices/0000:00:08.0
+/sys/kernel/iommu_groups/1/devices/0000:00:08.1
+/sys/kernel/iommu_groups/1/devices/0000:00:08.2
+/sys/kernel/iommu_groups/1/devices/0000:07:00.0
+/sys/kernel/iommu_groups/1/devices/0000:07:00.1
+/sys/kernel/iommu_groups/1/devices/0000:07:00.2
+/sys/kernel/iommu_groups/1/devices/0000:07:00.3
+/sys/kernel/iommu_groups/1/devices/0000:07:00.4
+/sys/kernel/iommu_groups/1/devices/0000:07:00.6
+/sys/kernel/iommu_groups/1/devices/0000:08:00.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.0
+/sys/kernel/iommu_groups/3/devices/0000:00:18.1
+/sys/kernel/iommu_groups/3/devices/0000:00:18.2
+/sys/kernel/iommu_groups/3/devices/0000:00:18.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.4
+/sys/kernel/iommu_groups/3/devices/0000:00:18.5
+/sys/kernel/iommu_groups/3/devices/0000:00:18.6
+/sys/kernel/iommu_groups/3/devices/0000:00:18.7
+
+Shifted GTX1650 GPU from PCIe Slot 1 to PCIe Slot 2
+
+Linux Command: lspci | grep VGA
+
+Output:
+
+05:00.0 VGA compatible controller: NVIDIA Corporation Device 1f82 (rev a1)
+06:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] P=
+icasso (rev c9)
+
+Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
+e | sort --version-sort
+
+Output:
+
+/sys/kernel/iommu_groups/0/devices/0000:00:01.0
+/sys/kernel/iommu_groups/0/devices/0000:00:01.2
+/sys/kernel/iommu_groups/0/devices/0000:01:00.0
+/sys/kernel/iommu_groups/0/devices/0000:01:00.1
+/sys/kernel/iommu_groups/0/devices/0000:01:00.2
+/sys/kernel/iommu_groups/0/devices/0000:02:00.0
+/sys/kernel/iommu_groups/0/devices/0000:02:01.0
+/sys/kernel/iommu_groups/0/devices/0000:02:04.0
+/sys/kernel/iommu_groups/0/devices/0000:04:00.0
+/sys/kernel/iommu_groups/0/devices/0000:05:00.0
+/sys/kernel/iommu_groups/0/devices/0000:05:00.1
+/sys/kernel/iommu_groups/1/devices/0000:00:08.0
+/sys/kernel/iommu_groups/1/devices/0000:00:08.1
+/sys/kernel/iommu_groups/1/devices/0000:00:08.2
+/sys/kernel/iommu_groups/1/devices/0000:06:00.0
+/sys/kernel/iommu_groups/1/devices/0000:06:00.1
+/sys/kernel/iommu_groups/1/devices/0000:06:00.2
+/sys/kernel/iommu_groups/1/devices/0000:06:00.3
+/sys/kernel/iommu_groups/1/devices/0000:06:00.4
+/sys/kernel/iommu_groups/1/devices/0000:06:00.6
+/sys/kernel/iommu_groups/1/devices/0000:07:00.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.0
+/sys/kernel/iommu_groups/3/devices/0000:00:18.1
+/sys/kernel/iommu_groups/3/devices/0000:00:18.2
+/sys/kernel/iommu_groups/3/devices/0000:00:18.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.4
+/sys/kernel/iommu_groups/3/devices/0000:00:18.5
+/sys/kernel/iommu_groups/3/devices/0000:00:18.6
+/sys/kernel/iommu_groups/3/devices/0000:00:18.7
+
+No improvement. Shift GTX1650 GPU back to PCIe slot 1.
+
+Downgraded motherboard bios to version F42h using Q-flash.
+
+Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
+e | sort --version-sort
+
+Output:
+
+/sys/kernel/iommu_groups/0/devices/0000:00:01.0
+/sys/kernel/iommu_groups/0/devices/0000:00:01.1
+/sys/kernel/iommu_groups/0/devices/0000:00:01.2
+/sys/kernel/iommu_groups/0/devices/0000:01:00.0
+/sys/kernel/iommu_groups/0/devices/0000:01:00.1
+/sys/kernel/iommu_groups/0/devices/0000:02:00.0
+/sys/kernel/iommu_groups/0/devices/0000:02:00.1
+/sys/kernel/iommu_groups/0/devices/0000:02:00.2
+/sys/kernel/iommu_groups/0/devices/0000:03:00.0
+/sys/kernel/iommu_groups/0/devices/0000:03:01.0
+/sys/kernel/iommu_groups/0/devices/0000:03:04.0
+/sys/kernel/iommu_groups/0/devices/0000:05:00.0
+/sys/kernel/iommu_groups/0/devices/0000:06:00.0
+/sys/kernel/iommu_groups/1/devices/0000:00:08.0
+/sys/kernel/iommu_groups/1/devices/0000:00:08.1
+/sys/kernel/iommu_groups/1/devices/0000:00:08.2
+/sys/kernel/iommu_groups/1/devices/0000:07:00.0
+/sys/kernel/iommu_groups/1/devices/0000:07:00.1
+/sys/kernel/iommu_groups/1/devices/0000:07:00.2
+/sys/kernel/iommu_groups/1/devices/0000:07:00.3
+/sys/kernel/iommu_groups/1/devices/0000:07:00.4
+/sys/kernel/iommu_groups/1/devices/0000:07:00.6
+/sys/kernel/iommu_groups/1/devices/0000:08:00.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.0
+/sys/kernel/iommu_groups/2/devices/0000:00:14.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.0
+/sys/kernel/iommu_groups/3/devices/0000:00:18.1
+/sys/kernel/iommu_groups/3/devices/0000:00:18.2
+/sys/kernel/iommu_groups/3/devices/0000:00:18.3
+/sys/kernel/iommu_groups/3/devices/0000:00:18.4
+/sys/kernel/iommu_groups/3/devices/0000:00:18.5
+/sys/kernel/iommu_groups/3/devices/0000:00:18.6
+/sys/kernel/iommu_groups/3/devices/0000:00:18.7
+
+Downgraded motherboard BIOS to version F41 using Q-Flash.
+
+Linux command: lspci | grep VGA
+
+Output:
+
+01:00.0 VGA compatible controller: NVIDIA Corporation Device 1f82 (rev a1)
+07:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] P=
+icasso (rev c9)
+
+Linux command: for a in /sys/kernel/iommu_groups/*; do find $a -type l; don=
+e | sort --version-sort
+
+Output:
+
+/sys/kernel/iommu_groups/0/devices/0000:00:01.0
+/sys/kernel/iommu_groups/1/devices/0000:00:01.1
+/sys/kernel/iommu_groups/2/devices/0000:00:01.2
+/sys/kernel/iommu_groups/3/devices/0000:00:08.0
+/sys/kernel/iommu_groups/4/devices/0000:00:08.1
+/sys/kernel/iommu_groups/5/devices/0000:00:14.0
+/sys/kernel/iommu_groups/5/devices/0000:00:14.3
+/sys/kernel/iommu_groups/6/devices/0000:00:18.0
+/sys/kernel/iommu_groups/6/devices/0000:00:18.1
+/sys/kernel/iommu_groups/6/devices/0000:00:18.2
+/sys/kernel/iommu_groups/6/devices/0000:00:18.3
+/sys/kernel/iommu_groups/6/devices/0000:00:18.4
+/sys/kernel/iommu_groups/6/devices/0000:00:18.5
+/sys/kernel/iommu_groups/6/devices/0000:00:18.6
+/sys/kernel/iommu_groups/6/devices/0000:00:18.7
+/sys/kernel/iommu_groups/7/devices/0000:01:00.0
+/sys/kernel/iommu_groups/7/devices/0000:01:00.1
+/sys/kernel/iommu_groups/8/devices/0000:02:00.0
+/sys/kernel/iommu_groups/8/devices/0000:02:00.1
+/sys/kernel/iommu_groups/8/devices/0000:02:00.2
+/sys/kernel/iommu_groups/8/devices/0000:03:00.0
+/sys/kernel/iommu_groups/8/devices/0000:03:01.0
+/sys/kernel/iommu_groups/8/devices/0000:03:04.0
+/sys/kernel/iommu_groups/8/devices/0000:05:00.0
+/sys/kernel/iommu_groups/8/devices/0000:06:00.0
+/sys/kernel/iommu_groups/9/devices/0000:07:00.0
+/sys/kernel/iommu_groups/10/devices/0000:07:00.1
+/sys/kernel/iommu_groups/10/devices/0000:07:00.2
+/sys/kernel/iommu_groups/10/devices/0000:07:00.3
+/sys/kernel/iommu_groups/10/devices/0000:07:00.4
+/sys/kernel/iommu_groups/10/devices/0000:07:00.6
+
+Conclusion:=20
+Motherboard BIOS version F41 is still the best. BIOS versions F42h and F50 =
+don't work at all.
+With BIOS version F41, the IOMMU group is 7. Within IOMMU group 7, only NVI=
+DIA GTX1650 GPU exists.
+With BIOS versions F42h and F50, the IOMMU group is 0 and there are too man=
+y devices within this group (cannot work).
+
+Using Linux kernel 5.5.1 encountered some problem.
+
+Linux command: sudo ./windows10vm.sh
+
+Output:
+
+qemu-system-x86_64: -balloon none: warning: This option is deprecated. Use =
+'--device virtio-balloon' to enable the balloon device.
+qemu-system-x86_64: -device vfio-pci,host=3D01:00.0,multifunction=3Don: vfi=
+o error: 0000:01:00.0: failed to open /dev/vfio/7: No such file or director=
+y
+
+Any changes in /etc/modprobe.d require you to update the initramfs. Enter a=
+t the command line:
+
+Linux command: sudo update-initramfs -u
+
+Linux command: sudo reboot
+
+Linux command: sudo update-grub
+
+Linux command: sudo reboot
+
+Linux kernel 5.5.1 is still having some issues with loading vfio-pci kernel=
+ module.
+
+Falling back to Linux kernel 5.3.0.
+
+Checked. Linux kernel 5.3.0 has no issues. Use Linux kernel 5.3.0 all the w=
+ay.
+
+However, Windows 10 virtual machine still giving me BSOD with IRQL NOT LESS=
+ OR EQUAL Stop Code.
+
+2 Feb 2020 Sunday 5 PM Singapore Time: I am very lost. I don't know what to=
+ do next. Some experts please help.
+
+Thank you very much.
+
+
+
 
 
 
