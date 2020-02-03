@@ -2,98 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2953F150403
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 11:16:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D59E1504D7
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 12:04:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727812AbgBCKP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 05:15:56 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:40270 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727389AbgBCKP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 05:15:56 -0500
-Received: from 189-68-179-241.dsl.telesp.net.br ([189.68.179.241] helo=calabresa)
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <cascardo@canonical.com>)
-        id 1iyYlF-0006lq-8V; Mon, 03 Feb 2020 10:15:21 +0000
-Date:   Mon, 3 Feb 2020 07:15:14 -0300
-From:   Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] x86/kvm: do not setup pv tlb flush when not
- paravirtualized
-Message-ID: <20200203101514.GG40679@calabresa>
-References: <20200131155655.49812-1-cascardo@canonical.com>
- <87wo94ng9d.fsf@vitty.brq.redhat.com>
+        id S1727494AbgBCLEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 06:04:23 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35227 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726369AbgBCLEX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 3 Feb 2020 06:04:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580727861;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lNIpyKIbuYkhKH52mLKQud1I8hBk+d/n2+bRNdOYVrE=;
+        b=Q1ApFLu9MZqj9g1qGl1D7FncUtH8C+3AxcKHVlBfc//tOxL05kTwyY67D0Aj6dRGAWmG/0
+        LcSFulWzv05l4bdG5NFE6HMejQ7649VmVHG0hcRrellrDVJ6NYdFBFglLYoDWwu5auyeKH
+        T2kMNkjFkkDv68vHSoSbfCz0yOUedUk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-2FZG1MiKOJOzvG_8PecjDA-1; Mon, 03 Feb 2020 06:04:20 -0500
+X-MC-Unique: 2FZG1MiKOJOzvG_8PecjDA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB8CE107ACC4;
+        Mon,  3 Feb 2020 11:04:18 +0000 (UTC)
+Received: from gondolin (ovpn-117-79.ams2.redhat.com [10.36.117.79])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DFFEC8642F;
+        Mon,  3 Feb 2020 11:04:14 +0000 (UTC)
+Date:   Mon, 3 Feb 2020 12:04:12 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org, david@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v5 1/7] s390x: smp: Cleanup smp.c
+Message-ID: <20200203120412.7ae7bb60.cohuck@redhat.com>
+In-Reply-To: <20200201152851.82867-2-frankja@linux.ibm.com>
+References: <20200201152851.82867-1-frankja@linux.ibm.com>
+        <20200201152851.82867-2-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wo94ng9d.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 03, 2020 at 10:59:10AM +0100, Vitaly Kuznetsov wrote:
-> Thadeu Lima de Souza Cascardo <cascardo@canonical.com> writes:
-> 
-> > kvm_setup_pv_tlb_flush will waste memory and print a misguiding message
-> > when KVM paravirtualization is not available.
-> >
-> > Intel SDM says that the when cpuid is used with EAX higher than the
-> > maximum supported value for basic of extended function, the data for the
-> > highest supported basic function will be returned.
-> >
-> > So, in some systems, kvm_arch_para_features will return bogus data,
-> > causing kvm_setup_pv_tlb_flush to detect support for pv tlb flush.
-> >
-> > Testing for kvm_para_available will work as it checks for the hypervisor
-> > signature.
-> >
-> > Besides, when the "nopv" command line parameter is used, it should not
-> > continue as well, as kvm_guest_init will no be called in that case.
-> >
-> > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-> > ---
-> >  arch/x86/kernel/kvm.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> > index 81045aabb6f4..d817f255aed8 100644
-> > --- a/arch/x86/kernel/kvm.c
-> > +++ b/arch/x86/kernel/kvm.c
-> > @@ -736,6 +736,9 @@ static __init int kvm_setup_pv_tlb_flush(void)
-> >  {
-> >  	int cpu;
-> >  
-> > +	if (!kvm_para_available() || nopv)
-> > +		return 0;
-> > +
-> >  	if (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
-> >  	    !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
-> >  	    kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
-> 
-> The patch will fix the immediate issue, but why kvm_setup_pv_tlb_flush()
-> is just an arch_initcall() which will be executed regardless of the fact
-> if we are running on KVM or not?
-> 
-> In Hyper-V we setup PV TLB flush from ms_hyperv_init_platform() -- which
-> only happens if Hyper-V platform was detected. Why don't we do it from
-> kvm_init_platform() in KVM?
-> 
-> -- 
-> Vitaly
-> 
+On Sat,  1 Feb 2020 10:28:45 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Because we can't call the allocator that early.
+> Let's remove a lot of badly formatted code by introducing the
+> wait_for_flag() and set_flag functions.
+> 
+> Also let's remove some stray spaces and always set the tesflag before
 
-Also, see the thread where this was "decided", the v6 of the original patch:
+s/tesflag/testflag/
 
-https://lore.kernel.org/kvm/20171129162118.GA10661@flask/
+> using it.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> ---
+>  s390x/smp.c | 55 ++++++++++++++++++++++++++++++++---------------------
+>  1 file changed, 33 insertions(+), 22 deletions(-)
 
-Regards.
-Cascardo.
