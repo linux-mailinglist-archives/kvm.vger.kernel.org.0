@@ -2,299 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C180F14FD7F
-	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2020 15:21:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6717D1500BD
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 04:29:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726878AbgBBOVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Feb 2020 09:21:47 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:36202 "EHLO huawei.com"
+        id S1727242AbgBCD30 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 2 Feb 2020 22:29:26 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2936 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726541AbgBBOVr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Feb 2020 09:21:47 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 3A9D16CAF9288BA7580E;
-        Sun,  2 Feb 2020 22:21:38 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Sun, 2 Feb 2020
- 22:21:32 +0800
-Subject: Re: [PATCH v22 4/9] ACPI: Build Hardware Error Source Table
-To:     Igor Mammedov <imammedo@redhat.com>
-CC:     <pbonzini@redhat.com>, <mst@redhat.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <fam@euphon.net>, <rth@twiddle.net>, <ehabkost@redhat.com>,
-        <mtosatti@redhat.com>, <xuwei5@huawei.com>,
-        <jonathan.cameron@huawei.com>, <james.morse@arm.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-        <qemu-arm@nongnu.org>, <zhengxiang9@huawei.com>,
-        <linuxarm@huawei.com>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-5-git-send-email-gengdongjiu@huawei.com>
- <20200123164808.38af0491@redhat.com>
-From:   gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <dae91013-043c-26fc-e77c-77be2d1186a1@huawei.com>
-Date:   Sun, 2 Feb 2020 22:21:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+        id S1727034AbgBCD30 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Feb 2020 22:29:26 -0500
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.53])
+        by Forcepoint Email with ESMTP id C98D5E13684D1791D165;
+        Mon,  3 Feb 2020 11:29:20 +0800 (CST)
+Received: from dggeme715-chm.china.huawei.com (10.1.199.111) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 3 Feb 2020 11:29:20 +0800
+Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
+ dggeme715-chm.china.huawei.com (10.1.199.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Mon, 3 Feb 2020 11:29:20 +0800
+Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
+ dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
+ Mon, 3 Feb 2020 11:29:20 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+CC:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH] KVM: nVMX: set rflags to specify success in
+ handle_invvpid() default case
+Thread-Topic: [PATCH] KVM: nVMX: set rflags to specify success in
+ handle_invvpid() default case
+Thread-Index: AdXaOs5msQGrd2JlS/qT+AceqW9QkQ==
+Date:   Mon, 3 Feb 2020 03:29:19 +0000
+Message-ID: <668e0827d62c489cbf52b7bc5d27ba9b@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.221.158]
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <20200123164808.38af0491@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
 X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020/1/23 23:48, Igor Mammedov wrote:
-> On Wed, 8 Jan 2020 19:32:18 +0800
-> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> 
->> This patch builds Hardware Error Source Table(HEST) via fw_cfg blobs.
->> Now it only supports ARMv8 SEA, a type of Generic Hardware Error
->> Source version 2(GHESv2) error source. Afterwards, we can extend
->> the supported types if needed. For the CPER section, currently it
->> is memory section because kernel mainly wants userspace to handle
->> the memory errors.
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>> On Thu, Jan 23, 2020 at 10:22:24AM -0800, Jim Mattson wrote:
+>>> On Thu, Jan 23, 2020 at 1:54 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>> >
+>>> > On 23/01/20 10:45, Vitaly Kuznetsov wrote:
+>>> > >>> SDM says that "If an
+>>> > >>> unsupported INVVPID type is specified, the instruction fails." 
+>>> > >>> and this is similar to INVEPT and I decided to check what 
+>>> > >>> handle_invept() does. Well, it does BUG_ON().
+>>> > >>>
+>>> > >>> Are we doing the right thing in any of these cases?
+>>> > >>
+>>> > >> Yes, both INVEPT and INVVPID catch this earlier.
+>>> > >>
+>>> > >> So I'm leaning towards not applying Miaohe's patch.
+>>> > >
+>>> > > Well, we may at least want to converge on BUG_ON() for both 
+>>> > > handle_invvpid()/handle_invept(), there's no need for them to differ.
+>>> >
+>>> > WARN_ON_ONCE + nested_vmx_failValid would probably be better, if we 
+>>> > really want to change this.
+>>> >
+>>> > Paolo
+>>> 
+>>> In both cases, something is seriously wrong. The only plausible 
+>>> explanations are compiler error or hardware failure. It would be nice 
+>>> to handle *all* such failures with a KVM_INTERNAL_ERROR exit to 
+>>> userspace. (I'm also thinking of situations like getting a VM-exit 
+>> for
+>>>> INIT.)
 >>
->> This patch follows the spec ACPI 6.2 to build the Hardware Error
->> Source table. For more detailed information, please refer to
->> document: docs/specs/acpi_hest_ghes.rst
->>
->> build_append_ghes_notify() will help to add Hardware Error Notification
->> to ACPI tables without using packed C structures and avoid endianness
->> issues as API doesn't need explicit conversion.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->> Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
-> 
-> 
-> Overall it looks fine to me, see couple nits below
-> 
-> 
->> ---
->>  hw/acpi/ghes.c           | 118 ++++++++++++++++++++++++++++++++++++++++++++++-
->>  hw/arm/virt-acpi-build.c |   2 +
->>  include/hw/acpi/ghes.h   |  40 ++++++++++++++++
->>  3 files changed, 159 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
->> index b7fdbbb..9d37798 100644
->> --- a/hw/acpi/ghes.c
->> +++ b/hw/acpi/ghes.c
->> @@ -34,9 +34,42 @@
->>  
->>  /* The max size in bytes for one error block */
->>  #define ACPI_GHES_MAX_RAW_DATA_LENGTH       0x400
->> -
->>  /* Now only support ARMv8 SEA notification type error source */
->>  #define ACPI_GHES_ERROR_SOURCE_COUNT        1
->> +/* Generic Hardware Error Source version 2 */
->> +#define ACPI_GHES_SOURCE_GENERIC_ERROR_V2   10
->> +/* Address offset in Generic Address Structure(GAS) */
->> +#define GAS_ADDR_OFFSET 4
->> +
->> +/*
->> + * Hardware Error Notification
->> + * ACPI 4.0: 17.3.2.7 Hardware Error Notification
->> + * Composes dummy Hardware Error Notification descriptor of specified type
->> + */
->> +static void build_ghes_hw_error_notification(GArray *table, const uint8_t type)
->> +{
->> +    /* Type */
->> +    build_append_int_noprefix(table, type, 1);
->> +    /*
->> +     * Length:
->> +     * Total length of the structure in bytes
->> +     */
->> +    build_append_int_noprefix(table, 28, 1);
->> +    /* Configuration Write Enable */
->> +    build_append_int_noprefix(table, 0, 2);
->> +    /* Poll Interval */
->> +    build_append_int_noprefix(table, 0, 4);
->> +    /* Vector */
->> +    build_append_int_noprefix(table, 0, 4);
->> +    /* Switch To Polling Threshold Value */
->> +    build_append_int_noprefix(table, 0, 4);
->> +    /* Switch To Polling Threshold Window */
->> +    build_append_int_noprefix(table, 0, 4);
->> +    /* Error Threshold Value */
->> +    build_append_int_noprefix(table, 0, 4);
->> +    /* Error Threshold Window */
->> +    build_append_int_noprefix(table, 0, 4);
->> +}
->>  
->>  /*
->>   * Build table for the hardware error fw_cfg blob.
->> @@ -92,3 +125,86 @@ void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker)
->>      bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_FILE,
->>          0, sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
->>  }
->> +
->> +/* Build Generic Hardware Error Source version 2 (GHESv2) */
->> +static void build_ghes_v2(GArray *table_data, int source_id, BIOSLinker *linker)
->> +{
->> +    uint64_t address_offset;
->> +    /*
->> +     * Type:
->> +     * Generic Hardware Error Source version 2(GHESv2 - Type 10)
->> +     */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_SOURCE_GENERIC_ERROR_V2, 2);
->> +    /* Source Id */
->> +    build_append_int_noprefix(table_data, source_id, 2);
->> +    /* Related Source Id */
->> +    build_append_int_noprefix(table_data, 0xffff, 2);
->> +    /* Flags */
->> +    build_append_int_noprefix(table_data, 0, 1);
->> +    /* Enabled */
->> +    build_append_int_noprefix(table_data, 1, 1);
->> +
->> +    /* Number of Records To Pre-allocate */
->> +    build_append_int_noprefix(table_data, 1, 4);
->> +    /* Max Sections Per Record */
->> +    build_append_int_noprefix(table_data, 1, 4);
->> +    /* Max Raw Data Length */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
->> +
->> +    address_offset = table_data->len;
->> +    /* Error Status Address */
->> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
->> +                     4 /* QWord access */, 0);
->> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->> +        address_offset + GAS_ADDR_OFFSET,
->> +        sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
->> +
->> +    /*
->> +     * Notification Structure
->> +     * Now only enable ARMv8 SEA notification type
->> +     */
->> +    build_ghes_hw_error_notification(table_data, ACPI_GHES_NOTIFY_SEA);
->> +
->> +    /* Error Status Block Length */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
->> +
->> +    /*
->> +     * Read Ack Register
->> +     * ACPI 6.1: 18.3.2.8 Generic Hardware Error Source
->> +     * version 2 (GHESv2 - Type 10)
->> +     */
->> +    address_offset = table_data->len;
->> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
->> +                     4 /* QWord access */, 0);
->> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->> +        address_offset + GAS_ADDR_OFFSET,
->> +        sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
->> +        ACPI_GHES_ERROR_SOURCE_COUNT * sizeof(uint64_t));
->> +
->> +    /*
->> +     * Read Ack Preserve
->> +     * We only provide the first bit in Read Ack Register to OSPM to write
->> +     * while the other bits are preserved.
->> +     */
->> +    build_append_int_noprefix(table_data, ~0x1ULL, 8);
->> +    /* Read Ack Write */
->> +    build_append_int_noprefix(table_data, 0x1, 8);
->> +}
->> +
->> +/* Build Hardware Error Source Table */
->> +void acpi_build_hest(GArray *table_data, GArray *hardware_errors,
->                                              ^^^^^^^^ it seems to be unused, so why it's here?
-Thanks, I will remove this parameter.
-
-> 
->> +                          BIOSLinker *linker)
->> +{
->> +    uint64_t hest_start = table_data->len;
->> +
->> +    /* Hardware Error Source Table header*/
->> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
->> +
->> +    /* Error Source Count */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_ERROR_SOURCE_COUNT, 4);
->> +
->> +    build_ghes_v2(table_data, ACPI_HEST_SRC_ID_SEA, linker);
->> +
->> +    build_header(linker, table_data, (void *)(table_data->data + hest_start),
->> +        "HEST", table_data->len - hest_start, 1, NULL, "");
->> +}
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index 6819fcf..837bbf9 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -834,6 +834,8 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>      if (vms->ras) {
->>          acpi_add_table(table_offsets, tables_blob);
->>          build_ghes_error_table(tables->hardwarerrors, tables->linker);
->> +        acpi_build_hest(tables_blob, tables->hardware_errors,
->> +                             tables->linker);
-> 
-> not aligned properly
-> 
-> you can use ./scripts/checkpatch.pl to see if there is style errors 
-
-It will not report style errors for this alignment, anyway I will do alignment to it.
-
-> 
-> 
->>      }
->>  
->>      if (ms->numa_state->num_nodes > 0) {
->> diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
->> index 3dbda3f..09a7f86 100644
->> --- a/include/hw/acpi/ghes.h
->> +++ b/include/hw/acpi/ghes.h
->> @@ -22,5 +22,45 @@
->>  #ifndef ACPI_GHES_H
->>  #define ACPI_GHES_H
->>  
->> +/*
->> + * Values for Hardware Error Notification Type field
->> + */
->> +enum AcpiGhesNotifyType {
->> +    /* Polled */
->> +    ACPI_GHES_NOTIFY_POLLED = 0,
->> +    /* External Interrupt */
->> +    ACPI_GHES_NOTIFY_EXTERNAL = 1,
->> +    /* Local Interrupt */
->> +    ACPI_GHES_NOTIFY_LOCAL = 2,
->> +    /* SCI */
->> +    ACPI_GHES_NOTIFY_SCI = 3,
->> +    /* NMI */
->> +    ACPI_GHES_NOTIFY_NMI = 4,
->> +    /* CMCI, ACPI 5.0: 18.3.2.7, Table 18-290 */
->> +    ACPI_GHES_NOTIFY_CMCI = 5,
->> +    /* MCE, ACPI 5.0: 18.3.2.7, Table 18-290 */
->> +    ACPI_GHES_NOTIFY_MCE = 6,
->> +    /* GPIO-Signal, ACPI 6.0: 18.3.2.7, Table 18-332 */
->> +    ACPI_GHES_NOTIFY_GPIO = 7,
->> +    /* ARMv8 SEA, ACPI 6.1: 18.3.2.9, Table 18-345 */
->> +    ACPI_GHES_NOTIFY_SEA = 8,
->> +    /* ARMv8 SEI, ACPI 6.1: 18.3.2.9, Table 18-345 */
->> +    ACPI_GHES_NOTIFY_SEI = 9,
->> +    /* External Interrupt - GSIV, ACPI 6.1: 18.3.2.9, Table 18-345 */
->> +    ACPI_GHES_NOTIFY_GSIV = 10,
->> +    /* Software Delegated Exception, ACPI 6.2: 18.3.2.9, Table 18-383 */
->> +    ACPI_GHES_NOTIFY_SDEI = 11,
->> +    /* 12 and greater are reserved */
->> +    ACPI_GHES_NOTIFY_RESERVED = 12
->> +};
->> +
->> +enum {
->> +    ACPI_HEST_SRC_ID_SEA = 0,
->> +    /* future ids go here */
->> +    ACPI_HEST_SRC_ID_RESERVED,
->> +};
->> +
->>  void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
->> +void acpi_build_hest(GArray *table_data, GArray *hardware_error,
->> +                          BIOSLinker *linker);
->>  #endif
-> 
-> .
-> 
-
+>> Ya.  Vitaly and I had a similar discussion[*].  The idea we tossed 
+>> around was to also mark the VM as having encountered a KVM/hardware 
+>> bug so that the VM is effectively dead.  That would also allow 
+>> gracefully handling bugs that are detected deep in the stack, i.e. 
+>> can't simply return 0 to get out to userspace.
+>
+>Yea, I was thinking about introducing a big hammer which would stop the whole VM as soon as possible to make it easier to debug such situations. Something like (not really tested):
+>
+Yea, please just ignore my origin patch and do what you want. :)
+I'm sorry for reply in such a big day. I'am just backing from a really hard festival. :(
