@@ -2,76 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 75B66150FFC
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 19:52:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 388C115101E
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 20:06:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729013AbgBCSw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 13:52:29 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41636 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727067AbgBCSw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 13:52:29 -0500
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727174AbgBCTGD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 14:06:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56438 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727073AbgBCTGC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 14:06:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580756761;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=p7GzZwqEUML3mo66Uh/XzQGGzjDISA4pAfoeedkyHHQ=;
+        b=Nvoa8ZPbns+rXcjMtKghbwVY6jkXVlsSwPFqhggnCqj2LB1eh+Ds/wVSMc9hU5vLA4HKC7
+        WlPXzJ63wKIdspDU3ZqdKlRZnRR25xHgXxAjeIn9qXiQJ0sd5Q+jmYoqsSocgChCg1cxFi
+        008AxJZBOfZkISB0J4NxQ+SMAZCWlZY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-144-bAkKNTLFPeqpSPYm6W-vCA-1; Mon, 03 Feb 2020 13:59:54 -0500
+X-MC-Unique: bAkKNTLFPeqpSPYm6W-vCA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 094AA20838
-        for <kvm@vger.kernel.org>; Mon,  3 Feb 2020 18:52:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1580755948;
-        bh=pARSwgYkMBJyABhyHmnGARQ80UDtRTlxYaKZnCi/W8w=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=X23f4DKcw/VO8i9LnkovXZU0Hoik5aH13r4f0uUQ5cMQWZ/Ok1NJ7rTfqQI6wdaU2
-         ogIHhGOYhpMO3OFRKI1LtOsgYO7ogGe+8nyy3OfdspBZbcTe+jwfDj7FlrOh5rLEud
-         I9dbBmi4OyAe7O+RPOWFpTkTXNe7Aq6fjnCNBq3w=
-Received: by mail-wr1-f48.google.com with SMTP id y17so19680799wrh.5
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 10:52:27 -0800 (PST)
-X-Gm-Message-State: APjAAAVwStUvvlKpSRWpXA8ZD2LnnAONgKg+A2/ijuR7N9qq50k8r5gA
-        SAAyAnNlniCjVbnyBJelOY8/Teb/40zZ4uuQISkMvw==
-X-Google-Smtp-Source: APXvYqydAzYMpo7YlxsrmraMrL4WuCg4APe95PSY1AMc0UTpplvcfcM2vuUTrptlnD2VD/DLpbyclMaFWyipZ/AYPps=
-X-Received: by 2002:a5d:4cc9:: with SMTP id c9mr16813882wrt.70.1580755946612;
- Mon, 03 Feb 2020 10:52:26 -0800 (PST)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B621DB20;
+        Mon,  3 Feb 2020 18:59:53 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F3B12811F8;
+        Mon,  3 Feb 2020 18:59:51 +0000 (UTC)
+Date:   Mon, 3 Feb 2020 19:59:49 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        andre.przywara@arm.com, vladimir.murzin@arm.com,
+        mark.rutland@arm.com
+Subject: Re: [kvm-unit-tests PATCH v4 00/10] arm/arm64: Various fixes
+Message-ID: <20200203185949.btxvofvgj6brxmzi@kamzik.brq.redhat.com>
+References: <20200131163728.5228-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-References: <20200203151608.28053-1-xiaoyao.li@intel.com> <20200203151608.28053-7-xiaoyao.li@intel.com>
-In-Reply-To: <20200203151608.28053-7-xiaoyao.li@intel.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Mon, 3 Feb 2020 10:52:15 -0800
-X-Gmail-Original-Message-ID: <CALCETrVuWY4G9-h+m9XAZDscaRrtaZ-j-F_y3qHfENvMkr1g5Q@mail.gmail.com>
-Message-ID: <CALCETrVuWY4G9-h+m9XAZDscaRrtaZ-j-F_y3qHfENvMkr1g5Q@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] x86: vmx: virtualize split lock detection
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Laight <David.Laight@aculab.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200131163728.5228-1-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 3, 2020 at 7:21 AM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+On Fri, Jan 31, 2020 at 04:37:18PM +0000, Alexandru Elisei wrote:
+> These are the patches that were left unmerged from the previous version of
+> the series, plus a few new patches. Patch #1 "Makefile: Use
+> no-stack-protector compiler options" is straightforward and came about
+> because of a compile error I experienced on RockPro64.
+> 
+> Patches #3 and #5 are the result of Andre's comments on the previous
+> version. When adding ISBs after register writes I noticed in the ARM ARM
+> that a read of the timer counter value can be reordered, and patch #4
+> tries to avoid that.
+> 
+> Patch #7 is also the result of a review comment. For the GIC tests, we wait
+> up to 5 seconds for the interrupt to be asserted. However, the GIC tests
+> can use more than one CPU, which is not the case with the timer test. And
+> waiting for the GIC to assert the interrupt can happen up to 6 times (8
+> times after patch #9), so I figured that a timeout of 10 seconds for the
+> test is acceptable.
+> 
+> Patch #8 tries to improve the way we test how the timer generates the
+> interrupt. If the GIC asserts the timer interrupt, but the device itself is
+> not generating it, that's a pretty big problem.
+> 
+> Ran the same tests as before:
+> 
+> - with kvmtool, on an arm64 host kernel: 64 and 32 bit tests, with GICv3
+>   (on an Ampere eMAG) and GICv2 (on a AMD Seattle box).
+> 
+> - with qemu, on an arm64 host kernel:
+>     a. with accel=kvm, 64 and 32 bit tests, with GICv3 (Ampere eMAG) and
+>        GICv2 (Seattle).
+>     b. with accel=tcg, 64 and 32 bit tests, on the Ampere eMAG machine.
+> 
+> Changes:
+> * Patches #1, #3, #4, #5, #7, #8 are new.
+> * For patch #2, as per Drew's suggestion, I changed the entry point to halt
+>   because the test is supposed to test if CPU_ON is successful.
+> * Removed the ISB from patch #6 because that was fixed by #3.
+> * Moved the architecture dependent function init_dcache_line_size to
+>   cpu_init in lib/arm/setup.c as per Drew's suggestion.
+> 
+> Alexandru Elisei (10):
+>   Makefile: Use no-stack-protector compiler options
+>   arm/arm64: psci: Don't run C code without stack or vectors
+>   arm64: timer: Add ISB after register writes
+>   arm64: timer: Add ISB before reading the counter value
+>   arm64: timer: Make irq_received volatile
+>   arm64: timer: EOIR the interrupt after masking the timer
+>   arm64: timer: Wait for the GIC to sample timer interrupt state
+>   arm64: timer: Check the timer interrupt state
+>   arm64: timer: Test behavior when timer disabled or masked
+>   arm/arm64: Perform dcache clean + invalidate after turning MMU off
+> 
+>  Makefile                  |  4 +-
+>  lib/arm/asm/processor.h   | 13 +++++++
+>  lib/arm64/asm/processor.h | 12 ++++++
+>  lib/arm/setup.c           |  8 ++++
+>  arm/cstart.S              | 22 +++++++++++
+>  arm/cstart64.S            | 23 ++++++++++++
+>  arm/psci.c                | 15 ++++++--
+>  arm/timer.c               | 79 ++++++++++++++++++++++++++++++++-------
+>  arm/unittests.cfg         |  2 +-
+>  9 files changed, 158 insertions(+), 20 deletions(-)
+> 
+> -- 
+> 2.20.1
 >
-> Due to the fact that MSR_TEST_CTRL is per-core scope, i.e., the sibling
-> threads in the same physical CPU core share the same MSR, only
-> advertising feature split lock detection to guest when SMT is disabled
-> or unsupported for simplicitly.
->
-> Only when host is sld_off, can guest control the hardware value of
-> MSR_TEST_CTL, i.e., KVM loads guest's value into hardware when vcpu is
-> running.
->
-> The vmx->disable_split_lock_detect can be set to true after unhandled
-> split_lock #AC in guest only when host is sld_warn mode. It's for not
-> burnning old guest, of course malicous guest can exploit it for DoS
-> attack.
 
-Is this actually worthwhile?  This only applies to the host having
-sld=off or warn and the host having HT off.  I suspect that
-deployments supporting migration will not want to use this, and
-multi-tenant deployments won't want to use it for SLD-aware guests doe
-to DoS risk.
+The series looks good to me. The first patch probably could have been
+posted separately, but I'll try to test the whole series tomorrow. If
+all looks well, I'll prepare a pull request for Paolo.
 
---Andy
+Thanks,
+drew 
+
