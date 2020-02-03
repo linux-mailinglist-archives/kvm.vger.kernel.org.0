@@ -2,101 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EDC915129E
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 00:00:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 844251512B2
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 00:09:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726913AbgBCXA1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 18:00:27 -0500
-Received: from mga18.intel.com ([134.134.136.126]:3227 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726474AbgBCXA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 18:00:27 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Feb 2020 15:00:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,398,1574150400"; 
-   d="scan'208";a="231177450"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga003.jf.intel.com with ESMTP; 03 Feb 2020 15:00:26 -0800
-Date:   Mon, 3 Feb 2020 15:00:26 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v2 2/5] KVM: nVMX: Handle pending #DB when injecting INIT
- VM-exit
-Message-ID: <20200203230026.GA27485@linux.intel.com>
-References: <20200128092715.69429-1-oupton@google.com>
- <20200128092715.69429-3-oupton@google.com>
- <20200203191330.GB19638@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200203191330.GB19638@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1726853AbgBCXJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 18:09:16 -0500
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:47486 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726369AbgBCXJQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 18:09:16 -0500
+Received: by mail-pg1-f202.google.com with SMTP id l15so10365756pgk.14
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 15:09:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=XnYm5qWPfb13s0wRqn1mpnrTwR4nnQJCgFQ13dO6/nI=;
+        b=f+ltTeOsJAty6dDVNXR6x/fkgqbS34nwR1S7fb/S8MIWpfYYBm2fIZFz3goe8MISee
+         vZNyGnXM0oagrrqp6Fg4kXeLKM5vejK8Dc++ZDSPRw3zcAuP/EWeQo162pVO6i3YCBPB
+         IJVaGCVG899JjEbedJ4bTkVCvbsaALE7QpXtogmZOM9bqAKXcq9Wfb4RxnmSX2axlB3J
+         tS5jEbcaL83lUi3DDOfWKbBZks/EzKOh7y5k/ZSW/MGgfvYnGquJBrtRfqN8XTs960K+
+         3OLgUJSt7opqlAM9aSC0EC/2GQOtIEfpqcGXIo5fKkbt6L5Nowyj/GFJbQltCI7whG94
+         A07A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=XnYm5qWPfb13s0wRqn1mpnrTwR4nnQJCgFQ13dO6/nI=;
+        b=FLI5mYpkVUXLOOC5aC7svPtJM0jWNIwKi1eSEyUtwA4QybW5o0iTZXAPkeZpRlkM8v
+         5nRq56rxnRS8naU9YXTWUffB8KIJOI8m726Z0oIaFJuz9PA0DtgRT9xhmsIMTKOHpZL0
+         AsDfU6jyF52wgfbb8ytI8gNbl42dU9o5X+Kro9YCiTz8pqhZWfPXLD7a0xmyHMJRF6Z5
+         /wz/VgmEwfT5tAZ3lguD0o0MKO4ic2iUlk4QLcuC0BECGtwi2xYfOeWDv+gGngA/fpho
+         KhT7E7+O4ZwHSomN9FkcVyaoP+JybnygeYbZCfTtcPs3RAY9ouw0rGsFWXfgyUpTqeEI
+         8BHw==
+X-Gm-Message-State: APjAAAUGx+nY4JWwphjeZQ5tPvYHSsWIv84mIeXJxNSEkRVM7JMG67Ol
+        20OR9gm3BMkdt30CeqpWgdz815M3j4Dx
+X-Google-Smtp-Source: APXvYqwIpUOKIGZE6NcawbIowukoMFpqRz5bIJROxtcwVDgJozQwJ0dNygWwt5RTsmOYDdDiweDP4j8XLV/K
+X-Received: by 2002:a63:3c2:: with SMTP id 185mr11545877pgd.72.1580771355857;
+ Mon, 03 Feb 2020 15:09:15 -0800 (PST)
+Date:   Mon,  3 Feb 2020 15:09:09 -0800
+Message-Id: <20200203230911.39755-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+Subject: [PATCH 1/3] kvm: mmu: Replace unsigned with unsigned int for PTE access
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 03, 2020 at 11:13:30AM -0800, Sean Christopherson wrote:
-> On Tue, Jan 28, 2020 at 01:27:12AM -0800, Oliver Upton wrote:
-> > SDM 27.3.4 states that the 'pending debug exceptions' VMCS field will
-> > be populated if a VM-exit caused by an INIT signal takes priority over a
-> > debug-trap. Emulate this behavior when synthesizing an INIT signal
-> > VM-exit into L1.
-> > 
-> > Fixes: 558b8d50dbff ("KVM: x86: Fix INIT signal handling in various CPU states")
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 23 +++++++++++++++++++++++
-> >  1 file changed, 23 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 95b3f4306ac2..aba16599ca69 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -3572,6 +3572,27 @@ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
-> >  	nested_vmx_vmexit(vcpu, EXIT_REASON_EXCEPTION_NMI, intr_info, exit_qual);
-> >  }
-> >  
-> > +static inline bool nested_vmx_check_pending_dbg(struct kvm_vcpu *vcpu)
-> 
-> Really dislike the name, partially because the code checks @has_payload and
-> partially because the part, nested_vmx_set_pending_dbg() "sets" completely
-> different state than this checks.
-> 
-> Checking has_payload may also be wrong, e.g. wouldn't it make sense to
-> update GUEST_PENDING_DBG_EXCEPTIONS, even if we crush it with '0'?
-> 
-> > +{
-> > +	return vcpu->arch.exception.nr == DB_VECTOR &&
-> > +			vcpu->arch.exception.pending &&
-> > +			vcpu->arch.exception.has_payload;
-> > +}
-> > +
-> > +/*
-> > + * If a higher priority VM-exit is delivered before a debug-trap, hardware will
-> > + * set the 'pending debug exceptions' field appropriately for reinjection on the
-> > + * next VM-entry.
-> > + */
-> > +static void nested_vmx_set_pending_dbg(struct kvm_vcpu *vcpu)
-> > +{
-> > +	vmcs_writel(GUEST_PENDING_DBG_EXCEPTIONS, vcpu->arch.exception.payload);
-> > +	vcpu->arch.exception.has_payload = false;
-> > +	vcpu->arch.exception.payload = 0;
-> > +	vcpu->arch.exception.pending = false;
-> > +	vcpu->arch.exception.injected = true;
-> 
-> This looks wrong.  The #DB hasn't been injected, KVM is simply emulating
-> the side effect of the VMCS field being updated.  E.g. KVM will have
-> different architecturally visible behavior depending on @has_payload.
+There are several functions which pass an access permission mask for
+SPTEs as an unsigned. This works, but checkpatch complains about it.
+Switch the occurrences of unsigned to unsigned int to satisfy checkpatch.
 
-My head is spinning trying to work through the #DB/MTF interactions.  I
-think this ends up being a moot point because prepare_vmcs12() will purge
-the pending exceptions.  If it is a moot point, then I'd prefer to not do
-the explicit arch.exception updates so as to keep this similar to other
-exceptions.
+No functional change expected.
+
+Tested by running kvm-unit-tests on an Intel Haswell machine. This
+commit introduced no new failures.
+
+This commit can be viewed in Gerrit at:
+	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2358
+
+Signed-off-by: Ben Gardon <bgardon@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 84eeb61d06aa3..a9c593dec49bf 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -452,7 +452,7 @@ static u64 get_mmio_spte_generation(u64 spte)
+ }
+ 
+ static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
+-			   unsigned access)
++			   unsigned int access)
+ {
+ 	u64 gen = kvm_vcpu_memslots(vcpu)->generation & MMIO_SPTE_GEN_MASK;
+ 	u64 mask = generation_mmio_spte_mask(gen);
+@@ -484,7 +484,7 @@ static unsigned get_mmio_spte_access(u64 spte)
+ }
+ 
+ static bool set_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
+-			  kvm_pfn_t pfn, unsigned access)
++			  kvm_pfn_t pfn, unsigned int access)
+ {
+ 	if (unlikely(is_noslot_pfn(pfn))) {
+ 		mark_mmio_spte(vcpu, sptep, gfn, access);
+@@ -2475,7 +2475,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 					     gva_t gaddr,
+ 					     unsigned level,
+ 					     int direct,
+-					     unsigned access)
++					     unsigned int access)
+ {
+ 	union kvm_mmu_page_role role;
+ 	unsigned quadrant;
+@@ -2990,7 +2990,7 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
+ #define SET_SPTE_NEED_REMOTE_TLB_FLUSH	BIT(1)
+ 
+ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+-		    unsigned pte_access, int level,
++		    unsigned int pte_access, int level,
+ 		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
+ 		    bool can_unsync, bool host_writable)
+ {
+@@ -3081,9 +3081,10 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 	return ret;
+ }
+ 
+-static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep, unsigned pte_access,
+-			int write_fault, int level, gfn_t gfn, kvm_pfn_t pfn,
+-		       	bool speculative, bool host_writable)
++static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
++			unsigned int pte_access, int write_fault, int level,
++			gfn_t gfn, kvm_pfn_t pfn, bool speculative,
++			bool host_writable)
+ {
+ 	int was_rmapped = 0;
+ 	int rmap_count;
+@@ -3165,7 +3166,7 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
+ {
+ 	struct page *pages[PTE_PREFETCH_NUM];
+ 	struct kvm_memory_slot *slot;
+-	unsigned access = sp->role.access;
++	unsigned int access = sp->role.access;
+ 	int i, ret;
+ 	gfn_t gfn;
+ 
+@@ -3400,7 +3401,8 @@ static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+ }
+ 
+ static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, gva_t gva, gfn_t gfn,
+-				kvm_pfn_t pfn, unsigned access, int *ret_val)
++				kvm_pfn_t pfn, unsigned int access,
++				int *ret_val)
+ {
+ 	/* The pfn is invalid, report the error! */
+ 	if (unlikely(is_error_pfn(pfn))) {
+@@ -4005,7 +4007,7 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
+ 
+ 	if (is_mmio_spte(spte)) {
+ 		gfn_t gfn = get_mmio_spte_gfn(spte);
+-		unsigned access = get_mmio_spte_access(spte);
++		unsigned int access = get_mmio_spte_access(spte);
+ 
+ 		if (!check_mmio_spte(vcpu, spte))
+ 			return RET_PF_INVALID;
+@@ -4349,7 +4351,7 @@ static void inject_page_fault(struct kvm_vcpu *vcpu,
+ }
+ 
+ static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
+-			   unsigned access, int *nr_present)
++			   unsigned int access, int *nr_present)
+ {
+ 	if (unlikely(is_mmio_spte(*sptep))) {
+ 		if (gfn != get_mmio_spte_gfn(*sptep)) {
+-- 
+2.25.0.341.g760bfbb309-goog
+
