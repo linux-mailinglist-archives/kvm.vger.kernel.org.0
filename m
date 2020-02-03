@@ -2,102 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6717D1500BD
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 04:29:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F58A15021B
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 08:51:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727242AbgBCD30 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 2 Feb 2020 22:29:26 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2936 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727034AbgBCD30 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Feb 2020 22:29:26 -0500
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id C98D5E13684D1791D165;
-        Mon,  3 Feb 2020 11:29:20 +0800 (CST)
-Received: from dggeme715-chm.china.huawei.com (10.1.199.111) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 3 Feb 2020 11:29:20 +0800
-Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme715-chm.china.huawei.com (10.1.199.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Mon, 3 Feb 2020 11:29:20 +0800
-Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
- dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Mon, 3 Feb 2020 11:29:20 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>
-CC:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH] KVM: nVMX: set rflags to specify success in
- handle_invvpid() default case
-Thread-Topic: [PATCH] KVM: nVMX: set rflags to specify success in
- handle_invvpid() default case
-Thread-Index: AdXaOs5msQGrd2JlS/qT+AceqW9QkQ==
-Date:   Mon, 3 Feb 2020 03:29:19 +0000
-Message-ID: <668e0827d62c489cbf52b7bc5d27ba9b@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.158]
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: 8BIT
+        id S1727489AbgBCHvx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 02:51:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21764 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727339AbgBCHvx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 02:51:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580716312;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=shrxJcLWYa5dcYmO7shA/1HAHpE7/18QYuBpgSLW+Y0=;
+        b=BG+gPlFvXR9u5TTU+6jDQOSSbi+zenA67zz62B4k6BxdS46+2O66XbZosTcEbzW/2GySIR
+        jr0QhKDpvO5cCxD35UijNDAUbctXjoKZZASRQfO+8w5bBVt4qWIYK5qn/QZ41W0+NBIX2v
+        nqa2aoQx0gCmEInvSzDbxBTR9Y5Qu3s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-72-QSFWe5ESNBOfXFi1a38mKw-1; Mon, 03 Feb 2020 02:51:50 -0500
+X-MC-Unique: QSFWe5ESNBOfXFi1a38mKw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86F1D1800D41;
+        Mon,  3 Feb 2020 07:51:48 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DC52960BE2;
+        Mon,  3 Feb 2020 07:51:41 +0000 (UTC)
+Date:   Mon, 3 Feb 2020 08:51:40 +0100
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     gengdongjiu <gengdongjiu@huawei.com>
+Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <fam@euphon.net>, <rth@twiddle.net>, <ehabkost@redhat.com>,
+        <mtosatti@redhat.com>, <xuwei5@huawei.com>,
+        <jonathan.cameron@huawei.com>, <james.morse@arm.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
+        <qemu-arm@nongnu.org>, <zhengxiang9@huawei.com>,
+        <linuxarm@huawei.com>
+Subject: Re: [PATCH v22 5/9] ACPI: Record the Generic Error Status Block
+ address
+Message-ID: <20200203085140.2e7ab793@redhat.com>
+In-Reply-To: <02a78eff-865c-b9e0-6d5f-d4caa4daa98d@huawei.com>
+References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
+        <1578483143-14905-6-git-send-email-gengdongjiu@huawei.com>
+        <20200128154110.04baa5bc@redhat.com>
+        <02a78eff-865c-b9e0-6d5f-d4caa4daa98d@huawei.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->> On Thu, Jan 23, 2020 at 10:22:24AM -0800, Jim Mattson wrote:
->>> On Thu, Jan 23, 2020 at 1:54 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>> >
->>> > On 23/01/20 10:45, Vitaly Kuznetsov wrote:
->>> > >>> SDM says that "If an
->>> > >>> unsupported INVVPID type is specified, the instruction fails." 
->>> > >>> and this is similar to INVEPT and I decided to check what 
->>> > >>> handle_invept() does. Well, it does BUG_ON().
->>> > >>>
->>> > >>> Are we doing the right thing in any of these cases?
->>> > >>
->>> > >> Yes, both INVEPT and INVVPID catch this earlier.
->>> > >>
->>> > >> So I'm leaning towards not applying Miaohe's patch.
->>> > >
->>> > > Well, we may at least want to converge on BUG_ON() for both 
->>> > > handle_invvpid()/handle_invept(), there's no need for them to differ.
->>> >
->>> > WARN_ON_ONCE + nested_vmx_failValid would probably be better, if we 
->>> > really want to change this.
->>> >
->>> > Paolo
->>> 
->>> In both cases, something is seriously wrong. The only plausible 
->>> explanations are compiler error or hardware failure. It would be nice 
->>> to handle *all* such failures with a KVM_INTERNAL_ERROR exit to 
->>> userspace. (I'm also thinking of situations like getting a VM-exit 
->> for
->>>> INIT.)
->>
->> Ya.  Vitaly and I had a similar discussion[*].  The idea we tossed 
->> around was to also mark the VM as having encountered a KVM/hardware 
->> bug so that the VM is effectively dead.  That would also allow 
->> gracefully handling bugs that are detected deep in the stack, i.e. 
->> can't simply return 0 to get out to userspace.
->
->Yea, I was thinking about introducing a big hammer which would stop the whole VM as soon as possible to make it easier to debug such situations. Something like (not really tested):
->
-Yea, please just ignore my origin patch and do what you want. :)
-I'm sorry for reply in such a big day. I'am just backing from a really hard festival. :(
+On Sun, 2 Feb 2020 20:44:35 +0800
+gengdongjiu <gengdongjiu@huawei.com> wrote:
+
+> sorry for the late response due to Chinese new year
+> 
+> On 2020/1/28 22:41, Igor Mammedov wrote:
+> > On Wed, 8 Jan 2020 19:32:19 +0800
+> > Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> > 
+> > in addition to comments of others:
+> >   
+> >> Record the GHEB address via fw_cfg file, when recording
+> >> a error to CPER, it will use this address to find out
+> >> Generic Error Data Entries and write the error.
+> >>
+> >> Make the HEST GHES to a GED device.  
+[...]
+> >> @@ -831,7 +832,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> >>      acpi_add_table(table_offsets, tables_blob);
+> >>      build_spcr(tables_blob, tables->linker, vms);
+> >>  
+> >> -    if (vms->ras) {
+> >> +    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
+> >> +                                                       NULL));
+> >> +    if (acpi_ged_state &&  vms->ras) {  
+> > 
+> > there is vms->acpi_dev which is GED, so you don't need to look it up
+> > 
+> > suggest:  
+>    Thanks for the suggestion.
+> 
+> >  if (ras) {
+> >     assert(ged)  
+>       assert(vms->acpi_dev), right?
+
+yes, something like this.
+
+ 
+> >     do other fun stuff ...
+> >  }  
+> 
+> >   
+> >>          acpi_add_table(table_offsets, tables_blob);
+> >>          build_ghes_error_table(tables->hardware_errors, tables->linker);
+> >>          acpi_build_hest(tables_blob, tables->hardware_errors,
+[...]
+
