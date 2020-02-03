@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ADE615064A
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 13:42:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A481C15066D
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 13:55:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727509AbgBCMmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 07:42:23 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27206 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727188AbgBCMmX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 Feb 2020 07:42:23 -0500
+        id S1727780AbgBCMzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 07:55:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26327 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727363AbgBCMzr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 07:55:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580733742;
+        s=mimecast20190719; t=1580734546;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=TYmvaWdfWIY2CO2m0YyjXtoTDOMMJedRMMAbCyAuU5U=;
-        b=Bf2k9Iu0CICu5AAYKJ9DyPpablKXQu/9OvhfQ7qJi4BpsMQfy6/VMZ9P7nEweUX4k0C3Fy
-        UuKC3q6JsruQR+OGnSBYTUE4Z05sN3mi1TVZ8Bne/BgQ91MOQWcWKQGHC+7UeMhGL7z7Of
-        tdWa0pgw5Q3er9dY5xKi6bnICpiIcoA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-A0DG2HksPamgib_XAem8eA-1; Mon, 03 Feb 2020 07:42:17 -0500
-X-MC-Unique: A0DG2HksPamgib_XAem8eA-1
-Received: by mail-wm1-f70.google.com with SMTP id p5so4751691wmc.4
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 04:42:17 -0800 (PST)
+        bh=PKYTrZ2l9XDKCKxWTKQUHgKqQscinAEepYElS6s2GdY=;
+        b=HaBiy+harC8QOQvwgxRoYFK9UU29EtYB7TqLQI+IwIWaTQsjzl004H9vjcfVSyW+NFJ3vd
+        BaMSnyeY2lTR9WYgNEWR7bnypZrc5BPEXN7PpXllVhDvpx5afVCiQG8xNp9VlRimLx7f9P
+        PJA+dvggHqggvYlRX0e2NcxffglUZ9U=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-0lhrlk7oNs6Thd3hDJE4zg-1; Mon, 03 Feb 2020 07:55:43 -0500
+X-MC-Unique: 0lhrlk7oNs6Thd3hDJE4zg-1
+Received: by mail-wr1-f69.google.com with SMTP id a12so6508101wrn.19
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 04:55:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=TYmvaWdfWIY2CO2m0YyjXtoTDOMMJedRMMAbCyAuU5U=;
-        b=iRXWyLtUotdUpO106HpcWUAAeGY+cXXWl781jP8r6MvTtAsCd0GfgPqnwKOIg8gco7
-         GdPd4C0pEm1FnOkHHrtdaQnpkRsAgfS9A8NDD3nRv3K3sclHKfoMOHYkbN0a63Hw+6qb
-         DRxx9SXA/IkvmdkEBdv94BoJaIHdtNwGrwNrn39wW0etLWWwV9LfEL4V3Lo+nOXySRT3
-         BhuPKSvaqm8nMg3F/Bp85YeGzUf4P3f44ASP5W+VKEaZaFP9rwgE28mxevCchRilCBYm
-         3WIYc2elR+b0Hdvak3bLNGQgTHelJDHb2ZDGLRyrSDs21toBAIbESmEvNBFfHR+lymU/
-         QAjQ==
-X-Gm-Message-State: APjAAAXSclPVQSUfxbeQUD13heulQ06EKUDf0lrti6d9f7bPs7EdH/Ts
-        giOTfHlHbuXKDVIpDmNZ1r1dQczjn3mB9CqYJX1hBsqhoVR+sgHGm0fc8M7Sk6fb//bQppcHcPv
-        65q/dGN0oYk9I
-X-Received: by 2002:a7b:c0d9:: with SMTP id s25mr4276781wmh.98.1580733736463;
-        Mon, 03 Feb 2020 04:42:16 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwdm4k8EedzgClLA+MN0ll3YAa2bCfhF2w/sjiLgqXACvp+q6FVH7riajO76FmIcSp3p77YNw==
-X-Received: by 2002:a7b:c0d9:: with SMTP id s25mr4276733wmh.98.1580733736187;
-        Mon, 03 Feb 2020 04:42:16 -0800 (PST)
+        bh=PKYTrZ2l9XDKCKxWTKQUHgKqQscinAEepYElS6s2GdY=;
+        b=rB0mq0A8WQRBfI6r/g3ZI4oFSQ7MK3WIx1zheE1JiwdRPOhs0fPMkQQq5EdtwGm+Oz
+         hJRwClpY5tAQOLv2yCp9vFP7H8imIvqGxsdNM2r+JFSNEsvCsJcrA+kYuBbLA4ZwsiR2
+         9uP6rXUEEUzoRv5ftpEdmf7x5iOg6BKHMw1LmRrQ+LtRSHfMzVqFMVnJYiNlYUPxsDEr
+         W2Q9OudtHmb7cuWHzkMHJM2eK/O43ac8/0dcDZ0CM1z9N00J6VDiqC3An95BsHab4Npp
+         Gjczt8Jfw/voZ6xS1J8qGxvtJJaCSh2e2iVFjOpFjQ7cbBcPZybkn1eUK1jxZIU5wZcd
+         Zp/Q==
+X-Gm-Message-State: APjAAAUJHme97NDlDnC8VUAy0mgb1A+MhOqnKubX9ADfr/rL6RyQQriA
+        BAQORfJ2FgjCXY3hiG4xplp4hhW2d9Fixjzr7rKcAVOr4YCGBwkEexNVi3CQQXEWgnqRnhTTfLW
+        rGrX16crzp4BN
+X-Received: by 2002:adf:fd8d:: with SMTP id d13mr15561238wrr.208.1580734541933;
+        Mon, 03 Feb 2020 04:55:41 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzuXwumKXy69ZvsnWkYM1n/3TsEHbX5cfQn3xjEJOebm44QI5GW+cGW67maRdHtBrct5bZLYg==
+X-Received: by 2002:adf:fd8d:: with SMTP id d13mr15561190wrr.208.1580734541492;
+        Mon, 03 Feb 2020 04:55:41 -0800 (PST)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id n3sm23352349wmc.27.2020.02.03.04.42.14
+        by smtp.gmail.com with ESMTPSA id r5sm25434161wrt.43.2020.02.03.04.55.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2020 04:42:15 -0800 (PST)
+        Mon, 03 Feb 2020 04:55:40 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] x86/kvm: do not setup pv tlb flush when not paravirtualized
-In-Reply-To: <20200203101514.GG40679@calabresa>
-References: <20200131155655.49812-1-cascardo@canonical.com> <87wo94ng9d.fsf@vitty.brq.redhat.com> <20200203101514.GG40679@calabresa>
-Date:   Mon, 03 Feb 2020 13:42:14 +0100
-Message-ID: <87r1zbona1.fsf@vitty.brq.redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 01/61] KVM: x86: Return -E2BIG when KVM_GET_SUPPORTED_CPUID hits max entries
+In-Reply-To: <20200201185218.24473-2-sean.j.christopherson@intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-2-sean.j.christopherson@intel.com>
+Date:   Mon, 03 Feb 2020 13:55:40 +0100
+Message-ID: <87mu9zomnn.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -67,68 +67,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thadeu Lima de Souza Cascardo <cascardo@canonical.com> writes:
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> On Mon, Feb 03, 2020 at 10:59:10AM +0100, Vitaly Kuznetsov wrote:
->> Thadeu Lima de Souza Cascardo <cascardo@canonical.com> writes:
->> 
->> > kvm_setup_pv_tlb_flush will waste memory and print a misguiding message
->> > when KVM paravirtualization is not available.
->> >
->> > Intel SDM says that the when cpuid is used with EAX higher than the
->> > maximum supported value for basic of extended function, the data for the
->> > highest supported basic function will be returned.
->> >
->> > So, in some systems, kvm_arch_para_features will return bogus data,
->> > causing kvm_setup_pv_tlb_flush to detect support for pv tlb flush.
->> >
->> > Testing for kvm_para_available will work as it checks for the hypervisor
->> > signature.
->> >
->> > Besides, when the "nopv" command line parameter is used, it should not
->> > continue as well, as kvm_guest_init will no be called in that case.
->> >
->> > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
->> > ---
->> >  arch/x86/kernel/kvm.c | 3 +++
->> >  1 file changed, 3 insertions(+)
->> >
->> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->> > index 81045aabb6f4..d817f255aed8 100644
->> > --- a/arch/x86/kernel/kvm.c
->> > +++ b/arch/x86/kernel/kvm.c
->> > @@ -736,6 +736,9 @@ static __init int kvm_setup_pv_tlb_flush(void)
->> >  {
->> >  	int cpu;
->> >  
->> > +	if (!kvm_para_available() || nopv)
->> > +		return 0;
->> > +
->> >  	if (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
->> >  	    !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
->> >  	    kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
->> 
->> The patch will fix the immediate issue, but why kvm_setup_pv_tlb_flush()
->> is just an arch_initcall() which will be executed regardless of the fact
->> if we are running on KVM or not?
->> 
->> In Hyper-V we setup PV TLB flush from ms_hyperv_init_platform() -- which
->> only happens if Hyper-V platform was detected. Why don't we do it from
->> kvm_init_platform() in KVM?
->> 
->> -- 
->> Vitaly
->> 
+> Fix a long-standing bug that causes KVM to return 0 instead of -E2BIG
+> when userspace's array is insufficiently sized.
 >
-> Because we can't call the allocator that early.
+> Note, while the Fixes: tag is accurate with respect to the immediate
+> bug, it's likely that similar bugs in KVM_GET_SUPPORTED_CPUID existed
+> prior to the refactoring, e.g. Qemu contains a workaround for the broken
+> KVM_GET_SUPPORTED_CPUID behavior that predates the buggy commit by over
+> two years.  The Qemu workaround is also likely the main reason the bug
+> has gone unreported for so long.
 >
-> Also, see the thread where this was "decided", the v6 of the original patch:
+> Qemu hack:
+>   commit 76ae317f7c16aec6b469604b1764094870a75470
+>   Author: Mark McLoughlin <markmc@redhat.com>
+>   Date:   Tue May 19 18:55:21 2009 +0100
 >
-> https://lore.kernel.org/kvm/20171129162118.GA10661@flask/
+>     kvm: work around supported cpuid ioctl() brokenness
+>
+>     KVM_GET_SUPPORTED_CPUID has been known to fail to return -E2BIG
+>     when it runs out of entries. Detect this by always trying again
+>     with a bigger table if the ioctl() fills the table.
+>
+> Fixes: 831bf664e9c1f ("KVM: Refactor and simplify kvm_dev_ioctl_get_supported_cpuid")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index b1c469446b07..47ce04762c20 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -908,9 +908,14 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
+>  			goto out_free;
+>  
+>  		limit = cpuid_entries[nent - 1].eax;
+> -		for (func = ent->func + 1; func <= limit && nent < cpuid->nent && r == 0; ++func)
+> +		for (func = ent->func + 1; func <= limit && r == 0; ++func) {
+> +			if (nent >= cpuid->nent) {
+> +				r = -E2BIG;
+> +				goto out_free;
+> +			}
+>  			r = do_cpuid_func(&cpuid_entries[nent], func,
+>  				          &nent, cpuid->nent, type);
+> +		}
+>  
+>  		if (r)
+>  			goto out_free;
 
-Ok, I see, it's basically about what we prioritize: shorter boot time vs
-smaller memory footprint. I'd personally vote for the former but the
-opposite opinion is equally valid. Let's preserve the status quo.
+Is fixing a bug a valid reason for breaking buggy userspace? :-)
+Personally, I think so. In particular, here the change is both the
+return value and the fact that we don't do copy_to_user() anymore so I
+think it's possible to meet a userspace which is going to get broken by
+the change.
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 -- 
 Vitaly
