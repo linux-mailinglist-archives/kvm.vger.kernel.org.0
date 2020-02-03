@@ -2,92 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C325151124
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 21:40:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22B9B15116C
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 21:54:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727004AbgBCUkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 15:40:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23122 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726984AbgBCUko (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 15:40:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580762443;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=pyvOKTyWkhnbfDDvx/t4H+37pFyaHZSbAEznQ9w1oyc=;
-        b=GNd73q3fLGO/5C9mP9Wt1cWp6qlbH6J0SXqStMGaIAFRhTHAbxEC6XoaD+04da2K7unhLW
-        TmPEpBiE2ihmxXv8p2Cft8Oaof0WMeaqOCOJfSWpy9xPetjbvgZNdcxDUCsxMDk2kTguH5
-        pOzA+0Reh4Ago9pgqxyEJ8M+UwdNFAI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-7l1xuXRFPdWWM4vbT9eVRQ-1; Mon, 03 Feb 2020 15:40:39 -0500
-X-MC-Unique: 7l1xuXRFPdWWM4vbT9eVRQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 809C118C8C01;
-        Mon,  3 Feb 2020 20:40:38 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4853187B1D;
-        Mon,  3 Feb 2020 20:40:38 +0000 (UTC)
-Date:   Mon, 3 Feb 2020 13:40:37 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [GIT PULL] VFIO updates for v5.6-rc1
-Message-ID: <20200203134037.2fda624f@w520.home>
+        id S1727044AbgBCUy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 15:54:27 -0500
+Received: from mga02.intel.com ([134.134.136.20]:59195 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725372AbgBCUy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 15:54:26 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Feb 2020 12:54:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,398,1574150400"; 
+   d="scan'208";a="403572253"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 03 Feb 2020 12:54:26 -0800
+Date:   Mon, 3 Feb 2020 12:54:26 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@amacapital.net>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Laight <David.Laight@aculab.com>
+Subject: Re: [PATCH v2 3/6] kvm: x86: Emulate split-lock access as a write
+Message-ID: <20200203205426.GF19638@linux.intel.com>
+References: <20200203151608.28053-1-xiaoyao.li@intel.com>
+ <20200203151608.28053-4-xiaoyao.li@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200203151608.28053-4-xiaoyao.li@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+On Mon, Feb 03, 2020 at 11:16:05PM +0800, Xiaoyao Li wrote:
+> If split lock detect is enabled (warn/fatal), #AC handler calls die()
+> when split lock happens in kernel.
+> 
+> A sane guest should never tigger emulation on a split-lock access, but
+> it cannot prevent malicous guest from doing this. So just emulating the
+> access as a write if it's a split-lock access to avoid malicous guest
+> polluting the kernel log.
+> 
+> More detail analysis can be found:
+> https://lkml.kernel.org/r/20200131200134.GD18946@linux.intel.com
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2d3be7f3ad67..821b7404c0fd 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5847,6 +5847,13 @@ static int emulator_write_emulated(struct x86_emulate_ctxt *ctxt,
+>  	(cmpxchg64((u64 *)(ptr), *(u64 *)(old), *(u64 *)(new)) == *(u64 *)(old))
+>  #endif
+>  
+> +static inline bool across_cache_line_access(gpa_t gpa, unsigned int bytes)
 
-The following changes since commit c79f46a282390e0f5b306007bf7b11a46d529538:
+s/across/split so as not to introduce another name.
 
-  Linux 5.5-rc5 (2020-01-05 14:23:27 -0800)
+> +{
+> +	unsigned int cache_line_size = cache_line_size();
+> +
+> +	return (gpa & (cache_line_size - 1)) + bytes > cache_line_size;
 
-are available in the Git repository at:
+I'd prefer to use the same logic as the page-split to avoid having to
+reason about the correctness of two different algorithms.
 
-  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.6-rc1
+> +}
+> +
+>  static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+>  				     unsigned long addr,
+>  				     const void *old,
+> @@ -5873,6 +5880,10 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+>  	if (((gpa + bytes - 1) & PAGE_MASK) != (gpa & PAGE_MASK))
+>  		goto emul_write;
+>  
+> +	if (get_split_lock_detect_state() != sld_off &&
+> +	    across_cache_line_access(gpa, bytes))
+> +		goto emul_write;
 
-for you to fetch changes up to 7b5372ba04ca1caabed1470d4ec23001cde2eb91:
+As an alternative to the above, the page/line splits can be handled in a
+single check, e.g.
 
-  vfio: platform: fix __iomem in vfio_platform_amdxgbe.c (2020-01-09 11:32:14 -0700)
+	page_line_mask = PAGE_MASK;
+	if (is_split_lock_detect_enabled())
+		page_line_mask = cache_line_size() - 1;
+	if (((gpa + bytes - 1) & page_line_mask) != (gpa & page_line_mask))
+		goto emul_write;
 
-----------------------------------------------------------------
-VFIO updates for v5.6-rc1
-
- - Fix nvlink error path (Alexey Kardashevskiy)
-
- - Update nvlink and spapr to use mmgrab() (Julia Lawall)
-
- - Update static declaration (Ben Dooks)
-
- - Annotate __iomem to fix sparse warnings (Ben Dooks)
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      vfio/spapr/nvlink2: Skip unpinning pages on error exit
-
-Ben Dooks (Codethink) (2):
-      vfio/mdev: make create attribute static
-      vfio: platform: fix __iomem in vfio_platform_amdxgbe.c
-
-Julia Lawall (2):
-      vfio: vfio_pci_nvlink2: use mmgrab
-      vfio/spapr_tce: use mmgrab
-
- drivers/vfio/mdev/mdev_sysfs.c                      | 2 +-
- drivers/vfio/pci/vfio_pci_nvlink2.c                 | 8 +++++---
- drivers/vfio/platform/reset/vfio_platform_amdxgbe.c | 4 ++--
- drivers/vfio/vfio_iommu_spapr_tce.c                 | 2 +-
- 4 files changed, 9 insertions(+), 7 deletions(-)
-
+> +
+>  	if (kvm_vcpu_map(vcpu, gpa_to_gfn(gpa), &map))
+>  		goto emul_write;
+>  
+> -- 
+> 2.23.0
+> 
