@@ -2,123 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED258151077
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 20:48:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C325151124
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 21:40:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726224AbgBCTsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 14:48:08 -0500
-Received: from mga07.intel.com ([134.134.136.100]:44391 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726018AbgBCTsI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 14:48:08 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Feb 2020 11:48:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,398,1574150400"; 
-   d="scan'208";a="231127073"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga003.jf.intel.com with ESMTP; 03 Feb 2020 11:48:07 -0800
-Date:   Mon, 3 Feb 2020 11:48:06 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v2 3/5] KVM: x86: Deliver exception payload on
- KVM_GET_VCPU_EVENTS
-Message-ID: <20200203194806.GC19638@linux.intel.com>
-References: <20200128092715.69429-1-oupton@google.com>
- <20200128092715.69429-4-oupton@google.com>
+        id S1727004AbgBCUkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 15:40:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23122 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726984AbgBCUko (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 15:40:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580762443;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=pyvOKTyWkhnbfDDvx/t4H+37pFyaHZSbAEznQ9w1oyc=;
+        b=GNd73q3fLGO/5C9mP9Wt1cWp6qlbH6J0SXqStMGaIAFRhTHAbxEC6XoaD+04da2K7unhLW
+        TmPEpBiE2ihmxXv8p2Cft8Oaof0WMeaqOCOJfSWpy9xPetjbvgZNdcxDUCsxMDk2kTguH5
+        pOzA+0Reh4Ago9pgqxyEJ8M+UwdNFAI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-430-7l1xuXRFPdWWM4vbT9eVRQ-1; Mon, 03 Feb 2020 15:40:39 -0500
+X-MC-Unique: 7l1xuXRFPdWWM4vbT9eVRQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 809C118C8C01;
+        Mon,  3 Feb 2020 20:40:38 +0000 (UTC)
+Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4853187B1D;
+        Mon,  3 Feb 2020 20:40:38 +0000 (UTC)
+Date:   Mon, 3 Feb 2020 13:40:37 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO updates for v5.6-rc1
+Message-ID: <20200203134037.2fda624f@w520.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200128092715.69429-4-oupton@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 28, 2020 at 01:27:13AM -0800, Oliver Upton wrote:
-> KVM doesn't utilize exception payloads by default, as this behavior
-> diverges from the expectations of the userspace API. However, this
-> constraint only applies if KVM is servicing a KVM_GET_VCPU_EVENTS ioctl
-> before delivering the exception.
-> 
-> Use exception payloads unconditionally if the vcpu is in guest mode.
+Hi Linus,
 
-This sentence is super confusing.  It doesn't align with the code, which
-is clearly handling "not is in guest mode".  And KVM already uses payloads
-unconditionally, it's only the deferring behavior that is changing.
+The following changes since commit c79f46a282390e0f5b306007bf7b11a46d529538:
 
-> Deliver the exception payload before completing a KVM_GET_VCPU_EVENTS
-> to ensure API compatibility.
-> 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/x86/kvm/x86.c | 29 ++++++++++++++++-------------
->  1 file changed, 16 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 7a341c0c978a..9f080101618c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -497,19 +497,7 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
->  		vcpu->arch.exception.error_code = error_code;
->  		vcpu->arch.exception.has_payload = has_payload;
->  		vcpu->arch.exception.payload = payload;
-> -		/*
-> -		 * In guest mode, payload delivery should be deferred,
-> -		 * so that the L1 hypervisor can intercept #PF before
-> -		 * CR2 is modified (or intercept #DB before DR6 is
-> -		 * modified under nVMX).  However, for ABI
-> -		 * compatibility with KVM_GET_VCPU_EVENTS and
-> -		 * KVM_SET_VCPU_EVENTS, we can't delay payload
-> -		 * delivery unless userspace has enabled this
-> -		 * functionality via the per-VM capability,
-> -		 * KVM_CAP_EXCEPTION_PAYLOAD.
-> -		 */
-> -		if (!vcpu->kvm->arch.exception_payload_enabled ||
-> -		    !is_guest_mode(vcpu))
-> +		if (!is_guest_mode(vcpu))
->  			kvm_deliver_exception_payload(vcpu);
->  		return;
->  	}
-> @@ -3790,6 +3778,21 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
->  {
->  	process_nmi(vcpu);
->  
-> +	/*
-> +	 * In guest mode, payload delivery should be deferred,
-> +	 * so that the L1 hypervisor can intercept #PF before
-> +	 * CR2 is modified (or intercept #DB before DR6 is
-> +	 * modified under nVMX).  However, for ABI
-> +	 * compatibility with KVM_GET_VCPU_EVENTS and
-> +	 * KVM_SET_VCPU_EVENTS, we can't delay payload
-> +	 * delivery unless userspace has enabled this
-> +	 * functionality via the per-VM capability,
-> +	 * KVM_CAP_EXCEPTION_PAYLOAD.
-> +	 */
+  Linux 5.5-rc5 (2020-01-05 14:23:27 -0800)
 
-This comment needs to be rewritten.  It makes sense in the context of
-kvm_multiple_exception(), here it's just confusing.
+are available in the Git repository at:
 
-> +	if (!vcpu->kvm->arch.exception_payload_enabled &&
-> +	    vcpu->arch.exception.pending && vcpu->arch.exception.has_payload)
-> +		kvm_deliver_exception_payload(vcpu);
+  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.6-rc1
 
-Crushing CR2/DR6 just because userspace is retrieving info can't possibly
-be correct.  If it somehow is correct then this needs big fat comment.
+for you to fetch changes up to 7b5372ba04ca1caabed1470d4ec23001cde2eb91:
 
-What is the ABI compatibility issue?  E.g. can KVM simply hide the payload
-info on KVM_GET_VCPU_EVENT and then drop it on KVM_SET_VCPU_EVENTS?
+  vfio: platform: fix __iomem in vfio_platform_amdxgbe.c (2020-01-09 11:32:14 -0700)
 
-> +
->  	/*
->  	 * The API doesn't provide the instruction length for software
->  	 * exceptions, so don't report them. As long as the guest RIP
-> -- 
-> 2.25.0.341.g760bfbb309-goog
-> 
+----------------------------------------------------------------
+VFIO updates for v5.6-rc1
+
+ - Fix nvlink error path (Alexey Kardashevskiy)
+
+ - Update nvlink and spapr to use mmgrab() (Julia Lawall)
+
+ - Update static declaration (Ben Dooks)
+
+ - Annotate __iomem to fix sparse warnings (Ben Dooks)
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (1):
+      vfio/spapr/nvlink2: Skip unpinning pages on error exit
+
+Ben Dooks (Codethink) (2):
+      vfio/mdev: make create attribute static
+      vfio: platform: fix __iomem in vfio_platform_amdxgbe.c
+
+Julia Lawall (2):
+      vfio: vfio_pci_nvlink2: use mmgrab
+      vfio/spapr_tce: use mmgrab
+
+ drivers/vfio/mdev/mdev_sysfs.c                      | 2 +-
+ drivers/vfio/pci/vfio_pci_nvlink2.c                 | 8 +++++---
+ drivers/vfio/platform/reset/vfio_platform_amdxgbe.c | 4 ++--
+ drivers/vfio/vfio_iommu_spapr_tce.c                 | 2 +-
+ 4 files changed, 9 insertions(+), 7 deletions(-)
+
