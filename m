@@ -2,47 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 844251512B2
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 00:09:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFA3E1512B3
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 00:09:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726853AbgBCXJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 18:09:16 -0500
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:47486 "EHLO
+        id S1727004AbgBCXJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 18:09:19 -0500
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:53512 "EHLO
         mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726369AbgBCXJQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 18:09:16 -0500
-Received: by mail-pg1-f202.google.com with SMTP id l15so10365756pgk.14
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 15:09:16 -0800 (PST)
+        with ESMTP id S1726913AbgBCXJS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 18:09:18 -0500
+Received: by mail-pg1-f202.google.com with SMTP id y15so10409875pgk.20
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 15:09:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=XnYm5qWPfb13s0wRqn1mpnrTwR4nnQJCgFQ13dO6/nI=;
-        b=f+ltTeOsJAty6dDVNXR6x/fkgqbS34nwR1S7fb/S8MIWpfYYBm2fIZFz3goe8MISee
-         vZNyGnXM0oagrrqp6Fg4kXeLKM5vejK8Dc++ZDSPRw3zcAuP/EWeQo162pVO6i3YCBPB
-         IJVaGCVG899JjEbedJ4bTkVCvbsaALE7QpXtogmZOM9bqAKXcq9Wfb4RxnmSX2axlB3J
-         tS5jEbcaL83lUi3DDOfWKbBZks/EzKOh7y5k/ZSW/MGgfvYnGquJBrtRfqN8XTs960K+
-         3OLgUJSt7opqlAM9aSC0EC/2GQOtIEfpqcGXIo5fKkbt6L5Nowyj/GFJbQltCI7whG94
-         A07A==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=xl3tRCmUg9jAOtg3vbIi0aqmSxX/oTR7vaT6w//vy0o=;
+        b=PaZqVy3m4rRoeYHHiMgnmO1X9LwxYioJlrNTA2svqHK3hggJWYYvBA2MEeaFhf2KVy
+         5M+xCl2G5eH8vcm3GcKXUqyewxqVrV4gi93BhUegaQhtPnPRZIiXZfDiNxnYm+B9HfCu
+         2yh7HmUwERA28LMmG7wDFzUkMRuNZzrK8OlMHR/CLeqCm7hlvE2/yrMuFGYDDeb9VanP
+         xVJ1Ts5xwFXU4agYgO2nocbjenLFEsEurFlcz/MWzFplIWT6QJz1VSv3m0NowHglNymJ
+         9phvS4l+TLdRDuMXHoEKuuniTmtfIkweuh5zbgHAey03inGXaQsSSTXC1adRs1670O1i
+         W/PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=XnYm5qWPfb13s0wRqn1mpnrTwR4nnQJCgFQ13dO6/nI=;
-        b=FLI5mYpkVUXLOOC5aC7svPtJM0jWNIwKi1eSEyUtwA4QybW5o0iTZXAPkeZpRlkM8v
-         5nRq56rxnRS8naU9YXTWUffB8KIJOI8m726Z0oIaFJuz9PA0DtgRT9xhmsIMTKOHpZL0
-         AsDfU6jyF52wgfbb8ytI8gNbl42dU9o5X+Kro9YCiTz8pqhZWfPXLD7a0xmyHMJRF6Z5
-         /wz/VgmEwfT5tAZ3lguD0o0MKO4ic2iUlk4QLcuC0BECGtwi2xYfOeWDv+gGngA/fpho
-         KhT7E7+O4ZwHSomN9FkcVyaoP+JybnygeYbZCfTtcPs3RAY9ouw0rGsFWXfgyUpTqeEI
-         8BHw==
-X-Gm-Message-State: APjAAAUGx+nY4JWwphjeZQ5tPvYHSsWIv84mIeXJxNSEkRVM7JMG67Ol
-        20OR9gm3BMkdt30CeqpWgdz815M3j4Dx
-X-Google-Smtp-Source: APXvYqwIpUOKIGZE6NcawbIowukoMFpqRz5bIJROxtcwVDgJozQwJ0dNygWwt5RTsmOYDdDiweDP4j8XLV/K
-X-Received: by 2002:a63:3c2:: with SMTP id 185mr11545877pgd.72.1580771355857;
- Mon, 03 Feb 2020 15:09:15 -0800 (PST)
-Date:   Mon,  3 Feb 2020 15:09:09 -0800
-Message-Id: <20200203230911.39755-1-bgardon@google.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=xl3tRCmUg9jAOtg3vbIi0aqmSxX/oTR7vaT6w//vy0o=;
+        b=t+42QOGDx3kOBVOp5timL7Y/QyRTGEcnwQwz/k4V+HxGeKu0Bw5layZDdBZzpKBxop
+         e1HX9Gauin0xNev+XmEYoPUhz5cX4VjmbmODVLi/2JhpX6eIqd+gYqV7zFdTIlyaT7Ty
+         q7QoNkVLj+viIgYv8BEPGBTqvbBYQ8CVLKPXLZAilYS13IHA6CkoJ/ApSsnqCY51yoq4
+         B4ZMmjZtTvxVpbpkFIsvmVoUbNs7kcK+hWjnpVjDsJmDHshWKV/0PnlqdDJwFPsXGdCL
+         qOvs4MO1Ctc7jlHNNaF6DpLl0Hv3QuCq6/P7TgKZslG94kjXfKGF1l3xuYlLfqrIuCF5
+         HkYw==
+X-Gm-Message-State: APjAAAXmERU+TnkYF/i+HFKXAVYDlpiS7ZcMPJrrsXdMCxbBJ7IZ9koE
+        MSgjkeoVHb67Xo39LQoqF7g6l3rccfGl
+X-Google-Smtp-Source: APXvYqyWlUjXcJEzuDtebyMcW/5VXbpWItEPNtkEANzEhxDbZ/L228ZficS0209NBH9onSObxOq8XT0lzWXX
+X-Received: by 2002:a63:2a06:: with SMTP id q6mr26394796pgq.92.1580771358048;
+ Mon, 03 Feb 2020 15:09:18 -0800 (PST)
+Date:   Mon,  3 Feb 2020 15:09:10 -0800
+In-Reply-To: <20200203230911.39755-1-bgardon@google.com>
+Message-Id: <20200203230911.39755-2-bgardon@google.com>
 Mime-Version: 1.0
+References: <20200203230911.39755-1-bgardon@google.com>
 X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
-Subject: [PATCH 1/3] kvm: mmu: Replace unsigned with unsigned int for PTE access
+Subject: [PATCH 2/3] kvm: mmu: Separate generating and setting mmio ptes
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -57,9 +61,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are several functions which pass an access permission mask for
-SPTEs as an unsigned. This works, but checkpatch complains about it.
-Switch the occurrences of unsigned to unsigned int to satisfy checkpatch.
+Separate the functions for generating MMIO page table entries from the
+function that inserts them into the paging structure. This refactoring
+will facilitate changes to the MMU sychronization model to use atomic
+compare / exchanges (which are not guaranteed to succeed) instead of a
+monolithic MMU lock.
 
 No functional change expected.
 
@@ -67,105 +73,49 @@ Tested by running kvm-unit-tests on an Intel Haswell machine. This
 commit introduced no new failures.
 
 This commit can be viewed in Gerrit at:
-	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2358
+	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2359
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 Reviewed-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 84eeb61d06aa3..a9c593dec49bf 100644
+index a9c593dec49bf..b81010d0edae1 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -452,7 +452,7 @@ static u64 get_mmio_spte_generation(u64 spte)
+@@ -451,9 +451,9 @@ static u64 get_mmio_spte_generation(u64 spte)
+ 	return gen;
  }
  
- static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
--			   unsigned access)
-+			   unsigned int access)
+-static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
+-			   unsigned int access)
++static u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
  {
++
  	u64 gen = kvm_vcpu_memslots(vcpu)->generation & MMIO_SPTE_GEN_MASK;
  	u64 mask = generation_mmio_spte_mask(gen);
-@@ -484,7 +484,7 @@ static unsigned get_mmio_spte_access(u64 spte)
+ 	u64 gpa = gfn << PAGE_SHIFT;
+@@ -464,6 +464,17 @@ static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
+ 	mask |= (gpa & shadow_nonpresent_or_rsvd_mask)
+ 		<< shadow_nonpresent_or_rsvd_mask_len;
+ 
++	return mask;
++}
++
++static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
++			   unsigned int access)
++{
++	u64 mask = make_mmio_spte(vcpu, gfn, access);
++	unsigned int gen = get_mmio_spte_generation(mask);
++
++	access = mask & ACC_ALL;
++
+ 	trace_mark_mmio_spte(sptep, gfn, access, gen);
+ 	mmu_spte_set(sptep, mask);
  }
- 
- static bool set_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
--			  kvm_pfn_t pfn, unsigned access)
-+			  kvm_pfn_t pfn, unsigned int access)
- {
- 	if (unlikely(is_noslot_pfn(pfn))) {
- 		mark_mmio_spte(vcpu, sptep, gfn, access);
-@@ -2475,7 +2475,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 					     gva_t gaddr,
- 					     unsigned level,
- 					     int direct,
--					     unsigned access)
-+					     unsigned int access)
- {
- 	union kvm_mmu_page_role role;
- 	unsigned quadrant;
-@@ -2990,7 +2990,7 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
- #define SET_SPTE_NEED_REMOTE_TLB_FLUSH	BIT(1)
- 
- static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
--		    unsigned pte_access, int level,
-+		    unsigned int pte_access, int level,
- 		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
- 		    bool can_unsync, bool host_writable)
- {
-@@ -3081,9 +3081,10 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 	return ret;
- }
- 
--static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep, unsigned pte_access,
--			int write_fault, int level, gfn_t gfn, kvm_pfn_t pfn,
--		       	bool speculative, bool host_writable)
-+static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-+			unsigned int pte_access, int write_fault, int level,
-+			gfn_t gfn, kvm_pfn_t pfn, bool speculative,
-+			bool host_writable)
- {
- 	int was_rmapped = 0;
- 	int rmap_count;
-@@ -3165,7 +3166,7 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
- {
- 	struct page *pages[PTE_PREFETCH_NUM];
- 	struct kvm_memory_slot *slot;
--	unsigned access = sp->role.access;
-+	unsigned int access = sp->role.access;
- 	int i, ret;
- 	gfn_t gfn;
- 
-@@ -3400,7 +3401,8 @@ static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
- }
- 
- static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, gva_t gva, gfn_t gfn,
--				kvm_pfn_t pfn, unsigned access, int *ret_val)
-+				kvm_pfn_t pfn, unsigned int access,
-+				int *ret_val)
- {
- 	/* The pfn is invalid, report the error! */
- 	if (unlikely(is_error_pfn(pfn))) {
-@@ -4005,7 +4007,7 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
- 
- 	if (is_mmio_spte(spte)) {
- 		gfn_t gfn = get_mmio_spte_gfn(spte);
--		unsigned access = get_mmio_spte_access(spte);
-+		unsigned int access = get_mmio_spte_access(spte);
- 
- 		if (!check_mmio_spte(vcpu, spte))
- 			return RET_PF_INVALID;
-@@ -4349,7 +4351,7 @@ static void inject_page_fault(struct kvm_vcpu *vcpu,
- }
- 
- static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
--			   unsigned access, int *nr_present)
-+			   unsigned int access, int *nr_present)
- {
- 	if (unlikely(is_mmio_spte(*sptep))) {
- 		if (gfn != get_mmio_spte_gfn(*sptep)) {
 -- 
 2.25.0.341.g760bfbb309-goog
 
