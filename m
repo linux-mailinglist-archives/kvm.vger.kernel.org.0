@@ -2,120 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 279A115021F
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 08:55:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E0801502A6
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 09:32:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727501AbgBCHzO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 02:55:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47503 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727489AbgBCHzO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 02:55:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580716512;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dboh0QVxXtI2PvjSsCAnC9KkJagQEfb/i+ydQ8g4GXY=;
-        b=B8ltmJRvDaVsPbXZNXDfYs5feptBzq3hUKqkz4ycPnrZlUBGR399YQemGQ0VkeWhISgjsb
-        qAuwYYrr6uEwP72iX0p+UQMvhnXkYZ4WjT//NuXQatTzFvMxJumSWUvJmV00jV/VfuRPAO
-        0U0DvAdpJosR0MQq0Gemg2J/aNGIpUc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-ziPYIh3SP6WXYH8YYFr7Yg-1; Mon, 03 Feb 2020 02:55:10 -0500
-X-MC-Unique: ziPYIh3SP6WXYH8YYFr7Yg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DBB4107ACCD;
-        Mon,  3 Feb 2020 07:55:08 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C280171D6;
-        Mon,  3 Feb 2020 07:55:02 +0000 (UTC)
-Date:   Mon, 3 Feb 2020 08:55:01 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     gengdongjiu <gengdongjiu@huawei.com>
-Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <fam@euphon.net>, <rth@twiddle.net>, <ehabkost@redhat.com>,
-        <mtosatti@redhat.com>, <xuwei5@huawei.com>,
-        <jonathan.cameron@huawei.com>, <james.morse@arm.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-        <qemu-arm@nongnu.org>, <zhengxiang9@huawei.com>,
-        <linuxarm@huawei.com>
-Subject: Re: [PATCH v22 7/9] ACPI: Record Generic Error Status Block(GESB)
- table
-Message-ID: <20200203085501.499e3a83@redhat.com>
-In-Reply-To: <a9f46632-0766-7e82-7dc4-752d00b4a0a1@huawei.com>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
-        <1578483143-14905-8-git-send-email-gengdongjiu@huawei.com>
-        <20200128162938.18bd0e95@redhat.com>
-        <a9f46632-0766-7e82-7dc4-752d00b4a0a1@huawei.com>
+        id S1727699AbgBCIcF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 03:32:05 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:41410 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726994AbgBCIcF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 03:32:05 -0500
+Received: by mail-oi1-f194.google.com with SMTP id i1so13931481oie.8;
+        Mon, 03 Feb 2020 00:32:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vgFT7KCLvNSNXKaIMj+AMJeeoDZdmCntNB9bIaSyhR8=;
+        b=haYQFwferv5+ZHvfqKEEV/YUXLdSYxjZlN0P4WdvN1Okw1asRKqpj1d86PDYFJ0bNa
+         xbKaXhElGXZr/ely1gzZrQrCPFVTjVuXzwzXhE/ijyl7iQ3LoLSiswWk38Q253tqBw0q
+         1nw/VQSBppW6Lk0PvkCsBqDNGWtWJEcmhb1puBaNLNh9vBH58UgOLbDbbnoKpofIKRJj
+         xFnaM4t2BEeo3hEnz+THrNEobj8VkLSIs7bjRb1vExJYwtzyJwskDSjlgvULeWME5Iji
+         PYA4PfHdddbpHlCPtScYnFwV9mMQqUaPVWeQZt0ezObLlBgGIrTaE2+qmR9/nWgEykGc
+         BkIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vgFT7KCLvNSNXKaIMj+AMJeeoDZdmCntNB9bIaSyhR8=;
+        b=EOl0CDIIY2/7YIbcHUNkN5gnaBypwjCyFGvU86Uu46s6wkgGmj519FbjWDL+DS2q40
+         3Ca7h3uqEJEZ2ruWWBtw09wSrJh/Gn4U4faF294EiFqWaWK/xdIHgAZBic5aw9tOvGTA
+         vhf4Z5FSB0PNVPg64ki8I6FII0s98+zLfLr4wBhUAjXn8zMSw6MmLxBu/jACPdV3Px/b
+         qeaAL0dSSMq3x14QpFkLQMT8lTrx1+gyJAlAkkQ9ZKmTNObYT8nL1cDHX948f7rjr0Ra
+         C4OHxwB8Gz7r47QU3mZ9NDKrjuhcyQn/3Q1wfNkgVZAQoSI8sDV/qW35fz/GRnEJtnXx
+         m9fg==
+X-Gm-Message-State: APjAAAWrohb13bDmGVSO7xheuxlJuHxF7nURN9vpGywJmY9MvrOuIRkb
+        9fmM4zD6LN+yW/I4illpths/vCwcEPdSyFQ3mEQ=
+X-Google-Smtp-Source: APXvYqyqbOZhNxcsolX/qhng0QvUrm1rXnOtQGEwvMXjjoc299vee2VDlGRGcQcpGnKEBBQUOUw1WCNoUuIu5xhQjIE=
+X-Received: by 2002:aca:44d7:: with SMTP id r206mr5716393oia.33.1580718724066;
+ Mon, 03 Feb 2020 00:32:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20200127071602.11460-1-nick.desaulniers@gmail.com>
+In-Reply-To: <20200127071602.11460-1-nick.desaulniers@gmail.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 3 Feb 2020 16:31:52 +0800
+Message-ID: <CANRm+CwK0Cg45mktda9Yz9fsjPCvtuB8O+fma5L3tV725ki1qw@mail.gmail.com>
+Subject: Re: [PATCH] dynamically allocate struct cpumask
+To:     Nick Desaulniers <nick.desaulniers@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        clang-built-linux@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 2 Feb 2020 21:42:23 +0800
-gengdongjiu <gengdongjiu@huawei.com> wrote:
+Hi Nick,
+On Mon, 27 Jan 2020 at 15:16, Nick Desaulniers
+<nick.desaulniers@gmail.com> wrote:
+>
+> This helps avoid avoid a potentially large stack allocation.
+>
+> When building with:
+> $ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
+> The following warning is observed:
+> arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
+> function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
+> static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
+> vector)
+>             ^
+> Debugging with:
+> https://github.com/ClangBuiltLinux/frame-larger-than
+> via:
+> $ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
+>   kvm_send_ipi_mask_allbutself
+> points to the stack allocated `struct cpumask newmask` in
+> `kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
+> potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
+> the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
+> 8192, making a single instance of a `struct cpumask` 1024 B.
 
-> On 2020/1/28 23:29, Igor Mammedov wrote:
-> > On Wed, 8 Jan 2020 19:32:21 +0800
-> > Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> >   
-> >> kvm_arch_on_sigbus_vcpu() error injection uses source_id as
-> >> index in etc/hardware_errors to find out Error Status Data
-> >> Block entry corresponding to error source. So supported source_id
-> >> values should be assigned here and not be changed afterwards to
-> >> make sure that guest will write error into expected Error Status
-> >> Data Block even if guest was migrated to a newer QEMU.
-> >>
-> >> Before QEMU writes a new error to ACPI table, it will check whether
-> >> previous error has been acknowledged. Otherwise it will ignore the new
-> >> error. For the errors section type, QEMU simulate it to memory section
-> >> error.
-> >>
-> >> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> >> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> >> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Could you help test the below untested patch?
 
-btw:
-when you are changing patch and it's not a trivial change,
-you are supposed to drop Reviewed-by/Acked-by tags.
+From 867753e2fa27906f15df7902ba1bce7f9cef6ebe Mon Sep 17 00:00:00 2001
+From: Wanpeng Li <wanpengli@tencent.com>
+Date: Mon, 3 Feb 2020 16:26:35 +0800
+Subject: [PATCH] KVM: Pre-allocate 1 cpumask variable per cpu for both
+pv tlb and pv ipis
 
-[...]
-> >> diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-> >> index 129c45f..b35e294 100644
-> >> --- a/include/qemu/uuid.h
-> >> +++ b/include/qemu/uuid.h
-> >> @@ -34,6 +34,11 @@ typedef struct {
-> >>      };
-> >>  } QemuUUID;
-> >>  
-> >> +#define UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
-> >> +  {{{ (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
-> >> +     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
-> >> +     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) } } }  
-> > 
-> > since you are adding generalizing macro, take of NVDIMM_UUID_LE which served as model  
-> 
-> do you mean use this generalizing macro to replace NVDIMM_UUID_LE, right?
+Reported-by: Nick Desaulniers <nick.desaulniers@gmail.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kernel/kvm.c | 33 +++++++++++++++++++++------------
+ 1 file changed, 21 insertions(+), 12 deletions(-)
 
-yes, and preferably do that in a separate patch
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 81045aab..b1e8efa 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -425,6 +425,8 @@ static void __init sev_map_percpu_data(void)
+     }
+ }
 
-> 
-> > 
-> >   
-> >>  #define UUID_FMT "%02hhx%02hhx%02hhx%02hhx-" \
-> >>                   "%02hhx%02hhx-%02hhx%02hhx-" \
-> >>                   "%02hhx%02hhx-" \  
-> > 
-> > .
-> >   
-> 
++static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
++
+ #ifdef CONFIG_SMP
+ #define KVM_IPI_CLUSTER_SIZE    (2 * BITS_PER_LONG)
 
+@@ -490,12 +492,12 @@ static void kvm_send_ipi_mask(const struct
+cpumask *mask, int vector)
+ static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask,
+int vector)
+ {
+     unsigned int this_cpu = smp_processor_id();
+-    struct cpumask new_mask;
++    struct cpumask *new_mask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+     const struct cpumask *local_mask;
+
+-    cpumask_copy(&new_mask, mask);
+-    cpumask_clear_cpu(this_cpu, &new_mask);
+-    local_mask = &new_mask;
++    cpumask_copy(new_mask, mask);
++    cpumask_clear_cpu(this_cpu, new_mask);
++    local_mask = new_mask;
+     __send_ipi_mask(local_mask, vector);
+ }
+
+@@ -575,7 +577,6 @@ static void __init kvm_apf_trap_init(void)
+     update_intr_gate(X86_TRAP_PF, async_page_fault);
+ }
+
+-static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
+
+ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+             const struct flush_tlb_info *info)
+@@ -583,7 +584,7 @@ static void kvm_flush_tlb_others(const struct
+cpumask *cpumask,
+     u8 state;
+     int cpu;
+     struct kvm_steal_time *src;
+-    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_tlb_mask);
++    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+
+     cpumask_copy(flushmask, cpumask);
+     /*
+@@ -624,6 +625,7 @@ static void __init kvm_guest_init(void)
+         kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+         pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
+         pv_ops.mmu.tlb_remove_table = tlb_remove_table;
++        pr_info("KVM setup pv remote TLB flush\n");
+     }
+
+     if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+@@ -732,23 +734,30 @@ static __init int activate_jump_labels(void)
+ }
+ arch_initcall(activate_jump_labels);
+
+-static __init int kvm_setup_pv_tlb_flush(void)
++static __init int kvm_alloc_cpumask(void)
+ {
+     int cpu;
++    bool alloc = false;
+
+     if (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
+         !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
+-        kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
++        kvm_para_has_feature(KVM_FEATURE_STEAL_TIME))
++        alloc = true;
++
++#if defined(CONFIG_SMP)
++    if (!alloc && kvm_para_has_feature(KVM_FEATURE_PV_SEND_IPI))
++        alloc = true;
++#endif
++
++    if (alloc)
+         for_each_possible_cpu(cpu) {
+-            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_tlb_mask, cpu),
++            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
+                 GFP_KERNEL, cpu_to_node(cpu));
+         }
+-        pr_info("KVM setup pv remote TLB flush\n");
+-    }
+
+     return 0;
+ }
+-arch_initcall(kvm_setup_pv_tlb_flush);
++arch_initcall(kvm_alloc_cpumask);
+
+ #ifdef CONFIG_PARAVIRT_SPINLOCKS
+
+--
+1.8.3.1
