@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9539B1506D2
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 14:20:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C84A1506D6
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 14:20:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727756AbgBCNUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 08:20:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24848 "EHLO
+        id S1728270AbgBCNUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 08:20:05 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56130 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726913AbgBCNUC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 3 Feb 2020 08:20:02 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 013DFUNa059470
+        by vger.kernel.org with ESMTP id S1727201AbgBCNUE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 3 Feb 2020 08:20:04 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 013DEPSK066164
         for <kvm@vger.kernel.org>; Mon, 3 Feb 2020 08:20:01 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxbx5ykag-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxgjwgps2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
         for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 08:20:01 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 013DFm2S060616
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 013DEVNk066809
         for <kvm@vger.kernel.org>; Mon, 3 Feb 2020 08:20:01 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxbx5yka0-1
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxgjwgprk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 03 Feb 2020 08:20:01 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 013DFSGN028727;
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 013DJ95a008188;
         Mon, 3 Feb 2020 13:20:00 GMT
 Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02dal.us.ibm.com with ESMTP id 2xw0y6da44-1
+        by ppma04dal.us.ibm.com with ESMTP id 2xw0y6n91d-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 03 Feb 2020 13:20:00 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 013DJwkv46072098
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 013DJwem32113020
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Mon, 3 Feb 2020 13:19:58 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4AE612806E;
+        by IMSVA (Postfix) with ESMTP id 54DBB2805E;
         Mon,  3 Feb 2020 13:19:58 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3C0C92805C;
+        by IMSVA (Postfix) with ESMTP id 512022806D;
         Mon,  3 Feb 2020 13:19:58 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.114.17.106])
         by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
@@ -54,139 +54,160 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
-Subject: [RFCv2 00/37] KVM: s390: Add support for protected VMs
-Date:   Mon,  3 Feb 2020 08:19:20 -0500
-Message-Id: <20200203131957.383915-1-borntraeger@de.ibm.com>
+Subject: [RFCv2 01/37] DOCUMENTATION: protvirt: Protected virtual machine introduction
+Date:   Mon,  3 Feb 2020 08:19:21 -0500
+Message-Id: <20200203131957.383915-2-borntraeger@de.ibm.com>
 X-Mailer: git-send-email 2.24.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200203131957.383915-1-borntraeger@de.ibm.com>
+References: <20200203131957.383915-1-borntraeger@de.ibm.com>
 X-TM-AS-GCONF: 00
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-03_04:2020-02-02,2020-02-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- adultscore=0 bulkscore=0 phishscore=0 clxscore=1015 impostorscore=0
- lowpriorityscore=0 spamscore=0 malwarescore=0 suspectscore=0
- mlxlogscore=661 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 malwarescore=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 adultscore=0 priorityscore=1501 impostorscore=0
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1911200001 definitions=main-2002030099
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Protected VMs (PVM) are KVM VMs, where KVM can't access the VM's state
-like guest memory and guest registers anymore. Instead the PVMs are
-mostly managed by a new entity called Ultravisor (UV), which provides
-an API, so KVM and the PV can request management actions.
+From: Janosch Frank <frankja@linux.ibm.com>
 
-PVMs are encrypted at rest and protected from hypervisor access while
-running. They switch from a normal operation into protected mode, so
-we can still use the standard boot process to load a encrypted blob
-and then move it into protected mode.
+Add documentation about protected KVM guests.
 
-Rebooting is only possible by passing through the unprotected/normal
-mode and switching to protected again.
-
-All patches are in the protvirtv2 branch of the korg s390 kvm git
-(on top of Janoschs reset rework).
-
-Claudio presented the technology at his presentation at KVM Forum
-2019.
-
-This contains a "pretty small" common code memory management change that
-will allow paging, guest backing with files etc almost just like normal
-VMs. Please note that the memory management part will still see some
-changes to deal with a corner case for the adapter interrupt indicator
-pages. So please focus on the non-mm parts (which hopefully has
-everthing addressed in the next version). Claudio will work with Andrea
-regarding this.
-
-Christian Borntraeger (3):
-  KVM: s390/mm: Make pages accessible before destroying the guest
-  KVM: s390: protvirt: Add SCLP interrupt handling
-  KVM: s390: protvirt: do not inject interrupts after start
-
-Claudio Imbrenda (3):
-  mm:gup/writeback: add callbacks for inaccessible pages
-  s390/mm: provide memory management functions for protected KVM guests
-  KVM: s390/mm: handle guest unpin events
-
-Janosch Frank (24):
-  DOCUMENTATION: protvirt: Protected virtual machine introduction
-  KVM: s390: add new variants of UV CALL
-  KVM: s390: protvirt: Add initial lifecycle handling
-  KVM: s390: protvirt: Add KVM api documentation
-  KVM: s390: protvirt: Secure memory is not mergeable
-  KVM: s390: protvirt: Handle SE notification interceptions
-  KVM: s390: protvirt: Instruction emulation
-  KVM: s390: protvirt: Handle spec exception loops
-  KVM: s390: protvirt: Add new gprs location handling
-  KVM: S390: protvirt: Introduce instruction data area bounce buffer
-  KVM: s390: protvirt: handle secure guest prefix pages
-  KVM: s390: protvirt: Write sthyi data to instruction data area
-  KVM: s390: protvirt: STSI handling
-  KVM: s390: protvirt: disallow one_reg
-  KVM: s390: protvirt: Only sync fmt4 registers
-  KVM: s390: protvirt: Add program exception injection
-  DOCUMENTATION: protvirt: Diag 308 IPL
-  KVM: s390: protvirt: Add diag 308 subcode 8 - 10 handling
-  KVM: s390: protvirt: UV calls diag308 0, 1
-  KVM: s390: protvirt: Report CPU state to Ultravisor
-  KVM: s390: protvirt: Support cmd 5 operation state
-  KVM: s390: protvirt: Add UV debug trace
-  KVM: s390: protvirt: Mask PSW interrupt bits for interception 104 and
-    112
-  KVM: s390: protvirt: Add UV cpu reset calls
-
-Michael Mueller (4):
-  KVM: s390: protvirt: Add interruption injection controls
-  KVM: s390: protvirt: Implement interruption injection
-  KVM: s390: protvirt: Add machine-check interruption injection controls
-  KVM: s390: protvirt: Implement machine-check interruption injection
-
-Vasily Gorbik (3):
-  s390/protvirt: introduce host side setup
-  s390/protvirt: add ultravisor initialization
-  s390: add (non)secure page access exceptions handlers
-
- .../admin-guide/kernel-parameters.txt         |   5 +
- Documentation/virt/kvm/api.txt                |  62 +++
- Documentation/virt/kvm/s390-pv-boot.rst       |  64 +++
- Documentation/virt/kvm/s390-pv.rst            | 103 ++++
- MAINTAINERS                                   |   1 +
- arch/s390/boot/Makefile                       |   2 +-
- arch/s390/boot/uv.c                           |  20 +-
- arch/s390/include/asm/gmap.h                  |   3 +
- arch/s390/include/asm/kvm_host.h              | 112 +++-
- arch/s390/include/asm/mmu.h                   |   2 +
- arch/s390/include/asm/mmu_context.h           |   1 +
- arch/s390/include/asm/page.h                  |   5 +
- arch/s390/include/asm/pgtable.h               |  35 +-
- arch/s390/include/asm/uv.h                    | 265 +++++++++-
- arch/s390/kernel/Makefile                     |   1 +
- arch/s390/kernel/pgm_check.S                  |   4 +-
- arch/s390/kernel/setup.c                      |   7 +-
- arch/s390/kernel/uv.c                         | 271 ++++++++++
- arch/s390/kvm/Kconfig                         |  19 +
- arch/s390/kvm/Makefile                        |   2 +-
- arch/s390/kvm/diag.c                          |   7 +
- arch/s390/kvm/intercept.c                     | 107 +++-
- arch/s390/kvm/interrupt.c                     | 211 ++++++--
- arch/s390/kvm/kvm-s390.c                      | 486 ++++++++++++++++--
- arch/s390/kvm/kvm-s390.h                      |  56 ++
- arch/s390/kvm/priv.c                          |   9 +-
- arch/s390/kvm/pv.c                            | 293 +++++++++++
- arch/s390/mm/fault.c                          |  87 ++++
- arch/s390/mm/gmap.c                           |  63 ++-
- include/linux/gfp.h                           |   6 +
- include/uapi/linux/kvm.h                      |  47 +-
- mm/gup.c                                      |   2 +
- mm/page-writeback.c                           |   1 +
- 33 files changed, 2217 insertions(+), 142 deletions(-)
- create mode 100644 Documentation/virt/kvm/s390-pv-boot.rst
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ Documentation/virt/kvm/s390-pv.rst | 103 +++++++++++++++++++++++++++++
+ MAINTAINERS                        |   1 +
+ 2 files changed, 104 insertions(+)
  create mode 100644 Documentation/virt/kvm/s390-pv.rst
- create mode 100644 arch/s390/kernel/uv.c
- create mode 100644 arch/s390/kvm/pv.c
 
+diff --git a/Documentation/virt/kvm/s390-pv.rst b/Documentation/virt/kvm/s390-pv.rst
+new file mode 100644
+index 000000000000..5ef7e6cc2180
+--- /dev/null
++++ b/Documentation/virt/kvm/s390-pv.rst
+@@ -0,0 +1,103 @@
++.. SPDX-License-Identifier: GPL-2.0
++============================
++Ultravisor and Protected VMs
++============================
++
++Summary
++-------
++Protected virtual machines (PVM) are KVM VMs, where KVM can't access
++the VM's state like guest memory and guest registers anymore. Instead,
++the PVMs are mostly managed by a new entity called Ultravisor
++(UV). The UV provides an API that can be used by PVMs and KVM to
++request management actions.
++
++Each guest starts in the non-protected mode and then may make a
++request to transition into protected mode. On transition, KVM
++registers the guest and its VCPUs with the Ultravisor and prepares
++everything for running it.
++
++The Ultravisor will secure and decrypt the guest's boot memory
++(i.e. kernel/initrd). It will safeguard state changes like VCPU
++starts/stops and injected interrupts while the guest is running.
++
++As access to the guest's state, such as the SIE state description, is
++normally needed to be able to run a VM, some changes have been made in
++SIE behavior. A new format 4 state description has been introduced,
++where some fields have different meanings for a PVM. SIE exits are
++minimized as much as possible to improve speed and reduce exposed
++guest state.
++
++
++Interrupt injection
++-------------------
++Interrupt injection is safeguarded by the Ultravisor. As KVM doesn't
++have access to the VCPUs' lowcores, injection is handled via the
++format 4 state description.
++
++Machine check, external, IO and restart interruptions each can be
++injected on SIE entry via a bit in the interrupt injection control
++field (offset 0x54). If the guest cpu is not enabled for the interrupt
++at the time of injection, a validity interception is recognized. The
++format 4 state description contains fields in the interception data
++block where data associated with the interrupt can be transported.
++
++Program and Service Call exceptions have another layer of
++safeguarding; they can only be injected for instructions that have
++been intercepted into KVM. The exceptions need to be a valid outcome
++of an instruction emulation by KVM, e.g. we can never inject a
++addressing exception as they are reported by SIE since KVM has no
++access to the guest memory.
++
++
++Mask notification interceptions
++-------------------------------
++As a replacement for the lctl(g) and lpsw(e) instruction
++interceptions, two new interception codes have been introduced. One
++indicating that the contents of CRs 0, 6 or 14 have been changed. And
++one indicating PSW bit 13 changes.
++
++Instruction emulation
++---------------------
++With the format 4 state description for PVMs, the SIE instruction already
++interprets more instructions than it does with format 2. As it is not
++able to interpret every instruction, the SIE and the UV safeguard KVM's
++emulation inputs and outputs.
++
++Guest GRs and most of the instruction data, such as I/O data structures,
++are filtered. Instruction data is copied to and from the Secure
++Instruction Data Area. Guest GRs are put into / retrieved from the
++Interception-Data block.
++
++The Interception-Data block from the state description's offset 0x380
++contains GRs 0 - 16. Only GR values needed to emulate an instruction
++will be copied into this area.
++
++The Interception Parameters state description field still contains the
++the bytes of the instruction text, but with pre-set register values
++instead of the actual ones. I.e. each instruction always uses the same
++instruction text, in order not to leak guest instruction text.
++
++The Secure Instruction Data Area contains instruction storage
++data. Instruction data, i.e. data being referenced by an instruction
++like the SCCB for sclp, is moved over the SIDA When an instruction is
++intercepted, the SIE will only allow data and program interrupts for
++this instruction to be moved to the guest via the two data areas
++discussed before. Other data is either ignored or results in validity
++interceptions.
++
++
++Instruction emulation interceptions
++-----------------------------------
++There are two types of SIE secure instruction intercepts: the normal
++and the notification type. Normal secure instruction intercepts will
++make the guest pending for instruction completion of the intercepted
++instruction type, i.e. on SIE entry it is attempted to complete
++emulation of the instruction with the data provided by KVM. That might
++be a program exception or instruction completion.
++
++The notification type intercepts inform KVM about guest environment
++changes due to guest instruction interpretation. Such an interception
++is recognized for example for the store prefix instruction to provide
++the new lowcore location. On SIE reentry, any KVM data in the data
++areas is ignored, program exceptions are not injected and execution
++continues, as if no intercept had happened.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 56765f542244..90da412bebd9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -9106,6 +9106,7 @@ L:	kvm@vger.kernel.org
+ W:	http://www.ibm.com/developerworks/linux/linux390/
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git
+ S:	Supported
++F:	Documentation/virt/kvm/s390*
+ F:	arch/s390/include/uapi/asm/kvm*
+ F:	arch/s390/include/asm/gmap.h
+ F:	arch/s390/include/asm/kvm*
 -- 
 2.24.0
 
