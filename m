@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 392141509B3
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 16:21:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4FFD1509AD
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 16:21:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728707AbgBCPVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 10:21:39 -0500
+        id S1728614AbgBCPV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 10:21:28 -0500
 Received: from mga02.intel.com ([134.134.136.20]:32939 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728588AbgBCPV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 10:21:26 -0500
+        id S1728602AbgBCPV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 10:21:28 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Feb 2020 07:21:25 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Feb 2020 07:21:27 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,398,1574150400"; 
-   d="scan'208";a="429473383"
+   d="scan'208";a="429473393"
 Received: from lxy-dell.sh.intel.com ([10.239.13.109])
-  by fmsmga005.fm.intel.com with ESMTP; 03 Feb 2020 07:21:23 -0800
+  by fmsmga005.fm.intel.com with ESMTP; 03 Feb 2020 07:21:26 -0800
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -29,9 +29,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         David Laight <David.Laight@aculab.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v2 4/6] kvm: vmx: Extend VMX's #AC handding for split lock in guest
-Date:   Mon,  3 Feb 2020 23:16:06 +0800
-Message-Id: <20200203151608.28053-5-xiaoyao.li@intel.com>
+Subject: [PATCH v2 5/6] kvm: x86: Emulate MSR IA32_CORE_CAPABILITIES
+Date:   Mon,  3 Feb 2020 23:16:07 +0800
+Message-Id: <20200203151608.28053-6-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200203151608.28053-1-xiaoyao.li@intel.com>
 References: <20200203151608.28053-1-xiaoyao.li@intel.com>
@@ -42,152 +42,126 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are two types of #AC can be generated in Intel CPUs:
- 1. legacy alignment check #AC;
- 2. split lock #AC;
+Emulate MSR_IA32_CORE_CAPABILITIES in software and unconditionally
+advertise its support to userspace. Like MSR_IA32_ARCH_CAPABILITIES, it
+is a feature-enumerating MSR and can be fully emulated regardless of
+hardware support. Existence of CORE_CAPABILITIES is enumerated via
+CPUID.(EAX=7H,ECX=0):EDX[30].
 
-Legacy alignment check #AC can be injected to guest if guest has enabled
-alignemnet check.
-
-When host enables split lock detection, i.e., split_lock_detect != off,
-guest will receive an unexpected #AC when there is a split lock happens
-since KVM doesn't virtualize this feature to guest hardware value of
-MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit stays unchanged when vcpu is running.
-
-Since old guests lack split_lock #AC handler and may have split lock buges.
-To make them survive from split lock, applying the similar policy
-as host's split lock detect configuration:
- - host split lock detect is sld_warn:
-   warn the split lock happened in guest, and disabling split lock
-   detect during vcpu is running to allow the guest to continue running.
- - host split lock detect is sld_fatal:
-   forwarding #AC to userspace, somewhat similar as sending SIGBUS.
-
-Please note:
-1. If sld_warn and SMT is enabled, the split lock in guest's vcpu
-leads to disable split lock detect on the sibling CPU thread during
-the vcpu is running.
-
-2. When host is sld_warn, it allows guest to generate split lock which also
-opens the door for malicious guest to do DoS attack. It is same that in
-sld_warn mode, userspace application can do DoS attack.
-
-3. If want to prevent DoS attack from guest, host must use sld_fatal mode.
+Note, support for individual features enumerated via CORE_CAPABILITIES,
+e.g., split lock detection, will be added in future patches.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 48 +++++++++++++++++++++++++++++++++++++++---
- arch/x86/kvm/vmx/vmx.h |  3 +++
- 2 files changed, 48 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            |  5 +++--
+ arch/x86/kvm/x86.c              | 22 ++++++++++++++++++++++
+ 3 files changed, 26 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c475fa2aaae0..93e3370c5f84 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4233,6 +4233,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 329d01c689b7..dc231240102f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -591,6 +591,7 @@ struct kvm_vcpu_arch {
+ 	u64 ia32_xss;
+ 	u64 microcode_version;
+ 	u64 arch_capabilities;
++	u64 core_capabilities;
  
- 	vmx->msr_ia32_umwait_control = 0;
+ 	/*
+ 	 * Paging state of the vcpu
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index b1c469446b07..7282d04f3a6b 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -409,10 +409,11 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+ 		    boot_cpu_has(X86_FEATURE_AMD_SSBD))
+ 			entry->edx |= F(SPEC_CTRL_SSBD);
+ 		/*
+-		 * We emulate ARCH_CAPABILITIES in software even
+-		 * if the host doesn't support it.
++		 * ARCH_CAPABILITIES and CORE_CAPABILITIES are emulated in
++		 * software regardless of host support.
+ 		 */
+ 		entry->edx |= F(ARCH_CAPABILITIES);
++		entry->edx |= F(CORE_CAPABILITIES);
+ 		break;
+ 	case 1:
+ 		entry->eax &= kvm_cpuid_7_1_eax_x86_features;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 821b7404c0fd..a97a8f5dd1df 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1222,6 +1222,7 @@ static const u32 emulated_msrs_all[] = {
+ 	MSR_IA32_TSC_ADJUST,
+ 	MSR_IA32_TSCDEADLINE,
+ 	MSR_IA32_ARCH_CAPABILITIES,
++	MSR_IA32_CORE_CAPS,
+ 	MSR_IA32_MISC_ENABLE,
+ 	MSR_IA32_MCG_STATUS,
+ 	MSR_IA32_MCG_CTL,
+@@ -1288,6 +1289,7 @@ static const u32 msr_based_features_all[] = {
+ 	MSR_F10H_DECFG,
+ 	MSR_IA32_UCODE_REV,
+ 	MSR_IA32_ARCH_CAPABILITIES,
++	MSR_IA32_CORE_CAPS,
+ };
  
-+	vmx->disable_split_lock_detect = false;
-+
- 	vcpu->arch.microcode_version = 0x100000000ULL;
- 	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
- 	vmx->hv_deadline_tsc = -1;
-@@ -4557,6 +4559,12 @@ static int handle_machine_check(struct kvm_vcpu *vcpu)
- 	return 1;
+ static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
+@@ -1341,12 +1343,20 @@ static u64 kvm_get_arch_capabilities(void)
+ 	return data;
  }
  
-+static inline bool guest_cpu_alignment_check_enabled(struct kvm_vcpu *vcpu)
++static u64 kvm_get_core_capabilities(void)
 +{
-+	return vmx_get_cpl(vcpu) == 3 && kvm_read_cr0_bits(vcpu, X86_CR0_AM) &&
-+	       (kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
++	return 0;
 +}
 +
- static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+ static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -4622,9 +4630,6 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
- 		return handle_rmode_exception(vcpu, ex_no, error_code);
- 
- 	switch (ex_no) {
--	case AC_VECTOR:
--		kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
--		return 1;
- 	case DB_VECTOR:
- 		dr6 = vmcs_readl(EXIT_QUALIFICATION);
- 		if (!(vcpu->guest_debug &
-@@ -4653,6 +4658,33 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
- 		kvm_run->debug.arch.pc = vmcs_readl(GUEST_CS_BASE) + rip;
- 		kvm_run->debug.arch.exception = ex_no;
+ 	switch (msr->index) {
+ 	case MSR_IA32_ARCH_CAPABILITIES:
+ 		msr->data = kvm_get_arch_capabilities();
  		break;
-+	case AC_VECTOR:
-+		/*
-+		 * Inject #AC back to guest only when legacy alignment check
-+		 * enabled.
-+		 * Otherwise, it must be an unexpected split-lock #AC for guest
-+		 * since KVM keeps hardware SPLIT_LOCK_DETECT bit unchanged
-+		 * when vcpu is running.
-+		 *  - If sld_state == sld_warn, treat it similar as user space
-+		 *    process that warn and allow it to continue running.
-+		 *    In this case, setting vmx->diasble_split_lock_detect to
-+		 *    true so that it will toggle MSR_TEST.SPLIT_LOCK_DETECT
-+		 *    bit during every following VM Entry and Exit;
-+		 *  - If sld_state == sld_fatal, it forwards #AC to userspace,
-+		 *    similar as sending SIGBUS.
-+		 */
-+		if (guest_cpu_alignment_check_enabled(vcpu) ||
-+		    WARN_ON(get_split_lock_detect_state() == sld_off)) {
-+			kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
++	case MSR_IA32_CORE_CAPS:
++		msr->data = kvm_get_core_capabilities();
++		break;
+ 	case MSR_IA32_UCODE_REV:
+ 		rdmsrl_safe(msr->index, &msr->data);
+ 		break;
+@@ -2716,6 +2726,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			return 1;
+ 		vcpu->arch.arch_capabilities = data;
+ 		break;
++	case MSR_IA32_CORE_CAPS:
++		if (!msr_info->host_initiated)
 +			return 1;
-+		}
-+		if (get_split_lock_detect_state() == sld_warn) {
-+			pr_warn("kvm: split lock #AC happened in %s [%d]\n",
-+				current->comm, current->pid);
-+			vmx->disable_split_lock_detect = true;
++		vcpu->arch.core_capabilities = data;
++		break;
+ 	case MSR_EFER:
+ 		return set_efer(vcpu, msr_info);
+ 	case MSR_K7_HWCR:
+@@ -3044,6 +3059,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			return 1;
+ 		msr_info->data = vcpu->arch.arch_capabilities;
+ 		break;
++	case MSR_IA32_CORE_CAPS:
++		if (!msr_info->host_initiated &&
++		    !guest_cpuid_has(vcpu, X86_FEATURE_CORE_CAPABILITIES))
 +			return 1;
-+		}
-+		/* fall through*/
- 	default:
- 		kvm_run->exit_reason = KVM_EXIT_EXCEPTION;
- 		kvm_run->ex.exception = ex_no;
-@@ -6530,6 +6562,11 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	x86_spec_ctrl_set_guest(vmx->spec_ctrl, 0);
++		msr_info->data = vcpu->arch.core_capabilities;
++		break;
+ 	case MSR_IA32_POWER_CTL:
+ 		msr_info->data = vcpu->arch.msr_ia32_power_ctl;
+ 		break;
+@@ -9288,6 +9309,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 		goto free_guest_fpu;
  
-+	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
-+	    unlikely(vmx->disable_split_lock_detect) &&
-+	    !test_tsk_thread_flag(current, TIF_SLD))
-+		split_lock_detect_set(false);
-+
- 	/* L1D Flush includes CPU buffer clear to mitigate MDS */
- 	if (static_branch_unlikely(&vmx_l1d_should_flush))
- 		vmx_l1d_flush(vcpu);
-@@ -6564,6 +6601,11 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	x86_spec_ctrl_restore_host(vmx->spec_ctrl, 0);
- 
-+	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
-+	    unlikely(vmx->disable_split_lock_detect) &&
-+	    !test_tsk_thread_flag(current, TIF_SLD))
-+		split_lock_detect_set(true);
-+
- 	/* All fields are clean at this point */
- 	if (static_branch_unlikely(&enable_evmcs))
- 		current_evmcs->hv_clean_fields |=
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 7f42cf3dcd70..912eba66c5d5 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -274,6 +274,9 @@ struct vcpu_vmx {
- 
- 	bool req_immediate_exit;
- 
-+	/* Disable split-lock detection when running the vCPU */
-+	bool disable_split_lock_detect;
-+
- 	/* Support for PML */
- #define PML_ENTITY_NUM		512
- 	struct page *pml_pg;
+ 	vcpu->arch.arch_capabilities = kvm_get_arch_capabilities();
++	vcpu->arch.core_capabilities = kvm_get_core_capabilities();
+ 	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
+ 	kvm_vcpu_mtrr_init(vcpu);
+ 	vcpu_load(vcpu);
 -- 
 2.23.0
 
