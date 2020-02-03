@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AA37F1509B7
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 16:21:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BF381509AA
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 16:21:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727619AbgBCPVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 10:21:17 -0500
+        id S1728151AbgBCPVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 10:21:20 -0500
 Received: from mga02.intel.com ([134.134.136.20]:32939 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726272AbgBCPVR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 10:21:17 -0500
+        id S1726272AbgBCPVT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 10:21:19 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Feb 2020 07:21:16 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Feb 2020 07:21:18 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,398,1574150400"; 
-   d="scan'208";a="429473339"
+   d="scan'208";a="429473347"
 Received: from lxy-dell.sh.intel.com ([10.239.13.109])
-  by fmsmga005.fm.intel.com with ESMTP; 03 Feb 2020 07:21:15 -0800
+  by fmsmga005.fm.intel.com with ESMTP; 03 Feb 2020 07:21:17 -0800
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -29,10 +29,12 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         David Laight <David.Laight@aculab.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v2 0/6] kvm/split_lock: Add feature split lock detection support in kvm
-Date:   Mon,  3 Feb 2020 23:16:02 +0800
-Message-Id: <20200203151608.28053-1-xiaoyao.li@intel.com>
+Subject: [PATCH v2 1/6] x86/split_lock: Add and export get_split_lock_detect_state()
+Date:   Mon,  3 Feb 2020 23:16:03 +0800
+Message-Id: <20200203151608.28053-2-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200203151608.28053-1-xiaoyao.li@intel.com>
+References: <20200203151608.28053-1-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -40,38 +42,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This version adds the virtualization of split lock detection for guest
-in patch 5 and patch 6.
+get_split_lock_detect_state() will be used by KVM module to get sld_state.
 
-No matter whether we advertise split lock detection to guest, we have to make
-a choice between not burn the old guest and prevent DoS attack from guest since
-we cannot identify whether a guest is malicious.
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+ arch/x86/include/asm/cpu.h  | 12 ++++++++++++
+ arch/x86/kernel/cpu/intel.c | 12 ++++++------
+ 2 files changed, 18 insertions(+), 6 deletions(-)
 
-Since sld_warn mode also allows userspace applications to do split lock
-we can extend the similar policy to guest that if host is sld_warn, we allow
-guest to generate split lock by clearing MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit
-when vcpu is running.
-
-If host is sld_fatal mode and guest doesn't set its SPLIT_LOCK_DETECT bit we
-forward split lock #AC to user space, similar as sending SIGBUS.
-
-Xiaoyao Li (6):
-  x86/split_lock: Add and export get_split_lock_detect_state()
-  x86/split_lock: Add and export split_lock_detect_set()
-  kvm: x86: Emulate split-lock access as a write
-  kvm: vmx: Extend VMX's #AC handding for split lock in guest
-  kvm: x86: Emulate MSR IA32_CORE_CAPABILITIES
-  x86: vmx: virtualize split lock detection
-
- arch/x86/include/asm/cpu.h      | 13 +++++
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kernel/cpu/intel.c     | 18 ++++--
- arch/x86/kvm/cpuid.c            |  5 +-
- arch/x86/kvm/vmx/vmx.c          | 98 ++++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/vmx.h          |  4 ++
- arch/x86/kvm/x86.c              | 44 ++++++++++++++-
- 7 files changed, 171 insertions(+), 12 deletions(-)
-
+diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
+index ff6f3ca649b3..167d0539e0ad 100644
+--- a/arch/x86/include/asm/cpu.h
++++ b/arch/x86/include/asm/cpu.h
+@@ -40,11 +40,23 @@ int mwait_usable(const struct cpuinfo_x86 *);
+ unsigned int x86_family(unsigned int sig);
+ unsigned int x86_model(unsigned int sig);
+ unsigned int x86_stepping(unsigned int sig);
++
++enum split_lock_detect_state {
++	sld_off = 0,
++	sld_warn,
++	sld_fatal,
++};
++
+ #ifdef CONFIG_CPU_SUP_INTEL
++extern enum split_lock_detect_state get_split_lock_detect_state(void);
+ extern void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c);
+ extern void switch_to_sld(unsigned long tifn);
+ extern bool handle_user_split_lock(struct pt_regs *regs, long error_code);
+ #else
++static inline enum split_lock_detect_state get_split_lock_detect_state(void)
++{
++	return sld_off;
++}
+ static inline void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c) {}
+ static inline void switch_to_sld(unsigned long tifn) {}
+ static inline bool handle_user_split_lock(struct pt_regs *regs, long error_code)
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index db3e745e5d47..a810cd022db5 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -33,12 +33,6 @@
+ #include <asm/apic.h>
+ #endif
+ 
+-enum split_lock_detect_state {
+-	sld_off = 0,
+-	sld_warn,
+-	sld_fatal,
+-};
+-
+ /*
+  * Default to sld_off because most systems do not support split lock detection
+  * split_lock_setup() will switch this to sld_warn on systems that support
+@@ -968,6 +962,12 @@ cpu_dev_register(intel_cpu_dev);
+ #undef pr_fmt
+ #define pr_fmt(fmt) "x86/split lock detection: " fmt
+ 
++enum split_lock_detect_state get_split_lock_detect_state(void)
++{
++	return sld_state;
++}
++EXPORT_SYMBOL_GPL(get_split_lock_detect_state);
++
+ static const struct {
+ 	const char			*option;
+ 	enum split_lock_detect_state	state;
 -- 
 2.23.0
 
