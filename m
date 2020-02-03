@@ -2,78 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B409F150629
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 13:28:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ADE615064A
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2020 13:42:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727942AbgBCM2C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 07:28:02 -0500
-Received: from foss.arm.com ([217.140.110.172]:52798 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727905AbgBCM2C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 07:28:02 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B2F9BFEC;
-        Mon,  3 Feb 2020 04:28:01 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BD26B3F52E;
-        Mon,  3 Feb 2020 04:28:00 -0800 (PST)
-Subject: Re: [PATCH v2 kvmtool 18/30] hw/vesa: Set the size for BAR 0
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-References: <20200123134805.1993-1-alexandru.elisei@arm.com>
- <20200123134805.1993-19-alexandru.elisei@arm.com>
- <20200203122049.05483484@donnerap.cambridge.arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <8f66615a-b771-1d6c-f794-182a5fd1d07d@arm.com>
-Date:   Mon, 3 Feb 2020 12:27:55 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727509AbgBCMmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 07:42:23 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27206 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727188AbgBCMmX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 3 Feb 2020 07:42:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580733742;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TYmvaWdfWIY2CO2m0YyjXtoTDOMMJedRMMAbCyAuU5U=;
+        b=Bf2k9Iu0CICu5AAYKJ9DyPpablKXQu/9OvhfQ7qJi4BpsMQfy6/VMZ9P7nEweUX4k0C3Fy
+        UuKC3q6JsruQR+OGnSBYTUE4Z05sN3mi1TVZ8Bne/BgQ91MOQWcWKQGHC+7UeMhGL7z7Of
+        tdWa0pgw5Q3er9dY5xKi6bnICpiIcoA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-A0DG2HksPamgib_XAem8eA-1; Mon, 03 Feb 2020 07:42:17 -0500
+X-MC-Unique: A0DG2HksPamgib_XAem8eA-1
+Received: by mail-wm1-f70.google.com with SMTP id p5so4751691wmc.4
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 04:42:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=TYmvaWdfWIY2CO2m0YyjXtoTDOMMJedRMMAbCyAuU5U=;
+        b=iRXWyLtUotdUpO106HpcWUAAeGY+cXXWl781jP8r6MvTtAsCd0GfgPqnwKOIg8gco7
+         GdPd4C0pEm1FnOkHHrtdaQnpkRsAgfS9A8NDD3nRv3K3sclHKfoMOHYkbN0a63Hw+6qb
+         DRxx9SXA/IkvmdkEBdv94BoJaIHdtNwGrwNrn39wW0etLWWwV9LfEL4V3Lo+nOXySRT3
+         BhuPKSvaqm8nMg3F/Bp85YeGzUf4P3f44ASP5W+VKEaZaFP9rwgE28mxevCchRilCBYm
+         3WIYc2elR+b0Hdvak3bLNGQgTHelJDHb2ZDGLRyrSDs21toBAIbESmEvNBFfHR+lymU/
+         QAjQ==
+X-Gm-Message-State: APjAAAXSclPVQSUfxbeQUD13heulQ06EKUDf0lrti6d9f7bPs7EdH/Ts
+        giOTfHlHbuXKDVIpDmNZ1r1dQczjn3mB9CqYJX1hBsqhoVR+sgHGm0fc8M7Sk6fb//bQppcHcPv
+        65q/dGN0oYk9I
+X-Received: by 2002:a7b:c0d9:: with SMTP id s25mr4276781wmh.98.1580733736463;
+        Mon, 03 Feb 2020 04:42:16 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwdm4k8EedzgClLA+MN0ll3YAa2bCfhF2w/sjiLgqXACvp+q6FVH7riajO76FmIcSp3p77YNw==
+X-Received: by 2002:a7b:c0d9:: with SMTP id s25mr4276733wmh.98.1580733736187;
+        Mon, 03 Feb 2020 04:42:16 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id n3sm23352349wmc.27.2020.02.03.04.42.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Feb 2020 04:42:15 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] x86/kvm: do not setup pv tlb flush when not paravirtualized
+In-Reply-To: <20200203101514.GG40679@calabresa>
+References: <20200131155655.49812-1-cascardo@canonical.com> <87wo94ng9d.fsf@vitty.brq.redhat.com> <20200203101514.GG40679@calabresa>
+Date:   Mon, 03 Feb 2020 13:42:14 +0100
+Message-ID: <87r1zbona1.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200203122049.05483484@donnerap.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+Thadeu Lima de Souza Cascardo <cascardo@canonical.com> writes:
 
-On 2/3/20 12:20 PM, Andre Przywara wrote:
-> On Thu, 23 Jan 2020 13:47:53 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> On Mon, Feb 03, 2020 at 10:59:10AM +0100, Vitaly Kuznetsov wrote:
+>> Thadeu Lima de Souza Cascardo <cascardo@canonical.com> writes:
+>> 
+>> > kvm_setup_pv_tlb_flush will waste memory and print a misguiding message
+>> > when KVM paravirtualization is not available.
+>> >
+>> > Intel SDM says that the when cpuid is used with EAX higher than the
+>> > maximum supported value for basic of extended function, the data for the
+>> > highest supported basic function will be returned.
+>> >
+>> > So, in some systems, kvm_arch_para_features will return bogus data,
+>> > causing kvm_setup_pv_tlb_flush to detect support for pv tlb flush.
+>> >
+>> > Testing for kvm_para_available will work as it checks for the hypervisor
+>> > signature.
+>> >
+>> > Besides, when the "nopv" command line parameter is used, it should not
+>> > continue as well, as kvm_guest_init will no be called in that case.
+>> >
+>> > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+>> > ---
+>> >  arch/x86/kernel/kvm.c | 3 +++
+>> >  1 file changed, 3 insertions(+)
+>> >
+>> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>> > index 81045aabb6f4..d817f255aed8 100644
+>> > --- a/arch/x86/kernel/kvm.c
+>> > +++ b/arch/x86/kernel/kvm.c
+>> > @@ -736,6 +736,9 @@ static __init int kvm_setup_pv_tlb_flush(void)
+>> >  {
+>> >  	int cpu;
+>> >  
+>> > +	if (!kvm_para_available() || nopv)
+>> > +		return 0;
+>> > +
+>> >  	if (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
+>> >  	    !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
+>> >  	    kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+>> 
+>> The patch will fix the immediate issue, but why kvm_setup_pv_tlb_flush()
+>> is just an arch_initcall() which will be executed regardless of the fact
+>> if we are running on KVM or not?
+>> 
+>> In Hyper-V we setup PV TLB flush from ms_hyperv_init_platform() -- which
+>> only happens if Hyper-V platform was detected. Why don't we do it from
+>> kvm_init_platform() in KVM?
+>> 
+>> -- 
+>> Vitaly
+>> 
 >
->> BAR 0 is an I/O BAR and is registered as an ioport region. Let's set its
->> size, so a guest can actually use it.
-> Well, the whole I/O bar emulates as RAZ/WI, so I would be curious how the guest would actually use it, but specifying the size is surely a good thing, so:
+> Because we can't call the allocator that early.
+>
+> Also, see the thread where this was "decided", the v6 of the original patch:
+>
+> https://lore.kernel.org/kvm/20171129162118.GA10661@flask/
 
-Yeah, you're right, I was thinking about ARM where ioport are MMIO and you need to
-map those address. I'll remove the part about the guest being able to actually use
-it in the next iteration of the series.. Is it OK if I keep your Reviewed-by?
+Ok, I see, it's basically about what we prioritize: shorter boot time vs
+smaller memory footprint. I'd personally vote for the former but the
+opposite opinion is equally valid. Let's preserve the status quo.
 
->  
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Reviewed-by: Andre Przywara <andre.przywara>
->
-> Cheers,
-> Andre
->
->> ---
->>  hw/vesa.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/vesa.c b/hw/vesa.c
->> index a665736a76d7..e988c0425946 100644
->> --- a/hw/vesa.c
->> +++ b/hw/vesa.c
->> @@ -70,6 +70,7 @@ struct framebuffer *vesa__init(struct kvm *kvm)
->>  
->>  	vesa_base_addr			= (u16)r;
->>  	vesa_pci_device.bar[0]		= cpu_to_le32(vesa_base_addr | PCI_BASE_ADDRESS_SPACE_IO);
->> +	vesa_pci_device.bar_size[0]	= PCI_IO_SIZE;
->>  	r = device__register(&vesa_device);
->>  	if (r < 0)
->>  		return ERR_PTR(r);
+-- 
+Vitaly
+
