@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0AFB151A61
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:13:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECE1E151A66
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:15:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727127AbgBDMNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 07:13:21 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29499 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727115AbgBDMNV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 07:13:21 -0500
+        id S1727136AbgBDMP3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 07:15:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47617 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727124AbgBDMP2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 07:15:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580818399;
+        s=mimecast20190719; t=1580818528;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=iEs8HZyVk6Rxn786ymoYxwv7M4tnPGVhtBP3285xSf0=;
-        b=eUvd0qvDQFKl9EMPTUUR5Fs95ZEY95tHCjTBWvnjZdQrLjIRvLjDtFrfEXqmuAQARmiy3t
-        HanC+PrQvfbAjEujh1BFr/mXAgNjYss0/QfyUYWy8DRcCnM/ET31aY/nbu0Qu9/YG0HBqq
-        zLkXf2j8sbpPJla4jdH3iibzPRF/wE0=
+        bh=HdY05I5gdgCm8j4ABP2KUYSFj9qcog7BW171SATHWJA=;
+        b=cBQTOSzPZnfzwqGxI9FPLdWMXNt9sMLhbiU8mP8q4/lvZQmHmAmB/AFjD2NJBDAKhXKtAL
+        ZTp2FlNhAkqJ3Ni4i49INeC2K8BI5FSmMptuft0QxesslxMFqlNNkEakYfSKRkONSjTgi2
+        dHMwfAYYDVRPlu7wgYV5So1GIJ5QR2s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-128-nG35jAehMde76pnffmIkjw-1; Tue, 04 Feb 2020 07:13:11 -0500
-X-MC-Unique: nG35jAehMde76pnffmIkjw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-239-tu8WSxpbOqO4OE9wTXll9w-1; Tue, 04 Feb 2020 07:15:26 -0500
+X-MC-Unique: tu8WSxpbOqO4OE9wTXll9w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 412CC1882CD8;
-        Tue,  4 Feb 2020 12:13:10 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AA57DB24;
+        Tue,  4 Feb 2020 12:15:25 +0000 (UTC)
 Received: from [10.36.117.121] (ovpn-117-121.ams2.redhat.com [10.36.117.121])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 89B8760BE0;
-        Tue,  4 Feb 2020 12:13:08 +0000 (UTC)
-Subject: Re: [RFCv2 08/37] KVM: s390: protvirt: Add initial lifecycle handling
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 52317100164D;
+        Tue,  4 Feb 2020 12:15:23 +0000 (UTC)
+Subject: Re: [RFCv2 10/37] KVM: s390: protvirt: Secure memory is not mergeable
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -42,7 +42,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-9-borntraeger@de.ibm.com>
+ <20200203131957.383915-11-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -88,108 +88,54 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <8fdcbfc6-3e58-8970-416f-4039bb151394@redhat.com>
-Date:   Tue, 4 Feb 2020 13:13:07 +0100
+Message-ID: <fb622974-6913-2cf0-86df-dddb48ea4db1@redhat.com>
+Date:   Tue, 4 Feb 2020 13:15:22 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200203131957.383915-9-borntraeger@de.ibm.com>
+In-Reply-To: <20200203131957.383915-11-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[...]
 
-> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
-> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
-> +{
-> +	int r =3D 0;
-> +	void __user *argp =3D (void __user *)cmd->data;
-> +
-> +	switch (cmd->cmd) {
-> +	case KVM_PV_VM_CREATE: {
-> +		r =3D -EINVAL;
-> +		if (kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r =3D kvm_s390_pv_alloc_vm(kvm);
-> +		if (r)
-> +			break;
-> +
-> +		mutex_lock(&kvm->lock);
-> +		kvm_s390_vcpu_block_all(kvm);
-> +		/* FMT 4 SIE needs esca */
-> +		r =3D sca_switch_to_extended(kvm);
-> +		if (!r)
-> +			r =3D kvm_s390_pv_create_vm(kvm);
-> +		kvm_s390_vcpu_unblock_all(kvm);
-> +		mutex_unlock(&kvm->lock);
-> +		break;
-> +	}
+>   * Enable storage key handling from now on and initialize the storage
+>   * keys with the default key.
+> @@ -2593,7 +2610,6 @@ static const struct mm_walk_ops enable_skey_walk_ops = {
+>  int s390_enable_skey(void)
+>  {
+>  	struct mm_struct *mm = current->mm;
+> -	struct vm_area_struct *vma;
+>  	int rc = 0;
+>  
+>  	down_write(&mm->mmap_sem);
+> @@ -2601,15 +2617,7 @@ int s390_enable_skey(void)
+>  		goto out_up;
+>  
+>  	mm->context.uses_skeys = 1;
+> -	for (vma = mm->mmap; vma; vma = vma->vm_next) {
+> -		if (ksm_madvise(vma, vma->vm_start, vma->vm_end,
+> -				MADV_UNMERGEABLE, &vma->vm_flags)) {
+> -			mm->context.uses_skeys = 0;
+> -			rc = -ENOMEM;
+> -			goto out_up;
+> -		}
+> -	}
+> -	mm->def_flags &= ~VM_MERGEABLE;
+> +	gmap_mark_unmergeable();
 
-I think KVM_PV_VM_ENABLE/KVM_PV_VM_DISABLE would be a better fit. You're
-not creating/deleting VMs, aren't you? All you're doing is allocating
-some data and performing some kind of a mode switch.
-[...]
 
->  	VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", id, vc=
-pu,
->  		 vcpu->arch.sie_block);
->  	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
-> @@ -4353,6 +4502,37 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp=
-,
->  	return -ENOIOCTLCMD;
->  }
-> =20
-> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
-> +static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu *vcpu,
-> +				   struct kvm_pv_cmd *cmd)
-> +{
-> +	int r =3D 0;
-> +
-> +	if (!kvm_s390_pv_is_protected(vcpu->kvm))
-> +		return -EINVAL;
-> +
-> +	switch (cmd->cmd) {
-> +	case KVM_PV_VCPU_CREATE: {
-> +		if (kvm_s390_pv_handle_cpu(vcpu))
-> +			return -EINVAL;
-> +
-> +		r =3D kvm_s390_pv_create_cpu(vcpu);
-> +		break;
-> +	}
-> +	case KVM_PV_VCPU_DESTROY: {
-> +		if (!kvm_s390_pv_handle_cpu(vcpu))
-> +			return -EINVAL;
-> +
-> +		r =3D kvm_s390_pv_destroy_cpu(vcpu);
-> +		break;
-> +	}
-> +	default:
-> +		r =3D -ENOTTY;
-> +	}
-> +	return r;
-> +}
+I think I already complained about this patch *as is* and there was an
+update. (ignoring errors, mm->context.uses_skeys handling in
+gmap_mark_unmergeable() etc.)
 
-I asked this already and didn't get an answer (lost in the flood of
-comments :) )
 
-Can't we simply convert all VCPUs via KVM_PV_VM_CREATE and destoy them
-via KVM_PV_VM_DESTROY? Then you can easily handle hotplug as well in the
-kernel when a new VCPU is created and PV is active - oh and I see you
-are already doing that in kvm_arch_vcpu_create(). So that screams for
-doing either this a) completely triggered by user space or b) completely
-in the kernel. I prefer the latter. One interface less required.
-
-I would assume that no VCPU is allowed to be running inside KVM while
-performing the PV switch, which would make this even easier.
-
---=20
+-- 
 Thanks,
 
 David / dhildenb
