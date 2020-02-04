@@ -2,155 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BDE75151AC2
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:49:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE78C151ACD
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:52:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727166AbgBDMtA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 07:49:00 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37753 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727127AbgBDMtA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 07:49:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580820538;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=oX5GlZgXq82vNSWN9LhqpMNOHy1UTBtpuifHtRuB3ac=;
-        b=cUubMmqeQmDwlQczh41zwUGRkI38r5Rwy3LzONlIeWUEWpkNexswseOHlh5q+kcDjHEF4/
-        0Irhg0kGnYHXHv9Uleoo86bCS21UZUmHlnRpnfn0hZlJLWCG2MfnyGe03cUlqGKSNmCp5D
-        zUT2lzlPWh9vLOFqYFxiIXBQFqHeaGU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-Kefbzag3NmGXLDX4x6HCcw-1; Tue, 04 Feb 2020 07:48:55 -0500
-X-MC-Unique: Kefbzag3NmGXLDX4x6HCcw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9F2059901;
-        Tue,  4 Feb 2020 12:48:53 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-39.ams2.redhat.com [10.36.116.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8953E87B1A;
-        Tue,  4 Feb 2020 12:48:49 +0000 (UTC)
-Subject: Re: [RFCv2 06/37] s390: add (non)secure page access exceptions
- handlers
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-7-borntraeger@de.ibm.com>
- <dd3d333d-d141-5a22-9b1d-161232b37cfb@redhat.com>
- <20200204124123.183ef25b@p-imbrenda>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <2362357d-f2b5-62f2-8cb1-b7e281ea66e2@redhat.com>
-Date:   Tue, 4 Feb 2020 13:48:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200204124123.183ef25b@p-imbrenda>
+        id S1727191AbgBDMwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 07:52:16 -0500
+Received: from mail-eopbgr80088.outbound.protection.outlook.com ([40.107.8.88]:11652
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727126AbgBDMwP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 07:52:15 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Hunt6rBe5ULWjDyCI35n3UJUQlpG9OrIt8B4HTj8A/6CNhKX+M1fJA3fg1/UlTgGuPY+rUNsxyjJsBPP/ZDf1/HIbk5+Afd9CTSYMhEOt3VBV7ER/j94iYoqEYNaxzCiPOFUyUTWYzJTA5Dn/j7KLhuAxZzZypioYPis1vHuoXui0pdzLDhD3A1beUHeiNfqtFCj6zFX53WZ0x8WAeyHQv3gFp0T9GnxyprHRO7GrNH6YLJgy0w6mTDPkY41LbdqnfQe0V0HNQz9So2jrUQk8RSZNFjbcmm0KBETnkAwAyO20IcDeHVxc4/71W8dwD1EG3GMKKI69l4sChtdM9IShg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mpC4kyVFwC3rB+vTbnM6pkI+Hr9jmeheaKUwckA2Hcg=;
+ b=gjRV4Hbw7onbeJk9nKyGW+Uq8b7uggDcpvhboqbndYdi7rkLGVuHj4RuQ8E24asmPVebCluUYvSfOZFOR82u9ARdF0GZfXEMGNXjL/+OP1zD4D1X6LTHznf8DExHOpVVlEjr8OWPGbhOabGzZGzr6ZQv8jPpFDyWuwNKlv11iSHJ5+HYp6wdljI/Z59WxLWshEH+Jm/tlcbb22SQXrPvvk5HYFAkhJnUntCWNHGFhhrBzg2tt1Mq0WDLOzwExzS1czfQ5mAn6HM0JI5s4/XwzUNz5fVo+2aJO60PZMfm90NZR0rX4PFDQAj424lQC25mi/VmgNOrfcWpuP0qf0WMoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mpC4kyVFwC3rB+vTbnM6pkI+Hr9jmeheaKUwckA2Hcg=;
+ b=FrmDGmLPgPi0FyJS7/DaY3IN2yXHT6wgBEs9vOgf+BXGG8HJunKkI+Onmmdz5zNE5knKPgmD9dTQueKNkA6+6o+RkP8AFzZ1PgUWEq1q4p2vYoqYFTz15x9sprMuJTle5LsttU6tK0A7es+NnTLaHG8h1crqfrrMmyu9rEz6QQg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
+ VI1PR05MB5277.eurprd05.prod.outlook.com (20.178.9.23) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.27; Tue, 4 Feb 2020 12:52:08 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2686.031; Tue, 4 Feb 2020
+ 12:52:08 +0000
+Date:   Tue, 4 Feb 2020 08:52:04 -0400
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Zhu Lingshan <lingshan.zhu@linux.intel.com>, mst@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
+        hch@infradead.org, aadam@redhat.com, jakub.kicinski@netronome.com,
+        jiri@mellanox.com, shahafs@mellanox.com, hanand@xilinx.com,
+        mhabets@solarflare.com
+Subject: Re: [PATCH 5/5] vdpasim: vDPA device simulator
+Message-ID: <20200204125204.GS23346@mellanox.com>
+References: <20200116124231.20253-1-jasowang@redhat.com>
+ <20200116124231.20253-6-jasowang@redhat.com>
+ <1b86d188-0666-f6ab-e3b3-bec1cfbd0c76@linux.intel.com>
+ <cca7901b-51dd-4f4b-5c30-c42577ad5194@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cca7901b-51dd-4f4b-5c30-c42577ad5194@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: MN2PR05CA0003.namprd05.prod.outlook.com
+ (2603:10b6:208:c0::16) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
+MIME-Version: 1.0
+Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR05CA0003.namprd05.prod.outlook.com (2603:10b6:208:c0::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.9 via Frontend Transport; Tue, 4 Feb 2020 12:52:07 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1iyxgS-0001Mu-BA; Tue, 04 Feb 2020 08:52:04 -0400
+X-Originating-IP: [142.68.57.212]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: e1e6986e-e8ef-4d48-fd46-08d7a9710b22
+X-MS-TrafficTypeDiagnostic: VI1PR05MB5277:|VI1PR05MB5277:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR05MB527710630800F2D39D9A8313CF030@VI1PR05MB5277.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 03030B9493
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(396003)(136003)(376002)(39860400002)(199004)(189003)(66946007)(66476007)(33656002)(66556008)(86362001)(8936002)(1076003)(478600001)(5660300002)(186003)(26005)(316002)(4326008)(2616005)(52116002)(9746002)(7416002)(9786002)(8676002)(6916009)(81156014)(81166006)(2906002)(36756003)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB5277;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+Received-SPF: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XDISqpoPOpohiCFsSvYYY08kahaUNrwILL4J0MuhX8aLG8S9Y4/Popl13wQ/DsZcjmSmxh/QRpguSLLVn5uCEAS48JtE/rPoWvviSAfxsJLYYM2knNI1MkCJUjwpgCYZBRS2XkEyvWwYOiHg6yT2KrmGO089BHXLVz9EAQDBS8MON0iLsGjF1utTdeAZlsgrZylfI45x6tQmryGNDX23APC182Cn93uSGSXa8f6NP2n7p87Mqzf3rUIfGXxVXtxtqxEj1hH0FyO+4kvJouSdQdDzJUVdS59YWtHlFLBGJUdfo2pLulXw2O4a27Gtlj7z2GeoxDS9AkpvKNNaW7HHMMJkjPBSXXKTGTyVs5BrKS2Tjgaajc4yc+JI5ba/CW7+//7Z/mKYkIkcuk+JzTe645jvNDK1b1wrR9evemWKGlwbYEp0+CM5I35KBJBoJbOAkIW+HdG62GM+Z0gTNXqNJbUqfulH7jc6dUImhL/DuPTZRs6WIuh3VPYngZNiyDC5
+X-MS-Exchange-AntiSpam-MessageData: YjcQgx1HsdIJVIig40XIush/QH2MeDhlC6P9RL2dVyQ0pEdat2Fq/nWP7KYXfzYFJ17YLUQYp4SaWVW9+gN6HY3WyyMxXNXThLoU6wqfNj1Y49R9Ad2ynODCy+PxnvqfIqOykiOTNbSZaH7IF5W8ug==
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1e6986e-e8ef-4d48-fd46-08d7a9710b22
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2020 12:52:08.1104
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HdXM5URTq/Pcq3bZwIiYkzxVTDdoYEq3DpCJnMoYQqo5TsX+hHFCC0pIDxUgEq9pv/+gNYCgzfrljqUby2nrUQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5277
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/02/2020 12.41, Claudio Imbrenda wrote:
-> On Tue, 4 Feb 2020 11:37:42 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
->=20
-> [...]
->=20
->>> ---
->>>  arch/s390/kernel/pgm_check.S |  4 +-
->>>  arch/s390/mm/fault.c         | 87
->>> ++++++++++++++++++++++++++++++++++++ 2 files changed, 89
->>> insertions(+), 2 deletions(-) =20
->> [...]
->>> +void do_non_secure_storage_access(struct pt_regs *regs)
->>> +{
->>> +	unsigned long gaddr =3D regs->int_parm_long &
->>> __FAIL_ADDR_MASK;
->>> +	struct gmap *gmap =3D (struct gmap *)S390_lowcore.gmap;
->>> +	struct uv_cb_cts uvcb =3D {
->>> +		.header.cmd =3D UVC_CMD_CONV_TO_SEC_STOR,
->>> +		.header.len =3D sizeof(uvcb),
->>> +		.guest_handle =3D gmap->se_handle,
->>> +		.gaddr =3D gaddr,
->>> +	};
->>> +	int rc;
->>> +
->>> +	if (get_fault_type(regs) !=3D GMAP_FAULT) {
->>> +		do_fault_error(regs, VM_READ | VM_WRITE,
->>> VM_FAULT_BADMAP);
->>> +		WARN_ON_ONCE(1);
->>> +		return;
->>> +	}
->>> +
->>> +	rc =3D uv_make_secure(gmap, gaddr, &uvcb, 0);
->>> +	if (rc =3D=3D -EINVAL && uvcb.header.rc !=3D 0x104)
->>> +		send_sig(SIGSEGV, current, 0);
->>> +} =20
->>
->> What about the other rc beside 0x104 that could happen here? They go
->> unnoticed?
->=20
-> no, they are handled in the uv_make_secure, and return an appropriate
-> error code.=20
-Hmm, in patch 05/37, I basically see:
+On Tue, Feb 04, 2020 at 04:28:27PM +0800, Jason Wang wrote:
+> 
+> On 2020/2/4 下午4:21, Zhu Lingshan wrote:
+> > > +static const struct dma_map_ops vdpasim_dma_ops = {
+> > > +    .map_page = vdpasim_map_page,
+> > > +    .unmap_page = vdpasim_unmap_page,
+> > > +    .alloc = vdpasim_alloc_coherent,
+> > > +    .free = vdpasim_free_coherent,
+> > > +};
+> > > +
+> > 
+> > Hey Jason,
+> > 
+> > IMHO, it would be nice if dma_ops of the parent device could be re-used.
+> > vdpa_device is expecting to represent a physical device except this
+> > simulator, however, there are not enough information in vdpa_device.dev
+> > to indicating which kind physical device it attached to. Namely
+> > get_arch_dma_ops(struct bus type) can not work on vdpa_device.dev. Then
+> > it seems device drivers need to implement a wrap of dma_ops of parent
+> > devices. Can this work be done in the vdpa framework since it looks like
+> > a common task? Can "vd_dev->vdev.dev.parent = vdpa->dev->parent;" in
+> > virtio_vdpa_probe() do the work?
+> > 
+> > Thanks,
+> > BR
+> > Zhu Lingshan
+> 
+> 
+> Good catch.
+> 
+> I think we can.
 
-+static int make_secure_pte(pte_t *ptep, unsigned long addr, void *data)
-+{
-[...]
-+	rc =3D uv_call(0, (u64)params->uvcb);
-+	page_ref_unfreeze(page, expected);
-+	if (rc)
-+		rc =3D (params->uvcb->rc =3D=3D 0x10a) ? -ENXIO : -EINVAL;
-+	return rc;
-+}
+IMHO you need to specify some 'dma_device', not try and play tricks
+with dma_ops, or assuming the parent is always the device used for
+dma.
 
-+int uv_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb,
-int pins)
-+{
-[...]
-+	lock_page(params.page);
-+	rc =3D apply_to_page_range(gmap->mm, uaddr, PAGE_SIZE, make_secure_pte,
-&params);
-+	unlock_page(params.page);
-+out:
-+	up_read(&gmap->mm->mmap_sem);
-+
-+	if (rc =3D=3D -EBUSY) {
-+		if (local_drain) {
-+			lru_add_drain_all();
-+			return -EAGAIN;
-+		}
-+		lru_add_drain();
-+		local_drain =3D 1;
-+		goto again;
-+	} else if (rc =3D=3D -ENXIO) {
-+		if (gmap_fault(gmap, gaddr, FAULT_FLAG_WRITE))
-+			return -EFAULT;
-+		return -EAGAIN;
-+	}
-+	return rc;
-+}
-
-So 0x10a result in -ENXIO and is handled =3D=3D> OK.
-And 0x104 is handled in do_non_secure_storage_access =3D=3D> OK.
-
-But what about the other possible error codes? make_secure_pte() returns
--EINVAL in that case, but uv_make_secure() does not care about that
-error code, and do_non_secure_storage_access() only cares if
-uvcb.header.rc was 0x104 ... what did I miss?
-
- Thomas
-
+Jason
