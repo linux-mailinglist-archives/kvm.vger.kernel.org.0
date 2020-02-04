@@ -2,220 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8678D151AE0
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:57:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 021D7151AEA
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 14:04:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727210AbgBDM5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 07:57:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24318 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727174AbgBDM5R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Feb 2020 07:57:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580821036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QUc1Zczmgm9nQV8lLS+0yNUCGflG/6zOwM+BqXBaIpE=;
-        b=CwM0vsoGIKjJLKTsinNW1dFF+GvW+AaIrOe89ihDkKwds/ShRJlXUV1xx8zQhkGJFwOZn6
-        5Bql30o90F0jSjWLFh4C+ff3q/n0/P/8+J2uAvcHw/sBsJNXUF+u3F8hgE2JIFO/0At3gd
-        0bcCCMtJRjH58aPmNMk3BfqUI979B6U=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-1dpp85bTNv6nF5Q8QSgG8A-1; Tue, 04 Feb 2020 07:57:09 -0500
-X-MC-Unique: 1dpp85bTNv6nF5Q8QSgG8A-1
-Received: by mail-wr1-f71.google.com with SMTP id o6so10087283wrp.8
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 04:57:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=QUc1Zczmgm9nQV8lLS+0yNUCGflG/6zOwM+BqXBaIpE=;
-        b=VZ4mZ13vMGJZqH4d2QX30bpsqvBH1obEzfHFebq26heIwrCUn677YtV4bkwiGO3eZL
-         g0MbehcTRKXEkxMPqohhXDQGi/vebGHvQgBmhSBZ61Y7HY+I0cr82/PEhHOfn0BfVKQh
-         TGaJUSDMwGWLkdvtAMEJocy20REGcjbFkTQ5p3wgcW7EVLZ8CV3/EZUJZJ97F23Sc5M2
-         +4FmOZYuDY7CZGoQ0dCsEaqsgOO+qeXsWnsUmPfM9GRu3NF9YVj93XqUQsAR921UBTsd
-         jtGQLKBLNlucApTxEI4BpWXKpqdXxSxlK8JBoHcIm8tiFYSCFP0zTaz+ErpKKF9ty7zm
-         qvVA==
-X-Gm-Message-State: APjAAAXkJWcAR6rkxpAk2FrN21gdRya4Klite4WEcNTthMMPoxdgl6O7
-        r8asmLXqlGcmWcayGcmYqVYbvSxblGgQDffmOUWal1OspWN+Hu13GbHn3entE/Jbuh0BILL+4VE
-        4dXaYaoFfHzH2
-X-Received: by 2002:a5d:410e:: with SMTP id l14mr20992782wrp.238.1580821027972;
-        Tue, 04 Feb 2020 04:57:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyRZZSjvon8ionEzjdZOIwMzpjS55ShQuUVAd+xkIJ0MG4jCofXi7E5DepoIDnT6c5w5yVUrA==
-X-Received: by 2002:a5d:410e:: with SMTP id l14mr20992759wrp.238.1580821027774;
-        Tue, 04 Feb 2020 04:57:07 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id t131sm3790960wmb.13.2020.02.04.04.57.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2020 04:57:07 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: Pre-allocate 1 cpumask variable per cpu for both pv tlb and pv ipis
-In-Reply-To: <CANRm+CwwYoSLeA3Squp-_fVZpmYmxEfqOB+DGoQN4Y_iMT347w@mail.gmail.com>
-References: <CANRm+CwwYoSLeA3Squp-_fVZpmYmxEfqOB+DGoQN4Y_iMT347w@mail.gmail.com>
-Date:   Tue, 04 Feb 2020 13:57:06 +0100
-Message-ID: <878slio6hp.fsf@vitty.brq.redhat.com>
+        id S1727210AbgBDNEY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 08:04:24 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30232 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727126AbgBDNEY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 08:04:24 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014CnwmM078109
+        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 08:04:23 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxtbjr0r4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 08:04:23 -0500
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 014CoGJd080295
+        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 08:04:22 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxtbjr0qf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Feb 2020 08:04:22 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 014D46aw020599;
+        Tue, 4 Feb 2020 13:04:21 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma04dal.us.ibm.com with ESMTP id 2xw0y6yqgc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 04 Feb 2020 13:04:21 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014D4KWG39190886
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 Feb 2020 13:04:20 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F18EAB2065;
+        Tue,  4 Feb 2020 13:04:19 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E26BCB2064;
+        Tue,  4 Feb 2020 13:04:19 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.17.106])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  4 Feb 2020 13:04:19 +0000 (GMT)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     david@redhat.com
+Cc:     Ulrich.Weigand@de.ibm.com, aarcange@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        frankja@linux.vnet.ibm.com, imbrenda@linux.ibm.com,
+        kvm@vger.kernel.org, thuth@redhat.com,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: [PATCH v2 10/37] KVM: s390: protvirt: Secure memory is not mergeable
+Date:   Tue,  4 Feb 2020 08:04:18 -0500
+Message-Id: <20200204130418.226980-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.24.0
+In-Reply-To: <04c69c18-52e8-c09e-d93e-dbf2c006ac5e@redhat.com>
+References: <04c69c18-52e8-c09e-d93e-dbf2c006ac5e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-04_03:2020-02-04,2020-02-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0 suspectscore=1
+ spamscore=0 phishscore=0 clxscore=1015 mlxscore=0 mlxlogscore=806
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2002040091
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+From: Janosch Frank <frankja@linux.ibm.com>
 
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> Nick Desaulniers Reported:
->
->   When building with:
->   $ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
->   The following warning is observed:
->   arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
->   function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
->   static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
->   vector)
->               ^
->   Debugging with:
->   https://github.com/ClangBuiltLinux/frame-larger-than
->   via:
->   $ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
->     kvm_send_ipi_mask_allbutself
->   points to the stack allocated `struct cpumask newmask` in
->   `kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
->   potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
->   the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
->   8192, making a single instance of a `struct cpumask` 1024 B.
->
-> This patch fixes it by pre-allocate 1 cpumask variable per cpu and use it for
-> both pv tlb and pv ipis..
->
-> Reported-by: Nick Desaulniers <ndesaulniers@google.com>
-> Acked-by: Nick Desaulniers <ndesaulniers@google.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Nick Desaulniers <ndesaulniers@google.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kernel/kvm.c | 33 +++++++++++++++++++++------------
->  1 file changed, 21 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 81045aab..b1e8efa 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -425,6 +425,8 @@ static void __init sev_map_percpu_data(void)
->      }
->  }
->
-> +static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
-> +
->  #ifdef CONFIG_SMP
->  #define KVM_IPI_CLUSTER_SIZE    (2 * BITS_PER_LONG)
->
-> @@ -490,12 +492,12 @@ static void kvm_send_ipi_mask(const struct
-> cpumask *mask, int vector)
->  static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask,
-> int vector)
->  {
->      unsigned int this_cpu = smp_processor_id();
-> -    struct cpumask new_mask;
-> +    struct cpumask *new_mask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
->      const struct cpumask *local_mask;
->
-> -    cpumask_copy(&new_mask, mask);
-> -    cpumask_clear_cpu(this_cpu, &new_mask);
-> -    local_mask = &new_mask;
-> +    cpumask_copy(new_mask, mask);
-> +    cpumask_clear_cpu(this_cpu, new_mask);
-> +    local_mask = new_mask;
->      __send_ipi_mask(local_mask, vector);
->  }
->
-> @@ -575,7 +577,6 @@ static void __init kvm_apf_trap_init(void)
->      update_intr_gate(X86_TRAP_PF, async_page_fault);
->  }
->
-> -static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
->
->  static void kvm_flush_tlb_others(const struct cpumask *cpumask,
->              const struct flush_tlb_info *info)
-> @@ -583,7 +584,7 @@ static void kvm_flush_tlb_others(const struct
-> cpumask *cpumask,
->      u8 state;
->      int cpu;
->      struct kvm_steal_time *src;
-> -    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_tlb_mask);
-> +    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
->
->      cpumask_copy(flushmask, cpumask);
->      /*
-> @@ -624,6 +625,7 @@ static void __init kvm_guest_init(void)
->          kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
->          pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
->          pv_ops.mmu.tlb_remove_table = tlb_remove_table;
-> +        pr_info("KVM setup pv remote TLB flush\n");
->      }
->
->      if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
-> @@ -732,23 +734,30 @@ static __init int activate_jump_labels(void)
->  }
->  arch_initcall(activate_jump_labels);
->
-> -static __init int kvm_setup_pv_tlb_flush(void)
-> +static __init int kvm_alloc_cpumask(void)
->  {
->      int cpu;
-> +    bool alloc = false;
->
->      if (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
->          !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
-> -        kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
-> +        kvm_para_has_feature(KVM_FEATURE_STEAL_TIME))
-> +        alloc = true;
-> +
-> +#if defined(CONFIG_SMP)
-> +    if (!alloc && kvm_para_has_feature(KVM_FEATURE_PV_SEND_IPI))
+KSM will not work on secure pages, because when the kernel reads a
+secure page, it will be encrypted and hence no two pages will look the
+same.
 
-'!alloc' check is superfluous.
+Let's mark the guest pages as unmergeable when we transition to secure
+mode.
 
-> +        alloc = true;
-> +#endif
-> +
-> +    if (alloc)
->          for_each_possible_cpu(cpu) {
-> -            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_tlb_mask, cpu),
-> +            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
->                  GFP_KERNEL, cpu_to_node(cpu));
->          }
-> -        pr_info("KVM setup pv remote TLB flush\n");
-> -    }
->
->      return 0;
->  }
-> -arch_initcall(kvm_setup_pv_tlb_flush);
-> +arch_initcall(kvm_alloc_cpumask);
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ arch/s390/include/asm/gmap.h |  1 +
+ arch/s390/kvm/kvm-s390.c     |  6 ++++++
+ arch/s390/mm/gmap.c          | 30 ++++++++++++++++++++----------
+ 3 files changed, 27 insertions(+), 10 deletions(-)
 
-Honestly, I'd simplify the check in kvm_alloc_cpumask() as
-
-if (!kvm_para_available())
-	return;
-
-and allocated masks for all other cases.
-
->
->  #ifdef CONFIG_PARAVIRT_SPINLOCKS
->
-> --
-> 1.8.3.1
->
-
+diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
+index e2d2f48c5c7c..e1f2cc0b2b00 100644
+--- a/arch/s390/include/asm/gmap.h
++++ b/arch/s390/include/asm/gmap.h
+@@ -146,4 +146,5 @@ int gmap_mprotect_notify(struct gmap *, unsigned long start,
+ 
+ void gmap_sync_dirty_log_pmd(struct gmap *gmap, unsigned long dirty_bitmap[4],
+ 			     unsigned long gaddr, unsigned long vmaddr);
++int gmap_mark_unmergeable(void);
+ #endif /* _ASM_S390_GMAP_H */
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 35f46404830f..741d81f57c3c 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2181,6 +2181,12 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+ 		if (r)
+ 			break;
+ 
++		down_write(&current->mm->mmap_sem);
++		r = gmap_mark_unmergeable();
++		up_write(&current->mm->mmap_sem);
++		if (r)
++			break;
++
+ 		mutex_lock(&kvm->lock);
+ 		kvm_s390_vcpu_block_all(kvm);
+ 		/* FMT 4 SIE needs esca */
+diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+index edcdca97e85e..7291452fe5f0 100644
+--- a/arch/s390/mm/gmap.c
++++ b/arch/s390/mm/gmap.c
+@@ -2548,6 +2548,22 @@ int s390_enable_sie(void)
+ }
+ EXPORT_SYMBOL_GPL(s390_enable_sie);
+ 
++int gmap_mark_unmergeable(void)
++{
++	struct mm_struct *mm = current->mm;
++	struct vm_area_struct *vma;
++
++	for (vma = mm->mmap; vma; vma = vma->vm_next) {
++		if (ksm_madvise(vma, vma->vm_start, vma->vm_end,
++				MADV_UNMERGEABLE, &vma->vm_flags)) {
++			return -ENOMEM;
++		}
++	}
++	mm->def_flags &= ~VM_MERGEABLE;
++	return 0;
++}
++EXPORT_SYMBOL_GPL(gmap_mark_unmergeable);
++
+ /*
+  * Enable storage key handling from now on and initialize the storage
+  * keys with the default key.
+@@ -2593,7 +2609,6 @@ static const struct mm_walk_ops enable_skey_walk_ops = {
+ int s390_enable_skey(void)
+ {
+ 	struct mm_struct *mm = current->mm;
+-	struct vm_area_struct *vma;
+ 	int rc = 0;
+ 
+ 	down_write(&mm->mmap_sem);
+@@ -2601,16 +2616,11 @@ int s390_enable_skey(void)
+ 		goto out_up;
+ 
+ 	mm->context.uses_skeys = 1;
+-	for (vma = mm->mmap; vma; vma = vma->vm_next) {
+-		if (ksm_madvise(vma, vma->vm_start, vma->vm_end,
+-				MADV_UNMERGEABLE, &vma->vm_flags)) {
+-			mm->context.uses_skeys = 0;
+-			rc = -ENOMEM;
+-			goto out_up;
+-		}
++	rc = gmap_mark_unmergeable();
++	if (rc) {
++		mm->context.uses_skeys = 0;
++		goto out_up;
+ 	}
+-	mm->def_flags &= ~VM_MERGEABLE;
+-
+ 	walk_page_range(mm, 0, TASK_SIZE, &enable_skey_walk_ops, NULL);
+ 
+ out_up:
 -- 
-Vitaly
+2.24.0
 
