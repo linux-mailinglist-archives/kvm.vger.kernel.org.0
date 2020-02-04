@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 80E27151B56
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 14:33:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E9BA151BB3
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 14:55:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727189AbgBDNdf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 08:33:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60802 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727174AbgBDNde (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 08:33:34 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014DTtHa137117
-        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 08:33:33 -0500
+        id S1727210AbgBDNzo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 08:55:44 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15336 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727183AbgBDNzn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 08:55:43 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014DtdGp012489
+        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 08:55:43 -0500
 Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxbmpcya4-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxtbjt0n4-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 08:33:33 -0500
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 08:55:42 -0500
 Received: from localhost
         by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 4 Feb 2020 13:33:29 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        Tue, 4 Feb 2020 13:55:06 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
         by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 4 Feb 2020 13:33:26 -0000
+        Tue, 4 Feb 2020 13:55:03 -0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014DXPfN49086572
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014Dt2Wx47972578
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Feb 2020 13:33:25 GMT
+        Tue, 4 Feb 2020 13:55:02 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 305D4A4051;
-        Tue,  4 Feb 2020 13:33:25 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3AA90A4053;
+        Tue,  4 Feb 2020 13:55:02 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CCED3A405B;
-        Tue,  4 Feb 2020 13:33:24 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id ED1B5A4051;
+        Tue,  4 Feb 2020 13:55:01 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Feb 2020 13:33:24 +0000 (GMT)
+        Tue,  4 Feb 2020 13:55:01 +0000 (GMT)
 Subject: Re: [RFCv2 07/37] KVM: s390: add new variants of UV CALL
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
  <20200203131957.383915-8-borntraeger@de.ibm.com>
- <20200204131107.6c7b3dae.cohuck@redhat.com>
+ <e2f34580-d853-ce73-b13f-dd2e17179513@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -94,26 +94,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 4 Feb 2020 14:33:24 +0100
+Date:   Tue, 4 Feb 2020 14:55:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200204131107.6c7b3dae.cohuck@redhat.com>
+In-Reply-To: <e2f34580-d853-ce73-b13f-dd2e17179513@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020413-0028-0000-0000-000003D74ED8
+x-cbid: 20020413-0028-0000-0000-000003D75078
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020413-0029-0000-0000-0000249BA9EB
-Message-Id: <dc31cca3-44ba-5ab2-6a9f-158dce0380b6@de.ibm.com>
+x-cbparentid: 20020413-0029-0000-0000-0000249BAB96
+Message-Id: <a01a4ab7-28c9-df74-7170-e8f1daeca58b@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-04_04:2020-02-04,2020-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- suspectscore=0 priorityscore=1501 bulkscore=0 phishscore=0
- lowpriorityscore=0 impostorscore=0 mlxlogscore=999 clxscore=1015
- mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2002040096
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0 suspectscore=0
+ spamscore=0 phishscore=0 clxscore=1015 mlxscore=0 mlxlogscore=900
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2002040098
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -121,89 +121,10 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 04.02.20 13:11, Cornelia Huck wrote:
-> On Mon,  3 Feb 2020 08:19:27 -0500
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> From: Janosch Frank <frankja@linux.ibm.com>
->>
->> This add 2 new variants of the UV CALL.
->>
->> The first variant handles UV CALLs that might have longer busy
->> conditions or just need longer when doing partial completion. We should
->> schedule when necessary.
->>
->> The second variant handles UV CALLs that only need the handle but have
->> no payload (e.g. destroying a VM). We can provide a simple wrapper for
->> those.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  arch/s390/include/asm/uv.h | 58 ++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 58 insertions(+)
->>
->> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
->> index 4eaea95f5c64..3448f12ef57a 100644
->> --- a/arch/s390/include/asm/uv.h
->> +++ b/arch/s390/include/asm/uv.h
->> @@ -14,6 +14,7 @@
->>  #include <linux/types.h>
->>  #include <linux/errno.h>
->>  #include <linux/bug.h>
->> +#include <linux/sched.h>
->>  #include <asm/page.h>
->>  #include <asm/gmap.h>
->>  
->> @@ -92,6 +93,18 @@ struct uv_cb_cfs {
->>  	u64 paddr;
->>  } __packed __aligned(8);
->>  
->> +/*
->> + * A common UV call struct for the following calls:
-> 
-> "for calls that take no payload"?
-> 
-> In case there will be more of them in the future :)
-
-ack. 
-
-/*
- * A common UV call struct for calls that take no payload
- * Examples: 
- * Destroy cpu/config
- * Verify
- */
-
-
-
-
-> 
->> + * Destroy cpu/config
->> + * Verify
->> + */
->> +struct uv_cb_nodata {
->> +	struct uv_cb_header header;
->> +	u64 reserved08[2];
->> +	u64 handle;
->> +	u64 reserved20[4];
->> +} __packed __aligned(8);
->> +
->>  struct uv_cb_share {
->>  	struct uv_cb_header header;
->>  	u64 reserved08[3];
->> @@ -99,6 +112,31 @@ struct uv_cb_share {
->>  	u64 reserved28;
->>  } __packed __aligned(8);
->>  
+On 04.02.20 14:27, Thomas Huth wrote:
 >> +/*
 >> + * Low level uv_call that takes r1 and r2 as parameter and avoids
 >> + * stalls for long running busy conditions by doing schedule
-> 
-> This can only ever return 0 or 1, right?
-
-Right. But the r2 parameter is usually an uvcb so callers can fiddle out
-more information (like rc) themselves. 
-> 
 >> + */
 >> +static inline int uv_call_sched(unsigned long r1, unsigned long r2)
 >> +{
@@ -216,27 +137,31 @@ more information (like rc) themselves.
 >> +			"		srl	%[cc],28\n"
 >> +			: [cc] "=d" (cc)
 >> +			: [r1] "a" (r1), [r2] "a" (r2)
+> 
+> You could use "d" instead of "a" for both, r1 and r2, here.
+
+Indeed. Fixed.
+
+> 
 >> +			: "memory", "cc");
 >> +		if (need_resched())
 >> +			schedule();
 >> +	}
+> 
+> It's a matter of taste, but I'd rather do:
+> 
+>    int cc;
+>    do {
+>        ...
+>    } while (cc > 1);
+> 
+> (i.e. no need to pre-initialize cc with 3)
+
+Yes, I like that better.
+> 
 >> +	return cc;
 >> +}
->> +
->> +/*
->> + * Low level uv_call that takes r1 and r2 as parameter
->> + */
->>  static inline int uv_call(unsigned long r1, unsigned long r2)
->>  {
->>  	int cc;
->> @@ -114,6 +152,26 @@ static inline int uv_call(unsigned long r1, unsigned long r2)
->>  	return cc;
->>  }
->>  
->> +/*
->> + * special variant of uv_call that only transport the cpu or guest
 > 
-> s/transport/transports/
-
-ack.
+>  Thomas
+> 
 
