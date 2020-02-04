@@ -2,98 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5B98151E16
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 17:18:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44172151E47
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 17:27:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727348AbgBDQSk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 11:18:40 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:59154 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727290AbgBDQSk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Feb 2020 11:18:40 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014GFpm9099115;
-        Tue, 4 Feb 2020 16:18:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=rKE6BXas3LZe481kZHsQO9RrFsrswJ8xXmcNA5ia/sc=;
- b=B83REeVYK/qA/uk+oNSDRp+5EZio8ECEraJSWV7MzTlwxzLxjK0dCBX7/3cBu4IuEntU
- Q1Y8pi4wWrh1em0ZC4e7lGaKm6i/0RRM/QnIwHH1gDJLvate0O6i76HWnDscTBFE03jp
- m0vYMX+CR8CzHfsUkd0oSvHE3E4LMihs90G5z8RF7RlKSMXGVYHAiLAbIu9zS8fO5cqp
- BmX2YTRDlSo03ouhjqzQh0eaz+YLA705/vTz5f67vJro2hoMppguLlZtpfjRoh/Ajtlw
- q5v78rojwBeLB9TacrjrNMjrioqHLiAuhvXudutZGto/SNje390kzS8o5T8HTQ+QrK+h FQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2xw0ru7rry-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Feb 2020 16:18:09 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014GGNC4155573;
-        Tue, 4 Feb 2020 16:18:09 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2xxw0xb6a8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Feb 2020 16:18:08 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 014GI6qi018533;
-        Tue, 4 Feb 2020 16:18:06 GMT
-Received: from [10.175.207.61] (/10.175.207.61)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 04 Feb 2020 08:18:05 -0800
-Subject: Re: [PATCH RFC 02/10] mm: Handle pmd entries in follow_pfn()
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-nvdimm@lists.01.org, Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Liran Alon <liran.alon@oracle.com>,
-        Nikita Leshenko <nikita.leshchenko@oracle.com>,
-        Barret Rhoden <brho@google.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-References: <20200110190313.17144-1-joao.m.martins@oracle.com>
- <20200110190313.17144-3-joao.m.martins@oracle.com>
- <20200203213718.GL8731@bombadil.infradead.org>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <94c35449-16ac-235b-fa2e-a5aea85dc568@oracle.com>
-Date:   Tue, 4 Feb 2020 16:17:59 +0000
+        id S1727379AbgBDQ13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 11:27:29 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23657 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727331AbgBDQ13 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 11:27:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580833648;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3SLppk//ApQMwF/rvA3NGuu9lEaUBa2+psuDrmQo5OU=;
+        b=GcVSGf3nB+wAhrqS5+5VDN6nXVvOnM0XE6pSKEFnolGOCVnv0bSyeguBF72gNPpU5Hhpbs
+        MSrbzVXUUaLsARN06wOrZY6IAGqxcc22xEej3iCaRAemgDH6ZUNbYIXeH55XEo3NE6Y2AD
+        Dlg8qpxhuyqFIEbb929CpioHJTN2+uo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-1a5VJADFOxKoEdo9lZ6E6A-1; Tue, 04 Feb 2020 11:27:24 -0500
+X-MC-Unique: 1a5VJADFOxKoEdo9lZ6E6A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A7051857374;
+        Tue,  4 Feb 2020 16:27:23 +0000 (UTC)
+Received: from gondolin (ovpn-117-199.ams2.redhat.com [10.36.117.199])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 948E05D9E2;
+        Tue,  4 Feb 2020 16:27:21 +0000 (UTC)
+Date:   Tue, 4 Feb 2020 17:27:18 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [RFCv2 08/37] KVM: s390: protvirt: Add initial lifecycle
+ handling
+Message-ID: <20200204172718.4780f011.cohuck@redhat.com>
+In-Reply-To: <20200203131957.383915-9-borntraeger@de.ibm.com>
+References: <20200203131957.383915-1-borntraeger@de.ibm.com>
+        <20200203131957.383915-9-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200203213718.GL8731@bombadil.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=767
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2002040108
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=830 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2002040108
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/3/20 9:37 PM, Matthew Wilcox wrote:
-> On Fri, Jan 10, 2020 at 07:03:05PM +0000, Joao Martins wrote:
->> @@ -4366,6 +4366,7 @@ EXPORT_SYMBOL(follow_pte_pmd);
->>  int follow_pfn(struct vm_area_struct *vma, unsigned long address,
->>  	unsigned long *pfn)
->>  {
->> +	pmd_t *pmdpp = NULL;
-> 
-> Please rename to 'pmdp'.
-> 
-Will do.
+On Mon,  3 Feb 2020 08:19:28 -0500
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Alongside patch 4 usage of pmdpp and renaming 'pudpp' to 'pudp'.
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> This contains 3 main changes:
+> 1. changes in SIE control block handling for secure guests
+> 2. helper functions for create/destroy/unpack secure guests
+> 3. KVM_S390_PV_COMMAND ioctl to allow userspace dealing with secure
+> machines
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/kvm_host.h |  24 ++-
+>  arch/s390/include/asm/uv.h       |  60 ++++++++
+>  arch/s390/kvm/Makefile           |   2 +-
+>  arch/s390/kvm/kvm-s390.c         | 198 ++++++++++++++++++++++++-
+>  arch/s390/kvm/kvm-s390.h         |  45 ++++++
+>  arch/s390/kvm/pv.c               | 246 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h         |  33 +++++
+>  7 files changed, 604 insertions(+), 4 deletions(-)
+>  create mode 100644 arch/s390/kvm/pv.c
+> 
+(...)
+> @@ -80,6 +95,32 @@ struct uv_cb_init {
+>  
+>  } __packed __aligned(8);
+>  
+> +struct uv_cb_cgc {
+
+Given that we now have a bunch of structs of the form uv_cb_TLA, can we
+add a comment to each for what uv call they are?
+
+> +	struct uv_cb_header header;
+> +	u64 reserved08[2];
+> +	u64 guest_handle;
+> +	u64 conf_base_stor_origin;
+> +	u64 conf_var_stor_origin;
+> +	u64 reserved30;
+> +	u64 guest_stor_origin;
+> +	u64 guest_stor_len;
+> +	u64 guest_sca;
+> +	u64 guest_asce;
+> +	u64 reserved60[5];
+> +} __packed __aligned(8);
+
+(...)
+
+> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
+> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+> +{
+> +	int r = 0;
+> +	void __user *argp = (void __user *)cmd->data;
+> +
+> +	switch (cmd->cmd) {
+> +	case KVM_PV_VM_CREATE: {
+> +		r = -EINVAL;
+> +		if (kvm_s390_pv_is_protected(kvm))
+> +			break;
+> +
+> +		r = kvm_s390_pv_alloc_vm(kvm);
+> +		if (r)
+> +			break;
+> +
+> +		mutex_lock(&kvm->lock);
+> +		kvm_s390_vcpu_block_all(kvm);
+> +		/* FMT 4 SIE needs esca */
+> +		r = sca_switch_to_extended(kvm);
+> +		if (!r)
+> +			r = kvm_s390_pv_create_vm(kvm);
+
+If sca_switch_to_extended() fails, you don't call
+kvm_s390_pv_dealloc_vm(). Also, kvm_s390_pv_create_vm() _does_ call
+_dealloc_vm() on failure, which seems a bit surprising. I'd probably
+move the _dealloc_vm() out of the error path of _create_vm() and call
+it here for r != 0.
+
+> +		kvm_s390_vcpu_unblock_all(kvm);
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+> +	}
+
+(...)
+
