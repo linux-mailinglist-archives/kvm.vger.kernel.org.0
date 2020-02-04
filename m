@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EB78D151A43
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:03:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41656151A46
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:05:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727228AbgBDMDk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 07:03:40 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24222 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727119AbgBDMDk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 07:03:40 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014C2hJ2042004
-        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 07:03:39 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xx93747ah-1
+        id S1727129AbgBDMFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 07:05:33 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29534 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727097AbgBDMFd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 07:05:33 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014C5Qcp004636
+        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 07:05:32 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxmkmp1nq-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 07:03:38 -0500
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 07:05:30 -0500
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 4 Feb 2020 12:03:37 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Tue, 4 Feb 2020 12:04:45 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 4 Feb 2020 12:03:34 -0000
+        Tue, 4 Feb 2020 12:04:43 -0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014C3X4k52953334
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014C3mkk43254238
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Feb 2020 12:03:33 GMT
+        Tue, 4 Feb 2020 12:03:48 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 137F64C050;
-        Tue,  4 Feb 2020 12:03:33 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 690BD4C04A;
+        Tue,  4 Feb 2020 12:04:41 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C74164C052;
-        Tue,  4 Feb 2020 12:03:32 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 1CE594C040;
+        Tue,  4 Feb 2020 12:04:41 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Feb 2020 12:03:32 +0000 (GMT)
+        Tue,  4 Feb 2020 12:04:41 +0000 (GMT)
 Subject: Re: [RFCv2 06/37] s390: add (non)secure page access exceptions
  handlers
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
  <20200203131957.383915-7-borntraeger@de.ibm.com>
- <dd3d333d-d141-5a22-9b1d-161232b37cfb@redhat.com>
+ <20200204121817.10a5f271.cohuck@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -95,26 +95,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 4 Feb 2020 13:03:32 +0100
+Date:   Tue, 4 Feb 2020 13:04:40 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <dd3d333d-d141-5a22-9b1d-161232b37cfb@redhat.com>
+In-Reply-To: <20200204121817.10a5f271.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020412-0012-0000-0000-000003839057
+x-cbid: 20020412-0008-0000-0000-0000034F9791
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020412-0013-0000-0000-000021BFF71E
-Message-Id: <db4d03a2-da34-184a-013f-5b5b7959634e@de.ibm.com>
+x-cbparentid: 20020412-0009-0000-0000-00004A70245B
+Message-Id: <dcbeb7a2-b895-7de9-9d19-583dbe013780@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-04_03:2020-02-04,2020-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=911 mlxscore=0 malwarescore=0 clxscore=1015 adultscore=0
- bulkscore=0 phishscore=0 spamscore=0 impostorscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2002040083
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ lowpriorityscore=0 bulkscore=0 mlxlogscore=923 clxscore=1015
+ malwarescore=0 mlxscore=0 adultscore=0 impostorscore=0 spamscore=0
+ suspectscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1911200001 definitions=main-2002040086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -122,8 +122,10 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 04.02.20 11:37, Thomas Huth wrote:
-> On 03/02/2020 14.19, Christian Borntraeger wrote:
+On 04.02.20 12:18, Cornelia Huck wrote:
+> On Mon,  3 Feb 2020 08:19:26 -0500
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
 >> From: Vasily Gorbik <gor@linux.ibm.com>
 >>
 >> Add exceptions handlers performing transparent transition of non-secure
@@ -135,51 +137,33 @@ On 04.02.20 11:37, Thomas Huth wrote:
 >> [adding checks for failures]
 >> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 >> [further changes like adding a check for gmap fault]
-> 
-> Who did which modification here? According to
-> Documentation/process/submitting-patches.rst the square brackets should
-> go in front of the S-o-b of the person who did the change, e.g.:
-> 
->   Signed-off-by: Random J Developer <random@developer.example.org>
->   [lucky@maintainer.example.org: struct foo moved from foo.c to foo.h]
->   Signed-off-by: Lucky K Maintainer <lucky@maintainer.example.org>
-> 
-> It would be nice if you could stick to that scheme.
-
-will fix
-
-> 
 >> ---
 >>  arch/s390/kernel/pgm_check.S |  4 +-
 >>  arch/s390/mm/fault.c         | 87 ++++++++++++++++++++++++++++++++++++
 >>  2 files changed, 89 insertions(+), 2 deletions(-)
-> [...]
->> +void do_non_secure_storage_access(struct pt_regs *regs)
->> +{
->> +	unsigned long gaddr = regs->int_parm_long & __FAIL_ADDR_MASK;
->> +	struct gmap *gmap = (struct gmap *)S390_lowcore.gmap;
->> +	struct uv_cb_cts uvcb = {
->> +		.header.cmd = UVC_CMD_CONV_TO_SEC_STOR,
->> +		.header.len = sizeof(uvcb),
->> +		.guest_handle = gmap->se_handle,
->> +		.gaddr = gaddr,
->> +	};
->> +	int rc;
->> +
->> +	if (get_fault_type(regs) != GMAP_FAULT) {
->> +		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
->> +		WARN_ON_ONCE(1);
->> +		return;
->> +	}
->> +
->> +	rc = uv_make_secure(gmap, gaddr, &uvcb, 0);
->> +	if (rc == -EINVAL && uvcb.header.rc != 0x104)
->> +		send_sig(SIGSEGV, current, 0);
->> +}
+>>
+>> diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
+>> index 59dee9d3bebf..27ac4f324c70 100644
+>> --- a/arch/s390/kernel/pgm_check.S
+>> +++ b/arch/s390/kernel/pgm_check.S
+>> @@ -78,8 +78,8 @@ PGM_CHECK(do_dat_exception)		/* 39 */
+>>  PGM_CHECK(do_dat_exception)		/* 3a */
+>>  PGM_CHECK(do_dat_exception)		/* 3b */
+>>  PGM_CHECK_DEFAULT			/* 3c */
+>> -PGM_CHECK_DEFAULT			/* 3d */
+>> -PGM_CHECK_DEFAULT			/* 3e */
+>> +PGM_CHECK(do_secure_storage_access)	/* 3d */
+>> +PGM_CHECK(do_non_secure_storage_access)	/* 3e */
 > 
-> What about the other rc beside 0x104 that could happen here? They go
-> unnoticed?
-> 
->  Thomas
-> 
+> I suppose that these two can only happen when we actually run a
+> protected virt guest...
+
+yes to this and all other questions.
+[...]
+
+> IOW, we don't really introduce complex code paths for systems not
+> acting as protected virt hosts, even if we switch on the config option
+> or ditch it completely?
+
+Yes.
 
