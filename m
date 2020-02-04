@@ -2,44 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BF98152243
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 23:13:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B363F15224B
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 23:19:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727613AbgBDWNj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 17:13:39 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33476 "EHLO
+        id S1727537AbgBDWT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 17:19:57 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2414 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727494AbgBDWNj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 17:13:39 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014MAutY112177
-        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 17:13:38 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xxtbkcca9-1
+        by vger.kernel.org with ESMTP id S1727468AbgBDWT5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 17:19:57 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014MAd6i002139
+        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 17:19:56 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyg4pj19u-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 17:13:38 -0500
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 17:19:56 -0500
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 4 Feb 2020 22:08:36 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Tue, 4 Feb 2020 22:19:53 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 4 Feb 2020 22:08:32 -0000
+        Tue, 4 Feb 2020 22:19:51 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014M8Vmv37683418
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014MJnUK53936188
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Feb 2020 22:08:31 GMT
+        Tue, 4 Feb 2020 22:19:49 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3379EA4054;
-        Tue,  4 Feb 2020 22:08:31 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id B8370A405B;
+        Tue,  4 Feb 2020 22:19:49 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B8C8FA405C;
-        Tue,  4 Feb 2020 22:08:30 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 47E08A4054;
+        Tue,  4 Feb 2020 22:19:49 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.174.10])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Feb 2020 22:08:30 +0000 (GMT)
-Subject: Re: [RFCv2 27/37] KVM: s390: protvirt: Only sync fmt4 registers
+        Tue,  4 Feb 2020 22:19:49 +0000 (GMT)
+Subject: Re: [RFCv2 30/37] KVM: s390: protvirt: Add diag 308 subcode 8 - 10
+ handling
 To:     Cornelia Huck <cohuck@redhat.com>
 Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
         KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
@@ -48,8 +49,8 @@ Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-28-borntraeger@de.ibm.com>
- <20200204181537.5f6bc2ce.cohuck@redhat.com>
+ <20200203131957.383915-31-borntraeger@de.ibm.com>
+ <20200204195118.20a86328.cohuck@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -94,25 +95,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 4 Feb 2020 23:08:30 +0100
+Date:   Tue, 4 Feb 2020 23:19:48 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200204181537.5f6bc2ce.cohuck@redhat.com>
+In-Reply-To: <20200204195118.20a86328.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020422-0016-0000-0000-000002E3B1DC
+x-cbid: 20020422-0028-0000-0000-000003D76CAA
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020422-0017-0000-0000-000033468F6B
-Message-Id: <4d8348cf-6946-fe6b-11df-f9d9a8def9ff@de.ibm.com>
+x-cbparentid: 20020422-0029-0000-0000-0000249BC93E
+Message-Id: <97a6a5a6-cbfe-3c88-d997-b665fad1624b@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-04_08:2020-02-04,2020-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0 suspectscore=0
- spamscore=0 phishscore=0 clxscore=1015 mlxscore=0 mlxlogscore=622
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
+ mlxlogscore=868 suspectscore=0 phishscore=0 mlxscore=0 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1911200001 definitions=main-2002040151
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -121,34 +122,61 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 04.02.20 18:15, Cornelia Huck wrote:
-> On Mon,  3 Feb 2020 08:19:47 -0500
+On 04.02.20 19:51, Cornelia Huck wrote:
+> On Mon,  3 Feb 2020 08:19:50 -0500
 > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
 >> From: Janosch Frank <frankja@linux.ibm.com>
 >>
->> A lot of the registers are controlled by the Ultravisor and never
->> visible to KVM. Also some registers are overlayed, like gbea is with
->> sidad, which might leak data to userspace.
->>
->> Hence we sync a minimal set of registers for both SIE formats and then
->> check and sync format 2 registers if necessary.
->>
->> Also we disable set/get one reg for the same reason. It's an old
->> interface anyway.
+>> If the host initialized the Ultravisor, we can set stfle bit 161
+>> (protected virtual IPL enhancements facility), which indicates, that
 > 
-> Didn't you already do that in the previous patch?
+> s/indicates,/indicates/
 
-Yes, a leftover from my patch splitting.
-Fixed. 
+ack
 
+> 
+>> the IPL subcodes 8, 9 and are valid. These subcodes are used by a
+> 
+> s/9 and/9, and 10/
+
+ack
+> 
+>> normal guest to set/retrieve a IPIB of type 5 and transition into
+> 
+> "an IPL information block of type 5 (for PVMs)" ?
+
+ack
+
+> 
+>> protected mode.
+>>
+>> Once in protected mode, the Ultravisor will conceal the facility
+>> bit. Therefore each boot into protected mode has to go through
+>> non-protected. There is no secure re-ipl with subcode 10 without a
+> 
+> "non-protected mode"
+
+ack
+
+ 
+>> previous subcode 3.
+>>
+>> In protected mode, there is no subcode 4 available, as the VM has no
+>> more access to its memory from non-protected mode. I.e. each IPL
+>> clears.
+> 
+> "i.e., only IPL clear is possible" ?
+
+ack
 > 
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> [Fixes and patch splitting]
 >> ---
->>  arch/s390/kvm/kvm-s390.c | 116 ++++++++++++++++++++++++---------------
->>  1 file changed, 72 insertions(+), 44 deletions(-)
+>>  arch/s390/kvm/diag.c     | 6 ++++++
+>>  arch/s390/kvm/kvm-s390.c | 5 +++++
+>>  2 files changed, 11 insertions(+)
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > 
 
