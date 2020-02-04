@@ -2,214 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5609E151A8D
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:34:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03A18151A96
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:35:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727128AbgBDMeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 07:34:19 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23104 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727115AbgBDMeS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 07:34:18 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014CUsmw193133
-        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 07:34:17 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xxk9hpu0w-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 07:34:17 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 4 Feb 2020 12:34:14 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 4 Feb 2020 12:34:11 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014CY9rX60817586
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Feb 2020 12:34:09 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C21574C04A;
-        Tue,  4 Feb 2020 12:34:09 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D4E64C046;
-        Tue,  4 Feb 2020 12:34:09 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Feb 2020 12:34:09 +0000 (GMT)
-Subject: Re: [RFCv2 08/37] KVM: s390: protvirt: Add initial lifecycle handling
-To:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        id S1727252AbgBDMfK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 07:35:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46843 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727127AbgBDMfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 07:35:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580819708;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=j8Ze2k/48T7ypOx2Rm4M44WtrOODhWxg8OlktpwSU50=;
+        b=XCH8EOaUY1za/Q1bF/J61mfzpH8z9tGgphv4XndgAxGH1AsPlSLyl5hynxMp3BdcqMjzB6
+        NNGwdnxcFO0fm+QjBpwVCtGKNM4EgdSwol9ms8Qu3E4Yqu+AB2AY9x+B1Lvy8q/erm09yc
+        PsyXUzCBjOkFHMdfruFds5VIDqRfJyg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311--mquGWQMODKRuxC6PwBksg-1; Tue, 04 Feb 2020 07:35:04 -0500
+X-MC-Unique: -mquGWQMODKRuxC6PwBksg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9241C10753FB;
+        Tue,  4 Feb 2020 12:35:03 +0000 (UTC)
+Received: from gondolin (ovpn-117-199.ams2.redhat.com [10.36.117.199])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1569060BE0;
+        Tue,  4 Feb 2020 12:34:56 +0000 (UTC)
+Date:   Tue, 4 Feb 2020 13:34:55 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [RFCv2 07/37] KVM: s390: add new variants of UV CALL
+Message-ID: <20200204133455.050de29b.cohuck@redhat.com>
+In-Reply-To: <20200204133002.5ddf78fd@p-imbrenda>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-9-borntraeger@de.ibm.com>
- <8fdcbfc6-3e58-8970-416f-4039bb151394@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 4 Feb 2020 13:34:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        <20200203131957.383915-8-borntraeger@de.ibm.com>
+        <20200204131107.6c7b3dae.cohuck@redhat.com>
+        <20200204133002.5ddf78fd@p-imbrenda>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <8fdcbfc6-3e58-8970-416f-4039bb151394@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20020412-0012-0000-0000-00000383922F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020412-0013-0000-0000-000021BFF906
-Message-Id: <6b4264ed-af75-53e0-a59d-94d8b5ff22e5@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-04_03:2020-02-04,2020-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 phishscore=0 lowpriorityscore=0
- bulkscore=0 mlxscore=0 impostorscore=0 clxscore=1015 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2002040088
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 4 Feb 2020 13:30:02 +0100
+Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 
-
-On 04.02.20 13:13, David Hildenbrand wrote:
+> On Tue, 4 Feb 2020 13:11:07 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
 > [...]
 > 
->> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
->> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->> +{
->> +	int r = 0;
->> +	void __user *argp = (void __user *)cmd->data;
->> +
->> +	switch (cmd->cmd) {
->> +	case KVM_PV_VM_CREATE: {
->> +		r = -EINVAL;
->> +		if (kvm_s390_pv_is_protected(kvm))
->> +			break;
->> +
->> +		r = kvm_s390_pv_alloc_vm(kvm);
->> +		if (r)
->> +			break;
->> +
->> +		mutex_lock(&kvm->lock);
->> +		kvm_s390_vcpu_block_all(kvm);
->> +		/* FMT 4 SIE needs esca */
->> +		r = sca_switch_to_extended(kvm);
->> +		if (!r)
->> +			r = kvm_s390_pv_create_vm(kvm);
->> +		kvm_s390_vcpu_unblock_all(kvm);
->> +		mutex_unlock(&kvm->lock);
->> +		break;
->> +	}
+> >   
+> > > +	rc = uv_call_sched(0, (u64)&uvcb);
+> > > +	if (ret)
+> > > +		*ret = *(u32 *)&uvcb.header.rc;    
+> > 
+> > Does that rc value in the block contain anything sensible if you
+> > didn't get cc==0?  
 > 
-> I think KVM_PV_VM_ENABLE/KVM_PV_VM_DISABLE would be a better fit. You're
-> not creating/deleting VMs, aren't you? All you're doing is allocating
-> some data and performing some kind of a mode switch.
+> yes, RC is always meaningful. 
+> 
+> CC == 0 implies RC == 1, which means success.
+> CC == 1 implies RC != 1, which means something went wrong in some way
+> 
+> in theory you could always disregard CC and only check RC
 
-I kind of like the idea. Need to talk to Janosch about this. 
-> [...]
-> 
->>  	VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", id, vcpu,
->>  		 vcpu->arch.sie_block);
->>  	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
->> @@ -4353,6 +4502,37 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
->>  	return -ENOIOCTLCMD;
->>  }
->>  
->> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
->> +static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu *vcpu,
->> +				   struct kvm_pv_cmd *cmd)
->> +{
->> +	int r = 0;
->> +
->> +	if (!kvm_s390_pv_is_protected(vcpu->kvm))
->> +		return -EINVAL;
->> +
->> +	switch (cmd->cmd) {
->> +	case KVM_PV_VCPU_CREATE: {
->> +		if (kvm_s390_pv_handle_cpu(vcpu))
->> +			return -EINVAL;
->> +
->> +		r = kvm_s390_pv_create_cpu(vcpu);
->> +		break;
->> +	}
->> +	case KVM_PV_VCPU_DESTROY: {
->> +		if (!kvm_s390_pv_handle_cpu(vcpu))
->> +			return -EINVAL;
->> +
->> +		r = kvm_s390_pv_destroy_cpu(vcpu);
->> +		break;
->> +	}
->> +	default:
->> +		r = -ENOTTY;
->> +	}
->> +	return r;
->> +}
-> 
-> I asked this already and didn't get an answer (lost in the flood of
-> comments :) )
-> 
-> Can't we simply convert all VCPUs via KVM_PV_VM_CREATE and destoy them
-> via KVM_PV_VM_DESTROY? Then you can easily handle hotplug as well in the
-> kernel when a new VCPU is created and PV is active - oh and I see you
-> are already doing that in kvm_arch_vcpu_create(). So that screams for
-> doing either this a) completely triggered by user space or b) completely
-> in the kernel. I prefer the latter. One interface less required.
-> 
-> I would assume that no VCPU is allowed to be running inside KVM while
-
-right.
-
-> performing the PV switch, which would make this even easier.
-
-Same as above. I like the idea. Will need to talk to Janosch. 
+Ok, thx.
 
