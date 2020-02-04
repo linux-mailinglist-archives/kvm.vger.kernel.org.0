@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FCBF151448
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 03:52:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C307915144A
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 03:55:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727154AbgBDCwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 21:52:08 -0500
-Received: from mga09.intel.com ([134.134.136.24]:4192 "EHLO mga09.intel.com"
+        id S1727072AbgBDCzo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 21:55:44 -0500
+Received: from mga09.intel.com ([134.134.136.24]:4551 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726930AbgBDCwI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 21:52:08 -0500
+        id S1726984AbgBDCzo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 21:55:44 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Feb 2020 18:52:06 -0800
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Feb 2020 18:55:44 -0800
 X-IronPort-AV: E=Sophos;i="5.70,398,1574150400"; 
-   d="scan'208";a="224153416"
+   d="scan'208";a="224154057"
 Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.30.164]) ([10.255.30.164])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 03 Feb 2020 18:52:03 -0800
-Subject: Re: [PATCH v2 6/6] x86: vmx: virtualize split lock detection
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 03 Feb 2020 18:55:41 -0800
+Subject: Re: [PATCH v2 3/6] kvm: x86: Emulate split-lock access as a write
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -28,15 +28,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         David Laight <David.Laight@aculab.com>
 References: <20200203151608.28053-1-xiaoyao.li@intel.com>
- <20200203151608.28053-7-xiaoyao.li@intel.com>
- <20200203214212.GH19638@linux.intel.com>
+ <20200203151608.28053-4-xiaoyao.li@intel.com>
+ <20200203205426.GF19638@linux.intel.com>
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <addf50c8-f683-9176-d6e4-51bc217dcc92@intel.com>
-Date:   Tue, 4 Feb 2020 10:52:01 +0800
+Message-ID: <f51517ca-2b44-7beb-bf13-93b74f261b42@intel.com>
+Date:   Tue, 4 Feb 2020 10:55:40 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.2
 MIME-Version: 1.0
-In-Reply-To: <20200203214212.GH19638@linux.intel.com>
+In-Reply-To: <20200203205426.GF19638@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -45,336 +45,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/4/2020 5:42 AM, Sean Christopherson wrote:
-> On Mon, Feb 03, 2020 at 11:16:08PM +0800, Xiaoyao Li wrote:
->> Due to the fact that MSR_TEST_CTRL is per-core scope, i.e., the sibling
->> threads in the same physical CPU core share the same MSR, only
->> advertising feature split lock detection to guest when SMT is disabled
->> or unsupported for simplicitly.
+On 2/4/2020 4:54 AM, Sean Christopherson wrote:
+> On Mon, Feb 03, 2020 at 11:16:05PM +0800, Xiaoyao Li wrote:
+>> If split lock detect is enabled (warn/fatal), #AC handler calls die()
+>> when split lock happens in kernel.
 >>
->> Only when host is sld_off, can guest control the hardware value of
->> MSR_TEST_CTL, i.e., KVM loads guest's value into hardware when vcpu is
->> running.
+>> A sane guest should never tigger emulation on a split-lock access, but
+>> it cannot prevent malicous guest from doing this. So just emulating the
+>> access as a write if it's a split-lock access to avoid malicous guest
+>> polluting the kernel log.
 >>
->> The vmx->disable_split_lock_detect can be set to true after unhandled
->> split_lock #AC in guest only when host is sld_warn mode. It's for not
->> burnning old guest, of course malicous guest can exploit it for DoS
->> attack.
+>> More detail analysis can be found:
+>> https://lkml.kernel.org/r/20200131200134.GD18946@linux.intel.com
 >>
->> If want to prevent DoS attack from malicious guest, it must use sld_fatal
->> mode in host. When host is sld_fatal, hardware value of
->> MSR_TEST_CTL.SPLIT_LOCK_DETECT never cleared.
->>
->> Below summarizing how guest behaves if SMT is off and it's a linux guest:
->>
->> -----------------------------------------------------------------------
->>     Host	| Guest | Guest behavior
->> -----------------------------------------------------------------------
->> 1. off	|	| same as in bare metal
->> -----------------------------------------------------------------------
->> 2. warn | off	| hardware bit set initially. Once split lock happens,
->> 	|	| it sets vmx->disable_split_lock_detect, which leads
->> 	|	| hardware bit to be cleared when vcpu is running
->>          |	| So, it's the same as in bare metal
->> 	---------------------------------------------------------------
->> 3.	| warn	| - user space: get #AC when split lock, then clear
->> 	|	|   MSR bit, but hardware bit is not cleared. #AC again,
->> 	|	|   finally sets vmx->disable_split_lock_detect, which
->> 	|	|   leads hardware bit to be cleared when vcpu is running;
->> 	|	|   After the userspace process finishes, it sets vcpu's
->> 	|	|   MSR_TEST_CTRL.SPLIT_LOCK_DETECT bit, which causes
->> 	|	|   vmx->disable_split_lock_detect to be set false
->>          |	|   So it's somehow the same as in bare-metal
->>          |	| - kernel: same as in bare metal.
->> 	--------------------------------------------------------------
->> 4.	| fatal | same as in bare metal
->> ----------------------------------------------------------------------
->> 5. fatal| off   | #AC reported to userspace
->> 	--------------------------------------------------------------
->> 6.	| warn  | - user space: get #AC when split lock, then clear
->> 	|	|   MSR bit, but hardware bit is not cleared, #AC again,
->>          |	|   #AC reported to userspace
->>          |	| - kernel: same as in bare metal, call die();
->> 	-------------------------------------------------------------
->> 7.    	| fatal | same as in bare metal
->> ----------------------------------------------------------------------
-> 
-> This table and half the changelog is unnecessary and confusing.  State that
-> SLD is exposed to the guest if and only if SLD is disabled in the host and
-> SMT is disabled (or the MSR is thread scoped), and leave it at that.
-
-Right, SLD is exposed to the guest only when host is sld_off makes thing 
-much simpler. But this seems only meaning for using guest for debugging 
-or testing?
-
-> Reiterating everything that was implemented in previous patches does more
-> harm than good.
-
-OK. Will remove them.
-
 >> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 >> ---
->>   arch/x86/kvm/vmx/vmx.c | 72 +++++++++++++++++++++++++++++++++++-------
->>   arch/x86/kvm/vmx/vmx.h |  1 +
->>   arch/x86/kvm/x86.c     | 13 ++++++--
->>   3 files changed, 73 insertions(+), 13 deletions(-)
+>>   arch/x86/kvm/x86.c | 11 +++++++++++
+>>   1 file changed, 11 insertions(+)
 >>
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 93e3370c5f84..a0c3f579ecb6 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -1781,6 +1781,26 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
->>   	}
->>   }
->>   
->> +/*
->> + * Note: for guest, feature split lock detection can only be enumerated by
->> + * MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT. The FMS enumeration is invalid.
->> + */
->> +static inline bool guest_has_feature_split_lock_detect(struct kvm_vcpu *vcpu)
->> +{
->> +	return !!(vcpu->arch.core_capabilities &
->> +		  MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT);
->> +}
->> +
->> +static inline u64 vmx_msr_test_ctrl_valid_bits(struct kvm_vcpu *vcpu)
->> +{
->> +	u64 valid_bits = 0;
->> +
->> +	if (guest_has_feature_split_lock_detect(vcpu))
->> +		valid_bits |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
->> +
->> +	return valid_bits;
->> +}
->> +
->>   /*
->>    * Reads an msr value (of 'msr_index') into 'pdata'.
->>    * Returns 0 on success, non-0 otherwise.
->> @@ -1793,6 +1813,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>   	u32 index;
->>   
->>   	switch (msr_info->index) {
->> +	case MSR_TEST_CTRL:
->> +		if (!msr_info->host_initiated &&
->> +		    !guest_has_feature_split_lock_detect(vcpu))
->> +			return 1;
->> +		msr_info->data = vmx->msr_test_ctrl;
->> +		break;
->>   #ifdef CONFIG_X86_64
->>   	case MSR_FS_BASE:
->>   		msr_info->data = vmcs_readl(GUEST_FS_BASE);
->> @@ -1934,6 +1960,15 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>   	u32 index;
->>   
->>   	switch (msr_index) {
->> +	case MSR_TEST_CTRL:
->> +		if (!msr_info->host_initiated &&
->> +		    (!guest_has_feature_split_lock_detect(vcpu) ||
->> +		     data & ~vmx_msr_test_ctrl_valid_bits(vcpu)))
->> +			return 1;
->> +		if (data & MSR_TEST_CTRL_SPLIT_LOCK_DETECT)
->> +			vmx->disable_split_lock_detect = false;
-> 
-> Pretty sure disable_split_lock_detect won't exist, but if it does, don't
-> reuse it for emulating guest behavior.  Keep the two things separate, i.e.
-> use vmx->msr_test_ctrl to track guest state and use the disable_sld to
-> track when the feature has been disabled for an ignorant guest.
-
-My thought was that when both host and guest are sld_warn.
-If there is a split lock in guest user space,
-  1. #AC trapped in kvm, and re-injected to guest due to guest's MSR bit 
-set;
-  2. Guest clears MSR bit but hardware bit not cleared, re-execute the 
-instruction
-  3. #AC trapped again, vmx->disable_sld set to true, vm-enter to guest 
-with hardware MSR bit cleared, re-execute the instruction
-  4. After guest user space application finishes/ or scheduled, guest 
-set MSR bit, here we'd better clear vmx->disable_sld, otherwise hardware 
-MSR bit keeps cleared for this vcpu thread.
-
-Also, this makes a difference for guest user space application that when 
-it scheduled out then scheduled in, the MSR bit is set again while in 
-bare metal it keeps cleared. That's why I use pr_warn_ratelimited() in 
-#AC interceptor.
-
->> +		vmx->msr_test_ctrl = data;
->> +		break;
->>   	case MSR_EFER:
->>   		ret = kvm_set_msr_common(vcpu, msr_info);
->>   		break;
->> @@ -4233,6 +4268,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->>   
->>   	vmx->msr_ia32_umwait_control = 0;
->>   
->> +	vmx->msr_test_ctrl = 0;
->>   	vmx->disable_split_lock_detect = false;
->>   
->>   	vcpu->arch.microcode_version = 0x100000000ULL;
->> @@ -4565,6 +4601,11 @@ static inline bool guest_cpu_alignment_check_enabled(struct kvm_vcpu *vcpu)
->>   	       (kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
->>   }
->>   
->> +static inline bool guest_cpu_split_lock_detect_enabled(struct vcpu_vmx *vmx)
->> +{
->> +	return !!(vmx->msr_test_ctrl & MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
-> 
-> The "!!" isn't necessary.
-
-Ok. will remove it.
-
->> +}
->> +
->>   static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->>   {
->>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
->> @@ -4660,8 +4701,8 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->>   		break;
->>   	case AC_VECTOR:
->>   		/*
->> -		 * Inject #AC back to guest only when legacy alignment check
->> -		 * enabled.
->> +		 * Inject #AC back to guest only when guest is expecting it,
->> +		 * i.e., legacy alignment check or split lock #AC enabled.
->>   		 * Otherwise, it must be an unexpected split-lock #AC for guest
->>   		 * since KVM keeps hardware SPLIT_LOCK_DETECT bit unchanged
->>   		 * when vcpu is running.
->> @@ -4674,12 +4715,13 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->>   		 *    similar as sending SIGBUS.
->>   		 */
->>   		if (guest_cpu_alignment_check_enabled(vcpu) ||
->> +		    guest_cpu_split_lock_detect_enabled(vmx) ||
-> 
-> Again, check for SLD before AC, it's significantly cheaper.
-
-OK. Thanks.
-
->>   		    WARN_ON(get_split_lock_detect_state() == sld_off)) {
->>   			kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
->>   			return 1;
->>   		}
->>   		if (get_split_lock_detect_state() == sld_warn) {
->> -			pr_warn("kvm: split lock #AC happened in %s [%d]\n",
->> +			pr_warn_ratelimited("kvm: split lock #AC happened in %s [%d]\n",
->>   				current->comm, current->pid);
-> 
-> Ratelimiting change belongs in the earlier path.  Moot point if this routes
-> through handle_user_split_lock().
-> 
->>   			vmx->disable_split_lock_detect = true;
->>   			return 1;
->> @@ -6491,6 +6533,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>   {
->>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
->>   	unsigned long cr3, cr4;
->> +	bool host_sld_enabled, guest_sld_enabled;
->>   
->>   	/* Record the guest's net vcpu time for enforced NMI injections. */
->>   	if (unlikely(!enable_vnmi &&
->> @@ -6562,10 +6605,15 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>   	 */
->>   	x86_spec_ctrl_set_guest(vmx->spec_ctrl, 0);
->>   
->> -	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
->> -	    unlikely(vmx->disable_split_lock_detect) &&
->> -	    !test_tsk_thread_flag(current, TIF_SLD))
->> -		split_lock_detect_set(false);
->> +	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
->> +		host_sld_enabled = get_split_lock_detect_state() &&
->> +				   !test_tsk_thread_flag(current, TIF_SLD);
->> +		guest_sld_enabled = guest_cpu_split_lock_detect_enabled(vmx);
->> +		if (host_sld_enabled && unlikely(vmx->disable_split_lock_detect))
->> +			split_lock_detect_set(false);
->> +		else if (!host_sld_enabled && guest_sld_enabled)
->> +			split_lock_detect_set(true);
-> 
-> This will be massively simplified by letting TIF_SLD do the dirty work.
-> Since SLD will be exposed to the guest if and only if it's disabled in the
-> host, this becomes:
-> 
-> 	if (static_cpu_has(...) && vmx->msr_test_control)
-> 		wrmsrl(MSR_TEST_CTL,
-> 		       this_cpu_read(msr_test_ctl_val) | vmx->msr_test_ctl);
-> 
-> 	__vmx_vcpu_run();
-> 
-> 
->          if (static_cpu_has(...) && vmx->msr_test_control)
->                  wrmsrl(MSR_TEST_CTL, this_cpu_read(msr_test_ctl_val));
-> 
->> +	}
->>   
->>   	/* L1D Flush includes CPU buffer clear to mitigate MDS */
->>   	if (static_branch_unlikely(&vmx_l1d_should_flush))
->> @@ -6601,10 +6649,12 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>   
->>   	x86_spec_ctrl_restore_host(vmx->spec_ctrl, 0);
->>   
->> -	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
->> -	    unlikely(vmx->disable_split_lock_detect) &&
->> -	    !test_tsk_thread_flag(current, TIF_SLD))
->> -		split_lock_detect_set(true);
->> +	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
->> +		if (host_sld_enabled && unlikely(vmx->disable_split_lock_detect))
->> +			split_lock_detect_set(true);
->> +		else if (!host_sld_enabled && guest_sld_enabled)
->> +			split_lock_detect_set(false);
->> +	}
->>   
->>   	/* All fields are clean at this point */
->>   	if (static_branch_unlikely(&enable_evmcs))
->> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->> index 912eba66c5d5..c36c663f4bae 100644
->> --- a/arch/x86/kvm/vmx/vmx.h
->> +++ b/arch/x86/kvm/vmx/vmx.h
->> @@ -222,6 +222,7 @@ struct vcpu_vmx {
->>   #endif
->>   
->>   	u64		      spec_ctrl;
->> +	u64		      msr_test_ctrl;
->>   	u32		      msr_ia32_umwait_control;
->>   
->>   	u32 secondary_exec_control;
 >> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index a97a8f5dd1df..56e799981d53 100644
+>> index 2d3be7f3ad67..821b7404c0fd 100644
 >> --- a/arch/x86/kvm/x86.c
 >> +++ b/arch/x86/kvm/x86.c
->> @@ -1163,7 +1163,7 @@ static const u32 msrs_to_save_all[] = {
+>> @@ -5847,6 +5847,13 @@ static int emulator_write_emulated(struct x86_emulate_ctxt *ctxt,
+>>   	(cmpxchg64((u64 *)(ptr), *(u64 *)(old), *(u64 *)(new)) == *(u64 *)(old))
 >>   #endif
->>   	MSR_IA32_TSC, MSR_IA32_CR_PAT, MSR_VM_HSAVE_PA,
->>   	MSR_IA32_FEAT_CTL, MSR_IA32_BNDCFGS, MSR_TSC_AUX,
->> -	MSR_IA32_SPEC_CTRL,
->> +	MSR_IA32_SPEC_CTRL, MSR_TEST_CTRL,
->>   	MSR_IA32_RTIT_CTL, MSR_IA32_RTIT_STATUS, MSR_IA32_RTIT_CR3_MATCH,
->>   	MSR_IA32_RTIT_OUTPUT_BASE, MSR_IA32_RTIT_OUTPUT_MASK,
->>   	MSR_IA32_RTIT_ADDR0_A, MSR_IA32_RTIT_ADDR0_B,
->> @@ -1345,7 +1345,12 @@ static u64 kvm_get_arch_capabilities(void)
 >>   
->>   static u64 kvm_get_core_capabilities(void)
->>   {
->> -	return 0;
->> +	u64 data = 0;
->> +
->> +	if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) && !cpu_smt_possible())
->> +		data |= MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT;
+>> +static inline bool across_cache_line_access(gpa_t gpa, unsigned int bytes)
 > 
-> And only if SLD is disabled, no?
+> s/across/split so as not to introduce another name.
 > 
+>> +{
+>> +	unsigned int cache_line_size = cache_line_size();
 >> +
->> +	return data;
->>   }
+>> +	return (gpa & (cache_line_size - 1)) + bytes > cache_line_size;
+> 
+> I'd prefer to use the same logic as the page-split to avoid having to
+> reason about the correctness of two different algorithms.
+> 
+>> +}
+>> +
+>>   static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+>>   				     unsigned long addr,
+>>   				     const void *old,
+>> @@ -5873,6 +5880,10 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+>>   	if (((gpa + bytes - 1) & PAGE_MASK) != (gpa & PAGE_MASK))
+>>   		goto emul_write;
 >>   
->>   static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
->> @@ -5259,6 +5264,10 @@ static void kvm_init_msr_list(void)
->>   		 * to the guests in some cases.
->>   		 */
->>   		switch (msrs_to_save_all[i]) {
->> +		case MSR_TEST_CTRL:
->> +			if (!(kvm_get_core_capabilities() &
->> +			      MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT))
->> +				continue;
->>   		case MSR_IA32_BNDCFGS:
->>   			if (!kvm_mpx_supported())
->>   				continue;
+>> +	if (get_split_lock_detect_state() != sld_off &&
+>> +	    across_cache_line_access(gpa, bytes))
+>> +		goto emul_write;
+> 
+> As an alternative to the above, the page/line splits can be handled in a
+> single check, e.g.
+> 
+> 	page_line_mask = PAGE_MASK;
+> 	if (is_split_lock_detect_enabled())
+> 		page_line_mask = cache_line_size() - 1;
+> 	if (((gpa + bytes - 1) & page_line_mask) != (gpa & page_line_mask))
+> 		goto emul_write;
+
+It's better, will use your suggestion.
+Thanks!
+
+>> +
+>>   	if (kvm_vcpu_map(vcpu, gpa_to_gfn(gpa), &map))
+>>   		goto emul_write;
+>>   
 >> -- 
 >> 2.23.0
 >>
