@@ -2,103 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 63D60151E02
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 17:15:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5B98151E16
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 17:18:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727412AbgBDQPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 11:15:52 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32757 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727406AbgBDQPv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 11:15:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580832950;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fGtFHIbquXcvehIzmocD/BNz/hYF+HSP4Jj3wEbCF8g=;
-        b=DzFQFJiRP4Ul4KnWyfqBQOnpM7YtvZ1g/2bxyoMWpjSBbX+taj9Q9v0hmiRoCfU0H9IIUC
-        OUFs0XuLbd/yc3vOd7JLhCzbT4f2xQxQOQbDUamQZiblcqRRXmVDUihTrcJSh1eNgYKk5W
-        Lx7JQVANzKIIlr5YYBO9ex3XvOwqiNg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-V2INv0adPjyWmOY9zp16fw-1; Tue, 04 Feb 2020 11:15:47 -0500
-X-MC-Unique: V2INv0adPjyWmOY9zp16fw-1
-Received: by mail-wr1-f70.google.com with SMTP id p8so3680131wrw.5
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 08:15:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=fGtFHIbquXcvehIzmocD/BNz/hYF+HSP4Jj3wEbCF8g=;
-        b=J0wj5OTH+CjvY07gVvA/T0oxqJUonDt9J9wLhUaNCBwFhC6brfV24zZuSRLh3kipWK
-         6zxJwNM6Fi+uhq4uozoAV5xD0sFTSfvQF98fO23ExkDrX5JAuDhiB7SfBlZSBXoXpdSH
-         daJe5B0GIu347ne/hl5u5Us11CR/N1Kh8lHfYLsDndUvxBTPOHLYvp1RXfUSNJNJ68ac
-         ZExvebKb7hVDXncoHEZ9ShE6p9vGf9DkzPMKw1ChuwDzq/5kR0GRKk8hJV+woN0kRdp/
-         8vhTplJwkPANq5SYDuVvTeLztF5RjARmn/n3ImwhAkXSUZOWb3bmLzFC4yv2rteB12Gz
-         RhBg==
-X-Gm-Message-State: APjAAAXZivXHb+Ht4xlpjlPPZ//iujiAcCSYyYoABRspm8LZR4LgxfnL
-        MachwsyROG0g9Oz6e9IR++9KYXOCYO9cmh2TN0TECL5lmCqkNXzdD4g1WTcgzG/rOupesSpBdzX
-        IwMWIRsE0HXNK
-X-Received: by 2002:adf:b60f:: with SMTP id f15mr24153895wre.372.1580832946425;
-        Tue, 04 Feb 2020 08:15:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyXWw5RfxHgVOOaGGG4vnuzrBJpumSAQo4wPDeegi3aQlAvW2b1XwNbmHXYeZOpig4eHyp3dQ==
-X-Received: by 2002:adf:b60f:: with SMTP id f15mr24153877wre.372.1580832946262;
-        Tue, 04 Feb 2020 08:15:46 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id v8sm30682747wrw.2.2020.02.04.08.15.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2020 08:15:45 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: nVMX: Remove stale comment from nested_vmx_load_cr3()
-In-Reply-To: <20200204153259.16318-1-sean.j.christopherson@intel.com>
-References: <20200204153259.16318-1-sean.j.christopherson@intel.com>
-Date:   Tue, 04 Feb 2020 17:15:44 +0100
-Message-ID: <87imkmmiq7.fsf@vitty.brq.redhat.com>
+        id S1727348AbgBDQSk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 11:18:40 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:59154 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727290AbgBDQSk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 11:18:40 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014GFpm9099115;
+        Tue, 4 Feb 2020 16:18:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=rKE6BXas3LZe481kZHsQO9RrFsrswJ8xXmcNA5ia/sc=;
+ b=B83REeVYK/qA/uk+oNSDRp+5EZio8ECEraJSWV7MzTlwxzLxjK0dCBX7/3cBu4IuEntU
+ Q1Y8pi4wWrh1em0ZC4e7lGaKm6i/0RRM/QnIwHH1gDJLvate0O6i76HWnDscTBFE03jp
+ m0vYMX+CR8CzHfsUkd0oSvHE3E4LMihs90G5z8RF7RlKSMXGVYHAiLAbIu9zS8fO5cqp
+ BmX2YTRDlSo03ouhjqzQh0eaz+YLA705/vTz5f67vJro2hoMppguLlZtpfjRoh/Ajtlw
+ q5v78rojwBeLB9TacrjrNMjrioqHLiAuhvXudutZGto/SNje390kzS8o5T8HTQ+QrK+h FQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2xw0ru7rry-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 04 Feb 2020 16:18:09 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014GGNC4155573;
+        Tue, 4 Feb 2020 16:18:09 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 2xxw0xb6a8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 04 Feb 2020 16:18:08 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 014GI6qi018533;
+        Tue, 4 Feb 2020 16:18:06 GMT
+Received: from [10.175.207.61] (/10.175.207.61)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 04 Feb 2020 08:18:05 -0800
+Subject: Re: [PATCH RFC 02/10] mm: Handle pmd entries in follow_pfn()
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     linux-nvdimm@lists.01.org, Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Liran Alon <liran.alon@oracle.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Barret Rhoden <brho@google.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+References: <20200110190313.17144-1-joao.m.martins@oracle.com>
+ <20200110190313.17144-3-joao.m.martins@oracle.com>
+ <20200203213718.GL8731@bombadil.infradead.org>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <94c35449-16ac-235b-fa2e-a5aea85dc568@oracle.com>
+Date:   Tue, 4 Feb 2020 16:17:59 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200203213718.GL8731@bombadil.infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=767
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2002040108
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=830 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2002040108
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On 2/3/20 9:37 PM, Matthew Wilcox wrote:
+> On Fri, Jan 10, 2020 at 07:03:05PM +0000, Joao Martins wrote:
+>> @@ -4366,6 +4366,7 @@ EXPORT_SYMBOL(follow_pte_pmd);
+>>  int follow_pfn(struct vm_area_struct *vma, unsigned long address,
+>>  	unsigned long *pfn)
+>>  {
+>> +	pmd_t *pmdpp = NULL;
+> 
+> Please rename to 'pmdp'.
+> 
+Will do.
 
-> The blurb pertaining to the return value of nested_vmx_load_cr3() no
-> longer matches reality, remove it entirely as the behavior it is
-> attempting to document is quite obvious when reading the actual code.
-
-"And if it doesn't seem that obvious just try staring at it for a few
-years, do some small (60-70 patches) refactorings and fix several dozens
-of bugs. It will." :-)
-
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 7608924ee8c1..0c9b847f7a25 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1076,8 +1076,6 @@ static bool nested_cr3_valid(struct kvm_vcpu *vcpu, unsigned long val)
->  /*
->   * Load guest's/host's cr3 at nested entry/exit. nested_ept is true if we are
->   * emulating VM entry into a guest with EPT enabled.
-> - * Returns 0 on success, 1 on failure. Invalid state exit qualification code
-> - * is assigned to entry_failure_code on failure.
->   */
->  static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool nested_ept,
->  			       u32 *entry_failure_code)
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
-
+Alongside patch 4 usage of pmdpp and renaming 'pudpp' to 'pudp'.
