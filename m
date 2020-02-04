@@ -2,181 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B363F15224B
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 23:19:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DCA11522BF
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 00:05:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727537AbgBDWT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 17:19:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2414 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727468AbgBDWT5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 17:19:57 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014MAd6i002139
-        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 17:19:56 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyg4pj19u-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 17:19:56 -0500
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 4 Feb 2020 22:19:53 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 4 Feb 2020 22:19:51 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014MJnUK53936188
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Feb 2020 22:19:49 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B8370A405B;
-        Tue,  4 Feb 2020 22:19:49 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47E08A4054;
-        Tue,  4 Feb 2020 22:19:49 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.174.10])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Feb 2020 22:19:49 +0000 (GMT)
-Subject: Re: [RFCv2 30/37] KVM: s390: protvirt: Add diag 308 subcode 8 - 10
- handling
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-31-borntraeger@de.ibm.com>
- <20200204195118.20a86328.cohuck@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 4 Feb 2020 23:19:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1727801AbgBDXFq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 18:05:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42875 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727483AbgBDXFp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 18:05:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580857543;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=50yJ/0uSQd8YRp4Nzpt7nFwJU44bA7UT36hqDKQZmJc=;
+        b=TZxM/3haiTtCkhp6j1IFQXCq254ZD8+17Vsj0txbfa0Rse90I1MUHaVokzKc8qWbqX6tjJ
+        2LSR9gYDHh7zRFCSP+1dnXykAvIzT+KJpGMy3UXRCKIsjjrByuIEl9dQ6SL3mL96Vt9Chq
+        MhpByx/UZ4yQ+EoIzD9jk2ZZH+gSKa8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-_PGm0uoKPEO2dpkXo_Cobw-1; Tue, 04 Feb 2020 18:05:39 -0500
+X-MC-Unique: _PGm0uoKPEO2dpkXo_Cobw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1C5F1085926;
+        Tue,  4 Feb 2020 23:05:37 +0000 (UTC)
+Received: from gimli.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 88DEA1084194;
+        Tue,  4 Feb 2020 23:05:34 +0000 (UTC)
+Subject: [RFC PATCH 0/7] vfio/pci: SR-IOV support
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dev@dpdk.org, mtosatti@redhat.com, thomas@monjalon.net,
+        bluca@debian.org, jerinjacobk@gmail.com,
+        bruce.richardson@intel.com, cohuck@redhat.com
+Date:   Tue, 04 Feb 2020 16:05:34 -0700
+Message-ID: <158085337582.9445.17682266437583505502.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
-In-Reply-To: <20200204195118.20a86328.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20020422-0028-0000-0000-000003D76CAA
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020422-0029-0000-0000-0000249BC93E
-Message-Id: <97a6a5a6-cbfe-3c88-d997-b665fad1624b@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-04_08:2020-02-04,2020-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- lowpriorityscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
- mlxlogscore=868 suspectscore=0 phishscore=0 mlxscore=0 malwarescore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2002040151
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+There seems to be an ongoing desire to use userspace, vfio-based
+drivers for both SR-IOV PF and VF devices.  The fundamental issue
+with this concept is that the VF is not fully independent of the PF
+driver.  Minimally the PF driver might be able to deny service to the
+VF, VF data paths might be dependent on the state of the PF device,
+or the PF my have some degree of ability to inspect or manipulate the
+VF data.  It therefore would seem irresponsible to unleash VFs onto
+the system, managed by a user owned PF.
+
+We address this in a few ways in this series.  First, we can use a bus
+notifier and the driver_override facility to make sure VFs are bound
+to the vfio-pci driver by default.  This should eliminate the chance
+that a VF is accidentally bound and used by host drivers.  We don't
+however remove the ability for a host admin to change this override.
+
+The next issue we need to address is how we let userspace drivers
+opt-in to this participation with the PF driver.  We do not want an
+admin to be able to unwittingly assign one of these VFs to a tenant
+that isn't working in collaboration with the PF driver.  We could use
+IOMMU grouping, but this seems to push too far towards tightly coupled
+PF and VF drivers.  This series introduces a "VF token", implemented
+as a UUID, as a shared secret between PF and VF drivers.  The token
+needs to be set by the PF driver and used as part of the device
+matching by the VF driver.  Provisions in the code also account for
+restarting the PF driver with active VF drivers, requiring the PF to
+use the current token to re-gain access to the PF.
+
+The above solutions introduce a bit of a modification to the VFIO ABI
+and an additional ABI extension.  The modification is that the
+VFIO_GROUP_GET_DEVICE_FD ioctl is specified to require a char string
+from the user providing the device name.  For this solution, we extend
+the syntax to allow the device name followed by key/value pairs.  In
+this case we add "vf_token=3e7e882e-1daf-417f-ad8d-882eea5ee337", for
+example.  These options are expected to be space separated.  Matching
+these key/value pairs is entirely left to the vfio bus driver (ex.
+vfio-pci) and the internal ops structure is extended to allow this
+optional support.  This extension should be fully backwards compatible
+to existing userspace, such code will simply fail to open these newly
+exposed devices, as intended.
+
+I've been debating whether instead of the above we should allow the
+user to get the device fd as normal, but restrict the interfaces until
+the user authenticates, but I'm afraid this would be a less backwards
+compatible solution.  It would be just as unclear to the user why a
+device read/write/mmap/ioctl failed as it might be to why getting the
+device fd could fail.  However in the latter case, I believe we do a
+better job of restricting how far userspace code might go before they
+ultimately fail.  I'd welcome discussion in the space, and or course
+the extension of the GET_DEVICE_FD string.
+
+Finally, the user needs to be able to set a VF token.  I add a
+VFIO_DEVICE_FEATURE ioctl for this that's meant to be reusable for
+getting, setting, and probing arbitrary features of a device.
+
+I'll reply to this cover letter with a very basic example of a QEMU
+update to support this interface, though I haven't found a device yet
+that behaves well with the PF running in one VM with the VF in
+another, or really even just a PF running in a VM with SR-IOV enabled.
+I know these devices exist though, and I suspect QEMU will not be the
+primary user of this support for now, but this behavior reaffirms my
+concerns to prevent mis-use.
+
+Please comment.  In particular, does this approach meet the DPDK needs
+for userspace PF and VF drivers, with the hopefully minor hurdle of
+sharing a token between drivers.  The token is of course left to
+userspace how to manage, and might be static (and not very secret) for
+a given set of drivers.  Thanks,
+
+Alex
+
+---
+
+Alex Williamson (7):
+      vfio: Include optional device match in vfio_device_ops callbacks
+      vfio/pci: Implement match ops
+      vfio/pci: Introduce VF token
+      vfio: Introduce VFIO_DEVICE_FEATURE ioctl and first user
+      vfio/pci: Add sriov_configure support
+      vfio/pci: Remove dev_fmt definition
+      vfio/pci: Cleanup .probe() exit paths
 
 
-On 04.02.20 19:51, Cornelia Huck wrote:
-> On Mon,  3 Feb 2020 08:19:50 -0500
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> From: Janosch Frank <frankja@linux.ibm.com>
->>
->> If the host initialized the Ultravisor, we can set stfle bit 161
->> (protected virtual IPL enhancements facility), which indicates, that
-> 
-> s/indicates,/indicates/
-
-ack
-
-> 
->> the IPL subcodes 8, 9 and are valid. These subcodes are used by a
-> 
-> s/9 and/9, and 10/
-
-ack
-> 
->> normal guest to set/retrieve a IPIB of type 5 and transition into
-> 
-> "an IPL information block of type 5 (for PVMs)" ?
-
-ack
-
-> 
->> protected mode.
->>
->> Once in protected mode, the Ultravisor will conceal the facility
->> bit. Therefore each boot into protected mode has to go through
->> non-protected. There is no secure re-ipl with subcode 10 without a
-> 
-> "non-protected mode"
-
-ack
-
- 
->> previous subcode 3.
->>
->> In protected mode, there is no subcode 4 available, as the VM has no
->> more access to its memory from non-protected mode. I.e. each IPL
->> clears.
-> 
-> "i.e., only IPL clear is possible" ?
-
-ack
-> 
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  arch/s390/kvm/diag.c     | 6 ++++++
->>  arch/s390/kvm/kvm-s390.c | 5 +++++
->>  2 files changed, 11 insertions(+)
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
+ drivers/vfio/pci/vfio_pci.c         |  315 ++++++++++++++++++++++++++++++++---
+ drivers/vfio/pci/vfio_pci_private.h |   10 +
+ drivers/vfio/vfio.c                 |   19 ++
+ include/linux/vfio.h                |    3 
+ include/uapi/linux/vfio.h           |   37 ++++
+ 5 files changed, 356 insertions(+), 28 deletions(-)
 
