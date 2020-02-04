@@ -2,185 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 68FA2151AFC
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 14:13:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BE18151AF9
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 14:10:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727181AbgBDNNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 08:13:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21854 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727170AbgBDNNN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 08:13:13 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014DBOf3046738
-        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 08:13:12 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xy6r8xnpk-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 08:13:11 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
-        Tue, 4 Feb 2020 13:08:08 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 4 Feb 2020 13:08:05 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014D842d51118152
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Feb 2020 13:08:04 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DD87242045;
-        Tue,  4 Feb 2020 13:08:03 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 958EC4204D;
-        Tue,  4 Feb 2020 13:08:03 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.108])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Feb 2020 13:08:03 +0000 (GMT)
-Date:   Tue, 4 Feb 2020 14:08:02 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [RFCv2 06/37] s390: add (non)secure page access exceptions
- handlers
-In-Reply-To: <2362357d-f2b5-62f2-8cb1-b7e281ea66e2@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
-        <20200203131957.383915-7-borntraeger@de.ibm.com>
-        <dd3d333d-d141-5a22-9b1d-161232b37cfb@redhat.com>
-        <20200204124123.183ef25b@p-imbrenda>
-        <2362357d-f2b5-62f2-8cb1-b7e281ea66e2@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727226AbgBDNKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 08:10:11 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:39631 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727146AbgBDNKL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 08:10:11 -0500
+Received: by mail-oi1-f196.google.com with SMTP id z2so18331979oih.6;
+        Tue, 04 Feb 2020 05:10:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SVaqwryK9Ch1A+cLGhauBqa2XFay6jr9KjYEvPy2h9E=;
+        b=ft+Pvuif5THe08dEA+J6tSpFlOdGs7cAa+rEScp8IB9hrfHWB6GW9ba8xGLaWaxxjB
+         Or5DU1AOgSlyrQr4qr/0O8UJ4G5JMvUsQFn+u3AsgaDlFyWDg5emsjhi80inIZDXnBRC
+         db00B8G1aSX0yZrR3/5mR7dzQZRcft0T9qSCLQL2l6AFQ1TmJqW7jrkOO/QZH6UL8P5U
+         K9WUZr0D9Uw1lI3akhV/MEO+Dg5hPAXIwi4RY53eLSwVRy9B4x0j79KMvDYlLUkwqq+q
+         F1Q/SO6RMcLML9FX39M4H9jquzs40nYF/Qr55d8Zzwi/ABaltFY7T7D+lyrbqQZB4rNu
+         UdQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SVaqwryK9Ch1A+cLGhauBqa2XFay6jr9KjYEvPy2h9E=;
+        b=swk/7kTx+tec3ZFbSr7RIFEU1hkFen655sHn4mONHehfJ9edSfDGcmKXy8tCfUYxQy
+         fh5k0eoFtPrtuo7YYfdAnj8fOmrF86lClbBian594a/2s/XJLQoupH6Z4WDKvQkiNHIs
+         6sNaJEvrgB5uBJXVw2mCAsHhqzyderWpL/bBXvpABe78jrPkSa2esXmSfBoa1DRVUrV/
+         A14lKCSeGCWmOOZ9NDb16nXymFtSUW7PPCZ3qrQREXBhnYAMNGCnCa0ZNQEmrl1HI6Py
+         B3+nThLxOxjbjdvRulB5U7cn/wIF2HN33nvLEUEn1fNCiPsiuupBaPB1ljJMvQcbHWMw
+         CL+w==
+X-Gm-Message-State: APjAAAXq/xvOCNpQ8xIo+E81dbXgPwJ/ozw7bQ2VHcxpWRBwCLGa6ozE
+        uoOx9lEyz8M/AogiI0zaZO6BZjmlmtGb+cpSImg=
+X-Google-Smtp-Source: APXvYqyH6d9P3RIwxAGPPDOQn7aOBhhAjlrTL/v9G6q3moosiXgKowmyepdspDqNsR00njTG2GGjBYbNk7Jpl8wKCMg=
+X-Received: by 2002:aca:8d5:: with SMTP id 204mr3288703oii.141.1580821810530;
+ Tue, 04 Feb 2020 05:10:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20020413-0016-0000-0000-000002E392C2
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020413-0017-0000-0000-000033466E79
-Message-Id: <20200204140802.412605a4@p-imbrenda>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-04_04:2020-02-04,2020-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 lowpriorityscore=0 phishscore=0 mlxlogscore=993
- mlxscore=0 impostorscore=0 suspectscore=0 bulkscore=0 clxscore=1015
- adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2002040092
+References: <CANRm+CwwYoSLeA3Squp-_fVZpmYmxEfqOB+DGoQN4Y_iMT347w@mail.gmail.com>
+ <878slio6hp.fsf@vitty.brq.redhat.com>
+In-Reply-To: <878slio6hp.fsf@vitty.brq.redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 4 Feb 2020 21:09:59 +0800
+Message-ID: <CANRm+CzkN9oYf4UqWYp2SHFii02=pvVLbW4oNkLmPan7ZroDZA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Pre-allocate 1 cpumask variable per cpu for both pv
+ tlb and pv ipis
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 4 Feb 2020 13:48:47 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Cc Thadeu,
+On Tue, 4 Feb 2020 at 20:57, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Wanpeng Li <kernellwp@gmail.com> writes:
+>
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Nick Desaulniers Reported:
+> >
+> >   When building with:
+> >   $ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
+> >   The following warning is observed:
+> >   arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
+> >   function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
+> >   static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
+> >   vector)
+> >               ^
+> >   Debugging with:
+> >   https://github.com/ClangBuiltLinux/frame-larger-than
+> >   via:
+> >   $ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
+> >     kvm_send_ipi_mask_allbutself
+> >   points to the stack allocated `struct cpumask newmask` in
+> >   `kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
+> >   potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
+> >   the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
+> >   8192, making a single instance of a `struct cpumask` 1024 B.
+> >
+> > This patch fixes it by pre-allocate 1 cpumask variable per cpu and use it for
+> > both pv tlb and pv ipis..
+> >
+> > Reported-by: Nick Desaulniers <ndesaulniers@google.com>
+> > Acked-by: Nick Desaulniers <ndesaulniers@google.com>
+> > Cc: Peter Zijlstra <peterz@infradead.org>
+> > Cc: Nick Desaulniers <ndesaulniers@google.com>
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> >  arch/x86/kernel/kvm.c | 33 +++++++++++++++++++++------------
+> >  1 file changed, 21 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> > index 81045aab..b1e8efa 100644
+> > --- a/arch/x86/kernel/kvm.c
+> > +++ b/arch/x86/kernel/kvm.c
+> > @@ -425,6 +425,8 @@ static void __init sev_map_percpu_data(void)
+> >      }
+> >  }
+> >
+> > +static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
+> > +
+> >  #ifdef CONFIG_SMP
+> >  #define KVM_IPI_CLUSTER_SIZE    (2 * BITS_PER_LONG)
+> >
+> > @@ -490,12 +492,12 @@ static void kvm_send_ipi_mask(const struct
+> > cpumask *mask, int vector)
+> >  static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask,
+> > int vector)
+> >  {
+> >      unsigned int this_cpu = smp_processor_id();
+> > -    struct cpumask new_mask;
+> > +    struct cpumask *new_mask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+> >      const struct cpumask *local_mask;
+> >
+> > -    cpumask_copy(&new_mask, mask);
+> > -    cpumask_clear_cpu(this_cpu, &new_mask);
+> > -    local_mask = &new_mask;
+> > +    cpumask_copy(new_mask, mask);
+> > +    cpumask_clear_cpu(this_cpu, new_mask);
+> > +    local_mask = new_mask;
+> >      __send_ipi_mask(local_mask, vector);
+> >  }
+> >
+> > @@ -575,7 +577,6 @@ static void __init kvm_apf_trap_init(void)
+> >      update_intr_gate(X86_TRAP_PF, async_page_fault);
+> >  }
+> >
+> > -static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
+> >
+> >  static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+> >              const struct flush_tlb_info *info)
+> > @@ -583,7 +584,7 @@ static void kvm_flush_tlb_others(const struct
+> > cpumask *cpumask,
+> >      u8 state;
+> >      int cpu;
+> >      struct kvm_steal_time *src;
+> > -    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_tlb_mask);
+> > +    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+> >
+> >      cpumask_copy(flushmask, cpumask);
+> >      /*
+> > @@ -624,6 +625,7 @@ static void __init kvm_guest_init(void)
+> >          kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+> >          pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
+> >          pv_ops.mmu.tlb_remove_table = tlb_remove_table;
+> > +        pr_info("KVM setup pv remote TLB flush\n");
+> >      }
+> >
+> >      if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+> > @@ -732,23 +734,30 @@ static __init int activate_jump_labels(void)
+> >  }
+> >  arch_initcall(activate_jump_labels);
+> >
+> > -static __init int kvm_setup_pv_tlb_flush(void)
+> > +static __init int kvm_alloc_cpumask(void)
+> >  {
+> >      int cpu;
+> > +    bool alloc = false;
+> >
+> >      if (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
+> >          !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
+> > -        kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+> > +        kvm_para_has_feature(KVM_FEATURE_STEAL_TIME))
+> > +        alloc = true;
+> > +
+> > +#if defined(CONFIG_SMP)
+> > +    if (!alloc && kvm_para_has_feature(KVM_FEATURE_PV_SEND_IPI))
+>
+> '!alloc' check is superfluous.
+>
+> > +        alloc = true;
+> > +#endif
+> > +
+> > +    if (alloc)
+> >          for_each_possible_cpu(cpu) {
+> > -            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_tlb_mask, cpu),
+> > +            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
+> >                  GFP_KERNEL, cpu_to_node(cpu));
+> >          }
+> > -        pr_info("KVM setup pv remote TLB flush\n");
+> > -    }
+> >
+> >      return 0;
+> >  }
+> > -arch_initcall(kvm_setup_pv_tlb_flush);
+> > +arch_initcall(kvm_alloc_cpumask);
+>
+> Honestly, I'd simplify the check in kvm_alloc_cpumask() as
+>
+> if (!kvm_para_available())
+>         return;
+>
+> and allocated masks for all other cases.
 
-> On 04/02/2020 12.41, Claudio Imbrenda wrote:
-> > On Tue, 4 Feb 2020 11:37:42 +0100
-> > Thomas Huth <thuth@redhat.com> wrote:
-> > 
-> > [...]
-> >   
-> >>> ---
-> >>>  arch/s390/kernel/pgm_check.S |  4 +-
-> >>>  arch/s390/mm/fault.c         | 87
-> >>> ++++++++++++++++++++++++++++++++++++ 2 files changed, 89
-> >>> insertions(+), 2 deletions(-)    
-> >> [...]  
-> >>> +void do_non_secure_storage_access(struct pt_regs *regs)
-> >>> +{
-> >>> +	unsigned long gaddr = regs->int_parm_long &
-> >>> __FAIL_ADDR_MASK;
-> >>> +	struct gmap *gmap = (struct gmap *)S390_lowcore.gmap;
-> >>> +	struct uv_cb_cts uvcb = {
-> >>> +		.header.cmd = UVC_CMD_CONV_TO_SEC_STOR,
-> >>> +		.header.len = sizeof(uvcb),
-> >>> +		.guest_handle = gmap->se_handle,
-> >>> +		.gaddr = gaddr,
-> >>> +	};
-> >>> +	int rc;
-> >>> +
-> >>> +	if (get_fault_type(regs) != GMAP_FAULT) {
-> >>> +		do_fault_error(regs, VM_READ | VM_WRITE,
-> >>> VM_FAULT_BADMAP);
-> >>> +		WARN_ON_ONCE(1);
-> >>> +		return;
-> >>> +	}
-> >>> +
-> >>> +	rc = uv_make_secure(gmap, gaddr, &uvcb, 0);
-> >>> +	if (rc == -EINVAL && uvcb.header.rc != 0x104)
-> >>> +		send_sig(SIGSEGV, current, 0);
-> >>> +}    
-> >>
-> >> What about the other rc beside 0x104 that could happen here? They
-> >> go unnoticed?  
-> > 
-> > no, they are handled in the uv_make_secure, and return an
-> > appropriate error code.   
-> Hmm, in patch 05/37, I basically see:
-> 
-> +static int make_secure_pte(pte_t *ptep, unsigned long addr, void
-> *data) +{
-> [...]
-> +	rc = uv_call(0, (u64)params->uvcb);
-> +	page_ref_unfreeze(page, expected);
-> +	if (rc)
-> +		rc = (params->uvcb->rc == 0x10a) ? -ENXIO : -EINVAL;
-> +	return rc;
-> +}
-> 
-> +int uv_make_secure(struct gmap *gmap, unsigned long gaddr, void
-> *uvcb, int pins)
-> +{
-> [...]
-> +	lock_page(params.page);
-> +	rc = apply_to_page_range(gmap->mm, uaddr, PAGE_SIZE,
-> make_secure_pte, &params);
-> +	unlock_page(params.page);
-> +out:
-> +	up_read(&gmap->mm->mmap_sem);
-> +
-> +	if (rc == -EBUSY) {
-> +		if (local_drain) {
-> +			lru_add_drain_all();
-> +			return -EAGAIN;
-> +		}
-> +		lru_add_drain();
-> +		local_drain = 1;
-> +		goto again;
-> +	} else if (rc == -ENXIO) {
-> +		if (gmap_fault(gmap, gaddr, FAULT_FLAG_WRITE))
-> +			return -EFAULT;
-> +		return -EAGAIN;
-> +	}
-> +	return rc;
-> +}
-> 
-> So 0x10a result in -ENXIO and is handled ==> OK.
-> And 0x104 is handled in do_non_secure_storage_access ==> OK.
-> 
-> But what about the other possible error codes? make_secure_pte()
-> returns -EINVAL in that case, but uv_make_secure() does not care
-> about that error code, and do_non_secure_storage_access() only cares
-> if uvcb.header.rc was 0x104 ... what did I miss?
+This will waste the memory if pv tlb and pv ipis are not exposed which
+are the only users currently.
 
-basically, any error value that is not handled by uv_make_secure is
-passed as-is from make_secure_pte directly to the caller of
-uv_make_secure .
-any RC value that is not explicitly handled here will
-result in -EINVAL. The caller has then to check for -EINVAL and check
-the RC value, like do_non_secure_storage_access does.
-
-so anything else that goes wrong is passed as-is to the caller.
-for some things, like interrupt handlers, we simply don't care; if we
-need to try again, we will try again, if we notice we can't continue,
-the VM will get killed.
-
-
-
+    Wanpeng
