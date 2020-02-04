@@ -2,150 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A778E152202
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 22:40:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A3759152205
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 22:43:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727579AbgBDVk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 16:40:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4910 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727441AbgBDVk2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 16:40:28 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014LdgOM080961
-        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 16:40:26 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyeh9whuy-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 16:40:26 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 4 Feb 2020 21:40:24 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 4 Feb 2020 21:40:22 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014LeK4f46072002
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Feb 2020 21:40:20 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7B226A405B;
-        Tue,  4 Feb 2020 21:40:20 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F0270A4060;
-        Tue,  4 Feb 2020 21:40:19 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.174.10])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Feb 2020 21:40:19 +0000 (GMT)
-Subject: Re: [RFCv2 09/37] KVM: s390: protvirt: Add KVM api documentation
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-10-borntraeger@de.ibm.com>
- <4ec2f1f0-cfdd-3592-c2bf-5153fc2f6005@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 4 Feb 2020 22:40:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1727534AbgBDVnu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 16:43:50 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:38700 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727412AbgBDVnu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 16:43:50 -0500
+Received: by mail-ot1-f65.google.com with SMTP id z9so18661318oth.5
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 13:43:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=h4sd+ZATda3xgd2Cabp+ey5GfoagpPrGA3dH0HD9uD4=;
+        b=om0IxymUwPkvWyb01X9tGRJ2/DQx9Zp+ONzq9K7omFBcxtLbIr+tzBJigBSQmHj8ji
+         gecf238XvqhNWCuCqz2KAnrN3hTNL031wGf8u0cF3krNJjO2TYR57Dh5Iw9/Q50LRnkl
+         QuE9a58jgymDElHyDs9NcX4/me9PQ561Fcz/F9UKFm3td3WJmgu2NBt2/IM50iZA2jYR
+         ynmSHN6PcWaa83ih4P3Dpic9Y+SrcIIVXw5jNyh5WQPZRLL9gyDTVPllEJgs5elyQq2f
+         f0vXXrc67OfZVvCrI/PryDxZ6ot5Kg/9J5OGoqR0kSXlTMTH4V1nKwTKuhVR/rFzH6xV
+         XGow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=h4sd+ZATda3xgd2Cabp+ey5GfoagpPrGA3dH0HD9uD4=;
+        b=SdkW37Fm8pbKXlgwMUqpzCQbPmIRuOuTt+miuR9Q2Ept7KL2osKlGgOBQJCaU63xtV
+         47u6T17e20N/dIxaMJvVjXsJamuBtGulh0wKOuoxQWgGgUDQOZbA/zWne7v0UKKlh9k5
+         AhsWBL+Xiwxx6WcWuN2GzPYszLBKYX65jS1n+XkI6MBQNwgAsHz+6uSalWIzQebLk+a+
+         ac5LSYUEQqifnLxiPJBa5ad4Hx11qv4SEx6fSlrYlU2AYx9kkOjKSO3tc1Rd7XQt2co2
+         xldEDiO4xGSZ+XsEfuw0bA55nTqHa2K+kWmNSUQcKf/iybp/nowvQWkBbps/d5cXcL9R
+         sQOw==
+X-Gm-Message-State: APjAAAW59A2T4pd1Wr/z2qiDAqYiLLfmUUiPttImCsql9RJnQYyhNOiW
+        2LG5pf3fe3JHx5wjVHb5DebmC5EI4GUSj3nc4YQUIg==
+X-Google-Smtp-Source: APXvYqyzRa/EgbcHWU5oWYs3EwkkIOeOuYIq70nRVJ+YY8OVe8Drtam8ArdPOslMqNhBe4zCRcUBk63gv56UchKAyW4=
+X-Received: by 2002:a9d:4e99:: with SMTP id v25mr24222626otk.363.1580852628908;
+ Tue, 04 Feb 2020 13:43:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <4ec2f1f0-cfdd-3592-c2bf-5153fc2f6005@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20020421-0012-0000-0000-00000383B2F4
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020421-0013-0000-0000-000021C01B47
-Message-Id: <f9ec6dc7-0ff6-5059-d680-584253bf3109@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-04_08:2020-02-04,2020-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=836 mlxscore=0
- suspectscore=0 malwarescore=0 impostorscore=0 bulkscore=0 clxscore=1015
- lowpriorityscore=0 adultscore=0 priorityscore=1501 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2002040147
+References: <20200110190313.17144-1-joao.m.martins@oracle.com>
+ <20200110190313.17144-11-joao.m.martins@oracle.com> <e605fed8-46f5-6a07-11e6-2cc079a1159b@google.com>
+ <CAPcyv4iiSsEOsfEwLQcV3bNDjBSxw1OgWoBdEWPQEymq6=xm-A@mail.gmail.com> <ae788015-616f-96e6-3a0e-39c1911c4b01@google.com>
+In-Reply-To: <ae788015-616f-96e6-3a0e-39c1911c4b01@google.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Tue, 4 Feb 2020 13:43:37 -0800
+Message-ID: <CAPcyv4ibWZgCSTqnYLicVR3vXeNKwuWSnV5K8fCwvyhz_h=0GQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 10/10] nvdimm/e820: add multiple namespaces support
+To:     Barret Rhoden <brho@google.com>
+Cc:     Joao Martins <joao.m.martins@oracle.com>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux MM <linux-mm@kvack.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04.02.20 21:19, Thomas Huth wrote:
-[...]
->> +KVM_PV_VM_DESTROY
->> +Unregisters the VM from the Ultravisor and frees memory that was
-> 
-> s/Unregisters/Deregisters/ ?
+On Tue, Feb 4, 2020 at 10:20 AM Barret Rhoden <brho@google.com> wrote:
+>
+> Hi -
+>
+> On 2/4/20 11:44 AM, Dan Williams wrote:
+> > On Tue, Feb 4, 2020 at 7:30 AM Barret Rhoden <brho@google.com> wrote:
+> >>
+> >> Hi -
+> >>
+> >> On 1/10/20 2:03 PM, Joao Martins wrote:
+> >>> User can define regions with 'memmap=size!offset' which in turn
+> >>> creates PMEM legacy devices. But because it is a label-less
+> >>> NVDIMM device we only have one namespace for the whole device.
+> >>>
+> >>> Add support for multiple namespaces by adding ndctl control
+> >>> support, and exposing a minimal set of features:
+> >>> (ND_CMD_GET_CONFIG_SIZE, ND_CMD_GET_CONFIG_DATA,
+> >>> ND_CMD_SET_CONFIG_DATA) alongside NDD_ALIASING because we can
+> >>> store labels.
+> >>
+> >> FWIW, I like this a lot.  If we move away from using memmap in favor of
+> >> efi_fake_mem, ideally we'd have the same support for full-fledged
+> >> pmem/dax regions and namespaces that this patch brings.
+> >
+> > No, efi_fake_mem only supports creating dax-regions. What's the use
+> > case that can't be satisfied by just specifying multiple memmap=
+> > ranges?
+>
+> I'd like to be able to create and destroy dax regions on the fly.  In
+> particular, I want to run guest VMs using the dax files for guest
+> memory, but I don't know at boot time how many VMs I'll have, or what
+> their sizes are.  Ideally, I'd have separate files for each VM, instead
+> of a single /dev/dax.
+>
+> I currently do this with fs-dax with one big memmap region (ext4 on
+> /dev/pmem0), and I use the file system to handle the
+> creation/destruction/resizing and metadata management.  But since fs-dax
+> won't work with device pass-through, I started looking at dev-dax, with
+> the expectation that I'd need some software to manage the memory (i.e.
+> allocation).  That led me to ndctl, which seems to need namespace labels
+> to have the level of control I was looking for.
 
-ack
+Ah, got it, you only ended up at wanting namespace labels because
+there was no other way to carve up device-dax. That's changing as part
+of the efi_fake_mem= enabling and I have a patch set in the works to
+allow discontiguous sub-divisions of a device-dax range. Note that is
+this branch rebases frequently:
 
-> 
->> +donated, so the kernel can use it again. All registered VCPUs have to
->> +be unregistered beforehand and all memory has to be exported or
->> +shared.
->> +
->> +KVM_PV_VM_SET_SEC_PARMS
->> +Pass the image header from VM memory to the Ultravisor in preparation
->> +of image unpacking and verification.
->> +
->> +KVM_PV_VM_UNPACK
->> +Unpack (protect and decrypt) a page of the encrypted boot image.
->> +
->> +KVM_PV_VM_VERIFY
->> +Verify the integrity of the unpacked image. Only if this succeeds, KVM
->> +
->> +is allowed to start protected VCPUs.
-> 
-> Please remove the empty line between "KVM" and "is allowed".
+https://git.kernel.org/pub/scm/linux/kernel/git/djbw/nvdimm.git/log/?h=libnvdimm-pending
 
-ack
 
+>
+> Thanks,
+>
+> Barret
+>
