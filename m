@@ -2,126 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EA06151F8A
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 18:36:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAEE6152005
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 18:50:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727441AbgBDRgx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 12:36:53 -0500
-Received: from foss.arm.com ([217.140.110.172]:39272 "EHLO foss.arm.com"
+        id S1727458AbgBDRug (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 12:50:36 -0500
+Received: from mga09.intel.com ([134.134.136.24]:49214 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727310AbgBDRgx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Feb 2020 12:36:53 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB149101E;
-        Tue,  4 Feb 2020 09:36:52 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CF3233F68E;
-        Tue,  4 Feb 2020 09:36:51 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v4 00/10] arm/arm64: Various fixes
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        andre.przywara@arm.com, vladimir.murzin@arm.com,
-        mark.rutland@arm.com
-References: <20200131163728.5228-1-alexandru.elisei@arm.com>
- <20200203185949.btxvofvgj6brxmzi@kamzik.brq.redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <d6c31196-14f6-4cbc-9ade-3bbcf2294136@arm.com>
-Date:   Tue, 4 Feb 2020 17:36:50 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727392AbgBDRug (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 12:50:36 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Feb 2020 09:50:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,402,1574150400"; 
+   d="scan'208";a="225579763"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by fmsmga008.fm.intel.com with ESMTP; 04 Feb 2020 09:50:35 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] x86: Fix the name for the SMEP CPUID bit
+Date:   Tue,  4 Feb 2020 09:50:34 -0800
+Message-Id: <20200204175034.18201-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200203185949.btxvofvgj6brxmzi@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andrew,
+Fix the X86_FEATURE_* name for SMEP, which is incorrectly named
+X86_FEATURE_INVPCID_SINGLE and is a wee bit confusing when looking at
+the SMEP unit tests.
 
-On 2/3/20 6:59 PM, Andrew Jones wrote:
-> On Fri, Jan 31, 2020 at 04:37:18PM +0000, Alexandru Elisei wrote:
->> These are the patches that were left unmerged from the previous version of
->> the series, plus a few new patches. Patch #1 "Makefile: Use
->> no-stack-protector compiler options" is straightforward and came about
->> because of a compile error I experienced on RockPro64.
->>
->> Patches #3 and #5 are the result of Andre's comments on the previous
->> version. When adding ISBs after register writes I noticed in the ARM ARM
->> that a read of the timer counter value can be reordered, and patch #4
->> tries to avoid that.
->>
->> Patch #7 is also the result of a review comment. For the GIC tests, we wait
->> up to 5 seconds for the interrupt to be asserted. However, the GIC tests
->> can use more than one CPU, which is not the case with the timer test. And
->> waiting for the GIC to assert the interrupt can happen up to 6 times (8
->> times after patch #9), so I figured that a timeout of 10 seconds for the
->> test is acceptable.
->>
->> Patch #8 tries to improve the way we test how the timer generates the
->> interrupt. If the GIC asserts the timer interrupt, but the device itself is
->> not generating it, that's a pretty big problem.
->>
->> Ran the same tests as before:
->>
->> - with kvmtool, on an arm64 host kernel: 64 and 32 bit tests, with GICv3
->>   (on an Ampere eMAG) and GICv2 (on a AMD Seattle box).
->>
->> - with qemu, on an arm64 host kernel:
->>     a. with accel=kvm, 64 and 32 bit tests, with GICv3 (Ampere eMAG) and
->>        GICv2 (Seattle).
->>     b. with accel=tcg, 64 and 32 bit tests, on the Ampere eMAG machine.
->>
->> Changes:
->> * Patches #1, #3, #4, #5, #7, #8 are new.
->> * For patch #2, as per Drew's suggestion, I changed the entry point to halt
->>   because the test is supposed to test if CPU_ON is successful.
->> * Removed the ISB from patch #6 because that was fixed by #3.
->> * Moved the architecture dependent function init_dcache_line_size to
->>   cpu_init in lib/arm/setup.c as per Drew's suggestion.
->>
->> Alexandru Elisei (10):
->>   Makefile: Use no-stack-protector compiler options
->>   arm/arm64: psci: Don't run C code without stack or vectors
->>   arm64: timer: Add ISB after register writes
->>   arm64: timer: Add ISB before reading the counter value
->>   arm64: timer: Make irq_received volatile
->>   arm64: timer: EOIR the interrupt after masking the timer
->>   arm64: timer: Wait for the GIC to sample timer interrupt state
->>   arm64: timer: Check the timer interrupt state
->>   arm64: timer: Test behavior when timer disabled or masked
->>   arm/arm64: Perform dcache clean + invalidate after turning MMU off
->>
->>  Makefile                  |  4 +-
->>  lib/arm/asm/processor.h   | 13 +++++++
->>  lib/arm64/asm/processor.h | 12 ++++++
->>  lib/arm/setup.c           |  8 ++++
->>  arm/cstart.S              | 22 +++++++++++
->>  arm/cstart64.S            | 23 ++++++++++++
->>  arm/psci.c                | 15 ++++++--
->>  arm/timer.c               | 79 ++++++++++++++++++++++++++++++++-------
->>  arm/unittests.cfg         |  2 +-
->>  9 files changed, 158 insertions(+), 20 deletions(-)
->>
->> -- 
->> 2.20.1
->>
-> The series looks good to me. The first patch probably could have been
-> posted separately, but I'll try to test the whole series tomorrow. If
+Note, there is no INVPCID_SINGLE CPUID bit, the bogus name likely came
+from the Linux kernel, which has a synthetic feature flag for
+INVPCID_SINGLE in word 7, bit 7 (CPUID 0x7.EBX is stored in word 9).
 
-Noted, next time I will try to do a better job separating the patches. I found the
-bug while testing the arm64 fixes, and I was getting ready to send the patches, so
-I just figured I'll send it as part of the series.
+Fixes: 6ddcc29 ("kvm-unit-test: x86: Implement a generic wrapper for cpuid/cpuid_indexed functions")
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ lib/x86/processor.h | 2 +-
+ x86/access.c        | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-> all looks well, I'll prepare a pull request for Paolo.
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 7057180..03fdf64 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -138,7 +138,7 @@ static inline u8 cpuid_maxphyaddr(void)
+ #define	X86_FEATURE_XMM2		(CPUID(0x1, 0, EDX, 26))
+ #define	X86_FEATURE_TSC_ADJUST		(CPUID(0x7, 0, EBX, 1))
+ #define	X86_FEATURE_HLE			(CPUID(0x7, 0, EBX, 4))
+-#define	X86_FEATURE_INVPCID_SINGLE	(CPUID(0x7, 0, EBX, 7))
++#define	X86_FEATURE_SMEP	        (CPUID(0x7, 0, EBX, 7))
+ #define	X86_FEATURE_INVPCID		(CPUID(0x7, 0, EBX, 10))
+ #define	X86_FEATURE_RTM			(CPUID(0x7, 0, EBX, 11))
+ #define	X86_FEATURE_SMAP		(CPUID(0x7, 0, EBX, 20))
+diff --git a/x86/access.c b/x86/access.c
+index 5233713..7303fc3 100644
+--- a/x86/access.c
++++ b/x86/access.c
+@@ -860,7 +860,7 @@ static int check_smep_andnot_wp(ac_pool_t *pool)
+ 	ac_test_t at1;
+ 	int err_prepare_andnot_wp, err_smep_andnot_wp;
+ 
+-	if (!this_cpu_has(X86_FEATURE_INVPCID_SINGLE)) {
++	if (!this_cpu_has(X86_FEATURE_SMEP)) {
+ 	    return 1;
+ 	}
+ 
+@@ -955,7 +955,7 @@ static int ac_test_run(void)
+ 	}
+     }
+ 
+-    if (!this_cpu_has(X86_FEATURE_INVPCID_SINGLE)) {
++    if (!this_cpu_has(X86_FEATURE_SMEP)) {
+ 	tests++;
+ 	if (set_cr4_smep(1) == GP_VECTOR) {
+             successes++;
+-- 
+2.24.1
 
-Thank you very much for taking the time to review the patches! Much appreciated.
-
-Thanks,
-Alex
->
-> Thanks,
-> drew 
->
