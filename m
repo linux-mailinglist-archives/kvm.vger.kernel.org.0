@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C8373151A6B
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:17:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36890151A73
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 13:20:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727154AbgBDMRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 07:17:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39225 "EHLO
+        id S1727129AbgBDMUs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 07:20:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56603 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727148AbgBDMRG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Feb 2020 07:17:06 -0500
+        with ESMTP id S1727119AbgBDMUs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 07:20:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580818625;
+        s=mimecast20190719; t=1580818846;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=Zx4tr6lerDXSMtHtycn0uHcHTiDnxybNzMZQSgmUd/Q=;
-        b=HZGhKJDftJOVaQbgY/m3BfpQR1us/wvukZ0vXUeiZqnz6qyDCnNsuHEBpnI/bqcZh76Hk8
-        Eob12GF5XqQvBi89mcTwY7Zg2T/c+s58odKAri1TLZuuVe/c3XwkGBQzPt1dE8wiYvpsrf
-        rxBKY2iMY6sXUjL+toILsc2kCWA8nM8=
+        bh=JbaZQMGGm4Gm/78JQKjQG7buQXn7tymqKNcDvf5EEFU=;
+        b=LQZd39V4KZiUGEBHDcjviX37TIHZK30b8ZMaW/8gh4neQOwPVjZNx47Rrpb3wM/5BlvyVT
+        rLVfSY29aOn32ubxXZZFKPJhHPZ4KNNDO3w/Be05kUgK4Q83ulYw9DFKtpBa0KWBrzujJJ
+        KkTSoTXgfg7bloazgEcs/0PhwStn8eI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-5f1RItIyOxC5Y7m43kxq3A-1; Tue, 04 Feb 2020 07:17:02 -0500
-X-MC-Unique: 5f1RItIyOxC5Y7m43kxq3A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-42-x7PKW8qZO62Nw6AeO4GGqA-1; Tue, 04 Feb 2020 07:20:43 -0500
+X-MC-Unique: x7PKW8qZO62Nw6AeO4GGqA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0362D8010EF;
-        Tue,  4 Feb 2020 12:17:01 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F373A1007281;
+        Tue,  4 Feb 2020 12:20:41 +0000 (UTC)
 Received: from [10.36.117.121] (ovpn-117-121.ams2.redhat.com [10.36.117.121])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4EA665D9C5;
-        Tue,  4 Feb 2020 12:16:59 +0000 (UTC)
-Subject: Re: [RFCv2 12/37] KVM: s390: protvirt: Handle SE notification
- interceptions
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B41915C1D4;
+        Tue,  4 Feb 2020 12:20:35 +0000 (UTC)
+Subject: Re: [RFCv2 13/37] KVM: s390: protvirt: Instruction emulation
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -43,7 +42,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-13-borntraeger@de.ibm.com>
+ <20200203131957.383915-14-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -89,64 +88,88 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <a3834959-0036-71fb-b729-2bc44d7186bb@redhat.com>
-Date:   Tue, 4 Feb 2020 13:16:58 +0100
+Message-ID: <da579f7a-f2a2-7f81-a606-3829878dec5d@redhat.com>
+Date:   Tue, 4 Feb 2020 13:20:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200203131957.383915-13-borntraeger@de.ibm.com>
+In-Reply-To: <20200203131957.383915-14-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
+On 03.02.20 14:19, Christian Borntraeger wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> We have two new SIE exit codes dealing with instructions.
+> 104 (0x68) for a secure instruction interception, on which the SIE needs
+> hypervisor action to complete the instruction. We can piggy-back on the
+> existing instruction handlers.
+> 
+> 108 which is merely a notification and provides data for tracking and
+> management. For example this is used to tell the host about a new value
+> for the prefix register. As there will be several special case handlers
+> in later patches, we handle this in a separate function.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
 >  arch/s390/include/asm/kvm_host.h |  2 ++
->  arch/s390/kvm/intercept.c        | 10 ++++++++++
->  2 files changed, 12 insertions(+)
+>  arch/s390/kvm/intercept.c        | 11 +++++++++++
+>  2 files changed, 13 insertions(+)
 > 
 > diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 841690d05080..d63ed05272ec 100644
+> index d63ed05272ec..58845b315be0 100644
 > --- a/arch/s390/include/asm/kvm_host.h
 > +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -215,6 +215,8 @@ struct kvm_s390_sie_block {
->  #define ICPT_PARTEXEC	0x38
->  #define ICPT_IOINST	0x40
+> @@ -217,6 +217,8 @@ struct kvm_s390_sie_block {
 >  #define ICPT_KSS	0x5c
-> +#define ICPT_PV_MCHKR	0x60
-> +#define ICPT_PV_INT_EN	0x64
+>  #define ICPT_PV_MCHKR	0x60
+>  #define ICPT_PV_INT_EN	0x64
+> +#define ICPT_PV_INSTR	0x68
+> +#define ICPT_PV_NOTIF	0x6c
+
+NOTIFY? NOTIFICATION? NOTIF is weird.
+
 >  	__u8	icptcode;		/* 0x0050 */
 >  	__u8	icptstatus;		/* 0x0051 */
 >  	__u16	ihcpu;			/* 0x0052 */
 > diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-> index a389fa85cca2..eaa2a21c3170 100644
+> index eaa2a21c3170..4b3fbbde1674 100644
 > --- a/arch/s390/kvm/intercept.c
 > +++ b/arch/s390/kvm/intercept.c
-> @@ -480,6 +480,16 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
->  	case ICPT_KSS:
->  		rc = kvm_s390_skey_check_enable(vcpu);
+> @@ -444,6 +444,11 @@ static int handle_operexc(struct kvm_vcpu *vcpu)
+>  	return kvm_s390_inject_program_int(vcpu, PGM_OPERATION);
+>  }
+>  
+> +static int handle_pv_not(struct kvm_vcpu *vcpu)
+
+"notification" please. not not. You see why ;)
+
+> +{
+> +	return handle_instruction(vcpu);
+> +}
+> +
+>  int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
+>  {
+>  	int rc, per_rc = 0;
+> @@ -490,6 +495,12 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
+>  		 */
+>  		rc = 0;
 >  		break;
-> +	case ICPT_PV_MCHKR:
-> +		/* fallthrough */
-
-No need for this annotation if there is no additional code in the case.
-
-> +	case ICPT_PV_INT_EN:
-> +		/*
-> +		 * PSW bit 13 or a CR (0, 6, 14) changed and we might
-> +		 * now be able to deliver interrupts. The pre-run code
-> +		 * will take care of this.
-> +		 */
-> +		rc = 0;
+> +	case ICPT_PV_INSTR:
+> +		rc = handle_instruction(vcpu);
+> +		break;
+> +	case ICPT_PV_NOTIF:
+> +		rc = handle_pv_not(vcpu);
 > +		break;
 >  	default:
 >  		return -EOPNOTSUPP;
 >  	}
-> 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
