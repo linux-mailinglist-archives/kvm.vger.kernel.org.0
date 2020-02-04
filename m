@@ -2,120 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2053D151F35
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 18:20:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EA06151F8A
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 18:36:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727442AbgBDRUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 12:20:19 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24992 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727414AbgBDRUT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 12:20:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580836818;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hw6+Wu4uyD789kyPxb+U85AivhJLuap+29+WsIGmLOk=;
-        b=Pl7OCcb35IRKXDzVPb1JO86MzWgRkN5keNqlz4+w4RBcreT1wqNKIG2rFTdIR/vZ77uigP
-        oCd1TgT7kuLbpvcKe9tWbAoDBIA6HN5xz46Zhb1lfoGWusYmChCGr1bQAuaNsgonaUxF8L
-        ZJISz5MhCWFvoNS28jiLxvyZ6Dzzv/0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-axvsEwpANvGpaNg11OZSzg-1; Tue, 04 Feb 2020 12:20:12 -0500
-X-MC-Unique: axvsEwpANvGpaNg11OZSzg-1
-Received: by mail-wm1-f72.google.com with SMTP id b202so1755723wmb.2
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 09:20:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hw6+Wu4uyD789kyPxb+U85AivhJLuap+29+WsIGmLOk=;
-        b=ubcr8ok3T7nb2f3B1DZc+bBS05yRq57y/cgpkKOzprzSqjqjV7KYToHJ2xu1FSTl5T
-         osAN137Boa67Z6gbxAeXdCK9efPDDop87vSxQmoAZR/N6Zq5te2YKbj7YgLaFfV0QdT3
-         VixCZQnK85YI5LucbRaVOPC+G4koLYEhfTS1Zvr8AlWEgxvqPN6vhFfKFWxmYrlxSIVQ
-         +lckRwbjmlZyyVBT6LBWNF6+epvtwGLeamE1QsfGvm50SiFMM9kNT84Cxnv4G5Io91Ni
-         Vj0oF7Py0DBgkoDU/vg/3vQ9j73Cr+Eq/DCmajLfvNuPADpAthQObKse/75xEuUCxvGL
-         t4ug==
-X-Gm-Message-State: APjAAAXHbDO4HxwFX+5roLJfVHDYpwQzv7qPVocC77plyX7+T/X2Vxa7
-        ebjhpor80Lvfojw+M42kXzla0uaK9MqxYaItr9y1Cs0HoHx0iVdn8X99FBquwZ9j1R9uYq7o6lK
-        o0g3V+HWJWHiK
-X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr28206wmk.131.1580836810502;
-        Tue, 04 Feb 2020 09:20:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxbro2tqGgYpNhs3142offvNXpPRxeBmpIjZwerMVMvgRuzLuB19WVpuA2rEayfC7paM+nNVQ==
-X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr28168wmk.131.1580836810223;
-        Tue, 04 Feb 2020 09:20:10 -0800 (PST)
-Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net. [83.52.55.162])
-        by smtp.gmail.com with ESMTPSA id h13sm19865065wrw.54.2020.02.04.09.20.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2020 09:20:09 -0800 (PST)
-Subject: Re: [PATCH v2 00/12] python: Explicit usage of Python 3
-To:     qemu-devel@nongnu.org
-Cc:     Richard Henderson <rth@twiddle.net>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Cleber Rosa <crosa@redhat.com>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Michael Roth <mdroth@linux.vnet.ibm.com>,
-        Max Reitz <mreitz@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-        kvm@vger.kernel.org
-References: <20200130163232.10446-1-philmd@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <36f9ee1f-03e1-beb5-6f2f-80b17a30ef79@redhat.com>
-Date:   Tue, 4 Feb 2020 18:20:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1727441AbgBDRgx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 12:36:53 -0500
+Received: from foss.arm.com ([217.140.110.172]:39272 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727310AbgBDRgx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 12:36:53 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB149101E;
+        Tue,  4 Feb 2020 09:36:52 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CF3233F68E;
+        Tue,  4 Feb 2020 09:36:51 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH v4 00/10] arm/arm64: Various fixes
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        andre.przywara@arm.com, vladimir.murzin@arm.com,
+        mark.rutland@arm.com
+References: <20200131163728.5228-1-alexandru.elisei@arm.com>
+ <20200203185949.btxvofvgj6brxmzi@kamzik.brq.redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <d6c31196-14f6-4cbc-9ade-3bbcf2294136@arm.com>
+Date:   Tue, 4 Feb 2020 17:36:50 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200130163232.10446-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200203185949.btxvofvgj6brxmzi@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/30/20 5:32 PM, Philippe Mathieu-Daudé wrote:
-> Hello,
-> 
-> These are mechanical sed patches used to convert the
-> code base to Python 3, as suggested on this thread:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675024.html
-> 
-> Since v1:
-> - new checkpatch.pl patch
-> - addressed Kevin and Vladimir review comments
-> - added R-b/A-b tags
-> 
-> Regards,
-> 
-> Phil.
-> 
-> Philippe Mathieu-Daudé (12):
->    scripts/checkpatch.pl: Only allow Python 3 interpreter
->    tests/qemu-iotests/check: Allow use of python3 interpreter
->    tests/qemu-iotests: Explicit usage of Python 3 (scripts with __main__)
->    tests: Explicit usage of Python 3
->    scripts: Explicit usage of Python 3 (scripts with __main__)
->    scripts/minikconf: Explicit usage of Python 3
->    tests/acceptance: Remove shebang header
->    scripts/tracetool: Remove shebang header
->    tests/vm: Remove shebang header
->    tests/qemu-iotests: Explicit usage of Python3 (scripts without
->      __main__)
->    scripts: Explicit usage of Python 3 (scripts without __main__)
->    tests/qemu-iotests/check: Only check for Python 3 interpreter
+Hi Andrew,
 
-Series applied to my python-next tree:
-https://gitlab.com/philmd/qemu/commits/python-next
+On 2/3/20 6:59 PM, Andrew Jones wrote:
+> On Fri, Jan 31, 2020 at 04:37:18PM +0000, Alexandru Elisei wrote:
+>> These are the patches that were left unmerged from the previous version of
+>> the series, plus a few new patches. Patch #1 "Makefile: Use
+>> no-stack-protector compiler options" is straightforward and came about
+>> because of a compile error I experienced on RockPro64.
+>>
+>> Patches #3 and #5 are the result of Andre's comments on the previous
+>> version. When adding ISBs after register writes I noticed in the ARM ARM
+>> that a read of the timer counter value can be reordered, and patch #4
+>> tries to avoid that.
+>>
+>> Patch #7 is also the result of a review comment. For the GIC tests, we wait
+>> up to 5 seconds for the interrupt to be asserted. However, the GIC tests
+>> can use more than one CPU, which is not the case with the timer test. And
+>> waiting for the GIC to assert the interrupt can happen up to 6 times (8
+>> times after patch #9), so I figured that a timeout of 10 seconds for the
+>> test is acceptable.
+>>
+>> Patch #8 tries to improve the way we test how the timer generates the
+>> interrupt. If the GIC asserts the timer interrupt, but the device itself is
+>> not generating it, that's a pretty big problem.
+>>
+>> Ran the same tests as before:
+>>
+>> - with kvmtool, on an arm64 host kernel: 64 and 32 bit tests, with GICv3
+>>   (on an Ampere eMAG) and GICv2 (on a AMD Seattle box).
+>>
+>> - with qemu, on an arm64 host kernel:
+>>     a. with accel=kvm, 64 and 32 bit tests, with GICv3 (Ampere eMAG) and
+>>        GICv2 (Seattle).
+>>     b. with accel=tcg, 64 and 32 bit tests, on the Ampere eMAG machine.
+>>
+>> Changes:
+>> * Patches #1, #3, #4, #5, #7, #8 are new.
+>> * For patch #2, as per Drew's suggestion, I changed the entry point to halt
+>>   because the test is supposed to test if CPU_ON is successful.
+>> * Removed the ISB from patch #6 because that was fixed by #3.
+>> * Moved the architecture dependent function init_dcache_line_size to
+>>   cpu_init in lib/arm/setup.c as per Drew's suggestion.
+>>
+>> Alexandru Elisei (10):
+>>   Makefile: Use no-stack-protector compiler options
+>>   arm/arm64: psci: Don't run C code without stack or vectors
+>>   arm64: timer: Add ISB after register writes
+>>   arm64: timer: Add ISB before reading the counter value
+>>   arm64: timer: Make irq_received volatile
+>>   arm64: timer: EOIR the interrupt after masking the timer
+>>   arm64: timer: Wait for the GIC to sample timer interrupt state
+>>   arm64: timer: Check the timer interrupt state
+>>   arm64: timer: Test behavior when timer disabled or masked
+>>   arm/arm64: Perform dcache clean + invalidate after turning MMU off
+>>
+>>  Makefile                  |  4 +-
+>>  lib/arm/asm/processor.h   | 13 +++++++
+>>  lib/arm64/asm/processor.h | 12 ++++++
+>>  lib/arm/setup.c           |  8 ++++
+>>  arm/cstart.S              | 22 +++++++++++
+>>  arm/cstart64.S            | 23 ++++++++++++
+>>  arm/psci.c                | 15 ++++++--
+>>  arm/timer.c               | 79 ++++++++++++++++++++++++++++++++-------
+>>  arm/unittests.cfg         |  2 +-
+>>  9 files changed, 158 insertions(+), 20 deletions(-)
+>>
+>> -- 
+>> 2.20.1
+>>
+> The series looks good to me. The first patch probably could have been
+> posted separately, but I'll try to test the whole series tomorrow. If
 
+Noted, next time I will try to do a better job separating the patches. I found the
+bug while testing the arm64 fixes, and I was getting ready to send the patches, so
+I just figured I'll send it as part of the series.
+
+> all looks well, I'll prepare a pull request for Paolo.
+
+Thank you very much for taking the time to review the patches! Much appreciated.
+
+Thanks,
+Alex
+>
+> Thanks,
+> drew 
+>
