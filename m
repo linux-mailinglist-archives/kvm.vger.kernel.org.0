@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FEFE151910
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 11:57:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2206B151972
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 12:18:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727097AbgBDK5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 05:57:49 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32147 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726631AbgBDK5s (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 05:57:48 -0500
+        id S1727126AbgBDLSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 06:18:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43762 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726908AbgBDLSa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 06:18:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580813867;
+        s=mimecast20190719; t=1580815109;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MfX0iXS1KCHzvK2ztIKpZeVr5aPTKM4ldu7P6kIU4jA=;
-        b=hCEisME7/Wx2WXN1A5gSTSsTeuR6bexY1q14HRRJofiYOSSXd1ktl/cKoaLduloNuREVeZ
-        e4u20CwX+I9OWEdy/++6MXvIvXniDVKSod54p8PD9flFlnb0e5e/2f87S0I9B+w4f6QaWS
-        LU/hMC8pM/inezziXOxoQpaRf5ihkfA=
+        bh=kPIhvHt3W7KVSuQIB0FkR5M7QwcguUaHb9Jb9v+rfPg=;
+        b=GXKeeKfxXmkyEEC1jbdx+x2mo05wLEeeFuLp7xgFVojAwyXXBi82irDwbQGZf6uNb5BF8V
+        4jGMQs8BdmTxEebA0wv8MSLgYeXrIHRHNsNnYYo8AhJlqUs+0c/fiLOkpyrBuNSOWaRkS1
+        r0KrBjoXhYsBjsDUps4BQpH5SOjg1rI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-75-xOYZqA12M4qaXccWRnPs9A-1; Tue, 04 Feb 2020 05:57:46 -0500
-X-MC-Unique: xOYZqA12M4qaXccWRnPs9A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-413-3_uETUYmNjCvQ46Yz3i2Iw-1; Tue, 04 Feb 2020 06:18:25 -0500
+X-MC-Unique: 3_uETUYmNjCvQ46Yz3i2Iw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB0561005F71;
-        Tue,  4 Feb 2020 10:57:44 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E6C51336575;
+        Tue,  4 Feb 2020 11:18:24 +0000 (UTC)
 Received: from gondolin (ovpn-117-199.ams2.redhat.com [10.36.117.199])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 92A8110018FF;
-        Tue,  4 Feb 2020 10:57:40 +0000 (UTC)
-Date:   Tue, 4 Feb 2020 11:57:38 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EF1BF5D9CA;
+        Tue,  4 Feb 2020 11:18:19 +0000 (UTC)
+Date:   Tue, 4 Feb 2020 12:18:17 +0100
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Christian Borntraeger <borntraeger@de.ibm.com>
 Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
@@ -42,154 +42,174 @@ Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [RFCv2 05/37] s390/mm: provide memory management functions for
- protected KVM guests
-Message-ID: <20200204115738.3336787a.cohuck@redhat.com>
-In-Reply-To: <20200203131957.383915-6-borntraeger@de.ibm.com>
+Subject: Re: [RFCv2 06/37] s390: add (non)secure page access exceptions
+ handlers
+Message-ID: <20200204121817.10a5f271.cohuck@redhat.com>
+In-Reply-To: <20200203131957.383915-7-borntraeger@de.ibm.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
-        <20200203131957.383915-6-borntraeger@de.ibm.com>
+        <20200203131957.383915-7-borntraeger@de.ibm.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  3 Feb 2020 08:19:25 -0500
+On Mon,  3 Feb 2020 08:19:26 -0500
 Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> From: Vasily Gorbik <gor@linux.ibm.com>
 > 
-> This provides the basic ultravisor calls and page table handling to cope
-> with secure guests.
-
-I'll leave reviewing the mm stuff to somebody actually familiar with
-mm; only some other comments from me.
-
+> Add exceptions handlers performing transparent transition of non-secure
+> pages to secure (import) upon guest access and secure pages to
+> non-secure (export) upon hypervisor access.
 > 
-> Co-authored-by: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> [adding checks for failures]
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> [further changes like adding a check for gmap fault]
 > ---
->  arch/s390/include/asm/gmap.h        |   2 +
->  arch/s390/include/asm/mmu.h         |   2 +
->  arch/s390/include/asm/mmu_context.h |   1 +
->  arch/s390/include/asm/page.h        |   5 +
->  arch/s390/include/asm/pgtable.h     |  34 +++++-
->  arch/s390/include/asm/uv.h          |  59 ++++++++++
->  arch/s390/kernel/uv.c               | 170 ++++++++++++++++++++++++++++
->  7 files changed, 268 insertions(+), 5 deletions(-)
+>  arch/s390/kernel/pgm_check.S |  4 +-
+>  arch/s390/mm/fault.c         | 87 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 89 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
-> index 37f96b6f0e61..f2ab8b6d4b57 100644
-> --- a/arch/s390/include/asm/gmap.h
-> +++ b/arch/s390/include/asm/gmap.h
-> @@ -9,6 +9,7 @@
->  #ifndef _ASM_S390_GMAP_H
->  #define _ASM_S390_GMAP_H
+> diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
+> index 59dee9d3bebf..27ac4f324c70 100644
+> --- a/arch/s390/kernel/pgm_check.S
+> +++ b/arch/s390/kernel/pgm_check.S
+> @@ -78,8 +78,8 @@ PGM_CHECK(do_dat_exception)		/* 39 */
+>  PGM_CHECK(do_dat_exception)		/* 3a */
+>  PGM_CHECK(do_dat_exception)		/* 3b */
+>  PGM_CHECK_DEFAULT			/* 3c */
+> -PGM_CHECK_DEFAULT			/* 3d */
+> -PGM_CHECK_DEFAULT			/* 3e */
+> +PGM_CHECK(do_secure_storage_access)	/* 3d */
+> +PGM_CHECK(do_non_secure_storage_access)	/* 3e */
+
+I suppose that these two can only happen when we actually run a
+protected virt guest...
+
+>  PGM_CHECK_DEFAULT			/* 3f */
+>  PGM_CHECK_DEFAULT			/* 40 */
+>  PGM_CHECK_DEFAULT			/* 41 */
+> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+> index 7b0bb475c166..bd75b0765cf1 100644
+> --- a/arch/s390/mm/fault.c
+> +++ b/arch/s390/mm/fault.c
+> @@ -38,6 +38,7 @@
+>  #include <asm/irq.h>
+>  #include <asm/mmu_context.h>
+>  #include <asm/facility.h>
+> +#include <asm/uv.h>
+>  #include "../kernel/entry.h"
 >  
-> +#include <linux/radix-tree.h>
->  #include <linux/refcount.h>
+>  #define __FAIL_ADDR_MASK -4096L
+> @@ -816,3 +817,89 @@ static int __init pfault_irq_init(void)
+>  early_initcall(pfault_irq_init);
 >  
->  /* Generic bits for GMAP notification on DAT table entry changes. */
-> @@ -61,6 +62,7 @@ struct gmap {
->  	spinlock_t shadow_lock;
->  	struct gmap *parent;
->  	unsigned long orig_asce;
-> +	unsigned long se_handle;
-
-This is a deviation from the "protected virtualization" naming scheme
-used in the previous patches, but I understand that the naming of this
-whole feature is still in flux :) (Would still be nice to have it
-consistent, though.)
-
-However, I think I'd prefer something named based on protected
-virtualization: the se_* stuff here just tends to make me think of
-SELinux...
-
->  	int edat_level;
->  	bool removed;
->  	bool initialized;
-> diff --git a/arch/s390/include/asm/mmu.h b/arch/s390/include/asm/mmu.h
-> index bcfb6371086f..984026cb3608 100644
-> --- a/arch/s390/include/asm/mmu.h
-> +++ b/arch/s390/include/asm/mmu.h
-> @@ -16,6 +16,8 @@ typedef struct {
->  	unsigned long asce;
->  	unsigned long asce_limit;
->  	unsigned long vdso_base;
-> +	/* The mmu context belongs to a secure guest. */
-> +	atomic_t is_se;
-
-Here as well.
-
->  	/*
->  	 * The following bitfields need a down_write on the mm
->  	 * semaphore when they are written to. As they are only
-
-(...)
-
-> @@ -520,6 +521,15 @@ static inline int mm_has_pgste(struct mm_struct *mm)
->  	return 0;
->  }
->  
-> +static inline int mm_is_se(struct mm_struct *mm)
-> +{
+>  #endif /* CONFIG_PFAULT */
+> +
 > +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
-> +	if (unlikely(atomic_read(&mm->context.is_se)))
-> +		return 1;
-> +#endif
-> +	return 0;
+> +
+> +void do_secure_storage_access(struct pt_regs *regs)
+> +{
+> +	unsigned long addr = regs->int_parm_long & __FAIL_ADDR_MASK;
+> +	struct vm_area_struct *vma;
+> +	struct mm_struct *mm;
+> +	struct page *page;
+> +	int rc;
+
+...so this rather complex function will never be called if we don't act
+as a host for protected virt guests?
+
+> +
+> +	switch (get_fault_type(regs)) {
+> +	case USER_FAULT:
+> +		mm = current->mm;
+> +		down_read(&mm->mmap_sem);
+> +		vma = find_vma(mm, addr);
+> +		if (!vma) {
+> +			up_read(&mm->mmap_sem);
+> +			do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
+> +			break;
+> +		}
+> +		page = follow_page(vma, addr, FOLL_WRITE | FOLL_GET);
+> +		if (IS_ERR_OR_NULL(page)) {
+> +			up_read(&mm->mmap_sem);
+> +			break;
+> +		}
+> +		if (arch_make_page_accessible(page))
+> +			send_sig(SIGSEGV, current, 0);
+> +		put_page(page);
+> +		up_read(&mm->mmap_sem);
+> +		break;
+> +	case KERNEL_FAULT:
+> +		page = phys_to_page(addr);
+> +		if (unlikely(!try_get_page(page)))
+> +			break;
+> +		rc = arch_make_page_accessible(page);
+> +		put_page(page);
+> +		if (rc)
+> +			BUG();
+> +		break;
+> +	case VDSO_FAULT:
+> +		/* fallthrough */
+> +	case GMAP_FAULT:
+> +		/* fallthrough */
+> +	default:
+> +		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
+> +		WARN_ON_ONCE(1);
+> +	}
+> +}
+> +NOKPROBE_SYMBOL(do_secure_storage_access);
+> +
+> +void do_non_secure_storage_access(struct pt_regs *regs)
+> +{
+> +	unsigned long gaddr = regs->int_parm_long & __FAIL_ADDR_MASK;
+> +	struct gmap *gmap = (struct gmap *)S390_lowcore.gmap;
+> +	struct uv_cb_cts uvcb = {
+> +		.header.cmd = UVC_CMD_CONV_TO_SEC_STOR,
+> +		.header.len = sizeof(uvcb),
+> +		.guest_handle = gmap->se_handle,
+> +		.gaddr = gaddr,
+> +	};
+> +	int rc;
+
+Same for this function, of course.
+
+> +
+> +	if (get_fault_type(regs) != GMAP_FAULT) {
+> +		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
+> +		WARN_ON_ONCE(1);
+> +		return;
+> +	}
+> +
+> +	rc = uv_make_secure(gmap, gaddr, &uvcb, 0);
+> +	if (rc == -EINVAL && uvcb.header.rc != 0x104)
+> +		send_sig(SIGSEGV, current, 0);
+> +}
+> +NOKPROBE_SYMBOL(do_non_secure_storage_access);
+> +
+> +#else
+> +void do_secure_storage_access(struct pt_regs *regs)
+> +{
+> +	default_trap_handler(regs);
+> +}
+> +
+> +void do_non_secure_storage_access(struct pt_regs *regs)
+> +{
+> +	default_trap_handler(regs);
 > +}
 
-I'm wondering how big of an overhead we actually have because we need
-to check the flag here if the feature is enabled. We have an extra
-check in a few functions anyway, even if protected virt is not
-configured in. Given that distributions would likely want to enable the
-feature in their kernels, I'm currently tending towards dropping the
-extra config option.
+And these should not really be called at all, I guess?
 
-> +
->  static inline int mm_alloc_pgste(struct mm_struct *mm)
->  {
->  #ifdef CONFIG_PGSTE
+> +#endif
 
-(...)
-
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index f7778493e829..136c60a8e3ca 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -9,6 +9,8 @@
->  #include <linux/sizes.h>
->  #include <linux/bitmap.h>
->  #include <linux/memblock.h>
-> +#include <linux/pagemap.h>
-> +#include <linux/swap.h>
->  #include <asm/facility.h>
->  #include <asm/sections.h>
->  #include <asm/uv.h>
-> @@ -98,4 +100,172 @@ void adjust_to_uv_max(unsigned long *vmax)
->  	if (prot_virt_host && *vmax > uv_info.max_sec_stor_addr)
->  		*vmax = uv_info.max_sec_stor_addr;
->  }
-> +
-> +static int __uv_pin_shared(unsigned long paddr)
-> +{
-> +	struct uv_cb_cfs uvcb = {
-> +		.header.cmd	= UVC_CMD_PIN_PAGE_SHARED,
-> +		.header.len	= sizeof(uvcb),
-> +		.paddr		= paddr,
-> +	};
-> +
-> +	if (uv_call(0, (u64)&uvcb))
-> +		return -EINVAL;
-> +	return 0;
-
-I guess this call won't set an error rc in the control block, if it
-does not set a condition code != 0?
-
-(...)
+IOW, we don't really introduce complex code paths for systems not
+acting as protected virt hosts, even if we switch on the config option
+or ditch it completely?
 
