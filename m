@@ -2,172 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F1D621512B7
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 00:09:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50C371513EA
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 02:06:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727119AbgBCXJW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 18:09:22 -0500
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:33063 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727080AbgBCXJU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 18:09:20 -0500
-Received: by mail-pf1-f202.google.com with SMTP id c72so10282650pfc.0
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 15:09:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=RjINtf+1IbJq55a0Ed6ZN6M3Wb8hRnnefI63Cx3MO7Q=;
-        b=QUCkYlSNVhLhOTJ0mmNYyS24kEWPAb3E8yra1v2H8umaNEH2T+QeCUD2qC+IUDMxqX
-         37fRa7vI4Fsr31SXnZvsMb4kutN/Coz+zQzU7M6EaAdzJzo2qiIRUyZLpu8wj4svKaVe
-         VbvBJr/TvUwYhTewt4d+jJRXpQKR7XDLTTj/KZ5g9UB6eid/2yHU+gjLAsItWkaZ8aY0
-         eHZAsqvA8kRo7hh+RQVYcrjHYzderaxahHKIbgqFqufzjYChQ+He9+BLxnn6TZtFTTqN
-         36R7GTcPxPdMWo8n+y3atn/Wigamg36uD/ptLBxySNx9mF+yEXWhRroPvu02i0xfHKZZ
-         D6bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=RjINtf+1IbJq55a0Ed6ZN6M3Wb8hRnnefI63Cx3MO7Q=;
-        b=ntLWxuPbftDmDiBV3yW+FJkmNNxCKAuEaeOZOoXt4GRty3nPEK38blgI58e0devr5k
-         McSMIqHJzLu0eFWc6HnxisqOYtf2y/G1Wy5r9P6K6OihoSYokC/GcZwi/bnTmHGtacg3
-         eVodyNEBA0hKFMjYpjjIwK4uyM1yAXxyIq8QTUpSc5Opiuqtr2Ctn8pIOZDN/cNWkD9k
-         a+Q9v3gGkKzDMbDVScIqnjrqNK9Sb7HU0qHjfVW9Hpv+gv7JO90tFdouw+qTON6fkms5
-         XK3xolcfMQ53gSizxyvstREQq41Oy5mzvFo0g3slD7QsZYslHLTchKblT5lb8jcdG7OK
-         oXbQ==
-X-Gm-Message-State: APjAAAVYSfxr+veHHn+pg3sbiaomHEia9xQPs35LuyCvxEH+wiUhebmi
-        CATr5g5NXU6B+1w+/3Qt14fuOUj+Yq/L
-X-Google-Smtp-Source: APXvYqwB8CnUgcoaQEPeq8AOsAR7CQC2zvfiaZ9Mq/eDGhQUW4hp4wi0EUJhhdwa3V8/FBqTPUrf3IjlDIxK
-X-Received: by 2002:a63:cd15:: with SMTP id i21mr22156938pgg.453.1580771359996;
- Mon, 03 Feb 2020 15:09:19 -0800 (PST)
-Date:   Mon,  3 Feb 2020 15:09:11 -0800
-In-Reply-To: <20200203230911.39755-1-bgardon@google.com>
-Message-Id: <20200203230911.39755-3-bgardon@google.com>
-Mime-Version: 1.0
-References: <20200203230911.39755-1-bgardon@google.com>
-X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
-Subject: [PATCH 3/3] kvm: mmu: Separate pte generation from set_spte
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727015AbgBDBG2 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 3 Feb 2020 20:06:28 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2937 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726369AbgBDBG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 20:06:28 -0500
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.53])
+        by Forcepoint Email with ESMTP id EA4A4F85327EF0073F05;
+        Tue,  4 Feb 2020 09:06:24 +0800 (CST)
+Received: from dggeme766-chm.china.huawei.com (10.3.19.112) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 4 Feb 2020 09:06:24 +0800
+Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
+ dggeme766-chm.china.huawei.com (10.3.19.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Tue, 4 Feb 2020 09:06:24 +0800
+Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
+ dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
+ Tue, 4 Feb 2020 09:06:24 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>
+Subject: Re: [PATCH] KVM: nVMX: set rflags to specify success in
+ handle_invvpid() default case
+Thread-Topic: [PATCH] KVM: nVMX: set rflags to specify success in
+ handle_invvpid() default case
+Thread-Index: AdXafKvMX+nOzg77R1+Pm4yHs8KoYw==
+Date:   Tue, 4 Feb 2020 01:06:24 +0000
+Message-ID: <3f280cdeac244ca28e327a24fd82ca66@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.221.158]
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Separate the functions for generating leaf page table entries from the
-function that inserts them into the paging structure. This refactoring
-will facilitate changes to the MMU sychronization model to use atomic
-compare / exchanges (which are not guaranteed to succeed) instead of a
-monolithic MMU lock.
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-No functional change expected.
+> linmiaohe <linmiaohe@huawei.com> writes:
+>
+> > I'm sorry for reply in such a big day. I'am just backing from a really 
+> > hard festival. :(
+>
+> Let the force be with you guys! We really hope the madness is going to be over soon. Stay safe!
+>
 
-Tested by running kvm-unit-tests on an Intel Haswell machine. This
-commit introduced no new failures.
-
-This commit can be viewed in Gerrit at:
-	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2360
-
-Signed-off-by: Ben Gardon <bgardon@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 52 +++++++++++++++++++++++++++---------------
- 1 file changed, 34 insertions(+), 18 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b81010d0edae1..9239ad5265dc6 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3000,20 +3000,14 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
- #define SET_SPTE_WRITE_PROTECTED_PT	BIT(0)
- #define SET_SPTE_NEED_REMOTE_TLB_FLUSH	BIT(1)
- 
--static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
--		    unsigned int pte_access, int level,
--		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
--		    bool can_unsync, bool host_writable)
-+static u64 make_spte(struct kvm_vcpu *vcpu, unsigned int pte_access, int level,
-+		     gfn_t gfn, kvm_pfn_t pfn, u64 old_spte, bool speculative,
-+		     bool can_unsync, bool host_writable, bool ad_disabled,
-+		     int *ret)
- {
- 	u64 spte = 0;
--	int ret = 0;
--	struct kvm_mmu_page *sp;
--
--	if (set_mmio_spte(vcpu, sptep, gfn, pfn, pte_access))
--		return 0;
- 
--	sp = page_header(__pa(sptep));
--	if (sp_ad_disabled(sp))
-+	if (ad_disabled)
- 		spte |= SPTE_AD_DISABLED_MASK;
- 	else if (kvm_vcpu_ad_need_write_protect(vcpu))
- 		spte |= SPTE_AD_WRPROT_ONLY_MASK;
-@@ -3066,27 +3060,49 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 		 * is responsibility of mmu_get_page / kvm_sync_page.
- 		 * Same reasoning can be applied to dirty page accounting.
- 		 */
--		if (!can_unsync && is_writable_pte(*sptep))
--			goto set_pte;
-+		if (!can_unsync && is_writable_pte(old_spte))
-+			return spte;
- 
- 		if (mmu_need_write_protect(vcpu, gfn, can_unsync)) {
- 			pgprintk("%s: found shadow page for %llx, marking ro\n",
- 				 __func__, gfn);
--			ret |= SET_SPTE_WRITE_PROTECTED_PT;
-+			*ret |= SET_SPTE_WRITE_PROTECTED_PT;
- 			pte_access &= ~ACC_WRITE_MASK;
- 			spte &= ~(PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE);
- 		}
- 	}
- 
--	if (pte_access & ACC_WRITE_MASK) {
--		kvm_vcpu_mark_page_dirty(vcpu, gfn);
-+	if (pte_access & ACC_WRITE_MASK)
- 		spte |= spte_shadow_dirty_mask(spte);
--	}
- 
- 	if (speculative)
- 		spte = mark_spte_for_access_track(spte);
- 
--set_pte:
-+	return spte;
-+}
-+
-+static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-+		    unsigned int pte_access, int level,
-+		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
-+		    bool can_unsync, bool host_writable)
-+{
-+	u64 spte = 0;
-+	struct kvm_mmu_page *sp;
-+	int ret = 0;
-+
-+	if (set_mmio_spte(vcpu, sptep, gfn, pfn, pte_access))
-+		return 0;
-+
-+	sp = page_header(__pa(sptep));
-+
-+	spte = make_spte(vcpu, pte_access, level, gfn, pfn, *sptep, speculative,
-+			 can_unsync, host_writable, sp_ad_disabled(sp), &ret);
-+	if (!spte)
-+		return 0;
-+
-+	if (spte & PT_WRITABLE_MASK)
-+		kvm_vcpu_mark_page_dirty(vcpu, gfn);
-+
- 	if (mmu_spte_update(sptep, spte))
- 		ret |= SET_SPTE_NEED_REMOTE_TLB_FLUSH;
- 	return ret;
--- 
-2.25.0.341.g760bfbb309-goog
+Many thanks! I believe we will defeat it soon ! Best wishes with you! Thanks again! :)
 
