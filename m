@@ -2,99 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EB3051513F5
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 02:25:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22CFA151438
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 03:35:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727102AbgBDBZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Feb 2020 20:25:10 -0500
-Received: from mail-pl1-f201.google.com ([209.85.214.201]:40973 "EHLO
-        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726872AbgBDBZJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Feb 2020 20:25:09 -0500
-Received: by mail-pl1-f201.google.com with SMTP id p19so7190705plr.8
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2020 17:25:09 -0800 (PST)
+        id S1726924AbgBDCe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Feb 2020 21:34:58 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:45912 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726561AbgBDCe6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Feb 2020 21:34:58 -0500
+Received: by mail-oi1-f193.google.com with SMTP id v19so16928196oic.12;
+        Mon, 03 Feb 2020 18:34:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=QUGZT2MVbSZ5vv9JAqfeam9eYCtpwd6NYyrPTQGL4Vw=;
-        b=LMaPXvTVHWRjR4OY/kwNL2KfAHa8UpJCbQ0fB/vH0vTkR8weS3+o9HmWUvxODuRA4v
-         9eGAqaftuBVncplz+Wug33AL9+V/WCN7uk+FPQfHd5+A1AsXHSPQlSeQaweYV0uSixD2
-         +R7y90zPyGDs/57TAHOvUZrRDaToG9qNnQvZcYcBx92QXf7LzAJPBkrN8fwwAWzqO8xR
-         z2+Fz4CR8lpoCEsdkzQo+V70TvTVhNfa5MSC3MpGeLYmhY9RxuxWO7+JNbPLoS67HTNK
-         OLQ4bDNxSF/Zyg0ujWp5pA9GN9o3W70W9mJr4rJmiqr3bu4xFkH4ZeZl4YSzsyVQymwL
-         IFJg==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=UwqlvjZg+P79VPrIKOEjrbePHOK7IvreNa3/f6eQCOM=;
+        b=o75bXAf6EcCc8NRROr5wamAH15QCJpnm3lCm/gPrIArOLHNbmg9obJ8XlT6HnSuBMW
+         /NtTIj3PTMGlXtbAZJyf7Ik6IaWWqtE6+vkhk/D4qWrDpoERF+gYpA1+AUE/klTr2+Gl
+         xNNAY8/JWTpHYzdEgPQ/EMBron58kp3tGYBiYUf6B3e9CeB8RqWb9btVSxE3xPda6jxj
+         MsUTzqvJmnaDNGnMGzMDuLWinT4KtBbek2tNmZXoO6VUsCR6KMBKlYoxMT7tktCGkfL8
+         f7Up591RJ7olppBt8mVJKnnYtCe3EQ0RwlCCRyBuy+t1Bq4eFulNPhB3kMB/bzgUoJnk
+         e3Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=QUGZT2MVbSZ5vv9JAqfeam9eYCtpwd6NYyrPTQGL4Vw=;
-        b=Az8qZy+pNCf6i8Auelh6q2K0p3k0cgfVyP+mJD/ILpZKH3XMf/FlPyywLsz6BP9Szz
-         sODgQO+ePYpd+tcRmIB8vLbybNlAjoutTwUbM2++UFaPVxZf4PC3rpNTti2lkCGZ6bgk
-         6r+Uz5Cymy2gWzia5+yLySFmY3T+B0cFetwKGi5qT0ctIOaBqxQUedPKd8vCtpeTscW8
-         bvWV4mtxzgNX5Fz0EuGcgEitsfnuKxt5yCYHJJ098bsjF1FXzjRSQZl8wRDfwDXHuh7S
-         1xM1RIfljlpajxFtQZGQOsNljfrpRY6klmxRpu/Xc0XgCfeWjrE0Xlk6qN4cggoww3Dm
-         Y19Q==
-X-Gm-Message-State: APjAAAVeTk/fVjEXXCuL+lZhUzVNRz33imuobVKxspIBI48xC3NpFVOJ
-        GSQmIpdlyozdGKObQrmx1tBUw6Aeg2JSQRc=
-X-Google-Smtp-Source: APXvYqyOkoVhkCWzz0zCy43+eQxoSu+yTApt3/SxLxfSIAKMDlDHWIT8cwq3rPNiC0x1HQmUNKFf5+CNs1BjSLo=
-X-Received: by 2002:a63:cd04:: with SMTP id i4mr20017956pgg.281.1580779508971;
- Mon, 03 Feb 2020 17:25:08 -0800 (PST)
-Date:   Mon,  3 Feb 2020 17:25:04 -0800
-Message-Id: <20200204012504.9590-1-ehankland@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
-Subject: [kvm-unit-tests PATCH] x86: pmu: Test WRMSR on a running counter
-From:   Eric Hankland <ehankland@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=UwqlvjZg+P79VPrIKOEjrbePHOK7IvreNa3/f6eQCOM=;
+        b=MvBlrsEoTJe+dMUkgYs/6Q1tC7YgGRVmlwVlegpDBt3y9yhgLNwk9wTtMPZgu7GtNk
+         iBp8RaozBXAUzsweMrJF69B4TT6A6VkfkCe8ThhJ/NjdfmIgO2NktvQ8OJoaxzKybc3o
+         GSlFS6Rvu6SCS3rrse5ysZmAmwZCP55tsmnN4pZjuTP9aqnihiU+k2TW7CPn8dmR/T+2
+         nt5rBl2VpiXMDe8qUnCy7sAoZVjrHU3TORNtRCTDRZ2mAnzpXLqkpghDSQp/UP2+mQGI
+         EE5EMAyqmVc7zN3+N/c7qacSNo1dyGZfe3LFsaKPzrfD+WDROYUPjZyHdSsAmRB/eDEC
+         GhOA==
+X-Gm-Message-State: APjAAAWDFYIuTYWJziIz+uCSNNyzE245Z+zCBQ9lt8h/ojHKpxz3Rtxu
+        KWOmgYCi9LAoKaEmJHTlTKUhNlR9vDvRbQgUQsNMcO83sNKPjQ==
+X-Google-Smtp-Source: APXvYqxSBol/GUwnr4C2zHlwCSaop2fNuJ2r/nOZROjoa36uLclaEGvQi1JSWOolBvI76ZXljm8ybrq3c2xi/nJcrwY=
+X-Received: by 2002:aca:1913:: with SMTP id l19mr1673868oii.47.1580783697159;
+ Mon, 03 Feb 2020 18:34:57 -0800 (PST)
+MIME-Version: 1.0
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 4 Feb 2020 10:34:45 +0800
+Message-ID: <CANRm+CwwYoSLeA3Squp-_fVZpmYmxEfqOB+DGoQN4Y_iMT347w@mail.gmail.com>
+Subject: [PATCH] KVM: Pre-allocate 1 cpumask variable per cpu for both pv tlb
+ and pv ipis
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Eric Hankland <ehankland@google.com>
+        Joerg Roedel <joro@8bytes.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ensure that the value of the counter was successfully set to 0 after
-writing it while the counter was running.
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Signed-off-by: Eric Hankland <ehankland@google.com>
+Nick Desaulniers Reported:
+
+  When building with:
+  $ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
+  The following warning is observed:
+  arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
+  function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
+  static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
+  vector)
+              ^
+  Debugging with:
+  https://github.com/ClangBuiltLinux/frame-larger-than
+  via:
+  $ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
+    kvm_send_ipi_mask_allbutself
+  points to the stack allocated `struct cpumask newmask` in
+  `kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
+  potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
+  the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
+  8192, making a single instance of a `struct cpumask` 1024 B.
+
+This patch fixes it by pre-allocate 1 cpumask variable per cpu and use it for
+both pv tlb and pv ipis..
+
+Reported-by: Nick Desaulniers <ndesaulniers@google.com>
+Acked-by: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- x86/pmu.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ arch/x86/kernel/kvm.c | 33 +++++++++++++++++++++------------
+ 1 file changed, 21 insertions(+), 12 deletions(-)
 
-diff --git a/x86/pmu.c b/x86/pmu.c
-index cb8c9e3..8a77993 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -419,6 +419,21 @@ static void check_rdpmc(void)
- 	report_prefix_pop();
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 81045aab..b1e8efa 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -425,6 +425,8 @@ static void __init sev_map_percpu_data(void)
+     }
  }
- 
-+static void check_running_counter_wrmsr(void)
-+{
-+	pmu_counter_t evt = {
-+		.ctr = MSR_IA32_PERFCTR0,
-+		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
-+		.count = 0,
-+	};
+
++static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
 +
-+	start_event(&evt);
-+	loop();
-+	wrmsr(MSR_IA32_PERFCTR0, 0);
-+	stop_event(&evt);
-+	report("running counter wrmsr", evt.count < gp_events[1].min);
-+}
-+
- int main(int ac, char **av)
+ #ifdef CONFIG_SMP
+ #define KVM_IPI_CLUSTER_SIZE    (2 * BITS_PER_LONG)
+
+@@ -490,12 +492,12 @@ static void kvm_send_ipi_mask(const struct
+cpumask *mask, int vector)
+ static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask,
+int vector)
  {
- 	struct cpuid id = cpuid(10);
-@@ -453,6 +468,7 @@ int main(int ac, char **av)
- 	check_counters_many();
- 	check_counter_overflow();
- 	check_gp_counter_cmask();
-+	check_running_counter_wrmsr();
- 
- 	return report_summary();
+     unsigned int this_cpu = smp_processor_id();
+-    struct cpumask new_mask;
++    struct cpumask *new_mask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+     const struct cpumask *local_mask;
+
+-    cpumask_copy(&new_mask, mask);
+-    cpumask_clear_cpu(this_cpu, &new_mask);
+-    local_mask = &new_mask;
++    cpumask_copy(new_mask, mask);
++    cpumask_clear_cpu(this_cpu, new_mask);
++    local_mask = new_mask;
+     __send_ipi_mask(local_mask, vector);
  }
 
+@@ -575,7 +577,6 @@ static void __init kvm_apf_trap_init(void)
+     update_intr_gate(X86_TRAP_PF, async_page_fault);
+ }
+
+-static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
+
+ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+             const struct flush_tlb_info *info)
+@@ -583,7 +584,7 @@ static void kvm_flush_tlb_others(const struct
+cpumask *cpumask,
+     u8 state;
+     int cpu;
+     struct kvm_steal_time *src;
+-    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_tlb_mask);
++    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+
+     cpumask_copy(flushmask, cpumask);
+     /*
+@@ -624,6 +625,7 @@ static void __init kvm_guest_init(void)
+         kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+         pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
+         pv_ops.mmu.tlb_remove_table = tlb_remove_table;
++        pr_info("KVM setup pv remote TLB flush\n");
+     }
+
+     if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+@@ -732,23 +734,30 @@ static __init int activate_jump_labels(void)
+ }
+ arch_initcall(activate_jump_labels);
+
+-static __init int kvm_setup_pv_tlb_flush(void)
++static __init int kvm_alloc_cpumask(void)
+ {
+     int cpu;
++    bool alloc = false;
+
+     if (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
+         !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
+-        kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
++        kvm_para_has_feature(KVM_FEATURE_STEAL_TIME))
++        alloc = true;
++
++#if defined(CONFIG_SMP)
++    if (!alloc && kvm_para_has_feature(KVM_FEATURE_PV_SEND_IPI))
++        alloc = true;
++#endif
++
++    if (alloc)
+         for_each_possible_cpu(cpu) {
+-            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_tlb_mask, cpu),
++            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
+                 GFP_KERNEL, cpu_to_node(cpu));
+         }
+-        pr_info("KVM setup pv remote TLB flush\n");
+-    }
+
+     return 0;
+ }
+-arch_initcall(kvm_setup_pv_tlb_flush);
++arch_initcall(kvm_alloc_cpumask);
+
+ #ifdef CONFIG_PARAVIRT_SPINLOCKS
+
+--
+1.8.3.1
