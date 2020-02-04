@@ -2,148 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 239DD152210
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 22:47:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F4B2152226
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 22:57:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727480AbgBDVrJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 16:47:09 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42398 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727445AbgBDVrJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 16:47:09 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 014Lkx2K113666
-        for <kvm@vger.kernel.org>; Tue, 4 Feb 2020 16:47:08 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xydyxp6aq-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 16:47:07 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 4 Feb 2020 21:46:08 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 4 Feb 2020 21:46:05 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 014Lk3LN1049062
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Feb 2020 21:46:03 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D7336A405B;
-        Tue,  4 Feb 2020 21:46:03 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 67EA1A4054;
-        Tue,  4 Feb 2020 21:46:03 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.174.10])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Feb 2020 21:46:03 +0000 (GMT)
-Subject: Re: [RFCv2 12/37] KVM: s390: protvirt: Handle SE notification
- interceptions
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-13-borntraeger@de.ibm.com>
- <f3d5a14b-2770-7c7a-3bd0-72b623b72c1a@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 4 Feb 2020 22:46:03 +0100
+        id S1727612AbgBDV5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 16:57:19 -0500
+Received: from mail-qv1-f65.google.com ([209.85.219.65]:33842 "EHLO
+        mail-qv1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727468AbgBDV5S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 16:57:18 -0500
+Received: by mail-qv1-f65.google.com with SMTP id o18so156402qvf.1
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 13:57:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=o8PJJopMHRnW2Lc0cvuzqZJdPgsHNH4EmbqfPi2CudQ=;
+        b=OH2U30gH+ZDmHD5RKklKpDEpNSUh2d5eNyvmYsHQBPN7ljSC5DhtSh97amEFql9+83
+         HIKukiAIGsoEcookCeIj3IUimjLT45df6BDTvuoIo97U1KeQIHYtNEdNFu5RI5RlTo94
+         5wxZ2VMVw23n+ITPWSknknHiTgiwthNe9VreGu8Ak3ShMZuF77zCdXwW+bOD1pC3+TPj
+         cHpvtOPMDheERtzU01rUP+UH5fm5uyvTwTXecYfA3Vfie6gNJnHoWPx1I0HaXpEIa7d1
+         XDwcPqTpjbFockMXiPTgzD/tqt3FHDIemmXEJopYHIVMf6OPHIBcjBniqMhd7BFvVtsU
+         j3Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=o8PJJopMHRnW2Lc0cvuzqZJdPgsHNH4EmbqfPi2CudQ=;
+        b=e9mPl0ACE5rBSrL/R/ywgImmbek7jg5b+JkS111JFYMjCOL4cCjVM9sjt7e2pmQ1kh
+         t9V/oWP98gGf80qWiivNkr1O+g5G4suexfgdaQnGRDo0L99ZSZimpsWIBuvzc1ihwtjT
+         bfppVIBTabywkBOJncmhkxv4F/Io8SooD6/n/AJbE21yAF/v6wU7l6J4fKUXcC5SwI0H
+         IOiLSzl45Vyv5U5LKvDlk9apqF2kwqzhRd0tIItyKproJACpRbBTDEGVPTQIeoN2TA2N
+         deGGe2OkW23vx1L0BVO8G0E7dlOndm1n4ZmDH0syc0ur4KHwMOkMScqVgexgkJfG9wsz
+         GV8Q==
+X-Gm-Message-State: APjAAAXAS45roXrAodnsPfCXbU6tWGyMhoVpMU3b4Opo7EVdfJu6PBEc
+        U3ajdJPKKoknsv+H0Ql+wHgI5w==
+X-Google-Smtp-Source: APXvYqw8wHQQ0TYYiyrNaAoyP1/6XXQmpVV3cfhOYaaGrRAqGG/43MHnS1ojgBUHUfnNQbnIl0rsDw==
+X-Received: by 2002:ad4:4511:: with SMTP id k17mr28109982qvu.135.1580853435966;
+        Tue, 04 Feb 2020 13:57:15 -0800 (PST)
+Received: from ?IPv6:2620:0:1004:a:6e2b:60f7:b51b:3b04? ([2620:0:1004:a:6e2b:60f7:b51b:3b04])
+        by smtp.gmail.com with ESMTPSA id y26sm12042230qtv.28.2020.02.04.13.57.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Feb 2020 13:57:15 -0800 (PST)
+Subject: Re: [PATCH RFC 10/10] nvdimm/e820: add multiple namespaces support
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Joao Martins <joao.m.martins@oracle.com>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux MM <linux-mm@kvack.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+References: <20200110190313.17144-1-joao.m.martins@oracle.com>
+ <20200110190313.17144-11-joao.m.martins@oracle.com>
+ <e605fed8-46f5-6a07-11e6-2cc079a1159b@google.com>
+ <CAPcyv4iiSsEOsfEwLQcV3bNDjBSxw1OgWoBdEWPQEymq6=xm-A@mail.gmail.com>
+ <ae788015-616f-96e6-3a0e-39c1911c4b01@google.com>
+ <CAPcyv4ibWZgCSTqnYLicVR3vXeNKwuWSnV5K8fCwvyhz_h=0GQ@mail.gmail.com>
+From:   Barret Rhoden <brho@google.com>
+Message-ID: <fb4efb83-1a19-4fb7-a32a-477d5b5cd80a@google.com>
+Date:   Tue, 4 Feb 2020 16:57:14 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <f3d5a14b-2770-7c7a-3bd0-72b623b72c1a@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAPcyv4ibWZgCSTqnYLicVR3vXeNKwuWSnV5K8fCwvyhz_h=0GQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20020421-0008-0000-0000-0000034FBA6F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020421-0009-0000-0000-00004A7048D5
-Message-Id: <1b686d11-aa54-6451-4ad4-118d86ba6d37@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-04_08:2020-02-04,2020-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- phishscore=0 mlxlogscore=779 adultscore=0 bulkscore=0 suspectscore=0
- clxscore=1015 impostorscore=0 lowpriorityscore=0 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1911200001 definitions=main-2002040149
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 04.02.20 22:16, Thomas Huth wrote:
-> On 03/02/2020 14.19, Christian Borntraeger wrote:
->> From: Janosch Frank <frankja@linux.ibm.com>
->>
->> Since KVM doesn't emulate any form of load control and load psw
->> instructions anymore, we wouldn't get an interception if PSWs or CRs
->> are changed in the guest. That means we can't inject IRQs right after
->> the guest is enabled for them.
+On 2/4/20 4:43 PM, Dan Williams wrote:
+> Ah, got it, you only ended up at wanting namespace labels because
+> there was no other way to carve up device-dax. That's changing as part
+> of the efi_fake_mem= enabling and I have a patch set in the works to
+> allow discontiguous sub-divisions of a device-dax range. Note that is
+> this branch rebases frequently:
 > 
-> I had to read that twice to understand it. I'd suggest maybe rather
-> something like:
-> 
-> Since there is no interception for load control and load psw instruction
-> in the protected mode, we need a new way to get notified whether we have
-> to inject an IRQ right after the guest has just enabled the possibility
-> for receiving them.
+> https://git.kernel.org/pub/scm/linux/kernel/git/djbw/nvdimm.git/log/?h=libnvdimm-pending
 
-I will use this with minor tweaks.
-> 
->> The new interception codes solve that problem by being a notification
-> 
-> maybe s/being/providing/
+Cool, thanks.  I'll check it out!
 
-ack
-
+Barret
