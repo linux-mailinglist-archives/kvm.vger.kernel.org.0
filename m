@@ -2,125 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 575881520EE
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 20:18:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1B971520FB
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2020 20:25:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727415AbgBDTSL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 14:18:11 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:45700 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727314AbgBDTSL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Feb 2020 14:18:11 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014JI3jc058510;
-        Tue, 4 Feb 2020 19:18:04 GMT
+        id S1727505AbgBDTZN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 14:25:13 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:53812 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727492AbgBDTZN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 14:25:13 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014JNPJc076640;
+        Tue, 4 Feb 2020 19:24:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=BarShku7lgfUR+oQEeWNHko4bNdH+Rp5Yxd95kqootg=;
- b=ovEPuy9nlguDsWGwlgctdRjCobwqY0BQ7NUzxSaUlRXDykiWyD8kk/AHg9uRPnx0OB4N
- Iwx71OPJE0UOHtwPf7LnsmQ30TbqJN17NUJC17P/rSbIr+OIsPzvcI0shbZ/kPNHVszX
- o4tCZXjoME7kX0nNClIGsxmh0rpVjujH0DMMqk/O3fdjYnjF9bLQZ5FJYBf89kxuJhTN
- +SN8XgGU2EMIAUVJfUfLhsA+1dLWkGwd73v6FesA4t8lJnrUkG6fP+Gh+I7gbDs4q1Db
- E27ZRghWLryyYuhAhRbTccwfq3gzY8iQo8lES1wgE59eINq/XLUxPSlqZbT3vD8gfnoH oA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2xwyg9n4qh-1
+ bh=E7izVF8VHlOuaprUDzyes2uRr9PaxAogt9I1VIGvP50=;
+ b=PssQbLXoxhz7QRcrzseSJMDq79/3pQpl0sS5Pa1f8B8ovJl3YBEwxy2KmtaIL6oxEiEs
+ MJRxYiQnbVCNMxk9cD0TMBoOoE/dye+2NVnkiHpiL8O4kJfdIeCVdSowVB6UUAMxI9No
+ zBjJH5pRgBRM+Aw/saxMEEQV4dQ55pAb8W5zpFY3QancPdrzuqWEOFg1rL6VMpXfjEUI
+ bHEtHwdNQRNcly/U2V88aw4XzU0ERNJD8JrPsD3B9UCm2Z/SOu38POxlqPVSdn6SSiwn
+ 9dkeR8ZeS1ApgWjvudwpD8zvGn/f+Qnr56we5+hsjXWSn4EW1RwLymng0Gj5qVOY0Srx BQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2xw0ru8xvx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Feb 2020 19:18:03 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014JEwEa090589;
-        Tue, 4 Feb 2020 19:18:02 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 2xxw0xpafg-1
+        Tue, 04 Feb 2020 19:24:48 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014JOJAe010226;
+        Tue, 4 Feb 2020 19:24:48 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 2xxvusfhs0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Feb 2020 19:18:02 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 014JI0Jl003098;
-        Tue, 4 Feb 2020 19:18:01 GMT
-Received: from localhost.localdomain (/10.159.243.11)
+        Tue, 04 Feb 2020 19:24:48 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 014JOjqi016183;
+        Tue, 4 Feb 2020 19:24:46 GMT
+Received: from [10.175.207.61] (/10.175.207.61)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 04 Feb 2020 11:18:00 -0800
-Subject: Re: [kvm-unit-tests PATCH] x86: Fix the name for the SMEP CPUID bit
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20200204175034.18201-1-sean.j.christopherson@intel.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <e3678c96-1e46-550c-616a-08fd541b7f3d@oracle.com>
-Date:   Tue, 4 Feb 2020 11:17:59 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        with ESMTP ; Tue, 04 Feb 2020 11:24:45 -0800
+Subject: Re: [PATCH RFC 10/10] nvdimm/e820: add multiple namespaces support
+To:     Barret Rhoden <brho@google.com>,
+        Dan Williams <dan.j.williams@intel.com>
+Cc:     linux-nvdimm <linux-nvdimm@lists.01.org>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux MM <linux-mm@kvack.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+References: <20200110190313.17144-1-joao.m.martins@oracle.com>
+ <20200110190313.17144-11-joao.m.martins@oracle.com>
+ <e605fed8-46f5-6a07-11e6-2cc079a1159b@google.com>
+ <CAPcyv4iiSsEOsfEwLQcV3bNDjBSxw1OgWoBdEWPQEymq6=xm-A@mail.gmail.com>
+ <ae788015-616f-96e6-3a0e-39c1911c4b01@google.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <6fc0d900-3df7-d09a-9b6a-dc6a82823d94@oracle.com>
+Date:   Tue, 4 Feb 2020 19:24:39 +0000
 MIME-Version: 1.0
-In-Reply-To: <20200204175034.18201-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <ae788015-616f-96e6-3a0e-39c1911c4b01@google.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2002040129
+ engine=8.0.1-1911140001 definitions=main-2002040130
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2002040129
+ definitions=main-2002040130
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2/4/20 6:20 PM, Barret Rhoden wrote:
+> Hi -
+> 
+> On 2/4/20 11:44 AM, Dan Williams wrote:
+>> On Tue, Feb 4, 2020 at 7:30 AM Barret Rhoden <brho@google.com> wrote:
+>>>
+>>> Hi -
+>>>
+>>> On 1/10/20 2:03 PM, Joao Martins wrote:
+>>>> User can define regions with 'memmap=size!offset' which in turn
+>>>> creates PMEM legacy devices. But because it is a label-less
+>>>> NVDIMM device we only have one namespace for the whole device.
+>>>>
+>>>> Add support for multiple namespaces by adding ndctl control
+>>>> support, and exposing a minimal set of features:
+>>>> (ND_CMD_GET_CONFIG_SIZE, ND_CMD_GET_CONFIG_DATA,
+>>>> ND_CMD_SET_CONFIG_DATA) alongside NDD_ALIASING because we can
+>>>> store labels.
+>>>
+>>> FWIW, I like this a lot.  If we move away from using memmap in favor of
+>>> efi_fake_mem, ideally we'd have the same support for full-fledged
+>>> pmem/dax regions and namespaces that this patch brings.
+>>
+>> No, efi_fake_mem only supports creating dax-regions. What's the use
+>> case that can't be satisfied by just specifying multiple memmap=
+>> ranges?
+> 
+> I'd like to be able to create and destroy dax regions on the fly.  In 
+> particular, I want to run guest VMs using the dax files for guest 
+> memory, but I don't know at boot time how many VMs I'll have, or what 
+> their sizes are.  Ideally, I'd have separate files for each VM, instead 
+> of a single /dev/dax.
+> 
+> I currently do this with fs-dax with one big memmap region (ext4 on 
+> /dev/pmem0), and I use the file system to handle the 
+> creation/destruction/resizing and metadata management.  But since fs-dax 
+> won't work with device pass-through, I started looking at dev-dax, with 
+> the expectation that I'd need some software to manage the memory (i.e. 
+> allocation).  That led me to ndctl, which seems to need namespace labels 
+> to have the level of control I was looking for.
+> 
 
-On 2/4/20 9:50 AM, Sean Christopherson wrote:
-> Fix the X86_FEATURE_* name for SMEP, which is incorrectly named
-> X86_FEATURE_INVPCID_SINGLE and is a wee bit confusing when looking at
-> the SMEP unit tests.
->
-> Note, there is no INVPCID_SINGLE CPUID bit, the bogus name likely came
-> from the Linux kernel, which has a synthetic feature flag for
-> INVPCID_SINGLE in word 7, bit 7 (CPUID 0x7.EBX is stored in word 9).
->
-> Fixes: 6ddcc29 ("kvm-unit-test: x86: Implement a generic wrapper for cpuid/cpuid_indexed functions")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   lib/x86/processor.h | 2 +-
->   x86/access.c        | 4 ++--
->   2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index 7057180..03fdf64 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -138,7 +138,7 @@ static inline u8 cpuid_maxphyaddr(void)
->   #define	X86_FEATURE_XMM2		(CPUID(0x1, 0, EDX, 26))
->   #define	X86_FEATURE_TSC_ADJUST		(CPUID(0x7, 0, EBX, 1))
->   #define	X86_FEATURE_HLE			(CPUID(0x7, 0, EBX, 4))
-> -#define	X86_FEATURE_INVPCID_SINGLE	(CPUID(0x7, 0, EBX, 7))
-> +#define	X86_FEATURE_SMEP	        (CPUID(0x7, 0, EBX, 7))
->   #define	X86_FEATURE_INVPCID		(CPUID(0x7, 0, EBX, 10))
->   #define	X86_FEATURE_RTM			(CPUID(0x7, 0, EBX, 11))
->   #define	X86_FEATURE_SMAP		(CPUID(0x7, 0, EBX, 20))
-> diff --git a/x86/access.c b/x86/access.c
-> index 5233713..7303fc3 100644
-> --- a/x86/access.c
-> +++ b/x86/access.c
-> @@ -860,7 +860,7 @@ static int check_smep_andnot_wp(ac_pool_t *pool)
->   	ac_test_t at1;
->   	int err_prepare_andnot_wp, err_smep_andnot_wp;
->   
-> -	if (!this_cpu_has(X86_FEATURE_INVPCID_SINGLE)) {
-> +	if (!this_cpu_has(X86_FEATURE_SMEP)) {
->   	    return 1;
->   	}
->   
-> @@ -955,7 +955,7 @@ static int ac_test_run(void)
->   	}
->       }
->   
-> -    if (!this_cpu_has(X86_FEATURE_INVPCID_SINGLE)) {
-> +    if (!this_cpu_has(X86_FEATURE_SMEP)) {
->   	tests++;
->   	if (set_cr4_smep(1) == GP_VECTOR) {
->               successes++;
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Indeed this is the intent of the patch.
+
+As Barret mentioned, memmap= is limited to the one namespace covering the entire
+region, and this would fix it (regardless of namespace mode). Otherwise we gotta
+know in advance the amount of guests and its exact sizes, which would be
+somewhat unflexible.
+
+But given that it's 'pmem emulation' I thought it was OK to twist the label-less
+aspect of nd_e820 (unless there's hardware out there which does this?).
+
+If Dan agrees, I can continue with the patch.
