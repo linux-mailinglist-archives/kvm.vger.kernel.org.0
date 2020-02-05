@@ -2,140 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A218B153332
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 15:39:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33B0515333B
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 15:42:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbgBEOjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 09:39:14 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55502 "EHLO
+        id S1726950AbgBEOms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 09:42:48 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41954 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726320AbgBEOjO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 09:39:14 -0500
+        by vger.kernel.org with ESMTP id S1726308AbgBEOms (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 09:42:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580913553;
+        s=mimecast20190719; t=1580913767;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SoydEapPcnWnsyykjUkOlfTYQqJiOhpLPIh1rU1g+ZM=;
-        b=THWJtdULO7acwRNjSzQVMxx+dCL+MvgXrTZ4YyyzmKosCrnlocFn5Ldi6TzekU/9kY6YOA
-        B+Kavzs9FJ48SlseFLMZa2vYwUFFpvb0Q/OBpn4jlhYFh1F9iHS+YwLRcjFkOQ1TPrOHk5
-        TUdFL0rgDX/rHgOIiZCn1AWS+phZwR4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-rqAzj5MXNa-tta_AXUKQ_Q-1; Wed, 05 Feb 2020 09:39:11 -0500
-X-MC-Unique: rqAzj5MXNa-tta_AXUKQ_Q-1
-Received: by mail-wr1-f72.google.com with SMTP id v17so1264350wrm.17
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 06:39:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=SoydEapPcnWnsyykjUkOlfTYQqJiOhpLPIh1rU1g+ZM=;
-        b=lTZOWSRlKUTGyIE/DExriFQ4v4P7r5OhIB2Ib3BsrlkQDRmhtC3eTdmqCq4LQeH2VZ
-         ZpeCJkahBHans0+kDgjGfLns7CQJEuTf2q0o9P4OZVwxWY/ZTs8XyLTH6byrOE53sy2b
-         OxhRA0/CW+yVUiirKIt9NsyU4rM8H6cLrjehWHxTvxwppxc9SqexG7XRKpe/WlNCJHso
-         GM/ya7FYJH9Y6FLrTc+DR/IFkug8DIwSiWYra4sUABDScJJC0hsZehh/EQgr0HVilcqn
-         VvadmXfbyJe+67lqYmcORcF7pEB5NU7SVeHZBbo9/lSaNzGJMsmlvHFW6Zlsfk3XfYtl
-         rIMw==
-X-Gm-Message-State: APjAAAU7p4R+7HnS9LTEhGDa04N1FSNfksLqfzBs5JgjbbzhKK0VjMVj
-        XatR2OxXhAZE/eYU7J/JQkTGd1BDA5d+u3FG0rK45Hx4N4KKOf8oquCi2Q7XeRIzfZDlFjm0KWj
-        97INY4AdKxwNb
-X-Received: by 2002:a7b:c759:: with SMTP id w25mr6027146wmk.15.1580913550657;
-        Wed, 05 Feb 2020 06:39:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxZ2+MUSKIq0bFGeGsEl8yDAXhtSQNMDtk5nz9iHlEYoHTTiNkrjIeGzfVkfAlpNl/KZdLkuQ==
-X-Received: by 2002:a7b:c759:: with SMTP id w25mr6027129wmk.15.1580913550452;
-        Wed, 05 Feb 2020 06:39:10 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id k13sm21684wrx.59.2020.02.05.06.39.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2020 06:39:09 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 05/26] KVM: x86: Move MSR_TSC_AUX existence checks into vendor code
-In-Reply-To: <20200129234640.8147-6-sean.j.christopherson@intel.com>
-References: <20200129234640.8147-1-sean.j.christopherson@intel.com> <20200129234640.8147-6-sean.j.christopherson@intel.com>
-Date:   Wed, 05 Feb 2020 15:39:08 +0100
-Message-ID: <87blqdksj7.fsf@vitty.brq.redhat.com>
+        bh=SjPSSuVkfj1bPqFrA3edTkwRFepWFmIr8RSbFmPzoeU=;
+        b=QZoNCucjGhRpdISGos0Z8h2jcbFWP4E+CBxKnnJX7jF2lgsy3E9SPmSaFIWmq6h41EOOFJ
+        VciN6Ra3oUwjY/wZbHt1JUe1GHa/u6RJOBE0O8vWhkR14BdfP+pvjJR+JXt3y7dBCZdpS3
+        zMnfM63gRN1l+mP30qheSvFveZEil3Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-zWZSeWJYMO26wEVCbxo5bg-1; Wed, 05 Feb 2020 09:42:43 -0500
+X-MC-Unique: zWZSeWJYMO26wEVCbxo5bg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56F6F800D6C;
+        Wed,  5 Feb 2020 14:42:42 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A8171001B05;
+        Wed,  5 Feb 2020 14:42:38 +0000 (UTC)
+Date:   Wed, 5 Feb 2020 15:42:35 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [RFCv2 26/37] KVM: s390: protvirt: disallow one_reg
+Message-ID: <20200205154235.13255eb3.cohuck@redhat.com>
+In-Reply-To: <20200203131957.383915-27-borntraeger@de.ibm.com>
+References: <20200203131957.383915-1-borntraeger@de.ibm.com>
+        <20200203131957.383915-27-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Mon,  3 Feb 2020 08:19:46 -0500
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> Move the MSR_TSC_AUX existence check into vendor code using the newly
-> introduced ->has_virtualized_msr() hook to help pave the way toward the
-> removal of ->rdtscp_supported().
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> A lot of the registers are controlled by the Ultravisor and never
+> visible to KVM. Some fields in the sie control block are overlayed,
+> like gbea. As no userspace uses the ONE_REG interface on s390 it is safe
+> to disable this for protected guests.
+
+Hm, QEMU seems to fall back to ONE_REG if sync regs are not available,
+doesn't it? So maybe it would be better to word this as
+
+"As no known userspace uses the ONE_REG interface on s390 if sync regs
+are available, no functionality is lost if it is disabled for protected
+guests."
+
+?
+
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  arch/x86/kvm/svm.c     | 7 +++++++
->  arch/x86/kvm/vmx/vmx.c | 7 +++++++
->  arch/x86/kvm/x86.c     | 4 ----
->  3 files changed, 14 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 1f9323fbad81..4c8427f57b71 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -5987,6 +5987,13 @@ static bool svm_cpu_has_accelerated_tpr(void)
->  
->  static bool svm_has_virtualized_msr(u32 index)
->  {
-> +	switch (index) {
-> +	case MSR_TSC_AUX:
-> +		return boot_cpu_has(X86_FEATURE_RDTSCP);
-> +	default:
-> +		break;
-> +	}
-> +
->  	return true;
->  }
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 3f2c094434e8..9588914e941e 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6276,6 +6276,13 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu,
->  
->  static bool vmx_has_virtualized_msr(u32 index)
->  {
-> +	switch (index) {
-> +	case MSR_TSC_AUX:
-> +		return cpu_has_vmx_rdtscp();
-> +	default:
-> +		break;
-> +	}
-> +
->  	return true;
->  }
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 94f90fe1c0de..a8619c52ea86 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5241,10 +5241,6 @@ static void kvm_init_msr_list(void)
->  			if (!kvm_mpx_supported())
->  				continue;
+>  arch/s390/kvm/kvm-s390.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 6e74c7afae3a..b9692d722c1e 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4641,6 +4641,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  	case KVM_SET_ONE_REG:
+>  	case KVM_GET_ONE_REG: {
+>  		struct kvm_one_reg reg;
+> +		r = -EINVAL;
+> +		if (kvm_s390_pv_is_protected(vcpu->kvm))
+> +			break;
+>  		r = -EFAULT;
+>  		if (copy_from_user(&reg, argp, sizeof(reg)))
 >  			break;
-> -		case MSR_TSC_AUX:
-> -			if (!kvm_x86_ops->rdtscp_supported())
-> -				continue;
-> -			break;
->  		case MSR_IA32_RTIT_CTL:
->  		case MSR_IA32_RTIT_STATUS:
->  			if (!kvm_x86_ops->pt_supported())
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
