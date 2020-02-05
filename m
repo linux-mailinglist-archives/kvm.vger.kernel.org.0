@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 98ADF153930
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 20:39:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF0CF153983
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 21:24:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727390AbgBETj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 14:39:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46716 "EHLO
+        id S1727385AbgBEUYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 15:24:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44544 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727079AbgBETj0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 14:39:26 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015Jbhld134581
-        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 14:39:24 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xyhmbncce-1
+        by vger.kernel.org with ESMTP id S1726208AbgBEUYg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 15:24:36 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015KJhUk018750
+        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 15:24:34 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2xyhmhm1d4-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 14:39:24 -0500
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 15:24:34 -0500
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 5 Feb 2020 19:39:22 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Wed, 5 Feb 2020 20:24:32 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 5 Feb 2020 19:39:19 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015JdIXP60096666
+        Wed, 5 Feb 2020 20:24:30 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015KOTkb48365758
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Feb 2020 19:39:18 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3E0D2A4040;
-        Wed,  5 Feb 2020 19:39:18 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C4637A4053;
-        Wed,  5 Feb 2020 19:39:17 +0000 (GMT)
+        Wed, 5 Feb 2020 20:24:29 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 08EB811C050;
+        Wed,  5 Feb 2020 20:24:29 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8FC4C11C04A;
+        Wed,  5 Feb 2020 20:24:28 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.26.20])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  5 Feb 2020 19:39:17 +0000 (GMT)
-Subject: Re: [RFCv2 22/37] KVM: s390: protvirt: handle secure guest prefix
- pages
-To:     David Hildenbrand <david@redhat.com>,
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  5 Feb 2020 20:24:28 +0000 (GMT)
+Subject: Re: [RFCv2 37/37] KVM: s390: protvirt: Add UV cpu reset calls
+To:     Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-23-borntraeger@de.ibm.com>
- <156a1749-20a6-7fe6-bf1e-79a803b7e628@redhat.com>
+ <20200203131957.383915-38-borntraeger@de.ibm.com>
+ <59cffd48-fa07-9a19-f797-cc6eb05f1ebb@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -95,26 +94,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 5 Feb 2020 20:39:17 +0100
+Date:   Wed, 5 Feb 2020 21:24:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <156a1749-20a6-7fe6-bf1e-79a803b7e628@redhat.com>
+In-Reply-To: <59cffd48-fa07-9a19-f797-cc6eb05f1ebb@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020519-0020-0000-0000-000003A75280
+x-cbid: 20020520-0012-0000-0000-0000038407FD
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020519-0021-0000-0000-000021FF1EBB
-Message-Id: <637cbe43-dfaf-5dfa-bc6e-1f099501bc0e@de.ibm.com>
+x-cbparentid: 20020520-0013-0000-0000-000021C0739B
+Message-Id: <c1940da8-8c1c-f759-6578-36a04f4faab6@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-05_06:2020-02-04,2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
- impostorscore=0 bulkscore=0 phishscore=0 priorityscore=1501 suspectscore=0
- lowpriorityscore=0 malwarescore=0 spamscore=0 adultscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002050149
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ impostorscore=0 malwarescore=0 priorityscore=1501 adultscore=0
+ mlxlogscore=908 suspectscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002050155
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -122,27 +121,25 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 05.02.20 12:52, David Hildenbrand wrote:
-> On 03.02.20 14:19, Christian Borntraeger wrote:
->> From: Janosch Frank <frankja@linux.ibm.com>
->>
->> The SPX instruction is handled by the ulravisor. We do get a
-> 
-> s/ulravisor/ultravisor/
+On 05.02.20 19:27, Thomas Huth wrote:
+[...]
 
-ack
+>> index 3e4716b3fc02..f7a3f84be064 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -4699,6 +4699,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>  	void __user *argp = (void __user *)arg;
+>>  	int idx;
+>>  	long r;
+>> +	u32 ret;
+> 
+> I'd maybe name it "uvret" instead to avoid that it gets mixed up easily
+> with the "r" variable.
+
+can do.
 
 > 
->> notification intercept, though. Let us update our internal view.
->>
->> In addition to that, when the guest prefix page is not secure, an
->> intercept 112 (0x70) is indicated.  To avoid this for the most common
->> cases, we can make the guest prefix page protected whenever we pin it.
->> We have to deal with 112 nevertheless, e.g. when some host code triggers
->> an export (e.g. qemu dump guest memory). We can simply re-run the
->> pinning logic by doing a no-op prefix change.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> 
+> Anyway,
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > 
 
