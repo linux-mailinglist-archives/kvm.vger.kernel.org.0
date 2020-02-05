@@ -2,163 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 25729153086
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 13:25:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DB8041530C8
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 13:31:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727051AbgBEMZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 07:25:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14652 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726809AbgBEMZt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 07:25:49 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015CHppw078452
-        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 07:25:47 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhmm5qf6-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 07:25:47 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Wed, 5 Feb 2020 12:25:45 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 5 Feb 2020 12:25:42 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015CPf0J58064968
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Feb 2020 12:25:41 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07D2E5205F;
-        Wed,  5 Feb 2020 12:25:41 +0000 (GMT)
-Received: from [9.152.99.235] (unknown [9.152.99.235])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8E8FA52051;
-        Wed,  5 Feb 2020 12:25:40 +0000 (GMT)
-Reply-To: mimu@linux.ibm.com
-Subject: Re: [RFCv2 15/37] KVM: s390: protvirt: Implement interruption
- injection
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-16-borntraeger@de.ibm.com>
- <20200205123133.34ac71a2.cohuck@redhat.com>
- <512413a4-196e-5acb-9583-561c061e40ee@linux.ibm.com>
- <20200205131146.611a0d78.cohuck@redhat.com>
-From:   Michael Mueller <mimu@linux.ibm.com>
-Organization: IBM
-Date:   Wed, 5 Feb 2020 13:26:52 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.1
+        id S1728018AbgBEMao (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 07:30:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53418 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727963AbgBEMan (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 07:30:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580905842;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=FZ3Fjj0BjzHheqix1bmWtGQyTCVbBm91zCQKiRJjeoc=;
+        b=BPC80VCMg0sbdv86KZrDCm8HS8doLuNB3nmSjvc+qFAaU9+N6RIB0Ep3/FEu3AY8UKPniO
+        QQonPk8pMm9zoY5S0AYIHHL6xQmp2XqBLlqJ/I0gOaCcQMgmk6X2P242nFHyyMhAmRV2HK
+        nVxooeV/hU5u6eq10l5KOFodYyLG++Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-XinBh8uIM7qBiEPxQGmciw-1; Wed, 05 Feb 2020 07:30:38 -0500
+X-MC-Unique: XinBh8uIM7qBiEPxQGmciw-1
+Received: by mail-wm1-f72.google.com with SMTP id o193so923474wme.8
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 04:30:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FZ3Fjj0BjzHheqix1bmWtGQyTCVbBm91zCQKiRJjeoc=;
+        b=nlbrhc/Q0h4xLBFd7B6CSD0zqFJySBdH1JlBOauAceiyZka7+iLfIrdm59PyhBOUfw
+         jq5nS1YimO5ssHdd0PzDysKHBLeUm0W4l0Z3NUCjcAo8EYcq7Pfkj35jIaszno2iKV3A
+         xcWN5BLnmC4qW+AsO6wjuiGKgcCgp/7RBXVG8qgppsRI6JA467M9OQ+Y2KP6RmvzBLk0
+         yenzLDkVdEw2eX5nUDpNQCY0XhSulM7PuyG48FioWGCsx3qHPHqXmTUR04QZp0P7Mv8g
+         HRa+19ey/OqRmkvKvhFYiX1vx0DdEAXkblN4ulwpSXlYDA2oNz9cre76Qw5o1Y41MPv4
+         TE8w==
+X-Gm-Message-State: APjAAAWbu784A9NHpgzCcRiTHPwzXFkcoNW//jj9GWQeTR3C02pkxk4a
+        9iFqkl4DZZd0I52/wpy+85NQM9kfA2N0RdwY8Mrus8hUWM7OHkjetmOzUvFlskyTQ9LWnUdMwPU
+        Aa5ovtW9Sj0KG
+X-Received: by 2002:a5d:6802:: with SMTP id w2mr27773562wru.353.1580905837104;
+        Wed, 05 Feb 2020 04:30:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy6xei4lJJtlxIHzm0eIiTXbZ2RJ6mzDj5iTZMvHZSp+m6YI7Hhbrz63uThgLSRStvcrZPzPw==
+X-Received: by 2002:a5d:6802:: with SMTP id w2mr27773549wru.353.1580905836907;
+        Wed, 05 Feb 2020 04:30:36 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id g7sm34227251wrq.21.2020.02.05.04.30.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2020 04:30:36 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
+        Roman Kagan <rkagan@virtuozzo.com>
+Subject: [PATCH 0/3] x86/kvm/hyper-v: fix enlightened VMCS & QEMU4.2
+Date:   Wed,  5 Feb 2020 13:30:31 +0100
+Message-Id: <20200205123034.630229-1-vkuznets@redhat.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200205131146.611a0d78.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20020512-0008-0000-0000-0000034FEC90
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020512-0009-0000-0000-00004A707CD7
-Message-Id: <d5878d81-38c5-3147-0da4-573e56610c9c@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-05_03:2020-02-04,2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 mlxscore=0 phishscore=0 malwarescore=0 priorityscore=1501
- mlxlogscore=563 suspectscore=0 bulkscore=0 adultscore=0 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002050100
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+With fine grained VMX feature enablement QEMU>=4.2 tries to do KVM_SET_MSRS
+with default (matching CPU model) values and in case eVMCS is also enabled,
+fails. While the regression is in QEMU, it may still be preferable to
+fix this in KVM.
 
+It would be great if we could just omit the VMX feature filtering in KVM
+and make this guest's responsibility: if it switches to using enlightened
+vmcs it should be aware that not all hardware features are going to be
+supported. Genuine Hyper-V, however, fails the test. It, for example,
+enables SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES and without
+'apic_access_addr' field in eVMCS there's not much we can do in KVM.
+Microsoft confirms the bug but it is unclear if it will ever get fixed
+in the existing Hyper-V versions as genuine Hyper-V never exposes
+these unsupported controls to L1.
 
-On 05.02.20 13:11, Cornelia Huck wrote:
-> On Wed, 5 Feb 2020 12:46:39 +0100
-> Michael Mueller <mimu@linux.ibm.com> wrote:
-> 
->> On 05.02.20 12:31, Cornelia Huck wrote:
->>> On Mon,  3 Feb 2020 08:19:35 -0500
->>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>    
->>>> From: Michael Mueller <mimu@linux.ibm.com>
->>>>
->>>> The patch implements interruption injection for the following
->>>> list of interruption types:
->>>>
->>>>     - I/O
->>>>       __deliver_io (III)
->>>>
->>>>     - External
->>>>       __deliver_cpu_timer (IEI)
->>>>       __deliver_ckc (IEI)
->>>>       __deliver_emergency_signal (IEI)
->>>>       __deliver_external_call (IEI)
->>>>
->>>>     - cpu restart
->>>>       __deliver_restart (IRI)
->>>
->>> Hm... what do 'III', 'IEI', and 'IRI' stand for?
->>
->> that's the kind of interruption injection being used:
->>
->> inject io interruption
->> inject external interruption
->> inject restart interruption
-> 
-> So, maybe make this:
-> 
-> - I/O (uses inject io interruption)
->    __ deliver_io
-> 
-> - External (uses inject external interruption)
-> (and so on)
-> 
-> I find using the acronyms without explanation very confusing.
+Changes since 'RFC':
+- Go with the bare minimum [Paolo]
 
-Make a guess from where they are coming...
+KVM RFC:
+https://lore.kernel.org/kvm/20200115171014.56405-1-vkuznets@redhat.com/
 
-Christian, would you please update the description accordingly.
+QEMU RFC@:
+https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg00123.html
 
+Vitaly Kuznetsov (3):
+  x86/kvm/hyper-v: remove stale evmcs_already_enabled check from
+    nested_enable_evmcs()
+  x86/kvm/hyper-v: move VMX controls sanitization out of
+    nested_enable_evmcs()
+  x86/kvm/hyper-v: don't allow to turn on unsupported VMX controls for
+    nested guests
 
-   - I/O (uses inject io interruption)
-     __deliver_io
+ arch/x86/kvm/vmx/evmcs.c  | 90 ++++++++++++++++++++++++++++++++++-----
+ arch/x86/kvm/vmx/evmcs.h  |  3 ++
+ arch/x86/kvm/vmx/nested.c |  3 ++
+ arch/x86/kvm/vmx/vmx.c    | 16 ++++++-
+ 4 files changed, 99 insertions(+), 13 deletions(-)
 
-   - External (uses inject external interruption)
-     __deliver_cpu_timer
-     __deliver_ckc
-     __deliver_emergency_signal
-     __deliver_external_call
-
-   - cpu restart (uses inject restart interruption)
-     __deliver_restart
-
-
-
-thanks
-
-Michael
-
-> 
->>
->>>    
->>>>
->>>> The service interrupt is handled in a followup patch.
->>>>
->>>> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
->>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>> [fixes]
->>>> ---
->>>>    arch/s390/include/asm/kvm_host.h |  8 +++
->>>>    arch/s390/kvm/interrupt.c        | 93 ++++++++++++++++++++++----------
->>>>    2 files changed, 74 insertions(+), 27 deletions(-)
-> 
+-- 
+2.24.1
 
