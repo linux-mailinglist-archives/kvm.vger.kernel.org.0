@@ -2,196 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40F0F1530C5
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 13:30:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C8A1153150
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 13:57:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728144AbgBEMaq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 07:30:46 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49365 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728102AbgBEMaq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 07:30:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580905845;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kH9R5qygaELgrXQXaWn/tfFU/2DvggTDzmG5IhlZM0c=;
-        b=Y+gAnnSvbjXvQgfmo62iFahMHa9iU6va0dXlOkDCqTG55qtd36Nqa/73y0k9xIeVnPpPxE
-        6R2/eDdOSXWKAn7yYdJ2vhyOjqI7VkxhF9GYDmqyiWcJ7Mt/syh5Buz9bHXaj07PxQcU1c
-        WwDTxon3zE76wuShCQmtkmHvIi3xvhg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-jKqfTACBOB-bEP1vPTSZ5w-1; Wed, 05 Feb 2020 07:30:42 -0500
-X-MC-Unique: jKqfTACBOB-bEP1vPTSZ5w-1
-Received: by mail-wr1-f70.google.com with SMTP id s13so1099388wrb.21
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 04:30:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=kH9R5qygaELgrXQXaWn/tfFU/2DvggTDzmG5IhlZM0c=;
-        b=hpxRdyz8Nm2EBhPzYbElVQTEtjNCABBV+IwDoHJqCjzLDDXVoQTHAhOvXLRKR81HSp
-         JZ3WrigsSokhrxy3aO0ESGfFamFwfaE+LOKiiAM0rP8CgeYoIcUBKuW0xdQBJ6UL1U7c
-         F22+2Q9KUBqEi+4cDlh4K7i6qIQeRVVMp67y0nESw499p+aCV1lw0ONqUhxmxmVhb2dI
-         CrAZ8Ih3hXVJB05cpC4bsBwXZq0GaVxNKTWK0U6OyDeiLfc2O72KslAr6w4kqa3Gf8X3
-         B8LRMeN/S3WV1UM6/Rf7Ncu5WXd9W299uSTG8zHgFdATuzp0LaLVdAGUIZu672eD4oDB
-         iu+Q==
-X-Gm-Message-State: APjAAAVdEUVLbTK0W7StsMEL2gAH3MbnH+5p+e6OJgw7J02HylHCwsJ3
-        YgX8U3fekcPQEywhNbuQyLfE+rOOVwsOqPe7FVZ8IFVuGm2MiyX2hyJ09fImr+2l899kzgnt5GP
-        D/ZJpy7gX5kdY
-X-Received: by 2002:adf:ea4d:: with SMTP id j13mr23997735wrn.292.1580905841363;
-        Wed, 05 Feb 2020 04:30:41 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy6a7nZphH4CpZdYImL27XES4Yf2yGaYtSWHx6fRouFNr/X6nSst7FOsMjeu0DoqFuZVNRk3A==
-X-Received: by 2002:adf:ea4d:: with SMTP id j13mr23997707wrn.292.1580905841119;
-        Wed, 05 Feb 2020 04:30:41 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id g7sm34227251wrq.21.2020.02.05.04.30.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2020 04:30:39 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
-        Roman Kagan <rkagan@virtuozzo.com>
-Subject: [PATCH 3/3] x86/kvm/hyper-v: don't allow to turn on unsupported VMX controls for nested guests
-Date:   Wed,  5 Feb 2020 13:30:34 +0100
-Message-Id: <20200205123034.630229-4-vkuznets@redhat.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200205123034.630229-1-vkuznets@redhat.com>
-References: <20200205123034.630229-1-vkuznets@redhat.com>
+        id S1728052AbgBEM5A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 07:57:00 -0500
+Received: from mail-eopbgr10041.outbound.protection.outlook.com ([40.107.1.41]:46861
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726386AbgBEM5A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 07:57:00 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NQKCu4+70/kJSBcmulkd6fE5JAWXqSUsoahihvze38tsEhLjuhOkLTtDOJCM0LrWI+DXWJwx//lnbUsRzVvt5WbgRBaf42ssZ84E0/EjgSDtjVQys3gIIZK7ZeMSJumy+YW3S4QydoHa5BeoBQnCBYFsDo/83qRCjQfu2OKqd14uP6caAsHCjTPv7Vvh7K+AMmjLiP4NtXaTMb+F/V4ZzaQGJ8L4AhGT3ib4rYOIFZppHXX5epzfUR8qJvgKB5jNxP5k3+NX8c0gyz7F2VT/LjmNXualnNpZuR2pszHP1zYtxe92Cc15q2V40gGz5rN+QNXM3tgH7ivN5qgFoFfGGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gbiPdN/Tw9XZTbyfw4LGMrONC3v0+6S/WuRJhvHO4Tw=;
+ b=JrAdRBJaCDYfHSnnGXGaLa1TNaH/UI1SUKmizArhczqd1cfVYEynecLkR9/5k5CAXlAqO1TWLv9lHSlzqTCyjvnXX5uywgB/I6eQ+6Pal2+9B3Q8YpR10FrLAnOO7jmqfkfcwlW4EmPK5iBNkpyLoQxDr4wZRXcQv1wFI8Lun/l1P6Po05iX3cgIA45m987EKsDOHxYssUV5gw37iH4Di9Z1aUCXfg/s6ZCfS2kUOfJu6iLitodvYetyhuebInN5D1BHd8InpYghBV1I/5/KfC+p8ImSL7tZYcBEZNqUiMxFMs2rOzLXZ/e738oQbQ1SP4fRZii6X/Kas7k73P6YrA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gbiPdN/Tw9XZTbyfw4LGMrONC3v0+6S/WuRJhvHO4Tw=;
+ b=HUqeCSJWz5pEvpa6i2a32ezw1unnN9LnmoIScZvtGJYTFugpRKxnstscHF3JzfdCzlQMBiJVjgdfzOU9nEVvDG9qp1MqyyNTrJXzhz27OLbaSVJzGwWhDYYPe5LGacHGJdZKRVNEMdD9HIuE44W0xAX0oJXISKaxOAGO24yU83s=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
+ VI1PR05MB4509.eurprd05.prod.outlook.com (10.171.182.149) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21; Wed, 5 Feb 2020 12:56:53 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2707.020; Wed, 5 Feb 2020
+ 12:56:53 +0000
+Date:   Wed, 5 Feb 2020 08:56:48 -0400
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Shahaf Shuler <shahafs@mellanox.com>,
+        Tiwei Bie <tiwei.bie@intel.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "dan.daly@intel.com" <dan.daly@intel.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>
+Subject: Re: [PATCH] vhost: introduce vDPA based backend
+Message-ID: <20200205125648.GV23346@mellanox.com>
+References: <20200131033651.103534-1-tiwei.bie@intel.com>
+ <7aab2892-bb19-a06a-a6d3-9c28bc4c3400@redhat.com>
+ <20200205020247.GA368700@___>
+ <AM0PR0502MB37952015716C1D5E07E390B6C3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+ <112858a4-1a01-f4d7-e41a-1afaaa1cad45@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <112858a4-1a01-f4d7-e41a-1afaaa1cad45@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: MN2PR05CA0062.namprd05.prod.outlook.com
+ (2603:10b6:208:236::31) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR05CA0062.namprd05.prod.outlook.com (2603:10b6:208:236::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.12 via Frontend Transport; Wed, 5 Feb 2020 12:56:53 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1izKEa-0002I9-2r; Wed, 05 Feb 2020 08:56:48 -0400
+X-Originating-IP: [142.68.57.212]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 8f8fb22b-1f4c-4d1b-e392-08d7aa3adf80
+X-MS-TrafficTypeDiagnostic: VI1PR05MB4509:|VI1PR05MB4509:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR05MB4509FA44E2ECF6674D62AB4DCF020@VI1PR05MB4509.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0304E36CA3
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(136003)(396003)(376002)(39860400002)(189003)(199004)(2616005)(6916009)(26005)(186003)(7416002)(36756003)(33656002)(81156014)(81166006)(8936002)(9746002)(9786002)(8676002)(2906002)(1076003)(4326008)(66476007)(66946007)(66556008)(4744005)(478600001)(5660300002)(316002)(52116002)(86362001)(54906003)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB4509;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LgU9/3vE7rJYUS2L6IWqg10NyNGNV3Fo/zCFzdtAkzHzdiYixeujAbMyPr3Up9SgmPunaXZQ1jEpn7UN42D5oDQ+WqaFoss+ZMs62E7ORCriGuviExal0wRfiIEo7zSMvbRStwZsBP+Q+1MUjJMMmYVHsjlyXQozL9JZwIaaf2Z+UqycIEdKFUy2y4qRgEqLIRnJO6gShwg00nwO9VZELiu8kuBNYj6sSchOSZcSXBxI3kXoeho5bKrxBDx1jb7TQ70iSKejvRmgqQgLsG7DWC1h+swqeaAoKgHd7Kv+NxgZTtLulqZ9oYhGYBDA3r37qFiG6wL/buJf//G8iVZHzuAVQC96dnIf9UjMAgSzALP03EIjhlPiLpyS/l0S6RUrhB8Uh0Hghemxnma9kgWowI6SXKD5yDyYuO6HxvvOpjWAfoWyR6g0A3c8vP20OtosdSLX112OG13R/+4i1OlceLT+GtVCZfEqLM7SS4ZYMSNVwKXbIgCG3TFYOvGiu2lL
+X-MS-Exchange-AntiSpam-MessageData: n1YkP5iFigNTfa5KFTJKaT4IhUwo19bRL4ngRj9iADAEXWD9JLYAO5y92o05X17qTFiV6JXJAt7MY+SCTscuiZ9/H2CvotdbMpx8YerIj9hngHhvbOf21RsGHMF3ozY3rr3eo2F8BncEuARfM1vWpw==
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f8fb22b-1f4c-4d1b-e392-08d7aa3adf80
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2020 12:56:53.3574
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dQ01rPmVWX2GbT50QEsE8g6wEQjpuNubHc0YWbcwnBAr7qgaxFt2UCbDidwlc0PIn3y+UjGfyWisqL0OL7AGXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4509
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sane L1 hypervisors are not supposed to turn any of the unsupported VMX
-controls on for its guests and nested_vmx_check_controls() checks for
-that. This is, however, not the case for the controls which are supported
-on the host but are missing in enlightened VMCS and when eVMCS is in use.
+On Wed, Feb 05, 2020 at 03:50:14PM +0800, Jason Wang wrote:
+> > Would it be better for the map/umnap logic to happen inside each device ?
+> > Devices that needs the IOMMU will call iommu APIs from inside the driver callback.
+> 
+> Technically, this can work. But if it can be done by vhost-vpda it will make
+> the vDPA driver more compact and easier to be implemented.
 
-It would certainly be possible to add these missing checks to
-nested_check_vm_execution_controls()/_vm_exit_controls()/.. but it seems
-preferable to keep eVMCS-specific stuff in eVMCS and reduce the impact on
-non-eVMCS guests by doing less unrelated checks. Create a separate
-nested_evmcs_check_controls() for this purpose.
+Generally speaking, in the kernel, it is normal to not hoist code of
+out drivers into subsystems until 2-3 drivers are duplicating that
+code. It helps ensure the right design is used
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/vmx/evmcs.c  | 53 +++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/evmcs.h  |  2 ++
- arch/x86/kvm/vmx/nested.c |  3 +++
- 3 files changed, 58 insertions(+)
-
-diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-index ba886fb7bc39..303813423c3e 100644
---- a/arch/x86/kvm/vmx/evmcs.c
-+++ b/arch/x86/kvm/vmx/evmcs.c
-@@ -7,6 +7,7 @@
- #include "evmcs.h"
- #include "vmcs.h"
- #include "vmx.h"
-+#include "trace.h"
- 
- DEFINE_STATIC_KEY_FALSE(enable_evmcs);
- 
-@@ -372,6 +373,58 @@ void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata)
- 	*pdata = ctl_low | ((u64)ctl_high << 32);
- }
- 
-+int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
-+{
-+	int ret = 0;
-+	u32 unsupp_ctl;
-+
-+	unsupp_ctl = vmcs12->pin_based_vm_exec_control &
-+		EVMCS1_UNSUPPORTED_PINCTRL;
-+	if (unsupp_ctl) {
-+		trace_kvm_nested_vmenter_failed(
-+			"eVMCS: unsupported pin-based VM-execution controls",
-+			unsupp_ctl);
-+		ret = -EINVAL;
-+	}
-+
-+	unsupp_ctl = vmcs12->secondary_vm_exec_control &
-+		EVMCS1_UNSUPPORTED_2NDEXEC;
-+	if (unsupp_ctl) {
-+		trace_kvm_nested_vmenter_failed(
-+			"eVMCS: unsupported secondary VM-execution controls",
-+			unsupp_ctl);
-+		ret = -EINVAL;
-+	}
-+
-+	unsupp_ctl = vmcs12->vm_exit_controls &
-+		EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
-+	if (unsupp_ctl) {
-+		trace_kvm_nested_vmenter_failed(
-+			"eVMCS: unsupported VM-exit controls",
-+			unsupp_ctl);
-+		ret = -EINVAL;
-+	}
-+
-+	unsupp_ctl = vmcs12->vm_entry_controls &
-+		EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
-+	if (unsupp_ctl) {
-+		trace_kvm_nested_vmenter_failed(
-+			"eVMCS: unsupported VM-entry controls",
-+			unsupp_ctl);
-+		ret = -EINVAL;
-+	}
-+
-+	unsupp_ctl = vmcs12->vm_function_control & EVMCS1_UNSUPPORTED_VMFUNC;
-+	if (unsupp_ctl) {
-+		trace_kvm_nested_vmenter_failed(
-+			"eVMCS: unsupported VM-function controls",
-+			unsupp_ctl);
-+		ret = -EINVAL;
-+	}
-+
-+	return ret;
-+}
-+
- int nested_enable_evmcs(struct kvm_vcpu *vcpu,
- 			uint16_t *vmcs_version)
- {
-diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-index b88d9807a796..6de47f2569c9 100644
---- a/arch/x86/kvm/vmx/evmcs.h
-+++ b/arch/x86/kvm/vmx/evmcs.h
-@@ -10,6 +10,7 @@
- 
- #include "capabilities.h"
- #include "vmcs.h"
-+#include "vmcs12.h"
- 
- struct vmcs_config;
- 
-@@ -202,5 +203,6 @@ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
- int nested_enable_evmcs(struct kvm_vcpu *vcpu,
- 			uint16_t *vmcs_version);
- void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata);
-+int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
- 
- #endif /* __KVM_X86_VMX_EVMCS_H */
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 6879966b7648..b9fd508f40c5 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2767,6 +2767,9 @@ static int nested_vmx_check_controls(struct kvm_vcpu *vcpu,
- 	    nested_check_vm_entry_controls(vcpu, vmcs12))
- 		return -EINVAL;
- 
-+	if (to_vmx(vcpu)->nested.enlightened_vmcs_enabled)
-+		return nested_evmcs_check_controls(vmcs12);
-+
- 	return 0;
- }
- 
--- 
-2.24.1
-
+Jason
