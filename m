@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E34F51538F7
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 20:22:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95DE8153910
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 20:26:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727307AbgBETWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 14:22:48 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57052 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727199AbgBETWs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 14:22:48 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015JJmJt104922
-        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 14:22:47 -0500
+        id S1727199AbgBET0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 14:26:08 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32546 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727085AbgBET0I (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 14:26:08 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015JJuV5062867
+        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 14:26:06 -0500
 Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhmdkgu2-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2xyhmh2ged-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 14:22:47 -0500
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 14:26:06 -0500
 Received: from localhost
         by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 5 Feb 2020 19:22:45 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        Wed, 5 Feb 2020 19:26:04 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
         by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 5 Feb 2020 19:22:42 -0000
+        Wed, 5 Feb 2020 19:26:01 -0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015JLlZT45613376
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015JQ0Wa58261694
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Feb 2020 19:21:47 GMT
+        Wed, 5 Feb 2020 19:26:00 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9BC51A404D;
-        Wed,  5 Feb 2020 19:22:40 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2BF16A4053;
+        Wed,  5 Feb 2020 19:26:00 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 24891A4040;
-        Wed,  5 Feb 2020 19:22:40 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id AAEE1A404D;
+        Wed,  5 Feb 2020 19:25:59 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.26.20])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  5 Feb 2020 19:22:40 +0000 (GMT)
-Subject: Re: [RFCv2 25/37] KVM: s390: protvirt: STSI handling
+        Wed,  5 Feb 2020 19:25:59 +0000 (GMT)
+Subject: Re: [RFCv2 26/37] KVM: s390: protvirt: disallow one_reg
 To:     Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -48,8 +48,8 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-26-borntraeger@de.ibm.com>
- <3625b3bc-ddfb-2424-3ab0-6cd217af5856@redhat.com>
+ <20200203131957.383915-27-borntraeger@de.ibm.com>
+ <e97e34a8-8eb8-f849-520e-b93656dca62b@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -94,26 +94,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 5 Feb 2020 20:22:39 +0100
+Date:   Wed, 5 Feb 2020 20:25:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <3625b3bc-ddfb-2424-3ab0-6cd217af5856@redhat.com>
+In-Reply-To: <e97e34a8-8eb8-f849-520e-b93656dca62b@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020519-0012-0000-0000-00000384055B
+x-cbid: 20020519-0012-0000-0000-00000384057F
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020519-0013-0000-0000-000021C070DD
-Message-Id: <5c7f3fe5-8c27-a22b-cd4d-2e1d9b24e483@de.ibm.com>
+x-cbparentid: 20020519-0013-0000-0000-000021C07101
+Message-Id: <15e9a8aa-ddbc-afb8-14e5-ca5556379ff4@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-05_06:2020-02-04,2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- spamscore=0 clxscore=1015 lowpriorityscore=0 priorityscore=1501 mlxscore=0
- mlxlogscore=999 malwarescore=0 impostorscore=0 adultscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002050148
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ spamscore=0 impostorscore=0 mlxlogscore=703 adultscore=0
+ lowpriorityscore=0 priorityscore=1501 phishscore=0 mlxscore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002050148
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -121,59 +121,66 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 05.02.20 13:13, Thomas Huth wrote:
+On 05.02.20 13:16, Thomas Huth wrote:
 > On 03/02/2020 14.19, Christian Borntraeger wrote:
 >> From: Janosch Frank <frankja@linux.ibm.com>
 >>
->> Save response to sidad and disable address checking for protected
->> guests.
+>> A lot of the registers are controlled by the Ultravisor and never
+>> visible to KVM. Some fields in the sie control block are overlayed,
+>> like gbea. As no userspace uses the ONE_REG interface on s390 it is safe
+>> to disable this for protected guests.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>  arch/s390/kvm/priv.c | 9 +++++++--
->>  1 file changed, 7 insertions(+), 2 deletions(-)
+>>  arch/s390/kvm/kvm-s390.c | 3 +++
+>>  1 file changed, 3 insertions(+)
 >>
->> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
->> index ed52ffa8d5d4..06c7e7a10825 100644
->> --- a/arch/s390/kvm/priv.c
->> +++ b/arch/s390/kvm/priv.c
->> @@ -872,7 +872,7 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->>  
->>  	operand2 = kvm_s390_get_base_disp_s(vcpu, &ar);
->>  
->> -	if (operand2 & 0xfff)
->> +	if (!kvm_s390_pv_is_protected(vcpu->kvm) && (operand2 & 0xfff))
->>  		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
->>  
->>  	switch (fc) {
->> @@ -893,8 +893,13 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->>  		handle_stsi_3_2_2(vcpu, (void *) mem);
->>  		break;
->>  	}
->> +	if (kvm_s390_pv_is_protected(vcpu->kvm)) {
->> +		memcpy((void *)vcpu->arch.sie_block->sidad, (void *)mem,
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index 6e74c7afae3a..b9692d722c1e 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -4641,6 +4641,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>  	case KVM_SET_ONE_REG:
+>>  	case KVM_GET_ONE_REG: {
+>>  		struct kvm_one_reg reg;
+>> +		r = -EINVAL;
+>> +		if (kvm_s390_pv_is_protected(vcpu->kvm))
+>> +			break;
+>>  		r = -EFAULT;
+>>  		if (copy_from_user(&reg, argp, sizeof(reg)))
+>>  			break;
 > 
-> That should use sida_origin() or "...->sidad & PAGE_MASK".
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+> PS:
+> Not sure, but maybe it would be also be good to add a sentence to
+> Documentation/virt/kvm/api.txt ?
 
-ack.
-> 
->> +		       PAGE_SIZE);
->> +		rc = 0;
->> +	} else
->> +		rc = write_guest(vcpu, operand2, ar, (void *)mem, PAGE_SIZE);
-> 
-> Coding style: If one branch of the if-statement uses curly braces,
-> please add them to the other branch as well.
-> 
 
-ack
+Ack:
 
->> -	rc = write_guest(vcpu, operand2, ar, (void *)mem, PAGE_SIZE);
->>  	if (rc) {
->>  		rc = kvm_s390_inject_prog_cond(vcpu, rc);
->>  		goto out;
->>
-> 
->  Thomas
-> 
+diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+index 4874d42286ca..8239b3665736 100644
+--- a/Documentation/virt/kvm/api.txt
++++ b/Documentation/virt/kvm/api.txt
+@@ -1918,7 +1918,8 @@ Parameters: struct kvm_one_reg (in)
+ Returns: 0 on success, negative value on failure
+ Errors:
+   ENOENT:   no such register
+-  EINVAL:   invalid register ID, or no such register
++  EINVAL:   invalid register ID, or no such register, ONE_REG forbidden
++            for protected guests (s390).
+   EPERM:    (arm64) register access not allowed before vcpu finalization
+ (These error codes are indicative only: do not rely on a specific error
+ code being returned in a specific situation.)
+@@ -2311,7 +2312,8 @@ Parameters: struct kvm_one_reg (in and out)
+ Returns: 0 on success, negative value on failure
+ Errors include:
+   ENOENT:   no such register
+-  EINVAL:   invalid register ID, or no such register
++  EINVAL:   invalid register ID, or no such register,ONE_REG forbidden
++            for protected guests (s390)
+   EPERM:    (arm64) register access not allowed before vcpu finalization
+ (These error codes are indicative only: do not rely on a specific error
+ code being returned in a specific situation.)
 
