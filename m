@@ -2,149 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CA14F152736
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 08:51:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 919E9152740
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 08:57:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727945AbgBEHvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 02:51:02 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48178 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726236AbgBEHvC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 02:51:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580889061;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YQLo/Dujelpm0XrehqZm62mCFlSLkIvoH/a0QZl9D2s=;
-        b=Q99F0HvUrenx935z7sUnwylWNIvHETMvhBqHcQfA5QSeLFP0CivbbCxdWAu86vlMc8HtFB
-        if9r9jUFq5/rKmxd6ngkh/5fUCitC6fr8vRDslnrMJqvA7I4uZH+3H+Eb7XcVFb73Dzzql
-        lArdzsLIhSUG19TjBT6RGs9f34c7wP4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-GBTihHV3M3uxJzsoVeentg-1; Wed, 05 Feb 2020 02:50:59 -0500
-X-MC-Unique: GBTihHV3M3uxJzsoVeentg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 826968010EF;
-        Wed,  5 Feb 2020 07:50:56 +0000 (UTC)
-Received: from [10.72.13.188] (ovpn-13-188.pek2.redhat.com [10.72.13.188])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8648C7792A;
-        Wed,  5 Feb 2020 07:50:23 +0000 (UTC)
-Subject: Re: [PATCH] vhost: introduce vDPA based backend
-To:     Shahaf Shuler <shahafs@mellanox.com>,
-        Tiwei Bie <tiwei.bie@intel.com>
-Cc:     "mst@redhat.com" <mst@redhat.com>,
+        id S1727965AbgBEH5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 02:57:25 -0500
+Received: from mga01.intel.com ([192.55.52.88]:21022 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725497AbgBEH5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 02:57:25 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Feb 2020 23:57:23 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,405,1574150400"; 
+   d="scan'208";a="264134166"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by fmsmga002.fm.intel.com with ESMTP; 04 Feb 2020 23:57:23 -0800
+Received: from fmsmsx121.amr.corp.intel.com (10.18.125.36) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 4 Feb 2020 23:57:23 -0800
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ fmsmsx121.amr.corp.intel.com (10.18.125.36) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 4 Feb 2020 23:57:23 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.98]) with mapi id 14.03.0439.000;
+ Wed, 5 Feb 2020 15:57:21 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "dan.daly@intel.com" <dan.daly@intel.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>
-References: <20200131033651.103534-1-tiwei.bie@intel.com>
- <7aab2892-bb19-a06a-a6d3-9c28bc4c3400@redhat.com>
- <20200205020247.GA368700@___>
- <AM0PR0502MB37952015716C1D5E07E390B6C3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <112858a4-1a01-f4d7-e41a-1afaaa1cad45@redhat.com>
-Date:   Wed, 5 Feb 2020 15:50:14 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <AM0PR0502MB37952015716C1D5E07E390B6C3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        "dev@dpdk.org" <dev@dpdk.org>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "thomas@monjalon.net" <thomas@monjalon.net>,
+        "bluca@debian.org" <bluca@debian.org>,
+        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
+        "Richardson, Bruce" <bruce.richardson@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>
+Subject: RE: [RFC PATCH 0/7] vfio/pci: SR-IOV support
+Thread-Topic: [RFC PATCH 0/7] vfio/pci: SR-IOV support
+Thread-Index: AQHV26+tAcTUgIsbdUG5kuoMQU0tFqgMLjsw
+Date:   Wed, 5 Feb 2020 07:57:21 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A1ABFE0@SHSMSX104.ccr.corp.intel.com>
+References: <158085337582.9445.17682266437583505502.stgit@gimli.home>
+In-Reply-To: <158085337582.9445.17682266437583505502.stgit@gimli.home>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYjVkODg5ZjktYjRmZS00NjM2LWJjZDAtYTM1YmE3YzZhZTlkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoidmhDZUpCSFJcL2ZwMkRmV2lIRU9uVkZpMlZqa2dLaTFQd1ZUUytpcnd2aE5wUjFkNnFpNlRyVnNUT25ZaDh3VisifQ==
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/2/5 =E4=B8=8B=E5=8D=883:15, Shahaf Shuler wrote:
-> Wednesday, February 5, 2020 4:03 AM, Tiwei Bie:
->> Subject: Re: [PATCH] vhost: introduce vDPA based backend
->>
->> On Tue, Feb 04, 2020 at 11:30:11AM +0800, Jason Wang wrote:
->>> On 2020/1/31 =E4=B8=8A=E5=8D=8811:36, Tiwei Bie wrote:
->>>> This patch introduces a vDPA based vhost backend. This backend is
->>>> built on top of the same interface defined in virtio-vDPA and
->>>> provides a generic vhost interface for userspace to accelerate the
->>>> virtio devices in guest.
->>>>
->>>> This backend is implemented as a vDPA device driver on top of the
->>>> same ops used in virtio-vDPA. It will create char device entry named
->>>> vhost-vdpa/$vdpa_device_index for userspace to use. Userspace can
->>>> use vhost ioctls on top of this char device to setup the backend.
->>>>
->>>> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> [...]
->
->>>> +static long vhost_vdpa_do_dma_mapping(struct vhost_vdpa *v) {
->>>> +	/* TODO: fix this */
->>>
->>> Before trying to do this it looks to me we need the following during
->>> the probe
->>>
->>> 1) if set_map() is not supported by the vDPA device probe the IOMMU
->>> that is supported by the vDPA device
->>> 2) allocate IOMMU domain
->>>
->>> And then:
->>>
->>> 3) pin pages through GUP and do proper accounting
->>> 4) store GPA->HPA mapping in the umem
->>> 5) generate diffs of memory table and using IOMMU API to setup the dm=
-a
->>> mapping in this method
->>>
->>> For 1), I'm not sure parent is sufficient for to doing this or need t=
-o
->>> introduce new API like iommu_device in mdev.
->> Agree. We may also need to introduce something like the iommu_device.
->>
-> Would it be better for the map/umnap logic to happen inside each device=
- ?
-> Devices that needs the IOMMU will call iommu APIs from inside the drive=
-r callback.
-
-
-Technically, this can work. But if it can be done by vhost-vpda it will=20
-make the vDPA driver more compact and easier to be implemented.
-
-
-> Devices that has other ways to do the DMA mapping will call the proprie=
-tary APIs.
-
-
-To confirm, do you prefer:
-
-1) map/unmap
-
-or
-
-2) pass all maps at one time?
-
-Thanks
-
-
->
-
+SGkgQWxleCwNCg0KU2lsbHkgcXVlc3Rpb25zIG9uIHRoZSBiYWNrZ3JvdW5kOg0KDQo+IEZyb206
+IEFsZXggV2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdl
+ZG5lc2RheSwgRmVicnVhcnkgNSwgMjAyMCA3OjA2IEFNDQo+IFN1YmplY3Q6IFtSRkMgUEFUQ0gg
+MC83XSB2ZmlvL3BjaTogU1ItSU9WIHN1cHBvcnQNCj4gDQo+IFRoZXJlIHNlZW1zIHRvIGJlIGFu
+IG9uZ29pbmcgZGVzaXJlIHRvIHVzZSB1c2Vyc3BhY2UsIHZmaW8tYmFzZWQNCj4gZHJpdmVycyBm
+b3IgYm90aCBTUi1JT1YgUEYgYW5kIFZGIGRldmljZXMuIA0KDQpJcyB0aGlzIHNlcmllcyB0byBt
+YWtlIFBGIGJlIGJvdW5kLWFibGUgdG8gdmZpby1wY2kgZXZlbiBTUi1JT1YgaXMNCmVuYWJsZWQg
+b24gc3VjaCBQRnM/IElmIHllcywgaXMgaXQgYWxsb3dlZCB0byBhc3NpZ24gUEYgdG8gYSBWTT8g
+b3INCml0IGNhbiBvbmx5IGJlIHVzZWQgYnkgdXNlcnNwYWNlIGFwcGxpY2F0aW9ucyBsaWtlIERQ
+REs/DQoNCj4gVGhlIGZ1bmRhbWVudGFsIGlzc3VlDQo+IHdpdGggdGhpcyBjb25jZXB0IGlzIHRo
+YXQgdGhlIFZGIGlzIG5vdCBmdWxseSBpbmRlcGVuZGVudCBvZiB0aGUgUEYNCj4gZHJpdmVyLiAg
+TWluaW1hbGx5IHRoZSBQRiBkcml2ZXIgbWlnaHQgYmUgYWJsZSB0byBkZW55IHNlcnZpY2UgdG8g
+dGhlDQo+IFZGLCBWRiBkYXRhIHBhdGhzIG1pZ2h0IGJlIGRlcGVuZGVudCBvbiB0aGUgc3RhdGUg
+b2YgdGhlIFBGIGRldmljZSwNCj4gb3IgdGhlIFBGIG15IGhhdmUgc29tZSBkZWdyZWUgb2YgYWJp
+bGl0eSB0byBpbnNwZWN0IG9yIG1hbmlwdWxhdGUgdGhlDQo+IFZGIGRhdGEuICBJdCB0aGVyZWZv
+cmUgd291bGQgc2VlbSBpcnJlc3BvbnNpYmxlIHRvIHVubGVhc2ggVkZzIG9udG8NCj4gdGhlIHN5
+c3RlbSwgbWFuYWdlZCBieSBhIHVzZXIgb3duZWQgUEYuDQo+IA0KPiBXZSBhZGRyZXNzIHRoaXMg
+aW4gYSBmZXcgd2F5cyBpbiB0aGlzIHNlcmllcy4gIEZpcnN0LCB3ZSBjYW4gdXNlIGEgYnVzDQo+
+IG5vdGlmaWVyIGFuZCB0aGUgZHJpdmVyX292ZXJyaWRlIGZhY2lsaXR5IHRvIG1ha2Ugc3VyZSBW
+RnMgYXJlIGJvdW5kDQo+IHRvIHRoZSB2ZmlvLXBjaSBkcml2ZXIgYnkgZGVmYXVsdC4gIFRoaXMg
+c2hvdWxkIGVsaW1pbmF0ZSB0aGUgY2hhbmNlDQo+IHRoYXQgYSBWRiBpcyBhY2NpZGVudGFsbHkg
+Ym91bmQgYW5kIHVzZWQgYnkgaG9zdCBkcml2ZXJzLiAgV2UgZG9uJ3QNCj4gaG93ZXZlciByZW1v
+dmUgdGhlIGFiaWxpdHkgZm9yIGEgaG9zdCBhZG1pbiB0byBjaGFuZ2UgdGhpcyBvdmVycmlkZS4N
+Cj4gDQo+IFRoZSBuZXh0IGlzc3VlIHdlIG5lZWQgdG8gYWRkcmVzcyBpcyBob3cgd2UgbGV0IHVz
+ZXJzcGFjZSBkcml2ZXJzDQo+IG9wdC1pbiB0byB0aGlzIHBhcnRpY2lwYXRpb24gd2l0aCB0aGUg
+UEYgZHJpdmVyLiAgV2UgZG8gbm90IHdhbnQgYW4NCj4gYWRtaW4gdG8gYmUgYWJsZSB0byB1bndp
+dHRpbmdseSBhc3NpZ24gb25lIG9mIHRoZXNlIFZGcyB0byBhIHRlbmFudA0KPiB0aGF0IGlzbid0
+IHdvcmtpbmcgaW4gY29sbGFib3JhdGlvbiB3aXRoIHRoZSBQRiBkcml2ZXIuICBXZSBjb3VsZCB1
+c2UNCj4gSU9NTVUgZ3JvdXBpbmcsIGJ1dCB0aGlzIHNlZW1zIHRvIHB1c2ggdG9vIGZhciB0b3dh
+cmRzIHRpZ2h0bHkgY291cGxlZA0KPiBQRiBhbmQgVkYgZHJpdmVycy4gIFRoaXMgc2VyaWVzIGlu
+dHJvZHVjZXMgYSAiVkYgdG9rZW4iLCBpbXBsZW1lbnRlZA0KPiBhcyBhIFVVSUQsIGFzIGEgc2hh
+cmVkIHNlY3JldCBiZXR3ZWVuIFBGIGFuZCBWRiBkcml2ZXJzLiAgVGhlIHRva2VuDQo+IG5lZWRz
+IHRvIGJlIHNldCBieSB0aGUgUEYgZHJpdmVyIGFuZCB1c2VkIGFzIHBhcnQgb2YgdGhlIGRldmlj
+ZQ0KPiBtYXRjaGluZyBieSB0aGUgVkYgZHJpdmVyLiAgUHJvdmlzaW9ucyBpbiB0aGUgY29kZSBh
+bHNvIGFjY291bnQgZm9yDQo+IHJlc3RhcnRpbmcgdGhlIFBGIGRyaXZlciB3aXRoIGFjdGl2ZSBW
+RiBkcml2ZXJzLCByZXF1aXJpbmcgdGhlIFBGIHRvDQo+IHVzZSB0aGUgY3VycmVudCB0b2tlbiB0
+byByZS1nYWluIGFjY2VzcyB0byB0aGUgUEYuDQoNCkhvdyBhYm91dCB0aGUgc2NlbmFyaW8gaW4g
+d2hpY2ggUEYgZHJpdmVyIGlzIHZmaW8tYmFzZWQgdXNlcnNwYWNlDQpkcml2ZXIgYnV0IFZGIGRy
+aXZlcnMgYXJlIG1peGVkLiBUaGlzIG1lYW5zIG5vdCBhbGwgVkZzIGFyZSBib3VuZA0KdG8gdmZp
+by1iYXNlZCB1c2Vyc3BhY2UgZHJpdmVyLiBJcyBpdCBhbHNvIHN1cHBvcnRlZCBoZXJlPyA6LSkN
+Cg0KUmVnYXJkcywNCllpIExpdQ0K
