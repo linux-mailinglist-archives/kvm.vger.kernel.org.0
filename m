@@ -2,123 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E4FBC153080
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 13:23:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25729153086
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 13:25:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727109AbgBEMXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 07:23:12 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33482 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726944AbgBEMXL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 07:23:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580905390;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WgtRU8921KOz0R/un0ply1/beSjVVXMaR52ovLvQgPo=;
-        b=efcm82GwtYa9Z8ih2d7iAJebyz2ysbhgENzGtSyLovDSG2LxrsiSZPjyi24uYq+MNXhiOv
-        W2VA2Jy7Dsyhog1Z5Z9weYn2CcVICcnl1zXMWVL7nlB7XuR16iuC5Ny7rrVAwbrYgboKBs
-        na5FR80Cde77TZnZhy+mGMXXqlMCdgE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-6C9mV_0hMvaxegC6S5qwYA-1; Wed, 05 Feb 2020 07:23:06 -0500
-X-MC-Unique: 6C9mV_0hMvaxegC6S5qwYA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 672E68010CB;
-        Wed,  5 Feb 2020 12:23:05 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7800C5C1B5;
-        Wed,  5 Feb 2020 12:23:01 +0000 (UTC)
-Date:   Wed, 5 Feb 2020 13:22:59 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
+        id S1727051AbgBEMZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 07:25:49 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14652 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726809AbgBEMZt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 07:25:49 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015CHppw078452
+        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 07:25:47 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhmm5qf6-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 07:25:47 -0500
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Wed, 5 Feb 2020 12:25:45 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 5 Feb 2020 12:25:42 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015CPf0J58064968
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 5 Feb 2020 12:25:41 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 07D2E5205F;
+        Wed,  5 Feb 2020 12:25:41 +0000 (GMT)
+Received: from [9.152.99.235] (unknown [9.152.99.235])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8E8FA52051;
+        Wed,  5 Feb 2020 12:25:40 +0000 (GMT)
+Reply-To: mimu@linux.ibm.com
+Subject: Re: [RFCv2 15/37] KVM: s390: protvirt: Implement interruption
+ injection
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
 Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
         KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [RFCv2 16/37] KVM: s390: protvirt: Add SCLP interrupt handling
-Message-ID: <20200205132259.75521fad.cohuck@redhat.com>
-In-Reply-To: <20200203131957.383915-17-borntraeger@de.ibm.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
-        <20200203131957.383915-17-borntraeger@de.ibm.com>
-Organization: Red Hat GmbH
+ <20200203131957.383915-16-borntraeger@de.ibm.com>
+ <20200205123133.34ac71a2.cohuck@redhat.com>
+ <512413a4-196e-5acb-9583-561c061e40ee@linux.ibm.com>
+ <20200205131146.611a0d78.cohuck@redhat.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+Organization: IBM
+Date:   Wed, 5 Feb 2020 13:26:52 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200205131146.611a0d78.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-TM-AS-GCONF: 00
+x-cbid: 20020512-0008-0000-0000-0000034FEC90
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20020512-0009-0000-0000-00004A707CD7
+Message-Id: <d5878d81-38c5-3147-0da4-573e56610c9c@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-05_03:2020-02-04,2020-02-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 mlxscore=0 phishscore=0 malwarescore=0 priorityscore=1501
+ mlxlogscore=563 suspectscore=0 bulkscore=0 adultscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002050100
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  3 Feb 2020 08:19:36 -0500
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> The sclp interrupt is kind of special. The ultravisor polices that we
-> do not inject and sclp interrupt with payload if no sccb is outstanding.
-> On the other hand we have "asynchronous" event interrupts, e.g. for
-> console input.
-> We separate both variants into sclp interrupt and sclp event interrupt.
-> The sclp interrupt is masked until a previous servc instruction has
-> finished (sie exit 108).
+
+On 05.02.20 13:11, Cornelia Huck wrote:
+> On Wed, 5 Feb 2020 12:46:39 +0100
+> Michael Mueller <mimu@linux.ibm.com> wrote:
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_host.h |  6 ++-
->  arch/s390/kvm/intercept.c        | 25 +++++++++
->  arch/s390/kvm/interrupt.c        | 92 ++++++++++++++++++++++++++------
->  arch/s390/kvm/kvm-s390.c         |  2 +
->  4 files changed, 108 insertions(+), 17 deletions(-)
+>> On 05.02.20 12:31, Cornelia Huck wrote:
+>>> On Mon,  3 Feb 2020 08:19:35 -0500
+>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>>    
+>>>> From: Michael Mueller <mimu@linux.ibm.com>
+>>>>
+>>>> The patch implements interruption injection for the following
+>>>> list of interruption types:
+>>>>
+>>>>     - I/O
+>>>>       __deliver_io (III)
+>>>>
+>>>>     - External
+>>>>       __deliver_cpu_timer (IEI)
+>>>>       __deliver_ckc (IEI)
+>>>>       __deliver_emergency_signal (IEI)
+>>>>       __deliver_external_call (IEI)
+>>>>
+>>>>     - cpu restart
+>>>>       __deliver_restart (IRI)
+>>>
+>>> Hm... what do 'III', 'IEI', and 'IRI' stand for?
+>>
+>> that's the kind of interruption injection being used:
+>>
+>> inject io interruption
+>> inject external interruption
+>> inject restart interruption
 > 
+> So, maybe make this:
+> 
+> - I/O (uses inject io interruption)
+>    __ deliver_io
+> 
+> - External (uses inject external interruption)
+> (and so on)
+> 
+> I find using the acronyms without explanation very confusing.
 
-> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-> index 4b3fbbde1674..c22214967214 100644
-> --- a/arch/s390/kvm/intercept.c
-> +++ b/arch/s390/kvm/intercept.c
-> @@ -444,8 +444,33 @@ static int handle_operexc(struct kvm_vcpu *vcpu)
->  	return kvm_s390_inject_program_int(vcpu, PGM_OPERATION);
->  }
->  
-> +static int handle_pv_sclp(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_s390_float_interrupt *fi = &vcpu->kvm->arch.float_int;
-> +
-> +	spin_lock(&fi->lock);
-> +	/*
-> +	 * 2 cases:
-> +	 * a: an sccb answering interrupt was already pending or in flight.
-> +	 *    As the sccb value is not used we can simply set some more bits
-> +	 *    and make sure that we deliver something
+Make a guess from where they are coming...
 
-The sccb value is not used because the firmware handles this?
+Christian, would you please update the description accordingly.
 
-> +	 * b: an error sccb interrupt needs to be injected so we also inject
-> +	 *    something and let firmware do the right thing.
-> +	 * This makes sure, that both errors and real sccb returns will only
-> +	 * be delivered when we are unmasked.
 
-What makes this sure? That we only unmask here?
+   - I/O (uses inject io interruption)
+     __deliver_io
 
-> +	 */
-> +	fi->srv_signal.ext_params |= 0x43000;
-> +	set_bit(IRQ_PEND_EXT_SERVICE, &fi->pending_irqs);
-> +	clear_bit(IRQ_PEND_EXT_SERVICE, &fi->masked_irqs);
-> +	spin_unlock(&fi->lock);
-> +	return 0;
-> +}
-> +
->  static int handle_pv_not(struct kvm_vcpu *vcpu)
->  {
-> +	if (vcpu->arch.sie_block->ipa == 0xb220)
-> +		return handle_pv_sclp(vcpu);
-> +
->  	return handle_instruction(vcpu);
->  }
->  
+   - External (uses inject external interruption)
+     __deliver_cpu_timer
+     __deliver_ckc
+     __deliver_emergency_signal
+     __deliver_external_call
+
+   - cpu restart (uses inject restart interruption)
+     __deliver_restart
+
+
+
+thanks
+
+Michael
+
+> 
+>>
+>>>    
+>>>>
+>>>> The service interrupt is handled in a followup patch.
+>>>>
+>>>> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>> [fixes]
+>>>> ---
+>>>>    arch/s390/include/asm/kvm_host.h |  8 +++
+>>>>    arch/s390/kvm/interrupt.c        | 93 ++++++++++++++++++++++----------
+>>>>    2 files changed, 74 insertions(+), 27 deletions(-)
+> 
 
