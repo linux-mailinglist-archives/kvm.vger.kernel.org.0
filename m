@@ -2,82 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 304641533BD
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:21:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B354D1533CC
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:23:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727466AbgBEPV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 10:21:29 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47327 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726661AbgBEPV3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 10:21:29 -0500
+        id S1726973AbgBEPWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 10:22:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51718 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726359AbgBEPWx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 10:22:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580916088;
+        s=mimecast20190719; t=1580916172;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jbAqmvDp8yZagHd04oR8JJifOFLKAv/diEDneSy9GDE=;
-        b=G/MrFBC1kkk0BvzIC4hjsEgkEQZdtmcb4UkZPmtexL7n4NaW6zv0S5BiaBPO2k613ukh7P
-        oPv3yvrA4wz+bc92K/S1YnMqsH48Uo3PgUWJeApA9uZBXX2dzWuByi/VBZpFoADtVHcXv8
-        LSEgIriHloDIcuPcxwcEwjfIkLo8KlA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-PNEmAhXROk-1L1ZZvSTxHA-1; Wed, 05 Feb 2020 10:15:20 -0500
-X-MC-Unique: PNEmAhXROk-1L1ZZvSTxHA-1
-Received: by mail-wm1-f70.google.com with SMTP id d4so954655wmd.7
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 07:15:18 -0800 (PST)
+        bh=vKHNNfcl+r6URdhvtsRg9I1PCC+GPUyhu2TKclBNVok=;
+        b=R37HaykiseAX+83N6o7BC5LaHGImjvlRcVfLQ/pyY/xdAwYRnXpzjreL1ILs4dU3r8qejt
+        FahZ9onjttYwR5zNod0rY6D2UkfON3FoFPDVhDB3WEAl9gzadZHenkfQRt48hBaeMn5LEo
+        NWnROMBUstWKqqN2Pid0SO9ofOxDvBU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-p_nfrLSvN_e4aksm_cIMXg-1; Wed, 05 Feb 2020 10:22:50 -0500
+X-MC-Unique: p_nfrLSvN_e4aksm_cIMXg-1
+Received: by mail-wr1-f72.google.com with SMTP id d8so1332745wrq.12
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 07:22:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jbAqmvDp8yZagHd04oR8JJifOFLKAv/diEDneSy9GDE=;
-        b=ipw6xsZ0QIQiA+0WhWYsM4Y4LyDQXKJOYvtrjulwBZwv0tudnvvscyu0nfPYO1C8RT
-         WSscu7MujHOjt8MWcLZAa3onepEuiJsqaNuFpnd6Zigot+wfkODS3G0wQw9E0NNarKwZ
-         HHCVa8sAborQJ3LqcWle4ut1ALrVRM3kvVOblTbiwAZy0do/Y4d6m+DzraVt/Lw5YtS9
-         YMWUc8+aytLGJzYt7FkZx3SH1YQ/fc5m7W/clcq8j7oI5bWvuW6El7pya5hIBSdMyJea
-         SSe+tvpOmFFGDumu7gIkLlR2NKHFHtSoNqyJvWcGlGVyWYgXM2BwGRvCK2eEsMhJlwTW
-         nn7Q==
-X-Gm-Message-State: APjAAAVZ601wG/0P7YYKgG0Q6V8RcZHaBc4aHtpQ8gDJ5gvlTqMG/MzK
-        1AIJQJQzX3gN0iAZUT888fIXuWRDGx5KQ4+dfTWfAfKA3rnhk8OJ0InX2X9GtwAuJ2N4aRu4lqo
-        a1/z52kbbNmU6
-X-Received: by 2002:adf:cd03:: with SMTP id w3mr30032416wrm.191.1580915718014;
-        Wed, 05 Feb 2020 07:15:18 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxvLhdRSWgM2maQ+SNfiAl7MjWC1I05ytVdRYhXthbKcs88COY/fnHNUifaodKxjXoLAz44eQ==
-X-Received: by 2002:adf:cd03:: with SMTP id w3mr30032401wrm.191.1580915717856;
-        Wed, 05 Feb 2020 07:15:17 -0800 (PST)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id x14sm8059396wmj.42.2020.02.05.07.15.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Feb 2020 07:15:17 -0800 (PST)
-Subject: Re: [GIT PULL 0/7] KVM: s390: Fixes and cleanups for 5.6
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-References: <20200131150348.73360-1-borntraeger@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cea0211f-5c7c-3838-d682-955e0505c8a4@redhat.com>
-Date:   Wed, 5 Feb 2020 16:15:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=vKHNNfcl+r6URdhvtsRg9I1PCC+GPUyhu2TKclBNVok=;
+        b=nJeyD3+lZBsMMV2M2IqMDyWZ3F8JEMXbvU9BrRkBqCe483h2BbuioIGfCFhPF82Az0
+         5Ps1XL1D39CdwHjGassxyYXjhdCociw35dk8ty2J1QW4J8CaQSh0p35Fv46aE1JbhPjt
+         vxdnNd37MSyUbFWK3nXUIT5YhTa0/QEjLSZeG9v8ErvRqUkvWGeTfke0AHMexpbF71qU
+         Q+1U/dzYE7bAG/v0PUUiMSWGNyiDB0VnTp8p+yJoRtFiRqtb/TQ08QvL+4mjX9SlQpB8
+         bCsKS2QvHKLT9Z7tNQyy25i9f4i9j8VVd4k4AFkx0O4W4sg5IgG7PIH7lUFHQlH1AnLq
+         2H7w==
+X-Gm-Message-State: APjAAAW3zLnC5/yKmydb951HTapoeaYOh6wAUUnKIiR1wJSInrJS0lKt
+        UXrTbhK0yqWlmZcQqVTKdoZ1HYEidETIjvcpL5IUXGyOQq78QwnAYnkAwAgAOn3yNZWhsAeuKNL
+        lKdaj/uyj/M7j
+X-Received: by 2002:a1c:48c1:: with SMTP id v184mr6184622wma.5.1580916169775;
+        Wed, 05 Feb 2020 07:22:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz1P6wGbDoWJ9U0FwfPyYZ8Yoaq4xJQ1R49Y2GfyL0piQVH3Iy3Xv1yALh03UKBJFamJjwwVQ==
+X-Received: by 2002:a1c:48c1:: with SMTP id v184mr6184584wma.5.1580916169331;
+        Wed, 05 Feb 2020 07:22:49 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id i204sm8952711wma.44.2020.02.05.07.22.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2020 07:22:48 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 04/26] KVM: x86: Add a kvm_x86_ops hook to query virtualized MSR support
+In-Reply-To: <20200205145923.GC4877@linux.intel.com>
+References: <20200129234640.8147-1-sean.j.christopherson@intel.com> <20200129234640.8147-5-sean.j.christopherson@intel.com> <87eev9ksqy.fsf@vitty.brq.redhat.com> <20200205145923.GC4877@linux.intel.com>
+Date:   Wed, 05 Feb 2020 16:22:48 +0100
+Message-ID: <8736bpkqif.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200131150348.73360-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/01/20 16:03, Christian Borntraeger wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.6-1
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-Pulled, thanks.
+> On Wed, Feb 05, 2020 at 03:34:29PM +0100, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>> 
+>> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>
+> Stooooooop!  Everything from this point on is obsoleted by kvm_cpu_caps!
+>
 
-Paolo
+Oops, this was only a week old series! Patches are rottening fast
+nowadays!
+
+-- 
+Vitaly
 
