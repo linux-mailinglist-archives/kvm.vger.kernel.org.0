@@ -2,34 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 85E221535C5
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 18:00:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9A271535C7
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 18:01:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727390AbgBERAt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 12:00:49 -0500
-Received: from foss.arm.com ([217.140.110.172]:49686 "EHLO foss.arm.com"
+        id S1727511AbgBERBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 12:01:00 -0500
+Received: from foss.arm.com ([217.140.110.172]:49696 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726534AbgBERAt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 12:00:49 -0500
+        id S1727303AbgBERBA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 12:01:00 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E5FB5328;
-        Wed,  5 Feb 2020 09:00:48 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9FF8C1FB;
+        Wed,  5 Feb 2020 09:00:59 -0800 (PST)
 Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E387B3F52E;
-        Wed,  5 Feb 2020 09:00:47 -0800 (PST)
-Date:   Wed, 5 Feb 2020 17:00:45 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90A243F52E;
+        Wed,  5 Feb 2020 09:00:58 -0800 (PST)
+Date:   Wed, 5 Feb 2020 17:00:56 +0000
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     kvm@vger.kernel.org, will@kernel.org,
         julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
         lorenzo.pieralisi@arm.com, maz@kernel.org
-Subject: Re: [PATCH v2 kvmtool 18/30] hw/vesa: Set the size for BAR 0
-Message-ID: <20200205170045.4022a566@donnerap.cambridge.arm.com>
-In-Reply-To: <8f66615a-b771-1d6c-f794-182a5fd1d07d@arm.com>
+Subject: Re: [PATCH v2 kvmtool 20/30] pci: Add helpers for BAR values and
+ memory/IO space access
+Message-ID: <20200205170056.3bfdf054@donnerap.cambridge.arm.com>
+In-Reply-To: <20200123134805.1993-21-alexandru.elisei@arm.com>
 References: <20200123134805.1993-1-alexandru.elisei@arm.com>
-        <20200123134805.1993-19-alexandru.elisei@arm.com>
-        <20200203122049.05483484@donnerap.cambridge.arm.com>
-        <8f66615a-b771-1d6c-f794-182a5fd1d07d@arm.com>
+        <20200123134805.1993-21-alexandru.elisei@arm.com>
 Organization: ARM
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
@@ -40,49 +39,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 3 Feb 2020 12:27:55 +0000
+On Thu, 23 Jan 2020 13:47:55 +0000
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-> Hi Andre,
-> 
-> On 2/3/20 12:20 PM, Andre Przywara wrote:
-> > On Thu, 23 Jan 2020 13:47:53 +0000
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> >  
-> >> BAR 0 is an I/O BAR and is registered as an ioport region. Let's set its
-> >> size, so a guest can actually use it.  
-> > Well, the whole I/O bar emulates as RAZ/WI, so I would be curious how the guest would actually use it, but specifying the size is surely a good thing, so:  
-> 
-> Yeah, you're right, I was thinking about ARM where ioport are MMIO and you need to
-> map those address. I'll remove the part about the guest being able to actually use
-> it in the next iteration of the series.. Is it OK if I keep your Reviewed-by?
+Hi,
 
-Sure, as I mentioned the patch itself is fine.
+> We're going to be checking the BAR type, the address written to it and
+> if access to memory or I/O space is enabled quite often when we add
+> support for reasignable BARs, add helpers for it.
 
-Thanks,
+I am not a particular fan of these double underscores inside identifiers, but I guess that is too late now, since it's already all over the place. So:
+
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
 Andre.
 
-> >    
-> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>  
-> > Reviewed-by: Andre Przywara <andre.przywara>
-> >
-> > Cheers,
-> > Andre
-> >  
-> >> ---
-> >>  hw/vesa.c | 1 +
-> >>  1 file changed, 1 insertion(+)
-> >>
-> >> diff --git a/hw/vesa.c b/hw/vesa.c
-> >> index a665736a76d7..e988c0425946 100644
-> >> --- a/hw/vesa.c
-> >> +++ b/hw/vesa.c
-> >> @@ -70,6 +70,7 @@ struct framebuffer *vesa__init(struct kvm *kvm)
-> >>  
-> >>  	vesa_base_addr			= (u16)r;
-> >>  	vesa_pci_device.bar[0]		= cpu_to_le32(vesa_base_addr | PCI_BASE_ADDRESS_SPACE_IO);
-> >> +	vesa_pci_device.bar_size[0]	= PCI_IO_SIZE;
-> >>  	r = device__register(&vesa_device);
-> >>  	if (r < 0)
-> >>  		return ERR_PTR(r);  
+> ---
+>  include/kvm/pci.h | 48 +++++++++++++++++++++++++++++++++++++++++++++++
+>  pci.c             |  2 +-
+>  2 files changed, 49 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
+> index ccb155e3e8fe..235cd82fff3c 100644
+> --- a/include/kvm/pci.h
+> +++ b/include/kvm/pci.h
+> @@ -5,6 +5,7 @@
+>  #include <linux/kvm.h>
+>  #include <linux/pci_regs.h>
+>  #include <endian.h>
+> +#include <stdbool.h>
+>  
+>  #include "kvm/devices.h"
+>  #include "kvm/msi.h"
+> @@ -161,4 +162,51 @@ void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data,
+>  
+>  void *pci_find_cap(struct pci_device_header *hdr, u8 cap_type);
+>  
+> +static inline bool __pci__memory_space_enabled(u16 command)
+> +{
+> +	return command & PCI_COMMAND_MEMORY;
+> +}
+> +
+> +static inline bool pci__memory_space_enabled(struct pci_device_header *pci_hdr)
+> +{
+> +	return __pci__memory_space_enabled(pci_hdr->command);
+> +}
+> +
+> +static inline bool __pci__io_space_enabled(u16 command)
+> +{
+> +	return command & PCI_COMMAND_IO;
+> +}
+> +
+> +static inline bool pci__io_space_enabled(struct pci_device_header *pci_hdr)
+> +{
+> +	return __pci__io_space_enabled(pci_hdr->command);
+> +}
+> +
+> +static inline bool __pci__bar_is_io(u32 bar)
+> +{
+> +	return bar & PCI_BASE_ADDRESS_SPACE_IO;
+> +}
+> +
+> +static inline bool pci__bar_is_io(struct pci_device_header *pci_hdr, int bar_num)
+> +{
+> +	return __pci__bar_is_io(pci_hdr->bar[bar_num]);
+> +}
+> +
+> +static inline bool pci__bar_is_memory(struct pci_device_header *pci_hdr, int bar_num)
+> +{
+> +	return !pci__bar_is_io(pci_hdr, bar_num);
+> +}
+> +
+> +static inline u32 __pci__bar_address(u32 bar)
+> +{
+> +	if (__pci__bar_is_io(bar))
+> +		return bar & PCI_BASE_ADDRESS_IO_MASK;
+> +	return bar & PCI_BASE_ADDRESS_MEM_MASK;
+> +}
+> +
+> +static inline u32 pci__bar_address(struct pci_device_header *pci_hdr, int bar_num)
+> +{
+> +	return __pci__bar_address(pci_hdr->bar[bar_num]);
+> +}
+> +
+>  #endif /* KVM__PCI_H */
+> diff --git a/pci.c b/pci.c
+> index b6892d974c08..4f7b863298f6 100644
+> --- a/pci.c
+> +++ b/pci.c
+> @@ -185,7 +185,7 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
+>  	 * size, it will write the address back.
+>  	 */
+>  	if (bar < 6) {
+> -		if (pci_hdr->bar[bar] & PCI_BASE_ADDRESS_SPACE_IO)
+> +		if (pci__bar_is_io(pci_hdr, bar))
+>  			mask = (u32)PCI_BASE_ADDRESS_IO_MASK;
+>  		else
+>  			mask = (u32)PCI_BASE_ADDRESS_MEM_MASK;
 
