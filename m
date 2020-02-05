@@ -2,65 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D1F4A1533E7
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:32:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C03221533F6
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:35:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726740AbgBEPcT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 10:32:19 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:10154 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726416AbgBEPcT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 10:32:19 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 43AB3AA846F77A695CEE;
-        Wed,  5 Feb 2020 23:32:11 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Wed, 5 Feb 2020
- 23:32:04 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <hpa@zytor.com>
-CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH] KVM: vmx: delete meaningless vmx_decache_cr0_guest_bits() declaration
-Date:   Wed, 5 Feb 2020 23:33:53 +0800
-Message-ID: <1580916833-28905-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727500AbgBEPfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 10:35:09 -0500
+Received: from mga04.intel.com ([192.55.52.120]:8220 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726416AbgBEPfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 10:35:09 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2020 07:35:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,406,1574150400"; 
+   d="scan'208";a="431903663"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga006.fm.intel.com with ESMTP; 05 Feb 2020 07:35:08 -0800
+Date:   Wed, 5 Feb 2020 07:35:08 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 04/26] KVM: x86: Add a kvm_x86_ops hook to query
+ virtualized MSR support
+Message-ID: <20200205153508.GD4877@linux.intel.com>
+References: <20200129234640.8147-1-sean.j.christopherson@intel.com>
+ <20200129234640.8147-5-sean.j.christopherson@intel.com>
+ <87eev9ksqy.fsf@vitty.brq.redhat.com>
+ <20200205145923.GC4877@linux.intel.com>
+ <8736bpkqif.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8736bpkqif.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
+On Wed, Feb 05, 2020 at 04:22:48PM +0100, Vitaly Kuznetsov wrote:
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> 
+> > On Wed, Feb 05, 2020 at 03:34:29PM +0100, Vitaly Kuznetsov wrote:
+> >> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> >> 
+> >> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >
+> > Stooooooop!  Everything from this point on is obsoleted by kvm_cpu_caps!
+> >
+> 
+> Oops, this was only a week old series! Patches are rottening fast
+> nowadays!
 
-The function vmx_decache_cr0_guest_bits() is only called below its
-implementation. So this is meaningless and should be removed.
+Sorry :-(
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
- arch/x86/kvm/vmx/vmx.c | 2 --
- 1 file changed, 2 deletions(-)
+I dug deeper into the CPUID crud after posting this series because I really
+didn't like the end result for vendor-specific leafs, and ended up coming
+up with (IMO) a much more elegant solution.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 678edbd6e278..061fefc30ecc 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1428,8 +1428,6 @@ static bool emulation_required(struct kvm_vcpu *vcpu)
- 	return emulate_invalid_guest_state && !guest_state_valid(vcpu);
- }
- 
--static void vmx_decache_cr0_guest_bits(struct kvm_vcpu *vcpu);
--
- unsigned long vmx_get_rflags(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
--- 
-2.19.1
+https://lkml.kernel.org/r/20200201185218.24473-1-sean.j.christopherson@intel.com/
 
+or on patchwork
+
+https://patchwork.kernel.org/cover/11361361/
