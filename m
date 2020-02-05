@@ -2,44 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B7D0153871
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 19:45:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44E2E15387C
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 19:52:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727455AbgBESp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 13:45:29 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57286 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727043AbgBESp3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 13:45:29 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015IiEK2033587
-        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 13:45:28 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhmm24wq-1
+        id S1727104AbgBESwV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 13:52:21 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34700 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726822AbgBESwU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 13:52:20 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015Ip87I058580
+        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 13:52:19 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhn33sgx-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 13:45:28 -0500
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 13:52:19 -0500
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 5 Feb 2020 18:45:26 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Wed, 5 Feb 2020 18:52:17 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 5 Feb 2020 18:45:24 -0000
+        Wed, 5 Feb 2020 18:52:16 -0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015IjMid51904642
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015IqEN458327146
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Feb 2020 18:45:22 GMT
+        Wed, 5 Feb 2020 18:52:14 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C639A4051;
-        Wed,  5 Feb 2020 18:45:22 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 89218A4057;
+        Wed,  5 Feb 2020 18:52:14 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27D93A4053;
-        Wed,  5 Feb 2020 18:45:22 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 10114A4051;
+        Wed,  5 Feb 2020 18:52:14 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.26.20])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  5 Feb 2020 18:45:22 +0000 (GMT)
-Subject: Re: [RFCv2 20/37] KVM: s390: protvirt: Add new gprs location handling
+        Wed,  5 Feb 2020 18:52:13 +0000 (GMT)
+Subject: Re: [RFCv2 24/37] KVM: s390: protvirt: Write sthyi data to
+ instruction data area
 To:     Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -48,8 +49,8 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-21-borntraeger@de.ibm.com>
- <a031e057-65f4-7288-63e4-cfa19b37707c@redhat.com>
+ <20200203131957.383915-25-borntraeger@de.ibm.com>
+ <5aed683a-3b65-f65a-0259-029170c23e6a@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -94,26 +95,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 5 Feb 2020 19:45:21 +0100
+Date:   Wed, 5 Feb 2020 19:52:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <a031e057-65f4-7288-63e4-cfa19b37707c@redhat.com>
+In-Reply-To: <5aed683a-3b65-f65a-0259-029170c23e6a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020518-0020-0000-0000-000003A74FDB
+x-cbid: 20020518-0028-0000-0000-000003D7BB07
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020518-0021-0000-0000-000021FF1BE8
-Message-Id: <72d1583c-b4bc-e8c6-4b66-0f32f3898ee6@de.ibm.com>
+x-cbparentid: 20020518-0029-0000-0000-0000249C1A95
+Message-Id: <b884622b-aed4-446b-a99f-363c6bcf7939@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-05_06:2020-02-04,2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=930 bulkscore=0
- impostorscore=0 mlxscore=0 priorityscore=1501 clxscore=1015 phishscore=0
- malwarescore=0 lowpriorityscore=0 suspectscore=0 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002050142
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 suspectscore=2 phishscore=0 clxscore=1015
+ adultscore=0 mlxlogscore=999 bulkscore=0 spamscore=0 lowpriorityscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002050143
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -121,75 +122,56 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 05.02.20 12:18, Thomas Huth wrote:
+On 05.02.20 13:09, Thomas Huth wrote:
 > On 03/02/2020 14.19, Christian Borntraeger wrote:
 >> From: Janosch Frank <frankja@linux.ibm.com>
 >>
->> Guest registers for protected guests are stored at offset 0x380.
+>> STHYI data has to go through the bounce buffer.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>  arch/s390/include/asm/kvm_host.h |  4 +++-
->>  arch/s390/kvm/kvm-s390.c         | 11 +++++++++++
->>  2 files changed, 14 insertions(+), 1 deletion(-)
+>>  arch/s390/kvm/intercept.c | 15 ++++++++++-----
+>>  1 file changed, 10 insertions(+), 5 deletions(-)
 >>
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->> index f5ca53574406..125511ec6eb0 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -343,7 +343,9 @@ struct kvm_s390_itdb {
->>  struct sie_page {
->>  	struct kvm_s390_sie_block sie_block;
->>  	struct mcck_volatile_info mcck_info;	/* 0x0200 */
->> -	__u8 reserved218[1000];		/* 0x0218 */
->> +	__u8 reserved218[360];		/* 0x0218 */
->> +	__u64 pv_grregs[16];		/* 0x380 */
-> 
-> s/0x380/0x0380/ to align with the other comments
-
-Ack. 
-> 
->> +	__u8 reserved400[512];
-> 
-> Maybe add a /* 0x0400 */ comment ... though it's obvious from the name
-> already.
-
-ack
-> 
->>  	struct kvm_s390_itdb itdb;	/* 0x0600 */
->>  	__u8 reserved700[2304];		/* 0x0700 */
->>  };
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 39bf39a10cf2..1945180b857a 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -3996,6 +3996,7 @@ static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
->>  static int __vcpu_run(struct kvm_vcpu *vcpu)
->>  {
->>  	int rc, exit_reason;
->> +	struct sie_page *sie_page = (struct sie_page *)vcpu->arch.sie_block;
+>> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+>> index 4b1effa44e41..06d1fa83ef4c 100644
+>> --- a/arch/s390/kvm/intercept.c
+>> +++ b/arch/s390/kvm/intercept.c
+>> @@ -392,7 +392,7 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
+>>  		goto out;
+>>  	}
 >>  
->>  	/*
->>  	 * We try to hold kvm->srcu during most of vcpu_run (except when run-
->> @@ -4017,8 +4018,18 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->>  		guest_enter_irqoff();
->>  		__disable_cpu_timer_accounting(vcpu);
->>  		local_irq_enable();
+>> -	if (addr & ~PAGE_MASK)
+>> +	if (!kvm_s390_pv_is_protected(vcpu->kvm) && (addr & ~PAGE_MASK))
+>>  		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+>>  
+>>  	sctns = (void *)get_zeroed_page(GFP_KERNEL);
+>> @@ -403,10 +403,15 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
+>>  
+>>  out:
+>>  	if (!cc) {
+>> -		r = write_guest(vcpu, addr, reg2, sctns, PAGE_SIZE);
+>> -		if (r) {
+>> -			free_page((unsigned long)sctns);
+>> -			return kvm_s390_inject_prog_cond(vcpu, r);
 >> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
->> +			memcpy(sie_page->pv_grregs,
->> +			       vcpu->run->s.regs.gprs,
->> +			       sizeof(sie_page->pv_grregs));
->> +		}
->>  		exit_reason = sie64a(vcpu->arch.sie_block,
->>  				     vcpu->run->s.regs.gprs);
->> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
->> +			memcpy(vcpu->run->s.regs.gprs,
->> +			       sie_page->pv_grregs,
->> +			       sizeof(sie_page->pv_grregs));
->> +		}
->>  		local_irq_disable();
->>  		__enable_cpu_timer_accounting(vcpu);
->>  		guest_exit_irqoff();
+>> +			memcpy((void *)(vcpu->arch.sie_block->sidad & PAGE_MASK), sctns,
+> 
+> I think it would look nicer with sida_origin() here.
+
+ack.
+
+> 
+>> +			       PAGE_SIZE);
+>> +		} else {
+>> +			r = write_guest(vcpu, addr, reg2, sctns, PAGE_SIZE);
+>> +			if (r) {
+>> +				free_page((unsigned long)sctns);
+>> +				return kvm_s390_inject_prog_cond(vcpu, r);
+>> +			}
+>>  		}
+>>  	}
+>>  
 >>
 > 
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
