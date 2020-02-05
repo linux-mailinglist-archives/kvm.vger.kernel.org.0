@@ -2,62 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92C6E1524A8
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 03:04:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58DD21524AD
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 03:06:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727794AbgBECEb convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 4 Feb 2020 21:04:31 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2940 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727714AbgBECEa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Feb 2020 21:04:30 -0500
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.56])
-        by Forcepoint Email with ESMTP id CDED2E6D00C4B87923D3;
-        Wed,  5 Feb 2020 10:04:28 +0800 (CST)
-Received: from dggeme713-chm.china.huawei.com (10.1.199.109) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 5 Feb 2020 10:04:28 +0800
-Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme713-chm.china.huawei.com (10.1.199.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Wed, 5 Feb 2020 10:04:28 +0800
-Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
- dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Wed, 5 Feb 2020 10:04:28 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Eric Auger <eric.auger@redhat.com>
-CC:     "thuth@redhat.com" <thuth@redhat.com>,
-        "drjones@redhat.com" <drjones@redhat.com>,
-        "wei.huang2@amd.com" <wei.huang2@amd.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>
-Subject: Re: [PATCH v3 3/3] selftests: KVM: SVM: Add vmcall test
-Thread-Topic: [PATCH v3 3/3] selftests: KVM: SVM: Add vmcall test
-Thread-Index: AdXbyB4zr7+qb6A1sUeJJzyTAcTB5w==
-Date:   Wed, 5 Feb 2020 02:04:28 +0000
-Message-ID: <2fb49b67f85740649895a2482a17625d@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.158]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727879AbgBECGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 21:06:09 -0500
+Received: from mga11.intel.com ([192.55.52.93]:32641 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727714AbgBECGI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Feb 2020 21:06:08 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Feb 2020 18:06:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,404,1574150400"; 
+   d="scan'208";a="249555008"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.74])
+  by orsmga002.jf.intel.com with ESMTP; 04 Feb 2020 18:06:03 -0800
+Date:   Wed, 5 Feb 2020 10:05:55 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        shahafs@mellanox.com, jgg@mellanox.com, rob.miller@broadcom.com,
+        haotian.wang@sifive.com, eperezma@redhat.com, lulu@redhat.com,
+        parav@mellanox.com, rdunlap@infradead.org, hch@infradead.org,
+        jiri@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com,
+        maxime.coquelin@redhat.com, lingshan.zhu@intel.com,
+        dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
+Subject: Re: [PATCH] vhost: introduce vDPA based backend
+Message-ID: <20200205020555.GA369236@___>
+References: <20200131033651.103534-1-tiwei.bie@intel.com>
+ <7aab2892-bb19-a06a-a6d3-9c28bc4c3400@redhat.com>
+ <20200204005306-mutt-send-email-mst@kernel.org>
+ <cf485e7f-46e3-20d3-8452-e3058b885d0a@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cf485e7f-46e3-20d3-8452-e3058b885d0a@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Eric Auger <eric.auger@redhat.com> writes:
-> L2 guest calls vmcall and L1 checks the exit status does correspond.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Tue, Feb 04, 2020 at 02:46:16PM +0800, Jason Wang wrote:
+> On 2020/2/4 下午2:01, Michael S. Tsirkin wrote:
+> > On Tue, Feb 04, 2020 at 11:30:11AM +0800, Jason Wang wrote:
+> > > 5) generate diffs of memory table and using IOMMU API to setup the dma
+> > > mapping in this method
+> > Frankly I think that's a bunch of work. Why not a MAP/UNMAP interface?
+> > 
+> 
+> Sure, so that basically VHOST_IOTLB_UPDATE/INVALIDATE I think?
 
-Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
+Do you mean we let userspace to only use VHOST_IOTLB_UPDATE/INVALIDATE
+to do the DMA mapping in vhost-vdpa case? When vIOMMU isn't available,
+userspace will set msg->iova to GPA, otherwise userspace will set
+msg->iova to GIOVA, and vhost-vdpa module will get HPA from msg->uaddr?
 
+Thanks,
+Tiwei
+
+> 
+> Thanks
+> 
+> 
