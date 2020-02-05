@@ -2,96 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03AF01533B1
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:20:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 304641533BD
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:21:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726957AbgBEPUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 10:20:18 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37308 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726534AbgBEPUR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 10:20:17 -0500
-Received: by mail-wm1-f66.google.com with SMTP id f129so3267122wmf.2;
-        Wed, 05 Feb 2020 07:20:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=Eu/czLrqDMFVqxZHLoEa1l5MyCiw1QB7Y2F2E91wwso=;
-        b=b5JgSbc6vwObcogWIFqOdkOezS9kTXNdfyy/tlLf8DObaHOghHX8McPh9K4mcOiOKB
-         85UssOj3VIaD1h+nwh5BdeqmGmJDmS5g4U5wkVdxkPjOHz9YJFxJar3htH96Vt7+ayPU
-         WM6ka3hNGbsAWbiknIrYLmhLGQ9Tn0EZBb8Pg/xdCbEaSSz+IyRJhSLGcLfEbmkhngY0
-         2x6ciCIVfpPBxkOazxKfJoVagfZ7yLz0FGCe/tY3X87XxX/Fx24mHowRqnGy9r3MCW34
-         yLlEPw+vip+6ianwxrIrlL06NBD4Ihg27IkXdJwZzMQoadZLUZOhx6w80Vu+44E5L53+
-         7+ZA==
+        id S1727466AbgBEPV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 10:21:29 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47327 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726661AbgBEPV3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 10:21:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580916088;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jbAqmvDp8yZagHd04oR8JJifOFLKAv/diEDneSy9GDE=;
+        b=G/MrFBC1kkk0BvzIC4hjsEgkEQZdtmcb4UkZPmtexL7n4NaW6zv0S5BiaBPO2k613ukh7P
+        oPv3yvrA4wz+bc92K/S1YnMqsH48Uo3PgUWJeApA9uZBXX2dzWuByi/VBZpFoADtVHcXv8
+        LSEgIriHloDIcuPcxwcEwjfIkLo8KlA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1-PNEmAhXROk-1L1ZZvSTxHA-1; Wed, 05 Feb 2020 10:15:20 -0500
+X-MC-Unique: PNEmAhXROk-1L1ZZvSTxHA-1
+Received: by mail-wm1-f70.google.com with SMTP id d4so954655wmd.7
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 07:15:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=Eu/czLrqDMFVqxZHLoEa1l5MyCiw1QB7Y2F2E91wwso=;
-        b=XyRMYZl/UVvpu1lZmFBEk9bR5OEF+qvKzm7PAcV+XTHLkYKCxV7QGn1Y8LTKYMiWtp
-         BJUA3DaOrlVdUiV1399Xo7lh2RXK2/kTNczUM6Nu3FTflisY8AfE1kMgz30zpuTOAtdV
-         xTpd3OHi4FMXjhxCgf8zkcLc6TTpfb8p//cRLYl+yKs577DpI0cC90OijE9pt68zclD3
-         ib+Esfctre7+sVJedLeQloyJJtkHc4C+7s37XO3CFm6MxysED5vLepZFS3e4dGEtRFGI
-         yqH3sFWkx3kR4A6SMkIz6IuSMVFW1rraTSo6kCOoEULD8mRKZnpd8lR49l2LIiC3o+Uz
-         zcWQ==
-X-Gm-Message-State: APjAAAXTk0LS71sdMpGi3hjsq5Zz7XKme8PegMUqJOA+Dzqxy46w4/oW
-        R9HNm33ueXprBumnDcZrPBCE0EY6
-X-Google-Smtp-Source: APXvYqwuVi7TatktuYrcptCy2OsCtreFpYhjY4vsG4aVYW8c+xoZYJfb6LlcgJJA4tkEcMtI/fcZ8A==
-X-Received: by 2002:a1c:7c08:: with SMTP id x8mr6582758wmc.106.1580915630238;
-        Wed, 05 Feb 2020 07:13:50 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id c15sm176452wrt.1.2020.02.05.07.13.49
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 05 Feb 2020 07:13:49 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jbAqmvDp8yZagHd04oR8JJifOFLKAv/diEDneSy9GDE=;
+        b=ipw6xsZ0QIQiA+0WhWYsM4Y4LyDQXKJOYvtrjulwBZwv0tudnvvscyu0nfPYO1C8RT
+         WSscu7MujHOjt8MWcLZAa3onepEuiJsqaNuFpnd6Zigot+wfkODS3G0wQw9E0NNarKwZ
+         HHCVa8sAborQJ3LqcWle4ut1ALrVRM3kvVOblTbiwAZy0do/Y4d6m+DzraVt/Lw5YtS9
+         YMWUc8+aytLGJzYt7FkZx3SH1YQ/fc5m7W/clcq8j7oI5bWvuW6El7pya5hIBSdMyJea
+         SSe+tvpOmFFGDumu7gIkLlR2NKHFHtSoNqyJvWcGlGVyWYgXM2BwGRvCK2eEsMhJlwTW
+         nn7Q==
+X-Gm-Message-State: APjAAAVZ601wG/0P7YYKgG0Q6V8RcZHaBc4aHtpQ8gDJ5gvlTqMG/MzK
+        1AIJQJQzX3gN0iAZUT888fIXuWRDGx5KQ4+dfTWfAfKA3rnhk8OJ0InX2X9GtwAuJ2N4aRu4lqo
+        a1/z52kbbNmU6
+X-Received: by 2002:adf:cd03:: with SMTP id w3mr30032416wrm.191.1580915718014;
+        Wed, 05 Feb 2020 07:15:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxvLhdRSWgM2maQ+SNfiAl7MjWC1I05ytVdRYhXthbKcs88COY/fnHNUifaodKxjXoLAz44eQ==
+X-Received: by 2002:adf:cd03:: with SMTP id w3mr30032401wrm.191.1580915717856;
+        Wed, 05 Feb 2020 07:15:17 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id x14sm8059396wmj.42.2020.02.05.07.15.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2020 07:15:17 -0800 (PST)
+Subject: Re: [GIT PULL 0/7] KVM: s390: Fixes and cleanups for 5.6
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20200131150348.73360-1-borntraeger@de.ibm.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     dgilbert@redhat.com, jmattson@google.com
-Subject: [PATCH] KVM: SVM: relax conditions for allowing MSR_IA32_SPEC_CTRL accesses
-Date:   Wed,  5 Feb 2020 16:13:48 +0100
-Message-Id: <1580915628-42930-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Message-ID: <cea0211f-5c7c-3838-d682-955e0505c8a4@redhat.com>
+Date:   Wed, 5 Feb 2020 16:15:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20200131150348.73360-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Userspace that does not know about the AMD_IBRS bit might still
-allow the guest to protect itself with MSR_IA32_SPEC_CTRL using
-the Intel SPEC_CTRL bit.  However, svm.c disallows this and will
-cause a #GP in the guest when writing to the MSR.  Fix this by
-loosening the test and allowing the Intel CPUID bit, and in fact
-allow the AMD_STIBP bit as well since it allows writing to
-MSR_IA32_SPEC_CTRL too.
+On 31/01/20 16:03, Christian Borntraeger wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.6-1
 
-Reported-by: Zhiyi Guo <zhguo@redhat.com>
-Analyzed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Analyzed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Pulled, thanks.
 
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index bf0556588ad0..a3e32d61d60c 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -4225,6 +4225,8 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_IA32_SPEC_CTRL:
- 		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_STIBP) &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBRS) &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_SSBD))
- 			return 1;
-@@ -4310,6 +4312,8 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 		break;
- 	case MSR_IA32_SPEC_CTRL:
- 		if (!msr->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_STIBP) &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBRS) &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_SSBD))
- 			return 1;
--- 
-1.8.3.1
+Paolo
 
