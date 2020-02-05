@@ -2,83 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B8AF153259
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 14:58:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 273DE153286
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 15:11:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728106AbgBEN6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 08:58:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32310 "EHLO
+        id S1727843AbgBEOLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 09:11:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28712 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727104AbgBEN6q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 08:58:46 -0500
+        with ESMTP id S1726748AbgBEOLF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 09:11:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580911125;
+        s=mimecast20190719; t=1580911864;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YJfMTUUUyxi1VxzyCVz1DpE8ZQQJQVENAYA2Qdsr+C4=;
-        b=dwLrnXlK25oW+gZJhMnHoe/GUlXiqNZZKJQcS77r5u014ZLYG2XzNp7Ud1HsaLN/ufTiNS
-        dyRd6P46FH5QGkDXWYo5Bd8BqSY0wtenC2Jpy6mx8L/JY1F1sZgwNLb5U1qNPoOgZhEKy1
-        iC/7dMv+4wFgBms8hZl+/5bHH3vxBPU=
+        bh=w4/IAIkLz0D/Z/IjxmMi8dEqQry7xSlVGHBtHnUX7vg=;
+        b=Z1WcrUakHCqJ+6Xe7XtsyRXOwm/JSLTyS7nmmeExkpk3SoTpAdpyy340czNHSNtGMGHG1W
+        6IN6Y81+eEu230c0RB2Q2ubKgNB3M6VH1IJxjkgNIJmGjt7mO7a1YpfwjFLC3f6phjJCLY
+        6TsKMcwg7+xeYKF0grZYuyZhFlPiyVg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-L5PxdEJ5PkSHPDZ0suQfBQ-1; Wed, 05 Feb 2020 08:58:41 -0500
-X-MC-Unique: L5PxdEJ5PkSHPDZ0suQfBQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-261-ugnoM9xKOA6feBUjQwI-mQ-1; Wed, 05 Feb 2020 09:11:00 -0500
+X-MC-Unique: ugnoM9xKOA6feBUjQwI-mQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 589E12EEB;
-        Wed,  5 Feb 2020 13:58:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AFB41336563;
+        Wed,  5 Feb 2020 14:10:58 +0000 (UTC)
 Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6A37419C7F;
-        Wed,  5 Feb 2020 13:58:38 +0000 (UTC)
-Date:   Wed, 5 Feb 2020 06:58:36 -0700
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E01660C05;
+        Wed,  5 Feb 2020 14:10:57 +0000 (UTC)
+Date:   Wed, 5 Feb 2020 07:10:56 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dev@dpdk.org, mtosatti@redhat.com,
-        thomas@monjalon.net, bluca@debian.org, jerinjacobk@gmail.com,
-        bruce.richardson@intel.com, cohuck@redhat.com
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dev@dpdk.org" <dev@dpdk.org>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "thomas@monjalon.net" <thomas@monjalon.net>,
+        "bluca@debian.org" <bluca@debian.org>,
+        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
+        "Richardson, Bruce" <bruce.richardson@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>
 Subject: Re: [RFC PATCH 0/7] vfio/pci: SR-IOV support
-Message-ID: <20200205065836.12308197@x1.home>
-In-Reply-To: <20200205070109.GA18027@infradead.org>
+Message-ID: <20200205071056.101ad3f2@x1.home>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A1ABFE0@SHSMSX104.ccr.corp.intel.com>
 References: <158085337582.9445.17682266437583505502.stgit@gimli.home>
-        <20200205070109.GA18027@infradead.org>
+        <A2975661238FB949B60364EF0F2C25743A1ABFE0@SHSMSX104.ccr.corp.intel.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 4 Feb 2020 23:01:09 -0800
-Christoph Hellwig <hch@infradead.org> wrote:
+On Wed, 5 Feb 2020 07:57:21 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-> On Tue, Feb 04, 2020 at 04:05:34PM -0700, Alex Williamson wrote:
+> Hi Alex,
+> 
+> Silly questions on the background:
+> 
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Wednesday, February 5, 2020 7:06 AM
+> > Subject: [RFC PATCH 0/7] vfio/pci: SR-IOV support
+> > 
+> > There seems to be an ongoing desire to use userspace, vfio-based
+> > drivers for both SR-IOV PF and VF devices.   
+> 
+> Is this series to make PF be bound-able to vfio-pci even SR-IOV is
+> enabled on such PFs? If yes, is it allowed to assign PF to a VM? or
+> it can only be used by userspace applications like DPDK?
+
+No, this series does not change the behavior of vfio-pci with respect
+to probing a PF where VFs are already enabled.  This is still
+disallowed.  I haven't seen a use case that requires this and allowing
+it tends to subvert the restrictions here.  For instance, if an
+existing VF is already in use by a vfio-pci driver, the PF can
+transition from a trusted host driver to an unknown userspace driver.
+
+> > The fundamental issue
+> > with this concept is that the VF is not fully independent of the PF
+> > driver.  Minimally the PF driver might be able to deny service to the
+> > VF, VF data paths might be dependent on the state of the PF device,
+> > or the PF my have some degree of ability to inspect or manipulate the
+> > VF data.  It therefore would seem irresponsible to unleash VFs onto
+> > the system, managed by a user owned PF.
+> > 
 > > We address this in a few ways in this series.  First, we can use a bus
 > > notifier and the driver_override facility to make sure VFs are bound
 > > to the vfio-pci driver by default.  This should eliminate the chance
 > > that a VF is accidentally bound and used by host drivers.  We don't
-> > however remove the ability for a host admin to change this override.  
+> > however remove the ability for a host admin to change this override.
+> > 
+> > The next issue we need to address is how we let userspace drivers
+> > opt-in to this participation with the PF driver.  We do not want an
+> > admin to be able to unwittingly assign one of these VFs to a tenant
+> > that isn't working in collaboration with the PF driver.  We could use
+> > IOMMU grouping, but this seems to push too far towards tightly coupled
+> > PF and VF drivers.  This series introduces a "VF token", implemented
+> > as a UUID, as a shared secret between PF and VF drivers.  The token
+> > needs to be set by the PF driver and used as part of the device
+> > matching by the VF driver.  Provisions in the code also account for
+> > restarting the PF driver with active VF drivers, requiring the PF to
+> > use the current token to re-gain access to the PF.  
 > 
-> That is just such a bad idea.  Using VFs in the host is a perfectly
-> valid use case that you are breaking.
+> How about the scenario in which PF driver is vfio-based userspace
+> driver but VF drivers are mixed. This means not all VFs are bound
+> to vfio-based userspace driver. Is it also supported here? :-)
 
-vfio-pci currently does not allow binding to a PF with VFs enabled and
-does not provide an sriov_configure callback, so it's not possible to
-have VFs on a vfio-pci bound PF.  Therefore I'm not breaking any
-existing use cases.  I'm also not preventing VFs from being used in the
-host, I only set a default driver_override value, which can be replaced
-if a different driver binding is desired.  So I also don't see that I'm
-breaking a usage model here.  I do stand by the idea that VFs sourced
-from a user owned PF should not by default be used in the host (ie.
-autoprobed on device add).  There's a pci-pf-stub driver that can be
-used to create VFs on a PF if no userspace access of the PF is required.
-Thanks,
+It's allowed.  Userspace VF drivers will need to participate in the VF
+token scheme, host drivers may be bound to VFs normally after removing
+the default driver_override.  Thanks,
 
 Alex
 
