@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5630915302C
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 12:52:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B21015302F
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 12:53:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726953AbgBELwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 06:52:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22749 "EHLO
+        id S1726960AbgBELxF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 06:53:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37215 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725385AbgBELwE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 06:52:04 -0500
+        with ESMTP id S1725385AbgBELxF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 06:53:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580903522;
+        s=mimecast20190719; t=1580903584;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=lBPQ5BkJBqpGEGMdfUYLFeLNx5mfOD9d49fcduAvLfs=;
-        b=Tb0ZVBEG8GvMcr15aViQ+Zi7YDMyWvivQKKMCyvj7BQLaT3e8TCxPUSuCqinJSHi1tw3ET
-        gVZ4Qodz2QvWhhIbeoUOfLWxihDia+PYjknR5L0ggB9Kzlv3FG8wiWDoLC6BumVCryuuNC
-        sXcHYym8AO1wD2SdEe7Q1vZmEmSTllc=
+        bh=2BD4Rn4GY5gL6/DUMIfwRE9DP1cwGigflUnx2LtPOH0=;
+        b=DrSpQKPByxAs5VdNSBr3tH1m4yocSKFpCkM12ETxju4pmfPMxFz/UKPS9kMD8VkP6sPWFV
+        DXBT9oJuZHAKTOTDLwWDZmudec7Ivudou1UiVgQDKW71UytC8odgQYmqppnibPVZ9mvxTd
+        yZJu9TGhXQINMdY+zRS0mp7dTkboIDo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-15OPrUM5PzWdXA4dbSMITg-1; Wed, 05 Feb 2020 06:52:01 -0500
-X-MC-Unique: 15OPrUM5PzWdXA4dbSMITg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-106-zHyCyC6kPFia3g9pMXjyjQ-1; Wed, 05 Feb 2020 06:53:00 -0500
+X-MC-Unique: zHyCyC6kPFia3g9pMXjyjQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDD1E100551A;
-        Wed,  5 Feb 2020 11:51:59 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBD24800D54;
+        Wed,  5 Feb 2020 11:52:58 +0000 (UTC)
 Received: from [10.36.116.217] (ovpn-116-217.ams2.redhat.com [10.36.116.217])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E38A5DA2C;
-        Wed,  5 Feb 2020 11:51:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F76919C7F;
+        Wed,  5 Feb 2020 11:52:57 +0000 (UTC)
 Subject: Re: [RFCv2 22/37] KVM: s390: protvirt: handle secure guest prefix
  pages
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -89,16 +89,16 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <8ccf2009-d391-d91b-3088-49e950b94674@redhat.com>
-Date:   Wed, 5 Feb 2020 12:51:57 +0100
+Message-ID: <156a1749-20a6-7fe6-bf1e-79a803b7e628@redhat.com>
+Date:   Wed, 5 Feb 2020 12:52:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
 In-Reply-To: <20200203131957.383915-23-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -106,127 +106,24 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On 03.02.20 14:19, Christian Borntraeger wrote:
 > From: Janosch Frank <frankja@linux.ibm.com>
->=20
+> 
 > The SPX instruction is handled by the ulravisor. We do get a
+
+s/ulravisor/ultravisor/
+
 > notification intercept, though. Let us update our internal view.
->=20
+> 
 > In addition to that, when the guest prefix page is not secure, an
 > intercept 112 (0x70) is indicated.  To avoid this for the most common
 > cases, we can make the guest prefix page protected whenever we pin it.
-> We have to deal with 112 nevertheless, e.g. when some host code trigger=
-s
+> We have to deal with 112 nevertheless, e.g. when some host code triggers
 > an export (e.g. qemu dump guest memory). We can simply re-run the
 > pinning logic by doing a no-op prefix change.
->=20
+> 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_host.h |  1 +
->  arch/s390/kvm/intercept.c        | 15 +++++++++++++++
->  arch/s390/kvm/kvm-s390.c         | 14 ++++++++++++++
->  3 files changed, 30 insertions(+)
->=20
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/k=
-vm_host.h
-> index 48f382680755..686b00ced55b 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -225,6 +225,7 @@ struct kvm_s390_sie_block {
->  #define ICPT_PV_INT_EN	0x64
->  #define ICPT_PV_INSTR	0x68
->  #define ICPT_PV_NOTIF	0x6c
-> +#define ICPT_PV_PREF	0x70
->  	__u8	icptcode;		/* 0x0050 */
->  	__u8	icptstatus;		/* 0x0051 */
->  	__u16	ihcpu;			/* 0x0052 */
-> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-> index d63f9cf10360..ceba0abb1900 100644
-> --- a/arch/s390/kvm/intercept.c
-> +++ b/arch/s390/kvm/intercept.c
-> @@ -451,6 +451,15 @@ static int handle_operexc(struct kvm_vcpu *vcpu)
->  	return kvm_s390_inject_program_int(vcpu, PGM_OPERATION);
->  }
-> =20
-> +static int handle_pv_spx(struct kvm_vcpu *vcpu)
-> +{
-> +	u32 pref =3D *(u32 *)vcpu->arch.sie_block->sidad;
-> +
-> +	kvm_s390_set_prefix(vcpu, pref);
-> +	trace_kvm_s390_handle_prefix(vcpu, 1, pref);
-> +	return 0;
-> +}
-> +
->  static int handle_pv_sclp(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_s390_float_interrupt *fi =3D &vcpu->kvm->arch.float_int;
-> @@ -475,6 +484,8 @@ static int handle_pv_sclp(struct kvm_vcpu *vcpu)
-> =20
->  static int handle_pv_not(struct kvm_vcpu *vcpu)
->  {
-> +	if (vcpu->arch.sie_block->ipa =3D=3D 0xb210)
-> +		return handle_pv_spx(vcpu);
->  	if (vcpu->arch.sie_block->ipa =3D=3D 0xb220)
->  		return handle_pv_sclp(vcpu);
-> =20
-> @@ -533,6 +544,10 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu=
-)
->  	case ICPT_PV_NOTIF:
->  		rc =3D handle_pv_not(vcpu);
->  		break;
-> +	case ICPT_PV_PREF:
-> +		rc =3D 0;
-> +		kvm_s390_set_prefix(vcpu, kvm_s390_get_prefix(vcpu));
-
-/me confused
-
-This is the "request to map prefix" case, right?
-
-I'd *really* prefer to have a comment and a manual
-
-/* request to convert and pin the prefix pages again */
-kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu)
-
-A TLB flush is IMHO not necessary, as the prefix did not change.
-
-> +		break;
->  	default:
->  		return -EOPNOTSUPP;
->  	}
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 76303b0f1226..6e74c7afae3a 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -3675,6 +3675,20 @@ static int kvm_s390_handle_requests(struct kvm_v=
-cpu *vcpu)
->  		rc =3D gmap_mprotect_notify(vcpu->arch.gmap,
->  					  kvm_s390_get_prefix(vcpu),
->  					  PAGE_SIZE * 2, PROT_WRITE);
-> +		if (!rc && kvm_s390_pv_is_protected(vcpu->kvm)) {
-> +			do {
-> +				rc =3D uv_convert_to_secure(
-> +						vcpu->arch.gmap,
-> +						kvm_s390_get_prefix(vcpu));
-> +			} while (rc =3D=3D -EAGAIN);
-> +			WARN_ONCE(rc, "Error while importing first prefix page. rc %d", rc)=
-;
-> +			do {
-> +				rc =3D uv_convert_to_secure(
-> +						vcpu->arch.gmap,
-> +						kvm_s390_get_prefix(vcpu) + PAGE_SIZE);
-> +			} while (rc =3D=3D -EAGAIN);
-> +			WARN_ONCE(rc, "Error while importing second prefix page. rc %d", rc=
-);
-
-Maybe factor that out into a separate function (e.g., for a single page
-and call that twice).
-
-> +		}
->  		if (rc) {
->  			kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
->  			return rc;
->=20
 
 
---=20
+-- 
 Thanks,
 
 David / dhildenb
