@@ -2,197 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C903815324B
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 14:52:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91A59153250
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 14:53:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728102AbgBENwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 08:52:44 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38613 "EHLO
+        id S1728228AbgBENxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 08:53:12 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54742 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726597AbgBENwn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 08:52:43 -0500
+        by vger.kernel.org with ESMTP id S1726308AbgBENxM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 08:53:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580910761;
+        s=mimecast20190719; t=1580910790;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=f5Sj7x8CxfrfyHDRynAhfcdpyI/AgR8ICRTetDOHq/Y=;
-        b=ar7NW7p7n+vf3iXdT0sO42nSJtNDvplw2kDlsqJjx6LfrLz1W9opEmpCO6Mpfcbd3bcHNm
-        CUfcpz3kQNsD9FWiS9ZeLmRbUUTsXlw96P2Bfk4/Feb+TtTliEayzeiU5hz8EWeaMFs961
-        ehjDuj2z2jizZTG8L8LZvcD5vDE/diI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-w_5-91bDPqmT2dbi635sQg-1; Wed, 05 Feb 2020 08:52:36 -0500
-X-MC-Unique: w_5-91bDPqmT2dbi635sQg-1
-Received: by mail-wm1-f71.google.com with SMTP id t17so1017255wmi.7
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 05:52:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=f5Sj7x8CxfrfyHDRynAhfcdpyI/AgR8ICRTetDOHq/Y=;
-        b=sn8HclnVHgalaTDhR9QjMR9Av8KAAsgBbzDZq0NLbgKUNSYcY9qCYRlnejr5jVA9jA
-         00mqTv4pEU4uHk2GYQ9+iImrYzbkhJDqPfvHd0PG/xPy1LD384m94GnbyrTMXZJrIAq2
-         c4Y2RuumC8DZzQwkYVrWGyNZ0HTY2qzmtIvNF7g7lc7MjA8+Txt6FmzqVGlZqR0StIMG
-         CrXoJRfejrvN7rdKfg99Ifi9Tw4TzFj9OdAm5XCVDgcm5kt+xWopbjb0XPMPjy/cMcaz
-         Xfdq8UdvxRyHfeyNO/qaEtZj5uGyXJqWJN8EjO6y81ElFsslDgk8QYOeg7NDRWONxANs
-         m7IA==
-X-Gm-Message-State: APjAAAUuoWt6ALE6poCd74SeA0ochN4EWZK01Tqy/oWyHz/AjxLdNIX2
-        TWDKXjFU7UbnFC0H2BcP0q5KbmN6qDbFAV5L82jfFAlMg/+8J6mgsJJ0E0JoqJtbg+3+JbVYsAi
-        zPgp7oplgitd1
-X-Received: by 2002:a1c:5419:: with SMTP id i25mr5991851wmb.150.1580910754601;
-        Wed, 05 Feb 2020 05:52:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy9C7S2xWyX6maFcY4AIf2bKYC/DyzgQynh2K/exOYnOeWiI1Vof7HIHkVr0VnE9kYTD22Z1A==
-X-Received: by 2002:a1c:5419:: with SMTP id i25mr5991818wmb.150.1580910754300;
-        Wed, 05 Feb 2020 05:52:34 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id r5sm34859540wrt.43.2020.02.05.05.52.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2020 05:52:33 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 3/3] kvm: mmu: Separate pte generation from set_spte
-In-Reply-To: <20200203230911.39755-3-bgardon@google.com>
-References: <20200203230911.39755-1-bgardon@google.com> <20200203230911.39755-3-bgardon@google.com>
-Date:   Wed, 05 Feb 2020 14:52:32 +0100
-Message-ID: <87pnetkuov.fsf@vitty.brq.redhat.com>
+        bh=D25bNTxf7IebHCL/s8A7Q+pPtOOsqrKpoggtAEI9Hfc=;
+        b=huwsyoVwZwNgU1y7ZTmIrH1Hmvp62c7l32vc7xS7A+aTmcvrTkuNADslVkNkyYqkcgTEEG
+        nj2QoAzwnDVlJiI44mq/DmdHwOJwbQztEdR/h5Nbg6Tk+iPsJW8wVNOquITSilFEmI+Gdv
+        ItDlroKontYrlqjGOsoYAcXEnEnKIAs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-426-AJZ0P5PVPv-yZGcOfSlh0g-1; Wed, 05 Feb 2020 08:53:06 -0500
+X-MC-Unique: AJZ0P5PVPv-yZGcOfSlh0g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD886801F74;
+        Wed,  5 Feb 2020 13:53:05 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 97E125C299;
+        Wed,  5 Feb 2020 13:53:01 +0000 (UTC)
+Date:   Wed, 5 Feb 2020 14:52:59 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [RFCv2 20/37] KVM: s390: protvirt: Add new gprs location
+ handling
+Message-ID: <20200205145259.0b228033.cohuck@redhat.com>
+In-Reply-To: <20200203131957.383915-21-borntraeger@de.ibm.com>
+References: <20200203131957.383915-1-borntraeger@de.ibm.com>
+        <20200203131957.383915-21-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ben Gardon <bgardon@google.com> writes:
+On Mon,  3 Feb 2020 08:19:40 -0500
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> Separate the functions for generating leaf page table entries from the
-> function that inserts them into the paging structure. This refactoring
-> will facilitate changes to the MMU sychronization model to use atomic
-> compare / exchanges (which are not guaranteed to succeed) instead of a
-> monolithic MMU lock.
->
-> No functional change expected.
->
-> Tested by running kvm-unit-tests on an Intel Haswell machine. This
-> commit introduced no new failures.
->
-> This commit can be viewed in Gerrit at:
-> 	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2360
->
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> Guest registers for protected guests are stored at offset 0x380.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 52 +++++++++++++++++++++++++++---------------
->  1 file changed, 34 insertions(+), 18 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index b81010d0edae1..9239ad5265dc6 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3000,20 +3000,14 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
->  #define SET_SPTE_WRITE_PROTECTED_PT	BIT(0)
->  #define SET_SPTE_NEED_REMOTE_TLB_FLUSH	BIT(1)
->  
-> -static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-> -		    unsigned int pte_access, int level,
-> -		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
-> -		    bool can_unsync, bool host_writable)
-> +static u64 make_spte(struct kvm_vcpu *vcpu, unsigned int pte_access, int level,
-> +		     gfn_t gfn, kvm_pfn_t pfn, u64 old_spte, bool speculative,
-> +		     bool can_unsync, bool host_writable, bool ad_disabled,
-> +		     int *ret)
+>  arch/s390/include/asm/kvm_host.h |  4 +++-
+>  arch/s390/kvm/kvm-s390.c         | 11 +++++++++++
+>  2 files changed, 14 insertions(+), 1 deletion(-)
+> 
 
-With such a long parameter list we may think about passing a pointer to
-a structure instead (common for make_spte()/set_spte())
+With the things pointed out by Thomas fixed:
 
->  {
->  	u64 spte = 0;
-> -	int ret = 0;
-> -	struct kvm_mmu_page *sp;
-> -
-> -	if (set_mmio_spte(vcpu, sptep, gfn, pfn, pte_access))
-> -		return 0;
->  
-> -	sp = page_header(__pa(sptep));
-> -	if (sp_ad_disabled(sp))
-> +	if (ad_disabled)
->  		spte |= SPTE_AD_DISABLED_MASK;
->  	else if (kvm_vcpu_ad_need_write_protect(vcpu))
->  		spte |= SPTE_AD_WRPROT_ONLY_MASK;
-> @@ -3066,27 +3060,49 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
->  		 * is responsibility of mmu_get_page / kvm_sync_page.
->  		 * Same reasoning can be applied to dirty page accounting.
->  		 */
-> -		if (!can_unsync && is_writable_pte(*sptep))
-> -			goto set_pte;
-> +		if (!can_unsync && is_writable_pte(old_spte))
-> +			return spte;
->  
->  		if (mmu_need_write_protect(vcpu, gfn, can_unsync)) {
->  			pgprintk("%s: found shadow page for %llx, marking ro\n",
->  				 __func__, gfn);
-> -			ret |= SET_SPTE_WRITE_PROTECTED_PT;
-> +			*ret |= SET_SPTE_WRITE_PROTECTED_PT;
->  			pte_access &= ~ACC_WRITE_MASK;
->  			spte &= ~(PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE);
->  		}
->  	}
->  
-> -	if (pte_access & ACC_WRITE_MASK) {
-> -		kvm_vcpu_mark_page_dirty(vcpu, gfn);
-> +	if (pte_access & ACC_WRITE_MASK)
->  		spte |= spte_shadow_dirty_mask(spte);
-> -	}
->  
->  	if (speculative)
->  		spte = mark_spte_for_access_track(spte);
->  
-> -set_pte:
-> +	return spte;
-> +}
-> +
-> +static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-> +		    unsigned int pte_access, int level,
-> +		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
-> +		    bool can_unsync, bool host_writable)
-> +{
-> +	u64 spte = 0;
-> +	struct kvm_mmu_page *sp;
-> +	int ret = 0;
-> +
-> +	if (set_mmio_spte(vcpu, sptep, gfn, pfn, pte_access))
-> +		return 0;
-> +
-> +	sp = page_header(__pa(sptep));
-> +
-> +	spte = make_spte(vcpu, pte_access, level, gfn, pfn, *sptep, speculative,
-> +			 can_unsync, host_writable, sp_ad_disabled(sp), &ret);
-
-I'm probably missing something, but in make_spte() I see just one place
-which writes to '*ret' so at the end, this is either
-SET_SPTE_WRITE_PROTECTED_PT or 0 (which we got only because we
-initialize it to 0 in set_spte()). Unless this is preparation to some
-other change, I don't see much value in the complication.
-
-Can we actually reverse the logic, pass 'spte' by reference and return
-'ret'?
-
-> +	if (!spte)
-> +		return 0;
-> +
-> +	if (spte & PT_WRITABLE_MASK)
-> +		kvm_vcpu_mark_page_dirty(vcpu, gfn);
-> +
->  	if (mmu_spte_update(sptep, spte))
->  		ret |= SET_SPTE_NEED_REMOTE_TLB_FLUSH;
->  	return ret;
-
--- 
-Vitaly
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
