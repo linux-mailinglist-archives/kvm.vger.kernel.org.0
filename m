@@ -2,47 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C8A1153150
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 13:57:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 651A1153182
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 14:14:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728052AbgBEM5A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 07:57:00 -0500
-Received: from mail-eopbgr10041.outbound.protection.outlook.com ([40.107.1.41]:46861
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726386AbgBEM5A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 07:57:00 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NQKCu4+70/kJSBcmulkd6fE5JAWXqSUsoahihvze38tsEhLjuhOkLTtDOJCM0LrWI+DXWJwx//lnbUsRzVvt5WbgRBaf42ssZ84E0/EjgSDtjVQys3gIIZK7ZeMSJumy+YW3S4QydoHa5BeoBQnCBYFsDo/83qRCjQfu2OKqd14uP6caAsHCjTPv7Vvh7K+AMmjLiP4NtXaTMb+F/V4ZzaQGJ8L4AhGT3ib4rYOIFZppHXX5epzfUR8qJvgKB5jNxP5k3+NX8c0gyz7F2VT/LjmNXualnNpZuR2pszHP1zYtxe92Cc15q2V40gGz5rN+QNXM3tgH7ivN5qgFoFfGGw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gbiPdN/Tw9XZTbyfw4LGMrONC3v0+6S/WuRJhvHO4Tw=;
- b=JrAdRBJaCDYfHSnnGXGaLa1TNaH/UI1SUKmizArhczqd1cfVYEynecLkR9/5k5CAXlAqO1TWLv9lHSlzqTCyjvnXX5uywgB/I6eQ+6Pal2+9B3Q8YpR10FrLAnOO7jmqfkfcwlW4EmPK5iBNkpyLoQxDr4wZRXcQv1wFI8Lun/l1P6Po05iX3cgIA45m987EKsDOHxYssUV5gw37iH4Di9Z1aUCXfg/s6ZCfS2kUOfJu6iLitodvYetyhuebInN5D1BHd8InpYghBV1I/5/KfC+p8ImSL7tZYcBEZNqUiMxFMs2rOzLXZ/e738oQbQ1SP4fRZii6X/Kas7k73P6YrA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gbiPdN/Tw9XZTbyfw4LGMrONC3v0+6S/WuRJhvHO4Tw=;
- b=HUqeCSJWz5pEvpa6i2a32ezw1unnN9LnmoIScZvtGJYTFugpRKxnstscHF3JzfdCzlQMBiJVjgdfzOU9nEVvDG9qp1MqyyNTrJXzhz27OLbaSVJzGwWhDYYPe5LGacHGJdZKRVNEMdD9HIuE44W0xAX0oJXISKaxOAGO24yU83s=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
- VI1PR05MB4509.eurprd05.prod.outlook.com (10.171.182.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Wed, 5 Feb 2020 12:56:53 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2707.020; Wed, 5 Feb 2020
- 12:56:53 +0000
-Date:   Wed, 5 Feb 2020 08:56:48 -0400
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Shahaf Shuler <shahafs@mellanox.com>,
+        id S1728005AbgBENO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 08:14:56 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54713 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727977AbgBENO4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 08:14:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580908495;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QuNXmwS8sysRc0ThXGMCmTTQlX8tFR45lSd0PUTiOGs=;
+        b=CzvJwhwXrycMJnKvpCWji+0amMkonKqF/bG//ByPBF59iq3kYYjy0F5ebHXAZlYr9RG7eV
+        U690ZpS/GYaOohPjq5mweRKtcUieVkAObnf7tfLLtFPX8+WuzzxwiJXnDcJI+VfOKD/8W1
+        1zaCRT901L2/EwMsv8hm36qP5XUPMcA=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-YwWUs1KpNXWUzJMZdKTg5A-1; Wed, 05 Feb 2020 08:14:54 -0500
+X-MC-Unique: YwWUs1KpNXWUzJMZdKTg5A-1
+Received: by mail-qk1-f197.google.com with SMTP id q2so1217066qkq.19
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 05:14:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QuNXmwS8sysRc0ThXGMCmTTQlX8tFR45lSd0PUTiOGs=;
+        b=Rf8s3byKJS2QChG400A4PpsYPY/fV6CL9XSgLvJJ1ENuq/OM52uTPVloPdtZACQlXt
+         MppLV3P0LLKbslYKm16Y10ZtUOnWA6Tt4UYVkQlJHLXleXNRIEiAzBGwWohV1DbyWN1/
+         cFeiZfGYwK5gtcrCMBBz8d1N/wdsXULKtU4dUIXki2RpnUGUEkME32PHVnXHwKCZcDc9
+         D3Z2Mxd5gU8iPCDIQpz4ctgdtDX1zXdtCmnZk5hYEZ+DA6S4pfKWmfHaSvcKqsD/Jab6
+         DMyCZXOXYyuKu8VDzNTPDTC8s+jxeN9pap5uc/lN/+kYk9vAtKN5aQcehgO4J6EDcxR1
+         303g==
+X-Gm-Message-State: APjAAAUHL2JH7WmzYWFlhHFuwQrchHaPeJNmRcfaNvdqe75EDMRZaSiv
+        T4//BTAhOWkhclRNKHsxOs5l4oyPIsV1oM2VfwvaX4eyGguLf23eUYm1B04HgTaPzaIGhR0GxQ2
+        jBXizgrWfgf5g
+X-Received: by 2002:a37:6551:: with SMTP id z78mr34386862qkb.144.1580908493725;
+        Wed, 05 Feb 2020 05:14:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyPJbBNbk5endfccq+ku5moWMnpzgaXCLDqjaEgV35BhSBP12RgV6EFcH2z1a9H9HuZasXKOQ==
+X-Received: by 2002:a37:6551:: with SMTP id z78mr34386840qkb.144.1580908493533;
+        Wed, 05 Feb 2020 05:14:53 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+        by smtp.gmail.com with ESMTPSA id c45sm14187780qtd.43.2020.02.05.05.14.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2020 05:14:52 -0800 (PST)
+Date:   Wed, 5 Feb 2020 08:14:46 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
         Tiwei Bie <tiwei.bie@intel.com>,
-        "mst@redhat.com" <mst@redhat.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
@@ -64,61 +76,41 @@ Cc:     Shahaf Shuler <shahafs@mellanox.com>,
         "cunming.liang@intel.com" <cunming.liang@intel.com>,
         "zhihong.wang@intel.com" <zhihong.wang@intel.com>
 Subject: Re: [PATCH] vhost: introduce vDPA based backend
-Message-ID: <20200205125648.GV23346@mellanox.com>
+Message-ID: <20200205081210-mutt-send-email-mst@kernel.org>
 References: <20200131033651.103534-1-tiwei.bie@intel.com>
  <7aab2892-bb19-a06a-a6d3-9c28bc4c3400@redhat.com>
  <20200205020247.GA368700@___>
  <AM0PR0502MB37952015716C1D5E07E390B6C3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
  <112858a4-1a01-f4d7-e41a-1afaaa1cad45@redhat.com>
+ <20200205125648.GV23346@mellanox.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <112858a4-1a01-f4d7-e41a-1afaaa1cad45@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: MN2PR05CA0062.namprd05.prod.outlook.com
- (2603:10b6:208:236::31) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
-MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR05CA0062.namprd05.prod.outlook.com (2603:10b6:208:236::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.12 via Frontend Transport; Wed, 5 Feb 2020 12:56:53 +0000
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1izKEa-0002I9-2r; Wed, 05 Feb 2020 08:56:48 -0400
-X-Originating-IP: [142.68.57.212]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 8f8fb22b-1f4c-4d1b-e392-08d7aa3adf80
-X-MS-TrafficTypeDiagnostic: VI1PR05MB4509:|VI1PR05MB4509:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB4509FA44E2ECF6674D62AB4DCF020@VI1PR05MB4509.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-Forefront-PRVS: 0304E36CA3
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(136003)(396003)(376002)(39860400002)(189003)(199004)(2616005)(6916009)(26005)(186003)(7416002)(36756003)(33656002)(81156014)(81166006)(8936002)(9746002)(9786002)(8676002)(2906002)(1076003)(4326008)(66476007)(66946007)(66556008)(4744005)(478600001)(5660300002)(316002)(52116002)(86362001)(54906003)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB4509;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-Received-SPF: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LgU9/3vE7rJYUS2L6IWqg10NyNGNV3Fo/zCFzdtAkzHzdiYixeujAbMyPr3Up9SgmPunaXZQ1jEpn7UN42D5oDQ+WqaFoss+ZMs62E7ORCriGuviExal0wRfiIEo7zSMvbRStwZsBP+Q+1MUjJMMmYVHsjlyXQozL9JZwIaaf2Z+UqycIEdKFUy2y4qRgEqLIRnJO6gShwg00nwO9VZELiu8kuBNYj6sSchOSZcSXBxI3kXoeho5bKrxBDx1jb7TQ70iSKejvRmgqQgLsG7DWC1h+swqeaAoKgHd7Kv+NxgZTtLulqZ9oYhGYBDA3r37qFiG6wL/buJf//G8iVZHzuAVQC96dnIf9UjMAgSzALP03EIjhlPiLpyS/l0S6RUrhB8Uh0Hghemxnma9kgWowI6SXKD5yDyYuO6HxvvOpjWAfoWyR6g0A3c8vP20OtosdSLX112OG13R/+4i1OlceLT+GtVCZfEqLM7SS4ZYMSNVwKXbIgCG3TFYOvGiu2lL
-X-MS-Exchange-AntiSpam-MessageData: n1YkP5iFigNTfa5KFTJKaT4IhUwo19bRL4ngRj9iADAEXWD9JLYAO5y92o05X17qTFiV6JXJAt7MY+SCTscuiZ9/H2CvotdbMpx8YerIj9hngHhvbOf21RsGHMF3ozY3rr3eo2F8BncEuARfM1vWpw==
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f8fb22b-1f4c-4d1b-e392-08d7aa3adf80
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2020 12:56:53.3574
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dQ01rPmVWX2GbT50QEsE8g6wEQjpuNubHc0YWbcwnBAr7qgaxFt2UCbDidwlc0PIn3y+UjGfyWisqL0OL7AGXQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4509
+In-Reply-To: <20200205125648.GV23346@mellanox.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 05, 2020 at 03:50:14PM +0800, Jason Wang wrote:
-> > Would it be better for the map/umnap logic to happen inside each device ?
-> > Devices that needs the IOMMU will call iommu APIs from inside the driver callback.
+On Wed, Feb 05, 2020 at 08:56:48AM -0400, Jason Gunthorpe wrote:
+> On Wed, Feb 05, 2020 at 03:50:14PM +0800, Jason Wang wrote:
+> > > Would it be better for the map/umnap logic to happen inside each device ?
+> > > Devices that needs the IOMMU will call iommu APIs from inside the driver callback.
+> > 
+> > Technically, this can work. But if it can be done by vhost-vpda it will make
+> > the vDPA driver more compact and easier to be implemented.
 > 
-> Technically, this can work. But if it can be done by vhost-vpda it will make
-> the vDPA driver more compact and easier to be implemented.
+> Generally speaking, in the kernel, it is normal to not hoist code of
+> out drivers into subsystems until 2-3 drivers are duplicating that
+> code. It helps ensure the right design is used
+> 
+> Jason
 
-Generally speaking, in the kernel, it is normal to not hoist code of
-out drivers into subsystems until 2-3 drivers are duplicating that
-code. It helps ensure the right design is used
+That's up to the sybsystem maintainer really, as there's also some
+intuition involved in guessing a specific API is widely useful.
+In-kernel APIs are flexible, if we find something isn't needed we just
+drop it.
 
-Jason
+-- 
+MST
+
