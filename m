@@ -2,96 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E7B51528A1
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 10:48:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9163B1528AD
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 10:51:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728096AbgBEJsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 04:48:25 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54966 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728035AbgBEJsY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 04:48:24 -0500
+        id S1728112AbgBEJvY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 04:51:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52734 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727068AbgBEJvY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 04:51:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580896103;
+        s=mimecast20190719; t=1580896283;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iYOL7XjTIAxW01ootqLvfDzjCPh14aTGE/Ook11e7A0=;
-        b=UNbpnarT5+A1istX5vI7opKJPcqfAMOY2sWXrJ01YiGeQFSD5vc+zwklKw6xMNMb8cqWPf
-        qiNAe2CdCqbqCbKn1jdRtdeWBzcKH0KLJQqgmR/C1PZTjJUIe1O/pM4hWaEmsCRBlYSMCY
-        cDi8k1laaY/Tpu4m9oKddS2qa86EBwM=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=ytGvTXipw8DnkRr9xmN70vayZGALA+KyOoO/895ayWQ=;
+        b=BXL7Sav884tpl6xouLjwReiWTt/8v5tqSbOGf2+zm7LaciKOUVPPTHWlWQsDqMiE54FRP+
+        QUr3dByT30EsMFSkrdKMtA63H0K3lSMoLDeGmO4W6HYqmndCuWDiNZwRpOGKQx+BlXLaVM
+        +vW9h1mX5Ld++g6QqcEu5C/D7KQjSc0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-75-APXccsL3OvOt2wEVi3WyLQ-1; Wed, 05 Feb 2020 04:48:22 -0500
-X-MC-Unique: APXccsL3OvOt2wEVi3WyLQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-329-Mn4sXiNIOOizLYFVnKUqZQ-1; Wed, 05 Feb 2020 04:51:20 -0500
+X-MC-Unique: Mn4sXiNIOOizLYFVnKUqZQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6B2318FE860;
-        Wed,  5 Feb 2020 09:48:20 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 313B51BC6D;
-        Wed,  5 Feb 2020 09:48:08 +0000 (UTC)
-Date:   Wed, 5 Feb 2020 10:48:06 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dinechin@redhat.com, sean.j.christopherson@intel.com,
-        pbonzini@redhat.com, jasowang@redhat.com, yan.y.zhao@intel.com,
-        mst@redhat.com, kevin.tian@intel.com, alex.williamson@redhat.com,
-        dgilbert@redhat.com, vkuznets@redhat.com
-Subject: Re: [PATCH 13/14] KVM: selftests: Let dirty_log_test async for dirty
- ring test
-Message-ID: <20200205094806.dqkzpxhrndocjl6g@kamzik.brq.redhat.com>
-References: <20200205025105.367213-1-peterx@redhat.com>
- <20200205025842.367575-1-peterx@redhat.com>
- <20200205025842.367575-10-peterx@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7F428010F9;
+        Wed,  5 Feb 2020 09:51:18 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-132.ams2.redhat.com [10.36.116.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 779A360BF4;
+        Wed,  5 Feb 2020 09:51:14 +0000 (UTC)
+Subject: Re: [RFCv2 15/37] KVM: s390: protvirt: Implement interruption
+ injection
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+References: <20200203131957.383915-1-borntraeger@de.ibm.com>
+ <20200203131957.383915-16-borntraeger@de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f6980d81-f1a9-10a0-9783-8835eae2c124@redhat.com>
+Date:   Wed, 5 Feb 2020 10:51:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200205025842.367575-10-peterx@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200203131957.383915-16-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 04, 2020 at 09:58:41PM -0500, Peter Xu wrote:
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 4b78a8d3e773..e64fbfe6bbd5 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -115,6 +115,7 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva);
->  struct kvm_run *vcpu_state(struct kvm_vm *vm, uint32_t vcpuid);
->  void vcpu_run(struct kvm_vm *vm, uint32_t vcpuid);
->  int _vcpu_run(struct kvm_vm *vm, uint32_t vcpuid);
-> +int __vcpu_run(struct kvm_vm *vm, uint32_t vcpuid);
->  void vcpu_run_complete_io(struct kvm_vm *vm, uint32_t vcpuid);
->  void vcpu_set_mp_state(struct kvm_vm *vm, uint32_t vcpuid,
->  		       struct kvm_mp_state *mp_state);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 25edf20d1962..5137882503bd 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1203,6 +1203,14 @@ int _vcpu_run(struct kvm_vm *vm, uint32_t vcpuid)
->  	return rc;
->  }
->  
-> +int __vcpu_run(struct kvm_vm *vm, uint32_t vcpuid)
-> +{
-> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+On 03/02/2020 14.19, Christian Borntraeger wrote:
+> From: Michael Mueller <mimu@linux.ibm.com>
+>=20
+> The patch implements interruption injection for the following
+> list of interruption types:
+>=20
+>   - I/O
+>     __deliver_io (III)
+>=20
+>   - External
+>     __deliver_cpu_timer (IEI)
+>     __deliver_ckc (IEI)
+>     __deliver_emergency_signal (IEI)
+>     __deliver_external_call (IEI)
+>=20
+>   - cpu restart
+>     __deliver_restart (IRI)
+>=20
+> The service interrupt is handled in a followup patch.
+>=20
+> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> [fixes]
+> ---
+>  arch/s390/include/asm/kvm_host.h |  8 +++
+>  arch/s390/kvm/interrupt.c        | 93 ++++++++++++++++++++++----------
+>  2 files changed, 74 insertions(+), 27 deletions(-)
+>=20
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/k=
+vm_host.h
+> index a45d10d87a8a..989cea7a5591 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -563,6 +563,14 @@ enum irq_types {
+>  #define IRQ_PEND_MCHK_MASK ((1UL << IRQ_PEND_MCHK_REP) | \
+>  			    (1UL << IRQ_PEND_MCHK_EX))
+> =20
+> +#define IRQ_PEND_MCHK_REP_MASK (1UL << IRQ_PEND_MCHK_REP)
 > +
-> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
-> +	return ioctl(vcpu->fd, KVM_RUN, NULL);
-> +}
+> +#define IRQ_PEND_EXT_II_MASK ((1UL << IRQ_PEND_EXT_CPU_TIMER)  | \
+> +			      (1UL << IRQ_PEND_EXT_CLOCK_COMP) | \
+> +			      (1UL << IRQ_PEND_EXT_EMERGENCY)  | \
+> +			      (1UL << IRQ_PEND_EXT_EXTERNAL)   | \
+> +			      (1UL << IRQ_PEND_EXT_SERVICE))
 > +
->  void vcpu_run_complete_io(struct kvm_vm *vm, uint32_t vcpuid)
->  {
->  	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+>  struct kvm_s390_interrupt_info {
+>  	struct list_head list;
+>  	u64	type;
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index c06c89d370a7..ecdec6960a60 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -387,6 +387,12 @@ static unsigned long deliverable_irqs(struct kvm_v=
+cpu *vcpu)
+>  		__clear_bit(IRQ_PEND_EXT_SERVICE, &active_mask);
+>  	if (psw_mchk_disabled(vcpu))
+>  		active_mask &=3D ~IRQ_PEND_MCHK_MASK;
+> +	/* PV guest cpus can have a single interruption injected at a time. *=
+/
+> +	if (kvm_s390_pv_is_protected(vcpu->kvm) &&
+> +	    vcpu->arch.sie_block->iictl !=3D IICTL_CODE_NONE)
+> +		active_mask &=3D ~(IRQ_PEND_EXT_II_MASK |
+> +				 IRQ_PEND_IO_MASK |
+> +				 IRQ_PEND_MCHK_REP_MASK);
 
-I think we should add a vcpu_get_fd(vm, vcpuid) function instead, and
-then call ioctl directly from the test.
+I don't quite understand why there is a difference between
+IRQ_PEND_MCHK_REP and IRQ_PEND_MCHK_EX here? Why not simply use
+IRQ_PEND_MCHK_MASK here? Could you elaborate? (and maybe add a sentence
+to the patch description)
 
-Thanks,
-drew
+> @@ -533,7 +547,6 @@ static int __must_check __deliver_pfault_init(struc=
+t kvm_vcpu *vcpu)
+>  	trace_kvm_s390_deliver_interrupt(vcpu->vcpu_id,
+>  					 KVM_S390_INT_PFAULT_INIT,
+>  					 0, ext.ext_params2);
+> -
+
+Nit: Unnecessary white space change.
+
+Apart from that, the patch look ok to me.
+
+ Thomas
 
