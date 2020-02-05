@@ -2,82 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6E011534F4
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 17:06:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD2A8153538
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 17:29:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727000AbgBEQGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 11:06:42 -0500
-Received: from mail-qt1-f181.google.com ([209.85.160.181]:40903 "EHLO
-        mail-qt1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726534AbgBEQGm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 11:06:42 -0500
-Received: by mail-qt1-f181.google.com with SMTP id v25so1937303qto.7
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 08:06:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=cW02At8rCtbSYQDR/qaGPWAr3cPov/cWnXwOHXKUCEE=;
-        b=qCOXTPg3gVMWLKd2m+MB2wzmTRaBJz3fGbh0J++hPjUcr++S1thR5AXdKdl/G5yWkF
-         wd0cGHrrcQh/zlKoBt2L8VN15PJIhC4DtvEKe+Ac5K9Gt1nBgPUWjXKec7xP3EeQXUai
-         agKo8bhVztBtd1iRiWGcmOXBEvY0hQd/zb6ZIh1emqeUO1tcT1e5qANnDvvdMLNFadeT
-         hec1IHeq/SxSEFrFIoNB0VQ5UOMOGnNRWmjK61YFUh5I6vngf2TEwVgsnH4KqavPchuk
-         VGugvW3qoKJEvDsg4LyyPAo6yo+WIOpLSBXuYufFG4nD9jQVQQghp82a7OHGginqnsQi
-         LQxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=cW02At8rCtbSYQDR/qaGPWAr3cPov/cWnXwOHXKUCEE=;
-        b=KVfBkIc43Br2XAqOm3aB4TmPhLVlbE1GUjsDR8EBqwzB7PfZXcaDFQZxkjynn3zDEr
-         Ip27m4pjnlLP1x6AK9JCzoGYK1575xbEfQS1Bi8HCgifnJ39kxxuUCs540wodzorRpzi
-         ENOfpTXA0X/3hDKhfj83rB3WApINchAAZl6Pj7DEHiERHsovoaTSQkszscNv6vYAtD9U
-         YE0OAfTK3wWHAyo2Xg1PztEzO8tQitlzTrJvFWb46jtVr8zxXXViOFaB5TTfSF47A14H
-         VWT7ZgErKOzmwnsHDNgbTXtc6ZvxYVxTSY4LELTLOPRNUQlx11s6NtJiJ4x6OKhEWbV3
-         nmJQ==
-X-Gm-Message-State: APjAAAWQ12M6YztMs7l2c13BaggSSAhUJPG5JFf8vpqk1HUdgH4x8ctA
-        tVyIpWujvWwozbYlo8yiBMAdQx225Rxf6Fvq+btYRYyKnrhp2g==
-X-Google-Smtp-Source: APXvYqw8fDS648qFrrFoUGpBYSDMsUkBZSWf+5e2V+AZywpQH/ESQAiTVZqDC3bMSJGml2rxHqxdbW3Qc3WiYc2hj34=
-X-Received: by 2002:ac8:4289:: with SMTP id o9mr34047949qtl.277.1580918801635;
- Wed, 05 Feb 2020 08:06:41 -0800 (PST)
+        id S1727231AbgBEQ3g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 11:29:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39103 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726359AbgBEQ3g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 11:29:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580920174;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=B+Mj3/ABbY5xnnRNytbcPUxlZHCIKx/r64rBUY1KC70=;
+        b=hKaUsVPDDUOUBgHZMIgKtgpRQoYU0hohG4QmBJ6u19eD2mCAF49izlOXrLyiaeDr+IX5hO
+        YetjQpkja4fHtsG6bG07RoM2CZV99bBNLU33mXG+sXMobZ0oagmHy/vnoazT8TUUoNhYSe
+        ctJhLezCK5Et1x6R7zRAnUBu77di71c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-14-RvpDQUn3OnufkMAeaN68hg-1; Wed, 05 Feb 2020 11:29:18 -0500
+X-MC-Unique: RvpDQUn3OnufkMAeaN68hg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C13A918C8C00;
+        Wed,  5 Feb 2020 16:29:16 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D6658DC00;
+        Wed,  5 Feb 2020 16:29:12 +0000 (UTC)
+Date:   Wed, 5 Feb 2020 17:29:10 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [RFCv2 27/37] KVM: s390: protvirt: Only sync fmt4 registers
+Message-ID: <20200205172910.2437729a.cohuck@redhat.com>
+In-Reply-To: <20200203131957.383915-28-borntraeger@de.ibm.com>
+References: <20200203131957.383915-1-borntraeger@de.ibm.com>
+        <20200203131957.383915-28-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Wed, 5 Feb 2020 16:06:30 +0000
-Message-ID: <CAJSP0QW0XqgVfBbS9ip8xL+TkMfu24A+GyKVQLurCwWc2fTEvQ@mail.gmail.com>
-Subject: CPU vulnerabilities in public clouds
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vitaly,
-I just watched your FOSDEM talk on CPU vulnerabilities in public clouds:
-https://mirror.cyberbits.eu/fosdem/2020/H.1309/vai_pubic_clouds_and_vulnerable_cpus.webm
+On Mon,  3 Feb 2020 08:19:47 -0500
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-If I understand correctly the situation for cloud users is:
-1. The cloud provider takes care of hypervisor and CPU microcode fixes
-but the instance may still be vulnerable to inter-process or guest
-kernel attacks.
-2. /sys/devices/system/cpu/vulnerabilities lists vulnerabilities that
-the guest kernel knows about.  This might be outdated if new
-vulnerabilities have been discovered since the kernel was installed.
-False negatives are possible where your slides show the guest kernel
-thinks there is no mitigation but you suspect the cloud provider has a
-fix in place.
-3. Cloud users still need to learn about every vulnerability to
-understand whether inter-process or guest kernel attacks are possible.
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> A lot of the registers are controlled by the Ultravisor and never
+> visible to KVM. Also some registers are overlayed, like gbea is with
+> sidad, which might leak data to userspace.
+> 
+> Hence we sync a minimal set of registers for both SIE formats and then
+> check and sync format 2 registers if necessary.
+> 
+> Also we disable set/get one reg for the same reason. It's an old
+> interface anyway.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> [Fixes and patch splitting]
+> ---
+>  arch/s390/kvm/kvm-s390.c | 116 ++++++++++++++++++++++++---------------
+>  1 file changed, 72 insertions(+), 44 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index b9692d722c1e..00a0ce4a3d35 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3444,9 +3444,11 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.sie_block->gcr[0] = CR0_INITIAL_MASK;
+>  	vcpu->arch.sie_block->gcr[14] = CR14_INITIAL_MASK;
+>  	vcpu->run->s.regs.fpc = 0;
+> -	vcpu->arch.sie_block->gbea = 1;
+> -	vcpu->arch.sie_block->pp = 0;
+> -	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+> +	if (!kvm_s390_pv_handle_cpu(vcpu)) {
+> +		vcpu->arch.sie_block->gbea = 1;
+> +		vcpu->arch.sie_block->pp = 0;
+> +		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
 
-Overall this seems to leave cloud users in a bad situation.  They
-still need to become experts in each vulnerability and don't have
-reliable information on their protection status.
+What about e.g. gcr[]? Is it something that just does not matter, while
+these conflict somehow?
 
-Users with deep pockets will pay someone to do the work for them. For
-many users the answer will probably be to apply guest OS updates and
-hope for the best? :(
+> +	}
+>  }
+>  
+>  static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
+> @@ -4057,25 +4059,16 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>  	return rc;
+>  }
+>  
+> -static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  {
+>  	struct runtime_instr_cb *riccb;
+>  	struct gs_cb *gscb;
+>  
+> -	riccb = (struct runtime_instr_cb *) &kvm_run->s.regs.riccb;
+> -	gscb = (struct gs_cb *) &kvm_run->s.regs.gscb;
+>  	vcpu->arch.sie_block->gpsw.mask = kvm_run->psw_mask;
+>  	vcpu->arch.sie_block->gpsw.addr = kvm_run->psw_addr;
+> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PREFIX)
+> -		kvm_s390_set_prefix(vcpu, kvm_run->s.regs.prefix);
+> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_CRS) {
+> -		memcpy(&vcpu->arch.sie_block->gcr, &kvm_run->s.regs.crs, 128);
+> -		/* some control register changes require a tlb flush */
+> -		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> -	}
+> +	riccb = (struct runtime_instr_cb *) &kvm_run->s.regs.riccb;
+> +	gscb = (struct gs_cb *) &kvm_run->s.regs.gscb;
+>  	if (kvm_run->kvm_dirty_regs & KVM_SYNC_ARCH0) {
+> -		kvm_s390_set_cpu_timer(vcpu, kvm_run->s.regs.cputm);
+> -		vcpu->arch.sie_block->ckc = kvm_run->s.regs.ckc;
+>  		vcpu->arch.sie_block->todpr = kvm_run->s.regs.todpr;
+>  		vcpu->arch.sie_block->pp = kvm_run->s.regs.pp;
+>  		vcpu->arch.sie_block->gbea = kvm_run->s.regs.gbea;
+> @@ -4116,6 +4109,47 @@ static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+>  		vcpu->arch.sie_block->fpf |= kvm_run->s.regs.bpbc ? FPF_BPBC : 0;
+>  	}
+> +	if (MACHINE_HAS_GS) {
+> +		preempt_disable();
+> +		__ctl_set_bit(2, 4);
+> +		if (current->thread.gs_cb) {
+> +			vcpu->arch.host_gscb = current->thread.gs_cb;
+> +			save_gs_cb(vcpu->arch.host_gscb);
+> +		}
+> +		if (vcpu->arch.gs_enabled) {
+> +			current->thread.gs_cb = (struct gs_cb *)
+> +						&vcpu->run->s.regs.gscb;
+> +			restore_gs_cb(current->thread.gs_cb);
+> +		}
+> +		preempt_enable();
+> +	}
+> +	/* SIE will load etoken directly from SDNX and therefore kvm_run */
+> +}
+> +
+> +static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +{
+> +	/*
+> +	 * at several places we have to modify our internal view to not do
+> +	 * things that are disallowed by the ultravisor. For example we must
 
-It would be nice if /sys/devices/system/cpu/vulnerabilities was at
-least accurate...  Do you have any thoughts on improving the situation
-for users?
+But we are still free to do them for non-protected guests, right?
 
-Stefan
+> +	 * not inject interrupts after specific exits (e.g. 112). We do this
+
+Spell out what 112 is? Emergency call? ;)
+
+> +	 * by turning off the MIE bits of our PSW copy. To avoid getting
+
+What is MIE? The bits controlling machine check, I/O, external
+interrupts?
+
+> +	 * validity intercepts, we do only accept the condition code from
+> +	 * userspace.
+> +	 */
+> +	vcpu->arch.sie_block->gpsw.mask &= ~PSW_MASK_CC;
+> +	vcpu->arch.sie_block->gpsw.mask |= kvm_run->psw_mask & PSW_MASK_CC;
+> +
+> +	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PREFIX)
+> +		kvm_s390_set_prefix(vcpu, kvm_run->s.regs.prefix);
+> +	if (kvm_run->kvm_dirty_regs & KVM_SYNC_CRS) {
+> +		memcpy(&vcpu->arch.sie_block->gcr, &kvm_run->s.regs.crs, 128);
+> +		/* some control register changes require a tlb flush */
+> +		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> +	}
+> +	if (kvm_run->kvm_dirty_regs & KVM_SYNC_ARCH0) {
+> +		kvm_s390_set_cpu_timer(vcpu, kvm_run->s.regs.cputm);
+> +		vcpu->arch.sie_block->ckc = kvm_run->s.regs.ckc;
+> +	}
+>  	save_access_regs(vcpu->arch.host_acrs);
+>  	restore_access_regs(vcpu->run->s.regs.acrs);
+>  	/* save host (userspace) fprs/vrs */
+
+Diff reordering makes this a bit hard to review, but it seems
+reasonable at a glance.
+
