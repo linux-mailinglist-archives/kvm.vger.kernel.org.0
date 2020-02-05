@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DDD2415306D
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 13:11:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAE91153070
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 13:13:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726944AbgBEML6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 07:11:58 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30131 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726597AbgBEML5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 07:11:57 -0500
+        id S1726822AbgBEMNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 07:13:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30573 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726277AbgBEMNc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 07:13:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580904717;
+        s=mimecast20190719; t=1580904811;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OGXz7pz38Jnt1LvODbA2vv6Yak9eBfHUGuKGnkc08CY=;
-        b=F0rAXcsDFDuAEADeRQdzD1bn6uXlW0ExSgCNRW9GyrvQtuluG9WgNltD4FLKoO0R8b0ipr
-        Dg17s60yBZEGOp2kAeeNfbAnTpEB9hdcOrh7WBkLCXZ0VAnGYSe868LmbsCWCnqPYGCbsC
-        dt1l29lGiSXjNjQ8OhjO2BMaZaXsu6k=
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=06IsHV2aYDRonHTGjC87qFivVlsz0PtymrsSVSrsboA=;
+        b=Y0t/CywvQexM/fkSu4mIJIggSxNKgryuwbDkqmtHpE1PhYiiye03em4CrBw+Rx9UJzE9O9
+        WhqadHXKHU0xNA/t+zFhaSUSvqmsX6fuIY7B//3DLYUWIS/RSYLGQzvaZlAwSrbCxnlS0D
+        c9w7Axij2iKao7ocyhHRHpFimWwZLJk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-hxzArFMtMlW93P3m6xz8bA-1; Wed, 05 Feb 2020 07:11:53 -0500
-X-MC-Unique: hxzArFMtMlW93P3m6xz8bA-1
+ us-mta-369-5eZuAM-ePM6nB9-D9NNW_w-1; Wed, 05 Feb 2020 07:13:26 -0500
+X-MC-Unique: 5eZuAM-ePM6nB9-D9NNW_w-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EDD51081FA1;
-        Wed,  5 Feb 2020 12:11:52 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 57EBB19C7F;
-        Wed,  5 Feb 2020 12:11:48 +0000 (UTC)
-Date:   Wed, 5 Feb 2020 13:11:46 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Michael Mueller <mimu@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 854031081FAB;
+        Wed,  5 Feb 2020 12:13:25 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-132.ams2.redhat.com [10.36.116.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 15BB32133;
+        Wed,  5 Feb 2020 12:13:20 +0000 (UTC)
+Subject: Re: [RFCv2 25/37] KVM: s390: protvirt: STSI handling
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [RFCv2 15/37] KVM: s390: protvirt: Implement interruption
- injection
-Message-ID: <20200205131146.611a0d78.cohuck@redhat.com>
-In-Reply-To: <512413a4-196e-5acb-9583-561c061e40ee@linux.ibm.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
-        <20200203131957.383915-16-borntraeger@de.ibm.com>
-        <20200205123133.34ac71a2.cohuck@redhat.com>
-        <512413a4-196e-5acb-9583-561c061e40ee@linux.ibm.com>
-Organization: Red Hat GmbH
+ <20200203131957.383915-26-borntraeger@de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <3625b3bc-ddfb-2424-3ab0-6cd217af5856@redhat.com>
+Date:   Wed, 5 Feb 2020 13:13:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200203131957.383915-26-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
@@ -61,58 +60,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 5 Feb 2020 12:46:39 +0100
-Michael Mueller <mimu@linux.ibm.com> wrote:
-
-> On 05.02.20 12:31, Cornelia Huck wrote:
-> > On Mon,  3 Feb 2020 08:19:35 -0500
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >   
-> >> From: Michael Mueller <mimu@linux.ibm.com>
-> >>
-> >> The patch implements interruption injection for the following
-> >> list of interruption types:
-> >>
-> >>    - I/O
-> >>      __deliver_io (III)
-> >>
-> >>    - External
-> >>      __deliver_cpu_timer (IEI)
-> >>      __deliver_ckc (IEI)
-> >>      __deliver_emergency_signal (IEI)
-> >>      __deliver_external_call (IEI)
-> >>
-> >>    - cpu restart
-> >>      __deliver_restart (IRI)  
-> > 
-> > Hm... what do 'III', 'IEI', and 'IRI' stand for?  
+On 03/02/2020 14.19, Christian Borntraeger wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> that's the kind of interruption injection being used:
+> Save response to sidad and disable address checking for protected
+> guests.
 > 
-> inject io interruption
-> inject external interruption
-> inject restart interruption
-
-So, maybe make this:
-
-- I/O (uses inject io interruption)
-  __ deliver_io
-
-- External (uses inject external interruption)
-(and so on)
-
-I find using the acronyms without explanation very confusing.
-
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  arch/s390/kvm/priv.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> >   
-> >>
-> >> The service interrupt is handled in a followup patch.
-> >>
-> >> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
-> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >> [fixes]
-> >> ---
-> >>   arch/s390/include/asm/kvm_host.h |  8 +++
-> >>   arch/s390/kvm/interrupt.c        | 93 ++++++++++++++++++++++----------
-> >>   2 files changed, 74 insertions(+), 27 deletions(-)
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index ed52ffa8d5d4..06c7e7a10825 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -872,7 +872,7 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>  
+>  	operand2 = kvm_s390_get_base_disp_s(vcpu, &ar);
+>  
+> -	if (operand2 & 0xfff)
+> +	if (!kvm_s390_pv_is_protected(vcpu->kvm) && (operand2 & 0xfff))
+>  		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+>  
+>  	switch (fc) {
+> @@ -893,8 +893,13 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>  		handle_stsi_3_2_2(vcpu, (void *) mem);
+>  		break;
+>  	}
+> +	if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+> +		memcpy((void *)vcpu->arch.sie_block->sidad, (void *)mem,
+
+That should use sida_origin() or "...->sidad & PAGE_MASK".
+
+> +		       PAGE_SIZE);
+> +		rc = 0;
+> +	} else
+> +		rc = write_guest(vcpu, operand2, ar, (void *)mem, PAGE_SIZE);
+
+Coding style: If one branch of the if-statement uses curly braces,
+please add them to the other branch as well.
+
+> -	rc = write_guest(vcpu, operand2, ar, (void *)mem, PAGE_SIZE);
+>  	if (rc) {
+>  		rc = kvm_s390_inject_prog_cond(vcpu, rc);
+>  		goto out;
+> 
+
+ Thomas
 
