@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 300C4153AF3
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 23:28:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 377E2153B2D
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 23:42:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727456AbgBEW2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 17:28:37 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55195 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727106AbgBEW2g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 17:28:36 -0500
+        id S1727579AbgBEWmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 17:42:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55516 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727518AbgBEWmC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 17:42:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580941715;
+        s=mimecast20190719; t=1580942522;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=xN2n9jkJvkSR0RH/zWMkRvEj2quGdHH6HsawLgUOQOY=;
-        b=dZayu8PSLv8/6Ghp/Mvv7c0KUzqbWjN5IIgGibeer+EBeiKqDOlXCaalVEpr6ZHR95R2GI
-        VzU86wDDsDrXGyCnKZv+jIJlIvU+xnJCrs0cxrgFbboUOecFaMHeazhhK/Mzufp6KD09Vt
-        vg+jgAiZu2w8ckESHO35/pIAhmie0tQ=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-TEkUgV6ROnWI1Te2B6wR7w-1; Wed, 05 Feb 2020 17:28:34 -0500
-X-MC-Unique: TEkUgV6ROnWI1Te2B6wR7w-1
-Received: by mail-qv1-f69.google.com with SMTP id g6so2476391qvp.0
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 14:28:34 -0800 (PST)
+        bh=rH9hapDVBD03GESwcZDF6GjM5sGJp1/0m6Dm+I8b0N0=;
+        b=JtDSey0FUdcytnDwLk7i5BQ57t9q7h12bqL0z5nUWblWZns4rdUrt8XGs9I3UhwoQ7NiX0
+        D3QnHe3wdCy17Urjhv/LosxOsxbLjDLkq+nK7BWa/BgbQCXHkFTP8vV06PRRJetJ+k1yFu
+        pa4uCYB0PHdEXHv4iIr3ow+Yxl48rWM=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-313-NXY0bi8qN3KU-gcZgK6W7Q-1; Wed, 05 Feb 2020 17:41:59 -0500
+X-MC-Unique: NXY0bi8qN3KU-gcZgK6W7Q-1
+Received: by mail-qt1-f197.google.com with SMTP id m8so2442140qta.20
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 14:41:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=xN2n9jkJvkSR0RH/zWMkRvEj2quGdHH6HsawLgUOQOY=;
-        b=UTX8XJLZ/0yX7n66McEfUjjQh89+VohTQGjaOSy1Z+1EitqtDRmaNTSYQ03xtIMAkk
-         CDjEQR7ulTxIFoRmXVrsCDyUdgqV8ak2yfnvuPsAweBt4UkmW/DeRaK05BkHYYHRMweX
-         MAcKFjMpj7JgzsmscZLglZBc7CtBqXH4qMZZqMeGQLOU8FylQjhMsJ0rgnYEmVzn4f/P
-         VS8QxW6WmX4K9VCn/nyn6zE7vYCpd0rN61g545KNjDxKJTADHBWXWdUht9bI+g7aT7LT
-         Qcco2E0lle/4okZ6kkmiCvy6TCNEX5cGHTfrcBBAWCvk7CID8kUx8p1o1Kov8sLN7RJB
-         LSlQ==
-X-Gm-Message-State: APjAAAUa9Neid/g1zjlmzYA7SqT/nKIC8uc9StKQSe/9c8vG7RQvxZds
-        gVDTKovKwM0njPz7HeO0tjXA/euTqPhk59DO583i/bw2iMWbFb/ScIHb6Z5S3FRzjyOgbvauwRQ
-        KCL7aYjXbc/QG
-X-Received: by 2002:a05:620a:a46:: with SMTP id j6mr13674qka.164.1580941714103;
-        Wed, 05 Feb 2020 14:28:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzgDC/fBZ4GnRbk3BQEXE+eWIhbbieAb4nE+MGEKdPSLikBImrRnbk5qAuaCcwE1K66PslinA==
-X-Received: by 2002:a05:620a:a46:: with SMTP id j6mr13650qka.164.1580941713724;
-        Wed, 05 Feb 2020 14:28:33 -0800 (PST)
+        bh=rH9hapDVBD03GESwcZDF6GjM5sGJp1/0m6Dm+I8b0N0=;
+        b=g2Bf84iXV04V1aDP61vim9OrsZu+jKIWjP4Dx6NVboQyH1W9hrOmW/M/+S2zpxMRWc
+         WELhIlmXWZV1rhu6aDsCl3M+OKEqZv+5w4YZxwlz+35qeKEU/AJZ/wuTia4/+XfTSjtL
+         TOo8y1llF/uoa0X5MKiCDhxBiWyJwuzi1Og6HSj83GFBCwdGCfrsvhRdeH2f+tFbweik
+         /HSlw9zMkUpavAD81cX5b3cogC/XEceWcBM0fvEaczXrPdBY4/1wWeZ66mwuJCAe86T5
+         FOujz/t/Soy2GwipJhkVjDUJCYH4LFKY5xPRjPLrWGKa0RsdVtegPj7HYWzCkfjb91lY
+         Lzog==
+X-Gm-Message-State: APjAAAWJLX43lgdQRmbFAUIG/01wER1k8yYiU8VF+OZByrGyR25ESItr
+        2L6ptp2tnMJFiryR8mGMngvsUhMDC2C2Ni9vlhkR2y6a49iGDyMsmANTlYbU4lX3RNauLNjiJpf
+        ToSwBU1Xz98Le
+X-Received: by 2002:a37:4fc3:: with SMTP id d186mr59902qkb.100.1580942518823;
+        Wed, 05 Feb 2020 14:41:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz7uhA3CGENCAtqy4g5GvmYMoxE6Qbx+Ub2ume93+vIa38OEJ1jq8Hx/Hw9ZpC1eb3usykd7Q==
+X-Received: by 2002:a37:4fc3:: with SMTP id d186mr59892qkb.100.1580942518606;
+        Wed, 05 Feb 2020 14:41:58 -0800 (PST)
 Received: from xz-x1 ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id c184sm503353qke.118.2020.02.05.14.28.31
+        by smtp.gmail.com with ESMTPSA id a201sm512222qkc.134.2020.02.05.14.41.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2020 14:28:33 -0800 (PST)
-Date:   Wed, 5 Feb 2020 17:28:29 -0500
+        Wed, 05 Feb 2020 14:41:57 -0800 (PST)
+Date:   Wed, 5 Feb 2020 17:41:54 -0500
 From:   Peter Xu <peterx@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -70,38 +70,45 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
         Christoffer Dall <christoffer.dall@arm.com>,
         Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v5 03/19] KVM: Don't free new memslot if allocation of
- said memslot fails
-Message-ID: <20200205222829.GF387680@xz-x1>
+Subject: Re: [PATCH v5 04/19] KVM: PPC: Move memslot memory allocation into
+ prepare_memory_region()
+Message-ID: <20200205224154.GG387680@xz-x1>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
- <20200121223157.15263-4-sean.j.christopherson@intel.com>
+ <20200121223157.15263-5-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200121223157.15263-4-sean.j.christopherson@intel.com>
+In-Reply-To: <20200121223157.15263-5-sean.j.christopherson@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 21, 2020 at 02:31:41PM -0800, Sean Christopherson wrote:
-> The two implementations of kvm_arch_create_memslot() in x86 and PPC are
-> both good citizens and free up all local resources if creation fails.
-> Return immediately (via a superfluous goto) instead of calling
-> kvm_free_memslot().
-> 
-> Note, the call to kvm_free_memslot() is effectively an expensive nop in
-> this case as there are no resources to be freed.
+On Tue, Jan 21, 2020 at 02:31:42PM -0800, Sean Christopherson wrote:
+>  static int kvmppc_core_prepare_memory_region_hv(struct kvm *kvm,
+> -					struct kvm_memory_slot *memslot,
+> -					const struct kvm_userspace_memory_region *mem)
+> +					struct kvm_memory_slot *slot,
+> +					const struct kvm_userspace_memory_region *mem,
+> +					enum kvm_mr_change change)
+>  {
+> +	unsigned long npages = mem->memory_size >> PAGE_SHIFT;
 
-(I failed to understand why that is expensive.. but the change looks OK)
-
-> 
-> No functional change intended.
-> 
-> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Only in case if this patch still needs a respin: IIUC we can directly
+use slot->npages below.  No matter what:
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
+
+> +
+> +	if (change == KVM_MR_CREATE) {
+> +		slot->arch.rmap = vzalloc(array_size(npages,
+> +					  sizeof(*slot->arch.rmap)));
+> +		if (!slot->arch.rmap)
+> +			return -ENOMEM;
+> +	}
+> +
+>  	return 0;
+>  }
 
 -- 
 Peter Xu
