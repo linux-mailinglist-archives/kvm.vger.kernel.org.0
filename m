@@ -2,64 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F1A01535AF
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 17:55:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5E551535B3
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 17:57:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727512AbgBEQzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 11:55:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35070 "EHLO
+        id S1727457AbgBEQ5G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 11:57:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32820 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727471AbgBEQzx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 11:55:53 -0500
+        with ESMTP id S1727079AbgBEQ5G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 11:57:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580921752;
+        s=mimecast20190719; t=1580921825;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=k4MVBpJvu2dSV+rRvdIP9GW4lozYekAvYZ8weTGnL0Q=;
-        b=gdGShX0JztpDvtezh/AwOu5deKmpDgKkHvkcQMMAebcAuYYCAoJm943VZ+SjB4sDeQ8PyU
-        8UyHGViJF8sOGPARi8E3xNpRO6bq9QJTUgM3o1pMhraJk5OvNiqMM3YlpBYAxKJImqvvtD
-        CYK+jcm7KtOkNHgL5UktEvgZpLT33NI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-sSQuxdHxMjmPBOzXAKdjTg-1; Wed, 05 Feb 2020 11:55:35 -0500
-X-MC-Unique: sSQuxdHxMjmPBOzXAKdjTg-1
-Received: by mail-wm1-f69.google.com with SMTP id l11so2175998wmi.0
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 08:55:35 -0800 (PST)
+        bh=PxFkSdvrYLxIEAwQWaBaRc6nRKIPOYjssvLU1SdT+6A=;
+        b=U093wRe37lr9NqEC+BhSd4vcVng3O56aQ2w9MBM5ZIXcBCK7WbjxkCrBjZ9k+5KsElccw/
+        Qe6CIH4t7hxzvhU8hZlAnZ16ojZl5/c8mCLoSNmW3OlAcgbmB2tCZvvYPM//ZrCLFCcTMf
+        xAQ0SxNKJNYStoduFBgqp9DXUlMZJVE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28-rP9gVdHsNTesCCUWEvr_bQ-1; Wed, 05 Feb 2020 11:57:02 -0500
+X-MC-Unique: rP9gVdHsNTesCCUWEvr_bQ-1
+Received: by mail-wr1-f71.google.com with SMTP id u18so1459714wrn.11
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 08:57:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=k4MVBpJvu2dSV+rRvdIP9GW4lozYekAvYZ8weTGnL0Q=;
-        b=Gl5JIPkq4CcrSiRaPdSC7bvv4X5ZUX12fTvsvnbrVzMKUjLNmKFAYLl399r58e2ESZ
-         uoLl1Klt99AyNznBa+3XGJOP+YegRbUOwXydFaFMKDeSs8nRsaYWswxZM6DLMcgHXi2O
-         J7tlSjFbDZHFhlKOvwbfAHVMzmnZCoKIeZAXXs6qNMqwND1rIUdx2MkZGXhkV+KhOw3A
-         bU9tnrEm0ZNi98cKSDf7dXOlGVg7zhXenY7lQb/vcxxJVKFAeD5vyhNcyoiduQYkhbQY
-         sS/YATbDTpUSo33WFMjmbSUIL/A/IWh5JqQ++zndMVQvKCORHXBSAS2GDEptv3wNfPFk
-         qR+g==
-X-Gm-Message-State: APjAAAVQnPfuN4SwTPmZZ3y8vObOkqymL6OxQ5Jnpm1jAs72IpTmXVMT
-        q/CCWuZrpirwDA5ccstILz7CF4yRan2WbdaPtw1HTjONPrzTsqMz0ZKFlg8bAiMWUGZYrQwwk/L
-        apz1wLCn9IMZa
-X-Received: by 2002:a5d:5345:: with SMTP id t5mr31667144wrv.0.1580921734228;
-        Wed, 05 Feb 2020 08:55:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzQQGZFn8f+vjgX1oOiNfRFBunHlzYyc7eIL09p/fJ5XAIKuxHd5/z7XrQWRsaDossHo7DJAg==
-X-Received: by 2002:a5d:5345:: with SMTP id t5mr31667128wrv.0.1580921734068;
-        Wed, 05 Feb 2020 08:55:34 -0800 (PST)
+        bh=PxFkSdvrYLxIEAwQWaBaRc6nRKIPOYjssvLU1SdT+6A=;
+        b=jVJHgNBWrFKMkeQSzN34fdzXx5sGamlJ3H4ck4wXDvjditqa450m8g+TdgqpfI9AeO
+         EE9D7XGQtcif49Fd2Iuowf6VTUP+aVOa1W5TMbbN13PIDq1uvW3fB4Dl+RkZWI0v/VwU
+         vCHg5FpEE8wDOiFbSugVRLiSvz11i5CqYuLAcnfRko8ECroyQwHT582ry9gPsCbdfpOH
+         spipp1jncorC3wMA206JnSnAutDVe0+nc7urD/Gw3AoqBV2uznm9f+FBzVjxIBwrD+0V
+         BA8ugYNbtXBZEa9RJ6o8bx5fYf8PlsSr3GJOolnL4vRHSfIjLVq+/XFHiql2Risr5PB7
+         oR4Q==
+X-Gm-Message-State: APjAAAUdupm4Rf1QW7BgWp1rvUYQsF0K2IcFQhwW/9z3sWgdfUCShy2i
+        kzkt3I7oKjvrzZoITi/3y5TXK9da0ab9WfZM3KqoJABxCzP1M7PerUuJ+dgUnRDkBu0K8SXc2l3
+        m/2BDLWUSyM2I
+X-Received: by 2002:a7b:ca49:: with SMTP id m9mr4617863wml.50.1580921821173;
+        Wed, 05 Feb 2020 08:57:01 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw6o+ESIGmO/3zFWtD1tm/ePiEllQhG+yeSmmbQ8rnxhegcVzud2hRMO5aLmfS0Rt3YXlUp7A==
+X-Received: by 2002:a7b:ca49:: with SMTP id m9mr4617845wml.50.1580921820988;
+        Wed, 05 Feb 2020 08:57:00 -0800 (PST)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id 18sm209330wmf.1.2020.02.05.08.55.33
+        by smtp.gmail.com with ESMTPSA id v14sm559308wrm.28.2020.02.05.08.57.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2020 08:55:33 -0800 (PST)
+        Wed, 05 Feb 2020 08:57:00 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 04/26] KVM: x86: Add a kvm_x86_ops hook to query virtualized MSR support
-In-Reply-To: <20200205153508.GD4877@linux.intel.com>
-References: <20200129234640.8147-1-sean.j.christopherson@intel.com> <20200129234640.8147-5-sean.j.christopherson@intel.com> <87eev9ksqy.fsf@vitty.brq.redhat.com> <20200205145923.GC4877@linux.intel.com> <8736bpkqif.fsf@vitty.brq.redhat.com> <20200205153508.GD4877@linux.intel.com>
-Date:   Wed, 05 Feb 2020 17:55:32 +0100
-Message-ID: <87tv45j7nf.fsf@vitty.brq.redhat.com>
+To:     linmiaohe <linmiaohe@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Subject: Re: [PATCH] KVM: vmx: delete meaningless vmx_decache_cr0_guest_bits() declaration
+In-Reply-To: <1580916833-28905-1-git-send-email-linmiaohe@huawei.com>
+References: <1580916833-28905-1-git-send-email-linmiaohe@huawei.com>
+Date:   Wed, 05 Feb 2020 17:56:59 +0100
+Message-ID: <87r1z9j7l0.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -67,39 +68,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+linmiaohe <linmiaohe@huawei.com> writes:
 
-> On Wed, Feb 05, 2020 at 04:22:48PM +0100, Vitaly Kuznetsov wrote:
->> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->> 
->> > On Wed, Feb 05, 2020 at 03:34:29PM +0100, Vitaly Kuznetsov wrote:
->> >> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->> >> 
->> >> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> >
->> > Stooooooop!  Everything from this point on is obsoleted by kvm_cpu_caps!
->> >
->> 
->> Oops, this was only a week old series! Patches are rottening fast
->> nowadays!
+> From: Miaohe Lin <linmiaohe@huawei.com>
 >
-> Sorry :-(
+> The function vmx_decache_cr0_guest_bits() is only called below its
+> implementation. So this is meaningless and should be removed.
 >
-> I dug deeper into the CPUID crud after posting this series because I really
-> didn't like the end result for vendor-specific leafs, and ended up coming
-> up with (IMO) a much more elegant solution.
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 2 --
+>  1 file changed, 2 deletions(-)
 >
-> https://lkml.kernel.org/r/20200201185218.24473-1-sean.j.christopherson@intel.com/
->
-> or on patchwork
->
-> https://patchwork.kernel.org/cover/11361361/
->
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 678edbd6e278..061fefc30ecc 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1428,8 +1428,6 @@ static bool emulation_required(struct kvm_vcpu *vcpu)
+>  	return emulate_invalid_guest_state && !guest_state_valid(vcpu);
+>  }
+>  
+> -static void vmx_decache_cr0_guest_bits(struct kvm_vcpu *vcpu);
+> -
+>  unsigned long vmx_get_rflags(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
 
-Thanks, I saw it. I tried applying it to kvm/next earlier today but
-failed. Do you by any chance have a git branch somewhere? I'll try to
-review it and test at least AMD stuff (if AMD people don't beat me to it
-of course).
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 -- 
 Vitaly
