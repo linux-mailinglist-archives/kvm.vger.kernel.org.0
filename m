@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E94761524F6
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 03:59:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91A741524F7
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 03:59:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727746AbgBEC6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Feb 2020 21:58:54 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32509 "EHLO
+        id S1727929AbgBEC6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Feb 2020 21:58:55 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50685 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727789AbgBEC6x (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 21:58:53 -0500
+        by vger.kernel.org with ESMTP id S1727832AbgBEC6z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Feb 2020 21:58:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580871532;
+        s=mimecast20190719; t=1580871534;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dlAqEpPTUndIZh7wPLDVCooz5AgvSxeI8vfIAUOxmtc=;
-        b=CvrNleSqn+uq8W+iWiDwmIdnyIFtvF63afOV0xAl1pxLPfNRuYrrGbHTvQSX15SH1jpWk3
-        Crd6uXNE7KieNowrZVL8BwXBQop43dOKRvkSOflLRV/9V+mrYzwIsazs1df9qZwIIVXaq1
-        9RU9aXbfnXRQGI3CUdbcv0yk3imADcE=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-jCwaQJ8-M-KWtgHkF6bLgA-1; Tue, 04 Feb 2020 21:58:50 -0500
-X-MC-Unique: jCwaQJ8-M-KWtgHkF6bLgA-1
-Received: by mail-qv1-f70.google.com with SMTP id z39so638682qve.5
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 18:58:50 -0800 (PST)
+        bh=FDwDto3hXPczPquqfclgMLW72/UWKwUFYUker/I93cA=;
+        b=M+RsxE+Z4uLJZjLH2HnMk4DRJKIbLQikBOlVFOS1ktwJ0Rumr+yVF0Bwr+p2Ozz1e2edR8
+        YWcOTHnSaIr3gzDfCff+umydDiYGsxI3pqiIeoOp8wG1V9Lqa/qzdKbRcj3e9FXcAp/Bdm
+        8IGxB+2ChCusvCmFV+2XDktI9W/TurA=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-0FOGjb3uPv6EnqhNNpaa-A-1; Tue, 04 Feb 2020 21:58:53 -0500
+X-MC-Unique: 0FOGjb3uPv6EnqhNNpaa-A-1
+Received: by mail-qt1-f200.google.com with SMTP id c10so399445qtk.18
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2020 18:58:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=dlAqEpPTUndIZh7wPLDVCooz5AgvSxeI8vfIAUOxmtc=;
-        b=tvBN1tUmrQSroP0eR7LDjMzJs8zki85MD0wHHyGGsC/CPUnZXJ1Vm7FgrfhhXXKTSS
-         v3n/U18+WTlE1pBsL7aNbK0mL/Rqh5aU8K3cOI0UYjm3D+bsQzYfPfpQawXKPzYugdT2
-         mlmV+9JckuKQaoh+p34TSoarVRDp1vNEFIUSTT9fKpFHEOKuVm8HpLEXlHNXsUpE5Ptc
-         LqIuAuN5yT3N5xDGLLZUHMQmE6V9zPpd9aoDnxvGlyIBHrq+nmqbOQxY531RczHVVprU
-         EtWq9wfCRZUI5vRDiwuD/VoYVqTRz0c89acqsQmnMscywdBnuPsJLcGHPFUecINLH0J2
-         GKlg==
-X-Gm-Message-State: APjAAAWFYVW30aU6eUfeB85Q9LBnBSMh1lRcECN0vSzW7I6Yv6hYw0Qs
-        ono1E5D6XXC/8XzGCS1INsTAyTffxftOe+eDasmeZSt/YeG7EIWrNTERS2sfcpAetidosJV+u0m
-        f0joLRjjA9YAa
-X-Received: by 2002:a37:a14f:: with SMTP id k76mr31068424qke.170.1580871530252;
-        Tue, 04 Feb 2020 18:58:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxlLWnSK6a/QgArTLNRRly1uyWTIwUItXLoG9GWm3CQ5h4eRRPsHCvnbEv3po8kqmv45eTqfg==
-X-Received: by 2002:a37:a14f:: with SMTP id k76mr31068418qke.170.1580871529992;
-        Tue, 04 Feb 2020 18:58:49 -0800 (PST)
+        bh=FDwDto3hXPczPquqfclgMLW72/UWKwUFYUker/I93cA=;
+        b=gSY+t5Xwl/7i+YW4DFyG9daWHvhnb7ea58vmL3ZVsKfB9Iw6N/qdGHyUdo3j/oVXMQ
+         mM/6g8CJofsywE9ovkGRZ2feSTrSoAqBB7OyGhToaMrJpO6F7acPtN33VNwYp2FdukMm
+         CLy+hKhnlpbvoQ59TQV3DCmOxj8/D/udbcQCkGXKE1HU93QdUFfsK4dfWsoGciKx9dTH
+         E1aCoibXmvZCkz2Mijj7sQq/NnwROwWkv/Iq4MXDo6pZwRWFKgRp3ZlQjsuXbzPI0/En
+         jesmQxuD2r+yHm/40cnmcPHUCq/GWrKk1WwUaFYH/KQlClcyKNl5h43G0M9KFDHL69rA
+         ijzw==
+X-Gm-Message-State: APjAAAUxlN8NqQrM3R9nBJKXHY/hn2tdIjuwkXzbNRzQcPfbfEbVcv35
+        xQMIOGb8P8U9vfV4DXMhZSJBf7qWZcRWCIldkcpzXrFtiBxf+i9T4kQ7xgxYI82nHkHUFqwuaMq
+        WFijDm+dtAP3N
+X-Received: by 2002:ac8:1a19:: with SMTP id v25mr31897235qtj.146.1580871532265;
+        Tue, 04 Feb 2020 18:58:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy668FfAXq+R1N+S7y8JoV5xEv9AZL3pJHQVt+dfDh0K4BFDgeoMXGuKkNpqPRLfsJVQKtMaw==
+X-Received: by 2002:ac8:1a19:: with SMTP id v25mr31897220qtj.146.1580871532024;
+        Tue, 04 Feb 2020 18:58:52 -0800 (PST)
 Received: from xz-x1.redhat.com ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id e64sm12961649qtd.45.2020.02.04.18.58.47
+        by smtp.gmail.com with ESMTPSA id e64sm12961649qtd.45.2020.02.04.18.58.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2020 18:58:48 -0800 (PST)
+        Tue, 04 Feb 2020 18:58:51 -0800 (PST)
 From:   Peter Xu <peterx@redhat.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     dinechin@redhat.com, sean.j.christopherson@intel.com,
@@ -57,9 +57,9 @@ Cc:     dinechin@redhat.com, sean.j.christopherson@intel.com,
         mst@redhat.com, peterx@redhat.com, kevin.tian@intel.com,
         alex.williamson@redhat.com, dgilbert@redhat.com,
         vkuznets@redhat.com
-Subject: [PATCH 06/14] KVM: Make dirty ring exclusive to dirty bitmap log
-Date:   Tue,  4 Feb 2020 21:58:34 -0500
-Message-Id: <20200205025842.367575-3-peterx@redhat.com>
+Subject: [PATCH 07/14] KVM: Don't allocate dirty bitmap if dirty ring is enabled
+Date:   Tue,  4 Feb 2020 21:58:35 -0500
+Message-Id: <20200205025842.367575-4-peterx@redhat.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200205025842.367575-1-peterx@redhat.com>
 References: <20200205025105.367213-1-peterx@redhat.com>
@@ -71,77 +71,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There's no good reason to use both the dirty bitmap logging and the
-new dirty ring buffer to track dirty bits.  We should be able to even
-support both of them at the same time, but it could complicate things
-which could actually help little.  Let's simply make it the rule
-before we enable dirty ring on any arch, that we don't allow these two
-interfaces to be used together.
+Because kvm dirty rings and kvm dirty log is used in an exclusive way,
+Let's avoid creating the dirty_bitmap when kvm dirty ring is enabled.
+At the meantime, since the dirty_bitmap will be conditionally created
+now, we can't use it as a sign of "whether this memory slot enabled
+dirty tracking".  Change users like that to check against the kvm
+memory slot flags.
 
-The big world switch would be KVM_CAP_DIRTY_LOG_RING capability
-enablement.  That's where we'll switch from the default dirty logging
-way to the dirty ring way.  As long as kvm->dirty_ring_size is setup
-correctly, we'll once and for all switch to the dirty ring buffer mode
-for the current virtual machine.
+Note that there still can be chances where the kvm memory slot got its
+dirty_bitmap allocated, _if_ the memory slots are created before
+enabling of the dirty rings and at the same time with the dirty
+tracking capability enabled, they'll still with the dirty_bitmap.
+However it should not hurt much (e.g., the bitmaps will always be
+freed if they are there), and the real users normally won't trigger
+this because dirty bit tracking flag should in most cases only be
+applied to kvm slots only before migration starts, that should be far
+latter than kvm initializes (VM starts).
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- Documentation/virt/kvm/api.txt |  7 +++++++
- virt/kvm/kvm_main.c            | 12 ++++++++++++
- 2 files changed, 19 insertions(+)
+ arch/x86/kvm/mmu/mmu.c   | 4 ++--
+ include/linux/kvm_host.h | 5 +++++
+ virt/kvm/kvm_main.c      | 5 +++--
+ 3 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-index 558e719efdec..bbdd68583cde 100644
---- a/Documentation/virt/kvm/api.txt
-+++ b/Documentation/virt/kvm/api.txt
-@@ -5514,3 +5514,10 @@ make sure all the existing dirty gfns are flushed to the dirty rings.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 92c250e26823..039d20043ca3 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1273,8 +1273,8 @@ gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+ 	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
+ 		return NULL;
+-	if (no_dirty_log && slot->dirty_bitmap)
+-		return NULL;
++	if (no_dirty_log && kvm_slot_dirty_track_enabled(slot))
++		return false;
  
- The dirty ring can gets full.  When it happens, the KVM_RUN of the
- vcpu will return with exit reason KVM_EXIT_DIRTY_LOG_FULL.
+ 	return slot;
+ }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e9d6e96a47be..a49e6846afe6 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -351,6 +351,11 @@ struct kvm_memory_slot {
+ 	u8 as_id;
+ };
+ 
++static inline bool kvm_slot_dirty_track_enabled(struct kvm_memory_slot *slot)
++{
++	return slot->flags & KVM_MEM_LOG_DIRTY_PAGES;
++}
 +
-+NOTE: the KVM_CAP_DIRTY_LOG_RING capability and the new ioctl
-+KVM_RESET_DIRTY_RINGS are exclusive to the existing KVM_GET_DIRTY_LOG
-+interface.  After enabling KVM_CAP_DIRTY_LOG_RING with an acceptable
-+dirty ring size, the virtual machine will switch to the dirty ring
-+tracking mode, and KVM_GET_DIRTY_LOG, KVM_CLEAR_DIRTY_LOG ioctls will
-+stop working.
+ static inline unsigned long kvm_dirty_bitmap_bytes(struct kvm_memory_slot *memslot)
+ {
+ 	return ALIGN(memslot->npages, BITS_PER_LONG) / 8;
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index b710cee7e897..5a6f83b7270f 100644
+index 5a6f83b7270f..72b45f491692 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1243,6 +1243,10 @@ int kvm_get_dirty_log(struct kvm *kvm,
- 	unsigned long n;
- 	unsigned long any = 0;
+@@ -1152,7 +1152,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	}
  
-+	/* Dirty ring tracking is exclusive to dirty log tracking */
-+	if (kvm->dirty_ring_size)
-+		return -EINVAL;
-+
- 	as_id = log->slot >> 16;
- 	id = (u16)log->slot;
- 	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
-@@ -1300,6 +1304,10 @@ int kvm_get_dirty_log_protect(struct kvm *kvm,
- 	unsigned long *dirty_bitmap;
- 	unsigned long *dirty_bitmap_buffer;
+ 	/* Allocate page dirty bitmap if needed */
+-	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
++	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap &&
++	    !kvm->dirty_ring_size) {
+ 		if (kvm_create_dirty_bitmap(&new) < 0)
+ 			goto out_free;
+ 	}
+@@ -2348,7 +2349,7 @@ static void mark_page_dirty_in_slot(struct kvm *kvm,
+ 				    struct kvm_memory_slot *memslot,
+ 				    gfn_t gfn)
+ {
+-	if (memslot && memslot->dirty_bitmap) {
++	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
+ 		unsigned long rel_gfn = gfn - memslot->base_gfn;
+ 		u32 slot = (memslot->as_id << 16) | memslot->id;
  
-+	/* Dirty ring tracking is exclusive to dirty log tracking */
-+	if (kvm->dirty_ring_size)
-+		return -EINVAL;
-+
- 	as_id = log->slot >> 16;
- 	id = (u16)log->slot;
- 	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
-@@ -1371,6 +1379,10 @@ int kvm_clear_dirty_log_protect(struct kvm *kvm,
- 	unsigned long *dirty_bitmap;
- 	unsigned long *dirty_bitmap_buffer;
- 
-+	/* Dirty ring tracking is exclusive to dirty log tracking */
-+	if (kvm->dirty_ring_size)
-+		return -EINVAL;
-+
- 	as_id = log->slot >> 16;
- 	id = (u16)log->slot;
- 	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
 -- 
 2.24.1
 
