@@ -2,72 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C03221533F6
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:35:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58C48153473
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:44:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727500AbgBEPfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 10:35:09 -0500
-Received: from mga04.intel.com ([192.55.52.120]:8220 "EHLO mga04.intel.com"
+        id S1726973AbgBEPoq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 10:44:46 -0500
+Received: from mga17.intel.com ([192.55.52.151]:45345 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726416AbgBEPfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 10:35:09 -0500
+        id S1726592AbgBEPoq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 10:44:46 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2020 07:35:09 -0800
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2020 07:44:45 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,406,1574150400"; 
-   d="scan'208";a="431903663"
+   d="scan'208";a="279408298"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga006.fm.intel.com with ESMTP; 05 Feb 2020 07:35:08 -0800
-Date:   Wed, 5 Feb 2020 07:35:08 -0800
+  by FMSMGA003.fm.intel.com with ESMTP; 05 Feb 2020 07:44:45 -0800
+Date:   Wed, 5 Feb 2020 07:44:45 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 04/26] KVM: x86: Add a kvm_x86_ops hook to query
- virtualized MSR support
-Message-ID: <20200205153508.GD4877@linux.intel.com>
-References: <20200129234640.8147-1-sean.j.christopherson@intel.com>
- <20200129234640.8147-5-sean.j.christopherson@intel.com>
- <87eev9ksqy.fsf@vitty.brq.redhat.com>
- <20200205145923.GC4877@linux.intel.com>
- <8736bpkqif.fsf@vitty.brq.redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] x86: Use "-cpu host" for PCID tests
+Message-ID: <20200205154444.GE4877@linux.intel.com>
+References: <20200204194809.2077-1-sean.j.christopherson@intel.com>
+ <150744a7-5be7-8ed6-9eea-cc9c1b46a425@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8736bpkqif.fsf@vitty.brq.redhat.com>
+In-Reply-To: <150744a7-5be7-8ed6-9eea-cc9c1b46a425@redhat.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 05, 2020 at 04:22:48PM +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Wed, Feb 05, 2020 at 04:26:40PM +0100, Paolo Bonzini wrote:
+> On 04/02/20 20:48, Sean Christopherson wrote:
+> > Use the host CPU model for the PCID tests to allow testing the various
+> > combinations of PCID and INVPCID enabled/disabled without having to
+> > manually change the kvm-unit-tests command line.  I.e. give users the
+> > option of changing the command line *OR* running on a (virtual) CPU
+> > with or without PCID and/or INVPCID.
 > 
-> > On Wed, Feb 05, 2020 at 03:34:29PM +0100, Vitaly Kuznetsov wrote:
-> >> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> >> 
-> >> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >
-> > Stooooooop!  Everything from this point on is obsoleted by kvm_cpu_caps!
-> >
-> 
-> Oops, this was only a week old series! Patches are rottening fast
-> nowadays!
+> I don't understand. :)
 
-Sorry :-(
+I was trying to test a change in the code that clears INVPCID in guest's
+CPUID if PCID isn't supported.  To do that, I ran the PCID unit test in L1,
+using L0 Qemu to hide PCID and/or INVPCID from L1 to iterate over the four
+combinations of PCID and INVPCID being enabled/disabled.  But the test in
+L1 never exercised INVPCID=y because unittest.cfg runs with the test with
+"-cpu=qemu64,+pcid".
 
-I dug deeper into the CPUID crud after posting this series because I really
-didn't like the end result for vendor-specific leafs, and ended up coming
-up with (IMO) a much more elegant solution.
+By using qemu64, the only way to test INVPCID=y is to manually run the test
+a different "-cpu..." command.  The idea behind "-cpu=host" is to enable
+running different combinations of the test in L1 by hiding features from L1
+instead of by running the test with different commands.
 
-https://lkml.kernel.org/r/20200201185218.24473-1-sean.j.christopherson@intel.com/
-
-or on patchwork
-
-https://patchwork.kernel.org/cover/11361361/
+In other words, if I create an L1 with PCID=y and INVPCID=y, I expect that
+running the as-configured PCID unit tests would actually test PCID=Y and
+INVPCID=y.
