@@ -2,101 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 72A3D153324
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 15:37:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A218B153332
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 15:39:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726563AbgBEOhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 09:37:24 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41286 "EHLO
+        id S1727008AbgBEOjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 09:39:14 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55502 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726502AbgBEOhY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 09:37:24 -0500
+        by vger.kernel.org with ESMTP id S1726320AbgBEOjO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 09:39:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580913442;
+        s=mimecast20190719; t=1580913553;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jWlvFwUdUv+RENWF5c/fy1loseX2NrAzZ8YGZViIh9Q=;
-        b=RI5vEzj05qZnkO2l4eqCqofgo3acbjKUDhjkyBTPAA+uW2y/xtYdsp7m6HRlrAL/RiaVuM
-        OIPC78r57yAjXLz1UNj21hsr5CVewDtwgrzapkHrrUI0t35mGDJjPugz+aK9md9tuiAX2X
-        +fzOvNH4LlZecviyAog68vszI7gkp1Y=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-257-nyehGvLPOMGTjCrTDlWY8w-1; Wed, 05 Feb 2020 09:37:20 -0500
-X-MC-Unique: nyehGvLPOMGTjCrTDlWY8w-1
-Received: by mail-wr1-f69.google.com with SMTP id 50so1293740wrc.2
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 06:37:20 -0800 (PST)
+        bh=SoydEapPcnWnsyykjUkOlfTYQqJiOhpLPIh1rU1g+ZM=;
+        b=THWJtdULO7acwRNjSzQVMxx+dCL+MvgXrTZ4YyyzmKosCrnlocFn5Ldi6TzekU/9kY6YOA
+        B+Kavzs9FJ48SlseFLMZa2vYwUFFpvb0Q/OBpn4jlhYFh1F9iHS+YwLRcjFkOQ1TPrOHk5
+        TUdFL0rgDX/rHgOIiZCn1AWS+phZwR4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-rqAzj5MXNa-tta_AXUKQ_Q-1; Wed, 05 Feb 2020 09:39:11 -0500
+X-MC-Unique: rqAzj5MXNa-tta_AXUKQ_Q-1
+Received: by mail-wr1-f72.google.com with SMTP id v17so1264350wrm.17
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 06:39:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jWlvFwUdUv+RENWF5c/fy1loseX2NrAzZ8YGZViIh9Q=;
-        b=mRtlPIimkQdi7g7Qx1USg/CLsFvI8nvlK0EjObDmOsmO9t8XAMOKdMpiZ2L3T4ZAkW
-         rMo26HTISeZ6yr30PAAvcCV/8dw7ntsVESzU5CES3Xqs8jRYWqdJgVRXc7EqCqssrbxX
-         hRNOf1Xnz4z5tmdnIAgy0Wq16NJKZeetNSq8l4FWRYOYJBdWFOTVQ4+qTxfZrCxagBwW
-         /sa/CqcC2fa0QWisC+Z2kLDJKeTC8MFfCxfkmhA/h6EgOn+2vNI2Zhyb5ubX5G3wJ1Xj
-         HdTHP/w5vzEmi7Uyjehz4lEpU0OZJBf8Po/gMfJ432nCsR9Nsx2KYiEBCJKQkv2bZgrA
-         MIBg==
-X-Gm-Message-State: APjAAAWYWkP6DEvmvbdppTFnpUl62gAe0fZT57uA6WRRDC6KrrqtJqDR
-        mNwB1STbf4s9l6k0Qv8UhL/TNtmqU1ZhXP6goH6AK3HYGnEh5mgvTDYSFfhVf7VytB9t50oFG3W
-        OCBjT9ngJe/ZA
-X-Received: by 2002:a5d:6144:: with SMTP id y4mr28122021wrt.367.1580913439820;
-        Wed, 05 Feb 2020 06:37:19 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzDnnQbP+VZROCaAZ6agojL2psHiA+jWmvjshHhDZUxQyLaSpAQAtfLUiTomj0vKySe4pbwqg==
-X-Received: by 2002:a5d:6144:: with SMTP id y4mr28122006wrt.367.1580913439652;
-        Wed, 05 Feb 2020 06:37:19 -0800 (PST)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id g128sm8208807wme.47.2020.02.05.06.37.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Feb 2020 06:37:19 -0800 (PST)
-Subject: Re: [PATCH 2/3] kvm: mmu: Separate generating and setting mmio ptes
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ben Gardon <bgardon@google.com>
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20200203230911.39755-1-bgardon@google.com>
- <20200203230911.39755-2-bgardon@google.com>
- <87sgjpkve2.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1a920cd0-530b-f380-a81a-da7cc6969f3e@redhat.com>
-Date:   Wed, 5 Feb 2020 15:37:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=SoydEapPcnWnsyykjUkOlfTYQqJiOhpLPIh1rU1g+ZM=;
+        b=lTZOWSRlKUTGyIE/DExriFQ4v4P7r5OhIB2Ib3BsrlkQDRmhtC3eTdmqCq4LQeH2VZ
+         ZpeCJkahBHans0+kDgjGfLns7CQJEuTf2q0o9P4OZVwxWY/ZTs8XyLTH6byrOE53sy2b
+         OxhRA0/CW+yVUiirKIt9NsyU4rM8H6cLrjehWHxTvxwppxc9SqexG7XRKpe/WlNCJHso
+         GM/ya7FYJH9Y6FLrTc+DR/IFkug8DIwSiWYra4sUABDScJJC0hsZehh/EQgr0HVilcqn
+         VvadmXfbyJe+67lqYmcORcF7pEB5NU7SVeHZBbo9/lSaNzGJMsmlvHFW6Zlsfk3XfYtl
+         rIMw==
+X-Gm-Message-State: APjAAAU7p4R+7HnS9LTEhGDa04N1FSNfksLqfzBs5JgjbbzhKK0VjMVj
+        XatR2OxXhAZE/eYU7J/JQkTGd1BDA5d+u3FG0rK45Hx4N4KKOf8oquCi2Q7XeRIzfZDlFjm0KWj
+        97INY4AdKxwNb
+X-Received: by 2002:a7b:c759:: with SMTP id w25mr6027146wmk.15.1580913550657;
+        Wed, 05 Feb 2020 06:39:10 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxZ2+MUSKIq0bFGeGsEl8yDAXhtSQNMDtk5nz9iHlEYoHTTiNkrjIeGzfVkfAlpNl/KZdLkuQ==
+X-Received: by 2002:a7b:c759:: with SMTP id w25mr6027129wmk.15.1580913550452;
+        Wed, 05 Feb 2020 06:39:10 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id k13sm21684wrx.59.2020.02.05.06.39.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2020 06:39:09 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 05/26] KVM: x86: Move MSR_TSC_AUX existence checks into vendor code
+In-Reply-To: <20200129234640.8147-6-sean.j.christopherson@intel.com>
+References: <20200129234640.8147-1-sean.j.christopherson@intel.com> <20200129234640.8147-6-sean.j.christopherson@intel.com>
+Date:   Wed, 05 Feb 2020 15:39:08 +0100
+Message-ID: <87blqdksj7.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87sgjpkve2.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/02/20 14:37, Vitaly Kuznetsov wrote:
->> +static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
->> +			   unsigned int access)
->> +{
->> +	u64 mask = make_mmio_spte(vcpu, gfn, access);
->> +	unsigned int gen = get_mmio_spte_generation(mask);
->> +
->> +	access = mask & ACC_ALL;
->> +
->>  	trace_mark_mmio_spte(sptep, gfn, access, gen);
-> 'access' and 'gen' are only being used for tracing, would it rather make
-> sense to rename&move it to the newly introduced make_mmio_spte()? Or do
-> we actually need tracing for both?
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-You would have the same issue with sptep.
+> Move the MSR_TSC_AUX existence check into vendor code using the newly
+> introduced ->has_virtualized_msr() hook to help pave the way toward the
+> removal of ->rdtscp_supported().
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/svm.c     | 7 +++++++
+>  arch/x86/kvm/vmx/vmx.c | 7 +++++++
+>  arch/x86/kvm/x86.c     | 4 ----
+>  3 files changed, 14 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 1f9323fbad81..4c8427f57b71 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -5987,6 +5987,13 @@ static bool svm_cpu_has_accelerated_tpr(void)
+>  
+>  static bool svm_has_virtualized_msr(u32 index)
+>  {
+> +	switch (index) {
+> +	case MSR_TSC_AUX:
+> +		return boot_cpu_has(X86_FEATURE_RDTSCP);
+> +	default:
+> +		break;
+> +	}
+> +
+>  	return true;
+>  }
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 3f2c094434e8..9588914e941e 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6276,6 +6276,13 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu,
+>  
+>  static bool vmx_has_virtualized_msr(u32 index)
+>  {
+> +	switch (index) {
+> +	case MSR_TSC_AUX:
+> +		return cpu_has_vmx_rdtscp();
+> +	default:
+> +		break;
+> +	}
+> +
+>  	return true;
+>  }
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 94f90fe1c0de..a8619c52ea86 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5241,10 +5241,6 @@ static void kvm_init_msr_list(void)
+>  			if (!kvm_mpx_supported())
+>  				continue;
+>  			break;
+> -		case MSR_TSC_AUX:
+> -			if (!kvm_x86_ops->rdtscp_supported())
+> -				continue;
+> -			break;
+>  		case MSR_IA32_RTIT_CTL:
+>  		case MSR_IA32_RTIT_STATUS:
+>  			if (!kvm_x86_ops->pt_supported())
 
-> Also, I dislike re-purposing function parameters.
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Yes, "trace_mark_mmio_spte(sptep, gfn, mask & ACC_ALL, gen);" is
-slightly better.
-
-Paolo
+-- 
+Vitaly
 
