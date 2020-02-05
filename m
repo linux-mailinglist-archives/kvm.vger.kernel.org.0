@@ -2,90 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C73B9153838
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 19:35:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B7D0153871
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 19:45:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727361AbgBESf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 13:35:29 -0500
-Received: from foss.arm.com ([217.140.110.172]:50994 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727309AbgBESf3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 13:35:29 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EACBD1FB;
-        Wed,  5 Feb 2020 10:35:28 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F5913F52E;
-        Wed,  5 Feb 2020 10:35:27 -0800 (PST)
-Date:   Wed, 5 Feb 2020 18:35:25 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-Subject: Re: [PATCH v2 kvmtool 24/30] vfio/pci: Don't write configuration
- value twice
-Message-ID: <20200205183525.0ed83c94@donnerap.cambridge.arm.com>
-In-Reply-To: <20200123134805.1993-25-alexandru.elisei@arm.com>
-References: <20200123134805.1993-1-alexandru.elisei@arm.com>
-        <20200123134805.1993-25-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1727455AbgBESp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 13:45:29 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57286 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727043AbgBESp3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 13:45:29 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015IiEK2033587
+        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 13:45:28 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhmm24wq-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 13:45:28 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Wed, 5 Feb 2020 18:45:26 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 5 Feb 2020 18:45:24 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015IjMid51904642
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 5 Feb 2020 18:45:22 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8C639A4051;
+        Wed,  5 Feb 2020 18:45:22 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 27D93A4053;
+        Wed,  5 Feb 2020 18:45:22 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.26.20])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  5 Feb 2020 18:45:22 +0000 (GMT)
+Subject: Re: [RFCv2 20/37] KVM: s390: protvirt: Add new gprs location handling
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+References: <20200203131957.383915-1-borntraeger@de.ibm.com>
+ <20200203131957.383915-21-borntraeger@de.ibm.com>
+ <a031e057-65f4-7288-63e4-cfa19b37707c@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Wed, 5 Feb 2020 19:45:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <a031e057-65f4-7288-63e4-cfa19b37707c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20020518-0020-0000-0000-000003A74FDB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20020518-0021-0000-0000-000021FF1BE8
+Message-Id: <72d1583c-b4bc-e8c6-4b66-0f32f3898ee6@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-05_06:2020-02-04,2020-02-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=930 bulkscore=0
+ impostorscore=0 mlxscore=0 priorityscore=1501 clxscore=1015 phishscore=0
+ malwarescore=0 lowpriorityscore=0 suspectscore=0 spamscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002050142
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jan 2020 13:47:59 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-Hi,
 
-> After writing to the device fd as part of the PCI configuration space
-> emulation, we read back from the device to make sure that the write
-> finished. The value is read back into the PCI configuration space and
-> afterwards, the same value is copied by the PCI emulation code. Let's
-> read from the device fd into a temporary variable, to prevent this
-> double write.
+On 05.02.20 12:18, Thomas Huth wrote:
+> On 03/02/2020 14.19, Christian Borntraeger wrote:
+>> From: Janosch Frank <frankja@linux.ibm.com>
+>>
+>> Guest registers for protected guests are stored at offset 0x380.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  arch/s390/include/asm/kvm_host.h |  4 +++-
+>>  arch/s390/kvm/kvm-s390.c         | 11 +++++++++++
+>>  2 files changed, 14 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>> index f5ca53574406..125511ec6eb0 100644
+>> --- a/arch/s390/include/asm/kvm_host.h
+>> +++ b/arch/s390/include/asm/kvm_host.h
+>> @@ -343,7 +343,9 @@ struct kvm_s390_itdb {
+>>  struct sie_page {
+>>  	struct kvm_s390_sie_block sie_block;
+>>  	struct mcck_volatile_info mcck_info;	/* 0x0200 */
+>> -	__u8 reserved218[1000];		/* 0x0218 */
+>> +	__u8 reserved218[360];		/* 0x0218 */
+>> +	__u64 pv_grregs[16];		/* 0x380 */
 > 
-> The double write is harmless in itself. But when we implement
-> reassignable BARs, we need to keep track of the old BAR value, and the
-> VFIO code is overwritting it.
+> s/0x380/0x0380/ to align with the other comments
+
+Ack. 
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  vfio/pci.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>> +	__u8 reserved400[512];
 > 
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index abde16dc8693..8a775a4a4a54 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -470,7 +470,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
->  	struct vfio_region_info *info;
->  	struct vfio_pci_device *pdev;
->  	struct vfio_device *vdev;
-> -	void *base = pci_hdr;
-> +	u32 tmp;
+> Maybe add a /* 0x0400 */ comment ... though it's obvious from the name
+> already.
 
-Can we make this a u64, please? I am not sure if 64-bit MMIO is allowed for PCI config space accesses, but a guest could do it anyway, and it looks like it would overwrite the vdev pointer on the stack here in this case.
-
-Cheers,
-Andre.
-
->  
->  	if (offset == PCI_ROM_ADDRESS)
->  		return;
-> @@ -490,7 +490,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
->  	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSI)
->  		vfio_pci_msi_cap_write(kvm, vdev, offset, data, sz);
->  
-> -	if (pread(vdev->fd, base + offset, sz, info->offset + offset) != sz)
-> +	if (pread(vdev->fd, &tmp, sz, info->offset + offset) != sz)
->  		vfio_dev_warn(vdev, "Failed to read %d bytes from Configuration Space at 0x%x",
->  			      sz, offset);
->  }
+ack
+> 
+>>  	struct kvm_s390_itdb itdb;	/* 0x0600 */
+>>  	__u8 reserved700[2304];		/* 0x0700 */
+>>  };
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index 39bf39a10cf2..1945180b857a 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -3996,6 +3996,7 @@ static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
+>>  static int __vcpu_run(struct kvm_vcpu *vcpu)
+>>  {
+>>  	int rc, exit_reason;
+>> +	struct sie_page *sie_page = (struct sie_page *)vcpu->arch.sie_block;
+>>  
+>>  	/*
+>>  	 * We try to hold kvm->srcu during most of vcpu_run (except when run-
+>> @@ -4017,8 +4018,18 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>>  		guest_enter_irqoff();
+>>  		__disable_cpu_timer_accounting(vcpu);
+>>  		local_irq_enable();
+>> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+>> +			memcpy(sie_page->pv_grregs,
+>> +			       vcpu->run->s.regs.gprs,
+>> +			       sizeof(sie_page->pv_grregs));
+>> +		}
+>>  		exit_reason = sie64a(vcpu->arch.sie_block,
+>>  				     vcpu->run->s.regs.gprs);
+>> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+>> +			memcpy(vcpu->run->s.regs.gprs,
+>> +			       sie_page->pv_grregs,
+>> +			       sizeof(sie_page->pv_grregs));
+>> +		}
+>>  		local_irq_disable();
+>>  		__enable_cpu_timer_accounting(vcpu);
+>>  		guest_exit_irqoff();
+>>
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
 
