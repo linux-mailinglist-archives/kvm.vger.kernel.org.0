@@ -2,84 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B354D1533CC
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:23:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AFB31533DA
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:26:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726973AbgBEPWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 10:22:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51718 "EHLO
+        id S1726661AbgBEP0s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 10:26:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56425 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726359AbgBEPWx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 10:22:53 -0500
+        with ESMTP id S1726359AbgBEP0r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 10:26:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580916172;
+        s=mimecast20190719; t=1580916406;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vKHNNfcl+r6URdhvtsRg9I1PCC+GPUyhu2TKclBNVok=;
-        b=R37HaykiseAX+83N6o7BC5LaHGImjvlRcVfLQ/pyY/xdAwYRnXpzjreL1ILs4dU3r8qejt
-        FahZ9onjttYwR5zNod0rY6D2UkfON3FoFPDVhDB3WEAl9gzadZHenkfQRt48hBaeMn5LEo
-        NWnROMBUstWKqqN2Pid0SO9ofOxDvBU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-p_nfrLSvN_e4aksm_cIMXg-1; Wed, 05 Feb 2020 10:22:50 -0500
-X-MC-Unique: p_nfrLSvN_e4aksm_cIMXg-1
-Received: by mail-wr1-f72.google.com with SMTP id d8so1332745wrq.12
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 07:22:50 -0800 (PST)
+        bh=RbjbepIUL1vCxAOKRoXzr+B1g/JIZ8wyixsAy1ctwI8=;
+        b=Ka60L+hKfC1Cabtj6C5xGhVO+l75DMxydIS5XekDw2/sSB52sTiid8jjXfZQH/zuQOsFEP
+        6xGa541//rTFvNEUr/s8tBhHLuWd2xuqZVWL6lSo/yYr3nE2UqMqmQY3lJzRphbQRlfb//
+        eBSJD6/DvO/aMQlYc3W1po3Vqdw52s8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-Q1lXVaFBOEWdhXfETGN6Ew-1; Wed, 05 Feb 2020 10:26:44 -0500
+X-MC-Unique: Q1lXVaFBOEWdhXfETGN6Ew-1
+Received: by mail-wm1-f71.google.com with SMTP id b133so974291wmb.2
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 07:26:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=vKHNNfcl+r6URdhvtsRg9I1PCC+GPUyhu2TKclBNVok=;
-        b=nJeyD3+lZBsMMV2M2IqMDyWZ3F8JEMXbvU9BrRkBqCe483h2BbuioIGfCFhPF82Az0
-         5Ps1XL1D39CdwHjGassxyYXjhdCociw35dk8ty2J1QW4J8CaQSh0p35Fv46aE1JbhPjt
-         vxdnNd37MSyUbFWK3nXUIT5YhTa0/QEjLSZeG9v8ErvRqUkvWGeTfke0AHMexpbF71qU
-         Q+1U/dzYE7bAG/v0PUUiMSWGNyiDB0VnTp8p+yJoRtFiRqtb/TQ08QvL+4mjX9SlQpB8
-         bCsKS2QvHKLT9Z7tNQyy25i9f4i9j8VVd4k4AFkx0O4W4sg5IgG7PIH7lUFHQlH1AnLq
-         2H7w==
-X-Gm-Message-State: APjAAAW3zLnC5/yKmydb951HTapoeaYOh6wAUUnKIiR1wJSInrJS0lKt
-        UXrTbhK0yqWlmZcQqVTKdoZ1HYEidETIjvcpL5IUXGyOQq78QwnAYnkAwAgAOn3yNZWhsAeuKNL
-        lKdaj/uyj/M7j
-X-Received: by 2002:a1c:48c1:: with SMTP id v184mr6184622wma.5.1580916169775;
-        Wed, 05 Feb 2020 07:22:49 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz1P6wGbDoWJ9U0FwfPyYZ8Yoaq4xJQ1R49Y2GfyL0piQVH3Iy3Xv1yALh03UKBJFamJjwwVQ==
-X-Received: by 2002:a1c:48c1:: with SMTP id v184mr6184584wma.5.1580916169331;
-        Wed, 05 Feb 2020 07:22:49 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id i204sm8952711wma.44.2020.02.05.07.22.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2020 07:22:48 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RbjbepIUL1vCxAOKRoXzr+B1g/JIZ8wyixsAy1ctwI8=;
+        b=dL8LjJ7XmejXvv1D8NN7ce94u4kY3W3xEdvESlGhiqsvhI30FPmNrNaMCAQ2zSQcLP
+         6uEpaV43m5bIq6L+dDYZfNM/jaAzacQMhCEmH62g6QuDzoWSTuiHr26d9EB5HDf1PMrs
+         sdh18Gd08Q8WlORBEllJoNBn/ffUVUURmcbrho+c8wgfc/6mQYrjc7Ps8oT3XimG9klK
+         Qy2MxsTuCP0rxVX5C6ov3ZhroZdjhZplyddcoatYML7K0JwcycI9C7GscBVpgArZh0rC
+         g8H3rCshPnyvMxBLvPW3tx+ucmOMsSTvih/BhBDBlkZ9CETeT6hLa9loNHEYjUIbZMfF
+         tE3Q==
+X-Gm-Message-State: APjAAAX1C6m+JDWkkeFjWAV1wy0dEzFH0kODva+K/IOw0FxEAtrS+Rud
+        MO/PcAAc/jwKAm22ZHapfnqr8kaLqtogwkOJW885VB2VhsHpftD3JvXuru+YqAL0Mv28WoVyk/N
+        Q2U5ronNCnWJA
+X-Received: by 2002:a1c:740b:: with SMTP id p11mr6550835wmc.78.1580916403011;
+        Wed, 05 Feb 2020 07:26:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzDjts+wG8+KRTMesJoG7yfBu0UrfAHvgWRpvAU6HKlur2QlqQmivkLI4stFk/0pdHeK6ScQw==
+X-Received: by 2002:a1c:740b:: with SMTP id p11mr6550818wmc.78.1580916402770;
+        Wed, 05 Feb 2020 07:26:42 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id z3sm200426wrs.32.2020.02.05.07.26.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2020 07:26:42 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH] x86: Use "-cpu host" for PCID tests
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 04/26] KVM: x86: Add a kvm_x86_ops hook to query virtualized MSR support
-In-Reply-To: <20200205145923.GC4877@linux.intel.com>
-References: <20200129234640.8147-1-sean.j.christopherson@intel.com> <20200129234640.8147-5-sean.j.christopherson@intel.com> <87eev9ksqy.fsf@vitty.brq.redhat.com> <20200205145923.GC4877@linux.intel.com>
-Date:   Wed, 05 Feb 2020 16:22:48 +0100
-Message-ID: <8736bpkqif.fsf@vitty.brq.redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20200204194809.2077-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <150744a7-5be7-8ed6-9eea-cc9c1b46a425@redhat.com>
+Date:   Wed, 5 Feb 2020 16:26:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200204194809.2077-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On 04/02/20 20:48, Sean Christopherson wrote:
+> Use the host CPU model for the PCID tests to allow testing the various
+> combinations of PCID and INVPCID enabled/disabled without having to
+> manually change the kvm-unit-tests command line.  I.e. give users the
+> option of changing the command line *OR* running on a (virtual) CPU
+> with or without PCID and/or INVPCID.
 
-> On Wed, Feb 05, 2020 at 03:34:29PM +0100, Vitaly Kuznetsov wrote:
->> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->> 
->> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->
-> Stooooooop!  Everything from this point on is obsoleted by kvm_cpu_caps!
->
+I don't understand. :)
 
-Oops, this was only a week old series! Patches are rottening fast
-nowadays!
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  x86/unittests.cfg | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index aae1523..25f4535 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -228,7 +228,7 @@ extra_params = --append "10000000 `date +%s`"
+>  
+>  [pcid]
+>  file = pcid.flat
+> -extra_params = -cpu qemu64,+pcid
+> +extra_params = -cpu host
+>  arch = x86_64
+>  
+>  [rdpru]
+> 
 
--- 
-Vitaly
+The main reason not to use "-cpu host" is that it is not supported by
+QEMU TCG (binary translation mode).  But there is no reason not to use
+"-cpu max", which works with TCG and is synonym with "-cpu host" on KVM. :)
+
+Paolo
+
+Paolo
 
