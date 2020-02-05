@@ -2,183 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B6FB1533DF
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:29:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A05091533E4
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 16:30:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726740AbgBEP3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 10:29:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36376 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726416AbgBEP3K (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 10:29:10 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 015FKQ5U143206
-        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 10:29:10 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhmn3c1c-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 10:29:10 -0500
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Wed, 5 Feb 2020 15:29:07 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 5 Feb 2020 15:29:06 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 015FT4tX43647460
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Feb 2020 15:29:05 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D364611C04A;
-        Wed,  5 Feb 2020 15:29:04 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 69F2611C04C;
-        Wed,  5 Feb 2020 15:29:04 +0000 (GMT)
-Received: from [9.152.99.235] (unknown [9.152.99.235])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  5 Feb 2020 15:29:04 +0000 (GMT)
-Reply-To: mimu@linux.ibm.com
-Subject: Re: [RFCv2 15/37] KVM: s390: protvirt: Implement interruption
- injection
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-16-borntraeger@de.ibm.com>
- <20200205123133.34ac71a2.cohuck@redhat.com>
-From:   Michael Mueller <mimu@linux.ibm.com>
-Organization: IBM
-Date:   Wed, 5 Feb 2020 16:30:15 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.1
+        id S1727029AbgBEPaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 10:30:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41844 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726359AbgBEPaj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 10:30:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580916637;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=moBbJsc64Ii3lhPLqwdyLSBVDQd6xMAbYyJ+BA5TEEA=;
+        b=bza7Hx70TCJV3G4DwnhUgT4LKkuQsuCWzSioWGsZKSqzXEq0FfLrjqa+SqbdleqxNfEm8m
+        oVjLXRK2bPDGjc9/e3agJALMcl1hNKXO8ANZubULkU6BmvxBrgXHXebW51yuRfSuRS0Lzz
+        Ls1+98GmtglQyvJVr/qGtbM48EdNY5k=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-_1sG5MV4PhyeaazB1nD6jg-1; Wed, 05 Feb 2020 10:30:35 -0500
+X-MC-Unique: _1sG5MV4PhyeaazB1nD6jg-1
+Received: by mail-wr1-f71.google.com with SMTP id t3so1333183wrm.23
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 07:30:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=moBbJsc64Ii3lhPLqwdyLSBVDQd6xMAbYyJ+BA5TEEA=;
+        b=HGERlcJXnxWIBfgdhzqgAISG7E899QnBo+5i0f1RRcXMcBP5U+WqE52n3oyxLTqveL
+         xlUgH25423cnGQw444RdE5ARqQDFRMlQytuEMJO93M4GNiO4KQfv4dH0Gb53Sq2hzogQ
+         9IFOsWm1DVDXIUXc7dZ0CkeET6C4Xk5A/j98GBMMgcDm/SQiKYmiEAgEPzHQcTzRlnBB
+         LnWs7+UoedpVolLvblHy2hxm4DCMtvPKLgA7QllDo3K2YYXB+7Dx/68IxsqpQe995WTJ
+         V4yCqGRecnxokMSQbaHXNkTufnAQb8J/+QEu9M7fo5XO+KiMfIymLrNzPZ0QZYiVtXEz
+         0Zug==
+X-Gm-Message-State: APjAAAVpoasuVMWlVoNibaHb6mE2EwMFCEFRMLzdYQSreQJWRSevGJVT
+        LSmLMbKpWoU2ijGdsbC+FcNk2BEmXrthze5JK7iJxWdKDqlHnHmsPpb61/H4xOcVFIkKF1v8i4R
+        EZIppXDsK4xgf
+X-Received: by 2002:a5d:4f8b:: with SMTP id d11mr27607535wru.87.1580916634272;
+        Wed, 05 Feb 2020 07:30:34 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzmVLL0VB9sQknIvinhqAh+AOK25JOU/h1W4GA++8d5Em1eRF5fiPuuCQpd8gHgCiyL1qmfSw==
+X-Received: by 2002:a5d:4f8b:: with SMTP id d11mr27607517wru.87.1580916633970;
+        Wed, 05 Feb 2020 07:30:33 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id f1sm169304wro.85.2020.02.05.07.30.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2020 07:30:33 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: Mark CR4.UMIP as reserved based on associated
+ CPUID bit
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200128235344.29581-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fc55c156-e689-0a3d-ae22-93c813630aa8@redhat.com>
+Date:   Wed, 5 Feb 2020 16:30:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200205123133.34ac71a2.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200128235344.29581-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20020515-0020-0000-0000-000003A74232
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020515-0021-0000-0000-000021FF0D53
-Message-Id: <d516c777-6fad-f11d-0952-a93fc294a12e@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-05_04:2020-02-04,2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 clxscore=1015
- malwarescore=0 suspectscore=0 phishscore=0 priorityscore=1501 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002050121
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 05.02.20 12:31, Cornelia Huck wrote:
-> On Mon,  3 Feb 2020 08:19:35 -0500
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 29/01/20 00:53, Sean Christopherson wrote:
+> Re-add code to mark CR4.UMIP as reserved if UMIP is not supported by the
+> host.  The UMIP handling was unintentionally dropped during a recent
+> refactoring.
 > 
->> From: Michael Mueller <mimu@linux.ibm.com>
->>
->> The patch implements interruption injection for the following
->> list of interruption types:
->>
->>    - I/O
->>      __deliver_io (III)
->>
->>    - External
->>      __deliver_cpu_timer (IEI)
->>      __deliver_ckc (IEI)
->>      __deliver_emergency_signal (IEI)
->>      __deliver_external_call (IEI)
->>
->>    - cpu restart
->>      __deliver_restart (IRI)
+> Not flagging CR4.UMIP allows the guest to set its CR4.UMIP regardless of
+> host support or userspace desires.  On CPUs with UMIP support, including
+> emulated UMIP, this allows the guest to enable UMIP against the wishes
+> of the userspace VMM.  On CPUs without any form of UMIP, this results in
+> a failed VM-Enter due to invalid guest state.
 > 
-> Hm... what do 'III', 'IEI', and 'IRI' stand for?
+> Fixes: 345599f9a2928 ("KVM: x86: Add macro to ensure reserved cr4 bits checks stay in sync")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
->>
->> The service interrupt is handled in a followup patch.
->>
->> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> [fixes]
->> ---
->>   arch/s390/include/asm/kvm_host.h |  8 +++
->>   arch/s390/kvm/interrupt.c        | 93 ++++++++++++++++++++++----------
->>   2 files changed, 74 insertions(+), 27 deletions(-)
->>
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->> index a45d10d87a8a..989cea7a5591 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -563,6 +563,14 @@ enum irq_types {
->>   #define IRQ_PEND_MCHK_MASK ((1UL << IRQ_PEND_MCHK_REP) | \
->>   			    (1UL << IRQ_PEND_MCHK_EX))
->>   
->> +#define IRQ_PEND_MCHK_REP_MASK (1UL << IRQ_PEND_MCHK_REP)
->> +
->> +#define IRQ_PEND_EXT_II_MASK ((1UL << IRQ_PEND_EXT_CPU_TIMER)  | \
-> 
-> What does 'II' stand for? Interrupt Injection?
-> 
->> +			      (1UL << IRQ_PEND_EXT_CLOCK_COMP) | \
->> +			      (1UL << IRQ_PEND_EXT_EMERGENCY)  | \
->> +			      (1UL << IRQ_PEND_EXT_EXTERNAL)   | \
->> +			      (1UL << IRQ_PEND_EXT_SERVICE))
->> +
->>   struct kvm_s390_interrupt_info {
->>   	struct list_head list;
->>   	u64	type;
-> 
-> (...)
-> 
->> @@ -1834,7 +1872,8 @@ static void __floating_irq_kick(struct kvm *kvm, u64 type)
->>   		break;
->>   	case KVM_S390_INT_IO_MIN...KVM_S390_INT_IO_MAX:
->>   		if (!(type & KVM_S390_INT_IO_AI_MASK &&
->> -		      kvm->arch.gisa_int.origin))
->> +		      kvm->arch.gisa_int.origin) ||
->> +		      kvm_s390_pv_handle_cpu(dst_vcpu))
->>   			kvm_s390_set_cpuflags(dst_vcpu, CPUSTAT_IO_INT);
->>   		break;
->>   	default:
-> 
-> Looking at this... can you also talk about protected virt vs. exitless
-> interrupts?
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7e3f1d937224..e70d1215638a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -898,6 +898,8 @@ EXPORT_SYMBOL_GPL(kvm_set_xcr);
+>  		__reserved_bits |= X86_CR4_PKE;		\
+>  	if (!__cpu_has(__c, X86_FEATURE_LA57))		\
+>  		__reserved_bits |= X86_CR4_LA57;	\
+> +	if (!__cpu_has(__c, X86_FEATURE_UMIP))		\
+> +		__reserved_bits |= X86_CR4_UMIP;	\
+>  	__reserved_bits;				\
+>  })
+>  
 > 
 
-Adapter interruptions are placed into the GISA but currently
-not proceessed in SIE context when running in PV context.
-Thus they get delivered by KVM explicitly by means of the
-io interruption injection code.
+Queued, thanks.
 
-...
-00 01580915540:999281 4 - 04 00000000eb351b8a  inject: I/O (AI/gisa) isc 3
-00 01580915540:999287 4 - 02 000000008345868d 
-00[0706c00180000000-00000000f4d2c544]: deliver: I/O (AI/gisa) isc 3
-00 01580915542:999283 4 - 04 00000000eb351b8a  inject: I/O (AI/gisa) isc 3
-00 01580915542:999288 4 - 02 000000008345868d 
-00[0706c00180000000-00000000f4d2c544]: deliver: I/O (AI/gisa) isc 3
-00 01580915543:996622 4 - 04 00000000eb351b8a  inject: I/O (AI/gisa) isc 3
-00 01580915543:996629 4 - 02 000000008345868d 
-00[0706c00180000000-00000000f4d2c544]: deliver: I/O (AI/gisa) isc 3
-00 01580915544:039280 4 - 04 00000000eb351b8a  inject: I/O (AI/gisa) isc 3
-00 01580915544:039290 4 - 02 000000008345868d 
-00[0706c00180000000-00000000f4d2c544]: deliver: I/O (AI/gisa) isc 3
-00 01580915544:039313 4 - 04 00000000eb351b8a  inject: I/O (AI/gisa) isc 3
-00 01580915544:039319 4 - 02 000000008345868d 
-00[0706c00180000000-00000000f4d2c544]: deliver: I/O (AI/gisa) isc 3
-...
-
-
-Michael
+Paolo
 
