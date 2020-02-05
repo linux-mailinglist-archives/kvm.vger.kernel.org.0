@@ -2,129 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CBD61532EE
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 15:31:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BC61153306
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 15:32:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727532AbgBEObL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 09:31:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24117 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727482AbgBEObE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 09:31:04 -0500
+        id S1727697AbgBEObw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 09:31:52 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42870 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727672AbgBEObs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 09:31:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580913064;
+        s=mimecast20190719; t=1580913107;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sHYKodjFVDSIcn10UudO1fMfOFwyzIATDeSzz3cLTkw=;
-        b=K2bYxWX8sRExA/uEEPcghqiEyfV3SmAPabWSJVYdsMN54OVcs3boctCme3tz9TtQUMppyT
-        097rLFjALH7j8jIKGdD0ic/5mHFLPftYbxO0w6F0yAIFXUpKQMxtK5HNANilOvWLMSisDr
-        Zkt5+AFo4yPrD1btmEFYlOhe7Gyfav8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-yoGHGBcEPTuY1AfS8KjvoA-1; Wed, 05 Feb 2020 09:31:02 -0500
-X-MC-Unique: yoGHGBcEPTuY1AfS8KjvoA-1
-Received: by mail-wr1-f69.google.com with SMTP id w17so1277530wrr.9
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 06:31:02 -0800 (PST)
+        bh=QIiDr7UauS84w6lC6LqITX2nEatUYOv8rB4hqu0Dq30=;
+        b=b66O2XCqu0UlQ/sSznHtpXED3yGUI+R/adU+lDrPnTm1zKI9G/i+8Y+Z5VmnwJAuKuh2Af
+        z2TZWgOBKRRh7U+AL7V5jV4B90MK2dN0Lqw85uQikYOLDqfhx9XoN/+6jmW9GdLaVZDy3H
+        NvKuydJCU5oUdNf1CIB7heTPAUU4kvg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-YDuiQaKdOqajJGUADALBNw-1; Wed, 05 Feb 2020 09:31:45 -0500
+X-MC-Unique: YDuiQaKdOqajJGUADALBNw-1
+Received: by mail-wr1-f71.google.com with SMTP id p8so1278915wrw.5
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 06:31:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=sHYKodjFVDSIcn10UudO1fMfOFwyzIATDeSzz3cLTkw=;
-        b=QkALqUqGCIVHS7d0HKkiezyI0zefyU5eMX3/t3fi3B9V583AdaV4HbEXq45mXO6Muh
-         QoV3ic3GF4L74RoYlbCZQ4BL8y3oIgrzglfkUGx0N5SypzefJq3tR9Umoj1zsGfNmtWI
-         teiMDNuPuvu0JoKkozADz9d8ZLaQiCtIgSefmB8KJQPkDOFO39IyoNVqsSCY8nboA/48
-         5eKulpRz1RQq0/Euz+mSbFF2LZtlwTIsq5zY0V20FEVFL+Tk2KLUdfoQXw23rVYU9E9Y
-         NxLj+I9ueMJG2x4Bb208Hbs76l+ZnfThlSzmeY+MBxx+MvcSU5PRZWvIJ5ZyNxrocU59
-         be/Q==
-X-Gm-Message-State: APjAAAWqpp/fFoFkGTB+m/BOpoFfsif6k5X2cJ8kglobXppTPO+zblX8
-        3ogvnWY+r/PRoMNaL++fBN0VoFXeGQYAvhA7+Zo9HV8vqCDk0UOmUyP8fpMxJ03r/2wf490288d
-        Hlt0zs4cUAdGL
-X-Received: by 2002:a5d:484d:: with SMTP id n13mr28173382wrs.420.1580913061409;
-        Wed, 05 Feb 2020 06:31:01 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzFK6EvOMGq9u7DSi56KhONwlHzFQfhDMzkLRJNTfs/7t/pQJPyaDPRAy10xdDkndgy5KPNtw==
-X-Received: by 2002:a5d:484d:: with SMTP id n13mr28173360wrs.420.1580913061224;
-        Wed, 05 Feb 2020 06:31:01 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id w7sm8284222wmi.9.2020.02.05.06.30.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2020 06:30:59 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QIiDr7UauS84w6lC6LqITX2nEatUYOv8rB4hqu0Dq30=;
+        b=GxSxco1HUhJ+/G8heZO+bQvuK/x98kMy/IHnDr3lMIEP8O/xKW1P9U/n4+ipXyrZE6
+         1s/Nq2239riME+VVgFn+DfU+tMqtvKkf8vzayrfbkhhennkeXLsRbOLNuKy360qNGY2N
+         Wb4XtXOBjv+DaFgkBXC/dmXV00PhLEtvP21eqXAIMs8HnVGM9+ejs7TJ4SfYH7vLDJla
+         UcdPjNsftGr743dYPnnJ7rANGeKM6SLx4iSMB+OGd4haurjYIzYbswPPCSLH5g9+IQof
+         DMaIQd56CB7wLR7bzznof8uOxNtLcSfudVyj7/laWhadK4WFQ8b6MyMuNXmpOdaaPNlF
+         3nUQ==
+X-Gm-Message-State: APjAAAXJX333kb0riH3L9ZX6Cn8LE0x9xm5NEmyLrfT8BUEYLWdN/U1z
+        lBf2E5ElJy8aUGfvR5NOF9weh4+LlOUuXQ53Rjvv7TatVRDt+3ZV+5mDvdhrgKrg0CUsKldiza5
+        Ha5uAQpnNrLbA
+X-Received: by 2002:a5d:4584:: with SMTP id p4mr30912462wrq.25.1580913104332;
+        Wed, 05 Feb 2020 06:31:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwP0pkVzTlW7EakEH9j7lzRpVa9D9kKCf5FqXxuVWuaCLr+/ZECn4MulgA/XKImX0nVCcCOYA==
+X-Received: by 2002:a5d:4584:: with SMTP id p4mr30912440wrq.25.1580913104144;
+        Wed, 05 Feb 2020 06:31:44 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56? ([2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56])
+        by smtp.gmail.com with ESMTPSA id g128sm8189827wme.47.2020.02.05.06.31.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2020 06:31:43 -0800 (PST)
+Subject: Re: [PATCH] KVM: nVMX: Remove stale comment from
+ nested_vmx_load_cr3()
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 02/26] KVM: x86: Take an unsigned 32-bit int for has_emulated_msr()'s index
-In-Reply-To: <20200129234640.8147-3-sean.j.christopherson@intel.com>
-References: <20200129234640.8147-1-sean.j.christopherson@intel.com> <20200129234640.8147-3-sean.j.christopherson@intel.com>
-Date:   Wed, 05 Feb 2020 15:30:59 +0100
-Message-ID: <87k151ksws.fsf@vitty.brq.redhat.com>
+        linux-kernel@vger.kernel.org
+References: <20200204153259.16318-1-sean.j.christopherson@intel.com>
+ <dcee13f5-f447-9ab4-4803-e3c4f42fb011@oracle.com>
+ <20200204203607.GB5663@linux.intel.com>
+ <14d6b39b-b907-d1f3-8f15-9b1df0718082@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c1952c6a-40ce-00c1-d145-21085ea5a982@redhat.com>
+Date:   Wed, 5 Feb 2020 15:31:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <14d6b39b-b907-d1f3-8f15-9b1df0718082@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On 04/02/20 23:01, Krish Sadhukhan wrote:
+>>
+>> /*
+>>   * Load guest's/host's cr3 at nested entry/exit.  @nested_ept is true
+>> if we are
+>>   * emulating VM-Entry into a guest with EPT enabled.  On failure, the
+>> expected
+>>   * Exit Qualification (for a VM-Entry consistency check VM-Exit) is
+>> assigned to
+>>   * @entry_failure_code.
+>>   */
+> It  works.
+> 
+> With that,
+> 
+> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 
-> Take a u32 for the index in has_emulated_msr() to match hardware, which
-> treats MSR indices as unsigned 32-bit values.  Functionally, taking a
-> signed int doesn't cause problems with the current code base, but could
-> theoretically cause problems with 32-bit KVM, e.g. if the index were
-> checked via a less-than statement, which would evaluate incorrectly for
-> MSR indices with bit 31 set.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 2 +-
->  arch/x86/kvm/svm.c              | 2 +-
->  arch/x86/kvm/vmx/vmx.c          | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 77d206a93658..5c2ad3fa0980 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1050,7 +1050,7 @@ struct kvm_x86_ops {
->  	int (*hardware_setup)(void);               /* __init */
->  	void (*hardware_unsetup)(void);            /* __exit */
->  	bool (*cpu_has_accelerated_tpr)(void);
-> -	bool (*has_emulated_msr)(int index);
-> +	bool (*has_emulated_msr)(u32 index);
->  	void (*cpuid_update)(struct kvm_vcpu *vcpu);
->  
->  	struct kvm *(*vm_alloc)(void);
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index bf0556588ad0..a7b944a3a0e2 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -5985,7 +5985,7 @@ static bool svm_cpu_has_accelerated_tpr(void)
->  	return false;
->  }
->  
-> -static bool svm_has_emulated_msr(int index)
-> +static bool svm_has_emulated_msr(u32 index)
->  {
->  	switch (index) {
->  	case MSR_IA32_MCG_EXT_CTL:
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 1419c53aed16..f5bb1ad2e9fa 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6274,7 +6274,7 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu,
->  		*exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
->  }
->  
-> -static bool vmx_has_emulated_msr(int index)
-> +static bool vmx_has_emulated_msr(u32 index)
->  {
->  	switch (index) {
->  	case MSR_IA32_SMBASE:
+Thanks, I folded in the change.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+Paolo
 
