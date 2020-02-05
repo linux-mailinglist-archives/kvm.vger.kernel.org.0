@@ -2,191 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 61685152A1D
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 12:43:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A791152A20
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 12:46:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727367AbgBELn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 06:43:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28559 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727328AbgBELn0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 06:43:26 -0500
+        id S1727068AbgBELp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 06:45:56 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43212 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726810AbgBELp4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 06:45:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580903005;
+        s=mimecast20190719; t=1580903155;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=5TEo0rgfNSIMQ+Djw0a5unxzlVSzNtXbo1fhqNnHOrc=;
-        b=PbxAEfJq5i8ceFOUzqWIEadNkbTECjYTdLxFV5yNkU/oR/K0GXSklrbxjftLLTNVbAQObT
-        u4RvRh8EVHlWqlcrOTcU3f82YC0yuL9ax0li6TRblUktQ/zzTH2BYi9p8ka+f1TZ3eN15y
-        Whabr05plFC5mN1eyLvQG5QB0bA9zj4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-ZwLSOKP6PBytM8ANn-W7Yw-1; Wed, 05 Feb 2020 06:43:21 -0500
-X-MC-Unique: ZwLSOKP6PBytM8ANn-W7Yw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 756DE18B5FA0;
-        Wed,  5 Feb 2020 11:43:20 +0000 (UTC)
-Received: from [10.36.116.217] (ovpn-116-217.ams2.redhat.com [10.36.116.217])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BC2FA60BF7;
-        Wed,  5 Feb 2020 11:43:18 +0000 (UTC)
-Subject: Re: [RFCv2 21/37] KVM: S390: protvirt: Introduce instruction data
- area bounce buffer
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-22-borntraeger@de.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <b947d722-845c-fa91-dfac-edc5d34a1a1c@redhat.com>
-Date:   Wed, 5 Feb 2020 12:43:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+         in-reply-to:in-reply-to:references:references;
+        bh=qew9pA6q2eKxei1b7rOjMSLdZuvXZkTmwP0IR146xxg=;
+        b=DK8KueOUcyhiMF6F8pHdtG2ENI900esqmmaGwpf9cffXDAdnq+suy5VcsOAB1jpxLlENuI
+        KByhM3lDsI+/ZxURCX8fLGDcR4YgV3ScVYeTpIAbFYemr6ATK99eJAa7Gy9XEt6kFMmKgr
+        LW0iU4eaOxqM0qAFfAN19OjGKOfPjXs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-202-i1DcIYzzO9aPmA5TMrcJGg-1; Wed, 05 Feb 2020 06:45:53 -0500
+X-MC-Unique: i1DcIYzzO9aPmA5TMrcJGg-1
+Received: by mail-wm1-f69.google.com with SMTP id d4so727723wmd.7
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 03:45:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=qew9pA6q2eKxei1b7rOjMSLdZuvXZkTmwP0IR146xxg=;
+        b=OXqI7WmH+C31goo1yNstSquTlkz3hIOGPDUEg5oKK9dLmCV5MkBQCEyfLw5ca/xlBb
+         VLB2yTpt4pKTjLINUggRJLN8Yzr7riiu7msRnG+3QkEKKATJroV6BdvX9sHaNXv0aj1b
+         +mzbrxhJk9iAWDiyj/hF0lrLiQfM5iTbJSWex7x7S7Tm5hE17w/TLJ/DnMKCS6fkAP7Y
+         Kx24V6moMbMvC1/zoFPHvLJw1Mshg6ZN+duXKZs7zaDjtt2r8tO6hvjaFBDIKXYgEobI
+         l0M2/C78d/BoCJKbkrRoaKbd84LNrGWuEFkAEw1YlgE9JxJ+9B08Nl9U0nidVBm+1ZZL
+         QdkQ==
+X-Gm-Message-State: APjAAAU6wQAA7j7f7cgXbIwv3rpKWVELnRlaIbrGjm/cryU6aqQjYmdA
+        Ty8zS1uREWtSmOfmeuQL/twCwvdRDaZi9x5u31wk+xNbLA8tlIYjX3LVyEWuEKZ+dzDnV35sod+
+        M96PxUtFQxM+j
+X-Received: by 2002:a1c:4e01:: with SMTP id g1mr5093127wmh.12.1580903152365;
+        Wed, 05 Feb 2020 03:45:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw4Kb21norHArN164n5Q5tzgN7BVgByConiKC2q0y5k32GhxC1/mCLz7bfqggAaHPRCf+WeUg==
+X-Received: by 2002:a1c:4e01:: with SMTP id g1mr5093110wmh.12.1580903152160;
+        Wed, 05 Feb 2020 03:45:52 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id n3sm33297899wrs.8.2020.02.05.03.45.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2020 03:45:51 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Eric Hankland <ehankland@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Eric Hankland <ehankland@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: pmu: Test WRMSR on a running counter
+In-Reply-To: <20200204012504.9590-1-ehankland@google.com>
+References: <20200204012504.9590-1-ehankland@google.com>
+Date:   Wed, 05 Feb 2020 12:45:50 +0100
+Message-ID: <87y2thl0k1.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200203131957.383915-22-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->  #ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
-> +static long kvm_s390_guest_sida_op(struct kvm_vcpu *vcpu,
-> +				   struct kvm_s390_mem_op *mop)
+Eric Hankland <ehankland@google.com> writes:
+
+> Ensure that the value of the counter was successfully set to 0 after
+> writing it while the counter was running.
+>
+> Signed-off-by: Eric Hankland <ehankland@google.com>
+> ---
+>  x86/pmu.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index cb8c9e3..8a77993 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -419,6 +419,21 @@ static void check_rdpmc(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void check_running_counter_wrmsr(void)
 > +{
-> +	int r =3D 0;
-> +	void __user *uaddr =3D (void __user *)mop->buf;
-
-Reverse christmas tree :)
-
+> +	pmu_counter_t evt = {
+> +		.ctr = MSR_IA32_PERFCTR0,
+> +		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
+> +		.count = 0,
+> +	};
 > +
-> +	if (mop->flags || !mop->size)
-> +		return -EINVAL;
-> +
-> +	if (mop->size > sida_size(vcpu->arch.sie_block))
-> +		return -E2BIG;
-
-Should be caught by the check below as well (or is this an implicit
-overflow check? - see below).
-
-> +
-> +	if (mop->size + mop->offset > sida_size(vcpu->arch.sie_block))
-> +		return -E2BIG;
-> +
-
-Do we have to care about overflows? (at least the offset is 32-bit,
-didn't check the size :))
-
-
-> +	switch (mop->op) {
-> +	case KVM_S390_MEMOP_SIDA_READ:
-> +		r =3D 0;
-> +		if (copy_to_user(uaddr, (void *)sida_origin(vcpu->arch.sie_block) +
-> +				 mop->offset, mop->size))
-> +			r =3D -EFAULT;
-> +
-> +		break;
-> +	case KVM_S390_MEMOP_SIDA_WRITE:
-> +		r =3D 0;
-> +		if (copy_from_user((void *)vcpu->arch.sie_block->sidad +
-> +				   mop->offset, uaddr, mop->size))
-> +			r =3D -EFAULT;
-> +		break;
-> +	}
-> +	return r;
+> +	start_event(&evt);
+> +	loop();
+> +	wrmsr(MSR_IA32_PERFCTR0, 0);
+> +	stop_event(&evt);
+> +	report("running counter wrmsr", evt.count < gp_events[1].min);
 > +}
 > +
->  static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu *vcpu,
->  				   struct kvm_pv_cmd *cmd)
+>  int main(int ac, char **av)
 >  {
-> @@ -4708,6 +4743,20 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  		r =3D kvm_s390_handle_pv_vcpu(vcpu, &args);
->  		break;
->  	}
-> +	case KVM_S390_SIDA_OP: {
-> +		struct kvm_s390_mem_op mem_op;
-> +
-> +		if (!kvm_s390_pv_is_protected(vcpu->kvm)) {
-> +			r =3D -EINVAL;
-> +			break;
-> +		}
+>  	struct cpuid id = cpuid(10);
+> @@ -453,6 +468,7 @@ int main(int ac, char **av)
+>  	check_counters_many();
+>  	check_counter_overflow();
+>  	check_gp_counter_cmask();
+> +	check_running_counter_wrmsr();
+>  
+>  	return report_summary();
+>  }
+>
 
-Could we race against a VM_DESTROY? Should we protect somehow?
-[...]
+You shall not pass [-Werror]:
 
-> -/* for KVM_S390_MEM_OP */
-> +/* for KVM_S390_MEM_OP and KVM_S390_SIDA_OP */
->  struct kvm_s390_mem_op {
->  	/* in */
->  	__u64 gaddr;		/* the guest address */
-> @@ -475,11 +475,17 @@ struct kvm_s390_mem_op {
->  	__u32 op;		/* type of operation */
->  	__u64 buf;		/* buffer in userspace */
->  	__u8 ar;		/* the access register number */
-> -	__u8 reserved[31];	/* should be set to 0 */
-> +	__u8 reserved21[3];	/* should be set to 0 */
-> +	__u32 offset;		/* offset into the sida */
+gcc  -mno-red-zone -mno-sse -mno-sse2 -m64 -O1 -g -MMD -MF x86/.pmu.d -fno-strict-aliasing -Wall -Wwrite-strings -Wempty-body -Wuninitialized -Wignored-qualifiers -Werror  -fno-omit-frame-pointer    -Wno-frame-address   -fno-pic  -no-pie  -Wclobbered  -Wunused-but-set-parameter  -Wmissing-parameter-type  -Wold-style-declaration -Woverride-init -Wmissing-prototypes -Wstrict-prototypes -std=gnu99 -ffreestanding -I /home/vitty/workspace/Upstream/kvm-unit-tests/lib -I /home/vitty/workspace/Upstream/kvm-unit-tests/lib/x86 -I lib   -c -o x86/pmu.o x86/pmu.c
+x86/pmu.c: In function ‘check_running_counter_wrmsr’:
+x86/pmu.c:435:44: error: passing argument 2 of ‘report’ makes pointer from integer without a cast [-Werror=int-conversion]
+  435 |  report("running counter wrmsr", evt.count < gp_events[1].min);
+      |                                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+      |                                            |
+      |                                            int
+In file included from /home/vitty/workspace/Upstream/kvm-unit-tests/lib/x86/processor.h:4,
+                 from x86/pmu.c:3:
+/home/vitty/workspace/Upstream/kvm-unit-tests/lib/libcflat.h:102:43: note: expected ‘const char *’ but argument is of type ‘int’
+  102 | extern void report(bool pass, const char *msg_fmt, ...)
+      |                               ~~~~~~~~~~~~^~~~~~~
+cc1: all warnings being treated as errors
 
-maybe "side_offset"? or define a union, overlying the ar (because that
-obviously doesn't apply to this memop). So eventually different layout
-for different memop.
 
---=20
-Thanks,
-
-David / dhildenb
+-- 
+Vitaly
 
