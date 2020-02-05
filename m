@@ -2,138 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6318A152907
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 11:21:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC93C15292A
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 11:34:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728035AbgBEKVh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 05:21:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31476 "EHLO
+        id S1728194AbgBEKdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 05:33:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46007 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727367AbgBEKVg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 05:21:36 -0500
+        with ESMTP id S1727468AbgBEKdu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 05:33:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580898096;
+        s=mimecast20190719; t=1580898829;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=xXn2eEdiaONi1YDX0b9EQW7+BL/5Md6R2SrtlVfDH6U=;
-        b=T3sZNfSBlgmjQttmr2rSDon4woKQNiydB9AQBkHnL6Lm2spW4bTI2zOiJxwZ0mryHPCtot
-        evlBBlFR22zeMIsKHZkyGKg73jomd4ToJqicdQ6bkW5hviOUiOkznNVGXBKdWVgLufs5El
-        e4rgr9YqY7925DTmDalb4KHk/WQB4Us=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-FJ4rCULTOrS9RKaTHUKJjQ-1; Wed, 05 Feb 2020 05:21:34 -0500
-X-MC-Unique: FJ4rCULTOrS9RKaTHUKJjQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57FCB1835A00;
-        Wed,  5 Feb 2020 10:21:33 +0000 (UTC)
-Received: from [10.36.116.217] (ovpn-116-217.ams2.redhat.com [10.36.116.217])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F234210013A1;
-        Wed,  5 Feb 2020 10:21:31 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] Add Janosch as a s390x maintainer
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Drew Jones <drjones@redhat.com>
-References: <20200205101935.19219-1-thuth@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <fca48d63-d890-87d2-cd59-587907cbd810@redhat.com>
-Date:   Wed, 5 Feb 2020 11:21:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+         in-reply-to:in-reply-to:references:references;
+        bh=fMJo0Joxo+pl/mB5o3Pd3oM2dXap9Kiay0KNytUxRsU=;
+        b=ZIWxRiOIzLW96aEkYuzKP+c8c6Yr4VUb/c/lPxeAgEQfDfkgOe5MfIc00azpJg+CofmS5H
+        oFRmCVrbW2lAeXJYCkJvCYyvfywqE3Z8VW1XF1CPlZKOc6I3ZkOkPmGu/0ynXMJh1yC7i+
+        B9iSR9oVlUUGUgqROv65tADe6ktU4rY=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-Yk2N9Rl_PjuDXagJhvItZw-1; Wed, 05 Feb 2020 05:33:48 -0500
+X-MC-Unique: Yk2N9Rl_PjuDXagJhvItZw-1
+Received: by mail-qk1-f199.google.com with SMTP id f22so960268qka.10
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 02:33:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=fMJo0Joxo+pl/mB5o3Pd3oM2dXap9Kiay0KNytUxRsU=;
+        b=nSh8CvxIV/TMxDQdtb0fjF3WYxo4avNln0A2nr4w4KR+ZVOMEIuWip72MAP1eiFwkt
+         xriXc3efNyKzDYu+Ge2IPp5OlkSLuTXvbFQZqJ+qdDSPWCvgOugCPDHrgKUHnvqBcicb
+         0udVURj6azCQ8N5CoxUDSGxtxWLGauoZ9ZZN69IVCoRpMuG4vcNwsOHyAfWUJWLMqO1k
+         xgh2yP1u7UHl3POC/VxymBBxy23SSDAMfxGL56mmlm1SvDX0RzYKVJO7yY3Wy2WMp0eY
+         PO+cdV08+nOB02MH45940A8QZ4VtDjP2ST2gNZkL3fPBxcGRaak0k1ln1aAjQ1sdr2B7
+         c+hA==
+X-Gm-Message-State: APjAAAVvLM0n5IjlNFW++jOkRctWvO4HO2azHCJtpQZSZI+8Cz8kLBWC
+        60VGMIBXu32R5Obp8391biJ83/EdQNY8c8xGitbpXOfpBtmZTkJleYKICGP0yvRILG50zxD1u5z
+        FrST6jQizlnos
+X-Received: by 2002:a37:6853:: with SMTP id d80mr4494836qkc.57.1580898827690;
+        Wed, 05 Feb 2020 02:33:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxSqc1HJF8dt4Eb/7jFWTJnHSPo1HCY1H3WJbmwy+Vb8UDe9HwZCYMCfYz7+b2DU8mORTzDoA==
+X-Received: by 2002:a37:6853:: with SMTP id d80mr4494800qkc.57.1580898827421;
+        Wed, 05 Feb 2020 02:33:47 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+        by smtp.gmail.com with ESMTPSA id p50sm13949401qtf.5.2020.02.05.02.33.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2020 02:33:46 -0800 (PST)
+Date:   Wed, 5 Feb 2020 05:33:40 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Shahaf Shuler <shahafs@mellanox.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "dan.daly@intel.com" <dan.daly@intel.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>
+Subject: Re: [PATCH] vhost: introduce vDPA based backend
+Message-ID: <20200205053129-mutt-send-email-mst@kernel.org>
+References: <20200131033651.103534-1-tiwei.bie@intel.com>
+ <7aab2892-bb19-a06a-a6d3-9c28bc4c3400@redhat.com>
+ <20200205020247.GA368700@___>
+ <AM0PR0502MB37952015716C1D5E07E390B6C3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+ <112858a4-1a01-f4d7-e41a-1afaaa1cad45@redhat.com>
+ <AM0PR0502MB3795AD42233D69F350402A8AC3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20200205101935.19219-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <AM0PR0502MB3795AD42233D69F350402A8AC3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.02.20 11:19, Thomas Huth wrote:
-> Both, David and I, often do not have as much spare time for the
-> kvm-unit-tests as we would like to have, so we could use a little
-> bit of additional help here. Janosch did some excellent work for
-> the s390x kvm-unit-tests in the past months and is listed as reviewer
-> for these patches since quite a while already, so he's a very well
-> suited for the maintainer job here, too.
+On Wed, Feb 05, 2020 at 09:30:14AM +0000, Shahaf Shuler wrote:
+> Wednesday, February 5, 2020 9:50 AM, Jason Wang:
+> > Subject: Re: [PATCH] vhost: introduce vDPA based backend
+> > On 2020/2/5 下午3:15, Shahaf Shuler wrote:
+> > > Wednesday, February 5, 2020 4:03 AM, Tiwei Bie:
+> > >> Subject: Re: [PATCH] vhost: introduce vDPA based backend
+> > >>
+> > >> On Tue, Feb 04, 2020 at 11:30:11AM +0800, Jason Wang wrote:
+> > >>> On 2020/1/31 上午11:36, Tiwei Bie wrote:
+> > >>>> This patch introduces a vDPA based vhost backend. This backend is
+> > >>>> built on top of the same interface defined in virtio-vDPA and
+> > >>>> provides a generic vhost interface for userspace to accelerate the
+> > >>>> virtio devices in guest.
+> > >>>>
+> > >>>> This backend is implemented as a vDPA device driver on top of the
+> > >>>> same ops used in virtio-vDPA. It will create char device entry
+> > >>>> named vhost-vdpa/$vdpa_device_index for userspace to use.
+> > Userspace
+> > >>>> can use vhost ioctls on top of this char device to setup the backend.
+> > >>>>
+> > >>>> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> > > [...]
+> > >
+> > >>>> +static long vhost_vdpa_do_dma_mapping(struct vhost_vdpa *v) {
+> > >>>> +	/* TODO: fix this */
+> > >>>
+> > >>> Before trying to do this it looks to me we need the following during
+> > >>> the probe
+> > >>>
+> > >>> 1) if set_map() is not supported by the vDPA device probe the IOMMU
+> > >>> that is supported by the vDPA device
+> > >>> 2) allocate IOMMU domain
+> > >>>
+> > >>> And then:
+> > >>>
+> > >>> 3) pin pages through GUP and do proper accounting
+> > >>> 4) store GPA->HPA mapping in the umem
+> > >>> 5) generate diffs of memory table and using IOMMU API to setup the
+> > >>> dma mapping in this method
+> > >>>
+> > >>> For 1), I'm not sure parent is sufficient for to doing this or need
+> > >>> to introduce new API like iommu_device in mdev.
+> > >> Agree. We may also need to introduce something like the iommu_device.
+> > >>
+> > > Would it be better for the map/umnap logic to happen inside each device ?
+> > > Devices that needs the IOMMU will call iommu APIs from inside the driver
+> > callback.
+> > 
+> > 
+> > Technically, this can work. But if it can be done by vhost-vpda it will make the
+> > vDPA driver more compact and easier to be implemented.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Need to see the layering of such proposal but am not sure. 
+> Vhost-vdpa is generic framework, while the DMA mapping is vendor specific. 
+> Maybe vhost-vdpa can have some shared code needed to operate on iommu, so drivers can re-use it.  to me it seems simpler than exposing a new iommu device. 
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 48da1db..082be95 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -80,7 +80,7 @@ F: lib/ppc64/*
->  S390X
->  M: Thomas Huth <thuth@redhat.com>
->  M: David Hildenbrand <david@redhat.com>
-> -R: Janosch Frank <frankja@linux.ibm.com>
-> +M: Janosch Frank <frankja@linux.ibm.com>
->  L: kvm@vger.kernel.org
->  F: s390x/*
->  F: lib/s390x/*
+> > 
+> > 
+> > > Devices that has other ways to do the DMA mapping will call the
+> > proprietary APIs.
+> > 
+> > 
+> > To confirm, do you prefer:
+> > 
+> > 1) map/unmap
 > 
+> It is not only that. AFAIR there also flush and invalidate calls, right?
+> 
+> > 
+> > or
+> > 
+> > 2) pass all maps at one time?
+> 
+> To me this seems more straight forward. 
+> It is correct that under hotplug and large number of memory segments
+> the driver will need to understand the diff (or not and just reload
+> the new configuration).
+> However, my assumption here is that memory
+> hotplug is heavy flow anyway, and the driver extra cycles will not be
+> that visible
 
-Indeed, happy to see this change
+I think we can just allow both, after all vhost already has both interfaces ...
+We just need a flag that tells userspace whether it needs to
+update all maps aggressively or can wait for a fault.
 
-Acked-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
+> > 
+> > Thanks
+> > 
+> > 
+> > >
+> 
 
