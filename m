@@ -2,75 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16DB1152A07
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 12:40:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CB75152A0C
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 12:42:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728034AbgBELkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 06:40:39 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27506 "EHLO
+        id S1726308AbgBELmE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 06:42:04 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23491 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727170AbgBELki (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 06:40:38 -0500
+        by vger.kernel.org with ESMTP id S1725385AbgBELmE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 06:42:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580902837;
+        s=mimecast20190719; t=1580902923;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WNqR7ULu5EzDjUknThEwmlTc7mP/+0VWPiZs8DBbl54=;
-        b=ivjHwXmaL1vcdw0PI20JduZ+kOI04joZFidAxbVY9nRLPX3Sp7VkSa8vgAUoway1YHSanS
-        Tdv9xqDyb4m391J690HLqG2vUC/B8rQ5oRPQHxHU/cfeUblEuWj1MkcImVkWgxwMLD5uNK
-        EBTgaUPjGG1YSx1AfN+bC8YQBPihgEM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-AUHLJOy3OBm3pewtVUGXlw-1; Wed, 05 Feb 2020 06:40:36 -0500
-X-MC-Unique: AUHLJOy3OBm3pewtVUGXlw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E02A4113784C;
-        Wed,  5 Feb 2020 11:40:34 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 157B360BFB;
-        Wed,  5 Feb 2020 11:40:30 +0000 (UTC)
-Date:   Wed, 5 Feb 2020 12:40:28 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [RFCv2 00/37] KVM: s390: Add support for protected VMs
-Message-ID: <20200205124028.20d76acf.cohuck@redhat.com>
-In-Reply-To: <4970de81-1df9-85bf-efcc-f2705b90c4b4@de.ibm.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
-        <8297d9a4-0d4a-1df0-d2a9-c980e4b2827c@redhat.com>
-        <4970de81-1df9-85bf-efcc-f2705b90c4b4@de.ibm.com>
-Organization: Red Hat GmbH
+        bh=jpUu4fMYbDbSNsl7P/RwPZTrmlpIgKsPg3QXKvzeK4Q=;
+        b=bTNOZXtfRX9ifVla79NgPB/6692811XpJmrNBDZyPTcCYFGeh2SkyRbfsn5dBVjO6VAHo0
+        /t3eimSKz2b8viiGgErieK9LRvJeBxVaBfauJ9n0dLBeheIKSK8yBAh9s5qdhQ68aWnTlq
+        lOYArDxpeRGLMC/z0HZV0EO/ruMea24=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-QNTrSiTaMKy0QULRE_ugSA-1; Wed, 05 Feb 2020 06:42:01 -0500
+X-MC-Unique: QNTrSiTaMKy0QULRE_ugSA-1
+Received: by mail-wr1-f72.google.com with SMTP id j4so1051177wrs.13
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 03:42:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=jpUu4fMYbDbSNsl7P/RwPZTrmlpIgKsPg3QXKvzeK4Q=;
+        b=MP9QgXA0kn2s1N8QpXmt8j34V3mVvbqVZZSoO8XeHbrRJAVo+CqOvfT910BJLnpYIE
+         guWkI5fwR+e1BUJRR4HL0n5nEckmYACKKUKuaVwToAcVfk4/FXJ3su5K08iqLOBrrnYp
+         9z9QjoBFHtY8UwdulzD43tLUQ/1Xdvf4vUjdBvPPOAewYKPOM+j481Zd94ydAslYZGz2
+         /lIPqH6SJL7lKg7eWiGv947vxScDvIvTWxM5awidv298kVRViZToCLVx/O5rCm29UMIR
+         7WuSVVzTgr/j34Gn4cgmSU0RFPYEIAJ3b+j1pDLQJrolimUX0TwTKXbqsMukwM03dHDj
+         opYQ==
+X-Gm-Message-State: APjAAAV5E2lLCc4f3fa2Y/CfVAG2X7EBReCoCoOST0dk5VrP4K5mMOe7
+        ETLX+/z7/yAc+i1xlCLxfTCGbIwP9Q5+Ur8B+7dnyXHy9aXNa6R40o0wrX9fVX/6X8ZNXWsqvLA
+        awDV+vwSDT5lm
+X-Received: by 2002:a05:600c:2042:: with SMTP id p2mr5543394wmg.79.1580902920343;
+        Wed, 05 Feb 2020 03:42:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzcY862LI5mYgTkhraujvfi3KdcZ5/gHdSqKm5EAl0UKiDZrq9uLi0a2BXur+Fx4gZ1M2Q6Ag==
+X-Received: by 2002:a05:600c:2042:: with SMTP id p2mr5543379wmg.79.1580902920147;
+        Wed, 05 Feb 2020 03:42:00 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id x132sm8880748wmg.0.2020.02.05.03.41.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2020 03:41:59 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: Fix the name for the SMEP CPUID bit
+In-Reply-To: <20200204175034.18201-1-sean.j.christopherson@intel.com>
+References: <20200204175034.18201-1-sean.j.christopherson@intel.com>
+Date:   Wed, 05 Feb 2020 12:41:58 +0100
+Message-ID: <871rr9mfax.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 5 Feb 2020 12:38:07 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> On 05.02.20 12:34, David Hildenbrand wrote:
-> 
-> > Due to the huge amount of review feedback (which makestime-consuming to
-> > review if one doesn't want to comment the same thing again), I suggest
-> > sending a new RFC rather soon-ish (e.g., on a weekly basis) - if nobody
-> > objects. Would at least make my life easier :)  
-> 
-> I can send one this evening?
-> 
+> Fix the X86_FEATURE_* name for SMEP, which is incorrectly named
+> X86_FEATURE_INVPCID_SINGLE and is a wee bit confusing when looking at
+> the SMEP unit tests.
+>
+> Note, there is no INVPCID_SINGLE CPUID bit, the bogus name likely came
+> from the Linux kernel, which has a synthetic feature flag for
+> INVPCID_SINGLE in word 7, bit 7 (CPUID 0x7.EBX is stored in word 9).
+>
+> Fixes: 6ddcc29 ("kvm-unit-test: x86: Implement a generic wrapper for cpuid/cpuid_indexed functions")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  lib/x86/processor.h | 2 +-
+>  x86/access.c        | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index 7057180..03fdf64 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -138,7 +138,7 @@ static inline u8 cpuid_maxphyaddr(void)
+>  #define	X86_FEATURE_XMM2		(CPUID(0x1, 0, EDX, 26))
+>  #define	X86_FEATURE_TSC_ADJUST		(CPUID(0x7, 0, EBX, 1))
+>  #define	X86_FEATURE_HLE			(CPUID(0x7, 0, EBX, 4))
+> -#define	X86_FEATURE_INVPCID_SINGLE	(CPUID(0x7, 0, EBX, 7))
+> +#define	X86_FEATURE_SMEP	        (CPUID(0x7, 0, EBX, 7))
+>  #define	X86_FEATURE_INVPCID		(CPUID(0x7, 0, EBX, 10))
+>  #define	X86_FEATURE_RTM			(CPUID(0x7, 0, EBX, 11))
+>  #define	X86_FEATURE_SMAP		(CPUID(0x7, 0, EBX, 20))
+> diff --git a/x86/access.c b/x86/access.c
+> index 5233713..7303fc3 100644
+> --- a/x86/access.c
+> +++ b/x86/access.c
+> @@ -860,7 +860,7 @@ static int check_smep_andnot_wp(ac_pool_t *pool)
+>  	ac_test_t at1;
+>  	int err_prepare_andnot_wp, err_smep_andnot_wp;
+>  
+> -	if (!this_cpu_has(X86_FEATURE_INVPCID_SINGLE)) {
+> +	if (!this_cpu_has(X86_FEATURE_SMEP)) {
+>  	    return 1;
+>  	}
+>  
+> @@ -955,7 +955,7 @@ static int ac_test_run(void)
+>  	}
+>      }
+>  
+> -    if (!this_cpu_has(X86_FEATURE_INVPCID_SINGLE)) {
+> +    if (!this_cpu_has(X86_FEATURE_SMEP)) {
+>  	tests++;
+>  	if (set_cr4_smep(1) == GP_VECTOR) {
+>              successes++;
 
-Perhaps not that fast; I have not yet made my way through all patches
-yet... let's wait until the end of the week?
+"No functional change intended" :-)
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
