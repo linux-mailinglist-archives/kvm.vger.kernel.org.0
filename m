@@ -2,96 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 940811531CE
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 14:27:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CBB781531F8
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2020 14:37:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728264AbgBEN1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 08:27:01 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:36225 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726822AbgBEN1A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 08:27:00 -0500
-Received: by mail-ot1-f68.google.com with SMTP id j20so1902087otq.3;
-        Wed, 05 Feb 2020 05:26:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2iTmjWroM0axQMfNXSTY4B+Vwm8DbZJfE7GwGUvjpyQ=;
-        b=NwK7gQWqLfS/JUcGRZD+ikHP6oDzawbpGi52vOScViy7NpUb95lXZ/qUrSo13MJZuk
-         5/yZgqQKnkk0cMi5K7k1nZ3Jkn32nXwG8KZDA4HzCX1QzJqELzGfLhg1RjDGNfa9+j16
-         2WgZ5TU6eDlgZr1yrAB0vtYMLNBqb/QSpHhDJA1FB9nSMkk+3OGgHseBOnZn6Ydg8Lvg
-         vJrmPR0nsLR7TIHrGo1+7I32n8wSUO3gmaXbvmBTsVMwTUQjtr/3fgwqRRomCz40+hgs
-         alg9cOYWy3/bXhMOq/p+kABPeatiwUrS7yeF9cVyPolffFTFyh/K1iyMZI+aP89YauAq
-         +bTQ==
+        id S1727104AbgBENhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 08:37:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58414 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726822AbgBENhj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 08:37:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580909859;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1ZHZKV/jKaOSLjENoe5XZtmnBOqMNMYSGhSaLDt7Q6E=;
+        b=ElcS/HnPYOcb2Uht3d8hsWwrHmhHlfQRbXH50H3GQKVX//eypOB//dQYD/4jUCbzoLIPVi
+        2ZEua/6DHPH5LSnZSu54/wyDJj4fd1tFzkED9V6YfHCNzJDFIgnLv93jmISJQi4j4ivJ36
+        TE9AYzI9+ggtWCK3v0nFHw6cGtKJQlw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-85-3JRHlBvEPGC23WjgbNljdA-1; Wed, 05 Feb 2020 08:37:28 -0500
+X-MC-Unique: 3JRHlBvEPGC23WjgbNljdA-1
+Received: by mail-wm1-f69.google.com with SMTP id u11so1007622wmb.4
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 05:37:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2iTmjWroM0axQMfNXSTY4B+Vwm8DbZJfE7GwGUvjpyQ=;
-        b=WzjJo3ZViRdjrUhgzA7oeCBf1SGXCNRCCJ9KureROJrZQPPHo18zB3pA77vKxRCZwT
-         z+A8Kg9eqGYSsv/2rSUIL3X4EzQGtdmNIj+EyyPJExj0q9rcKIRv3unG4BZE28Hd1wLd
-         GYDAlY786hvEl8b6q/HyOUzeKAOMVRzLN9RuYt/54OXpHDTCxAHCy+Dztc/8G3KeqxKG
-         g2ZpktZeNZbw+LkIWJMoztrUJ00bLX+5hCgaK+KHhTKpoUPdvZzWikzSNZZALEuBuZ4P
-         eyPlj6Zf3laI8MRkD5ux9fImxkfUZWPRq6qfL7HslJSDSkxDMJ1+WqwEFat7ihUO3mM+
-         0AKg==
-X-Gm-Message-State: APjAAAWHS8fTBYZ6AoMYZ7dW4PAac1C4nVqxgojfVWRas28V8tTn8eFz
-        gHd7VcvG+QmzCP5OBPNQRT7VHNOGuiBi7mZIToU=
-X-Google-Smtp-Source: APXvYqx1Uo1av+7UTImzpbx3g3+rhU7G9l4tWB7NjhIpKmc4Fdg2DC7DGxSh2/aVlTgjwCfxuKVENTDYA5D3HTry98k=
-X-Received: by 2002:a05:6830:231d:: with SMTP id u29mr26656265ote.185.1580909219503;
- Wed, 05 Feb 2020 05:26:59 -0800 (PST)
-MIME-Version: 1.0
-References: <CANRm+CwwYoSLeA3Squp-_fVZpmYmxEfqOB+DGoQN4Y_iMT347w@mail.gmail.com>
- <878slio6hp.fsf@vitty.brq.redhat.com> <CANRm+CzkN9oYf4UqWYp2SHFii02=pvVLbW4oNkLmPan7ZroDZA@mail.gmail.com>
- <874kw6o1ve.fsf@vitty.brq.redhat.com>
-In-Reply-To: <874kw6o1ve.fsf@vitty.brq.redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 5 Feb 2020 21:26:48 +0800
-Message-ID: <CANRm+CwgJ07i3O_-DpvDMaVSGThX7Ymwuty9rBm5Sc2wiuV-bw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: Pre-allocate 1 cpumask variable per cpu for both pv
- tlb and pv ipis
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=1ZHZKV/jKaOSLjENoe5XZtmnBOqMNMYSGhSaLDt7Q6E=;
+        b=MakxClH6W44eNnJnPSUZCLEZqTWOYPO3yMRJmlBC1tHp6mdPTG43bDiZzPdREwj2es
+         uOoWv/lE445KjyRP1jU/9Y/NQp9V7qB/+3D01jDNJwWVPZqe9Lc++NhMhyl7WU91WlPy
+         GB/d2BJ2AEe3q++ecz6C6kpwKjbIsN4uBTc6g/mN0++K3y+Hc8lX9p28VkuSknY579G9
+         t/anAXekiVIOnZt4Z80eBJRyyt1nH+hla1NKbYO8mmC50Orr7tO88v7bpf97KDrysgzF
+         4GAgAhCF4eIayd5hEIqM5fEdMD41fmIf3OYkzWxogHpaBK5Jg2sJuWbmZNXCImFHGSgP
+         d69Q==
+X-Gm-Message-State: APjAAAXSRBbtm7rjOzGj/rsHIfOjb+PThboKfz89rLDeGm3/amsYE3hm
+        zKJa+ZckyR/i3AqxNTXA7YHaa/N7jXvX8LBo7DnpVdY0mN03CwdYDlJY4AiCt5aActuordPJ2ol
+        XDy2LcF7T2+ZH
+X-Received: by 2002:a1c:9a56:: with SMTP id c83mr5908600wme.79.1580909847509;
+        Wed, 05 Feb 2020 05:37:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwzFfXP0e0I4L4edLOhHxfXyc4Wmj97qyd8lGe4qqcytnp7OMRoH9/s3pDomwcVTc8YqdMMAg==
+X-Received: by 2002:a1c:9a56:: with SMTP id c83mr5908575wme.79.1580909847254;
+        Wed, 05 Feb 2020 05:37:27 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id k13sm33844114wrx.59.2020.02.05.05.37.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2020 05:37:26 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-Content-Type: text/plain; charset="UTF-8"
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 2/3] kvm: mmu: Separate generating and setting mmio ptes
+In-Reply-To: <20200203230911.39755-2-bgardon@google.com>
+References: <20200203230911.39755-1-bgardon@google.com> <20200203230911.39755-2-bgardon@google.com>
+Date:   Wed, 05 Feb 2020 14:37:25 +0100
+Message-ID: <87sgjpkve2.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 4 Feb 2020 at 22:36, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> Wanpeng Li <kernellwp@gmail.com> writes:
->
-> >>
-> >> Honestly, I'd simplify the check in kvm_alloc_cpumask() as
-> >>
-> >> if (!kvm_para_available())
-> >>         return;
-> >>
-> >> and allocated masks for all other cases.
-> >
-> > This will waste the memory if pv tlb and pv ipis are not exposed which
-> > are the only users currently.
-> >
->
-> My assumption is that the number of cases where we a) expose KVM b)
-> don't expose IPIs and PV-TLB and c) care about 1 cpumask per cpu is
-> relatively low. Ok, let's at least have a function for
->
->         if (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
->             !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
->             kvm_para_has_feature(KVM_FEATURE_STEAL_TIME))
->
-> as we now check it twice: in kvm_alloc_cpumask() and kvm_guest_init(),
-> something like pv_tlb_flush_supported(). We can also do
-> pv_ipi_supported() and probably others for consistency.
+Ben Gardon <bgardon@google.com> writes:
 
-Will do.
+> Separate the functions for generating MMIO page table entries from the
+> function that inserts them into the paging structure. This refactoring
+> will facilitate changes to the MMU sychronization model to use atomic
+> compare / exchanges (which are not guaranteed to succeed) instead of a
+> monolithic MMU lock.
+>
+> No functional change expected.
+>
+> Tested by running kvm-unit-tests on an Intel Haswell machine. This
+> commit introduced no new failures.
+>
+> This commit can be viewed in Gerrit at:
+> 	https://linux-review.googlesource.com/c/virt/kvm/kvm/+/2359
+>
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> Reviewed-by: Oliver Upton <oupton@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index a9c593dec49bf..b81010d0edae1 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -451,9 +451,9 @@ static u64 get_mmio_spte_generation(u64 spte)
+>  	return gen;
+>  }
+>  
+> -static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
+> -			   unsigned int access)
+> +static u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
+>  {
+> +
 
-    Wanpeng
+Unneded newline.
+
+>  	u64 gen = kvm_vcpu_memslots(vcpu)->generation & MMIO_SPTE_GEN_MASK;
+>  	u64 mask = generation_mmio_spte_mask(gen);
+>  	u64 gpa = gfn << PAGE_SHIFT;
+> @@ -464,6 +464,17 @@ static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
+>  	mask |= (gpa & shadow_nonpresent_or_rsvd_mask)
+>  		<< shadow_nonpresent_or_rsvd_mask_len;
+>  
+> +	return mask;
+> +}
+> +
+> +static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
+> +			   unsigned int access)
+> +{
+> +	u64 mask = make_mmio_spte(vcpu, gfn, access);
+> +	unsigned int gen = get_mmio_spte_generation(mask);
+> +
+> +	access = mask & ACC_ALL;
+> +
+>  	trace_mark_mmio_spte(sptep, gfn, access, gen);
+
+'access' and 'gen' are only being used for tracing, would it rather make
+sense to rename&move it to the newly introduced make_mmio_spte()? Or do
+we actually need tracing for both?
+
+Also, I dislike re-purposing function parameters.
+
+>  	mmu_spte_set(sptep, mask);
+>  }
+
+-- 
+Vitaly
+
