@@ -2,113 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 97D8C153D66
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 04:13:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FC33153D7B
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 04:17:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727916AbgBFDMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 22:12:13 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22771 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727703AbgBFDMM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 22:12:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580958732;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RspSNO+p1yr02wpcehjk1h3AeZBEyxIwLa/kF1BxhEY=;
-        b=Tzu/fv1+x57PPEYYLKMdcqmju0mpoP7/vTvkoKseGP3HEPZfXPa6OPdgaFqvEuNWxp2i1J
-        rTS2hH0KS9B/cnzajxOAcikwiBJnieqsB4Lu1Hlqlx95vWMoYKAVIApXWQTnnT8JxX+AOU
-        P6L9SYGk/bzTklPNYE4Wen+Xtfd9TbU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-IABUdiBpNvaQmA4HuVYVBQ-1; Wed, 05 Feb 2020 22:12:10 -0500
-X-MC-Unique: IABUdiBpNvaQmA4HuVYVBQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727663AbgBFDRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 22:17:33 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7152 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727572AbgBFDRd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 5 Feb 2020 22:17:33 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0163Dgfx094664
+        for <kvm@vger.kernel.org>; Wed, 5 Feb 2020 22:17:31 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2xyhmhvpef-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 22:17:31 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <sbobroff@linux.ibm.com>;
+        Thu, 6 Feb 2020 03:17:29 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 6 Feb 2020 03:17:28 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0163HROY47775860
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 6 Feb 2020 03:17:27 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3881E4203F;
+        Thu,  6 Feb 2020 03:17:27 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D7DEF42041;
+        Thu,  6 Feb 2020 03:17:26 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  6 Feb 2020 03:17:26 +0000 (GMT)
+Received: from osmium.ozlabs.ibm.com (haven.au.ibm.com [9.192.254.114])
+        (using TLSv1.2 with cipher DHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4495D8018A5;
-        Thu,  6 Feb 2020 03:12:07 +0000 (UTC)
-Received: from [10.72.13.85] (ovpn-13-85.pek2.redhat.com [10.72.13.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2AAA85C1B2;
-        Thu,  6 Feb 2020 03:11:53 +0000 (UTC)
-Subject: Re: [PATCH] vhost: introduce vDPA based backend
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Gunthorpe <jgg@mellanox.com>
-Cc:     Shahaf Shuler <shahafs@mellanox.com>,
-        Tiwei Bie <tiwei.bie@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "dan.daly@intel.com" <dan.daly@intel.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>
-References: <20200131033651.103534-1-tiwei.bie@intel.com>
- <7aab2892-bb19-a06a-a6d3-9c28bc4c3400@redhat.com>
- <20200205020247.GA368700@___>
- <AM0PR0502MB37952015716C1D5E07E390B6C3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
- <112858a4-1a01-f4d7-e41a-1afaaa1cad45@redhat.com>
- <20200205125648.GV23346@mellanox.com>
- <20200205081210-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <55b050d6-b31d-f8a2-2a15-0fc68896d47f@redhat.com>
-Date:   Thu, 6 Feb 2020 11:11:52 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by ozlabs.au.ibm.com (Postfix) with ESMTPSA id AB959A00EE;
+        Thu,  6 Feb 2020 14:17:22 +1100 (AEDT)
+From:   Sam Bobroff <sbobroff@linux.ibm.com>
+To:     kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     aik@ozlabs.ru
+Subject: [PATCH 1/1] vfio-pci/nvlink2: Allow fallback to ibm,mmio-atsd[0]
+Date:   Thu,  6 Feb 2020 14:17:25 +1100
+X-Mailer: git-send-email 2.22.0.216.g00a2a96fc9
 MIME-Version: 1.0
-In-Reply-To: <20200205081210-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20020603-0028-0000-0000-000003D7D5E5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20020603-0029-0000-0000-0000249C365F
+Message-Id: <426f75e09ac1a6879a6d51f592bf683c698b4bda.1580959044.git.sbobroff@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-05_06:2020-02-04,2020-02-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1011
+ impostorscore=0 malwarescore=0 priorityscore=1501 adultscore=0
+ mlxlogscore=999 suspectscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002060023
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Older versions of skiboot only provide a single value in the device
+tree property "ibm,mmio-atsd", even when multiple Address Translation
+Shoot Down (ATSD) registers are present. This prevents NVLink2 devices
+(other than the first) from being used with vfio-pci because vfio-pci
+expects to be able to assign a dedicated ATSD register to each NVLink2
+device.
 
-On 2020/2/5 =E4=B8=8B=E5=8D=889:14, Michael S. Tsirkin wrote:
-> On Wed, Feb 05, 2020 at 08:56:48AM -0400, Jason Gunthorpe wrote:
->> On Wed, Feb 05, 2020 at 03:50:14PM +0800, Jason Wang wrote:
->>>> Would it be better for the map/umnap logic to happen inside each dev=
-ice ?
->>>> Devices that needs the IOMMU will call iommu APIs from inside the dr=
-iver callback.
->>> Technically, this can work. But if it can be done by vhost-vpda it wi=
-ll make
->>> the vDPA driver more compact and easier to be implemented.
->> Generally speaking, in the kernel, it is normal to not hoist code of
->> out drivers into subsystems until 2-3 drivers are duplicating that
->> code. It helps ensure the right design is used
->>
->> Jason
-> That's up to the sybsystem maintainer really, as there's also some
-> intuition involved in guessing a specific API is widely useful.
-> In-kernel APIs are flexible, if we find something isn't needed we just
-> drop it.
->
+However, ATSD registers can be shared among devices. This change
+allows vfio-pci to fall back to sharing the register at index 0 if
+necessary.
 
-If I understand correctly. At least Intel (Ling Shan) and Brodcom (Rob)=20
-doesn't want to deal with DMA stuffs in their driver.
+Signed-off-by: Sam Bobroff <sbobroff@linux.ibm.com>
+---
+ drivers/vfio/pci/vfio_pci_nvlink2.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-Anyway since the DMA bus operations is optional, driver may still choose=20
-to do DMA by itself if they want even if it requires platform IOMMU to wo=
-rk.
-
-Thanks
+diff --git a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
+index f2983f0f84be..851ba673882b 100644
+--- a/drivers/vfio/pci/vfio_pci_nvlink2.c
++++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
+@@ -420,8 +420,17 @@ int vfio_pci_ibm_npu2_init(struct vfio_pci_device *vdev)
+ 
+ 	if (of_property_read_u64_index(hose->dn, "ibm,mmio-atsd", nvlink_index,
+ 			&mmio_atsd)) {
+-		dev_warn(&vdev->pdev->dev, "No available ATSD found\n");
+-		mmio_atsd = 0;
++		dev_warn(&vdev->pdev->dev,
++			 "No ibm,mmio-atsd[%d] found: trying ibm,mmio-atsd[0]\n",
++			 nvlink_index);
++		if (of_property_read_u64_index(hose->dn, "ibm,mmio-atsd", 0,
++				&mmio_atsd)) {
++			dev_warn(&vdev->pdev->dev, "No available ATSD found\n");
++			mmio_atsd = 0;
++		} else {
++			dev_warn(&vdev->pdev->dev,
++				 "Using fallback ibm,mmio-atsd[0] for ATSD.\n");
++		}
+ 	}
+ 
+ 	if (of_property_read_u64(npu_node, "ibm,device-tgt-addr", &tgt)) {
+-- 
+2.22.0.216.g00a2a96fc9
 
