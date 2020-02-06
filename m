@@ -2,165 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 441C4154E6F
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 22:57:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90B19154E8A
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 23:04:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727519AbgBFV5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 16:57:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50808 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727450AbgBFV5s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 16:57:48 -0500
+        id S1727585AbgBFWEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 17:04:04 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27355 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726765AbgBFWED (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 17:04:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581026267;
+        s=mimecast20190719; t=1581026641;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=10sxOSYhRMsVf98oXqVUEQI4+OBsS58gSL9iiVuqLjE=;
-        b=FGZ/e3iN8XwtLsTMLyUmFaR1Yab+RnDGkVH9q2c777Xda8ALepSoXKvhyvejMMY7BUBaXa
-        DhtutlXhc9icsbXcPtz2ksaJuEejp74rW+FENdaKGe61Iun9Iu6tFWkYlV+lnv0wFVyrkW
-        +LNLoasvYiR+7XRLlGbJZOovfBsm0uY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-fPMKBz6dN_aPrigkqVmRFw-1; Thu, 06 Feb 2020 16:57:45 -0500
-X-MC-Unique: fPMKBz6dN_aPrigkqVmRFw-1
-Received: by mail-wr1-f71.google.com with SMTP id u8so127897wrp.10
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 13:57:44 -0800 (PST)
+        bh=dz1uoo006UjtoREFQWYnwIS83IIptUYIWImaDlSbYB4=;
+        b=ZCrBK0sGmA2QLXYWI0UERoKto8eD3raHVkkCSbFavG+XfSrNa4L4MSl9onBWSCdCneCPhF
+        DmUNUGtKzzzbW1OcKj7Bk6wfMGoQiW6vgy8YyPt36tJsso5HI2JhHHC7DiXApbBfhSoS6i
+        hxJqt5UgpyJBuNvBTMv/x5Ysa0AOsvs=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-tC9osU5uPvqB7UQeHfJjmA-1; Thu, 06 Feb 2020 17:03:59 -0500
+X-MC-Unique: tC9osU5uPvqB7UQeHfJjmA-1
+Received: by mail-qv1-f70.google.com with SMTP id g15so4618440qvk.11
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 14:03:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=10sxOSYhRMsVf98oXqVUEQI4+OBsS58gSL9iiVuqLjE=;
-        b=trVefUXtwcw9ni6RZ3Q5if34rVsWF5G6I8LyGPEDe0emM4cTQqHmWR9H2gpi/KXQ0o
-         vVRROXf0S1RzFUzGBMmbAWIKn2DbHpocvGH27FD41EsrhpLZgMn9ovusls5VqontKEXH
-         LcI5XeogN7dgW7/B4GWOq79ReDqCZx3abWsHmpsPbeqmJfgxEV44eg2LnnLd2IMNbgig
-         gM7TOw8K09a0D24xf30M7YxqteINjgu188v5B+v1cbUTCN6YjE4jTk1cit2JfF052CC9
-         JsJtmSdqItf32yEYtevE3wEjZ0NjlMEv0MSthO2rJWy4NmB7NCjcm0dsh5tezzOmS1mM
-         Y1GQ==
-X-Gm-Message-State: APjAAAWqo1Tv0yVhjC+M7yaQ3JjryjuPP3Odnup4NKcESFRVc1rhvp6f
-        y69mw4JtbrPvzVeTN2dFLjxioFyBALAiJ+iC73LqQK+JL40C/VONUUm8/tw9MHYCSmY71iuSjs8
-        HJeqbW62k103g
-X-Received: by 2002:adf:f44a:: with SMTP id f10mr112379wrp.16.1581026263797;
-        Thu, 06 Feb 2020 13:57:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxkLFknJmswfLS3WjKUC9icqucrhzXHz50poy/wudiPuIytWlnrCqIq9yCj0/e3FcMbZ4huIQ==
-X-Received: by 2002:adf:f44a:: with SMTP id f10mr112362wrp.16.1581026263425;
-        Thu, 06 Feb 2020 13:57:43 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56? ([2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56])
-        by smtp.gmail.com with ESMTPSA id e16sm733749wrs.73.2020.02.06.13.57.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Feb 2020 13:57:42 -0800 (PST)
-Subject: Re: [PATCH v2 21/27] docs: kvm: Convert locking.txt to ReST format
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org
-References: <cover.1581000481.git.mchehab+huawei@kernel.org>
- <1464d69fe780940cec6ecec4ac2505b9701a1e01.1581000481.git.mchehab+huawei@kernel.org>
- <20200206171132.4f51f17a.cohuck@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a17d6a27-0d3f-2020-7fc2-87ec20a6225f@redhat.com>
-Date:   Thu, 6 Feb 2020 22:57:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dz1uoo006UjtoREFQWYnwIS83IIptUYIWImaDlSbYB4=;
+        b=f+gaQqNWNPju0FYfImseQcNlGUu2ZnD20WiG7TShVgh6mEF2/DF9p+E2BMGCNAEg5l
+         QNsjkbtOVx+lP3afqtO25ryRAe7sD3i8bDjw7FDFxJNwFqXJjJGnyRdEqqePjOdfqa/S
+         YWxJjFORgX5vFeCVPIRY7lIvKzjYJ52wr3Vm4TWls6X6gEQJywrXz8lIQdUfUku470A6
+         o2mBCbMOCWqCku7hba/E+nC82r19uAxfClz4hGObpNv9dqRUGuyQMme3BfaSzz6bcJ0A
+         rQoq+cnhG9KCTbMeYbXSjszMIe/rfpHbyVbD6TJv6wiel57Bllh1QXF4GfN3+GPVaJnc
+         8u1w==
+X-Gm-Message-State: APjAAAVyxY+sRO5vD5PBK740xqTE9C07+WGcA+L/+Yaef9dyuVfXdC89
+        JpJikk6PffY4PkB0TTYqRiPNAFx/0PLh3AUYzxCZTcspH9ibw5/LT4aJ8B9I6m6DtV5XnR6wqQL
+        CcvudtPDcs0TI
+X-Received: by 2002:ac8:7396:: with SMTP id t22mr4707009qtp.269.1581026639165;
+        Thu, 06 Feb 2020 14:03:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwu2LJdikIjEQUWHwIaSDYrGQrBVVncwkTn7Iy+PzbVsPREs+ohxiEeOt5zr/YlX26hX6iftw==
+X-Received: by 2002:ac8:7396:: with SMTP id t22mr4706974qtp.269.1581026638877;
+        Thu, 06 Feb 2020 14:03:58 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+        by smtp.gmail.com with ESMTPSA id i7sm312515qki.83.2020.02.06.14.03.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2020 14:03:58 -0800 (PST)
+Date:   Thu, 6 Feb 2020 17:03:55 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v4 16/19] KVM: Ensure validity of memslot with respect to
+ kvm_get_dirty_log()
+Message-ID: <20200206220355.GH700495@xz-x1>
+References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
+ <20191217204041.10815-17-sean.j.christopherson@intel.com>
+ <20191224181930.GC17176@xz-x1>
+ <20200114182506.GF16784@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200206171132.4f51f17a.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20200114182506.GF16784@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/02/20 17:11, Cornelia Huck wrote:
-> On Thu,  6 Feb 2020 15:50:18 +0100
-> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+On Tue, Jan 14, 2020 at 10:25:07AM -0800, Sean Christopherson wrote:
+> On Tue, Dec 24, 2019 at 01:19:30PM -0500, Peter Xu wrote:
+> > On Tue, Dec 17, 2019 at 12:40:38PM -0800, Sean Christopherson wrote:
+> > > +int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
+> > > +		      int *is_dirty, struct kvm_memory_slot **memslot)
+> > >  {
+> > >  	struct kvm_memslots *slots;
+> > > -	struct kvm_memory_slot *memslot;
+> > >  	int i, as_id, id;
+> > >  	unsigned long n;
+> > >  	unsigned long any = 0;
+> > >  
+> > > +	*memslot = NULL;
+> > > +	*is_dirty = 0;
+> > > +
+> > >  	as_id = log->slot >> 16;
+> > >  	id = (u16)log->slot;
+> > >  	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
+> > >  		return -EINVAL;
+> > >  
+> > >  	slots = __kvm_memslots(kvm, as_id);
+> > > -	memslot = id_to_memslot(slots, id);
+> > > -	if (!memslot->dirty_bitmap)
+> > > +	*memslot = id_to_memslot(slots, id);
+> > > +	if (!(*memslot)->dirty_bitmap)
+> > >  		return -ENOENT;
+> > >  
+> > > -	n = kvm_dirty_bitmap_bytes(memslot);
+> > > +	kvm_arch_sync_dirty_log(kvm, *memslot);
+> > 
+> > Should this line belong to previous patch?
 > 
->> - Use document title and chapter markups;
->> - Add markups for literal blocks;
->> - use :field: for field descriptions;
->> - Add blank lines and adjust indentation.
->>
->> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
->> ---
->>  Documentation/virt/kvm/index.rst              |   1 +
->>  .../virt/kvm/{locking.txt => locking.rst}     | 111 ++++++++++--------
->>  2 files changed, 63 insertions(+), 49 deletions(-)
->>  rename Documentation/virt/kvm/{locking.txt => locking.rst} (78%)
+> No.
 > 
-> (...)
+> The previous patch, "KVM: Provide common implementation for generic dirty
+> log functions", is consolidating the implementation of dirty log functions
+> for architectures with CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y.
 > 
->> @@ -48,19 +52,23 @@ restore the saved R/X bits if VMX_EPT_TRACK_ACCESS mask is set, or both. This
->>  is safe because whenever changing these bits can be detected by cmpxchg.
->>  
->>  But we need carefully check these cases:
->> -1): The mapping from gfn to pfn
->> +
->> +1) The mapping from gfn to pfn
->> +
->>  The mapping from gfn to pfn may be changed since we can only ensure the pfn
->>  is not changed during cmpxchg. This is a ABA problem, for example, below case
->>  will happen:
->>  
->> -At the beginning:
->> -gpte = gfn1
->> -gfn1 is mapped to pfn1 on host
->> -spte is the shadow page table entry corresponding with gpte and
->> -spte = pfn1
->> +At the beginning::
->>  
->> -   VCPU 0                           VCPU0
->> -on fast page fault path:
->> +	gpte = gfn1
->> +	gfn1 is mapped to pfn1 on host
->> +	spte is the shadow page table entry corresponding with gpte and
->> +	spte = pfn1
->> +
->> +	   VCPU 0                           VCPU0
->> +
->> +on fast page fault path::
->>  
->>     old_spte = *spte;
->>                                   pfn1 is swapped out:
+> This code is being moved from s390's kvm_vm_ioctl_get_dirty_log(), as s390
+> doesn't select KVM_GENERIC_DIRTYLOG_READ_PROTECT.  It's functionally a nop
+> as kvm_arch_sync_dirty_log() is empty for PowerPC, the only other arch that
+> doesn't select KVM_GENERIC_DIRTYLOG_READ_PROTECT.
 > 
-> I'm wondering if that should rather be converted to a proper table.
-
-Would be nicer but this is acceptable too I think.  Especially, the
-monospaced font allows breaking the table and keeping the parts aligned.
-
-But the two headers should be "CPU 0" and "CPU 1", and it's worth
-changing that while we're at it.  Same for the table below.
-
-Paolo
-
-
+> Arguably, the call to kvm_arch_sync_dirty_log() should be moved in a
+> separate prep patch.  It can't be a follow-on patch as that would swap the
+> ordering of kvm_arch_sync_dirty_log() and kvm_dirty_bitmap_bytes(), etc...
 > 
->> @@ -99,12 +109,14 @@ Accessed bit and Dirty bit can not be lost.
->>  But it is not true after fast page fault since the spte can be marked
->>  writable between reading spte and updating spte. Like below case:
->>  
->> -At the beginning:
->> -spte.W = 0
->> -spte.Accessed = 1
->> +At the beginning::
->>  
->> -   VCPU 0                                       VCPU0
->> -In mmu_spte_clear_track_bits():
->> +	spte.W = 0
->> +	spte.Accessed = 1
->> +
->> +	   VCPU 0                                       VCPU0
->> +
->> +In mmu_spte_clear_track_bits()::
->>  
->>     old_spte = *spte;
->>  
+> My reasoning for not splitting it to a separate patch is that prior to this
+> patch, the common code and arch specific code are doing separate memslot
+> lookups via id_to_memslot(), i.e. moving the kvm_arch_sync_dirty_log() call
+> would operate on a "different" memslot.   It can't actually be a different
+> memslot because slots_lock is held, it just felt weird.
 > 
-> This one as well.
+> All that being said, I don't have a strong opinion on moving the call to
+> kvm_arch_sync_dirty_log() in a separate patch; IIRC, I vascillated between
+> the two options when writing the code.  If anyone wants it to be a separate
+> patch I'll happily split it out.
 
+(Sorry to respond so late)
 
+I think the confusing part is the subject, where you only mentioned
+the memslot change.  IMHO you can split the change to make it clearer,
+or at least would you mind mention that kvm_arch_sync_dirty_log() move
+in the commit message?  Thanks,
+
+-- 
+Peter Xu
 
