@@ -2,160 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C3752154011
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 09:23:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E221F154015
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 09:25:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727548AbgBFIXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 03:23:47 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54305 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726673AbgBFIXr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 03:23:47 -0500
+        id S1727698AbgBFIZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 03:25:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33507 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726673AbgBFIZ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 03:25:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580977426;
+        s=mimecast20190719; t=1580977556;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zE/0umiDG6aHdnQ/nah3OJItmeTUm4mCLCMjaiSPlGo=;
-        b=JA0EswtoWdc/Cdw5Xvfg9o8226ZTRZncYRTXsLHBaUMIjrQtgwqC8TJAY96MI+32tq9ZwI
-        oF4XURodDBZj7fG15k5Mb2bMRxIotZ+N4qJXLDAjZb5vg17TvbHIN0vsGrmoLpaIwvCJuZ
-        VTrRdgjHMBWKtxbJVhK03GsT+PaBJpU=
+        bh=PDyDa5Dzr4xy8blteeZ0yJhb15nJxcktYC094Uibheg=;
+        b=CQGWCz3CawAS2d1Z+AmrooWRT6OB7F29Wqsdd8m6V10Ystcu3aaRmp0+bJRhz8M/6OES6e
+        8/TdGELy8TQBeAxWopXB6YSEM9ixure5Vg0zNF11IUQUMah3f4guraObaI3LfLUyHlxBMD
+        VHoU01qc6PHUIyaITuAhHemArculxck=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-9ZbonbHvPwaSSTn9KHLnvw-1; Thu, 06 Feb 2020 03:23:42 -0500
-X-MC-Unique: 9ZbonbHvPwaSSTn9KHLnvw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-207-y_zx8CnYOR6BDhdfY45C2A-1; Thu, 06 Feb 2020 03:25:54 -0500
+X-MC-Unique: y_zx8CnYOR6BDhdfY45C2A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B6011081FA1;
-        Thu,  6 Feb 2020 08:23:41 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E51B4801FA9;
+        Thu,  6 Feb 2020 08:25:52 +0000 (UTC)
 Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0125F89A7A;
-        Thu,  6 Feb 2020 08:23:36 +0000 (UTC)
-Date:   Thu, 6 Feb 2020 09:23:34 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E882C8DC1F;
+        Thu,  6 Feb 2020 08:25:48 +0000 (UTC)
+Date:   Thu, 6 Feb 2020 09:25:46 +0100
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     mimu@linux.ibm.com, Janosch Frank <frankja@linux.vnet.ibm.com>,
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
         KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [RFCv2 15/37] KVM: s390: protvirt: Implement interruption
- injection
-Message-ID: <20200206092334.0c5e01c9.cohuck@redhat.com>
-In-Reply-To: <dd426775-9666-a702-459c-429f1db8711b@de.ibm.com>
+Subject: Re: [RFCv2 18/37] KVM: s390: protvirt: Implement machine-check
+ interruption injection
+Message-ID: <20200206092546.14a812ce.cohuck@redhat.com>
+In-Reply-To: <55e7548b-520b-d271-6867-fb887697235e@de.ibm.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
-        <20200203131957.383915-16-borntraeger@de.ibm.com>
-        <20200205123133.34ac71a2.cohuck@redhat.com>
-        <512413a4-196e-5acb-9583-561c061e40ee@linux.ibm.com>
-        <20200205131146.611a0d78.cohuck@redhat.com>
-        <d5878d81-38c5-3147-0da4-573e56610c9c@linux.ibm.com>
-        <dd426775-9666-a702-459c-429f1db8711b@de.ibm.com>
+        <20200203131957.383915-19-borntraeger@de.ibm.com>
+        <20200205144704.58b2c327.cohuck@redhat.com>
+        <55e7548b-520b-d271-6867-fb887697235e@de.ibm.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 5 Feb 2020 19:00:47 +0100
+On Wed, 5 Feb 2020 19:18:44 +0100
 Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On 05.02.20 13:26, Michael Mueller wrote:
-> >=20
-> >=20
-> > On 05.02.20 13:11, Cornelia Huck wrote: =20
-> >> On Wed, 5 Feb 2020 12:46:39 +0100
-> >> Michael Mueller <mimu@linux.ibm.com> wrote:
-> >> =20
-> >>> On 05.02.20 12:31, Cornelia Huck wrote: =20
-> >>>> On Mon,=C2=A0 3 Feb 2020 08:19:35 -0500
-> >>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >>>> =C2=A0=C2=A0 =20
-> >>>>> From: Michael Mueller <mimu@linux.ibm.com>
-> >>>>>
-> >>>>> The patch implements interruption injection for the following
-> >>>>> list of interruption types:
-> >>>>>
-> >>>>> =C2=A0=C2=A0=C2=A0 - I/O
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __deliver_io (III)
-> >>>>>
-> >>>>> =C2=A0=C2=A0=C2=A0 - External
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __deliver_cpu_timer (IEI)
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __deliver_ckc (IEI)
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __deliver_emergency_signal (IEI)
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __deliver_external_call (IEI)
-> >>>>>
-> >>>>> =C2=A0=C2=A0=C2=A0 - cpu restart
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __deliver_restart (IRI) =20
-> >>>>
-> >>>> Hm... what do 'III', 'IEI', and 'IRI' stand for? =20
-> >>>
-> >>> that's the kind of interruption injection being used:
-> >>>
-> >>> inject io interruption
-> >>> inject external interruption
-> >>> inject restart interruption =20
-> >>
-> >> So, maybe make this:
-> >>
-> >> - I/O (uses inject io interruption)
-> >> =C2=A0=C2=A0 __ deliver_io
-> >>
-> >> - External (uses inject external interruption)
-> >> (and so on)
-> >>
-> >> I find using the acronyms without explanation very confusing. =20
-> >=20
-> > Make a guess from where they are coming...
-> >=20
-> > Christian, would you please update the description accordingly.
-> >=20
-> >=20
-> > =C2=A0 - I/O (uses inject io interruption)
-> > =C2=A0=C2=A0=C2=A0 __deliver_io
-> >=20
-> > =C2=A0 - External (uses inject external interruption)
-> > =C2=A0=C2=A0=C2=A0 __deliver_cpu_timer
-> > =C2=A0=C2=A0=C2=A0 __deliver_ckc
-> > =C2=A0=C2=A0=C2=A0 __deliver_emergency_signal
-> > =C2=A0=C2=A0=C2=A0 __deliver_external_call
-> >=20
-> > =C2=A0 - cpu restart (uses inject restart interruption)
-> > =C2=A0=C2=A0=C2=A0 __deliver_restart =20
->=20
-> Will use that and also add.
-> Please note that posted interrupts (GISA) are not used for protected gues=
-ts as of today.
+> On 05.02.20 14:47, Cornelia Huck wrote:
+> [..]
+> >> --- a/arch/s390/kvm/interrupt.c
+> >> +++ b/arch/s390/kvm/interrupt.c
+> >> @@ -571,6 +571,14 @@ static int __write_machine_check(struct kvm_vcpu *vcpu,
+> >>  	union mci mci;
+> >>  	int rc;
+> >>  
+> >> +	if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+> >> +		vcpu->arch.sie_block->iictl = IICTL_CODE_MCHK;
+> >> +		vcpu->arch.sie_block->mcic = mchk->mcic;
+> >> +		vcpu->arch.sie_block->faddr = mchk->failing_storage_address;
+> >> +		vcpu->arch.sie_block->edc = mchk->ext_damage_code;  
+> > 
+> > Maybe add a comment that we don't need with other machine-check related data?  
+> 
+> Not sure I get this point. Can you make a proposal?
 
-Thanks, that makes it more clear.
+/*
+ * All other possible payload for a machine check will
+ * not be handled by the hypervisor, as it does not have
+ * the needed information for protected guests.
+ */
 
->=20
-> >=20
-> > thanks
-> >=20
-> > Michael
-> >  =20
-> >> =20
-> >>> =20
-> >>>> =C2=A0=C2=A0 =20
-> >>>>>
-> >>>>> The service interrupt is handled in a followup patch.
-> >>>>>
-> >>>>> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
-> >>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >>>>> [fixes]
-> >>>>> ---
-> >>>>> =C2=A0=C2=A0 arch/s390/include/asm/kvm_host.h |=C2=A0 8 +++
-> >>>>> =C2=A0=C2=A0 arch/s390/kvm/interrupt.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 | 93 ++++++++++++++++++++++----------
-> >>>>> =C2=A0=C2=A0 2 files changed, 74 insertions(+), 27 deletions(-) =20
-> >> =20
-> >  =20
->=20
+Something like that?
+
+> 
+> >   
+> >> +		return 0;
+> >> +	}
+> >> +
+> >>  	mci.val = mchk->mcic;
+> >>  	/* take care of lazy register loading */
+> >>  	save_fpu_regs();  
+> > 
+> > Anyway,
+> > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> >   
+> 
 
