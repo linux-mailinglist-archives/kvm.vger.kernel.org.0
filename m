@@ -2,56 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B95D615491C
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 17:26:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62918154926
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 17:28:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727806AbgBFQ0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 11:26:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24751 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727778AbgBFQ0q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 11:26:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581006405;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=H3nLSU6aNBKxxlwzEldmN2l97fU6AU4NrctqbL5/r9Q=;
-        b=gn4MDNjTmTpfeJjdxoddze1SdOSY1oYCyvksA+OiIHFL+DUb5toFOXhTyBShhGAej2fba1
-        e5V1DHJI/gzfarbvX9ImQgl0wQKO4+xqhPjwynhMuwCvjFjM1tpy3vc+d7a5UrWi41fjMW
-        7lk1IxTLtUFZPsXhaZQPQPyNyH9RQVc=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-83kSRIsAOoCVEikocMJ_rg-1; Thu, 06 Feb 2020 11:26:44 -0500
-X-MC-Unique: 83kSRIsAOoCVEikocMJ_rg-1
-Received: by mail-qv1-f71.google.com with SMTP id u11so4002472qvo.8
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 08:26:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=H3nLSU6aNBKxxlwzEldmN2l97fU6AU4NrctqbL5/r9Q=;
-        b=abkxMrt6jYO5ovT9J+MyfF9VxEp2ysibTsXyCsyWP3uHzhUHCj8yMBjwqQ2LgZ41OO
-         i7r889b4/RUvTMQVIUMU7aiJH8HTMz8oWTMVh4afPtCDtlUk7ZBbk7bfNnQCn1fWSzhY
-         cXyDpgi9c7q3gOgXP1L2J2uFbGWx6oL8dUEZJkGmkPJ/mdaio8TiWFJUPm7TsYvEPtl1
-         MZ5yD31OG+11KIluqYK5UWTaKOgVx3F6kAWPi8hc9IC1VVpFzpxZapVN+bMDkoDAe762
-         t88yL497aLKKCfAqhyVx+ni7XyFPivxs3Gc8Ov9iC/ent0/WB7Q440cZQcU5gMwn5Fe/
-         N/kQ==
-X-Gm-Message-State: APjAAAVkkQwxVmIeSosZ900anyBNe0U74+BXXtMn9e/8BNAvDGjhCuv1
-        sujDJygEA6WtRVE1lDQ3AlBliD7x4t7PExc1W5vUYiPSf1kkjglhZ+JU8UMH5Hch/EgHEqaB1Bb
-        yt+hfCVvnqF3F
-X-Received: by 2002:ac8:1e08:: with SMTP id n8mr3297381qtl.175.1581006403785;
-        Thu, 06 Feb 2020 08:26:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxQlIJcJ9283T0k3SJBUCagGgD/4X0S4VFGYxAKtPxVCA909nX5ytULcXgwNYLmQcG3Ogy1yQ==
-X-Received: by 2002:ac8:1e08:: with SMTP id n8mr3297351qtl.175.1581006403586;
-        Thu, 06 Feb 2020 08:26:43 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id q7sm1618375qkc.43.2020.02.06.08.26.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2020 08:26:42 -0800 (PST)
-Date:   Thu, 6 Feb 2020 11:26:39 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1727753AbgBFQ2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 11:28:19 -0500
+Received: from mga04.intel.com ([192.55.52.120]:30727 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727358AbgBFQ2T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 11:28:19 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Feb 2020 08:28:19 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,410,1574150400"; 
+   d="scan'208";a="344968003"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga001.fm.intel.com with ESMTP; 06 Feb 2020 08:28:18 -0800
+Date:   Thu, 6 Feb 2020 08:28:18 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -69,32 +41,56 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
         Christoffer Dall <christoffer.dall@arm.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v5 10/19] KVM: Drop "const" attribute from old memslot in
- commit_memory_region()
-Message-ID: <20200206162639.GC695333@xz-x1>
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 12/19] KVM: Move memslot deletion to helper function
+Message-ID: <20200206162818.GD13067@linux.intel.com>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
- <20200121223157.15263-11-sean.j.christopherson@intel.com>
+ <20200121223157.15263-13-sean.j.christopherson@intel.com>
+ <20200206161415.GA695333@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200121223157.15263-11-sean.j.christopherson@intel.com>
+In-Reply-To: <20200206161415.GA695333@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 21, 2020 at 02:31:48PM -0800, Sean Christopherson wrote:
-> Drop the "const" attribute from @old in kvm_arch_commit_memory_region()
-> to allow arch specific code to free arch specific resources in the old
-> memslot without having to cast away the attribute.  Freeing resources in
-> kvm_arch_commit_memory_region() paves the way for simplifying
-> kvm_free_memslot() by eliminating the last usage of its @dont param.
+On Thu, Feb 06, 2020 at 11:14:15AM -0500, Peter Xu wrote:
+> On Tue, Jan 21, 2020 at 02:31:50PM -0800, Sean Christopherson wrote:
+> > Move memslot deletion into its own routine so that the success path for
+> > other memslot updates does not need to use kvm_free_memslot(), i.e. can
+> > explicitly destroy the dirty bitmap when necessary.  This paves the way
+> > for dropping @dont from kvm_free_memslot(), i.e. all callers now pass
+> > NULL for @dont.
+> > 
+> > Add a comment above the code to make a copy of the existing memslot
+> > prior to deletion, it is not at all obvious that the pointer will become
+> > stale during sorting and/or installation of new memslots.
 > 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Could you help explain a bit on this explicit comment?  I can follow
+> up with the patch itself which looks all correct to me, but I failed
+> to catch what this extra comment wants to emphasize...
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+It's tempting to write the code like this (I know, because I did it):
 
--- 
-Peter Xu
+	if (!mem->memory_size)
+		return kvm_delete_memslot(kvm, mem, slot, as_id);
 
+	new = *slot;
+
+Where @slot is a pointer to the memslot to be deleted.  At first, second,
+and third glances, this seems perfectly sane.
+
+The issue is that slot was pulled from struct kvm_memslots.memslots, e.g.
+
+	slot = &slots->memslots[index];
+
+Note that slots->memslots holds actual "struct kvm_memory_slot" objects,
+not pointers to slots.  When update_memslots() sorts the slots, it swaps
+the actual slot objects, not pointers.  I.e. after update_memslots(), even
+though @slot points at the same address, it's could be pointing at a
+different slot.  As a result kvm_free_memslot() in kvm_delete_memslot()
+will free the dirty page info and arch-specific points for some random
+slot, not the intended slot, and will set npages=0 for that random slot.
