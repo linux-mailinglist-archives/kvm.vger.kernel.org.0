@@ -2,199 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F04A153DD4
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 05:23:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE1C7153DFF
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 06:05:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727572AbgBFEXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 23:23:10 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:46211 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726687AbgBFEXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 23:23:09 -0500
-Received: by mail-pg1-f194.google.com with SMTP id z124so2046077pgb.13
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 20:23:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:autocrypt:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=NhHfw27OM6QtaNDnF1wz5s2GUJ41VvIqPjI87pRWRn8=;
-        b=ZSLzilziAZinzscO803GzyR6U1uk9cJmpc49PIBev5O4LFTestoNFC0YAinjHRXMqt
-         Bif4/DyTY7/uZxfdkQdAxvUedkFEFBhge/7uhvWWVJwQXOCb/AdDOPQroV1jgB4G39NB
-         Ng+vaIv7amoXenwCSNOYPixZL5S8GsLZLwGVJMGtNjAtTw2O/5Rg+MIOuqxDffyraH0i
-         7Jx75Mrlm6vxr5nKFFjtJsIV23KfcBQXumWgVbCVyodCMGxrXWSDYglOdMtZeRd3sQhC
-         NteTu47ly+hbFFDiY0hcFv3rR872prP7XwSuNOtgflPtX/bYj5rJ24t+3BL7XFR+tice
-         DP0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NhHfw27OM6QtaNDnF1wz5s2GUJ41VvIqPjI87pRWRn8=;
-        b=LqwzbGncX7YnFENcCfNEyw62xDI+aBDYPrLOCca4hBobwaCMTFNVxqMvlbzT5kROJ9
-         7qyeQ/A8At1nezRDC10oocznf97oNOc4b3vbO/2wX6ZUbmFpnEPrY0rI+nqM+5d966Qm
-         oxOgfRoTWGCoOWTxwNxBEfljy1Q/6LxGJpFmbkYMg49rZweDoj9+CYQiHhh8NCIevsAA
-         qeJmXpT5C6o8fOV+aEus4Yc0CX8OSmSdtcFdrlFErIxoLJnf/ld6R+IMydwJ81YfQcuW
-         3HMkwyjIrtVvDl7nEAMRnkSP6QKS1+mOIpO+4NutVyjwBfZzqxy6CFsl+H7d41R3ZEK6
-         lmcw==
-X-Gm-Message-State: APjAAAXsBf7Ex3M1usxYstbTB8jHczANS2bugFEI54j+EJUJf6UyLsTA
-        R0SDFkAhboxQ5rz/X+wO1rfEVQ==
-X-Google-Smtp-Source: APXvYqw40Ukbz+EFLpMpIh8ooPVV06BVuRvgVs0eonFt7DAOLTdTLBF5adh5rsCFLAac5wDsy7Qb6g==
-X-Received: by 2002:a63:5f8e:: with SMTP id t136mr1454088pgb.411.1580962987678;
-        Wed, 05 Feb 2020 20:23:07 -0800 (PST)
-Received: from [10.61.2.175] ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id x6sm1095846pfi.83.2020.02.05.20.23.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Feb 2020 20:23:07 -0800 (PST)
-Subject: Re: [PATCH 1/1] vfio-pci/nvlink2: Allow fallback to ibm,mmio-atsd[0]
-To:     Sam Bobroff <sbobroff@linux.ibm.com>, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org,
-        Alex Williamson <alex.williamson@redhat.com>
-References: <426f75e09ac1a6879a6d51f592bf683c698b4bda.1580959044.git.sbobroff@linux.ibm.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <84147d70-3409-e216-495d-fc54366b92a6@ozlabs.ru>
-Date:   Thu, 6 Feb 2020 15:23:03 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        id S1726744AbgBFFFV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 00:05:21 -0500
+Received: from mga05.intel.com ([192.55.52.43]:37740 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725792AbgBFFFU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 00:05:20 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2020 21:05:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,408,1574150400"; 
+   d="scan'208";a="254987822"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga004.fm.intel.com with ESMTP; 05 Feb 2020 21:05:19 -0800
+Date:   Wed, 5 Feb 2020 21:05:19 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 01/19] KVM: x86: Allocate new rmap and large page
+ tracking when moving memslot
+Message-ID: <20200206050518.GA9401@linux.intel.com>
+References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+ <20200121223157.15263-2-sean.j.christopherson@intel.com>
+ <20200205214952.GD387680@xz-x1>
+ <20200205235533.GA7631@linux.intel.com>
+ <20200206020031.GJ387680@xz-x1>
+ <20200206021714.GB7631@linux.intel.com>
+ <20200206025858.GK387680@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <426f75e09ac1a6879a6d51f592bf683c698b4bda.1580959044.git.sbobroff@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200206025858.GK387680@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 06/02/2020 14:17, Sam Bobroff wrote:
-> Older versions of skiboot only provide a single value in the device	
-> tree property "ibm,mmio-atsd", even when multiple Address Translation
-> Shoot Down (ATSD) registers are present. This prevents NVLink2 devices
-> (other than the first) from being used with vfio-pci because vfio-pci
-> expects to be able to assign a dedicated ATSD register to each NVLink2
-> device.
+On Wed, Feb 05, 2020 at 09:58:58PM -0500, Peter Xu wrote:
+> On Wed, Feb 05, 2020 at 06:17:15PM -0800, Sean Christopherson wrote:
+> > On Wed, Feb 05, 2020 at 09:00:31PM -0500, Peter Xu wrote:
+> > > On Wed, Feb 05, 2020 at 03:55:33PM -0800, Sean Christopherson wrote:
+> > > > On Wed, Feb 05, 2020 at 04:49:52PM -0500, Peter Xu wrote:
+> > > > > Instead of calling kvm_arch_create_memslot() explicitly again here,
+> > > > > can it be replaced by below?
+> > > > > 
+> > > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > > > index 72b45f491692..85a7b02fd752 100644
+> > > > > --- a/virt/kvm/kvm_main.c
+> > > > > +++ b/virt/kvm/kvm_main.c
+> > > > > @@ -1144,7 +1144,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> > > > >                 new.dirty_bitmap = NULL;
+> > > > >  
+> > > > >         r = -ENOMEM;
+> > > > > -       if (change == KVM_MR_CREATE) {
+> > > > > +       if (change == KVM_MR_CREATE || change == KVM_MR_MOVE) {
+> > > > >                 new.userspace_addr = mem->userspace_addr;
+> > > > >  
+> > > > >                 if (kvm_arch_create_memslot(kvm, &new, npages))
+> > > > 
+> > > > No, because other architectures don't need to re-allocate new metadata on
+> > > > MOVE and rely on __kvm_set_memory_region() to copy @arch from old to new,
+> > > > e.g. see kvmppc_core_create_memslot_hv().
+> > > 
+> > > Yes it's only required in x86, but iiuc it also will still work for
+> > > ppc?  Say, in that case ppc won't copy @arch from old to new, and
+> > > kvmppc_core_free_memslot_hv() will free the old, however it should
+> > > still work.
+> > 
+> > No, calling kvm_arch_create_memslot() for MOVE will result in PPC leaking
+> > memory due to overwriting slot->arch.rmap with a new allocation.
 > 
-> However, ATSD registers can be shared among devices. This change
-> allows vfio-pci to fall back to sharing the register at index 0 if
-> necessary.
-> 
-> Signed-off-by: Sam Bobroff <sbobroff@linux.ibm.com>
-> ---
->  drivers/vfio/pci/vfio_pci_nvlink2.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
-> index f2983f0f84be..851ba673882b 100644
-> --- a/drivers/vfio/pci/vfio_pci_nvlink2.c
-> +++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
-> @@ -420,8 +420,17 @@ int vfio_pci_ibm_npu2_init(struct vfio_pci_device *vdev)
->  
->  	if (of_property_read_u64_index(hose->dn, "ibm,mmio-atsd", nvlink_index,
->  			&mmio_atsd)) {
-> -		dev_warn(&vdev->pdev->dev, "No available ATSD found\n");
-> -		mmio_atsd = 0;
-> +		dev_warn(&vdev->pdev->dev,
-> +			 "No ibm,mmio-atsd[%d] found: trying ibm,mmio-atsd[0]\n",
-> +			 nvlink_index);
+> Why?  For the MOVE case, kvm_arch_create_memslot() will create a new
+> rmap for the "new" memslot.  If the whole procedure succeeded,
+> kvm_free_memslot() will free the old rmap.  If it failed,
+> kvm_free_memslot() will free the new rmap if !NULL.  Looks fine?
 
+Oh, I see what you're suggesting.   Please god no.
 
-We do not really need this warning (nvlink_index doesn't matter that
-much, we can work out from the device tree what happened), warnings
-below are enough (if you really want, you can print nvlink_index there).
+This is a bug fix that needs to be backported to stable.  Arbitrarily
+changing PPC behavior is a bad idea, especially since I don't know squat
+about the PPC rmap behavior.
 
-Either way,
+If it happens to fix a PPC rmap bug, then PPC should get an explicit fix.
+If it's not a bug fix, then at best it is a minor performance hit due to an
+extra allocation and the need to refill the rmap.  Worst case scenario it
+breaks PPC.
 
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+And unless this were a temporary change, which would be silly, I would have
+to carry forward the change into "KVM: PPC: Move memslot memory allocation
+into prepare_memory_region()", and again, I don't know squat about PPC.
 
-
-
-
-> +		if (of_property_read_u64_index(hose->dn, "ibm,mmio-atsd", 0,
-> +				&mmio_atsd)) {
-> +			dev_warn(&vdev->pdev->dev, "No available ATSD found\n");
-> +			mmio_atsd = 0;
-> +		} else {
-> +			dev_warn(&vdev->pdev->dev,
-> +				 "Using fallback ibm,mmio-atsd[0] for ATSD.\n");
-> +		}
->  	}
->  
->  	if (of_property_read_u64(npu_node, "ibm,device-tgt-addr", &tgt)) {
-> 
-
--- 
-Alexey
+I also don't want to effectively introduce a misnamed function, even if
+only temporarily, e.g. it's kvm_arch_create_memslot(), not
+kvm_arch_create_or_move_memslot(), because the whole flow gets reworked a
+few patches later.
