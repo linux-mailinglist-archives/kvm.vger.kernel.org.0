@@ -2,56 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D170153C93
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 02:25:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3166B153CBD
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 02:44:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727577AbgBFBZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 20:25:45 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:42815 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727170AbgBFBZp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 20:25:45 -0500
-Received: by mail-oi1-f194.google.com with SMTP id j132so2904847oih.9
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 17:25:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=3Uk6WSlPgg2mi3HnuZ4WllqBBeIatoU9lrS+iTrTuL0=;
-        b=ikKA+9gDNE4vEcvM+ppxGLqx1oHoM8SaUJ9s9vb/0HrQwd36Elu/xZ652PPPITvNqu
-         hR7vyuSba54PkioQMyyyK60YpigUpo3gKqbfQhTb4LPCJh2uTfrCpmdAL6pLi+k8/SBR
-         Vw4LOUw/YLHwJMgAWI/Zson/OMqmco0MVUl65EZNOTHx5jB0Gmpyg2sT8XaKIGJtJyQJ
-         MD3hy3lW/I3YvnWbtCUJG6VNe1M8d5GR4bJrAG/bqF41cssE0Dwds88rhGH3KiZvjiH1
-         nYnfLm2PsiKPSEwLEGBYGCLieTAnk32Bv/uSpjiPPcVupQk6yPrXvmGVrZcy8NVBLVlx
-         Cq/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=3Uk6WSlPgg2mi3HnuZ4WllqBBeIatoU9lrS+iTrTuL0=;
-        b=H2P1rnxYJDKvuuAKxNc92DqFzm55WTmJ0xCshtekSKCDNPfFAbue9XfkDiv9Mzq3Xf
-         TbobEyffyyd7B8ILO7N3AQYi5J2i/RZk4S1gHgyOzpIhRruTQX06w4zpanOhxwidrHbE
-         EmBfKwUignzh1OvABn2G+wfyiG2f4GX7P4U4kczo0pcshfy7Oi368bwOJtT0JgpWHN6C
-         jNWx2fmFOEb5YwS4aT5Wd8lPBSA2ownuko1H1ct0BWjGpgOicwu5Su8nxOiM3zkamARb
-         9EYEpxgKZ22KURF3t+UUikOMNOGQOOGvr3QyH4Z6fpk/pA7+e5OTMdwWZVlxocC5IvWi
-         7mBQ==
-X-Gm-Message-State: APjAAAVCVsCaQ3PAkZovPe4TFpBTXBV/aBZU8KEUF5EE2BdjofBWMoFZ
-        K5O5jxVayD7ZY3FNOn7jFMnG/XHr5pT7PHjnng0=
-X-Google-Smtp-Source: APXvYqy78f5jpkt1S9WdNmjEoSq7KxyBLzNStPDAl23VaL7lGo4VH5bjkzr9/+/e9IBn+wWJmFGR0lRJIUSY9uGbVws=
-X-Received: by 2002:aca:f242:: with SMTP id q63mr5338690oih.72.1580952343776;
- Wed, 05 Feb 2020 17:25:43 -0800 (PST)
+        id S1727705AbgBFBoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 20:44:09 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:9701 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727170AbgBFBoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 20:44:09 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id F400A1F6CA1EBF20BB35;
+        Thu,  6 Feb 2020 09:44:04 +0800 (CST)
+Received: from huawei.com (10.175.105.18) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Thu, 6 Feb 2020
+ 09:43:55 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
+        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <hpa@zytor.com>
+CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <x86@kernel.org>
+Subject: [PATCH] KVM: x86: remove duplicated KVM_REQ_EVENT request
+Date:   Thu, 6 Feb 2020 09:45:44 +0800
+Message-ID: <1580953544-4778-1-git-send-email-linmiaohe@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Received: by 2002:ac9:7ad0:0:0:0:0:0 with HTTP; Wed, 5 Feb 2020 17:25:43 -0800 (PST)
-Reply-To: haeinjung52@gmail.com
-From:   Haein Jung <goodwilladams2@gmail.com>
-Date:   Thu, 6 Feb 2020 01:25:43 +0000
-Message-ID: <CAB7CBX30ojkWKWvZ-=+mZcucmUhvNV7+gM15jovu5Y=0wh-Fuw@mail.gmail.com>
-Subject: hope you will contact
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.175.105.18]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-My name is  Hae-in Jung. I would like to establish mutual contact with
-you for a specific purpose
+From: Miaohe Lin <linmiaohe@huawei.com>
+
+The KVM_REQ_EVENT request is already made in kvm_set_rflags(). We should
+not make it again.
+
+Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+---
+ arch/x86/kvm/x86.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index fbabb2f06273..212282c6fb76 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8942,7 +8942,6 @@ int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
+ 
+ 	kvm_rip_write(vcpu, ctxt->eip);
+ 	kvm_set_rflags(vcpu, ctxt->eflags);
+-	kvm_make_request(KVM_REQ_EVENT, vcpu);
+ 	return 1;
+ }
+ EXPORT_SYMBOL_GPL(kvm_task_switch);
+-- 
+2.19.1
+
