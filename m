@@ -2,73 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66DD6154523
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 14:42:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2476154532
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 14:45:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727918AbgBFNmx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 08:42:53 -0500
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:34355 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727773AbgBFNmx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 08:42:53 -0500
-Received: by mail-ed1-f68.google.com with SMTP id r18so5998864edl.1
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 05:42:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=ksZ9yvJQLEPos9sVNg0k5UIVDrjEW5mJFI3LUcUgjiE=;
-        b=ImMj94dGvPUDRwLq9r1A3x1SO8cg2zKba8JnKV7YPsr9dYYmdley7+YrISni+L4Orx
-         u5fBLxkZleqc1787FWUjlu3szyJdluo25JqpkQdkjaU+JIGTO/a6mN0ymepP22Bh8zN6
-         95AaD2P4tzO9A71pA5+8lx+N4rwwbGKdZiJVy/OvoJ5re3DbQr4KH6OTspuWOZh+/Fz4
-         J2WV/beTSJIFiiWknNBwZU3RWM9vEZOYgIeNjkixEmt0JpwYsGZaHeFoogMdymniFoKc
-         9Tw8qZBAB0J8TUZrUtTJkRPEcLhoTPyrO2Z4BJbkGIouQf8ikxhlSgP2eyIoFFHQM/lA
-         lDXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=ksZ9yvJQLEPos9sVNg0k5UIVDrjEW5mJFI3LUcUgjiE=;
-        b=JD3mJ/eCNhmjMf/bGniImmb8zR76SIY4gmsr3xrYcwrrpjGn1yzBKpqrP1tc0nUuIj
-         C+qAxs+VHHe7eYn/PgMXf7/S4oK1YatkQolxsaBmK4K/JgjZ/VBaEdo1ZS3mFQ4JB6mk
-         PEmX9zv7i0HpRtaKsVcne/cWNN2aEQ8+yt+8K7KEVGYGMOQSlQwhemhv3waojaiIhoUB
-         d7+/6rjoOdMa99RuqMQYrxtZQ+bjhtqaM3PTmyR361b9bGJWEBTWBgtxXrK0wBkgVLN0
-         OyltL0Jo/Ps/FfdCQrVoWPxdxXxuOxt5nKoPTs31I/xUOtu7xTjYVLAakDkwqB/WL30D
-         /JKA==
-X-Gm-Message-State: APjAAAWX2K3fkQIrxRoWQpWWW0dU0AlkVzIRIZzJCvVYPQvdFO0uhFSr
-        owgl19rV2dA1TBhNcmO2auc2dmKt3p32DEn2U6k=
-X-Google-Smtp-Source: APXvYqx1DpLC3qocfZN58PeAT+sNNaIe4FgpEJBDYXg+AFn5OoKz7n3ddvxhurVG+zLjNUxKkvrMyx8PwCuNP37hAhg=
-X-Received: by 2002:a17:906:2885:: with SMTP id o5mr3252110ejd.154.1580996572160;
- Thu, 06 Feb 2020 05:42:52 -0800 (PST)
+        id S1727861AbgBFNpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 08:45:21 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28626 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727361AbgBFNpV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 08:45:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580996720;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NDU1pecxlc+BOyhBmEht8Gi+UsDhBE70bSJ3aCURxjY=;
+        b=BINwRiA955dn+mQmP5Yzz/eHLrv1JZ17Wmy7/cGbr0CMDtE2lORWkr+c/GIofGkI4m7/W4
+        albqPN0qG5tgRQfOQfyFM/DKhQwz1P4jiXmiPKkJ41WIlthe4ZwVPmwoz/ankKLjuMp0Sj
+        4N9dokfZfQVdVzC6HGuyBmby4jYQ4FQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-_j4sQ72kNc6cDjhpHwN4kA-1; Thu, 06 Feb 2020 08:45:16 -0500
+X-MC-Unique: _j4sQ72kNc6cDjhpHwN4kA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 059468024DB;
+        Thu,  6 Feb 2020 13:45:15 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E1BE484DB4;
+        Thu,  6 Feb 2020 13:45:09 +0000 (UTC)
+Date:   Thu, 6 Feb 2020 14:45:06 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dev@dpdk.org, mtosatti@redhat.com,
+        thomas@monjalon.net, bluca@debian.org, jerinjacobk@gmail.com,
+        bruce.richardson@intel.com
+Subject: Re: [RFC PATCH 6/7] vfio/pci: Remove dev_fmt definition
+Message-ID: <20200206144506.178ba10a.cohuck@redhat.com>
+In-Reply-To: <158085758432.9445.12129266614127683867.stgit@gimli.home>
+References: <158085337582.9445.17682266437583505502.stgit@gimli.home>
+        <158085758432.9445.12129266614127683867.stgit@gimli.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Received: by 2002:a05:6402:22dc:0:0:0:0 with HTTP; Thu, 6 Feb 2020 05:42:51
- -0800 (PST)
-Reply-To: eco.bank1204@gmail.com
-From:   "MS. MARYANNA B. THOMASON" <eco.bank1204@gmail.com>
-Date:   Thu, 6 Feb 2020 14:42:51 +0100
-Message-ID: <CAOE+jAArxcjooRPgf-Uv3ad6dRrQx4xvQ8x9E8Sbr8xdLLT=QA@mail.gmail.com>
-Subject: Contact Federal Reserve Bank New York to receive your inheritance
- contract payment (US$12.8M)
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Attention Fund Beneficiary,
-Contact Federal Reserve Bank New York to receive your inheritance
-contract payment  (US$12.8M)
-Payment Release Instruction from US department of Homeland Security New York.
-Contact Federal Reserve Bank New York to receive your inheritance
-contract payment  (US$12.8M) deposited this morning in your favor.
-Contact Person, Dr. Jerome H. Powell.
-CEO Director, Federal Reserve Bank New York
-Email: reservebank.ny93@gmail.com
-Telephone- (917) 983-4846)
-Note.I have paid the deposit and insurance fee for you,but only money
-you are required to send to the bank is $US25.00,your processing funds
-transfer fee only to enable them release your funds to you today.
-Thank you for your anticipated co-operation.
-TREAT AS URGENT.
-Mr.Richard Longhair
-DIRECTOR OF FUNDS CLEARANCE UNIT
+On Tue, 04 Feb 2020 16:06:24 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
+
+> It currently results in messages like:
+> 
+>  "vfio-pci 0000:03:00.0: vfio_pci: ..."
+> 
+> Which is quite a bit redundant.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c |    1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 026308aa18b5..343fe38ed06b 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -9,7 +9,6 @@
+>   */
+>  
+>  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> -#define dev_fmt pr_fmt
+>  
+>  #include <linux/device.h>
+>  #include <linux/eventfd.h>
+> 
+
+Yes, that looks a bit superfluous.
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
