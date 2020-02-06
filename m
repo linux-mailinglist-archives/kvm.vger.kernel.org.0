@@ -2,96 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F1978154832
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:35:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C064154840
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:41:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727626AbgBFPfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 10:35:47 -0500
-Received: from mga17.intel.com ([192.55.52.151]:18676 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725535AbgBFPfr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 10:35:47 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Feb 2020 07:35:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,410,1574150400"; 
-   d="scan'208";a="404517225"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 06 Feb 2020 07:35:46 -0800
-Date:   Thu, 6 Feb 2020 07:35:46 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     linmiaohe <linmiaohe@huawei.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com,
-        rkrcmar@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com
-Subject: Re: [PATCH] KVM: nVMX: Fix some comment typos and coding style
-Message-ID: <20200206153546.GB13067@linux.intel.com>
-References: <1580956162-5609-1-git-send-email-linmiaohe@huawei.com>
- <87a75wgdd5.fsf@vitty.brq.redhat.com>
+        id S1727512AbgBFPl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 10:41:26 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30196 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727457AbgBFPl0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 10:41:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581003685;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9wMwSq0HYfGlp3ThYr5DJrLa20xKFoqvuSdrLGy9yV8=;
+        b=TW8xZMRSIYGEsmzzAPj2tTNZCkgDIabOyvL9wQtm3ySKZjMcI+wB95I7VoH6f8n5xpCBVV
+        hFk5e5JvNYvLHE8lhBz6NsMM2i+fU2DAym2c2bmW1W2+aNJr8LC8DODysLQj4o7C38FckK
+        tY4eJmcL5BxYzbtjlTkJko/DjhmMbnM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-8JnXo92QOgiTftGzzdRklw-1; Thu, 06 Feb 2020 10:41:20 -0500
+X-MC-Unique: 8JnXo92QOgiTftGzzdRklw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 648AE102CE16;
+        Thu,  6 Feb 2020 15:41:19 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CB555DA7C;
+        Thu,  6 Feb 2020 15:41:17 +0000 (UTC)
+Date:   Thu, 6 Feb 2020 16:41:15 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 05/27] docs: virt: convert halt-polling.txt to ReST
+ format
+Message-ID: <20200206164115.7b395348.cohuck@redhat.com>
+In-Reply-To: <6af4ab0b9c9977b6de9abe0a120ef0904a631a52.1581000481.git.mchehab+huawei@kernel.org>
+References: <cover.1581000481.git.mchehab+huawei@kernel.org>
+        <6af4ab0b9c9977b6de9abe0a120ef0904a631a52.1581000481.git.mchehab+huawei@kernel.org>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a75wgdd5.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 12:32:38PM +0100, Vitaly Kuznetsov wrote:
-> linmiaohe <linmiaohe@huawei.com> writes:
-> 
-> > From: Miaohe Lin <linmiaohe@huawei.com>
-> >
-> > Fix some typos in the comments. Also fix coding style.
-> >
-> > Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h | 2 +-
-> >  arch/x86/kvm/vmx/nested.c       | 5 +++--
-> >  2 files changed, 4 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 4dffbc10d3f8..8196a4a0df8b 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -782,7 +782,7 @@ struct kvm_vcpu_arch {
-> >  
-> >  	/*
-> >  	 * Indicate whether the access faults on its page table in guest
-> 
-> Indicates?
-> 
-> > -	 * which is set when fix page fault and used to detect unhandeable
-> > +	 * which is set when fix page fault and used to detect unhandleable
-> >  	 * instruction.
-> 
-> I have to admit that shadow MMU in KVM is not my strong side but this
-> comment reads weird, I'd appreciate if someone could suggest a better
-> alternative.
+On Thu,  6 Feb 2020 15:50:02 +0100
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
 
-	/* One off flag for a stupid corner case in shadow paging. */
+> - Fix document title to match ReST format
+> - Convert the table to be properly recognized
+> - Some indentation fixes to match ReST syntax.
 > 
-> >  	 */
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
+>  .../{halt-polling.txt => halt-polling.rst}    | 86 ++++++++++---------
+>  Documentation/virt/kvm/index.rst              |  1 +
+>  2 files changed, 46 insertions(+), 41 deletions(-)
+>  rename Documentation/virt/kvm/{halt-polling.txt => halt-polling.rst} (64%)
 
-	/*
-	 * Indicates the guest is trying to write a gfn that contains one or
-	 * more of the PTEs used to translate the write itself, i.e. the access
-	 * is changing its own translation in the guest page tables.  KVM exits
-	 * to userspace if emulation of the faulting instruction fails and this
-	 * flag is set, as KVM cannot make forward progress.
-	 *
-	 * If emulation fails for a write to guest page tables, KVM unprotects
-	 * (zaps) the shadow page for the target gfn and resumes the guest to
-	 * retry the non-emulatable instruction (on hardware).  Unprotecting the
-	 * gfn doesn't allow forward progress for a self-changing access because
-	 * doing so also zaps the translation for the gfn, i.e. retrying the
-	 * instruction will hit a !PRESENT fault, which results in a new shadow
-	 * page and sends KVM back to square one.
-	 */
-> >  	bool write_fault_to_shadow_pgtable;
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
