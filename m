@@ -2,105 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CDAEA153D90
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 04:21:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F04A153DD4
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 05:23:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727799AbgBFDVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 22:21:36 -0500
-Received: from mga09.intel.com ([134.134.136.24]:30365 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727474AbgBFDVg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 22:21:36 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2020 19:21:35 -0800
-X-IronPort-AV: E=Sophos;i="5.70,408,1574150400"; 
-   d="scan'208";a="224871203"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.249.175.127]) ([10.249.175.127])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 05 Feb 2020 19:21:30 -0800
-Subject: Re: [PATCH] vhost: introduce vDPA based backend
-To:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Gunthorpe <jgg@mellanox.com>
-Cc:     Shahaf Shuler <shahafs@mellanox.com>,
-        Tiwei Bie <tiwei.bie@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "dan.daly@intel.com" <dan.daly@intel.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>
-References: <20200131033651.103534-1-tiwei.bie@intel.com>
- <7aab2892-bb19-a06a-a6d3-9c28bc4c3400@redhat.com>
- <20200205020247.GA368700@___>
- <AM0PR0502MB37952015716C1D5E07E390B6C3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
- <112858a4-1a01-f4d7-e41a-1afaaa1cad45@redhat.com>
- <20200205125648.GV23346@mellanox.com>
- <20200205081210-mutt-send-email-mst@kernel.org>
- <55b050d6-b31d-f8a2-2a15-0fc68896d47f@redhat.com>
-From:   Zhu Lingshan <lingshan.zhu@linux.intel.com>
-Message-ID: <4b1753eb-b281-17e0-6636-849ac20cbe50@linux.intel.com>
-Date:   Thu, 6 Feb 2020 11:21:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1727572AbgBFEXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 23:23:10 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:46211 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726687AbgBFEXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 23:23:09 -0500
+Received: by mail-pg1-f194.google.com with SMTP id z124so2046077pgb.13
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 20:23:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:autocrypt:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=NhHfw27OM6QtaNDnF1wz5s2GUJ41VvIqPjI87pRWRn8=;
+        b=ZSLzilziAZinzscO803GzyR6U1uk9cJmpc49PIBev5O4LFTestoNFC0YAinjHRXMqt
+         Bif4/DyTY7/uZxfdkQdAxvUedkFEFBhge/7uhvWWVJwQXOCb/AdDOPQroV1jgB4G39NB
+         Ng+vaIv7amoXenwCSNOYPixZL5S8GsLZLwGVJMGtNjAtTw2O/5Rg+MIOuqxDffyraH0i
+         7Jx75Mrlm6vxr5nKFFjtJsIV23KfcBQXumWgVbCVyodCMGxrXWSDYglOdMtZeRd3sQhC
+         NteTu47ly+hbFFDiY0hcFv3rR872prP7XwSuNOtgflPtX/bYj5rJ24t+3BL7XFR+tice
+         DP0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NhHfw27OM6QtaNDnF1wz5s2GUJ41VvIqPjI87pRWRn8=;
+        b=LqwzbGncX7YnFENcCfNEyw62xDI+aBDYPrLOCca4hBobwaCMTFNVxqMvlbzT5kROJ9
+         7qyeQ/A8At1nezRDC10oocznf97oNOc4b3vbO/2wX6ZUbmFpnEPrY0rI+nqM+5d966Qm
+         oxOgfRoTWGCoOWTxwNxBEfljy1Q/6LxGJpFmbkYMg49rZweDoj9+CYQiHhh8NCIevsAA
+         qeJmXpT5C6o8fOV+aEus4Yc0CX8OSmSdtcFdrlFErIxoLJnf/ld6R+IMydwJ81YfQcuW
+         3HMkwyjIrtVvDl7nEAMRnkSP6QKS1+mOIpO+4NutVyjwBfZzqxy6CFsl+H7d41R3ZEK6
+         lmcw==
+X-Gm-Message-State: APjAAAXsBf7Ex3M1usxYstbTB8jHczANS2bugFEI54j+EJUJf6UyLsTA
+        R0SDFkAhboxQ5rz/X+wO1rfEVQ==
+X-Google-Smtp-Source: APXvYqw40Ukbz+EFLpMpIh8ooPVV06BVuRvgVs0eonFt7DAOLTdTLBF5adh5rsCFLAac5wDsy7Qb6g==
+X-Received: by 2002:a63:5f8e:: with SMTP id t136mr1454088pgb.411.1580962987678;
+        Wed, 05 Feb 2020 20:23:07 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id x6sm1095846pfi.83.2020.02.05.20.23.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2020 20:23:07 -0800 (PST)
+Subject: Re: [PATCH 1/1] vfio-pci/nvlink2: Allow fallback to ibm,mmio-atsd[0]
+To:     Sam Bobroff <sbobroff@linux.ibm.com>, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org,
+        Alex Williamson <alex.williamson@redhat.com>
+References: <426f75e09ac1a6879a6d51f592bf683c698b4bda.1580959044.git.sbobroff@linux.ibm.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <84147d70-3409-e216-495d-fc54366b92a6@ozlabs.ru>
+Date:   Thu, 6 Feb 2020 15:23:03 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <55b050d6-b31d-f8a2-2a15-0fc68896d47f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <426f75e09ac1a6879a6d51f592bf683c698b4bda.1580959044.git.sbobroff@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2/6/2020 11:11 AM, Jason Wang wrote:
->
-> On 2020/2/5 下午9:14, Michael S. Tsirkin wrote:
->> On Wed, Feb 05, 2020 at 08:56:48AM -0400, Jason Gunthorpe wrote:
->>> On Wed, Feb 05, 2020 at 03:50:14PM +0800, Jason Wang wrote:
->>>>> Would it be better for the map/umnap logic to happen inside each 
->>>>> device ?
->>>>> Devices that needs the IOMMU will call iommu APIs from inside the 
->>>>> driver callback.
->>>> Technically, this can work. But if it can be done by vhost-vpda it 
->>>> will make
->>>> the vDPA driver more compact and easier to be implemented.
->>> Generally speaking, in the kernel, it is normal to not hoist code of
->>> out drivers into subsystems until 2-3 drivers are duplicating that
->>> code. It helps ensure the right design is used
->>>
->>> Jason
->> That's up to the sybsystem maintainer really, as there's also some
->> intuition involved in guessing a specific API is widely useful.
->> In-kernel APIs are flexible, if we find something isn't needed we just
->> drop it.
->>
->
-> If I understand correctly. At least Intel (Ling Shan) and Brodcom 
-> (Rob) doesn't want to deal with DMA stuffs in their driver.
->
-> Anyway since the DMA bus operations is optional, driver may still 
-> choose to do DMA by itself if they want even if it requires platform 
-> IOMMU to work.
->
-> Thanks
->
-Many Thanks if this could be done. The parent device has DMA 
-capabilities and dma ops implemented, we hope can make use of it, as 
-discussed in the vdpa thread.
+
+On 06/02/2020 14:17, Sam Bobroff wrote:
+> Older versions of skiboot only provide a single value in the device	
+> tree property "ibm,mmio-atsd", even when multiple Address Translation
+> Shoot Down (ATSD) registers are present. This prevents NVLink2 devices
+> (other than the first) from being used with vfio-pci because vfio-pci
+> expects to be able to assign a dedicated ATSD register to each NVLink2
+> device.
+> 
+> However, ATSD registers can be shared among devices. This change
+> allows vfio-pci to fall back to sharing the register at index 0 if
+> necessary.
+> 
+> Signed-off-by: Sam Bobroff <sbobroff@linux.ibm.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_nvlink2.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
+> index f2983f0f84be..851ba673882b 100644
+> --- a/drivers/vfio/pci/vfio_pci_nvlink2.c
+> +++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
+> @@ -420,8 +420,17 @@ int vfio_pci_ibm_npu2_init(struct vfio_pci_device *vdev)
+>  
+>  	if (of_property_read_u64_index(hose->dn, "ibm,mmio-atsd", nvlink_index,
+>  			&mmio_atsd)) {
+> -		dev_warn(&vdev->pdev->dev, "No available ATSD found\n");
+> -		mmio_atsd = 0;
+> +		dev_warn(&vdev->pdev->dev,
+> +			 "No ibm,mmio-atsd[%d] found: trying ibm,mmio-atsd[0]\n",
+> +			 nvlink_index);
+
+
+We do not really need this warning (nvlink_index doesn't matter that
+much, we can work out from the device tree what happened), warnings
+below are enough (if you really want, you can print nvlink_index there).
+
+Either way,
+
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+
+
+
+
+> +		if (of_property_read_u64_index(hose->dn, "ibm,mmio-atsd", 0,
+> +				&mmio_atsd)) {
+> +			dev_warn(&vdev->pdev->dev, "No available ATSD found\n");
+> +			mmio_atsd = 0;
+> +		} else {
+> +			dev_warn(&vdev->pdev->dev,
+> +				 "Using fallback ibm,mmio-atsd[0] for ATSD.\n");
+> +		}
+>  	}
+>  
+>  	if (of_property_read_u64(npu_node, "ibm,device-tgt-addr", &tgt)) {
+> 
+
+-- 
+Alexey
