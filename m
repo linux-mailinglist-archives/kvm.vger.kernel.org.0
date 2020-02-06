@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A5C5015486C
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:47:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A4FBD154891
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:54:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727542AbgBFPrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 10:47:36 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38809 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727484AbgBFPrf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 10:47:35 -0500
+        id S1727530AbgBFPyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 10:54:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28327 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727505AbgBFPyi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 10:54:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581004054;
+        s=mimecast20190719; t=1581004477;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=W5o7VzK3YB2cNDyLSCiswlw0M+bsMwT1Ow82wmetAgA=;
-        b=Cjq76PXDMV7r8uYCg3JVCyUJgDq2DXNpakX0Um/UL7PLT04S/rvoTZwRHoQO2HRo613Knt
-        1x6Uccau736Vn8l2qTmR9mUX8aAgYrms3kuI5To9TijfL/EVu57/PucfflPlWAbCVMIBJo
-        ClVMavMCdKGUnaysA/wyIR7Giz9dwII=
+        bh=ciQt4hN0wl1qHYzD18uw6MsOEFU9EprkzhmTJib+6UY=;
+        b=azF9/fhCZuRLy1Ev6VN8YCgaQJBtvcw512zmn9w+TKREZ29h3knoYGVqGAh5QKmDjaduCU
+        /fnmJsCn9KJlYWqACkApMXSEHvL4Tqen9wkMOY3nAsUeTmOw0pVPw+qyaHaTo6dMx8LjLl
+        oKUhVXHiBmhBWZVHFXeef806aCJxWso=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-YMY6GAxdN8Cgz_voIOvalw-1; Thu, 06 Feb 2020 10:47:30 -0500
-X-MC-Unique: YMY6GAxdN8Cgz_voIOvalw-1
+ us-mta-282-YwsrgvhwPBeSmotAqWik-g-1; Thu, 06 Feb 2020 10:54:36 -0500
+X-MC-Unique: YwsrgvhwPBeSmotAqWik-g-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6368996F85;
-        Thu,  6 Feb 2020 15:47:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDD2B10CE783;
+        Thu,  6 Feb 2020 15:54:34 +0000 (UTC)
 Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2587B1001B05;
-        Thu,  6 Feb 2020 15:47:28 +0000 (UTC)
-Date:   Thu, 6 Feb 2020 16:47:25 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F33E1001B05;
+        Thu,  6 Feb 2020 15:54:33 +0000 (UTC)
+Date:   Thu, 6 Feb 2020 16:54:06 +0100
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 Cc:     Linux Media Mailing List <linux-media@vger.kernel.org>,
@@ -41,11 +41,11 @@ Cc:     Linux Media Mailing List <linux-media@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
-Subject: Re: [PATCH v2 12/27] docs: kvm: convert devices/vcpu.txt to ReST
-Message-ID: <20200206164725.4a7914bc.cohuck@redhat.com>
-In-Reply-To: <011ccabd61ce299e638a9545adf7f59eead15131.1581000481.git.mchehab+huawei@kernel.org>
+Subject: Re: [PATCH v2 13/27] docs: kvm: convert devices/vcpu.txt to ReST
+Message-ID: <20200206165406.701e43e9.cohuck@redhat.com>
+In-Reply-To: <3c02c923c84af973f6a783c10d86d7312f16e6c5.1581000481.git.mchehab+huawei@kernel.org>
 References: <cover.1581000481.git.mchehab+huawei@kernel.org>
-        <011ccabd61ce299e638a9545adf7f59eead15131.1581000481.git.mchehab+huawei@kernel.org>
+        <3c02c923c84af973f6a783c10d86d7312f16e6c5.1581000481.git.mchehab+huawei@kernel.org>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -56,40 +56,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  6 Feb 2020 15:50:09 +0100
+On Thu,  6 Feb 2020 15:50:10 +0100
 Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
 
-> - Use title markups;
-> - adjust indentation and add blank lines as needed;
-> - adjust tables to match ReST accepted formats;
-> - use :field: markups;
+$SUBJECT: s/vcpu/vfio/
+
+> - Use standard title markup;
+> - adjust lists;
 > - mark code blocks as such.
 > 
 > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 > ---
->  Documentation/virt/kvm/devices/index.rst |   1 +
->  Documentation/virt/kvm/devices/vcpu.rst  | 114 +++++++++++++++++++++++
->  Documentation/virt/kvm/devices/vcpu.txt  |  76 ---------------
->  3 files changed, 115 insertions(+), 76 deletions(-)
->  create mode 100644 Documentation/virt/kvm/devices/vcpu.rst
->  delete mode 100644 Documentation/virt/kvm/devices/vcpu.txt
+>  Documentation/virt/kvm/devices/index.rst      |  1 +
+>  .../virt/kvm/devices/{vfio.txt => vfio.rst}   | 25 +++++++++++--------
+>  2 files changed, 16 insertions(+), 10 deletions(-)
+>  rename Documentation/virt/kvm/devices/{vfio.txt => vfio.rst} (72%)
 
-Forgot to do a git mv? Makes this a tad hard to review.
-
-(...)
-
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> new file mode 100644
-> index 000000000000..e4e41b7fcac3
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-
-(...)
-
-> +2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
-> +=================================
-> +
-> +:Architectures: ARM,ARM64
-
-As you're touching this anyway, add a blank before 'ARM64'?
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
