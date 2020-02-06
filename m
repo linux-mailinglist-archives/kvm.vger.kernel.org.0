@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 569CB154681
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 15:51:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A626C1546BA
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 15:51:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727632AbgBFOuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 09:50:39 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:55366 "EHLO
+        id S1727803AbgBFOvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 09:51:19 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:55392 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727514AbgBFOuf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 09:50:35 -0500
+        with ESMTP id S1727527AbgBFOug (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 09:50:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=sx/+8+iZzlYrslWjWWCbVGN3KcfYw72YNJslLwCNE1I=; b=c7SlY+e7+2GKm3ImZMQV3ImgPJ
-        9BKpSuWQavKccG9qodDo7YEb4lkfFZNu8C2n31DNKWhx6E07MllEgwB3ZWQKTZT7cOuHlDfducD15
-        ZlLgYe/3wLmP+pniJsvfjwXCbRrPAMppb49Pm0tiM59cz2APU5ogHfiGtm/2WR2FhRkeu9D7HMTXv
-        jyB+ead+goXL+gZIrMYm6D/lZ4CSlr4MxnHtcUmbBfcSBWkU36c+sHVnAWIT3r/1CqzXy+pP1k/S6
-        BZXrcDee6s9nthsuciw0ia6ZOVMPqLp7daKSQOLZdNU6okH5gfy2VGG+wrr7B1xcCr5AdAa4APhyP
-        NaXZb5KA==;
+        bh=qTpK99sN7WRqIfWf+ZjYD4CgBdyOTvR2MsNxs1Vzre8=; b=SiLIfsQECfdhy3NHjPkIWI/fa2
+        QemtgGMo27Lpw3GUYAKeZfBsXv3dfYZnUqr2QS4qOydsZ6LnC4jE2LymDvI0Ixy6Q9gvE3rFTNg9E
+        9jzhG7iiEDt8B1o8eg+rEc62ylhRoGSunTwt5WogAjXRG2Kxm5hRi78TWHvoha1RR5fhfbIXEL6h1
+        cldDeXtCS/d15Dgg6SgmLVU0fLlj3muUx1cpe418cSTneutynX6iUSsP+soLWj1F4pP5s+5jyBpla
+        Kpcr+mR5/JcZwcCvzTZM8/Z1FV4UkJTPJOMTxi1bcYd7sv8fktJFrFZGEnXnNMG5qS4oVMihaMfrM
+        zUiMACJw==;
 Received: from [179.95.15.160] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iziUE-0004IL-AI; Thu, 06 Feb 2020 14:50:34 +0000
+        id 1iziUE-0004Ia-RY; Thu, 06 Feb 2020 14:50:35 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iziU6-002nLi-Vw; Thu, 06 Feb 2020 15:50:26 +0100
+        id 1iziU7-002nLn-0e; Thu, 06 Feb 2020 15:50:27 +0100
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Media Mailing List <linux-media@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
@@ -34,9 +34,9 @@ Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
-Subject: [PATCH v2 21/27] docs: kvm: Convert locking.txt to ReST format
-Date:   Thu,  6 Feb 2020 15:50:18 +0100
-Message-Id: <1464d69fe780940cec6ecec4ac2505b9701a1e01.1581000481.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v2 22/27] docs: kvm: Convert mmu.txt to ReST format
+Date:   Thu,  6 Feb 2020 15:50:19 +0100
+Message-Id: <6d1a51c7f1ab22a8722c14b05caa3c80cac9fbf0.1581000481.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <cover.1581000481.git.mchehab+huawei@kernel.org>
 References: <cover.1581000481.git.mchehab+huawei@kernel.org>
@@ -48,230 +48,204 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 - Use document title and chapter markups;
+- Add markups for tables;
 - Add markups for literal blocks;
-- use :field: for field descriptions;
 - Add blank lines and adjust indentation.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- Documentation/virt/kvm/index.rst              |   1 +
- .../virt/kvm/{locking.txt => locking.rst}     | 111 ++++++++++--------
- 2 files changed, 63 insertions(+), 49 deletions(-)
- rename Documentation/virt/kvm/{locking.txt => locking.rst} (78%)
+ Documentation/virt/kvm/index.rst            |  1 +
+ Documentation/virt/kvm/{mmu.txt => mmu.rst} | 62 ++++++++++++++++-----
+ 2 files changed, 49 insertions(+), 14 deletions(-)
+ rename Documentation/virt/kvm/{mmu.txt => mmu.rst} (94%)
 
 diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
-index ac83bc588f7e..9be8f53b729d 100644
+index 9be8f53b729d..95e2487d38f4 100644
 --- a/Documentation/virt/kvm/index.rst
 +++ b/Documentation/virt/kvm/index.rst
-@@ -12,6 +12,7 @@ KVM
-    cpuid
+@@ -13,6 +13,7 @@ KVM
     halt-polling
     hypercalls
-+   locking
+    locking
++   mmu
     msr
     vcpu-requests
  
-diff --git a/Documentation/virt/kvm/locking.txt b/Documentation/virt/kvm/locking.rst
-similarity index 78%
-rename from Documentation/virt/kvm/locking.txt
-rename to Documentation/virt/kvm/locking.rst
-index 635cd6eaf714..428cb3412ecc 100644
---- a/Documentation/virt/kvm/locking.txt
-+++ b/Documentation/virt/kvm/locking.rst
+diff --git a/Documentation/virt/kvm/mmu.txt b/Documentation/virt/kvm/mmu.rst
+similarity index 94%
+rename from Documentation/virt/kvm/mmu.txt
+rename to Documentation/virt/kvm/mmu.rst
+index dadb29e8738f..60981887d20b 100644
+--- a/Documentation/virt/kvm/mmu.txt
++++ b/Documentation/virt/kvm/mmu.rst
 @@ -1,3 +1,6 @@
 +.. SPDX-License-Identifier: GPL-2.0
 +
-+=================
- KVM Lock Overview
- =================
++======================
+ The x86 kvm shadow mmu
+ ======================
  
-@@ -18,7 +21,7 @@ On x86, vcpu->mutex is taken outside kvm->arch.hyperv.hv_lock.
- Everything else is a leaf: no other lock is taken inside the critical
- sections.
+@@ -7,27 +10,37 @@ physical addresses to host physical addresses.
  
--2: Exception
-+2. Exception
- ------------
+ The mmu code attempts to satisfy the following requirements:
  
- Fast page fault:
-@@ -28,15 +31,16 @@ the mmu-lock on x86. Currently, the page fault can be fast in one of the
- following two cases:
+-- correctness: the guest should not be able to determine that it is running
++- correctness:
++	       the guest should not be able to determine that it is running
+                on an emulated mmu except for timing (we attempt to comply
+                with the specification, not emulate the characteristics of
+                a particular implementation such as tlb size)
+-- security:    the guest must not be able to touch host memory not assigned
++- security:
++	       the guest must not be able to touch host memory not assigned
+                to it
+-- performance: minimize the performance penalty imposed by the mmu
+-- scaling:     need to scale to large memory and large vcpu guests
+-- hardware:    support the full range of x86 virtualization hardware
+-- integration: Linux memory management code must be in control of guest memory
++- performance:
++               minimize the performance penalty imposed by the mmu
++- scaling:
++               need to scale to large memory and large vcpu guests
++- hardware:
++               support the full range of x86 virtualization hardware
++- integration:
++               Linux memory management code must be in control of guest memory
+                so that swapping, page migration, page merging, transparent
+                hugepages, and similar features work without change
+-- dirty tracking: report writes to guest memory to enable live migration
++- dirty tracking:
++               report writes to guest memory to enable live migration
+                and framebuffer-based displays
+-- footprint:   keep the amount of pinned kernel memory low (most memory
++- footprint:
++               keep the amount of pinned kernel memory low (most memory
+                should be shrinkable)
+-- reliability:  avoid multipage or GFP_ATOMIC allocations
++- reliability:
++               avoid multipage or GFP_ATOMIC allocations
  
- 1. Access Tracking: The SPTE is not present, but it is marked for access
--tracking i.e. the SPTE_SPECIAL_MASK is set. That means we need to
--restore the saved R/X bits. This is described in more detail later below.
-+   tracking i.e. the SPTE_SPECIAL_MASK is set. That means we need to
-+   restore the saved R/X bits. This is described in more detail later below.
+ Acronyms
+ ========
  
- 2. Write-Protection: The SPTE is present and the fault is
--caused by write-protect. That means we just need to change the W bit of the 
--spte.
-+   caused by write-protect. That means we just need to change the W bit of
-+   the spte.
++====  ====================================================================
+ pfn   host page frame number
+ hpa   host physical address
+ hva   host virtual address
+@@ -41,6 +54,7 @@ pte   page table entry (used also to refer generically to paging structure
+ gpte  guest pte (referring to gfns)
+ spte  shadow pte (referring to pfns)
+ tdp   two dimensional paging (vendor neutral term for NPT and EPT)
++====  ====================================================================
  
- What we use to avoid all the race is the SPTE_HOST_WRITEABLE bit and
- SPTE_MMU_WRITEABLE bit on the spte:
+ Virtual and real hardware supported
+ ===================================
+@@ -90,11 +104,13 @@ Events
+ The mmu is driven by events, some from the guest, some from the host.
+ 
+ Guest generated events:
 +
- - SPTE_HOST_WRITEABLE means the gfn is writable on host.
- - SPTE_MMU_WRITEABLE means the gfn is writable on mmu. The bit is set when
-   the gfn is writable on guest mmu and it is not write-protected by shadow
-@@ -48,19 +52,23 @@ restore the saved R/X bits if VMX_EPT_TRACK_ACCESS mask is set, or both. This
- is safe because whenever changing these bits can be detected by cmpxchg.
+ - writes to control registers (especially cr3)
+ - invlpg/invlpga instruction execution
+ - access to missing or protected translations
  
- But we need carefully check these cases:
--1): The mapping from gfn to pfn
+ Host generated events:
 +
-+1) The mapping from gfn to pfn
+ - changes in the gpa->hpa translation (either through gpa->hva changes or
+   through hva->hpa changes)
+ - memory pressure (the shrinker)
+@@ -117,16 +133,19 @@ Leaf ptes point at guest pages.
+ The following table shows translations encoded by leaf ptes, with higher-level
+ translations in parentheses:
+ 
+- Non-nested guests:
++ Non-nested guests::
 +
- The mapping from gfn to pfn may be changed since we can only ensure the pfn
- is not changed during cmpxchg. This is a ABA problem, for example, below case
- will happen:
- 
--At the beginning:
--gpte = gfn1
--gfn1 is mapped to pfn1 on host
--spte is the shadow page table entry corresponding with gpte and
--spte = pfn1
-+At the beginning::
- 
--   VCPU 0                           VCPU0
--on fast page fault path:
-+	gpte = gfn1
-+	gfn1 is mapped to pfn1 on host
-+	spte is the shadow page table entry corresponding with gpte and
-+	spte = pfn1
+   nonpaging:     gpa->hpa
+   paging:        gva->gpa->hpa
+   paging, tdp:   (gva->)gpa->hpa
+- Nested guests:
 +
-+	   VCPU 0                           VCPU0
++ Nested guests::
 +
-+on fast page fault path::
+   non-tdp:       ngva->gpa->hpa  (*)
+   tdp:           (ngva->)ngpa->gpa->hpa
  
-    old_spte = *spte;
-                                  pfn1 is swapped out:
-@@ -81,6 +89,7 @@ We dirty-log for gfn1, that means gfn2 is lost in dirty-bitmap.
- For direct sp, we can easily avoid it since the spte of direct sp is fixed
- to gfn. For indirect sp, before we do cmpxchg, we call gfn_to_pfn_atomic()
- to pin gfn to pfn, because after gfn_to_pfn_atomic():
+-(*) the guest hypervisor will encode the ngva->gpa translation into its page
+-    tables if npt is not present
++  (*) the guest hypervisor will encode the ngva->gpa translation into its page
++      tables if npt is not present
+ 
+ Shadow pages contain the following information:
+   role.level:
+@@ -291,28 +310,41 @@ Handling a page fault is performed as follows:
+ 
+  - if the RSV bit of the error code is set, the page fault is caused by guest
+    accessing MMIO and cached MMIO information is available.
 +
- - We have held the refcount of pfn that means the pfn can not be freed and
-   be reused for another gfn.
- - The pfn is writable that means it can not be shared between different gfns
-@@ -91,7 +100,8 @@ Then, we can ensure the dirty bitmaps is correctly set for a gfn.
- Currently, to simplify the whole things, we disable fast page fault for
- indirect shadow page.
- 
--2): Dirty bit tracking
-+2) Dirty bit tracking
+    - walk shadow page table
+    - check for valid generation number in the spte (see "Fast invalidation of
+      MMIO sptes" below)
+    - cache the information to vcpu->arch.mmio_gva, vcpu->arch.mmio_access and
+      vcpu->arch.mmio_gfn, and call the emulator
 +
- In the origin code, the spte can be fast updated (non-atomically) if the
- spte is read-only and the Accessed bit has already been set since the
- Accessed bit and Dirty bit can not be lost.
-@@ -99,12 +109,14 @@ Accessed bit and Dirty bit can not be lost.
- But it is not true after fast page fault since the spte can be marked
- writable between reading spte and updating spte. Like below case:
- 
--At the beginning:
--spte.W = 0
--spte.Accessed = 1
-+At the beginning::
- 
--   VCPU 0                                       VCPU0
--In mmu_spte_clear_track_bits():
-+	spte.W = 0
-+	spte.Accessed = 1
+  - If both P bit and R/W bit of error code are set, this could possibly
+    be handled as a "fast page fault" (fixed without taking the MMU lock).  See
+    the description in Documentation/virt/kvm/locking.txt.
 +
-+	   VCPU 0                                       VCPU0
+  - if needed, walk the guest page tables to determine the guest translation
+    (gva->gpa or ngpa->gpa)
 +
-+In mmu_spte_clear_track_bits()::
- 
-    old_spte = *spte;
- 
-@@ -134,7 +146,8 @@ In order to avoid this kind of issue, we always treat the spte as "volatile"
- if it can be updated out of mmu-lock, see spte_has_volatile_bits(), it means,
- the spte is always atomically updated in this case.
- 
--3): flush tlbs due to spte updated
-+3) flush tlbs due to spte updated
+    - if permissions are insufficient, reflect the fault back to the guest
 +
- If the spte is updated from writable to readonly, we should flush all TLBs,
- otherwise rmap_write_protect will find a read-only spte, even though the
- writable spte might be cached on a CPU's TLB.
-@@ -166,47 +179,47 @@ which time it will be set using the Dirty tracking mechanism described above.
- 3. Reference
- ------------
+  - determine the host page
++
+    - if this is an mmio request, there is no host page; cache the info to
+      vcpu->arch.mmio_gva, vcpu->arch.mmio_access and vcpu->arch.mmio_gfn
++
+  - walk the shadow page table to find the spte for the translation,
+    instantiating missing intermediate page tables as necessary
++
+    - If this is an mmio request, cache the mmio info to the spte and set some
+      reserved bit on the spte (see callers of kvm_mmu_set_mmio_spte_mask)
++
+  - try to unsynchronize the page
++
+    - if successful, we can let the guest continue and modify the gpte
++
+  - emulate the instruction
++
+    - if failed, unshadow the page and let the guest continue
++
+  - update any translations that were modified by the instruction
  
--Name:		kvm_lock
--Type:		mutex
--Arch:		any
--Protects:	- vm_list
-+:Name:		kvm_lock
-+:Type:		mutex
-+:Arch:		any
-+:Protects:	- vm_list
+ invlpg handling:
+@@ -324,10 +356,12 @@ invlpg handling:
+ Guest control register updates:
  
--Name:		kvm_count_lock
--Type:		raw_spinlock_t
--Arch:		any
--Protects:	- hardware virtualization enable/disable
--Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
-+:Name:		kvm_count_lock
-+:Type:		raw_spinlock_t
-+:Arch:		any
-+:Protects:	- hardware virtualization enable/disable
-+:Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
- 		migration.
+ - mov to cr3
++
+   - look up new shadow roots
+   - synchronize newly reachable shadow pages
  
--Name:		kvm_arch::tsc_write_lock
--Type:		raw_spinlock
--Arch:		x86
--Protects:	- kvm_arch::{last_tsc_write,last_tsc_nsec,last_tsc_offset}
-+:Name:		kvm_arch::tsc_write_lock
-+:Type:		raw_spinlock
-+:Arch:		x86
-+:Protects:	- kvm_arch::{last_tsc_write,last_tsc_nsec,last_tsc_offset}
- 		- tsc offset in vmcb
--Comment:	'raw' because updating the tsc offsets must not be preempted.
-+:Comment:	'raw' because updating the tsc offsets must not be preempted.
+ - mov to cr0/cr4/efer
++
+   - set up mmu context for new paging mode
+   - look up new shadow roots
+   - synchronize newly reachable shadow pages
+@@ -358,6 +392,7 @@ on fault type:
+ (user write faults generate a #PF)
  
--Name:		kvm->mmu_lock
--Type:		spinlock_t
--Arch:		any
--Protects:	-shadow page/shadow tlb entry
--Comment:	it is a spinlock since it is used in mmu notifier.
-+:Name:		kvm->mmu_lock
-+:Type:		spinlock_t
-+:Arch:		any
-+:Protects:	-shadow page/shadow tlb entry
-+:Comment:	it is a spinlock since it is used in mmu notifier.
+ In the first case there are two additional complications:
++
+ - if CR4.SMEP is enabled: since we've turned the page into a kernel page,
+   the kernel may now execute it.  We handle this by also setting spte.nx.
+   If we get a user fetch or read fault, we'll change spte.u=1 and
+@@ -446,4 +481,3 @@ Further reading
  
--Name:		kvm->srcu
--Type:		srcu lock
--Arch:		any
--Protects:	- kvm->memslots
-+:Name:		kvm->srcu
-+:Type:		srcu lock
-+:Arch:		any
-+:Protects:	- kvm->memslots
- 		- kvm->buses
--Comment:	The srcu read lock must be held while accessing memslots (e.g.
-+:Comment:	The srcu read lock must be held while accessing memslots (e.g.
- 		when using gfn_to_* functions) and while accessing in-kernel
- 		MMIO/PIO address->device structure mapping (kvm->buses).
- 		The srcu index can be stored in kvm_vcpu->srcu_idx per vcpu
- 		if it is needed by multiple functions.
- 
--Name:		blocked_vcpu_on_cpu_lock
--Type:		spinlock_t
--Arch:		x86
--Protects:	blocked_vcpu_on_cpu
--Comment:	This is a per-CPU lock and it is used for VT-d posted-interrupts.
-+:Name:		blocked_vcpu_on_cpu_lock
-+:Type:		spinlock_t
-+:Arch:		x86
-+:Protects:	blocked_vcpu_on_cpu
-+:Comment:	This is a per-CPU lock and it is used for VT-d posted-interrupts.
- 		When VT-d posted-interrupts is supported and the VM has assigned
- 		devices, we put the blocked vCPU on the list blocked_vcpu_on_cpu
- 		protected by blocked_vcpu_on_cpu_lock, when VT-d hardware issues
+ - NPT presentation from KVM Forum 2008
+   http://www.linux-kvm.org/images/c/c8/KvmForum2008%24kdf2008_21.pdf
+-
 -- 
 2.24.1
 
