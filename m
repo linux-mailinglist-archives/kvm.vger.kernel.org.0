@@ -2,147 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90509154718
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:10:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B381154733
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:10:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727551AbgBFPKA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 10:10:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58103 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727389AbgBFPJ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 10:09:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581001798;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EZiBMYoM5ngA1SWJXac8F1p5eppKDaYXsn4jaAv3LSk=;
-        b=Qe0tIXaafjYFLbssbpemZ+JsrLKFYREbrKAZsuZt68ov3+wc2M3UIQJkYiMg7hz/aQOidj
-        abERDG9k5TwYmZfW8v4k8eAu0C4p+qA3iTYVl2KkLJygljrVbEQrtMzPmRTqhWIZH+fi3C
-        ZRS8UAwg8wJ1+N+2K/dkZJAwtBFY/AE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-aow8YKnAMHWPBXp4n8nNSw-1; Thu, 06 Feb 2020 10:09:55 -0500
-X-MC-Unique: aow8YKnAMHWPBXp4n8nNSw-1
-Received: by mail-wr1-f69.google.com with SMTP id d15so3562622wru.1
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 07:09:55 -0800 (PST)
+        id S1727762AbgBFPKk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 10:10:40 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45323 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727481AbgBFPKi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 10:10:38 -0500
+Received: by mail-wr1-f66.google.com with SMTP id a6so7592925wrx.12;
+        Thu, 06 Feb 2020 07:10:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=y0Ojwov/p4Jd1JXFXjHbwQfCbylx1jkuhxgufPLa1OA=;
+        b=pDMRkwPJqrBih1TASmqx/inhRtwNlegH4FgcuQa+x+0CuZ1W4in1lZNkwWLXutEDYZ
+         12nmARn2+gmNSdGIYBSmmQsMzLOAe9RrR0CUvsiT9GjIrSAmwCHjAWtjWtxxYwIIFcLI
+         8D0lrNW0ARRm/4Y9m4gA2FOU5ULq0CPMfBtQiRIdgjKwmvGaPIWP/ut6kBSxt5RPrlA6
+         Zkcixz2Afs8bnRPmo7sQrszeJPHFJA7lHDpp9YH9TAgizTAipHcgahKaS8mOTifKnbYM
+         gc+xXupHP0pkrL8u98nyQoQc7JmnVs2PkGRc70RMfiwNaR0i1JHXpwVAoNlJfKdsIQsz
+         HUNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=EZiBMYoM5ngA1SWJXac8F1p5eppKDaYXsn4jaAv3LSk=;
-        b=nIKBnl/c48OT04Xn/XJD7H5IYE++oI0czhizP6dUmv4afH4l6jQL6RlSzUKDNHNvrp
-         NBvKbFIAl8oky8UAaxoVyON/L1sAKNfixy6Uyl/YtdFhqWjVhcFEPM2ZtFtHha2w0AlR
-         DxLigMn9QZfT4fBQFjwKtRgB6TAg7HYb4ebdBPegBBkITPdDsAlsGrVnhHTRNHMcmsgT
-         0INED8Eeoplx+3ds6Zx5yiRwQq8U8UNkRVGzlA0RxBT9TY2Ih7BBnf/yz5Z85ZEr+LSo
-         TkgR3cpQA5Vfqop0rMPrTBwCrGvHVGcNsCMdDYhXpu4s9s9WLYKjcZJoDNkGRqGpw3al
-         JWQQ==
-X-Gm-Message-State: APjAAAWgVeEwThaNDuPI8BtpS/4tcnVyAjDTLSTZjO3Zd/PlM5NzXa1w
-        qKjjibqB0pbgjjmywg+odZcMF+f6jcjXoPEXZYRUhYi9bpbSjPkIBLsATRcs2iwRyLMcmKV3EoH
-        PEisxw6hW+mKz
-X-Received: by 2002:a1c:151:: with SMTP id 78mr4844273wmb.182.1581001794835;
-        Thu, 06 Feb 2020 07:09:54 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy7PZM8qvaN6WfZLfowxyRpKK0ElKwo8vzNSQ8xUj7u0xgC7aIvhuRCNLsPUGIuGsyl4qCxbg==
-X-Received: by 2002:a1c:151:: with SMTP id 78mr4844246wmb.182.1581001794592;
-        Thu, 06 Feb 2020 07:09:54 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id q130sm4453532wme.19.2020.02.06.07.09.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2020 07:09:54 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 04/61] KVM: x86: Clean up error handling in kvm_dev_ioctl_get_cpuid()
-In-Reply-To: <20200201185218.24473-5-sean.j.christopherson@intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-5-sean.j.christopherson@intel.com>
-Date:   Thu, 06 Feb 2020 16:09:53 +0100
-Message-ID: <87mu9vg3b2.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=y0Ojwov/p4Jd1JXFXjHbwQfCbylx1jkuhxgufPLa1OA=;
+        b=E+49KTC9RKh9L2FBcp2YK1dUMp1AaCXZc8lj95NeLkjk3Cn2VK3A/DDGozUCk3yost
+         yUj5cL7iuHlDDZHRaQJ7DUfRM1MejcyDu8kjn37I+O8dcz2KjZF1kMrR+6Kd7rgBz+2q
+         530/E3vU5QQnj51Xth/REkS8Zj9lq+ZVzp58gA6Trrj1eLOSBcs2Op5y0KcwmcywfbNe
+         KqlJTxm0lV3VNRYHgCkDPxveM+4yeYHuoHWUf496SyxCzE6fsHJKEnm93HhGWtIl9cMl
+         QBFGtQifpu0NzkVSriRE9Gt9OHyb7TPifeQbbMVTBBRXWg03cVv2fr36GWbcE6c4EKFz
+         kKjQ==
+X-Gm-Message-State: APjAAAWWrTFz02E5kMH9UK8u1oy7dygbXCGOLEb38WBK6+oHceS/BVP+
+        Js8QFTXErhJtleHK5gWp2MAZ4pIL
+X-Google-Smtp-Source: APXvYqx2ijJjkVCaZvijNI6ErmO4C3TqUYvFIXxr/sRwhZDfu7TKh1eWF55YylJGpsaCn1bwx5lUMA==
+X-Received: by 2002:adf:ca07:: with SMTP id o7mr4135355wrh.49.1581001834954;
+        Thu, 06 Feb 2020 07:10:34 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id r5sm4471032wrt.43.2020.02.06.07.10.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Feb 2020 07:10:34 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM changes for 5.6 merge window
+Date:   Thu,  6 Feb 2020 16:10:31 +0100
+Message-Id: <1581001831-17609-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+Linus,
 
-> Clean up the error handling in kvm_dev_ioctl_get_cpuid(), which has
-> gotten a bit crusty as the function has evolved over the years.
->
-> Opportunistically hoist the static @funcs declaration to the top of the
-> function to make it more obvious that it's a "static const".
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/cpuid.c | 19 +++++++------------
->  1 file changed, 7 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index de52cbb46171..11d5f311ef10 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -889,45 +889,40 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->  			    struct kvm_cpuid_entry2 __user *entries,
->  			    unsigned int type)
->  {
-> -	struct kvm_cpuid_entry2 *cpuid_entries;
-> -	int nent = 0, r = -E2BIG, i;
-> -
->  	static const u32 funcs[] = {
->  		0, 0x80000000, CENTAUR_CPUID_SIGNATURE, KVM_CPUID_SIGNATURE,
->  	};
->  
-> +	struct kvm_cpuid_entry2 *cpuid_entries;
-> +	int nent = 0, r, i;
-> +
->  	if (cpuid->nent < 1)
-> -		goto out;
-> +		return -E2BIG;
->  	if (cpuid->nent > KVM_MAX_CPUID_ENTRIES)
->  		cpuid->nent = KVM_MAX_CPUID_ENTRIES;
->  
->  	if (sanity_check_entries(entries, cpuid->nent, type))
->  		return -EINVAL;
->  
-> -	r = -ENOMEM;
->  	cpuid_entries = vzalloc(array_size(sizeof(struct kvm_cpuid_entry2),
->  					   cpuid->nent));
->  	if (!cpuid_entries)
-> -		goto out;
-> +		return -ENOMEM;
->  
-> -	r = 0;
->  	for (i = 0; i < ARRAY_SIZE(funcs); i++) {
->  		r = get_cpuid_func(cpuid_entries, funcs[i], &nent, cpuid->nent,
->  				   type);
->  		if (r)
->  			goto out_free;
->  	}
-> +	cpuid->nent = nent;
->  
-> -	r = -EFAULT;
->  	if (copy_to_user(entries, cpuid_entries,
->  			 nent * sizeof(struct kvm_cpuid_entry2)))
-> -		goto out_free;
-> -	cpuid->nent = nent;
-> -	r = 0;
-> +		r = -EFAULT;
->  
->  out_free:
->  	vfree(cpuid_entries);
-> -out:
->  	return r;
->  }
+The following changes since commit e813e65038389b66d2f8dd87588694caf8dc2923:
 
-Please [partially] disregard my comment on PATCH 02
+  Merge tag 'kvm-5.6-1' of git://git.kernel.org/pub/scm/virt/kvm/kvm (2020-01-31 09:30:41 -0800)
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+are available in the git repository at:
 
--- 
-Vitaly
 
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/kvm-5.6-2
+
+for you to fetch changes up to a8be1ad01b795bd2a13297ddbaecdb956ab0efd0:
+
+  KVM: vmx: delete meaningless vmx_decache_cr0_guest_bits() declaration (2020-02-05 16:44:06 +0100)
+
+----------------------------------------------------------------
+s390:
+* fix register corruption
+* ENOTSUPP/EOPNOTSUPP mixed
+* reset cleanups/fixes
+* selftests
+
+x86:
+* Bug fixes and cleanups
+* AMD support for APIC virtualization even in combination with
+  in-kernel PIT or IOAPIC.
+
+MIPS:
+* Compilation fix.
+
+Generic:
+* Fix refcount overflow for zero page.
+
+----------------------------------------------------------------
+Ben Gardon (2):
+      kvm: mmu: Replace unsigned with unsigned int for PTE access
+      kvm: mmu: Separate generating and setting mmio ptes
+
+Christian Borntraeger (2):
+      KVM: s390: ENOTSUPP -> EOPNOTSUPP fixups
+      KVM: s390: do not clobber registers during guest reset/store status
+
+Eric Hankland (1):
+      KVM: x86: Fix perfctr WRMSR for running counters
+
+Janosch Frank (4):
+      KVM: s390: Cleanup initial cpu reset
+      KVM: s390: Add new reset vcpu API
+      selftests: KVM: Add fpu and one reg set/get library functions
+      selftests: KVM: s390x: Add reset tests
+
+Miaohe Lin (2):
+      KVM: nVMX: delete meaningless nested_vmx_run() declaration
+      KVM: vmx: delete meaningless vmx_decache_cr0_guest_bits() declaration
+
+Paolo Bonzini (7):
+      KVM: x86: remove get_enable_apicv from kvm_x86_ops
+      KVM: SVM: allow AVIC without split irqchip
+      KVM: x86: reorganize pvclock_gtod_data members
+      KVM: x86: use raw clock values consistently
+      KVM: SVM: relax conditions for allowing MSR_IA32_SPEC_CTRL accesses
+      Merge tag 'kvm-s390-next-5.6-1' of git://git.kernel.org/.../kvms390/linux into HEAD
+      x86: vmxfeatures: rename features for consistency with KVM and manual
+
+Pierre Morel (1):
+      selftests: KVM: testing the local IRQs resets
+
+Sean Christopherson (5):
+      KVM: x86: Take a u64 when checking for a valid dr7 value
+      KVM: MIPS: Fix a build error due to referencing not-yet-defined function
+      KVM: MIPS: Fold comparecount_func() into comparecount_wakeup()
+      KVM: nVMX: Remove stale comment from nested_vmx_load_cr3()
+      KVM: x86: Mark CR4.UMIP as reserved based on associated CPUID bit
+
+Suravee Suthikulpanit (15):
+      kvm: lapic: Introduce APICv update helper function
+      kvm: x86: Introduce APICv inhibit reason bits
+      kvm: x86: Add support for dynamic APICv activation
+      kvm: x86: Add APICv (de)activate request trace points
+      kvm: x86: svm: Add support to (de)activate posted interrupts
+      KVM: svm: avic: Add support for dynamic setup/teardown of virtual APIC backing page
+      kvm: x86: Introduce APICv x86 ops for checking APIC inhibit reasons
+      kvm: x86: Introduce x86 ops hook for pre-update APICv
+      svm: Add support for dynamic APICv
+      kvm: x86: hyperv: Use APICv update request interface
+      svm: Deactivate AVIC when launching guest with nested SVM support
+      svm: Temporarily deactivate AVIC during ExtINT handling
+      kvm: i8254: Deactivate APICv when using in-kernel PIT re-injection mode.
+      kvm: ioapic: Refactor kvm_ioapic_update_eoi()
+      kvm: ioapic: Lazy update IOAPIC EOI
+
+Thadeu Lima de Souza Cascardo (1):
+      x86/kvm: do not setup pv tlb flush when not paravirtualized
+
+Vitaly Kuznetsov (2):
+      x86/kvm/hyper-v: move VMX controls sanitization out of nested_enable_evmcs()
+      x86/kvm/hyper-v: don't allow to turn on unsupported VMX controls for nested guests
+
+Zhuang Yanying (1):
+      KVM: fix overflow of zero page refcount with ksm running
+
+ Documentation/virt/kvm/api.txt                 |  43 ++++++
+ arch/mips/kvm/mips.c                           |  37 ++---
+ arch/s390/include/asm/kvm_host.h               |   5 +
+ arch/s390/kvm/interrupt.c                      |   6 +-
+ arch/s390/kvm/kvm-s390.c                       |  92 +++++++-----
+ arch/x86/include/asm/kvm_host.h                |  18 ++-
+ arch/x86/include/asm/vmx.h                     |   6 +-
+ arch/x86/include/asm/vmxfeatures.h             |   6 +-
+ arch/x86/kernel/kvm.c                          |   3 +
+ arch/x86/kvm/hyperv.c                          |   5 +-
+ arch/x86/kvm/i8254.c                           |  12 ++
+ arch/x86/kvm/ioapic.c                          | 149 ++++++++++++-------
+ arch/x86/kvm/lapic.c                           |  22 ++-
+ arch/x86/kvm/lapic.h                           |   1 +
+ arch/x86/kvm/mmu/mmu.c                         |  37 +++--
+ arch/x86/kvm/svm.c                             | 166 ++++++++++++++++++---
+ arch/x86/kvm/trace.h                           |  19 +++
+ arch/x86/kvm/vmx/evmcs.c                       |  85 ++++++++++-
+ arch/x86/kvm/vmx/evmcs.h                       |   3 +
+ arch/x86/kvm/vmx/nested.c                      |  13 +-
+ arch/x86/kvm/vmx/pmu_intel.c                   |   9 +-
+ arch/x86/kvm/vmx/vmx.c                         |  34 +++--
+ arch/x86/kvm/x86.c                             | 139 +++++++++++------
+ arch/x86/kvm/x86.h                             |   2 +-
+ include/uapi/linux/kvm.h                       |   5 +
+ tools/testing/selftests/kvm/Makefile           |   1 +
+ tools/testing/selftests/kvm/include/kvm_util.h |   6 +
+ tools/testing/selftests/kvm/lib/kvm_util.c     |  36 +++++
+ tools/testing/selftests/kvm/s390x/resets.c     | 197 +++++++++++++++++++++++++
+ virt/kvm/kvm_main.c                            |   1 +
+ 30 files changed, 925 insertions(+), 233 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/s390x/resets.c
