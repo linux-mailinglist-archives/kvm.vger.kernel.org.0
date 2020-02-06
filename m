@@ -2,142 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 054CF154ECA
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 23:14:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 548B4154ED0
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 23:17:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727579AbgBFWOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 17:14:36 -0500
-Received: from mga18.intel.com ([134.134.136.126]:33157 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727441AbgBFWOg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 17:14:36 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Feb 2020 14:14:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,411,1574150400"; 
-   d="scan'208";a="226291753"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga008.fm.intel.com with ESMTP; 06 Feb 2020 14:14:35 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/mmu: Avoid retpoline on ->page_fault() with TDP
-Date:   Thu,  6 Feb 2020 14:14:34 -0800
-Message-Id: <20200206221434.23790-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
+        id S1727481AbgBFWR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 17:17:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57101 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727441AbgBFWR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 17:17:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581027447;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dliw2RAM/nP3vDLbquqsu5FLbVnJwrHBsnpHt8MF4Y8=;
+        b=Bs9Lz2p+ZXJ0cJFtnPu/BAAhMbvh+j1yvWg144fj50x5xlkBdyoBEr2x8q1HVxOJK2QHhl
+        29l4blarwSvcj4vjMulxcihFrrX0oAMlPtF40SASaP5nrL9Ejfry5jZl0q0rQqEJfXqhla
+        jc8TW2xr73wHMEjOjScOc/uan276LJQ=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-114-mySpXerBPLWtT1FNInas6A-1; Thu, 06 Feb 2020 17:17:25 -0500
+X-MC-Unique: mySpXerBPLWtT1FNInas6A-1
+Received: by mail-qt1-f198.google.com with SMTP id p12so254964qtu.6
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 14:17:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dliw2RAM/nP3vDLbquqsu5FLbVnJwrHBsnpHt8MF4Y8=;
+        b=nwvDsejZ2IIjYBeIxPawcIdF8WMyq/yzo9IQZpyXc9A9HX7VVz0k1KsVoeZhQOhGnD
+         zvlrU+tFjrSE6jEUfkrw3DraRwHVfdxjc8Rzu4oJkfZAiYkdFjvIaXzxgEtB4wtBtFac
+         /Q4dF6jLKwsnCJM25CnV7urq1Bsqtcdtb7fQCrDoiwPrJp/8t2BUn5y+TkLjYf0JieKq
+         rvaYhzkmGxl5PLuXBEAkooaUWt/mN59nT1p/tb8VG12eL9WO3fHLCFqEBHk/2Gy6xq7V
+         KdwxAADtdIfhGfbB1XUwNE38ZXgPrV0c9AYNZ17bQE82DznxOCal9eB5LSO9BGvxzgkL
+         zmZA==
+X-Gm-Message-State: APjAAAW2d1jZp8k7z/JNq2yFcK1YrEAJoi+Z6pGKjt5eNzhufmUv6IjK
+        qtzmcm/yS8gECTmCsdF6R/YSemcYZ6ZZvp9hqZxb8e5pT6SnVV8XvD+UfntCMUxvdYIUDjsVCxA
+        oJUPwYVLB+8yr
+X-Received: by 2002:ad4:4c42:: with SMTP id cs2mr4304142qvb.198.1581027445012;
+        Thu, 06 Feb 2020 14:17:25 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx4aT6nHPT/UCOxB/dIpvh77YFb+ccbCujxO7QlHqlvH0kWVJQHP+Kls/zNpxqC5KRYicsxvQ==
+X-Received: by 2002:ad4:4c42:: with SMTP id cs2mr4304120qvb.198.1581027444763;
+        Thu, 06 Feb 2020 14:17:24 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+        by smtp.gmail.com with ESMTPSA id s22sm362089qke.19.2020.02.06.14.17.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2020 14:17:23 -0800 (PST)
+Date:   Thu, 6 Feb 2020 17:17:19 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     eperezma@redhat.com,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
+ crashes in KVM guests after reboot
+Message-ID: <20200206171349-mutt-send-email-mst@kernel.org>
+References: <20200106054041-mutt-send-email-mst@kernel.org>
+ <08ae8d28-3d8c-04e8-bdeb-0117d06c6dc7@de.ibm.com>
+ <20200107042401-mutt-send-email-mst@kernel.org>
+ <c6795e53-d12c-0709-c2e9-e35d9af1f693@de.ibm.com>
+ <20200107065434-mutt-send-email-mst@kernel.org>
+ <fe6e7e90-3004-eb7a-9ed8-b53a7667959f@de.ibm.com>
+ <20200120012724-mutt-send-email-mst@kernel.org>
+ <2a63b15f-8cf5-5868-550c-42e2cfd92c60@de.ibm.com>
+ <b6e32f58e5d85ac5cc3141e9155fb140ae5cd580.camel@redhat.com>
+ <1ade56b5-083f-bb6f-d3e0-3ddcf78f4d26@de.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ade56b5-083f-bb6f-d3e0-3ddcf78f4d26@de.ibm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wrap calls to ->page_fault() with a small shim to directly invoke the
-TDP fault handler when the kernel is using retpolines and TDP is being
-used.  Denote the TDP fault handler by nullifying mmu->page_fault, and
-annotate the TDP path as likely to coerce the compiler into preferring
-the TDP path.
+On Thu, Feb 06, 2020 at 04:12:21PM +0100, Christian Borntraeger wrote:
+> 
+> 
+> On 06.02.20 15:22, eperezma@redhat.com wrote:
+> > Hi Christian.
+> > 
+> > Could you try this patch on top of ("38ced0208491 vhost: use batched version by default")?
+> > 
+> > It will not solve your first random crash but it should help with the lost of network connectivity.
+> > 
+> > Please let me know how does it goes.
+> 
+> 
+> 38ced0208491 + this seem to be ok.
+> 
+> Not sure if you can make out anything of this (and the previous git bisect log)
 
-Rename tdp_page_fault() to kvm_tdp_page_fault() as it's exposed outside
-of mmu.c to allow inlining the shim.
+Yes it does - that this is just bad split-up of patches, and there's
+still a real bug that caused worse crashes :)
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
+So I just pushed batch-v4.
+I expect that will fail, and bisect to give us
+    vhost: batching fetches
+Can you try that please?
 
-Haven't done any performance testing, this popped into my head when mucking
-with the 5-level page table crud as an easy way to shave cycles in the
-happy path.
-
- arch/x86/kvm/mmu.h     | 13 +++++++++++++
- arch/x86/kvm/mmu/mmu.c | 16 ++++++++++------
- arch/x86/kvm/x86.c     |  2 +-
- 3 files changed, 24 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index d55674f44a18..9277ee8a54a5 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -102,6 +102,19 @@ static inline void kvm_mmu_load_cr3(struct kvm_vcpu *vcpu)
- 					      kvm_get_active_pcid(vcpu));
- }
- 
-+int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-+		       bool prefault);
-+
-+static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-+					u32 err, bool prefault)
-+{
-+#ifdef CONFIG_RETPOLINE
-+	if (likely(!vcpu->arch.mmu->page_fault))
-+		return kvm_tdp_page_fault(vcpu, cr2_or_gpa, err, prefault);
-+#endif
-+	return vcpu->arch.mmu->page_fault(vcpu, cr2_or_gpa, err, prefault);
-+}
-+
- /*
-  * Currently, we have two sorts of write-protection, a) the first one
-  * write-protects guest page to sync the guest modification, b) another one is
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7011a4e54866..5267f1440677 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4219,8 +4219,8 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- }
- EXPORT_SYMBOL_GPL(kvm_handle_page_fault);
- 
--static int tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
--			  bool prefault)
-+int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-+		       bool prefault)
- {
- 	int max_level;
- 
-@@ -4925,7 +4925,12 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	context->mmu_role.as_u64 = new_role.as_u64;
--	context->page_fault = tdp_page_fault;
-+#ifdef CONFIG_RETPOLINE
-+	/* Nullify ->page_fault() to use direct kvm_tdp_page_fault() call. */
-+	context->page_fault = NULL;
-+#else
-+	context->page_fault = kvm_tdp_page_fault;
-+#endif
- 	context->sync_page = nonpaging_sync_page;
- 	context->invlpg = nonpaging_invlpg;
- 	context->update_pte = nonpaging_update_pte;
-@@ -5436,9 +5441,8 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
- 	}
- 
- 	if (r == RET_PF_INVALID) {
--		r = vcpu->arch.mmu->page_fault(vcpu, cr2_or_gpa,
--					       lower_32_bits(error_code),
--					       false);
-+		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa,
-+					  lower_32_bits(error_code), false);
- 		WARN_ON(r == RET_PF_INVALID);
- 	}
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fbabb2f06273..39251ecafd2b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10182,7 +10182,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 	      work->arch.cr3 != vcpu->arch.mmu->get_cr3(vcpu))
- 		return;
- 
--	vcpu->arch.mmu->page_fault(vcpu, work->cr2_or_gpa, 0, true);
-+	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
- }
- 
- static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
--- 
-2.24.1
 
