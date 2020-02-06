@@ -2,272 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E40B2153D0D
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 03:59:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B076153D26
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 04:05:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727737AbgBFC7G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Feb 2020 21:59:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55776 "EHLO
+        id S1727795AbgBFDFB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Feb 2020 22:05:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58731 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727415AbgBFC7G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Feb 2020 21:59:06 -0500
+        with ESMTP id S1727681AbgBFDFB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Feb 2020 22:05:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1580957945;
+        s=mimecast20190719; t=1580958299;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=elrfXvAvFe9N2hMUG5HMqPNblHdCzzwkwPDHkqMX4vs=;
-        b=SejnIZmJRQIUooA6tcqrjzC+NT7GnoZcRmpSjXRcMckGdQiLYTEdPxeMjyOgamAJmRKvvR
-        +3sGWzczYNShOHWTq9XbO3P6StRph32IGb/KFz48Rl6sriS2jxejCgT8cebAKv9V9UiEw4
-        JrHBoM+aFOSxVfxTTKCbJceaXafcDvs=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-629LHaVzO9uO6v5_P-bqEQ-1; Wed, 05 Feb 2020 21:59:03 -0500
-X-MC-Unique: 629LHaVzO9uO6v5_P-bqEQ-1
-Received: by mail-qv1-f71.google.com with SMTP id g15so2810107qvq.20
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2020 18:59:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=elrfXvAvFe9N2hMUG5HMqPNblHdCzzwkwPDHkqMX4vs=;
-        b=shERd8cIkIOux5m4tPT6nej7v5H9ZCI1Bhk1rtPDOwxaoW0r90pwqAV43LO1oO/IKj
-         C3H7xSzW7F9GaaQnw8sVrF4Hpr3e98uClOSJoqgO5/dC7pElQnbSoM6F/EJAHesoPsU0
-         f0N6W1k8qCDuFsA36QV04+4HNw1Px670qrnZyF8Bz6EoBF0Q2qSnPWZo/kh5bAJgV7NI
-         Voe9rZ7jA41qkp0MSEShaLrUK5g4dci/w1eRx1Zyp/7ZAzVyw4vCOybfQi5JbxgS8klS
-         fZGLkcsc2oP601Dbm3xbVi/phGhPJYoL5mKLo+hR9UdZfTxvaGM5YTgshIVv1q4t4y2z
-         6lvA==
-X-Gm-Message-State: APjAAAU/pzwOf//ka+sl6bnh9wCxe4p00hYoNiPaBK0ruIGcWNrocyf6
-        jmchA+JmmSk/W1JA5DDJfTciWzn3YosgFzHOUHT1GoPqE/ohgbqfbiDH3vYrUxFROIl/JhSqIEQ
-        Ple/px/Gcv7hv
-X-Received: by 2002:ad4:4434:: with SMTP id e20mr629679qvt.157.1580957942589;
-        Wed, 05 Feb 2020 18:59:02 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwRefmCuC5EkrvnBISCbt0OMK+7Pg2aDUhgdS94eihOXUTCefpmLLHm+a79iObj3JseFjw0PA==
-X-Received: by 2002:ad4:4434:: with SMTP id e20mr629652qvt.157.1580957942224;
-        Wed, 05 Feb 2020 18:59:02 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id y26sm915791qtv.28.2020.02.05.18.58.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2020 18:59:01 -0800 (PST)
-Date:   Wed, 5 Feb 2020 21:58:58 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v5 01/19] KVM: x86: Allocate new rmap and large page
- tracking when moving memslot
-Message-ID: <20200206025858.GK387680@xz-x1>
-References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
- <20200121223157.15263-2-sean.j.christopherson@intel.com>
- <20200205214952.GD387680@xz-x1>
- <20200205235533.GA7631@linux.intel.com>
- <20200206020031.GJ387680@xz-x1>
- <20200206021714.GB7631@linux.intel.com>
+        bh=dZmilr4tlxmSPvlBFFTM+7GZjr7g54JZ6ybjetf90JQ=;
+        b=bBclXKWHqE0FmkFxHVOKEBkvMde4umICaVTEnS4TtKSyTx4Q5Me/DgH8V4l33o8+IWgqyy
+        /DmV8YAn/VPxiK+dvQ9QpFtzeETE8Monq6YzFOZaLX3/j5UXSSWQ8JZLEis/U7Yg3VE4Jo
+        fiWKJz95vox2rkS2JqqiPDGbNmaZYw4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-X0XgH6JIPi2zxsSJw37NDg-1; Wed, 05 Feb 2020 22:04:58 -0500
+X-MC-Unique: X0XgH6JIPi2zxsSJw37NDg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 784FA2F60;
+        Thu,  6 Feb 2020 03:04:55 +0000 (UTC)
+Received: from [10.72.13.85] (ovpn-13-85.pek2.redhat.com [10.72.13.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D3A4D5C1B2;
+        Thu,  6 Feb 2020 03:04:42 +0000 (UTC)
+Subject: Re: [PATCH] vhost: introduce vDPA based backend
+To:     Shahaf Shuler <shahafs@mellanox.com>,
+        Tiwei Bie <tiwei.bie@intel.com>
+Cc:     "mst@redhat.com" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "dan.daly@intel.com" <dan.daly@intel.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>
+References: <20200131033651.103534-1-tiwei.bie@intel.com>
+ <7aab2892-bb19-a06a-a6d3-9c28bc4c3400@redhat.com>
+ <20200205020247.GA368700@___>
+ <AM0PR0502MB37952015716C1D5E07E390B6C3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+ <112858a4-1a01-f4d7-e41a-1afaaa1cad45@redhat.com>
+ <AM0PR0502MB3795AD42233D69F350402A8AC3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <8af7b9b1-f721-8d1c-dd1c-403424ee20b9@redhat.com>
+Date:   Thu, 6 Feb 2020 11:04:41 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200206021714.GB7631@linux.intel.com>
+In-Reply-To: <AM0PR0502MB3795AD42233D69F350402A8AC3020@AM0PR0502MB3795.eurprd05.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 05, 2020 at 06:17:15PM -0800, Sean Christopherson wrote:
-> On Wed, Feb 05, 2020 at 09:00:31PM -0500, Peter Xu wrote:
-> > On Wed, Feb 05, 2020 at 03:55:33PM -0800, Sean Christopherson wrote:
-> > > On Wed, Feb 05, 2020 at 04:49:52PM -0500, Peter Xu wrote:
-> > > > On Tue, Jan 21, 2020 at 02:31:39PM -0800, Sean Christopherson wrote:
-> > > > > Reallocate a rmap array and recalcuate large page compatibility when
-> > > > > moving an existing memslot to correctly handle the alignment properties
-> > > > > of the new memslot.  The number of rmap entries required at each level
-> > > > > is dependent on the alignment of the memslot's base gfn with respect to
-> > > > > that level, e.g. moving a large-page aligned memslot so that it becomes
-> > > > > unaligned will increase the number of rmap entries needed at the now
-> > > > > unaligned level.
-> > > > > 
-> > > > > Not updating the rmap array is the most obvious bug, as KVM accesses
-> > > > > garbage data beyond the end of the rmap.  KVM interprets the bad data as
-> > > > > pointers, leading to non-canonical #GPs, unexpected #PFs, etc...
-> > > > > 
-> > > > >   general protection fault: 0000 [#1] SMP
-> > > > >   CPU: 0 PID: 1909 Comm: move_memory_reg Not tainted 5.4.0-rc7+ #139
-> > > > >   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
-> > > > >   RIP: 0010:rmap_get_first+0x37/0x50 [kvm]
-> > > > >   Code: <48> 8b 3b 48 85 ff 74 ec e8 6c f4 ff ff 85 c0 74 e3 48 89 d8 5b c3
-> > > > >   RSP: 0018:ffffc9000021bbc8 EFLAGS: 00010246
-> > > > >   RAX: ffff00617461642e RBX: ffff00617461642e RCX: 0000000000000012
-> > > > >   RDX: ffff88827400f568 RSI: ffffc9000021bbe0 RDI: ffff88827400f570
-> > > > >   RBP: 0010000000000000 R08: ffffc9000021bd00 R09: ffffc9000021bda8
-> > > > >   R10: ffffc9000021bc48 R11: 0000000000000000 R12: 0030000000000000
-> > > > >   R13: 0000000000000000 R14: ffff88827427d700 R15: ffffc9000021bce8
-> > > > >   FS:  00007f7eda014700(0000) GS:ffff888277a00000(0000) knlGS:0000000000000000
-> > > > >   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > >   CR2: 00007f7ed9216ff8 CR3: 0000000274391003 CR4: 0000000000162eb0
-> > > > >   Call Trace:
-> > > > >    kvm_mmu_slot_set_dirty+0xa1/0x150 [kvm]
-> > > > >    __kvm_set_memory_region.part.64+0x559/0x960 [kvm]
-> > > > >    kvm_set_memory_region+0x45/0x60 [kvm]
-> > > > >    kvm_vm_ioctl+0x30f/0x920 [kvm]
-> > > > >    do_vfs_ioctl+0xa1/0x620
-> > > > >    ksys_ioctl+0x66/0x70
-> > > > >    __x64_sys_ioctl+0x16/0x20
-> > > > >    do_syscall_64+0x4c/0x170
-> > > > >    entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > > > >   RIP: 0033:0x7f7ed9911f47
-> > > > >   Code: <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 21 6f 2c 00 f7 d8 64 89 01 48
-> > > > >   RSP: 002b:00007ffc00937498 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> > > > >   RAX: ffffffffffffffda RBX: 0000000001ab0010 RCX: 00007f7ed9911f47
-> > > > >   RDX: 0000000001ab1350 RSI: 000000004020ae46 RDI: 0000000000000004
-> > > > >   RBP: 000000000000000a R08: 0000000000000000 R09: 00007f7ed9214700
-> > > > >   R10: 00007f7ed92149d0 R11: 0000000000000246 R12: 00000000bffff000
-> > > > >   R13: 0000000000000003 R14: 00007f7ed9215000 R15: 0000000000000000
-> > > > >   Modules linked in: kvm_intel kvm irqbypass
-> > > > >   ---[ end trace 0c5f570b3358ca89 ]---
-> > > > > 
-> > > > > The disallow_lpage tracking is more subtle.  Failure to update results
-> > > > > in KVM creating large pages when it shouldn't, either due to stale data
-> > > > > or again due to indexing beyond the end of the metadata arrays, which
-> > > > > can lead to memory corruption and/or leaking data to guest/userspace.
-> > > > > 
-> > > > > Note, the arrays for the old memslot are freed by the unconditional call
-> > > > > to kvm_free_memslot() in __kvm_set_memory_region().
-> > > > 
-> > > > If __kvm_set_memory_region() failed, I think the old memslot will be
-> > > > kept and the new memslot will be freed instead?
-> > > 
-> > > This is referring to a successful MOVE operation to note that zeroing @arch
-> > > in kvm_arch_create_memslot() won't leak memory.
-> > > 
-> > > > > 
-> > > > > Fixes: 05da45583de9b ("KVM: MMU: large page support")
-> > > > > Cc: stable@vger.kernel.org
-> > > > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > > > ---
-> > > > >  arch/x86/kvm/x86.c | 11 +++++++++++
-> > > > >  1 file changed, 11 insertions(+)
-> > > > > 
-> > > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > > index 4c30ebe74e5d..1953c71c52f2 100644
-> > > > > --- a/arch/x86/kvm/x86.c
-> > > > > +++ b/arch/x86/kvm/x86.c
-> > > > > @@ -9793,6 +9793,13 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
-> > > > >  {
-> > > > >  	int i;
-> > > > >  
-> > > > > +	/*
-> > > > > +	 * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
-> > > > > +	 * old arrays will be freed by __kvm_set_memory_region() if installing
-> > > > > +	 * the new memslot is successful.
-> > > > > +	 */
-> > > > > +	memset(&slot->arch, 0, sizeof(slot->arch));
-> > > > 
-> > > > I actually gave r-b on this patch but it was lost... And then when I
-> > > > read it again I start to confuse on why we need to set these to zeros.
-> > > > Even if they're not zeros, iiuc kvm_free_memslot() will compare each
-> > > > of the array pointer and it will only free the changed pointers, then
-> > > > it looks fine even without zeroing?
-> > > 
-> > > It's for the failure path, the out_free label, which blindy calls kvfree()
-> > > and relies on un-allocated pointers being NULL.  If @arch isn't zeroed, the
-> > > failure path will free metadata from the previous memslot.
-> > 
-> > IMHO it won't, because kvm_free_memslot() will only free metadata if
-> > the pointer changed.  So:
-> > 
-> >   - For succeeded kvcalloc(), the pointer will change in the new slot,
-> >     so kvm_free_memslot() will free it,
-> > 
-> >   - For failed kvcalloc(), the pointer will be NULL, so
-> >     kvm_free_memslot() will skip it,
-> 
-> No.  The out_free path iterates over all possible entries and would free
-> pointers from the old memslot.  It's still be wrong even if the very last
-> kcalloc() failed as that allocation is captured in a local variable and
-> only propagated to lpage_info on success.
-> 
-> out_free:
-> 	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> 		kvfree(slot->arch.rmap[i]);
-> 		slot->arch.rmap[i] = NULL;
-> 		if (i == 0)
-> 			continue;
-> 
-> 		kvfree(slot->arch.lpage_info[i - 1]);
-> 		slot->arch.lpage_info[i - 1] = NULL;
-> 	}
-> 	return -ENOMEM;
 
-Ah right.  These discussion does also prove that simplify the slot
-free path is good, because it's easy to get confused. :)
+On 2020/2/5 =E4=B8=8B=E5=8D=885:30, Shahaf Shuler wrote:
+> Wednesday, February 5, 2020 9:50 AM, Jason Wang:
+>> Subject: Re: [PATCH] vhost: introduce vDPA based backend
+>> On 2020/2/5 =E4=B8=8B=E5=8D=883:15, Shahaf Shuler wrote:
+>>> Wednesday, February 5, 2020 4:03 AM, Tiwei Bie:
+>>>> Subject: Re: [PATCH] vhost: introduce vDPA based backend
+>>>>
+>>>> On Tue, Feb 04, 2020 at 11:30:11AM +0800, Jason Wang wrote:
+>>>>> On 2020/1/31 =E4=B8=8A=E5=8D=8811:36, Tiwei Bie wrote:
+>>>>>> This patch introduces a vDPA based vhost backend. This backend is
+>>>>>> built on top of the same interface defined in virtio-vDPA and
+>>>>>> provides a generic vhost interface for userspace to accelerate the
+>>>>>> virtio devices in guest.
+>>>>>>
+>>>>>> This backend is implemented as a vDPA device driver on top of the
+>>>>>> same ops used in virtio-vDPA. It will create char device entry
+>>>>>> named vhost-vdpa/$vdpa_device_index for userspace to use.
+>> Userspace
+>>>>>> can use vhost ioctls on top of this char device to setup the backe=
+nd.
+>>>>>>
+>>>>>> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+>>> [...]
+>>>
+>>>>>> +static long vhost_vdpa_do_dma_mapping(struct vhost_vdpa *v) {
+>>>>>> +	/* TODO: fix this */
+>>>>> Before trying to do this it looks to me we need the following durin=
+g
+>>>>> the probe
+>>>>>
+>>>>> 1) if set_map() is not supported by the vDPA device probe the IOMMU
+>>>>> that is supported by the vDPA device
+>>>>> 2) allocate IOMMU domain
+>>>>>
+>>>>> And then:
+>>>>>
+>>>>> 3) pin pages through GUP and do proper accounting
+>>>>> 4) store GPA->HPA mapping in the umem
+>>>>> 5) generate diffs of memory table and using IOMMU API to setup the
+>>>>> dma mapping in this method
+>>>>>
+>>>>> For 1), I'm not sure parent is sufficient for to doing this or need
+>>>>> to introduce new API like iommu_device in mdev.
+>>>> Agree. We may also need to introduce something like the iommu_device=
+.
+>>>>
+>>> Would it be better for the map/umnap logic to happen inside each devi=
+ce ?
+>>> Devices that needs the IOMMU will call iommu APIs from inside the dri=
+ver
+>> callback.
+>>
+>>
+>> Technically, this can work. But if it can be done by vhost-vpda it wil=
+l make the
+>> vDPA driver more compact and easier to be implemented.
+> Need to see the layering of such proposal but am not sure.
+> Vhost-vdpa is generic framework, while the DMA mapping is vendor specif=
+ic.
+> Maybe vhost-vdpa can have some shared code needed to operate on iommu, =
+so drivers can re-use it.  to me it seems simpler than exposing a new iom=
+mu device.
 
-> 
-> >   - For untouched pointer, it'll be the same as the old, so
-> >     kvm_free_memslot() will skip it as well.
-> > 
-> > > 
-> > > > > +
-> > > > >  	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> > > > >  		struct kvm_lpage_info *linfo;
-> > > > >  		unsigned long ugfn;
-> > > > > @@ -9867,6 +9874,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> > > > >  				const struct kvm_userspace_memory_region *mem,
-> > > > >  				enum kvm_mr_change change)
-> > > > >  {
-> > > > > +	if (change == KVM_MR_MOVE)
-> > > > > +		return kvm_arch_create_memslot(kvm, memslot,
-> > > > > +					       mem->memory_size >> PAGE_SHIFT);
-> > > > > +
-> > > > 
-> > > > Instead of calling kvm_arch_create_memslot() explicitly again here,
-> > > > can it be replaced by below?
-> > > > 
-> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > > index 72b45f491692..85a7b02fd752 100644
-> > > > --- a/virt/kvm/kvm_main.c
-> > > > +++ b/virt/kvm/kvm_main.c
-> > > > @@ -1144,7 +1144,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> > > >                 new.dirty_bitmap = NULL;
-> > > >  
-> > > >         r = -ENOMEM;
-> > > > -       if (change == KVM_MR_CREATE) {
-> > > > +       if (change == KVM_MR_CREATE || change == KVM_MR_MOVE) {
-> > > >                 new.userspace_addr = mem->userspace_addr;
-> > > >  
-> > > >                 if (kvm_arch_create_memslot(kvm, &new, npages))
-> > > 
-> > > No, because other architectures don't need to re-allocate new metadata on
-> > > MOVE and rely on __kvm_set_memory_region() to copy @arch from old to new,
-> > > e.g. see kvmppc_core_create_memslot_hv().
-> > 
-> > Yes it's only required in x86, but iiuc it also will still work for
-> > ppc?  Say, in that case ppc won't copy @arch from old to new, and
-> > kvmppc_core_free_memslot_hv() will free the old, however it should
-> > still work.
-> 
-> No, calling kvm_arch_create_memslot() for MOVE will result in PPC leaking
-> memory due to overwriting slot->arch.rmap with a new allocation.
 
-Why?  For the MOVE case, kvm_arch_create_memslot() will create a new
-rmap for the "new" memslot.  If the whole procedure succeeded,
-kvm_free_memslot() will free the old rmap.  If it failed,
-kvm_free_memslot() will free the new rmap if !NULL.  Looks fine?
+I think you mean on-chip IOMMU here. For shared code, I guess this only=20
+thing that could be shared is the mapping (rbtree) and some helpers. Or=20
+is there any other in your mind?
 
--- 
-Peter Xu
+
+>>
+>>> Devices that has other ways to do the DMA mapping will call the
+>> proprietary APIs.
+>>
+>>
+>> To confirm, do you prefer:
+>>
+>> 1) map/unmap
+> It is not only that. AFAIR there also flush and invalidate calls, right=
+?
+
+
+unmap will accept a range so it it can do flush and invalidate.
+
+
+>
+>> or
+>>
+>> 2) pass all maps at one time?
+> To me this seems more straight forward.
+> It is correct that under hotplug and large number of memory segments th=
+e driver will need to understand the diff (or not and just reload the new=
+ configuration). However, my assumption here is that memory hotplug is he=
+avy flow anyway, and the driver extra cycles will not be that visible
+
+
+Yes, and vhost can provide helpers to generate the diffs.
+
+Thanks
+
+
+>
+>> Thanks
+>>
+>>
 
