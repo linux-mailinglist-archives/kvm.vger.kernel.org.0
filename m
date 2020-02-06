@@ -2,55 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 803871542F6
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 12:24:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B7721542A1
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 12:07:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727060AbgBFLYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 06:24:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27484 "EHLO
+        id S1727482AbgBFLHZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 06:07:25 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45636 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726687AbgBFLYA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 06:24:00 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 016AxBZD039802
-        for <kvm@vger.kernel.org>; Thu, 6 Feb 2020 06:00:02 -0500
+        by vger.kernel.org with ESMTP id S1727478AbgBFLHY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 06:07:24 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 016B702k101908
+        for <kvm@vger.kernel.org>; Thu, 6 Feb 2020 06:07:23 -0500
 Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhn3wth9-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2xyhm8f1hc-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 06:00:02 -0500
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 06:07:22 -0500
 Received: from localhost
         by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 6 Feb 2020 11:00:00 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        Thu, 6 Feb 2020 11:07:21 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
         by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 6 Feb 2020 10:59:58 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 016Axvns62914608
+        Thu, 6 Feb 2020 11:07:17 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 016B7Gr656099062
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 6 Feb 2020 10:59:57 GMT
+        Thu, 6 Feb 2020 11:07:16 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EB2CD4204C;
-        Thu,  6 Feb 2020 10:59:56 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0404A4203F;
+        Thu,  6 Feb 2020 11:07:16 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A4F6342047;
-        Thu,  6 Feb 2020 10:59:56 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id ADB4142049;
+        Thu,  6 Feb 2020 11:07:15 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  6 Feb 2020 10:59:56 +0000 (GMT)
-Subject: Re: [RFCv2 30/37] KVM: s390: protvirt: Add diag 308 subcode 8 - 10
- handling
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-31-borntraeger@de.ibm.com>
- <6a751e3d-6e2b-4a80-ddda-d2126b5e0ade@redhat.com>
+        Thu,  6 Feb 2020 11:07:15 +0000 (GMT)
+Subject: Re: [RFCv2.1] KVM: S390: protvirt: Introduce instruction data area
+ bounce buffer
+To:     Thomas Huth <thuth@redhat.com>, david@redhat.com
+Cc:     Ulrich.Weigand@de.ibm.com, aarcange@redhat.com, cohuck@redhat.com,
+        frankja@linux.ibm.com, frankja@linux.vnet.ibm.com,
+        imbrenda@linux.ibm.com, kvm@vger.kernel.org
+References: <4508d11e-455e-1496-f4a3-5a9c994a9126@redhat.com>
+ <20200206093907.5784-1-borntraeger@de.ibm.com>
+ <6a6bda5f-a432-e0b1-6f74-3f916d7ec9a0@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -95,25 +92,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Thu, 6 Feb 2020 11:59:56 +0100
+Date:   Thu, 6 Feb 2020 12:07:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <6a751e3d-6e2b-4a80-ddda-d2126b5e0ade@redhat.com>
+In-Reply-To: <6a6bda5f-a432-e0b1-6f74-3f916d7ec9a0@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020611-0008-0000-0000-0000035043F5
+x-cbid: 20020611-0008-0000-0000-0000035044AA
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020610-0009-0000-0000-00004A70D77A
-Message-Id: <e52ca657-08f3-b164-a52b-86bc57b18ad1@de.ibm.com>
+x-cbparentid: 20020611-0009-0000-0000-00004A70D834
+Message-Id: <bb6effbe-e5d9-1136-67ac-0bcdebb92fe0@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-06_01:2020-02-06,2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 malwarescore=0 suspectscore=0 phishscore=0 clxscore=1015
- adultscore=0 mlxlogscore=655 bulkscore=0 spamscore=0 lowpriorityscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ definitions=2020-02-06_01:2020-02-06,2020-02-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 clxscore=1015 adultscore=0 phishscore=0
+ priorityscore=1501 bulkscore=0 malwarescore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002060083
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -122,53 +119,120 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 05.02.20 19:21, Thomas Huth wrote:
-> On 03/02/2020 14.19, Christian Borntraeger wrote:
+On 06.02.20 11:32, Thomas Huth wrote:
+> On 06/02/2020 10.39, Christian Borntraeger wrote:
 >> From: Janosch Frank <frankja@linux.ibm.com>
 >>
->> If the host initialized the Ultravisor, we can set stfle bit 161
->> (protected virtual IPL enhancements facility), which indicates, that
->> the IPL subcodes 8, 9 and are valid. These subcodes are used by a
->> normal guest to set/retrieve a IPIB of type 5 and transition into
->> protected mode.
->>
->> Once in protected mode, the Ultravisor will conceal the facility
->> bit. Therefore each boot into protected mode has to go through
->> non-protected. There is no secure re-ipl with subcode 10 without a
->> previous subcode 3.
->>
->> In protected mode, there is no subcode 4 available, as the VM has no
->> more access to its memory from non-protected mode. I.e. each IPL
->> clears.
+>> Now that we can't access guest memory anymore, we have a dedicated
+>> sattelite block that's a bounce buffer for instruction data.
+> 
+> s/sattelite/satellite/
+> 
+>> We re-use the memop interface to copy the instruction data to / from
+>> userspace. This lets us re-use a lot of QEMU code which used that
+>> interface to make logical guest memory accesses which are not possible
+>> anymore in protected mode anyway.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>  arch/s390/kvm/diag.c     | 6 ++++++
->>  arch/s390/kvm/kvm-s390.c | 5 +++++
->>  2 files changed, 11 insertions(+)
+>>  arch/s390/include/asm/kvm_host.h | 11 ++++++-
+>>  arch/s390/kvm/kvm-s390.c         | 49 ++++++++++++++++++++++++++++++++
+>>  arch/s390/kvm/pv.c               |  9 ++++++
+>>  include/uapi/linux/kvm.h         | 10 +++++--
+>>  4 files changed, 76 insertions(+), 3 deletions(-)
 >>
->> diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
->> index 3fb54ec2cf3e..b951dbdcb6a0 100644
->> --- a/arch/s390/kvm/diag.c
->> +++ b/arch/s390/kvm/diag.c
->> @@ -197,6 +197,12 @@ static int __diag_ipl_functions(struct kvm_vcpu *vcpu)
->>  	case 4:
->>  		vcpu->run->s390_reset_flags = 0;
->>  		break;
->> +	case 8:
->> +	case 9:
->> +	case 10:
->> +		if (!test_kvm_facility(vcpu->kvm, 161))
->> +			return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
->> +		/* fall through */
->>  	default:
->>  		return -EOPNOTSUPP;
+>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>> index 9d7b248dcadc..2fe8d3c81951 100644
+>> --- a/arch/s390/include/asm/kvm_host.h
+>> +++ b/arch/s390/include/asm/kvm_host.h
+>> @@ -127,6 +127,12 @@ struct mcck_volatile_info {
+>>  #define CR14_INITIAL_MASK (CR14_UNUSED_32 | CR14_UNUSED_33 | \
+>>  			   CR14_EXTERNAL_DAMAGE_SUBMASK)
+>>  
+>> +#define SIDAD_SIZE_MASK		0xff
+>> +#define sida_origin(sie_block) \
+>> +	(sie_block->sidad & PAGE_MASK)
+>> +#define sida_size(sie_block) \
+>> +	(((sie_block->sidad & SIDAD_SIZE_MASK) + 1) * PAGE_SIZE)
+>> +
+>>  #define CPUSTAT_STOPPED    0x80000000
+>>  #define CPUSTAT_WAIT       0x10000000
+>>  #define CPUSTAT_ECALL_PEND 0x08000000
+>> @@ -315,7 +321,10 @@ struct kvm_s390_sie_block {
+>>  #define CRYCB_FORMAT2 0x00000003
+>>  	__u32	crycbd;			/* 0x00fc */
+>>  	__u64	gcr[16];		/* 0x0100 */
+>> -	__u64	gbea;			/* 0x0180 */
+>> +	union {
+>> +		__u64	gbea;			/* 0x0180 */
 > 
-> If we don't handle these diags in the kernel anyway, why do you care
-> about injecting the program interrupt from kernel space? Couldn't that
-> be done by userspace instead? I.e. could the whole hunk be dropped?
+> Maybe adjust the spaces before the comment.
+> 
+>> +		__u64	sidad;
+[...]
 
-Agreed. While this is a fast path we can certainly let QEMU handle the
-error cases. Will remove and add a comment to the patch description that
-userspace will handle the error cases.
+
+ack
+
+>> +	switch (mop->op) {
+>> +	case KVM_S390_MEMOP_SIDA_READ:
+>> +		r = 0;
+> 
+> r is alread pre-initialized with 0 where it is declared, so you could
+> remove the above line.
+
+ack
+
+> 
+>> +		if (copy_to_user(uaddr, (void *)(sida_origin(vcpu->arch.sie_block) +
+>> +				 mop->sida_offset), mop->size))
+>> +			r = -EFAULT;
+>> +
+>> +		break;
+>> +	case KVM_S390_MEMOP_SIDA_WRITE:
+>> +		r = 0;
+> 
+> dito.
+> 
+
+ack
+[...]
+
+>>  };
+>>  
+>> -/* for KVM_S390_MEM_OP */
+>> +/* for KVM_S390_MEM_OP and KVM_S390_SIDA_OP */
+> 
+> Remove this change now, please.
+
+ack
+
+> 
+>>  struct kvm_s390_mem_op {
+>>  	/* in */
+>>  	__u64 gaddr;		/* the guest address */
+>> @@ -475,11 +475,17 @@ struct kvm_s390_mem_op {
+>>  	__u32 op;		/* type of operation */
+>>  	__u64 buf;		/* buffer in userspace */
+>>  	__u8 ar;		/* the access register number */
+>> -	__u8 reserved[31];	/* should be set to 0 */
+>> +	__u8 reserved21[3];	/* should be set to 0 */
+>> +	__u32 sida_offset;	/* offset into the sida */
+>> +	__u8 reserved28[24];	/* should be set to 0 */
+>>  };
+>> +
+>> +
+>>  /* types for kvm_s390_mem_op->op */
+>>  #define KVM_S390_MEMOP_LOGICAL_READ	0
+>>  #define KVM_S390_MEMOP_LOGICAL_WRITE	1
+>> +#define KVM_S390_MEMOP_SIDA_READ	2
+>> +#define KVM_S390_MEMOP_SIDA_WRITE	3
+>>  /* flags for kvm_s390_mem_op->flags */
+>>  #define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
+>>  #define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
+> 
+> With the nits fixed:
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+thanks
 
