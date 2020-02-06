@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DF1815490D
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 17:25:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B71B15490F
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 17:25:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727722AbgBFQYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 11:24:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51129 "EHLO
+        id S1727518AbgBFQY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 11:24:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48355 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727687AbgBFQYx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 11:24:53 -0500
+        with ESMTP id S1727723AbgBFQYz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 11:24:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581006292;
+        s=mimecast20190719; t=1581006294;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KSFaiR49IZ7H9CAqMnaJ05LSpmpZ/yYWMtM2kbxNYt0=;
-        b=E4qKwirQ9aibGBdmsvImVTOZx+Bz6p8FpgIGntihBuNa+dYviV6wA+ZoplLk0J3vdRg981
-        w5mQk6dYb8mCidJohkMbQI99qJYAQZ51/lo3YiAsnGN0RjD6edjOEIgmX/hU3gfcdIhLju
-        7su2bry1SX8+pfXPhQ371dmC4qDjyvk=
+        bh=GWdcw7fJkxpacmxVt5aymQ7Mku43vkMBFm2JtfEzl5U=;
+        b=b/tmpTvV3cqIypFw2WtpLXWS8tnJWYeIJkOPcq/CQw4IOrEi0bNX/E8MCDtXRvgG87/98Z
+        4V9Ot47dxiV8sCyv3rus82/XbQmQbmal3qqIkAA4ahF91ZAEciGEP1ZmP5tg/NUNcSuhIa
+        YWJPVhHRmvmsxQ32RllHqH1LC3mAenI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-3wtcqOXUNPy9Uj10S7vlqQ-1; Thu, 06 Feb 2020 11:24:50 -0500
-X-MC-Unique: 3wtcqOXUNPy9Uj10S7vlqQ-1
+ us-mta-330-X5f4v7rTP8GNalyd1Y-0_g-1; Thu, 06 Feb 2020 11:24:52 -0500
+X-MC-Unique: X5f4v7rTP8GNalyd1Y-0_g-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBBC618AB2C2;
-        Thu,  6 Feb 2020 16:24:49 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D9C318AB2C6;
+        Thu,  6 Feb 2020 16:24:51 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CDE1B1001B05;
-        Thu,  6 Feb 2020 16:24:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 20CF310016DA;
+        Thu,  6 Feb 2020 16:24:49 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PULL kvm-unit-tests 08/10] arm64: timer: Check the timer interrupt state
-Date:   Thu,  6 Feb 2020 17:24:32 +0100
-Message-Id: <20200206162434.14624-9-drjones@redhat.com>
+Subject: [PULL kvm-unit-tests 09/10] arm64: timer: Test behavior when timer disabled or masked
+Date:   Thu,  6 Feb 2020 17:24:33 +0100
+Message-Id: <20200206162434.14624-10-drjones@redhat.com>
 In-Reply-To: <20200206162434.14624-1-drjones@redhat.com>
 References: <20200206162434.14624-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -51,74 +51,60 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-We check that the interrupt is pending (or not) at the GIC level, but we
-don't check if the timer is asserting it (or not). Let's make sure we don=
-'t
-run into a strange situation where the two devices' states aren't
-synchronized.
+When the timer is disabled (the *_CTL_EL0.ENABLE bit is clear) or the
+timer interrupt is masked at the timer level (the *_CTL_EL0.IMASK bit is
+set), timer interrupts must not be pending or asserted by the VGIC.
+However, only when the timer interrupt is masked, we can still check
+that the timer condition is met by reading the *_CTL_EL0.ISTATUS bit.
 
-Coincidently, the "interrupt signal no longer pending" test fails for
-non-emulated timers (i.e, the virtual timer on a non-vhe host) if the
-host kernel doesn't have patch 16e604a437c89 ("KVM: arm/arm64: vgic:
-Reevaluate level sensitive interrupts on enable").
+This test was used to discover a bug and test the fix introduced by KVM
+commit 16e604a437c8 ("KVM: arm/arm64: vgic: Reevaluate level sensitive
+interrupts on enable").
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/timer.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ arm/timer.c       | 7 +++++++
+ arm/unittests.cfg | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/arm/timer.c b/arm/timer.c
-index ba7e8c6a90ed..35038f2bae57 100644
+index 35038f2bae57..dea364f5355d 100644
 --- a/arm/timer.c
 +++ b/arm/timer.c
-@@ -183,6 +183,13 @@ static void irq_handler(struct pt_regs *regs)
- 	info->irq_received =3D true;
- }
-=20
-+/* Check that the timer condition is met. */
-+static bool timer_pending(struct timer_info *info)
-+{
-+	return (info->read_ctl() & ARCH_TIMER_CTL_ENABLE) &&
-+		(info->read_ctl() & ARCH_TIMER_CTL_ISTATUS);
-+}
-+
- static enum gic_state gic_timer_state(struct timer_info *info)
- {
- 	enum gic_state state =3D GIC_STATE_INACTIVE;
-@@ -220,7 +227,7 @@ static bool test_cval_10msec(struct timer_info *info)
- 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
-=20
- 	/* Wait for the timer to fire */
--	while (!(info->read_ctl() & ARCH_TIMER_CTL_ISTATUS))
-+	while (!timer_pending(info))
- 		;
-=20
- 	/* It fired, check how long it took */
-@@ -253,17 +260,17 @@ static void test_timer(struct timer_info *info)
- 	/* Enable the timer, but schedule it for much later */
- 	info->write_cval(later);
- 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
--	report(gic_timer_state(info) =3D=3D GIC_STATE_INACTIVE,
-+	report(!timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_I=
-NACTIVE,
- 			"not pending before");
-=20
- 	info->write_cval(now - 1);
--	report(gic_timer_state(info) =3D=3D GIC_STATE_PENDING,
-+	report(timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_PE=
-NDING,
- 			"interrupt signal pending");
+@@ -269,10 +269,17 @@ static void test_timer(struct timer_info *info)
 =20
  	/* Disable the timer again and prepare to take interrupts */
  	info->write_ctl(0);
++	info->irq_received =3D false;
  	set_timer_irq_enabled(info, true);
--	report(gic_timer_state(info) =3D=3D GIC_STATE_INACTIVE,
-+	report(!timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_I=
++	report(!info->irq_received, "no interrupt when timer is disabled");
+ 	report(!timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_I=
 NACTIVE,
  			"interrupt signal no longer pending");
 =20
++	info->write_cval(now - 1);
++	info->write_ctl(ARCH_TIMER_CTL_ENABLE | ARCH_TIMER_CTL_IMASK);
++	report(timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_IN=
+ACTIVE,
++			"interrupt signal not pending");
++
  	report(test_cval_10msec(info), "latency within 10 ms");
+ 	report(info->irq_received, "interrupt received");
+=20
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 1f1bb24d9d13..017958d28ffd 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -132,7 +132,7 @@ groups =3D psci
+ [timer]
+ file =3D timer.flat
+ groups =3D timer
+-timeout =3D 8s
++timeout =3D 10s
+ arch =3D arm64
+=20
+ # Exit tests
 --=20
 2.21.1
 
