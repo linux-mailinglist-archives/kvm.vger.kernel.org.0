@@ -2,111 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AF4B1547FF
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:25:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1978154832
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:35:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727963AbgBFPY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 10:24:56 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50478 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727742AbgBFPYz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 10:24:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581002694;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VDikhD16Evvn1Sryhm3WQZr7k9nYSi7+3qLuDWiD+FI=;
-        b=MXK8N1DprrE3kZJjg9zYnPcprnIFyquLHGkk9w1oN9z76bUOxTGHArE2HSdjjn8YlixEow
-        K6VLbADpAP48xy8smru6Cg0EShPfeYlh2koAlCtbOoRr8Z3vWXPYGJw+u0Dvx+npeHcR3n
-        PKaeTGASHtq64JbzMVLnZivbQcrTDfo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-jkx7J_TkNWe5YxXddgeE2A-1; Thu, 06 Feb 2020 10:24:51 -0500
-X-MC-Unique: jkx7J_TkNWe5YxXddgeE2A-1
-Received: by mail-wr1-f71.google.com with SMTP id s13so3559053wru.7
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 07:24:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=VDikhD16Evvn1Sryhm3WQZr7k9nYSi7+3qLuDWiD+FI=;
-        b=At/M+HcUMT+83RVHZn6zNaEJOrPkTazXI7OdxZXclNA0W7G6sK68oKW01OJoKmUcA8
-         Dx6GhxDLSbUQGelrmB9uBzt/yZ0mTXsizPeA06d/ZUE0A8EDDYGTLGuOYVF0PeaNdpzW
-         JzkFipEAabFeqp/GE8K0yBa5eFJnKBjqjdr0rEmghgLSPr0VI56QWKJ7cqgaurOTnDRF
-         51ke13mkANgpu0ECsKyZLPv/n91lmuicFs1ypaBWytmpUUJEeS14zQGrvgogsF6d3oLH
-         UqtR+xQ857Jbz++zfsmx3YZgtLL6bxpy+Bv2Q4XDLO9p6f8JpsHrLp0u8kf5DAWrHFk8
-         cqYQ==
-X-Gm-Message-State: APjAAAXW455ed93uo2ENE+9cvzeFYwEWqCQR9lPITC2rMXdWpZRHnXb3
-        fWC1ubtweQ5F6s3Tx5oayk9ipFI4xoF2NfZ0mhyLqM/GAcFaBHzSOOb4adPR5OF4xfWJMtabXz/
-        O8JBLhhAAp8Bn
-X-Received: by 2002:a5d:5706:: with SMTP id a6mr4360392wrv.108.1581002690140;
-        Thu, 06 Feb 2020 07:24:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyDfgeM519VoXEHCNZuvgRVP3rjGryo/TbI5trM9zUhz8/cXUgb/b8aGM99u2lpQAJWzti+PA==
-X-Received: by 2002:a5d:5706:: with SMTP id a6mr4360377wrv.108.1581002689876;
-        Thu, 06 Feb 2020 07:24:49 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id w7sm3991741wmi.9.2020.02.06.07.24.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2020 07:24:49 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 05/61] KVM: x86: Check userapce CPUID array size after validating sub-leaf
-In-Reply-To: <20200201185218.24473-6-sean.j.christopherson@intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-6-sean.j.christopherson@intel.com>
-Date:   Thu, 06 Feb 2020 16:24:48 +0100
-Message-ID: <87k14zg2m7.fsf@vitty.brq.redhat.com>
+        id S1727626AbgBFPfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 10:35:47 -0500
+Received: from mga17.intel.com ([192.55.52.151]:18676 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725535AbgBFPfr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 10:35:47 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Feb 2020 07:35:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,410,1574150400"; 
+   d="scan'208";a="404517225"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 06 Feb 2020 07:35:46 -0800
+Date:   Thu, 6 Feb 2020 07:35:46 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     linmiaohe <linmiaohe@huawei.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com,
+        rkrcmar@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com
+Subject: Re: [PATCH] KVM: nVMX: Fix some comment typos and coding style
+Message-ID: <20200206153546.GB13067@linux.intel.com>
+References: <1580956162-5609-1-git-send-email-linmiaohe@huawei.com>
+ <87a75wgdd5.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a75wgdd5.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Thu, Feb 06, 2020 at 12:32:38PM +0100, Vitaly Kuznetsov wrote:
+> linmiaohe <linmiaohe@huawei.com> writes:
+> 
+> > From: Miaohe Lin <linmiaohe@huawei.com>
+> >
+> > Fix some typos in the comments. Also fix coding style.
+> >
+> > Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h | 2 +-
+> >  arch/x86/kvm/vmx/nested.c       | 5 +++--
+> >  2 files changed, 4 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 4dffbc10d3f8..8196a4a0df8b 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -782,7 +782,7 @@ struct kvm_vcpu_arch {
+> >  
+> >  	/*
+> >  	 * Indicate whether the access faults on its page table in guest
+> 
+> Indicates?
+> 
+> > -	 * which is set when fix page fault and used to detect unhandeable
+> > +	 * which is set when fix page fault and used to detect unhandleable
+> >  	 * instruction.
+> 
+> I have to admit that shadow MMU in KVM is not my strong side but this
+> comment reads weird, I'd appreciate if someone could suggest a better
+> alternative.
 
-> Verify that the next sub-leaf of CPUID 0x4 (or 0x8000001d) is valid
-> before rejecting the entire KVM_GET_SUPPORTED_CPUID due to insufficent
-> space in the userspace array.
->
-> Note, although this is technically a bug, it's not visible to userspace
-> as KVM_GET_SUPPORTED_CPUID is guaranteed to fail on KVM_CPUID_SIGNATURE,
-> which is hardcoded to be added after the affected leafs.  The real
-> motivation for the change is to tightly couple the nent/maxnent and
-> do_host_cpuid() sequences in preparation for future cleanup.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/cpuid.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 11d5f311ef10..e5cf1e0cf84a 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -552,12 +552,12 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
->  
->  		/* read more entries until cache_type is zero */
->  		for (i = 1; ; ++i) {
-> -			if (*nent >= maxnent)
-> -				goto out;
-> -
->  			cache_type = entry[i - 1].eax & 0x1f;
->  			if (!cache_type)
->  				break;
-> +
-> +			if (*nent >= maxnent)
-> +				goto out;
->  			do_host_cpuid(&entry[i], function, i);
->  			++*nent;
->  		}
+	/* One off flag for a stupid corner case in shadow paging. */
+> 
+> >  	 */
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
-
+	/*
+	 * Indicates the guest is trying to write a gfn that contains one or
+	 * more of the PTEs used to translate the write itself, i.e. the access
+	 * is changing its own translation in the guest page tables.  KVM exits
+	 * to userspace if emulation of the faulting instruction fails and this
+	 * flag is set, as KVM cannot make forward progress.
+	 *
+	 * If emulation fails for a write to guest page tables, KVM unprotects
+	 * (zaps) the shadow page for the target gfn and resumes the guest to
+	 * retry the non-emulatable instruction (on hardware).  Unprotecting the
+	 * gfn doesn't allow forward progress for a self-changing access because
+	 * doing so also zaps the translation for the gfn, i.e. retrying the
+	 * instruction will hit a !PRESENT fault, which results in a new shadow
+	 * page and sends KVM back to square one.
+	 */
+> >  	bool write_fault_to_shadow_pgtable;
