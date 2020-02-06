@@ -2,299 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C482154910
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 17:25:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF441154912
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 17:26:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727609AbgBFQZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 11:25:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55828 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727556AbgBFQY7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 11:24:59 -0500
+        id S1727751AbgBFQ0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 11:26:25 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55239 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727654AbgBFQ0Z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 11:26:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581006298;
+        s=mimecast20190719; t=1581006383;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Fa3hMmMOW5FU9aFmVZeiIF+c6T94QcQm1rzYH9qBabg=;
-        b=RSIprctD3+MYjEbotq1ZgjGeydY4nuSUXY8AS09cPVe8irKxp8pMw5p7cBxjq+K5R/1ZuE
-        NfLnyn5eVjwykz4K5tWRd4C+nzk7Bwv6L7HWK/NnJeGhKFF/R1WkEilD8bwJciKEs+U7y1
-        TaisHRfdWDQQVQKVm34MdC9Lezs/LyQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-8aWdNmKqM5279PQBF5KRRA-1; Thu, 06 Feb 2020 11:24:53 -0500
-X-MC-Unique: 8aWdNmKqM5279PQBF5KRRA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6837994CDD;
-        Thu,  6 Feb 2020 16:24:52 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 675C110027BE;
-        Thu,  6 Feb 2020 16:24:51 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PULL kvm-unit-tests 10/10] arm/arm64: Perform dcache clean + invalidate after turning MMU off
-Date:   Thu,  6 Feb 2020 17:24:34 +0100
-Message-Id: <20200206162434.14624-11-drjones@redhat.com>
-In-Reply-To: <20200206162434.14624-1-drjones@redhat.com>
-References: <20200206162434.14624-1-drjones@redhat.com>
+        bh=QT4Dyzc7mqGctXHju0bs7rAU06NGyt0QOqamAxfKKT8=;
+        b=ODPzivV0wloQyTvxE8Fx+9ZCydF7LGRvJINhskrXeICt018tsfKO/HWwUAHG9ame1xB24h
+        eH6RQVcqHZn6w5s92l7fBjMEqHtxXATrbH9FSRtS4MsCXTuvLQcYAU1NeNSFYtICh6hpB9
+        3pmoAc1P/nkNujkIq34WcZNJxqLUzzw=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-eM7jCIKiMj6oHHwI1tfu2A-1; Thu, 06 Feb 2020 11:26:21 -0500
+X-MC-Unique: eM7jCIKiMj6oHHwI1tfu2A-1
+Received: by mail-qv1-f70.google.com with SMTP id dw11so3981396qvb.16
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 08:26:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=QT4Dyzc7mqGctXHju0bs7rAU06NGyt0QOqamAxfKKT8=;
+        b=o9MpVD9lq7r4ca2VvRXLTjtWyFMbXdejIf/jCah/AcDHhJTSo9WkU4P21DC+l4ILWH
+         gBiGkcvlrRuUMiL2KQMhHQ7pmY8l77sbZeHXWkxWMUYyAcqlbeIuaoEc1Pqx93Shg3wv
+         mLZAUJ6LMVrDyDVgkDmpfWujAqk+79UHsDLprnEWmoIkCfGO5TilFeHyqIFKHFgJ1Tnl
+         v7kpw319nu4CgOHjePkPRYb8wbv3MnVyF59JD6csk6YTUtPS0AQUpd/F6ISVI6ty1FTB
+         +lRg9weyq4eiez4Kl/yRbzSD2UuLbR3tdV6NFxER37K5uKztnakAEHZJKEgRLqG/1FM5
+         vMIw==
+X-Gm-Message-State: APjAAAUpaHEYqOwddvHZIlsrx0aFfMaGDYiOyiZOmTdF29ph8maRLzkU
+        tzSwgxJeKMlQSNeZpx34G97yxULnB6+LY9nwh2pkBOSJa3oRWnvgm8mXMKQ0xrA0UXi9viR8FFi
+        IFaFA51ENMOyT
+X-Received: by 2002:a37:7b43:: with SMTP id w64mr3282145qkc.203.1581006381180;
+        Thu, 06 Feb 2020 08:26:21 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx+9hqm72d72EyKnRwyP/P3+idsr/CwBkH5EeXl92Z4n7jMR0A/IUI51rmKg9nIiuqPw/V2og==
+X-Received: by 2002:a37:7b43:: with SMTP id w64mr3282106qkc.203.1581006380845;
+        Thu, 06 Feb 2020 08:26:20 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+        by smtp.gmail.com with ESMTPSA id g77sm1629814qke.129.2020.02.06.08.26.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2020 08:26:20 -0800 (PST)
+Date:   Thu, 6 Feb 2020 11:26:17 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 09/19] KVM: Move setting of memslot into helper routine
+Message-ID: <20200206162617.GB695333@xz-x1>
+References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+ <20200121223157.15263-10-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200121223157.15263-10-sean.j.christopherson@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+On Tue, Jan 21, 2020 at 02:31:47PM -0800, Sean Christopherson wrote:
+> Split out the core functionality of setting a memslot into a separate
+> helper in preparation for moving memslot deletion into its own routine.
+> 
+> Tested-by: Christoffer Dall <christoffer.dall@arm.com>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  virt/kvm/kvm_main.c | 106 ++++++++++++++++++++++++++------------------
+>  1 file changed, 63 insertions(+), 43 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index fdf045a5d240..64f6c5d35260 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -982,6 +982,66 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
+>  	return old_memslots;
+>  }
+>  
+> +static int kvm_set_memslot(struct kvm *kvm,
+> +			   const struct kvm_userspace_memory_region *mem,
+> +			   const struct kvm_memory_slot *old,
+> +			   struct kvm_memory_slot *new, int as_id,
+> +			   enum kvm_mr_change change)
+> +{
+> +	struct kvm_memory_slot *slot;
+> +	struct kvm_memslots *slots;
+> +	int r;
+> +
+> +	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+> +	if (!slots)
+> +		return -ENOMEM;
+> +	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
+> +
+> +	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+> +		/*
+> +		 * Note, the INVALID flag needs to be in the appropriate entry
+> +		 * in the freshly allocated memslots, not in @old or @new.
+> +		 */
+> +		slot = id_to_memslot(slots, old->id);
+> +		slot->flags |= KVM_MEMSLOT_INVALID;
+> +
+> +		/*
+> +		 * We can re-use the old memslots, the only difference from the
+> +		 * newly installed memslots is the invalid flag, which will get
+> +		 * dropped by update_memslots anyway.  We'll also revert to the
+> +		 * old memslots if preparing the new memory region fails.
+> +		 */
+> +		slots = install_new_memslots(kvm, as_id, slots);
+> +
+> +		/* From this point no new shadow pages pointing to a deleted,
+> +		 * or moved, memslot will be created.
+> +		 *
+> +		 * validation of sp->gfn happens in:
+> +		 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
+> +		 *	- kvm_is_visible_gfn (mmu_check_root)
+> +		 */
+> +		kvm_arch_flush_shadow_memslot(kvm, slot);
+> +	}
+> +
+> +	r = kvm_arch_prepare_memory_region(kvm, new, mem, change);
+> +	if (r)
+> +		goto out_slots;
+> +
+> +	update_memslots(slots, new, change);
+> +	slots = install_new_memslots(kvm, as_id, slots);
+> +
+> +	kvm_arch_commit_memory_region(kvm, mem, old, new, change);
+> +
+> +	kvfree(slots);
+> +	return 0;
+> +
+> +out_slots:
+> +	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
+> +		slots = install_new_memslots(kvm, as_id, slots);
+> +	kvfree(slots);
+> +	return r;
+> +}
+> +
+>  /*
+>   * Allocate some memory and give it an address in the guest physical address
+>   * space.
+> @@ -998,7 +1058,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  	unsigned long npages;
+>  	struct kvm_memory_slot *slot;
+>  	struct kvm_memory_slot old, new;
+> -	struct kvm_memslots *slots;
+>  	int as_id, id;
+>  	enum kvm_mr_change change;
+>  
+> @@ -1085,58 +1144,19 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  			return r;
+>  	}
+>  
+> -	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+> -	if (!slots) {
+> -		r = -ENOMEM;
+> -		goto out_bitmap;
+> -	}
+> -	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
+> -
+> -	if ((change == KVM_MR_DELETE) || (change == KVM_MR_MOVE)) {
+> -		slot = id_to_memslot(slots, id);
+> -		slot->flags |= KVM_MEMSLOT_INVALID;
+> -
+> -		/*
+> -		 * We can re-use the old memslots, the only difference from the
+> -		 * newly installed memslots is the invalid flag, which will get
+> -		 * dropped by update_memslots anyway.  We'll also revert to the
+> -		 * old memslots if preparing the new memory region fails.
+> -		 */
+> -		slots = install_new_memslots(kvm, as_id, slots);
+> -
+> -		/* From this point no new shadow pages pointing to a deleted,
+> -		 * or moved, memslot will be created.
+> -		 *
+> -		 * validation of sp->gfn happens in:
+> -		 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
+> -		 *	- kvm_is_visible_gfn (mmu_check_root)
+> -		 */
+> -		kvm_arch_flush_shadow_memslot(kvm, slot);
+> -	}
+> -
+> -	r = kvm_arch_prepare_memory_region(kvm, &new, mem, change);
+> -	if (r)
+> -		goto out_slots;
+> -
+>  	/* actual memory is freed via old in kvm_free_memslot below */
+>  	if (change == KVM_MR_DELETE) {
+>  		new.dirty_bitmap = NULL;
+>  		memset(&new.arch, 0, sizeof(new.arch));
+>  	}
 
-When the MMU is off, data accesses are to Device nGnRnE memory on arm64 [=
-1]
-or to Strongly-Ordered memory on arm [2]. This means that the accesses ar=
-e
-non-cacheable.
+It's not extremely clear to me on why this single block is leftover
+here instead of putting into kvm_set_memslot().  I see that after all
+it'll be removed in patch 12, so it seems OK:
 
-Perform a dcache clean to PoC so we can read the newer values from the
-cache after we turn the MMU off, instead of the stale values from memory.
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Perform an invalidation so we can access the data written to memory after
-we turn the MMU back on. This prevents reading back the stale values we
-cleaned from the cache when we turned the MMU off.
+>  
+> -	update_memslots(slots, &new, change);
+> -	slots = install_new_memslots(kvm, as_id, slots);
+> -
+> -	kvm_arch_commit_memory_region(kvm, mem, &old, &new, change);
+> +	r = kvm_set_memslot(kvm, mem, &old, &new, as_id, change);
+> +	if (r)
+> +		goto out_bitmap;
+>  
+>  	kvm_free_memslot(kvm, &old, &new);
+> -	kvfree(slots);
+>  	return 0;
+>  
+> -out_slots:
+> -	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
+> -		slots = install_new_memslots(kvm, as_id, slots);
+> -	kvfree(slots);
+>  out_bitmap:
+>  	if (new.dirty_bitmap && !old.dirty_bitmap)
+>  		kvm_destroy_dirty_bitmap(&new);
+> -- 
+> 2.24.1
+> 
 
-Data caches are PIPT and the VAs are translated using the current
-translation tables, or an identity mapping (what Arm calls a "flat
-mapping") when the MMU is off [1, 2]. Do the clean + invalidate when the
-MMU is off so we don't depend on the current translation tables and we ca=
-n
-make sure that the operation applies to the entire physical memory.
-
-The patch was tested by hacking arm/selftest.c:
-
-+#include <alloc_page.h>
-+#include <asm/mmu.h>
- int main(int argc, char **argv)
- {
-+	int *x =3D alloc_page();
-+
- 	report_prefix_push("selftest");
-
-+	*x =3D 0x42;
-+	mmu_disable();
-+	report(*x =3D=3D 0x42, "read back value written with MMU on");
-+	*x =3D 0x50;
-+	mmu_enable(current_thread_info()->pgtable);
-+	report(*x =3D=3D 0x50, "read back value written with MMU off");
-+
- 	if (argc < 2)
- 		report_abort("no test specified");
-
-Without the fix, the first report fails, and the test usually hangs befor=
-e
-the second report. This is because mmu_enable pushes the LR register on t=
-he
-stack when the MMU is off, which means that the value will be written to
-memory.  However, after asm_mmu_enable, the MMU is enabled, and we read i=
-t
-back from the dcache, thus getting garbage.
-
-With the fix, the two reports pass.
-
-[1] ARM DDI 0487E.a, section D5.2.9
-[2] ARM DDI 0406C.d, section B3.2.1
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arm/cstart.S              | 22 ++++++++++++++++++++++
- arm/cstart64.S            | 23 +++++++++++++++++++++++
- lib/arm/asm/processor.h   | 13 +++++++++++++
- lib/arm/setup.c           |  8 ++++++++
- lib/arm64/asm/processor.h | 12 ++++++++++++
- 5 files changed, 78 insertions(+)
-
-diff --git a/arm/cstart.S b/arm/cstart.S
-index e54e380e0d53..ef936ae2f874 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -197,6 +197,20 @@ asm_mmu_enable:
-=20
- 	mov     pc, lr
-=20
-+.macro dcache_clean_inval domain, start, end, tmp1, tmp2
-+	ldr	\tmp1, =3Ddcache_line_size
-+	ldr	\tmp1, [\tmp1]
-+	sub	\tmp2, \tmp1, #1
-+	bic	\start, \start, \tmp2
-+9998:
-+	/* DCCIMVAC */
-+	mcr	p15, 0, \start, c7, c14, 1
-+	add	\start, \start, \tmp1
-+	cmp	\start, \end
-+	blo	9998b
-+	dsb	\domain
-+.endm
-+
- .globl asm_mmu_disable
- asm_mmu_disable:
- 	/* SCTLR */
-@@ -204,6 +218,14 @@ asm_mmu_disable:
- 	bic	r0, #CR_M
- 	mcr	p15, 0, r0, c1, c0, 0
- 	isb
-+
-+	ldr	r0, =3D__phys_offset
-+	ldr	r0, [r0]
-+	ldr	r1, =3D__phys_end
-+	ldr	r1, [r1]
-+	dcache_clean_inval sy, r0, r1, r2, r3
-+	isb
-+
- 	mov     pc, lr
-=20
- /*
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index e5a561ea2e39..ffdd49f73ddd 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -193,12 +193,35 @@ asm_mmu_enable:
-=20
- 	ret
-=20
-+/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
-+.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
-+	adrp	\tmp1, dcache_line_size
-+	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
-+	sub	\tmp2, \tmp1, #1
-+	bic	\start, \start, \tmp2
-+9998:
-+	dc	\op , \start
-+	add	\start, \start, \tmp1
-+	cmp	\start, \end
-+	b.lo	9998b
-+	dsb	\domain
-+.endm
-+
- .globl asm_mmu_disable
- asm_mmu_disable:
- 	mrs	x0, sctlr_el1
- 	bic	x0, x0, SCTLR_EL1_M
- 	msr	sctlr_el1, x0
- 	isb
-+
-+	/* Clean + invalidate the entire memory */
-+	adrp	x0, __phys_offset
-+	ldr	x0, [x0, :lo12:__phys_offset]
-+	adrp	x1, __phys_end
-+	ldr	x1, [x1, :lo12:__phys_end]
-+	dcache_by_line_op civac, sy, x0, x1, x2, x3
-+	isb
-+
- 	ret
-=20
- /*
-diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-index a8c4628da818..1e1132dafd2b 100644
---- a/lib/arm/asm/processor.h
-+++ b/lib/arm/asm/processor.h
-@@ -9,6 +9,11 @@
- #include <asm/sysreg.h>
- #include <asm/barrier.h>
-=20
-+#define CTR_DMINLINE_SHIFT	16
-+#define CTR_DMINLINE_MASK	(0xf << 16)
-+#define CTR_DMINLINE(x)	\
-+	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
-+
- enum vector {
- 	EXCPTN_RST,
- 	EXCPTN_UND,
-@@ -64,6 +69,7 @@ extern bool is_user(void);
-=20
- #define CNTVCT		__ACCESS_CP15_64(1, c14)
- #define CNTFRQ		__ACCESS_CP15(c14, 0, c0, 0)
-+#define CTR		__ACCESS_CP15(c0, 0, c0, 1)
-=20
- static inline u64 get_cntvct(void)
- {
-@@ -76,4 +82,11 @@ static inline u32 get_cntfrq(void)
- 	return read_sysreg(CNTFRQ);
- }
-=20
-+static inline u32 get_ctr(void)
-+{
-+	return read_sysreg(CTR);
-+}
-+
-+extern u32 dcache_line_size;
-+
- #endif /* _ASMARM_PROCESSOR_H_ */
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 385e135f4865..418b4e58a5f8 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -20,6 +20,7 @@
- #include <asm/thread_info.h>
- #include <asm/setup.h>
- #include <asm/page.h>
-+#include <asm/processor.h>
- #include <asm/smp.h>
-=20
- #include "io.h"
-@@ -38,6 +39,8 @@ static struct mem_region __initial_mem_regions[NR_INITI=
-AL_MEM_REGIONS + 1];
- struct mem_region *mem_regions =3D __initial_mem_regions;
- phys_addr_t __phys_offset, __phys_end;
-=20
-+u32 dcache_line_size;
-+
- int mpidr_to_cpu(uint64_t mpidr)
- {
- 	int i;
-@@ -66,6 +69,11 @@ static void cpu_init(void)
- 	ret =3D dt_for_each_cpu_node(cpu_set, NULL);
- 	assert(ret =3D=3D 0);
- 	set_cpu_online(0, true);
-+	/*
-+	 * DminLine is log2 of the number of words in the smallest cache line; =
-a
-+	 * word is 4 bytes.
-+	 */
-+	dcache_line_size =3D 1 << (CTR_DMINLINE(get_ctr()) + 2);
- }
-=20
- unsigned int mem_region_get_flags(phys_addr_t paddr)
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 1d9223f728a5..02665b84cc7e 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -16,6 +16,11 @@
- #define SCTLR_EL1_A	(1 << 1)
- #define SCTLR_EL1_M	(1 << 0)
-=20
-+#define CTR_DMINLINE_SHIFT	16
-+#define CTR_DMINLINE_MASK	(0xf << 16)
-+#define CTR_DMINLINE(x)	\
-+	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
-+
- #ifndef __ASSEMBLY__
- #include <asm/ptrace.h>
- #include <asm/esr.h>
-@@ -105,5 +110,12 @@ static inline u32 get_cntfrq(void)
- 	return read_sysreg(cntfrq_el0);
- }
-=20
-+static inline u64 get_ctr(void)
-+{
-+	return read_sysreg(ctr_el0);
-+}
-+
-+extern u32 dcache_line_size;
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM64_PROCESSOR_H_ */
---=20
-2.21.1
+-- 
+Peter Xu
 
