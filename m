@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FA82153F20
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 08:09:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A087153F29
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 08:09:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725895AbgBFHJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 02:09:35 -0500
+        id S1728016AbgBFHJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 02:09:39 -0500
 Received: from mga04.intel.com ([192.55.52.120]:56103 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727988AbgBFHJc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 02:09:32 -0500
+        id S1727904AbgBFHJe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 02:09:34 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2020 23:09:31 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2020 23:09:34 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,408,1574150400"; 
-   d="scan'208";a="231957234"
+   d="scan'208";a="231957251"
 Received: from lxy-dell.sh.intel.com ([10.239.13.109])
-  by orsmga003.jf.intel.com with ESMTP; 05 Feb 2020 23:09:29 -0800
+  by orsmga003.jf.intel.com with ESMTP; 05 Feb 2020 23:09:31 -0800
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -29,9 +29,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
 Cc:     peterz@infradead.org, fenghua.yu@intel.com, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v3 4/8] x86/split_lock: Add and export split_lock_detect_enabled() and split_lock_detect_fatal()
-Date:   Thu,  6 Feb 2020 15:04:08 +0800
-Message-Id: <20200206070412.17400-5-xiaoyao.li@intel.com>
+Subject: [PATCH v3 5/8] kvm: x86: Emulate split-lock access as a write
+Date:   Thu,  6 Feb 2020 15:04:09 +0800
+Message-Id: <20200206070412.17400-6-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200206070412.17400-1-xiaoyao.li@intel.com>
 References: <20200206070412.17400-1-xiaoyao.li@intel.com>
@@ -42,56 +42,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These two functions will be used by KVM to check whether host's
-sld_state.
+If split lock detect is enabled (warn/fatal), #AC handler calls die()
+when split lock happens in kernel.
 
+A sane guest should never tigger emulation on a split-lock access, but
+it cannot prevent malicous guest from doing this. So just emulating the
+access as a write if it's a split-lock access (the same as access spans
+page) to avoid malicous guest polluting the kernel log.
+
+More detail analysis can be found:
+https://lkml.kernel.org/r/20200131200134.GD18946@linux.intel.com
+
+Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- arch/x86/include/asm/cpu.h  |  4 ++++
- arch/x86/kernel/cpu/intel.c | 12 ++++++++++++
- 2 files changed, 16 insertions(+)
+v3:
+ - intergrate cache split case into page split case to reuse the logic;
+---
+ arch/x86/kvm/x86.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-index 2b20829db450..f5172dbd3f01 100644
---- a/arch/x86/include/asm/cpu.h
-+++ b/arch/x86/include/asm/cpu.h
-@@ -46,6 +46,8 @@ unsigned int x86_stepping(unsigned int sig);
- extern void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c);
- extern void switch_to_sld(unsigned long tifn);
- extern bool handle_user_split_lock(unsigned long ip);
-+extern bool split_lock_detect_enabled(void);
-+extern bool split_lock_detect_fatal(void);
- #else
- static inline void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c) {}
- static inline void switch_to_sld(unsigned long tifn) {}
-@@ -53,5 +55,7 @@ static inline bool handle_user_split_lock(unsigned long ip)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2d3be7f3ad67..fab4d25575bf 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5856,6 +5856,7 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
  {
- 	return false;
- }
-+static inline bool split_lock_detect_enabled(void) { return false; }
-+static inline bool split_lock_detect_fatal(void) { return false; }
- #endif
- #endif /* _ASM_X86_CPU_H */
-diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index ff27d026cb4a..b67b46ea66df 100644
---- a/arch/x86/kernel/cpu/intel.c
-+++ b/arch/x86/kernel/cpu/intel.c
-@@ -1131,3 +1131,15 @@ void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c)
- 	if (ia32_core_caps & MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT)
- 		split_lock_setup();
- }
+ 	struct kvm_host_map map;
+ 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
++	u64 page_line_mask = PAGE_MASK;
+ 	gpa_t gpa;
+ 	char *kaddr;
+ 	bool exchanged;
+@@ -5870,7 +5871,11 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 	    (gpa & PAGE_MASK) == APIC_DEFAULT_PHYS_BASE)
+ 		goto emul_write;
+ 
+-	if (((gpa + bytes - 1) & PAGE_MASK) != (gpa & PAGE_MASK))
++	if (split_lock_detect_enabled())
++		page_line_mask = ~(cache_line_size() - 1);
 +
-+bool split_lock_detect_enabled(void)
-+{
-+	return sld_state != sld_off;
-+}
-+EXPORT_SYMBOL_GPL(split_lock_detect_enabled);
-+
-+bool split_lock_detect_fatal(void)
-+{
-+	return sld_state == sld_fatal;
-+}
-+EXPORT_SYMBOL_GPL(split_lock_detect_fatal);
++	/* when write spans page or spans cache when SLD enabled */
++	if (((gpa + bytes - 1) & page_line_mask) != (gpa & page_line_mask))
+ 		goto emul_write;
+ 
+ 	if (kvm_vcpu_map(vcpu, gpa_to_gfn(gpa), &map))
 -- 
 2.23.0
 
