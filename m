@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B85F154094
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 09:43:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89F841540CC
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 10:01:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728047AbgBFInh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 03:43:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11606 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727881AbgBFInh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 03:43:37 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0168hVNJ048571
-        for <kvm@vger.kernel.org>; Thu, 6 Feb 2020 03:43:36 -0500
+        id S1728132AbgBFJBM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 04:01:12 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7944 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727822AbgBFJBL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 04:01:11 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01690Pgv052121
+        for <kvm@vger.kernel.org>; Thu, 6 Feb 2020 04:01:10 -0500
 Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhnsbj29-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyphxa3aw-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 03:43:34 -0500
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 04:01:10 -0500
 Received: from localhost
         by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 6 Feb 2020 08:43:25 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        Thu, 6 Feb 2020 09:01:08 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
         by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 6 Feb 2020 08:43:23 -0000
+        Thu, 6 Feb 2020 09:01:04 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0168hLLw57344236
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 016909Ye50266574
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 6 Feb 2020 08:43:21 GMT
+        Thu, 6 Feb 2020 09:00:10 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9C1A7A4066;
-        Thu,  6 Feb 2020 08:43:21 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id F1124A406D;
+        Thu,  6 Feb 2020 09:01:02 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A7C8A4062;
-        Thu,  6 Feb 2020 08:43:21 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id B39ABA4066;
+        Thu,  6 Feb 2020 09:01:02 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  6 Feb 2020 08:43:21 +0000 (GMT)
-Subject: Re: [RFCv2 21/37] KVM: S390: protvirt: Introduce instruction data
- area bounce buffer
-To:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thu,  6 Feb 2020 09:01:02 +0000 (GMT)
+Subject: Re: [RFCv2 18/37] KVM: s390: protvirt: Implement machine-check
+ interruption injection
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-22-borntraeger@de.ibm.com>
- <b947d722-845c-fa91-dfac-edc5d34a1a1c@redhat.com>
+ <20200203131957.383915-19-borntraeger@de.ibm.com>
+ <20200205144704.58b2c327.cohuck@redhat.com>
+ <55e7548b-520b-d271-6867-fb887697235e@de.ibm.com>
+ <20200206092546.14a812ce.cohuck@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -95,26 +97,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Thu, 6 Feb 2020 09:43:21 +0100
+Date:   Thu, 6 Feb 2020 10:01:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <b947d722-845c-fa91-dfac-edc5d34a1a1c@redhat.com>
+In-Reply-To: <20200206092546.14a812ce.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020608-4275-0000-0000-0000039E7451
+x-cbid: 20020609-4275-0000-0000-0000039E75A7
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020608-4276-0000-0000-000038B2A0EB
-Message-Id: <f92106be-b74e-9684-fed0-f1ca20990d99@de.ibm.com>
+x-cbparentid: 20020609-4276-0000-0000-000038B2A244
+Message-Id: <a008c638-780a-a383-0cd9-9954ef2468ab@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-05_06:2020-02-04,2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- mlxlogscore=895 bulkscore=0 priorityscore=1501 adultscore=0 suspectscore=0
- lowpriorityscore=0 clxscore=1015 impostorscore=0 spamscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002060068
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 mlxscore=0 clxscore=1015 suspectscore=0 phishscore=0
+ mlxlogscore=341 lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002060071
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -122,111 +124,42 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 05.02.20 12:43, David Hildenbrand wrote:
->>  #ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
->> +static long kvm_s390_guest_sida_op(struct kvm_vcpu *vcpu,
->> +				   struct kvm_s390_mem_op *mop)
->> +{
->> +	int r = 0;
->> +	void __user *uaddr = (void __user *)mop->buf;
+On 06.02.20 09:25, Cornelia Huck wrote:
+> On Wed, 5 Feb 2020 19:18:44 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
-> Reverse christmas tree :)
+>> On 05.02.20 14:47, Cornelia Huck wrote:
+>> [..]
+>>>> --- a/arch/s390/kvm/interrupt.c
+>>>> +++ b/arch/s390/kvm/interrupt.c
+>>>> @@ -571,6 +571,14 @@ static int __write_machine_check(struct kvm_vcpu *vcpu,
+>>>>  	union mci mci;
+>>>>  	int rc;
+>>>>  
+>>>> +	if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+>>>> +		vcpu->arch.sie_block->iictl = IICTL_CODE_MCHK;
+>>>> +		vcpu->arch.sie_block->mcic = mchk->mcic;
+>>>> +		vcpu->arch.sie_block->faddr = mchk->failing_storage_address;
+>>>> +		vcpu->arch.sie_block->edc = mchk->ext_damage_code;  
+>>>
+>>> Maybe add a comment that we don't need with other machine-check related data?  
+>>
+>> Not sure I get this point. Can you make a proposal?
+> 
+> /*
+>  * All other possible payload for a machine check will
+>  * not be handled by the hypervisor, as it does not have
+>  * the needed information for protected guests.
+>  */
+> 
+> Something like that?
 
-ack.
-> 
->> +
->> +	if (mop->flags || !mop->size)
->> +		return -EINVAL;
->> +
->> +	if (mop->size > sida_size(vcpu->arch.sie_block))
->> +		return -E2BIG;
-> 
-> Should be caught by the check below as well (or is this an implicit
-> overflow check? - see below).
-> 
->> +
->> +	if (mop->size + mop->offset > sida_size(vcpu->arch.sie_block))
->> +		return -E2BIG;
->> +
-> 
-> Do we have to care about overflows? (at least the offset is 32-bit,
-> didn't check the size :))
-
-size and offset are both unsigned. So offset 0xfffffff0 + size 0x100 would not
-be covered by both checks. 
-
-Hmm, should we add this as well?
-
-@@ -4538,6 +4538,9 @@ static long kvm_s390_guest_sida_op(struct kvm_vcpu *vcpu,
-        if (mop->size > sida_size(vcpu->arch.sie_block))
-                return -E2BIG;
- 
-+       if (mop->offset > sida_size(vcpu->arch.sie_block))
-+               return -E2BIG;
-+
-        if (mop->size + mop->offset > sida_size(vcpu->arch.sie_block))
-                return -E2BIG;
- 
-
-
-> 
-> 
->> +	switch (mop->op) {
->> +	case KVM_S390_MEMOP_SIDA_READ:
->> +		r = 0;
->> +		if (copy_to_user(uaddr, (void *)sida_origin(vcpu->arch.sie_block) +
->> +				 mop->offset, mop->size))
->> +			r = -EFAULT;
->> +
->> +		break;
->> +	case KVM_S390_MEMOP_SIDA_WRITE:
->> +		r = 0;
->> +		if (copy_from_user((void *)vcpu->arch.sie_block->sidad +
->> +				   mop->offset, uaddr, mop->size))
->> +			r = -EFAULT;
->> +		break;
->> +	}
->> +	return r;
->> +}
->> +
->>  static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu *vcpu,
->>  				   struct kvm_pv_cmd *cmd)
->>  {
->> @@ -4708,6 +4743,20 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->>  		r = kvm_s390_handle_pv_vcpu(vcpu, &args);
->>  		break;
->>  	}
->> +	case KVM_S390_SIDA_OP: {
->> +		struct kvm_s390_mem_op mem_op;
->> +
->> +		if (!kvm_s390_pv_is_protected(vcpu->kvm)) {
->> +			r = -EINVAL;
->> +			break;
->> +		}
-> 
-> Could we race against a VM_DESTROY? Should we protect somehow?
-
-As far as I can tell SIDA_OP and the VCPU_DESTROY are both per cpu ioctls
-and thus protected by the vcpu->mutex. (please double check).
-
-> [...]
-> 
->> -/* for KVM_S390_MEM_OP */
->> +/* for KVM_S390_MEM_OP and KVM_S390_SIDA_OP */
->>  struct kvm_s390_mem_op {
->>  	/* in */
->>  	__u64 gaddr;		/* the guest address */
->> @@ -475,11 +475,17 @@ struct kvm_s390_mem_op {
->>  	__u32 op;		/* type of operation */
->>  	__u64 buf;		/* buffer in userspace */
->>  	__u8 ar;		/* the access register number */
->> -	__u8 reserved[31];	/* should be set to 0 */
->> +	__u8 reserved21[3];	/* should be set to 0 */
->> +	__u32 offset;		/* offset into the sida */
-> 
-> maybe "side_offset"? or define a union, overlying the ar (because that
-> obviously doesn't apply to this memop). So eventually different layout
-> for different memop.
-
-Will use sida_offset for now, but I have to look into Thomas proposal.
+Ah, you mean the registers and so on for the checkout?
+I will add 
+        /*
+         * All other possible payload for a machine check (e.g. the register
+         * contents in the save area) will be handled by the ultravisor, as 
+         * the hypervisor does not not have the needed information for
+         * protected guests.
+         */
 
