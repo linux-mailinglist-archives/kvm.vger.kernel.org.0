@@ -2,188 +2,505 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B381154733
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:10:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A3F9B154750
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 16:12:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727762AbgBFPKk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 10:10:40 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:45323 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727481AbgBFPKi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 10:10:38 -0500
-Received: by mail-wr1-f66.google.com with SMTP id a6so7592925wrx.12;
-        Thu, 06 Feb 2020 07:10:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=y0Ojwov/p4Jd1JXFXjHbwQfCbylx1jkuhxgufPLa1OA=;
-        b=pDMRkwPJqrBih1TASmqx/inhRtwNlegH4FgcuQa+x+0CuZ1W4in1lZNkwWLXutEDYZ
-         12nmARn2+gmNSdGIYBSmmQsMzLOAe9RrR0CUvsiT9GjIrSAmwCHjAWtjWtxxYwIIFcLI
-         8D0lrNW0ARRm/4Y9m4gA2FOU5ULq0CPMfBtQiRIdgjKwmvGaPIWP/ut6kBSxt5RPrlA6
-         Zkcixz2Afs8bnRPmo7sQrszeJPHFJA7lHDpp9YH9TAgizTAipHcgahKaS8mOTifKnbYM
-         gc+xXupHP0pkrL8u98nyQoQc7JmnVs2PkGRc70RMfiwNaR0i1JHXpwVAoNlJfKdsIQsz
-         HUNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=y0Ojwov/p4Jd1JXFXjHbwQfCbylx1jkuhxgufPLa1OA=;
-        b=E+49KTC9RKh9L2FBcp2YK1dUMp1AaCXZc8lj95NeLkjk3Cn2VK3A/DDGozUCk3yost
-         yUj5cL7iuHlDDZHRaQJ7DUfRM1MejcyDu8kjn37I+O8dcz2KjZF1kMrR+6Kd7rgBz+2q
-         530/E3vU5QQnj51Xth/REkS8Zj9lq+ZVzp58gA6Trrj1eLOSBcs2Op5y0KcwmcywfbNe
-         KqlJTxm0lV3VNRYHgCkDPxveM+4yeYHuoHWUf496SyxCzE6fsHJKEnm93HhGWtIl9cMl
-         QBFGtQifpu0NzkVSriRE9Gt9OHyb7TPifeQbbMVTBBRXWg03cVv2fr36GWbcE6c4EKFz
-         kKjQ==
-X-Gm-Message-State: APjAAAWWrTFz02E5kMH9UK8u1oy7dygbXCGOLEb38WBK6+oHceS/BVP+
-        Js8QFTXErhJtleHK5gWp2MAZ4pIL
-X-Google-Smtp-Source: APXvYqx2ijJjkVCaZvijNI6ErmO4C3TqUYvFIXxr/sRwhZDfu7TKh1eWF55YylJGpsaCn1bwx5lUMA==
-X-Received: by 2002:adf:ca07:: with SMTP id o7mr4135355wrh.49.1581001834954;
-        Thu, 06 Feb 2020 07:10:34 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id r5sm4471032wrt.43.2020.02.06.07.10.33
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Feb 2020 07:10:34 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] Second batch of KVM changes for 5.6 merge window
-Date:   Thu,  6 Feb 2020 16:10:31 +0100
-Message-Id: <1581001831-17609-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727570AbgBFPMf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 10:12:35 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:46572 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727473AbgBFPMf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 10:12:35 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 30C342B1006464400976;
+        Thu,  6 Feb 2020 23:12:27 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Thu, 6 Feb 2020
+ 23:12:18 +0800
+Subject: Re: [kvm-unit-tests PATCH v3 05/14] arm/arm64: ITS: Introspection
+ tests
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>
+CC:     <drjones@redhat.com>, <andre.przywara@arm.com>,
+        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
+        <thuth@redhat.com>
+References: <20200128103459.19413-1-eric.auger@redhat.com>
+ <20200128103459.19413-6-eric.auger@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <a5f8d1dc-fa1c-c5e2-e449-afac92840563@huawei.com>
+Date:   Thu, 6 Feb 2020 23:12:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <20200128103459.19413-6-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+Hi Eric,
 
-The following changes since commit e813e65038389b66d2f8dd87588694caf8dc2923:
+On 2020/1/28 18:34, Eric Auger wrote:
+> Detect the presence of an ITS as part of the GICv3 init
+> routine, initialize its base address and read few registers
+> the IIDR, the TYPER to store its dimensioning parameters.
+> Also parse the BASER registers.
+> 
+> This is our first ITS test, belonging to a new "its" group.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v2 -> v3:
+> - updated dates and changed author
+> - squash "arm/arm64: ITS: Test BASER" into this patch but
+>    removes setup_baser which will be introduced later.
+> - only compile on aarch64
+> - restrict the new test to aarch64
+> 
+> v1 -> v2:
+> - clean GITS_TYPER macros and unused fields in typer struct
+> - remove memory attribute related macros
+> - remove everything related to memory attributes
+> - s/dev_baser/coll_baser/ in report_info
+> - add extra line
+> - removed index filed in its_baser
+> ---
+>   arm/Makefile.arm64         |   1 +
+>   arm/gic.c                  |  49 ++++++++++++++++++
+>   arm/unittests.cfg          |   7 +++
+>   lib/arm/asm/gic-v3-its.h   | 103 +++++++++++++++++++++++++++++++++++++
+>   lib/arm/gic-v3-its.c       |  88 +++++++++++++++++++++++++++++++
+>   lib/arm/gic.c              |  30 +++++++++--
+>   lib/arm64/asm/gic-v3-its.h |   1 +
+>   7 files changed, 274 insertions(+), 5 deletions(-)
+>   create mode 100644 lib/arm/asm/gic-v3-its.h
+>   create mode 100644 lib/arm/gic-v3-its.c
+>   create mode 100644 lib/arm64/asm/gic-v3-its.h
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 6d3dc2c..2571ffb 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -19,6 +19,7 @@ endef
+>   cstart.o = $(TEST_DIR)/cstart64.o
+>   cflatobjs += lib/arm64/processor.o
+>   cflatobjs += lib/arm64/spinlock.o
+> +cflatobjs += lib/arm/gic-v3-its.o
+>   
+>   OBJDIRS += lib/arm64
+>   
+> diff --git a/arm/gic.c b/arm/gic.c
+> index abf08c7..4d7dd03 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -16,6 +16,7 @@
+>   #include <asm/processor.h>
+>   #include <asm/delay.h>
+>   #include <asm/gic.h>
+> +#include <asm/gic-v3-its.h>
+>   #include <asm/smp.h>
+>   #include <asm/barrier.h>
+>   #include <asm/io.h>
+> @@ -518,6 +519,50 @@ static void gic_test_mmio(void)
+>   		test_targets(nr_irqs);
+>   }
+>   
+> +#if defined(__arm__)
+> +
+> +static void test_its_introspection(void) {}
+> +
+> +#else /* __arch64__ */
+> +
+> +static void test_its_introspection(void)
+> +{
+> +	struct its_baser *dev_baser, *coll_baser;
+> +	struct its_typer *typer = &its_data.typer;
+> +
+> +	if (!gicv3_its_base()) {
+> +		report_skip("No ITS, skip ...");
+> +		return;
+> +	}
+> +
+> +	/* IIDR */
+> +	report(test_readonly_32(gicv3_its_base() + GITS_IIDR, false),
+> +	       "GITS_IIDR is read-only"),
+> +
+> +	/* TYPER */
+> +	report(test_readonly_32(gicv3_its_base() + GITS_TYPER, false),
+> +	       "GITS_TYPER is read-only");
+> +
+> +	report(typer->phys_lpi, "ITS supports physical LPIs");
+> +	report_info("vLPI support: %s", typer->virt_lpi ? "yes" : "no");
+> +	report_info("ITT entry size = 0x%x", typer->ite_size);
+> +	report_info("Bit Count: EventID=%d DeviceId=%d CollId=%d",
+> +		    typer->eventid_bits, typer->deviceid_bits,
+> +		    typer->collid_bits);
+> +	report(typer->eventid_bits && typer->deviceid_bits &&
+> +	       typer->collid_bits, "ID spaces");
+> +	report_info("Target address format %s",
+> +			typer->pta ? "Redist basse address" : "PE #");
 
-  Merge tag 'kvm-5.6-1' of git://git.kernel.org/pub/scm/virt/kvm/kvm (2020-01-31 09:30:41 -0800)
+typo: s/basse/base/
 
-are available in the git repository at:
+> +
+> +	dev_baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
+> +	coll_baser = its_lookup_baser(GITS_BASER_TYPE_COLLECTION);
+> +	report(dev_baser && coll_baser, "detect device and collection BASER");
+> +	report_info("device baser entry_size = 0x%x", dev_baser->esz);
+> +	report_info("collection baser entry_size = 0x%x", coll_baser->esz);
+
+How about "device table entry_size = ..." and "collection table
+entry_size = ..."?
+
+> +}
+> +
+> +#endif
+> +
+>   int main(int argc, char **argv)
+>   {
+>   	if (!gic_init()) {
+> @@ -549,6 +594,10 @@ int main(int argc, char **argv)
+>   		report_prefix_push(argv[1]);
+>   		gic_test_mmio();
+>   		report_prefix_pop();
+> +	} else if (strcmp(argv[1], "its-introspection") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_its_introspection();
+> +		report_prefix_pop();
+>   	} else {
+>   		report_abort("Unknown subtest '%s'", argv[1]);
+>   	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index daeb5a0..ba2b31b 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -122,6 +122,13 @@ smp = $MAX_SMP
+>   extra_params = -machine gic-version=3 -append 'active'
+>   groups = gic
+>   
+> +[its-introspection]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'its-introspection'
+> +groups = its
+> +arch = arm64
+> +
+>   # Test PSCI emulation
+>   [psci]
+>   file = psci.flat
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..815c515
+> --- /dev/null
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -0,0 +1,103 @@
+> +/*
+> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
+> + *
+> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#ifndef _ASMARM_GIC_V3_ITS_H_
+> +#define _ASMARM_GIC_V3_ITS_H_
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +struct its_typer {
+> +	unsigned int ite_size;
+> +	unsigned int eventid_bits;
+> +	unsigned int deviceid_bits;
+> +	unsigned int collid_bits;
+> +	bool pta;
+> +	bool phys_lpi;
+> +	bool virt_lpi;
+> +};
+> +
+> +struct its_baser {
+> +	int type;
+> +	size_t psz;
+> +	int nr_pages;
+> +	bool indirect;
+> +	phys_addr_t table_addr;
+> +	bool valid;
+> +	int esz;
+> +};
+> +
+> +#define GITS_BASER_NR_REGS              8
+> +
+> +struct its_data {
+> +	void *base;
+> +	struct its_typer typer;
+> +	struct its_baser baser[GITS_BASER_NR_REGS];
+> +};
+> +
+> +extern struct its_data its_data;
+> +
+> +#define gicv3_its_base()		(its_data.base)
+> +
+> +#if defined(__aarch64__)
+> +
+> +#define GITS_CTLR			0x0000
+> +#define GITS_IIDR			0x0004
+> +#define GITS_TYPER			0x0008
+> +#define GITS_CBASER			0x0080
+> +#define GITS_CWRITER			0x0088
+> +#define GITS_CREADR			0x0090
+> +#define GITS_BASER			0x0100
+> +
+> +#define GITS_TYPER_PLPIS                BIT(0)
+> +#define GITS_TYPER_VLPIS		BIT(1)
+> +#define GITS_TYPER_ITT_ENTRY_SIZE	GENMASK_ULL(7, 4)
+> +#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
+> +#define GITS_TYPER_IDBITS		GENMASK_ULL(8, 12)
+> +#define GITS_TYPER_IDBITS_SHIFT         8
+> +#define GITS_TYPER_DEVBITS		GENMASK_ULL(13, 17)
+> +#define GITS_TYPER_DEVBITS_SHIFT        13
+> +#define GITS_TYPER_PTA                  BIT(19)
+> +#define GITS_TYPER_CIDBITS		GENMASK_ULL(32, 35)
+> +#define GITS_TYPER_CIDBITS_SHIFT	32
+> +#define GITS_TYPER_CIL			BIT(36)
+> +
+> +#define GITS_CTLR_ENABLE		(1U << 0)
+> +
+> +#define GITS_CBASER_VALID		(1UL << 63)
+> +
+> +#define GITS_BASER_VALID		BIT(63)
+> +#define GITS_BASER_INDIRECT		BIT(62)
+> +#define GITS_BASER_TYPE_SHIFT		(56)
+> +#define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
+> +#define GITS_BASER_ENTRY_SIZE_SHIFT	(48)
+> +#define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
+> +#define GITS_BASER_PAGE_SIZE_SHIFT	(8)
+> +#define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_64K	(2UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_MASK	(3UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGES_MAX		256
+> +#define GITS_BASER_PAGES_SHIFT		(0)
+> +#define GITS_BASER_NR_PAGES(r)		(((r) & 0xff) + 1)
+> +#define GITS_BASER_PHYS_ADDR_MASK	0xFFFFFFFFF000
+> +#define GITS_BASER_TYPE_NONE		0
+> +#define GITS_BASER_TYPE_DEVICE		1
+> +#define GITS_BASER_TYPE_COLLECTION	4
+> +
+> +extern void its_parse_typer(void);
+> +extern void its_init(void);
+> +extern int its_parse_baser(int i, struct its_baser *baser);
+> +extern struct its_baser *its_lookup_baser(int type);
+> +
+> +#else /* __arm__ */
+> +
+> +static inline void its_init(void) {}
+> +
+> +#endif
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +#endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> new file mode 100644
+> index 0000000..2c0ce13
+> --- /dev/null
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -0,0 +1,88 @@
+> +/*
+> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <asm/gic.h>
+> +#include <alloc_page.h>
+> +#include <asm/gic-v3-its.h>
+> +
+> +void its_parse_typer(void)
+> +{
+> +	u64 typer = readq(gicv3_its_base() + GITS_TYPER);
+> +
+> +	its_data.typer.ite_size = ((typer & GITS_TYPER_ITT_ENTRY_SIZE) >>
+> +					GITS_TYPER_ITT_ENTRY_SIZE_SHIFT) + 1;
+> +	its_data.typer.pta = typer & GITS_TYPER_PTA;
+> +	its_data.typer.eventid_bits = ((typer & GITS_TYPER_IDBITS) >>
+> +						GITS_TYPER_IDBITS_SHIFT) + 1;
+> +	its_data.typer.deviceid_bits = ((typer & GITS_TYPER_DEVBITS) >>
+> +						GITS_TYPER_DEVBITS_SHIFT) + 1;
+> +
+> +	if (typer & GITS_TYPER_CIL)
+> +		its_data.typer.collid_bits = ((typer & GITS_TYPER_CIDBITS) >>
+> +						GITS_TYPER_CIDBITS_SHIFT) + 1;
+> +	else
+> +		its_data.typer.collid_bits = 16;
+> +
+> +	its_data.typer.virt_lpi = typer & GITS_TYPER_VLPIS;
+> +	its_data.typer.phys_lpi = typer & GITS_TYPER_PLPIS;
+> +}
+> +
+> +int its_parse_baser(int i, struct its_baser *baser)
+> +{
+> +	void *reg_addr = gicv3_its_base() + GITS_BASER + i * 8;
+> +	u64 val = readq(reg_addr);
+> +
+> +	if (!val) {
+> +		memset(baser, 0, sizeof(*baser));
+> +		return -1;
+> +	}
+
+Unimplemented BASERs? How about using something like:
+
+	if (GITS_BASER_TYPE(val) == GITS_BASER_TYPE_NONE) {
+		[...]
+	}
+
+to make it a bit more explicit?
+
+But feel free to just ignore it because you're right that
+the unimplemented BASERs are RES0.
 
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/kvm-5.6-2
+Thanks,
+Zenghui
 
-for you to fetch changes up to a8be1ad01b795bd2a13297ddbaecdb956ab0efd0:
+> +
+> +	baser->valid = val & GITS_BASER_VALID;
+> +	baser->indirect = val & GITS_BASER_INDIRECT;
+> +	baser->type = GITS_BASER_TYPE(val);
+> +	baser->esz = GITS_BASER_ENTRY_SIZE(val);
+> +	baser->nr_pages = GITS_BASER_NR_PAGES(val);
+> +	baser->table_addr = val & GITS_BASER_PHYS_ADDR_MASK;
+> +	switch (val & GITS_BASER_PAGE_SIZE_MASK) {
+> +	case GITS_BASER_PAGE_SIZE_4K:
+> +		baser->psz = SZ_4K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_16K:
+> +		baser->psz = SZ_16K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_64K:
+> +		baser->psz = SZ_64K;
+> +		break;
+> +	default:
+> +		baser->psz = SZ_64K;
+> +	}
+> +	return 0;
+> +}
+> +
+> +struct its_baser *its_lookup_baser(int type)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+> +		struct its_baser *baser = &its_data.baser[i];
+> +
+> +		if (baser->type == type)
+> +			return baser;
+> +	}
+> +	return NULL;
+> +}
+> +
+> +void its_init(void)
+> +{
+> +	int i;
+> +
+> +	if (!its_data.base)
+> +		return;
+> +
+> +	its_parse_typer();
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++)
+> +		its_parse_baser(i, &its_data.baser[i]);
+> +}
+> +
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index aa9cb86..6b70b05 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -6,9 +6,11 @@
+>   #include <devicetree.h>
+>   #include <asm/gic.h>
+>   #include <asm/io.h>
+> +#include <asm/gic-v3-its.h>
+>   
+>   struct gicv2_data gicv2_data;
+>   struct gicv3_data gicv3_data;
+> +struct its_data its_data;
+>   
+>   struct gic_common_ops {
+>   	void (*enable_defaults)(void);
+> @@ -44,12 +46,13 @@ static const struct gic_common_ops gicv3_common_ops = {
+>    * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
+>    */
+>   static bool
+> -gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+> +gic_get_dt_bases(const char *compatible, void **base1, void **base2, void **base3)
+>   {
+>   	struct dt_pbus_reg reg;
+> -	struct dt_device gic;
+> +	struct dt_device gic, its;
+>   	struct dt_bus bus;
+> -	int node, ret, i;
+> +	int node, subnode, ret, i, len;
+> +	const void *fdt = dt_fdt();
+>   
+>   	dt_bus_init_defaults(&bus);
+>   	dt_device_init(&gic, &bus, NULL);
+> @@ -74,19 +77,35 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+>   		base2[i] = ioremap(reg.addr, reg.size);
+>   	}
+>   
+> +	if (base3 && !strcmp(compatible, "arm,gic-v3")) {
+> +		dt_for_each_subnode(node, subnode) {
+> +			const struct fdt_property *prop;
+> +
+> +			prop = fdt_get_property(fdt, subnode, "compatible", &len);
+> +			if (!strcmp((char *)prop->data, "arm,gic-v3-its")) {
+> +				dt_device_bind_node(&its, subnode);
+> +				ret = dt_pbus_translate(&its, 0, &reg);
+> +				assert(ret == 0);
+> +				*base3 = ioremap(reg.addr, reg.size);
+> +				break;
+> +			}
+> +		}
+> +
+> +	}
+> +
+>   	return true;
+>   }
+>   
+>   int gicv2_init(void)
+>   {
+>   	return gic_get_dt_bases("arm,cortex-a15-gic",
+> -			&gicv2_data.dist_base, &gicv2_data.cpu_base);
+> +			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
+>   }
+>   
+>   int gicv3_init(void)
+>   {
+>   	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
+> -			&gicv3_data.redist_bases[0]);
+> +			&gicv3_data.redist_bases[0], &its_data.base);
+>   }
+>   
+>   int gic_version(void)
+> @@ -104,6 +123,7 @@ int gic_init(void)
+>   		gic_common_ops = &gicv2_common_ops;
+>   	else if (gicv3_init())
+>   		gic_common_ops = &gicv3_common_ops;
+> +	its_init();
+>   	return gic_version();
+>   }
+>   
+> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..083cba4
+> --- /dev/null
+> +++ b/lib/arm64/asm/gic-v3-its.h
+> @@ -0,0 +1 @@
+> +#include "../../arm/asm/gic-v3-its.h"
+> 
 
-  KVM: vmx: delete meaningless vmx_decache_cr0_guest_bits() declaration (2020-02-05 16:44:06 +0100)
-
-----------------------------------------------------------------
-s390:
-* fix register corruption
-* ENOTSUPP/EOPNOTSUPP mixed
-* reset cleanups/fixes
-* selftests
-
-x86:
-* Bug fixes and cleanups
-* AMD support for APIC virtualization even in combination with
-  in-kernel PIT or IOAPIC.
-
-MIPS:
-* Compilation fix.
-
-Generic:
-* Fix refcount overflow for zero page.
-
-----------------------------------------------------------------
-Ben Gardon (2):
-      kvm: mmu: Replace unsigned with unsigned int for PTE access
-      kvm: mmu: Separate generating and setting mmio ptes
-
-Christian Borntraeger (2):
-      KVM: s390: ENOTSUPP -> EOPNOTSUPP fixups
-      KVM: s390: do not clobber registers during guest reset/store status
-
-Eric Hankland (1):
-      KVM: x86: Fix perfctr WRMSR for running counters
-
-Janosch Frank (4):
-      KVM: s390: Cleanup initial cpu reset
-      KVM: s390: Add new reset vcpu API
-      selftests: KVM: Add fpu and one reg set/get library functions
-      selftests: KVM: s390x: Add reset tests
-
-Miaohe Lin (2):
-      KVM: nVMX: delete meaningless nested_vmx_run() declaration
-      KVM: vmx: delete meaningless vmx_decache_cr0_guest_bits() declaration
-
-Paolo Bonzini (7):
-      KVM: x86: remove get_enable_apicv from kvm_x86_ops
-      KVM: SVM: allow AVIC without split irqchip
-      KVM: x86: reorganize pvclock_gtod_data members
-      KVM: x86: use raw clock values consistently
-      KVM: SVM: relax conditions for allowing MSR_IA32_SPEC_CTRL accesses
-      Merge tag 'kvm-s390-next-5.6-1' of git://git.kernel.org/.../kvms390/linux into HEAD
-      x86: vmxfeatures: rename features for consistency with KVM and manual
-
-Pierre Morel (1):
-      selftests: KVM: testing the local IRQs resets
-
-Sean Christopherson (5):
-      KVM: x86: Take a u64 when checking for a valid dr7 value
-      KVM: MIPS: Fix a build error due to referencing not-yet-defined function
-      KVM: MIPS: Fold comparecount_func() into comparecount_wakeup()
-      KVM: nVMX: Remove stale comment from nested_vmx_load_cr3()
-      KVM: x86: Mark CR4.UMIP as reserved based on associated CPUID bit
-
-Suravee Suthikulpanit (15):
-      kvm: lapic: Introduce APICv update helper function
-      kvm: x86: Introduce APICv inhibit reason bits
-      kvm: x86: Add support for dynamic APICv activation
-      kvm: x86: Add APICv (de)activate request trace points
-      kvm: x86: svm: Add support to (de)activate posted interrupts
-      KVM: svm: avic: Add support for dynamic setup/teardown of virtual APIC backing page
-      kvm: x86: Introduce APICv x86 ops for checking APIC inhibit reasons
-      kvm: x86: Introduce x86 ops hook for pre-update APICv
-      svm: Add support for dynamic APICv
-      kvm: x86: hyperv: Use APICv update request interface
-      svm: Deactivate AVIC when launching guest with nested SVM support
-      svm: Temporarily deactivate AVIC during ExtINT handling
-      kvm: i8254: Deactivate APICv when using in-kernel PIT re-injection mode.
-      kvm: ioapic: Refactor kvm_ioapic_update_eoi()
-      kvm: ioapic: Lazy update IOAPIC EOI
-
-Thadeu Lima de Souza Cascardo (1):
-      x86/kvm: do not setup pv tlb flush when not paravirtualized
-
-Vitaly Kuznetsov (2):
-      x86/kvm/hyper-v: move VMX controls sanitization out of nested_enable_evmcs()
-      x86/kvm/hyper-v: don't allow to turn on unsupported VMX controls for nested guests
-
-Zhuang Yanying (1):
-      KVM: fix overflow of zero page refcount with ksm running
-
- Documentation/virt/kvm/api.txt                 |  43 ++++++
- arch/mips/kvm/mips.c                           |  37 ++---
- arch/s390/include/asm/kvm_host.h               |   5 +
- arch/s390/kvm/interrupt.c                      |   6 +-
- arch/s390/kvm/kvm-s390.c                       |  92 +++++++-----
- arch/x86/include/asm/kvm_host.h                |  18 ++-
- arch/x86/include/asm/vmx.h                     |   6 +-
- arch/x86/include/asm/vmxfeatures.h             |   6 +-
- arch/x86/kernel/kvm.c                          |   3 +
- arch/x86/kvm/hyperv.c                          |   5 +-
- arch/x86/kvm/i8254.c                           |  12 ++
- arch/x86/kvm/ioapic.c                          | 149 ++++++++++++-------
- arch/x86/kvm/lapic.c                           |  22 ++-
- arch/x86/kvm/lapic.h                           |   1 +
- arch/x86/kvm/mmu/mmu.c                         |  37 +++--
- arch/x86/kvm/svm.c                             | 166 ++++++++++++++++++---
- arch/x86/kvm/trace.h                           |  19 +++
- arch/x86/kvm/vmx/evmcs.c                       |  85 ++++++++++-
- arch/x86/kvm/vmx/evmcs.h                       |   3 +
- arch/x86/kvm/vmx/nested.c                      |  13 +-
- arch/x86/kvm/vmx/pmu_intel.c                   |   9 +-
- arch/x86/kvm/vmx/vmx.c                         |  34 +++--
- arch/x86/kvm/x86.c                             | 139 +++++++++++------
- arch/x86/kvm/x86.h                             |   2 +-
- include/uapi/linux/kvm.h                       |   5 +
- tools/testing/selftests/kvm/Makefile           |   1 +
- tools/testing/selftests/kvm/include/kvm_util.h |   6 +
- tools/testing/selftests/kvm/lib/kvm_util.c     |  36 +++++
- tools/testing/selftests/kvm/s390x/resets.c     | 197 +++++++++++++++++++++++++
- virt/kvm/kvm_main.c                            |   1 +
- 30 files changed, 925 insertions(+), 233 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/s390x/resets.c
