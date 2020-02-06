@@ -2,45 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 239C015460C
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 15:25:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1626215461B
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2020 15:27:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727769AbgBFOZC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Feb 2020 09:25:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21120 "EHLO
+        id S1727861AbgBFO1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 09:27:37 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35290 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726765AbgBFOZC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 09:25:02 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 016EOabi027789
-        for <kvm@vger.kernel.org>; Thu, 6 Feb 2020 09:25:01 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyphxmvf7-1
+        by vger.kernel.org with ESMTP id S1727415AbgBFO1h (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Feb 2020 09:27:37 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 016EOEcq101225
+        for <kvm@vger.kernel.org>; Thu, 6 Feb 2020 09:27:36 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhmpa1f6-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 09:25:01 -0500
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2020 09:27:36 -0500
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 6 Feb 2020 14:24:58 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 6 Feb 2020 14:27:33 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 6 Feb 2020 14:24:56 -0000
+        Thu, 6 Feb 2020 14:27:31 -0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 016EOsl542533004
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 016ERTV335520744
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 6 Feb 2020 14:24:54 GMT
+        Thu, 6 Feb 2020 14:27:29 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D2B0C4C04A;
-        Thu,  6 Feb 2020 14:24:54 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 808DD4C046;
+        Thu,  6 Feb 2020 14:27:29 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8AF4D4C040;
-        Thu,  6 Feb 2020 14:24:54 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3E84C4C040;
+        Thu,  6 Feb 2020 14:27:29 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  6 Feb 2020 14:24:54 +0000 (GMT)
-Subject: Re: [RFCv2 36/37] KVM: s390: protvirt: do not inject interrupts after
- start
+        Thu,  6 Feb 2020 14:27:29 +0000 (GMT)
+Subject: Re: [RFCv2 37/37] KVM: s390: protvirt: Add UV cpu reset calls
 To:     Cornelia Huck <cohuck@redhat.com>
 Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
         KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
@@ -49,8 +48,8 @@ Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>
 References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-37-borntraeger@de.ibm.com>
- <20200206111332.26e455e8.cohuck@redhat.com>
+ <20200203131957.383915-38-borntraeger@de.ibm.com>
+ <20200206114552.766d3a53.cohuck@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -95,26 +94,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Thu, 6 Feb 2020 15:24:54 +0100
+Date:   Thu, 6 Feb 2020 15:27:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200206111332.26e455e8.cohuck@redhat.com>
+In-Reply-To: <20200206114552.766d3a53.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020614-0012-0000-0000-000003844DC1
+x-cbid: 20020614-0016-0000-0000-000002E449FD
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020614-0013-0000-0000-000021C0BBF8
-Message-Id: <9c861701-6a5d-c3d2-55ec-15da517eb27b@de.ibm.com>
+x-cbparentid: 20020614-0017-0000-0000-000033473001
+Message-Id: <bf52cc95-3746-c781-8db4-3dd174cf6567@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-06_01:2020-02-06,2020-02-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 suspectscore=0 phishscore=0
- mlxlogscore=658 lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002060109
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ malwarescore=0 suspectscore=0 phishscore=0 priorityscore=1501 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002060109
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -122,43 +121,86 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 06.02.20 11:13, Cornelia Huck wrote:
-> On Mon,  3 Feb 2020 08:19:56 -0500
+On 06.02.20 11:45, Cornelia Huck wrote:
+> On Mon,  3 Feb 2020 08:19:57 -0500
 > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
->> As PSW restart is handled by the ultravisor (and we only get a start
->> notification) we must re-check the PSW after a start before injecting
->> interrupts.
+>> From: Janosch Frank <frankja@linux.ibm.com>
 >>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  arch/s390/kvm/kvm-s390.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
+>> For protected VMs, the VCPU resets are done by the Ultravisor, as KVM
+>> has no access to the VCPU registers.
 >>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 137ae5dc9101..3e4716b3fc02 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -4451,6 +4451,12 @@ void kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
->>  	/* Let's tell the UV that we want to start again */
->>  	kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR);
->>  	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_STOPPED);
->> +	/*
->> +	 * The real PSW might have changed due to an interpreted RESTART.
+>> As the Ultravisor will only accept a call for the reset that is
+>> needed, we need to fence the UV calls when chaining resets.
 > 
-> "a RESTART interpreted by the ultravisor" ?
+> Stale note, chaining resets is gone?
+> 
+> "Note that the ultravisor will only accept a call for the exact reset
+> that has been requested." ?
 
 ack
 
 > 
->> +	 * We block all interrupts and let the next sie exit refresh our view.
->> +	 */
->> +	if (kvm_s390_pv_is_protected(vcpu->kvm))
->> +		vcpu->arch.sie_block->gpsw.mask &= ~PSW_INT_MASK;
->>  	/*
->>  	 * Another VCPU might have used IBS while we were offline.
->>  	 * Let's play safe and flush the VCPU at startup.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  arch/s390/kvm/kvm-s390.c | 20 ++++++++++++++++++++
+>>  1 file changed, 20 insertions(+)
+>>
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index 3e4716b3fc02..f7a3f84be064 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -4699,6 +4699,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>  	void __user *argp = (void __user *)arg;
+>>  	int idx;
+>>  	long r;
+>> +	u32 ret;
+>>  
+>>  	vcpu_load(vcpu);
+>>  
+>> @@ -4720,14 +4721,33 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>  	case KVM_S390_CLEAR_RESET:
+>>  		r = 0;
+>>  		kvm_arch_vcpu_ioctl_clear_reset(vcpu);
+>> +		if (kvm_s390_pv_handle_cpu(vcpu)) {
+>> +			r = uv_cmd_nodata(kvm_s390_pv_handle_cpu(vcpu),
+>> +					  UVC_CMD_CPU_RESET_CLEAR, &ret);
+>> +			VCPU_EVENT(vcpu, 3, "PROTVIRT RESET CLEAR VCPU: cpu %d rc %x rrc %x",
+>> +				   vcpu->vcpu_id, ret >> 16, ret & 0x0000ffff);
 > 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> I think VCPU_EVENT() already traces the vcpu_id, doesn't it?
+
+Yes, it does. will fix.
+
+
+> 
+>> +		}
+>>  		break;
+>>  	case KVM_S390_INITIAL_RESET:
+>>  		r = 0;
+>>  		kvm_arch_vcpu_ioctl_initial_reset(vcpu);
+>> +		if (kvm_s390_pv_handle_cpu(vcpu)) {
+>> +			r = uv_cmd_nodata(kvm_s390_pv_handle_cpu(vcpu),
+>> +					  UVC_CMD_CPU_RESET_INITIAL,
+>> +					  &ret);
+>> +			VCPU_EVENT(vcpu, 3, "PROTVIRT RESET INITIAL VCPU: cpu %d rc %x rrc %x",
+>> +				   vcpu->vcpu_id, ret >> 16, ret & 0x0000ffff);
+>> +		}
+>>  		break;
+>>  	case KVM_S390_NORMAL_RESET:
+>>  		r = 0;
+>>  		kvm_arch_vcpu_ioctl_normal_reset(vcpu);
+>> +		if (kvm_s390_pv_handle_cpu(vcpu)) {
+>> +			r = uv_cmd_nodata(kvm_s390_pv_handle_cpu(vcpu),
+>> +					  UVC_CMD_CPU_RESET, &ret);
+>> +			VCPU_EVENT(vcpu, 3, "PROTVIRT RESET NORMAL VCPU: cpu %d rc %x rrc %x",
+>> +				   vcpu->vcpu_id, ret >> 16, ret & 0x0000ffff);
+>> +		}
+>>  		break;
+>>  	case KVM_SET_ONE_REG:
+>>  	case KVM_GET_ONE_REG: {
+> 
+> Otherwise, looks good.
 > 
 
