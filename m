@@ -2,199 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFAAE155D75
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:14:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55DA4155D56
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:07:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727457AbgBGSOP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 13:14:15 -0500
-Received: from mx2.suse.de ([195.135.220.15]:39500 "EHLO mx2.suse.de"
+        id S1727011AbgBGSHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 13:07:22 -0500
+Received: from mga14.intel.com ([192.55.52.115]:38121 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727392AbgBGSOO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 13:14:14 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 540E4AD3F;
-        Fri,  7 Feb 2020 18:14:12 +0000 (UTC)
-From:   Davidlohr Bueso <dave@stgolabs.net>
-To:     akpm@linux-foundation.org
-Cc:     dave@stgolabs.net, linux-kernel@vger.kernel.org, mcgrof@kernel.org,
-        broonie@kernel.org, alex.williamson@redhat.com, cohuck@redhat.com,
-        kvm@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>
-Subject: [PATCH 4/5] vfio/type1: optimize dma_list tree iterations
-Date:   Fri,  7 Feb 2020 10:03:04 -0800
-Message-Id: <20200207180305.11092-5-dave@stgolabs.net>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20200207180305.11092-1-dave@stgolabs.net>
-References: <20200207180305.11092-1-dave@stgolabs.net>
+        id S1726900AbgBGSHV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 13:07:21 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 10:07:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,414,1574150400"; 
+   d="scan'208";a="432641480"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga006.fm.intel.com with ESMTP; 07 Feb 2020 10:07:20 -0800
+Date:   Fri, 7 Feb 2020 10:07:20 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 12/19] KVM: Move memslot deletion to helper function
+Message-ID: <20200207180720.GH2401@linux.intel.com>
+References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+ <20200121223157.15263-13-sean.j.christopherson@intel.com>
+ <20200206161415.GA695333@xz-x1>
+ <20200206162818.GD13067@linux.intel.com>
+ <20200206165116.GE695333@xz-x1>
+ <20200207175912.GG2401@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200207175912.GG2401@linux.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Both ->release() and ->attach_group() vfio_iommu driver
-callbacks can incur in full in-order iommu->dma_list traversals,
-which can be suboptimal under regular rbtree interators. This
-patch proposes using the optimized llrbtree interface such that
-we always have a branchless O(1) next node available. The cost
-is higher memory footprint, mainly enlarging struct vfio_dma
-by two pointers. This allows for minimal runtime overhead
-when doing tree modifications.
+On Fri, Feb 07, 2020 at 09:59:12AM -0800, Sean Christopherson wrote:
+> On Thu, Feb 06, 2020 at 11:51:16AM -0500, Peter Xu wrote:
+> > /*
+> >  * Make a full copy of the old memslot, the pointer will become stale
+> >  * when the memslots are re-sorted by update_memslots() in
+> >  * kvm_delete_memslot(), while to make the kvm_free_memslot() work as
+> >  * expected later on, we still need the cached memory slot.
+> >  */
+> 
+> As above, it's more subtle than just the kvm_delete_memslot() case.
+> 
+> 	/*
+> 	 * Make a full copy of the old memslot, the pointer will become stale
+> 	 * when the memslots are re-sorted by update_memslots() when deleting
+> 	 * or moving a memslot, and additional modifications to the old memslot
+> 	 * need to be made after calling update_memslots().
+> 	 */
 
-Cc: alex.williamson@redhat.com
-Cc: cohuck@redhat.com
-Cc: kvm@vger.kernel.org
-Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
----
- drivers/vfio/vfio_iommu_type1.c | 50 +++++++++++++++++++++++------------------
- 1 file changed, 28 insertions(+), 22 deletions(-)
+Actually, that's not quite correct, as the same is true for all memslot
+updates, and we still query @old after update_memslots() for CREATE and
+FLAGS.  This is better.
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 2ada8e6cdb88..875170fc8515 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -28,6 +28,7 @@
- #include <linux/module.h>
- #include <linux/mm.h>
- #include <linux/rbtree.h>
-+#include <linux/ll_rbtree.h>
- #include <linux/sched/signal.h>
- #include <linux/sched/mm.h>
- #include <linux/slab.h>
-@@ -65,7 +66,7 @@ struct vfio_iommu {
- 	struct list_head	iova_list;
- 	struct vfio_domain	*external_domain; /* domain for external user */
- 	struct mutex		lock;
--	struct rb_root		dma_list;
-+	struct llrb_root	dma_list;
- 	struct blocking_notifier_head notifier;
- 	unsigned int		dma_avail;
- 	bool			v2;
-@@ -81,7 +82,7 @@ struct vfio_domain {
- };
- 
- struct vfio_dma {
--	struct rb_node		node;
-+	struct llrb_node	node;
- 	dma_addr_t		iova;		/* Device address */
- 	unsigned long		vaddr;		/* Process virtual addr */
- 	size_t			size;		/* Map size (bytes) */
-@@ -134,10 +135,10 @@ static int put_pfn(unsigned long pfn, int prot);
- static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
- 				      dma_addr_t start, size_t size)
- {
--	struct rb_node *node = iommu->dma_list.rb_node;
-+	struct rb_node *node = iommu->dma_list.rb_root.rb_node;
- 
- 	while (node) {
--		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
-+		struct vfio_dma *dma = llrb_entry(node, struct vfio_dma, node);
- 
- 		if (start + size <= dma->iova)
- 			node = node->rb_left;
-@@ -152,26 +153,30 @@ static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
- 
- static void vfio_link_dma(struct vfio_iommu *iommu, struct vfio_dma *new)
- {
--	struct rb_node **link = &iommu->dma_list.rb_node, *parent = NULL;
-+	struct rb_node **link = &iommu->dma_list.rb_root.rb_node;
-+	struct rb_node *parent = NULL;
-+	struct llrb_node *prev = NULL;
- 	struct vfio_dma *dma;
- 
- 	while (*link) {
- 		parent = *link;
--		dma = rb_entry(parent, struct vfio_dma, node);
-+		dma = llrb_entry(parent, struct vfio_dma, node);
- 
- 		if (new->iova + new->size <= dma->iova)
- 			link = &(*link)->rb_left;
--		else
-+		else {
- 			link = &(*link)->rb_right;
-+			prev = llrb_from_rb(parent);
-+		}
- 	}
- 
--	rb_link_node(&new->node, parent, link);
--	rb_insert_color(&new->node, &iommu->dma_list);
-+	rb_link_node(&new->node.rb_node, parent, link);
-+	llrb_insert(&iommu->dma_list, &new->node, prev);
- }
- 
- static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
- {
--	rb_erase(&old->node, &iommu->dma_list);
-+	llrb_erase(&old->node, &iommu->dma_list);
- }
- 
- /*
-@@ -1170,15 +1175,15 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 			     struct vfio_domain *domain)
- {
- 	struct vfio_domain *d;
--	struct rb_node *n;
-+	struct llrb_node *n;
- 	unsigned long limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
- 	int ret;
- 
- 	/* Arbitrarily pick the first domain in the list for lookups */
- 	d = list_first_entry(&iommu->domain_list, struct vfio_domain, next);
--	n = rb_first(&iommu->dma_list);
-+	n = llrb_first(&iommu->dma_list);
- 
--	for (; n; n = rb_next(n)) {
-+	for (; n; n = llrb_next(n)) {
- 		struct vfio_dma *dma;
- 		dma_addr_t iova;
- 
-@@ -1835,18 +1840,19 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 
- static void vfio_iommu_unmap_unpin_all(struct vfio_iommu *iommu)
- {
--	struct rb_node *node;
-+	struct llrb_node *node;
- 
--	while ((node = rb_first(&iommu->dma_list)))
-+	while ((node = llrb_first(&iommu->dma_list)))
- 		vfio_remove_dma(iommu, rb_entry(node, struct vfio_dma, node));
- }
- 
- static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
- {
--	struct rb_node *n, *p;
-+	struct llrb_node *n;
-+	struct rb_node *p;
- 
--	n = rb_first(&iommu->dma_list);
--	for (; n; n = rb_next(n)) {
-+	n = llrb_first(&iommu->dma_list);
-+	for (; n; n = llrb_next(n)) {
- 		struct vfio_dma *dma;
- 		long locked = 0, unlocked = 0;
- 
-@@ -1866,10 +1872,10 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
- 
- static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
- {
--	struct rb_node *n;
-+	struct llrb_node *n;
- 
--	n = rb_first(&iommu->dma_list);
--	for (; n; n = rb_next(n)) {
-+	n = llrb_first(&iommu->dma_list);
-+	for (; n; n = llrb_next(n)) {
- 		struct vfio_dma *dma;
- 
- 		dma = rb_entry(n, struct vfio_dma, node);
-@@ -2060,7 +2066,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
- 
- 	INIT_LIST_HEAD(&iommu->domain_list);
- 	INIT_LIST_HEAD(&iommu->iova_list);
--	iommu->dma_list = RB_ROOT;
-+	iommu->dma_list = LLRB_ROOT;
- 	iommu->dma_avail = dma_entry_limit;
- 	mutex_init(&iommu->lock);
- 	BLOCKING_INIT_NOTIFIER_HEAD(&iommu->notifier);
--- 
-2.16.4
+        /*
+         * Make a full copy of the old memslot, the pointer will become stale
+         * when the memslots are re-sorted by update_memslots(), and the old
+	 * memslot needs to be referenced after calling update_memslots(), e.g.
+	 * to free its resources and for arch specific behavior.
+         */
 
