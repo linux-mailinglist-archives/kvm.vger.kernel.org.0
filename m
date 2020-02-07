@@ -2,213 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E8A6155596
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 11:25:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62C621555DB
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 11:36:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726890AbgBGKZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 05:25:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36400 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726674AbgBGKZZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 05:25:25 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0CB342082E;
-        Fri,  7 Feb 2020 10:25:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581071125;
-        bh=1O89POEVxteUnANqCrA7vltm9KSiEdwONARJWVy+kbs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Evo1pKcoLIsgc7bb+b1tM0igAc8sXwVcpwLUBxUPwwsE2z2gg95Sn1MBADUabqRso
-         ihAIl3GIdmkgqKgG+XPMGT/7enGW9jg32BpKDSHOD9AGttrAmt0+LRz5h2abLUfVxo
-         VCxFJIbJgJPSr/5fSCcKA+6ooLtTpPFY82yvnKek=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j00p9-003VUd-E5; Fri, 07 Feb 2020 10:25:23 +0000
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Fri, 07 Feb 2020 10:25:23 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, peterx@redhat.com
-Subject: Re: BUG: using __this_cpu_read() in preemptible [00000000] code
-In-Reply-To: <3e90c020-e7f3-61f1-3731-a489df0b1d9c@huawei.com>
-References: <318984f6-bc36-33a3-abc6-bf2295974b06@huawei.com>
- <828d3b538b7258f692f782b6798277cf@kernel.org>
- <3e90c020-e7f3-61f1-3731-a489df0b1d9c@huawei.com>
-Message-ID: <f2fd3b371fda9167a02a7312cda5d217@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, peterx@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        id S1727231AbgBGKga (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 05:36:30 -0500
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:54664 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727154AbgBGKg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 05:36:29 -0500
+Received: by mail-pg1-f201.google.com with SMTP id i21so1333822pgm.21
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 02:36:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=unQMDuml2JRM4lxYQH2f2pyITlNbCCf7jTarNpqVCtg=;
+        b=iAy2sqKJeA5u4JT+aKW2ZATjLCzZ6D5Q7rsC1sHLCP+lQ9kIbvNhDGwPf7SQ2te/zf
+         nxUMJGmotyhSNhO9eHPJf92319VtS+y7wL983u8ktJGoNKILbXshZgUfyVqplYpNtUgJ
+         nIvwlNbcCpVY/rkSAJlvOVE/gwTCsE6OGyzuJ5msG1N4lmJRpQk4WZzQOBQnNGx+NspO
+         I7xC9XTGQXpm8XU+Ftdc09y2CUAbcTbsO6GCDWf4gC8GWe/Aw8f+F/4rF6cMdjsUIW7o
+         m33kncoEfF4Zt4SaW29mG2aajfA4Dj/zUgkzyBaMonzapqc92xIa96+bL6Vut2IL02LA
+         PX+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=unQMDuml2JRM4lxYQH2f2pyITlNbCCf7jTarNpqVCtg=;
+        b=KPPV4lV2OW6wNoRDM8+j7kt7DRAGiZryxi5XTJwCsv3rWpyjFy/y+d4AVZq+CXGXiA
+         g6kW5Rmb7uDryrk8tbivMhFzLD9Z9IfbSQ0Umf5BbSmreupZC1xlpcfU6COysydaZvB3
+         S4rCY87Fg0OVVFrut9I2EEmYW6ygBi3sLKaPRS+2DpN7E/SChCab9RwIw+nLmh4cofLr
+         mD6CzUMKFx5Tx4aLdMXQe7zZJ7CETL3jpicl9L+IDo7dBsPeeaB7Mk/QyKTINpYkSQ1Z
+         qSaSutgXf3mIWsWszMTgFMxuCc/CdO1qvB0CUKwAQIp/gmMKJ5gJVNVcho1CAEq393XC
+         bkHw==
+X-Gm-Message-State: APjAAAXJZnGfD3OfGQZEZ3uIw/g+SCcIX/Jc1WyslIIY0fuj1AFhByQz
+        27Oiav4O1mUuZKpsVJSrvj3M795PwrmflcOHWZC4ZNXhbYpYe+tlvUyNJVBGuqF9JeFHe10h6ly
+        Z6SeCOGlo08Ixh6JemuWg6KJFZZ+U/V0JX6x1nPjOdTYfN9zDWINiwGSATA==
+X-Google-Smtp-Source: APXvYqxClo4dpjDVyAe6XA2FLDc0x+PYkzKL+JCtlEPz5tMClKKtBg/12Gsl2A1IsE8tk4LKsyPsPQhxIok=
+X-Received: by 2002:a63:646:: with SMTP id 67mr8731570pgg.376.1581071788480;
+ Fri, 07 Feb 2020 02:36:28 -0800 (PST)
+Date:   Fri,  7 Feb 2020 02:36:03 -0800
+Message-Id: <20200207103608.110305-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+Subject: [PATCH v3 0/5] Handle monitor trap flag during instruction emulation
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-02-07 10:19, Zenghui Yu wrote:
-> Hi Marc,
-> 
-> On 2020/2/7 17:19, Marc Zyngier wrote:
->> Hi Zenghui,
->> 
->> On 2020-02-07 09:00, Zenghui Yu wrote:
->>> Hi,
->>> 
->>> Running a latest preemptible kernel and some guests on it,
->>> I got the following message,
->>> 
->>> ---8<---
->>> 
->>> [  630.031870] BUG: using __this_cpu_read() in preemptible [00000000]
->>> code: qemu-system-aar/37270
->>> [  630.031872] caller is kvm_get_running_vcpu+0x1c/0x38
->>> [  630.031874] CPU: 32 PID: 37270 Comm: qemu-system-aar Kdump: loaded
->>> Not tainted 5.5.0+
->>> [  630.031876] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 
->>> 1.58
->>> 10/29/2018
->>> [  630.031876] Call trace:
->>> [  630.031878]  dump_backtrace+0x0/0x200
->>> [  630.031880]  show_stack+0x24/0x30
->>> [  630.031882]  dump_stack+0xb0/0xf4
->>> [  630.031884]  __this_cpu_preempt_check+0xc8/0xd0
->>> [  630.031886]  kvm_get_running_vcpu+0x1c/0x38
->>> [  630.031888]  vgic_mmio_change_active.isra.4+0x2c/0xe0
->>> [  630.031890]  __vgic_mmio_write_cactive+0x80/0xc8
->>> [  630.031892]  vgic_mmio_uaccess_write_cactive+0x3c/0x50
->>> [  630.031894]  vgic_uaccess+0xcc/0x138
->>> [  630.031896]  vgic_v3_redist_uaccess+0x7c/0xa8
->>> [  630.031898]  vgic_v3_attr_regs_access+0x1a8/0x230
->>> [  630.031901]  vgic_v3_set_attr+0x1b4/0x290
->>> [  630.031903]  kvm_device_ioctl_attr+0xbc/0x110
->>> [  630.031905]  kvm_device_ioctl+0xc4/0x108
->>> [  630.031907]  ksys_ioctl+0xb4/0xd0
->>> [  630.031909]  __arm64_sys_ioctl+0x28/0x38
->>> [  630.031911]  el0_svc_common.constprop.1+0x7c/0x1a0
->>> [  630.031913]  do_el0_svc+0x34/0xa0
->>> [  630.031915]  el0_sync_handler+0x124/0x274
->>> [  630.031916]  el0_sync+0x140/0x180
->>> 
->>> ---8<---
->>> 
->>> I'm now at commit 90568ecf561540fa330511e21fcd823b0c3829c6.
->>> 
->>> And it looks like vgic_get_mmio_requester_vcpu() was broken by
->>> 7495e22bb165 ("KVM: Move running VCPU from ARM to common code").
->>> 
->>> Could anyone please have a look?
->> 
->> Here you go:
->> 
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c 
->> b/virt/kvm/arm/vgic/vgic-mmio.c
->> index d656ebd5f9d4..e1735f19c924 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->> @@ -190,6 +190,15 @@ unsigned long vgic_mmio_read_pending(struct 
->> kvm_vcpu *vcpu,
->>    * value later will give us the same value as we update the per-CPU 
->> variable
->>    * in the preempt notifier handlers.
->>    */
->> +static struct kvm_vcpu *vgic_get_mmio_requester_vcpu(void)
->> +{
->> +    struct kvm_vcpu *vcpu;
->> +
->> +    preempt_disable();
->> +    vcpu = kvm_get_running_vcpu();
->> +    preempt_enable();
->> +    return vcpu;
->> +}
->> 
->>   /* Must be called with irq->irq_lock held */
->>   static void vgic_hw_irq_spending(struct kvm_vcpu *vcpu, struct 
->> vgic_irq *irq,
->> @@ -212,7 +221,7 @@ void vgic_mmio_write_spending(struct kvm_vcpu 
->> *vcpu,
->>                     gpa_t addr, unsigned int len,
->>                     unsigned long val)
->>   {
->> -    bool is_uaccess = !kvm_get_running_vcpu();
->> +    bool is_uaccess = !vgic_get_mmio_requester_vcpu();
->>       u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->>       int i;
->>       unsigned long flags;
->> @@ -265,7 +274,7 @@ void vgic_mmio_write_cpending(struct kvm_vcpu 
->> *vcpu,
->>                     gpa_t addr, unsigned int len,
->>                     unsigned long val)
->>   {
->> -    bool is_uaccess = !kvm_get_running_vcpu();
->> +    bool is_uaccess = !vgic_get_mmio_requester_vcpu();
->>       u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->>       int i;
->>       unsigned long flags;
->> @@ -326,7 +335,7 @@ static void vgic_mmio_change_active(struct 
->> kvm_vcpu *vcpu, struct vgic_irq *irq,
->>                       bool active)
->>   {
->>       unsigned long flags;
->> -    struct kvm_vcpu *requester_vcpu = kvm_get_running_vcpu();
->> +    struct kvm_vcpu *requester_vcpu = vgic_get_mmio_requester_vcpu();
->> 
->>       raw_spin_lock_irqsave(&irq->irq_lock, flags);
->> 
->> 
->> That's basically a revert of the offending code. The comment right 
->> above
->> vgic_get_mmio_requester_vcpu() explains *why* this is valid, and why
->> preempt_disable() is needed.
-> 
-> I see, thanks!
-> 
->> 
->> Can you please give it a shot?
-> 
-> Yes, it works for me:
-> 
-> Tested-by: Zenghui Yu <yuzenghui@huawei.com>
+v1: http://lore.kernel.org/r/20200113221053.22053-1-oupton@google.com
+v2: http://lore.kernel.org/r/20200128092715.69429-1-oupton@google.com
 
-Actually, maybe a better/simpler fix would be this:
+v1 => v2:
+ - Don't split the #DB delivery by vendors. Unconditionally injecting
+   #DB payloads into the 'pending debug exceptions' field will cause KVM
+   to get stuck in a loop. Per the SDM, when hardware injects an event
+   resulting from this field's value, it is checked against the
+   exception interception bitmap.
+ - Address Sean's comments by injecting the VM-exit into L1 from
+   vmx_check_nested_events().
+ - Added fix for nested INIT VM-exits + 'pending debug exceptions' field
+   as it was noticed in implementing v2.
+ - Drop Peter + Jim's Reviewed-by tags, as the patch set has changed
+   since v1.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 67ae2d5c37b2..3cf7719d3177 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4414,7 +4414,13 @@ static void kvm_sched_out(struct preempt_notifier 
-*pn,
-   */
-  struct kvm_vcpu *kvm_get_running_vcpu(void)
-  {
--        return __this_cpu_read(kvm_running_vcpu);
-+	struct kvm_vcpu *vcpu;
-+
-+	preempt_disable();
-+	vcpu = __this_cpu_read(kvm_running_vcpu);
-+	preempt_enable();
-+
-+	return vcpu;
-  }
+v2 => v3:
+ - Merge the check/set_pending_dbg helpers into a single helper,
+   vmx_update_pending_dbg(). Add clarifying comment to this helper.
+ - Rewrite commit message, descriptive comment for change in 3/5 to
+   explicitly describe the reason for mutating payload delivery
+   behavior.
+ - Undo the changes to kvm_vcpu_do_singlestep(). Instead, add a new hook
+   to call for 'full' instruction emulation + 'fast' emulation.
 
-  /**
+KVM already provides guests the ability to use the 'monitor trap flag'
+VM-execution control. Support for this flag is provided by the fact that
+KVM unconditionally forwards MTF VM-exits to the guest (if requested),
+as KVM doesn't utilize MTF. While this provides support during hardware
+instruction execution, it is insufficient for instruction emulation.
 
-which matches the comment that comes with the function.
+Should L0 emulate an instruction on the behalf of L2, L0 should also
+synthesize an MTF VM-exit into L1, should control be set.
 
-Paolo, which one do you prefer? It seems to me that the intent of moving
-this to core code was to provide a high level API that works at all 
-times.
+The first patch corrects a nuanced difference between the definition of
+a #DB exception payload field and DR6 register. Mask off bit 12 which is
+defined in the 'pending debug exceptions' field when applying to DR6,
+since the payload field is said to be compatible with the aforementioned
+VMCS field.
 
-Thanks,
+The second patch sets the 'pending debug exceptions' VMCS field when
+delivering an INIT signal VM-exit to L1, as described in the SDM. This
+patch also introduces helpers for setting the 'pending debug exceptions'
+VMCS field.
 
-         M.
+The third patch massages KVM's handling of exception payloads with
+regard to API compatibility. Rather than immediately delivering the
+payload w/o opt-in, instead defer the payload + inject
+before completing a KVM_GET_VCPU_EVENTS. This maintains API
+compatibility whilst correcting #DB behavior with regard to higher
+priority VM-exit events.
+
+Fourth patch introduces MTF implementation for emulated instructions.
+Identify if an MTF is due on an instruction boundary from
+kvm_vcpu_do_singlestep(), however only deliver this VM-exit from
+vmx_check_nested_events() to respect the relative prioritization to
+other VM-exits. Since this augments the nested state, introduce a new
+flag for (de)serialization.
+
+Last patch adds tests to kvm-unit-tests to assert the correctness of MTF
+under several conditions (concurrent #DB trap, #DB fault, etc). These
+tests pass under virtualization with this series as well as on
+bare-metal.
+
+Based on commit 2c2787938512 ("KVM: selftests: Stop memslot creation in
+KVM internal memslot region").
+
+Oliver Upton (4):
+  KVM: x86: Mask off reserved bit from #DB exception payload
+  KVM: nVMX: Handle pending #DB when injecting INIT VM-exit
+  KVM: x86: Deliver exception payload on KVM_GET_VCPU_EVENTS
+  KVM: nVMX: Emulate MTF when performing instruction emulation
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/include/uapi/asm/kvm.h |  1 +
+ arch/x86/kvm/svm.c              |  1 +
+ arch/x86/kvm/vmx/nested.c       | 54 ++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/nested.h       |  5 +++
+ arch/x86/kvm/vmx/vmx.c          | 37 +++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.h          |  3 ++
+ arch/x86/kvm/x86.c              | 39 ++++++++++++++++--------
+ 8 files changed, 126 insertions(+), 15 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+2.25.0.341.g760bfbb309-goog
+
