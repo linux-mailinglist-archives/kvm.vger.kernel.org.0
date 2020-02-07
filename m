@@ -2,240 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BD4D2155BB3
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 17:25:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40ED8155BB6
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 17:26:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727028AbgBGQZk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 11:25:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36962 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726874AbgBGQZk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 11:25:40 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F1DD720720;
-        Fri,  7 Feb 2020 16:25:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581092739;
-        bh=dxItuX/MNTUp6xJbcDfCUpdL0low5rzKYrUjnrd6wsA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Lvn87mwAKYbtOHpVVZV+YpOuzhgWjtpfnUl9KvehyroTl8nYi41besgKe0gXZbmpC
-         1p66gQ7h+1nMkurSSG0TJEZNXL+teKng2Ek82V+YEHYTymtJW8XK/jpp6zAYQThCon
-         5pV9CuQF0UAXduZ63tImO8Uc/k7OO8R59Phlq0kY=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j06Rl-003ZVe-8p; Fri, 07 Feb 2020 16:25:37 +0000
+        id S1727347AbgBGQZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 11:25:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35147 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726874AbgBGQZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 11:25:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581092757;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1A4AnPYG4QKudcgCccIbKk1UqeHiL89Ca/26LbtLNW0=;
+        b=TTsJWg/z6Bufg8NOGA7/vSgYWPlt/n7mvcrdpjSrmfaKo+tqYUupjxpcLPVSfTe/buTKjO
+        BtLlFIQNP9mEHmhFooSvMbQNpHzaGEqxUTLDtJEIIwI+0Ub8cIUFeQNjrXYyrfVOxAzDxo
+        s7pWeKHFp2yAterED1Hc2g/5zuZU6HY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-MH39CF0jOQqPIdou9QFOUQ-1; Fri, 07 Feb 2020 11:25:52 -0500
+X-MC-Unique: MH39CF0jOQqPIdou9QFOUQ-1
+Received: by mail-wm1-f69.google.com with SMTP id z7so961358wmi.0
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 08:25:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=1A4AnPYG4QKudcgCccIbKk1UqeHiL89Ca/26LbtLNW0=;
+        b=c67+qFSPsLbKgPri8Crk4uuCsAZwVRCcjNEaoRqnXRyhNomO90lSgft0cBMxS5u47J
+         UoIKAdQi+JSbKjcrU7+6UIIw8DElkiK9C2EIXO1e+J003M2aHQm8/eYHq3Li44Oqe0Zv
+         /RMUikrvjTsIRW9fRPHoh0HGF/Fpj5MtM0nBaPpu89O5ky4dLMkEoLye2Pn+4epryCcI
+         hbhlQNbKxKqQsW4ilf4PCZT5c/kJv99EUS5CxIMxKz4v9GNnpqFAuuKGI4ugSv7fIfsL
+         0cVz+VakUfpe0D/Gnwx9hChjF1wunBRkXMWignmz8+B9fJGU1lGIFmgU2BaEUmRmtN9o
+         tfAA==
+X-Gm-Message-State: APjAAAVtOV8zYP8dNCI/wuBo3gvQZsqwPG1YwsCAZaXyPoL7DURvOmoi
+        9+CkO5jnDdlTFoc4Ml+9aMU180uqWwcdP30SomlU+iCxw/E4tAtiYTBgL2EyqwucAey8pb/Sggb
+        eIQCK4hZoMvs9
+X-Received: by 2002:a7b:cbc8:: with SMTP id n8mr5161410wmi.35.1581092751588;
+        Fri, 07 Feb 2020 08:25:51 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw301M5FoKZ0/Wzsw2hrBkoIM94RmCmiNqrRJGjHwwSRYaykvhuKE/qTOXZAcTjqdr1tHov0w==
+X-Received: by 2002:a7b:cbc8:: with SMTP id n8mr5161389wmi.35.1581092751345;
+        Fri, 07 Feb 2020 08:25:51 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id e22sm4044678wme.45.2020.02.07.08.25.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2020 08:25:50 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     linmiaohe <linmiaohe@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Subject: Re: [PATCH v2] KVM: nVMX: Fix some comment typos and coding style
+In-Reply-To: <1581088965-3334-1-git-send-email-linmiaohe@huawei.com>
+References: <1581088965-3334-1-git-send-email-linmiaohe@huawei.com>
+Date:   Fri, 07 Feb 2020 17:25:50 +0100
+Message-ID: <87zhdupdo1.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Fri, 07 Feb 2020 16:25:37 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com
-Subject: Re: BUG: using __this_cpu_read() in preemptible [00000000] code
-In-Reply-To: <20200207161845.GB707371@xz-x1>
-References: <318984f6-bc36-33a3-abc6-bf2295974b06@huawei.com>
- <828d3b538b7258f692f782b6798277cf@kernel.org>
- <3e90c020-e7f3-61f1-3731-a489df0b1d9c@huawei.com>
- <f2fd3b371fda9167a02a7312cda5d217@kernel.org>
- <20200207161845.GB707371@xz-x1>
-Message-ID: <5a132e2ca9918b1b2c3d2f146ab44311@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: peterx@redhat.com, yuzenghui@huawei.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-02-07 16:18, Peter Xu wrote:
-> On Fri, Feb 07, 2020 at 10:25:23AM +0000, Marc Zyngier wrote:
->> On 2020-02-07 10:19, Zenghui Yu wrote:
->> > Hi Marc,
->> >
->> > On 2020/2/7 17:19, Marc Zyngier wrote:
->> > > Hi Zenghui,
->> > >
->> > > On 2020-02-07 09:00, Zenghui Yu wrote:
->> > > > Hi,
->> > > >
->> > > > Running a latest preemptible kernel and some guests on it,
->> > > > I got the following message,
->> > > >
->> > > > ---8<---
->> > > >
->> > > > [  630.031870] BUG: using __this_cpu_read() in preemptible [00000000]
->> > > > code: qemu-system-aar/37270
->> > > > [  630.031872] caller is kvm_get_running_vcpu+0x1c/0x38
->> > > > [  630.031874] CPU: 32 PID: 37270 Comm: qemu-system-aar Kdump: loaded
->> > > > Not tainted 5.5.0+
->> > > > [  630.031876] Hardware name: Huawei TaiShan 2280 /BC11SPCD,
->> > > > BIOS 1.58
->> > > > 10/29/2018
->> > > > [  630.031876] Call trace:
->> > > > [  630.031878]  dump_backtrace+0x0/0x200
->> > > > [  630.031880]  show_stack+0x24/0x30
->> > > > [  630.031882]  dump_stack+0xb0/0xf4
->> > > > [  630.031884]  __this_cpu_preempt_check+0xc8/0xd0
->> > > > [  630.031886]  kvm_get_running_vcpu+0x1c/0x38
->> > > > [  630.031888]  vgic_mmio_change_active.isra.4+0x2c/0xe0
->> > > > [  630.031890]  __vgic_mmio_write_cactive+0x80/0xc8
->> > > > [  630.031892]  vgic_mmio_uaccess_write_cactive+0x3c/0x50
->> > > > [  630.031894]  vgic_uaccess+0xcc/0x138
->> > > > [  630.031896]  vgic_v3_redist_uaccess+0x7c/0xa8
->> > > > [  630.031898]  vgic_v3_attr_regs_access+0x1a8/0x230
->> > > > [  630.031901]  vgic_v3_set_attr+0x1b4/0x290
->> > > > [  630.031903]  kvm_device_ioctl_attr+0xbc/0x110
->> > > > [  630.031905]  kvm_device_ioctl+0xc4/0x108
->> > > > [  630.031907]  ksys_ioctl+0xb4/0xd0
->> > > > [  630.031909]  __arm64_sys_ioctl+0x28/0x38
->> > > > [  630.031911]  el0_svc_common.constprop.1+0x7c/0x1a0
->> > > > [  630.031913]  do_el0_svc+0x34/0xa0
->> > > > [  630.031915]  el0_sync_handler+0x124/0x274
->> > > > [  630.031916]  el0_sync+0x140/0x180
->> > > >
->> > > > ---8<---
->> > > >
->> > > > I'm now at commit 90568ecf561540fa330511e21fcd823b0c3829c6.
->> > > >
->> > > > And it looks like vgic_get_mmio_requester_vcpu() was broken by
->> > > > 7495e22bb165 ("KVM: Move running VCPU from ARM to common code").
->> > > >
->> > > > Could anyone please have a look?
->> > >
->> > > Here you go:
->> > >
->> > > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c
->> > > b/virt/kvm/arm/vgic/vgic-mmio.c
->> > > index d656ebd5f9d4..e1735f19c924 100644
->> > > --- a/virt/kvm/arm/vgic/vgic-mmio.c
->> > > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->> > > @@ -190,6 +190,15 @@ unsigned long vgic_mmio_read_pending(struct
->> > > kvm_vcpu *vcpu,
->> > >    * value later will give us the same value as we update the
->> > > per-CPU variable
->> > >    * in the preempt notifier handlers.
->> > >    */
->> > > +static struct kvm_vcpu *vgic_get_mmio_requester_vcpu(void)
->> > > +{
->> > > +    struct kvm_vcpu *vcpu;
->> > > +
->> > > +    preempt_disable();
->> > > +    vcpu = kvm_get_running_vcpu();
->> > > +    preempt_enable();
->> > > +    return vcpu;
->> > > +}
->> > >
->> > >   /* Must be called with irq->irq_lock held */
->> > >   static void vgic_hw_irq_spending(struct kvm_vcpu *vcpu, struct
->> > > vgic_irq *irq,
->> > > @@ -212,7 +221,7 @@ void vgic_mmio_write_spending(struct kvm_vcpu
->> > > *vcpu,
->> > >                     gpa_t addr, unsigned int len,
->> > >                     unsigned long val)
->> > >   {
->> > > -    bool is_uaccess = !kvm_get_running_vcpu();
->> > > +    bool is_uaccess = !vgic_get_mmio_requester_vcpu();
->> > >       u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->> > >       int i;
->> > >       unsigned long flags;
->> > > @@ -265,7 +274,7 @@ void vgic_mmio_write_cpending(struct kvm_vcpu
->> > > *vcpu,
->> > >                     gpa_t addr, unsigned int len,
->> > >                     unsigned long val)
->> > >   {
->> > > -    bool is_uaccess = !kvm_get_running_vcpu();
->> > > +    bool is_uaccess = !vgic_get_mmio_requester_vcpu();
->> > >       u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->> > >       int i;
->> > >       unsigned long flags;
->> > > @@ -326,7 +335,7 @@ static void vgic_mmio_change_active(struct
->> > > kvm_vcpu *vcpu, struct vgic_irq *irq,
->> > >                       bool active)
->> > >   {
->> > >       unsigned long flags;
->> > > -    struct kvm_vcpu *requester_vcpu = kvm_get_running_vcpu();
->> > > +    struct kvm_vcpu *requester_vcpu = vgic_get_mmio_requester_vcpu();
->> > >
->> > >       raw_spin_lock_irqsave(&irq->irq_lock, flags);
->> > >
->> > >
->> > > That's basically a revert of the offending code. The comment right
->> > > above
->> > > vgic_get_mmio_requester_vcpu() explains *why* this is valid, and why
->> > > preempt_disable() is needed.
-> 
-> Sorry for not noticing this before.
-> 
->> >
->> > I see, thanks!
->> >
->> > >
->> > > Can you please give it a shot?
->> >
->> > Yes, it works for me:
->> >
->> > Tested-by: Zenghui Yu <yuzenghui@huawei.com>
->> 
->> Actually, maybe a better/simpler fix would be this:
->> 
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 67ae2d5c37b2..3cf7719d3177 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -4414,7 +4414,13 @@ static void kvm_sched_out(struct 
->> preempt_notifier
->> *pn,
->>   */
->>  struct kvm_vcpu *kvm_get_running_vcpu(void)
->>  {
->> -        return __this_cpu_read(kvm_running_vcpu);
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	preempt_disable();
->> +	vcpu = __this_cpu_read(kvm_running_vcpu);
->> +	preempt_enable();
->> +
->> +	return vcpu;
->>  }
->> 
->>  /**
->> 
->> which matches the comment that comes with the function.
->> 
->> Paolo, which one do you prefer? It seems to me that the intent of 
->> moving
->> this to core code was to provide a high level API that works at all 
->> times.
-> 
-> Not sure about Paolo, but this looks better at least to me.  Shall we
-> also move the comment from vgic-mmio.c to here?  And we can remove the
-> 1st paragraph:
-> 
-> /*
->  * We can disable preemption locally around accessing the per-CPU 
-> variable,
->  * and use the resolved vcpu pointer after enabling preemption again, 
-> because
->  * even if the current thread is migrated to another CPU, reading the 
-> per-CPU
->  * value later will give us the same value as we update the per-CPU 
-> variable
->  * in the preempt notifier handlers.
->  */
+linmiaohe <linmiaohe@huawei.com> writes:
 
-Sure. I'll add it and post an actual patch in a moment.
+> From: Miaohe Lin <linmiaohe@huawei.com>
+>
+> Fix some typos in the comments. Also fix coding style.
+> [Sean Christopherson rewrites the comment of write_fault_to_shadow_pgtable
+> field in struct kvm_vcpu_arch.]
+>
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+> v1->v2:
+> Use Sean Christopherson' comment for write_fault_to_shadow_pgtable
+> ---
+>  arch/x86/include/asm/kvm_host.h | 16 +++++++++++++---
+>  arch/x86/kvm/vmx/nested.c       |  5 +++--
+>  2 files changed, 16 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 4dffbc10d3f8..40a0c0fd95ca 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -781,9 +781,19 @@ struct kvm_vcpu_arch {
+>  	u64 msr_kvm_poll_control;
+>  
+>  	/*
+> -	 * Indicate whether the access faults on its page table in guest
+> -	 * which is set when fix page fault and used to detect unhandeable
+> -	 * instruction.
+> +	 * Indicates the guest is trying to write a gfn that contains one or
+> +	 * more of the PTEs used to translate the write itself, i.e. the access
+> +	 * is changing its own translation in the guest page tables.  KVM exits
+> +	 * to userspace if emulation of the faulting instruction fails and this
+> +	 * flag is set, as KVM cannot make forward progress.
+> +	 *
+> +	 * If emulation fails for a write to guest page tables, KVM unprotects
+> +	 * (zaps) the shadow page for the target gfn and resumes the guest to
+> +	 * retry the non-emulatable instruction (on hardware).  Unprotecting the
+> +	 * gfn doesn't allow forward progress for a self-changing access because
+> +	 * doing so also zaps the translation for the gfn, i.e. retrying the
+> +	 * instruction will hit a !PRESENT fault, which results in a new shadow
+> +	 * page and sends KVM back to square one.
+>  	 */
+>  	bool write_fault_to_shadow_pgtable;
+>  
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 657c2eda357c..e7faebccd733 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -544,7 +544,8 @@ static void nested_vmx_disable_intercept_for_msr(unsigned long *msr_bitmap_l1,
+>  	}
+>  }
+>  
+> -static inline void enable_x2apic_msr_intercepts(unsigned long *msr_bitmap) {
+> +static inline void enable_x2apic_msr_intercepts(unsigned long *msr_bitmap)
+> +{
+>  	int msr;
+>  
+>  	for (msr = 0x800; msr <= 0x8ff; msr += BITS_PER_LONG) {
+> @@ -1981,7 +1982,7 @@ static int nested_vmx_handle_enlightened_vmptrld(struct kvm_vcpu *vcpu,
+>  	}
+>  
+>  	/*
+> -	 * Clean fields data can't de used on VMLAUNCH and when we switch
+> +	 * Clean fields data can't be used on VMLAUNCH and when we switch
+>  	 * between different L2 guests as KVM keeps a single VMCS12 per L1.
+>  	 */
+>  	if (from_launch || evmcs_gpa_changed)
 
-Thanks,
+With Sean's comment added the subject of the patch is a bit unexpected
+:-) But the change itself looks good (and thanks Sean for the great
+explanation!).
 
-         M.
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
 -- 
-Jazz is not dead. It just smells funny...
+Vitaly
+
