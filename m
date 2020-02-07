@@ -2,217 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A39F3155568
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 11:16:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82FAE15557B
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 11:19:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726874AbgBGKQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 05:16:05 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50655 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726587AbgBGKQF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 05:16:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581070563;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sAtq39YosfHmZJxK5UhNNcUku/GZXmkz5H1802fMXAM=;
-        b=Yqacl5ClP7+ioTSwahzWUGZXZ48BPqwwdGwShNY+vKa5fWSqomOnXZ4xJ4DJsDKeTd5D8n
-        9ajgCaGwMUDE3iO5DRya4xZdF/eP2QdKYxsae8Jx8z4T0j/A+nuy2JI/z3wsZ3oiDAF5HX
-        xAhS1eM7UYkrqZiQnuAgc50LuNCGXYo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-XV0cSZK6PFigHiiSQPK9Ig-1; Fri, 07 Feb 2020 05:16:01 -0500
-X-MC-Unique: XV0cSZK6PFigHiiSQPK9Ig-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95CF6800E21;
-        Fri,  7 Feb 2020 10:16:00 +0000 (UTC)
-Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CF1215DA7D;
-        Fri,  7 Feb 2020 10:15:56 +0000 (UTC)
-Subject: Re: [PATCH v4 3/3] selftests: KVM: SVM: Add vmcall test
-To:     Wei Huang <wei.huang2@amd.com>
-Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
-        thuth@redhat.com, drjones@redhat.com
-References: <20200206104710.16077-1-eric.auger@redhat.com>
- <20200206104710.16077-4-eric.auger@redhat.com>
- <20200206173931.GC2465308@weiserver.amd.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <130c32bc-7533-1b4e-b913-d9596ed4e94d@redhat.com>
-Date:   Fri, 7 Feb 2020 11:15:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726915AbgBGKTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 05:19:32 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:50008 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726587AbgBGKTb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 05:19:31 -0500
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 9C53C2CE6D0BD3553543;
+        Fri,  7 Feb 2020 18:19:27 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Fri, 7 Feb 2020
+ 18:19:19 +0800
+Subject: Re: BUG: using __this_cpu_read() in preemptible [00000000] code
+To:     Marc Zyngier <maz@kernel.org>
+CC:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <pbonzini@redhat.com>, <peterx@redhat.com>
+References: <318984f6-bc36-33a3-abc6-bf2295974b06@huawei.com>
+ <828d3b538b7258f692f782b6798277cf@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <3e90c020-e7f3-61f1-3731-a489df0b1d9c@huawei.com>
+Date:   Fri, 7 Feb 2020 18:19:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20200206173931.GC2465308@weiserver.amd.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <828d3b538b7258f692f782b6798277cf@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Wei,
+Hi Marc,
 
-On 2/6/20 6:39 PM, Wei Huang wrote:
-> On 02/06 11:47, Eric Auger wrote:
->> L2 guest calls vmcall and L1 checks the exit status does
->> correspond.
+On 2020/2/7 17:19, Marc Zyngier wrote:
+> Hi Zenghui,
+> 
+> On 2020-02-07 09:00, Zenghui Yu wrote:
+>> Hi,
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
+>> Running a latest preemptible kernel and some guests on it,
+>> I got the following message,
+>>
+>> ---8<---
+>>
+>> [  630.031870] BUG: using __this_cpu_read() in preemptible [00000000]
+>> code: qemu-system-aar/37270
+>> [  630.031872] caller is kvm_get_running_vcpu+0x1c/0x38
+>> [  630.031874] CPU: 32 PID: 37270 Comm: qemu-system-aar Kdump: loaded
+>> Not tainted 5.5.0+
+>> [  630.031876] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58
+>> 10/29/2018
+>> [  630.031876] Call trace:
+>> [  630.031878]  dump_backtrace+0x0/0x200
+>> [  630.031880]  show_stack+0x24/0x30
+>> [  630.031882]  dump_stack+0xb0/0xf4
+>> [  630.031884]  __this_cpu_preempt_check+0xc8/0xd0
+>> [  630.031886]  kvm_get_running_vcpu+0x1c/0x38
+>> [  630.031888]  vgic_mmio_change_active.isra.4+0x2c/0xe0
+>> [  630.031890]  __vgic_mmio_write_cactive+0x80/0xc8
+>> [  630.031892]  vgic_mmio_uaccess_write_cactive+0x3c/0x50
+>> [  630.031894]  vgic_uaccess+0xcc/0x138
+>> [  630.031896]  vgic_v3_redist_uaccess+0x7c/0xa8
+>> [  630.031898]  vgic_v3_attr_regs_access+0x1a8/0x230
+>> [  630.031901]  vgic_v3_set_attr+0x1b4/0x290
+>> [  630.031903]  kvm_device_ioctl_attr+0xbc/0x110
+>> [  630.031905]  kvm_device_ioctl+0xc4/0x108
+>> [  630.031907]  ksys_ioctl+0xb4/0xd0
+>> [  630.031909]  __arm64_sys_ioctl+0x28/0x38
+>> [  630.031911]  el0_svc_common.constprop.1+0x7c/0x1a0
+>> [  630.031913]  do_el0_svc+0x34/0xa0
+>> [  630.031915]  el0_sync_handler+0x124/0x274
+>> [  630.031916]  el0_sync+0x140/0x180
+>>
+>> ---8<---
+>>
+>> I'm now at commit 90568ecf561540fa330511e21fcd823b0c3829c6.
+>>
+>> And it looks like vgic_get_mmio_requester_vcpu() was broken by
+>> 7495e22bb165 ("KVM: Move running VCPU from ARM to common code").
+>>
+>> Could anyone please have a look?
 > 
-> I verified this patch with my AMD box, both with nested=1 and nested=0. I
-> also intentionally changed the assertion of exit_code to a different
-> value (0x082) and the test complained about it. So the test is good.
+> Here you go:
 > 
-> # selftests: kvm: svm_vmcall_test
-> # ==== Test Assertion Failure ====
-> #   x86_64/svm_vmcall_test.c:64: false
-> #   pid=2485656 tid=2485656 - Interrupted system call
-> #      1        0x0000000000401387: main at svm_vmcall_test.c:72
-> #      2        0x00007fd0978d71a2: ?? ??:0
-> #      3        0x00000000004013ed: _start at ??:?
-> #   Failed guest assert: vmcb->control.exit_code == SVM_EXIT_VMMCALL
-> # Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-> # Guest physical address width detected: 48
-> not ok 15 selftests: kvm: svm_vmcall_test # exit=254
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index d656ebd5f9d4..e1735f19c924 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -190,6 +190,15 @@ unsigned long vgic_mmio_read_pending(struct 
+> kvm_vcpu *vcpu,
+>    * value later will give us the same value as we update the per-CPU 
+> variable
+>    * in the preempt notifier handlers.
+>    */
+> +static struct kvm_vcpu *vgic_get_mmio_requester_vcpu(void)
+> +{
+> +    struct kvm_vcpu *vcpu;
+> +
+> +    preempt_disable();
+> +    vcpu = kvm_get_running_vcpu();
+> +    preempt_enable();
+> +    return vcpu;
+> +}
+> 
+>   /* Must be called with irq->irq_lock held */
+>   static void vgic_hw_irq_spending(struct kvm_vcpu *vcpu, struct 
+> vgic_irq *irq,
+> @@ -212,7 +221,7 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
+>                     gpa_t addr, unsigned int len,
+>                     unsigned long val)
+>   {
+> -    bool is_uaccess = !kvm_get_running_vcpu();
+> +    bool is_uaccess = !vgic_get_mmio_requester_vcpu();
+>       u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>       int i;
+>       unsigned long flags;
+> @@ -265,7 +274,7 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+>                     gpa_t addr, unsigned int len,
+>                     unsigned long val)
+>   {
+> -    bool is_uaccess = !kvm_get_running_vcpu();
+> +    bool is_uaccess = !vgic_get_mmio_requester_vcpu();
+>       u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>       int i;
+>       unsigned long flags;
+> @@ -326,7 +335,7 @@ static void vgic_mmio_change_active(struct kvm_vcpu 
+> *vcpu, struct vgic_irq *irq,
+>                       bool active)
+>   {
+>       unsigned long flags;
+> -    struct kvm_vcpu *requester_vcpu = kvm_get_running_vcpu();
+> +    struct kvm_vcpu *requester_vcpu = vgic_get_mmio_requester_vcpu();
+> 
+>       raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> 
+> 
+> That's basically a revert of the offending code. The comment right above
+> vgic_get_mmio_requester_vcpu() explains *why* this is valid, and why
+> preempt_disable() is needed.
 
-thank you for testing! May I include your T-b then?
-> 
->>
->> ---
->>
->> v3 -> v4:
->> - remove useless includes
->> - collected Lin's R-b
->>
->> v2 -> v3:
->> - remove useless comment and add Vitaly's R-b
->> ---
->>  tools/testing/selftests/kvm/Makefile          |  1 +
->>  .../selftests/kvm/x86_64/svm_vmcall_test.c    | 79 +++++++++++++++++++
->>  2 files changed, 80 insertions(+)
->>  create mode 100644 tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
->>
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index 2e770f554cae..b529d3b42c02 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -26,6 +26,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_dirty_log_test
->>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
->>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
->>  TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
->> +TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
->>  TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
->>  TEST_GEN_PROGS_x86_64 += dirty_log_test
->>  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
->> diff --git a/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c b/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
->> new file mode 100644
->> index 000000000000..6d3565aab94e
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
-> 
-> Probably rename the file to svm_nested_vmcall_test.c. This matches with
-> the naming convention of VMX's nested tests. Otherwise people might not know
-> it is a nested one.
+I see, thanks!
 
-From what I understand, all the vmx_* (including vmx_tsc_adjust_test for
-instance) are related to nested. So I'd rather leave svm_ prefix for
-nested SVM.
+> 
+> Can you please give it a shot?
 
-Thanks
+Yes, it works for me:
 
-Eric
-> 
-> Everything else looks good.
-> 
->> @@ -0,0 +1,79 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * svm_vmcall_test
->> + *
->> + * Copyright (C) 2020, Red Hat, Inc.
->> + *
->> + * Nested SVM testing: VMCALL
->> + */
->> +
->> +#include "test_util.h"
->> +#include "kvm_util.h"
->> +#include "processor.h"
->> +#include "svm_util.h"
->> +
->> +#define VCPU_ID		5
->> +
->> +static struct kvm_vm *vm;
->> +
->> +static inline void l2_vmcall(struct svm_test_data *svm)
->> +{
->> +	__asm__ __volatile__("vmcall");
->> +}
->> +
->> +static void l1_guest_code(struct svm_test_data *svm)
->> +{
->> +	#define L2_GUEST_STACK_SIZE 64
->> +	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
->> +	struct vmcb *vmcb = svm->vmcb;
->> +
->> +	/* Prepare for L2 execution. */
->> +	generic_svm_setup(svm, l2_vmcall,
->> +			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
->> +
->> +	run_guest(vmcb, svm->vmcb_gpa);
->> +
->> +	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
->> +	GUEST_DONE();
->> +}
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +	vm_vaddr_t svm_gva;
->> +
->> +	nested_svm_check_supported();
->> +
->> +	vm = vm_create_default(VCPU_ID, 0, (void *) l1_guest_code);
->> +	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
->> +
->> +	vcpu_alloc_svm(vm, &svm_gva);
->> +	vcpu_args_set(vm, VCPU_ID, 1, svm_gva);
->> +
->> +	for (;;) {
->> +		volatile struct kvm_run *run = vcpu_state(vm, VCPU_ID);
->> +		struct ucall uc;
->> +
->> +		vcpu_run(vm, VCPU_ID);
->> +		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
->> +			    "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
->> +			    run->exit_reason,
->> +			    exit_reason_str(run->exit_reason));
->> +
->> +		switch (get_ucall(vm, VCPU_ID, &uc)) {
->> +		case UCALL_ABORT:
->> +			TEST_ASSERT(false, "%s",
->> +				    (const char *)uc.args[0]);
->> +			/* NOT REACHED */
->> +		case UCALL_SYNC:
->> +			break;
->> +		case UCALL_DONE:
->> +			goto done;
->> +		default:
->> +			TEST_ASSERT(false,
->> +				    "Unknown ucall 0x%x.", uc.cmd);
->> +		}
->> +	}
->> +done:
->> +	kvm_vm_free(vm);
->> +	return 0;
->> +}
-> 
-> 
+Tested-by: Zenghui Yu <yuzenghui@huawei.com>
 
