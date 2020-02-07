@@ -2,179 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D526915595E
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 15:28:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF7B41559AA
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 15:34:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727595AbgBGO1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 09:27:50 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39838 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727588AbgBGO1u (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 09:27:50 -0500
+        id S1726874AbgBGOep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 09:34:45 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20244 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726867AbgBGOep (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 09:34:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581085668;
+        s=mimecast20190719; t=1581086082;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Xg9KQqM6XBMkFHF6VY7rnAiaKVdwxMzLzQfnIUyGzfo=;
-        b=IH+deAab22y1tkhgWciONOLsb1EbzcG6I36FD6bDEMKCkkMKf+jnhbQBu2R3Nmv5lCNs4e
-        XpnzA1UG78fRGGzs8QoRv1Y9SgXtdA6eaQzGWk63WKuJ62pTZiEtcjMAYJAedFPFtvdN0K
-        /SKoSC0CRvVkNE+14BmI0YOpLyPrGkU=
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=XGlHftD4p0/1OUISque/2SdzSbPsHuEO8pdtrMcZxgw=;
+        b=CnTRfGohPgJMMzDPl6wPty5z+Id0aqAMVpUwfgp+Rrt6MnjcofDiB/4AMKh/y1kxM+01yF
+        DT7n4TR5h4nL208Jv3Diuz8sS3SnLZIcTzU2W4AfzaThByRgKmcX8dSkzXoM0WjVt2ONZe
+        2bbOLKX9M0vHNTxPjdwo66JT5akxPY4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-aeQWNHsKP3SNF78D5J_C5w-1; Fri, 07 Feb 2020 09:27:47 -0500
-X-MC-Unique: aeQWNHsKP3SNF78D5J_C5w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-224-EFhHva6sPI602H4eKnrcWQ-1; Fri, 07 Feb 2020 09:34:40 -0500
+X-MC-Unique: EFhHva6sPI602H4eKnrcWQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4339107B280;
-        Fri,  7 Feb 2020 14:27:45 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B4E7A60BEC;
-        Fri,  7 Feb 2020 14:27:38 +0000 (UTC)
-From:   Eric Auger <eric.auger@redhat.com>
-To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com
-Cc:     thuth@redhat.com, drjones@redhat.com, wei.huang2@amd.com,
-        krish.sadhukhan@oracle.com
-Subject: [PATCH v5 4/4] selftests: KVM: SVM: Add vmcall test
-Date:   Fri,  7 Feb 2020 15:27:15 +0100
-Message-Id: <20200207142715.6166-5-eric.auger@redhat.com>
-In-Reply-To: <20200207142715.6166-1-eric.auger@redhat.com>
-References: <20200207142715.6166-1-eric.auger@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81959DBCE;
+        Fri,  7 Feb 2020 14:34:38 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-143.ams2.redhat.com [10.36.116.143])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10A8C790FC;
+        Fri,  7 Feb 2020 14:34:32 +0000 (UTC)
+Subject: Re: [PATCH 07/35] KVM: s390: add new variants of UV CALL
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-8-borntraeger@de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <e387472b-4417-9079-2df2-8f6f1689093e@redhat.com>
+Date:   Fri, 7 Feb 2020 15:34:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200207113958.7320-8-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-L2 guest calls vmcall and L1 checks the exit status does
-correspond.
+On 07/02/2020 12.39, Christian Borntraeger wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> This add 2 new variants of the UV CALL.
+> 
+> The first variant handles UV CALLs that might have longer busy
+> conditions or just need longer when doing partial completion. We should
+> schedule when necessary.
+> 
+> The second variant handles UV CALLs that only need the handle but have
+> no payload (e.g. destroying a VM). We can provide a simple wrapper for
+> those.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/include/asm/uv.h | 59 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 59 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 1b97230a57ba..e1cef772fde1 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -14,6 +14,7 @@
+>  #include <linux/types.h>
+>  #include <linux/errno.h>
+>  #include <linux/bug.h>
+> +#include <linux/sched.h>
+>  #include <asm/page.h>
+>  #include <asm/gmap.h>
+>  
+> @@ -91,6 +92,19 @@ struct uv_cb_cfs {
+>  	u64 paddr;
+>  } __packed __aligned(8);
+>  
+> +/*
+> + * A common UV call struct for calls that take no payload
+> + * Examples:
+> + * Destroy cpu/config
+> + * Verify
+> + */
+> +struct uv_cb_nodata {
+> +	struct uv_cb_header header;
+> +	u64 reserved08[2];
+> +	u64 handle;
+> +	u64 reserved20[4];
+> +} __packed __aligned(8);
+> +
+>  struct uv_cb_share {
+>  	struct uv_cb_header header;
+>  	u64 reserved08[3];
+> @@ -98,6 +112,31 @@ struct uv_cb_share {
+>  	u64 reserved28;
+>  } __packed __aligned(8);
+>  
+> +/*
+> + * Low level uv_call that takes r1 and r2 as parameter and avoids
+> + * stalls for long running busy conditions by doing schedule
+> + */
+> +static inline int uv_call_sched(unsigned long r1, unsigned long r2)
+> +{
+> +	int cc;
+> +
+> +	do {
+> +		asm volatile(
+> +			"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
+> +			"		ipm	%[cc]\n"
+> +			"		srl	%[cc],28\n"
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
+Maybe remove one TAB before "ipm" and "srl" ?
 
----
+Apart from that, patch looks fine to me now.
 
-v4 -> v5:
-- rename l2_vmcall into l2_guest_code
-
-v3 -> v4:
-- remove useless includes
-- collected Lin's R-b
-
-v2 -> v3:
-- remove useless comment and add Vitaly's R-b
----
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../selftests/kvm/x86_64/svm_vmcall_test.c    | 79 +++++++++++++++++++
- 2 files changed, 80 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftes=
-ts/kvm/Makefile
-index fb2fa62d7dd5..d91c53b726e6 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -26,6 +26,7 @@ TEST_GEN_PROGS_x86_64 +=3D x86_64/vmx_dirty_log_test
- TEST_GEN_PROGS_x86_64 +=3D x86_64/vmx_set_nested_state_test
- TEST_GEN_PROGS_x86_64 +=3D x86_64/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86_64 +=3D x86_64/xss_msr_test
-+TEST_GEN_PROGS_x86_64 +=3D x86_64/svm_vmcall_test
- TEST_GEN_PROGS_x86_64 +=3D clear_dirty_log_test
- TEST_GEN_PROGS_x86_64 +=3D dirty_log_test
- TEST_GEN_PROGS_x86_64 +=3D kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c b/tools=
-/testing/selftests/kvm/x86_64/svm_vmcall_test.c
-new file mode 100644
-index 000000000000..d74ab0cc06d0
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
-@@ -0,0 +1,79 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * svm_vmcall_test
-+ *
-+ * Copyright (C) 2020, Red Hat, Inc.
-+ *
-+ * Nested SVM testing: VMCALL
-+ */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+
-+#define VCPU_ID		5
-+
-+static struct kvm_vm *vm;
-+
-+static inline void l2_guest_code(struct svm_test_data *svm)
-+{
-+	__asm__ __volatile__("vmcall");
-+}
-+
-+static void l1_guest_code(struct svm_test_data *svm)
-+{
-+	#define L2_GUEST_STACK_SIZE 64
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb =3D svm->vmcb;
-+
-+	/* Prepare for L2 execution. */
-+	generic_svm_setup(svm, l2_guest_code,
-+			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT(vmcb->control.exit_code =3D=3D SVM_EXIT_VMMCALL);
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	vm_vaddr_t svm_gva;
-+
-+	nested_svm_check_supported();
-+
-+	vm =3D vm_create_default(VCPU_ID, 0, (void *) l1_guest_code);
-+	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+
-+	vcpu_alloc_svm(vm, &svm_gva);
-+	vcpu_args_set(vm, VCPU_ID, 1, svm_gva);
-+
-+	for (;;) {
-+		volatile struct kvm_run *run =3D vcpu_state(vm, VCPU_ID);
-+		struct ucall uc;
-+
-+		vcpu_run(vm, VCPU_ID);
-+		TEST_ASSERT(run->exit_reason =3D=3D KVM_EXIT_IO,
-+			    "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
-+			    run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_ABORT:
-+			TEST_ASSERT(false, "%s",
-+				    (const char *)uc.args[0]);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_ASSERT(false,
-+				    "Unknown ucall 0x%x.", uc.cmd);
-+		}
-+	}
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
---=20
-2.20.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
