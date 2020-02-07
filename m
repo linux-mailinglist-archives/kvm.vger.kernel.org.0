@@ -2,199 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FB08155C79
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 18:03:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96958155C90
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 18:05:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727032AbgBGRDC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 12:03:02 -0500
-Received: from foss.arm.com ([217.140.110.172]:42242 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726867AbgBGRDC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 12:03:02 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8D091FB;
-        Fri,  7 Feb 2020 09:03:01 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D8C723F68E;
-        Fri,  7 Feb 2020 09:03:00 -0800 (PST)
-Date:   Fri, 7 Feb 2020 17:02:51 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     will@kernel.org, julien.thierry.kdev@gmail.com
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
-        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com, maz@kernel.org
-Subject: Re: [PATCH v2 kvmtool 00/30] Add reassignable BARs and PCIE 1.1
- support
-Message-ID: <20200207170251.29efc6b4@donnerap.cambridge.arm.com>
-In-Reply-To: <20200123134805.1993-1-alexandru.elisei@arm.com>
-References: <20200123134805.1993-1-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1727546AbgBGRFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 12:05:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49539 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726956AbgBGRFE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 12:05:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581095104;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=W/mzwS+af3IHrG/BFwWznCkZFHf8eWaEKxp9UaXyBTw=;
+        b=GKDS7DGLwyM58djj2/+w5epqUJNUTfhIFPOufZENcFqUcDCCC2Sd3Lz4vzwiKWqPnUK1Vg
+        eV5aFbtLbVt/f1/UvwMg3coQzLt4Fdm+wqGs2nCn4odqPSvY5U+IIJzJxbL5whCYQC7BpY
+        VxyluW+JCx/JEle+WHxA72ztE/fXDk4=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-352--6n3MruRO9mjJrZ7Fj6sPQ-1; Fri, 07 Feb 2020 12:04:46 -0500
+X-MC-Unique: -6n3MruRO9mjJrZ7Fj6sPQ-1
+Received: by mail-qk1-f197.google.com with SMTP id 24so1834788qka.16
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 09:04:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=W/mzwS+af3IHrG/BFwWznCkZFHf8eWaEKxp9UaXyBTw=;
+        b=oMgJFL8U+sTV8bm6hUhhrTaI/0bmWV7O3iKawUcCmIYlaRmKNu3/MEO4rCLRJKD0Bb
+         MsKyVlPrgFhdRbXN9rkCvSy4yaXhGqlqBSX96/jftKuMcLpbYlveV9U4G+xkuzMdH+jk
+         sB4BjWg/ymezRnvGCf2nUGSnZBn4q6NzhsGjYQZjKUPG8BqNyiyvwt1ZvyoXQuTs7om0
+         kXJK87OGtyeFVp3XPO4ExoxItUUjRuo92lWTAexSYZiGFP0CvWVpPTqHYuJT3J7QctRu
+         i6vNK1JuKMYWz0cYID4ReWGZjsdyY1wLWJaGnX1qN29Ziy24/T0n4Jke9q71+wPiVIny
+         VRIw==
+X-Gm-Message-State: APjAAAXrqj8p0V8SzmSUM4NHoO9VnqkNzBw0E8ik+f9r6DIeQHSFjCFc
+        jr8POE8oQWwkGLhueOQ1ksV/hBZzIES9mxscSerfQeTCcPWsSpyce+Sx4Aq3jcg+FuenQn2sRKU
+        xoaKeUPxmAK8j
+X-Received: by 2002:ac8:540f:: with SMTP id b15mr8284825qtq.237.1581095086455;
+        Fri, 07 Feb 2020 09:04:46 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw1G0WIFJFzF3ZaR8RGw77pX9iDrwBoxVk9+CVkdk7fCeK283mLiW1K0rb7VbrSqZfB/uogkQ==
+X-Received: by 2002:ac8:540f:: with SMTP id b15mr8284804qtq.237.1581095086189;
+        Fri, 07 Feb 2020 09:04:46 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+        by smtp.gmail.com with ESMTPSA id z11sm1575949qkj.91.2020.02.07.09.04.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2020 09:04:45 -0800 (PST)
+Date:   Fri, 7 Feb 2020 12:04:43 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: Disable preemption in kvm_get_running_vcpu()
+Message-ID: <20200207170443.GB720553@xz-x1>
+References: <20200207163410.31276-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200207163410.31276-1-maz@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jan 2020 13:47:35 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Fri, Feb 07, 2020 at 04:34:10PM +0000, Marc Zyngier wrote:
+> Accessing a per-cpu variable only makes sense when preemption is
+> disabled (and the kernel does check this when the right debug options
+> are switched on).
+> 
+> For kvm_get_running_vcpu(), it is fine to return the value after
+> re-enabling preemption, as the preempt notifiers will make sure that
+> this is kept consistent across task migration (the comment above the
+> function hints at it, but lacks the crucial preemption management).
+> 
+> While we're at it, move the comment from the ARM code, which explains
+> why the whole thing works.
+> 
+> Fixes: 7495e22bb165 ("KVM: Move running VCPU from ARM to common code").
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/318984f6-bc36-33a3-abc6-bf2295974b06@huawei.com
 
-Hi Will,
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-I am done with reviewing this series. The first patches up to and including 07/30 are good to go, since they are fixes, I would be delighted to see them merged ASAP. You might want to add my R-b: tags to those.
-
-For the rest of the series I had some comments, but apart from two locking issues I don't see any showstoppers.
-If I understand correctly, Alex would send a new version soonish. Merging the first fixes now would help to make v3 less daunting regarding the number of patches ;-)
-
-Thanks,
-Andre
-
-> kvmtool uses the Linux-only dt property 'linux,pci-probe-only' to prevent
-> it from trying to reassign the BARs. Let's make the BARs reassignable so
-> we can get rid of this band-aid.
-> 
-> Let's also extend the legacy PCI emulation, which came out in 1992, so we
-> can properly emulate the PCI Express version 1.1 protocol, which is
-> relatively new, being published in 2005.
-> 
-> For this iteration, I have completely reworked the way BARs are
-> reassigned. As I was adding support for reassignable BARs to more devices,
-> it became clear to me that I was duplicating the same code over and over
-> again.  Furthermore, during device configuration, Linux can assign a region
-> resource to a BAR that temporarily overlaps with another device. With my
-> original approach, that meant that every device must be aware of the BAR
-> values for all the other devices.
-> 
-> With this new approach, the algorithm for activating/deactivating emulation
-> as BAR addresses change lives completely inside the PCI code. Each device
-> registers two callback functions which are called when device emulation is
-> activated (for example, to activate emulation for a newly assigned BAR
-> address), respectively, when device emulation is deactivated (a previous
-> BAR address is changed, and emulation for that region must be deactivated).
-> 
-> I also tried to do better at testing the patches. I have tested VFIO with
-> virtio-pci on an arm64 and a x86 machine:
-> 
-> 1. AMD Seattle: Intel 82574L Gigabit Ethernet card, Samsung 970 Pro NVME
-> (controller registers are in the same BAR region as the MSIX table and PBA,
-> I wrote a nasty hack to make it work, will try to upstream something after
-> this series), Realtek 8168 Gigabit Ethernet card, NVIDIA Quadro P400 (only
-> device detection), AMD Firepro W2100 (amdgpu driver fails probing
-> because of missing expansion ROM emulation in kvmtool, I will send patches
-> for this too), Myricom 10 Gigabit Ethernet card, Seagate Barracuda 1000GB
-> drive.
-> 
-> 2. Ryzen 3900x + Gigabyte x570 Aorus Master (bios F10): Realtek 8168
-> Gigabit Ethernet card, AMD Firepro W2100 (same issue as on Seattle).
-> 
-> Using the CFI flash emulation for kvmtool [1] and a hacked version of EDK2
-> as the firmware for the virtual machine, I was able download an official
-> debian arm64 installation iso, install debian and then run it. EDK2 patches
-> for kvmtool will be posted soon.
-> 
-> You will notice from the changelog that there are a lot of new patches
-> (17!), but most of them are fixes for stuff that I found while testing.
-> 
-> Patches 1-18 are fixes and cleanups, and can be merged independently. They
-> are pretty straightforward, so if the size of the series looks off-putting,
-> please review these first. I am aware that the series has grown quite a
-> lot, I am willing to split the fixes from the rest of the patches, or
-> whatever else can make reviewing easier.
-> 
-> Changes in v2:
-> * Patches 2, 11-18, 20, 22-27, 29 are new.
-> * Patches 11, 13, and 14 have been dropped.
-> * Reworked the way BAR reassignment is implemented.
-> * The patch "Add PCI Express 1.1 support" has been reworked to apply only
->   to arm64. For x86 we would need ACPI support in order to advertise the
->   location of the ECAM space.
-> * Gathered Reviewed-by tags.
-> * Implemented review comments.
-> 
-> [1] https://www.spinics.net/lists/arm-kernel/msg778623.html
-> 
-> Alexandru Elisei (24):
->   Makefile: Use correct objcopy binary when cross-compiling for x86_64
->   hw/i8042: Compile only for x86
->   Remove pci-shmem device
->   Check that a PCI device's memory size is power of two
->   arm/pci: Advertise only PCI bus 0 in the DT
->   vfio/pci: Allocate correct size for MSIX table and PBA BARs
->   vfio/pci: Don't assume that only even numbered BARs are 64bit
->   vfio/pci: Ignore expansion ROM BAR writes
->   vfio/pci: Don't access potentially unallocated regions
->   virtio: Don't ignore initialization failures
->   Don't ignore errors registering a device, ioport or mmio emulation
->   hw/vesa: Don't ignore fatal errors
->   hw/vesa: Set the size for BAR 0
->   Use independent read/write locks for ioport and mmio
->   pci: Add helpers for BAR values and memory/IO space access
->   virtio/pci: Get emulated region address from BARs
->   vfio: Destroy memslot when unmapping the associated VAs
->   vfio: Reserve ioports when configuring the BAR
->   vfio/pci: Don't write configuration value twice
->   pci: Implement callbacks for toggling BAR emulation
->   pci: Toggle BAR I/O and memory space emulation
->   pci: Implement reassignable BARs
->   vfio: Trap MMIO access to BAR addresses which aren't page aligned
->   arm/arm64: Add PCI Express 1.1 support
-> 
-> Julien Thierry (5):
->   ioport: pci: Move port allocations to PCI devices
->   pci: Fix ioport allocation size
->   arm/pci: Fix PCI IO region
->   virtio/pci: Make memory and IO BARs independent
->   arm/fdt: Remove 'linux,pci-probe-only' property
-> 
-> Sami Mujawar (1):
->   pci: Fix BAR resource sizing arbitration
-> 
->  Makefile                          |   6 +-
->  arm/fdt.c                         |   1 -
->  arm/include/arm-common/kvm-arch.h |   4 +-
->  arm/include/arm-common/pci.h      |   1 +
->  arm/ioport.c                      |   3 +-
->  arm/kvm.c                         |   3 +
->  arm/pci.c                         |  25 +-
->  builtin-run.c                     |   6 +-
->  hw/i8042.c                        |  14 +-
->  hw/pci-shmem.c                    | 400 ------------------------------
->  hw/vesa.c                         | 132 +++++++---
->  include/kvm/devices.h             |   3 +-
->  include/kvm/ioport.h              |  10 +-
->  include/kvm/kvm-config.h          |   2 +-
->  include/kvm/kvm.h                 |   9 +-
->  include/kvm/pci-shmem.h           |  32 ---
->  include/kvm/pci.h                 | 168 ++++++++++++-
->  include/kvm/util.h                |   2 +
->  include/kvm/vesa.h                |   6 +-
->  include/kvm/virtio-pci.h          |   3 -
->  include/kvm/virtio.h              |   7 +-
->  include/linux/compiler.h          |   2 +-
->  ioport.c                          |  57 ++---
->  kvm.c                             |  65 ++++-
->  mips/kvm.c                        |   3 +-
->  mmio.c                            |  26 +-
->  pci.c                             | 320 ++++++++++++++++++++++--
->  powerpc/include/kvm/kvm-arch.h    |   2 +-
->  powerpc/ioport.c                  |   3 +-
->  powerpc/spapr_pci.c               |   2 +-
->  vfio/core.c                       |  22 +-
->  vfio/pci.c                        | 231 +++++++++++++----
->  virtio/9p.c                       |   9 +-
->  virtio/balloon.c                  |  10 +-
->  virtio/blk.c                      |  14 +-
->  virtio/console.c                  |  11 +-
->  virtio/core.c                     |   9 +-
->  virtio/mmio.c                     |  13 +-
->  virtio/net.c                      |  32 +--
->  virtio/pci.c                      | 220 +++++++++++-----
->  virtio/scsi.c                     |  14 +-
->  x86/include/kvm/kvm-arch.h        |   2 +-
->  x86/ioport.c                      |  66 +++--
->  43 files changed, 1217 insertions(+), 753 deletions(-)
->  delete mode 100644 hw/pci-shmem.c
->  delete mode 100644 include/kvm/pci-shmem.h
-> 
+-- 
+Peter Xu
 
