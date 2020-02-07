@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 62FD5155DC4
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:18:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA30F155DC2
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:18:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727835AbgBGSS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 13:18:28 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:40728 "EHLO
+        id S1727778AbgBGSSX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 13:18:23 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:40730 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727379AbgBGSQr (ORCPT
+        by vger.kernel.org with ESMTP id S1727529AbgBGSQr (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 13:16:47 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id C5DCD305D3DC;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id CE12C305D3DD;
         Fri,  7 Feb 2020 20:16:39 +0200 (EET)
 Received: from host.bbu.bitdefender.biz (unknown [195.210.4.22])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id B608E3052068;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id BEAF43052069;
         Fri,  7 Feb 2020 20:16:39 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
@@ -24,9 +24,9 @@ Cc:     virtualization@lists.linux-foundation.org,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <ncitu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v7 25/78] KVM: x86: add .control_singlestep()
-Date:   Fri,  7 Feb 2020 20:15:43 +0200
-Message-Id: <20200207181636.1065-26-alazar@bitdefender.com>
+Subject: [RFC PATCH v7 26/78] KVM: x86: export kvm_arch_vcpu_set_guest_debug()
+Date:   Fri,  7 Feb 2020 20:15:44 +0200
+Message-Id: <20200207181636.1065-27-alazar@bitdefender.com>
 In-Reply-To: <20200207181636.1065-1-alazar@bitdefender.com>
 References: <20200207181636.1065-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -39,54 +39,68 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Nicușor Cîțu <ncitu@bitdefender.com>
 
-This function is needed for KVMI_VCPU_CONTROL_SINGLESTEP
-and KVMI_EVENT_SINGLESTEP.
+This function is needed for the KVMI_EVENT_BP event.
 
 Signed-off-by: Nicușor Cîțu <ncitu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/vmx/vmx.c          | 11 +++++++++++
- 2 files changed, 12 insertions(+)
+ arch/x86/kvm/x86.c       | 18 +++++++++++++-----
+ include/linux/kvm_host.h |  2 ++
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e05569a5da10..6927a6044e26 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1257,6 +1257,7 @@ struct kvm_x86_ops {
- 	u64 (*fault_gla)(struct kvm_vcpu *vcpu);
- 	bool (*spt_fault)(struct kvm_vcpu *vcpu);
- 	bool (*gpt_translation_fault)(struct kvm_vcpu *vcpu);
-+	void (*control_singlestep)(struct kvm_vcpu *vcpu, bool enable);
- };
- 
- struct kvm_arch_async_pf {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 83f047fe6bc1..475f5eb6c4c2 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7837,6 +7837,16 @@ static bool vmx_gpt_translation_fault(struct kvm_vcpu *vcpu)
- 	return true;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index fee24bb5fa52..c607148dcf63 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8927,14 +8927,12 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ 	return ret;
  }
  
-+static void vmx_control_singlestep(struct kvm_vcpu *vcpu, bool enable)
+-int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+-					struct kvm_guest_debug *dbg)
++int kvm_arch_vcpu_set_guest_debug(struct kvm_vcpu *vcpu,
++				 struct kvm_guest_debug *dbg)
+ {
+ 	unsigned long rflags;
+ 	int i, r;
+ 
+-	vcpu_load(vcpu);
+-
+ 	if (dbg->control & (KVM_GUESTDBG_INJECT_DB | KVM_GUESTDBG_INJECT_BP)) {
+ 		r = -EBUSY;
+ 		if (vcpu->arch.exception.pending)
+@@ -8980,10 +8978,20 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 	r = 0;
+ 
+ out:
+-	vcpu_put(vcpu);
+ 	return r;
+ }
+ 
++int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
++					struct kvm_guest_debug *dbg)
 +{
-+	if (enable)
-+		exec_controls_setbit(to_vmx(vcpu),
-+			      CPU_BASED_MONITOR_TRAP_FLAG);
-+	else
-+		exec_controls_clearbit(to_vmx(vcpu),
-+				CPU_BASED_MONITOR_TRAP_FLAG);
++	int ret;
++
++	vcpu_load(vcpu);
++	ret = kvm_arch_vcpu_set_guest_debug(vcpu, dbg);
++	vcpu_put(vcpu);
++	return ret;
 +}
 +
- static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
- 	.cpu_has_kvm_support = cpu_has_kvm_support,
- 	.disabled_by_bios = vmx_disabled_by_bios,
-@@ -7998,6 +8008,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
- 	.fault_gla = vmx_fault_gla,
- 	.spt_fault = vmx_spt_fault,
- 	.gpt_translation_fault = vmx_gpt_translation_fault,
-+	.control_singlestep = vmx_control_singlestep,
- };
+ /*
+  * Translate a guest virtual address to a guest physical address.
+  */
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index c7ef69015050..625f567f6120 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -869,6 +869,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state);
+ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 					struct kvm_guest_debug *dbg);
++int kvm_arch_vcpu_set_guest_debug(struct kvm_vcpu *vcpu,
++				 struct kvm_guest_debug *dbg);
+ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run);
  
- static void vmx_cleanup_l1d_flush(void)
+ int kvm_arch_init(void *opaque);
