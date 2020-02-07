@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D89F155DA1
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:17:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7901155D9C
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:17:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727621AbgBGSR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 13:17:29 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:40614 "EHLO
+        id S1727637AbgBGSRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 13:17:21 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:40646 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727635AbgBGSQx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 13:16:53 -0500
+        by vger.kernel.org with ESMTP id S1727582AbgBGSQz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 13:16:55 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 90790305D35E;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 9D0EC305D35F;
         Fri,  7 Feb 2020 20:16:41 +0200 (EET)
 Received: from host.bbu.bitdefender.biz (unknown [195.210.4.22])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 7B3833052074;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 91A553052066;
         Fri,  7 Feb 2020 20:16:41 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
@@ -23,11 +23,10 @@ Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <ncitu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v7 64/78] KVM: introspection: add KVMI_EVENT_XSETBV
-Date:   Fri,  7 Feb 2020 20:16:22 +0200
-Message-Id: <20200207181636.1065-65-alazar@bitdefender.com>
+Subject: [RFC PATCH v7 65/78] KVM: introspection: add KVMI_VCPU_GET_XSAVE
+Date:   Fri,  7 Feb 2020 20:16:23 +0200
+Message-Id: <20200207181636.1065-66-alazar@bitdefender.com>
 In-Reply-To: <20200207181636.1065-1-alazar@bitdefender.com>
 References: <20200207181636.1065-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -40,298 +39,217 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Mihai Donțu <mdontu@bitdefender.com>
 
-This event is sent when the extended control register XCR0 is going to
-be changed.
+This vCPU command is used to get the XSAVE area.
 
 Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
-Co-developed-by: Nicușor Cîțu <ncitu@bitdefender.com>
-Signed-off-by: Nicușor Cîțu <ncitu@bitdefender.com>
+Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst               | 26 ++++++
- arch/x86/include/asm/kvmi_host.h              |  2 +
- arch/x86/kvm/x86.c                            |  6 ++
- include/uapi/linux/kvmi.h                     |  1 +
- .../testing/selftests/kvm/x86_64/kvmi_test.c  | 83 +++++++++++++++++++
- virt/kvm/introspection/kvmi_int.h             |  1 +
- virt/kvm/introspection/kvmi_msg.c             | 39 +++++++++
- 7 files changed, 158 insertions(+)
+ Documentation/virt/kvm/kvmi.rst               | 31 +++++++++++++++++++
+ arch/x86/include/uapi/asm/kvmi.h              |  4 +++
+ arch/x86/kvm/kvmi.c                           | 21 +++++++++++++
+ include/uapi/linux/kvmi.h                     |  2 ++
+ .../testing/selftests/kvm/x86_64/kvmi_test.c  | 21 +++++++++++++
+ virt/kvm/introspection/kvmi_int.h             |  4 +++
+ virt/kvm/introspection/kvmi_msg.c             | 17 ++++++++++
+ 7 files changed, 100 insertions(+)
 
 diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index c1badcde1662..8b43e0f80f77 100644
+index 8b43e0f80f77..5d2b828f2159 100644
 --- a/Documentation/virt/kvm/kvmi.rst
 +++ b/Documentation/virt/kvm/kvmi.rst
-@@ -534,6 +534,7 @@ the following events::
- 	KVMI_EVENT_CR
- 	KVMI_EVENT_HYPERCALL
- 	KVMI_EVENT_TRAP
-+	KVMI_EVENT_XSETBV
+@@ -756,6 +756,37 @@ memory slots allocated by KVM, considering all address spaces indicated
+ by KVM_ADDRESS_SPACE_NUM. Stricly speaking, the returned value refers
+ to the first inaccessible GFN, next to the maximum accessible GFN.
  
- When an event is enabled, the introspection tool is notified and it
- must reply with: continue, retry, crash, etc. (see **Events** below).
-@@ -999,3 +1000,28 @@ took place and the introspection has been enabled for this event
- ``kvmi_event``, exception/interrupt number (vector), exception code
- (``error_code``) and CR2 are sent to the introspection tool,
- which should check if its exception has been injected or overridden.
++17. KVMI_VCPU_GET_XSAVE
++-----------------------
 +
-+7. KVMI_EVENT_XSETBV
-+--------------------
-+
-+:Architectures: x86
++:Architecture: x86
 +:Versions: >= 1
-+:Actions: CONTINUE, CRASH
 +:Parameters:
 +
 +::
 +
-+	struct kvmi_event;
++	struct kvmi_vcpu_hdr;
 +
 +:Returns:
 +
 +::
 +
-+	struct kvmi_vcpu_hdr;
-+	struct kvmi_event_reply;
++	struct kvmi_error_code;
++	struct kvmi_vcpu_get_xsave_reply {
++		__u32 region[0];
++	};
 +
-+This event is sent when the extended control register XCR0 is going
-+to be changed and the introspection has been enabled for this event
-+(see *KVMI_VCPU_CONTROL_EVENTS*).
++Returns a buffer containing the XSAVE area. Currently, the size of
++``kvm_xsave`` is used, but it could change. The userspace should get
++the buffer size from the message size.
 +
-+``kvmi_event`` is sent to the introspection tool.
-diff --git a/arch/x86/include/asm/kvmi_host.h b/arch/x86/include/asm/kvmi_host.h
-index 24f3f8fdee62..b3fa950362db 100644
---- a/arch/x86/include/asm/kvmi_host.h
-+++ b/arch/x86/include/asm/kvmi_host.h
-@@ -30,6 +30,7 @@ bool kvmi_cr_event(struct kvm_vcpu *vcpu, unsigned int cr,
- 		   unsigned long old_value, unsigned long *new_value);
- bool kvmi_cr3_intercepted(struct kvm_vcpu *vcpu);
- bool kvmi_monitor_cr3w_intercept(struct kvm_vcpu *vcpu, bool enable);
-+void kvmi_xsetbv_event(struct kvm_vcpu *vcpu);
- 
- #else /* CONFIG_KVM_INTROSPECTION */
- 
-@@ -41,6 +42,7 @@ static inline bool kvmi_cr_event(struct kvm_vcpu *vcpu, unsigned int cr,
- static inline bool kvmi_cr3_intercepted(struct kvm_vcpu *vcpu) { return false; }
- static inline bool kvmi_monitor_cr3w_intercept(struct kvm_vcpu *vcpu,
- 						bool enable) { return false; }
-+static inline void kvmi_xsetbv_event(struct kvm_vcpu *vcpu) { }
- 
- #endif /* CONFIG_KVM_INTROSPECTION */
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ff61123ce4bd..fa583f82298e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -866,6 +866,12 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
- 	}
- 	vcpu->arch.xcr0 = xcr0;
- 
-+#ifdef CONFIG_KVM_INTROSPECTION
-+	if (index == 0 && xcr0 != old_xcr0)
-+		kvmi_xsetbv_event(vcpu);
-+#endif /* CONFIG_KVM_INTROSPECTION */
++:Errors:
 +
++* -KVM_EINVAL - the selected vCPU is invalid
++* -KVM_EINVAL - padding is not zero
++* -KVM_EAGAIN - the selected vCPU can't be introspected yet
++* -KVM_ENOMEM - not enough memory to allocate the reply
 +
- 	if ((xcr0 ^ old_xcr0) & XFEATURE_MASK_EXTEND)
- 		kvm_update_cpuid(vcpu);
- 	return 0;
+ Events
+ ======
+ 
+diff --git a/arch/x86/include/uapi/asm/kvmi.h b/arch/x86/include/uapi/asm/kvmi.h
+index 06f69cfa3d79..68ad3d737d7e 100644
+--- a/arch/x86/include/uapi/asm/kvmi.h
++++ b/arch/x86/include/uapi/asm/kvmi.h
+@@ -97,4 +97,8 @@ struct kvmi_vcpu_inject_exception {
+ 	__u64 address;
+ };
+ 
++struct kvmi_vcpu_get_xsave_reply {
++	__u32 region[0];
++};
++
+ #endif /* _UAPI_ASM_X86_KVMI_H */
+diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
+index ac493fcebb5b..f8fd8ce140c5 100644
+--- a/arch/x86/kvm/kvmi.c
++++ b/arch/x86/kvm/kvmi.c
+@@ -616,3 +616,24 @@ void kvmi_arch_inject_pending_exception(struct kvm_vcpu *vcpu)
+ 
+ 	kvmi_save_injected_event(vcpu);
+ }
++
++int kvmi_arch_cmd_vcpu_get_xsave(struct kvm_vcpu *vcpu,
++				 struct kvmi_vcpu_get_xsave_reply **dest,
++				 size_t *dest_size)
++{
++	struct kvmi_vcpu_get_xsave_reply *rpl = NULL;
++	size_t rpl_size = sizeof(*rpl) + sizeof(struct kvm_xsave);
++	struct kvm_xsave *area;
++
++	rpl = kvmi_msg_alloc_check(rpl_size);
++	if (!rpl)
++		return -KVM_ENOMEM;
++
++	area = (struct kvm_xsave *) &rpl->region[0];
++	kvm_vcpu_ioctl_x86_get_xsave(vcpu, area);
++
++	*dest = rpl;
++	*dest_size = rpl_size;
++
++	return 0;
++}
 diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index 70d5a67badef..3ea4882ac469 100644
+index 3ea4882ac469..bc63c04a543d 100644
 --- a/include/uapi/linux/kvmi.h
 +++ b/include/uapi/linux/kvmi.h
-@@ -47,6 +47,7 @@ enum {
- 	KVMI_EVENT_BREAKPOINT = 3,
- 	KVMI_EVENT_CR         = 4,
- 	KVMI_EVENT_TRAP       = 5,
-+	KVMI_EVENT_XSETBV     = 6,
+@@ -37,6 +37,8 @@ enum {
  
- 	KVMI_NUM_EVENTS
+ 	KVMI_VM_GET_MAX_GFN = 17,
+ 
++	KVMI_VCPU_GET_XSAVE = 18,
++
+ 	KVMI_NUM_MESSAGES
  };
+ 
 diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-index 2852e6894e81..299f4d29d0d6 100644
+index 299f4d29d0d6..638491f33138 100644
 --- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-@@ -21,6 +21,8 @@
- 
- #define VCPU_ID         5
- 
-+#define X86_FEATURE_XSAVE	(1<<26)
-+
- static int socket_pair[2];
- #define Kvm_socket       socket_pair[0]
- #define Userspace_socket socket_pair[1]
-@@ -53,6 +55,7 @@ enum {
- 	GUEST_TEST_BP,
- 	GUEST_TEST_CR,
- 	GUEST_TEST_HYPERCALL,
-+	GUEST_TEST_XSETBV,
- };
- 
- #define GUEST_REQUEST_TEST()     GUEST_SYNC(0)
-@@ -84,6 +87,45 @@ static void guest_hypercall_test(void)
- 	asm volatile(".byte 0x0f,0x01,0xc1");
+@@ -1322,6 +1322,26 @@ static void test_event_xsetbv(struct kvm_vm *vm)
+ 	disable_vcpu_event(vm, event_id);
  }
  
-+/* from fpu/internal.h */
-+static u64 xgetbv(u32 index)
++static void test_cmd_vcpu_get_xsave(struct kvm_vm *vm)
 +{
-+	u32 eax, edx;
-+
-+	asm volatile(".byte 0x0f,0x01,0xd0" /* xgetbv */
-+		     : "=a" (eax), "=d" (edx)
-+		     : "c" (index));
-+	return eax + ((u64)edx << 32);
-+}
-+
-+/* from fpu/internal.h */
-+static void xsetbv(u32 index, u64 value)
-+{
-+	u32 eax = value;
-+	u32 edx = value >> 32;
-+
-+	asm volatile(".byte 0x0f,0x01,0xd1" /* xsetbv */
-+		     : : "a" (eax), "d" (edx), "c" (index));
-+}
-+
-+static void guest_xsetbv_test(void)
-+{
-+	const int SSE_BIT = 1 << 1;
-+	const int AVX_BIT = 1 << 2;
-+	u64 xcr0;
-+
-+	/* avoid #UD */
-+	set_cr4(get_cr4() | X86_CR4_OSXSAVE);
-+
-+	xcr0 = xgetbv(0);
-+	if (xcr0 & AVX_BIT)
-+		xcr0 &= ~AVX_BIT;
-+	else
-+		xcr0 |= (AVX_BIT | SSE_BIT);
-+
-+	xsetbv(0, xcr0);
-+}
-+
- static void guest_code(void)
- {
- 	while (true) {
-@@ -99,6 +141,9 @@ static void guest_code(void)
- 		case GUEST_TEST_HYPERCALL:
- 			guest_hypercall_test();
- 			break;
-+		case GUEST_TEST_XSETBV:
-+			guest_xsetbv_test();
-+			break;
- 		}
- 		GUEST_SIGNAL_TEST_DONE();
- 	}
-@@ -1240,6 +1285,43 @@ static void test_cmd_vm_get_max_gfn(void)
- 	DEBUG("max_gfn: 0x%llx\n", rpl.gfn);
- }
- 
-+static void test_event_xsetbv(struct kvm_vm *vm)
-+{
-+	struct vcpu_worker_data data = {
-+		.vm = vm,
-+		.vcpu_id = VCPU_ID,
-+		.test_id = GUEST_TEST_XSETBV,
-+	};
-+	__u16 event_id = KVMI_EVENT_XSETBV;
 +	struct kvm_cpuid_entry2 *entry;
-+	struct vcpu_reply rpl = {};
-+	struct kvmi_msg_hdr hdr;
-+	pthread_t vcpu_thread;
-+	struct kvmi_event ev;
++	struct {
++		struct kvmi_msg_hdr hdr;
++		struct kvmi_vcpu_hdr vcpu_hdr;
++	} req = {};
++	struct kvm_xsave rpl;
 +
 +	entry = kvm_get_supported_cpuid_entry(1);
 +	if (!(entry->ecx & X86_FEATURE_XSAVE)) {
-+		DEBUG("XSAVE is not supported, ecx 0x%x, skipping xsetbv test\n",
++		DEBUG("XSAVE is not supported, ecx 0x%x, skipping xsave test\n",
 +			entry->ecx);
 +		return;
 +	}
 +
-+	enable_vcpu_event(vm, event_id);
-+
-+	vcpu_thread = start_vcpu_worker(&data);
-+
-+	receive_event(&hdr, &ev, sizeof(ev), event_id);
-+
-+	DEBUG("XSETBV event, rip 0x%llx\n", ev.arch.regs.rip);
-+
-+	reply_to_event(&hdr, &ev, KVMI_EVENT_ACTION_CONTINUE,
-+			&rpl, sizeof(rpl));
-+
-+	stop_vcpu_worker(vcpu_thread, &data);
-+
-+	disable_vcpu_event(vm, event_id);
++	test_vcpu0_command(vm, KVMI_VCPU_GET_XSAVE, &req.hdr, sizeof(req),
++			   &rpl, sizeof(rpl));
 +}
 +
  static void test_introspection(struct kvm_vm *vm)
  {
  	setup_socket();
-@@ -1264,6 +1346,7 @@ static void test_introspection(struct kvm_vm *vm)
- 	test_cmd_vcpu_control_cr(vm);
+@@ -1347,6 +1367,7 @@ static void test_introspection(struct kvm_vm *vm)
  	test_cmd_vcpu_inject_exception(vm);
  	test_cmd_vm_get_max_gfn();
-+	test_event_xsetbv(vm);
+ 	test_event_xsetbv(vm);
++	test_cmd_vcpu_get_xsave(vm);
  
  	unhook_introspection(vm);
  }
 diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
-index 65a5801f143c..5a00e38c88cc 100644
+index 5a00e38c88cc..5e1231f09440 100644
 --- a/virt/kvm/introspection/kvmi_int.h
 +++ b/virt/kvm/introspection/kvmi_int.h
-@@ -27,6 +27,7 @@
- 			  | BIT(KVMI_EVENT_HYPERCALL) \
- 			  | BIT(KVMI_EVENT_TRAP) \
- 			  | BIT(KVMI_EVENT_PAUSE_VCPU) \
-+			  | BIT(KVMI_EVENT_XSETBV) \
+@@ -47,6 +47,7 @@
+ 			| BIT(KVMI_VCPU_CONTROL_EVENTS) \
+ 			| BIT(KVMI_VCPU_GET_CPUID) \
+ 			| BIT(KVMI_VCPU_GET_REGISTERS) \
++			| BIT(KVMI_VCPU_GET_XSAVE) \
+ 			| BIT(KVMI_VCPU_INJECT_EXCEPTION) \
+ 			| BIT(KVMI_VCPU_SET_REGISTERS) \
  		)
+@@ -135,5 +136,8 @@ int kvmi_arch_cmd_vcpu_inject_exception(struct kvm_vcpu *vcpu, u8 vector,
+ 					u32 error_code, u64 address);
+ void kvmi_arch_trap_event(struct kvm_vcpu *vcpu);
+ void kvmi_arch_inject_pending_exception(struct kvm_vcpu *vcpu);
++int kvmi_arch_cmd_vcpu_get_xsave(struct kvm_vcpu *vcpu,
++				 struct kvmi_vcpu_get_xsave_reply **dest,
++				 size_t *dest_size);
  
- #define KVMI_KNOWN_EVENTS (KVMI_KNOWN_VM_EVENTS | KVMI_KNOWN_VCPU_EVENTS)
+ #endif
 diff --git a/virt/kvm/introspection/kvmi_msg.c b/virt/kvm/introspection/kvmi_msg.c
-index 94fab70b56fa..ba2d7c6acb22 100644
+index ba2d7c6acb22..1639f5eab68b 100644
 --- a/virt/kvm/introspection/kvmi_msg.c
 +++ b/virt/kvm/introspection/kvmi_msg.c
-@@ -956,3 +956,42 @@ u32 kvmi_msg_send_bp(struct kvm_vcpu *vcpu, u64 gpa, u8 insn_len)
- 
- 	return action;
+@@ -31,6 +31,7 @@ static const char *const msg_IDs[] = {
+ 	[KVMI_VCPU_GET_CPUID]        = "KVMI_VCPU_GET_CPUID",
+ 	[KVMI_VCPU_GET_INFO]         = "KVMI_VCPU_GET_INFO",
+ 	[KVMI_VCPU_GET_REGISTERS]    = "KVMI_VCPU_GET_REGISTERS",
++	[KVMI_VCPU_GET_XSAVE]        = "KVMI_VCPU_GET_XSAVE",
+ 	[KVMI_VCPU_INJECT_EXCEPTION] = "KVMI_VCPU_INJECT_EXCEPTION",
+ 	[KVMI_VCPU_PAUSE]            = "KVMI_VCPU_PAUSE",
+ 	[KVMI_VCPU_SET_REGISTERS]    = "KVMI_VCPU_SET_REGISTERS",
+@@ -526,6 +527,21 @@ static int handle_vcpu_inject_exception(const struct kvmi_vcpu_cmd_job *job,
+ 	return kvmi_msg_vcpu_reply(job, msg, ec, NULL, 0);
  }
-+
-+static u32 kvmi_send_xsetbv(struct kvm_vcpu *vcpu)
+ 
++static int handle_vcpu_get_xsave(const struct kvmi_vcpu_cmd_job *job,
++				 const struct kvmi_msg_hdr *msg,
++				 const void *req)
 +{
-+	int err, action;
++	struct kvmi_vcpu_get_xsave_reply *rpl = NULL;
++	size_t rpl_size = 0;
++	int err, ec;
 +
-+	err = kvmi_send_event(vcpu, KVMI_EVENT_XSETBV, NULL, 0,
-+			      NULL, 0, &action);
-+	if (err)
-+		return KVMI_EVENT_ACTION_CONTINUE;
++	ec = kvmi_arch_cmd_vcpu_get_xsave(job->vcpu, &rpl, &rpl_size);
 +
-+	return action;
++	err = kvmi_msg_vcpu_reply(job, msg, ec, rpl, rpl_size);
++	kvmi_msg_free(rpl);
++	return err;
 +}
 +
-+static void __kvmi_xsetbv_event(struct kvm_vcpu *vcpu)
-+{
-+	u32 action;
-+
-+	action = kvmi_send_xsetbv(vcpu);
-+	switch (action) {
-+	case KVMI_EVENT_ACTION_CONTINUE:
-+		break;
-+	default:
-+		kvmi_handle_common_event_actions(vcpu->kvm, action, "XSETBV");
-+	}
-+}
-+
-+void kvmi_xsetbv_event(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_introspection *kvmi;
-+
-+	kvmi = kvmi_get(vcpu->kvm);
-+	if (!kvmi)
-+		return;
-+
-+	if (is_event_enabled(vcpu, KVMI_EVENT_XSETBV))
-+		__kvmi_xsetbv_event(vcpu);
-+
-+	kvmi_put(vcpu->kvm);
-+}
+ /*
+  * These commands are executed on the vCPU thread. The receiving thread
+  * passes the messages using a newly allocated 'struct kvmi_vcpu_cmd_job'
+@@ -540,6 +556,7 @@ static int(*const msg_vcpu[])(const struct kvmi_vcpu_cmd_job *,
+ 	[KVMI_VCPU_GET_CPUID]        = handle_get_cpuid,
+ 	[KVMI_VCPU_GET_INFO]         = handle_get_vcpu_info,
+ 	[KVMI_VCPU_GET_REGISTERS]    = handle_get_registers,
++	[KVMI_VCPU_GET_XSAVE]        = handle_vcpu_get_xsave,
+ 	[KVMI_VCPU_INJECT_EXCEPTION] = handle_vcpu_inject_exception,
+ 	[KVMI_VCPU_SET_REGISTERS]    = handle_set_registers,
+ };
