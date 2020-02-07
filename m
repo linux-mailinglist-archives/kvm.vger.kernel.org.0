@@ -2,200 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B9411556C1
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 12:36:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4820F1556D0
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 12:40:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726857AbgBGLgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 06:36:25 -0500
-Received: from foss.arm.com ([217.140.110.172]:39300 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726798AbgBGLgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 06:36:25 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C26CE328;
-        Fri,  7 Feb 2020 03:36:22 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCB583F68E;
-        Fri,  7 Feb 2020 03:36:21 -0800 (PST)
-Date:   Fri, 7 Feb 2020 11:36:19 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-Subject: Re: [PATCH v2 kvmtool 26/30] pci: Toggle BAR I/O and memory space
- emulation
-Message-ID: <20200207113619.26c11a24@donnerap.cambridge.arm.com>
-In-Reply-To: <2d14a067-7d7c-d7b4-90f3-72f5778a2fec@arm.com>
-References: <20200123134805.1993-1-alexandru.elisei@arm.com>
-        <20200123134805.1993-27-alexandru.elisei@arm.com>
-        <20200206182137.48894a54@donnerap.cambridge.arm.com>
-        <2d14a067-7d7c-d7b4-90f3-72f5778a2fec@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1727422AbgBGLkJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 06:40:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50638 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727305AbgBGLkJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 06:40:09 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 017BaBFH150237;
+        Fri, 7 Feb 2020 06:40:05 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y0m79r8j9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Feb 2020 06:40:04 -0500
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 017BbB1a152717;
+        Fri, 7 Feb 2020 06:40:03 -0500
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y0m79r8hf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Feb 2020 06:40:03 -0500
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 017BcmY1015311;
+        Fri, 7 Feb 2020 11:40:01 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma04wdc.us.ibm.com with ESMTP id 2xykc9vtpb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Feb 2020 11:40:01 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 017Be08452167154
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 7 Feb 2020 11:40:00 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3AAB5AC05E;
+        Fri,  7 Feb 2020 11:40:00 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2981DAC059;
+        Fri,  7 Feb 2020 11:40:00 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.17.106])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri,  7 Feb 2020 11:40:00 +0000 (GMT)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH 00/35] KVM: s390: Add support for protected VMs
+Date:   Fri,  7 Feb 2020 06:39:23 -0500
+Message-Id: <20200207113958.7320-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-07_01:2020-02-07,2020-02-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0
+ clxscore=1015 suspectscore=0 mlxlogscore=999 malwarescore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002070089
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 7 Feb 2020 11:08:19 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-Hi,
+Upfront: This series contains a "pretty small" common code memory
+management change that will allow paging, guest backing with files etc
+almost just like normal VMs. It should be a no-op for all architectures
+not opting in. And it should be usable for others that also try to get
+notified on "the pages are in the process of being used for things like
+I/O"
 
-> On 2/6/20 6:21 PM, Andre Przywara wrote:
-> > On Thu, 23 Jan 2020 13:48:01 +0000
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> >
-> > Hi,
-> >  
-> >> During configuration of the BAR addresses, a Linux guest disables and
-> >> enables access to I/O and memory space. When access is disabled, we don't
-> >> stop emulating the memory regions described by the BARs. Now that we have
-> >> callbacks for activating and deactivating emulation for a BAR region,
-> >> let's use that to stop emulation when access is disabled, and
-> >> re-activate it when access is re-enabled.
-> >>
-> >> The vesa emulation hasn't been designed with toggling on and off in
-> >> mind, so refuse writes to the PCI command register that disable memory
-> >> or IO access.
-> >>
-> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >> ---
-> >>  hw/vesa.c | 16 ++++++++++++++++
-> >>  pci.c     | 42 ++++++++++++++++++++++++++++++++++++++++++
-> >>  2 files changed, 58 insertions(+)
-> >>
-> >> diff --git a/hw/vesa.c b/hw/vesa.c
-> >> index 74ebebbefa6b..3044a86078fb 100644
-> >> --- a/hw/vesa.c
-> >> +++ b/hw/vesa.c
-> >> @@ -81,6 +81,18 @@ static int vesa__bar_deactivate(struct kvm *kvm,
-> >>  	return -EINVAL;
-> >>  }
-> >>  
-> >> +static void vesa__pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hdr,
-> >> +				u8 offset, void *data, int sz)
-> >> +{
-> >> +	u32 value;  
-> > I guess the same comment as on the other patch applies: using u64 looks safer to me. Also you should clear it, to avoid nasty surprises in case of a short write (1 or 2 bytes only).  
-> 
-> I was under the impression that the maximum size for a write to the PCI CAM or
-> ECAM space is 32 bits. This is certainly what I've seen when running Linux, and
-> the assumption in the PCI emulation code which has been working since 2010. I'm
-> trying to dig out more information about this.
-> 
-> If it's not, then we have a bigger problem because the PCI emulation code doesn't
-> support it, and to account for it we would need to add a certain amount of logic
-> to the code to deal with it: what if a write hits the command register and another
-> adjacent register? what if a write hits two BARs? A BAR and a regular register
-> before/after it? Part of a BAR and two registers before/after? You can see where
-> this is going.
-> 
-> Until we find exactly where in a PCI spec says that 64 bit writes to the
-> configuration space are allowed, I would rather avoid all this complexity and
-> assume that the guest is sane and will only write 32 bit values.
+I CCed linux-mm (and Andrew as mm maintainer and Andrea as he was
+involved in some design discussions) on the first patch (common code
+mm). I also added the CC to some other patches that make use of this
+infrastructure or are dealing with arch-specific memory management.
 
-I don't think it's allowed, but that's not the point here:
-If a (malicious?) guest does a 64-bit write, it will overwrite kvmtool's stack. We should not allow that. We don't need to behave correctly, but the guest should not be able to affect the host (VMM). All it should take is to have "u64 value = 0;" to fix that.
+The full patch queue is on the linux-s390 and kvm mailing list.  It
+would be good to get an ACK for this patch. I can then carry that via
+the s390 tree.
 
-Another possibility would be to filter for legal MMIO lengths earlier.
+Overview
+--------
+Protected VMs (PVM) are KVM VMs, where KVM can't access the VM's state
+like guest memory and guest registers anymore. Instead the PVMs are
+mostly managed by a new entity called Ultravisor (UV), which provides
+an API, so KVM and the PV can request management actions.
 
-Cheers,
-Andre.
+PVMs are encrypted at rest and protected from hypervisor access while
+running. They switch from a normal operation into protected mode, so
+we can still use the standard boot process to load a encrypted blob
+and then move it into protected mode.
 
-> 
-> Thanks,
-> Alex
-> >
-> > The rest looks alright.
-> >
-> > Cheers,
-> > Andre
-> >  
-> >> +
-> >> +	if (offset == PCI_COMMAND) {
-> >> +		memcpy(&value, data, sz);
-> >> +		value |= (PCI_COMMAND_IO | PCI_COMMAND_MEMORY);
-> >> +		memcpy(data, &value, sz);
-> >> +	}
-> >> +}
-> >> +
-> >>  struct framebuffer *vesa__init(struct kvm *kvm)
-> >>  {
-> >>  	struct vesa_dev *vdev;
-> >> @@ -114,6 +126,10 @@ struct framebuffer *vesa__init(struct kvm *kvm)
-> >>  		.bar_size[1]		= VESA_MEM_SIZE,
-> >>  	};
-> >>  
-> >> +	vdev->pci_hdr.cfg_ops = (struct pci_config_operations) {
-> >> +		.write	= vesa__pci_cfg_write,
-> >> +	};
-> >> +
-> >>  	vdev->fb = (struct framebuffer) {
-> >>  		.width			= VESA_WIDTH,
-> >>  		.height			= VESA_HEIGHT,
-> >> diff --git a/pci.c b/pci.c
-> >> index 5412f2defa2e..98331a1fc205 100644
-> >> --- a/pci.c
-> >> +++ b/pci.c
-> >> @@ -157,6 +157,42 @@ static struct ioport_operations pci_config_data_ops = {
-> >>  	.io_out	= pci_config_data_out,
-> >>  };
-> >>  
-> >> +static void pci_config_command_wr(struct kvm *kvm,
-> >> +				  struct pci_device_header *pci_hdr,
-> >> +				  u16 new_command)
-> >> +{
-> >> +	int i;
-> >> +	bool toggle_io, toggle_mem;
-> >> +
-> >> +	toggle_io = (pci_hdr->command ^ new_command) & PCI_COMMAND_IO;
-> >> +	toggle_mem = (pci_hdr->command ^ new_command) & PCI_COMMAND_MEMORY;
-> >> +
-> >> +	for (i = 0; i < 6; i++) {
-> >> +		if (!pci_bar_is_implemented(pci_hdr, i))
-> >> +			continue;
-> >> +
-> >> +		if (toggle_io && pci__bar_is_io(pci_hdr, i)) {
-> >> +			if (__pci__io_space_enabled(new_command))
-> >> +				pci_hdr->bar_activate_fn(kvm, pci_hdr, i,
-> >> +							 pci_hdr->data);
-> >> +			else
-> >> +				pci_hdr->bar_deactivate_fn(kvm, pci_hdr, i,
-> >> +							   pci_hdr->data);
-> >> +		}
-> >> +
-> >> +		if (toggle_mem && pci__bar_is_memory(pci_hdr, i)) {
-> >> +			if (__pci__memory_space_enabled(new_command))
-> >> +				pci_hdr->bar_activate_fn(kvm, pci_hdr, i,
-> >> +							 pci_hdr->data);
-> >> +			else
-> >> +				pci_hdr->bar_deactivate_fn(kvm, pci_hdr, i,
-> >> +							   pci_hdr->data);
-> >> +		}
-> >> +	}
-> >> +
-> >> +	pci_hdr->command = new_command;
-> >> +}
-> >> +
-> >>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
-> >>  {
-> >>  	void *base;
-> >> @@ -182,6 +218,12 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
-> >>  	if (*(u32 *)(base + offset) == 0)
-> >>  		return;
-> >>  
-> >> +	if (offset == PCI_COMMAND) {
-> >> +		memcpy(&value, data, size);
-> >> +		pci_config_command_wr(kvm, pci_hdr, (u16)value);
-> >> +		return;
-> >> +	}
-> >> +
-> >>  	bar = (offset - PCI_BAR_OFFSET(0)) / sizeof(u32);
-> >>  
-> >>  	/*  
+Rebooting is only possible by passing through the unprotected/normal
+mode and switching to protected again.
+
+All patches are in the protvirtv3 branch of the korg s390 kvm git
+https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git/log/?h=protvirtv3
+
+Claudio presented the technology at his presentation at KVM Forum
+2019.
+
+https://static.sched.com/hosted_files/kvmforum2019/3b/ibm_protected_vms_s390x.pdf
+
+
+RFCv2 -> v1 (you can diff the protvirtv2 and the protvirtv3 branch)
+- tons of review feedback integrated (see mail thread)
+- memory management now complete and working
+- Documentation patches merged
+- interrupt patches merged
+- CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST removed
+- SIDA interface integrated into memop
+- for merged patches I removed reviews that were not in all patches
+
+Christian Borntraeger (3):
+  KVM: s390/mm: Make pages accessible before destroying the guest
+  KVM: s390: protvirt: Add SCLP interrupt handling
+  KVM: s390: protvirt: do not inject interrupts after start
+
+Claudio Imbrenda (3):
+  mm:gup/writeback: add callbacks for inaccessible pages
+  s390/mm: provide memory management functions for protected KVM guests
+  KVM: s390/mm: handle guest unpin events
+
+Janosch Frank (23):
+  KVM: s390: add new variants of UV CALL
+  KVM: s390: protvirt: Add initial lifecycle handling
+  KVM: s390: protvirt: Add KVM api documentation
+  KVM: s390: protvirt: Secure memory is not mergeable
+  KVM: s390: protvirt: Handle SE notification interceptions
+  KVM: s390: protvirt: Instruction emulation
+  KVM: s390: protvirt: Handle spec exception loops
+  KVM: s390: protvirt: Add new gprs location handling
+  KVM: S390: protvirt: Introduce instruction data area bounce buffer
+  KVM: s390: protvirt: handle secure guest prefix pages
+  KVM: s390: protvirt: Write sthyi data to instruction data area
+  KVM: s390: protvirt: STSI handling
+  KVM: s390: protvirt: disallow one_reg
+  KVM: s390: protvirt: Only sync fmt4 registers
+  KVM: s390: protvirt: Add program exception injection
+  KVM: s390: protvirt: Add diag 308 subcode 8 - 10 handling
+  KVM: s390: protvirt: UV calls diag308 0, 1
+  KVM: s390: protvirt: Report CPU state to Ultravisor
+  KVM: s390: protvirt: Support cmd 5 operation state
+  KVM: s390: protvirt: Add UV debug trace
+  KVM: s390: protvirt: Mask PSW interrupt bits for interception 104 and
+    112
+  KVM: s390: protvirt: Add UV cpu reset calls
+  DOCUMENTATION: Protected virtual machine introduction and IPL
+
+Michael Mueller (2):
+  KVM: s390: protvirt: Add interruption injection controls
+  KVM: s390: protvirt: Implement interruption injection
+
+Ulrich Weigand (1):
+  KVM: s390/interrupt: do not pin adapter interrupt pages
+
+Vasily Gorbik (3):
+  s390/protvirt: introduce host side setup
+  s390/protvirt: add ultravisor initialization
+  s390/mm: add (non)secure page access exceptions handlers
+
+ .../admin-guide/kernel-parameters.txt         |   5 +
+ Documentation/virt/kvm/api.txt                |  67 ++-
+ Documentation/virt/kvm/index.rst              |   2 +
+ Documentation/virt/kvm/s390-pv-boot.rst       |  79 +++
+ Documentation/virt/kvm/s390-pv.rst            | 116 +++++
+ MAINTAINERS                                   |   1 +
+ arch/s390/boot/Makefile                       |   2 +-
+ arch/s390/boot/uv.c                           |  21 +-
+ arch/s390/include/asm/gmap.h                  |   3 +
+ arch/s390/include/asm/kvm_host.h              | 114 ++++-
+ arch/s390/include/asm/mmu.h                   |   2 +
+ arch/s390/include/asm/mmu_context.h           |   1 +
+ arch/s390/include/asm/page.h                  |   5 +
+ arch/s390/include/asm/pgtable.h               |  35 +-
+ arch/s390/include/asm/uv.h                    | 267 +++++++++-
+ arch/s390/kernel/Makefile                     |   1 +
+ arch/s390/kernel/pgm_check.S                  |   4 +-
+ arch/s390/kernel/setup.c                      |   7 +-
+ arch/s390/kernel/uv.c                         | 274 ++++++++++
+ arch/s390/kvm/Makefile                        |   2 +-
+ arch/s390/kvm/diag.c                          |   1 +
+ arch/s390/kvm/intercept.c                     | 109 +++-
+ arch/s390/kvm/interrupt.c                     | 371 +++++++++++---
+ arch/s390/kvm/kvm-s390.c                      | 477 ++++++++++++++++--
+ arch/s390/kvm/kvm-s390.h                      |  39 ++
+ arch/s390/kvm/priv.c                          |  11 +-
+ arch/s390/kvm/pv.c                            | 292 +++++++++++
+ arch/s390/mm/fault.c                          |  86 ++++
+ arch/s390/mm/gmap.c                           |  65 ++-
+ include/linux/gfp.h                           |   6 +
+ include/uapi/linux/kvm.h                      |  42 +-
+ mm/gup.c                                      |   2 +
+ mm/page-writeback.c                           |   1 +
+ 33 files changed, 2325 insertions(+), 185 deletions(-)
+ create mode 100644 Documentation/virt/kvm/s390-pv-boot.rst
+ create mode 100644 Documentation/virt/kvm/s390-pv.rst
+ create mode 100644 arch/s390/kernel/uv.c
+ create mode 100644 arch/s390/kvm/pv.c
+
+-- 
+2.24.0
 
