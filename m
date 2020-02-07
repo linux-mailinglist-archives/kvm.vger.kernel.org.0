@@ -2,88 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A0BC1553B4
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 09:30:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64EF51553B9
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 09:32:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726827AbgBGI2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 03:28:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54556 "EHLO
+        id S1726874AbgBGIcD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 03:32:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49228 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726130AbgBGI2J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 03:28:09 -0500
+        with ESMTP id S1726130AbgBGIcD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 03:32:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581064088;
+        s=mimecast20190719; t=1581064321;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZGjVa5zDX/EV/wwl3qhrGlYcIwyaFbMCvHGqatHqroU=;
-        b=OpCpdBAYZ+5vVH85XGD1cpIJ/5gzhd7hiMJjgVYfcPUcUdJxnTgHymM7wd7FBCJ8R9LibQ
-        w4v9pTuulevlCTrHhKFBhHZzl3jROydwbprV/koo0LkLJf6PIbiacHOCUA6z6kivQ1Mxrp
-        Ptwa7yegIIVXQ5DDvswMSnODAyr/c2Q=
+        bh=aL2Km/dBEpan3J9Haz80g0IwUlEFP1QZ7JNkl7An7tY=;
+        b=ibJ4yxev1VJkhnXCRsTivxFMgiZWoFP3RT+dG3G6j2XISdQ/aS3tS5igNxaJFZebVR8kxb
+        g8ygyM1rMcPaUf5WQBcFtJ0hraaX9SjNf8kSbC9zt9OVH4NKr/h9AX8OJdPNLDaGB7kWn3
+        va8VZrRoGlPxyxJlouOlzi+siBHgpAM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-m1vd_5_NOQCxoLhydiP4hw-1; Fri, 07 Feb 2020 03:28:07 -0500
-X-MC-Unique: m1vd_5_NOQCxoLhydiP4hw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-356-avDrBAESOwG3kSNcluShBA-1; Fri, 07 Feb 2020 03:31:55 -0500
+X-MC-Unique: avDrBAESOwG3kSNcluShBA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FF418018DE;
-        Fri,  7 Feb 2020 08:28:05 +0000 (UTC)
-Received: from gondolin (ovpn-117-112.ams2.redhat.com [10.36.117.112])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3EDAA87B11;
-        Fri,  7 Feb 2020 08:28:01 +0000 (UTC)
-Date:   Fri, 7 Feb 2020 09:27:59 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [RFCv2 34/37] KVM: s390: protvirt: Add UV debug trace
-Message-ID: <20200207092759.43450715.cohuck@redhat.com>
-In-Reply-To: <8b5857ac-d557-96e7-8164-3da42edc5a42@de.ibm.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
-        <20200203131957.383915-35-borntraeger@de.ibm.com>
-        <20200206104159.16130ccb.cohuck@redhat.com>
-        <8b5857ac-d557-96e7-8164-3da42edc5a42@de.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93BD68010D6;
+        Fri,  7 Feb 2020 08:31:54 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 05D3860BEC;
+        Fri,  7 Feb 2020 08:31:41 +0000 (UTC)
+Date:   Fri, 7 Feb 2020 09:31:38 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dinechin@redhat.com, sean.j.christopherson@intel.com,
+        pbonzini@redhat.com, jasowang@redhat.com, yan.y.zhao@intel.com,
+        mst@redhat.com, kevin.tian@intel.com, alex.williamson@redhat.com,
+        dgilbert@redhat.com, vkuznets@redhat.com
+Subject: Re: [PATCH 10/14] KVM: selftests: Use a single binary for
+ dirty/clear log test
+Message-ID: <20200207083138.2duukfbf5lykwzox@kamzik.brq.redhat.com>
+References: <20200205025105.367213-1-peterx@redhat.com>
+ <20200205025842.367575-1-peterx@redhat.com>
+ <20200205025842.367575-7-peterx@redhat.com>
+ <20200205092852.vjskgirqlnm5ebtv@kamzik.brq.redhat.com>
+ <20200205154617.GA378317@xz-x1>
+ <20200205171109.2a7ufrhiqowkqz6e@kamzik.brq.redhat.com>
+ <20200205173939.GD378317@xz-x1>
+ <20200206224042.GK700495@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200206224042.GK700495@xz-x1>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 7 Feb 2020 09:05:27 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> On 06.02.20 10:41, Cornelia Huck wrote:
-> > On Mon,  3 Feb 2020 08:19:54 -0500
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >   
-> >> From: Janosch Frank <frankja@linux.ibm.com>
-> >>
-> >> Let's have some debug traces which stay around for longer than the
-> >> guest.
-> >>
-> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >> ---
-> >>  arch/s390/kvm/kvm-s390.c | 10 +++++++++-
-> >>  arch/s390/kvm/kvm-s390.h |  9 +++++++++
-> >>  arch/s390/kvm/pv.c       | 21 +++++++++++++++++++--
-> >>  3 files changed, 37 insertions(+), 3 deletions(-)
-
-> > You often seem to log in pairs (into the per-vm dbf and into the new uv
-> > dbf). Would it make sense to introduce a new helper for that, or is
-> > that overkill?  
+On Thu, Feb 06, 2020 at 05:40:42PM -0500, Peter Xu wrote:
+> On Wed, Feb 05, 2020 at 12:39:39PM -0500, Peter Xu wrote:
+> > On Wed, Feb 05, 2020 at 06:11:09PM +0100, Andrew Jones wrote:
+> > > On Wed, Feb 05, 2020 at 10:46:17AM -0500, Peter Xu wrote:
+> > > > On Wed, Feb 05, 2020 at 10:28:52AM +0100, Andrew Jones wrote:
+> > > > > On Tue, Feb 04, 2020 at 09:58:38PM -0500, Peter Xu wrote:
+> > > > > > Remove the clear_dirty_log test, instead merge it into the existing
+> > > > > > dirty_log_test.  It should be cleaner to use this single binary to do
+> > > > > > both tests, also it's a preparation for the upcoming dirty ring test.
+> > > > > > 
+> > > > > > The default test will still be the dirty_log test.  To run the clear
+> > > > > > dirty log test, we need to specify "-M clear-log".
+> > > > > 
+> > > > > How about keeping most of these changes, which nicely clean up the
+> > > > > #ifdefs, but also keeping the separate test, which I think is the
+> > > > > preferred way to organize and execute selftests. We can use argv[0]
+> > > > > to determine which path to take rather than a command line parameter.
+> > > > 
+> > > > Hi, Drew,
+> > > > 
+> > > > How about we just create a few selftest links that points to the same
+> > > > test binary in Makefile?  I'm fine with compiling it for mulitple
+> > > > binaries too, just in case the makefile trick could be even easier.
+> > > 
+> > > I think I prefer the binaries. That way they can be selectively moved
+> > > and run elsewhere, i.e. each test is a standalone test.
+> > 
+> > Sure, will do.
 > 
-> I guess the logging will see several changes over time anyway. Let us start
-> with an initial variant. 
+> Or... Shall we still keep one binary, but by default run all the
+> supported logging mode in sequence in a single dirty_log_test?  Say,
+> run "./dirty_log_test" will run all supported tests one by one; run
+> "./dirty_log_test -M LOG_MODE" will only run specific mode.
+> 
+> With this patch it's fairly easy to achieve this too.
+>
 
-Fair enough.
+Works for me.
+
+Thanks,
+drew 
 
