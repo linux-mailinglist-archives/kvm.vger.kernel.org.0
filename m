@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 073D41556FF
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 12:40:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6ADB1556CF
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 12:40:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727599AbgBGLkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 06:40:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31786 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727076AbgBGLkH (ORCPT
+        id S1727387AbgBGLkJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 06:40:09 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22400 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727049AbgBGLkH (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 06:40:07 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 017Bd6eV091554;
-        Fri, 7 Feb 2020 06:40:04 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 017Bb4vV143330;
+        Fri, 7 Feb 2020 06:40:06 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y0mpp9mjc-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y0ktsc5us-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Feb 2020 06:40:06 -0500
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 017Bd0W1002454;
+        Fri, 7 Feb 2020 06:40:04 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y0ktsc5t4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 07 Feb 2020 06:40:04 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 017BdD00092058;
-        Fri, 7 Feb 2020 06:40:03 -0500
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y0mpp9mhc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Feb 2020 06:40:03 -0500
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 017BcnN6004034;
-        Fri, 7 Feb 2020 11:40:02 GMT
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 017BckgP031704;
+        Fri, 7 Feb 2020 11:40:03 GMT
 Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma01wdc.us.ibm.com with ESMTP id 2xykc9vtdv-1
+        by ppma04dal.us.ibm.com with ESMTP id 2xykca20vr-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Feb 2020 11:40:02 +0000
+        Fri, 07 Feb 2020 11:40:03 +0000
 Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 017Be1pt49676714
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 017Be1wp40173888
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Fri, 7 Feb 2020 11:40:01 GMT
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E77F8AC05F;
-        Fri,  7 Feb 2020 11:40:00 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 03FE4AC064;
+        Fri,  7 Feb 2020 11:40:01 +0000 (GMT)
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CD4E9AC064;
+        by IMSVA (Postfix) with ESMTP id E9F1CAC067;
         Fri,  7 Feb 2020 11:40:00 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.114.17.106])
         by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
@@ -56,12 +56,11 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
-        Andrew Morton <akpm@linux-foundation.org>,
+        Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
-Subject: [PATCH 06/35] s390/mm: add (non)secure page access exceptions handlers
-Date:   Fri,  7 Feb 2020 06:39:29 -0500
-Message-Id: <20200207113958.7320-7-borntraeger@de.ibm.com>
+Subject: [PATCH 07/35] KVM: s390: add new variants of UV CALL
+Date:   Fri,  7 Feb 2020 06:39:30 -0500
+Message-Id: <20200207113958.7320-8-borntraeger@de.ibm.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20200207113958.7320-1-borntraeger@de.ibm.com>
 References: <20200207113958.7320-1-borntraeger@de.ibm.com>
@@ -69,151 +68,127 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-07_01:2020-02-07,2020-02-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 clxscore=1015 suspectscore=0 lowpriorityscore=0
- adultscore=0 malwarescore=0 impostorscore=0 phishscore=0 mlxscore=0
- bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002070090
+ definitions=2020-02-07_01:2020-02-07,2020-02-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ impostorscore=0 malwarescore=0 suspectscore=0 phishscore=0 adultscore=0
+ lowpriorityscore=0 priorityscore=1501 spamscore=0 clxscore=1015
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002070089
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vasily Gorbik <gor@linux.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
 
-Add exceptions handlers performing transparent transition of non-secure
-pages to secure (import) upon guest access and secure pages to
-non-secure (export) upon hypervisor access.
+This add 2 new variants of the UV CALL.
 
-Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
-[frankja@linux.ibm.com: adding checks for failures]
+The first variant handles UV CALLs that might have longer busy
+conditions or just need longer when doing partial completion. We should
+schedule when necessary.
+
+The second variant handles UV CALLs that only need the handle but have
+no payload (e.g. destroying a VM). We can provide a simple wrapper for
+those.
+
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-[imbrenda@linux.ibm.com:  adding a check for gmap fault]
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- arch/s390/kernel/pgm_check.S |  4 +-
- arch/s390/mm/fault.c         | 86 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 88 insertions(+), 2 deletions(-)
+ arch/s390/include/asm/uv.h | 59 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
-index 59dee9d3bebf..27ac4f324c70 100644
---- a/arch/s390/kernel/pgm_check.S
-+++ b/arch/s390/kernel/pgm_check.S
-@@ -78,8 +78,8 @@ PGM_CHECK(do_dat_exception)		/* 39 */
- PGM_CHECK(do_dat_exception)		/* 3a */
- PGM_CHECK(do_dat_exception)		/* 3b */
- PGM_CHECK_DEFAULT			/* 3c */
--PGM_CHECK_DEFAULT			/* 3d */
--PGM_CHECK_DEFAULT			/* 3e */
-+PGM_CHECK(do_secure_storage_access)	/* 3d */
-+PGM_CHECK(do_non_secure_storage_access)	/* 3e */
- PGM_CHECK_DEFAULT			/* 3f */
- PGM_CHECK_DEFAULT			/* 40 */
- PGM_CHECK_DEFAULT			/* 41 */
-diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-index 7b0bb475c166..fab4219fa0be 100644
---- a/arch/s390/mm/fault.c
-+++ b/arch/s390/mm/fault.c
-@@ -38,6 +38,7 @@
- #include <asm/irq.h>
- #include <asm/mmu_context.h>
- #include <asm/facility.h>
-+#include <asm/uv.h>
- #include "../kernel/entry.h"
+diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+index 1b97230a57ba..e1cef772fde1 100644
+--- a/arch/s390/include/asm/uv.h
++++ b/arch/s390/include/asm/uv.h
+@@ -14,6 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/errno.h>
+ #include <linux/bug.h>
++#include <linux/sched.h>
+ #include <asm/page.h>
+ #include <asm/gmap.h>
  
- #define __FAIL_ADDR_MASK -4096L
-@@ -816,3 +817,88 @@ static int __init pfault_irq_init(void)
- early_initcall(pfault_irq_init);
+@@ -91,6 +92,19 @@ struct uv_cb_cfs {
+ 	u64 paddr;
+ } __packed __aligned(8);
  
- #endif /* CONFIG_PFAULT */
++/*
++ * A common UV call struct for calls that take no payload
++ * Examples:
++ * Destroy cpu/config
++ * Verify
++ */
++struct uv_cb_nodata {
++	struct uv_cb_header header;
++	u64 reserved08[2];
++	u64 handle;
++	u64 reserved20[4];
++} __packed __aligned(8);
 +
-+#if IS_ENABLED(CONFIG_KVM)
-+void do_secure_storage_access(struct pt_regs *regs)
+ struct uv_cb_share {
+ 	struct uv_cb_header header;
+ 	u64 reserved08[3];
+@@ -98,6 +112,31 @@ struct uv_cb_share {
+ 	u64 reserved28;
+ } __packed __aligned(8);
+ 
++/*
++ * Low level uv_call that takes r1 and r2 as parameter and avoids
++ * stalls for long running busy conditions by doing schedule
++ */
++static inline int uv_call_sched(unsigned long r1, unsigned long r2)
 +{
-+	unsigned long addr = regs->int_parm_long & __FAIL_ADDR_MASK;
-+	struct vm_area_struct *vma;
-+	struct mm_struct *mm;
-+	struct page *page;
-+	int rc;
++	int cc;
 +
-+	switch (get_fault_type(regs)) {
-+	case USER_FAULT:
-+		mm = current->mm;
-+		down_read(&mm->mmap_sem);
-+		vma = find_vma(mm, addr);
-+		if (!vma) {
-+			up_read(&mm->mmap_sem);
-+			do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
-+			break;
-+		}
-+		page = follow_page(vma, addr, FOLL_WRITE | FOLL_GET);
-+		if (IS_ERR_OR_NULL(page)) {
-+			up_read(&mm->mmap_sem);
-+			break;
-+		}
-+		if (arch_make_page_accessible(page))
-+			send_sig(SIGSEGV, current, 0);
-+		put_page(page);
-+		up_read(&mm->mmap_sem);
-+		break;
-+	case KERNEL_FAULT:
-+		page = phys_to_page(addr);
-+		if (unlikely(!try_get_page(page)))
-+			break;
-+		rc = arch_make_page_accessible(page);
-+		put_page(page);
-+		if (rc)
-+			BUG();
-+		break;
-+	case VDSO_FAULT:
-+		/* fallthrough */
-+	case GMAP_FAULT:
-+		/* fallthrough */
-+	default:
-+		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
-+		WARN_ON_ONCE(1);
-+	}
++	do {
++		asm volatile(
++			"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
++			"		ipm	%[cc]\n"
++			"		srl	%[cc],28\n"
++			: [cc] "=d" (cc)
++			: [r1] "d" (r1), [r2] "d" (r2)
++			: "memory", "cc");
++		if (need_resched())
++			schedule();
++	} while (cc > 1);
++	return cc;
 +}
-+NOKPROBE_SYMBOL(do_secure_storage_access);
 +
-+void do_non_secure_storage_access(struct pt_regs *regs)
++/*
++ * Low level uv_call that takes r1 and r2 as parameter
++ */
+ static inline int uv_call(unsigned long r1, unsigned long r2)
+ {
+ 	int cc;
+@@ -113,6 +152,26 @@ static inline int uv_call(unsigned long r1, unsigned long r2)
+ 	return cc;
+ }
+ 
++/*
++ * special variant of uv_call that only transports the cpu or guest
++ * handle and the command, like destroy or verify.
++ */
++static inline int uv_cmd_nodata(u64 handle, u16 cmd, u32 *ret)
 +{
-+	unsigned long gaddr = regs->int_parm_long & __FAIL_ADDR_MASK;
-+	struct gmap *gmap = (struct gmap *)S390_lowcore.gmap;
-+	struct uv_cb_cts uvcb = {
-+		.header.cmd = UVC_CMD_CONV_TO_SEC_STOR,
++	int rc;
++	struct uv_cb_nodata uvcb = {
++		.header.cmd = cmd,
 +		.header.len = sizeof(uvcb),
-+		.guest_handle = gmap->guest_handle,
-+		.gaddr = gaddr,
++		.handle = handle,
 +	};
-+	int rc;
 +
-+	if (get_fault_type(regs) != GMAP_FAULT) {
-+		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
-+		WARN_ON_ONCE(1);
-+		return;
-+	}
-+
-+	rc = uv_make_secure(gmap, gaddr, &uvcb);
-+	if (rc == -EINVAL && uvcb.header.rc != 0x104)
-+		send_sig(SIGSEGV, current, 0);
-+}
-+NOKPROBE_SYMBOL(do_non_secure_storage_access);
-+
-+#else
-+void do_secure_storage_access(struct pt_regs *regs)
-+{
-+	default_trap_handler(regs);
++	WARN(!handle, "No handle provided to Ultravisor call cmd %x\n", cmd);
++	rc = uv_call_sched(0, (u64)&uvcb);
++	if (ret)
++		*ret = *(u32 *)&uvcb.header.rc;
++	return rc ? -EINVAL : 0;
 +}
 +
-+void do_non_secure_storage_access(struct pt_regs *regs)
-+{
-+	default_trap_handler(regs);
-+}
-+#endif
+ struct uv_info {
+ 	unsigned long inst_calls_list[4];
+ 	unsigned long uv_base_stor_len;
 -- 
 2.24.0
 
