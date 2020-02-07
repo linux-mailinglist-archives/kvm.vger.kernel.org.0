@@ -2,93 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 96958155C90
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 18:05:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45CF1155CFA
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 18:38:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727546AbgBGRFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 12:05:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49539 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726956AbgBGRFE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 12:05:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581095104;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=W/mzwS+af3IHrG/BFwWznCkZFHf8eWaEKxp9UaXyBTw=;
-        b=GKDS7DGLwyM58djj2/+w5epqUJNUTfhIFPOufZENcFqUcDCCC2Sd3Lz4vzwiKWqPnUK1Vg
-        eV5aFbtLbVt/f1/UvwMg3coQzLt4Fdm+wqGs2nCn4odqPSvY5U+IIJzJxbL5whCYQC7BpY
-        VxyluW+JCx/JEle+WHxA72ztE/fXDk4=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352--6n3MruRO9mjJrZ7Fj6sPQ-1; Fri, 07 Feb 2020 12:04:46 -0500
-X-MC-Unique: -6n3MruRO9mjJrZ7Fj6sPQ-1
-Received: by mail-qk1-f197.google.com with SMTP id 24so1834788qka.16
-        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 09:04:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=W/mzwS+af3IHrG/BFwWznCkZFHf8eWaEKxp9UaXyBTw=;
-        b=oMgJFL8U+sTV8bm6hUhhrTaI/0bmWV7O3iKawUcCmIYlaRmKNu3/MEO4rCLRJKD0Bb
-         MsKyVlPrgFhdRbXN9rkCvSy4yaXhGqlqBSX96/jftKuMcLpbYlveV9U4G+xkuzMdH+jk
-         sB4BjWg/ymezRnvGCf2nUGSnZBn4q6NzhsGjYQZjKUPG8BqNyiyvwt1ZvyoXQuTs7om0
-         kXJK87OGtyeFVp3XPO4ExoxItUUjRuo92lWTAexSYZiGFP0CvWVpPTqHYuJT3J7QctRu
-         i6vNK1JuKMYWz0cYID4ReWGZjsdyY1wLWJaGnX1qN29Ziy24/T0n4Jke9q71+wPiVIny
-         VRIw==
-X-Gm-Message-State: APjAAAXrqj8p0V8SzmSUM4NHoO9VnqkNzBw0E8ik+f9r6DIeQHSFjCFc
-        jr8POE8oQWwkGLhueOQ1ksV/hBZzIES9mxscSerfQeTCcPWsSpyce+Sx4Aq3jcg+FuenQn2sRKU
-        xoaKeUPxmAK8j
-X-Received: by 2002:ac8:540f:: with SMTP id b15mr8284825qtq.237.1581095086455;
-        Fri, 07 Feb 2020 09:04:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw1G0WIFJFzF3ZaR8RGw77pX9iDrwBoxVk9+CVkdk7fCeK283mLiW1K0rb7VbrSqZfB/uogkQ==
-X-Received: by 2002:ac8:540f:: with SMTP id b15mr8284804qtq.237.1581095086189;
-        Fri, 07 Feb 2020 09:04:46 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id z11sm1575949qkj.91.2020.02.07.09.04.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2020 09:04:45 -0800 (PST)
-Date:   Fri, 7 Feb 2020 12:04:43 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: Disable preemption in kvm_get_running_vcpu()
-Message-ID: <20200207170443.GB720553@xz-x1>
-References: <20200207163410.31276-1-maz@kernel.org>
+        id S1727005AbgBGRhu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 12:37:50 -0500
+Received: from mga06.intel.com ([134.134.136.31]:53093 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726897AbgBGRhu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 12:37:50 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 09:37:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,414,1574150400"; 
+   d="scan'208";a="346067524"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by fmsmga001.fm.intel.com with ESMTP; 07 Feb 2020 09:37:48 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/7] KVM: x86/mmu: nVMX: 5-level paging fixes and enabling
+Date:   Fri,  7 Feb 2020 09:37:40 -0800
+Message-Id: <20200207173747.6243-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200207163410.31276-1-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 07, 2020 at 04:34:10PM +0000, Marc Zyngier wrote:
-> Accessing a per-cpu variable only makes sense when preemption is
-> disabled (and the kernel does check this when the right debug options
-> are switched on).
-> 
-> For kvm_get_running_vcpu(), it is fine to return the value after
-> re-enabling preemption, as the preempt notifiers will make sure that
-> this is kept consistent across task migration (the comment above the
-> function hints at it, but lacks the crucial preemption management).
-> 
-> While we're at it, move the comment from the ARM code, which explains
-> why the whole thing works.
-> 
-> Fixes: 7495e22bb165 ("KVM: Move running VCPU from ARM to common code").
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/318984f6-bc36-33a3-abc6-bf2295974b06@huawei.com
+Two fixes for 5-level paging bugs with a 100% fatality rate, a patch to
+enable 5-level EPT in L1, and additional clean up on top (mostly renames
+of functions/variables that caused me no end of confusion when trying to
+figure out what was broken).
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Tested fixed kernels at L0, L1 and L2, with most combinations of EPT,
+shadow paging, 4-level and 5-level.  EPT kvm-unit-tests runs clean in L0.
+Patches for kvm-unit-tests incoming to play nice with 5-level nested EPT.
+
+Ideally patches 1 and 2 would get into 5.6, 5-level paging is quite
+broken without them.
+
+v2:
+  - Increase the nested EPT array sizes to accomodate 5-level paging in
+    the patch that adds support for 5-level nested EPT, not in the bug
+    fix for 5-level shadow paging.
+
+Sean Christopherson (7):
+  KVM: nVMX: Use correct root level for nested EPT shadow page tables
+  KVM: x86/mmu: Fix struct guest_walker arrays for 5-level paging
+  KVM: nVMX: Allow L1 to use 5-level page walks for nested EPT
+  KVM: nVMX: Rename nested_ept_get_cr3() to nested_ept_get_eptp()
+  KVM: nVMX: Rename EPTP validity helper and associated variables
+  KVM: x86/mmu: Rename kvm_mmu->get_cr3() to ->get_guest_cr3_or_eptp()
+  KVM: nVMX: Drop unnecessary check on ept caps for execute-only
+
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/include/asm/vmx.h      | 12 +++++++
+ arch/x86/kvm/mmu/mmu.c          | 35 ++++++++++----------
+ arch/x86/kvm/mmu/paging_tmpl.h  |  6 ++--
+ arch/x86/kvm/svm.c              | 10 +++---
+ arch/x86/kvm/vmx/nested.c       | 58 ++++++++++++++++++++-------------
+ arch/x86/kvm/vmx/nested.h       |  4 +--
+ arch/x86/kvm/vmx/vmx.c          |  2 ++
+ arch/x86/kvm/x86.c              |  2 +-
+ 9 files changed, 79 insertions(+), 52 deletions(-)
 
 -- 
-Peter Xu
+2.24.1
 
