@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 011DA1555DF
+	by mail.lfdr.de (Postfix) with ESMTP id 7679C1555E0
 	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 11:36:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727317AbgBGKgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727372AbgBGKgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 05:36:36 -0500
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:35070 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727309AbgBGKgf (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 7 Feb 2020 05:36:35 -0500
-Received: from mail-pj1-f74.google.com ([209.85.216.74]:53333 "EHLO
-        mail-pj1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727289AbgBGKgf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 05:36:35 -0500
-Received: by mail-pj1-f74.google.com with SMTP id h6so1052308pju.3
-        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 02:36:33 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id v24so1073556plo.2
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 02:36:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=k7kvp2Q+X5KKtfSI8p1ZPpCKg5nn6Yhdzbm1PfKGtkY=;
-        b=o25Kgm1kmvf6F3mjEiIhA6Pl4jji6+z1cg7UB4hFy4w8nVJ2tZlS+Pq6zICFwIXm11
-         TxHs/MWmO+HlU18zXGwMbTzPdBQKoHvBsCyw0lf8J17+n1gQDOCMCDRrvfKldu5Z4q0m
-         uNcyN7jATMxzFMkfNW0KMDup7fB0jAAmxka3pen8ERi1xpBIBoBxApNNRarMCPH2jRxr
-         TNsjIR4yPHEFpzC/S7LTF3+SBAsQln+sZ0mVECY3caf1te3/oHFirT9pGic1/yU4RiXz
-         KqE0TK6EXg+hm6Ky6F1QzPxJKACrZzKCcSXouJ6jwtch7/001jaOEjMVuO2bFnj5KUqo
-         9iNQ==
+        bh=vh3v3X1DXxF+Ymma2gVlAjTYvpcrxrg4caBobl2XuBU=;
+        b=nOy8wb3STmb9+NTXzXL4gVt1ksnDKObSWEHFb/bMEX1W+7QiX60OGQ3AsLeMAoa23e
+         lBd6Fd4R/YQOjXI0dliYsC5QTCjeX5Vs3UmDunMVKRNQDwaDqhEAPKZFU22CTz/WuLi2
+         UgSeq8K/EzfoUw3ojoeqKnmy8mP4x6F+R+d6Uw3o9onivthOyHLpBNxTjawELIomy/Qx
+         Zb3kJJF2jyF03zSt0GvvKEAmVQnzJ3HrRhJk8VusvfyicJK//w997M5rkW2vBw8hBFo+
+         NyL8W8ijts6dUjCoPVldDdryDV9rNVv8vKOyehFK7XuenNK19Ruw2WjQ31A0+NuZbWmM
+         8xDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=k7kvp2Q+X5KKtfSI8p1ZPpCKg5nn6Yhdzbm1PfKGtkY=;
-        b=N/ZgP+0MkteY9bdN9pln8qf7PtJk/BWXK/1vTZiLJNTUpVChc1z5GnWGNRxri8AgNE
-         zIkH0iqWMUw/LabyMQlodFZn+mjZ8ju45U5YqcmMuGRqPGAGnnCO7bwxHqREkhTgVvf8
-         qUeREkndlCPb1+CzISKmdVuN3bNk7CfoBWOqhbRkMG2XU2KG5oBGHmfDNyuSOUG7mhtt
-         nrua4tY/WMRTyIZYa8WPccomypsxvWosE29F+um9WJm6iOUWzjnKmYXHXzWny+WHJrl0
-         AsooeaRBekCjjK+cU/DtZ/bs4kJMEl8TNnhH31CXbWut0U2l4gMAqnk2Ag+VhDRAmlyW
-         DtrA==
-X-Gm-Message-State: APjAAAUVcEYR3diAzfLgOv3DgPFFFRKoRkqqH1RLYqiaC4QtF27z0RXA
-        t+Memkf9cSBby4Oi2hU41/FtrzHk8WucSHxcIJs5TYrYr0fMcULBm+RkGCMx3tGQeEUl/+6eA4G
-        Aa76i00e2toY+hPAlVxj3NuyeJChunLXUpLXJiF0VL4MQQ5gupXuOACAR1g==
-X-Google-Smtp-Source: APXvYqwbgewb6DSXLk2Ht/rqknjGlGwBTjE7AjqfGaEEzJcv/T0jPL0snVAg7XB1JDxR6vPX0aegW07hmcg=
-X-Received: by 2002:a63:7145:: with SMTP id b5mr8577044pgn.409.1581071792911;
- Fri, 07 Feb 2020 02:36:32 -0800 (PST)
-Date:   Fri,  7 Feb 2020 02:36:05 -0800
+        bh=vh3v3X1DXxF+Ymma2gVlAjTYvpcrxrg4caBobl2XuBU=;
+        b=hUu0LXTcFI8BPlQZkdpn7yKxdNt/rwm4zsfvyISOyTsEIRyk00Tini3ZdbdQ8j+QZ5
+         sF45u+TnA9jrMlDs4jeidTICiazmiDI3sopWv+UFCNgfwitDpg+z7saOaAdai7jsvxFr
+         fXIUq2SmQ1W1kJ05374ja4S6wxux0KEnp3Q2tFPR6yaJGakTG3onp+AD9vrslST7Af/t
+         WGuxV50kG14pt5LkufrglBekpuTCFMjrFcpYtglWXsiM8SeITj2UCJdQ8vcZGkoPdtaf
+         BtAtd5jTojz55Lf/OjaHW0U4G+3vEdt5hj23o8jH8MrWdMPDaCsJV1sW3HCXiVKSEbkk
+         GfyQ==
+X-Gm-Message-State: APjAAAWxPNsfvwVqDaq/zUhrxY+SkYszx5pkgHgCrGMvNUy1TmE01cFX
+        E3LSL4oXANFjL48nYIvpEiuc0xxCnHTZ7e6We/YH0E7KS+KcqkxhYnOJYExvVcp89dJqFnfQTes
+        r9f5I2foEaMpvlEVAFuZA9IcoyVMzJar9/4Qhf2Nq0n0IcZn3+MLpz3QB8g==
+X-Google-Smtp-Source: APXvYqyQmdX0vgN9Hz/XcyhzRAMGVrlh82fZQE0TAvBrq6kmg8w9Rhzss9eF0HTXSownGVtjUeqQUVYqnw0=
+X-Received: by 2002:a63:7a0f:: with SMTP id v15mr8668920pgc.139.1581071795043;
+ Fri, 07 Feb 2020 02:36:35 -0800 (PST)
+Date:   Fri,  7 Feb 2020 02:36:06 -0800
 In-Reply-To: <20200207103608.110305-1-oupton@google.com>
-Message-Id: <20200207103608.110305-3-oupton@google.com>
+Message-Id: <20200207103608.110305-4-oupton@google.com>
 Mime-Version: 1.0
 References: <20200207103608.110305-1-oupton@google.com>
 X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
-Subject: [PATCH v3 2/5] KVM: nVMX: Handle pending #DB when injecting INIT VM-exit
+Subject: [PATCH v3 3/5] KVM: x86: Deliver exception payload on KVM_GET_VCPU_EVENTS
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -61,63 +61,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SDM 27.3.4 states that the 'pending debug exceptions' VMCS field will
-be populated if a VM-exit caused by an INIT signal takes priority over a
-debug-trap. Emulate this behavior when synthesizing an INIT signal
-VM-exit into L1.
+KVM allows the deferral of exception payloads when a vCPU is in guest
+mode to allow the L1 hypervisor to intercept certain events (#PF, #DB)
+before register state has been modified. However, this behavior is
+incompatible with the KVM_{GET,SET}_VCPU_EVENTS ABI, as userspace
+expects register state to have been immediately modified. Userspace may
+opt-in for the payload deferral behavior with the
+KVM_CAP_EXCEPTION_PAYLOAD per-VM capability. As such,
+kvm_multiple_exception() will immediately manipulate guest registers if
+the capability hasn't been requested.
 
-Fixes: 4b9852f4f389 ("KVM: x86: Fix INIT signal handling in various CPU states")
+Since the deferral is only necessary if a userspace ioctl were to be
+serviced at the same as a payload bearing exception is recognized, this
+behavior can be relaxed. Instead, opportunistically defer the payload
+from kvm_multiple_exception() and deliver the payload before completing
+a KVM_GET_VCPU_EVENTS ioctl.
+
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ arch/x86/kvm/x86.c | 29 ++++++++++++++++-------------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 657c2eda357c..1586aaae3a6f 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3575,6 +3575,33 @@ static void nested_vmx_inject_exception_vmexit(struct kvm_vcpu *vcpu,
- 	nested_vmx_vmexit(vcpu, EXIT_REASON_EXCEPTION_NMI, intr_info, exit_qual);
- }
- 
-+/*
-+ * Returns true if a debug trap is pending delivery.
-+ *
-+ * In KVM, debug traps bear an exception payload. As such, the class of a #DB
-+ * exception may be inferred from the presence of an exception payload.
-+ */
-+static inline bool vmx_pending_dbg_trap(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.exception.pending &&
-+			vcpu->arch.exception.nr == DB_VECTOR &&
-+			vcpu->arch.exception.payload;
-+}
-+
-+/*
-+ * Certain VM-exits set the 'pending debug exceptions' field to indicate a
-+ * recognized #DB (data or single-step) that has yet to be delivered. Since KVM
-+ * represents these debug traps with a payload that is said to be compatible
-+ * with the 'pending debug exceptions' field, write the payload to the VMCS
-+ * field if a VM-exit is delivered before the debug trap.
-+ */
-+static void nested_vmx_update_pending_dbg(struct kvm_vcpu *vcpu)
-+{
-+	if (vmx_pending_dbg_trap(vcpu))
-+		vmcs_writel(GUEST_PENDING_DBG_EXCEPTIONS,
-+			    vcpu->arch.exception.payload);
-+}
-+
- static int vmx_check_nested_events(struct kvm_vcpu *vcpu, bool external_intr)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 95b753dab207..4d3310df1758 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -498,19 +498,7 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
+ 		vcpu->arch.exception.error_code = error_code;
+ 		vcpu->arch.exception.has_payload = has_payload;
+ 		vcpu->arch.exception.payload = payload;
+-		/*
+-		 * In guest mode, payload delivery should be deferred,
+-		 * so that the L1 hypervisor can intercept #PF before
+-		 * CR2 is modified (or intercept #DB before DR6 is
+-		 * modified under nVMX).  However, for ABI
+-		 * compatibility with KVM_GET_VCPU_EVENTS and
+-		 * KVM_SET_VCPU_EVENTS, we can't delay payload
+-		 * delivery unless userspace has enabled this
+-		 * functionality via the per-VM capability,
+-		 * KVM_CAP_EXCEPTION_PAYLOAD.
+-		 */
+-		if (!vcpu->kvm->arch.exception_payload_enabled ||
+-		    !is_guest_mode(vcpu))
++		if (!is_guest_mode(vcpu))
+ 			kvm_deliver_exception_payload(vcpu);
+ 		return;
+ 	}
+@@ -3803,6 +3791,21 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -3587,6 +3614,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu, bool external_intr)
- 		test_bit(KVM_APIC_INIT, &apic->pending_events)) {
- 		if (block_nested_events)
- 			return -EBUSY;
-+		nested_vmx_update_pending_dbg(vcpu);
- 		clear_bit(KVM_APIC_INIT, &apic->pending_events);
- 		nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
- 		return 0;
+ 	process_nmi(vcpu);
+ 
++	/*
++	 * In guest mode, payload delivery should be deferred,
++	 * so that the L1 hypervisor can intercept #PF before
++	 * CR2 is modified (or intercept #DB before DR6 is
++	 * modified under nVMX). Unless the per-VM capability,
++	 * KVM_CAP_EXCEPTION_PAYLOAD, is set, we may not defer the delivery of
++	 * an exception payload and handle after a KVM_GET_VCPU_EVENTS. Since we
++	 * opportunistically defer the exception payload, deliver it if the
++	 * capability hasn't been requested before processing a
++	 * KVM_GET_VCPU_EVENTS.
++	 */
++	if (!vcpu->kvm->arch.exception_payload_enabled &&
++	    vcpu->arch.exception.pending && vcpu->arch.exception.has_payload)
++		kvm_deliver_exception_payload(vcpu);
++
+ 	/*
+ 	 * The API doesn't provide the instruction length for software
+ 	 * exceptions, so don't report them. As long as the guest RIP
 -- 
 2.25.0.341.g760bfbb309-goog
 
