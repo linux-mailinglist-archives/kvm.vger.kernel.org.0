@@ -2,254 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D810C155548
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 11:06:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0DAD15554C
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 11:08:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726936AbgBGKGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 05:06:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51996 "EHLO
+        id S1726798AbgBGKIA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 05:08:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59392 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726642AbgBGKGJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 05:06:09 -0500
+        with ESMTP id S1726587AbgBGKIA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 05:08:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581069968;
+        s=mimecast20190719; t=1581070079;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=D4NZi+h363P+5qKPOIAZPmD2180+BMbjcmkv6zLYjc8=;
-        b=F/uzBG4Ew+ZH4jYrqHa7l8id10S3IXJb10lpzoBbTfHDru5u5VkAhdO4pXD6cDtE8/5v3J
-        8Cok1huYUQZOdvEo2TMVVeYXGpcJak3fShULO7vBX9A4xLcQFbXkZ1rf5Dz86buPFrMvPr
-        6UCy1DqExn3q0MGuYILouRq075W+SDw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-uphhDSkzPBeInfzEow0_Eg-1; Fri, 07 Feb 2020 05:06:04 -0500
-X-MC-Unique: uphhDSkzPBeInfzEow0_Eg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C709100551A;
-        Fri,  7 Feb 2020 10:06:03 +0000 (UTC)
-Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FB2760BF7;
-        Fri,  7 Feb 2020 10:05:55 +0000 (UTC)
-Subject: Re: [PATCH v4 3/3] selftests: KVM: SVM: Add vmcall test
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Wei Huang <wei.huang2@amd.com>
-Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
-        thuth@redhat.com, drjones@redhat.com
-References: <20200206104710.16077-1-eric.auger@redhat.com>
- <20200206104710.16077-4-eric.auger@redhat.com>
- <20200206173931.GC2465308@weiserver.amd.com>
- <556d20b2-d6cf-e13c-635c-809836316b80@oracle.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <ebec5529-1b38-6df9-241b-2326e87a9f8e@redhat.com>
-Date:   Fri, 7 Feb 2020 11:05:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        bh=hww+G4VML7m0WisANEdJ/P2iFS+sF+6xCl9lSHHOIXI=;
+        b=ND2emrhhWdclIrzzkkZ7bQ/od9ewgpblRhGHLi3pbk/92EsZScNfuyW9mIaY81/vgutucW
+        b/gR+TcGEoyet2Mynk2bGx0k/Q/9UV+8VEr7bJp4WRiZgt003KxQPl/5gjaNxegdFjsBi/
+        ZNb7m9i6Rs4c+3c9nOpHWJsP2ZRVHO8=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-MBPwFJNnPcOCBfZ_HVsLWg-1; Fri, 07 Feb 2020 05:07:57 -0500
+X-MC-Unique: MBPwFJNnPcOCBfZ_HVsLWg-1
+Received: by mail-qv1-f71.google.com with SMTP id j15so811487qvp.21
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 02:07:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hww+G4VML7m0WisANEdJ/P2iFS+sF+6xCl9lSHHOIXI=;
+        b=G+ggleQ3Tp//cQK5K3y4iYEGp9qxU/JSstjJLxWQkS3K17zzWDBnR/cesr/E5xEMnT
+         m+KG0ObKH1nFBau0IPHefQRpp5PVi69E2FYXCIGQMdXN2zCoNC3raaaOarDCnC+Lc8z0
+         uxvz/5FApPQO5YeIgvwIiSnnccTsO90FVqBacvHszvjxKf7eOoDEmhFBYb5qnrj/Mfib
+         MyFshSrtjxE4gm3OIv3BQbnftPhfU3T8sCL+1ZY0bbLDQE0zxqE/4gTX3lEuS8mxLKJY
+         /Yt6uGMsrCHYArGnYqJVSqYhF/HgD3slLQkwPBySFHpThBFEzdjHpqXzrUmdWtVkOU/E
+         KO8w==
+X-Gm-Message-State: APjAAAVTEp/guAXLjgiYj3lbJS2v+VcOgqOUBZszEAbPegFN3mN4j7fa
+        KzwdOpA7J2r6J6IYJ5p+kgeeHtCuM59xrdpUcO07K1gWMCR3LKAx8uUfuQI0Y3zAqMpPaI7qIzY
+        3E2/Ui3oXe49c
+X-Received: by 2002:a37:d8e:: with SMTP id 136mr6565022qkn.293.1581070076408;
+        Fri, 07 Feb 2020 02:07:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx2Tf4Dc3I9vhEU7wQz4PfOE2roZy7Xvp6VWxn/M6XGCbLGhkv3J1M03O/Eb7Fbru/j5RsZlQ==
+X-Received: by 2002:a37:d8e:: with SMTP id 136mr6565001qkn.293.1581070076110;
+        Fri, 07 Feb 2020 02:07:56 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+        by smtp.gmail.com with ESMTPSA id g6sm1052150qki.100.2020.02.07.02.07.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2020 02:07:55 -0800 (PST)
+Date:   Fri, 7 Feb 2020 05:07:50 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        eperezma@redhat.com,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
+ crashes in KVM guests after reboot
+Message-ID: <20200207050731-mutt-send-email-mst@kernel.org>
+References: <fe6e7e90-3004-eb7a-9ed8-b53a7667959f@de.ibm.com>
+ <20200120012724-mutt-send-email-mst@kernel.org>
+ <2a63b15f-8cf5-5868-550c-42e2cfd92c60@de.ibm.com>
+ <b6e32f58e5d85ac5cc3141e9155fb140ae5cd580.camel@redhat.com>
+ <1ade56b5-083f-bb6f-d3e0-3ddcf78f4d26@de.ibm.com>
+ <20200206171349-mutt-send-email-mst@kernel.org>
+ <5c860fa1-cef5-b389-4ebf-99a62afa0fe8@de.ibm.com>
+ <20200207025806-mutt-send-email-mst@kernel.org>
+ <97c93d38-ef07-e321-d133-18483d54c0c0@de.ibm.com>
+ <20200207095353.08bc91e4.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <556d20b2-d6cf-e13c-635c-809836316b80@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200207095353.08bc91e4.cohuck@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Krish,
-On 2/6/20 8:08 PM, Krish Sadhukhan wrote:
->=20
-> On 2/6/20 9:39 AM, Wei Huang wrote:
->> On 02/06 11:47, Eric Auger wrote:
->>> L2 guest calls vmcall and L1 checks the exit status does
->>> correspond.
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->>> Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
->> I verified this patch with my AMD box, both with nested=3D1 and nested=
-=3D0. I
->> also intentionally changed the assertion of exit_code to a different
->> value (0x082) and the test complained about it. So the test is good.
->>
->> # selftests: kvm: svm_vmcall_test
->> # =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
->> #=C2=A0=C2=A0 x86_64/svm_vmcall_test.c:64: false
->> #=C2=A0=C2=A0 pid=3D2485656 tid=3D2485656 - Interrupted system call
->> #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 0x0000000000401387: main at svm_vmcall_test.c:72
->> #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 0x00007fd0978d71a2: ?? ??:0
->> #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 3=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 0x00000000004013ed: _start at ??:?
->> #=C2=A0=C2=A0 Failed guest assert: vmcb->control.exit_code =3D=3D SVM_=
-EXIT_VMMCALL
->> # Testing guest mode: PA-bits:ANY, VA-bits:48,=C2=A0 4K pages
->> # Guest physical address width detected: 48
->> not ok 15 selftests: kvm: svm_vmcall_test # exit=3D254
->>
->>> ---
->>>
->>> v3 -> v4:
->>> - remove useless includes
->>> - collected Lin's R-b
->>>
->>> v2 -> v3:
->>> - remove useless comment and add Vitaly's R-b
->>> ---
->>> =C2=A0 tools/testing/selftests/kvm/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
->>> =C2=A0 .../selftests/kvm/x86_64/svm_vmcall_test.c=C2=A0=C2=A0=C2=A0 |=
- 79 +++++++++++++++++++
->>> =C2=A0 2 files changed, 80 insertions(+)
->>> =C2=A0 create mode 100644
->>> tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
->>>
->>> diff --git a/tools/testing/selftests/kvm/Makefile
->>> b/tools/testing/selftests/kvm/Makefile
->>> index 2e770f554cae..b529d3b42c02 100644
->>> --- a/tools/testing/selftests/kvm/Makefile
->>> +++ b/tools/testing/selftests/kvm/Makefile
->>> @@ -26,6 +26,7 @@ TEST_GEN_PROGS_x86_64 +=3D x86_64/vmx_dirty_log_tes=
-t
->>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D x86_64/vmx_set_nested_state_test
->>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D x86_64/vmx_tsc_adjust_test
->>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D x86_64/xss_msr_test
->>> +TEST_GEN_PROGS_x86_64 +=3D x86_64/svm_vmcall_test
->>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D clear_dirty_log_test
->>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D dirty_log_test
->>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D kvm_create_max_vcpus
->>> diff --git a/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
->>> b/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
->>> new file mode 100644
->>> index 000000000000..6d3565aab94e
->>> --- /dev/null
->>> +++ b/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
->> Probably rename the file to svm_nested_vmcall_test.c. This matches wit=
-h
->> the naming convention of VMX's nested tests. Otherwise people might
->> not know
->> it is a nested one.
->=20
-> Is it better to give this file a generic name, say, nsvm_tests or
-> something like that, and place all future nested SVM tests in it, rathe=
-r
-> than creating a separate file for each nested test ?
-We had this discussion earlier. See https://lkml.org/lkml/2020/1/21/429
+On Fri, Feb 07, 2020 at 09:53:53AM +0100, Cornelia Huck wrote:
+> On Fri, 7 Feb 2020 09:13:14 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+> > On 07.02.20 08:58, Michael S. Tsirkin wrote:
+> > > On Fri, Feb 07, 2020 at 08:47:14AM +0100, Christian Borntraeger wrote:  
+> > >> Also adding Cornelia.
+> > >>
+> > >>
+> > >> On 06.02.20 23:17, Michael S. Tsirkin wrote:  
+> > >>> On Thu, Feb 06, 2020 at 04:12:21PM +0100, Christian Borntraeger wrote:  
+> > >>>>
+> > >>>>
+> > >>>> On 06.02.20 15:22, eperezma@redhat.com wrote:  
+> > >>>>> Hi Christian.
+> > >>>>>
+> > >>>>> Could you try this patch on top of ("38ced0208491 vhost: use batched version by default")?
+> > >>>>>
+> > >>>>> It will not solve your first random crash but it should help with the lost of network connectivity.
+> > >>>>>
+> > >>>>> Please let me know how does it goes.  
+> > >>>>
+> > >>>>
+> > >>>> 38ced0208491 + this seem to be ok.
+> > >>>>
+> > >>>> Not sure if you can make out anything of this (and the previous git bisect log)  
+> > >>>
+> > >>> Yes it does - that this is just bad split-up of patches, and there's
+> > >>> still a real bug that caused worse crashes :)
+> > >>>
+> > >>> So I just pushed batch-v4.
+> > >>> I expect that will fail, and bisect to give us
+> > >>>     vhost: batching fetches
+> > >>> Can you try that please?
+> > >>>  
+> > >>
+> > >> yes.
+> > >>
+> > >> eccb852f1fe6bede630e2e4f1a121a81e34354ab is the first bad commit
+> > >> commit eccb852f1fe6bede630e2e4f1a121a81e34354ab
+> > >> Author: Michael S. Tsirkin <mst@redhat.com>
+> > >> Date:   Mon Oct 7 06:11:18 2019 -0400
+> > >>
+> > >>     vhost: batching fetches
+> > >>     
+> > >>     With this patch applied, new and old code perform identically.
+> > >>     
+> > >>     Lots of extra optimizations are now possible, e.g.
+> > >>     we can fetch multiple heads with copy_from/to_user now.
+> > >>     We can get rid of maintaining the log array.  Etc etc.
+> > >>     
+> > >>     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > >>
+> > >>  drivers/vhost/test.c  |  2 +-
+> > >>  drivers/vhost/vhost.c | 39 ++++++++++++++++++++++++++++++++++-----
+> > >>  drivers/vhost/vhost.h |  4 +++-
+> > >>  3 files changed, 38 insertions(+), 7 deletions(-)
+> > >>  
+> > > 
+> > > 
+> > > And the symptom is still the same - random crashes
+> > > after a bit of traffic, right?  
+> > 
+> > random guest crashes after a reboot of the guests. As if vhost would still
+> > write into now stale buffers.
+> > 
+> 
+> I'm late to the party; but where is that commit located? Or has it been
+> dropped again already?
 
-In v1 I proposed a similar framework as kut with sub-tests but it looks
-we do not target such kind of tests in kselftests. vmcall test is just a
-first dummy test that paves the way for more involved API tests.
-
-Thanks
-
-Eric
->>
->> Everything else looks good.
->>
->>> @@ -0,0 +1,79 @@
->>> +// SPDX-License-Identifier: GPL-2.0-only
->>> +/*
->>> + * svm_vmcall_test
->>> + *
->>> + * Copyright (C) 2020, Red Hat, Inc.
->>> + *
->>> + * Nested SVM testing: VMCALL
->>> + */
->>> +
->>> +#include "test_util.h"
->>> +#include "kvm_util.h"
->>> +#include "processor.h"
->>> +#include "svm_util.h"
->>> +
->>> +#define VCPU_ID=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 5
->>> +
->>> +static struct kvm_vm *vm;
->>> +
->>> +static inline void l2_vmcall(struct svm_test_data *svm)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 __asm__ __volatile__("vmcall");
->>> +}
->>> +
->>> +static void l1_guest_code(struct svm_test_data *svm)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 #define L2_GUEST_STACK_SIZE 64
->>> +=C2=A0=C2=A0=C2=A0 unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE]=
-;
->>> +=C2=A0=C2=A0=C2=A0 struct vmcb *vmcb =3D svm->vmcb;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /* Prepare for L2 execution. */
->>> +=C2=A0=C2=A0=C2=A0 generic_svm_setup(svm, l2_vmcall,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 &l2_guest_stack[L2_GUEST_STACK_SIZE]);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 run_guest(vmcb, svm->vmcb_gpa);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 GUEST_ASSERT(vmcb->control.exit_code =3D=3D SVM_E=
-XIT_VMMCALL);
->>> +=C2=A0=C2=A0=C2=A0 GUEST_DONE();
->>> +}
->>> +
->>> +int main(int argc, char *argv[])
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 vm_vaddr_t svm_gva;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 nested_svm_check_supported();
->>> +
->>> +=C2=A0=C2=A0=C2=A0 vm =3D vm_create_default(VCPU_ID, 0, (void *) l1_=
-guest_code);
->>> +=C2=A0=C2=A0=C2=A0 vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpu=
-id());
->>> +
->>> +=C2=A0=C2=A0=C2=A0 vcpu_alloc_svm(vm, &svm_gva);
->>> +=C2=A0=C2=A0=C2=A0 vcpu_args_set(vm, VCPU_ID, 1, svm_gva);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 for (;;) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 volatile struct kvm_run *=
-run =3D vcpu_state(vm, VCPU_ID);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct ucall uc;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu_run(vm, VCPU_ID);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TEST_ASSERT(run->exit_rea=
-son =3D=3D KVM_EXIT_IO,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n"=
-,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 run->exit_reason,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 exit_reason_str(run->exit_reason));
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 switch (get_ucall(vm, VCP=
-U_ID, &uc)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case UCALL_ABORT:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 T=
-EST_ASSERT(false, "%s",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (const char *)uc.args[0]);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /=
-* NOT REACHED */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case UCALL_SYNC:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
-reak;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case UCALL_DONE:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g=
-oto done;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 T=
-EST_ASSERT(false,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Unknown ucall 0x%x.", uc.c=
-md);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +done:
->>> +=C2=A0=C2=A0=C2=A0 kvm_vm_free(vm);
->>> +=C2=A0=C2=A0=C2=A0 return 0;
->>> +}
->>
->=20
+my vhost tree. Tag batch-v4.
 
