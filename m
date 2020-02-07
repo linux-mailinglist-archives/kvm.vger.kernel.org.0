@@ -2,134 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CBA4B155EBE
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 20:47:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7245155EC5
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 20:48:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727071AbgBGTrD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 14:47:03 -0500
-Received: from mga17.intel.com ([192.55.52.151]:7172 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726974AbgBGTrD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 14:47:03 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 11:47:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,414,1574150400"; 
-   d="scan'208";a="404920287"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 07 Feb 2020 11:47:01 -0800
-Date:   Fri, 7 Feb 2020 11:47:02 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 03/61] KVM: x86: Simplify handling of Centaur CPUID leafs
-Message-ID: <20200207194701.GL2401@linux.intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-4-sean.j.christopherson@intel.com>
- <87pnerg3hp.fsf@vitty.brq.redhat.com>
+        id S1727065AbgBGTsh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 14:48:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38341 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727009AbgBGTsh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 14:48:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581104916;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UvpPfUMiwANMI5u+GVArzdqSMKMh2UqZnM1jU2+L7ac=;
+        b=FYRuzd+uelYpNIoGX/4Tns8boYkHajmxBP88q6wO0McUCXdQP3LFWha1QVTf5+dUtZQTnT
+        eucZKFkxIlI3eczRC2RtLjoY8Go2tsBqw4wwa47Nxa7H4glTCB8cB8dulTuwoKtbAY1idI
+        edvhOLAUhp97RbXmq9No72mcvRXcsPs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-Eo6Q_iuiOjSVlqbPbVqE9w-1; Fri, 07 Feb 2020 14:48:34 -0500
+X-MC-Unique: Eo6Q_iuiOjSVlqbPbVqE9w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CAC9805462;
+        Fri,  7 Feb 2020 19:48:32 +0000 (UTC)
+Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CCBB75C21A;
+        Fri,  7 Feb 2020 19:48:31 +0000 (UTC)
+Date:   Fri, 7 Feb 2020 12:48:31 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cohuck@redhat.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        kevin.tian@intel.com, shaopeng.he@intel.com, yi.l.liu@intel.com
+Subject: Re: [RFC PATCH v2 1/9] vfio/pci: split vfio_pci_device into public
+ and private parts
+Message-ID: <20200207124831.391d5f70@w520.home>
+In-Reply-To: <20200131020956.27604-1-yan.y.zhao@intel.com>
+References: <20200131020803.27519-1-yan.y.zhao@intel.com>
+        <20200131020956.27604-1-yan.y.zhao@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87pnerg3hp.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 04:05:54PM +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> 
-> > Refactor the handling of the Centaur-only CPUID leaf to detect the leaf
-> > via a runtime query instead of adding a one-off callback in the static
-> > array.  When the callback was introduced, there were additional fields
-> > in the array's structs, and more importantly, retpoline wasn't a thing.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  arch/x86/kvm/cpuid.c | 32 ++++++++++----------------------
-> >  1 file changed, 10 insertions(+), 22 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index f49fdd06f511..de52cbb46171 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -829,15 +829,7 @@ static int do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 func,
-> >  	return __do_cpuid_func(entry, func, nent, maxnent);
-> >  }
-> >  
-> > -struct kvm_cpuid_param {
-> > -	u32 func;
-> > -	bool (*qualifier)(const struct kvm_cpuid_param *param);
-> > -};
-> > -
-> > -static bool is_centaur_cpu(const struct kvm_cpuid_param *param)
-> > -{
-> > -	return boot_cpu_data.x86_vendor == X86_VENDOR_CENTAUR;
-> > -}
-> > +#define CENTAUR_CPUID_SIGNATURE 0xC0000000
-> 
-> arch/x86/kernel/cpu/centaur.c also hardcodes the value, would make sense
-> to put it to some x86 header instead.
+On Thu, 30 Jan 2020 21:09:56 -0500
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Ya, I just didn't want to touch non-KVM code in a 60+ patch series.
+> split vfio_pci_device into two parts:
+> (1) a public part,
+>     including pdev, num_region, irq_type which are accessible from
+>     outside of vfio.
+> (2) a private part,
+>     a pointer to vfio_pci_device_private, only accessible within vfio
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c         | 209 +++++++++++++++-------------
+>  drivers/vfio/pci/vfio_pci_config.c  | 157 +++++++++++----------
+>  drivers/vfio/pci/vfio_pci_igd.c     |  16 +--
+>  drivers/vfio/pci/vfio_pci_intrs.c   | 171 ++++++++++++-----------
+>  drivers/vfio/pci/vfio_pci_nvlink2.c |  16 +--
+>  drivers/vfio/pci/vfio_pci_private.h |   5 +-
+>  drivers/vfio/pci/vfio_pci_rdwr.c    |  36 ++---
+>  include/linux/vfio.h                |   7 +
+>  8 files changed, 321 insertions(+), 296 deletions(-)
 
-> >  static int get_cpuid_func(struct kvm_cpuid_entry2 *entries, u32 func,
-> >  			  int *nent, int maxnent, unsigned int type)
-> > @@ -845,6 +837,10 @@ static int get_cpuid_func(struct kvm_cpuid_entry2 *entries, u32 func,
-> >  	u32 limit;
-> >  	int r;
-> >  
-> > +	if (func == CENTAUR_CPUID_SIGNATURE &&
-> > +	    boot_cpu_data.x86_vendor != X86_VENDOR_CENTAUR)
-> > +		return 0;
-> > +
-> >  	r = do_cpuid_func(&entries[*nent], func, nent, maxnent, type);
-> >  	if (r)
-> >  		return r;
-> > @@ -896,11 +892,8 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
-> >  	struct kvm_cpuid_entry2 *cpuid_entries;
-> >  	int nent = 0, r = -E2BIG, i;
-> >  
-> > -	static const struct kvm_cpuid_param param[] = {
-> > -		{ .func = 0 },
-> > -		{ .func = 0x80000000 },
-> > -		{ .func = 0xC0000000, .qualifier = is_centaur_cpu },
-> > -		{ .func = KVM_CPUID_SIGNATURE },
-> > +	static const u32 funcs[] = {
-> > +		0, 0x80000000, CENTAUR_CPUID_SIGNATURE, KVM_CPUID_SIGNATURE,
-> >  	};
-> >  
-> >  	if (cpuid->nent < 1)
-> > @@ -918,14 +911,9 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
-> >  		goto out;
-> >  
-> >  	r = 0;
-> > -	for (i = 0; i < ARRAY_SIZE(param); i++) {
-> > -		const struct kvm_cpuid_param *ent = &param[i];
-> > -
-> > -		if (ent->qualifier && !ent->qualifier(ent))
-> > -			continue;
-> > -
-> > -		r = get_cpuid_func(cpuid_entries, ent->func, &nent,
-> > -				   cpuid->nent, type);
-> > +	for (i = 0; i < ARRAY_SIZE(funcs); i++) {
-> > +		r = get_cpuid_func(cpuid_entries, funcs[i], &nent, cpuid->nent,
-> > +				   type);
-> >  		if (r)
-> >  			goto out_free;
-> >  	}
-> 
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> 
-> -- 
-> Vitaly
-> 
+I think the typical solution to something like this would be...
+
+struct vfio_pci_device {
+	...
+};
+
+struct vfio_pci_device_private {
+	struct vfio_pci_device vdev;
+	...
+};
+
+External code would be able to work with the vfio_pci_device and
+internal code would do a container_of() to get access to the private
+fields.  What's done here is pretty ugly and not very cache friendly.
+Thanks,
+
+Alex
+
