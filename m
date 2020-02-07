@@ -2,347 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A749E1558FF
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 15:08:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEF45155901
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 15:08:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726867AbgBGOGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 09:06:41 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36060 "EHLO
+        id S1726974AbgBGOHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 09:07:09 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44440 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726674AbgBGOGl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 09:06:41 -0500
+        by vger.kernel.org with ESMTP id S1726674AbgBGOHJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 09:07:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581084399;
+        s=mimecast20190719; t=1581084427;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1ANWr1J4B+2ekgdtAkoqM5ghV0In7jIKf11OTWBZkeY=;
-        b=A0aGfumH6T6xZA385aAbrY4xgPy0VspRKkrwqUqJATTA/AFDA/B7S56gCOBQsWspSu2thx
-        5PKvl8lXbyLDDZfNWcy1WZ1zpHrEBsWNsm40xqvddNmVr8QOD8Ol6go1wl+QZVtntEpiC4
-        6T3FR3JIP25AiFhb0qsYggMr4xSs7Rw=
+        bh=zjE0doL/Kljl7VVADzKbj9EuYEFZUKU2QlpS/aF4JRs=;
+        b=H0pIv0BYzMI17jhnR627781TChb6MfXUsr7TtL2Vzego9k7rm4e2fhHuK6IyYFOXsTA+hq
+        0DSQt/U7GVpeWWBCNWk7NrUJAffmiEVYGJJY4B794P/NkxIGMuo8D1x8LshZ9+t5vAiOsF
+        VAXfVms0xoCk45F64+YzaoU0ia/qYIU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-A3Xp7amqMniKgguMD0pKew-1; Fri, 07 Feb 2020 09:06:37 -0500
-X-MC-Unique: A3Xp7amqMniKgguMD0pKew-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-213-g0fQTHegOQmfdo9L58BH7w-1; Fri, 07 Feb 2020 09:07:03 -0500
+X-MC-Unique: g0fQTHegOQmfdo9L58BH7w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57D10800D54;
-        Fri,  7 Feb 2020 14:06:35 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 57A521001281;
-        Fri,  7 Feb 2020 14:06:29 +0000 (UTC)
-Date:   Fri, 7 Feb 2020 15:06:27 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org,
-        peter.maydell@linaro.org, andre.przywara@arm.com, thuth@redhat.com,
-        yuzenghui@huawei.com, alexandru.elisei@arm.com
-Subject: Re: [kvm-unit-tests PATCH v3 14/14] arm/arm64: ITS: pending table
- migration test
-Message-ID: <20200207140627.rikkw5coe7naxssb@kamzik.brq.redhat.com>
-References: <20200128103459.19413-1-eric.auger@redhat.com>
- <20200128103459.19413-15-eric.auger@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 725D4133656D;
+        Fri,  7 Feb 2020 14:07:02 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 520A360BEC;
+        Fri,  7 Feb 2020 14:06:57 +0000 (UTC)
+From:   Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 3/3] selftests: KVM: SVM: Add vmcall test
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com
+Cc:     thuth@redhat.com, drjones@redhat.com, wei.huang2@amd.com
+References: <20200206104710.16077-1-eric.auger@redhat.com>
+ <20200206104710.16077-4-eric.auger@redhat.com>
+ <2469b52e-9f66-b19b-7269-297dbbd0ca27@oracle.com>
+Message-ID: <7ddf3ab7-ef24-0450-8084-e82435f62b5e@redhat.com>
+Date:   Fri, 7 Feb 2020 15:06:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200128103459.19413-15-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <2469b52e-9f66-b19b-7269-297dbbd0ca27@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 28, 2020 at 11:34:59AM +0100, Eric Auger wrote:
-> Add two new migration tests. One testing the migration of
-> a topology where collection were unmapped. The second test
-> checks the migration of the pending table.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v2 -> v3:
-> - tests belong to both its and migration groups
-> ---
->  arm/gic.c         | 150 ++++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg |  16 +++++
->  2 files changed, 166 insertions(+)
-> 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index fa8626a..ec3dd3a 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -195,6 +195,7 @@ static void lpi_handler(struct pt_regs *regs __unused)
->  	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
->  	lpi_stats.observed.cpu_id = smp_processor_id();
->  	lpi_stats.observed.lpi_id = irqnr;
-> +	acked[lpi_stats.observed.cpu_id]++;
->  	smp_wmb(); /* pairs with rmb in check_lpi_stats */
->  }
->  
-> @@ -239,6 +240,18 @@ static void secondary_lpi_test(void)
->  	while (1)
->  		wfi();
->  }
-> +
-> +static void check_lpi_hits(int *expected)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < nr_cpus; i++) {
-> +		if (acked[i] != expected[i])
-> +			report(false, "expected %d LPIs on PE #%d, %d observed",
-> +			       expected[i], i, acked[i]);
+Hi Krish,
 
-report_info
-pass = false
+On 2/6/20 11:46 PM, Krish Sadhukhan wrote:
+>=20
+>=20
+> On 02/06/2020 02:47 AM, Eric Auger wrote:
+>> L2 guest calls vmcall and L1 checks the exit status does
+>> correspond.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
+>>
+>> ---
+>>
+>> v3 -> v4:
+>> - remove useless includes
+>> - collected Lin's R-b
+>>
+>> v2 -> v3:
+>> - remove useless comment and add Vitaly's R-b
+>> ---
+>> =C2=A0 tools/testing/selftests/kvm/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
+>> =C2=A0 .../selftests/kvm/x86_64/svm_vmcall_test.c=C2=A0=C2=A0=C2=A0 | =
+79 +++++++++++++++++++
+>> =C2=A0 2 files changed, 80 insertions(+)
+>> =C2=A0 create mode 100644 tools/testing/selftests/kvm/x86_64/svm_vmcal=
+l_test.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile
+>> b/tools/testing/selftests/kvm/Makefile
+>> index 2e770f554cae..b529d3b42c02 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -26,6 +26,7 @@ TEST_GEN_PROGS_x86_64 +=3D x86_64/vmx_dirty_log_test
+>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D x86_64/vmx_set_nested_state_test
+>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D x86_64/vmx_tsc_adjust_test
+>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D x86_64/xss_msr_test
+>> +TEST_GEN_PROGS_x86_64 +=3D x86_64/svm_vmcall_test
+>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D clear_dirty_log_test
+>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D dirty_log_test
+>> =C2=A0 TEST_GEN_PROGS_x86_64 +=3D kvm_create_max_vcpus
+>> diff --git a/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
+>> b/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
+>> new file mode 100644
+>> index 000000000000..6d3565aab94e
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
+>> @@ -0,0 +1,79 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * svm_vmcall_test
+>> + *
+>> + * Copyright (C) 2020, Red Hat, Inc.
+>> + *
+>> + * Nested SVM testing: VMCALL
+>> + */
+>> +
+>> +#include "test_util.h"
+>> +#include "kvm_util.h"
+>> +#include "processor.h"
+>> +#include "svm_util.h"
+>> +
+>> +#define VCPU_ID=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 5
+>> +
+>> +static struct kvm_vm *vm;
+>> +
+>> +static inline void l2_vmcall(struct svm_test_data *svm)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 __asm__ __volatile__("vmcall");
+> Is it possible to re-use the existing vmcall() function ?
+well the function is declared in vmx header. Also vmx_tsc_adjust_test
+does not use it for instance. For this test the above is simple and does
+the job.
 
-> +		}
-> +	report(true, "check LPI on all vcpus");
+> Also, we should probably re-name the function to 'l2_guest_code' which
+> is used in the existing code and also it matches with 'l1_guest_code'
+> naming.
+OK
+>> +}
+>> +
+>> +static void l1_guest_code(struct svm_test_data *svm)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 #define L2_GUEST_STACK_SIZE 64
+>> +=C2=A0=C2=A0=C2=A0 unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
+>> +=C2=A0=C2=A0=C2=A0 struct vmcb *vmcb =3D svm->vmcb;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* Prepare for L2 execution. */
+>> +=C2=A0=C2=A0=C2=A0 generic_svm_setup(svm, l2_vmcall,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 &l2_guest_stack[L2_GUEST_STACK_SIZE]);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 run_guest(vmcb, svm->vmcb_gpa);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 GUEST_ASSERT(vmcb->control.exit_code =3D=3D SVM_EX=
+IT_VMMCALL);
+>> +=C2=A0=C2=A0=C2=A0 GUEST_DONE();
+>> +}
+>> +
+>> +int main(int argc, char *argv[])
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 vm_vaddr_t svm_gva;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 nested_svm_check_supported();
+>> +
+>> +=C2=A0=C2=A0=C2=A0 vm =3D vm_create_default(VCPU_ID, 0, (void *) l1_g=
+uest_code);
+>> +=C2=A0=C2=A0=C2=A0 vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpui=
+d());
+>> +
+>> +=C2=A0=C2=A0=C2=A0 vcpu_alloc_svm(vm, &svm_gva);
+>> +=C2=A0=C2=A0=C2=A0 vcpu_args_set(vm, VCPU_ID, 1, svm_gva);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 for (;;) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 volatile struct kvm_run *r=
+un =3D vcpu_state(vm, VCPU_ID);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct ucall uc;
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu_run(vm, VCPU_ID);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TEST_ASSERT(run->exit_reas=
+on =3D=3D KVM_EXIT_IO,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n"=
+,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 run->exit_reason,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 exit_reason_str(run->exit_reason));
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 switch (get_ucall(vm, VCPU=
+_ID, &uc)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case UCALL_ABORT:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TE=
+ST_ASSERT(false, "%s",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (const char *)uc.args[0]);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
+ NOT REACHED */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case UCALL_SYNC:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case UCALL_DONE:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 go=
+to done;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TE=
+ST_ASSERT(false,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Unknown ucall 0x%x.", uc.c=
+md);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +done:
+>> +=C2=A0=C2=A0=C2=A0 kvm_vm_free(vm);
+>> +=C2=A0=C2=A0=C2=A0 return 0;
+>> +}
+>=20
+Thanks
 
-report(pass, ...);
-
-> +}
->  #endif
->  
->  static void gicv2_ipi_send_self(void)
-> @@ -594,6 +607,8 @@ static void gic_test_mmio(void)
->  static void test_its_introspection(void) {}
->  static void test_its_trigger(void) {}
->  static void test_its_migration(void) {}
-> +static void test_migrate_unmapped_collection(void) {}
-> +static void test_its_pending_migration(void) {}
-
-I'm not sure what's worse. This pile of stubs or one #ifdef in main()
-wrapping all the calls.
-
->  
->  #else /* __arch64__ */
->  
-> @@ -666,6 +681,18 @@ static bool its_prerequisites(int nb_cpus)
->  	return false;
->  }
->  
-> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-> +		    struct its_collection *col)
-> +{
-> +	if (!dev || !col)
-
-I don't think col can be null, and this doesn't look like the right place
-to check if dev is null.  If we're bothiner to call set_lpi, then I
-think we should already expect dev to be good to go.
-
-> +		report_abort("wrong device or collection");
-> +
-> +	its_send_mapti(dev, physid, eventid, col);
-> +
-> +	gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
-> +	its_send_invall(col);
-> +}
-> +
->  /*
->   * Setup the configuration for those mappings:
->   * dev_id=2 event=20 -> vcpu 3, intid=8195
-> @@ -806,6 +833,121 @@ static void test_its_migration(void)
->  	its_send_int(dev7, 255);
->  	check_lpi_stats();
->  }
-> +
-> +static void test_migrate_unmapped_collection(void)
-> +{
-> +	struct its_collection *col;
-> +	struct its_device *dev2, *dev7;
-> +	u8 config;
-> +
-> +	if (its_setup1())
-> +		return;
-> +
-> +	col = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-> +	dev2 = its_get_device(2);
-> +	dev7 = its_get_device(7);
-> +
-> +	/* MAPTI with the collection unmapped */
-> +	set_lpi(dev2, 0, 8192, col);
-> +
-> +	puts("Now migrate the VM, then press a key to continue...\n");
-> +	(void)getchar();
-> +	report(true, "Migration complete");
-
-report_info
-
-> +
-> +	/* on the destination, map the collection */
-> +	its_send_mapc(col, true);
-> +
-> +	lpi_stats_expect(2, 8196);
-> +	its_send_int(dev7, 255);
-> +	check_lpi_stats();
-> +
-> +	config = gicv3_lpi_get_config(8192);
-> +	report(config == LPI_PROP_DEFAULT,
-> +	       "Config of LPI 8192 was properly migrated");
-> +
-> +	lpi_stats_expect(nr_cpus - 1, 8192);
-> +	its_send_int(dev2, 0);
-> +	check_lpi_stats();
-> +
-> +	/* unmap the collection */
-> +	its_send_mapc(col, false);
-> +
-> +	lpi_stats_expect(-1, -1);
-> +	its_send_int(dev2, 0);
-> +	check_lpi_stats();
-> +
-> +	/* remap event 0 onto lpiid 8193 */
-> +	set_lpi(dev2, 0, 8193, col);
-> +	lpi_stats_expect(-1, -1);
-> +	its_send_int(dev2, 0);
-> +	check_lpi_stats();
-> +
-> +	/* remap the collection */
-> +	its_send_mapc(col, true);
-> +	lpi_stats_expect(nr_cpus - 1, 8193);
-> +}
-> +
-> +static void test_its_pending_migration(void)
-> +{
-> +	struct its_device *dev;
-> +	struct its_collection *collection[2];
-> +	int expected[NR_CPUS];
-
-expected = malloc(nr_cpus * sizeof(int));
-
-I know there are other places using NR_CPUS right now that don't have to,
-but we shouldn't add more. Eventually I'll change the other places too.
-
-> +	u64 pendbaser;
-> +	void *ptr;
-> +	int i;
-> +
-> +	if (its_prerequisites(4))
-> +		return;
-> +
-> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-> +	its_send_mapd(dev, true);
-> +
-> +	collection[0] = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-> +	collection[1] = its_create_collection(nr_cpus - 2, nr_cpus - 2);
-> +	its_send_mapc(collection[0], true);
-> +	its_send_mapc(collection[1], true);
-> +
-> +	/* disable lpi at redist level */
-> +	gicv3_lpi_rdist_ctrl(nr_cpus - 1, false);
-> +	gicv3_lpi_rdist_ctrl(nr_cpus - 2, false);
-> +
-> +	/* even lpis are assigned to even cpu */
-> +	for (i = 0; i < 256; i++) {
-> +		struct its_collection *col = i % 2 ? collection[0] :
-> +						     collection[1];
-> +		int vcpu = col->target_address >> 16;
-
-I'm lost with the even/odd (nr_cpus - 1)/(nr_cpus - 2) stuff, and won't
-it swap if nr_cpus is odd vs. even?
-
-Shouldn't we just have something like
-
-  pe1 = nr_cpus - 1;
-  pe2 = nr_cpus - 2;
-  col1 = its_create_collection(pe1, pe1);
-  col2 = its_create_collection(pe2, pe2);
-
-without mentioning even and odd?
-
-> +
-> +		its_send_mapti(dev, 8192 + i, i, col);
-> +		gicv3_lpi_set_config(8192 + i, LPI_PROP_DEFAULT);
-> +		gicv3_lpi_set_pending_table_bit(vcpu, 8192 + i, true);
-> +	}
-> +	its_send_invall(collection[0]);
-> +	its_send_invall(collection[1]);
-> +
-> +	/* Set the PTZ bit on each pendbaser */
-> +
-> +	expected[nr_cpus - 1] = 128;
-> +	expected[nr_cpus - 2] = 128;
-> +
-> +	ptr = gicv3_data.redist_base[nr_cpus - 1] + GICR_PENDBASER;
-> +	pendbaser = readq(ptr);
-> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> +
-> +	ptr = gicv3_data.redist_base[nr_cpus - 2] + GICR_PENDBASER;
-> +	pendbaser = readq(ptr);
-> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> +
-> +	gicv3_lpi_rdist_ctrl(nr_cpus - 1, true);
-> +	gicv3_lpi_rdist_ctrl(nr_cpus - 2, true);
-> +
-> +	puts("Now migrate the VM, then press a key to continue...\n");
-> +	(void)getchar();
-> +	report(true, "Migration complete");
-
-report_info
-
-> +
-> +	mdelay(1000);
-
-This delay needs a comment explaining why it's here.
-
-> +
-> +	check_lpi_hits(expected);
-> +}
->  #endif
->  
->  int main(int argc, char **argv)
-> @@ -847,6 +989,14 @@ int main(int argc, char **argv)
->  		report_prefix_push(argv[1]);
->  		test_its_migration();
->  		report_prefix_pop();
-> +	} else if (!strcmp(argv[1], "its-pending-migration")) {
-> +		report_prefix_push(argv[1]);
-> +		test_its_pending_migration();
-> +		report_prefix_pop();
-> +	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
-> +		report_prefix_push(argv[1]);
-> +		test_migrate_unmapped_collection();
-> +		report_prefix_pop();
->  	} else if (strcmp(argv[1], "its-introspection") == 0) {
->  		report_prefix_push(argv[1]);
->  		test_its_introspection();
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 8b8ec79..d917157 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -144,6 +144,22 @@ extra_params = -machine gic-version=3 -append 'its-migration'
->  groups = its migration
->  arch = arm64
->  
-> +[its-pending-migration]
-> +file = gic.flat
-> +smp = $MAX_SMP
-> +accel = kvm
-> +extra_params = -machine gic-version=3 -append 'its-pending-migration'
-> +groups = its migration
-> +arch = arm64
-> +
-> +[its-migrate-unmapped-collection]
-> +file = gic.flat
-> +smp = $MAX_SMP
-> +accel = kvm
-> +extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
-> +groups = its migration
-> +arch = arm64
-> +
->  # Test PSCI emulation
->  [psci]
->  file = psci.flat
-> -- 
-> 2.20.1
-> 
->
-
-Thanks,
-drew 
+Eric
 
