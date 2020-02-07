@@ -2,92 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C1CE155425
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 10:00:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CBE8D155449
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 10:05:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726958AbgBGJAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 04:00:42 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:40898 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726417AbgBGJAm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 04:00:42 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 88D6132A064F138B9523;
-        Fri,  7 Feb 2020 17:00:33 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Fri, 7 Feb 2020
- 17:00:26 +0800
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Subject: BUG: using __this_cpu_read() in preemptible [00000000] code
-CC:     <pbonzini@redhat.com>, <peterx@redhat.com>,
-        Marc Zyngier <maz@kernel.org>
-To:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>
-Message-ID: <318984f6-bc36-33a3-abc6-bf2295974b06@huawei.com>
-Date:   Fri, 7 Feb 2020 17:00:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1726951AbgBGJFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 04:05:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26216 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726867AbgBGJFi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 04:05:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581066336;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2TFD9rG7vA4FDrUIR6pMmUw/PlKpoAIbTdMQNf1sIX4=;
+        b=g+o5SDvyv3ILn6cZTY725p+e61VeqbF8jv9RPRrCzJk/9p+T1FHlsFgYqOUr5zKFbGR8qj
+        eiNx2gX5QJjGWQ6ezuDukt6uXs8Gntt3OeRMD1svz/cE3HWyD+Ig3V2aVeGynv4tdoaWfn
+        WaLjvz5BSn3YLi4MlZcUUQOlj2mr6kQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-DJakZkDgODiXcqldhy8MJg-1; Fri, 07 Feb 2020 04:05:35 -0500
+X-MC-Unique: DJakZkDgODiXcqldhy8MJg-1
+Received: by mail-wm1-f69.google.com with SMTP id y125so1394302wmg.1
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 01:05:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=2TFD9rG7vA4FDrUIR6pMmUw/PlKpoAIbTdMQNf1sIX4=;
+        b=JImAThZ+CJ+MFuJSH/vb5nRuP6ur0ZFLF6Li43oJR/M4H0bqjoBnhStqanewc4v+OH
+         sI28mQvBEZGza57w1DVQ0cYAvte0Bsd8F55c3oJ2qDuDdvKW6GrHIKillgm39Qn/bw2b
+         2X+FZXERsWVVY+pYBqDJiIVq15RtqeliqCCwAw05RagXoJufYp7FFf5E79PU+QtqpV3/
+         myFYsZC/FPYEm6nRxAjVS5dC5CgJxHdmR/fQt2xyxmak8uNE6nl0b/emgQjri7VVZDA0
+         7wclpnbD09Xu/KPj9tGf3KmNhVXVm9jRvLQp9buU0VygKsAIjnv8PmObiDTG5RV5hXUm
+         oWUQ==
+X-Gm-Message-State: APjAAAXzi1xXja1B3KstNj3Wx1ktg3eJhPLOYEhcYGWsmP2/072mUzuL
+        N38+v5BzsqdGety6L/9+7VeNDPu1lKEfGNEc0GNfl5twHfEqgnXS2nLqOR9v//Gq6uGey3qTBUr
+        3kxAptn/H7Vrb
+X-Received: by 2002:a5d:6b82:: with SMTP id n2mr3721295wrx.153.1581066334202;
+        Fri, 07 Feb 2020 01:05:34 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz6O3wbeZZQCUtS6dsN5hRsa9i0lefOI3eygicXS4BIRznUA5cVKuqZiLR+ei7uBb07X4RFTQ==
+X-Received: by 2002:a5d:6b82:: with SMTP id n2mr3721243wrx.153.1581066333856;
+        Fri, 07 Feb 2020 01:05:33 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id y7sm2571820wrr.56.2020.02.07.01.05.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2020 01:05:33 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     linmiaohe <linmiaohe@huawei.com>
+Cc:     "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86\@kernel.org" <x86@kernel.org>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar\@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson\@intel.com" <sean.j.christopherson@intel.com>,
+        "wanpengli\@tencent.com" <wanpengli@tencent.com>,
+        "jmattson\@google.com" <jmattson@google.com>,
+        "joro\@8bytes.org" <joro@8bytes.org>,
+        "tglx\@linutronix.de" <tglx@linutronix.de>,
+        "mingo\@redhat.com" <mingo@redhat.com>,
+        "bp\@alien8.de" <bp@alien8.de>, "hpa\@zytor.com" <hpa@zytor.com>
+Subject: Re: [PATCH] KVM: x86: remove duplicated KVM_REQ_EVENT request
+In-Reply-To: <a95c89cdcdca4749a1ca4d779ebd4a0a@huawei.com>
+References: <a95c89cdcdca4749a1ca4d779ebd4a0a@huawei.com>
+Date:   Fri, 07 Feb 2020 10:05:32 +0100
+Message-ID: <87h802g42r.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+linmiaohe <linmiaohe@huawei.com> writes:
 
-Running a latest preemptible kernel and some guests on it,
-I got the following message,
+> Hi：
+> Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+>> linmiaohe <linmiaohe@huawei.com> writes:
+>>> From: Miaohe Lin <linmiaohe@huawei.com>
+>>>
+>>> The KVM_REQ_EVENT request is already made in kvm_set_rflags(). We 
+>>> should not make it again.
+>>>  	kvm_rip_write(vcpu, ctxt->eip);
+>>>  	kvm_set_rflags(vcpu, ctxt->eflags);
+>>> -	kvm_make_request(KVM_REQ_EVENT, vcpu);
+>>
+>> I would've actually done it the other way around and removed
+>> kvm_make_request() from kvm_set_rflags() as it is not an obvious behavior (e.g. why kvm_rip_write() doens't do that and kvm_set_rflags() does ?) adding kvm_make_request() to all call sites.
+>>
+>>In case this looks like too big of a change with no particular gain I'd suggest you at least leave a comment above kvm_set_rflags(), something like
+>>
+>>"kvm_make_request() also requests KVM_REQ_EVENT"
+>
+> I think adding kvm_make_request() to all call sites is too big without particular gain. And also leave a comment above
+> kvm_set_rflags() maybe isn't needed as rflags updates is an site that can trigger event injection. Please see commit
+> (3842d135ff24 KVM: Check for pending events before attempting injection) for detail.
+>
+> What do you think?
 
----8<---
+I don't have a strong opinion on this and your change is correct so feel
+free to throw my
 
-[  630.031870] BUG: using __this_cpu_read() in preemptible [00000000] 
-code: qemu-system-aar/37270
-[  630.031872] caller is kvm_get_running_vcpu+0x1c/0x38
-[  630.031874] CPU: 32 PID: 37270 Comm: qemu-system-aar Kdump: loaded 
-Not tainted 5.5.0+
-[  630.031876] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58 
-10/29/2018
-[  630.031876] Call trace:
-[  630.031878]  dump_backtrace+0x0/0x200
-[  630.031880]  show_stack+0x24/0x30
-[  630.031882]  dump_stack+0xb0/0xf4
-[  630.031884]  __this_cpu_preempt_check+0xc8/0xd0
-[  630.031886]  kvm_get_running_vcpu+0x1c/0x38
-[  630.031888]  vgic_mmio_change_active.isra.4+0x2c/0xe0
-[  630.031890]  __vgic_mmio_write_cactive+0x80/0xc8
-[  630.031892]  vgic_mmio_uaccess_write_cactive+0x3c/0x50
-[  630.031894]  vgic_uaccess+0xcc/0x138
-[  630.031896]  vgic_v3_redist_uaccess+0x7c/0xa8
-[  630.031898]  vgic_v3_attr_regs_access+0x1a8/0x230
-[  630.031901]  vgic_v3_set_attr+0x1b4/0x290
-[  630.031903]  kvm_device_ioctl_attr+0xbc/0x110
-[  630.031905]  kvm_device_ioctl+0xc4/0x108
-[  630.031907]  ksys_ioctl+0xb4/0xd0
-[  630.031909]  __arm64_sys_ioctl+0x28/0x38
-[  630.031911]  el0_svc_common.constprop.1+0x7c/0x1a0
-[  630.031913]  do_el0_svc+0x34/0xa0
-[  630.031915]  el0_sync_handler+0x124/0x274
-[  630.031916]  el0_sync+0x140/0x180
-
----8<---
-
-I'm now at commit 90568ecf561540fa330511e21fcd823b0c3829c6.
-
-And it looks like vgic_get_mmio_requester_vcpu() was broken by
-7495e22bb165 ("KVM: Move running VCPU from ARM to common code").
-
-Could anyone please have a look?
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>
-
-
-Thanks,
-Zenghui
+-- 
+Vitaly
 
