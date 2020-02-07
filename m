@@ -2,330 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B2B81556D2
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 12:40:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A788A15571B
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 12:44:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727457AbgBGLkL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 06:40:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53292 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727317AbgBGLkK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 06:40:10 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 017Bb6eK143534;
-        Fri, 7 Feb 2020 06:40:08 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y0ktsc5yf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Feb 2020 06:40:08 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 017Bbglo145725;
-        Fri, 7 Feb 2020 06:40:06 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y0ktsc5x3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Feb 2020 06:40:06 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 017Bckx6013696;
-        Fri, 7 Feb 2020 11:40:06 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma03dal.us.ibm.com with ESMTP id 2xykca210b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Feb 2020 11:40:05 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 017Be3FD35652058
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 7 Feb 2020 11:40:03 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A4B9EAC05E;
-        Fri,  7 Feb 2020 11:40:03 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 93863AC059;
-        Fri,  7 Feb 2020 11:40:03 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.114.17.106])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  7 Feb 2020 11:40:03 +0000 (GMT)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: [PATCH 35/35] DOCUMENTATION: Protected virtual machine introduction and IPL
-Date:   Fri,  7 Feb 2020 06:39:58 -0500
-Message-Id: <20200207113958.7320-36-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20200207113958.7320-1-borntraeger@de.ibm.com>
-References: <20200207113958.7320-1-borntraeger@de.ibm.com>
-X-TM-AS-GCONF: 00
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S1726874AbgBGLo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 06:44:27 -0500
+Received: from foss.arm.com ([217.140.110.172]:39416 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726674AbgBGLo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 06:44:27 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3843F328;
+        Fri,  7 Feb 2020 03:44:26 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 45F9E3F68E;
+        Fri,  7 Feb 2020 03:44:25 -0800 (PST)
+Subject: Re: [PATCH v2 kvmtool 26/30] pci: Toggle BAR I/O and memory space
+ emulation
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com, maz@kernel.org
+References: <20200123134805.1993-1-alexandru.elisei@arm.com>
+ <20200123134805.1993-27-alexandru.elisei@arm.com>
+ <20200206182137.48894a54@donnerap.cambridge.arm.com>
+ <2d14a067-7d7c-d7b4-90f3-72f5778a2fec@arm.com>
+ <20200207113619.26c11a24@donnerap.cambridge.arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <8096b1b0-d903-896c-f8f6-60088a50342e@arm.com>
+Date:   Fri, 7 Feb 2020 11:44:24 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-07_01:2020-02-07,2020-02-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- impostorscore=0 malwarescore=0 suspectscore=0 phishscore=0 adultscore=0
- lowpriorityscore=0 priorityscore=1501 spamscore=0 clxscore=1015
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002070089
+In-Reply-To: <20200207113619.26c11a24@donnerap.cambridge.arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Janosch Frank <frankja@linux.ibm.com>
+Hi,
 
-Add documentation about protected KVM guests and description of changes
-that are necessary to move a KVM VM into Protected Virtualization mode.
+On 2/7/20 11:36 AM, Andre Przywara wrote:
+> On Fri, 7 Feb 2020 11:08:19 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+>> On 2/6/20 6:21 PM, Andre Przywara wrote:
+>>> On Thu, 23 Jan 2020 13:48:01 +0000
+>>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>>>
+>>> Hi,
+>>>  
+>>>> During configuration of the BAR addresses, a Linux guest disables and
+>>>> enables access to I/O and memory space. When access is disabled, we don't
+>>>> stop emulating the memory regions described by the BARs. Now that we have
+>>>> callbacks for activating and deactivating emulation for a BAR region,
+>>>> let's use that to stop emulation when access is disabled, and
+>>>> re-activate it when access is re-enabled.
+>>>>
+>>>> The vesa emulation hasn't been designed with toggling on and off in
+>>>> mind, so refuse writes to the PCI command register that disable memory
+>>>> or IO access.
+>>>>
+>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>> ---
+>>>>  hw/vesa.c | 16 ++++++++++++++++
+>>>>  pci.c     | 42 ++++++++++++++++++++++++++++++++++++++++++
+>>>>  2 files changed, 58 insertions(+)
+>>>>
+>>>> diff --git a/hw/vesa.c b/hw/vesa.c
+>>>> index 74ebebbefa6b..3044a86078fb 100644
+>>>> --- a/hw/vesa.c
+>>>> +++ b/hw/vesa.c
+>>>> @@ -81,6 +81,18 @@ static int vesa__bar_deactivate(struct kvm *kvm,
+>>>>  	return -EINVAL;
+>>>>  }
+>>>>  
+>>>> +static void vesa__pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>>>> +				u8 offset, void *data, int sz)
+>>>> +{
+>>>> +	u32 value;  
+>>> I guess the same comment as on the other patch applies: using u64 looks safer to me. Also you should clear it, to avoid nasty surprises in case of a short write (1 or 2 bytes only).  
+>> I was under the impression that the maximum size for a write to the PCI CAM or
+>> ECAM space is 32 bits. This is certainly what I've seen when running Linux, and
+>> the assumption in the PCI emulation code which has been working since 2010. I'm
+>> trying to dig out more information about this.
+>>
+>> If it's not, then we have a bigger problem because the PCI emulation code doesn't
+>> support it, and to account for it we would need to add a certain amount of logic
+>> to the code to deal with it: what if a write hits the command register and another
+>> adjacent register? what if a write hits two BARs? A BAR and a regular register
+>> before/after it? Part of a BAR and two registers before/after? You can see where
+>> this is going.
+>>
+>> Until we find exactly where in a PCI spec says that 64 bit writes to the
+>> configuration space are allowed, I would rather avoid all this complexity and
+>> assume that the guest is sane and will only write 32 bit values.
+> I don't think it's allowed, but that's not the point here:
+> If a (malicious?) guest does a 64-bit write, it will overwrite kvmtool's stack. We should not allow that. We don't need to behave correctly, but the guest should not be able to affect the host (VMM). All it should take is to have "u64 value = 0;" to fix that.
+>
+> Another possibility would be to filter for legal MMIO lengths earlier.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-[borntraeger@de.ibm.com: fixing and conversion to rst]
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- Documentation/virt/kvm/index.rst        |   2 +
- Documentation/virt/kvm/s390-pv-boot.rst |  79 ++++++++++++++++
- Documentation/virt/kvm/s390-pv.rst      | 116 ++++++++++++++++++++++++
- MAINTAINERS                             |   1 +
- 4 files changed, 198 insertions(+)
- create mode 100644 Documentation/virt/kvm/s390-pv-boot.rst
- create mode 100644 Documentation/virt/kvm/s390-pv.rst
+I would rather respond to accesses to the PCI config space which are longer than
+32 bits with a MASTER ABORT. I think this would be more robust.
 
-diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
-index ada224a511fe..9a3b3fff18aa 100644
---- a/Documentation/virt/kvm/index.rst
-+++ b/Documentation/virt/kvm/index.rst
-@@ -10,3 +10,5 @@ KVM
-    amd-memory-encryption
-    cpuid
-    vcpu-requests
-+   s390-pv
-+   s390-pv-boot
-diff --git a/Documentation/virt/kvm/s390-pv-boot.rst b/Documentation/virt/kvm/s390-pv-boot.rst
-new file mode 100644
-index 000000000000..47814e53369a
---- /dev/null
-+++ b/Documentation/virt/kvm/s390-pv-boot.rst
-@@ -0,0 +1,79 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+======================================
-+s390 (IBM Z) Boot/IPL of Protected VMs
-+======================================
-+
-+Summary
-+-------
-+Protected Virtual Machines (PVM) are not accessible by I/O or the
-+hypervisor.  When the hypervisor wants to access the memory of PVMs
-+the memory needs to be made accessible. When doing so, the memory will
-+be encrypted.  See :doc:`s390-pv` for details.
-+
-+On IPL a small plaintext bootloader is started which provides
-+information about the encrypted components and necessary metadata to
-+KVM to decrypt the protected virtual machine.
-+
-+Based on this data, KVM will make the protected virtual machine known
-+to the Ultravisor(UV) and instruct it to secure the memory of the PVM,
-+decrypt the components and verify the data and address list hashes, to
-+ensure integrity. Afterwards KVM can run the PVM via the SIE
-+instruction which the UV will intercept and execute on KVM's behalf.
-+
-+The switch into PV mode lets us load encrypted guest executables and
-+data via every available method (network, dasd, scsi, direct kernel,
-+...) without the need to change the boot process.
-+
-+
-+Diag308
-+-------
-+This diagnose instruction is the basis for VM IPL. The VM can set and
-+retrieve IPL information blocks, that specify the IPL method/devices
-+and request VM memory and subsystem resets, as well as IPLs.
-+
-+For PVs this concept has been extended with new subcodes:
-+
-+Subcode 8: Set an IPL Information Block of type 5 (information block
-+for PVMs)
-+Subcode 9: Store the saved block in guest memory
-+Subcode 10: Move into Protected Virtualization mode
-+
-+The new PV load-device-specific-parameters field specifies all data,
-+that is necessary to move into PV mode.
-+
-+* PV Header origin
-+* PV Header length
-+* List of Components composed of
-+   * AES-XTS Tweak prefix
-+   * Origin
-+   * Size
-+
-+The PV header contains the keys and hashes, which the UV will use to
-+decrypt and verify the PV, as well as control flags and a start PSW.
-+
-+The components are for instance an encrypted kernel, kernel cmd and
-+initrd. The components are decrypted by the UV.
-+
-+All non-decrypted data of the guest before it switches to protected
-+virtualization mode are zero on first access of the PV.
-+
-+
-+When running in protected mode some subcodes will result in exceptions
-+or return error codes.
-+
-+Subcodes 4 and 7 will result in specification exceptions as they would
-+not clear out the guest memory.
-+When removing a secure VM, the UV will clear all memory, so we can't
-+have non-clearing IPL subcodes.
-+
-+Subcodes 8, 9, 10 will result in specification exceptions.
-+Re-IPL into a protected mode is only possible via a detour into non
-+protected mode.
-+
-+Keys
-+----
-+Every CEC will have a unique public key to enable tooling to build
-+encrypted images.
-+See  `s390-tools <https://github.com/ibm-s390-tools/s390-tools/>`_
-+for the tooling.
-diff --git a/Documentation/virt/kvm/s390-pv.rst b/Documentation/virt/kvm/s390-pv.rst
-new file mode 100644
-index 000000000000..dbe9110dfd1e
---- /dev/null
-+++ b/Documentation/virt/kvm/s390-pv.rst
-@@ -0,0 +1,116 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=========================================
-+s390 (IBM Z) Ultravisor and Protected VMs
-+=========================================
-+
-+Summary
-+-------
-+Protected virtual machines (PVM) are KVM VMs, where KVM can't access
-+the VM's state like guest memory and guest registers anymore. Instead,
-+the PVMs are mostly managed by a new entity called Ultravisor
-+(UV). The UV provides an API that can be used by PVMs and KVM to
-+request management actions.
-+
-+Each guest starts in the non-protected mode and then may make a
-+request to transition into protected mode. On transition, KVM
-+registers the guest and its VCPUs with the Ultravisor and prepares
-+everything for running it.
-+
-+The Ultravisor will secure and decrypt the guest's boot memory
-+(i.e. kernel/initrd). It will safeguard state changes like VCPU
-+starts/stops and injected interrupts while the guest is running.
-+
-+As access to the guest's state, such as the SIE state description, is
-+normally needed to be able to run a VM, some changes have been made in
-+SIE behavior. A new format 4 state description has been introduced,
-+where some fields have different meanings for a PVM. SIE exits are
-+minimized as much as possible to improve speed and reduce exposed
-+guest state.
-+
-+
-+Interrupt injection
-+-------------------
-+Interrupt injection is safeguarded by the Ultravisor. As KVM doesn't
-+have access to the VCPUs' lowcores, injection is handled via the
-+format 4 state description.
-+
-+Machine check, external, IO and restart interruptions each can be
-+injected on SIE entry via a bit in the interrupt injection control
-+field (offset 0x54). If the guest cpu is not enabled for the interrupt
-+at the time of injection, a validity interception is recognized. The
-+format 4 state description contains fields in the interception data
-+block where data associated with the interrupt can be transported.
-+
-+Program and Service Call exceptions have another layer of
-+safeguarding; they can only be injected for instructions that have
-+been intercepted into KVM. The exceptions need to be a valid outcome
-+of an instruction emulation by KVM, e.g. we can never inject a
-+addressing exception as they are reported by SIE since KVM has no
-+access to the guest memory.
-+
-+
-+Mask notification interceptions
-+-------------------------------
-+In order to be notified when a PVM enables a certain class of
-+interrupt, KVM cannot intercept lctl(g) and lpsw(e) anymore. As a
-+replacement, two new interception codes have been introduced: One
-+indicating that the contents of CRs 0, 6, or 14 have been changed,
-+indicating different interruption subclasses; and one indicating that
-+PSW bit 13 has been changed, indicating that a machine check
-+intervention was requested and those are now enabled.
-+
-+Instruction emulation
-+---------------------
-+With the format 4 state description for PVMs, the SIE instruction already
-+interprets more instructions than it does with format 2. It is not able
-+to interpret every instruction, but needs to hand some tasks to KVM;
-+therefore, the SIE and the ultravisor safeguard emulation inputs and outputs.
-+
-+The control structures associated with SIE provide the Secure
-+Instruction Data Area (SIDA), the Interception Parameters (IP) and the
-+Secure Interception General Register Save Area.  Guest GRs and most of
-+the instruction data, such as I/O data structures, are filtered.
-+Instruction data is copied to and from the Secure Instruction Data
-+Area (SIDA) when needed.  Guest GRs are put into / retrieved from the
-+Secure Interception General Register Save Area.
-+
-+Only GR values needed to emulate an instruction will be copied into this
-+save area and the real register numbers will be hidden.
-+
-+The Interception Parameters state description field still contains the
-+the bytes of the instruction text, but with pre-set register values
-+instead of the actual ones. I.e. each instruction always uses the same
-+instruction text, in order not to leak guest instruction text.
-+This also implies that the register content that a guest had in r<n>
-+may be in r<m> from the hypervisors point of view.
-+
-+The Secure Instruction Data Area contains instruction storage
-+data. Instruction data, i.e. data being referenced by an instruction
-+like the SCCB for sclp, is moved over the SIDA. When an instruction is
-+intercepted, the SIE will only allow data and program interrupts for
-+this instruction to be moved to the guest via the two data areas
-+discussed before. Other data is either ignored or results in validity
-+interceptions.
-+
-+
-+Instruction emulation interceptions
-+-----------------------------------
-+There are two types of SIE secure instruction intercepts: the normal
-+and the notification type. Normal secure instruction intercepts will
-+make the guest pending for instruction completion of the intercepted
-+instruction type, i.e. on SIE entry it is attempted to complete
-+emulation of the instruction with the data provided by KVM. That might
-+be a program exception or instruction completion.
-+
-+The notification type intercepts inform KVM about guest environment
-+changes due to guest instruction interpretation. Such an interception
-+is recognized, for example, for the store prefix instruction to provide
-+the new lowcore location. On SIE reentry, any KVM data in the data areas
-+is ignored and execution continues as if the guest instruction had
-+completed. For that reason KVM is not allowed to inject a program
-+interrupt.
-+
-+Links
-+-----
-+`KVM Forum 2019 presentation <https://static.sched.com/hosted_files/kvmforum2019/3b/ibm_protected_vms_s390x.pdf>`_
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 56765f542244..90da412bebd9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9106,6 +9106,7 @@ L:	kvm@vger.kernel.org
- W:	http://www.ibm.com/developerworks/linux/linux390/
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git
- S:	Supported
-+F:	Documentation/virt/kvm/s390*
- F:	arch/s390/include/uapi/asm/kvm*
- F:	arch/s390/include/asm/gmap.h
- F:	arch/s390/include/asm/kvm*
--- 
-2.24.0
-
+Thanks,
+Alex
+>
+> Cheers,
+> Andre.
+>
+>> Thanks,
+>> Alex
+>>> The rest looks alright.
+>>>
+>>> Cheers,
+>>> Andre
+>>>  
+>>>> +
+>>>> +	if (offset == PCI_COMMAND) {
+>>>> +		memcpy(&value, data, sz);
+>>>> +		value |= (PCI_COMMAND_IO | PCI_COMMAND_MEMORY);
+>>>> +		memcpy(data, &value, sz);
+>>>> +	}
+>>>> +}
+>>>> +
+>>>>  struct framebuffer *vesa__init(struct kvm *kvm)
+>>>>  {
+>>>>  	struct vesa_dev *vdev;
+>>>> @@ -114,6 +126,10 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>>>>  		.bar_size[1]		= VESA_MEM_SIZE,
+>>>>  	};
+>>>>  
+>>>> +	vdev->pci_hdr.cfg_ops = (struct pci_config_operations) {
+>>>> +		.write	= vesa__pci_cfg_write,
+>>>> +	};
+>>>> +
+>>>>  	vdev->fb = (struct framebuffer) {
+>>>>  		.width			= VESA_WIDTH,
+>>>>  		.height			= VESA_HEIGHT,
+>>>> diff --git a/pci.c b/pci.c
+>>>> index 5412f2defa2e..98331a1fc205 100644
+>>>> --- a/pci.c
+>>>> +++ b/pci.c
+>>>> @@ -157,6 +157,42 @@ static struct ioport_operations pci_config_data_ops = {
+>>>>  	.io_out	= pci_config_data_out,
+>>>>  };
+>>>>  
+>>>> +static void pci_config_command_wr(struct kvm *kvm,
+>>>> +				  struct pci_device_header *pci_hdr,
+>>>> +				  u16 new_command)
+>>>> +{
+>>>> +	int i;
+>>>> +	bool toggle_io, toggle_mem;
+>>>> +
+>>>> +	toggle_io = (pci_hdr->command ^ new_command) & PCI_COMMAND_IO;
+>>>> +	toggle_mem = (pci_hdr->command ^ new_command) & PCI_COMMAND_MEMORY;
+>>>> +
+>>>> +	for (i = 0; i < 6; i++) {
+>>>> +		if (!pci_bar_is_implemented(pci_hdr, i))
+>>>> +			continue;
+>>>> +
+>>>> +		if (toggle_io && pci__bar_is_io(pci_hdr, i)) {
+>>>> +			if (__pci__io_space_enabled(new_command))
+>>>> +				pci_hdr->bar_activate_fn(kvm, pci_hdr, i,
+>>>> +							 pci_hdr->data);
+>>>> +			else
+>>>> +				pci_hdr->bar_deactivate_fn(kvm, pci_hdr, i,
+>>>> +							   pci_hdr->data);
+>>>> +		}
+>>>> +
+>>>> +		if (toggle_mem && pci__bar_is_memory(pci_hdr, i)) {
+>>>> +			if (__pci__memory_space_enabled(new_command))
+>>>> +				pci_hdr->bar_activate_fn(kvm, pci_hdr, i,
+>>>> +							 pci_hdr->data);
+>>>> +			else
+>>>> +				pci_hdr->bar_deactivate_fn(kvm, pci_hdr, i,
+>>>> +							   pci_hdr->data);
+>>>> +		}
+>>>> +	}
+>>>> +
+>>>> +	pci_hdr->command = new_command;
+>>>> +}
+>>>> +
+>>>>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
+>>>>  {
+>>>>  	void *base;
+>>>> @@ -182,6 +218,12 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
+>>>>  	if (*(u32 *)(base + offset) == 0)
+>>>>  		return;
+>>>>  
+>>>> +	if (offset == PCI_COMMAND) {
+>>>> +		memcpy(&value, data, size);
+>>>> +		pci_config_command_wr(kvm, pci_hdr, (u16)value);
+>>>> +		return;
+>>>> +	}
+>>>> +
+>>>>  	bar = (offset - PCI_BAR_OFFSET(0)) / sizeof(u32);
+>>>>  
+>>>>  	/*  
