@@ -2,127 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 27D0815607D
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 22:08:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67A83156085
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 22:10:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727117AbgBGVIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 16:08:34 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:42767 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726987AbgBGVIe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 16:08:34 -0500
-Received: by mail-qk1-f195.google.com with SMTP id q15so488409qke.9
-        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 13:08:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=onxmmjqXELNJOnSDJZ2qgajL7wmylkhLVi0Ggn784AA=;
-        b=dk5vzb2tCbBXS4d5M4it8BrIKygD26w5xPGFMn5hH7EB5FDmp0KmRWi/KQkqFkG1m8
-         CZbK1VtVLge1Eb4gNl4uRSdTopDs5ifncqrRoaKJt0xiy4KsrUNbkeoHFnpDu82NGpoM
-         XgxVX/bjgquMFQ7AL/PU5uShMvk5OCyQSKtUkAks5S2bpFBayhohiAjbSrs0bfH02cql
-         1XoSJkbIUFB0Kr13E5+kCY/PyGf5zGsZNuwNfBWNLXgLPruhljRLmWxCkW2WzgOfO3Au
-         cCNrrWIRqHsKpBql3MPaR/UFV+dcy3bnv/2M3EhyPrCMvK48LPH69/Y2TcNSDDw1XeRt
-         sj7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=onxmmjqXELNJOnSDJZ2qgajL7wmylkhLVi0Ggn784AA=;
-        b=Vd5g96LR81OfT9S3ZqRqFP7gJkDUz9CshK+oi+LcWctnXPKXFcmR8i+HrbBrkot3eb
-         JIBsiuhzfymAg9nB2qMASwdlvLdpfmRCGNx/9v+pkviqwIUtlTSMOXs+0CNIBVZ1VcwG
-         dPnm9Rok204abmrqWnOMpwGrGxo9yftXGW5xxzJJjKDODcO7SceVQV7NOV9C/KUjbBe3
-         7Abryv2m1E/MxUHyANAcfN0DGzI6qst6JuMtGztQdHa+pjNXBUX+JoDEI5/BXE05rb0q
-         ssD0VhmbZgeUdZQHuXHleyk6hU4WU5J6e+kv97WhW57bg/4IxtM1WP7xBxdNYq9KA/I/
-         Irzg==
-X-Gm-Message-State: APjAAAWeZWrJetmfz98dh+k6BPb2VNpIPPvcO95tmrAq7l8GiU3FgmJq
-        pBFXzcOLx6FALmFaaVI05xGymg==
-X-Google-Smtp-Source: APXvYqxV/m72xBwpp0O2ntYMuXRK2I5x5D+oyFT5b9Vs5/VSe70eUTFQFZZtB9ADtTtpSzP+vqImqQ==
-X-Received: by 2002:a37:e10f:: with SMTP id c15mr806650qkm.331.1581109713217;
-        Fri, 07 Feb 2020 13:08:33 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id n7sm189917qkk.41.2020.02.07.13.08.32
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 07 Feb 2020 13:08:32 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1j0ArY-00086p-0F; Fri, 07 Feb 2020 17:08:32 -0400
-Date:   Fri, 7 Feb 2020 17:08:31 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     linux-nvdimm@lists.01.org, Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Liran Alon <liran.alon@oracle.com>,
-        Nikita Leshenko <nikita.leshchenko@oracle.com>,
-        Barret Rhoden <brho@google.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: Re: [PATCH RFC 09/10] vfio/type1: Use follow_pfn for VM_FPNMAP VMAs
-Message-ID: <20200207210831.GA31015@ziepe.ca>
-References: <20200110190313.17144-1-joao.m.martins@oracle.com>
- <20200110190313.17144-10-joao.m.martins@oracle.com>
+        id S1727347AbgBGVKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 16:10:17 -0500
+Received: from mga01.intel.com ([192.55.52.88]:27540 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727048AbgBGVKR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 16:10:17 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 13:10:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,414,1574150400"; 
+   d="scan'208";a="220912856"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga007.jf.intel.com with ESMTP; 07 Feb 2020 13:10:16 -0800
+Date:   Fri, 7 Feb 2020 13:10:16 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 17/19] KVM: Terminate memslot walks via used_slots
+Message-ID: <20200207211016.GN2401@linux.intel.com>
+References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+ <20200121223157.15263-18-sean.j.christopherson@intel.com>
+ <20200206210944.GD700495@xz-x1>
+ <20200207183325.GI2401@linux.intel.com>
+ <20200207203909.GE720553@xz-x1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200110190313.17144-10-joao.m.martins@oracle.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200207203909.GE720553@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 10, 2020 at 07:03:12PM +0000, Joao Martins wrote:
-> From: Nikita Leshenko <nikita.leshchenko@oracle.com>
+On Fri, Feb 07, 2020 at 03:39:09PM -0500, Peter Xu wrote:
+> On Fri, Feb 07, 2020 at 10:33:25AM -0800, Sean Christopherson wrote:
+> > On Thu, Feb 06, 2020 at 04:09:44PM -0500, Peter Xu wrote:
+> > > On Tue, Jan 21, 2020 at 02:31:55PM -0800, Sean Christopherson wrote:
+> > > > @@ -9652,13 +9652,13 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+> > > >  		if (IS_ERR((void *)hva))
+> > > >  			return PTR_ERR((void *)hva);
+> > > >  	} else {
+> > > > -		if (!slot->npages)
+> > > > +		if (!slot || !slot->npages)
+> > > >  			return 0;
+> > > >  
+> > > > -		hva = 0;
+> > > > +		hva = slot->userspace_addr;
+> > > 
+> > > Is this intended?
+> > 
+> > Yes.  It's possible to allow VA=0 for userspace mappings.  It's extremely
+> > uncommon, but possible.  Therefore "hva == 0" shouldn't be used to
+> > indicate an invalid slot.
 > 
-> Unconditionally interpreting vm_pgoff as a PFN is incorrect.
+> Note that this is the deletion path in __x86_set_memory_region() not
+> allocation.  IIUC userspace_addr won't even be used in follow up code
+> path so it shouldn't really matter.  Or am I misunderstood somewhere?
+
+No, but that's precisely why I don't want to zero out @hva, as doing so
+implies that '0' indicates an invalid hva, which is wrong.
+
+What if I change this to 
+
+			hva = 0xdeadull << 48;
+
+and add a blurb in the changelog about stuff hva with a non-canonical value
+to indicate it's being destroyed.
+
+> > > > +		old_npages = slot->npages;
+> > > >  	}
+> > > >  
+> > > > -	old = *slot;
+> > > >  	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> > > >  		struct kvm_userspace_memory_region m;
+> > > >  
+
+...
+
+> > > > +{
+> > > > +	struct kvm_memory_slot *mslots = slots->memslots;
+> > > > +	int i;
+> > > > +
+> > > > +	if (WARN_ON_ONCE(slots->id_to_index[memslot->id] == -1) ||
+> > > > +	    WARN_ON_ONCE(!slots->used_slots))
+> > > > +		return -1;
+> > > > +
+> > > > +	/*
+> > > > +	 * Move the target memslot backward in the array by shifting existing
+> > > > +	 * memslots with a higher GFN (than the target memslot) towards the
+> > > > +	 * front of the array.
+> > > > +	 */
+> > > > +	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots - 1; i++) {
+> > > > +		if (memslot->base_gfn > mslots[i + 1].base_gfn)
+> > > > +			break;
+> > > > +
+> > > > +		WARN_ON_ONCE(memslot->base_gfn == mslots[i + 1].base_gfn);
+> > > 
+> > > Will this trigger?  Note that in __kvm_set_memory_region() we have
+> > > already checked overlap of memslots.
+> > 
+> > If you screw up the code it will :-)  In a perfect world, no WARN() will
+> > *ever* trigger.  All of the added WARN_ON_ONCE() are to help the next poor
+> > soul that wants to modify this code.
 > 
-> VMAs created by /dev/mem do this, but in general VM_PFNMAP just means
-> that the VMA doesn't have an associated struct page and is being managed
-> directly by something other than the core mmu.
+> I normally won't keep WARN_ON if it is 100% not triggering (100% here
+> I mean when e.g. it is checked twice so the 1st one will definitely
+> trigger first).  My question is more like a pure question in case I
+> overlooked something.  Please also feel free to keep it if you want.
+
+Ah.  The WARNs here as much to concisely document the assumptions and
+conditions of the code as they are there to enforce those conditions.
+
+> > > > +
+> > > > +		/* Shift the next memslot forward one and update its index. */
+> > > > +		mslots[i] = mslots[i + 1];
+s> > > > +		slots->id_to_index[mslots[i].id] = i;
+> > > > +	}
+> > > > +	return i;
+> > > > +}
+> > > > @@ -1104,8 +1203,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> > 
+> > ...
+> > 
+> > > >  	 * when the memslots are re-sorted by update_memslots().
+> > > >  	 */
+> > > >  	tmp = id_to_memslot(__kvm_memslots(kvm, as_id), id);
+> > > > -	old = *tmp;
+> > > > -	tmp = NULL;
+> > > 
+> > > I was confused in that patch, then...
+> > > 
+> > > > +	if (tmp) {
+> > > > +		old = *tmp;
+> > > > +		tmp = NULL;
+> > > 
+> > > ... now I still don't know why it needs to set to NULL?
+> > 
+> > To make it abundantly clear that though shall not use @tmp, i.e. to force
+> > using the copy and not the pointer.  Note, @tmp is also reused as an
+> > iterator below.
 > 
-> Use follow_pfn like KVM does to find the PFN.
-> 
-> Signed-off-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
->  drivers/vfio/vfio_iommu_type1.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 2ada8e6cdb88..1e43581f95ea 100644
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -362,9 +362,9 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
->  
->  	if (vma && vma->vm_flags & VM_PFNMAP) {
-> -		*pfn = ((vaddr - vma->vm_start) >> PAGE_SHIFT) + vma->vm_pgoff;
-> -		if (is_invalid_reserved_pfn(*pfn))
-> -			ret = 0;
-> +		ret = follow_pfn(vma, vaddr, pfn);
-> +		if (!ret && !is_invalid_reserved_pfn(*pfn))
-> +			ret = -EOPNOTSUPP;
->  	}
+> OK it still feels a bit strange, say, we can comment on that if you
+> wants to warn the others.  The difference is probably no useless
+> instruction executed.  But this is also trivial, I'll leave to the
+> others to judge.
 
-FWIW this existing code is a huge hack and a security problem.
+After having suffered through deciphering this code and blundering into
+nasty gotchas more than once, I'd really like to keep the nullification.
+I'll add a comment to explain that the sole purpose is to kill @tmp so it
+can't be used incorrectly and thus cause silent failure.
 
-I'm not sure how you could be successfully using this path on actual
-memory without hitting bad bugs?
-
-Fudamentally VFIO can't retain a reference to a page from within a VMA
-without some kind of recount/locking/etc to allow the thing that put
-the page there to know it is still being used (ie programmed in a
-IOMMU) by VFIO.
-
-Otherwise it creates use-after-free style security problems on the
-page.
-
-This code needs to be deleted, not extended :(
-
-Jason
+This is also another reason I'd like to keep the WARN_ONs.  When this code
+goes awry, the result is usually silent corruption and delayed explosions,
+i.e. failures that absolutely suck to debug.
