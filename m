@@ -2,77 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 55914155D02
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 18:38:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84E1D155D11
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 18:42:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727581AbgBGRie (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 12:38:34 -0500
-Received: from foss.arm.com ([217.140.110.172]:42506 "EHLO foss.arm.com"
+        id S1727303AbgBGRms (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 12:42:48 -0500
+Received: from mga11.intel.com ([192.55.52.93]:13003 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727574AbgBGRid (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 12:38:33 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 73A6D1FB;
-        Fri,  7 Feb 2020 09:38:33 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C0633F68E;
-        Fri,  7 Feb 2020 09:38:32 -0800 (PST)
-Date:   Fri, 7 Feb 2020 17:38:29 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org,
-        Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v2 kvmtool 28/30] arm/fdt: Remove 'linux,pci-probe-only'
- property
-Message-ID: <20200207173829.1ac1884e@donnerap.cambridge.arm.com>
-In-Reply-To: <20200123134805.1993-29-alexandru.elisei@arm.com>
-References: <20200123134805.1993-1-alexandru.elisei@arm.com>
-        <20200123134805.1993-29-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1727154AbgBGRmr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 12:42:47 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 09:42:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,414,1574150400"; 
+   d="scan'208";a="312095672"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by orsmga001.jf.intel.com with ESMTP; 07 Feb 2020 09:42:46 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH 0/4] nVMX: 5-level nested EPT support
+Date:   Fri,  7 Feb 2020 09:42:40 -0800
+Message-Id: <20200207174244.6590-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 Jan 2020 13:48:03 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+Add support for 5-level nested EPT and clean up the test for
+MSR_IA32_VMX_EPT_VPID_CAP in the process.
 
-Hi,
+Sean Christopherson (4):
+  nVMX: Extend EPTP test to allow 5-level EPT
+  nVMX: Refactor the EPT/VPID MSR cap check to make it readable
+  nVMX: Mark bit 39 of MSR_IA32_VMX_EPT_VPID_CAP as reserved
+  nVMX: Extend EPT cap MSR test to allow 5-level EPT
 
-> From: Julien Thierry <julien.thierry@arm.com>
-> 
-> PCI now supports configurable BARs. Get rid of the no longer needed,
-> Linux-only, fdt property.
+ x86/vmx.c       | 21 ++++++++++++++++++++-
+ x86/vmx.h       |  4 +++-
+ x86/vmx_tests.c | 12 ++++++++----
+ 3 files changed, 31 insertions(+), 6 deletions(-)
 
-I was just wondering: what is the x86 story here?
-Does the x86 kernel never reassign BARs? Or is this dependent on something else?
-I see tons of pci kernel command line parameters for pci=, maybe one of them would explicitly allow reassigning?
-
-Cheers,
-Andre
-
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/fdt.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/arm/fdt.c b/arm/fdt.c
-> index c80e6da323b6..02091e9e0bee 100644
-> --- a/arm/fdt.c
-> +++ b/arm/fdt.c
-> @@ -130,7 +130,6 @@ static int setup_fdt(struct kvm *kvm)
->  
->  	/* /chosen */
->  	_FDT(fdt_begin_node(fdt, "chosen"));
-> -	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
->  
->  	/* Pass on our amended command line to a Linux kernel only. */
->  	if (kvm->cfg.firmware_filename) {
+-- 
+2.24.1
 
