@@ -2,146 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40ED8155BB6
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 17:26:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 277F2155BB7
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 17:26:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727347AbgBGQZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 11:25:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35147 "EHLO
+        id S1727129AbgBGQ0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 11:26:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43625 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726874AbgBGQZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 11:25:58 -0500
+        with ESMTP id S1726874AbgBGQ0K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 11:26:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581092757;
+        s=mimecast20190719; t=1581092769;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1A4AnPYG4QKudcgCccIbKk1UqeHiL89Ca/26LbtLNW0=;
-        b=TTsJWg/z6Bufg8NOGA7/vSgYWPlt/n7mvcrdpjSrmfaKo+tqYUupjxpcLPVSfTe/buTKjO
-        BtLlFIQNP9mEHmhFooSvMbQNpHzaGEqxUTLDtJEIIwI+0Ub8cIUFeQNjrXYyrfVOxAzDxo
-        s7pWeKHFp2yAterED1Hc2g/5zuZU6HY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-MH39CF0jOQqPIdou9QFOUQ-1; Fri, 07 Feb 2020 11:25:52 -0500
-X-MC-Unique: MH39CF0jOQqPIdou9QFOUQ-1
-Received: by mail-wm1-f69.google.com with SMTP id z7so961358wmi.0
-        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 08:25:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=1A4AnPYG4QKudcgCccIbKk1UqeHiL89Ca/26LbtLNW0=;
-        b=c67+qFSPsLbKgPri8Crk4uuCsAZwVRCcjNEaoRqnXRyhNomO90lSgft0cBMxS5u47J
-         UoIKAdQi+JSbKjcrU7+6UIIw8DElkiK9C2EIXO1e+J003M2aHQm8/eYHq3Li44Oqe0Zv
-         /RMUikrvjTsIRW9fRPHoh0HGF/Fpj5MtM0nBaPpu89O5ky4dLMkEoLye2Pn+4epryCcI
-         hbhlQNbKxKqQsW4ilf4PCZT5c/kJv99EUS5CxIMxKz4v9GNnpqFAuuKGI4ugSv7fIfsL
-         0cVz+VakUfpe0D/Gnwx9hChjF1wunBRkXMWignmz8+B9fJGU1lGIFmgU2BaEUmRmtN9o
-         tfAA==
-X-Gm-Message-State: APjAAAVtOV8zYP8dNCI/wuBo3gvQZsqwPG1YwsCAZaXyPoL7DURvOmoi
-        9+CkO5jnDdlTFoc4Ml+9aMU180uqWwcdP30SomlU+iCxw/E4tAtiYTBgL2EyqwucAey8pb/Sggb
-        eIQCK4hZoMvs9
-X-Received: by 2002:a7b:cbc8:: with SMTP id n8mr5161410wmi.35.1581092751588;
-        Fri, 07 Feb 2020 08:25:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw301M5FoKZ0/Wzsw2hrBkoIM94RmCmiNqrRJGjHwwSRYaykvhuKE/qTOXZAcTjqdr1tHov0w==
-X-Received: by 2002:a7b:cbc8:: with SMTP id n8mr5161389wmi.35.1581092751345;
-        Fri, 07 Feb 2020 08:25:51 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id e22sm4044678wme.45.2020.02.07.08.25.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2020 08:25:50 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     linmiaohe <linmiaohe@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Subject: Re: [PATCH v2] KVM: nVMX: Fix some comment typos and coding style
-In-Reply-To: <1581088965-3334-1-git-send-email-linmiaohe@huawei.com>
-References: <1581088965-3334-1-git-send-email-linmiaohe@huawei.com>
-Date:   Fri, 07 Feb 2020 17:25:50 +0100
-Message-ID: <87zhdupdo1.fsf@vitty.brq.redhat.com>
+        bh=cxeqVJ/Oa/YlVBdGzWhoqslIEY+UxuZ7N1JDOSgyoqQ=;
+        b=Ter8RomugqA/P4CPQkmuojbApqU71KCMQlPZUSojuF0Hq752NrCGmrCorU0rlawQKU4gWH
+        vf2YULKlu9pAUzXB4JONCyUsvLhT3QdAQINUAxnTrO5Nlh3v4WLpLQBZutaLpCHI63zeEw
+        /zmCiVsXzlnL5ouJ/EZHxDgxV0k9BM8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-NBQ247HvPGu52Ha5hOOkJw-1; Fri, 07 Feb 2020 11:26:06 -0500
+X-MC-Unique: NBQ247HvPGu52Ha5hOOkJw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B039D18A5510
+        for <kvm@vger.kernel.org>; Fri,  7 Feb 2020 16:26:05 +0000 (UTC)
+Received: from paraplu.localdomain (ovpn-116-47.ams2.redhat.com [10.36.116.47])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C7B4C46;
+        Fri,  7 Feb 2020 16:26:02 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+        id 42D2F3E048C; Fri,  7 Feb 2020 17:26:00 +0100 (CET)
+Date:   Fri, 7 Feb 2020 17:26:00 +0100
+From:   Kashyap Chamarthy <kchamart@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, dgilbert@redhat.com, vkuznets@redhat.com
+Subject: Re: [PATCH] docs/virt/kvm: Document running nested guests
+Message-ID: <20200207162600.GA30317@paraplu>
+References: <20200207153002.16081-1-kchamart@redhat.com>
+ <20200207164653.28849ef0.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200207164653.28849ef0.cohuck@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-linmiaohe <linmiaohe@huawei.com> writes:
+On Fri, Feb 07, 2020 at 04:46:53PM +0100, Cornelia Huck wrote:
+> On Fri,  7 Feb 2020 16:30:02 +0100
+> Kashyap Chamarthy <kchamart@redhat.com> wrote:
+>=20
 
-> From: Miaohe Lin <linmiaohe@huawei.com>
->
-> Fix some typos in the comments. Also fix coding style.
-> [Sean Christopherson rewrites the comment of write_fault_to_shadow_pgtable
-> field in struct kvm_vcpu_arch.]
->
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
-> v1->v2:
-> Use Sean Christopherson' comment for write_fault_to_shadow_pgtable
-> ---
->  arch/x86/include/asm/kvm_host.h | 16 +++++++++++++---
->  arch/x86/kvm/vmx/nested.c       |  5 +++--
->  2 files changed, 16 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 4dffbc10d3f8..40a0c0fd95ca 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -781,9 +781,19 @@ struct kvm_vcpu_arch {
->  	u64 msr_kvm_poll_control;
->  
->  	/*
-> -	 * Indicate whether the access faults on its page table in guest
-> -	 * which is set when fix page fault and used to detect unhandeable
-> -	 * instruction.
-> +	 * Indicates the guest is trying to write a gfn that contains one or
-> +	 * more of the PTEs used to translate the write itself, i.e. the access
-> +	 * is changing its own translation in the guest page tables.  KVM exits
-> +	 * to userspace if emulation of the faulting instruction fails and this
-> +	 * flag is set, as KVM cannot make forward progress.
-> +	 *
-> +	 * If emulation fails for a write to guest page tables, KVM unprotects
-> +	 * (zaps) the shadow page for the target gfn and resumes the guest to
-> +	 * retry the non-emulatable instruction (on hardware).  Unprotecting the
-> +	 * gfn doesn't allow forward progress for a self-changing access because
-> +	 * doing so also zaps the translation for the gfn, i.e. retrying the
-> +	 * instruction will hit a !PRESENT fault, which results in a new shadow
-> +	 * page and sends KVM back to square one.
->  	 */
->  	bool write_fault_to_shadow_pgtable;
->  
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 657c2eda357c..e7faebccd733 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -544,7 +544,8 @@ static void nested_vmx_disable_intercept_for_msr(unsigned long *msr_bitmap_l1,
->  	}
->  }
->  
-> -static inline void enable_x2apic_msr_intercepts(unsigned long *msr_bitmap) {
-> +static inline void enable_x2apic_msr_intercepts(unsigned long *msr_bitmap)
-> +{
->  	int msr;
->  
->  	for (msr = 0x800; msr <= 0x8ff; msr += BITS_PER_LONG) {
-> @@ -1981,7 +1982,7 @@ static int nested_vmx_handle_enlightened_vmptrld(struct kvm_vcpu *vcpu,
->  	}
->  
->  	/*
-> -	 * Clean fields data can't de used on VMLAUNCH and when we switch
-> +	 * Clean fields data can't be used on VMLAUNCH and when we switch
->  	 * between different L2 guests as KVM keeps a single VMCS12 per L1.
->  	 */
->  	if (from_launch || evmcs_gpa_changed)
+[...]
 
-With Sean's comment added the subject of the patch is a bit unexpected
-:-) But the change itself looks good (and thanks Sean for the great
-explanation!).
+> > ---
+> >  .../virt/kvm/running-nested-guests.rst        | 171 ++++++++++++++++=
+++
+> >  1 file changed, 171 insertions(+)
+> >  create mode 100644 Documentation/virt/kvm/running-nested-guests.rst
+>=20
+> FWIW, there's currently a series converting this subdirectory to rst
+> on-list.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+I see, noted.  I hope there won't be any conflict, as this is a new file
+addition.
 
--- 
-Vitaly
+> >=20
+> > diff --git a/Documentation/virt/kvm/running-nested-guests.rst b/Docum=
+entation/virt/kvm/running-nested-guests.rst
+> > new file mode 100644
+> > index 0000000000000000000000000000000000000000..e94ab665c71a36b7718ae=
+bae902af16b792f6dd3
+> > --- /dev/null
+> > +++ b/Documentation/virt/kvm/running-nested-guests.rst
+> > @@ -0,0 +1,171 @@
+> > +Running nested guests with KVM
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+>=20
+> I think the common style is to also have a "=3D=3D=3D..." line on top.
+
+Will add.  (Just that some projects don't use it; others do.  :-))
+
+
+> > +
+> > +A nested guest is a KVM guest that in turn runs on a KVM guest::
+> > +
+> > +              .----------------.  .----------------.
+> > +              |                |  |                |
+> > +              |      L2        |  |      L2        |
+> > +              | (Nested Guest) |  | (Nested Guest) |
+> > +              |                |  |                |
+> > +              |----------------'--'----------------|
+> > +              |                                    |
+> > +              |       L1 (Guest Hypervisor)        |
+> > +              |          KVM (/dev/kvm)            |
+> > +              |                                    |
+> > +      .------------------------------------------------------.
+> > +      |                 L0 (Host Hypervisor)                 |
+> > +      |                    KVM (/dev/kvm)                    |
+> > +      |------------------------------------------------------|
+> > +      |                  x86 Hardware (VMX)                  |
+>=20
+> Just 'Hardware'? I don't think you want to make this x86-specific?
+
+Good point, will make it more generic.
+
+>=20
+> > +      '------------------------------------------------------'
+> > +
+> > +
+> > +Terminology:
+> > +
+> > +  - L0 =E2=80=93 level-0; the bare metal host, running KVM
+> > +
+> > +  - L1 =E2=80=93 level-1 guest; a VM running on L0; also called the =
+"guest
+> > +    hypervisor", as it itself is capable of running KVM.
+> > +
+> > +  - L2 =E2=80=93 level-2 guest; a VM running on L1, this is the "nes=
+ted guest"
+> > +
+> > +
+> > +Use Cases
+> > +---------
+> > +
+> > +An additional layer of virtualization sometimes can .  You
+>=20
+> Something seems to be missing here?
+
+Err, broken sentence while rewriting (perils of distraction).  I'll fix
+it.
+
+> > +might have access to a large virtual machine in a cloud environment =
+that
+> > +you want to compartmentalize into multiple workloads.  You might be
+> > +running a lab environment in a training session.
+> > +
+> > +There are several scenarios where nested KVM can be Useful:
+>=20
+> s/Useful/useful/
+
+Will fix in v2.
+
+[...]
+
+> > +    $ cat /sys/module/kvm_intel/parameters/nested
+> > +    Y
+> > +
+> > +For AMD hosts, the process is the same as above, except that the mod=
+ule
+> > +name is ``kvm-amd``.
+>=20
+> This looks x86-specific. Don't know about others, but s390 has one
+> module, also a 'nested' parameter, which is mutually exclusive with a
+> 'hpage' parameter.
+
+Fair point, I'll add a seperate section for all relevant architectures.
+Thanks for pointing it out.
+
+> > +
+> > +Once your bare metal host (L0) is configured for nesting, you should=
+ be
+> > +able to start an L1 guest with ``qemu-kvm -cpu host`` (which passes
+> > +through the host CPU's capabilities as-is to the guest); or for bett=
+er
+> > +live migration compatibility, use a named CPU model supported by QEM=
+U,
+> > +e.g.: ``-cpu Haswell-noTSX-IBRS,vmx=3Don`` and the guest will subseq=
+uently
+> > +be capable of running an L2 guest with accelerated KVM.
+>=20
+> That's probably more something that should go into a section that gives
+> an example how to start a nested guest with QEMU? Cpu models also look
+> different between architectures.
+
+Yeah, I wondered about it.  I'll add a simple, representative example.
+
+[...]
+
+> > +Again, to persist the above values across reboot, append them to
+> > +``/etc/modprobe.d/kvm_intel.conf``::
+> > +
+> > +    options kvm-intel nested=3Dy
+> > +    options kvm-intel enable_shadow_vmcs=3Dy
+> > +    options kvm-intel enable_apivc=3Dy
+> > +    options kvm-intel ept=3Dy
+>=20
+> x86 specific -- maybe reorganize this document by starting with a
+> general setup section and then giving some architecture-specific
+> information?
+
+Yeah, good point.  Sorry, I was too x86-centric as I tend to just work
+with x86 machines.  Reorganizing it as you suggest sounds good.
+
+[...]
+
+> > +Limitations on Linux kernel versions older than 5.3
+> > +---------------------------------------------------
+> > +
+> > +On Linux kernel versions older than 5.3, once an L1 guest has starte=
+d an
+> > +L2 guest, the L1 guest would no longer capable of being migrated, sa=
+ved,
+> > +or loaded (refer to QEMU documentation on "save"/"load") until the L=
+2
+> > +guest shuts down.  [FIXME: Is this limitation fixed for *all*
+> > +architectures, including s390x?]
+>=20
+> I don't think we ever had that limitation on s390x, since the whole way
+> control blocks etc. are handled is different there. David (H), do you
+> remember?
+
+I see, I was just not sure.  Thought I better ask on the list :-)
+
+Thank you for the quick review!
+
+[...]
+
+--=20
+/kashyap
 
