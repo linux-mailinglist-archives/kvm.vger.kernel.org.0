@@ -2,93 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 02B061550CF
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 03:59:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BB121550F3
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 04:20:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727028AbgBGC7S convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 6 Feb 2020 21:59:18 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:40578 "EHLO huawei.com"
+        id S1726838AbgBGDUu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Feb 2020 22:20:50 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:9707 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726597AbgBGC7R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Feb 2020 21:59:17 -0500
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id 04D312EDC18A8F6983C6;
-        Fri,  7 Feb 2020 10:59:15 +0800 (CST)
-Received: from dggeme713-chm.china.huawei.com (10.1.199.109) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 7 Feb 2020 10:59:14 +0800
-Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme713-chm.china.huawei.com (10.1.199.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Fri, 7 Feb 2020 10:59:14 +0800
-Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
- dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Fri, 7 Feb 2020 10:59:14 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
-Subject: Re: [PATCH] KVM: apic: reuse smp_wmb() in kvm_make_request()
-Thread-Topic: [PATCH] KVM: apic: reuse smp_wmb() in kvm_make_request()
-Thread-Index: AdXdYflqAMGIHsEtNky6XhNmzdckJQ==
-Date:   Fri, 7 Feb 2020 02:59:14 +0000
-Message-ID: <0f8ae71f59cd4b80ac93b9e1aa3b2428@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.158]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726628AbgBGDUt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Feb 2020 22:20:49 -0500
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 4FC83DEDBF9E915389DD;
+        Fri,  7 Feb 2020 11:20:46 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Fri, 7 Feb 2020
+ 11:20:39 +0800
+Subject: Re: [kvm-unit-tests PATCH v3 08/14] arm/arm64: ITS:
+ its_enable_defaults
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>
+CC:     <drjones@redhat.com>, <andre.przywara@arm.com>,
+        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
+        <thuth@redhat.com>
+References: <20200128103459.19413-1-eric.auger@redhat.com>
+ <20200128103459.19413-9-eric.auger@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <10d0630f-1464-b12a-5ad5-ee617eaa5cca@huawei.com>
+Date:   Fri, 7 Feb 2020 11:20:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
+In-Reply-To: <20200128103459.19413-9-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
 X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> On Thu, Feb 06, 2020 at 11:47:02AM +0100, Vitaly Kuznetsov wrote:
->> linmiaohe <linmiaohe@huawei.com> writes:
->> 
->> > From: Miaohe Lin <linmiaohe@huawei.com>
->> >
->> > There is already an smp_mb() barrier in kvm_make_request(). We reuse 
->> > it here.
->> > +			/*
->> > +			 * Make sure pending_events is visible before sending
->> > +			 * the request.
->> > +			 * There is already an smp_wmb() in kvm_make_request(),
->> > +			 * we reuse that barrier here.
->> > +			 */
->> 
->> Let me suggest an alternative wording,
->> 
->> "kvm_make_request() provides smp_wmb() so pending_events changes are 
->> guaranteed to be visible"
->> 
->> But there is nothing wrong with yours, it's just longer than it could 
->> be
->> :-)
+Hi Eric,
 
-Thanks for your alternative wording. It looks much better.
+On 2020/1/28 18:34, Eric Auger wrote:
+> its_enable_defaults() is the top init function that allocates the
+> command queue and all the requested tables (device, collection,
+> lpi config and pending tables), enable LPIs at distributor level
+> and ITS level.
+> 
+> gicv3_enable_defaults must be called before.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v2 -> v3:
+> - introduce its_setup_baser in this patch
+> - squash "arm/arm64: ITS: Init the command queue" in this patch.
+> ---
+>   lib/arm/asm/gic-v3-its.h |  8 ++++
+>   lib/arm/gic-v3-its.c     | 89 ++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 97 insertions(+)
+> 
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> index 815c515..fe73c04 100644
+> --- a/lib/arm/asm/gic-v3-its.h
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -36,6 +36,8 @@ struct its_data {
+>   	void *base;
+>   	struct its_typer typer;
+>   	struct its_baser baser[GITS_BASER_NR_REGS];
+> +	struct its_cmd_block *cmd_base;
+> +	struct its_cmd_block *cmd_write;
+>   };
+>   
+>   extern struct its_data its_data;
+> @@ -88,10 +90,16 @@ extern struct its_data its_data;
+>   #define GITS_BASER_TYPE_DEVICE		1
+>   #define GITS_BASER_TYPE_COLLECTION	4
+>   
+> +
+> +struct its_cmd_block {
+> +	u64 raw_cmd[4];
+> +};
+> +
+>   extern void its_parse_typer(void);
+>   extern void its_init(void);
+>   extern int its_parse_baser(int i, struct its_baser *baser);
+>   extern struct its_baser *its_lookup_baser(int type);
+> +extern void its_enable_defaults(void);
+>   
+>   #else /* __arm__ */
+>   
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> index 2c0ce13..d1e7e52 100644
+> --- a/lib/arm/gic-v3-its.c
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -86,3 +86,92 @@ void its_init(void)
+>   		its_parse_baser(i, &its_data.baser[i]);
+>   }
+>   
+> +static void its_setup_baser(int i, struct its_baser *baser)
+> +{
+> +	unsigned long n = (baser->nr_pages * baser->psz) >> PAGE_SHIFT;
+> +	unsigned long order = is_power_of_2(n) ? fls(n) : fls(n) + 1;
+> +	u64 val;
+> +
+> +	baser->table_addr = (u64)virt_to_phys(alloc_pages(order));
+> +
+> +	val = ((u64)baser->table_addr					|
+> +		((u64)baser->type	<< GITS_BASER_TYPE_SHIFT)	|
+> +		((u64)(baser->esz - 1)	<< GITS_BASER_ENTRY_SIZE_SHIFT)	|
+> +		((baser->nr_pages - 1)	<< GITS_BASER_PAGES_SHIFT)	|
+> +		(u64)baser->indirect	<< 62				|
 
->I usually lean in favor of more comments, but in thise case I'd vote to drop the comment altogether.  There are lots of places that rely on the
->smp_wmb() in kvm_make_request() without a comment, e.g. the cases for APIC_DM_STARTUP and APIC_DM_REMRD in this same switch, kvm_inject_nmi(), etc...  One might wonder what makes INIT special.
->
->And on the flip side, APIC_DM_STARTUP is a good example of when a
->smp_wmb()/smp_rmb() is needed and commented correctly (though calling out the exactly location of the other half would be helpful).
+I haven't seen the 'nr_pages' and 'indirect' are programmed anywhere
+except in its_parse_baser(). It looks like they're treated as RO (but
+they shouldn't) and I now don't think it makes sense to parse them in
+its_parse_baser(), in patch#5.
 
-Yeh, I think the comment should be dropped too. :)
+> +		(u64)baser->valid	<< 63);
+> +
+> +	switch (baser->psz) {
+> +	case SZ_4K:
+> +		val |= GITS_BASER_PAGE_SIZE_4K;
+> +		break;
+> +	case SZ_16K:
+> +		val |= GITS_BASER_PAGE_SIZE_16K;
+> +		break;
+> +	case SZ_64K:
+> +		val |= GITS_BASER_PAGE_SIZE_64K;
+> +		break;
+> +	}
+> +
+> +	writeq(val, gicv3_its_base() + GITS_BASER + i * 8);
+> +}
+> +
+> +/**
+> + * init_cmd_queue: Allocate the command queue and initialize
+> + * CBASER, CREADR, CWRITER
 
-Thanks to both for review! I would send v2.
+no 'CREADR'.
+
+
+Thanks,
+Zenghui
+
