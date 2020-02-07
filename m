@@ -2,115 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 51F95155AF8
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 16:48:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 614E6155B00
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 16:49:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbgBGPsc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 10:48:32 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29247 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726936AbgBGPsb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 10:48:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581090510;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xwuFs+d8bJwJhhJOajzZNm6jYesIdXdjH4QKPI8LzcM=;
-        b=UKoR3ISb2Lg2z9n/UeNCSqQKZMMLtNWNZUfbEJcVrmT42pmTqwghij0Bb6BhJbDD5/kk/V
-        lPAwdn6vK0N8QtGeiH1UAIPM1rg/ktupWOamw+UKW80gn84Vg0Mvpj7KMIalIKjB8vOPLM
-        N29ODvB5mLitMTo1yzgaHtLO9aAh1k4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-NAvWHxUtOPGHi_Khtt1G0w-1; Fri, 07 Feb 2020 10:48:26 -0500
-X-MC-Unique: NAvWHxUtOPGHi_Khtt1G0w-1
-Received: by mail-wr1-f72.google.com with SMTP id j4so1448065wrs.13
-        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 07:48:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=xwuFs+d8bJwJhhJOajzZNm6jYesIdXdjH4QKPI8LzcM=;
-        b=b+WrPPza9RRB5hbPvB+yzGV+w93mlf7nPtFNaHTmdO9koSg88y8uUJFSwhS4J1OITF
-         bqIdx/1otHnf/O+wEkCGXuWNQTTcqIKX1k1PZf1AUerthagE1COIFQo3S/1ojsfpccIt
-         K1YPPqhD3UD4Eefw+f+57ZltJA1JxHPvyN2zt6MKCcrR+b1BmiVMOULiKlCde7AEC1lb
-         3Wd2GGc6A7JAiHiPIBMm5+TeKnLZt1czJMKkgytVFJaFKg6AZRC7N52JPz8ZscCBnY/C
-         JK2f0S7qHDFcKm/CeBrOkbHI30fUuK3eXJ0+kHRSqE6LQNRd9ReM+FhZFHjW21ctpPKM
-         5UUg==
-X-Gm-Message-State: APjAAAUyrZiWFU2zS9lDME+s7NgijGdnPXS7qGJTvueu3kUIpyi3aX0i
-        zk29QEZgpHr2nb5CjB7fpJaF3uV7ViGBsrOLrs5V9DNd50kEEmIrXsEr5OWNAayrkXMRiFZLsZH
-        Hzh44emKdcWld
-X-Received: by 2002:adf:cd04:: with SMTP id w4mr5631196wrm.219.1581090504117;
-        Fri, 07 Feb 2020 07:48:24 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz41NVY/PedM9n7Ys7gSqcfGjqvwYpzjm3X6C/T7/jBpkYp83BGA/BjCIhF9v9j1utS1ZenLA==
-X-Received: by 2002:adf:cd04:: with SMTP id w4mr5631171wrm.219.1581090503877;
-        Fri, 07 Feb 2020 07:48:23 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id a22sm3922661wmd.20.2020.02.07.07.48.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2020 07:48:23 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 07/61] KVM: x86: Check for CPUID 0xD.N support before validating array size
-In-Reply-To: <20200201185218.24473-8-sean.j.christopherson@intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-8-sean.j.christopherson@intel.com>
-Date:   Fri, 07 Feb 2020 16:48:22 +0100
-Message-ID: <87eev6qtyx.fsf@vitty.brq.redhat.com>
+        id S1727047AbgBGPtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 10:49:43 -0500
+Received: from mail-bn8nam12on2083.outbound.protection.outlook.com ([40.107.237.83]:23518
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726874AbgBGPtn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 10:49:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bB6Af1K1+WLuDqcKaKzaO4EWk+EXqNYGhlBzRzpRu0XToMjmSLs20e8bUJy1UgRbb58ZvSRzub4z2WALu6j8hoTLtdQcI5OEegip4AiC/m8HQ4ehfXnuYdaBNmjjWbaLB+3OAKCTIAoREYI/oOdsvgLKWJaW8krfTh9w1jCpUbE/BezhhHIZbIKlzOFUUkW5/yNuECTmrK0GBIKiXTJZMi8S0X3SOjgdgyUMwF7T8yuxe0euww52bw+bPtG7WeuJl2MY4mrTk6+qgsQ+PzpR98ovXGqtziUUNHZ7eianI4OUQewXZk/zvLO9Z6QQGGwXGw+z14p4qaoIh8FeU6EOww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FrPbTT8UM/dooNdpWttwq8p2PT6EKWTaxeV4RQ9oVeQ=;
+ b=Z+UEOulL/UJUnha7i8dXbZqdMgsUg0b0SMiUcnZHDSeZpjpjOA2MAje849p4R4Oiqpn1uy34laEG3yHgqiT4RU4r4yoVROWg7eQGgM09RgkkPepSNrY7pYYKD9MgDWCUyGSWMJpnP1eolKQmTVf2qRddkQk48mqnBQoscmfUEk3DoCYobA9C2qFmm2dP/d2Gh/J3XFo55CJyRz8y0Cnd2o55CIqsI5eA192gBFvsX86kryLvpzADpG155GLqlAEFstLdu8ViMPTep4xShNeU215FoxQXSs8qC05NwK6DWxnj8jm76DZd/Q1AnZpTCkoJfbiiDTpipaAdx3dt+HrOnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FrPbTT8UM/dooNdpWttwq8p2PT6EKWTaxeV4RQ9oVeQ=;
+ b=tX/obtMYNXGRd0DNq5k3TVT39PlPmlgdE0bTB4bzqIKYtQlrVudUfoohOOPAE0bAuUjo/vJ6qLpYZAsX31Vy0v1OQWrffUT6QVYGMz4/S8pgBsu/NVwVg/YVKxhcadh+e++OPZOgiwGZV/8LF2b9JA7gEIAyl8unOP3JhAZB0jU=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Wei.Huang2@amd.com; 
+Received: from CH2PR12MB3991.namprd12.prod.outlook.com (52.132.247.26) by
+ CH2PR12MB4214.namprd12.prod.outlook.com (20.180.7.21) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21; Fri, 7 Feb 2020 15:49:41 +0000
+Received: from CH2PR12MB3991.namprd12.prod.outlook.com
+ ([fe80::5559:35b0:5478:1892]) by CH2PR12MB3991.namprd12.prod.outlook.com
+ ([fe80::5559:35b0:5478:1892%6]) with mapi id 15.20.2707.024; Fri, 7 Feb 2020
+ 15:49:41 +0000
+Subject: Re: [PATCH v3 2/3] selftests: KVM: AMD Nested test infrastructure
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
+        thuth@redhat.com, drjones@redhat.com
+References: <20200204150040.2465-1-eric.auger@redhat.com>
+ <20200204150040.2465-3-eric.auger@redhat.com>
+ <20200206181521.GD2465308@weiserver.amd.com>
+ <88fe7667-17ab-6856-0e99-7106454b9de4@redhat.com>
+From:   Wei Huang <wei.huang2@amd.com>
+Message-ID: <c4af40ab-3ad3-ace1-36dc-44e2613a6bbb@amd.com>
+Date:   Fri, 7 Feb 2020 09:49:39 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
+In-Reply-To: <88fe7667-17ab-6856-0e99-7106454b9de4@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN1PR12CA0067.namprd12.prod.outlook.com
+ (2603:10b6:802:20::38) To CH2PR12MB3991.namprd12.prod.outlook.com
+ (2603:10b6:610:2f::26)
 MIME-Version: 1.0
-Content-Type: text/plain
+Received: from [10.236.30.248] (165.204.77.1) by SN1PR12CA0067.namprd12.prod.outlook.com (2603:10b6:802:20::38) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.21 via Frontend Transport; Fri, 7 Feb 2020 15:49:40 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: c2df4efb-8d7d-48c8-560d-08d7abe55845
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4214:
+X-Microsoft-Antispam-PRVS: <CH2PR12MB4214A11A241FA7F6A7EE508DCF1C0@CH2PR12MB4214.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1443;
+X-Forefront-PRVS: 0306EE2ED4
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(39860400002)(346002)(396003)(136003)(376002)(189003)(199004)(2616005)(956004)(186003)(66946007)(16526019)(31686004)(8936002)(81166006)(8676002)(81156014)(316002)(16576012)(26005)(36756003)(5660300002)(2906002)(31696002)(86362001)(478600001)(4326008)(53546011)(52116002)(6486002)(6916009)(66476007)(66556008);DIR:OUT;SFP:1101;SCL:1;SRVR:CH2PR12MB4214;H:CH2PR12MB3991.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RErujJYLHRb2ZOZYTYjTcUQifsZQay4e4LNlnKz+6QOG6lx/Nla7NFgquGeGpoJsSjQ/72i776cdnoQrRFp6Hs/P9vQWJjOhogwNl6FYZnxp1kU3/OaTfP8tDCf84iS56nN9VE6m6DVC09FiaJKh9387xiEFG2fa8Cv107ATuQZmss1XnSrXsn7cA7XoFUR9ViX2trFAbktJP98PXshQ5Rk5cUp1+0PXhq18glMMMwDfxoSXddRxT9U4wl1oYDodxyYR4R78Xn8CN2VYnF9MosMkNQh/MmXc7Zbr/muDNvURSvIgQv83fl3jJlv/Qjkr4L+pK8QO8vrkKKJ3ByHPDF3pDQ4n6Bo3XzzIPEj4GazS7OOzDEc4sZD2iuHMvbDvpnbwKBpxs8X9eGp2bxfgkTE2+x9OfUXSiAG92ZHFJ75A/iB7FneYtuvUaGjBCrfK
+X-MS-Exchange-AntiSpam-MessageData: vHp3CGUiHwqc0l0iK0xfDgNufYYmWFLcnlZDZVO7lD5ZfzdX0Dsglnzu1vDxNmlCGNmwxq3UIHx+IplUUiKHXe2csJDogiveFLSt0CjAccilAv61lKwyI6ae1Sp4czzQH0t6P3qQpWlqaBhXhQdWwA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2df4efb-8d7d-48c8-560d-08d7abe55845
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2020 15:49:41.4403
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G4qK+A2L/FBR6iPHnttq3/GUmPGZM1wIcrsrvF+XyGiEnKvYyLBF6zdEvetKwer4
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4214
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> Now that sub-leaf 1 is handled separately, verify the next sub-leaf is
-> needed before rejecting KVM_GET_SUPPORTED_CPUID due to an insufficiently
-> sized userspace array.
->
-> Note, although this is technically a bug, it's not visible to userspace
-> as KVM_GET_SUPPORTED_CPUID is guaranteed to fail on KVM_CPUID_SIGNATURE,
-> which is hardcoded to be added after leaf 0xD.  The real motivation for
-> the change is to tightly couple the nent/maxnent and do_host_cpuid()
-> sequences in preparation for future cleanup.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/cpuid.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index fc8540596386..fd9b29aa7abc 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -670,13 +670,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
->  		entry[1].edx = 0;
->  
->  		for (idx = 2, i = 2; idx < 64; ++idx) {
-> -			u64 mask = ((u64)1 << idx);
-> +			if (!(supported & BIT_ULL(idx)))
-> +				continue;
->  
->  			if (*nent >= maxnent)
->  				goto out;
->  
->  			do_host_cpuid(&entry[i], function, idx);
-> -			if (entry[i].eax == 0 || !(supported & mask))
-> +			if (entry[i].eax == 0)
->  				continue;
->  			if (WARN_ON_ONCE(entry[i].ecx & 1))
->  				continue;
 
-The remaining WARN_ON_ONCE() is technically the same 'bug not visible to
-userspace' :-)
+On 2/7/20 3:53 AM, Auger Eric wrote:
+[snip]
+>>> +
+>>> +#define	SVM_EXITINTINFO_TYPE_INTR SVM_EVTINJ_TYPE_INTR
+>>> +#define	SVM_EXITINTINFO_TYPE_NMI SVM_EVTINJ_TYPE_NMI
+>>> +#define	SVM_EXITINTINFO_TYPE_EXEPT SVM_EVTINJ_TYPE_EXEPT
+>>> +#define	SVM_EXITINTINFO_TYPE_SOFT SVM_EVTINJ_TYPE_SOFT
+>>           ^^^^^^
+>> TAB instead of SPACE
+> 
+> as written in the history log (but I think I will add this to the commit
+> msg too), this file is an exact copy of arch/x86/include/asm/svm.h
+> (except the header includer #ifdef + uapi/asm/svm.h header inclusion. So
+> it inherits the style issue of its parent ;-)
+>>
+>>> +
+>>> +#define SVM_EXITINTINFO_VALID SVM_EVTINJ_VALID
+>>> +#define SVM_EXITINTINFO_VALID_ERR SVM_EVTINJ_VALID_ERR
+>>> +
+>>> +#define SVM_EXITINFOSHIFT_TS_REASON_IRET 36
+>>> +#define SVM_EXITINFOSHIFT_TS_REASON_JMP 38
+>>> +#define SVM_EXITINFOSHIFT_TS_HAS_ERROR_CODE 44
+>>> +
+>>> +#define SVM_EXITINFO_REG_MASK 0x0F
+>>> +
+>>> +#define SVM_CR0_SELECTIVE_MASK (X86_CR0_TS | X86_CR0_MP)
+>>> +
+>>> +#endif /* SELFTEST_KVM_SVM_H */
+>>> diff --git a/tools/testing/selftests/kvm/include/x86_64/svm_util.h b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+>>> new file mode 100644
+>>> index 000000000000..6a67a89c5d06
+>>> --- /dev/null
+>>> +++ b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
+>>> @@ -0,0 +1,36 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>>> +/*
+>>> + * tools/testing/selftests/kvm/include/x86_64/svm_utils.h
+>>> + * Header for nested SVM testing
+>>> + *
+>>> + * Copyright (C) 2020, Red Hat, Inc.
+>>> + */
+>>> +
+>>> +#ifndef SELFTEST_KVM_SVM_UTILS_H
+>>> +#define SELFTEST_KVM_SVM_UTILS_H
+>>> +
+>>> +#include <stdint.h>
+>>> +#include "svm.h"
+>>> +#include "processor.h"
+>>> +
+>>> +#define CPUID_SVM_BIT		2
+>>> +#define CPUID_SVM		BIT_ULL(CPUID_SVM_BIT)
+>>> +
+>>> +#define SVM_EXIT_VMMCALL	0x081
+>>
+>> SVM_EXIT_VMMCALL is better to relocate to svm.h file as it is an
+>> architecture definition.
+> For the same reason I am tempted to leave this definition here for now.
+> Maybe at some point if we introduce some additional ones, this will
+> indeed deserve to be moved to the parent? Is it ok?
+> 
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+I figured out this was your intention when I compared arch/x86/include/asm/svm.h with tools/testing/selftests/kvm/include/x86_64/svm.h. However I also noticed that vmx.h in tools/testing/selftests/kvm/include/x86_64/ is not identical as arch/x86/include/asm/vmx.h. So being the same isn't a hard requirement. I am OK with either way.
 
--- 
-Vitaly
+-Wei
+
 
