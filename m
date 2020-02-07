@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FF9D155DAB
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:17:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ACF90155DA2
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:17:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727634AbgBGSRx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 13:17:53 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:40728 "EHLO
+        id S1727123AbgBGSRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 13:17:34 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:40730 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727609AbgBGSQv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 13:16:51 -0500
+        by vger.kernel.org with ESMTP id S1727618AbgBGSQx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 13:16:53 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id C775A305D34E;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id CF1CD305D34F;
         Fri,  7 Feb 2020 20:16:40 +0200 (EET)
 Received: from host.bbu.bitdefender.biz (unknown [195.210.4.22])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id B52F23052069;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id C0FB03011E0E;
         Fri,  7 Feb 2020 20:16:40 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
@@ -23,11 +23,11 @@ Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?q?Mircea=20C=C3=AErjaliu?= <mcirjaliu@bitdefender.com>,
+        =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <ncitu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v7 48/78] KVM: introspection: handle vCPU introspection requests
-Date:   Fri,  7 Feb 2020 20:16:06 +0200
-Message-Id: <20200207181636.1065-49-alazar@bitdefender.com>
+Subject: [RFC PATCH v7 49/78] KVM: introspection: handle vCPU commands
+Date:   Fri,  7 Feb 2020 20:16:07 +0200
+Message-Id: <20200207181636.1065-50-alazar@bitdefender.com>
 In-Reply-To: <20200207181636.1065-1-alazar@bitdefender.com>
 References: <20200207181636.1065-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -40,221 +40,266 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Mihai Donțu <mdontu@bitdefender.com>
 
-The introspection requests (KVM_REQ_INTROSPECTION) are checked before
-entering guest or when the vCPU is halted.
+Based on the common structure (kvmi_vcpu_hdr) used for all vCPU commands,
+the receiving thread validates and dispatches the message to the proper
+vCPU (adding the handling function to its jobs list).
 
 Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
-Co-developed-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
-Signed-off-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
+Co-developed-by: Nicușor Cîțu <ncitu@bitdefender.com>
+Signed-off-by: Nicușor Cîțu <ncitu@bitdefender.com>
 Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/x86.c              |  3 ++
- include/linux/kvm_host.h        |  2 +
- include/linux/kvmi_host.h       |  4 ++
- virt/kvm/introspection/kvmi.c   | 72 +++++++++++++++++++++++++++++++++
- virt/kvm/kvm_main.c             |  2 +
- 6 files changed, 84 insertions(+)
+ Documentation/virt/kvm/kvmi.rst   |   8 ++
+ include/uapi/linux/kvmi.h         |   6 ++
+ virt/kvm/introspection/kvmi_int.h |   3 +
+ virt/kvm/introspection/kvmi_msg.c | 151 +++++++++++++++++++++++++++++-
+ 4 files changed, 166 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 378a094ceb5b..9cf45ca73af5 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -78,6 +78,7 @@
- #define KVM_REQ_HV_STIMER		KVM_ARCH_REQ(22)
- #define KVM_REQ_LOAD_EOI_EXITMAP	KVM_ARCH_REQ(23)
- #define KVM_REQ_GET_VMCS12_PAGES	KVM_ARCH_REQ(24)
-+#define KVM_REQ_INTROSPECTION		KVM_ARCH_REQ(25)
+diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
+index 60fa50585c36..38f566b07bb5 100644
+--- a/Documentation/virt/kvm/kvmi.rst
++++ b/Documentation/virt/kvm/kvmi.rst
+@@ -232,6 +232,14 @@ The following C structures are meant to be used directly when communicating
+ over the wire. The peer that detects any size mismatch should simply close
+ the connection and report the error.
  
- #define CR0_RESERVED_BITS                                               \
- 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 46aeb32cb07f..46a135595893 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8391,6 +8391,9 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
- 	vcpu->arch.l1tf_flush_l1d = true;
- 
- 	for (;;) {
-+		if (kvm_check_request(KVM_REQ_INTROSPECTION, vcpu))
-+			kvmi_handle_requests(vcpu);
++The commands related to vCPUs start with::
 +
- 		if (kvm_vcpu_running(vcpu)) {
- 			r = vcpu_enter_guest(vcpu);
- 		} else {
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 52e98720d0f6..d2d9b814093e 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -505,6 +505,8 @@ struct kvm {
- 	struct srcu_struct irq_srcu;
- 	pid_t userspace_pid;
- 	struct mutex kvmi_lock;
-+	refcount_t kvmi_ref;
-+	struct completion kvmi_complete;
- 	struct kvm_introspection *kvmi;
++	struct kvmi_vcpu_hdr {
++		__u16 vcpu;
++		__u16 padding1;
++		__u32 padding2;
++	}
++
+ 1. KVMI_GET_VERSION
+ -------------------
+ 
+diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
+index 3b8590c0fc98..b2cbefdb8b29 100644
+--- a/include/uapi/linux/kvmi.h
++++ b/include/uapi/linux/kvmi.h
+@@ -89,6 +89,12 @@ struct kvmi_vm_write_physical {
+ 	__u8  data[0];
  };
  
-diff --git a/include/linux/kvmi_host.h b/include/linux/kvmi_host.h
-index 1d80d233fbd5..6a0fb481b192 100644
---- a/include/linux/kvmi_host.h
-+++ b/include/linux/kvmi_host.h
-@@ -56,6 +56,8 @@ int kvmi_ioctl_command(struct kvm *kvm, void __user *argp);
- int kvmi_ioctl_event(struct kvm *kvm, void __user *argp);
- int kvmi_ioctl_preunhook(struct kvm *kvm);
- 
-+void kvmi_handle_requests(struct kvm_vcpu *vcpu);
++struct kvmi_vcpu_hdr {
++	__u16 vcpu;
++	__u16 padding1;
++	__u32 padding2;
++};
 +
- #else
+ struct kvmi_event {
+ 	__u16 size;
+ 	__u16 vcpu;
+diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
+index e0d8256162f9..e7ebb4d67dd6 100644
+--- a/virt/kvm/introspection/kvmi_int.h
++++ b/virt/kvm/introspection/kvmi_int.h
+@@ -55,6 +55,9 @@ int kvmi_msg_send_unhook(struct kvm_introspection *kvmi);
+ void *kvmi_msg_alloc(void);
+ void *kvmi_msg_alloc_check(size_t size);
+ void kvmi_msg_free(void *addr);
++int kvmi_add_job(struct kvm_vcpu *vcpu,
++		 void (*fct)(struct kvm_vcpu *vcpu, void *ctx),
++		 void *ctx, void (*free_fct)(void *ctx));
+ int kvmi_cmd_vm_control_events(struct kvm_introspection *kvmi,
+ 				unsigned int event_id, bool enable);
+ int kvmi_cmd_read_physical(struct kvm *kvm, u64 gpa, u64 size,
+diff --git a/virt/kvm/introspection/kvmi_msg.c b/virt/kvm/introspection/kvmi_msg.c
+index 032b6b5b8000..94225153f7cc 100644
+--- a/virt/kvm/introspection/kvmi_msg.c
++++ b/virt/kvm/introspection/kvmi_msg.c
+@@ -8,6 +8,14 @@
+ #include <linux/net.h>
+ #include "kvmi_int.h"
  
- static inline int kvmi_init(void) { return 0; }
-@@ -64,6 +66,8 @@ static inline void kvmi_create_vm(struct kvm *kvm) { }
- static inline void kvmi_destroy_vm(struct kvm *kvm) { }
- static inline void kvmi_vcpu_uninit(struct kvm_vcpu *vcpu) { }
- 
-+static inline void kvmi_handle_requests(struct kvm_vcpu *vcpu) { }
++struct kvmi_vcpu_cmd_job {
++	struct {
++		struct kvmi_msg_hdr hdr;
++		struct kvmi_vcpu_hdr cmd;
++	} *msg;
++	struct kvm_vcpu *vcpu;
++};
 +
- #endif /* CONFIG_KVM_INTROSPECTION */
- 
- #endif
-diff --git a/virt/kvm/introspection/kvmi.c b/virt/kvm/introspection/kvmi.c
-index 5149f8e06131..ea86512ca81e 100644
---- a/virt/kvm/introspection/kvmi.c
-+++ b/virt/kvm/introspection/kvmi.c
-@@ -65,6 +65,12 @@ void kvmi_uninit(void)
- 	kvmi_cache_destroy();
+ static const char *const msg_IDs[] = {
+ 	[KVMI_GET_VERSION]       = "KVMI_GET_VERSION",
+ 	[KVMI_VM_CHECK_COMMAND]  = "KVMI_VM_CHECK_COMMAND",
+@@ -123,6 +131,28 @@ static bool is_command_allowed(struct kvm_introspection *kvmi, int id)
+ 	return test_bit(id, kvmi->cmd_allow_mask);
  }
  
-+static void kvmi_make_request(struct kvm_vcpu *vcpu)
++static bool invalid_vcpu_hdr(const struct kvmi_vcpu_hdr *hdr)
 +{
-+	kvm_make_request(KVM_REQ_INTROSPECTION, vcpu);
-+	kvm_vcpu_kick(vcpu);
++	return hdr->padding1 || hdr->padding2;
 +}
 +
- static int __kvmi_add_job(struct kvm_vcpu *vcpu,
- 			  void (*fct)(struct kvm_vcpu *vcpu, void *ctx),
- 			  void *ctx, void (*free_fct)(void *ctx))
-@@ -96,6 +102,9 @@ int kvmi_add_job(struct kvm_vcpu *vcpu,
- 
- 	err = __kvmi_add_job(vcpu, fct, ctx, free_fct);
- 
-+	if (!err)
-+		kvmi_make_request(vcpu);
++static int kvmi_get_vcpu(struct kvm_introspection *kvmi, unsigned int vcpu_idx,
++			 struct kvm_vcpu **dest)
++{
++	struct kvm *kvm = kvmi->kvm;
++	struct kvm_vcpu *vcpu;
 +
- 	return err;
- }
- 
-@@ -217,6 +226,7 @@ static void __kvmi_unhook(struct kvm *kvm)
++	if (vcpu_idx >= atomic_read(&kvm->online_vcpus))
++		return -KVM_EINVAL;
++
++	vcpu = kvm_get_vcpu(kvm, vcpu_idx);
++	if (!vcpu)
++		return -KVM_EINVAL;
++
++	*dest = vcpu;
++	return 0;
++}
++
+ static int handle_get_version(struct kvm_introspection *kvmi,
+ 			      const struct kvmi_msg_hdr *msg, const void *req)
  {
- 	struct kvm_introspection *kvmi = KVMI(kvm);
+@@ -265,16 +295,67 @@ static int(*const msg_vm[])(struct kvm_introspection *,
+ 	[KVMI_VM_WRITE_PHYSICAL] = handle_write_physical,
+ };
  
-+	wait_for_completion_killable(&kvm->kvmi_complete);
- 	kvmi_sock_put(kvmi);
- }
- 
-@@ -242,8 +252,23 @@ int kvmi_ioctl_unhook(struct kvm *kvm)
- 	return 0;
- }
- 
-+struct kvm_introspection * __must_check kvmi_get(struct kvm *kvm)
++/*
++ * These commands are executed on the vCPU thread. The receiving thread
++ * passes the messages using a newly allocated 'struct kvmi_vcpu_cmd_job'
++ * and signals the vCPU to handle the command (which includes
++ * sending back the reply).
++ */
++static int(*const msg_vcpu[])(const struct kvmi_vcpu_cmd_job *,
++			      const struct kvmi_msg_hdr *, const void *) = {
++};
++
++static void kvmi_job_vcpu_cmd(struct kvm_vcpu *vcpu, void *ctx)
 +{
-+	if (refcount_inc_not_zero(&kvm->kvmi_ref))
-+		return kvm->kvmi;
++	struct kvmi_vcpu_cmd_job *job = ctx;
++	size_t id = job->msg->hdr.id;
++	int err;
 +
-+	return NULL;
-+}
++	job->vcpu = vcpu;
 +
-+void kvmi_put(struct kvm *kvm)
-+{
-+	if (refcount_dec_and_test(&kvm->kvmi_ref))
-+		complete(&kvm->kvmi_complete);
-+}
++	err = msg_vcpu[id](job, &job->msg->hdr, job->msg + 1);
 +
- static int __kvmi_hook(struct kvm *kvm,
- 		       const struct kvm_introspection_hook *hook)
++	if (err) {
++		struct kvm_introspection *kvmi = KVMI(vcpu->kvm);
 +
- {
- 	struct kvm_introspection *kvmi = KVMI(kvm);
- 
-@@ -266,6 +291,7 @@ static int kvmi_recv_thread(void *arg)
- 	 */
- 	kvmi_sock_shutdown(kvmi);
- 
-+	kvmi_put(kvmi->kvm);
- 	return 0;
- }
- 
-@@ -293,9 +319,18 @@ int kvmi_hook(struct kvm *kvm, const struct kvm_introspection_hook *hook)
- 	if (err)
- 		goto destroy;
- 
-+	init_completion(&kvm->kvmi_complete);
-+
-+	refcount_set(&kvm->kvmi_ref, 1);
-+	/*
-+	 * Paired with refcount_inc_not_zero() from kvmi_get().
-+	 */
-+	smp_wmb();
-+
- 	kvmi->recv = kthread_run(kvmi_recv_thread, kvmi, "kvmi-recv");
- 	if (IS_ERR(kvmi->recv)) {
- 		err = -ENOMEM;
-+		kvmi_put(kvm);
- 		goto unhook;
- 	}
- 
-@@ -616,3 +651,40 @@ int kvmi_cmd_write_physical(struct kvm *kvm, u64 gpa, u64 size, const void *buf)
- 
- 	return 0;
- }
-+
-+static struct kvmi_job *kvmi_pull_job(struct kvm_vcpu_introspection *vcpui)
-+{
-+	struct kvmi_job *job = NULL;
-+
-+	spin_lock(&vcpui->job_lock);
-+	job = list_first_entry_or_null(&vcpui->job_list, typeof(*job), link);
-+	if (job)
-+		list_del(&job->link);
-+	spin_unlock(&vcpui->job_lock);
-+
-+	return job;
-+}
-+
-+void kvmi_run_jobs(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vcpu_introspection *vcpui = VCPUI(vcpu);
-+	struct kvmi_job *job;
-+
-+	while ((job = kvmi_pull_job(vcpui))) {
-+		job->fct(vcpu, job->ctx);
-+		kvmi_free_job(job);
++		kvmi_err(kvmi,
++			 "%s: cmd id: %zu (%s), err: %d\n", __func__,
++			 id, id2str(id), err);
++		kvmi_sock_shutdown(kvmi);
 +	}
 +}
 +
-+void kvmi_handle_requests(struct kvm_vcpu *vcpu)
++static void kvmi_free_ctx(void *_ctx)
 +{
-+	struct kvm_introspection *kvmi;
++	const struct kvmi_vcpu_cmd_job *ctx = _ctx;
 +
-+	kvmi = kvmi_get(vcpu->kvm);
-+	if (!kvmi)
-+		return;
-+
-+	kvmi_run_jobs(vcpu);
-+
-+	kvmi_put(vcpu->kvm);
++	kvmi_msg_free(ctx->msg);
++	kfree(ctx);
 +}
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ef7d14ef8e86..b701254f1125 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2414,6 +2414,8 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
- 		goto out;
- 	if (signal_pending(current))
- 		goto out;
-+	if (kvm_test_request(KVM_REQ_INTROSPECTION, vcpu))
-+		goto out;
++
++static int kvmi_msg_queue_to_vcpu(struct kvm_vcpu *vcpu,
++				  const struct kvmi_vcpu_cmd_job *cmd)
++{
++	return kvmi_add_job(vcpu, kvmi_job_vcpu_cmd, (void *)cmd,
++			    kvmi_free_ctx);
++}
++
+ static bool is_vm_message(u16 id)
+ {
+ 	return id < ARRAY_SIZE(msg_vm) && !!msg_vm[id];
+ }
  
- 	ret = 0;
- out:
++static bool is_vcpu_message(u16 id)
++{
++	return id < ARRAY_SIZE(msg_vcpu) && !!msg_vcpu[id];
++}
++
+ static bool is_unsupported_message(u16 id)
+ {
+ 	bool supported;
+ 
+-	supported = is_known_message(id) && is_vm_message(id);
++	supported = is_known_message(id) &&
++			(is_vm_message(id) || is_vcpu_message(id));
+ 
+ 	return !supported;
+ }
+@@ -344,12 +425,78 @@ static int kvmi_msg_dispatch_vm_cmd(struct kvm_introspection *kvmi,
+ 	return msg_vm[msg->id](kvmi, msg, msg + 1);
+ }
+ 
++static bool vcpu_can_handle_commands(struct kvm_vcpu *vcpu)
++{
++	return vcpu->arch.mp_state != KVM_MP_STATE_UNINITIALIZED;
++}
++
++static int kvmi_get_vcpu_if_ready(struct kvm_introspection *kvmi,
++				  unsigned int vcpu_idx,
++				  struct kvm_vcpu **vcpu)
++{
++	int err;
++
++	err = kvmi_get_vcpu(kvmi, vcpu_idx, vcpu);
++
++	if (!err && !vcpu_can_handle_commands(*vcpu))
++		err = -KVM_EAGAIN;
++
++	return err;
++}
++
++static int kvmi_msg_dispatch_vcpu_job(struct kvm_introspection *kvmi,
++				      struct kvmi_vcpu_cmd_job *job,
++				      bool *queued)
++{
++	struct kvmi_vcpu_hdr *cmd = &job->msg->cmd;
++	struct kvmi_msg_hdr *hdr = &job->msg->hdr;
++	struct kvm_vcpu *vcpu = NULL;
++	int err;
++
++	if (invalid_vcpu_hdr(cmd))
++		return -KVM_EINVAL;
++
++	err = kvmi_get_vcpu_if_ready(kvmi, cmd->vcpu, &vcpu);
++
++	if (err)
++		return kvmi_msg_vm_reply(kvmi, hdr, err, NULL, 0);
++
++	err = kvmi_msg_queue_to_vcpu(vcpu, job);
++	if (!err)
++		*queued = true;
++	return err;
++}
++
++static int kvmi_msg_dispatch_vcpu_cmd(struct kvm_introspection *kvmi,
++				      struct kvmi_msg_hdr *msg,
++				      bool *queued)
++{
++	struct kvmi_vcpu_cmd_job *job_cmd;
++	int err;
++
++	job_cmd = kzalloc(sizeof(*job_cmd), GFP_KERNEL);
++	if (!job_cmd)
++		return -KVM_ENOMEM;
++
++	job_cmd->msg = (void *)msg;
++
++	err = kvmi_msg_dispatch_vcpu_job(kvmi, job_cmd, queued);
++
++	if (!*queued)
++		kfree(job_cmd);
++
++	return err;
++}
++
+ static int kvmi_msg_dispatch(struct kvm_introspection *kvmi,
+ 			     struct kvmi_msg_hdr *msg, bool *queued)
+ {
+ 	int err;
+ 
+-	err = kvmi_msg_dispatch_vm_cmd(kvmi, msg);
++	if (is_vcpu_message(msg->id))
++		err = kvmi_msg_dispatch_vcpu_cmd(kvmi, msg, queued);
++	else
++		err = kvmi_msg_dispatch_vm_cmd(kvmi, msg);
+ 
+ 	if (err)
+ 		kvmi_err(kvmi, "%s: msg id: %u (%s), err: %d\n", __func__,
