@@ -2,189 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 58B33155226
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 06:42:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EE9515526A
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 07:24:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726619AbgBGFmJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 00:42:09 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:50088 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725837AbgBGFmI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 00:42:08 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id A8F7D8F5FD0ADFE965E5;
-        Fri,  7 Feb 2020 13:42:01 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Fri, 7 Feb 2020
- 13:41:54 +0800
-Subject: Re: [kvm-unit-tests PATCH v3 09/14] arm/arm64: ITS: Device and
- collection Initialization
-To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
-        <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <qemu-arm@nongnu.org>
-CC:     <drjones@redhat.com>, <andre.przywara@arm.com>,
-        <peter.maydell@linaro.org>, <alexandru.elisei@arm.com>,
-        <thuth@redhat.com>
-References: <20200128103459.19413-1-eric.auger@redhat.com>
- <20200128103459.19413-10-eric.auger@redhat.com>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <42a8964a-af3d-0117-bfac-5db6b7b832dd@huawei.com>
-Date:   Fri, 7 Feb 2020 13:41:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1726738AbgBGGYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 01:24:20 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:50288 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726451AbgBGGYU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 01:24:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:
+        From:Date:Sender:Reply-To:Content-ID:Content-Description;
+        bh=FZP0iQ7V7SgWd2g6clqUyIaa9pDDhceClvjQC6yZ8gc=; b=oUXSOgDctYqjzalLqUrfRY/oYl
+        3mNEyg7oK6ZeFlBNI96//BS/C/Ctcc5nSXpQ48i3TsFWVv+5j/mY1zaU671yoLGocq7yt7Xqrov/x
+        VEyXJU4iQtBmh1vacrt9kaitB3/6aZH//a6jhq5zeLEuZf7BzoyRo5ATwlW8puh6tSg9gNi2jppcX
+        8zG1W4Qq4Qjwc7xYQzVahjWAIc95ByxtYv+GgsM/z9iAG2r/jfUaMin6EN/2ns7MqG2P0AEfym/qk
+        YjrY/8ck2xuWrurwH40AplewuUuYbeUpx1aOxgBSKZncGs/ItS6xuC2zsabBoQJpZEojVBhvmEJPF
+        O/yIP+XQ==;
+Received: from [80.156.29.194] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1izx3k-0002BL-Vf; Fri, 07 Feb 2020 06:24:13 +0000
+Date:   Fri, 7 Feb 2020 07:24:09 +0100
+From:   Mauro Carvalho Chehab <mchehab@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 21/27] docs: kvm: Convert locking.txt to ReST format
+Message-ID: <20200207072409.2cb038da@infradead.org>
+In-Reply-To: <20200206234736.196ef417@kernel.org>
+References: <cover.1581000481.git.mchehab+huawei@kernel.org>
+        <1464d69fe780940cec6ecec4ac2505b9701a1e01.1581000481.git.mchehab+huawei@kernel.org>
+        <20200206171132.4f51f17a.cohuck@redhat.com>
+        <a17d6a27-0d3f-2020-7fc2-87ec20a6225f@redhat.com>
+        <20200206234736.196ef417@kernel.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200128103459.19413-10-eric.auger@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+X-SRS-Rewrite: SMTP reverse-path rewritten from <mchehab@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 2020/1/28 18:34, Eric Auger wrote:
-> Introduce an helper functions to register
-> - a new device, characterized by its device id and the
->    max number of event IDs that dimension its ITT (Interrupt
->    Translation Table).  The function allocates the ITT.
 > 
-> - a new collection, characterized by its ID and the
->    target processing engine (PE).
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v2 -> v3:
-> - s/report_abort/assert
-> 
-> v1 -> v2:
-> - s/nb_/nr_
-> ---
->   lib/arm/asm/gic-v3-its.h | 20 +++++++++++++++++-
->   lib/arm/gic-v3-its.c     | 44 ++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 63 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-> index fe73c04..acd97a9 100644
-> --- a/lib/arm/asm/gic-v3-its.h
-> +++ b/lib/arm/asm/gic-v3-its.h
-> @@ -31,6 +31,19 @@ struct its_baser {
->   };
->   
->   #define GITS_BASER_NR_REGS              8
-> +#define GITS_MAX_DEVICES		8
-> +#define GITS_MAX_COLLECTIONS		8
-> +
-> +struct its_device {
-> +	u32 device_id;	/* device ID */
-> +	u32 nr_ites;	/* Max Interrupt Translation Entries */
-> +	void *itt;	/* Interrupt Translation Table GPA */
-> +};
-> +
-> +struct its_collection {
-> +	u64 target_address;
-> +	u16 col_id;
-> +};
->   
->   struct its_data {
->   	void *base;
-> @@ -38,6 +51,10 @@ struct its_data {
->   	struct its_baser baser[GITS_BASER_NR_REGS];
->   	struct its_cmd_block *cmd_base;
->   	struct its_cmd_block *cmd_write;
-> +	struct its_device devices[GITS_MAX_DEVICES];
-> +	u32 nr_devices;		/* Allocated Devices */
-> +	struct its_collection collections[GITS_MAX_COLLECTIONS];
-> +	u32 nr_collections;	/* Allocated Collections */
->   };
->   
->   extern struct its_data its_data;
-> @@ -90,7 +107,6 @@ extern struct its_data its_data;
->   #define GITS_BASER_TYPE_DEVICE		1
->   #define GITS_BASER_TYPE_COLLECTION	4
->   
-> -
->   struct its_cmd_block {
->   	u64 raw_cmd[4];
->   };
-> @@ -100,6 +116,8 @@ extern void its_init(void);
->   extern int its_parse_baser(int i, struct its_baser *baser);
->   extern struct its_baser *its_lookup_baser(int type);
->   extern void its_enable_defaults(void);
-> +extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
-> +extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
->   
->   #else /* __arm__ */
->   
-> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-> index d1e7e52..c2dcd01 100644
-> --- a/lib/arm/gic-v3-its.c
-> +++ b/lib/arm/gic-v3-its.c
-> @@ -175,3 +175,47 @@ void its_enable_defaults(void)
->   
->   	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
->   }
-> +
-> +struct its_device *its_create_device(u32 device_id, int nr_ites)
-> +{
-> +	struct its_baser *baser;
-> +	struct its_device *new;
-> +	unsigned long n, order;
-> +
-> +	assert(its_data.nr_devices < GITS_MAX_DEVICES);
-> +
+> > 
+> > Would be nicer but this is acceptable too I think.  Especially, the
+> > monospaced font allows breaking the table and keeping the parts aligned.  
 
+I couldn't resist trying to use a table ;-)
 
-> +	baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
-> +	if (!baser)
-> +		return NULL;
+The following patch does that. IMO, it looks nice on both text and html
+outputs.
 
-I think there's no need to lookup the device baser here. As the
-device baser should have already been setup at initialization
-time (i.e. in its_enable_defaults). And anyway, 'baser' is not
-being used in this function.
+Cheers,
+Mauro
 
-
-Thanks,
-Zenghui
-
-> +
-> +	new = &its_data.devices[its_data.nr_devices];
-> +
-> +	new->device_id = device_id;
-> +	new->nr_ites = nr_ites;
-> +
-> +	n = (its_data.typer.ite_size * nr_ites) >> PAGE_SHIFT;
-> +	order = is_power_of_2(n) ? fls(n) : fls(n) + 1;
-> +	new->itt = (void *)virt_to_phys(alloc_pages(order));
-> +
-> +	its_data.nr_devices++;
-> +	return new;
-> +}
-> +
-> +struct its_collection *its_create_collection(u32 col_id, u32 pe)
-> +{
-> +	struct its_collection *new;
-> +
-> +	assert(its_data.nr_collections < GITS_MAX_COLLECTIONS);
-> +
-> +	new = &its_data.collections[its_data.nr_collections];
-> +
-> +	new->col_id = col_id;
-> +
-> +	if (its_data.typer.pta)
-> +		new->target_address = (u64)gicv3_data.redist_base[pe];
-> +	else
-> +		new->target_address = pe << 16;
-> +
-> +	its_data.nr_collections++;
-> +	return new;
-> +}
-> 
-
+diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+index 428cb3412ecc..c02291beac3f 100644
+--- a/Documentation/virt/kvm/locking.rst
++++ b/Documentation/virt/kvm/locking.rst
+@@ -59,30 +59,39 @@ The mapping from gfn to pfn may be changed since we can only ensure the pfn
+ is not changed during cmpxchg. This is a ABA problem, for example, below case
+ will happen:
+ 
+-At the beginning::
+-
+-	gpte = gfn1
+-	gfn1 is mapped to pfn1 on host
+-	spte is the shadow page table entry corresponding with gpte and
+-	spte = pfn1
+-
+-	   VCPU 0                           VCPU0
+-
+-on fast page fault path::
+-
+-   old_spte = *spte;
+-                                 pfn1 is swapped out:
+-                                    spte = 0;
+-
+-                                 pfn1 is re-alloced for gfn2.
+-
+-                                 gpte is changed to point to
+-                                 gfn2 by the guest:
+-                                    spte = pfn1;
+-
+-   if (cmpxchg(spte, old_spte, old_spte+W)
+-	mark_page_dirty(vcpu->kvm, gfn1)
+-             OOPS!!!
+++------------------------------------------------------------------------+
++| At the beginning::                                                     |
++|                                                                        |
++|	gpte = gfn1                                                      |
++|	gfn1 is mapped to pfn1 on host                                   |
++|	spte is the shadow page table entry corresponding with gpte and  |
++|	spte = pfn1                                                      |
+++------------------------------------------------------------------------+
++| On fast page fault path:                                               |
+++------------------------------------+-----------------------------------+
++| CPU 0:                             | CPU 1:                            |
+++------------------------------------+-----------------------------------+
++| ::                                 |                                   |
++|                                    |                                   |
++|   old_spte = *spte;                |                                   |
+++------------------------------------+-----------------------------------+
++|                                    | pfn1 is swapped out::             |
++|                                    |                                   |
++|                                    |    spte = 0;                      |
++|                                    |                                   |
++|                                    | pfn1 is re-alloced for gfn2.      |
++|                                    |                                   |
++|                                    | gpte is changed to point to       |
++|                                    | gfn2 by the guest::               |
++|                                    |                                   |
++|                                    |    spte = pfn1;                   |
+++------------------------------------+-----------------------------------+
++| ::                                                                     |
++|                                                                        |
++|   if (cmpxchg(spte, old_spte, old_spte+W)                              |
++|	mark_page_dirty(vcpu->kvm, gfn1)                                 |
++|            OOPS!!!                                                     |
+++------------------------------------------------------------------------+
+ 
+ We dirty-log for gfn1, that means gfn2 is lost in dirty-bitmap.
+ 
+@@ -109,36 +118,42 @@ Accessed bit and Dirty bit can not be lost.
+ But it is not true after fast page fault since the spte can be marked
+ writable between reading spte and updating spte. Like below case:
+ 
+-At the beginning::
+-
+-	spte.W = 0
+-	spte.Accessed = 1
+-
+-	   VCPU 0                                       VCPU0
+-
+-In mmu_spte_clear_track_bits()::
+-
+-   old_spte = *spte;
+-
+-   /* 'if' condition is satisfied. */
+-   if (old_spte.Accessed == 1 &&
+-        old_spte.W == 0)
+-      spte = 0ull;
+-                                         on fast page fault path:
+-                                             spte.W = 1
+-                                         memory write on the spte:
+-                                             spte.Dirty = 1
+-
+-
+-   else
+-      old_spte = xchg(spte, 0ull)
+-
+-
+-   if (old_spte.Accessed == 1)
+-      kvm_set_pfn_accessed(spte.pfn);
+-   if (old_spte.Dirty == 1)
+-      kvm_set_pfn_dirty(spte.pfn);
+-      OOPS!!!
+++------------------------------------------------------------------------+
++| At the beginning::                                                     |
++|                                                                        |
++|	spte.W = 0                                                       |
++|	spte.Accessed = 1                                                |
+++------------------------------------+-----------------------------------+
++| CPU 0:                             | CPU 1:                            |
+++------------------------------------+-----------------------------------+
++| In mmu_spte_clear_track_bits()::   |                                   |
++|                                    |                                   |
++|  old_spte = *spte;                 |                                   |
++|                                    |                                   |
++|                                    |                                   |
++|  /* 'if' condition is satisfied. */|                                   |
++|  if (old_spte.Accessed == 1 &&     |                                   |
++|       old_spte.W == 0)             |                                   |
++|     spte = 0ull;                   |                                   |
+++------------------------------------+-----------------------------------+
++|                                    | on fast page fault path::         |
++|                                    |                                   |
++|                                    |    spte.W = 1                     |
++|                                    |                                   |
++|                                    | memory write on the spte::        |
++|                                    |                                   |
++|                                    |    spte.Dirty = 1                 |
+++------------------------------------+-----------------------------------+
++|  ::                                |                                   |
++|                                    |                                   |
++|   else                             |                                   |
++|     old_spte = xchg(spte, 0ull)    |                                   |
++|   if (old_spte.Accessed == 1)      |                                   |
++|     kvm_set_pfn_accessed(spte.pfn);|                                   |
++|   if (old_spte.Dirty == 1)         |                                   |
++|     kvm_set_pfn_dirty(spte.pfn);   |                                   |
++|     OOPS!!!                        |                                   |
+++------------------------------------+-----------------------------------+
+ 
+ The Dirty bit is lost in this case.
+ 
