@@ -2,30 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A57D3155DAA
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:17:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96E8B155DB9
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:18:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727895AbgBGSRr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 13:17:47 -0500
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:40710 "EHLO
+        id S1727609AbgBGSSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 13:18:05 -0500
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:40732 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727598AbgBGSQv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 13:16:51 -0500
+        by vger.kernel.org with ESMTP id S1727602AbgBGSQu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 13:16:50 -0500
 Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 94210305D34A;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id AC29B305D34B;
         Fri,  7 Feb 2020 20:16:40 +0200 (EET)
 Received: from host.bbu.bitdefender.biz (unknown [195.210.4.22])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 8A9003052068;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 908D33052077;
         Fri,  7 Feb 2020 20:16:40 +0200 (EET)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v7 44/78] KVM: introspection: add KVMI_VM_CONTROL_EVENTS
-Date:   Fri,  7 Feb 2020 20:16:02 +0200
-Message-Id: <20200207181636.1065-45-alazar@bitdefender.com>
+Subject: [RFC PATCH v7 45/78] KVM: introspection: add KVMI_VM_READ_PHYSICAL/KVMI_VM_WRITE_PHYSICAL
+Date:   Fri,  7 Feb 2020 20:16:03 +0200
+Message-Id: <20200207181636.1065-46-alazar@bitdefender.com>
 In-Reply-To: <20200207181636.1065-1-alazar@bitdefender.com>
 References: <20200207181636.1065-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -36,30 +37,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With this command the introspection tool enables/disables VM events
-(ie. KVMI_EVENT_UNHOOK), because no event (neither VM event, nor vCPU
-event) will be sent to the introspection tool unless enabled/requested.
+From: Mihai Donțu <mdontu@bitdefender.com>
 
+These commands allows the introspection tool to read/write from/to the
+guest memory.
+
+Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
+Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virt/kvm/kvmi.rst               | 44 +++++++++++++++--
- include/linux/kvmi_host.h                     |  2 +
- include/uapi/linux/kvmi.h                     | 18 +++++--
- .../testing/selftests/kvm/x86_64/kvmi_test.c  | 48 +++++++++++++++++++
- virt/kvm/introspection/kvmi.c                 | 14 ++++++
- virt/kvm/introspection/kvmi_int.h             |  9 ++++
- virt/kvm/introspection/kvmi_msg.c             | 43 +++++++++++++----
- 7 files changed, 161 insertions(+), 17 deletions(-)
+ Documentation/virt/kvm/kvmi.rst               |  62 +++++++
+ include/uapi/linux/kvmi.h                     |  13 ++
+ .../testing/selftests/kvm/x86_64/kvmi_test.c  | 167 ++++++++++++++++++
+ virt/kvm/introspection/kvmi.c                 | 135 ++++++++++++++
+ virt/kvm/introspection/kvmi_int.h             |   9 +
+ virt/kvm/introspection/kvmi_msg.c             |  46 +++++
+ 6 files changed, 432 insertions(+)
 
 diff --git a/Documentation/virt/kvm/kvmi.rst b/Documentation/virt/kvm/kvmi.rst
-index 949e940487ab..7039f4d2b782 100644
+index 7039f4d2b782..60fa50585c36 100644
 --- a/Documentation/virt/kvm/kvmi.rst
 +++ b/Documentation/virt/kvm/kvmi.rst
-@@ -333,11 +333,45 @@ This command is always allowed.
+@@ -366,6 +366,68 @@ the following events::
+ * -KVM_EINVAL - padding is not zero
+ * -KVM_EPERM - the access is restricted by the host
  
- Returns the number of online vCPUs.
- 
-+5. KVMI_VM_CONTROL_EVENTS
++6. KVMI_VM_READ_PHYSICAL
++------------------------
++
++:Architectures: all
++:Versions: >= 1
++:Parameters:
++
++::
++
++	struct kvmi_vm_read_physical {
++		__u64 gpa;
++		__u64 size;
++	};
++
++:Returns:
++
++::
++
++	struct kvmi_error_code;
++	__u8 data[0];
++
++Reads from the guest memory.
++
++Currently, the size must be non-zero and the read must be restricted to
++one page (offset + size <= PAGE_SIZE).
++
++:Errors:
++
++* -KVM_EINVAL - the specified gpa/size pair is invalid
++* -KVM_ENOENT - the guest page doesn't exists
++
++7. KVMI_VM_WRITE_PHYSICAL
 +-------------------------
 +
 +:Architectures: all
@@ -68,11 +102,10 @@ index 949e940487ab..7039f4d2b782 100644
 +
 +::
 +
-+	struct kvmi_vm_control_events {
-+		__u16 event_id;
-+		__u8 enable;
-+		__u8 padding1;
-+		__u32 padding2;
++	struct kvmi_vm_write_physical {
++		__u64 gpa;
++		__u64 size;
++		__u8  data[0];
 +	};
 +
 +:Returns:
@@ -81,269 +114,484 @@ index 949e940487ab..7039f4d2b782 100644
 +
 +	struct kvmi_error_code
 +
-+Enables/disables VM introspection events. This command can be used with
-+the following events::
++Writes into the guest memory.
 +
-+	KVMI_EVENT_UNHOOK
++Currently, the size must be non-zero and the write must be restricted to
++one page (offset + size <= PAGE_SIZE).
 +
 +:Errors:
 +
-+* -KVM_EINVAL - the event ID is invalid/unknown (use *KVMI_VM_CHECK_EVENT* first)
-+* -KVM_EINVAL - padding is not zero
-+* -KVM_EPERM - the access is restricted by the host
++* -KVM_EINVAL - the specified gpa/size pair is invalid
++* -KVM_ENOENT - the guest page doesn't exists
 +
  Events
  ======
  
- All introspection events (VM or vCPU related) are sent
--using the *KVMI_EVENT* message id.
-+using the *KVMI_EVENT* message id. No event will be sent unless
-+it is explicitly enabled.
- 
- The *KVMI_EVENT_UNHOOK* event doesn't have a reply and share the kvmi_event
- structure, for consistency with the vCPU events.
-@@ -391,6 +425,8 @@ Specific data can follow these common structures.
- 
- :Returns: none
- 
--This event is sent when the device manager has to pause/stop/migrate the
--guest (see **Unhooking**).  The introspection tool has a chance to unhook
--and close the KVMI channel (signaling that the operation can proceed).
-+This event is sent when the device manager has to pause/stop/migrate
-+the guest (see **Unhooking**) and the introspection has been enabled
-+for this event (see **KVMI_VM_CONTROL_EVENTS**). The introspection tool
-+has a chance to unhook and close the KVMI channel (signaling that the
-+operation can proceed).
-diff --git a/include/linux/kvmi_host.h b/include/linux/kvmi_host.h
-index 180e26335a8f..41b22af771fb 100644
---- a/include/linux/kvmi_host.h
-+++ b/include/linux/kvmi_host.h
-@@ -22,6 +22,8 @@ struct kvm_introspection {
- 	DECLARE_BITMAP(cmd_allow_mask, KVMI_NUM_COMMANDS);
- 	DECLARE_BITMAP(event_allow_mask, KVMI_NUM_EVENTS);
- 
-+	DECLARE_BITMAP(vm_event_enable_mask, KVMI_NUM_EVENTS);
-+
- 	atomic_t ev_seq;
- };
- 
 diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index e74240aff5b7..da9bf30ae513 100644
+index da9bf30ae513..3b8590c0fc98 100644
 --- a/include/uapi/linux/kvmi.h
 +++ b/include/uapi/linux/kvmi.h
-@@ -15,12 +15,13 @@ enum {
- };
- 
- enum {
--	KVMI_EVENT            = 1,
-+	KVMI_EVENT             = 1,
- 
--	KVMI_GET_VERSION      = 2,
--	KVMI_VM_CHECK_COMMAND = 3,
--	KVMI_VM_CHECK_EVENT   = 4,
--	KVMI_VM_GET_INFO      = 5,
-+	KVMI_GET_VERSION       = 2,
-+	KVMI_VM_CHECK_COMMAND  = 3,
-+	KVMI_VM_CHECK_EVENT    = 4,
-+	KVMI_VM_GET_INFO       = 5,
-+	KVMI_VM_CONTROL_EVENTS = 6,
+@@ -22,6 +22,8 @@ enum {
+ 	KVMI_VM_CHECK_EVENT    = 4,
+ 	KVMI_VM_GET_INFO       = 5,
+ 	KVMI_VM_CONTROL_EVENTS = 6,
++	KVMI_VM_READ_PHYSICAL  = 7,
++	KVMI_VM_WRITE_PHYSICAL = 8,
  
  	KVMI_NUM_MESSAGES
  };
-@@ -68,6 +69,13 @@ struct kvmi_vm_get_info_reply {
- 	__u32 padding[3];
+@@ -76,6 +78,17 @@ struct kvmi_vm_control_events {
+ 	__u32 padding2;
  };
  
-+struct kvmi_vm_control_events {
-+	__u16 event_id;
-+	__u8 enable;
-+	__u8 padding1;
-+	__u32 padding2;
++struct kvmi_vm_read_physical {
++	__u64 gpa;
++	__u64 size;
++};
++
++struct kvmi_vm_write_physical {
++	__u64 gpa;
++	__u64 size;
++	__u8  data[0];
 +};
 +
  struct kvmi_event {
  	__u16 size;
  	__u16 vcpu;
 diff --git a/tools/testing/selftests/kvm/x86_64/kvmi_test.c b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-index f5d67fd0cde8..23dba71e7dc6 100644
+index 23dba71e7dc6..b0573d7e2e5b 100644
 --- a/tools/testing/selftests/kvm/x86_64/kvmi_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/kvmi_test.c
-@@ -298,15 +298,62 @@ static void receive_event(struct kvmi_msg_hdr *hdr, struct kvmi_event *ev,
- 		ev->event, event_id);
+@@ -24,6 +24,13 @@ static int socket_pair[2];
+ #define Kvm_socket       socket_pair[0]
+ #define Userspace_socket socket_pair[1]
+ 
++static vm_vaddr_t test_gva;
++static void *test_hva;
++static vm_paddr_t test_gpa;
++
++static uint8_t test_write_pattern;
++static int page_size;
++
+ void setup_socket(void)
+ {
+ 	int r;
+@@ -356,6 +363,150 @@ static void test_cmd_vm_control_events(void)
+ 	disable_vm_event(id);
  }
  
-+static int cmd_vm_control_events(__u16 event_id, bool enable)
++static int cmd_write_page(__u64 gpa, __u64 size, void *p)
++{
++	struct kvmi_vm_write_physical *cmd;
++	struct kvmi_msg_hdr *req;
++	size_t req_size;
++	int r;
++
++	req_size = sizeof(*req) + sizeof(*cmd) + size;
++
++	req = calloc(1, req_size);
++	TEST_ASSERT(req, "Insufficient Memory\n");
++
++	cmd = (struct kvmi_vm_write_physical *)(req + 1);
++	cmd->gpa = gpa;
++	cmd->size = size;
++
++	memcpy(cmd + 1, p, size);
++
++	r = do_command(KVMI_VM_WRITE_PHYSICAL, req, req_size, NULL, 0);
++
++	free(req);
++
++	return r;
++}
++
++static void write_guest_page(__u64 gpa, void *p)
++{
++	int r;
++
++	r = cmd_write_page(gpa, page_size, p);
++	TEST_ASSERT(r == 0,
++		"KVMI_VM_WRITE_PHYSICAL failed, gpa 0x%lx, error %d (%s)\n",
++		gpa, -r, kvm_strerror(-r));
++}
++
++static void write_with_invalid_arguments(__u64 gpa, __u64 size, void *p)
++{
++	int r;
++
++	r = cmd_write_page(gpa, size, p);
++	TEST_ASSERT(r == -KVM_EINVAL,
++		"KVMI_VM_WRITE_PHYSICAL did not failed with EINVAL, gpa 0x%lx, error %d (%s)\n",
++		gpa, -r, kvm_strerror(-r));
++}
++
++static void write_invalid_guest_page(struct kvm_vm *vm, void *p)
++{
++	uint64_t gpa = vm->max_gfn << vm->page_shift;
++	int r;
++
++	r = cmd_write_page(gpa, 1, p);
++	TEST_ASSERT(r == -KVM_ENOENT,
++		"KVMI_VM_WRITE_PHYSICAL did not failed with ENOENT, gpa 0x%lx, error %d (%s)\n",
++		gpa, -r, kvm_strerror(-r));
++}
++
++static int cmd_read_page(__u64 gpa, __u64 size, void *p)
 +{
 +	struct {
 +		struct kvmi_msg_hdr hdr;
-+		struct kvmi_vm_control_events cmd;
-+	} req = {};
++		struct kvmi_vm_read_physical cmd;
++	} req = { };
 +
-+	req.cmd.event_id = event_id;
-+	req.cmd.enable = enable ? 1 : 0;
++	req.cmd.gpa = gpa;
++	req.cmd.size = size;
 +
-+	return do_command(KVMI_VM_CONTROL_EVENTS, &req.hdr, sizeof(req),
-+			     NULL, 0);
++	return do_command(KVMI_VM_READ_PHYSICAL, &req.hdr, sizeof(req), p,
++			     page_size);
 +}
 +
-+static void enable_vm_event(__u16 event_id)
++static void read_guest_page(__u64 gpa, void *p)
 +{
 +	int r;
 +
-+	r = cmd_vm_control_events(event_id, true);
++	r = cmd_read_page(gpa, page_size, p);
 +	TEST_ASSERT(r == 0,
-+		"KVMI_VM_CONTROL_EVENTS failed to enable VM event %d, error %d (%s)\n",
-+		event_id, -r, kvm_strerror(-r));
++		"KVMI_VM_READ_PHYSICAL failed, gpa 0x%lx, error %d (%s)\n",
++		gpa, -r, kvm_strerror(-r));
 +}
 +
-+static void disable_vm_event(__u16 event_id)
++static void read_with_invalid_arguments(__u64 gpa, __u64 size, void *p)
 +{
 +	int r;
 +
-+	r = cmd_vm_control_events(event_id, false);
-+	TEST_ASSERT(r == 0,
-+		"KVMI_VM_CONTROL_EVENTS failed to disable VM event %d, error %d (%s)\n",
-+		event_id, -r, kvm_strerror(-r));
++	r = cmd_read_page(gpa, size, p);
++	TEST_ASSERT(r == -KVM_EINVAL,
++		"KVMI_VM_READ_PHYSICAL did not failed with EINVAL, gpa 0x%lx, error %d (%s)\n",
++		gpa, -r, kvm_strerror(-r));
 +}
 +
- static void test_event_unhook(struct kvm_vm *vm)
- {
- 	__u16 id = KVMI_EVENT_UNHOOK;
- 	struct kvmi_msg_hdr hdr;
- 	struct kvmi_event ev;
- 
-+	enable_vm_event(id);
-+
- 	trigger_event_unhook_notification(vm);
- 
- 	receive_event(&hdr, &ev, sizeof(ev), id);
-+
-+	disable_vm_event(id);
-+}
-+
-+static void test_cmd_vm_control_events(void)
++static void read_invalid_guest_page(struct kvm_vm *vm)
 +{
-+	__u16 id = KVMI_EVENT_UNHOOK;
++	uint64_t gpa = vm->max_gfn << vm->page_shift;
++	int r;
 +
-+	enable_vm_event(id);
++	r = cmd_read_page(gpa, 1, NULL);
++	TEST_ASSERT(r == -KVM_ENOENT,
++		"KVMI_VM_READ_PHYSICAL did not failed with ENOENT, gpa 0x%lx, error %d (%s)\n",
++		gpa, -r, kvm_strerror(-r));
++}
 +
-+	disable_vm_event(id);
- }
- 
++static void new_test_write_pattern(struct kvm_vm *vm)
++{
++	uint8_t n;
++
++	do {
++		n = random();
++	} while (!n || n == test_write_pattern);
++
++	test_write_pattern = n;
++	sync_global_to_guest(vm, test_write_pattern);
++}
++
++static void test_memory_access(struct kvm_vm *vm)
++{
++	void *pw, *pr;
++
++	new_test_write_pattern(vm);
++
++	pw = malloc(page_size);
++	TEST_ASSERT(pw, "Insufficient Memory\n");
++
++	memset(pw, test_write_pattern, page_size);
++
++	write_guest_page(test_gpa, pw);
++	TEST_ASSERT(memcmp(pw, test_hva, page_size) == 0,
++		"Write page test failed");
++
++	pr = malloc(page_size);
++	TEST_ASSERT(pr, "Insufficient Memory\n");
++
++	read_guest_page(test_gpa, pr);
++	TEST_ASSERT(memcmp(pw, pr, page_size) == 0,
++		"Read page test failed");
++
++	read_with_invalid_arguments(test_gpa, 0, pr);
++	write_with_invalid_arguments(test_gpa, 0, pw);
++	write_invalid_guest_page(vm, pw);
++
++	free(pw);
++	free(pr);
++
++	read_invalid_guest_page(vm);
++}
  static void test_introspection(struct kvm_vm *vm)
-@@ -320,6 +367,7 @@ static void test_introspection(struct kvm_vm *vm)
- 	test_cmd_check_event();
+ {
+ 	setup_socket();
+@@ -368,10 +519,23 @@ static void test_introspection(struct kvm_vm *vm)
  	test_cmd_get_vm_info();
  	test_event_unhook(vm);
-+	test_cmd_vm_control_events();
+ 	test_cmd_vm_control_events();
++	test_memory_access(vm);
  
  	unhook_introspection(vm);
  }
+ 
++static void setup_test_pages(struct kvm_vm *vm)
++{
++	test_gva = vm_vaddr_alloc(vm, page_size, KVM_UTIL_MIN_VADDR, 0, 0);
++
++	sync_global_to_guest(vm, test_gva);
++
++	test_hva = addr_gva2hva(vm, test_gva);
++	memset(test_hva, 0, page_size);
++
++	test_gpa = addr_gva2gpa(vm, test_gva);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	struct kvm_vm *vm;
+@@ -385,6 +549,9 @@ int main(int argc, char *argv[])
+ 	vm = vm_create_default(VCPU_ID, 0, NULL);
+ 	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
+ 
++	page_size = getpagesize();
++	setup_test_pages(vm);
++
+ 	test_introspection(vm);
+ 
+ 	return 0;
 diff --git a/virt/kvm/introspection/kvmi.c b/virt/kvm/introspection/kvmi.c
-index 74e3e1aa326b..9d246152c5e8 100644
+index 9d246152c5e8..9e4e8fb07859 100644
 --- a/virt/kvm/introspection/kvmi.c
 +++ b/virt/kvm/introspection/kvmi.c
-@@ -331,6 +331,9 @@ static bool kvmi_unhook_event(struct kvm_introspection *kvmi)
- {
- 	int err;
+@@ -5,6 +5,7 @@
+  * Copyright (C) 2017-2020 Bitdefender S.R.L.
+  *
+  */
++#include <linux/mmu_context.h>
+ #include "kvmi_int.h"
+ #include <linux/kthread.h>
  
-+	if (!is_vm_event_enabled(kvmi, KVMI_EVENT_UNHOOK))
-+		return false;
-+
- 	err = kvmi_msg_send_unhook(kvmi);
+@@ -368,3 +369,137 @@ int kvmi_cmd_vm_control_events(struct kvm_introspection *kvmi,
  
- 	return !err;
-@@ -354,3 +357,14 @@ int kvmi_ioctl_preunhook(struct kvm *kvm)
- 
- 	return err;
+ 	return 0;
  }
 +
-+int kvmi_cmd_vm_control_events(struct kvm_introspection *kvmi,
-+				unsigned int event_id, bool enable)
++unsigned long gfn_to_hva_safe(struct kvm *kvm, gfn_t gfn)
 +{
-+	if (enable)
-+		set_bit(event_id, kvmi->vm_event_enable_mask);
-+	else
-+		clear_bit(event_id, kvmi->vm_event_enable_mask);
++	unsigned long hva;
++	int srcu_idx;
++
++	srcu_idx = srcu_read_lock(&kvm->srcu);
++	hva = gfn_to_hva(kvm, gfn);
++	srcu_read_unlock(&kvm->srcu, srcu_idx);
++
++	return hva;
++}
++
++static long
++get_user_pages_remote_unlocked(struct mm_struct *mm, unsigned long start,
++				unsigned long nr_pages, unsigned int gup_flags,
++				struct page **pages)
++{
++	struct vm_area_struct **vmas = NULL;
++	struct task_struct *tsk = NULL;
++	int locked = 1;
++	long r;
++
++	down_read(&mm->mmap_sem);
++	r = get_user_pages_remote(tsk, mm, start, nr_pages, gup_flags,
++				  pages, vmas, &locked);
++	if (locked)
++		up_read(&mm->mmap_sem);
++
++	return r;
++}
++
++static void *get_page_ptr(struct kvm *kvm, gpa_t gpa, struct page **page,
++			  bool write)
++{
++	unsigned int flags = write ? FOLL_WRITE : 0;
++	unsigned long hva;
++
++	*page = NULL;
++
++	hva = gfn_to_hva_safe(kvm, gpa_to_gfn(gpa));
++
++	if (kvm_is_error_hva(hva))
++		return NULL;
++
++	if (get_user_pages_remote_unlocked(kvm->mm, hva, 1, flags, page) != 1)
++		return NULL;
++
++	return write ? kmap_atomic(*page) : kmap(*page);
++}
++
++static void put_page_ptr(void *ptr, struct page *page, bool write)
++{
++	if (ptr) {
++		if (write)
++			kunmap_atomic(ptr);
++		else
++			kunmap(ptr);
++	}
++	if (page)
++		put_page(page);
++}
++
++static int get_first_vcpu(struct kvm *kvm, struct kvm_vcpu **vcpu)
++{
++	struct kvm_vcpu *v;
++
++	if (!atomic_read(&kvm->online_vcpus))
++		return -KVM_EINVAL;
++
++	v = kvm_get_vcpu(kvm, 0);
++	if (!v)
++		return -KVM_EINVAL;
++
++	*vcpu = v;
++
++	return 0;
++}
++
++int kvmi_cmd_read_physical(struct kvm *kvm, u64 gpa, u64 size,
++			   int (*send)(struct kvm_introspection *,
++					const struct kvmi_msg_hdr *,
++					int err, const void *buf, size_t),
++			   const struct kvmi_msg_hdr *ctx)
++{
++	void *ptr_page = NULL, *ptr = NULL;
++	struct page *page = NULL;
++	struct kvm_vcpu *vcpu;
++	size_t ptr_size = 0;
++	int err, ec;
++
++	ec = get_first_vcpu(kvm, &vcpu);
++
++	if (ec)
++		goto out;
++
++	ptr_page = get_page_ptr(kvm, gpa, &page, false);
++	if (!ptr_page) {
++		ec = -KVM_ENOENT;
++		goto out;
++	}
++
++	ptr = ptr_page + (gpa & ~PAGE_MASK);
++	ptr_size = size;
++
++out:
++	err = send(KVMI(kvm), ctx, ec, ptr, ptr_size);
++
++	put_page_ptr(ptr_page, page, false);
++	return err;
++}
++
++int kvmi_cmd_write_physical(struct kvm *kvm, u64 gpa, u64 size, const void *buf)
++{
++	struct kvm_vcpu *vcpu;
++	struct page *page;
++	void *ptr;
++	int err;
++
++	err = get_first_vcpu(kvm, &vcpu);
++
++	if (err)
++		return err;
++
++	ptr = get_page_ptr(kvm, gpa, &page, true);
++	if (!ptr)
++		return -KVM_ENOENT;
++
++	memcpy(ptr + (gpa & ~PAGE_MASK), buf, size);
++
++	put_page_ptr(ptr, page, true);
 +
 +	return 0;
 +}
 diff --git a/virt/kvm/introspection/kvmi_int.h b/virt/kvm/introspection/kvmi_int.h
-index 3ea8e8250f7d..d1c143334626 100644
+index d1c143334626..3bc598b9b66c 100644
 --- a/virt/kvm/introspection/kvmi_int.h
 +++ b/virt/kvm/introspection/kvmi_int.h
-@@ -29,11 +29,18 @@
- 			  BIT(KVMI_GET_VERSION) \
- 			| BIT(KVMI_VM_CHECK_COMMAND) \
+@@ -31,6 +31,8 @@
  			| BIT(KVMI_VM_CHECK_EVENT) \
-+			| BIT(KVMI_VM_CONTROL_EVENTS) \
+ 			| BIT(KVMI_VM_CONTROL_EVENTS) \
  			| BIT(KVMI_VM_GET_INFO) \
++			| BIT(KVMI_VM_READ_PHYSICAL) \
++			| BIT(KVMI_VM_WRITE_PHYSICAL) \
  		)
  
  #define KVMI(kvm) ((struct kvm_introspection *)((kvm)->kvmi))
- 
-+static inline bool is_vm_event_enabled(struct kvm_introspection *kvmi,
-+					int event)
-+{
-+	return test_bit(event, kvmi->vm_event_enable_mask);
-+}
-+
- /* kvmi_msg.c */
- bool kvmi_sock_get(struct kvm_introspection *kvmi, int fd);
- void kvmi_sock_shutdown(struct kvm_introspection *kvmi);
-@@ -45,5 +52,7 @@ int kvmi_msg_send_unhook(struct kvm_introspection *kvmi);
- void *kvmi_msg_alloc(void);
- void *kvmi_msg_alloc_check(size_t size);
+@@ -54,5 +56,12 @@ void *kvmi_msg_alloc_check(size_t size);
  void kvmi_msg_free(void *addr);
-+int kvmi_cmd_vm_control_events(struct kvm_introspection *kvmi,
-+				unsigned int event_id, bool enable);
+ int kvmi_cmd_vm_control_events(struct kvm_introspection *kvmi,
+ 				unsigned int event_id, bool enable);
++int kvmi_cmd_read_physical(struct kvm *kvm, u64 gpa, u64 size,
++			   int (*send)(struct kvm_introspection *,
++					const struct kvmi_msg_hdr*,
++					int err, const void *buf, size_t),
++			   const struct kvmi_msg_hdr *ctx);
++int kvmi_cmd_write_physical(struct kvm *kvm, u64 gpa, u64 size,
++			    const void *buf);
  
  #endif
 diff --git a/virt/kvm/introspection/kvmi_msg.c b/virt/kvm/introspection/kvmi_msg.c
-index dbc2ba9a1399..79b26853b5cb 100644
+index 79b26853b5cb..032b6b5b8000 100644
 --- a/virt/kvm/introspection/kvmi_msg.c
 +++ b/virt/kvm/introspection/kvmi_msg.c
-@@ -9,10 +9,11 @@
- #include "kvmi_int.h"
- 
- static const char *const msg_IDs[] = {
--	[KVMI_GET_VERSION]      = "KVMI_GET_VERSION",
--	[KVMI_VM_CHECK_COMMAND] = "KVMI_VM_CHECK_COMMAND",
--	[KVMI_VM_CHECK_EVENT]   = "KVMI_VM_CHECK_EVENT",
--	[KVMI_VM_GET_INFO]      = "KVMI_VM_GET_INFO",
-+	[KVMI_GET_VERSION]       = "KVMI_GET_VERSION",
-+	[KVMI_VM_CHECK_COMMAND]  = "KVMI_VM_CHECK_COMMAND",
-+	[KVMI_VM_CHECK_EVENT]    = "KVMI_VM_CHECK_EVENT",
-+	[KVMI_VM_CONTROL_EVENTS] = "KVMI_VM_CONTROL_EVENTS",
-+	[KVMI_VM_GET_INFO]       = "KVMI_VM_GET_INFO",
+@@ -14,6 +14,8 @@ static const char *const msg_IDs[] = {
+ 	[KVMI_VM_CHECK_EVENT]    = "KVMI_VM_CHECK_EVENT",
+ 	[KVMI_VM_CONTROL_EVENTS] = "KVMI_VM_CONTROL_EVENTS",
+ 	[KVMI_VM_GET_INFO]       = "KVMI_VM_GET_INFO",
++	[KVMI_VM_READ_PHYSICAL]  = "KVMI_VM_READ_PHYSICAL",
++	[KVMI_VM_WRITE_PHYSICAL] = "KVMI_VM_WRITE_PHYSICAL",
  };
  
  static bool is_known_message(u16 id)
-@@ -181,15 +182,41 @@ static int handle_get_info(struct kvm_introspection *kvmi,
- 	return kvmi_msg_vm_reply(kvmi, msg, 0, &rpl, sizeof(rpl));
+@@ -207,6 +209,48 @@ static int handle_vm_control_events(struct kvm_introspection *kvmi,
+ 	return kvmi_msg_vm_reply(kvmi, msg, ec, NULL, 0);
  }
  
-+static int handle_vm_control_events(struct kvm_introspection *kvmi,
-+				    const struct kvmi_msg_hdr *msg,
-+				    const void *_req)
++static bool invalid_page_access(u64 gpa, u64 size)
 +{
-+	const struct kvmi_vm_control_events *req = _req;
-+	DECLARE_BITMAP(known_events, KVMI_NUM_EVENTS);
++	u64 off = gpa & ~PAGE_MASK;
++
++	return (size == 0 || size > PAGE_SIZE || off + size > PAGE_SIZE);
++}
++
++static int handle_read_physical(struct kvm_introspection *kvmi,
++				const struct kvmi_msg_hdr *msg,
++				const void *_req)
++{
++	const struct kvmi_vm_read_physical *req = _req;
++
++	if (invalid_page_access(req->gpa, req->size)) {
++		int ec = -KVM_EINVAL;
++
++		return kvmi_msg_vm_reply(kvmi, msg, ec, NULL, 0);
++	}
++
++	return kvmi_cmd_read_physical(kvmi->kvm, req->gpa, req->size,
++				      kvmi_msg_vm_reply, msg);
++}
++
++static int handle_write_physical(struct kvm_introspection *kvmi,
++				 const struct kvmi_msg_hdr *msg,
++				 const void *_req)
++{
++	const struct kvmi_vm_write_physical *req = _req;
 +	int ec;
 +
-+	bitmap_from_u64(known_events, KVMI_KNOWN_VM_EVENTS);
++	if (msg->size < sizeof(*req) + req->size)
++		return -EINVAL;
 +
-+	if (req->padding1 || req->padding2)
++	if (invalid_page_access(req->gpa, req->size))
 +		ec = -KVM_EINVAL;
-+	else if (req->event_id >= KVMI_NUM_EVENTS)
-+		ec = -KVM_EINVAL;
-+	else if (!test_bit(req->event_id, known_events))
-+		ec = -KVM_EINVAL;
-+	else if (!is_event_allowed(kvmi, req->event_id))
-+		ec = -KVM_EPERM;
 +	else
-+		ec = kvmi_cmd_vm_control_events(kvmi, req->event_id,
-+						req->enable);
++		ec = kvmi_cmd_write_physical(kvmi->kvm, req->gpa,
++					     req->size, req->data);
 +
 +	return kvmi_msg_vm_reply(kvmi, msg, ec, NULL, 0);
 +}
@@ -351,17 +599,12 @@ index dbc2ba9a1399..79b26853b5cb 100644
  /*
   * These commands are executed by the receiving thread/worker.
   */
- static int(*const msg_vm[])(struct kvm_introspection *,
- 			    const struct kvmi_msg_hdr *, const void *) = {
--	[KVMI_GET_VERSION]      = handle_get_version,
--	[KVMI_VM_CHECK_COMMAND] = handle_check_command,
--	[KVMI_VM_CHECK_EVENT]   = handle_check_event,
--	[KVMI_VM_GET_INFO]      = handle_get_info,
-+	[KVMI_GET_VERSION]       = handle_get_version,
-+	[KVMI_VM_CHECK_COMMAND]  = handle_check_command,
-+	[KVMI_VM_CHECK_EVENT]    = handle_check_event,
-+	[KVMI_VM_CONTROL_EVENTS] = handle_vm_control_events,
-+	[KVMI_VM_GET_INFO]       = handle_get_info,
+@@ -217,6 +261,8 @@ static int(*const msg_vm[])(struct kvm_introspection *,
+ 	[KVMI_VM_CHECK_EVENT]    = handle_check_event,
+ 	[KVMI_VM_CONTROL_EVENTS] = handle_vm_control_events,
+ 	[KVMI_VM_GET_INFO]       = handle_get_info,
++	[KVMI_VM_READ_PHYSICAL]  = handle_read_physical,
++	[KVMI_VM_WRITE_PHYSICAL] = handle_write_physical,
  };
  
  static bool is_vm_message(u16 id)
