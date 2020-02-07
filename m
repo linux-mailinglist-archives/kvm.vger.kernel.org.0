@@ -2,66 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E6DBB156114
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 23:15:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30EC815612A
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 23:24:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727068AbgBGWP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 17:15:56 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:40328 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727032AbgBGWP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 17:15:56 -0500
-Received: by mail-io1-f65.google.com with SMTP id x1so1204775iop.7
-        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 14:15:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yfZLiffjzS8p0VcpmAdgeBkNbj1uA9jdNca01ue7Jt4=;
-        b=ez+9IuDImdaUY7iHSTgV+FCo7hQlp4h/2a0nUVizcOs3oBlJ/RRxgF6bIAU0ObYswc
-         oPeSVvZy446HOPH5Xt1e3KZvlQaBBWMcZiFk9qP8FxLXOx4fwQB8AovK25jkxUNthXN6
-         uvgJKuhuj2/gihncyDcwLrEcE9O+SOFWPZqbjw1nt1ItVNEdrNKjJSzGfuuFUh7uBF2U
-         UC/nEm6Lk0iI+a6bdnS3j8T9OTsed2h9kln58cKRdK5nAVQ7QGfMZx3wd0qUBY/HOiQy
-         g7GFtcCRdf/7vRrJO+xBX1lulK1l2RZfaYsAF4x3ROyhHYCIpik6GHJ73WrcnqiQKl5C
-         qU+A==
+        id S1727484AbgBGWYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 17:24:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47569 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727243AbgBGWYq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 17:24:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581114284;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JRnjR1s6c5pJE2ossLQbJM2NZYkPQ/exCWBRJ0Gziy8=;
+        b=JVIH2sFE1+gNZomg8s9GDeK4Ckm08xmCey9ElrWa7O/3f1y9MikpVs/FomADQNGzb2wbK3
+        43ZfT0am7/dpuTiQnkp5BkvRuvyIWYKJs5g0fWpZY8zv2Acty4IYNaeZ0FjqFYduNph7RB
+        G0IJuj7kYpz4q1WHRHigop43r5JI+IQ=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28-CDeI0Wc3Ncm7CwzpALVOSg-1; Fri, 07 Feb 2020 17:24:42 -0500
+X-MC-Unique: CDeI0Wc3Ncm7CwzpALVOSg-1
+Received: by mail-qv1-f71.google.com with SMTP id b8so488774qvw.3
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 14:24:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yfZLiffjzS8p0VcpmAdgeBkNbj1uA9jdNca01ue7Jt4=;
-        b=KgmtriwMqcI1lNDGBxlZ9RAWn1mA5eHb3QX2nsjAB+BjC9NQSH9vJg8pR+PK8rsDYP
-         0pwIzqKm0q3kW41QQrUIjJbHiCEXxRKis0K4MKewjtaP2HXYqXXNBk3iKpYMIgwxBFRm
-         H/k1Qrbg6E1Hg+pHX/ykoXj9B/6kR10f9MN7e2BOUr+Wex2vkTzP4GpApMyTtsH4LuoK
-         zfaDv323ruJpMmxM/+yN/Yi2GWUC0FQYFMcZ5Aw7dBI9sd8kNDIKd8V2JPAzY4wuiohW
-         qe/f7Dh+Dc8DVKevstqwv7TBzvIh5ho7Qlb0fwkEyukRnBKT9VH06CAEZN3K54V+OHGo
-         ZVmw==
-X-Gm-Message-State: APjAAAXQFzSIUa7xSweAoEKb2N+03CfRi1+Vm9jSWu+kJ9CvfYtG6V/k
-        gkTfbZe+YuYbhEkJx7CgDLVpYIs68boGtClUN98WtQ==
-X-Google-Smtp-Source: APXvYqx6uhzoHSlOqVuZtnEdU6UHdi8JnHFJryKQ4FvVyStADif7DkR6ipcJ1CsZbjO5ly5yUz01y9XExH+ustLG4AU=
-X-Received: by 2002:a6b:92d4:: with SMTP id u203mr606535iod.288.1581113755090;
- Fri, 07 Feb 2020 14:15:55 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JRnjR1s6c5pJE2ossLQbJM2NZYkPQ/exCWBRJ0Gziy8=;
+        b=X0vjGaAtyw6BrM7Xa7RyGNV6ghnqsyTYx8+kO0fN+dbceIi1+RwueSv7huq40zf7CC
+         /0sRIdv2i+RhK9MqYswwwpcGBLdmhqCPxidREqYFWDGbk7WrxZ4EZvLpcqtfNc7hiWxB
+         CGGVU9HlTjZ9VQvD1BbUTo/AcRwqbEXwO1XDzApqcTRd7j9OE8oJ3mP0wDGNpkgxzJl9
+         v+MOsn7YUcT27Ic1+6+ioW326ZF2d7UXrqGrglNcCB56/syLta2DWNI2kM37wQ6ksEzn
+         pgsY1LPbOURiF6n25Dmi3f5yAkbcXtED0wgs1+ZQTXCWkDBiI2efHX+IqyIn8JoLZaYc
+         X1AA==
+X-Gm-Message-State: APjAAAV9JN8b3GiVfK+zroRTKOGURs2QbZuFBKuwSwJLmVgEb6ziT8Nr
+        mUSVDPZWjKL1Z+dwH3qsAfw9UMsjiNCPOT2m1SP53ECTqzonnEnENuScv/mnLZYbh2IF5mYY9e0
+        1Ch15fVcULLyH
+X-Received: by 2002:a37:c53:: with SMTP id 80mr1117256qkm.285.1581114282356;
+        Fri, 07 Feb 2020 14:24:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxdmbvsmW8pfTDFhkNFpJOBOyIyACeKZQZlqIgbOpE5taqn1c19m2GAF/qQjzf2ieRiXzn8Xg==
+X-Received: by 2002:a37:c53:: with SMTP id 80mr1117228qkm.285.1581114282106;
+        Fri, 07 Feb 2020 14:24:42 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+        by smtp.gmail.com with ESMTPSA id j1sm1933090qkl.86.2020.02.07.14.24.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2020 14:24:41 -0800 (PST)
+Date:   Fri, 7 Feb 2020 17:24:38 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 17/19] KVM: Terminate memslot walks via used_slots
+Message-ID: <20200207222438.GH720553@xz-x1>
+References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+ <20200121223157.15263-18-sean.j.christopherson@intel.com>
+ <20200206210944.GD700495@xz-x1>
+ <20200207183325.GI2401@linux.intel.com>
+ <20200207203909.GE720553@xz-x1>
+ <20200207211016.GN2401@linux.intel.com>
+ <20200207214623.GF720553@xz-x1>
+ <20200207220325.GO2401@linux.intel.com>
 MIME-Version: 1.0
-References: <20200127212256.194310-1-ehankland@google.com> <2a394c6d-c453-6559-bf33-f654af7922bd@redhat.com>
- <CAOyeoRVaV3Dh=M4ioiT3DU+p5ZnQGRcy9_PssJZ=a36MhL-xHQ@mail.gmail.com> <c1cec3c8-570f-d824-cb20-6641cf686981@redhat.com>
-In-Reply-To: <c1cec3c8-570f-d824-cb20-6641cf686981@redhat.com>
-From:   Eric Hankland <ehankland@google.com>
-Date:   Fri, 7 Feb 2020 14:15:43 -0800
-Message-ID: <CAOyeoRWX1Xw+iPX52uCZef6Rqk44d-niUTikH1qL-fRoaYJeng@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Fix perfctr WRMSR for running counters
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200207220325.GO2401@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Yes, please send it!  Thanks,
+On Fri, Feb 07, 2020 at 02:03:25PM -0800, Sean Christopherson wrote:
+> On Fri, Feb 07, 2020 at 04:46:23PM -0500, Peter Xu wrote:
+> > On Fri, Feb 07, 2020 at 01:10:16PM -0800, Sean Christopherson wrote:
+> > > On Fri, Feb 07, 2020 at 03:39:09PM -0500, Peter Xu wrote:
+> > > > On Fri, Feb 07, 2020 at 10:33:25AM -0800, Sean Christopherson wrote:
+> > > > > On Thu, Feb 06, 2020 at 04:09:44PM -0500, Peter Xu wrote:
+> > > > > > On Tue, Jan 21, 2020 at 02:31:55PM -0800, Sean Christopherson wrote:
+> > > > > > > @@ -9652,13 +9652,13 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+> > > > > > >  		if (IS_ERR((void *)hva))
+> > > > > > >  			return PTR_ERR((void *)hva);
+> > > > > > >  	} else {
+> > > > > > > -		if (!slot->npages)
+> > > > > > > +		if (!slot || !slot->npages)
+> > > > > > >  			return 0;
+> > > > > > >  
+> > > > > > > -		hva = 0;
+> > > > > > > +		hva = slot->userspace_addr;
+> > > > > > 
+> > > > > > Is this intended?
+> > > > > 
+> > > > > Yes.  It's possible to allow VA=0 for userspace mappings.  It's extremely
+> > > > > uncommon, but possible.  Therefore "hva == 0" shouldn't be used to
+> > > > > indicate an invalid slot.
+> > > > 
+> > > > Note that this is the deletion path in __x86_set_memory_region() not
+> > > > allocation.  IIUC userspace_addr won't even be used in follow up code
+> > > > path so it shouldn't really matter.  Or am I misunderstood somewhere?
+> > > 
+> > > No, but that's precisely why I don't want to zero out @hva, as doing so
+> > > implies that '0' indicates an invalid hva, which is wrong.
+> > > 
+> > > What if I change this to 
+> > > 
+> > > 			hva = 0xdeadull << 48;
+> > > 
+> > > and add a blurb in the changelog about stuff hva with a non-canonical value
+> > > to indicate it's being destroyed.
+> > 
+> > IMO it's fairly common to have the case where "when A is XXX then
+> > parameters B is invalid" happens in C.
+> 
+> I'm not arguing that's not the case.  My point is that there's nothing
+> special about '0', so why use it?  E.g. "hva = 1" would also be ok from a
+> functional perspective, but more obviously "wrong".
 
-I sent out the test a couple days ago and you queued it (commit
-b9624f3f34bd "Test WRMSR on a running counter").
-Are there any other changes that I should make?
+I think the answer is as simple as the original author thought 0 was
+better than an arbitrary number on the stack, which I agree. :-)
 
-Thanks,
-Eric
+-- 
+Peter Xu
+
