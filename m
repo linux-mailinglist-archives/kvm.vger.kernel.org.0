@@ -2,54 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 38892155371
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 09:05:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 612DF15538C
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 09:13:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726573AbgBGIFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 03:05:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40716 "EHLO
+        id S1726728AbgBGINX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 03:13:23 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48822 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726130AbgBGIFf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 03:05:35 -0500
+        by vger.kernel.org with ESMTP id S1726130AbgBGINW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 03:13:22 -0500
 Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01784CLC069083
-        for <kvm@vger.kernel.org>; Fri, 7 Feb 2020 03:05:34 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y0ned1gg8-1
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0178AF5S087191
+        for <kvm@vger.kernel.org>; Fri, 7 Feb 2020 03:13:21 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y0ned1rdv-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 03:05:33 -0500
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 03:13:21 -0500
 Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 7 Feb 2020 08:05:32 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Fri, 7 Feb 2020 08:13:19 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 7 Feb 2020 08:05:29 -0000
+        Fri, 7 Feb 2020 08:13:16 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01785SQ449414168
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0178DF7552691044
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 7 Feb 2020 08:05:28 GMT
+        Fri, 7 Feb 2020 08:13:15 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 32A51A4062;
-        Fri,  7 Feb 2020 08:05:28 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 608CEA405B;
+        Fri,  7 Feb 2020 08:13:15 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E3F03A4054;
-        Fri,  7 Feb 2020 08:05:27 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 18503A4054;
+        Fri,  7 Feb 2020 08:13:15 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  7 Feb 2020 08:05:27 +0000 (GMT)
-Subject: Re: [RFCv2 34/37] KVM: s390: protvirt: Add UV debug trace
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200203131957.383915-1-borntraeger@de.ibm.com>
- <20200203131957.383915-35-borntraeger@de.ibm.com>
- <20200206104159.16130ccb.cohuck@redhat.com>
+        Fri,  7 Feb 2020 08:13:15 +0000 (GMT)
+Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
+ crashes in KVM guests after reboot
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     eperezma@redhat.com,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+References: <20200107042401-mutt-send-email-mst@kernel.org>
+ <c6795e53-d12c-0709-c2e9-e35d9af1f693@de.ibm.com>
+ <20200107065434-mutt-send-email-mst@kernel.org>
+ <fe6e7e90-3004-eb7a-9ed8-b53a7667959f@de.ibm.com>
+ <20200120012724-mutt-send-email-mst@kernel.org>
+ <2a63b15f-8cf5-5868-550c-42e2cfd92c60@de.ibm.com>
+ <b6e32f58e5d85ac5cc3141e9155fb140ae5cd580.camel@redhat.com>
+ <1ade56b5-083f-bb6f-d3e0-3ddcf78f4d26@de.ibm.com>
+ <20200206171349-mutt-send-email-mst@kernel.org>
+ <5c860fa1-cef5-b389-4ebf-99a62afa0fe8@de.ibm.com>
+ <20200207025806-mutt-send-email-mst@kernel.org>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -94,26 +106,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Fri, 7 Feb 2020 09:05:27 +0100
+Date:   Fri, 7 Feb 2020 09:13:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200206104159.16130ccb.cohuck@redhat.com>
+In-Reply-To: <20200207025806-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20020708-4275-0000-0000-0000039ED060
+x-cbid: 20020708-0012-0000-0000-000003849033
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020708-4276-0000-0000-000038B2FFB8
-Message-Id: <8b5857ac-d557-96e7-8164-3da42edc5a42@de.ibm.com>
+x-cbparentid: 20020708-0013-0000-0000-000021C1008C
+Message-Id: <97c93d38-ef07-e321-d133-18483d54c0c0@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-06_04:2020-02-06,2020-02-06 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
  lowpriorityscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- malwarescore=0 spamscore=0 suspectscore=0 adultscore=0 mlxlogscore=814
+ malwarescore=0 spamscore=0 suspectscore=0 adultscore=0 mlxlogscore=999
  mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002070061
+ engine=8.12.0-2001150001 definitions=main-2002070062
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -121,96 +133,65 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 06.02.20 10:41, Cornelia Huck wrote:
-> On Mon,  3 Feb 2020 08:19:54 -0500
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> From: Janosch Frank <frankja@linux.ibm.com>
+On 07.02.20 08:58, Michael S. Tsirkin wrote:
+> On Fri, Feb 07, 2020 at 08:47:14AM +0100, Christian Borntraeger wrote:
+>> Also adding Cornelia.
 >>
->> Let's have some debug traces which stay around for longer than the
->> guest.
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  arch/s390/kvm/kvm-s390.c | 10 +++++++++-
->>  arch/s390/kvm/kvm-s390.h |  9 +++++++++
->>  arch/s390/kvm/pv.c       | 21 +++++++++++++++++++--
->>  3 files changed, 37 insertions(+), 3 deletions(-)
+>> On 06.02.20 23:17, Michael S. Tsirkin wrote:
+>>> On Thu, Feb 06, 2020 at 04:12:21PM +0100, Christian Borntraeger wrote:
+>>>>
+>>>>
+>>>> On 06.02.20 15:22, eperezma@redhat.com wrote:
+>>>>> Hi Christian.
+>>>>>
+>>>>> Could you try this patch on top of ("38ced0208491 vhost: use batched version by default")?
+>>>>>
+>>>>> It will not solve your first random crash but it should help with the lost of network connectivity.
+>>>>>
+>>>>> Please let me know how does it goes.
+>>>>
+>>>>
+>>>> 38ced0208491 + this seem to be ok.
+>>>>
+>>>> Not sure if you can make out anything of this (and the previous git bisect log)
+>>>
+>>> Yes it does - that this is just bad split-up of patches, and there's
+>>> still a real bug that caused worse crashes :)
+>>>
+>>> So I just pushed batch-v4.
+>>> I expect that will fail, and bisect to give us
+>>>     vhost: batching fetches
+>>> Can you try that please?
+>>>
 >>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 2beb93f0572f..d4dc156e2c3e 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -221,6 +221,7 @@ static struct kvm_s390_vm_cpu_subfunc kvm_s390_available_subfunc;
->>  static struct gmap_notifier gmap_notifier;
->>  static struct gmap_notifier vsie_gmap_notifier;
->>  debug_info_t *kvm_s390_dbf;
->> +debug_info_t *kvm_s390_dbf_uv;
->>  
->>  /* Section: not file related */
->>  int kvm_arch_hardware_enable(void)
->> @@ -462,7 +463,13 @@ int kvm_arch_init(void *opaque)
->>  	if (!kvm_s390_dbf)
->>  		return -ENOMEM;
->>  
->> -	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view))
->> +	kvm_s390_dbf_uv = debug_register("kvm-uv", 32, 1, 7 * sizeof(long));
->> +	if (!kvm_s390_dbf_uv)
->> +		return -ENOMEM;
+>> yes.
+>>
+>> eccb852f1fe6bede630e2e4f1a121a81e34354ab is the first bad commit
+>> commit eccb852f1fe6bede630e2e4f1a121a81e34354ab
+>> Author: Michael S. Tsirkin <mst@redhat.com>
+>> Date:   Mon Oct 7 06:11:18 2019 -0400
+>>
+>>     vhost: batching fetches
+>>     
+>>     With this patch applied, new and old code perform identically.
+>>     
+>>     Lots of extra optimizations are now possible, e.g.
+>>     we can fetch multiple heads with copy_from/to_user now.
+>>     We can get rid of maintaining the log array.  Etc etc.
+>>     
+>>     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>
+>>  drivers/vhost/test.c  |  2 +-
+>>  drivers/vhost/vhost.c | 39 ++++++++++++++++++++++++++++++++++-----
+>>  drivers/vhost/vhost.h |  4 +++-
+>>  3 files changed, 38 insertions(+), 7 deletions(-)
+>>
 > 
-> Doesn't that leak kvm_s390_dbf?
+> 
+> And the symptom is still the same - random crashes
+> after a bit of traffic, right?
 
-Yes, it does.  I can simply goto out. The kvm_arch_exit will release all non-zero
-dbfs.
-
-> 
->> +
->> +
-> 
-> One blank line should be enough.
-
-ack.
-
-> 
->> +	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view) ||
->> +	    debug_register_view(kvm_s390_dbf_uv, &debug_sprintf_view))
->>  		goto out;
->>  
->>  	kvm_s390_cpu_feat_init();
->> @@ -489,6 +496,7 @@ void kvm_arch_exit(void)
->>  {
->>  	kvm_s390_gib_destroy();
->>  	debug_unregister(kvm_s390_dbf);
->> +	debug_unregister(kvm_s390_dbf_uv);
->>  }
->>  
->>  /* Section: device related */
-> 
-> (...)
-> 
->> @@ -252,7 +269,7 @@ int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
->>  		addr += PAGE_SIZE;
->>  		tw[1] += PAGE_SIZE;
->>  	}
->> -	VM_EVENT(kvm, 3, "PROTVIRT VM UNPACK: finished rc %x", rc);
->> +	VM_EVENT(kvm, 3, "PROTVIRT VM UNPACK: finished with rc %x", rc);
-> 
-> Can you merge this into the patch that introduces this log entry?
-
-ack.
-> 
-> Also, do you want to add logging into the new dbf here as well?
-
-ack
-> 
->>  	return rc;
->>  }
->>  
-> 
-> You often seem to log in pairs (into the per-vm dbf and into the new uv
-> dbf). Would it make sense to introduce a new helper for that, or is
-> that overkill?
-
-I guess the logging will see several changes over time anyway. Let us start
-with an initial variant. 
+random guest crashes after a reboot of the guests. As if vhost would still
+write into now stale buffers.
 
