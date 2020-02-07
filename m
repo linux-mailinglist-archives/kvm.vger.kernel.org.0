@@ -2,140 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 921F0155406
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 09:54:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C1CE155425
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 10:00:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726935AbgBGIyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 03:54:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32539 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726619AbgBGIyL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 03:54:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581065649;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0USnf3hBn92ifbh7P2D9fosqj0oQrhEhCYDRgIDXfoE=;
-        b=KtUCSeXnu4vcZuxCbtH2LyuDPy3dbhTYCSdMa7p55sF3EDZjMOs2G7GmRA5PrFqVn6eOUr
-        T2spddgHEny2fdSombbK6YZz2TX/nlXApBcYvWiC0wNfRXYuAc3vMx9QFpdOuMFdHVj3ZW
-        ouxSQhcVJHzc7XmHZpCK1Dl3Bpp2YEo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-wGf86mQwOcWZfWagUhSSDA-1; Fri, 07 Feb 2020 03:54:08 -0500
-X-MC-Unique: wGf86mQwOcWZfWagUhSSDA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF06810CE783;
-        Fri,  7 Feb 2020 08:54:06 +0000 (UTC)
-Received: from gondolin (ovpn-117-112.ams2.redhat.com [10.36.117.112])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 82683857BF;
-        Fri,  7 Feb 2020 08:53:56 +0000 (UTC)
-Date:   Fri, 7 Feb 2020 09:53:53 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, eperezma@redhat.com,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger
- random crashes in KVM guests after reboot
-Message-ID: <20200207095353.08bc91e4.cohuck@redhat.com>
-In-Reply-To: <97c93d38-ef07-e321-d133-18483d54c0c0@de.ibm.com>
-References: <20200107042401-mutt-send-email-mst@kernel.org>
-        <c6795e53-d12c-0709-c2e9-e35d9af1f693@de.ibm.com>
-        <20200107065434-mutt-send-email-mst@kernel.org>
-        <fe6e7e90-3004-eb7a-9ed8-b53a7667959f@de.ibm.com>
-        <20200120012724-mutt-send-email-mst@kernel.org>
-        <2a63b15f-8cf5-5868-550c-42e2cfd92c60@de.ibm.com>
-        <b6e32f58e5d85ac5cc3141e9155fb140ae5cd580.camel@redhat.com>
-        <1ade56b5-083f-bb6f-d3e0-3ddcf78f4d26@de.ibm.com>
-        <20200206171349-mutt-send-email-mst@kernel.org>
-        <5c860fa1-cef5-b389-4ebf-99a62afa0fe8@de.ibm.com>
-        <20200207025806-mutt-send-email-mst@kernel.org>
-        <97c93d38-ef07-e321-d133-18483d54c0c0@de.ibm.com>
-Organization: Red Hat GmbH
+        id S1726958AbgBGJAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 04:00:42 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:40898 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726417AbgBGJAm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 04:00:42 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 88D6132A064F138B9523;
+        Fri,  7 Feb 2020 17:00:33 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Fri, 7 Feb 2020
+ 17:00:26 +0800
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Subject: BUG: using __this_cpu_read() in preemptible [00000000] code
+CC:     <pbonzini@redhat.com>, <peterx@redhat.com>,
+        Marc Zyngier <maz@kernel.org>
+To:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>
+Message-ID: <318984f6-bc36-33a3-abc6-bf2295974b06@huawei.com>
+Date:   Fri, 7 Feb 2020 17:00:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 7 Feb 2020 09:13:14 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+Hi,
 
-> On 07.02.20 08:58, Michael S. Tsirkin wrote:
-> > On Fri, Feb 07, 2020 at 08:47:14AM +0100, Christian Borntraeger wrote:  
-> >> Also adding Cornelia.
-> >>
-> >>
-> >> On 06.02.20 23:17, Michael S. Tsirkin wrote:  
-> >>> On Thu, Feb 06, 2020 at 04:12:21PM +0100, Christian Borntraeger wrote:  
-> >>>>
-> >>>>
-> >>>> On 06.02.20 15:22, eperezma@redhat.com wrote:  
-> >>>>> Hi Christian.
-> >>>>>
-> >>>>> Could you try this patch on top of ("38ced0208491 vhost: use batched version by default")?
-> >>>>>
-> >>>>> It will not solve your first random crash but it should help with the lost of network connectivity.
-> >>>>>
-> >>>>> Please let me know how does it goes.  
-> >>>>
-> >>>>
-> >>>> 38ced0208491 + this seem to be ok.
-> >>>>
-> >>>> Not sure if you can make out anything of this (and the previous git bisect log)  
-> >>>
-> >>> Yes it does - that this is just bad split-up of patches, and there's
-> >>> still a real bug that caused worse crashes :)
-> >>>
-> >>> So I just pushed batch-v4.
-> >>> I expect that will fail, and bisect to give us
-> >>>     vhost: batching fetches
-> >>> Can you try that please?
-> >>>  
-> >>
-> >> yes.
-> >>
-> >> eccb852f1fe6bede630e2e4f1a121a81e34354ab is the first bad commit
-> >> commit eccb852f1fe6bede630e2e4f1a121a81e34354ab
-> >> Author: Michael S. Tsirkin <mst@redhat.com>
-> >> Date:   Mon Oct 7 06:11:18 2019 -0400
-> >>
-> >>     vhost: batching fetches
-> >>     
-> >>     With this patch applied, new and old code perform identically.
-> >>     
-> >>     Lots of extra optimizations are now possible, e.g.
-> >>     we can fetch multiple heads with copy_from/to_user now.
-> >>     We can get rid of maintaining the log array.  Etc etc.
-> >>     
-> >>     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >>
-> >>  drivers/vhost/test.c  |  2 +-
-> >>  drivers/vhost/vhost.c | 39 ++++++++++++++++++++++++++++++++++-----
-> >>  drivers/vhost/vhost.h |  4 +++-
-> >>  3 files changed, 38 insertions(+), 7 deletions(-)
-> >>  
-> > 
-> > 
-> > And the symptom is still the same - random crashes
-> > after a bit of traffic, right?  
-> 
-> random guest crashes after a reboot of the guests. As if vhost would still
-> write into now stale buffers.
-> 
+Running a latest preemptible kernel and some guests on it,
+I got the following message,
 
-I'm late to the party; but where is that commit located? Or has it been
-dropped again already?
+---8<---
+
+[  630.031870] BUG: using __this_cpu_read() in preemptible [00000000] 
+code: qemu-system-aar/37270
+[  630.031872] caller is kvm_get_running_vcpu+0x1c/0x38
+[  630.031874] CPU: 32 PID: 37270 Comm: qemu-system-aar Kdump: loaded 
+Not tainted 5.5.0+
+[  630.031876] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58 
+10/29/2018
+[  630.031876] Call trace:
+[  630.031878]  dump_backtrace+0x0/0x200
+[  630.031880]  show_stack+0x24/0x30
+[  630.031882]  dump_stack+0xb0/0xf4
+[  630.031884]  __this_cpu_preempt_check+0xc8/0xd0
+[  630.031886]  kvm_get_running_vcpu+0x1c/0x38
+[  630.031888]  vgic_mmio_change_active.isra.4+0x2c/0xe0
+[  630.031890]  __vgic_mmio_write_cactive+0x80/0xc8
+[  630.031892]  vgic_mmio_uaccess_write_cactive+0x3c/0x50
+[  630.031894]  vgic_uaccess+0xcc/0x138
+[  630.031896]  vgic_v3_redist_uaccess+0x7c/0xa8
+[  630.031898]  vgic_v3_attr_regs_access+0x1a8/0x230
+[  630.031901]  vgic_v3_set_attr+0x1b4/0x290
+[  630.031903]  kvm_device_ioctl_attr+0xbc/0x110
+[  630.031905]  kvm_device_ioctl+0xc4/0x108
+[  630.031907]  ksys_ioctl+0xb4/0xd0
+[  630.031909]  __arm64_sys_ioctl+0x28/0x38
+[  630.031911]  el0_svc_common.constprop.1+0x7c/0x1a0
+[  630.031913]  do_el0_svc+0x34/0xa0
+[  630.031915]  el0_sync_handler+0x124/0x274
+[  630.031916]  el0_sync+0x140/0x180
+
+---8<---
+
+I'm now at commit 90568ecf561540fa330511e21fcd823b0c3829c6.
+
+And it looks like vgic_get_mmio_requester_vcpu() was broken by
+7495e22bb165 ("KVM: Move running VCPU from ARM to common code").
+
+Could anyone please have a look?
+
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>
+
+
+Thanks,
+Zenghui
 
