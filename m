@@ -2,77 +2,306 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2334155B41
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 16:57:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4FF9155B55
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 17:02:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727243AbgBGP46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 10:56:58 -0500
-Received: from mga06.intel.com ([134.134.136.31]:46283 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726867AbgBGP46 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 10:56:58 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 07:56:57 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,413,1574150400"; 
-   d="scan'208";a="225415707"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga008.jf.intel.com with ESMTP; 07 Feb 2020 07:56:57 -0800
-Date:   Fri, 7 Feb 2020 07:56:57 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 08/61] KVM: x86: Warn on zero-size save state for valid
- CPUID 0xD.N sub-leaf
-Message-ID: <20200207155657.GD2401@linux.intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-9-sean.j.christopherson@intel.com>
- <87blqaqtnw.fsf@vitty.brq.redhat.com>
+        id S1727048AbgBGQC2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 11:02:28 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59997 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726899AbgBGQC2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 11:02:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581091345;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=71qa8TrRVD2ZAnIKgl1QIKZUpyxS9u04IPmlS+EvjUk=;
+        b=FtBWJUe+RLzytpSqO4nGnjk6lUANKrLeVa34/KJs99OiyzTkFxGz8Qd/biNaJ4vCoFeT9f
+        VOj32dHV8kohZdOEfa7pCqcIaN2m6uYiAKwPW/9IhAATv2GmeeKe9pUZDVJZ5sPq/nbt4v
+        VLLwEdoWFv9UUo7SOFhC3uZyCw6sdv4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-40-vCrPxejTNsuuUuJ7Go7sHQ-1; Fri, 07 Feb 2020 11:02:01 -0500
+X-MC-Unique: vCrPxejTNsuuUuJ7Go7sHQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5A591084420
+        for <kvm@vger.kernel.org>; Fri,  7 Feb 2020 16:02:00 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.64])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B5AAB790D8;
+        Fri,  7 Feb 2020 16:01:59 +0000 (UTC)
+Date:   Fri, 7 Feb 2020 16:01:57 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Kashyap Chamarthy <kchamart@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com
+Subject: Re: [PATCH] docs/virt/kvm: Document running nested guests
+Message-ID: <20200207160157.GI3302@work-vm>
+References: <20200207153002.16081-1-kchamart@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87blqaqtnw.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200207153002.16081-1-kchamart@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 07, 2020 at 04:54:59PM +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> 
-> > WARN if the save state size for a valid XCR0-managed sub-leaf is zero,
-> > which would indicate a KVM or CPU bug.  Add a comment to explain why KVM
-> > WARNs so the reader doesn't have to tease out the relevant bits from
-> > Intel's SDM and KVM's XCR0/XSS code.
-> >
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  arch/x86/kvm/cpuid.c | 13 ++++++++++---
-> >  1 file changed, 10 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index fd9b29aa7abc..424dde41cb5d 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -677,10 +677,17 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
-> >  				goto out;
-> >  
-> >  			do_host_cpuid(&entry[i], function, idx);
-> > -			if (entry[i].eax == 0)
-> > -				continue;
-> > -			if (WARN_ON_ONCE(entry[i].ecx & 1))
-> > +
-> > +			/*
-> > +			 * The @supported check above should have filtered out
-> > +			 * invalid sub-leafs as well as sub-leafs managed by
-> 
-> Is it 'sub-leafs' or 'sub-leaves' actually? :-)
+* Kashyap Chamarthy (kchamart@redhat.com) wrote:
+> This is a rewrite of the Wiki page:
+>=20
+>     https://www.linux-kvm.org/page/Nested_Guests
+>=20
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> ---
+> Question: is the live migration of L1-with-L2-running-in-it fixed for
+> *all* architectures, including s390x?
+> ---
+>  .../virt/kvm/running-nested-guests.rst        | 171 ++++++++++++++++++
+>  1 file changed, 171 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/running-nested-guests.rst
+>=20
+> diff --git a/Documentation/virt/kvm/running-nested-guests.rst b/Documen=
+tation/virt/kvm/running-nested-guests.rst
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..e94ab665c71a36b7718aeba=
+e902af16b792f6dd3
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/running-nested-guests.rst
+> @@ -0,0 +1,171 @@
+> +Running nested guests with KVM
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
+> +
+> +A nested guest is a KVM guest that in turn runs on a KVM guest::
 
-Yes.  :-D
+Note nesting maybe a little more general; e.g. L1 might be another
+OS/hypervisor that wants to run it's own L2; and similarly
+KVM might be the L1 under someone elses hypervisor.
+
+I think this doc is mostly about the case of KVM being the L0
+and wanting to run an L1 that's capable of running an L2.
+
+> +              .----------------.  .----------------.
+> +              |                |  |                |
+> +              |      L2        |  |      L2        |
+> +              | (Nested Guest) |  | (Nested Guest) |
+> +              |                |  |                |
+> +              |----------------'--'----------------|
+> +              |                                    |
+> +              |       L1 (Guest Hypervisor)        |
+> +              |          KVM (/dev/kvm)            |
+> +              |                                    |
+> +      .------------------------------------------------------.
+> +      |                 L0 (Host Hypervisor)                 |
+> +      |                    KVM (/dev/kvm)                    |
+> +      |------------------------------------------------------|
+> +      |                  x86 Hardware (VMX)                  |
+> +      '------------------------------------------------------'
+
+This is now x86 specific but the doc is in a general directory;
+I'm not sure what other architecture nesting rules are.
+
+Woth having VMX/SVM at least.
+
+> +
+> +Terminology:
+> +
+> +  - L0 =E2=80=93 level-0; the bare metal host, running KVM
+> +
+> +  - L1 =E2=80=93 level-1 guest; a VM running on L0; also called the "g=
+uest
+> +    hypervisor", as it itself is capable of running KVM.
+> +
+> +  - L2 =E2=80=93 level-2 guest; a VM running on L1, this is the "neste=
+d guest"
+> +
+> +
+> +Use Cases
+> +---------
+> +
+> +An additional layer of virtualization sometimes can .  You
+> +might have access to a large virtual machine in a cloud environment th=
+at
+> +you want to compartmentalize into multiple workloads.  You might be
+> +running a lab environment in a training session.
+
+Lose this paragraph, and just use the list below?
+
+> +There are several scenarios where nested KVM can be Useful:
+> +
+> +  - As a developer, you want to test your software on different OSes.
+> +    Instead of renting multiple VMs from a Cloud Provider, using neste=
+d
+> +    KVM lets you rent a large enough "guest hypervisor" (level-1 guest=
+).
+> +    This in turn allows you to create multiple nested guests (level-2
+> +    guests), running different OSes, on which you can develop and test
+> +    your software.
+> +
+> +  - Live migration of "guest hypervisors" and their nested guests, for
+> +    load balancing, disaster recovery, etc.
+> +
+> +  - Using VMs for isolation (as in Kata Containers, and before it Clea=
+r
+> +    Containers https://lwn.net/Articles/644675/) if you're running on =
+a
+> +    cloud provider that is already using virtual machines
+
+Some others that might be worth listing;
+   - VM image creation tools (e.g. virt-install etc) often run their own
+     VM, and users expect these to work inside a VM.
+   - Some other OS's use virtualization internally for other
+     features/protection.
+
+> +Procedure to enable nesting on the bare metal host
+> +--------------------------------------------------
+> +
+> +The KVM kernel modules do not enable nesting by default (though your
+> +distribution may override this default).
+
+It's the other way;  see 1e58e5e for intel has made it default; AMD has
+it set as default for longer.
+
+ >To enable nesting, set the
+> +``nested`` module parameter to ``Y`` or ``1``. You may set this
+> +parameter persistently in a file in ``/etc/modprobe.d`` in the L0 host=
+:
+
+
+> +1. On the bare metal host (L0), list the kernel modules, and ensure th=
+at
+> +   the KVM modules::
+> +
+> +    $ lsmod | grep -i kvm
+> +    kvm_intel             133627  0
+> +    kvm                   435079  1 kvm_intel
+> +
+> +2. Show information for ``kvm_intel`` module::
+> +
+> +    $ modinfo kvm_intel | grep -i nested
+> +    parm:           nested:boolkvm                   435079  1 kvm_int=
+el
+> +
+> +3. To make nested KVM configuration persistent across reboots, place t=
+he
+> +   below entry in a config attribute::
+> +
+> +    $ cat /etc/modprobe.d/kvm_intel.conf
+> +    options kvm-intel nested=3Dy
+> +
+> +4. Unload and re-load the KVM Intel module::
+> +
+> +    $ sudo rmmod kvm-intel
+> +    $ sudo modprobe kvm-intel
+> +
+> +5. Verify if the ``nested`` parameter for KVM is enabled::
+> +
+> +    $ cat /sys/module/kvm_intel/parameters/nested
+> +    Y
+> +
+> +For AMD hosts, the process is the same as above, except that the modul=
+e
+> +name is ``kvm-amd``.
+> +
+> +Once your bare metal host (L0) is configured for nesting, you should b=
+e
+> +able to start an L1 guest with ``qemu-kvm -cpu host`` (which passes
+> +through the host CPU's capabilities as-is to the guest); or for better
+> +live migration compatibility, use a named CPU model supported by QEMU,
+> +e.g.: ``-cpu Haswell-noTSX-IBRS,vmx=3Don`` and the guest will subseque=
+ntly
+> +be capable of running an L2 guest with accelerated KVM.
+> +
+> +Additional nested-related kernel parameters
+> +-------------------------------------------
+> +
+> +If your hardware is sufficiently advanced (Intel Haswell processor or
+> +above which has newer hardware virt extensions), you might want to
+> +enable additional features: "Shadow VMCS (Virtual Machine Control
+> +Structure)", APIC Virtualization on your bare metal host (L0).
+> +Parameters for Intel hosts::
+> +
+> +    $ cat /sys/module/kvm_intel/parameters/enable_shadow_vmcs
+> +    Y
+> +
+> +    $ cat /sys/module/kvm_intel/parameters/enable_apicv
+> +    N
+> +
+> +    $ cat /sys/module/kvm_intel/parameters/ept
+> +    Y
+
+Don't those happen automatically (mostly?)
+
+> +Again, to persist the above values across reboot, append them to
+> +``/etc/modprobe.d/kvm_intel.conf``::
+> +
+> +    options kvm-intel nested=3Dy
+> +    options kvm-intel enable_shadow_vmcs=3Dy
+> +    options kvm-intel enable_apivc=3Dy
+> +    options kvm-intel ept=3Dy
+> +
+> +
+> +Live migration with nested KVM
+> +------------------------------
+> +
+> +The below live migration scenarios should work as of Linux kernel 5.3
+> +and QEMU 4.2.0.  In all the below cases, L1 exposes ``/dev/kvm`` in
+> +it, i.e. the L2 guest is a "KVM-accelerated guest", not a "plain
+> +emulated guest" (as done by QEMU's TCG).
+> +
+> +- Migrating a nested guest (L2) to another L1 guest on the *same* bare
+> +  metal host.
+> +
+> +- Migrating a nested guest (L2) to another L1 guest on a *different*
+> +  bare metal host.
+> +
+> +- Migrating an L1 guest, with an *offline* nested guest in it, to
+> +  another bare metal host.
+> +
+> +- Migrating an L1 guest, with a  *live* nested guest in it, to another
+> +  bare metal host.
+> +
+> +
+> +Limitations on Linux kernel versions older than 5.3
+> +---------------------------------------------------
+> +
+> +On Linux kernel versions older than 5.3, once an L1 guest has started =
+an
+> +L2 guest, the L1 guest would no longer capable of being migrated, save=
+d,
+> +or loaded (refer to QEMU documentation on "save"/"load") until the L2
+> +guest shuts down.  [FIXME: Is this limitation fixed for *all*
+> +architectures, including s390x?]
+> +
+> +Attempting to migrate or save & load an L1 guest while an L2 guest is
+> +running will result in undefined behavior.  You might see a ``kernel
+> +BUG!`` entry in ``dmesg``, a kernel 'oops', or an outright kernel pani=
+c.
+> +Such a migrated or loaded L1 guest can no longer be considered stable =
+or
+> +secure, and must be restarted.
+> +
+> +Migrating an L1 guest merely configured to support nesting, while not
+> +actually running L2 guests, is expected to function normally.
+> +Live-migrating an L2 guest from one L1 guest to another is also expect=
+ed
+> +to succeed.
+
+Can you add an entry along the lines of 'reporting bugs with nesting'
+that explains you should clearly state what the host CPU is,
+and the exact OS and hypervisor config in L0,L1 and L2 ?
+
+Dave
+
+> --=20
+> 2.21.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
