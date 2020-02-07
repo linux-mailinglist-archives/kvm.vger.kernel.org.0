@@ -2,105 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2B311560FB
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 23:03:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6DBB156114
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 23:15:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727130AbgBGWD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 17:03:26 -0500
-Received: from mga12.intel.com ([192.55.52.136]:23731 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727031AbgBGWD0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 17:03:26 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 14:03:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,415,1574150400"; 
-   d="scan'208";a="280100123"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by FMSMGA003.fm.intel.com with ESMTP; 07 Feb 2020 14:03:25 -0800
-Date:   Fri, 7 Feb 2020 14:03:25 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v5 17/19] KVM: Terminate memslot walks via used_slots
-Message-ID: <20200207220325.GO2401@linux.intel.com>
-References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
- <20200121223157.15263-18-sean.j.christopherson@intel.com>
- <20200206210944.GD700495@xz-x1>
- <20200207183325.GI2401@linux.intel.com>
- <20200207203909.GE720553@xz-x1>
- <20200207211016.GN2401@linux.intel.com>
- <20200207214623.GF720553@xz-x1>
+        id S1727068AbgBGWP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 17:15:56 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:40328 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727032AbgBGWP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 17:15:56 -0500
+Received: by mail-io1-f65.google.com with SMTP id x1so1204775iop.7
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 14:15:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yfZLiffjzS8p0VcpmAdgeBkNbj1uA9jdNca01ue7Jt4=;
+        b=ez+9IuDImdaUY7iHSTgV+FCo7hQlp4h/2a0nUVizcOs3oBlJ/RRxgF6bIAU0ObYswc
+         oPeSVvZy446HOPH5Xt1e3KZvlQaBBWMcZiFk9qP8FxLXOx4fwQB8AovK25jkxUNthXN6
+         uvgJKuhuj2/gihncyDcwLrEcE9O+SOFWPZqbjw1nt1ItVNEdrNKjJSzGfuuFUh7uBF2U
+         UC/nEm6Lk0iI+a6bdnS3j8T9OTsed2h9kln58cKRdK5nAVQ7QGfMZx3wd0qUBY/HOiQy
+         g7GFtcCRdf/7vRrJO+xBX1lulK1l2RZfaYsAF4x3ROyhHYCIpik6GHJ73WrcnqiQKl5C
+         qU+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yfZLiffjzS8p0VcpmAdgeBkNbj1uA9jdNca01ue7Jt4=;
+        b=KgmtriwMqcI1lNDGBxlZ9RAWn1mA5eHb3QX2nsjAB+BjC9NQSH9vJg8pR+PK8rsDYP
+         0pwIzqKm0q3kW41QQrUIjJbHiCEXxRKis0K4MKewjtaP2HXYqXXNBk3iKpYMIgwxBFRm
+         H/k1Qrbg6E1Hg+pHX/ykoXj9B/6kR10f9MN7e2BOUr+Wex2vkTzP4GpApMyTtsH4LuoK
+         zfaDv323ruJpMmxM/+yN/Yi2GWUC0FQYFMcZ5Aw7dBI9sd8kNDIKd8V2JPAzY4wuiohW
+         qe/f7Dh+Dc8DVKevstqwv7TBzvIh5ho7Qlb0fwkEyukRnBKT9VH06CAEZN3K54V+OHGo
+         ZVmw==
+X-Gm-Message-State: APjAAAXQFzSIUa7xSweAoEKb2N+03CfRi1+Vm9jSWu+kJ9CvfYtG6V/k
+        gkTfbZe+YuYbhEkJx7CgDLVpYIs68boGtClUN98WtQ==
+X-Google-Smtp-Source: APXvYqx6uhzoHSlOqVuZtnEdU6UHdi8JnHFJryKQ4FvVyStADif7DkR6ipcJ1CsZbjO5ly5yUz01y9XExH+ustLG4AU=
+X-Received: by 2002:a6b:92d4:: with SMTP id u203mr606535iod.288.1581113755090;
+ Fri, 07 Feb 2020 14:15:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200207214623.GF720553@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200127212256.194310-1-ehankland@google.com> <2a394c6d-c453-6559-bf33-f654af7922bd@redhat.com>
+ <CAOyeoRVaV3Dh=M4ioiT3DU+p5ZnQGRcy9_PssJZ=a36MhL-xHQ@mail.gmail.com> <c1cec3c8-570f-d824-cb20-6641cf686981@redhat.com>
+In-Reply-To: <c1cec3c8-570f-d824-cb20-6641cf686981@redhat.com>
+From:   Eric Hankland <ehankland@google.com>
+Date:   Fri, 7 Feb 2020 14:15:43 -0800
+Message-ID: <CAOyeoRWX1Xw+iPX52uCZef6Rqk44d-niUTikH1qL-fRoaYJeng@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Fix perfctr WRMSR for running counters
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 07, 2020 at 04:46:23PM -0500, Peter Xu wrote:
-> On Fri, Feb 07, 2020 at 01:10:16PM -0800, Sean Christopherson wrote:
-> > On Fri, Feb 07, 2020 at 03:39:09PM -0500, Peter Xu wrote:
-> > > On Fri, Feb 07, 2020 at 10:33:25AM -0800, Sean Christopherson wrote:
-> > > > On Thu, Feb 06, 2020 at 04:09:44PM -0500, Peter Xu wrote:
-> > > > > On Tue, Jan 21, 2020 at 02:31:55PM -0800, Sean Christopherson wrote:
-> > > > > > @@ -9652,13 +9652,13 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
-> > > > > >  		if (IS_ERR((void *)hva))
-> > > > > >  			return PTR_ERR((void *)hva);
-> > > > > >  	} else {
-> > > > > > -		if (!slot->npages)
-> > > > > > +		if (!slot || !slot->npages)
-> > > > > >  			return 0;
-> > > > > >  
-> > > > > > -		hva = 0;
-> > > > > > +		hva = slot->userspace_addr;
-> > > > > 
-> > > > > Is this intended?
-> > > > 
-> > > > Yes.  It's possible to allow VA=0 for userspace mappings.  It's extremely
-> > > > uncommon, but possible.  Therefore "hva == 0" shouldn't be used to
-> > > > indicate an invalid slot.
-> > > 
-> > > Note that this is the deletion path in __x86_set_memory_region() not
-> > > allocation.  IIUC userspace_addr won't even be used in follow up code
-> > > path so it shouldn't really matter.  Or am I misunderstood somewhere?
-> > 
-> > No, but that's precisely why I don't want to zero out @hva, as doing so
-> > implies that '0' indicates an invalid hva, which is wrong.
-> > 
-> > What if I change this to 
-> > 
-> > 			hva = 0xdeadull << 48;
-> > 
-> > and add a blurb in the changelog about stuff hva with a non-canonical value
-> > to indicate it's being destroyed.
-> 
-> IMO it's fairly common to have the case where "when A is XXX then
-> parameters B is invalid" happens in C.
+> Yes, please send it!  Thanks,
 
-I'm not arguing that's not the case.  My point is that there's nothing
-special about '0', so why use it?  E.g. "hva = 1" would also be ok from a
-functional perspective, but more obviously "wrong".
+I sent out the test a couple days ago and you queued it (commit
+b9624f3f34bd "Test WRMSR on a running counter").
+Are there any other changes that I should make?
+
+Thanks,
+Eric
