@@ -2,326 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 368A9155E14
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:27:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9464E155E22
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 19:33:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727068AbgBGS1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 13:27:12 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:36187 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726956AbgBGS1M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 13:27:12 -0500
-Received: by mail-qk1-f196.google.com with SMTP id w25so29318qki.3;
-        Fri, 07 Feb 2020 10:27:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=+OAgpmrRlNjGrGTn4Z7dnsY9QFeVT8xQyRpohXldMIY=;
-        b=YNEHliD/meMvkLzZLN95qUNNkh5R9gvm83c+UPkV+SeoyofDrCymewJig6nkRRykJm
-         6tZlckrmnjNu5/O+ZFTE9BvnbUkvbFtpsN8HaqgIjEEW3LE+k3yUA5IkVrX2+diKC7fU
-         TkYHYNgYUU3AQJEZQt/AVTWyuTmG/pMPfuhLYZEAA5P5N1mTqTC8CXb++E9FxWijZBhl
-         +zqFp1Eu04vwsVFrfLHd/oKzzhPFjZXOS5/gxziORpbjGqox+59SLDmMNHMWjgd4Thbe
-         dkJKXiRiHzHKjFfIgxveoVKFmHERXqEp8xkZ/XWiD9EqgiwyiS9H65NB5JHODyjn63nr
-         14nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=+OAgpmrRlNjGrGTn4Z7dnsY9QFeVT8xQyRpohXldMIY=;
-        b=nfzW4dtpvUk2qB/2yoHtEGL86mT9j04AXliCWlXnCeyBsHku+lg8THTCiXyScrSbXx
-         BMt3SsTNvFHhXhmyOQtqGPzovYwBWpBGvy6b7lJmVGTxym5PGO/gzxGwB98nbLTBrExH
-         TpHxz6SWS+PglGa+C7+t89KmvsiB8xlBSKFBr3Qx+0/mApmIHC0XhRH98w54xGbyRalv
-         Eian5agQGsM/+7v8X8ft9qnXqDJyot116ovwV/n9mL1QsWHgeDPQ/my53rOVNI2nPx4D
-         3IuyH4+m0dg4jAxlw/jXhfgD1tlT1zJZh8z474JXO+GLFNbsuoq8R1eUyX1AIJn+LFTv
-         kMoQ==
-X-Gm-Message-State: APjAAAVJPPAwqGJ2+5q0XyD8a3M08YOIUUHlg7EVHGmg1maDPkQAJw6K
-        r3THVBBRHqom0zhEohDBouM=
-X-Google-Smtp-Source: APXvYqyi/aWZcVJWp4bzy8fSYhSWACX+gqlcrZFaUkgAC+TuVSL/ytuz1Gyn3rOHESPdfyEuAfkZ3g==
-X-Received: by 2002:a05:620a:20d4:: with SMTP id f20mr124599qka.343.1581100030467;
-        Fri, 07 Feb 2020 10:27:10 -0800 (PST)
-Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
-        by smtp.gmail.com with ESMTPSA id y21sm1748988qto.15.2020.02.07.10.27.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2020 10:27:10 -0800 (PST)
-From:   Arvind Sankar <nivedita@alum.mit.edu>
-X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
-Date:   Fri, 7 Feb 2020 13:27:08 -0500
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        hpa@zytor.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Andy Lutomirski <luto@kernel.org>, tony.luck@intel.com,
-        peterz@infradead.org, fenghua.yu@intel.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 8/8] x86: vmx: virtualize split lock detection
-Message-ID: <20200207182706.GA3267197@rani.riverdale.lan>
-References: <20200206070412.17400-1-xiaoyao.li@intel.com>
- <20200206070412.17400-9-xiaoyao.li@intel.com>
+        id S1727048AbgBGSdf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 13:33:35 -0500
+Received: from mga17.intel.com ([192.55.52.151]:2218 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726951AbgBGSdf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Feb 2020 13:33:35 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 10:33:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,414,1574150400"; 
+   d="scan'208";a="430918451"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga005.fm.intel.com with ESMTP; 07 Feb 2020 10:33:25 -0800
+Date:   Fri, 7 Feb 2020 10:33:25 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 17/19] KVM: Terminate memslot walks via used_slots
+Message-ID: <20200207183325.GI2401@linux.intel.com>
+References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+ <20200121223157.15263-18-sean.j.christopherson@intel.com>
+ <20200206210944.GD700495@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200206070412.17400-9-xiaoyao.li@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200206210944.GD700495@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 03:04:12PM +0800, Xiaoyao Li wrote:
-> Due to the fact that MSR_TEST_CTRL is per-core scope, i.e., the sibling
-> threads in the same physical CPU core share the same MSR, only
-> advertising feature split lock detection to guest when SMT is disabled
-> or unsupported for simplicitly.
+On Thu, Feb 06, 2020 at 04:09:44PM -0500, Peter Xu wrote:
+> On Tue, Jan 21, 2020 at 02:31:55PM -0800, Sean Christopherson wrote:
+> > @@ -9652,13 +9652,13 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
+> >  		if (IS_ERR((void *)hva))
+> >  			return PTR_ERR((void *)hva);
+> >  	} else {
+> > -		if (!slot->npages)
+> > +		if (!slot || !slot->npages)
+> >  			return 0;
+> >  
+> > -		hva = 0;
+> > +		hva = slot->userspace_addr;
 > 
-> Below summarizing how guest behaves of different host configuration:
-> 
->   sld_fatal - MSR_TEST_CTL.SDL is forced on and is sticky from the guest's
-			     ^^^ typo
->               perspective (so the guest can detect a forced fatal mode).
+> Is this intended?
 
-Is the part in parentheses actually true currently, before adding [1] Sean's
-suggested SPLIT_LOCK_DETECT_STICKY bit? How would the guest detect the
-forced fatal mode without that?
+Yes.  It's possible to allow VA=0 for userspace mappings.  It's extremely
+uncommon, but possible.  Therefore "hva == 0" shouldn't be used to
+indicate an invalid slot.
 
-[1] https://lore.kernel.org/kvm/20200204060353.GB31665@linux.intel.com/
+> > +		old_npages = slot->npages;
+> >  	}
+> >  
+> > -	old = *slot;
+> >  	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> >  		struct kvm_userspace_memory_region m;
+> >  
+
+...
+
+> > @@ -869,63 +869,162 @@ static int kvm_create_dirty_bitmap(struct kvm_memory_slot *memslot)
+> >  }
+> >  
+> >  /*
+> > - * Insert memslot and re-sort memslots based on their GFN,
+> > - * so binary search could be used to lookup GFN.
+> > - * Sorting algorithm takes advantage of having initially
+> > - * sorted array and known changed memslot position.
+> > + * Delete a memslot by decrementing the number of used slots and shifting all
+> > + * other entries in the array forward one spot.
+> > + */
+> > +static inline void kvm_memslot_delete(struct kvm_memslots *slots,
+> > +				      struct kvm_memory_slot *memslot)
+> > +{
+> > +	struct kvm_memory_slot *mslots = slots->memslots;
+> > +	int i;
+> > +
+> > +	if (WARN_ON(slots->id_to_index[memslot->id] == -1))
+> > +		return;
+> > +
+> > +	slots->used_slots--;
+> > +
+> > +	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots; i++) {
+> > +		mslots[i] = mslots[i + 1];
+> > +		slots->id_to_index[mslots[i].id] = i;
+> > +	}
+> > +	mslots[i] = *memslot;
+> > +	slots->id_to_index[memslot->id] = -1;
+> > +}
+> > +
+> > +/*
+> > + * "Insert" a new memslot by incrementing the number of used slots.  Returns
+> > + * the new slot's initial index into the memslots array.
+> > + */
+> > +static inline int kvm_memslot_insert_back(struct kvm_memslots *slots)
+> 
+> The naming here didn't help me to understand but a bit more
+> confused...
+> 
+> How about "kvm_memslot_insert_end"?  Or even unwrap it.
+
+It's not guaranteed to be the end, as there could be multiple unused
+entries at the back of the array.  I agree the naming isn't perfect, but
+IMO it's the least crappy option and will be familiar to anyone with C++
+STL (and other languages?) experience.  Arguably it would be better to
+follow kernel naming for lists, e.g. head/tail, but there are no
+convenient adverbs for the move helpers, e.g. kvm_memslot_move_backward()
+would be kvm_memslot_move_towards_tail().
+
+I'm very strongly opposed to unwrapping it.
+
+The code would look like this.  Without a beefy comment, the high level
+semantics of the KVM_MR_CREATE case are not at all clear.  Adding a
+comment gets messy because putting it above the entire if-else makes it
+difficult to understand that its *only* for the CREATE case, and I hate
+having multi-line comments in if-else statements without brackets.
+
+                if (change == KVM_MR_CREATE)
+                        i = slots->used_slots++
+                else
+                        i = kvm_memslot_move_backward(slots, memslot);
+
+> > +{
+> > +	return slots->used_slots++;
+> > +}
+> > +
+> > +/*
+> > + * Move a changed memslot backwards in the array by shifting existing slots
+> > + * with a higher GFN toward the front of the array.  Note, the changed memslot
+> > + * itself is not preserved in the array, i.e. not swapped at this time, only
+> > + * its new index into the array is tracked.  Returns the changed memslot's
+> > + * current index into the memslots array.
+> > + */
+> > +static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
+> > +					    struct kvm_memory_slot *memslot)
+> 
+> "backward" makes me feel like it's moving towards smaller index,
+> instead it's moving to bigger index.  Same applies to "forward" below.
+> I'm not sure whether I'm the only one, though...
+
+Move forward towards the front, and backward towards the back.  In the
+languages I am familiar with, e.g. C++ STL, JavaScript, Python, and Golang,
+front==container[0] and back==container[len() - 1].
+
+> > +{
+> > +	struct kvm_memory_slot *mslots = slots->memslots;
+> > +	int i;
+> > +
+> > +	if (WARN_ON_ONCE(slots->id_to_index[memslot->id] == -1) ||
+> > +	    WARN_ON_ONCE(!slots->used_slots))
+> > +		return -1;
+> > +
+> > +	/*
+> > +	 * Move the target memslot backward in the array by shifting existing
+> > +	 * memslots with a higher GFN (than the target memslot) towards the
+> > +	 * front of the array.
+> > +	 */
+> > +	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots - 1; i++) {
+> > +		if (memslot->base_gfn > mslots[i + 1].base_gfn)
+> > +			break;
+> > +
+> > +		WARN_ON_ONCE(memslot->base_gfn == mslots[i + 1].base_gfn);
+> 
+> Will this trigger?  Note that in __kvm_set_memory_region() we have
+> already checked overlap of memslots.
+
+If you screw up the code it will :-)  In a perfect world, no WARN() will
+*ever* trigger.  All of the added WARN_ON_ONCE() are to help the next poor
+soul that wants to modify this code.
+ 
+> > +
+> > +		/* Shift the next memslot forward one and update its index. */
+> > +		mslots[i] = mslots[i + 1];
+> > +		slots->id_to_index[mslots[i].id] = i;
+> > +	}
+> > +	return i;
+> > +}
+> > @@ -1104,8 +1203,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+
+...
+
+> >  	 * when the memslots are re-sorted by update_memslots().
+> >  	 */
+> >  	tmp = id_to_memslot(__kvm_memslots(kvm, as_id), id);
+> > -	old = *tmp;
+> > -	tmp = NULL;
+> 
+> I was confused in that patch, then...
+> 
+> > +	if (tmp) {
+> > +		old = *tmp;
+> > +		tmp = NULL;
+> 
+> ... now I still don't know why it needs to set to NULL?
+
+To make it abundantly clear that though shall not use @tmp, i.e. to force
+using the copy and not the pointer.  Note, @tmp is also reused as an
+iterator below.
 
 > 
->   sld_warn - SLD is exposed to the guest.  MSR_TEST_CTRL.SLD is left on
->              until an #AC is intercepted with MSR_TEST_CTRL.SLD=0 in the
->              guest, at which point normal sld_warn rules apply.  If a vCPU
->              associated with the task does VM-Enter with
-> 	     MSR_TEST_CTRL.SLD=1, TIF_SLD is reset and the cycle begins
-> 	     anew.
+> > +	} else {
+> > +		memset(&old, 0, sizeof(old));
+> > +		old.id = id;
+> > +	}
+> >  
+> >  	if (!mem->memory_size)
+> >  		return kvm_delete_memslot(kvm, mem, &old, as_id);
+> > @@ -1223,7 +1327,7 @@ int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
+> >  
+> >  	slots = __kvm_memslots(kvm, as_id);
+> >  	*memslot = id_to_memslot(slots, id);
+> > -	if (!(*memslot)->dirty_bitmap)
+> > +	if (!(*memslot) || !(*memslot)->dirty_bitmap)
+> >  		return -ENOENT;
+> >  
+> >  	kvm_arch_sync_dirty_log(kvm, *memslot);
+> > @@ -1281,10 +1385,10 @@ static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
+> >  
+> >  	slots = __kvm_memslots(kvm, as_id);
+> >  	memslot = id_to_memslot(slots, id);
+> > +	if (!memslot || !memslot->dirty_bitmap)
+> > +		return -ENOENT;
+> >  
+> >  	dirty_bitmap = memslot->dirty_bitmap;
+> > -	if (!dirty_bitmap)
+> > -		return -ENOENT;
+> >  
+> >  	kvm_arch_sync_dirty_log(kvm, memslot);
+> >  
+> > @@ -1392,10 +1496,10 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+> >  
+> >  	slots = __kvm_memslots(kvm, as_id);
+> >  	memslot = id_to_memslot(slots, id);
+> > +	if (!memslot || !memslot->dirty_bitmap)
+> > +		return -ENOENT;
+> >  
+> >  	dirty_bitmap = memslot->dirty_bitmap;
+> > -	if (!dirty_bitmap)
+> > -		return -ENOENT;
+> >  
+> >  	n = ALIGN(log->num_pages, BITS_PER_LONG) / 8;
+> >  
+> > -- 
+> > 2.24.1
+> > 
 > 
->   sld_off - When set by the guest, MSR_TEST_CTL.SLD is set on VM-Entry
->             and cleared on VM-Exit if guest enables SLD.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  arch/x86/include/asm/cpu.h  |  2 ++
->  arch/x86/kernel/cpu/intel.c |  7 +++++
->  arch/x86/kvm/vmx/vmx.c      | 59 +++++++++++++++++++++++++++++++++++--
->  arch/x86/kvm/vmx/vmx.h      |  1 +
->  arch/x86/kvm/x86.c          | 14 +++++++--
->  5 files changed, 79 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-> index f5172dbd3f01..2920de10e72c 100644
-> --- a/arch/x86/include/asm/cpu.h
-> +++ b/arch/x86/include/asm/cpu.h
-> @@ -46,6 +46,7 @@ unsigned int x86_stepping(unsigned int sig);
->  extern void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c);
->  extern void switch_to_sld(unsigned long tifn);
->  extern bool handle_user_split_lock(unsigned long ip);
-> +extern void sld_turn_back_on(void);
->  extern bool split_lock_detect_enabled(void);
->  extern bool split_lock_detect_fatal(void);
->  #else
-> @@ -55,6 +56,7 @@ static inline bool handle_user_split_lock(unsigned long ip)
->  {
->  	return false;
->  }
-> +static inline void sld_turn_back_on(void) {}
->  static inline bool split_lock_detect_enabled(void) { return false; }
->  static inline bool split_lock_detect_fatal(void) { return false; }
->  #endif
-> diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-> index b67b46ea66df..28dc1141152b 100644
-> --- a/arch/x86/kernel/cpu/intel.c
-> +++ b/arch/x86/kernel/cpu/intel.c
-> @@ -1087,6 +1087,13 @@ bool handle_user_split_lock(unsigned long ip)
->  }
->  EXPORT_SYMBOL_GPL(handle_user_split_lock);
->  
-> +void sld_turn_back_on(void)
-> +{
-> +	__sld_msr_set(true);
-> +	clear_tsk_thread_flag(current, TIF_SLD);
-> +}
-> +EXPORT_SYMBOL_GPL(sld_turn_back_on);
-> +
->  /*
->   * This function is called only when switching between tasks with
->   * different split-lock detection modes. It sets the MSR for the
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 822211975e6c..8735bf0f3dfd 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1781,6 +1781,25 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
->  	}
->  }
->  
-> +/*
-> + * Note: for guest, feature split lock detection can only be enumerated through
-> + * MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT bit. The FMS enumeration is invalid.
-> + */
-> +static inline bool guest_has_feature_split_lock_detect(struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->arch.core_capabilities & MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT;
-> +}
-> +
-> +static inline u64 vmx_msr_test_ctrl_valid_bits(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 valid_bits = 0;
-> +
-> +	if (guest_has_feature_split_lock_detect(vcpu))
-> +		valid_bits |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
-> +
-> +	return valid_bits;
-> +}
-> +
->  /*
->   * Reads an msr value (of 'msr_index') into 'pdata'.
->   * Returns 0 on success, non-0 otherwise.
-> @@ -1793,6 +1812,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	u32 index;
->  
->  	switch (msr_info->index) {
-> +	case MSR_TEST_CTRL:
-> +		if (!msr_info->host_initiated &&
-> +		    !guest_has_feature_split_lock_detect(vcpu))
-> +			return 1;
-> +		msr_info->data = vmx->msr_test_ctrl;
-> +		break;
->  #ifdef CONFIG_X86_64
->  	case MSR_FS_BASE:
->  		msr_info->data = vmcs_readl(GUEST_FS_BASE);
-> @@ -1934,6 +1959,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	u32 index;
->  
->  	switch (msr_index) {
-> +	case MSR_TEST_CTRL:
-> +		if (!msr_info->host_initiated &&
-> +		    (!guest_has_feature_split_lock_detect(vcpu) ||
-> +		     data & ~vmx_msr_test_ctrl_valid_bits(vcpu)))
-> +			return 1;
-> +		vmx->msr_test_ctrl = data;
-> +		break;
->  	case MSR_EFER:
->  		ret = kvm_set_msr_common(vcpu, msr_info);
->  		break;
-> @@ -4230,6 +4262,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  
->  	vmx->rmode.vm86_active = 0;
->  	vmx->spec_ctrl = 0;
-> +	vmx->msr_test_ctrl = 0;
->  
->  	vmx->msr_ia32_umwait_control = 0;
->  
-> @@ -4563,6 +4596,11 @@ static inline bool guest_cpu_alignment_check_enabled(struct kvm_vcpu *vcpu)
->  	       (kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
->  }
->  
-> +static inline bool guest_cpu_split_lock_detect_enabled(struct vcpu_vmx *vmx)
-> +{
-> +	return vmx->msr_test_ctrl & MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
-> +}
-> +
->  static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> @@ -4658,8 +4696,9 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  		break;
->  	case AC_VECTOR:
->  		/*
-> -		 * Inject #AC back to guest only when guest enables legacy
-> -		 * alignment check.
-> +		 * Inject #AC back to guest only when guest is expecting it,
-> +		 * i.e., guest enables legacy alignment check or split lock
-> +		 * detection.
->  		 * Otherwise, it must be an unexpected split lock #AC of guest
->  		 * since hardware SPLIT_LOCK_DETECT bit keeps unchanged set
->  		 * when vcpu is running. In this case, treat guest the same as
-> @@ -4670,6 +4709,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  		 *    similar as sending SIGBUS.
->  		 */
->  		if (!split_lock_detect_enabled() ||
-> +		    guest_cpu_split_lock_detect_enabled(vmx) ||
->  		    guest_cpu_alignment_check_enabled(vcpu)) {
->  			kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
->  			return 1;
-> @@ -6555,6 +6595,16 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  	 */
->  	x86_spec_ctrl_set_guest(vmx->spec_ctrl, 0);
->  
-> +	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
-> +	    guest_cpu_split_lock_detect_enabled(vmx)) {
-> +		if (test_thread_flag(TIF_SLD))
-> +			sld_turn_back_on();
-> +		else if (!split_lock_detect_enabled())
-> +			wrmsrl(MSR_TEST_CTRL,
-> +			       this_cpu_read(msr_test_ctrl_cache) |
-> +			       MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
-> +	}
-> +
->  	/* L1D Flush includes CPU buffer clear to mitigate MDS */
->  	if (static_branch_unlikely(&vmx_l1d_should_flush))
->  		vmx_l1d_flush(vcpu);
-> @@ -6589,6 +6639,11 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  
->  	x86_spec_ctrl_restore_host(vmx->spec_ctrl, 0);
->  
-> +	if (static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
-> +	    guest_cpu_split_lock_detect_enabled(vmx) &&
-> +	    !split_lock_detect_enabled())
-> +		wrmsrl(MSR_TEST_CTRL, this_cpu_read(msr_test_ctrl_cache));
-> +
->  	/* All fields are clean at this point */
->  	if (static_branch_unlikely(&enable_evmcs))
->  		current_evmcs->hv_clean_fields |=
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 7f42cf3dcd70..4cb8075e0b2a 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -222,6 +222,7 @@ struct vcpu_vmx {
->  #endif
->  
->  	u64		      spec_ctrl;
-> +	u64		      msr_test_ctrl;
->  	u32		      msr_ia32_umwait_control;
->  
->  	u32 secondary_exec_control;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ed16644289a3..a3bb09319526 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1163,7 +1163,7 @@ static const u32 msrs_to_save_all[] = {
->  #endif
->  	MSR_IA32_TSC, MSR_IA32_CR_PAT, MSR_VM_HSAVE_PA,
->  	MSR_IA32_FEAT_CTL, MSR_IA32_BNDCFGS, MSR_TSC_AUX,
-> -	MSR_IA32_SPEC_CTRL,
-> +	MSR_IA32_SPEC_CTRL, MSR_TEST_CTRL,
->  	MSR_IA32_RTIT_CTL, MSR_IA32_RTIT_STATUS, MSR_IA32_RTIT_CR3_MATCH,
->  	MSR_IA32_RTIT_OUTPUT_BASE, MSR_IA32_RTIT_OUTPUT_MASK,
->  	MSR_IA32_RTIT_ADDR0_A, MSR_IA32_RTIT_ADDR0_B,
-> @@ -1345,7 +1345,12 @@ static u64 kvm_get_arch_capabilities(void)
->  
->  static u64 kvm_get_core_capabilities(void)
->  {
-> -	return 0;
-> +	u64 data = 0;
-> +
-> +	if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) && !cpu_smt_possible())
-> +		data |= MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT;
-> +
-> +	return data;
->  }
->  
->  static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
-> @@ -5259,6 +5264,11 @@ static void kvm_init_msr_list(void)
->  		 * to the guests in some cases.
->  		 */
->  		switch (msrs_to_save_all[i]) {
-> +		case MSR_TEST_CTRL:
-> +			if (!(kvm_get_core_capabilities() &
-> +			      MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT))
-> +				continue;
-> +			break;
->  		case MSR_IA32_BNDCFGS:
->  			if (!kvm_mpx_supported())
->  				continue;
 > -- 
-> 2.23.0
+> Peter Xu
 > 
