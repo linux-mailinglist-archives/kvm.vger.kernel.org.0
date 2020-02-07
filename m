@@ -2,115 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E625F155451
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 10:12:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89BC915545A
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2020 10:16:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726899AbgBGJMc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Feb 2020 04:12:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29546 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726417AbgBGJMc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Feb 2020 04:12:32 -0500
+        id S1727309AbgBGJQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Feb 2020 04:16:40 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51488 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726999AbgBGJQk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Feb 2020 04:16:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581066750;
+        s=mimecast20190719; t=1581066998;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5TyuWNZKysSSJUR/G19ReAR/3QYXehjLVxwZbgY9U6Y=;
-        b=iTj+z13HyuriGopOnS0PGn+aqrbdhBTQzJFsbmBYsfRUzdRlDzxueC9vP0O3H+SRL+qHIo
-        gIP83ren+vM5rp1JTGgIdVoIowhws9t+8ceaWUzggZU72fN5FTUmuoMeQH9U7FqD+rj7zQ
-        IPGIxLokQsaP4MvOHou/kVbF9JlchdQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-LfKIYUCjP1ya2sl70pfFig-1; Fri, 07 Feb 2020 04:12:26 -0500
-X-MC-Unique: LfKIYUCjP1ya2sl70pfFig-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBA6D8018A5;
-        Fri,  7 Feb 2020 09:12:24 +0000 (UTC)
-Received: from gondolin (ovpn-117-112.ams2.redhat.com [10.36.117.112])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F8AE60BF7;
-        Fri,  7 Feb 2020 09:12:23 +0000 (UTC)
-Date:   Fri, 7 Feb 2020 10:12:20 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v2 0/9] s390x/vfio-ccw: Channel Path Handling
-Message-ID: <20200207101220.2d057f18.cohuck@redhat.com>
-In-Reply-To: <20200206213825.11444-1-farman@linux.ibm.com>
-References: <20200206213825.11444-1-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=3e6VGnl7p5aII5PG66IQC6em60bIEwWa13Qn8r4drow=;
+        b=GyTxi4X0G4QdW/EatxE3KRRq9HHqEHLy3ZWslhR1TAgd/ALntY4p2ACdZ4AzajPXJ3SgjH
+        oJMzBF3eXkSQs5+9a5JXV61MWaOV5CHj0s1puYVGYdttdiSf7MXkCJYvApWF0o45p0eUQy
+        xrhKdXD16TauBV3eN27xqTQKEqJxQZM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-wpkXOpcrNYasF_BJ_es-Tg-1; Fri, 07 Feb 2020 04:16:37 -0500
+X-MC-Unique: wpkXOpcrNYasF_BJ_es-Tg-1
+Received: by mail-wm1-f69.google.com with SMTP id q125so488631wme.1
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2020 01:16:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=3e6VGnl7p5aII5PG66IQC6em60bIEwWa13Qn8r4drow=;
+        b=dCo1Culf5tcIV0b8a4pZ9bRB+wqDXMb+dyE0noJN/sW4V5XqkTZudp72naWEySY100
+         hpjqW3WtbeQnpYZBo60Lkwgk34IlSGkP67xv/BZOtD7zb7VdJqizwIss6MtjFpYccTki
+         FgS3fIBsvzkamHwqVroDE9GhLRCxm7khDTjfWaEwK+B1d8DhCGJ57Jm7ue8LBubElabp
+         r5cNlI7FyWlQyFKIpD3IybXhu8Yu3qKjtdZIgDr6PPJEErM0rPJrKQIssFaxdZfWLe/6
+         Rn+6dY9Nrk0ZAuH5p6kfuugXR9sSI8H697AokkM6DMlkuYZmUpPpXoAN94ImkjwwfHs+
+         AiMA==
+X-Gm-Message-State: APjAAAWxVHuUjNmLflzn9uJDz4+auiQ+NH2v0GDARUZhUTEQIg1/MjNP
+        5WoER7qHCzIGwLmOHJWN84qxro8jQFXz3gLRuYCGP2CMe9IjZtuUrPV99ftFSvyNX5BeQ8zlkmm
+        F39iM8rPpk1iy
+X-Received: by 2002:a1c:7f87:: with SMTP id a129mr3413211wmd.156.1581066996051;
+        Fri, 07 Feb 2020 01:16:36 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxWo7rQpQBdxXn6bJTKzbF2UU/0mee8M38zNSRICzbl5n6q/+4CeKDtcLL8L2jb7RfK5OLSRg==
+X-Received: by 2002:a1c:7f87:: with SMTP id a129mr3413176wmd.156.1581066995824;
+        Fri, 07 Feb 2020 01:16:35 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id x132sm16326045wmg.0.2020.02.07.01.16.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2020 01:16:35 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     thuth@redhat.com, drjones@redhat.com, wei.huang2@amd.com,
+        Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Subject: Re: [PATCH v4 2/3] selftests: KVM: AMD Nested test infrastructure
+In-Reply-To: <92106709-10ff-44d3-1fe8-2c77c010913f@oracle.com>
+References: <20200206104710.16077-1-eric.auger@redhat.com> <20200206104710.16077-3-eric.auger@redhat.com> <92106709-10ff-44d3-1fe8-2c77c010913f@oracle.com>
+Date:   Fri, 07 Feb 2020 10:16:34 +0100
+Message-ID: <87blqag3kd.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  6 Feb 2020 22:38:16 +0100
-Eric Farman <farman@linux.ibm.com> wrote:
+Krish Sadhukhan <krish.sadhukhan@oracle.com> writes:
 
-> Here is a new pass at the channel-path handling code for vfio-ccw.
-> This was initially developed by Farhan Ali this past summer, and
-> picked up by me.  For my own benefit/sanity, I made a small changelog
-> in the commit message for each patch, describing the changes I've
-> made to his original code beyond just rebasing to master, rather than
-> a giant list appended here.
-> 
-> I had been encountering a host crash which I think was triggered by
-> this code rather than existing within it.  I'd sent a potential fix
-> for that separately, but need more diagnosis.  So while that is
-> outstanding, I think I've gotten most (but probably not all) comments
-> from v1 addressed within.
-> 
-> With this, and the corresponding QEMU series (to be posted momentarily),
-> applied I am able to configure off/on a CHPID (for example, by issuing
-> "chchp -c 0/1 xx" on the host), and the guest is able to see both the
-> events and reflect the updated path masks in its structures.
-> 
-> For reasons that are hopefully obvious, issuing chchp within the guest
-> only works for the logical vary.  Configuring it off/on does not work,
-> which I think is fine.
+...
+> +	asm volatile (
+>> +		"vmload\n\t"
+> Don't we need to set %rax before calling vmload ?
+>
 
-Before I delve into this: While the basic architecture here (and in the
-QEMU part) is still similar, you changed things like handling multiple
-CRWs? That's at least the impression I got from a very high-level skim.
+No, because it is already there
 
-> 
-> v1: https://lore.kernel.org/kvm/20191115025620.19593-1-farman@linux.ibm.com/
-> 
-> Eric Farman (4):
->   vfio-ccw: Refactor the unregister of the async regions
->   vfio-ccw: Refactor IRQ handlers
->   vfio-ccw: Add trace for CRW event
->   vfio-ccw: Remove inline get_schid() routine
-> 
-> Farhan Ali (5):
->   vfio-ccw: Introduce new helper functions to free/destroy regions
->   vfio-ccw: Register a chp_event callback for vfio-ccw
->   vfio-ccw: Introduce a new schib region
->   vfio-ccw: Introduce a new CRW region
->   vfio-ccw: Wire up the CRW irq and CRW region
-> 
->  Documentation/s390/vfio-ccw.rst     |  31 ++++-
->  drivers/s390/cio/Makefile           |   2 +-
->  drivers/s390/cio/vfio_ccw_chp.c     | 136 ++++++++++++++++++++
->  drivers/s390/cio/vfio_ccw_drv.c     | 186 ++++++++++++++++++++++++++--
->  drivers/s390/cio/vfio_ccw_fsm.c     |   8 +-
->  drivers/s390/cio/vfio_ccw_ops.c     |  65 +++++++---
->  drivers/s390/cio/vfio_ccw_private.h |  16 +++
->  drivers/s390/cio/vfio_ccw_trace.c   |   1 +
->  drivers/s390/cio/vfio_ccw_trace.h   |  30 +++++
->  include/uapi/linux/vfio.h           |   3 +
->  include/uapi/linux/vfio_ccw.h       |  19 +++
->  11 files changed, 463 insertions(+), 34 deletions(-)
->  create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
-> 
+...
+>> +		: : [vmcb] "r" (vmcb), [vmcb_gpa] "a" (vmcb_gpa)
+
+"a" constraint in input operands does the job.
+
+-- 
+Vitaly
 
