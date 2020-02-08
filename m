@@ -2,73 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C50E6156320
-	for <lists+kvm@lfdr.de>; Sat,  8 Feb 2020 06:55:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6D2E156355
+	for <lists+kvm@lfdr.de>; Sat,  8 Feb 2020 08:46:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbgBHFzS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 8 Feb 2020 00:55:18 -0500
-Received: from sonic314-21.consmr.mail.ir2.yahoo.com ([77.238.177.147]:34237
-        "EHLO sonic314-21.consmr.mail.ir2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725789AbgBHFzR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 8 Feb 2020 00:55:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1581141315; bh=pa1o5VRYWWG3WgDVzwpWeoz/bqhPAQKm9h7htHGAd9k=; h=Date:From:Reply-To:Subject:References:From:Subject; b=MXJlIbbwANnmKEL7HGDDjoBWRDP9fPGJXxceRWSgnGaQNkAEOUiRiK+I9hgN32R1sMg2CEWdIVobpFtT8bEBY/C4WzVZlsmCOv1/d/3tLW3/FkCFbfH2J9NL3IgxPYg1pSvM/dxFqK0uAwgdOP8mOm07t9FFvLW0VKP0vgARpPgTJg7CEwVB75yUFw7BTSsHGzzSXEKK5V7WehFA8cu4u+2hwARW8CuCkr5YKziNPV2Uu1hIg7A6++v/LF8WXEwX9ycWdYArBXpxV6m3lPLokexBUJQjTXezDBjuyw5B8PwQ57WeQEOjaU7Iv4ew06IRWAmf6qAPxhqnCRMgbfc9mw==
-X-YMail-OSG: 2sOt1UEVM1mMTSe7JTBsTEfOEXfZMfNY4vF9nuRJ0CRvf_Nb9fW_NEVDLKJfpRT
- 1wVPotrLOWe_XWOcHDav262TQiKONYgYAykVi2QNcTAZTo9LLVsYc90GVAwzGvm0OPC.aQV304NA
- k9gPvDddEJu7CL9PsVavPRyvsgzEqb28C9iQE90JtVq2x1_wwpenhQ_QfR4TtPFMr.tWpSF_Qtoz
- bDTgG508gqce4N2hSPncGSODhPwOP6s93h.l3ChL1X4hgmOQCivMgz186D5IxBWlUUxk.0MXcBXr
- GT0J1o17WGNcD82zxy.LkjepFQNcPj32FEWVJHv.nz0G4wd0RXa2nhM_pSmkT7tiLNSXno9ZycF7
- ICxZcERQyCnLMuVjDEj99B7N1EfAbuscP_McWQJj.hHwPXQuQ2gnu5IFg3Axooo0zMLhk4r.w7ZJ
- t1Z.hM3AUE2.zI7eYQ0iAz2p.HjCZROQh38es3d19PZHJiHjSzDyLom30GnbcX7FVmmY2S7n4xEE
- HYoqi.ZrYymQCaGJn9DM0UOLEJPh1ZY2rtXq0TdGKOgtZg1NEtOYQS7xMrpYeEWxBpwXVCD8Ken7
- wFNn930_VM2dgkKzefbw2_7xjLCy0doi4MQKWMbzRoT5cp_NGFkyCSjghbxtB5Minpp4HRe2VwIj
- eczEx5ujU2KwyuVAtqFoBV7ZawzIl3YqdU_l7mh.yQUDxixlby6ovNmx4FiHWgI2mAiaQwaZe9Fi
- TfnjSgEX6eBXKILBVLRGEum49vc5MthiNpxl.P6dL67tuR37e3O6JFrjohAQqqn8gUM2pLIqpnmK
- r7qx1Cv2l_ny7KufelnGZ5jK4k4fdWripkR8ZN7P9oflOsLV2R_VchYayhlaGhh4N7kuVwGyM_qk
- 64otpfxvbg4GU2WAkuTIptAOeGZD0y.6q9Y.XJUumkQCnEDdZkbd5jMtlH0WDrKz6jdcEekU5iyz
- OccK4k1d6Nt4lriG7yjkFzkxRHKEQso3aQCGZcRdQRD8vCvAvEjOB4_LDbxKJnxCKtskvuci0bAO
- yhHEwHPzy_4e.CBzsNxI8c6qC448_Vk6vYwYx1E4dp9u64xe8gZr5r5BeHFHLp2plEPMwEdE1HfR
- c9SDEK0GhC2QW39woVCOSM2avG1egRD3UC2SX.9.0ICl1X1L_a1eAbcd3_B301DTzdk36bltJKUF
- XuWnxwRFQw9B8AgZsVlQZuLNJKKFGOhnDKGF6WAJ.OUKFY3zL1k0zESJhNJAbAaNCm3QvRUAvkwc
- QGYIbXkmASyyguBkehnMZ78_1Owji8kStnGAoMVTL4I.ea.r6ZVl_ZTvuFipVx4qJB.DRTUSF.g-
- -
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic314.consmr.mail.ir2.yahoo.com with HTTP; Sat, 8 Feb 2020 05:55:15 +0000
-Date:   Sat, 8 Feb 2020 05:55:11 +0000 (UTC)
-From:   "D.H.L REJOY" <mrsrajoysmrsrajoyshassain@gmail.com>
-Reply-To: rejoy_hassain_2020@mail.ru
-Message-ID: <1727372609.29561.1581141311800@mail.yahoo.com>
-Subject: =?UTF-8?Q?Greetings=C2=A0to=C2=A0you.?=
+        id S1727118AbgBHHqd convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 8 Feb 2020 02:46:33 -0500
+Received: from mga02.intel.com ([134.134.136.20]:60934 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725789AbgBHHqc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 8 Feb 2020 02:46:32 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 23:46:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,416,1574150400"; 
+   d="scan'208";a="431096976"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by fmsmga005.fm.intel.com with ESMTP; 07 Feb 2020 23:46:31 -0800
+Received: from fmsmsx158.amr.corp.intel.com (10.18.116.75) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 7 Feb 2020 23:46:31 -0800
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ fmsmsx158.amr.corp.intel.com (10.18.116.75) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 7 Feb 2020 23:46:31 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.98]) with mapi id 14.03.0439.000;
+ Sat, 8 Feb 2020 15:46:29 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [RFC v1 0/2] vfio/pci: expose device's PASID capability to VMs
+Thread-Topic: [RFC v1 0/2] vfio/pci: expose device's PASID capability to VMs
+Thread-Index: AQHV1p2L6Ox9Ls63fUG3sLdpayIPaagQ+k+g
+Date:   Sat, 8 Feb 2020 07:46:28 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A1B57BC@SHSMSX104.ccr.corp.intel.com>
+References: <1580300325-86259-1-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1580300325-86259-1-git-send-email-yi.l.liu@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjExNjc0ZWMtMWU1NS00YTIyLTgwMTMtODkwYWExMjBhODg0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiRUtqNWlmRmZBa1VrZFVtS2x3emNaRUJLYjd2azQ2U0NjRm5sdVMwY0xuQjkwUkZRV0Jxa0lJTlV4d25TZ1R6SyJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <1727372609.29561.1581141311800.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.15199 YMailNodin Mozilla/5.0 (Windows NT 5.1; rv:52.0) Gecko/20100101 Firefox/52.0
-To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ATTENTION: DEAR BENEFICIARY CONGRATULATIONS TO YOU DEAR GOOD DAY I AM SORRY IF YOU RECEIVED THIS LETTER IN YOUR SPAM OR JUNK MAIL IT IS DUE TO A RECENT CONNECTION HERE IN MY COUNTRY.
+Hi Alex,
 
-DEAR FRIEND.
+Any comment on this series?
 
-YOU MAY BE WONDERING WHYI CONTACT YOU BUT SOMEONE LUCKY HAS TO BE CHOSEN WHICH IS YOU. I WANT YOU TO HANDLE THIS BUSINESS TRASACTION WITH ME IF CHANCE YOU TO DO INTERNATION BUSINESS I GO YOUR CONTACT FROM A RELIABLE WEB DIRECTORY.
+Regards,
+Yi Liu
 
-I RECEIVE YOUR CONTENT OF YOUR EMAIL FROM THIS DHL MASTER CARD OFFICES FUND OF $10.5 USD MILLION AFTER THE BOARD OF DIRECTORS MEETINGS, THE UNITED NATIONS GOVERNMENT HAVE DECIDED TO ISSUE YOU YOUR (ATM) VALUED AT 10.5 MILLION UNITED STATES DOLLAR.THIS IS TO BRING TO YOUR NOTICE THAT YOUR VALUED SUM OF 10.5 MILLION DOLLAR HAS BEING TODAY CREDITED INTO (ATM) MASTER CARD AND HAS BEEN HANDLE TO THE FOREIGN REMITTANCE DEPARTMENT TO SEND IT TO YOU TODAY IN YOUR FAVOR.
+> From: Liu, Yi L
+> Sent: Wednesday, January 29, 2020 8:19 PM
+> To: alex.williamson@redhat.com; eric.auger@redhat.com
+> Subject: [RFC v1 0/2] vfio/pci: expose device's PASID capability to VMs
+> 
+> Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on Intel
+> platforms allows address space sharing between device DMA and applications. SVA
+> can reduce programming complexity and enhance security.
+> 
+> To enable SVA, device needs to have PASID capability, which is a key capability for
+> SVA. This patchset exposes the device's PASID capability to guest instead of hiding it
+> from guest.
+> 
+> The second patch emulates PASID capability for VFs (Virtual Function) since VFs don't
+> implement such capability per PCIe spec. This patch emulates such capability and
+> expose to VM if the capability is enabled in PF (Physical Function).
+> 
+> However, there is an open for PASID emulation. If PF driver disables PASID capability
+> at runtime, then it may be an issue. e.g. PF should not disable PASID capability if
+> there is guest using this capability on any VF related to this PF. To solve it, may need
+> to introduce a generic communication framework between vfio-pci driver and PF
+> drivers. Please feel free to give your suggestions on it.
+> 
+> Liu Yi L (2):
+>   vfio/pci: Expose PCIe PASID capability to guest
+>   vfio/pci: Emulate PASID/PRI capability for VFs
+> 
+>  drivers/vfio/pci/vfio_pci_config.c | 321
+> ++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 318 insertions(+), 3 deletions(-)
+> 
+> --
+> 2.7.4
 
-WITH YOUR (ATM) YOU WILL HAVE ACCESS TO MAKE DAILY WITHDRAWALS OF $5000,00 UNITED STATE DOLLARS DAILIES AS ALREADY PROGRAMMED UNTIL YOU WITHDRAW YOUR TOTAL SUM IN YOUR (ATM) CARD WHICH HAS REGISTERED IN OUR SYSTEM FOR PAYMENT RECORD, AS SOON AS WE RECEIVE YOUR INFORMATIONS AND YOUR HOME ADDRESS OF YOUR COUNTRY AS ALREADY PROGRAMMED, WE WILL SEND YOUR (ATM) CARD THROUGH DHL COURIER SERVICE, WE HAVE RECEIVED A SIGNAL FROM THE SWISS WORLD BANK TO INFECT YOUR TRANSFER TO YOU WITHIN ONE WEEK,
-
-WE HAVE JUST FINISHED OUR ANNUAL GENERAL MEETING WITH THE CENTRAL BANK OF AMERICA (BOA). AT THE END OF THE BOARD OF DIRECTORS MEETING TODAY, WE HAVE CONCLUDED TO IMMEDIATELY ISSUE YOU AS SOON AS POSSIBLE,
-
-AND YOUR VALUE SUM HAS BEEN CREDITED INTO YOUR (ATM) VISA CARD
-ACCOUNT. WHICH YOU WILL USE TO WITHDRAW YOUR FUND IN ANY PART OF THE WORLD, WE HAVE ISSUED AND CREDITED YOUR (ATM) CARD IN YOUR NAME TODAY,
-
-YOUR (ATM) WILL BE INSURE BY THE INSURANCE COMPANY AND SEND TO YOU
-THROUGH ANY AVAILABLE COURIER COMPANY OF OUR CHOICE.
-
-ONCE AGAIN CONGRATULATIONS TO YOU,
-
-DIRECTOR DHL SERVICE,
-THANKS,
-SINCERELY.
-MRS. RAJOYS HASSAIN,
