@@ -2,152 +2,303 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41C76156868
-	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2020 03:36:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73960156B38
+	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2020 16:50:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727574AbgBICgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 8 Feb 2020 21:36:36 -0500
-Received: from omta04.suddenlink.net ([208.180.40.74]:48674 "EHLO
-        omta04.suddenlink.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727559AbgBICgg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 8 Feb 2020 21:36:36 -0500
-X-Greylist: delayed 304 seconds by postgrey-1.27 at vger.kernel.org; Sat, 08 Feb 2020 21:36:35 EST
-Received: from dalifep02 ([10.130.7.34]) by dalofep02.suddenlink.net
-          (InterMail vM.8.04.03.22.02 201-2389-100-169-20190213) with ESMTP
-          id <20200209023130.JVGU3014.dalofep02.suddenlink.net@dalifep02>;
-          Sat, 8 Feb 2020 20:31:30 -0600
-Message-ID: <20200208203130.MHKQM.231508.root@dalifep02>
-Date:   Sat, 8 Feb 2020 20:31:30 -0600
-From:   <dkkdjjdkjsds@suddenlink.net>
-Subject: =?utf-8?B?4LiX4Li14LmI4Lij4Lix4LiB4LiC4Lit4LiH4LiJ4Lix4LiZ?=
+        id S1727787AbgBIPu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Feb 2020 10:50:27 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45805 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727698AbgBIPu0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 9 Feb 2020 10:50:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581263424;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=KaFEQGhCio0vaJ36d2gdvNZzagyeOET/PRnad/wUE2Q=;
+        b=dxPQ7zccpQK2kKQimySZyaoj2rfQ2FKAeA6twFcQuStPV3rFOkZoCGpFoVkEFr1fHZVFUB
+        B6jGHuNDAn+WIMmcaieplQusKxJ3R3y7VmjWA++p36qQEQAuUeiKgBFjVqcw5P/7X8U2vS
+        oG3P9YjiYt1xLpLuQpQNyB/Ap3OT5Bw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-314-sfIe6fiEMMyD3_wamzZATg-1; Sun, 09 Feb 2020 10:50:20 -0500
+X-MC-Unique: sfIe6fiEMMyD3_wamzZATg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F70A1005512;
+        Sun,  9 Feb 2020 15:50:19 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-108.ams2.redhat.com [10.36.116.108])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 888A760BEC;
+        Sun,  9 Feb 2020 15:50:13 +0000 (UTC)
+Subject: Re: [PATCH 25/35] KVM: s390: protvirt: Only sync fmt4 registers
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-26-borntraeger@de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <cbb6ae42-5320-e6cf-214d-a81602a359cf@redhat.com>
+Date:   Sun, 9 Feb 2020 16:50:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20200207113958.7320-26-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: base64
-X-Priority: 3 (Normal)
-Sensitivity: Normal
-X-Authentication-Info: Submitted using SMTP AUTH LOGIN at dalofep02.suddenlink.net from [10.130.7.34] using ID dkkdjjdkjsds@suddenlink.net at Sat, 8 Feb 2020 20:31:30 -0600
-X-CM-Analysis: v=2.3 cv=PfaBeRpd c=1 sm=1 tr=0 cx=a_idp_d a=eIt+936qRqyxddQpGZhhnA==:117 a=9cW_t1CCXrUA:10 a=IkcTkHD0fZMA:10 a=l697ptgUJYAA:10 a=5KLPUuaC_9wA:10 a=CjxXgO3LAAAA:8 a=cR6EXLStVrmmaC8n3c4A:9 a=QEXdDO2ut3YA:10 a=KETQ2wGClcgA:10
-X-CM-Envelope: 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 a/oObp2BPgw2WAq+nqyRsg==
-To:     unlisted-recipients:; (no To-header on input)
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-IA0K4LiX4Li14LmI4Lij4Lix4LiB4LiC4Lit4LiH4LiJ4Lix4LiZDQoNCuC4ieC4seC4meC4hOC4
-t+C4reC4i+C4ueC4i+C4suC4meC5gOC4reC4peC4p+C4ueC4lOC4iOC4suC4geC5geC4hOC4meC4
-suC4lOC4suC4ieC4seC4meC5geC4leC5iOC4h+C4h+C4suC4meC4geC4seC4muC4meC4suC4ouC4
-oeC4tOC5gOC4iuC4peC5gOC4reC4peC4p+C4ueC5ieC4lOC4nOC4ueC5ieC5gOC4hOC4ouC4o+C5
-iOC4p+C4oeC4h+C4suC4meC4geC4seC4muC4quC4luC4suC4meC4l+C4ueC4leC5geC4hOC4meC4
-suC4lOC4suC5g+C4meC5guC4geC4leC4lOC4tOC4p+C4seC4p+C4o+C5jOC5gOC4m+C5h+C4meC5
-gOC4p+C4peC4suC4ouC4teC5iOC4quC4tOC4muC4q+C4geC4m+C4teC4geC5iOC4reC4meC4l+C4
-teC5iOC5gOC4guC4suC4iOC4sOC5gOC4quC4teC4ouC4iuC4teC4p+C4tOC4lQ0KDQrguYDguKPg
-uLLguYHguJXguYjguIfguIfguLLguJnguIHguLHguJnguKHguLLguKrguLTguJrguYHguJvguJTg
-uJvguLXguYHguKXguYnguKfguYLguJTguKLguKHguLUgZHVhZ2h0ZXIgKExpbmRhKSDguIvguLbg
-uYjguIfguJXguYjguK3guKHguLLguYDguKrguLXguKLguIrguLXguKfguLTguJXguIjguLLguIHg
-uK3guLjguJrguLHguJXguLTguYDguKvguJXguLjguJfguLLguIfguKPguJbguKLguJnguJXguYzg
-uIHguYjguK3guJnguJfguLXguYjguKrguLLguKHguLXguILguK3guIfguInguLHguJnguIjguLDg
-uYDguKrguLXguKLguIrguLXguKfguLTguJXguIHguYjguK3guJnguKfguLHguKLguK3guLHguJng
-uITguKfguKPguYDguKPguLLguJfguLHguYnguIfguITguLnguYjguIHguYfguYDguIHguLTguJTg
-uITguKPguLTguKrguYDguJXguLXguKLguJnguK3guLXguIHguITguKPguLHguYnguIcg4LiV4Lix
-4LmJ4LiH4LmB4LiV4LmI4Lir4Lil4Lix4LiH4LiE4Lin4Liy4Lih4LiV4Liy4Lii4LiC4Lit4LiH
-4LmA4LiC4Liy4LiJ4Lix4LiZ4LiV4Lix4LiU4Liq4Li04LiZ4LmD4LiI4LiX4Li14LmI4LiI4Liw
-4LmE4Lih4LmI4LmB4LiV4LmI4LiH4LiH4Liy4LiZ4LmD4Lir4Lih4LmI4Lir4Lij4Li34Lit4Lij
-4Lix4Lia4Lil4Li54LiB4LiZ4Lit4LiB4Lia4LmJ4Liy4LiZ4LmA4LiB4Li14LmI4Lii4Lin4LiB
-4Lix4Lia4LiB4Liy4Lij4LmB4LiV4LmI4LiH4LiH4Liy4LiZ4LiC4Lit4LiH4LiJ4Lix4LiZ4LiL
-4Li24LmI4LiH4LiE4Lix4Lih4Lig4Li14Lij4LmM4LmE4Lia4LmA4Lia4Li04Lil4Lic4Li04LiU
-IOC5gOC4oeC4t+C5iOC4reC4quC4suC4oeC4teC4nOC4ueC5ieC4peC5iOC4p+C4h+C4peC4seC4
-muC4guC4reC4h+C4ieC4seC4meC4ouC4seC4h+C4oeC4teC4iuC4teC4p+C4tOC4leC4reC4ouC4
-ueC5iOC5gOC4guC4suC4neC4suC4geC5gOC4h+C4tOC4meC4o+C4p+C4oSAoNC41IOC4peC5ieC4
-suC4meC5gOC4q+C4o+C4teC4ouC4jeC4quC4q+C4o+C4seC4kCkgKOC4quC4teC5iOC4peC5ieC4
-suC4meC4q+C5ieC4suC5geC4quC4meC4lOC4reC4peC4peC4suC4o+C5jOC4quC4q+C4o+C4seC4
-kCkg4LmD4LiZ4Lia4Lix4LiN4LiK4Li1IEdlbmVyYWwgVHJ1c3Qg4LiB4Lix4Lia4LiY4LiZ4Liy
-4LiE4Liy4Lij4LiK4Lix4LmJ4LiZ4LiZ4Liz4LmD4LiZIEFiaWRqYW4gQ290ZSBkJ0l2b2lyZQ0K
-DQrguJvguLHguIjguIjguLjguJrguLHguJnguYDguIfguLTguJnguJnguLXguYnguKLguLHguIfg
-uK3guKLguLnguYjguIHguLHguJrguJjguJnguLLguITguLLguKMg4LmA4Lih4Li34LmI4Lit4LmE
-4Lih4LmI4LiZ4Liy4LiZ4Lih4Liy4LiZ4Li14LmJ4Liq4Li44LiC4Lig4Liy4Lie4LiC4Lit4LiH
-4LiJ4Lix4LiZ4LmE4Lih4LmI4LiU4Li14Lir4Lih4Lit4LiC4Lit4LiH4LiJ4Lix4LiZ4Lia4Lit
-4LiB4LiJ4Lix4LiZ4Lin4LmI4Liy4LiJ4Lix4LiZ4Lit4Liy4LiI4LiI4Liw4Lit4Lii4Li54LmI
-4LmE4LiU4LmJ4LmE4Lih4LmI4LiZ4Liy4LiZ4LmD4LiZ4Lit4Li14LiB4Liq4Li14LmI4LmA4LiU
-4Li34Lit4LiZ4LiC4LmJ4Liy4LiH4Lir4LiZ4LmJ4Liy4LmA4LiZ4Li34LmI4Lit4LiH4LiI4Liy
-4LiB4Lib4Lix4LiN4Lir4Liy4LmC4Lij4LiE4Lih4Liw4LmA4Lij4LmH4LiH4LiC4Lit4LiH4LiJ
-4Lix4LiZ4LiE4LiZ4LiX4Li14LmI4Lij4Lia4LiB4Lin4LiZ4LiJ4Lix4LiZ4Lih4Liy4LiB4LiX
-4Li14LmI4Liq4Li44LiU4LiE4Li34Lit4LmC4Lij4LiE4Lir4Lil4Lit4LiU4LmA4Lil4Li34Lit
-4LiU4Liq4Lih4Lit4LiH4LiC4Lit4LiH4LiJ4Lix4LiZIOC4reC4h+C4hOC5jOC4geC4o+C4hOC4
-o+C4tOC4quC4leC4qOC4suC4quC4meC4siAo4LiE4Lij4Li04Liq4LiV4LiI4Lix4LiB4LijKSDg
-uJfguLXguYjguIjguLDguYPguIrguYnguYDguIfguLTguJnguJnguLXguYnguYPguJnguYHguJrg
-uJrguJfguLXguYjguInguLHguJnguIjguLDguKrguK3guJnguYPguJnguJfguLXguYjguJnguLXg
-uYnguJXguLLguKHguITguKfguLLguKHguJvguKPguLLguKPguJbguJnguLLguILguK3guIfguKrg
-uLLguKHguLXguJzguLnguYnguKXguYjguKfguIfguKXguLHguJrguILguK3guIfguInguLHguJng
-uIHguYjguK3guJnguJfguLXguYjguYDguILguLLguIjguLDguYDguKrguLXguKLguIrguLXguKfg
-uLTguJUg4LiJ4Lix4LiZ4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmD4Lir4LmJ4LiB4Lit4LiH4LiX
-4Li44LiZ4LiZ4Li14LmJ4LiW4Li54LiB4LmD4LiK4LmJ4LmD4LiZ4LiB4Li04LiI4LiB4Lij4Lij
-4Lih4LiC4Lit4LiH4LiE4Lij4Li04Liq4LiV4LiI4Lix4LiB4Lij4LmA4LiK4LmI4LiZ4Liq4LiW
-4Liy4LiZ4LmA4Lil4Li14LmJ4Lii4LiH4LmA4LiU4LmH4LiB4LiB4Liz4Lie4Lij4LmJ4Liy4LmC
-4Lij4LiH4LmA4Lij4Li14Lii4LiZ4LiC4Lit4LiH4LiE4Lij4Li04Liq4LiV4LiI4Lix4LiB4Lij
-4LmB4Lil4Liw4LmC4Lia4Liq4LiW4LmM4LmA4Lie4Li34LmI4Lit4LmA4Lic4Lii4LmB4Lie4Lij
-4LmI4Lie4Lij4Liw4Lin4LiI4LiZ4Liw4LiC4Lit4LiH4Lie4Lij4Liw4LmA4LiI4LmJ4Liy4LmB
-4Lil4Liw4Lie4Lii4Liy4Lii4Liy4Lih4LiX4Li14LmI4LiI4Liw4Lij4Lix4LiB4Lip4Liy4Lia
-4LmJ4Liy4LiZ4LiC4Lit4LiH4Lie4Lij4Liw4LmA4LiI4LmJ4Liy4LmE4Lin4LmJDQoNCuC4nuC4
-o+C4sOC4hOC4seC4oeC4oOC4teC4o+C5jOC4l+C4s+C5g+C4q+C5ieC5gOC4o+C4suC5gOC4guC5
-ieC4suC5g+C4iOC4p+C5iOC4siAi4LiE4Lin4Liy4Lih4Liq4Li44LiC4LiE4Li34Lit4Lih4Li3
-4Lit4LiX4Li14LmI4LmD4Lir4LmJIiDguInguLHguJnguJXguLHguJTguKrguLTguJnguYPguIjg
-uITguKPguLHguYnguIfguJnguLXguYnguYDguJ7guKPguLLguLDguInguLHguJnguYTguKHguYjg
-uKHguLXguKXguLnguIHguJfguLXguYjguIjguLDguKPguLHguJrguYDguIfguLTguJnguJnguLXg
-uYnguYHguKXguLDguI3guLLguJXguLTguKrguLLguKHguLXguILguK3guIfguInguLHguJnguYTg
-uKHguYjguYPguIrguYjguITguKPguLTguKrguYDguJXguLXguKLguJnguYHguKXguLDguInguLHg
-uJnguYTguKHguYjguJXguYnguK3guIfguIHguLLguKPguYPguKvguYnguITguKfguLLguKHguJ7g
-uKLguLLguKLguLLguKHguILguK3guIfguKrguLLguKHguLXguInguLHguJnguJbguLnguIHguYPg
-uIrguYnguYLguJTguKLguJzguLnguYnguJfguLXguYjguYTguKHguYjguYDguIrguLfguYjguK0g
-4LiJ4Lix4LiZ4LmE4Lih4LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4Liq4LiW4Liy4LiZ4LiB4Liy
-4Lij4LiT4LmM4LiX4Li14LmI4LmA4LiH4Li04LiZ4LiZ4Li14LmJ4LiI4Liw4LiW4Li54LiB4LiZ
-4Liz4LmE4Lib4LmD4LiK4LmJ4LmD4LiZ4LiX4Liy4LiH4LiX4Li14LmI4LmE4Lih4LmI4LiU4Li1
-IOC4meC4teC5iOC4hOC4t+C4reC5gOC4q+C4leC4uOC4nOC4peC4l+C4teC5iOC4ieC4seC4meC4
-leC4seC4lOC4quC4tOC4meC5g+C4iA0KDQrguInguLHguJnguYTguKHguYjguIHguKXguLHguKfg
-uITguKfguLLguKHguJXguLLguKLguJTguLHguIfguJnguLHguYnguJnguInguLHguJnguKPguLng
-uYnguKfguYjguLLguInguLHguJnguIjguLDguYTguJvguJfguLXguYjguYTguKvguJkg4LiJ4Lix
-4LiZ4Lij4Li54LmJ4Lin4LmI4Liy4LiJ4Lix4LiZ4LiI4Liw4LiV4LmJ4Lit4LiH4Lit4Lii4Li5
-4LmI4LmD4LiZ4Lit4LmJ4Lit4Lih4Lit4LiB4LiC4Lit4LiH4Lie4Lij4Liw4LmA4LiI4LmJ4Liy
-IOC4reC4nuC4ouC4niAxNCBWUyAxNCDguIHguKXguYjguLLguKfguKfguYjguLIgIuC5gOC4iOC5
-ieC4suC4meC4suC4ouC4iOC4sOC4leC5iOC4reC4quC4ueC5ieC4hOC4lOC4teC4guC4reC4h+C4
-ieC4seC4meC5geC4peC4sOC4ieC4seC4meC4iOC4sOC4o+C4sOC4h+C4seC4muC4hOC4p+C4suC4
-oeC4quC4h+C4miIg4LiJ4Lix4LiZ4LmE4Lih4LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiB4Liy
-4Lij4Liq4Li34LmI4Lit4Liq4Liy4Lij4LiX4Liy4LiH4LmC4LiX4Lij4Lio4Lix4Lie4LiX4LmM
-4LmD4LiZ4LmA4Lij4Li34LmI4Lit4LiH4LiZ4Li14LmJ4LmA4Lie4Lij4Liy4Liw4Liq4Li44LiC
-4Lig4Liy4Lie4LiC4Lit4LiH4LiJ4Lix4LiZ4LiU4Lix4LiH4LiZ4Lix4LmJ4LiZ4LiB4Liy4Lij
-4Lih4Li14LiN4Liy4LiV4Li04LiC4Lit4LiH4Liq4Liy4Lih4Li14LiJ4Lix4LiZ4Lit4Lii4Li5
-4LmI4Lij4Lit4Lia4LiV4Lix4Lin4LiJ4Lix4LiZ4LmA4Liq4Lih4Lit4LiJ4Lix4LiZ4LmE4Lih
-4LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmD4Lir4LmJ4Lie4Lin4LiB4LmA4LiC4Liy4Lij4Li5
-4LmJ4LmA4LiB4Li14LmI4Lii4Lin4LiB4Lix4Lia4LiB4Liy4Lij4Lie4Lix4LiS4LiZ4Liy4LiZ
-4Li14LmJ4LiB4Lix4Lia4Lie4Lij4Liw4LmA4LiI4LmJ4Liy4LiX4Li44LiB4Liq4Li04LmI4LiH
-4LmA4Lib4LmH4LiZ4LmE4Lib4LmE4LiU4LmJIOC4l+C4seC4meC4l+C4teC4l+C4teC5iOC4ieC4
-seC4meC5hOC4lOC5ieC4o+C4seC4muC4hOC4s+C4leC4reC4muC4guC4reC4h+C4hOC4uOC4k+C4
-ieC4seC4meC4iOC4sOC5g+C4q+C5ieC4nOC4ueC5ieC4leC4tOC4lOC4leC5iOC4reC4guC4reC4
-h+C4mOC4meC4suC4hOC4suC4o+C5g+C4mSBBQklESkFODQoNCuC4ieC4seC4meC4iOC4sOC4reC4
-reC4geC5gOC4reC4geC4quC4suC4o+C5g+C4q+C5ieC4hOC4uOC4k+C5gOC4nuC4t+C5iOC4reC4
-nuC4tOC4quC4ueC4iOC4meC5jOC4p+C5iOC4suC4hOC4uOC4k+C5gOC4m+C5h+C4meC4nOC4ueC5
-ieC4o+C4seC4muC4nOC4peC4m+C4o+C4sOC5guC4ouC4iuC4meC5jOC5g+C4meC4m+C4seC4iOC4
-iOC4uOC4muC4seC4meC4guC4reC4h+C4geC4reC4h+C4l+C4uOC4meC4meC4teC5iSDguInguLHg
-uJnguJXguYnguK3guIfguIHguLLguKPguYPguKvguYnguITguLjguJPguYHguKXguLDguITguKPg
-uLTguKrguJXguIjguLHguIHguKPguKrguKfguJTguKDguLLguKfguJnguLLguYPguKvguYnguIng
-uLHguJnguYDguKrguKHguK3guYDguJ7guKPguLLguLDguJfguYjguLLguJnguKXguK3guKPguYzg
-uJTguYDguJvguYfguJnguJzguLnguYnguJTguLnguYHguKXguInguLHguJkg4LiE4Lin4Liy4Lih
-4Liq4Li44LiC4LiC4Lit4LiH4LiJ4Lix4LiZ4LiE4Li34Lit4LiB4Liy4Lij4LmD4LiK4LmJ4LiK
-4Li14Lin4Li04LiV4LiC4Lit4LiH4LiE4Lij4Li04Liq4LmA4LiV4Li14Lii4LiZ4LiX4Li14LmI
-4LiE4Li54LmI4LiE4Lin4LijIOC5g+C4hOC4o+C4geC5h+C4leC4suC4oeC4l+C4teC5iOC4leC5
-ieC4reC4h+C4geC4suC4o+C4o+C4seC4muC5g+C4iuC5ieC4nuC4o+C4sOC5gOC4iOC5ieC4suC4
-leC5ieC4reC4h+C4o+C4seC4muC5g+C4iuC5ieC4nuC4o+C4sOC4reC4h+C4hOC5jOC4lOC5ieC4
-p+C4ouC4p+C4tOC4jeC4jeC4suC4k+C5geC4peC4sOC4hOC4p+C4suC4oeC4iOC4o+C4tOC4hyDg
-uYLguJvguKPguJTguKrguKfguJTguK3guYnguK3guJnguKfguK3guJnguJXguKXguK3guJTguJfg
-uLjguIHguITguKfguLLguKHguKXguYjguLLguIrguYnguLLguILguK3guIfguITguLjguJPguYPg
-uJnguIHguLLguKPguJXguK3guJrguIHguKXguLHguJrguILguK3guIfguITguLjguJPguIjguLDg
-uJfguLPguYPguKvguYnguInguLHguJnguKHguLXguJ7guLfguYnguJnguJfguLXguYjguYPguJng
-uIHguLLguKPguIjguLHguJTguKvguLLguITguKPguLTguKrguJXguIjguLHguIHguKPguK3guLfg
-uYjguJnguYDguJ7guLfguYjguK3guIjguLjguJTguJvguKPguLDguKrguIfguITguYzguYDguJTg
-uLXguKLguKfguIHguLHguJnguJnguLXguYkg4LmC4Lib4Lij4LiU4Lii4Li34LiZ4Lii4Lix4LiZ
-4LiJ4Lix4LiZ4Lin4LmI4Liy4LiE4Li44LiT4LiI4Liw4LiX4Liz4LiV4Liy4Lih4LmC4Lib4Lij
-4LiU4LiV4Li04LiU4LiV4LmI4Lit4LiJ4Lix4LiZ4LiX4Li14LmI4LiZ4Li14LmIIDxzdXNhbmVs
-dzAyQHlhaG9vLmNvbSA+Pg0KDQrguIjguIfguKHguLXguITguKfguLLguKHguKrguLjguILguYPg
-uJnguK3guIfguITguYzguJ7guKPguLDguJzguLnguYnguYDguJvguYfguJnguYDguIjguYnguLIN
-CuC4guC4reC4h+C4hOC4uOC4k+C5g+C4meC4nuC4o+C4sOC4hOC4o+C4tOC4quC4leC5jA0K4LiZ
-4Liy4LiH4LiL4Li54LiL4Liy4LiZ4LmA4Lit4Lil4Lin4Li54LiU
+On 07/02/2020 12.39, Christian Borntraeger wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
+>=20
+> A lot of the registers are controlled by the Ultravisor and never
+> visible to KVM. Also some registers are overlayed, like gbea is with
+> sidad, which might leak data to userspace.
+>=20
+> Hence we sync a minimal set of registers for both SIE formats and then
+> check and sync format 2 registers if necessary.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 116 ++++++++++++++++++++++++---------------
+>  1 file changed, 72 insertions(+), 44 deletions(-)
+>=20
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index f995040102ea..7df48cc942fd 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3447,9 +3447,11 @@ static void kvm_arch_vcpu_ioctl_initial_reset(st=
+ruct kvm_vcpu *vcpu)
+>  	vcpu->arch.sie_block->gcr[0] =3D CR0_INITIAL_MASK;
+>  	vcpu->arch.sie_block->gcr[14] =3D CR14_INITIAL_MASK;
+>  	vcpu->run->s.regs.fpc =3D 0;
+> -	vcpu->arch.sie_block->gbea =3D 1;
+> -	vcpu->arch.sie_block->pp =3D 0;
+> -	vcpu->arch.sie_block->fpf &=3D ~FPF_BPBC;
+> +	if (!kvm_s390_pv_handle_cpu(vcpu)) {
+> +		vcpu->arch.sie_block->gbea =3D 1;
+> +		vcpu->arch.sie_block->pp =3D 0;
+> +		vcpu->arch.sie_block->fpf &=3D ~FPF_BPBC;
+> +	}
+
+Technically, this part is not about sync'ing but about reset ... worth
+to mention this in the patch description, too? (or maybe even move to
+the reset patch 34/35 or a new patch?)
+
+And what about vcpu->arch.sie_block->todpr ? Should that be moved into
+the if-statement, too?
+
+>  }
+> =20
+>  static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
+> @@ -4060,25 +4062,16 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>  	return rc;
+>  }
+> =20
+> -static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_=
+run)
+>  {
+>  	struct runtime_instr_cb *riccb;
+>  	struct gs_cb *gscb;
+> =20
+> -	riccb =3D (struct runtime_instr_cb *) &kvm_run->s.regs.riccb;
+> -	gscb =3D (struct gs_cb *) &kvm_run->s.regs.gscb;
+>  	vcpu->arch.sie_block->gpsw.mask =3D kvm_run->psw_mask;
+>  	vcpu->arch.sie_block->gpsw.addr =3D kvm_run->psw_addr;
+> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PREFIX)
+> -		kvm_s390_set_prefix(vcpu, kvm_run->s.regs.prefix);
+> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_CRS) {
+> -		memcpy(&vcpu->arch.sie_block->gcr, &kvm_run->s.regs.crs, 128);
+> -		/* some control register changes require a tlb flush */
+> -		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> -	}
+> +	riccb =3D (struct runtime_instr_cb *) &kvm_run->s.regs.riccb;
+> +	gscb =3D (struct gs_cb *) &kvm_run->s.regs.gscb;
+
+You could leave the riccb and gscb lines at the beginning to make the
+diff a little bit nicer.
+
+>  	if (kvm_run->kvm_dirty_regs & KVM_SYNC_ARCH0) {
+> -		kvm_s390_set_cpu_timer(vcpu, kvm_run->s.regs.cputm);
+> -		vcpu->arch.sie_block->ckc =3D kvm_run->s.regs.ckc;
+>  		vcpu->arch.sie_block->todpr =3D kvm_run->s.regs.todpr;
+>  		vcpu->arch.sie_block->pp =3D kvm_run->s.regs.pp;
+>  		vcpu->arch.sie_block->gbea =3D kvm_run->s.regs.gbea;
+> @@ -4119,6 +4112,47 @@ static void sync_regs(struct kvm_vcpu *vcpu, str=
+uct kvm_run *kvm_run)
+>  		vcpu->arch.sie_block->fpf &=3D ~FPF_BPBC;
+>  		vcpu->arch.sie_block->fpf |=3D kvm_run->s.regs.bpbc ? FPF_BPBC : 0;
+>  	}
+> +	if (MACHINE_HAS_GS) {
+> +		preempt_disable();
+> +		__ctl_set_bit(2, 4);
+> +		if (current->thread.gs_cb) {
+> +			vcpu->arch.host_gscb =3D current->thread.gs_cb;
+> +			save_gs_cb(vcpu->arch.host_gscb);
+> +		}
+> +		if (vcpu->arch.gs_enabled) {
+> +			current->thread.gs_cb =3D (struct gs_cb *)
+> +						&vcpu->run->s.regs.gscb;
+> +			restore_gs_cb(current->thread.gs_cb);
+> +		}
+> +		preempt_enable();
+> +	}
+> +	/* SIE will load etoken directly from SDNX and therefore kvm_run */
+> +}
+> +
+> +static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +{
+> +	/*
+> +	 * at several places we have to modify our internal view to not do
+> +	 * things that are disallowed by the ultravisor. For example we must
+> +	 * not inject interrupts after specific exits (e.g. 112). We do this
+> +	 * by turning off the MIE bits of our PSW copy. To avoid getting
+> +	 * validity intercepts, we do only accept the condition code from
+> +	 * userspace.
+> +	 */
+> +	vcpu->arch.sie_block->gpsw.mask &=3D ~PSW_MASK_CC;
+> +	vcpu->arch.sie_block->gpsw.mask |=3D kvm_run->psw_mask & PSW_MASK_CC;
+
+I think it would be cleaner to only do this for protected guests. You
+could combine it with the call to sync_regs_fmt2():
+
+	if (likely(!kvm_s390_pv_is_protected(vcpu->kvm))) {
+		sync_regs_fmt2(vcpu, kvm_run);
+	} else {
+		vcpu->arch.sie_block->gpsw.mask &=3D ~PSW_MASK_CC;
+		vcpu->arch.sie_block->gpsw.mask |=3D kvm_run->psw_mask &
+						   PSW_MASK_CC;
+	}
+
+> +	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PREFIX)
+> +		kvm_s390_set_prefix(vcpu, kvm_run->s.regs.prefix);
+> +	if (kvm_run->kvm_dirty_regs & KVM_SYNC_CRS) {
+> +		memcpy(&vcpu->arch.sie_block->gcr, &kvm_run->s.regs.crs, 128);
+> +		/* some control register changes require a tlb flush */
+> +		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> +	}
+> +	if (kvm_run->kvm_dirty_regs & KVM_SYNC_ARCH0) {
+> +		kvm_s390_set_cpu_timer(vcpu, kvm_run->s.regs.cputm);
+> +		vcpu->arch.sie_block->ckc =3D kvm_run->s.regs.ckc;
+> +	}
+>  	save_access_regs(vcpu->arch.host_acrs);
+>  	restore_access_regs(vcpu->run->s.regs.acrs);
+>  	/* save host (userspace) fprs/vrs */
+> @@ -4133,23 +4167,31 @@ static void sync_regs(struct kvm_vcpu *vcpu, st=
+ruct kvm_run *kvm_run)
+>  	if (test_fp_ctl(current->thread.fpu.fpc))
+>  		/* User space provided an invalid FPC, let's clear it */
+>  		current->thread.fpu.fpc =3D 0;
+> +
+> +	/* Sync fmt2 only data */
+> +	if (likely(!kvm_s390_pv_is_protected(vcpu->kvm)))
+> +		sync_regs_fmt2(vcpu, kvm_run);
+> +	kvm_run->kvm_dirty_regs =3D 0;
+> +}
+> +
+> +static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm=
+_run)
+> +{
+> +	kvm_run->s.regs.pp =3D vcpu->arch.sie_block->pp;
+> +	kvm_run->s.regs.gbea =3D vcpu->arch.sie_block->gbea;
+> +	kvm_run->s.regs.bpbc =3D (vcpu->arch.sie_block->fpf & FPF_BPBC) =3D=3D=
+ FPF_BPBC;
+>  	if (MACHINE_HAS_GS) {
+> -		preempt_disable();
+>  		__ctl_set_bit(2, 4);
+> -		if (current->thread.gs_cb) {
+> -			vcpu->arch.host_gscb =3D current->thread.gs_cb;
+> -			save_gs_cb(vcpu->arch.host_gscb);
+> -		}
+> -		if (vcpu->arch.gs_enabled) {
+> -			current->thread.gs_cb =3D (struct gs_cb *)
+> -						&vcpu->run->s.regs.gscb;
+> -			restore_gs_cb(current->thread.gs_cb);
+> -		}
+> +		if (vcpu->arch.gs_enabled)
+> +			save_gs_cb(current->thread.gs_cb);
+> +		preempt_disable();
+> +		current->thread.gs_cb =3D vcpu->arch.host_gscb;
+> +		restore_gs_cb(vcpu->arch.host_gscb);
+>  		preempt_enable();
+> +		if (!vcpu->arch.host_gscb)
+> +			__ctl_clear_bit(2, 4);
+> +		vcpu->arch.host_gscb =3D NULL;
+>  	}
+> -	/* SIE will load etoken directly from SDNX and therefore kvm_run */
+> -
+> -	kvm_run->kvm_dirty_regs =3D 0;
+> +	/* SIE will save etoken directly into SDNX and therefore kvm_run */
+>  }
+> =20
+>  static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> @@ -4161,12 +4203,9 @@ static void store_regs(struct kvm_vcpu *vcpu, st=
+ruct kvm_run *kvm_run)
+>  	kvm_run->s.regs.cputm =3D kvm_s390_get_cpu_timer(vcpu);
+>  	kvm_run->s.regs.ckc =3D vcpu->arch.sie_block->ckc;
+>  	kvm_run->s.regs.todpr =3D vcpu->arch.sie_block->todpr;
+
+TODPR handling has been move from sync_regs() to sync_regs_fmt2() ...
+should this here move from store_regs() to store_regs_fmt2(), too?
+
+And maybe you should also not read the sie_block->gpsw.addr (and some of
+the control registers) field in store_regs() either, i.e. move the lines
+to store_regs_fmt2()?
+
+> -	kvm_run->s.regs.pp =3D vcpu->arch.sie_block->pp;
+> -	kvm_run->s.regs.gbea =3D vcpu->arch.sie_block->gbea;
+>  	kvm_run->s.regs.pft =3D vcpu->arch.pfault_token;
+>  	kvm_run->s.regs.pfs =3D vcpu->arch.pfault_select;
+>  	kvm_run->s.regs.pfc =3D vcpu->arch.pfault_compare;
+> -	kvm_run->s.regs.bpbc =3D (vcpu->arch.sie_block->fpf & FPF_BPBC) =3D=3D=
+ FPF_BPBC;
+>  	save_access_regs(vcpu->run->s.regs.acrs);
+>  	restore_access_regs(vcpu->arch.host_acrs);
+>  	/* Save guest register state */
+> @@ -4175,19 +4214,8 @@ static void store_regs(struct kvm_vcpu *vcpu, st=
+ruct kvm_run *kvm_run)
+>  	/* Restore will be done lazily at return */
+>  	current->thread.fpu.fpc =3D vcpu->arch.host_fpregs.fpc;
+>  	current->thread.fpu.regs =3D vcpu->arch.host_fpregs.regs;
+> -	if (MACHINE_HAS_GS) {
+> -		__ctl_set_bit(2, 4);
+> -		if (vcpu->arch.gs_enabled)
+> -			save_gs_cb(current->thread.gs_cb);
+> -		preempt_disable();
+> -		current->thread.gs_cb =3D vcpu->arch.host_gscb;
+> -		restore_gs_cb(vcpu->arch.host_gscb);
+> -		preempt_enable();
+> -		if (!vcpu->arch.host_gscb)
+> -			__ctl_clear_bit(2, 4);
+> -		vcpu->arch.host_gscb =3D NULL;
+> -	}
+> -	/* SIE will save etoken directly into SDNX and therefore kvm_run */
+> +	if (likely(!kvm_s390_pv_is_protected(vcpu->kvm)))
+> +		store_regs_fmt2(vcpu, kvm_run);
+>  }
+> =20
+>  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm=
+_run)
+>=20
+
+ Thomas
+
