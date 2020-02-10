@@ -2,45 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3F551571C0
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 10:34:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 746A91571F2
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 10:43:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727431AbgBJJeC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 04:34:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17588 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726621AbgBJJeC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 04:34:02 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01A9WccM047434
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 04:34:01 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1tn4f0t9-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 04:34:01 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 10 Feb 2020 09:33:58 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 10 Feb 2020 09:33:55 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01A9X00b45351232
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Feb 2020 09:33:00 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC02711C05B;
-        Mon, 10 Feb 2020 09:33:53 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 74AFD11C050;
-        Mon, 10 Feb 2020 09:33:53 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.98.183])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Feb 2020 09:33:53 +0000 (GMT)
-Subject: Re: [PATCH 25/35] KVM: s390: protvirt: Only sync fmt4 registers
-To:     Thomas Huth <thuth@redhat.com>,
+        id S1727398AbgBJJnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 04:43:02 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48131 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727022AbgBJJnB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 04:43:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581327780;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=U7/trwws/wlrSgMtBTmM0ftUrtRbvojpXNWwiQbFGcg=;
+        b=Nt0LCXJAygzWlAZVcB7k2/F9blTaGRwFbPHZ1AJjTmaHmWB0Ju+gqSMi25hHusLmtLYklm
+        VY6qTSVgHwlbm10hgsrO3n6LOj1QByvV8+Rkh41UoJRkqt8mplmi1KTwloM2DjvCIRgJCV
+        3ZZxnCWIiqk+Q6rkRw/6lKXvL5vvtKY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-334-wR-6uW8LO1CTDrTnocoPZw-1; Mon, 10 Feb 2020 04:42:50 -0500
+X-MC-Unique: wR-6uW8LO1CTDrTnocoPZw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 480D318C35A0;
+        Mon, 10 Feb 2020 09:42:49 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-219.ams2.redhat.com [10.36.116.219])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 23A911001281;
+        Mon, 10 Feb 2020 09:42:43 +0000 (UTC)
+Subject: Re: [PATCH 03/35] s390/protvirt: introduce host side setup
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         David Hildenbrand <david@redhat.com>,
@@ -49,262 +43,162 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>
 References: <20200207113958.7320-1-borntraeger@de.ibm.com>
- <20200207113958.7320-26-borntraeger@de.ibm.com>
- <cbb6ae42-5320-e6cf-214d-a81602a359cf@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 10 Feb 2020 10:33:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ <20200207113958.7320-4-borntraeger@de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <528f69f0-2c9e-9a7b-d817-07809d00ce1b@redhat.com>
+Date:   Mon, 10 Feb 2020 10:42:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <cbb6ae42-5320-e6cf-214d-a81602a359cf@redhat.com>
+In-Reply-To: <20200207113958.7320-4-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021009-0012-0000-0000-000003856F23
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021009-0013-0000-0000-000021C1E577
-Message-Id: <4b676484-100d-694a-fcea-4ab2bd9411e2@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-10_02:2020-02-07,2020-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 suspectscore=0 bulkscore=0 clxscore=1015 impostorscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 phishscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002100076
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09.02.20 16:50, Thomas Huth wrote:
-> On 07/02/2020 12.39, Christian Borntraeger wrote:
->> From: Janosch Frank <frankja@linux.ibm.com>
->>
->> A lot of the registers are controlled by the Ultravisor and never
->> visible to KVM. Also some registers are overlayed, like gbea is with
->> sidad, which might leak data to userspace.
->>
->> Hence we sync a minimal set of registers for both SIE formats and then
->> check and sync format 2 registers if necessary.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  arch/s390/kvm/kvm-s390.c | 116 ++++++++++++++++++++++++---------------
->>  1 file changed, 72 insertions(+), 44 deletions(-)
->>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index f995040102ea..7df48cc942fd 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -3447,9 +3447,11 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
->>  	vcpu->arch.sie_block->gcr[0] = CR0_INITIAL_MASK;
->>  	vcpu->arch.sie_block->gcr[14] = CR14_INITIAL_MASK;
->>  	vcpu->run->s.regs.fpc = 0;
->> -	vcpu->arch.sie_block->gbea = 1;
->> -	vcpu->arch.sie_block->pp = 0;
->> -	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
->> +	if (!kvm_s390_pv_handle_cpu(vcpu)) {
->> +		vcpu->arch.sie_block->gbea = 1;
->> +		vcpu->arch.sie_block->pp = 0;
->> +		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
->> +	}
+On 07/02/2020 12.39, Christian Borntraeger wrote:
+> From: Vasily Gorbik <gor@linux.ibm.com>
 > 
-> Technically, this part is not about sync'ing but about reset ... worth
-> to mention this in the patch description, too? (or maybe even move to
-> the reset patch 34/35 or a new patch?)
-
-Will move into a separate patch. 
+> Add "prot_virt" command line option which controls if the kernel
+> protected VMs support is enabled at early boot time. This has to be
+> done early, because it needs large amounts of memory and will disable
+> some features like STP time sync for the lpar.
 > 
-> And what about vcpu->arch.sie_block->todpr ? Should that be moved into
-> the if-statement, too?
-
-Yes, todpr is not accessible by the KVM and should go in here 
-
-
+> Extend ultravisor info definitions and expose it via uv_info struct
+> filled in during startup.
 > 
->>  }
->>  
->>  static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
->> @@ -4060,25 +4062,16 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->>  	return rc;
->>  }
->>  
->> -static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>  {
->>  	struct runtime_instr_cb *riccb;
->>  	struct gs_cb *gscb;
->>  
->> -	riccb = (struct runtime_instr_cb *) &kvm_run->s.regs.riccb;
->> -	gscb = (struct gs_cb *) &kvm_run->s.regs.gscb;
->>  	vcpu->arch.sie_block->gpsw.mask = kvm_run->psw_mask;
->>  	vcpu->arch.sie_block->gpsw.addr = kvm_run->psw_addr;
->> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PREFIX)
->> -		kvm_s390_set_prefix(vcpu, kvm_run->s.regs.prefix);
->> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_CRS) {
->> -		memcpy(&vcpu->arch.sie_block->gcr, &kvm_run->s.regs.crs, 128);
->> -		/* some control register changes require a tlb flush */
->> -		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
->> -	}
->> +	riccb = (struct runtime_instr_cb *) &kvm_run->s.regs.riccb;
->> +	gscb = (struct gs_cb *) &kvm_run->s.regs.gscb;
-> 
-> You could leave the riccb and gscb lines at the beginning to make the
-> diff a little bit nicer.
-
-ack.
-> 
->>  	if (kvm_run->kvm_dirty_regs & KVM_SYNC_ARCH0) {
->> -		kvm_s390_set_cpu_timer(vcpu, kvm_run->s.regs.cputm);
->> -		vcpu->arch.sie_block->ckc = kvm_run->s.regs.ckc;
->>  		vcpu->arch.sie_block->todpr = kvm_run->s.regs.todpr;
->>  		vcpu->arch.sie_block->pp = kvm_run->s.regs.pp;
->>  		vcpu->arch.sie_block->gbea = kvm_run->s.regs.gbea;
->> @@ -4119,6 +4112,47 @@ static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>  		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
->>  		vcpu->arch.sie_block->fpf |= kvm_run->s.regs.bpbc ? FPF_BPBC : 0;
->>  	}
->> +	if (MACHINE_HAS_GS) {
->> +		preempt_disable();
->> +		__ctl_set_bit(2, 4);
->> +		if (current->thread.gs_cb) {
->> +			vcpu->arch.host_gscb = current->thread.gs_cb;
->> +			save_gs_cb(vcpu->arch.host_gscb);
->> +		}
->> +		if (vcpu->arch.gs_enabled) {
->> +			current->thread.gs_cb = (struct gs_cb *)
->> +						&vcpu->run->s.regs.gscb;
->> +			restore_gs_cb(current->thread.gs_cb);
->> +		}
->> +		preempt_enable();
->> +	}
->> +	/* SIE will load etoken directly from SDNX and therefore kvm_run */
->> +}
->> +
->> +static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->> +{
->> +	/*
->> +	 * at several places we have to modify our internal view to not do
->> +	 * things that are disallowed by the ultravisor. For example we must
->> +	 * not inject interrupts after specific exits (e.g. 112). We do this
->> +	 * by turning off the MIE bits of our PSW copy. To avoid getting
->> +	 * validity intercepts, we do only accept the condition code from
->> +	 * userspace.
->> +	 */
->> +	vcpu->arch.sie_block->gpsw.mask &= ~PSW_MASK_CC;
->> +	vcpu->arch.sie_block->gpsw.mask |= kvm_run->psw_mask & PSW_MASK_CC;
-> 
-> I think it would be cleaner to only do this for protected guests. You
-> could combine it with the call to sync_regs_fmt2():
-> 
-> 	if (likely(!kvm_s390_pv_is_protected(vcpu->kvm))) {
-> 		sync_regs_fmt2(vcpu, kvm_run);
-> 	} else {
-> 		vcpu->arch.sie_block->gpsw.mask &= ~PSW_MASK_CC;
-> 		vcpu->arch.sie_block->gpsw.mask |= kvm_run->psw_mask &
-> 						   PSW_MASK_CC;
-> 	}
-
-I like that. 
-
+> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
 [...]
->>  static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->> @@ -4161,12 +4203,9 @@ static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>  	kvm_run->s.regs.cputm = kvm_s390_get_cpu_timer(vcpu);
->>  	kvm_run->s.regs.ckc = vcpu->arch.sie_block->ckc;
->>  	kvm_run->s.regs.todpr = vcpu->arch.sie_block->todpr;
-> 
-> TODPR handling has been move from sync_regs() to sync_regs_fmt2() ...
-> should this here move from store_regs() to store_regs_fmt2(), too?
+> diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
+> index ed007f4a6444..af9e1cc93c68 100644
+> --- a/arch/s390/boot/uv.c
+> +++ b/arch/s390/boot/uv.c
+> @@ -3,7 +3,13 @@
+>  #include <asm/facility.h>
+>  #include <asm/sections.h>
+>  
+> +/* will be used in arch/s390/kernel/uv.c */
+> +#ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
+>  int __bootdata_preserved(prot_virt_guest);
+> +#endif
+> +#if IS_ENABLED(CONFIG_KVM)
+> +struct uv_info __bootdata_preserved(uv_info);
+> +#endif
+>  
+>  void uv_query_info(void)
+>  {
+> @@ -18,7 +24,20 @@ void uv_query_info(void)
+>  	if (uv_call(0, (uint64_t)&uvcb))
+>  		return;
+>  
+> -	if (test_bit_inv(BIT_UVC_CMD_SET_SHARED_ACCESS, (unsigned long *)uvcb.inst_calls_list) &&
+> +	if (IS_ENABLED(CONFIG_KVM)) {
+> +		memcpy(uv_info.inst_calls_list, uvcb.inst_calls_list, sizeof(uv_info.inst_calls_list));
+> +		uv_info.uv_base_stor_len = uvcb.uv_base_stor_len;
+> +		uv_info.guest_base_stor_len = uvcb.conf_base_phys_stor_len;
+> +		uv_info.guest_virt_base_stor_len = uvcb.conf_base_virt_stor_len;
+> +		uv_info.guest_virt_var_stor_len = uvcb.conf_virt_var_stor_len;
+> +		uv_info.guest_cpu_stor_len = uvcb.cpu_stor_len;
+> +		uv_info.max_sec_stor_addr = ALIGN(uvcb.max_guest_stor_addr, PAGE_SIZE);
+> +		uv_info.max_num_sec_conf = uvcb.max_num_sec_conf;
+> +		uv_info.max_guest_cpus = uvcb.max_guest_cpus;
+> +	}
+> +
+> +	if (IS_ENABLED(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) &&
+> +	    test_bit_inv(BIT_UVC_CMD_SET_SHARED_ACCESS, (unsigned long *)uvcb.inst_calls_list) &&
+>  	    test_bit_inv(BIT_UVC_CMD_REMOVE_SHARED_ACCESS, (unsigned long *)uvcb.inst_calls_list))
+>  		prot_virt_guest = 1;
+>  }
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 4093a2856929..cc7b0b0bc874 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -44,7 +44,19 @@ struct uv_cb_qui {
+>  	struct uv_cb_header header;
+>  	u64 reserved08;
+>  	u64 inst_calls_list[4];
+> -	u64 reserved30[15];
+> +	u64 reserved30[2];
+> +	u64 uv_base_stor_len;
+> +	u64 reserved48;
+> +	u64 conf_base_phys_stor_len;
+> +	u64 conf_base_virt_stor_len;
+> +	u64 conf_virt_var_stor_len;
+> +	u64 cpu_stor_len;
+> +	u32 reserved70[3];
+> +	u32 max_num_sec_conf;
+> +	u64 max_guest_stor_addr;
+> +	u8  reserved88[158-136];
+> +	u16 max_guest_cpus;
+> +	u64 reserveda0;
+>  } __packed __aligned(8);
+>  
+>  struct uv_cb_share {
+> @@ -69,9 +81,21 @@ static inline int uv_call(unsigned long r1, unsigned long r2)
+>  	return cc;
+>  }
+>  
+> -#ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
+> +struct uv_info {
+> +	unsigned long inst_calls_list[4];
+> +	unsigned long uv_base_stor_len;
+> +	unsigned long guest_base_stor_len;
+> +	unsigned long guest_virt_base_stor_len;
+> +	unsigned long guest_virt_var_stor_len;
+> +	unsigned long guest_cpu_stor_len;
+> +	unsigned long max_sec_stor_addr;
+> +	unsigned int max_num_sec_conf;
+> +	unsigned short max_guest_cpus;
+> +};
+> +extern struct uv_info uv_info;
+>  extern int prot_virt_guest;
 
-ack.
-> 
-> And maybe you should also not read the sie_block->gpsw.addr (and some of
-> the control registers) field in store_regs() either, i.e. move the lines
-> to store_regs_fmt2()?
-> 
->> -	kvm_run->s.regs.pp = vcpu->arch.sie_block->pp;
->> -	kvm_run->s.regs.gbea = vcpu->arch.sie_block->gbea;
->>  	kvm_run->s.regs.pft = vcpu->arch.pfault_token;
->>  	kvm_run->s.regs.pfs = vcpu->arch.pfault_select;
->>  	kvm_run->s.regs.pfc = vcpu->arch.pfault_compare;
->> -	kvm_run->s.regs.bpbc = (vcpu->arch.sie_block->fpf & FPF_BPBC) == FPF_BPBC;
->>  	save_access_regs(vcpu->run->s.regs.acrs);
->>  	restore_access_regs(vcpu->arch.host_acrs);
->>  	/* Save guest register state */
->> @@ -4175,19 +4214,8 @@ static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>  	/* Restore will be done lazily at return */
->>  	current->thread.fpu.fpc = vcpu->arch.host_fpregs.fpc;
->>  	current->thread.fpu.regs = vcpu->arch.host_fpregs.regs;
->> -	if (MACHINE_HAS_GS) {
->> -		__ctl_set_bit(2, 4);
->> -		if (vcpu->arch.gs_enabled)
->> -			save_gs_cb(current->thread.gs_cb);
->> -		preempt_disable();
->> -		current->thread.gs_cb = vcpu->arch.host_gscb;
->> -		restore_gs_cb(vcpu->arch.host_gscb);
->> -		preempt_enable();
->> -		if (!vcpu->arch.host_gscb)
->> -			__ctl_clear_bit(2, 4);
->> -		vcpu->arch.host_gscb = NULL;
->> -	}
->> -	/* SIE will save etoken directly into SDNX and therefore kvm_run */
->> +	if (likely(!kvm_s390_pv_is_protected(vcpu->kvm)))
->> +		store_regs_fmt2(vcpu, kvm_run);
->>  }
->>  
->>  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>
-> 
->  Thomas
-> 
+Don't you want to keep prot_virt_guest within the "#ifdef
+CONFIG_PROTECTED_VIRTUALIZATION_GUEST" ?
+
+> +#ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
+>  static inline int is_prot_virt_guest(void)
+>  {
+>  	return prot_virt_guest;
+> @@ -121,11 +145,27 @@ static inline int uv_remove_shared(unsigned long addr)
+>  	return share(addr, UVC_CMD_REMOVE_SHARED_ACCESS);
+>  }
+>  
+> -void uv_query_info(void);
+>  #else
+>  #define is_prot_virt_guest() 0
+>  static inline int uv_set_shared(unsigned long addr) { return 0; }
+>  static inline int uv_remove_shared(unsigned long addr) { return 0; }
+> +#endif
+> +
+> +#if IS_ENABLED(CONFIG_KVM)
+> +extern int prot_virt_host;
+> +
+> +static inline int is_prot_virt_host(void)
+> +{
+> +	return prot_virt_host;
+> +}
+> +#else
+> +#define is_prot_virt_host() 0
+> +#endif
+> +
+> +#if defined(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) ||                          \
+> +	IS_ENABLED(CONFIG_KVM)
+> +void uv_query_info(void);
+> +#else
+>  static inline void uv_query_info(void) {}
+>  #endif
+
+With the nit fixed:
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
