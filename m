@@ -2,111 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 844BD156B4F
-	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2020 17:07:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4161156D42
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 01:44:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727723AbgBIQHd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Feb 2020 11:07:33 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28022 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727692AbgBIQHd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 9 Feb 2020 11:07:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581264451;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=ZAc1dgNxPNHyfCKWvg9DMIElxZOkY394u4FbZX4RzhM=;
-        b=B4uEk2oGkXmHgviplk5X+dYgGSFI94EClldMV0yx1e/KehtCAnaF5HYGup0XdBDDNoXW65
-        nFYJvdEdXL8MVIC7WCcDiRIKLVV2uExXwuQgc/+IKe23pf1BHnWIIpbYvwyuH0ZTsHZIIA
-        HKjcH8XgDkjUW7lycvYjs8HSiTgPYeY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-FjvMHkHzNQCpX4_EPQ6pEg-1; Sun, 09 Feb 2020 11:07:26 -0500
-X-MC-Unique: FjvMHkHzNQCpX4_EPQ6pEg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 112F78017CC;
-        Sun,  9 Feb 2020 16:07:25 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-108.ams2.redhat.com [10.36.116.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 05A2F87B01;
-        Sun,  9 Feb 2020 16:07:19 +0000 (UTC)
-Subject: Re: [PATCH 32/35] KVM: s390: protvirt: Mask PSW interrupt bits for
- interception 104 and 112
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200207113958.7320-1-borntraeger@de.ibm.com>
- <20200207113958.7320-33-borntraeger@de.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <66cb29f7-b190-2faa-ab32-9cfd149fa3e4@redhat.com>
-Date:   Sun, 9 Feb 2020 17:07:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726077AbgBJAn5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Feb 2020 19:43:57 -0500
+Received: from mga02.intel.com ([134.134.136.20]:57022 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725868AbgBJAn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 Feb 2020 19:43:57 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Feb 2020 16:43:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,423,1574150400"; 
+   d="scan'208";a="280491112"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by FMSMGA003.fm.intel.com with ESMTP; 09 Feb 2020 16:43:54 -0800
+Date:   Sun, 9 Feb 2020 19:34:36 -0500
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [RFC PATCH v2 1/9] vfio/pci: split vfio_pci_device into public
+ and private parts
+Message-ID: <20200210003436.GA3520@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200131020803.27519-1-yan.y.zhao@intel.com>
+ <20200131020956.27604-1-yan.y.zhao@intel.com>
+ <20200207124831.391d5f70@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <20200207113958.7320-33-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200207124831.391d5f70@w520.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/02/2020 12.39, Christian Borntraeger wrote:
-> From: Janosch Frank <frankja@linux.ibm.com>
+On Sat, Feb 08, 2020 at 03:48:31AM +0800, Alex Williamson wrote:
+> On Thu, 30 Jan 2020 21:09:56 -0500
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> We're not allowed to inject interrupts on intercepts that leave the
-> guest state in an "in-beetween" state where the next SIE entry will do a
-> continuation.  Namely secure instruction interception and secure prefix
-> interception.
-> As our PSW is just a copy of the real one that will be replaced on the
-> next exit, we can mask out the interrupt bits in the PSW to make sure
-> that we do not inject anything.
+> > split vfio_pci_device into two parts:
+> > (1) a public part,
+> >     including pdev, num_region, irq_type which are accessible from
+> >     outside of vfio.
+> > (2) a private part,
+> >     a pointer to vfio_pci_device_private, only accessible within vfio
+> > 
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci.c         | 209 +++++++++++++++-------------
+> >  drivers/vfio/pci/vfio_pci_config.c  | 157 +++++++++++----------
+> >  drivers/vfio/pci/vfio_pci_igd.c     |  16 +--
+> >  drivers/vfio/pci/vfio_pci_intrs.c   | 171 ++++++++++++-----------
+> >  drivers/vfio/pci/vfio_pci_nvlink2.c |  16 +--
+> >  drivers/vfio/pci/vfio_pci_private.h |   5 +-
+> >  drivers/vfio/pci/vfio_pci_rdwr.c    |  36 ++---
+> >  include/linux/vfio.h                |   7 +
+> >  8 files changed, 321 insertions(+), 296 deletions(-)
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/kvm/kvm-s390.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> I think the typical solution to something like this would be...
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index ced2bac251a6..8c7b27287b91 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4052,6 +4052,7 @@ static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
->  	return vcpu_post_run_fault_in_sie(vcpu);
->  }
->  
-> +#define PSW_INT_MASK (PSW_MASK_EXT | PSW_MASK_IO | PSW_MASK_MCHECK)
->  static int __vcpu_run(struct kvm_vcpu *vcpu)
->  {
->  	int rc, exit_reason;
-> @@ -4088,6 +4089,10 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->  			memcpy(vcpu->run->s.regs.gprs,
->  			       sie_page->pv_grregs,
->  			       sizeof(sie_page->pv_grregs));
-> +			if (vcpu->arch.sie_block->icptcode == ICPT_PV_INSTR ||
-> +			    vcpu->arch.sie_block->icptcode == ICPT_PV_PREF) {
-> +				vcpu->arch.sie_block->gpsw.mask &= ~PSW_INT_MASK;
-> +			}
->  		}
->  		local_irq_disable();
->  		__enable_cpu_timer_accounting(vcpu);
+> struct vfio_pci_device {
+> 	...
+> };
 > 
+> struct vfio_pci_device_private {
+> 	struct vfio_pci_device vdev;
+> 	...
+> };
+> 
+> External code would be able to work with the vfio_pci_device and
+> internal code would do a container_of() to get access to the private
+> fields.  What's done here is pretty ugly and not very cache friendly.
+> Thanks,
+>
+got it, it's much better!
+will change it. Thanks!
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Yan
 
