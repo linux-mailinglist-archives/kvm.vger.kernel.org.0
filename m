@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 75906158272
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 19:35:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD6131582C1
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 19:39:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727433AbgBJSfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 13:35:06 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11412 "EHLO
+        id S1727548AbgBJSjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 13:39:06 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58030 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727056AbgBJSfG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 13:35:06 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AIMApU062036
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 13:35:05 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1ubqrq9h-1
+        by vger.kernel.org with ESMTP id S1727056AbgBJSjF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 13:39:05 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AIKxoG113834
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 13:39:04 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1tn52hxn-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 13:35:05 -0500
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 13:39:04 -0500
 Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 10 Feb 2020 18:35:03 -0000
+        Mon, 10 Feb 2020 18:39:02 -0000
 Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 10 Feb 2020 18:35:01 -0000
+        Mon, 10 Feb 2020 18:38:59 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01AIYxSM49676390
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01AIcvIU58654770
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Feb 2020 18:34:59 GMT
+        Mon, 10 Feb 2020 18:38:57 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D67A052051;
-        Mon, 10 Feb 2020 18:34:59 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id BFFAA52052;
+        Mon, 10 Feb 2020 18:38:57 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.7.195])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9A11652052;
-        Mon, 10 Feb 2020 18:34:57 +0000 (GMT)
-Subject: Re: [PATCH 24/35] KVM: s390: protvirt: disallow one_reg
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9A3A45204E;
+        Mon, 10 Feb 2020 18:38:54 +0000 (GMT)
+Subject: Re: [PATCH 02/35] KVM: s390/interrupt: do not pin adapter interrupt
+ pages
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>
 References: <20200207113958.7320-1-borntraeger@de.ibm.com>
- <20200207113958.7320-25-borntraeger@de.ibm.com>
- <20200210185307.73b45f78.cohuck@redhat.com>
+ <20200207113958.7320-3-borntraeger@de.ibm.com>
+ <2cf62b84-8eb6-18d5-437b-7e86401b9c45@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -95,25 +96,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 10 Feb 2020 19:34:56 +0100
+Date:   Mon, 10 Feb 2020 19:38:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200210185307.73b45f78.cohuck@redhat.com>
+In-Reply-To: <2cf62b84-8eb6-18d5-437b-7e86401b9c45@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20021018-0008-0000-0000-000003519ADF
+x-cbid: 20021018-0028-0000-0000-000003D949B4
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021018-0009-0000-0000-00004A7239AC
-Message-Id: <df4805f2-0c51-6ee9-2082-42d0f2276bd3@de.ibm.com>
+x-cbparentid: 20021018-0029-0000-0000-0000249DB671
+Message-Id: <083a3fd0-7b56-e92b-bf15-3383b7f5488b@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-10_06:2020-02-10,2020-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- priorityscore=1501 phishscore=0 adultscore=0 spamscore=0 clxscore=1015
- bulkscore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=588
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 suspectscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 phishscore=0 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002100136
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -122,36 +123,132 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 10.02.20 18:53, Cornelia Huck wrote:
-> On Fri,  7 Feb 2020 06:39:47 -0500
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> From: Janosch Frank <frankja@linux.ibm.com>
+On 10.02.20 13:26, David Hildenbrand wrote:
+> On 07.02.20 12:39, Christian Borntraeger wrote:
+>> From: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
 >>
->> A lot of the registers are controlled by the Ultravisor and never
->> visible to KVM. Some fields in the sie control block are overlayed,
->> like gbea. As no userspace uses the ONE_REG interface on s390 it is safe
->> to disable this for protected guests.
-> 
-> Last round, I suggested
-> 
-> "As no known userspace uses the ONE_REG interface on s390 if sync regs
-> are available, no functionality is lost if it is disabled for protected
-> guests."
-
-If you think this variant is better I can use this, I am fine with either. 
-> 
-> Any opinion on that?
-> 
+>> The adapter interrupt page containing the indicator bits is currently
+>> pinned. That means that a guest with many devices can pin a lot of
+>> memory pages in the host. This also complicates the reference tracking
+>> which is needed for memory management handling of protected virtual
+>> machines.
+>> We can reuse the pte notifiers to "cache" the page without pinning it.
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>> Signed-off-by: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+>> Suggested-by: Andrea Arcangeli <aarcange@redhat.com>
 >> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 >> ---
->>  Documentation/virt/kvm/api.txt | 6 ++++--
->>  arch/s390/kvm/kvm-s390.c       | 3 +++
->>  2 files changed, 7 insertions(+), 2 deletions(-)
 > 
+> So, instead of pinning explicitly, look up the page address, cache it,
+> and glue its lifetime to the gmap table entry. When that entry is
+> changed, invalidate the cached page. On re-access, look up the page
+> again and register the gmap notifier for the table entry again.
+
+I think I might want to split this into two parts.
+part 1: a naive approach that always does get_user_pages_remote/put_page
+part 2: do the complex caching
+
+Ulrich mentioned that this actually could make the map/unmap a no-op as we
+have the address and bit already in the irq route. In the end this might be
+as fast as todays pinning as we replace a list walk with a page table walk. 
+Plus it would simplify the code. Will have a look if that is the case.
+
+> 
+> [...]
+> 
+>>  #define MAX_S390_IO_ADAPTERS ((MAX_ISC + 1) * 8)
+>> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+>> index c06c89d370a7..4bfb2f8fe57c 100644
+>> --- a/arch/s390/kvm/interrupt.c
+>> +++ b/arch/s390/kvm/interrupt.c
+>> @@ -28,6 +28,7 @@
+>>  #include <asm/switch_to.h>
+>>  #include <asm/nmi.h>
+>>  #include <asm/airq.h>
+>> +#include <linux/pagemap.h>
+>>  #include "kvm-s390.h"
+>>  #include "gaccess.h"
+>>  #include "trace-s390.h"
+>> @@ -2328,8 +2329,8 @@ static int register_io_adapter(struct kvm_device *dev,
+>>  		return -ENOMEM;
+>>  
+>>  	INIT_LIST_HEAD(&adapter->maps);
+>> -	init_rwsem(&adapter->maps_lock);
+>> -	atomic_set(&adapter->nr_maps, 0);
+>> +	spin_lock_init(&adapter->maps_lock);
+>> +	adapter->nr_maps = 0;
+>>  	adapter->id = adapter_info.id;
+>>  	adapter->isc = adapter_info.isc;
+>>  	adapter->maskable = adapter_info.maskable;
+>> @@ -2375,19 +2376,15 @@ static int kvm_s390_adapter_map(struct kvm *kvm, unsigned int id, __u64 addr)
+>>  		ret = -EFAULT;
+>>  		goto out;
+>>  	}
+>> -	ret = get_user_pages_fast(map->addr, 1, FOLL_WRITE, &map->page);
+>> -	if (ret < 0)
+>> -		goto out;
+>> -	BUG_ON(ret != 1);
+>> -	down_write(&adapter->maps_lock);
+>> -	if (atomic_inc_return(&adapter->nr_maps) < MAX_S390_ADAPTER_MAPS) {
+>> +	spin_lock(&adapter->maps_lock);
+>> +	if (adapter->nr_maps < MAX_S390_ADAPTER_MAPS) {
+>> +		adapter->nr_maps++;
+>>  		list_add_tail(&map->list, &adapter->maps);
+> 
+> I do wonder if we should check for duplicates. The unmap path will only
+> remove exactly one entry. But maybe this can never happen or is already
+> handled on a a higher layer.
+
+
+This would be a broken userspace, but I also do not see a what would break
+in the host if this happens.
+
+
+> 
+>>  }
+>> @@ -2430,7 +2426,6 @@ void kvm_s390_destroy_adapters(struct kvm *kvm)
+>>  		list_for_each_entry_safe(map, tmp,
+>>  					 &kvm->arch.adapters[i]->maps, list) {
+>>  			list_del(&map->list);
+>> -			put_page(map->page);
+>>  			kfree(map);
+>>  		}
+>>  		kfree(kvm->arch.adapters[i]);
+> 
+> Between the gmap being removed in kvm_arch_vcpu_destroy() and
+> kvm_s390_destroy_adapters(), the entries would no longer properly get
+> invalidated. AFAIK, removing/freeing the gmap will not trigger any
+> notifiers.
+> 
+> Not sure if that's an issue (IOW, if we can have some very weird race).
+> But I guess we would have similar races already :)
+
+This is only called when all file descriptors are closed and this also closes
+all irq routes. So I guess no I/O should be going on any more. 
+
+> 
+>> @@ -2690,6 +2685,31 @@ struct kvm_device_ops kvm_flic_ops = {
+>>  	.destroy = flic_destroy,
+>>  };
+>>  
+>> +void kvm_s390_adapter_gmap_notifier(struct gmap *gmap, unsigned long start,
+>> +				    unsigned long end)
+>> +{
+>> +	struct kvm *kvm = gmap->private;
+>> +	struct s390_map_info *map, *tmp;
+>> +	int i;
+>> +
+>> +	for (i = 0; i < MAX_S390_IO_ADAPTERS; i++) {
+>> +		struct s390_io_adapter *adapter = kvm->arch.adapters[i];
+>> +
+>> +		if (!adapter)
+>> +			continue;
+> 
+> I have to ask very dumb: How is kvm->arch.adapters[] protected?
+
+We only add new ones and this is removed at guest teardown it seems.
+[...]
+
+Let me have a look if we can simplify this.
 
