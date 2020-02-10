@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DF35157470
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 13:24:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 51ABF157479
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 13:26:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727003AbgBJMYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 07:24:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48204 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726796AbgBJMYT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 07:24:19 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ACIeTQ044441
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:24:18 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1u55u89w-1
+        id S1727079AbgBJM0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 07:26:45 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22308 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726796AbgBJM0o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 07:26:44 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ACKagQ018461
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:26:43 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y1tncwj66-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:24:16 -0500
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:26:43 -0500
 Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 10 Feb 2020 12:22:11 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Mon, 10 Feb 2020 12:26:41 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 10 Feb 2020 12:22:08 -0000
+        Mon, 10 Feb 2020 12:26:37 -0000
 Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ACM6vn50724942
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ACQZUh47513988
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Feb 2020 12:22:06 GMT
+        Mon, 10 Feb 2020 12:26:36 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D02CB4204F;
-        Mon, 10 Feb 2020 12:22:06 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E404342047;
+        Mon, 10 Feb 2020 12:26:35 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6398642045;
-        Mon, 10 Feb 2020 12:22:06 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 8606D42045;
+        Mon, 10 Feb 2020 12:26:35 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Feb 2020 12:22:06 +0000 (GMT)
-Subject: Re: [PATCH 07/35] KVM: s390: add new variants of UV CALL
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
+        Mon, 10 Feb 2020 12:26:35 +0000 (GMT)
+Subject: Re: [PATCH 09/35] KVM: s390: protvirt: Add KVM api documentation
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
@@ -52,8 +52,8 @@ Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200207113958.7320-1-borntraeger@de.ibm.com>
- <20200207113958.7320-8-borntraeger@de.ibm.com>
- <20200210131626.39c88be8.cohuck@redhat.com>
+ <20200207113958.7320-10-borntraeger@de.ibm.com>
+ <f7089ad6-65d2-35fc-16fb-b94e968fd4e8@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -98,25 +98,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 10 Feb 2020 13:22:06 +0100
+Date:   Mon, 10 Feb 2020 13:26:35 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200210131626.39c88be8.cohuck@redhat.com>
+In-Reply-To: <f7089ad6-65d2-35fc-16fb-b94e968fd4e8@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20021012-4275-0000-0000-0000039FBF13
+x-cbid: 20021012-0028-0000-0000-000003D9316E
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021012-4276-0000-0000-000038B3F2C8
-Message-Id: <5678ba29-4218-0bb9-b8b2-29ca724a9e8b@de.ibm.com>
+x-cbparentid: 20021012-0029-0000-0000-0000249D9C00
+Message-Id: <aae6434d-de87-503d-de51-4cee52d375b9@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-10_02:2020-02-10,2020-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- mlxlogscore=693 impostorscore=0 bulkscore=0 priorityscore=1501
- adultscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 malwarescore=0 suspectscore=0 bulkscore=0 phishscore=0
+ impostorscore=0 adultscore=0 priorityscore=1501 clxscore=1015 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002100097
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -125,37 +125,54 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 10.02.20 13:16, Cornelia Huck wrote:
-> On Fri,  7 Feb 2020 06:39:30 -0500
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
+On 08.02.20 15:57, Thomas Huth wrote:
+> On 07/02/2020 12.39, Christian Borntraeger wrote:
 >> From: Janosch Frank <frankja@linux.ibm.com>
 >>
->> This add 2 new variants of the UV CALL.
-> 
-> "This adds two new helper functions for doing UV CALLs."
-
-ack
-
-> 
-> ?
-> 
->>
->> The first variant handles UV CALLs that might have longer busy
->> conditions or just need longer when doing partial completion. We should
->> schedule when necessary.
->>
->> The second variant handles UV CALLs that only need the handle but have
->> no payload (e.g. destroying a VM). We can provide a simple wrapper for
->> those.
+>> Add documentation for KVM_CAP_S390_PROTECTED capability and the
+>> KVM_S390_PV_COMMAND and KVM_S390_PV_COMMAND_VCPU ioctls.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 >> ---
->>  arch/s390/include/asm/uv.h | 59 ++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 59 insertions(+)
+>>  Documentation/virt/kvm/api.txt | 61 ++++++++++++++++++++++++++++++++++
+>>  1 file changed, 61 insertions(+)
+>>
+>> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+>> index 73448764f544..4874d42286ca 100644
+>> --- a/Documentation/virt/kvm/api.txt
+>> +++ b/Documentation/virt/kvm/api.txt
+>> @@ -4204,6 +4204,60 @@ the clear cpu reset definition in the POP. However, the cpu is not put
+>>  into ESA mode. This reset is a superset of the initial reset.
+>>  
+>>  
+>> +4.125 KVM_S390_PV_COMMAND
+>> +
+>> +Capability: KVM_CAP_S390_PROTECTED
+>> +Architectures: s390
+>> +Type: vm ioctl
+>> +Parameters: struct kvm_pv_cmd
+>> +Returns: 0 on success, < 0 on error
+>> +
+>> +struct kvm_pv_cmd {
+>> +	__u32	cmd;	/* Command to be executed */
+>> +	__u16	rc;	/* Ultravisor return code */
+>> +	__u16	rrc;	/* Ultravisor return reason code */
+>> +	__u64	data;	/* Data or address */
 > 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
+> That remindes me ... do we maybe want a "reserved" field in here for
+> future extensions? Or is the "data" pointer enough?
+
+
+This is now:
+
+struct kvm_pv_cmd {
+
+        __u32 cmd;      /* Command to be executed */
+        __u32 flags;    /* flags for future extensions. Must be 0 for now */
+        __u64 data;     /* Data or address */
+        __u64 reserved[2];
+};
+
 
