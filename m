@@ -2,95 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4161156D42
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 01:44:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC09E156E21
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 04:57:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726077AbgBJAn5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 9 Feb 2020 19:43:57 -0500
-Received: from mga02.intel.com ([134.134.136.20]:57022 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725868AbgBJAn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 9 Feb 2020 19:43:57 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Feb 2020 16:43:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,423,1574150400"; 
-   d="scan'208";a="280491112"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by FMSMGA003.fm.intel.com with ESMTP; 09 Feb 2020 16:43:54 -0800
-Date:   Sun, 9 Feb 2020 19:34:36 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [RFC PATCH v2 1/9] vfio/pci: split vfio_pci_device into public
- and private parts
-Message-ID: <20200210003436.GA3520@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200131020803.27519-1-yan.y.zhao@intel.com>
- <20200131020956.27604-1-yan.y.zhao@intel.com>
- <20200207124831.391d5f70@w520.home>
+        id S1727008AbgBJD5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 9 Feb 2020 22:57:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23905 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726944AbgBJD5b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 9 Feb 2020 22:57:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581307050;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=FpaNsEwT/ks+uSjIzZvFcpf96lfi9mqPgeVQPWwqQKs=;
+        b=DMcX/8Odtj6c1Z6BdlocRrW8K2Xz1cuZns/YKwcGfV8+UHsMrbAdQXUVtunFSexUdO2Q86
+        V9ne2Q+SHhjp/JLK/1N3BjyvyF2MnnU4Mj/FZXqriYVzaGKqJYMK6vIWW3Srr3REH2L9ll
+        XWxoLrLE9i6/MSuF4Z0JxMmYQeGyX8A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-zqTqYp5IPvKusquXu357Vg-1; Sun, 09 Feb 2020 22:57:27 -0500
+X-MC-Unique: zqTqYp5IPvKusquXu357Vg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03CD8800D5E;
+        Mon, 10 Feb 2020 03:57:25 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-13-219.pek2.redhat.com [10.72.13.219])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB5E9101D481;
+        Mon, 10 Feb 2020 03:56:13 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc:     tiwei.bie@intel.com, jgg@mellanox.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
+        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
+        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com,
+        Jason Wang <jasowang@redhat.com>
+Subject: [PATCH V2 0/5] vDPA support
+Date:   Mon, 10 Feb 2020 11:56:03 +0800
+Message-Id: <20200210035608.10002-1-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200207124831.391d5f70@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 08, 2020 at 03:48:31AM +0800, Alex Williamson wrote:
-> On Thu, 30 Jan 2020 21:09:56 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > split vfio_pci_device into two parts:
-> > (1) a public part,
-> >     including pdev, num_region, irq_type which are accessible from
-> >     outside of vfio.
-> > (2) a private part,
-> >     a pointer to vfio_pci_device_private, only accessible within vfio
-> > 
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci.c         | 209 +++++++++++++++-------------
-> >  drivers/vfio/pci/vfio_pci_config.c  | 157 +++++++++++----------
-> >  drivers/vfio/pci/vfio_pci_igd.c     |  16 +--
-> >  drivers/vfio/pci/vfio_pci_intrs.c   | 171 ++++++++++++-----------
-> >  drivers/vfio/pci/vfio_pci_nvlink2.c |  16 +--
-> >  drivers/vfio/pci/vfio_pci_private.h |   5 +-
-> >  drivers/vfio/pci/vfio_pci_rdwr.c    |  36 ++---
-> >  include/linux/vfio.h                |   7 +
-> >  8 files changed, 321 insertions(+), 296 deletions(-)
-> 
-> I think the typical solution to something like this would be...
-> 
-> struct vfio_pci_device {
-> 	...
-> };
-> 
-> struct vfio_pci_device_private {
-> 	struct vfio_pci_device vdev;
-> 	...
-> };
-> 
-> External code would be able to work with the vfio_pci_device and
-> internal code would do a container_of() to get access to the private
-> fields.  What's done here is pretty ugly and not very cache friendly.
-> Thanks,
->
-got it, it's much better!
-will change it. Thanks!
+Hi all:
 
-Yan
+This is an updated version of kernel support for vDPA device. Various
+changes were made based on the feedback since last verion. One major
+change is to drop the sysfs API and leave the management interface for
+future development, and introudce the incremental DMA bus
+operations. Please see changelog for more information.
+
+The work on vhost, IFCVF (intel VF driver for vDPA) and qemu is
+ongoing.
+
+Please provide feedback.
+
+Thanks
+
+Change from V1:
+
+- drop sysfs API, leave the management interface to future development
+  (Michael)
+- introduce incremental DMA ops (dma_map/dma_unmap) (Michael)
+- introduce dma_device and use it instead of parent device for doing
+  IOMMU or DMA from bus driver (Michael, Jason, Ling Shan, Tiwei)
+- accept parent device and dma device when register vdpa device
+- coding style and compile fixes (Randy)
+- using vdpa_xxx instead of xxx_vdpa (Jason)
+- ove vDPA accessors to header and make it static inline (Jason)
+- split vdp_register_device() into two helpers vdpa_init_device() and
+  vdpa_register_device() which allows intermediate step to be done (Jason=
+)
+- warn on invalidate queue state when fail to creating virtqueue (Jason)
+- make to_virtio_vdpa_device() static (Jason)
+- use kmalloc/kfree instead of devres for virtio vdpa device (Jason)
+- avoid using cast in vdpa bus function (Jason)
+- introduce module_vdpa_driver and fix module refcnt (Jason)
+- fix returning freed address in vdapsim coherent DMA addr allocation (Da=
+n)
+- various other fixes and tweaks
+
+V1: https://lkml.org/lkml/2020/1/16/353
+
+Jason Wang (5):
+  vhost: factor out IOTLB
+  vringh: IOTLB support
+  vDPA: introduce vDPA bus
+  virtio: introduce a vDPA based transport
+  vdpasim: vDPA device simulator
+
+ MAINTAINERS                    |   2 +
+ drivers/vhost/Kconfig          |   7 +
+ drivers/vhost/Kconfig.vringh   |   1 +
+ drivers/vhost/Makefile         |   2 +
+ drivers/vhost/net.c            |   2 +-
+ drivers/vhost/vhost.c          | 221 ++++-------
+ drivers/vhost/vhost.h          |  36 +-
+ drivers/vhost/vhost_iotlb.c    | 171 +++++++++
+ drivers/vhost/vringh.c         | 421 ++++++++++++++++++--
+ drivers/virtio/Kconfig         |  15 +
+ drivers/virtio/Makefile        |   2 +
+ drivers/virtio/vdpa/Kconfig    |  26 ++
+ drivers/virtio/vdpa/Makefile   |   3 +
+ drivers/virtio/vdpa/vdpa.c     | 160 ++++++++
+ drivers/virtio/vdpa/vdpa_sim.c | 678 +++++++++++++++++++++++++++++++++
+ drivers/virtio/virtio_vdpa.c   | 392 +++++++++++++++++++
+ include/linux/vdpa.h           | 233 +++++++++++
+ include/linux/vhost_iotlb.h    |  45 +++
+ include/linux/vringh.h         |  36 ++
+ 19 files changed, 2249 insertions(+), 204 deletions(-)
+ create mode 100644 drivers/vhost/vhost_iotlb.c
+ create mode 100644 drivers/virtio/vdpa/Kconfig
+ create mode 100644 drivers/virtio/vdpa/Makefile
+ create mode 100644 drivers/virtio/vdpa/vdpa.c
+ create mode 100644 drivers/virtio/vdpa/vdpa_sim.c
+ create mode 100644 drivers/virtio/virtio_vdpa.c
+ create mode 100644 include/linux/vdpa.h
+ create mode 100644 include/linux/vhost_iotlb.h
+
+--=20
+2.19.1
 
