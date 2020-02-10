@@ -2,618 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FF6115814D
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 18:25:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ED21158155
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 18:27:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728021AbgBJRZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 12:25:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26840 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727558AbgBJRZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Feb 2020 12:25:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581355527;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U7VGIkLewDYC1Gd2Ft28wg804gnRMll/tFWK4kGV0s4=;
-        b=CBcPvwz3sKBBLmnpoKnKEGQ6iaLn1oPgvGYK9dqcMMTV5bfvkhltWshQZob8Q3BuQQsDr7
-        VxtKE1csrJ5H08fFMMRucXpVaGyMHBWcCaJlmaLAMG8URlXd7QFsDg8pO+pvtdZz2HoTq7
-        qqIdLFHXzllD+TPafHKn7jokqiL+QG0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-crQmTkbMM9WEh4-YoaQj3w-1; Mon, 10 Feb 2020 12:25:23 -0500
-X-MC-Unique: crQmTkbMM9WEh4-YoaQj3w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4FAA477;
-        Mon, 10 Feb 2020 17:25:20 +0000 (UTC)
-Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3FC7689F0A;
-        Mon, 10 Feb 2020 17:25:19 +0000 (UTC)
-Date:   Mon, 10 Feb 2020 10:25:18 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v12 Kernel 4/7] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20200210102518.490a0d87@x1.home>
-In-Reply-To: <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
-References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
-        <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat
+        id S1728107AbgBJR1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 12:27:16 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41044 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728059AbgBJR1Q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 12:27:16 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AHOVqI054793
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 12:27:15 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y1tnd8w6t-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 12:27:14 -0500
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 10 Feb 2020 17:27:13 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 10 Feb 2020 17:27:07 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01AHR6qO54132752
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Feb 2020 17:27:06 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 30F8F52050;
+        Mon, 10 Feb 2020 17:27:06 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.7.195])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 2CFB952059;
+        Mon, 10 Feb 2020 17:27:05 +0000 (GMT)
+Subject: Re: [PATCH 01/35] mm:gup/writeback: add callbacks for inaccessible
+ pages
+To:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
+        kvm-ppc@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-2-borntraeger@de.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Mon, 10 Feb 2020 18:27:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200207113958.7320-2-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021017-4275-0000-0000-0000039FD488
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021017-4276-0000-0000-000038B409F8
+Message-Id: <28792269-e053-ac70-a344-45612ee5c729@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-10_06:2020-02-10,2020-02-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 malwarescore=0 suspectscore=2 bulkscore=0 phishscore=0
+ impostorscore=0 adultscore=0 priorityscore=1501 clxscore=1015 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002100131
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 8 Feb 2020 01:12:31 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+CC Marc Zyngier for KVM on ARM.  Marc, see below. Will there be any
+use for this on KVM/ARM in the future?
 
-> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> - Start pinned and unpinned pages tracking while migration is active
-> - Stop pinned and unpinned dirty pages tracking. This is also used to
->   stop dirty pages tracking if migration failed or cancelled.
-> - Get dirty pages bitmap. This ioctl returns bitmap of dirty pages, its
->   user space application responsibility to copy content of dirty pages
->   from source to destination during migration.
+CC Sean Christopherson/Tom Lendacky. Any obvious use case for Intel/AMD
+to have a callback before a page is used for I/O?
+
+Andrew (or other mm people) any chance to get an ACK for this change?
+I could then carry that via s390 or KVM tree. Or if you want to carry
+that yourself I can send an updated version (we need to kind of 
+synchronize that Linus will pull the KVM changes after the mm changes).
+
+Andrea asked if others would benefit from this, so here are some more
+information about this (and I can also put this into the patch
+description).  So we have talked to the POWER folks. They do not use
+the standard normal memory management, instead they have a hard split
+between secure and normal memory. The secure memory  is the handled by
+the hypervisor as device memory and the ultravisor and the hypervisor
+move this forth and back when needed.
+
+On s390 there is no *separate* pool of physical pages that are secure.
+Instead, *any* physical page can be marked as secure or not, by
+setting a bit in a per-page data structure that hardware uses to stop
+unauthorized access.  (That bit is under control of the ultravisor.)
+
+Note that one side effect of this strategy is that the decision
+*which* secure pages to encrypt and then swap out is actually done by
+the hypervisor, not the ultravisor.  In our case, the hypervisor is
+Linux/KVM, so we're using the regular Linux memory management scheme
+(active/inactive LRU lists etc.) to make this decision.  The advantage
+is that the Ultravisor code does not need to itself implement any
+memory management code, making it a lot simpler.
+
+However, in the end this is why we need the hook into Linux memory
+management: once Linux has decided to swap a page out, we need to get
+a chance to tell the Ultravisor to "export" the page (i.e., encrypt
+its contents and mark it no longer secure).
+
+As outlined below this should be a no-op for anybody not opting in.
+
+Christian                                   
+
+On 07.02.20 12:39, Christian Borntraeger wrote:
+> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > 
-> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> structure. Bitmap size is calculated considering smallest supported page
-> size. Bitmap is allocated when dirty logging is enabled for those
-> vfio_dmas whose vpfn list is not empty or whole range is mapped, in
-> case of pass-through device.
+> With the introduction of protected KVM guests on s390 there is now a
+> concept of inaccessible pages. These pages need to be made accessible
+> before the host can access them.
 > 
-> There could be multiple option as to when bitmap should be populated:
-> * Polulate bitmap for already pinned pages when bitmap is allocated for
->   a vfio_dma with the smallest supported page size. Updates bitmap from
->   page pinning and unpinning functions. When user application queries
->   bitmap, check if requested page size is same as page size used to
->   populated bitmap. If it is equal, copy bitmap. But if not equal,
->   re-populated bitmap according to requested page size and then copy to
->   user.
->   Pros: Bitmap gets populated on the fly after dirty tracking has
->         started.
->   Cons: If requested page size is different than smallest supported
->         page size, then bitmap has to be re-populated again, with
->         additional overhead of allocating bitmap memory again for
->         re-population of bitmap.
-
-No memory needs to be allocated to re-populate the bitmap.  The bitmap
-is clear-on-read and by tracking the bitmap in the smallest supported
-page size we can guarantee that we can fit the user requested bitmap
-size within the space occupied by that minimal page size range of the
-bitmap.  Therefore we'd destructively translate the requested region of
-the bitmap to a different page size, write it out to the user, and
-clear it.  Also we expect userspace to use the minimum page size almost
-exclusively, which is optimized by this approach as dirty bit tracking
-is spread out over each page pinning operation.
-
+> While cpu accesses will trigger a fault that can be resolved, I/O
+> accesses will just fail.  We need to add a callback into architecture
+> code for places that will do I/O, namely when writeback is started or
+> when a page reference is taken.
 > 
-> * Populate bitmap when bitmap is queried by user application.
->   Pros: Bitmap is populated with requested page size. This eliminates
->         the need to re-populate bitmap if requested page size is
->         different than smallest supported pages size.
->   Cons: There is one time processing time, when bitmap is queried.
-
-Another significant Con is that the vpfn list needs to track and manage
-unpinned pages, which makes it more complex and intrusive.  The
-previous option seems to have both time and complexity advantages,
-especially in the case we expect to be most common of the user
-accessing the bitmap with the minimum page size, ie. PAGE_SIZE.  It's
-also not clear why we pre-allocate the bitmap at all with this approach.
-
-> I prefer later option with simple logic and to eliminate over-head of
-> bitmap repopulation in case of differnt page sizes. Later option is
-> implemented in this patch.
-
-Hmm, we'll see below, but I not convinced based on the above rationale.
-
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 299 ++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 287 insertions(+), 12 deletions(-)
+>  include/linux/gfp.h | 6 ++++++
+>  mm/gup.c            | 2 ++
+>  mm/page-writeback.c | 1 +
+>  3 files changed, 9 insertions(+)
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index d386461e5d11..df358dc1c85b 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -70,6 +70,7 @@ struct vfio_iommu {
->  	unsigned int		dma_avail;
->  	bool			v2;
->  	bool			nesting;
-> +	bool			dirty_page_tracking;
->  };
->  
->  struct vfio_domain {
-> @@ -90,6 +91,7 @@ struct vfio_dma {
->  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->  	struct task_struct	*task;
->  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> +	unsigned long		*bitmap;
->  };
->  
->  struct vfio_group {
-> @@ -125,6 +127,7 @@ struct vfio_regions {
->  					(!list_empty(&iommu->domain_list))
->  
->  static int put_pfn(unsigned long pfn, int prot);
-> +static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
->  
->  /*
->   * This code handles mapping and unmapping of user data buffers
-> @@ -174,6 +177,57 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->  	rb_erase(&old->node, &iommu->dma_list);
->  }
->  
-> +static inline unsigned long dirty_bitmap_bytes(unsigned int npages)
+> diff --git a/include/linux/gfp.h b/include/linux/gfp.h
+> index e5b817cb86e7..be2754841369 100644
+> --- a/include/linux/gfp.h
+> +++ b/include/linux/gfp.h
+> @@ -485,6 +485,12 @@ static inline void arch_free_page(struct page *page, int order) { }
+>  #ifndef HAVE_ARCH_ALLOC_PAGE
+>  static inline void arch_alloc_page(struct page *page, int order) { }
+>  #endif
+> +#ifndef HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
+> +static inline int arch_make_page_accessible(struct page *page)
 > +{
-> +	if (!npages)
-> +		return 0;
-> +
-> +	return ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
-> +}
-> +
-> +static int vfio_dma_bitmap_alloc(struct vfio_iommu *iommu,
-> +				 struct vfio_dma *dma, unsigned long pgsizes)
-> +{
-> +	unsigned long pgshift = __ffs(pgsizes);
-> +
-> +	if (!RB_EMPTY_ROOT(&dma->pfn_list) || dma->iommu_mapped) {
-> +		unsigned long npages = dma->size >> pgshift;
-> +		unsigned long bsize = dirty_bitmap_bytes(npages);
-> +
-> +		dma->bitmap = kvzalloc(bsize, GFP_KERNEL);
-
-nit, we don't need to store bsize in a local variable.
-
-> +		if (!dma->bitmap)
-> +			return -ENOMEM;
-> +	}
 > +	return 0;
 > +}
-> +
-> +static int vfio_dma_all_bitmap_alloc(struct vfio_iommu *iommu,
-> +				     unsigned long pgsizes)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +	int ret;
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		ret = vfio_dma_bitmap_alloc(iommu, dma, pgsizes);
-> +		if (ret)
-> +			return ret;
-
-This doesn't unwind on failure, so we're left with partially allocated
-bitmap cruft.
-
-> +	}
-> +	return 0;
-> +}
-> +
-> +static void vfio_dma_all_bitmap_free(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		kfree(dma->bitmap);
-
-We don't set dma->bitmap = NULL and we don't even prevent the case of a
-user making multiple STOP calls, so we have a user triggerable double
-free :(
-
-> +	}
-> +}
-> +
->  /*
->   * Helper Functions for host iova-pfn list
->   */
-> @@ -244,6 +298,29 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
->  	kfree(vpfn);
->  }
+> +#endif
 >  
-> +static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma)
-> +{
-> +	struct rb_node *n = rb_first(&dma->pfn_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
-> +
-> +		if (!vpfn->ref_count)
-> +			vfio_remove_from_pfn_list(dma, vpfn);
-> +	}
-> +}
-> +
-> +static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		vfio_remove_unpinned_from_pfn_list(dma);
-> +	}
-> +}
-> +
->  static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->  					       unsigned long iova)
->  {
-> @@ -261,7 +338,8 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
->  	vpfn->ref_count--;
->  	if (!vpfn->ref_count) {
->  		ret = put_pfn(vpfn->pfn, dma->prot);
-> -		vfio_remove_from_pfn_list(dma, vpfn);
-> +		if (!dma->bitmap)
-> +			vfio_remove_from_pfn_list(dma, vpfn);
->  	}
->  	return ret;
->  }
-> @@ -483,13 +561,14 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
->  	return ret;
->  }
->  
-> -static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
-> +static int vfio_unpin_page_external(struct vfio_iommu *iommu,
-
-We added a parameter but didn't use it in this patch.
-
-> +				    struct vfio_dma *dma, dma_addr_t iova,
->  				    bool do_accounting)
->  {
->  	int unlocked;
->  	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
->  
-> -	if (!vpfn)
-> +	if (!vpfn || !vpfn->ref_count)
->  		return 0;
->  
->  	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
-> @@ -510,6 +589,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  	unsigned long remote_vaddr;
->  	struct vfio_dma *dma;
->  	bool do_accounting;
-> +	unsigned long iommu_pgsizes = vfio_pgsize_bitmap(iommu);
->  
->  	if (!iommu || !user_pfn || !phys_pfn)
->  		return -EINVAL;
-> @@ -551,8 +631,10 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  
->  		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
->  		if (vpfn) {
-> -			phys_pfn[i] = vpfn->pfn;
-> -			continue;
-> +			if (vpfn->ref_count > 1) {
-> +				phys_pfn[i] = vpfn->pfn;
-> +				continue;
-> +			}
+>  struct page *
+>  __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order, int preferred_nid,
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 7646bf993b25..a01262cd2821 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -257,6 +257,7 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+>  			page = ERR_PTR(-ENOMEM);
+>  			goto out;
 >  		}
->  
->  		remote_vaddr = dma->vaddr + iova - dma->iova;
-> @@ -560,11 +642,23 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  					     do_accounting);
->  		if (ret)
->  			goto pin_unwind;
-> -
-> -		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-> -		if (ret) {
-> -			vfio_unpin_page_external(dma, iova, do_accounting);
-> -			goto pin_unwind;
-> +		if (!vpfn) {
-> +			ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
-> +			if (ret) {
-> +				vfio_unpin_page_external(iommu, dma, iova,
-> +							 do_accounting);
-> +				goto pin_unwind;
-> +			}
-> +		} else
-> +			vpfn->pfn = phys_pfn[i];
-> +
-> +		if (iommu->dirty_page_tracking && !dma->bitmap) {
-> +			ret = vfio_dma_bitmap_alloc(iommu, dma, iommu_pgsizes);
-> +			if (ret) {
-> +				vfio_unpin_page_external(iommu, dma, iova,
-> +							 do_accounting);
-> +				goto pin_unwind;
-> +			}
->  		}
+> +		arch_make_page_accessible(page);
 >  	}
+>  	if (flags & FOLL_TOUCH) {
+>  		if ((flags & FOLL_WRITE) &&
+> @@ -1870,6 +1871,7 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
 >  
-> @@ -578,7 +672,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  		VM_BUG_ON_PAGE(compound_head(page) != head, page);
 >  
->  		iova = user_pfn[j] << PAGE_SHIFT;
->  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
-> -		vfio_unpin_page_external(dma, iova, do_accounting);
-> +		vfio_unpin_page_external(iommu, dma, iova, do_accounting);
->  		phys_pfn[j] = 0;
+> +		arch_make_page_accessible(page);
+>  		SetPageReferenced(page);
+>  		pages[*nr] = page;
+>  		(*nr)++;
+> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> index 2caf780a42e7..0f0bd14571b1 100644
+> --- a/mm/page-writeback.c
+> +++ b/mm/page-writeback.c
+> @@ -2806,6 +2806,7 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
+>  		inc_lruvec_page_state(page, NR_WRITEBACK);
+>  		inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
 >  	}
->  pin_done:
-> @@ -612,7 +706,7 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
->  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
->  		if (!dma)
->  			goto unpin_exit;
-> -		vfio_unpin_page_external(dma, iova, do_accounting);
-> +		vfio_unpin_page_external(iommu, dma, iova, do_accounting);
->  	}
+> +	arch_make_page_accessible(page);
+>  	unlock_page_memcg(page);
+
+As outlined by Ulrich, we can move the callback after the unlock.
+
+>  	return ret;
 >  
->  unpin_exit:
-> @@ -830,6 +924,113 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->  	return bitmap;
->  }
->  
-> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> +				  size_t size, uint64_t pgsize,
-> +				  unsigned char __user *bitmap)
-> +{
-> +	struct vfio_dma *dma;
-> +	dma_addr_t i = iova, iova_limit;
-> +	unsigned int bsize, nbits = 0, l = 0;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +
-> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
-> +		int ret, j;
-> +		unsigned int npages = 0, shift = 0;
-> +		unsigned char temp = 0;
-> +
-> +		/* mark all pages dirty if all pages are pinned and mapped. */
-> +		if (dma->iommu_mapped) {
-> +			iova_limit = min(dma->iova + dma->size, iova + size);
-> +			npages = iova_limit/pgsize;
-> +			bitmap_set(dma->bitmap, 0, npages);
-
-npages is derived from iova_limit, which is the number of bits to set
-dirty relative to the first requested iova, not iova zero, ie. the set
-of dirty bits is offset from those requested unless iova == dma->iova.
-
-Also I hope dma->bitmap was actually allocated.  Not only does the
-START error path potentially leave dirty tracking enabled without all
-the bitmap allocated, when does the bitmap get allocated for a new
-vfio_dma when dirty tracking is enabled?  Seems it only occurs if a
-vpfn gets marked dirty.
-
-> +		} else if (dma->bitmap) {
-> +			struct rb_node *n = rb_first(&dma->pfn_list);
-> +			bool found = false;
-> +
-> +			for (; n; n = rb_next(n)) {
-> +				struct vfio_pfn *vpfn = rb_entry(n,
-> +						struct vfio_pfn, node);
-> +				if (vpfn->iova >= i) {
-> +					found = true;
-> +					break;
-> +				}
-> +			}
-> +
-> +			if (!found) {
-> +				i += dma->size;
-> +				continue;
-> +			}
-> +
-> +			for (; n; n = rb_next(n)) {
-> +				unsigned int s;
-> +				struct vfio_pfn *vpfn = rb_entry(n,
-> +						struct vfio_pfn, node);
-> +
-> +				if (vpfn->iova >= iova + size)
-> +					break;
-> +
-> +				s = (vpfn->iova - dma->iova) >> pgshift;
-> +				bitmap_set(dma->bitmap, s, 1);
-> +
-> +				iova_limit = vpfn->iova + pgsize;
-> +			}
-> +			npages = iova_limit/pgsize;
-
-Isn't iova_limit potentially uninitialized here?  For example, if our
-vfio_dma covers {0,8192} and we ask for the bitmap of {0,4096} and
-there's a vpfn at {4096,8192}.  I think that means vpfn->iova >= i
-(4096 >= 0), so we break with found = true, then we test 4096 >= 0 +
-4096 and break, and npages = ????/pgsize.
-
-> +		}
-> +
-> +		bsize = dirty_bitmap_bytes(npages);
-> +		shift = nbits % BITS_PER_BYTE;
-> +
-> +		if (npages && shift) {
-> +			l--;
-> +			if (!access_ok((void __user *)bitmap + l,
-> +					sizeof(unsigned char)))
-> +				return -EINVAL;
-> +
-> +			ret = __get_user(temp, bitmap + l);
-
-I don't understand why we care to get the user's bitmap, are we trying
-to leave whatever garbage they might have set in it and only also set
-the dirty bits?  That seems unnecessary.
-
-Also why do we need these access_ok() checks when we already checked
-the range at the start of the ioctl?
-
-> +			if (ret)
-> +				return ret;
-> +		}
-> +
-> +		for (j = 0; j < bsize; j++, l++) {
-> +			temp = temp |
-> +			       (*((unsigned char *)dma->bitmap + j) << shift);
-
-|=
-
-> +			if (!access_ok((void __user *)bitmap + l,
-> +					sizeof(unsigned char)))
-> +				return -EINVAL;
-> +
-> +			ret = __put_user(temp, bitmap + l);
-> +			if (ret)
-> +				return ret;
-> +			if (shift) {
-> +				temp = *((unsigned char *)dma->bitmap + j) >>
-> +					(BITS_PER_BYTE - shift);
-> +			}
-
-When shift == 0, temp just seems to accumulate bits that never get
-cleared.
-
-> +		}
-> +
-> +		nbits += npages;
-> +
-> +		i = min(dma->iova + dma->size, iova + size);
-> +		if (i >= iova + size)
-> +			break;
-
-So whether we error or succeed, we leave cruft in dma->bitmap for the
-next pass.  It doesn't seem to make any sense why we pre-allocated the
-bitmap, we might as well just allocate it on demand here.  Actually, if
-we're not going to do a copy_to_user() for some range of the bitmap,
-I'm not sure what it's purpose is at all.  I think the big advantages
-of the bitmap are that we can't amortize the cost across every pinned
-page or DMA mapping, we don't need the overhead of tracking unmapped
-vpfns, and we can use copy_to_user() to push the bitmap out.  We're not
-getting any of those advantages here.
-
-> +	}
-> +	return 0;
-> +}
-> +
-> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
-> +{
-> +	long bsize;
-> +
-> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
-> +		return -EINVAL;
-> +
-> +	bsize = dirty_bitmap_bytes(npages);
-> +
-> +	if (bitmap_size < bsize)
-> +		return -EINVAL;
-> +
-> +	return bsize;
-> +}
-
-Seems like this could simply return int, -errno or zero for success.
-The returned bsize is not used for anything else.
-
-> +
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			     struct vfio_iommu_type1_dma_unmap *unmap)
->  {
-> @@ -2277,6 +2478,80 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> +		struct vfio_iommu_type1_dirty_bitmap range;
-> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +		int ret;
-> +
-> +		if (!iommu->v2)
-> +			return -EACCES;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +				    bitmap);
-
-We require the user to provide iova, size, pgsize, bitmap_size, and
-bitmap fields to START/STOP?  Why?
-
-> +
-> +		if (copy_from_user(&range, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (range.argsz < minsz || range.flags & ~mask)
-> +			return -EINVAL;
-> +
-> +		/* only one flag should be set at a time */
-> +		if (__ffs(range.flags) != __fls(range.flags))
-> +			return -EINVAL;
-> +
-> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +			unsigned long iommu_pgsizes = vfio_pgsize_bitmap(iommu);
-> +
-> +			mutex_lock(&iommu->lock);
-> +			iommu->dirty_page_tracking = true;
-> +			ret = vfio_dma_all_bitmap_alloc(iommu, iommu_pgsizes);
-
-So dirty page tracking is enabled even if we fail to allocate all the
-bitmaps?  Shouldn't this return an error if dirty tracking is already
-enabled?
-
-> +			mutex_unlock(&iommu->lock);
-> +			return ret;
-> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +			mutex_lock(&iommu->lock);
-> +			iommu->dirty_page_tracking = false;
-
-Shouldn't we only allow STOP if tracking is enabled?
-
-> +			vfio_dma_all_bitmap_free(iommu);
-
-Here's where that user induced double free enters the picture.
-
-> +			vfio_remove_unpinned_from_dma_list(iommu);
-> +			mutex_unlock(&iommu->lock);
-> +			return 0;
-> +		} else if (range.flags &
-> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> +			long bsize;
-> +			unsigned long pgshift = __ffs(range.pgsize);
-> +			uint64_t iommu_pgsizes = vfio_pgsize_bitmap(iommu);
-> +			uint64_t iommu_pgmask =
-> +				 ((uint64_t)1 << __ffs(iommu_pgsizes)) - 1;
-> +
-> +			if ((range.pgsize & iommu_pgsizes) != range.pgsize)
-> +				return -EINVAL;
-> +			if (range.iova & iommu_pgmask)
-> +				return -EINVAL;
-> +			if (!range.size || range.size & iommu_pgmask)
-> +				return -EINVAL;
-> +			if (range.iova + range.size < range.iova)
-> +				return -EINVAL;
-> +			if (!access_ok((void __user *)range.bitmap,
-> +				       range.bitmap_size))
-> +				return -EINVAL;
-> +
-> +			bsize = verify_bitmap_size(range.size >> pgshift,
-> +						   range.bitmap_size);
-> +			if (bsize < 0)
-> +				return bsize;
-> +
-> +			mutex_lock(&iommu->lock);
-> +			if (iommu->dirty_page_tracking)
-> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
-> +					 range.size, range.pgsize,
-> +					 (unsigned char __user *)range.bitmap);
-> +			else
-> +				ret = -EINVAL;
-> +			mutex_unlock(&iommu->lock);
-> +
-> +			return ret;
-> +		}
->  	}
->  
->  	return -ENOTTY;
-
-Thanks,
-Alex
+> 
 
