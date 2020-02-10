@@ -2,57 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 85B96158246
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 19:28:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75906158272
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 19:35:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727363AbgBJS2o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 13:28:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48804 "EHLO
+        id S1727433AbgBJSfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 13:35:06 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11412 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726809AbgBJS2o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 13:28:44 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AILjxJ087061
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 13:28:43 -0500
+        by vger.kernel.org with ESMTP id S1727056AbgBJSfG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 13:35:06 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AIMApU062036
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 13:35:05 -0500
 Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1ums0trk-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1ubqrq9h-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 13:28:42 -0500
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 13:35:05 -0500
 Received: from localhost
         by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 10 Feb 2020 18:28:40 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        Mon, 10 Feb 2020 18:35:03 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
         by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 10 Feb 2020 18:28:37 -0000
+        Mon, 10 Feb 2020 18:35:01 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01AISZ8Z51838998
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01AIYxSM49676390
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Feb 2020 18:28:35 GMT
+        Mon, 10 Feb 2020 18:34:59 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9D1A35204F;
-        Mon, 10 Feb 2020 18:28:35 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D67A052051;
+        Mon, 10 Feb 2020 18:34:59 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.7.195])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 58D105204E;
-        Mon, 10 Feb 2020 18:28:34 +0000 (GMT)
-Subject: Re: [PATCH 01/35] mm:gup/writeback: add callbacks for inaccessible
- pages
-To:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9A11652052;
+        Mon, 10 Feb 2020 18:34:57 +0000 (GMT)
+Subject: Re: [PATCH 24/35] KVM: s390: protvirt: disallow one_reg
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@kernel.org>
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
 References: <20200207113958.7320-1-borntraeger@de.ibm.com>
- <20200207113958.7320-2-borntraeger@de.ibm.com>
- <d8622308-6089-50a4-54e0-277dc7c8c74b@redhat.com>
+ <20200207113958.7320-25-borntraeger@de.ibm.com>
+ <20200210185307.73b45f78.cohuck@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -97,25 +95,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 10 Feb 2020 19:28:34 +0100
+Date:   Mon, 10 Feb 2020 19:34:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <d8622308-6089-50a4-54e0-277dc7c8c74b@redhat.com>
+In-Reply-To: <20200210185307.73b45f78.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20021018-0008-0000-0000-000003519A91
+x-cbid: 20021018-0008-0000-0000-000003519ADF
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021018-0009-0000-0000-00004A72395C
-Message-Id: <f7065c72-0487-9d03-a286-f75a60b4ac5f@de.ibm.com>
+x-cbparentid: 20021018-0009-0000-0000-00004A7239AC
+Message-Id: <df4805f2-0c51-6ee9-2082-42d0f2276bd3@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-10_06:2020-02-10,2020-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- spamscore=0 priorityscore=1501 clxscore=1015 impostorscore=0
- malwarescore=0 phishscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ priorityscore=1501 phishscore=0 adultscore=0 spamscore=0 clxscore=1015
+ bulkscore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=588
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002100136
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -124,55 +122,36 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 10.02.20 19:17, David Hildenbrand wrote:
-> On 07.02.20 12:39, Christian Borntraeger wrote:
->> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+On 10.02.20 18:53, Cornelia Huck wrote:
+> On Fri,  7 Feb 2020 06:39:47 -0500
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> From: Janosch Frank <frankja@linux.ibm.com>
 >>
->> With the introduction of protected KVM guests on s390 there is now a
->> concept of inaccessible pages. These pages need to be made accessible
->> before the host can access them.
+>> A lot of the registers are controlled by the Ultravisor and never
+>> visible to KVM. Some fields in the sie control block are overlayed,
+>> like gbea. As no userspace uses the ONE_REG interface on s390 it is safe
+>> to disable this for protected guests.
+> 
+> Last round, I suggested
+> 
+> "As no known userspace uses the ONE_REG interface on s390 if sync regs
+> are available, no functionality is lost if it is disabled for protected
+> guests."
+
+If you think this variant is better I can use this, I am fine with either. 
+> 
+> Any opinion on that?
+> 
 >>
->> While cpu accesses will trigger a fault that can be resolved, I/O
->> accesses will just fail.  We need to add a callback into architecture
->> code for places that will do I/O, namely when writeback is started or
->> when a page reference is taken.
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  Documentation/virt/kvm/api.txt | 6 ++++--
+>>  arch/s390/kvm/kvm-s390.c       | 3 +++
+>>  2 files changed, 7 insertions(+), 2 deletions(-)
 > 
-> My question would be: What guarantees that the page will stay accessible
-> (for I/O)? IIRC, pages can be converted back to secure/inaccessible
-> whenever the guest wants to access them. How will that be dealt with?
-
-Yes, in patch 5 we do use the page lock, PageWriteBack and page_ref_freeze
-to only make the page secure again if no I/O is going to be started or
-still running.
-
-We have minimized the common code impact (just these 3 callbacks) so that 
-architecture code can do the right thing.
-
-> 
-> I would assume some magic counter that tracks if the page still has to
-> remain accessible. Once all clients that require the page to be
-> "accessible" on the I/O path are done, the page can be made inaccessible
-> again. But then, I would assume there would be something like a
-> 
-> /* make page accessible and make sure the page will remain accessible */
-> arch_get_page_accessible(page);
-> 
-> /* we're done dealing with the page content */
-> arch_put_page_accessible(page);
-> 
-> You mention page references. I think you should elaborate how that is
-> expected to work in the patch description more detailed.
-> 
-> 
-> (side note: I assume you guys have a plan for dealing with kdump wanting
-> to dump inaccessible pages. the kexec kernel would have to talk to the
-> UV to convert pages - and also make pages accessible on the I/O path I
-> guess - or one would want to mark and skip encrypted pages completely in
-> kdump somehow, as the content is essentially garbage)
-
-On kexec and kdump the ultravisor is called as part of the the diagnose
-308 subcodes 0 and 1 to make sure that a: kdump works (no fault on a 
-previously secure page) and b: the content of the secure page is no 
-longer accessible.
-
 
