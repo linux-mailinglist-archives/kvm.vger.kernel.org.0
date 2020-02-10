@@ -2,195 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 62A2D156FA6
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 07:39:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D777E1570D8
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 09:34:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727429AbgBJGjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 01:39:11 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:42750 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726118AbgBJGjL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Feb 2020 01:39:11 -0500
-Received: by mail-ot1-f68.google.com with SMTP id 66so5244190otd.9;
-        Sun, 09 Feb 2020 22:39:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=HlsjcWP9mUkL0ZSkAPaWKXT3aO8hLJuD8G7R6rOrkyo=;
-        b=DgaeFq+u997sASMaYeP69Cfm3FrtMU5HvAXKfwLQv2kd4NSHBGEsiylOn3nWsAKX6/
-         v/YruLjveEu+JFC5cPxCiHKZHhNr9or+BMP6TrMsSy9el69bBlfmWj0R4YeQdL6G/Ng5
-         KE9QCKR6l2tgmIi3/wof+1Zmhdh/OXU4ctsO5HCplwR9OPCLL4+fL8R8qOmFNe3dMFgb
-         nE1LB+WyYnFXd96gdNIiatiQGPldn3tJE7ozzb6w5l9xzzADvshy1zNPXEKT7GIsUiZH
-         HficcbrdUpOEDAtqCwfhZmFyeQXELuKLp0Y2yEx2cVVRH5xQGj9SLvvNehR3kyFCAH6P
-         8MIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=HlsjcWP9mUkL0ZSkAPaWKXT3aO8hLJuD8G7R6rOrkyo=;
-        b=BkBnxVme5SUNhH1l9eYag3zUYRqnmwwOgPyaNDT5yY0QKbLHeaS58hN3ebezNTTQ++
-         uAd7s4ET3MGEqfhG036+tqKAyphjuwmDzzKx7FW1B/LwA+qv6/RzpVte8IbMhBf96Qe3
-         d5r/UIuV5gYAVsBr6/+Qpzis6tW0Z0nipPaz6KryE7SQ3K6l4qRMT06v6FQaQ4ULqnI7
-         jwqBQXQYHD2evnjTUF9q5NoqXFYgaaElXGBS48JM8F46jVn0U1Ojj7Kj6CosxhVKPjqc
-         0KJtvrV9xFelgVonDTbfxTHxppdmrA+UJZroIPYApjQgMovrsl5RuzS7KqUEEvxHiR9M
-         7PvQ==
-X-Gm-Message-State: APjAAAXLlLO9Kh9Unf2a+WkgRt86OAet0+X+r6vwGyrJWp/RXrsY6vPO
-        x87rXgy0HGGcBPEBdzQxSqPP3JAZ4oVEPKRFlWFx4ic1eYPp/g==
-X-Google-Smtp-Source: APXvYqzPo25A9j9ckAWsBjnev3+3TQTWLXQQtFc33/AoSq2bgjPdrjBd9Wtyam+cPp8vkJf3sQE36TRwavSyrCwFtzY=
-X-Received: by 2002:a9d:7ccd:: with SMTP id r13mr19722otn.56.1581316750332;
- Sun, 09 Feb 2020 22:39:10 -0800 (PST)
+        id S1727447AbgBJIeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 03:34:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37136 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726968AbgBJIeZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 03:34:25 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01A8T4sf037518
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 03:34:24 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1u2dce3v-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 03:34:23 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 10 Feb 2020 08:34:21 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 10 Feb 2020 08:34:17 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01A8YG7a46924156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Feb 2020 08:34:16 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1CE3A4C058;
+        Mon, 10 Feb 2020 08:34:16 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B62734C044;
+        Mon, 10 Feb 2020 08:34:15 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Feb 2020 08:34:15 +0000 (GMT)
+Subject: Re: [PATCH 08/35] KVM: s390: protvirt: Add initial lifecycle handling
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-9-borntraeger@de.ibm.com>
+ <c4949664-c6fd-f4d9-d42d-f2fa9426db00@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Mon, 10 Feb 2020 09:34:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 10 Feb 2020 14:38:59 +0800
-Message-ID: <CANRm+CxGOeGQ0vV9ueBgjUDvkzH29EQWLe4GQGDvOhm3idM6NQ@mail.gmail.com>
-Subject: [PATCH v2 2/2] KVM: Pre-allocate 1 cpumask variable per cpu for both
- pv tlb and pv ipis
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <c4949664-c6fd-f4d9-d42d-f2fa9426db00@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021008-0020-0000-0000-000003A8B68F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021008-0021-0000-0000-000022009012
+Message-Id: <5f9da2a4-8e76-5b2e-b455-f91e60e8e505@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-10_02:2020-02-07,2020-02-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 malwarescore=0 adultscore=0 mlxlogscore=999 bulkscore=0
+ spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002100071
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
 
-Nick Desaulniers Reported:
 
-  When building with:
-  $ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
-  The following warning is observed:
-  arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
-  function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
-  static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
-  vector)
-              ^
-  Debugging with:
-  https://github.com/ClangBuiltLinux/frame-larger-than
-  via:
-  $ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
-    kvm_send_ipi_mask_allbutself
-  points to the stack allocated `struct cpumask newmask` in
-  `kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
-  potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
-  the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
-  8192, making a single instance of a `struct cpumask` 1024 B.
+On 07.02.20 17:32, Thomas Huth wrote:
+> On 07/02/2020 12.39, Christian Borntraeger wrote:
+>> From: Janosch Frank <frankja@linux.ibm.com>
+>>
+>> This contains 3 main changes:
+>> 1. changes in SIE control block handling for secure guests
+>> 2. helper functions for create/destroy/unpack secure guests
+>> 3. KVM_S390_PV_COMMAND ioctl to allow userspace dealing with secure
+>> machines
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+> [...]
+>> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+>> index e1cef772fde1..7c21d55d2e49 100644
+>> --- a/arch/s390/include/asm/uv.h
+>> +++ b/arch/s390/include/asm/uv.h
+>> @@ -23,11 +23,19 @@
+>>  #define UVC_RC_INV_STATE	0x0003
+>>  #define UVC_RC_INV_LEN		0x0005
+>>  #define UVC_RC_NO_RESUME	0x0007
+>> +#define UVC_RC_NEED_DESTROY	0x8000
+> 
+> This define is never used. I'd suggest to drop it.
 
-This patch fixes it by pre-allocate 1 cpumask variable per cpu and use it for
-both pv tlb and pv ipis..
+I should be used in 
 
-Reported-by: Nick Desaulniers <ndesaulniers@google.com>
-Acked-by: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Nick Desaulniers <ndesaulniers@google.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
-v1 -> v2:
- * remove '!alloc' check
- * use new pv check helpers
+diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+index da281d8dcc92..8cc927ca061f 100644
+--- a/arch/s390/kvm/pv.c
++++ b/arch/s390/kvm/pv.c
+@@ -189,7 +189,7 @@ int kvm_s390_pv_create_vm(struct kvm *kvm)
+        /* Outputs */
+        kvm->arch.pv.handle = uvcb.guest_handle;
+ 
+-       if (rc && (uvcb.header.rc & 0x8000)) {
++       if (rc && (uvcb.header.rc & UVC_RC_NEED_DESTROY)) {
+                kvm_s390_pv_destroy_vm(kvm);
+                return -EINVAL;
+        }
 
- arch/x86/kernel/kvm.c | 33 +++++++++++++++++++++------------
- 1 file changed, 21 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 76ea8c4..377b224 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -432,6 +432,8 @@ static bool pv_tlb_flush_supported(void)
-         kvm_para_has_feature(KVM_FEATURE_STEAL_TIME));
- }
+Will fix.
 
-+static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
-+
- #ifdef CONFIG_SMP
-
- static bool pv_ipi_supported(void)
-@@ -510,12 +512,12 @@ static void kvm_send_ipi_mask(const struct
-cpumask *mask, int vector)
- static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask,
-int vector)
- {
-     unsigned int this_cpu = smp_processor_id();
--    struct cpumask new_mask;
-+    struct cpumask *new_mask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
-     const struct cpumask *local_mask;
-
--    cpumask_copy(&new_mask, mask);
--    cpumask_clear_cpu(this_cpu, &new_mask);
--    local_mask = &new_mask;
-+    cpumask_copy(new_mask, mask);
-+    cpumask_clear_cpu(this_cpu, new_mask);
-+    local_mask = new_mask;
-     __send_ipi_mask(local_mask, vector);
- }
-
-@@ -595,7 +597,6 @@ static void __init kvm_apf_trap_init(void)
-     update_intr_gate(X86_TRAP_PF, async_page_fault);
- }
-
--static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
-
- static void kvm_flush_tlb_others(const struct cpumask *cpumask,
-             const struct flush_tlb_info *info)
-@@ -603,7 +604,7 @@ static void kvm_flush_tlb_others(const struct
-cpumask *cpumask,
-     u8 state;
-     int cpu;
-     struct kvm_steal_time *src;
--    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_tlb_mask);
-+    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
-
-     cpumask_copy(flushmask, cpumask);
-     /*
-@@ -642,6 +643,7 @@ static void __init kvm_guest_init(void)
-     if (pv_tlb_flush_supported()) {
-         pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
-         pv_ops.mmu.tlb_remove_table = tlb_remove_table;
-+        pr_info("KVM setup pv remote TLB flush\n");
-     }
-
-     if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
-@@ -748,24 +750,31 @@ static __init int activate_jump_labels(void)
- }
- arch_initcall(activate_jump_labels);
-
--static __init int kvm_setup_pv_tlb_flush(void)
-+static __init int kvm_alloc_cpumask(void)
- {
-     int cpu;
-+    bool alloc = false;
-
-     if (!kvm_para_available() || nopv)
-         return 0;
-
--    if (pv_tlb_flush_supported()) {
-+    if (pv_tlb_flush_supported())
-+        alloc = true;
-+
-+#if defined(CONFIG_SMP)
-+    if (pv_ipi_supported())
-+        alloc = true;
-+#endif
-+
-+    if (alloc)
-         for_each_possible_cpu(cpu) {
--            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_tlb_mask, cpu),
-+            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
-                 GFP_KERNEL, cpu_to_node(cpu));
-         }
--        pr_info("KVM setup pv remote TLB flush\n");
--    }
-
-     return 0;
- }
--arch_initcall(kvm_setup_pv_tlb_flush);
-+arch_initcall(kvm_alloc_cpumask);
-
- #ifdef CONFIG_PARAVIRT_SPINLOCKS
-
---
-2.7.4
