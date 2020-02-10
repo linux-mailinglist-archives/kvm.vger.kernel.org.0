@@ -2,57 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 579121576BC
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 13:55:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AEEC1576FB
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 13:56:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729859AbgBJMzB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 07:55:01 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24416 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729804AbgBJMy7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 07:54:59 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ACnDeD084218
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:54:58 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1umrm465-1
+        id S1729595AbgBJM4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 07:56:48 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33242 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727621AbgBJM4r (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 07:56:47 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ACs9oY086583
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:56:46 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1ucj34sw-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:54:58 -0500
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:56:43 -0500
 Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 10 Feb 2020 12:54:56 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Mon, 10 Feb 2020 12:56:41 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 10 Feb 2020 12:54:53 -0000
+        Mon, 10 Feb 2020 12:56:39 -0000
 Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ACspGj50987060
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ACubDO38928472
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Feb 2020 12:54:51 GMT
+        Mon, 10 Feb 2020 12:56:37 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A922142045;
-        Mon, 10 Feb 2020 12:54:51 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 6C7B942045;
+        Mon, 10 Feb 2020 12:56:37 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5274B4203F;
-        Mon, 10 Feb 2020 12:54:51 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 030AA4204B;
+        Mon, 10 Feb 2020 12:56:37 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Feb 2020 12:54:51 +0000 (GMT)
-Subject: Re: [PATCH 03/35] s390/protvirt: introduce host side setup
-To:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-References: <20200207113958.7320-1-borntraeger@de.ibm.com>
- <20200207113958.7320-4-borntraeger@de.ibm.com>
- <ad0d8be2-7af8-d195-ba08-157a649a9ab1@redhat.com>
+        Mon, 10 Feb 2020 12:56:36 +0000 (GMT)
+Subject: Re: [PATCH/RFC] KVM: s390: protvirt: pass-through rc and rrc
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     thuth@redhat.com, Ulrich.Weigand@de.ibm.com, aarcange@redhat.com,
+        david@redhat.com, frankja@linux.ibm.com,
+        frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
+        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, mimu@linux.ibm.com
+References: <62d5cd46-93d7-e272-f9bb-d4ec3c7a1f71@de.ibm.com>
+ <20200210114526.134769-1-borntraeger@de.ibm.com>
+ <a94f3d09-1474-29d2-a2d3-3118170e494e@de.ibm.com>
+ <20200210135040.24f06b8e.cohuck@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -97,25 +94,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 10 Feb 2020 13:54:51 +0100
+Date:   Mon, 10 Feb 2020 13:56:36 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <ad0d8be2-7af8-d195-ba08-157a649a9ab1@redhat.com>
+In-Reply-To: <20200210135040.24f06b8e.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20021012-0008-0000-0000-0000035185CB
+x-cbid: 20021012-0028-0000-0000-000003D934B7
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021012-0009-0000-0000-00004A7222B2
-Message-Id: <af6b0234-c9c8-fdf2-40ea-36621ee5eb44@de.ibm.com>
+x-cbparentid: 20021012-0029-0000-0000-0000249D9F5A
+Message-Id: <b99afb71-c8cb-0608-6583-99ac482f8322@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-10_02:2020-02-10,2020-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- spamscore=0 priorityscore=1501 clxscore=1015 impostorscore=0
- malwarescore=0 phishscore=0 suspectscore=0 mlxscore=0 mlxlogscore=764
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ phishscore=0 impostorscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0
+ mlxlogscore=373 priorityscore=1501 suspectscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002100101
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -124,31 +121,17 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 10.02.20 13:38, David Hildenbrand wrote:
+On 10.02.20 13:50, Cornelia Huck wrote:
+> On Mon, 10 Feb 2020 13:06:19 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> What about the following. I will rip out RC and RRC but add 
+>> a 32bit flags field (which must be 0) and 3*64 bit reserved.
+> 
+> Probably dumb question: How are these new fields supposed to be used?
 
->> +		pr_info("Running as protected virtualization guest.");
-> 
-> /me confused about gluing an informative message to disabling a feature.
-> 
-> Should this actually be a
-> 
-> pr_warn("Protected virtualization not available in protected guests.");
-
-Yes, this is probably better.
-
-> 
->> +	}
->> +
->> +	if (prot_virt_host && !test_facility(158)) {
->> +		prot_virt_host = 0;
->> +		pr_info("The ultravisor call facility is not available.");
-> 
-> It's somehwhat confusing for a user to requested "prot_virt" and get
-> that error message.
-> 
-> pr_warn("Protected virtualization not supported by the hardware".);
-
-
-The name is still in flux, but we can change that later on. Will use your 
-variant.
+This was planned for error handling in QEMU. As we have no user of rc/rrc
+yet, I have ripped that out and added a flag field + 16 bytes of reserved.
+Usage is as usual flags must be 0. When flags!=0 the reserved fields will
+have a new meaning. 
 
