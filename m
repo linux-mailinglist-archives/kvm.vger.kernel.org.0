@@ -2,80 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 47C59157E04
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 15:59:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F349D157EC5
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 16:32:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727662AbgBJO7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 09:59:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23507 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727029AbgBJO7k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Feb 2020 09:59:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581346778;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=ObcJMF9eHWDHZwvar2hIIvlhGKtrGFkhpaN5+VqsSf4=;
-        b=UcUK0OvGD9QI+hMZw9nL5ybVhRACikGYqKVTi6Or1hQMm+mreLCmUueAtp/NioIBTq97sO
-        Kd2+4N5IX0bvuELI/xKQL467KAZJMDCxuwjhtJ3nALf7FtVB/ac5PXuWfBd4ampvJpPMOE
-        h3c8Z7EvO3a2sDV88kJWTVD+yTsFoQo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-Cvox3QXjMWOsgoSU9E01hA-1; Mon, 10 Feb 2020 09:59:35 -0500
-X-MC-Unique: Cvox3QXjMWOsgoSU9E01hA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FBB3190B2A6
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 14:59:34 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-219.ams2.redhat.com [10.36.116.219])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8942786E0D;
-        Mon, 10 Feb 2020 14:59:31 +0000 (UTC)
-Subject: Re: [kvm-unit-tests v2 PATCH] Fixes for the umip test
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20200210143514.5347-1-thuth@redhat.com>
- <8701a05c-21cd-e13b-c94b-4d78b7cfefaf@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <cc9d2b0f-6cea-20ba-3f01-84c9f6cdf12e@redhat.com>
-Date:   Mon, 10 Feb 2020 15:59:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727546AbgBJPcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 10:32:00 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:37796 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727363AbgBJPcA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Feb 2020 10:32:00 -0500
+Received: by mail-il1-f194.google.com with SMTP id v13so559836iln.4
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:32:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lixom-net.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rJKu0curXNDiIv07BXA7ZVrF2bICC0+Hs2nUqvpWWBE=;
+        b=CAXc09ubXS9ZFxUmd/SbvlfA3zsu6fw84nPAia6Y37IBnkkixzVnQQ1DvPc4gVvSDy
+         W6Uq5WrNvmHIM9pR9ez7FYUhIv6XdEX9GEwY2rJl2vY33gTufoWhbjwUcACu+BIPxG5G
+         bAgK1f8xNqN/VhPHCmGFF+SDEbTzUji36h+YGdbhQmDJdX3HrBJ3fQ7RFH6TSmczTUaI
+         l8Lh7ZdUVtAyloybvuqg1r1VSaZqNUt/8vLmi/SyTQGmfdOyC29Tgxf2X4u9kYNOUF8c
+         D8wdvnGGssR7+hgN4BP19DR9Am1ylWfvoMD4pA/mEq3/e3yQTNmVwZHuB6JEdy2D62Br
+         iXZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rJKu0curXNDiIv07BXA7ZVrF2bICC0+Hs2nUqvpWWBE=;
+        b=Ccch2cHJgZRVjt1nrc4/VWF7YU5wBfgvvPNmwSxowhhCZTXXUhlTwok/BlOdGZ/Kg7
+         JJJYJBeBLiUARjaKAJ4N4RaKlMynUNZzNyAbeSRKCIeKkOcW4xau2bAiWL/KJKHByjQt
+         QErf1f8L2PVlfpS5SmKQIDR4kLM3lOgQKuRbXlOx//KoH8Ta9P53DahF4MA4wAJ1C4zJ
+         FmpxbiGLJMK6M0aZsn6yjeEKSMVRbpOnG6SkcODpzTsH6Igk6FWXnusslqdt9Mc6pkFl
+         QMrNn1XrCSi04I3NdFl4WpiGqdDzU7ExWUmIRjqxFyxCLttc9h7eLfgpQYQkvXDyAg9X
+         n/8g==
+X-Gm-Message-State: APjAAAUvpMKcMqjLQOqS1VT11RsFhP4mUd8+J73//MnOoidYX9/nZw3Y
+        oFJ4OLto0DwtW3zV6nSwvNelW7qdykSlZlffMirytQ==
+X-Google-Smtp-Source: APXvYqxYx29kgSFceIBbFGWRItTIbjo6m8Fbpp5JsPt65w5bFXVn9ceiixXHhUS3KHfAZHhdKoQKoj4ONXPF4oZheGk=
+X-Received: by 2002:a92:9f1a:: with SMTP id u26mr1986348ili.72.1581348719752;
+ Mon, 10 Feb 2020 07:31:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <8701a05c-21cd-e13b-c94b-4d78b7cfefaf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20200210141324.21090-1-maz@kernel.org>
+In-Reply-To: <20200210141324.21090-1-maz@kernel.org>
+From:   Olof Johansson <olof@lixom.net>
+Date:   Mon, 10 Feb 2020 16:21:42 +0100
+Message-ID: <CAOesGMhHkez-5vxwWuzXc2Rm=dYYWjMX9C8AewVy9GDWuZcwMw@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Linux ARM Mailing List <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Anders Berg <anders.berg@lsi.com>,
+        Vladimir Murzin <vladimir.murzin@arm.com>,
+        Russell King <linux@arm.linux.org.uk>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Christoffer Dall <Christoffer.Dall@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/02/2020 15.56, Paolo Bonzini wrote:
-> On 10/02/20 15:35, Thomas Huth wrote:
->>  #define GP_ASM(stmt, in, clobber)                  \
->> -     asm ("mov" W " $1f, %[expected_rip]\n\t"      \
->> +    asm volatile (                                 \
->> +          "mov" W " $1f, %[expected_rip]\n\t"      \
->>            "movl $2f-1f, %[skip_count]\n\t"         \
->>            "1: " stmt "\n\t"                        \
->>            "2: "                                    \
->> @@ -159,7 +160,7 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
->>  		  : [ret] "=&a" (ret)
->>  		  : [user_ds] "i" (USER_DS),
->>  		    [user_cs] "i" (USER_CS),
->> -		    [user_stack_top]"m"(user_stack[sizeof user_stack]),
->> +		    [user_stack_top]"m"(user_stack[sizeof(user_stack) - 2]),
-> 
-> This should be "- sizeof(long)" in order to keep the stack aligned.
-> 
-> I can fix this when I apply.
+On Mon, Feb 10, 2020 at 3:13 PM Marc Zyngier <maz@kernel.org> wrote:
+>
+> KVM/arm was merged just over 7 years ago, and has lived a very quiet
+> life so far. It mostly works if you're prepared to deal with its
+> limitations, it has been a good prototype for the arm64 version,
+> but it suffers a few problems:
+>
+> - It is incomplete (no debug support, no PMU)
+> - It hasn't followed any of the architectural evolutions
+> - It has zero users (I don't count myself here)
+> - It is more and more getting in the way of new arm64 developments
+>
+> So here it is: unless someone screams and shows that they rely on
+> KVM/arm to be maintained upsteam, I'll remove 32bit host support
+> form the tree. One of the reasons that makes me confident nobody is
+> using it is that I never receive *any* bug report. Yes, it is perfect.
+> But if you depend on KVM/arm being available in mainline, please shout.
+>
+> To reiterate: 32bit guest support for arm64 stays, of course. Only
+> 32bit host goes. Once this is merged, I plan to move virt/kvm/arm to
+> arm64, and cleanup all the now unnecessary abstractions.
+>
+> The patches have been generated with the -D option to avoid spamming
+> everyone with huge diffs, and there is a kvm-arm/goodbye branch in
+> my kernel.org repository.
+>
+> Marc Zyngier (5):
+>   arm: Unplug KVM from the build system
+>   arm: Remove KVM from config files
+>   arm: Remove 32bit KVM host support
+>   arm: Remove HYP/Stage-2 page-table support
+>   arm: Remove GICv3 vgic compatibility macros
 
-Thanks!
+Since I'm generally happy to drop legacy code that has no users, with
+the "if there are any significant users that speak up, I'll revoke my
+support" caveat:
 
- Thomas
+Acked-by: Olof Johansson <olof@lixom.net>
 
+
+-Olof
