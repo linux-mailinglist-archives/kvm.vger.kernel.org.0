@@ -2,136 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 17AB8158370
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 20:19:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4EDE1583C3
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 20:33:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727604AbgBJTTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 14:19:00 -0500
-Received: from mga18.intel.com ([134.134.136.126]:50779 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727056AbgBJTTA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Feb 2020 14:19:00 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Feb 2020 11:19:00 -0800
-X-IronPort-AV: E=Sophos;i="5.70,426,1574150400"; 
-   d="scan'208";a="405682140"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Feb 2020 11:18:59 -0800
-Message-ID: <d943ada56babfbebf408ad0f94988a5b09d2b472.camel@linux.intel.com>
-Subject: Should I repost? (was: Re: [PATCH v16.1 0/9] mm / virtio: Provide
- support for free page reporting)
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     akpm@linux-foundation.org, mgorman@techsingularity.net,
-        david@redhat.com
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de,
-        vbabka@suse.cz, AlexanderDuyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org
-Date:   Mon, 10 Feb 2020 11:18:59 -0800
-In-Reply-To: <6758b1e3373fc06b37af1c87901237974d52322f.camel@linux.intel.com>
-References: <20200122173040.6142.39116.stgit@localhost.localdomain>
-         <6758b1e3373fc06b37af1c87901237974d52322f.camel@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1727669AbgBJTdM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 14:33:12 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20156 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727604AbgBJTdM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 14:33:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581363190;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KMGTDJZkPMbNI+3IMfPL5+AglR9F0y1G1+wx9lx+BsI=;
+        b=TcPQpmue+JLSX8FYKYt9F8+9+ilvj9HwZGbs5qLxrXEOkODtkXwierfmqq4q80RrCRKf7y
+        Ke7ytNffFrFPTaWc44oF6dm2aKDNQ1R0CrVXV4WHMUFvmFCcx/Om1kQLqMMgbC6L61UsNz
+        EHMfaZxtljDmaCydJLjPCuGGWSqJNxk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-i2rUGfZGNU2OfFOEN89h9Q-1; Mon, 10 Feb 2020 14:33:08 -0500
+X-MC-Unique: i2rUGfZGNU2OfFOEN89h9Q-1
+Received: by mail-wr1-f70.google.com with SMTP id s13so5520750wru.7
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 11:33:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=KMGTDJZkPMbNI+3IMfPL5+AglR9F0y1G1+wx9lx+BsI=;
+        b=EYErjQSqsDPxyMoQxhxfzlnZt0JFIo+ME/5oYxeSLoisDNth/mQkdJh9epcAPXHaI5
+         fLvYZb40nrlIvCxag4prZ8IA3EQvfSF2V+o4NtBaVB4bI5hItBqt1/f8RMjJlK5dQ35Q
+         KsVl7W0XnZePQXso9SJaWfSwG92EBvTlAyqu6dLIDxuzP9gqlXyHmH1POQ61XQpCSEt3
+         Pi+zk4YNNIDYSY3D/+j9jyKa0m1Gxsm0WJv72QMoMql9bBZ194+QExDUD7HIhBDmDEi1
+         +Yn13KF0V3fagJoxxYy58HAkJGtz3Oc2eyMmILqKzKoBmC015BgV20PITvlA3wjQHMvB
+         1SjQ==
+X-Gm-Message-State: APjAAAUch4r1baTJD1+WgVvf2hIhrXJDpRp91CvTKslpAgclwa0Qjxs6
+        hJQl4lhneIxQiUbO34MTOvz9R2+yoz8uWzhKMp/Jc1tVrw+tOlDaIv25Ti0ENI++2y45RSs/IgX
+        Plt0mH/BlWiGk
+X-Received: by 2002:a7b:c651:: with SMTP id q17mr547563wmk.5.1581363187537;
+        Mon, 10 Feb 2020 11:33:07 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwOFQo4U+msfHUzbyhRVj8cg0iNrOibhxMs/UaxDfGLpnaLdW3bHIUiRE0Ps7lwZNvo2fOj/g==
+X-Received: by 2002:a7b:c651:: with SMTP id q17mr547530wmk.5.1581363187308;
+        Mon, 10 Feb 2020 11:33:07 -0800 (PST)
+Received: from [192.168.3.122] (p5B0C6A1F.dip0.t-ipconnect.de. [91.12.106.31])
+        by smtp.gmail.com with ESMTPSA id a16sm1803138wrx.87.2020.02.10.11.33.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Feb 2020 11:33:06 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   David Hildenbrand <david@redhat.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 02/35] KVM: s390/interrupt: do not pin adapter interrupt pages
+Date:   Mon, 10 Feb 2020 20:33:06 +0100
+Message-Id: <567B980B-BDA5-4EF3-A96E-1542D11F2BD4@redhat.com>
+References: <083a3fd0-7b56-e92b-bf15-3383b7f5488b@de.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>
+In-Reply-To: <083a3fd0-7b56-e92b-bf15-3383b7f5488b@de.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+X-Mailer: iPhone Mail (17C54)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-02-03 at 14:05 -0800, Alexander Duyck wrote:
-> On Wed, 2020-01-22 at 09:43 -0800, Alexander Duyck wrote:
-> > This series provides an asynchronous means of reporting free guest pages
-> > to a hypervisor so that the memory associated with those pages can be
-> > dropped and reused by other processes and/or guests on the host. Using
-> > this it is possible to avoid unnecessary I/O to disk and greatly improve
-> > performance in the case of memory overcommit on the host.
-> 
-> <snip>
-> 
-> > A brief history on the background of free page reporting can be found at:
-> > https://lore.kernel.org/lkml/29f43d5796feed0dec8e8bb98b187d9dac03b900.camel@linux.intel.com/
-> > 
-> > Changes from v14:
-> > https://lore.kernel.org/lkml/20191119214454.24996.66289.stgit@localhost.localdomain/
-> > Renamed "unused page reporting" to "free page reporting"
-> >   Updated code, kconfig, and patch descriptions
-> > Split out patch for __free_isolated_page
-> >   Renamed function to __putback_isolated_page
-> > Rewrote core reporting functionality
-> >   Added logic to reschedule worker in 2 seconds instead of run to completion
-> >   Removed reported_pages statistics
-> >   Removed REPORTING_REQUESTED bit used in zone flags
-> >   Replaced page_reporting_dev_info refcount with state variable
-> >   Removed scatterlist from page_reporting_dev_info
-> >   Removed capacity from page reporting device
-> >   Added dynamic scatterlist allocation/free at start/end of reporting process
-> >   Updated __free_one_page so that reported pages are not always added to tail
-> >   Added logic to handle error from report function
-> > Updated virtio-balloon patch that adds support for page reporting
-> >   Updated patch description to try and highlight differences in approaches
-> >   Updated logic to reflect that we cannot limit the scatterlist from device
-> >   Added logic to return error from report function
-> > Moved documentation patch to end of patch set
-> > 
-> > Changes from v15:
-> > https://lore.kernel.org/lkml/20191205161928.19548.41654.stgit@localhost.localdomain/
-> > Rebased on linux-next-20191219
-> > Split out patches for budget and moving head to last page processed
-> > Updated budget code to reduce how much memory is reported per pass
-> > Added logic to also rotate the list if we exit due a page isolation failure
-> > Added migratetype as argument in __putback_isolated_page
-> > 
-> > Changes from v16:
-> > https://lore.kernel.org/lkml/20200103210509.29237.18426.stgit@localhost.localdomain/
-> > Rebased on linux-next-20200122
-> >   Updated patch 2 to to account for removal of pr_info in __isolate_free_page
-> > Updated patch title for patches 7, 8, and 9 to use prefix mm/page_reporting
-> > No code changes other than conflict resolution for patch 2
-> 
-> So I thought I would put out a gentle nudge since it has been about 4
-> weeks since v16 was submitted, a little over a week and a half for v16.1,
-> and I have yet to get any feedback on the code contained in the patchset.
-> Codewise nothing has changed from the v16 patchset other than rebasing it
-> off of the linux-next tree to resolve some merge conflicts that I saw
-> recently, and discussion around v16.1 was mostly about next steps and how
-> to deal with the page cache instead of discussing the code itself.
-> 
-> The full patchset can be found at:
-> https://lore.kernel.org/lkml/20200122173040.6142.39116.stgit@localhost.localdomain/
-> 
-> I believe I still need review feedback for patches 3, 4, 7, 8, and 9.
-> 
-> Thanks.
-> 
-> - Alex
-
-So I had posted this patch set a few days before Linus's merge window
-opened. When I posted it the discussion was about what the follow-up on
-this patch set will be in terms of putting pressure on the page cache to
-force it to shrink. However I didn't get any review comments on the code
-itself.
-
-My last understanding on this patch set is that I am waiting on patch
-feedback from Mel Gorman as he had the remaining requests that led to most
-of the changes in v15 and v16. I believe I have addressed them, but I
-don't believe he has had a chance to review them.
-
-I am wondering now if it is still possible to either get it reviewed
-and/or applied without reposting, or do I need to repost it since it has
-been several weeks since I submitted it? The patch set still applies to
-the linux-next tree without any issues.
-
-Thanks.
-
-- Alex
 
 
+> Am 10.02.2020 um 19:41 schrieb Christian Borntraeger <borntraeger@de.ibm.c=
+om>:
+>=20
+> =EF=BB=BF
+>=20
+>> On 10.02.20 13:26, David Hildenbrand wrote:
+>>> On 07.02.20 12:39, Christian Borntraeger wrote:
+>>> From: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+>>>=20
+>>> The adapter interrupt page containing the indicator bits is currently
+>>> pinned. That means that a guest with many devices can pin a lot of
+>>> memory pages in the host. This also complicates the reference tracking
+>>> which is needed for memory management handling of protected virtual
+>>> machines.
+>>> We can reuse the pte notifiers to "cache" the page without pinning it.
+>>>=20
+>>> Signed-off-by: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+>>> Suggested-by: Andrea Arcangeli <aarcange@redhat.com>
+>>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>> ---
+>>=20
+>> So, instead of pinning explicitly, look up the page address, cache it,
+>> and glue its lifetime to the gmap table entry. When that entry is
+>> changed, invalidate the cached page. On re-access, look up the page
+>> again and register the gmap notifier for the table entry again.
+>=20
+> I think I might want to split this into two parts.
+> part 1: a naive approach that always does get_user_pages_remote/put_page
+> part 2: do the complex caching
+>=20
+> Ulrich mentioned that this actually could make the map/unmap a no-op as we=
 
+> have the address and bit already in the irq route. In the end this might b=
+e
+> as fast as todays pinning as we replace a list walk with a page table walk=
+.=20
+> Plus it would simplify the code. Will have a look if that is the case.
+
+If we could simplify that heavily, that would be awesome!=
 
