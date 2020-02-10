@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F571157295
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 11:10:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F364D157330
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 12:02:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727549AbgBJKKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 05:10:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5620 "EHLO
+        id S1727496AbgBJLCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 06:02:04 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52032 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727045AbgBJKKD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 05:10:03 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AA9VQr167316
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 05:10:02 -0500
+        by vger.kernel.org with ESMTP id S1727437AbgBJLCE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 06:02:04 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AAx885023283
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 06:02:03 -0500
 Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1umrejuy-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1tpbagm1-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 05:10:01 -0500
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 06:02:03 -0500
 Received: from localhost
         by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 10 Feb 2020 10:09:59 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        Mon, 10 Feb 2020 11:02:01 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
         by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 10 Feb 2020 10:09:57 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01AA9uB942598536
+        Mon, 10 Feb 2020 11:01:57 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01AB12Io46072280
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Feb 2020 10:09:56 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 81C9AAE051;
-        Mon, 10 Feb 2020 10:09:56 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2B656AE053;
-        Mon, 10 Feb 2020 10:09:56 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.98.183])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Feb 2020 10:09:56 +0000 (GMT)
+        Mon, 10 Feb 2020 11:01:03 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DA46EA405E;
+        Mon, 10 Feb 2020 11:01:56 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 93803A4051;
+        Mon, 10 Feb 2020 11:01:56 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Feb 2020 11:01:56 +0000 (GMT)
 Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
  crashes in KVM guests after reboot
 To:     Eugenio Perez Martin <eperezma@redhat.com>
@@ -108,26 +108,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 10 Feb 2020 11:09:55 +0100
+Date:   Mon, 10 Feb 2020 12:01:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
 In-Reply-To: <CAJaqyWfngzP4d01B6+Sqt8FXN6jX7kGegjx8ie4no_1Er3igQA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20021010-4275-0000-0000-0000039FB489
+x-cbid: 20021011-4275-0000-0000-0000039FB957
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021010-4276-0000-0000-000038B3E7E9
-Message-Id: <656663f4-87b5-5efa-07e5-235a0a5d4597@de.ibm.com>
+x-cbparentid: 20021011-4276-0000-0000-000038B3ECDF
+Message-Id: <43a5dbaa-9129-e220-8483-45c60a82c945@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-10_02:2020-02-10,2020-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- spamscore=0 priorityscore=1501 clxscore=1015 impostorscore=0
- malwarescore=0 phishscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002100079
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0
+ clxscore=1015 mlxlogscore=903 mlxscore=0 suspectscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002100086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -135,98 +135,12 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 10.02.20 10:40, Eugenio Perez Martin wrote:
+On 10.02.20 10:47, Eugenio Perez Martin wrote:
 > Hi Christian.
 > 
 > I'm not able to reproduce the failure with eccb852f1fe6bede630e2e4f1a121a81e34354ab commit. Could you add more data? Your configuration (libvirt or qemu line), and host's dmesg output if any?
-
-I do the following in the guest:
-ping -c 200 -f somevalidip; reboot
-sometimes I need to do that multiple times and sometimes I do not get a guest crash but host dmesg like
-
-Guest moved used index from 0 to 292
-
-xml is pretty simple
-
-    <interface type='direct'>
-      <mac address='52:54:00:7c:2c:f3'/>
-      <source dev='encbd00' mode='bridge'/>
-      <model type='virtio'/>
-      <driver name='vhost'/>
-      <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0001'/>
-    </interface>
-
-
-Reverting this patch seems to make both problems go away.
-
-
 > 
 > Thanks!
-> 
-> On Fri, Feb 7, 2020 at 9:13 AM Christian Borntraeger <borntraeger@de.ibm.com <mailto:borntraeger@de.ibm.com>> wrote:
-> 
-> 
-> 
->     On 07.02.20 08:58, Michael S. Tsirkin wrote:
->     > On Fri, Feb 07, 2020 at 08:47:14AM +0100, Christian Borntraeger wrote:
->     >> Also adding Cornelia.
->     >>
->     >>
->     >> On 06.02.20 23:17, Michael S. Tsirkin wrote:
->     >>> On Thu, Feb 06, 2020 at 04:12:21PM +0100, Christian Borntraeger wrote:
->     >>>>
->     >>>>
->     >>>> On 06.02.20 15:22, eperezma@redhat.com <mailto:eperezma@redhat.com> wrote:
->     >>>>> Hi Christian.
->     >>>>>
->     >>>>> Could you try this patch on top of ("38ced0208491 vhost: use batched version by default")?
->     >>>>>
->     >>>>> It will not solve your first random crash but it should help with the lost of network connectivity.
->     >>>>>
->     >>>>> Please let me know how does it goes.
->     >>>>
->     >>>>
->     >>>> 38ced0208491 + this seem to be ok.
->     >>>>
->     >>>> Not sure if you can make out anything of this (and the previous git bisect log)
->     >>>
->     >>> Yes it does - that this is just bad split-up of patches, and there's
->     >>> still a real bug that caused worse crashes :)
->     >>>
->     >>> So I just pushed batch-v4.
->     >>> I expect that will fail, and bisect to give us
->     >>>     vhost: batching fetches
->     >>> Can you try that please?
->     >>>
->     >>
->     >> yes.
->     >>
->     >> eccb852f1fe6bede630e2e4f1a121a81e34354ab is the first bad commit
->     >> commit eccb852f1fe6bede630e2e4f1a121a81e34354ab
->     >> Author: Michael S. Tsirkin <mst@redhat.com <mailto:mst@redhat.com>>
->     >> Date:   Mon Oct 7 06:11:18 2019 -0400
->     >>
->     >>     vhost: batching fetches
->     >>     
->     >>     With this patch applied, new and old code perform identically.
->     >>     
->     >>     Lots of extra optimizations are now possible, e.g.
->     >>     we can fetch multiple heads with copy_from/to_user now.
->     >>     We can get rid of maintaining the log array.  Etc etc.
->     >>     
->     >>     Signed-off-by: Michael S. Tsirkin <mst@redhat.com <mailto:mst@redhat.com>>
->     >>
->     >>  drivers/vhost/test.c  |  2 +-
->     >>  drivers/vhost/vhost.c | 39 ++++++++++++++++++++++++++++++++++-----
->     >>  drivers/vhost/vhost.h |  4 +++-
->     >>  3 files changed, 38 insertions(+), 7 deletions(-)
->     >>
->     >
->     >
->     > And the symptom is still the same - random crashes
->     > after a bit of traffic, right?
-> 
->     random guest crashes after a reboot of the guests. As if vhost would still
->     write into now stale buffers.
-> 
+
+If it was not obvious, this is on s390x, a big endian system.
 
