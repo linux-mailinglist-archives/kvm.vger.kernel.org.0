@@ -2,103 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C200D157C1B
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 14:35:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B684157C86
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 14:40:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728043AbgBJNew (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 08:34:52 -0500
-Received: from mail-eopbgr60056.outbound.protection.outlook.com ([40.107.6.56]:45027
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727810AbgBJNev (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Feb 2020 08:34:51 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NVzveOVfN8Xz03ksgNbMr4idgkvXDa4UJuOEVyHJs7yjUdF/NhLEL8xy46vF1DXiGMqx3hJfaffI3/utfy3gBQPC/1P+zsIKZoi5RCCCVUUO30mn2N3Smn1G9YOXe1/6dIoCnm6TO6qKQYP4hOOQDZ02oJAorYRejw7Ee653FcUVwdMR/cvUiCATBCuGtKcUHDZ454xwn2Jg9mFB0Siw7Xm2eKxB2KLEU68huumecTvaPTreCsZD/sYQ5gsKizNZX2VLxHJZqT0eE7vGPu8JUJ8P0xKomxzhhgr0CSBI2yro2ptxf1W62ScLvE++cJzG52NEWFvDmwWNfXK3oAvnwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GaZwTrZDk3+PW79yrrqW4udBycnyk2AgyvXtnszqCh0=;
- b=CcnW1wcBwhJw+og1Ut8119zGiTAePKe7B7XKjLWDL0DrgiaXw+8kGFY63Smmw2LZsSau7pQM/8hvPR0rpjsteuPx6XRDqp7Ff40elaaGeOUatm8Ix8mPkPJRxgQHdc6U5RrMsjejD+M0gZ6h8AK6umIomFNFph+aFa0VdY1woexieiBWoOzoXhYaGMLdPubEmL4kHZIhQnahUxzuYIVqExsiwsim5cDgOqbQ3Odwei24m1y8HAs0zq4fCoYWnJKwMXxwD/oTcQ3/sBllAFPACyNl+FFKXQ1zBsVFlndNP8eMrW1J8S35xa1VV0DlVhldLkC8085ARzCaXOsCwLg17g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GaZwTrZDk3+PW79yrrqW4udBycnyk2AgyvXtnszqCh0=;
- b=kC2Bb9TIdknNEFb3gDBe1E9ApYXXtpQEV/3soJEKHJxcExIbVm0KP6CY/Rk4zZla1lcK5yROaudbo1DZ79Lp9EP4kYT0YE+yXmq8kA6fvK8pvkJNuFd5qJpkORwQB03MjoMEF2fx/ovo4jD/rxJLZlA7z0T5yEfR6boL3nqwnvQ=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
- VI1PR05MB5693.eurprd05.prod.outlook.com (20.178.124.87) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.25; Mon, 10 Feb 2020 13:34:46 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2707.030; Mon, 10 Feb 2020
- 13:34:46 +0000
-Date:   Mon, 10 Feb 2020 09:34:42 -0400
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, lingshan.zhu@intel.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
-        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
-        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
-Subject: Re: [PATCH V2 4/5] virtio: introduce a vDPA based transport
-Message-ID: <20200210133442.GS23346@mellanox.com>
-References: <20200210035608.10002-1-jasowang@redhat.com>
- <20200210035608.10002-5-jasowang@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200210035608.10002-5-jasowang@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: MN2PR10CA0003.namprd10.prod.outlook.com
- (2603:10b6:208:120::16) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
+        id S1727433AbgBJNkZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 08:40:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46362 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727417AbgBJNkY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 08:40:24 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ADeFqm129864
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 08:40:23 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1ubqdmpv-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 08:40:23 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 10 Feb 2020 13:40:21 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 10 Feb 2020 13:40:18 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ADeHKD33751142
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Feb 2020 13:40:17 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E163B42049;
+        Mon, 10 Feb 2020 13:40:16 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8F0A34204B;
+        Mon, 10 Feb 2020 13:40:16 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Feb 2020 13:40:16 +0000 (GMT)
+Subject: Re: [PATCH 31/35] KVM: s390: protvirt: Add UV debug trace
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-32-borntraeger@de.ibm.com>
+ <20200210142229.41da20dd.cohuck@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Mon, 10 Feb 2020 14:40:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR10CA0003.namprd10.prod.outlook.com (2603:10b6:208:120::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.21 via Frontend Transport; Mon, 10 Feb 2020 13:34:46 +0000
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1j19D0-0007da-Dx; Mon, 10 Feb 2020 09:34:42 -0400
-X-Originating-IP: [142.68.57.212]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 25ec9ef4-7192-407d-6259-08d7ae2dfe74
-X-MS-TrafficTypeDiagnostic: VI1PR05MB5693:|VI1PR05MB5693:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB56939BD3265A5DA05A710F4FCF190@VI1PR05MB5693.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
-X-Forefront-PRVS: 03094A4065
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(346002)(376002)(366004)(39860400002)(199004)(189003)(33656002)(4744005)(36756003)(86362001)(5660300002)(1076003)(7416002)(316002)(66946007)(66476007)(66556008)(9746002)(9786002)(8936002)(2906002)(81156014)(52116002)(81166006)(4326008)(8676002)(6916009)(478600001)(2616005)(26005)(186003)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB5693;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-Received-SPF: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YtvaUXxzyYCj0pgU9Eg9keN35LKCSqyajPZxI905JRj11wLMxtYAEPa+nLINWL3o0WGqS9oBKxsKm5zmaiBzl2LDzTMDWaudCZBBq145H8ZpPY33e2CoAeHQ2PrO79/9uXAmhuULv8GCn/Ah1OqYIrVimheg2es5qKwOHHbQxIdQUi1iuiRdzgrCn9FNAazngDZuwo+o39s/CYy/4iel+FKT5fLW1weTjKhWZBXTKIyOlIOD95c0jYTn4q1pdciS1vZo14+AIXaG0mC/ZG88Ka3S5cTvmTAGCPxIpnVZ/NQvoR+EWwSDPzP/My3C0qBV5dwi3M9pUXn1XffqFlUW1cTzfzhtRlPeHw9zncG833vHgFqqF4HJaLu5WBKjxVP/G90PH5nDcRPKQ4g9cq6k6s/mlvEwe9OP1+EhPBTCfE1ElzhKnA1+t8ys8MjlxkfzZNFwqh86kN8p9P0Og4wc2KwGzHRqAwi1+eCpwDaupUciDcm8HNQ8hFc4Khi+ZHdq
-X-MS-Exchange-AntiSpam-MessageData: CIfrORGkJvDfy+1AFpTaIVIepe25xJRzSvJHNesSmByTLAqMjmHrCN+QEKzTXE6KqbDIQWiuPiA0NMdEwHgGGOsekA2xCRDrU5emtcnb8XC29S1a8/VbIiaBUn3cAMLbFBpEW05Iak+cXoINndaL4g==
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 25ec9ef4-7192-407d-6259-08d7ae2dfe74
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2020 13:34:46.5204
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dSYCotorbWwV1JeU4KqH7/avPuFIxu20RpiHphMzFN55hK9WttMyFe2tQNyj3ibEswqN73mEb3fSJqlrvuO0ng==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5693
+In-Reply-To: <20200210142229.41da20dd.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021013-0012-0000-0000-000003858342
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021013-0013-0000-0000-000021C1FA6C
+Message-Id: <85947d75-2907-a985-2aa2-14478ecec227@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-10_04:2020-02-10,2020-02-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=2 mlxscore=0
+ priorityscore=1501 phishscore=0 adultscore=0 spamscore=0 clxscore=1015
+ bulkscore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=918
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002100108
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 10, 2020 at 11:56:07AM +0800, Jason Wang wrote:
-> This patch introduces a vDPA transport for virtio. This is used to
-> use kernel virtio driver to drive the mediated device that is capable
-> of populating virtqueue directly.
 
-Is this comment still right? Is there a mediated device still?
 
-Jason
+On 10.02.20 14:22, Cornelia Huck wrote:
+> On Fri,  7 Feb 2020 06:39:54 -0500
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> From: Janosch Frank <frankja@linux.ibm.com>
+>>
+>> Let's have some debug traces which stay around for longer than the
+>> guest.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  arch/s390/kvm/kvm-s390.c |  9 ++++++++-
+>>  arch/s390/kvm/kvm-s390.h |  9 +++++++++
+>>  arch/s390/kvm/pv.c       | 20 +++++++++++++++++++-
+>>  3 files changed, 36 insertions(+), 2 deletions(-)
+> (...)
+>> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+>> index a58f5106ba5f..da281d8dcc92 100644
+>> --- a/arch/s390/kvm/pv.c
+>> +++ b/arch/s390/kvm/pv.c
+>> @@ -74,6 +74,8 @@ int kvm_s390_pv_destroy_vm(struct kvm *kvm)
+>>  	atomic_set(&kvm->mm->context.is_protected, 0);
+>>  	VM_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x",
+>>  		 ret >> 16, ret & 0x0000ffff);
+>> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x",
+>> +		 ret >> 16, ret & 0x0000ffff);
+>>  	return rc;
+>>  }
+>>  
+>> @@ -89,6 +91,8 @@ int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu)
+>>  
+>>  		VCPU_EVENT(vcpu, 3, "PROTVIRT DESTROY VCPU: cpu %d rc %x rrc %x",
+>>  			   vcpu->vcpu_id, ret >> 16, ret & 0x0000ffff);
+> 
+> I think these should drop the vcpu_id, as VCPU_EVENT already includes
+> it (in the patch introducing them).
+
+ack, this is patch 8.
+
+> 
+>> +		KVM_UV_EVENT(vcpu->kvm, 3, "PROTVIRT DESTROY VCPU: cpu %d rc %x rrc %x",
+>> +			     vcpu->vcpu_id, ret >> 16, ret & 0x0000ffff);
+
+>>  	}
+>>  
+>>  	free_pages(vcpu->arch.pv.stor_base,
+> 
+> Otherwise, looks good.
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
+
