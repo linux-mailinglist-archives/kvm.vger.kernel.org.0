@@ -2,52 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 13D0E1573D4
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 13:06:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 177FC157452
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2020 13:14:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbgBJMG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Feb 2020 07:06:29 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43918 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726950AbgBJMG2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 07:06:28 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ABwxHw143736
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:06:27 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1tpbcsev-1
+        id S1727681AbgBJMOM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Feb 2020 07:14:12 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48502 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727079AbgBJMOM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 10 Feb 2020 07:14:12 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AC9k9R021434
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:14:10 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1u1hv71s-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:06:27 -0500
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2020 07:14:10 -0500
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 10 Feb 2020 12:06:25 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Mon, 10 Feb 2020 12:14:08 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 10 Feb 2020 12:06:22 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01AC5Qa327459938
+        Mon, 10 Feb 2020 12:14:05 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ACE4jw52625596
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Feb 2020 12:05:26 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7439CA405F;
-        Mon, 10 Feb 2020 12:06:20 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 05704A4040;
-        Mon, 10 Feb 2020 12:06:20 +0000 (GMT)
+        Mon, 10 Feb 2020 12:14:04 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0CC8A4203F;
+        Mon, 10 Feb 2020 12:14:04 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A969442047;
+        Mon, 10 Feb 2020 12:14:03 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.61])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Feb 2020 12:06:19 +0000 (GMT)
-Subject: Re: [PATCH/RFC] KVM: s390: protvirt: pass-through rc and rrc
-Cc:     Ulrich.Weigand@de.ibm.com, aarcange@redhat.com, cohuck@redhat.com,
-        david@redhat.com, frankja@linux.ibm.com,
-        frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
-        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, mimu@linux.ibm.com
-References: <62d5cd46-93d7-e272-f9bb-d4ec3c7a1f71@de.ibm.com>
- <20200210114526.134769-1-borntraeger@de.ibm.com>
-To:     thuth@redhat.com
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Feb 2020 12:14:03 +0000 (GMT)
+Subject: Re: [PATCH 03/35] s390/protvirt: introduce host side setup
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-4-borntraeger@de.ibm.com>
+ <20200210125452.7f66706d.cohuck@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -92,345 +97,98 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 10 Feb 2020 13:06:19 +0100
+Date:   Mon, 10 Feb 2020 13:14:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200210114526.134769-1-borntraeger@de.ibm.com>
+In-Reply-To: <20200210125452.7f66706d.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20021012-0016-0000-0000-000002E5765C
+x-cbid: 20021012-4275-0000-0000-0000039FBE94
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021012-0017-0000-0000-0000334866E6
-Message-Id: <a94f3d09-1474-29d2-a2d3-3118170e494e@de.ibm.com>
+x-cbparentid: 20021012-4276-0000-0000-000038B3F243
+Message-Id: <f8175088-2041-46ac-dee7-8d0e7b22863d@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-10_02:2020-02-10,2020-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0
- clxscore=1015 mlxlogscore=978 mlxscore=0 suspectscore=3 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002100095
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ impostorscore=0 bulkscore=0 mlxlogscore=999 mlxscore=0 phishscore=0
+ lowpriorityscore=0 spamscore=0 adultscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002100097
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-What about the following. I will rip out RC and RRC but add 
-a 32bit flags field (which must be 0) and 3*64 bit reserved.
 
 
-On 10.02.20 12:45, Christian Borntraeger wrote:
-> This would be one variant to get the RC/RRC to userspace.
+On 10.02.20 12:54, Cornelia Huck wrote:
+> On Fri,  7 Feb 2020 06:39:26 -0500
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/kvm/kvm-s390.c | 34 +++++++++++++++++++++++++---------
->  arch/s390/kvm/kvm-s390.h | 15 ++++++++-------
->  arch/s390/kvm/pv.c       | 30 ++++++++++++++++++++++--------
->  include/uapi/linux/kvm.h |  4 ++--
->  4 files changed, 57 insertions(+), 26 deletions(-)
+>> From: Vasily Gorbik <gor@linux.ibm.com>
+>>
+>> Add "prot_virt" command line option which controls if the kernel
+>> protected VMs support is enabled at early boot time. This has to be
+>> done early, because it needs large amounts of memory and will disable
+>> some features like STP time sync for the lpar.
+>>
+>> Extend ultravisor info definitions and expose it via uv_info struct
+>> filled in during startup.
+>>
+>> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  .../admin-guide/kernel-parameters.txt         |  5 ++
+>>  arch/s390/boot/Makefile                       |  2 +-
+>>  arch/s390/boot/uv.c                           | 21 +++++++-
+>>  arch/s390/include/asm/uv.h                    | 46 +++++++++++++++--
+>>  arch/s390/kernel/Makefile                     |  1 +
+>>  arch/s390/kernel/setup.c                      |  4 --
+>>  arch/s390/kernel/uv.c                         | 49 +++++++++++++++++++
+>>  7 files changed, 119 insertions(+), 9 deletions(-)
+>>  create mode 100644 arch/s390/kernel/uv.c
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index e1bccbb41fdd..8dae9629b47f 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2172,6 +2172,8 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  	int r = 0;
->  	void __user *argp = (void __user *)cmd->data;
->  
-> +	cmd->rc = 0;
-> +	cmd->rrc = 0;
->  	switch (cmd->cmd) {
->  	case KVM_PV_VM_CREATE: {
->  		r = -EINVAL;
-> @@ -2192,7 +2194,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  			mutex_unlock(&kvm->lock);
->  			break;
->  		}
-> -		r = kvm_s390_pv_create_vm(kvm);
-> +		r = kvm_s390_pv_create_vm(kvm, cmd);
->  		kvm_s390_vcpu_unblock_all(kvm);
->  		mutex_unlock(&kvm->lock);
->  		break;
-> @@ -2205,7 +2207,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  		/* All VCPUs have to be destroyed before this call. */
->  		mutex_lock(&kvm->lock);
->  		kvm_s390_vcpu_block_all(kvm);
-> -		r = kvm_s390_pv_destroy_vm(kvm);
-> +		r = kvm_s390_pv_destroy_vm(kvm, cmd);
->  		if (!r)
->  			kvm_s390_pv_dealloc_vm(kvm);
->  		kvm_s390_vcpu_unblock_all(kvm);
-> @@ -2237,7 +2239,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  		r = -EFAULT;
->  		if (!copy_from_user(hdr, (void __user *)parms.origin,
->  				   parms.length))
-> -			r = kvm_s390_pv_set_sec_parms(kvm, hdr, parms.length);
-> +			r = kvm_s390_pv_set_sec_parms(kvm, hdr, parms.length, cmd);
->  
->  		vfree(hdr);
->  		break;
-> @@ -2253,7 +2255,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  		if (copy_from_user(&unp, argp, sizeof(unp)))
->  			break;
->  
-> -		r = kvm_s390_pv_unpack(kvm, unp.addr, unp.size, unp.tweak);
-> +		r = kvm_s390_pv_unpack(kvm, unp.addr, unp.size, unp.tweak, cmd);
->  		break;
->  	}
->  	case KVM_PV_VM_VERIFY: {
-> @@ -2268,6 +2270,8 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  				  &ret);
->  		VM_EVENT(kvm, 3, "PROTVIRT VERIFY: rc %x rrc %x",
->  			 ret >> 16, ret & 0x0000ffff);
-> +		cmd->rc = ret >> 16;
-> +		cmd->rrc = ret & 0xffff;
->  		break;
->  	}
->  	default:
-> @@ -2385,6 +2389,10 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  			break;
->  
->  		r = kvm_s390_handle_pv(kvm, &args);
-> +
-> +		if (copy_to_user(argp, &args, sizeof(args)))
-> +			r = -EFAULT;
-> +
->  		break;
->  	}
->  	default:
-> @@ -2650,6 +2658,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  
->  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  {
-> +	struct kvm_pv_cmd dummy;
-> +
->  	VCPU_EVENT(vcpu, 3, "%s", "free cpu");
->  	trace_kvm_s390_destroy_vcpu(vcpu->vcpu_id);
->  	kvm_s390_clear_local_irqs(vcpu);
-> @@ -2663,7 +2673,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	if (vcpu->kvm->arch.use_cmma)
->  		kvm_s390_vcpu_unsetup_cmma(vcpu);
->  	if (kvm_s390_pv_handle_cpu(vcpu))
-> -		kvm_s390_pv_destroy_cpu(vcpu);
-> +		kvm_s390_pv_destroy_cpu(vcpu, &dummy);
->  	free_page((unsigned long)(vcpu->arch.sie_block));
->  
->  	kvm_vcpu_uninit(vcpu);
-> @@ -2688,11 +2698,13 @@ static void kvm_free_vcpus(struct kvm *kvm)
->  
->  void kvm_arch_destroy_vm(struct kvm *kvm)
->  {
-> +	struct kvm_pv_cmd dummy;
-> +
->  	kvm_free_vcpus(kvm);
->  	sca_dispose(kvm);
->  	kvm_s390_gisa_destroy(kvm);
->  	if (kvm_s390_pv_is_protected(kvm)) {
-> -		kvm_s390_pv_destroy_vm(kvm);
-> +		kvm_s390_pv_destroy_vm(kvm, &dummy);
->  		kvm_s390_pv_dealloc_vm(kvm);
->  	}
->  	debug_unregister(kvm->arch.dbf);
-> @@ -3153,6 +3165,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
->  {
->  	struct kvm_vcpu *vcpu;
->  	struct sie_page *sie_page;
-> +	struct kvm_pv_cmd dummy;
->  	int rc = -EINVAL;
->  
->  	if (!kvm_is_ucontrol(kvm) && !sca_can_add_vcpu(kvm, id))
-> @@ -3188,7 +3201,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
->  		goto out_free_sie_block;
->  
->  	if (kvm_s390_pv_is_protected(kvm)) {
-> -		rc = kvm_s390_pv_create_cpu(vcpu);
-> +		rc = kvm_s390_pv_create_cpu(vcpu, &dummy);
->  		if (rc) {
->  			kvm_vcpu_uninit(vcpu);
->  			goto out_free_sie_block;
-> @@ -4511,19 +4524,22 @@ static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu *vcpu,
->  	if (!kvm_s390_pv_is_protected(vcpu->kvm))
->  		return -EINVAL;
->  
-> +	cmd->rc = 0;
-> +	cmd->rrc = 0;
-> +
->  	switch (cmd->cmd) {
->  	case KVM_PV_VCPU_CREATE: {
->  		if (kvm_s390_pv_handle_cpu(vcpu))
->  			return -EINVAL;
->  
-> -		r = kvm_s390_pv_create_cpu(vcpu);
-> +		r = kvm_s390_pv_create_cpu(vcpu, cmd);
->  		break;
->  	}
->  	case KVM_PV_VCPU_DESTROY: {
->  		if (!kvm_s390_pv_handle_cpu(vcpu))
->  			return -EINVAL;
->  
-> -		r = kvm_s390_pv_destroy_cpu(vcpu);
-> +		r = kvm_s390_pv_destroy_cpu(vcpu, cmd);
->  		break;
->  	}
->  	default:
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index 32c0c01d5df0..b77d5f565b5c 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -199,14 +199,15 @@ static inline int kvm_s390_user_cpu_state_ctrl(struct kvm *kvm)
->  /* implemented in pv.c */
->  void kvm_s390_pv_dealloc_vm(struct kvm *kvm);
->  int kvm_s390_pv_alloc_vm(struct kvm *kvm);
-> -int kvm_s390_pv_create_vm(struct kvm *kvm);
-> -int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu);
-> -int kvm_s390_pv_destroy_vm(struct kvm *kvm);
-> -int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu);
-> -int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length);
-> +int kvm_s390_pv_create_vm(struct kvm *kvm, struct kvm_pv_cmd *cmd);
-> +int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, struct kvm_pv_cmd *cmd);
-> +int kvm_s390_pv_destroy_vm(struct kvm *kvm, struct kvm_pv_cmd *cmd);
-> +int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, struct kvm_pv_cmd *cmd);
-> +int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length,
-> +			      struct kvm_pv_cmd *cmd);
->  int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
-> -		       unsigned long tweak);
-> -int kvm_s390_pv_verify(struct kvm *kvm);
-> +		       unsigned long tweak, struct kvm_pv_cmd *cmd);
-> +int kvm_s390_pv_verify(struct kvm *kvm, struct kvm_pv_cmd *cmd);
->  
->  static inline bool kvm_s390_pv_is_protected(struct kvm *kvm)
->  {
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index c1778cb3f8ac..381dc3fefac4 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -61,7 +61,7 @@ int kvm_s390_pv_alloc_vm(struct kvm *kvm)
->  	return -ENOMEM;
->  }
->  
-> -int kvm_s390_pv_destroy_vm(struct kvm *kvm)
-> +int kvm_s390_pv_destroy_vm(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  {
->  	int rc;
->  	u32 ret;
-> @@ -72,10 +72,12 @@ int kvm_s390_pv_destroy_vm(struct kvm *kvm)
->  	atomic_set(&kvm->mm->context.is_protected, 0);
->  	VM_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x",
->  		 ret >> 16, ret & 0x0000ffff);
-> +	cmd->rc = ret >> 16;
-> +	cmd->rrc = ret & 0xffff;
->  	return rc;
->  }
->  
-> -int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu)
-> +int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, struct kvm_pv_cmd *cmd)
->  {
->  	int rc = 0;
->  	u32 ret;
-> @@ -87,6 +89,8 @@ int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu)
->  
->  		VCPU_EVENT(vcpu, 3, "PROTVIRT DESTROY VCPU: cpu %d rc %x rrc %x",
->  			   vcpu->vcpu_id, ret >> 16, ret & 0x0000ffff);
-> +		cmd->rc = ret >> 16;
-> +		cmd->rrc = ret & 0xffff;
->  	}
->  
->  	free_pages(vcpu->arch.pv.stor_base,
-> @@ -98,7 +102,7 @@ int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu)
->  	return rc;
->  }
->  
-> -int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu)
-> +int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, struct kvm_pv_cmd *cmd)
->  {
->  	int rc;
->  	struct uv_cb_csc uvcb = {
-> @@ -124,9 +128,13 @@ int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu)
->  	VCPU_EVENT(vcpu, 3, "PROTVIRT CREATE VCPU: cpu %d handle %llx rc %x rrc %x",
->  		   vcpu->vcpu_id, uvcb.cpu_handle, uvcb.header.rc,
->  		   uvcb.header.rrc);
-> +	cmd->rc = uvcb.header.rc;
-> +	cmd->rrc = uvcb.header.rrc;
->  
->  	if (rc) {
-> -		kvm_s390_pv_destroy_cpu(vcpu);
-> +		struct kvm_pv_cmd dummy;
-> +
-> +		kvm_s390_pv_destroy_cpu(vcpu, &dummy);
->  		return -EINVAL;
->  	}
->  
-> @@ -138,7 +146,7 @@ int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> -int kvm_s390_pv_create_vm(struct kvm *kvm)
-> +int kvm_s390_pv_create_vm(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  {
->  	int rc;
->  
-> @@ -162,12 +170,15 @@ int kvm_s390_pv_create_vm(struct kvm *kvm)
->  	VM_EVENT(kvm, 3, "PROTVIRT CREATE VM: handle %llx len %llx rc %x rrc %x",
->  		 uvcb.guest_handle, uvcb.guest_stor_len, uvcb.header.rc,
->  		 uvcb.header.rrc);
-> +	cmd->rc = uvcb.header.rc;
-> +	cmd->rrc = uvcb.header.rrc;
->  
->  	/* Outputs */
->  	kvm->arch.pv.handle = uvcb.guest_handle;
->  
->  	if (rc && (uvcb.header.rc & UVC_RC_NEED_DESTROY)) {
-> -		kvm_s390_pv_destroy_vm(kvm);
-> +		struct kvm_pv_cmd dummy;
-> +		kvm_s390_pv_destroy_vm(kvm, &dummy);
->  		return -EINVAL;
->  	}
->  	kvm->arch.gmap->guest_handle = uvcb.guest_handle;
-> @@ -176,7 +187,7 @@ int kvm_s390_pv_create_vm(struct kvm *kvm)
->  }
->  
->  int kvm_s390_pv_set_sec_parms(struct kvm *kvm,
-> -			      void *hdr, u64 length)
-> +			      void *hdr, u64 length, struct kvm_pv_cmd *cmd)
->  {
->  	int rc;
->  	struct uv_cb_ssc uvcb = {
-> @@ -193,6 +204,9 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm,
->  	rc = uv_call(0, (u64)&uvcb);
->  	VM_EVENT(kvm, 3, "PROTVIRT VM SET PARMS: rc %x rrc %x",
->  		 uvcb.header.rc, uvcb.header.rrc);
-> +	cmd->rc = uvcb.header.rc;
-> +	cmd->rrc = uvcb.header.rrc;
-> +
->  	if (rc)
->  		return -EINVAL;
->  	return 0;
-> @@ -219,7 +233,7 @@ static int unpack_one(struct kvm *kvm, unsigned long addr, u64 tweak[2])
->  }
->  
->  int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
-> -		       unsigned long tweak)
-> +		       unsigned long tweak, struct kvm_pv_cmd *cmd)
->  {
->  	int rc = 0;
->  	u64 tw[2] = {tweak, 0};
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index eab741bc12c3..17c1a9556eac 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1508,8 +1508,8 @@ struct kvm_pv_cmd {
->  };
->  
->  /* Available with KVM_CAP_S390_PROTECTED */
-> -#define KVM_S390_PV_COMMAND		_IOW(KVMIO, 0xc5, struct kvm_pv_cmd)
-> -#define KVM_S390_PV_COMMAND_VCPU	_IOW(KVMIO, 0xc6, struct kvm_pv_cmd)
-> +#define KVM_S390_PV_COMMAND		_IOWR(KVMIO, 0xc5, struct kvm_pv_cmd)
-> +#define KVM_S390_PV_COMMAND_VCPU	_IOWR(KVMIO, 0xc6, struct kvm_pv_cmd)
->  
->  /* Secure Encrypted Virtualization command */
->  enum sev_cmd_id {
+> (...)
 > 
+>> diff --git a/arch/s390/boot/Makefile b/arch/s390/boot/Makefile
+>> index e2c47d3a1c89..30f1811540c5 100644
+>> --- a/arch/s390/boot/Makefile
+>> +++ b/arch/s390/boot/Makefile
+>> @@ -37,7 +37,7 @@ CFLAGS_sclp_early_core.o += -I$(srctree)/drivers/s390/char
+>>  obj-y	:= head.o als.o startup.o mem_detect.o ipl_parm.o ipl_report.o
+>>  obj-y	+= string.o ebcdic.o sclp_early_core.o mem.o ipl_vmparm.o cmdline.o
+>>  obj-y	+= version.o pgm_check_info.o ctype.o text_dma.o
+>> -obj-$(CONFIG_PROTECTED_VIRTUALIZATION_GUEST)	+= uv.o
+>> +obj-$(findstring y, $(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) $(CONFIG_PGSTE))	+= uv.o
+> 
+> I'm wondering why you're checking CONFIG_PGSTE here...
+
+It was just simpler for a Makefile, because CONFIG_KVM can be m or y.
+PGSTE is always y when CONFIG_KVM is set. Suggestions welcome.
+
+[...]
+
+>> +		prot_virt_host = 0;
+>> +		pr_info("Running as protected virtualization guest.");
+>> +	}
+>> +
+>> +	if (prot_virt_host && !test_facility(158)) {
+>> +		prot_virt_host = 0;
+>> +		pr_info("The ultravisor call facility is not available.");
+>> +	}
+> 
+> What about prefixing these two with 'prot_virt:'? It seems the name is
+> settled now?
+
+It is not settled, but I can certainly do something like
+
+#define KMSG_COMPONENT "prot_virt"
+#define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
+
+
+to prefix all pr_* calls in this file.
 
