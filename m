@@ -2,129 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 839AF159112
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:58:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74927159122
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:58:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730017AbgBKN5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 08:57:50 -0500
-Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:41711 "EHLO
-        wnew1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729509AbgBKN5t (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 08:57:49 -0500
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.west.internal (Postfix) with ESMTP id 3E42970F;
-        Tue, 11 Feb 2020 08:57:47 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Tue, 11 Feb 2020 08:57:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=monjalon.net; h=
-        from:to:cc:subject:date:message-id:in-reply-to:references
-        :mime-version:content-transfer-encoding:content-type; s=mesmtp;
-         bh=noAzCHI04Ek8RDpgVHZPtuU30mmVFLmEki2n2dFXUfk=; b=hEAdjWREXeec
-        UBe4OGm3aAkBhgEuC6s/I22PkSk8Qp5WD9sZd2YG3U1I9YFFI1jI2JPfe7CE8kua
-        a9cwQ8EDSb1wXlcDnnJxxz05qpS73YVTsL1jk9BUPMwYuZQo55VetRWR4jgubvkw
-        VE0SEnS5aHX6ey2GRCcfRVDcGKBgVuY=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:content-type
-        :date:from:in-reply-to:message-id:mime-version:references
-        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; bh=noAzCHI04Ek8RDpgVHZPtuU30mmVFLmEki2n2dFXU
-        fk=; b=y5Paqyy4NiV6O7SNz07Qb80FTYAjxZH4YjIhM2t1gTxOdGMvkqxirSsjJ
-        Q6fSwKqri9dK8G3gtNgxo1R640+6+xgzBlaGD1ayurch2P6wA5yLj8n78rvxaiGI
-        Yd544n7+BS/0xChp4rzcHA5C4jkZDNiP2D4jcv+yyhWPyakBFyKM+hF5ezz0B+Tv
-        wVJpwUb4yM7QOHA7St4ivDthMER/Mxt+eMyQio8kRsUURkvHDRfHa5hZOTeTu77r
-        M0V9DbaHQcHuuWh7yYn1Tou9rsdsc1u3gZLL/OpXADtsIVOv9fN1fTxIelwXcRg2
-        zRedtOWfwsJyFjmaVOP8u1ziPH/5g==
-X-ME-Sender: <xms:2rJCXpDm4fNVO8qyaB36A6ti_RSmVSf2tsLD7ela3qvNr7hgN6edGA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedugedrieefgdehlecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefhvffufffkjghfggfgtgesthfuredttddtvdenucfhrhhomhepvfhhohhmrghs
-    ucfoohhnjhgrlhhonhcuoehthhhomhgrshesmhhonhhjrghlohhnrdhnvghtqeenucfkph
-    epjeejrddufeegrddvtdefrddukeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghr
-    rghmpehmrghilhhfrhhomhepthhhohhmrghssehmohhnjhgrlhhonhdrnhgvth
-X-ME-Proxy: <xmx:2rJCXq7fF8aqvNdXEcyrvltANgu3CGdUxC0WpymCsa7MaNj8jgW4VA>
-    <xmx:2rJCXv2jjxQEkHCAQQYcMaI-DJDPYIKZPbiGvfK8f24-MoY664lTzw>
-    <xmx:2rJCXlSQdpgKERW12Dki5jngEP_sTxf67BMK7q97PS56vK1cDBp-dA>
-    <xmx:2rJCXuSprx1LlVxeacnKLUvMQm8fKQ7rvAe4dbSq2z_2yE6U4nH1TxQxK-0>
-Received: from xps.localnet (184.203.134.77.rev.sfr.net [77.134.203.184])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 4AB833060840;
-        Tue, 11 Feb 2020 08:57:45 -0500 (EST)
-From:   Thomas Monjalon <thomas@monjalon.net>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     dev@dpdk.org, kvm@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dev@dpdk.org, mtosatti@redhat.com,
-        Luca Boccassi <bluca@debian.org>,
-        "Richardson, Bruce" <bruce.richardson@intel.com>,
-        cohuck@redhat.com, Vamsi Attunuru <vattunuru@marvell.com>,
-        Jerin Jacob <jerinjacobk@gmail.com>
-Subject: Re: [dpdk-dev] [RFC PATCH 0/7] vfio/pci: SR-IOV support
-Date:   Tue, 11 Feb 2020 14:57:44 +0100
-Message-ID: <2203508.9fHWaBTJ5E@xps>
-In-Reply-To: <CALBAE1Oz2u+cmoL8LhEZ-4paXEebKh3DzfWGLQLQx0oaW=tBXw@mail.gmail.com>
-References: <158085337582.9445.17682266437583505502.stgit@gimli.home> <CALBAE1Oz2u+cmoL8LhEZ-4paXEebKh3DzfWGLQLQx0oaW=tBXw@mail.gmail.com>
+        id S1730085AbgBKN6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 08:58:19 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23834 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730081AbgBKN6S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 08:58:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581429498;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WG0Npq/OjpsV9gQYxRWfzFxfkdPt4v/t5ykKU8PVL2k=;
+        b=KhvBvuC97C4MY12yCudTQbd1Jr79/g68mzIh1IAz4g32ClOlsGyNWNktHQc3qe04LKp31L
+        +ICUfzfPMhyFb1LNCVwzmlHANF3xy2YEjOAjWun45yJSCw9uU1mdjKplRSsFFU2mp8fWPn
+        VtyFAteJl2x7fjslI4Q4Ahh3NGWlHx4=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-uLx8qWbiPaWA-I6mmi0k0Q-1; Tue, 11 Feb 2020 08:58:04 -0500
+X-MC-Unique: uLx8qWbiPaWA-I6mmi0k0Q-1
+Received: by mail-qk1-f199.google.com with SMTP id w29so7114856qkw.1
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 05:58:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=WG0Npq/OjpsV9gQYxRWfzFxfkdPt4v/t5ykKU8PVL2k=;
+        b=JgO4OGC7iT0pX637mzyzEp+KvyernVW3RNIoHyQAbMGz9wQw9e+9KIjAlQ+sJSDEbq
+         qvn1hIDr4H3n3CI9Mpyyl+yiV+/wgpbSu0X+XtKaY+ahwiVYfjE8yDn2GCrLXBix9BcU
+         yvGmfubbMKxtaG/bd/9hgqE3bIoHhyPpz0XktK2MFWkp1jQog3OXfWRxTNuNtkiF8ALO
+         QU1pkp9t/ZK6PSwC61VW98Z7eowxCL6tAx5d+cJVV6LCmnZkEdLTBZEMK6dgXazpG6Rt
+         e79IjKXwyDCyQPLcT0E/ESqnNicYsykCR6ixIBpfrZS7tNp1VSryVn5ErrEJsuTf+u8e
+         60hQ==
+X-Gm-Message-State: APjAAAV5Qy+FER2zE/a0Q4r4rs3IwXfizhZr+7YFzw7A5VVEGWZb9Rst
+        Zuf9fIVz4Zd4umnjmH6vlFZ4tPHiMkz/R0N+MRbfZDzwcnoEb/ffSs2HlYnWFVaMzQ7/YVZ07Ql
+        RRswtF/6Te6uw
+X-Received: by 2002:ad4:49ca:: with SMTP id j10mr2823698qvy.155.1581429483896;
+        Tue, 11 Feb 2020 05:58:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz11UYC/BUBAy6kXD/YknIJWxgOMbrK5yvh/VgO+Bst7ojYaRjy5EybVs2SGNTw/K86LmEO+w==
+X-Received: by 2002:ad4:49ca:: with SMTP id j10mr2823688qvy.155.1581429483704;
+        Tue, 11 Feb 2020 05:58:03 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+        by smtp.gmail.com with ESMTPSA id a72sm2102422qkc.121.2020.02.11.05.58.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2020 05:58:02 -0800 (PST)
+Date:   Tue, 11 Feb 2020 08:57:58 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
+ crashes in KVM guests after reboot
+Message-ID: <20200211085736-mutt-send-email-mst@kernel.org>
+References: <2a63b15f-8cf5-5868-550c-42e2cfd92c60@de.ibm.com>
+ <b6e32f58e5d85ac5cc3141e9155fb140ae5cd580.camel@redhat.com>
+ <1ade56b5-083f-bb6f-d3e0-3ddcf78f4d26@de.ibm.com>
+ <20200206171349-mutt-send-email-mst@kernel.org>
+ <5c860fa1-cef5-b389-4ebf-99a62afa0fe8@de.ibm.com>
+ <20200207025806-mutt-send-email-mst@kernel.org>
+ <97c93d38-ef07-e321-d133-18483d54c0c0@de.ibm.com>
+ <CAJaqyWfngzP4d01B6+Sqt8FXN6jX7kGegjx8ie4no_1Er3igQA@mail.gmail.com>
+ <43a5dbaa-9129-e220-8483-45c60a82c945@de.ibm.com>
+ <e299afca8e22044916abbf9fbbd0bff6b0ee9e13.camel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e299afca8e22044916abbf9fbbd0bff6b0ee9e13.camel@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-11/02/2020 12:18, Jerin Jacob:
-> On Wed, Feb 5, 2020 at 4:35 AM Alex Williamson wrote:
-> >
-> > There seems to be an ongoing desire to use userspace, vfio-based
-> > drivers for both SR-IOV PF and VF devices.  The fundamental issue
-> > with this concept is that the VF is not fully independent of the PF
-> > driver.  Minimally the PF driver might be able to deny service to the
-> > VF, VF data paths might be dependent on the state of the PF device,
-> > or the PF my have some degree of ability to inspect or manipulate the
-> > VF data.  It therefore would seem irresponsible to unleash VFs onto
-> > the system, managed by a user owned PF.
-> >
-> > We address this in a few ways in this series.  First, we can use a bus
-> > notifier and the driver_override facility to make sure VFs are bound
-> > to the vfio-pci driver by default.  This should eliminate the chance
-> > that a VF is accidentally bound and used by host drivers.  We don't
-> > however remove the ability for a host admin to change this override.
-> >
-> > The next issue we need to address is how we let userspace drivers
-> > opt-in to this participation with the PF driver.  We do not want an
-> > admin to be able to unwittingly assign one of these VFs to a tenant
-> > that isn't working in collaboration with the PF driver.  We could use
-> > IOMMU grouping, but this seems to push too far towards tightly coupled
-> > PF and VF drivers.  This series introduces a "VF token", implemented
-> > as a UUID, as a shared secret between PF and VF drivers.  The token
-> > needs to be set by the PF driver and used as part of the device
-> > matching by the VF driver.  Provisions in the code also account for
-> > restarting the PF driver with active VF drivers, requiring the PF to
-> > use the current token to re-gain access to the PF.
+On Tue, Feb 11, 2020 at 02:04:54PM +0100, Eugenio Pérez wrote:
+> On Mon, 2020-02-10 at 12:01 +0100, Christian Borntraeger wrote:
+> > 
+> > On 10.02.20 10:47, Eugenio Perez Martin wrote:
+> > > Hi Christian.
+> > > 
+> > > I'm not able to reproduce the failure with eccb852f1fe6bede630e2e4f1a121a81e34354ab commit. Could you add more data?
+> > > Your configuration (libvirt or qemu line), and host's dmesg output if any?
+> > > 
+> > > Thanks!
+> > 
+> > If it was not obvious, this is on s390x, a big endian system.
+> > 
 > 
-> Thanks Alex for the series. DPDK realizes this use-case through, an out of
-> tree igb_uio module, for non VFIO devices. Supporting this use case, with
-> VFIO, will be a great enhancement for DPDK as we are planning to
-> get rid of out of tree modules any focus only on userspace aspects.
-[..]
-> Regarding the use case where  PF bound to DPDK/VFIO and
-> VF bound to DPDK/VFIO are _two different_ processes then sharing the UUID
-> will be a little tricky thing in terms of usage. But if that is the
-> purpose of bringing UUID to the equation then it fine.
+> Hi Christian. Thank you very much for your fast responses.
 > 
-> Overall this series looks good to me.  We can test the next non-RFC
-> series and give
-> Tested-by by after testing with DPDK.
-[..]
-> > Please comment.  In particular, does this approach meet the DPDK needs
-> > for userspace PF and VF drivers, with the hopefully minor hurdle of
-> > sharing a token between drivers.  The token is of course left to
-> > userspace how to manage, and might be static (and not very secret) for
-> > a given set of drivers.  Thanks,
+> Could you try this patch on top of eccb852f1fe6bede630e2e4f1a121a81e34354ab?
+> 
+> Thanks!
+> 
+> >From 71d0f9108a18aa894cc0c0c1c7efbad39f465a27 Mon Sep 17 00:00:00 2001
+> From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <
+> eperezma@redhat.com>
+> Date: Tue, 11 Feb 2020 13:19:10 +0100
+> Subject: [PATCH] vhost: fix return value of vhost_get_vq_desc
+> 
+> Before of the batch change, it was the chain's head. Need to keep that
+> way or we will not be able to free a chain of descriptors.
 
-Thanks Alex, it looks to be a great improvement.
+I think it's cleaner to have all descriptors in the chain
+have the same id.
 
-In the meantime, DPDK is going to move igb_uio (an out-of-tree
-Linux kernel module) from the main DPDK repository to a side-repo.
-This move and this patchset will hopefully encourage using VFIO.
-As Jerin said, DPDK prefers relying on upstream Linux modules.
-
+> Fixes: eccb852f1fe6 ("vhost: batching fetches")
+> ---
+>  drivers/vhost/vhost.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index b5a51b1f2e79..fc422c3e5c08 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2409,12 +2409,11 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+>  			*out_num += ret;
+>  		}
+>  
+> -		ret = desc->id;
+> -
+>  		if (!(desc->flags & VRING_DESC_F_NEXT))
+>  			break;
+>  	}
+>  
+> +	ret = vq->descs[vq->first_desc].id;
+>  	vq->first_desc = i + 1;
+>  
+>  	return ret;
+> -- 
+> 2.18.1
 
