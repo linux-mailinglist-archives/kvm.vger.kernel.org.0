@@ -2,33 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F114F158CA1
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 11:24:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F544158CA5
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 11:25:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728351AbgBKKYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 05:24:10 -0500
-Received: from mga01.intel.com ([192.55.52.88]:22872 "EHLO mga01.intel.com"
+        id S1728369AbgBKKYc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 05:24:32 -0500
+Received: from mga11.intel.com ([192.55.52.93]:32500 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727840AbgBKKYK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 05:24:10 -0500
+        id S1728299AbgBKKYc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 05:24:32 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Feb 2020 02:24:09 -0800
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Feb 2020 02:24:31 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; 
-   d="scan'208";a="221888988"
+   d="scan'208";a="221889050"
 Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.16])
-  by orsmga007.jf.intel.com with ESMTP; 11 Feb 2020 02:24:07 -0800
+  by orsmga007.jf.intel.com with ESMTP; 11 Feb 2020 02:24:29 -0800
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     alex.williamson@redhat.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         cohuck@redhat.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
         kevin.tian@intel.com, shaopeng.he@intel.com, yi.l.liu@intel.com,
-        Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH v3 7/9] samples/vfio-pci: add a sample vendor module of vfio-pci for IGD devices
-Date:   Tue, 11 Feb 2020 05:14:47 -0500
-Message-Id: <20200211101447.21137-1-yan.y.zhao@intel.com>
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Subject: [RFC PATCH v3 8/9] vfio: header for vfio live migration region.
+Date:   Tue, 11 Feb 2020 05:15:09 -0500
+Message-Id: <20200211101509.21189-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211095727.20426-1-yan.y.zhao@intel.com>
 References: <20200211095727.20426-1-yan.y.zhao@intel.com>
@@ -37,206 +38,176 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This sample driver does nothing but calls default device ops of vfio-pci
-to pass through IGD devices.
+Header file copied from vfio live migration patch series v8. [1].
 
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05542.html
+
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- samples/Kconfig           |   6 ++
- samples/Makefile          |   1 +
- samples/vfio-pci/Makefile |   2 +
- samples/vfio-pci/igd_pt.c | 148 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 157 insertions(+)
- create mode 100644 samples/vfio-pci/Makefile
- create mode 100644 samples/vfio-pci/igd_pt.c
+ include/uapi/linux/vfio.h | 149 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 149 insertions(+)
 
-diff --git a/samples/Kconfig b/samples/Kconfig
-index c8dacb4dda80..84d6a91567af 100644
---- a/samples/Kconfig
-+++ b/samples/Kconfig
-@@ -169,4 +169,10 @@ config SAMPLE_VFS
- 	  as mount API and statx().  Note that this is restricted to the x86
- 	  arch whilst it accesses system calls that aren't yet in all arches.
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 9e843a147ead..135a1d3fa111 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -306,6 +306,155 @@ struct vfio_region_info_cap_type {
+ #define VFIO_REGION_TYPE_GFX                    (1)
+ #define VFIO_REGION_TYPE_CCW			(2)
  
-+config SAMPLE_VFIO_PCI_IGD_PT
-+	tristate "Build VFIO sample vendor driver to pass through IGD devices -- loadable modules only"
-+	depends on VFIO_PCI && m
-+	help
-+	  Build a sample driver to pass through IGD devices as a vendor driver
-+	  of VFIO PCI.
- endif # SAMPLES
-diff --git a/samples/Makefile b/samples/Makefile
-index 7d6e4ca28d69..db56daf3a11c 100644
---- a/samples/Makefile
-+++ b/samples/Makefile
-@@ -19,4 +19,5 @@ obj-$(CONFIG_SAMPLE_TRACE_EVENTS)	+= trace_events/
- obj-$(CONFIG_SAMPLE_TRACE_PRINTK)	+= trace_printk/
- obj-$(CONFIG_VIDEO_PCI_SKELETON)	+= v4l/
- obj-y					+= vfio-mdev/
-+obj-y					+= vfio-pci/
- subdir-$(CONFIG_SAMPLE_VFS)		+= vfs
-diff --git a/samples/vfio-pci/Makefile b/samples/vfio-pci/Makefile
-new file mode 100644
-index 000000000000..7125f0a325c2
---- /dev/null
-+++ b/samples/vfio-pci/Makefile
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_SAMPLE_VFIO_PCI_IGD_PT) += igd_pt.o
-diff --git a/samples/vfio-pci/igd_pt.c b/samples/vfio-pci/igd_pt.c
-new file mode 100644
-index 000000000000..45acbd1ad2fb
---- /dev/null
-+++ b/samples/vfio-pci/igd_pt.c
-@@ -0,0 +1,148 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Pass through IGD devices as a vendor driver of vfio-pci device driver
-+ * Copyright(c) 2019 Intel Corporation.
++/* Migration region type and sub-type */
++#define VFIO_REGION_TYPE_MIGRATION          (3)
++#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
++
++/**
++ * Structure vfio_device_migration_info is placed at 0th offset of
++ * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
++ * information. Field accesses from this structure are only supported at their
++ * native width and alignment, otherwise the result is undefined and vendor
++ * drivers should return an error.
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * device_state: (read/write)
++ *      To indicate vendor driver the state VFIO device should be transitioned
++ *      to. If device state transition fails, write on this field return error.
++ *      It consists of 3 bits:
++ *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
++ *        _STOPPED state. When device is changed to _STOPPED, driver should stop
++ *        device before write() returns.
++ *      - If bit 1 set, indicates _SAVING state.
++ *      - If bit 2 set, indicates _RESUMING state.
++ *      Bits 3 - 31 are reserved for future use. User should perform
++ *      read-modify-write operation on this field.
++ *      _SAVING and _RESUMING bits set at the same time is invalid state.
++ *
++ * pending bytes: (read only)
++ *      Number of pending bytes yet to be migrated from vendor driver
++ *
++ * data_offset: (read only)
++ *      User application should read data_offset in migration region from where
++ *      user application should read device data during _SAVING state or write
++ *      device data during _RESUMING state or read dirty pages bitmap. See below
++ *      for detail of sequence to be followed.
++ *
++ * data_size: (read/write)
++ *      User application should read data_size to get size of data copied in
++ *      migration region during _SAVING state and write size of data copied in
++ *      migration region during _RESUMING state.
++ *
++ * start_pfn: (write only)
++ *      Start address pfn to get bitmap of dirty pages from vendor driver duing
++ *      _SAVING state.
++ *
++ * page_size: (write only)
++ *      User application should write the page_size of pfn.
++ *
++ * total_pfns: (write only)
++ *      Total pfn count from start_pfn for which dirty bitmap is requested.
++ *
++ * copied_pfns: (read only)
++ *      pfn count for which dirty bitmap is copied to migration region.
++ *      Vendor driver should copy the bitmap with bits set only for pages to be
++ *      marked dirty in migration region.
++ *      - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_NONE if none of the
++ *        pages are dirty in requested range or rest of the range.
++ *      - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL to mark all
++ *        pages dirty in the given range or rest of the range.
++ *      - Vendor driver should return pfn count for which bitmap is written in
++ *        the region.
++ *
++ * Migration region looks like:
++ *  ------------------------------------------------------------------
++ * |vfio_device_migration_info|    data section                      |
++ * |                          |     ///////////////////////////////  |
++ * ------------------------------------------------------------------
++ *   ^                              ^                             ^
++ *  offset 0-trapped part        data_offset                 data_size
++ *
++ * Data section is always followed by vfio_device_migration_info structure
++ * in the region, so data_offset will always be non-0. Offset from where data
++ * is copied is decided by kernel driver, data section can be trapped or
++ * mapped or partitioned, depending on how kernel driver defines data section.
++ * Data section partition can be defined as mapped by sparse mmap capability.
++ * If mmapped, then data_offset should be page aligned, where as initial section
++ * which contain vfio_device_migration_info structure might not end at offset
++ * which is page aligned.
++ * Data_offset can be same or different for device data and dirty pages bitmap.
++ * Vendor driver should decide whether to partition data section and how to
++ * partition the data section. Vendor driver should return data_offset
++ * accordingly.
++ *
++ * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
++ * and for _SAVING device state or stop-and-copy phase:
++ * a. read pending_bytes. If pending_bytes > 0, go through below steps.
++ * b. read data_offset, indicates kernel driver to write data to staging buffer.
++ * c. read data_size, amount of data in bytes written by vendor driver in
++ *    migration region.
++ * d. read data_size bytes of data from data_offset in the migration region.
++ * e. process data.
++ * f. Loop through a to e.
++ *
++ * To copy system memory content during migration, vendor driver should be able
++ * to report system memory pages which are dirtied by that driver. For such
++ * dirty page reporting, user application should query for a range of GFNs
++ * relative to device address space (IOVA), then vendor driver should provide
++ * the bitmap of pages from this range which are dirtied by him through
++ * migration region where each bit represents a page and bit set to 1 represents
++ * that the page is dirty.
++ * User space application should take care of copying content of system memory
++ * for those pages.
++ *
++ * Steps to get dirty page bitmap:
++ * a. write start_pfn, page_size and total_pfns.
++ * b. read copied_pfns. Vendor driver should take one of the below action:
++ *     - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_NONE if driver
++ *       doesn't have any page to report dirty in given range or rest of the
++ *       range. Exit the loop.
++ *     - Vendor driver should return VFIO_DEVICE_DIRTY_PFNS_ALL to mark all
++ *       pages dirty for given range or rest of the range. User space
++ *       application mark all pages in the range as dirty and exit the loop.
++ *     - Vendor driver should return copied_pfns and provide bitmap for
++ *       copied_pfn in migration region.
++ * c. read data_offset, where vendor driver has written bitmap.
++ * d. read bitmap from the migration region from data_offset.
++ * e. Iterate through steps a to d while (total copied_pfns < total_pfns)
++ *
++ * Sequence to be followed while _RESUMING device state:
++ * While data for this device is available, repeat below steps:
++ * a. read data_offset from where user application should write data.
++ * b. write data of data_size to migration region from data_offset.
++ * c. write data_size which indicates vendor driver that data is written in
++ *    staging buffer.
++ *
++ * For user application, data is opaque. User should write data in the same
++ * order as received.
 + */
 +
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/device.h>
-+#include <linux/kernel.h>
-+#include <linux/vfio.h>
-+#include <linux/sysfs.h>
-+#include <linux/file.h>
-+#include <linux/pci.h>
-+#include <linux/eventfd.h>
++struct vfio_device_migration_info {
++	__u32 device_state;         /* VFIO device state */
++#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
++#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
++#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
++#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
++				     VFIO_DEVICE_STATE_SAVING | \
++				     VFIO_DEVICE_STATE_RESUMING)
++#define VFIO_DEVICE_STATE_INVALID   (VFIO_DEVICE_STATE_SAVING | \
++				     VFIO_DEVICE_STATE_RESUMING)
++	__u32 reserved;
++	__u64 pending_bytes;
++	__u64 data_offset;
++	__u64 data_size;
++	__u64 start_pfn;
++	__u64 page_size;
++	__u64 total_pfns;
++	__u64 copied_pfns;
++#define VFIO_DEVICE_DIRTY_PFNS_NONE     (0)
++#define VFIO_DEVICE_DIRTY_PFNS_ALL      (~0ULL)
++} __attribute__((packed));
 +
-+#define VERSION_STRING  "0.1"
-+#define DRIVER_AUTHOR   "Intel Corporation"
 +
-+/*
-+ * below are pciids of IGD devices supported in this driver
-+ */
-+static const struct pci_device_id pciidlist[] = {
-+	{0x8086, 0x5927, ~0, ~0, 0x30000, 0xff0000, 0},
-+	{0x8086, 0x591d, ~0, ~0, 0x30000, 0xff0000, 0},
-+	{0x8086, 0x193b, ~0, ~0, 0x30000, 0xff0000, 0},
-+};
-+
-+struct igd_pt_device {
-+	__u32 vendor;
-+	__u32 device;
-+
-+};
-+
-+void *igd_pt_probe(struct pci_dev *pdev)
-+{
-+	int supported_dev_cnt =
-+		sizeof(pciidlist)/sizeof(struct pci_device_id);
-+	int i;
-+	struct igd_pt_device *igd_device;
-+
-+	for (i = 0; i < supported_dev_cnt; i++) {
-+		if (pciidlist[i].vendor == pdev->vendor &&
-+				pciidlist[i].device == pdev->device)
-+			goto support;
-+	}
-+
-+	return ERR_PTR(-ENODEV);
-+
-+support:
-+
-+	igd_device = kzalloc(sizeof(*igd_device), GFP_KERNEL);
-+
-+	if (!igd_device)
-+		return ERR_PTR(-ENOMEM);
-+
-+	igd_device->vendor = pdev->vendor;
-+	igd_device->device = pdev->device;
-+
-+	return igd_device;
-+}
-+
-+static void igd_pt_remove(void *vendor_data)
-+{
-+	struct igd_pt_device *igd_device =
-+		(struct igd_pt_device *)vendor_data;
-+
-+	kfree(igd_device);
-+}
-+
-+static int igd_pt_open(void *device_data)
-+{
-+	struct vfio_pci_device *vdev = device_data;
-+
-+	return vfio_pci_open(vdev);
-+}
-+
-+void igd_pt_release(void *device_data)
-+{
-+	struct vfio_pci_device *vdev = device_data;
-+
-+	vfio_pci_release(vdev);
-+}
-+
-+static long igd_pt_ioctl(void *device_data,
-+			 unsigned int cmd, unsigned long arg)
-+{
-+	struct vfio_pci_device *vdev = device_data;
-+
-+	return vfio_pci_ioctl(vdev, cmd, arg);
-+}
-+
-+static ssize_t igd_pt_read(void *device_data, char __user *buf,
-+			     size_t count, loff_t *ppos)
-+{
-+	struct vfio_pci_device *vdev = device_data;
-+
-+	return vfio_pci_read(vdev, buf, count, ppos);
-+}
-+
-+static ssize_t igd_pt_write(void *device_data, const char __user *buf,
-+			    size_t count, loff_t *ppos)
-+{
-+	struct vfio_pci_device *vdev = device_data;
-+
-+	return vfio_pci_write(vdev, buf, count, ppos);
-+}
-+
-+static int igd_pt_mmap(void *device_data, struct vm_area_struct *vma)
-+{
-+	struct vfio_pci_device *vdev = device_data;
-+
-+	return vfio_pci_mmap(vdev, vma);
-+}
-+
-+static void igd_pt_request(void *device_data, unsigned int count)
-+{
-+	struct vfio_pci_device *vdev = device_data;
-+
-+	vfio_pci_request(vdev, count);
-+}
-+
-+static struct vfio_device_ops igd_pt_device_ops_node = {
-+	.name		= "IGD dt",
-+	.open		= igd_pt_open,
-+	.release	= igd_pt_release,
-+	.ioctl		= igd_pt_ioctl,
-+	.read		= igd_pt_read,
-+	.write		= igd_pt_write,
-+	.mmap		= igd_pt_mmap,
-+	.request	= igd_pt_request,
-+};
-+
-+#define igd_pt_device_ops (&igd_pt_device_ops_node)
-+
-+module_vfio_pci_register_vendor_handler("IGD dt", igd_pt_probe,
-+					igd_pt_remove, igd_pt_device_ops);
-+
-+MODULE_ALIAS("vfio-pci:8086-591d");
-+MODULE_ALIAS("vfio-pci:8086-5927");
-+MODULE_LICENSE("GPL v2");
-+MODULE_INFO(supported, "Sample driver as vendor driver of vfio-pci to pass through IGD");
-+MODULE_VERSION(VERSION_STRING);
-+MODULE_AUTHOR(DRIVER_AUTHOR);
+ /* sub-types for VFIO_REGION_TYPE_PCI_* */
+ 
+ /* 8086 vendor PCI sub-types */
 -- 
 2.17.1
 
