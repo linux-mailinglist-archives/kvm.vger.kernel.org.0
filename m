@@ -2,111 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 70B02159246
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 15:51:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 589281592A0
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 16:13:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730107AbgBKOvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 09:51:14 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:44884 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727707AbgBKOvO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 09:51:14 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 6146C161BFF83916527A;
-        Tue, 11 Feb 2020 22:51:07 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 11 Feb 2020
- 22:50:59 +0800
-Subject: Re: [PATCH kvm-unit-tests v2] arm64: timer: Speed up gic-timer-state
- check
-To:     Andrew Jones <drjones@redhat.com>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>
-CC:     <alexandru.elisei@arm.com>
-References: <20200211133705.1398-1-drjones@redhat.com>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <60c6c4c7-1d6b-5b64-adc1-8e96f45332c6@huawei.com>
-Date:   Tue, 11 Feb 2020 22:50:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1730175AbgBKPM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 10:12:59 -0500
+Received: from foss.arm.com ([217.140.110.172]:47498 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728825AbgBKPM7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 10:12:59 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5C08A30E;
+        Tue, 11 Feb 2020 07:12:58 -0800 (PST)
+Received: from [10.1.32.161] (e121487-lin.cambridge.arm.com [10.1.32.161])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B07A3F68E;
+        Tue, 11 Feb 2020 07:12:55 -0800 (PST)
+Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christoffer Dall <Christoffer.Dall@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Russell King <linux@arm.linux.org.uk>,
+        Anders Berg <anders.berg@lsi.com>,
+        Arnd Bergmann <arnd@arndb.de>
+References: <20200210141324.21090-1-maz@kernel.org>
+From:   Vladimir Murzin <vladimir.murzin@arm.com>
+Message-ID: <fee903cf-0c21-da4b-aafc-1539b0a0163d@arm.com>
+Date:   Tue, 11 Feb 2020 15:12:53 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200211133705.1398-1-drjones@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200210141324.21090-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
-
-On 2020/2/11 21:37, Andrew Jones wrote:
-> Let's bail out of the wait loop if we see the expected state
-> to save over six seconds of run time. Make sure we wait a bit
-> before reading the registers and double check again after,
-> though, to somewhat mitigate the chance of seeing the expected
-> state by accident.
+On 2/10/20 2:13 PM, Marc Zyngier wrote:
+> KVM/arm was merged just over 7 years ago, and has lived a very quiet
+> life so far. It mostly works if you're prepared to deal with its
+> limitations, it has been a good prototype for the arm64 version,
+> but it suffers a few problems:
 > 
-> We also take this opportunity to push more IRQ state code to
-> the library.
+> - It is incomplete (no debug support, no PMU)
+> - It hasn't followed any of the architectural evolutions
+> - It has zero users (I don't count myself here)
+> - It is more and more getting in the way of new arm64 developments
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-
-[...]
-
-> +
-> +enum gic_irq_state gic_irq_state(int irq)
-
-This is a *generic* name while this function only deals with PPI.
-Maybe we can use something like gic_ppi_state() instead?  Or you
-will have to take all interrupt types into account in a single
-function, which is not a easy job I think.
-
-> +{
-> +	enum gic_irq_state state;
-> +	bool pending = false, active = false;
-> +	void *base;
-> +
-> +	assert(gic_common_ops);
-> +
-> +	switch (gic_version()) {
-> +	case 2:
-> +		base = gicv2_dist_base();
-> +		pending = readl(base + GICD_ISPENDR) & (1 << PPI(irq));
-> +		active = readl(base + GICD_ISACTIVER) & (1 << PPI(irq));
-> +		break;
-> +	case 3:
-> +		base = gicv3_sgi_base();
-> +		pending = readl(base + GICR_ISPENDR0) & (1 << PPI(irq));
-> +		active = readl(base + GICR_ISACTIVER0) & (1 << PPI(irq));
-
-And you may also want to ensure that the 'irq' is valid for PPI().
-Or personally, I'd just use a real PPI number (PPI(info->irq)) as
-the input parameter of this function.
-
-> +		break;
-> +	}
-> +
-> +	if (!active && !pending)
-> +		state = GIC_IRQ_STATE_INACTIVE;
-> +	if (pending)
-> +		state = GIC_IRQ_STATE_PENDING;
-> +	if (active)
-> +		state = GIC_IRQ_STATE_ACTIVE;
-> +	if (active && pending)
-> +		state = GIC_IRQ_STATE_ACTIVE_PENDING;
-> +
-> +	return state;
-> +}
+> So here it is: unless someone screams and shows that they rely on
+> KVM/arm to be maintained upsteam, I'll remove 32bit host support
+> form the tree. One of the reasons that makes me confident nobody is
+> using it is that I never receive *any* bug report. Yes, it is perfect.
+> But if you depend on KVM/arm being available in mainline, please shout.
 > 
+> To reiterate: 32bit guest support for arm64 stays, of course. Only
+> 32bit host goes. Once this is merged, I plan to move virt/kvm/arm to
+> arm64, and cleanup all the now unnecessary abstractions.
+> 
+> The patches have been generated with the -D option to avoid spamming
+> everyone with huge diffs, and there is a kvm-arm/goodbye branch in
+> my kernel.org repository.
+> 
+> Marc Zyngier (5):
+>   arm: Unplug KVM from the build system
+>   arm: Remove KVM from config files
+>   arm: Remove 32bit KVM host support
+>   arm: Remove HYP/Stage-2 page-table support
+>   arm: Remove GICv3 vgic compatibility macros
 
-Otherwise,
-
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Tested-by: Zenghui Yu <yuzenghui@huawei.com>
-
-
-Thanks
+Acked-by: Vladimir Murzin <vladimir.murzin@arm.com>
+ 
 
