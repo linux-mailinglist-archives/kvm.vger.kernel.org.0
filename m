@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 47E7D1596E6
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:52:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D2C91596CA
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:51:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730505AbgBKRwL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 12:52:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54910 "EHLO mail.kernel.org"
+        id S1730388AbgBKRvo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 12:51:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54224 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727966AbgBKRwL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 12:52:11 -0500
+        id S1730372AbgBKRvo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 12:51:44 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 222C6206CC;
-        Tue, 11 Feb 2020 17:52:10 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 67EB020578;
+        Tue, 11 Feb 2020 17:51:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581443530;
-        bh=qk6x1d4NRUqw3DKQMLEUfcyqYegsG9M/hW2zPBecrX4=;
+        s=default; t=1581443503;
+        bh=0Meg/3iJbL3MBzT1+yZerX/G5rQIdjlezfw/2Tu1x/0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GsF0UjKrFzsPxCokJJaiQu0DtQz79/SS2LrJiBodRo4EB5+K/WEskOxtF6yh/gXBZ
-         eMKq2wTbq36MAzUGDxisxGWxYJTufuzT9GvFH3u6FVl75/ij+IiNVR3xtefjggIdKH
-         LGY9BXe6XiKQt/QxN7yMaZvT93DixEPxZApau50A=
+        b=nDyF35cfeJLCZ1Exk84bNpVljETTKER1JLv+mpo8rnEe0BM1e2vTSn9itXPtIpwZN
+         l7uwqcL1Otu37w3PjTpiIXwErNaRkKxuFPseraE3p+7JhWt5zGNR8U4JIuEYybhTDx
+         ULHECoCu/uY1cM6HREUzmNHEFBQAGr/OIZJVS4KE=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1j1Zg2-004O7k-US; Tue, 11 Feb 2020 17:50:27 +0000
+        id 1j1Zg3-004O7k-Gv; Tue, 11 Feb 2020 17:50:27 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -39,9 +39,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 57/94] arm64: KVM: nv: Add handling of EL2-specific timer registers
-Date:   Tue, 11 Feb 2020 17:49:01 +0000
-Message-Id: <20200211174938.27809-58-maz@kernel.org>
+Subject: [PATCH v2 58/94] arm64: KVM: nv: Honor SCTLR_EL2.SPAN on entering vEL2
+Date:   Tue, 11 Feb 2020 17:49:02 +0000
+Message-Id: <20200211174938.27809-59-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -56,111 +56,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the required handling for EL2 and EL02 registers, as
-well as EL1 registers used in the E2H context.
+On entering vEL2, we must honor the SCTLR_EL2.SPAN bit so that
+PSTATE.PAN reflect the expected setting.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 72 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c1e856cb84f1..c62080d7742c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1384,20 +1384,92 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 8380ed810062..97af080b9b52 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -131,9 +131,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ static void enter_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 				enum exception_type type)
+ {
++	u64 spsr = *vcpu_cpsr(vcpu);
++
+ 	trace_kvm_inject_nested_exception(vcpu, esr_el2, type);
  
- 	switch (reg) {
- 	case SYS_CNTP_TVAL_EL0:
-+		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
+-	vcpu_write_sys_reg(vcpu, *vcpu_cpsr(vcpu), SPSR_EL2);
++	vcpu_write_sys_reg(vcpu, spsr, SPSR_EL2);
+ 	vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
+ 	vcpu_write_sys_reg(vcpu, esr_el2, ESR_EL2);
+ 
+@@ -141,6 +143,15 @@ static void enter_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 	/* On an exception, PSTATE.SP becomes 1 */
+ 	*vcpu_cpsr(vcpu) = PSR_MODE_EL2h;
+ 	*vcpu_cpsr(vcpu) |= PSR_A_BIT | PSR_F_BIT | PSR_I_BIT | PSR_D_BIT;
 +
- 	case SYS_AARCH32_CNTP_TVAL:
-+	case SYS_CNTP_TVAL_EL02:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_TVAL;
- 		break;
-+
-+	case SYS_CNTV_TVAL_EL02:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
-+	case SYS_CNTHP_TVAL_EL2:
-+		tmr = TIMER_HPTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
-+	case SYS_CNTHV_TVAL_EL2:
-+		tmr = TIMER_HVTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
- 	case SYS_CNTP_CTL_EL0:
-+		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
- 	case SYS_AARCH32_CNTP_CTL:
-+	case SYS_CNTP_CTL_EL02:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_CTL;
- 		break;
-+
-+	case SYS_CNTV_CTL_EL02:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
-+	case SYS_CNTHP_CTL_EL2:
-+		tmr = TIMER_HPTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
-+	case SYS_CNTHV_CTL_EL2:
-+		tmr = TIMER_HVTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
- 	case SYS_CNTP_CVAL_EL0:
-+		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
- 	case SYS_AARCH32_CNTP_CVAL:
-+	case SYS_CNTP_CVAL_EL02:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_CVAL;
- 		break;
-+
-+	case SYS_CNTV_CVAL_EL02:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
-+	case SYS_CNTHP_CVAL_EL2:
-+		tmr = TIMER_HPTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
-+	case SYS_CNTHV_CVAL_EL2:
-+		tmr = TIMER_HVTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
- 	case SYS_CNTVOFF_EL2:
- 		tmr = TIMER_VTIMER;
- 		treg = TIMER_REG_VOFF;
++	/*
++	 * If SPAN is clear, set the PAN bit on exception entry
++	 * if SPAN is set, copy the PAN bit across
++	 */
++	if (!(vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_EL1_SPAN))
++		*vcpu_cpsr(vcpu) |= PSR_PAN_BIT;
++	else
++		*vcpu_cpsr(vcpu) |= (spsr & PSR_PAN_BIT);
+ }
+ 
+ /*
 -- 
 2.20.1
 
