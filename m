@@ -2,110 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE0D41597A8
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 19:04:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB9231597C1
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 19:09:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730160AbgBKSEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 13:04:44 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39891 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728712AbgBKSEo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 13:04:44 -0500
-Received: by mail-wr1-f67.google.com with SMTP id y11so13596092wrt.6;
-        Tue, 11 Feb 2020 10:04:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id;
-        bh=q8IlFsAzW42BdHawcbUm+vPgezsGHOH9GeI0fUJDSVM=;
-        b=I87ccuceFBGwZWz6MWVVHLS9yZqJ4oxZ8rVMt3h/dieBPIXmTksaUGIK9emDsbPJ72
-         72KObeNgooFPdyUFIkNE9tfG9YCQT6DX97igWnoTk5XILeoDrV7XmBmNHZ6wxbM8Pmtd
-         ZWogo0fjRb3v4pOrlrDwa/TkzDxv79WtPnZGLikTvYVSmqKOdPgekvANTruoPe8hQVKg
-         Q8ke+MOLP8bEfh1RqNNqqj250UkVxF57F9Nw8ItyeGJqfXF0ht/pwYs3rJ8NaEpULXf7
-         4shrJgs+Hi1V6e1ec38bHvO7j+2I/5AcC3i48ib6FRo+YneO8Psd2BR1w1z+iHS0GGNP
-         T6Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id;
-        bh=q8IlFsAzW42BdHawcbUm+vPgezsGHOH9GeI0fUJDSVM=;
-        b=ZTFCevzZLRLYONXoarrtdgaFG+qMN6VxIt7PBilJy3UOKW4tQCEpUL/7qA60CNe6pZ
-         mlTrYp5fDU4FyCUbjlXe4dx/yxsIIir7pasBqevJ2eKBVnnbAVBqNRGg39+js6lyKmaS
-         F0C2zVr0VIewR5aJhL9TkWtLVc/dbaDKHiMijGJApR2YExzJR35wbme5EcXz/U6DqVBr
-         jtvzrlF7+1OdwN0FoqTF/2SW87vAPbIsjdADPKnaqgBsUMBoN/AYxZRrc4juSGKicgV5
-         aWmCWd325/f21woo4fVZcNTy1IrWJQG78tRXhaWFbqHXUk4HJ9b921IJkOMk+DvlaTMZ
-         gRgA==
-X-Gm-Message-State: APjAAAUGacB7d3EcZO27bNCwchIJjs35NH0FEfcZP+BFXRWwziORzaiB
-        ScbXnaveeogU/BA+bbAusiXB+BlX
-X-Google-Smtp-Source: APXvYqyhLYqPjSzy0F1s0h9EYZQPJT9P7yUxxdFIy+Dr2hO87FpztILGHBFxMSyYce9J9y6V8rVzgQ==
-X-Received: by 2002:adf:e8c9:: with SMTP id k9mr9870271wrn.168.1581444281212;
-        Tue, 11 Feb 2020 10:04:41 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id h128sm168982wmh.33.2020.02.11.10.04.40
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Feb 2020 10:04:40 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] KVM: x86: do not reset microcode version on INIT or RESET
-Date:   Tue, 11 Feb 2020 19:04:39 +0100
-Message-Id: <1581444279-10033-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1731144AbgBKSJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 13:09:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55174 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727764AbgBKSJO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 13:09:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581444553;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cvWT08/WflUIvbNwwiYodUIPz5SYW+7c7HDtxodvSyY=;
+        b=W6/RrsC4pwnN6zq1fVK73Kknq2zCFLHDpN8652dY/fYkWZE2PnBwPSCg7nHm8wSviac7s5
+        a4RnW41/7p61Nedt1oxPVlwstJUUXB45RMfgyqDutVZYfJgPl9jmMskTFwk5104RnzQONU
+        QLvrK7ncOv34AZ4yIgR9NfMK7Y5HhcQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-OeXjBtt3PWWnfP3RTAnh4g-1; Tue, 11 Feb 2020 13:09:08 -0500
+X-MC-Unique: OeXjBtt3PWWnfP3RTAnh4g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC05918A8C8B;
+        Tue, 11 Feb 2020 18:09:06 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EB2A360499;
+        Tue, 11 Feb 2020 18:09:01 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 4/9] arm: pmu: Check Required Event
+ Support
+To:     Peter Maydell <peter.maydell@linaro.org>
+Cc:     Eric Auger <eric.auger.pro@gmail.com>,
+        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm-devel <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Andrew Murray <andrew.murray@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+References: <20200130112510.15154-1-eric.auger@redhat.com>
+ <20200130112510.15154-5-eric.auger@redhat.com>
+ <CAFEAcA9rsncts+s4tVn4tY4zaMHKeqyJj1O4J=Ufx33fb=Nrcg@mail.gmail.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <45a29624-764f-acb2-dcc8-294bc591032e@redhat.com>
+Date:   Tue, 11 Feb 2020 19:08:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9rsncts+s4tVn4tY4zaMHKeqyJj1O4J=Ufx33fb=Nrcg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The microcode version should be set just once, since it is essentially
-a CPU feature; so do it on vCPU creation rather than reset.
+Hi Peter,
 
-Userspace can tie the fix to the availability of MSR_IA32_UCODE_REV in
-the list of emulated MSRs.
+On 2/11/20 4:33 PM, Peter Maydell wrote:
+> On Thu, 30 Jan 2020 at 11:25, Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> If event counters are implemented check the common events
+>> required by the PMUv3 are implemented.
+>>
+>> Some are unconditionally required (SW_INCR, CPU_CYCLES,
+>> either INST_RETIRED or INST_SPEC). Some others only are
+>> required if the implementation implements some other features.
+>>
+>> Check those wich are unconditionally required.
+>>
+>> This test currently fails on TCG as neither INST_RETIRED
+>> or INST_SPEC are supported.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+> 
+>> +static bool is_event_supported(uint32_t n, bool warn)
+>> +{
+>> +       uint64_t pmceid0 = read_sysreg(pmceid0_el0);
+>> +       uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
+>> +       bool supported;
+>> +       uint64_t reg;
+>> +
+>> +       /*
+>> +        * The low 32-bits of PMCEID0/1 respectly describe
+> 
+> "respectively"
+> 
+>> +        * event support for events 0-31/32-63. Their High
+>> +        * 32-bits describe support for extended events
+>> +        * starting at 0x4000, using the same split.
+>> +        */
+>> +       if (n >= 0x0  && n <= 0x3F)
+>> +               reg = (pmceid0 & 0xFFFFFFFF) | ((pmceid1 & 0xFFFFFFFF) << 32);
+>> +       else if  (n >= 0x4000 && n <= 0x403F)
+>> +               reg = (pmceid0 >> 32) | ((pmceid1 >> 32) << 32);
+>> +       else
+>> +               abort();
+>> +
+>> +       supported =  reg & (1UL << (n & 0x3F));
+>> +
+>> +       if (!supported && warn)
+>> +               report_info("event %d is not supported", n);
+>> +       return supported;
+>> +}
+>> +
+>> +static void test_event_introspection(void)
+>> +{
+>> +       bool required_events;
+>> +
+>> +       if (!pmu.nb_implemented_counters) {
+>> +               report_skip("No event counter, skip ...");
+>> +               return;
+>> +       }
+>> +
+>> +       /* PMUv3 requires an implementation includes some common events */
+>> +       required_events = is_event_supported(0x0, true) /* SW_INCR */ &&
+>> +                         is_event_supported(0x11, true) /* CPU_CYCLES */ &&
+>> +                         (is_event_supported(0x8, true) /* INST_RETIRED */ ||
+>> +                          is_event_supported(0x1B, true) /* INST_PREC */);
+>> +
+>> +       if (pmu.version == 0x4) {
+> 
+> This condition will only test for v8.1-required events if the PMU
+> is exactly 8.1, so you lose coverage if the implementation happens
+> to support ARMv8.4-PMU. Hopefully you have already bailed out
+> for "ID_AA64DFR0_EL1.PMUVer == 0xf" which means "non-standard IMPDEF
+> PMU", in which case you can just check >= 0x4.
+OK thanks
 
-Reported-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm.c     | 2 +-
- arch/x86/kvm/vmx/vmx.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index a7e63b613837..280f6d024e84 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2185,7 +2185,6 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	u32 dummy;
- 	u32 eax = 1;
- 
--	vcpu->arch.microcode_version = 0x01000065;
- 	svm->spec_ctrl = 0;
- 	svm->virt_spec_ctrl = 0;
- 
-@@ -2276,6 +2275,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 	init_vmcb(svm);
- 
- 	svm_init_osvw(vcpu);
-+	vcpu->arch.microcode_version = 0x01000065;
- 
- 	return 0;
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9a6664886f2e..d625b4b0e7b4 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4238,7 +4238,6 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 
- 	vmx->msr_ia32_umwait_control = 0;
- 
--	vcpu->arch.microcode_version = 0x100000000ULL;
- 	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
- 	vmx->hv_deadline_tsc = -1;
- 	kvm_set_cr8(vcpu, 0);
-@@ -6763,6 +6762,7 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
- 	vmx->nested.posted_intr_nv = -1;
- 	vmx->nested.current_vmptr = -1ull;
- 
-+	vcpu->arch.microcode_version = 0x100000000ULL;
- 	vmx->msr_ia32_feature_control_valid_bits = FEAT_CTL_LOCKED;
- 
- 	/*
--- 
-1.8.3.1
+Eric
+> 
+>> +               /* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
+>> +               required_events = required_events &&
+>> +                                 is_event_supported(0x23, true) &&
+>> +                                 is_event_supported(0x24, true);
+>> +       }
+>> +
+>> +       report(required_events, "Check required events are implemented");
+>> +}
+>> +
+>>  #endif
+> 
+> thanks
+> -- PMM
+> 
 
