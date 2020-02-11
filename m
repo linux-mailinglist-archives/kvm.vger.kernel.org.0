@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B86F21596D0
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:51:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1B9F1596C0
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:51:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730425AbgBKRvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 12:51:50 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54424 "EHLO mail.kernel.org"
+        id S1730364AbgBKRvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 12:51:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53974 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730304AbgBKRvt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 12:51:49 -0500
+        id S1730330AbgBKRvf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 12:51:35 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DE93D20848;
-        Tue, 11 Feb 2020 17:51:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D14EA20870;
+        Tue, 11 Feb 2020 17:51:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581443509;
-        bh=zoNIyoYHhwbdd0bsnFoLdmLpXNlGzytX2uCWQSzCgPs=;
+        s=default; t=1581443494;
+        bh=nuQ0MN9/FGm7i28EpIRwCZK8BlzSNLL3qWI84G027to=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AJE2JSztRdtust1r5duNIrKHaokiDlXjwJZdJYyo42BV/MCTz+4cMOVVp7nvLElr+
-         dvOT2w3ebUF//S0TLPzTpXk5b+JF/3+0x7lg1WuX+hjKZMcGGklwFEEdqll4C2hrqo
-         IA45nTChV0pXHHHtmQoJmeTnuwR+Zfj6mkxZmG4o=
+        b=rolyyoPuIhxBuyT6P+LDNWJEt7S0gbHBnRuxoO3pDpiT1W3uvPTj54mfLnzGvNJn+
+         KGORkhoUe9fKJI85d88XUE62BTUZwT1FxXGoyWmWoujF8nsrfh+zkCLbhaVjmtYsnp
+         xDROX7tA1ILiT/6yP4V63hBMwenL6EBKRL7IXBU0=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1j1Zfo-004O7k-JU; Tue, 11 Feb 2020 17:50:12 +0000
+        id 1j1Zfp-004O7k-5C; Tue, 11 Feb 2020 17:50:13 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -39,9 +39,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 33/94] KVM: arm64: nv: Hide RAS from nested guests
-Date:   Tue, 11 Feb 2020 17:48:37 +0000
-Message-Id: <20200211174938.27809-34-maz@kernel.org>
+Subject: [PATCH v2 34/94] KVM: arm64: nv: Use ARMv8.5-GTG to advertise supported Stage-2 page sizes
+Date:   Tue, 11 Feb 2020 17:48:38 +0000
+Message-Id: <20200211174938.27809-35-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -56,43 +56,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We don't want to expose complicated features to guests until we have
-a good grasp on the basic CPU emulation. So let's pretend that RAS,
-doesn't exist in a nested guest. We already hide the feature bits,
-let's now make sure VDISR_EL1 will UNDEF.
+ARMv8.5-GTG gives the opportunity to advertize the supported Stage-2
+page sizes to hypervisors, and allow them to differ from the page sizes
+supported at Stage-1.
+
+As KVM cannot support guest Stage-2 page sizes that are smaller than
+PAGE_SIZE (it would break the guest's isolation guarantees), let's use
+this feature to let the guest know (assuming it has been told about
+ARMv8.5-GTG).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/arm64/include/asm/sysreg.h |  3 +++
+ arch/arm64/kvm/nested.c         | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 966eb31a84e6..364020afc17c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -592,6 +592,14 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
- }
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 360ef9e8dfe4..a167219e42f4 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -701,6 +701,9 @@
+ #define ID_AA64ZFR0_SVEVER_SVE2		0x1
  
-+static bool trap_undef(struct kvm_vcpu *vcpu,
-+		       struct sys_reg_params *p,
-+		       const struct sys_reg_desc *r)
-+{
-+	kvm_inject_undefined(vcpu);
-+	return false;
-+}
-+
- /*
-  * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
-  * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-@@ -2056,6 +2064,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_VBAR_EL2), access_rw, reset_val, VBAR_EL2, 0 },
- 	{ SYS_DESC(SYS_RVBAR_EL2), access_rw, reset_val, RVBAR_EL2, 0 },
- 	{ SYS_DESC(SYS_RMR_EL2), access_wi, reset_val, RMR_EL2, 1 },
-+	{ SYS_DESC(SYS_VDISR_EL2), trap_undef },
+ /* id_aa64mmfr0 */
++#define ID_AA64MMFR0_TGRAN4_2_SHIFT	40
++#define ID_AA64MMFR0_TGRAN64_2_SHIFT	36
++#define ID_AA64MMFR0_TGRAN16_2_SHIFT	32
+ #define ID_AA64MMFR0_TGRAN4_SHIFT	28
+ #define ID_AA64MMFR0_TGRAN64_SHIFT	24
+ #define ID_AA64MMFR0_TGRAN16_SHIFT	20
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index cecea8d91196..c40bf753ead9 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -95,6 +95,35 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 		break;
  
- 	{ SYS_DESC(SYS_CONTEXTIDR_EL2), access_rw, reset_val, CONTEXTIDR_EL2, 0 },
- 	{ SYS_DESC(SYS_TPIDR_EL2), access_rw, reset_val, TPIDR_EL2, 0 },
+ 	case SYS_ID_AA64MMFR0_EL1:
++		/* Hide unsupported S2 page sizes */
++		switch (PAGE_SIZE) {
++		case SZ_64K:
++			val &= ~FEATURE(ID_AA64MMFR0_TGRAN16_2);
++			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0001);
++			/* Fall through */
++		case SZ_16K:
++			val &= ~FEATURE(ID_AA64MMFR0_TGRAN4_2);
++			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0001);
++			/* Fall through */
++		case SZ_4K:
++			/* Support everything */
++			break;
++		}
++		/* Advertize supported S2 page sizes */
++		switch (PAGE_SIZE) {
++		case SZ_4K:
++			val &= ~FEATURE(ID_AA64MMFR0_TGRAN4_2);
++			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0010);
++			/* Fall through */
++		case SZ_16K:
++			val &= ~FEATURE(ID_AA64MMFR0_TGRAN16_2);
++			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0010);
++			/* Fall through */
++		case SZ_64K:
++			val &= ~FEATURE(ID_AA64MMFR0_TGRAN64_2);
++			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN64_2), 0b0010);
++			break;
++		}
+ 		/* Cap PARange to 40bits */
+ 		tmp = FIELD_GET(FEATURE(ID_AA64MMFR0_PARANGE), val);
+ 		if (tmp > 0b0010) {
 -- 
 2.20.1
 
