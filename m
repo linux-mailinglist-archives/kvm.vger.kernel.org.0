@@ -2,229 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BCC0159182
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 15:05:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18CB915918D
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 15:07:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729560AbgBKOFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 09:05:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47278 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728922AbgBKOFr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 09:05:47 -0500
+        id S1729819AbgBKOHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 09:07:24 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49760 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728124AbgBKOHY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 09:07:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581429946;
+        s=mimecast20190719; t=1581430043;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=8HErzYCL0mTM3sdscy5HTASrBXdUf3Z4THh5KgpEyOg=;
-        b=Ak9vX2jqn+xVz6YceW4LTcF84H6rRPpaHMWivLTyc3DKTXkXbcasbk+1UMUyNt8ju1K7sR
-        5yg4Wk6qy+Hnt1+1kkwbBEdqdmEU+S/SJIZLREYqQEuGGwPqtjpOyKRqSeQnKrE9a5Ufd6
-        XALtYRVX1CaE/ojY1HbAr0KXcRu1uI0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-nXvAokSrPyWUhMt81NYckA-1; Tue, 11 Feb 2020 09:05:44 -0500
-X-MC-Unique: nXvAokSrPyWUhMt81NYckA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 087061336597;
-        Tue, 11 Feb 2020 14:05:43 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DF16989F0D;
-        Tue, 11 Feb 2020 14:05:41 +0000 (UTC)
-Date:   Tue, 11 Feb 2020 15:05:39 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        yuzenghui@huawei.com
-Subject: Re: [PATCH kvm-unit-tests v2] arm64: timer: Speed up gic-timer-state
- check
-Message-ID: <20200211140539.kmnnyinilcd7cl6v@kamzik.brq.redhat.com>
-References: <20200211133705.1398-1-drjones@redhat.com>
- <87b71045-a2cd-1434-c26d-e427d58e5d9b@arm.com>
+        bh=INu84orqc9+je081poLUqhp5eUlqzmj/i/n4RyB/kg0=;
+        b=DSrejC4qSdxcV95d6dmOECnxKD2UQTgbtGXcJFUvrPNC8BLehCkDu6nBbGoELpaU4q6n+O
+        ZvE84g6ARMO9BPsI5C//KAwbTJtW0hHOKLjBPnPoxWX0EBLD1zXYDC1bARcFpvPrRzVero
+        YjtChnX+W29aIpIIoH29eeD0OtjEiiw=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-1uH2N9UpNwGMVcNK_sgftw-1; Tue, 11 Feb 2020 09:07:21 -0500
+X-MC-Unique: 1uH2N9UpNwGMVcNK_sgftw-1
+Received: by mail-qt1-f199.google.com with SMTP id d9so6615137qtq.13
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 06:07:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=INu84orqc9+je081poLUqhp5eUlqzmj/i/n4RyB/kg0=;
+        b=j/DNIxhnIZ5wT3drfw/kkjZ13LBIDtzOMqBxJG7G6OnPO86o4Fikkkbe99rdjj5zF4
+         6fXBnaHfMwIGIaPgAFqJhZDWSObcaJSOkox2nOAdAlcZlZtRGj8Y/Km8Z2T0rPY0tLOH
+         Lo01jsiA/c0RX8wzYiGELxYenHwb4iy+9STEW2EfkPk0aoYm/Rp8bOahJXA8NTGVb7EV
+         xvy4kcvjyZtuhHo1/uIwhgbzMKTayEvOOQnmHCPHfdJTf+ClTJW+mmsG+0IRNe+FYrhd
+         mxtkleTYksz8tLaGGUFDiY9DV3u9RTKbJqHV4sg+u8sEWUv0t61i0EFKpaGZCG4OytBO
+         ZmQQ==
+X-Gm-Message-State: APjAAAVgyZc6ejVSY+zxCUHPwurXBHzd+qG/bODK+DyHLaeLpVnjDCeZ
+        YYPKhhK7x3oL2lcq+fVilESn3Fh2xmKqwLX2UPYuJ3/InJe7unzv2/8fazr8vIsXHeb4y5qJJbK
+        txpTGXtbSuMUa
+X-Received: by 2002:a37:9e09:: with SMTP id h9mr6306036qke.176.1581430040980;
+        Tue, 11 Feb 2020 06:07:20 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzu8Y9MsH8YO9REysQ9nYFhCJuec8Q3jBv6o6L1bwS7xwhDk3Sc7yQGpQut6djeRWTzM+X5sw==
+X-Received: by 2002:a37:9e09:: with SMTP id h9mr6306002qke.176.1581430040713;
+        Tue, 11 Feb 2020 06:07:20 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+        by smtp.gmail.com with ESMTPSA id z1sm2150280qtq.69.2020.02.11.06.07.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2020 06:07:19 -0800 (PST)
+Date:   Tue, 11 Feb 2020 09:07:12 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz,
+        yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com, osalvador@suse.de
+Subject: Re: [PATCH v16.1 6/9] virtio-balloon: Add support for providing free
+ page reports to host
+Message-ID: <20200211090052-mutt-send-email-mst@kernel.org>
+References: <20200122173040.6142.39116.stgit@localhost.localdomain>
+ <20200122174347.6142.92803.stgit@localhost.localdomain>
+ <b8cbf72d-55a7-4a58-6d08-b0ac5fa86e82@redhat.com>
+ <20200211063441-mutt-send-email-mst@kernel.org>
+ <ada0ec83-8e7d-abb3-7053-0ec2bf2a9aa5@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87b71045-a2cd-1434-c26d-e427d58e5d9b@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <ada0ec83-8e7d-abb3-7053-0ec2bf2a9aa5@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 11, 2020 at 01:52:35PM +0000, Alexandru Elisei wrote:
-> Hi,
+On Tue, Feb 11, 2020 at 01:19:31PM +0100, David Hildenbrand wrote:
+> >>
+> >> Did you see the discussion regarding unifying handling of
+> >> inflate/deflate/free_page_hinting_free_page_reporting, requested by
+> >> Michael? I think free page reporting is special and shall be left alone.
+> > 
+> > Not sure what do you mean by "left alone here". Could you clarify?
 > 
-> On 2/11/20 1:37 PM, Andrew Jones wrote:
-> > Let's bail out of the wait loop if we see the expected state
-> > to save over six seconds of run time. Make sure we wait a bit
-> > before reading the registers and double check again after,
-> > though, to somewhat mitigate the chance of seeing the expected
-> > state by accident.
-> >
-> > We also take this opportunity to push more IRQ state code to
-> > the library.
-> >
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  arm/timer.c       | 30 ++++++++++++------------------
-> >  lib/arm/asm/gic.h | 11 ++++++-----
-> >  lib/arm/gic.c     | 33 +++++++++++++++++++++++++++++++++
-> >  3 files changed, 51 insertions(+), 23 deletions(-)
-> >
-> > diff --git a/arm/timer.c b/arm/timer.c
-> > index f5cf775ce50f..3c4e27f20e2e 100644
-> > --- a/arm/timer.c
-> > +++ b/arm/timer.c
-> > @@ -183,28 +183,22 @@ static bool timer_pending(struct timer_info *info)
-> >  		(info->read_ctl() & ARCH_TIMER_CTL_ISTATUS);
-> >  }
-> >  
-> > -static enum gic_state gic_timer_state(struct timer_info *info)
-> > +static bool gic_timer_check_state(struct timer_info *info,
-> > +				  enum gic_irq_state expected_state)
-> >  {
-> > -	enum gic_state state = GIC_STATE_INACTIVE;
-> >  	int i;
-> > -	bool pending, active;
-> >  
-> >  	/* Wait for up to 1s for the GIC to sample the interrupt. */
-> >  	for (i = 0; i < 10; i++) {
-> > -		pending = readl(gic_ispendr) & (1 << PPI(info->irq));
-> > -		active = readl(gic_isactiver) & (1 << PPI(info->irq));
-> > -		if (!active && !pending)
-> > -			state = GIC_STATE_INACTIVE;
-> > -		if (pending)
-> > -			state = GIC_STATE_PENDING;
-> > -		if (active)
-> > -			state = GIC_STATE_ACTIVE;
-> > -		if (active && pending)
-> > -			state = GIC_STATE_ACTIVE_PENDING;
-> >  		mdelay(100);
-> > +		if (gic_irq_state(info->irq) == expected_state) {
-> > +			mdelay(100);
-> > +			if (gic_irq_state(info->irq) == expected_state)
-> > +				return true;
-> > +		}
-> >  	}
-> >  
-> > -	return state;
-> > +	return false;
-> >  }
-> >  
-> >  static bool test_cval_10msec(struct timer_info *info)
-> > @@ -253,11 +247,11 @@ static void test_timer(struct timer_info *info)
-> >  	/* Enable the timer, but schedule it for much later */
-> >  	info->write_cval(later);
-> >  	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
-> > -	report(!timer_pending(info) && gic_timer_state(info) == GIC_STATE_INACTIVE,
-> > +	report(!timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STATE_INACTIVE),
-> >  			"not pending before");
-> >  
-> >  	info->write_cval(now - 1);
-> > -	report(timer_pending(info) && gic_timer_state(info) == GIC_STATE_PENDING,
-> > +	report(timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STATE_PENDING),
-> >  			"interrupt signal pending");
-> >  
-> >  	/* Disable the timer again and prepare to take interrupts */
-> > @@ -265,12 +259,12 @@ static void test_timer(struct timer_info *info)
-> >  	info->irq_received = false;
-> >  	set_timer_irq_enabled(info, true);
-> >  	report(!info->irq_received, "no interrupt when timer is disabled");
-> > -	report(!timer_pending(info) && gic_timer_state(info) == GIC_STATE_INACTIVE,
-> > +	report(!timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STATE_INACTIVE),
-> >  			"interrupt signal no longer pending");
-> >  
-> >  	info->write_cval(now - 1);
-> >  	info->write_ctl(ARCH_TIMER_CTL_ENABLE | ARCH_TIMER_CTL_IMASK);
-> > -	report(timer_pending(info) && gic_timer_state(info) == GIC_STATE_INACTIVE,
-> > +	report(timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STATE_INACTIVE),
-> >  			"interrupt signal not pending");
-> >  
-> >  	report(test_cval_10msec(info), "latency within 10 ms");
-> > diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-> > index a72e0cde4e9c..922cbe95750c 100644
-> > --- a/lib/arm/asm/gic.h
-> > +++ b/lib/arm/asm/gic.h
-> > @@ -47,11 +47,11 @@
-> >  #ifndef __ASSEMBLY__
-> >  #include <asm/cpumask.h>
-> >  
-> > -enum gic_state {
-> > -	GIC_STATE_INACTIVE,
-> > -	GIC_STATE_PENDING,
-> > -	GIC_STATE_ACTIVE,
-> > -	GIC_STATE_ACTIVE_PENDING,
-> > +enum gic_irq_state {
-> > +	GIC_IRQ_STATE_INACTIVE,
-> > +	GIC_IRQ_STATE_PENDING,
-> > +	GIC_IRQ_STATE_ACTIVE,
-> > +	GIC_IRQ_STATE_ACTIVE_PENDING,
-> >  };
-> >  
-> >  /*
-> > @@ -80,6 +80,7 @@ extern u32 gic_iar_irqnr(u32 iar);
-> >  extern void gic_write_eoir(u32 irqstat);
-> >  extern void gic_ipi_send_single(int irq, int cpu);
-> >  extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
-> > +extern enum gic_irq_state gic_irq_state(int irq);
-> >  
-> >  #endif /* !__ASSEMBLY__ */
-> >  #endif /* _ASMARM_GIC_H_ */
-> > diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> > index 94301169215c..0563b31132c8 100644
-> > --- a/lib/arm/gic.c
-> > +++ b/lib/arm/gic.c
-> > @@ -146,3 +146,36 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
-> >  	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
-> >  	gic_common_ops->ipi_send_mask(irq, dest);
-> >  }
-> > +
-> > +enum gic_irq_state gic_irq_state(int irq)
-> > +{
-> > +	enum gic_irq_state state;
-> > +	bool pending = false, active = false;
-> > +	void *base;
-> > +
-> > +	assert(gic_common_ops);
-> > +
-> > +	switch (gic_version()) {
-> > +	case 2:
-> > +		base = gicv2_dist_base();
-> > +		pending = readl(base + GICD_ISPENDR) & (1 << PPI(irq));
-> > +		active = readl(base + GICD_ISACTIVER) & (1 << PPI(irq));
-> > +		break;
-> > +	case 3:
-> > +		base = gicv3_sgi_base();
-> > +		pending = readl(base + GICR_ISPENDR0) & (1 << PPI(irq));
-> > +		active = readl(base + GICR_ISACTIVER0) & (1 << PPI(irq));
-> > +		break;
-> > +	}
-> > +
-> > +	if (!active && !pending)
-> > +		state = GIC_IRQ_STATE_INACTIVE;
-> > +	if (pending)
-> > +		state = GIC_IRQ_STATE_PENDING;
-> > +	if (active)
-> > +		state = GIC_IRQ_STATE_ACTIVE;
-> > +	if (active && pending)
-> > +		state = GIC_IRQ_STATE_ACTIVE_PENDING;
-> > +
-> > +	return state;
-> > +}
+> Don't try to unify handling like I proposed below, because it's
+> semantics are special.
 > 
-> Looks good. The gic_ispendr and gic_isactiver variables are not used anymore and
-> could be removed, but it's not a big deal. Either way:
+> > 
+> >> VIRTIO_BALLOON_F_REPORTING is nothing but a more advanced inflate, right
+> >> (sg, inflate based on size - not "virtio pages")?
+> > 
+> > 
+> > Not exactly - it's also initiated by guest as opposed to host, and
+> > not guided by the ballon size request set by the host.
 > 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> True, but AFAIKS you could use existing INFLATE/DEFLATE in a similar
+> way. There is no way for the hypervisor to nack a request. The balloon
+> size is not glued to inflate/deflate requests. The guests manually
+> updates it.
 
-Indeed. I'll remove them and add your r-b while applying.
+Hmm how isn't it? num_pages is the only way to inflate/deflate.
 
-Thanks,
-drew
+Spec also says:
+The device is driven either by the receipt of a configuration change notification, or by changing guest memory
+needs, such as performing memory compaction or responding to out of memory conditions.
 
+so ignoring compaction/oom (later is under-specified, not a good example
+to follow) yes inflate/deflate are tied to host specified configuration.
+
+
+> > And uses a dedicated queue to avoid blocking other functionality ...
 > 
+> True, but the other queues also don't allow for an easy extension
+> AFAIKS, so that's another reason.
+> 
+> > 
+> > I really think this is more like an inflate immediately followed by deflate.
+> 
+> Depends on how you look at it. As inflate/deflate is not glued to the
+> balloon size (the guest updates the size manually), it's not obvious.
+> 
+> E.g., in QEMU, a deflate is just a performance improvement
+> ("MADV_WILLNEED") - in that regard, it's more like an optional deflation.
+> 
+> [...]
+> 
+> > 
+> > I'd rather wait until we have a usecase and preferably a POC
+> > showing it helps before we add optional deflate ...
+> > For now I personally am fine with just making this go ahead as is,
+> > and imply SG and OPTIONAL_DEFLATE just for this VQ.
+> 
+> Also fine with me, you asked about if we can abstract any of this if I
+> am not wrong :) So this was my take.
+> 
+> > 
+> > Do you feel strongly we need to bring this up to a TC vote?
+> 
+> Not really. People have been asking about how to inflate/deflate huge
+> pages a long time ago (comes with different challenges - e.g., balloon
+> compaction). looked like this interface could have been reused for this
+> as well.
+> 
+> But yeah, I am not a fan of virtio-balloon and the whole inflate/deflate
+> thingy. So at least I don't see a need to extend the inflate/deflate
+> capability.
+> 
+> Free page reporting is a different story (and the semantics require no
+> inflate/deflate/balloon size) - it could have been moved to
+> virtio-whatever without any issues. So I am fine with this.
+> 
+> -- 
 > Thanks,
-> Alex
 > 
+> David / dhildenb
 
