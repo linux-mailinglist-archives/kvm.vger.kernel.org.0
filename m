@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E949F15970A
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:52:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0196015973E
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:53:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730556AbgBKRwl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 12:52:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55756 "EHLO mail.kernel.org"
+        id S1730739AbgBKRx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 12:53:26 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56986 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730586AbgBKRwk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 12:52:40 -0500
+        id S1730637AbgBKRxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 12:53:25 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 06173206D7;
-        Tue, 11 Feb 2020 17:52:40 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 07D0A20578;
+        Tue, 11 Feb 2020 17:53:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581443560;
-        bh=hU+8ZXqCJKxOobeRNU4DXaABOcyKqWOi8gVrtQCKmB4=;
+        s=default; t=1581443605;
+        bh=6qEfnPAQpmbL6mkKK1EQQA1y8FQyNR3EaGGAZea+tbk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EdhZW7l3r9pBPITz5bqtPd1CMIS/aQIr6rlitozY7j+K2VybQepugwb24fh8UVjmE
-         0IKsMPOBpFsJi0tuRE/Li5AFMw54PwX/ED9WfADaS8YXOe/U39Wwb8HizuHHsiZjgY
-         c1f1w5mTgRnPnA1rb0405qetcy0+BVl1Ce+jMb80=
+        b=C2hxYCSBr8A2cGVap21mWjhMt72gIg1HgqTKuOrdCTVW4rkT+XN8MmJXbILHounYV
+         sku3e/hkzreGyEo5shAsbkuwL8odH4tzmlWRDYQjnYuWjGmzmZ2r4eL+Pnl7utC925
+         U3GQaUkOsj5HYl856LkVthyKy8D1I+RdICX9srbU=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1j1Zg4-004O7k-2O; Tue, 11 Feb 2020 17:50:28 +0000
+        id 1j1Zg4-004O7k-ON; Tue, 11 Feb 2020 17:50:28 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -39,9 +39,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 59/94] arm64: KVM: nv: Handle SCTLR_EL2 RES0/RES1 bits
-Date:   Tue, 11 Feb 2020 17:49:03 +0000
-Message-Id: <20200211174938.27809-60-maz@kernel.org>
+Subject: [PATCH v2 60/94] arm64: KVM: nv: Restrict S2 RD/WR permissions to match the guest's
+Date:   Tue, 11 Feb 2020 17:49:04 +0000
+Message-Id: <20200211174938.27809-61-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -56,67 +56,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Depending on the HCR_EL2.{E2H,TGE} values, SCTLR_EL2 has different
-RES0/RES1 constraints.
-
-Let's handle that.
+When mapping a page in a shadow stage-2, special care must be
+taken not to be more permissive than the guest is (writable or
+readable page when the guest hasn't set that permission).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_mmu.h      | 18 ++++++++++++++++++
+ arch/arm64/include/asm/kvm_mmu.h    | 18 ++++++++++++++++++
+ arch/arm64/include/asm/kvm_nested.h | 10 ++++++++++
+ virt/kvm/arm/mmu.c                  | 21 ++++++++++++++++++++-
+ 4 files changed, 66 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c62080d7742c..121b3f28cae2 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -443,6 +443,37 @@ static bool access_vbar_el1(struct kvm_vcpu *vcpu,
- 	return access_rw(vcpu, p, r);
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 1d0d5f00f0af..be7be6583e54 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -113,6 +113,12 @@ static inline pud_t kvm_s2pud_mkexec(pud_t pud)
+ 	return pud;
  }
  
-+static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
-+			     struct sys_reg_params *p,
-+			     const struct sys_reg_desc *r)
++static inline pud_t kvm_s2pud_revoke_read(pud_t pud)
 +{
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
-+
-+	if (p->is_write) {
-+		u64 val = p->regval;
-+
-+		if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
-+			val &= ~(GENMASK_ULL(63,45) | GENMASK_ULL(34, 32) |
-+				 BIT_ULL(17));
-+			val |=  SCTLR_EL1_RES1;
-+		} else {
-+			val &= ~(GENMASK_ULL(63,45) | BIT_ULL(42) |
-+				 GENMASK_ULL(39, 38) | GENMASK_ULL(35, 32) |
-+				 BIT_ULL(26) | BIT_ULL(24) | BIT_ULL(20) |
-+				 BIT_ULL(17) | GENMASK_ULL(15, 14) |
-+				 GENMASK(10, 7));
-+			val |=  SCTLR_EL2_RES1;
-+		}
-+
-+		vcpu_write_sys_reg(vcpu, val, r->reg);
-+	} else {
-+		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-+	}
-+
-+	return true;
++	WARN_ON(1);
++	return pud;
 +}
 +
- /*
-  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-  */
-@@ -2254,7 +2285,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_vpidr, VPIDR_EL2 },
- 	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_vmpidr, VMPIDR_EL2 },
+ static inline bool kvm_s2pud_exec(pud_t *pud)
+ {
+ 	WARN_ON(1);
+@@ -155,6 +161,18 @@ static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
+ 	return pmd;
+ }
  
--	{ SYS_DESC(SYS_SCTLR_EL2), access_rw, reset_val, SCTLR_EL2, 0 },
-+	{ SYS_DESC(SYS_SCTLR_EL2), access_sctlr_el2, reset_val, SCTLR_EL2, SCTLR_EL2_RES1 },
- 	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
- 	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
- 	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
++static inline pte_t kvm_s2pte_revoke_read(pte_t pte)
++{
++	pte_val(pte) &= ~L_PTE_S2_RDONLY;
++	return pte;
++}
++
++static inline pmd_t kvm_s2pmd_revoke_read(pmd_t pmd)
++{
++	pmd_val(pmd) &= ~L_PMD_S2_RDONLY;
++	return pmd;
++}
++
+ static inline void kvm_set_s2pte_readonly(pte_t *pte)
+ {
+ 	pte_val(*pte) = (pte_val(*pte) & ~L_PTE_S2_RDWR) | L_PTE_S2_RDONLY;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 9c0bf878fb3b..b390bba466e9 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -228,6 +228,24 @@ static inline pud_t kvm_s2pud_mkexec(pud_t pud)
+ 	return pud;
+ }
+ 
++static inline pte_t kvm_s2pte_revoke_read(pte_t pte)
++{
++	pte_val(pte) &= ~PTE_S2_RDONLY;
++	return pte;
++}
++
++static inline pmd_t kvm_s2pmd_revoke_read(pmd_t pmd)
++{
++	pmd_val(pmd) &= ~PMD_S2_RDONLY;
++	return pmd;
++}
++
++static inline pud_t kvm_s2pud_revoke_read(pud_t pud)
++{
++	pud_val(pud) &= ~PUD_S2_RDONLY;
++	return pud;
++}
++
+ static inline void kvm_set_s2pte_readonly(pte_t *ptep)
+ {
+ 	pteval_t old_pteval, pteval;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 45c013c0c856..7cd0c5b0fec9 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -43,6 +43,16 @@ static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
+ 	return trans->esr;
+ }
+ 
++static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
++{
++	return trans->readable;
++}
++
++static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
++{
++	return trans->writable;
++}
++
+ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 			      struct kvm_s2_trans *result);
+ 
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 0086b42237af..7da72c2b7f0f 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1721,7 +1721,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  unsigned long hva, unsigned long fault_status)
+ {
+ 	int ret;
+-	bool write_fault, writable;
++	bool write_fault, writable, readable = true;
+ 	bool exec_fault, needs_exec;
+ 	unsigned long mmu_seq;
+ 	phys_addr_t ipa = fault_ipa;
+@@ -1841,6 +1841,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (exec_fault && is_iomap(flags))
+ 		return -ENOEXEC;
+ 
++	/*
++	 * Potentially reduce shadow S2 permissions to match the guest's own
++	 * S2. For exec faults, we'd only reach this point if the guest
++	 * actually allowed it (see kvm_s2_handle_perm_fault).
++	 */
++	if (kvm_is_shadow_s2_fault(vcpu)) {
++		writable &= kvm_s2_trans_writable(nested);
++		readable &= kvm_s2_trans_readable(nested);
++	}
++
+ 	spin_lock(&kvm->mmu_lock);
+ 	if (mmu_notifier_retry(kvm, mmu_seq))
+ 		goto out_unlock;
+@@ -1886,6 +1896,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		if (writable)
+ 			new_pud = kvm_s2pud_mkwrite(new_pud);
+ 
++		if (!readable)
++			new_pud = kvm_s2pud_revoke_read(new_pud);
++
+ 		if (needs_exec)
+ 			new_pud = kvm_s2pud_mkexec(new_pud);
+ 
+@@ -1898,6 +1911,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		if (writable)
+ 			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+ 
++		if (!readable)
++			new_pmd = kvm_s2pmd_revoke_read(new_pmd);
++
+ 		if (needs_exec)
+ 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+ 
+@@ -1910,6 +1926,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			mark_page_dirty(kvm, gfn);
+ 		}
+ 
++		if (!readable)
++			new_pte = kvm_s2pte_revoke_read(new_pte);
++
+ 		if (needs_exec)
+ 			new_pte = kvm_s2pte_mkexec(new_pte);
+ 
 -- 
 2.20.1
 
