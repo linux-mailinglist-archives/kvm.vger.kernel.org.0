@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C544D1590E4
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:56:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE15C1590EA
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:56:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729095AbgBKN4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 08:56:14 -0500
-Received: from 8bytes.org ([81.169.241.247]:51838 "EHLO theia.8bytes.org"
+        id S1729582AbgBKN4P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 08:56:15 -0500
+Received: from 8bytes.org ([81.169.241.247]:52198 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729546AbgBKNxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1729544AbgBKNxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 11 Feb 2020 08:53:25 -0500
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id CE3BEE7D; Tue, 11 Feb 2020 14:53:13 +0100 (CET)
+        id 09D04E82; Tue, 11 Feb 2020 14:53:13 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
@@ -27,9 +27,9 @@ Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 37/62] x86/sev-es: Wire up existing #VC exit-code handlers
-Date:   Tue, 11 Feb 2020 14:52:31 +0100
-Message-Id: <20200211135256.24617-38-joro@8bytes.org>
+Subject: [PATCH 38/62] x86/sev-es: Handle instruction fetches from user-space
+Date:   Tue, 11 Feb 2020 14:52:32 +0100
+Message-Id: <20200211135256.24617-39-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211135256.24617-1-joro@8bytes.org>
 References: <20200211135256.24617-1-joro@8bytes.org>
@@ -40,69 +40,57 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Re-use the handlers for CPUID and IOIO caused #VC exceptions in the
-early boot handler.
+When a #VC exception is triggered by user-space the instruction
+decoder needs to read the instruction bytes from user addresses.
+Enhance es_fetch_insn_byte() to safely fetch kernel and user
+instruction bytes.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/sev-es-shared.c | 9 +++------
- arch/x86/kernel/sev-es.c        | 9 +++++++++
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ arch/x86/kernel/sev-es.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
-index 57c29c91fe87..14693eff9614 100644
---- a/arch/x86/kernel/sev-es-shared.c
-+++ b/arch/x86/kernel/sev-es-shared.c
-@@ -358,8 +358,7 @@ static enum es_result ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
- 	return ES_OK;
- }
- 
--static enum es_result __maybe_unused
--handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
-+static enum es_result handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- {
- 	struct pt_regs *regs = ctxt->regs;
- 	u64 exit_info_1, exit_info_2;
-@@ -451,8 +450,7 @@ handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- 	return ret;
- }
- 
--static enum es_result __maybe_unused
--handle_cpuid(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
-+static enum es_result handle_cpuid(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- {
- 	struct pt_regs *regs = ctxt->regs;
- 	u32 cr4 = native_read_cr4();
-@@ -658,8 +656,7 @@ static enum es_result handle_mmio_twobyte_ops(struct ghcb *ghcb,
- 	return ret;
- }
- 
--static enum es_result __maybe_unused
--handle_mmio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
-+static enum es_result handle_mmio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- {
- 	struct insn *insn = &ctxt->insn;
- 	unsigned int bytes = 0;
 diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 1fb7128ff386..2a801919e7c0 100644
+index 2a801919e7c0..f5bff4219f6f 100644
 --- a/arch/x86/kernel/sev-es.c
 +++ b/arch/x86/kernel/sev-es.c
-@@ -174,6 +174,15 @@ static enum es_result handle_vc_exception(struct es_em_ctxt *ctxt,
- 	enum es_result result;
+@@ -61,13 +61,29 @@ static enum es_result es_fetch_insn_byte(struct es_em_ctxt *ctxt,
+ 					 unsigned int offset,
+ 					 char *buffer)
+ {
+-	char *rip = (char *)ctxt->regs->ip;
+-
+-	/* More checks are needed when we boot to user-space */
+-	if (!check_kernel(ctxt->regs))
+-		return ES_UNSUPPORTED;
+-
+-	buffer[offset] = rip[offset];
++	if (user_mode(ctxt->regs)) {
++		unsigned long addr = ctxt->regs->ip + offset;
++		char __user *rip = (char __user *)addr;
++
++		if (unlikely(addr >= TASK_SIZE_MAX))
++			return ES_UNSUPPORTED;
++
++		if (copy_from_user(buffer + offset, rip, 1)) {
++			ctxt->fi.vector     = X86_TRAP_PF;
++			ctxt->fi.cr2        = addr;
++			ctxt->fi.error_code = X86_PF_INSTR | X86_PF_USER;
++			return ES_EXCEPTION;
++		}
++	} else {
++		char *rip = (char *)ctxt->regs->ip + offset;
++
++		if (probe_kernel_read(buffer + offset, rip, 1) != 0) {
++			ctxt->fi.vector     = X86_TRAP_PF;
++			ctxt->fi.cr2        = (unsigned long)rip;
++			ctxt->fi.error_code = X86_PF_INSTR;
++			return ES_EXCEPTION;
++		}
++	}
  
- 	switch (exit_code) {
-+	case SVM_EXIT_CPUID:
-+		result = handle_cpuid(ghcb, ctxt);
-+		break;
-+	case SVM_EXIT_IOIO:
-+		result = handle_ioio(ghcb, ctxt);
-+		break;
-+	case SVM_EXIT_NPF:
-+		result = handle_mmio(ghcb, ctxt);
-+		break;
- 	default:
- 		/*
- 		 * Unexpected #VC exception
+ 	return ES_OK;
+ }
 -- 
 2.17.1
 
