@@ -2,94 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4B60158CE6
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 11:46:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 658A8158CEF
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 11:51:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728401AbgBKKqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 05:46:05 -0500
-Received: from outbound-smtp33.blacknight.com ([81.17.249.66]:45999 "EHLO
-        outbound-smtp33.blacknight.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727805AbgBKKqE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 05:46:04 -0500
-X-Greylist: delayed 320 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Feb 2020 05:46:03 EST
-Received: from mail.blacknight.com (unknown [81.17.254.11])
-        by outbound-smtp33.blacknight.com (Postfix) with ESMTPS id A3C74D0207
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 10:40:42 +0000 (GMT)
-Received: (qmail 4116 invoked from network); 11 Feb 2020 10:40:42 -0000
-Received: from unknown (HELO techsingularity.net) (mgorman@techsingularity.net@[84.203.18.57])
-  by 81.17.254.9 with ESMTPSA (AES256-SHA encrypted, authenticated); 11 Feb 2020 10:40:42 -0000
-Date:   Tue, 11 Feb 2020 10:40:41 +0000
-From:   Mel Gorman <mgorman@techsingularity.net>
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Cc:     akpm@linux-foundation.org, david@redhat.com,
-        yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de,
-        vbabka@suse.cz, AlexanderDuyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org
-Subject: Re: Should I repost? (was: Re: [PATCH v16.1 0/9] mm / virtio:
- Provide support for free page reporting)
-Message-ID: <20200211104041.GK3466@techsingularity.net>
-References: <20200122173040.6142.39116.stgit@localhost.localdomain>
- <6758b1e3373fc06b37af1c87901237974d52322f.camel@linux.intel.com>
- <d943ada56babfbebf408ad0f94988a5b09d2b472.camel@linux.intel.com>
+        id S1728402AbgBKKvr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 05:51:47 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32278 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727805AbgBKKvq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 05:51:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581418305;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Wcyxf6NJeWTzFTTd7ngQGUJSq/GL3N66hN3Lol5zgv4=;
+        b=F/CRTKkBn/gF5/7EZzf4pn2g8LXgY2lHCw4VU4MLtvNzXZM6TvYm+HMPaecXl2ggQzSuss
+        NdfPsJa0VRhwhEBUAO1TiqSXOtDesmfdOGdoLajuKb2fgwQzmxh3mBVJC/6/z7t9OusxWi
+        HHyjFUgnR/w7Bjw1ycUHbr8+Q9O117o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-sJFTBCenMR6wTA3kUvwUGA-1; Tue, 11 Feb 2020 05:51:42 -0500
+X-MC-Unique: sJFTBCenMR6wTA3kUvwUGA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83FF6800EB2;
+        Tue, 11 Feb 2020 10:51:40 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DBB675C1B2;
+        Tue, 11 Feb 2020 10:51:34 +0000 (UTC)
+Date:   Tue, 11 Feb 2020 11:51:17 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 25/35] KVM: s390: protvirt: Only sync fmt4 registers
+Message-ID: <20200211115117.33a2e3a5.cohuck@redhat.com>
+In-Reply-To: <20200207113958.7320-26-borntraeger@de.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+        <20200207113958.7320-26-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-In-Reply-To: <d943ada56babfbebf408ad0f94988a5b09d2b472.camel@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 10, 2020 at 11:18:59AM -0800, Alexander Duyck wrote:
-> > So I thought I would put out a gentle nudge since it has been about 4
-> > weeks since v16 was submitted, a little over a week and a half for v16.1,
-> > and I have yet to get any feedback on the code contained in the patchset.
-> > Codewise nothing has changed from the v16 patchset other than rebasing it
-> > off of the linux-next tree to resolve some merge conflicts that I saw
-> > recently, and discussion around v16.1 was mostly about next steps and how
-> > to deal with the page cache instead of discussing the code itself.
-> > 
-> > The full patchset can be found at:
-> > https://lore.kernel.org/lkml/20200122173040.6142.39116.stgit@localhost.localdomain/
-> > 
-> > I believe I still need review feedback for patches 3, 4, 7, 8, and 9.
-> > 
-> > Thanks.
-> > 
-> > - Alex
-> 
-> So I had posted this patch set a few days before Linus's merge window
-> opened. When I posted it the discussion was about what the follow-up on
-> this patch set will be in terms of putting pressure on the page cache to
-> force it to shrink. However I didn't get any review comments on the code
-> itself.
-> 
-> My last understanding on this patch set is that I am waiting on patch
-> feedback from Mel Gorman as he had the remaining requests that led to most
-> of the changes in v15 and v16. I believe I have addressed them, but I
-> don't believe he has had a chance to review them.
-> 
-> I am wondering now if it is still possible to either get it reviewed
-> and/or applied without reposting, or do I need to repost it since it has
-> been several weeks since I submitted it? The patch set still applies to
-> the linux-next tree without any issues.
-> 
+On Fri,  7 Feb 2020 06:39:48 -0500
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Please repost to take into account that this is confirmed to be working
-as expected after the merge window and has not conflicted with anything
-else that got merged in the meantime. This fell off my radar because of the
-timing when it was posted and the volume of mail I was receiving. I simply
-noted a large amount of traffic in response to the series and assumed
-others had issues that would get resolved without looking closely. Now
-I see that it was all comments on future work instead of the series itself.
+> +static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +{
+> +	/*
+> +	 * at several places we have to modify our internal view to not do
 
-Sorry.
+s/at/In/ ?
 
--- 
-Mel Gorman
-SUSE Labs
+> +	 * things that are disallowed by the ultravisor. For example we must
+> +	 * not inject interrupts after specific exits (e.g. 112). We do this
+
+Spell out what 112 is?
+
+> +	 * by turning off the MIE bits of our PSW copy. To avoid getting
+
+And also spell out what MIE is?
+
+> +	 * validity intercepts, we do only accept the condition code from
+> +	 * userspace.
+> +	 */
+
