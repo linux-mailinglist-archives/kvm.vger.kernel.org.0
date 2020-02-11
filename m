@@ -2,155 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 649F5159042
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:48:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9038815913B
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:59:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729066AbgBKNr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 08:47:56 -0500
-Received: from mail-am6eur05on2043.outbound.protection.outlook.com ([40.107.22.43]:3041
-        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728921AbgBKNrz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 08:47:55 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n755TQjlEVqPvIX62y/oEPA7hjjo+EeBAOAaA1f+b5jX3eQOFYy5lFGWTRQHtRU3iF2RsGk40bYlQpd5bnMXMSn0lRujRf+HqP2/KXzT54TeNubVdD5R26y7JZAUKB57drEAT4T7r4y+BOF0oJ6DfzPpFhVwRHCy/JZxJWjV+mcttZXEjeNlS90ZkxaMwHYWFvIUwPkYngJxeUacWdYi5SHmT9vrJ1UH4TjZ1HLmDMECPSi9gux8ALKhXcEfSs1R38ds0O9LUDI0WJu1jLv/ZpU0nJn7Wc1lvwdy1aYvhi/QzVDNNboTUXGdfxWvNYaxjrPjSgW52mYeOQnB9xmwxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O3RViT7jx3uOhpwUikxYveBcgiP7xloyY/aoS0FZppo=;
- b=CswdyqbQIuIPCc+QniHLTdsxyR0w3VMOu21lxSpA5/iR6PlpjSFj92z0sVn/k4P1pe2yAt3ZpDcAAD84JmgKaCWBtJ30NoAsptuqlirqCwoCZRFfZIxeiJzNEEniJW3RFCoJ2Xl6ik2U7sQNBPBdSd0AmTKTxY3gNwDUz+oPGsRsVK+UCdD97jvgbbc1a2WdsvYRjO+413a4zWrrffqpXdXCfBE/CUe47C2H/0ONu6eOdlObHsN7PWMc3rtMW/46qDsWuWzy0gWXAWZzgmjJgdUs8jD17I/oCnyaqg4xSmAlnKHSdTf4yopfS5dIjkVVlBSKybaFZ/0BEp1xKwzPhA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O3RViT7jx3uOhpwUikxYveBcgiP7xloyY/aoS0FZppo=;
- b=MsaqThPx2Y9JjAol+eTgDcT2ESsF8gGhJA7lpHWoZR7o4mPdG/jO7E8T9yWI2casiXsFHClwaDc5fEOYMGwk2jFzCn6uti6FevTvrffTF2W0l47Wz3dkQ0U2Zhzc9ez1qBCL0zG0AbtxJxfyL4A0X8sW9ta1TkwdfbJn0x6nyR0=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
- VI1PR05MB5102.eurprd05.prod.outlook.com (20.177.51.151) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.23; Tue, 11 Feb 2020 13:47:50 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
- 13:47:50 +0000
-Date:   Tue, 11 Feb 2020 09:47:46 -0400
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, lingshan.zhu@intel.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
-        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
-        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
-Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
-Message-ID: <20200211134746.GI4271@mellanox.com>
-References: <20200210035608.10002-1-jasowang@redhat.com>
- <20200210035608.10002-4-jasowang@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200210035608.10002-4-jasowang@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: MN2PR14CA0020.namprd14.prod.outlook.com
- (2603:10b6:208:23e::25) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
-MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR14CA0020.namprd14.prod.outlook.com (2603:10b6:208:23e::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.21 via Frontend Transport; Tue, 11 Feb 2020 13:47:50 +0000
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1j1VtC-0005NE-JH; Tue, 11 Feb 2020 09:47:46 -0400
-X-Originating-IP: [142.68.57.212]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 80ee99ac-9a8d-49ce-870c-08d7aef8fc2a
-X-MS-TrafficTypeDiagnostic: VI1PR05MB5102:|VI1PR05MB5102:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB51025721EE5118416576B579CF180@VI1PR05MB5102.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
-X-Forefront-PRVS: 0310C78181
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(346002)(376002)(366004)(136003)(189003)(199004)(316002)(66476007)(81166006)(52116002)(66556008)(81156014)(66946007)(2906002)(478600001)(86362001)(33656002)(7416002)(5660300002)(8936002)(36756003)(9786002)(9746002)(186003)(1076003)(6916009)(8676002)(2616005)(4326008)(26005)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB5102;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-Received-SPF: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: T23A4tiyjVXJsicFKnT9kc2z80/eaJrG8sKW27M5UJ4wF0zAgBJeeQ6wuJdOhL9009BfyYVagtB0bTr6i/991KT4kshFzoHVrNYKY3yNyPI5XWX6GSx0xr7Bhq3chncHLCi91R8AOyEITFJUJze1YcCy4eFimxAAwRCHc8koDe/+8coMcwzprVbTKXSMyUYydTFvwYZYaAD1VSlQzFlAxZDONf6pwsMuOt6QrWPqEEwTJyDG3ZGEd2BN9Pd0s8rXUg2/dwkO7TWRPszxV+nufywBukdHtJ1++QO2wku5Ew+Pj9WCu5o6hYJSgbMIpHAgtR1kToAmoSEbfA5l9z/JTie8EqVv/JnFL/xobghUAaBlj5L4q7rz8rF5bDe6sHF89fHwe1LmUJHy2smi/gSnzbvVwfp97zVlTaP0iNmnaMxIToiQM3fNftV3EGy1QhT0XqMdnu7v+ynIY7ATDbgdOW31VCOLHFgbHdxlluVGAv/Dks5osei4Bh9+4g8ymq5Q
-X-MS-Exchange-AntiSpam-MessageData: OJ9PUo8SwnxMuhdfmsVM7okmDwwE6acVEU5RJvCFAJSDZFDGjKnfCnb7WurfyPGmtRjNGji1Q6D6moy+juXIbRTmKrxnbvl2MhjcLKdIVEdjcdSwjxxqhAPoK1HxZDZsFx0cRHDcxCtc531usVvS/w==
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80ee99ac-9a8d-49ce-870c-08d7aef8fc2a
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2020 13:47:50.6309
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6SnG/tU9/bEK0bYQNTdUWz6LkEzEOPNxy4la5azD6WHfAGaKU8AdkVEueLk7pQEw9ADajrrWJ+Ul/7jVRWUsJA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5102
+        id S1729397AbgBKNxK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 08:53:10 -0500
+Received: from 8bytes.org ([81.169.241.247]:51752 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729383AbgBKNxJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 08:53:09 -0500
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 4F93F303; Tue, 11 Feb 2020 14:53:07 +0100 (CET)
+From:   Joerg Roedel <joro@8bytes.org>
+To:     x86@kernel.org
+Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>
+Subject: [RFC PATCH 00/62] Linux as SEV-ES Guest Support
+Date:   Tue, 11 Feb 2020 14:51:54 +0100
+Message-Id: <20200211135256.24617-1-joro@8bytes.org>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 10, 2020 at 11:56:06AM +0800, Jason Wang wrote:
-> +/**
-> + * vdpa_register_device - register a vDPA device
-> + * Callers must have a succeed call of vdpa_init_device() before.
-> + * @vdev: the vdpa device to be registered to vDPA bus
-> + *
-> + * Returns an error when fail to add to vDPA bus
-> + */
-> +int vdpa_register_device(struct vdpa_device *vdev)
-> +{
-> +	int err = device_add(&vdev->dev);
-> +
-> +	if (err) {
-> +		put_device(&vdev->dev);
-> +		ida_simple_remove(&vdpa_index_ida, vdev->index);
-> +	}
+Hi,
 
-This is a very dangerous construction, I've seen it lead to driver
-bugs. Better to require the driver to always do the put_device on
-error unwind
+here is the first public post of the patch-set to enable Linux to run
+under SEV-ES enabled hypervisors. The code is mostly feature-complete,
+but there are still a couple of bugs to fix. Nevertheless, given the
+size of the patch-set, I think it is about time to ask for initial
+feedback of the changes that come with it. To better understand the code
+here is a quick explanation of SEV-ES first.
 
-The ida_simple_remove should probably be part of the class release
-function to make everything work right
+This patch-set does not contain the hypervisor changes necessary to run
+SEV-ES enabled KVM guests. These patches will be sent separatly when
+they are ready to be sent out.
 
-> +/**
-> + * vdpa_unregister_driver - unregister a vDPA device driver
-> + * @drv: the vdpa device driver to be unregistered
-> + */
-> +void vdpa_unregister_driver(struct vdpa_driver *drv)
-> +{
-> +	driver_unregister(&drv->driver);
-> +}
-> +EXPORT_SYMBOL_GPL(vdpa_unregister_driver);
-> +
-> +static int vdpa_init(void)
-> +{
-> +	if (bus_register(&vdpa_bus) != 0)
-> +		panic("virtio bus registration failed");
-> +	return 0;
-> +}
+What is SEV-ES
+==============
 
-Linus will tell you not to kill the kernel - return the error code and
-propagate it up to the module init function.
+SEV-ES is an acronym for 'Secure Encrypted Virtualization - Encrypted
+State' and means a hardware feature of AMD processors which hides the
+register state of VCPUs to the hypervisor by encrypting it. The
+hypervisor can't read or make changes to the guests register state.
 
-> +/**
-> + * vDPA device - representation of a vDPA device
-> + * @dev: underlying device
-> + * @dma_dev: the actual device that is performing DMA
-> + * @config: the configuration ops for this device.
-> + * @index: device index
-> + */
-> +struct vdpa_device {
-> +	struct device dev;
-> +	struct device *dma_dev;
-> +	const struct vdpa_config_ops *config;
-> +	int index;
+Most intercepts set by the hypervisor do not cause a #VMEXIT of the
+guest anymore, but turn into a VMM Communication Exception (#VC
+exception, vector 29) inside the guest. The error-code of this exception
+is the intercept exit-code that caused the exception. The guest handles
+the #VC exception by communicating with the hypervisor through a shared
+data structure, the 'Guest-Hypervisor-Communication-Block' (GHCB). The
+layout of that data-structure and the protocol is specified in [1].
 
-unsigned values shuld be unsigned int
+A description of the SEV-ES hardware interface can be found in the AMD64
+Architecture Programmer's Manual Volume 2, Section 15.35 [2].
 
-Jason
+Implementation Details
+======================
+
+SEV-ES guests will always boot via UEFI firmware and use the 64-bit EFI
+entry point into the kernel. This implies that only 64-bit Linux x86
+guests are supported.
+
+Pre-Decompression Boot Code and Early Exception Support
+-------------------------------------------------------
+
+Intercepts that cause exceptions in the guest include instructions like
+CPUID, RDMSR/WRMSR, IOIO instructions and a couple more. Some of them
+are executed very early during boot, which means that exceptions need to
+work that early. That is the reason big parts of this patch-set enable
+support for early exceptions, first in the pre-decompression boot-code
+and later also in the early boot-code of the kernel image.
+
+As these patches add exception support to the pre-decompression boot
+code, it also implements a page-fault handler to create the
+identity-mapped page-table on-demand. One reason for this change is to
+make use of the exception handling code in non SEV-ES guests too, so
+that it is less likely to break in the future. The other reason is that
+for SEV-ES guests the code needs to setup its own page-table to map the
+GHCB unencrypted. Without these patches the pre-decompression code only
+uses its own page-table when KASLR is enabled and used.
+
+SIPI and INIT Handling
+----------------------
+
+The hypervisor also can't make changes to the guest register state,
+which implies that it can't emulate SIPI and INIT messages. This means
+that any CPU register state reset needs to be done inside the guest.
+Most of this is handled in the firmware, but the Linux kernel has to
+setup an AP Jump Table to boot secondary processors. CPU online/offline
+handling also needs special handling, where this patch-set implements a
+shortcut. An offlined CPU will not go back to real-mode when it is woken
+up again, but stays in long-mode an just jumps back to the trampoline
+code.
+
+NMI Special Handling
+--------------------
+
+The last thing that needs special handling with SEV-ES are NMIs.
+Hypervisors usually start to intercept IRET instructions when an NMI got
+injected to find out when the NMI window is re-opened. But handling IRET
+intercepts requires the hypervisor to access guest register state and is
+not possible with SEV-ES. The specification under [1] solves this
+problem with an NMI_COMPLETE message sent my the guest to the
+hypervisor, upon which the hypervisor re-opens the NMI window for the
+guest.
+
+This patch-set sends the NMI_COMPLETE message before the actual IRET,
+while the kernel is still on a valid stack and kernel cr3. This opens
+the NMI-window a few instructions early, but this is fine as under
+x86-64 Linux NMI-nesting is safe. The alternative would be to
+single-step over the IRET, but that requires more intrusive changes to
+the entry code because it does not handle entries from kernel-mode while
+on the entry stack.
+
+Besides the special handling above the patch-set contains the handlers
+for the #VC exception and all the exit-codes specified in [1].
+
+Current State of the Patches
+============================
+
+The patch-set posted here can boot an SMP Linux guest under
+SEV-ES-enabled KVM and the guest survives some load-testing
+(kernel-compiles).  The guest boots to the graphical desktop and is
+usable. But there are still know bugs and issues:
+
+	* Putting some NMI-load on the guest will make it crash usually
+	  within a minute
+	* The handler for MMIO events needs more security checks when
+	  walking the page-table
+	* The MMIO handler also lacks emulation for MOVS and REP MOVS
+	  instructions like used by memcpy_toio() and memcpy_fromio().
+
+More testing will likely uncover more bugs, but I think the patch-set is
+ready for initial feedback. It grew pretty big already and handling it
+becomes more and more painful.
+
+So please review the parts of the patch-set that you find interesting
+and let me know your feedback.
+
+Thanks a lot,
+
+       Joerg
+
+[1] https://developer.amd.com/wp-content/resources/56421.pdf
+[2] https://www.amd.com/system/files/TechDocs/24593.pdf
+
+Doug Covelli (1):
+  x86/vmware: Add VMware specific handling for VMMCALL under SEV-ES
+
+Joerg Roedel (43):
+  KVM: SVM: Add GHCB Accessor functions
+  x86/traps: Move some definitions to <asm/trap_defs.h>
+  x86/insn-decoder: Make inat-tables.c suitable for pre-decompression
+    code
+  x86/boot/compressed: Fix debug_puthex() parameter type
+  x86/boot/compressed/64: Disable red-zone usage
+  x86/boot/compressed/64: Add IDT Infrastructure
+  x86/boot/compressed/64: Rename kaslr_64.c to ident_map_64.c
+  x86/boot/compressed/64: Add page-fault handler
+  x86/boot/compressed/64: Always switch to own page-table
+  x86/boot/compressed/64: Don't pre-map memory in KASLR code
+  x86/boot/compressed/64: Change add_identity_map() to take start and
+    end
+  x86/boot/compressed/64: Add stage1 #VC handler
+  x86/boot/compressed/64: Call set_sev_encryption_mask earlier
+  x86/boot/compressed/64: Check return value of
+    kernel_ident_mapping_init()
+  x86/boot/compressed/64: Add function to map a page unencrypted
+  x86/boot/compressed/64: Setup GHCB Based VC Exception handler
+  x86/fpu: Move xgetbv()/xsetbv() into separate header
+  x86/idt: Move IDT to data segment
+  x86/idt: Split idt_data setup out of set_intr_gate()
+  x86/head/64: Install boot GDT
+  x86/head/64: Reload GDT after switch to virtual addresses
+  x86/head/64: Load segment registers earlier
+  x86/head/64: Switch to initial stack earlier
+  x86/head/64: Load IDT earlier
+  x86/head/64: Move early exception dispatch to C code
+  x86/sev-es: Add SEV-ES Feature Detection
+  x86/sev-es: Compile early handler code into kernel image
+  x86/sev-es: Setup early #VC handler
+  x86/sev-es: Setup GHCB based boot #VC handler
+  x86/sev-es: Wire up existing #VC exit-code handlers
+  x86/sev-es: Handle instruction fetches from user-space
+  x86/sev-es: Harden runtime #VC handler for exceptions from user-space
+  x86/sev-es: Filter exceptions not supported from user-space
+  x86/sev-es: Handle RDTSCP Events
+  x86/sev-es: Handle #AC Events
+  x86/sev-es: Handle #DB Events
+  x86/paravirt: Allow hypervisor specific VMMCALL handling under SEV-ES
+  x86/realmode: Add SEV-ES specific trampoline entry point
+  x86/head/64: Don't call verify_cpu() on starting APs
+  x86/head/64: Rename start_cpu0
+  x86/sev-es: Support CPU offline/online
+  x86/cpufeature: Add SEV_ES_GUEST CPU Feature
+  x86/sev-es: Add NMI state tracking
+
+Tom Lendacky (18):
+  KVM: SVM: Add GHCB definitions
+  x86/cpufeatures: Add SEV-ES CPU feature
+  x86/sev-es: Add support for handling IOIO exceptions
+  x86/sev-es: Add CPUID handling to #VC handler
+  x86/sev-es: Add handler for MMIO events
+  x86/sev-es: Setup per-cpu GHCBs for the runtime handler
+  x86/sev-es: Add Runtime #VC Exception Handler
+  x86/sev-es: Handle MSR events
+  x86/sev-es: Handle DR7 read/write events
+  x86/sev-es: Handle WBINVD Events
+  x86/sev-es: Handle RDTSC Events
+  x86/sev-es: Handle RDPMC Events
+  x86/sev-es: Handle INVD Events
+  x86/sev-es: Handle MONITOR/MONITORX Events
+  x86/sev-es: Handle MWAIT/MWAITX Events
+  x86/sev-es: Handle VMMCALL Events
+  x86/kvm: Add KVM specific VMMCALL handling under SEV-ES
+  x86/realmode: Setup AP jump table
+
+ arch/x86/Kconfig                           |   1 +
+ arch/x86/boot/Makefile                     |   2 +-
+ arch/x86/boot/compressed/Makefile          |   8 +-
+ arch/x86/boot/compressed/head_64.S         |  41 ++
+ arch/x86/boot/compressed/ident_map_64.c    | 320 +++++++++
+ arch/x86/boot/compressed/idt_64.c          |  53 ++
+ arch/x86/boot/compressed/idt_handlers_64.S |  78 +++
+ arch/x86/boot/compressed/kaslr.c           |  36 +-
+ arch/x86/boot/compressed/kaslr_64.c        | 156 -----
+ arch/x86/boot/compressed/misc.h            |  34 +-
+ arch/x86/boot/compressed/sev-es.c          | 148 ++++
+ arch/x86/entry/entry_64.S                  |  52 ++
+ arch/x86/include/asm/cpu.h                 |   2 +-
+ arch/x86/include/asm/cpufeatures.h         |   2 +
+ arch/x86/include/asm/desc.h                |   2 +
+ arch/x86/include/asm/desc_defs.h           |   3 +
+ arch/x86/include/asm/fpu/internal.h        |  29 +-
+ arch/x86/include/asm/fpu/xcr.h             |  32 +
+ arch/x86/include/asm/mem_encrypt.h         |   5 +
+ arch/x86/include/asm/msr-index.h           |   3 +
+ arch/x86/include/asm/processor.h           |   1 +
+ arch/x86/include/asm/realmode.h            |   4 +
+ arch/x86/include/asm/segment.h             |   2 +-
+ arch/x86/include/asm/sev-es.h              | 119 ++++
+ arch/x86/include/asm/svm.h                 | 103 +++
+ arch/x86/include/asm/trap_defs.h           |  50 ++
+ arch/x86/include/asm/traps.h               |  51 +-
+ arch/x86/include/asm/x86_init.h            |  16 +-
+ arch/x86/include/uapi/asm/svm.h            |  11 +
+ arch/x86/kernel/Makefile                   |   1 +
+ arch/x86/kernel/cpu/amd.c                  |  10 +-
+ arch/x86/kernel/cpu/scattered.c            |   1 +
+ arch/x86/kernel/cpu/vmware.c               |  48 +-
+ arch/x86/kernel/head64.c                   |  49 ++
+ arch/x86/kernel/head_32.S                  |   4 +-
+ arch/x86/kernel/head_64.S                  | 162 +++--
+ arch/x86/kernel/idt.c                      |  60 +-
+ arch/x86/kernel/kvm.c                      |  35 +-
+ arch/x86/kernel/nmi.c                      |   8 +
+ arch/x86/kernel/sev-es-shared.c            | 721 ++++++++++++++++++++
+ arch/x86/kernel/sev-es.c                   | 748 +++++++++++++++++++++
+ arch/x86/kernel/smpboot.c                  |   4 +-
+ arch/x86/kernel/traps.c                    |   3 +
+ arch/x86/mm/extable.c                      |   1 +
+ arch/x86/mm/mem_encrypt.c                  |  11 +-
+ arch/x86/mm/mem_encrypt_identity.c         |   3 +
+ arch/x86/realmode/init.c                   |  12 +
+ arch/x86/realmode/rm/header.S              |   3 +
+ arch/x86/realmode/rm/trampoline_64.S       |  20 +
+ arch/x86/tools/gen-insn-attr-x86.awk       |  50 +-
+ tools/arch/x86/tools/gen-insn-attr-x86.awk |  50 +-
+ 51 files changed, 3016 insertions(+), 352 deletions(-)
+ create mode 100644 arch/x86/boot/compressed/ident_map_64.c
+ create mode 100644 arch/x86/boot/compressed/idt_64.c
+ create mode 100644 arch/x86/boot/compressed/idt_handlers_64.S
+ delete mode 100644 arch/x86/boot/compressed/kaslr_64.c
+ create mode 100644 arch/x86/boot/compressed/sev-es.c
+ create mode 100644 arch/x86/include/asm/fpu/xcr.h
+ create mode 100644 arch/x86/include/asm/sev-es.h
+ create mode 100644 arch/x86/include/asm/trap_defs.h
+ create mode 100644 arch/x86/kernel/sev-es-shared.c
+ create mode 100644 arch/x86/kernel/sev-es.c
+
+-- 
+2.17.1
+
