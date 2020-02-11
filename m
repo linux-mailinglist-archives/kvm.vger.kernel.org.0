@@ -2,205 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B7B151599F1
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 20:43:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D3E0159A2E
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 21:03:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729202AbgBKTnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 14:43:42 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23307 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727668AbgBKTnm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 14:43:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581450219;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=h7KUPmf86zB702J560kJNk/Uikfj86BS/GU0xdCnSuI=;
-        b=Gd8po4U1AAP81UyZ7+/RqTmZ7O+baLh+pRr8mJfr+U37d8llD7Kl+3DxbRuFS+liw60d+V
-        xaIX7/5/mqL3wkmPkYEuxt9fNVwLQvQiGNlQeDvL1T3kNYLH7hNzkKbDXyKCcQyWq4HVSq
-        1N6wRG/snGbFXL8xwDsOAec2oq8jPRI=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-9_nmaTUCO1iku6jrzGYITQ-1; Tue, 11 Feb 2020 14:43:34 -0500
-X-MC-Unique: 9_nmaTUCO1iku6jrzGYITQ-1
-Received: by mail-qt1-f200.google.com with SMTP id b13so4146964qtp.8
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 11:43:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=h7KUPmf86zB702J560kJNk/Uikfj86BS/GU0xdCnSuI=;
-        b=hEo+L7q1dOv2Cjyls6BiDkOAKbMjNQ3W1A7DJNoxxW+k7/SfnveX7J4jx/1R1MQzlS
-         LDXT0CwVUjtyFiYPAXFLQ6K6ii308j+R+0BjdMfJYN30462ZZucoYi03LK8jKvYO0R5/
-         AXYXETyIt7v6irB+RX+Ih0fJ/FEyiftyUFxf1v68zT9OxSpif6ZhBaR+Dz0kgmfcnv8m
-         i5m5Fpm9LUqYgBhvOHks2q6U+w01catCpZ/go3n0LgYZJaVvn6+mioBfvqKm+y+Uszgm
-         AStn55M3zgNzLDoe5xAlRlvHA3zjar3jqmjK8lZwTElU1gH4aXJA8FFKypr4bhcjVBbr
-         eFpQ==
-X-Gm-Message-State: APjAAAW8tREYj+5/XTmM2kCQitTESdtDkdxPPuDpdvZHLyOy0jRRjRnu
-        hblk2L0eO8Fvkmu1hUk5vGzKOGGsrxwHL3blWm1j+9oVlX4OWf8Om2TZbV5anJelCPXUyYXkU/v
-        1JFcozD1LqSqt
-X-Received: by 2002:a05:620a:412:: with SMTP id 18mr7737118qkp.213.1581450214428;
-        Tue, 11 Feb 2020 11:43:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzaQKrkmzYTPMBwqDXhjjHJJr6Jkmjr2WXR0RK4oj5iaQ+jZhyfSdQZUhqw4MyroKiz2WqNWw==
-X-Received: by 2002:a05:620a:412:: with SMTP id 18mr7737098qkp.213.1581450214196;
-        Tue, 11 Feb 2020 11:43:34 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id x197sm2540447qkb.28.2020.02.11.11.43.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2020 11:43:33 -0800 (PST)
-Date:   Tue, 11 Feb 2020 14:43:31 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     qemu-devel@nongnu.org, david@gibson.dropbear.id.au,
-        pbonzini@redhat.com, alex.williamson@redhat.com, mst@redhat.com,
-        eric.auger@redhat.com, kevin.tian@intel.com, jun.j.tian@intel.com,
-        yi.y.sun@intel.com, kvm@vger.kernel.org, hao.wu@intel.com,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be string
- option
-Message-ID: <20200211194331.GK984290@xz-x1>
-References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-14-git-send-email-yi.l.liu@intel.com>
+        id S1730935AbgBKUD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 15:03:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60752 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728745AbgBKUD0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 15:03:26 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01BJn8mZ100772
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 15:03:25 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y3yw75vfp-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 15:03:25 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Tue, 11 Feb 2020 20:03:22 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 11 Feb 2020 20:03:20 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01BK3I4b67043530
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Feb 2020 20:03:18 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A562842047;
+        Tue, 11 Feb 2020 20:03:18 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E379A42049;
+        Tue, 11 Feb 2020 20:03:17 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.170.228])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 11 Feb 2020 20:03:17 +0000 (GMT)
+Subject: Re: [PATCH 35/35] DOCUMENTATION: Protected virtual machine
+ introduction and IPL
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-36-borntraeger@de.ibm.com>
+ <5d8050a6-c730-4325-2d46-2b5c9cdc8408@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Tue, 11 Feb 2020 21:03:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <5d8050a6-c730-4325-2d46-2b5c9cdc8408@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1580300216-86172-14-git-send-email-yi.l.liu@intel.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021120-0020-0000-0000-000003A94221
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021120-0021-0000-0000-0000220123B6
+Message-Id: <a2e5f248-4d4d-5650-6f48-174bddd328f9@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-11_05:2020-02-11,2020-02-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ lowpriorityscore=0 clxscore=1015 suspectscore=0 spamscore=0 mlxscore=0
+ phishscore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002110132
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 29, 2020 at 04:16:44AM -0800, Liu, Yi L wrote:
-> From: Liu Yi L <yi.l.liu@intel.com>
+
+
+On 11.02.20 13:23, Thomas Huth wrote:
+> On 07/02/2020 12.39, Christian Borntraeger wrote:
+>> From: Janosch Frank <frankja@linux.ibm.com>
+>>
+>> Add documentation about protected KVM guests and description of changes
+>> that are necessary to move a KVM VM into Protected Virtualization mode.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> [borntraeger@de.ibm.com: fixing and conversion to rst]
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+> [...]
+>> diff --git a/Documentation/virt/kvm/s390-pv-boot.rst b/Documentation/virt/kvm/s390-pv-boot.rst
+>> new file mode 100644
+>> index 000000000000..47814e53369a
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/s390-pv-boot.rst
+>> @@ -0,0 +1,79 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>> +======================================
+>> +s390 (IBM Z) Boot/IPL of Protected VMs
+>> +======================================
+>> +
+>> +Summary
+>> +-------
+>> +Protected Virtual Machines (PVM) are not accessible by I/O or the
+>> +hypervisor.  When the hypervisor wants to access the memory of PVMs
+>> +the memory needs to be made accessible. When doing so, the memory will
+>> +be encrypted.  See :doc:`s390-pv` for details.
+>> +
+>> +On IPL a small plaintext bootloader is started which provides
+>> +information about the encrypted components and necessary metadata to
+>> +KVM to decrypt the protected virtual machine.
+>> +
+>> +Based on this data, KVM will make the protected virtual machine known
+>> +to the Ultravisor(UV) and instruct it to secure the memory of the PVM,
+>> +decrypt the components and verify the data and address list hashes, to
+>> +ensure integrity. Afterwards KVM can run the PVM via the SIE
+>> +instruction which the UV will intercept and execute on KVM's behalf.
+>> +
+>> +The switch into PV mode lets us load encrypted guest executables and
 > 
-> Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabilities
-> related to scalable mode translation, thus there are multiple combinations.
-> While this vIOMMU implementation wants simplify it for user by providing
-> typical combinations. User could config it by "x-scalable-mode" option. The
-> usage is as below:
+> Maybe rather: "After the switch into PV mode, the guest can load ..." ?
+
+No its not after the switch. By doing the switch the guest image can be loaded
+fro anywhere because it is just like a kernel.
+
+So I will do:
+
+As the guest image is just like an opaque kernel image that does the
+switch into PV mode itself, the user can load encrypted guest
+executables and data via every available method (network, dasd, scsi,
+direct kernel, ...) without the need to change the boot process.
+
+
+
 > 
-> "-device intel-iommu,x-scalable-mode=["legacy"|"modern"]"
+>> +data via every available method (network, dasd, scsi, direct kernel,
+>> +...) without the need to change the boot process.
+>> +
+>> +
+>> +Diag308
+>> +-------
+>> +This diagnose instruction is the basis for VM IPL. The VM can set and
+>> +retrieve IPL information blocks, that specify the IPL method/devices
+>> +and request VM memory and subsystem resets, as well as IPLs.
+>> +
+>> +For PVs this concept has been extended with new subcodes:
+>> +
+>> +Subcode 8: Set an IPL Information Block of type 5 (information block
+>> +for PVMs)
+>> +Subcode 9: Store the saved block in guest memory
+>> +Subcode 10: Move into Protected Virtualization mode
+>> +
+>> +The new PV load-device-specific-parameters field specifies all data,
+> 
+> remove the comma?
 
-Maybe also "off" when someone wants to explicitly disable it?
+ack.
 
 > 
->  - "legacy": gives support for SL page table
->  - "modern": gives support for FL page table, pasid, virtual command
->  -  if not configured, means no scalable mode support, if not proper
->     configured, will throw error
+>> +that is necessary to move into PV mode.
+>> +
+>> +* PV Header origin
+>> +* PV Header length
+>> +* List of Components composed of
+>> +   * AES-XTS Tweak prefix
+>> +   * Origin
+>> +   * Size
+>> +
+>> +The PV header contains the keys and hashes, which the UV will use to
+>> +decrypt and verify the PV, as well as control flags and a start PSW.
+>> +
+>> +The components are for instance an encrypted kernel, kernel cmd and
 > 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> ---
->  hw/i386/intel_iommu.c          | 27 +++++++++++++++++++++++++--
->  hw/i386/intel_iommu_internal.h |  3 +++
->  include/hw/i386/intel_iommu.h  |  2 ++
->  3 files changed, 30 insertions(+), 2 deletions(-)
+> s/kernel cmd/kernel parameters/ ?
+
+ack
 > 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 1c1eb7f..33be40c 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3078,7 +3078,7 @@ static Property vtd_properties[] = {
->      DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
->                        VTD_HOST_ADDRESS_WIDTH),
->      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
-> -    DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
-> +    DEFINE_PROP_STRING("x-scalable-mode", IntelIOMMUState, scalable_mode_str),
->      DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> @@ -3708,8 +3708,11 @@ static void vtd_init(IntelIOMMUState *s)
->      }
->  
->      /* TODO: read cap/ecap from host to decide which cap to be exposed. */
-> -    if (s->scalable_mode) {
-> +    if (s->scalable_mode && !s->scalable_modern) {
->          s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
-> +    } else if (s->scalable_mode && s->scalable_modern) {
-> +        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
-> +                   | VTD_ECAP_FLTS | VTD_ECAP_PSS;
-
-This patch might be good to be the last one after all the impls are
-ready.
-
->      }
->  
->      vtd_reset_caches(s);
-> @@ -3845,6 +3848,26 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
->          return false;
->      }
->  
-> +    if (s->scalable_mode_str &&
-> +        (strcmp(s->scalable_mode_str, "modern") &&
-> +         strcmp(s->scalable_mode_str, "legacy"))) {
-> +        error_setg(errp, "Invalid x-scalable-mode config");
-
-Maybe "..., Please use 'modern', 'legacy', or 'off'." to show options.
-
-> +        return false;
-> +    }
-> +
-> +    if (s->scalable_mode_str &&
-> +        !strcmp(s->scalable_mode_str, "legacy")) {
-> +        s->scalable_mode = true;
-> +        s->scalable_modern = false;
-> +    } else if (s->scalable_mode_str &&
-> +        !strcmp(s->scalable_mode_str, "modern")) {
-> +        s->scalable_mode = true;
-> +        s->scalable_modern = true;
-> +    } else {
-> +        s->scalable_mode = false;
-> +        s->scalable_modern = false;
-> +    }
-> +
->      return true;
->  }
->  
-> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-> index 862033e..c4dbb2c 100644
-> --- a/hw/i386/intel_iommu_internal.h
-> +++ b/hw/i386/intel_iommu_internal.h
-> @@ -190,8 +190,11 @@
->  #define VTD_ECAP_PT                 (1ULL << 6)
->  #define VTD_ECAP_MHMV               (15ULL << 20)
->  #define VTD_ECAP_SRS                (1ULL << 31)
-> +#define VTD_ECAP_PSS                (19ULL << 35)
-> +#define VTD_ECAP_PASID              (1ULL << 40)
->  #define VTD_ECAP_SMTS               (1ULL << 43)
->  #define VTD_ECAP_SLTS               (1ULL << 46)
-> +#define VTD_ECAP_FLTS               (1ULL << 47)
->  
->  /* CAP_REG */
->  /* (offset >> 4) << 24 */
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> index 8571a85..1ef2917 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -244,6 +244,8 @@ struct IntelIOMMUState {
->  
->      bool caching_mode;              /* RO - is cap CM enabled? */
->      bool scalable_mode;             /* RO - is Scalable Mode supported? */
-> +    char *scalable_mode_str;        /* RO - admin's Scalable Mode config */
-> +    bool scalable_modern;           /* RO - is modern SM supported? */
->  
->      dma_addr_t root;                /* Current root table pointer */
->      bool root_scalable;             /* Type of root table (scalable or not) */
-> -- 
-> 2.7.4
+>> +initrd. The components are decrypted by the UV.
+>> +
+>> +All non-decrypted data of the guest before it switches to protected
+>> +virtualization mode are zero on first access of the PV.
 > 
+> Before it switches to protected virtualization mode, all non-decrypted
+> data of the guest are ... ?
 
--- 
-Peter Xu
+No, this is about the data after the initial import.
+What about
+
+After the initial import of the encrypted data all defined pages will
+contain the guest content. All non-specified pages will start out as
+zero pages on first access.
+
+
+> 
+>> +
+>> +When running in protected mode some subcodes will result in exceptions
+>> +or return error codes.
+>> +
+>> +Subcodes 4 and 7 will result in specification exceptions as they would
+>> +not clear out the guest memory.
+>> +When removing a secure VM, the UV will clear all memory, so we can't
+>> +have non-clearing IPL subcodes.
+>> +
+>> +Subcodes 8, 9, 10 will result in specification exceptions.
+>> +Re-IPL into a protected mode is only possible via a detour into non
+>> +protected mode.
+>> +
+>> +Keys
+>> +----
+>> +Every CEC will have a unique public key to enable tooling to build
+>> +encrypted images.
+>> +See  `s390-tools <https://github.com/ibm-s390-tools/s390-tools/>`_
+>> +for the tooling.
+>> diff --git a/Documentation/virt/kvm/s390-pv.rst b/Documentation/virt/kvm/s390-pv.rst
+>> new file mode 100644
+>> index 000000000000..dbe9110dfd1e
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/s390-pv.rst
+>> @@ -0,0 +1,116 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>> +=========================================
+>> +s390 (IBM Z) Ultravisor and Protected VMs
+>> +=========================================
+>> +
+>> +Summary
+>> +-------
+>> +Protected virtual machines (PVM) are KVM VMs, where KVM can't access
+>> +the VM's state like guest memory and guest registers anymore. Instead,
+>> +the PVMs are mostly managed by a new entity called Ultravisor
+>> +(UV). The UV provides an API that can be used by PVMs and KVM to
+>> +request management actions.
+>> +
+>> +Each guest starts in the non-protected mode and then may make a
+>> +request to transition into protected mode. On transition, KVM
+>> +registers the guest and its VCPUs with the Ultravisor and prepares
+>> +everything for running it.
+>> +
+>> +The Ultravisor will secure and decrypt the guest's boot memory
+>> +(i.e. kernel/initrd). It will safeguard state changes like VCPU
+>> +starts/stops and injected interrupts while the guest is running.
+>> +
+>> +As access to the guest's state, such as the SIE state description, is
+>> +normally needed to be able to run a VM, some changes have been made in
+>> +SIE behavior. A new format 4 state description has been introduced,
+> 
+> s/in SIE behavior/in the behavior of the SIE instruction/ ?
+
+ack
+> 
 
