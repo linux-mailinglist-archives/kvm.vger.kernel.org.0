@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B97B8159712
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:52:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FD8D15971C
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:52:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730532AbgBKRwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 12:52:49 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55986 "EHLO mail.kernel.org"
+        id S1730569AbgBKRw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 12:52:58 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56192 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730601AbgBKRws (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 12:52:48 -0500
+        id S1727911AbgBKRw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 12:52:57 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 78F65206CC;
-        Tue, 11 Feb 2020 17:52:47 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 09BF520661;
+        Tue, 11 Feb 2020 17:52:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581443567;
-        bh=2syRWuDJzfIhjmeHULYOTlZtqJYdWIZ8ljebtdFDvB8=;
+        s=default; t=1581443577;
+        bh=0Nz9UTGevazxDml65pFpWpvj0exBxapL78FXYgUMnz0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=wp/LuaXqiT/UXN4ujliiqSWSxfUJHNoXMMZhWIP8qPeOZ97PnWgh5aniyzsMv33Sw
-         KcYsDjK/qN88AtCWGBO27Zo6QvwPlaCTxD+tsp3lxg1OwJdOXoDKKE7/VXIoq/Kxlf
-         v18T2whLoAhs2vv/qOqQMSiaBXxPQkLeNOYkqkc0=
+        b=IcFmD277CljVD6bmP3Wy7n2VaxV2vcftE3JKZII/M6aNiw0vusETXJ/mMll8RM3iJ
+         opkauox9ZD21Jr/Q/fk6qUjJT+wAVs0olyUTGYowWGA69MI8ag4U4ixvviu16p9tt4
+         I14BqMlS+TphflWFD++Rq2bmdp+2ppObgLiIHPlA=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1j1Zfm-004O7k-Rb; Tue, 11 Feb 2020 17:50:11 +0000
+        id 1j1Zfn-004O7k-F6; Tue, 11 Feb 2020 17:50:11 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -39,9 +39,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 30/94] KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
-Date:   Tue, 11 Feb 2020 17:48:34 +0000
-Message-Id: <20200211174938.27809-31-maz@kernel.org>
+Subject: [PATCH v2 31/94] KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2 changes
+Date:   Tue, 11 Feb 2020 17:48:35 +0000
+Message-Id: <20200211174938.27809-32-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -56,69 +56,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jintack Lim <jintack.lim@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-We enable nested virtualization by setting the HCR NV and NV1 bit.
+So far we were flushing almost the entire universe whenever a VM would
+load/unload the SCTLR_EL1 and the two versions of that register had
+different MMU enabled settings.  This turned out to be so slow that it
+prevented forward progress for a nested VM, because a scheduler timer
+tick interrupt would always be pending when we reached the nested VM.
 
-When the virtual E2H bit is set, we can support EL2 register accesses
-via EL1 registers from the virtual EL2 by doing trap-and-emulate. A
-better alternative, however, is to allow the virtual EL2 to access EL2
-register states without trap. This can be easily achieved by not traping
-EL1 registers since those registers already have EL2 register states.
+To avoid this problem, we consider the SCTLR_EL2 when evaluating if
+caches are on or off when entering virtual EL2 (because this is the
+value that we end up shadowing onto the hardware EL1 register).
 
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/switch.c | 36 +++++++++++++++++++++++++++++++++---
- 1 file changed, 33 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index ae967e274e08..fd4085ebf062 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -151,9 +151,39 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 	if (cpus_have_const_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
- 		hcr |= HCR_TVM;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index ee47f7637f28..ec4de0613e7c 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -88,6 +88,7 @@ alternative_cb_end
+ #include <asm/cacheflush.h>
+ #include <asm/mmu_context.h>
+ #include <asm/pgtable.h>
++#include <asm/kvm_emulate.h>
  
--	/* Trap VM sysreg accesses if an EL2 guest is not using VHE. */
--	if (vcpu_mode_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
--		hcr |= HCR_TVM | HCR_TRVM;
-+	if (is_hyp_ctxt(vcpu)) {
-+		hcr |= HCR_NV;
-+
-+		if (!vcpu_el2_e2h_is_set(vcpu)) {
-+			/*
-+			 * For a guest hypervisor on v8.0, trap and emulate
-+			 * the EL1 virtual memory control register accesses.
-+			 */
-+			hcr |= HCR_TVM | HCR_TRVM | HCR_NV1;
-+		} else {
-+			/*
-+			 * For a guest hypervisor on v8.1 (VHE), allow to
-+			 * access the EL1 virtual memory control registers
-+			 * natively. These accesses are to access EL2 register
-+			 * states.
-+			 * Note that we still need to respect the virtual
-+			 * HCR_EL2 state.
-+			 */
-+			u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
-+
-+			/*
-+			 * We already set TVM to handle set/way cache maint
-+			 * ops traps, this somewhat collides with the nested
-+			 * virt trapping for nVHE. So turn this off for now
-+			 * here, in the hope that VHE guests won't ever do this.
-+			 * TODO: find out whether it's worth to support both
-+			 * cases at the same time.
-+			 */
-+			hcr &= ~HCR_TVM;
-+
-+			hcr |= vhcr_el2 & (HCR_TVM | HCR_TRVM);
-+		}
-+	}
+ void kvm_update_va_mask(struct alt_instr *alt,
+ 			__le32 *origptr, __le32 *updptr, int nr_inst);
+@@ -305,7 +306,10 @@ struct kvm;
  
- 	write_sysreg(hcr, hcr_el2);
+ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+ {
+-	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
++	if (vcpu_mode_el2(vcpu))
++		return (__vcpu_sys_reg(vcpu, SCTLR_EL2) & 0b101) == 0b101;
++	else
++		return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
+ }
  
+ static inline void __clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
 -- 
 2.20.1
 
