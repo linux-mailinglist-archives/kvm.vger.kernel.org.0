@@ -2,95 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F55D1593A2
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 16:49:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E885E159469
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 17:08:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730465AbgBKPtc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 10:49:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21329 "EHLO
+        id S1729911AbgBKQID (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 11:08:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27050 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730428AbgBKPtb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 10:49:31 -0500
+        with ESMTP id S1729397AbgBKQIC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 11:08:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581436169;
+        s=mimecast20190719; t=1581437282;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fz/9T71wlj0EphJ0rxzCeEvJ/uyMAvvoFKZFbiWI/y4=;
-        b=IGL+kH9BxzcEu9fAG7Ks3CJTc6izgafKusYkdCFIPZoDy5rpoWbJo4q1cCYAf2FEa4SMJ4
-        egCVLAekyYb1kxrxA97V4bbakJtsKtEFdG8d/Yg/G1hgZ9sj9e+nQNyE7+hsd4gJKqIvdA
-        qYQJy36G68vn3q+nEm/peYLiaRg2kh8=
+        bh=Etqe//LRT3pM0qb1yDS4eT6yXsXnFgQdg0GzoAov0i4=;
+        b=dtOW5kD+4Mwd+tNHaZct6UHGktVFG6cNyD81osNO6O0hBQr5xhvUYw9jK4c2oHc1kynG20
+        PVNoRuTXg0ASM25DBj7LO54m4gI4icPvnZ01v0BI0dQXvm2cMVrbe5X+qNnoauUsXKK9Ph
+        TJhFN4/awBiFfmpanMrisUT2OUDEYTQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-Fnl9TNtkPa2RWvAp4KFIAw-1; Tue, 11 Feb 2020 10:49:25 -0500
-X-MC-Unique: Fnl9TNtkPa2RWvAp4KFIAw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-229-Kn7K1Dw3MZq2mN87tEtssA-1; Tue, 11 Feb 2020 11:07:43 -0500
+X-MC-Unique: Kn7K1Dw3MZq2mN87tEtssA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E16361800D42;
-        Tue, 11 Feb 2020 15:49:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65421107ACC4;
+        Tue, 11 Feb 2020 16:07:41 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C64C260499;
-        Tue, 11 Feb 2020 15:49:22 +0000 (UTC)
-Date:   Tue, 11 Feb 2020 16:49:20 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E648F26FDF;
+        Tue, 11 Feb 2020 16:07:35 +0000 (UTC)
+Date:   Tue, 11 Feb 2020 17:07:33 +0100
 From:   Andrew Jones <drjones@redhat.com>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        alexandru.elisei@arm.com
-Subject: Re: [PATCH kvm-unit-tests v2] arm64: timer: Speed up gic-timer-state
- check
-Message-ID: <20200211154920.gxb32rzzcbnuo34v@kamzik.brq.redhat.com>
-References: <20200211133705.1398-1-drjones@redhat.com>
- <60c6c4c7-1d6b-5b64-adc1-8e96f45332c6@huawei.com>
- <83803119-0ea8-078d-628b-537c3d9525b1@huawei.com>
+To:     Peter Maydell <peter.maydell@linaro.org>
+Cc:     Eric Auger <eric.auger@redhat.com>,
+        Eric Auger <eric.auger.pro@gmail.com>,
+        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm-devel <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>,
+        Andrew Murray <andrew.murray@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 0/9] KVM: arm64: PMUv3 Event Counter
+ Tests
+Message-ID: <20200211160733.zbqh3vbscdfgkkcd@kamzik.brq.redhat.com>
+References: <20200130112510.15154-1-eric.auger@redhat.com>
+ <CAFEAcA8iBvM2xguW2_6OFWDjPPEzEorief4F2aoh0Vitp466rQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <83803119-0ea8-078d-628b-537c3d9525b1@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFEAcA8iBvM2xguW2_6OFWDjPPEzEorief4F2aoh0Vitp466rQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 11, 2020 at 11:32:14PM +0800, Zenghui Yu wrote:
-> On 2020/2/11 22:50, Zenghui Yu wrote:
-> > Hi Drew,
-> >=20
-> > On 2020/2/11 21:37, Andrew Jones wrote:
-> > > Let's bail out of the wait loop if we see the expected state
-> > > to save over six seconds of run time. Make sure we wait a bit
-> > > before reading the registers and double check again after,
-> > > though, to somewhat mitigate the chance of seeing the expected
-> > > state by accident.
-> > >=20
-> > > We also take this opportunity to push more IRQ state code to
-> > > the library.
-> > >=20
-> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> >=20
-> > [...]
-> >=20
-> > > +
-> > > +enum gic_irq_state gic_irq_state(int irq)
-> >=20
-> > This is a *generic* name while this function only deals with PPI.
-> > Maybe we can use something like gic_ppi_state() instead?=A0 Or you
-> > will have to take all interrupt types into account in a single
-> > function, which is not a easy job I think.
->=20
-> Just to follow up, gic_irq_get_irqchip_state()/gic_peek_irq() [*] is
-> the Linux implementation of this for PPIs and SPIs.
->=20
-> [*] linux/drivers/irqchip/irq-gic-v3.c
->
+On Tue, Feb 11, 2020 at 03:42:38PM +0000, Peter Maydell wrote:
+> On Thu, 30 Jan 2020 at 11:25, Eric Auger <eric.auger@redhat.com> wrote:
+> >
+> > This series implements tests exercising the PMUv3 event counters.
+> > It tests both the 32-bit and 64-bit versions. Overflow interrupts
+> > also are checked. Those tests only are written for arm64.
+> >
+> > It allowed to reveal some issues related to SW_INCR implementation
+> > (esp. related to 64-bit implementation), some problems related to
+> > 32-bit <-> 64-bit transitions and consistency of enabled states
+> > of odd and event counters (See [1]).
+> >
+> > Overflow interrupt testing relies of one patch from Andre
+> > ("arm: gic: Provide per-IRQ helper functions") to enable the
+> > PPI 23, coming from "arm: gic: Test SPIs and interrupt groups"
+> > (https://patchwork.kernel.org/cover/11234975/). Drew kindly
+> > provided "arm64: Provide read/write_sysreg_s".
+> >
+> > All PMU tests can be launched with:
+> > ./run_tests.sh -g pmu
+> > Tests also can be launched individually. For example:
+> > ./arm-run arm/pmu.flat -append 'chained-sw-incr'
+> >
+> > With KVM:
+> > - chain-promotion and chained-sw-incr are known to be failing.
+> >   [1] proposed a fix.
+> > - On TX2, I have some random failures due to MEM_ACCESS event
+> >   measured with a great disparity. This is not observed on
+> >   other machines I have access to.
+> > With TCG:
+> > - all new tests are skipped
+> 
+> I'm having a go at using this patchset to test the support
+> I'm adding for TCG for the v8.1 and v8.4 PMU extensions...
+> 
+> Q1: how can I get run_tests.sh to pass extra arguments to
+> QEMU ? The PMU events check will fail unless QEMU gets
+> the '-icount 8' to enable cycle-counting, but although
+> the underlying ./arm/run lets you add arbitrary extra
+> arguments to QEMU, run_tests.sh doesn't seem to. Trying to
+> pass them in via "QEMU=/path/to/qemu -icount 8" doesn't
+> work either.
 
-Thanks. I just skimmed that now and it looks like the diff I sent is
-pretty close. But, I do see a bug in my diff (missing '* 4' on the
-offset calculation).
+Alex Bennee once submit a patch[*] allowing that to work, but
+it never got merged. I just rebased it and tried it, but it
+doesn't work now. Too much has changed in the run scripts
+since his posting. I can try to rework it though.
+
+[*] https://github.com/rhdrjones/kvm-unit-tests/commit/9a8574bfd924f3e865611688e26bb12e53821747
+
+> 
+> Q2: do you know why arm/pmu.c:check_pmcr() insists that
+> PMCR.IMP is non-zero? The comment says "simple sanity check",
+> but architecturally a zero IMP field is permitted (meaning
+> "go look at MIDR_EL1 instead"). This causes TCG to fail this
+> test on '-cpu max', because in that case we set PMCR.IMP
+> to the same thing as MIDR_EL1.Implementer which is 0
+> ("software use", since QEMU is software...)
+
+Probably just a misunderstanding on the part of the author (and
+reviewers). Maybe Eric can fix that while preparing this series.
 
 Thanks,
-drew=20
+drew
 
