@@ -2,185 +2,335 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E5FEB158B72
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 09:48:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5430158BD0
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 10:23:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727847AbgBKIsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 03:48:23 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55594 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727811AbgBKIsX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 03:48:23 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01B8lOm0136447
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 03:48:21 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1uck1q1p-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 03:48:21 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Tue, 11 Feb 2020 08:48:19 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 11 Feb 2020 08:48:15 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01B8mD3651773626
+        id S1727665AbgBKJXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 04:23:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3230 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727121AbgBKJXz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 04:23:55 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01B9JKiK120432;
+        Tue, 11 Feb 2020 04:23:51 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y3pqf5ebj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Feb 2020 04:23:51 -0500
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01B9K2nL122629;
+        Tue, 11 Feb 2020 04:23:51 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y3pqf5eb5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Feb 2020 04:23:51 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01B9MhJU003454;
+        Tue, 11 Feb 2020 09:23:50 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02dal.us.ibm.com with ESMTP id 2y1mm7dn65-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Feb 2020 09:23:50 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01B9NkD855640528
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Feb 2020 08:48:13 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 98CD84C04E;
-        Tue, 11 Feb 2020 08:48:13 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D2CA4C050;
-        Tue, 11 Feb 2020 08:48:13 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.20.233])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Feb 2020 08:48:12 +0000 (GMT)
-Subject: Re: [PATCH/RFC] KVM: s390: protvirt: pass-through rc and rrc
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     thuth@redhat.com, Ulrich.Weigand@de.ibm.com, aarcange@redhat.com,
-        david@redhat.com, frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
-        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, mimu@linux.ibm.com
-References: <62d5cd46-93d7-e272-f9bb-d4ec3c7a1f71@de.ibm.com>
- <20200210114526.134769-1-borntraeger@de.ibm.com>
- <a94f3d09-1474-29d2-a2d3-3118170e494e@de.ibm.com>
- <20200210135040.24f06b8e.cohuck@redhat.com>
- <b99afb71-c8cb-0608-6583-99ac482f8322@de.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Tue, 11 Feb 2020 09:48:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        Tue, 11 Feb 2020 09:23:46 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C6E6A6E052;
+        Tue, 11 Feb 2020 09:23:46 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E09266E04C;
+        Tue, 11 Feb 2020 09:23:45 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.17.106])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 11 Feb 2020 09:23:45 +0000 (GMT)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     david@redhat.com
+Cc:     Ulrich.Weigand@de.ibm.com, aarcange@redhat.com,
+        akpm@linux-foundation.org, borntraeger@de.ibm.com,
+        cohuck@redhat.com, frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
+        imbrenda@linux.ibm.com, kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
+Subject: [PATCH v2 RFC] KVM: s390/interrupt: do not pin adapter interrupt pages
+Date:   Tue, 11 Feb 2020 04:23:41 -0500
+Message-Id: <20200211092341.3965-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.24.0
+In-Reply-To: <567B980B-BDA5-4EF3-A96E-1542D11F2BD4@redhat.com>
+References: <567B980B-BDA5-4EF3-A96E-1542D11F2BD4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b99afb71-c8cb-0608-6583-99ac482f8322@de.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="BQUqFhgX2rlYL0SVPmKEYxwmTkwimyL3b"
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20021108-0008-0000-0000-00000351C44A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021108-0009-0000-0000-00004A7264B6
-Message-Id: <b1cef696-d5c6-a5f2-0635-99d8bc52fc7f@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-11_02:2020-02-10,2020-02-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- phishscore=0 impostorscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=680 priorityscore=1501 suspectscore=0 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002110065
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ bulkscore=0 malwarescore=0 mlxlogscore=841 adultscore=0 spamscore=0
+ lowpriorityscore=0 mlxscore=0 suspectscore=4 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002110069
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BQUqFhgX2rlYL0SVPmKEYxwmTkwimyL3b
-Content-Type: multipart/mixed; boundary="p1HaBuY7QJVQrcRmWIPbRV0Py0j1NCqak"
+From: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
 
---p1HaBuY7QJVQrcRmWIPbRV0Py0j1NCqak
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+The adapter interrupt page containing the indicator bits is currently
+pinned. That means that a guest with many devices can pin a lot of
+memory pages in the host. This also complicates the reference tracking
+which is needed for memory management handling of protected virtual
+machines.
+We can simply try to get the userspace page set the bits and free the
+page. By storing the userspace address in the irq routing entry instead
+of the guest address we can actually avoid many lookups and list walks
+so that this variant is very likely not slower.
 
-On 2/10/20 1:56 PM, Christian Borntraeger wrote:
->=20
->=20
-> On 10.02.20 13:50, Cornelia Huck wrote:
->> On Mon, 10 Feb 2020 13:06:19 +0100
->> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>
->>> What about the following. I will rip out RC and RRC but add=20
->>> a 32bit flags field (which must be 0) and 3*64 bit reserved.
->>
->> Probably dumb question: How are these new fields supposed to be used?
->=20
-> This was planned for error handling in QEMU. As we have no user of rc/r=
-rc
-> yet, I have ripped that out and added a flag field + 16 bytes of reserv=
-ed.
-> Usage is as usual flags must be 0. When flags!=3D0 the reserved fields =
-will
-> have a new meaning.=20
->=20
-
-I want to have the rcs because right now we would only output the return
-value of the ioctl and most UV error codes are mapped to -EINVAL. So if
-an error occurs, admins would need to match up the crashed VM with the
-UV debugfs files which might not even exist if debugfs is not mounted...
-
-That's also one of the reasons I like having separate create calls for
-VM and VCPUs.
+Signed-off-by: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+[borntraeger@de.ibm.com: patch simplification]
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+quick and dirty, how this could look like
 
 
---p1HaBuY7QJVQrcRmWIPbRV0Py0j1NCqak--
+ arch/s390/include/asm/kvm_host.h |   3 -
+ arch/s390/kvm/interrupt.c        | 146 +++++++++++--------------------
+ 2 files changed, 49 insertions(+), 100 deletions(-)
 
---BQUqFhgX2rlYL0SVPmKEYxwmTkwimyL3b
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5CakwACgkQ41TmuOI4
-ufgCrxAAzAMinYoB8+uxdkjA/EcRRdfXsZnrRdhg8dxlCUZnXR2DfK+j15lacENE
-lDP2ndhtYYEVcizedeljEoaNw94AHw7eb8LafNX54ASAVwKxMVh0PexH1J240dAy
-++LAn/pGQh92RkYQXPBeicHgioLiw3bmjC3VW+IHxF8oCMBb1+j/0y8lXleOaF2Q
-V1CeaqMXnw2+FSxbyN1xHwyZsn4XCQYLveOB1CJMB31dn6IEe3Xwn5Y70rx3KZ2j
-Z3wnt4YLq15aCccOD4uoRJOfm2Ru8RNT06QyXZkLhx0ySMco+E6gH90dLKHE5MUA
-FmwZCrMFB10QwAyyJ5DD4ijECfBV+nOwo/5XAE0GRIsVDxCZum4ArympTIo5GDra
-bQkp0VZC1RPlu1OrAqf2AHHXsZFLSH65ZwLTx40hMocri2sG19JF8f7Ai4daoY/G
-dCmmGfSaYjGiCQ116x2t9KdVpGLF5ZlaWzQDkGpEAi6MMrVaN5/6w7gUsDzoQYWi
-dwL8eH51D5d1lT6IP2KayAERORpsHauat+AjFr4PaFrp4EawyhO/MJXWqXkU6Y7W
-mTz+6QqBqFCVXZTIniZYnRZrEA3/T/GlDgrLQ8xs3Sz1MvqpApMiuSe2bv4Djzxk
-BguPdkxlPAAAUSnXpKh/8OiRWRh2hiKhYKGXKMF/NOFiibk7ASg=
-=LV3H
------END PGP SIGNATURE-----
-
---BQUqFhgX2rlYL0SVPmKEYxwmTkwimyL3b--
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 0d398738ded9..88a218872fa0 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -771,9 +771,6 @@ struct s390_io_adapter {
+ 	bool masked;
+ 	bool swap;
+ 	bool suppressible;
+-	struct rw_semaphore maps_lock;
+-	struct list_head maps;
+-	atomic_t nr_maps;
+ };
+ 
+ #define MAX_S390_IO_ADAPTERS ((MAX_ISC + 1) * 8)
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index d4d35ec79e12..e6fe8b61ee9b 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -2459,9 +2459,6 @@ static int register_io_adapter(struct kvm_device *dev,
+ 	if (!adapter)
+ 		return -ENOMEM;
+ 
+-	INIT_LIST_HEAD(&adapter->maps);
+-	init_rwsem(&adapter->maps_lock);
+-	atomic_set(&adapter->nr_maps, 0);
+ 	adapter->id = adapter_info.id;
+ 	adapter->isc = adapter_info.isc;
+ 	adapter->maskable = adapter_info.maskable;
+@@ -2488,83 +2485,26 @@ int kvm_s390_mask_adapter(struct kvm *kvm, unsigned int id, bool masked)
+ 
+ static int kvm_s390_adapter_map(struct kvm *kvm, unsigned int id, __u64 addr)
+ {
+-	struct s390_io_adapter *adapter = get_io_adapter(kvm, id);
+-	struct s390_map_info *map;
+-	int ret;
+-
+-	if (!adapter || !addr)
+-		return -EINVAL;
+-
+-	map = kzalloc(sizeof(*map), GFP_KERNEL);
+-	if (!map) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-	INIT_LIST_HEAD(&map->list);
+-	map->guest_addr = addr;
+-	map->addr = gmap_translate(kvm->arch.gmap, addr);
+-	if (map->addr == -EFAULT) {
+-		ret = -EFAULT;
+-		goto out;
+-	}
+-	ret = get_user_pages_fast(map->addr, 1, FOLL_WRITE, &map->page);
+-	if (ret < 0)
+-		goto out;
+-	BUG_ON(ret != 1);
+-	down_write(&adapter->maps_lock);
+-	if (atomic_inc_return(&adapter->nr_maps) < MAX_S390_ADAPTER_MAPS) {
+-		list_add_tail(&map->list, &adapter->maps);
+-		ret = 0;
+-	} else {
+-		put_page(map->page);
+-		ret = -EINVAL;
++	/*
++	 * We resolve the gpa to hva when setting the IRQ routing. If userspace
++	 * decides to mess with the memslots it better also updates the irq
++	 * routing. Otherwise we will write to the wrong userspace address.
++	 */
++	return 0;
+ 	}
+-	up_write(&adapter->maps_lock);
+-out:
+-	if (ret)
+-		kfree(map);
+-	return ret;
+-}
+ 
+ static int kvm_s390_adapter_unmap(struct kvm *kvm, unsigned int id, __u64 addr)
+ {
+-	struct s390_io_adapter *adapter = get_io_adapter(kvm, id);
+-	struct s390_map_info *map, *tmp;
+-	int found = 0;
+-
+-	if (!adapter || !addr)
+-		return -EINVAL;
+-
+-	down_write(&adapter->maps_lock);
+-	list_for_each_entry_safe(map, tmp, &adapter->maps, list) {
+-		if (map->guest_addr == addr) {
+-			found = 1;
+-			atomic_dec(&adapter->nr_maps);
+-			list_del(&map->list);
+-			put_page(map->page);
+-			kfree(map);
+-			break;
+-		}
+-	}
+-	up_write(&adapter->maps_lock);
+-
+-	return found ? 0 : -EINVAL;
++	return 0;
+ }
+ 
+ void kvm_s390_destroy_adapters(struct kvm *kvm)
+ {
+ 	int i;
+-	struct s390_map_info *map, *tmp;
+ 
+ 	for (i = 0; i < MAX_S390_IO_ADAPTERS; i++) {
+ 		if (!kvm->arch.adapters[i])
+ 			continue;
+-		list_for_each_entry_safe(map, tmp,
+-					 &kvm->arch.adapters[i]->maps, list) {
+-			list_del(&map->list);
+-			put_page(map->page);
+-			kfree(map);
+-		}
+ 		kfree(kvm->arch.adapters[i]);
+ 	}
+ }
+@@ -2831,19 +2771,25 @@ static unsigned long get_ind_bit(__u64 addr, unsigned long bit_nr, bool swap)
+ 	return swap ? (bit ^ (BITS_PER_LONG - 1)) : bit;
+ }
+ 
+-static struct s390_map_info *get_map_info(struct s390_io_adapter *adapter,
+-					  u64 addr)
++static struct page *get_map_page(struct kvm *kvm,
++				 struct s390_io_adapter *adapter,
++				 u64 uaddr)
+ {
+-	struct s390_map_info *map;
++	struct page *page;
++	int ret;
+ 
+ 	if (!adapter)
+ 		return NULL;
+-
+-	list_for_each_entry(map, &adapter->maps, list) {
+-		if (map->guest_addr == addr)
+-			return map;
+-	}
+-	return NULL;
++	page = NULL;
++	if (!uaddr)
++		return NULL;
++	down_read(&kvm->mm->mmap_sem);
++	ret = get_user_pages_remote(NULL, kvm->mm, uaddr, 1, FOLL_WRITE,
++				    &page, NULL, NULL);
++	if (ret < 1)
++		page = NULL;
++	up_read(&kvm->mm->mmap_sem);
++	return page;
+ }
+ 
+ static int adapter_indicators_set(struct kvm *kvm,
+@@ -2852,30 +2798,35 @@ static int adapter_indicators_set(struct kvm *kvm,
+ {
+ 	unsigned long bit;
+ 	int summary_set, idx;
+-	struct s390_map_info *info;
++	struct page *ind_page, *summary_page;
+ 	void *map;
+ 
+-	info = get_map_info(adapter, adapter_int->ind_addr);
+-	if (!info)
++	ind_page = get_map_page(kvm, adapter, adapter_int->ind_addr);
++	if (!ind_page)
+ 		return -1;
+-	map = page_address(info->page);
+-	bit = get_ind_bit(info->addr, adapter_int->ind_offset, adapter->swap);
+-	set_bit(bit, map);
+-	idx = srcu_read_lock(&kvm->srcu);
+-	mark_page_dirty(kvm, info->guest_addr >> PAGE_SHIFT);
+-	set_page_dirty_lock(info->page);
+-	info = get_map_info(adapter, adapter_int->summary_addr);
+-	if (!info) {
+-		srcu_read_unlock(&kvm->srcu, idx);
++	summary_page = get_map_page(kvm, adapter, adapter_int->summary_addr);
++	if (!summary_page) {
++		put_page(ind_page);
+ 		return -1;
+ 	}
+-	map = page_address(info->page);
+-	bit = get_ind_bit(info->addr, adapter_int->summary_offset,
+-			  adapter->swap);
++
++	idx = srcu_read_lock(&kvm->srcu);
++	map = page_address(ind_page);
++	bit = get_ind_bit(adapter_int->ind_addr,
++			  adapter_int->ind_offset, adapter->swap);
++	set_bit(bit, map);
++	mark_page_dirty(kvm, adapter_int->ind_addr >> PAGE_SHIFT);
++	set_page_dirty_lock(ind_page);
++	map = page_address(summary_page);
++	bit = get_ind_bit(adapter_int->summary_addr,
++			  adapter_int->summary_offset, adapter->swap);
+ 	summary_set = test_and_set_bit(bit, map);
+-	mark_page_dirty(kvm, info->guest_addr >> PAGE_SHIFT);
+-	set_page_dirty_lock(info->page);
++	mark_page_dirty(kvm, adapter_int->summary_addr >> PAGE_SHIFT);
++	set_page_dirty_lock(summary_page);
+ 	srcu_read_unlock(&kvm->srcu, idx);
++
++	put_page(ind_page);
++	put_page(summary_page);
+ 	return summary_set ? 0 : 1;
+ }
+ 
+@@ -2897,9 +2848,7 @@ static int set_adapter_int(struct kvm_kernel_irq_routing_entry *e,
+ 	adapter = get_io_adapter(kvm, e->adapter.adapter_id);
+ 	if (!adapter)
+ 		return -1;
+-	down_read(&adapter->maps_lock);
+ 	ret = adapter_indicators_set(kvm, adapter, &e->adapter);
+-	up_read(&adapter->maps_lock);
+ 	if ((ret > 0) && !adapter->masked) {
+ 		ret = kvm_s390_inject_airq(kvm, adapter);
+ 		if (ret == 0)
+@@ -2951,12 +2900,15 @@ int kvm_set_routing_entry(struct kvm *kvm,
+ 			  const struct kvm_irq_routing_entry *ue)
+ {
+ 	int ret;
++	u64 uaddr;
+ 
+ 	switch (ue->type) {
+ 	case KVM_IRQ_ROUTING_S390_ADAPTER:
+ 		e->set = set_adapter_int;
+-		e->adapter.summary_addr = ue->u.adapter.summary_addr;
+-		e->adapter.ind_addr = ue->u.adapter.ind_addr;
++		uaddr =  gmap_translate(kvm->arch.gmap, ue->u.adapter.summary_addr);
++		e->adapter.summary_addr = uaddr;
++		uaddr =  gmap_translate(kvm->arch.gmap, ue->u.adapter.ind_addr);
++		e->adapter.ind_addr = uaddr;
+ 		e->adapter.summary_offset = ue->u.adapter.summary_offset;
+ 		e->adapter.ind_offset = ue->u.adapter.ind_offset;
+ 		e->adapter.adapter_id = ue->u.adapter.adapter_id;
+-- 
+2.24.0
 
