@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82801159724
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:53:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD09F1596CC
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:51:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730660AbgBKRxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 12:53:04 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56362 "EHLO mail.kernel.org"
+        id S1730436AbgBKRvr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 12:51:47 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54308 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730641AbgBKRxD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 12:53:03 -0500
+        id S1730304AbgBKRvq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 12:51:46 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AD4DB206D7;
-        Tue, 11 Feb 2020 17:53:02 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3E71120661;
+        Tue, 11 Feb 2020 17:51:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581443582;
-        bh=+RRWW/hkjQ++uwcIqUV7epI4LDYcCn4wfi9/FkAslBs=;
+        s=default; t=1581443505;
+        bh=/f2Xo9z6ABnZFrjbNY2DUZXX0BqaADfqp97+fkRaLFA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=xzyBktmCt/WDU5W1GAQeUg6EGjoO+QxNysTaWznPdDJllLNvJIxpIC/3ChIqvqLX8
-         uDkZNKD388DUg1VD3BmTFDVDLDjBI2Vq6QwzWqYs1cnVE1cH6LYySjcI1SS6ndGU/v
-         RL1q330SYVfqEev6CBt/n1536bYbdog7YEta5f2A=
+        b=T6XlXcVElAGuLukxHE8s/3/xKQky48ltUFJ+DGNxA5rgyeI1FJFCRokoQ+cgmGnUh
+         tah2TFs5vNMX/sFquSH4qKSv0Coe4Uc8YkOCe/tuVGlAbm/3STT8g7RUMTKaKpfaI9
+         /28iyb2Cf8IRNq+3Fi5u95UkPbOk5uhbLmPebnIs=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1j1ZgA-004O7k-3C; Tue, 11 Feb 2020 17:50:34 +0000
+        id 1j1ZgA-004O7k-Os; Tue, 11 Feb 2020 17:50:34 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -39,9 +39,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 69/94] arm64: KVM: Use TTL hint in when invalidating stage-2 translations
-Date:   Tue, 11 Feb 2020 17:49:13 +0000
-Message-Id: <20200211174938.27809-70-maz@kernel.org>
+Subject: [PATCH v2 70/94] arm64: KVM: nv: Add include containing the VNCR_EL2 offsets
+Date:   Tue, 11 Feb 2020 17:49:14 +0000
+Message-Id: <20200211174938.27809-71-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -56,169 +56,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since we always have a precide idea of the level we're dealing with
-when invalidating TLBs, we can provide it to as a hint to our
-invalidation helper.
+VNCR_EL2 points to a page containing a number of system registers
+accessed by a guest hypervisor when ARMv8.4-NV is enabled.
+
+Let's document the offsets in that page, as we are going to use
+this layout.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm/include/asm/stage2_pgtable.h   |  9 +++++++++
- arch/arm64/include/asm/stage2_pgtable.h |  9 +++++++++
- virt/kvm/arm/mmu.c                      | 27 +++++++++++++------------
- 3 files changed, 32 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/vncr_mapping.h | 73 +++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
+ create mode 100644 arch/arm64/include/asm/vncr_mapping.h
 
-diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-index aaceec7855ec..d54ad534da20 100644
---- a/arch/arm/include/asm/stage2_pgtable.h
-+++ b/arch/arm/include/asm/stage2_pgtable.h
-@@ -72,4 +72,13 @@ static inline bool kvm_stage2_has_pmd(struct kvm *kvm)
- 	return true;
- }
- 
+diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+new file mode 100644
+index 000000000000..64c46d658fc8
+--- /dev/null
++++ b/arch/arm64/include/asm/vncr_mapping.h
+@@ -0,0 +1,73 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +/*
-+ * The ARMv8.4-TTL extension doesn't apply to AArch32, so the below is
-+ * only to keep things compiling.
++ * System register offsets in the VNCR page
++ * All offsets are *byte* displacements!
 + */
-+#define S2_NO_LEVEL_HINT	0
-+#define S2_PUD_LEVEL		S2_NO_LEVEL_HINT
-+#define S2_PMD_LEVEL		S2_NO_LEVEL_HINT
-+#define S2_PTE_LEVEL		S2_NO_LEVEL_HINT
 +
- #endif	/* __ARM_S2_PGTABLE_H_ */
-diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-index 326aac658b9d..7ed5c1a769a9 100644
---- a/arch/arm64/include/asm/stage2_pgtable.h
-+++ b/arch/arm64/include/asm/stage2_pgtable.h
-@@ -230,4 +230,13 @@ stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- 	return (boundary - 1 < end - 1) ? boundary : end;
- }
- 
-+/*
-+ * Level values for the ARMv8.4-TTL extension, mapping PUD/PMD/PTE and
-+ * the architectural page-table level.
-+ */
-+#define S2_NO_LEVEL_HINT	0
-+#define S2_PUD_LEVEL		1
-+#define S2_PMD_LEVEL		2
-+#define S2_PTE_LEVEL		3
++#ifndef __ARM64_VNCR_MAPPING_H__
++#define __ARM64_VNCR_MAPPING_H__
 +
- #endif	/* __ARM64_S2_PGTABLE_H_ */
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 67752c2a615f..f6ea17f55712 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -74,9 +74,10 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
- 	}
- }
- 
--static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-+static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
-+				   int level)
- {
--	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa, 0);
-+	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa, level);
- }
- 
- /*
-@@ -118,7 +119,7 @@ static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t
- 		return;
- 
- 	pmd_clear(pmd);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
- 	put_page(virt_to_page(pmd));
- }
- 
-@@ -138,7 +139,7 @@ static void stage2_dissolve_pud(struct kvm_s2_mmu *mmu, phys_addr_t addr, pud_t
- 		return;
- 
- 	stage2_pud_clear(kvm, pudp);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
- 	put_page(virt_to_page(pudp));
- }
- 
-@@ -180,7 +181,7 @@ static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, phys_addr
- 
- 	pud_t *pud_table __maybe_unused = stage2_pud_offset(kvm, pgd, 0UL);
- 	stage2_pgd_clear(kvm, pgd);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
- 	stage2_pud_free(kvm, pud_table);
- 	put_page(virt_to_page(pgd));
- }
-@@ -192,7 +193,7 @@ static void clear_stage2_pud_entry(struct kvm_s2_mmu *mmu, pud_t *pud, phys_addr
- 	pmd_t *pmd_table __maybe_unused = stage2_pmd_offset(kvm, pud, 0);
- 	VM_BUG_ON(stage2_pud_huge(kvm, *pud));
- 	stage2_pud_clear(kvm, pud);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
- 	stage2_pmd_free(kvm, pmd_table);
- 	put_page(virt_to_page(pud));
- }
-@@ -202,7 +203,7 @@ static void clear_stage2_pmd_entry(struct kvm_s2_mmu *mmu, pmd_t *pmd, phys_addr
- 	pte_t *pte_table = pte_offset_kernel(pmd, 0);
- 	VM_BUG_ON(pmd_thp_or_huge(*pmd));
- 	pmd_clear(pmd);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
- 	free_page((unsigned long)pte_table);
- 	put_page(virt_to_page(pmd));
- }
-@@ -272,7 +273,7 @@ static void unmap_stage2_ptes(struct kvm_s2_mmu *mmu, pmd_t *pmd,
- 			pte_t old_pte = *pte;
- 
- 			kvm_set_pte(pte, __pte(0));
--			kvm_tlb_flush_vmid_ipa(mmu, addr);
-+			kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PTE_LEVEL);
- 
- 			/* No need to invalidate the cache for device mappings */
- 			if (!kvm_is_device_pfn(pte_pfn(old_pte)))
-@@ -301,7 +302,7 @@ static void unmap_stage2_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
- 				pmd_t old_pmd = *pmd;
- 
- 				pmd_clear(pmd);
--				kvm_tlb_flush_vmid_ipa(mmu, addr);
-+				kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
- 
- 				kvm_flush_dcache_pmd(old_pmd);
- 
-@@ -331,7 +332,7 @@ static void unmap_stage2_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
- 				pud_t old_pud = *pud;
- 
- 				stage2_pud_clear(kvm, pud);
--				kvm_tlb_flush_vmid_ipa(mmu, addr);
-+				kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
- 				kvm_flush_dcache_pud(old_pud);
- 				put_page(virt_to_page(pud));
- 			} else {
-@@ -1158,7 +1159,7 @@ static int stage2_set_pmd_huge(struct kvm_s2_mmu *mmu,
- 		 */
- 		WARN_ON_ONCE(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
- 		pmd_clear(pmd);
--		kvm_tlb_flush_vmid_ipa(mmu, addr);
-+		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
- 	} else {
- 		get_page(virt_to_page(pmd));
- 	}
-@@ -1200,7 +1201,7 @@ static int stage2_set_pud_huge(struct kvm_s2_mmu *mmu,
- 
- 		WARN_ON_ONCE(kvm_pud_pfn(old_pud) != kvm_pud_pfn(*new_pudp));
- 		stage2_pud_clear(kvm, pudp);
--		kvm_tlb_flush_vmid_ipa(mmu, addr);
-+		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
- 	} else {
- 		get_page(virt_to_page(pudp));
- 	}
-@@ -1349,7 +1350,7 @@ static int stage2_set_pte(struct kvm_s2_mmu *mmu,
- 			return 0;
- 
- 		kvm_set_pte(pte, __pte(0));
--		kvm_tlb_flush_vmid_ipa(mmu, addr);
-+		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PTE_LEVEL);
- 	} else {
- 		get_page(virt_to_page(pte));
- 	}
++#define VNCR_VTTBR_EL2          0x020
++#define VNCR_VTCR_EL2           0x040
++#define VNCR_VMPIDR_EL2         0x050
++#define VNCR_CNTVOFF_EL2        0x060
++#define VNCR_HCR_EL2            0x078
++#define VNCR_HSTR_EL2           0x080
++#define VNCR_VPIDR_EL2          0x088
++#define VNCR_TPIDR_EL2          0x090
++#define VNCR_VNCR_EL2           0x0B0
++#define VNCR_CPACR_EL1          0x100
++#define VNCR_CONTEXTIDR_EL1     0x108
++#define VNCR_SCTLR_EL1          0x110
++#define VNCR_ACTLR_EL1          0x118
++#define VNCR_TCR_EL1            0x120
++#define VNCR_AFSR0_EL1          0x128
++#define VNCR_AFSR1_EL1          0x130
++#define VNCR_ESR_EL1            0x138
++#define VNCR_MAIR_EL1           0x140
++#define VNCR_AMAIR_EL1          0x148
++#define VNCR_MDSCR_EL1          0x158
++#define VNCR_SPSR_EL1           0x160
++#define VNCR_CNTV_CVAL_EL0      0x168
++#define VNCR_CNTV_CTL_EL0       0x170
++#define VNCR_CNTP_CVAL_EL0      0x178
++#define VNCR_CNTP_CTL_EL0       0x180
++#define VNCR_SCXTNUM_EL1        0x188
++#define VNCR_ZCR_EL1            0x1E0
++#define VNCR_TTBR0_EL1          0x200
++#define VNCR_TTBR1_EL1          0x210
++#define VNCR_FAR_EL1            0x220
++#define VNCR_ELR_EL1            0x230
++#define VNCR_SP_EL1             0x240
++#define VNCR_VBAR_EL1           0x250
++#define VNCR_ICH_LR0_EL2        0x400
++//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
++#define VNCR_ICH_AP0R0_EL2      0x480
++//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
++#define VNCR_ICH_AP1R0_EL2      0x4A0
++//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
++#define VNCR_ICH_HCR_EL2        0x4C0
++#define VNCR_ICH_VMCR_EL2       0x4C8
++#define VNCR_VDISR_EL2          0x500
++#define VNCR_PMBLIMITR_EL1      0x800
++#define VNCR_PMBPTR_EL1         0x810
++#define VNCR_PMBSR_EL1          0x820
++#define VNCR_PMSCR_EL1          0x828
++#define VNCR_PMSEVFR_EL1        0x830
++#define VNCR_PMSICR_EL1         0x838
++#define VNCR_PMSIRR_EL1         0x840
++#define VNCR_PMSLATFR_EL1       0x848
++#define VNCR_TRFCR_EL1          0x880
++#define VNCR_MPAM1_EL1          0x900
++#define VNCR_MPAMHCR_EL2        0x930
++#define VNCR_MPAMVPMV_EL2       0x938
++#define VNCR_MPAMVPM0_EL2       0x940
++#define VNCR_MPAMVPM1_EL2       0x948
++#define VNCR_MPAMVPM2_EL2       0x950
++#define VNCR_MPAMVPM3_EL2       0x958
++#define VNCR_MPAMVPM4_EL2       0x960
++#define VNCR_MPAMVPM5_EL2       0x968
++#define VNCR_MPAMVPM6_EL2       0x970
++#define VNCR_MPAMVPM7_EL2       0x978
++
++#endif /* __ARM64_VNCR_MAPPING_H__ */
 -- 
 2.20.1
 
