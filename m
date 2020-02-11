@@ -2,205 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9608115973A
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:53:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 174031597A1
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 19:03:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730730AbgBKRxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 12:53:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56950 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730671AbgBKRxY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 12:53:24 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3269E206D7;
-        Tue, 11 Feb 2020 17:53:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581443603;
-        bh=nQAHpVL2nQ+w5tVvVTUPy86BjEvLrpd6ejEhrIIhTy0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=E6EOLZcy2osyUIfHwfxM1Yo1Ij7GHJC+4X8MClNJdq89jKUrgLgq7PLco/rhHhXDl
-         ghOp+Y4NMlbVJWg4dSfFq4MIW6pORTSUJULq08S1v+8itBMThFwgZSOnxG4q5ruYbb
-         0BjvB3r2BwyNpabfh2pPalzZX5MGN53jf53ihgFo=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j1ZgO-004O7k-Uu; Tue, 11 Feb 2020 17:50:49 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 94/94] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
-Date:   Tue, 11 Feb 2020 17:49:38 +0000
-Message-Id: <20200211174938.27809-95-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
-References: <20200211174938.27809-1-maz@kernel.org>
+        id S1730140AbgBKSDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 13:03:38 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:46137 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728712AbgBKSDi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 13:03:38 -0500
+Received: by mail-il1-f193.google.com with SMTP id t17so4197589ilm.13;
+        Tue, 11 Feb 2020 10:03:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1x8g+GZrx9UI30UQ428luOfA3vU/d+bR1M2CImC2i24=;
+        b=G3+hWX2bEWAklGq4AzNSV1VIQT/5QGIZhOpYbFrKtW5yO7PFvgRlFCFn1OkCv7sqSZ
+         L+R38a5iS9BWBAxanexVNJZq8NV2eIsWjUS3NvyvREkzavqHkJgj+dVhJY5hsG4ErN5e
+         wW0iRcLxy2kZDPM3sM5uBg63ZMwfa5xnXN5lJku3CeDXmXRjcBV4To2AnIqLGAW0ppbc
+         bX/o6S+1PtVRLAVvDvDnbaqbWL1QiXVZnvwTqcetk2fWqIFqHoxo3xBl35LIeEQdQTYd
+         MeT859bNIKuRZyjPbrs1+tcMnVyvcEx+m+AdnumPpGVNZ5R/P90ETSsP5KqXqb4aZqzR
+         bT2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1x8g+GZrx9UI30UQ428luOfA3vU/d+bR1M2CImC2i24=;
+        b=Gm/dprC2JX1A6eOQa6eOiPjKvNx1tfBvl2Bz5Yzs2uOzq0lbE5v5wPbF8JX58uApgl
+         CkSrXLsnRbFpW3n7TxxvcX4c7tSfZcl7nRZQAvvyCIuoa5//3+2hb5BhcQeGWYvNCQII
+         TBChUB6Ho23P9w7FYilsHIIO1+33z2ftLRHn4aBF65FzNJ+v0uPs0SePo1WzeH/wn3d7
+         bdWBNdg3CbeFaBVvH8cXbd1h4dTl8w1H7I+ybbtUgs839wz2Zy42xAwk5YeBKqNb4I+1
+         slT9TKu1u8O2hkx+aHSpTmSz/hvKeSD2dFjaz188j0ppBofyNRGs1ET+Icv6wgPEDILK
+         RgzQ==
+X-Gm-Message-State: APjAAAWTarIjd53TG7jFJ8YZy/EihsgpF+wCv3OuLJvVaPFPI92jGAyE
+        bNY0WsTEAF/DE4Pojqb1RtTKUueKpCW7AWiolrM=
+X-Google-Smtp-Source: APXvYqyIl9xAGOG4Dv9gUsKlKYBC1e6XhYVcwA4py9BJZof1NgKuj455lQCD42QmQK+XV8GOKiC7eKcKti9WaSF1xvc=
+X-Received: by 2002:a92:481d:: with SMTP id v29mr7445801ila.271.1581444216868;
+ Tue, 11 Feb 2020 10:03:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <158085337582.9445.17682266437583505502.stgit@gimli.home>
+ <CALBAE1Oz2u+cmoL8LhEZ-4paXEebKh3DzfWGLQLQx0oaW=tBXw@mail.gmail.com> <20200211100612.65cf2433@w520.home>
+In-Reply-To: <20200211100612.65cf2433@w520.home>
+From:   Jerin Jacob <jerinjacobk@gmail.com>
+Date:   Tue, 11 Feb 2020 23:33:20 +0530
+Message-ID: <CALBAE1MrEoCc8Ch6MNUNTsOcZyJnhr+z+iD0VWjHagQsEdBWCw@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/7] vfio/pci: SR-IOV support
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dpdk-dev <dev@dpdk.org>,
+        mtosatti@redhat.com, Thomas Monjalon <thomas@monjalon.net>,
+        Luca Boccassi <bluca@debian.org>,
+        "Richardson, Bruce" <bruce.richardson@intel.com>,
+        cohuck@redhat.com, Vamsi Attunuru <vattunuru@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Due to the way ARMv8.4-NV suppresses traps when accessing EL2
-system registers, we can't track when the guest changes its
-HCR_EL2.TGE setting. This means we alwats trap EL1 TLBIs,
-even if they don't affect any guest.
+On Tue, Feb 11, 2020 at 10:36 PM Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> On Tue, 11 Feb 2020 16:48:47 +0530
+> Jerin Jacob <jerinjacobk@gmail.com> wrote:
+>
+> > On Wed, Feb 5, 2020 at 4:35 AM Alex Williamson
+> > <alex.williamson@redhat.com> wrote:
+> > >
+> > > There seems to be an ongoing desire to use userspace, vfio-based
+> > > drivers for both SR-IOV PF and VF devices.  The fundamental issue
+> > > with this concept is that the VF is not fully independent of the PF
+> > > driver.  Minimally the PF driver might be able to deny service to the
+> > > VF, VF data paths might be dependent on the state of the PF device,
+> > > or the PF my have some degree of ability to inspect or manipulate the
+> > > VF data.  It therefore would seem irresponsible to unleash VFs onto
+> > > the system, managed by a user owned PF.
+> > >
+> > > We address this in a few ways in this series.  First, we can use a bus
+> > > notifier and the driver_override facility to make sure VFs are bound
+> > > to the vfio-pci driver by default.  This should eliminate the chance
+> > > that a VF is accidentally bound and used by host drivers.  We don't
+> > > however remove the ability for a host admin to change this override.
+> > >
+> > > The next issue we need to address is how we let userspace drivers
+> > > opt-in to this participation with the PF driver.  We do not want an
+> > > admin to be able to unwittingly assign one of these VFs to a tenant
+> > > that isn't working in collaboration with the PF driver.  We could use
+> > > IOMMU grouping, but this seems to push too far towards tightly coupled
+> > > PF and VF drivers.  This series introduces a "VF token", implemented
+> > > as a UUID, as a shared secret between PF and VF drivers.  The token
+> > > needs to be set by the PF driver and used as part of the device
+> > > matching by the VF driver.  Provisions in the code also account for
+> > > restarting the PF driver with active VF drivers, requiring the PF to
+> > > use the current token to re-gain access to the PF.
+> >
+> > Thanks Alex for the series. DPDK realizes this use-case through, an out of
+> > tree igb_uio module, for non VFIO devices. Supporting this use case, with
+> > VFIO, will be a great enhancement for DPDK as we are planning to
+> > get rid of out of tree modules any focus only on userspace aspects.
+> >
+> > From the DPDK perspective, we have following use-cases
+> >
+> > 1) VF representer or OVS/vSwitch  use cases where
+> > DPDK PF acts as an HW switch to steer traffic to VF
+> > using the rte_flow library backed by HW CAMs.
+> >
+> > 2) Unlike, other PCI class of devices, Network class of PCIe devices
+> > would have additional
+> > capability on the PF devices such as promiscuous mode support etc
+> > leverage that in DPDK
+> > PF and VF use cases.
+> >
+> > That would boil down to the use of the following topology.
+> > a)  PF bound to DPDK/VFIO  and  VF bound to Linux
+> > b)  PF bound to DPDK/VFIO  and  VF bound to DPDK/VFIO
+> >
+> > Tested the use case (a) and it works this patch. Tested use case(b), it
+> > works with patch provided both PF and VF under the same application.
+> >
+> > Regarding the use case where  PF bound to DPDK/VFIO and
+> > VF bound to DPDK/VFIO are _two different_ processes then sharing the UUID
+> > will be a little tricky thing in terms of usage. But if that is the
+> > purpose of bringing
+> > UUID to the equation then it fine.
+> >
+> > Overall this series looks good to me.  We can test the next non-RFC
+> > series and give
+> > Tested-by by after testing with DPDK.
+>
+> Thanks Jerin, that's great feedback.  For case b), it is rather the
+> intention of the shared VF token proposed here that it imposes some
+> small barrier in validating the collaboration between the PF and VF
+> drivers.  In a trusted environment, a common UUID might be exposed in a
+> shared file and the same token could be used by all PFs and VFs on the
+> system, or datacenter.  The goal is simply to make sure the
+> collaboration is explicit, I don't want to be fielding support issues
+> from users assigning PFs and VFs to unrelated VM instances or
+> unintentionally creating your scenario a) configuration.
 
-This obviously has a huge impact on performance, as we handle
-TLBI traps as a normal exit, and a normal VHE host issues
-thousands of TLBIs when booting (and quite a few when running
-userspace).
+Yes. Makes sense from kernel PoV.
 
-A cheap way to reduce the overhead is to handle the limited
-case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
-the right mmu configuration in place. Just execute the decoded
-instruction right away and return to the guest.
+DPDK side, probably we will end in hardcoded UUID value.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/switch.c | 35 +++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/tlb.c    |  6 ++++--
- arch/arm64/kvm/sys_regs.c   | 28 +++++++++-------------------
- 3 files changed, 48 insertions(+), 21 deletions(-)
+The tricky part would DPDK PF and QEMU VF integration case.
+I am not sure about that integration( a command-line option for UUID) or
+something more sophisticated orchestration. Anyway, it is clear from
+kernel side,
+Something needs to be sorted with the QEMU community.
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d8aae4b5f089..c892fdfecf56 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -539,6 +539,38 @@ static bool __hyp_text __hyp_handle_eret(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static bool __hyp_text __hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu)
-+{
-+	u32 instr;
-+	u64 val;
-+
-+	/*
-+	 * Ideally, we would never trap on EL1 TLB invalidations when the
-+	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
-+	 * don't trap writes to HCR_EL2, meaning that we can't track
-+	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
-+	 * the host. Oopsie...
-+	 *
-+	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
-+	 * set, try and handle these invalidation as quickly as possible,
-+	 * without fully exiting (unless this needs forwarding).
-+	 */
-+	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_SYS64 ||
-+	    !vcpu_mode_el2(vcpu) ||
-+	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
-+		return false;
-+
-+	instr = esr_sys64_to_sysreg(kvm_vcpu_get_hsr(vcpu));
-+	if (sys_reg_Op0(instr) != TLBI_Op0 ||
-+	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
-+		return false;
-+
-+	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
-+	__kvm_tlb_el1_instr(NULL, val, instr);
-+	__kvm_skip_instr(vcpu);
-+
-+	return true;
-+}
- 
- static bool __hyp_text handle_tx2_tvm(struct kvm_vcpu *vcpu)
- {
-@@ -669,6 +701,9 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
- 	if (__hyp_handle_eret(vcpu))
- 		return true;
- 
-+	if (__hyp_handle_tlbi_el1(vcpu))
-+		return true;
-+
- 	if (!__populate_fault_info(vcpu))
- 		return true;
- 
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 71e4e86e0981..ef52c5a58866 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -278,7 +278,8 @@ void __hyp_text __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_enc
- 	dsb(ishst);
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	if (mmu)
-+		__tlb_switch_to_guest(mmu, &cxt);
- 
- 	/*
- 	 * Execute the same instruction as the guest hypervisor did,
-@@ -317,5 +318,6 @@ void __hyp_text __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_enc
- 	dsb(ish);
- 	isb();
- 
--	__tlb_switch_to_host(mmu, &cxt);
-+	if (mmu)
-+		__tlb_switch_to_host(mmu, &cxt);
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f20f5975633f..c464bc3d8dad 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2688,6 +2688,8 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+	struct kvm_s2_mmu *mmu;
- 
- 	/*
- 	 * If we're here, this is because we've trapped on a EL1 TLBI
-@@ -2706,27 +2708,15 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	mutex_lock(&vcpu->kvm->lock);
- 
--	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
--		u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
--		struct kvm_s2_mmu *mmu;
--
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
--		if (mmu)
--			kvm_call_hyp(__kvm_tlb_el1_instr,
--				     mmu, p->regval, sys_encoding);
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
-+	if (mmu)
-+		kvm_call_hyp(__kvm_tlb_el1_instr,
-+			     mmu, p->regval, sys_encoding);
- 
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
--		if (mmu)
--			kvm_call_hyp(__kvm_tlb_el1_instr,
--				     mmu, p->regval, sys_encoding);
--	} else {
--		/*
--		 * ARMv8.4-NV allows the guest to change TGE behind
--		 * our back, so we always trap EL1 TLBIs from vEL2...
--		 */
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
-+	if (mmu)
- 		kvm_call_hyp(__kvm_tlb_el1_instr,
--			     &vcpu->kvm->arch.mmu, p->regval, sys_encoding);
--	}
-+			     mmu, p->regval, sys_encoding);
- 
- 	mutex_unlock(&vcpu->kvm->lock);
- 
--- 
-2.20.1
+> With the positive response from you and Thomas, I'll post a non-RFC
+> version and barring any blockers maybe we can get this in for the v5.7
+> kernel.  Thanks,
 
+Great.
+
+>
+> Alex
+>
