@@ -2,215 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 55121158DD8
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 13:00:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98987158E4C
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 13:20:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728198AbgBKMAj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 07:00:39 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41245 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727434AbgBKMAi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 07:00:38 -0500
+        id S1728536AbgBKMT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 07:19:59 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45940 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728043AbgBKMT6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 07:19:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581422437;
+        s=mimecast20190719; t=1581423597;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=HFoQGwqMI48EK/Nq6IgA2kqYRKEMGzNzhrvDfODlwoo=;
-        b=EyLUvR+fXVF0tRCXGas6LWDlZRlqQ1DjhBcgQ1qw9g9nQaIz2bx1F++yuBjQ+tgTfE59GS
-        3N6TUk3Y7J/y0ptpDr1oI8+Ckyng3fzzmfgX190WEcRR0g0Rp91uClzUEivvIC5n1p5xag
-        L2cwBOYKD9yhNV1lnKTqN1q0XZUVwPk=
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=rY7sfHFLE3EdoKM/Z4lC35365WbQC8hmWmWulIxlBt8=;
+        b=YH7Iw99WzeGasQPvP0PNkB3oCjirQHcBwmq/AuSSa9yhetHGeiviQ9upViNXWk98dZB2AH
+        QU+lKvmmcmh0v+i7LY+MUHnutX5MPnj1ZFTd72U2GEk7vBJs5r1SCn6zKCErHRM/r14KqN
+        zUfc8pjYsY5CDv3GrvTCIUhoe0qaYm0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-hAf5eJXxOKqMyxjx9yOxmQ-1; Tue, 11 Feb 2020 07:00:33 -0500
-X-MC-Unique: hAf5eJXxOKqMyxjx9yOxmQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-385-oKHjTAIXO_e1cT13bqrvSQ-1; Tue, 11 Feb 2020 07:19:55 -0500
+X-MC-Unique: oKHjTAIXO_e1cT13bqrvSQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BCCE8017DF;
-        Tue, 11 Feb 2020 12:00:31 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-131.ams2.redhat.com [10.36.116.131])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FFC48ED02;
-        Tue, 11 Feb 2020 12:00:25 +0000 (UTC)
-Subject: Re: [PATCH 16/35] KVM: s390: protvirt: Add SCLP interrupt handling
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200207113958.7320-1-borntraeger@de.ibm.com>
- <20200207113958.7320-17-borntraeger@de.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <dbeb32f7-7cf5-ad93-fb79-94d4ac7e3d8c@redhat.com>
-Date:   Tue, 11 Feb 2020 13:00:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A5D018B5F6D;
+        Tue, 11 Feb 2020 12:19:53 +0000 (UTC)
+Received: from [10.36.117.14] (ovpn-117-14.ams2.redhat.com [10.36.117.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C187566838;
+        Tue, 11 Feb 2020 12:19:32 +0000 (UTC)
+Subject: Re: [PATCH v16.1 6/9] virtio-balloon: Add support for providing free
+ page reports to host
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz,
+        yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com, osalvador@suse.de
+References: <20200122173040.6142.39116.stgit@localhost.localdomain>
+ <20200122174347.6142.92803.stgit@localhost.localdomain>
+ <b8cbf72d-55a7-4a58-6d08-b0ac5fa86e82@redhat.com>
+ <20200211063441-mutt-send-email-mst@kernel.org>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <ada0ec83-8e7d-abb3-7053-0ec2bf2a9aa5@redhat.com>
+Date:   Tue, 11 Feb 2020 13:19:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200207113958.7320-17-borntraeger@de.ibm.com>
+In-Reply-To: <20200211063441-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/02/2020 12.39, Christian Borntraeger wrote:
-> The sclp interrupt is kind of special. The ultravisor polices that we
-> do not inject an sclp interrupt with payload if no sccb is outstanding.
-> On the other hand we have "asynchronous" event interrupts, e.g. for
-> console input.
-> We separate both variants into sclp interrupt and sclp event interrupt.
-> The sclp interrupt is masked until a previous servc instruction has
-> finished (sie exit 108).
-> 
-> [frankja@linux.ibm.com: factoring out write_sclp]
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
+>>
+>> Did you see the discussion regarding unifying handling of
+>> inflate/deflate/free_page_hinting_free_page_reporting, requested by
+>> Michael? I think free page reporting is special and shall be left alon=
+e.
+>=20
+> Not sure what do you mean by "left alone here". Could you clarify?
+
+Don't try to unify handling like I proposed below, because it's
+semantics are special.
+
+>=20
+>> VIRTIO_BALLOON_F_REPORTING is nothing but a more advanced inflate, rig=
+ht
+>> (sg, inflate based on size - not "virtio pages")?
+>=20
+>=20
+> Not exactly - it's also initiated by guest as opposed to host, and
+> not guided by the ballon size request set by the host.
+
+True, but AFAIKS you could use existing INFLATE/DEFLATE in a similar
+way. There is no way for the hypervisor to nack a request. The balloon
+size is not glued to inflate/deflate requests. The guests manually
+updates it.
+
+> And uses a dedicated queue to avoid blocking other functionality ...
+
+True, but the other queues also don't allow for an easy extension
+AFAIKS, so that's another reason.
+
+>=20
+> I really think this is more like an inflate immediately followed by def=
+late.
+
+Depends on how you look at it. As inflate/deflate is not glued to the
+balloon size (the guest updates the size manually), it's not obvious.
+
+E.g., in QEMU, a deflate is just a performance improvement
+("MADV_WILLNEED") - in that regard, it's more like an optional deflation.
+
 [...]
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index e5ee52e33d96..c28fa09cb557 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -325,8 +325,11 @@ static inline int gisa_tac_ipm_gisc(struct kvm_s390_gisa *gisa, u32 gisc)
->  
->  static inline unsigned long pending_irqs_no_gisa(struct kvm_vcpu *vcpu)
->  {
-> -	return vcpu->kvm->arch.float_int.pending_irqs |
-> -		vcpu->arch.local_int.pending_irqs;
-> +	unsigned long pending = vcpu->kvm->arch.float_int.pending_irqs |
-> +				vcpu->arch.local_int.pending_irqs;
-> +
-> +	pending &= ~vcpu->kvm->arch.float_int.masked_irqs;
-> +	return pending;
->  }
->  
->  static inline unsigned long pending_irqs(struct kvm_vcpu *vcpu)
-> @@ -384,8 +387,10 @@ static unsigned long deliverable_irqs(struct kvm_vcpu *vcpu)
->  		__clear_bit(IRQ_PEND_EXT_CLOCK_COMP, &active_mask);
->  	if (!(vcpu->arch.sie_block->gcr[0] & CR0_CPU_TIMER_SUBMASK))
->  		__clear_bit(IRQ_PEND_EXT_CPU_TIMER, &active_mask);
-> -	if (!(vcpu->arch.sie_block->gcr[0] & CR0_SERVICE_SIGNAL_SUBMASK))
-> +	if (!(vcpu->arch.sie_block->gcr[0] & CR0_SERVICE_SIGNAL_SUBMASK)) {
->  		__clear_bit(IRQ_PEND_EXT_SERVICE, &active_mask);
-> +		__clear_bit(IRQ_PEND_EXT_SERVICE_EV, &active_mask);
-> +	}
->  	if (psw_mchk_disabled(vcpu))
->  		active_mask &= ~IRQ_PEND_MCHK_MASK;
->  	/* PV guest cpus can have a single interruption injected at a time. */
-> @@ -947,6 +952,31 @@ static int __must_check __deliver_prog(struct kvm_vcpu *vcpu)
->  	return rc ? -EFAULT : 0;
->  }
->  
-> +#define SCCB_MASK 0xFFFFFFF8
-> +#define SCCB_EVENT_PENDING 0x3
-> +
-> +static int write_sclp(struct kvm_vcpu *vcpu, u32 parm)
-> +{
-> +	int rc;
-> +
-> +	if (kvm_s390_pv_handle_cpu(vcpu)) {
-> +		vcpu->arch.sie_block->iictl = IICTL_CODE_EXT;
-> +		vcpu->arch.sie_block->eic = EXT_IRQ_SERVICE_SIG;
-> +		vcpu->arch.sie_block->eiparams = parm;
-> +		return 0;
-> +	}
-> +
-> +	rc  = put_guest_lc(vcpu, EXT_IRQ_SERVICE_SIG, (u16 *)__LC_EXT_INT_CODE);
-> +	rc |= put_guest_lc(vcpu, 0, (u16 *)__LC_EXT_CPU_ADDR);
-> +	rc |= write_guest_lc(vcpu, __LC_EXT_OLD_PSW,
-> +			     &vcpu->arch.sie_block->gpsw, sizeof(psw_t));
-> +	rc |= read_guest_lc(vcpu, __LC_EXT_NEW_PSW,
-> +			    &vcpu->arch.sie_block->gpsw, sizeof(psw_t));
-> +	rc |= put_guest_lc(vcpu, parm,
-> +			   (u32 *)__LC_EXT_PARAMS);
-> +	return rc;
 
-I think it would be nicer to move the "return rc ? -EFAULT : 0;" here
-instead of using it in the __deliver_service* functions...
+>=20
+> I'd rather wait until we have a usecase and preferably a POC
+> showing it helps before we add optional deflate ...
+> For now I personally am fine with just making this go ahead as is,
+> and imply SG and OPTIONAL_DEFLATE just for this VQ.
 
-> +}
-> +
->  static int __must_check __deliver_service(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_s390_float_interrupt *fi = &vcpu->kvm->arch.float_int;
-> @@ -954,13 +984,17 @@ static int __must_check __deliver_service(struct kvm_vcpu *vcpu)
->  	int rc = 0;
->  
->  	spin_lock(&fi->lock);
-> -	if (!(test_bit(IRQ_PEND_EXT_SERVICE, &fi->pending_irqs))) {
-> +	if (test_bit(IRQ_PEND_EXT_SERVICE, &fi->masked_irqs) ||
-> +	    !(test_bit(IRQ_PEND_EXT_SERVICE, &fi->pending_irqs))) {
->  		spin_unlock(&fi->lock);
->  		return 0;
->  	}
->  	ext = fi->srv_signal;
->  	memset(&fi->srv_signal, 0, sizeof(ext));
->  	clear_bit(IRQ_PEND_EXT_SERVICE, &fi->pending_irqs);
-> +	clear_bit(IRQ_PEND_EXT_SERVICE_EV, &fi->pending_irqs);
-> +	if (kvm_s390_pv_is_protected(vcpu->kvm))
-> +		set_bit(IRQ_PEND_EXT_SERVICE, &fi->masked_irqs);
->  	spin_unlock(&fi->lock);
->  
->  	VCPU_EVENT(vcpu, 4, "deliver: sclp parameter 0x%x",
-> @@ -969,15 +1003,33 @@ static int __must_check __deliver_service(struct kvm_vcpu *vcpu)
->  	trace_kvm_s390_deliver_interrupt(vcpu->vcpu_id, KVM_S390_INT_SERVICE,
->  					 ext.ext_params, 0);
->  
-> -	rc  = put_guest_lc(vcpu, EXT_IRQ_SERVICE_SIG, (u16 *)__LC_EXT_INT_CODE);
-> -	rc |= put_guest_lc(vcpu, 0, (u16 *)__LC_EXT_CPU_ADDR);
-> -	rc |= write_guest_lc(vcpu, __LC_EXT_OLD_PSW,
-> -			     &vcpu->arch.sie_block->gpsw, sizeof(psw_t));
-> -	rc |= read_guest_lc(vcpu, __LC_EXT_NEW_PSW,
-> -			    &vcpu->arch.sie_block->gpsw, sizeof(psw_t));
-> -	rc |= put_guest_lc(vcpu, ext.ext_params,
-> -			   (u32 *)__LC_EXT_PARAMS);
-> +	rc = write_sclp(vcpu, ext.ext_params);
-> +	return rc ? -EFAULT : 0;
+Also fine with me, you asked about if we can abstract any of this if I
+am not wrong :) So this was my take.
 
-... i.e. use "return write_sclp(...)" here...
+>=20
+> Do you feel strongly we need to bring this up to a TC vote?
 
-> +}
-> +
-> +static int __must_check __deliver_service_ev(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_s390_float_interrupt *fi = &vcpu->kvm->arch.float_int;
-> +	struct kvm_s390_ext_info ext;
-> +	int rc = 0;
-> +
-> +	spin_lock(&fi->lock);
-> +	if (!(test_bit(IRQ_PEND_EXT_SERVICE_EV, &fi->pending_irqs))) {
-> +		spin_unlock(&fi->lock);
-> +		return 0;
-> +	}
-> +	ext = fi->srv_signal;
-> +	/* only clear the event bit */
-> +	fi->srv_signal.ext_params &= ~SCCB_EVENT_PENDING;
-> +	clear_bit(IRQ_PEND_EXT_SERVICE_EV, &fi->pending_irqs);
-> +	spin_unlock(&fi->lock);
-> +
-> +	VCPU_EVENT(vcpu, 4, "%s", "deliver: sclp parameter event");
-> +	vcpu->stat.deliver_service_signal++;
-> +	trace_kvm_s390_deliver_interrupt(vcpu->vcpu_id, KVM_S390_INT_SERVICE,
-> +					 ext.ext_params, 0);
->  
-> +	rc = write_sclp(vcpu, SCCB_EVENT_PENDING);
->  	return rc ? -EFAULT : 0;
->  }
+Not really. People have been asking about how to inflate/deflate huge
+pages a long time ago (comes with different challenges - e.g., balloon
+compaction). looked like this interface could have been reused for this
+as well.
 
-... and here.
+But yeah, I am not a fan of virtio-balloon and the whole inflate/deflate
+thingy. So at least I don't see a need to extend the inflate/deflate
+capability.
 
-Apart from that, patch looks ok to me.
+Free page reporting is a different story (and the semantics require no
+inflate/deflate/balloon size) - it could have been moved to
+virtio-whatever without any issues. So I am fine with this.
 
- Thomas
+--=20
+Thanks,
+
+David / dhildenb
 
