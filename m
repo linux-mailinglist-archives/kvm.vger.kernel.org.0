@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0315A15910F
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:58:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1119A1590F9
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:57:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729083AbgBKN5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 08:57:43 -0500
-Received: from 8bytes.org ([81.169.241.247]:52104 "EHLO theia.8bytes.org"
+        id S1729948AbgBKN5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 08:57:07 -0500
+Received: from 8bytes.org ([81.169.241.247]:52278 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729509AbgBKNxW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 08:53:22 -0500
+        id S1729512AbgBKNxX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 08:53:23 -0500
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 6C46DE16; Tue, 11 Feb 2020 14:53:11 +0100 (CET)
+        id 967DDE29; Tue, 11 Feb 2020 14:53:11 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
@@ -27,9 +27,9 @@ Cc:     hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 24/62] x86/idt: Split idt_data setup out of set_intr_gate()
-Date:   Tue, 11 Feb 2020 14:52:18 +0100
-Message-Id: <20200211135256.24617-25-joro@8bytes.org>
+Subject: [PATCH 25/62] x86/head/64: Install boot GDT
+Date:   Tue, 11 Feb 2020 14:52:19 +0100
+Message-Id: <20200211135256.24617-26-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211135256.24617-1-joro@8bytes.org>
 References: <20200211135256.24617-1-joro@8bytes.org>
@@ -40,55 +40,58 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-The code to setup idt_data is needed for early exception handling, but
-set_intr_gate() can't be used that early because it has pv-ops in its
-code path, which don't work that early.
-
-Split out the idt_data initialization part from set_intr_gate() so
-that it can be used separatly.
+Handling exceptions during boot requires a working GDT. The kernel GDT
+is not yet ready for use, so install a temporary boot GDT.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/kernel/idt.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ arch/x86/kernel/head_64.S | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
-index 7f81c1294847..7d8fa631dca9 100644
---- a/arch/x86/kernel/idt.c
-+++ b/arch/x86/kernel/idt.c
-@@ -227,18 +227,24 @@ idt_setup_from_table(gate_desc *idt, const struct idt_data *t, int size, bool sy
- 	}
- }
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 4bbc770af632..5a3cde971cb7 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -72,6 +72,20 @@ SYM_CODE_START_NOALIGN(startup_64)
+ 	/* Set up the stack for verify_cpu(), similar to initial_stack below */
+ 	leaq	(__end_init_task - SIZEOF_PTREGS)(%rip), %rsp
  
-+static void init_idt_data(struct idt_data *data, unsigned int n,
-+			  const void *addr)
-+{
-+	BUG_ON(n > 0xFF);
++	/* Setup boot GDT descriptor and load boot GDT */
++	leaq	boot_gdt(%rip), %rax
++	movq	%rax, boot_gdt_base(%rip)
++	lgdt	boot_gdt_descr(%rip)
 +
-+	memset(data, 0, sizeof(*data));
-+	data->vector	= n;
-+	data->addr	= addr;
-+	data->segment	= __KERNEL_CS;
-+	data->bits.type	= GATE_INTERRUPT;
-+	data->bits.p	= 1;
-+}
++	/* GDT loaded - switch to __KERNEL_CS so IRET works reliably */
++	pushq	$__KERNEL_CS
++	leaq	.Lon_kernel_cs(%rip), %rax
++	pushq	%rax
++	lretq
 +
- static void set_intr_gate(unsigned int n, const void *addr)
- {
- 	struct idt_data data;
++.Lon_kernel_cs:
++	UNWIND_HINT_EMPTY
++
+ 	/* Sanitize CPU configuration */
+ 	call verify_cpu
  
--	BUG_ON(n > 0xFF);
--
--	memset(&data, 0, sizeof(data));
--	data.vector	= n;
--	data.addr	= addr;
--	data.segment	= __KERNEL_CS;
--	data.bits.type	= GATE_INTERRUPT;
--	data.bits.p	= 1;
-+	init_idt_data(&data, n, addr);
+@@ -480,6 +494,18 @@ SYM_DATA_LOCAL(early_gdt_descr_base,	.quad INIT_PER_CPU_VAR(gdt_page))
+ SYM_DATA(phys_base, .quad 0x0)
+ EXPORT_SYMBOL(phys_base)
  
- 	idt_setup_from_table(idt_table, &data, 1, false);
- }
++/* Boot GDT used when kernel addresses are not mapped yet */
++SYM_DATA_LOCAL(boot_gdt_descr,		.word boot_gdt_end - boot_gdt)
++SYM_DATA_LOCAL(boot_gdt_base,		.quad 0)
++SYM_DATA_START(boot_gdt)
++	.quad	0
++	.quad   0x00cf9a000000ffff      /* __KERNEL32_CS */
++	.quad   0x00af9a000000ffff      /* __KERNEL_CS */
++	.quad   0x00cf92000000ffff      /* __KERNEL_DS */
++	.quad   0x0080890000000000      /* TS descriptor */
++	.quad   0x0000000000000000      /* TS continued */
++SYM_DATA_END_LABEL(boot_gdt, SYM_L_LOCAL, boot_gdt_end)
++
+ #include "../../x86/xen/xen-head.S"
+ 
+ 	__PAGE_ALIGNED_BSS
 -- 
 2.17.1
 
