@@ -2,215 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4345F15901B
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:37:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 649F5159042
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 14:48:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728245AbgBKNhP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 08:37:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55565 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728091AbgBKNhO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 08:37:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581428233;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Nx7UfFP0sIiH35S7kPPK91DRlS1gGk3KRmm0NaUAgl4=;
-        b=XCoLoi91gJUR2zOyu+o1ao+8Nv16cDzuosEdCzwJfaEfLOrPXiRx5NuRx7FqGtHwIRcsln
-        heZ6mEQLGjjk1XyyVgRmZxgfRPpkKvOgfYm1lWm+FU3oTwMb4nOKrv8WP096zIzKmQBgN5
-        bGCYfVkYPfG7/jRW7ParPhUt5Dr0qSc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-58-mwDLRYU3N7G8fTlDMoOOWg-1; Tue, 11 Feb 2020 08:37:09 -0500
-X-MC-Unique: mwDLRYU3N7G8fTlDMoOOWg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 274ED1005514;
-        Tue, 11 Feb 2020 13:37:08 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B9D8887B34;
-        Tue, 11 Feb 2020 13:37:06 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     alexandru.elisei@arm.com, yuzenghui@huawei.com
-Subject: [PATCH kvm-unit-tests v2] arm64: timer: Speed up gic-timer-state check
-Date:   Tue, 11 Feb 2020 14:37:05 +0100
-Message-Id: <20200211133705.1398-1-drjones@redhat.com>
+        id S1729066AbgBKNr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 08:47:56 -0500
+Received: from mail-am6eur05on2043.outbound.protection.outlook.com ([40.107.22.43]:3041
+        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728921AbgBKNrz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 08:47:55 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n755TQjlEVqPvIX62y/oEPA7hjjo+EeBAOAaA1f+b5jX3eQOFYy5lFGWTRQHtRU3iF2RsGk40bYlQpd5bnMXMSn0lRujRf+HqP2/KXzT54TeNubVdD5R26y7JZAUKB57drEAT4T7r4y+BOF0oJ6DfzPpFhVwRHCy/JZxJWjV+mcttZXEjeNlS90ZkxaMwHYWFvIUwPkYngJxeUacWdYi5SHmT9vrJ1UH4TjZ1HLmDMECPSi9gux8ALKhXcEfSs1R38ds0O9LUDI0WJu1jLv/ZpU0nJn7Wc1lvwdy1aYvhi/QzVDNNboTUXGdfxWvNYaxjrPjSgW52mYeOQnB9xmwxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O3RViT7jx3uOhpwUikxYveBcgiP7xloyY/aoS0FZppo=;
+ b=CswdyqbQIuIPCc+QniHLTdsxyR0w3VMOu21lxSpA5/iR6PlpjSFj92z0sVn/k4P1pe2yAt3ZpDcAAD84JmgKaCWBtJ30NoAsptuqlirqCwoCZRFfZIxeiJzNEEniJW3RFCoJ2Xl6ik2U7sQNBPBdSd0AmTKTxY3gNwDUz+oPGsRsVK+UCdD97jvgbbc1a2WdsvYRjO+413a4zWrrffqpXdXCfBE/CUe47C2H/0ONu6eOdlObHsN7PWMc3rtMW/46qDsWuWzy0gWXAWZzgmjJgdUs8jD17I/oCnyaqg4xSmAlnKHSdTf4yopfS5dIjkVVlBSKybaFZ/0BEp1xKwzPhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O3RViT7jx3uOhpwUikxYveBcgiP7xloyY/aoS0FZppo=;
+ b=MsaqThPx2Y9JjAol+eTgDcT2ESsF8gGhJA7lpHWoZR7o4mPdG/jO7E8T9yWI2casiXsFHClwaDc5fEOYMGwk2jFzCn6uti6FevTvrffTF2W0l47Wz3dkQ0U2Zhzc9ez1qBCL0zG0AbtxJxfyL4A0X8sW9ta1TkwdfbJn0x6nyR0=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
+ VI1PR05MB5102.eurprd05.prod.outlook.com (20.177.51.151) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.23; Tue, 11 Feb 2020 13:47:50 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
+ 13:47:50 +0000
+Date:   Tue, 11 Feb 2020 09:47:46 -0400
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
+        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
+        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
+Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
+Message-ID: <20200211134746.GI4271@mellanox.com>
+References: <20200210035608.10002-1-jasowang@redhat.com>
+ <20200210035608.10002-4-jasowang@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200210035608.10002-4-jasowang@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: MN2PR14CA0020.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::25) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
+Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR14CA0020.namprd14.prod.outlook.com (2603:10b6:208:23e::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.21 via Frontend Transport; Tue, 11 Feb 2020 13:47:50 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1j1VtC-0005NE-JH; Tue, 11 Feb 2020 09:47:46 -0400
+X-Originating-IP: [142.68.57.212]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 80ee99ac-9a8d-49ce-870c-08d7aef8fc2a
+X-MS-TrafficTypeDiagnostic: VI1PR05MB5102:|VI1PR05MB5102:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR05MB51025721EE5118416576B579CF180@VI1PR05MB5102.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
+X-Forefront-PRVS: 0310C78181
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(346002)(376002)(366004)(136003)(189003)(199004)(316002)(66476007)(81166006)(52116002)(66556008)(81156014)(66946007)(2906002)(478600001)(86362001)(33656002)(7416002)(5660300002)(8936002)(36756003)(9786002)(9746002)(186003)(1076003)(6916009)(8676002)(2616005)(4326008)(26005)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB5102;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: T23A4tiyjVXJsicFKnT9kc2z80/eaJrG8sKW27M5UJ4wF0zAgBJeeQ6wuJdOhL9009BfyYVagtB0bTr6i/991KT4kshFzoHVrNYKY3yNyPI5XWX6GSx0xr7Bhq3chncHLCi91R8AOyEITFJUJze1YcCy4eFimxAAwRCHc8koDe/+8coMcwzprVbTKXSMyUYydTFvwYZYaAD1VSlQzFlAxZDONf6pwsMuOt6QrWPqEEwTJyDG3ZGEd2BN9Pd0s8rXUg2/dwkO7TWRPszxV+nufywBukdHtJ1++QO2wku5Ew+Pj9WCu5o6hYJSgbMIpHAgtR1kToAmoSEbfA5l9z/JTie8EqVv/JnFL/xobghUAaBlj5L4q7rz8rF5bDe6sHF89fHwe1LmUJHy2smi/gSnzbvVwfp97zVlTaP0iNmnaMxIToiQM3fNftV3EGy1QhT0XqMdnu7v+ynIY7ATDbgdOW31VCOLHFgbHdxlluVGAv/Dks5osei4Bh9+4g8ymq5Q
+X-MS-Exchange-AntiSpam-MessageData: OJ9PUo8SwnxMuhdfmsVM7okmDwwE6acVEU5RJvCFAJSDZFDGjKnfCnb7WurfyPGmtRjNGji1Q6D6moy+juXIbRTmKrxnbvl2MhjcLKdIVEdjcdSwjxxqhAPoK1HxZDZsFx0cRHDcxCtc531usVvS/w==
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 80ee99ac-9a8d-49ce-870c-08d7aef8fc2a
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2020 13:47:50.6309
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6SnG/tU9/bEK0bYQNTdUWz6LkEzEOPNxy4la5azD6WHfAGaKU8AdkVEueLk7pQEw9ADajrrWJ+Ul/7jVRWUsJA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5102
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's bail out of the wait loop if we see the expected state
-to save over six seconds of run time. Make sure we wait a bit
-before reading the registers and double check again after,
-though, to somewhat mitigate the chance of seeing the expected
-state by accident.
+On Mon, Feb 10, 2020 at 11:56:06AM +0800, Jason Wang wrote:
+> +/**
+> + * vdpa_register_device - register a vDPA device
+> + * Callers must have a succeed call of vdpa_init_device() before.
+> + * @vdev: the vdpa device to be registered to vDPA bus
+> + *
+> + * Returns an error when fail to add to vDPA bus
+> + */
+> +int vdpa_register_device(struct vdpa_device *vdev)
+> +{
+> +	int err = device_add(&vdev->dev);
+> +
+> +	if (err) {
+> +		put_device(&vdev->dev);
+> +		ida_simple_remove(&vdpa_index_ida, vdev->index);
+> +	}
 
-We also take this opportunity to push more IRQ state code to
-the library.
+This is a very dangerous construction, I've seen it lead to driver
+bugs. Better to require the driver to always do the put_device on
+error unwind
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arm/timer.c       | 30 ++++++++++++------------------
- lib/arm/asm/gic.h | 11 ++++++-----
- lib/arm/gic.c     | 33 +++++++++++++++++++++++++++++++++
- 3 files changed, 51 insertions(+), 23 deletions(-)
+The ida_simple_remove should probably be part of the class release
+function to make everything work right
 
-diff --git a/arm/timer.c b/arm/timer.c
-index f5cf775ce50f..3c4e27f20e2e 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -183,28 +183,22 @@ static bool timer_pending(struct timer_info *info)
- 		(info->read_ctl() & ARCH_TIMER_CTL_ISTATUS);
- }
-=20
--static enum gic_state gic_timer_state(struct timer_info *info)
-+static bool gic_timer_check_state(struct timer_info *info,
-+				  enum gic_irq_state expected_state)
- {
--	enum gic_state state =3D GIC_STATE_INACTIVE;
- 	int i;
--	bool pending, active;
-=20
- 	/* Wait for up to 1s for the GIC to sample the interrupt. */
- 	for (i =3D 0; i < 10; i++) {
--		pending =3D readl(gic_ispendr) & (1 << PPI(info->irq));
--		active =3D readl(gic_isactiver) & (1 << PPI(info->irq));
--		if (!active && !pending)
--			state =3D GIC_STATE_INACTIVE;
--		if (pending)
--			state =3D GIC_STATE_PENDING;
--		if (active)
--			state =3D GIC_STATE_ACTIVE;
--		if (active && pending)
--			state =3D GIC_STATE_ACTIVE_PENDING;
- 		mdelay(100);
-+		if (gic_irq_state(info->irq) =3D=3D expected_state) {
-+			mdelay(100);
-+			if (gic_irq_state(info->irq) =3D=3D expected_state)
-+				return true;
-+		}
- 	}
-=20
--	return state;
-+	return false;
- }
-=20
- static bool test_cval_10msec(struct timer_info *info)
-@@ -253,11 +247,11 @@ static void test_timer(struct timer_info *info)
- 	/* Enable the timer, but schedule it for much later */
- 	info->write_cval(later);
- 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
--	report(!timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_I=
-NACTIVE,
-+	report(!timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STAT=
-E_INACTIVE),
- 			"not pending before");
-=20
- 	info->write_cval(now - 1);
--	report(timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_PE=
-NDING,
-+	report(timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STATE=
-_PENDING),
- 			"interrupt signal pending");
-=20
- 	/* Disable the timer again and prepare to take interrupts */
-@@ -265,12 +259,12 @@ static void test_timer(struct timer_info *info)
- 	info->irq_received =3D false;
- 	set_timer_irq_enabled(info, true);
- 	report(!info->irq_received, "no interrupt when timer is disabled");
--	report(!timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_I=
-NACTIVE,
-+	report(!timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STAT=
-E_INACTIVE),
- 			"interrupt signal no longer pending");
-=20
- 	info->write_cval(now - 1);
- 	info->write_ctl(ARCH_TIMER_CTL_ENABLE | ARCH_TIMER_CTL_IMASK);
--	report(timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_IN=
-ACTIVE,
-+	report(timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STATE=
-_INACTIVE),
- 			"interrupt signal not pending");
-=20
- 	report(test_cval_10msec(info), "latency within 10 ms");
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index a72e0cde4e9c..922cbe95750c 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -47,11 +47,11 @@
- #ifndef __ASSEMBLY__
- #include <asm/cpumask.h>
-=20
--enum gic_state {
--	GIC_STATE_INACTIVE,
--	GIC_STATE_PENDING,
--	GIC_STATE_ACTIVE,
--	GIC_STATE_ACTIVE_PENDING,
-+enum gic_irq_state {
-+	GIC_IRQ_STATE_INACTIVE,
-+	GIC_IRQ_STATE_PENDING,
-+	GIC_IRQ_STATE_ACTIVE,
-+	GIC_IRQ_STATE_ACTIVE_PENDING,
- };
-=20
- /*
-@@ -80,6 +80,7 @@ extern u32 gic_iar_irqnr(u32 iar);
- extern void gic_write_eoir(u32 irqstat);
- extern void gic_ipi_send_single(int irq, int cpu);
- extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
-+extern enum gic_irq_state gic_irq_state(int irq);
-=20
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_H_ */
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index 94301169215c..0563b31132c8 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -146,3 +146,36 @@ void gic_ipi_send_mask(int irq, const cpumask_t *des=
-t)
- 	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
- 	gic_common_ops->ipi_send_mask(irq, dest);
- }
-+
-+enum gic_irq_state gic_irq_state(int irq)
-+{
-+	enum gic_irq_state state;
-+	bool pending =3D false, active =3D false;
-+	void *base;
-+
-+	assert(gic_common_ops);
-+
-+	switch (gic_version()) {
-+	case 2:
-+		base =3D gicv2_dist_base();
-+		pending =3D readl(base + GICD_ISPENDR) & (1 << PPI(irq));
-+		active =3D readl(base + GICD_ISACTIVER) & (1 << PPI(irq));
-+		break;
-+	case 3:
-+		base =3D gicv3_sgi_base();
-+		pending =3D readl(base + GICR_ISPENDR0) & (1 << PPI(irq));
-+		active =3D readl(base + GICR_ISACTIVER0) & (1 << PPI(irq));
-+		break;
-+	}
-+
-+	if (!active && !pending)
-+		state =3D GIC_IRQ_STATE_INACTIVE;
-+	if (pending)
-+		state =3D GIC_IRQ_STATE_PENDING;
-+	if (active)
-+		state =3D GIC_IRQ_STATE_ACTIVE;
-+	if (active && pending)
-+		state =3D GIC_IRQ_STATE_ACTIVE_PENDING;
-+
-+	return state;
-+}
---=20
-2.21.1
+> +/**
+> + * vdpa_unregister_driver - unregister a vDPA device driver
+> + * @drv: the vdpa device driver to be unregistered
+> + */
+> +void vdpa_unregister_driver(struct vdpa_driver *drv)
+> +{
+> +	driver_unregister(&drv->driver);
+> +}
+> +EXPORT_SYMBOL_GPL(vdpa_unregister_driver);
+> +
+> +static int vdpa_init(void)
+> +{
+> +	if (bus_register(&vdpa_bus) != 0)
+> +		panic("virtio bus registration failed");
+> +	return 0;
+> +}
 
+Linus will tell you not to kill the kernel - return the error code and
+propagate it up to the module init function.
+
+> +/**
+> + * vDPA device - representation of a vDPA device
+> + * @dev: underlying device
+> + * @dma_dev: the actual device that is performing DMA
+> + * @config: the configuration ops for this device.
+> + * @index: device index
+> + */
+> +struct vdpa_device {
+> +	struct device dev;
+> +	struct device *dma_dev;
+> +	const struct vdpa_config_ops *config;
+> +	int index;
+
+unsigned values shuld be unsigned int
+
+Jason
