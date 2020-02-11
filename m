@@ -2,90 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE77D158BD7
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 10:26:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFECA158BE6
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 10:32:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727761AbgBKJ0Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 04:26:24 -0500
-Received: from foss.arm.com ([217.140.110.172]:43206 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727121AbgBKJ0Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 04:26:24 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9686A31B;
-        Tue, 11 Feb 2020 01:26:23 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA8EC3F68E;
-        Tue, 11 Feb 2020 01:26:22 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 2/3] arm64: timer: Use the proper RDist
- register name in GICv3
-To:     Zenghui Yu <yuzenghui@huawei.com>, drjones@redhat.com,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     wanghaibin.wang@huawei.com
-References: <20200211083901.1478-1-yuzenghui@huawei.com>
- <20200211083901.1478-3-yuzenghui@huawei.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <50dcce90-b2b6-e375-b8af-9c1c53d43a4a@arm.com>
-Date:   Tue, 11 Feb 2020 09:26:16 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727828AbgBKJcU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 04:32:20 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50803 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727617AbgBKJcU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 04:32:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581413538;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vUIoKsy00yC8FduSIq6A0fM/o1AiegnuIk2T9JsHl8s=;
+        b=Es/E77omZg6VEkNiYUcpCDsAfDaGuFOf8ScITr8dMvnyCdaI/nq+/alYbcj9JkeWfSspnN
+        +2gXJ2N1Nja8f7s3voQN8c/8DqNWGcaSTxeqanEY+826bh9hERtZYtn+rZ+Ff7LTEeoMQR
+        1shaSehETVLYM+LhGvM9mVbkcxnMxeE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-110-yhNg-sQ5N2ClZiwoQy9BMQ-1; Tue, 11 Feb 2020 04:32:14 -0500
+X-MC-Unique: yhNg-sQ5N2ClZiwoQy9BMQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3F60107B7DC;
+        Tue, 11 Feb 2020 09:32:12 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B6175C21B;
+        Tue, 11 Feb 2020 09:32:10 +0000 (UTC)
+Date:   Tue, 11 Feb 2020 09:32:09 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Avi Kivity <avi@scylladb.com>,
+        Davide Libenzi <davidel@xmailserver.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Masatake YAMATO <yamato@redhat.com>
+Subject: Re: [RFC] eventfd: add EFD_AUTORESET flag
+Message-ID: <20200211093209.GA420951@stefanha-x1.localdomain>
+References: <20200129172010.162215-1-stefanha@redhat.com>
+ <20200204154035.GA47059@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20200211083901.1478-3-yuzenghui@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200204154035.GA47059@stefanha-x1.localdomain>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Tue, Feb 04, 2020 at 03:40:35PM +0000, Stefan Hajnoczi wrote:
+> On Wed, Jan 29, 2020 at 05:20:10PM +0000, Stefan Hajnoczi wrote:
+> > Some applications simply use eventfd for inter-thread notifications
+> > without requiring counter or semaphore semantics.  They wait for the
+> > eventfd to become readable using poll(2)/select(2) and then call read(2)
+> > to reset the counter.
+> > 
+> > This patch adds the EFD_AUTORESET flag to reset the counter when
+> > f_ops->poll() finds the eventfd is readable, eliminating the need to
+> > call read(2) to reset the counter.
+> > 
+> > This results in a small but measurable 1% performance improvement with
+> > QEMU virtio-blk emulation.  Each read(2) takes 1 microsecond execution
+> > time in the event loop according to perf.
+> > 
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> > Does this look like a reasonable thing to do?  I'm not very familiar
+> > with f_ops->poll() or the eventfd internals, so maybe I'm overlooking a
+> > design flaw.
+> 
+> Ping?
 
-On 2/11/20 8:39 AM, Zenghui Yu wrote:
-> We're actually going to read GICR_ISACTIVER0 and GICR_ISPENDR0 (in
-> SGI_base frame of the redistribitor) to get the active/pending state
-> of the timer interrupt.  Fix this typo.
->
-> And since they have the same value, there's no functional change.
->
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->  arm/timer.c          | 4 ++--
->  lib/arm/asm/gic-v3.h | 4 ++++
->  2 files changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/arm/timer.c b/arm/timer.c
-> index 94543f2..10a88f3 100644
-> --- a/arm/timer.c
-> +++ b/arm/timer.c
-> @@ -351,8 +351,8 @@ static void test_init(void)
->  		gic_icenabler = gicv2_dist_base() + GICD_ICENABLER;
->  		break;
->  	case 3:
-> -		gic_isactiver = gicv3_sgi_base() + GICD_ISACTIVER;
-> -		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
-> +		gic_isactiver = gicv3_sgi_base() + GICR_ISACTIVER0;
-> +		gic_ispendr = gicv3_sgi_base() + GICR_ISPENDR0;
->  		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
->  		gic_icenabler = gicv3_sgi_base() + GICR_ICENABLER0;
->  		break;
-> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-> index 0dc838b..e2736a1 100644
-> --- a/lib/arm/asm/gic-v3.h
-> +++ b/lib/arm/asm/gic-v3.h
-> @@ -32,6 +32,10 @@
->  #define GICR_IGROUPR0			GICD_IGROUPR
->  #define GICR_ISENABLER0			GICD_ISENABLER
->  #define GICR_ICENABLER0			GICD_ICENABLER
-> +#define GICR_ISPENDR0			GICD_ISPENDR
-> +#define GICR_ICPENDR0			GICD_ICPENDR
-> +#define GICR_ISACTIVER0			GICD_ISACTIVER
-> +#define GICR_ICACTIVER0			GICD_ICACTIVER
->  #define GICR_IPRIORITYR0		GICD_IPRIORITYR
->  
->  #define ICC_SGI1R_AFFINITY_1_SHIFT	16
+Ping?
 
-Looks like an improvement to me:
+I would appreciate an indication of whether EFD_AUTORESET is an
+acceptable new feature.  Thanks!
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > I've tested this with QEMU and it works fine:
+> > https://github.com/stefanha/qemu/commits/eventfd-autoreset
+> > ---
+> >  fs/eventfd.c            | 99 +++++++++++++++++++++++++----------------
+> >  include/linux/eventfd.h |  3 +-
+> >  2 files changed, 62 insertions(+), 40 deletions(-)
+> > 
+> > diff --git a/fs/eventfd.c b/fs/eventfd.c
+> > index 8aa0ea8c55e8..208f6b9e2234 100644
+> > --- a/fs/eventfd.c
+> > +++ b/fs/eventfd.c
+> > @@ -116,45 +116,62 @@ static __poll_t eventfd_poll(struct file *file, poll_table *wait)
+> >  
+> >  	poll_wait(file, &ctx->wqh, wait);
+> >  
+> > -	/*
+> > -	 * All writes to ctx->count occur within ctx->wqh.lock.  This read
+> > -	 * can be done outside ctx->wqh.lock because we know that poll_wait
+> > -	 * takes that lock (through add_wait_queue) if our caller will sleep.
+> > -	 *
+> > -	 * The read _can_ therefore seep into add_wait_queue's critical
+> > -	 * section, but cannot move above it!  add_wait_queue's spin_lock acts
+> > -	 * as an acquire barrier and ensures that the read be ordered properly
+> > -	 * against the writes.  The following CAN happen and is safe:
+> > -	 *
+> > -	 *     poll                               write
+> > -	 *     -----------------                  ------------
+> > -	 *     lock ctx->wqh.lock (in poll_wait)
+> > -	 *     count = ctx->count
+> > -	 *     __add_wait_queue
+> > -	 *     unlock ctx->wqh.lock
+> > -	 *                                        lock ctx->qwh.lock
+> > -	 *                                        ctx->count += n
+> > -	 *                                        if (waitqueue_active)
+> > -	 *                                          wake_up_locked_poll
+> > -	 *                                        unlock ctx->qwh.lock
+> > -	 *     eventfd_poll returns 0
+> > -	 *
+> > -	 * but the following, which would miss a wakeup, cannot happen:
+> > -	 *
+> > -	 *     poll                               write
+> > -	 *     -----------------                  ------------
+> > -	 *     count = ctx->count (INVALID!)
+> > -	 *                                        lock ctx->qwh.lock
+> > -	 *                                        ctx->count += n
+> > -	 *                                        **waitqueue_active is false**
+> > -	 *                                        **no wake_up_locked_poll!**
+> > -	 *                                        unlock ctx->qwh.lock
+> > -	 *     lock ctx->wqh.lock (in poll_wait)
+> > -	 *     __add_wait_queue
+> > -	 *     unlock ctx->wqh.lock
+> > -	 *     eventfd_poll returns 0
+> > -	 */
+> > -	count = READ_ONCE(ctx->count);
+> > +	if (ctx->flags & EFD_AUTORESET) {
+> > +		unsigned long flags;
+> > +		__poll_t requested = poll_requested_events(wait);
+> > +
+> > +		spin_lock_irqsave(&ctx->wqh.lock, flags);
+> > +		count = ctx->count;
+> > +
+> > +		/* Reset counter if caller is polling for read */
+> > +		if (count != 0 && (requested & EPOLLIN)) {
+> > +			ctx->count = 0;
+> > +			events |= EPOLLOUT;
+> > +			/* TODO is a EPOLLOUT wakeup necessary here? */
+> > +		}
+> > +
+> > +		spin_unlock_irqrestore(&ctx->wqh.lock, flags);
+> > +	} else {
+> > +		/*
+> > +		 * All writes to ctx->count occur within ctx->wqh.lock.  This read
+> > +		 * can be done outside ctx->wqh.lock because we know that poll_wait
+> > +		 * takes that lock (through add_wait_queue) if our caller will sleep.
+> > +		 *
+> > +		 * The read _can_ therefore seep into add_wait_queue's critical
+> > +		 * section, but cannot move above it!  add_wait_queue's spin_lock acts
+> > +		 * as an acquire barrier and ensures that the read be ordered properly
+> > +		 * against the writes.  The following CAN happen and is safe:
+> > +		 *
+> > +		 *     poll                               write
+> > +		 *     -----------------                  ------------
+> > +		 *     lock ctx->wqh.lock (in poll_wait)
+> > +		 *     count = ctx->count
+> > +		 *     __add_wait_queue
+> > +		 *     unlock ctx->wqh.lock
+> > +		 *                                        lock ctx->qwh.lock
+> > +		 *                                        ctx->count += n
+> > +		 *                                        if (waitqueue_active)
+> > +		 *                                          wake_up_locked_poll
+> > +		 *                                        unlock ctx->qwh.lock
+> > +		 *     eventfd_poll returns 0
+> > +		 *
+> > +		 * but the following, which would miss a wakeup, cannot happen:
+> > +		 *
+> > +		 *     poll                               write
+> > +		 *     -----------------                  ------------
+> > +		 *     count = ctx->count (INVALID!)
+> > +		 *                                        lock ctx->qwh.lock
+> > +		 *                                        ctx->count += n
+> > +		 *                                        **waitqueue_active is false**
+> > +		 *                                        **no wake_up_locked_poll!**
+> > +		 *                                        unlock ctx->qwh.lock
+> > +		 *     lock ctx->wqh.lock (in poll_wait)
+> > +		 *     __add_wait_queue
+> > +		 *     unlock ctx->wqh.lock
+> > +		 *     eventfd_poll returns 0
+> > +		 */
+> > +		count = READ_ONCE(ctx->count);
+> > +	}
+> >  
+> >  	if (count > 0)
+> >  		events |= EPOLLIN;
+> > @@ -400,6 +417,10 @@ static int do_eventfd(unsigned int count, int flags)
+> >  	if (flags & ~EFD_FLAGS_SET)
+> >  		return -EINVAL;
+> >  
+> > +	/* Semaphore semantics don't make sense when autoreset is enabled */
+> > +	if ((flags & EFD_SEMAPHORE) && (flags & EFD_AUTORESET))
+> > +		return -EINVAL;
+> > +
+> >  	ctx = kmalloc(sizeof(*ctx), GFP_KERNEL);
+> >  	if (!ctx)
+> >  		return -ENOMEM;
+> > diff --git a/include/linux/eventfd.h b/include/linux/eventfd.h
+> > index ffcc7724ca21..27577fafc553 100644
+> > --- a/include/linux/eventfd.h
+> > +++ b/include/linux/eventfd.h
+> > @@ -21,11 +21,12 @@
+> >   * shared O_* flags.
+> >   */
+> >  #define EFD_SEMAPHORE (1 << 0)
+> > +#define EFD_AUTORESET (1 << 6) /* aliases O_CREAT */
+> >  #define EFD_CLOEXEC O_CLOEXEC
+> >  #define EFD_NONBLOCK O_NONBLOCK
+> >  
+> >  #define EFD_SHARED_FCNTL_FLAGS (O_CLOEXEC | O_NONBLOCK)
+> > -#define EFD_FLAGS_SET (EFD_SHARED_FCNTL_FLAGS | EFD_SEMAPHORE)
+> > +#define EFD_FLAGS_SET (EFD_SHARED_FCNTL_FLAGS | EFD_SEMAPHORE | EFD_AUTORESET)
+> >  
+> >  struct eventfd_ctx;
+> >  struct file;
+> > -- 
+> > 2.24.1
+> > 
+
 
