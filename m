@@ -2,135 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 52F0A158E97
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 13:35:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E6F2158E9C
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 13:38:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728521AbgBKMfa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 07:35:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50988 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728031AbgBKMf3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 07:35:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581424529;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=SvgnBksltlfdKTQjesT7j5JDJyAmqiI6NDbtZfxaBYc=;
-        b=QQXq1/OoeobxBPDl6j3B5I1tadgyW1YEXwsq4mHwMSHTEIXIuZjPzWxIV9CGFclNA3t/t5
-        HP4X9patdwnrDvu4ES0l9u0qe7rlnWHIRloUCno5wj854CmVm1R+O0TqLzpKIWt3LcZJrk
-        iOnGyYOFgm/600OST0T8WRr7eYgarvk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-p6630gJaMpGBbeTuArspaw-1; Tue, 11 Feb 2020 07:35:25 -0500
-X-MC-Unique: p6630gJaMpGBbeTuArspaw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CAF9477;
-        Tue, 11 Feb 2020 12:35:24 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A15976055B;
-        Tue, 11 Feb 2020 12:35:22 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     alexandru.elisei@arm.com, yuzenghui@huawei.com
-Subject: [PATCH kvm-unit-tests] arm64: timer: Speed up gic-timer-state check
-Date:   Tue, 11 Feb 2020 13:35:21 +0100
-Message-Id: <20200211123521.13637-1-drjones@redhat.com>
+        id S1728810AbgBKMid (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 07:38:33 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:39090 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727954AbgBKMid (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 07:38:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=oxjM1lyVFBW4RHs88S9RTOZ+n3z0Ab4hzDGdR1eROMQ=; b=D+a4ql07h54FNTVT1ClJXeYcqM
+        AeSYdLBj7pnrKZnyq7t99w3O1iAJDCvg5xS+DE1ouN/gF46F20HJkGRkxXVZ30/vqXfUJlmX16Fq0
+        V3QIgLMmsHQsoHNjScjM8VvknuWkhyuUdLMjOAnInO2uD5OwPYP7iluz9Y0FECxSDuGkmMYBnlV7r
+        xxg5/v6ADmthv5gOpDlmGHOKb91Bd18TY/YakJ7qmZmH2dWtWkVXTHW7sDNAt3XjQH4Sg1PWYO44a
+        qX3UPZPap/HCxbCaqlx9QivR8ds74LPUz7pDr5cPoEBfjlNyeiW0tEcyo84nUSbBCvetsDDJIgR08
+        +L22Dcsg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j1Uo4-00006E-4H; Tue, 11 Feb 2020 12:38:24 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 31A4230066E;
+        Tue, 11 Feb 2020 13:36:33 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id DA2BD2B88D75F; Tue, 11 Feb 2020 13:38:21 +0100 (CET)
+Date:   Tue, 11 Feb 2020 13:38:21 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        David Laight <David.Laight@aculab.com>
+Subject: Re: [PATCH v2 5/6] kvm: x86: Emulate MSR IA32_CORE_CAPABILITIES
+Message-ID: <20200211123821.GO14914@hirez.programming.kicks-ass.net>
+References: <20200203151608.28053-1-xiaoyao.li@intel.com>
+ <20200203151608.28053-6-xiaoyao.li@intel.com>
+ <20200203214300.GI19638@linux.intel.com>
+ <829bd606-6852-121f-0d95-e9f1d35a3dde@intel.com>
+ <20200204093725.GC14879@hirez.programming.kicks-ass.net>
+ <CALCETrUAsUzqLhhNkLSC2612odskjqPQvj4uXgBOaoBGoCQD0A@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrUAsUzqLhhNkLSC2612odskjqPQvj4uXgBOaoBGoCQD0A@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's bail out of the wait loop if we see the expected state
-to save about seven seconds of run time. Make sure we wait a
-bit before reading the registers, though, to somewhat mitigate
-the chance of the expected state being stale.
+On Mon, Feb 10, 2020 at 07:52:13PM -0800, Andy Lutomirski wrote:
+> On Tue, Feb 4, 2020 at 1:37 AM Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > On Tue, Feb 04, 2020 at 05:19:26PM +0800, Xiaoyao Li wrote:
+> >
+> > > > > + case MSR_IA32_CORE_CAPS:
+> > > > > +         if (!msr_info->host_initiated)
+> > > >
+> > > > Shouldn't @data be checked against kvm_get_core_capabilities()?
+> > >
+> > > Maybe it's for the case that userspace might have the ability to emulate SLD
+> > > feature? And we usually let userspace set whatever it wants, e.g.,
+> > > ARCH_CAPABILITIES.
+> >
+> > If the 'sq_misc.split_lock' event is sufficiently accurate, I suppose
+> > the host could use that to emulate the feature at the cost of one
+> > counter used.
+> 
+> I would be impressed if the event were to fire before executing the
+> offending split lock.  Wouldn't the best possible result be for it to
+> fire with RIP pointing to the *next* instruction?  This seems like it
+> could be quite confusing to a guest.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arm/timer.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+True; and I see no indication the event is PEBS capable, so even that is
+pushing it.
 
-diff --git a/arm/timer.c b/arm/timer.c
-index f5cf775ce50f..c2262c112c09 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -183,7 +183,8 @@ static bool timer_pending(struct timer_info *info)
- 		(info->read_ctl() & ARCH_TIMER_CTL_ISTATUS);
- }
-=20
--static enum gic_state gic_timer_state(struct timer_info *info)
-+static bool gic_timer_check_state(struct timer_info *info,
-+				  enum gic_state expected_state)
- {
- 	enum gic_state state =3D GIC_STATE_INACTIVE;
- 	int i;
-@@ -191,6 +192,7 @@ static enum gic_state gic_timer_state(struct timer_in=
-fo *info)
-=20
- 	/* Wait for up to 1s for the GIC to sample the interrupt. */
- 	for (i =3D 0; i < 10; i++) {
-+		mdelay(100);
- 		pending =3D readl(gic_ispendr) & (1 << PPI(info->irq));
- 		active =3D readl(gic_isactiver) & (1 << PPI(info->irq));
- 		if (!active && !pending)
-@@ -201,10 +203,11 @@ static enum gic_state gic_timer_state(struct timer_=
-info *info)
- 			state =3D GIC_STATE_ACTIVE;
- 		if (active && pending)
- 			state =3D GIC_STATE_ACTIVE_PENDING;
--		mdelay(100);
-+		if (state =3D=3D expected_state)
-+			return true;
- 	}
-=20
--	return state;
-+	return false;
- }
-=20
- static bool test_cval_10msec(struct timer_info *info)
-@@ -253,11 +256,11 @@ static void test_timer(struct timer_info *info)
- 	/* Enable the timer, but schedule it for much later */
- 	info->write_cval(later);
- 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
--	report(!timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_I=
-NACTIVE,
-+	report(!timer_pending(info) && gic_timer_check_state(info, GIC_STATE_IN=
-ACTIVE),
- 			"not pending before");
-=20
- 	info->write_cval(now - 1);
--	report(timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_PE=
-NDING,
-+	report(timer_pending(info) && gic_timer_check_state(info, GIC_STATE_PEN=
-DING),
- 			"interrupt signal pending");
-=20
- 	/* Disable the timer again and prepare to take interrupts */
-@@ -265,12 +268,12 @@ static void test_timer(struct timer_info *info)
- 	info->irq_received =3D false;
- 	set_timer_irq_enabled(info, true);
- 	report(!info->irq_received, "no interrupt when timer is disabled");
--	report(!timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_I=
-NACTIVE,
-+	report(!timer_pending(info) && gic_timer_check_state(info, GIC_STATE_IN=
-ACTIVE),
- 			"interrupt signal no longer pending");
-=20
- 	info->write_cval(now - 1);
- 	info->write_ctl(ARCH_TIMER_CTL_ENABLE | ARCH_TIMER_CTL_IMASK);
--	report(timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_IN=
-ACTIVE,
-+	report(timer_pending(info) && gic_timer_check_state(info, GIC_STATE_INA=
-CTIVE),
- 			"interrupt signal not pending");
-=20
- 	report(test_cval_10msec(info), "latency within 10 ms");
---=20
-2.21.1
-
+However, it's virt; isn't that confused per definition? ;-))
