@@ -2,48 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23ACA159BF6
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 23:12:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABA09159BFC
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 23:14:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727264AbgBKWMS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 17:12:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48456 "EHLO mail.kernel.org"
+        id S1727429AbgBKWOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 17:14:05 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48950 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727054AbgBKWMS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 17:12:18 -0500
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+        id S1727111AbgBKWOF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 17:14:05 -0500
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F2B6321739
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 22:12:17 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 52B89214DB
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 22:14:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581459138;
-        bh=yNqZod946paujAdEqMRJ1ejAWBjSCe4eeJhwXaauReA=;
+        s=default; t=1581459244;
+        bh=Tzo7oLihh6XmYdZ4fKdx4WcMxH4KEKF1Qm1JB/jwLwY=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=CIBIe+lFFTrJtJr5PAHqlakYHlpJHZ8/IxM6nu6BnvrvP7QlnGB0UYifJ+cLbPD1u
-         h1S/MFtkHV/kfSrWKBYyT33E1VvxImKO4GN0JxCZomOMAUqT1BPCihhCIlujCDaFTm
-         +HfJXF6DSOj/kVMp23bh1nYVKiS1eqyxL1JzNMCc=
-Received: by mail-wr1-f51.google.com with SMTP id w15so14530606wru.4
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 14:12:17 -0800 (PST)
-X-Gm-Message-State: APjAAAVtdFdbQjYC7TtpSDCDGlM6J5mt5joNrVfseW9m9EwwakUfDKw8
-        OI/Y/rPYo2Gnnfzr2fHEz0RPaK2AKT0UJvZ+qm/Hhg==
-X-Google-Smtp-Source: APXvYqx/FE/ZBM/IRE/iZmNcUdhlAsvuwyZQ8jxjO4FhrLlV/QjKqYE4nFeb7APUWZqWIeFWsWQE68sUQ55NIG/jAcY=
-X-Received: by 2002:a5d:494b:: with SMTP id r11mr10779334wrs.184.1581459136232;
- Tue, 11 Feb 2020 14:12:16 -0800 (PST)
+        b=VpUH9q2Ld9f0sZfPeirYatwOo0AY9GNGwCayffYWwmErMNp068fBLBmJfdfSc/lE1
+         1KTgyuEpfu3cUeSrxuONfZouwJuPNKBDZ+9U4pgZ1McQo3gStxCp/uwgNkRzBij3/W
+         mVANOrP5chQlopRUZpNrxR4trUkQQr/2dH+S486o=
+Received: by mail-wr1-f44.google.com with SMTP id m16so14476336wrx.11
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 14:14:04 -0800 (PST)
+X-Gm-Message-State: APjAAAUfDWUVREp33ab5L56vYKrIaYcx45uvtfPu5sJQGMkmajZFRL1O
+        z1u/LxB23dKCWfbpGtQuQfb05O5iJdc8G8znc9Dwrw==
+X-Google-Smtp-Source: APXvYqydo76PkEmj5PG5O27EmrWOjY3nLu09O+yXpO0pI2+Gs1e7Uz84BfjfNy+FRfjeX2dRElyHGQ0YcfBM+E5UZeM=
+X-Received: by 2002:a5d:5305:: with SMTP id e5mr11001033wrv.18.1581459242661;
+ Tue, 11 Feb 2020 14:14:02 -0800 (PST)
 MIME-Version: 1.0
-References: <20200211135256.24617-1-joro@8bytes.org> <20200211145008.GT14914@hirez.programming.kicks-ass.net>
- <20200211154321.GB22063@8bytes.org>
-In-Reply-To: <20200211154321.GB22063@8bytes.org>
+References: <20200211135256.24617-1-joro@8bytes.org> <20200211135256.24617-8-joro@8bytes.org>
+In-Reply-To: <20200211135256.24617-8-joro@8bytes.org>
 From:   Andy Lutomirski <luto@kernel.org>
-Date:   Tue, 11 Feb 2020 14:12:04 -0800
-X-Gmail-Original-Message-ID: <CALCETrUtvd0OuLoo=ZBRmaJRFxgFWV9hSZyHBwmWCs2+b4J-sg@mail.gmail.com>
-Message-ID: <CALCETrUtvd0OuLoo=ZBRmaJRFxgFWV9hSZyHBwmWCs2+b4J-sg@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/62] Linux as SEV-ES Guest Support
+Date:   Tue, 11 Feb 2020 14:13:50 -0800
+X-Gmail-Original-Message-ID: <CALCETrVVjECt2TNVDJcuS68663ioPTiEY13-1uO_gWYjWaVwPA@mail.gmail.com>
+Message-ID: <CALCETrVVjECt2TNVDJcuS68663ioPTiEY13-1uO_gWYjWaVwPA@mail.gmail.com>
+Subject: Re: [PATCH 07/62] x86/boot/compressed/64: Disable red-zone usage
 To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Peter Zijlstra <peterz@infradead.org>, X86 ML <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+Cc:     X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
         Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
         Thomas Hellstrom <thellstrom@vmware.com>,
         Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
@@ -60,23 +59,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 11, 2020 at 7:43 AM Joerg Roedel <joro@8bytes.org> wrote:
+On Tue, Feb 11, 2020 at 5:53 AM Joerg Roedel <joro@8bytes.org> wrote:
 >
-> On Tue, Feb 11, 2020 at 03:50:08PM +0100, Peter Zijlstra wrote:
+> From: Joerg Roedel <jroedel@suse.de>
 >
-> > Oh gawd; so instead of improving the whole NMI situation, AMD went and
-> > made it worse still ?!?
+> The x86-64 ABI defines a red-zone on the stack:
 >
-> Well, depends on how you want to see it. Under SEV-ES an IRET will not
-> re-open the NMI window, but the guest has to tell the hypervisor
-> explicitly when it is ready to receive new NMIs via the NMI_COMPLETE
-> message.  NMIs stay blocked even when an exception happens in the
-> handler, so this could also be seen as a (slight) improvement.
+>   The 128-byte area beyond the location pointed to by %rsp is
+>   considered to be reserved and shall not be modified by signal or
+>   interrupt handlers. 10 Therefore, functions may use this area for
+>   temporary data that is not needed across function calls. In
+>   particular, leaf functions may use this area for their entire stack
+>   frame, rather than adjusting the stack pointer in the prologue and
+>   epilogue. This area is known as the red zone.
 >
+> This is not compatible with exception handling, so disable it for the
+> pre-decompression boot code.
 
-I don't get it.  VT-x has a VMCS bit "Interruptibility
-state"."Blocking by NMI" that tracks the NMI masking state.  Would it
-have killed AMD to solve the problem they same way to retain
-architectural behavior inside a SEV-ES VM?
+Acked-by: Andy Lutomirski <luto@kernel.org>
+
+I admit that I thought we already supported exceptions this early.  At
+least I seem to remember writing this code.  Maybe it never got
+upstreamed?
 
 --Andy
