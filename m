@@ -2,111 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 060F11594F1
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 17:28:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83686159502
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 17:33:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729650AbgBKQ2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 11:28:45 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:33254 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729102AbgBKQ2o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 11:28:44 -0500
-Received: by mail-ot1-f67.google.com with SMTP id b18so10720110otp.0
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2020 08:28:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sBL1pdvCcbU5vh2MRuYeHAqsYDWdsnFmPWD7z1MAFS8=;
-        b=SoHdSL0v6iKBaL8zgd+lCUElYoaXsAfUEXa9LewiooAA5sfD7WLzJr/zUAq9inb3HN
-         g9KiANDepXgVQcQML6UQoWdxX/zCH7k5u/cQJb++myJJll2u1soQx+bX3bgsEogEyYwT
-         o98FqckKC1IhQGCE3z3WZHOMPuGB8UU2meAF8cGqSkqAshTrVWdNtyg65J2bHeD0z3AG
-         LH8pUj+bixTPli6OWfF6iNF+dspoPIks04pG2OV9Re/uPltKscvyX9FfW6qXZfK/hE4Q
-         DwsGFLAMTwyXlci8q0KGniQs9daCRGj+ie2k3v81msJ7xmG5YCS5YkqCUHbx8lobeQuZ
-         r3fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sBL1pdvCcbU5vh2MRuYeHAqsYDWdsnFmPWD7z1MAFS8=;
-        b=XqXWyC1xtc+13F/wQLRR05eUW1A17ax/CSPLCQ2mWejcolYoUHQvO/dEIHk744CyEX
-         9/7fC4jlDAxPXLAOsr9FM1wftdOv7GjT5zyxSLiwkW0T7Oj/IAszbCAcZ+EjjW0FuNx3
-         dEullYDYl8xF83uJvHs1hQVzLIQJ5Ux8hsjZytK27rUGa/o5b+eLsJv9keGzcIUx+WkZ
-         QgWKQOxOZ110PMzrbrY/PXAwTu2UWV7pgcPT2lLoqEDv31PsnX2DPwmXLzOasCJKxn8L
-         hniJZch3szTLGeFP2ogBFWPuZvN9azPAltDuNKZbjiP1FGkC+rzidZdN/HGx417NhTr4
-         Ktbg==
-X-Gm-Message-State: APjAAAXMW6jXrKN6RD3+4tifyozqfW/yW0PBtbSF/MgmSoy9DL9aEO9r
-        W//04Gl+Ockt/+RlqwwA1h30BrSjhpgojWMwFhwo3lTQ
-X-Google-Smtp-Source: APXvYqwMDFOjjhVbQZtRmwikjYOZ3DieS0MB81Yf/FbcjGebMqahe3qweuGumfab9jxqW2C9ue8obJUgmNf0Y4w4xC8=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id l4mr5921019otd.91.1581438522842;
- Tue, 11 Feb 2020 08:28:42 -0800 (PST)
-MIME-Version: 1.0
-References: <20200130112510.15154-1-eric.auger@redhat.com> <20200130112510.15154-5-eric.auger@redhat.com>
-In-Reply-To: <20200130112510.15154-5-eric.auger@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 11 Feb 2020 16:28:32 +0000
-Message-ID: <CAFEAcA_V3rT+C1FCPPyjmQ8svxF1tMWWOLgZ1Vn_CNQ3N0x-KA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 4/9] arm: pmu: Check Required Event Support
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     Eric Auger <eric.auger.pro@gmail.com>,
-        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm-devel <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Murray <andrew.murray@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
+        id S1730175AbgBKQdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 11:33:20 -0500
+Received: from mga09.intel.com ([134.134.136.24]:18514 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728295AbgBKQdT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 11:33:19 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Feb 2020 08:33:18 -0800
+X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; 
+   d="scan'208";a="237443521"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Feb 2020 08:33:18 -0800
+Message-ID: <3a8d9e1a3a5528c3a0889448f2ffd02c186399b7.camel@linux.intel.com>
+Subject: Re: [PATCH v16.1 6/9] virtio-balloon: Add support for providing
+ free page reports to host
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz,
+        yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
+Date:   Tue, 11 Feb 2020 08:33:18 -0800
+In-Reply-To: <314cb54e-8dfc-7606-7135-c21dbf416505@redhat.com>
+References: <20200122173040.6142.39116.stgit@localhost.localdomain>
+         <20200122174347.6142.92803.stgit@localhost.localdomain>
+         <b8cbf72d-55a7-4a58-6d08-b0ac5fa86e82@redhat.com>
+         <20200211063441-mutt-send-email-mst@kernel.org>
+         <ada0ec83-8e7d-abb3-7053-0ec2bf2a9aa5@redhat.com>
+         <20200211090052-mutt-send-email-mst@kernel.org>
+         <d6b481fb-6c72-455d-f8e4-600a8677c7a8@redhat.com>
+         <20200211094357-mutt-send-email-mst@kernel.org>
+         <314cb54e-8dfc-7606-7135-c21dbf416505@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Jan 2020 at 11:25, Eric Auger <eric.auger@redhat.com> wrote:
->
-> If event counters are implemented check the common events
-> required by the PMUv3 are implemented.
->
-> Some are unconditionally required (SW_INCR, CPU_CYCLES,
-> either INST_RETIRED or INST_SPEC). Some others only are
-> required if the implementation implements some other features.
->
-> Check those wich are unconditionally required.
->
-> This test currently fails on TCG as neither INST_RETIRED
-> or INST_SPEC are supported.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
+On Tue, 2020-02-11 at 16:13 +0100, David Hildenbrand wrote:
+>  >> AFAIKs, the guest could inflate/deflate (esp. temporarily) and
+> > > communicate via "actual" the actual balloon size as he sees it.
+> > 
+> > OK so you want hinted but unused pages counted, and reported
+> > in "actual"? That's a vmexit before each page use ...
+> 
+> No, not at all. I rather meant, that it is unclear how
+> inflation/deflation requests and "actual" *could* interact. Especially
+> if we would consider free page reporting as some way of inflation
+> (+immediate deflation) triggered by the guest. IMHO, we would not touch
+> "actual" in that case.
+> 
+> But as I said, I am totally fine with keeping it as is in this patch.
+> IOW not glue free page reporting to inflation/deflation but let it act
+> like something different with its own semantics (and document these
+> properly).
+> 
 
-> +static bool is_event_supported(uint32_t n, bool warn)
-> +{
-> +       uint64_t pmceid0 = read_sysreg(pmceid0_el0);
-> +       uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
-> +       bool supported;
-> +       uint64_t reg;
-> +
-> +       /*
-> +        * The low 32-bits of PMCEID0/1 respectly describe
-> +        * event support for events 0-31/32-63. Their High
-> +        * 32-bits describe support for extended events
-> +        * starting at 0x4000, using the same split.
-> +        */
-> +       if (n >= 0x0  && n <= 0x3F)
-> +               reg = (pmceid0 & 0xFFFFFFFF) | ((pmceid1 & 0xFFFFFFFF) << 32);
-> +       else if  (n >= 0x4000 && n <= 0x403F)
-> +               reg = (pmceid0 >> 32) | ((pmceid1 >> 32) << 32);
-> +       else
-> +               abort();
-> +
-> +       supported =  reg & (1UL << (n & 0x3F));
-> +
-> +       if (!supported && warn)
-> +               report_info("event %d is not supported", n);
+Okay, so before I post v17 am I leaving the virtio-balloon changes as they
+were then?
 
-As with satisfy_prerequisites(), printing this with "0x%x"
-would probably be more helpful to most users.
+For what it is worth I agree with Michael that there is more to this than
+just a scatter-gather queue. For now I am trying to keep the overall
+impact on QEMU on the smaller side, and if we do end up supporting the
+MADV_FREE instead of MADV_DONTNEED that would also have an impact on
+things as it would be yet another difference between ballooning and
+hinting.
 
-thanks
--- PMM
+Thanks.
+
+- Alex
+
