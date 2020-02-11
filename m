@@ -2,253 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B94DF158D27
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 12:04:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96A48158D64
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 12:19:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728468AbgBKLEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 06:04:20 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20241 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727561AbgBKLEU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 06:04:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581419058;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=aa12nrPdXRCXi0DpMjeRsGmvvZHuC0T/W7CViGSTKaU=;
-        b=TRpxlSHknAM6M4X0h8fMDgHmFygsVMLnOuQKWdGNJlo9FEs0wp+uiY/XkDLuPPHRoJ4PD3
-        /t5j+85kVUEODEMFnaBsF5Nb0fJgAH3G7a3MCYIEbIO610yowgbh8stB3BeZI8eGEdsuqU
-        YEzmh2r1e+DjjcFv14VkLSJy0XksbsM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-eGNPQViHN5WXs1PcGFLEFQ-1; Tue, 11 Feb 2020 06:04:15 -0500
-X-MC-Unique: eGNPQViHN5WXs1PcGFLEFQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CF43107ACC9;
-        Tue, 11 Feb 2020 11:04:13 +0000 (UTC)
-Received: from [10.36.117.14] (ovpn-117-14.ams2.redhat.com [10.36.117.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E6A815C1B2;
-        Tue, 11 Feb 2020 11:03:57 +0000 (UTC)
-Subject: Re: [PATCH v16.1 6/9] virtio-balloon: Add support for providing free
- page reports to host
-To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
-        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
-        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mgorman@techsingularity.net, vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com,
-        alexander.h.duyck@linux.intel.com, osalvador@suse.de
-References: <20200122173040.6142.39116.stgit@localhost.localdomain>
- <20200122174347.6142.92803.stgit@localhost.localdomain>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <b8cbf72d-55a7-4a58-6d08-b0ac5fa86e82@redhat.com>
-Date:   Tue, 11 Feb 2020 12:03:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1728560AbgBKLTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 06:19:04 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:44373 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727761AbgBKLTE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 06:19:04 -0500
+Received: by mail-il1-f194.google.com with SMTP id s85so3083078ill.11;
+        Tue, 11 Feb 2020 03:19:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rVhcVjlq8na3czw/tkwf6l6sePScsOfYU5Ogr7k0eCs=;
+        b=jhM+87nIV3eGnOzI14WbJNrPKm1HIDv1USv22qODslUnAdL8F6u/kl61BxSpUOTnW4
+         xZfVVaajACAOZw+wxOUBKyxBjupzu/ErjqCyQD0iSgVqVP7l2q8KOOSRFZIyT4JiBq6K
+         NjNBWnlrJ7A0/ZnaU/nWC7qvGwzm6sEfZOKgzSncc1YwHqePggXpcG3QlQ9DiNQFINo8
+         2qN3krHATdz6m5NZOlpfV47HNzgcMQ6XB9B291HeVn78wmzUayrPbTOaiTgUaBLHKkrX
+         x/ajVJmuewSo2LRLOHlDcqkqJS1Jb5DhWnwimEEda3wtR4Ts7kxuu7G+n+4tu6ZuYfIi
+         lC+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rVhcVjlq8na3czw/tkwf6l6sePScsOfYU5Ogr7k0eCs=;
+        b=trBsuCdFfreE7U4bN2o5TgQZ4L0qjo0j5/F8GYHmEE5LHXh9fe/FYTPZeJuIkyGkqD
+         nCvnM1WwN40uK/fcDYpTSd4YNa96CC0K+WRnucvuM6ueR8V4DKDRsbcNuy2ayLw3iBxH
+         xTw9p8BLRQe2hVqQCIPoufLyv0PK5y6nbt0pBNbddXT35Q4oIRmdAQYM9DQQs+msedQ2
+         9v0ptihqNp+hXx/qja68XmTpoZ66czkVy0iDeEtw0VQkk+bdy4chfF66We0JW+6S2wkr
+         s9qushjV814HSu5+w59NkLsdRTJt0qJUQw7DFhaDnzJyRMJyMbxjNudx4rKlZRC8bRZF
+         yCFQ==
+X-Gm-Message-State: APjAAAXgNPEq4R3DNnLZAO+d5/iesGm+drpaCdE2QljuRB5+O6kNKSfp
+        WxqKTbD3dAv7/NdNhaAzih6O3rP8nAkuDs90NHY=
+X-Google-Smtp-Source: APXvYqwpJFGGow05e+peGMiccU09OXwxzA3q7JgF8vOUFvh3CVcgIle2N9uPDYB0Zu84nghhzJetQpekPDvKMOVQPjY=
+X-Received: by 2002:a92:50a:: with SMTP id q10mr6210854ile.294.1581419943357;
+ Tue, 11 Feb 2020 03:19:03 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200122174347.6142.92803.stgit@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+References: <158085337582.9445.17682266437583505502.stgit@gimli.home>
+In-Reply-To: <158085337582.9445.17682266437583505502.stgit@gimli.home>
+From:   Jerin Jacob <jerinjacobk@gmail.com>
+Date:   Tue, 11 Feb 2020 16:48:47 +0530
+Message-ID: <CALBAE1Oz2u+cmoL8LhEZ-4paXEebKh3DzfWGLQLQx0oaW=tBXw@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/7] vfio/pci: SR-IOV support
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dpdk-dev <dev@dpdk.org>,
+        mtosatti@redhat.com, Thomas Monjalon <thomas@monjalon.net>,
+        Luca Boccassi <bluca@debian.org>,
+        "Richardson, Bruce" <bruce.richardson@intel.com>,
+        cohuck@redhat.com, Vamsi Attunuru <vattunuru@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22.01.20 18:43, Alexander Duyck wrote:
-> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->=20
-> Add support for the page reporting feature provided by virtio-balloon.
-> Reporting differs from the regular balloon functionality in that is is
-> much less durable than a standard memory balloon. Instead of creating a
-> list of pages that cannot be accessed the pages are only inaccessible
-> while they are being indicated to the virtio interface. Once the
-> interface has acknowledged them they are placed back into their respect=
-ive
-> free lists and are once again accessible by the guest system.
->=20
-> Unlike a standard balloon we don't inflate and deflate the pages. Inste=
-ad
-> we perform the reporting, and once the reporting is completed it is
-> assumed that the page has been dropped from the guest and will be fault=
-ed
-> back in the next time the page is accessed.
->=20
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On Wed, Feb 5, 2020 at 4:35 AM Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> There seems to be an ongoing desire to use userspace, vfio-based
+> drivers for both SR-IOV PF and VF devices.  The fundamental issue
+> with this concept is that the VF is not fully independent of the PF
+> driver.  Minimally the PF driver might be able to deny service to the
+> VF, VF data paths might be dependent on the state of the PF device,
+> or the PF my have some degree of ability to inspect or manipulate the
+> VF data.  It therefore would seem irresponsible to unleash VFs onto
+> the system, managed by a user owned PF.
+>
+> We address this in a few ways in this series.  First, we can use a bus
+> notifier and the driver_override facility to make sure VFs are bound
+> to the vfio-pci driver by default.  This should eliminate the chance
+> that a VF is accidentally bound and used by host drivers.  We don't
+> however remove the ability for a host admin to change this override.
+>
+> The next issue we need to address is how we let userspace drivers
+> opt-in to this participation with the PF driver.  We do not want an
+> admin to be able to unwittingly assign one of these VFs to a tenant
+> that isn't working in collaboration with the PF driver.  We could use
+> IOMMU grouping, but this seems to push too far towards tightly coupled
+> PF and VF drivers.  This series introduces a "VF token", implemented
+> as a UUID, as a shared secret between PF and VF drivers.  The token
+> needs to be set by the PF driver and used as part of the device
+> matching by the VF driver.  Provisions in the code also account for
+> restarting the PF driver with active VF drivers, requiring the PF to
+> use the current token to re-gain access to the PF.
+
+Thanks Alex for the series. DPDK realizes this use-case through, an out of
+tree igb_uio module, for non VFIO devices. Supporting this use case, with
+VFIO, will be a great enhancement for DPDK as we are planning to
+get rid of out of tree modules any focus only on userspace aspects.
+
+From the DPDK perspective, we have following use-cases
+
+1) VF representer or OVS/vSwitch  use cases where
+DPDK PF acts as an HW switch to steer traffic to VF
+using the rte_flow library backed by HW CAMs.
+
+2) Unlike, other PCI class of devices, Network class of PCIe devices
+would have additional
+capability on the PF devices such as promiscuous mode support etc
+leverage that in DPDK
+PF and VF use cases.
+
+That would boil down to the use of the following topology.
+a)  PF bound to DPDK/VFIO  and  VF bound to Linux
+b)  PF bound to DPDK/VFIO  and  VF bound to DPDK/VFIO
+
+Tested the use case (a) and it works this patch. Tested use case(b), it
+works with patch provided both PF and VF under the same application.
+
+Regarding the use case where  PF bound to DPDK/VFIO and
+VF bound to DPDK/VFIO are _two different_ processes then sharing the UUID
+will be a little tricky thing in terms of usage. But if that is the
+purpose of bringing
+UUID to the equation then it fine.
+
+Overall this series looks good to me.  We can test the next non-RFC
+series and give
+Tested-by by after testing with DPDK.
+
+
+>
+> The above solutions introduce a bit of a modification to the VFIO ABI
+> and an additional ABI extension.  The modification is that the
+> VFIO_GROUP_GET_DEVICE_FD ioctl is specified to require a char string
+> from the user providing the device name.  For this solution, we extend
+> the syntax to allow the device name followed by key/value pairs.  In
+> this case we add "vf_token=3e7e882e-1daf-417f-ad8d-882eea5ee337", for
+> example.  These options are expected to be space separated.  Matching
+> these key/value pairs is entirely left to the vfio bus driver (ex.
+> vfio-pci) and the internal ops structure is extended to allow this
+> optional support.  This extension should be fully backwards compatible
+> to existing userspace, such code will simply fail to open these newly
+> exposed devices, as intended.
+>
+> I've been debating whether instead of the above we should allow the
+> user to get the device fd as normal, but restrict the interfaces until
+> the user authenticates, but I'm afraid this would be a less backwards
+> compatible solution.  It would be just as unclear to the user why a
+> device read/write/mmap/ioctl failed as it might be to why getting the
+> device fd could fail.  However in the latter case, I believe we do a
+> better job of restricting how far userspace code might go before they
+> ultimately fail.  I'd welcome discussion in the space, and or course
+> the extension of the GET_DEVICE_FD string.
+>
+> Finally, the user needs to be able to set a VF token.  I add a
+> VFIO_DEVICE_FEATURE ioctl for this that's meant to be reusable for
+> getting, setting, and probing arbitrary features of a device.
+>
+> I'll reply to this cover letter with a very basic example of a QEMU
+> update to support this interface, though I haven't found a device yet
+> that behaves well with the PF running in one VM with the VF in
+> another, or really even just a PF running in a VM with SR-IOV enabled.
+> I know these devices exist though, and I suspect QEMU will not be the
+> primary user of this support for now, but this behavior reaffirms my
+> concerns to prevent mis-use.
+>
+> Please comment.  In particular, does this approach meet the DPDK needs
+> for userspace PF and VF drivers, with the hopefully minor hurdle of
+> sharing a token between drivers.  The token is of course left to
+> userspace how to manage, and might be static (and not very secret) for
+> a given set of drivers.  Thanks,
+>
+> Alex
+>
 > ---
->  drivers/virtio/Kconfig              |    1 +
->  drivers/virtio/virtio_balloon.c     |   64 +++++++++++++++++++++++++++=
-++++++++
->  include/uapi/linux/virtio_balloon.h |    1 +
->  3 files changed, 66 insertions(+)
->=20
-> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> index 078615cf2afc..4b2dd8259ff5 100644
-> --- a/drivers/virtio/Kconfig
-> +++ b/drivers/virtio/Kconfig
-> @@ -58,6 +58,7 @@ config VIRTIO_BALLOON
->  	tristate "Virtio balloon driver"
->  	depends on VIRTIO
->  	select MEMORY_BALLOON
-> +	select PAGE_REPORTING
->  	---help---
->  	 This driver supports increasing and decreasing the amount
->  	 of memory within a KVM guest.
-> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_ba=
-lloon.c
-> index 40bb7693e3de..a07b9e18a292 100644
-> --- a/drivers/virtio/virtio_balloon.c
-> +++ b/drivers/virtio/virtio_balloon.c
-> @@ -19,6 +19,7 @@
->  #include <linux/mount.h>
->  #include <linux/magic.h>
->  #include <linux/pseudo_fs.h>
-> +#include <linux/page_reporting.h>
-> =20
->  /*
->   * Balloon device works in 4K page units.  So each page is pointed to =
-by
-> @@ -47,6 +48,7 @@ enum virtio_balloon_vq {
->  	VIRTIO_BALLOON_VQ_DEFLATE,
->  	VIRTIO_BALLOON_VQ_STATS,
->  	VIRTIO_BALLOON_VQ_FREE_PAGE,
-> +	VIRTIO_BALLOON_VQ_REPORTING,
->  	VIRTIO_BALLOON_VQ_MAX
->  };
-> =20
-> @@ -114,6 +116,10 @@ struct virtio_balloon {
-> =20
->  	/* To register a shrinker to shrink memory upon memory pressure */
->  	struct shrinker shrinker;
-> +
-> +	/* Free page reporting device */
-> +	struct virtqueue *reporting_vq;
-> +	struct page_reporting_dev_info pr_dev_info;
->  };
-> =20
->  static struct virtio_device_id id_table[] =3D {
-> @@ -153,6 +159,33 @@ static void tell_host(struct virtio_balloon *vb, s=
-truct virtqueue *vq)
-> =20
->  }
-> =20
-> +int virtballoon_free_page_report(struct page_reporting_dev_info *pr_de=
-v_info,
-> +				   struct scatterlist *sg, unsigned int nents)
-> +{
-> +	struct virtio_balloon *vb =3D
-> +		container_of(pr_dev_info, struct virtio_balloon, pr_dev_info);
-> +	struct virtqueue *vq =3D vb->reporting_vq;
-> +	unsigned int unused, err;
-> +
-> +	/* We should always be able to add these buffers to an empty queue. *=
-/
-> +	err =3D virtqueue_add_inbuf(vq, sg, nents, vb, GFP_NOWAIT | __GFP_NOW=
-ARN);
-> +
-> +	/*
-> +	 * In the extremely unlikely case that something has occurred and we
-> +	 * are able to trigger an error we will simply display a warning
-> +	 * and exit without actually processing the pages.
-> +	 */
-> +	if (WARN_ON_ONCE(err))
-> +		return err;
-> +
-> +	virtqueue_kick(vq);
-> +
-> +	/* When host has read buffer, this completes via balloon_ack */
-> +	wait_event(vb->acked, virtqueue_get_buf(vq, &unused));
-> +
-> +	return 0;
-> +}
-
-
-Did you see the discussion regarding unifying handling of
-inflate/deflate/free_page_hinting_free_page_reporting, requested by
-Michael? I think free page reporting is special and shall be left alone.
-
-VIRTIO_BALLOON_F_REPORTING is nothing but a more advanced inflate, right
-(sg, inflate based on size - not "virtio pages")? And you rely on
-deflates not being required before reusing an inflated page.
-
-I suggest the following:
-
-/* New interface (+ 2 virtqueues) to inflate/deflate using a SG */
-VIRTIO_BALLOON_F_SG
-/*
- * No need to deflate when reusing pages (once the inflate request was
- * processed). Applies to all inflate queues.
- */
-VIRTIO_BALLOON_F_OPTIONAL_DEFLATE
-
-And two new virtqueues
-
-VIRTIO_BALLOON_VQ_INFLATE_SG
-VIRTIO_BALLOON_VQ_DEFLATE_SG
-
-
-Your feature would depend on VIRTIO_BALLOON_F_SG &&
-VIRTIO_BALLOON_F_OPTIONAL_DEFLATE. VIRTIO_BALLOON_F_OPTIONAL_DEFLATE
-could be reused to avoid deflating on certain events (e.g., from
-OOM/shrinker).
-
-Thoughts?
-
---=20
-Thanks,
-
-David / dhildenb
-
+>
+> Alex Williamson (7):
+>       vfio: Include optional device match in vfio_device_ops callbacks
+>       vfio/pci: Implement match ops
+>       vfio/pci: Introduce VF token
+>       vfio: Introduce VFIO_DEVICE_FEATURE ioctl and first user
+>       vfio/pci: Add sriov_configure support
+>       vfio/pci: Remove dev_fmt definition
+>       vfio/pci: Cleanup .probe() exit paths
+>
+>
+>  drivers/vfio/pci/vfio_pci.c         |  315 ++++++++++++++++++++++++++++++++---
+>  drivers/vfio/pci/vfio_pci_private.h |   10 +
+>  drivers/vfio/vfio.c                 |   19 ++
+>  include/linux/vfio.h                |    3
+>  include/uapi/linux/vfio.h           |   37 ++++
+>  5 files changed, 356 insertions(+), 28 deletions(-)
+>
