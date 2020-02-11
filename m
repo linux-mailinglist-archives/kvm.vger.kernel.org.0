@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 819D41596D7
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:51:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB2F615974F
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:53:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730463AbgBKRv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 12:51:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54610 "EHLO mail.kernel.org"
+        id S1730776AbgBKRxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 12:53:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57456 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730345AbgBKRv6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 12:51:58 -0500
+        id S1730787AbgBKRxl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 12:53:41 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6857220661;
-        Tue, 11 Feb 2020 17:51:56 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BC92620848;
+        Tue, 11 Feb 2020 17:53:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581443516;
-        bh=8yWpTF4iaTUbN9LOY7/rc6Dq7R5pIpQHT5f/RMVwKY4=;
+        s=default; t=1581443619;
+        bh=DmBeKOo8g9nGEtxFHJrBStIc81V1f1OuSuMxpsF+zgc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Xnf9tvHBy1TruTl5Sm8GlHHWCjQ16Uyak6LpSO+GNv+TgH50Y1d4f2SZ6UHYfGhmU
-         6LXT+c6DK7oMB137K/LHYYv/oVcxJw46sLGNCExd6D32Cxt7kQi9GRnoQ/EhfegG9A
-         V032SwHm1rDg1IqKgyDWO8AIyDtYm7kqmP7lMVAk=
+        b=kD+FqneJLPNxsWfm9Dxu3wOYG9nF8cWB0IU2BlnpaWrrfSeaYejloK6kYk4vJSMgM
+         gqse9oROIKluCx+/pibylv0uEwJ40Bh37hc/6JmMs9AEFKm90Td20Ty3G3siEIZSW7
+         YopO4xoYfeyIhUI5mk7kqpco0/AXOw7RrQb/vlP0=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1j1ZgE-004O7k-TP; Tue, 11 Feb 2020 17:50:39 +0000
+        id 1j1ZgF-004O7k-GC; Tue, 11 Feb 2020 17:50:39 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -39,9 +39,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 77/94] KVM: arm64: nv: Move sysreg reset check to boot time
-Date:   Tue, 11 Feb 2020 17:49:21 +0000
-Message-Id: <20200211174938.27809-78-maz@kernel.org>
+Subject: [PATCH v2 78/94] KVM: arm64: Map VNCR-capable registers to a separate page
+Date:   Tue, 11 Feb 2020 17:49:22 +0000
+Message-Id: <20200211174938.27809-79-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -56,145 +56,171 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Our sysreg reset check has become a bit silly, as it only checks whether
-a reset callback actually exists for a given sysreg entry, and apply the
-method if available. Doing the check at each vcpu reset is pretty dumb,
-as the tables never change. It is thus perfectly possible to do the same
-checks at boot time.
+With ARMv8.4-NV, registers that can be directly accessed in memory
+by the guest have to live at architected offsets in a special page.
 
-This also allows us to introduce a sparse sys_regs[] array, something
-that will be required with ARMv8.4-NV.
+Let's annotate the sysreg enum to reflect the offset at which they
+are in this page, whith a little twist:
+
+If running on HW that doesn't have the ARMv8.4-NV feature, or even
+a VM that doesn't use NV, we store all the system registers in the
+usual sys_regs array. The only difference with the pre-8.4
+situation is that VNCR-capable registers are at a "similar" offset
+as in the VNCR page (we can compute the actual offset at compile
+time), and that the sys_regs array is both bigger and sparse.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 74 +++++++++++++++++++--------------------
- 1 file changed, 36 insertions(+), 38 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 78 +++++++++++++++++++++----------
+ 1 file changed, 54 insertions(+), 24 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 268829c73313..9d426304bfb3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3166,12 +3166,37 @@ static const struct sys_reg_desc cp15_64_regs[] = {
- 	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 83ed3865dda8..e160cf283601 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -25,6 +25,7 @@
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/thread_info.h>
++#include <asm/vncr_mapping.h>
+ 
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+ 
+@@ -154,6 +155,23 @@ struct kvm_vcpu_fault_info {
+ 	u64 disr_el1;		/* Deferred [SError] Status Register */
  };
  
-+static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
-+			      bool is_32)
++/*
++ * VNCR() just places the VNCR_capable registers in the enum after
++ * __VNCR_START__, and the value (after correction) to be an 8-byte offset
++ * from the VNCR base. As we don't require the enum to be otherwise ordered,
++ * we need the terrible hack below to ensure that we correctly size the
++ * sys_regs array, no matter what.
++ *
++ * The __MAX__ macro has been lifted from Sean Eron Anderson's wonderful
++ * treasure trove of bit hacks:
++ * https://graphics.stanford.edu/~seander/bithacks.html#IntegerMinOrMax
++ */
++#define __MAX__(x,y)	((x) ^ (((x) ^ (y)) & -((x) < (y))))
++#define VNCR(r)						\
++	__before_##r,					\
++	r = __VNCR_START__ + ((VNCR_ ## r) / 8),	\
++	__after_##r = __MAX__(__before_##r - 1, r)
++
+ /*
+  * 0 is reserved as an invalid value.
+  * Order should be kept in sync with the save/restore code.
+@@ -162,27 +180,11 @@ enum vcpu_sysreg {
+ 	__INVALID_SYSREG__,
+ 	MPIDR_EL1,	/* MultiProcessor Affinity Register */
+ 	CSSELR_EL1,	/* Cache Size Selection Register */
+-	SCTLR_EL1,	/* System Control Register */
+-	ACTLR_EL1,	/* Auxiliary Control Register */
+-	CPACR_EL1,	/* Coprocessor Access Control */
+-	ZCR_EL1,	/* SVE Control */
+-	TTBR0_EL1,	/* Translation Table Base Register 0 */
+-	TTBR1_EL1,	/* Translation Table Base Register 1 */
+-	TCR_EL1,	/* Translation Control Register */
+-	ESR_EL1,	/* Exception Syndrome Register */
+-	AFSR0_EL1,	/* Auxiliary Fault Status Register 0 */
+-	AFSR1_EL1,	/* Auxiliary Fault Status Register 1 */
+-	FAR_EL1,	/* Fault Address Register */
+-	MAIR_EL1,	/* Memory Attribute Indirection Register */
+-	VBAR_EL1,	/* Vector Base Address Register */
+-	CONTEXTIDR_EL1,	/* Context ID Register */
+ 	TPIDR_EL0,	/* Thread ID, User R/W */
+ 	TPIDRRO_EL0,	/* Thread ID, User R/O */
+ 	TPIDR_EL1,	/* Thread ID, Privileged */
+-	AMAIR_EL1,	/* Aux Memory Attribute Indirection Register */
+ 	CNTKCTL_EL1,	/* Timer Control Register (EL1) */
+ 	PAR_EL1,	/* Physical Address Register */
+-	MDSCR_EL1,	/* Monitor Debug System Control Register */
+ 	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+ 	DISR_EL1,	/* Deferred Interrupt Status Register */
+ 
+@@ -220,20 +222,14 @@ enum vcpu_sysreg {
+ 	DBGVCR32_EL2,	/* Debug Vector Catch Register */
+ 
+ 	/* EL2 registers sorted ascending by Op0, Op1, CRn, CRm, Op2 */
+-	VPIDR_EL2,	/* Virtualization Processor ID Register */
+-	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
+ 	SCTLR_EL2,	/* System Control Register (EL2) */
+ 	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
+-	HCR_EL2,	/* Hypervisor Configuration Register */
+ 	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+ 	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
+-	HSTR_EL2,	/* Hypervisor System Trap Register */
+ 	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+ 	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+ 	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+ 	TCR_EL2,	/* Translation Control Register (EL2) */
+-	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
+-	VTCR_EL2,	/* Virtualization Translation Control Register */
+ 	SPSR_EL2,	/* EL2 saved program status register */
+ 	ELR_EL2,	/* EL2 exception link register */
+ 	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
+@@ -247,10 +243,35 @@ enum vcpu_sysreg {
+ 	RVBAR_EL2,	/* Reset Vector Base Address Register */
+ 	RMR_EL2,	/* Reset Management Register */
+ 	CONTEXTIDR_EL2,	/* Context ID Register (EL2) */
+-	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+ 	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+ 	SP_EL2,		/* EL2 Stack Pointer */
+ 
++	__VNCR_START__,	/* Any VNCR-capable reg goes after this point */
++
++	VNCR(SCTLR_EL1),/* System Control Register */
++	VNCR(ACTLR_EL1),/* Auxiliary Control Register */
++	VNCR(CPACR_EL1),/* Coprocessor Access Control */
++	VNCR(ZCR_EL1),	/* SVE Control */
++	VNCR(TTBR0_EL1),/* Translation Table Base Register 0 */
++	VNCR(TTBR1_EL1),/* Translation Table Base Register 1 */
++	VNCR(TCR_EL1),	/* Translation Control Register */
++	VNCR(ESR_EL1),	/* Exception Syndrome Register */
++	VNCR(AFSR0_EL1),/* Auxiliary Fault Status Register 0 */
++	VNCR(AFSR1_EL1),/* Auxiliary Fault Status Register 1 */
++	VNCR(FAR_EL1),	/* Fault Address Register */
++	VNCR(MAIR_EL1),	/* Memory Attribute Indirection Register */
++	VNCR(VBAR_EL1),	/* Vector Base Address Register */
++	VNCR(CONTEXTIDR_EL1),	/* Context ID Register */
++	VNCR(AMAIR_EL1),/* Aux Memory Attribute Indirection Register */
++	VNCR(MDSCR_EL1),/* Monitor Debug System Control Register */
++	VNCR(VPIDR_EL2),/* Virtualization Processor ID Register */
++	VNCR(VMPIDR_EL2),/* Virtualization Multiprocessor ID Register */
++	VNCR(HCR_EL2),	/* Hypervisor Configuration Register */
++	VNCR(HSTR_EL2),	/* Hypervisor System Trap Register */
++	VNCR(VTTBR_EL2),/* Virtualization Translation Table Base Register */
++	VNCR(VTCR_EL2),	/* Virtualization Translation Control Register */
++	VNCR(TPIDR_EL2),/* EL2 Software Thread ID Register */
++
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
+ 
+@@ -303,6 +324,9 @@ struct kvm_cpu_context {
+ 	};
+ 
+ 	struct kvm_vcpu *__hyp_running_vcpu;
++
++	/* This pointer has to be 4kB aligned. */
++	u64 *vncr_array;
+ };
+ 
+ struct kvm_pmu_events {
+@@ -474,7 +498,13 @@ struct kvm_vcpu_arch {
+  * for system registers that are never context switched, but only
+  * emulated.
+  */
+-#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
++static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
 +{
-+	unsigned int i;
++	if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
++		return &ctxt->vncr_array[r - __VNCR_START__];
 +
-+	for (i = 0; i < n; i++) {
-+		if (!is_32 && table[i].reg && !table[i].reset) {
-+			kvm_err("sys_reg table %p entry %d has lacks reset\n",
-+				table, i);
-+			return 1;
-+		}
-+
-+		if (i && cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
-+			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
-+			return 1;
-+		}
-+	}
-+
-+	return 0;
++	return (u64 *)&ctxt->sys_regs[r];
 +}
-+
- /* Target specific emulation tables */
- static struct kvm_sys_reg_target_table *target_tables[KVM_ARM_NUM_TARGETS];
  
- void kvm_register_target_sys_reg_table(unsigned int target,
- 				       struct kvm_sys_reg_target_table *table)
- {
-+	if (check_sysreg_table(table->table64.table, table->table64.num, false) ||
-+	    check_sysreg_table(table->table32.table, table->table32.num, true))
-+		return;
-+
- 	target_tables[target] = table;
- }
+ #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
  
-@@ -3483,19 +3508,13 @@ static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
- }
- 
- static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
--				const struct sys_reg_desc *table, size_t num,
--				unsigned long *bmap)
-+				const struct sys_reg_desc *table, size_t num)
- {
- 	unsigned long i;
- 
- 	for (i = 0; i < num; i++)
--		if (table[i].reset) {
--			int reg = table[i].reg;
--
-+		if (table[i].reset)
- 			table[i].reset(vcpu, &table[i]);
--			if (reg > 0 && reg < NR_SYS_REGS)
--				set_bit(reg, bmap);
--		}
- }
- 
- /**
-@@ -3958,33 +3977,19 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 	return write_demux_regids(uindices);
- }
- 
--static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n)
--{
--	unsigned int i;
--
--	for (i = 1; i < n; i++) {
--		if (cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
--			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
--			return 1;
--		}
--	}
--
--	return 0;
--}
--
- void kvm_sys_reg_table_init(void)
- {
- 	unsigned int i;
- 	struct sys_reg_desc clidr;
- 
- 	/* Make sure tables are unique and in order. */
--	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs)));
--	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs)));
--	BUG_ON(check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs)));
--	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
--	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs)));
--	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs)));
--	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs)));
-+	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false));
-+	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true));
-+	BUG_ON(check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true));
-+	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true));
-+	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true));
-+	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false));
-+	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false));
- 
- 	/* We abuse the reset function to overwrite the table itself. */
- 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
-@@ -4020,17 +4025,10 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- {
- 	size_t num;
- 	const struct sys_reg_desc *table;
--	DECLARE_BITMAP(bmap, NR_SYS_REGS) = { 0, };
- 
- 	/* Generic chip reset first (so target could override). */
--	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs), bmap);
-+	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- 
- 	table = get_target_table(vcpu->arch.target, true, &num);
--	reset_sys_reg_descs(vcpu, table, num, bmap);
--
--	for (num = 1; num < NR_SYS_REGS; num++) {
--		if (WARN(!test_bit(num, bmap),
--			 "Didn't reset __vcpu_sys_reg(%zi)\n", num))
--			break;
--	}
-+	reset_sys_reg_descs(vcpu, table, num);
- }
 -- 
 2.20.1
 
