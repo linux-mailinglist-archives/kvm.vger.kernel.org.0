@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 646B2159725
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:53:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A0ED159748
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 18:53:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730661AbgBKRxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 12:53:06 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56414 "EHLO mail.kernel.org"
+        id S1730770AbgBKRxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 12:53:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57280 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730604AbgBKRxF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 12:53:05 -0500
+        id S1730742AbgBKRxf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 12:53:35 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8942C20661;
-        Tue, 11 Feb 2020 17:53:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 490C520578;
+        Tue, 11 Feb 2020 17:53:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581443584;
-        bh=BN3tlU9n1B0zRdOhqrbQdngEkobkGgI4KuYwe6IjLYk=;
+        s=default; t=1581443614;
+        bh=OlZdyOHdrre2bQo7COdxhqVktnxJk6q8cNv5W0KzVjY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BuKsD7yyzUGPkfznB6PX1A4rkvYf29CA/nfZdbBaCewW+i9RUneZPe7q+7XjWZkra
-         A239sBVHogTkJlGMNip3PXa1hV4nflwpQOdGyOsbBkvpM8QpoMIwcY3DmrRFpHpI2k
-         eK6ukM2Tp2SbS8ZGuN2msJSe3qH97sLNs0eCqt7A=
+        b=loqhoKYUIjzWJz/Eu5Oj/sCPMFRsidr5MYViOOS3IJ9v27E3CNa6Jrwv/McTdcCsz
+         1/jm0aO/U0iEOymamx0MjvyPzXu3bIgEYKLfsRQ4ZLKGs8xPyL1zVTv/Wo7DQJTR2k
+         tC92Oxl79d9uswMuiD72P/JCW+k9b6zHX570nYPc=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1j1ZgD-004O7k-Nw; Tue, 11 Feb 2020 17:50:37 +0000
+        id 1j1ZgE-004O7k-Ae; Tue, 11 Feb 2020 17:50:38 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -39,9 +39,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 75/94] KVM: arm64: debug: Use ctxt_sys_reg() instead of raw sys_regs access
-Date:   Tue, 11 Feb 2020 17:49:19 +0000
-Message-Id: <20200211174938.27809-76-maz@kernel.org>
+Subject: [PATCH v2 76/94] KVM: arm64: Add missing reset handlers for PMU emulation
+Date:   Tue, 11 Feb 2020 17:49:20 +0000
+Message-Id: <20200211174938.27809-77-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -56,73 +56,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that we have a wrapper for the sysreg accesses, let's use that
-consistently.
+As we're about to become a bit more harsh when it comes to the lack of
+reset callbacks, let's add the missing PMU reset handlers. Note that
+these only cover *CLR registers that were always covered by their *SET
+counterpart, so there is no semantic change here.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/debug-sr.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index 0fc9872a1467..421e547ed10f 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -129,8 +129,7 @@ static void __hyp_text __debug_restore_spe_nvhe(u64 pmscr_el1)
- 	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
- }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 8d4e67594d87..268829c73313 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2151,7 +2151,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
  
--static void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
--					  struct kvm_guest_debug_arch *dbg,
-+static void __hyp_text __debug_save_state(struct kvm_guest_debug_arch *dbg,
- 					  struct kvm_cpu_context *ctxt)
- {
- 	u64 aa64dfr0;
-@@ -145,11 +144,10 @@ static void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
- 	save_debug(dbg->dbg_wcr, dbgwcr, wrps);
- 	save_debug(dbg->dbg_wvr, dbgwvr, wrps);
+ 	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+-	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, NULL, PMINTENSET_EL1 },
++	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
  
--	ctxt->sys_regs[MDCCINT_EL1] = read_sysreg(mdccint_el1);
-+	ctxt_sys_reg(ctxt, MDCCINT_EL1) = read_sysreg(mdccint_el1);
- }
+ 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+ 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+@@ -2190,8 +2190,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
--static void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
--					     struct kvm_guest_debug_arch *dbg,
-+static void __hyp_text __debug_restore_state(struct kvm_guest_debug_arch *dbg,
- 					     struct kvm_cpu_context *ctxt)
- {
- 	u64 aa64dfr0;
-@@ -165,7 +163,7 @@ static void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
- 	restore_debug(dbg->dbg_wcr, dbgwcr, wrps);
- 	restore_debug(dbg->dbg_wvr, dbgwvr, wrps);
- 
--	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
-+	write_sysreg(ctxt_sys_reg(ctxt, MDCCINT_EL1), mdccint_el1);
- }
- 
- void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-@@ -190,8 +188,8 @@ void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
- 
--	__debug_save_state(vcpu, host_dbg, host_ctxt);
--	__debug_restore_state(vcpu, guest_dbg, guest_ctxt);
-+	__debug_save_state(host_dbg, host_ctxt);
-+	__debug_restore_state(guest_dbg, guest_ctxt);
- }
- 
- void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
-@@ -212,8 +210,8 @@ void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
- 
--	__debug_save_state(vcpu, guest_dbg, guest_ctxt);
--	__debug_restore_state(vcpu, host_dbg, host_ctxt);
-+	__debug_save_state(guest_dbg, guest_ctxt);
-+	__debug_restore_state(host_dbg, host_ctxt);
- 
- 	vcpu->arch.flags &= ~KVM_ARM64_DEBUG_DIRTY;
- }
+ 	{ SYS_DESC(SYS_PMCR_EL0), access_pmcr, reset_pmcr, PMCR_EL0 },
+ 	{ SYS_DESC(SYS_PMCNTENSET_EL0), access_pmcnten, reset_unknown, PMCNTENSET_EL0 },
+-	{ SYS_DESC(SYS_PMCNTENCLR_EL0), access_pmcnten, NULL, PMCNTENSET_EL0 },
+-	{ SYS_DESC(SYS_PMOVSCLR_EL0), access_pmovs, NULL, PMOVSSET_EL0 },
++	{ SYS_DESC(SYS_PMCNTENCLR_EL0), access_pmcnten, reset_unknown, PMCNTENSET_EL0 },
++	{ SYS_DESC(SYS_PMOVSCLR_EL0), access_pmovs, reset_unknown, PMOVSSET_EL0 },
+ 	{ SYS_DESC(SYS_PMSWINC_EL0), access_pmswinc, reset_unknown, PMSWINC_EL0 },
+ 	{ SYS_DESC(SYS_PMSELR_EL0), access_pmselr, reset_unknown, PMSELR_EL0 },
+ 	{ SYS_DESC(SYS_PMCEID0_EL0), access_pmceid },
 -- 
 2.20.1
 
