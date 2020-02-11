@@ -2,145 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 14527159CBA
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 00:05:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42642159CBD
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 00:05:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727646AbgBKXFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 18:05:13 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37076 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727330AbgBKXFN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 18:05:13 -0500
-Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727817AbgBKXFc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 18:05:32 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56333 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727799AbgBKXFb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Feb 2020 18:05:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581462331;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=kHSxze2a1nRCn20xOJSopREUpsR/wHcjPJb/ZM+x9bk=;
+        b=HX8zUnAuQN12GbxBfoHSaJsArO+KMiZgMLtzE3o65zJN3gzSGazQqUjYwukw9r2kHJ16PQ
+        r13a0IJCV5d5ShSjaP+dfr+mFA0o7HKa31AbmOmh6uIGR25WTfdbG/fpRGvZltEZd5tot6
+        Vp92gJIv0baEWW8K4q1nAHSgXcp48K0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-ov1zL7QkOzGol9JblHnMjg-1; Tue, 11 Feb 2020 18:05:22 -0500
+X-MC-Unique: ov1zL7QkOzGol9JblHnMjg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 675F720714;
-        Tue, 11 Feb 2020 23:05:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581462312;
-        bh=gc7DhHS8YjgFqXgvKUqHpLvMtqF3t8p2EA8qJid/pJY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=V6bxjjhNqk+LQXvjilFlPGb+JcXh/YTC+kQuFiSPDgRNmHjDuW0wN/J0u47oGlz9V
-         1VeENODzGvOpqjQds1qR9LXUqyPWa4nsMMPRnDSF0OtKAmUlkZn7kQM0c/exr/9sPM
-         amIUZavHzMsLH/5n1r8LQJwsC00OEyjlfvnb4SOw=
-Date:   Tue, 11 Feb 2020 15:05:10 -0800
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     kvm@vger.kernel.org, david@redhat.com, mst@redhat.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        mgorman@techsingularity.net, yang.zhang.wz@gmail.com,
-        pagupta@redhat.com, konrad.wilk@oracle.com, nitesh@redhat.com,
-        riel@surriel.com, willy@infradead.org, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, mhocko@kernel.org,
-        alexander.h.duyck@linux.intel.com, vbabka@suse.cz,
-        osalvador@suse.de
-Subject: Re: [PATCH v17 0/9] mm / virtio: Provide support for free page
- reporting
-Message-Id: <20200211150510.ca864143284c8ccaa906f524@linux-foundation.org>
-In-Reply-To: <20200211224416.29318.44077.stgit@localhost.localdomain>
-References: <20200211224416.29318.44077.stgit@localhost.localdomain>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F81718FF660;
+        Tue, 11 Feb 2020 23:05:20 +0000 (UTC)
+Received: from gimli.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2EAC160BF1;
+        Tue, 11 Feb 2020 23:05:17 +0000 (UTC)
+Subject: [PATCH 0/7] vfio/pci: SR-IOV support
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dev@dpdk.org, mtosatti@redhat.com, thomas@monjalon.net,
+        bluca@debian.org, jerinjacobk@gmail.com,
+        bruce.richardson@intel.com, cohuck@redhat.com
+Date:   Tue, 11 Feb 2020 16:05:16 -0700
+Message-ID: <158145472604.16827.15751375540102298130.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 Feb 2020 14:45:51 -0800 Alexander Duyck <alexander.duyck@gmail.com> wrote:
+Given the mostly positive feedback from the RFC[1], here's a new
+non-RFC revision.  Changes since RFC:
 
-> This series provides an asynchronous means of reporting free guest pages
-> to a hypervisor so that the memory associated with those pages can be
-> dropped and reused by other processes and/or guests on the host. Using
-> this it is possible to avoid unnecessary I/O to disk and greatly improve
-> performance in the case of memory overcommit on the host.
+ - vfio_device_ops.match semantics refined
+ - Use helpers for struct pci_dev.physfn to avoid breakage without
+   CONFIG_PCI_IOV
+ - Relax to allow SR-IOV configuration changes while PF is opened.
+   There are potentially interesting use cases here, including
+   perhaps QEMU emulating an SR-IOV capability and calling out
+   to a privileged entity to manipulate sriov_numvfs and corral
+   the resulting devices.
+ - Retest vfio_device_feature.argsz to include uuid length.
+ - Add Connie's R-b on 6/7
 
-"greatly improve" sounds nice.
+I still wish we had a solution to make it less opaque to the user
+why a VFIO_GROUP_GET_DEVICE_FD() has failed if a VF token is
+required, but this is still the best I've been able to come up with.
+If there are objections or better ideas, please raise them now.
 
-> When enabled we will be performing a scan of free memory every 2 seconds
-> while pages of sufficiently high order are being freed. In each pass at
-> least one sixteenth of each free list will be reported. By doing this we
-> avoid racing against other threads that may be causing a high amount of
-> memory churn.
-> 
-> The lowest page order currently scanned when reporting pages is
-> pageblock_order so that this feature will not interfere with the use of
-> Transparent Huge Pages in the case of virtualization.
-> 
-> Currently this is only in use by virtio-balloon however there is the hope
-> that at some point in the future other hypervisors might be able to make
-> use of it. In the virtio-balloon/QEMU implementation the hypervisor is
-> currently using MADV_DONTNEED to indicate to the host kernel that the page
-> is currently free. It will be zeroed and faulted back into the guest the
-> next time the page is accessed.
-> 
-> To track if a page is reported or not the Uptodate flag was repurposed and
-> used as a Reported flag for Buddy pages. We walk though the free list
-> isolating pages and adding them to the scatterlist until we either
-> encounter the end of the list or have processed at least one sixteenth of
-> the pages that were listed in nr_free prior to us starting. If we fill the
-> scatterlist before we reach the end of the list we rotate the list so that
-> the first unreported page we encounter is moved to the head of the list as
-> that is where we will resume after we have freed the reported pages back
-> into the tail of the list.
-> 
-> Below are the results from various benchmarks. I primarily focused on two
-> tests. The first is the will-it-scale/page_fault2 test, and the other is
-> a modified version of will-it-scale/page_fault1 that was enabled to use
-> THP. I did this as it allows for better visibility into different parts
-> of the memory subsystem. The guest is running with 32G for RAM on one
-> node of a E5-2630 v3. The host has had some features such as CPU turbo
-> disabled in the BIOS.
-> 
-> Test                   page_fault1 (THP)    page_fault2
-> Name            tasks  Process Iter  STDEV  Process Iter  STDEV
-> Baseline            1    1012402.50  0.14%     361855.25  0.81%
->                    16    8827457.25  0.09%    3282347.00  0.34%
-> 
-> Patches Applied     1    1007897.00  0.23%     361887.00  0.26%
->                    16    8784741.75  0.39%    3240669.25  0.48%
-> 
-> Patches Enabled     1    1010227.50  0.39%     359749.25  0.56%
->                    16    8756219.00  0.24%    3226608.75  0.97%
-> 
-> Patches Enabled     1    1050982.00  4.26%     357966.25  0.14%
->  page shuffle      16    8672601.25  0.49%    3223177.75  0.40%
-> 
-> Patches enabled     1    1003238.00  0.22%     360211.00  0.22%
->  shuffle w/ RFC    16    8767010.50  0.32%    3199874.00  0.71%
+The synopsis of this series is that we have an ongoing desire to drive
+PCIe SR-IOV PFs from userspace with VFIO.  There's an immediate need
+for this with DPDK drivers and potentially interesting future use
+cases in virtualization.  We've been reluctant to add this support
+previously due to the dependency and trust relationship between the
+VF device and PF driver.  Minimally the PF driver can induce a denial
+of service to the VF, but depending on the specific implementation,
+the PF driver might also be responsible for moving data between VFs
+or have direct access to the state of the VF, including data or state
+otherwise private to the VF or VF driver.
 
-But these differences seem really small - around 1%?  I think we're
-just showing not much harm was caused?
+To help resolve these concerns, we introduce a VF token into the VFIO
+PCI ABI, which acts as a shared secret key between drivers.  The
+userspace PF driver is required to set the VF token to a known value
+and userspace VF drivers are required to provide the token to access
+the VF device.  If a PF driver is restarted with VF drivers in use, it
+must also provide the current token in order to prevent a rogue
+untrusted PF driver from replacing a known driver.  The degree to
+which this new token is considered secret is left to the userspace
+drivers, the kernel intentionally provides no means to retrieve the
+current token.
 
-> The results above are for a baseline with a linux-next-20191219 kernel,
-> that kernel with this patch set applied but page reporting disabled in
-> virtio-balloon, the patches applied and page reporting fully enabled, the
-> patches enabled with page shuffling enabled, and the patches applied with
-> page shuffling enabled and an RFC patch that makes used of MADV_FREE in
-> QEMU. These results include the deviation seen between the average value
-> reported here versus the high and/or low value. I observed that during the
-> test memory usage for the first three tests never dropped whereas with the
-> patches fully enabled the VM would drop to using only a few GB of the
-> host's memory when switching from memhog to page fault tests.
+Note that the above token is only required for this new model where
+both the PF and VF devices are usable through vfio-pci.  Existing
+models of VFIO drivers where the PF is used without SR-IOV enabled
+or the VF is bound to a userspace driver with an in-kernel, host PF
+driver are unaffected.
 
-And this is the "great improvement", yes?
+The latter configuration above also highlights a new inverted scenario
+that is now possible, a userspace PF driver with in-kernel VF drivers.
+I believe this is a scenario that should be allowed, but should not be
+enabled by default.  This series includes code to set a default
+driver_override for VFs sourced from a vfio-pci user owned PF, such
+that the VFs are also bound to vfio-pci.  This model is compatible
+with tools like driverctl and allows the system administrator to
+decide if other bindings should be enabled.  The VF token interface
+above exists only between vfio-pci PF and VF drivers, once a VF is
+bound to another driver, the administrator has effectively pronounced
+the device as trusted.  The vfio-pci driver will note alternate
+binding in dmesg for logging and debugging purposes.
 
-Is it possible to measure the end-user-visible benefits of this?
+Please review, comment, and test.  The example QEMU implementation
+provided with the RFC[2] is still current for this version.  Thanks,
 
-> Any of the overhead visible with this patch set enabled seems due to page
-> faults caused by accessing the reported pages and the host zeroing the page
-> before giving it back to the guest. This overhead is much more visible when
-> using THP than with standard 4K pages. In addition page shuffling seemed to
-> increase the amount of faults generated due to an increase in memory churn.
-> The overehad is reduced when using MADV_FREE as we can avoid the extra
-> zeroing of the pages when they are reintroduced to the host, as can be seen
-> when the RFC is applied with shuffling enabled.
-> 
-> The overall guest size is kept fairly small to only a few GB while the test
-> is running. If the host memory were oversubscribed this patch set should
-> result in a performance improvement as swapping memory in the host can be
-> avoided.
+Alex
 
-"should result".  Can we firm this up a lot?
+[1] https://lore.kernel.org/lkml/158085337582.9445.17682266437583505502.stgit@gimli.home/
+[2] https://lore.kernel.org/lkml/20200204161737.34696b91@w520.home/
+---
+
+Alex Williamson (7):
+      vfio: Include optional device match in vfio_device_ops callbacks
+      vfio/pci: Implement match ops
+      vfio/pci: Introduce VF token
+      vfio: Introduce VFIO_DEVICE_FEATURE ioctl and first user
+      vfio/pci: Add sriov_configure support
+      vfio/pci: Remove dev_fmt definition
+      vfio/pci: Cleanup .probe() exit paths
+
+
+ drivers/vfio/pci/vfio_pci.c         |  312 ++++++++++++++++++++++++++++++++---
+ drivers/vfio/pci/vfio_pci_private.h |   10 +
+ drivers/vfio/vfio.c                 |   20 ++
+ include/linux/vfio.h                |    4 
+ include/uapi/linux/vfio.h           |   37 ++++
+ 5 files changed, 355 insertions(+), 28 deletions(-)
+
