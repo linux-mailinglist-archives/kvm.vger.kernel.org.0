@@ -2,161 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 174031597A1
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 19:03:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE0D41597A8
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2020 19:04:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730140AbgBKSDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Feb 2020 13:03:38 -0500
-Received: from mail-il1-f193.google.com ([209.85.166.193]:46137 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728712AbgBKSDi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Feb 2020 13:03:38 -0500
-Received: by mail-il1-f193.google.com with SMTP id t17so4197589ilm.13;
-        Tue, 11 Feb 2020 10:03:37 -0800 (PST)
+        id S1730160AbgBKSEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Feb 2020 13:04:44 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39891 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728712AbgBKSEo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Feb 2020 13:04:44 -0500
+Received: by mail-wr1-f67.google.com with SMTP id y11so13596092wrt.6;
+        Tue, 11 Feb 2020 10:04:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1x8g+GZrx9UI30UQ428luOfA3vU/d+bR1M2CImC2i24=;
-        b=G3+hWX2bEWAklGq4AzNSV1VIQT/5QGIZhOpYbFrKtW5yO7PFvgRlFCFn1OkCv7sqSZ
-         L+R38a5iS9BWBAxanexVNJZq8NV2eIsWjUS3NvyvREkzavqHkJgj+dVhJY5hsG4ErN5e
-         wW0iRcLxy2kZDPM3sM5uBg63ZMwfa5xnXN5lJku3CeDXmXRjcBV4To2AnIqLGAW0ppbc
-         bX/o6S+1PtVRLAVvDvDnbaqbWL1QiXVZnvwTqcetk2fWqIFqHoxo3xBl35LIeEQdQTYd
-         MeT859bNIKuRZyjPbrs1+tcMnVyvcEx+m+AdnumPpGVNZ5R/P90ETSsP5KqXqb4aZqzR
-         bT2A==
+        h=sender:from:to:subject:date:message-id;
+        bh=q8IlFsAzW42BdHawcbUm+vPgezsGHOH9GeI0fUJDSVM=;
+        b=I87ccuceFBGwZWz6MWVVHLS9yZqJ4oxZ8rVMt3h/dieBPIXmTksaUGIK9emDsbPJ72
+         72KObeNgooFPdyUFIkNE9tfG9YCQT6DX97igWnoTk5XILeoDrV7XmBmNHZ6wxbM8Pmtd
+         ZWogo0fjRb3v4pOrlrDwa/TkzDxv79WtPnZGLikTvYVSmqKOdPgekvANTruoPe8hQVKg
+         Q8ke+MOLP8bEfh1RqNNqqj250UkVxF57F9Nw8ItyeGJqfXF0ht/pwYs3rJ8NaEpULXf7
+         4shrJgs+Hi1V6e1ec38bHvO7j+2I/5AcC3i48ib6FRo+YneO8Psd2BR1w1z+iHS0GGNP
+         T6Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1x8g+GZrx9UI30UQ428luOfA3vU/d+bR1M2CImC2i24=;
-        b=Gm/dprC2JX1A6eOQa6eOiPjKvNx1tfBvl2Bz5Yzs2uOzq0lbE5v5wPbF8JX58uApgl
-         CkSrXLsnRbFpW3n7TxxvcX4c7tSfZcl7nRZQAvvyCIuoa5//3+2hb5BhcQeGWYvNCQII
-         TBChUB6Ho23P9w7FYilsHIIO1+33z2ftLRHn4aBF65FzNJ+v0uPs0SePo1WzeH/wn3d7
-         bdWBNdg3CbeFaBVvH8cXbd1h4dTl8w1H7I+ybbtUgs839wz2Zy42xAwk5YeBKqNb4I+1
-         slT9TKu1u8O2hkx+aHSpTmSz/hvKeSD2dFjaz188j0ppBofyNRGs1ET+Icv6wgPEDILK
-         RgzQ==
-X-Gm-Message-State: APjAAAWTarIjd53TG7jFJ8YZy/EihsgpF+wCv3OuLJvVaPFPI92jGAyE
-        bNY0WsTEAF/DE4Pojqb1RtTKUueKpCW7AWiolrM=
-X-Google-Smtp-Source: APXvYqyIl9xAGOG4Dv9gUsKlKYBC1e6XhYVcwA4py9BJZof1NgKuj455lQCD42QmQK+XV8GOKiC7eKcKti9WaSF1xvc=
-X-Received: by 2002:a92:481d:: with SMTP id v29mr7445801ila.271.1581444216868;
- Tue, 11 Feb 2020 10:03:36 -0800 (PST)
-MIME-Version: 1.0
-References: <158085337582.9445.17682266437583505502.stgit@gimli.home>
- <CALBAE1Oz2u+cmoL8LhEZ-4paXEebKh3DzfWGLQLQx0oaW=tBXw@mail.gmail.com> <20200211100612.65cf2433@w520.home>
-In-Reply-To: <20200211100612.65cf2433@w520.home>
-From:   Jerin Jacob <jerinjacobk@gmail.com>
-Date:   Tue, 11 Feb 2020 23:33:20 +0530
-Message-ID: <CALBAE1MrEoCc8Ch6MNUNTsOcZyJnhr+z+iD0VWjHagQsEdBWCw@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/7] vfio/pci: SR-IOV support
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dpdk-dev <dev@dpdk.org>,
-        mtosatti@redhat.com, Thomas Monjalon <thomas@monjalon.net>,
-        Luca Boccassi <bluca@debian.org>,
-        "Richardson, Bruce" <bruce.richardson@intel.com>,
-        cohuck@redhat.com, Vamsi Attunuru <vattunuru@marvell.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:sender:from:to:subject:date:message-id;
+        bh=q8IlFsAzW42BdHawcbUm+vPgezsGHOH9GeI0fUJDSVM=;
+        b=ZTFCevzZLRLYONXoarrtdgaFG+qMN6VxIt7PBilJy3UOKW4tQCEpUL/7qA60CNe6pZ
+         mlTrYp5fDU4FyCUbjlXe4dx/yxsIIir7pasBqevJ2eKBVnnbAVBqNRGg39+js6lyKmaS
+         F0C2zVr0VIewR5aJhL9TkWtLVc/dbaDKHiMijGJApR2YExzJR35wbme5EcXz/U6DqVBr
+         jtvzrlF7+1OdwN0FoqTF/2SW87vAPbIsjdADPKnaqgBsUMBoN/AYxZRrc4juSGKicgV5
+         aWmCWd325/f21woo4fVZcNTy1IrWJQG78tRXhaWFbqHXUk4HJ9b921IJkOMk+DvlaTMZ
+         gRgA==
+X-Gm-Message-State: APjAAAUGacB7d3EcZO27bNCwchIJjs35NH0FEfcZP+BFXRWwziORzaiB
+        ScbXnaveeogU/BA+bbAusiXB+BlX
+X-Google-Smtp-Source: APXvYqyhLYqPjSzy0F1s0h9EYZQPJT9P7yUxxdFIy+Dr2hO87FpztILGHBFxMSyYce9J9y6V8rVzgQ==
+X-Received: by 2002:adf:e8c9:: with SMTP id k9mr9870271wrn.168.1581444281212;
+        Tue, 11 Feb 2020 10:04:41 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id h128sm168982wmh.33.2020.02.11.10.04.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 11 Feb 2020 10:04:40 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH] KVM: x86: do not reset microcode version on INIT or RESET
+Date:   Tue, 11 Feb 2020 19:04:39 +0100
+Message-Id: <1581444279-10033-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 11, 2020 at 10:36 PM Alex Williamson
-<alex.williamson@redhat.com> wrote:
->
-> On Tue, 11 Feb 2020 16:48:47 +0530
-> Jerin Jacob <jerinjacobk@gmail.com> wrote:
->
-> > On Wed, Feb 5, 2020 at 4:35 AM Alex Williamson
-> > <alex.williamson@redhat.com> wrote:
-> > >
-> > > There seems to be an ongoing desire to use userspace, vfio-based
-> > > drivers for both SR-IOV PF and VF devices.  The fundamental issue
-> > > with this concept is that the VF is not fully independent of the PF
-> > > driver.  Minimally the PF driver might be able to deny service to the
-> > > VF, VF data paths might be dependent on the state of the PF device,
-> > > or the PF my have some degree of ability to inspect or manipulate the
-> > > VF data.  It therefore would seem irresponsible to unleash VFs onto
-> > > the system, managed by a user owned PF.
-> > >
-> > > We address this in a few ways in this series.  First, we can use a bus
-> > > notifier and the driver_override facility to make sure VFs are bound
-> > > to the vfio-pci driver by default.  This should eliminate the chance
-> > > that a VF is accidentally bound and used by host drivers.  We don't
-> > > however remove the ability for a host admin to change this override.
-> > >
-> > > The next issue we need to address is how we let userspace drivers
-> > > opt-in to this participation with the PF driver.  We do not want an
-> > > admin to be able to unwittingly assign one of these VFs to a tenant
-> > > that isn't working in collaboration with the PF driver.  We could use
-> > > IOMMU grouping, but this seems to push too far towards tightly coupled
-> > > PF and VF drivers.  This series introduces a "VF token", implemented
-> > > as a UUID, as a shared secret between PF and VF drivers.  The token
-> > > needs to be set by the PF driver and used as part of the device
-> > > matching by the VF driver.  Provisions in the code also account for
-> > > restarting the PF driver with active VF drivers, requiring the PF to
-> > > use the current token to re-gain access to the PF.
-> >
-> > Thanks Alex for the series. DPDK realizes this use-case through, an out of
-> > tree igb_uio module, for non VFIO devices. Supporting this use case, with
-> > VFIO, will be a great enhancement for DPDK as we are planning to
-> > get rid of out of tree modules any focus only on userspace aspects.
-> >
-> > From the DPDK perspective, we have following use-cases
-> >
-> > 1) VF representer or OVS/vSwitch  use cases where
-> > DPDK PF acts as an HW switch to steer traffic to VF
-> > using the rte_flow library backed by HW CAMs.
-> >
-> > 2) Unlike, other PCI class of devices, Network class of PCIe devices
-> > would have additional
-> > capability on the PF devices such as promiscuous mode support etc
-> > leverage that in DPDK
-> > PF and VF use cases.
-> >
-> > That would boil down to the use of the following topology.
-> > a)  PF bound to DPDK/VFIO  and  VF bound to Linux
-> > b)  PF bound to DPDK/VFIO  and  VF bound to DPDK/VFIO
-> >
-> > Tested the use case (a) and it works this patch. Tested use case(b), it
-> > works with patch provided both PF and VF under the same application.
-> >
-> > Regarding the use case where  PF bound to DPDK/VFIO and
-> > VF bound to DPDK/VFIO are _two different_ processes then sharing the UUID
-> > will be a little tricky thing in terms of usage. But if that is the
-> > purpose of bringing
-> > UUID to the equation then it fine.
-> >
-> > Overall this series looks good to me.  We can test the next non-RFC
-> > series and give
-> > Tested-by by after testing with DPDK.
->
-> Thanks Jerin, that's great feedback.  For case b), it is rather the
-> intention of the shared VF token proposed here that it imposes some
-> small barrier in validating the collaboration between the PF and VF
-> drivers.  In a trusted environment, a common UUID might be exposed in a
-> shared file and the same token could be used by all PFs and VFs on the
-> system, or datacenter.  The goal is simply to make sure the
-> collaboration is explicit, I don't want to be fielding support issues
-> from users assigning PFs and VFs to unrelated VM instances or
-> unintentionally creating your scenario a) configuration.
+The microcode version should be set just once, since it is essentially
+a CPU feature; so do it on vCPU creation rather than reset.
 
-Yes. Makes sense from kernel PoV.
+Userspace can tie the fix to the availability of MSR_IA32_UCODE_REV in
+the list of emulated MSRs.
 
-DPDK side, probably we will end in hardcoded UUID value.
+Reported-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm.c     | 2 +-
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-The tricky part would DPDK PF and QEMU VF integration case.
-I am not sure about that integration( a command-line option for UUID) or
-something more sophisticated orchestration. Anyway, it is clear from
-kernel side,
-Something needs to be sorted with the QEMU community.
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index a7e63b613837..280f6d024e84 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -2185,7 +2185,6 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	u32 dummy;
+ 	u32 eax = 1;
+ 
+-	vcpu->arch.microcode_version = 0x01000065;
+ 	svm->spec_ctrl = 0;
+ 	svm->virt_spec_ctrl = 0;
+ 
+@@ -2276,6 +2275,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+ 	init_vmcb(svm);
+ 
+ 	svm_init_osvw(vcpu);
++	vcpu->arch.microcode_version = 0x01000065;
+ 
+ 	return 0;
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 9a6664886f2e..d625b4b0e7b4 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4238,7 +4238,6 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 
+ 	vmx->msr_ia32_umwait_control = 0;
+ 
+-	vcpu->arch.microcode_version = 0x100000000ULL;
+ 	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
+ 	vmx->hv_deadline_tsc = -1;
+ 	kvm_set_cr8(vcpu, 0);
+@@ -6763,6 +6762,7 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+ 	vmx->nested.posted_intr_nv = -1;
+ 	vmx->nested.current_vmptr = -1ull;
+ 
++	vcpu->arch.microcode_version = 0x100000000ULL;
+ 	vmx->msr_ia32_feature_control_valid_bits = FEAT_CTL_LOCKED;
+ 
+ 	/*
+-- 
+1.8.3.1
 
-> With the positive response from you and Thomas, I'll post a non-RFC
-> version and barring any blockers maybe we can get this in for the v5.7
-> kernel.  Thanks,
-
-Great.
-
->
-> Alex
->
