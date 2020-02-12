@@ -2,106 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2FFB15A715
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 11:54:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11E4315A73F
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 12:01:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727567AbgBLKyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Feb 2020 05:54:37 -0500
-Received: from mail-wm1-f49.google.com ([209.85.128.49]:55457 "EHLO
-        mail-wm1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726728AbgBLKyh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Feb 2020 05:54:37 -0500
-Received: by mail-wm1-f49.google.com with SMTP id q9so1616091wmj.5
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2020 02:54:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=scylladb-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:organization:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=u0hbtEe40WtjYd4Z3cF7cNzYLzfg1k4LAZeLlhEhqPc=;
-        b=uEMcigegIefRrGr+eDX7uy0nV0LzCM5v2XSBfBZS60IkGfAg+JqGCP3rP15GsFBN6z
-         MU0ABFdW877uVg1il17ntz+OhuLlWoevBQV2K7LFOEM7T7w4p8Qi+uHob7okQxAmHbNm
-         hgRx8WKev5+DGFUT0kmeErmLPVF84rDsi6fyRHjDb7p/mTIBsLNaB3mJgF+46HfXPx71
-         SdWHbStfhb2v9U09D34BBuDFRWvoot5kD/7gkFO+vtjXfwcCuIrz9PAEhQ+MCOmzTrSY
-         Z9iUNfR8rVyJhfx619Wmir+mMd7kveGe1OL47f2SjMtNbx7dkplbITUg8jUeEa4cwhkL
-         FEdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=u0hbtEe40WtjYd4Z3cF7cNzYLzfg1k4LAZeLlhEhqPc=;
-        b=nYKD093cwJkW+gJzKq/mhWviPUoL7dQYl9+3NF0WKKJofhJmOzYNv7KemkHLTMA7CL
-         N+KMeFaYl2mncQyMRKYeBM27hkaFHVh19KqJ++EcOC+k+SrvZ3UIeiPdk6WJXsTD/UrX
-         xyuPE5/uRJWqfQSkABYLv6c0P668LFt1/2088DScqg+PcD+rYdf/XV3CmRWNCx45T9ud
-         0+0O+HkAK6PrxbG2sBKcmUVDzBpmPcbV4ac3YmzvuX+IyFdXlgAbWTGKIi5zmJnEPQlz
-         jUZzyB+VsYcgK5Q9jFkgbJz7Ws4+7bKe7KGNmIAW+MMVkkUepBi6Gb7mAhNODfxs90Cx
-         qTmg==
-X-Gm-Message-State: APjAAAVAvxLlwnaCYrB6hKHOw64Pe4jkDcOGl5/IXCmfs/oz/kBd1T7G
-        Ktwg+LPWVaoeGZ7f3HLCg5zouYVLJzg=
-X-Google-Smtp-Source: APXvYqzYXtkZvCRJnNbFl2gXB2hBpm//tPq+iQ3d9s3L2TXBxnpsoSkLEFvY0Sp+AYMiw6a8HLYDrg==
-X-Received: by 2002:a1c:7712:: with SMTP id t18mr3942812wmi.32.1581504873707;
-        Wed, 12 Feb 2020 02:54:33 -0800 (PST)
-Received: from [10.0.0.1] (system.cloudius-systems.com. [199.203.229.89])
-        by smtp.gmail.com with ESMTPSA id f11sm242610wml.3.2020.02.12.02.54.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Feb 2020 02:54:32 -0800 (PST)
-Subject: Re: [RFC] eventfd: add EFD_AUTORESET flag
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Davide Libenzi <davidel@xmailserver.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-References: <20200129172010.162215-1-stefanha@redhat.com>
- <66566792-58a4-bf65-6723-7d2887c84160@redhat.com>
- <20200212102912.GA464050@stefanha-x1.localdomain>
- <156cb709-282a-ddb6-6f34-82b4bb211f73@redhat.com>
-From:   Avi Kivity <avi@scylladb.com>
-Organization: ScyllaDB
-Message-ID: <cadb4320-4717-1a41-dfb5-bb782fd0a5da@scylladb.com>
-Date:   Wed, 12 Feb 2020 12:54:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1727429AbgBLLBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Feb 2020 06:01:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42902 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725874AbgBLLBT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Feb 2020 06:01:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581505278;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nnVLsLjJq61roZogZjlHcOZ1qVAeRKMJqRoGZW5TNvY=;
+        b=LmfW1d0/Iq5ckREAv3HFFMQTL12MMpQ8zvlhVPoHpAniWP01csOPh1YVP3wTD9wmtDulem
+        x7rPtKm6c7Fst7u8fMpZQ1fhvSzA/jtpV2R18h27td9eBpd0qhdO5LWuN9xpdrvr4El38Z
+        F6fnXaFMSz+a/ysednIxBe9B9doF1uc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-ErmEXazlObG_pEgj0w6QGw-1; Wed, 12 Feb 2020 06:01:13 -0500
+X-MC-Unique: ErmEXazlObG_pEgj0w6QGw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B56318A6EC1;
+        Wed, 12 Feb 2020 11:01:12 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5836390073;
+        Wed, 12 Feb 2020 11:01:07 +0000 (UTC)
+Date:   Wed, 12 Feb 2020 12:01:04 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 35/35] DOCUMENTATION: Protected virtual machine
+ introduction and IPL
+Message-ID: <20200212120104.106e8ce2.cohuck@redhat.com>
+In-Reply-To: <20200207113958.7320-36-borntraeger@de.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+        <20200207113958.7320-36-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <156cb709-282a-ddb6-6f34-82b4bb211f73@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri,  7 Feb 2020 06:39:58 -0500
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-On 12/02/2020 12.47, Paolo Bonzini wrote:
-> On 12/02/20 11:29, Stefan Hajnoczi wrote:
->> On Wed, Feb 12, 2020 at 09:31:32AM +0100, Paolo Bonzini wrote:
->>> On 29/01/20 18:20, Stefan Hajnoczi wrote:
->>>> +	/* Semaphore semantics don't make sense when autoreset is enabled */
->>>> +	if ((flags & EFD_SEMAPHORE) && (flags & EFD_AUTORESET))
->>>> +		return -EINVAL;
->>>> +
->>> I think they do, you just want to subtract 1 instead of setting the
->>> count to 0.  This way, writing 1 would be the post operation on the
->>> semaphore, while poll() would be the wait operation.
->> True!  Then EFD_AUTORESET is not a fitting name.  EFD_AUTOREAD or
->> EFD_POLL_READS?
-> Avi's suggestion also makes sense.  Switching the event loop from poll()
-> to IORING_OP_POLL_ADD would be good on its own, and then you could make
-> it use IORING_OP_READV for eventfds.
->
-> In QEMU parlance, perhaps you need a different abstraction than
-> EventNotifier (let's call it WakeupNotifier) which would also use
-> eventfd but it would provide a smaller API.  Thanks to the smaller API,
-> it would not need EFD_NONBLOCK, unlike the regular EventNotifier, and it
-> could either set up a poll() handler calling read(), or use
-> IORING_OP_READV when io_uring is in use.
->
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> Add documentation about protected KVM guests and description of changes
+> that are necessary to move a KVM VM into Protected Virtualization mode.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> [borntraeger@de.ibm.com: fixing and conversion to rst]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  Documentation/virt/kvm/index.rst        |   2 +
+>  Documentation/virt/kvm/s390-pv-boot.rst |  79 ++++++++++++++++
+>  Documentation/virt/kvm/s390-pv.rst      | 116 ++++++++++++++++++++++++
+>  MAINTAINERS                             |   1 +
+>  4 files changed, 198 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/s390-pv-boot.rst
+>  create mode 100644 Documentation/virt/kvm/s390-pv.rst
+> 
+(...)
+> diff --git a/Documentation/virt/kvm/s390-pv-boot.rst b/Documentation/virt/kvm/s390-pv-boot.rst
+> new file mode 100644
+> index 000000000000..47814e53369a
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/s390-pv-boot.rst
+> @@ -0,0 +1,79 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +======================================
+> +s390 (IBM Z) Boot/IPL of Protected VMs
+> +======================================
+> +
+> +Summary
+> +-------
+> +Protected Virtual Machines (PVM) are not accessible by I/O or the
+> +hypervisor.  When the hypervisor wants to access the memory of PVMs
+> +the memory needs to be made accessible. When doing so, the memory will
+> +be encrypted.  See :doc:`s390-pv` for details.
 
-Just to be clear, for best performance don't use IORING_OP_POLL_ADD, 
-just IORING_OP_READ. That's what you say in the second paragraph but the 
-first can be misleading.
+Maybe
 
+"The memory of Protected Virtual Machines (PVMs) is not accessible to
+I/O or the hypervisor. In those cases where the hypervisor needs to
+access the memory of a PVM, that memory must be made accessible. Memory
+made accessible to the hypervisor will be encrypted. See :doc:`s390-pv`
+for details."
+
+?
+
+> +
+> +On IPL a small plaintext bootloader is started which provides
+
+"On IPL (boot), a small plaintext bootloader is started, which..."
+
+?
+
+> +information about the encrypted components and necessary metadata to
+> +KVM to decrypt the protected virtual machine.
+
+(...)
+
+> +Diag308
+> +-------
+> +This diagnose instruction is the basis for VM IPL. The VM can set and
+
+"This diagnose instruction is the basic mechanism to handle IPL and
+related operations for virtual machines." ?
+
+> +retrieve IPL information blocks, that specify the IPL method/devices
+> +and request VM memory and subsystem resets, as well as IPLs.
+> +
+> +For PVs this concept has been extended with new subcodes:
+
+s/For PVs/For PVMs,/
+
+(...)
+
+> +When running in protected mode some subcodes will result in exceptions
+
+s/When running in protected mode/When running in protected virtualization mode,/
+
+?
+
+> +or return error codes.
+> +
+> +Subcodes 4 and 7 will result in specification exceptions as they would
+> +not clear out the guest memory.
+> +When removing a secure VM, the UV will clear all memory, so we can't
+> +have non-clearing IPL subcodes.
+
+"Subcodes 4 and 7, which specify operations that do not clear the guest
+memory, will result in specification exceptions. This is because the UV
+will clear all memory when a secure VM is removed, and therefore
+non-clearing IPL subcodes are not allowed."
+
+?
+
+(...)
+> diff --git a/Documentation/virt/kvm/s390-pv.rst b/Documentation/virt/kvm/s390-pv.rst
+> new file mode 100644
+> index 000000000000..dbe9110dfd1e
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/s390-pv.rst
+> @@ -0,0 +1,116 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +=========================================
+> +s390 (IBM Z) Ultravisor and Protected VMs
+> +=========================================
+> +
+> +Summary
+> +-------
+> +Protected virtual machines (PVM) are KVM VMs, where KVM can't access
+> +the VM's state like guest memory and guest registers anymore. Instead,
+
+"...are KVM VMs that do not allow KVM to access VM state like guest
+memory or guest registers."
+
+?
+
+(...)
+
+> +The Interception Parameters state description field still contains the
+> +the bytes of the instruction text, but with pre-set register values
+> +instead of the actual ones. I.e. each instruction always uses the same
+> +instruction text, in order not to leak guest instruction text.
+> +This also implies that the register content that a guest had in r<n>
+> +may be in r<m> from the hypervisors point of view.
+
+s/hypervisors/hypervisor's/
+
+> +
+> +The Secure Instruction Data Area contains instruction storage
+> +data. Instruction data, i.e. data being referenced by an instruction
+> +like the SCCB for sclp, is moved over the SIDA. When an instruction is
+
+s/over/via/ ?
+
+> +intercepted, the SIE will only allow data and program interrupts for
+> +this instruction to be moved to the guest via the two data areas
+> +discussed before. Other data is either ignored or results in validity
+> +interceptions.
+
+(...)
 
