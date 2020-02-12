@@ -2,97 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B3C4615AD3A
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 17:22:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34EB715AD3B
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 17:22:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728602AbgBLQWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Feb 2020 11:22:21 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:46409 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727361AbgBLQWS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Feb 2020 11:22:18 -0500
-Received: by mail-pf1-f195.google.com with SMTP id k29so1459865pfp.13
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2020 08:22:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=UtBs909g2Ug5B/GmWLl9syqH2ckGGAYGctQB3xVEPLk=;
-        b=V0nJ4J4nOpEq7kQ1dqdvmNnRxG670BfZwH5PqrHNkdmszKt+Nuf5IkDfEPLa6hHtjy
-         oQ/5HvIyGCUiyO+DKLpmEhjIaRtaMGsX4Ho4j+g5PEHbDGEU4EJj2lBNBfX3LEUu9h39
-         U7haCGvFvvtAEpjYU7/qWar6H5YvcL/BQUp2/+6JPuTRlsj3hgsVKRDQdiJerCImp4VP
-         9O/2vHiw/xH7JQHP6NWurerQCjwskocQQpbyiomB2Q4aqgBGsB4wCYS4fgUtTV5EJVqO
-         a9lsRy8l7mxCuMF2IuG8tVVKQVL4K7Y4LzMZWYykNg9SJMfePai7QvvlNM7P3AxhiqI8
-         2brg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=UtBs909g2Ug5B/GmWLl9syqH2ckGGAYGctQB3xVEPLk=;
-        b=C/057sM1OguoYifTlQRPicMSTEfoQmri63WOeHkpd4TuMD3yF8YOY4YkorESyThZWF
-         ovWuk093Ko421pjtClTs6ux9KXIruyRIlVqJ0HDvu/LG8OT1sr2lDEOqB/sbM7OHuzau
-         b9Jj0ZmjyTGHM+ia+SPnqwBrN7a7uu42NxTS2l1PDrt+SCXcvMAL4eRbSgKTUv/sJm2W
-         1XT4QpNnuqZAB27y/Cz4VkmK4yznHlUeeW7qGE2vtnilCl1el1LOr6mZfcIR4/3Jezqo
-         YX2M5FWkS8iu2D4FI88QDu3j1Va0DcD+jyKwPUqGTvaK1wwMu3gIG1VDWL/5S8tVQLJM
-         v/pA==
-X-Gm-Message-State: APjAAAWvTNYYPYhNLOpWVPKeUa5V0rHq+i0ZgzX57PMu7zD0yc+JvCHm
-        j7QEpbTlxsiujW/D6R3ikrzHfw==
-X-Google-Smtp-Source: APXvYqyksnxVfiGQnmL2dJDTJhvH3Jj2OjnrG6wn2hFFnBKljhf5Nl9AB7BmudDVKXJXj5Ka8PadqA==
-X-Received: by 2002:aa7:86c2:: with SMTP id h2mr9202566pfo.45.1581524537390;
-        Wed, 12 Feb 2020 08:22:17 -0800 (PST)
-Received: from ?IPv6:2601:646:c200:1ef2:6918:d286:95c1:bba2? ([2601:646:c200:1ef2:6918:d286:95c1:bba2])
-        by smtp.gmail.com with ESMTPSA id z19sm1429801pfn.49.2020.02.12.08.22.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Feb 2020 08:22:16 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 14/62] x86/boot/compressed/64: Add stage1 #VC handler
-Date:   Wed, 12 Feb 2020 08:22:14 -0800
-Message-Id: <A67CC291-C07A-496C-BD67-2A795813E93F@amacapital.net>
-References: <20200212113840.GB20066@8bytes.org>
-Cc:     Andy Lutomirski <luto@kernel.org>, X86 ML <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Juergen Gross <JGross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>
-In-Reply-To: <20200212113840.GB20066@8bytes.org>
-To:     Joerg Roedel <joro@8bytes.org>
-X-Mailer: iPhone Mail (17D50)
+        id S1728639AbgBLQWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Feb 2020 11:22:22 -0500
+Received: from mga11.intel.com ([192.55.52.93]:17698 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727361AbgBLQWW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Feb 2020 11:22:22 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Feb 2020 08:22:21 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,433,1574150400"; 
+   d="scan'208";a="380807826"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga004.jf.intel.com with ESMTP; 12 Feb 2020 08:22:20 -0800
+Date:   Wed, 12 Feb 2020 08:22:20 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/mmu: Avoid retpoline on ->page_fault() with TDP
+Message-ID: <20200212162220.GA15617@linux.intel.com>
+References: <20200206221434.23790-1-sean.j.christopherson@intel.com>
+ <878sleg2z7.fsf@vitty.brq.redhat.com>
+ <20200207155539.GC2401@linux.intel.com>
+ <408bfd4c-7407-48cd-95fb-db44a7c1c2bf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <408bfd4c-7407-48cd-95fb-db44a7c1c2bf@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Feb 12, 2020 at 12:55:09PM +0100, Paolo Bonzini wrote:
+> On 07/02/20 16:55, Sean Christopherson wrote:
+> > It becomes a matter of weighing the maintenance cost and robustness against
+> > the performance benefits.  For the TDP case, amost no one (that cares about
+> > performance) uses shadow paging, the change is very explicit, tiny and
+> > isolated, and TDP page fault are a hot path, e.g. when booting the VM.
+> > I.e. low maintenance overhead, still robust, and IMO worth the shenanigans.
+> 
+> The "NULL" trick does not seem needed though.  Any objections to this?
 
+Nope, no objections.
 
-> On Feb 12, 2020, at 3:38 AM, Joerg Roedel <joro@8bytes.org> wrote:
->=20
-> =EF=BB=BFOn Tue, Feb 11, 2020 at 02:23:22PM -0800, Andy Lutomirski wrote:
->>> On Tue, Feb 11, 2020 at 5:53 AM Joerg Roedel <joro@8bytes.org> wrote:
->>> +void __init no_ghcb_vc_handler(struct pt_regs *regs)
->>=20
->> Isn't there a second parameter: unsigned long error_code?
->=20
-> No, the function gets the error-code from regs->orig_ax. This particular
-> function only needs to check for error_code =3D=3D SVM_EXIT_CPUID, as that=
-
-> is the only one supported when there is no GHCB.
->=20
-
-Hmm. It might be nice to use the same signature for early handlers as for no=
-rmal ones.
-
-> Regards,
->=20
->    Joerg
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index 9277ee8a54a5..a647601c9e1c 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -109,7 +109,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  					u32 err, bool prefault)
+>  {
+>  #ifdef CONFIG_RETPOLINE
+> -	if (likely(!vcpu->arch.mmu->page_fault))
+> +	if (likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault))
+>  		return kvm_tdp_page_fault(vcpu, cr2_or_gpa, err, prefault);
+>  #endif
+>  	return vcpu->arch.mmu->page_fault(vcpu, cr2_or_gpa, err, prefault);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 5267f1440677..87e9ba27ada1 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4925,12 +4925,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
+>  		return;
+>  
+>  	context->mmu_role.as_u64 = new_role.as_u64;
+> -#ifdef CONFIG_RETPOLINE
+> -	/* Nullify ->page_fault() to use direct kvm_tdp_page_fault() call. */
+> -	context->page_fault = NULL;
+> -#else
+>  	context->page_fault = kvm_tdp_page_fault;
+> -#endif
+>  	context->sync_page = nonpaging_sync_page;
+>  	context->invlpg = nonpaging_invlpg;
+>  	context->update_pte = nonpaging_update_pte;
+> 
+> Paolo
+> 
