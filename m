@@ -2,176 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 01DCB15A83B
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 12:49:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B805415A83F
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 12:49:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728168AbgBLLtZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Feb 2020 06:49:25 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28678 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728089AbgBLLtZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 12 Feb 2020 06:49:25 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01CBnBFL054958
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2020 06:49:24 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y3wtf4c6r-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2020 06:49:24 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 12 Feb 2020 11:49:21 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 12 Feb 2020 11:49:20 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01CBnIKQ62390438
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Feb 2020 11:49:18 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7581AA405F;
-        Wed, 12 Feb 2020 11:49:18 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17C31A4054;
-        Wed, 12 Feb 2020 11:49:18 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 12 Feb 2020 11:49:18 +0000 (GMT)
-Subject: Re: [PATCH 35/35] DOCUMENTATION: Protected virtual machine
- introduction and IPL
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200207113958.7320-1-borntraeger@de.ibm.com>
- <20200207113958.7320-36-borntraeger@de.ibm.com>
- <5d8050a6-c730-4325-2d46-2b5c9cdc8408@redhat.com>
- <a2e5f248-4d4d-5650-6f48-174bddd328f9@de.ibm.com>
- <20200212120357.205e9ede.cohuck@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 12 Feb 2020 12:49:17 +0100
+        id S1728245AbgBLLtc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Feb 2020 06:49:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37651 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725781AbgBLLtc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Feb 2020 06:49:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581508170;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JnelCP0BeqCKzB5HUK/Y879g+TjBn3kcCBi0brqpess=;
+        b=ZJlMiwNSev/DjItLdpr5qq49hhhiloLf/3GwER+0FGlHIxRWt0P8Bz/7iVyTlwVg6+P9fP
+        qyjARjfU8OkbFaVPTxaATje4PRz4PanU2ZyvYphL/rKHUZ8z4ra5U14iX8H7g/RRvPpU+0
+        jFTfFT6BUAYc5dyKYQX8uaMsZ/vEKZc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-Fj2BjzH9NSeYMvbyBDjWaw-1; Wed, 12 Feb 2020 06:49:29 -0500
+X-MC-Unique: Fj2BjzH9NSeYMvbyBDjWaw-1
+Received: by mail-wr1-f70.google.com with SMTP id z15so724207wrw.0
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2020 03:49:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JnelCP0BeqCKzB5HUK/Y879g+TjBn3kcCBi0brqpess=;
+        b=X4nWp7X3CgQGqee57oMUUtUDm7IpsAWHapAAqfx477TfMZUv8qXSypawihZHHD+/qE
+         n4SNXju2kwV4Ih5DTbIeBZ5ZOFYTr8PkTCmrPyRGCLBfhm4EZSx9DvV9ds1dgMhzxb+B
+         JlEPnF5btGVHV2pLLX6e+0bjwy+cCTdIOgbRUd037bbfLHytEDXhPhyXSDlA0cUM0rDm
+         oUscpyRyykUpRhLdyQK4juGVosaylhXwvSmQN3Wo0B6V83HiZcus1kyG+jvQWIOY+6dH
+         XQTRIOZ312aO85fTNryhWTXsnKIvFO9UWMI7EiwmDdBEFnQZUlMm/OYMvtOw0xBUqRN8
+         +35Q==
+X-Gm-Message-State: APjAAAUjB92iQjXugMlBObkjPBO6UvpHLjcuj+WwdtFRXKRo6F+0mJy+
+        VMOJEaFe2CN0kLDV/8Zmr1rkOog+rxpPlEgjgryBMO+AMUMHqImlI0gEyLQ+OzIFandjrFyfTT7
+        /YbmeIs6yodCh
+X-Received: by 2002:a5d:4e91:: with SMTP id e17mr14147897wru.233.1581508168428;
+        Wed, 12 Feb 2020 03:49:28 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzeI48yUIlfasjczSuSSNgiv99/Z58AUwqGUMZMkVGFbIwyZAB7OqaXkxrlubZ3ZIBd8MW2nw==
+X-Received: by 2002:a5d:4e91:: with SMTP id e17mr14147880wru.233.1581508168206;
+        Wed, 12 Feb 2020 03:49:28 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:652c:29a6:517b:66d9? ([2001:b07:6468:f312:652c:29a6:517b:66d9])
+        by smtp.gmail.com with ESMTPSA id m9sm318916wrx.55.2020.02.12.03.49.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Feb 2020 03:49:27 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: remove duplicated KVM_REQ_EVENT request
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linmiaohe <linmiaohe@huawei.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
+References: <a95c89cdcdca4749a1ca4d779ebd4a0a@huawei.com>
+ <87h802g42r.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1386ffda-37c7-aef6-2ff4-f2b753b51af1@redhat.com>
+Date:   Wed, 12 Feb 2020 12:49:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200212120357.205e9ede.cohuck@redhat.com>
+In-Reply-To: <87h802g42r.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021211-0012-0000-0000-000003862332
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021211-0013-0000-0000-000021C2A238
-Message-Id: <0d7e4249-e0cb-b619-a999-941b2ad3e6cd@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-12_06:2020-02-11,2020-02-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- lowpriorityscore=0 spamscore=0 priorityscore=1501 bulkscore=0
- mlxlogscore=668 malwarescore=0 phishscore=0 mlxscore=0 clxscore=1015
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002120097
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 07/02/20 10:05, Vitaly Kuznetsov wrote:
+> kvm_make_request() from kvm_set_rflags() as it is not an obvious
+> behavior (e.g. why kvm_rip_write() doens't do that and
+> kvm_set_rflags() does ?)
 
+Because writing RFLAGS can change IF and therefore cause an interrupt to
+be injected.
 
-On 12.02.20 12:03, Cornelia Huck wrote:
-> On Tue, 11 Feb 2020 21:03:17 +0100
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 11.02.20 13:23, Thomas Huth wrote:
->>> On 07/02/2020 12.39, Christian Borntraeger wrote:  
->>>> +The switch into PV mode lets us load encrypted guest executables and  
->>>
->>> Maybe rather: "After the switch into PV mode, the guest can load ..." ?  
->>
->> No its not after the switch. By doing the switch the guest image can be loaded
->> fro anywhere because it is just like a kernel.
->>
->> So I will do:
->>
->> As the guest image is just like an opaque kernel image that does the
->> switch into PV mode itself, the user can load encrypted guest
->> executables and data via every available method (network, dasd, scsi,
->> direct kernel, ...) without the need to change the boot process.
-> 
-> Sounds good to me.
-> 
-> (...)
-> 
->>>> +All non-decrypted data of the guest before it switches to protected
->>>> +virtualization mode are zero on first access of the PV.  
->>>
->>> Before it switches to protected virtualization mode, all non-decrypted
->>> data of the guest are ... ?  
->>
->> No, this is about the data after the initial import.
->> What about
->>
->> After the initial import of the encrypted data all defined pages will
-> 
-> s/data/data,/
-
-ack.
-> 
->> contain the guest content. All non-specified pages will start out as
->> zero pages on first access.
-> 
-> Also sounds good to me.
-> 
-> (...)
-> 
+Paolo
 
