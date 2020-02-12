@@ -2,117 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C5A0E15ACC9
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 17:05:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3C4615AD3A
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2020 17:22:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727429AbgBLQFw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Feb 2020 11:05:52 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37115 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726351AbgBLQFw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 12 Feb 2020 11:05:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581523551;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BuiFEByjTOdPJEqSzlof5kdw7dqIMMEevCIbGA7HPC0=;
-        b=Yac81R/QbVZtzb0O4XlwgRMfY9LIujb/A4tnVwYlFwTXsmEtH16ppjuaukI7icR+452CPT
-        fBBvOISTxqC1Cc0SmwpY5BvB0AMMe78SAhAmtLAXyNWHDRpVujFO2WYZCFHulx54yvsU8E
-        7ccZ6Vktp72UyTR4qLF0Hv0VVRCoPNs=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-0JlccWaFOnm4F1R7JKk0IQ-1; Wed, 12 Feb 2020 11:05:48 -0500
-X-MC-Unique: 0JlccWaFOnm4F1R7JKk0IQ-1
-Received: by mail-qv1-f69.google.com with SMTP id b8so1669795qvw.3
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2020 08:05:48 -0800 (PST)
+        id S1728602AbgBLQWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Feb 2020 11:22:21 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:46409 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727361AbgBLQWS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Feb 2020 11:22:18 -0500
+Received: by mail-pf1-f195.google.com with SMTP id k29so1459865pfp.13
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2020 08:22:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=UtBs909g2Ug5B/GmWLl9syqH2ckGGAYGctQB3xVEPLk=;
+        b=V0nJ4J4nOpEq7kQ1dqdvmNnRxG670BfZwH5PqrHNkdmszKt+Nuf5IkDfEPLa6hHtjy
+         oQ/5HvIyGCUiyO+DKLpmEhjIaRtaMGsX4Ho4j+g5PEHbDGEU4EJj2lBNBfX3LEUu9h39
+         U7haCGvFvvtAEpjYU7/qWar6H5YvcL/BQUp2/+6JPuTRlsj3hgsVKRDQdiJerCImp4VP
+         9O/2vHiw/xH7JQHP6NWurerQCjwskocQQpbyiomB2Q4aqgBGsB4wCYS4fgUtTV5EJVqO
+         a9lsRy8l7mxCuMF2IuG8tVVKQVL4K7Y4LzMZWYykNg9SJMfePai7QvvlNM7P3AxhiqI8
+         2brg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BuiFEByjTOdPJEqSzlof5kdw7dqIMMEevCIbGA7HPC0=;
-        b=IV2zf1scwW2WhoQ3nLrLcvivwIRPBSFPgEA4bfqUof5FZRGzQQRrfx4hIE2RjpZfIo
-         +y5Vzn4rs+8Ufmh5eZ7k/Tg2hjs7CYckSgkWKXAkDt3ApwXSsEGARTN9Mum/h0tiDynk
-         KJeFb3MCozY62qwss1HA4b7mFF+Kd+G4gnYpmx09yfc48e8UoKpfWy4BCElDQLQQJrji
-         MEYLCFYpxTOUSG3KZ+Kbg8LoiWdsNgd7Ns7Ja197nW62Ch0WxYnMBkyix/p0Mua0efge
-         SyQcQ5DnHVclikWBfzXSbxm9omFFBeEWz/0ZUa06SsCa/Ko59gPQFSE5MPuGzwZPDbq4
-         GEiw==
-X-Gm-Message-State: APjAAAWbDFnQezdv5p/lhUReIkYXvOxfar8OyxChNBg9mUT8XnF189FS
-        BGQ3FNXOgaQDeX2kcmOym+vWIXwYGPOk4WxGSR+mUsIwmr8SIEG8I0IHVBCvRSWznWbynoZmWpy
-        ylp8gl6b2LGNu
-X-Received: by 2002:aed:27de:: with SMTP id m30mr19941638qtg.151.1581523548285;
-        Wed, 12 Feb 2020 08:05:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwNDm2UfrjOrDJPfYOACk8aWkMeivWc5hd+gjQaGVxgdqdXt5A3hx1c1nj6DLkByyf8owdTKg==
-X-Received: by 2002:aed:27de:: with SMTP id m30mr19941603qtg.151.1581523548025;
-        Wed, 12 Feb 2020 08:05:48 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
-        by smtp.gmail.com with ESMTPSA id v2sm376207qto.73.2020.02.12.08.05.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2020 08:05:46 -0800 (PST)
-Date:   Wed, 12 Feb 2020 11:05:44 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be string
- option
-Message-ID: <20200212160544.GC1083891@xz-x1>
-References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-14-git-send-email-yi.l.liu@intel.com>
- <20200211194331.GK984290@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A1BA573@SHSMSX104.ccr.corp.intel.com>
-MIME-Version: 1.0
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=UtBs909g2Ug5B/GmWLl9syqH2ckGGAYGctQB3xVEPLk=;
+        b=C/057sM1OguoYifTlQRPicMSTEfoQmri63WOeHkpd4TuMD3yF8YOY4YkorESyThZWF
+         ovWuk093Ko421pjtClTs6ux9KXIruyRIlVqJ0HDvu/LG8OT1sr2lDEOqB/sbM7OHuzau
+         b9Jj0ZmjyTGHM+ia+SPnqwBrN7a7uu42NxTS2l1PDrt+SCXcvMAL4eRbSgKTUv/sJm2W
+         1XT4QpNnuqZAB27y/Cz4VkmK4yznHlUeeW7qGE2vtnilCl1el1LOr6mZfcIR4/3Jezqo
+         YX2M5FWkS8iu2D4FI88QDu3j1Va0DcD+jyKwPUqGTvaK1wwMu3gIG1VDWL/5S8tVQLJM
+         v/pA==
+X-Gm-Message-State: APjAAAWvTNYYPYhNLOpWVPKeUa5V0rHq+i0ZgzX57PMu7zD0yc+JvCHm
+        j7QEpbTlxsiujW/D6R3ikrzHfw==
+X-Google-Smtp-Source: APXvYqyksnxVfiGQnmL2dJDTJhvH3Jj2OjnrG6wn2hFFnBKljhf5Nl9AB7BmudDVKXJXj5Ka8PadqA==
+X-Received: by 2002:aa7:86c2:: with SMTP id h2mr9202566pfo.45.1581524537390;
+        Wed, 12 Feb 2020 08:22:17 -0800 (PST)
+Received: from ?IPv6:2601:646:c200:1ef2:6918:d286:95c1:bba2? ([2601:646:c200:1ef2:6918:d286:95c1:bba2])
+        by smtp.gmail.com with ESMTPSA id z19sm1429801pfn.49.2020.02.12.08.22.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Feb 2020 08:22:16 -0800 (PST)
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A1BA573@SHSMSX104.ccr.corp.intel.com>
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 14/62] x86/boot/compressed/64: Add stage1 #VC handler
+Date:   Wed, 12 Feb 2020 08:22:14 -0800
+Message-Id: <A67CC291-C07A-496C-BD67-2A795813E93F@amacapital.net>
+References: <20200212113840.GB20066@8bytes.org>
+Cc:     Andy Lutomirski <luto@kernel.org>, X86 ML <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Juergen Gross <JGross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        Joerg Roedel <jroedel@suse.de>
+In-Reply-To: <20200212113840.GB20066@8bytes.org>
+To:     Joerg Roedel <joro@8bytes.org>
+X-Mailer: iPhone Mail (17D50)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 12, 2020 at 07:28:24AM +0000, Liu, Yi L wrote:
-> > From: Peter Xu <peterx@redhat.com>
-> > Sent: Wednesday, February 12, 2020 3:44 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be string
-> > option
-> > 
-> > On Wed, Jan 29, 2020 at 04:16:44AM -0800, Liu, Yi L wrote:
-> > > From: Liu Yi L <yi.l.liu@intel.com>
-> > >
-> > > Intel VT-d 3.0 introduces scalable mode, and it has a bunch of
-> > > capabilities related to scalable mode translation, thus there are multiple
-> > combinations.
-> > > While this vIOMMU implementation wants simplify it for user by
-> > > providing typical combinations. User could config it by
-> > > "x-scalable-mode" option. The usage is as below:
-> > >
-> > > "-device intel-iommu,x-scalable-mode=["legacy"|"modern"]"
-> > 
-> > Maybe also "off" when someone wants to explicitly disable it?
-> 
-> emmm, I  think x-scalable-mode should be disabled by default. It is enabled
-> only when "legacy" or "modern" is configured. I'm fine to add "off" as an
-> explicit way to turn it off if you think it is necessary. :-)
 
-It's not necessary.  It'll be necessary when we remove "x-" and change
-the default value.  However it'll always be good to provide all
-options explicitly in the parameter starting from when we design it,
-imho.  It's still experimental, so... Your call. :)
 
--- 
-Peter Xu
+> On Feb 12, 2020, at 3:38 AM, Joerg Roedel <joro@8bytes.org> wrote:
+>=20
+> =EF=BB=BFOn Tue, Feb 11, 2020 at 02:23:22PM -0800, Andy Lutomirski wrote:
+>>> On Tue, Feb 11, 2020 at 5:53 AM Joerg Roedel <joro@8bytes.org> wrote:
+>>> +void __init no_ghcb_vc_handler(struct pt_regs *regs)
+>>=20
+>> Isn't there a second parameter: unsigned long error_code?
+>=20
+> No, the function gets the error-code from regs->orig_ax. This particular
+> function only needs to check for error_code =3D=3D SVM_EXIT_CPUID, as that=
 
+> is the only one supported when there is no GHCB.
+>=20
+
+Hmm. It might be nice to use the same signature for early handlers as for no=
+rmal ones.
+
+> Regards,
+>=20
+>    Joerg
