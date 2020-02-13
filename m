@@ -2,305 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A01615BBB7
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 10:32:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C223415BBC0
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 10:33:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729643AbgBMJb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 04:31:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49845 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729586AbgBMJb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 04:31:59 -0500
+        id S1729759AbgBMJdL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 04:33:11 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53228 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729632AbgBMJdJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Feb 2020 04:33:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581586318;
+        s=mimecast20190719; t=1581586388;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=E4cV9ThXgXlizZ8497eGzx0V/2ZNcQLP7ghs+RahG+g=;
-        b=eyy2V5eC8m9FRj2DVdNKIXDp74tTxAujehcYsELa3ZTEywdgbN6miXUcTMk4Xv/4AvljV5
-        8KhU+f5FpYxAzVCKj3YRW1TBwLGQqNYRRdJmXtKjXLb1P8qXV9dUgFqzYuKRRf5dQtyLWh
-        gCTr1PRnjc/6lQ+4sy3vlpZcstz5Juc=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=O8Z9Thp+VSDpsbJ/c3/SKEh6FPSKloGY5r0r2a4bGnM=;
+        b=b0Dm8qpAsBVp0LFUHF2wgAbhLn4QHlBlq2QYoNkIKBo/aXNXXhyeWgvZM3pOjSh/wpeskz
+        Ta+prHgKHHFxBalCE8/bDFcE7duqF21qmQBeBGAjVQj76OMA/dxsqIWrHdfWmeTzfUnb2Z
+        iBAbTKbmk9NAheMu5E/EJOFtr3aMMzo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-9M9bJ2msMX2lr_oZJ0r8Kg-1; Thu, 13 Feb 2020 04:31:55 -0500
-X-MC-Unique: 9M9bJ2msMX2lr_oZJ0r8Kg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-369-yZJ42JDsPGWE0H5Gm83c3A-1; Thu, 13 Feb 2020 04:33:04 -0500
+X-MC-Unique: yZJ42JDsPGWE0H5Gm83c3A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9A261005510;
-        Thu, 13 Feb 2020 09:31:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26D68107ACCA;
+        Thu, 13 Feb 2020 09:33:03 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A802926E7B;
-        Thu, 13 Feb 2020 09:31:49 +0000 (UTC)
-Date:   Thu, 13 Feb 2020 10:31:47 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EA80B5C13F;
+        Thu, 13 Feb 2020 09:32:58 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        alexandru.elisei@arm.com, andre.przywara@arm.com,
-        eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests v2] arm64: timer: Speed up gic-timer-state
- check
-Message-ID: <20200213093147.2d3o5x5rg7qwykx6@kamzik.brq.redhat.com>
-References: <20200211133705.1398-1-drjones@redhat.com>
- <60c6c4c7-1d6b-5b64-adc1-8e96f45332c6@huawei.com>
- <20200211154135.vxxkpstt4cpoyqsp@kamzik.brq.redhat.com>
- <a8876667-934d-f617-682d-c488e7276d38@huawei.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     alexandru.elisei@arm.com, yuzenghui@huawei.com,
+        andre.przywara@arm.com, eric.auger@redhat.com
+Subject: [PATCH kvm-unit-tests v3] arm64: timer: Speed up gic-timer-state check
+Date:   Thu, 13 Feb 2020 10:32:57 +0100
+Message-Id: <20200213093257.23367-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a8876667-934d-f617-682d-c488e7276d38@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 12, 2020 at 10:57:09AM +0800, Zenghui Yu wrote:
-> Hi Drew,
-> 
-> On 2020/2/11 23:41, Andrew Jones wrote:
-> > On Tue, Feb 11, 2020 at 10:50:58PM +0800, Zenghui Yu wrote:
-> > > Hi Drew,
-> > > 
-> > > On 2020/2/11 21:37, Andrew Jones wrote:
-> > > > Let's bail out of the wait loop if we see the expected state
-> > > > to save over six seconds of run time. Make sure we wait a bit
-> > > > before reading the registers and double check again after,
-> > > > though, to somewhat mitigate the chance of seeing the expected
-> > > > state by accident.
-> > > > 
-> > > > We also take this opportunity to push more IRQ state code to
-> > > > the library.
-> > > > 
-> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > 
-> > > [...]
-> > > 
-> > > > +
-> > > > +enum gic_irq_state gic_irq_state(int irq)
-> > > 
-> > > This is a *generic* name while this function only deals with PPI.
-> > > Maybe we can use something like gic_ppi_state() instead?  Or you
-> > > will have to take all interrupt types into account in a single
-> > > function, which is not a easy job I think.
-> > 
-> > Very good point.
-> > 
-> > > 
-> > > > +{
-> > > > +	enum gic_irq_state state;
-> > > > +	bool pending = false, active = false;
-> > > > +	void *base;
-> > > > +
-> > > > +	assert(gic_common_ops);
-> > > > +
-> > > > +	switch (gic_version()) {
-> > > > +	case 2:
-> > > > +		base = gicv2_dist_base();
-> > > > +		pending = readl(base + GICD_ISPENDR) & (1 << PPI(irq));
-> > > > +		active = readl(base + GICD_ISACTIVER) & (1 << PPI(irq));
-> > > > +		break;
-> > > > +	case 3:
-> > > > +		base = gicv3_sgi_base();
-> > > > +		pending = readl(base + GICR_ISPENDR0) & (1 << PPI(irq));
-> > > > +		active = readl(base + GICR_ISACTIVER0) & (1 << PPI(irq));
-> > > 
-> > > And you may also want to ensure that the 'irq' is valid for PPI().
-> > > Or personally, I'd just use a real PPI number (PPI(info->irq)) as
-> > > the input parameter of this function.
-> > 
-> > Indeed, if we want to make this a general function we should require
-> > the caller to pass PPI(irq).
-> > 
-> > > 
-> > > > +		break;
-> > > > +	}
-> > > > +
-> > > > +	if (!active && !pending)
-> > > > +		state = GIC_IRQ_STATE_INACTIVE;
-> > > > +	if (pending)
-> > > > +		state = GIC_IRQ_STATE_PENDING;
-> > > > +	if (active)
-> > > > +		state = GIC_IRQ_STATE_ACTIVE;
-> > > > +	if (active && pending)
-> > > > +		state = GIC_IRQ_STATE_ACTIVE_PENDING;
-> > > > +
-> > > > +	return state;
-> > > > +}
-> > > > 
-> > > 
-> > > Otherwise,
-> > > 
-> > > Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-> > > Tested-by: Zenghui Yu <yuzenghui@huawei.com>
-> > 
-> > Thanks, but I guess I should squash in changes to make this function more
-> > general. My GIC/SPI skills are weak, so I'm not sure this is right,
-> > especially because the SPI stuff doesn't yet have a user to validate it.
-> 
-> (I guess the PL031 can be another new user.)
-> 
-> > However, if all reviewers think it's correct, then I'll squash it into
-> > the arm/queue branch. I've added Andre and Eric to help review too.
-> > 
-> > Thanks,
-> > drew
-> > 
-> > 
-> > diff --git a/arm/timer.c b/arm/timer.c
-> > index ae5fdbf54b35..44621b4f2967 100644
-> > --- a/arm/timer.c
-> > +++ b/arm/timer.c
-> > @@ -189,9 +189,9 @@ static bool gic_timer_check_state(struct timer_info *info,
-> >   	/* Wait for up to 1s for the GIC to sample the interrupt. */
-> >   	for (i = 0; i < 10; i++) {
-> >   		mdelay(100);
-> > -		if (gic_irq_state(info->irq) == expected_state) {
-> > +		if (gic_irq_state(PPI(info->irq)) == expected_state) {
-> >   			mdelay(100);
-> > -			if (gic_irq_state(info->irq) == expected_state)
-> > +			if (gic_irq_state(PPI(info->irq)) == expected_state)
-> >   				return true;
-> >   		}
-> >   	}
-> > diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> > index 0563b31132c8..3924dd1d1ee6 100644
-> > --- a/lib/arm/gic.c
-> > +++ b/lib/arm/gic.c
-> > @@ -150,22 +150,37 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
-> >   enum gic_irq_state gic_irq_state(int irq)
-> >   {
-> >   	enum gic_irq_state state;
-> > -	bool pending = false, active = false;
-> > -	void *base;
-> > +	void *ispendr, *isactiver;
-> > +	bool pending, active;
-> >   	assert(gic_common_ops);
-> 
-> We can also assert that only interrupts with ID smaller than 1020
-> will be handled.
+Let's bail out of the wait loop if we see the expected state
+to save over six seconds of run time. Make sure we wait a bit
+before reading the registers and double check again after,
+though, to somewhat mitigate the chance of seeing the expected
+state by accident.
 
-Good idea
+We also take this opportunity to push more IRQ state code to
+the library.
 
-> 
-> >   	switch (gic_version()) {
-> >   	case 2:
-> > -		base = gicv2_dist_base();
-> > -		pending = readl(base + GICD_ISPENDR) & (1 << PPI(irq));
-> > -		active = readl(base + GICD_ISACTIVER) & (1 << PPI(irq));
-> > +		ispendr = gicv2_dist_base() + GICD_ISPENDR;
-> > +		isactiver = gicv2_dist_base() + GICD_ISACTIVER;
-> >   		break;
-> >   	case 3:
-> > -		base = gicv3_sgi_base();
-> > -		pending = readl(base + GICR_ISPENDR0) & (1 << PPI(irq));
-> > -		active = readl(base + GICR_ISACTIVER0) & (1 << PPI(irq));
-> > +		if (irq < GIC_NR_PRIVATE_IRQS) {
-> > +			ispendr = gicv3_sgi_base() + GICR_ISPENDR0;
-> > +			isactiver = gicv3_sgi_base() + GICR_ISACTIVER0;
-> > +		} else {
-> > +			ispendr = gicv3_dist_base() + GICD_ISPENDR;
-> > +			isactiver = gicv3_dist_base() + GICD_ISACTIVER;
-> > +		}
-> >   		break;
-> > +	default:
-> > +		assert(0);
-> > +	}
-> > +
-> > +	if (irq < GIC_NR_PRIVATE_IRQS) {
-> > +		pending = readl(ispendr) & (1 << irq);
-> > +		active = readl(isactiver) & (1 << irq);
-> > +	} else {
-> > +		int offset = (irq - GIC_FIRST_SPI) / 32;
-> > +		int mask = 1 << ((irq - GIC_FIRST_SPI) % 32);
-> 
-> No need to minus GIC_FIRST_SPI.  And therefore these two cases
-> can actually be merged.
+Cc: Zenghui Yu <yuzenghui@huawei.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+v3:
+ - make gic_irq_state general for all irqs < 1020 [Zenghui Yu]
+ - remove unused gic offsets from arm/timer.c [Alexandru Elisei]
+v2:
+ - check timer irq state twice [Alexandru Elisei]
 
-Yup, will do
+ arm/timer.c       | 36 ++++++++++++------------------------
+ lib/arm/asm/gic.h | 11 ++++++-----
+ lib/arm/gic.c     | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 63 insertions(+), 29 deletions(-)
 
-> 
-> > +		pending = readl(ispendr + offset) & mask;
-> > +		active = readl(isactiver + offset) & mask;
-> >   	}
-> >   	if (!active && !pending)
-> 
-> Otherwise this looks good enough (to me) for now, and let's wait
-> other reviewers to comment.  I've used the following diff to give
-> the pl031 test a go (roughly written, not dig into PL031 so much),
-> it just works fine :)
-> 
-> 
-> Thanks,
-> Zenghui
-> 
-> diff --git a/arm/pl031.c b/arm/pl031.c
-> index 86035fa..2d4160f 100644
-> --- a/arm/pl031.c
-> +++ b/arm/pl031.c
-> @@ -118,11 +118,12 @@ static int check_rtc_freq(void)
->  	return 0;
->  }
-> 
-> -static bool gic_irq_pending(void)
-> +static bool gic_pl031_pending(void)
->  {
-> -	uint32_t offset = (pl031_irq / 32) * 4;
-> +	enum gic_irq_state state = gic_irq_state(pl031_irq);
-> 
-> -	return readl(gic_ispendr + offset) & (1 << (pl031_irq & 31));
-> +	return state == GIC_IRQ_STATE_PENDING ||
-> +		state == GIC_IRQ_STATE_ACTIVE_PENDING;
-
-Nice way to test, but I'll leave this change out.
-
->  }
-> 
->  static void gic_irq_unmask(void)
-> 
-> [...]
-> /* replace all gic_irq_pending() with gic_pl031_pending() */
-> [...]
-> 
-> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> index 3924dd1..34d77e3 100644
-> --- a/lib/arm/gic.c
-> +++ b/lib/arm/gic.c
-> @@ -152,6 +152,7 @@ enum gic_irq_state gic_irq_state(int irq)
->  	enum gic_irq_state state;
->  	void *ispendr, *isactiver;
->  	bool pending, active;
-> +	int offset, mask;
-> 
->  	assert(gic_common_ops);
-> 
-> @@ -173,15 +174,10 @@ enum gic_irq_state gic_irq_state(int irq)
->  		assert(0);
->  	}
-> 
-> -	if (irq < GIC_NR_PRIVATE_IRQS) {
-> -		pending = readl(ispendr) & (1 << irq);
-> -		active = readl(isactiver) & (1 << irq);
-> -	} else {
-> -		int offset = (irq - GIC_FIRST_SPI) / 32;
-> -		int mask = 1 << ((irq - GIC_FIRST_SPI) % 32);
-> -		pending = readl(ispendr + offset) & mask;
-> -		active = readl(isactiver + offset) & mask;
-> -	}
-> +	offset = (irq / 32) * 4;
-> +	mask = 1 << (irq % 32);
-> +	pending = readl(ispendr + offset) & mask;
-> +	active = readl(isactiver + offset) & mask;
-> 
->  	if (!active && !pending)
->  		state = GIC_IRQ_STATE_INACTIVE;
->
-
-I'll send a final patch now for review, but I'm pretty happy with this so
-I've gone ahead and squashed it into arm/queue already. I kept Alex's
-r-b as there shouldn't be any functional change with respect to what
-he reviewed.
-
-Thanks,
-drew
+diff --git a/arm/timer.c b/arm/timer.c
+index f5cf775ce50f..44621b4f2967 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -17,8 +17,6 @@
+ #define ARCH_TIMER_CTL_IMASK   (1 << 1)
+ #define ARCH_TIMER_CTL_ISTATUS (1 << 2)
+=20
+-static void *gic_isactiver;
+-static void *gic_ispendr;
+ static void *gic_isenabler;
+ static void *gic_icenabler;
+=20
+@@ -183,28 +181,22 @@ static bool timer_pending(struct timer_info *info)
+ 		(info->read_ctl() & ARCH_TIMER_CTL_ISTATUS);
+ }
+=20
+-static enum gic_state gic_timer_state(struct timer_info *info)
++static bool gic_timer_check_state(struct timer_info *info,
++				  enum gic_irq_state expected_state)
+ {
+-	enum gic_state state =3D GIC_STATE_INACTIVE;
+ 	int i;
+-	bool pending, active;
+=20
+ 	/* Wait for up to 1s for the GIC to sample the interrupt. */
+ 	for (i =3D 0; i < 10; i++) {
+-		pending =3D readl(gic_ispendr) & (1 << PPI(info->irq));
+-		active =3D readl(gic_isactiver) & (1 << PPI(info->irq));
+-		if (!active && !pending)
+-			state =3D GIC_STATE_INACTIVE;
+-		if (pending)
+-			state =3D GIC_STATE_PENDING;
+-		if (active)
+-			state =3D GIC_STATE_ACTIVE;
+-		if (active && pending)
+-			state =3D GIC_STATE_ACTIVE_PENDING;
+ 		mdelay(100);
++		if (gic_irq_state(PPI(info->irq)) =3D=3D expected_state) {
++			mdelay(100);
++			if (gic_irq_state(PPI(info->irq)) =3D=3D expected_state)
++				return true;
++		}
+ 	}
+=20
+-	return state;
++	return false;
+ }
+=20
+ static bool test_cval_10msec(struct timer_info *info)
+@@ -253,11 +245,11 @@ static void test_timer(struct timer_info *info)
+ 	/* Enable the timer, but schedule it for much later */
+ 	info->write_cval(later);
+ 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+-	report(!timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_I=
+NACTIVE,
++	report(!timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STAT=
+E_INACTIVE),
+ 			"not pending before");
+=20
+ 	info->write_cval(now - 1);
+-	report(timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_PE=
+NDING,
++	report(timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STATE=
+_PENDING),
+ 			"interrupt signal pending");
+=20
+ 	/* Disable the timer again and prepare to take interrupts */
+@@ -265,12 +257,12 @@ static void test_timer(struct timer_info *info)
+ 	info->irq_received =3D false;
+ 	set_timer_irq_enabled(info, true);
+ 	report(!info->irq_received, "no interrupt when timer is disabled");
+-	report(!timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_I=
+NACTIVE,
++	report(!timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STAT=
+E_INACTIVE),
+ 			"interrupt signal no longer pending");
+=20
+ 	info->write_cval(now - 1);
+ 	info->write_ctl(ARCH_TIMER_CTL_ENABLE | ARCH_TIMER_CTL_IMASK);
+-	report(timer_pending(info) && gic_timer_state(info) =3D=3D GIC_STATE_IN=
+ACTIVE,
++	report(timer_pending(info) && gic_timer_check_state(info, GIC_IRQ_STATE=
+_INACTIVE),
+ 			"interrupt signal not pending");
+=20
+ 	report(test_cval_10msec(info), "latency within 10 ms");
+@@ -345,14 +337,10 @@ static void test_init(void)
+=20
+ 	switch (gic_version()) {
+ 	case 2:
+-		gic_isactiver =3D gicv2_dist_base() + GICD_ISACTIVER;
+-		gic_ispendr =3D gicv2_dist_base() + GICD_ISPENDR;
+ 		gic_isenabler =3D gicv2_dist_base() + GICD_ISENABLER;
+ 		gic_icenabler =3D gicv2_dist_base() + GICD_ICENABLER;
+ 		break;
+ 	case 3:
+-		gic_isactiver =3D gicv3_sgi_base() + GICR_ISACTIVER0;
+-		gic_ispendr =3D gicv3_sgi_base() + GICR_ISPENDR0;
+ 		gic_isenabler =3D gicv3_sgi_base() + GICR_ISENABLER0;
+ 		gic_icenabler =3D gicv3_sgi_base() + GICR_ICENABLER0;
+ 		break;
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index a72e0cde4e9c..922cbe95750c 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -47,11 +47,11 @@
+ #ifndef __ASSEMBLY__
+ #include <asm/cpumask.h>
+=20
+-enum gic_state {
+-	GIC_STATE_INACTIVE,
+-	GIC_STATE_PENDING,
+-	GIC_STATE_ACTIVE,
+-	GIC_STATE_ACTIVE_PENDING,
++enum gic_irq_state {
++	GIC_IRQ_STATE_INACTIVE,
++	GIC_IRQ_STATE_PENDING,
++	GIC_IRQ_STATE_ACTIVE,
++	GIC_IRQ_STATE_ACTIVE_PENDING,
+ };
+=20
+ /*
+@@ -80,6 +80,7 @@ extern u32 gic_iar_irqnr(u32 iar);
+ extern void gic_write_eoir(u32 irqstat);
+ extern void gic_ipi_send_single(int irq, int cpu);
+ extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
++extern enum gic_irq_state gic_irq_state(int irq);
+=20
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM_GIC_H_ */
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+index 94301169215c..c3c5f6bc5b0e 100644
+--- a/lib/arm/gic.c
++++ b/lib/arm/gic.c
+@@ -146,3 +146,48 @@ void gic_ipi_send_mask(int irq, const cpumask_t *des=
+t)
+ 	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+ 	gic_common_ops->ipi_send_mask(irq, dest);
+ }
++
++enum gic_irq_state gic_irq_state(int irq)
++{
++	enum gic_irq_state state;
++	void *ispendr, *isactiver;
++	bool pending, active;
++	int offset, mask;
++
++	assert(gic_common_ops);
++	assert(irq < 1020);
++
++	switch (gic_version()) {
++	case 2:
++		ispendr =3D gicv2_dist_base() + GICD_ISPENDR;
++		isactiver =3D gicv2_dist_base() + GICD_ISACTIVER;
++		break;
++	case 3:
++		if (irq < GIC_NR_PRIVATE_IRQS) {
++			ispendr =3D gicv3_sgi_base() + GICR_ISPENDR0;
++			isactiver =3D gicv3_sgi_base() + GICR_ISACTIVER0;
++		} else {
++			ispendr =3D gicv3_dist_base() + GICD_ISPENDR;
++			isactiver =3D gicv3_dist_base() + GICD_ISACTIVER;
++		}
++		break;
++	default:
++		assert(0);
++	}
++
++	offset =3D irq / 32 * 4;
++	mask =3D 1 << (irq % 32);
++	pending =3D readl(ispendr + offset) & mask;
++	active =3D readl(isactiver + offset) & mask;
++
++	if (!active && !pending)
++		state =3D GIC_IRQ_STATE_INACTIVE;
++	if (pending)
++		state =3D GIC_IRQ_STATE_PENDING;
++	if (active)
++		state =3D GIC_IRQ_STATE_ACTIVE;
++	if (active && pending)
++		state =3D GIC_IRQ_STATE_ACTIVE_PENDING;
++
++	return state;
++}
+--=20
+2.21.1
 
