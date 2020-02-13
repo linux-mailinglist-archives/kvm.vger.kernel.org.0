@@ -2,85 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 80E0715B67C
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 02:16:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 725B715B67F
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 02:17:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729394AbgBMBQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Feb 2020 20:16:26 -0500
-Received: from mail-eopbgr690041.outbound.protection.outlook.com ([40.107.69.41]:40833
+        id S1729458AbgBMBQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Feb 2020 20:16:43 -0500
+Received: from mail-eopbgr690085.outbound.protection.outlook.com ([40.107.69.85]:33413
         "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729276AbgBMBQ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Feb 2020 20:16:26 -0500
+        id S1729185AbgBMBQn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Feb 2020 20:16:43 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Glyrr63PTZuEOXHNWTdT255rD+S4toV/1FUA88Xw0Da2QwXOpjsyPp8YuhAsMLY9oTzmJ5SyGjFqC3RNGrmDtRNf5iEueEIWs6BJYpxYxwKqYeRmbuv0GacCpqiVvFOta81h3duKiff1lc3mSRCk8OQaICS0Y54M4KbtgBQ5ik3ghEsKuds8Mn6qKQzGbQNsVjctvOPuZQZMkdUJX6qny2EDm3diHhILycUsFKNfHCL3gwbpfa6ezN6CeFYKYgh3aQRnVx+cLvSUnDnnz4Njfc0FWKw0I2Wkj1Ga82qxE32GV6EefQpifeiSralWzF/T21h1/kllnWN8fjo7lon2kQ==
+ b=dcxqys0eiphBBpII7LQVRZ5rKyMKznKAKtPM23QcB9CMktmqPB8VbWgevJ/uPyf3CVzr/0E8+28SQOaG+Bj4edwW734Zxnk8i3bRVR+4FrV6flo6ckswQD4lLiZhp3Xr7cRcSpw7HB/tLNeDUh1N2iuotfY9dSZzLbph9y4tRSlxnGHLidxm5zYDCdGrrY7MsI5bC2Oo7ui8HJfoNHnDXVBKacklC1Q6SIe/nH7k/KE1i1GkSog4/TjkneUhmOsTSwA73tzsbwwWttQzzPbU0CefgaV2GfBPVeBcA1m25Z20Vg7zkGptnmRf9knPQQIlIIBPxBs2PPD3Uhl/LUFqIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=swqFPurofpMDZYrmVIIjPRTcqalWc2cHXs8EPG4/xeU=;
- b=h6F45IdOTG+MSVEVGMe/Axf9ifenMMNZZxNolHhk1a6NQZIDmfYFSsG7KRSrhrUcwExQgZuF5Mv47ZdB82xyZqXKxhzf8TQc3Z7oy1ioz/sPt3qo2T29zxt1EH4QmeyzHpEwsxLuQ4tFvLbNfoJ8zW/rrdcFJnsnfVxoKq12FhCgwZjJz6fD0nWljXC3z9xADajX/dGQa0KgNDeMQb0Mw8ShoOKMwWSKH7ZBy61fjMErrSOTQ7wbdmHZq6XLhI3Uys1SgQncrpRfG5iHfxHtk/8Zis6fBkhXeVqgOVK8fzToplruQ27HW3WfS8J9gItYIysrcrUobP+8SpP3lmbk+g==
+ bh=EdhPnYXL7XrsMehKNBFgkWdN2ch3x9dIwK63Ttaigh4=;
+ b=XEibVfaOOik/HJBtuB9xhUEK3UfvPinajZtrUc5XhZVxVP58l+Q/D5B40k2gizOfc8d3d3jRdeDA65VTgvuXYljWV3RTR6dDSr78IzUj6SEEbLwn4s6Am6SlFu8PynbWNQH/98J7KFUUtDGknP3Rkev9j6xO6RH4imYavrbSp8DGw9ON71PrBcyKPfIA+hIosaLMrrZ8UnVrfrTQnzG5rQMsO9yUJrK+1G7Orgnt53T3rYNTZ1X9ABK2m6KZvfletjhcqb3seuu7yKiaY1omIxP5ntV+hpPLKwAh4gUNEIV40aD74rxvFyJHmEr9VvLuL3Ra4LF0X/qgr4liH0HO+A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=swqFPurofpMDZYrmVIIjPRTcqalWc2cHXs8EPG4/xeU=;
- b=cy26+rZWeQxzKhbqIRFB4CKanB3Qc/cwJ9rsiDdoSPQqWwvx02+Mf257FHtTj2ILLCvHSHicRrSwS2ppZzNKvIpzxoSL3ysLPktgJkRNS827pOljQ50tFLKYJj2WDluuLOEZGYrXsvaQ1u2V+YkpHiVi5kwwH6AVx6MyNEYiV+c=
+ bh=EdhPnYXL7XrsMehKNBFgkWdN2ch3x9dIwK63Ttaigh4=;
+ b=jTQ3iCFJwpzhQyHRfzQllBTpzVrEIghDodWnxxhZxjSkiLsKc9akUUD9bvVPOyeTvZxVieTnKEuP1wK/+AC1aQIGuTTDKWC3wxVp4uLZGyI++XAoay6NacEQsf4WwcKmutTTE5YXh8hFVHzCgpRS5htSy7OFw29rBi7BG3YpiUo=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Ashish.Kalra@amd.com; 
 Received: from SN1PR12MB2528.namprd12.prod.outlook.com (52.132.196.33) by
  SN1PR12MB2366.namprd12.prod.outlook.com (52.132.194.147) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.22; Thu, 13 Feb 2020 01:16:21 +0000
+ 15.20.2729.22; Thu, 13 Feb 2020 01:16:37 +0000
 Received: from SN1PR12MB2528.namprd12.prod.outlook.com
  ([fe80::fd48:9921:dd63:c6e1]) by SN1PR12MB2528.namprd12.prod.outlook.com
  ([fe80::fd48:9921:dd63:c6e1%7]) with mapi id 15.20.2707.030; Thu, 13 Feb 2020
- 01:16:21 +0000
+ 01:16:37 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         rkrcmar@redhat.com, joro@8bytes.org, bp@suse.de,
         thomas.lendacky@amd.com, rientjes@google.com, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 03/12] KVM: SVM: Add KVM_SEV_SEND_FINISH command
-Date:   Thu, 13 Feb 2020 01:16:11 +0000
-Message-Id: <d6f21be0c775fd51a63565c8944b03b3bf099e0f.1581555616.git.ashish.kalra@amd.com>
+Subject: [PATCH 04/12] KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
+Date:   Thu, 13 Feb 2020 01:16:27 +0000
+Message-Id: <0a0b3815e03dcee47ca0fbf4813821877b4c2ea0.1581555616.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1581555616.git.ashish.kalra@amd.com>
 References: <cover.1581555616.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DM6PR03CA0068.namprd03.prod.outlook.com
- (2603:10b6:5:100::45) To SN1PR12MB2528.namprd12.prod.outlook.com
+X-ClientProxiedBy: DM5PR21CA0059.namprd21.prod.outlook.com
+ (2603:10b6:3:129::21) To SN1PR12MB2528.namprd12.prod.outlook.com
  (2603:10b6:802:28::33)
 MIME-Version: 1.0
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by DM6PR03CA0068.namprd03.prod.outlook.com (2603:10b6:5:100::45) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.23 via Frontend Transport; Thu, 13 Feb 2020 01:16:20 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by DM5PR21CA0059.namprd21.prod.outlook.com (2603:10b6:3:129::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.5 via Frontend Transport; Thu, 13 Feb 2020 01:16:36 +0000
 X-Mailer: git-send-email 2.17.1
 X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 8bc916cd-a590-4558-c71c-08d7b022562c
+X-MS-Office365-Filtering-Correlation-Id: 7fd0ae01-1bdd-44a9-37d4-08d7b0225f56
 X-MS-TrafficTypeDiagnostic: SN1PR12MB2366:|SN1PR12MB2366:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2366E6A2BE883AF8955C43648E1A0@SN1PR12MB2366.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB23668008460960F73293474E8E1A0@SN1PR12MB2366.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2331;
 X-Forefront-PRVS: 031257FE13
 X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(136003)(366004)(376002)(39860400002)(396003)(199004)(189003)(8936002)(5660300002)(66946007)(66476007)(66556008)(7416002)(2906002)(6916009)(6666004)(4326008)(7696005)(52116002)(316002)(36756003)(66574012)(6486002)(86362001)(956004)(2616005)(81156014)(478600001)(8676002)(81166006)(26005)(16526019)(186003);DIR:OUT;SFP:1101;SCL:1;SRVR:SN1PR12MB2366;H:SN1PR12MB2528.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 Received-SPF: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PbonPrQhB3AI6NAjssE/BKyePT6RiPtooWD0xNHV6F7WO/TekM92CgsGRUM8htG7IvdmpE3Ya/Jt+34uUSZPpPc5/zYGXdvraEoltub/AOEKrqO+4JkgUJ2NSaXH6/dgDlFmk9uANTAgHdie2OtRNTI2u/dCCo+h+h1REvml/m9O3vbyEq/ebHvsbxTsfx+l+Uk1icq/xLxZHR25h35YtXc2FOyDm9fYzwSenUkFXjGmwr1rN2hL7+aF+GAGhGkl+3mpjVVNHHug7P4G+8YILWgAQI0DsjrG6/nmtDuUJvswIjtrGGma692fgIl46fY77UFmfuE3hLlkwidCPWxDfBll8LM7q7aKg6JoxcwSjzsZl0/mNqEyInpU/EGx/3MQs6w4Ve8kza5T/R9tnNyyNXyvpk3dxPfvBlx9xLy3CdCVDSHmmo94fGm6WCrhcTU7
-X-MS-Exchange-AntiSpam-MessageData: h3UegRnFAMfbOC0XTkiG24Nvu+76EqxcshPhEQmY8lwcrzoAcmHRRO1iUkIjSAkjqHT4Xu0Vx8uMvE2KKdq99hQIU0iSIjusYJo0aoZJnfGq/qt+Vp/kJY4Uwg54M5cdEKniJ/O3v0KkKjSFR4gJ0w==
+X-Microsoft-Antispam-Message-Info: LL/XF5jaj30TZhUs7xFguUYAzHoInLj5XQZflcCXb0YmzZcjK5tGjD4i1e2l4kXXyb53GolH9H27eXtQ+GBA2nHfzdCJA4ovtCne4ByeK1kokHHydIwmN7ZjE3HrGGZa/Ovxs2NfJiyCRtTaN6vUKV6yjd5uycZRTk3UMtzdZ5qZbSBxE2Gs2KpTafbggbgOOgDvQerFOOfNIxIdAf6cFsuSJH9kov+qmjbYpj0y6oUEfoUddSWqccHhPKvtcpmnC4qzz6DD9bzOAlmhF9qlg/trAAisEpDkODMYZDRh5N51PuVNhNDPjQATRzW2hrwNXP4OVu4SQ2vyc6Qm4N0sWMGDx3sMea2dgarroGIdIV1GkEv+jbxMDmXsXPCQ2nwJpXWqRqi4nDhfyNr802Nz+n0Vo2tAHaqsP4yPOyf2/Wb3Zpswtc6u67vB8U/ZYDbP
+X-MS-Exchange-AntiSpam-MessageData: s/f/67pW+wGWdUTskbagEEgUqsVWckjkQzshuyfzHTgp7PsoN1p81p/eZBu5MRu9PRGPWi878BkkbrrucowcX8/wXC5Qr/Rtd1g8CFaBzDyKwfAILIVQqEXAYrFXzlfLx1BPxonItaApK0eXuoTJfQ==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8bc916cd-a590-4558-c71c-08d7b022562c
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2020 01:16:21.8675
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7fd0ae01-1bdd-44a9-37d4-08d7b0225f56
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2020 01:16:37.2286
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7OjgE5PqGeZz2F2UxO0Pg9ty5xfy3Hdw6XRmWOl9LqOW2QbFb5Rw1Lev0RuqFjavUjyQxfP5MGjyvfCqumB+zQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: bxl4iPI8Ak2XeQViZ7oqshCbjLcgRPzoq6vA+IopSMzkQHvhzHBwIZhC2QiVTGObr91EUQxcqZwuFk99KAhq/A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2366
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -89,8 +89,9 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-The command is used to finailize the encryption context created with
-KVM_SEV_SEND_START command.
+The command is used to create the encryption context for an incoming
+SEV guest. The encryption context can be later used by the hypervisor
+to import the incoming data into the SEV guest memory space.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
@@ -106,70 +107,170 @@ Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- .../virt/kvm/amd-memory-encryption.rst        |  8 +++++++
- arch/x86/kvm/svm.c                            | 23 +++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ .../virt/kvm/amd-memory-encryption.rst        | 29 +++++++
+ arch/x86/kvm/svm.c                            | 81 +++++++++++++++++++
+ include/uapi/linux/kvm.h                      |  9 +++
+ 3 files changed, 119 insertions(+)
 
 diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-index 0f1c3860360f..f22f09ad72bd 100644
+index f22f09ad72bd..4b882fb681fa 100644
 --- a/Documentation/virt/kvm/amd-memory-encryption.rst
 +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-@@ -289,6 +289,14 @@ Returns: 0 on success, -negative on error
-                 __u32 trans_len;
-         };
+@@ -297,6 +297,35 @@ issued by the hypervisor to delete the encryption context.
  
-+12. KVM_SEV_SEND_FINISH
+ Returns: 0 on success, -negative on error
+ 
++13. KVM_SEV_RECEIVE_START
 +------------------------
 +
-+After completion of the migration flow, the KVM_SEV_SEND_FINISH command can be
-+issued by the hypervisor to delete the encryption context.
++The KVM_SEV_RECEIVE_START command is used for creating the memory encryption
++context for an incoming SEV guest. To create the encryption context, the user must
++provide a guest policy, the platform public Diffie-Hellman (PDH) key and session
++information.
++
++Parameters: struct  kvm_sev_receive_start (in/out)
 +
 +Returns: 0 on success, -negative on error
++
++::
++
++        struct kvm_sev_receive_start {
++                __u32 handle;           /* if zero then firmware creates a new handle */
++                __u32 policy;           /* guest's policy */
++
++                __u64 pdh_uaddr;         /* userspace address pointing to the PDH key */
++                __u32 dh_len;
++
++                __u64 session_addr;     /* userspace address which points to the guest session information */
++                __u32 session_len;
++        };
++
++On success, the 'handle' field contains a new handle and on error, a negative value.
++
++For more details, see SEV spec Section 6.12.
 +
  References
  ==========
  
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index ae97f774e979..c55c1865f9e0 100644
+index c55c1865f9e0..3b766f386c84 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -7387,6 +7387,26 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+@@ -7407,6 +7407,84 @@ static int sev_send_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
  	return ret;
  }
  
-+static int sev_send_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
++static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
 +{
 +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+	struct sev_data_send_finish *data;
++	struct sev_data_receive_start *start;
++	struct kvm_sev_receive_start params;
++	int *error = &argp->error;
++	void *session_data;
++	void *pdh_data;
 +	int ret;
 +
 +	if (!sev_guest(kvm))
 +		return -ENOTTY;
 +
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
++	/* Get parameter from the userspace */
++	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
++			sizeof(struct kvm_sev_receive_start)))
++		return -EFAULT;
 +
-+	data->handle = sev->handle;
-+	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_FINISH, data, &argp->error);
++	/* some sanity checks */
++	if (!params.pdh_uaddr || !params.pdh_len ||
++	    !params.session_uaddr || !params.session_len)
++		return -EINVAL;
 +
-+	kfree(data);
++	pdh_data = psp_copy_user_blob(params.pdh_uaddr, params.pdh_len);
++	if (IS_ERR(pdh_data))
++		return PTR_ERR(pdh_data);
++
++	session_data = psp_copy_user_blob(params.session_uaddr,
++			params.session_len);
++	if (IS_ERR(session_data)) {
++		ret = PTR_ERR(session_data);
++		goto e_free_pdh;
++	}
++
++	ret = -ENOMEM;
++	start = kzalloc(sizeof(*start), GFP_KERNEL);
++	if (!start)
++		goto e_free_session;
++
++	start->handle = params.handle;
++	start->policy = params.policy;
++	start->pdh_cert_address = __psp_pa(pdh_data);
++	start->pdh_cert_len = params.pdh_len;
++	start->session_address = __psp_pa(session_data);
++	start->session_len = params.session_len;
++
++	/* create memory encryption context */
++	ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_RECEIVE_START, start,
++				error);
++	if (ret)
++		goto e_free;
++
++	/* Bind ASID to this guest */
++	ret = sev_bind_asid(kvm, start->handle, error);
++	if (ret)
++		goto e_free;
++
++	params.handle = start->handle;
++	if (copy_to_user((void __user *)(uintptr_t)argp->data,
++			 &params, sizeof(struct kvm_sev_receive_start))) {
++		ret = -EFAULT;
++		sev_unbind_asid(kvm, start->handle);
++		goto e_free;
++	}
++
++	sev->handle = start->handle;
++	sev->fd = argp->sev_fd;
++
++e_free:
++	kfree(start);
++e_free_session:
++	kfree(session_data);
++e_free_pdh:
++	kfree(pdh_data);
++
 +	return ret;
 +}
 +
  static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
  {
  	struct kvm_sev_cmd sev_cmd;
-@@ -7434,6 +7454,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_SEND_UPDATE_DATA:
- 		r = sev_send_update_data(kvm, &sev_cmd);
+@@ -7457,6 +7535,9 @@ static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_SEND_FINISH:
+ 		r = sev_send_finish(kvm, &sev_cmd);
  		break;
-+	case KVM_SEV_SEND_FINISH:
-+		r = sev_send_finish(kvm, &sev_cmd);
++	case KVM_SEV_RECEIVE_START:
++		r = sev_receive_start(kvm, &sev_cmd);
 +		break;
  	default:
  		r = -EINVAL;
  		goto out;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d9dc81bb9c55..74764b9db5fa 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1579,6 +1579,15 @@ struct kvm_sev_send_update_data {
+ 	__u32 trans_len;
+ };
+ 
++struct kvm_sev_receive_start {
++	__u32 handle;
++	__u32 policy;
++	__u64 pdh_uaddr;
++	__u32 pdh_len;
++	__u64 session_uaddr;
++	__u32 session_len;
++};
++
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
 -- 
 2.17.1
 
