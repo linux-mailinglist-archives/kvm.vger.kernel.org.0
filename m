@@ -2,111 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33ED815CE01
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 23:18:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E94B15CE12
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 23:28:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727916AbgBMWSx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 17:18:53 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:38833 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726780AbgBMWSx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 17:18:53 -0500
-Received: by mail-io1-f67.google.com with SMTP id s24so8355368iog.5
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2020 14:18:52 -0800 (PST)
+        id S1727905AbgBMW2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 17:28:35 -0500
+Received: from mail-mw2nam12on2054.outbound.protection.outlook.com ([40.107.244.54]:6194
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726780AbgBMW2e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Feb 2020 17:28:34 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n2KVNgEVtN2uKuS/Lg6kdN9Bxd+qBkNVkYwjDBSd6Yy79IPPiD7eIOs2t9i0RqafUMQS4aGNXYIRAAGaKgehdtawdM1fGEOUJ7u1O07jX3ssHLz+nGhex7T7AVoib63rrjN3zCAscf0wtJ/gclGH+iIv69BZlVPsUkp0aWfAAZvfppAA4GUqG6jkMsb8IUtcqydyLO/+MB5hE9dA2uqjhMwgfGLkJjR/gOHZdrmF9CWPotso1B54LA2Bafw3u+HP2zeUWwOftty5jGWgX4Llxxdz8+aecZWr6G5rRCzP8yomEVysuZMV3Q7BtcTWGOi9xBG62LKYnz/u2EX/i22K3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=y+NKkAFnf1wCFqWpZ4FwDbTT+ee+Tq7RQ+oCptIR2Z8=;
+ b=gxhUeEyPl82niyADyxEGLRiu7+5QucyTeUSVPROScaKj8nqHQqfomK4OHHr5CeuKx1RapW0x2MXubWSw0YpIn9Q5ifFT8IQkJtYj0ALBm6giLWy3+JIOgrMAuCdSA+LjRC6px2kKBeHuC0rzng0KmnDu9HbBCyApKh25D/BjdfxX5UchhClJJ8IDTbIlIRCEw0dxVGjswaSdlV0C2GOxK5FHRwTBtT8C1Qh3r7bcGXRIJjHMebO/Gi9jJNaGR5w1Zdi4z4XOKhnz2NS0UaZM1Q/yg5u/T9X3dqkc3NtsRtSlAvcqkLXpJr01M+Xsz0WwPmdcTauJS10yOGPc9xSktw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cgJetIujIpTH3S+W9TWGosMzVWu5sFXVz/DtyknH4BM=;
-        b=JV0MoYAV9Ah9y9mX6EMwYfgBuYYaPUY4Vtgdhk8pNUAzi5XfgOtdMRFoJSw5da+g7b
-         ScmRhWwnph6Ew2mwFfq+tAVGzATIM90EXhnKIuXiZWmS7hihYQlUOfpUAuK9zxWf62jW
-         BZ80VR/ltodBW0LXnRCVlyfCawA+IA4dIDqcxb+qump0199JdLKenSLGK3kWCOk9+zqk
-         02kh8AtBuG5Er22Kae0kVN8qdm8p9RaYoaZ1kQyskApQQsh/DpHuCzfOqjFhllrop5YM
-         CoyYtJQKtVxc/cdF81c070GpMpJRe7SaM6kS3OLsSCEv1gAWKwWFYIJN03oMO68KBUJx
-         lEXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cgJetIujIpTH3S+W9TWGosMzVWu5sFXVz/DtyknH4BM=;
-        b=EOYbwAOUDcADgoTyk9FvrEzxZARgYlPhzbxtKTD0oXi330KAo3PuMA9I56pWb2g282
-         qyttnI6MYEg9YOx6ALZvJ+aO8bUFkWBv4G50A+RufhHEydoifRzyCglkGhF2qGG7r5DV
-         opHmZu/yj+u4mYdxX/oZ5fzPwFf6rlvnrFw4Xkcjo3i4/uLc66iDI0PF5p0lGx/R6fUO
-         SOcRWXsbSPcFhOraXY4G75RLwdrjZ2u7bR4wtJMRcLt38WnZsM8zWezQdsClPVTXhfGz
-         wCXI3jBZN9g6o3zsC87cnb0wwqFjRUbpZGZSmlMlCXDUI0BDXPkqLw0ZGK3+SZEUQoEG
-         tU4g==
-X-Gm-Message-State: APjAAAVKjZ43V9trzuYXL5rvflWrp8m3g2dvheKtQ95C7/xU89oPpuCa
-        WGO5KX5jhIgxLD4329FXa8zZYLumWWrFo/oRyKw=
-X-Google-Smtp-Source: APXvYqyJjYPcylq2tJdi+XpmWzTzJo74Hv8POtQ7C61FrOILZGSI/nkmlgldQs/32rRcnnTdMjVQ5SggqocZH2gYXoI=
-X-Received: by 2002:a5d:8555:: with SMTP id b21mr23821852ios.200.1581632332393;
- Thu, 13 Feb 2020 14:18:52 -0800 (PST)
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=y+NKkAFnf1wCFqWpZ4FwDbTT+ee+Tq7RQ+oCptIR2Z8=;
+ b=TIDVisVY01nPuaUrjQkUGLGe5cX0487G3+ds9d9MGuFqIAtH6b1LeUF6q6LdQIkC7lnUfdr3qfNip4LcYpZIEXuxF5lBYJYCHaheeNnrkzR65ref8i6OIWdiMPx5Qp4dY1T/pTg1Pe/jxWUCGnk5eoJ9WcEGiZhJ7wjGRJJf7hU=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Ashish.Kalra@amd.com; 
+Received: from SN1PR12MB2528.namprd12.prod.outlook.com (52.132.196.33) by
+ SN1PR12MB2589.namprd12.prod.outlook.com (52.132.198.32) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.22; Thu, 13 Feb 2020 22:28:32 +0000
+Received: from SN1PR12MB2528.namprd12.prod.outlook.com
+ ([fe80::fd48:9921:dd63:c6e1]) by SN1PR12MB2528.namprd12.prod.outlook.com
+ ([fe80::fd48:9921:dd63:c6e1%7]) with mapi id 15.20.2707.030; Thu, 13 Feb 2020
+ 22:28:32 +0000
+Date:   Thu, 13 Feb 2020 22:28:25 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 10/12] mm: x86: Invoke hypercall when page encryption
+ status is changed
+Message-ID: <20200213222825.GA8784@ashkalra_ubuntu_server>
+References: <cover.1581555616.git.ashish.kalra@amd.com>
+ <a22c5b534fa035b23e549669fd5ac617b6031158.1581555616.git.ashish.kalra@amd.com>
+ <CALCETrX6Oo00NXn2QfR=eOKD9wvWiov_=WBRwb7V266=hJ2Duw@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrX6Oo00NXn2QfR=eOKD9wvWiov_=WBRwb7V266=hJ2Duw@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: DM3PR11CA0017.namprd11.prod.outlook.com
+ (2603:10b6:0:54::27) To SN1PR12MB2528.namprd12.prod.outlook.com
+ (2603:10b6:802:28::33)
 MIME-Version: 1.0
-References: <20200213213036.207625-1-olvaffe@gmail.com> <8fdb85ea-6441-9519-ae35-eaf91ffe8741@redhat.com>
-In-Reply-To: <8fdb85ea-6441-9519-ae35-eaf91ffe8741@redhat.com>
-From:   Chia-I Wu <olvaffe@gmail.com>
-Date:   Thu, 13 Feb 2020 14:18:41 -0800
-Message-ID: <CAPaKu7T8VYXTMc1_GOzJnwBaZSG214qNoqRr8c7Z4Lb3B7dtTg@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] KVM: x86: honor guest memory type
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org,
-        Gurchetan Singh <gurchetansingh@chromium.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        ML dri-devel <dri-devel@lists.freedesktop.org>
-Content-Type: text/plain; charset="UTF-8"
+Received: from ashkalra_ubuntu_server (165.204.77.1) by DM3PR11CA0017.namprd11.prod.outlook.com (2603:10b6:0:54::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.24 via Frontend Transport; Thu, 13 Feb 2020 22:28:31 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 382e77ec-4c28-4e2a-4aba-08d7b0d40eba
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2589:|SN1PR12MB2589:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB258980DDAA18475FAB0FD4438E1A0@SN1PR12MB2589.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 031257FE13
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(366004)(136003)(396003)(39860400002)(189003)(199004)(316002)(6916009)(33656002)(2906002)(33716001)(956004)(86362001)(8676002)(5660300002)(7416002)(54906003)(81156014)(81166006)(44832011)(8936002)(52116002)(53546011)(6496006)(478600001)(26005)(186003)(16526019)(66556008)(66476007)(66946007)(6666004)(4326008)(9686003)(1076003)(55016002);DIR:OUT;SFP:1101;SCL:1;SRVR:SN1PR12MB2589;H:SN1PR12MB2528.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fLY35JEOJ/oj2l1SKvQ6TdzZ2eSnCpZMwWXyfxCX6ZTHcjFnFw9o1zlOLlBxJDmyfMs3ps5KZgHfwmdItsJz+ObBcpGBmF/0MQBn83NPMe2HxoxMtvHz/hgi+oSbPIZYA5ssZtcmV4/5dk4PBVGUY8XX0Hz6YB5H9JCzz79zLf7nX8BMwgB4v5us0uKS77/4MApvF9Z1qaw38b/N6Qk5I8iQzVDtw3n61gluz1CcyzOjWLJYAHXt8xWvlkzQRnLdxB1xV1K60sp1FcbO6gIO7HToXRyepmiMGRXcZYfHtK5mix0lZwkXxpjc5ZfSVMWAQZMFa5QKjw2pCamJTB/iKeRctgmpi+PlrxE4BwtMTROL8gDW+Bi5Hz7QsRwFNu3rGg1/jNFgEh/BbOcYuEi/3t1rfTb9jS4N9FpYVo08oBkJziGkzIdloTmfBFsNZQib
+X-MS-Exchange-AntiSpam-MessageData: ZxbWk4lLAsy/LsEvo8BG75VYuONXJMPK6tM+xfPsK8spqOOWKxlLIV/9G0QxSFb079I9+OJ2XP6lhDvtGQ17IoaT9gTITOZG0zqJiNax1ZBSbJln/Uo5Y8S7rRa/JiyfYjjAp+3B8LiN5tw/vf8CVw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 382e77ec-4c28-4e2a-4aba-08d7b0d40eba
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2020 22:28:32.6657
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +4ImK4TBmDmKPo0G+SmhxvqNiHU43b/1wxSJYL5HXz3MvZzMP++4HfaurVZA0pa/Dj3FWBswdAF27VAdCihjLg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2589
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 1:41 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 13/02/20 22:30, Chia-I Wu wrote:
-> > Hi,
+On Wed, Feb 12, 2020 at 09:42:02PM -0800, Andy Lutomirski wrote:
+>> On Wed, Feb 12, 2020 at 5:18 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>> >
+>> > From: Brijesh Singh <brijesh.singh@amd.com>
 > >
-> > Host GPU drivers like to give userspace WC mapping.  When the userspace makes
-> > the mapping available to a guest, it also tells the guest to create a WC
-> > mapping.  However, even when the guest kernel picks the correct memory type,
-> > it gets ignored because of VMX_EPT_IPAT_BIT on Intel.
-> >
-> > This series adds a new flag to KVM_SET_USER_MEMORY_REGION, which tells the
-> > host kernel to honor the guest memory type for the memslot.  An alternative
-> > fix is for KVM to unconditionally honor the guest memory type (unless it is
-> > MMIO, to avoid MCEs on Intel).  I believe the alternative fix is how things
-> > are on ARM, and probably also how things are on AMD.
-> >
-> > I am new to KVM and HW virtualization technologies.  This series is meant as
-> > an RFC.
-> >
->
-> When we tried to do this in the past, we got machine checks everywhere
-> unfortunately due to the same address being mapped with different memory
-> types.  Unfortunately I cannot find the entry anymore in bugzilla, but
-> this was not fixed as far as I know.
-Yeah, I did a bit of history digging here
+> > Invoke a hypercall when a memory region is changed from encrypted ->
+> > decrypted and vice versa. Hypervisor need to know the page encryption
+> > status during the guest migration.
+>> 
+>> What happens if the guest memory status doesn't match what the
+>> hypervisor thinks it is?  What happens if the guest gets migrated
+>> between the hypercall and the associated flushes?
 
-  https://gitlab.freedesktop.org/virgl/virglrenderer/issues/151#note_372594
+This is basically same as the dirty page tracking and logging being done
+during Live Migration. As with dirty page tracking and logging we
+maintain a page encryption bitmap in the kernel which keeps tracks of
+guest's page encrypted/decrypted state changes and this bitmap is
+sync'ed regularly from kernel to qemu and also during the live migration
+process, therefore any dirty pages whose encryption status will change
+during migration, should also have their page status updated when the
+page encryption bitmap is sync'ed. 
 
-The bug you mentioned was probably this one
+Also i think that when the amount of dirty pages reach a low threshold,
+QEMU stops the source VM and then transfers all the remaining dirty
+pages, so at that point, there will also be a final sync of the page
+encryption bitmap, there won't be any hypercalls after this as the
+source VM has been stopped and the remaining VM state gets transferred.
 
-  https://bugzilla.kernel.org/show_bug.cgi?id=104091
-
-which was caused by
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fd717f11015f673487ffc826e59b2bad69d20fe5
-
-From what I can tell, the commit allowed the guests to create cached
-mappings to MMIO regions and caused MCEs.  That is different than what
-I need, which is to allow guests to create uncached mappings to system
-ram (i.e., !kvm_is_mmio_pfn) when the host userspace also has uncached
-mappings.  But it is true that this still allows the userspace & guest
-kernel to create conflicting memory types.
-
-Implementation-wise, the current implementation uses
-kvm_arch_register_noncoherent_dma.  It essentially treats a memslot
-with the new flag as a non-coherent vfio device as far as mmu is
-concerned.
-
->
-> Paolo
->
+Thanks,
+Ashish
