@@ -2,165 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D758B15C0FE
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 16:06:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5572015C10D
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 16:08:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727798AbgBMPFw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 10:05:52 -0500
-Received: from mail-eopbgr20084.outbound.protection.outlook.com ([40.107.2.84]:17728
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726937AbgBMPFv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 10:05:51 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=noSSVL51yIXso78V/Drx7VlBIuluW9PG+LVgjG1w9olWlzONG0vk5GF097ZgVVgGVLjfONTjp8ZgizsY0iMIsTg5/3xbYz5TtC1Zaj/HiOv7MID9KBblTdMY+BKT5D43F6nSjZWPj+IZqLWizCmJdvp/ttBQdO8HK978U91K2vwhoEcLa+pGbj9wvF7WWyP9zs+ZEnIAuYEyQ8AsMqMy+kb8QJm20IHsK5xVsp/eWQEpSfdL5++nyy5NOYGg9K6pkCjoIX35+cbj/jJUb44BajK3+lN06/hMtYYWrHMHCpCMc+ihgpht+ovUxKfhZpq7wOnDgXeKzusDKVghFW6d/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AZPJ+StsmdpwxZ9pIrUwvbhuQ3GSj2LQY7edxansr/c=;
- b=auO7HzasFaBNK8rMTYqVUwyEVXw3ndgqgyGRg4JFd62TN/f9KnOwqos6tAso7SgO01jbRhSuRAwVq5ulxv45xbewpExVvHz5vthi5guGv2adn887JJ9GOt0any2OSKV/3C5uXO5WLYy+KNlEn9aoy54h2Ei1/WBnLDyudMW2qE2mWW2BRi3TOwICx1eCzNLWM+ZnANqbngMCO9hABYorhcaK8EvJ/XW1QWvSKA4/AqQPgcdDMc6aOPAA+HoGZbBM/7FX2rdq6JWGh8OTsTP6oS36kShT+d1rHv0WnhPmTdcbn838ahqijUlEWHUY5EGSnWd9d4dC8cQBHgDTZj5biQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AZPJ+StsmdpwxZ9pIrUwvbhuQ3GSj2LQY7edxansr/c=;
- b=tBkJ4bz+01k3FHjFAQjeScwkYVAIiXcdb9dZOeLGXnU5xgUNAvqlKQOoR55pfjNxnVrs/QlYxl+9RcjWfXUVfxbtrb4w16YMhWwHeLThEhF/P5XecE41koHqPqiOompDqUj+6JKjpcx3UjyawrLbdB88xhPdqKLX1nSwAKznJiU=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
- VI1PR05MB4303.eurprd05.prod.outlook.com (52.133.15.147) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Thu, 13 Feb 2020 15:05:46 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2729.025; Thu, 13 Feb 2020
- 15:05:46 +0000
-Date:   Thu, 13 Feb 2020 11:05:42 -0400
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, lingshan.zhu@intel.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
-        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
-        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
-Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
-Message-ID: <20200213150542.GW4271@mellanox.com>
-References: <20200210035608.10002-1-jasowang@redhat.com>
- <20200210035608.10002-4-jasowang@redhat.com>
- <20200211134746.GI4271@mellanox.com>
- <cf7abcc9-f8ef-1fe2-248e-9b9028788ade@redhat.com>
- <20200212125108.GS4271@mellanox.com>
- <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
- <20200213134128.GV4271@mellanox.com>
- <ebaea825-5432-65e2-2ab3-720a8c4030e7@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ebaea825-5432-65e2-2ab3-720a8c4030e7@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: MN2PR13CA0030.namprd13.prod.outlook.com
- (2603:10b6:208:160::43) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:44::15)
+        id S1727529AbgBMPIi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 10:08:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31142 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727163AbgBMPIi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Feb 2020 10:08:38 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01DF0hEA102249
+        for <kvm@vger.kernel.org>; Thu, 13 Feb 2020 10:08:36 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y3wxfttdh-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 13 Feb 2020 10:08:36 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Thu, 13 Feb 2020 15:08:34 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 13 Feb 2020 15:08:32 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01DF8VvV49348740
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Feb 2020 15:08:31 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ACECB4203F;
+        Thu, 13 Feb 2020 15:08:31 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 84ED742047;
+        Thu, 13 Feb 2020 15:08:31 +0000 (GMT)
+Received: from dyn-9-152-224-44.boeblingen.de.ibm.com (unknown [9.152.224.44])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 13 Feb 2020 15:08:31 +0000 (GMT)
+Subject: Re: [PATCH kvm-unit-tests] s390x: unittests: Use smp parameter
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com
+References: <20200213143855.2965-1-drjones@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Thu, 13 Feb 2020 16:08:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR13CA0030.namprd13.prod.outlook.com (2603:10b6:208:160::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.8 via Frontend Transport; Thu, 13 Feb 2020 15:05:46 +0000
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1j2G3i-00051c-IR; Thu, 13 Feb 2020 11:05:42 -0400
-X-Originating-IP: [142.68.57.212]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 1de89200-f5cd-4531-9b8b-08d7b0963424
-X-MS-TrafficTypeDiagnostic: VI1PR05MB4303:|VI1PR05MB4303:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR05MB4303985C9353290AE0B7AFC5CF1A0@VI1PR05MB4303.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-Forefront-PRVS: 031257FE13
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39860400002)(346002)(136003)(376002)(366004)(199004)(189003)(66946007)(66556008)(66476007)(1076003)(5660300002)(2616005)(9786002)(9746002)(6916009)(33656002)(7416002)(36756003)(81156014)(316002)(8936002)(8676002)(186003)(4326008)(52116002)(26005)(2906002)(478600001)(81166006)(86362001)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB4303;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-Received-SPF: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0JV+7gcnIpRhY7xy6VlPe50jvbWAdQ/VgWpnmlYS34kEZItBzHLgfbAd/fYyRfdKFbMYcXiOcppWPg8eLl3BnIyMXf46EypX4A5RCDbE2HnB6AH883q9UTzAum9lTkHdN65ojwxUaBUVBbhnq4WZjidZgMKSyG30Y2g1iQdJVU2tQrA6P6h66Qcn9aEqmEfvyKnqcL1k53Xwrx7kqu338aTR+z7Te+hyDmJSVAbnH+yBcz5lzerUybhblGGE7sfkJ3Fz3NG1bMZHjU+3gE6Nq4fQWLZUsFxPE3ymVr6d/PLhSmFkz/kEVq1meF3rOZgeM8p+rS68ypsvb4NALoxLcLx2LQcjlCd5nnyF8NDjE6zvqOx4DVvEC9Ysye4k4vSfben30/By6mA9CAZrOqiBkOE6Pe7p1MPD2kBfGo3ce2OHsw3OSFe73DGvoSVNwZ89Ms391nHJPhotRJtdC8AlB8KCFX38ZCYElvVd6GKfv04vrHrPpSLBT3ZozYI4RnK+
-X-MS-Exchange-AntiSpam-MessageData: 2knGk/lhiSDBLfVEG7p0Gewtp8omMkfE3scWuR+/HuuJOhjjlZkqIzDQKVVisdnCgG+519Dq90GIstvc/zU8uaEKzqfVK+93ZRGfMb95diSCoQqiOEeUSwVMv1aK84dGAUOToRglULVP5wZO/icr5w==
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1de89200-f5cd-4531-9b8b-08d7b0963424
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2020 15:05:46.5619
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5OgHvRSQiJaIqUR0iQv5SiJgQj0mFopLu5IxDzpYTxDmC7hHopdzG/PriGlsv9ctdMmatxPwkpEhdRPisGqssg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB4303
+In-Reply-To: <20200213143855.2965-1-drjones@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="OoCrLLzlIsqrpCmIGKuoYOw8Xxehl2wfL"
+X-TM-AS-GCONF: 00
+x-cbid: 20021315-0028-0000-0000-000003DA3789
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021315-0029-0000-0000-0000249EAF0F
+Message-Id: <33d2e4cd-d43f-d93c-2958-8603e8f899e8@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-13_05:2020-02-12,2020-02-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ malwarescore=0 suspectscore=3 clxscore=1015 mlxscore=0 priorityscore=1501
+ bulkscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002130119
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 10:58:44PM +0800, Jason Wang wrote:
-> 
-> On 2020/2/13 下午9:41, Jason Gunthorpe wrote:
-> > On Thu, Feb 13, 2020 at 11:34:10AM +0800, Jason Wang wrote:
-> > 
-> > > >    You have dev, type or
-> > > > class to choose from. Type is rarely used and doesn't seem to be used
-> > > > by vdpa, so class seems the right choice
-> > > > 
-> > > > Jason
-> > > Yes, but my understanding is class and bus are mutually exclusive. So we
-> > > can't add a class to a device which is already attached on a bus.
-> > While I suppose there are variations, typically 'class' devices are
-> > user facing things and 'bus' devices are internal facing (ie like a
-> > PCI device)
-> 
-> 
-> Though all vDPA devices have the same programming interface, but the
-> semantic is different. So it looks to me that use bus complies what
-> class.rst said:
-> 
-> "
-> 
-> Each device class defines a set of semantics and a programming interface
-> that devices of that class adhere to. Device drivers are the
-> implementation of that programming interface for a particular device on
-> a particular bus.
-> 
-> "
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OoCrLLzlIsqrpCmIGKuoYOw8Xxehl2wfL
+Content-Type: multipart/mixed; boundary="akhPVFoIO5rT22x1JPfyQZI27K8J9oGen"
 
-Here we are talking about the /dev/XX node that provides the
-programming interface. All the vdpa devices have the same basic
-chardev interface and discover any semantic variations 'in band'
+--akhPVFoIO5rT22x1JPfyQZI27K8J9oGen
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> > So why is this using a bus? VDPA is a user facing object, so the
-> > driver should create a class vhost_vdpa device directly, and that
-> > driver should live in the drivers/vhost/ directory.
->  
-> This is because we want vDPA to be generic for being used by different
-> drivers which is not limited to vhost-vdpa. E.g in this series, it allows
-> vDPA to be used by kernel virtio drivers. And in the future, we will
-> probably introduce more drivers in the future.
+On 2/13/20 3:38 PM, Andrew Jones wrote:
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  s390x/unittests.cfg | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 07013b2b8748..aa6d5d96e292 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -74,7 +74,7 @@ file =3D stsi.elf
+> =20
+>  [smp]
+>  file =3D smp.elf
+> -extra_params =3D-smp 2
+> +smp =3D 2
+> =20
 
-I don't see how that connects with using a bus.
+That should've been part of the VMM patchset?
 
-Every class of virtio traffic is going to need a special HW driver to
-enable VDPA, that special driver can create the correct vhost side
-class device.
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-> > For the PCI VF case this driver would bind to a PCI device like
-> > everything else
-> > 
-> > For our future SF/ADI cases the driver would bind to some
-> > SF/ADI/whatever device on a bus.
-> 
-> All these driver will still be bound to their own bus (PCI or other). And
-> what the driver needs is to present a vDPA device to virtual vDPA bus on
-> top.
+>  [sclp-1g]
+>  file =3D sclp.elf
+>=20
 
-Again, I can't see any reason to inject a 'vdpa virtual bus' on
-top. That seems like mis-using the driver core.
 
-Jason
+
+--akhPVFoIO5rT22x1JPfyQZI27K8J9oGen--
+
+--OoCrLLzlIsqrpCmIGKuoYOw8Xxehl2wfL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5FZm8ACgkQ41TmuOI4
+ufg0Xw//ZXgY+8qmDWKfzwXzIK9w9m2TQJsHVJ4m415tNkkFIuuDcukdIJYwYHaC
+5nwa3DR9sdrSV9p809mDlDo1wrAQw03rmlFoElvtezZhMg78e64zkVqjeodMLc1I
+juffF52X3NTpB0UQaayQ8HwWbQN7Nb3/1lxV8VKa2zpzlFu/dN/U6zMBS0Mc4pa7
+gt6tIJ18ePahm/jl8WXRzfY3+eqgUC0y27pwVIUdZCjV+hsvPFHapJto8KE8RLIr
+svv5lOtRibkDczCPIQWxMLO3zPd7elh2QwqIewRT4FVqnmsnxiGXDzorxICerx1M
+Ed+xuf6c/lKYvna+rQncpvCrxQmvBJtecVTO8zKO8jueQUtVEFsa5lwhNb8rdfx4
+7H/sjtmElUQ7W36SOM+u2TK/aOrYatn0sACxY6Wojot4tkuwkwLcGago9I6So7Lr
+ssG8a8qNcRzY9NeuHrBw3nsIWYM4gmFMiDIueRMblr8J1poa8webHBa7OyRZlhMw
+wmq7nLcTIdDwVcSDoIHt3GCth0IVhN8hQM53LAVYG76BIBRbNUgjXsyqJz4o3kBU
+AkCfKoYcMCsVqtJ+qbEwG+8zcBxaZv1BdfbyO4H3BfGvATJnywIinKRL1b93Fq2Q
+6nXowDoSeJyouhU4ExqvcgqnBcjtThVhmNTyFaLxV7ilTgJYa18=
+=z3qm
+-----END PGP SIGNATURE-----
+
+--OoCrLLzlIsqrpCmIGKuoYOw8Xxehl2wfL--
+
