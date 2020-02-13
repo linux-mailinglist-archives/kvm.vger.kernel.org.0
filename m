@@ -2,118 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A902115B7D1
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 04:34:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30BF515B924
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 06:42:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729519AbgBMDed (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Feb 2020 22:34:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49267 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729443AbgBMDed (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Feb 2020 22:34:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581564872;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jveoJYEei31LnYAAA1c+qGj2sc1cBfYcZJcuE3oKpzU=;
-        b=IfPK6GPzSSAIyATiMStCwXT2kh68/p284zdYWH+8CY6l76AopclO/eX3YHmeKFsuvPr5Am
-        q1nS3SwZVmi8pUL/4UPWNpoH7vda/MPaZzqX414W3MgrolwzBxpO1HgF+wfjKFLroU7xhX
-        hrlz0pe6YcE9RPyTUi78rIy7E+dwf1E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-_Su18Ee-OOmoGnyCqHCCHA-1; Wed, 12 Feb 2020 22:34:30 -0500
-X-MC-Unique: _Su18Ee-OOmoGnyCqHCCHA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBD04800D41;
-        Thu, 13 Feb 2020 03:34:27 +0000 (UTC)
-Received: from [10.72.13.212] (ovpn-13-212.pek2.redhat.com [10.72.13.212])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 54EF710002B6;
-        Thu, 13 Feb 2020 03:34:12 +0000 (UTC)
-Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
-To:     Jason Gunthorpe <jgg@mellanox.com>
-Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, lingshan.zhu@intel.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
-        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
-        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
-References: <20200210035608.10002-1-jasowang@redhat.com>
- <20200210035608.10002-4-jasowang@redhat.com>
- <20200211134746.GI4271@mellanox.com>
- <cf7abcc9-f8ef-1fe2-248e-9b9028788ade@redhat.com>
- <20200212125108.GS4271@mellanox.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
-Date:   Thu, 13 Feb 2020 11:34:10 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1729383AbgBMFmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 00:42:16 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44997 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725773AbgBMFmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Feb 2020 00:42:16 -0500
+Received: by mail-wr1-f68.google.com with SMTP id m16so5076797wrx.11
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2020 21:42:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=KrVdZxUS3EdrVwf2LulQeNvZSOGZj8UErtKTW8hDsp4=;
+        b=w1uRGrofq8Crx4GZdwfV4wkquRC4twWMACVsFhy2Vd8PPoWrSLPsxcRraKzCuVKIas
+         Yg8oy6NL12nIc2ofcDMw5Tajqly5YvuLoiTrfpyyGDjxQPqciZAWZfOsY7hNhULFrF6L
+         K4fsc3JRjcrporH+RWc5Q/v4uWanuptrZUE2GDS9EZlDKH3N0XZmdHtexNAwuKl2vtXm
+         npgUYKosKJR+H4OijQ/5Yrn5Uo2wtxngqiaxUjSL+WiGbkltgks4pFgKLX2UEeQHwgvJ
+         H35ywMcxhefmRoAbu3nSPcAQcbfd6CZgIDR6yj6SV0FARWPbdYa3bz9XBLfLsZi3+Gfd
+         FIjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=KrVdZxUS3EdrVwf2LulQeNvZSOGZj8UErtKTW8hDsp4=;
+        b=f9v98tv8ACtyEU/o/mVqXvIsJhDCSKeF+NdoHwUMRjpZD6fibyrxxpTfnvIKiakmSM
+         +GN3BWfg7z205k+v+E3htDbXa86BSz3w9yDQNm7xhi2RWpW4ekpPBZdy8g+1WJpZNX4L
+         9hdzlzDNJ4yYbq3mDfa8Iomfx/WoURmsD61zPYv1JYzMK+uYSq61OXlCg27OjqQFjckK
+         9ZxZhf931Kdw5gRq8oXxkNHbGFDiWztmI3VY2IqN0SHi3/1ePXtbiETVRfHc7OcqdLKs
+         cuhp2meHwZ5zRYZHuefFfR03hwmHFPiG6MNIa2RWpTyzGstTBbmS6g1QpVbDMpI2iEN9
+         078w==
+X-Gm-Message-State: APjAAAUkatuEbyfgANpg/ja7grwwL0oGGPjWb17t4NkvhLC5piEe0vTt
+        h9isY6IyXlDZSBu0gp5jQhjf9gc0FJeiJyQXjlAEoA==
+X-Google-Smtp-Source: APXvYqzbLibnTsVhaOasUfqj4QQmDz+9rvU/9cSEEzpgU+tO3apNBRAozS/osrvVGr+j/63o9K7WjhWWHKgRCSrzUj0=
+X-Received: by 2002:adf:ea85:: with SMTP id s5mr19169000wrm.75.1581572533390;
+ Wed, 12 Feb 2020 21:42:13 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200212125108.GS4271@mellanox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+References: <cover.1581555616.git.ashish.kalra@amd.com> <a22c5b534fa035b23e549669fd5ac617b6031158.1581555616.git.ashish.kalra@amd.com>
+In-Reply-To: <a22c5b534fa035b23e549669fd5ac617b6031158.1581555616.git.ashish.kalra@amd.com>
+From:   Andy Lutomirski <luto@amacapital.net>
+Date:   Wed, 12 Feb 2020 21:42:02 -0800
+Message-ID: <CALCETrX6Oo00NXn2QfR=eOKD9wvWiov_=WBRwb7V266=hJ2Duw@mail.gmail.com>
+Subject: Re: [PATCH 10/12] mm: x86: Invoke hypercall when page encryption
+ status is changed
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/2/12 =E4=B8=8B=E5=8D=888:51, Jason Gunthorpe wrote:
-> On Wed, Feb 12, 2020 at 03:55:31PM +0800, Jason Wang wrote:
->>> The ida_simple_remove should probably be part of the class release
->>> function to make everything work right
->> It looks to me bus instead of class is the correct abstraction here si=
-nce
->> the devices share a set of programming interface but not the semantics=
-.
-> device_release() doesn't call the bus release?
-
-
-What it did is:
-
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dev->release)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 dev->release(dev);
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else if (dev->type && dev->ty=
-pe->release)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 dev->type->release(dev);
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else if (dev->class && dev->c=
-lass->dev_release)
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 dev->class->dev_release(dev);
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 WARN(1, KERN_ERR "Device '%s' does not have a release(=
-)=20
-function, it is broken and must be fixed. See Documentation/kobject.txt.\=
-n",
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev_na=
-me(dev));
-
-So it looks not.
-
-
->   You have dev, type or
-> class to choose from. Type is rarely used and doesn't seem to be used
-> by vdpa, so class seems the right choice
+On Wed, Feb 12, 2020 at 5:18 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
 >
-> Jason
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> Invoke a hypercall when a memory region is changed from encrypted ->
+> decrypted and vice versa. Hypervisor need to know the page encryption
+> status during the guest migration.
 
-
-Yes, but my understanding is class and bus are mutually exclusive. So we=20
-can't add a class to a device which is already attached on a bus.
-
-Thanks
-
-
+What happens if the guest memory status doesn't match what the
+hypervisor thinks it is?  What happens if the guest gets migrated
+between the hypercall and the associated flushes?
