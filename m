@@ -2,63 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33D9A15B742
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 03:44:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 277F615B746
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 03:46:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729440AbgBMCov (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Feb 2020 21:44:51 -0500
-Received: from mga02.intel.com ([134.134.136.20]:62751 "EHLO mga02.intel.com"
+        id S1729522AbgBMCqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Feb 2020 21:46:37 -0500
+Received: from mga12.intel.com ([192.55.52.136]:48365 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729407AbgBMCov (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Feb 2020 21:44:51 -0500
+        id S1729407AbgBMCqg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Feb 2020 21:46:36 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Feb 2020 18:44:50 -0800
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Feb 2020 18:46:36 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,434,1574150400"; 
-   d="scan'208";a="257028350"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by fmsmga004.fm.intel.com with ESMTP; 12 Feb 2020 18:44:50 -0800
-Received: from fmsmsx114.amr.corp.intel.com (10.18.116.8) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 12 Feb 2020 18:44:50 -0800
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- FMSMSX114.amr.corp.intel.com (10.18.116.8) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 12 Feb 2020 18:44:49 -0800
+   d="scan'208";a="380962571"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by orsmga004.jf.intel.com with ESMTP; 12 Feb 2020 18:46:36 -0800
+Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 12 Feb 2020 18:46:35 -0800
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 12 Feb 2020 18:46:35 -0800
 Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.222]) with mapi id 14.03.0439.000;
- Thu, 13 Feb 2020 10:44:47 +0800
+ shsmsx102.ccr.corp.intel.com ([169.254.2.126]) with mapi id 14.03.0439.000;
+ Thu, 13 Feb 2020 10:46:33 +0800
 From:   "Liu, Yi L" <yi.l.liu@intel.com>
 To:     Peter Xu <peterx@redhat.com>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Wu, Hao" <hao.wu@intel.com>,
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
         Yi Sun <yi.y.sun@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        "Eduardo Habkost" <ehabkost@redhat.com>
-Subject: RE: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be string
- option
-Thread-Topic: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be
- string option
-Thread-Index: AQHV1p1OaPbyEoP2OUqqqdiprp3R66gV87yAgAFI6dCAAAyTAIABOICQ
-Date:   Thu, 13 Feb 2020 02:44:47 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A1BBC3E@SHSMSX104.ccr.corp.intel.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: RE: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
+Thread-Topic: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
+Thread-Index: AQHV1p1ISlCEZJtKwkqCei/mecuDIagDpFsAgADzWWCAES39gIABZmlAgAAbggCAATpJsA==
+Date:   Thu, 13 Feb 2020 02:46:32 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A1BBC65@SHSMSX104.ccr.corp.intel.com>
 References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-14-git-send-email-yi.l.liu@intel.com>
- <20200211194331.GK984290@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A1BA573@SHSMSX104.ccr.corp.intel.com>
- <20200212160544.GC1083891@xz-x1>
-In-Reply-To: <20200212160544.GC1083891@xz-x1>
+ <1580300216-86172-4-git-send-email-yi.l.liu@intel.com>
+ <20200131040644.GG15210@umbus.fritz.box>
+ <A2975661238FB949B60364EF0F2C25743A199306@SHSMSX104.ccr.corp.intel.com>
+ <20200211165843.GG984290@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A1BA4D8@SHSMSX104.ccr.corp.intel.com>
+ <20200212155958.GB1083891@xz-x1>
+In-Reply-To: <20200212155958.GB1083891@xz-x1>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -67,7 +64,7 @@ dlp-product: dlpe-windows
 dlp-version: 11.2.0.6
 dlp-reaction: no-action
 x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNGFjNDMyMmQtZWQxZS00MjU2LWE3MTgtYmQ3MTQyMTZiYzNmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiS2FXMGZRVkoxUVdoOG9IbjVUc2pMR1RcLzZvXC9nSmR2M2V5UFR3c0ZmTE9pT3RPWFlVV1BlY1B3TGVHRUhVZURrIn0=
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOTE4YzZhOTMtNjg0Yi00ZGU2LWE4NzAtNWMzMWE4MTQ0YjhjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSjlxaThVSGt4dmp0N0RzOXM2TzEzOGgwdWJUSVpDTmRtQmQ1aXlCRFI3QXRCRzhvdFZcL2ZFcmFqY2NiZWc0eHUifQ==
 x-originating-ip: [10.239.127.40]
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
@@ -78,33 +75,25 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFRodXJzZGF5LCBG
-ZWJydWFyeSAxMywgMjAyMCAxMjowNiBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRl
-bC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIHYzIDEzLzI1XSBpbnRlbF9pb21tdTogbW9kaWZ5
-IHgtc2NhbGFibGUtbW9kZSB0byBiZSBzdHJpbmcNCj4gb3B0aW9uDQo+IA0KPiBPbiBXZWQsIEZl
-YiAxMiwgMjAyMCBhdCAwNzoyODoyNEFNICswMDAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gPiBG
-cm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiBTZW50OiBXZWRuZXNkYXks
-IEZlYnJ1YXJ5IDEyLCAyMDIwIDM6NDQgQU0NCj4gPiA+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1
-QGludGVsLmNvbT4NCj4gPiA+IFN1YmplY3Q6IFJlOiBbUkZDIHYzIDEzLzI1XSBpbnRlbF9pb21t
-dTogbW9kaWZ5IHgtc2NhbGFibGUtbW9kZSB0bw0KPiA+ID4gYmUgc3RyaW5nIG9wdGlvbg0KPiA+
-ID4NCj4gPiA+IE9uIFdlZCwgSmFuIDI5LCAyMDIwIGF0IDA0OjE2OjQ0QU0gLTA4MDAsIExpdSwg
-WWkgTCB3cm90ZToNCj4gPiA+ID4gRnJvbTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4N
-Cj4gPiA+ID4NCj4gPiA+ID4gSW50ZWwgVlQtZCAzLjAgaW50cm9kdWNlcyBzY2FsYWJsZSBtb2Rl
-LCBhbmQgaXQgaGFzIGEgYnVuY2ggb2YNCj4gPiA+ID4gY2FwYWJpbGl0aWVzIHJlbGF0ZWQgdG8g
-c2NhbGFibGUgbW9kZSB0cmFuc2xhdGlvbiwgdGh1cyB0aGVyZSBhcmUNCj4gPiA+ID4gbXVsdGlw
-bGUNCj4gPiA+IGNvbWJpbmF0aW9ucy4NCj4gPiA+ID4gV2hpbGUgdGhpcyB2SU9NTVUgaW1wbGVt
-ZW50YXRpb24gd2FudHMgc2ltcGxpZnkgaXQgZm9yIHVzZXIgYnkNCj4gPiA+ID4gcHJvdmlkaW5n
-IHR5cGljYWwgY29tYmluYXRpb25zLiBVc2VyIGNvdWxkIGNvbmZpZyBpdCBieQ0KPiA+ID4gPiAi
-eC1zY2FsYWJsZS1tb2RlIiBvcHRpb24uIFRoZSB1c2FnZSBpcyBhcyBiZWxvdzoNCj4gPiA+ID4N
-Cj4gPiA+ID4gIi1kZXZpY2UgaW50ZWwtaW9tbXUseC1zY2FsYWJsZS1tb2RlPVsibGVnYWN5Inwi
-bW9kZXJuIl0iDQo+ID4gPg0KPiA+ID4gTWF5YmUgYWxzbyAib2ZmIiB3aGVuIHNvbWVvbmUgd2Fu
-dHMgdG8gZXhwbGljaXRseSBkaXNhYmxlIGl0Pw0KPiA+DQo+ID4gZW1tbSwgSSAgdGhpbmsgeC1z
-Y2FsYWJsZS1tb2RlIHNob3VsZCBiZSBkaXNhYmxlZCBieSBkZWZhdWx0LiBJdCBpcw0KPiA+IGVu
-YWJsZWQgb25seSB3aGVuICJsZWdhY3kiIG9yICJtb2Rlcm4iIGlzIGNvbmZpZ3VyZWQuIEknbSBm
-aW5lIHRvIGFkZA0KPiA+ICJvZmYiIGFzIGFuIGV4cGxpY2l0IHdheSB0byB0dXJuIGl0IG9mZiBp
-ZiB5b3UgdGhpbmsgaXQgaXMgbmVjZXNzYXJ5Lg0KPiA+IDotKQ0KPiANCj4gSXQncyBub3QgbmVj
-ZXNzYXJ5LiAgSXQnbGwgYmUgbmVjZXNzYXJ5IHdoZW4gd2UgcmVtb3ZlICJ4LSIgYW5kIGNoYW5n
-ZSB0aGUNCj4gZGVmYXVsdCB2YWx1ZS4gIEhvd2V2ZXIgaXQnbGwgYWx3YXlzIGJlIGdvb2QgdG8g
-cHJvdmlkZSBhbGwgb3B0aW9ucyBleHBsaWNpdGx5IGluIHRoZQ0KPiBwYXJhbWV0ZXIgc3RhcnRp
-bmcgZnJvbSB3aGVuIHdlIGRlc2lnbiBpdCwgaW1oby4gIEl0J3Mgc3RpbGwgZXhwZXJpbWVudGFs
-LCBzby4uLg0KPiBZb3VyIGNhbGwuIDopDQoNCkdvdCBpdC4gTGV0IG1lIGFkZCBpdCBpbiBuZXh0
-IHZlcnNpb24uIPCfmIoNCg0KUmVnYXJkcywNCllpIExpdQ0K
+ZWJydWFyeSAxMywgMjAyMCAxMjowMCBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRl
+bC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIHYzIDAzLzI1XSBody9pb21tdTogaW50cm9kdWNl
+IElPTU1VQ29udGV4dA0KPiANCj4gT24gV2VkLCBGZWIgMTIsIDIwMjAgYXQgMDc6MTU6MTNBTSAr
+MDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiANCj4gWy4uLl0NCj4gDQo+ID4gV2hpbGUgY29uc2lk
+ZXJpbmcgeW91ciBzdWdnZXN0aW9uIG9uIGRyb3BwaW5nIG9uZSBvZiB0aGUgdHdvIGFic3RyYWN0
+DQo+ID4gbGF5ZXJzLiBJIGNhbWUgdXAgYSBuZXcgcHJvcG9zYWwgYXMgYmVsb3c6DQo+ID4NCj4g
+PiBXZSBtYXkgZHJvcCB0aGUgSU9NTVVDb250ZXh0IGluIHRoaXMgc2VyaWVzLCBhbmQgcmVuYW1l
+DQo+ID4gRHVhbFN0YWdlSU9NTVVPYmplY3QgdG8gSG9zdElPTU1VQ29udGV4dCwgd2hpY2ggaXMg
+cGVyLXZmaW8tY29udGFpbmVyLg0KPiA+IEFkZCBhbiBpbnRlcmZhY2UgaW4gUENJIGxheWVyKGUu
+Zy4gYW4gY2FsbGJhY2sgaW4gIFBDSURldmljZSkgdG8gbGV0IHZJT01NVSBnZXQNCj4gSG9zdElP
+TU1VQ29udGV4dC4NCj4gPiBJIHRoaW5rIHRoaXMgY291bGQgY292ZXIgdGhlIHJlcXVpcmVtZW50
+IG9mIHByb3ZpZGluZyBleHBsaWNpdCBtZXRob2QNCj4gPiBmb3IgdklPTU1VIHRvIGNhbGwgaW50
+byBWRklPIGFuZCB0aGVuIHByb2dyYW0gaG9zdCBJT01NVS4NCj4gPg0KPiA+IFdoaWxlIGZvciB0
+aGUgcmVxdWlyZW1lbnQgb2YgVkZJTyB0byB2SU9NTVUgY2FsbGluZ3MgKGUuZy4gUFJRKSwgSQ0K
+PiA+IHRoaW5rIGl0IGNvdWxkIGJlIGRvbmUgdmlhIFBDSSBsYXllciBieSBhZGRpbmcgYW4gb3Bl
+cmF0aW9uIGluIFBDSUlPTU1VT3BzLg0KPiBUaG91Z2h0cz8NCj4gDQo+IEhtbSBzb3VuZHMgZ29v
+ZC4gOikNCj4gDQo+IFRoZSB0aGluZyBpcyBmb3IgdGhlIGNhbGxzIHRvIHRoZSBvdGhlciBkaXJl
+Y3Rpb24gKGUuZy4gVkZJTyBpbmplY3RpbmcgZmF1bHRzIHRvDQo+IHZJT01NVSksIHRoYXQncyBu
+ZWl0aGVyIHBlci1jb250YWluZXIgbm9yIHBlci1kZXZpY2UsIGJ1dCBwZXItdklPTU1VLg0KPiBQ
+Q0lJT01NVU9wcyBzdWl0ZXMgZm9yIHRoYXQgam9iIEknZCBzYXksIHdoaWNoIGlzIHBlci12SU9N
+TVUuDQo+IA0KPiBMZXQncyBzZWUgaG93IGl0IGdvZXMuDQoNClRoYW5rcywgbGV0IG1lIGdldCBh
+IG5ldyB2ZXJzaW9uIGJ5IGVuZC1vZiB0aGlzIHdlZWsuDQoNClJlZ2FyZHMsDQpZaSBMaXUNCg0K
