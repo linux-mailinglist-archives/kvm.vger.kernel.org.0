@@ -2,156 +2,458 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5552815CE83
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 00:09:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74BBF15CE96
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 00:20:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727754AbgBMXJW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 18:09:22 -0500
-Received: from mail-bn8nam11on2084.outbound.protection.outlook.com ([40.107.236.84]:36800
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726780AbgBMXJW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 18:09:22 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jkaTCPwYZTzO2kgyTuiEz/aCcWqaE5y8P6gXv8Afh4mfchQoz+OOjeUDKE+s0g6a6KnbmDi9n/EKWQ73JFq+v0WrSvri5yoI8DzkDmdT7nab8F0Iq2/kewiG9AymzzqcgwsV6iKLX+4NkV97kpOLPs+ayWbHPVdTSW40tnK0+v/r1busP+rKksPvUw/tD346cxJMd/sgdApWlD9MJh+2MJEALz+9WMdKMtifMl+kZAHpQgc/+WaHspdp7vhcrSS5Ep/mSMwueDPw6MnV6qGzZvsBqhqBL+rM5B8j1dDwhWZvbFOTwyMZikDrIwTVFKsXmyNLy1L6/cxz9whprJbGiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q3vNUy6bhNEdoneOpVv8/qGwSMpnJig9Z1U/0TN5d7A=;
- b=c34W+HSxpuegmL9Zh1GBbN49+mrMC2R1gu4Uo0Ss0Wuu81NRREcVEYalAcCE9im5p53I0lL69iHdb+oZ/rI1AoFritRH4p2uN5y1/TTk5+T1R6WS4PWKvUOBsvix1HR6p/OoFJIA4C8nc8GJ0Rn8gldkQ48/gzhZknmaTZ3jcoePD5d9G6fPvEp1vIEYA0TaT3SDN5mHznkC1B2GoJDbsZNHIEnStqwrFY4dl8psdqkqX09LqYTDVihMQxtSJEHLtoK/UAQejw8H97Xem63uL/g4gVeM7nAtZYAI7l7H+djKK2RfPDI3oPrDch8nww0sDHXmq7xoyizQvVdVpODLAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q3vNUy6bhNEdoneOpVv8/qGwSMpnJig9Z1U/0TN5d7A=;
- b=cuED20UmV+ccVXmIuqxwo/cZdUICsSV6/byTJCbHw21W/tdlecANuVrE+Z3mchKW+kL95ywHOt1yli/nrOL+7/UgNDV4T2z7LM0AbDlGyArU47JQP2Tq3sc4LROZP6TSNTP/Q2jejnlzkSi9QR77AGvUpnb3RgpXQpX+O0tywDc=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Ashish.Kalra@amd.com; 
-Received: from SN1PR12MB2528.namprd12.prod.outlook.com (52.132.196.33) by
- SN1PR12MB2351.namprd12.prod.outlook.com (52.132.197.139) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.22; Thu, 13 Feb 2020 23:09:18 +0000
-Received: from SN1PR12MB2528.namprd12.prod.outlook.com
- ([fe80::fd48:9921:dd63:c6e1]) by SN1PR12MB2528.namprd12.prod.outlook.com
- ([fe80::fd48:9921:dd63:c6e1%7]) with mapi id 15.20.2707.030; Thu, 13 Feb 2020
- 23:09:18 +0000
-Date:   Thu, 13 Feb 2020 23:09:16 +0000
-From:   Ashish Kalra <ashish.kalra@amd.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, brijesh.singh@amd.com
-Subject: Re: [PATCH 00/12] SEV Live Migration Patchset.
-Message-ID: <20200213230916.GB8784@ashkalra_ubuntu_server>
-References: <cover.1581555616.git.ashish.kalra@amd.com>
- <CALCETrXE9cWd3TbBZMsAwmSwWpDYFsicLZ=amHLWsvE0burQSw@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALCETrXE9cWd3TbBZMsAwmSwWpDYFsicLZ=amHLWsvE0burQSw@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: SN1PR12CA0086.namprd12.prod.outlook.com
- (2603:10b6:802:21::21) To SN1PR12MB2528.namprd12.prod.outlook.com
- (2603:10b6:802:28::33)
+        id S1727595AbgBMXUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 18:20:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38483 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727347AbgBMXUW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Feb 2020 18:20:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581636020;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K4/VgbNnOlfRscNQs3tU1+OFCu3BgXVR7Omh3XCio2Q=;
+        b=Vh0seEBj2bmvMuVfiEwhGLs/JmcG5XlYvusj3iAGYqONGMR0zpI6tC104GIrW94+iKrFIt
+        Z1pFLChinU6nkklxOWMsnHSfef+GZWXSivRbBNvPgxSHemtZtkygRYfPHaTBrm2LPPgH1n
+        uxhpQHJC5+TF/S4LdTYzUR7a+uO7YhU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-ncBwiqwUObCxPfPSKztTMA-1; Thu, 13 Feb 2020 18:20:18 -0500
+X-MC-Unique: ncBwiqwUObCxPfPSKztTMA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7BF9477;
+        Thu, 13 Feb 2020 23:20:15 +0000 (UTC)
+Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5042A5C1C3;
+        Thu, 13 Feb 2020 23:20:13 +0000 (UTC)
+Date:   Thu, 13 Feb 2020 16:20:11 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v12 Kernel 4/7] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20200213162011.40b760a8@w520.home>
+In-Reply-To: <0244aca6-80f7-1c1d-812e-d53a48b5479d@nvidia.com>
+References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
+        <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
+        <20200210102518.490a0d87@x1.home>
+        <7e7356c8-29ed-31fa-5c0b-2545ae69f321@nvidia.com>
+        <20200212161320.02d8dfac@w520.home>
+        <0244aca6-80f7-1c1d-812e-d53a48b5479d@nvidia.com>
 MIME-Version: 1.0
-Received: from ashkalra_ubuntu_server (165.204.77.1) by SN1PR12CA0086.namprd12.prod.outlook.com (2603:10b6:802:21::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.29 via Frontend Transport; Thu, 13 Feb 2020 23:09:17 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 42ea5417-0973-4bf5-bf01-08d7b0d9c099
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2351:|SN1PR12MB2351:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2351C7DB4B967ED1DB6DC36A8E1A0@SN1PR12MB2351.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 031257FE13
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(39860400002)(396003)(346002)(376002)(136003)(199004)(189003)(8936002)(53546011)(478600001)(33716001)(44832011)(81156014)(8676002)(81166006)(1076003)(956004)(26005)(316002)(6916009)(54906003)(6496006)(52116002)(33656002)(16526019)(186003)(5660300002)(4326008)(7416002)(9686003)(66476007)(66946007)(66556008)(2906002)(86362001)(55016002);DIR:OUT;SFP:1101;SCL:1;SRVR:SN1PR12MB2351;H:SN1PR12MB2528.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WosHpiu6zs2ufpZgdEY18YBgWws39edNPF29A0/0tSxOFL2uanlRufuewHsS1t8LPEOHPUlh/PTRyUj4jMaEEFlZhh0ELrvqFGP7/iEHKWY2Z5g+0xOPAjsOm1TJmXNAw8UCxUIQG5FRxk8H5Zki7TUZoGMqz7tnTkrMg05KvLSl6gy+eSJlRTeZgJxIkTl/tdz6LVNE7IT1Xd5X4/8D1XF1jd2S1TLtc+UGikPNiJo73C9dFSwk4HQA7jW9Vbqp4nNHavg1ZwdiJwHWfzV66PhWom4ba8BF+X8txPHf2JIhbR8cHW9rhMvV/uugyXeXHtkkFcAr6FziK87Y1As6Q3PhKpfqPl5X0AhWhDecrswb0j5dl5ousDeaIUuxZBlhCf9Xbf/0opIj0xKBSTPQeBC75kHmf/d9FJhGID207cPLn5F6QOcuB5MBkPntyZDV
-X-MS-Exchange-AntiSpam-MessageData: 6dWqZzK8LNUTQal7671Qe8D1t8+CRC7oln/rxQfUeNzWZ+xJ+cnoQpN80/DRT91uxzTExRXXuS+4XKsBPe43JnzlbRge8nofb4EgPayon5cYESARdZ9LqwiUXnQ+VZ9WIUaOaF0496NJiQpmgOAw1A==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42ea5417-0973-4bf5-bf01-08d7b0d9c099
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2020 23:09:18.3986
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +zmNw0aJtE0TV5+cmyr2X+8IwY77dQK0uZPXeH43cC6aJh7IVNpc9rGD7O9zrS7lASAoOyzaxij3XmfsK6IdKA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2351
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 12, 2020 at 09:43:41PM -0800, Andy Lutomirski wrote:
-> On Wed, Feb 12, 2020 at 5:14 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
-> >
-> > From: Ashish Kalra <ashish.kalra@amd.com>
-> >
-> > This patchset adds support for SEV Live Migration on KVM/QEMU.
+On Fri, 14 Feb 2020 01:41:35 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> <snip>
 > 
-> I skimmed this all and I don't see any description of how this all works.
+> >>>>    
+> >>>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> >>>> +				  size_t size, uint64_t pgsize,
+> >>>> +				  unsigned char __user *bitmap)
+> >>>> +{
+> >>>> +	struct vfio_dma *dma;
+> >>>> +	dma_addr_t i = iova, iova_limit;
+> >>>> +	unsigned int bsize, nbits = 0, l = 0;
+> >>>> +	unsigned long pgshift = __ffs(pgsize);
+> >>>> +
+> >>>> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
+> >>>> +		int ret, j;
+> >>>> +		unsigned int npages = 0, shift = 0;
+> >>>> +		unsigned char temp = 0;
+> >>>> +
+> >>>> +		/* mark all pages dirty if all pages are pinned and mapped. */
+> >>>> +		if (dma->iommu_mapped) {
+> >>>> +			iova_limit = min(dma->iova + dma->size, iova + size);
+> >>>> +			npages = iova_limit/pgsize;
+> >>>> +			bitmap_set(dma->bitmap, 0, npages);  
+> >>>
+> >>> npages is derived from iova_limit, which is the number of bits to set
+> >>> dirty relative to the first requested iova, not iova zero, ie. the set
+> >>> of dirty bits is offset from those requested unless iova == dma->iova.
+> >>>      
+> >>
+> >> Right, fixing.
+> >>  
+> >>> Also I hope dma->bitmap was actually allocated.  Not only does the
+> >>> START error path potentially leave dirty tracking enabled without all
+> >>> the bitmap allocated, when does the bitmap get allocated for a new
+> >>> vfio_dma when dirty tracking is enabled?  Seems it only occurs if a
+> >>> vpfn gets marked dirty.
+> >>>      
+> >>
+> >> Right.
+> >>
+> >> Fixing error paths.
+> >>
+> >>  
+> >>>> +		} else if (dma->bitmap) {
+> >>>> +			struct rb_node *n = rb_first(&dma->pfn_list);
+> >>>> +			bool found = false;
+> >>>> +
+> >>>> +			for (; n; n = rb_next(n)) {
+> >>>> +				struct vfio_pfn *vpfn = rb_entry(n,
+> >>>> +						struct vfio_pfn, node);
+> >>>> +				if (vpfn->iova >= i) {
+> >>>> +					found = true;
+> >>>> +					break;
+> >>>> +				}
+> >>>> +			}
+> >>>> +
+> >>>> +			if (!found) {
+> >>>> +				i += dma->size;
+> >>>> +				continue;
+> >>>> +			}
+> >>>> +
+> >>>> +			for (; n; n = rb_next(n)) {
+> >>>> +				unsigned int s;
+> >>>> +				struct vfio_pfn *vpfn = rb_entry(n,
+> >>>> +						struct vfio_pfn, node);
+> >>>> +
+> >>>> +				if (vpfn->iova >= iova + size)
+> >>>> +					break;
+> >>>> +
+> >>>> +				s = (vpfn->iova - dma->iova) >> pgshift;
+> >>>> +				bitmap_set(dma->bitmap, s, 1);
+> >>>> +
+> >>>> +				iova_limit = vpfn->iova + pgsize;
+> >>>> +			}
+> >>>> +			npages = iova_limit/pgsize;  
+> >>>
+> >>> Isn't iova_limit potentially uninitialized here?  For example, if our
+> >>> vfio_dma covers {0,8192} and we ask for the bitmap of {0,4096} and
+> >>> there's a vpfn at {4096,8192}.  I think that means vpfn->iova >= i
+> >>> (4096 >= 0), so we break with found = true, then we test 4096 >= 0 +
+> >>> 4096 and break, and npages = ????/pgsize.
+> >>>      
+> >>
+> >> Right, Fixing it.
+> >>  
+> >>>> +		}
+> >>>> +
+> >>>> +		bsize = dirty_bitmap_bytes(npages);
+> >>>> +		shift = nbits % BITS_PER_BYTE;
+> >>>> +
+> >>>> +		if (npages && shift) {
+> >>>> +			l--;
+> >>>> +			if (!access_ok((void __user *)bitmap + l,
+> >>>> +					sizeof(unsigned char)))
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			ret = __get_user(temp, bitmap + l);  
+> >>>
+> >>> I don't understand why we care to get the user's bitmap, are we trying
+> >>> to leave whatever garbage they might have set in it and only also set
+> >>> the dirty bits?  That seems unnecessary.
+> >>>      
+> >>
+> >> Suppose dma mapped ranges are {start, size}:
+> >> {0, 0xa000}, {0xa000, 0x10000}
+> >>
+> >> Bitmap asked from 0 - 0x10000. Say suppose all pages are dirty.
+> >> Then in first iteration for dma {0,0xa000} there are 10 pages, so 10
+> >> bits are set, put_user() happens for 2 bytes, (00000011 11111111b).
+> >> In second iteration for dma {0xa000, 0x10000} there are 6 pages and
+> >> these bits should be appended to previous byte. So get_user() that byte,
+> >> then shift-OR rest of the bitmap, result should be: (11111111 11111111b)
+> >>
+> >> Without get_user() and shift-OR, resulting bitmap would be
+> >> 111111 00000011 11111111b which would be wrong.  
+> > 
+> > Seems like if we use a put_user() approach then we should look for
+> > adjacent vfio_dmas within the same byte/word/dword before we push it to
+> > the user to avoid this sort of inefficiency.
+> >   
 > 
-> Does any of this address the mess in svm_register_enc_region()?  Right
-> now, when QEMU (or a QEMU alternative) wants to allocate some memory
-> to be used for guest encrypted pages, it mmap()s some memory and the
-> kernel does get_user_pages_fast() on it.  The pages are kept pinned
-> for the lifetime of the mapping.  This is not at all okay.  Let's see:
+> Won't that add more complication to logic?
+
+I'm tempted to think it might be less complicated.
+ 
+> >>> Also why do we need these access_ok() checks when we already checked
+> >>> the range at the start of the ioctl?  
+> >>
+> >> Since pointer is updated runtime here, better to check that pointer
+> >> before using that pointer.  
+> > 
+> > Sorry, I still don't understand this, we check access_ok() with a
+> > pointer and a length, therefore as long as we're incrementing the
+> > pointer within that length, why do we need to retest?
+> >   
 > 
->  - The memory is pinned and it doesn't play well with the Linux memory
-> management code.  You just wrote a big patch set to migrate the pages
-> to a whole different machines, but we apparently can't even migrate
-> them to a different NUMA node or even just a different address.  And
-> good luck swapping it out.
+> Ideally caller for put_user() and get_user() must check the pointer with 
+> access_ok() which is used as argument to these functions before calling 
+> this function. That makes sure that pointer is correct after pointer 
+> arithematic. May be lets remove previous check of pointer and length, 
+> but keep these checks.
+
+So we don't trust that we can increment a pointer within a range that
+we've already tested with access_ok() and expect it to still be ok?  I
+think the point of having access_ok() and __put_user() is that we can
+batch many __put_user() calls under a single access_ok() check.  I
+don't see any justification here why if we already tested
+access_ok(ptr, 2) that we still need to test access_ok(ptr + 0, 1) and
+access_ok(ptr + 1, 1), and removing the initial test is clearly the
+wrong optimization if we agree there is redundancy here.	
+
+> >>>> +			if (ret)
+> >>>> +				return ret;
+> >>>> +		}
+> >>>> +
+> >>>> +		for (j = 0; j < bsize; j++, l++) {
+> >>>> +			temp = temp |
+> >>>> +			       (*((unsigned char *)dma->bitmap + j) << shift);  
+> >>>
+> >>> |=
+> >>>      
+> >>>> +			if (!access_ok((void __user *)bitmap + l,
+> >>>> +					sizeof(unsigned char)))
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			ret = __put_user(temp, bitmap + l);
+> >>>> +			if (ret)
+> >>>> +				return ret;
+> >>>> +			if (shift) {
+> >>>> +				temp = *((unsigned char *)dma->bitmap + j) >>
+> >>>> +					(BITS_PER_BYTE - shift);
+> >>>> +			}  
+> >>>
+> >>> When shift == 0, temp just seems to accumulate bits that never get
+> >>> cleared.
+> >>>      
+> >>
+> >> Hope example above explains the shift logic.  
+> > 
+> > But that example is when shift is non-zero.  When shift is zero, each
+> > iteration of the loop just ORs in new bits to temp without ever
+> > clearing the bits for the previous iteration.
+> > 
+> >   
 > 
->  - The memory is still mapped in the QEMU process, and that mapping is
-> incoherent with actual guest access to the memory.  It's nice that KVM
-> clflushes it so that, in principle, everything might actually work,
-> but this is gross.  We should not be exposing incoherent mappings to
-> userspace.
+> Oh right, fixing it.
 > 
-> Perhaps all this fancy infrastructure you're writing for migration and
-> all this new API surface could also teach the kernel how to migrate
-> pages from a guest *to the same guest* so we don't need to pin pages
-> forever.  And perhaps you could put some thought into how to improve
-> the API so that it doesn't involve nonsensical incoherent mappings.o
+> >>>> +		}
+> >>>> +
+> >>>> +		nbits += npages;
+> >>>> +
+> >>>> +		i = min(dma->iova + dma->size, iova + size);
+> >>>> +		if (i >= iova + size)
+> >>>> +			break;  
+> >>>
+> >>> So whether we error or succeed, we leave cruft in dma->bitmap for the
+> >>> next pass.  It doesn't seem to make any sense why we pre-allocated the
+> >>> bitmap, we might as well just allocate it on demand here.  Actually, if
+> >>> we're not going to do a copy_to_user() for some range of the bitmap,
+> >>> I'm not sure what it's purpose is at all.  I think the big advantages
+> >>> of the bitmap are that we can't amortize the cost across every pinned
+> >>> page or DMA mapping, we don't need the overhead of tracking unmapped
+> >>> vpfns, and we can use copy_to_user() to push the bitmap out.  We're not
+> >>> getting any of those advantages here.
+> >>>      
+> >>
+> >> That would still not work if dma range size is not multiples of 8 pages.
+> >> See example above.  
+> > 
+> > I don't understand this comment, what about the example above justifies
+> > the bitmap?  
+> 
+> copy_to_user() could be used if dma range size is not multiple of 8 pages.
 
-As a different key is used to encrypt memory in each VM, the hypervisor
-can't simply copy the the ciphertext from one VM to another to migrate
-the VM.  Therefore, the AMD SEV Key Management API provides a new sets
-of function which the hypervisor can use to package a guest page for
-migration, while maintaining the confidentiality provided by AMD SEV.
+s/is not/is/ ?
 
-There is a new page encryption bitmap created in the kernel which 
-keeps tracks of encrypted/decrypted state of guest's pages and this
-bitmap is updated by a new hypercall interface provided to the guest
-kernel and firmware. 
+And we expect that to be a far more common case, right?  I don't think
+there are too many ranges for a guest that are only mapped in sub-32KB
+chucks.
+ 
+> >  As I understand the above algorithm, we find a vfio_dma
+> > overlapping the request and populate the bitmap for that range.  Then
+> > we go back and put_user() for each byte that we touched.  We could
+> > instead simply work on a one byte buffer as we enumerate the requested
+> > range and do a put_user() ever time we reach the end of it and have bits
+> > set. That would greatly simplify the above example.  But I would expect
+> > that we're a) more likely to get asked for ranges covering a single
+> > vfio_dma   
+> 
+> QEMU ask for single vfio_dma during each iteration.
+> 
+> If we restrict this ABI to cover single vfio_dma only, then it 
+> simplifies the logic here. That was my original suggestion. Should we 
+> think about that again?
 
-KVM_GET_PAGE_ENC_BITMAP ioctl can be used to get the guest page encryption
-bitmap. The bitmap can be used to check if the given guest page is
-private or shared.
+But we currently allow unmaps that overlap multiple vfio_dmas as long
+as no vfio_dma is bisected, so I think that implies that an unmap while
+asking for the dirty bitmap has even further restricted semantics.  I'm
+also reluctant to design an ABI around what happens to be the current
+QEMU implementation.
 
-During the migration flow, the SEND_START is called on the source hypervisor
-to create an outgoing encryption context. The SEV guest policy dictates whether
-the certificate passed through the migrate-set-parameters command will be
-validated. SEND_UPDATE_DATA is called to encrypt the guest private pages.
-After migration is completed, SEND_FINISH is called to destroy the encryption
-context and make the VM non-runnable to protect it against cloning.
+If we take your example above, ranges {0x0000,0xa000} and
+{0xa000,0x10000} ({start,end}), I think you're working with the
+following two bitmaps in this implementation:
 
-On the target machine, RECEIVE_START is called first to create an
-incoming encryption context. The RECEIVE_UPDATE_DATA is called to copy
-the received encrypted page into guest memory. After migration has
-completed, RECEIVE_FINISH is called to make the VM runnable.
+00000011 11111111b
+00111111b
 
-Thanks,
-Ashish
+And we need to combine those into:
+
+11111111 11111111b
+
+Right?
+
+But it seems like that would be easier if the second bitmap was instead:
+
+11111100b
+
+Then we wouldn't need to worry about the entire bitmap being shifted by
+the bit offset within the byte, which limits our fixes to the boundary
+byte and allows us to use copy_to_user() directly for the bulk of the
+copy.  So how do we get there?
+
+I think we start with allocating the vfio_dma bitmap to account for
+this initial offset, so we calculate bitmap_base_iova as:
+  (iova & ~((PAGE_SIZE << 3) - 1))
+We then use bitmap_base_iova in calculating which bits to set.
+
+The user needs to follow the same rules, and maybe this adds some value
+to the user providing the bitmap size rather than the kernel
+calculating it.  For example, if the user wanted the dirty bitmap for
+the range {0xa000,0x10000} above, they'd provide at least a 1 byte
+bitmap, but we'd return bit #2 set to indicate 0xa000 is dirty.
+
+Effectively the user can ask for any iova range, but the buffer will be
+filled relative to the zeroth bit of the bitmap following the above
+bitmap_base_iova formula (and replacing PAGE_SIZE with the user
+requested pgsize).  I'm tempted to make this explicit in the user
+interface (ie. only allow bitmaps starting on aligned pages), but a
+user is able to map and unmap single pages and we need to support
+returning a dirty bitmap with an unmap, so I don't think we can do that.
+
+So now are we biting off more than we can chew trying to transpose the
+bitmap between page sizes?  If asked for the previous range with an 8K
+pgsize, we'd somehow need to translate 11111100b into 00001110b.
+What's worse, the user could ask for just the 8K page at 0xa000 and we'd
+need to return back 00000010b while leaving our internal bitmap a
+11110000b after we mark the bits clean.  Seems like this is really
+only tenable if we do multiples of PAGE_SIZE pages within a byte, so
+for 4K we'd have 32K, 64K, 128K, 256K, etc.  I'm somewhat losing sight
+on what this accomplishes though and whether we need this in the first
+implementation.  Should we simplify by dropping this aspect of it,
+supporting only the minimum iommu page size, and focus on actually
+using the bitmaps effectively?
+ 
+> > and b) we're going to spend far more time operating in the
+> > middle of the range and limiting ourselves to one-byte operations there
+> > seems absurd.  If we want to specify that the user provides 4-byte
+> > aligned buffers and naturally aligned iova ranges to make our lives
+> > easier in the kernel, now would be the time to do that.
+> >   
+> >>>> +	}
+> >>>> +	return 0;
+> >>>> +}
+> >>>> +
+> >>>> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
+> >>>> +{
+> >>>> +	long bsize;
+> >>>> +
+> >>>> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
+> >>>> +		return -EINVAL;
+> >>>> +
+> >>>> +	bsize = dirty_bitmap_bytes(npages);
+> >>>> +
+> >>>> +	if (bitmap_size < bsize)
+> >>>> +		return -EINVAL;
+> >>>> +
+> >>>> +	return bsize;
+> >>>> +}  
+> >>>
+> >>> Seems like this could simply return int, -errno or zero for success.
+> >>> The returned bsize is not used for anything else.
+> >>>      
+> >>
+> >> ok.
+> >>  
+> >>>> +
+> >>>>    static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>    			     struct vfio_iommu_type1_dma_unmap *unmap)
+> >>>>    {
+> >>>> @@ -2277,6 +2478,80 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >>>>    
+> >>>>    		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+> >>>>    			-EFAULT : 0;
+> >>>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+> >>>> +		struct vfio_iommu_type1_dirty_bitmap range;
+> >>>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+> >>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> >>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> >>>> +		int ret;
+> >>>> +
+> >>>> +		if (!iommu->v2)
+> >>>> +			return -EACCES;
+> >>>> +
+> >>>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+> >>>> +				    bitmap);  
+> >>>
+> >>> We require the user to provide iova, size, pgsize, bitmap_size, and
+> >>> bitmap fields to START/STOP?  Why?
+> >>>     
+> >>
+> >> No. But those are part of structure.  
+> > 
+> > But we do require it, minsz here includes all those fields, which would
+> > probably make a user scratch their head wondering why they need to pass
+> > irrelevant data for START/STOP.  It almost implies that we support
+> > starting and stopping dirty logging for specific ranges of the IOVA
+> > space.  We could define the structure, for example:
+> > 
+> > struct vfio_iommu_type1_dirty_bitmap {
+> > 	__u32	argsz;
+> > 	__u32	flags;
+> > 	__u8	data[];
+> > };
+> > 
+> > struct vfio_iommu_type1_dirty_bitmap_get {
+> > 	__u64	iova;
+> > 	__u64	size;
+> > 	__u64	pgsize;
+> > 	__u64	bitmap_size;
+> > 	void __user *bitmap;
+> > };
+> > 
+> > Where data[] is defined as the latter structure when FLAG_GET_BITMAP is
+> > specified.  
+> 
+> Ok. Changing as above.
+> 
+> >  BTW, don't we need to specify the trailing void* as __u64?
+> > We could theoretically be talking to an ILP32 user process.  Thanks,
+> >   
+> 
+> Even on ILP32, using void* pointer will reserve the size required to 
+> save a pointer address. I don't think using void* should be problem.
+
+I think you're still assuming sizeof(void *) is the same in kernel vs
+userspace whereas I'm thinking about an ILP32 user running on an LP64
+kernel.  Thanks,
+
+Alex
+
