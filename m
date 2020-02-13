@@ -2,119 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B9EF915C988
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 18:37:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10DCA15C994
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 18:40:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728798AbgBMRhS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 12:37:18 -0500
-Received: from mga05.intel.com ([192.55.52.43]:45921 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728186AbgBMRhS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 12:37:18 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Feb 2020 09:37:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,437,1574150400"; 
-   d="scan'208";a="227305266"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga008.jf.intel.com with ESMTP; 13 Feb 2020 09:37:17 -0800
-Date:   Thu, 13 Feb 2020 09:37:17 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 30/61] KVM: x86: Handle MPX CPUID adjustment in VMX code
-Message-ID: <20200213173717.GB18610@linux.intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-31-sean.j.christopherson@intel.com>
- <4ff69a7e-acdb-40fd-d717-3b2829f20154@intel.com>
+        id S1728641AbgBMRkG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 12:40:06 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37806 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727966AbgBMRkF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Feb 2020 12:40:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581615604;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GLZM+36nvBe4D6Zpq/xw18BS+ZIob6yzLP0Z2c3tuXU=;
+        b=MtnpP1HBYQDQlOEEjCVJrpmpzqxH0kq6eAsl6xeggCKrfdfH86NXGhC5/xO2WYKg3E2p8B
+        rPTpTp6ii8FOkqkWESFHdbqgzRsQp8dWlee7bUw53Zvt2o20HPBSpk9pvTzSkegy4TseuK
+        zCxZEmrJg8dTmosHXeBNxhaArutQTIY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-QlKTuWg3PB6qDr-rm7hjjw-1; Thu, 13 Feb 2020 12:40:00 -0500
+X-MC-Unique: QlKTuWg3PB6qDr-rm7hjjw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FB81190B2A9;
+        Thu, 13 Feb 2020 17:39:58 +0000 (UTC)
+Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B3473391;
+        Thu, 13 Feb 2020 17:39:57 +0000 (UTC)
+Date:   Thu, 13 Feb 2020 10:39:57 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dev@dpdk.org, mtosatti@redhat.com,
+        thomas@monjalon.net, bluca@debian.org, jerinjacobk@gmail.com,
+        bruce.richardson@intel.com
+Subject: Re: [PATCH 4/7] vfio: Introduce VFIO_DEVICE_FEATURE ioctl and first
+ user
+Message-ID: <20200213103957.0d75034b@w520.home>
+In-Reply-To: <20200213134121.54b8debb.cohuck@redhat.com>
+References: <158145472604.16827.15751375540102298130.stgit@gimli.home>
+        <158146235133.16827.7215789038918853214.stgit@gimli.home>
+        <20200213134121.54b8debb.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ff69a7e-acdb-40fd-d717-3b2829f20154@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 09:51:08PM +0800, Xiaoyao Li wrote:
-> On 2/2/2020 2:51 AM, Sean Christopherson wrote:
-> >Move the MPX CPUID adjustments into VMX to eliminate an instance of the
-> >undesirable "unsigned f_* = *_supported ? F(*) : 0" pattern in the
-> >common CPUID handling code.
-> >
-> >Note, VMX must manually check for kernel support via
-> >boot_cpu_has(X86_FEATURE_MPX).
-> 
-> Why must?
+On Thu, 13 Feb 2020 13:41:21 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-do_cpuid_7_mask() runs the CPUID result through cpuid_mask(), which masks
-features based on boot_cpu_data, i.e. clears bits for features that are
-supported by hardware but unsupported/disabled by the kernel.
-
-vmx_set_supported_cpuid() needs to to query boot_cpu_has() to preserve the
-"supported by kernel" check provided by cpuid_mask().
-
+> On Tue, 11 Feb 2020 16:05:51 -0700
+> Alex Williamson <alex.williamson@redhat.com> wrote:
 > 
-> >No functional change intended.
-> >
-> >Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> >---
-> >  arch/x86/kvm/cpuid.c   |  3 +--
-> >  arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++--
-> >  2 files changed, 13 insertions(+), 4 deletions(-)
-> >
-> >diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> >index cb5870a323cc..09e24d1d731c 100644
-> >--- a/arch/x86/kvm/cpuid.c
-> >+++ b/arch/x86/kvm/cpuid.c
-> >@@ -340,7 +340,6 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
-> >  static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
-> >  {
-> >  	unsigned f_invpcid = kvm_x86_ops->invpcid_supported() ? F(INVPCID) : 0;
-> >-	unsigned f_mpx = kvm_mpx_supported() ? F(MPX) : 0;
-> >  	unsigned f_umip = kvm_x86_ops->umip_emulated() ? F(UMIP) : 0;
-> >  	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
-> >  	unsigned f_la57;
-> >@@ -349,7 +348,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
-> >  	/* cpuid 7.0.ebx */
-> >  	const u32 kvm_cpuid_7_0_ebx_x86_features =
-> >  		F(FSGSBASE) | F(BMI1) | F(HLE) | F(AVX2) | F(SMEP) |
-> >-		F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | f_mpx | F(RDSEED) |
-> >+		F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | 0 /*MPX*/ | F(RDSEED) |
-> >  		F(ADX) | F(SMAP) | F(AVX512IFMA) | F(AVX512F) | F(AVX512PF) |
-> >  		F(AVX512ER) | F(AVX512CD) | F(CLFLUSHOPT) | F(CLWB) | F(AVX512DQ) |
-> >  		F(SHA_NI) | F(AVX512BW) | F(AVX512VL) | f_intel_pt;
-> >diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> >index 3ff830e2258e..143193fc178e 100644
-> >--- a/arch/x86/kvm/vmx/vmx.c
-> >+++ b/arch/x86/kvm/vmx/vmx.c
-> >@@ -7106,8 +7106,18 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
-> >  static void vmx_set_supported_cpuid(struct kvm_cpuid_entry2 *entry)
-> >  {
-> >-	if (entry->function == 1 && nested)
-> >-		entry->ecx |= feature_bit(VMX);
-> >+	switch (entry->function) {
-> >+	case 0x1:
-> >+		if (nested)
-> >+			cpuid_entry_set(entry, X86_FEATURE_VMX);
-> >+		break;
-> >+	case 0x7:
-> >+		if (boot_cpu_has(X86_FEATURE_MPX) && kvm_mpx_supported())
-> >+			cpuid_entry_set(entry, X86_FEATURE_MPX);
-> >+		break;
-> >+	default:
-> >+		break;
-> >+	}
-> >  }
-> >  static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
-> >
+> > The VFIO_DEVICE_FEATURE ioctl is meant to be a general purpose, device
+> > agnostic ioctl for setting, retrieving, and probing device features.
+> > This implementation provides a 16-bit field for specifying a feature
+> > index, where the data porition of the ioctl is determined by the
+> > semantics for the given feature.  Additional flag bits indicate the
+> > direction and nature of the operation; SET indicates user data is
+> > provided into the device feature, GET indicates the device feature is
+> > written out into user data.  The PROBE flag augments determining
+> > whether the given feature is supported, and if provided, whether the
+> > given operation on the feature is supported.
+> > 
+> > The first user of this ioctl is for setting the vfio-pci VF token,
+> > where the user provides a shared secret key (UUID) on a SR-IOV PF
+> > device, which users must provide when opening associated VF devices.
+> > 
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci.c |   52 +++++++++++++++++++++++++++++++++++++++++++
+> >  include/uapi/linux/vfio.h   |   37 +++++++++++++++++++++++++++++++
+> >  2 files changed, 89 insertions(+)  
 > 
+> (...)
+> 
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 9e843a147ead..c5cbf04ce5a7 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -707,6 +707,43 @@ struct vfio_device_ioeventfd {
+> >  
+> >  #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
+> >  
+> > +/**
+> > + * VFIO_DEVICE_FEATURE - _IORW(VFIO_TYPE, VFIO_BASE + 17,
+> > + *			       struct vfio_device_feature  
+> 
+> Missing ')'
+
+Fixed.
+ 
+> > + *
+> > + * Get, set, or probe feature data of the device.  The feature is selected
+> > + * using the FEATURE_MASK portion of the flags field.  Support for a feature
+> > + * can be probed by setting both the FEATURE_MASK and PROBE bits.  A probe
+> > + * may optionally include the GET and/or SET bits to determine read vs write
+> > + * access of the feature respectively.  Probing a feature will return success
+> > + * if the feature is supported and all of the optionally indicated GET/SET
+> > + * methods are supported.  The format of the data portion of the structure is  
+> 
+> If neither GET nor SET are specified, will it return success if any of
+> the two are supported?
+
+Yes, that's how I've implemented this first feature.
+
+> > + * specific to the given feature.  The data portion is not required for
+> > + * probing.
+> > + *
+> > + * Return 0 on success, -errno on failure.
+> > + */
+> > +struct vfio_device_feature {
+> > +	__u32	argsz;
+> > +	__u32	flags;
+> > +#define VFIO_DEVICE_FEATURE_MASK	(0xffff) /* 16-bit feature index */
+> > +#define VFIO_DEVICE_FEATURE_GET		(1 << 16) /* Get feature into data[] */
+> > +#define VFIO_DEVICE_FEATURE_SET		(1 << 17) /* Set feature from data[] */
+> > +#define VFIO_DEVICE_FEATURE_PROBE	(1 << 18) /* Probe feature support */
+> > +	__u8	data[];
+> > +};  
+> 
+> I'm not sure I'm a fan of cramming both feature selection and operation
+> selection into flags. What about:
+> 
+> struct vfio_device_feature {
+> 	__u32 argsz;
+> 	__u32 flags;
+> /* GET/SET/PROBE #defines */
+> 	__u32 feature;
+> 	__u8  data[];
+> };
+
+Then data is unaligned so we either need to expand feature or add
+padding.  So this makes the structure at least 8 bytes bigger and buys
+us...?  What's so special about the bottom half of flags that we can't
+designate it as the flags that specify the feature?  We still have
+another 13 bits of flags for future use.
+
+> Getting/setting more than one feature at the same time does not sound
+> like a common use case; you would need to specify some kind of
+> algorithm for that anyway, and just doing it individually seems much
+> easier than that.
+
+Yup.  I just figured 2^16 features is a nice way to make use of the
+structure vs 2^32 features and 4 bytes of padding or 2^64 features.  I
+don't think I'm being optimistic in thinking we'll have far less than
+16K features and we can always reserve feature 0xffff as an extended
+feature where the first 8-bytes of data defines that extended feature
+index.
+
+> > +
+> > +#define VFIO_DEVICE_FEATURE		_IO(VFIO_TYPE, VFIO_BASE + 17)
+> > +
+> > +/*
+> > + * Provide support for setting a PCI VF Token, which is used as a shared
+> > + * secret between PF and VF drivers.  This feature may only be set on a
+> > + * PCI SR-IOV PF when SR-IOV is enabled on the PF and there are no existing
+> > + * open VFs.  Data provided when setting this feature is a 16-byte array
+> > + * (__u8 b[16]), representing a UUID.  
+> 
+> No objection to that.
+
+:)  Thanks!
+
+Alex
+
