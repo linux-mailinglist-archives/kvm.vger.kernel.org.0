@@ -2,71 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8932315BFB5
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 14:50:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 790A915BFBD
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 14:51:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730081AbgBMNuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 08:50:07 -0500
-Received: from mail-qt1-f174.google.com ([209.85.160.174]:44922 "EHLO
-        mail-qt1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729994AbgBMNuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 08:50:06 -0500
-Received: by mail-qt1-f174.google.com with SMTP id k7so4367576qth.11
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2020 05:50:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=message-id:subject:from:to:cc:date:mime-version
-         :content-transfer-encoding;
-        bh=hYWzdyVfx8Qtyuo6FsSKCev9Wngp3vI5dQBFQPr+z38=;
-        b=asQduntXxoDqj4rpCaoGvHOQ1wkbE2AIP+WmNjqJd4jJ98NSHc6WIIqySVY11MhBmc
-         HiFoySnWDJCxGHwvHEM9glItkO9hpTzcFtUckVvstoeeSNOAqdHXoXrg3zz00XXxdOjM
-         Y5lTj22qEBaKgI2eyn4DhbDnhs2dwiB9Z2aiYqv5GWtqDVXn7aszCbsYAR0AGus8FuVo
-         qQjEc87hgGcZYHnqmfOI/c+pfSsXTLkG0iRDvDqmccu2soP5bnV0VlNytNIQUpLvuerO
-         k4oKTneOg6Arr1DH2cceGUoO0HzMRStdSMUfpve35PAuhJhH6EZHqU4aKC8Gf0jzcQPR
-         GUSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:mime-version
-         :content-transfer-encoding;
-        bh=hYWzdyVfx8Qtyuo6FsSKCev9Wngp3vI5dQBFQPr+z38=;
-        b=U80enEDeEkpFand31Mlbz5GWrWnk7fzoliC6FEd9T+z5+KqWDiyDVSw1G95dmEm4Zn
-         ZtwX7G4y7toSGX3B5vfwmS7bV2pdQeGiOcjetrBenGXu7eNZDkcy4nrQ19ldN2pxrmQy
-         St2SM5dYLhUFZp8Y4VmBM2nNImheA3CRm02NCvY9r08BrDEisDCRI299Lc1/cQRbtrl5
-         LkgutE527wdBDmgUonUXgZ+GfzJHMIhowaBPX45IDj6OUn1LvH3dRSSISUOFv+544cs8
-         0x2prFCw8oCctS/3+7qOIbwrRM3CF+KImVhWaQTCpUlPUL0fBlP6g6Q7gc6/ywyhOn29
-         XEJQ==
-X-Gm-Message-State: APjAAAVKHUnojnpFE806Sqzj7P2oB/p47qS3psdqN2NeINhMyZc/tK6P
-        VJPTJrQ5v9/lwxbgPIxdWGnFUP09lvrBrQ==
-X-Google-Smtp-Source: APXvYqwA+9/ZAaF2KlXuLlj8Uncda4mkIqcNiui+fb6MIQTtai11Pu7pHSfxSn6DOLXREHif/a9goA==
-X-Received: by 2002:ac8:1a19:: with SMTP id v25mr24196508qtj.146.1581601805810;
-        Thu, 13 Feb 2020 05:50:05 -0800 (PST)
-Received: from dhcp-41-57.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id c14sm1327859qkj.80.2020.02.13.05.50.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Feb 2020 05:50:05 -0800 (PST)
-Message-ID: <1581601803.7365.57.camel@lca.pw>
-Subject: "KVM: x86: enable -Werror" breaks W=1 compilation
-From:   Qian Cai <cai@lca.pw>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     joe@perches.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 13 Feb 2020 08:50:03 -0500
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.22.6 (3.22.6-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1730082AbgBMNvM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 08:51:12 -0500
+Received: from mga01.intel.com ([192.55.52.88]:59554 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730003AbgBMNvM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Feb 2020 08:51:12 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Feb 2020 05:51:12 -0800
+X-IronPort-AV: E=Sophos;i="5.70,436,1574150400"; 
+   d="scan'208";a="227235705"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.30.123]) ([10.255.30.123])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 13 Feb 2020 05:51:10 -0800
+Subject: Re: [PATCH 30/61] KVM: x86: Handle MPX CPUID adjustment in VMX code
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
+ <20200201185218.24473-31-sean.j.christopherson@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <4ff69a7e-acdb-40fd-d717-3b2829f20154@intel.com>
+Date:   Thu, 13 Feb 2020 21:51:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
+MIME-Version: 1.0
+In-Reply-To: <20200201185218.24473-31-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-People have been running W=1 to catch additional compilation warnings with an
-expectation that not all of warnings will be fixed, but the linux-next commit
-ead68df94d24 ("KVM: x86: enable -Werror") breaks the build for them.
+On 2/2/2020 2:51 AM, Sean Christopherson wrote:
+> Move the MPX CPUID adjustments into VMX to eliminate an instance of the
+> undesirable "unsigned f_* = *_supported ? F(*) : 0" pattern in the
+> common CPUID handling code.
+> 
+> Note, VMX must manually check for kernel support via
+> boot_cpu_has(X86_FEATURE_MPX).
 
-arch/x86/kvm/../../../virt/kvm/kvm_main.c:663:12: error: no previous prototype
-for ‘kvm_arch_post_init_vm’ [-Werror=missing-prototypes]
- int __weak kvm_arch_post_init_vm(struct kvm *kvm)
-            ^~~~~~~~~~~~~~~~~~~~~
-arch/x86/kvm/../../../virt/kvm/kvm_main.c:672:13: error: no previous prototype
-for ‘kvm_arch_pre_destroy_vm’ [-Werror=missing-prototypes]
- void __weak kvm_arch_pre_destroy_vm(struct kvm *kvm)
+Why must?
+
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>   arch/x86/kvm/cpuid.c   |  3 +--
+>   arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++--
+>   2 files changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index cb5870a323cc..09e24d1d731c 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -340,7 +340,6 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
+>   static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
+>   {
+>   	unsigned f_invpcid = kvm_x86_ops->invpcid_supported() ? F(INVPCID) : 0;
+> -	unsigned f_mpx = kvm_mpx_supported() ? F(MPX) : 0;
+>   	unsigned f_umip = kvm_x86_ops->umip_emulated() ? F(UMIP) : 0;
+>   	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
+>   	unsigned f_la57;
+> @@ -349,7 +348,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
+>   	/* cpuid 7.0.ebx */
+>   	const u32 kvm_cpuid_7_0_ebx_x86_features =
+>   		F(FSGSBASE) | F(BMI1) | F(HLE) | F(AVX2) | F(SMEP) |
+> -		F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | f_mpx | F(RDSEED) |
+> +		F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | 0 /*MPX*/ | F(RDSEED) |
+>   		F(ADX) | F(SMAP) | F(AVX512IFMA) | F(AVX512F) | F(AVX512PF) |
+>   		F(AVX512ER) | F(AVX512CD) | F(CLFLUSHOPT) | F(CLWB) | F(AVX512DQ) |
+>   		F(SHA_NI) | F(AVX512BW) | F(AVX512VL) | f_intel_pt;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 3ff830e2258e..143193fc178e 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7106,8 +7106,18 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+>   
+>   static void vmx_set_supported_cpuid(struct kvm_cpuid_entry2 *entry)
+>   {
+> -	if (entry->function == 1 && nested)
+> -		entry->ecx |= feature_bit(VMX);
+> +	switch (entry->function) {
+> +	case 0x1:
+> +		if (nested)
+> +			cpuid_entry_set(entry, X86_FEATURE_VMX);
+> +		break;
+> +	case 0x7:
+> +		if (boot_cpu_has(X86_FEATURE_MPX) && kvm_mpx_supported())
+> +			cpuid_entry_set(entry, X86_FEATURE_MPX);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+>   }
+>   
+>   static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
+> 
+
