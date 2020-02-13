@@ -2,94 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 05D4315B929
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 06:43:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 436C015B9C5
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 07:51:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729687AbgBMFny (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 00:43:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57618 "EHLO mail.kernel.org"
+        id S1729728AbgBMGvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 01:51:41 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:43696 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729482AbgBMFny (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 00:43:54 -0500
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726654AbgBMGvl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Feb 2020 01:51:41 -0500
+Received: from zn.tnic (p200300EC2F07F600C900F9734EF2E51F.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:f600:c900:f973:4ef2:e51f])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C364F217F4
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2020 05:43:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581572634;
-        bh=MeLA6KBsKMNopTpVt73O8Wl7j6vH4TfNZlX2CyoSvrA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=tQMa4cy5y61Eqk2HT4RhEU9VuwdcKmwmLV+Pm9dxWTPAgh9MYuU7dVQnXUxZ6Wux+
-         vU0nBwtQNGI/ps/3y0l8NVCzoimDaot739BC7xRFDHA1CrZZaxhPkyNd4Uk3cUJsEa
-         qbP/QS7COcKS5XVFIhtTOXEk2C2TyXgbaXJgMsxY=
-Received: by mail-wm1-f47.google.com with SMTP id a5so4785877wmb.0
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2020 21:43:53 -0800 (PST)
-X-Gm-Message-State: APjAAAWCQ2/FWKBo6sOxeYUY0qEoAVVaAhA9AO6g4Z3B979XF3na61Ky
-        VJKoOmRbz1z5MaIRMZ7G0YAy3iILCnCplNd13R8jgA==
-X-Google-Smtp-Source: APXvYqyqUoW3kfb8cYofHM8mbkBfIsE5YpgIUhk/mRvexUuzH11inVRX40a4Ns/fahBVe21U0vz1KAbXBJxlE849bAY=
-X-Received: by 2002:a1c:bb82:: with SMTP id l124mr3454795wmf.176.1581572632244;
- Wed, 12 Feb 2020 21:43:52 -0800 (PST)
-MIME-Version: 1.0
-References: <cover.1581555616.git.ashish.kalra@amd.com>
-In-Reply-To: <cover.1581555616.git.ashish.kalra@amd.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Wed, 12 Feb 2020 21:43:41 -0800
-X-Gmail-Original-Message-ID: <CALCETrXE9cWd3TbBZMsAwmSwWpDYFsicLZ=amHLWsvE0burQSw@mail.gmail.com>
-Message-ID: <CALCETrXE9cWd3TbBZMsAwmSwWpDYFsicLZ=amHLWsvE0burQSw@mail.gmail.com>
-Subject: Re: [PATCH 00/12] SEV Live Migration Patchset.
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C4EDE1EC0CD2;
+        Thu, 13 Feb 2020 07:51:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1581576699;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=wf2AmwI9fi4Vl0/u0IIy7+8D26tMI5ezRzlAF6DDWs8=;
+        b=P65ey5vigoXjTd7ueflajmSjmkBu2Bllf6vzf1XgbPemXuoGDfOlbNXaqfPNcgyGSr2EWy
+        NAYs2muwd1lcDwmLVWFQhoOPxBscCFa9RaScvP8CC7axukYg6aiImLSWDraOolnsBUbBFG
+        sXhEd0CHSK5zjMfgt/gRS63dnJk8QHk=
+Date:   Thu, 13 Feb 2020 07:51:30 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Dave Hansen <dave.hansen@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Joerg Roedel <jroedel@suse.de>
+Subject: Re: [PATCH 03/62] x86/cpufeatures: Add SEV-ES CPU feature
+Message-ID: <20200213065130.GC31799@zn.tnic>
+References: <20200211135256.24617-1-joro@8bytes.org>
+ <20200211135256.24617-4-joro@8bytes.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200211135256.24617-4-joro@8bytes.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 12, 2020 at 5:14 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Ashish Kalra <ashish.kalra@amd.com>
->
-> This patchset adds support for SEV Live Migration on KVM/QEMU.
+On Tue, Feb 11, 2020 at 02:51:57PM +0100, Joerg Roedel wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> Add CPU feature detection for Secure Encrypted Virtualization with
+> Encrypted State. This feature enhances SEV by also encrypting the
+> guest register state, making it in-accessible to the hypervisor.
+> 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/include/asm/cpufeatures.h | 1 +
+>  arch/x86/kernel/cpu/amd.c          | 4 +++-
+>  arch/x86/kernel/cpu/scattered.c    | 1 +
+>  3 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index f3327cb56edf..26e4ee209f7b 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -285,6 +285,7 @@
+>  #define X86_FEATURE_CQM_MBM_LOCAL	(11*32+ 3) /* LLC Local MBM monitoring */
+>  #define X86_FEATURE_FENCE_SWAPGS_USER	(11*32+ 4) /* "" LFENCE in user entry SWAPGS path */
+>  #define X86_FEATURE_FENCE_SWAPGS_KERNEL	(11*32+ 5) /* "" LFENCE in kernel entry SWAPGS path */
+> +#define X86_FEATURE_SEV_ES		(11*32+ 6) /* AMD Secure Encrypted Virtualization - Encrypted State */
 
-I skimmed this all and I don't see any description of how this all works.
+Let's put this in word 8 which is for virt flags. X86_FEATURE_SEV could
+go there too but that should be a separate patch anyway, if at all.
 
-Does any of this address the mess in svm_register_enc_region()?  Right
-now, when QEMU (or a QEMU alternative) wants to allocate some memory
-to be used for guest encrypted pages, it mmap()s some memory and the
-kernel does get_user_pages_fast() on it.  The pages are kept pinned
-for the lifetime of the mapping.  This is not at all okay.  Let's see:
+>  /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
+>  #define X86_FEATURE_AVX512_BF16		(12*32+ 5) /* AVX512 BFLOAT16 instructions */
+> diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+> index ac83a0fef628..aad2223862ef 100644
+> --- a/arch/x86/kernel/cpu/amd.c
+> +++ b/arch/x86/kernel/cpu/amd.c
+> @@ -580,7 +580,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+>  	 *	      If BIOS has not enabled SME then don't advertise the
+>  	 *	      SME feature (set in scattered.c).
+>  	 *   For SEV: If BIOS has not enabled SEV then don't advertise the
+> -	 *            SEV feature (set in scattered.c).
+> +	 *            SEV and SEV_ES feature (set in scattered.c).
+>  	 *
+>  	 *   In all cases, since support for SME and SEV requires long mode,
+>  	 *   don't advertise the feature under CONFIG_X86_32.
+> @@ -611,6 +611,8 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+>  		setup_clear_cpu_cap(X86_FEATURE_SME);
+>  clear_sev:
+>  		setup_clear_cpu_cap(X86_FEATURE_SEV);
+> +		setup_clear_cpu_cap(X86_FEATURE_SEV);
 
- - The memory is pinned and it doesn't play well with the Linux memory
-management code.  You just wrote a big patch set to migrate the pages
-to a whole different machines, but we apparently can't even migrate
-them to a different NUMA node or even just a different address.  And
-good luck swapping it out.
+X86_FEATURE_SEV twice? Because once didn't stick?
 
- - The memory is still mapped in the QEMU process, and that mapping is
-incoherent with actual guest access to the memory.  It's nice that KVM
-clflushes it so that, in principle, everything might actually work,
-but this is gross.  We should not be exposing incoherent mappings to
-userspace.
+:-)
 
-Perhaps all this fancy infrastructure you're writing for migration and
-all this new API surface could also teach the kernel how to migrate
-pages from a guest *to the same guest* so we don't need to pin pages
-forever.  And perhaps you could put some thought into how to improve
-the API so that it doesn't involve nonsensical incoherent mappings.
+-- 
+Regards/Gruss,
+    Boris.
 
-(To be blunt: if I had noticed how the SEV code worked before it was
-merged, I would have NAKed it.  It's too late now to retroactively
-remove it from the kernel, but perhaps we could try not to pile more
-complexity on top of the unfortunate foundation we have.)
+https://people.kernel.org/tglx/notes-about-netiquette
