@@ -2,392 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F49C15CB6B
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 20:53:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E78115CB75
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 20:56:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727946AbgBMTxw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 14:53:52 -0500
-Received: from UPDC19PA19.eemsg.mail.mil ([214.24.27.194]:3876 "EHLO
-        UPDC19PA19.eemsg.mail.mil" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727742AbgBMTxw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 14:53:52 -0500
-X-Greylist: delayed 433 seconds by postgrey-1.27 at vger.kernel.org; Thu, 13 Feb 2020 14:53:50 EST
-X-EEMSG-check-017: 58603417|UPDC19PA19_ESA_OUT01.csd.disa.mil
-X-EEMSG-Attachment-filename: kvm.cil, userfaultfd.cil, kvm.c, userfaultfd.c
-X-EEMSG-Attachment-filesize: 1115, 621, 2234, 870
-X-IronPort-AV: E=Sophos;i="5.70,437,1574121600"; 
-   d="c'?cil'?scan'208";a="58603417"
-Received: from emsm-gh1-uea10.ncsc.mil ([214.29.60.2])
-  by UPDC19PA19.eemsg.mail.mil with ESMTP/TLS/DHE-RSA-AES256-SHA256; 13 Feb 2020 19:46:35 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tycho.nsa.gov; i=@tycho.nsa.gov; q=dns/txt;
-  s=tycho.nsa.gov; t=1581623195; x=1613159195;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to;
-  bh=ALUVptGGMslrhVQNJqMME0pB8k6xyz3v2MmpazMeWm8=;
-  b=blwOHwFEIRoBz1pQCdvuuFMFRqgUCJrwa4Z2kljWeRaAAd2pf7VjSZLa
-   xW4QLcklFwNOnEky73WtxAodMTmJucwNT0+vgP4oqICSC8FO6DUBitU02
-   8FqF/fJdtcIOaK+cH/h+6tlqmq2c6DhwyiL/aGjpVKo4Rt2yKsGbeH624
-   O6KKgy9d/G/l/JCK+dNp1CuEqQX+V6Q/wK4iT38HXRS5iE/yeQzxexmTV
-   FVVbmMKQyVM12ACTPPBMb0YTrAr0HBIrgoN9s0FuiepMwBCrYZ7AeXL0M
-   9Rd01NSEVL5gQc86UhJluWol6x6BqBG57V4UTbdoq5y+dY7t38v4HWKlk
-   A==;
-X-Attachment-Exists: TRUE
-X-IronPort-AV: E=Sophos;i="5.70,437,1574121600"; 
-   d="c'?cil'?scan'208";a="33048248"
-IronPort-PHdr: =?us-ascii?q?9a23=3ASRMxeRDGx9+11N8fnhiVUyQJP3N1i/DPJgcQr6?=
- =?us-ascii?q?AfoPdwSP35p8qwAkXT6L1XgUPTWs2DsrQY0raQ7fCrADZfqb+681k8M7V0Hy?=
- =?us-ascii?q?cfjssXmwFySOWkMmbcaMDQUiohAc5ZX0Vk9XzoeWJcGcL5ekGA6ibqtW1aFR?=
- =?us-ascii?q?rwLxd6KfroEYDOkcu3y/qy+5rOaAlUmTaxe7x/IAi5oAnLt8QbgoRuJrsvxh?=
- =?us-ascii?q?bLv3BFZ/lYyWR0KF2cmBrx+t2+94N5/SRKvPIh+c9AUaHkcKk9ULdVEjcoPX?=
- =?us-ascii?q?0r6cPyrRXMQheB6XUaUmUNjxpHGBPF4w3gXpfwqST1qOxw0zSHMMLsTLA0XT?=
- =?us-ascii?q?Oi77p3SBLtlSwKOSI1/H3Rh8dtgq1buhahrAFhzYDSbo+eKf5ycrrdcN4eQG?=
- =?us-ascii?q?ZMWNtaWS5cDYOmd4YBEvQPPehYoYf+qVUBoxSxCguwC+70zz9EmmX70Lcm3+?=
- =?us-ascii?q?kvEwzL2hErEdIUsHTTqdX4LLocUfyrw6nQzTXMcfVW0irg5ojNaB8hpfWMUq?=
- =?us-ascii?q?xwcMHMzkQvDB7Kjk6LpIz5PzKayuQNs2+B4+pmTuKgkXQrqw52ojix38ohjJ?=
- =?us-ascii?q?TCiIENyl3c6Cl0z4k4Kce4RUJme9KoDpRduz+AO4drRM4pXntmtzwgyrIcvJ?=
- =?us-ascii?q?62ZC0KyJM6yBHBc/GHaI2I4g77VOaWPDd4mGppeLKhiBa29kit0vH8WdOu0F?=
- =?us-ascii?q?ZLsypFicPAtnEL1xzd7ciHUeVy8Vu71TaT1wHc9uFEIUcumardN5Eh2aI/mo?=
- =?us-ascii?q?AWsUTCGi/6gET2jKmIeUU44uWk9uvqb7r8qpKcKoN4kB/yP6swlsClHOg0Kg?=
- =?us-ascii?q?0OUHKa+eS42r3j50r5QLBSg/0tj6bZq4vXJdgbp6GlAw9V1Zwv6xCkDzi8yt?=
- =?us-ascii?q?gYkn4HLExddBKdk4fpI03OIOz/DfqnmFSjjjNrx/HAPr38DZTANWbDkLj/cr?=
- =?us-ascii?q?Zn8UJcyxQ8zcpZ551KDrENOvXzWlX+tNbAFB82LxS0w/r7CNV6zo4eXWOPAq?=
- =?us-ascii?q?mEMKLdqFOI/fwgLPWRZI8PuTb9N/gk6+frjX8+hFAdYK2p0oUMZXCmEfRpPV?=
- =?us-ascii?q?+ZbWDvgtgfC2cKuBQxTOjwhF2FSz5TaG64X7gg6TEjFIKmEYDDS5ipgLyA2i?=
- =?us-ascii?q?e7A5JXanlIClCXDHjnaZuEVOkIaC+JPM9hnSILVaK7R48iyx6urgn6xKRjLu?=
- =?us-ascii?q?bO/S0Yr53j3sBv5+LPjREy6SB0D8OF3mGOUWF0m3gFRyE53K9hu0xx0FSD3r?=
- =?us-ascii?q?Zig/xeC9NT4+lFUgAgNZ7T1+Z6Ecz9WhrdfteVT1arWsumATArTtI22NIPYl?=
- =?us-ascii?q?hyG9OjjhDdxSaqB74Vl7qWBJ076K7c2GLxJ8lnx3bb16krl0MmTddXNW26mq?=
- =?us-ascii?q?5/8BDeB5bTnEWEk6anbrwc0zTQ9GeH1GaOuUZYUAlqUarbR3wQekzWrdHh7E?=
- =?us-ascii?q?PYU7CuEagnMhdGycOaN6RFcNvpgklBRPfnI9nebGWxm2C/BRaM2LyAdpble2?=
- =?us-ascii?q?IY3C/FEkgLjxgT/WqaNQg5HiqhpWTeDD91GFLgZEPs9uZ+qHelQUMu0w6KaE?=
- =?us-ascii?q?hhhPKJ/UsOiPidTe4D9qwLtT1nqDhuGlu5mdXMBImuvQ1kKZ5AbMs97VEP7m?=
- =?us-ascii?q?fQswhwL9T0NKx5rkIPeARw+UX13lN4DZsWwptil28j0AcncfHQ61hGbT7NmM?=
- =?us-ascii?q?2hNw=3D=3D?=
-X-IPAS-Result: =?us-ascii?q?A2AtAwAtpkVe/wHyM5BmHAEBAQEBBwEBEQEEBAEBgXuBf?=
- =?us-ascii?q?YEYVSAShD6JA4ZfBoE3iXCRSgkBAQEBAQEBAQEDIBQEAQGEQAKCcDgTAhABA?=
- =?us-ascii?q?QEFAQEBAQEFAwEBbIVDgjspgwMBBSMEUhALGCoCAgJVEwgBAYJjPwGCViWuB?=
- =?us-ascii?q?n8zhUqDPIEuEIE4gVOKa3mBB4E4D4JdPoRignmCXgSNTYl4DTl8lm+CRIJPg?=
- =?us-ascii?q?R6CO4Eljn4GHIJIjF6LcS2reSKBWCsIAhgIIQ+DJwlHGA2BGo0PFxWOLCMDj?=
- =?us-ascii?q?Q4sghcBAQ?=
-Received: from tarius.tycho.ncsc.mil (HELO tarius.infosec.tycho.ncsc.mil) ([144.51.242.1])
-  by EMSM-GH1-UEA10.NCSC.MIL with ESMTP; 13 Feb 2020 19:46:33 +0000
-Received: from moss-pluto.infosec.tycho.ncsc.mil (moss-pluto [192.168.25.131])
-        by tarius.infosec.tycho.ncsc.mil (8.14.7/8.14.4) with ESMTP id 01DJjbsW102736;
-        Thu, 13 Feb 2020 14:45:37 -0500
-Subject: Re: [RFC PATCH] security,anon_inodes,kvm: enable security support for
- anon inodes
-To:     selinux@vger.kernel.org
-Cc:     linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
-        viro@zeniv.linux.org.uk, paul@paul-moore.com, dancol@google.com,
-        nnk@google.com
-References: <20200213194157.5877-1-sds@tycho.nsa.gov>
-From:   Stephen Smalley <sds@tycho.nsa.gov>
-Message-ID: <513f6230-1fb3-dbb5-5f75-53cd02b91b28@tycho.nsa.gov>
-Date:   Thu, 13 Feb 2020 14:47:35 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1728374AbgBMT4E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 14:56:04 -0500
+Received: from mga03.intel.com ([134.134.136.65]:51558 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728295AbgBMT4E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Feb 2020 14:56:04 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Feb 2020 11:56:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,437,1574150400"; 
+   d="scan'208";a="234218810"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga003.jf.intel.com with ESMTP; 13 Feb 2020 11:56:02 -0800
+Date:   Thu, 13 Feb 2020 11:56:02 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
+        kvm-ppc@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 01/35] mm:gup/writeback: add callbacks for inaccessible
+ pages
+Message-ID: <20200213195602.GD18610@linux.intel.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-2-borntraeger@de.ibm.com>
+ <28792269-e053-ac70-a344-45612ee5c729@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200213194157.5877-1-sds@tycho.nsa.gov>
-Content-Type: multipart/mixed;
- boundary="------------936176FE2E25230FE1E6A035"
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28792269-e053-ac70-a344-45612ee5c729@de.ibm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------936176FE2E25230FE1E6A035
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Mon, Feb 10, 2020 at 06:27:04PM +0100, Christian Borntraeger wrote:
+> CC Marc Zyngier for KVM on ARM.  Marc, see below. Will there be any
+> use for this on KVM/ARM in the future?
+> 
+> CC Sean Christopherson/Tom Lendacky. Any obvious use case for Intel/AMD
+> to have a callback before a page is used for I/O?
 
-On 2/13/20 2:41 PM, Stephen Smalley wrote:
-> An example of a sample program and policy will follow in a follow-up
-> to this patch to demonstrate the effect on userfaultfd and kvm.
+Yes?
 
-Attached are example test programs and policies to demonstrate the 
-change in behavior before and after this RFC patch for userfaultfd and 
-kvm.  The test policies can be edited to selectively allow specific 
-permissions for testing various scenarios, but with the defaults in 
-them, one should see the following behavior:
+> Andrew (or other mm people) any chance to get an ACK for this change?
+> I could then carry that via s390 or KVM tree. Or if you want to carry
+> that yourself I can send an updated version (we need to kind of 
+> synchronize that Linus will pull the KVM changes after the mm changes).
+> 
+> Andrea asked if others would benefit from this, so here are some more
+> information about this (and I can also put this into the patch
+> description).  So we have talked to the POWER folks. They do not use
+> the standard normal memory management, instead they have a hard split
+> between secure and normal memory. The secure memory  is the handled by
+> the hypervisor as device memory and the ultravisor and the hypervisor
+> move this forth and back when needed.
+> 
+> On s390 there is no *separate* pool of physical pages that are secure.
+> Instead, *any* physical page can be marked as secure or not, by
+> setting a bit in a per-page data structure that hardware uses to stop
+> unauthorized access.  (That bit is under control of the ultravisor.)
+> 
+> Note that one side effect of this strategy is that the decision
+> *which* secure pages to encrypt and then swap out is actually done by
+> the hypervisor, not the ultravisor.  In our case, the hypervisor is
+> Linux/KVM, so we're using the regular Linux memory management scheme
+> (active/inactive LRU lists etc.) to make this decision.  The advantage
+> is that the Ultravisor code does not need to itself implement any
+> memory management code, making it a lot simpler.
 
-sudo semodule -i kvm.cil userfaultfd.cil
-make kvm userfaultfd
+Disclaimer: I'm not familiar with s390 guest page faults or UV.  I tried
+to give myself a crash course, apologies if I'm way out in left field...
 
-Before:
+AIUI, pages will first be added to a secure guest by converting a normal,
+non-secure page to secure and stuffing it into the guest page tables.  To
+swap a page from a secure guest, arch_make_page_accessible() will be called
+to encrypt the page in place so that it can be accessed by the untrusted
+kernel/VMM and written out to disk.  And to fault the page back in, on s390
+a secure guest access to a non-secure page will generate a page fault with
+a dedicated type.  That fault routes directly to
+do_non_secure_storage_access(), which converts the page to secure and thus
+makes it re-accessible to the guest.
 
-(no labeling/access control applied by SELinux to userfaultfd files or 
-to anon inodes created by kvm)
+That all sounds sane and usable for Intel.
 
-$ ./userfaultfd
-api: 170
-features: 510
-ioctls: 9223372036854775811
+My big question is the follow/get flows, more on that below.
 
-read: Resource temporarily unavailable
+> However, in the end this is why we need the hook into Linux memory
+> management: once Linux has decided to swap a page out, we need to get
+> a chance to tell the Ultravisor to "export" the page (i.e., encrypt
+> its contents and mark it no longer secure).
+> 
+> As outlined below this should be a no-op for anybody not opting in.
+> 
+> Christian                                   
+> 
+> On 07.02.20 12:39, Christian Borntraeger wrote:
+> > From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > 
+> > With the introduction of protected KVM guests on s390 there is now a
+> > concept of inaccessible pages. These pages need to be made accessible
+> > before the host can access them.
+> > 
+> > While cpu accesses will trigger a fault that can be resolved, I/O
+> > accesses will just fail.  We need to add a callback into architecture
+> > code for places that will do I/O, namely when writeback is started or
+> > when a page reference is taken.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> > ---
+> >  include/linux/gfp.h | 6 ++++++
+> >  mm/gup.c            | 2 ++
+> >  mm/page-writeback.c | 1 +
+> >  3 files changed, 9 insertions(+)
+> > 
+> > diff --git a/include/linux/gfp.h b/include/linux/gfp.h
+> > index e5b817cb86e7..be2754841369 100644
+> > --- a/include/linux/gfp.h
+> > +++ b/include/linux/gfp.h
+> > @@ -485,6 +485,12 @@ static inline void arch_free_page(struct page *page, int order) { }
+> >  #ifndef HAVE_ARCH_ALLOC_PAGE
+> >  static inline void arch_alloc_page(struct page *page, int order) { }
+> >  #endif
+> > +#ifndef HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
+> > +static inline int arch_make_page_accessible(struct page *page)
+> > +{
+> > +	return 0;
+> > +}
+> > +#endif
+> >  
+> >  struct page *
+> >  __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order, int preferred_nid,
+> > diff --git a/mm/gup.c b/mm/gup.c
+> > index 7646bf993b25..a01262cd2821 100644
+> > --- a/mm/gup.c
+> > +++ b/mm/gup.c
+> > @@ -257,6 +257,7 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+> >  			page = ERR_PTR(-ENOMEM);
+> >  			goto out;
+> >  		}
+> > +		arch_make_page_accessible(page);
 
-$ ./kvm
-api version: 12
+As Will pointed out, the return value definitely needs to be checked, there
+will undoubtedly be scenarios where the page cannot be made accessible.
 
-created vm
+What is the use case for calling arch_make_page_accessible() in the follow()
+and gup() paths?  Live migration is the only thing that comes to mind, and
+for live migration I would expect you would want to keep the secure guest
+running when copying pages to the target, i.e. use pre-copy.  That would
+conflict with converting the page in place.  Rather, migration would use a
+separate dedicated path to copy the encrypted contents of the secure page to
+a completely different page, and send *that* across the wire so that the
+guest can continue accessing the original page.
 
-created vcpu
+Am I missing a need to do this for the swap/reclaim case?  Or is there a
+completely different use case I'm overlooking?
 
-rax: 0
-rbx: 0
-rcx: 0
-rdx: 1536
-rdi: 0
-rsi: 0
-rsp: 0
-rbp: 0
-r8: 0
-r9: 0
-r10: 0
-r11: 0
-r12: 0
-r13: 0
-r14: 0
-r15: 0
-rip: 65520
-rflags: 2
+Tangentially related, hooks here could be quite useful for sanity checking
+the kernel/KVM and/or debugging kernel/KVM bugs.  Would it make sense to
+pass a param to arch_make_page_accessible() to provide some information as
+to why the page needs to be made accessible?
 
-created device
-
-checked device attr
-
-After:
-
-(SELinux ioctl whitelisting used to selectively deny access)
-
-./userfaultfd
-UFFDIO_API: Permission denied
-
-$ ./kvm
-api version: 12
-
-created vm
-
-created vcpu
-
-KVM_GET_REGS: Permission denied
-
---------------936176FE2E25230FE1E6A035
-Content-Type: application/vnd.ms-artgalry;
- name="kvm.cil"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="kvm.cil"
-
-OyBVbmNvbW1lbnQgb25lIG9mIHRoZSBhbGxvd3ggbGluZXMgYmVsb3cgdG8gdGVzdC4KOyBD
-dXJyZW50bHkgdGhlIDR0aCBvbmUgaXMgdW5jb21tZW50ZWQ7IGNvbW1lbnQgdGhhdCBvdXQg
-aWYgdHJ5aW5nIGFub3RoZXIuCgo7IE5vbmUKOyhhbGxvd3ggdW5jb25maW5lZF90IGt2bV9k
-ZXZpY2VfdCAoaW9jdGwgY2hyX2ZpbGUgKCgweDAwKSkpKQoKOyBLVk1fR0VUX0FQSV9WRVJT
-SU9OCjsoYWxsb3d4IHVuY29uZmluZWRfdCBrdm1fZGV2aWNlX3QgKGlvY3RsIGNocl9maWxl
-ICgoMHhhZTAwKSkpKQoKOyBLVk1fR0VUX0FQSV9WRVJTSU9OCUtWTV9DUkVBVEVfVk0KOyhh
-bGxvd3ggdW5jb25maW5lZF90IGt2bV9kZXZpY2VfdCAoaW9jdGwgY2hyX2ZpbGUgKCgweGFl
-MDAgMHhhZTAxKSkpKQoKOyBLVk1fR0VUX0FQSV9WRVJTSU9OCUtWTV9DUkVBVEVfVk0JS1ZN
-X0NSRUFURV9WQ1BVCihhbGxvd3ggdW5jb25maW5lZF90IGt2bV9kZXZpY2VfdCAoaW9jdGwg
-Y2hyX2ZpbGUgKCgweGFlMDAgMHhhZTAxIDB4YWU0MSkpKSkKCjsgS1ZNX0dFVF9BUElfVkVS
-U0lPTglLVk1fQ1JFQVRFX1ZNCUtWTV9DUkVBVEVfVkNQVQlLVk1fR0VUX1JFR1MKOyhhbGxv
-d3ggdW5jb25maW5lZF90IGt2bV9kZXZpY2VfdCAoaW9jdGwgY2hyX2ZpbGUgKCgweGFlMDAg
-MHhhZTAxIDB4YWU0MSAweGFlODEpKSkpCgo7IEtWTV9HRVRfQVBJX1ZFUlNJT04gICAgICAg
-IEtWTV9DUkVBVEVfVk0gICAgICAgIEtWTV9DUkVBVEVfVkNQVQo7IEtWTV9HRVRfUkVHUyAg
-ICAgICAgICAgICAgIEtWTV9DUkVBVEVfREVWSUNFCjsoYWxsb3d4IHVuY29uZmluZWRfdCBr
-dm1fZGV2aWNlX3QgKGlvY3RsIGNocl9maWxlICgoMHhhZTAwIDB4YWUwMSAweGFlNDEgMHhh
-ZTgxIDB4YWVlMCkpKSkKCjsgS1ZNX0dFVF9BUElfVkVSU0lPTiAgICAgICAgS1ZNX0NSRUFU
-RV9WTSAgICAgICAgS1ZNX0NSRUFURV9WQ1BVCjsgS1ZNX0dFVF9SRUdTICAgICAgICAgICAg
-ICAgS1ZNX0NSRUFURV9ERVZJQ0UgICAgS1ZNX0hBU19ERVZJQ0VfQVRUUgo7KGFsbG93eCB1
-bmNvbmZpbmVkX3Qga3ZtX2RldmljZV90IChpb2N0bCBjaHJfZmlsZSAoKDB4YWUwMCAweGFl
-MDEgMHhhZTQxIDB4YWU4MSAweGFlZTAgMHhhZWUzKSkpKQo=
---------------936176FE2E25230FE1E6A035
-Content-Type: application/vnd.ms-artgalry;
- name="userfaultfd.cil"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="userfaultfd.cil"
-
-KHR5cGUgdWZmZF90KQoKOyBMYWJlbCB0aGUgVUZGRCB3aXRoIHVmZmRfdDsgdGhpcyBjYW4g
-YmUgc3BlY2lhbGl6ZWQgcGVyIGRvbWFpbgoodHlwZXRyYW5zaXRpb24gdW5jb25maW5lZF90
-IHVuY29uZmluZWRfdCBmaWxlICJbdXNlcmZhdWx0ZmRdIiAgIHVmZmRfdCkKCjsgUGVybWl0
-IHJlYWQoKSBhbmQgaW9jdGwoKSBvbiB0aGUgVUZGRC4KOyBDb21tZW50IG91dCBpZiB5b3Ug
-d2FudCB0byB0ZXN0IHJlYWQgb3IgYmFzaWMgaW9jdGwgZW5mb3JjZW1lbnQuCihhbGxvdyB1
-bmNvbmZpbmVkX3QgdWZmZF90IChmaWxlIChyZWFkKSkpCihhbGxvdyB1bmNvbmZpbmVkX3Qg
-dWZmZF90IChmaWxlIChpb2N0bCkpKQoKOyBVbmNvbW1lbnQgb25lIG9mIHRoZSBhbGxvd3gg
-bGluZXMgYmVsb3cgdG8gdGVzdCBpb2N0bCB3aGl0ZWxpc3RpbmcuCjsgQ3VycmVudGx5IHRo
-ZSAxc3Qgb25lIGlzIHVuY29tbWVudGVkOyBjb21tZW50IHRoYXQgb3V0IGlmIHRyeWluZyBh
-bm90aGVyLgoKOyBOb25lCihhbGxvd3ggdW5jb25maW5lZF90IHVmZmRfdCAoaW9jdGwgZmls
-ZSAoKDB4MDApKSkpCgo7IFVGRkRJT19BUEkKOyhhbGxvd3ggdW5jb25maW5lZF90IHVmZmRf
-dCAoaW9jdGwgZmlsZSAoKDB4YWEzZikpKSkK
---------------936176FE2E25230FE1E6A035
-Content-Type: text/x-csrc; charset=UTF-8;
- name="kvm.c"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="kvm.c"
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/ioctl.h>
-#include <linux/kvm.h>
-
-void print_regs(const struct kvm_regs *regs)
-{
-	printf("rax: %llu\n", regs->rax);
-	printf("rbx: %llu\n", regs->rbx);
-	printf("rcx: %llu\n", regs->rcx);
-	printf("rdx: %llu\n", regs->rdx);
-	printf("rdi: %llu\n", regs->rdi);
-	printf("rsi: %llu\n", regs->rsi);
-	printf("rsp: %llu\n", regs->rsp);
-	printf("rbp: %llu\n", regs->rbp);
-	printf("r8: %llu\n", regs->r8);
-	printf("r9: %llu\n", regs->r9);
-	printf("r10: %llu\n", regs->r10);
-	printf("r11: %llu\n", regs->r11);
-	printf("r12: %llu\n", regs->r12);
-	printf("r13: %llu\n", regs->r13);
-	printf("r14: %llu\n", regs->r14);
-	printf("r15: %llu\n", regs->r15);
-	printf("rip: %llu\n", regs->rip);
-	printf("rflags: %llu\n", regs->rflags);
-
-	printf("\n");
-}
-
-void print_device_attr(const struct kvm_device_attr *dev_attr)
-{
-	printf("flags: %u\n", dev_attr->flags);
-	printf("group: %u\n", dev_attr->group);
-	printf("attr: %llu\n", dev_attr->attr);
-	printf("addr: %llu\n", dev_attr->addr);
-
-	printf("\n");
-}
-
-int main(void)
-{
-	int fd = open("/dev/kvm", O_RDWR);
-	if (fd < 0) {
-		perror("/dev/kvm");
-		return -1;
-	}
-
-	int ret = ioctl(fd, KVM_GET_API_VERSION, 0);
-	if (ret < 0) {
-		perror("KVM_GET_API_VERSION");
-		return -1;
-	}
-
-	printf("api version: %d\n\n", ret);
-
-	int vmfd = ioctl(fd, KVM_CREATE_VM, 0);
-	if (vmfd < 0) {
-		perror("KVM_CREATE_VM");
-		return -1;
-	}
-
-	printf("created vm\n\n");
-
-	int vcpufd = ioctl(vmfd, KVM_CREATE_VCPU, 0);
-	if (vcpufd < 0) {
-		perror("KVM_CREATE_VCPU");
-		return -1;
-	}
-
-	printf("created vcpu\n\n");
-
-	struct kvm_regs regs;
-	if (ioctl(vcpufd, KVM_GET_REGS, &regs) < 0) {
-		perror("KVM_GET_REGS");
-		return -1;
-	}
-
-	print_regs(&regs);
-
-	struct kvm_create_device dev = {0};
-	dev.type = KVM_DEV_TYPE_VFIO;
-
-	if (ioctl(vmfd, KVM_CREATE_DEVICE, &dev) < 0) {
-		perror("KVM_CREATE_DEVICE");
-		return -1;
-	}
-
-	printf("created device\n\n");
-
-	struct kvm_device_attr dev_attr = {0};
-	dev_attr.group = KVM_DEV_VFIO_GROUP;
-	dev_attr.attr = KVM_DEV_VFIO_GROUP_ADD;
-	if (ioctl(dev.fd, KVM_HAS_DEVICE_ATTR, &dev_attr) < 0) {
-		perror("KVM_HAS_DEVICE_ATTR");
-		return -1;
-	}
-
-	printf("checked device attr\n\n");
-
-	return 0;
-}
-
---------------936176FE2E25230FE1E6A035
-Content-Type: text/x-csrc; charset=UTF-8;
- name="userfaultfd.c"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="userfaultfd.c"
-
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/syscall.h>
-
-#include <linux/userfaultfd.h>
-
-void print_api(const struct uffdio_api *api)
-{
-	printf("api: %llu\n", api->api);
-	printf("features: %llu\n", api->features);
-	printf("ioctls: %llu\n", api->ioctls);
-
-	printf("\n");
-}
-
-int main(void)
-{
-	long uffd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
-	if (uffd < 0) {
-		perror("syscall(userfaultfd)");
-		return -1;
-	}
-
-	struct uffdio_api api = {0};
-	api.api = UFFD_API;
-	if (ioctl(uffd, UFFDIO_API, &api) < 0) {
-		perror("UFFDIO_API");
-		return -1;
-	}
-
-	print_api(&api);
-
-	struct uffd_msg msg = {0};
-	ssize_t count = read(uffd, &msg, sizeof(msg));
-	if (count < 0) {
-		perror("read");
-		return -1;
-	} else if (count == 0) {
-		printf("read EOF\n\n");
-	}
-
-	printf("read uffd\n\n");
-
-	return 0;
-}
-
---------------936176FE2E25230FE1E6A035--
+> >  	}
+> >  	if (flags & FOLL_TOUCH) {
+> >  		if ((flags & FOLL_WRITE) &&
+> > @@ -1870,6 +1871,7 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+> >  
+> >  		VM_BUG_ON_PAGE(compound_head(page) != head, page);
+> >  
+> > +		arch_make_page_accessible(page);
+> >  		SetPageReferenced(page);
+> >  		pages[*nr] = page;
+> >  		(*nr)++;
+> > diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> > index 2caf780a42e7..0f0bd14571b1 100644
+> > --- a/mm/page-writeback.c
+> > +++ b/mm/page-writeback.c
+> > @@ -2806,6 +2806,7 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
+> >  		inc_lruvec_page_state(page, NR_WRITEBACK);
+> >  		inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+> >  	}
+> > +	arch_make_page_accessible(page);
+> >  	unlock_page_memcg(page);
+> 
+> As outlined by Ulrich, we can move the callback after the unlock.
+> 
+> >  	return ret;
+> >  
+> > 
+> 
