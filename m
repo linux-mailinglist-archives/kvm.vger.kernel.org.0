@@ -2,61 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A062D15B7E2
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 04:42:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A902115B7D1
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2020 04:34:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729547AbgBMDmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Feb 2020 22:42:07 -0500
-Received: from smtprelay0139.hostedemail.com ([216.40.44.139]:58946 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729470AbgBMDmH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 12 Feb 2020 22:42:07 -0500
-X-Greylist: delayed 578 seconds by postgrey-1.27 at vger.kernel.org; Wed, 12 Feb 2020 22:42:06 EST
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave06.hostedemail.com (Postfix) with ESMTP id DAD0781238EC
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2020 03:32:28 +0000 (UTC)
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay01.hostedemail.com (Postfix) with ESMTP id 8F5A3100E7B40;
-        Thu, 13 Feb 2020 03:32:27 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Spam-Summary: 2,0,0,,d41d8cd98f00b204,joe@perches.com,:::::::::,RULES_HIT:41:355:379:599:800:960:973:988:989:1260:1277:1311:1313:1314:1345:1359:1437:1515:1516:1518:1534:1538:1566:1593:1594:1711:1714:1730:1747:1777:1792:2393:2559:2562:2828:3138:3139:3140:3141:3142:3622:3865:3866:3868:3870:3871:3874:4321:5007:10004:10400:10848:11232:11658:11914:12297:12740:12760:12895:13019:13069:13149:13230:13311:13357:13439:14181:14659:14721:21080:21611:21627:30054:30091,0,RBL:none,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:,MSBL:0,DNSBL:none,Custom_rules:0:0:0,LFtime:20,LUA_SUMMARY:none
-X-HE-Tag: debt42_6ca657be6622e
-X-Filterd-Recvd-Size: 1290
-Received: from XPS-9350.home (unknown [47.151.143.254])
-        (Authenticated sender: joe@perches.com)
-        by omf07.hostedemail.com (Postfix) with ESMTPA;
-        Thu, 13 Feb 2020 03:32:26 +0000 (UTC)
-Message-ID: <71b3bf53c0fc3c68b10368092022e3bf2cffc506.camel@perches.com>
-Subject: Re: [PATCH] KVM: x86: enable -Werror
-From:   Joe Perches <joe@perches.com>
-To:     linmiaohe <linmiaohe@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Linus Walleij <linux.walleij@sterricsson.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Date:   Wed, 12 Feb 2020 19:31:08 -0800
-In-Reply-To: <12259a951c5e47359c46f7875e758d41@huawei.com>
-References: <12259a951c5e47359c46f7875e758d41@huawei.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.34.1-2 
+        id S1729519AbgBMDed (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Feb 2020 22:34:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49267 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729443AbgBMDed (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Feb 2020 22:34:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581564872;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jveoJYEei31LnYAAA1c+qGj2sc1cBfYcZJcuE3oKpzU=;
+        b=IfPK6GPzSSAIyATiMStCwXT2kh68/p284zdYWH+8CY6l76AopclO/eX3YHmeKFsuvPr5Am
+        q1nS3SwZVmi8pUL/4UPWNpoH7vda/MPaZzqX414W3MgrolwzBxpO1HgF+wfjKFLroU7xhX
+        hrlz0pe6YcE9RPyTUi78rIy7E+dwf1E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-_Su18Ee-OOmoGnyCqHCCHA-1; Wed, 12 Feb 2020 22:34:30 -0500
+X-MC-Unique: _Su18Ee-OOmoGnyCqHCCHA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBD04800D41;
+        Thu, 13 Feb 2020 03:34:27 +0000 (UTC)
+Received: from [10.72.13.212] (ovpn-13-212.pek2.redhat.com [10.72.13.212])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 54EF710002B6;
+        Thu, 13 Feb 2020 03:34:12 +0000 (UTC)
+Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
+        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
+        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
+References: <20200210035608.10002-1-jasowang@redhat.com>
+ <20200210035608.10002-4-jasowang@redhat.com>
+ <20200211134746.GI4271@mellanox.com>
+ <cf7abcc9-f8ef-1fe2-248e-9b9028788ade@redhat.com>
+ <20200212125108.GS4271@mellanox.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
+Date:   Thu, 13 Feb 2020 11:34:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200212125108.GS4271@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-02-13 at 01:40 +0000, linmiaohe wrote:
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > Avoid more embarrassing mistakes.  At least those that the compiler can catch.
-> > 
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
 
-I think adding -Werror is a bad idea as
-new versions of compilers can create
-additional compilation warnings and
-break builds in the future.
+On 2020/2/12 =E4=B8=8B=E5=8D=888:51, Jason Gunthorpe wrote:
+> On Wed, Feb 12, 2020 at 03:55:31PM +0800, Jason Wang wrote:
+>>> The ida_simple_remove should probably be part of the class release
+>>> function to make everything work right
+>> It looks to me bus instead of class is the correct abstraction here si=
+nce
+>> the devices share a set of programming interface but not the semantics=
+.
+> device_release() doesn't call the bus release?
 
+
+What it did is:
+
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dev->release)
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 dev->release(dev);
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else if (dev->type && dev->ty=
+pe->release)
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 dev->type->release(dev);
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else if (dev->class && dev->c=
+lass->dev_release)
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 dev->class->dev_release(dev);
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 WARN(1, KERN_ERR "Device '%s' does not have a release(=
+)=20
+function, it is broken and must be fixed. See Documentation/kobject.txt.\=
+n",
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev_na=
+me(dev));
+
+So it looks not.
+
+
+>   You have dev, type or
+> class to choose from. Type is rarely used and doesn't seem to be used
+> by vdpa, so class seems the right choice
+>
+> Jason
+
+
+Yes, but my understanding is class and bus are mutually exclusive. So we=20
+can't add a class to a device which is already attached on a bus.
+
+Thanks
 
 
