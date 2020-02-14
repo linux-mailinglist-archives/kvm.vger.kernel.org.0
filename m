@@ -2,122 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F8A115E9B4
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 18:08:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3CA215E9C6
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 18:09:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404067AbgBNRIt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 12:08:49 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:38385 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391876AbgBNRIr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 12:08:47 -0500
-Received: by mail-qk1-f194.google.com with SMTP id z19so9874946qkj.5
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 09:08:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=fXvyu0kZf5A1U63q/YhyFfRXYuCW/78tH+0468+IS98=;
-        b=YFJ/kMLjchBhiT8aNq0VrtM4AcJeWee2US4hluINe65IunCXS3vJuj4Bkbt4gqrlc9
-         xSK8WM66btieYfHnX95r5cKhvH7E17po1pg7gSr6OevWFmVmk8Cql8RHZFeuHCv08hwf
-         3/sxsLR7FFiN7OKwP0erO9lLPFlmPWzw4WIgrDmrtzTYg3Eav+OtYw0SPSr59xFJ5kcq
-         teKwvCq9AEwvlyWG0mAayZa01tij9LomvrQ+gp5Wr2P3JSgZAUqg2qTZPUv8OPkhrrNf
-         kGV8o4do/4/KGXvJrd/ylkT265lwoafDkZa+Ox1SowWFpDIen1G/c3gxYprXLAOJ/fLX
-         gJ/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=fXvyu0kZf5A1U63q/YhyFfRXYuCW/78tH+0468+IS98=;
-        b=pjOTrSeEiKw1IY2Uoau2Ii2r3/bL9xJuTJzpzZiPaX/laMrXCgY45sr9cJmT567KwF
-         WY4VNI9zPrN/VYROJk2yLGa5Q9nsJ4msyU6l5XhafOPCPzvEtu3IQKdiyorXZBfvYqzS
-         fl5zwRmvDeJM+87V4bOSwuMhPmhEmPQAc9Fdow/Q14AvkjA6yirQDJA0NonoDqXZTEhu
-         jygkAD8WtXat8FgW+9zgBqIlHsDfS1AQNbWcbTslsXAobA3b1qlwi1crVFAD4Lgf6dWJ
-         gBxwceqiNkgiFHHzqqfGz4LArp0vDtva1XHZiklWPP+X34Hn26tIk2Z0jAPGkuXpI5LY
-         yUIQ==
-X-Gm-Message-State: APjAAAXwv/emin+fYrECWLG1e6T0M/VFNyVaQu1s0cVHaXBrqPNdC0QP
-        UZR37RyquAywVhboXgDmZS4K1w==
-X-Google-Smtp-Source: APXvYqyT/rOWJB967/ihSOHGw7VRvxvP2mM5AosTsnw/AhWVTsl2iZIE1fPQw2Z1aaAiOiJtR9sAQg==
-X-Received: by 2002:a05:620a:13a9:: with SMTP id m9mr3571942qki.359.1581700126842;
-        Fri, 14 Feb 2020 09:08:46 -0800 (PST)
-Received: from dhcp-41-57.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id r1sm3538113qtu.83.2020.02.14.09.08.45
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Feb 2020 09:08:46 -0800 (PST)
-Message-ID: <1581700124.7365.70.camel@lca.pw>
-Subject: Re: [PATCH] kvm/emulate: fix a -Werror=cast-function-type
-From:   Qian Cai <cai@lca.pw>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        id S2394133AbgBNRJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 12:09:16 -0500
+Received: from mga06.intel.com ([134.134.136.31]:10149 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2392336AbgBNRJQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 12:09:16 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Feb 2020 09:09:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,441,1574150400"; 
+   d="scan'208";a="223073823"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga007.jf.intel.com with ESMTP; 14 Feb 2020 09:09:14 -0800
+Date:   Fri, 14 Feb 2020 09:09:14 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Fri, 14 Feb 2020 12:08:44 -0500
-In-Reply-To: <20200214165923.GA20690@linux.intel.com>
-References: <1581695768-6123-1-git-send-email-cai@lca.pw>
-         <20200214165923.GA20690@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.22.6 (3.22.6-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 26/61] KVM: x86: Introduce cpuid_entry_{get,has}()
+ accessors
+Message-ID: <20200214170914.GC20690@linux.intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
+ <20200201185218.24473-27-sean.j.christopherson@intel.com>
+ <1f918bcf-d36d-f759-5796-2acb2a514888@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1f918bcf-d36d-f759-5796-2acb2a514888@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2020-02-14 at 08:59 -0800, Sean Christopherson wrote:
-> On Fri, Feb 14, 2020 at 10:56:08AM -0500, Qian Cai wrote:
-> > arch/x86/kvm/emulate.c: In function 'x86_emulate_insn':
-> > arch/x86/kvm/emulate.c:5686:22: error: cast between incompatible
-> > function types from 'int (*)(struct x86_emulate_ctxt *)' to 'void
-> > (*)(struct fastop *)' [-Werror=cast-function-type]
-> >     rc = fastop(ctxt, (fastop_t)ctxt->execute);
-> > 
-> > Fixes: 3009afc6e39e ("KVM: x86: Use a typedef for fastop functions")
-> > Signed-off-by: Qian Cai <cai@lca.pw>
-> > ---
-> >  arch/x86/kvm/emulate.c | 8 +++++---
-> >  1 file changed, 5 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> > index ddbc61984227..17ae820cf59d 100644
-> > --- a/arch/x86/kvm/emulate.c
-> > +++ b/arch/x86/kvm/emulate.c
-> > @@ -5682,10 +5682,12 @@ int x86_emulate_insn(struct x86_emulate_ctxt *ctxt)
-> >  		ctxt->eflags &= ~X86_EFLAGS_RF;
-> >  
-> >  	if (ctxt->execute) {
-> > -		if (ctxt->d & Fastop)
-> > -			rc = fastop(ctxt, (fastop_t)ctxt->execute);
-> 
-> Alternatively, can we do -Wno-cast-function-type?  That's a silly warning
-> IMO.
+On Fri, Feb 14, 2020 at 05:44:41PM +0800, Xiaoyao Li wrote:
+> On 2/2/2020 2:51 AM, Sean Christopherson wrote:
+> >@@ -387,7 +388,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
+> >  		entry->ebx |= F(TSC_ADJUST);
+> >  		entry->ecx &= kvm_cpuid_7_0_ecx_x86_features;
+> >-		f_la57 = entry->ecx & F(LA57);
+> >+		f_la57 = cpuid_entry_get(entry, X86_FEATURE_LA57);
 
-I am doing W=1 on linux-next where some of the warnings might be silly but the
-recent commit changes all warnings to errors forces me having to silence those
-somehow.
+Note, cpuid_entry_get() is used here.
 
+> >  		cpuid_mask(&entry->ecx, CPUID_7_ECX);
+> >  		/* Set LA57 based on hardware capability. */
+> >  		entry->ecx |= f_la57;
+> >diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> >index 72a79bdfed6b..64e96e4086e2 100644
+> >--- a/arch/x86/kvm/cpuid.h
+> >+++ b/arch/x86/kvm/cpuid.h
+> >@@ -95,16 +95,10 @@ static __always_inline struct cpuid_reg x86_feature_cpuid(unsigned x86_feature)
+> >  	return reverse_cpuid[x86_leaf];
+> >  }
+> >-static __always_inline u32 *guest_cpuid_get_register(struct kvm_vcpu *vcpu, unsigned x86_feature)
+> >+static __always_inline u32 *__cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry,
+> >+						  const struct cpuid_reg *cpuid)
+> >  {
+> >-	struct kvm_cpuid_entry2 *entry;
+> >-	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
+> >-
+> >-	entry = kvm_find_cpuid_entry(vcpu, cpuid.function, cpuid.index);
+> >-	if (!entry)
+> >-		return NULL;
+> >-
+> >-	switch (cpuid.reg) {
+> >+	switch (cpuid->reg) {
+> >  	case CPUID_EAX:
+> >  		return &entry->eax;
+> >  	case CPUID_EBX:
+> >@@ -119,6 +113,40 @@ static __always_inline u32 *guest_cpuid_get_register(struct kvm_vcpu *vcpu, unsi
+> >  	}
+> >  }
+> >+static __always_inline u32 *cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry,
+> >+						unsigned x86_feature)
+> >+{
+> >+	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
+> >+
+> >+	return __cpuid_entry_get_reg(entry, &cpuid);
+> >+}
+> >+
+> >+static __always_inline u32 cpuid_entry_get(struct kvm_cpuid_entry2 *entry,
+> >+					   unsigned x86_feature)
+> >+{
+> >+	u32 *reg = cpuid_entry_get_reg(entry, x86_feature);
+> >+
+> >+	return *reg & __feature_bit(x86_feature);
+> >+}
+> >+
 > 
-> If not, will either of these work?
-> 
-> 			rc = fastop(ctxt, (void *)ctxt->execute);
-> 
-> or
-> 			rc = fastop(ctxt, (fastop_t)(void *)ctxt->execute);
+> This helper function is unnecessary. There is only one user throughout this
+> series, i.e., cpuid_entry_has() below.
 
-I have no strong preference. I originally thought just to go back the previous
-code style where might be more acceptable, but it is up to maintainers.
+And the LA57 case above.
 
+> And I cannot image other possible use case of it.
+
+The LA57 case, which admittedly goes away soon, was subtle enough (OR in
+the flag instead of querying yes/no) that I wanted keep the accessor around
+in case a similar case popped up in the future.
+
+> >+static __always_inline bool cpuid_entry_has(struct kvm_cpuid_entry2 *entry,
+> >+					    unsigned x86_feature)
+> >+{
+> >+	return cpuid_entry_get(entry, x86_feature);
+> >+}
+> >+
+> >+static __always_inline int *guest_cpuid_get_register(struct kvm_vcpu *vcpu, unsigned x86_feature)
+>                           ^
+> Should be                 u32
+> otherwise, previous patch will be unhappy. :)
+
+Doh, thanks!
+ 
+> >+{
+> >+	struct kvm_cpuid_entry2 *entry;
+> >+	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
+> >+
+> >+	entry = kvm_find_cpuid_entry(vcpu, cpuid.function, cpuid.index);
+> >+	if (!entry)
+> >+		return NULL;
+> >+
+> >+	return __cpuid_entry_get_reg(entry, &cpuid);
+> >+}
+> >+
+> >  static __always_inline bool guest_cpuid_has(struct kvm_vcpu *vcpu, unsigned x86_feature)
+> >  {
+> >  	u32 *reg;
+> >
 > 
-> > -		else
-> > +		if (ctxt->d & Fastop) {
-> > +			fastop_t fop = (void *)ctxt->execute;
-> > +			rc = fastop(ctxt, fop);
-> > +		} else {
-> >  			rc = ctxt->execute(ctxt);
-> > +		}
-> >  		if (rc != X86EMUL_CONTINUE)
-> >  			goto done;
-> >  		goto writeback;
-> > -- 
-> > 1.8.3.1
-> > 
