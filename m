@@ -2,99 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 977AF15D612
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 11:51:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2DD215D698
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 12:36:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729074AbgBNKvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 05:51:41 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38544 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726220AbgBNKvl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 05:51:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581677499;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7oS6qPRTWAcSh1xwsTps0ddgDaOPTPDtHt5BvNvlXNk=;
-        b=i7/1m+MYwuezSoReDsFvrxSyyjS5nNOkgGokZaCdl9CD70jnaHGJlN+/hjVr++9VNipJ5o
-        LeRyIhFwimN0Px9lMHaazSQcTAXZ6QA3p7j6wjmXTz4M4R4bC96jDdG1g/SzUKEWxhfpQE
-        7f+vOOdVsLkWEnprg2fTmaYP+GxIz6U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-htjPEdjFNkiufYKQkG20Ew-1; Fri, 14 Feb 2020 05:51:30 -0500
-X-MC-Unique: htjPEdjFNkiufYKQkG20Ew-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0228800D48;
-        Fri, 14 Feb 2020 10:51:29 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1FAA562670;
-        Fri, 14 Feb 2020 10:51:22 +0000 (UTC)
-Date:   Fri, 14 Feb 2020 11:51:20 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, peter.maydell@linaro.org,
-        alex.bennee@linaro.org, lvivier@redhat.com, thuth@redhat.com,
-        david@redhat.com, frankja@linux.ibm.com, eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests 1/2] arch-run: Allow $QEMU to include
- parameters
-Message-ID: <20200214105120.qjgrwewm74sh32db@kamzik.brq.redhat.com>
-References: <20200213143300.32141-1-drjones@redhat.com>
- <20200213143300.32141-2-drjones@redhat.com>
- <c14fd5b0-9658-dbe9-a2b2-bf368d57fc7d@redhat.com>
+        id S1728062AbgBNLgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 06:36:25 -0500
+Received: from foss.arm.com ([217.140.110.172]:59992 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727652AbgBNLgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 06:36:25 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A64C01FB;
+        Fri, 14 Feb 2020 03:36:24 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A47E93F68F;
+        Fri, 14 Feb 2020 03:36:23 -0800 (PST)
+Date:   Fri, 14 Feb 2020 11:36:07 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2] kvm: arm: VGIC: Fix interrupt group enablement
+Message-ID: <20200214113607.39854c81@donnerap.cambridge.arm.com>
+In-Reply-To: <e2426986ebc9be4e14eb99028b28a43e@www.loen.fr>
+References: <20191122185142.65477-1-andre.przywara@arm.com>
+        <e2426986ebc9be4e14eb99028b28a43e@www.loen.fr>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c14fd5b0-9658-dbe9-a2b2-bf368d57fc7d@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 11:31:04AM +0100, Paolo Bonzini wrote:
-> On 13/02/20 15:32, Andrew Jones wrote:
-> > +	if [ -n "$QEMU" ]; then
-> > +		set -- $QEMU
-> > +		if ! "$1" --help 2>/dev/null | grep -q 'QEMU'; then
-> > +			echo "\$QEMU environment variable not set to a QEMU binary." >&2
-> > +			return 2
-> > +		fi
-> > +		qemu=$(command -v "$1")
-> > +		shift
-> > +		echo "$qemu $@"
-> 
-> I think $* is more appropriate here.  Something like "foo $@ bar" has a
-> weird effect:
+On Mon, 25 Nov 2019 10:55:01 +0000
+Marc Zyngier <maz@kernel.org> wrote:
 
-Will fix for v2.
+Hi Marc,
 
-> 
-> 	$ set -x
-> 	$ set a b c
-> 
-> 	$ echo "foo $@ bar"
-> 	+ echo 'foo a' b 'c bar'
-> 	foo a b c bar
-> 
-> 	$ echo "foo $* bar"
-> 	+ echo 'foo a b c bar'
-> 	foo a b c bar
-> 
-> Otherwise, this is a good idea.
+dug this out of my inbox, sorry for warming this up.
 
-Thanks,
-drew
+> On 2019-11-22 18:51, Andre Przywara wrote:
+> > Hi Marc,
+> >
+> > this is still a bit rough, and only briefly tested, but I wanted to
+> > hear your opinion on the general approach (using a second list in
+> > addition to the ap_list). Some ugly bits come from the fact that the
+> > two lists are not that different, so we have to consider both of them
+> > at times. This is what I wanted to avoid with just one list that gets
+> > filtered on the fly.
+> > Or I am just stupid and don't see how it can be done properly ;-)  
+> 
+> I don't know about that, but I think there is a better way.
+> 
+> You have essentially two sets of pending interrupts:
+> 
+> 1) those that are enabled and group-enabled, that end up in the AP list
+> 2) those that are either disabled and/or group-disabled
+> 
+> Today, (2) are not on any list.
 
-> 
-> Thanks,
-> 
-> Paolo
-> 
-> > +		return
-> > +	fi
-> > +
-> 
+For a reason: because we don't really care about them. And so far they would only become interesting on an *individual* interrupt base, and our VGIC routines can deal very well with that.
 
+> What I'm suggesting is that we create
+> a list for these interrupts that cannot be forwarded.
+
+So the problem with that is that a list would need a list lock, and this is where things get hairy:
+- Either we introduce a separate disabled_list lock, adding to the nightmare of lock hierarchy we already have. I don't think that's really justifiable just because of group0 IRQs.
+- We piggy-back on an existing lock, like the ap_list_lock. The problem with that is that vgic_queue_irq_unlock takes and drops that lock, so we can't just iterate over this disabled list while holding that lock, and feed each IRQ to vgic_queue_irq_unlock() easily.
+One solution I was thinking about was something like:
+while (!list_empty(disabled_list)) {
+	spin_lock(ap_list_lock);
+	irq = remove_first_entry(disabled_list);
+	spin_unlock(ap_list_lock);
+
+	lock_irq(irq);
+	/* re-check? */
+	vgic_queue_irq_unlock(irq);
+}
+
+Does that sound feasible? It's not really efficient nor nice, but I am not sure we care so much about this since we assume group enablement is rather rare.
+
+Cheers,
+Andre
+
+> Then enabling an interrupt or a group is a matter of moving pending
+> interrupts from one list to another. And I think most of the logic
+> can be hidden in vgic_queue_irq_unlock().
+> 
+>          M.
