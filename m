@@ -2,145 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DA0515F9A1
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 23:28:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66F2715F960
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 23:26:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728137AbgBNW2C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 17:28:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49206 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728040AbgBNW12 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 17:27:28 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01EMQm2p112920;
-        Fri, 14 Feb 2020 17:27:27 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1tn7vd1y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Feb 2020 17:27:27 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01EMQxob113162;
-        Fri, 14 Feb 2020 17:27:27 -0500
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1tn7vd1m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Feb 2020 17:27:27 -0500
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01EMP6up015196;
-        Fri, 14 Feb 2020 22:27:26 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma01wdc.us.ibm.com with ESMTP id 2y5bc01xgq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Feb 2020 22:27:25 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01EMRMmk50200878
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Feb 2020 22:27:22 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 03FFB136094;
-        Fri, 14 Feb 2020 22:27:22 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4779A136091;
-        Fri, 14 Feb 2020 22:27:21 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.114.17.106])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 14 Feb 2020 22:27:21 +0000 (GMT)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Subject: [PATCH v2 22/42] KVM: s390/mm: handle guest unpin events
-Date:   Fri, 14 Feb 2020 17:26:38 -0500
-Message-Id: <20200214222658.12946-23-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.0
-In-Reply-To: <20200214222658.12946-1-borntraeger@de.ibm.com>
-References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+        id S1727696AbgBNW0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 17:26:47 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42827 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725879AbgBNW0r (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 17:26:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581719205;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zi+FAk6+B1tEDdQPEK9hBxVo2EUuPbQZvG2bbkdWBcE=;
+        b=fFBTH0lHuEWpei7ly0GeS2/BMvVegejNUVoVI0gEpoPtsP+okdGa1xBO1WHLV2cGp7QuP/
+        HPtv8rCioVf4cM6jgLTEuqja0GmMBmpVW3lMP1lQIW5BgcOcu1ag35B1CKQGznhYPhjPpt
+        VFe4Dt8kWp/irbwQzYX5huafDGrsBgY=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-AAb6qsp6M2qxyxqpyB9AmQ-1; Fri, 14 Feb 2020 17:26:44 -0500
+X-MC-Unique: AAb6qsp6M2qxyxqpyB9AmQ-1
+Received: by mail-qv1-f72.google.com with SMTP id n11so6661353qvp.15
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 14:26:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zi+FAk6+B1tEDdQPEK9hBxVo2EUuPbQZvG2bbkdWBcE=;
+        b=mGZoMRJlj0CcEaWW69dCweQY30SNyW+KoekARsUI7tXnH8xmkslFftCyrL6pSaoaOV
+         oHj8mt2v8ihdBgDoQKNkH+TLDY0vXzMJ0WgVOOTsiAuPgWBjYR8GSNApwfITHlRNdOml
+         TLF2DwiQv0njfOo89dalBpD20yhG5gbq5frca2HbWNY5vxCa2RyZRzfgYqWn+PyaD3O1
+         zyxuybQyyW1UHG4GleY69AxyTg1qTIingznx2GDuJ2gTdSd2hf34aCLdK2wnFS6XGOX6
+         apLT+5MaqIrN/Fa0aei29BlQFshjRydho6ks8OqB5He2MjBrjP9X7Pzzlt9FqmqibLOR
+         gkdg==
+X-Gm-Message-State: APjAAAWjjRTGWwzPpDqcwcUqMr5vZY2ouA0EQp0x22+9G0FXxhVuyeH+
+        KkClxc6Kk86M31izmDSCvZ+SclSIml+vRisjYABKfIJE46YxMJTpd+hKP3bEZPNIvIN8Qi2aOn+
+        8u4koKB1zC4UR
+X-Received: by 2002:ac8:176b:: with SMTP id u40mr4497501qtk.272.1581719202256;
+        Fri, 14 Feb 2020 14:26:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwWs2UO5Nf1jK+xyGw6/TqetiujeGHCYaXaOLmPWYECnM7OjFY8i2I+Px3Qs0O38aQSXDRBRA==
+X-Received: by 2002:ac8:176b:: with SMTP id u40mr4497484qtk.272.1581719201973;
+        Fri, 14 Feb 2020 14:26:41 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id d16sm23923qkc.132.2020.02.14.14.26.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2020 14:26:41 -0800 (PST)
+Date:   Fri, 14 Feb 2020 17:26:39 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, bgardon@google.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [PATCH 00/13] KVM: selftests: Various fixes and cleanups
+Message-ID: <20200214222639.GB1195634@xz-x1>
+References: <20200214145920.30792-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-14_08:2020-02-14,2020-02-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- malwarescore=0 mlxscore=0 impostorscore=0 phishscore=0 priorityscore=1501
- suspectscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002140165
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200214145920.30792-1-drjones@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+On Fri, Feb 14, 2020 at 03:59:07PM +0100, Andrew Jones wrote:
+> This series has several parts:
+> 
+>  * First, a hack to get x86 to compile. The missing __NR_userfaultfd
+>    define should be fixed a better way.
 
-The current code tries to first pin shared pages, if that fails (e.g.
-because the page is not shared) it will export them. For shared pages
-this means that we get a new intercept telling us that the guest is
-unsharing that page. We will make the page secure at that point in time
-and revoke the host access. This is synchronized with other host events,
-e.g. the code will wait until host I/O has finished.
+Yeh otherwise I think it will only compile on x86_64.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-[borntraeger@de.ibm.com: patch merging, splitting, fixing]
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- arch/s390/kvm/intercept.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+My gut feeling is we've got an artificial unistd_{32|64}.h under tools
+that is included rather than the real one that we should include
+(which should locate under $LINUX_ROOT/usr/include/asm/).  Below patch
+worked for me, but I'm not 100% sure whether I fixed all the current
+users of that artifact header just in case I'll break some (what I saw
+is only this evsel.c and another setns.c, while that setns.c has
+syscall.h included correct so it seems fine):
 
-diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-index 6c9db886381c..1e231058e4b3 100644
---- a/arch/s390/kvm/intercept.c
-+++ b/arch/s390/kvm/intercept.c
-@@ -16,6 +16,7 @@
- #include <asm/asm-offsets.h>
- #include <asm/irq.h>
- #include <asm/sysinfo.h>
-+#include <asm/uv.h>
- 
- #include "kvm-s390.h"
- #include "gaccess.h"
-@@ -484,12 +485,35 @@ static int handle_pv_sclp(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static int handle_pv_uvc(struct kvm_vcpu *vcpu)
-+{
-+	struct uv_cb_share *guest_uvcb = (void *)vcpu->arch.sie_block->sidad;
-+	struct uv_cb_cts uvcb = {
-+		.header.cmd	= UVC_CMD_UNPIN_PAGE_SHARED,
-+		.header.len	= sizeof(uvcb),
-+		.guest_handle	= kvm_s390_pv_handle(vcpu->kvm),
-+		.gaddr		= guest_uvcb->paddr,
-+	};
-+	int rc;
-+
-+	if (guest_uvcb->header.cmd != UVC_CMD_REMOVE_SHARED_ACCESS) {
-+		WARN_ONCE(1, "Unexpected UVC 0x%x!\n", guest_uvcb->header.cmd);
-+		return 0;
-+	}
-+	rc = gmap_make_secure(vcpu->arch.gmap, uvcb.gaddr, &uvcb);
-+	if (rc == -EINVAL)
-+		return 0;
-+	return rc;
-+}
-+
- static int handle_pv_notification(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu->arch.sie_block->ipa == 0xb210)
- 		return handle_pv_spx(vcpu);
- 	if (vcpu->arch.sie_block->ipa == 0xb220)
- 		return handle_pv_sclp(vcpu);
-+	if (vcpu->arch.sie_block->ipa == 0xb9a4)
-+		return handle_pv_uvc(vcpu);
- 
- 	return handle_instruction(vcpu);
- }
+diff --git a/tools/arch/x86/include/asm/unistd_32.h b/tools/arch/x86/include/asm/unistd_32.h
+deleted file mode 100644
+index 60a89dba01b6..000000000000
+--- a/tools/arch/x86/include/asm/unistd_32.h
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef __NR_perf_event_open
+-# define __NR_perf_event_open 336
+-#endif
+-#ifndef __NR_futex
+-# define __NR_futex 240
+-#endif
+-#ifndef __NR_gettid
+-# define __NR_gettid 224
+-#endif
+-#ifndef __NR_getcpu
+-# define __NR_getcpu 318
+-#endif
+-#ifndef __NR_setns
+-# define __NR_setns 346
+-#endif
+diff --git a/tools/arch/x86/include/asm/unistd_64.h b/tools/arch/x86/include/asm/unistd_64.h
+deleted file mode 100644
+index cb52a3a8b8fc..000000000000
+--- a/tools/arch/x86/include/asm/unistd_64.h
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef __NR_perf_event_open
+-# define __NR_perf_event_open 298
+-#endif
+-#ifndef __NR_futex
+-# define __NR_futex 202
+-#endif
+-#ifndef __NR_gettid
+-# define __NR_gettid 186
+-#endif
+-#ifndef __NR_getcpu
+-# define __NR_getcpu 309
+-#endif
+-#ifndef __NR_setns
+-#define __NR_setns 308
+-#endif
+diff --git a/tools/perf/util/evsel.c b/tools/perf/util/evsel.c
+index a69e64236120..f4075392dcb6 100644
+--- a/tools/perf/util/evsel.c
++++ b/tools/perf/util/evsel.c
+@@ -21,6 +21,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/resource.h>
+ #include <sys/types.h>
++#include <sys/syscall.h>
+ #include <dirent.h>
+ #include <stdlib.h>
+ #include <perf/evsel.h>
+
 -- 
-2.25.0
+Peter Xu
 
