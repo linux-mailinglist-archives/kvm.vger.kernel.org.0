@@ -2,131 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C777915F642
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 19:59:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8021A15F69C
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 20:14:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387720AbgBNS7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 13:59:02 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46516 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729900AbgBNS7C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 13:59:02 -0500
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1A36524684
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 18:59:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581706741;
-        bh=sDuNfKWoPpSrN5oPOUrwlTFcBuhLYXcdRqnE84ZHMxI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=dBvKkrbN2zjKd1UtcXTrhOUf9txYmtN0gkqLua8TatxLDTKDhnFRk10uGFH4s/WXt
-         IBc0zPL4OqPZ/9WlXc2HcUXR7nlTjCWoNDOEEiYDf4x8oeRqZ4V5akhtz7mhTCGD3F
-         nYSXryAUaoB6HbO7V4V529hFJYgfz3F3t1+QvK28=
-Received: by mail-wr1-f44.google.com with SMTP id m16so12086840wrx.11
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 10:59:01 -0800 (PST)
-X-Gm-Message-State: APjAAAV7KeoRA2GTnGRML7qPQDSnHzTsC2xkhgFQWVOHiOC13aGXu3eu
-        cEVBTMFr7b6aHq34wxV0ez6blzxGFnKCeeNd5nFsTw==
-X-Google-Smtp-Source: APXvYqwjzgYrmhHLu5TEIGRVZ7CWlT5Ssetb8QK0esyZiXxWwEmJYOpZXgV19RAPW2gMZRaV7w98pJpEKU/JOguli74=
-X-Received: by 2002:a5d:4cc9:: with SMTP id c9mr5361655wrt.70.1581706739323;
- Fri, 14 Feb 2020 10:58:59 -0800 (PST)
-MIME-Version: 1.0
-References: <cover.1581555616.git.ashish.kalra@amd.com> <CALCETrXE9cWd3TbBZMsAwmSwWpDYFsicLZ=amHLWsvE0burQSw@mail.gmail.com>
- <20200213230916.GB8784@ashkalra_ubuntu_server>
-In-Reply-To: <20200213230916.GB8784@ashkalra_ubuntu_server>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Fri, 14 Feb 2020 10:58:46 -0800
-X-Gmail-Original-Message-ID: <CALCETrUQBsof3fMf-Dj7RDJJ9GDdVGNOML_ZyeSmJtcp_LhdPQ@mail.gmail.com>
-Message-ID: <CALCETrUQBsof3fMf-Dj7RDJJ9GDdVGNOML_ZyeSmJtcp_LhdPQ@mail.gmail.com>
-Subject: Re: [PATCH 00/12] SEV Live Migration Patchset.
-To:     Ashish Kalra <ashish.kalra@amd.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
+        id S2388330AbgBNTOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 14:14:09 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:43887 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387718AbgBNTOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 14:14:09 -0500
+Received: by mail-qt1-f195.google.com with SMTP id d18so7693295qtj.10
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 11:14:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lca.pw; s=google;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=scnEoR+rGyXwnk7+XhNjguBgKH2xz3AYHqxz930H50g=;
+        b=RzdXkWTLw9HZo7wGGYxbe32zLEXoVEUum/GroJFlvy/OqFanHtxrUUSTvsI9E8M27N
+         TByGA/BF7OrGpT/4xfadH6mDsaBVOqQJnWMvdlfwtqI3bwaehXqHQihHrKxfmB4wW1SV
+         Vj4545QIFYgl3393+10HVm88sNn+2DwlX6jRxw6SdyXvqGCe6VuMf+qunmPmOlemlX1j
+         VETn72COVYnOpbGYfD4q5n/vcnCdvep7XtH3bNaaqvX6AtNn8rZM+3YMMHqnzD/gwUXm
+         tisJGXe0T/pAVQ/Qb0EK2mRmiocplXXt+SBTsZReo94obPoke06rofB4BUi702zvNQYJ
+         dsRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=scnEoR+rGyXwnk7+XhNjguBgKH2xz3AYHqxz930H50g=;
+        b=f7kkP6mtEH4/amZhr8/4sy1L4sZAUhRXAbYOTKp8dfTUU3ylAt9C4EhceGG4L/+6vR
+         9z9hoS44lROr1S2l26d+yoFJOyQMQOXUTDaaSfIf/Imjv/Hmdqp64YAGj5PAUxYO30Mk
+         JHFztEjoJVYNy7YFxm5Pa/QC6EZ9X2agvvXd+87w19oNTgF+von3LbsqytTHOYyNOMPY
+         PG3jR3TRvz63k5Nc7LA0K0BUxab6qoXpHohFp+K+BGuCToAl9wU5akzS7+EGtf0Ez30D
+         TNXRpNfWZOOgGQQFphJxHJrOVt5Nu5lnb/SKdt1HTdIAm3d1GeOUNwOHSVIaNpIBhyuk
+         On/w==
+X-Gm-Message-State: APjAAAUwAYHKC6uKVINzaLV1njDSDyuwYXPx94WZu04s1PZa4QdmO5Ok
+        pRIEf3A2nl6iEzigROdNy+ie4A==
+X-Google-Smtp-Source: APXvYqywuXE1sPf3ZVbmi/yqbjXdbPGAskWSsolHbLxZksHzi47OXzqWC5sMv7lEn+r7hypEB6sacw==
+X-Received: by 2002:ac8:145:: with SMTP id f5mr3793275qtg.194.1581707648516;
+        Fri, 14 Feb 2020 11:14:08 -0800 (PST)
+Received: from dhcp-41-57.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id u4sm3816823qkh.59.2020.02.14.11.14.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 14 Feb 2020 11:14:07 -0800 (PST)
+Message-ID: <1581707646.7365.72.camel@lca.pw>
+Subject: Re: [PATCH] kvm/emulate: fix a -Werror=cast-function-type
+From:   Qian Cai <cai@lca.pw>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Brijesh Singh <brijesh.singh@amd.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Date:   Fri, 14 Feb 2020 14:14:06 -0500
+In-Reply-To: <CALMp9eTRn-46oKg5a9h79EZOvHGwT=8ZZN15Zmy5NUYsd+r8wQ@mail.gmail.com>
+References: <1581695768-6123-1-git-send-email-cai@lca.pw>
+         <20200214165923.GA20690@linux.intel.com> <1581700124.7365.70.camel@lca.pw>
+         <CALMp9eTRn-46oKg5a9h79EZOvHGwT=8ZZN15Zmy5NUYsd+r8wQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.22.6 (3.22.6-10.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 3:09 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
->
-> On Wed, Feb 12, 2020 at 09:43:41PM -0800, Andy Lutomirski wrote:
-> > On Wed, Feb 12, 2020 at 5:14 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
-> > >
-> > > From: Ashish Kalra <ashish.kalra@amd.com>
-> > >
-> > > This patchset adds support for SEV Live Migration on KVM/QEMU.
-> >
-> > I skimmed this all and I don't see any description of how this all works.
-> >
-> > Does any of this address the mess in svm_register_enc_region()?  Right
-> > now, when QEMU (or a QEMU alternative) wants to allocate some memory
-> > to be used for guest encrypted pages, it mmap()s some memory and the
-> > kernel does get_user_pages_fast() on it.  The pages are kept pinned
-> > for the lifetime of the mapping.  This is not at all okay.  Let's see:
-> >
-> >  - The memory is pinned and it doesn't play well with the Linux memory
-> > management code.  You just wrote a big patch set to migrate the pages
-> > to a whole different machines, but we apparently can't even migrate
-> > them to a different NUMA node or even just a different address.  And
-> > good luck swapping it out.
-> >
-> >  - The memory is still mapped in the QEMU process, and that mapping is
-> > incoherent with actual guest access to the memory.  It's nice that KVM
-> > clflushes it so that, in principle, everything might actually work,
-> > but this is gross.  We should not be exposing incoherent mappings to
-> > userspace.
-> >
-> > Perhaps all this fancy infrastructure you're writing for migration and
-> > all this new API surface could also teach the kernel how to migrate
-> > pages from a guest *to the same guest* so we don't need to pin pages
-> > forever.  And perhaps you could put some thought into how to improve
-> > the API so that it doesn't involve nonsensical incoherent mappings.o
->
-> As a different key is used to encrypt memory in each VM, the hypervisor
-> can't simply copy the the ciphertext from one VM to another to migrate
-> the VM.  Therefore, the AMD SEV Key Management API provides a new sets
-> of function which the hypervisor can use to package a guest page for
-> migration, while maintaining the confidentiality provided by AMD SEV.
->
-> There is a new page encryption bitmap created in the kernel which
-> keeps tracks of encrypted/decrypted state of guest's pages and this
-> bitmap is updated by a new hypercall interface provided to the guest
-> kernel and firmware.
->
-> KVM_GET_PAGE_ENC_BITMAP ioctl can be used to get the guest page encryption
-> bitmap. The bitmap can be used to check if the given guest page is
-> private or shared.
->
-> During the migration flow, the SEND_START is called on the source hypervisor
-> to create an outgoing encryption context. The SEV guest policy dictates whether
-> the certificate passed through the migrate-set-parameters command will be
-> validated. SEND_UPDATE_DATA is called to encrypt the guest private pages.
-> After migration is completed, SEND_FINISH is called to destroy the encryption
-> context and make the VM non-runnable to protect it against cloning.
->
-> On the target machine, RECEIVE_START is called first to create an
-> incoming encryption context. The RECEIVE_UPDATE_DATA is called to copy
-> the received encrypted page into guest memory. After migration has
-> completed, RECEIVE_FINISH is called to make the VM runnable.
->
+On Fri, 2020-02-14 at 09:40 -0800, Jim Mattson wrote:
+> On Fri, Feb 14, 2020 at 9:08 AM Qian Cai <cai@lca.pw> wrote:
+> > 
+> > On Fri, 2020-02-14 at 08:59 -0800, Sean Christopherson wrote:
+> > > On Fri, Feb 14, 2020 at 10:56:08AM -0500, Qian Cai wrote:
+> > > > arch/x86/kvm/emulate.c: In function 'x86_emulate_insn':
+> > > > arch/x86/kvm/emulate.c:5686:22: error: cast between incompatible
+> > > > function types from 'int (*)(struct x86_emulate_ctxt *)' to 'void
+> > > > (*)(struct fastop *)' [-Werror=cast-function-type]
+> > > >     rc = fastop(ctxt, (fastop_t)ctxt->execute);
+> > > > 
+> > > > Fixes: 3009afc6e39e ("KVM: x86: Use a typedef for fastop functions")
+> > > > Signed-off-by: Qian Cai <cai@lca.pw>
+> > > > ---
+> > > >  arch/x86/kvm/emulate.c | 8 +++++---
+> > > >  1 file changed, 5 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> > > > index ddbc61984227..17ae820cf59d 100644
+> > > > --- a/arch/x86/kvm/emulate.c
+> > > > +++ b/arch/x86/kvm/emulate.c
+> > > > @@ -5682,10 +5682,12 @@ int x86_emulate_insn(struct x86_emulate_ctxt *ctxt)
+> > > >             ctxt->eflags &= ~X86_EFLAGS_RF;
+> > > > 
+> > > >     if (ctxt->execute) {
+> > > > -           if (ctxt->d & Fastop)
+> > > > -                   rc = fastop(ctxt, (fastop_t)ctxt->execute);
+> > > 
+> > > Alternatively, can we do -Wno-cast-function-type?  That's a silly warning
+> > > IMO.
+> > 
+> > I am doing W=1 on linux-next where some of the warnings might be silly but the
+> > recent commit changes all warnings to errors forces me having to silence those
+> > somehow.
+> > 
+> > > 
+> > > If not, will either of these work?
+> > > 
+> > >                       rc = fastop(ctxt, (void *)ctxt->execute);
+> > > 
+> > > or
+> > >                       rc = fastop(ctxt, (fastop_t)(void *)ctxt->execute);
+> > 
+> > I have no strong preference. I originally thought just to go back the previous
+> > code style where might be more acceptable, but it is up to maintainers.
+> 
+> It seems misguided to define a local variable just to get an implicit
+> cast from (void *) to (fastop_t). Sean's first suggestion gives you
+> the same implicit cast without the local variable. The second
+> suggestion makes both casts explicit.
 
-Thanks!  This belongs somewhere in the patch set.
-
-You still haven't answered my questions about the existing coherency
-issues and whether the same infrastructure can be used to migrate
-guest pages within the same machine.
-
-Also, you're making guest-side and host-side changes.  What ensures
-that you don't try to migrate a guest that doesn't support the
-hypercall for encryption state tracking?
+OK, I'll do a v2 using the first suggestion which looks simpler once it passed
+compilations.
