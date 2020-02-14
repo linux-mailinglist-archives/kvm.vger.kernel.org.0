@@ -2,46 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CF5915D5D7
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 11:34:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EA0315D5DA
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 11:35:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387409AbgBNKeK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 05:34:10 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32759 "EHLO
+        id S2387414AbgBNKfI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 05:35:08 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23605 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387397AbgBNKeK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 05:34:10 -0500
+        by vger.kernel.org with ESMTP id S1729122AbgBNKfH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 05:35:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581676448;
+        s=mimecast20190719; t=1581676505;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=xCpJHQkBYPZN2FNpoYNMpe91Kkro70dG9axz/3d1rYw=;
-        b=alklvCNj+Q89tfRXgql8GLTuIlNE5e4HLJcIjqopbTE1HuCypQf6jK/Dc2QiYNkOhuMCCi
-        /RUhCBFeDYlzVA6CkfL9RpLg/Qtie6v8tNpVoy4sLKq8+lF8dvI8SmiFAJgGmpgRcFdXgJ
-        rnA7ecAQN/7+fUkVT6XsFayf5pe1W/c=
+        bh=mOprtpuyKK+UcOEZps2WDzkzNMYMp6lFF0pFi/mLl30=;
+        b=VTCNocLR/CW6fjxiHeItL3MLNp82/yvHlGs38GIgbcF1hgfc56K85/91D2UuTmirQ6NX3R
+        vZJHWDZQ8S8584m/hmn4ho4mXU2lZxp5YSuWCrUCNQBlSUkN+iBrqlNFBk931LOu6thfDW
+        w0J146iUWXNbpRhMkexMqXL73KJUkMw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-zajYfwgTOYS_NK2dqiybTg-1; Fri, 14 Feb 2020 05:34:02 -0500
-X-MC-Unique: zajYfwgTOYS_NK2dqiybTg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-438-6VciVSPmNOScUWQVYXJ96Q-1; Fri, 14 Feb 2020 05:35:01 -0500
+X-MC-Unique: 6VciVSPmNOScUWQVYXJ96Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB87E802684;
-        Fri, 14 Feb 2020 10:34:00 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BA24801E70;
+        Fri, 14 Feb 2020 10:35:00 +0000 (UTC)
 Received: from [10.36.118.137] (unknown [10.36.118.137])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E32B160BEF;
-        Fri, 14 Feb 2020 10:33:56 +0000 (UTC)
-Subject: Re: [PATCH kvm-unit-tests 2/2] runtime: Introduce VMM_PARAMS
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, peter.maydell@linaro.org,
-        alex.bennee@linaro.org, pbonzini@redhat.com, lvivier@redhat.com,
-        thuth@redhat.com, frankja@linux.ibm.com, eric.auger@redhat.com
-References: <20200213143300.32141-1-drjones@redhat.com>
- <20200213143300.32141-3-drjones@redhat.com>
- <b455b420-bdbd-8389-4a9c-c28a9970bfc2@redhat.com>
- <20200214103059.vcvsg6mfr3mo7dnm@kamzik.brq.redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C26CD5C115;
+        Fri, 14 Feb 2020 10:34:55 +0000 (UTC)
+Subject: Re: [PATCH 04/35] s390/protvirt: add ultravisor initialization
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-5-borntraeger@de.ibm.com>
+ <44aa351c-2333-e1df-42ce-6cf3a6808802@redhat.com>
+ <81e4d5a1-ec8a-4de8-e136-8e61ad1fc788@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -87,48 +93,38 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <dfbd6f4c-6082-2909-e324-a401713c3af2@redhat.com>
-Date:   Fri, 14 Feb 2020 11:33:55 +0100
+Message-ID: <fa6ba72c-0f24-a3c0-442c-ff7613fbf05a@redhat.com>
+Date:   Fri, 14 Feb 2020 11:34:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214103059.vcvsg6mfr3mo7dnm@kamzik.brq.redhat.com>
+In-Reply-To: <81e4d5a1-ec8a-4de8-e136-8e61ad1fc788@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.02.20 11:30, Andrew Jones wrote:
-> On Fri, Feb 14, 2020 at 11:14:49AM +0100, David Hildenbrand wrote:
->> On 13.02.20 15:33, Andrew Jones wrote:
->>> Users may need to temporarily provide additional VMM parameters.
->>> The VMM_PARAMS environment variable provides a way to do that.
->>> We take care to make sure when executing ./run_tests.sh that
->>> the VMM_PARAMS parameters come last, allowing unittests.cfg
->>> parameters to be overridden. However, when running a command
->>> line like `$ARCH/run $TEST $PARAMS` we want $PARAMS to override
->>> $VMM_PARAMS, so we ensure that too.
+
 >>
->> While reading this, I was wondering why not simply "$QEMU_PARAMS"?
+>>> +	prot_virt_host = 0;> +}
+>>> +
+>>> +void adjust_to_uv_max(unsigned long *vmax)
+>>> +{
+>>> +	if (prot_virt_host && *vmax > uv_info.max_sec_stor_addr)
+>>> +		*vmax = uv_info.max_sec_stor_addr;
+>>
+>> Once you move the prot virt check out of this function
 > 
-> I'd like to slowly move away from assuming QEMU is the VMM. We
-> already have support for kvmtool (to some degree) and I'd like
-> to see that support increase. Also, maybe we'll eventually add
-> support for a rust-vmm reference VMM to drive kvm-unit-tests.
-> IOW, rather than add yet another QEMU named variable I'd like
-> to start a trend of using VMM named variables. Actually, we
-> could add VMM named alternatives for the QEMU named ones we have
-> now and start using them in the scripts. We'd just need to remap
-> the old names for backward compatibility early in the run.
+> 
+>>
+>> 	*vmax = max_t(unsigned long, *vmax, uv_info.max_sec_stor_addr);
 
-And we do expect other VMMs to eat the same set of parameters? If it's
-QEMU specific, I think we should make this clear.
+actually min_t, sorry :)
 
-But no strong opinion.
 
 -- 
 Thanks,
