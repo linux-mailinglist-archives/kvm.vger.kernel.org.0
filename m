@@ -2,80 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CE2D15EED5
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 18:43:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7ED015F3E5
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 19:22:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389855AbgBNRn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 12:43:27 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:36320 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389771AbgBNRnZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 12:43:25 -0500
-Received: by mail-io1-f67.google.com with SMTP id d15so11451519iog.3
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 09:43:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vH6F7s/7KJOmKxjFPtdbua/0bzQH273F8zOPdozonb8=;
-        b=Ux0PhWNqk4sJNEs0icorJrDWXp824NUdWvxe43XntaFe4SR1FlgGObmsib+qpD1Ty7
-         umGaCdf7ZDRykv+Sv2UF5ntf+qG8pt5dWqR/xopxpGobdyEjt5xGlt4rw1j4DFllB77o
-         FOztyw1X44q3OjHuAhB1kKDHPd0QVA4rXe0fj30RB2ZhUuqqjhwAILokrOlystz9aCtH
-         BuJQ4pE3vnGZV+wn6vUDXCbeHqMTyxNMwnukmyBKdCF353gbp6mq3IwTWL+1hDurD3Vq
-         OEXtqLyEqHCMjGkg5XDUqbWHcyfnFD5fNCN7/5hBPPH64kCTgNVhIl1huzTna60C8xnK
-         fgxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vH6F7s/7KJOmKxjFPtdbua/0bzQH273F8zOPdozonb8=;
-        b=uUH5LW4gskYhPtycb2O08QyFTaKY9wvdnBXaaETGTlm4rAtvQBrnuXR7V6cW+tiHND
-         lbkqTi2D42wP29kKYbJpAbbgsLorVExIUgNVAT06ivlq0bdpiy1uSrw0403DvDNqG0/w
-         2LpE8YysGbLdJECYdSR0PncEZoC7TG273XBq7/yb0TrCmMsaotUEKAITQr5OkZut0UnO
-         UNihNd4NJM9MjR7TFk+qfwNpq5Jb9gCJ56sNr839PqjMqxOx7hYw1GtB9FG1XjUKUrML
-         oFbkJpXjyT6jX8RBW4Rl2JVpicuSVl+grJztsEgtuAZuWjzf++/CRoxhtnIcsqrra6w/
-         Y8AQ==
-X-Gm-Message-State: APjAAAUTSqwUEbgx7niGxmTXZpLskZjx58PcKBXtiVxeg9P990tOUgUn
-        AcxVxjUesMTmGCMXn5sKOF7Rn9w1ukKDNrMuHl1g1Q==
-X-Google-Smtp-Source: APXvYqzLzSD4wBOn+oU2MaRsuKpeItnXRIq8O1WrWQrL68J+eAQXMFVizCcOMm7FYVALf8go9yilwPgtCiPr2/V3muY=
-X-Received: by 2002:a5e:8e4c:: with SMTP id r12mr3089863ioo.119.1581702203932;
- Fri, 14 Feb 2020 09:43:23 -0800 (PST)
+        id S2404872AbgBNSQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 13:16:25 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56626 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730802AbgBNPve (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 10:51:34 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B7EF224688;
+        Fri, 14 Feb 2020 15:51:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1581695493;
+        bh=pnCToD4ejXqmCSEfYgdkO9vs0Zi7wt1AqjYvKxi4kFY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=MXpxqSZMVbriUiIPgs8WVrPNXwZYPyAOY1AO4c2gWdl0BM1fqs8/axoGLYRfrlm3C
+         z0t1ty+yW+8cNnLRPlryxczwcuIy3sZLJeB2EhWs5PAOvclFb+BufgVTyUNL34vTF/
+         kk7JN8lanfT4xjPU9617nh+uB/rqxsGvKoQ3+2r4=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Julian Wiedmann <jwi@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.5 122/542] KVM: s390: ENOTSUPP -> EOPNOTSUPP fixups
+Date:   Fri, 14 Feb 2020 10:41:54 -0500
+Message-Id: <20200214154854.6746-122-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200214154854.6746-1-sashal@kernel.org>
+References: <20200214154854.6746-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20200214143035.607115-1-e.velu@criteo.com>
-In-Reply-To: <20200214143035.607115-1-e.velu@criteo.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 14 Feb 2020 09:43:13 -0800
-Message-ID: <CALMp9eSdOz4NMHEM_J1V3PiyTsivPG3AJ-NX1CTvyxF_uJFaAQ@mail.gmail.com>
-Subject: Re: [PATCH] kvm: x86: Print "disabled by bios" only once per host
-To:     Erwan Velu <erwanaliasr1@gmail.com>
-Cc:     Erwan Velu <e.velu@criteo.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 6:33 AM Erwan Velu <erwanaliasr1@gmail.com> wrote:
->
-> The current behavior is to print a "disabled by bios" message per CPU thread.
-> As modern CPUs can have up to 64 cores, 128 on a dual socket, and turns this
-> printk to be a pretty noisy by showing up to 256 times the same line in a row.
->
-> This patch offer to only print the message once per host considering the BIOS will
-> disabled the feature for all sockets/cores at once and not on a per core basis.
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-That's quite an assumption you're making. I guess I've seen more
-broken BIOSes than you have. :-) Still, I would rather see the message
-just once--perhaps with an additional warning if all logical
-processors aren't in agreement.
+[ Upstream commit c611990844c28c61ca4b35ff69d3a2ae95ccd486 ]
+
+There is no ENOTSUPP for userspace.
+
+Reported-by: Julian Wiedmann <jwi@linux.ibm.com>
+Fixes: 519783935451 ("KVM: s390: introduce ais mode modify function")
+Fixes: 2c1a48f2e5ed ("KVM: S390: add new group for flic")
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/s390/kvm/interrupt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index 165dea4c7f193..c06c89d370a73 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -2190,7 +2190,7 @@ static int flic_ais_mode_get_all(struct kvm *kvm, struct kvm_device_attr *attr)
+ 		return -EINVAL;
+ 
+ 	if (!test_kvm_facility(kvm, 72))
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	mutex_lock(&fi->ais_lock);
+ 	ais.simm = fi->simm;
+@@ -2499,7 +2499,7 @@ static int modify_ais_mode(struct kvm *kvm, struct kvm_device_attr *attr)
+ 	int ret = 0;
+ 
+ 	if (!test_kvm_facility(kvm, 72))
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	if (copy_from_user(&req, (void __user *)attr->addr, sizeof(req)))
+ 		return -EFAULT;
+@@ -2579,7 +2579,7 @@ static int flic_ais_mode_set_all(struct kvm *kvm, struct kvm_device_attr *attr)
+ 	struct kvm_s390_ais_all ais;
+ 
+ 	if (!test_kvm_facility(kvm, 72))
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	if (copy_from_user(&ais, (void __user *)attr->addr, sizeof(ais)))
+ 		return -EFAULT;
+-- 
+2.20.1
+
