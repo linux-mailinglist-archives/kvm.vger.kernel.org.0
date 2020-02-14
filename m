@@ -2,129 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 880F015D41C
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 09:51:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE96815D423
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 09:54:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729028AbgBNIvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 03:51:48 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:40887 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726179AbgBNIvs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 03:51:48 -0500
-Received: by mail-oi1-f193.google.com with SMTP id a142so8710681oii.7;
-        Fri, 14 Feb 2020 00:51:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=63V0t6Y+v/yU31L4w6jaW53E7T9mH+a6FE6ph40izng=;
-        b=HW3SWoPMAWcziUXejTkkg3tJQaxTLuOcvMfS1u7iXWG4qTREGVNOIA8n7j4odk9xS7
-         cJe3jRrGJX+xMTRDlDm0vroKYXPufsoD3B+UQJeCCSh+FQ7j7HjWFq/W4/lRfHAlO8Jb
-         KuD8qjITfSzr9SeVUMoUH8OSnMIRhwA3KJ5yInw7w0kDjOV4Tkc/hSu036QHmbofsDKd
-         NIG1rGHCD2/7ihQoa6kpjivDs1Ue/AfhFemnGRa4ZM3X5Ie/2s6FM02JImYWFkM11W6I
-         rM3tyN6utg8T76cWcF/0+l7XZcdRBoRoJ/wVlwGjGsNXEXK5QHaf543+DBFF3s3JXXGQ
-         facQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=63V0t6Y+v/yU31L4w6jaW53E7T9mH+a6FE6ph40izng=;
-        b=Hq6VeisiqmPn5QiO8Qcwk8vZPv86Ho4v0pMKlTJbNARdPagDdUPo8cJ/GqwWxIEuK2
-         ZS7//n+Xg81m1Zvbf4mf0f8o40uGX8K4wT+iboXU72xiFdaCOPwGyU9Ca4BquGuOmkrk
-         rglbrxHY9wySoriHrzQFfNCGDWr1SHUnJlQBxSF8B1K6PAyp7lWGvd1k3pe50Q8lqTH8
-         OL+DpTdJEI5xGitKE8ayrCa+Byu6LeUkBMmiWy/FAi12Lv6M/hWztaTK2qGCa8SkmrTj
-         Xp+Q/pgv4ME1BQrUh6UKKv91RycGgZbXoWeYizzQQTzMJ1OyNu2YCO/PvUFhCSypHWCs
-         /kWw==
-X-Gm-Message-State: APjAAAV4UveUuMB6iZbGCzM3UcayXC5DTUS+vaZj9jjPMingrOC2054g
-        kOugQa+KVEvAYxlDwsSUhLxwDz79Csd9Q8XNUUF07fSTy94=
-X-Google-Smtp-Source: APXvYqzzT/hXgE2DdlxSNcSrYssedfnMU72KPc54edfHOxHDky+PtYBpJAGzIQX2Grl1StRVMAViAAW1GYp6zeO/aIA=
-X-Received: by 2002:a05:6808:249:: with SMTP id m9mr1179982oie.5.1581670307046;
- Fri, 14 Feb 2020 00:51:47 -0800 (PST)
+        id S1728864AbgBNIyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 03:54:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52218 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726004AbgBNIyG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 03:54:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581670445;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lRnaNkrQwUxMeKz5EJIhuvgUUtSlhXIlwWyva/AZZvc=;
+        b=LH0Un+i5iBAO1JZhana4fd3XjZubgL0btOazWCh2Dovg8EQQvPFqkloj3o57ueJHJHe0SD
+        xHqjwxzVd4N72wKYVvKd2egansp1nJWgMvDeUCDsNmvr1nyIlo0sheUJOCOgAcb0ryVbLs
+        KTDuowxWK+eqSIzE5oRERzNCfQcMs4c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-ymzW-huHM3akZYa8vuo4_w-1; Fri, 14 Feb 2020 03:53:59 -0500
+X-MC-Unique: ymzW-huHM3akZYa8vuo4_w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FCD71007273;
+        Fri, 14 Feb 2020 08:53:58 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8843D5C134;
+        Fri, 14 Feb 2020 08:53:54 +0000 (UTC)
+Date:   Fri, 14 Feb 2020 09:53:52 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [RFCv2 34/37] KVM: s390: protvirt: Add UV debug trace
+Message-ID: <20200214095352.269b259e.cohuck@redhat.com>
+In-Reply-To: <0edf1540-475c-cdf5-2c2c-b7b592beaaad@de.ibm.com>
+References: <20200203131957.383915-1-borntraeger@de.ibm.com>
+        <20200203131957.383915-35-borntraeger@de.ibm.com>
+        <20200206104159.16130ccb.cohuck@redhat.com>
+        <0edf1540-475c-cdf5-2c2c-b7b592beaaad@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 14 Feb 2020 16:51:36 +0800
-Message-ID: <CANRm+CwmVnJqCzN1sWhBOKZBCqpL2ZfRbT-V+tHMGFwPjCZGvw@mail.gmail.com>
-Subject: [PATCH RESEND] KVM: X86: Grab KVM's srcu lock when accessing hv
- assist page
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Fri, 14 Feb 2020 09:32:26 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Acquire kvm->srcu for the duration of mapping eVMCS to fix a bug where accessing
-hv assist page derefences ->memslots without holding ->srcu or ->slots_lock.
+> On 06.02.20 10:41, Cornelia Huck wrote:
+> 
+> > 
+> > You often seem to log in pairs (into the per-vm dbf and into the new uv
+> > dbf). Would it make sense to introduce a new helper for that, or is
+> > that overkill?  
+> 
+> I think I had now a good idea.
+> 
+> I will let KVM_UV_EVENT always log into both logs (the per KVM and the global one).
+> If it is important enough for the global one it really should also be in the 
+> per kvm one. So I will split out all messages into the separate patches and
+> move this infrastructure at the beginning of the patch series.
+> Then we only need one line of code for each log. 
+> 
 
-It can be reproduced by running KVM's evmcs_test selftest.
+I think that makes a lot of sense.
 
-  =============================
-  WARNING: suspicious RCU usage
-  5.6.0-rc1+ #53 Tainted: G        W IOE
-  -----------------------------
-  ./include/linux/kvm_host.h:623 suspicious rcu_dereference_check() usage!
-
-  other info that might help us debug this:
-
-   rcu_scheduler_active = 2, debug_locks = 1
-  1 lock held by evmcs_test/8507:
-   #0: ffff9ddd156d00d0 (&vcpu->mutex){+.+.}, at:
-kvm_vcpu_ioctl+0x85/0x680 [kvm]
-
-  stack backtrace:
-  CPU: 6 PID: 8507 Comm: evmcs_test Tainted: G        W IOE     5.6.0-rc1+ #53
-  Hardware name: Dell Inc. OptiPlex 7040/0JCTF8, BIOS 1.4.9 09/12/2016
-  Call Trace:
-   dump_stack+0x68/0x9b
-   kvm_read_guest_cached+0x11d/0x150 [kvm]
-   kvm_hv_get_assist_page+0x33/0x40 [kvm]
-   nested_enlightened_vmentry+0x2c/0x60 [kvm_intel]
-   nested_vmx_handle_enlightened_vmptrld.part.52+0x32/0x1c0 [kvm_intel]
-   nested_sync_vmcs12_to_shadow+0x439/0x680 [kvm_intel]
-   vmx_vcpu_run+0x67a/0xe60 [kvm_intel]
-   vcpu_enter_guest+0x35e/0x1bc0 [kvm]
-   kvm_arch_vcpu_ioctl_run+0x40b/0x670 [kvm]
-   kvm_vcpu_ioctl+0x370/0x680 [kvm]
-   ksys_ioctl+0x235/0x850
-   __x64_sys_ioctl+0x16/0x20
-   do_syscall_64+0x77/0x780
-   entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/vmx/nested.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 657c2ed..a68a69d 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1994,14 +1994,18 @@ static int
-nested_vmx_handle_enlightened_vmptrld(struct kvm_vcpu *vcpu,
- void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
- {
-     struct vcpu_vmx *vmx = to_vmx(vcpu);
-+    int idx;
-
-     /*
-      * hv_evmcs may end up being not mapped after migration (when
-      * L2 was running), map it here to make sure vmcs12 changes are
-      * properly reflected.
-      */
--    if (vmx->nested.enlightened_vmcs_enabled && !vmx->nested.hv_evmcs)
-+    if (vmx->nested.enlightened_vmcs_enabled && !vmx->nested.hv_evmcs) {
-+        idx = srcu_read_lock(&vcpu->kvm->srcu);
-         nested_vmx_handle_enlightened_vmptrld(vcpu, false);
-+        srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+    }
-
-     if (vmx->nested.hv_evmcs) {
-         copy_vmcs12_to_enlightened(vmx);
---
-2.7.4
