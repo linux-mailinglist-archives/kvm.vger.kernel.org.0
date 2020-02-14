@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CA5A15F5CD
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 19:40:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D3E415F5E8
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 19:45:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730741AbgBNSjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 13:39:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50905 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729906AbgBNSji (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 13:39:38 -0500
+        id S2388969AbgBNSlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 13:41:09 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47584 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388668AbgBNSlI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 13:41:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581705575;
+        s=mimecast20190719; t=1581705667;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=a9L7X7lu3Zm+B9R/kuIAndsV1kZyiBjybeJtrjbnD+U=;
-        b=iEeiK4RqhiORuxIE2T7+xj3LHiXzzRoxbfB2GaoqHEETksUc4tsZQ+UfoEuCFUNW77Ume4
-        0TPGeEQJK20FpmQCgeMpiH8gq/Na8B/1yNA8AI6fI1yJkGHnsxSz9Mr0KVSNyxQ8au7mxZ
-        FOb8e0MuuHbXqa6IAw6SELVEydXZWlk=
+        bh=O4/aI97aQYr51nakvr+GDGLLi6Wp0MwjJf0RUHk/5YM=;
+        b=O3ZO2Ier4XVgabLCNBwvZ7zDvBcdy6rhUAtO22E9Ad3gSHICeNl40icQcZJB/T+q74iPbH
+        0OiN6aOO3SsMNYVVyreWH3J1d0b1e47cK4PLFBzaR2vykmCQdwiiEkBZ9V+X9GE/D1y6O9
+        NwfiS+w6McquRksqUMN7mF0CyH4GsEs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-298-TAYbWqI-OpKhL7eLJ4CpAg-1; Fri, 14 Feb 2020 13:39:30 -0500
-X-MC-Unique: TAYbWqI-OpKhL7eLJ4CpAg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-242-_olhrK2XO9O89aq8MMpuww-1; Fri, 14 Feb 2020 13:41:01 -0500
+X-MC-Unique: _olhrK2XO9O89aq8MMpuww-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C680D100550E;
-        Fri, 14 Feb 2020 18:39:28 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3A15800D50;
+        Fri, 14 Feb 2020 18:40:59 +0000 (UTC)
 Received: from [10.36.118.137] (unknown [10.36.118.137])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 253C360BF1;
-        Fri, 14 Feb 2020 18:39:25 +0000 (UTC)
-Subject: Re: [PATCH 08/35] KVM: s390: protvirt: Add initial lifecycle handling
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 29B965DA7D;
+        Fri, 14 Feb 2020 18:40:56 +0000 (UTC)
+Subject: Re: [PATCH 11/35] KVM: s390/mm: Make pages accessible before
+ destroying the guest
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -43,10 +44,10 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>
 References: <20200207113958.7320-1-borntraeger@de.ibm.com>
- <20200207113958.7320-9-borntraeger@de.ibm.com>
+ <20200207113958.7320-12-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -92,510 +93,108 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <e627e0a6-b27a-7e3a-05cd-056eb49ed16e@redhat.com>
-Date:   Fri, 14 Feb 2020 19:39:25 +0100
+Message-ID: <d44194a4-c9f0-7114-c633-327ebb553517@redhat.com>
+Date:   Fri, 14 Feb 2020 19:40:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200207113958.7320-9-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200207113958.7320-12-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 07.02.20 12:39, Christian Borntraeger wrote:
-> From: Janosch Frank <frankja@linux.ibm.com>
+> Before we destroy the secure configuration, we better make all
+> pages accessible again. This also happens during reboot, where we reboot
+> into a non-secure guest that then can go again into secure mode. As
+> this "new" secure guest will have a new ID we cannot reuse the old page
+> state.
 > 
-> This contains 3 main changes:
-> 1. changes in SIE control block handling for secure guests
-> 2. helper functions for create/destroy/unpack secure guests
-> 3. KVM_S390_PV_COMMAND ioctl to allow userspace dealing with secure
-> machines
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  arch/s390/include/asm/kvm_host.h |  24 ++-
->  arch/s390/include/asm/uv.h       |  69 +++++++++
->  arch/s390/kvm/Makefile           |   2 +-
->  arch/s390/kvm/kvm-s390.c         | 191 +++++++++++++++++++++++-
->  arch/s390/kvm/kvm-s390.h         |  27 ++++
->  arch/s390/kvm/pv.c               | 244 +++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h         |  33 +++++
->  7 files changed, 586 insertions(+), 4 deletions(-)
->  create mode 100644 arch/s390/kvm/pv.c
+>  arch/s390/include/asm/pgtable.h |  1 +
+>  arch/s390/kvm/pv.c              |  2 ++
+>  arch/s390/mm/gmap.c             | 35 +++++++++++++++++++++++++++++++++
+>  3 files changed, 38 insertions(+)
 > 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 884503e05424..3ed31c5f80e1 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -160,7 +160,13 @@ struct kvm_s390_sie_block {
->  	__u8	reserved08[4];		/* 0x0008 */
->  #define PROG_IN_SIE (1<<0)
->  	__u32	prog0c;			/* 0x000c */
-> -	__u8	reserved10[16];		/* 0x0010 */
-> +	union {
-> +		__u8	reserved10[16];		/* 0x0010 */
-> +		struct {
-> +			__u64	pv_handle_cpu;
-> +			__u64	pv_handle_config;
-> +		};
-> +	};
->  #define PROG_BLOCK_SIE	(1<<0)
->  #define PROG_REQUEST	(1<<1)
->  	atomic_t prog20;		/* 0x0020 */
-> @@ -233,7 +239,7 @@ struct kvm_s390_sie_block {
->  #define ECB3_RI  0x01
->  	__u8    ecb3;			/* 0x0063 */
->  	__u32	scaol;			/* 0x0064 */
-> -	__u8	reserved68;		/* 0x0068 */
-> +	__u8	sdf;			/* 0x0068 */
->  	__u8    epdx;			/* 0x0069 */
->  	__u8    reserved6a[2];		/* 0x006a */
->  	__u32	todpr;			/* 0x006c */
-> @@ -645,6 +651,11 @@ struct kvm_guestdbg_info_arch {
->  	unsigned long last_bp;
->  };
+> diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
+> index dbd1453e6924..3e2ea997c334 100644
+> --- a/arch/s390/include/asm/pgtable.h
+> +++ b/arch/s390/include/asm/pgtable.h
+> @@ -1669,6 +1669,7 @@ extern int vmem_remove_mapping(unsigned long start, unsigned long size);
+>  extern int s390_enable_sie(void);
+>  extern int s390_enable_skey(void);
+>  extern void s390_reset_cmma(struct mm_struct *mm);
+> +extern void s390_reset_acc(struct mm_struct *mm);
 >  
-> +struct kvm_s390_pv_vcpu {
-> +	u64 handle;
-> +	unsigned long stor_base;
-> +};
-> +
->  struct kvm_vcpu_arch {
->  	struct kvm_s390_sie_block *sie_block;
->  	/* if vsie is active, currently executed shadow sie control block */
-> @@ -673,6 +684,7 @@ struct kvm_vcpu_arch {
->  	__u64 cputm_start;
->  	bool gs_enabled;
->  	bool skey_enabled;
-> +	struct kvm_s390_pv_vcpu pv;
->  };
+>  /* s390 has a private copy of get unmapped area to deal with cache synonyms */
+>  #define HAVE_ARCH_UNMAPPED_AREA
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index 4795e61f4e16..392795a92bd9 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -66,6 +66,8 @@ int kvm_s390_pv_destroy_vm(struct kvm *kvm)
+>  	int rc;
+>  	u32 ret;
 >  
->  struct kvm_vm_stat {
-> @@ -846,6 +858,13 @@ struct kvm_s390_gisa_interrupt {
->  	DECLARE_BITMAP(kicked_mask, KVM_MAX_VCPUS);
->  };
->  
-> +struct kvm_s390_pv {
-> +	u64 handle;
-> +	u64 guest_len;
-> +	unsigned long stor_base;
-> +	void *stor_var;
-> +};
-> +
->  struct kvm_arch{
->  	void *sca;
->  	int use_esca;
-> @@ -881,6 +900,7 @@ struct kvm_arch{
->  	DECLARE_BITMAP(cpu_feat, KVM_S390_VM_CPU_FEAT_NR_BITS);
->  	DECLARE_BITMAP(idle_mask, KVM_MAX_VCPUS);
->  	struct kvm_s390_gisa_interrupt gisa_int;
-> +	struct kvm_s390_pv pv;
->  };
->  
->  #define KVM_HVA_ERR_BAD		(-1UL)
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index e1cef772fde1..7c21d55d2e49 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -23,11 +23,19 @@
->  #define UVC_RC_INV_STATE	0x0003
->  #define UVC_RC_INV_LEN		0x0005
->  #define UVC_RC_NO_RESUME	0x0007
-> +#define UVC_RC_NEED_DESTROY	0x8000
->  
->  #define UVC_CMD_QUI			0x0001
->  #define UVC_CMD_INIT_UV			0x000f
-> +#define UVC_CMD_CREATE_SEC_CONF		0x0100
-> +#define UVC_CMD_DESTROY_SEC_CONF	0x0101
-> +#define UVC_CMD_CREATE_SEC_CPU		0x0120
-> +#define UVC_CMD_DESTROY_SEC_CPU		0x0121
->  #define UVC_CMD_CONV_TO_SEC_STOR	0x0200
->  #define UVC_CMD_CONV_FROM_SEC_STOR	0x0201
-> +#define UVC_CMD_SET_SEC_CONF_PARAMS	0x0300
-> +#define UVC_CMD_UNPACK_IMG		0x0301
-> +#define UVC_CMD_VERIFY_IMG		0x0302
->  #define UVC_CMD_PIN_PAGE_SHARED		0x0341
->  #define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
->  #define UVC_CMD_SET_SHARED_ACCESS	0x1000
-> @@ -37,10 +45,17 @@
->  enum uv_cmds_inst {
->  	BIT_UVC_CMD_QUI = 0,
->  	BIT_UVC_CMD_INIT_UV = 1,
-> +	BIT_UVC_CMD_CREATE_SEC_CONF = 2,
-> +	BIT_UVC_CMD_DESTROY_SEC_CONF = 3,
-> +	BIT_UVC_CMD_CREATE_SEC_CPU = 4,
-> +	BIT_UVC_CMD_DESTROY_SEC_CPU = 5,
->  	BIT_UVC_CMD_CONV_TO_SEC_STOR = 6,
->  	BIT_UVC_CMD_CONV_FROM_SEC_STOR = 7,
->  	BIT_UVC_CMD_SET_SHARED_ACCESS = 8,
->  	BIT_UVC_CMD_REMOVE_SHARED_ACCESS = 9,
-> +	BIT_UVC_CMD_SET_SEC_PARMS = 11,
-> +	BIT_UVC_CMD_UNPACK_IMG = 13,
-> +	BIT_UVC_CMD_VERIFY_IMG = 14,
->  	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
->  	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
->  };
-> @@ -52,6 +67,7 @@ struct uv_cb_header {
->  	u16 rrc;	/* Return Reason Code */
->  } __packed __aligned(8);
->  
-> +/* Query Ultravisor Information */
->  struct uv_cb_qui {
->  	struct uv_cb_header header;
->  	u64 reserved08;
-> @@ -71,6 +87,7 @@ struct uv_cb_qui {
->  	u64 reserveda0;
->  } __packed __aligned(8);
->  
-> +/* Initialize Ultravisor */
->  struct uv_cb_init {
->  	struct uv_cb_header header;
->  	u64 reserved08[2];
-> @@ -79,6 +96,35 @@ struct uv_cb_init {
->  	u64 reserved28[4];
->  } __packed __aligned(8);
->  
-> +/* Create Guest Configuration */
-> +struct uv_cb_cgc {
-> +	struct uv_cb_header header;
-> +	u64 reserved08[2];
-> +	u64 guest_handle;
-> +	u64 conf_base_stor_origin;
-> +	u64 conf_virt_stor_origin;
-> +	u64 reserved30;
-> +	u64 guest_stor_origin;
-> +	u64 guest_stor_len;
-> +	u64 guest_sca;
-> +	u64 guest_asce;
-> +	u64 reserved58[5];
-> +} __packed __aligned(8);
-> +
-> +/* Create Secure CPU */
-> +struct uv_cb_csc {
-> +	struct uv_cb_header header;
-> +	u64 reserved08[2];
-> +	u64 cpu_handle;
-> +	u64 guest_handle;
-> +	u64 stor_origin;
-> +	u8  reserved30[6];
-> +	u16 num;
-> +	u64 state_origin;
-> +	u64 reserved40[4];
-> +} __packed __aligned(8);
-> +
-> +/* Convert to Secure */
->  struct uv_cb_cts {
->  	struct uv_cb_header header;
->  	u64 reserved08[2];
-> @@ -86,12 +132,34 @@ struct uv_cb_cts {
->  	u64 gaddr;
->  } __packed __aligned(8);
->  
-> +/* Convert from Secure / Pin Page Shared */
->  struct uv_cb_cfs {
->  	struct uv_cb_header header;
->  	u64 reserved08[2];
->  	u64 paddr;
->  } __packed __aligned(8);
->  
-> +/* Set Secure Config Parameter */
-> +struct uv_cb_ssc {
-> +	struct uv_cb_header header;
-> +	u64 reserved08[2];
-> +	u64 guest_handle;
-> +	u64 sec_header_origin;
-> +	u32 sec_header_len;
-> +	u32 reserved2c;
-> +	u64 reserved30[4];
-> +} __packed __aligned(8);
-> +
-> +/* Unpack */
-> +struct uv_cb_unp {
-> +	struct uv_cb_header header;
-> +	u64 reserved08[2];
-> +	u64 guest_handle;
-> +	u64 gaddr;
-> +	u64 tweak[2];
-> +	u64 reserved38[3];
-> +} __packed __aligned(8);
-> +
->  /*
->   * A common UV call struct for calls that take no payload
->   * Examples:
-> @@ -105,6 +173,7 @@ struct uv_cb_nodata {
->  	u64 reserved20[4];
->  } __packed __aligned(8);
->  
-> +/* Set Shared Access */
->  struct uv_cb_share {
->  	struct uv_cb_header header;
->  	u64 reserved08[3];
-> diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
-> index 05ee90a5ea08..12decca22e7c 100644
-> --- a/arch/s390/kvm/Makefile
-> +++ b/arch/s390/kvm/Makefile
-> @@ -9,6 +9,6 @@ common-objs = $(KVM)/kvm_main.o $(KVM)/eventfd.o  $(KVM)/async_pf.o $(KVM)/irqch
->  ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
->  
->  kvm-objs := $(common-objs) kvm-s390.o intercept.o interrupt.o priv.o sigp.o
-> -kvm-objs += diag.o gaccess.o guestdbg.o vsie.o
-> +kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o
->  
->  obj-$(CONFIG_KVM) += kvm.o
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 1a48214ac507..e1bccbb41fdd 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -44,6 +44,7 @@
->  #include <asm/cpacf.h>
->  #include <asm/timex.h>
->  #include <asm/ap.h>
-> +#include <asm/uv.h>
->  #include "kvm-s390.h"
->  #include "gaccess.h"
->  
-> @@ -236,6 +237,7 @@ int kvm_arch_check_processor_compat(void)
->  
->  static void kvm_gmap_notifier(struct gmap *gmap, unsigned long start,
->  			      unsigned long end);
-> +static int sca_switch_to_extended(struct kvm *kvm);
->  
->  static void kvm_clock_sync_scb(struct kvm_s390_sie_block *scb, u64 delta)
->  {
-> @@ -568,6 +570,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_S390_BPB:
->  		r = test_facility(82);
->  		break;
-> +	case KVM_CAP_S390_PROTECTED:
-> +		r = is_prot_virt_host();
-> +		break;
->  	default:
->  		r = 0;
->  	}
-> @@ -2162,6 +2167,115 @@ static int kvm_s390_set_cmma_bits(struct kvm *kvm,
->  	return r;
+> +	/* make all pages accessible before destroying the guest */
+> +	s390_reset_acc(kvm->mm);
+>  	rc = uv_cmd_nodata(kvm_s390_pv_handle(kvm),
+>  			   UVC_CMD_DESTROY_SEC_CONF, &ret);
+>  	WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
+> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> index 7291452fe5f0..27926a06df32 100644
+> --- a/arch/s390/mm/gmap.c
+> +++ b/arch/s390/mm/gmap.c
+> @@ -2650,3 +2650,38 @@ void s390_reset_cmma(struct mm_struct *mm)
+>  	up_write(&mm->mmap_sem);
 >  }
->  
-> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>  EXPORT_SYMBOL_GPL(s390_reset_cmma);
+> +
+> +/*
+> + * make inaccessible pages accessible again
+> + */
+> +static int __s390_reset_acc(pte_t *ptep, unsigned long addr,
+> +			    unsigned long next, struct mm_walk *walk)
 > +{
-> +	int r = 0;
-> +	void __user *argp = (void __user *)cmd->data;
+> +	pte_t pte = READ_ONCE(*ptep);
 > +
-> +	switch (cmd->cmd) {
-> +	case KVM_PV_VM_CREATE: {
-> +		r = -EINVAL;
-> +		if (kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r = kvm_s390_pv_alloc_vm(kvm);
-> +		if (r)
-> +			break;
-> +
-> +		mutex_lock(&kvm->lock);
-> +		kvm_s390_vcpu_block_all(kvm);
-> +		/* FMT 4 SIE needs esca */
-> +		r = sca_switch_to_extended(kvm);
-> +		if (r) {
-> +			kvm_s390_pv_dealloc_vm(kvm);
-> +			kvm_s390_vcpu_unblock_all(kvm);
-> +			mutex_unlock(&kvm->lock);
-> +			break;
-> +		}
-> +		r = kvm_s390_pv_create_vm(kvm);
-> +		kvm_s390_vcpu_unblock_all(kvm);
-> +		mutex_unlock(&kvm->lock);
-> +		break;
-> +	}
-> +	case KVM_PV_VM_DESTROY: {
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		/* All VCPUs have to be destroyed before this call. */
-> +		mutex_lock(&kvm->lock);
-> +		kvm_s390_vcpu_block_all(kvm);
-> +		r = kvm_s390_pv_destroy_vm(kvm);
-> +		if (!r)
-> +			kvm_s390_pv_dealloc_vm(kvm);
-> +		kvm_s390_vcpu_unblock_all(kvm);
-> +		mutex_unlock(&kvm->lock);
-> +		break;
-> +	}
-> +	case KVM_PV_VM_SET_SEC_PARMS: {
-> +		struct kvm_s390_pv_sec_parm parms = {};
-> +		void *hdr;
-> +
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&parms, argp, sizeof(parms)))
-> +			break;
-> +
-> +		/* Currently restricted to 8KB */
-> +		r = -EINVAL;
-> +		if (parms.length > PAGE_SIZE * 2)
-> +			break;
-> +
-> +		r = -ENOMEM;
-> +		hdr = vmalloc(parms.length);
-> +		if (!hdr)
-> +			break;
-> +
-> +		r = -EFAULT;
-> +		if (!copy_from_user(hdr, (void __user *)parms.origin,
-> +				   parms.length))
-> +			r = kvm_s390_pv_set_sec_parms(kvm, hdr, parms.length);
-> +
-> +		vfree(hdr);
-> +		break;
-> +	}
-> +	case KVM_PV_VM_UNPACK: {
-> +		struct kvm_s390_pv_unp unp = {};
-> +
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&unp, argp, sizeof(unp)))
-> +			break;
-> +
-> +		r = kvm_s390_pv_unpack(kvm, unp.addr, unp.size, unp.tweak);
-> +		break;
-> +	}
-> +	case KVM_PV_VM_VERIFY: {
-> +		u32 ret;
-> +
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r = uv_cmd_nodata(kvm_s390_pv_handle(kvm),
-> +				  UVC_CMD_VERIFY_IMG,
-> +				  &ret);
-> +		VM_EVENT(kvm, 3, "PROTVIRT VERIFY: rc %x rrc %x",
-> +			 ret >> 16, ret & 0x0000ffff);
-> +		break;
-> +	}
-> +	default:
-> +		return -ENOTTY;
-> +	}
-> +	return r;
+> +	if (pte_present(pte))
+> +		WARN_ON_ONCE(uv_convert_from_secure(pte_val(pte) & PAGE_MASK));
+> +	return 0;
 > +}
 > +
->  long kvm_arch_vm_ioctl(struct file *filp,
->  		       unsigned int ioctl, unsigned long arg)
->  {
-> @@ -2259,6 +2373,20 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  		mutex_unlock(&kvm->slots_lock);
->  		break;
->  	}
-> +	case KVM_S390_PV_COMMAND: {
-> +		struct kvm_pv_cmd args;
+> +static const struct mm_walk_ops reset_acc_walk_ops = {
+> +	.pte_entry		= __s390_reset_acc,
+> +};
 > +
-> +		r = -EINVAL;
-> +		if (!is_prot_virt_host())
-> +			break;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&args, argp, sizeof(args)))
-> +			break;
-> +
-> +		r = kvm_s390_handle_pv(kvm, &args);
-> +		break;
-> +	}
->  	default:
->  		r = -ENOTTY;
->  	}
-> @@ -2534,6 +2662,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  
->  	if (vcpu->kvm->arch.use_cmma)
->  		kvm_s390_vcpu_unsetup_cmma(vcpu);
-> +	if (kvm_s390_pv_handle_cpu(vcpu))
-> +		kvm_s390_pv_destroy_cpu(vcpu);
->  	free_page((unsigned long)(vcpu->arch.sie_block));
->  
->  	kvm_vcpu_uninit(vcpu);
-> @@ -2560,8 +2690,12 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->  {
->  	kvm_free_vcpus(kvm);
->  	sca_dispose(kvm);
-> -	debug_unregister(kvm->arch.dbf);
->  	kvm_s390_gisa_destroy(kvm);
-> +	if (kvm_s390_pv_is_protected(kvm)) {
-> +		kvm_s390_pv_destroy_vm(kvm);
-> +		kvm_s390_pv_dealloc_vm(kvm);
-> +	}
-> +	debug_unregister(kvm->arch.dbf);
->  	free_page((unsigned long)kvm->arch.sie_page2);
->  	if (!kvm_is_ucontrol(kvm))
->  		gmap_remove(kvm->arch.gmap);
-> @@ -2657,6 +2791,9 @@ static int sca_switch_to_extended(struct kvm *kvm)
->  	unsigned int vcpu_idx;
->  	u32 scaol, scaoh;
->  
-> +	if (kvm->arch.use_esca)
-> +		return 0;
-> +
->  	new_sca = alloc_pages_exact(sizeof(*new_sca), GFP_KERNEL|__GFP_ZERO);
->  	if (!new_sca)
->  		return -ENOMEM;
-> @@ -3049,6 +3186,15 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
->  	rc = kvm_vcpu_init(vcpu, kvm, id);
->  	if (rc)
->  		goto out_free_sie_block;
-> +
-> +	if (kvm_s390_pv_is_protected(kvm)) {
-> +		rc = kvm_s390_pv_create_cpu(vcpu);
-> +		if (rc) {
-> +			kvm_vcpu_uninit(vcpu);
-> +			goto out_free_sie_block;
-> +		}
-> +	}
-> +
->  	VM_EVENT(kvm, 3, "create cpu %d at 0x%pK, sie block at 0x%pK", id, vcpu,
->  		 vcpu->arch.sie_block);
->  	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
-> @@ -4357,6 +4503,35 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
->  	return -ENOIOCTLCMD;
->  }
->  
-> +static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu *vcpu,
-> +				   struct kvm_pv_cmd *cmd)
+> +#include <linux/sched/mm.h>
+> +void s390_reset_acc(struct mm_struct *mm)
 > +{
-> +	int r = 0;
-> +
-> +	if (!kvm_s390_pv_is_protected(vcpu->kvm))
-> +		return -EINVAL;
-> +
-> +	switch (cmd->cmd) {
-> +	case KVM_PV_VCPU_CREATE: {
-> +		if (kvm_s390_pv_handle_cpu(vcpu))
-> +			return -EINVAL;
-> +
-> +		r = kvm_s390_pv_create_cpu(vcpu);
-> +		break;
-> +	}
-> +	case KVM_PV_VCPU_DESTROY: {
-> +		if (!kvm_s390_pv_handle_cpu(vcpu))
-> +			return -EINVAL;
-> +
-> +		r = kvm_s390_pv_destroy_cpu(vcpu);
-> +		break;
-> +	}
+> +	/*
+> +	 * we might be called during
+> +	 * reset:                             we walk the pages and clear
+> +	 * close of all kvm file descriptors: we walk the pages and clear
+> +	 * exit of process on fd closure:     vma already gone, do nothing
+> +	 */
+> +	if (!mmget_not_zero(mm))
+> +		return;
+> +	down_read(&mm->mmap_sem);
+> +	walk_page_range(mm, 0, TASK_SIZE, &reset_acc_walk_ops, NULL);
+> +	up_read(&mm->mmap_sem);
+> +	mmput(mm);
+> +}
+> +EXPORT_SYMBOL_GPL(s390_reset_acc);
+> 
 
-I feel like my review comments for this patch were lost, so not
-repeating them.
-
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
