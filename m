@@ -2,47 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E9BC15D410
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 09:49:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 880F015D41C
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 09:51:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728775AbgBNItx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 03:49:53 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:41736 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727965AbgBNItw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 03:49:52 -0500
-Received: by mail-oi1-f194.google.com with SMTP id i1so8700910oie.8;
-        Fri, 14 Feb 2020 00:49:52 -0800 (PST)
+        id S1729028AbgBNIvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 03:51:48 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:40887 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726179AbgBNIvs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 03:51:48 -0500
+Received: by mail-oi1-f193.google.com with SMTP id a142so8710681oii.7;
+        Fri, 14 Feb 2020 00:51:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to:cc;
         bh=63V0t6Y+v/yU31L4w6jaW53E7T9mH+a6FE6ph40izng=;
-        b=R0uUESk3MsiC5YP1WOZfAT8n+/ojmsNrrE5g7LzkcOPSJYaEUCugsokO96Hx/q6B6o
-         MwOAZEg7NYg7lJk8R4UwCGC1F0jkKzSKHsDrTNn8OG7PvbXzH55heh5tugj+ynlrAHI9
-         xF19P9vrVUGcS3oyXST+dOzahIUYJSRGLJ53YRaxn0/9rsX3RNgGcr6169KP78Zrmr0h
-         XZB83bFxDx9gVlIp9HENGVLscimNvUi4xgVJaE5QCB2cvVnd8pGPlwq3F7D5yFpHkrFU
-         XHCXuUXN5FzGRWvOOKmd13ZbhHM7dKx3zfnU3zBQQXIVQMMEJDNz8HCx/QtN2G/qh1Yv
-         LRxA==
+        b=HW3SWoPMAWcziUXejTkkg3tJQaxTLuOcvMfS1u7iXWG4qTREGVNOIA8n7j4odk9xS7
+         cJe3jRrGJX+xMTRDlDm0vroKYXPufsoD3B+UQJeCCSh+FQ7j7HjWFq/W4/lRfHAlO8Jb
+         KuD8qjITfSzr9SeVUMoUH8OSnMIRhwA3KJ5yInw7w0kDjOV4Tkc/hSu036QHmbofsDKd
+         NIG1rGHCD2/7ihQoa6kpjivDs1Ue/AfhFemnGRa4ZM3X5Ie/2s6FM02JImYWFkM11W6I
+         rM3tyN6utg8T76cWcF/0+l7XZcdRBoRoJ/wVlwGjGsNXEXK5QHaf543+DBFF3s3JXXGQ
+         facQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
         bh=63V0t6Y+v/yU31L4w6jaW53E7T9mH+a6FE6ph40izng=;
-        b=mudyMEcnqomqREq5yb65hLNAkV9fNDUoCMgdhDVXKRh18njPYm//gSLJpmoqFQhg+1
-         +kDETo24vmKmr/Il60koo3X2NZyq5q3EIuISZsxXb5YMrvWeVrQd0/Rdaia+FxxXKUEy
-         sPuDv1Xa77Lpg2ni/WIygR3Fot+JCFgGdXtXQxD70aPb+cTr/X0VoPmEZAeQOp/qxKLS
-         TX5Vs/aRF7U0JWZyLKlml3rvrlQd/LR2Avl7E4Zw4i+ZVV8sxLPJslALp4ZKHUjMLLJ0
-         thFYHmDTICBrMVFyzA8/TzZE7GpOq3l+Oc5yv/F72y9IlHYwRiX2Udv30NjlFZ8H8KpJ
-         k4vg==
-X-Gm-Message-State: APjAAAWYm3PkEFr8AKV2wLIPMiWbRbhPELHeuk6yhGtLDoNLhR6WRnRF
-        ebuEBL++fK0Y0tJKapmUGGgWlrzD0neken0jTHznDCRaPjU=
-X-Google-Smtp-Source: APXvYqxSR7hdkvVWpfTtP8bXIo9KPG+2Up1I5vbFN/ZlGRPnCSxrUUcnNtc2e57PBd7YJZI52LQJ6Ykx01+ilb/Fx9A=
-X-Received: by 2002:aca:8d5:: with SMTP id 204mr1088854oii.141.1581670191637;
- Fri, 14 Feb 2020 00:49:51 -0800 (PST)
+        b=Hq6VeisiqmPn5QiO8Qcwk8vZPv86Ho4v0pMKlTJbNARdPagDdUPo8cJ/GqwWxIEuK2
+         ZS7//n+Xg81m1Zvbf4mf0f8o40uGX8K4wT+iboXU72xiFdaCOPwGyU9Ca4BquGuOmkrk
+         rglbrxHY9wySoriHrzQFfNCGDWr1SHUnJlQBxSF8B1K6PAyp7lWGvd1k3pe50Q8lqTH8
+         OL+DpTdJEI5xGitKE8ayrCa+Byu6LeUkBMmiWy/FAi12Lv6M/hWztaTK2qGCa8SkmrTj
+         Xp+Q/pgv4ME1BQrUh6UKKv91RycGgZbXoWeYizzQQTzMJ1OyNu2YCO/PvUFhCSypHWCs
+         /kWw==
+X-Gm-Message-State: APjAAAV4UveUuMB6iZbGCzM3UcayXC5DTUS+vaZj9jjPMingrOC2054g
+        kOugQa+KVEvAYxlDwsSUhLxwDz79Csd9Q8XNUUF07fSTy94=
+X-Google-Smtp-Source: APXvYqzzT/hXgE2DdlxSNcSrYssedfnMU72KPc54edfHOxHDky+PtYBpJAGzIQX2Grl1StRVMAViAAW1GYp6zeO/aIA=
+X-Received: by 2002:a05:6808:249:: with SMTP id m9mr1179982oie.5.1581670307046;
+ Fri, 14 Feb 2020 00:51:47 -0800 (PST)
 MIME-Version: 1.0
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 14 Feb 2020 16:49:40 +0800
-Message-ID: <CANRm+Cy5ChjkMf4k9BCnzApxvgNUFcbMSLPmvTkOkCougXF1jA@mail.gmail.com>
-Subject: KVM: X86: Grab KVM's srcu lock when accessing hv assist page
+Date:   Fri, 14 Feb 2020 16:51:36 +0800
+Message-ID: <CANRm+CwmVnJqCzN1sWhBOKZBCqpL2ZfRbT-V+tHMGFwPjCZGvw@mail.gmail.com>
+Subject: [PATCH RESEND] KVM: X86: Grab KVM's srcu lock when accessing hv
+ assist page
 To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
