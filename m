@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BAD2315F63A
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 19:57:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C777915F642
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 19:59:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387552AbgBNS5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 13:57:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45790 "EHLO mail.kernel.org"
+        id S2387720AbgBNS7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 13:59:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:46516 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728859AbgBNS5I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 13:57:08 -0500
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+        id S1729900AbgBNS7C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 13:59:02 -0500
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9F03E24670
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 18:57:06 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1A36524684
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 18:59:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581706626;
-        bh=YlbFqP4MOujySUgnVR9wtKNwv0GjLZbM5SbUJK0O0gQ=;
+        s=default; t=1581706741;
+        bh=sDuNfKWoPpSrN5oPOUrwlTFcBuhLYXcdRqnE84ZHMxI=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=LFxgD4D+vmep4eAzrKNlFmVFdKVoEdLCpcb8r6lf3Y7K8zRscdcjqr7NFiohrVA85
-         HzvaAZxHtIPji4PzbrjMDpMUOw9EiuIwJGLQ2/v7mzoIFjvifDnzJgHub58d+I9LIM
-         8U/QNff+0x9O+PPZqDCBUvpj8SGZ5n3iEL5Alnrw=
-Received: by mail-wm1-f54.google.com with SMTP id t14so11785997wmi.5
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 10:57:06 -0800 (PST)
-X-Gm-Message-State: APjAAAVcFv50+jh44AD2SoJ0Pq+rAPTiyhnFLwc4LB/Q8xejU/HAqSGE
-        zwSpRCUSeqfHHop1JMW0VkOmsoorpaHBWInvHcI9xw==
-X-Google-Smtp-Source: APXvYqxxTQ3SaP1YdoafrYMVaIYSQJJTGOsfi5VrDKZoEp9ouh4TF+uABwFX1kDAEk06lgdpKqTVZcp7FLgcnYYfkKY=
-X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr6008857wmi.21.1581706625011;
- Fri, 14 Feb 2020 10:57:05 -0800 (PST)
+        b=dBvKkrbN2zjKd1UtcXTrhOUf9txYmtN0gkqLua8TatxLDTKDhnFRk10uGFH4s/WXt
+         IBc0zPL4OqPZ/9WlXc2HcUXR7nlTjCWoNDOEEiYDf4x8oeRqZ4V5akhtz7mhTCGD3F
+         nYSXryAUaoB6HbO7V4V529hFJYgfz3F3t1+QvK28=
+Received: by mail-wr1-f44.google.com with SMTP id m16so12086840wrx.11
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 10:59:01 -0800 (PST)
+X-Gm-Message-State: APjAAAV7KeoRA2GTnGRML7qPQDSnHzTsC2xkhgFQWVOHiOC13aGXu3eu
+        cEVBTMFr7b6aHq34wxV0ez6blzxGFnKCeeNd5nFsTw==
+X-Google-Smtp-Source: APXvYqwjzgYrmhHLu5TEIGRVZ7CWlT5Ssetb8QK0esyZiXxWwEmJYOpZXgV19RAPW2gMZRaV7w98pJpEKU/JOguli74=
+X-Received: by 2002:a5d:4cc9:: with SMTP id c9mr5361655wrt.70.1581706739323;
+ Fri, 14 Feb 2020 10:58:59 -0800 (PST)
 MIME-Version: 1.0
-References: <cover.1581555616.git.ashish.kalra@amd.com> <a22c5b534fa035b23e549669fd5ac617b6031158.1581555616.git.ashish.kalra@amd.com>
- <CALCETrX6Oo00NXn2QfR=eOKD9wvWiov_=WBRwb7V266=hJ2Duw@mail.gmail.com> <20200213222825.GA8784@ashkalra_ubuntu_server>
-In-Reply-To: <20200213222825.GA8784@ashkalra_ubuntu_server>
+References: <cover.1581555616.git.ashish.kalra@amd.com> <CALCETrXE9cWd3TbBZMsAwmSwWpDYFsicLZ=amHLWsvE0burQSw@mail.gmail.com>
+ <20200213230916.GB8784@ashkalra_ubuntu_server>
+In-Reply-To: <20200213230916.GB8784@ashkalra_ubuntu_server>
 From:   Andy Lutomirski <luto@kernel.org>
-Date:   Fri, 14 Feb 2020 10:56:53 -0800
-X-Gmail-Original-Message-ID: <CALCETrX=ycjSuf_N_ff-VQtqq2_RoawuAqdkM+bCPn_2_swkjg@mail.gmail.com>
-Message-ID: <CALCETrX=ycjSuf_N_ff-VQtqq2_RoawuAqdkM+bCPn_2_swkjg@mail.gmail.com>
-Subject: Re: [PATCH 10/12] mm: x86: Invoke hypercall when page encryption
- status is changed
+Date:   Fri, 14 Feb 2020 10:58:46 -0800
+X-Gmail-Original-Message-ID: <CALCETrUQBsof3fMf-Dj7RDJJ9GDdVGNOML_ZyeSmJtcp_LhdPQ@mail.gmail.com>
+Message-ID: <CALCETrUQBsof3fMf-Dj7RDJJ9GDdVGNOML_ZyeSmJtcp_LhdPQ@mail.gmail.com>
+Subject: Re: [PATCH 00/12] SEV Live Migration Patchset.
 To:     Ashish Kalra <ashish.kalra@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
@@ -50,43 +50,83 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
         kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        LKML <linux-kernel@vger.kernel.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 2:28 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+On Thu, Feb 13, 2020 at 3:09 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
 >
-> On Wed, Feb 12, 2020 at 09:42:02PM -0800, Andy Lutomirski wrote:
-> >> On Wed, Feb 12, 2020 at 5:18 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
-> >> >
-> >> > From: Brijesh Singh <brijesh.singh@amd.com>
+> On Wed, Feb 12, 2020 at 09:43:41PM -0800, Andy Lutomirski wrote:
+> > On Wed, Feb 12, 2020 at 5:14 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
 > > >
-> > > Invoke a hypercall when a memory region is changed from encrypted ->
-> > > decrypted and vice versa. Hypervisor need to know the page encryption
-> > > status during the guest migration.
-> >>
-> >> What happens if the guest memory status doesn't match what the
-> >> hypervisor thinks it is?  What happens if the guest gets migrated
-> >> between the hypercall and the associated flushes?
+> > > From: Ashish Kalra <ashish.kalra@amd.com>
+> > >
+> > > This patchset adds support for SEV Live Migration on KVM/QEMU.
+> >
+> > I skimmed this all and I don't see any description of how this all works.
+> >
+> > Does any of this address the mess in svm_register_enc_region()?  Right
+> > now, when QEMU (or a QEMU alternative) wants to allocate some memory
+> > to be used for guest encrypted pages, it mmap()s some memory and the
+> > kernel does get_user_pages_fast() on it.  The pages are kept pinned
+> > for the lifetime of the mapping.  This is not at all okay.  Let's see:
+> >
+> >  - The memory is pinned and it doesn't play well with the Linux memory
+> > management code.  You just wrote a big patch set to migrate the pages
+> > to a whole different machines, but we apparently can't even migrate
+> > them to a different NUMA node or even just a different address.  And
+> > good luck swapping it out.
+> >
+> >  - The memory is still mapped in the QEMU process, and that mapping is
+> > incoherent with actual guest access to the memory.  It's nice that KVM
+> > clflushes it so that, in principle, everything might actually work,
+> > but this is gross.  We should not be exposing incoherent mappings to
+> > userspace.
+> >
+> > Perhaps all this fancy infrastructure you're writing for migration and
+> > all this new API surface could also teach the kernel how to migrate
+> > pages from a guest *to the same guest* so we don't need to pin pages
+> > forever.  And perhaps you could put some thought into how to improve
+> > the API so that it doesn't involve nonsensical incoherent mappings.o
 >
-> This is basically same as the dirty page tracking and logging being done
-> during Live Migration. As with dirty page tracking and logging we
-> maintain a page encryption bitmap in the kernel which keeps tracks of
-> guest's page encrypted/decrypted state changes and this bitmap is
-> sync'ed regularly from kernel to qemu and also during the live migration
-> process, therefore any dirty pages whose encryption status will change
-> during migration, should also have their page status updated when the
-> page encryption bitmap is sync'ed.
+> As a different key is used to encrypt memory in each VM, the hypervisor
+> can't simply copy the the ciphertext from one VM to another to migrate
+> the VM.  Therefore, the AMD SEV Key Management API provides a new sets
+> of function which the hypervisor can use to package a guest page for
+> migration, while maintaining the confidentiality provided by AMD SEV.
 >
-> Also i think that when the amount of dirty pages reach a low threshold,
-> QEMU stops the source VM and then transfers all the remaining dirty
-> pages, so at that point, there will also be a final sync of the page
-> encryption bitmap, there won't be any hypercalls after this as the
-> source VM has been stopped and the remaining VM state gets transferred.
+> There is a new page encryption bitmap created in the kernel which
+> keeps tracks of encrypted/decrypted state of guest's pages and this
+> bitmap is updated by a new hypercall interface provided to the guest
+> kernel and firmware.
+>
+> KVM_GET_PAGE_ENC_BITMAP ioctl can be used to get the guest page encryption
+> bitmap. The bitmap can be used to check if the given guest page is
+> private or shared.
+>
+> During the migration flow, the SEND_START is called on the source hypervisor
+> to create an outgoing encryption context. The SEV guest policy dictates whether
+> the certificate passed through the migrate-set-parameters command will be
+> validated. SEND_UPDATE_DATA is called to encrypt the guest private pages.
+> After migration is completed, SEND_FINISH is called to destroy the encryption
+> context and make the VM non-runnable to protect it against cloning.
+>
+> On the target machine, RECEIVE_START is called first to create an
+> incoming encryption context. The RECEIVE_UPDATE_DATA is called to copy
+> the received encrypted page into guest memory. After migration has
+> completed, RECEIVE_FINISH is called to make the VM runnable.
+>
 
-And have you ensured that, in the inevitable race when a guest gets
-migrated part way through an encryption state change, that no data
-corruption occurs?
+Thanks!  This belongs somewhere in the patch set.
+
+You still haven't answered my questions about the existing coherency
+issues and whether the same infrastructure can be used to migrate
+guest pages within the same machine.
+
+Also, you're making guest-side and host-side changes.  What ensures
+that you don't try to migrate a guest that doesn't support the
+hypercall for encryption state tracking?
