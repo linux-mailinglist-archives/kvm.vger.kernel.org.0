@@ -2,148 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A6B415F159
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 19:03:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80FDD15F1FF
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 19:09:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731093AbgBNSBx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 13:01:53 -0500
-Received: from USFB19PA34.eemsg.mail.mil ([214.24.26.197]:27480 "EHLO
-        USFB19PA34.eemsg.mail.mil" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731105AbgBNSBv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 13:01:51 -0500
-X-EEMSG-check-017: 56399755|USFB19PA34_ESA_OUT04.csd.disa.mil
-X-IronPort-AV: E=Sophos;i="5.70,441,1574121600"; 
-   d="scan'208";a="56399755"
-Received: from emsm-gh1-uea11.ncsc.mil ([214.29.60.3])
-  by USFB19PA34.eemsg.mail.mil with ESMTP/TLS/DHE-RSA-AES256-SHA256; 14 Feb 2020 18:01:41 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tycho.nsa.gov; i=@tycho.nsa.gov; q=dns/txt;
-  s=tycho.nsa.gov; t=1581703301; x=1613239301;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=OBvX8TcgLji7a8VnRi0stkRmiT+GTHv2A0MgzinqleU=;
-  b=d3B6JrzVm2lLCdyr9XB8ygZ3TAWOnvnDSVM7+PGiqgnA7Wt//wNXnFi3
-   wgHvoaKprZ3N4xb2XTPY5wsG3Kwd1TihZ17MdxnxQyzLKLJUN3Epzry48
-   8qJAq5T5iN3kJZ0VHRHy7TeOMPUpJviGY6SMhkAjO8h9qGhoGqu1mHMin
-   V4VpycYbSUSvkrtD/nlTRpYeAhak9837DvRymnx/ObotOhVzYj6lMIXih
-   VDBJ6fuY1/suf2As7lbONbeNFctb8ablGcrb2sNrnHjChwBbT1tFkEDg5
-   B6ceMy0KFN21DF0rortc0+bOIfy5/Bmu2WZg4nraQTTjdj2dIDu4stkfH
-   w==;
-X-IronPort-AV: E=Sophos;i="5.70,441,1574121600"; 
-   d="scan'208";a="39145150"
-IronPort-PHdr: =?us-ascii?q?9a23=3A4jHv7x/tg6OZQv9uRHKM819IXTAuvvDOBiVQ1K?=
- =?us-ascii?q?B+1+8XIJqq85mqBkHD//Il1AaPAdyHra0cwLOO4+jJYi8p39WoiDg6aptCVh?=
- =?us-ascii?q?sI2409vjcLJ4q7M3D9N+PgdCcgHc5PBxdP9nC/NlVJSo6lPwWB6nK94iQPFR?=
- =?us-ascii?q?rhKAF7Ovr6GpLIj8Swyuu+54Dfbx9HiTagbr5+Nhe7oRneusULnYdvKbs6xw?=
- =?us-ascii?q?fUrHdPZ+lZymRkKE6JkR3h/Mmw5plj8ypRu/Il6cFNVLjxcro7Q7JFEjkoKn?=
- =?us-ascii?q?g568L3uxbNSwuP/WYcXX4NkhVUGQjF7Qr1UYn3vyDnq+dywiiaPcnxTbApRT?=
- =?us-ascii?q?Sv6rpgRRH0hCsbMTMy7XragdJsgq1FvB2hpgR/w4/Kb4GTKPp+Zb7WcdcDSW?=
- =?us-ascii?q?ZcQspdSylND4WyYIsVC+oKIPhWoY/zqVATqReyHAmhCefqxjJOm3T437A10/?=
- =?us-ascii?q?45HA/bwgIgEdIAvnfaotr7O6gdU/y6wqbTwDXfbf5bwyvx5JTGfx0jp/yHQL?=
- =?us-ascii?q?J+cdDWyUkqDw7Lk0mQppL9PzOVyOsNtXWQ4fdlVe21j24nrx9+oziyzcorkY?=
- =?us-ascii?q?nGm5kVx0vY9SR53Ik1Jdq4RFR9Yd6/CpRcrS6aN4xoQs47RWxjpSU0yqUetJ?=
- =?us-ascii?q?KmcyUHx44ryh7CZ/CdbYSF7QzvWPyMLTp+mXlrYqiwhwyo/kil0uD8U86030?=
- =?us-ascii?q?tUoSddidnMs2wN1wTU6siaVvtx5keh1iiL1wDU8uxEPVo7lbDaK5482b48jJ?=
- =?us-ascii?q?sTsULNHi/xg0X5krOZel84+umo9+vnYrLmqoWaN4BokQHxLr4imsm+AeQ8Kg?=
- =?us-ascii?q?QOXm6b9vqg1LD74EH0T7pHguc2n6XEqpzWO8sWqrCjDwNIyooj7gywDzai0N?=
- =?us-ascii?q?QWh3kHK1dFdQqcj4f0IFHDO+z4DPejjFSslzdn3fbGPqb7DZnXIXjDl6nhca?=
- =?us-ascii?q?5n60FA0Aoz0cxf55VMB74cOv3zXFP+tNvcDhIiPAy0xOHnCNp51owAQ26AHq?=
- =?us-ascii?q?iZMKbKu1+S+u0vO/WMZJMSuDvlN/gl5vvujXokmV8HZ6mmx5sWZWu3HvRhJE?=
- =?us-ascii?q?WZbn7sjckbHWgWuQo+SfTgiEeeXj5Le3ayQ6U86ykgCI24CYfDR4atgKGO3S?=
- =?us-ascii?q?qgAJ1WaX5JCkqWHXfraYqEQfEMZzyWIsN7lTwET7ehQZc71R6yrA/616ZnLu?=
- =?us-ascii?q?3M9y0ctJLj0sV15uLKmREp6zN7E9md03uMT2FonmIEXjo23KdirkxgzleMz7?=
- =?us-ascii?q?N1g+JXFdNN/fNFSAQ6OoDGz+x8Fd/yXhjNftCTSFapWt+mGy0+Tsotw98SZE?=
- =?us-ascii?q?ZwA9GijhHF3yq3DL4ZjrKLBIcp/a3CwXj+OcJ9xm3Y1KkukVYmWNFDNW64ia?=
- =?us-ascii?q?5l8QjcGYrJn1+el6aweqQWxDTN+3ubzWqSoEFYVxZ9UaHEXXAZe0vXos315k?=
- =?us-ascii?q?DcQL+0D7QoLA9BxNWcKqtFdNLpl09KRPT9N9TEZWK+hWOwCQyPxrOWY4rgY3?=
- =?us-ascii?q?8d0znFCEgYjwAT+m6LNQsgBiekuG/eEjNuGkz1Y0/28ulxtmm7TkkqwAGOdU?=
- =?us-ascii?q?Fh0KC1+hENj/yGV/wTxq4EuDsmqzhsAla93sjWC92bqgtgYqpcZ9I94Eld2W?=
- =?us-ascii?q?Ldtgx9OIGgLq94il4ZaQR3sFni1wh0Co9Yi8glsGsqzBZuKaKfyF5BbymX3Y?=
- =?us-ascii?q?30OrDMMmn95g2va6rP1lHb19aW/b0P5+oip1r/uwGpE1Io82973NlNz3uc+p?=
- =?us-ascii?q?LKARIUUZL3UUY67Bd6p7bdYiky44Pby2dgPrWzsj/Hw9gpHvcqyg68f9dDN6?=
- =?us-ascii?q?OJDAvyE8oZB8ewM+wqm1epbhMZM+BI7qE5JMymd/yB2K6kOOZvgiiqgnhA4I?=
- =?us-ascii?q?B4gQqw8H9QQ+jJ0pJN6Pac1xCMVjD6gR/1vsnxkodATT4VGWW7xG7vA4sHNY?=
- =?us-ascii?q?NoeoNeMnujO826wJ1FgpfpX3NJvAq4C0guxN6ieR3UaUf0mwJXyxJE8jSchS?=
- =?us-ascii?q?KkwmkswHkSpa2F0XmLmrmzeQ=3D=3D?=
-X-IPAS-Result: =?us-ascii?q?A2BzAgAz4EZe/wHyM5BmHAEBAQEBBwEBEQEEBAEBgXuBe?=
- =?us-ascii?q?AWBbSASKoQUiQOGWQEBBAaBEiWJcJFKCQEBAQEBAQEBATcEAQGEQAKCJTgTA?=
- =?us-ascii?q?hABAQEFAQEBAQEFAwEBbIVDgjspAYMCAQUjFUEQCw4KAgImAgJXBg0GAgEBg?=
- =?us-ascii?q?mM/glclrjmBMoVKg1GBPoEOKow+eYEHgTgMA4JdPodbgl4EjhOCC4ZFZEaXb?=
- =?us-ascii?q?YJEgk+TfAYcmxisJyKBWCsIAhgIIQ+DJ1AYDY4pF45BIwMwkFgBAQ?=
-Received: from tarius.tycho.ncsc.mil (HELO tarius.infosec.tycho.ncsc.mil) ([144.51.242.1])
-  by emsm-gh1-uea11.NCSC.MIL with ESMTP; 14 Feb 2020 18:01:34 +0000
-Received: from moss-pluto.infosec.tycho.ncsc.mil (moss-pluto [192.168.25.131])
-        by tarius.infosec.tycho.ncsc.mil (8.14.7/8.14.4) with ESMTP id 01EI0Zuk224275;
-        Fri, 14 Feb 2020 13:00:36 -0500
-Subject: Re: [PATCH 2/3] Teach SELinux about anonymous inodes
-To:     Daniel Colascione <dancol@google.com>
-Cc:     Tim Murray <timmurray@google.com>,
-        SElinux list <selinux@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>, paul@paul-moore.com,
-        Nick Kralevich <nnk@google.com>,
-        Lokesh Gidra <lokeshgidra@google.com>
-References: <20200211225547.235083-1-dancol@google.com>
- <20200214032635.75434-1-dancol@google.com>
- <20200214032635.75434-3-dancol@google.com>
- <9ca03838-8686-0007-0971-ee63bf5031da@tycho.nsa.gov>
- <CAKOZuev-=7Lgu35E3tzpHQn0m_KAvvrqi+ZJr1dpqRjHERRSqg@mail.gmail.com>
-From:   Stephen Smalley <sds@tycho.nsa.gov>
-Message-ID: <23f725ca-5b5a-5938-fcc8-5bbbfc9ba9bc@tycho.nsa.gov>
-Date:   Fri, 14 Feb 2020 13:02:43 -0500
+        id S2391626AbgBNSF2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 13:05:28 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24552 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2391613AbgBNSF0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 13:05:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581703525;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=rUebluGvxWOJGeiBzNgaSQxX4d6as30a+TdaEoqZTN8=;
+        b=bjWIQOFQJtzTnIRyVGi+hYsJHy6MXiMtj3T8n/ZQcdgFEq7L5dhvnkB/DgevpaY1U46eC+
+        judoVsPCYMOvxdMBcdxEc0qNR6zVr+7ZrtHHYKGcUD+Z8/1aXcGkoOuByhbhkHFaeHbukO
+        9fSTNN1pO4FE943/U53hdM8lDJwanLY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-KzCU7JD1PpGMPrkIduZr3Q-1; Fri, 14 Feb 2020 13:05:15 -0500
+X-MC-Unique: KzCU7JD1PpGMPrkIduZr3Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF535800D50;
+        Fri, 14 Feb 2020 18:05:12 +0000 (UTC)
+Received: from [10.36.118.137] (unknown [10.36.118.137])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1FF161001B2C;
+        Fri, 14 Feb 2020 18:05:09 +0000 (UTC)
+Subject: Re: [PATCH 06/35] s390/mm: add (non)secure page access exceptions
+ handlers
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-7-borntraeger@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <c05f8672-dc29-271a-66d2-73138406cf21@redhat.com>
+Date:   Fri, 14 Feb 2020 19:05:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <CAKOZuev-=7Lgu35E3tzpHQn0m_KAvvrqi+ZJr1dpqRjHERRSqg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200207113958.7320-7-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/14/20 12:21 PM, Daniel Colascione wrote:
-> On Fri, Feb 14, 2020 at 8:38 AM Stephen Smalley <sds@tycho.nsa.gov> wrote:
->> That's assuming you are ok with having to define these type_transition
->> rules for the userfaultfd case instead of having your own separate
->> security class.  Wondering how many different anon inode names/classes
->> there are in the kernel today and how much they change over time; for a
->> small, relatively stable set, separate classes might be ok; for a large,
->> dynamic set, type transitions should scale better.
+On 07.02.20 12:39, Christian Borntraeger wrote:
+> From: Vasily Gorbik <gor@linux.ibm.com>
 > 
-> I think we can get away without a class per anonymous-inode-type. I do
-> wonder whether we need a class for all anonymous inodes, though: if we
-> just give them the file class and use the anon inode type name for the
-> type_transition rule, isn't it possible that the type_transition rule
-> might also fire for plain files with the same names in the last path
-> component and the same originating sid? (Maybe I'm not understanding
-> type_transition rules properly.) Using a class to encompass all
-> anonymous inodes would address this problem (assuming the problem
-> exists in the first place).
+> Add exceptions handlers performing transparent transition of non-secure
+> pages to secure (import) upon guest access and secure pages to
+> non-secure (export) upon hypervisor access.
+> 
+> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+> [frankja@linux.ibm.com: adding checks for failures]
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> [imbrenda@linux.ibm.com:  adding a check for gmap fault]
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/kernel/pgm_check.S |  4 +-
+>  arch/s390/mm/fault.c         | 86 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 88 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
+> index 59dee9d3bebf..27ac4f324c70 100644
+> --- a/arch/s390/kernel/pgm_check.S
+> +++ b/arch/s390/kernel/pgm_check.S
+> @@ -78,8 +78,8 @@ PGM_CHECK(do_dat_exception)		/* 39 */
+>  PGM_CHECK(do_dat_exception)		/* 3a */
+>  PGM_CHECK(do_dat_exception)		/* 3b */
+>  PGM_CHECK_DEFAULT			/* 3c */
+> -PGM_CHECK_DEFAULT			/* 3d */
+> -PGM_CHECK_DEFAULT			/* 3e */
+> +PGM_CHECK(do_secure_storage_access)	/* 3d */
+> +PGM_CHECK(do_non_secure_storage_access)	/* 3e */
+>  PGM_CHECK_DEFAULT			/* 3f */
+>  PGM_CHECK_DEFAULT			/* 40 */
+>  PGM_CHECK_DEFAULT			/* 41 */
+> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+> index 7b0bb475c166..fab4219fa0be 100644
+> --- a/arch/s390/mm/fault.c
+> +++ b/arch/s390/mm/fault.c
+> @@ -38,6 +38,7 @@
+>  #include <asm/irq.h>
+>  #include <asm/mmu_context.h>
+>  #include <asm/facility.h>
+> +#include <asm/uv.h>
+>  #include "../kernel/entry.h"
+>  
+>  #define __FAIL_ADDR_MASK -4096L
+> @@ -816,3 +817,88 @@ static int __init pfault_irq_init(void)
+>  early_initcall(pfault_irq_init);
+>  
+>  #endif /* CONFIG_PFAULT */
+> +
+> +#if IS_ENABLED(CONFIG_KVM)
+> +void do_secure_storage_access(struct pt_regs *regs)
+> +{
+> +	unsigned long addr = regs->int_parm_long & __FAIL_ADDR_MASK;
+> +	struct vm_area_struct *vma;
+> +	struct mm_struct *mm;
+> +	struct page *page;
+> +	int rc;
+> +
+> +	switch (get_fault_type(regs)) {
+> +	case USER_FAULT:
+> +		mm = current->mm;
+> +		down_read(&mm->mmap_sem);
+> +		vma = find_vma(mm, addr);
+> +		if (!vma) {
+> +			up_read(&mm->mmap_sem);
+> +			do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
+> +			break;
+> +		}
+> +		page = follow_page(vma, addr, FOLL_WRITE | FOLL_GET);
+> +		if (IS_ERR_OR_NULL(page)) {
+> +			up_read(&mm->mmap_sem);
+> +			break;
+> +		}
+> +		if (arch_make_page_accessible(page))
+> +			send_sig(SIGSEGV, current, 0);
+> +		put_page(page);
+> +		up_read(&mm->mmap_sem);
+> +		break;
+> +	case KERNEL_FAULT:
+> +		page = phys_to_page(addr);
+> +		if (unlikely(!try_get_page(page)))
+> +			break;
+> +		rc = arch_make_page_accessible(page);
+> +		put_page(page);
+> +		if (rc)
+> +			BUG();
+> +		break;
+> +	case VDSO_FAULT:
+> +		/* fallthrough */
+> +	case GMAP_FAULT:
+> +		/* fallthrough */
 
-It shouldn't fire for non-anon inodes because on a (non-anon) file 
-creation, security_transition_sid() is passed the parent directory SID 
-as the second argument and we only assign task SIDs to /proc/pid 
-directories, which don't support (userspace) file creation anyway.
+Could we ever get here from the SIE?
 
-However, in the absence of a matching type_transition rule, we'll end up 
-defaulting to the task SID on the anon inode, and without a separate 
-class we won't be able to distinguish it from a /proc/pid inode.  So 
-that might justify a separate anoninode or similar class.
+> +	default:
+> +		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
+> +		WARN_ON_ONCE(1);
+> +	}
+> +}
+> +NOKPROBE_SYMBOL(do_secure_storage_access);
+> +
+> +void do_non_secure_storage_access(struct pt_regs *regs)
+> +{
+> +	unsigned long gaddr = regs->int_parm_long & __FAIL_ADDR_MASK;
+> +	struct gmap *gmap = (struct gmap *)S390_lowcore.gmap;
+> +	struct uv_cb_cts uvcb = {
+> +		.header.cmd = UVC_CMD_CONV_TO_SEC_STOR,
+> +		.header.len = sizeof(uvcb),
+> +		.guest_handle = gmap->guest_handle,
+> +		.gaddr = gaddr,
+> +	};
+> +	int rc;
+> +
+> +	if (get_fault_type(regs) != GMAP_FAULT) {
+> +		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
+> +		WARN_ON_ONCE(1);
+> +		return;
+> +	}
+> +
+> +	rc = uv_make_secure(gmap, gaddr, &uvcb);
+> +	if (rc == -EINVAL && uvcb.header.rc != 0x104)
+> +		send_sig(SIGSEGV, current, 0);
 
-This however reminded me that for the context_inode case, we not only 
-want to inherit the SID but also the sclass from the context_inode. 
-That is so that anon inodes created via device node ioctls inherit the 
-same SID/class pair as the device node and a single allowx rule can 
-govern all ioctl commands on that device.
+
+Looks good to me, but I don't feel like being ready for an r-b. I'll
+have to let that sink in :)
+
+Assumed-is-okay-by: David Hildenbrand <david@redhat.com>
 
 
+-- 
+Thanks,
 
-
-
-
-
+David / dhildenb
 
