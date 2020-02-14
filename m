@@ -2,143 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66F2715F960
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 23:26:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 221BB15F978
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 23:27:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727696AbgBNW0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 17:26:47 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42827 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725879AbgBNW0r (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 17:26:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581719205;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zi+FAk6+B1tEDdQPEK9hBxVo2EUuPbQZvG2bbkdWBcE=;
-        b=fFBTH0lHuEWpei7ly0GeS2/BMvVegejNUVoVI0gEpoPtsP+okdGa1xBO1WHLV2cGp7QuP/
-        HPtv8rCioVf4cM6jgLTEuqja0GmMBmpVW3lMP1lQIW5BgcOcu1ag35B1CKQGznhYPhjPpt
-        VFe4Dt8kWp/irbwQzYX5huafDGrsBgY=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-AAb6qsp6M2qxyxqpyB9AmQ-1; Fri, 14 Feb 2020 17:26:44 -0500
-X-MC-Unique: AAb6qsp6M2qxyxqpyB9AmQ-1
-Received: by mail-qv1-f72.google.com with SMTP id n11so6661353qvp.15
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 14:26:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zi+FAk6+B1tEDdQPEK9hBxVo2EUuPbQZvG2bbkdWBcE=;
-        b=mGZoMRJlj0CcEaWW69dCweQY30SNyW+KoekARsUI7tXnH8xmkslFftCyrL6pSaoaOV
-         oHj8mt2v8ihdBgDoQKNkH+TLDY0vXzMJ0WgVOOTsiAuPgWBjYR8GSNApwfITHlRNdOml
-         TLF2DwiQv0njfOo89dalBpD20yhG5gbq5frca2HbWNY5vxCa2RyZRzfgYqWn+PyaD3O1
-         zyxuybQyyW1UHG4GleY69AxyTg1qTIingznx2GDuJ2gTdSd2hf34aCLdK2wnFS6XGOX6
-         apLT+5MaqIrN/Fa0aei29BlQFshjRydho6ks8OqB5He2MjBrjP9X7Pzzlt9FqmqibLOR
-         gkdg==
-X-Gm-Message-State: APjAAAWjjRTGWwzPpDqcwcUqMr5vZY2ouA0EQp0x22+9G0FXxhVuyeH+
-        KkClxc6Kk86M31izmDSCvZ+SclSIml+vRisjYABKfIJE46YxMJTpd+hKP3bEZPNIvIN8Qi2aOn+
-        8u4koKB1zC4UR
-X-Received: by 2002:ac8:176b:: with SMTP id u40mr4497501qtk.272.1581719202256;
-        Fri, 14 Feb 2020 14:26:42 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwWs2UO5Nf1jK+xyGw6/TqetiujeGHCYaXaOLmPWYECnM7OjFY8i2I+Px3Qs0O38aQSXDRBRA==
-X-Received: by 2002:ac8:176b:: with SMTP id u40mr4497484qtk.272.1581719201973;
-        Fri, 14 Feb 2020 14:26:41 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id d16sm23923qkc.132.2020.02.14.14.26.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2020 14:26:41 -0800 (PST)
+        id S1728043AbgBNW1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 17:27:30 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48672 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727957AbgBNW13 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 17:27:29 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01EMOcQh035853;
+        Fri, 14 Feb 2020 17:27:27 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y3wxvyprx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Feb 2020 17:27:27 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01EMQCCM038707;
+        Fri, 14 Feb 2020 17:27:27 -0500
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y3wxvyprn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Feb 2020 17:27:27 -0500
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01EMP5iO003828;
+        Fri, 14 Feb 2020 22:27:26 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma04wdc.us.ibm.com with ESMTP id 2y5bc09x95-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Feb 2020 22:27:26 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01EMRNtU36831576
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Feb 2020 22:27:23 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DBD15136097;
+        Fri, 14 Feb 2020 22:27:22 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1EC8B136093;
+        Fri, 14 Feb 2020 22:27:22 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.114.17.106])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 14 Feb 2020 22:27:22 +0000 (GMT)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: [PATCH v2 23/42] KVM: s390: protvirt: Write sthyi data to instruction data area
 Date:   Fri, 14 Feb 2020 17:26:39 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, bgardon@google.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [PATCH 00/13] KVM: selftests: Various fixes and cleanups
-Message-ID: <20200214222639.GB1195634@xz-x1>
-References: <20200214145920.30792-1-drjones@redhat.com>
+Message-Id: <20200214222658.12946-24-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.25.0
+In-Reply-To: <20200214222658.12946-1-borntraeger@de.ibm.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200214145920.30792-1-drjones@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-14_08:2020-02-14,2020-02-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ impostorscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
+ suspectscore=2 mlxlogscore=999 spamscore=0 mlxscore=0 lowpriorityscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002140165
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 03:59:07PM +0100, Andrew Jones wrote:
-> This series has several parts:
-> 
->  * First, a hack to get x86 to compile. The missing __NR_userfaultfd
->    define should be fixed a better way.
+From: Janosch Frank <frankja@linux.ibm.com>
 
-Yeh otherwise I think it will only compile on x86_64.
+STHYI data has to go through the bounce buffer.
 
-My gut feeling is we've got an artificial unistd_{32|64}.h under tools
-that is included rather than the real one that we should include
-(which should locate under $LINUX_ROOT/usr/include/asm/).  Below patch
-worked for me, but I'm not 100% sure whether I fixed all the current
-users of that artifact header just in case I'll break some (what I saw
-is only this evsel.c and another setns.c, while that setns.c has
-syscall.h included correct so it seems fine):
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+[borntraeger@de.ibm.com: patch merging, splitting, fixing]
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ arch/s390/kvm/intercept.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/tools/arch/x86/include/asm/unistd_32.h b/tools/arch/x86/include/asm/unistd_32.h
-deleted file mode 100644
-index 60a89dba01b6..000000000000
---- a/tools/arch/x86/include/asm/unistd_32.h
-+++ /dev/null
-@@ -1,16 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef __NR_perf_event_open
--# define __NR_perf_event_open 336
--#endif
--#ifndef __NR_futex
--# define __NR_futex 240
--#endif
--#ifndef __NR_gettid
--# define __NR_gettid 224
--#endif
--#ifndef __NR_getcpu
--# define __NR_getcpu 318
--#endif
--#ifndef __NR_setns
--# define __NR_setns 346
--#endif
-diff --git a/tools/arch/x86/include/asm/unistd_64.h b/tools/arch/x86/include/asm/unistd_64.h
-deleted file mode 100644
-index cb52a3a8b8fc..000000000000
---- a/tools/arch/x86/include/asm/unistd_64.h
-+++ /dev/null
-@@ -1,16 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef __NR_perf_event_open
--# define __NR_perf_event_open 298
--#endif
--#ifndef __NR_futex
--# define __NR_futex 202
--#endif
--#ifndef __NR_gettid
--# define __NR_gettid 186
--#endif
--#ifndef __NR_getcpu
--# define __NR_getcpu 309
--#endif
--#ifndef __NR_setns
--#define __NR_setns 308
--#endif
-diff --git a/tools/perf/util/evsel.c b/tools/perf/util/evsel.c
-index a69e64236120..f4075392dcb6 100644
---- a/tools/perf/util/evsel.c
-+++ b/tools/perf/util/evsel.c
-@@ -21,6 +21,7 @@
- #include <sys/ioctl.h>
- #include <sys/resource.h>
- #include <sys/types.h>
-+#include <sys/syscall.h>
- #include <dirent.h>
- #include <stdlib.h>
- #include <perf/evsel.h>
-
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index 1e231058e4b3..cfabeecbb777 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -392,7 +392,7 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
+ 		goto out;
+ 	}
+ 
+-	if (addr & ~PAGE_MASK)
++	if (!kvm_s390_pv_is_protected(vcpu->kvm) && (addr & ~PAGE_MASK))
+ 		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+ 
+ 	sctns = (void *)get_zeroed_page(GFP_KERNEL);
+@@ -403,10 +403,15 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
+ 
+ out:
+ 	if (!cc) {
+-		r = write_guest(vcpu, addr, reg2, sctns, PAGE_SIZE);
+-		if (r) {
+-			free_page((unsigned long)sctns);
+-			return kvm_s390_inject_prog_cond(vcpu, r);
++		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
++			memcpy((void *)(sida_origin(vcpu->arch.sie_block)),
++			       sctns, PAGE_SIZE);
++		} else {
++			r = write_guest(vcpu, addr, reg2, sctns, PAGE_SIZE);
++			if (r) {
++				free_page((unsigned long)sctns);
++				return kvm_s390_inject_prog_cond(vcpu, r);
++			}
+ 		}
+ 	}
+ 
 -- 
-Peter Xu
+2.25.0
 
