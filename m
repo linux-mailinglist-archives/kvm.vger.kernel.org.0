@@ -2,134 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 55F9215D07E
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 04:27:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1CC715D0DC
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 05:06:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728704AbgBND1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 22:27:13 -0500
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:57119 "EHLO
-        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728658AbgBND1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 22:27:04 -0500
-Received: by mail-pg1-f202.google.com with SMTP id 71so4348355pgg.23
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2020 19:27:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=X6QDL8gBNzuj73VK08XhwQEnv+QGpLeB+NeJs2q4QiA=;
-        b=VzDiW3Ve5NoPwulQ9rACsUE+AdCGz6Tn8fOk5PdfosKG5duRJWKXexptHG1OP1BTd5
-         Q8dLm9zHjbIffhKpoCxnc8ZoOwvhmWOVRYosD0TnaUqTZFbjLOanPLZJplOKFfmZZTDs
-         iPtf/9w7LFn/S2gyhwropV9Dp93tZriB7rKaiVtVtMuJzRzaQQROMU2wBM4U9wX9W6oy
-         ypNt/ZXRwHDutyyBxAC5ojUNhte+sGzh8OqpSF1VnDQfNls0eCeiY7VIM9Wss4vVsmmx
-         fN0cjYxc9Cc76lZ7iIaxqTj61i4fKabo8qGxQWkHAFUHWS8sreT34/OEMKCLq6MVi9Am
-         PKJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=X6QDL8gBNzuj73VK08XhwQEnv+QGpLeB+NeJs2q4QiA=;
-        b=ABIzsR2y4jtW8H983R2T7IOOXpVIbAuyv+1DKUjSdh2TbkNq60s/ctnTUlBonLaeSp
-         gpXy78FwKqR7zezpapIKqmj6N/sMWfSzxmN95tfFUKxcB7/0vLVLemnS0paaDaIWUXAT
-         Q5g1JOP8LVLiB0QkKwE0+Rr6WqwdV78uPX1j9cyHUyIwipoTnYD9VeiKiDEHN2cWH1Jf
-         D+xbQPp22oywrkiO8+6oXxURyWmcfqTL3M9okA7rTzTBmSDSR1Z1ODwYH6O0aNUy8OmI
-         YYAIrtuustyDPVEtQZrnz6wGxByME9p6L6j0PFbnKw6eS86lgha+6JJ82J9QxHz0p6zZ
-         fftw==
-X-Gm-Message-State: APjAAAVwaRUX31if5hRniR9V+ocxY3Hwx9pFztEQtQJNKNZCymE8B8OB
-        W2vAvXkFuqiqT3ZPwvQVuYPcaVuBsCc=
-X-Google-Smtp-Source: APXvYqy7rl57xlhtajkcJd4uTbrfB+y+koGz7h3kInZETsBrWQXUhiqIBocYjR8QCz0K4KyBhGjBdPj4ijU=
-X-Received: by 2002:a63:d041:: with SMTP id s1mr1169428pgi.363.1581650823887;
- Thu, 13 Feb 2020 19:27:03 -0800 (PST)
-Date:   Thu, 13 Feb 2020 19:26:35 -0800
-In-Reply-To: <20200214032635.75434-1-dancol@google.com>
-Message-Id: <20200214032635.75434-4-dancol@google.com>
-Mime-Version: 1.0
-References: <20200211225547.235083-1-dancol@google.com> <20200214032635.75434-1-dancol@google.com>
-X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
-Subject: [PATCH 3/3] Wire UFFD up to SELinux
-From:   Daniel Colascione <dancol@google.com>
-To:     timmurray@google.com, selinux@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, viro@zeniv.linux.org.uk, paul@paul-moore.com,
-        nnk@google.com, sds@tycho.nsa.gov, lokeshgidra@google.com
-Cc:     Daniel Colascione <dancol@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1728641AbgBNEGA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 23:06:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31197 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728195AbgBNEF7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Feb 2020 23:05:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581653158;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1xIK/TCy6JocWI9iXEP20gpQgUBQR0k0L01ueOgMC6U=;
+        b=dTCsZyImf8LE70oKeRCCGQv6q/D2F7KB3Rc7J73Xn220bfgstU8DU+tV6c8a0CbKvdI0jG
+        qrKrThZWpnOVTovKlR8kHLNH3DMEyvCISzabRIQRz1Mo80shbLryvliIz086jMvC+AMvLZ
+        QZUEMLXNKjore+ltRMttul8Ja7KIarc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-6SAUathIOGSb9suc0ErvHg-1; Thu, 13 Feb 2020 23:05:56 -0500
+X-MC-Unique: 6SAUathIOGSb9suc0ErvHg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2715800D41;
+        Fri, 14 Feb 2020 04:05:53 +0000 (UTC)
+Received: from [10.72.13.213] (ovpn-13-213.pek2.redhat.com [10.72.13.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 327E55DA83;
+        Fri, 14 Feb 2020 04:05:33 +0000 (UTC)
+Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
+To:     Jason Gunthorpe <jgg@mellanox.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
+        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
+        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
+References: <20200211134746.GI4271@mellanox.com>
+ <cf7abcc9-f8ef-1fe2-248e-9b9028788ade@redhat.com>
+ <20200212125108.GS4271@mellanox.com>
+ <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
+ <20200213134128.GV4271@mellanox.com>
+ <ebaea825-5432-65e2-2ab3-720a8c4030e7@redhat.com>
+ <20200213150542.GW4271@mellanox.com>
+ <20200213103714-mutt-send-email-mst@kernel.org>
+ <20200213155154.GX4271@mellanox.com>
+ <20200213105425-mutt-send-email-mst@kernel.org>
+ <20200213162407.GZ4271@mellanox.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <5625f971-0455-6463-2c0a-cbca6a1f8271@redhat.com>
+Date:   Fri, 14 Feb 2020 12:05:32 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20200213162407.GZ4271@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change gives userfaultfd file descriptors a real security
-context, allowing policy to act on them.
 
-Signed-off-by: Daniel Colascione <dancol@google.com>
----
- fs/userfaultfd.c | 30 ++++++++++++++++++++++++++----
- 1 file changed, 26 insertions(+), 4 deletions(-)
+On 2020/2/14 =E4=B8=8A=E5=8D=8812:24, Jason Gunthorpe wrote:
+> On Thu, Feb 13, 2020 at 10:56:00AM -0500, Michael S. Tsirkin wrote:
+>> On Thu, Feb 13, 2020 at 11:51:54AM -0400, Jason Gunthorpe wrote:
+>>>> That bus is exactly what Greg KH proposed. There are other ways
+>>>> to solve this I guess but this bikeshedding is getting tiring.
+>>> This discussion was for a different goal, IMHO.
+>> Hmm couldn't find it anymore. What was the goal there in your opinion?
+> I think it was largely talking about how to model things like
+> ADI/SF/etc, plus stuff got very confused when the discussion tried to
+> explain what mdev's role was vs the driver core.
+>
+> The standard driver model is a 'bus' driver provides the HW access
+> (think PCI level things), and a 'hw driver' attaches to the bus
+> device,
 
-diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-index 07b0f6e03849..06e92697aba4 100644
---- a/fs/userfaultfd.c
-+++ b/fs/userfaultfd.c
-@@ -76,6 +76,8 @@ struct userfaultfd_ctx {
- 	bool mmap_changing;
- 	/* mm with one ore more vmas attached to this userfaultfd_ctx */
- 	struct mm_struct *mm;
-+	/* The inode that owns this context --- not a strong reference.  */
-+	const struct inode *owner;
- };
- 
- struct userfaultfd_fork_ctx {
-@@ -1020,8 +1022,10 @@ static int resolve_userfault_fork(struct userfaultfd_ctx *ctx,
- {
- 	int fd;
- 
--	fd = anon_inode_getfd("[userfaultfd]", &userfaultfd_fops, new,
--			      O_RDWR | (new->flags & UFFD_SHARED_FCNTL_FLAGS));
-+	fd = anon_inode_getfd_secure(
-+		"[userfaultfd]", &userfaultfd_fops, new,
-+		O_RDWR | (new->flags & UFFD_SHARED_FCNTL_FLAGS),
-+		ctx->owner);
- 	if (fd < 0)
- 		return fd;
- 
-@@ -1943,6 +1947,7 @@ static void init_once_userfaultfd_ctx(void *mem)
- 
- SYSCALL_DEFINE1(userfaultfd, int, flags)
- {
-+	struct file *file;
- 	struct userfaultfd_ctx *ctx;
- 	int fd;
- 
-@@ -1972,8 +1977,25 @@ SYSCALL_DEFINE1(userfaultfd, int, flags)
- 	/* prevent the mm struct to be freed */
- 	mmgrab(ctx->mm);
- 
--	fd = anon_inode_getfd("[userfaultfd]", &userfaultfd_fops, ctx,
--			      O_RDWR | (flags & UFFD_SHARED_FCNTL_FLAGS));
-+	file = anon_inode_getfile_secure(
-+		"[userfaultfd]", &userfaultfd_fops, ctx,
-+		O_RDWR | (flags & UFFD_SHARED_FCNTL_FLAGS),
-+		NULL);
-+	if (IS_ERR(file)) {
-+		fd = PTR_ERR(file);
-+		goto out;
-+	}
-+
-+	fd = get_unused_fd_flags(O_RDONLY | O_CLOEXEC);
-+	if (fd < 0) {
-+		fput(file);
-+		goto out;
-+	}
-+
-+	ctx->owner = file_inode(file);
-+	fd_install(fd, file);
-+
-+out:
- 	if (fd < 0) {
- 		mmdrop(ctx->mm);
- 		kmem_cache_free(userfaultfd_ctx_cachep, ctx);
--- 
-2.25.0.265.gbab2e86ba0-goog
+
+This is not true, kernel had already had plenty virtual bus where=20
+virtual devices and drivers could be attached, besides mdev and virtio,=20
+you can see vop, rpmsg, visorbus etc.
+
+
+> and instantiates a 'subsystem device' (think netdev, rdma,
+> etc) using some per-subsystem XXX_register().
+
+
+Well, if you go through virtio spec, we support ~20 types of different=20
+devices. Classes like netdev and rdma are correct since they have a=20
+clear set of semantics their own. But grouping network and scsi into a=20
+single class looks wrong, that's the work of a virtual bus.
+
+The class should be done on top of vDPA device instead of vDPA device=20
+itself:
+
+- For kernel driver, netdev, blk dev could be done on top
+- For userspace driver, the class could be done by the drivers inside VM=20
+or userspace (dpdk)
+
+
+> The 'hw driver' pulls in
+> functions from the 'subsystem' using a combination of callbacks and
+> library-style calls so there is no code duplication.
+
+
+The point is we want vDPA devices to be used by different subsystems,=20
+not only vhost, but also netdev, blk, crypto (every subsystem that can=20
+use virtio devices). That's why we introduce vDPA bus and introduce=20
+different drivers on top.
+
+
+>
+> As a subsystem, vhost&vdpa should expect its 'HW driver' to bind to
+> devices on busses, for instance I would expect:
+>
+>   - A future SF/ADI/'virtual bus' as a child of multi-functional PCI de=
+vice
+>     Exactly how this works is still under active discussion and is
+>     one place where Greg said 'use a bus'.
+
+
+That's ok but it's something that is not directly related to vDPA which=20
+can be implemented by any kinds of devices/buses:
+
+struct XXX_device {
+struct vdpa_device vdpa;
+struct adi_device/pci_device *lowerdev;
+}
+...
+
+
+>   - An existing PCI, platform, or other bus and device. No need for an
+>     extra bus here, PCI is the bus.
+
+
+There're several examples that a bus is needed on top.
+
+A good example is Mellanox TmFIFO driver which is a platform device=20
+driver but register itself as a virtio device in order to be used by=20
+virito-console driver on the virtio bus.
+
+But it's a pity that the device can not be used by userspace driver due=20
+to the limitation of virito bus which is designed for kernel driver.=20
+That's why vDPA bus is introduced which abstract the common requirements=20
+of both kernel and userspace drivers which allow the a single HW driver=20
+to be used by kernel drivers (and the subsystems on top) and userspace=20
+drivers.
+
+
+>   - No bus, ie for a simulator or binding to a netdev. (existing vhost?=
+)
+
+
+Note, simulator can have its own class (sysfs etc.).
+
+
+>
+> They point is that the HW driver's job is to adapt from the bus level
+> interfaces (eg readl/writel) to the subsystem level (eg something like
+> the vdpa_ops).
+>
+> For instance that Intel driver should be a pci_driver to bind to a
+> struct pci_device for its VF and then call some 'vhost&vdpa'
+> _register() function to pass its ops to the subsystem which in turn
+> creates the struct device of the subsystem calls, common char devices,
+> sysfs, etc and calls the driver's ops in response to uAPI calls.
+>
+> This is already almost how things were setup in v2 of the patches,
+> near as I can see, just that a bus was inserted somehow instead of
+> having only the vhost class.
+
+
+Well the series (plus mdev part) uses a bus since day 0. It's not=20
+something new.
+
+Thanks
+
+
+>   So it iwas confusing and the lifetime
+> model becomes too complicated to implement correctly...
+>
+> Jason
+>
 
