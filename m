@@ -2,79 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5846A15D018
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 03:42:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7C9E15D063
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 04:23:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728406AbgBNCmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 21:42:35 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:10619 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728004AbgBNCmf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 21:42:35 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 7FACC6BB37394EE36B5A;
-        Fri, 14 Feb 2020 10:42:31 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Fri, 14 Feb 2020
- 10:42:23 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <hpa@zytor.com>
-CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH] KVM: nVMX: Fix some obsolete comments and grammar error
-Date:   Fri, 14 Feb 2020 10:44:05 +0800
-Message-ID: <1581648245-8414-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1728374AbgBNDXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 22:23:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20531 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728004AbgBNDXx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Feb 2020 22:23:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581650632;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WiBwyrz6cX+xE4nXs+94fQKaFw5y/aQb69mQMK4gGl0=;
+        b=W7uwClEemERc8oqUMk4qYGC2Cvjz/RryTBJnVU3EnnQVRa2yOJ6SxEKrWMy5cqe/REoQSl
+        VaoifEFf3xu4qH0nlGRJvK4khLaVdG5AVIVbqIXqsBx+QdYoauKS0PFmBqJL5Nu+ujaOva
+        36pXuM10anrv0L7OtFQJomoEyY/FK/8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-fdAi4kdyMtWwFgGd05oe8Q-1; Thu, 13 Feb 2020 22:23:51 -0500
+X-MC-Unique: fdAi4kdyMtWwFgGd05oe8Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45C388017CC;
+        Fri, 14 Feb 2020 03:23:48 +0000 (UTC)
+Received: from [10.72.13.213] (ovpn-13-213.pek2.redhat.com [10.72.13.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E0CD338A;
+        Fri, 14 Feb 2020 03:23:29 +0000 (UTC)
+Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
+        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
+        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
+References: <20200210035608.10002-1-jasowang@redhat.com>
+ <20200210035608.10002-4-jasowang@redhat.com>
+ <20200211134746.GI4271@mellanox.com>
+ <cf7abcc9-f8ef-1fe2-248e-9b9028788ade@redhat.com>
+ <20200212125108.GS4271@mellanox.com>
+ <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
+ <20200213134128.GV4271@mellanox.com>
+ <ebaea825-5432-65e2-2ab3-720a8c4030e7@redhat.com>
+ <20200213150542.GW4271@mellanox.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <8b3e6a9c-8bfd-fb3c-12a8-2d6a3879f1ae@redhat.com>
+Date:   Fri, 14 Feb 2020 11:23:27 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200213150542.GW4271@mellanox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
 
-Fix wrong variable names and grammar error in comment.
+On 2020/2/13 =E4=B8=8B=E5=8D=8811:05, Jason Gunthorpe wrote:
+> On Thu, Feb 13, 2020 at 10:58:44PM +0800, Jason Wang wrote:
+>> On 2020/2/13 =E4=B8=8B=E5=8D=889:41, Jason Gunthorpe wrote:
+>>> On Thu, Feb 13, 2020 at 11:34:10AM +0800, Jason Wang wrote:
+>>>
+>>>>>     You have dev, type or
+>>>>> class to choose from. Type is rarely used and doesn't seem to be us=
+ed
+>>>>> by vdpa, so class seems the right choice
+>>>>>
+>>>>> Jason
+>>>> Yes, but my understanding is class and bus are mutually exclusive. S=
+o we
+>>>> can't add a class to a device which is already attached on a bus.
+>>> While I suppose there are variations, typically 'class' devices are
+>>> user facing things and 'bus' devices are internal facing (ie like a
+>>> PCI device)
+>>
+>> Though all vDPA devices have the same programming interface, but the
+>> semantic is different. So it looks to me that use bus complies what
+>> class.rst said:
+>>
+>> "
+>>
+>> Each device class defines a set of semantics and a programming interfa=
+ce
+>> that devices of that class adhere to. Device drivers are the
+>> implementation of that programming interface for a particular device o=
+n
+>> a particular bus.
+>>
+>> "
+> Here we are talking about the /dev/XX node that provides the
+> programming interface.
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
- arch/x86/kvm/vmx/nested.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 657c2eda357c..f2d8cb68dce8 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3160,10 +3160,10 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
-  * or KVM_SET_NESTED_STATE).  Otherwise it's called from vmlaunch/vmresume.
-  *
-  * Returns:
-- *	NVMX_ENTRY_SUCCESS: Entered VMX non-root mode
-- *	NVMX_ENTRY_VMFAIL:  Consistency check VMFail
-- *	NVMX_ENTRY_VMEXIT:  Consistency check VMExit
-- *	NVMX_ENTRY_KVM_INTERNAL_ERROR: KVM internal error
-+ *	NVMX_VMENTRY_SUCCESS: Entered VMX non-root mode
-+ *	NVMX_VMENTRY_VMFAIL:  Consistency check VMFail
-+ *	NVMX_VMENTRY_VMEXIT:  Consistency check VMExit
-+ *	NVMX_VMENTRY_KVM_INTERNAL_ERROR: KVM internal error
-  */
- enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 							bool from_vmentry)
-@@ -5301,7 +5301,7 @@ static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
- }
- 
- /*
-- * Return 1 if we should exit from L2 to L1 to handle an MSR access access,
-+ * Return 1 if we should exit from L2 to L1 to handle an MSR access,
-  * rather than handle it ourselves in L0. I.e., check whether L1 expressed
-  * disinterest in the current event (read or write a specific MSR) by using an
-  * MSR bitmap. This may be the case even when L0 doesn't use MSR bitmaps.
--- 
-2.19.1
+I'm confused here, are you suggesting to use class to create char device=20
+in vhost-vdpa? That's fine but the comment should go for vhost-vdpa patch=
+.
+
+
+> All the vdpa devices have the same basic
+> chardev interface and discover any semantic variations 'in band'
+
+
+That's not true, char interface is only used for vhost. Kernel virtio=20
+driver does not need char dev but a device on the virtio bus.
+
+
+>
+>>> So why is this using a bus? VDPA is a user facing object, so the
+>>> driver should create a class vhost_vdpa device directly, and that
+>>> driver should live in the drivers/vhost/ directory.
+>>  =20
+>> This is because we want vDPA to be generic for being used by different
+>> drivers which is not limited to vhost-vdpa. E.g in this series, it all=
+ows
+>> vDPA to be used by kernel virtio drivers. And in the future, we will
+>> probably introduce more drivers in the future.
+> I don't see how that connects with using a bus.
+
+
+This is demonstrated in the virito-vdpa driver. So if you want to use=20
+kernel virito driver for vDPA device, a bus is most straight forward.
+
+
+>
+> Every class of virtio traffic is going to need a special HW driver to
+> enable VDPA, that special driver can create the correct vhost side
+> class device.
+
+
+Are you saying, e.g it's the charge of IFCVF driver to create vhost char=20
+dev and other stuffs?
+
+
+>
+>>> For the PCI VF case this driver would bind to a PCI device like
+>>> everything else
+>>>
+>>> For our future SF/ADI cases the driver would bind to some
+>>> SF/ADI/whatever device on a bus.
+>> All these driver will still be bound to their own bus (PCI or other). =
+And
+>> what the driver needs is to present a vDPA device to virtual vDPA bus =
+on
+>> top.
+> Again, I can't see any reason to inject a 'vdpa virtual bus' on
+> top. That seems like mis-using the driver core.
+
+
+I don't think so. Vhost is not the only programming interface for vDPA.=20
+We don't want a device that can only work for userspace drivers and only=20
+have a single set of userspace APIs.
+
+Thanks
+
+
+>
+> Jason
+>
 
