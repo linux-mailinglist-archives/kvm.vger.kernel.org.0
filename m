@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DDC4915DAAA
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 16:22:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66BCE15DA92
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 16:21:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387585AbgBNPVP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 10:21:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34392 "EHLO mail.kernel.org"
+        id S2387430AbgBNPVI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 10:21:08 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33950 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387570AbgBNPVP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 10:21:15 -0500
+        id S1729258AbgBNPVH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 10:21:07 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 743702082F;
-        Fri, 14 Feb 2020 15:21:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2B7522465D;
+        Fri, 14 Feb 2020 15:21:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581693674;
-        bh=569NeW8Dm5AkGLXd1hzDBfiVUVN9Yy66W/d/qknuHC4=;
+        s=default; t=1581693666;
+        bh=C26s2HRE+wPz1uugU5+btkXiJRVLhTEvqGNwYSzqZE8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QsF85+YHSPrNVsA48g/Z8BWYatwIgxNCLX4lMER68E1IKun9naiwygADMAlQgFWfk
-         kimOtcjlWvJ1ie5m4BQDJkwu3t3snNLfl90YoVf34cLz8gJJ2WwZ0dIrxM0+VhGD5X
-         FLFCDylfAl7XwCaW8WlvOSm1tJNk5MnDbkpZre5Q=
+        b=VDN01hxRKiUm11geARc6hVKNzTiMZ+UWfmV4hI21kVM+UZPfTNpMRRkajaeagMdLj
+         LGKBV9jZ3Mll55RLXrhdlZBtEGVIVyx4EmeVvv+3qcba1Kz0sr8S7Xrartj6bsoXy7
+         F6ZCCAug3uy4ZzP+uc6yenbV7zG2FdLtRj4UXuG4=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1j2cPn-0057sw-MG; Fri, 14 Feb 2020 14:57:59 +0000
+        id 1j2cPo-0057sw-AH; Fri, 14 Feb 2020 14:58:00 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -40,9 +40,9 @@ Cc:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v4 16/20] KVM: arm64: GICv4.1: Allow SGIs to switch between HW and SW interrupts
-Date:   Fri, 14 Feb 2020 14:57:32 +0000
-Message-Id: <20200214145736.18550-17-maz@kernel.org>
+Subject: [PATCH v4 17/20] KVM: arm64: GICv4.1: Plumb SGI implementation selection in the distributor
+Date:   Fri, 14 Feb 2020 14:57:33 +0000
+Message-Id: <20200214145736.18550-18-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214145736.18550-1-maz@kernel.org>
 References: <20200214145736.18550-1-maz@kernel.org>
@@ -57,165 +57,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to let a guest buy in the new, active-less SGIs, we
-need to be able to switch between the two modes.
+The GICv4.1 architecture gives the hypervisor the option to let
+the guest choose whether it wants the good old SGIs with an
+active state, or the new, HW-based ones that do not have one.
 
-Handle this by stopping all guest activity, transfer the state
-from one mode to the other, and resume the guest.
+For this, plumb the configuration of SGIs into the GICv3 MMIO
+handling, present the GICD_TYPER2.nASSGIcap to the guest,
+and handle the GICD_CTLR.nASSGIreq setting.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- include/kvm/arm_vgic.h      |  3 ++
- virt/kvm/arm/vgic/vgic-v3.c |  2 +
- virt/kvm/arm/vgic/vgic-v4.c | 96 +++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h    |  1 +
- 4 files changed, 102 insertions(+)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 48 ++++++++++++++++++++++++++++++--
+ 1 file changed, 46 insertions(+), 2 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 63457908c9c4..69f4164d6477 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -231,6 +231,9 @@ struct vgic_dist {
- 	/* distributor enabled */
- 	bool			enabled;
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index de89da76a379..442f3b8c2559 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -3,6 +3,7 @@
+  * VGICv3 MMIO handling functions
+  */
  
-+	/* Wants SGIs without active state */
-+	bool			nassgireq;
++#include <linux/bitfield.h>
+ #include <linux/irqchip/arm-gic-v3.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+@@ -70,6 +71,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 		if (vgic->enabled)
+ 			value |= GICD_CTLR_ENABLE_SS_G1;
+ 		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
++		if (kvm_vgic_global_state.has_gicv4_1 && vgic->nassgireq)
++			value |= GICD_CTLR_nASSGIreq;
+ 		break;
+ 	case GICD_TYPER:
+ 		value = vgic->nr_spis + VGIC_NR_PRIVATE_IRQS;
+@@ -81,6 +84,10 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 			value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
+ 		}
+ 		break;
++	case GICD_TYPER2:
++		if (kvm_vgic_global_state.has_gicv4_1)
++			value = GICD_TYPER2_nASSGIcap;
++		break;
+ 	case GICD_IIDR:
+ 		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
+ 			(vgic->implementation_rev << GICD_IIDR_REVISION_SHIFT) |
+@@ -98,17 +105,43 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
+ 				    unsigned long val)
+ {
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+-	bool was_enabled = dist->enabled;
+ 
+ 	switch (addr & 0x0c) {
+-	case GICD_CTLR:
++	case GICD_CTLR: {
++		bool was_enabled, is_hwsgi;
 +
- 	struct vgic_irq		*spis;
++		mutex_lock(&vcpu->kvm->lock);
++
++		was_enabled = dist->enabled;
++		is_hwsgi = dist->nassgireq;
++
+ 		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
  
- 	struct vgic_io_device	dist_iodev;
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 1bc09b523486..2c9fc13e2c59 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -540,6 +540,8 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 		goto out;
++		/* Not a GICv4.1? No HW SGIs */
++		if (!kvm_vgic_global_state.has_gicv4_1)
++			val &= ~GICD_CTLR_nASSGIreq;
++
++		/* Dist stays enabled? nASSGIreq is RO */
++		if (was_enabled && dist->enabled) {
++			val &= ~GICD_CTLR_nASSGIreq;
++			val |= FIELD_PREP(GICD_CTLR_nASSGIreq, is_hwsgi);
++		}
++
++		/* Switching HW SGIs? */
++		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
++		if (is_hwsgi != dist->nassgireq)
++			vgic_v4_configure_vsgis(vcpu->kvm);
++
+ 		if (!was_enabled && dist->enabled)
+ 			vgic_kick_vcpus(vcpu->kvm);
++
++		mutex_unlock(&vcpu->kvm->lock);
+ 		break;
++	}
+ 	case GICD_TYPER:
++	case GICD_TYPER2:
+ 	case GICD_IIDR:
++		/* This is at best for documentation purposes... */
+ 		return;
+ 	}
+ }
+@@ -117,10 +150,21 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
+ 					   gpa_t addr, unsigned int len,
+ 					   unsigned long val)
+ {
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++
+ 	switch (addr & 0x0c) {
+ 	case GICD_IIDR:
+ 		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
+ 			return -EINVAL;
++		return 0;
++	case GICD_CTLR:
++		/* Not a GICv4.1? No HW SGIs */
++		if (!kvm_vgic_global_state.has_gicv4_1)
++			val &= ~GICD_CTLR_nASSGIreq;
++
++		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
++		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
++		return 0;
  	}
  
-+	if (kvm_vgic_global_state.has_gicv4_1)
-+		vgic_v4_configure_vsgis(kvm);
- 	dist->ready = true;
- 
- out:
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index c2fcde104ea2..063785fd2dc7 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -97,6 +97,102 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
- 	return IRQ_HANDLED;
- }
- 
-+static void vgic_v4_sync_sgi_config(struct its_vpe *vpe, struct vgic_irq *irq)
-+{
-+	vpe->sgi_config[irq->intid].enabled	= irq->enabled;
-+	vpe->sgi_config[irq->intid].group 	= irq->group;
-+	vpe->sgi_config[irq->intid].priority	= irq->priority;
-+}
-+
-+static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
-+{
-+	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-+	int i;
-+
-+	/*
-+	 * With GICv4.1, every virtual SGI can be directly injected. So
-+	 * let's pretend that they are HW interrupts, tied to a host
-+	 * IRQ. The SGI code will do its magic.
-+	 */
-+	for (i = 0; i < VGIC_NR_SGIS; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
-+		struct irq_desc *desc;
-+		int ret;
-+
-+		if (irq->hw) {
-+			vgic_put_irq(vcpu->kvm, irq);
-+			continue;
-+		}
-+
-+		irq->hw = true;
-+		irq->host_irq = irq_find_mapping(vpe->sgi_domain, i);
-+		vgic_v4_sync_sgi_config(vpe, irq);
-+		/*
-+		 * SGIs are initialised as disabled. Enable them if
-+		 * required by the rest of the VGIC init code.
-+		 */
-+		desc = irq_to_desc(irq->host_irq);
-+		ret = irq_domain_activate_irq(irq_desc_get_irq_data(desc),
-+					      false);
-+		if (!WARN_ON(ret)) {
-+			/* Transfer pending state */
-+			ret = irq_set_irqchip_state(irq->host_irq,
-+						    IRQCHIP_STATE_PENDING,
-+						    irq->pending_latch);
-+			WARN_ON(ret);
-+			irq->pending_latch = false;
-+		}
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+}
-+
-+static void vgic_v4_disable_vsgis(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+
-+	for (i = 0; i < VGIC_NR_SGIS; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
-+		struct irq_desc *desc;
-+		int ret;
-+
-+		if (!irq->hw) {
-+			vgic_put_irq(vcpu->kvm, irq);
-+			continue;
-+		}
-+
-+		irq->hw = false;
-+		ret = irq_get_irqchip_state(irq->host_irq,
-+					    IRQCHIP_STATE_PENDING,
-+					    &irq->pending_latch);
-+		WARN_ON(ret);
-+
-+		desc = irq_to_desc(irq->host_irq);
-+		irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+}
-+
-+/* Must be called with the kvm lock held */
-+void vgic_v4_configure_vsgis(struct kvm *kvm)
-+{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct kvm_vcpu *vcpu;
-+	int i;
-+
-+	kvm_arm_halt_guest(kvm);
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (dist->nassgireq)
-+			vgic_v4_enable_vsgis(vcpu);
-+		else
-+			vgic_v4_disable_vsgis(vcpu);
-+	}
-+
-+	kvm_arm_resume_guest(kvm);
-+}
-+
- /**
-  * vgic_v4_init - Initialize the GICv4 data structures
-  * @kvm:	Pointer to the VM being initialized
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index c7fefd6b1c80..769e4802645e 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -316,5 +316,6 @@ void vgic_its_invalidate_cache(struct kvm *kvm);
- bool vgic_supports_direct_msis(struct kvm *kvm);
- int vgic_v4_init(struct kvm *kvm);
- void vgic_v4_teardown(struct kvm *kvm);
-+void vgic_v4_configure_vsgis(struct kvm *kvm);
- 
- #endif
+ 	vgic_mmio_write_v3_misc(vcpu, addr, len, val);
 -- 
 2.20.1
 
