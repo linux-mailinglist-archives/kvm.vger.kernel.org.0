@@ -2,38 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 09A5F15EE67
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 18:40:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 532F315ED05
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 18:32:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390019AbgBNRjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 12:39:53 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52056 "EHLO mail.kernel.org"
+        id S2390781AbgBNRbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 12:31:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58296 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389427AbgBNQEK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:04:10 -0500
+        id S2390598AbgBNQHL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:07:11 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ACD2E2187F;
-        Fri, 14 Feb 2020 16:04:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2B0852067D;
+        Fri, 14 Feb 2020 16:07:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581696249;
-        bh=4T5JPQqUE6xKW9k7cnqNq3V+LwoqG3tjHTLL42udH/w=;
+        s=default; t=1581696430;
+        bh=IL0DlRLZwPFnTOfxoGC0+a/kYVgGNy0nkZp7u869IZc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=W/S6bqkHlUGiNiGQwmxWjKxFaE9G9n3ELgsbYNkVwOyk4BgJCReNX4t9TpFVq8o5H
-         yvpslWD0FSLcGPZQPuhPmRomsMx0Xa7hY4XS+NAFVuRxa/YEbsBQi4qIAUFHBD1UIL
-         ysERshPk9tSacSx6VXJweMiasjk5coII+5kY+fhQ=
+        b=MmXwT/mB2UEieua5DL0roq3cZK3dnZ1UwM0hpPCF4Tz8TRmot9wS8TjEPUTSOtD59
+         ThD+JL0t3DGJKaeSh2ob5iqV/2oryxV0d5wz9zJxt8GUa12Kwa6vlZEz9ZytWfupIc
+         zK1MZBYkQywzpDe/NahSHdQIxkmIWs0Bkt/4Jnks=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Julian Wiedmann <jwi@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 106/459] KVM: s390: ENOTSUPP -> EOPNOTSUPP fixups
-Date:   Fri, 14 Feb 2020 10:55:56 -0500
-Message-Id: <20200214160149.11681-106-sashal@kernel.org>
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 249/459] vfio/spapr/nvlink2: Skip unpinning pages on error exit
+Date:   Fri, 14 Feb 2020 10:58:19 -0500
+Message-Id: <20200214160149.11681-249-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214160149.11681-1-sashal@kernel.org>
 References: <20200214160149.11681-1-sashal@kernel.org>
@@ -46,54 +43,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-[ Upstream commit c611990844c28c61ca4b35ff69d3a2ae95ccd486 ]
+[ Upstream commit 338b4e10f939a71194d8ecef7ece205a942cec05 ]
 
-There is no ENOTSUPP for userspace.
+The nvlink2 subdriver for IBM Witherspoon machines preregisters
+GPU memory in the IOMMI API so KVM TCE code can map this memory
+for DMA as well. This is done by mm_iommu_newdev() called from
+vfio_pci_nvgpu_regops::mmap.
 
-Reported-by: Julian Wiedmann <jwi@linux.ibm.com>
-Fixes: 519783935451 ("KVM: s390: introduce ais mode modify function")
-Fixes: 2c1a48f2e5ed ("KVM: S390: add new group for flic")
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+In an unlikely event of failure the data->mem remains NULL and
+since mm_iommu_put() (which unregisters the region and unpins memory
+if that was regular memory) does not expect mem=NULL, it should not be
+called.
+
+This adds a check to only call mm_iommu_put() for a valid data->mem.
+
+Fixes: 7f92891778df ("vfio_pci: Add NVIDIA GV100GL [Tesla V100 SXM2] subdriver")
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/s390/kvm/interrupt.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/vfio/pci/vfio_pci_nvlink2.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index d1ccc168c0714..62388a678b91a 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -2191,7 +2191,7 @@ static int flic_ais_mode_get_all(struct kvm *kvm, struct kvm_device_attr *attr)
- 		return -EINVAL;
+diff --git a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
+index f2983f0f84bea..3f5f8198a6bb1 100644
+--- a/drivers/vfio/pci/vfio_pci_nvlink2.c
++++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
+@@ -97,8 +97,10 @@ static void vfio_pci_nvgpu_release(struct vfio_pci_device *vdev,
  
- 	if (!test_kvm_facility(kvm, 72))
--		return -ENOTSUPP;
-+		return -EOPNOTSUPP;
+ 	/* If there were any mappings at all... */
+ 	if (data->mm) {
+-		ret = mm_iommu_put(data->mm, data->mem);
+-		WARN_ON(ret);
++		if (data->mem) {
++			ret = mm_iommu_put(data->mm, data->mem);
++			WARN_ON(ret);
++		}
  
- 	mutex_lock(&fi->ais_lock);
- 	ais.simm = fi->simm;
-@@ -2500,7 +2500,7 @@ static int modify_ais_mode(struct kvm *kvm, struct kvm_device_attr *attr)
- 	int ret = 0;
- 
- 	if (!test_kvm_facility(kvm, 72))
--		return -ENOTSUPP;
-+		return -EOPNOTSUPP;
- 
- 	if (copy_from_user(&req, (void __user *)attr->addr, sizeof(req)))
- 		return -EFAULT;
-@@ -2580,7 +2580,7 @@ static int flic_ais_mode_set_all(struct kvm *kvm, struct kvm_device_attr *attr)
- 	struct kvm_s390_ais_all ais;
- 
- 	if (!test_kvm_facility(kvm, 72))
--		return -ENOTSUPP;
-+		return -EOPNOTSUPP;
- 
- 	if (copy_from_user(&ais, (void __user *)attr->addr, sizeof(ais)))
- 		return -EFAULT;
+ 		mmdrop(data->mm);
+ 	}
 -- 
 2.20.1
 
