@@ -2,144 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6D9915F7A9
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 21:23:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 217B915F7C8
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 21:35:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729977AbgBNUXi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 15:23:38 -0500
-Received: from USFB19PA31.eemsg.mail.mil ([214.24.26.194]:25819 "EHLO
-        USFB19PA31.eemsg.mail.mil" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729682AbgBNUXh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 15:23:37 -0500
-X-EEMSG-check-017: 56145307|USFB19PA31_ESA_OUT01.csd.disa.mil
-X-IronPort-AV: E=Sophos;i="5.70,441,1574121600"; 
-   d="scan'208";a="56145307"
-Received: from emsm-gh1-uea11.ncsc.mil ([214.29.60.3])
-  by USFB19PA31.eemsg.mail.mil with ESMTP/TLS/DHE-RSA-AES256-SHA256; 14 Feb 2020 20:23:34 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tycho.nsa.gov; i=@tycho.nsa.gov; q=dns/txt;
-  s=tycho.nsa.gov; t=1581711815; x=1613247815;
-  h=subject:from:to:cc:references:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=Yh8yVLzfgcJrNxKWl5z8u9g/3WjkV3f+RBoxNQYxV4E=;
-  b=SEjRFt+jPcV9d7xQ62emkRKBYfsit3hOVekv1/DwwiF5oakkpP17NzWX
-   VVXQpk2mV0jH9UN9n38HRgU/XvFPkyCelfxznnJHvH9Iwuogof2WjGaPU
-   4KYZ/+b4DTTO1L09qVa0fU6HAKl9nO1K/VtW1OyTedB+KO2N50r/AHjnI
-   Q8AiHI1dXqh3azBLfk1EbPVaavaOrozkSReb9pYccrzTv13eIVvEWZpKH
-   Q8WLrY3+g1IRB8K/1kI6Ph3sKakQuzqWKqCfKDnVUoYCPAT8t4JeR74Qn
-   cofMpTvxl6hbjRZBbwgi1NxDfGjvgLj73zE2GLtqrxrdsFeVbZ4dh48t7
-   A==;
-X-IronPort-AV: E=Sophos;i="5.70,441,1574121600"; 
-   d="scan'208";a="39155698"
-IronPort-PHdr: =?us-ascii?q?9a23=3AgzRpzBR99aF4BifuhODwqvMPatpsv+yvbD5Q0Y?=
- =?us-ascii?q?Iujvd0So/mwa67YB2Ot8tkgFKBZ4jH8fUM07OQ7/m8HzNYqs/a7zgrS99laV?=
- =?us-ascii?q?wssY0uhQsuAcqIWwXQDcXBSGgEJvlET0Jv5HqhMEJYS47UblzWpWCuv3ZJQk?=
- =?us-ascii?q?2sfQV6Kf7oFYHMks+5y/69+4HJYwVPmTGxfa5+IA+5oAnMucQam4lvJro+xh?=
- =?us-ascii?q?fUrHZFefldyH91K16Ugxvz6cC88YJ5/S9Nofwh7clAUav7f6Q8U7NVCSktPn?=
- =?us-ascii?q?426sP2qxTNVBOD6XQAXGoYlBpIGBXF4wrhXpjtqCv6t/Fy1zecMMbrUL07Qz?=
- =?us-ascii?q?Wi76NsSB/1lCcKMiMy/W/LhsBsiq9QvQmsrAJjzYHKfI6VNeJ+fqLDctMcWW?=
- =?us-ascii?q?pBRdtaWyhYDo+hc4cDE+8NMOBWoInno1sFsAWwCw+iCujyzjNEn3/70Kk/3+?=
- =?us-ascii?q?knDArI3hEvH8gWvXrJrNv7KqkSX+O7wqbGwjrMbe9Z1zjm5YjUcR0su+2AUa?=
- =?us-ascii?q?5+fMfTz0QkCgPLjk+XqYzgJz6by/gNvHaD7+pgS+2vjXMspRx0oje1wscsjp?=
- =?us-ascii?q?fGh4IIwV3D7iV23Z01KMakSE97fdGkEJxQuzucN4ttWMwuWW5ouCEkyrAfv5?=
- =?us-ascii?q?OwYSsEyIw/yhLCZPGKfJKE7xL+WOqLPzt1i2xpdKiiixu07EOu0PfzVtOu31?=
- =?us-ascii?q?ZPtidFl97MuW0T2BHL8ciHT+d9/l+m2TaSywDf8uFELl4wlarcM5Mh3qQ/lo?=
- =?us-ascii?q?ASsUTeBS/6gkT2jKmYdkUj4ein9fjobq/6pp6cK4B0igb+Pr4omsOjGuQ3Lh?=
- =?us-ascii?q?ICX22a+eS4zLHj/Ev5T6tWjvAuj6XUv5/XKd4bq6KkGQNZzIku5wilAzu7yN?=
- =?us-ascii?q?gYmGMILFNBeBKJlYjpPFTOLejjDfiimFShiytrxvDaMb3hBZXBNH7DkKz7cr?=
- =?us-ascii?q?pn5E5czxQzwchF551IErEBPO7zWkjpudPFFBA5NRC7w+HjCNhm2YMeXmWPAq?=
- =?us-ascii?q?CdMKzMq1OH+uUvI+yUbo8PpDn9M+Ql5+LpjXIhhV8dfKyp3Z4KaHCiBPRpOU?=
- =?us-ascii?q?WYbGHjgtcGFmcKsQ4+Q/LwhFKeVj5TYm64X7gg6TEjFIKmEYDDS5i2gLOf2C?=
- =?us-ascii?q?e7H5tWZn1JC12XD3foeJuLW+0WZCKRPMBhiDoEWqalS4M70hGurgD6waJ9Lu?=
- =?us-ascii?q?XI4i0YqY7j1N9t6u3XlBEy8yF0DsuE32GWUW57gn4IRyU33KBjoU1x01KD0a?=
- =?us-ascii?q?9ljPxFEdxc+ehEUhk1NZHC1ex2EdPyVRzbftePVlmmRs+qATYrTtI+29UOeV?=
- =?us-ascii?q?pyG82+jhDf2CqnG7sVl72NBJwp/aPQxnbxJ91gxHnYyqkukV0mT9BRNW2pmK?=
- =?us-ascii?q?F/7RLfB43XnEWDkaala6Ac0DTK9GeZwmqEpFtYXxJoUaXZQXAfYVPbrdD45k?=
- =?us-ascii?q?PEUr+vBq0rMghfxs6YLKtFdNnpgE5YRPfsJtveeXi9m2SuChaSwLODco7qd3?=
- =?us-ascii?q?8a3CXHB0gOixoT8mqeNQgiGiehpHrTDD9wFVLqeE7s7+Z+p22hTkMuzAGFcV?=
- =?us-ascii?q?dh17yr9R4Rn/CcTOkT3r0csic7tzp0BEq9387RC9eYuQphfb9cYdQm7VZGy2?=
- =?us-ascii?q?3ZsQ19PoK6I6Bmh14edRl3vkz02xVwEIVAntImrG4pzABqM6KXzEtBdy+E3Z?=
- =?us-ascii?q?D3IrDXMnP9/A2ra6PNwlHRysuW+qMW5PQ9rFXjuxupGVQ4/3p71NlV1mOW5o?=
- =?us-ascii?q?/WAwoKTZLxTkE3+gB8p7HcYSkw/IzU1XprMam7tj/NxcglC/ciyhalZ91fKr?=
- =?us-ascii?q?+LFBfuE80GAMijMOgqm1+qbh0aJ+BS9KE0P8K7ePucwqGmJ+lgnDWhjWRI5I?=
- =?us-ascii?q?ByzFiA+DZ7Su7Nx5wF2e2X3hObVzfgi1esqsL3lp5KZTEcAGqy0ifkBIlWZq?=
- =?us-ascii?q?19eYYEF32iLNGwxtV71NbRXCt0/ViiCldO88itcAGZblv70EUE2U0RqnujsS?=
- =?us-ascii?q?S/yDNwnnciqa/JjwLUxOG3TwYKIm5GQiFZiF7oJYWlx4QBUFOAcxkilBzj41?=
- =?us-ascii?q?3zgadcuvIsfCHoXU5Ucn2ufClZWayqu+/HOpMe5Q=3D=3D?=
-X-IPAS-Result: =?us-ascii?q?A2ANAwAXAUde/wHyM5BmHAEBAQEBBwEBEQEEBAEBgXuBe?=
- =?us-ascii?q?AWCDRKEPokDhlwBAQEDBoESJYlwkUoJAQEBAQEBAQEBNwQBAYRAAoIlOBMCE?=
- =?us-ascii?q?AEBAQUBAQEBAQUDAQFshUOCOykBgwIBBSMPAQVBEAsOCgICJgICVwYNCAEBg?=
- =?us-ascii?q?mM/glclriiBMokfgT6BDiqMPnmBB4E4DAOCXT6HW4JeBI1ggj6Hb5dtgkSCT?=
- =?us-ascii?q?5N8BhybGKwnIoFYKwgCGAghD4MoTxgNjikXjkEjA5EIAQE?=
-Received: from tarius.tycho.ncsc.mil (HELO tarius.infosec.tycho.ncsc.mil) ([144.51.242.1])
-  by emsm-gh1-uea11.NCSC.MIL with ESMTP; 14 Feb 2020 20:23:33 +0000
-Received: from moss-pluto.infosec.tycho.ncsc.mil (moss-pluto [192.168.25.131])
-        by tarius.infosec.tycho.ncsc.mil (8.14.7/8.14.4) with ESMTP id 01EKMXfe033109;
-        Fri, 14 Feb 2020 15:22:33 -0500
-Subject: Re: [PATCH 2/3] Teach SELinux about anonymous inodes
-From:   Stephen Smalley <sds@tycho.nsa.gov>
-To:     Daniel Colascione <dancol@google.com>
-Cc:     Tim Murray <timmurray@google.com>,
-        SElinux list <selinux@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>, paul@paul-moore.com,
-        Nick Kralevich <nnk@google.com>,
-        Lokesh Gidra <lokeshgidra@google.com>,
-        Jeffrey Vander Stoep <jeffv@google.com>
-References: <20200211225547.235083-1-dancol@google.com>
- <20200214032635.75434-1-dancol@google.com>
- <20200214032635.75434-3-dancol@google.com>
- <9ca03838-8686-0007-0971-ee63bf5031da@tycho.nsa.gov>
- <CAKOZuev-=7Lgu35E3tzpHQn0m_KAvvrqi+ZJr1dpqRjHERRSqg@mail.gmail.com>
- <23f725ca-5b5a-5938-fcc8-5bbbfc9ba9bc@tycho.nsa.gov>
- <97603935-9f6b-ccf4-4229-87f26380c3db@tycho.nsa.gov>
-Message-ID: <6d8f2e69-85e0-5313-337f-53144cf08218@tycho.nsa.gov>
-Date:   Fri, 14 Feb 2020 15:24:43 -0500
+        id S2387499AbgBNUfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 15:35:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22810 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730112AbgBNUfO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 15:35:14 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01EKYbt6189507
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 15:35:13 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y3wxvvug4-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 15:35:13 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Fri, 14 Feb 2020 20:35:11 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 14 Feb 2020 20:35:08 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01EKZ7q653477446
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Feb 2020 20:35:07 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AB70DA404D;
+        Fri, 14 Feb 2020 20:35:07 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0115FA4051;
+        Fri, 14 Feb 2020 20:35:07 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.191.169])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 14 Feb 2020 20:35:06 +0000 (GMT)
+Subject: Re: [PATCH 02/13] fixup! KVM: selftests: Add support for
+ vcpu_args_set to aarch64 and s390x
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, bgardon@google.com, frankja@linux.ibm.com,
+        thuth@redhat.com, peterx@redhat.com
+References: <20200214145920.30792-1-drjones@redhat.com>
+ <20200214145920.30792-3-drjones@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Fri, 14 Feb 2020 21:35:06 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <97603935-9f6b-ccf4-4229-87f26380c3db@tycho.nsa.gov>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200214145920.30792-3-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021420-0012-0000-0000-00000386E8CC
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021420-0013-0000-0000-000021C370D3
+Message-Id: <40bc77ed-a5d8-bfed-3f77-5445ba667f97@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-14_07:2020-02-14,2020-02-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ impostorscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
+ suspectscore=0 mlxlogscore=778 spamscore=0 mlxscore=0 lowpriorityscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002140150
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/14/20 1:08 PM, Stephen Smalley wrote:
-> On 2/14/20 1:02 PM, Stephen Smalley wrote:
->> It shouldn't fire for non-anon inodes because on a (non-anon) file 
->> creation, security_transition_sid() is passed the parent directory SID 
->> as the second argument and we only assign task SIDs to /proc/pid 
->> directories, which don't support (userspace) file creation anyway.
->>
->> However, in the absence of a matching type_transition rule, we'll end 
->> up defaulting to the task SID on the anon inode, and without a 
->> separate class we won't be able to distinguish it from a /proc/pid 
->> inode.  So that might justify a separate anoninode or similar class.
->>
->> This however reminded me that for the context_inode case, we not only 
->> want to inherit the SID but also the sclass from the context_inode. 
->> That is so that anon inodes created via device node ioctls inherit the 
->> same SID/class pair as the device node and a single allowx rule can 
->> govern all ioctl commands on that device.
-> 
-> At least that's the way our patch worked with the /dev/kvm example. 
-> However, if we are introducing a separate anoninode class for the 
-> type_transition case, maybe we should apply that to all anon inodes 
-> regardless of how they are labeled (based on context_inode or 
-> transition) and then we'd need to write two allowx rules, one for ioctls 
-> on the original device node and one for those on anon inodes created 
-> from it.  Not sure how Android wants to handle that as the original 
-> developer and primary user of SELinux ioctl whitelisting.
 
-I would tentatively argue for inheriting both sclass and SID from the 
-context_inode for the sake of sane policy writing.  In the userfaultfd 
-case, that will still end up using the new SECCLASS_ANONINODE or 
-whatever since the sclass will be initially set to that value for the 
-transition SID case and then inherited on fork.  But for /dev/kvm, it 
-would be the class from the /dev/kvm inode, i.e. SECCLASS_CHR_FILE.
+
+On 14.02.20 15:59, Andrew Jones wrote:
+> [Fixed array index (num => i) and made some style changes.]
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  .../selftests/kvm/lib/aarch64/processor.c     | 24 ++++---------------
+
+subject says s390, the patch not.
 
