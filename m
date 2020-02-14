@@ -2,146 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6639715D88B
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 14:34:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CC4615D8CE
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 14:52:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728437AbgBNNeK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 08:34:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32114 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728083AbgBNNeJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 08:34:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581687248;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=l7aMxDi0mAhQvw9oGCvK/t3d5+SiBEkXdJDHyytIXQc=;
-        b=a7ExFgCToe1+CCy+8uKmbC+QzisXNbIebdEMffbH+T/IFdfKFE8PKuxEeT4SOPdavhqW6q
-        gKQzFpjjgQlCfeNpXhagb/qyG2h7vhiAN/eppb39H4ez9JF0ry/c/OWeIbRyZmvU+aesO2
-        EE1L+fWIeZSyJsEdcMG02xfPfn3ge38=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-eMAnR9l5N-24-ILozPcilg-1; Fri, 14 Feb 2020 08:34:05 -0500
-X-MC-Unique: eMAnR9l5N-24-ILozPcilg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEEA1107B7D4;
-        Fri, 14 Feb 2020 13:34:03 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 921B826FB6;
-        Fri, 14 Feb 2020 13:34:02 +0000 (UTC)
-Date:   Fri, 14 Feb 2020 14:34:00 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v2 7/9] vfio-ccw: Wire up the CRW irq and CRW region
-Message-ID: <20200214143400.175c9e5e.cohuck@redhat.com>
-In-Reply-To: <20200206213825.11444-8-farman@linux.ibm.com>
-References: <20200206213825.11444-1-farman@linux.ibm.com>
-        <20200206213825.11444-8-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1729305AbgBNNwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 08:52:43 -0500
+Received: from mail-eopbgr20061.outbound.protection.outlook.com ([40.107.2.61]:19405
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728336AbgBNNwn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 08:52:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=L5ZzalYHtNcBgMzZqnD3H86VJr3tmTbKIMo0Xybp+3/buds8XfdHh5BLpiClM87BsfU9Y/rrVeUUCajIYt/MQ0jKpMHpY5LIK+w3/QPFBGdvMOBIYUUDZVl2IMRGURO6aQkVwKfW9eCMzgVnWvsZL/dokDhJGJBbmu1D8ANPVPP48YA5JFtGMdKkZvu/XfzJWebtVNO+ImzI2W5vWAWG41rbWyclRjiWMHfVF8UsAh4etnCLDFE8SNukjkKgmDZutRot3qifd+x25mGudyKRX7YOXIHuMp2hPYNaFk0itWGa0YfUc1nvgpWzrbzze/QCzuGk1L2Gc50O42zYC9eg6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YxpWpz4eowZpMYAuHyuVF5zK2GcnGnMBAfGo76YNdzI=;
+ b=EaEjgK6u/3tmcuZHDUlvYx0w6mnnzidptXaNhWLm/IHrMP3DKY6lsAIIP8WcdvZl/a6bX0UZAuJIGyV1mNU1nIx7LhsKeuKJ6SKzfatEyLH48e77VBMFPKaO5oqv6hFGz5lzR1sgRWXryB7MFkN4HYtQTjjtbyhuK83V5/ppWy+9wsIYdszrAMXx086PATHaWo3DKUTVUCG6VgeNxglDewBVx5gakDY5iOCkly+crIBV2f+Oq0AKtzg5cfYjEkVOlDf0BnrdDGJEhUsROgvurIJPbLJND9tu+lGnWrTe83sdhOS94SVgS1wZlswB4qsh44f6obv7c6PenaF821cv4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YxpWpz4eowZpMYAuHyuVF5zK2GcnGnMBAfGo76YNdzI=;
+ b=ZcR3nfqYyR9mrJICQHsIF/SuEYX/zZa6iLzmfMWNp5y4MZ1NHcjEow3wFCY8A7esenKOLySty5MxDlCYkhRUW9YD4IjFPf2orhBmiE7jotd1P5369vKqOpS6CHIHyt7FEUorc1AzOm8WKtRpobmz6j+xZYXCXVnXBgmTEkl0g8Q=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
+ VI1PR05MB6621.eurprd05.prod.outlook.com (20.178.204.79) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21; Fri, 14 Feb 2020 13:52:36 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2729.025; Fri, 14 Feb 2020
+ 13:52:36 +0000
+Date:   Fri, 14 Feb 2020 09:52:32 -0400
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
+        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
+        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
+Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
+Message-ID: <20200214135232.GB4271@mellanox.com>
+References: <20200210035608.10002-1-jasowang@redhat.com>
+ <20200210035608.10002-4-jasowang@redhat.com>
+ <20200211134746.GI4271@mellanox.com>
+ <cf7abcc9-f8ef-1fe2-248e-9b9028788ade@redhat.com>
+ <20200212125108.GS4271@mellanox.com>
+ <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
+ <20200213134128.GV4271@mellanox.com>
+ <ebaea825-5432-65e2-2ab3-720a8c4030e7@redhat.com>
+ <20200213150542.GW4271@mellanox.com>
+ <8b3e6a9c-8bfd-fb3c-12a8-2d6a3879f1ae@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b3e6a9c-8bfd-fb3c-12a8-2d6a3879f1ae@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: MN2PR10CA0026.namprd10.prod.outlook.com
+ (2603:10b6:208:120::39) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR10CA0026.namprd10.prod.outlook.com (2603:10b6:208:120::39) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2707.26 via Frontend Transport; Fri, 14 Feb 2020 13:52:36 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1j2bOS-0003FV-6X; Fri, 14 Feb 2020 09:52:32 -0400
+X-Originating-IP: [142.68.57.212]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 6e271afe-f030-4144-f0b2-08d7b15525d1
+X-MS-TrafficTypeDiagnostic: VI1PR05MB6621:|VI1PR05MB6621:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR05MB6621E34FFFB266C5F7BFC95ACF150@VI1PR05MB6621.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Forefront-PRVS: 03137AC81E
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(396003)(39850400004)(346002)(376002)(366004)(189003)(199004)(316002)(4326008)(81166006)(81156014)(8676002)(2906002)(2616005)(186003)(33656002)(66946007)(26005)(8936002)(6916009)(52116002)(86362001)(36756003)(478600001)(1076003)(66556008)(9746002)(9786002)(5660300002)(66476007)(7416002)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB6621;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JauTHxWt7t7VdWMC57/Psrc9u1RNFT1QksxHxkrOdvVzWC+GhECky+PkB/CQF0KxxyU+9MnodSNUMZhxdRKS0NOwiyBZzZRKC3CjcVRgp7p4sNf34V7rSuc0pFghUeE5UhtKyT5J4wEUEcvb+u6ZvGYcx1M1WAEL9lTQ2gmNKXD+WYjmaQ7y3c/IXWFzk5cuNdG7Wcc3NJEwjUcZaEQ8zpLXawZfOURh4g6A8b9gfVwkHHdJVqkI+bY/M424bZMvFMnzw+EzRzc7Y/ATAoWKF1bkk+oerRk/svaaC2Fa6h9psE3KlMvAkXDBjfAEe2zjn840XOWpJrcP5ZU05EB4QKE7nuGhfAL+77Sc7F0KeCjKVmruumdwuFO1N9It7ryFo6eMP4As2CS4/kbsEe8EPyipVNsHshWDazF0oRAHgCiSRtah32F1TWJVXiu1XaNREaEKDwSYpDBHCw6K6KyNNce430XL23FPGDbHIQG+QQ9sQzIDRzKIHlLgedIw3DZI
+X-MS-Exchange-AntiSpam-MessageData: DFWHp3xgtS72ySJlgdo/TcKbYn6hmg95vo+5OZ35Db+J2RTdaRsvchI/PcKWiHvEwstSBxsBof8dAi1C11LME1DIPr0gO9rMhXcclCbNInVTtLsC+HPBuIQ2IAxSDa1C1bQ5CkQXgGUwowdLs4IqHw==
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e271afe-f030-4144-f0b2-08d7b15525d1
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2020 13:52:36.3715
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CuqEAMdz4DD+aUr6MoSXqk3kHyIhl7o/MHhq+oRLqZS45AHa0H3vvnLP9AaqnOXjXKTpeiH3nQDjSKL1CvxDEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB6621
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  6 Feb 2020 22:38:23 +0100
-Eric Farman <farman@linux.ibm.com> wrote:
+On Fri, Feb 14, 2020 at 11:23:27AM +0800, Jason Wang wrote:
 
-> From: Farhan Ali <alifm@linux.ibm.com>
+> > > Though all vDPA devices have the same programming interface, but the
+> > > semantic is different. So it looks to me that use bus complies what
+> > > class.rst said:
+> > > 
+> > > "
+> > > 
+> > > Each device class defines a set of semantics and a programming interface
+> > > that devices of that class adhere to. Device drivers are the
+> > > implementation of that programming interface for a particular device on
+> > > a particular bus.
+> > > 
+> > > "
+> > Here we are talking about the /dev/XX node that provides the
+> > programming interface.
 > 
-> Use an IRQ to notify userspace that there is a CRW
-> pending in the region, related to path-availability
-> changes on the passthrough subchannel.
 > 
-> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
+> I'm confused here, are you suggesting to use class to create char device in
+> vhost-vdpa? That's fine but the comment should go for vhost-vdpa patch.
+
+Certainly yes, something creating many char devs should have a
+class. That makes the sysfs work as expected
+
+I suppose this is vhost user? I admit I don't really see how this
+vhost stuff works, all I see are global misc devices? Very unusual for
+a new subsystem to be using global misc devices..
+
+I would have expected that a single VDPA device comes out as a single
+char dev linked to only that VDPA device.
+
+> > All the vdpa devices have the same basic
+> > chardev interface and discover any semantic variations 'in band'
 > 
-> Notes:
->     v1->v2:
->      - Remove extraneous 0x0 in crw.rsid assignment [CH]
->      - Refactor the building/queueing of a crw into its own routine [EF]
->     
->     v0->v1: [EF]
->      - Place the non-refactoring changes from the previous patch here
->      - Clean up checkpatch (whitespace) errors
->      - s/chp_crw/crw/
->      - Move acquire/release of io_mutex in vfio_ccw_crw_region_read()
->        into patch that introduces that region
->      - Remove duplicate include from vfio_ccw_drv.c
->      - Reorder include in vfio_ccw_private.h
+> That's not true, char interface is only used for vhost. Kernel virtio driver
+> does not need char dev but a device on the virtio bus.
+
+Okay, this is fine, but why do you need two busses to accomplish this?
+
+Shouldn't the 'struct virito_device' be the plug in point for HW
+drivers I was talking about - and from there a vhost-user can connect
+to the struct virtio_device to give it a char dev or a kernel driver
+can connect to link it to another subsystem?
+
+It is easy to see something is going wrong with this design because
+the drivers/virtio/virtio_vdpa.c mainly contains a bunch of trampoline
+functions reflecting identical calls from one ops struct to a
+different ops struct. This suggests the 'vdpa' is some subclass of
+'virtio' and it is possibly better to model it by extending 'struct
+virito_device' to include the vdpa specific stuff.
+
+Where does the vhost-user char dev get invovled in with the v2 series?
+Is that included?
+
+> > Every class of virtio traffic is going to need a special HW driver to
+> > enable VDPA, that special driver can create the correct vhost side
+> > class device.
 > 
->  drivers/s390/cio/vfio_ccw_chp.c     |  5 ++
->  drivers/s390/cio/vfio_ccw_drv.c     | 73 +++++++++++++++++++++++++++++
->  drivers/s390/cio/vfio_ccw_ops.c     |  4 ++
->  drivers/s390/cio/vfio_ccw_private.h |  9 ++++
->  include/uapi/linux/vfio.h           |  1 +
->  5 files changed, 92 insertions(+)
-> 
-(...)
-> +static void vfio_ccw_alloc_crw(struct vfio_ccw_private *private,
-> +			       struct chp_link *link,
-> +			       unsigned int erc)
-> +{
-> +	struct vfio_ccw_crw *vc_crw;
-> +	struct crw *crw;
-> +
-> +	/*
-> +	 * If unable to allocate a CRW, just drop the event and
-> +	 * carry on.  The guest will either see a later one or
-> +	 * learn when it issues its own store subchannel.
-> +	 */
-> +	vc_crw = kzalloc(sizeof(*vc_crw), GFP_ATOMIC);
-> +	if (!vc_crw)
-> +		return;
-> +
-> +	/*
-> +	 * Build in the first CRW space, but don't chain anything
-> +	 * into the second one even though the space exists.
-> +	 */
-> +	crw = &vc_crw->crw[0];
-> +
-> +	/*
-> +	 * Presume every CRW we handle is reported by a channel-path.
-> +	 * Maybe not future-proof, but good for what we're doing now.
+> Are you saying, e.g it's the charge of IFCVF driver to create vhost char dev
+> and other stuffs?
 
-You could pass in a source indication, maybe? Presumably, at least one
-of the callers further up the chain knows...
+No.
 
-> +	 *
-> +	 * FIXME Sort of a lie, since we're converting a CRW
-> +	 * reported by a channel-path into one issued to each
-> +	 * subchannel, but still saying it's coming from the path.
-
-It's still channel-path related, though :)
-
-The important point is probably is that userspace needs to be aware
-that the same channel-path related event is reported on all affected
-subchannels, and they therefore need some appropriate handling on their
-side.
-
-> +	 */
-> +	crw->rsc = CRW_RSC_CPATH;
-> +	crw->rsid = (link->chpid.cssid << 8) | link->chpid.id;
-> +	crw->erc = erc;
-> +
-> +	list_add_tail(&vc_crw->next, &private->crw);
-> +	queue_work(vfio_ccw_work_q, &private->crw_work);
-> +}
-> +
->  static int vfio_ccw_chp_event(struct subchannel *sch,
->  			      struct chp_link *link, int event)
->  {
-(...)
-
+Jason
