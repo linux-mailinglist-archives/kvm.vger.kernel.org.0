@@ -2,126 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 217B915F7C8
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 21:35:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 99AFD15F7CE
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 21:36:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387499AbgBNUfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 15:35:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22810 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730112AbgBNUfO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 15:35:14 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01EKYbt6189507
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 15:35:13 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y3wxvvug4-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 15:35:13 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 14 Feb 2020 20:35:11 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 14 Feb 2020 20:35:08 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01EKZ7q653477446
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Feb 2020 20:35:07 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AB70DA404D;
-        Fri, 14 Feb 2020 20:35:07 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0115FA4051;
-        Fri, 14 Feb 2020 20:35:07 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.191.169])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 14 Feb 2020 20:35:06 +0000 (GMT)
-Subject: Re: [PATCH 02/13] fixup! KVM: selftests: Add support for
- vcpu_args_set to aarch64 and s390x
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, bgardon@google.com, frankja@linux.ibm.com,
-        thuth@redhat.com, peterx@redhat.com
-References: <20200214145920.30792-1-drjones@redhat.com>
- <20200214145920.30792-3-drjones@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Fri, 14 Feb 2020 21:35:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1730133AbgBNUgt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 15:36:49 -0500
+Received: from mail-eopbgr750041.outbound.protection.outlook.com ([40.107.75.41]:5031
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387432AbgBNUgt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 15:36:49 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Apmq1Rs/XUd+yqYiyepB7jkC5zo9vM31hEmKiXknwkm+txSLxxYnqxmpTUGpKL59mEv4M5IQGgxiuIRYwhcGty2lzrabJlXksGx+CR5M+wyfZ5DTUuE3lfi/f6h3qFPCQMn/Xs6f/OD3LpdRkgq9aJy8xVXy6nTpB3kMH7De8goib/2af08/7zqe5o4Tho196FKinHQOub8YtZXWoNtsYnmSLM1RjJZmpAHBAkaGuVk1ax/6WjcVJ0mKDYQOQfzAskhU38Kfbqka9JI+2lng1OxBlLDfv9mcvSkCCEuD6SjIAiroB5a/P4vEMU0ePHnJALCeILok0bgYMAwJdVV/zQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lWb40P9qWSQO/ds6C1riFEfWfr7Vp3bBXaJfrEEDiNQ=;
+ b=Sr/ze3glrsROcTDs+vB0Q7TvIzzbb2So4E2gNukIRnz/g+tIAfaL0OylbqwipTbXG71QY5DPGGuGg+D16L1v8R43X6EGOYtaJadrQo8T9D1CsN86fWXJ6Ti83Zhj6rK5p3SeQTAlgYeokmTDpQ8y0TzJwJAS+/ek8/YfC7kPOnaIDMhHyvwsPSYq52itt/hwbQcpqjRAVdJbwvIdVb3IfqP3NgPOs5Xzs4U6fIZzv3ZXT2Tq5IDqY3Adg0rvIFwoCIZS+kWQ82Fd4/UWmet4CBC3dluY+8GV8FwBZxqBMkuqM9AgnsURrXVAoSa50eBK403EEMlwvCbqFar+DhVUuQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lWb40P9qWSQO/ds6C1riFEfWfr7Vp3bBXaJfrEEDiNQ=;
+ b=aucl3JqIjhWZvTgjLddOEHBMSrp+y9HpygEZkwCC5WZHEfCVCo/yLEl/sGE2BXIPk6YYyHiXOF+m9hjHc+BwkcXWkBLgf9xXRkG3h55a3hiiaqY8j3QnhmiFR4NdMoKRdZMhdV5f/T9j+bFoxX53tAdweuD+/7JxBk1Wf5DrTPM=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Ashish.Kalra@amd.com; 
+Received: from SN1PR12MB2528.namprd12.prod.outlook.com (52.132.196.33) by
+ SN1PR12MB2557.namprd12.prod.outlook.com (52.132.193.15) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.22; Fri, 14 Feb 2020 20:36:46 +0000
+Received: from SN1PR12MB2528.namprd12.prod.outlook.com
+ ([fe80::fd48:9921:dd63:c6e1]) by SN1PR12MB2528.namprd12.prod.outlook.com
+ ([fe80::fd48:9921:dd63:c6e1%7]) with mapi id 15.20.2729.025; Fri, 14 Feb 2020
+ 20:36:46 +0000
+Date:   Fri, 14 Feb 2020 20:36:41 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, brijesh.singh@amd.com
+Subject: Re: [PATCH 10/12] mm: x86: Invoke hypercall when page encryption
+ status is changed
+Message-ID: <20200214203641.GA11368@ashkalra_ubuntu_server>
+References: <cover.1581555616.git.ashish.kalra@amd.com>
+ <a22c5b534fa035b23e549669fd5ac617b6031158.1581555616.git.ashish.kalra@amd.com>
+ <CALCETrX6Oo00NXn2QfR=eOKD9wvWiov_=WBRwb7V266=hJ2Duw@mail.gmail.com>
+ <20200213222825.GA8784@ashkalra_ubuntu_server>
+ <CALCETrX=ycjSuf_N_ff-VQtqq2_RoawuAqdkM+bCPn_2_swkjg@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrX=ycjSuf_N_ff-VQtqq2_RoawuAqdkM+bCPn_2_swkjg@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: SN4PR0801CA0013.namprd08.prod.outlook.com
+ (2603:10b6:803:29::23) To SN1PR12MB2528.namprd12.prod.outlook.com
+ (2603:10b6:802:28::33)
 MIME-Version: 1.0
-In-Reply-To: <20200214145920.30792-3-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021420-0012-0000-0000-00000386E8CC
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021420-0013-0000-0000-000021C370D3
-Message-Id: <40bc77ed-a5d8-bfed-3f77-5445ba667f97@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-14_07:2020-02-14,2020-02-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- impostorscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
- suspectscore=0 mlxlogscore=778 spamscore=0 mlxscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002140150
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SN4PR0801CA0013.namprd08.prod.outlook.com (2603:10b6:803:29::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.22 via Frontend Transport; Fri, 14 Feb 2020 20:36:46 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: aa991d5c-7a3f-46cc-d79e-08d7b18d9c3e
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2557:|SN1PR12MB2557:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2557A2EB2DAA1906159BFE418E150@SN1PR12MB2557.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-Forefront-PRVS: 03137AC81E
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(136003)(396003)(366004)(39860400002)(199004)(189003)(4326008)(8936002)(9686003)(55016002)(7416002)(53546011)(5660300002)(66946007)(52116002)(6916009)(33716001)(66476007)(6496006)(2906002)(66556008)(86362001)(54906003)(44832011)(26005)(8676002)(316002)(186003)(956004)(16526019)(1076003)(33656002)(478600001)(81156014)(81166006)(6666004);DIR:OUT;SFP:1101;SCL:1;SRVR:SN1PR12MB2557;H:SN1PR12MB2528.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: rFBKv2LHCtKyqYQj7HVek/QW+D4StvOjscCWN560N9TQWlaOcg+/qAePANW4ds/GnztpB3dv2QZoFLBR4ECLo0SLphy3sTHspPLXob7dl6R+dAScCTrSRiqgm7o7S0HSFXlEZKmvemoduLqoI45yevsckuZqoA1P2XXXuj10ytycXmOZvdo+juUStCnb7/xGOh6n6g8g8igphPW7pUYoC7KjCpfLvfzIzTLv73xOSnvmsFCZ0Hf1LdCgMCITR1UeJKAHi0+T4fKSgY8iFl2kUYR5uxsBvlLJyw6Pbhgx0ImrkxpF5W+9lb/6LoeEZ/lTec0jsYs+1SuvJNg99HPTxmsmGmKTBQ7qVOPpE79LsJGLa+NO4xdvjfLbkw/PXm+eSEwM6dbIyrMQ6+VEPJ/5c15bK6MZPvL8zjb99NZ2CcqnbTJOrSudsolFhPTKUyrA
+X-MS-Exchange-AntiSpam-MessageData: fEGZQvLHnpaN6TeG9x4HEcYVlBtm0Qx1hrr3VH3/LWsbYt01jJGaIMM1cNGZWMm838v5eFdL5jAC70uwpY3WPgig0Y1ikK/uXptyVsFO3bDuejbTK1t4hmSyH0uXb1wPh4+v1yAoBOin7Fw5QGO0+Q==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa991d5c-7a3f-46cc-d79e-08d7b18d9c3e
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2020 20:36:46.8462
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IVpAsrc0DuRcbVVKF8N9V/TkQWr+3cpB/Oy42ZxVh5dFyw67lAwvli+VS85XGFhyCONxUzzMhDWaO+e+Bgndew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2557
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Feb 14, 2020 at 10:56:53AM -0800, Andy Lutomirski wrote:
+> On Thu, Feb 13, 2020 at 2:28 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+> >
+> > On Wed, Feb 12, 2020 at 09:42:02PM -0800, Andy Lutomirski wrote:
+> > >> On Wed, Feb 12, 2020 at 5:18 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> > >> >
+> > >> > From: Brijesh Singh <brijesh.singh@amd.com>
+> > > >
+> > > > Invoke a hypercall when a memory region is changed from encrypted ->
+> > > > decrypted and vice versa. Hypervisor need to know the page encryption
+> > > > status during the guest migration.
+> > >>
+> > >> What happens if the guest memory status doesn't match what the
+> > >> hypervisor thinks it is?  What happens if the guest gets migrated
+> > >> between the hypercall and the associated flushes?
+> >
+> > This is basically same as the dirty page tracking and logging being done
+> > during Live Migration. As with dirty page tracking and logging we
+> > maintain a page encryption bitmap in the kernel which keeps tracks of
+> > guest's page encrypted/decrypted state changes and this bitmap is
+> > sync'ed regularly from kernel to qemu and also during the live migration
+> > process, therefore any dirty pages whose encryption status will change
+> > during migration, should also have their page status updated when the
+> > page encryption bitmap is sync'ed.
+> >
+> > Also i think that when the amount of dirty pages reach a low threshold,
+> > QEMU stops the source VM and then transfers all the remaining dirty
+> > pages, so at that point, there will also be a final sync of the page
+> > encryption bitmap, there won't be any hypercalls after this as the
+> > source VM has been stopped and the remaining VM state gets transferred.
+> 
+> And have you ensured that, in the inevitable race when a guest gets
+> migrated part way through an encryption state change, that no data
+> corruption occurs?
 
+We ensure that we send the page encryption state bitmap to the
+destination VM at migration completion and when the remaining amount of 
+RAM/dirty pages are flushed. Also as the source VM is stopped before
+this flush of remaining blocks occur, so any encryption state change
+hypercalls would have been completed before that.
 
-On 14.02.20 15:59, Andrew Jones wrote:
-> [Fixed array index (num => i) and made some style changes.]
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  .../selftests/kvm/lib/aarch64/processor.c     | 24 ++++---------------
-
-subject says s390, the patch not.
-
+Thanks,
+Ashish
