@@ -2,96 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2DD215D698
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 12:36:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F83315D6DD
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 12:51:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728062AbgBNLgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 06:36:25 -0500
-Received: from foss.arm.com ([217.140.110.172]:59992 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727652AbgBNLgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 06:36:25 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A64C01FB;
-        Fri, 14 Feb 2020 03:36:24 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A47E93F68F;
-        Fri, 14 Feb 2020 03:36:23 -0800 (PST)
-Date:   Fri, 14 Feb 2020 11:36:07 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v2] kvm: arm: VGIC: Fix interrupt group enablement
-Message-ID: <20200214113607.39854c81@donnerap.cambridge.arm.com>
-In-Reply-To: <e2426986ebc9be4e14eb99028b28a43e@www.loen.fr>
-References: <20191122185142.65477-1-andre.przywara@arm.com>
-        <e2426986ebc9be4e14eb99028b28a43e@www.loen.fr>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1728062AbgBNLvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 06:51:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30243 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727652AbgBNLvI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 06:51:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581681068;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oRbqqZO6a+MeMwBgOzJgX5nq8QvwfWWd6YqYAkhAo+Q=;
+        b=WWbQf7iN6nR1TxbNuDLHm2m96LR9yszCbNcAJtngQ7qRwWvV+OkqORwcyuMW6TNSfu53Iw
+        R4apRpYWQiGz13BwGNKfAaLVYo2majhmjHatSn8isdUP5wEJ+k6oS1q5HCFzrSM8sRyq37
+        YKzIkFGlTeiVcwFTJ1+2yX2yJOuQBvQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-171-OpPM0aUlPwm3O5e9SU3lpw-1; Fri, 14 Feb 2020 06:51:01 -0500
+X-MC-Unique: OpPM0aUlPwm3O5e9SU3lpw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A93D21005510;
+        Fri, 14 Feb 2020 11:51:00 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F2EEB5DA85;
+        Fri, 14 Feb 2020 11:50:53 +0000 (UTC)
+Date:   Fri, 14 Feb 2020 12:50:51 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, peter.maydell@linaro.org,
+        alex.bennee@linaro.org, lvivier@redhat.com, thuth@redhat.com,
+        david@redhat.com, frankja@linux.ibm.com, eric.auger@redhat.com
+Subject: Re: [PATCH kvm-unit-tests 2/2] runtime: Introduce VMM_PARAMS
+Message-ID: <20200214115051.o4t6ro55y42oztxf@kamzik.brq.redhat.com>
+References: <20200213143300.32141-1-drjones@redhat.com>
+ <20200213143300.32141-3-drjones@redhat.com>
+ <689d8031-22ac-c414-a3c3-e10567c3c9af@redhat.com>
+ <20200214103853.ycxs4clif4gisk6i@kamzik.brq.redhat.com>
+ <d04b6913-e71e-8983-e704-d956be12dac9@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d04b6913-e71e-8983-e704-d956be12dac9@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Nov 2019 10:55:01 +0000
-Marc Zyngier <maz@kernel.org> wrote:
-
-Hi Marc,
-
-dug this out of my inbox, sorry for warming this up.
-
-> On 2019-11-22 18:51, Andre Przywara wrote:
-> > Hi Marc,
-> >
-> > this is still a bit rough, and only briefly tested, but I wanted to
-> > hear your opinion on the general approach (using a second list in
-> > addition to the ap_list). Some ugly bits come from the fact that the
-> > two lists are not that different, so we have to consider both of them
-> > at times. This is what I wanted to avoid with just one list that gets
-> > filtered on the fly.
-> > Or I am just stupid and don't see how it can be done properly ;-)  
+On Fri, Feb 14, 2020 at 11:50:08AM +0100, Paolo Bonzini wrote:
+> On 14/02/20 11:38, Andrew Jones wrote:
+> > That was the way we originally planned on doing it when Alex Bennee posted
+> > his patch. However since d4d34e648482 ("run_tests: fix command line
+> > options handling") the "--" has become the divider between run_tests.sh
+> > parameter inputs and individually specified tests.
 > 
-> I don't know about that, but I think there is a better way.
+> Hmm, more precisely that is how getopt separates options from other 
+> parameters.
 > 
-> You have essentially two sets of pending interrupts:
+> Since we don't expect test names starting with a dash, we could do 
+> something like (untested):
 > 
-> 1) those that are enabled and group-enabled, that end up in the AP list
-> 2) those that are either disabled and/or group-disabled
+> diff --git a/run_tests.sh b/run_tests.sh
+> index 01e36dc..8b71cf2 100755
+> --- a/run_tests.sh
+> +++ b/run_tests.sh
+> @@ -35,7 +35,20 @@ RUNTIME_arch_run="./$TEST_DIR/run"
+>  source scripts/runtime.bash
+>  
+>  only_tests=""
+> -args=`getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*`
+> +args=""
+> +vmm_args=""
+> +while [ $# -gt 0 ]; do
+> +   if test "$1" = --; then
+> +       shift
+> +       vmm_args=$*
+> +       break
+> +   else
+> +       args="args $1"
+> +       shift
+> +   fi
+> +done
+> +
+> +args=`getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $args`
+>  [ $? -ne 0 ] && exit 2;
+>  set -- $args;
+>  while [ $# -gt 0 ]; do
+
+Unfortunately it regresses the current command line. Here's what I tested
+
+Before
+------
+
+$ ./run_tests.sh -j 2 -v pmu psci
+VMM_PARAMS= TESTNAME=pmu TIMEOUT=90s ACCEL= ./arm/run arm/pmu.flat -smp 1
+VMM_PARAMS= TESTNAME=psci TIMEOUT=90s ACCEL= ./arm/run arm/psci.flat -smp $MAX_SMP
+PASS pmu (3 tests)
+PASS psci (4 tests)
+
+$ ./run_tests.sh pmu psci -j 2 -v
+VMM_PARAMS= TESTNAME=pmu TIMEOUT=90s ACCEL= ./arm/run arm/pmu.flat -smp 1
+VMM_PARAMS= TESTNAME=psci TIMEOUT=90s ACCEL= ./arm/run arm/psci.flat -smp $MAX_SMP
+PASS pmu (3 tests)
+PASS psci (4 tests)
+
+$ ./run_tests.sh -j 2 -v -- pmu psci
+VMM_PARAMS= TESTNAME=pmu TIMEOUT=90s ACCEL= ./arm/run arm/pmu.flat -smp 1
+VMM_PARAMS= TESTNAME=psci TIMEOUT=90s ACCEL= ./arm/run arm/psci.flat -smp $MAX_SMP
+PASS pmu (3 tests)
+PASS psci (4 tests)
+
+After
+-----
+
+$ ./run_tests.sh -j 2 -v pmu psci
+PASS psci (4 tests)
+
+$ ./run_tests.sh pmu psci -j 2 -v
+$
+
+(no output)
+
+$ ./run_tests.sh -j 2 -v -- pmu psci
+$
+
+(no output)
+
 > 
-> Today, (2) are not on any list.
-
-For a reason: because we don't really care about them. And so far they would only become interesting on an *individual* interrupt base, and our VGIC routines can deal very well with that.
-
-> What I'm suggesting is that we create
-> a list for these interrupts that cannot be forwarded.
-
-So the problem with that is that a list would need a list lock, and this is where things get hairy:
-- Either we introduce a separate disabled_list lock, adding to the nightmare of lock hierarchy we already have. I don't think that's really justifiable just because of group0 IRQs.
-- We piggy-back on an existing lock, like the ap_list_lock. The problem with that is that vgic_queue_irq_unlock takes and drops that lock, so we can't just iterate over this disabled list while holding that lock, and feed each IRQ to vgic_queue_irq_unlock() easily.
-One solution I was thinking about was something like:
-while (!list_empty(disabled_list)) {
-	spin_lock(ap_list_lock);
-	irq = remove_first_entry(disabled_list);
-	spin_unlock(ap_list_lock);
-
-	lock_irq(irq);
-	/* re-check? */
-	vgic_queue_irq_unlock(irq);
-}
-
-Does that sound feasible? It's not really efficient nor nice, but I am not sure we care so much about this since we assume group enablement is rather rare.
-
-Cheers,
-Andre
-
-> Then enabling an interrupt or a group is a matter of moving pending
-> interrupts from one list to another. And I think most of the logic
-> can be hidden in vgic_queue_irq_unlock().
+> > will run the test with "-foo bar" appended to the command line. We could
+> > modify mkstandalone.sh to get that feature too (allowing the additional
+> > parameters to be given after tests/mytest), but with VMM_PARAMS we don't
+> > have to.
 > 
->          M.
+> Yes, having consistency between standalone and run_tests.sh is a good thing.
+>
+
+So should we:
+
+ 1) try to get "--" working, but also keep the environment variable as
+    an alternative which works with standalone?
+ 2) drop the environment variable, get "--" working and modify
+    mkstandalone.sh?
+ 3) drop the environment variable, get "--" working, but forget about
+    standalone?
+ 4) just keep the VMM_PARAMS approach and forget about "--"?
+
+Thanks,
+drew
+
