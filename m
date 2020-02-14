@@ -2,143 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B3CA215E9C6
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 18:09:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 734E415EB94
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 18:22:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394133AbgBNRJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 12:09:16 -0500
-Received: from mga06.intel.com ([134.134.136.31]:10149 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392336AbgBNRJQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 12:09:16 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Feb 2020 09:09:15 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,441,1574150400"; 
-   d="scan'208";a="223073823"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga007.jf.intel.com with ESMTP; 14 Feb 2020 09:09:14 -0800
-Date:   Fri, 14 Feb 2020 09:09:14 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 26/61] KVM: x86: Introduce cpuid_entry_{get,has}()
- accessors
-Message-ID: <20200214170914.GC20690@linux.intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-27-sean.j.christopherson@intel.com>
- <1f918bcf-d36d-f759-5796-2acb2a514888@intel.com>
+        id S2391959AbgBNRVo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 12:21:44 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:43800 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391444AbgBNRVn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 12:21:43 -0500
+Received: by mail-oi1-f194.google.com with SMTP id p125so10092529oif.10
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 09:21:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lyrhKNeMU7eJT6PQUqEykdJHGU1Beqa7yTElEjUp1E0=;
+        b=Vrn2eOFlzFF/53jUFp1t0oYF9TfJcGmQyncWKIriM2ZXKwsnnVwXyPEwMYBT9SoOvv
+         M9+pzijsccF6LKpwqVNwH7arNG/hJkR82XFRmVPyeQfsr2WEzgiC7PjODsswCoLGSpaY
+         LaKRFh+AbvxODIzDTc9/KjTYvCJBjUXvMcY0lndjCM6xdnpAlg8uqBx3b/me3q46lm3g
+         3BVL3n1uIIzcduNMraAfMFs20elqdxaKxcGWiqzInJy8oFts0UuFlfQstgm5hh/nVuyG
+         KEqS6DZpZ/3ejce9GGRl8uDlBf7GeSu1Ldi9wOUcn9yptQaljIzYAeog+BBmqeGJgZ48
+         s6NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lyrhKNeMU7eJT6PQUqEykdJHGU1Beqa7yTElEjUp1E0=;
+        b=cIuQOaMMo5C9odPk+/rDbFNpDsHifPcnKd8Oey+Qh9qARTUyxDUkYbV7FznGsQhpnW
+         gd9InkKYvlqAejmrmCLvC2WOHa+TO2MIRPy79oyulaBdbry7iXZsswSu2ONDQsl0xXtb
+         dMh72AHGnxj+Bgj4VJESy6MfPdB8n8x+bTOJ5GHWPzYlPdnYJbrP5sfJmz+L1/4tLXdl
+         gYawJ/qty3gyFf3AkgBWMsPN5ONh8HTAPJB48485CcXDdk4ObUJfuzzqOTI5z2O/laPk
+         Dmo7NNY55EYPfiebIi6A2j9gEGMjVXpRvFb3x/8pbwvQGELxdDT/To5MmUBsp3UtlFh6
+         FXYA==
+X-Gm-Message-State: APjAAAU65xECfTxVY8hTxAWO4NtR7/XbxLd16g3UTFwkUY5+nNeNKe8S
+        SMnh5rDVxORJdhl9SpE9R8DIslxH6UE84vwQbjWfypW5
+X-Google-Smtp-Source: APXvYqzW5wCMUPDZUW8FlhlD0lFevf/gsf9pfcTNJvNRaLJB2Qb+Yl5ryjulc4AOX27A438sIlR0pFuhqlw/4hCWscQ=
+X-Received: by 2002:a54:458d:: with SMTP id z13mr2670272oib.32.1581700902393;
+ Fri, 14 Feb 2020 09:21:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1f918bcf-d36d-f759-5796-2acb2a514888@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200211225547.235083-1-dancol@google.com> <20200214032635.75434-1-dancol@google.com>
+ <20200214032635.75434-3-dancol@google.com> <9ca03838-8686-0007-0971-ee63bf5031da@tycho.nsa.gov>
+In-Reply-To: <9ca03838-8686-0007-0971-ee63bf5031da@tycho.nsa.gov>
+From:   Daniel Colascione <dancol@google.com>
+Date:   Fri, 14 Feb 2020 09:21:04 -0800
+Message-ID: <CAKOZuev-=7Lgu35E3tzpHQn0m_KAvvrqi+ZJr1dpqRjHERRSqg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] Teach SELinux about anonymous inodes
+To:     Stephen Smalley <sds@tycho.nsa.gov>
+Cc:     Tim Murray <timmurray@google.com>,
+        SElinux list <selinux@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>, paul@paul-moore.com,
+        Nick Kralevich <nnk@google.com>,
+        Lokesh Gidra <lokeshgidra@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 05:44:41PM +0800, Xiaoyao Li wrote:
-> On 2/2/2020 2:51 AM, Sean Christopherson wrote:
-> >@@ -387,7 +388,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
-> >  		entry->ebx |= F(TSC_ADJUST);
-> >  		entry->ecx &= kvm_cpuid_7_0_ecx_x86_features;
-> >-		f_la57 = entry->ecx & F(LA57);
-> >+		f_la57 = cpuid_entry_get(entry, X86_FEATURE_LA57);
-
-Note, cpuid_entry_get() is used here.
-
-> >  		cpuid_mask(&entry->ecx, CPUID_7_ECX);
-> >  		/* Set LA57 based on hardware capability. */
-> >  		entry->ecx |= f_la57;
-> >diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> >index 72a79bdfed6b..64e96e4086e2 100644
-> >--- a/arch/x86/kvm/cpuid.h
-> >+++ b/arch/x86/kvm/cpuid.h
-> >@@ -95,16 +95,10 @@ static __always_inline struct cpuid_reg x86_feature_cpuid(unsigned x86_feature)
-> >  	return reverse_cpuid[x86_leaf];
-> >  }
-> >-static __always_inline u32 *guest_cpuid_get_register(struct kvm_vcpu *vcpu, unsigned x86_feature)
-> >+static __always_inline u32 *__cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry,
-> >+						  const struct cpuid_reg *cpuid)
-> >  {
-> >-	struct kvm_cpuid_entry2 *entry;
-> >-	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
-> >-
-> >-	entry = kvm_find_cpuid_entry(vcpu, cpuid.function, cpuid.index);
-> >-	if (!entry)
-> >-		return NULL;
-> >-
-> >-	switch (cpuid.reg) {
-> >+	switch (cpuid->reg) {
-> >  	case CPUID_EAX:
-> >  		return &entry->eax;
-> >  	case CPUID_EBX:
-> >@@ -119,6 +113,40 @@ static __always_inline u32 *guest_cpuid_get_register(struct kvm_vcpu *vcpu, unsi
-> >  	}
-> >  }
-> >+static __always_inline u32 *cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry,
-> >+						unsigned x86_feature)
-> >+{
-> >+	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
-> >+
-> >+	return __cpuid_entry_get_reg(entry, &cpuid);
-> >+}
-> >+
-> >+static __always_inline u32 cpuid_entry_get(struct kvm_cpuid_entry2 *entry,
-> >+					   unsigned x86_feature)
-> >+{
-> >+	u32 *reg = cpuid_entry_get_reg(entry, x86_feature);
-> >+
-> >+	return *reg & __feature_bit(x86_feature);
-> >+}
-> >+
-> 
-> This helper function is unnecessary. There is only one user throughout this
-> series, i.e., cpuid_entry_has() below.
-
-And the LA57 case above.
-
-> And I cannot image other possible use case of it.
-
-The LA57 case, which admittedly goes away soon, was subtle enough (OR in
-the flag instead of querying yes/no) that I wanted keep the accessor around
-in case a similar case popped up in the future.
-
-> >+static __always_inline bool cpuid_entry_has(struct kvm_cpuid_entry2 *entry,
-> >+					    unsigned x86_feature)
-> >+{
-> >+	return cpuid_entry_get(entry, x86_feature);
-> >+}
-> >+
-> >+static __always_inline int *guest_cpuid_get_register(struct kvm_vcpu *vcpu, unsigned x86_feature)
->                           ^
-> Should be                 u32
-> otherwise, previous patch will be unhappy. :)
-
-Doh, thanks!
- 
-> >+{
-> >+	struct kvm_cpuid_entry2 *entry;
-> >+	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
-> >+
-> >+	entry = kvm_find_cpuid_entry(vcpu, cpuid.function, cpuid.index);
-> >+	if (!entry)
-> >+		return NULL;
-> >+
-> >+	return __cpuid_entry_get_reg(entry, &cpuid);
-> >+}
-> >+
-> >  static __always_inline bool guest_cpuid_has(struct kvm_vcpu *vcpu, unsigned x86_feature)
-> >  {
-> >  	u32 *reg;
+On Fri, Feb 14, 2020 at 8:38 AM Stephen Smalley <sds@tycho.nsa.gov> wrote:
+>
+> On 2/13/20 10:26 PM, Daniel Colascione wrote:
+> > diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+> > index 1659b59fb5d7..6de0892620b3 100644
+> > --- a/security/selinux/hooks.c
+> > +++ b/security/selinux/hooks.c
+> > @@ -2915,6 +2915,62 @@ static int selinux_inode_init_security(struct inode *inode, struct inode *dir,
+> >       return 0;
+> >   }
 > >
-> 
+> > +static int selinux_inode_init_security_anon(struct inode *inode,
+> > +                                         const struct qstr *name,
+> > +                                         const struct file_operations *fops,
+> > +                                         const struct inode *context_inode)
+> > +{
+> > +     const struct task_security_struct *tsec = selinux_cred(current_cred());
+> > +     struct common_audit_data ad;
+> > +     struct inode_security_struct *isec;
+> > +     int rc;
+> > +
+> > +     if (unlikely(IS_PRIVATE(inode)))
+> > +             return 0;
+>
+> This is not possible since the caller clears S_PRIVATE before calling
+> and it would be a bug to call the hook on an inode that was intended to
+> be private, so we shouldn't check it here.
+>
+> > +
+> > +     if (unlikely(!selinux_state.initialized))
+> > +             return 0;
+>
+> Are we doing this to defer initialization until selinux_complete_init()
+> - that's normally why we bail in the !initialized case?  Not entirely
+> sure what will happen in such a situation since we won't have the
+> context_inode or the allocating task information at that time, so we
+> certainly won't get the same result - probably they would all be labeled
+> with whatever anon_inodefs is assigned via genfscon or
+> SECINITSID_UNLABELED by default.
+> If we instead just drop this test and
+> proceed, we'll inherit the context inode SID if specified or we'll call
+> security_transition_sid(), which in the !initialized case will just
+> return the tsid i.e. tsec->sid, so it will be labeled with the creating
+> task SID (SECINITSID_KERNEL prior to initialization).  Then the
+> avc_has_perm() call will pass because everything gets allowed until
+> initialization. So you could drop this check and userfaultfds created
+> before policy load would get the kernel SID, or you can keep it and they
+> will get the unlabeled SID.  Preference?
+
+The kernel SID seems safer. Thanks for the explanation!
+
+> > +
+> > +     isec = selinux_inode(inode);
+> > +
+> > +     /*
+> > +      * We only get here once per ephemeral inode.  The inode has
+> > +      * been initialized via inode_alloc_security but is otherwise
+> > +      * untouched.
+> > +      */
+> > +
+> > +     if (context_inode) {
+> > +             struct inode_security_struct *context_isec =
+> > +                     selinux_inode(context_inode);
+> > +             if (IS_ERR(context_isec))
+> > +                     return PTR_ERR(context_isec);
+>
+> This isn't possible AFAICT so you don't need to test for it or handle
+> it.  In fact, even the test for NULL in selinux_inode() is bogus and
+> should get dropped AFAICT; we always allocate an inode security blob
+> even before policy load so it would be a bug if we ever had a NULL there.
+
+Thanks. Will fix.
+
+> > +             isec->sid = context_isec->sid;
+> > +     } else {
+> > +             rc = security_transition_sid(
+> > +                     &selinux_state, tsec->sid, tsec->sid,
+> > +                     SECCLASS_FILE, name, &isec->sid);
+> > +             if (rc)
+> > +                     return rc;
+> > +     }
+>
+> Since you switched to using security_transition_sid(), you are not using
+> the fops parameter anymore nor comparing with userfaultfd_fops, so you
+> could drop the parameter from the hook and leave the latter static in
+> the first patch.
+
+That's true, but I figured different LSMs might want different rules
+that depend on the fops. I'm also okay with removing this parameter
+for now, since we're not using it.
+
+> That's assuming you are ok with having to define these type_transition
+> rules for the userfaultfd case instead of having your own separate
+> security class.  Wondering how many different anon inode names/classes
+> there are in the kernel today and how much they change over time; for a
+> small, relatively stable set, separate classes might be ok; for a large,
+> dynamic set, type transitions should scale better.
+
+I think we can get away without a class per anonymous-inode-type. I do
+wonder whether we need a class for all anonymous inodes, though: if we
+just give them the file class and use the anon inode type name for the
+type_transition rule, isn't it possible that the type_transition rule
+might also fire for plain files with the same names in the last path
+component and the same originating sid? (Maybe I'm not understanding
+type_transition rules properly.) Using a class to encompass all
+anonymous inodes would address this problem (assuming the problem
+exists in the first place).
+
+> We might still need
+> to create a mapping table in SELinux from the names to some stable
+> identifier for the policy lookup if we can't rely on the names being stable.
+
+Sure. The anonymous inode type names have historically been stable,
+though, so maybe we can just use the names from anon_inodes directly
+for now and then add some kind of remapping if we want to change those
+names in the core, remaping to the old name for SELinux
+type_transition purposes.
