@@ -2,59 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 74B9D15D737
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 13:17:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 367A315D74F
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 13:23:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728965AbgBNMR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 07:17:27 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25095 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728522AbgBNMR0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 07:17:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581682643;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yrmzuJ+fH7311DsS5RRrwU93gv+A0MLkcTc50rXkIA8=;
-        b=AOX32H01dihrjGD5Q/cqFWvrtKjmLHoAbZB+93yFRnXm8y+j/2XxbmSGq3ohtm0eyq3mBS
-        e7bEwekS5hWo7oP88PzRBIOsoIaigGvxiWc+S00mGLRlqYGTGxmg4BuImtiIPwPlXQW9D6
-        FeHTkzQM5l6p948QMsPyLdiWN+2CVyg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-IjwqhxrkNceqM-ExACLHPw-1; Fri, 14 Feb 2020 07:17:21 -0500
-X-MC-Unique: IjwqhxrkNceqM-ExACLHPw-1
-Received: by mail-wr1-f72.google.com with SMTP id t6so3940481wru.3
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 04:17:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=yrmzuJ+fH7311DsS5RRrwU93gv+A0MLkcTc50rXkIA8=;
-        b=oeFH+JpVik23BbHnmFPIRvT3+96woQG8L8MAn9DO0UiJiAAFsBt/HlaYFoJMo4C+HV
-         hDMD5ywVFB0Knymeu9Y6wRayuXlojMkfr6NWTUTuLu8FwL52qRTpjRXf/VrQUfNtWnbo
-         E70iJDFZjsMchWyxJzEd4T6wXvKd3llP/scIWeh+I5DK4nOiLQYERTF4NxRsoWOa2F+n
-         uDknWfDTtBm5bE81nJA30Y/MzO/mfEeWZk/bbtiflhsfEBhI3pNQiCKTwXE7pmXVFPas
-         QE+hRIzGi2HkHxbG15yj4cqoN1itQVqAekgrq3nMlKigSuvtqSlOhQY8d9HSFVcsVq0W
-         505w==
-X-Gm-Message-State: APjAAAUKuZA+66CaDPa95mYy7fZu81FKP+2CxKuNkgeo3nMJiad8UM5H
-        /w0vTQHI876XfmDqpbrC5gMAzPuv/xz+5zSXoZ0fi/zmXpcl8J6FKvKC1iadSXJnMiuvT1upQCH
-        9Ae88dLW8a8tJ
-X-Received: by 2002:a5d:6789:: with SMTP id v9mr3997610wru.55.1581682640418;
-        Fri, 14 Feb 2020 04:17:20 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwUY7G6Eyy0BblIPNqREPcRdO1IaZ98xrb5ldzo9iHVZMftnXhPti3GuSVreKeNeNZx+fz6Qg==
-X-Received: by 2002:a5d:6789:: with SMTP id v9mr3997580wru.55.1581682640060;
-        Fri, 14 Feb 2020 04:17:20 -0800 (PST)
-Received: from eperezma.remote.csb (189.140.78.188.dynamic.jazztel.es. [188.78.140.189])
-        by smtp.gmail.com with ESMTPSA id l132sm7337639wmf.16.2020.02.14.04.17.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2020 04:17:19 -0800 (PST)
-Message-ID: <35dca16b9a85eb203f35d3e55dcaa9d0dae5a922.camel@redhat.com>
-Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger
- random crashes in KVM guests after reboot
-From:   Eugenio =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
+        id S1728582AbgBNMW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 07:22:58 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26990 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728748AbgBNMWz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 07:22:55 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01ECKld1134686
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 07:22:53 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y1tn7cefc-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2020 07:22:53 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Fri, 14 Feb 2020 12:22:51 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 14 Feb 2020 12:22:48 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01ECMlxl42729754
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Feb 2020 12:22:47 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 98774AE057;
+        Fri, 14 Feb 2020 12:22:47 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 501FDAE056;
+        Fri, 14 Feb 2020 12:22:47 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.211])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 14 Feb 2020 12:22:47 +0000 (GMT)
+Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
+ crashes in KVM guests after reboot
+To:     =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
@@ -64,504 +51,123 @@ Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         kvm list <kvm@vger.kernel.org>,
         Halil Pasic <pasic@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>
-Date:   Fri, 14 Feb 2020 13:17:17 +0100
-In-Reply-To: <dabe59fe-e068-5935-f49e-bc1da3d8471a@de.ibm.com>
 References: <20200107042401-mutt-send-email-mst@kernel.org>
-         <5c860fa1-cef5-b389-4ebf-99a62afa0fe8@de.ibm.com>
-         <20200207025806-mutt-send-email-mst@kernel.org>
-         <97c93d38-ef07-e321-d133-18483d54c0c0@de.ibm.com>
-         <CAJaqyWfngzP4d01B6+Sqt8FXN6jX7kGegjx8ie4no_1Er3igQA@mail.gmail.com>
-         <43a5dbaa-9129-e220-8483-45c60a82c945@de.ibm.com>
-         <e299afca8e22044916abbf9fbbd0bff6b0ee9e13.camel@redhat.com>
-         <4c3f70b7-723a-8b0f-ac49-babef1bcc180@de.ibm.com>
-         <50a79c3491ac483583c97df2fac29e2c3248fdea.camel@redhat.com>
-         <8fbbfb49-99d1-7fee-e713-d6d5790fe866@de.ibm.com>
-         <2364d0728c3bb4bcc0c13b591f774109a9274a30.camel@redhat.com>
-         <bb9fb726-306c-5330-05aa-a86bd1b18097@de.ibm.com>
-         <468983fad50a5e74a739f71487f0ea11e8d4dfd1.camel@redhat.com>
-         <2dc1df65-1431-3917-40e5-c2b12096e2a7@de.ibm.com>
-         <bd9c9b4d99abd20d5420583af5a4954ea1cf4618.camel@redhat.com>
-         <e11ba53c-a5fa-0518-2e06-9296897ed529@de.ibm.com>
-         <CAJaqyWfJFArAdpOwehTn5ci-frqai+pazGgcn2VvQSebqGRVtg@mail.gmail.com>
-         <80520391-d90d-e10d-a107-7a18f2810900@de.ibm.com>
-         <dabe59fe-e068-5935-f49e-bc1da3d8471a@de.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-6.el8) 
-Mime-Version: 1.0
+ <CAJaqyWfngzP4d01B6+Sqt8FXN6jX7kGegjx8ie4no_1Er3igQA@mail.gmail.com>
+ <43a5dbaa-9129-e220-8483-45c60a82c945@de.ibm.com>
+ <e299afca8e22044916abbf9fbbd0bff6b0ee9e13.camel@redhat.com>
+ <4c3f70b7-723a-8b0f-ac49-babef1bcc180@de.ibm.com>
+ <50a79c3491ac483583c97df2fac29e2c3248fdea.camel@redhat.com>
+ <8fbbfb49-99d1-7fee-e713-d6d5790fe866@de.ibm.com>
+ <2364d0728c3bb4bcc0c13b591f774109a9274a30.camel@redhat.com>
+ <bb9fb726-306c-5330-05aa-a86bd1b18097@de.ibm.com>
+ <468983fad50a5e74a739f71487f0ea11e8d4dfd1.camel@redhat.com>
+ <2dc1df65-1431-3917-40e5-c2b12096e2a7@de.ibm.com>
+ <bd9c9b4d99abd20d5420583af5a4954ea1cf4618.camel@redhat.com>
+ <e11ba53c-a5fa-0518-2e06-9296897ed529@de.ibm.com>
+ <CAJaqyWfJFArAdpOwehTn5ci-frqai+pazGgcn2VvQSebqGRVtg@mail.gmail.com>
+ <80520391-d90d-e10d-a107-7a18f2810900@de.ibm.com>
+ <dabe59fe-e068-5935-f49e-bc1da3d8471a@de.ibm.com>
+ <35dca16b9a85eb203f35d3e55dcaa9d0dae5a922.camel@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Fri, 14 Feb 2020 13:22:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <35dca16b9a85eb203f35d3e55dcaa9d0dae5a922.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021412-0016-0000-0000-000002E6C505
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021412-0017-0000-0000-00003349CC77
+Message-Id: <3144806d-436e-86a1-2e29-74f7027f7f0b@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-14_03:2020-02-12,2020-02-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ malwarescore=0 mlxscore=0 impostorscore=0 phishscore=0 priorityscore=1501
+ suspectscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002140102
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2020-02-14 at 08:47 +0100, Christian Borntraeger wrote:
-> repro
-> 
-> 
-> On 14.02.20 08:43, Christian Borntraeger wrote:
-> > 
-> > On 14.02.20 08:40, Eugenio Perez Martin wrote:
-> > > Hi.
-> > > 
-> > > Were the vhost and vhost_net modules loaded with dyndbg='+plt'? I miss
-> > > all the others regular debug traces on that one.
-> > 
-> > I did 
-> > 
-> >  echo -n 'file drivers/vhost/vhost.c +plt' > control
-> > and
-> > echo -n 'file drivers/vhost/net.c +plt'  > control
-> > 
-> > but apparently it did not work...me hates dynamic debug.
 
-Sorry about use dyndbg, but it is the easiest way to obtain accurate line numbers, threads id...
 
-I usually load the module with that option (modprobe vhost dyndbg=+pfmlt && modprobe vhost_net dyndbg=+pfmlt), so it is
-available from the very beginning.
+On 14.02.20 13:17, Eugenio Pérez wrote:
+> Can you try the inlined patch over 52c36ce7f334 ("vhost: use batched version by default")? My intention is to check if
+> "strange VHOST_SET_VRING_BASE" line appears. In previous tests, it appears very fast, but maybe it takes some time for
+> it to appear, or it does not appear anymore.
 
-> > 
-> > > Thanks!
-> > > 
-> > > On Fri, Feb 14, 2020 at 8:34 AM Christian Borntraeger
-> > > <borntraeger@de.ibm.com> wrote:
-> > > > I did
-> > > > ping -c 20 -f ... ; reboot
-> > > > twice
-> > > > 
-> > > > The ping after the first reboot showed .......E
-> > > > 
-> > > > this was on the host console
-> > > > 
-> > > > [   55.951885] CPU: 34 PID: 1908 Comm: CPU 0/KVM Not tainted 5.5.0+ #21
-> > > > [   55.951891] Hardware name: IBM 3906 M04 704 (LPAR)
-> > > > [   55.951892] Call Trace:
-> > > > [   55.951902]  [<0000001ede114132>] show_stack+0x8a/0xd0
-> > > > [   55.951906]  [<0000001edeb0672a>] dump_stack+0x8a/0xb8
-> > > > [   55.951915]  [<000003ff803736a6>] vhost_vring_ioctl+0x6fe/0x858 [vhost]
-> > > > [   55.951919]  [<000003ff8042a608>] vhost_net_ioctl+0x510/0x570 [vhost_net]
-> > > > [   55.951924]  [<0000001ede3c4dd8>] do_vfs_ioctl+0x430/0x6f8
-> > > > [   55.951926]  [<0000001ede3c5124>] ksys_ioctl+0x84/0xb0
-> > > > [   55.951927]  [<0000001ede3c51ba>] __s390x_sys_ioctl+0x2a/0x38
-> > > > [   55.951931]  [<0000001edeb27f72>] system_call+0x2a6/0x2c8
-> > > > [   55.951949] CPU: 34 PID: 1908 Comm: CPU 0/KVM Not tainted 5.5.0+ #21
-> > > > [   55.951950] Hardware name: IBM 3906 M04 704 (LPAR)
-> > > > [   55.951951] Call Trace:
-> > > > [   55.951952]  [<0000001ede114132>] show_stack+0x8a/0xd0
-> > > > [   55.951954]  [<0000001edeb0672a>] dump_stack+0x8a/0xb8
-> > > > [   55.951956]  [<000003ff803736a6>] vhost_vring_ioctl+0x6fe/0x858 [vhost]
-> > > > [   55.951958]  [<000003ff8042a608>] vhost_net_ioctl+0x510/0x570 [vhost_net]
-> > > > [   55.951959]  [<0000001ede3c4dd8>] do_vfs_ioctl+0x430/0x6f8
-> > > > [   55.951961]  [<0000001ede3c5124>] ksys_ioctl+0x84/0xb0
-> > > > [   55.951962]  [<0000001ede3c51ba>] __s390x_sys_ioctl+0x2a/0x38
-> > > > [   55.951964]  [<0000001edeb27f72>] system_call+0x2a6/0x2c8
-> > > > [   55.951997] Guest moved vq 0000000063d896c6 used index from 44 to 0
-> > > > [   56.609831] unexpected descriptor format for RX: out 0, in 0
-> > > > [   86.540460] CPU: 6 PID: 1908 Comm: CPU 0/KVM Not tainted 5.5.0+ #21
-> > > > [   86.540464] Hardware name: IBM 3906 M04 704 (LPAR)
-> > > > [   86.540466] Call Trace:
-> > > > [   86.540473]  [<0000001ede114132>] show_stack+0x8a/0xd0
-> > > > [   86.540477]  [<0000001edeb0672a>] dump_stack+0x8a/0xb8
-> > > > [   86.540486]  [<000003ff803736a6>] vhost_vring_ioctl+0x6fe/0x858 [vhost]
-> > > > [   86.540490]  [<000003ff8042a608>] vhost_net_ioctl+0x510/0x570 [vhost_net]
-> > > > [   86.540494]  [<0000001ede3c4dd8>] do_vfs_ioctl+0x430/0x6f8
-> > > > [   86.540496]  [<0000001ede3c5124>] ksys_ioctl+0x84/0xb0
-> > > > [   86.540498]  [<0000001ede3c51ba>] __s390x_sys_ioctl+0x2a/0x38
-> > > > [   86.540501]  [<0000001edeb27f72>] system_call+0x2a6/0x2c8
-> > > > [   86.540524] CPU: 6 PID: 1908 Comm: CPU 0/KVM Not tainted 5.5.0+ #21
-> > > > [   86.540525] Hardware name: IBM 3906 M04 704 (LPAR)
-> > > > [   86.540526] Call Trace:
-> > > > [   86.540527]  [<0000001ede114132>] show_stack+0x8a/0xd0
-> > > > [   86.540528]  [<0000001edeb0672a>] dump_stack+0x8a/0xb8
-> > > > [   86.540531]  [<000003ff803736a6>] vhost_vring_ioctl+0x6fe/0x858 [vhost]
-> > > > [   86.540532]  [<000003ff8042a608>] vhost_net_ioctl+0x510/0x570 [vhost_net]
-> > > > [   86.540534]  [<0000001ede3c4dd8>] do_vfs_ioctl+0x430/0x6f8
-> > > > [   86.540536]  [<0000001ede3c5124>] ksys_ioctl+0x84/0xb0
-> > > > [   86.540537]  [<0000001ede3c51ba>] __s390x_sys_ioctl+0x2a/0x38
-> > > > [   86.540538]  [<0000001edeb27f72>] system_call+0x2a6/0x2c8
-> > > > [   86.540570] unexpected descriptor format for RX: out 0, in 0
-> > > > [   86.540577] Unexpected header len for TX: 0 expected 0
-> > > > 
-> > > > 
-> > > > On 14.02.20 08:06, Eugenio Pérez wrote:
-> > > > > Hi Christian.
-> > > > > 
-> > > > > Sorry, that was meant to be applied over previous debug patch.
-> > > > > 
-> > > > > Here I inline the one meant to be applied over eccb852f1fe6bede630e2e4f1a121a81e34354ab.
-> > > > > 
-> > > > > Thanks!
-> > > > > 
-> > > > > From d978ace99e4844b49b794d768385db3d128a4cc0 Mon Sep 17 00:00:00 2001
-> > > > > From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-> > > > > Date: Fri, 14 Feb 2020 08:02:26 +0100
-> > > > > Subject: [PATCH] vhost: disable all features and trace last_avail_idx and
-> > > > >  ioctl calls
-> > > > > 
-> > > > > ---
-> > > > >  drivers/vhost/net.c   | 20 +++++++++++++++++---
-> > > > >  drivers/vhost/vhost.c | 25 +++++++++++++++++++++++--
-> > > > >  drivers/vhost/vhost.h | 10 +++++-----
-> > > > >  3 files changed, 45 insertions(+), 10 deletions(-)
-> > > > > 
-> > > > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > > > index e158159671fa..e4d5f843f9c0 100644
-> > > > > --- a/drivers/vhost/net.c
-> > > > > +++ b/drivers/vhost/net.c
-> > > > > @@ -1505,10 +1505,13 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
-> > > > > 
-> > > > >       mutex_lock(&n->dev.mutex);
-> > > > >       r = vhost_dev_check_owner(&n->dev);
-> > > > > -     if (r)
-> > > > > +     if (r) {
-> > > > > +             pr_debug("vhost_dev_check_owner index=%u fd=%d rc r=%d", index, fd, r);
-> > > > >               goto err;
-> > > > > +     }
-> > > > > 
-> > > > >       if (index >= VHOST_NET_VQ_MAX) {
-> > > > > +             pr_debug("vhost_dev_check_owner index=%u fd=%d MAX=%d", index, fd, VHOST_NET_VQ_MAX);
-> > > > >               r = -ENOBUFS;
-> > > > >               goto err;
-> > > > >       }
-> > > > > @@ -1518,22 +1521,26 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
-> > > > > 
-> > > > >       /* Verify that ring has been setup correctly. */
-> > > > >       if (!vhost_vq_access_ok(vq)) {
-> > > > > +             pr_debug("vhost_net_set_backend index=%u fd=%d !vhost_vq_access_ok", index, fd);
-> > > > >               r = -EFAULT;
-> > > > >               goto err_vq;
-> > > > >       }
-> > > > >       sock = get_socket(fd);
-> > > > >       if (IS_ERR(sock)) {
-> > > > >               r = PTR_ERR(sock);
-> > > > > +             pr_debug("vhost_net_set_backend index=%u fd=%d get_socket err r=%d", index, fd, r);
-> > > > >               goto err_vq;
-> > > > >       }
-> > > > > 
-> > > > >       /* start polling new socket */
-> > > > >       oldsock = vq->private_data;
-> > > > >       if (sock != oldsock) {
-> > > > > +             pr_debug("sock=%p != oldsock=%p index=%u fd=%d vq=%p", sock, oldsock, index, fd, vq);
-> > > > >               ubufs = vhost_net_ubuf_alloc(vq,
-> > > > >                                            sock && vhost_sock_zcopy(sock));
-> > > > >               if (IS_ERR(ubufs)) {
-> > > > >                       r = PTR_ERR(ubufs);
-> > > > > +                     pr_debug("ubufs index=%u fd=%d err r=%d vq=%p", index, fd, r, vq);
-> > > > >                       goto err_ubufs;
-> > > > >               }
-> > > > > 
-> > > > > @@ -1541,11 +1548,15 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
-> > > > >               vq->private_data = sock;
-> > > > >               vhost_net_buf_unproduce(nvq);
-> > > > >               r = vhost_vq_init_access(vq);
-> > > > > -             if (r)
-> > > > > +             if (r) {
-> > > > > +                     pr_debug("init_access index=%u fd=%d r=%d vq=%p", index, fd, r, vq);
-> > > > >                       goto err_used;
-> > > > > +             }
-> > > > >               r = vhost_net_enable_vq(n, vq);
-> > > > > -             if (r)
-> > > > > +             if (r) {
-> > > > > +                     pr_debug("enable_vq index=%u fd=%d r=%d vq=%p", index, fd, r, vq);
-> > > > >                       goto err_used;
-> > > > > +             }
-> > > > >               if (index == VHOST_NET_VQ_RX)
-> > > > >                       nvq->rx_ring = get_tap_ptr_ring(fd);
-> > > > > 
-> > > > > @@ -1559,6 +1570,8 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
-> > > > > 
-> > > > >       mutex_unlock(&vq->mutex);
-> > > > > 
-> > > > > +     pr_debug("sock=%p", sock);
-> > > > > +
-> > > > >       if (oldubufs) {
-> > > > >               vhost_net_ubuf_put_wait_and_free(oldubufs);
-> > > > >               mutex_lock(&vq->mutex);
-> > > > > @@ -1710,6 +1723,7 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
-> > > > > 
-> > > > >       switch (ioctl) {
-> > > > >       case VHOST_NET_SET_BACKEND:
-> > > > > +             pr_debug("VHOST_NET_SET_BACKEND");
-> > > > >               if (copy_from_user(&backend, argp, sizeof backend))
-> > > > >                       return -EFAULT;
-> > > > >               return vhost_net_set_backend(n, backend.index, backend.fd);
-> > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > > index b5a51b1f2e79..ec25ba32fe81 100644
-> > > > > --- a/drivers/vhost/vhost.c
-> > > > > +++ b/drivers/vhost/vhost.c
-> > > > > @@ -1642,15 +1642,30 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
-> > > > >                       r = -EINVAL;
-> > > > >                       break;
-> > > > >               }
-> > > > > +
-> > > > > +             if (vq->last_avail_idx || vq->avail_idx) {
-> > > > > +                     pr_debug(
-> > > > > +                             "strange VHOST_SET_VRING_BASE [vq=%p][s.index=%u][s.num=%u]",
-> > > > > +                             vq, s.index, s.num);
-> > > > > +                     dump_stack();
-> > > > > +                     r = 0;
-> > > > > +                     break;
-> > > > > +             }
-> > > > >               vq->last_avail_idx = s.num;
-> > > > >               /* Forget the cached index value. */
-> > > > >               vq->avail_idx = vq->last_avail_idx;
-> > > > > +             pr_debug(
-> > > > > +                     "VHOST_SET_VRING_BASE [vq=%p][vq->last_avail_idx=%u][vq-
-> > > > > >avail_idx=%u][s.index=%u][s.num=%u]",
-> > > > > +                     vq, vq->last_avail_idx, vq->avail_idx, s.index, s.num);
-> > > > >               break;
-> > > > >       case VHOST_GET_VRING_BASE:
-> > > > >               s.index = idx;
-> > > > >               s.num = vq->last_avail_idx;
-> > > > >               if (copy_to_user(argp, &s, sizeof s))
-> > > > >                       r = -EFAULT;
-> > > > > +             pr_debug(
-> > > > > +                     "VHOST_GET_VRING_BASE [vq=%p][vq->last_avail_idx=%u][vq-
-> > > > > >avail_idx=%u][s.index=%u][s.num=%u]",
-> > > > > +                     vq, vq->last_avail_idx, vq->avail_idx, s.index, s.num);
-> > > > >               break;
-> > > > >       case VHOST_SET_VRING_KICK:
-> > > > >               if (copy_from_user(&f, argp, sizeof f)) {
-> > > > > @@ -2239,8 +2254,8 @@ static int fetch_buf(struct vhost_virtqueue *vq)
-> > > > >               vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
-> > > > > 
-> > > > >               if (unlikely((u16)(vq->avail_idx - last_avail_idx) > vq->num)) {
-> > > > > -                     vq_err(vq, "Guest moved used index from %u to %u",
-> > > > > -                             last_avail_idx, vq->avail_idx);
-> > > > > +                     vq_err(vq, "Guest moved vq %p used index from %u to %u",
-> > > > > +                             vq, last_avail_idx, vq->avail_idx);
-> > > > >                       return -EFAULT;
-> > > > >               }
-> > > > > 
-> > > > > @@ -2316,6 +2331,9 @@ static int fetch_buf(struct vhost_virtqueue *vq)
-> > > > >       BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
-> > > > > 
-> > > > >       /* On success, increment avail index. */
-> > > > > +     pr_debug(
-> > > > > +             "[vq=%p][vq->last_avail_idx=%u][vq->avail_idx=%u][vq->ndescs=%d][vq->first_desc=%d]",
-> > > > > +             vq, vq->last_avail_idx, vq->avail_idx, vq->ndescs, vq->first_desc);
-> > > > >       vq->last_avail_idx++;
-> > > > > 
-> > > > >       return 0;
-> > > > > @@ -2432,6 +2450,9 @@ EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
-> > > > >  /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
-> > > > >  void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
-> > > > >  {
-> > > > > +     pr_debug(
-> > > > > +             "DISCARD [vq=%p][vq->last_avail_idx=%u][vq->avail_idx=%u][n=%d]",
-> > > > > +             vq, vq->last_avail_idx, vq->avail_idx, n);
-> > > > >       vq->last_avail_idx -= n;
-> > > > >  }
-> > > > >  EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
-> > > > > diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> > > > > index 661088ae6dc7..08f6d2ccb697 100644
-> > > > > --- a/drivers/vhost/vhost.h
-> > > > > +++ b/drivers/vhost/vhost.h
-> > > > > @@ -250,11 +250,11 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled);
-> > > > >       } while (0)
-> > > > > 
-> > > > >  enum {
-> > > > > -     VHOST_FEATURES = (1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
-> > > > > -                      (1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
-> > > > > -                      (1ULL << VIRTIO_RING_F_EVENT_IDX) |
-> > > > > -                      (1ULL << VHOST_F_LOG_ALL) |
-> > > > > -                      (1ULL << VIRTIO_F_ANY_LAYOUT) |
-> > > > > +     VHOST_FEATURES = /* (1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) | */
-> > > > > +                      /* (1ULL << VIRTIO_RING_F_INDIRECT_DESC) | */
-> > > > > +                      /* (1ULL << VIRTIO_RING_F_EVENT_IDX) | */
-> > > > > +                      /* (1ULL << VHOST_F_LOG_ALL) | */
-> > > > > +                      /* (1ULL << VIRTIO_F_ANY_LAYOUT) | */
-> > > > >                        (1ULL << VIRTIO_F_VERSION_1)
-> > > > >  };
-> > > > > 
-> > > > > 
-
-Can you try the inlined patch over 52c36ce7f334 ("vhost: use batched version by default")? My intention is to check if
-"strange VHOST_SET_VRING_BASE" line appears. In previous tests, it appears very fast, but maybe it takes some time for
-it to appear, or it does not appear anymore.
-
-Thanks!
-
-From 756a96e489688b2c04230580770aac17c8a46265 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-Date: Fri, 14 Feb 2020 08:02:26 +0100
-Subject: [PATCH] vhost: disable all features and trace last_avail_idx and
- ioctl calls
-
----
- drivers/vhost/net.c   | 20 +++++++++++++++++---
- drivers/vhost/vhost.c | 25 +++++++++++++++++++++++--
- drivers/vhost/vhost.h | 10 +++++-----
- 3 files changed, 45 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index e158159671fa..e4d5f843f9c0 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1505,10 +1505,13 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 
- 	mutex_lock(&n->dev.mutex);
- 	r = vhost_dev_check_owner(&n->dev);
--	if (r)
-+	if (r) {
-+		pr_debug("vhost_dev_check_owner index=%u fd=%d rc r=%d", index, fd, r);
- 		goto err;
-+	}
- 
- 	if (index >= VHOST_NET_VQ_MAX) {
-+		pr_debug("vhost_dev_check_owner index=%u fd=%d MAX=%d", index, fd, VHOST_NET_VQ_MAX);
- 		r = -ENOBUFS;
- 		goto err;
- 	}
-@@ -1518,22 +1521,26 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 
- 	/* Verify that ring has been setup correctly. */
- 	if (!vhost_vq_access_ok(vq)) {
-+		pr_debug("vhost_net_set_backend index=%u fd=%d !vhost_vq_access_ok", index, fd);
- 		r = -EFAULT;
- 		goto err_vq;
- 	}
- 	sock = get_socket(fd);
- 	if (IS_ERR(sock)) {
- 		r = PTR_ERR(sock);
-+		pr_debug("vhost_net_set_backend index=%u fd=%d get_socket err r=%d", index, fd, r);
- 		goto err_vq;
- 	}
- 
- 	/* start polling new socket */
- 	oldsock = vq->private_data;
- 	if (sock != oldsock) {
-+		pr_debug("sock=%p != oldsock=%p index=%u fd=%d vq=%p", sock, oldsock, index, fd, vq);
- 		ubufs = vhost_net_ubuf_alloc(vq,
- 					     sock && vhost_sock_zcopy(sock));
- 		if (IS_ERR(ubufs)) {
- 			r = PTR_ERR(ubufs);
-+			pr_debug("ubufs index=%u fd=%d err r=%d vq=%p", index, fd, r, vq);
- 			goto err_ubufs;
- 		}
- 
-@@ -1541,11 +1548,15 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 		vq->private_data = sock;
- 		vhost_net_buf_unproduce(nvq);
- 		r = vhost_vq_init_access(vq);
--		if (r)
-+		if (r) {
-+			pr_debug("init_access index=%u fd=%d r=%d vq=%p", index, fd, r, vq);
- 			goto err_used;
-+		}
- 		r = vhost_net_enable_vq(n, vq);
--		if (r)
-+		if (r) {
-+			pr_debug("enable_vq index=%u fd=%d r=%d vq=%p", index, fd, r, vq);
- 			goto err_used;
-+		}
- 		if (index == VHOST_NET_VQ_RX)
- 			nvq->rx_ring = get_tap_ptr_ring(fd);
- 
-@@ -1559,6 +1570,8 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 
- 	mutex_unlock(&vq->mutex);
- 
-+	pr_debug("sock=%p", sock);
-+
- 	if (oldubufs) {
- 		vhost_net_ubuf_put_wait_and_free(oldubufs);
- 		mutex_lock(&vq->mutex);
-@@ -1710,6 +1723,7 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 
- 	switch (ioctl) {
- 	case VHOST_NET_SET_BACKEND:
-+		pr_debug("VHOST_NET_SET_BACKEND");
- 		if (copy_from_user(&backend, argp, sizeof backend))
- 			return -EFAULT;
- 		return vhost_net_set_backend(n, backend.index, backend.fd);
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 56c5253056ee..babc48c8a8c4 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -1640,15 +1640,30 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
- 			r = -EINVAL;
- 			break;
- 		}
-+
-+		if (vq->last_avail_idx || vq->avail_idx) {
-+			pr_debug(
-+				"strange VHOST_SET_VRING_BASE [vq=%p][s.index=%u][s.num=%u]",
-+				vq, s.index, s.num);
-+			dump_stack();
-+			r = 0;
-+			break;
-+		}
- 		vq->last_avail_idx = s.num;
- 		/* Forget the cached index value. */
- 		vq->avail_idx = vq->last_avail_idx;
-+		pr_debug(
-+			"VHOST_SET_VRING_BASE [vq=%p][vq->last_avail_idx=%u][vq->avail_idx=%u][s.index=%u][s.num=%u]",
-+			vq, vq->last_avail_idx, vq->avail_idx, s.index, s.num);
- 		break;
- 	case VHOST_GET_VRING_BASE:
- 		s.index = idx;
- 		s.num = vq->last_avail_idx;
- 		if (copy_to_user(argp, &s, sizeof s))
- 			r = -EFAULT;
-+		pr_debug(
-+			"VHOST_GET_VRING_BASE [vq=%p][vq->last_avail_idx=%u][vq->avail_idx=%u][s.index=%u][s.num=%u]",
-+			vq, vq->last_avail_idx, vq->avail_idx, s.index, s.num);
- 		break;
- 	case VHOST_SET_VRING_KICK:
- 		if (copy_from_user(&f, argp, sizeof f)) {
-@@ -2233,8 +2248,8 @@ static int fetch_descs(struct vhost_virtqueue *vq)
- 		vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
- 
- 		if (unlikely((u16)(vq->avail_idx - last_avail_idx) > vq->num)) {
--			vq_err(vq, "Guest moved used index from %u to %u",
--				last_avail_idx, vq->avail_idx);
-+			vq_err(vq, "Guest moved vq %p used index from %u to %u",
-+				vq, last_avail_idx, vq->avail_idx);
- 			return -EFAULT;
- 		}
- 
-@@ -2310,6 +2325,9 @@ static int fetch_descs(struct vhost_virtqueue *vq)
- 	BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
- 
- 	/* On success, increment avail index. */
-+	pr_debug(
-+		"[vq=%p][vq->last_avail_idx=%u][vq->avail_idx=%u][vq->ndescs=%d][vq->first_desc=%d]",
-+		vq, vq->last_avail_idx, vq->avail_idx, vq->ndescs, vq->first_desc);
- 	vq->last_avail_idx++;
- 
- 	return 0;
-@@ -2403,6 +2421,9 @@ EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
- /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
- void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
- {
-+	pr_debug(
-+		"DISCARD [vq=%p][vq->last_avail_idx=%u][vq->avail_idx=%u][n=%d]",
-+		vq, vq->last_avail_idx, vq->avail_idx, n);
- 	vq->last_avail_idx -= n;
- }
- EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index a0bcf8bffa43..2ce2d3a97c31 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -248,11 +248,11 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled);
- 	} while (0)
- 
- enum {
--	VHOST_FEATURES = (1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
--			 (1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
--			 (1ULL << VIRTIO_RING_F_EVENT_IDX) |
--			 (1ULL << VHOST_F_LOG_ALL) |
--			 (1ULL << VIRTIO_F_ANY_LAYOUT) |
-+	VHOST_FEATURES = /* (1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) | */
-+			 /* (1ULL << VIRTIO_RING_F_INDIRECT_DESC) | */
-+			 /* (1ULL << VIRTIO_RING_F_EVENT_IDX) | */
-+			 /* (1ULL << VHOST_F_LOG_ALL) | */
-+			 /* (1ULL << VIRTIO_F_ANY_LAYOUT) | */
- 			 (1ULL << VIRTIO_F_VERSION_1)
- };
- 
--- 
-2.18.1
-
+  LD [M]  drivers/vhost/vhost_vsock.o
+  CC [M]  drivers/vhost/vhost.o
+In file included from ./include/linux/printk.h:331,
+                 from ./include/linux/kernel.h:15,
+                 from ./include/linux/list.h:9,
+                 from ./include/linux/wait.h:7,
+                 from ./include/linux/eventfd.h:13,
+                 from drivers/vhost/vhost.c:13:
+drivers/vhost/vhost.c: In function ‘fetch_descs’:
+drivers/vhost/vhost.c:2330:56: error: ‘struct vhost_virtqueue’ has no member named ‘first_desc’
+ 2330 |   vq, vq->last_avail_idx, vq->avail_idx, vq->ndescs, vq->first_desc);
+      |                                                        ^~
+./include/linux/dynamic_debug.h:125:15: note: in definition of macro ‘__dynamic_func_call’
+  125 |   func(&id, ##__VA_ARGS__);  \
+      |               ^~~~~~~~~~~
+./include/linux/dynamic_debug.h:153:2: note: in expansion of macro ‘_dynamic_func_call’
+  153 |  _dynamic_func_call(fmt, __dynamic_pr_debug,  \
+      |  ^~~~~~~~~~~~~~~~~~
+./include/linux/printk.h:335:2: note: in expansion of macro ‘dynamic_pr_debug’
+  335 |  dynamic_pr_debug(fmt, ##__VA_ARGS__)
+      |  ^~~~~~~~~~~~~~~~
+drivers/vhost/vhost.c:2328:2: note: in expansion of macro ‘pr_debug’
+ 2328 |  pr_debug(
+      |  ^~~~~~~~
+make[2]: *** [scripts/Makefile.build:266: drivers/vhost/vhost.o] Error 1
+make[1]: *** [scripts/Makefile.build:503: drivers/vhost] Error 2
 
