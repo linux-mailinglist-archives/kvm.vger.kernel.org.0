@@ -2,174 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7C9E15D063
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 04:23:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C4CA15D06F
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 04:27:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728374AbgBNDXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Feb 2020 22:23:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20531 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728004AbgBNDXx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Feb 2020 22:23:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581650632;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WiBwyrz6cX+xE4nXs+94fQKaFw5y/aQb69mQMK4gGl0=;
-        b=W7uwClEemERc8oqUMk4qYGC2Cvjz/RryTBJnVU3EnnQVRa2yOJ6SxEKrWMy5cqe/REoQSl
-        VaoifEFf3xu4qH0nlGRJvK4khLaVdG5AVIVbqIXqsBx+QdYoauKS0PFmBqJL5Nu+ujaOva
-        36pXuM10anrv0L7OtFQJomoEyY/FK/8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-fdAi4kdyMtWwFgGd05oe8Q-1; Thu, 13 Feb 2020 22:23:51 -0500
-X-MC-Unique: fdAi4kdyMtWwFgGd05oe8Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45C388017CC;
-        Fri, 14 Feb 2020 03:23:48 +0000 (UTC)
-Received: from [10.72.13.213] (ovpn-13-213.pek2.redhat.com [10.72.13.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E0CD338A;
-        Fri, 14 Feb 2020 03:23:29 +0000 (UTC)
-Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
-To:     Jason Gunthorpe <jgg@mellanox.com>
-Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        tiwei.bie@intel.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, lingshan.zhu@intel.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        kevin.tian@intel.com, stefanha@redhat.com, rdunlap@infradead.org,
-        hch@infradead.org, aadam@redhat.com, jiri@mellanox.com,
-        shahafs@mellanox.com, hanand@xilinx.com, mhabets@solarflare.com
-References: <20200210035608.10002-1-jasowang@redhat.com>
- <20200210035608.10002-4-jasowang@redhat.com>
- <20200211134746.GI4271@mellanox.com>
- <cf7abcc9-f8ef-1fe2-248e-9b9028788ade@redhat.com>
- <20200212125108.GS4271@mellanox.com>
- <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
- <20200213134128.GV4271@mellanox.com>
- <ebaea825-5432-65e2-2ab3-720a8c4030e7@redhat.com>
- <20200213150542.GW4271@mellanox.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <8b3e6a9c-8bfd-fb3c-12a8-2d6a3879f1ae@redhat.com>
-Date:   Fri, 14 Feb 2020 11:23:27 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20200213150542.GW4271@mellanox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+        id S1728550AbgBND06 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Feb 2020 22:26:58 -0500
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:50691 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728089AbgBND05 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Feb 2020 22:26:57 -0500
+Received: by mail-pl1-f201.google.com with SMTP id g5so4365854plq.17
+        for <kvm@vger.kernel.org>; Thu, 13 Feb 2020 19:26:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=0WYp+nOc4W1ueTL6njcvhwE6Wrya56t+7LdjPX2+2/g=;
+        b=d7u2FkhwK0FN7IXYD8paZmQSKyhKm96rk0yh6wSPXStrq+ZyUe0RBJ0cSR/kkVrTZ7
+         yyAcca7EmJ6rSMeEPPDmRMQPnPyEsl8d+DvxOEmq0DTwgrwmiGE7SqOajaQIzDeOuqcf
+         Dup93fAzq0KZymXZwZ+fiEXw7p7pZvYsz9Sd3yWE6XW47saWou3JDaduJwLGhI/6aCvr
+         jXEAo8CTJA5tMyHfa2LpOlraU1cl+g4iI3Mmkp15BOF9zeBzfcEkhcK1YsPI+ryUiGy1
+         60g7n05mvI2V1MgGUXg5cFf4vvol75AtiWxiV1xP9EDlQm2jLHIy74/BgTZiK6/Tk6+T
+         /DFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=0WYp+nOc4W1ueTL6njcvhwE6Wrya56t+7LdjPX2+2/g=;
+        b=aOEWBh1LKQqmnv7ChyFfFpfnwSatIRLQ2id8KZctzT1MbzaNv0PiSV/9+NRkS249DE
+         1zzhxQBf0+sW3CTUntZ9fj5K8QiSjyGnWLo4Hh6STq1aGzLBiTyGBpx4zuZ9Jq7m7CvR
+         1CXzT6BXNliJm99vTq+Y4HZ12zEdEBqjqMNkPeo0y9da3nXZJ+yz6+jRBPhIRyhp1Jkh
+         LfuMQSZjEpXL+0MMg/V+8nE+cvVxHC+3Srmt6Ls+TA6VZa+u/CKPRTvlJmALR6aALbp/
+         mgrIiIIGOg0hpvV0JkR1xmDOu1niyunupjoZCGOS1kmnbDmS/Xnh0JcszK6oyitucW8X
+         fDfA==
+X-Gm-Message-State: APjAAAXyywJUuyLVXF+vNo2BAI65VwbuTxxAQURmNYzBYXTsCO5oJq8X
+        wZOgKHZKOh8AcwIClLwfK3DABXYZLSw=
+X-Google-Smtp-Source: APXvYqycI2BpuraXCc3IrQ2spptnq0wpysgGaSnKRL3VQeWA2X/FZ9eFhD8j0BwJp3nlWxw33egBUz7gUsU=
+X-Received: by 2002:a63:5a11:: with SMTP id o17mr1256158pgb.60.1581650815604;
+ Thu, 13 Feb 2020 19:26:55 -0800 (PST)
+Date:   Thu, 13 Feb 2020 19:26:32 -0800
+In-Reply-To: <20200211225547.235083-1-dancol@google.com>
+Message-Id: <20200214032635.75434-1-dancol@google.com>
+Mime-Version: 1.0
+References: <20200211225547.235083-1-dancol@google.com>
+X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+Subject: [PATCH 0/3] SELinux support for anonymous inodes and UFFD
+From:   Daniel Colascione <dancol@google.com>
+To:     timmurray@google.com, selinux@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, viro@zeniv.linux.org.uk, paul@paul-moore.com,
+        nnk@google.com, sds@tycho.nsa.gov, lokeshgidra@google.com
+Cc:     Daniel Colascione <dancol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Userfaultfd in unprivileged contexts could be potentially very
+useful. We'd like to harden userfaultfd to make such unprivileged use
+less risky. This patch series allows SELinux to manage userfaultfd
+file descriptors and in the future, other kinds of
+anonymous-inode-based file descriptor.  SELinux policy authors can
+apply policy types to anonymous inodes by providing name-based
+transition rules keyed off the anonymous inode internal name (
+"[userfaultfd]" in the case of userfaultfd(2) file descriptors) and
+applying policy to the new SIDs thus produced.
 
-On 2020/2/13 =E4=B8=8B=E5=8D=8811:05, Jason Gunthorpe wrote:
-> On Thu, Feb 13, 2020 at 10:58:44PM +0800, Jason Wang wrote:
->> On 2020/2/13 =E4=B8=8B=E5=8D=889:41, Jason Gunthorpe wrote:
->>> On Thu, Feb 13, 2020 at 11:34:10AM +0800, Jason Wang wrote:
->>>
->>>>>     You have dev, type or
->>>>> class to choose from. Type is rarely used and doesn't seem to be us=
-ed
->>>>> by vdpa, so class seems the right choice
->>>>>
->>>>> Jason
->>>> Yes, but my understanding is class and bus are mutually exclusive. S=
-o we
->>>> can't add a class to a device which is already attached on a bus.
->>> While I suppose there are variations, typically 'class' devices are
->>> user facing things and 'bus' devices are internal facing (ie like a
->>> PCI device)
->>
->> Though all vDPA devices have the same programming interface, but the
->> semantic is different. So it looks to me that use bus complies what
->> class.rst said:
->>
->> "
->>
->> Each device class defines a set of semantics and a programming interfa=
-ce
->> that devices of that class adhere to. Device drivers are the
->> implementation of that programming interface for a particular device o=
-n
->> a particular bus.
->>
->> "
-> Here we are talking about the /dev/XX node that provides the
-> programming interface.
+Inside the kernel, a pair of new anon_inodes interface,
+anon_inode_getfile_secure and anon_inode_getfd_secure, allow callers
+to opt into this SELinux management. In this new "secure" mode,
+anon_inodes creates new ephemeral inodes for anonymous file objects
+instead of reusing the normal anon_inodes singleton dummy inode. A new
+LSM hook gives security modules an opportunity to configure and veto
+these ephemeral inodes.
 
+This patch series is one of two fork of [1] and is an
+alternative to [2].
 
-I'm confused here, are you suggesting to use class to create char device=20
-in vhost-vdpa? That's fine but the comment should go for vhost-vdpa patch=
-.
+The primary difference between the two patch series is that this
+partch series creates a unique inode for each "secure" anonymous
+inode, while the other patch series ([2]) continues using the
+singleton dummy anonymous inode and adds a way to attach SELinux
+security information directly to file objects.
 
+I prefer the approach in this patch series because 1) it's a smaller
+patch than [2], and 2) it produces a more regular security
+architecture: in this patch series, secure anonymous inodes aren't
+S_PRIVATE and they maintain the SELinux property that the label for a
+file is in its inode. We do need an additional inode per anonymous
+file, but per-struct-file inode creation doesn't seem to be a problem
+for pipes and sockets.
 
-> All the vdpa devices have the same basic
-> chardev interface and discover any semantic variations 'in band'
+The previous version of this feature ([1]) created a new SELinux
+security class for userfaultfd file descriptors. This version adopts
+the generic transition-based approach of [2].
 
+This patch series also differs from [2] in that it doesn't affect all
+anonymous inodes right away --- instead requiring anon_inodes callers
+to opt in --- but this difference isn't one of basic approach. The
+important question to resolve is whether we should be creating new
+inodes or enhancing per-file data.
 
-That's not true, char interface is only used for vhost. Kernel virtio=20
-driver does not need char dev but a device on the virtio bus.
+[1] https://lore.kernel.org/lkml/20200211225547.235083-1-dancol@google.com/
+[2] https://lore.kernel.org/linux-fsdevel/20200213194157.5877-1-sds@tycho.nsa.gov/
 
+Daniel Colascione (3):
+  Add a new LSM-supporting anonymous inode interface
+  Teach SELinux about anonymous inodes
+  Wire UFFD up to SELinux
 
->
->>> So why is this using a bus? VDPA is a user facing object, so the
->>> driver should create a class vhost_vdpa device directly, and that
->>> driver should live in the drivers/vhost/ directory.
->>  =20
->> This is because we want vDPA to be generic for being used by different
->> drivers which is not limited to vhost-vdpa. E.g in this series, it all=
-ows
->> vDPA to be used by kernel virtio drivers. And in the future, we will
->> probably introduce more drivers in the future.
-> I don't see how that connects with using a bus.
+ fs/anon_inodes.c            | 196 ++++++++++++++++++++++++++++--------
+ fs/userfaultfd.c            |  34 +++++--
+ include/linux/anon_inodes.h |  13 +++
+ include/linux/lsm_hooks.h   |   9 ++
+ include/linux/security.h    |   4 +
+ security/security.c         |  10 ++
+ security/selinux/hooks.c    |  57 +++++++++++
+ 7 files changed, 274 insertions(+), 49 deletions(-)
 
-
-This is demonstrated in the virito-vdpa driver. So if you want to use=20
-kernel virito driver for vDPA device, a bus is most straight forward.
-
-
->
-> Every class of virtio traffic is going to need a special HW driver to
-> enable VDPA, that special driver can create the correct vhost side
-> class device.
-
-
-Are you saying, e.g it's the charge of IFCVF driver to create vhost char=20
-dev and other stuffs?
-
-
->
->>> For the PCI VF case this driver would bind to a PCI device like
->>> everything else
->>>
->>> For our future SF/ADI cases the driver would bind to some
->>> SF/ADI/whatever device on a bus.
->> All these driver will still be bound to their own bus (PCI or other). =
-And
->> what the driver needs is to present a vDPA device to virtual vDPA bus =
-on
->> top.
-> Again, I can't see any reason to inject a 'vdpa virtual bus' on
-> top. That seems like mis-using the driver core.
-
-
-I don't think so. Vhost is not the only programming interface for vDPA.=20
-We don't want a device that can only work for userspace drivers and only=20
-have a single set of userspace APIs.
-
-Thanks
-
-
->
-> Jason
->
+-- 
+2.25.0.265.gbab2e86ba0-goog
 
