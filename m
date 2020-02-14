@@ -2,176 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D012815D979
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 15:29:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2437415D995
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 15:33:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729457AbgBNO3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 09:29:32 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54094 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729327AbgBNO3b (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 14 Feb 2020 09:29:31 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01EENtFj083007;
-        Fri, 14 Feb 2020 09:29:30 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y4j8gjqtq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Feb 2020 09:29:30 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01EEPJm5092074;
-        Fri, 14 Feb 2020 09:29:30 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y4j8gjqte-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Feb 2020 09:29:29 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01EEPqBq006356;
-        Fri, 14 Feb 2020 14:29:29 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma04dal.us.ibm.com with ESMTP id 2y5bc08p2x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Feb 2020 14:29:29 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01EETSfJ54002016
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Feb 2020 14:29:28 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3BDD8B2065;
-        Fri, 14 Feb 2020 14:29:28 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B8549B205F;
-        Fri, 14 Feb 2020 14:29:27 +0000 (GMT)
-Received: from [9.160.20.216] (unknown [9.160.20.216])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 14 Feb 2020 14:29:27 +0000 (GMT)
-Subject: Re: [RFC PATCH v2 4/9] vfio-ccw: Introduce a new schib region
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200206213825.11444-1-farman@linux.ibm.com>
- <20200206213825.11444-5-farman@linux.ibm.com>
- <20200214133218.6841b81e.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <b7beb425-8af2-5db4-5d0d-e2f52a84d37f@linux.ibm.com>
-Date:   Fri, 14 Feb 2020 09:29:27 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1729417AbgBNOdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 09:33:23 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35154 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbgBNOdX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 09:33:23 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b17so10863628wmb.0;
+        Fri, 14 Feb 2020 06:33:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=I7FmDXyfboRLEPAe8bo8K3mXwXolpPNpCrODWfL+mak=;
+        b=gAGGyVySMmr2ATay53+kqMswj1tPiJDsz3jS4++s3wXWDQlHnkpWf2HL70eWdJ+fsv
+         CQvQV1BddgIFW0e4KztZJD7K4semtYzzKwObmrXtXYQ/cxD8Qzy6aTxMTRNqh6cRubpF
+         r1mn7IPnxTtShGYjCl7ka+xqU3DkAAl59gyDCf6L/mYm7eFQ7XNxMEWhLhC5inUVRkjG
+         b3lWZWNLQKotrlB26P93uU+wUAvI9uiOrpPMGRWGQwTatskOO7SGxBeGQoOg8tiuvbvj
+         b02BwS2WnHhy3I04PFR9L9ZP6j0IWJ9ssjt+UJS+QH/c2pmOi3Ohh3JE9B08BgCSKO/U
+         JhWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=I7FmDXyfboRLEPAe8bo8K3mXwXolpPNpCrODWfL+mak=;
+        b=GpmBROZNhghhymDlmg1EU/EIZhu3Mej5TqB08f5v71VF2Ro8vbA1VtM0McNRTtaeeu
+         FxsXBKVs1iy5fV275QDcOztFwuNSIW5tUnhuvxVeBHr2LDlTlH7nUMfqyW2ioTTTkg9w
+         gqL9qLXEhM/+q9qL5w+LuENpCCrSqFXf9RuI69V0RiJtMlBzqK6xrRiNw+qjxcKEiV8k
+         w+MCdC5hxtWUoZ4ush5onATQzGEIjgIzCw+345Zn+9u8jyTQTAjE7NGdxPnCyiYhd7J0
+         Ea+b1Rl35cDMW4zsbQjvZHwkfKyp+DfZqwP6njRsoU0+zxNntW585wgvnhJy18FLRIUo
+         GwDA==
+X-Gm-Message-State: APjAAAXiMstNfoeoc7ap6jGDRIX2AOI1ixK8Gl8bC37zMkKpx5mCaPIi
+        tI4wuW63ZRlgxJcZppHchOAx2snMNgiWjQ==
+X-Google-Smtp-Source: APXvYqx1QmY2R3J7t7fyqRZrLDCCPv+AondDOF0VmfUJgnj3oPdg3EMRb9Zs6jCDFFBEg13lUluE9g==
+X-Received: by 2002:a7b:cf12:: with SMTP id l18mr5265928wmg.66.1581690799833;
+        Fri, 14 Feb 2020 06:33:19 -0800 (PST)
+Received: from t1700.criteois.lan ([91.199.242.236])
+        by smtp.gmail.com with ESMTPSA id w13sm7511520wru.38.2020.02.14.06.33.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2020 06:33:19 -0800 (PST)
+From:   Erwan Velu <erwanaliasr1@gmail.com>
+X-Google-Original-From: Erwan Velu <e.velu@criteo.com>
+Cc:     Erwan Velu <e.velu@criteo.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] kvm: x86: Print "disabled by bios" only once per host
+Date:   Fri, 14 Feb 2020 15:30:35 +0100
+Message-Id: <20200214143035.607115-1-e.velu@criteo.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200214133218.6841b81e.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-14_04:2020-02-12,2020-02-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- phishscore=0 impostorscore=0 bulkscore=0 malwarescore=0 mlxscore=0
- adultscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002140116
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The current behavior is to print a "disabled by bios" message per CPU thread.
+As modern CPUs can have up to 64 cores, 128 on a dual socket, and turns this
+printk to be a pretty noisy by showing up to 256 times the same line in a row.
 
+This patch offer to only print the message once per host considering the BIOS will
+disabled the feature for all sockets/cores at once and not on a per core basis.
 
-On 2/14/20 7:32 AM, Cornelia Huck wrote:
-> On Thu,  6 Feb 2020 22:38:20 +0100
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> From: Farhan Ali <alifm@linux.ibm.com>
->>
->> The schib region can be used by userspace to get the subchannel-
->> information block (SCHIB) for the passthrough subchannel.
->> This can be useful to get information such as channel path
->> information via the SCHIB.PMCW fields.
->>
->> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
->> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->> ---
->>
->> Notes:
->>     v1->v2:
->>      - Add new region info to Documentation/s390/vfio-ccw.rst [CH]
->>      - Add a block comment to struct ccw_schib_region [CH]
->>     
->>     v0->v1: [EF]
->>      - Clean up checkpatch (#include, whitespace) errors
->>      - Remove unnecessary includes from vfio_ccw_chp.c
->>      - Add ret=-ENOMEM in error path for new region
->>      - Add call to vfio_ccw_unregister_dev_regions() during error exit
->>        path of vfio_ccw_mdev_open()
->>      - New info on the module prologue
->>      - Reorder cleanup of regions
->>
->>  Documentation/s390/vfio-ccw.rst     | 16 +++++-
->>  drivers/s390/cio/Makefile           |  2 +-
->>  drivers/s390/cio/vfio_ccw_chp.c     | 75 +++++++++++++++++++++++++++++
->>  drivers/s390/cio/vfio_ccw_drv.c     | 20 ++++++++
->>  drivers/s390/cio/vfio_ccw_ops.c     | 14 +++++-
->>  drivers/s390/cio/vfio_ccw_private.h |  3 ++
->>  include/uapi/linux/vfio.h           |  1 +
->>  include/uapi/linux/vfio_ccw.h       | 10 ++++
->>  8 files changed, 137 insertions(+), 4 deletions(-)
->>  create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
->>
->> diff --git a/Documentation/s390/vfio-ccw.rst b/Documentation/s390/vfio-ccw.rst
->> index fca9c4f5bd9c..b805dc995fc8 100644
->> --- a/Documentation/s390/vfio-ccw.rst
->> +++ b/Documentation/s390/vfio-ccw.rst
->> @@ -231,6 +231,19 @@ This region is exposed via region type VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD.
->>  
->>  Currently, CLEAR SUBCHANNEL and HALT SUBCHANNEL use this region.
->>  
->> +vfio-ccw schib region
->> +---------------------
->> +
->> +The vfio-ccw schib region is used to return Subchannel-Information
->> +Block (SCHIB) data to userspace::
->> +
->> +  struct ccw_schib_region {
->> +  #define SCHIB_AREA_SIZE 52
->> +         __u8 schib_area[SCHIB_AREA_SIZE];
->> +  } __packed;
->> +
->> +This region is exposed via region type VFIO_REGION_SUBTYPE_CCW_SCHIB.
-> 
-> Also mention that reading this triggers a stsch() updating the schib?
+Signed-off-by: Erwan Velu <e.velu@criteo.com>
+---
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yeah, I tucked that in the uapi header, but it should be mentioned here too.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index fbabb2f06273..8f0d7a09d453 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7300,7 +7300,7 @@ int kvm_arch_init(void *opaque)
+ 		goto out;
+ 	}
+ 	if (ops->disabled_by_bios()) {
+-		printk(KERN_ERR "kvm: disabled by bios\n");
++		printk_once(KERN_ERR "kvm: disabled by bios\n");
+ 		r = -EOPNOTSUPP;
+ 		goto out;
+ 	}
+-- 
+2.24.1
 
-> 
->> +
->>  vfio-ccw operation details
->>  --------------------------
->>  
-> 
-> (...)
-> 
->> diff --git a/drivers/s390/cio/vfio_ccw_chp.c b/drivers/s390/cio/vfio_ccw_chp.c
->> new file mode 100644
->> index 000000000000..826d08379fe3
->> --- /dev/null
->> +++ b/drivers/s390/cio/vfio_ccw_chp.c
->> @@ -0,0 +1,75 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Channel path related status regions for vfio_ccw
->> + *
->> + * Copyright IBM Corp. 2019
-> 
-> Should the year be updated?
-
-Probably.  :)
-
-> 
->> + *
->> + * Author(s): Farhan Ali <alifm@linux.ibm.com>
->> + */
-> 
-> (...)
-> 
