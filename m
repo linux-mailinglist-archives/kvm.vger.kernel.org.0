@@ -2,157 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F83315D6DD
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 12:51:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DFE115D72B
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2020 13:11:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728062AbgBNLvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 06:51:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30243 "EHLO
+        id S1729198AbgBNML6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Feb 2020 07:11:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53644 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727652AbgBNLvI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 06:51:08 -0500
+        with ESMTP id S1729173AbgBNML6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Feb 2020 07:11:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581681068;
+        s=mimecast20190719; t=1581682316;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oRbqqZO6a+MeMwBgOzJgX5nq8QvwfWWd6YqYAkhAo+Q=;
-        b=WWbQf7iN6nR1TxbNuDLHm2m96LR9yszCbNcAJtngQ7qRwWvV+OkqORwcyuMW6TNSfu53Iw
-        R4apRpYWQiGz13BwGNKfAaLVYo2majhmjHatSn8isdUP5wEJ+k6oS1q5HCFzrSM8sRyq37
-        YKzIkFGlTeiVcwFTJ1+2yX2yJOuQBvQ=
+        bh=gMapDa92RWh8r/o4GosyXN9K5BHZYArAZzKdh1fmPss=;
+        b=POYEty4XaGLsbxR3JunUZqZvX+pyayub8OPWE8jf+o1Rta6M1sZdPMF2FEuFgP92zyQu29
+        JuxeM5fj0XUqaZWP58abN6Y/czEmW1ZK3dy2gV0pxLIl6WqljefQSX8SILyyV+W2bMD43w
+        hB8wqtF5OTUKV1E0M0KauxhlgXLYuuI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-OpPM0aUlPwm3O5e9SU3lpw-1; Fri, 14 Feb 2020 06:51:01 -0500
-X-MC-Unique: OpPM0aUlPwm3O5e9SU3lpw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-228-uYYL8RxZOfeerqa5DWzezA-1; Fri, 14 Feb 2020 07:11:52 -0500
+X-MC-Unique: uYYL8RxZOfeerqa5DWzezA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A93D21005510;
-        Fri, 14 Feb 2020 11:51:00 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F2EEB5DA85;
-        Fri, 14 Feb 2020 11:50:53 +0000 (UTC)
-Date:   Fri, 14 Feb 2020 12:50:51 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, peter.maydell@linaro.org,
-        alex.bennee@linaro.org, lvivier@redhat.com, thuth@redhat.com,
-        david@redhat.com, frankja@linux.ibm.com, eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests 2/2] runtime: Introduce VMM_PARAMS
-Message-ID: <20200214115051.o4t6ro55y42oztxf@kamzik.brq.redhat.com>
-References: <20200213143300.32141-1-drjones@redhat.com>
- <20200213143300.32141-3-drjones@redhat.com>
- <689d8031-22ac-c414-a3c3-e10567c3c9af@redhat.com>
- <20200214103853.ycxs4clif4gisk6i@kamzik.brq.redhat.com>
- <d04b6913-e71e-8983-e704-d956be12dac9@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFBB88010E3;
+        Fri, 14 Feb 2020 12:11:50 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A9C3919C70;
+        Fri, 14 Feb 2020 12:11:49 +0000 (UTC)
+Date:   Fri, 14 Feb 2020 13:11:47 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v2 2/9] vfio-ccw: Register a chp_event callback for
+ vfio-ccw
+Message-ID: <20200214131147.0a98dd7d.cohuck@redhat.com>
+In-Reply-To: <20200206213825.11444-3-farman@linux.ibm.com>
+References: <20200206213825.11444-1-farman@linux.ibm.com>
+        <20200206213825.11444-3-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d04b6913-e71e-8983-e704-d956be12dac9@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 11:50:08AM +0100, Paolo Bonzini wrote:
-> On 14/02/20 11:38, Andrew Jones wrote:
-> > That was the way we originally planned on doing it when Alex Bennee posted
-> > his patch. However since d4d34e648482 ("run_tests: fix command line
-> > options handling") the "--" has become the divider between run_tests.sh
-> > parameter inputs and individually specified tests.
+On Thu,  6 Feb 2020 22:38:18 +0100
+Eric Farman <farman@linux.ibm.com> wrote:
+
+> From: Farhan Ali <alifm@linux.ibm.com>
 > 
-> Hmm, more precisely that is how getopt separates options from other 
-> parameters.
+> Register the chp_event callback to receive channel path related
+> events for the subchannels managed by vfio-ccw.
+
+I'm wondering how useful this patch would be on its own.
+
 > 
-> Since we don't expect test names starting with a dash, we could do 
-> something like (untested):
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
 > 
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 01e36dc..8b71cf2 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -35,7 +35,20 @@ RUNTIME_arch_run="./$TEST_DIR/run"
->  source scripts/runtime.bash
+> Notes:
+>     v1->v2:
+>      - Move s390dbf before cio_update_schib() call [CH]
+>     
+>     v0->v1: [EF]
+>      - Add s390dbf trace
+> 
+>  drivers/s390/cio/vfio_ccw_drv.c | 44 +++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+> 
+(...)
+> @@ -257,6 +258,48 @@ static int vfio_ccw_sch_event(struct subchannel *sch, int process)
+>  	return rc;
+>  }
 >  
->  only_tests=""
-> -args=`getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*`
-> +args=""
-> +vmm_args=""
-> +while [ $# -gt 0 ]; do
-> +   if test "$1" = --; then
-> +       shift
-> +       vmm_args=$*
-> +       break
-> +   else
-> +       args="args $1"
-> +       shift
-> +   fi
-> +done
+> +static int vfio_ccw_chp_event(struct subchannel *sch,
+> +			      struct chp_link *link, int event)
+> +{
+> +	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+> +	int mask = chp_ssd_get_mask(&sch->ssd_info, link);
+> +	int retry = 255;
 > +
-> +args=`getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $args`
->  [ $? -ne 0 ] && exit 2;
->  set -- $args;
->  while [ $# -gt 0 ]; do
+> +	if (!private || !mask)
+> +		return 0;
+> +
+> +	VFIO_CCW_MSG_EVENT(2, "%pUl (%x.%x.%04x): mask=0x%x event=%d\n",
+> +			   mdev_uuid(private->mdev), sch->schid.cssid,
+> +			   sch->schid.ssid, sch->schid.sch_no,
+> +			   mask, event);
+> +
+> +	if (cio_update_schib(sch))
+> +		return -ENODEV;
+> +
+> +	switch (event) {
+> +	case CHP_VARY_OFF:
+> +		/* Path logically turned off */
+> +		sch->opm &= ~mask;
+> +		sch->lpm &= ~mask;
+> +		break;
+> +	case CHP_OFFLINE:
+> +		/* Path is gone */
+> +		cio_cancel_halt_clear(sch, &retry);
 
-Unfortunately it regresses the current command line. Here's what I tested
+Any reason you do this only for CHP_OFFLINE and not for CHP_VARY_OFF?
 
-Before
-------
+> +		break;
+> +	case CHP_VARY_ON:
+> +		/* Path logically turned on */
+> +		sch->opm |= mask;
+> +		sch->lpm |= mask;
+> +		break;
+> +	case CHP_ONLINE:
+> +		/* Path became available */
+> +		sch->lpm |= mask & sch->opm;
 
-$ ./run_tests.sh -j 2 -v pmu psci
-VMM_PARAMS= TESTNAME=pmu TIMEOUT=90s ACCEL= ./arm/run arm/pmu.flat -smp 1
-VMM_PARAMS= TESTNAME=psci TIMEOUT=90s ACCEL= ./arm/run arm/psci.flat -smp $MAX_SMP
-PASS pmu (3 tests)
-PASS psci (4 tests)
+If I'm not mistaken, this patch introduces the first usage of sch->opm
+in the vfio-ccw code. Are we missing something? Or am I missing
+something? :)
 
-$ ./run_tests.sh pmu psci -j 2 -v
-VMM_PARAMS= TESTNAME=pmu TIMEOUT=90s ACCEL= ./arm/run arm/pmu.flat -smp 1
-VMM_PARAMS= TESTNAME=psci TIMEOUT=90s ACCEL= ./arm/run arm/psci.flat -smp $MAX_SMP
-PASS pmu (3 tests)
-PASS psci (4 tests)
-
-$ ./run_tests.sh -j 2 -v -- pmu psci
-VMM_PARAMS= TESTNAME=pmu TIMEOUT=90s ACCEL= ./arm/run arm/pmu.flat -smp 1
-VMM_PARAMS= TESTNAME=psci TIMEOUT=90s ACCEL= ./arm/run arm/psci.flat -smp $MAX_SMP
-PASS pmu (3 tests)
-PASS psci (4 tests)
-
-After
------
-
-$ ./run_tests.sh -j 2 -v pmu psci
-PASS psci (4 tests)
-
-$ ./run_tests.sh pmu psci -j 2 -v
-$
-
-(no output)
-
-$ ./run_tests.sh -j 2 -v -- pmu psci
-$
-
-(no output)
-
-> 
-> > will run the test with "-foo bar" appended to the command line. We could
-> > modify mkstandalone.sh to get that feature too (allowing the additional
-> > parameters to be given after tests/mytest), but with VMM_PARAMS we don't
-> > have to.
-> 
-> Yes, having consistency between standalone and run_tests.sh is a good thing.
->
-
-So should we:
-
- 1) try to get "--" working, but also keep the environment variable as
-    an alternative which works with standalone?
- 2) drop the environment variable, get "--" working and modify
-    mkstandalone.sh?
- 3) drop the environment variable, get "--" working, but forget about
-    standalone?
- 4) just keep the VMM_PARAMS approach and forget about "--"?
-
-Thanks,
-drew
+> +		break;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static struct css_device_id vfio_ccw_sch_ids[] = {
+>  	{ .match_flags = 0x1, .type = SUBCHANNEL_TYPE_IO, },
+>  	{ /* end of list */ },
+(...)
 
