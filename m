@@ -2,97 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8C9315FEF9
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2020 16:33:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A45015FFF6
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2020 20:11:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726273AbgBOPdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Feb 2020 10:33:14 -0500
-Received: from mail-il1-f198.google.com ([209.85.166.198]:47895 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726162AbgBOPdO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Feb 2020 10:33:14 -0500
-Received: by mail-il1-f198.google.com with SMTP id x69so10251475ill.14
-        for <kvm@vger.kernel.org>; Sat, 15 Feb 2020 07:33:14 -0800 (PST)
+        id S1726340AbgBOTLt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Feb 2020 14:11:49 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32553 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726209AbgBOTLt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 15 Feb 2020 14:11:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581793907;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EZ9r/oBZwZQJSFS9KT9wcCzoJjtsGACoOSPPGOIDHh0=;
+        b=GlADqL7K9VwOYectseYoYvJt6ZaZDOEcv7pmg/1Lt1YNp18GwyN+fOuLwTz7nfWMNjyYRt
+        QBqIzbDdni3CgUwXR6erf8hTxrZwZbrF9zzwIo1NoVFf8Ef1s4is1uQOA2KTEstEYhnj8u
+        SqDj1tx1I12zubZDYBqNx3MmBOA+li0=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-0sp38ZgGPa2ABCbeOiwuYQ-1; Sat, 15 Feb 2020 14:11:45 -0500
+X-MC-Unique: 0sp38ZgGPa2ABCbeOiwuYQ-1
+Received: by mail-qt1-f199.google.com with SMTP id e37so8221767qtk.7
+        for <kvm@vger.kernel.org>; Sat, 15 Feb 2020 11:11:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=i1ZtrzvsphpDvmdslly7GxdVaV3LFE9gOyvz4k2Kd4o=;
-        b=JqKkleZevG/wXtPhrvibmTKMvutRrXPfE7X77YwqzjdLA8+0fFU1fR5HXXPXDk8lz3
-         a5xdcp+DkCudXb+rvXEyFvPd2XE83X4y+hfG6z/0NI2oRPNiHW3CsYK74Dq492ktYhH3
-         b5lIWLk/Iexg/hipOAz2ZSt+z2PiV96a4YJibjqFr22zkA3HOWjcsD69ID1MdNWubwOb
-         LLrg6D83Pm2+jGEuMPQ17o/6CHcucFPDr/tx1LRyOK5SHpREmBUqujZdqilzGAs7vpoE
-         3Y2XYAVa8VpAsbQr+OFbufrg9uurDxIr3vouVm35p7IX0pvoFiPdN3XTxO4zIkhWuwmb
-         m4BA==
-X-Gm-Message-State: APjAAAX0KLjuFpQTh49B0sOnPp5zEuS3HJ5ZaNiMKx4FCsjXeXbIszrw
-        pysoKXmPyOJ44LVeFQr64zvo/lPl1nCcyM72LXJzzIPTYLoL
-X-Google-Smtp-Source: APXvYqwaf1rvNvL+yMEH5bZ2WsGu2SzzPqdBvJEz74lk96rib3k0fOVblHOHXJfNsAW+wX5QVomcBi9oS1AMk6CC1Qg43VCdt2Z2
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EZ9r/oBZwZQJSFS9KT9wcCzoJjtsGACoOSPPGOIDHh0=;
+        b=AjFM/Tb3O1hfQzWZOOXqWmjL61ym2EOIhxvjLlk+tcNDZ/dvjE+Yrs7YoUAPIsr54C
+         9F4BVvoUATs8O22kDWvkLa+z2qjJvn8+bqKyNZFROMEMUClqt0Zh31ryGZRjkKgrQeH5
+         ejHSE3tUDwOIsR6kBJFsNDwnaGNcPmr4KqW0W3ZOZSVgsDWT7SLGm+CA4iUX0ntsiJct
+         2aMvphxnKDo8eZu5Oaye0c0IZj/2i/KViX1W/dW5x+QrGU9NhXRuHCPX3tvrxdDIreUs
+         QtBEiukxGu3GiBkB2AmvFhWI81x70YsHfV7PwUErk4wTBnfgsKXsAdMrKvcnYyCtb2ts
+         /wNg==
+X-Gm-Message-State: APjAAAXegjXK09ejS1FMYgNu8d4qYSgunM+4hhychaNBFM4NaR73Qryo
+        BXV20WAyBoJUx+M5bNhlOW8mrEHez0nO4f2ZpoHtrV0r/nXT54Nc/wlKjmj9fu3ePdiU7SXua3P
+        t8iK3wNrXmShu
+X-Received: by 2002:a0c:e8c7:: with SMTP id m7mr7243134qvo.128.1581793904938;
+        Sat, 15 Feb 2020 11:11:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy8mQRiagTE+HIsLhJeYgynAu0GcjDD9kJvzBjwWMBb+VAwfV2vAD1fLgDha/5MOJzcSrUUPw==
+X-Received: by 2002:a0c:e8c7:: with SMTP id m7mr7243119qvo.128.1581793904684;
+        Sat, 15 Feb 2020 11:11:44 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+        by smtp.gmail.com with ESMTPSA id t55sm6272393qte.24.2020.02.15.11.11.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Feb 2020 11:11:43 -0800 (PST)
+Date:   Sat, 15 Feb 2020 14:11:42 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, bgardon@google.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [PATCH 00/13] KVM: selftests: Various fixes and cleanups
+Message-ID: <20200215190900.GC1195634@xz-x1>
+References: <20200214145920.30792-1-drjones@redhat.com>
+ <20200214222639.GB1195634@xz-x1>
+ <20200215070752.4fcymg7ruarfc4fc@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-X-Received: by 2002:a5d:80d6:: with SMTP id h22mr6058924ior.129.1581780793813;
- Sat, 15 Feb 2020 07:33:13 -0800 (PST)
-Date:   Sat, 15 Feb 2020 07:33:13 -0800
-In-Reply-To: <000000000000fd119d0597d12a56@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000053f643059e9f0a89@google.com>
-Subject: Re: kernel panic: stack is corrupted in vhost_net_ioctl
-From:   syzbot <syzbot+f2a62d07a5198c819c7b@syzkaller.appspotmail.com>
-To:     ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
-        davem@davemloft.net, hawk@kernel.org, jakub.kicinski@netronome.com,
-        jasowang@redhat.com, john.fastabend@gmail.com, kuba@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200215070752.4fcymg7ruarfc4fc@kamzik.brq.redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+On Sat, Feb 15, 2020 at 08:07:52AM +0100, Andrew Jones wrote:
+> On Fri, Feb 14, 2020 at 05:26:39PM -0500, Peter Xu wrote:
+> > On Fri, Feb 14, 2020 at 03:59:07PM +0100, Andrew Jones wrote:
+> > > This series has several parts:
+> > > 
+> > >  * First, a hack to get x86 to compile. The missing __NR_userfaultfd
+> > >    define should be fixed a better way.
+> > 
+> > Yeh otherwise I think it will only compile on x86_64.
+> 
+> The opposite for me. I could compile on AArch64 without this hack, but on
+> x86 (my Fedora 30 laptop) I could not.
 
-HEAD commit:    2019fc96 Merge git://git.kernel.org/pub/scm/linux/kernel/g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1677602de00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6780df5a5f208964
-dashboard link: https://syzkaller.appspot.com/bug?extid=f2a62d07a5198c819c7b
-compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16dcd87ee00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1135fa31e00000
+Ah, then probably because ARM does not have that artificial unisted*.h
+defined (tools/arch/x86/include/asm/unistd_{32|64}.h for x86), then
+<sys/syscall.h> can find the correct headers.
 
-Bisection is inconclusive: the bug happens on the oldest tested release.
+And I have said it wrong above... with patch 1 compilation should
+always work, but IIUC the syscall number will be wrong on 32bit
+systems.  Maybe we still need the other solution to make the test
+runnable on all platforms by removing those two artificial headers.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13204371e00000
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=10a04371e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17204371e00000
+Thanks,
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+f2a62d07a5198c819c7b@syzkaller.appspotmail.com
-
-Kernel panic - not syncing: stack-protector: Kernel stack is corrupted in: vhost_net_ioctl+0x1d83/0x1db0 drivers/vhost/net.c:366
-CPU: 0 PID: 8673 Comm: syz-executor239 Not tainted 5.6.0-rc1-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1fb/0x318 lib/dump_stack.c:118
- panic+0x264/0x7a9 kernel/panic.c:221
- __stack_chk_fail+0x1f/0x20 kernel/panic.c:667
- vhost_net_ioctl+0x1d83/0x1db0 drivers/vhost/net.c:366
- vfs_ioctl fs/ioctl.c:47 [inline]
- ksys_ioctl fs/ioctl.c:763 [inline]
- __do_sys_ioctl fs/ioctl.c:772 [inline]
- __se_sys_ioctl+0x113/0x190 fs/ioctl.c:770
- __x64_sys_ioctl+0x7b/0x90 fs/ioctl.c:770
- do_syscall_64+0xf7/0x1c0 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x440259
-Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffdeb5890b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440259
-RDX: 0000000020f1dff8 RSI: 000000004008af30 RDI: 0000000000000003
-RBP: 00000000006ca018 R08: 00000000004002c8 R09: 00000000004002c8
-R10: 00000000004002c8 R11: 0000000000000246 R12: 0000000000401ae0
-R13: 0000000000401b70 R14: 0000000000000000 R15: 0000000000000000
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
+-- 
+Peter Xu
 
