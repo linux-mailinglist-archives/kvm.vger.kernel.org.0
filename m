@@ -2,67 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BAD9215FC7B
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2020 04:44:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD44715FCEB
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2020 06:34:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727684AbgBODl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Feb 2020 22:41:59 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:10180 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727641AbgBODl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Feb 2020 22:41:59 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 7B2EBC6613FE84DAD0A9;
-        Sat, 15 Feb 2020 11:41:55 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Sat, 15 Feb 2020
- 11:41:47 +0800
-Subject: Re: [PATCH kvm-unit-tests v3] arm64: timer: Speed up gic-timer-state
- check
-To:     Andrew Jones <drjones@redhat.com>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>
-CC:     <alexandru.elisei@arm.com>, <andre.przywara@arm.com>,
-        <eric.auger@redhat.com>
-References: <20200213093257.23367-1-drjones@redhat.com>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <cb4b85c1-7b25-f930-f09d-3ef86bc33930@huawei.com>
-Date:   Sat, 15 Feb 2020 11:41:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1725810AbgBOFeL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Feb 2020 00:34:11 -0500
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:38824 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725791AbgBOFeL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 Feb 2020 00:34:11 -0500
+Received: by mail-ed1-f67.google.com with SMTP id p23so13801652edr.5;
+        Fri, 14 Feb 2020 21:34:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=VoLbzQnWuWhgQvIu/ihsEdqU9Gv5bRRjTaIt273JgVw=;
+        b=ouje4b6XyVh8L3CyU5EmYSuFqC+kINVYAvRemNoBWfYn4BEIQj3DbWo7sNuJP0bWT+
+         vEhANWoadxcbmIrrIJ5PaLrRRI+XPokWEvxVTPO9ELVWGU3Kq46+/jpBHTZP66b9PMEQ
+         nYpdxtfY24W3VUhP/35N0apOK5+TVTY3skouBdZn23T5Y3EV8zncWvcI4eBpgyYrS5E1
+         p6jmKb0yUnEABx1o8mk1x+p18+TUjCSKAK0hpdSOglKU/D54ERYwGszVlVM8u8F5KNBQ
+         KsXWkf41p0aQpm2jZa8TauoAZjbgG14dtHRslZx6m9gtc/5GjvBRv5awFH/g1pRzosGa
+         lKgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=VoLbzQnWuWhgQvIu/ihsEdqU9Gv5bRRjTaIt273JgVw=;
+        b=fhevcECeLwFeYwxUrobOs9cfXP4UqRLWkRn11gDmz1Kj4KQFwQIAsbP79QsycPfckD
+         oAkcEYUZoP0BwC4v7LUrmGe612u5USC3lz8WyzvyVI4yF6U5dbynshQ7zJT/dRWBff1/
+         mv2Jn65g0BRUa7ECUupIsd38mEaEfSG+pkiQyy9k82YkO7CcSeEwDr0CKYJEhH7FLr8m
+         as9hOYzNuFxwACdcOT1xvNCyl6pOz8Qa4ScR29whsMGyvNYSamzmeWpC+EEC3uCsdRa7
+         wIBBzpyR2YM+cfF0MzZTiNVJAt7UqE3/HNyw1S300moHvKDP2gQKAYwnDHgzIjDrW2th
+         9whg==
+X-Gm-Message-State: APjAAAUuZjPQbgwESPyYH1/3CyAEPwGxr9aPJeFN+qZjymmQ2xXTYU/t
+        L7lhB2CbiM18GJrq0LHEPdJzfalJDLZkJg8EuA==
+X-Google-Smtp-Source: APXvYqxMU400tyc2NMgWHEhslnRUFnWgMaf0SCN2dokHv0Sc2+DfucSVowVhgXpFFqvrZZ0Rypwd8WIE7nj28smJH+c=
+X-Received: by 2002:a17:906:a898:: with SMTP id ha24mr6100472ejb.374.1581744849130;
+ Fri, 14 Feb 2020 21:34:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200213093257.23367-1-drjones@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+References: <fdc45fbc0b9c4c38ab539c1abf0f1e4a@huawei.com>
+In-Reply-To: <fdc45fbc0b9c4c38ab539c1abf0f1e4a@huawei.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Date:   Sat, 15 Feb 2020 13:33:57 +0800
+Message-ID: <CAB5KdOYgfhZX7ya3G3YFOpLehzagYfajBE+mVOgOd7dvD3vXqA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Add the check and free to avoid unknown errors.
+To:     linmiaohe <linmiaohe@huawei.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
+linmiaohe <linmiaohe@huawei.com> =E4=BA=8E2020=E5=B9=B42=E6=9C=8815=E6=97=
+=A5=E5=91=A8=E5=85=AD =E4=B8=8A=E5=8D=8810:00=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Hi:
+> Haiwei Li <lihaiwei.kernel@gmail.com> wrote:
+> > From: Haiwei Li <lihaiwei@tencent.com>
+> >
+> > If 'kvm_create_vm_debugfs()' fails in 'kzalloc(sizeof(*stat_data), ...)=
+', 'kvm_destroy_vm_debugfs()' will be called by the final fput(file) in 'kv=
+m_dev_ioctl_create_vm()'.
+> >
+> > Add the check and free to avoid unknown errors.
+>
+> Add the check and free? According to the code,it seem what you mean is "a=
+dd the check against free" ?
 
-On 2020/2/13 17:32, Andrew Jones wrote:
-> Let's bail out of the wait loop if we see the expected state
-> to save over six seconds of run time. Make sure we wait a bit
-> before reading the registers and double check again after,
-> though, to somewhat mitigate the chance of seeing the expected
-> state by accident.
-> 
-> We also take this opportunity to push more IRQ state code to
-> the library.
-> 
-> Cc: Zenghui Yu <yuzenghui@huawei.com>
+Right, i can change the description.
 
-Please feel free to replace this with:
+>
+> >
+> > Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+> >
+> >       if (kvm->debugfs_stat_data) {
+> > -             for (i =3D 0; i < kvm_debugfs_num_entries; i++)
+> > +             for (i =3D 0; i < kvm_debugfs_num_entries; i++) {
+> > +                     if (!kvm->debugfs_stat_data[i])
+> > +                             break;
+> >                       kfree(kvm->debugfs_stat_data[i]);
+> > +             }
+> >               kfree(kvm->debugfs_stat_data);
+> >       }
+> >   }
+>
+> If (!kvm->debugfs_stat_data[i]) is checked in kfree() internal. And break=
+ early seems have no different effect.
+> Could you please explain what unknown errors may occur? And how? Thanks.
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Tested-by: Zenghui Yu <yuzenghui@huawei.com>
+I get the free() code. It is just like what you said. Thanks a lot.
+Break early is useful. If kvm->debugfs_stat_data[i] is null, breaking
+early can reduce the check.
 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-
-
-Thanks
-
+>
