@@ -2,152 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 355B7161319
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 14:17:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6A06161328
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 14:20:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728727AbgBQNQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 08:16:45 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:39383 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728424AbgBQNQo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 08:16:44 -0500
-Received: by mail-ot1-f68.google.com with SMTP id 77so16010289oty.6;
-        Mon, 17 Feb 2020 05:16:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nuL8CtX55BPzoxygKW6S6mjcIN5tjUT7yCyHUMOTXFo=;
-        b=uY++/MYyUuwsgE64k/bddQKpPdzGtkbxV+rSZh8QMqltJT0hYCIvJnjZX3pqR2nlHC
-         aqqD/UAK3cMEOGdOoVQzgKbvz1LU1s4F3PqBtX4RIYrMan2knFMpp6iQove+FnCekIJx
-         LL25CNd/avk2I8VoI4/VrPcOHxH3GsVD8Hm97VuLvAX7x4ljb6VCrQ/YmFn877xqDkuB
-         gBcJvknwdcPJZre+JBdVZQlpTlAEJtMZilpKF9y7KFf6niLltb88TdB4cl1V2CgJwaUE
-         jyQWQiQx+8WQK7qXO/vvk9amOfCdbb9vB+MPUZt5uxc5v/7n5rz1/eGLR1wjb5q8hy1S
-         zDKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nuL8CtX55BPzoxygKW6S6mjcIN5tjUT7yCyHUMOTXFo=;
-        b=mT7XRl2VlfGC6RhkHOXs+SbehXLRqOOrAa22C6H9Ug2Wq/zYdDPuMezhe9iT86eyzT
-         U1NUr3w5RsuJtOezek9VhAsR/hAll4glrL21W8CsybDaqJ2H/WgwQ1nl2f8XNUQBwNt2
-         unOaCj0Llsf8/YNac8pVhXmKylcIiFvVykwVYgS+91rAWIfmKZeMU5eDx+hLdgZRLsav
-         i1f+87I3j393+9HnVQQ6yN38/jLQCPKDO6LVODVtPMXPJyaSFVkY9mW+wJ4t9dZugUlN
-         yWZMdj1nsRVLNCzWQY5GxxpttNZvFTqhu8+o7jd+UzG0aCfk8SRtvGcuvDEDCDPUHIUu
-         yGhw==
-X-Gm-Message-State: APjAAAXjJa1je2D1yzQkmRYs93oZl/dUMS38NsKre1q3IvuzosFMFUWl
-        X9m4teeGTfQ89SwO7ULQB2nySauWyis95p70PJo=
-X-Google-Smtp-Source: APXvYqyO59KG3VGRDFRxNNSCDwt0uDuXL6mNedgykhIhPOwWQpJrde2FHja7BQSCWDOOV+Zqg2DIo1uZRUdPnbB9RPM=
-X-Received: by 2002:a9d:7ccd:: with SMTP id r13mr11674114otn.56.1581945402563;
- Mon, 17 Feb 2020 05:16:42 -0800 (PST)
+        id S1728063AbgBQNUI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 08:20:08 -0500
+Received: from mga06.intel.com ([134.134.136.31]:31422 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726414AbgBQNUH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 08:20:07 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Feb 2020 05:20:07 -0800
+X-IronPort-AV: E=Sophos;i="5.70,452,1574150400"; 
+   d="scan'208";a="228416652"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.168.218]) ([10.249.168.218])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 17 Feb 2020 05:20:05 -0800
+Subject: Re: [RFC PATCH 1/2] KVM: CPUID: Enable supervisor XSAVE states in
+ CPUID enumeration and XSS
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        aaronlewis@google.com
+References: <20200211065706.3462-1-weijiang.yang@intel.com>
+ <a75a0e16-198d-9c96-3a63-d09a93909c0f@intel.com>
+ <20200217130355.GA10854@local-michael-cet-test.sh.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <2125c47d-06c5-d559-c95c-a55a71790f31@intel.com>
+Date:   Mon, 17 Feb 2020 21:20:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <CANRm+CznPq3LQUyiXr8nA7uP5q+d8Ud-Ki-W7vPCo_BjDJtOSw@mail.gmail.com>
- <7171e537-27f9-c1e5-ae32-9305710be2c7@redhat.com> <20200214213357.GH20690@linux.intel.com>
-In-Reply-To: <20200214213357.GH20690@linux.intel.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 17 Feb 2020 21:16:31 +0800
-Message-ID: <CANRm+CwEnrU0ErsxXd51K5muVyYypx5HME6ZNj1b2uEUN57gwQ@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: X86: Grab KVM's srcu lock when accessing hv
- assist page
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200217130355.GA10854@local-michael-cet-test.sh.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 15 Feb 2020 at 05:33, Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> The subject shoud be rewritten to simply states that the vmcs12->shadow
-> sync is being.  The changelog can explain the motiviation, but a one-line
-> git log should clearly reveal that this affects the shadow VMCS.
->
-> Subsystem should also be "KVM: nVMX:"
->
-> On Fri, Feb 14, 2020 at 10:27:12AM +0100, Paolo Bonzini wrote:
-> > On 14/02/20 10:16, Wanpeng Li wrote:
-> > > From: wanpeng li <wanpengli@tencent.com>
-> > >
-> > > For the duration of mapping eVMCS, it derefences ->memslots without holding
-> > > ->srcu or ->slots_lock when accessing hv assist page. This patch fixes it by
-> > > moving nested_sync_vmcs12_to_shadow to prepare_guest_switch, where the SRCU
-> > > is already taken.
-> >
-> > Looks good, but I'd like an extra review from Sean or Vitaly.
-> >
-> > We also should add a WARN_ON_ONCE that replaces the previous location of
-> > the "if (vmx->nested.need_vmcs12_to_shadow_sync)", but I can do that myself.
-> >
-> > Thanks,
-> >
-> > Paolo
-> >
-> > > It can be reproduced by running kvm's evmcs_test selftest.
-> > >
-> > >   =============================
-> > >   warning: suspicious rcu usage
-> > >   5.6.0-rc1+ #53 tainted: g        w ioe
-> > >   -----------------------------
-> > >   ./include/linux/kvm_host.h:623 suspicious rcu_dereference_check() usage!
-> > >
-> > >   other info that might help us debug this:
-> > >
-> > >    rcu_scheduler_active = 2, debug_locks = 1
-> > >   1 lock held by evmcs_test/8507:
-> > >    #0: ffff9ddd156d00d0 (&vcpu->mutex){+.+.}, at:
-> > > kvm_vcpu_ioctl+0x85/0x680 [kvm]
-> > >
-> > >   stack backtrace:
-> > >   cpu: 6 pid: 8507 comm: evmcs_test tainted: g        w ioe     5.6.0-rc1+ #53
-> > >   hardware name: dell inc. optiplex 7040/0jctf8, bios 1.4.9 09/12/2016
-> > >   call trace:
-> > >    dump_stack+0x68/0x9b
-> > >    kvm_read_guest_cached+0x11d/0x150 [kvm]
-> > >    kvm_hv_get_assist_page+0x33/0x40 [kvm]
-> > >    nested_enlightened_vmentry+0x2c/0x60 [kvm_intel]
-> > >    nested_vmx_handle_enlightened_vmptrld.part.52+0x32/0x1c0 [kvm_intel]
-> > >    nested_sync_vmcs12_to_shadow+0x439/0x680 [kvm_intel]
-> > >    vmx_vcpu_run+0x67a/0xe60 [kvm_intel]
-> > >    vcpu_enter_guest+0x35e/0x1bc0 [kvm]
-> > >    kvm_arch_vcpu_ioctl_run+0x40b/0x670 [kvm]
-> > >    kvm_vcpu_ioctl+0x370/0x680 [kvm]
-> > >    ksys_ioctl+0x235/0x850
-> > >    __x64_sys_ioctl+0x16/0x20
-> > >    do_syscall_64+0x77/0x780
-> > >    entry_syscall_64_after_hwframe+0x49/0xbe
-> > >
-> > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/vmx.c | 6 +++---
-> > >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 9a66648..6bd6ca4 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -1214,6 +1214,9 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
-> > >
-> > >      vmx_set_host_fs_gs(host_state, fs_sel, gs_sel, fs_base, gs_base);
-> > >      vmx->guest_state_loaded = true;
-> > > +
-> > > +    if (vmx->nested.need_vmcs12_to_shadow_sync)
-> > > +        nested_sync_vmcs12_to_shadow(vcpu);
->
-> This needs to be above the short circuit check on guest_state_loaded, e.g.:
->
->         if (vmx->nested.need_vmcs12_to_shadow_sync)
->                 nested_sync_vmcs12_to_shadow(vcpu);
->
->         if (vmx->guest_state_loaded)
->                 return;
+On 2/17/2020 9:03 PM, Yang Weijiang wrote:
+> On Mon, Feb 17, 2020 at 12:26:51PM +0800, Xiaoyao Li wrote:
+>> On 2/11/2020 2:57 PM, Yang Weijiang wrote:
+>>> CPUID.(EAX=DH, ECX={i}H i>=0) enumerates XSAVE related leaves/sub-leaves,
+>>> +extern int host_xss;
+>>> +u64 kvm_supported_xss(void)
+>>> +{
+>>> +	return KVM_SUPPORTED_XSS & host_xss;
+>>> +}
+>>> +
+>>
+>> How about using a global variable, supported_xss, instead of calculating the
+>> mask on every call. Just like what Sean posted on
+>> https://lore.kernel.org/kvm/20200201185218.24473-21-sean.j.christopherson@intel.com/
+>>
+> Thanks Xiaoyao for the comments!
+> Good suggestion, I'll change it in next version.
+> 
+>>>    #define F(x) bit(X86_FEATURE_##x)
+>>>    int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+>>> @@ -112,10 +118,17 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+>>>    		vcpu->arch.guest_xstate_size = best->ebx =
+>>>    			xstate_required_size(vcpu->arch.xcr0, false);
+>>>    	}
+>>> -
+>>>    	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
+>>> -	if (best && (best->eax & (F(XSAVES) | F(XSAVEC))))
+>>> -		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+>>> +	if (best && (best->eax & (F(XSAVES) | F(XSAVEC)))) {
+>>> +		u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
+>>> +
+>>> +		best->ebx = xstate_required_size(xstate, true);
+>>> +		vcpu->arch.guest_supported_xss =
+>>> +			(best->ecx | ((u64)best->edx << 32)) &
+>>> +			kvm_supported_xss();
+>>> +	} else {
+>>> +		vcpu->arch.guest_supported_xss = 0;
+>>> +	}
+>>>    	/*
+>>>    	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+>>> @@ -426,6 +439,56 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+>>>    	}
+>>>    }
+>>> +static inline bool do_cpuid_0xd_mask(struct kvm_cpuid_entry2 *entry, int index)
+>>> +{
+>>> +	unsigned int f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
+>>> +	/* cpuid 0xD.1.eax */
+>>> +	const u32 kvm_cpuid_D_1_eax_x86_features =
+>>> +		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+>>> +	u64 u_supported = kvm_supported_xcr0();
+>>> +	u64 s_supported = kvm_supported_xss();
+>>> +	u64 supported;
+>>> +
+>>> +	switch (index) {
+>>> +	case 0:
+>>> +		if (!u_supported) {
+>>> +			entry->eax = 0;
+>>> +			entry->ebx = 0;
+>>> +			entry->ecx = 0;
+>>> +			entry->edx = 0;
+>>> +			return false;
+>>> +		}
+>>> +		entry->eax &= u_supported;
+>>> +		entry->ebx = xstate_required_size(u_supported, false);
+>>> +		entry->ecx = entry->ebx;
+>>> +		entry->edx &= u_supported >> 32;
+>>> +		break;
+>>> +	case 1:
+>>> +		supported = u_supported | s_supported;
+>>> +		entry->eax &= kvm_cpuid_D_1_eax_x86_features;
+>>> +		cpuid_mask(&entry->eax, CPUID_D_1_EAX);
+>>> +		entry->ebx = 0;
+>>> +		entry->edx &= s_supported >> 32;
+>>> +		entry->ecx &= s_supported;
+>>
+>> We'd better initialize msr_ia32_xss bitmap (entry->ecx & entry-edx) as zeros
+>> here.
+> Hmm, explicit setting the MSR to 0 is good in this case, but there's implied
+> flow to ensure guest MSR_IA32_XSS will be 0 if entry->ecx and entry->edx are 0s.
+> In above kvm_update_cpuid(), vcpu->arch.guest_supported_xss is set to 0
+> when they're 0s. this masks guest cannot set non-zero value to this
+> MSR. And in kvm_vcpu_reset(), vcpu->arch.ia32_xss is initialized to 0,
+> in kvm_load_guest_xsave_state() MSR_IA32_XSS is set to ia32_xss,
+> therefore the MSR is kept to 0.
 
-Agreed, do it in new version.
+Sorry, I think what I said "msr_ia32_xss bitmap" misled you.
 
-    Wanpeng
+"msr_ia32_xss bitmap" is not MSR_IA32_XSS,
+but the (entry->ecx | entry->edx >> 32) of cpuid.D_1
+
+I meant we'd better set entry->ecx and entry->edx to 0 here.
+
+>>
+>>> +		if (entry->eax & (F(XSAVES) | F(XSAVEC)))
+>>> +			entry->ebx = xstate_required_size(supported, true);
+>>
+>> And setup msr_ia32_xss bitmap based on the s_supported within this condition
+>> when F(XSAVES) is supported.
+> 
+
+And set entry->ecx & entry->edx only when F(XSAVES) is supported.
+
+> IIUC, both XSAVEC and XSAVES use compacted format of the extended
+> region, so if XSAVEC is supported while XSAVES is not, guest still can
+> get correct size, so in existing code the two bits are ORed.
+
+Yeah, but entry->ecx and entry->edx should be non-zero only when 
+F(XSAVES) is set.
+
+>>
+>>> +		break;
+>>> +	default:
+>>> +		supported = (entry->ecx & 0x1) ? s_supported : u_supported;
+>>> +		if (!(supported & (BIT_ULL(index)))) {
+>>> +			entry->eax = 0;
+>>> +			entry->ebx = 0;
+>>> +			entry->ecx = 0;
+>>> +			entry->edx = 0;
+>>> +			return false;
+>>> +		}
+>>> +		if (entry->ecx & 0x1)
+>>> +			entry->ebx = 0;
+>>> +		break;
+>>> +	}
+>>> +	return true;
+>>> +}
+>>> +
+>>>    static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>>>    				  int *nent, int maxnent)
+>>>    {
+>>> @@ -440,7 +503,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>>>    	unsigned f_lm = 0;
+>>>    #endif
+>>>    	unsigned f_rdtscp = kvm_x86_ops->rdtscp_supported() ? F(RDTSCP) : 0;
+>>> -	unsigned f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
+>>>    	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
+>>>    	/* cpuid 1.edx */
+>>> @@ -495,10 +557,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>>>    		F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
+>>>    		F(PMM) | F(PMM_EN);
+>>> -	/* cpuid 0xD.1.eax */
+>>> -	const u32 kvm_cpuid_D_1_eax_x86_features =
+>>> -		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+>>> -
+>>>    	/* all calls to cpuid_count() should be made on the same cpu */
+>>>    	get_cpu();
+>>> @@ -639,38 +697,21 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>>>    		break;
+>>>    	}
+>>>    	case 0xd: {
+>>> -		int idx, i;
+>>> -		u64 supported = kvm_supported_xcr0();
+>>> +		int i, idx;
+>>> -		entry->eax &= supported;
+>>> -		entry->ebx = xstate_required_size(supported, false);
+>>> -		entry->ecx = entry->ebx;
+>>> -		entry->edx &= supported >> 32;
+>>> -		if (!supported)
+>>> +		if (!do_cpuid_0xd_mask(&entry[0], 0))
+>>>    			break;
+>>> -
+>>> -		for (idx = 1, i = 1; idx < 64; ++idx) {
+>>> -			u64 mask = ((u64)1 << idx);
+>>> +		for (i = 1, idx = 1; idx < 64; ++idx) {
+>>>    			if (*nent >= maxnent)
+>>>    				goto out;
+>>> -
+>>>    			do_host_cpuid(&entry[i], function, idx);
+>>> -			if (idx == 1) {
+>>> -				entry[i].eax &= kvm_cpuid_D_1_eax_x86_features;
+>>> -				cpuid_mask(&entry[i].eax, CPUID_D_1_EAX);
+>>> -				entry[i].ebx = 0;
+>>> -				if (entry[i].eax & (F(XSAVES)|F(XSAVEC)))
+>>> -					entry[i].ebx =
+>>> -						xstate_required_size(supported,
+>>> -								     true);
+>>> -			} else {
+>>> -				if (entry[i].eax == 0 || !(supported & mask))
+>>> -					continue;
+>>> -				if (WARN_ON_ONCE(entry[i].ecx & 1))
+>>> -					continue;
+>>> -			}
+>>> -			entry[i].ecx = 0;
+>>> -			entry[i].edx = 0;
+>>> +
+>>> +			if (entry[i].eax == 0 && entry[i].ebx == 0 &&
+>>> +			    entry[i].ecx == 0 && entry[i].edx == 0)
+>>> +				continue;
+>>> +
+>>> +			if (!do_cpuid_0xd_mask(&entry[i], idx))
+>>> +				continue;
+>>>    			++*nent;
+>>>    			++i;
+>>>    		}
+>   >
+> 
+
