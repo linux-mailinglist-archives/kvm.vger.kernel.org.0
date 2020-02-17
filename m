@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED6401607B2
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 02:25:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F17BC1607B4
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 02:25:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726754AbgBQBZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Feb 2020 20:25:29 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:37608 "EHLO huawei.com"
+        id S1726824AbgBQBZb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Feb 2020 20:25:31 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:37694 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726650AbgBQBZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Feb 2020 20:25:29 -0500
+        id S1726697AbgBQBZa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Feb 2020 20:25:30 -0500
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 268FCEF1D9D1814F2F6E;
+        by Forcepoint Email with ESMTP id 38579131F8B89D31F2D9;
         Mon, 17 Feb 2020 09:25:28 +0800 (CST)
 Received: from huawei.com (10.151.151.243) by DGGEMS405-HUB.china.huawei.com
  (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
- 09:25:17 +0800
+ 09:25:18 +0800
 From:   Dongjiu Geng <gengdongjiu@huawei.com>
 To:     <mst@redhat.com>, <imammedo@redhat.com>,
         <xiaoguangrong.eric@gmail.com>, <shannon.zhaosl@gmail.com>,
@@ -28,9 +28,9 @@ To:     <mst@redhat.com>, <imammedo@redhat.com>,
         <jonathan.cameron@huawei.com>,
         <shameerali.kolothum.thodi@huawei.com>
 CC:     <gengdongjiu@huawei.com>, <zhengxiang9@huawei.com>
-Subject: [PATCH RESEND v23 02/10] hw/arm/virt: Introduce a RAS machine option
-Date:   Mon, 17 Feb 2020 09:27:29 +0800
-Message-ID: <20200217012737.30231-3-gengdongjiu@huawei.com>
+Subject: [PATCH RESEND v23 03/10] docs: APEI GHES generation and CPER record description
+Date:   Mon, 17 Feb 2020 09:27:30 +0800
+Message-ID: <20200217012737.30231-4-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.18.0.huawei.25
 In-Reply-To: <20200217012737.30231-1-gengdongjiu@huawei.com>
 References: <20200217012737.30231-1-gengdongjiu@huawei.com>
@@ -43,71 +43,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-RAS Virtualization feature is not supported now, so add a RAS machine
-option and disable it by default.
+Add APEI/GHES detailed design document
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/arm/virt.c         | 23 +++++++++++++++++++++++
- include/hw/arm/virt.h |  1 +
- 2 files changed, 24 insertions(+)
+ docs/specs/acpi_hest_ghes.rst | 110 ++++++++++++++++++++++++++++++++++++++++++
+ docs/specs/index.rst          |   1 +
+ 2 files changed, 111 insertions(+)
+ create mode 100644 docs/specs/acpi_hest_ghes.rst
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index f788fe2..9555b8b 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1823,6 +1823,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
-     vms->its = value;
- }
- 
-+static bool virt_get_ras(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
+diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
+new file mode 100644
+index 0000000..68f1fbe
+--- /dev/null
++++ b/docs/specs/acpi_hest_ghes.rst
+@@ -0,0 +1,110 @@
++APEI tables generating and CPER record
++======================================
 +
-+    return vms->ras;
-+}
++..
++   Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
 +
-+static void virt_set_ras(Object *obj, bool value, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
++   This work is licensed under the terms of the GNU GPL, version 2 or later.
++   See the COPYING file in the top-level directory.
 +
-+    vms->ras = value;
-+}
++Design Details
++--------------
 +
- static char *virt_get_gic_version(Object *obj, Error **errp)
- {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
-@@ -2126,6 +2140,15 @@ static void virt_instance_init(Object *obj)
-                                     "Valid values are none and smmuv3",
-                                     NULL);
- 
-+    /* Default disallows RAS instantiation */
-+    vms->ras = false;
-+    object_property_add_bool(obj, "ras", virt_get_ras,
-+                             virt_set_ras, NULL);
-+    object_property_set_description(obj, "ras",
-+                                    "Set on/off to enable/disable reporting host memory errors "
-+                                    "to a KVM guest using ACPI and guest external abort exceptions",
-+                                    NULL);
++::
 +
-     vms->irqmap = a15irqmap;
- 
-     virt_flash_create(vms);
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 71508bf..c32b7c7 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -123,6 +123,7 @@ typedef struct {
-     bool highmem_ecam;
-     bool its;
-     bool virt;
-+    bool ras;
-     int32_t gic_version;
-     VirtIOMMUType iommu;
-     struct arm_boot_info bootinfo;
++         etc/acpi/tables                           etc/hardware_errors
++      ====================                   ===============================
++  + +--------------------------+            +----------------------------+
++  | | HEST                     | +--------->|    error_block_address1    |------+
++  | +--------------------------+ |          +----------------------------+      |
++  | | GHES1                    | | +------->|    error_block_address2    |------+-+
++  | +--------------------------+ | |        +----------------------------+      | |
++  | | .................        | | |        |      ..............        |      | |
++  | | error_status_address-----+-+ |        -----------------------------+      | |
++  | | .................        |   |   +--->|    error_block_addressN    |------+-+---+
++  | | read_ack_register--------+-+ |   |    +----------------------------+      | |   |
++  | | read_ack_preserve        | +-+---+--->|     read_ack_register1     |      | |   |
++  | | read_ack_write           |   |   |    +----------------------------+      | |   |
++  + +--------------------------+   | +-+--->|     read_ack_register2     |      | |   |
++  | | GHES2                    |   | | |    +----------------------------+      | |   |
++  + +--------------------------+   | | |    |       .............        |      | |   |
++  | | .................        |   | | |    +----------------------------+      | |   |
++  | | error_status_address-----+---+ | | +->|     read_ack_registerN     |      | |   |
++  | | .................        |     | | |  +----------------------------+      | |   |
++  | | read_ack_register--------+-----+ | |  |Generic Error Status Block 1|<-----+ |   |
++  | | read_ack_preserve        |       | |  |-+------------------------+-+        |   |
++  | | read_ack_write           |       | |  | |          CPER          | |        |   |
++  + +--------------------------|       | |  | |          CPER          | |        |   |
++  | | ...............          |       | |  | |          ....          | |        |   |
++  + +--------------------------+       | |  | |          CPER          | |        |   |
++  | | GHESN                    |       | |  |-+------------------------+-|        |   |
++  + +--------------------------+       | |  |Generic Error Status Block 2|<-------+   |
++  | | .................        |       | |  |-+------------------------+-+            |
++  | | error_status_address-----+-------+ |  | |           CPER         | |            |
++  | | .................        |         |  | |           CPER         | |            |
++  | | read_ack_register--------+---------+  | |           ....         | |            |
++  | | read_ack_preserve        |            | |           CPER         | |            |
++  | | read_ack_write           |            +-+------------------------+-+            |
++  + +--------------------------+            |         ..........         |            |
++                                            |----------------------------+            |
++                                            |Generic Error Status Block N |<----------+
++                                            |-+-------------------------+-+
++                                            | |          CPER           | |
++                                            | |          CPER           | |
++                                            | |          ....           | |
++                                            | |          CPER           | |
++                                            +-+-------------------------+-+
++
++
++(1) QEMU generates the ACPI HEST table. This table goes in the current
++    "etc/acpi/tables" fw_cfg blob. Each error source has different
++    notification types.
++
++(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
++    also needs to populate this blob. The "etc/hardware_errors" fw_cfg blob
++    contains an address registers table and an Error Status Data Block table.
++
++(3) The address registers table contains N Error Block Address entries
++    and N Read Ack Register entries. The size for each entry is 8-byte.
++    The Error Status Data Block table contains N Error Status Data Block
++    entries. The size for each entry is 4096(0x1000) bytes. The total size
++    for the "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
++    N is the number of the kinds of hardware error sources.
++
++(4) QEMU generates the ACPI linker/loader script for the firmware. The
++    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
++    and copies blob contents there.
++
++(5) QEMU generates N ADD_POINTER commands, which patch addresses in the
++    "error_status_address" fields of the HEST table with a pointer to the
++    corresponding "address registers" in the "etc/hardware_errors" blob.
++
++(6) QEMU generates N ADD_POINTER commands, which patch addresses in the
++    "read_ack_register" fields of the HEST table with a pointer to the
++    corresponding "read_ack_register" within the "etc/hardware_errors" blob.
++
++(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
++    addresses in the "error_block_address" fields with a pointer to the
++    respective "Error Status Data Block" in the "etc/hardware_errors" blob.
++
++(8) QEMU defines a third and write-only fw_cfg blob which is called
++    "etc/hardware_errors_addr". Through that blob, the firmware can send back
++    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
++    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER command
++    for the firmware. The firmware will write back the start address of
++    "etc/hardware_errors" blob to the fw_cfg file "etc/hardware_errors_addr".
++
++(9) When QEMU gets a SIGBUS from the kernel, QEMU writes CPER into corresponding
++    "Error Status Data Block", guest memory, and then injects platform specific
++    interrupt (in case of arm/virt machine it's Synchronous External Abort) as a
++    notification which is necessary for notifying the guest.
++
++(10) This notification (in virtual hardware) will be handled by the guest
++     kernel, on receiving notification, guest APEI driver could read the CPER error
++     and take appropriate action.
++
++(11) kvm_arch_on_sigbus_vcpu() uses source_id as index in "etc/hardware_errors" to
++     find out "Error Status Data Block" entry corresponding to error source. So supported
++     source_id values should be assigned here and not be changed afterwards to make sure
++     that guest will write error into expected "Error Status Data Block" even if guest was
++     migrated to a newer QEMU.
+diff --git a/docs/specs/index.rst b/docs/specs/index.rst
+index de46a8b..426632a 100644
+--- a/docs/specs/index.rst
++++ b/docs/specs/index.rst
+@@ -14,3 +14,4 @@ Contents:
+    ppc-spapr-xive
+    acpi_hw_reduced_hotplug
+    tpm
++   acpi_hest_ghes
 -- 
 1.8.3.1
 
