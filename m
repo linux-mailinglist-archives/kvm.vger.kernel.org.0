@@ -2,114 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 85060161819
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 17:40:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44D3716183B
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 17:48:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729453AbgBQQkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 11:40:33 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48877 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726891AbgBQQkc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 11:40:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581957631;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fm9Mu329tflOhzJ9YEndE4Fe2Pm3uRmsk0n5PQaTgWY=;
-        b=dMtHCsnSW9Va1psj1CCnjPOpJFVAll1UD/afCF1lnAgJQwfLpS00wuxwEliIBONPXpsm5r
-        +GIDSQabtM27z7+lKr3LuW4ErseeYdwSsDoSekHEYCNQqgLGhxfyKl9KjBpHPOMXJMGo2S
-        X/BdxA+g0GYYd7QSU/VfWcu15XtYVtg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-62AA3akEP_6ZE6PgZng5qA-1; Mon, 17 Feb 2020 11:40:29 -0500
-X-MC-Unique: 62AA3akEP_6ZE6PgZng5qA-1
-Received: by mail-wr1-f72.google.com with SMTP id d8so9162404wrq.12
-        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 08:40:29 -0800 (PST)
+        id S1729413AbgBQQsj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 11:48:39 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:37597 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727545AbgBQQsj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 11:48:39 -0500
+Received: by mail-qt1-f195.google.com with SMTP id w47so12457860qtk.4
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 08:48:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lca.pw; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=et9GtBlMwNyxXKtY81oCoU0p2n7F0NO/hCNz4eL9vi4=;
+        b=MsltEajVC7Lm/8rj+VK0/bBou9ueubcoYM1ggoVVaK1xxTGTPTHah7qcq/2NnPYrQn
+         3v+ldGqaICuedwbPKZnqJFID347yBwxclCc/mlWjX02kVSDodn5UZpjJCZtJeiEZ9iV1
+         PK2z2pLj9gMhtNlfP7D/DwsUhx0dT18QaY1PAOTTDuEivFQwmiioNAf3pygnOgIQsQxG
+         BwxGL95/gwlXDxc1aKE5nn9VQE045CxPeVeVQk0IcoUf0vLgDBzZmvOUd/E5MAKSbcvp
+         hOKKYsUTYmXpaWBg9lNmk7+ETCeBEeyPhVl+8a+wRJx/UB5gCWEHwNk8yhG5Z2dnX9C4
+         XRnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=fm9Mu329tflOhzJ9YEndE4Fe2Pm3uRmsk0n5PQaTgWY=;
-        b=BJLS9sWm7j2zu03wD2BQIG0UKJqvE2CP5pyJAxWnjmaS+XyZhfvFdVocaHh7D4VnNc
-         bwq6OIccbZociCPc4XJO3B0ucED2EzFm31hczJ1JXgOTS01z34ayhYP/ABtn9Io1BjHd
-         hb5gPziiNywTkn476wzCqsMn9bIZjbvQlJWz+RGbi4217IFxDTtPBboEBSXpIdasaEF+
-         xaLfAKLQnBeshJj5c7Q8cTOFfvwROuyD2PdQYl/3GTIxOEPkd6DuRoR2hzxep88Uoes2
-         jpUUKbzPYEy2VF6VZuhutyx+JJwiG3iKyheODIa0diltO5Ff367Kk2zH/ct3DaiIBZCN
-         DHqg==
-X-Gm-Message-State: APjAAAVm/5QFEw3oE/Nur+SXJjQ37YKirmbw2DU5s405EoRj7kpQfx18
-        wm9zfxLTtK203YRsEiaK+I4sPVxvJG/EhIz4/pLSjlTspZwMxrno3QHdGxaBMqb5K3HqTToxo+d
-        378s5JD3L+fBF
-X-Received: by 2002:a1c:740a:: with SMTP id p10mr23104935wmc.65.1581957627971;
-        Mon, 17 Feb 2020 08:40:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwCCTrFsnWEQy/Qavf0QH4TGCt6wA1yzkQAK3IxV3vfOTUJgIEepTQUFdbvUG6+zqWkVDBsGg==
-X-Received: by 2002:a1c:740a:: with SMTP id p10mr23104922wmc.65.1581957627771;
-        Mon, 17 Feb 2020 08:40:27 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id x17sm1732096wrt.74.2020.02.17.08.40.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2020 08:40:27 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     linmiaohe <linmiaohe@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Subject: Re: [PATCH v2] KVM: VMX: Add 'else' to split mutually exclusive case
-In-Reply-To: <1581951750-17854-1-git-send-email-linmiaohe@huawei.com>
-References: <1581951750-17854-1-git-send-email-linmiaohe@huawei.com>
-Date:   Mon, 17 Feb 2020 17:40:26 +0100
-Message-ID: <87h7zp9ngl.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=et9GtBlMwNyxXKtY81oCoU0p2n7F0NO/hCNz4eL9vi4=;
+        b=dv9cz6YPVvLMaCVCf6KYoJ1ZzHm7x2OCsJVyyWt5hw0xfCyHiSQK8ZYjMJ9KWf55+z
+         mexzk5ELmjEtz6qBz3XrhCJXBMmpu1TRWT+yj6+VL3o4pg7Ofh4R2/bM4kNfwgGZZvDT
+         jxUY3Y7kWkyR9mZUjYSPFK3y5806lWpax8FDanStiFSZ+gtzvrYv8ACGwtYhjTCg2/E4
+         OHr2SO38+H8dUiG64EG4zmgTqzi4bSKBUX3f9EWzf3O80AHqYepBlxDG9+1A4uZgc12E
+         HtboddKGBcdIVJFvt49dbhRgxTZOqR3M96kbzNL3MeVSwMpXZKKCbJJAMz2ZowN6Sf1r
+         Uldg==
+X-Gm-Message-State: APjAAAWysxcQvdhg2upC6KaQ/I/iJM3y5VxDeZvOWwCR0Hk7vFiam26E
+        DFN/sGq2H+USL1iI92/c7VPZcQ==
+X-Google-Smtp-Source: APXvYqxrKwMoVogoFbUxH1yhlHkDUk5WxvIvhRaGwwYyjVjQnDoFqAia0cI5ZzRTsqQHqmWwYcFzEQ==
+X-Received: by 2002:ac8:3fa9:: with SMTP id d38mr13115689qtk.333.1581958118352;
+        Mon, 17 Feb 2020 08:48:38 -0800 (PST)
+Received: from qcai.nay.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id b12sm476086qkl.0.2020.02.17.08.48.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 17 Feb 2020 08:48:37 -0800 (PST)
+From:   Qian Cai <cai@lca.pw>
+To:     pbonzini@redhat.com
+Cc:     sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Qian Cai <cai@lca.pw>
+Subject: [PATCH v2] kvm/emulate: fix a -Werror=cast-function-type
+Date:   Mon, 17 Feb 2020 11:48:26 -0500
+Message-Id: <1581958106-16668-1-git-send-email-cai@lca.pw>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-linmiaohe <linmiaohe@huawei.com> writes:
+arch/x86/kvm/emulate.c: In function 'x86_emulate_insn':
+arch/x86/kvm/emulate.c:5686:22: error: cast between incompatible
+function types from 'int (*)(struct x86_emulate_ctxt *)' to 'void
+(*)(struct fastop *)' [-Werror=cast-function-type]
+    rc = fastop(ctxt, (fastop_t)ctxt->execute);
 
-> From: Miaohe Lin <linmiaohe@huawei.com>
->
-> Each if branch in handle_external_interrupt_irqoff() is mutually
-> exclusive. Add 'else' to make it clear and also avoid some unnecessary
-> check.
->
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
-> v1->v2:
-> add braces to all if branches
-> ---
->  arch/x86/kvm/vmx/vmx.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 9a6664886f2e..a13368b2719c 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6176,15 +6176,13 @@ static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
->  	vmx->exit_intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
->  
->  	/* if exit due to PF check for async PF */
-> -	if (is_page_fault(vmx->exit_intr_info))
-> +	if (is_page_fault(vmx->exit_intr_info)) {
->  		vmx->vcpu.arch.apf.host_apf_reason = kvm_read_and_reset_pf_reason();
-> -
->  	/* Handle machine checks before interrupts are enabled */
-> -	if (is_machine_check(vmx->exit_intr_info))
-> +	} else if (is_machine_check(vmx->exit_intr_info)) {
->  		kvm_machine_check();
-> -
->  	/* We need to handle NMIs before interrupts are enabled */
-> -	if (is_nmi(vmx->exit_intr_info)) {
-> +	} else if (is_nmi(vmx->exit_intr_info)) {
->  		kvm_before_interrupt(&vmx->vcpu);
->  		asm("int $2");
->  		kvm_after_interrupt(&vmx->vcpu);
+Fix it by using an unnamed union of a (*execute) function pointer and a
+(*fastop) function pointer.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Fixes: 3009afc6e39e ("KVM: x86: Use a typedef for fastop functions")
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Qian Cai <cai@lca.pw>
+---
 
+v2: use an unnamed union.
+
+ arch/x86/include/asm/kvm_emulate.h | 13 ++++++++++++-
+ arch/x86/kvm/emulate.c             | 36 ++++++++++++++----------------------
+ 2 files changed, 26 insertions(+), 23 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
+index 03946eb3e2b9..2a8f2bd2e5cf 100644
+--- a/arch/x86/include/asm/kvm_emulate.h
++++ b/arch/x86/include/asm/kvm_emulate.h
+@@ -292,6 +292,14 @@ enum x86emul_mode {
+ #define X86EMUL_SMM_MASK             (1 << 6)
+ #define X86EMUL_SMM_INSIDE_NMI_MASK  (1 << 7)
+ 
++/*
++ * fastop functions are declared as taking a never-defined fastop parameter,
++ * so they can't be called from C directly.
++ */
++struct fastop;
++
++typedef void (*fastop_t)(struct fastop *);
++
+ struct x86_emulate_ctxt {
+ 	const struct x86_emulate_ops *ops;
+ 
+@@ -324,7 +332,10 @@ struct x86_emulate_ctxt {
+ 	struct operand src;
+ 	struct operand src2;
+ 	struct operand dst;
+-	int (*execute)(struct x86_emulate_ctxt *ctxt);
++	union {
++		int (*execute)(struct x86_emulate_ctxt *ctxt);
++		fastop_t fop;
++	};
+ 	int (*check_perm)(struct x86_emulate_ctxt *ctxt);
+ 	/*
+ 	 * The following six fields are cleared together,
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index ddbc61984227..dd19fb3539e0 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -191,25 +191,6 @@
+ #define NR_FASTOP (ilog2(sizeof(ulong)) + 1)
+ #define FASTOP_SIZE 8
+ 
+-/*
+- * fastop functions have a special calling convention:
+- *
+- * dst:    rax        (in/out)
+- * src:    rdx        (in/out)
+- * src2:   rcx        (in)
+- * flags:  rflags     (in/out)
+- * ex:     rsi        (in:fastop pointer, out:zero if exception)
+- *
+- * Moreover, they are all exactly FASTOP_SIZE bytes long, so functions for
+- * different operand sizes can be reached by calculation, rather than a jump
+- * table (which would be bigger than the code).
+- *
+- * fastop functions are declared as taking a never-defined fastop parameter,
+- * so they can't be called from C directly.
+- */
+-
+-struct fastop;
+-
+ struct opcode {
+ 	u64 flags : 56;
+ 	u64 intercept : 8;
+@@ -311,8 +292,19 @@ static void invalidate_registers(struct x86_emulate_ctxt *ctxt)
+ #define ON64(x)
+ #endif
+ 
+-typedef void (*fastop_t)(struct fastop *);
+-
++/*
++ * fastop functions have a special calling convention:
++ *
++ * dst:    rax        (in/out)
++ * src:    rdx        (in/out)
++ * src2:   rcx        (in)
++ * flags:  rflags     (in/out)
++ * ex:     rsi        (in:fastop pointer, out:zero if exception)
++ *
++ * Moreover, they are all exactly FASTOP_SIZE bytes long, so functions for
++ * different operand sizes can be reached by calculation, rather than a jump
++ * table (which would be bigger than the code).
++ */
+ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop);
+ 
+ #define __FOP_FUNC(name) \
+@@ -5683,7 +5675,7 @@ int x86_emulate_insn(struct x86_emulate_ctxt *ctxt)
+ 
+ 	if (ctxt->execute) {
+ 		if (ctxt->d & Fastop)
+-			rc = fastop(ctxt, (fastop_t)ctxt->execute);
++			rc = fastop(ctxt, ctxt->fop);
+ 		else
+ 			rc = ctxt->execute(ctxt);
+ 		if (rc != X86EMUL_CONTINUE)
 -- 
-Vitaly
+1.8.3.1
 
