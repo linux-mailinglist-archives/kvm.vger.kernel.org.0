@@ -2,174 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 73F2416156D
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 16:02:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66F85161576
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 16:04:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729362AbgBQPC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 10:02:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21438 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729300AbgBQPC5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 10:02:57 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01HExHXK093125
-        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 10:02:55 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y6dkwqh90-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 10:02:55 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 17 Feb 2020 15:02:52 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 17 Feb 2020 15:02:50 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01HF2lUV62914606
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Feb 2020 15:02:47 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC787A405F;
-        Mon, 17 Feb 2020 15:02:46 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 983CCA405C;
-        Mon, 17 Feb 2020 15:02:46 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.211])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 17 Feb 2020 15:02:46 +0000 (GMT)
-Subject: Re: [PATCH 2/2] merge vm/cpu create
-To:     Janosch Frank <frankja@linux.ibm.com>, david@redhat.com
-Cc:     Ulrich.Weigand@de.ibm.com, cohuck@redhat.com,
-        frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
-        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
-References: <c77dbb1b-0f4b-e40a-52a4-7110aec75e32@redhat.com>
- <20200217145302.19085-1-borntraeger@de.ibm.com>
- <20200217145302.19085-3-borntraeger@de.ibm.com>
- <5c0b4baa-4113-d183-5bc6-c1e7b1f3032c@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 17 Feb 2020 16:02:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1729315AbgBQPEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 10:04:07 -0500
+Received: from foss.arm.com ([217.140.110.172]:36934 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729240AbgBQPEG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 10:04:06 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B06D30E;
+        Mon, 17 Feb 2020 07:04:06 -0800 (PST)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 556B23F703;
+        Mon, 17 Feb 2020 07:04:05 -0800 (PST)
+Date:   Mon, 17 Feb 2020 15:04:03 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v2 15/94] KVM: arm64: nv: Handle SPSR_EL2 specially
+Message-ID: <20200217150402.GE47755@lakrids.cambridge.arm.com>
+References: <20200211174938.27809-1-maz@kernel.org>
+ <20200211174938.27809-16-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5c0b4baa-4113-d183-5bc6-c1e7b1f3032c@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021715-0008-0000-0000-00000353CE89
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021715-0009-0000-0000-00004A74D4E8
-Message-Id: <fe034c64-2924-9a5d-60bd-d982c53e2e4a@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-17_08:2020-02-17,2020-02-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- adultscore=0 priorityscore=1501 mlxlogscore=850 suspectscore=0
- malwarescore=0 spamscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002170124
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200211174938.27809-16-maz@kernel.org>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 17.02.20 16:00, Janosch Frank wrote:
-> On 2/17/20 3:53 PM, Christian Borntraeger wrote:
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  arch/s390/kvm/kvm-s390.c | 55 +++++++++++++++++++++++++++++-----------
->>  1 file changed, 40 insertions(+), 15 deletions(-)
->>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index a095d9695f18..10b20e17a7fe 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -2171,9 +2171,41 @@ static int kvm_s390_set_cmma_bits(struct kvm *kvm,
->>  	return r;
->>  }
->>  
->> +static int kvm_s390_switch_from_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->> +{
->> +	int i, r = 0;
->> +
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	kvm_for_each_vcpu(i, vcpu, kvm) {
->> +		r = kvm_s390_pv_destroy_cpu(vcpu, rc, rrc);
->> +		if (r)
->> +			break;
->> +	}
->> +	return r;
->> +}
->> +
->> +static int kvm_s390_switch_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->> +{
->> +	int i, r = 0;
->> +	u16 dummy;
->> +
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	kvm_for_each_vcpu(i, vcpu, kvm) {
->> +		r = kvm_s390_pv_create_cpu(vcpu, rc, rrc);
->> +		if (r)
->> +			break;
->> +	}
->> +	if (r)
->> +		kvm_s390_switch_from_pv(kvm,&dummy, &dummy);
->> +	return r;
->> +}
+On Tue, Feb 11, 2020 at 05:48:19PM +0000, Marc Zyngier wrote:
+> SPSR_EL2 needs special attention when running nested on ARMv8.3:
 > 
-> Why does that only affect the cpus?
-> If we have a switch function it should do VM and VCPUs, no?
+> If taking an exception while running at vEL2 (actually EL1), the
+> HW will update the SPSR_EL1 register with the EL1 mode. We need
+> to track this in order to make sure that accesses to the virtual
+> view of SPSR_EL2 is correct.
+> 
+> To do so, we place an illegal value in SPSR_EL1.M, and patch it
+> accordingly if required when accessing it.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 45 ++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c            | 23 ++++++++++++--
+>  2 files changed, 66 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 486978d0346b..26552c8571cb 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -277,11 +277,51 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+>  	return __is_hyp_ctxt(&vcpu->arch.ctxt);
+>  }
+>  
+> +static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
+> +{
+> +	if (!__vcpu_el2_e2h_is_set(ctxt)) {
+> +		/*
+> +		 * Clear the .M field when writing SPSR to the CPU, so that we
+> +		 * can detect when the CPU clobbered our SPSR copy during a
+> +		 * local exception.
+> +		 */
+> +		val &= ~0xc;
 
-It is a helper function for the function below. 
+Probably worth making that UL(0xc) so that we consistently treat the
+SPSRs as 64-bits.
 
-FWIW, it also needs to take the cpu->mutex for each cpu.
+Perhaps:
 
+#define SPSR_EL2_M_3_2	UL(0xc)
+
+... so that we can use it consistently below?
+
+> +	}
+> +
+> +	return val;
+> +}
+> +
+> +static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
+> +{
+> +	if (__vcpu_el2_e2h_is_set(ctxt))
+> +		return val;
+> +
+> +	/*
+> +	 * SPSR.M == 0 means the CPU has not touched the SPSR, so the
+> +	 * register has still the value we saved on the last write.
+> +	 */
+> +	if ((val & 0xc) == 0)
+> +		return ctxt->sys_regs[SPSR_EL2];
+> +
+> +	/*
+> +	 * Otherwise there was a "local" exception on the CPU,
+
+Perhaps "exit-less" rather than "local"?
+
+Thanks,
+Mark.
+
+> +	 * which from the guest's point of view was being taken from
+> +	 * EL2 to EL2, although it actually happened to be from
+> +	 * EL1 to EL1.
+> +	 * So we need to fix the .M field in SPSR, to make it look
+> +	 * like EL2, which is what the guest would expect.
+> +	 */
+> +	return (val & ~0x0c) | CurrentEL_EL2;
+> +}
+> +
+>  static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu_mode_is_32bit(vcpu))
+>  		return vcpu_read_spsr32(vcpu);
+>  
+> +	if (unlikely(vcpu_mode_el2(vcpu)))
+> +		return vcpu_read_sys_reg(vcpu, SPSR_EL2);
+> +
+>  	if (vcpu->arch.sysregs_loaded_on_cpu)
+>  		return read_sysreg_el1(SYS_SPSR);
+>  	else
+> @@ -295,6 +335,11 @@ static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
+>  		return;
+>  	}
+>  
+> +	if (unlikely(vcpu_mode_el2(vcpu))) {
+> +		vcpu_write_sys_reg(vcpu, v, SPSR_EL2);
+> +		return;
+> +	}
+> +
+>  	if (vcpu->arch.sysregs_loaded_on_cpu)
+>  		write_sysreg_el1(v, SYS_SPSR);
+>  	else
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 64be9f452ad6..8c7d3d410689 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -258,11 +258,14 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  			goto memory_read;
+>  
+>  		/*
+> -		 * ELR_EL2 is special cased for now.
+> +		 * ELR_EL2 and SPSR_EL2 are special cased for now.
+>  		 */
+>  		switch (reg) {
+>  		case ELR_EL2:
+>  			return read_sysreg_el1(SYS_ELR);
+> +		case SPSR_EL2:
+> +			val = read_sysreg_el1(SYS_SPSR);
+> +			return __fixup_spsr_el2_read(&vcpu->arch.ctxt, val);
+>  		}
+>  
+>  		/*
+> @@ -319,6 +322,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  		case ELR_EL2:
+>  			write_sysreg_el1(val, SYS_ELR);
+>  			return;
+> +		case SPSR_EL2:
+> +			val = __fixup_spsr_el2_write(&vcpu->arch.ctxt, val);
+> +			write_sysreg_el1(val, SYS_SPSR);
+> +			return;
+>  		}
+>  
+>  		/* No EL1 counterpart? We're done here.? */
+> @@ -1589,6 +1596,18 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+> +			    struct sys_reg_params *p,
+> +			    const struct sys_reg_desc *r)
+> +{
+> +	if (p->is_write)
+> +		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
+> +	else
+> +		p->regval = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+> +
+> +	return true;
+> +}
+> +
+>  /*
+>   * Architected system registers.
+>   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> @@ -1899,7 +1918,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
+>  
+>  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+> -	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
+> +	{ SYS_DESC(SYS_SPSR_EL2), access_spsr_el2, reset_val, SPSR_EL2, 0 },
+>  	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
+>  	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+>  
+> -- 
+> 2.20.1
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
