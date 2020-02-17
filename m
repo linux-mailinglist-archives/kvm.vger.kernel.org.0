@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A5AE161084
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 12:00:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9280E161089
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 12:01:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727107AbgBQK77 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 05:59:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53657 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726267AbgBQK77 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 05:59:59 -0500
+        id S1727270AbgBQLBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 06:01:21 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51476 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726414AbgBQLBV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 06:01:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581937198;
+        s=mimecast20190719; t=1581937279;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=4LtbxmY14VvP+7JT8s/h/gdL8Ybt0EjctXKukQdkcGw=;
-        b=B4r97uLtSWVxjYbmK9tluFcaUV41AzvEwJvg6v5TRqSG8bGYr8MfO9QGBp1mQN2j00oJjL
-        uTWWgZOkdTqToUVhqD2A3vfSwtrxGU/1V5l9zq4YjDXJVSnttVXKv4AUF6e6Vtr9Tv05Mo
-        ESb9+Srdku9/3BP1A0bzeIxecxijYrY=
+        bh=EzwLwv/b+RKSYpn2Ps61Te2Rklf9yt9xcFgDgL+eO5Q=;
+        b=g6Kb9hCZJHvQtml73JR+zhYdMJ0jHbGVEugdlzd23uy5baRxa+zfMWTbmjUdkbEkxoM0Zg
+        YgQqzpN7os9CyZ0FvGoe4Qgba5BaRZanrAzffx1P/QO62uj4LaqcxPDf5/APdqvhP+S24g
+        BX/9n+yZQ+wqRjlwAFUrv4/B0yqgG90=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-ebrjW23OOWeQIHXTGy6l4g-1; Mon, 17 Feb 2020 05:59:56 -0500
-X-MC-Unique: ebrjW23OOWeQIHXTGy6l4g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-116-UKf_koGBMfeQXuF7qsmFZw-1; Mon, 17 Feb 2020 06:01:12 -0500
+X-MC-Unique: UKf_koGBMfeQXuF7qsmFZw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74FB81005512;
-        Mon, 17 Feb 2020 10:59:54 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A0DE100551A;
+        Mon, 17 Feb 2020 11:01:10 +0000 (UTC)
 Received: from [10.36.117.64] (ovpn-117-64.ams2.redhat.com [10.36.117.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1BC222CC39;
-        Mon, 17 Feb 2020 10:59:48 +0000 (UTC)
-Subject: Re: [PATCH v2 15/42] KVM: s390: protvirt: Add interruption injection
- controls
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5092827061;
+        Mon, 17 Feb 2020 11:01:04 +0000 (UTC)
+Subject: Re: [PATCH v2 19/42] KVM: s390: protvirt: Add new gprs location
+ handling
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -43,9 +43,10 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-16-borntraeger@de.ibm.com>
+ <20200214222658.12946-20-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,123 +92,89 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <f5122739-bf1d-3e10-3953-c2b3487cc91a@redhat.com>
-Date:   Mon, 17 Feb 2020 11:59:46 +0100
+Message-ID: <38b60f61-db18-ee7a-6b8e-192a7bb9d259@redhat.com>
+Date:   Mon, 17 Feb 2020 12:01:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214222658.12946-16-borntraeger@de.ibm.com>
+In-Reply-To: <20200214222658.12946-20-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 14.02.20 23:26, Christian Borntraeger wrote:
-> From: Michael Mueller <mimu@linux.ibm.com>
+> From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> This defines the necessary data structures in the SIE control block to
-> inject machine checks,external and I/O interrupts. We first define the
-> the interrupt injection control, which defines the next interrupt to
-> inject. Then we define the fields that contain the payload for machine
-> checks,external and I/O interrupts
+> Guest registers for protected guests are stored at offset 0x380.
 > 
-> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/s390/include/asm/kvm_host.h | 56 +++++++++++++++++++++++++-------
->  1 file changed, 44 insertions(+), 12 deletions(-)
+>  arch/s390/include/asm/kvm_host.h |  4 +++-
+>  arch/s390/kvm/kvm-s390.c         | 11 +++++++++++
+>  2 files changed, 14 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index c6694f47b73b..834b3b7a6e23 100644
+> index ba3364b37159..4fcbb055a565 100644
 > --- a/arch/s390/include/asm/kvm_host.h
 > +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -222,7 +222,15 @@ struct kvm_s390_sie_block {
->  	__u8	icptcode;		/* 0x0050 */
->  	__u8	icptstatus;		/* 0x0051 */
->  	__u16	ihcpu;			/* 0x0052 */
-> -	__u8	reserved54[2];		/* 0x0054 */
-> +	__u8	reserved54;		/* 0x0054 */
-> +#define IICTL_CODE_NONE		 0x00
-> +#define IICTL_CODE_MCHK		 0x01
-> +#define IICTL_CODE_EXT		 0x02
-> +#define IICTL_CODE_IO		 0x03
-> +#define IICTL_CODE_RESTART	 0x04
-> +#define IICTL_CODE_SPECIFICATION 0x10
-> +#define IICTL_CODE_OPERAND	 0x11
-> +	__u8	iictl;			/* 0x0055 */
->  	__u16	ipa;			/* 0x0056 */
->  	__u32	ipb;			/* 0x0058 */
->  	__u32	scaoh;			/* 0x005c */
-> @@ -259,24 +267,48 @@ struct kvm_s390_sie_block {
->  #define HPID_KVM	0x4
->  #define HPID_VSIE	0x5
->  	__u8	hpid;			/* 0x00b8 */
-> -	__u8	reservedb9[11];		/* 0x00b9 */
-> -	__u16	extcpuaddr;		/* 0x00c4 */
-> -	__u16	eic;			/* 0x00c6 */
-> +	__u8	reservedb9[7];		/* 0x00b9 */
-> +	union {
-> +		struct {
-> +			__u32	eiparams;	/* 0x00c0 */
-> +			__u16	extcpuaddr;	/* 0x00c4 */
-> +			__u16	eic;		/* 0x00c6 */
-> +		};
-> +		__u64	mcic;			/* 0x00c0 */
-> +	} __packed;
->  	__u32	reservedc8;		/* 0x00c8 */
-> -	__u16	pgmilc;			/* 0x00cc */
-> -	__u16	iprcc;			/* 0x00ce */
-> -	__u32	dxc;			/* 0x00d0 */
-> -	__u16	mcn;			/* 0x00d4 */
-> -	__u8	perc;			/* 0x00d6 */
-> -	__u8	peratmid;		/* 0x00d7 */
-> +	union {
-> +		struct {
-> +			__u16	pgmilc;		/* 0x00cc */
-> +			__u16	iprcc;		/* 0x00ce */
-> +		};
-> +		__u32	edc;			/* 0x00cc */
-> +	} __packed;
-> +	union {
-> +		struct {
-> +			__u32	dxc;		/* 0x00d0 */
-> +			__u16	mcn;		/* 0x00d4 */
-> +			__u8	perc;		/* 0x00d6 */
-> +			__u8	peratmid;	/* 0x00d7 */
-> +		};
-> +		__u64	faddr;			/* 0x00d0 */
-> +	} __packed;
->  	__u64	peraddr;		/* 0x00d8 */
->  	__u8	eai;			/* 0x00e0 */
->  	__u8	peraid;			/* 0x00e1 */
->  	__u8	oai;			/* 0x00e2 */
->  	__u8	armid;			/* 0x00e3 */
->  	__u8	reservede4[4];		/* 0x00e4 */
-> -	__u64	tecmc;			/* 0x00e8 */
-> -	__u8	reservedf0[12];		/* 0x00f0 */
-> +	union {
-> +		__u64	tecmc;		/* 0x00e8 */
-> +		struct {
-> +			__u16	subchannel_id;	/* 0x00e8 */
-> +			__u16	subchannel_nr;	/* 0x00ea */
-> +			__u32	io_int_parm;	/* 0x00ec */
-> +			__u32	io_int_word;	/* 0x00f0 */
-> +		};
-> +	} __packed;
-> +	__u8	reservedf4[8];		/* 0x00f4 */
->  #define CRYCB_FORMAT_MASK 0x00000003
->  #define CRYCB_FORMAT0 0x00000000
->  #define CRYCB_FORMAT1 0x00000001
+> @@ -343,7 +343,9 @@ struct kvm_s390_itdb {
+>  struct sie_page {
+>  	struct kvm_s390_sie_block sie_block;
+>  	struct mcck_volatile_info mcck_info;	/* 0x0200 */
+> -	__u8 reserved218[1000];		/* 0x0218 */
+> +	__u8 reserved218[360];		/* 0x0218 */
+> +	__u64 pv_grregs[16];		/* 0x0380 */
+> +	__u8 reserved400[512];		/* 0x0400 */
+>  	struct kvm_s390_itdb itdb;	/* 0x0600 */
+>  	__u8 reserved700[2304];		/* 0x0700 */
+>  };
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index a85e50075d99..6ebb0dae5a2e 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3999,6 +3999,7 @@ static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
+>  static int __vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+>  	int rc, exit_reason;
+> +	struct sie_page *sie_page = (struct sie_page *)vcpu->arch.sie_block;
+>  
+>  	/*
+>  	 * We try to hold kvm->srcu during most of vcpu_run (except when run-
+> @@ -4020,8 +4021,18 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>  		guest_enter_irqoff();
+>  		__disable_cpu_timer_accounting(vcpu);
+>  		local_irq_enable();
+> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+> +			memcpy(sie_page->pv_grregs,
+> +			       vcpu->run->s.regs.gprs,
+> +			       sizeof(sie_page->pv_grregs));
+> +		}
+>  		exit_reason = sie64a(vcpu->arch.sie_block,
+>  				     vcpu->run->s.regs.gprs);
+> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+> +			memcpy(vcpu->run->s.regs.gprs,
+> +			       sie_page->pv_grregs,
+> +			       sizeof(sie_page->pv_grregs));
+> +		}
+>  		local_irq_disable();
+>  		__enable_cpu_timer_accounting(vcpu);
+>  		guest_exit_irqoff();
 > 
 
-I'd just squash that into the patch where it is actually used. (IOW, the
-next one)
+As discussed, I think there is room for improvement in the future (which
+we could have documented in the patch description), because this is
+obviously sub-optimal.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
