@@ -2,88 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 289A81612C7
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 14:12:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD61D1612B5
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 14:10:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728593AbgBQNMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 08:12:51 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:37669 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727285AbgBQNMv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 08:12:51 -0500
-Received: by mail-ot1-f67.google.com with SMTP id l2so9820726otp.4;
-        Mon, 17 Feb 2020 05:12:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xyDoQXaxUnAhbcSh1pD7Fmld76RkwiIErcec174JinM=;
-        b=epRTAwIzLUTlnb+/jUX+cHtyDo7U5ekQ1QXhi8Dtx2GLxvNAwcaB7Uv0VQQxmV8ja6
-         mvbMtUMfKzn4o+a4bPe1hysnGfVg6UhfoSwKe3Eqdlpguw6o9rj5F1pDx6axSDir0hPH
-         K4pFMtOcfzc/jC3kHlze9t+Jjs7+cnWF2ffzOwB0QWAuqlFCO4PUYBv7qwBATZKyUPXO
-         DXTjXcVefk6VfasXOhLb03ByM+xyTTGfZssbYOvv3CzB+Q7LkP/pRDymT/Kmak6B6JSL
-         /jkwuwwuaeoLbuHX84scx9G2dtMYtKUs2IBeP7uMGj/Hfmqi9Z8267U5dxnaqj2t+lxe
-         CbwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xyDoQXaxUnAhbcSh1pD7Fmld76RkwiIErcec174JinM=;
-        b=nuwdCIudEnmFNCczJvbMp3NS9/rwxvTEvjKKRLpw/wDjnb4/KhBAO2spBL6Ne3zFwr
-         LC92RlR5wG7RzMbYVNRzNuT8lcfejT04LRyzlLhOHjhUSqM8rqFyGsup0lOYa2ersfqr
-         i/L8xSNmNUSn/T4K4EBe37kje2sPrI5mRyXrLH6u9OiH3p3RzZEd3j52OoOkPe0+p/ki
-         CjSb0zApnCdjHLm6zLjz8dcPsE4zkBpkkfnlF6Ga1EwSi1Vg9JzNsmWZyIGWVCyMmx0t
-         a+3hdWEQ+fjXH+QeBii1OUreZ5FfwCHToH4mCunV8vMzbh5JZ+TDrfQa9truYElv1mT6
-         jIQw==
-X-Gm-Message-State: APjAAAVy+OmHB72glnTHBdeIRzoWypxDq8FXP+RWsKTxVmoqll+knZK3
-        yeQQOuSWwtDLYnSW2ffQrJkHW8xS1XaW7RbEpLt60Q6JIkI=
-X-Google-Smtp-Source: APXvYqzfL7ZMeN9pKFsyZ9L4G9+Gn2ozS60R8nAHEorU6lGOmN4Eg5nc99nLnEbP0RSwoAMKoOvY7SshdPTjhs4leoQ=
-X-Received: by 2002:a9d:7ccd:: with SMTP id r13mr11661299otn.56.1581945170431;
- Mon, 17 Feb 2020 05:12:50 -0800 (PST)
+        id S1728063AbgBQNKk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 08:10:40 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:45252 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727497AbgBQNKk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 08:10:40 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 35A2E7B31B0D52699C31;
+        Mon, 17 Feb 2020 21:10:36 +0800 (CST)
+Received: from huawei.com (10.151.151.243) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
+ 21:10:29 +0800
+From:   Dongjiu Geng <gengdongjiu@huawei.com>
+To:     <mst@redhat.com>, <imammedo@redhat.com>,
+        <xiaoguangrong.eric@gmail.com>, <shannon.zhaosl@gmail.com>,
+        <peter.maydell@linaro.org>, <fam@euphon.net>, <rth@twiddle.net>,
+        <ehabkost@redhat.com>, <mtosatti@redhat.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
+        <qemu-arm@nongnu.org>, <pbonzini@redhat.com>,
+        <james.morse@arm.com>, <lersek@redhat.com>,
+        <jonathan.cameron@huawei.com>,
+        <shameerali.kolothum.thodi@huawei.com>
+CC:     <gengdongjiu@huawei.com>, <zhengxiang9@huawei.com>
+Subject: [PATCH v24 02/10] hw/arm/virt: Introduce a RAS machine option
+Date:   Mon, 17 Feb 2020 21:12:40 +0800
+Message-ID: <20200217131248.28273-3-gengdongjiu@huawei.com>
+X-Mailer: git-send-email 2.18.0.huawei.25
+In-Reply-To: <20200217131248.28273-1-gengdongjiu@huawei.com>
+References: <20200217131248.28273-1-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-References: <CANRm+Cz6Es1TLFdGxz_65i-4osE6=67J=noqWC6n09TeXSJ5SA@mail.gmail.com>
- <8fd7a83a-6fde-652f-0a2e-ec7b90c13616@redhat.com>
-In-Reply-To: <8fd7a83a-6fde-652f-0a2e-ec7b90c13616@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 17 Feb 2020 21:12:39 +0800
-Message-ID: <CANRm+CxZRCs6h_mffFQsX6N7KFJFFhSADR4vn1J-1OopU+UEAA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] KVM: X86: Less kvmclock sync induced vmexits after
- VM boots
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.151.151.243]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Feb 2020 at 19:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 17/02/20 11:36, Wanpeng Li wrote:
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index fb5d64e..d0ba2d4 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -9390,8 +9390,9 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
-> >      if (!kvmclock_periodic_sync)
-> >          return;
-> >
-> > -    schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
-> > -                    KVMCLOCK_SYNC_PERIOD);
-> > +    if (kvm->created_vcpus == 1)
-> > +        schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
-> > +                        KVMCLOCK_SYNC_PERIOD);
->
-> This is called with kvm->lock not held, so you can have
-> kvm->created_vcpus == 2 by the time you get here.  You can test instead
-> "if (vcpu->vcpu_idx == 0)".
+RAS Virtualization feature is not supported now, so add a RAS machine
+option and disable it by default.
 
-Agreed.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+---
+ hw/arm/virt.c         | 23 +++++++++++++++++++++++
+ include/hw/arm/virt.h |  1 +
+ 2 files changed, 24 insertions(+)
 
-    Wanpeng
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index f788fe2..9555b8b 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1823,6 +1823,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
+     vms->its = value;
+ }
+ 
++static bool virt_get_ras(Object *obj, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    return vms->ras;
++}
++
++static void virt_set_ras(Object *obj, bool value, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    vms->ras = value;
++}
++
+ static char *virt_get_gic_version(Object *obj, Error **errp)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+@@ -2126,6 +2140,15 @@ static void virt_instance_init(Object *obj)
+                                     "Valid values are none and smmuv3",
+                                     NULL);
+ 
++    /* Default disallows RAS instantiation */
++    vms->ras = false;
++    object_property_add_bool(obj, "ras", virt_get_ras,
++                             virt_set_ras, NULL);
++    object_property_set_description(obj, "ras",
++                                    "Set on/off to enable/disable reporting host memory errors "
++                                    "to a KVM guest using ACPI and guest external abort exceptions",
++                                    NULL);
++
+     vms->irqmap = a15irqmap;
+ 
+     virt_flash_create(vms);
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 71508bf..c32b7c7 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -123,6 +123,7 @@ typedef struct {
+     bool highmem_ecam;
+     bool its;
+     bool virt;
++    bool ras;
+     int32_t gic_version;
+     VirtIOMMUType iommu;
+     struct arm_boot_info bootinfo;
+-- 
+1.8.3.1
+
