@@ -2,111 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C0F1B16189F
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 18:15:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96114161900
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 18:43:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729066AbgBQRPy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 12:15:54 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58052 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728059AbgBQRPy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 12:15:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581959753;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=So9XPv62WRRlQlobfjbv7DGM07vzxCapcWtJuCnxFtQ=;
-        b=J/gdLYXDrdFqP63s11JHB+M+yMo+e7jPxmfqR55S1v5ki5pSbp1ML+ta68HhwPEObA+uyq
-        nbhAF3IqPPVk+uQkNBtUW90dkad8aIscVtz/fbv30A3qSqY5j33oIDKrksk9nttdf4qfYN
-        AY18T3Ts7Nq6aDy2tkgokkiY0y9VS5E=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-mHCqsTSkMMSJI_6IHJRpFQ-1; Mon, 17 Feb 2020 12:15:51 -0500
-X-MC-Unique: mHCqsTSkMMSJI_6IHJRpFQ-1
-Received: by mail-wr1-f69.google.com with SMTP id z15so9307156wrw.0
-        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 09:15:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=So9XPv62WRRlQlobfjbv7DGM07vzxCapcWtJuCnxFtQ=;
-        b=VIgl9mEfr+cpMl4aRoqFHKbxyfh3o9+58UITFsAvgs+xOVvwTLHqBi4yftRtSHAyTV
-         JFPPHGznR4d85VVWHjRdixuBIXROeSlj/iY5PwvghQSvdVIUwkwzU0YBsVjz0vKJNdX4
-         1JmbKl+NSyybUU7BDOeTZ22nn6gllrC20yEpbGgcov1OyeKbsSd0nRsVt3BG+9R1EEmN
-         y1feQ4Z29nk4RNd8qKzSH6T97OlyAVukL7QPnilFadsnf6+A2iWqRFRAQw+PDwzw4zFj
-         W61QExIFCPoTgQFVkR7Po/ttBx/oJuwYoyrY9GYpTrGh6lJUovqwXRdUDxeoUwvEMzVz
-         sLPg==
-X-Gm-Message-State: APjAAAV+GbEsYLEpc0wmr4e+PicsyV7DNpP9SGVyr0p/TDzWWHbwhW11
-        tkHh+N+2CnMJqdE7FtlAT8B3TCVPtzLqvk2SlZdf8+NU9K2jDwgbJONyeK4WXfKyc5d4thDmZWP
-        B/+MNR6ved5oV
-X-Received: by 2002:a1c:9646:: with SMTP id y67mr73760wmd.42.1581959750543;
-        Mon, 17 Feb 2020 09:15:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz7y8IWxspRQy16pPYhFQi9maKhxPLla3Ezv35ZwrJ/KCJ6PiM5kALcG5Usi+8wrJWxGKchZQ==
-X-Received: by 2002:a1c:9646:: with SMTP id y67mr73732wmd.42.1581959750239;
-        Mon, 17 Feb 2020 09:15:50 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:59c7:c3ee:2dec:d2b4? ([2001:b07:6468:f312:59c7:c3ee:2dec:d2b4])
-        by smtp.gmail.com with ESMTPSA id x17sm1883439wrt.74.2020.02.17.09.15.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Feb 2020 09:15:49 -0800 (PST)
-Subject: Re: [PATCH] KVM: Add the check and free to avoid unknown errors.
-To:     Haiwei Li <lihaiwei.kernel@gmail.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <aaac4289-f6b9-4ee5-eba3-5fe6a4b72645@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <33cd2fda-f863-82be-5711-8c9e4eaa7971@redhat.com>
-Date:   Mon, 17 Feb 2020 18:15:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1729479AbgBQRnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 12:43:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55860 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727428AbgBQRnS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 12:43:18 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3535420725;
+        Mon, 17 Feb 2020 17:43:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1581961397;
+        bh=lPr9M38+t5sBMw6u5u7ZBlJacBz/RdUPLYWWMEb5nNk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=tVe05Pq6lqr4xtBpglJlPSurnLCwFA+rJdqpQZJ4DlhZQQZOrU/R/SeCPdQ+BFakp
+         Ys32tvVejNhf5kOIa7yEQSSK1enWtUna1CieWb5rv+lvVLj484mHd4XD1vtZSj+Dhv
+         9RFZ4vr78BmGKFJX7E7dV67+fAnuYn03nZO/mzfc=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1j3kQN-005yzm-KA; Mon, 17 Feb 2020 17:43:15 +0000
 MIME-Version: 1.0
-In-Reply-To: <aaac4289-f6b9-4ee5-eba3-5fe6a4b72645@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 17 Feb 2020 17:43:15 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Mark Rutland <mark.rutland@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v2 12/94] KVM: arm64: nv: Add EL2->EL1 translation helpers
+In-Reply-To: <20200217145630.GD47755@lakrids.cambridge.arm.com>
+References: <20200211174938.27809-1-maz@kernel.org>
+ <20200211174938.27809-13-maz@kernel.org>
+ <20200217145630.GD47755@lakrids.cambridge.arm.com>
+Message-ID: <97f6387adfec3b96182908f3d8f074ae@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, Dave.Martin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/02/20 22:02, Haiwei Li wrote:
-> From: Haiwei Li <lihaiwei@tencent.com>
-> 
-> If 'kvm_create_vm_debugfs()' fails in 'kzalloc(sizeof(*stat_data), ...)',
-> 'kvm_destroy_vm_debugfs()' will be called by the final fput(file) in
-> 'kvm_dev_ioctl_create_vm()'.
+Hi Mark,
 
-Can you explain better?  It is okay to pass NULL to kfree.
+Congratulations, you will now be CC'd on all the subsequent postings
+of this series! Yes, I'm that nice! ;-)
 
-Paolo
+On 2020-02-17 14:56, Mark Rutland wrote:
+> On Tue, Feb 11, 2020 at 05:48:16PM +0000, Marc Zyngier wrote:
+>> Some EL2 system registers immediately affect the current execution
+>> of the system, so we need to use their respective EL1 counterparts.
+>> For this we need to define a mapping between the two.
+>> 
+>> These helpers will get used in subsequent patches.
+>> 
+>> Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/include/asm/kvm_emulate.h |  6 ++++
+>>  arch/arm64/kvm/sys_regs.c            | 48 
+>> ++++++++++++++++++++++++++++
+>>  2 files changed, 54 insertions(+)
+>> 
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h 
+>> b/arch/arm64/include/asm/kvm_emulate.h
+>> index 282e9ddbe1bc..486978d0346b 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -58,6 +58,12 @@ void kvm_emulate_nested_eret(struct kvm_vcpu 
+>> *vcpu);
+>>  int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
+>>  int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
+>> 
+>> +u64 translate_tcr(u64 tcr);
+>> +u64 translate_cptr(u64 tcr);
+>> +u64 translate_sctlr(u64 tcr);
+>> +u64 translate_ttbr0(u64 tcr);
+>> +u64 translate_cnthctl(u64 tcr);
+> 
+> Sorry to bikeshed, but could we please make the direction of 
+> translation
+> explicit in the name? e.g. tcr_el2_to_tcr_el1(), or tcr_el2_to_el1()?
 
-> Add the check and free to avoid unknown errors.
-> 
-> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
-> ---
->  virt/kvm/kvm_main.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 67ae2d5..18a32e1 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -617,8 +617,11 @@ static void kvm_destroy_vm_debugfs(struct kvm *kvm)
->      debugfs_remove_recursive(kvm->debugfs_dentry);
-> 
->      if (kvm->debugfs_stat_data) {
-> -        for (i = 0; i < kvm_debugfs_num_entries; i++)
-> +        for (i = 0; i < kvm_debugfs_num_entries; i++) {
-> +            if (!kvm->debugfs_stat_data[i])
-> +                break;
->              kfree(kvm->debugfs_stat_data[i]);
-> +        }
->          kfree(kvm->debugfs_stat_data);
->      }
->  }
-> -- 
-> 1.8.3.1
-> 
+Sure, that's an easy one!
 
+> 
+>> +
+>>  static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+>>  {
+>>  	return !(vcpu->arch.hcr_el2 & HCR_RW);
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 4b5310ea3bf8..634d3ee6799c 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -65,6 +65,54 @@ static bool write_to_read_only(struct kvm_vcpu 
+>> *vcpu,
+>>  	return false;
+>>  }
+>> 
+>> +static u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
+>> +{
+>> +	return ((tcr_el2 & TCR_EL2_PS_MASK) >> TCR_EL2_PS_SHIFT)
+>> +		<< TCR_IPS_SHIFT;
+>> +}
+>> +
+>> +u64 translate_tcr(u64 tcr)
+>> +{
+>> +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
+>> +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
+>> +	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
+>> +	       (tcr & TCR_EL2_TG0_MASK) |
+>> +	       (tcr & TCR_EL2_ORGN0_MASK) |
+>> +	       (tcr & TCR_EL2_IRGN0_MASK) |
+>> +	       (tcr & TCR_EL2_T0SZ_MASK);
+>> +}
+> 
+> I'm guessing this is only meant to cover a !VHE guest EL2 for the
+> moment, so only covers HCR_EL2.E2H=0? It might be worth mentioning in
+> the commit message.
+
+Indeed, all the "translate_*" function have a single purpose: converting
+an !VHE EL2 layout into an EL1 layout.
+
+> It looks like this is missing some bits (e.g. TBID, HPD, HD, HA) that
+> could apply to the Guest-EL2 Stage-1. Maybe those are added by later
+> patches, but that's not obvious to me at this point in the series.
+
+ARMv8.3-PAUTH isn't supported, and ARMv8.1-TTHM cannot be supported at
+Stage-2, so we don't support it at Stage-1 either (even if we 
+technically
+could). Maybe worth suggesting to the powers that be...
+
+ARMv8.1-HPD is an oversight though, and we should be able to support it.
+
+> 
+>> +
+>> +u64 translate_cptr(u64 cptr_el2)
+>> +{
+>> +	u64 cpacr_el1 = 0;
+>> +
+>> +	if (!(cptr_el2 & CPTR_EL2_TFP))
+>> +		cpacr_el1 |= CPACR_EL1_FPEN;
+>> +	if (cptr_el2 & CPTR_EL2_TTA)
+>> +		cpacr_el1 |= CPACR_EL1_TTA;
+>> +	if (!(cptr_el2 & CPTR_EL2_TZ))
+>> +		cpacr_el1 |= CPACR_EL1_ZEN;
+>> +
+>> +	return cpacr_el1;
+>> +}
+> 
+> Looking in ARM DDI 0487E.a I also see TCPAC and TAM; I guess we don't
+> need to map those to anthing?
+
+TCPAC allows us to trap CPACR_EL1, but we always have the physical
+CPTR_EL2.TCPAC set in this case, so that bit doesn't need to translate
+into anything.
+
+TAM doesn't seem to translate into anything in CPACR_EL1, and I don't
+plan to support the AMU any time soon with NV! ;-)
+
+> 
+>> +
+>> +u64 translate_sctlr(u64 sctlr)
+>> +{
+>> +	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
+>> +	return sctlr | BIT(20);
+>> +}
+> 
+> Looking in ARM DDI 0487E.a section D13.2.105, bit 20 is TSCXT, so this
+> might need to be reconsidered.
+
+Huhuh, nice catch! We need to detect ARMv8.0-CSV2 here, and set the bit
+accordingly.
+
+> 
+>> +
+>> +u64 translate_ttbr0(u64 ttbr0)
+>> +{
+>> +	/* Force ASID to 0 (ASID 0 or RES0) */
+>> +	return ttbr0 & ~GENMASK_ULL(63, 48);
+>> +}
+> 
+> Again, I assume this is only meant to provide a !VHE EL2 as this 
+> stands.
+
+Indeed. I guess I need to write a better commit message to make this 
+clear.
+
+> 
+>> +
+>> +u64 translate_cnthctl(u64 cnthctl)
+>> +{
+>> +	return ((cnthctl & 0x3) << 10) | (cnthctl & 0xfc);
+>> +}
+> 
+> I assume this yields CNTKCTL_EL1, but I don't entirely follow. For
+> virtual-EL2 don't we have to force EL1P(C)TEN so that virtual-EL2
+> accesses don't trap?
+
+A non-VHE guest will use the _EL2 instructions to access its own timer,
+which will trap. At the same time, we use the EL1 timer to implement
+the vEL2 timer, meaning we also need to trap the EL1 timer. Yes, !VHE
+looses on all fronts.
+
+We could treat !VHE specially in the wap we map timers (complete 
+emulation
+for vEL2, and direct access for guest timers). But this seems pretty
+complex for very little gain.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
