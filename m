@@ -2,79 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A3BCC161559
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 16:01:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73F2416156D
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 16:02:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729361AbgBQPBH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 10:01:07 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:10632 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729315AbgBQPBH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 10:01:07 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id A2B23B6A8D864C6AB5DD;
-        Mon, 17 Feb 2020 23:01:01 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
- 23:00:53 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <hpa@zytor.com>
-CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH v2] KVM: VMX: Add 'else' to split mutually exclusive case
-Date:   Mon, 17 Feb 2020 23:02:30 +0800
-Message-ID: <1581951750-17854-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1729362AbgBQPC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 10:02:57 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21438 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729300AbgBQPC5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 10:02:57 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01HExHXK093125
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 10:02:55 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y6dkwqh90-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 10:02:55 -0500
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 17 Feb 2020 15:02:52 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 17 Feb 2020 15:02:50 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01HF2lUV62914606
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Feb 2020 15:02:47 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EC787A405F;
+        Mon, 17 Feb 2020 15:02:46 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 983CCA405C;
+        Mon, 17 Feb 2020 15:02:46 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.211])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Feb 2020 15:02:46 +0000 (GMT)
+Subject: Re: [PATCH 2/2] merge vm/cpu create
+To:     Janosch Frank <frankja@linux.ibm.com>, david@redhat.com
+Cc:     Ulrich.Weigand@de.ibm.com, cohuck@redhat.com,
+        frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
+        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
+References: <c77dbb1b-0f4b-e40a-52a4-7110aec75e32@redhat.com>
+ <20200217145302.19085-1-borntraeger@de.ibm.com>
+ <20200217145302.19085-3-borntraeger@de.ibm.com>
+ <5c0b4baa-4113-d183-5bc6-c1e7b1f3032c@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Mon, 17 Feb 2020 16:02:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
+In-Reply-To: <5c0b4baa-4113-d183-5bc6-c1e7b1f3032c@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021715-0008-0000-0000-00000353CE89
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021715-0009-0000-0000-00004A74D4E8
+Message-Id: <fe034c64-2924-9a5d-60bd-d982c53e2e4a@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-17_08:2020-02-17,2020-02-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ adultscore=0 priorityscore=1501 mlxlogscore=850 suspectscore=0
+ malwarescore=0 spamscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002170124
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
 
-Each if branch in handle_external_interrupt_irqoff() is mutually
-exclusive. Add 'else' to make it clear and also avoid some unnecessary
-check.
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
-v1->v2:
-add braces to all if branches
----
- arch/x86/kvm/vmx/vmx.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+On 17.02.20 16:00, Janosch Frank wrote:
+> On 2/17/20 3:53 PM, Christian Borntraeger wrote:
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  arch/s390/kvm/kvm-s390.c | 55 +++++++++++++++++++++++++++++-----------
+>>  1 file changed, 40 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index a095d9695f18..10b20e17a7fe 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -2171,9 +2171,41 @@ static int kvm_s390_set_cmma_bits(struct kvm *kvm,
+>>  	return r;
+>>  }
+>>  
+>> +static int kvm_s390_switch_from_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
+>> +{
+>> +	int i, r = 0;
+>> +
+>> +	struct kvm_vcpu *vcpu;
+>> +
+>> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+>> +		r = kvm_s390_pv_destroy_cpu(vcpu, rc, rrc);
+>> +		if (r)
+>> +			break;
+>> +	}
+>> +	return r;
+>> +}
+>> +
+>> +static int kvm_s390_switch_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
+>> +{
+>> +	int i, r = 0;
+>> +	u16 dummy;
+>> +
+>> +	struct kvm_vcpu *vcpu;
+>> +
+>> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+>> +		r = kvm_s390_pv_create_cpu(vcpu, rc, rrc);
+>> +		if (r)
+>> +			break;
+>> +	}
+>> +	if (r)
+>> +		kvm_s390_switch_from_pv(kvm,&dummy, &dummy);
+>> +	return r;
+>> +}
+> 
+> Why does that only affect the cpus?
+> If we have a switch function it should do VM and VCPUs, no?
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9a6664886f2e..a13368b2719c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6176,15 +6176,13 @@ static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
- 	vmx->exit_intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
- 
- 	/* if exit due to PF check for async PF */
--	if (is_page_fault(vmx->exit_intr_info))
-+	if (is_page_fault(vmx->exit_intr_info)) {
- 		vmx->vcpu.arch.apf.host_apf_reason = kvm_read_and_reset_pf_reason();
--
- 	/* Handle machine checks before interrupts are enabled */
--	if (is_machine_check(vmx->exit_intr_info))
-+	} else if (is_machine_check(vmx->exit_intr_info)) {
- 		kvm_machine_check();
--
- 	/* We need to handle NMIs before interrupts are enabled */
--	if (is_nmi(vmx->exit_intr_info)) {
-+	} else if (is_nmi(vmx->exit_intr_info)) {
- 		kvm_before_interrupt(&vmx->vcpu);
- 		asm("int $2");
- 		kvm_after_interrupt(&vmx->vcpu);
--- 
-2.19.1
+It is a helper function for the function below. 
+
+FWIW, it also needs to take the cpu->mutex for each cpu.
 
