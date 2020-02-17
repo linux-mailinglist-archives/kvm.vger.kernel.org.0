@@ -2,190 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D8186161460
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 15:17:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C298C161479
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 15:23:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728574AbgBQOQ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 09:16:56 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46065 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727898AbgBQOQ4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 09:16:56 -0500
+        id S1728688AbgBQOXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 09:23:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20585 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728589AbgBQOXd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 09:23:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581949015;
+        s=mimecast20190719; t=1581949411;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=X5owJ1Q5kyCcEn/wK666suwQNxuxUfzmbCXN/IZugIc=;
-        b=Ql/QslLIYBgfgKNU7L0Xfdjyx8FBxDJ4HLpO6fHytDF2YVc/hw42J0d20hJz69sd1geY44
-        tiYj9X0ud2lRGGkXm7dgjFVocdKavaaxMKDqMl0e2jq01gLKHCMgEDNwAoJyiQdGaW9hgx
-        m/iCr1EGVIH+qsxZdlaxS7OMBZSn25E=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-RYKALqOPOJColw7288Yrkw-1; Mon, 17 Feb 2020 09:16:50 -0500
-X-MC-Unique: RYKALqOPOJColw7288Yrkw-1
-Received: by mail-wm1-f72.google.com with SMTP id 7so6273938wmf.9
-        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 06:16:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=X5owJ1Q5kyCcEn/wK666suwQNxuxUfzmbCXN/IZugIc=;
-        b=UCasv6+W8+jJtzwM4QU7d3qKkVhr/s+I76txEr0rY5+pzzrqArUfT3k3K6rJqS1xad
-         PMoRnnOikvmeRu7c6dzQ3B/vFSF87ZGbunKAQzbj4lGOVOe1L4dWSreoO/EBoT1uTi+y
-         Buxsqp5ca61ZhOvsH5t060zNcZ8fp3pe6xpjZe7GvJBuSClEG6PtkExA5MPUfHNVhgbs
-         WQnqMwr+5R34rIbA7+SmLUXhTPiWIpB0ILxn7ZcBZOCvWGCxBuPulw3CmmtUE5sXbb+X
-         RCeI/dZrnAsqQ3CE3NgggCNTa6q3W+j0XO4afbqmOadz1OAzSpeUseHN8EbarWtQ0Ds7
-         WNwA==
-X-Gm-Message-State: APjAAAUNCIdBJEJnXpB/wWTPXf2ypIfec6I6MZGIeUI0JETGe1QI1XmO
-        o75jXxNvNXoNBCrdJl43cBFGGbvEqIwSpQ+YLm/LHfiB5po8YvfiriPza3qyOAu6pfh06HAxg7F
-        grMu4kQ3g485m
-X-Received: by 2002:a1c:ddc3:: with SMTP id u186mr22709060wmg.103.1581949008356;
-        Mon, 17 Feb 2020 06:16:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzY6ppV8fkLLxTSONFBrhFjjhdBJrSKf63MFZ71BdYb8RtzZ2UHi8XTjoJ9gzQ6Hi134wRxyw==
-X-Received: by 2002:a1c:ddc3:: with SMTP id u186mr22709044wmg.103.1581949008070;
-        Mon, 17 Feb 2020 06:16:48 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id u62sm830661wmu.17.2020.02.17.06.16.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2020 06:16:47 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Subject: Re: [PATCH v2 2/2] KVM: Pre-allocate 1 cpumask variable per cpu for both pv tlb and pv ipis
-In-Reply-To: <CANRm+Cz_gskKwa0SU0PUhtacj3Ovm_MmBASDJHOECsnYz=jxkg@mail.gmail.com>
-References: <CANRm+CxGOeGQ0vV9ueBgjUDvkzH29EQWLe4GQGDvOhm3idM6NQ@mail.gmail.com> <871rqtbcve.fsf@vitty.brq.redhat.com> <CANRm+Cz_gskKwa0SU0PUhtacj3Ovm_MmBASDJHOECsnYz=jxkg@mail.gmail.com>
-Date:   Mon, 17 Feb 2020 15:16:46 +0100
-Message-ID: <87y2t19u41.fsf@vitty.brq.redhat.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=F/O9sptek+ABp6xrkpuILOZTNwe+EXM+HzSfwXk2MfY=;
+        b=Npp+GssroYZpghbLOXnwZHHCjMGESoDdTxWNQQ7SkSA/X1+DjRxUyU5GS+WeeS2OIoQSET
+        L6ruayuRUCmO+8zFcm48kctS3yQRrU2eNnLuDbH41q8Tv8yVnQhLYuhN1m+m6UAM7siCmq
+        7PT22IvNUFP8Q4ZDtF6+DFsscSb1JdM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48-yvq3T5SOOLeGN91Kf9Dw8Q-1; Mon, 17 Feb 2020 09:23:26 -0500
+X-MC-Unique: yvq3T5SOOLeGN91Kf9Dw8Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81CE7800D5A;
+        Mon, 17 Feb 2020 14:23:24 +0000 (UTC)
+Received: from [10.36.117.64] (ovpn-117-64.ams2.redhat.com [10.36.117.64])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 62CDE19757;
+        Mon, 17 Feb 2020 14:23:19 +0000 (UTC)
+Subject: Re: [PATCH v2 22/42] KVM: s390/mm: handle guest unpin events
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-23-borntraeger@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <b080c452-4b22-d0b6-75d4-8848bd152fa4@redhat.com>
+Date:   Mon, 17 Feb 2020 15:23:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200214222658.12946-23-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+On 14.02.20 23:26, Christian Borntraeger wrote:
+> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> 
+> The current code tries to first pin shared pages, if that fails (e.g.
+> because the page is not shared) it will export them. For shared pages
+> this means that we get a new intercept telling us that the guest is
+> unsharing that page. We will make the page secure at that point in time
+> and revoke the host access. This is synchronized with other host events,
+> e.g. the code will wait until host I/O has finished.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/kvm/intercept.c | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+> index 6c9db886381c..1e231058e4b3 100644
+> --- a/arch/s390/kvm/intercept.c
+> +++ b/arch/s390/kvm/intercept.c
+> @@ -16,6 +16,7 @@
+>  #include <asm/asm-offsets.h>
+>  #include <asm/irq.h>
+>  #include <asm/sysinfo.h>
+> +#include <asm/uv.h>
+>  
+>  #include "kvm-s390.h"
+>  #include "gaccess.h"
+> @@ -484,12 +485,35 @@ static int handle_pv_sclp(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +static int handle_pv_uvc(struct kvm_vcpu *vcpu)
+> +{
+> +	struct uv_cb_share *guest_uvcb = (void *)vcpu->arch.sie_block->sidad;
+> +	struct uv_cb_cts uvcb = {
+> +		.header.cmd	= UVC_CMD_UNPIN_PAGE_SHARED,
+> +		.header.len	= sizeof(uvcb),
+> +		.guest_handle	= kvm_s390_pv_handle(vcpu->kvm),
+> +		.gaddr		= guest_uvcb->paddr,
+> +	};
+> +	int rc;
+> +
+> +	if (guest_uvcb->header.cmd != UVC_CMD_REMOVE_SHARED_ACCESS) {
+> +		WARN_ONCE(1, "Unexpected UVC 0x%x!\n", guest_uvcb->header.cmd);
+> +		return 0;
+> +	}
+> +	rc = gmap_make_secure(vcpu->arch.gmap, uvcb.gaddr, &uvcb);
+> +	if (rc == -EINVAL)
+> +		return 0;
+> +	return rc;
+> +}
+> +
+>  static int handle_pv_notification(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu->arch.sie_block->ipa == 0xb210)
+>  		return handle_pv_spx(vcpu);
+>  	if (vcpu->arch.sie_block->ipa == 0xb220)
+>  		return handle_pv_sclp(vcpu);
+> +	if (vcpu->arch.sie_block->ipa == 0xb9a4)
+> +		return handle_pv_uvc(vcpu);
+>  
+>  	return handle_instruction(vcpu);
+>  }
+> 
 
-> On Mon, 17 Feb 2020 at 20:46, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->>
->> Wanpeng Li <kernellwp@gmail.com> writes:
->>
->> > From: Wanpeng Li <wanpengli@tencent.com>
->> >
->> > Nick Desaulniers Reported:
->> >
->> >   When building with:
->> >   $ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
->> >   The following warning is observed:
->> >   arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
->> >   function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
->> >   static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
->> >   vector)
->> >               ^
->> >   Debugging with:
->> >   https://github.com/ClangBuiltLinux/frame-larger-than
->> >   via:
->> >   $ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
->> >     kvm_send_ipi_mask_allbutself
->> >   points to the stack allocated `struct cpumask newmask` in
->> >   `kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
->> >   potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
->> >   the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
->> >   8192, making a single instance of a `struct cpumask` 1024 B.
->> >
->> > This patch fixes it by pre-allocate 1 cpumask variable per cpu and use it for
->> > both pv tlb and pv ipis..
->> >
->> > Reported-by: Nick Desaulniers <ndesaulniers@google.com>
->> > Acked-by: Nick Desaulniers <ndesaulniers@google.com>
->> > Cc: Peter Zijlstra <peterz@infradead.org>
->> > Cc: Nick Desaulniers <ndesaulniers@google.com>
->> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->> > ---
->> > v1 -> v2:
->> >  * remove '!alloc' check
->> >  * use new pv check helpers
->> >
->> >  arch/x86/kernel/kvm.c | 33 +++++++++++++++++++++------------
->> >  1 file changed, 21 insertions(+), 12 deletions(-)
->> >
->> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->> > index 76ea8c4..377b224 100644
->> > --- a/arch/x86/kernel/kvm.c
->> > +++ b/arch/x86/kernel/kvm.c
->> > @@ -432,6 +432,8 @@ static bool pv_tlb_flush_supported(void)
->> >          kvm_para_has_feature(KVM_FEATURE_STEAL_TIME));
->> >  }
->> >
->> > +static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
->> > +
->> >  #ifdef CONFIG_SMP
->> >
->> >  static bool pv_ipi_supported(void)
->> > @@ -510,12 +512,12 @@ static void kvm_send_ipi_mask(const struct
->> > cpumask *mask, int vector)
->> >  static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask,
->> > int vector)
->> >  {
->> >      unsigned int this_cpu = smp_processor_id();
->> > -    struct cpumask new_mask;
->> > +    struct cpumask *new_mask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
->> >      const struct cpumask *local_mask;
->> >
->> > -    cpumask_copy(&new_mask, mask);
->> > -    cpumask_clear_cpu(this_cpu, &new_mask);
->> > -    local_mask = &new_mask;
->> > +    cpumask_copy(new_mask, mask);
->> > +    cpumask_clear_cpu(this_cpu, new_mask);
->> > +    local_mask = new_mask;
->> >      __send_ipi_mask(local_mask, vector);
->> >  }
->> >
->> > @@ -595,7 +597,6 @@ static void __init kvm_apf_trap_init(void)
->> >      update_intr_gate(X86_TRAP_PF, async_page_fault);
->> >  }
->> >
->> > -static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
->> >
->> >  static void kvm_flush_tlb_others(const struct cpumask *cpumask,
->> >              const struct flush_tlb_info *info)
->> > @@ -603,7 +604,7 @@ static void kvm_flush_tlb_others(const struct
->> > cpumask *cpumask,
->> >      u8 state;
->> >      int cpu;
->> >      struct kvm_steal_time *src;
->> > -    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_tlb_mask);
->> > +    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
->> >
->> >      cpumask_copy(flushmask, cpumask);
->> >      /*
->> > @@ -642,6 +643,7 @@ static void __init kvm_guest_init(void)
->> >      if (pv_tlb_flush_supported()) {
->> >          pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
->> >          pv_ops.mmu.tlb_remove_table = tlb_remove_table;
->> > +        pr_info("KVM setup pv remote TLB flush\n");
->>
->> Nit: to be consistent with __send_ipi_mask() the message should be
->> somthing like
->>
->> "KVM: switch to using PV TLB flush"
->
-> There is a lot of native ops we replace by pv ops in kvm.c, I use "KVM
-> setup xxx" there, like pv ipis, pv tlb flush, pv sched yield, should
-> we keep consistent as before?
->
-
-Oh, I see, it's either one or another :-) Personally, I prefer when
-subsystem is delimited with ':' so if we were to change them all I'd
-prefer the "KVM: switch to using PV TLB flush" (__send_ipi_mask()
-style). But this looks more like a separate patch idea, we can discuss
-our personal preferences there :-)
+Acked-by: David Hildenbrand <david@redhat.com>
 
 -- 
-Vitaly
+Thanks,
+
+David / dhildenb
 
