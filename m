@@ -2,102 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C32516163B
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 16:33:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0D7D161648
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 16:35:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728441AbgBQPdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 10:33:24 -0500
-Received: from foss.arm.com ([217.140.110.172]:37460 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728404AbgBQPdY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 10:33:24 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B8BDD30E;
-        Mon, 17 Feb 2020 07:33:23 -0800 (PST)
-Received: from [10.1.196.37] (e121345-lin.cambridge.arm.com [10.1.196.37])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE7333F703;
-        Mon, 17 Feb 2020 07:33:22 -0800 (PST)
-Subject: Re: [PATCH 1/2] KVM: arm64: Add PMU event filtering infrastructure
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        id S1728924AbgBQPfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 10:35:14 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34447 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727976AbgBQPfM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 10:35:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581953710;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=I94s+/OW2nmFtGVziJ+53lmgRDQEQNRHpvcvNRvPjFg=;
+        b=Uz9oWtwLYuCDLZQ6pGFOwN47vY9HVwUFSrs6OYzi17EliHIAvWEJWBDXU1KnnqjO1Qgo8T
+        xrYTr6NuHPWYBLmDFbiTNRdofkeKrdz5UTRmOqt1AeUJToSUKMZX/PXsQPC5dX8XgqEG6Y
+        mQ3yUoLOOyZgdugMWOqPRGFoIGSfsRg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-chZOztYdMdiqHlQtSLD1_A-1; Mon, 17 Feb 2020 10:35:08 -0500
+X-MC-Unique: chZOztYdMdiqHlQtSLD1_A-1
+Received: by mail-wr1-f69.google.com with SMTP id d15so9125904wru.1
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 07:35:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=I94s+/OW2nmFtGVziJ+53lmgRDQEQNRHpvcvNRvPjFg=;
+        b=tdQIlN6swfrDd0hSUA4U0fvLyBJTI5KW2IJja0rNnbzTqDDNhPlA9gPctpHpzZVI++
+         9X/CdK113cj0EkSbJy0svLvuIMguhFtxl2D2EqCC4bG81oR7rtDGSc4Iu+TeVNXl1lWi
+         XWiH5fj+GLpvNskxL28CuGd4oqlc/X4DA5lE4Vf3NJkHH0TRHsAVUg85sfJ/pDE4E+pv
+         pDO/t3eQyNM369LlIxBzt9OrgIN2PVpJ+2WAh9cwI6z2TAWb4Md6kNkrbyM7BABOSJ/0
+         NlsWYbxmH7c+KqaMDkJR4vqwDy+nYe8aFr/3w8W2cPjFzUs6PCbSnRhuHGGwbpRna4sU
+         ipRQ==
+X-Gm-Message-State: APjAAAU2Dk/gPhzgucDRt175KgsfSA4S29TFAVv/qpKPoCBAyZelZybc
+        jKZSNYn9OU5n4LX4HfPKJFNu7q37pRW5pvV5vygyj4EHro6a05xKBLggzC9zyq+zAR9OtC99/Re
+        3FCYDwQKEcLKk
+X-Received: by 2002:a7b:cd8e:: with SMTP id y14mr22883678wmj.150.1581953707731;
+        Mon, 17 Feb 2020 07:35:07 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw70CrrrSfMwVWl7qnn5bAkrGx2tWvnt4qyiyI0/zrMUKDzlnUG9J1tN9btzikV0/JwRnl8xw==
+X-Received: by 2002:a7b:cd8e:: with SMTP id y14mr22883657wmj.150.1581953707447;
+        Mon, 17 Feb 2020 07:35:07 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id y8sm1018221wma.10.2020.02.17.07.35.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Feb 2020 07:35:06 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200214183615.25498-1-maz@kernel.org>
- <20200214183615.25498-2-maz@kernel.org>
- <ac2a8a87-3a90-1abb-30a5-00c20667cd14@arm.com> <868sl46t60.wl-maz@kernel.org>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <5d7a2907-f12c-0add-c020-c927aad50feb@arm.com>
-Date:   Mon, 17 Feb 2020 15:33:21 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v5 15/19] KVM: Provide common implementation for generic dirty log functions
+In-Reply-To: <20200207194532.GK2401@linux.intel.com>
+References: <20200121223157.15263-1-sean.j.christopherson@intel.com> <20200121223157.15263-16-sean.j.christopherson@intel.com> <20200206200200.GC700495@xz-x1> <20200206212120.GF13067@linux.intel.com> <20200206214106.GG700495@xz-x1> <20200207194532.GK2401@linux.intel.com>
+Date:   Mon, 17 Feb 2020 16:35:05 +0100
+Message-ID: <87v9o59qhi.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <868sl46t60.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/02/2020 10:28 am, Marc Zyngier wrote:
-> On Fri, 14 Feb 2020 22:01:01 +0000,
-> Robin Murphy <robin.murphy@arm.com> wrote:
-> 
-> Hi Robin,
-> 
->>
->> Hi Marc,
->>
->> On 2020-02-14 6:36 pm, Marc Zyngier wrote:
->> [...]
->>> @@ -585,6 +585,14 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->>>    	    pmc->idx != ARMV8_PMU_CYCLE_IDX)
->>>    		return;
->>>    +	/*
->>> +	 * If we have a filter in place and that the event isn't allowed, do
->>> +	 * not install a perf event either.
->>> +	 */
->>> +	if (vcpu->kvm->arch.pmu_filter &&
->>> +	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
->>> +		return;
->>
->> If I'm reading the derivation of eventsel right, this will end up
->> treating cycle counter events (aliased to SW_INCR) differently from
->> CPU_CYCLES, which doesn't seem desirable.
-> 
-> Indeed, this doesn't look quite right.
-> 
-> Looking at the description of event 0x11, it doesn't seem to count
-> exactly like the cycle counter (there are a number of PMCR controls
-> affecting it). But none of these actually apply to our PMU emulation
-> (no secure mode, and the idea of dealing with virtual EL2 in the
-> context of the PMU is... not appealing).
-> 
-> Now, given that we implement the cycle counter with event 0x11 anyway,
-> I don't think there is any reason to deal with them separately.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-Right, from the user's PoV they can only ask for event 0x11, and where 
-it gets scheduled is more of a black-box implementation detail. Reading 
-the Arm ARM doesn't leave me entirely convinced that cycles couldn't 
-ever leak idle/not-idle information between closely-coupled PEs, so this 
-might not be entirely academic.
+> +Vitaly for HyperV
+>
+> On Thu, Feb 06, 2020 at 04:41:06PM -0500, Peter Xu wrote:
+>> On Thu, Feb 06, 2020 at 01:21:20PM -0800, Sean Christopherson wrote:
+>> > On Thu, Feb 06, 2020 at 03:02:00PM -0500, Peter Xu wrote:
+>> > > But that matters to this patch because if MIPS can use
+>> > > kvm_flush_remote_tlbs(), then we probably don't need this
+>> > > arch-specific hook any more and we can directly call
+>> > > kvm_flush_remote_tlbs() after sync dirty log when flush==true.
+>> > 
+>> > Ya, the asid_flush_mask in kvm_vz_flush_shadow_all() is the only thing
+>> > that prevents calling kvm_flush_remote_tlbs() directly, but I have no
+>> > clue as to the important of that code.
+>> 
+>> As said above I think the x86 lockdep is really not necessary, then
+>> considering MIPS could be the only one that will use the new hook
+>> introduced in this patch...  Shall we figure that out first?
+>
+> So I prepped a follow-up patch to make kvm_arch_dirty_log_tlb_flush() a
+> MIPS-only hook and use kvm_flush_remote_tlbs() directly for arm and x86,
+> but then I realized x86 *has* a hook to do a precise remote TLB flush.
+> There's even an existing kvm_flush_remote_tlbs_with_address() call on a
+> memslot, i.e. this exact scenario.  So arguably, x86 should be using the
+> more precise flush and should keep kvm_arch_dirty_log_tlb_flush().
+>
+> But, the hook is only used when KVM is running as an L1 on top of HyperV,
+> and I assume dirty logging isn't used much, if at all, for L1 KVM on
+> HyperV?
 
->> Also, if the user did try to blacklist SW_INCR for ridiculous
->> reasons, we'd need to special-case kvm_pmu_software_increment() to
->> make it (not) work as expected, right?
-> 
-> I thought of that one, and couldn't see a reason to blacklist it
-> (after all, the guest could also increment a variable) and send itself
-> an interrupt. I'm tempted to simply document that event 0 is never
-> filtered.
+(Sorry for the delayed reply, was traveling last week)
 
-I'd say you're on even stronger ground simply because KVM's 
-implementation of SW_INCR doesn't go near the PMU hardware at all, thus 
-is well beyond the purpose of the blacklist anyway. I believe it's 
-important that how the code behaves matches expectations, but there's no 
-harm in changing the latter as appropriate ;)
+When KVM runs as an L1 on top of Hyper-V it uses eVMCS by default and
+eVMCSv1 doesn't support PML. I've also just checked Hyper-V 2019 and it
+hides SECONDARY_EXEC_ENABLE_PML from guests (this was expected).
 
-Cheers,
-Robin.
+>
+> I see three options:
+>
+>   1. Make kvm_arch_dirty_log_tlb_flush() MIPS-only and call
+>      kvm_flush_remote_tlbs() directly for arm and x86.  Add comments to
+>      explain when an arch should implement kvm_arch_dirty_log_tlb_flush().
+>
+>   2. Change x86 to use kvm_flush_remote_tlbs_with_address() when flushing
+>      a memslot after the dirty log is grabbed by userspace.
+>
+>   3. Keep the resulting code as is, but add a comment in x86's
+>      kvm_arch_dirty_log_tlb_flush() to explain why it uses
+>      kvm_flush_remote_tlbs() instead of the with_address() variant.
+>
+> I strongly prefer to (2) or (3), but I'll defer to Vitaly as to which of
+> those is preferable.
+
+I'd vote for (2): while this will effectively be kvm_flush_remote_tlbs()
+for now, we may think of something smarter in the future (e.g. PV
+interface for KVM-on-KVM).
+
+>
+> I don't like (1) because (a) it requires more lines code (well comments),
+> to explain why kvm_flush_remote_tlbs() is the default, and (b) it would
+> require even more comments, which would be x86-specific in generic KVM,
+> to explain why x86 doesn't use its with_address() flush, or we'd lost that
+> info altogether.
+>
+
+-- 
+Vitaly
+
