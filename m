@@ -2,71 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D8EB160E0C
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 10:07:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D48D160E16
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 10:10:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728665AbgBQJHj convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 17 Feb 2020 04:07:39 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2579 "EHLO huawei.com"
+        id S1728714AbgBQJKI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 04:10:08 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:10186 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728388AbgBQJHj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 04:07:39 -0500
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
-        by Forcepoint Email with ESMTP id 990698DDFA6D29E9FA0B;
-        Mon, 17 Feb 2020 17:07:36 +0800 (CST)
-Received: from dggeme765-chm.china.huawei.com (10.3.19.111) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 17 Feb 2020 17:07:36 +0800
-Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme765-chm.china.huawei.com (10.3.19.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Mon, 17 Feb 2020 17:07:36 +0800
-Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
- dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Mon, 17 Feb 2020 17:07:36 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
-Subject: Re: [PATCH] KVM: x86: Fix print format and coding style
-Thread-Topic: [PATCH] KVM: x86: Fix print format and coding style
-Thread-Index: AdXlcVqOLoEtSnfjyUCXI/9+r0L0Xg==
-Date:   Mon, 17 Feb 2020 09:07:36 +0000
-Message-ID: <5e83fce88d5a4b589c2c91883da23688@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.158]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1728272AbgBQJKI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 04:10:08 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 2DA1CB514C6D5A13730F;
+        Mon, 17 Feb 2020 17:10:04 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
+ 17:09:57 +0800
+Subject: Re: [PATCH v4 03/20] irqchip/gic-v4.1: Advertise support v4.1 to KVM
+To:     Marc Zyngier <maz@kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        "James Morse" <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200214145736.18550-1-maz@kernel.org>
+ <20200214145736.18550-4-maz@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <6ee89f59-6ef4-6161-ded9-94b36bc614fb@huawei.com>
+Date:   Mon, 17 Feb 2020 17:09:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
+In-Reply-To: <20200214145736.18550-4-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
 X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
->linmiaohe <linmiaohe@huawei.com> writes:
->
->I would've suggested we split such unrelated changes by source files in
->the future to simplify (possible) stable backporting. Changes themselves
->look good,
->
+On 2020/2/14 22:57, Marc Zyngier wrote:
+> Tell KVM that we support v4.1. Nothing uses this information so far.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-I would take care, many thanks for your remind.
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 
->Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
-Thanks for your review. :)
