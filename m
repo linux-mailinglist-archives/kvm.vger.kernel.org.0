@@ -2,80 +2,331 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 645D4160882
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 04:12:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A78A1609A0
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 05:26:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727686AbgBQDMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Feb 2020 22:12:07 -0500
-Received: from mail3.iservicesmail.com ([217.130.24.75]:56586 "EHLO
-        mail3.iservicesmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726560AbgBQDMG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Feb 2020 22:12:06 -0500
-IronPort-SDR: DiUFmNEpF+RH2zAZZy73rUa6Odayg7ra41eD/0+8JW6M4RhmInEjUCbIu7Lui2KoLhpisfmvQl
- q7VGbkbsVLRQ==
-IronPort-PHdr: =?us-ascii?q?9a23=3AvjpOQRb17ngVk8yuHRq+g+T/LSx+4OfEezUN45?=
- =?us-ascii?q?9isYplN5qZoMmybnLW6fgltlLVR4KTs6sC17OK9f+9EjFbqb+681k8M7V0Hy?=
- =?us-ascii?q?cfjssXmwFySOWkMmbcaMDQUiohAc5ZX0Vk9XzoeWJcGcL5ekGA6ibqtW1aFR?=
- =?us-ascii?q?rwLxd6KfroEYDOkcu3y/qy+5rOaAlUmTaxe7x/IAi5oAnLtMQbgYRuJ6Y/xx?=
- =?us-ascii?q?DUvnZGZuNayH9nKl6Ugxvy/Nq78oR58yRXtfIh9spAXrv/cq8lU7FWDykoPn?=
- =?us-ascii?q?4s6sHzuhbNUQWA5n0HUmULiRVIGBTK7Av7XpjqrCT3sPd21TSAMs33SbA0Xi?=
- =?us-ascii?q?mi77tuRRT1hioLKyI1/WfKgcF2kalVog+upwZnzoDaYI+VLuRwcKDAc9wVWW?=
- =?us-ascii?q?VPUd1cVzBDD4ygc4cDE/YNMfheooLgp1UOtxy+BQy0Ce311DBImmH53bcn2O?=
- =?us-ascii?q?shFgHG2gMgFM8JvXTMq9X1LrsSXvquwanVyzXDbuhW2Svn6IfSbx8uu+uAXb?=
- =?us-ascii?q?NsccfIz0QkCgDLjk2IpID7Ij+Y1P4Bv3WV4uZ8T+6jlWEqpxt/rzWvwMonl5?=
- =?us-ascii?q?PHiZgPyl/e8CV02IM1JdqlR0FledOkC55Qtz2CN4txX8MiX3lkuCYkxb0Cvp?=
- =?us-ascii?q?62ZC0Kx44mxx7bcfyIbYyI7g7sWeqLPzd4g29qd6ixhxa190iv1PfwWdev0F?=
- =?us-ascii?q?pSrypFlMfDtmwV2hDN98SKSOFx8lqv1DqTzQzf9O5JLVo6mKfbM5Ihx6Q/lp?=
- =?us-ascii?q?sXsUTNBC/2n0D2gbeOdkUj4Oio9/7ob677pp+aNo90kR3+Mr40lcOiG+s0KA?=
- =?us-ascii?q?kOX3SD9eSmyLLj5VH5QKlNjvAukanZrpXaKN8Fpq62HQBVyJwv6xWhADe81t?=
- =?us-ascii?q?QXg30HIEhCeBKdgIi6c23JdfPmCN+hjFm21jRm3fbLOvvmGJqeFHXblKbdeu?=
- =?us-ascii?q?NF5lJR0kIMytZQr8ZMB60MOu30XEDxt9zDBBQRPAm9wuKhA9J4gNAwQ2WKV5?=
- =?us-ascii?q?eULK7I+WCP4O1nd/GLfpMckCv7KuM5/ffihDk4hQlOLuGSwZILZSXgTbxdKE?=
- =?us-ascii?q?KDbC+0jw=3D=3D?=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-Anti-Spam-Result: =?us-ascii?q?A2HOOABABEpelyMYgtlmgkOBPgIBgVV?=
- =?us-ascii?q?SIBKMY4ZsVAZzH4NDhlKEEYEFgQCDM4YHEwyBWw0BAQEBATUCBAEBhECCBCQ?=
- =?us-ascii?q?8Ag0CAw0BAQYBAQEBAQUEAQECEAEBAQEBCBYGhXOCOyKDcCAPOUoMQAEOAYN?=
- =?us-ascii?q?XgksBAQoprQ4NDQKFHoJXBAqBCIEbI4E2AwEBjCEaeYEHgSMhgisIAYIBgn8?=
- =?us-ascii?q?BEgFugkiCWQSNUhIhiUWYNIFqWgSWa4I5AQ+IFoQ3A4JaD4ELgx2DCYFnhFK?=
- =?us-ascii?q?Bf59mhBRXgSBzcTMaCDCBbhqBIE8YDY43jisCQIEXEAJPi0mCMgEB?=
-X-IPAS-Result: =?us-ascii?q?A2HOOABABEpelyMYgtlmgkOBPgIBgVVSIBKMY4ZsVAZzH?=
- =?us-ascii?q?4NDhlKEEYEFgQCDM4YHEwyBWw0BAQEBATUCBAEBhECCBCQ8Ag0CAw0BAQYBA?=
- =?us-ascii?q?QEBAQUEAQECEAEBAQEBCBYGhXOCOyKDcCAPOUoMQAEOAYNXgksBAQoprQ4ND?=
- =?us-ascii?q?QKFHoJXBAqBCIEbI4E2AwEBjCEaeYEHgSMhgisIAYIBgn8BEgFugkiCWQSNU?=
- =?us-ascii?q?hIhiUWYNIFqWgSWa4I5AQ+IFoQ3A4JaD4ELgx2DCYFnhFKBf59mhBRXgSBzc?=
- =?us-ascii?q?TMaCDCBbhqBIE8YDY43jisCQIEXEAJPi0mCMgEB?=
-X-IronPort-AV: E=Sophos;i="5.70,451,1574118000"; 
-   d="scan'208";a="319345077"
-Received: from mailrel04.vodafone.es ([217.130.24.35])
-  by mail01.vodafone.es with ESMTP; 17 Feb 2020 04:12:04 +0100
-Received: (qmail 18944 invoked from network); 17 Feb 2020 02:17:37 -0000
-Received: from unknown (HELO 192.168.1.163) (mariapazos@[217.217.179.17])
-          (envelope-sender <porta@unistrada.it>)
-          by mailrel04.vodafone.es (qmail-ldap-1.03) with SMTP
-          for <kvm@vger.kernel.org>; 17 Feb 2020 02:17:37 -0000
-Date:   Mon, 17 Feb 2020 03:17:37 +0100 (CET)
-From:   Peter Wong <porta@unistrada.it>
-Reply-To: Peter Wong <peterwonghkhsbc@gmail.com>
-To:     kvm@vger.kernel.org
-Message-ID: <4792754.70566.1581905857499.JavaMail.cash@217.130.24.55>
-Subject: Investment opportunity
+        id S1727362AbgBQE05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Feb 2020 23:26:57 -0500
+Received: from mga11.intel.com ([192.55.52.93]:59423 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726656AbgBQE05 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Feb 2020 23:26:57 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Feb 2020 20:26:56 -0800
+X-IronPort-AV: E=Sophos;i="5.70,451,1574150400"; 
+   d="scan'208";a="228290255"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.168.218]) ([10.249.168.218])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 16 Feb 2020 20:26:53 -0800
+Subject: Re: [RFC PATCH 1/2] KVM: CPUID: Enable supervisor XSAVE states in
+ CPUID enumeration and XSS
+To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        jmattson@google.com, aaronlewis@google.com
+References: <20200211065706.3462-1-weijiang.yang@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <a75a0e16-198d-9c96-3a63-d09a93909c0f@intel.com>
+Date:   Mon, 17 Feb 2020 12:26:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20200211065706.3462-1-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Greetings,
-Please check the attached email for a buisness proposal to explore.
-Looking forward to hearing from you for more details.
-Sincerely: Peter Wong
+On 2/11/2020 2:57 PM, Yang Weijiang wrote:
+> CPUID.(EAX=DH, ECX={i}H i>=0) enumerates XSAVE related leaves/sub-leaves,
+> but supervisor states are not taken into account. Meanwhile,more and more
+> new features, e.g., CET, PT, LBR, rely on supervisor states to enhance
+> performance, so updating related KVM code becomes necessary.
+> 
+> With Aaron Lewis's <aaronlewis@google.com> patches in place, i.e.,
+> {c90992bfb080, 52297436199d, 864e2ab2b46d, 139a12cfe1a0, 9753d68865c5,
+> 312a1c87798e, 78958563d802, c034f2aa8622, 7204160eb780}, this patch
+> is to enable suppervisor XSAVE states support in CPUID enumeration and
+> MSR IA32_XSS. KVM_SUPPORTED_XSS is a static mask for KVM/Guest supervisor
+> states and guest_supported_xss is a dynamic mask which consolidates
+> current host IA32_XSS and QEMU configuration together with static mask.
+> 
+> Right now, supervisor states in IA32_XSS haven't been used in upstreamed
+> KVM code, so set KVM_SUPPORTED_XSS to 0 in the patch, new XSAVES related
+> features can expand the macro to enable save/restore with XSAVES/XSTORS
+> instruction.
+> 
+> To test the patch, I first set the KVM_SUPPORTED_XSS to 0x3900 and inject
+> value to IA32_XSS too, 0x3900 corresponds to the most recent possible
+> candidate supervisor states on Intel platforms, tested on TGL platform as
+> results below:
+> 
+> cpuid.[d.0]: eax = 0x000002e7, ebx = 0x00000a88, ecx = 0x00000a88, edx = 0x00000000
+> cpuid.[d.1]: eax = 0x0000000f, ebx = 0x00000a38, ecx = 0x00003900, edx = 0x00000000
+> cpuid.[d.2]: eax = 0x00000100, ebx = 0x00000240, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.5]: eax = 0x00000040, ebx = 0x00000440, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.6]: eax = 0x00000200, ebx = 0x00000480, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.7]: eax = 0x00000400, ebx = 0x00000680, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.8]: eax = 0x00000080, ebx = 0x00000000, ecx = 0x00000001, edx = 0x00000000
+> cpuid.[d.9]: eax = 0x00000008, ebx = 0x00000a80, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.11]: eax = 0x00000010, ebx = 0x00000000, ecx = 0x00000001, edx = 0x00000000
+> cpuid.[d.12]: eax = 0x00000018, ebx = 0x00000000, ecx = 0x00000001, edx = 0x00000000
+> cpuid.[d.13]: eax = 0x00000008, ebx = 0x00000000, ecx = 0x00000001, edx = 0x00000000
+> bit[8] in MSR_IA32_XSS is supported
+> bit[11] in MSR_IA32_XSS is supported
+> bit[12] in MSR_IA32_XSS is supported
+> bit[13] in MSR_IA32_XSS is supported
+> Supported bit mask in MSR_IA32_XSS is : 0x3900
+> 
+> When IA32_XSS and KVM_SUPPORTED_XSS are 0, got below output:
+> cpuid.[d.0]: eax = 0x000002e7, ebx = 0x00000a88, ecx = 0x00000a88, edx = 0x00000000
+> cpuid.[d.1]: eax = 0x0000000f, ebx = 0x00000988, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.2]: eax = 0x00000100, ebx = 0x00000240, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.5]: eax = 0x00000040, ebx = 0x00000440, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.6]: eax = 0x00000200, ebx = 0x00000480, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.7]: eax = 0x00000400, ebx = 0x00000680, ecx = 0x00000000, edx = 0x00000000
+> cpuid.[d.9]: eax = 0x00000008, ebx = 0x00000a80, ecx = 0x00000000, edx = 0x00000000
+> Supported bit mask in MSR_IA32_XSS is : 0x0
+> 
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h |   1 +
+>   arch/x86/kvm/cpuid.c            | 111 ++++++++++++++++++++++----------
+>   arch/x86/kvm/x86.c              |   4 +-
+>   arch/x86/kvm/x86.h              |   8 +++
+>   4 files changed, 87 insertions(+), 37 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index b79cd6aa4075..627284fa4369 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -638,6 +638,7 @@ struct kvm_vcpu_arch {
+>   
+>   	u64 xcr0;
+>   	u64 guest_supported_xcr0;
+> +	u64 guest_supported_xss;
+>   	u32 guest_xstate_size;
+>   
+>   	struct kvm_pio_request pio;
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index cfafa320a8cf..9546271d4038 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -62,6 +62,12 @@ u64 kvm_supported_xcr0(void)
+>   	return xcr0;
+>   }
+>   
+> +extern int host_xss;
+> +u64 kvm_supported_xss(void)
+> +{
+> +	return KVM_SUPPORTED_XSS & host_xss;
+> +}
+> +
 
+How about using a global variable, supported_xss, instead of calculating 
+the mask on every call. Just like what Sean posted on
+https://lore.kernel.org/kvm/20200201185218.24473-21-sean.j.christopherson@intel.com/
 
+>   #define F(x) bit(X86_FEATURE_##x)
+>   
+>   int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+> @@ -112,10 +118,17 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+>   		vcpu->arch.guest_xstate_size = best->ebx =
+>   			xstate_required_size(vcpu->arch.xcr0, false);
+>   	}
+> -
+>   	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
+> -	if (best && (best->eax & (F(XSAVES) | F(XSAVEC))))
+> -		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+> +	if (best && (best->eax & (F(XSAVES) | F(XSAVEC)))) {
+> +		u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
+> +
+> +		best->ebx = xstate_required_size(xstate, true);
+> +		vcpu->arch.guest_supported_xss =
+> +			(best->ecx | ((u64)best->edx << 32)) &
+> +			kvm_supported_xss();
+> +	} else {
+> +		vcpu->arch.guest_supported_xss = 0;
+> +	}
+>   
+>   	/*
+>   	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+> @@ -426,6 +439,56 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+>   	}
+>   }
+>   
+> +static inline bool do_cpuid_0xd_mask(struct kvm_cpuid_entry2 *entry, int index)
+> +{
+> +	unsigned int f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
+> +	/* cpuid 0xD.1.eax */
+> +	const u32 kvm_cpuid_D_1_eax_x86_features =
+> +		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+> +	u64 u_supported = kvm_supported_xcr0();
+> +	u64 s_supported = kvm_supported_xss();
+> +	u64 supported;
+> +
+> +	switch (index) {
+> +	case 0:
+> +		if (!u_supported) {
+> +			entry->eax = 0;
+> +			entry->ebx = 0;
+> +			entry->ecx = 0;
+> +			entry->edx = 0;
+> +			return false;
+> +		}
+> +		entry->eax &= u_supported;
+> +		entry->ebx = xstate_required_size(u_supported, false);
+> +		entry->ecx = entry->ebx;
+> +		entry->edx &= u_supported >> 32;
+> +		break;
+> +	case 1:
+> +		supported = u_supported | s_supported;
+> +		entry->eax &= kvm_cpuid_D_1_eax_x86_features;
+> +		cpuid_mask(&entry->eax, CPUID_D_1_EAX);
+> +		entry->ebx = 0;
+> +		entry->edx &= s_supported >> 32;
+> +		entry->ecx &= s_supported;
 
+We'd better initialize msr_ia32_xss bitmap (entry->ecx & entry-edx) as 
+zeros here.
 
-----------------------------------------------------
-This email was sent by the shareware version of Postman Professional.
+> +		if (entry->eax & (F(XSAVES) | F(XSAVEC)))
+> +			entry->ebx = xstate_required_size(supported, true);
+
+And setup msr_ia32_xss bitmap based on the s_supported within this 
+condition when F(XSAVES) is supported.
+
+> +		break;
+> +	default:
+> +		supported = (entry->ecx & 0x1) ? s_supported : u_supported;
+> +		if (!(supported & (BIT_ULL(index)))) {
+> +			entry->eax = 0;
+> +			entry->ebx = 0;
+> +			entry->ecx = 0;
+> +			entry->edx = 0;
+> +			return false;
+> +		}
+> +		if (entry->ecx & 0x1)
+> +			entry->ebx = 0;
+> +		break;
+> +	}
+> +	return true;
+> +}
+> +
+>   static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>   				  int *nent, int maxnent)
+>   {
+> @@ -440,7 +503,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>   	unsigned f_lm = 0;
+>   #endif
+>   	unsigned f_rdtscp = kvm_x86_ops->rdtscp_supported() ? F(RDTSCP) : 0;
+> -	unsigned f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
+>   	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
+>   
+>   	/* cpuid 1.edx */
+> @@ -495,10 +557,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>   		F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
+>   		F(PMM) | F(PMM_EN);
+>   
+> -	/* cpuid 0xD.1.eax */
+> -	const u32 kvm_cpuid_D_1_eax_x86_features =
+> -		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+> -
+>   	/* all calls to cpuid_count() should be made on the same cpu */
+>   	get_cpu();
+>   
+> @@ -639,38 +697,21 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>   		break;
+>   	}
+>   	case 0xd: {
+> -		int idx, i;
+> -		u64 supported = kvm_supported_xcr0();
+> +		int i, idx;
+>   
+> -		entry->eax &= supported;
+> -		entry->ebx = xstate_required_size(supported, false);
+> -		entry->ecx = entry->ebx;
+> -		entry->edx &= supported >> 32;
+> -		if (!supported)
+> +		if (!do_cpuid_0xd_mask(&entry[0], 0))
+>   			break;
+> -
+> -		for (idx = 1, i = 1; idx < 64; ++idx) {
+> -			u64 mask = ((u64)1 << idx);
+> +		for (i = 1, idx = 1; idx < 64; ++idx) {
+>   			if (*nent >= maxnent)
+>   				goto out;
+> -
+>   			do_host_cpuid(&entry[i], function, idx);
+> -			if (idx == 1) {
+> -				entry[i].eax &= kvm_cpuid_D_1_eax_x86_features;
+> -				cpuid_mask(&entry[i].eax, CPUID_D_1_EAX);
+> -				entry[i].ebx = 0;
+> -				if (entry[i].eax & (F(XSAVES)|F(XSAVEC)))
+> -					entry[i].ebx =
+> -						xstate_required_size(supported,
+> -								     true);
+> -			} else {
+> -				if (entry[i].eax == 0 || !(supported & mask))
+> -					continue;
+> -				if (WARN_ON_ONCE(entry[i].ecx & 1))
+> -					continue;
+> -			}
+> -			entry[i].ecx = 0;
+> -			entry[i].edx = 0;
+> +
+> +			if (entry[i].eax == 0 && entry[i].ebx == 0 &&
+> +			    entry[i].ecx == 0 && entry[i].edx == 0)
+> +				continue;
+> +
+> +			if (!do_cpuid_0xd_mask(&entry[i], idx))
+> +				continue;
+>   			++*nent;
+>   			++i;
+>   		}
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index cf917139de6b..908a6cdb2151 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -177,7 +177,7 @@ struct kvm_shared_msrs {
+>   static struct kvm_shared_msrs_global __read_mostly shared_msrs_global;
+>   static struct kvm_shared_msrs __percpu *shared_msrs;
+>   
+> -static u64 __read_mostly host_xss;
+> +u64 __read_mostly host_xss;
+>   
+>   struct kvm_stats_debugfs_item debugfs_entries[] = {
+>   	{ "pf_fixed", VCPU_STAT(pf_fixed) },
+> @@ -2732,7 +2732,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		 * RDMSR/WRMSR rather than XSAVES/XRSTORS to save/restore PT
+>   		 * MSRs.
+>   		 */
+> -		if (data != 0)
+> +		if (data & ~vcpu->arch.guest_supported_xss)
+>   			return 1;
+>   		vcpu->arch.ia32_xss = data;
+>   		break;
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 29391af8871d..9e7725f8bb46 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -296,6 +296,14 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, unsigned long cr2,
+>   				| XFEATURE_MASK_YMM | XFEATURE_MASK_BNDREGS \
+>   				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
+>   				| XFEATURE_MASK_PKRU)
+> +
+> +/*
+> + * In future, new XSS bits can be ORed here to make them available
+> + * to KVM and guest, right now, it's 0, meaning no XSS bits are
+> + * supported.
+> + */
+> +#define KVM_SUPPORTED_XSS 0
+> +
+>   extern u64 host_xcr0;
+>   
+>   extern u64 kvm_supported_xcr0(void);
+> 
 
