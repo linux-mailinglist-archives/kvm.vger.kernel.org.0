@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E1E96160F61
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 10:57:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5776B160FD4
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 11:22:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728967AbgBQJ5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 04:57:48 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49075 "EHLO
+        id S1729187AbgBQKWA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 05:22:00 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33598 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726397AbgBQJ5s (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 04:57:48 -0500
+        by vger.kernel.org with ESMTP id S1729142AbgBQKWA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 05:22:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581933466;
+        s=mimecast20190719; t=1581934918;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=4yk3Qtds39rc1OcH48wJvhZACOb7J0k21xrxG4yhrzg=;
-        b=fEqUEuuSuMcpNfwxSJ4qiOc6lTMb97JEdg6VzUMgXkKVdLXH7eOSkWq7l+Gz83Yw8SAuxh
-        9IePRITsXcT/C1oXWEOjUT4atSCRUOLm7FhrDqfjtEMSMRsAfNEgEn27goqmIPLUw0Rkqo
-        s0uooOy7ftPmALrOy2e1w3LMFWhIFdw=
+        bh=VrgVyJ+tJIJgafivxeVgCktrUYbOjjFTO1NCGrJVUG4=;
+        b=Iz6RFNXBo+IsPUOB7v267aJeQMMv+WEIaIVLTg3p1Uq5wvDpXXKkGMdBqIf/UsWeF+e8fj
+        hkffh726hQJFzlWrWI8OfME/wZ1w0MFWs8MHVEZVYe6zKFcXiubNbO8unHCLGEi8qzH2Ut
+        mv9If8+jN1YkNeq4n2BnNISfH+pdXis=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-J6f7V987PvesVlFCbvcb2Q-1; Mon, 17 Feb 2020 04:57:43 -0500
-X-MC-Unique: J6f7V987PvesVlFCbvcb2Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-282-KeRGx3kiNfyD-68imKku1g-1; Mon, 17 Feb 2020 05:21:53 -0500
+X-MC-Unique: KeRGx3kiNfyD-68imKku1g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FBC2800D55;
-        Mon, 17 Feb 2020 09:57:42 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0A428017DF;
+        Mon, 17 Feb 2020 10:21:51 +0000 (UTC)
 Received: from [10.36.117.64] (ovpn-117-64.ams2.redhat.com [10.36.117.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8FE89385;
-        Mon, 17 Feb 2020 09:57:36 +0000 (UTC)
-Subject: Re: [PATCH v2 04/42] s390/protvirt: add ultravisor initialization
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F8348681F;
+        Mon, 17 Feb 2020 10:21:46 +0000 (UTC)
+Subject: Re: [PATCH v2 05/42] s390/mm: provide memory management functions for
+ protected KVM guests
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -42,9 +43,10 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-5-borntraeger@de.ibm.com>
+ <20200214222658.12946-6-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -90,155 +92,267 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <ad934492-afcb-7a11-c682-6884e5c0ffed@redhat.com>
-Date:   Mon, 17 Feb 2020 10:57:33 +0100
+Message-ID: <f5523486-ee76-e6c1-9563-658bca7f3b0d@redhat.com>
+Date:   Mon, 17 Feb 2020 11:21:44 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214222658.12946-5-borntraeger@de.ibm.com>
+In-Reply-To: <20200214222658.12946-6-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.02.20 23:26, Christian Borntraeger wrote:
-> From: Vasily Gorbik <gor@linux.ibm.com>
-> 
-> Before being able to host protected virtual machines, donate some of
-> the memory to the ultravisor. Besides that the ultravisor might impose
-> addressing limitations for memory used to back protected VM storage. Treat
-> that limit as protected virtualization host's virtual memory limit.
-> 
-> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/include/asm/uv.h | 15 +++++++++++
->  arch/s390/kernel/setup.c   |  5 ++++
->  arch/s390/kernel/uv.c      | 51 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 71 insertions(+)
-> 
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 34b1114dcc38..f5b55e3972b3 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -23,12 +23,14 @@
->  #define UVC_RC_NO_RESUME	0x0007
->  
->  #define UVC_CMD_QUI			0x0001
-> +#define UVC_CMD_INIT_UV			0x000f
->  #define UVC_CMD_SET_SHARED_ACCESS	0x1000
->  #define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
->  
->  /* Bits in installed uv calls */
->  enum uv_cmds_inst {
->  	BIT_UVC_CMD_QUI = 0,
-> +	BIT_UVC_CMD_INIT_UV = 1,
->  	BIT_UVC_CMD_SET_SHARED_ACCESS = 8,
->  	BIT_UVC_CMD_REMOVE_SHARED_ACCESS = 9,
->  };
-> @@ -59,6 +61,14 @@ struct uv_cb_qui {
->  	u64 reserveda0;
->  } __packed __aligned(8);
->  
-> +struct uv_cb_init {
-> +	struct uv_cb_header header;
-> +	u64 reserved08[2];
-> +	u64 stor_origin;
-> +	u64 stor_len;
-> +	u64 reserved28[4];
-> +} __packed __aligned(8);
+> diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.=
+h
+> index 85e944f04c70..4ebcf891ff3c 100644
+> --- a/arch/s390/include/asm/page.h
+> +++ b/arch/s390/include/asm/page.h
+> @@ -153,6 +153,11 @@ static inline int devmem_is_allowed(unsigned long =
+pfn)
+>  #define HAVE_ARCH_FREE_PAGE
+>  #define HAVE_ARCH_ALLOC_PAGE
+> =20
+> +#if IS_ENABLED(CONFIG_PGSTE)
+> +int arch_make_page_accessible(struct page *page);
+> +#define HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
+> +#endif
 > +
->  struct uv_cb_share {
->  	struct uv_cb_header header;
->  	u64 reserved08[3];
-> @@ -159,8 +169,13 @@ static inline int is_prot_virt_host(void)
->  {
->  	return prot_virt_host;
->  }
+
+Feels like this should have been one of the (CONFIG_)ARCH_HAVE_XXX
+thingies defined via kconfig instead.
+
+E.g., like (CONFIG_)HAVE_ARCH_TRANSPARENT_HUGEPAGE
+
+[...]
+
 > +
-> +void setup_uv(void);
-> +void adjust_to_uv_max(unsigned long *vmax);
->  #else
->  #define is_prot_virt_host() 0
-> +static inline void setup_uv(void) {}
-> +static inline void adjust_to_uv_max(unsigned long *vmax) {}
->  #endif
->  
->  #if defined(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) ||                          \
-> diff --git a/arch/s390/kernel/setup.c b/arch/s390/kernel/setup.c
-> index a2496382175e..e02727812e67 100644
-> --- a/arch/s390/kernel/setup.c
-> +++ b/arch/s390/kernel/setup.c
-> @@ -560,6 +560,9 @@ static void __init setup_memory_end(void)
->  			vmax = _REGION1_SIZE; /* 4-level kernel page table */
->  	}
->  
-> +	if (prot_virt_host)
-> +		adjust_to_uv_max(&vmax);
-> +
->  	/* module area is at the end of the kernel address space. */
->  	MODULES_END = vmax;
->  	MODULES_VADDR = MODULES_END - MODULES_LEN;
-> @@ -1134,6 +1137,8 @@ void __init setup_arch(char **cmdline_p)
->  	 */
->  	memblock_trim_memory(1UL << (MAX_ORDER - 1 + PAGE_SHIFT));
->  
-> +	if (prot_virt_host)
-> +		setup_uv();
->  	setup_memory_end();
->  	setup_memory();
->  	dma_contiguous_reserve(memory_end);
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index b1f936710360..1424994f5489 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -49,4 +49,55 @@ static int __init prot_virt_setup(char *val)
->  	return rc;
->  }
->  early_param("prot_virt", prot_virt_setup);
-> +
-> +static int __init uv_init(unsigned long stor_base, unsigned long stor_len)
+> +/*
+> + * Requests the Ultravisor to encrypt a guest page and make it
+> + * accessible to the host for paging (export).
+> + *
+> + * @paddr: Absolute host address of page to be exported
+> + */
+> +int uv_convert_from_secure(unsigned long paddr)
 > +{
-> +	struct uv_cb_init uvcb = {
-> +		.header.cmd = UVC_CMD_INIT_UV,
-> +		.header.len = sizeof(uvcb),
-> +		.stor_origin = stor_base,
-> +		.stor_len = stor_len,
+> +	struct uv_cb_cfs uvcb =3D {
+> +		.header.cmd =3D UVC_CMD_CONV_FROM_SEC_STOR,
+> +		.header.len =3D sizeof(uvcb),
+> +		.paddr =3D paddr
 > +	};
 > +
-> +	if (uv_call(0, (uint64_t)&uvcb)) {
-> +		pr_err("Ultravisor init failed with rc: 0x%x rrc: 0%x\n",
-> +		       uvcb.header.rc, uvcb.header.rrc);
-> +		return -1;
-> +	}
+> +	if (uv_call(0, (u64)&uvcb))
+> +		return -EINVAL;
 > +	return 0;
 > +}
 > +
-> +void __init setup_uv(void)
+> +/*
+> + * Calculate the expected ref_count for a page that would otherwise ha=
+ve no
+> + * further pins. This was cribbed from similar functions in other plac=
+es in
+> + * the kernel, but with some slight modifications. We know that a secu=
+re
+> + * page can not be a huge page for example.
+
+s/ca not cannot/
+
+> + */
+> +static int expected_page_refs(struct page *page)
 > +{
-> +	unsigned long uv_stor_base;
+> +	int res;
 > +
-> +	if (!prot_virt_host)
-> +		return;
-
-That can go.
-
+> +	res =3D page_mapcount(page);
+> +	if (PageSwapCache(page)) {
+> +		res++;
+> +	} else if (page_mapping(page)) {
+> +		res++;
+> +		if (page_has_private(page))
+> +			res++;
+> +	}
+> +	return res;
+> +}
 > +
-> +	uv_stor_base = (unsigned long)memblock_alloc_try_nid(
-> +		uv_info.uv_base_stor_len, SZ_1M, SZ_2G,
-> +		MEMBLOCK_ALLOC_ACCESSIBLE, NUMA_NO_NODE);
+> +static int make_secure_pte(pte_t *ptep, unsigned long addr,
+> +			   struct page *exp_page, struct uv_cb_header *uvcb)
+> +{
+> +	pte_t entry =3D READ_ONCE(*ptep);
+> +	struct page *page;
+> +	int expected, rc =3D 0;
+> +
+> +	if (!pte_present(entry))
+> +		return -ENXIO;
+> +	if (pte_val(entry) & _PAGE_INVALID)
+> +		return -ENXIO;
+> +
+> +	page =3D pte_page(entry);
+> +	if (page !=3D exp_page)
+> +		return -ENXIO;
+> +	if (PageWriteback(page))
+> +		return -EAGAIN;
+> +	expected =3D expected_page_refs(page);
+> +	if (!page_ref_freeze(page, expected))
+> +		return -EBUSY;
+> +	set_bit(PG_arch_1, &page->flags);
+> +	rc =3D uv_call(0, (u64)uvcb);
+> +	page_ref_unfreeze(page, expected);
+> +	/* Return -ENXIO if the page was not mapped, -EINVAL otherwise */
+> +	if (rc)
+> +		rc =3D uvcb->rc =3D=3D 0x10a ? -ENXIO : -EINVAL;
+> +	return rc;
+> +}
+> +
+> +/*
+> + * Requests the Ultravisor to make a page accessible to a guest.
+> + * If it's brought in the first time, it will be cleared. If
+> + * it has been exported before, it will be decrypted and integrity
+> + * checked.
+> + */
+> +int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvc=
+b)
+> +{
+> +	struct vm_area_struct *vma;
+> +	unsigned long uaddr;
+> +	struct page *page;
+> +	int rc, local_drain =3D 0;
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+local_drain could have been a bool.
 
--- 
+> +	spinlock_t *ptelock;
+> +	pte_t *ptep;
+> +
+> +again:
+> +	rc =3D -EFAULT;
+> +	down_read(&gmap->mm->mmap_sem);
+> +
+> +	uaddr =3D __gmap_translate(gmap, gaddr);
+> +	if (IS_ERR_VALUE(uaddr))
+> +		goto out;
+> +	vma =3D find_vma(gmap->mm, uaddr);
+> +	if (!vma)
+> +		goto out;
+> +	/*
+> +	 * Secure pages cannot be huge and userspace should not combine both.
+> +	 * In case userspace does it anyway this will result in an -EFAULT fo=
+r
+> +	 * the unpack. The guest is thus never reaching secure mode. If
+> +	 * userspace is playing dirty tricky with mapping huge pages later
+> +	 * on this will result in a segmenation fault.
+
+s/segmenation/segmentation/
+
+> +	 */
+> +	if (is_vm_hugetlb_page(vma))
+> +		goto out;
+> +
+> +	rc =3D -ENXIO;
+> +	page =3D follow_page(vma, uaddr, FOLL_WRITE);
+> +	if (IS_ERR_OR_NULL(page))
+> +		goto out;
+> +
+> +	lock_page(page);
+> +	ptep =3D get_locked_pte(gmap->mm, uaddr, &ptelock);
+> +	rc =3D make_secure_pte(ptep, uaddr, page, uvcb);
+> +	pte_unmap_unlock(ptep, ptelock);
+> +	unlock_page(page);
+> +out:
+> +	up_read(&gmap->mm->mmap_sem);
+> +
+> +	if (rc =3D=3D -EAGAIN) {
+> +		wait_on_page_writeback(page);
+> +	} else if (rc =3D=3D -EBUSY) {
+> +		/*
+> +		 * If we have tried a local drain and the page refcount
+> +		 * still does not match our expected safe value, try with a
+> +		 * system wide drain. This is needed if the pagevecs holding
+> +		 * the page are on a different CPU.
+> +		 */
+> +		if (local_drain) {
+> +			lru_add_drain_all();
+
+I do wonder if that is valid to be called with all the locks at this poin=
+t.
+
+> +			/* We give up here, and let the caller try again */
+> +			return -EAGAIN;
+> +		}
+> +		/*
+> +		 * We are here if the page refcount does not match the
+> +		 * expected safe value. The main culprits are usually
+> +		 * pagevecs. With lru_add_drain() we drain the pagevecs
+> +		 * on the local CPU so that hopefully the refcount will
+> +		 * reach the expected safe value.
+> +		 */
+> +		lru_add_drain();
+
+dito ...
+
+> +		local_drain =3D 1;
+> +		/* And now we try again immediately after draining */
+> +		goto again;
+> +	} else if (rc =3D=3D -ENXIO) {
+> +		if (gmap_fault(gmap, gaddr, FAULT_FLAG_WRITE))
+> +			return -EFAULT;
+> +		return -EAGAIN;
+> +	}
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL_GPL(gmap_make_secure);
+> +
+> +int gmap_convert_to_secure(struct gmap *gmap, unsigned long gaddr)
+> +{
+> +	struct uv_cb_cts uvcb =3D {
+> +		.header.cmd =3D UVC_CMD_CONV_TO_SEC_STOR,
+> +		.header.len =3D sizeof(uvcb),
+> +		.guest_handle =3D gmap->guest_handle,
+> +		.gaddr =3D gaddr,
+> +	};
+> +
+> +	return gmap_make_secure(gmap, gaddr, &uvcb);
+> +}
+> +EXPORT_SYMBOL_GPL(gmap_convert_to_secure);
+> +
+> +/**
+> + * To be called with the page locked or with an extra reference!
+
+Can we have races here? (IOW, two callers concurrently for the same page)
+
+> + */
+> +int arch_make_page_accessible(struct page *page)
+> +{
+> +	int rc =3D 0;
+> +
+> +	/* Hugepage cannot be protected, so nothing to do */
+> +	if (PageHuge(page))
+> +		return 0;
+> +
+> +	/*
+> +	 * PG_arch_1 is used in 3 places:
+> +	 * 1. for kernel page tables during early boot
+> +	 * 2. for storage keys of huge pages and KVM
+> +	 * 3. As an indication that this page might be secure. This can
+> +	 *    overindicate, e.g. we set the bit before calling
+> +	 *    convert_to_secure.
+> +	 * As secure pages are never huge, all 3 variants can co-exists.
+> +	 */
+> +	if (!test_bit(PG_arch_1, &page->flags))
+> +		return 0;
+> +
+> +	rc =3D uv_pin_shared(page_to_phys(page));
+> +	if (!rc) {
+> +		clear_bit(PG_arch_1, &page->flags);
+> +		return 0;
+> +	}
+
+Overall, looks sane to me. (I am mostly concerned about possible races,
+e.g., when two gmaps would be created for a single VM and nasty stuff be
+done with them). But yeah, I guess you guys thought about this ;)
+
+--=20
 Thanks,
 
 David / dhildenb
