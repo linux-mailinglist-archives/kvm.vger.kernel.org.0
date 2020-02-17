@@ -2,41 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 350731610A8
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 12:08:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23FAE1610B2
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 12:10:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728581AbgBQLIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 06:08:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24372 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726401AbgBQLIk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 06:08:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581937718;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=hEs7TjrznZyPgDTkgLBuJ+NxjJuDkDAHWOwyHgi6GDw=;
-        b=DHYbLJMzpH0fPYmW7eAk1JOEdATHLqbBO2MUhcofKZzjjLUStx905WdiMCH6/oLrYInIEO
-        Y6kKDvrIU9zBxhYPFe9Draa8aN+wszszOTl2LKxzmKBuZiPS9Ch2XHF/RBFTHZFgERgWAd
-        GRfMAMVt5x/OiF7tptNpbZfsmtoPJD4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-GNUUTqNMM8eyW8upToavRg-1; Mon, 17 Feb 2020 06:08:33 -0500
-X-MC-Unique: GNUUTqNMM8eyW8upToavRg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCD038017DF;
-        Mon, 17 Feb 2020 11:08:31 +0000 (UTC)
-Received: from [10.36.117.64] (ovpn-117-64.ams2.redhat.com [10.36.117.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CF0E910016DA;
-        Mon, 17 Feb 2020 11:08:25 +0000 (UTC)
-Subject: Re: [PATCH v2 20/42] KVM: S390: protvirt: Introduce instruction data
- area bounce buffer
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
+        id S1728104AbgBQLKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 06:10:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64376 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728002AbgBQLKL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 06:10:11 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01HB0xaS137439
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 06:10:10 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y6d60fv8m-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 06:10:09 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 17 Feb 2020 11:10:06 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 17 Feb 2020 11:10:04 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01HBA2P644695864
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Feb 2020 11:10:02 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7E47252054;
+        Mon, 17 Feb 2020 11:10:02 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.211])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 14B8452051;
+        Mon, 17 Feb 2020 11:10:02 +0000 (GMT)
+Subject: Re: [PATCH v2 01/42] mm:gup/writeback: add callbacks for inaccessible
+ pages
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
@@ -44,169 +48,135 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
+        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
+        Will Deacon <will@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-21-borntraeger@de.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <ad84934a-3d18-d56e-5658-1d8b8292f6b3@redhat.com>
-Date:   Mon, 17 Feb 2020 12:08:23 +0100
+ <20200214222658.12946-2-borntraeger@de.ibm.com>
+ <107a8a72-b745-26f2-5805-c4d99ce77b35@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Mon, 17 Feb 2020 12:10:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214222658.12946-21-borntraeger@de.ibm.com>
+In-Reply-To: <107a8a72-b745-26f2-5805-c4d99ce77b35@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021711-0016-0000-0000-000002E79038
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021711-0017-0000-0000-0000334A9F31
+Message-Id: <dd33cc1a-214d-b949-8f5e-9c2d40a8e518@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-17_05:2020-02-17,2020-02-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 mlxscore=0 suspectscore=0 adultscore=0 bulkscore=0
+ impostorscore=0 clxscore=1015 phishscore=0 priorityscore=1501 spamscore=0
+ mlxlogscore=820 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002170096
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> @@ -4460,6 +4489,10 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
->  
->  	switch (mop->op) {
->  	case KVM_S390_MEMOP_LOGICAL_READ:
-> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
-> +			r = -EINVAL;
-> +			break;
-> +		}
 
-Could we have a possible race with disabling code, especially while
-concurrently freeing? (sorry if I ask again, there was just a flood of
-emails)
 
->  		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
->  			r = check_gva_range(vcpu, mop->gaddr, mop->ar,
->  					    mop->size, GACC_FETCH);
-> @@ -4472,6 +4505,10 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
->  		}
->  		break;
->  	case KVM_S390_MEMOP_LOGICAL_WRITE:
-> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
-> +			r = -EINVAL;
-> +			break;
-> +		}
+On 17.02.20 10:14, David Hildenbrand wrote:
+> On 14.02.20 23:26, Christian Borntraeger wrote:
+>> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>
+>> With the introduction of protected KVM guests on s390 there is now a
+>> concept of inaccessible pages. These pages need to be made accessible
+>> before the host can access them.
+>>
+>> While cpu accesses will trigger a fault that can be resolved, I/O
+>> accesses will just fail.  We need to add a callback into architecture
+>> code for places that will do I/O, namely when writeback is started or
+>> when a page reference is taken.
+>>
+>> This is not only to enable paging, file backing etc, it is also
+>> necessary to protect the host against a malicious user space. For
+>> example a bad QEMU could simply start direct I/O on such protected
+>> memory.  We do not want userspace to be able to trigger I/O errors and
+>> thus we the logic is "whenever somebody accesses that page (gup) or
+>> doing I/O, make sure that this page can be accessed. When the guest
+>> tries to access that page we will wait in the page fault handler for
+>> writeback to have finished and for the page_ref to be the expected
+>> value.
+>>
+>> If wanted by others, the callbacks can be extended with error handlin
+>> and a parameter from where this is called.
+> 
+> s/handlin/handling/
 
-dito
+ack. 
+> 
+> One last question from my side:
+> 
+> Why is it OK to ignore errors here. IOW, why not squash "[PATCH v2
+> 39/42] example for future extension: mm:gup/writeback: add callbacks for
+> inaccessible pages: error cases" into this patch.
 
->  		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
->  			r = check_gva_range(vcpu, mop->gaddr, mop->ar,
->  					    mop->size, GACC_STORE);
-> @@ -4483,6 +4520,11 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
->  		}
->  		r = write_guest(vcpu, mop->gaddr, mop->ar, tmpbuf, mop->size);
->  		break;
-> +	case KVM_S390_MEMOP_SIDA_READ:
-> +	case KVM_S390_MEMOP_SIDA_WRITE:
-> +		/* we are locked against sida going away by the vcpu->mutex */
-> +		r = kvm_s390_guest_sida_op(vcpu, mop);
-> +		break;
->  	default:
->  		r = -EINVAL;
->  	}
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index 09573e36c329..80169a9b43ec 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -92,6 +92,7 @@ int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
->  
->  	free_pages(vcpu->arch.pv.stor_base,
->  		   get_order(uv_info.guest_cpu_stor_len));
-> +	free_page(sida_origin(vcpu->arch.sie_block));
->  	vcpu->arch.sie_block->pv_handle_cpu = 0;
->  	vcpu->arch.sie_block->pv_handle_config = 0;
->  	memset(&vcpu->arch.pv, 0, sizeof(vcpu->arch.pv));
-> @@ -121,6 +122,14 @@ int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
->  	uvcb.state_origin = (u64)vcpu->arch.sie_block;
->  	uvcb.stor_origin = (u64)vcpu->arch.pv.stor_base;
->  
-> +	/* Alloc Secure Instruction Data Area Designation */
-> +	vcpu->arch.sie_block->sidad = __get_free_page(GFP_KERNEL | __GFP_ZERO);
-> +	if (!vcpu->arch.sie_block->sidad) {
-> +		free_pages(vcpu->arch.pv.stor_base,
-> +			   get_order(uv_info.guest_cpu_stor_len));
-> +		return -ENOMEM;
-> +	}
-> +
->  	cc = uv_call(0, (u64)&uvcb);
->  	*rc = uvcb.header.rc;
->  	*rrc = uvcb.header.rrc;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 207915488502..0fdee1bc3798 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -475,11 +475,15 @@ struct kvm_s390_mem_op {
->  	__u32 op;		/* type of operation */
->  	__u64 buf;		/* buffer in userspace */
->  	__u8 ar;		/* the access register number */
-> -	__u8 reserved[31];	/* should be set to 0 */
-> +	__u8 reserved21[3];	/* should be set to 0 */
-> +	__u32 sida_offset;	/* offset into the sida */
-> +	__u8 reserved28[24];	/* should be set to 0 */
->  };
+I can certainly squash this in. But I have never heard feedback from the 
+memory management people if they would prefer the patch as-is (no overhead
+at all for !s390) or already with the error handling. 
+> 
+> I can see in patch "[PATCH v2 05/42] s390/mm: provide memory management
+> functions for protected KVM guests", that the call can fail for various
+> reasons. That puzzles me a bit - what would happen if any of that fails?
 
-As discussed, I'd prefer an overlaying layout for the sida, as the ar
-does not make any sense (correct me if I'm wrong :) )
+The convert _to_ secure has error handling. uv_convert_from_secure (the
+one that is used for arch_make_page_accessible can only fail if we mess up,
+e.g. an "export" on memory that we have donated to the ultravisor.
 
-__u32 op;		/* type of operation */
-__u64 buf;		/* buffer in userspace */
-uinon {
-	__u8 ar;		/* the access register number */
-	__u32 sida_offset;	/* offset into the sida */
-	__u8 reserved[32];	/* should be set to 0 */
-};
 
-With something like that
+> Or will it actually never fail for s390x (and all that error handling in
+> arch_make_page_accessible() is essentially dead code in real life?)
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
+So yes, if everything is setup properly this should not fail in real life
+and only we have a kernel (or firmware) bug.
 
