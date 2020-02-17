@@ -2,105 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 537B51612B6
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 14:10:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 289A81612C7
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 14:12:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728091AbgBQNKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 08:10:41 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:45264 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726797AbgBQNKk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 08:10:40 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 3D8A360CF7DC4101A5CE;
-        Mon, 17 Feb 2020 21:10:36 +0800 (CST)
-Received: from huawei.com (10.151.151.243) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
- 21:10:28 +0800
-From:   Dongjiu Geng <gengdongjiu@huawei.com>
-To:     <mst@redhat.com>, <imammedo@redhat.com>,
-        <xiaoguangrong.eric@gmail.com>, <shannon.zhaosl@gmail.com>,
-        <peter.maydell@linaro.org>, <fam@euphon.net>, <rth@twiddle.net>,
-        <ehabkost@redhat.com>, <mtosatti@redhat.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-        <qemu-arm@nongnu.org>, <pbonzini@redhat.com>,
-        <james.morse@arm.com>, <lersek@redhat.com>,
-        <jonathan.cameron@huawei.com>,
-        <shameerali.kolothum.thodi@huawei.com>
-CC:     <gengdongjiu@huawei.com>, <zhengxiang9@huawei.com>
-Subject: [PATCH v24 01/10] acpi: nvdimm: change NVDIMM_UUID_LE to a common macro
-Date:   Mon, 17 Feb 2020 21:12:39 +0800
-Message-ID: <20200217131248.28273-2-gengdongjiu@huawei.com>
-X-Mailer: git-send-email 2.18.0.huawei.25
-In-Reply-To: <20200217131248.28273-1-gengdongjiu@huawei.com>
-References: <20200217131248.28273-1-gengdongjiu@huawei.com>
+        id S1728593AbgBQNMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 08:12:51 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:37669 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727285AbgBQNMv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 08:12:51 -0500
+Received: by mail-ot1-f67.google.com with SMTP id l2so9820726otp.4;
+        Mon, 17 Feb 2020 05:12:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xyDoQXaxUnAhbcSh1pD7Fmld76RkwiIErcec174JinM=;
+        b=epRTAwIzLUTlnb+/jUX+cHtyDo7U5ekQ1QXhi8Dtx2GLxvNAwcaB7Uv0VQQxmV8ja6
+         mvbMtUMfKzn4o+a4bPe1hysnGfVg6UhfoSwKe3Eqdlpguw6o9rj5F1pDx6axSDir0hPH
+         K4pFMtOcfzc/jC3kHlze9t+Jjs7+cnWF2ffzOwB0QWAuqlFCO4PUYBv7qwBATZKyUPXO
+         DXTjXcVefk6VfasXOhLb03ByM+xyTTGfZssbYOvv3CzB+Q7LkP/pRDymT/Kmak6B6JSL
+         /jkwuwwuaeoLbuHX84scx9G2dtMYtKUs2IBeP7uMGj/Hfmqi9Z8267U5dxnaqj2t+lxe
+         CbwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xyDoQXaxUnAhbcSh1pD7Fmld76RkwiIErcec174JinM=;
+        b=nuwdCIudEnmFNCczJvbMp3NS9/rwxvTEvjKKRLpw/wDjnb4/KhBAO2spBL6Ne3zFwr
+         LC92RlR5wG7RzMbYVNRzNuT8lcfejT04LRyzlLhOHjhUSqM8rqFyGsup0lOYa2ersfqr
+         i/L8xSNmNUSn/T4K4EBe37kje2sPrI5mRyXrLH6u9OiH3p3RzZEd3j52OoOkPe0+p/ki
+         CjSb0zApnCdjHLm6zLjz8dcPsE4zkBpkkfnlF6Ga1EwSi1Vg9JzNsmWZyIGWVCyMmx0t
+         a+3hdWEQ+fjXH+QeBii1OUreZ5FfwCHToH4mCunV8vMzbh5JZ+TDrfQa9truYElv1mT6
+         jIQw==
+X-Gm-Message-State: APjAAAVy+OmHB72glnTHBdeIRzoWypxDq8FXP+RWsKTxVmoqll+knZK3
+        yeQQOuSWwtDLYnSW2ffQrJkHW8xS1XaW7RbEpLt60Q6JIkI=
+X-Google-Smtp-Source: APXvYqzfL7ZMeN9pKFsyZ9L4G9+Gn2ozS60R8nAHEorU6lGOmN4Eg5nc99nLnEbP0RSwoAMKoOvY7SshdPTjhs4leoQ=
+X-Received: by 2002:a9d:7ccd:: with SMTP id r13mr11661299otn.56.1581945170431;
+ Mon, 17 Feb 2020 05:12:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.151.151.243]
-X-CFilter-Loop: Reflected
+References: <CANRm+Cz6Es1TLFdGxz_65i-4osE6=67J=noqWC6n09TeXSJ5SA@mail.gmail.com>
+ <8fd7a83a-6fde-652f-0a2e-ec7b90c13616@redhat.com>
+In-Reply-To: <8fd7a83a-6fde-652f-0a2e-ec7b90c13616@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 17 Feb 2020 21:12:39 +0800
+Message-ID: <CANRm+CxZRCs6h_mffFQsX6N7KFJFFhSADR4vn1J-1OopU+UEAA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] KVM: X86: Less kvmclock sync induced vmexits after
+ VM boots
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The little end UUID is used in many places, so make
-NVDIMM_UUID_LE to a common macro to convert the UUID
-to a little end array.
+On Mon, 17 Feb 2020 at 19:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 17/02/20 11:36, Wanpeng Li wrote:
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index fb5d64e..d0ba2d4 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -9390,8 +9390,9 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+> >      if (!kvmclock_periodic_sync)
+> >          return;
+> >
+> > -    schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
+> > -                    KVMCLOCK_SYNC_PERIOD);
+> > +    if (kvm->created_vcpus == 1)
+> > +        schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
+> > +                        KVMCLOCK_SYNC_PERIOD);
+>
+> This is called with kvm->lock not held, so you can have
+> kvm->created_vcpus == 2 by the time you get here.  You can test instead
+> "if (vcpu->vcpu_idx == 0)".
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Reviewed-by: Xiang Zheng <zhengxiang9@huawei.com>
----
- hw/acpi/nvdimm.c    | 8 ++------
- include/qemu/uuid.h | 5 +++++
- 2 files changed, 7 insertions(+), 6 deletions(-)
+Agreed.
 
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index 9fdad6d..232b701 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -27,6 +27,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/uuid.h"
- #include "hw/acpi/acpi.h"
- #include "hw/acpi/aml-build.h"
- #include "hw/acpi/bios-linker-loader.h"
-@@ -60,17 +61,12 @@ static GSList *nvdimm_get_device_list(void)
-     return list;
- }
- 
--#define NVDIMM_UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
--   { (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
--     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
--     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }
--
- /*
-  * define Byte Addressable Persistent Memory (PM) Region according to
-  * ACPI 6.0: 5.2.25.1 System Physical Address Range Structure.
-  */
- static const uint8_t nvdimm_nfit_spa_uuid[] =
--      NVDIMM_UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
-+      UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
-                      0x18, 0xb7, 0x8c, 0xdb);
- 
- /*
-diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-index 129c45f..bd38af5 100644
---- a/include/qemu/uuid.h
-+++ b/include/qemu/uuid.h
-@@ -34,6 +34,11 @@ typedef struct {
-     };
- } QemuUUID;
- 
-+#define UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
-+  { (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
-+     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
-+     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }
-+
- #define UUID_FMT "%02hhx%02hhx%02hhx%02hhx-" \
-                  "%02hhx%02hhx-%02hhx%02hhx-" \
-                  "%02hhx%02hhx-" \
--- 
-1.8.3.1
-
+    Wanpeng
