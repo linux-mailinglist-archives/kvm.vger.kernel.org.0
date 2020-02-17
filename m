@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DD6516104B
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 11:42:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33E3F161077
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 11:57:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729315AbgBQKma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 05:42:30 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28571 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727789AbgBQKma (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 05:42:30 -0500
+        id S1728477AbgBQK5P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 05:57:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55812 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727503AbgBQK5P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 05:57:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581936149;
+        s=mimecast20190719; t=1581937033;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=nzdTp/0H5gbaw5/RwV7f4pZJdkx9/t/zQFdYTfWWGlI=;
-        b=BjwXtBkYAr3dnqshcxbdmpHqo7d2K+XPzGiFqL5wtxsVhKWa1ibdcYJSlmglWFsxyP4dF1
-        IJa/z7WynXX6/3Yk69WBdG8xE/3UUQjuh8z+5u5w75Qxm11qZIrEorm6E7xJzvzw91DPjZ
-        DhFa0ZdImdG1VvpsdYZAJND0k3WQdYo=
+        bh=0Scpa3b0TzPivhBJvorpeAnXyDU/GJd07Htz7fcMK+E=;
+        b=cF8GR/Frtg5uGYmoiXOjWypsD0gPbvF9jxrGJvwYIungS3gcyVh8CoqYqAGtZAMJQtpdbS
+        ibghh/R+fIMzuX725ePfPmR7BoFfoK8ud/agldukAYZPMoRZc3Rgii0PiF1xWGNDKlgRBb
+        XBlWglXd3+pX4DKD2r4VCdV6IHTj67k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-vVAG4uuHNP6Qo7i22NJnyw-1; Mon, 17 Feb 2020 05:42:25 -0500
-X-MC-Unique: vVAG4uuHNP6Qo7i22NJnyw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-343-5CQTUQieN6aW3uH9T3uWiA-1; Mon, 17 Feb 2020 05:57:08 -0500
+X-MC-Unique: 5CQTUQieN6aW3uH9T3uWiA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 996FD1857342;
-        Mon, 17 Feb 2020 10:42:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9CE21005512;
+        Mon, 17 Feb 2020 10:57:06 +0000 (UTC)
 Received: from [10.36.117.64] (ovpn-117-64.ams2.redhat.com [10.36.117.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 733D510021B3;
-        Mon, 17 Feb 2020 10:42:17 +0000 (UTC)
-Subject: Re: [PATCH v2 08/42] KVM: s390: add new variants of UV CALL
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A6BFC5C100;
+        Mon, 17 Feb 2020 10:56:59 +0000 (UTC)
+Subject: Re: [PATCH v2 09/42] KVM: s390: protvirt: Add initial vm and cpu
+ lifecycle handling
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -45,7 +46,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-9-borntraeger@de.ibm.com>
+ <20200214222658.12946-10-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,148 +92,329 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <d3b051ec-d380-f243-2315-053fb8f75d4a@redhat.com>
-Date:   Mon, 17 Feb 2020 11:42:16 +0100
+Message-ID: <9cac0f98-e593-b6ae-9d53-d3c77ea090a1@redhat.com>
+Date:   Mon, 17 Feb 2020 11:56:57 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214222658.12946-9-borntraeger@de.ibm.com>
+In-Reply-To: <20200214222658.12946-10-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.02.20 23:26, Christian Borntraeger wrote:
-> From: Janosch Frank <frankja@linux.ibm.com>
-> 
-> This adds two new helper functions for doing UV CALLs.
-> 
-> The first variant handles UV CALLs that might have longer busy
-> conditions or just need longer when doing partial completion. We should
-> schedule when necessary.
-> 
-> The second variant handles UV CALLs that only need the handle but have
-> no payload (e.g. destroying a VM). We can provide a simple wrapper for
-> those.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/include/asm/uv.h | 65 +++++++++++++++++++++++++++++++++++---
->  1 file changed, 60 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index e45963cc7f40..bc452a15ac3f 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -14,6 +14,7 @@
->  #include <linux/types.h>
->  #include <linux/errno.h>
->  #include <linux/bug.h>
-> +#include <linux/sched.h>
->  #include <asm/page.h>
->  #include <asm/gmap.h>
->  
-> @@ -91,6 +92,19 @@ struct uv_cb_cfs {
->  	u64 paddr;
->  } __packed __aligned(8);
->  
-> +/*
-> + * A common UV call struct for calls that take no payload
-> + * Examples:
-> + * Destroy cpu/config
-> + * Verify
-> + */
-> +struct uv_cb_nodata {
-> +	struct uv_cb_header header;
-> +	u64 reserved08[2];
-> +	u64 handle;
-> +	u64 reserved20[4];
-> +} __packed __aligned(8);
+[...]
+> =20
+> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+> +{
+> +	int r =3D 0;
+> +	void __user *argp =3D (void __user *)cmd->data;
 > +
->  struct uv_cb_share {
->  	struct uv_cb_header header;
->  	u64 reserved08[3];
-> @@ -98,21 +112,62 @@ struct uv_cb_share {
->  	u64 reserved28;
->  } __packed __aligned(8);
->  
-> -static inline int uv_call(unsigned long r1, unsigned long r2)
-> +static inline int __uv_call(unsigned long r1, unsigned long r2)
+> +	switch (cmd->cmd) {
+> +	case KVM_PV_VM_CREATE: {
+> +		r =3D -EINVAL;
+> +		if (kvm_s390_pv_is_protected(kvm))
+> +			break;
+
+Isn't this racy? I think there has to be a way to make sure the PV state
+can't change. Is there any and I am missing something obvious? (is
+suspect we need the kvm->lock)
+
+> +
+> +		r =3D kvm_s390_pv_alloc_vm(kvm);
+> +		if (r)
+> +			break;
+> +
+> +		mutex_lock(&kvm->lock);
+> +		kvm_s390_vcpu_block_all(kvm);
+> +		/* FMT 4 SIE needs esca */
+> +		r =3D sca_switch_to_extended(kvm);
+> +		if (r) {
+> +			kvm_s390_pv_dealloc_vm(kvm);
+> +			kvm_s390_vcpu_unblock_all(kvm);
+> +			mutex_unlock(&kvm->lock);
+> +			break;
+> +		}
+> +		r =3D kvm_s390_pv_create_vm(kvm, &cmd->rc, &cmd->rrc);
+> +		kvm_s390_vcpu_unblock_all(kvm);
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+> +	}
+> +	case KVM_PV_VM_DESTROY: {
+> +		r =3D -EINVAL;
+> +		if (!kvm_s390_pv_is_protected(kvm))
+> +			break;
+> +
+
+dito
+
+> +		/* All VCPUs have to be destroyed before this call. */
+> +		mutex_lock(&kvm->lock);
+> +		kvm_s390_vcpu_block_all(kvm);
+> +		r =3D kvm_s390_pv_destroy_vm(kvm, &cmd->rc, &cmd->rrc);
+> +		if (!r)
+> +			kvm_s390_pv_dealloc_vm(kvm);
+> +		kvm_s390_vcpu_unblock_all(kvm);
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+> +	}
+> +	case KVM_PV_VM_SET_SEC_PARMS: {
+
+I'd name this "KVM_PV_VM_SET_PARMS" instead.
+
+> +		struct kvm_s390_pv_sec_parm parms =3D {};
+> +		void *hdr;
+> +
+> +		r =3D -EINVAL;
+> +		if (!kvm_s390_pv_is_protected(kvm))
+> +			break;
+> +
+
+dito
+
+> +		r =3D -EFAULT;
+> +		if (copy_from_user(&parms, argp, sizeof(parms)))
+> +			break;
+> +
+> +		/* Currently restricted to 8KB */
+> +		r =3D -EINVAL;
+> +		if (parms.length > PAGE_SIZE * 2)
+> +			break;
+> +
+> +		r =3D -ENOMEM;
+> +		hdr =3D vmalloc(parms.length);
+> +		if (!hdr)
+> +			break;
+> +
+> +		r =3D -EFAULT;
+> +		if (!copy_from_user(hdr, (void __user *)parms.origin,
+> +				    parms.length))
+> +			r =3D kvm_s390_pv_set_sec_parms(kvm, hdr, parms.length,
+> +						      &cmd->rc, &cmd->rrc);
+> +
+> +		vfree(hdr);
+> +		break;
+> +	}
+> +	case KVM_PV_VM_UNPACK: {
+> +		struct kvm_s390_pv_unp unp =3D {};
+> +
+> +		r =3D -EINVAL;
+> +		if (!kvm_s390_pv_is_protected(kvm))
+> +			break;
+> +
+
+dito
+
+> +		r =3D -EFAULT;
+> +		if (copy_from_user(&unp, argp, sizeof(unp)))
+> +			break;
+> +
+> +		r =3D kvm_s390_pv_unpack(kvm, unp.addr, unp.size, unp.tweak,
+> +				       &cmd->rc, &cmd->rrc);
+> +		break;
+> +	}
+> +	case KVM_PV_VM_VERIFY: {
+> +		r =3D -EINVAL;
+> +		if (!kvm_s390_pv_is_protected(kvm))> +			break;
+
+dito
+
+> +
+> +		r =3D uv_cmd_nodata(kvm_s390_pv_handle(kvm),
+> +				  UVC_CMD_VERIFY_IMG, &cmd->rc, &cmd->rrc);
+> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT VERIFY: rc %x rrc %x", cmd->rc,
+> +			     cmd->rrc);
+> +		break;
+> +	}
+> +	default:
+> +		return -ENOTTY;
+> +	}
+> +	return r;
+> +}
+> +
+>  long kvm_arch_vm_ioctl(struct file *filp,
+>  		       unsigned int ioctl, unsigned long arg)
 >  {
->  	int cc;
->  
->  	asm volatile(
-> -		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
-> -		"		brc	3,0b\n"
-> -		"		ipm	%[cc]\n"
-> -		"		srl	%[cc],28\n"
-> +		"	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
-> +		"	ipm	%[cc]\n"
-> +		"	srl	%[cc],28\n"
->  		: [cc] "=d" (cc)
->  		: [r1] "a" (r1), [r2] "a" (r2)
->  		: "memory", "cc");
->  	return cc;
+> @@ -2262,6 +2376,25 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>  		mutex_unlock(&kvm->slots_lock);
+>  		break;
+>  	}
+> +	case KVM_S390_PV_COMMAND: {
+> +		struct kvm_pv_cmd args;
+> +
+> +		r =3D 0;
+> +		if (!is_prot_virt_host()) {
+> +			r =3D -EINVAL;
+> +			break;
+> +		}
+> +		if (copy_from_user(&args, argp, sizeof(args))) {
+> +			r =3D -EFAULT;
+> +			break;
+> +		}
+> +		r =3D kvm_s390_handle_pv(kvm, &args);
+> +		if (copy_to_user(argp, &args, sizeof(args))) {
+> +			r =3D -EFAULT;
+> +			break;
+> +		}
+> +		break;
+> +	}
+>  	default:
+>  		r =3D -ENOTTY;
+>  	}
+> @@ -2525,6 +2658,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned lo=
+ng type)
+> =20
+>  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  {
+> +	u16 rc, rrc;
+> +
+>  	VCPU_EVENT(vcpu, 3, "%s", "free cpu");
+>  	trace_kvm_s390_destroy_vcpu(vcpu->vcpu_id);
+>  	kvm_s390_clear_local_irqs(vcpu);
+> @@ -2537,6 +2672,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+> =20
+>  	if (vcpu->kvm->arch.use_cmma)
+>  		kvm_s390_vcpu_unsetup_cmma(vcpu);
+> +	if (kvm_s390_pv_handle_cpu(vcpu))
+> +		kvm_s390_pv_destroy_cpu(vcpu, &rc, &rrc);
+>  	free_page((unsigned long)(vcpu->arch.sie_block));
 >  }
->  
-> +static inline int uv_call(unsigned long r1, unsigned long r2)
-> +{
-> +	int cc;
+> =20
+> @@ -2558,10 +2695,15 @@ static void kvm_free_vcpus(struct kvm *kvm)
+> =20
+>  void kvm_arch_destroy_vm(struct kvm *kvm)
+>  {
+> +	u16 rc, rrc;
+>  	kvm_free_vcpus(kvm);
+>  	sca_dispose(kvm);
+> -	debug_unregister(kvm->arch.dbf);
+>  	kvm_s390_gisa_destroy(kvm);
+> +	if (kvm_s390_pv_is_protected(kvm)) {
+> +		kvm_s390_pv_destroy_vm(kvm, &rc, &rrc);
+> +		kvm_s390_pv_dealloc_vm(kvm);
+> +	}
+> +	debug_unregister(kvm->arch.dbf);
+>  	free_page((unsigned long)kvm->arch.sie_page2);
+>  	if (!kvm_is_ucontrol(kvm))
+>  		gmap_remove(kvm->arch.gmap);
+> @@ -2657,6 +2799,9 @@ static int sca_switch_to_extended(struct kvm *kvm=
+)
+>  	unsigned int vcpu_idx;
+>  	u32 scaol, scaoh;
+> =20
+> +	if (kvm->arch.use_esca)
+> +		return 0;
 > +
-> +	do {
-> +		cc = __uv_call(r1, r2);
-> +	} while (cc > 1);
-> +	return cc;
-> +}
-> +
-> +/* Low level uv_call that avoids stalls for long running busy conditions  */
-> +static inline int uv_call_sched(unsigned long r1, unsigned long r2)
-> +{
-> +	int cc;
-> +
-> +	do {
-> +		cc = __uv_call(r1, r2);
-> +		cond_resched();
-> +	} while (cc > 1);
-> +	return cc;
-> +}
-> +
-> +/*
-> + * special variant of uv_call that only transports the cpu or guest
-> + * handle and the command, like destroy or verify.
-> + */
-> +static inline int uv_cmd_nodata(u64 handle, u16 cmd, u16 *rc, u16 *rrc)
-> +{
-> +	struct uv_cb_nodata uvcb = {
-> +		.header.cmd = cmd,
-> +		.header.len = sizeof(uvcb),
-> +		.handle = handle,
-> +	};
-> +	int cc;
-> +
-> +	WARN(!handle, "No handle provided to Ultravisor call cmd %x\n", cmd);
-> +	cc = uv_call_sched(0, (u64)&uvcb);
-> +	*rc = uvcb.header.rc;
-> +	*rrc = uvcb.header.rrc;
-> +	return cc ? -EINVAL : 0;
-> +}
-> +
->  struct uv_info {
->  	unsigned long inst_calls_list[4];
->  	unsigned long uv_base_stor_len;
-> 
+>  	new_sca =3D alloc_pages_exact(sizeof(*new_sca), GFP_KERNEL|__GFP_ZERO=
+);
+>  	if (!new_sca)
+>  		return -ENOMEM;
+> @@ -2908,6 +3053,7 @@ static void kvm_s390_vcpu_setup_model(struct kvm_=
+vcpu *vcpu)
+>  static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
+>  {
+>  	int rc =3D 0;
+> +	u16 uvrc, uvrrc;
+> =20
+>  	atomic_set(&vcpu->arch.sie_block->cpuflags, CPUSTAT_ZARCH |
+>  						    CPUSTAT_SM |
+> @@ -2975,6 +3121,9 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *v=
+cpu)
+> =20
+>  	kvm_s390_vcpu_crypto_setup(vcpu);
+> =20
+> +	if (kvm_s390_pv_is_protected(vcpu->kvm))
+> +		rc =3D kvm_s390_pv_create_cpu(vcpu, &uvrc, &uvrrc);
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+With an explicit KVM_PV_VCPU_CREATE, this does not belong here. When
+hotplugging CPUs, user space has to do that manually. But as I said
+already, this user space API could be improved. (below)
 
--- 
+> +
+>  	return rc;
+>  }
+> =20
+> @@ -4352,6 +4501,38 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp=
+,
+>  	return -ENOIOCTLCMD;
+>  }
+> =20
+> +static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu *vcpu,
+> +				   struct kvm_pv_cmd *cmd)
+> +{
+> +	int r =3D 0;
+> +
+> +	if (!kvm_s390_pv_is_protected(vcpu->kvm))
+> +		return -EINVAL;
+> +
+> +	if (cmd->flags)
+> +		return -EINVAL;
+> +
+> +	switch (cmd->cmd) {
+> +	case KVM_PV_VCPU_CREATE: {
+> +		if (kvm_s390_pv_handle_cpu(vcpu))
+> +			return -EINVAL;
+> +
+> +		r =3D kvm_s390_pv_create_cpu(vcpu, &cmd->rc, &cmd->rrc);
+> +		break;
+> +	}
+> +	case KVM_PV_VCPU_DESTROY: {
+> +		if (!kvm_s390_pv_handle_cpu(vcpu))
+> +			return -EINVAL;
+> +
+> +		r =3D kvm_s390_pv_destroy_cpu(vcpu, &cmd->rc, &cmd->rrc);
+> +		break;
+> +	}
+> +	default:
+> +		r =3D -ENOTTY;
+> +	}
+> +	return r;
+> +}
+> +
+>  long kvm_arch_vcpu_ioctl(struct file *filp,
+>  			 unsigned int ioctl, unsigned long arg)
+>  {
+> @@ -4493,6 +4674,25 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  					   irq_state.len);
+>  		break;
+>  	}
+> +	case KVM_S390_PV_COMMAND_VCPU: {
+> +		struct kvm_pv_cmd args;
+> +
+> +		r =3D 0;
+> +		if (!is_prot_virt_host()) {
+> +			r =3D -EINVAL;
+> +			break;
+> +		}
+> +		if (copy_from_user(&args, argp, sizeof(args))) {
+> +			r =3D -EFAULT;
+> +			break;
+> +		}
+> +		r =3D kvm_s390_handle_pv_vcpu(vcpu, &args);
+> +		if (copy_to_user(argp, &args, sizeof(args))) {
+> +			r =3D -EFAULT;
+> +			break;
+> +		}
+> +		break;
+> +	}
+>  	default:
+>  		r =3D -ENOTTY;
+
+
+Can we please discuss why we can't
+
+- Get rid of KVM_S390_PV_COMMAND_VCPU
+- Do the allocation in KVM_PV_VM_CREATE
+- Rename KVM_PV_VM_CREATE -> KVM_PV_ENABLE
+- Rename KVM_PV_VM_DESTROY -> KVM_PV_DISABLE
+
+This user space API is unnecessary complicated and confusing.
+
+--=20
 Thanks,
 
 David / dhildenb
