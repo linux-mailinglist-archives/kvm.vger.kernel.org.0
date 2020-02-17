@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F0D5161041
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 11:41:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DD6516104B
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 11:42:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727803AbgBQKla (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 05:41:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38958 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726821AbgBQKl3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 05:41:29 -0500
+        id S1729315AbgBQKma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 05:42:30 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28571 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727789AbgBQKma (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 05:42:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581936088;
+        s=mimecast20190719; t=1581936149;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=AwP1zRB5llpKsjRtm1hjBQfYDatEkhzkLwXv1wbbJ6Y=;
-        b=BUy1cNX1kPkpZgoQAU+UvRDTLvMMN79F84f28p/jshIxrWEf+Ne3bovBuno/uQmVh7oeOE
-        RvKripW6cZ9rRfy6N72FOXwJQ2ndUvXVRf6uu8oo38ghiFNla+zRAdVs8Vx8ePbERM57CD
-        0jBLjfu7Z1hmtdDWdv9psdr8+/y5JOg=
+        bh=nzdTp/0H5gbaw5/RwV7f4pZJdkx9/t/zQFdYTfWWGlI=;
+        b=BjwXtBkYAr3dnqshcxbdmpHqo7d2K+XPzGiFqL5wtxsVhKWa1ibdcYJSlmglWFsxyP4dF1
+        IJa/z7WynXX6/3Yk69WBdG8xE/3UUQjuh8z+5u5w75Qxm11qZIrEorm6E7xJzvzw91DPjZ
+        DhFa0ZdImdG1VvpsdYZAJND0k3WQdYo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-R5Yx4OW3MAa9jZwcDQ2M5A-1; Mon, 17 Feb 2020 05:41:24 -0500
-X-MC-Unique: R5Yx4OW3MAa9jZwcDQ2M5A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-321-vVAG4uuHNP6Qo7i22NJnyw-1; Mon, 17 Feb 2020 05:42:25 -0500
+X-MC-Unique: vVAG4uuHNP6Qo7i22NJnyw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEAF4801A06;
-        Mon, 17 Feb 2020 10:41:22 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 996FD1857342;
+        Mon, 17 Feb 2020 10:42:23 +0000 (UTC)
 Received: from [10.36.117.64] (ovpn-117-64.ams2.redhat.com [10.36.117.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 06E412CC39;
-        Mon, 17 Feb 2020 10:41:16 +0000 (UTC)
-Subject: Re: [PATCH v2 07/42] KVM: s390: protvirt: Add UV debug trace
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 733D510021B3;
+        Mon, 17 Feb 2020 10:42:17 +0000 (UTC)
+Subject: Re: [PATCH v2 08/42] KVM: s390: add new variants of UV CALL
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -45,7 +45,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-8-borntraeger@de.ibm.com>
+ <20200214222658.12946-9-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,16 +91,16 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <d33fd043-a350-bc75-87d0-e6485163ae17@redhat.com>
-Date:   Mon, 17 Feb 2020 11:41:15 +0100
+Message-ID: <d3b051ec-d380-f243-2315-053fb8f75d4a@redhat.com>
+Date:   Mon, 17 Feb 2020 11:42:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214222658.12946-8-borntraeger@de.ibm.com>
+In-Reply-To: <20200214222658.12946-9-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -109,39 +109,126 @@ X-Mailing-List: kvm@vger.kernel.org
 On 14.02.20 23:26, Christian Borntraeger wrote:
 > From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> Let's have some debug traces which stay around for longer than the
-> guest.
+> This adds two new helper functions for doing UV CALLs.
+> 
+> The first variant handles UV CALLs that might have longer busy
+> conditions or just need longer when doing partial completion. We should
+> schedule when necessary.
+> 
+> The second variant handles UV CALLs that only need the handle but have
+> no payload (e.g. destroying a VM). We can provide a simple wrapper for
+> those.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/s390/kvm/kvm-s390.c |  9 ++++++++-
->  arch/s390/kvm/kvm-s390.h | 11 +++++++++++
->  2 files changed, 19 insertions(+), 1 deletion(-)
+>  arch/s390/include/asm/uv.h | 65 +++++++++++++++++++++++++++++++++++---
+>  1 file changed, 60 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index d7ff30e45589..cc7793525a69 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -220,6 +220,7 @@ static struct kvm_s390_vm_cpu_subfunc kvm_s390_available_subfunc;
->  static struct gmap_notifier gmap_notifier;
->  static struct gmap_notifier vsie_gmap_notifier;
->  debug_info_t *kvm_s390_dbf;
-> +debug_info_t *kvm_s390_dbf_uv;
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index e45963cc7f40..bc452a15ac3f 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -14,6 +14,7 @@
+>  #include <linux/types.h>
+>  #include <linux/errno.h>
+>  #include <linux/bug.h>
+> +#include <linux/sched.h>
+>  #include <asm/page.h>
+>  #include <asm/gmap.h>
 >  
->  /* Section: not file related */
->  int kvm_arch_hardware_enable(void)
-> @@ -460,7 +461,12 @@ int kvm_arch_init(void *opaque)
->  	if (!kvm_s390_dbf)
->  		return -ENOMEM;
+> @@ -91,6 +92,19 @@ struct uv_cb_cfs {
+>  	u64 paddr;
+>  } __packed __aligned(8);
 >  
-> -	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view))
-> +	kvm_s390_dbf_uv = debug_register("kvm-uv", 32, 1, 7 * sizeof(long));
-> +	if (!kvm_s390_dbf_uv)
-> +		goto out;
-
+> +/*
+> + * A common UV call struct for calls that take no payload
+> + * Examples:
+> + * Destroy cpu/config
+> + * Verify
+> + */
+> +struct uv_cb_nodata {
+> +	struct uv_cb_header header;
+> +	u64 reserved08[2];
+> +	u64 handle;
+> +	u64 reserved20[4];
+> +} __packed __aligned(8);
+> +
+>  struct uv_cb_share {
+>  	struct uv_cb_header header;
+>  	u64 reserved08[3];
+> @@ -98,21 +112,62 @@ struct uv_cb_share {
+>  	u64 reserved28;
+>  } __packed __aligned(8);
+>  
+> -static inline int uv_call(unsigned long r1, unsigned long r2)
+> +static inline int __uv_call(unsigned long r1, unsigned long r2)
+>  {
+>  	int cc;
+>  
+>  	asm volatile(
+> -		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
+> -		"		brc	3,0b\n"
+> -		"		ipm	%[cc]\n"
+> -		"		srl	%[cc],28\n"
+> +		"	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
+> +		"	ipm	%[cc]\n"
+> +		"	srl	%[cc],28\n"
+>  		: [cc] "=d" (cc)
+>  		: [r1] "a" (r1), [r2] "a" (r2)
+>  		: "memory", "cc");
+>  	return cc;
+>  }
+>  
+> +static inline int uv_call(unsigned long r1, unsigned long r2)
+> +{
+> +	int cc;
+> +
+> +	do {
+> +		cc = __uv_call(r1, r2);
+> +	} while (cc > 1);
+> +	return cc;
+> +}
+> +
+> +/* Low level uv_call that avoids stalls for long running busy conditions  */
+> +static inline int uv_call_sched(unsigned long r1, unsigned long r2)
+> +{
+> +	int cc;
+> +
+> +	do {
+> +		cc = __uv_call(r1, r2);
+> +		cond_resched();
+> +	} while (cc > 1);
+> +	return cc;
+> +}
+> +
+> +/*
+> + * special variant of uv_call that only transports the cpu or guest
+> + * handle and the command, like destroy or verify.
+> + */
+> +static inline int uv_cmd_nodata(u64 handle, u16 cmd, u16 *rc, u16 *rrc)
+> +{
+> +	struct uv_cb_nodata uvcb = {
+> +		.header.cmd = cmd,
+> +		.header.len = sizeof(uvcb),
+> +		.handle = handle,
+> +	};
+> +	int cc;
+> +
+> +	WARN(!handle, "No handle provided to Ultravisor call cmd %x\n", cmd);
+> +	cc = uv_call_sched(0, (u64)&uvcb);
+> +	*rc = uvcb.header.rc;
+> +	*rrc = uvcb.header.rrc;
+> +	return cc ? -EINVAL : 0;
+> +}
+> +
+>  struct uv_info {
+>  	unsigned long inst_calls_list[4];
+>  	unsigned long uv_base_stor_len;
+> 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
