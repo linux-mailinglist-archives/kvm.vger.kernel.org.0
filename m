@@ -2,112 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 70EF81613B4
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 14:41:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45739161453
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 15:15:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726710AbgBQNlX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 08:41:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37966 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726314AbgBQNlX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 08:41:23 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 06D192070B;
-        Mon, 17 Feb 2020 13:41:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581946882;
-        bh=tbdEvdf/iPgFcEmtTo5xRVHBll2cVJBNEUT7VMieH2o=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=0y+9BYPbqi6vSSbFz5DTxlY+Gpnead5nMhaRnAy62noKXvukNSdoeYwrZGh4kDn1c
-         RQzqtxoaWV6Lf7AmhPCrvYe74cvfzZK5sGsf7DkvThIEfx8MF0nya9HeOnIFftJDNa
-         fSfx4YvR9b+0VfE9GUQm8iP6eCT5vQMoUT3Jx204=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j3geG-005vjd-1f; Mon, 17 Feb 2020 13:41:20 +0000
+        id S1728375AbgBQOPW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 09:15:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26362 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726760AbgBQOPW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 09:15:22 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01HEFFwp109493
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 09:15:20 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y6dh3yxa5-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 09:15:20 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <uweigand@de.ibm.com>;
+        Mon, 17 Feb 2020 14:15:18 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 17 Feb 2020 14:15:13 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01HEFCEs4915318
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Feb 2020 14:15:12 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 45DB74C076;
+        Mon, 17 Feb 2020 14:15:12 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 331A54C06F;
+        Mon, 17 Feb 2020 14:15:12 +0000 (GMT)
+Received: from oc3748833570.ibm.com (unknown [9.152.214.26])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Feb 2020 14:15:12 +0000 (GMT)
+Received: by oc3748833570.ibm.com (Postfix, from userid 1000)
+        id F3736D802EA; Mon, 17 Feb 2020 15:15:11 +0100 (CET)
+Date:   Mon, 17 Feb 2020 15:15:11 +0100
+From:   Ulrich Weigand <uweigand@de.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
+        Will Deacon <will@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v2 40/42] example for future extension: mm:gup/writeback:
+ add callbacks for inaccessible pages: source indication
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-41-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 17 Feb 2020 13:41:19 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v2 09/94] KVM: arm64: nv: Support virtual EL2 exceptions
-In-Reply-To: <20200217125240.GC47755@lakrids.cambridge.arm.com>
-References: <20200211174938.27809-1-maz@kernel.org>
- <20200211174938.27809-10-maz@kernel.org>
- <20200217125240.GC47755@lakrids.cambridge.arm.com>
-Message-ID: <6ad311202c1be408236899853f66c74a@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, Dave.Martin@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200214222658.12946-41-borntraeger@de.ibm.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-TM-AS-GCONF: 00
+x-cbid: 20021714-0020-0000-0000-000003AAF3BB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021714-0021-0000-0000-00002202EB10
+Message-Id: <20200217141511.GA14704@oc3748833570.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-17_08:2020-02-17,2020-02-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 mlxscore=0 bulkscore=0 phishscore=0 adultscore=0
+ mlxlogscore=682 clxscore=1015 malwarescore=0 lowpriorityscore=0
+ impostorscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2001150001 definitions=main-2002170118
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-02-17 12:52, Mark Rutland wrote:
-> On Tue, Feb 11, 2020 at 05:48:13PM +0000, Marc Zyngier wrote:
->> From: Jintack Lim <jintack.lim@linaro.org>
->> 
->> Support injecting exceptions and performing exception returns to and
->> from virtual EL2.  This must be done entirely in software except when
->> taking an exception from vEL0 to vEL2 when the virtual 
->> HCR_EL2.{E2H,TGE}
->> == {1,1}  (a VHE guest hypervisor).
->> 
->> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
->> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/include/asm/kvm_arm.h     |  17 +++
->>  arch/arm64/include/asm/kvm_emulate.h |  22 ++++
->>  arch/arm64/kvm/Makefile              |   2 +
->>  arch/arm64/kvm/emulate-nested.c      | 183 
->> +++++++++++++++++++++++++++
->>  arch/arm64/kvm/inject_fault.c        |  12 --
->>  arch/arm64/kvm/trace.h               |  56 ++++++++
->>  6 files changed, 280 insertions(+), 12 deletions(-)
->>  create mode 100644 arch/arm64/kvm/emulate-nested.c
-> 
-> [...]
-> 
->> +static void enter_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
->> +				enum exception_type type)
->> +{
->> +	trace_kvm_inject_nested_exception(vcpu, esr_el2, type);
->> +
->> +	vcpu_write_sys_reg(vcpu, *vcpu_cpsr(vcpu), SPSR_EL2);
->> +	vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
->> +	vcpu_write_sys_reg(vcpu, esr_el2, ESR_EL2);
->> +
->> +	*vcpu_pc(vcpu) = get_el2_except_vector(vcpu, type);
->> +	/* On an exception, PSTATE.SP becomes 1 */
->> +	*vcpu_cpsr(vcpu) = PSR_MODE_EL2h;
->> +	*vcpu_cpsr(vcpu) |= PSR_A_BIT | PSR_F_BIT | PSR_I_BIT | PSR_D_BIT;
->> +}
-> 
-> This needs to be fixed up to handle the rest of the PSTATE bits.
-> 
-> It should be possible to refactor get_except64_pstate() for that. I
-> *think* the only differences are bits affects by SCTLR controls, but
-> someone should audit that -- good thing we added references. :)
+On Fri, Feb 14, 2020 at 05:26:56PM -0500, Christian Borntraeger wrote:
+> +enum access_type {
+> +	MAKE_ACCESSIBLE_GENERIC,
+> +	MAKE_ACCESSIBLE_GET,
+> +	MAKE_ACCESSIBLE_GET_FAST,
+> +	MAKE_ACCESSIBLE_WRITEBACK
+> +};
+>  #ifndef HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
+> -static inline int arch_make_page_accessible(struct page *page)
+> +static inline int arch_make_page_accessible(struct page *page, int where)
 
-Absolutely. It is on my list of things to fix for the next drop. Also,
-("arm64: KVM: nv: Honor SCTLR_EL2.SPAN on entering vEL2") should be
-folded in there (or simply dropped if we can reuse the EL1 stuff).
+If we want to make this distinction, wouldn't it be simpler to just
+use different function names, like
+  arch_make_page_accessible_for_writeback
+  arch_make_page_accessible_for_gup
+etc.
 
-Thanks,
+Bye,
+Ulrich
 
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+  Dr. Ulrich Weigand
+  GNU/Linux compilers and toolchain
+  Ulrich.Weigand@de.ibm.com
+
