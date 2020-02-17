@@ -2,84 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D16E16125E
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 13:52:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 559A6161271
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 14:00:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727332AbgBQMwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 07:52:44 -0500
-Received: from foss.arm.com ([217.140.110.172]:35368 "EHLO foss.arm.com"
+        id S1728799AbgBQNAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 08:00:01 -0500
+Received: from mga06.intel.com ([134.134.136.31]:30334 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726797AbgBQMwo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 07:52:44 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9ED0330E;
-        Mon, 17 Feb 2020 04:52:43 -0800 (PST)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B75A73F703;
-        Mon, 17 Feb 2020 04:52:42 -0800 (PST)
-Date:   Mon, 17 Feb 2020 12:52:40 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v2 09/94] KVM: arm64: nv: Support virtual EL2 exceptions
-Message-ID: <20200217125240.GC47755@lakrids.cambridge.arm.com>
-References: <20200211174938.27809-1-maz@kernel.org>
- <20200211174938.27809-10-maz@kernel.org>
+        id S1728791AbgBQNAB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 08:00:01 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Feb 2020 05:00:00 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,452,1574150400"; 
+   d="scan'208";a="258260178"
+Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
+  by fmsmga004.fm.intel.com with ESMTP; 17 Feb 2020 04:59:58 -0800
+Date:   Mon, 17 Feb 2020 21:03:55 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        jmattson@google.com, aaronlewis@google.com
+Subject: Re: [RFC PATCH 1/2] KVM: CPUID: Enable supervisor XSAVE states in
+ CPUID enumeration and XSS
+Message-ID: <20200217130355.GA10854@local-michael-cet-test.sh.intel.com>
+References: <20200211065706.3462-1-weijiang.yang@intel.com>
+ <a75a0e16-198d-9c96-3a63-d09a93909c0f@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200211174938.27809-10-maz@kernel.org>
-User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+In-Reply-To: <a75a0e16-198d-9c96-3a63-d09a93909c0f@intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 11, 2020 at 05:48:13PM +0000, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
+On Mon, Feb 17, 2020 at 12:26:51PM +0800, Xiaoyao Li wrote:
+> On 2/11/2020 2:57 PM, Yang Weijiang wrote:
+> > CPUID.(EAX=DH, ECX={i}H i>=0) enumerates XSAVE related leaves/sub-leaves,
+> > +extern int host_xss;
+> > +u64 kvm_supported_xss(void)
+> > +{
+> > +	return KVM_SUPPORTED_XSS & host_xss;
+> > +}
+> > +
 > 
-> Support injecting exceptions and performing exception returns to and
-> from virtual EL2.  This must be done entirely in software except when
-> taking an exception from vEL0 to vEL2 when the virtual HCR_EL2.{E2H,TGE}
-> == {1,1}  (a VHE guest hypervisor).
+> How about using a global variable, supported_xss, instead of calculating the
+> mask on every call. Just like what Sean posted on
+> https://lore.kernel.org/kvm/20200201185218.24473-21-sean.j.christopherson@intel.com/
+>
+Thanks Xiaoyao for the comments!
+Good suggestion, I'll change it in next version.
+
+> >   #define F(x) bit(X86_FEATURE_##x)
+> >   int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+> > @@ -112,10 +118,17 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+> >   		vcpu->arch.guest_xstate_size = best->ebx =
+> >   			xstate_required_size(vcpu->arch.xcr0, false);
+> >   	}
+> > -
+> >   	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
+> > -	if (best && (best->eax & (F(XSAVES) | F(XSAVEC))))
+> > -		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+> > +	if (best && (best->eax & (F(XSAVES) | F(XSAVEC)))) {
+> > +		u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
+> > +
+> > +		best->ebx = xstate_required_size(xstate, true);
+> > +		vcpu->arch.guest_supported_xss =
+> > +			(best->ecx | ((u64)best->edx << 32)) &
+> > +			kvm_supported_xss();
+> > +	} else {
+> > +		vcpu->arch.guest_supported_xss = 0;
+> > +	}
+> >   	/*
+> >   	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+> > @@ -426,6 +439,56 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+> >   	}
+> >   }
+> > +static inline bool do_cpuid_0xd_mask(struct kvm_cpuid_entry2 *entry, int index)
+> > +{
+> > +	unsigned int f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
+> > +	/* cpuid 0xD.1.eax */
+> > +	const u32 kvm_cpuid_D_1_eax_x86_features =
+> > +		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+> > +	u64 u_supported = kvm_supported_xcr0();
+> > +	u64 s_supported = kvm_supported_xss();
+> > +	u64 supported;
+> > +
+> > +	switch (index) {
+> > +	case 0:
+> > +		if (!u_supported) {
+> > +			entry->eax = 0;
+> > +			entry->ebx = 0;
+> > +			entry->ecx = 0;
+> > +			entry->edx = 0;
+> > +			return false;
+> > +		}
+> > +		entry->eax &= u_supported;
+> > +		entry->ebx = xstate_required_size(u_supported, false);
+> > +		entry->ecx = entry->ebx;
+> > +		entry->edx &= u_supported >> 32;
+> > +		break;
+> > +	case 1:
+> > +		supported = u_supported | s_supported;
+> > +		entry->eax &= kvm_cpuid_D_1_eax_x86_features;
+> > +		cpuid_mask(&entry->eax, CPUID_D_1_EAX);
+> > +		entry->ebx = 0;
+> > +		entry->edx &= s_supported >> 32;
+> > +		entry->ecx &= s_supported;
 > 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_arm.h     |  17 +++
->  arch/arm64/include/asm/kvm_emulate.h |  22 ++++
->  arch/arm64/kvm/Makefile              |   2 +
->  arch/arm64/kvm/emulate-nested.c      | 183 +++++++++++++++++++++++++++
->  arch/arm64/kvm/inject_fault.c        |  12 --
->  arch/arm64/kvm/trace.h               |  56 ++++++++
->  6 files changed, 280 insertions(+), 12 deletions(-)
->  create mode 100644 arch/arm64/kvm/emulate-nested.c
+> We'd better initialize msr_ia32_xss bitmap (entry->ecx & entry-edx) as zeros
+> here.
+Hmm, explicit setting the MSR to 0 is good in this case, but there's implied
+flow to ensure guest MSR_IA32_XSS will be 0 if entry->ecx and entry->edx are 0s.
+In above kvm_update_cpuid(), vcpu->arch.guest_supported_xss is set to 0
+when they're 0s. this masks guest cannot set non-zero value to this
+MSR. And in kvm_vcpu_reset(), vcpu->arch.ia32_xss is initialized to 0,
+in kvm_load_guest_xsave_state() MSR_IA32_XSS is set to ia32_xss,
+therefore the MSR is kept to 0.
+> 
+> > +		if (entry->eax & (F(XSAVES) | F(XSAVEC)))
+> > +			entry->ebx = xstate_required_size(supported, true);
+> 
+> And setup msr_ia32_xss bitmap based on the s_supported within this condition
+> when F(XSAVES) is supported.
 
-[...]
-
-> +static void enter_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
-> +				enum exception_type type)
-> +{
-> +	trace_kvm_inject_nested_exception(vcpu, esr_el2, type);
-> +
-> +	vcpu_write_sys_reg(vcpu, *vcpu_cpsr(vcpu), SPSR_EL2);
-> +	vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
-> +	vcpu_write_sys_reg(vcpu, esr_el2, ESR_EL2);
-> +
-> +	*vcpu_pc(vcpu) = get_el2_except_vector(vcpu, type);
-> +	/* On an exception, PSTATE.SP becomes 1 */
-> +	*vcpu_cpsr(vcpu) = PSR_MODE_EL2h;
-> +	*vcpu_cpsr(vcpu) |= PSR_A_BIT | PSR_F_BIT | PSR_I_BIT | PSR_D_BIT;
-> +}
-
-This needs to be fixed up to handle the rest of the PSTATE bits.
-
-It should be possible to refactor get_except64_pstate() for that. I
-*think* the only differences are bits affects by SCTLR controls, but
-someone should audit that -- good thing we added references. :)
-
-Thanks,
-Mark.
+IIUC, both XSAVEC and XSAVES use compacted format of the extended
+region, so if XSAVEC is supported while XSAVES is not, guest still can
+get correct size, so in existing code the two bits are ORed.
+> 
+> > +		break;
+> > +	default:
+> > +		supported = (entry->ecx & 0x1) ? s_supported : u_supported;
+> > +		if (!(supported & (BIT_ULL(index)))) {
+> > +			entry->eax = 0;
+> > +			entry->ebx = 0;
+> > +			entry->ecx = 0;
+> > +			entry->edx = 0;
+> > +			return false;
+> > +		}
+> > +		if (entry->ecx & 0x1)
+> > +			entry->ebx = 0;
+> > +		break;
+> > +	}
+> > +	return true;
+> > +}
+> > +
+> >   static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+> >   				  int *nent, int maxnent)
+> >   {
+> > @@ -440,7 +503,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+> >   	unsigned f_lm = 0;
+> >   #endif
+> >   	unsigned f_rdtscp = kvm_x86_ops->rdtscp_supported() ? F(RDTSCP) : 0;
+> > -	unsigned f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
+> >   	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
+> >   	/* cpuid 1.edx */
+> > @@ -495,10 +557,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+> >   		F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
+> >   		F(PMM) | F(PMM_EN);
+> > -	/* cpuid 0xD.1.eax */
+> > -	const u32 kvm_cpuid_D_1_eax_x86_features =
+> > -		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+> > -
+> >   	/* all calls to cpuid_count() should be made on the same cpu */
+> >   	get_cpu();
+> > @@ -639,38 +697,21 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+> >   		break;
+> >   	}
+> >   	case 0xd: {
+> > -		int idx, i;
+> > -		u64 supported = kvm_supported_xcr0();
+> > +		int i, idx;
+> > -		entry->eax &= supported;
+> > -		entry->ebx = xstate_required_size(supported, false);
+> > -		entry->ecx = entry->ebx;
+> > -		entry->edx &= supported >> 32;
+> > -		if (!supported)
+> > +		if (!do_cpuid_0xd_mask(&entry[0], 0))
+> >   			break;
+> > -
+> > -		for (idx = 1, i = 1; idx < 64; ++idx) {
+> > -			u64 mask = ((u64)1 << idx);
+> > +		for (i = 1, idx = 1; idx < 64; ++idx) {
+> >   			if (*nent >= maxnent)
+> >   				goto out;
+> > -
+> >   			do_host_cpuid(&entry[i], function, idx);
+> > -			if (idx == 1) {
+> > -				entry[i].eax &= kvm_cpuid_D_1_eax_x86_features;
+> > -				cpuid_mask(&entry[i].eax, CPUID_D_1_EAX);
+> > -				entry[i].ebx = 0;
+> > -				if (entry[i].eax & (F(XSAVES)|F(XSAVEC)))
+> > -					entry[i].ebx =
+> > -						xstate_required_size(supported,
+> > -								     true);
+> > -			} else {
+> > -				if (entry[i].eax == 0 || !(supported & mask))
+> > -					continue;
+> > -				if (WARN_ON_ONCE(entry[i].ecx & 1))
+> > -					continue;
+> > -			}
+> > -			entry[i].ecx = 0;
+> > -			entry[i].edx = 0;
+> > +
+> > +			if (entry[i].eax == 0 && entry[i].ebx == 0 &&
+> > +			    entry[i].ecx == 0 && entry[i].edx == 0)
+> > +				continue;
+> > +
+> > +			if (!do_cpuid_0xd_mask(&entry[i], idx))
+> > +				continue;
+> >   			++*nent;
+> >   			++i;
+> >   		}
+ > 
