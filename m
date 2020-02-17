@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C37F6161128
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 12:33:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E9D2161191
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 13:04:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728594AbgBQLdZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 06:33:25 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10616 "EHLO
+        id S1729070AbgBQMEW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 07:04:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57638 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728077AbgBQLdZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 06:33:25 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01HBUAUU054058
-        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 06:33:23 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y6dnsgrt2-1
+        by vger.kernel.org with ESMTP id S1726397AbgBQMEV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 07:04:21 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01HBxOkL066300
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 07:04:20 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y6bp03ykt-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 06:33:23 -0500
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2020 07:04:20 -0500
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 17 Feb 2020 11:33:21 -0000
+        Mon, 17 Feb 2020 12:04:18 -0000
 Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 17 Feb 2020 11:33:19 -0000
+        Mon, 17 Feb 2020 12:04:15 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01HBWKCq49611016
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01HC3GGb47120740
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Feb 2020 11:32:20 GMT
+        Mon, 17 Feb 2020 12:03:16 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EA9C252050;
-        Mon, 17 Feb 2020 11:33:15 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 9B30A5205F;
+        Mon, 17 Feb 2020 12:04:11 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.211])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 959245204E;
-        Mon, 17 Feb 2020 11:33:15 +0000 (GMT)
-Subject: Re: [PATCH v2 19/42] KVM: s390: protvirt: Add new gprs location
- handling
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 47EFF5204E;
+        Mon, 17 Feb 2020 12:04:11 +0000 (GMT)
+Subject: Re: [PATCH v2 09/42] KVM: s390: protvirt: Add initial vm and cpu
+ lifecycle handling
 To:     David Hildenbrand <david@redhat.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -49,8 +49,8 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-20-borntraeger@de.ibm.com>
- <38b60f61-db18-ee7a-6b8e-192a7bb9d259@redhat.com>
+ <20200214222658.12946-10-borntraeger@de.ibm.com>
+ <9cac0f98-e593-b6ae-9d53-d3c77ea090a1@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -95,26 +95,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 17 Feb 2020 12:33:15 +0100
+Date:   Mon, 17 Feb 2020 13:04:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <38b60f61-db18-ee7a-6b8e-192a7bb9d259@redhat.com>
+In-Reply-To: <9cac0f98-e593-b6ae-9d53-d3c77ea090a1@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20021711-0016-0000-0000-000002E791DB
+x-cbid: 20021712-0012-0000-0000-0000038797C3
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021711-0017-0000-0000-0000334AA0E9
-Message-Id: <7cd5dbca-6693-d1f1-dff4-8479f080c921@de.ibm.com>
+x-cbparentid: 20021712-0013-0000-0000-000021C4249E
+Message-Id: <f70b97fe-fbaf-2e5a-cc7d-a7529a8943f4@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-17_06:2020-02-17,2020-02-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
- malwarescore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
- adultscore=0 suspectscore=0 mlxscore=0 phishscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002170099
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ spamscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
+ malwarescore=0 phishscore=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002170103
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -122,20 +122,106 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 17.02.20 12:01, David Hildenbrand wrote:
-
-> As discussed, I think there is room for improvement in the future (which
-> we could have documented in the patch description), because this is
-> obviously sub-optimal.
+On 17.02.20 11:56, David Hildenbrand wrote:
+> [...]
+>>  
+>> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>> +{
+>> +	int r = 0;
+>> +	void __user *argp = (void __user *)cmd->data;
+>> +
+>> +	switch (cmd->cmd) {
+>> +	case KVM_PV_VM_CREATE: {
+>> +		r = -EINVAL;
+>> +		if (kvm_s390_pv_is_protected(kvm))
+>> +			break;
 > 
-
-Will use the following as patch description
-  
-Guest registers for protected guests are stored at offset 0x380.  We
-will copy those to the usual places.  Long term we could refactor this
-or use register access functions.
+> Isn't this racy? I think there has to be a way to make sure the PV state
+> can't change. Is there any and I am missing something obvious? (is
+> suspect we need the kvm->lock)
 
 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+Yes, kvm->lock around kvm_s390_handle_pv is safer.
+
+Something like
+
+
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 932f7f32e82f..87dc6caa2181 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2422,7 +2422,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
+                        r = -EFAULT;
+                        break;
+                }
++               mutex_lock(&kvm->lock);
+                r = kvm_s390_handle_pv(kvm, &args);
++               mutex_unlock(&kvm->lock);
+                if (copy_to_user(argp, &args, sizeof(args))) {
+                        r = -EFAULT;
+                        break;
+
+
+
+[...]
+
+
+>> +	case KVM_PV_VM_SET_SEC_PARMS: {
 > 
+> I'd name this "KVM_PV_VM_SET_PARMS" instead.
+
+[...]
+
+>> @@ -2975,6 +3121,9 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
+>>  
+>>  	kvm_s390_vcpu_crypto_setup(vcpu);
+>>  
+>> +	if (kvm_s390_pv_is_protected(vcpu->kvm))
+>> +		rc = kvm_s390_pv_create_cpu(vcpu, &uvrc, &uvrrc);
+> 
+> With an explicit KVM_PV_VCPU_CREATE, this does not belong here. When
+> hotplugging CPUs, user space has to do that manually. But as I said
+> already, this user space API could be improved. (below)
+
+With your proposed API this would stay.
+
+[...]
+
+>> @@ -4493,6 +4674,25 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>  					   irq_state.len);
+>>  		break;
+>>  	}
+>> +	case KVM_S390_PV_COMMAND_VCPU: {
+>> +		struct kvm_pv_cmd args;
+>> +
+>> +		r = 0;
+>> +		if (!is_prot_virt_host()) {
+>> +			r = -EINVAL;
+>> +			break;
+>> +		}
+>> +		if (copy_from_user(&args, argp, sizeof(args))) {
+>> +			r = -EFAULT;
+>> +			break;
+>> +		}
+>> +		r = kvm_s390_handle_pv_vcpu(vcpu, &args);
+>> +		if (copy_to_user(argp, &args, sizeof(args))) {
+>> +			r = -EFAULT;
+>> +			break;
+>> +		}
+>> +		break;
+>> +	}
+>>  	default:
+>>  		r = -ENOTTY;
+> 
+> 
+> Can we please discuss why we can't
+> 
+> - Get rid of KVM_S390_PV_COMMAND_VCPU
+> - Do the allocation in KVM_PV_VM_CREATE
+> - Rename KVM_PV_VM_CREATE -> KVM_PV_ENABLE
+> - Rename KVM_PV_VM_DESTROY -> KVM_PV_DISABLE
+> 
+> This user space API is unnecessary complicated and confusing.
+
+I will have a look if this is feasible.
 
