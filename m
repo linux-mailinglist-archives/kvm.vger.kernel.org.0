@@ -2,53 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4D88161B68
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 20:16:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D35B6161B6F
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2020 20:18:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729642AbgBQTQ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 14:16:56 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48392 "EHLO
+        id S1729698AbgBQTSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Feb 2020 14:18:36 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39501 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729477AbgBQTQ4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 14:16:56 -0500
+        by vger.kernel.org with ESMTP id S1729694AbgBQTSg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 17 Feb 2020 14:18:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1581967015;
+        s=mimecast20190719; t=1581967115;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=l1LTUBcs3Qor7uwmZ82Ma1YSEqxnpgMTX6nSQntrMIs=;
-        b=cUrlYlE6FoWU6QwKe0B5vylXUCG9+qTQBAp7KMFRi/3G66248Hp2JrLh4qmMnj8IOIxiTN
-        6Z0lbg1mz5dw2j5Ld0964LOdhciV+fh/SlUfZAZQd0QfgGgjSK2GDzq8n4HZ4repFcaeou
-        9Mti1+sCR/s+UQk11WLy5uOVsr2Eezg=
+        bh=iDZfdclp0/SS0QQiJmNSUpIbKNUbK0xQoW0mh1iwWO4=;
+        b=EflqxNCzAh+P2KR7UJhVz+8VpK82NgZYzo3/jNcet2XVXFWBOQgREPu94+9jQQzThmQkQR
+        IRHXgCoJU8WUZrr1D0+EHuXbum0Tns4lvTqKTK7fMQUGnpk6qkKVmTGSUhy5HDhPZLbLmi
+        C2XhW/EkJ/Jm3OpzAkX7QnykwuoanEQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-ZtXDKaVFOKS-ypZpJR4SYg-1; Mon, 17 Feb 2020 14:16:53 -0500
-X-MC-Unique: ZtXDKaVFOKS-ypZpJR4SYg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-262-1xBaZSzhM5mOERF-fi9c4A-1; Mon, 17 Feb 2020 14:18:31 -0500
+X-MC-Unique: 1xBaZSzhM5mOERF-fi9c4A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC59D13F7;
-        Mon, 17 Feb 2020 19:16:51 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AE22DB2A;
+        Mon, 17 Feb 2020 19:18:29 +0000 (UTC)
 Received: from [10.36.116.62] (ovpn-116-62.ams2.redhat.com [10.36.116.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A4F15D9E2;
-        Mon, 17 Feb 2020 19:16:49 +0000 (UTC)
-Subject: Re: [PATCH v2 23/42] KVM: s390: protvirt: Write sthyi data to
- instruction data area
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-24-borntraeger@de.ibm.com>
- <0054ceb5-a1ab-5129-cc34-b785ee8ad782@redhat.com>
- <286d4d0a-84a2-5298-c4f9-221d5b4d2b13@de.ibm.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F8AA10021B2;
+        Mon, 17 Feb 2020 19:18:26 +0000 (UTC)
+Subject: Re: [PATCH 0/2] example changes
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Ulrich.Weigand@de.ibm.com, cohuck@redhat.com,
+        frankja@linux.ibm.com, frankja@linux.vnet.ibm.com,
+        gor@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
+References: <c77dbb1b-0f4b-e40a-52a4-7110aec75e32@redhat.com>
+ <20200217145302.19085-1-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -94,76 +86,27 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <da5c46e0-f4bc-4515-cd11-9ddc491bbb0f@redhat.com>
-Date:   Mon, 17 Feb 2020 20:16:48 +0100
+Message-ID: <a5601e3b-fe73-faa5-4152-93a2ba14c563@redhat.com>
+Date:   Mon, 17 Feb 2020 20:18:26 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <286d4d0a-84a2-5298-c4f9-221d5b4d2b13@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200217145302.19085-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17.02.20 19:40, Christian Borntraeger wrote:
-> 
-> 
-> On 17.02.20 15:24, David Hildenbrand wrote:
->> On 14.02.20 23:26, Christian Borntraeger wrote:
->>> From: Janosch Frank <frankja@linux.ibm.com>
->>>
->>> STHYI data has to go through the bounce buffer.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> ---
->>>  arch/s390/kvm/intercept.c | 15 ++++++++++-----
->>>  1 file changed, 10 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
->>> index 1e231058e4b3..cfabeecbb777 100644
->>> --- a/arch/s390/kvm/intercept.c
->>> +++ b/arch/s390/kvm/intercept.c
->>> @@ -392,7 +392,7 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
->>>  		goto out;
->>>  	}
->>>  
->>> -	if (addr & ~PAGE_MASK)
->>> +	if (!kvm_s390_pv_is_protected(vcpu->kvm) && (addr & ~PAGE_MASK))
->>>  		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
->>>  
->>>  	sctns = (void *)get_zeroed_page(GFP_KERNEL);
->>> @@ -403,10 +403,15 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
->>>  
->>>  out:
->>>  	if (!cc) {
->>> -		r = write_guest(vcpu, addr, reg2, sctns, PAGE_SIZE);
->>> -		if (r) {
->>> -			free_page((unsigned long)sctns);
->>> -			return kvm_s390_inject_prog_cond(vcpu, r);
->>> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
->>
->> I have the feeling that we might have to think about proper locking for
->> kvm_s390_pv_is_protected(). We have to make sure there cannot be any
->> races with user space. Smells like a new r/w lock maybe.
-> 
-> I think we can keep that within kvm->lock (for the global changes) and vcpu->mutex. 
-> All the intercepts only happen within the vcpu run ioctl and that takes the
-> vcpu->mutex. See my other patch (with  mutex_lock(&vcpu->mutex) and mutex_unlock(&vcpu->mutex)
-> around the create/destroy functions). lockdep_assert_help is happy and as long as the
-> pv_handle reflects the state of the control block of that CPU we are good.
-> 
-> I pushed out the patch/rfcs to pv_worktree on kvms390.git.
+On 17.02.20 15:53, Christian Borntraeger wrote:
+> I also need to rename the ioctls and do more testing,
+> but this is probably what you want?
 
-Fine with me!
-
+Yes, looks like that should be it! Will have a look at the remaining
+patches tomorrow.
 
 -- 
 Thanks,
