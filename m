@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C0A6162284
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 09:40:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD35316228A
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 09:43:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726319AbgBRIk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 03:40:27 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42809 "EHLO
+        id S1726239AbgBRInD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 03:43:03 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26666 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726298AbgBRIk0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 03:40:26 -0500
+        by vger.kernel.org with ESMTP id S1726186AbgBRInD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 03:43:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582015226;
+        s=mimecast20190719; t=1582015382;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=y3eZ8S1SowfFFWtDQB3jxMcAnV1KE4voLJeI/91FNBQ=;
-        b=V+rPnbr0ioKA8DRGUfcBrN/oEDNN3+vmVndt9IiYjqnoTLlmJJ34zLONpzIZSbiMXAdNtO
-        bXh4k3roK1TwgQ93yrwrolHL9wZffC8cl4B3RXh3k9Z2Qs6mAV9fOjdPFRzKbBrAdgThTH
-        5SDvoVUS8LQ5qRBf0Vb1blXEvdkclqs=
+        bh=1oknx/M8+VweBiz1lyf9d5TBoluq9NHKeSJ8LaOEsow=;
+        b=AQ3XhjGinwAk4yRrs9y95ORH4uSSVsP2+NQsnvsmJIjfRKycgq28I8yu3+Pvs6oA33d8WW
+        a+AJoqawnu3SMJZkC1s7o3I4k72RhcNLTysx6R03H3fbx9VMIjsMmglnoZPGmj0pcvoYN2
+        tGPHkJ4PJs1HD6cojSW2aCHJyK66CxU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55--qMcYVrvPIKWOKVIgmwTmg-1; Tue, 18 Feb 2020 03:40:21 -0500
-X-MC-Unique: -qMcYVrvPIKWOKVIgmwTmg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-140-N74ggy_uMUKL0MR8JCttgw-1; Tue, 18 Feb 2020 03:42:58 -0500
+X-MC-Unique: N74ggy_uMUKL0MR8JCttgw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 222D41088380;
-        Tue, 18 Feb 2020 08:40:20 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B19F107ACC5;
+        Tue, 18 Feb 2020 08:42:57 +0000 (UTC)
 Received: from [10.36.116.190] (ovpn-116-190.ams2.redhat.com [10.36.116.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C383A472E2;
-        Tue, 18 Feb 2020 08:40:17 +0000 (UTC)
-Subject: Re: [PATCH v2 25/42] KVM: s390: protvirt: disallow one_reg
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C88EC8579D;
+        Tue, 18 Feb 2020 08:42:54 +0000 (UTC)
+Subject: Re: [PATCH v2 26/42] KVM: s390: protvirt: Do only reset registers
+ that are accessible
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -45,7 +46,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-26-borntraeger@de.ibm.com>
+ <20200214222658.12946-27-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,16 +92,16 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <031b7db2-c255-e32d-782d-d4769dcb6ee8@redhat.com>
-Date:   Tue, 18 Feb 2020 09:40:16 +0100
+Message-ID: <9b66eb07-9755-4afe-6837-6197acd5fa09@redhat.com>
+Date:   Tue, 18 Feb 2020 09:42:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214222658.12946-26-borntraeger@de.ibm.com>
+In-Reply-To: <20200214222658.12946-27-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -108,95 +109,54 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On 14.02.20 23:26, Christian Borntraeger wrote:
 > From: Janosch Frank <frankja@linux.ibm.com>
-
-"KVM: s390: protvirt: disallow KVM_GET_ONE_REG/KVM_SET_ONE_REG"
-
->=20
-> A lot of the registers are controlled by the Ultravisor and never
-> visible to KVM. Some fields in the sie control block are overlayed, lik=
-e
-> gbea. As no known userspace uses the ONE_REG interface on s390 if sync
-> regs are available, no functionality is lost if it is disabled for
-> protected guests.
->=20
+> 
+> For protected VMs the hypervisor can not access guest breaking event
+> address, program parameter, bpbc and todpr. Do not reset those fields
+> as the control block does not provide access to these fields.
+> 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  Documentation/virt/kvm/api.rst | 6 ++++--
->  arch/s390/kvm/kvm-s390.c       | 3 +++
->  2 files changed, 7 insertions(+), 2 deletions(-)
->=20
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
-i.rst
-> index cb58714fe60d..a82166e5f7d9 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -2117,7 +2117,8 @@ Errors:
-> =20
->    =3D=3D=3D=3D=3D=3D   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->   =C2=A0ENOENT =C2=A0=C2=A0no such register
-> - =C2=A0EINVAL =C2=A0=C2=A0invalid register ID, or no such register
-> + =C2=A0EINVAL =C2=A0=C2=A0invalid register ID, or no such register, ON=
-E_REG forbidden
-> +           for protected guests (s390)
-
-"invalid register ID, no such register, or used with VMs in protected
-virtualization mode on s390" ?
-
->   =C2=A0EPERM =C2=A0=C2=A0=C2=A0(arm64) register access not allowed bef=
-ore vcpu finalization
->    =3D=3D=3D=3D=3D=3D   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =20
-> @@ -2552,7 +2553,8 @@ Errors include:
-> =20
->    =3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->   =C2=A0ENOENT =C2=A0=C2=A0no such register
-> - =C2=A0EINVAL =C2=A0=C2=A0invalid register ID, or no such register
-> + =C2=A0EINVAL =C2=A0=C2=A0invalid register ID, or no such register, ON=
-E_REG forbidden
-> +           for protected guests (s390)
-
-dito
-
->   =C2=A0EPERM =C2=A0=C2=A0=C2=A0(arm64) register access not allowed bef=
-ore vcpu finalization
->    =3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =20
+>  arch/s390/kvm/kvm-s390.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
 > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 8db82aaf1275..d20a7fa9d480 100644
+> index d20a7fa9d480..5b551cc73540 100644
 > --- a/arch/s390/kvm/kvm-s390.c
 > +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4638,6 +4638,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  	case KVM_SET_ONE_REG:
->  	case KVM_GET_ONE_REG: {
->  		struct kvm_one_reg reg;
-> +		r =3D -EINVAL;
-> +		if (kvm_s390_pv_is_protected(vcpu->kvm))
-> +			break;
+> @@ -3442,14 +3442,16 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+>  	kvm_s390_set_prefix(vcpu, 0);
+>  	kvm_s390_set_cpu_timer(vcpu, 0);
+>  	vcpu->arch.sie_block->ckc = 0;
+> -	vcpu->arch.sie_block->todpr = 0;
+>  	memset(vcpu->arch.sie_block->gcr, 0, sizeof(vcpu->arch.sie_block->gcr));
+>  	vcpu->arch.sie_block->gcr[0] = CR0_INITIAL_MASK;
+>  	vcpu->arch.sie_block->gcr[14] = CR14_INITIAL_MASK;
+>  	vcpu->run->s.regs.fpc = 0;
+> -	vcpu->arch.sie_block->gbea = 1;
+> -	vcpu->arch.sie_block->pp = 0;
+> -	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+> +	if (!kvm_s390_pv_handle_cpu(vcpu)) {
 
-I assume races will be dealt with in your next series.
+Shouldn't we instead check if the VM is in PV mode? (with changed
+lifecycle handling). Easier to understand.
 
->  		r =3D -EFAULT;
->  		if (copy_from_user(&reg, argp, sizeof(reg)))
->  			break;
->=20
+(side not: the name kvm_s390_pv_handle_cpu() is very confusing. I'd
+suggest kvm_s390_pv_cpu_get_handle(). Will reply to the other patch)
 
-With the two nits fixed
+> +		vcpu->arch.sie_block->gbea = 1;
+> +		vcpu->arch.sie_block->pp = 0;
+> +		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+> +		vcpu->arch.sie_block->todpr = 0;
+> +	}
+>  }
+>  
+>  static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
+> 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
 
---=20
+-- 
 Thanks,
 
 David / dhildenb
