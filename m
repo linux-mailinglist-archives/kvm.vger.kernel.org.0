@@ -2,189 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 61B4016209F
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 06:59:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4935B16210A
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 07:45:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726293AbgBRF7I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 00:59:08 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:15997 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726114AbgBRF7I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 00:59:08 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5e4b7d1d0000>; Mon, 17 Feb 2020 21:58:53 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 17 Feb 2020 21:59:06 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 17 Feb 2020 21:59:06 -0800
-Received: from [10.40.101.150] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 18 Feb
- 2020 05:58:57 +0000
-Subject: Re: [PATCH v12 Kernel 4/7] vfio iommu: Implementation of ioctl to for
- dirty pages tracking.
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
- <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
- <20200210102518.490a0d87@x1.home>
- <7e7356c8-29ed-31fa-5c0b-2545ae69f321@nvidia.com>
- <20200212161320.02d8dfac@w520.home>
- <0244aca6-80f7-1c1d-812e-d53a48b5479d@nvidia.com>
- <20200213162011.40b760a8@w520.home>
- <ea31fb62-4cd3-babb-634d-f69407586c93@nvidia.com>
- <20200217135518.4d48ebd6@w520.home>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <57199367-e562-800a-ef73-f28bc5ddb2fe@nvidia.com>
-Date:   Tue, 18 Feb 2020 11:28:53 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726127AbgBRGpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 01:45:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59698 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726072AbgBRGpC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 01:45:02 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01I6itZJ115901
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 01:45:01 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y6adrnx5c-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 01:45:01 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Tue, 18 Feb 2020 06:44:57 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 18 Feb 2020 06:44:53 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01I6iq4e36896974
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Feb 2020 06:44:52 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2C6EEA4055;
+        Tue, 18 Feb 2020 06:44:52 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 60BCCA4040;
+        Tue, 18 Feb 2020 06:44:51 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.188.142])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Feb 2020 06:44:51 +0000 (GMT)
+Subject: Re: [PATCH 01/35] mm:gup/writeback: add callbacks for inaccessible
+ pages
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+References: <20200207113958.7320-1-borntraeger@de.ibm.com>
+ <20200207113958.7320-2-borntraeger@de.ibm.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78AA37@SHSMSX104.ccr.corp.intel.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Tue, 18 Feb 2020 07:44:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200217135518.4d48ebd6@w520.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D78AA37@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1582005533; bh=UVFuTcvlyh3iWYM+gJt93GCmfNP7VaK7DTQFFJhvpSk=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=SXytaGDwhevD6jXrh2a64+moNmNGuOsWvDYZ4i02wQXHW4VGGAYAdtBQ07O/y5wCt
-         caYOqD7Dk7TC7JjSS59wBggf3aAz9ANVALhBmcn6EMGkNP/FwnlCFi/+1tK4bXbJuc
-         +rLy27AcexbPB/Js/6InITnDv4SlhG9MHw9ddp+S8giLHtp3A25TVOwvZQtDIjFd3g
-         DqRDhqeRAAOuCqg9OJ5MSZBC6ErTApYqwgZWCNJs5JlYQi59pd5EysJiZ574WLa0Rf
-         BT4oXP+e8iLa2b5yZYL6HJehK/FVYzt0dWL1f/3e8Dsdsaxk8xpq1F+2get2uh/muc
-         1RsxHD2eeiPew==
+X-TM-AS-GCONF: 00
+x-cbid: 20021806-0020-0000-0000-000003AB2A3B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021806-0021-0000-0000-0000220323E9
+Message-Id: <16c66640-85bf-b158-9685-ea59359d1771@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-17_14:2020-02-17,2020-02-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 priorityscore=1501 adultscore=0 mlxlogscore=929
+ malwarescore=0 phishscore=0 spamscore=0 bulkscore=0 clxscore=1015
+ mlxscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002180054
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-<snip>
 
->>>>>    As I understand the above algorithm, we find a vfio_dma
->>>>> overlapping the request and populate the bitmap for that range.  Then
->>>>> we go back and put_user() for each byte that we touched.  We could
->>>>> instead simply work on a one byte buffer as we enumerate the requested
->>>>> range and do a put_user() ever time we reach the end of it and have bits
->>>>> set. That would greatly simplify the above example.  But I would expect
->>>>> that we're a) more likely to get asked for ranges covering a single
->>>>> vfio_dma
->>>>
->>>> QEMU ask for single vfio_dma during each iteration.
->>>>
->>>> If we restrict this ABI to cover single vfio_dma only, then it
->>>> simplifies the logic here. That was my original suggestion. Should we
->>>> think about that again?
->>>
->>> But we currently allow unmaps that overlap multiple vfio_dmas as long
->>> as no vfio_dma is bisected, so I think that implies that an unmap while
->>> asking for the dirty bitmap has even further restricted semantics.  I'm
->>> also reluctant to design an ABI around what happens to be the current
->>> QEMU implementation.
->>>
->>> If we take your example above, ranges {0x0000,0xa000} and
->>> {0xa000,0x10000} ({start,end}), I think you're working with the
->>> following two bitmaps in this implementation:
->>>
->>> 00000011 11111111b
->>> 00111111b
->>>
->>> And we need to combine those into:
->>>
->>> 11111111 11111111b
->>>
->>> Right?
->>>
->>> But it seems like that would be easier if the second bitmap was instead:
->>>
->>> 11111100b
->>>
->>> Then we wouldn't need to worry about the entire bitmap being shifted by
->>> the bit offset within the byte, which limits our fixes to the boundary
->>> byte and allows us to use copy_to_user() directly for the bulk of the
->>> copy.  So how do we get there?
->>>
->>> I think we start with allocating the vfio_dma bitmap to account for
->>> this initial offset, so we calculate bitmap_base_iova as:
->>>     (iova & ~((PAGE_SIZE << 3) - 1))
->>> We then use bitmap_base_iova in calculating which bits to set.
->>>
->>> The user needs to follow the same rules, and maybe this adds some value
->>> to the user providing the bitmap size rather than the kernel
->>> calculating it.  For example, if the user wanted the dirty bitmap for
->>> the range {0xa000,0x10000} above, they'd provide at least a 1 byte
->>> bitmap, but we'd return bit #2 set to indicate 0xa000 is dirty.
->>>
->>> Effectively the user can ask for any iova range, but the buffer will be
->>> filled relative to the zeroth bit of the bitmap following the above
->>> bitmap_base_iova formula (and replacing PAGE_SIZE with the user
->>> requested pgsize).  I'm tempted to make this explicit in the user
->>> interface (ie. only allow bitmaps starting on aligned pages), but a
->>> user is able to map and unmap single pages and we need to support
->>> returning a dirty bitmap with an unmap, so I don't think we can do that.
->>>    
+On 18.02.20 04:36, Tian, Kevin wrote:
+>> From: Christian Borntraeger
+>> Sent: Friday, February 7, 2020 7:39 PM
 >>
->> Sigh, finding adjacent vfio_dmas within the same byte seems simpler than
->> this.
+>> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>
+>> With the introduction of protected KVM guests on s390 there is now a
+>> concept of inaccessible pages. These pages need to be made accessible
+>> before the host can access them.
+>>
+>> While cpu accesses will trigger a fault that can be resolved, I/O
+>> accesses will just fail.  We need to add a callback into architecture
+>> code for places that will do I/O, namely when writeback is started or
+>> when a page reference is taken.
 > 
-> How does KVM do this?  My intent was that if all of our bitmaps share
-> the same alignment then we can merge the intersection and continue to
-> use copy_to_user() on either side.  However, if QEMU doesn't do the
-> same, it doesn't really help us.  Is QEMU stuck with an implementation
-> of only retrieving dirty bits per MemoryRegionSection exactly because
-> of this issue and therefore we can rely on it in our implementation as
-> well?  Thanks,
-> 
+> What about hooking the callback to DMA API ops?
 
-QEMU sync dirty_bitmap per MemoryRegionSection. Within 
-MemoryRegionSection there could be multiple KVMSlots. QEMU queries 
-dirty_bitmap per KVMSlot and mark dirty for each KVMSlot.
-On kernel side, KVM_GET_DIRTY_LOG ioctl calls 
-kvm_get_dirty_log_protect(), where it uses copy_to_user() to copy bitmap 
-of that memSlot.
-vfio_dma is per MemoryRegionSection. We can reply on MemoryRegionSection 
-in our implementation. But to get bitmap during unmap, we have to take 
-care of concatenating bitmaps.
-
-In QEMU, in function kvm_physical_sync_dirty_bitmap() there is a comment 
-where bitmap size is calculated and bitmap is defined as 'void __user 
-*dirty_bitmap' which is also the concern you raised and could be handled 
-similarly as below.
-
-         /* XXX bad kernel interface alert
-          * For dirty bitmap, kernel allocates array of size aligned to
-          * bits-per-long.  But for case when the kernel is 64bits and
-          * the userspace is 32bits, userspace can't align to the same
-          * bits-per-long, since sizeof(long) is different between kernel
-          * and user space.  This way, userspace will provide buffer which
-          * may be 4 bytes less than the kernel will use, resulting in
-          * userspace memory corruption (which is not detectable by valgrind
-          * too, in most cases).
-          * So for now, let's align to 64 instead of HOST_LONG_BITS here, in
-          * a hope that sizeof(long) won't become >8 any time soon.
-          */
-         if (!mem->dirty_bmap) {
-             hwaddr bitmap_size = ALIGN(((mem->memory_size) >> 
-TARGET_PAGE_BITS),
-                                         /*HOST_LONG_BITS*/ 64) / 8;
-             /* Allocate on the first log_sync, once and for all */
-             mem->dirty_bmap = g_malloc0(bitmap_size);
-         }
-
-Thanks,
-Kirti
+Not all device drivers do use the DMA API so it wont work for us.
 
