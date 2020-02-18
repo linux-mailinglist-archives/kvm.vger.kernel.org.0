@@ -2,78 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E1CC51629A7
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 16:43:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6ED681629BD
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 16:46:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726650AbgBRPmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 10:42:55 -0500
-Received: from mga11.intel.com ([192.55.52.93]:23711 "EHLO mga11.intel.com"
+        id S1726492AbgBRPqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 10:46:12 -0500
+Received: from mga02.intel.com ([134.134.136.20]:26197 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726338AbgBRPmz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 10:42:55 -0500
+        id S1726360AbgBRPqM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 10:46:12 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Feb 2020 07:42:55 -0800
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Feb 2020 07:46:11 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,456,1574150400"; 
-   d="scan'208";a="224171282"
+   d="scan'208";a="258592417"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga007.jf.intel.com with ESMTP; 18 Feb 2020 07:42:54 -0800
-Date:   Tue, 18 Feb 2020 07:42:54 -0800
+  by fmsmga004.fm.intel.com with ESMTP; 18 Feb 2020 07:46:10 -0800
+Date:   Tue, 18 Feb 2020 07:46:10 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     linmiaohe <linmiaohe@huawei.com>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH] KVM: VMX: replace "fall through" with "return true" to
- indicate different case
-Message-ID: <20200218154254.GA27565@linux.intel.com>
-References: <1581997168-20350-1-git-send-email-linmiaohe@huawei.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 01/42] mm:gup/writeback: add callbacks for
+ inaccessible pages
+Message-ID: <20200218154610.GB27565@linux.intel.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-2-borntraeger@de.ibm.com>
+ <107a8a72-b745-26f2-5805-c4d99ce77b35@redhat.com>
+ <dd33cc1a-214d-b949-8f5e-9c2d40a8e518@de.ibm.com>
+ <a8f8786e-1ed0-0c44-08d0-ebc58f43ae40@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1581997168-20350-1-git-send-email-linmiaohe@huawei.com>
+In-Reply-To: <a8f8786e-1ed0-0c44-08d0-ebc58f43ae40@redhat.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 18, 2020 at 11:39:28AM +0800, linmiaohe wrote:
-> From: Miaohe Lin <linmiaohe@huawei.com>
+On Tue, Feb 18, 2020 at 09:27:20AM +0100, David Hildenbrand wrote:
+> On 17.02.20 12:10, Christian Borntraeger wrote:
+> > So yes, if everything is setup properly this should not fail in real life
+> > and only we have a kernel (or firmware) bug.
+> > 
 > 
-> The second "/* fall through */" in rmode_exception() makes code harder to
-> read. Replace it with "return true" to indicate they are different cases
-> and also this improves the readability.
-> 
-> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index a13368b2719c..c5bcbbada2db 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4495,7 +4495,7 @@ static bool rmode_exception(struct kvm_vcpu *vcpu, int vec)
->  		if (vcpu->guest_debug &
->  			(KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP))
->  			return false;
-> -		/* fall through */
-> +		return true;
+> Then, without feedback from other possible users, this should be a void
+> function. So either introduce error handling or convert it to a void for
+> now (and add e.g., BUG_ON and a comment inside the s390x implementation).
 
-I prefer the current code, i.e. the fall through.  This code is already
-burdened with a fall through, from #BP->#DB, and IMO the fall through makes
-it more obvious that the vcpu->guest_debug checks are corner cases, while
-everything else is handled by common logic.
-
->  	case DE_VECTOR:
->  	case OF_VECTOR:
->  	case BR_VECTOR:
-> -- 
-> 2.19.1
-> 
+My preference would also be for a void function (versus ignoring an int
+return).
