@@ -2,235 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6709716276F
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 14:54:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C29116277C
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 14:56:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726701AbgBRNyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 08:54:03 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:43039 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726475AbgBRNyC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 08:54:02 -0500
-Received: by mail-qk1-f196.google.com with SMTP id p7so19512993qkh.10
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 05:54:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=wco1ACmBJKT01bm8zBO0MP2nnQlGcVNyX36uIR1E9uo=;
-        b=G0ZnAaGIytyfHiex43w/GJT+NEhMLwNxhYp1/W9HDnNFPo3glIRu93O66AaSeintW4
-         ewAToI5pRBz8O0l7tILOYNKjgySJWe17ht2quS2ahOjbZzAcz+xWKd0a5zthc019NWFQ
-         R1W77HwaNo2iUrrHabUyK2dJHQqwkMP3HcjM/gvl7CgOnOP2bq7gx3OJGNClRVsDU1GO
-         EpLTqCubJgP4nYoHsCBh1Njcn6q1PFTHEiM9EHe9usCQvVsgXVgmRkKNwwLnoHhUcsio
-         7ZzHIqeumqbjEfKuANmJfatwdGn/Gam/JXB0m0k1C5xdDcz21BPJmu8PlWtabKOypOds
-         oRlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=wco1ACmBJKT01bm8zBO0MP2nnQlGcVNyX36uIR1E9uo=;
-        b=ccIbCohWAcr/8MNyocU4tfSYLRru4pMTuJc2RjaRCB7aX1LNZZMXHpBvph0DFP2bH6
-         eN9ClA9NGXIm3OtWSCtnmoiDW+UfEutUJ0jJlGi4v/rL1+6ke81a2YHqONW9Lu2P5LcY
-         M9HSiPThrDvPFKHtJ+7stC798a0DErX93Y4L8zGEohIRG1pzqCaxQWSh9dP01AK249Nk
-         lDVcmpS6vR0vc0CUbP+Xjgvfo90zOgDqov4J+d94Q7+e7YZn/6y7TTGwUicD6HmgCx9n
-         OXmCvT0kzNVN3imA0DOoEZ+bSuLLOGxK5pArmh9eKmReBk5+JGNlxlLLQ+44Y5QE9W3n
-         b9pw==
-X-Gm-Message-State: APjAAAUQ6viCguRnxlQPpuzYM1FjVFbdcZypcM9c2xTXyhJDi4/W4Ud6
-        /ThvXUE+g+N+Ri6NXrBVDEw13Q==
-X-Google-Smtp-Source: APXvYqwkMwWoPoOuRyU9S1o0YCBdIBRy95mN2TqVYVQmY44HIF+ueV8rib/5b0aqZ5/M9OsEvpjRCQ==
-X-Received: by 2002:a37:b8c2:: with SMTP id i185mr18411300qkf.156.1582034040843;
-        Tue, 18 Feb 2020 05:54:00 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id w21sm1956489qth.17.2020.02.18.05.54.00
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 18 Feb 2020 05:54:00 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1j43K3-0002fU-Nx; Tue, 18 Feb 2020 09:53:59 -0400
-Date:   Tue, 18 Feb 2020 09:53:59 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Tiwei Bie <tiwei.bie@intel.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, shahafs@mellanox.com,
-        rob.miller@broadcom.com, haotian.wang@sifive.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        rdunlap@infradead.org, hch@infradead.org, jiri@mellanox.com,
-        hanand@xilinx.com, mhabets@solarflare.com,
-        maxime.coquelin@redhat.com, lingshan.zhu@intel.com,
-        dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
-Subject: Re: [PATCH] vhost: introduce vDPA based backend
-Message-ID: <20200218135359.GA9608@ziepe.ca>
-References: <20200131033651.103534-1-tiwei.bie@intel.com>
+        id S1726682AbgBRN4R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 08:56:17 -0500
+Received: from mail-eopbgr20079.outbound.protection.outlook.com ([40.107.2.79]:23742
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726582AbgBRN4R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 08:56:17 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=P+pyMp88oZKIN8Hzn7aeUQcNPdIcxmhxwMGc2/fU9DpFqpVGRx6TbTrso8DdJ3vrCOulWSGPTu8Z2R2m/e9ew3nV3D5s3XpcEFQWaJmF0/3tG0EfhCfqh7J6YrRZVNgA4n+rAHtm8gRUM0ldggRgfr76YpHxYfvxyBOlCDAluYsCFYcFTy+Gx4UoXDLHFQvOftzYfCQCQgGt9EqRrc8oGeHQzoI8fTyErbyWE59gvD0HmaKvIlOvsMokwNNg90/vp/OIK7V2K596hhyyjvFuXDuCrDZ6lcuA197MquD0rrzeJ88f9mZqF5oDHSNcIWxk/Nt5hSFHyW9PQi3GoT8MPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=maFn4RFzaNi815Hh3PxnLpr3qN/Luvk0149mJSNSCe4=;
+ b=Rt5Kwk2Za3Xi/rwixJXp71TtSz65w9/PynpYTlpkgL4+sjdkDDkc7h6ahywwBmFli9WlVsl8buCtQSYZwAUUWGs64TxTGvgT5u724RwbxrvFzlUFDBvQGm758MhKK66Bmh2FUVFX/u9ea9ZMnd0uGbZKxo5YUp58sryB/Ira24ZaJy59lWhPqTEMkWmDZEel0FgDtqxvjV0lCZiN62npgkMqMsQznrkthxI+tZBN3CxX/g/WjDogUi+uvIeJ6J3zUkHSh+vbqizsF/3Q0RitvsGznqJCqWI55U2d5BARbVeikuKCHD66NxaqfNBd2sR3i+vJaaO57mxuoYosQE1kBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=maFn4RFzaNi815Hh3PxnLpr3qN/Luvk0149mJSNSCe4=;
+ b=GwuqgV7dtf2brUaOHZVWuPXvIt0Nlo+iNVraVMkVf0fXUKV5pM8vkIysE+r9psxIAgayq343AQYW0ta1IxhSEU+92Mzs8H4yEcgrXHP0hoHjEq2PQiapt+qBy89XgAOxj133uDW7WmmUGWnvpploFiiAkBGlKzUkZ5upGTyuaWs=
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
+ VI1PR05MB5918.eurprd05.prod.outlook.com (20.178.126.27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.22; Tue, 18 Feb 2020 13:56:12 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2729.032; Tue, 18 Feb 2020
+ 13:56:12 +0000
+Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR14CA0006.namprd14.prod.outlook.com (2603:10b6:208:23e::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.22 via Frontend Transport; Tue, 18 Feb 2020 13:56:11 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1j43M8-0002h5-9S; Tue, 18 Feb 2020 09:56:08 -0400
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>
+CC:     "mst@redhat.com" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "aadam@redhat.com" <aadam@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
+Thread-Topic: [PATCH V2 3/5] vDPA: introduce vDPA bus
+Thread-Index: AQHV38asJrupyM4st0u+LnLMVE2dj6gWBCEAgAEv6YCAAFKZAIAA9rcAgACprgCAABWWAIAAAfIAgADOIICAAK/EAIAENTiAgAIVHQA=
+Date:   Tue, 18 Feb 2020 13:56:12 +0000
+Message-ID: <20200218135608.GS4271@mellanox.com>
+References: <20200211134746.GI4271@mellanox.com>
+ <cf7abcc9-f8ef-1fe2-248e-9b9028788ade@redhat.com>
+ <20200212125108.GS4271@mellanox.com>
+ <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
+ <20200213134128.GV4271@mellanox.com>
+ <ebaea825-5432-65e2-2ab3-720a8c4030e7@redhat.com>
+ <20200213150542.GW4271@mellanox.com>
+ <8b3e6a9c-8bfd-fb3c-12a8-2d6a3879f1ae@redhat.com>
+ <20200214135232.GB4271@mellanox.com>
+ <01c86ebb-cf4b-691f-e682-2d6f93ddbcf7@redhat.com>
+In-Reply-To: <01c86ebb-cf4b-691f-e682-2d6f93ddbcf7@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: MN2PR14CA0006.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::11) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [142.68.57.212]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 7604cef4-cb39-495b-9819-08d7b47a500c
+x-ms-traffictypediagnostic: VI1PR05MB5918:|VI1PR05MB5918:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR05MB5918CD3ACFCA91AD10215909CF110@VI1PR05MB5918.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 031763BCAF
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(366004)(136003)(396003)(376002)(346002)(199004)(189003)(8676002)(33656002)(54906003)(8936002)(6666004)(316002)(4326008)(7416002)(9786002)(81156014)(26005)(1076003)(5660300002)(66446008)(64756008)(2616005)(66946007)(9746002)(66476007)(81166006)(186003)(66556008)(71200400001)(4744005)(36756003)(966005)(52116002)(2906002)(478600001)(86362001)(6916009)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB5918;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Tsx07X9JHj26sipFLqHPJ5MkFK7bAlhozKrErwU4s+Oc3auwrQh1HhzYqDwW/JdtLsMwRdrx06pcnwVrkGq66Tl05voxaqt8Jd5u1ebxQyS9LFFRnidXXBm62TGKlJgcRyajoMP5eb6euONSGcR2QskdkILdxIglw7X283QDqg6ACdU3JBmeR0YCblnKuFnQeZS0kKU352bc2aC8cJZR2/IAzWGbTnu6k/SwvDHZuWSDbCAGLobyidUGpUpOFkJM72btiaujr6ZdLmXWZtkuOgkEIkYef5eyyDEGOQSQaVQKcPOOnL32ODOh5xrcwAu8WEs2XlkQ+dW+3+wjxWo8Q8rCppWUsK8Qs5yjZaKcBLHJtfTyajladW8dj3aqz5MNHx+ijm4KwcrkReAi6Q3vTahQv1d6dNJf5e+q+WQbQliWrmPv6H6HdT2tevmAZCKQJveiH/o/YzruEoyNEzAIb5GSmc5vYOP535tLj2rJCpFoOZfA7jYVt3n6bJtqI5JtyvOySwcZdk2DL3tA8ODZlyY+0C/vEV9xGcSYQWWX8FCYgDLE4kvhHDmXQLkXQpIKk/H3F3+aNnylk48HwdrgfA==
+x-ms-exchange-antispam-messagedata: eQp/Q00Tmt9N+AcvTTj7wNGg/V1ahBinAUAZJxNFFawgROsTwUUrJLUl4NjWAZljJDaJDTv1sOJcsfFv++il9h6x4hqk1oex0Gd2J4aUOH0oNJ97Rm+y5JYhJOkDVqK/Vsz9iuITuWV8evuykL8NJw==
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <CFAA87160CBAF244B86C490A3BEFC428@eurprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200131033651.103534-1-tiwei.bie@intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7604cef4-cb39-495b-9819-08d7b47a500c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Feb 2020 13:56:12.1974
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: JbcQEUBlLgXjLVGAyDtF5h5en7Ncnd/3fCgi0YDztLjJ/o7pVwMrewTsXeL7VgQZRJMBvkFCL8ajrwiGYQKUVQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5918
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 31, 2020 at 11:36:51AM +0800, Tiwei Bie wrote:
+On Mon, Feb 17, 2020 at 02:08:03PM +0800, Jason Wang wrote:
 
-> +static int vhost_vdpa_alloc_minor(struct vhost_vdpa *v)
-> +{
-> +	return idr_alloc(&vhost_vdpa.idr, v, 0, MINORMASK + 1,
-> +			 GFP_KERNEL);
-> +}
+> I thought you were copied in the patch [1], maybe we can move vhost relat=
+ed
+> discussion there to avoid confusion.
+>
+> [1] https://lwn.net/Articles/811210/
 
-Please don't use idr in new code, use xarray directly
+Wow, that is .. confusing.
 
-> +static int vhost_vdpa_probe(struct device *dev)
-> +{
-> +	struct vdpa_device *vdpa = dev_to_vdpa(dev);
-> +	const struct vdpa_config_ops *ops = vdpa->config;
-> +	struct vhost_vdpa *v;
-> +	struct device *d;
-> +	int minor, nvqs;
-> +	int r;
-> +
-> +	/* Currently, we only accept the network devices. */
-> +	if (ops->get_device_id(vdpa) != VIRTIO_ID_NET) {
-> +		r = -ENOTSUPP;
-> +		goto err;
-> +	}
-> +
-> +	v = kzalloc(sizeof(*v), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
-> +	if (!v) {
-> +		r = -ENOMEM;
-> +		goto err;
-> +	}
-> +
-> +	nvqs = VHOST_VDPA_VQ_MAX;
-> +
-> +	v->vqs = kmalloc_array(nvqs, sizeof(struct vhost_virtqueue),
-> +			       GFP_KERNEL);
-> +	if (!v->vqs) {
-> +		r = -ENOMEM;
-> +		goto err_alloc_vqs;
-> +	}
-> +
-> +	mutex_init(&v->mutex);
-> +	atomic_set(&v->opened, 0);
-> +
-> +	v->vdpa = vdpa;
-> +	v->nvqs = nvqs;
-> +	v->virtio_id = ops->get_device_id(vdpa);
-> +
-> +	mutex_lock(&vhost_vdpa.mutex);
-> +
-> +	minor = vhost_vdpa_alloc_minor(v);
-> +	if (minor < 0) {
-> +		r = minor;
-> +		goto err_alloc_minor;
-> +	}
-> +
-> +	d = device_create(vhost_vdpa.class, NULL,
-> +			  MKDEV(MAJOR(vhost_vdpa.devt), minor),
-> +			  v, "%d", vdpa->index);
-> +	if (IS_ERR(d)) {
-> +		r = PTR_ERR(d);
-> +		goto err_device_create;
-> +	}
-> +
+So this is supposed to duplicate the uAPI of vhost-user? But it is
+open coded and duplicated because .. vdpa?
 
-I can't understand what this messing around with major/minor numbers
-does. Without allocating a cdev via cdev_add/etc there is only a
-single char dev in existence here. This and the stuff in
-vhost_vdpa_open() looks non-functional.
+> So it's cheaper and simpler to introduce a new bus instead of refactoring=
+ a
+> well known bus and API where brunches of drivers and devices had been
+> implemented for years.
 
-> +static void vhost_vdpa_remove(struct device *dev)
-> +{
-> +	DEFINE_WAIT_FUNC(wait, woken_wake_function);
-> +	struct vhost_vdpa *v = dev_get_drvdata(dev);
-> +	int opened;
-> +
-> +	add_wait_queue(&vhost_vdpa.release_q, &wait);
-> +
-> +	do {
-> +		opened = atomic_cmpxchg(&v->opened, 0, 1);
-> +		if (!opened)
-> +			break;
-> +		wait_woken(&wait, TASK_UNINTERRUPTIBLE, HZ * 10);
-> +	} while (1);
-> +
-> +	remove_wait_queue(&vhost_vdpa.release_q, &wait);
+If you reason for this approach is to ease the implementation then you
+should talk about it in the cover letters/etc
 
-*barf* use the normal refcount pattern please
+Maybe it is reasonable to do this because the rework is too great, I
+don't know, but to me this whole thing looks rather messy.=20
 
-read side:
-
-  refcount_inc_not_zero(uses)
-  //stuff
-  if (refcount_dec_and_test(uses))
-     complete(completer)
-
-destroy side:
-  if (refcount_dec_and_test(uses))
-     complete(completer)
-  wait_for_completion(completer)
-  // refcount now permanently == 0
-
-Use a completion in driver code
-
-> +	mutex_lock(&vhost_vdpa.mutex);
-> +	device_destroy(vhost_vdpa.class,
-> +		       MKDEV(MAJOR(vhost_vdpa.devt), v->minor));
-> +	vhost_vdpa_free_minor(v->minor);
-> +	mutex_unlock(&vhost_vdpa.mutex);
-> +	kfree(v->vqs);
-> +	kfree(v);
-
-This use after-fress vs vhost_vdpa_open prior to it setting the open
-bit. Maybe use xarray, rcu and kfree_rcu ..
-
-> +static int __init vhost_vdpa_init(void)
-> +{
-> +	int r;
-> +
-> +	idr_init(&vhost_vdpa.idr);
-> +	mutex_init(&vhost_vdpa.mutex);
-> +	init_waitqueue_head(&vhost_vdpa.release_q);
-> +
-> +	/* /dev/vhost-vdpa/$vdpa_device_index */
-> +	vhost_vdpa.class = class_create(THIS_MODULE, "vhost-vdpa");
-> +	if (IS_ERR(vhost_vdpa.class)) {
-> +		r = PTR_ERR(vhost_vdpa.class);
-> +		goto err_class;
-> +	}
-> +
-> +	vhost_vdpa.class->devnode = vhost_vdpa_devnode;
-> +
-> +	r = alloc_chrdev_region(&vhost_vdpa.devt, 0, MINORMASK + 1,
-> +				"vhost-vdpa");
-> +	if (r)
-> +		goto err_alloc_chrdev;
-> +
-> +	cdev_init(&vhost_vdpa.cdev, &vhost_vdpa_fops);
-> +	r = cdev_add(&vhost_vdpa.cdev, vhost_vdpa.devt, MINORMASK + 1);
-> +	if (r)
-> +		goto err_cdev_add;
-
-It is very strange, is the intention to create a single global char
-dev?
-
-If so, why is there this:
-
-+static int vhost_vdpa_open(struct inode *inode, struct file *filep)
-+{
-+	struct vhost_vdpa *v;
-+	struct vhost_dev *dev;
-+	struct vhost_virtqueue **vqs;
-+	int nvqs, i, r, opened;
-+
-+	v = vhost_vdpa_get_from_minor(iminor(inode));
-
-?
-
-If the idea is to create a per-vdpa char dev then this stuff belongs
-in vhost_vdpa_probe(), the cdev should be part of the vhost_vdpa, and
-the above should be container_of not an idr lookup.
+Remember this stuff is all uAPI as it shows up in sysfs, so you can
+easilly get stuck with it forever.
 
 Jason
