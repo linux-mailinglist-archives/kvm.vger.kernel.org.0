@@ -2,119 +2,282 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A722A162007
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 06:08:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11BF0162086
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 06:44:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726065AbgBRFHz convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 18 Feb 2020 00:07:55 -0500
-Received: from mga12.intel.com ([192.55.52.136]:8794 "EHLO mga12.intel.com"
+        id S1726074AbgBRFoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 00:44:22 -0500
+Received: from mga11.intel.com ([192.55.52.93]:48074 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725263AbgBRFHz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 00:07:55 -0500
+        id S1725909AbgBRFoW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 00:44:22 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Feb 2020 21:07:54 -0800
-X-ExtLoop1: 1
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Feb 2020 21:44:22 -0800
 X-IronPort-AV: E=Sophos;i="5.70,455,1574150400"; 
-   d="scan'208";a="282689196"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Feb 2020 21:07:54 -0800
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 17 Feb 2020 21:07:53 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.126]) with mapi id 14.03.0439.000;
- Tue, 18 Feb 2020 13:07:51 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC v3 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
-Thread-Topic: [RFC v3 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
-Thread-Index: AQHV1pyWdXmNxNYiSUCDLwZiDlOrAKgBy+IAgALeXlCAG9SJ8A==
-Date:   Tue, 18 Feb 2020 05:07:50 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A1C0D93@SHSMSX104.ccr.corp.intel.com>
-References: <1580299912-86084-1-git-send-email-yi.l.liu@intel.com>
-        <1580299912-86084-2-git-send-email-yi.l.liu@intel.com>
- <20200129165540.335774d5@w520.home>
- <A2975661238FB949B60364EF0F2C25743A1993E8@SHSMSX104.ccr.corp.intel.com>
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A1993E8@SHSMSX104.ccr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiODk5Y2JlYjEtZjRjMi00ZTI3LWJjNTYtY2NlZmMyZWZhYjBlIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiaVZFb3VjY1ZoWEVKd3JcL1F1dEhIamZ3NDE2RzdISUZRdlZ2UzBlbzIzVmpqcDVxa3FSWDE5c3VDRFYxNkRrTVEifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+   d="scan'208";a="228628055"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.168.218]) ([10.249.168.218])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 17 Feb 2020 21:44:19 -0800
+Subject: Re: [RFC PATCH 1/2] KVM: CPUID: Enable supervisor XSAVE states in
+ CPUID enumeration and XSS
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        aaronlewis@google.com
+References: <20200211065706.3462-1-weijiang.yang@intel.com>
+ <a75a0e16-198d-9c96-3a63-d09a93909c0f@intel.com>
+ <20200217130355.GA10854@local-michael-cet-test.sh.intel.com>
+ <2125c47d-06c5-d559-c95c-a55a71790f31@intel.com>
+Message-ID: <44baa7f5-c643-27d5-b2d7-fd03e78ad2a5@intel.com>
+Date:   Tue, 18 Feb 2020 13:44:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <2125c47d-06c5-d559-c95c-a55a71790f31@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Friday, January 31, 2020 8:41 PM
-> To: Alex Williamson <alex.williamson@redhat.com>
-> Subject: RE: [RFC v3 1/8] vfio: Add VFIO_IOMMU_PASID_REQUEST(alloc/free)
-> > > +static int vfio_iommu_type1_pasid_free(struct vfio_iommu *iommu,
-> > > +				       unsigned int pasid)
-> > > +{
-> > > +	struct vfio_mm *vmm = iommu->vmm;
-> > > +	int ret = 0;
-> > > +
-> > > +	mutex_lock(&iommu->lock);
-> > > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> >
-> > But we could have been IOMMU backed when the pasid was allocated, did we
-> just
-> > leak something?  In fact, I didn't spot anything in this series that handles
-> > a container with pasids allocated losing iommu backing.
-> > I'd think we want to release all pasids when that happens since permission for
-> > the user to hold pasids goes along with having an iommu backed device.
-> 
-> oh, yes. If a container lose iommu backend, then needs to reclaim the allocated
-> PASIDs. right? I'll add it. :-)
+On 2/17/2020 9:20 PM, Xiaoyao Li wrote:
+> On 2/17/2020 9:03 PM, Yang Weijiang wrote:
+>> On Mon, Feb 17, 2020 at 12:26:51PM +0800, Xiaoyao Li wrote:
+>>> On 2/11/2020 2:57 PM, Yang Weijiang wrote:
+>>>> CPUID.(EAX=DH, ECX={i}H i>=0) enumerates XSAVE related 
+>>>> leaves/sub-leaves,
+>>>> +extern int host_xss;
+>>>> +u64 kvm_supported_xss(void)
+>>>> +{
+>>>> +    return KVM_SUPPORTED_XSS & host_xss;
+>>>> +}
+>>>> +
+>>>
+>>> How about using a global variable, supported_xss, instead of 
+>>> calculating the
+>>> mask on every call. Just like what Sean posted on
+>>> https://lore.kernel.org/kvm/20200201185218.24473-21-sean.j.christopherson@intel.com/ 
+>>>
+>>>
+>> Thanks Xiaoyao for the comments!
+>> Good suggestion, I'll change it in next version.
+>>
+>>>>    #define F(x) bit(X86_FEATURE_##x)
+>>>>    int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+>>>> @@ -112,10 +118,17 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+>>>>            vcpu->arch.guest_xstate_size = best->ebx =
+>>>>                xstate_required_size(vcpu->arch.xcr0, false);
+>>>>        }
+>>>> -
+>>>>        best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
+>>>> -    if (best && (best->eax & (F(XSAVES) | F(XSAVEC))))
+>>>> -        best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+>>>> +    if (best && (best->eax & (F(XSAVES) | F(XSAVEC)))) {
+>>>> +        u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
+>>>> +
+>>>> +        best->ebx = xstate_required_size(xstate, true);
+>>>> +        vcpu->arch.guest_supported_xss =
+>>>> +            (best->ecx | ((u64)best->edx << 32)) &
+>>>> +            kvm_supported_xss();
+>>>> +    } else {
+>>>> +        vcpu->arch.guest_supported_xss = 0;
+>>>> +    }
 
-Hi Alex,
+also here should be something like below:
 
-I went through the flow again. Maybe current series has already covered
-it. There is vfio_mm which is used to track allocated PASIDs. Its life
-cycle is type1 driver open and release. If I understand it correctly,
-type1 driver release happens when there is no more iommu backed groups
-in a container.
-
-static void __vfio_group_unset_container(struct vfio_group *group)
-{
-[...]
-
-	/* Detaching the last group deprivileges a container, remove iommu */
-	if (driver && list_empty(&container->group_list)) {
-		driver->ops->release(container->iommu_data);
-		module_put(driver->ops->owner);
-		container->iommu_driver = NULL;
-		container->iommu_data = NULL;
+if (best) {
+	if (best->eax & (F(XSAVES) | F(XSAVEC)))) {
+		u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
+		best->ebx = xstate_required_size(xstate, true);
 	}
-[...]
+
+	if (best->eax & F(XSAVES) {
+		vcpu->arch.guest_supported_xss =
+			(best->ecx | ((u64)best->edx << 32)) &
+			kvm_supported_xss();
+	} else {
+		best->ecx = 0;
+		best->edx = 0;
+		vcpu->arch.guest_supported_xss = 0;
+	}
 }
 
-Regards,
-Yi Liu
-
+>>>>        /*
+>>>>         * The existing code assumes virtual address is 48-bit or 
+>>>> 57-bit in the
+>>>> @@ -426,6 +439,56 @@ static inline void do_cpuid_7_mask(struct 
+>>>> kvm_cpuid_entry2 *entry, int index)
+>>>>        }
+>>>>    }
+>>>> +static inline bool do_cpuid_0xd_mask(struct kvm_cpuid_entry2 
+>>>> *entry, int index)
+>>>> +{
+>>>> +    unsigned int f_xsaves = kvm_x86_ops->xsaves_supported() ? 
+>>>> F(XSAVES) : 0;
+>>>> +    /* cpuid 0xD.1.eax */
+>>>> +    const u32 kvm_cpuid_D_1_eax_x86_features =
+>>>> +        F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+>>>> +    u64 u_supported = kvm_supported_xcr0();
+>>>> +    u64 s_supported = kvm_supported_xss();
+>>>> +    u64 supported;
+>>>> +
+>>>> +    switch (index) {
+>>>> +    case 0:
+>>>> +        if (!u_supported) {
+>>>> +            entry->eax = 0;
+>>>> +            entry->ebx = 0;
+>>>> +            entry->ecx = 0;
+>>>> +            entry->edx = 0;
+>>>> +            return false;
+>>>> +        }
+>>>> +        entry->eax &= u_supported;
+>>>> +        entry->ebx = xstate_required_size(u_supported, false);
+>>>> +        entry->ecx = entry->ebx;
+>>>> +        entry->edx &= u_supported >> 32;
+>>>> +        break;
+>>>> +    case 1:
+>>>> +        supported = u_supported | s_supported;
+>>>> +        entry->eax &= kvm_cpuid_D_1_eax_x86_features;
+>>>> +        cpuid_mask(&entry->eax, CPUID_D_1_EAX);
+>>>> +        entry->ebx = 0;
+>>>> +        entry->edx &= s_supported >> 32;
+>>>> +        entry->ecx &= s_supported;
+>>>
+>>> We'd better initialize msr_ia32_xss bitmap (entry->ecx & entry-edx) 
+>>> as zeros
+>>> here.
+>> Hmm, explicit setting the MSR to 0 is good in this case, but there's 
+>> implied
+>> flow to ensure guest MSR_IA32_XSS will be 0 if entry->ecx and 
+>> entry->edx are 0s.
+>> In above kvm_update_cpuid(), vcpu->arch.guest_supported_xss is set to 0
+>> when they're 0s. this masks guest cannot set non-zero value to this
+>> MSR. And in kvm_vcpu_reset(), vcpu->arch.ia32_xss is initialized to 0,
+>> in kvm_load_guest_xsave_state() MSR_IA32_XSS is set to ia32_xss,
+>> therefore the MSR is kept to 0.
+> 
+> Sorry, I think what I said "msr_ia32_xss bitmap" misled you.
+> 
+> "msr_ia32_xss bitmap" is not MSR_IA32_XSS,
+> but the (entry->ecx | entry->edx >> 32) of cpuid.D_1
+> 
+> I meant we'd better set entry->ecx and entry->edx to 0 here.
+> 
+>>>
+>>>> +        if (entry->eax & (F(XSAVES) | F(XSAVEC)))
+>>>> +            entry->ebx = xstate_required_size(supported, true);
+>>>
+>>> And setup msr_ia32_xss bitmap based on the s_supported within this 
+>>> condition
+>>> when F(XSAVES) is supported.
+>>
+> 
+> And set entry->ecx & entry->edx only when F(XSAVES) is supported.
+> 
+>> IIUC, both XSAVEC and XSAVES use compacted format of the extended
+>> region, so if XSAVEC is supported while XSAVES is not, guest still can
+>> get correct size, so in existing code the two bits are ORed.
+> 
+> Yeah, but entry->ecx and entry->edx should be non-zero only when 
+> F(XSAVES) is set.
+> 
+>>>
+>>>> +        break;
+>>>> +    default:
+>>>> +        supported = (entry->ecx & 0x1) ? s_supported : u_supported;
+>>>> +        if (!(supported & (BIT_ULL(index)))) {
+>>>> +            entry->eax = 0;
+>>>> +            entry->ebx = 0;
+>>>> +            entry->ecx = 0;
+>>>> +            entry->edx = 0;
+>>>> +            return false;
+>>>> +        }
+>>>> +        if (entry->ecx & 0x1)
+>>>> +            entry->ebx = 0;
+>>>> +        break;
+>>>> +    }
+>>>> +    return true;
+>>>> +}
+>>>> +
+>>>>    static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, 
+>>>> u32 function,
+>>>>                      int *nent, int maxnent)
+>>>>    {
+>>>> @@ -440,7 +503,6 @@ static inline int __do_cpuid_func(struct 
+>>>> kvm_cpuid_entry2 *entry, u32 function,
+>>>>        unsigned f_lm = 0;
+>>>>    #endif
+>>>>        unsigned f_rdtscp = kvm_x86_ops->rdtscp_supported() ? 
+>>>> F(RDTSCP) : 0;
+>>>> -    unsigned f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) 
+>>>> : 0;
+>>>>        unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? 
+>>>> F(INTEL_PT) : 0;
+>>>>        /* cpuid 1.edx */
+>>>> @@ -495,10 +557,6 @@ static inline int __do_cpuid_func(struct 
+>>>> kvm_cpuid_entry2 *entry, u32 function,
+>>>>            F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
+>>>>            F(PMM) | F(PMM_EN);
+>>>> -    /* cpuid 0xD.1.eax */
+>>>> -    const u32 kvm_cpuid_D_1_eax_x86_features =
+>>>> -        F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+>>>> -
+>>>>        /* all calls to cpuid_count() should be made on the same cpu */
+>>>>        get_cpu();
+>>>> @@ -639,38 +697,21 @@ static inline int __do_cpuid_func(struct 
+>>>> kvm_cpuid_entry2 *entry, u32 function,
+>>>>            break;
+>>>>        }
+>>>>        case 0xd: {
+>>>> -        int idx, i;
+>>>> -        u64 supported = kvm_supported_xcr0();
+>>>> +        int i, idx;
+>>>> -        entry->eax &= supported;
+>>>> -        entry->ebx = xstate_required_size(supported, false);
+>>>> -        entry->ecx = entry->ebx;
+>>>> -        entry->edx &= supported >> 32;
+>>>> -        if (!supported)
+>>>> +        if (!do_cpuid_0xd_mask(&entry[0], 0))
+>>>>                break;
+>>>> -
+>>>> -        for (idx = 1, i = 1; idx < 64; ++idx) {
+>>>> -            u64 mask = ((u64)1 << idx);
+>>>> +        for (i = 1, idx = 1; idx < 64; ++idx) {
+>>>>                if (*nent >= maxnent)
+>>>>                    goto out;
+>>>> -
+>>>>                do_host_cpuid(&entry[i], function, idx);
+>>>> -            if (idx == 1) {
+>>>> -                entry[i].eax &= kvm_cpuid_D_1_eax_x86_features;
+>>>> -                cpuid_mask(&entry[i].eax, CPUID_D_1_EAX);
+>>>> -                entry[i].ebx = 0;
+>>>> -                if (entry[i].eax & (F(XSAVES)|F(XSAVEC)))
+>>>> -                    entry[i].ebx =
+>>>> -                        xstate_required_size(supported,
+>>>> -                                     true);
+>>>> -            } else {
+>>>> -                if (entry[i].eax == 0 || !(supported & mask))
+>>>> -                    continue;
+>>>> -                if (WARN_ON_ONCE(entry[i].ecx & 1))
+>>>> -                    continue;
+>>>> -            }
+>>>> -            entry[i].ecx = 0;
+>>>> -            entry[i].edx = 0;
+>>>> +
+>>>> +            if (entry[i].eax == 0 && entry[i].ebx == 0 &&
+>>>> +                entry[i].ecx == 0 && entry[i].edx == 0)
+>>>> +                continue;
+>>>> +
+>>>> +            if (!do_cpuid_0xd_mask(&entry[i], idx))
+>>>> +                continue;
+>>>>                ++*nent;
+>>>>                ++i;
+>>>>            }
+>>   >
+>>
+> 
 
