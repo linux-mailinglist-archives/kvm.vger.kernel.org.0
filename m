@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E5B4116235B
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:28:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6300916236E
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:33:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726296AbgBRJ2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 04:28:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33237 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726264AbgBRJ2S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 04:28:18 -0500
+        id S1726346AbgBRJdi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 04:33:38 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32839 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726193AbgBRJdi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 04:33:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582018097;
+        s=mimecast20190719; t=1582018416;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=tYdu9Qle2rTthStTy+Ff20TvcMzq7HbIQcrIhK8uvuE=;
-        b=djfbMlaYIx9UQLkKVwTEnMlttJaKXLokwONme5OKs7AxusLIWNwbZQ/2Rymk+is0kb2FX0
-        clhS7arMbM9RKOmBB9UTjg7nbnpc/P2CDhm+J4xd0ytmcvJ1eNY4MKAj1nLXMY5VwFtkeM
-        feuEwmTwfir0sKAedDGLpgt/yhJtiHs=
+        bh=qMI1bzaiOwvkuRWA5FpHjNm1mmlySKYW/+J6MHs7e2E=;
+        b=AhsLPr4Tgem88B6kVCJNoEAuHxs1c2IMf7ipAvCokqTGuJkn+S1GARO4G1muHq5xRw88Nu
+        f12rTtYMW1AqRqhRDYW3oRhr4xBwAVNoghgYyO4Kj/MzUqS7Z3g6u/KJbNCUpZNUJB4rFc
+        mwaIUcSTJaMGiumDHz/1DAXs6ahmg5o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-OXUzyLHWPgeFEHphTbDkxw-1; Tue, 18 Feb 2020 04:28:13 -0500
-X-MC-Unique: OXUzyLHWPgeFEHphTbDkxw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-294-QPFA3uAnP42HhMhnPvLB3A-1; Tue, 18 Feb 2020 04:33:32 -0500
+X-MC-Unique: QPFA3uAnP42HhMhnPvLB3A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEA8B189F763;
-        Tue, 18 Feb 2020 09:28:11 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 514E71005513;
+        Tue, 18 Feb 2020 09:33:31 +0000 (UTC)
 Received: from [10.36.116.190] (ovpn-116-190.ams2.redhat.com [10.36.116.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6715119756;
-        Tue, 18 Feb 2020 09:28:09 +0000 (UTC)
-Subject: Re: [PATCH v2 26/42] KVM: s390: protvirt: Do only reset registers
- that are accessible
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 03A635DA60;
+        Tue, 18 Feb 2020 09:33:28 +0000 (UTC)
+Subject: Re: [PATCH v2 28/42] KVM: s390: protvirt: Add program exception
+ injection
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -46,9 +46,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-27-borntraeger@de.ibm.com>
- <9b66eb07-9755-4afe-6837-6197acd5fa09@redhat.com>
- <1893c520-165d-6006-47cd-0e7498f39188@de.ibm.com>
+ <20200214222658.12946-29-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -94,66 +92,81 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <88acfaf1-b8d1-da77-79b1-52be912fd53b@redhat.com>
-Date:   Tue, 18 Feb 2020 10:28:08 +0100
+Message-ID: <0911c8c1-0877-047b-0da5-4c7f79aef3ae@redhat.com>
+Date:   Tue, 18 Feb 2020 10:33:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <1893c520-165d-6006-47cd-0e7498f39188@de.ibm.com>
+In-Reply-To: <20200214222658.12946-29-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18.02.20 10:20, Christian Borntraeger wrote:
+On 14.02.20 23:26, Christian Borntraeger wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
 > 
+> Only two program exceptions can be injected for a protected guest:
+> specification and operand.
 > 
-> On 18.02.20 09:42, David Hildenbrand wrote:
->> On 14.02.20 23:26, Christian Borntraeger wrote:
->>> From: Janosch Frank <frankja@linux.ibm.com>
->>>
->>> For protected VMs the hypervisor can not access guest breaking event
->>> address, program parameter, bpbc and todpr. Do not reset those fields
->>> as the control block does not provide access to these fields.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> ---
->>>  arch/s390/kvm/kvm-s390.c | 10 ++++++----
->>>  1 file changed, 6 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>> index d20a7fa9d480..5b551cc73540 100644
->>> --- a/arch/s390/kvm/kvm-s390.c
->>> +++ b/arch/s390/kvm/kvm-s390.c
->>> @@ -3442,14 +3442,16 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
->>>  	kvm_s390_set_prefix(vcpu, 0);
->>>  	kvm_s390_set_cpu_timer(vcpu, 0);
->>>  	vcpu->arch.sie_block->ckc = 0;
->>> -	vcpu->arch.sie_block->todpr = 0;
->>>  	memset(vcpu->arch.sie_block->gcr, 0, sizeof(vcpu->arch.sie_block->gcr));
->>>  	vcpu->arch.sie_block->gcr[0] = CR0_INITIAL_MASK;
->>>  	vcpu->arch.sie_block->gcr[14] = CR14_INITIAL_MASK;
->>>  	vcpu->run->s.regs.fpc = 0;
->>> -	vcpu->arch.sie_block->gbea = 1;
->>> -	vcpu->arch.sie_block->pp = 0;
->>> -	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
->>> +	if (!kvm_s390_pv_handle_cpu(vcpu)) {
->>
->> Shouldn't we instead check if the VM is in PV mode? (with changed
->> lifecycle handling). Easier to understand.
+> For both, a code needs to be specified in the interrupt injection
+> control of the state description, as the guest prefix page is not
+> accessible to KVM for such guests.
 > 
-> No. these ioctls are under the vcpu->mutex, so I am going to compare
-> against the per cpu variant.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/kvm/interrupt.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 > 
-> I will use kvm_s390_pv_cpu_is_protected instead to have the lockdep assertion.
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 3e160d9a214f..7a10096fa204 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -836,6 +836,21 @@ static int __must_check __deliver_external_call(struct kvm_vcpu *vcpu)
+>  	return rc ? -EFAULT : 0;
+>  }
+>  
+> +static int __deliver_prog_pv(struct kvm_vcpu *vcpu, u16 code)
+> +{
+> +	switch (code) {
+> +	case PGM_SPECIFICATION:
+> +		vcpu->arch.sie_block->iictl = IICTL_CODE_SPECIFICATION;
+> +		break;
+> +	case PGM_OPERAND:
+> +		vcpu->arch.sie_block->iictl = IICTL_CODE_OPERAND;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +	return 0;
+> +}
+> +
+>  static int __must_check __deliver_prog(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
+> @@ -856,6 +871,9 @@ static int __must_check __deliver_prog(struct kvm_vcpu *vcpu)
+>  	trace_kvm_s390_deliver_interrupt(vcpu->vcpu_id, KVM_S390_PROGRAM_INT,
+>  					 pgm_info.code, 0);
+>  
+> +	if (kvm_s390_pv_is_protected(vcpu->kvm))
 
-That's what I meant!
+Can we actually ever have PER set, and what would happen if so?
+Shouldn't we also return -EINVAL?
+
+> +		return __deliver_prog_pv(vcpu, pgm_info.code & ~PGM_PER);
+> +
+>  	switch (pgm_info.code & ~PGM_PER) {
+>  	case PGM_AFX_TRANSLATION:
+>  	case PGM_ASX_TRANSLATION:
+> 
 
 
 -- 
