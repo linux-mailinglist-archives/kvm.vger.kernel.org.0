@@ -2,235 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F4A4162358
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:28:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5B4116235B
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:28:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726401AbgBRJ1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 04:27:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42334 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726199AbgBRJ1r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 04:27:47 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726296AbgBRJ2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 04:28:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33237 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726264AbgBRJ2S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 04:28:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582018097;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=tYdu9Qle2rTthStTy+Ff20TvcMzq7HbIQcrIhK8uvuE=;
+        b=djfbMlaYIx9UQLkKVwTEnMlttJaKXLokwONme5OKs7AxusLIWNwbZQ/2Rymk+is0kb2FX0
+        clhS7arMbM9RKOmBB9UTjg7nbnpc/P2CDhm+J4xd0ytmcvJ1eNY4MKAj1nLXMY5VwFtkeM
+        feuEwmTwfir0sKAedDGLpgt/yhJtiHs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-OXUzyLHWPgeFEHphTbDkxw-1; Tue, 18 Feb 2020 04:28:13 -0500
+X-MC-Unique: OXUzyLHWPgeFEHphTbDkxw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A8FD9206EF;
-        Tue, 18 Feb 2020 09:27:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582018066;
-        bh=JfpnX0/9AXLX0SUbepC6ix94WfC2VqtqT6BShq+yOfY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=i1haDJBjVgMh5Z7iwcxqIPg/WGXs7z0EMLSEMdnH/za4diZ8awNNMtjwGtabI/lIp
-         VqU2FVFh4bDIRMvJpSNwBU0pVTDG/F9SEdf0JMsf1n237Pn+/e0cHW7rCudfCcUM3F
-         UNa9nlJINV2tawUiRWnD29FGW09j4zoy/Fj888bY=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j3zAP-006BEh-0t; Tue, 18 Feb 2020 09:27:45 +0000
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEA8B189F763;
+        Tue, 18 Feb 2020 09:28:11 +0000 (UTC)
+Received: from [10.36.116.190] (ovpn-116-190.ams2.redhat.com [10.36.116.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6715119756;
+        Tue, 18 Feb 2020 09:28:09 +0000 (UTC)
+Subject: Re: [PATCH v2 26/42] KVM: s390: protvirt: Do only reset registers
+ that are accessible
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-27-borntraeger@de.ibm.com>
+ <9b66eb07-9755-4afe-6837-6197acd5fa09@redhat.com>
+ <1893c520-165d-6006-47cd-0e7498f39188@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <88acfaf1-b8d1-da77-79b1-52be912fd53b@redhat.com>
+Date:   Tue, 18 Feb 2020 10:28:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <1893c520-165d-6006-47cd-0e7498f39188@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Tue, 18 Feb 2020 09:27:44 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v4 08/20] irqchip/gic-v4.1: Plumb get/set_irqchip_state
- SGI callbacks
-In-Reply-To: <4b7f71f1-5e7f-e6af-f47d-7ed0d3a8739f@huawei.com>
-References: <20200214145736.18550-1-maz@kernel.org>
- <20200214145736.18550-9-maz@kernel.org>
- <4b7f71f1-5e7f-e6af-f47d-7ed0d3a8739f@huawei.com>
-Message-ID: <75597af0d2373ac4d92d8162a1338cbb@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
-
-On 2020-02-18 07:00, Zenghui Yu wrote:
-> Hi Marc,
+On 18.02.20 10:20, Christian Borntraeger wrote:
 > 
-> On 2020/2/14 22:57, Marc Zyngier wrote:
->> To implement the get/set_irqchip_state callbacks (limited to the
->> PENDING state), we have to use a particular set of hacks:
->> 
->> - Reading the pending state is done by using a pair of new 
->> redistributor
->>    registers (GICR_VSGIR, GICR_VSGIPENDR), which allow the 16 
->> interrupts
->>    state to be retrieved.
->> - Setting the pending state is done by generating it as we'd otherwise 
->> do
->>    for a guest (writing to GITS_SGIR)
->> - Clearing the pending state is done by emiting a VSGI command with 
->> the
->>    "clear" bit set.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>   drivers/irqchip/irq-gic-v3-its.c   | 56 
->> ++++++++++++++++++++++++++++++
->>   include/linux/irqchip/arm-gic-v3.h | 14 ++++++++
->>   2 files changed, 70 insertions(+)
->> 
->> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
->> b/drivers/irqchip/irq-gic-v3-its.c
->> index 1e448d9a16ea..a9753435c4ff 100644
->> --- a/drivers/irqchip/irq-gic-v3-its.c
->> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -3915,11 +3915,67 @@ static int its_sgi_set_affinity(struct 
->> irq_data *d,
->>   	return -EINVAL;
->>   }
->>   +static int its_sgi_set_irqchip_state(struct irq_data *d,
->> +				     enum irqchip_irq_state which,
->> +				     bool state)
->> +{
->> +	if (which != IRQCHIP_STATE_PENDING)
->> +		return -EINVAL;
->> +
->> +	if (state) {
->> +		struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
->> +		struct its_node *its = find_4_1_its();
->> +		u64 val;
->> +
->> +		val  = FIELD_PREP(GITS_SGIR_VPEID, vpe->vpe_id);
->> +		val |= FIELD_PREP(GITS_SGIR_VINTID, d->hwirq);
->> +		writeq_relaxed(val, its->sgir_base + GITS_SGIR - SZ_128K);
->> +	} else {
->> +		its_configure_sgi(d, true);
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int its_sgi_get_irqchip_state(struct irq_data *d,
->> +				     enum irqchip_irq_state which, bool *val)
->> +{
->> +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
->> +	void __iomem *base = gic_data_rdist_cpu(vpe->col_idx)->rd_base + 
->> SZ_128K;
 > 
-> There might be a race on reading the 'vpe->col_idx' against a 
-> concurrent
-> vPE schedule (col_idx will be modified in its_vpe_set_affinity)? Will 
-> we
-> end up accessing the GICR_VSGI* registers of the old redistributor,
-> while the vPE is now resident on the new one? Or is it harmful?
-
-Very well spotted. There is a potential problem if old and new RDs are 
-not part
-of the same CommonLPIAff group.
-
-> The same question for direct_lpi_inv(), where 'vpe->col_idx' will be
-> used in irq_to_cpuid().
-
-Same problem indeed. We need to ensure that no VMOVP operation can occur 
-whilst
-we use col_idx to access a redistributor. This means a vPE lock of some 
-sort
-that will protect the affinity.
-
-But I think there is a slightly more general problem here, which we 
-failed to
-see initially: the same issue exists for physical LPIs, as col_map[] can 
-be
-updated (its_set_affinity()) in parallel with a direct invalidate.
-
-The good old invalidation through the ITS does guarantee that the two 
-operation
-don't overlap, but direct invalidation breaks it.
-
-Let me have a think about it.
-
+> On 18.02.20 09:42, David Hildenbrand wrote:
+>> On 14.02.20 23:26, Christian Borntraeger wrote:
+>>> From: Janosch Frank <frankja@linux.ibm.com>
+>>>
+>>> For protected VMs the hypervisor can not access guest breaking event
+>>> address, program parameter, bpbc and todpr. Do not reset those fields
+>>> as the control block does not provide access to these fields.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>> ---
+>>>  arch/s390/kvm/kvm-s390.c | 10 ++++++----
+>>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>> index d20a7fa9d480..5b551cc73540 100644
+>>> --- a/arch/s390/kvm/kvm-s390.c
+>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>> @@ -3442,14 +3442,16 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+>>>  	kvm_s390_set_prefix(vcpu, 0);
+>>>  	kvm_s390_set_cpu_timer(vcpu, 0);
+>>>  	vcpu->arch.sie_block->ckc = 0;
+>>> -	vcpu->arch.sie_block->todpr = 0;
+>>>  	memset(vcpu->arch.sie_block->gcr, 0, sizeof(vcpu->arch.sie_block->gcr));
+>>>  	vcpu->arch.sie_block->gcr[0] = CR0_INITIAL_MASK;
+>>>  	vcpu->arch.sie_block->gcr[14] = CR14_INITIAL_MASK;
+>>>  	vcpu->run->s.regs.fpc = 0;
+>>> -	vcpu->arch.sie_block->gbea = 1;
+>>> -	vcpu->arch.sie_block->pp = 0;
+>>> -	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+>>> +	if (!kvm_s390_pv_handle_cpu(vcpu)) {
+>>
+>> Shouldn't we instead check if the VM is in PV mode? (with changed
+>> lifecycle handling). Easier to understand.
 > 
->> +	u32 count = 1000000;	/* 1s! */
->> +	u32 status;
->> +
->> +	if (which != IRQCHIP_STATE_PENDING)
->> +		return -EINVAL;
->> +
->> +	writel_relaxed(vpe->vpe_id, base + GICR_VSGIR);
->> +	do {
->> +		status = readl_relaxed(base + GICR_VSGIPENDR);
->> +		if (!(status & GICR_VSGIPENDR_BUSY))
->> +			goto out;
->> +
->> +		count--;
->> +		if (!count) {
->> +			pr_err_ratelimited("Unable to get SGI status\n");
->> +			goto out;
->> +		}
->> +		cpu_relax();
->> +		udelay(1);
->> +	} while(count);
->> +
->> +out:
->> +	*val = !!(status & (1 << d->hwirq));
->> +
->> +	return 0;
->> +}
->> +
->>   static struct irq_chip its_sgi_irq_chip = {
->>   	.name			= "GICv4.1-sgi",
->>   	.irq_mask		= its_sgi_mask_irq,
->>   	.irq_unmask		= its_sgi_unmask_irq,
->>   	.irq_set_affinity	= its_sgi_set_affinity,
->> +	.irq_set_irqchip_state	= its_sgi_set_irqchip_state,
->> +	.irq_get_irqchip_state	= its_sgi_get_irqchip_state,
->>   };
->>     static int its_sgi_irq_domain_alloc(struct irq_domain *domain,
->> diff --git a/include/linux/irqchip/arm-gic-v3.h 
->> b/include/linux/irqchip/arm-gic-v3.h
->> index a89578884263..64da945486ac 100644
->> --- a/include/linux/irqchip/arm-gic-v3.h
->> +++ b/include/linux/irqchip/arm-gic-v3.h
->> @@ -345,6 +345,15 @@
->>   #define GICR_VPENDBASER_4_1_VGRP1EN	(1ULL << 58)
->>   #define GICR_VPENDBASER_4_1_VPEID	GENMASK_ULL(15, 0)
->>   +#define GICR_VSGIR			0x0080
->> +
->> +#define GICR_VSGIR_VPEID		GENMASK(15, 0)
->> +
->> +#define GICR_VSGIPENDR			0x0088
->> +
->> +#define GICR_VSGIPENDR_BUSY		(1U << 31)
->> +#define GICR_VSGIPENDR_PENDING		GENMASK(15, 0)
->> +
->>   /*
->>    * ITS registers, offsets from ITS_base
->>    */
->> @@ -368,6 +377,11 @@
->>     #define GITS_TRANSLATER			0x10040
->>   +#define GITS_SGIR			0x20020
->> +
->> +#define GITS_SGIR_VPEID			GENMASK_ULL(47, 32)
->> +#define GITS_SGIR_VINTID		GENMASK_ULL(7, 0)
+> No. these ioctls are under the vcpu->mutex, so I am going to compare
+> against the per cpu variant.
 > 
-> The spec says vINTID field is [3:0] of the GITS_SGIR.
+> I will use kvm_s390_pv_cpu_is_protected instead to have the lockdep assertion.
 
-Indeed, well spotted again!
+That's what I meant!
 
+
+-- 
 Thanks,
 
-          M.
--- 
-Jazz is not dead. It just smells funny...
+David / dhildenb
+
