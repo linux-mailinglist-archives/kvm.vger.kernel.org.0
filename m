@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EEA611623D7
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:48:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ABD21623E1
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:51:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726478AbgBRJsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 04:48:35 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59639 "EHLO
+        id S1726225AbgBRJvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 04:51:01 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37335 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726391AbgBRJse (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 04:48:34 -0500
+        by vger.kernel.org with ESMTP id S1726403AbgBRJvA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 04:51:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582019313;
+        s=mimecast20190719; t=1582019459;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=H4Ci7DLkLbSebqZjQA3eb0pFWyQqzJG+6SEjkBjK1AU=;
-        b=LCRbOc+D07e13qnoi4xb7IWkl/9dy5azYuzKfPlIHUKxjd+CXDhZata3COkfJkltLZkix7
-        zwsPrM/uDZP0KBBmLShJvwH/KVZh2LNx9trkJdnKCx/Oet4sTTcrWxh40TtLBsWUP3vE2F
-        TITSb7w/Z5qbPuRWK7x4DiGZ9xl2Pe0=
+        bh=UEy2/O55avx7fGad5nvEi8toAS4W/GVDgQM/RdiISUY=;
+        b=COMkgTF8yhZimtVqZQrRXbXVa4zKH5fABlWdLu5I+MGItPhcIhg9tAHrlaCv1+tjXb2Ls0
+        CP4UyWrgwnRVB1+YN6U5j53gmgbxMMOLkmxsAD3tp5SGIRbiHB54tW2CQf5wUdsW/vUVnW
+        hRJcUsSKFIOLLHTsjtq2+c4a/qarRO8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-42Gk7z-KPXa1bTE_gJctoA-1; Tue, 18 Feb 2020 04:48:29 -0500
-X-MC-Unique: 42Gk7z-KPXa1bTE_gJctoA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-255-zrO0KW3IPBeRCaXaSR3lxw-1; Tue, 18 Feb 2020 04:50:55 -0500
+X-MC-Unique: zrO0KW3IPBeRCaXaSR3lxw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E6941B2C98A;
-        Tue, 18 Feb 2020 09:48:28 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74E5E1B2C980;
+        Tue, 18 Feb 2020 09:50:53 +0000 (UTC)
 Received: from [10.36.116.190] (ovpn-116-190.ams2.redhat.com [10.36.116.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1000290525;
-        Tue, 18 Feb 2020 09:48:25 +0000 (UTC)
-Subject: Re: [PATCH v2 31/42] KVM: s390: protvirt: Report CPU state to
- Ultravisor
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2951B90F5B;
+        Tue, 18 Feb 2020 09:50:50 +0000 (UTC)
+Subject: Re: [PATCH v2 32/42] KVM: s390: protvirt: Support cmd 5 operation
+ state
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -46,7 +46,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-32-borntraeger@de.ibm.com>
+ <20200214222658.12946-33-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -92,16 +92,16 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <33cffbe7-9d87-d94f-dc56-6d31ea2e56eb@redhat.com>
-Date:   Tue, 18 Feb 2020 10:48:25 +0100
+Message-ID: <f84bdd3a-a305-9bc1-af92-0b1ff36bfca8@redhat.com>
+Date:   Tue, 18 Feb 2020 10:50:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214222658.12946-32-borntraeger@de.ibm.com>
+In-Reply-To: <20200214222658.12946-33-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -110,8 +110,10 @@ X-Mailing-List: kvm@vger.kernel.org
 On 14.02.20 23:26, Christian Borntraeger wrote:
 > From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> VCPU states have to be reported to the ultravisor for SIGP
-> interpretation, kdump, kexec and reboot.
+> Code 5 for the set cpu state UV call tells the UV to load a PSW from
+> the SE header (first IPL) or from guest location 0x0 (diag 308 subcode
+> 0/1). Also it sets the cpu into operating state afterwards, so we can
+> start it.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
@@ -119,142 +121,44 @@ On 14.02.20 23:26, Christian Borntraeger wrote:
 > [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/s390/include/asm/uv.h | 15 +++++++++++++++
->  arch/s390/kvm/kvm-s390.c   |  7 ++++++-
->  arch/s390/kvm/kvm-s390.h   |  2 ++
->  arch/s390/kvm/pv.c         | 22 ++++++++++++++++++++++
->  4 files changed, 45 insertions(+), 1 deletion(-)
+>  arch/s390/include/asm/uv.h | 1 +
+>  arch/s390/kvm/kvm-s390.c   | 8 ++++++++
+>  include/uapi/linux/kvm.h   | 1 +
+>  3 files changed, 10 insertions(+)
 > 
 > diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 254d5769d136..7b82881ec3b4 100644
+> index 7b82881ec3b4..d59825d95b9d 100644
 > --- a/arch/s390/include/asm/uv.h
 > +++ b/arch/s390/include/asm/uv.h
-> @@ -37,6 +37,7 @@
->  #define UVC_CMD_UNPACK_IMG		0x0301
->  #define UVC_CMD_VERIFY_IMG		0x0302
->  #define UVC_CMD_PREPARE_RESET		0x0320
-> +#define UVC_CMD_CPU_SET_STATE		0x0330
->  #define UVC_CMD_SET_UNSHARE_ALL		0x0340
->  #define UVC_CMD_PIN_PAGE_SHARED		0x0341
->  #define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
-> @@ -58,6 +59,7 @@ enum uv_cmds_inst {
->  	BIT_UVC_CMD_SET_SEC_PARMS = 11,
->  	BIT_UVC_CMD_UNPACK_IMG = 13,
->  	BIT_UVC_CMD_VERIFY_IMG = 14,
-> +	BIT_UVC_CMD_CPU_SET_STATE = 17,
->  	BIT_UVC_CMD_PREPARE_RESET = 18,
->  	BIT_UVC_CMD_UNSHARE_ALL = 20,
->  	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
-> @@ -164,6 +166,19 @@ struct uv_cb_unp {
->  	u64 reserved38[3];
->  } __packed __aligned(8);
+> @@ -169,6 +169,7 @@ struct uv_cb_unp {
+>  #define PV_CPU_STATE_OPR	1
+>  #define PV_CPU_STATE_STP	2
+>  #define PV_CPU_STATE_CHKSTP	3
+> +#define PV_CPU_STATE_OPR_LOAD	5
 >  
-> +#define PV_CPU_STATE_OPR	1
-> +#define PV_CPU_STATE_STP	2
-> +#define PV_CPU_STATE_CHKSTP	3
-> +
-> +struct uv_cb_cpu_set_state {
-> +	struct uv_cb_header header;
-> +	u64 reserved08[2];
-> +	u64 cpu_handle;
-> +	u8  reserved20[7];
-> +	u8  state;
-> +	u64 reserved28[5];
-> +};
-> +
->  /*
->   * A common UV call struct for calls that take no payload
->   * Examples:
+>  struct uv_cb_cpu_set_state {
+>  	struct uv_cb_header header;
 > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index ad84c1144908..5426b01e3da1 100644
+> index 5426b01e3da1..b6113285f47f 100644
 > --- a/arch/s390/kvm/kvm-s390.c
 > +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4396,6 +4396,7 @@ static void __enable_ibs_on_vcpu(struct kvm_vcpu *vcpu)
->  void kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
->  {
->  	int i, online_vcpus, started_vcpus = 0;
-> +	u16 rc, rrc;
->  
->  	if (!is_vcpu_stopped(vcpu))
->  		return;
-> @@ -4421,7 +4422,8 @@ void kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
->  		 */
->  		__disable_ibs_on_all_vcpus(vcpu->kvm);
+> @@ -4656,6 +4656,14 @@ static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu *vcpu,
+>  		r = kvm_s390_pv_destroy_cpu(vcpu, &cmd->rc, &cmd->rrc);
+>  		break;
 >  	}
-> -
-> +	/* Let's tell the UV that we want to start again */
-> +	kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR, &rc, &rrc);
->  	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_STOPPED);
->  	/*
->  	 * Another VCPU might have used IBS while we were offline.
-> @@ -4436,6 +4438,7 @@ void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
->  {
->  	int i, online_vcpus, started_vcpus = 0;
->  	struct kvm_vcpu *started_vcpu = NULL;
-> +	u16 rc, rrc;
->  
->  	if (is_vcpu_stopped(vcpu))
->  		return;
-> @@ -4449,6 +4452,8 @@ void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
->  	kvm_s390_clear_stop_irq(vcpu);
->  
->  	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
-> +	/* Let's tell the UV that we successfully stopped the vcpu */
-> +	kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_STP, &rc, &rrc);
->  	__disable_ibs_on_vcpu(vcpu);
->  
->  	for (i = 0; i < online_vcpus; i++) {
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index d5503dd0d1e4..1af1e30beead 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -218,6 +218,8 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
->  			      u16 *rrc);
->  int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
->  		       unsigned long tweak, u16 *rc, u16 *rrc);
-> +int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state, u16 *rc,
-> +			      u16 *rrc);
->  
->  static inline bool kvm_s390_pv_is_protected(struct kvm *kvm)
->  {
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index 80169a9b43ec..b4bf6b6eb708 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -271,3 +271,25 @@ int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
->  		KVM_UV_EVENT(kvm, 3, "%s", "PROTVIRT VM UNPACK: successful");
->  	return ret;
->  }
+> +	case KVM_PV_VCPU_SET_IPL_PSW: {
+> +		if (!kvm_s390_pv_handle_cpu(vcpu))
+> +			return -EINVAL;
 > +
-> +int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state, u16 *rc,
-> +			      u16 *rrc)
-> +{
-> +	struct uv_cb_cpu_set_state uvcb = {
-> +		.header.cmd	= UVC_CMD_CPU_SET_STATE,
-> +		.header.len	= sizeof(uvcb),
-> +		.cpu_handle	= kvm_s390_pv_handle_cpu(vcpu),
-> +		.state		= state,
-> +	};
-> +	int cc;
-> +
-> +	if (!kvm_s390_pv_handle_cpu(vcpu))
+> +		r = kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR_LOAD,
+> +					      &cmd->rc, &cmd->rrc);
 
-I'd actually prefer to move this to the caller. (and sue the _protected
-variant)
+Can we squeeze that into kvm_arch_vcpu_ioctl_set_mpstate() instead? The
+interface seems to do exactly what you want it to do.
 
-> +		return -EINVAL;
-> +
-> +	cc = uv_call(0, (u64)&uvcb);
-> +	*rc = uvcb.header.rc;
-> +	*rrc = uvcb.header.rrc;
-> +	if (cc)
-> +		return -EINVAL;
+KVM_MP_STATE_OPERATING_LOAD
 
-All return values are ignored. warn instead and make this a void function?
-
-> +	return 0;
-> +}
-> 
+Allow it only when in PV.
 
 
 
