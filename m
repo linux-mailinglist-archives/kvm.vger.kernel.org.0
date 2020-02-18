@@ -2,141 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0594162EC6
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 19:40:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD31B162EF3
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 19:48:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726446AbgBRSkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 13:40:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60070 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726225AbgBRSkY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 13:40:24 -0500
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E3BA124656;
-        Tue, 18 Feb 2020 18:40:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582051223;
-        bh=e0prGkshvWw2XTwL3+iei7JE8F3vbsgEto2sLKzoNxY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ZbapHghKemvj/oI+zpPIruW3rQ0y+/IGCFK4hWmOUDx7Vi4fNxeSS/WMkU/tOfVw6
-         5U9tzmE0siFMLLMGiimacSWFAD6i3onMYAlpQEevIhoPtM05rP/W3Mn7mRRqz8OUEZ
-         FvJ+rEAk2hZeuYncgmnHdz8KREoKXg7XPBgExTnc=
-Received: by mail-qk1-f170.google.com with SMTP id h4so20556083qkm.0;
-        Tue, 18 Feb 2020 10:40:22 -0800 (PST)
-X-Gm-Message-State: APjAAAXMOybWhbMjP/PI5WyTkGrIoj25iB3wKpVv2e+lmQsAhJTKVBQW
-        6myrge+bZL3RZnK73O4cu1nqjyZvPb1bDrWCqQ==
-X-Google-Smtp-Source: APXvYqzzc5l2bT41Ulxw896RzAsZHa163jCmWCxKmNgy3aUdTfnzFWB1uBJXqNRZFmClh71pLAlutTDYlRFRVHXfwrQ=
-X-Received: by 2002:ae9:f205:: with SMTP id m5mr20551704qkg.152.1582051221993;
- Tue, 18 Feb 2020 10:40:21 -0800 (PST)
-MIME-Version: 1.0
-References: <20200218171321.30990-1-robh@kernel.org> <20200218181356.09ae0779@donnerap.cambridge.arm.com>
-In-Reply-To: <20200218181356.09ae0779@donnerap.cambridge.arm.com>
-From:   Rob Herring <robh@kernel.org>
-Date:   Tue, 18 Feb 2020 12:40:10 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqJpDLn5Zr2UHno1TeReqrwZ-HAAfd78AouigGi4sAQuOw@mail.gmail.com>
-Message-ID: <CAL_JsqJpDLn5Zr2UHno1TeReqrwZ-HAAfd78AouigGi4sAQuOw@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/11] Removing Calxeda platform support
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        soc@kernel.org, Robert Richter <rrichter@marvell.com>,
-        Jon Loeliger <jdl@jdl.com>, Alexander Graf <graf@amazon.com>,
-        Matthias Brugger <mbrugger@suse.com>,
-        Mark Langsdorf <mlangsdo@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        devicetree@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
-        Linux IOMMU <iommu@lists.linux-foundation.org>,
-        James Morse <james.morse@arm.com>,
-        Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-        kvm@vger.kernel.org, linux-clk <linux-clk@vger.kernel.org>,
-        linux-edac <linux-edac@vger.kernel.org>,
-        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
-        <linux-ide@vger.kernel.org>,
-        "open list:THERMAL" <linux-pm@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Will Deacon <will@kernel.org>
+        id S1726446AbgBRSsG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 13:48:06 -0500
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:37998 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726225AbgBRSsF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 13:48:05 -0500
+Received: by mail-pg1-f202.google.com with SMTP id x16so13910255pgg.5
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 10:48:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=mUCg79WyMDbLxcG7uSEM7XFzy4Eo8iAxs3oCavIjWFs=;
+        b=pziMD2Jsu2b0vq9lw2bBmxIrkSUC8VKVp/8B4Pw7kAdkCfYavMg8imPAlC9/8VuRrm
+         NPmdmDGRkk4fWlUBsM5KeJPrpxYrCH9N50jlSPcxwEvSq6akDdnw0vKVRmYoz9lP4W5w
+         ngOcUKBRmQ7djFvnnoLaa9uEAtd4VBp4jJ8MfthW5Pua2dHBgNLkSs5pzZk8HmcoCzu6
+         Pg7oU+k/9koDkl0a0mmI92DAHI7KpuKoSTkge/ufq2GVjEZXbYA3nFqyAz1w5eODnmAo
+         VnSVNybD7CQWJJY5dGAlZUU6dSGR1e+u+W/WFMu0/EVhIC/gjr+P/iNg/S4bebRZMFep
+         UKxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=mUCg79WyMDbLxcG7uSEM7XFzy4Eo8iAxs3oCavIjWFs=;
+        b=iFT9vd+MEOWJIaECOHgtWwI0EnFm4ZMp+jeSqLtezRdC3uWqnOzO63HoSR76O/xeSm
+         cd2015ggFJHN3N4EgRneZ8M80kAT0giQ1l/QKP3YCCJrdvGYwNi8c0OmVJNqOPAjE4wR
+         HkkwKc26ZlzneqzTxImRDGqvuOnp6PI0+5w04SUeY5YdEky08IvOwJ5dVWiydqZ+PChD
+         Q7Hkmlc1dWpKSFR1ni25Tpj0kExVOU9jnb4W6770jgx3GKMZKNCwkp1970cyjefL0Qjm
+         QTB7rtUzOQvlUOPquPIApAyYzTF/tGnC5gghOU2ae4GUO9mt/KXoCJhRCToGAIIe3qM0
+         oPwA==
+X-Gm-Message-State: APjAAAUzlR4mJgyr4cqHS7Y4dS/SzPZAgCwfntzQ91T/tZm9pqpVlgEj
+        HtzfmKtreV9YzFpm2ZAHgXfIdMgORMDbBLpX3uKqqqB2hbS9WuR0vRP+3fYhdwYYNNlAORcj1sE
+        nvFOTi6x02eNs0jLL49Oaqu2UPZpKTqlBDjMVjveOoUWgO0BTBDgYls+VUg==
+X-Google-Smtp-Source: APXvYqx3zhzxSNKOn5ldYpofPbZr1gJcux2SG8syIhC/e+izLZEQHemLW8fagUtzeQZA3Q9d2crvbdfTVb4=
+X-Received: by 2002:a63:5826:: with SMTP id m38mr24858005pgb.191.1582051683115;
+ Tue, 18 Feb 2020 10:48:03 -0800 (PST)
+Date:   Tue, 18 Feb 2020 10:47:56 -0800
+Message-Id: <20200218184756.242904-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+Subject: [PATCH] KVM: Suppress warning in __kvm_gfn_to_hva_cache_init
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oupton@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 18, 2020 at 12:14 PM Andre Przywara <andre.przywara@arm.com> wr=
-ote:
->
-> On Tue, 18 Feb 2020 11:13:10 -0600
-> Rob Herring <robh@kernel.org> wrote:
->
-> Hi,
->
-> > Calxeda has been defunct for 6 years now. Use of Calxeda servers carrie=
-d
-> > on for some time afterwards primarily as distro builders for 32-bit ARM=
-.
-> > AFAIK, those systems have been retired in favor of 32-bit VMs on 64-bit
-> > hosts.
-> >
-> > The other use of Calxeda Midway I'm aware of was testing 32-bit ARM KVM
-> > support as there are few or no other systems with enough RAM and LPAE. =
-Now
-> > 32-bit KVM host support is getting removed[1].
-> >
-> > While it's not much maintenance to support, I don't care to convert the
-> > Calxeda DT bindings to schema nor fix any resulting errors in the dts f=
-iles
-> > (which already don't exactly match what's shipping in firmware).
->
-> While every kernel maintainer seems always happy to take patches with a n=
-egative diffstat, I wonder if this is really justification enough to remove=
- a perfectly working platform. I don't really know about any active users, =
-but experience tells that some platforms really are used for quite a long t=
-ime, even if they are somewhat obscure. N900 or Netwinder, anyone?
->
-> So to not give the impression that actually *everyone* (from that small s=
-ubset of people actively reading the kernel list) is happy with that, I thi=
-nk that having support for at least Midway would be useful. On the one hand=
- it's a decent LPAE platform (with memory actually exceeding 4GB), and on t=
-he other hand it's something with capable I/O (SATA) and networking, so one=
- can actually stress test the system. Which is the reason I was using that =
-for KVM testing, but even with that probably going away now there remain st=
-ill some use cases, and be it for general ARM(32) testing.
+Particularly draconian compilers warn of a possible uninitialized use of
+the nr_pages_avail variable. Silence this warning by initializing it to
+zero.
 
-Does LPAE with more than 4GB actually need to work if there's not
-another platform out there?
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> I don't particularly care about the more optional parts like EDAC, cpuidl=
-e, or cpufreq, but I wonder if keeping in at least the rather small SATA an=
-d XGMAC drivers and basic platform support is feasible.
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 70f03ce0e5c1..dc8a67ad082d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2219,7 +2219,7 @@ static int __kvm_gfn_to_hva_cache_init(struct kvm_memslots *slots,
+ 	gfn_t start_gfn = gpa >> PAGE_SHIFT;
+ 	gfn_t end_gfn = (gpa + len - 1) >> PAGE_SHIFT;
+ 	gfn_t nr_pages_needed = end_gfn - start_gfn + 1;
+-	gfn_t nr_pages_avail;
++	gfn_t nr_pages_avail = 0;
+ 
+ 	/* Update ghc->generation before performing any error checks. */
+ 	ghc->generation = slots->generation;
+-- 
+2.25.0.265.gbab2e86ba0-goog
 
-cpuidle isn't actually stable from what I remember. I think without
-cpufreq, we default to 1.1GHz instead of 1.4.
-
-> If YAML DT bindings are used as an excuse, I am more than happy to conver=
-t those over.
-
-Thanks!
-
->
-> And if anyone has any particular gripes with some code, maybe there is a =
-way to fix that instead of removing it? I was always wondering if we could =
-get rid of the mach-highbank directory, for instance. I think most of it is=
- Highbank (Cortex-A9) related.
-
-All the reset/suspend/poweroff and coherency parts are shared. The SCU
-and L2 parts could be removed, but not really worth the surgery IMO.
-
-Rob
