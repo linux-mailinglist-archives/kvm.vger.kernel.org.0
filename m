@@ -2,93 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D7DC71623CC
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:46:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EEA611623D7
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:48:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726383AbgBRJqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 04:46:13 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46950 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726295AbgBRJqM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 04:46:12 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726478AbgBRJsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 04:48:35 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59639 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726391AbgBRJse (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 04:48:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582019313;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=H4Ci7DLkLbSebqZjQA3eb0pFWyQqzJG+6SEjkBjK1AU=;
+        b=LCRbOc+D07e13qnoi4xb7IWkl/9dy5azYuzKfPlIHUKxjd+CXDhZata3COkfJkltLZkix7
+        zwsPrM/uDZP0KBBmLShJvwH/KVZh2LNx9trkJdnKCx/Oet4sTTcrWxh40TtLBsWUP3vE2F
+        TITSb7w/Z5qbPuRWK7x4DiGZ9xl2Pe0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-42Gk7z-KPXa1bTE_gJctoA-1; Tue, 18 Feb 2020 04:48:29 -0500
+X-MC-Unique: 42Gk7z-KPXa1bTE_gJctoA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 417AD206E2;
-        Tue, 18 Feb 2020 09:46:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582019172;
-        bh=IMHp2n/+7oTwD0UMPuIj8WNmYZDuF7jfPDPHTkTYfds=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VyGbrUNyvk2JJyr92klamHD9Lto3mF5e88GAPxsdBirRnVEK+iEZjLdPSfdI9GqLk
-         3PdCSBYhoXLTi4LssEL5OsP7PB7OMmGExG/uRxgVBGspua2E3Kj4GQbt5N9MO/+Wij
-         oOk4IwquRePoKh6l9ZL8TbQ5Vs0Bwet7Q+K/CNyw=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j3zSE-006Bbs-Ih; Tue, 18 Feb 2020 09:46:10 +0000
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E6941B2C98A;
+        Tue, 18 Feb 2020 09:48:28 +0000 (UTC)
+Received: from [10.36.116.190] (ovpn-116-190.ams2.redhat.com [10.36.116.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1000290525;
+        Tue, 18 Feb 2020 09:48:25 +0000 (UTC)
+Subject: Re: [PATCH v2 31/42] KVM: s390: protvirt: Report CPU state to
+ Ultravisor
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-32-borntraeger@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <33cffbe7-9d87-d94f-dc56-6d31ea2e56eb@redhat.com>
+Date:   Tue, 18 Feb 2020 10:48:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20200214222658.12946-32-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Tue, 18 Feb 2020 09:46:10 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Robert Richter <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v4 06/20] irqchip/gic-v4.1: Add initial SGI configuration
-In-Reply-To: <e47baffb-83a5-57d7-1721-eaee28aaaabf@huawei.com>
-References: <20200214145736.18550-1-maz@kernel.org>
- <20200214145736.18550-7-maz@kernel.org>
- <e47baffb-83a5-57d7-1721-eaee28aaaabf@huawei.com>
-Message-ID: <4a64bf17c015cb10e62d9c1a1ff64db5@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
-
-On 2020-02-18 07:25, Zenghui Yu wrote:
-> Hi Marc,
-
-[...]
-
->>     static void its_sgi_irq_domain_deactivate(struct irq_domain 
->> *domain,
->>   					  struct irq_data *d)
->>   {
->> -	/* Nothing to do */
->> +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
->> +
->> +	vpe->sgi_config[d->hwirq].enabled = false;
->> +	its_configure_sgi(d, true);
+On 14.02.20 23:26, Christian Borntraeger wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> The spec says, when C==1, VSGI clears the pending state of the vSGI,
-> leaving the configuration unchanged.  So should we first clear the
-> pending state and then disable vSGI (let E==0)?
+> VCPU states have to be reported to the ultravisor for SIGP
+> interpretation, kdump, kexec and reboot.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/include/asm/uv.h | 15 +++++++++++++++
+>  arch/s390/kvm/kvm-s390.c   |  7 ++++++-
+>  arch/s390/kvm/kvm-s390.h   |  2 ++
+>  arch/s390/kvm/pv.c         | 22 ++++++++++++++++++++++
+>  4 files changed, 45 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 254d5769d136..7b82881ec3b4 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -37,6 +37,7 @@
+>  #define UVC_CMD_UNPACK_IMG		0x0301
+>  #define UVC_CMD_VERIFY_IMG		0x0302
+>  #define UVC_CMD_PREPARE_RESET		0x0320
+> +#define UVC_CMD_CPU_SET_STATE		0x0330
+>  #define UVC_CMD_SET_UNSHARE_ALL		0x0340
+>  #define UVC_CMD_PIN_PAGE_SHARED		0x0341
+>  #define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
+> @@ -58,6 +59,7 @@ enum uv_cmds_inst {
+>  	BIT_UVC_CMD_SET_SEC_PARMS = 11,
+>  	BIT_UVC_CMD_UNPACK_IMG = 13,
+>  	BIT_UVC_CMD_VERIFY_IMG = 14,
+> +	BIT_UVC_CMD_CPU_SET_STATE = 17,
+>  	BIT_UVC_CMD_PREPARE_RESET = 18,
+>  	BIT_UVC_CMD_UNSHARE_ALL = 20,
+>  	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
+> @@ -164,6 +166,19 @@ struct uv_cb_unp {
+>  	u64 reserved38[3];
+>  } __packed __aligned(8);
+>  
+> +#define PV_CPU_STATE_OPR	1
+> +#define PV_CPU_STATE_STP	2
+> +#define PV_CPU_STATE_CHKSTP	3
+> +
+> +struct uv_cb_cpu_set_state {
+> +	struct uv_cb_header header;
+> +	u64 reserved08[2];
+> +	u64 cpu_handle;
+> +	u8  reserved20[7];
+> +	u8  state;
+> +	u64 reserved28[5];
+> +};
+> +
+>  /*
+>   * A common UV call struct for calls that take no payload
+>   * Examples:
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index ad84c1144908..5426b01e3da1 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4396,6 +4396,7 @@ static void __enable_ibs_on_vcpu(struct kvm_vcpu *vcpu)
+>  void kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
+>  {
+>  	int i, online_vcpus, started_vcpus = 0;
+> +	u16 rc, rrc;
+>  
+>  	if (!is_vcpu_stopped(vcpu))
+>  		return;
+> @@ -4421,7 +4422,8 @@ void kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
+>  		 */
+>  		__disable_ibs_on_all_vcpus(vcpu->kvm);
+>  	}
+> -
+> +	/* Let's tell the UV that we want to start again */
+> +	kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR, &rc, &rrc);
+>  	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_STOPPED);
+>  	/*
+>  	 * Another VCPU might have used IBS while we were offline.
+> @@ -4436,6 +4438,7 @@ void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>  {
+>  	int i, online_vcpus, started_vcpus = 0;
+>  	struct kvm_vcpu *started_vcpu = NULL;
+> +	u16 rc, rrc;
+>  
+>  	if (is_vcpu_stopped(vcpu))
+>  		return;
+> @@ -4449,6 +4452,8 @@ void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>  	kvm_s390_clear_stop_irq(vcpu);
+>  
+>  	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
+> +	/* Let's tell the UV that we successfully stopped the vcpu */
+> +	kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_STP, &rc, &rrc);
+>  	__disable_ibs_on_vcpu(vcpu);
+>  
+>  	for (i = 0; i < online_vcpus; i++) {
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index d5503dd0d1e4..1af1e30beead 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -218,6 +218,8 @@ int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, u16 *rc,
+>  			      u16 *rrc);
+>  int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
+>  		       unsigned long tweak, u16 *rc, u16 *rrc);
+> +int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state, u16 *rc,
+> +			      u16 *rrc);
+>  
+>  static inline bool kvm_s390_pv_is_protected(struct kvm *kvm)
+>  {
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index 80169a9b43ec..b4bf6b6eb708 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -271,3 +271,25 @@ int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
+>  		KVM_UV_EVENT(kvm, 3, "%s", "PROTVIRT VM UNPACK: successful");
+>  	return ret;
+>  }
+> +
+> +int kvm_s390_pv_set_cpu_state(struct kvm_vcpu *vcpu, u8 state, u16 *rc,
+> +			      u16 *rrc)
+> +{
+> +	struct uv_cb_cpu_set_state uvcb = {
+> +		.header.cmd	= UVC_CMD_CPU_SET_STATE,
+> +		.header.len	= sizeof(uvcb),
+> +		.cpu_handle	= kvm_s390_pv_handle_cpu(vcpu),
+> +		.state		= state,
+> +	};
+> +	int cc;
+> +
+> +	if (!kvm_s390_pv_handle_cpu(vcpu))
 
-Right you are again. We need two commands, not just one (the pseudocode 
-is
-pretty explicit).
+I'd actually prefer to move this to the caller. (and sue the _protected
+variant)
 
+> +		return -EINVAL;
+> +
+> +	cc = uv_call(0, (u64)&uvcb);
+> +	*rc = uvcb.header.rc;
+> +	*rrc = uvcb.header.rrc;
+> +	if (cc)
+> +		return -EINVAL;
+
+All return values are ignored. warn instead and make this a void function?
+
+> +	return 0;
+> +}
+> 
+
+
+
+-- 
 Thanks,
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+David / dhildenb
+
