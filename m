@@ -2,138 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5949316238E
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:39:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31DC8162395
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:41:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726616AbgBRJjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 04:39:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21895 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726193AbgBRJjT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 04:39:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582018758;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=Bhxsn1zL0jzRCDXn2kGIHLqyP/YRsOO43CmQjq0FFws=;
-        b=WSGPXt/W/SV4olckR1mtA27n/PTsje+6DFxX7WuUkqfOGtgsCrwx/BxjfkojTZGKvKz3Er
-        cuW0F+i2qUUD1g25YJ19PdnRSe3IG3o6Dnpd5tsdvU/l/2f05bczCU4d2YT7KvmGHyl5FD
-        dKRwRCFm7Z3oC8gRm6D8hUMlmEp++EU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-mGWp-DxIMMKNww0FUiwQ-Q-1; Tue, 18 Feb 2020 04:39:15 -0500
-X-MC-Unique: mGWp-DxIMMKNww0FUiwQ-Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726384AbgBRJlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 04:41:25 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44726 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726347AbgBRJlY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 04:41:24 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6710107ACC9;
-        Tue, 18 Feb 2020 09:39:13 +0000 (UTC)
-Received: from [10.36.116.190] (ovpn-116-190.ams2.redhat.com [10.36.116.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9ADD78B550;
-        Tue, 18 Feb 2020 09:39:11 +0000 (UTC)
-Subject: Re: [PATCH v2 28/42] KVM: s390: protvirt: Add program exception
- injection
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-29-borntraeger@de.ibm.com>
- <0911c8c1-0877-047b-0da5-4c7f79aef3ae@redhat.com>
- <2374ea8d-0244-f710-36b9-54ec1e9b4b7f@de.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <e0af7b49-bda2-ef73-a06e-ea9cd60978ef@redhat.com>
-Date:   Tue, 18 Feb 2020 10:39:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        by mail.kernel.org (Postfix) with ESMTPSA id 8DD0B206E2;
+        Tue, 18 Feb 2020 09:41:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1582018883;
+        bh=pw2K2224fxAUUaU2pI7bCCAGARvYwAr/+j4AL8lzv6w=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=GmI7V+jCtJhHkYvf4HXGGzSEsYsfOzgmCu765k6xM+smhJ7mh6vMw8EYwP4Hsufgn
+         655ZVvHXc6u771KnpaXry8XvfnzEtLmSzU58yi1yCeoAYwpwYC9/PSiGwOH3fhf/bx
+         6NW2F6jvTfBa9qzn2iHs0zd9iTrSYQijRxt5MUPw=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1j3zNZ-006BTx-Rj; Tue, 18 Feb 2020 09:41:21 +0000
 MIME-Version: 1.0
-In-Reply-To: <2374ea8d-0244-f710-36b9-54ec1e9b4b7f@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Date:   Tue, 18 Feb 2020 09:41:21 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Robert Richter <rrichter@marvell.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v4 15/20] KVM: arm64: GICv4.1: Add direct injection
+ capability to SGI registers
+In-Reply-To: <5e744173-5d7a-98b7-e44d-d1f8c47b3e3c@huawei.com>
+References: <20200214145736.18550-1-maz@kernel.org>
+ <20200214145736.18550-16-maz@kernel.org>
+ <5e744173-5d7a-98b7-e44d-d1f8c47b3e3c@huawei.com>
+Message-ID: <fb5cd47ffec8db887d442e1e23ffc0db@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net, rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18.02.20 10:37, Christian Borntraeger wrote:
+On 2020-02-18 08:46, Zenghui Yu wrote:
+> Hi Marc,
 > 
+> On 2020/2/14 22:57, Marc Zyngier wrote:
+>> Most of the GICv3 emulation code that deals with SGIs now has to be
+>> aware of the v4.1 capabilities in order to benefit from it.
+>> 
+>> Add such support, keyed on the interrupt having the hw flag set and
+>> being a SGI.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>   virt/kvm/arm/vgic/vgic-mmio-v3.c | 15 +++++-
+>>   virt/kvm/arm/vgic/vgic-mmio.c    | 88 
+>> ++++++++++++++++++++++++++++++--
+>>   2 files changed, 96 insertions(+), 7 deletions(-)
+>> 
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c 
+>> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> index ebc218840fc2..de89da76a379 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+>> @@ -6,6 +6,7 @@
+>>   #include <linux/irqchip/arm-gic-v3.h>
+>>   #include <linux/kvm.h>
+>>   #include <linux/kvm_host.h>
+>> +#include <linux/interrupt.h>
+>>   #include <kvm/iodev.h>
+>>   #include <kvm/arm_vgic.h>
+>>   @@ -942,8 +943,18 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu 
+>> *vcpu, u64 reg, bool allow_group1)
+>>   		 * generate interrupts of either group.
+>>   		 */
+>>   		if (!irq->group || allow_group1) {
+>> -			irq->pending_latch = true;
+>> -			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+>> +			if (!irq->hw) {
+>> +				irq->pending_latch = true;
+>> +				vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+>> +			} else {
+>> +				/* HW SGI? Ask the GIC to inject it */
+>> +				int err;
+>> +				err = irq_set_irqchip_state(irq->host_irq,
+>> +							    IRQCHIP_STATE_PENDING,
+>> +							    true);
+>> +				WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
+>> +				raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+>> +			}
+>>   		} else {
+>>   			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+>>   		}
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c 
+>> b/virt/kvm/arm/vgic/vgic-mmio.c
+>> index d656ebd5f9d4..0a1fb61e5b89 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+>> @@ -5,6 +5,8 @@
+>>     #include <linux/bitops.h>
+>>   #include <linux/bsearch.h>
+>> +#include <linux/interrupt.h>
+>> +#include <linux/irq.h>
+>>   #include <linux/kvm.h>
+>>   #include <linux/kvm_host.h>
+>>   #include <kvm/iodev.h>
+>> @@ -59,6 +61,11 @@ unsigned long vgic_mmio_read_group(struct kvm_vcpu 
+>> *vcpu,
+>>   	return value;
+>>   }
+>>   +static void vgic_update_vsgi(struct vgic_irq *irq)
+>> +{
+>> +	WARN_ON(its_prop_update_vsgi(irq->host_irq, irq->priority, 
+>> irq->group));
+>> +}
+>> +
+>>   void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
+>>   			   unsigned int len, unsigned long val)
+>>   {
+>> @@ -71,7 +78,12 @@ void vgic_mmio_write_group(struct kvm_vcpu *vcpu, 
+>> gpa_t addr,
+>>     		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>>   		irq->group = !!(val & BIT(i));
+>> -		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+>> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+>> +			vgic_update_vsgi(irq);
+>> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+>> +		} else {
+>> +			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+>> +		}
+>>     		vgic_put_irq(vcpu->kvm, irq);
+>>   	}
+>> @@ -113,7 +125,21 @@ void vgic_mmio_write_senable(struct kvm_vcpu 
+>> *vcpu,
+>>   		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>     		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>> -		if (vgic_irq_is_mapped_level(irq)) {
+>> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+>> +			if (!irq->enabled) {
+>> +				struct irq_data *data;
+>> +
+>> +				irq->enabled = true;
+>> +				data = &irq_to_desc(irq->host_irq)->irq_data;
+>> +				while (irqd_irq_disabled(data))
+>> +					enable_irq(irq->host_irq);
+>> +			}
+>> +
+>> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+>> +			vgic_put_irq(vcpu->kvm, irq);
+>> +
+>> +			continue;
+>> +		} else if (vgic_irq_is_mapped_level(irq)) {
+>>   			bool was_high = irq->line_level;
+>>     			/*
+>> @@ -148,6 +174,8 @@ void vgic_mmio_write_cenable(struct kvm_vcpu 
+>> *vcpu,
+>>   		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>     		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>> +		if (irq->hw && vgic_irq_is_sgi(irq->intid) && irq->enabled)
+>> +			disable_irq_nosync(irq->host_irq);
+>>     		irq->enabled = false;
+>>   @@ -167,10 +195,22 @@ unsigned long vgic_mmio_read_pending(struct 
+>> kvm_vcpu *vcpu,
+>>   	for (i = 0; i < len * 8; i++) {
+>>   		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>   		unsigned long flags;
+>> +		bool val;
+>>     		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>> -		if (irq_is_pending(irq))
+>> -			value |= (1U << i);
+>> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+>> +			int err;
+>> +
+>> +			val = false;
+>> +			err = irq_get_irqchip_state(irq->host_irq,
+>> +						    IRQCHIP_STATE_PENDING,
+>> +						    &val);
+>> +			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
+>> +		} else {
+>> +			val = irq_is_pending(irq);
+>> +		}
+>> +
+>> +		value |= ((u32)val << i);
+>>   		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+>>     		vgic_put_irq(vcpu->kvm, irq);
+>> @@ -227,6 +267,21 @@ void vgic_mmio_write_spending(struct kvm_vcpu 
+>> *vcpu,
+>>   		}
+>>     		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>> +
+>> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+>> +			/* HW SGI? Ask the GIC to inject it */
+>> +			int err;
+>> +			err = irq_set_irqchip_state(irq->host_irq,
+>> +						    IRQCHIP_STATE_PENDING,
+>> +						    true);
+>> +			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
+>> +
+>> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+>> +			vgic_put_irq(vcpu->kvm, irq);
+>> +
+>> +			continue;
+>> +		}
+>> +
+>>   		if (irq->hw)
+>>   			vgic_hw_irq_spending(vcpu, irq, is_uaccess);
+>>   		else
 > 
-> On 18.02.20 10:33, David Hildenbrand wrote:
-> eliver_prog(struct kvm_vcpu *vcpu)
->>>  {
->>>  	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
->>> @@ -856,6 +871,9 @@ static int __must_check __deliver_prog(struct kvm_vcpu *vcpu)
->>>  	trace_kvm_s390_deliver_interrupt(vcpu->vcpu_id, KVM_S390_PROGRAM_INT,
->>>  					 pgm_info.code, 0);
->>>  
->>> +	if (kvm_s390_pv_is_protected(vcpu->kvm))
->>
->> Can we actually ever have PER set, and what would happen if so?
->> Shouldn't we also return -EINVAL?
+> Should we consider taking the GICv4.1 support into uaccess_{read/write}
+> callbacks for GICR_ISPENDR0 so that userspace can properly save/restore
+> the pending state of GICv4.1 vSGIs?
 > 
-> The ultravisor would add a concurrent PER event if appropriate.
+> I *think* we can do it because on restoration, GICD_CTLR(.nASSGIreq) is
+> restored before GICR_ISPENDR0.  So we know whether we're restoring
+> pending for vSGIs, and we can restore it to the HW level if v4.1 is
+> supported by GIC. Otherwise restore it by the normal way.
 > 
+> And saving is easy with the get_irqchip_state callback, right?
 
-Please add that to the patch description.
+Yes, this should be pretty easy to do, but I haven't completely worked 
+out
+the ordering dependencies (you're way ahead of me here!).
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+There is still a chance that userspace will play with us trying to set 
+and
+reset nASSGIreq, so we need to define what is acceptable...
 
+> 
+>> @@ -281,6 +336,20 @@ void vgic_mmio_write_cpending(struct kvm_vcpu 
+>> *vcpu,
+>>     		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>>   +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+>> +			/* HW SGI? Ask the GIC to inject it */
+> 
+> "Ask the GIC to clear its pending state" :-)
+
+One day, I'll ban copy/paste from my editor... ;-)
+
+         M.
 -- 
-Thanks,
-
-David / dhildenb
-
+Jazz is not dead. It just smells funny...
