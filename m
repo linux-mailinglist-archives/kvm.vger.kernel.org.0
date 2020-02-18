@@ -2,50 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 791D0162400
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:54:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E459162407
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:56:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726438AbgBRJym (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 04:54:42 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49691 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726373AbgBRJym (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 04:54:42 -0500
+        id S1726464AbgBRJ4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 04:56:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29270 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726360AbgBRJ4t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 04:56:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582019680;
+        s=mimecast20190719; t=1582019807;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=zoCKDQV9qQ809ibwKBCPXIJuk1J7QejXw7X5cnIZZrU=;
-        b=fdwQEkncTP5C5W0IsgE3g9ZdNHn2fXefvCHaTowi90bSY8+lBr+f8lLEhC+qvzinmlv35I
-        pM9nh2FdicE1+WNBVFRoHEMEMe9od6Az/R91HgJ7UnZKJZXxqr2FhdfuVXW+QJ7KS4xALd
-        Jhd9nH3HrRF9OkuaMRcIzXJP5LhoOb0=
+        bh=j5SqOpoqU7PlhGnltoiJZDVg+ZjUcSgX3R7TC0XOqwQ=;
+        b=EH5cxhlbIco1Q6NN4VupB1H5B47rQu9DWshHUpJF/8wXPz6fWMebEveGuu8jbF6lbkYuyV
+        gmnWCrfkm/E3fhEaI+Soqxmd5lDW4alYND76NGXul3hSoI4nDKdAEEMkXkSgROXKKNb/1t
+        TjLmOT7ZcgAxhCFKSqxg4wIenpDNZk8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-RZhli8JtMEm6YrL1nG3k1g-1; Tue, 18 Feb 2020 04:54:35 -0500
-X-MC-Unique: RZhli8JtMEm6YrL1nG3k1g-1
+ us-mta-230-PyiRDi0JPbyVdE1oq_5DTQ-1; Tue, 18 Feb 2020 04:56:42 -0500
+X-MC-Unique: PyiRDi0JPbyVdE1oq_5DTQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0696107ACCC;
-        Tue, 18 Feb 2020 09:54:33 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BD458017CC;
+        Tue, 18 Feb 2020 09:56:41 +0000 (UTC)
 Received: from [10.36.116.190] (ovpn-116-190.ams2.redhat.com [10.36.116.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 921D719481;
-        Tue, 18 Feb 2020 09:54:31 +0000 (UTC)
-Subject: Re: [PATCH v2 35/42] KVM: s390: protvirt: Add UV cpu reset calls
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-36-borntraeger@de.ibm.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D5C0319481;
+        Tue, 18 Feb 2020 09:56:38 +0000 (UTC)
+Subject: Re: [PATCH v2.1] KVM: s390: protvirt: Add initial vm and cpu
+ lifecycle handling
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Ulrich.Weigand@de.ibm.com, cohuck@redhat.com,
+        frankja@linux.ibm.com, frankja@linux.vnet.ibm.com,
+        gor@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
+References: <20200214222658.12946-10-borntraeger@de.ibm.com>
+ <20200218083946.44720-1-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,12 +87,12 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <0b0b89f4-4c2d-9461-80c8-b38285e86360@redhat.com>
-Date:   Tue, 18 Feb 2020 10:54:30 +0100
+Message-ID: <2585441c-5d80-3264-d248-08f04261cb2e@redhat.com>
+Date:   Tue, 18 Feb 2020 10:56:38 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214222658.12946-36-borntraeger@de.ibm.com>
+In-Reply-To: <20200218083946.44720-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -106,73 +102,287 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.02.20 23:26, Christian Borntraeger wrote:
+On 18.02.20 09:39, Christian Borntraeger wrote:
 > From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> For protected VMs, the VCPU resets are done by the Ultravisor, as KVM
-> has no access to the VCPU registers.
-> 
-> Note that the ultravisor will only accept a call for the exact reset
-> that has been requested.
+> This contains 3 main changes:
+> 1. changes in SIE control block handling for secure guests
+> 2. helper functions for create/destroy/unpack secure guests
+> 3. KVM_S390_PV_COMMAND ioctl to allow userspace dealing with secure
+> machines
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/s390/include/asm/uv.h |  6 ++++++
->  arch/s390/kvm/kvm-s390.c   | 20 ++++++++++++++++++++
->  2 files changed, 26 insertions(+)
+> 2->2.1  - combine CREATE/DESTROY CPU/VM into ENABLE DISABLE
+> 	- rework locking and check locks with lockdep
+> 	- I still have the PV_COMMAND_CPU in here for later use in
+> 	  the SET_IPL_PSW ioctl. If wanted I can move
+> 	- change CAP number
 > 
+>  arch/s390/include/asm/kvm_host.h |  24 ++-
+>  arch/s390/include/asm/uv.h       |  69 ++++++++
+>  arch/s390/kvm/Makefile           |   2 +-
+>  arch/s390/kvm/kvm-s390.c         | 231 ++++++++++++++++++++++++++-
+>  arch/s390/kvm/kvm-s390.h         |  35 +++++
+>  arch/s390/kvm/pv.c               | 262 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h         |  35 +++++
+>  7 files changed, 654 insertions(+), 4 deletions(-)
+>  create mode 100644 arch/s390/kvm/pv.c
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index d058289385a5..1aa2382fe363 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -160,7 +160,13 @@ struct kvm_s390_sie_block {
+>  	__u8	reserved08[4];		/* 0x0008 */
+>  #define PROG_IN_SIE (1<<0)
+>  	__u32	prog0c;			/* 0x000c */
+> -	__u8	reserved10[16];		/* 0x0010 */
+> +	union {
+> +		__u8	reserved10[16];		/* 0x0010 */
+> +		struct {
+> +			__u64	pv_handle_cpu;
+> +			__u64	pv_handle_config;
+> +		};
+> +	};
+>  #define PROG_BLOCK_SIE	(1<<0)
+>  #define PROG_REQUEST	(1<<1)
+>  	atomic_t prog20;		/* 0x0020 */
+> @@ -233,7 +239,7 @@ struct kvm_s390_sie_block {
+>  #define ECB3_RI  0x01
+>  	__u8    ecb3;			/* 0x0063 */
+>  	__u32	scaol;			/* 0x0064 */
+> -	__u8	reserved68;		/* 0x0068 */
+> +	__u8	sdf;			/* 0x0068 */
+>  	__u8    epdx;			/* 0x0069 */
+>  	__u8    reserved6a[2];		/* 0x006a */
+>  	__u32	todpr;			/* 0x006c */
+> @@ -645,6 +651,11 @@ struct kvm_guestdbg_info_arch {
+>  	unsigned long last_bp;
+>  };
+>  
+> +struct kvm_s390_pv_vcpu {
+> +	u64 handle;
+> +	unsigned long stor_base;
+> +};
+> +
+>  struct kvm_vcpu_arch {
+>  	struct kvm_s390_sie_block *sie_block;
+>  	/* if vsie is active, currently executed shadow sie control block */
+> @@ -673,6 +684,7 @@ struct kvm_vcpu_arch {
+>  	__u64 cputm_start;
+>  	bool gs_enabled;
+>  	bool skey_enabled;
+> +	struct kvm_s390_pv_vcpu pv;
+>  };
+>  
+>  struct kvm_vm_stat {
+> @@ -843,6 +855,13 @@ struct kvm_s390_gisa_interrupt {
+>  	DECLARE_BITMAP(kicked_mask, KVM_MAX_VCPUS);
+>  };
+>  
+> +struct kvm_s390_pv {
+> +	u64 handle;
+> +	u64 guest_len;
+> +	unsigned long stor_base;
+> +	void *stor_var;
+> +};
+> +
+>  struct kvm_arch{
+>  	void *sca;
+>  	int use_esca;
+> @@ -878,6 +897,7 @@ struct kvm_arch{
+>  	DECLARE_BITMAP(cpu_feat, KVM_S390_VM_CPU_FEAT_NR_BITS);
+>  	DECLARE_BITMAP(idle_mask, KVM_MAX_VCPUS);
+>  	struct kvm_s390_gisa_interrupt gisa_int;
+> +	struct kvm_s390_pv pv;
+>  };
+>  
+>  #define KVM_HVA_ERR_BAD		(-1UL)
 > diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index d59825d95b9d..d4fb54231932 100644
+> index bc452a15ac3f..839cb3a89986 100644
 > --- a/arch/s390/include/asm/uv.h
 > +++ b/arch/s390/include/asm/uv.h
-> @@ -36,7 +36,10 @@
->  #define UVC_CMD_SET_SEC_CONF_PARAMS	0x0300
->  #define UVC_CMD_UNPACK_IMG		0x0301
->  #define UVC_CMD_VERIFY_IMG		0x0302
-> +#define UVC_CMD_CPU_RESET		0x0310
-> +#define UVC_CMD_CPU_RESET_INITIAL	0x0311
->  #define UVC_CMD_PREPARE_RESET		0x0320
-> +#define UVC_CMD_CPU_RESET_CLEAR		0x0321
->  #define UVC_CMD_CPU_SET_STATE		0x0330
->  #define UVC_CMD_SET_UNSHARE_ALL		0x0340
+> @@ -23,11 +23,19 @@
+>  #define UVC_RC_INV_STATE	0x0003
+>  #define UVC_RC_INV_LEN		0x0005
+>  #define UVC_RC_NO_RESUME	0x0007
+> +#define UVC_RC_NEED_DESTROY	0x8000
+>  
+>  #define UVC_CMD_QUI			0x0001
+>  #define UVC_CMD_INIT_UV			0x000f
+> +#define UVC_CMD_CREATE_SEC_CONF		0x0100
+> +#define UVC_CMD_DESTROY_SEC_CONF	0x0101
+> +#define UVC_CMD_CREATE_SEC_CPU		0x0120
+> +#define UVC_CMD_DESTROY_SEC_CPU		0x0121
+>  #define UVC_CMD_CONV_TO_SEC_STOR	0x0200
+>  #define UVC_CMD_CONV_FROM_SEC_STOR	0x0201
+> +#define UVC_CMD_SET_SEC_CONF_PARAMS	0x0300
+> +#define UVC_CMD_UNPACK_IMG		0x0301
+> +#define UVC_CMD_VERIFY_IMG		0x0302
 >  #define UVC_CMD_PIN_PAGE_SHARED		0x0341
-> @@ -59,8 +62,11 @@ enum uv_cmds_inst {
->  	BIT_UVC_CMD_SET_SEC_PARMS = 11,
->  	BIT_UVC_CMD_UNPACK_IMG = 13,
->  	BIT_UVC_CMD_VERIFY_IMG = 14,
-> +	BIT_UVC_CMD_CPU_RESET = 15,
-> +	BIT_UVC_CMD_CPU_RESET_INITIAL = 16,
->  	BIT_UVC_CMD_CPU_SET_STATE = 17,
->  	BIT_UVC_CMD_PREPARE_RESET = 18,
-> +	BIT_UVC_CMD_CPU_PERFORM_CLEAR_RESET = 19,
->  	BIT_UVC_CMD_UNSHARE_ALL = 20,
+>  #define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
+>  #define UVC_CMD_SET_SHARED_ACCESS	0x1000
+> @@ -37,10 +45,17 @@
+>  enum uv_cmds_inst {
+>  	BIT_UVC_CMD_QUI = 0,
+>  	BIT_UVC_CMD_INIT_UV = 1,
+> +	BIT_UVC_CMD_CREATE_SEC_CONF = 2,
+> +	BIT_UVC_CMD_DESTROY_SEC_CONF = 3,
+> +	BIT_UVC_CMD_CREATE_SEC_CPU = 4,
+> +	BIT_UVC_CMD_DESTROY_SEC_CPU = 5,
+>  	BIT_UVC_CMD_CONV_TO_SEC_STOR = 6,
+>  	BIT_UVC_CMD_CONV_FROM_SEC_STOR = 7,
+>  	BIT_UVC_CMD_SET_SHARED_ACCESS = 8,
+>  	BIT_UVC_CMD_REMOVE_SHARED_ACCESS = 9,
+> +	BIT_UVC_CMD_SET_SEC_PARMS = 11,
+> +	BIT_UVC_CMD_UNPACK_IMG = 13,
+> +	BIT_UVC_CMD_VERIFY_IMG = 14,
 >  	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
 >  	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
+>  };
+> @@ -52,6 +67,7 @@ struct uv_cb_header {
+>  	u16 rrc;	/* Return Reason Code */
+>  } __packed __aligned(8);
+>  
+> +/* Query Ultravisor Information */
+>  struct uv_cb_qui {
+>  	struct uv_cb_header header;
+>  	u64 reserved08;
+> @@ -71,6 +87,7 @@ struct uv_cb_qui {
+>  	u64 reserveda0;
+>  } __packed __aligned(8);
+>  
+> +/* Initialize Ultravisor */
+>  struct uv_cb_init {
+>  	struct uv_cb_header header;
+>  	u64 reserved08[2];
+> @@ -79,6 +96,35 @@ struct uv_cb_init {
+>  	u64 reserved28[4];
+>  } __packed __aligned(8);
+>  
+> +/* Create Guest Configuration */
+> +struct uv_cb_cgc {
+> +	struct uv_cb_header header;
+> +	u64 reserved08[2];
+> +	u64 guest_handle;
+> +	u64 conf_base_stor_origin;
+> +	u64 conf_virt_stor_origin;
+> +	u64 reserved30;
+> +	u64 guest_stor_origin;
+> +	u64 guest_stor_len;
+> +	u64 guest_sca;
+> +	u64 guest_asce;
+> +	u64 reserved58[5];
+> +} __packed __aligned(8);
+> +
+> +/* Create Secure CPU */
+> +struct uv_cb_csc {
+> +	struct uv_cb_header header;
+> +	u64 reserved08[2];
+> +	u64 cpu_handle;
+> +	u64 guest_handle;
+> +	u64 stor_origin;
+> +	u8  reserved30[6];
+> +	u16 num;
+> +	u64 state_origin;
+> +	u64 reserved40[4];
+> +} __packed __aligned(8);
+> +
+> +/* Convert to Secure */
+>  struct uv_cb_cts {
+>  	struct uv_cb_header header;
+>  	u64 reserved08[2];
+> @@ -86,12 +132,34 @@ struct uv_cb_cts {
+>  	u64 gaddr;
+>  } __packed __aligned(8);
+>  
+> +/* Convert from Secure / Pin Page Shared */
+>  struct uv_cb_cfs {
+>  	struct uv_cb_header header;
+>  	u64 reserved08[2];
+>  	u64 paddr;
+>  } __packed __aligned(8);
+>  
+> +/* Set Secure Config Parameter */
+> +struct uv_cb_ssc {
+> +	struct uv_cb_header header;
+> +	u64 reserved08[2];
+> +	u64 guest_handle;
+> +	u64 sec_header_origin;
+> +	u32 sec_header_len;
+> +	u32 reserved2c;
+> +	u64 reserved30[4];
+> +} __packed __aligned(8);
+> +
+> +/* Unpack */
+> +struct uv_cb_unp {
+> +	struct uv_cb_header header;
+> +	u64 reserved08[2];
+> +	u64 guest_handle;
+> +	u64 gaddr;
+> +	u64 tweak[2];
+> +	u64 reserved38[3];
+> +} __packed __aligned(8);
+> +
+>  /*
+>   * A common UV call struct for calls that take no payload
+>   * Examples:
+> @@ -105,6 +173,7 @@ struct uv_cb_nodata {
+>  	u64 reserved20[4];
+>  } __packed __aligned(8);
+>  
+> +/* Set Shared Access */
+>  struct uv_cb_share {
+>  	struct uv_cb_header header;
+>  	u64 reserved08[3];
+> diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
+> index 05ee90a5ea08..12decca22e7c 100644
+> --- a/arch/s390/kvm/Makefile
+> +++ b/arch/s390/kvm/Makefile
+> @@ -9,6 +9,6 @@ common-objs = $(KVM)/kvm_main.o $(KVM)/eventfd.o  $(KVM)/async_pf.o $(KVM)/irqch
+>  ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
+>  
+>  kvm-objs := $(common-objs) kvm-s390.o intercept.o interrupt.o priv.o sigp.o
+> -kvm-objs += diag.o gaccess.o guestdbg.o vsie.o
+> +kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o
+>  
+>  obj-$(CONFIG_KVM) += kvm.o
 > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 16af4d1a2c29..932f7f32e82f 100644
+> index cc7793525a69..1a7bb08f5c26 100644
 > --- a/arch/s390/kvm/kvm-s390.c
 > +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4695,6 +4695,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  	void __user *argp = (void __user *)arg;
->  	int idx;
->  	long r;
-> +	u16 rc, rrc;
+> @@ -44,6 +44,7 @@
+>  #include <asm/cpacf.h>
+>  #include <asm/timex.h>
+>  #include <asm/ap.h>
+> +#include <asm/uv.h>
+>  #include "kvm-s390.h"
+>  #include "gaccess.h"
 >  
->  	vcpu_load(vcpu);
+> @@ -234,8 +235,10 @@ int kvm_arch_check_processor_compat(void)
+>  	return 0;
+>  }
 >  
-> @@ -4716,14 +4717,33 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  	case KVM_S390_CLEAR_RESET:
->  		r = 0;
->  		kvm_arch_vcpu_ioctl_clear_reset(vcpu);
-> +		if (kvm_s390_pv_handle_cpu(vcpu)) {
+> +/* forward declarations */
+>  static void kvm_gmap_notifier(struct gmap *gmap, unsigned long start,
+>  			      unsigned long end);
+> +static int sca_switch_to_extended(struct kvm *kvm);
+>  
+>  static void kvm_clock_sync_scb(struct kvm_s390_sie_block *scb, u64 delta)
+>  {
+> @@ -571,6 +574,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_S390_BPB:
+>  		r = test_facility(82);
+>  		break;
+> +	case KVM_CAP_S390_PROTECTED:
+> +		r = is_prot_virt_host();
+> +		break;
 
-_protected checks please. (if not already converted in your tree :) )
-
+FWIW, the clean thing to do is to enable the capability only after all
+features have been implemented, so as the very last patch.
 
 -- 
 Thanks,
