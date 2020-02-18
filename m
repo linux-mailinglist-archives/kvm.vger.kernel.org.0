@@ -2,170 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 31699162D3F
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 18:43:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF9CE162D41
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 18:43:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726716AbgBRRnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 12:43:47 -0500
-Received: from mail-vs1-f67.google.com ([209.85.217.67]:32804 "EHLO
-        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726403AbgBRRnq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 12:43:46 -0500
-Received: by mail-vs1-f67.google.com with SMTP id n27so13607608vsa.0
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 09:43:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xQIAlNmI7W08fGBLJ8a40XEubTfALPEjkVY3EPcK8i8=;
-        b=DBfeV+EPVF/OdPS4dmt6SMMWf/n+EVSILQlmkKqg7nNiDRjDl1cBSjpb7bUzC8qWYJ
-         FWf8TzDYgjd1MUuH5Z9gCOPqjBYKRU/zmgWP/MKscmJQ7qywh/0RjOtkONkiU/wLfZf1
-         edvN60ooEzjeZJZ6NI1Cv6RSMMdqOrC159s4gp6cse2ZtUYlZcDLsXr+KhoJVqGXTxd9
-         i/ObzqU4HRVHBd6TUzc6hUL+4Y6xwVuvjXkJKE92CeF6oAGic1XDhwu8aNeAMrlSErIb
-         ie4wUZAGSHGdBJPcYEyALvrrGB9GgpqJZfbknu/GofgLFa757y9vcIPfpBLpapE4F47J
-         nBDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xQIAlNmI7W08fGBLJ8a40XEubTfALPEjkVY3EPcK8i8=;
-        b=N1QQvGW9nQfbfrGJxJJIhUjB9vObZRkOputjlXjYlQagVkAq/IhwVbON7yMw9521Yn
-         jHvYrhs0aS5RRXQdFEXMJR0qTjQWZZ9pDMfeugzFjE5E2RNjfOZ32wRTJ0ghVIYe//Nq
-         m/MApP5vww46HVaubxZ2PdXCv/RHTA8EEdjcRlJPLSMPFDOZ/hKMAtVCdggAq0SGA00D
-         ah90EEx2k+Vf6IG0F5344bnDcnVPUQw0wDNnFx7VAxRcHEo4EtGrKDIvXZhpmhRolZyy
-         Yco4YpSjMm6mhHpXlIIrCq2XbEgQujmldDiTOUx4+tgF36/sCBhnRaqAjxL3x+xR6oEg
-         ZAzQ==
-X-Gm-Message-State: APjAAAWLf4nG3Ldx48v7eJMRNOgbNlCgpMvfSpu+iqK0II9ui8npO5sj
-        whQuRESgdpKRXQMGhDyusgzceIMdhGuqks/eppOPqp/cRKw=
-X-Google-Smtp-Source: APXvYqyZXSRbWJANMCLyt9XUg/xPmmzVI53d1TOFcfw0kYT/8c1T5C/R88IBY+Tp1wrUWiRvSORFvWe/+JU1zW7Rppg=
-X-Received: by 2002:a67:f683:: with SMTP id n3mr11461516vso.117.1582047825398;
- Tue, 18 Feb 2020 09:43:45 -0800 (PST)
+        id S1726801AbgBRRnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 12:43:53 -0500
+Received: from foss.arm.com ([217.140.110.172]:57312 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726786AbgBRRnx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 12:43:53 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09773FEC;
+        Tue, 18 Feb 2020 09:43:53 -0800 (PST)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 24E873F703;
+        Tue, 18 Feb 2020 09:43:52 -0800 (PST)
+Subject: Re: [PATCH 3/5] kvm: arm64: Limit PMU version to ARMv8.1
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200216185324.32596-1-maz@kernel.org>
+ <20200216185324.32596-4-maz@kernel.org>
+From:   James Morse <james.morse@arm.com>
+Message-ID: <eb0294ef-5ad2-9940-2d59-b92220948ffc@arm.com>
+Date:   Tue, 18 Feb 2020 17:43:51 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20200214145920.30792-1-drjones@redhat.com> <20200214145920.30792-5-drjones@redhat.com>
-In-Reply-To: <20200214145920.30792-5-drjones@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 18 Feb 2020 09:43:34 -0800
-Message-ID: <CANgfPd8BfWy=hRcM2or5sokNkJ4xSng2_CWwocA8E_C0Mvg29Q@mail.gmail.com>
-Subject: Re: [PATCH 04/13] fixup! KVM: selftests: Add memory size parameter to
- the demand paging test
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
-        Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200216185324.32596-4-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 14, 2020 at 6:59 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> [Rewrote parse_size() to simplify and provide user more flexibility as
->  to how sizes are input. Also fixed size overflow assert.]
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
+Hi Marc,
 
-Great cleanup and fix, thank you.
-> ---
->  tools/testing/selftests/kvm/lib/test_util.c | 76 +++++++++------------
->  1 file changed, 33 insertions(+), 43 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-> index 706e0f963a44..cbd7f51b07a1 100644
-> --- a/tools/testing/selftests/kvm/lib/test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> @@ -4,58 +4,48 @@
->   *
->   * Copyright (C) 2020, Google LLC.
->   */
-> -
-> -#include "test_util.h"
-> -
-> +#include <stdlib.h>
->  #include <ctype.h>
-> +#include <limits.h>
-> +#include "test_util.h"
->
->  /*
->   * Parses "[0-9]+[kmgt]?".
->   */
->  size_t parse_size(const char *size)
->  {
-> -       size_t len = strlen(size);
-> -       size_t i;
-> -       size_t scale_shift = 0;
->         size_t base;
-> -
-> -       TEST_ASSERT(len > 0, "Need at least 1 digit in '%s'", size);
-> -
-> -       /* Find the first letter in the string, indicating scale. */
-> -       for (i = 0; i < len; i++) {
-> -               if (!isdigit(size[i])) {
-> -                       TEST_ASSERT(i > 0, "Need at least 1 digit in '%s'",
-> -                                   size);
-> -                       TEST_ASSERT(i == len - 1,
-> -                                   "Expected letter at the end in '%s'.",
-> -                                   size);
-> -                       switch (tolower(size[i])) {
-> -                       case 't':
-> -                               scale_shift = 40;
-> -                               break;
-> -                       case 'g':
-> -                               scale_shift = 30;
-> -                               break;
-> -                       case 'm':
-> -                               scale_shift = 20;
-> -                               break;
-> -                       case 'k':
-> -                               scale_shift = 10;
-> -                               break;
-> -                       default:
-> -                               TEST_ASSERT(false, "Unknown size letter %c",
-> -                                           size[i]);
-> -                       }
-> -               }
-> +       char *scale;
-> +       int shift = 0;
-> +
-> +       TEST_ASSERT(size && isdigit(size[0]), "Need at least one digit in '%s'", size);
-> +
-> +       base = strtoull(size, &scale, 0);
-> +
-> +       TEST_ASSERT(base != ULLONG_MAX, "Overflow parsing size!");
-> +
-> +       switch (tolower(*scale)) {
-> +       case 't':
-> +               shift = 40;
-> +               break;
-> +       case 'g':
-> +               shift = 30;
-> +               break;
-> +       case 'm':
-> +               shift = 20;
-> +               break;
-> +       case 'k':
-> +               shift = 10;
-> +               break;
-> +       case 'b':
-> +       case '\0':
-> +               shift = 0;
-> +               break;
-> +       default:
-> +               TEST_ASSERT(false, "Unknown size letter %c", *scale);
->         }
->
-> -       TEST_ASSERT(scale_shift < 8 * sizeof(size_t),
-> -                   "Overflow parsing scale!");
-> -
-> -       base = atoi(size);
-> -
-> -       TEST_ASSERT(!(base & ~((1 << (sizeof(size_t) - scale_shift)) - 1)),
-> -              "Overflow parsing size!");
-> +       TEST_ASSERT((base << shift) >> shift == base, "Overflow scaling size!");
->
-> -       return base << scale_shift;
-> +       return base << shift;
->  }
-> --
-> 2.21.1
->
+On 16/02/2020 18:53, Marc Zyngier wrote:
+> Our PMU code is only implementing the ARMv8.1 features, so let's
+> stick to this when reporting the feature set to the guest.
+
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 682fedd7700f..06b2d0dc6c73 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1093,6 +1093,11 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  				 FEATURE(ID_AA64ISAR1_GPA) |
+>  				 FEATURE(ID_AA64ISAR1_GPI));
+>  		break;
+> +	case SYS_ID_AA64DFR0_EL1:
+> +		/* Limit PMU to ARMv8.1 */
+
+Not just limit, but upgrade too! (force?)
+This looks safe because ARMV8_PMU_EVTYPE_EVENT always includes the extra bits this added,
+and the register is always trapped.
+
+
+The PMU version is also readable via ID_DFR0_EL1.PerfMon, should that be sanitised to be
+the same?
+(I don't think we've hidden an aarch64 feature that also existed in aarch32 before).
+
+
+Regardless:
+Reviewed-by: James Morse <james.morse@arm.com>
+
+
+Thanks,
+
+James
+
+
+
+> +		val &= ~FEATURE(ID_AA64DFR0_PMUVER);
+> +		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_PMUVER), 4);
+> +		break;
+>  	}
+>  
+>  	return val;
+> 
+
