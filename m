@@ -2,282 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 11BF0162086
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 06:44:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61B4016209F
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 06:59:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbgBRFoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 00:44:22 -0500
-Received: from mga11.intel.com ([192.55.52.93]:48074 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725909AbgBRFoW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 00:44:22 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Feb 2020 21:44:22 -0800
-X-IronPort-AV: E=Sophos;i="5.70,455,1574150400"; 
-   d="scan'208";a="228628055"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.168.218]) ([10.249.168.218])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 17 Feb 2020 21:44:19 -0800
-Subject: Re: [RFC PATCH 1/2] KVM: CPUID: Enable supervisor XSAVE states in
- CPUID enumeration and XSS
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        aaronlewis@google.com
-References: <20200211065706.3462-1-weijiang.yang@intel.com>
- <a75a0e16-198d-9c96-3a63-d09a93909c0f@intel.com>
- <20200217130355.GA10854@local-michael-cet-test.sh.intel.com>
- <2125c47d-06c5-d559-c95c-a55a71790f31@intel.com>
-Message-ID: <44baa7f5-c643-27d5-b2d7-fd03e78ad2a5@intel.com>
-Date:   Tue, 18 Feb 2020 13:44:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+        id S1726293AbgBRF7I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 00:59:08 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:15997 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726114AbgBRF7I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 00:59:08 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5e4b7d1d0000>; Mon, 17 Feb 2020 21:58:53 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 17 Feb 2020 21:59:06 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 17 Feb 2020 21:59:06 -0800
+Received: from [10.40.101.150] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 18 Feb
+ 2020 05:58:57 +0000
+Subject: Re: [PATCH v12 Kernel 4/7] vfio iommu: Implementation of ioctl to for
+ dirty pages tracking.
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
+ <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
+ <20200210102518.490a0d87@x1.home>
+ <7e7356c8-29ed-31fa-5c0b-2545ae69f321@nvidia.com>
+ <20200212161320.02d8dfac@w520.home>
+ <0244aca6-80f7-1c1d-812e-d53a48b5479d@nvidia.com>
+ <20200213162011.40b760a8@w520.home>
+ <ea31fb62-4cd3-babb-634d-f69407586c93@nvidia.com>
+ <20200217135518.4d48ebd6@w520.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <57199367-e562-800a-ef73-f28bc5ddb2fe@nvidia.com>
+Date:   Tue, 18 Feb 2020 11:28:53 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <2125c47d-06c5-d559-c95c-a55a71790f31@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200217135518.4d48ebd6@w520.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1582005533; bh=UVFuTcvlyh3iWYM+gJt93GCmfNP7VaK7DTQFFJhvpSk=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=SXytaGDwhevD6jXrh2a64+moNmNGuOsWvDYZ4i02wQXHW4VGGAYAdtBQ07O/y5wCt
+         caYOqD7Dk7TC7JjSS59wBggf3aAz9ANVALhBmcn6EMGkNP/FwnlCFi/+1tK4bXbJuc
+         +rLy27AcexbPB/Js/6InITnDv4SlhG9MHw9ddp+S8giLHtp3A25TVOwvZQtDIjFd3g
+         DqRDhqeRAAOuCqg9OJ5MSZBC6ErTApYqwgZWCNJs5JlYQi59pd5EysJiZ574WLa0Rf
+         BT4oXP+e8iLa2b5yZYL6HJehK/FVYzt0dWL1f/3e8Dsdsaxk8xpq1F+2get2uh/muc
+         1RsxHD2eeiPew==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/17/2020 9:20 PM, Xiaoyao Li wrote:
-> On 2/17/2020 9:03 PM, Yang Weijiang wrote:
->> On Mon, Feb 17, 2020 at 12:26:51PM +0800, Xiaoyao Li wrote:
->>> On 2/11/2020 2:57 PM, Yang Weijiang wrote:
->>>> CPUID.(EAX=DH, ECX={i}H i>=0) enumerates XSAVE related 
->>>> leaves/sub-leaves,
->>>> +extern int host_xss;
->>>> +u64 kvm_supported_xss(void)
->>>> +{
->>>> +    return KVM_SUPPORTED_XSS & host_xss;
->>>> +}
->>>> +
+<snip>
+
+>>>>>    As I understand the above algorithm, we find a vfio_dma
+>>>>> overlapping the request and populate the bitmap for that range.  Then
+>>>>> we go back and put_user() for each byte that we touched.  We could
+>>>>> instead simply work on a one byte buffer as we enumerate the requested
+>>>>> range and do a put_user() ever time we reach the end of it and have bits
+>>>>> set. That would greatly simplify the above example.  But I would expect
+>>>>> that we're a) more likely to get asked for ranges covering a single
+>>>>> vfio_dma
+>>>>
+>>>> QEMU ask for single vfio_dma during each iteration.
+>>>>
+>>>> If we restrict this ABI to cover single vfio_dma only, then it
+>>>> simplifies the logic here. That was my original suggestion. Should we
+>>>> think about that again?
 >>>
->>> How about using a global variable, supported_xss, instead of 
->>> calculating the
->>> mask on every call. Just like what Sean posted on
->>> https://lore.kernel.org/kvm/20200201185218.24473-21-sean.j.christopherson@intel.com/ 
+>>> But we currently allow unmaps that overlap multiple vfio_dmas as long
+>>> as no vfio_dma is bisected, so I think that implies that an unmap while
+>>> asking for the dirty bitmap has even further restricted semantics.  I'm
+>>> also reluctant to design an ABI around what happens to be the current
+>>> QEMU implementation.
 >>>
+>>> If we take your example above, ranges {0x0000,0xa000} and
+>>> {0xa000,0x10000} ({start,end}), I think you're working with the
+>>> following two bitmaps in this implementation:
 >>>
->> Thanks Xiaoyao for the comments!
->> Good suggestion, I'll change it in next version.
+>>> 00000011 11111111b
+>>> 00111111b
+>>>
+>>> And we need to combine those into:
+>>>
+>>> 11111111 11111111b
+>>>
+>>> Right?
+>>>
+>>> But it seems like that would be easier if the second bitmap was instead:
+>>>
+>>> 11111100b
+>>>
+>>> Then we wouldn't need to worry about the entire bitmap being shifted by
+>>> the bit offset within the byte, which limits our fixes to the boundary
+>>> byte and allows us to use copy_to_user() directly for the bulk of the
+>>> copy.  So how do we get there?
+>>>
+>>> I think we start with allocating the vfio_dma bitmap to account for
+>>> this initial offset, so we calculate bitmap_base_iova as:
+>>>     (iova & ~((PAGE_SIZE << 3) - 1))
+>>> We then use bitmap_base_iova in calculating which bits to set.
+>>>
+>>> The user needs to follow the same rules, and maybe this adds some value
+>>> to the user providing the bitmap size rather than the kernel
+>>> calculating it.  For example, if the user wanted the dirty bitmap for
+>>> the range {0xa000,0x10000} above, they'd provide at least a 1 byte
+>>> bitmap, but we'd return bit #2 set to indicate 0xa000 is dirty.
+>>>
+>>> Effectively the user can ask for any iova range, but the buffer will be
+>>> filled relative to the zeroth bit of the bitmap following the above
+>>> bitmap_base_iova formula (and replacing PAGE_SIZE with the user
+>>> requested pgsize).  I'm tempted to make this explicit in the user
+>>> interface (ie. only allow bitmaps starting on aligned pages), but a
+>>> user is able to map and unmap single pages and we need to support
+>>> returning a dirty bitmap with an unmap, so I don't think we can do that.
+>>>    
 >>
->>>>    #define F(x) bit(X86_FEATURE_##x)
->>>>    int kvm_update_cpuid(struct kvm_vcpu *vcpu)
->>>> @@ -112,10 +118,17 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
->>>>            vcpu->arch.guest_xstate_size = best->ebx =
->>>>                xstate_required_size(vcpu->arch.xcr0, false);
->>>>        }
->>>> -
->>>>        best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
->>>> -    if (best && (best->eax & (F(XSAVES) | F(XSAVEC))))
->>>> -        best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
->>>> +    if (best && (best->eax & (F(XSAVES) | F(XSAVEC)))) {
->>>> +        u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
->>>> +
->>>> +        best->ebx = xstate_required_size(xstate, true);
->>>> +        vcpu->arch.guest_supported_xss =
->>>> +            (best->ecx | ((u64)best->edx << 32)) &
->>>> +            kvm_supported_xss();
->>>> +    } else {
->>>> +        vcpu->arch.guest_supported_xss = 0;
->>>> +    }
+>> Sigh, finding adjacent vfio_dmas within the same byte seems simpler than
+>> this.
+> 
+> How does KVM do this?  My intent was that if all of our bitmaps share
+> the same alignment then we can merge the intersection and continue to
+> use copy_to_user() on either side.  However, if QEMU doesn't do the
+> same, it doesn't really help us.  Is QEMU stuck with an implementation
+> of only retrieving dirty bits per MemoryRegionSection exactly because
+> of this issue and therefore we can rely on it in our implementation as
+> well?  Thanks,
+> 
 
-also here should be something like below:
+QEMU sync dirty_bitmap per MemoryRegionSection. Within 
+MemoryRegionSection there could be multiple KVMSlots. QEMU queries 
+dirty_bitmap per KVMSlot and mark dirty for each KVMSlot.
+On kernel side, KVM_GET_DIRTY_LOG ioctl calls 
+kvm_get_dirty_log_protect(), where it uses copy_to_user() to copy bitmap 
+of that memSlot.
+vfio_dma is per MemoryRegionSection. We can reply on MemoryRegionSection 
+in our implementation. But to get bitmap during unmap, we have to take 
+care of concatenating bitmaps.
 
-if (best) {
-	if (best->eax & (F(XSAVES) | F(XSAVEC)))) {
-		u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
-		best->ebx = xstate_required_size(xstate, true);
-	}
+In QEMU, in function kvm_physical_sync_dirty_bitmap() there is a comment 
+where bitmap size is calculated and bitmap is defined as 'void __user 
+*dirty_bitmap' which is also the concern you raised and could be handled 
+similarly as below.
 
-	if (best->eax & F(XSAVES) {
-		vcpu->arch.guest_supported_xss =
-			(best->ecx | ((u64)best->edx << 32)) &
-			kvm_supported_xss();
-	} else {
-		best->ecx = 0;
-		best->edx = 0;
-		vcpu->arch.guest_supported_xss = 0;
-	}
-}
+         /* XXX bad kernel interface alert
+          * For dirty bitmap, kernel allocates array of size aligned to
+          * bits-per-long.  But for case when the kernel is 64bits and
+          * the userspace is 32bits, userspace can't align to the same
+          * bits-per-long, since sizeof(long) is different between kernel
+          * and user space.  This way, userspace will provide buffer which
+          * may be 4 bytes less than the kernel will use, resulting in
+          * userspace memory corruption (which is not detectable by valgrind
+          * too, in most cases).
+          * So for now, let's align to 64 instead of HOST_LONG_BITS here, in
+          * a hope that sizeof(long) won't become >8 any time soon.
+          */
+         if (!mem->dirty_bmap) {
+             hwaddr bitmap_size = ALIGN(((mem->memory_size) >> 
+TARGET_PAGE_BITS),
+                                         /*HOST_LONG_BITS*/ 64) / 8;
+             /* Allocate on the first log_sync, once and for all */
+             mem->dirty_bmap = g_malloc0(bitmap_size);
+         }
 
->>>>        /*
->>>>         * The existing code assumes virtual address is 48-bit or 
->>>> 57-bit in the
->>>> @@ -426,6 +439,56 @@ static inline void do_cpuid_7_mask(struct 
->>>> kvm_cpuid_entry2 *entry, int index)
->>>>        }
->>>>    }
->>>> +static inline bool do_cpuid_0xd_mask(struct kvm_cpuid_entry2 
->>>> *entry, int index)
->>>> +{
->>>> +    unsigned int f_xsaves = kvm_x86_ops->xsaves_supported() ? 
->>>> F(XSAVES) : 0;
->>>> +    /* cpuid 0xD.1.eax */
->>>> +    const u32 kvm_cpuid_D_1_eax_x86_features =
->>>> +        F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
->>>> +    u64 u_supported = kvm_supported_xcr0();
->>>> +    u64 s_supported = kvm_supported_xss();
->>>> +    u64 supported;
->>>> +
->>>> +    switch (index) {
->>>> +    case 0:
->>>> +        if (!u_supported) {
->>>> +            entry->eax = 0;
->>>> +            entry->ebx = 0;
->>>> +            entry->ecx = 0;
->>>> +            entry->edx = 0;
->>>> +            return false;
->>>> +        }
->>>> +        entry->eax &= u_supported;
->>>> +        entry->ebx = xstate_required_size(u_supported, false);
->>>> +        entry->ecx = entry->ebx;
->>>> +        entry->edx &= u_supported >> 32;
->>>> +        break;
->>>> +    case 1:
->>>> +        supported = u_supported | s_supported;
->>>> +        entry->eax &= kvm_cpuid_D_1_eax_x86_features;
->>>> +        cpuid_mask(&entry->eax, CPUID_D_1_EAX);
->>>> +        entry->ebx = 0;
->>>> +        entry->edx &= s_supported >> 32;
->>>> +        entry->ecx &= s_supported;
->>>
->>> We'd better initialize msr_ia32_xss bitmap (entry->ecx & entry-edx) 
->>> as zeros
->>> here.
->> Hmm, explicit setting the MSR to 0 is good in this case, but there's 
->> implied
->> flow to ensure guest MSR_IA32_XSS will be 0 if entry->ecx and 
->> entry->edx are 0s.
->> In above kvm_update_cpuid(), vcpu->arch.guest_supported_xss is set to 0
->> when they're 0s. this masks guest cannot set non-zero value to this
->> MSR. And in kvm_vcpu_reset(), vcpu->arch.ia32_xss is initialized to 0,
->> in kvm_load_guest_xsave_state() MSR_IA32_XSS is set to ia32_xss,
->> therefore the MSR is kept to 0.
-> 
-> Sorry, I think what I said "msr_ia32_xss bitmap" misled you.
-> 
-> "msr_ia32_xss bitmap" is not MSR_IA32_XSS,
-> but the (entry->ecx | entry->edx >> 32) of cpuid.D_1
-> 
-> I meant we'd better set entry->ecx and entry->edx to 0 here.
-> 
->>>
->>>> +        if (entry->eax & (F(XSAVES) | F(XSAVEC)))
->>>> +            entry->ebx = xstate_required_size(supported, true);
->>>
->>> And setup msr_ia32_xss bitmap based on the s_supported within this 
->>> condition
->>> when F(XSAVES) is supported.
->>
-> 
-> And set entry->ecx & entry->edx only when F(XSAVES) is supported.
-> 
->> IIUC, both XSAVEC and XSAVES use compacted format of the extended
->> region, so if XSAVEC is supported while XSAVES is not, guest still can
->> get correct size, so in existing code the two bits are ORed.
-> 
-> Yeah, but entry->ecx and entry->edx should be non-zero only when 
-> F(XSAVES) is set.
-> 
->>>
->>>> +        break;
->>>> +    default:
->>>> +        supported = (entry->ecx & 0x1) ? s_supported : u_supported;
->>>> +        if (!(supported & (BIT_ULL(index)))) {
->>>> +            entry->eax = 0;
->>>> +            entry->ebx = 0;
->>>> +            entry->ecx = 0;
->>>> +            entry->edx = 0;
->>>> +            return false;
->>>> +        }
->>>> +        if (entry->ecx & 0x1)
->>>> +            entry->ebx = 0;
->>>> +        break;
->>>> +    }
->>>> +    return true;
->>>> +}
->>>> +
->>>>    static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, 
->>>> u32 function,
->>>>                      int *nent, int maxnent)
->>>>    {
->>>> @@ -440,7 +503,6 @@ static inline int __do_cpuid_func(struct 
->>>> kvm_cpuid_entry2 *entry, u32 function,
->>>>        unsigned f_lm = 0;
->>>>    #endif
->>>>        unsigned f_rdtscp = kvm_x86_ops->rdtscp_supported() ? 
->>>> F(RDTSCP) : 0;
->>>> -    unsigned f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) 
->>>> : 0;
->>>>        unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? 
->>>> F(INTEL_PT) : 0;
->>>>        /* cpuid 1.edx */
->>>> @@ -495,10 +557,6 @@ static inline int __do_cpuid_func(struct 
->>>> kvm_cpuid_entry2 *entry, u32 function,
->>>>            F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
->>>>            F(PMM) | F(PMM_EN);
->>>> -    /* cpuid 0xD.1.eax */
->>>> -    const u32 kvm_cpuid_D_1_eax_x86_features =
->>>> -        F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
->>>> -
->>>>        /* all calls to cpuid_count() should be made on the same cpu */
->>>>        get_cpu();
->>>> @@ -639,38 +697,21 @@ static inline int __do_cpuid_func(struct 
->>>> kvm_cpuid_entry2 *entry, u32 function,
->>>>            break;
->>>>        }
->>>>        case 0xd: {
->>>> -        int idx, i;
->>>> -        u64 supported = kvm_supported_xcr0();
->>>> +        int i, idx;
->>>> -        entry->eax &= supported;
->>>> -        entry->ebx = xstate_required_size(supported, false);
->>>> -        entry->ecx = entry->ebx;
->>>> -        entry->edx &= supported >> 32;
->>>> -        if (!supported)
->>>> +        if (!do_cpuid_0xd_mask(&entry[0], 0))
->>>>                break;
->>>> -
->>>> -        for (idx = 1, i = 1; idx < 64; ++idx) {
->>>> -            u64 mask = ((u64)1 << idx);
->>>> +        for (i = 1, idx = 1; idx < 64; ++idx) {
->>>>                if (*nent >= maxnent)
->>>>                    goto out;
->>>> -
->>>>                do_host_cpuid(&entry[i], function, idx);
->>>> -            if (idx == 1) {
->>>> -                entry[i].eax &= kvm_cpuid_D_1_eax_x86_features;
->>>> -                cpuid_mask(&entry[i].eax, CPUID_D_1_EAX);
->>>> -                entry[i].ebx = 0;
->>>> -                if (entry[i].eax & (F(XSAVES)|F(XSAVEC)))
->>>> -                    entry[i].ebx =
->>>> -                        xstate_required_size(supported,
->>>> -                                     true);
->>>> -            } else {
->>>> -                if (entry[i].eax == 0 || !(supported & mask))
->>>> -                    continue;
->>>> -                if (WARN_ON_ONCE(entry[i].ecx & 1))
->>>> -                    continue;
->>>> -            }
->>>> -            entry[i].ecx = 0;
->>>> -            entry[i].edx = 0;
->>>> +
->>>> +            if (entry[i].eax == 0 && entry[i].ebx == 0 &&
->>>> +                entry[i].ecx == 0 && entry[i].edx == 0)
->>>> +                continue;
->>>> +
->>>> +            if (!do_cpuid_0xd_mask(&entry[i], idx))
->>>> +                continue;
->>>>                ++*nent;
->>>>                ++i;
->>>>            }
->>   >
->>
-> 
+Thanks,
+Kirti
 
