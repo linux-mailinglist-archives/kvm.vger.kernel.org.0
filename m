@@ -2,137 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 57B0C162A88
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 17:30:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2849E162A95
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 17:30:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726927AbgBRQaS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 11:30:18 -0500
-Received: from mail-vi1eur05on2104.outbound.protection.outlook.com ([40.107.21.104]:54076
-        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726851AbgBRQaP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 11:30:15 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dbxDpIH7u9K09iSOZotpy/fjfcuUeMPU3iheDAZ0nh/DKBLQbEzAtZLJ0aLlCz7sBg8iMQHiQGDw3eyL1xtmCm2NzGYcI1CrO+HPmrt6hbOSC5+QKupgYfkVk1upXpjVD+c4QUmgsscAPc2e6GTM+EjG7+DrJxiNKp3Hf7VCw9yLfiP7tr7SrF2/adBOxGaK/OqKcTvD/OV8EHf5Gt0wilIizqvU0HGRis7NamSc12qhdJnzi2V35JhpFnTfp0TVYmEx2078SP4EA1zLf5Xi55txqQEmC6272cwCoqaNkbj1O71lkgfFxE94qKnZNmhgPydMfnBLRBzd/uFenSmL6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ej2ue1lLgmdf5zJdSOtLbPx813U8Q7wRBefSJNpzJ3o=;
- b=Swsn1bw5vCchPa0sf4RFeF3FIMjkP7LA1yPm1c+dsshgTbqsxj8JEWNKD988BYhiKul6dyqyHalCVBeVmPMbAmtiwHrCL7HQ9v6Nz/CpFQTAP7ZsIUtqnDhq8KbaQayJCkhLkiEwtAxl68jQDr2vDFE1iK/0WNAtlM4FOmwwYbfHQmfgmhrzky+Sdj7TUblxeAdbg4v8vks16pfYGH7l1IvhTlV9tFyWreb0C0ThZXG+M9aQ2kGgU5ZBF5/0XCrtue3tQCeUYwHL76i2MK7uajPMR9jtHUYAKmpW2lPrsBLsi+B0Pknz2+t5PEpzLCSce+YS9xT+M5yba+2U5PK0sQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=criteo.com; dmarc=pass action=none header.from=criteo.com;
- dkim=pass header.d=criteo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=criteo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ej2ue1lLgmdf5zJdSOtLbPx813U8Q7wRBefSJNpzJ3o=;
- b=qB5DAraBJoAr5LPniXJ5XQNE+8AAwCqpth2kK51kPFjZ0GGbcEV4OzvaWChvHcWI/CDdI9N1ruklF3QuiyFzhL+Vvm3aq9St1ufBsQ37uTjhLbvhHsuB38vwyVL0Gbak/IhJyBWpuoAPFTorrHPe4bs+RibSOuuFuOL1s0r579U=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=e.velu@criteo.com; 
-Received: from AM6SPR01MB0017.eurprd04.prod.outlook.com (20.177.39.10) by
- AM6PR04MB4744.eurprd04.prod.outlook.com (20.177.33.94) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.31; Tue, 18 Feb 2020 16:30:12 +0000
-Received: from AM6SPR01MB0017.eurprd04.prod.outlook.com
- ([fe80::adee:74cd:cdd3:3e40]) by AM6SPR01MB0017.eurprd04.prod.outlook.com
- ([fe80::adee:74cd:cdd3:3e40%4]) with mapi id 15.20.2729.032; Tue, 18 Feb 2020
- 16:30:12 +0000
-Subject: Re: [PATCH] kvm: x86: Print "disabled by bios" only once per host
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Erwan Velu <erwanaliasr1@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jmattson@google.com
-References: <20200214143035.607115-1-e.velu@criteo.com>
- <20200214170508.GB20690@linux.intel.com>
-From:   Erwan Velu <e.velu@criteo.com>
-Message-ID: <70b4d8fa-57c0-055b-8391-4952dec32a58@criteo.com>
-Date:   Tue, 18 Feb 2020 17:28:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-In-Reply-To: <20200214170508.GB20690@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: LO2P265CA0396.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:f::24) To AM6SPR01MB0017.eurprd04.prod.outlook.com
- (2603:10a6:20b:1c::10)
+        id S1727462AbgBRQav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 11:30:51 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6060 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726528AbgBRQau (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 11:30:50 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01IGLSm3196043
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 11:30:48 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y6dq7besv-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 11:30:48 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Tue, 18 Feb 2020 16:30:46 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 18 Feb 2020 16:30:43 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01IGTjio48431498
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Feb 2020 16:29:46 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4F6D742047;
+        Tue, 18 Feb 2020 16:30:41 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8BC284204D;
+        Tue, 18 Feb 2020 16:30:40 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.58.100])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Feb 2020 16:30:40 +0000 (GMT)
+Subject: Re: [PATCH v2 39/42] example for future extension: mm:gup/writeback:
+ add callbacks for inaccessible pages: error cases
+To:     Will Deacon <will@kernel.org>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-40-borntraeger@de.ibm.com>
+ <20200218162546.GC1133@willie-the-truck>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Tue, 18 Feb 2020 17:30:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Received: from [192.168.4.193] (91.199.242.236) by LO2P265CA0396.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:f::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.25 via Frontend Transport; Tue, 18 Feb 2020 16:30:12 +0000
-X-Originating-IP: [91.199.242.236]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7153df1f-1e4a-43a7-bdd1-08d7b48fd3d7
-X-MS-TrafficTypeDiagnostic: AM6PR04MB4744:
-X-Microsoft-Antispam-PRVS: <AM6PR04MB474411A38884BA3B040ABD21F2110@AM6PR04MB4744.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 031763BCAF
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(376002)(136003)(346002)(366004)(39860400002)(189003)(199004)(4326008)(66556008)(52116002)(66476007)(66946007)(31696002)(26005)(16526019)(7416002)(53546011)(6666004)(186003)(86362001)(110136005)(6486002)(2906002)(31686004)(36756003)(478600001)(2616005)(956004)(8936002)(8676002)(81156014)(81166006)(54906003)(5660300002)(16576012)(316002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR04MB4744;H:AM6SPR01MB0017.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-Received-SPF: None (protection.outlook.com: criteo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2aKLyl4eXfkWPeTiu5Q1rCfizXSZsnyHnHiAOcpHVrnpABzWsYWsvqA+ti01FBB34pn50bo82LB4L1qsHnIfjVjuBnyLK8+fhxDwlMnC+oMq/ufB4ZOM9SK2FSwmAW/AiScF/mfRbYgkFwb55xC2Mq6m70NBmtSnCH9YUsUdTYwCI5+HGvisKZHtrugCDiUlo+0jVNa6Y+YwqNf0BqNkRDgTi12LtJ1VwpK73exsewu49wWRXlExibEGkvD4wd4A3rT8yTqjHQTb6rTWHk9UoFwjGCcYrpksuAjvVBtIXbMx0qTMuxGTgEeGHSR+DemPgh4zfgm7DHV4eQq0SnKW8kFP7RRPyI4W8Kn2X+9SD76nVyxk/azKroRM4Zzk+TgYbdo8zlt3wFAFH33ySIk4W3z1Q6AXok8eEEXq9EJU1yzG8vXVpDbYGUJbYhJMPI8N
-X-MS-Exchange-AntiSpam-MessageData: +RakYntgVh+QenPHD3E/BcreRTNHD0XQvqNx5LBstMBBwyWa96lFobmTe5YQjgcUfiaCZy+gUyZGOF4geSQ9XN4R/NvVW+Ws+/oAp4dvPq3FMWhZCgqh14Kbm0i1WgJD+ccWQfr43V46F95a1/266Q==
-X-OriginatorOrg: criteo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7153df1f-1e4a-43a7-bdd1-08d7b48fd3d7
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2020 16:30:12.5587
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2a35d8fd-574d-48e3-927c-8c398e225a01
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cNjAu4Ezg3OT2GHlZzI3Wxjrg96fqwOwAhQnrQMF7le8+LgMtcyoAMUD++ezanezNeLmLcIOytEx8vcpI/306A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB4744
+In-Reply-To: <20200218162546.GC1133@willie-the-truck>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021816-0016-0000-0000-000002E80300
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021816-0017-0000-0000-0000334B17CD
+Message-Id: <e7f91b4f-455f-5fc7-19ab-51362dec4e62@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-18_04:2020-02-18,2020-02-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 impostorscore=0
+ spamscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002180121
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/02/2020 18:05, Sean Christopherson wrote:
-> This has come up before[*].  Using _once() doesn't fully solve the issue
-> when KVM is built as a module.  The spam is more than likely a userspace
-> bug, i.e. userspace is probing KVM on every CPU.
-
-I made some progress on this.
 
 
-That's "/usr/bin/udevadm trigger --type=devices --action=add" the culprit.
+On 18.02.20 17:25, Will Deacon wrote:
+> On Fri, Feb 14, 2020 at 05:26:55PM -0500, Christian Borntraeger wrote:
+>> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>
+>> This is a potential extension to do error handling if we fail to
+>> make the page accessible if we know what others need.
+>>
+>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>> ---
+>>  mm/gup.c            | 17 ++++++++++++-----
+>>  mm/page-writeback.c |  6 +++++-
+>>  2 files changed, 17 insertions(+), 6 deletions(-)
+> 
+> Sorry, I missed this when replying elsewhere in the thread!
+> Anyway, looks good to me:
+> 
+> Acked-by: Will Deacon <will@kernel.org>
 
-It does echo "add" in /sys/devices/system/cpu/cpu<x>/uevent
-
-For the each cpu, it does the 'add' which trigger the "disabled by bios" 
-message from kvm_arch_init.
-
-Note that doing a "add" on the same processor will trigger the same 
-message at every "add" event.
-
-
-So I tried the patch of using pr_err_once() instead of printk() and the 
-behavior is fine : despite the number of "add" generated, there is a 
-single line being printed out.
-
-Without the patch, every "add" generates the "disabled by bios" message.
-
-
-So the question is : do we want to handle the case where a possible bios 
-missed the configuration of some cores ?
-
-If no, then the patch is fine and could be submitted. I don't see the 
-need of printing this message at every call as it pollute the kernel log.
-
-If yes, then we need to keep a trace of the number of enabled/disabled 
-cores so we can report a mismatch. As this message seems printed per 
-cpu, that would kind of mean a global variable right ?
-
-
-What are your recommendations on this ?
-
-
-Erwan,
+I can use that for a combined patch (this one merged into the first) ? Correct?
 
