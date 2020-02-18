@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E56A6162422
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 11:02:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C59D3162424
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 11:03:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726427AbgBRKCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 05:02:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45631 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726193AbgBRKCs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 05:02:48 -0500
+        id S1726439AbgBRKDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 05:03:03 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45678 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726482AbgBRKDD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 05:03:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582020166;
+        s=mimecast20190719; t=1582020182;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=xhzCI8MRkhfzbatrxOf+H0Q1eP2LNFU2gPXCPKfw75g=;
-        b=QGdS5FwB50Cx5M+tsbonRUWjO3e1+FqPrZzy7RrP3rZJjoiDqlRhWDv8NnkaSw9flYZy6C
-        EUrFwX8xZZFCcYZsHEmny5Wh9H+cYmJS/yn+FXQjXmHEMRUUNNiBP3qmOvjmwGwH5f2XLY
-        ba66oFqNLMIwgLR3tiY/OoueWBNe6GE=
+        bh=eDJsfYbOPj7/JxIZcWioo7sZkXDEWHUkmkr7ZrLeTHo=;
+        b=ORQ+aXXDdwbrHdBxeOz5nwgQeviXrxwesYEcrUSb80XeSVfExcunpSbO5em15PtuM4ixUh
+        fy63ZrNhIC5SjcBFzPTKac4IUDieZaE8/Zh9Fl0cx/7XgPUHuu4Bwjo7ivFqoYtcT9O/Ah
+        pZQ3SXOU7wJNjbEm+Ph5OcKOQzotCPE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-oBNSBKIwOLq0hqQYDCPweg-1; Tue, 18 Feb 2020 05:02:42 -0500
-X-MC-Unique: oBNSBKIwOLq0hqQYDCPweg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-77-AF2iyVmlP0emiC5Gl-KD_g-1; Tue, 18 Feb 2020 05:02:58 -0500
+X-MC-Unique: AF2iyVmlP0emiC5Gl-KD_g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F25FBDB8E;
-        Tue, 18 Feb 2020 10:02:40 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4308800D48;
+        Tue, 18 Feb 2020 10:02:56 +0000 (UTC)
 Received: from [10.36.116.190] (ovpn-116-190.ams2.redhat.com [10.36.116.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B06BD8CCC5;
-        Tue, 18 Feb 2020 10:02:38 +0000 (UTC)
-Subject: Re: [PATCH v2 33/42] KVM: s390: protvirt: Mask PSW interrupt bits for
- interception 104 and 112
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BAE0D1BC6D;
+        Tue, 18 Feb 2020 10:02:54 +0000 (UTC)
+Subject: Re: [PATCH v2 34/42] KVM: s390: protvirt: do not inject interrupts
+ after start
 From:   David Hildenbrand <david@redhat.com>
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
@@ -44,11 +44,10 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-34-borntraeger@de.ibm.com>
- <70f30f71-f7f2-8286-aafb-ea5ca5fb86e9@redhat.com>
+ <20200214222658.12946-35-borntraeger@de.ibm.com>
+ <4651fa57-5b2f-3a05-2347-7767bc675fa3@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -93,16 +92,16 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <b9220515-6d9e-a338-e4f8-4c11c795315a@redhat.com>
-Date:   Tue, 18 Feb 2020 11:02:37 +0100
+Message-ID: <01481732-91e1-6604-d97d-7ab2d283c298@redhat.com>
+Date:   Tue, 18 Feb 2020 11:02:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <70f30f71-f7f2-8286-aafb-ea5ca5fb86e9@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <4651fa57-5b2f-3a05-2347-7767bc675fa3@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -110,58 +109,36 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On 18.02.20 10:53, David Hildenbrand wrote:
 > On 14.02.20 23:26, Christian Borntraeger wrote:
->> From: Janosch Frank <frankja@linux.ibm.com>
+>> As PSW restart is handled by the ultravisor (and we only get a start
+>> notification) we must re-check the PSW after a start before injecting
+>> interrupts.
 >>
->> We're not allowed to inject interrupts on intercepts that leave the
->> guest state in an "in-between" state where the next SIE entry will do a
->> continuation, namely secure instruction interception (104) and secure
->> prefix interception (112).
->> As our PSW is just a copy of the real one that will be replaced on the
->> next exit, we can mask out the interrupt bits in the PSW to make sure
->> that we do not inject anything.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
 >> ---
->>  arch/s390/kvm/kvm-s390.c | 11 +++++++++++
->>  1 file changed, 11 insertions(+)
+>>  arch/s390/kvm/kvm-s390.c | 7 +++++++
+>>  1 file changed, 7 insertions(+)
 >>
 >> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index b6113285f47f..1b6963bbc96f 100644
+>> index 1b6963bbc96f..16af4d1a2c29 100644
 >> --- a/arch/s390/kvm/kvm-s390.c
 >> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -4025,6 +4025,7 @@ static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
->>  	return vcpu_post_run_fault_in_sie(vcpu);
->>  }
->>  
->> +#define PSW_INT_MASK (PSW_MASK_EXT | PSW_MASK_IO | PSW_MASK_MCHECK)
->>  static int __vcpu_run(struct kvm_vcpu *vcpu)
->>  {
->>  	int rc, exit_reason;
->> @@ -4061,6 +4062,16 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->>  			memcpy(vcpu->run->s.regs.gprs,
->>  			       sie_page->pv_grregs,
->>  			       sizeof(sie_page->pv_grregs));
->> +			/*
->> +			 * We're not allowed to inject interrupts on intercepts
->> +			 * that leave the guest state in an "in-between" state
->> +			 * where the next SIE entry will do a continuation.
->> +			 * Fence interrupts in our "internal" PSW.
->> +			 */
->> +			if (vcpu->arch.sie_block->icptcode == ICPT_PV_INSTR ||
->> +			    vcpu->arch.sie_block->icptcode == ICPT_PV_PREF) {
->> +				vcpu->arch.sie_block->gpsw.mask &= ~PSW_INT_MASK;
->> +			}
+>> @@ -4436,6 +4436,13 @@ void kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
+>>  	/* Let's tell the UV that we want to start again */
+>>  	kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR, &rc, &rrc);
+>>  	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_STOPPED);
+>> +	/*
+>> +	 * The real PSW might have changed due to a RESTART interpreted by the
+>> +	 * ultravisor. We block all interrupts and let the next sie exit
+>> +	 * refresh our view.
+>> +	 */
+>> +	if (kvm_s390_pv_is_protected(vcpu->kvm))
+>> +		vcpu->arch.sie_block->gpsw.mask &= ~PSW_INT_MASK;
 > 
-> Is this actually the right approach? I mean, you lose PSW masks, but you
-> only want to teach the interrupt delivery code to skip delivering
-> interrupts until the intercept has been handled. Does not look clean to
-> me TBH.
+> Same comment as to the previous patch.
 
-After reading the patch description again :)
+As I understood how it works
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
