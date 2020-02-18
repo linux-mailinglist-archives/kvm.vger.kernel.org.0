@@ -2,98 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C64B0162C3E
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 18:15:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52D16162C84
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 18:20:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727875AbgBRRPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 12:15:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29147 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726647AbgBRRO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 12:14:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582046099;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JfsHq8FXaZ0WyNMC2vdaaoGHFKHETrOhlNj0vSeLcqM=;
-        b=V1MZQ1PcDwRcYrdalk6zUeSWVfS3IRzPaQa5qTDK8A4RPt2WxYgSZCImflP5r/kpJkF9kd
-        pV2J7YdVhJ94cPn0cKXb0jvAfzmzf66WFpMo7KWpg2VdR6ywQSCpPLvJFzoAPwyhnmoYjA
-        JYFzH6oQW73XgHFkfHI3woDbWuKd4es=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-8Umqm8alNaCJDnOdptchGw-1; Tue, 18 Feb 2020 12:14:51 -0500
-X-MC-Unique: 8Umqm8alNaCJDnOdptchGw-1
-Received: by mail-wm1-f70.google.com with SMTP id w12so344076wmc.3
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 09:14:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=JfsHq8FXaZ0WyNMC2vdaaoGHFKHETrOhlNj0vSeLcqM=;
-        b=NjAXL9gy2pTQ9OqD0h+kbpjDzOO7GAEUm67y5CjTTQkw7mcUJATRuV0S2joNpartn8
-         C9h1cs/qjp5zvj4gE9R2e7Obu41DkgV8GclrGO+EH0jmnU5CsIxOdJoQZt+S2TOhP+rp
-         zs4PX4K/2vOHfvtGlQ/7vewnH1j9f/5eRbj9nJkvLaS7tGUhWV4LvNQ0OXU0g47LRvf9
-         /6WPzWdiBxyf6TanekoTgbFkc0zqkwWig+tEbDm3XIL7yKcMVAtEAZV/7k7FF4WJBFI1
-         di/yX4f/5vixw0PS3lv+AZOs85lYxJpdlDX18tRFVkXQ7h1Y5RTRwm7mhSK13kllaAwT
-         wIhQ==
-X-Gm-Message-State: APjAAAW/faIkmr50cZgQZhTF8GK76nJ+H8BKRoMkBKGa6oTggz7Jjbai
-        E+aucEl97QPBnpGBu6tyjkqJk4L6VjroX6GjR2vhRWloX2w3MI8Vmhq/2mWMfe8RNDZMYo0ZX1T
-        +5k0+6hjUh3ms
-X-Received: by 2002:a5d:4a8c:: with SMTP id o12mr29230336wrq.43.1582046089272;
-        Tue, 18 Feb 2020 09:14:49 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxi6b63+py5Mn2YyRuY6BikZi2vFKPXvOnPfJFaH2rpDMGfHkl4Qga0oQk8ioy8nYBgUIrURQ==
-X-Received: by 2002:a5d:4a8c:: with SMTP id o12mr29230318wrq.43.1582046089043;
-        Tue, 18 Feb 2020 09:14:49 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id k10sm7013588wrd.68.2020.02.18.09.14.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2020 09:14:48 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com,
-        liran.alon@oracle.com, rkagan@virtuozzo.com, pbonzini@redhat.com,
-        rth@twiddle.net
-Subject: Re: [PATCH RFC] target/i386: filter out VMX_PIN_BASED_POSTED_INTR when enabling SynIC
-In-Reply-To: <158204497899.18888.4612758973157728331@a1bbccc8075a>
-References: <158204497899.18888.4612758973157728331@a1bbccc8075a>
-Date:   Tue, 18 Feb 2020 18:14:47 +0100
-Message-ID: <87h7zn95rs.fsf@vitty.brq.redhat.com>
+        id S1726640AbgBRRUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 12:20:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45638 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726415AbgBRRUK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 12:20:10 -0500
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2AA1D20801;
+        Tue, 18 Feb 2020 17:20:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1582046409;
+        bh=1/QcFFVdy6vaYY3yC/qBVxENZ9VWu8BQUFNLPDxdkwc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FUdza3Rmbg/mS79PNLWd5ZIzn/9300o9tKNwbcJP/mcDcJzUXNmpPjr3jh0X1zJQY
+         2DeI3v9A8QBOH7SD92VtvtrHYPjrF3geQHcK40Qmlnhfnh4LVkrgJXeC+f0XbtauyE
+         Egn9ZDEQtvitjwxDPEpQNg8nsuu31Fls/i5PJ22g=
+Date:   Tue, 18 Feb 2020 17:20:00 +0000
+From:   Will Deacon <will@kernel.org>
+To:     Rob Herring <robh@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        soc@kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Robert Richter <rrichter@marvell.com>,
+        Jon Loeliger <jdl@jdl.com>, Alexander Graf <graf@amazon.com>,
+        Matthias Brugger <mbrugger@suse.com>,
+        Mark Langsdorf <mlangsdo@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
+        iommu@lists.linux-foundation.org,
+        James Morse <james.morse@arm.com>,
+        Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+        kvm@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-pm@vger.kernel.org,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        netdev@vger.kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>
+Subject: Re: [RFC PATCH 06/11] iommu: arm-smmu: Remove Calxeda secure mode
+ quirk
+Message-ID: <20200218172000.GF1133@willie-the-truck>
+References: <20200218171321.30990-1-robh@kernel.org>
+ <20200218171321.30990-7-robh@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200218171321.30990-7-robh@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-no-reply@patchew.org writes:
+On Tue, Feb 18, 2020 at 11:13:16AM -0600, Rob Herring wrote:
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Robin Murphy <robin.murphy@arm.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: iommu@lists.linux-foundation.org
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+> Do not apply yet.
 
-> Patchew URL: https://patchew.org/QEMU/20200218144415.94722-1-vkuznets@redhat.com/
->
->
->
-> Hi,
->
-> This series failed the docker-quick@centos7 build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
+Pleeeeease? ;)
 
-Hm, honestly I don't see how this can be related to my patch:
+>  drivers/iommu/arm-smmu-impl.c | 43 -----------------------------------
+>  1 file changed, 43 deletions(-)
 
---- /tmp/qemu-test/src/tests/qemu-iotests/041.out	2020-02-18 14:42:30.000000000 +0000
-+++ /tmp/qemu-test/build/tests/qemu-iotests/041.out.bad	2020-02-18 16:50:07.383069241 +0000
-@@ -1,5 +1,29 @@
--...........................................................................................
-+..................................E........................................................
-+======================================================================
-+ERROR: test_pause (__main__.TestSingleBlockdev)
-+----------------------------------------------------------------------
-...
-+Exception: Timeout waiting for job to pause
-+
+Yes, I'm happy to get rid of this. Sadly, I don't think we can remove
+anything from 'struct arm_smmu_impl' because most implementations fall
+just short of perfect.
 
-something else is broken?
+Anyway, let me know when I can push the button and I'll queue this in
+the arm-smmu tree.
 
--- 
-Vitaly
+Cheers,
 
+Will
