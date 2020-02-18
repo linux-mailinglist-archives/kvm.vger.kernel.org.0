@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4930D1637BE
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 00:55:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89B2B1637BA
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 00:55:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728122AbgBRXzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 18:55:25 -0500
-Received: from mga04.intel.com ([192.55.52.120]:40044 "EHLO mga04.intel.com"
+        id S1727951AbgBRXzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 18:55:19 -0500
+Received: from mga04.intel.com ([192.55.52.120]:40045 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726641AbgBRXyk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727763AbgBRXyk (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 18 Feb 2020 18:54:40 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Feb 2020 15:54:39 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,458,1574150400"; 
-   d="scan'208";a="224313159"
+   d="scan'208";a="224313162"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by orsmga007.jf.intel.com with ESMTP; 18 Feb 2020 15:54:38 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -38,9 +38,9 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         linux-mips@vger.kernel.org, kvm@vger.kernel.org,
         kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/9] KVM: x86: Move init-only kvm_x86_ops to separate struct
-Date:   Tue, 18 Feb 2020 15:54:30 -0800
-Message-Id: <20200218235437.20533-3-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 3/9] KVM: VMX: Move hardware_setup() definition below vmx_x86_ops
+Date:   Tue, 18 Feb 2020 15:54:31 -0800
+Message-Id: <20200218235437.20533-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200218235437.20533-1-sean.j.christopherson@intel.com>
 References: <20200218235437.20533-1-sean.j.christopherson@intel.com>
@@ -51,186 +51,364 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the kvm_x86_ops functions that are used only within the scope of
-kvm_init() into a separate struct, kvm_x86_init_ops.  In addition to
-identifying the init-only functions without restorting to code comments,
-this also sets the stage for waiting until after ->hardware_setup() to
-set kvm_x86_ops.  Setting kvm_x86_ops after ->hardware_setup() is
-desirable as many of the hooks are not usable until ->hardware_setup()
-completes.
+Move VMX's hardware_setup() below its vmx_x86_ops definition so that a
+future patch can refactor hardware_setup() to modify vmx_x86_ops
+directly instead of indirectly modifying the ops via the global
+kvm_x86_ops.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 13 +++++++++----
- arch/x86/kvm/svm.c              | 15 ++++++++++-----
- arch/x86/kvm/vmx/vmx.c          | 16 +++++++++++-----
- arch/x86/kvm/x86.c              | 10 ++++++----
- 4 files changed, 36 insertions(+), 18 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 328 ++++++++++++++++++++---------------------
+ 1 file changed, 164 insertions(+), 164 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4dffbc10d3f8..55e72b0e592b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1042,12 +1042,8 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
- }
- 
- struct kvm_x86_ops {
--	int (*cpu_has_kvm_support)(void);          /* __init */
--	int (*disabled_by_bios)(void);             /* __init */
- 	int (*hardware_enable)(void);
- 	void (*hardware_disable)(void);
--	int (*check_processor_compatibility)(void);/* __init */
--	int (*hardware_setup)(void);               /* __init */
- 	void (*hardware_unsetup)(void);            /* __exit */
- 	bool (*cpu_has_accelerated_tpr)(void);
- 	bool (*has_emulated_msr)(int index);
-@@ -1258,6 +1254,15 @@ struct kvm_x86_ops {
- 	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
- };
- 
-+struct kvm_x86_init_ops {
-+	int (*cpu_has_kvm_support)(void);
-+	int (*disabled_by_bios)(void);
-+	int (*check_processor_compatibility)(void);
-+	int (*hardware_setup)(void);
-+
-+	struct kvm_x86_ops *runtime_ops;
-+};
-+
- struct kvm_arch_async_pf {
- 	u32 token;
- 	gfn_t gfn;
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index a3e32d61d60c..b1faf6c33541 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -7375,11 +7375,7 @@ static void svm_pre_update_apicv_exec_ctrl(struct kvm *kvm, bool activate)
- }
- 
- static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
--	.cpu_has_kvm_support = has_svm,
--	.disabled_by_bios = is_disabled,
--	.hardware_setup = svm_hardware_setup,
- 	.hardware_unsetup = svm_hardware_unsetup,
--	.check_processor_compatibility = svm_check_processor_compat,
- 	.hardware_enable = svm_hardware_enable,
- 	.hardware_disable = svm_hardware_disable,
- 	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
-@@ -7515,9 +7511,18 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
- };
- 
-+static struct kvm_x86_init_ops svm_init_ops __initdata = {
-+	.cpu_has_kvm_support = has_svm,
-+	.disabled_by_bios = is_disabled,
-+	.hardware_setup = svm_hardware_setup,
-+	.check_processor_compatibility = svm_check_processor_compat,
-+
-+	.runtime_ops = &svm_x86_ops,
-+};
-+
- static int __init svm_init(void)
- {
--	return kvm_init(&svm_x86_ops, sizeof(struct vcpu_svm),
-+	return kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
- 			__alignof__(struct vcpu_svm), THIS_MODULE);
- }
- 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9a6664886f2e..01aed5386ed2 100644
+index 01aed5386ed2..168386f8c9da 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7729,11 +7729,8 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
+@@ -7548,170 +7548,6 @@ static bool vmx_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+ 	return to_vmx(vcpu)->nested.vmxon;
  }
  
- static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
--	.cpu_has_kvm_support = cpu_has_kvm_support,
--	.disabled_by_bios = vmx_disabled_by_bios,
--	.hardware_setup = hardware_setup,
- 	.hardware_unsetup = hardware_unsetup,
--	.check_processor_compatibility = vmx_check_processor_compat,
-+
- 	.hardware_enable = hardware_enable,
- 	.hardware_disable = hardware_disable,
- 	.cpu_has_accelerated_tpr = report_flexpriority,
-@@ -7881,6 +7878,15 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+-static __init int hardware_setup(void)
+-{
+-	unsigned long host_bndcfgs;
+-	struct desc_ptr dt;
+-	int r, i;
+-
+-	rdmsrl_safe(MSR_EFER, &host_efer);
+-
+-	store_idt(&dt);
+-	host_idt_base = dt.address;
+-
+-	for (i = 0; i < ARRAY_SIZE(vmx_msr_index); ++i)
+-		kvm_define_shared_msr(i, vmx_msr_index[i]);
+-
+-	if (setup_vmcs_config(&vmcs_config, &vmx_capability) < 0)
+-		return -EIO;
+-
+-	if (boot_cpu_has(X86_FEATURE_NX))
+-		kvm_enable_efer_bits(EFER_NX);
+-
+-	if (boot_cpu_has(X86_FEATURE_MPX)) {
+-		rdmsrl(MSR_IA32_BNDCFGS, host_bndcfgs);
+-		WARN_ONCE(host_bndcfgs, "KVM: BNDCFGS in host will be lost");
+-	}
+-
+-	if (!cpu_has_vmx_vpid() || !cpu_has_vmx_invvpid() ||
+-	    !(cpu_has_vmx_invvpid_single() || cpu_has_vmx_invvpid_global()))
+-		enable_vpid = 0;
+-
+-	if (!cpu_has_vmx_ept() ||
+-	    !cpu_has_vmx_ept_4levels() ||
+-	    !cpu_has_vmx_ept_mt_wb() ||
+-	    !cpu_has_vmx_invept_global())
+-		enable_ept = 0;
+-
+-	if (!cpu_has_vmx_ept_ad_bits() || !enable_ept)
+-		enable_ept_ad_bits = 0;
+-
+-	if (!cpu_has_vmx_unrestricted_guest() || !enable_ept)
+-		enable_unrestricted_guest = 0;
+-
+-	if (!cpu_has_vmx_flexpriority())
+-		flexpriority_enabled = 0;
+-
+-	if (!cpu_has_virtual_nmis())
+-		enable_vnmi = 0;
+-
+-	/*
+-	 * set_apic_access_page_addr() is used to reload apic access
+-	 * page upon invalidation.  No need to do anything if not
+-	 * using the APIC_ACCESS_ADDR VMCS field.
+-	 */
+-	if (!flexpriority_enabled)
+-		kvm_x86_ops->set_apic_access_page_addr = NULL;
+-
+-	if (!cpu_has_vmx_tpr_shadow())
+-		kvm_x86_ops->update_cr8_intercept = NULL;
+-
+-	if (enable_ept && !cpu_has_vmx_ept_2m_page())
+-		kvm_disable_largepages();
+-
+-#if IS_ENABLED(CONFIG_HYPERV)
+-	if (ms_hyperv.nested_features & HV_X64_NESTED_GUEST_MAPPING_FLUSH
+-	    && enable_ept) {
+-		kvm_x86_ops->tlb_remote_flush = hv_remote_flush_tlb;
+-		kvm_x86_ops->tlb_remote_flush_with_range =
+-				hv_remote_flush_tlb_with_range;
+-	}
+-#endif
+-
+-	if (!cpu_has_vmx_ple()) {
+-		ple_gap = 0;
+-		ple_window = 0;
+-		ple_window_grow = 0;
+-		ple_window_max = 0;
+-		ple_window_shrink = 0;
+-	}
+-
+-	if (!cpu_has_vmx_apicv()) {
+-		enable_apicv = 0;
+-		kvm_x86_ops->sync_pir_to_irr = NULL;
+-	}
+-
+-	if (cpu_has_vmx_tsc_scaling()) {
+-		kvm_has_tsc_control = true;
+-		kvm_max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
+-		kvm_tsc_scaling_ratio_frac_bits = 48;
+-	}
+-
+-	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
+-
+-	if (enable_ept)
+-		vmx_enable_tdp();
+-	else
+-		kvm_disable_tdp();
+-
+-	/*
+-	 * Only enable PML when hardware supports PML feature, and both EPT
+-	 * and EPT A/D bit features are enabled -- PML depends on them to work.
+-	 */
+-	if (!enable_ept || !enable_ept_ad_bits || !cpu_has_vmx_pml())
+-		enable_pml = 0;
+-
+-	if (!enable_pml) {
+-		kvm_x86_ops->slot_enable_log_dirty = NULL;
+-		kvm_x86_ops->slot_disable_log_dirty = NULL;
+-		kvm_x86_ops->flush_log_dirty = NULL;
+-		kvm_x86_ops->enable_log_dirty_pt_masked = NULL;
+-	}
+-
+-	if (!cpu_has_vmx_preemption_timer())
+-		enable_preemption_timer = false;
+-
+-	if (enable_preemption_timer) {
+-		u64 use_timer_freq = 5000ULL * 1000 * 1000;
+-		u64 vmx_msr;
+-
+-		rdmsrl(MSR_IA32_VMX_MISC, vmx_msr);
+-		cpu_preemption_timer_multi =
+-			vmx_msr & VMX_MISC_PREEMPTION_TIMER_RATE_MASK;
+-
+-		if (tsc_khz)
+-			use_timer_freq = (u64)tsc_khz * 1000;
+-		use_timer_freq >>= cpu_preemption_timer_multi;
+-
+-		/*
+-		 * KVM "disables" the preemption timer by setting it to its max
+-		 * value.  Don't use the timer if it might cause spurious exits
+-		 * at a rate faster than 0.1 Hz (of uninterrupted guest time).
+-		 */
+-		if (use_timer_freq > 0xffffffffu / 10)
+-			enable_preemption_timer = false;
+-	}
+-
+-	if (!enable_preemption_timer) {
+-		kvm_x86_ops->set_hv_timer = NULL;
+-		kvm_x86_ops->cancel_hv_timer = NULL;
+-		kvm_x86_ops->request_immediate_exit = __kvm_request_immediate_exit;
+-	}
+-
+-	kvm_set_posted_intr_wakeup_handler(wakeup_handler);
+-
+-	kvm_mce_cap_supported |= MCG_LMCE_P;
+-
+-	if (pt_mode != PT_MODE_SYSTEM && pt_mode != PT_MODE_HOST_GUEST)
+-		return -EINVAL;
+-	if (!enable_ept || !cpu_has_vmx_intel_pt())
+-		pt_mode = PT_MODE_SYSTEM;
+-
+-	if (nested) {
+-		nested_vmx_setup_ctls_msrs(&vmcs_config.nested,
+-					   vmx_capability.ept, enable_apicv);
+-
+-		r = nested_vmx_hardware_setup(kvm_vmx_exit_handlers);
+-		if (r)
+-			return r;
+-	}
+-
+-	r = alloc_kvm_area();
+-	if (r)
+-		nested_vmx_hardware_unsetup();
+-	return r;
+-}
+-
+ static __exit void hardware_unsetup(void)
+ {
+ 	if (nested)
+@@ -7878,6 +7714,170 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
  	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
  };
  
-+static struct kvm_x86_init_ops vmx_init_ops __initdata = {
-+	.cpu_has_kvm_support = cpu_has_kvm_support,
-+	.disabled_by_bios = vmx_disabled_by_bios,
-+	.check_processor_compatibility = vmx_check_processor_compat,
-+	.hardware_setup = hardware_setup,
++static __init int hardware_setup(void)
++{
++	unsigned long host_bndcfgs;
++	struct desc_ptr dt;
++	int r, i;
 +
-+	.runtime_ops = &vmx_x86_ops,
-+};
++	rdmsrl_safe(MSR_EFER, &host_efer);
 +
- static void vmx_cleanup_l1d_flush(void)
- {
- 	if (vmx_l1d_flush_pages) {
-@@ -7965,7 +7971,7 @@ static int __init vmx_init(void)
- 	}
- #endif
- 
--	r = kvm_init(&vmx_x86_ops, sizeof(struct vcpu_vmx),
-+	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
- 		     __alignof__(struct vcpu_vmx), THIS_MODULE);
- 	if (r)
- 		return r;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bdd0a613b374..315297dec85c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7285,8 +7285,8 @@ static struct notifier_block pvclock_gtod_notifier = {
- 
- int kvm_arch_init(void *opaque)
- {
-+	struct kvm_x86_init_ops *ops = opaque;
- 	int r;
--	struct kvm_x86_ops *ops = opaque;
- 
- 	if (kvm_x86_ops) {
- 		printk(KERN_ERR "kvm: already loaded the other module\n");
-@@ -7335,7 +7335,7 @@ int kvm_arch_init(void *opaque)
- 	if (r)
- 		goto out_free_percpu;
- 
--	kvm_x86_ops = ops;
-+	kvm_x86_ops = ops->runtime_ops;
- 
- 	kvm_mmu_set_mask_ptes(PT_USER_MASK, PT_ACCESSED_MASK,
- 			PT_DIRTY_MASK, PT64_NX_MASK, 0,
-@@ -9593,9 +9593,10 @@ void kvm_arch_hardware_disable(void)
- 
- int kvm_arch_hardware_setup(void *opaque)
- {
-+	struct kvm_x86_init_ops *ops = opaque;
- 	int r;
- 
--	r = kvm_x86_ops->hardware_setup();
-+	r = ops->hardware_setup();
- 	if (r != 0)
- 		return r;
- 
-@@ -9630,13 +9631,14 @@ void kvm_arch_hardware_unsetup(void)
- int kvm_arch_check_processor_compat(void *opaque)
- {
- 	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
-+	struct kvm_x86_init_ops *ops = opaque;
- 
- 	WARN_ON(!irqs_disabled());
- 
- 	if (kvm_host_cr4_reserved_bits(c) != cr4_reserved_bits)
- 		return -EIO;
- 
--	return kvm_x86_ops->check_processor_compatibility();
-+	return ops->check_processor_compatibility();
- }
- 
- bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
++	store_idt(&dt);
++	host_idt_base = dt.address;
++
++	for (i = 0; i < ARRAY_SIZE(vmx_msr_index); ++i)
++		kvm_define_shared_msr(i, vmx_msr_index[i]);
++
++	if (setup_vmcs_config(&vmcs_config, &vmx_capability) < 0)
++		return -EIO;
++
++	if (boot_cpu_has(X86_FEATURE_NX))
++		kvm_enable_efer_bits(EFER_NX);
++
++	if (boot_cpu_has(X86_FEATURE_MPX)) {
++		rdmsrl(MSR_IA32_BNDCFGS, host_bndcfgs);
++		WARN_ONCE(host_bndcfgs, "KVM: BNDCFGS in host will be lost");
++	}
++
++	if (!cpu_has_vmx_vpid() || !cpu_has_vmx_invvpid() ||
++	    !(cpu_has_vmx_invvpid_single() || cpu_has_vmx_invvpid_global()))
++		enable_vpid = 0;
++
++	if (!cpu_has_vmx_ept() ||
++	    !cpu_has_vmx_ept_4levels() ||
++	    !cpu_has_vmx_ept_mt_wb() ||
++	    !cpu_has_vmx_invept_global())
++		enable_ept = 0;
++
++	if (!cpu_has_vmx_ept_ad_bits() || !enable_ept)
++		enable_ept_ad_bits = 0;
++
++	if (!cpu_has_vmx_unrestricted_guest() || !enable_ept)
++		enable_unrestricted_guest = 0;
++
++	if (!cpu_has_vmx_flexpriority())
++		flexpriority_enabled = 0;
++
++	if (!cpu_has_virtual_nmis())
++		enable_vnmi = 0;
++
++	/*
++	 * set_apic_access_page_addr() is used to reload apic access
++	 * page upon invalidation.  No need to do anything if not
++	 * using the APIC_ACCESS_ADDR VMCS field.
++	 */
++	if (!flexpriority_enabled)
++		kvm_x86_ops->set_apic_access_page_addr = NULL;
++
++	if (!cpu_has_vmx_tpr_shadow())
++		kvm_x86_ops->update_cr8_intercept = NULL;
++
++	if (enable_ept && !cpu_has_vmx_ept_2m_page())
++		kvm_disable_largepages();
++
++#if IS_ENABLED(CONFIG_HYPERV)
++	if (ms_hyperv.nested_features & HV_X64_NESTED_GUEST_MAPPING_FLUSH
++	    && enable_ept) {
++		kvm_x86_ops->tlb_remote_flush = hv_remote_flush_tlb;
++		kvm_x86_ops->tlb_remote_flush_with_range =
++				hv_remote_flush_tlb_with_range;
++	}
++#endif
++
++	if (!cpu_has_vmx_ple()) {
++		ple_gap = 0;
++		ple_window = 0;
++		ple_window_grow = 0;
++		ple_window_max = 0;
++		ple_window_shrink = 0;
++	}
++
++	if (!cpu_has_vmx_apicv()) {
++		enable_apicv = 0;
++		kvm_x86_ops->sync_pir_to_irr = NULL;
++	}
++
++	if (cpu_has_vmx_tsc_scaling()) {
++		kvm_has_tsc_control = true;
++		kvm_max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
++		kvm_tsc_scaling_ratio_frac_bits = 48;
++	}
++
++	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
++
++	if (enable_ept)
++		vmx_enable_tdp();
++	else
++		kvm_disable_tdp();
++
++	/*
++	 * Only enable PML when hardware supports PML feature, and both EPT
++	 * and EPT A/D bit features are enabled -- PML depends on them to work.
++	 */
++	if (!enable_ept || !enable_ept_ad_bits || !cpu_has_vmx_pml())
++		enable_pml = 0;
++
++	if (!enable_pml) {
++		kvm_x86_ops->slot_enable_log_dirty = NULL;
++		kvm_x86_ops->slot_disable_log_dirty = NULL;
++		kvm_x86_ops->flush_log_dirty = NULL;
++		kvm_x86_ops->enable_log_dirty_pt_masked = NULL;
++	}
++
++	if (!cpu_has_vmx_preemption_timer())
++		enable_preemption_timer = false;
++
++	if (enable_preemption_timer) {
++		u64 use_timer_freq = 5000ULL * 1000 * 1000;
++		u64 vmx_msr;
++
++		rdmsrl(MSR_IA32_VMX_MISC, vmx_msr);
++		cpu_preemption_timer_multi =
++			vmx_msr & VMX_MISC_PREEMPTION_TIMER_RATE_MASK;
++
++		if (tsc_khz)
++			use_timer_freq = (u64)tsc_khz * 1000;
++		use_timer_freq >>= cpu_preemption_timer_multi;
++
++		/*
++		 * KVM "disables" the preemption timer by setting it to its max
++		 * value.  Don't use the timer if it might cause spurious exits
++		 * at a rate faster than 0.1 Hz (of uninterrupted guest time).
++		 */
++		if (use_timer_freq > 0xffffffffu / 10)
++			enable_preemption_timer = false;
++	}
++
++	if (!enable_preemption_timer) {
++		kvm_x86_ops->set_hv_timer = NULL;
++		kvm_x86_ops->cancel_hv_timer = NULL;
++		kvm_x86_ops->request_immediate_exit = __kvm_request_immediate_exit;
++	}
++
++	kvm_set_posted_intr_wakeup_handler(wakeup_handler);
++
++	kvm_mce_cap_supported |= MCG_LMCE_P;
++
++	if (pt_mode != PT_MODE_SYSTEM && pt_mode != PT_MODE_HOST_GUEST)
++		return -EINVAL;
++	if (!enable_ept || !cpu_has_vmx_intel_pt())
++		pt_mode = PT_MODE_SYSTEM;
++
++	if (nested) {
++		nested_vmx_setup_ctls_msrs(&vmcs_config.nested,
++					   vmx_capability.ept, enable_apicv);
++
++		r = nested_vmx_hardware_setup(kvm_vmx_exit_handlers);
++		if (r)
++			return r;
++	}
++
++	r = alloc_kvm_area();
++	if (r)
++		nested_vmx_hardware_unsetup();
++	return r;
++}
++
+ static struct kvm_x86_init_ops vmx_init_ops __initdata = {
+ 	.cpu_has_kvm_support = cpu_has_kvm_support,
+ 	.disabled_by_bios = vmx_disabled_by_bios,
 -- 
 2.24.1
 
