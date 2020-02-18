@@ -2,172 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B7E901634C2
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 22:23:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE72E163520
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 22:34:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726482AbgBRVXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 16:23:14 -0500
-Received: from mga05.intel.com ([192.55.52.43]:25018 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726352AbgBRVXO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 16:23:14 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Feb 2020 13:23:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,458,1574150400"; 
-   d="scan'208";a="282908772"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by FMSMGA003.fm.intel.com with ESMTP; 18 Feb 2020 13:23:03 -0800
-Date:   Tue, 18 Feb 2020 13:23:03 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jay Zhou <jianjay.zhou@huawei.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, peterx@redhat.com,
-        wangxinxin.wang@huawei.com, linfeng23@huawei.com,
-        weidong.huang@huawei.com
-Subject: Re: [PATCH] KVM: x86: enable dirty log gradually in small chunks
-Message-ID: <20200218212303.GH28156@linux.intel.com>
-References: <20200218110013.15640-1-jianjay.zhou@huawei.com>
+        id S1726808AbgBRVek (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 16:34:40 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:44292 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726481AbgBRVek (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 16:34:40 -0500
+Received: by mail-pf1-f196.google.com with SMTP id y5so11303784pfb.11
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 13:34:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=SBOJ8T4utDvYPiE0OTTO7CUK+naC2X4suhjjDEv6LL4=;
+        b=dExiKNGZlBtDf7hUSf4rVsh13WCjcG9t5Bdulzb35GTIcoXedUySK8h3kR2YQDpMQs
+         r1zoMxQ4ehTg2SG/32PPtbflzF22b1r/E/wP1PXtxF/KCbBq9Qys1TiuXgQ5krT4zz7Z
+         6zosWvFLDPeJx9J+e6M2/6o/6ttomwCwZNEE1kJ+pq/OqVRi1D7soZe3u1ZfIWnOtbkJ
+         PUSLxyZXGMJxHiDQl8/1w4zFjBUowijDyigDoWBJF/NGjQvZSZFrtZAml7Lc7suaQHW+
+         9WkYKZEe3WA27iK/26JzwY7Q0p+/R38m+XdX+XGDWkLIiC7CY0/Sb79dTfUKCyI4s2Ck
+         tFew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=SBOJ8T4utDvYPiE0OTTO7CUK+naC2X4suhjjDEv6LL4=;
+        b=J8f9UO+aTw+ez920cUWopPsNA1kMs7O/BpB68i9Nu79ifSU5AZSGRknUrkOeRfrwue
+         CTtYGHYe82AYRlVKM5UuRSFKvD7xtr6slIlWKEh2dWY2CEOJUn9MHfoqFBsv6bSIVG4I
+         kQ6T/OcR5Cp5vXm9SxQwZYXYjXN4AswPBQXuTrFwEvI7PON4Z1wPkScUNWA1Pd2RZD84
+         hGaGhNoSK5991XiW+mc4Pwc6Anw4dGsax3QLLN2Iwdah04z6oHMthpR82kXpmDA362p0
+         lb7w0uGJTIsN/Kl4hxnGj7WwCtgseEFoxFbtA0aPN4ZfXIiYMtBSuJmlPMTUTUWCYt6y
+         MWxg==
+X-Gm-Message-State: APjAAAVKHx3Ux2928CZgkpQpT7VUmx7/Ttyu7lqvWEBg8usc6jCpyp0L
+        ZNLyKSNjKTZ5Ng/639eOE66aow==
+X-Google-Smtp-Source: APXvYqwNHrRjMtaB9u+Ff4cPws+OQoqOgz3l3RZiwtoYTFRXw1d4mjdChuyHSGVwSsvHA6eW6twvcw==
+X-Received: by 2002:a63:6c09:: with SMTP id h9mr24176790pgc.34.1582061677879;
+        Tue, 18 Feb 2020 13:34:37 -0800 (PST)
+Received: from google.com ([2620:15c:100:202:d78:d09d:ec00:5fa7])
+        by smtp.gmail.com with ESMTPSA id g24sm5234048pfk.92.2020.02.18.13.34.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2020 13:34:37 -0800 (PST)
+Date:   Tue, 18 Feb 2020 13:34:33 -0800
+From:   Oliver Upton <oupton@google.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: Suppress warning in __kvm_gfn_to_hva_cache_init
+Message-ID: <20200218213433.GA164161@google.com>
+References: <20200218184756.242904-1-oupton@google.com>
+ <20200218190729.GD28156@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200218110013.15640-1-jianjay.zhou@huawei.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200218190729.GD28156@linux.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 18, 2020 at 07:00:13PM +0800, Jay Zhou wrote:
-> It could take kvm->mmu_lock for an extended period of time when
-> enabling dirty log for the first time. The main cost is to clear
-> all the D-bits of last level SPTEs. This situation can benefit from
-> manual dirty log protect as well, which can reduce the mmu_lock
-> time taken. The sequence is like this:
+Hey Sean,
+
+On Tue, Feb 18, 2020 at 11:07:29AM -0800, Sean Christopherson wrote:
+> On Tue, Feb 18, 2020 at 10:47:56AM -0800, Oliver Upton wrote:
+> > Particularly draconian compilers warn of a possible uninitialized use of
+> > the nr_pages_avail variable. Silence this warning by initializing it to
+> > zero.
 > 
-> 1. Set all the bits of the first dirty bitmap to 1 when enabling
->    dirty log for the first time
-> 2. Only write protect the huge pages
-> 3. KVM_GET_DIRTY_LOG returns the dirty bitmap info
-> 4. KVM_CLEAR_DIRTY_LOG will clear D-bit for each of the leaf level
->    SPTEs gradually in small chunks
+> Can you check if the warning still exists with commit 6ad1e29fe0ab ("KVM:
+> Clean up __kvm_gfn_to_hva_cache_init() and its callers")?  I'm guessing
+> (hoping?) the suppression is no longer necessary.
+
+Hmm. I rebased this patch right before sending out + it seems that it is
+required (at least for me) to silence the compiler warning. For good
+measure, I ran git branch --contains to ensure I had your change. Looks
+like my topic branch did in fact have your fix.
+
+--
+Oliver
+
+> commit 6ad1e29fe0aba843dfffc714fced0ef6a2e19502
+> Author: Sean Christopherson <sean.j.christopherson@intel.com>
+> Date:   Thu Jan 9 14:58:55 2020 -0500
 > 
-> Under the Intel(R) Xeon(R) Gold 6152 CPU @ 2.10GHz environment,
-> I did some tests with a 128G windows VM and counted the time taken
-> of memory_global_dirty_log_start, here is the numbers:
+>     KVM: Clean up __kvm_gfn_to_hva_cache_init() and its callers
 > 
-> VM Size        Before    After optimization
-> 128G           460ms     10ms
+>     Barret reported a (technically benign) bug where nr_pages_avail can be
+>     accessed without being initialized if gfn_to_hva_many() fails.
 > 
-> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c   |  5 +++++
->  include/linux/kvm_host.h |  5 +++++
->  virt/kvm/kvm_main.c      | 10 ++++++++--
->  3 files changed, 18 insertions(+), 2 deletions(-)
+>       virt/kvm/kvm_main.c:2193:13: warning: 'nr_pages_avail' may be
+>       used uninitialized in this function [-Wmaybe-uninitialized]
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 3be25ec..a8d64f6 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7201,7 +7201,12 @@ static void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu)
->  static void vmx_slot_enable_log_dirty(struct kvm *kvm,
->  				     struct kvm_memory_slot *slot)
->  {
-> +#if CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> +	if (!kvm->manual_dirty_log_protect)
-> +		kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
-> +#else
->  	kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
-> +#endif
-
-The ifdef is unnecessary, this is in VMX (x86) code, i.e.
-CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT is guaranteed to be defined.
-
->  	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);
->  }
->  
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e89eb67..fd149b0 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -360,6 +360,11 @@ static inline unsigned long *kvm_second_dirty_bitmap(struct kvm_memory_slot *mem
->  	return memslot->dirty_bitmap + len / sizeof(*memslot->dirty_bitmap);
->  }
->  
-> +static inline void kvm_set_first_dirty_bitmap(struct kvm_memory_slot *memslot)
-> +{
-> +	bitmap_set(memslot->dirty_bitmap, 0, memslot->npages);
-> +}
-
-I'd prefer this be open coded with a comment, e.g. "first" is misleading
-because it's really "initial dirty bitmap for this memslot after enabling
-dirty logging".
-
-> +
->  struct kvm_s390_adapter_int {
->  	u64 ind_addr;
->  	u64 summary_addr;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 70f03ce..08565ed 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -862,7 +862,8 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
->   * Allocation size is twice as large as the actual dirty bitmap size.
->   * See x86's kvm_vm_ioctl_get_dirty_log() why this is needed.
->   */
-> -static int kvm_create_dirty_bitmap(struct kvm_memory_slot *memslot)
-> +static int kvm_create_dirty_bitmap(struct kvm *kvm,
-> +				struct kvm_memory_slot *memslot)
->  {
->  	unsigned long dirty_bytes = 2 * kvm_dirty_bitmap_bytes(memslot);
->  
-> @@ -870,6 +871,11 @@ static int kvm_create_dirty_bitmap(struct kvm_memory_slot *memslot)
->  	if (!memslot->dirty_bitmap)
->  		return -ENOMEM;
->  
-> +#if CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
-
-The ifdef is unnecessary, manual_dirty_log_protect always exists and is
-guaranteed to be false if CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=n.  This
-isn't exactly a hot path so saving the uop isn't worth the #ifdef.
-
-> +	if (kvm->manual_dirty_log_protect)
-> +		kvm_set_first_dirty_bitmap(memslot);
-> +#endif
-> +
->  	return 0;
->  }
->  
-> @@ -1094,7 +1100,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  
->  	/* Allocate page dirty bitmap if needed */
->  	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
-> -		if (kvm_create_dirty_bitmap(&new) < 0)
-> +		if (kvm_create_dirty_bitmap(kvm, &new) < 0)
-
-Rather than pass @kvm, what about doing bitmap_set() in __kvm_set_memory_region()
-and s/kvm_create_dirty_bitmap/kvm_alloc_dirty_bitmap to make it clear that
-the helper is only responsible for allocation?  And opportunistically drop
-the superfluous "< 0", e.g.
-
-	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
-		if (kvm_alloc_dirty_bitmap(&new))
-			goto out_free;
-
-		/*
-		 * WORDS!
-		 */		
-		if (kvm->manual_dirty_log_protect)
-			bitmap_set(memslot->dirty_bitmap, 0, memslot->npages);
-	}
-
->  			goto out_free;
->  	}
->  
-> -- 
-> 1.8.3.1
+>     Rather than simply squashing the warning by initializing nr_pages_avail,
+>     fix the underlying issues by reworking __kvm_gfn_to_hva_cache_init() to
+>     return immediately instead of continuing on.  Now that all callers check
+>     the result and/or bail immediately on a bad hva, there's no need to
+>     explicitly nullify the memslot on error.
+> 
+>     Reported-by: Barret Rhoden <brho@google.com>
+>     Fixes: f1b9dd5eb86c ("kvm: Disallow wraparound in kvm_gfn_to_hva_cache_init")
+>     Cc: Jim Mattson <jmattson@google.com>
+>     Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > 
 > 
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > ---
+> >  virt/kvm/kvm_main.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 70f03ce0e5c1..dc8a67ad082d 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -2219,7 +2219,7 @@ static int __kvm_gfn_to_hva_cache_init(struct kvm_memslots *slots,
+> >  	gfn_t start_gfn = gpa >> PAGE_SHIFT;
+> >  	gfn_t end_gfn = (gpa + len - 1) >> PAGE_SHIFT;
+> >  	gfn_t nr_pages_needed = end_gfn - start_gfn + 1;
+> > -	gfn_t nr_pages_avail;
+> > +	gfn_t nr_pages_avail = 0;
+> >  
+> >  	/* Update ghc->generation before performing any error checks. */
+> >  	ghc->generation = slots->generation;
+> > -- 
+> > 2.25.0.265.gbab2e86ba0-goog
+> > 
