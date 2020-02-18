@@ -2,136 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E86F31628C3
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 15:44:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DC631628E8
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 15:54:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbgBROoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 09:44:22 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41791 "EHLO
+        id S1726820AbgBROyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 09:54:23 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46176 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726605AbgBROoW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 09:44:22 -0500
+        by vger.kernel.org with ESMTP id S1726634AbgBROyX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 09:54:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582037061;
+        s=mimecast20190719; t=1582037661;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=fhZ0I3YWrEhOWa29fWSP+eeinOmrWp9ss357sd3bjMY=;
-        b=A1gm0B5OEgRFKCyeLpv0QWqLP65mpR6mzRjjKDbcGP+qQiyPQmY79W3zN/zk3exG1tAjqF
-        W71VzQRuy9pMCZpXgs3QmuInru0QTjqGlK/y8j43Gp6CBz13CxZVhfVPL9ild8FSSXPE9Z
-        kWccAZ8SIFHLAuT8OxGZJWLC9vLsUu4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-cAWyZ9CYP0yMuDtEywkuTg-1; Tue, 18 Feb 2020 09:44:19 -0500
-X-MC-Unique: cAWyZ9CYP0yMuDtEywkuTg-1
-Received: by mail-wm1-f72.google.com with SMTP id g26so149163wmk.6
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 06:44:19 -0800 (PST)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oAYE5zIUMBfPxzBexfTcLOpuwobiWBtk76M7O7fy2cY=;
+        b=UTdQyjGkLMxIRYccyXdsFBNPeAkjs6IBEFg+zBn04HIHnJtywMyzIv3emvDQPEmzSOeWva
+        6ZXbJLqSWGFe3aI8KFbNATzZQ5Ysju7WOpAAu+f5LaP3s3mquprWKR8lGsqmLSHC7UjTKL
+        sJSVmlpY94UDCUMYdI0oNvM/3g2ftX4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-k8R_PEdsMJi-1sH_2BzZYQ-1; Tue, 18 Feb 2020 09:54:18 -0500
+X-MC-Unique: k8R_PEdsMJi-1sH_2BzZYQ-1
+Received: by mail-wr1-f72.google.com with SMTP id u8so10945353wrp.10
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 06:54:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fhZ0I3YWrEhOWa29fWSP+eeinOmrWp9ss357sd3bjMY=;
-        b=bzEVfnXmjyzPjG8mxwC70wzBU7IEoFDLJ1TfSRvvd6RitMPRg/w7JlPkI1BBxGj8z4
-         Ns2G8g+TNKLTfRG7F9VBwzawr+8/OnoEjceXeEcn9Pg6hDeysCCJsXzRlhJmvAvmSlb/
-         6fZAyVgnyjLKEw1+nxTcvExlmFOPaNPj6Sr0FoRGFiHNTfE6xnlIeeYnoOUT6hYMTN9b
-         J1xzEKIe+oza0H4F7YM3fDxvu2H6YZ5d+V3GI7gzwL15GARf2+Rpe2sc42JvXN/XmA/M
-         vOm+YNteX/wWwkdkZssBDwBcf8Wyao2b5+2YPgSmeK0e4dk+FjCP30IY6N0lTgT5qvHx
-         U9HQ==
-X-Gm-Message-State: APjAAAUXebmLltXKSDzSbls1lrsKo5JuGeH6zTH1xTP9ZA1mzO21eQ94
-        n5UYjPZDxOcwH5cqdUM9YzfeF7RXT68Rz45hXOSqrTiIE9lBZ4uYu/HVBmTaChZ56n4hEl3asFn
-        ANDNCGwl/T8dQ
-X-Received: by 2002:a1c:7717:: with SMTP id t23mr3688914wmi.17.1582037058139;
-        Tue, 18 Feb 2020 06:44:18 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwqyat2sqLbmEAil4KU1aSm4DesjlvwfePK23mCqjFAU6F67Sm42Y9pWvOTl46vSBYIORUf+A==
-X-Received: by 2002:a1c:7717:: with SMTP id t23mr3688887wmi.17.1582037057826;
-        Tue, 18 Feb 2020 06:44:17 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=oAYE5zIUMBfPxzBexfTcLOpuwobiWBtk76M7O7fy2cY=;
+        b=qc74GZuvokPYXSMbjZotmWYKLT60w1J3WEIg/JLQ1DW1KNUBnre+M3D3S/g5A9Sm5V
+         vk2Jbw+SGOsLNxUuIj397lAKPI7ybyEt0p8F3/Zgvy8oJ3s30/coiGJ1iVQw/A6UkC9K
+         51/Xg++XaYK8CHPOzN7vOGBYRMfBalUo4I2wbjFT8EjIYSX0EytHVuG8szx0Mo2Zk3bC
+         7gBDhnYUCpB3CtQ/1pN9l1c//y9uYf4Z387hW5GGkVg3q0JDPHe3xO+vLhd/M5Q1rm6X
+         nrACjdCdoYBxe57cLOa9AEnFTmRVn834f1CnftmNU6TJWocDQ7t4Ztvc4uieAWyWbpR0
+         wfjQ==
+X-Gm-Message-State: APjAAAU+n2OAAwHdF8Q5+2saf5VZU0jzyFxpFjAS67wYn+yFgfbFZGqW
+        sAJUmnz5Tvv6IXduA2qUE83L9L1M/6z/02tXpKg8nvcQ/SqIdCUw0Zd02f1V37MoX0viZOwvB7v
+        xToXGn8lREBnh
+X-Received: by 2002:adf:f606:: with SMTP id t6mr29394030wrp.304.1582037657390;
+        Tue, 18 Feb 2020 06:54:17 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx3KNJMO5F3fa7ubC1BaO9mmpNeE7KVzCllzDAfvWz7/f13qvu0EW0swAoA822SBicvqKuTfQ==
+X-Received: by 2002:adf:f606:: with SMTP id t6mr29394011wrp.304.1582037657204;
+        Tue, 18 Feb 2020 06:54:17 -0800 (PST)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id l15sm6201826wrv.39.2020.02.18.06.44.16
+        by smtp.gmail.com with ESMTPSA id a13sm6288184wrp.93.2020.02.18.06.54.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2020 06:44:17 -0800 (PST)
+        Tue, 18 Feb 2020 06:54:16 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Roman Kagan <rkagan@virtuozzo.com>, kvm@vger.kernel.org
-Subject: [PATCH RFC] target/i386: filter out VMX_PIN_BASED_POSTED_INTR when enabling SynIC
-Date:   Tue, 18 Feb 2020 15:44:15 +0100
-Message-Id: <20200218144415.94722-1-vkuznets@redhat.com>
-X-Mailer: git-send-email 2.24.1
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v4 1/2] KVM: X86: Less kvmclock sync induced vmexits after VM boots
+In-Reply-To: <1581988630-19182-1-git-send-email-wanpengli@tencent.com>
+References: <1581988630-19182-1-git-send-email-wanpengli@tencent.com>
+Date:   Tue, 18 Feb 2020 15:54:15 +0100
+Message-ID: <87r1ys7xpk.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a multi-vCPU guest is created with hv_synic, secondary vCPUs fail
-to initialize with
+Wanpeng Li <kernellwp@gmail.com> writes:
 
-qemu-system-x86_64: error: failed to set MSR 0x48d to 0xff00000016
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> In the progress of vCPUs creation, it queues a kvmclock sync worker to the global 
+> workqueue before each vCPU creation completes. Each worker will be scheduled 
+> after 300 * HZ delay and request a kvmclock update for all vCPUs and kick them 
+> out. This is especially worse when scaling to large VMs due to a lot of vmexits. 
+> Just one worker as a leader to trigger the kvmclock sync request for all vCPUs is 
+> enough.
+>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+> v3 -> v4:
+>  * check vcpu->vcpu_idx
+>
+>  arch/x86/kvm/x86.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index fb5d64e..d0ba2d4 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9390,8 +9390,9 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+>  	if (!kvmclock_periodic_sync)
+>  		return;
+>  
+> -	schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
+> -					KVMCLOCK_SYNC_PERIOD);
+> +	if (vcpu->vcpu_idx == 0)
+> +		schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
+> +						KVMCLOCK_SYNC_PERIOD);
+>  }
+>  
+>  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
 
-This is caused by SynIC enablement on the boot CPU: when we do this
-KVM disables apicv for the whole guest so we can't set
-VMX_PIN_BASED_POSTED_INTR bit in MSR_IA32_VMX_TRUE_PINBASED_CTLS anymore.
-(see nested_vmx_setup_ctls_msrs() in KVM).
+Forgive me my ignorance, I was under the impression
+schedule_delayed_work() doesn't do anything if the work is already
+queued (see queue_delayed_work_on()) and we seem to be scheduling the
+same work (&kvm->arch.kvmclock_sync_work) which is per-kvm (not
+per-vcpu). Do we actually happen to finish executing it before next vCPU
+is created or why does the storm you describe happens?
 
-This used to work before fine-grained VMX feature enablement because
-we were not setting VMX MSRs.
-
-Fix the issue by filtering out VMX_PIN_BASED_POSTED_INTR when enabling
-SynIC. We also need to re-order kvm_init_msrs() with hyperv_init_vcpu()
-so filtering on secondary CPUs happens before.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
-RFC: This is somewhat similar to eVMCS breakage and it is likely possible
-to fix this in KVM. I decided to try QEMU first as this is a single
-control and unlike eVMCS we don't need to keep a list of things to disable.
----
- target/i386/kvm.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 69eb43d796e6..6829b597fdbf 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1366,6 +1366,7 @@ static Error *hv_no_nonarch_cs_mig_blocker;
- static int hyperv_init_vcpu(X86CPU *cpu)
- {
-     CPUState *cs = CPU(cpu);
-+    CPUX86State *env = &cpu->env;
-     Error *local_err = NULL;
-     int ret;
- 
-@@ -1431,6 +1432,9 @@ static int hyperv_init_vcpu(X86CPU *cpu)
-             return ret;
-         }
- 
-+        /* When SynIC is enabled, APICv controls become unavailable */
-+        env->features[FEAT_VMX_PINBASED_CTLS] &= ~VMX_PIN_BASED_POSTED_INTR;
-+
-         if (!cpu->hyperv_synic_kvm_only) {
-             ret = hyperv_x86_synic_add(cpu);
-             if (ret < 0) {
-@@ -1845,13 +1849,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         has_msr_tsc_aux = false;
-     }
- 
--    kvm_init_msrs(cpu);
--
-     r = hyperv_init_vcpu(cpu);
-     if (r) {
-         goto fail;
-     }
- 
-+    kvm_init_msrs(cpu);
-+
-     return 0;
- 
-  fail:
 -- 
-2.24.1
+Vitaly
 
