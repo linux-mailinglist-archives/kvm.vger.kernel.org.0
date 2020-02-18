@@ -2,194 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C10316273F
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 14:40:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6709716276F
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 14:54:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726595AbgBRNkE convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 18 Feb 2020 08:40:04 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2582 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726567AbgBRNkE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 08:40:04 -0500
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id B1470B7E6F5B4204B9EF;
-        Tue, 18 Feb 2020 21:39:43 +0800 (CST)
-Received: from DGGEMM422-HUB.china.huawei.com (10.1.198.39) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 18 Feb 2020 21:39:42 +0800
-Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.16]) by
- dggemm422-hub.china.huawei.com ([10.1.198.39]) with mapi id 14.03.0439.000;
- Tue, 18 Feb 2020 21:39:36 +0800
-From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "peterx@redhat.com" <peterx@redhat.com>,
-        "wangxin (U)" <wangxinxin.wang@huawei.com>,
-        "linfeng (M)" <linfeng23@huawei.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
-Subject: RE: [PATCH] KVM: x86: enable dirty log gradually in small chunks
-Thread-Topic: [PATCH] KVM: x86: enable dirty log gradually in small chunks
-Thread-Index: AQHV5kqezhdNltl9dkyyI6w50CaTlKggTY0AgACgi6A=
-Date:   Tue, 18 Feb 2020 13:39:36 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7474BAF9BDD@DGGEMM528-MBX.china.huawei.com>
-References: <20200218110013.15640-1-jianjay.zhou@huawei.com>
- <24b21aee-e038-bc55-a85e-0f64912e7b89@redhat.com>
-In-Reply-To: <24b21aee-e038-bc55-a85e-0f64912e7b89@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.228.206]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726701AbgBRNyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 08:54:03 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:43039 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726475AbgBRNyC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 08:54:02 -0500
+Received: by mail-qk1-f196.google.com with SMTP id p7so19512993qkh.10
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 05:54:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=wco1ACmBJKT01bm8zBO0MP2nnQlGcVNyX36uIR1E9uo=;
+        b=G0ZnAaGIytyfHiex43w/GJT+NEhMLwNxhYp1/W9HDnNFPo3glIRu93O66AaSeintW4
+         ewAToI5pRBz8O0l7tILOYNKjgySJWe17ht2quS2ahOjbZzAcz+xWKd0a5zthc019NWFQ
+         R1W77HwaNo2iUrrHabUyK2dJHQqwkMP3HcjM/gvl7CgOnOP2bq7gx3OJGNClRVsDU1GO
+         EpLTqCubJgP4nYoHsCBh1Njcn6q1PFTHEiM9EHe9usCQvVsgXVgmRkKNwwLnoHhUcsio
+         7ZzHIqeumqbjEfKuANmJfatwdGn/Gam/JXB0m0k1C5xdDcz21BPJmu8PlWtabKOypOds
+         oRlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=wco1ACmBJKT01bm8zBO0MP2nnQlGcVNyX36uIR1E9uo=;
+        b=ccIbCohWAcr/8MNyocU4tfSYLRru4pMTuJc2RjaRCB7aX1LNZZMXHpBvph0DFP2bH6
+         eN9ClA9NGXIm3OtWSCtnmoiDW+UfEutUJ0jJlGi4v/rL1+6ke81a2YHqONW9Lu2P5LcY
+         M9HSiPThrDvPFKHtJ+7stC798a0DErX93Y4L8zGEohIRG1pzqCaxQWSh9dP01AK249Nk
+         lDVcmpS6vR0vc0CUbP+Xjgvfo90zOgDqov4J+d94Q7+e7YZn/6y7TTGwUicD6HmgCx9n
+         OXmCvT0kzNVN3imA0DOoEZ+bSuLLOGxK5pArmh9eKmReBk5+JGNlxlLLQ+44Y5QE9W3n
+         b9pw==
+X-Gm-Message-State: APjAAAUQ6viCguRnxlQPpuzYM1FjVFbdcZypcM9c2xTXyhJDi4/W4Ud6
+        /ThvXUE+g+N+Ri6NXrBVDEw13Q==
+X-Google-Smtp-Source: APXvYqwkMwWoPoOuRyU9S1o0YCBdIBRy95mN2TqVYVQmY44HIF+ueV8rib/5b0aqZ5/M9OsEvpjRCQ==
+X-Received: by 2002:a37:b8c2:: with SMTP id i185mr18411300qkf.156.1582034040843;
+        Tue, 18 Feb 2020 05:54:00 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id w21sm1956489qth.17.2020.02.18.05.54.00
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 18 Feb 2020 05:54:00 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1j43K3-0002fU-Nx; Tue, 18 Feb 2020 09:53:59 -0400
+Date:   Tue, 18 Feb 2020 09:53:59 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Tiwei Bie <tiwei.bie@intel.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, shahafs@mellanox.com,
+        rob.miller@broadcom.com, haotian.wang@sifive.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        rdunlap@infradead.org, hch@infradead.org, jiri@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com,
+        maxime.coquelin@redhat.com, lingshan.zhu@intel.com,
+        dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
+Subject: Re: [PATCH] vhost: introduce vDPA based backend
+Message-ID: <20200218135359.GA9608@ziepe.ca>
+References: <20200131033651.103534-1-tiwei.bie@intel.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200131033651.103534-1-tiwei.bie@intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Fri, Jan 31, 2020 at 11:36:51AM +0800, Tiwei Bie wrote:
 
-> -----Original Message-----
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> Sent: Tuesday, February 18, 2020 7:40 PM
-> To: Zhoujian (jay) <jianjay.zhou@huawei.com>; kvm@vger.kernel.org
-> Cc: peterx@redhat.com; wangxin (U) <wangxinxin.wang@huawei.com>;
-> linfeng (M) <linfeng23@huawei.com>; Huangweidong (C)
-> <weidong.huang@huawei.com>
-> Subject: Re: [PATCH] KVM: x86: enable dirty log gradually in small chunks
-> 
-> On 18/02/20 12:00, Jay Zhou wrote:
-> > It could take kvm->mmu_lock for an extended period of time when
-> > enabling dirty log for the first time. The main cost is to clear all
-> > the D-bits of last level SPTEs. This situation can benefit from manual
-> > dirty log protect as well, which can reduce the mmu_lock time taken.
-> > The sequence is like this:
-> >
-> > 1. Set all the bits of the first dirty bitmap to 1 when enabling
-> >    dirty log for the first time
-> > 2. Only write protect the huge pages
-> > 3. KVM_GET_DIRTY_LOG returns the dirty bitmap info 4.
-> > KVM_CLEAR_DIRTY_LOG will clear D-bit for each of the leaf level
-> >    SPTEs gradually in small chunks
-> >
-> > Under the Intel(R) Xeon(R) Gold 6152 CPU @ 2.10GHz environment, I did
-> > some tests with a 128G windows VM and counted the time taken of
-> > memory_global_dirty_log_start, here is the numbers:
-> >
-> > VM Size        Before    After optimization
-> > 128G           460ms     10ms
-> 
-> This is a good idea, but could userspace expect the bitmap to be 0 for pages
-> that haven't been touched? 
+> +static int vhost_vdpa_alloc_minor(struct vhost_vdpa *v)
+> +{
+> +	return idr_alloc(&vhost_vdpa.idr, v, 0, MINORMASK + 1,
+> +			 GFP_KERNEL);
+> +}
 
-The userspace gets the bitmap information only from the kernel side.
-It depends on the kernel side to distinguish whether the pages have been touched
-I think, which using the rmap to traverse for now. I haven't the other ideas yet, :-(
+Please don't use idr in new code, use xarray directly
 
-But even though the userspace gets 1 for pages that haven't been touched, these
-pages will be filtered out too in the kernel space KVM_CLEAR_DIRTY_LOG ioctl
-path, since the rmap does not exist I think.
+> +static int vhost_vdpa_probe(struct device *dev)
+> +{
+> +	struct vdpa_device *vdpa = dev_to_vdpa(dev);
+> +	const struct vdpa_config_ops *ops = vdpa->config;
+> +	struct vhost_vdpa *v;
+> +	struct device *d;
+> +	int minor, nvqs;
+> +	int r;
+> +
+> +	/* Currently, we only accept the network devices. */
+> +	if (ops->get_device_id(vdpa) != VIRTIO_ID_NET) {
+> +		r = -ENOTSUPP;
+> +		goto err;
+> +	}
+> +
+> +	v = kzalloc(sizeof(*v), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
+> +	if (!v) {
+> +		r = -ENOMEM;
+> +		goto err;
+> +	}
+> +
+> +	nvqs = VHOST_VDPA_VQ_MAX;
+> +
+> +	v->vqs = kmalloc_array(nvqs, sizeof(struct vhost_virtqueue),
+> +			       GFP_KERNEL);
+> +	if (!v->vqs) {
+> +		r = -ENOMEM;
+> +		goto err_alloc_vqs;
+> +	}
+> +
+> +	mutex_init(&v->mutex);
+> +	atomic_set(&v->opened, 0);
+> +
+> +	v->vdpa = vdpa;
+> +	v->nvqs = nvqs;
+> +	v->virtio_id = ops->get_device_id(vdpa);
+> +
+> +	mutex_lock(&vhost_vdpa.mutex);
+> +
+> +	minor = vhost_vdpa_alloc_minor(v);
+> +	if (minor < 0) {
+> +		r = minor;
+> +		goto err_alloc_minor;
+> +	}
+> +
+> +	d = device_create(vhost_vdpa.class, NULL,
+> +			  MKDEV(MAJOR(vhost_vdpa.devt), minor),
+> +			  v, "%d", vdpa->index);
+> +	if (IS_ERR(d)) {
+> +		r = PTR_ERR(d);
+> +		goto err_device_create;
+> +	}
+> +
 
-> I think this should be added as a new bit to the
-> KVM_ENABLE_CAP for KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2.  That is:
-> 
-> - in kvm_vm_ioctl_check_extension_generic, return 3 for
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 (better: define two constants
-> KVM_DIRTY_LOG_MANUAL_PROTECT as 1 and
-> KVM_DIRTY_LOG_INITIALLY_SET as 2).
-> 
-> - in kvm_vm_ioctl_enable_cap_generic, allow bit 0 and bit 1 for cap->args[0]
-> 
-> - in kvm_vm_ioctl_enable_cap_generic, check "if
-> (!(kvm->manual_dirty_log_protect & KVM_DIRTY_LOG_INITIALLY_SET))".
+I can't understand what this messing around with major/minor numbers
+does. Without allocating a cdev via cdev_add/etc there is only a
+single char dev in existence here. This and the stuff in
+vhost_vdpa_open() looks non-functional.
 
-Thanks for the details! I'll add them in the next version.
+> +static void vhost_vdpa_remove(struct device *dev)
+> +{
+> +	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+> +	struct vhost_vdpa *v = dev_get_drvdata(dev);
+> +	int opened;
+> +
+> +	add_wait_queue(&vhost_vdpa.release_q, &wait);
+> +
+> +	do {
+> +		opened = atomic_cmpxchg(&v->opened, 0, 1);
+> +		if (!opened)
+> +			break;
+> +		wait_woken(&wait, TASK_UNINTERRUPTIBLE, HZ * 10);
+> +	} while (1);
+> +
+> +	remove_wait_queue(&vhost_vdpa.release_q, &wait);
 
-Regards,
-Jay Zhou
+*barf* use the normal refcount pattern please
 
-> 
-> Thanks,
-> 
-> Paolo
-> 
-> 
-> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c   |  5 +++++
-> >  include/linux/kvm_host.h |  5 +++++
-> >  virt/kvm/kvm_main.c      | 10 ++++++++--
-> >  3 files changed, 18 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c index
-> > 3be25ec..a8d64f6 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7201,7 +7201,12 @@ static void vmx_sched_in(struct kvm_vcpu *vcpu,
-> > int cpu)  static void vmx_slot_enable_log_dirty(struct kvm *kvm,
-> >  				     struct kvm_memory_slot *slot)  {
-> > +#if CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> > +	if (!kvm->manual_dirty_log_protect)
-> > +		kvm_mmu_slot_leaf_clear_dirty(kvm, slot); #else
-> >  	kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
-> > +#endif
-> >  	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);  }
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h index
-> > e89eb67..fd149b0 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -360,6 +360,11 @@ static inline unsigned long
-> *kvm_second_dirty_bitmap(struct kvm_memory_slot *mem
-> >  	return memslot->dirty_bitmap + len / sizeof(*memslot->dirty_bitmap);
-> > }
-> >
-> > +static inline void kvm_set_first_dirty_bitmap(struct kvm_memory_slot
-> > +*memslot) {
-> > +	bitmap_set(memslot->dirty_bitmap, 0, memslot->npages); }
-> > +
-> >  struct kvm_s390_adapter_int {
-> >  	u64 ind_addr;
-> >  	u64 summary_addr;
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c index
-> > 70f03ce..08565ed 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -862,7 +862,8 @@ static int kvm_vm_release(struct inode *inode,
-> struct file *filp)
-> >   * Allocation size is twice as large as the actual dirty bitmap size.
-> >   * See x86's kvm_vm_ioctl_get_dirty_log() why this is needed.
-> >   */
-> > -static int kvm_create_dirty_bitmap(struct kvm_memory_slot *memslot)
-> > +static int kvm_create_dirty_bitmap(struct kvm *kvm,
-> > +				struct kvm_memory_slot *memslot)
-> >  {
-> >  	unsigned long dirty_bytes = 2 * kvm_dirty_bitmap_bytes(memslot);
-> >
-> > @@ -870,6 +871,11 @@ static int kvm_create_dirty_bitmap(struct
-> kvm_memory_slot *memslot)
-> >  	if (!memslot->dirty_bitmap)
-> >  		return -ENOMEM;
-> >
-> > +#if CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> > +	if (kvm->manual_dirty_log_protect)
-> > +		kvm_set_first_dirty_bitmap(memslot);
-> > +#endif
-> > +
-> >  	return 0;
-> >  }
-> >
-> > @@ -1094,7 +1100,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> >
-> >  	/* Allocate page dirty bitmap if needed */
-> >  	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
-> > -		if (kvm_create_dirty_bitmap(&new) < 0)
-> > +		if (kvm_create_dirty_bitmap(kvm, &new) < 0)
-> >  			goto out_free;
-> >  	}
-> >
-> >
+read side:
 
+  refcount_inc_not_zero(uses)
+  //stuff
+  if (refcount_dec_and_test(uses))
+     complete(completer)
+
+destroy side:
+  if (refcount_dec_and_test(uses))
+     complete(completer)
+  wait_for_completion(completer)
+  // refcount now permanently == 0
+
+Use a completion in driver code
+
+> +	mutex_lock(&vhost_vdpa.mutex);
+> +	device_destroy(vhost_vdpa.class,
+> +		       MKDEV(MAJOR(vhost_vdpa.devt), v->minor));
+> +	vhost_vdpa_free_minor(v->minor);
+> +	mutex_unlock(&vhost_vdpa.mutex);
+> +	kfree(v->vqs);
+> +	kfree(v);
+
+This use after-fress vs vhost_vdpa_open prior to it setting the open
+bit. Maybe use xarray, rcu and kfree_rcu ..
+
+> +static int __init vhost_vdpa_init(void)
+> +{
+> +	int r;
+> +
+> +	idr_init(&vhost_vdpa.idr);
+> +	mutex_init(&vhost_vdpa.mutex);
+> +	init_waitqueue_head(&vhost_vdpa.release_q);
+> +
+> +	/* /dev/vhost-vdpa/$vdpa_device_index */
+> +	vhost_vdpa.class = class_create(THIS_MODULE, "vhost-vdpa");
+> +	if (IS_ERR(vhost_vdpa.class)) {
+> +		r = PTR_ERR(vhost_vdpa.class);
+> +		goto err_class;
+> +	}
+> +
+> +	vhost_vdpa.class->devnode = vhost_vdpa_devnode;
+> +
+> +	r = alloc_chrdev_region(&vhost_vdpa.devt, 0, MINORMASK + 1,
+> +				"vhost-vdpa");
+> +	if (r)
+> +		goto err_alloc_chrdev;
+> +
+> +	cdev_init(&vhost_vdpa.cdev, &vhost_vdpa_fops);
+> +	r = cdev_add(&vhost_vdpa.cdev, vhost_vdpa.devt, MINORMASK + 1);
+> +	if (r)
+> +		goto err_cdev_add;
+
+It is very strange, is the intention to create a single global char
+dev?
+
+If so, why is there this:
+
++static int vhost_vdpa_open(struct inode *inode, struct file *filep)
++{
++	struct vhost_vdpa *v;
++	struct vhost_dev *dev;
++	struct vhost_virtqueue **vqs;
++	int nvqs, i, r, opened;
++
++	v = vhost_vdpa_get_from_minor(iminor(inode));
+
+?
+
+If the idea is to create a per-vdpa char dev then this stuff belongs
+in vhost_vdpa_probe(), the cdev should be part of the vhost_vdpa, and
+the above should be container_of not an idr lookup.
+
+Jason
