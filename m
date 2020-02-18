@@ -2,149 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2849E162A95
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 17:30:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14E78162AA3
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 17:31:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727462AbgBRQav (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 11:30:51 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6060 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726528AbgBRQau (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 11:30:50 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01IGLSm3196043
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 11:30:48 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y6dq7besv-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 11:30:48 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 18 Feb 2020 16:30:46 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 18 Feb 2020 16:30:43 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01IGTjio48431498
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Feb 2020 16:29:46 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4F6D742047;
-        Tue, 18 Feb 2020 16:30:41 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8BC284204D;
-        Tue, 18 Feb 2020 16:30:40 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.58.100])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Feb 2020 16:30:40 +0000 (GMT)
-Subject: Re: [PATCH v2 39/42] example for future extension: mm:gup/writeback:
- add callbacks for inaccessible pages: error cases
-To:     Will Deacon <will@kernel.org>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-40-borntraeger@de.ibm.com>
- <20200218162546.GC1133@willie-the-truck>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Tue, 18 Feb 2020 17:30:40 +0100
+        id S1727601AbgBRQbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 11:31:11 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56655 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726557AbgBRQbJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 11:31:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582043469;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1wux/ShdRZLS6eqfJ1i2bb+05bcGXuWlAmnT6X3Ge3Y=;
+        b=e2zwp3M0doguu5zBs08IxyVx/WlV6jSmV+OyqiO1oHFvm9Hyg9+FqL0liHoGptD2Hp2ZMV
+        182RbtHRwwkyQqwpaJrpE7AQGDiteNdPmyX2O52Jyr4BgumoLiSNwHgaKqQ399IoY9gHt9
+        hRucxEFNdA1CjETJnYVGUMqp8Di0fJQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-rlZi1ZgUNh2Osi-u5HJYvQ-1; Tue, 18 Feb 2020 11:31:06 -0500
+X-MC-Unique: rlZi1ZgUNh2Osi-u5HJYvQ-1
+Received: by mail-wr1-f70.google.com with SMTP id a12so11087898wrn.19
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 08:31:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1wux/ShdRZLS6eqfJ1i2bb+05bcGXuWlAmnT6X3Ge3Y=;
+        b=BFFI9cXZVkLT71IdQiQq/ZCB7e7Lc7HnIZc2COnmsY5BWF8q6J7I9nT8dRt81toQCn
+         X20bsyQ2VDNGUNzM7r8K7+eqR4FIRMOPG+JFn+38nhuo7uqEgaR5iuEv87PEB2ppfGOJ
+         xUFjrZzj6yYCD9DoGDyFOM4DBeE7xp7mZXoeOF4eSPjD20ZfF+Y/YCQMdCrEwvMaxCFu
+         RhJ0Ux/2hnbSOWlraRhn2uGJzMXdXUDFQssbSLweD1nF+TmI0TxYnYJTp+OOQFAVrs7s
+         UYk04hhc73/EUSr6P7/t5eW43dlTO5P2nwbA6/8NbW4oMcABnGmaTINgL2XFqoKRMpgP
+         29EQ==
+X-Gm-Message-State: APjAAAVqVviFnB8htK5seT1EzSoEmN49ZaHty5iOZN2KbsRGyu3Htd4G
+        MkPWbbgnwadUO5KoZwPn51Y9tuDFoUzz30HM2ipagP7lNjGTQyTFOvz6EBf04YPrj/oOqXXg+3h
+        dFVFkt89xUGNC
+X-Received: by 2002:a1c:8055:: with SMTP id b82mr4053685wmd.127.1582043465298;
+        Tue, 18 Feb 2020 08:31:05 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxcbLjDdl8yYBOLssLztWaiKZt1qolfF/drqUpVyQbR31GyH51q/Z7meOxgMs3aCiblWpkLYA==
+X-Received: by 2002:a1c:8055:: with SMTP id b82mr4053661wmd.127.1582043465086;
+        Tue, 18 Feb 2020 08:31:05 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:59c7:c3ee:2dec:d2b4? ([2001:b07:6468:f312:59c7:c3ee:2dec:d2b4])
+        by smtp.gmail.com with ESMTPSA id e6sm4179931wme.3.2020.02.18.08.31.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Feb 2020 08:31:04 -0800 (PST)
+Subject: Re: [PATCH v4 1/2] KVM: X86: Less kvmclock sync induced vmexits after
+ VM boots
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <kernellwp@gmail.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <1581988630-19182-1-git-send-email-wanpengli@tencent.com>
+ <87r1ys7xpk.fsf@vitty.brq.redhat.com>
+ <e6caee13-f8f7-596c-fb37-6120e7c25f99@redhat.com>
+ <87mu9f97uv.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8804030e-db83-d212-d712-807833f9fd7e@redhat.com>
+Date:   Tue, 18 Feb 2020 17:31:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200218162546.GC1133@willie-the-truck>
+In-Reply-To: <87mu9f97uv.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021816-0016-0000-0000-000002E80300
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021816-0017-0000-0000-0000334B17CD
-Message-Id: <e7f91b4f-455f-5fc7-19ab-51362dec4e62@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-18_04:2020-02-18,2020-02-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 impostorscore=0
- spamscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 clxscore=1015
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002180121
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 18.02.20 17:25, Will Deacon wrote:
-> On Fri, Feb 14, 2020 at 05:26:55PM -0500, Christian Borntraeger wrote:
->> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>
->> This is a potential extension to do error handling if we fail to
->> make the page accessible if we know what others need.
->>
->> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->> ---
->>  mm/gup.c            | 17 ++++++++++++-----
->>  mm/page-writeback.c |  6 +++++-
->>  2 files changed, 17 insertions(+), 6 deletions(-)
+On 18/02/20 17:29, Vitaly Kuznetsov wrote:
+>> No, it executes after 5 minutes.  I agree that the patch shouldn't be
+>> really necessary, though you do save on cacheline bouncing due to
+>> test_and_set_bit.
 > 
-> Sorry, I missed this when replying elsewhere in the thread!
-> Anyway, looks good to me:
-> 
-> Acked-by: Will Deacon <will@kernel.org>
+> True, but the changelog should probably be updated then.
 
-I can use that for a combined patch (this one merged into the first) ? Correct?
+Yes, I agree.
+
+Paolo
 
