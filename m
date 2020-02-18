@@ -2,105 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D057162ACB
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 17:37:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A49D7162B2A
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 17:56:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726512AbgBRQhr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 11:37:47 -0500
-Received: from mga18.intel.com ([134.134.136.126]:50244 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726399AbgBRQhr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 11:37:47 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Feb 2020 08:37:46 -0800
-X-IronPort-AV: E=Sophos;i="5.70,456,1574150400"; 
-   d="scan'208";a="224189171"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Feb 2020 08:37:46 -0800
-Message-ID: <31383bb111737c9f8ffbb1e6e4446cb4fd620a53.camel@linux.intel.com>
-Subject: Re: [PATCH v17 0/9] mm / virtio: Provide support for free page
- reporting
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     mgorman@techsingularity.net
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, david@redhat.com, mst@redhat.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        yang.zhang.wz@gmail.com, pagupta@redhat.com,
-        konrad.wilk@oracle.com, nitesh@redhat.com, riel@surriel.com,
-        willy@infradead.org, lcapitulino@redhat.com, dave.hansen@intel.com,
-        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, mhocko@kernel.org, vbabka@suse.cz,
-        osalvador@suse.de
-Date:   Tue, 18 Feb 2020 08:37:46 -0800
-In-Reply-To: <20200211161927.1068232d044e892782aef9ae@linux-foundation.org>
-References: <20200211224416.29318.44077.stgit@localhost.localdomain>
-         <20200211150510.ca864143284c8ccaa906f524@linux-foundation.org>
-         <c45a6e8ab6af089da1001c0db28783dcea6bebd5.camel@linux.intel.com>
-         <20200211161927.1068232d044e892782aef9ae@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+        id S1726444AbgBRQ4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 11:56:43 -0500
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21135 "EHLO
+        sender4-of-o51.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726360AbgBRQ4m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 11:56:42 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1582044984; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=B5WIwq8BMSN2XFAB6cj7t1cp9ThG8HcZOpulk/Lax9xlSYIpn1nQJXaCD+fjth5b19QQB1PCtqmwIsvzByU8yI4myW8q9yYEZ1q+AsmTJiqEeQ9Lw0sTOW0/x/tbXeeYXEZzGNUoRpoJ13norZW7V9hD1/HJvX9SqRIi66cGWnQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1582044984; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
+        bh=IWA3fRvBQd88MJbWury/cdTMguSSAhsrpbhrocUey24=; 
+        b=Zw4dTU0YvFOJSG99IHtSp4z6kLjt6NgxbOFo2LV/0Zpd3dcJUFPBtEzBUpHm0+4FK0CsflOBhVQ0lzoKafaqbaeJ13Z4na+dPhg0HEbgBPpIpbkinwZDfAJ5iH6heUeurk2ZpGYqMPaIRQ4xREuOPO3i9IPIq3pRnykVfzs++wg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        dkim=pass  header.i=patchew.org;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 1582044980660311.482906912614; Tue, 18 Feb 2020 08:56:20 -0800 (PST)
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20200218144415.94722-1-vkuznets@redhat.com>
+Subject: Re: [PATCH RFC] target/i386: filter out VMX_PIN_BASED_POSTED_INTR when enabling SynIC
+Message-ID: <158204497899.18888.4612758973157728331@a1bbccc8075a>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     vkuznets@redhat.com
+Cc:     qemu-devel@nongnu.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+        mtosatti@redhat.com, liran.alon@oracle.com, rkagan@virtuozzo.com,
+        pbonzini@redhat.com, rth@twiddle.net
+Date:   Tue, 18 Feb 2020 08:56:20 -0800 (PST)
+X-ZohoMailClient: External
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2020-02-11 at 16:19 -0800, Andrew Morton wrote:
-> On Tue, 11 Feb 2020 15:55:31 -0800 Alexander Duyck <alexander.h.duyck@linux.intel.com> wrote:
-> 
-> > On the host I just have to monitor /proc/meminfo and I can see the
-> > difference. I get the following results on the host, in the enabled case
-> > it takes about 30 seconds for it to settle into the final state since I
-> > only report page a bit at a time:
-> > Baseline/Applied
-> >   MemTotal:    131963012 kB
-> >   MemFree:      95189740 kB
-> > 
-> > Enabled:
-> >   MemTotal:    131963012 kB
-> >   MemFree:     126459472 kB
-> > 
-> > This is what I was referring to with the comment above. I had a test I was
-> > running back around the first RFC that consisted of bringing up enough VMs
-> > so that there was a bit of memory overcommit and then having the VMs in
-> > turn run memhog. As I recall the difference between the two was  something
-> > like a couple minutes to run through all the VMs as the memhog would take
-> > up to 40+ seconds for one that was having to pull from swap while it took
-> > only 5 to 7 seconds for the VMs that were all running the page hinting.
-> > 
-> > I had referenced it here in the RFC:
-> > https://lore.kernel.org/lkml/20190204181118.12095.38300.stgit@localhost.localdomain/
-> > 
-> > I have been verifying the memory has been getting freed but didn't feel
-> > like the test added much value so I haven't added it to the cover page for
-> > a while since the time could vary widely and is dependent on things like
-> > the disk type used for the host swap since my SSD is likely faster than
-> > spinning rust, but may not be as fast as other SSDs on the market. Since
-> > the disk speed can play such a huge role I wasn't comfortable posting
-> > numbers since the benefits could vary so widely.
-> 
-> OK, thanks.  I'll add the patches to the mm pile.  The new
-> mm/page_reporting.c is unreviewed afaict, so I guess you own that for
-> now ;)
-> 
-> It would be very nice to get some feedback from testers asserting "yes,
-> this really helped my workload" but I understand this sort of testing
-> is hard to obtain at this stage.
-> 
-
-Mel,
-
-Any ETA on when you would be available to review these patches? They are
-now in Andrew's tree and in linux-next. I am hoping to get any remaining
-review from the community sorted out in the next few weeks so I can move
-onto focusing on how best to exert pressure on the page cache so that we
-can keep the guest memory footprint small.
-
-Thanks.
-
-- Alex
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIxODE0NDQxNS45NDcy
+Mi0xLXZrdXpuZXRzQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
+b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
+bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBO
+RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBK
+PTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKLS4uLi4uLi4uLi4uLi4uLi4u
+Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
+Li4uLi4uLi4uLi4uLi4uLi4KKy4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi5FLi4u
+Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4KKz09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT0KK0VSUk9SOiB0ZXN0X3BhdXNlIChfX21haW5fXy5UZXN0U2luZ2xlQmxvY2tk
+ZXYpCistLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tCitUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6Cisg
+IEZpbGUgIjA0MSIsIGxpbmUgMTA2LCBpbiB0ZXN0X3BhdXNlCi0tLQogUmFuIDkxIHRlc3RzCiAK
+LU9LCitGQUlMRUQgKGVycm9ycz0xKQogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwNDIKICBURVNU
+ICAgIGlvdGVzdC1xY293MjogMDQzCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDA0NgotLS0KICBU
+RVNUICAgIGlvdGVzdC1xY293MjogMjgzCkZhaWx1cmVzOiAwNDEKRmFpbGVkIDEgb2YgMTE2IGlv
+dGVzdHMKbWFrZTogKioqIFtjaGVjay10ZXN0cy9jaGVjay1ibG9jay5zaF0gRXJyb3IgMQpUcmFj
+ZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9j
+a2VyLnB5IiwgbGluZSA2NjQsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkpCi0tLQog
+ICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxs
+ZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywg
+Jy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1kMTAyYzFjMjEzZjk0ODZkYWE0ZGRi
+OWZmNjg2NDA0YicsICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5j
+b25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05G
+SUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAn
+LWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICct
+dicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2Nj
+YWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC13anR1dG9vNy9zcmMv
+ZG9ja2VyLXNyYy4yMDIwLTAyLTE4LTExLjQzLjQxLjExMjIzOi92YXIvdG1wL3FlbXU6eixybycs
+ICdxZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1
+cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFl
+bXUuaW5zdGFuY2UudXVpZD1kMTAyYzFjMjEzZjk0ODZkYWE0ZGRiOWZmNjg2NDA0YgptYWtlWzFd
+OiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC13anR1dG9vNy9zcmMnCm1ha2U6ICoqKiBbZG9ja2Vy
+LXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTJtMzguNjYycwp1c2Vy
+ICAgIDBtOC44MjVzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
+dy5vcmcvbG9ncy8yMDIwMDIxODE0NDQxNS45NDcyMi0xLXZrdXpuZXRzQHJlZGhhdC5jb20vdGVz
+dGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
