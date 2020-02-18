@@ -2,129 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE72E163520
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 22:34:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6EE316352B
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 22:35:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726808AbgBRVek (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 16:34:40 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:44292 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726481AbgBRVek (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 16:34:40 -0500
-Received: by mail-pf1-f196.google.com with SMTP id y5so11303784pfb.11
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2020 13:34:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=SBOJ8T4utDvYPiE0OTTO7CUK+naC2X4suhjjDEv6LL4=;
-        b=dExiKNGZlBtDf7hUSf4rVsh13WCjcG9t5Bdulzb35GTIcoXedUySK8h3kR2YQDpMQs
-         r1zoMxQ4ehTg2SG/32PPtbflzF22b1r/E/wP1PXtxF/KCbBq9Qys1TiuXgQ5krT4zz7Z
-         6zosWvFLDPeJx9J+e6M2/6o/6ttomwCwZNEE1kJ+pq/OqVRi1D7soZe3u1ZfIWnOtbkJ
-         PUSLxyZXGMJxHiDQl8/1w4zFjBUowijDyigDoWBJF/NGjQvZSZFrtZAml7Lc7suaQHW+
-         9WkYKZEe3WA27iK/26JzwY7Q0p+/R38m+XdX+XGDWkLIiC7CY0/Sb79dTfUKCyI4s2Ck
-         tFew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=SBOJ8T4utDvYPiE0OTTO7CUK+naC2X4suhjjDEv6LL4=;
-        b=J8f9UO+aTw+ez920cUWopPsNA1kMs7O/BpB68i9Nu79ifSU5AZSGRknUrkOeRfrwue
-         CTtYGHYe82AYRlVKM5UuRSFKvD7xtr6slIlWKEh2dWY2CEOJUn9MHfoqFBsv6bSIVG4I
-         kQ6T/OcR5Cp5vXm9SxQwZYXYjXN4AswPBQXuTrFwEvI7PON4Z1wPkScUNWA1Pd2RZD84
-         hGaGhNoSK5991XiW+mc4Pwc6Anw4dGsax3QLLN2Iwdah04z6oHMthpR82kXpmDA362p0
-         lb7w0uGJTIsN/Kl4hxnGj7WwCtgseEFoxFbtA0aPN4ZfXIiYMtBSuJmlPMTUTUWCYt6y
-         MWxg==
-X-Gm-Message-State: APjAAAVKHx3Ux2928CZgkpQpT7VUmx7/Ttyu7lqvWEBg8usc6jCpyp0L
-        ZNLyKSNjKTZ5Ng/639eOE66aow==
-X-Google-Smtp-Source: APXvYqwNHrRjMtaB9u+Ff4cPws+OQoqOgz3l3RZiwtoYTFRXw1d4mjdChuyHSGVwSsvHA6eW6twvcw==
-X-Received: by 2002:a63:6c09:: with SMTP id h9mr24176790pgc.34.1582061677879;
-        Tue, 18 Feb 2020 13:34:37 -0800 (PST)
-Received: from google.com ([2620:15c:100:202:d78:d09d:ec00:5fa7])
-        by smtp.gmail.com with ESMTPSA id g24sm5234048pfk.92.2020.02.18.13.34.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2020 13:34:37 -0800 (PST)
-Date:   Tue, 18 Feb 2020 13:34:33 -0800
-From:   Oliver Upton <oupton@google.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: Suppress warning in __kvm_gfn_to_hva_cache_init
-Message-ID: <20200218213433.GA164161@google.com>
-References: <20200218184756.242904-1-oupton@google.com>
- <20200218190729.GD28156@linux.intel.com>
+        id S1727857AbgBRVft (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 16:35:49 -0500
+Received: from mga04.intel.com ([192.55.52.120]:31054 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727804AbgBRVft (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Feb 2020 16:35:49 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Feb 2020 13:35:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,458,1574150400"; 
+   d="scan'208";a="382589447"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga004.jf.intel.com with ESMTP; 18 Feb 2020 13:35:48 -0800
+Date:   Tue, 18 Feb 2020 13:35:48 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org
+Subject: Re: [PATCH v2 01/42] mm:gup/writeback: add callbacks for
+ inaccessible pages
+Message-ID: <20200218213548.GI28156@linux.intel.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-2-borntraeger@de.ibm.com>
+ <107a8a72-b745-26f2-5805-c4d99ce77b35@redhat.com>
+ <dd33cc1a-214d-b949-8f5e-9c2d40a8e518@de.ibm.com>
+ <a8f8786e-1ed0-0c44-08d0-ebc58f43ae40@redhat.com>
+ <20200218154610.GB27565@linux.intel.com>
+ <20200218160242.GB1133@willie-the-truck>
+ <d2536349-bc47-2b0f-79dc-4bb7cea5182d@de.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200218190729.GD28156@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <d2536349-bc47-2b0f-79dc-4bb7cea5182d@de.ibm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Sean,
-
-On Tue, Feb 18, 2020 at 11:07:29AM -0800, Sean Christopherson wrote:
-> On Tue, Feb 18, 2020 at 10:47:56AM -0800, Oliver Upton wrote:
-> > Particularly draconian compilers warn of a possible uninitialized use of
-> > the nr_pages_avail variable. Silence this warning by initializing it to
-> > zero.
-> 
-> Can you check if the warning still exists with commit 6ad1e29fe0ab ("KVM:
-> Clean up __kvm_gfn_to_hva_cache_init() and its callers")?  I'm guessing
-> (hoping?) the suppression is no longer necessary.
-
-Hmm. I rebased this patch right before sending out + it seems that it is
-required (at least for me) to silence the compiler warning. For good
-measure, I ran git branch --contains to ensure I had your change. Looks
-like my topic branch did in fact have your fix.
-
---
-Oliver
-
-> commit 6ad1e29fe0aba843dfffc714fced0ef6a2e19502
-> Author: Sean Christopherson <sean.j.christopherson@intel.com>
-> Date:   Thu Jan 9 14:58:55 2020 -0500
-> 
->     KVM: Clean up __kvm_gfn_to_hva_cache_init() and its callers
-> 
->     Barret reported a (technically benign) bug where nr_pages_avail can be
->     accessed without being initialized if gfn_to_hva_many() fails.
-> 
->       virt/kvm/kvm_main.c:2193:13: warning: 'nr_pages_avail' may be
->       used uninitialized in this function [-Wmaybe-uninitialized]
-> 
->     Rather than simply squashing the warning by initializing nr_pages_avail,
->     fix the underlying issues by reworking __kvm_gfn_to_hva_cache_init() to
->     return immediately instead of continuing on.  Now that all callers check
->     the result and/or bail immediately on a bad hva, there's no need to
->     explicitly nullify the memslot on error.
-> 
->     Reported-by: Barret Rhoden <brho@google.com>
->     Fixes: f1b9dd5eb86c ("kvm: Disallow wraparound in kvm_gfn_to_hva_cache_init")
->     Cc: Jim Mattson <jmattson@google.com>
->     Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Tue, Feb 18, 2020 at 05:15:57PM +0100, Christian Borntraeger wrote:
 > 
 > 
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 18.02.20 17:02, Will Deacon wrote:
+> > On Tue, Feb 18, 2020 at 07:46:10AM -0800, Sean Christopherson wrote:
+> >> On Tue, Feb 18, 2020 at 09:27:20AM +0100, David Hildenbrand wrote:
+> >>> On 17.02.20 12:10, Christian Borntraeger wrote:
+> >>>> So yes, if everything is setup properly this should not fail in real life
+> >>>> and only we have a kernel (or firmware) bug.
+> >>>>
+> >>>
+> >>> Then, without feedback from other possible users, this should be a void
+> >>> function. So either introduce error handling or convert it to a void for
+> >>> now (and add e.g., BUG_ON and a comment inside the s390x implementation).
+> >>
+> >> My preference would also be for a void function (versus ignoring an int
+> >> return).
 > > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 70f03ce0e5c1..dc8a67ad082d 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -2219,7 +2219,7 @@ static int __kvm_gfn_to_hva_cache_init(struct kvm_memslots *slots,
-> >  	gfn_t start_gfn = gpa >> PAGE_SHIFT;
-> >  	gfn_t end_gfn = (gpa + len - 1) >> PAGE_SHIFT;
-> >  	gfn_t nr_pages_needed = end_gfn - start_gfn + 1;
-> > -	gfn_t nr_pages_avail;
-> > +	gfn_t nr_pages_avail = 0;
-> >  
-> >  	/* Update ghc->generation before performing any error checks. */
-> >  	ghc->generation = slots->generation;
-> > -- 
-> > 2.25.0.265.gbab2e86ba0-goog
-> > 
+> > The gup code could certainly handle the error value, although the writeback
+> > is a lot less clear (so a BUG_ON() would seem to be sufficient for now).
+> 
+> Sean, David. Can we agree on merging patch 39?
+
+I'm a-ok with adding error checking, ignoring the return value is the only
+option I don't like :-)
