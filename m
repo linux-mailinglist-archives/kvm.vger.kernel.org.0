@@ -2,210 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 51CC3161E7E
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 02:23:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6356C161E9C
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 02:41:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726266AbgBRBX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Feb 2020 20:23:27 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:45923 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726070AbgBRBX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Feb 2020 20:23:26 -0500
-Received: by mail-oi1-f194.google.com with SMTP id v19so18517030oic.12;
-        Mon, 17 Feb 2020 17:23:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8upeiht+r89HKGNg+QWPXHKtgwxpcyyqCLrriB2c5lg=;
-        b=uJyagPQHBQMc2p72vARugaNjTaNi9Auy6/mDOPA5lUeycInuT7YlArbkMDLQYTvVXX
-         TCKNnsounbc8Yfx4m1g0Zozj0e5y2PVrxxehGELSeIlRuoH4ML336bnS6hrw3I2Uf1ed
-         LkBBeiHyRGQHYUiIwSD0XhDoh8ya1uEVOaBrOax5YZPwwINr5ZJEMeBzpYhs4KOSbzC+
-         4ikSkKpr8ONAwArmzwUXefIBrG2W916T8N2pX9iGj/59UneS3E7uhmwIj3BdF0Mx3L5h
-         YeNFvRAdRGD915XUuqC0rfLaTU0M8YmSeyJccgChu9S/Ap+5mk9eNjz5QY5KmBWragxZ
-         P5gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8upeiht+r89HKGNg+QWPXHKtgwxpcyyqCLrriB2c5lg=;
-        b=GEu4xF8drWbSPl1xSQyF3reYypbxoofo2f2+7lZ4J+rk3LpcAlXrvX9R83bpN8EggM
-         89F15dsajGkTJ1CG2ABgraWWWTYuYqUErhynFvTuycJ6dbj16pEwFxN7GqcPzlwXPGcz
-         qXfc8l9l0FpRZCVd/uaaIwN0KxMySUvif3cRbtjR5vt2Xcc8a2/x6Ggy/kbj7qhc5SR7
-         fv7KJvVlnHZTdDdJ7G7/pBz4CgPHXIfZYmJxnNqA2XCd6XDYoT7zElW4lBVSwaDaaW01
-         faWgwyLcinkNWp+juhilXyVsBHklJy4YSdW1a2ARzGkuzm1r0BiwvZgSGPnR3JHO8T02
-         RiPQ==
-X-Gm-Message-State: APjAAAWoOIdjeL5703So4DDx+2W3dOCssCrMSwRRLyGJJaWYdJ5cZLCU
-        LT9suDRDMqb3y3CRQwLGLeYhTri4GZDj67Tm+Ev/AgstMEM=
-X-Google-Smtp-Source: APXvYqx4hj1wk1F9MvBZvnoeZOuCQkj7QqeDnG2So1wH3pvraNelBYrkulWsOcWrGas5nPfNZeZHSWAbw8cdZM32a7g=
-X-Received: by 2002:aca:8d5:: with SMTP id 204mr1083369oii.141.1581989005963;
- Mon, 17 Feb 2020 17:23:25 -0800 (PST)
+        id S1726185AbgBRBlg convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 17 Feb 2020 20:41:36 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2581 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726097AbgBRBlg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Feb 2020 20:41:36 -0500
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.54])
+        by Forcepoint Email with ESMTP id AA90F4EEC760BFC529C0;
+        Tue, 18 Feb 2020 09:41:33 +0800 (CST)
+Received: from dggeme715-chm.china.huawei.com (10.1.199.111) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 18 Feb 2020 09:41:33 +0800
+Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
+ dggeme715-chm.china.huawei.com (10.1.199.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Tue, 18 Feb 2020 09:41:33 +0800
+Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
+ dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
+ Tue, 18 Feb 2020 09:41:33 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
+Subject: Re: [PATCH] KVM: x86: don't notify userspace IOAPIC on edge-triggered
+ interrupt EOI
+Thread-Topic: [PATCH] KVM: x86: don't notify userspace IOAPIC on
+ edge-triggered interrupt EOI
+Thread-Index: AdXl+vxCGIl6i2nBTZGSqb8vkSSkRw==
+Date:   Tue, 18 Feb 2020 01:41:33 +0000
+Message-ID: <edf7454be5a743928cbc1bec5dce238d@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.221.158]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-References: <CANRm+CxGOeGQ0vV9ueBgjUDvkzH29EQWLe4GQGDvOhm3idM6NQ@mail.gmail.com>
- <b2ee716e-8ef0-3940-0841-28c5a245b207@redhat.com>
-In-Reply-To: <b2ee716e-8ef0-3940-0841-28c5a245b207@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 18 Feb 2020 09:23:15 +0800
-Message-ID: <CANRm+CwQcg5u=BFYrvRTwLvbVFCpXQyF2wb65org6pdMpSb8mg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: Pre-allocate 1 cpumask variable per cpu for
- both pv tlb and pv ipis
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Feb 2020 at 01:11, Paolo Bonzini <pbonzini@redhat.com> wrote:
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+>linmiaohe <linmiaohe@huawei.com> writes:
 >
-> On 10/02/20 07:38, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > Nick Desaulniers Reported:
-> >
-> >   When building with:
-> >   $ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
-> >   The following warning is observed:
-> >   arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
-> >   function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
-> >   static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
-> >   vector)
-> >               ^
-> >   Debugging with:
-> >   https://github.com/ClangBuiltLinux/frame-larger-than
-> >   via:
-> >   $ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
-> >     kvm_send_ipi_mask_allbutself
-> >   points to the stack allocated `struct cpumask newmask` in
-> >   `kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
-> >   potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
-> >   the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
-> >   8192, making a single instance of a `struct cpumask` 1024 B.
-> >
-> > This patch fixes it by pre-allocate 1 cpumask variable per cpu and use it for
-> > both pv tlb and pv ipis..
-> >
-> > Reported-by: Nick Desaulniers <ndesaulniers@google.com>
-> > Acked-by: Nick Desaulniers <ndesaulniers@google.com>
-> > Cc: Peter Zijlstra <peterz@infradead.org>
-> > Cc: Nick Desaulniers <ndesaulniers@google.com>
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> > v1 -> v2:
-> >  * remove '!alloc' check
-> >  * use new pv check helpers
-> >
-> >  arch/x86/kernel/kvm.c | 33 +++++++++++++++++++++------------
-> >  1 file changed, 21 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> > index 76ea8c4..377b224 100644
-> > --- a/arch/x86/kernel/kvm.c
-> > +++ b/arch/x86/kernel/kvm.c
-> > @@ -432,6 +432,8 @@ static bool pv_tlb_flush_supported(void)
-> >          kvm_para_has_feature(KVM_FEATURE_STEAL_TIME));
-> >  }
-> >
-> > +static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
-> > +
-> >  #ifdef CONFIG_SMP
-> >
-> >  static bool pv_ipi_supported(void)
-> > @@ -510,12 +512,12 @@ static void kvm_send_ipi_mask(const struct
-> > cpumask *mask, int vector)
-> >  static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask,
-> > int vector)
-> >  {
-> >      unsigned int this_cpu = smp_processor_id();
-> > -    struct cpumask new_mask;
-> > +    struct cpumask *new_mask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
-> >      const struct cpumask *local_mask;
-> >
-> > -    cpumask_copy(&new_mask, mask);
-> > -    cpumask_clear_cpu(this_cpu, &new_mask);
-> > -    local_mask = &new_mask;
-> > +    cpumask_copy(new_mask, mask);
-> > +    cpumask_clear_cpu(this_cpu, new_mask);
-> > +    local_mask = new_mask;
-> >      __send_ipi_mask(local_mask, vector);
-> >  }
-> >
-> > @@ -595,7 +597,6 @@ static void __init kvm_apf_trap_init(void)
-> >      update_intr_gate(X86_TRAP_PF, async_page_fault);
-> >  }
-> >
-> > -static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
-> >
-> >  static void kvm_flush_tlb_others(const struct cpumask *cpumask,
-> >              const struct flush_tlb_info *info)
-> > @@ -603,7 +604,7 @@ static void kvm_flush_tlb_others(const struct
-> > cpumask *cpumask,
-> >      u8 state;
-> >      int cpu;
-> >      struct kvm_steal_time *src;
-> > -    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_tlb_mask);
-> > +    struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
-> >
-> >      cpumask_copy(flushmask, cpumask);
-> >      /*
-> > @@ -642,6 +643,7 @@ static void __init kvm_guest_init(void)
-> >      if (pv_tlb_flush_supported()) {
-> >          pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
-> >          pv_ops.mmu.tlb_remove_table = tlb_remove_table;
-> > +        pr_info("KVM setup pv remote TLB flush\n");
-> >      }
-> >
-> >      if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
-> > @@ -748,24 +750,31 @@ static __init int activate_jump_labels(void)
-> >  }
-> >  arch_initcall(activate_jump_labels);
-> >
-> > -static __init int kvm_setup_pv_tlb_flush(void)
-> > +static __init int kvm_alloc_cpumask(void)
-> >  {
-> >      int cpu;
-> > +    bool alloc = false;
-> >
-> >      if (!kvm_para_available() || nopv)
-> >          return 0;
-> >
-> > -    if (pv_tlb_flush_supported()) {
-> > +    if (pv_tlb_flush_supported())
-> > +        alloc = true;
-> > +
-> > +#if defined(CONFIG_SMP)
-> > +    if (pv_ipi_supported())
-> > +        alloc = true;
-> > +#endif
-> > +
-> > +    if (alloc)
-> >          for_each_possible_cpu(cpu) {
-> > -            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_tlb_mask, cpu),
-> > +            zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
-> >                  GFP_KERNEL, cpu_to_node(cpu));
-> >          }
-> > -        pr_info("KVM setup pv remote TLB flush\n");
-> > -    }
-> >
-> >      return 0;
-> >  }
-> > -arch_initcall(kvm_setup_pv_tlb_flush);
-> > +arch_initcall(kvm_alloc_cpumask);
-> >
-> >  #ifdef CONFIG_PARAVIRT_SPINLOCKS
-> >
-> > --
-> > 2.7.4
-> >
+>> @@ -417,7 +417,7 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
+>>  
+>>  			kvm_set_msi_irq(vcpu->kvm, entry, &irq);
+>>  
+>> -			if (irq.level &&
+>> +			if (irq.trig_mode &&
+>>  			    kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+>>  						irq.dest_id, irq.dest_mode))
+>>  				__set_bit(irq.vector, ioapic_handled_vectors);
 >
-> Also has messed up whitespace, can you resend please?
+>Assuming Radim's comment (13db77347db1) is correct, the change in
+>3159d36ad799 looks wrong and your patch restores the status quo. Actually, kvm_set_msi_irq() always sets irq->level = 1 so checking it is pointless.
+>
+>Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-My fault, just resend all of them.
+Thanks for review.
 
-    Wanpeng
+>
+> (but it is actually possible that there's a buggy userspace out there which expects EOI notifications; we won't find out unless we try to fix the bug).
+>
+
+Yeh, there may be a buggy userspace hidden from this unexpected EOI notifications. It may not be worth enough to fix it as we may spend many time
+to catch the bug.
+Perhaps we should only remove the pointless checking of irq->level for cleanup. :)
+
