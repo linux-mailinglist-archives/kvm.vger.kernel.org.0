@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EFAA51623F8
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:53:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 791D0162400
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 10:54:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726558AbgBRJxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 04:53:40 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25289 "EHLO
+        id S1726438AbgBRJym (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 04:54:42 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49691 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726363AbgBRJxk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 04:53:40 -0500
+        by vger.kernel.org with ESMTP id S1726373AbgBRJym (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 04:54:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582019619;
+        s=mimecast20190719; t=1582019680;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=tClP+OX+OOpDD3nWzUP0SsgGQ4K+RknzO9RmHmmwV18=;
-        b=WJuZcMRO2pB64bf+b1ztISHoe+b5UnjmyWYfG47KBBe5CovaNNu/YWphGkyuncXDhnLy+j
-        WxiBIuMx01P9onStwpK4601yqGCyAcBxY4+BHwvomgzvuQmZWsl8u8gA2LPRvN8l92QkVg
-        9PFTrjphfG7xtTS0Q93oBQBHc9DNnNU=
+        bh=zoCKDQV9qQ809ibwKBCPXIJuk1J7QejXw7X5cnIZZrU=;
+        b=fdwQEkncTP5C5W0IsgE3g9ZdNHn2fXefvCHaTowi90bSY8+lBr+f8lLEhC+qvzinmlv35I
+        pM9nh2FdicE1+WNBVFRoHEMEMe9od6Az/R91HgJ7UnZKJZXxqr2FhdfuVXW+QJ7KS4xALd
+        Jhd9nH3HrRF9OkuaMRcIzXJP5LhoOb0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-__dXmzhYPlC0-vZUPBgUmw-1; Tue, 18 Feb 2020 04:53:35 -0500
-X-MC-Unique: __dXmzhYPlC0-vZUPBgUmw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-238-RZhli8JtMEm6YrL1nG3k1g-1; Tue, 18 Feb 2020 04:54:35 -0500
+X-MC-Unique: RZhli8JtMEm6YrL1nG3k1g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA2DA800D55;
-        Tue, 18 Feb 2020 09:53:33 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0696107ACCC;
+        Tue, 18 Feb 2020 09:54:33 +0000 (UTC)
 Received: from [10.36.116.190] (ovpn-116-190.ams2.redhat.com [10.36.116.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A33E95D9E2;
-        Tue, 18 Feb 2020 09:53:31 +0000 (UTC)
-Subject: Re: [PATCH v2 34/42] KVM: s390: protvirt: do not inject interrupts
- after start
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 921D719481;
+        Tue, 18 Feb 2020 09:54:31 +0000 (UTC)
+Subject: Re: [PATCH v2 35/42] KVM: s390: protvirt: Add UV cpu reset calls
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -43,9 +42,10 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
 References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-35-borntraeger@de.ibm.com>
+ <20200214222658.12946-36-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,50 +91,87 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <4651fa57-5b2f-3a05-2347-7767bc675fa3@redhat.com>
-Date:   Tue, 18 Feb 2020 10:53:30 +0100
+Message-ID: <0b0b89f4-4c2d-9461-80c8-b38285e86360@redhat.com>
+Date:   Tue, 18 Feb 2020 10:54:30 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200214222658.12946-35-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200214222658.12946-36-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 14.02.20 23:26, Christian Borntraeger wrote:
-> As PSW restart is handled by the ultravisor (and we only get a start
-> notification) we must re-check the PSW after a start before injecting
-> interrupts.
+> From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> For protected VMs, the VCPU resets are done by the Ultravisor, as KVM
+> has no access to the VCPU registers.
+> 
+> Note that the ultravisor will only accept a call for the exact reset
+> that has been requested.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/s390/kvm/kvm-s390.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  arch/s390/include/asm/uv.h |  6 ++++++
+>  arch/s390/kvm/kvm-s390.c   | 20 ++++++++++++++++++++
+>  2 files changed, 26 insertions(+)
 > 
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index d59825d95b9d..d4fb54231932 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -36,7 +36,10 @@
+>  #define UVC_CMD_SET_SEC_CONF_PARAMS	0x0300
+>  #define UVC_CMD_UNPACK_IMG		0x0301
+>  #define UVC_CMD_VERIFY_IMG		0x0302
+> +#define UVC_CMD_CPU_RESET		0x0310
+> +#define UVC_CMD_CPU_RESET_INITIAL	0x0311
+>  #define UVC_CMD_PREPARE_RESET		0x0320
+> +#define UVC_CMD_CPU_RESET_CLEAR		0x0321
+>  #define UVC_CMD_CPU_SET_STATE		0x0330
+>  #define UVC_CMD_SET_UNSHARE_ALL		0x0340
+>  #define UVC_CMD_PIN_PAGE_SHARED		0x0341
+> @@ -59,8 +62,11 @@ enum uv_cmds_inst {
+>  	BIT_UVC_CMD_SET_SEC_PARMS = 11,
+>  	BIT_UVC_CMD_UNPACK_IMG = 13,
+>  	BIT_UVC_CMD_VERIFY_IMG = 14,
+> +	BIT_UVC_CMD_CPU_RESET = 15,
+> +	BIT_UVC_CMD_CPU_RESET_INITIAL = 16,
+>  	BIT_UVC_CMD_CPU_SET_STATE = 17,
+>  	BIT_UVC_CMD_PREPARE_RESET = 18,
+> +	BIT_UVC_CMD_CPU_PERFORM_CLEAR_RESET = 19,
+>  	BIT_UVC_CMD_UNSHARE_ALL = 20,
+>  	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
+>  	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
 > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 1b6963bbc96f..16af4d1a2c29 100644
+> index 16af4d1a2c29..932f7f32e82f 100644
 > --- a/arch/s390/kvm/kvm-s390.c
 > +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4436,6 +4436,13 @@ void kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
->  	/* Let's tell the UV that we want to start again */
->  	kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR, &rc, &rrc);
->  	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_STOPPED);
-> +	/*
-> +	 * The real PSW might have changed due to a RESTART interpreted by the
-> +	 * ultravisor. We block all interrupts and let the next sie exit
-> +	 * refresh our view.
-> +	 */
-> +	if (kvm_s390_pv_is_protected(vcpu->kvm))
-> +		vcpu->arch.sie_block->gpsw.mask &= ~PSW_INT_MASK;
+> @@ -4695,6 +4695,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  	void __user *argp = (void __user *)arg;
+>  	int idx;
+>  	long r;
+> +	u16 rc, rrc;
+>  
+>  	vcpu_load(vcpu);
+>  
+> @@ -4716,14 +4717,33 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  	case KVM_S390_CLEAR_RESET:
+>  		r = 0;
+>  		kvm_arch_vcpu_ioctl_clear_reset(vcpu);
+> +		if (kvm_s390_pv_handle_cpu(vcpu)) {
 
-Same comment as to the previous patch.
+_protected checks please. (if not already converted in your tree :) )
 
 
 -- 
