@@ -2,184 +2,279 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 97F1B162F04
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 19:51:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1503162F08
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2020 19:51:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726391AbgBRSvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 13:51:31 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:55179 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726296AbgBRSva (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Feb 2020 13:51:30 -0500
-Received: by mail-pj1-f65.google.com with SMTP id dw13so1419987pjb.4;
-        Tue, 18 Feb 2020 10:51:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=VVBvTCIz+yTpld7B2DsaTCEQHI9uyXmzgTeduGY+LYA=;
-        b=YyfD8RI2sOZkvpQX+EPsxFwPE+8W6Mqhbgaev0cp3lZfa1zBdEkHJwnYok6Q84CGw5
-         4MotE/7eB6g0ZFFCcYW59THKajcBFuVQkh9BFG99NU4OcPCBKIJ5IhyZ5S4hXa/oScm2
-         nJSmaVJsd7eIJneNj5ixjj6vNqkw18m3Z+AYZTXAPJwSTIctzoTUoqVaTLRt7mGsD+sH
-         I1tHTvOVQyjydoojWGlPS7DCuqsXCz2zvXVXBjr/KPWLvxOvhKdQMPPN7a8FmN+0QRCP
-         bOoSRgPbC+gfD5KTmFsJiwvSQTGqMFcHqg1hlbCyOdsHBv/KcWHzGF2qBRfQ2uM8e332
-         BFAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=VVBvTCIz+yTpld7B2DsaTCEQHI9uyXmzgTeduGY+LYA=;
-        b=JmwkiKjVioIH+MajnlXHcrTxgpJG7gYd++LcoQv+VhoiggcGoycobmlDhWGdQSNFcM
-         9Lg1xvgtA8qq++AmUR2Lvy4aoJo/FcR4kKJ5MYQfUCLZPRBEIdtJhl+hV6dTmK0zUnBA
-         M62K5rIbwkAWmaq8GSiGqLJdak6ixekJCbEiDZUoAprju1kyZ/0Nh2b/EyEsCo18QqN5
-         dve1sOy+RvVqGe3PSzX6tVYEFRz5hjxnRByKB/pqTi4O7fgYTLE72tjfhflUI7/iwSkV
-         +4Kxz/1kmti3la9KOwohnTQPzX2r1I0YLvStY5eU2r5xPcWeIcNOAhG+vDkDfJE5eF/w
-         uRJg==
-X-Gm-Message-State: APjAAAWYIO59qTijlxele266b6cOd6VoPDJjK11ydsY6L3U7c/BXG8Hr
-        AadVA/uWdwswqGHVQAqva2E=
-X-Google-Smtp-Source: APXvYqzvrBKSEU9iKuP0lRt9jwVl6eac+xJEeOlhpux5veVmUEO3+4YXawgvXtL/rE+XQnMB3A5eUQ==
-X-Received: by 2002:a17:902:7283:: with SMTP id d3mr21924336pll.118.1582051889702;
-        Tue, 18 Feb 2020 10:51:29 -0800 (PST)
-Received: from [10.67.49.41] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id gx2sm4000789pjb.18.2020.02.18.10.51.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Feb 2020 10:51:29 -0800 (PST)
-Subject: Re: [RFC PATCH 00/11] Removing Calxeda platform support
-To:     Rob Herring <robh@kernel.org>,
-        Andre Przywara <andre.przywara@arm.com>
-Cc:     Mark Langsdorf <mlangsdo@redhat.com>, kvm@vger.kernel.org,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
-        <linux-ide@vger.kernel.org>, Will Deacon <will@kernel.org>,
-        linux-clk <linux-clk@vger.kernel.org>, soc@kernel.org,
-        Joerg Roedel <joro@8bytes.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        devicetree@vger.kernel.org, Jon Loeliger <jdl@jdl.com>,
-        "open list:THERMAL" <linux-pm@vger.kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Alexander Graf <graf@amazon.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>,
-        linux-edac <linux-edac@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Matthias Brugger <mbrugger@suse.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux IOMMU <iommu@lists.linux-foundation.org>,
-        Robert Richter <rrichter@marvell.com>,
-        James Morse <james.morse@arm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "David S. Miller" <davem@davemloft.net>
-References: <20200218171321.30990-1-robh@kernel.org>
- <20200218181356.09ae0779@donnerap.cambridge.arm.com>
- <CAL_JsqJpDLn5Zr2UHno1TeReqrwZ-HAAfd78AouigGi4sAQuOw@mail.gmail.com>
-From:   Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
- xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
- xGlkaOSDuu09rxuW+69Y2f1TzjFuGpBk4ysWOR85O2Nx8AJ6fYGCoeTbovrNlGT1M9obSFGQ
- X3IzRnWoqlfudjTO5TKoqkbOgpYqIo5n1QbEjCCwCwCg3DOH/4ug2AUUlcIT9/l3pGvoRJ0E
- AICDzi3l7pmC5IWn2n1mvP5247urtHFs/uusE827DDj3K8Upn2vYiOFMBhGsxAk6YKV6IP0d
- ZdWX6fqkJJlu9cSDvWtO1hXeHIfQIE/xcqvlRH783KrihLcsmnBqOiS6rJDO2x1eAgC8meAX
- SAgsrBhcgGl2Rl5gh/jkeA5ykwbxA/9u1eEuL70Qzt5APJmqVXR+kWvrqdBVPoUNy/tQ8mYc
- nzJJ63ng3tHhnwHXZOu8hL4nqwlYHRa9eeglXYhBqja4ZvIvCEqSmEukfivk+DlIgVoOAJbh
- qIWgvr3SIEuR6ayY3f5j0f2ejUMYlYYnKdiHXFlF9uXm1ELrb0YX4GMHz80nRmxvcmlhbiBG
- YWluZWxsaSA8Zi5mYWluZWxsaUBnbWFpbC5jb20+wmYEExECACYCGyMGCwkIBwMCBBUCCAME
- FgIDAQIeAQIXgAUCVF/S8QUJHlwd3wAKCRBhV5kVtWN2DvCVAJ4u4/bPF4P3jxb4qEY8I2gS
- 6hG0gACffNWlqJ2T4wSSn+3o7CCZNd7SLSDOwU0EVxvH8AEQAOqv6agYuT4x3DgFIJNv9i0e
- S443rCudGwmg+CbjXGA4RUe1bNdPHYgbbIaN8PFkXfb4jqg64SyU66FXJJJO+DmPK/t7dRNA
- 3eMB1h0GbAHlLzsAzD0DKk1ARbjIusnc02aRQNsAUfceqH5fAMfs2hgXBa0ZUJ4bLly5zNbr
- r0t/fqZsyI2rGQT9h1D5OYn4oF3KXpSpo+orJD93PEDeseho1EpmMfsVH7PxjVUlNVzmZ+tc
- IDw24CDSXf0xxnaojoicQi7kzKpUrJodfhNXUnX2JAm/d0f9GR7zClpQMezJ2hYAX7BvBajb
- Wbtzwi34s8lWGI121VjtQNt64mSqsK0iQAE6OYk0uuQbmMaxbBTT63+04rTPBO+gRAWZNDmQ
- b2cTLjrOmdaiPGClSlKx1RhatzW7j1gnUbpfUl91Xzrp6/Rr9BgAZydBE/iu57KWsdMaqu84
- JzO9UBGomh9eyBWBkrBt+Fe1qN78kM7JO6i3/QI56NA4SflV+N4PPgI8TjDVaxgrfUTV0gVa
- cr9gDE5VgnSeSiOleChM1jOByZu0JTShOkT6AcSVW0kCz3fUrd4e5sS3J3uJezSvXjYDZ53k
- +0GS/Hy//7PSvDbNVretLkDWL24Sgxu/v8i3JiYIxe+F5Br8QpkwNa1tm7FK4jOd95xvYADl
- BUI1EZMCPI7zABEBAAHCwagEGBECAAkFAlcbx/ACGwICKQkQYVeZFbVjdg7BXSAEGQECAAYF
- Alcbx/AACgkQh9CWnEQHBwSJBw//Z5n6IO19mVzMy/ZLU/vu8flv0Aa0kwk5qvDyvuvfiDTd
- WQzq2PLs+obX0y1ffntluhvP+8yLzg7h5O6/skOfOV26ZYD9FeV3PIgR3QYF26p2Ocwa3B/k
- P6ENkk2pRL2hh6jaA1Bsi0P34iqC2UzzLq+exctXPa07ioknTIJ09BT31lQ36Udg7NIKalnj
- 5UbkRjqApZ+Rp0RAP9jFtq1n/gjvZGyEfuuo/G+EVCaiCt3Vp/cWxDYf2qsX6JxkwmUNswuL
- C3duQ0AOMNYrT6Pn+Vf0kMboZ5UJEzgnSe2/5m8v6TUc9ZbC5I517niyC4+4DY8E2m2V2LS9
- es9uKpA0yNcd4PfEf8bp29/30MEfBWOf80b1yaubrP5y7yLzplcGRZMF3PgBfi0iGo6kM/V2
- 13iD/wQ45QTV0WTXaHVbklOdRDXDHIpT69hFJ6hAKnnM7AhqZ70Qi31UHkma9i/TeLLzYYXz
- zhLHGIYaR04dFT8sSKTwTSqvm8rmDzMpN54/NeDSoSJitDuIE8givW/oGQFb0HGAF70qLgp0
- 2XiUazRyRU4E4LuhNHGsUxoHOc80B3l+u3jM6xqJht2ZyMZndbAG4LyVA2g9hq2JbpX8BlsF
- skzW1kbzIoIVXT5EhelxYEGqLFsZFdDhCy8tjePOWK069lKuuFSssaZ3C4edHtkZ8gCfWWtA
- 8dMsqeOIg9Trx7ZBCDOZGNAAnjYQmSb2eYOAti3PX3Ex7vI8ZhJCzsNNBEjPuBIQEAC/6NPW
- 6EfQ91ZNU7e/oKWK91kOoYGFTjfdOatp3RKANidHUMSTUcN7J2mxww80AQHKjr3Yu2InXwVX
- SotMMR4UrkQX7jqabqXV5G+88bj0Lkr3gi6qmVkUPgnNkIBe0gaoM523ujYKLreal2OQ3GoJ
- PS6hTRoSUM1BhwLCLIWqdX9AdT6FMlDXhCJ1ffA/F3f3nTN5oTvZ0aVF0SvQb7eIhGVFxrlb
- WS0+dpyulr9hGdU4kzoqmZX9T/r8WCwcfXipmmz3Zt8o2pYWPMq9Utby9IEgPwultaP06MHY
- nhda1jfzGB5ZKco/XEaXNvNYADtAD91dRtNGMwRHWMotIGiWwhEJ6vFc9bw1xcR88oYBs+7p
- gbFSpmMGYAPA66wdDKGj9+cLhkd0SXGht9AJyaRA5AWB85yNmqcXXLkzzh2chIpSEawRsw8B
- rQIZXc5QaAcBN2dzGN9UzqQArtWaTTjMrGesYhN+aVpMHNCmJuISQORhX5lkjeg54oplt6Zn
- QyIsOCH3MfG95ha0TgWwyFtdxOdY/UY2zv5wGivZ3WeS0TtQf/BcGre2y85rAohFziWOzTaS
- BKZKDaBFHwnGcJi61Pnjkz82hena8OmsnsBIucsz4N0wE+hVd6AbDYN8ZcFNIDyt7+oGD1+c
- PfqLz2df6qjXzq27BBUboklbGUObNwADBQ//V45Z51Q4fRl/6/+oY5q+FPbRLDPlUF2lV6mb
- hymkpqIzi1Aj/2FUKOyImGjbLAkuBQj3uMqy+BSSXyQLG3sg8pDDe8AJwXDpG2fQTyTzQm6l
- OnaMCzosvALk2EOPJryMkOCI52+hk67cSFA0HjgTbkAv4Mssd52y/5VZR28a+LW+mJIZDurI
- Y14UIe50G99xYxjuD1lNdTa/Yv6qFfEAqNdjEBKNuOEUQOlTLndOsvxOOPa1mRUk8Bqm9BUt
- LHk3GDb8bfDwdos1/h2QPEi+eI+O/bm8YX7qE7uZ13bRWBY+S4+cd+Cyj8ezKYAJo9B+0g4a
- RVhdhc3AtW44lvZo1h2iml9twMLfewKkGV3oG35CcF9mOd7n6vDad3teeNpYd/5qYhkopQrG
- k2oRBqxyvpSLrJepsyaIpfrt5NNaH7yTCtGXcxlGf2jzGdei6H4xQPjDcVq2Ra5GJohnb/ix
- uOc0pWciL80ohtpSspLlWoPiIowiKJu/D/Y0bQdatUOZcGadkywCZc/dg5hcAYNYchc8AwA4
- 2dp6w8SlIsm1yIGafWlNnfvqbRBglSTnxFuKqVggiz2zk+1wa/oP+B96lm7N4/3Aw6uy7lWC
- HvsHIcv4lxCWkFXkwsuWqzEKK6kxVpRDoEQPDj+Oy/ZJ5fYuMbkdHrlegwoQ64LrqdmiVVPC
- TwQYEQIADwIbDAUCVF/S8QUJHlwd3wAKCRBhV5kVtWN2Do+FAJ956xSz2XpDHql+Wg/2qv3b
- G10n8gCguORqNGMsVRxrlLs7/himep7MrCc=
-Message-ID: <f2b15018-2b88-01b8-14f1-a6c326b10b58@gmail.com>
-Date:   Tue, 18 Feb 2020 10:51:17 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1726571AbgBRSvv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 13:51:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60237 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726478AbgBRSvu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 13:51:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582051909;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aRk89fcGpSqd1HZwvbbTzIVysSoWwLOggMDD0CvkgR0=;
+        b=BzHK19esP4ZJQ2GHB6xZ3qf1u/m/EYGmpX9tHotrsHsoqgKoZtAQNFZQWFRcZvUbPG35P0
+        o7Tbu+TZPZ12knwE3iNNQlNBOaN7YxzM6SGO8RpwfCbP+OrJVdQH81o9juIqnsO7PCCz81
+        A2ee1hbs6W1qhol9iMz7a/Wd1sgiyRI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-259-DTLSgxV5Pkq_8_FKH3lTLg-1; Tue, 18 Feb 2020 13:51:39 -0500
+X-MC-Unique: DTLSgxV5Pkq_8_FKH3lTLg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54B69107B7D5;
+        Tue, 18 Feb 2020 18:51:37 +0000 (UTC)
+Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3698A60BE1;
+        Tue, 18 Feb 2020 18:51:36 +0000 (UTC)
+Date:   Tue, 18 Feb 2020 11:51:35 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, joro@8bytes.org, vkuznets@redhat.com,
+        rkagan@virtuozzo.com, graf@amazon.com, jschoenh@amazon.de,
+        karahmed@amazon.de, rimasluk@amazon.com, jon.grimm@amd.com
+Subject: Re: [PATCH v5 14/18] kvm: i8254: Deactivate APICv when using
+ in-kernel PIT re-injection mode.
+Message-ID: <20200218115135.4e09ffca@w520.home>
+In-Reply-To: <1573762520-80328-15-git-send-email-suravee.suthikulpanit@amd.com>
+References: <1573762520-80328-1-git-send-email-suravee.suthikulpanit@amd.com>
+ <1573762520-80328-15-git-send-email-suravee.suthikulpanit@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <CAL_JsqJpDLn5Zr2UHno1TeReqrwZ-HAAfd78AouigGi4sAQuOw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/18/20 10:40 AM, Rob Herring wrote:
-> On Tue, Feb 18, 2020 at 12:14 PM Andre Przywara <andre.przywara@arm.com> wrote:
->>
->> On Tue, 18 Feb 2020 11:13:10 -0600
->> Rob Herring <robh@kernel.org> wrote:
->>
->> Hi,
->>
->>> Calxeda has been defunct for 6 years now. Use of Calxeda servers carried
->>> on for some time afterwards primarily as distro builders for 32-bit ARM.
->>> AFAIK, those systems have been retired in favor of 32-bit VMs on 64-bit
->>> hosts.
->>>
->>> The other use of Calxeda Midway I'm aware of was testing 32-bit ARM KVM
->>> support as there are few or no other systems with enough RAM and LPAE. Now
->>> 32-bit KVM host support is getting removed[1].
->>>
->>> While it's not much maintenance to support, I don't care to convert the
->>> Calxeda DT bindings to schema nor fix any resulting errors in the dts files
->>> (which already don't exactly match what's shipping in firmware).
->>
->> While every kernel maintainer seems always happy to take patches with a negative diffstat, I wonder if this is really justification enough to remove a perfectly working platform. I don't really know about any active users, but experience tells that some platforms really are used for quite a long time, even if they are somewhat obscure. N900 or Netwinder, anyone?
->>
->> So to not give the impression that actually *everyone* (from that small subset of people actively reading the kernel list) is happy with that, I think that having support for at least Midway would be useful. On the one hand it's a decent LPAE platform (with memory actually exceeding 4GB), and on the other hand it's something with capable I/O (SATA) and networking, so one can actually stress test the system. Which is the reason I was using that for KVM testing, but even with that probably going away now there remain still some use cases, and be it for general ARM(32) testing.
-> 
-> Does LPAE with more than 4GB actually need to work if there's not
-> another platform out there?
+On Thu, 14 Nov 2019 14:15:16 -0600
+Suravee Suthikulpanit <suravee.suthikulpanit@amd.com> wrote:
 
-There are ARCH_BRCMSTB platforms that are 32-bit only and have 6GB of
-DRAM populated, and those continue to work just fine, though there is no
-known use for KVM AFAICT.
--- 
-Florian
+> AMD SVM AVIC accelerates EOI write and does not trap. This causes
+> in-kernel PIT re-injection mode to fail since it relies on irq-ack
+> notifier mechanism. So, APICv is activated only when in-kernel PIT
+> is in discard mode e.g. w/ qemu option:
+> 
+>   -global kvm-pit.lost_tick_policy=discard
+> 
+> Also, introduce APICV_INHIBIT_REASON_PIT_REINJ bit to be used for this
+> reason.
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> ---
+
+Hi,
+
+I've bisected https://bugzilla.kernel.org/show_bug.cgi?id=206579 (a
+kernel NULL pointer deref when using device assigned on AMD platforms)
+to this commit, e2ed4078a6ef3ddf4063329298852e24c36d46c8.  My VM is a
+very basic libvirt managed domain with an assigned NIC, I don't even
+have an OS installed:
+
+/usr/bin/qemu-system-x86_64 \
+-name guest=fedora31,debug-threads=on \
+-S \
+-object
+secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-1-fedora31/master-key.aes
+\ -machine pc-q35-3.1,accel=kvm,usb=off,vmport=off,dump-guest-core=off
+\ -cpu
+EPYC-IBPB,x2apic=on,tsc-deadline=on,hypervisor=on,tsc_adjust=on,xsaves=on,cmp_legacy=on,perfctr_core=on,virt-ssbd=on,monitor=off
+\ -m 8192 \ -realtime mlock=off \ -smp 8,sockets=8,cores=1,threads=1 \
+-uuid a9639aa6-b3c1-4b45-b07b-80e0ad6d7df2 \
+-no-user-config \
+-nodefaults \
+-chardev socket,id=charmonitor,fd=30,server,nowait \
+-mon chardev=charmonitor,id=monitor,mode=control \
+-rtc base=utc,driftfix=slew \
+-global kvm-pit.lost_tick_policy=delay \
+-no-hpet \
+-no-shutdown \
+-global ICH9-LPC.disable_s3=1 \
+-global ICH9-LPC.disable_s4=1 \
+-boot strict=on \
+-device
+pcie-root-port,port=0x10,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x2
+\ -device
+pcie-root-port,port=0x11,chassis=2,id=pci.2,bus=pcie.0,addr=0x2.0x1 \
+-device
+pcie-root-port,port=0x12,chassis=3,id=pci.3,bus=pcie.0,addr=0x2.0x2 \
+-device
+pcie-root-port,port=0x13,chassis=4,id=pci.4,bus=pcie.0,addr=0x2.0x3 \
+-device
+pcie-root-port,port=0x14,chassis=5,id=pci.5,bus=pcie.0,addr=0x2.0x4 \
+-device
+pcie-root-port,port=0x15,chassis=6,id=pci.6,bus=pcie.0,addr=0x2.0x5 \
+-device
+pcie-root-port,port=0x16,chassis=7,id=pci.7,bus=pcie.0,addr=0x2.0x6 \
+-device qemu-xhci,p2=15,p3=15,id=usb,bus=pci.2,addr=0x0 \ -drive
+file=/var/lib/libvirt/images/fedora31.qcow2,format=qcow2,if=none,id=drive-virtio-disk0
+\ -device
+virtio-blk-pci,scsi=off,bus=pci.3,addr=0x0,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1
+\ -netdev tap,fd=32,id=hostnet0,vhost=on,vhostfd=33 \ -device
+virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:c4:c4:fb,bus=pci.1,addr=0x0
+\ -vnc 127.0.0.1:0 \ -device
+VGA,id=video0,vgamem_mb=16,bus=pcie.0,addr=0x1 \ -device
+vfio-pci,host=01:00.0,id=hostdev0,bus=pci.4,addr=0x0 \ -device
+virtio-balloon-pci,id=balloon0,bus=pci.5,addr=0x0 \ -object
+rng-random,id=objrng0,filename=/dev/urandom \ -device
+virtio-rng-pci,rng=objrng0,id=rng0,bus=pci.6,addr=0x0 \ -sandbox
+on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny
+\ -msg timestamp=on
+
+This results in:
+
+BUG: kernel NULL pointer dereference, address: 0000000000000010
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0 
+Oops: 0000 [#1] SMP NOPTI
+CPU: 54 PID: 31469 Comm: CPU 0/KVM Not tainted 5.5.0+ #24
+Hardware name: AMD Corporation Diesel/Diesel, BIOS RDL100BB 11/14/2018
+RIP: 0010:svm_refresh_apicv_exec_ctrl+0xe4/0x110 [kvm_amd]
+Code: 8b 83 b8 39 00 00 48 39 c5 74 31 48 8b 9b b8 39 00 00 48 39 dd 75
+13 eb 23 e8 c8 0d 97 d6 85 c0 75 1a 48 8b 1b 48 39 dd 74 12 <48> 8b 7b
+10 45 85 e4 75 e6 e8 1e 0d 97 d6 85 c0 74 e6 5b 4c 89 ee RSP:
+0018:ffff99ae87923d70 EFLAGS: 00010086 RAX: 0000000000000000 RBX:
+0000000000000000 RCX: ffff8d2323b0a000 RDX: 0000000000000001 RSI:
+ffff8d232e76c600 RDI: ffff8d232c9bf398 RBP: ffff8d232c9bf388 R08:
+0000000000000000 R09: ffff8d232e76c600 R10: 0000000000000000 R11:
+0000000000000000 R12: 0000000000000000 R13: 0000000000000202 R14:
+ffff8d232c9bf398 R15: ffff99ae86e361a0 FS:  00007f2aa3d7d700(0000)
+GS:ffff8d232fd80000(0000) knlGS:0000000000000000 CS:  0010 DS: 0000 ES:
+0000 CR0: 0000000080050033 CR2: 0000000000000010 CR3: 000000046c716000
+CR4: 00000000003406e0 Call Trace: kvm_arch_vcpu_ioctl_run+0x335/0x1a90
+[kvm] ? do_futex+0x86b/0xca0
+ ? __seccomp_filter+0x7b/0x670
+ kvm_vcpu_ioctl+0x218/0x5c0 [kvm]
+ ksys_ioctl+0x87/0xc0
+ __x64_sys_ioctl+0x16/0x20
+ do_syscall_64+0x5b/0x1b0
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x7f2aaa9c6fcb
+Code: 0f 1e fa 48 8b 05 bd ce 0c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff
+ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01
+f0 ff ff 73 01 c3 48 8b 0d 8d ce 0c 00 f7 d8 64 89 01 48 RSP:
+002b:00007f2aa3d7c688 EFLAGS: 00000246 ORIG_RAX: 0000000000000010 RAX:
+ffffffffffffffda RBX: 00005623b5362220 RCX: 00007f2aaa9c6fcb RDX:
+0000000000000000 RSI: 000000000000ae80 RDI: 000000000000000f RBP:
+00007f2aabc65000 R08: 00005623b4316f30 R09: 0000000000000000 R10:
+00005623b52f2280 R11: 0000000000000246 R12: 00005623b5382e70 R13:
+00005623b5362220 R14: 00005623b478a7c0 R15: 00007f2aa3d7c880 Modules
+linked in: kvm_amd ccp kvm vhost_net vhost macvtap macvlan tap vfio_pci
+vfio_virqfd vfio_iommu_type1 vfio irqbypass xt_CHECKSUM xt_MASQUERADE
+xt_conntrack tun bridge stp llc ip6table_mangle ip6table_nat
+iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6
+nf_defrag_ipv4 libcrc32c ebtable_filter ebtables ip6table_filter
+ip6_tables rfkill rpcrdma ib_isert iscsi_target_mod ib_iser libiscsi
+scsi_transport_iscsi ib_srpt target_core_mod sunrpc ib_srp
+scsi_transport_srp ib_ipoib rdma_ucm ib_umad vfat fat rdma_cm ib_cm
+iw_cm amd64_edac_mod edac_mce_amd i40iw ipmi_ssif ib_uverbs
+crct10dif_pclmul crc32_pclmul ib_core ghash_clmulni_intel pcspkr joydev
+sp5100_tco ipmi_si k10temp i2c_piix4 ipmi_devintf ipmi_msghandler
+acpi_cpufreq nouveau ast video drm_vram_helper mxm_wmi wmi
+drm_ttm_helper i2c_algo_bit drm_kms_helper cec ttm drm i40e e1000e
+crc32c_intel nvme nvme_core pinctrl_amd [last unloaded: ccp] CR2:
+0000000000000010 ---[ end trace 5d826c21656a44f3 ]--- RIP:
+0010:svm_refresh_apicv_exec_ctrl+0xe4/0x110 [kvm_amd] Code: 8b 83 b8 39
+00 00 48 39 c5 74 31 48 8b 9b b8 39 00 00 48 39 dd 75 13 eb 23 e8 c8 0d
+97 d6 85 c0 75 1a 48 8b 1b 48 39 dd 74 12 <48> 8b 7b 10 45 85 e4 75 e6
+e8 1e 0d 97 d6 85 c0 74 e6 5b 4c 89 ee RSP: 0018:ffff99ae87923d70
+EFLAGS: 00010086 RAX: 0000000000000000 RBX: 0000000000000000 RCX:
+ffff8d2323b0a000 RDX: 0000000000000001 RSI: ffff8d232e76c600 RDI:
+ffff8d232c9bf398 RBP: ffff8d232c9bf388 R08: 0000000000000000 R09:
+ffff8d232e76c600 R10: 0000000000000000 R11: 0000000000000000 R12:
+0000000000000000 R13: 0000000000000202 R14: ffff8d232c9bf398 R15:
+ffff99ae86e361a0 FS:  00007f2aa3d7d700(0000) GS:ffff8d232fd80000(0000)
+knlGS:0000000000000000 CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033 CR2: 0000000000000010 CR3: 000000046c716000 CR4:
+00000000003406e0
+
+Please fix.  Thanks,
+
+Alex
+
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/i8254.c            | 12 ++++++++++++
+>  arch/x86/kvm/svm.c              | 11 +++++++++--
+>  3 files changed, 22 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 4b51222..9cb2d2e 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -853,6 +853,7 @@ enum kvm_irqchip_mode {
+>  #define APICV_INHIBIT_REASON_HYPERV     1
+>  #define APICV_INHIBIT_REASON_NESTED     2
+>  #define APICV_INHIBIT_REASON_IRQWIN     3
+> +#define APICV_INHIBIT_REASON_PIT_REINJ  4
+>  
+>  struct kvm_arch {
+>  	unsigned long n_used_mmu_pages;
+> diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+> index 4a6dc54..b24c606 100644
+> --- a/arch/x86/kvm/i8254.c
+> +++ b/arch/x86/kvm/i8254.c
+> @@ -295,12 +295,24 @@ void kvm_pit_set_reinject(struct kvm_pit *pit, bool reinject)
+>  	if (atomic_read(&ps->reinject) == reinject)
+>  		return;
+>  
+> +	/*
+> +	 * AMD SVM AVIC accelerates EOI write and does not trap.
+> +	 * This cause in-kernel PIT re-inject mode to fail
+> +	 * since it checks ps->irq_ack before kvm_set_irq()
+> +	 * and relies on the ack notifier to timely queue
+> +	 * the pt->worker work iterm and reinject the missed tick.
+> +	 * So, deactivate APICv when PIT is in reinject mode.
+> +	 */
+>  	if (reinject) {
+> +		kvm_request_apicv_update(kvm, false,
+> +					 APICV_INHIBIT_REASON_PIT_REINJ);
+>  		/* The initial state is preserved while ps->reinject == 0. */
+>  		kvm_pit_reset_reinject(pit);
+>  		kvm_register_irq_ack_notifier(kvm, &ps->irq_ack_notifier);
+>  		kvm_register_irq_mask_notifier(kvm, 0, &pit->mask_notifier);
+>  	} else {
+> +		kvm_request_apicv_update(kvm, true,
+> +					 APICV_INHIBIT_REASON_PIT_REINJ);
+>  		kvm_unregister_irq_ack_notifier(kvm, &ps->irq_ack_notifier);
+>  		kvm_unregister_irq_mask_notifier(kvm, 0, &pit->mask_notifier);
+>  	}
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index b7883b3..2dfdd7c 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -1684,7 +1684,13 @@ static int avic_update_access_page(struct kvm *kvm, bool activate)
+>  	int ret = 0;
+>  
+>  	mutex_lock(&kvm->slots_lock);
+> -	if (kvm->arch.apic_access_page_done == activate)
+> +	/*
+> +	 * During kvm_destroy_vm(), kvm_pit_set_reinject() could trigger
+> +	 * APICv mode change, which update APIC_ACCESS_PAGE_PRIVATE_MEMSLOT
+> +	 * memory region. So, we need to ensure that kvm->mm == current->mm.
+> +	 */
+> +	if ((kvm->arch.apic_access_page_done == activate) ||
+> +	    (kvm->mm != current->mm))
+>  		goto out;
+>  
+>  	ret = __x86_set_memory_region(kvm,
+> @@ -7281,7 +7287,8 @@ static bool svm_check_apicv_inhibit_reasons(ulong bit)
+>  	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
+>  			  BIT(APICV_INHIBIT_REASON_HYPERV) |
+>  			  BIT(APICV_INHIBIT_REASON_NESTED) |
+> -			  BIT(APICV_INHIBIT_REASON_IRQWIN);
+> +			  BIT(APICV_INHIBIT_REASON_IRQWIN) |
+> +			  BIT(APICV_INHIBIT_REASON_PIT_REINJ);
+>  
+>  	return supported & BIT(bit);
+>  }
+
