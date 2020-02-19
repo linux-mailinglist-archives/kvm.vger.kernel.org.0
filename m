@@ -2,116 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B59F91644AD
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 13:52:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06BFD1644B1
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 13:53:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727686AbgBSMwx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 07:52:53 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:33276 "EHLO huawei.com"
+        id S1727740AbgBSMxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 07:53:09 -0500
+Received: from mail-eopbgr70044.outbound.protection.outlook.com ([40.107.7.44]:20832
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726491AbgBSMwx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 07:52:53 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id E9F2C4E3A921C48424B1;
-        Wed, 19 Feb 2020 20:52:12 +0800 (CST)
-Received: from [127.0.0.1] (10.177.246.209) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Wed, 19 Feb 2020
- 20:52:03 +0800
-Subject: Re: [PATCH] mm/hugetlb: avoid get wrong ptep caused by race
-To:     Mike Kravetz <mike.kravetz@oracle.com>
-CC:     Matthew Wilcox <willy@infradead.org>, <akpm@linux-foundation.org>,
-        <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-        <arei.gonglei@huawei.com>, <weidong.huang@huawei.com>,
-        <weifuqiang@huawei.com>, <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <1582027825-112728-1-git-send-email-longpeng2@huawei.com>
- <20200218205239.GE24185@bombadil.infradead.org>
- <593d82a3-1d1e-d8f2-6b90-137f10441522@huawei.com>
- <8292299c-4c5a-a8cb-22e2-d5c9051f122a@oracle.com>
-From:   "Longpeng (Mike)" <longpeng2@huawei.com>
-Message-ID: <805f6f4b-af57-b08c-49c6-6c2f02ee2f96@huawei.com>
-Date:   Wed, 19 Feb 2020 20:52:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1727525AbgBSMxJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Feb 2020 07:53:09 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PmGaVcqtJiTVZc16QLRT7uHm3ZaoDnVc4RJ8USXfeJxDY3ffxS6F1sxBdOEq0ybYM0NUpgvioHtoHTUNQf3pWp41o8RciMizwjpyZ2Kng7D1HGN6bhtvUcz0slYYoqXwgnwHhlsmvksYMsVVxqHQK81RuHuDKhei3SVezOCyX8xWWwWcCGPNtzdB8uhfOZ4phSqxZKrX7zHuTABl9/PYuSR8awvp/JdgSoI82YvBIBxVhALGMAloJQPKJ1QdIUXoOM6QQ9J5xZCfYHk2PAgw4hFK++jwHqUGFW9xFE64Gj8B4zPEmljwoX1WS80Dk/qr9wV09uV6bnne6XuqJBDskQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4U1S7gWxCLD+xZLK4Y4HwOFiPmx8BRGT7v9BHSVFWxE=;
+ b=eHsK1uZzCNqyS0KQQ5oRQhgMfan8L4mTfTDtUOmAzo0jDyJLEIEHNZv4/K7T437Zq4NKg+7hXoy17Fv/hDzB5zQNd38KYmAHzBhRuo+k7kFrywpqFrSi0K5kJdzImBnRR5zuwojmujp9pUemkflYDPWNWCNhv9Wc7gNoff5Ky17zxjq0CPPZOtltJAzYsKh9+unhs1J3L4JdCfStPzrx6vMzGKJ+5aJl/BEnGzOk6eDr/3+lCG3h7kAglG8AwzYBtsmcF0/wxbgQn2Rl260nZCHiIfJIptwH8aZPn/e9sKEV1U7JaHaGWkGSwMYnMGoxgeKBKvtsz4UtynA2jW8Kww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4U1S7gWxCLD+xZLK4Y4HwOFiPmx8BRGT7v9BHSVFWxE=;
+ b=IPGYsba6GSc122cZ1aYJwnV8l1LQCjUXumQ+HqsJIa9DSZNbpkKiG0PJyP1Ob+foH68yQmjrfp9urhPhX1FJqceQ3vdS5w0aAATc9EaYggBKnM68w30oMcfR9LRQN7SVGSI3l1qQzLSBZxP8aj3mQPTF0a+6Rn5dmXPHqUL0C0U=
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
+ VI1PR05MB5389.eurprd05.prod.outlook.com (20.177.201.145) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.24; Wed, 19 Feb 2020 12:53:02 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2729.032; Wed, 19 Feb 2020
+ 12:53:02 +0000
+Received: from mlx.ziepe.ca (142.68.57.212) by MN2PR14CA0025.namprd14.prod.outlook.com (2603:10b6:208:23e::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.18 via Frontend Transport; Wed, 19 Feb 2020 12:53:02 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1j4OqZ-0000XF-5J; Wed, 19 Feb 2020 08:52:59 -0400
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>
+CC:     "mst@redhat.com" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "aadam@redhat.com" <aadam@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
+Thread-Topic: [PATCH V2 3/5] vDPA: introduce vDPA bus
+Thread-Index: AQHV38asJrupyM4st0u+LnLMVE2dj6gWBCEAgAEv6YCAAFKZAIAA9rcAgACprgCAABWWAIAAAfIAgADOIICAAK/EAIAENTiAgAIVHQCAAQZvgIAAekGA
+Date:   Wed, 19 Feb 2020 12:53:02 +0000
+Message-ID: <20200219125259.GH23930@mellanox.com>
+References: <20200212125108.GS4271@mellanox.com>
+ <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
+ <20200213134128.GV4271@mellanox.com>
+ <ebaea825-5432-65e2-2ab3-720a8c4030e7@redhat.com>
+ <20200213150542.GW4271@mellanox.com>
+ <8b3e6a9c-8bfd-fb3c-12a8-2d6a3879f1ae@redhat.com>
+ <20200214135232.GB4271@mellanox.com>
+ <01c86ebb-cf4b-691f-e682-2d6f93ddbcf7@redhat.com>
+ <20200218135608.GS4271@mellanox.com>
+ <bbfc608b-2bfa-e4c7-c2b9-dbcfe63518cb@redhat.com>
+In-Reply-To: <bbfc608b-2bfa-e4c7-c2b9-dbcfe63518cb@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: MN2PR14CA0025.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::30) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [142.68.57.212]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: ba3fbb23-66d0-496c-1b57-08d7b53aa7ab
+x-ms-traffictypediagnostic: VI1PR05MB5389:|VI1PR05MB5389:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR05MB53894C300B08E0D37A71AFC9CF100@VI1PR05MB5389.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0318501FAE
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(366004)(346002)(376002)(396003)(136003)(189003)(199004)(52116002)(4326008)(6666004)(1076003)(86362001)(2616005)(478600001)(2906002)(33656002)(8936002)(7416002)(71200400001)(26005)(66946007)(54906003)(186003)(316002)(4744005)(36756003)(66446008)(64756008)(66556008)(81156014)(6916009)(9786002)(81166006)(9746002)(66476007)(5660300002)(8676002)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB5389;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: h2bn7lMnv5+3VAWg8h1VzAxvHo8s5grx723CDDzXVV07RrFEUmpPXMX8XIDGYjx3bJQkMmI6KqThTikiXUZi4NwMXLHy64RckQ+ZG44hSYXmaD0YHvgkEQ+WUVjSAwng1au1CPb5yFiWTzsyh4TBvMgo+mjdV0GMl7ohVGuSSS2JBFzMgkEE7iXVrT40UnUjxOA3lGELZMNJLyxJL+7uO4dihJdeH8m2zxEYr4QVkJskpFntnSDFi421z83nMNCywK3OlqmKUrDOruCn2+TQC0kJhzIIFDBdGyAcq9eMGfP/tG3yPDA+4YB305BGKyS0ND/eoip46cTYegD3FES7VgiXJL/5dCktwJ6mE30c27YFCJZWxiwyJRfMevXNS2Ui81mE/cLSgYv6LOHft53QKBAzxmBVsupR8Dsu1EwF1FX35PASd5wDDhI4jH3AHWghuT4hhvI2/8awJ/9Dnn2wZ4dxW6VNvqx8QvDvGW/6VClGApPzaaLi8jYVswiUMxez
+x-ms-exchange-antispam-messagedata: 3KmHXdOKXt3p+R/SpTcbfIFAAbPJn8i/qeEwpMJ5bE9BEk5SxHkLkL2BUlChz8ALFSms17lF55JV3cpOFqD35h9Exnj0DOv7jlAYlT8JFA3FR42gW+ZE0bcPA94c5qsvy1E2ZWbjSboxus4RH/q96w==
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <9CD8241DD584C146AFED1EACF6700144@eurprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <8292299c-4c5a-a8cb-22e2-d5c9051f122a@oracle.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.177.246.209]
-X-CFilter-Loop: Reflected
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba3fbb23-66d0-496c-1b57-08d7b53aa7ab
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2020 12:53:02.5591
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: T2Gm6sTxtBrUs+PoINIJ75nsuTN77W160XncxFqtXOCGiQg1y/3XrxOV4JFVAwhUWI3M1EB1GsNeRqAGOJmSDw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB5389
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-在 2020/2/19 11:49, Mike Kravetz 写道:
-> On 2/18/20 6:09 PM, Longpeng (Mike) wrote:
->> 在 2020/2/19 4:52, Matthew Wilcox 写道:
->>> On Tue, Feb 18, 2020 at 08:10:25PM +0800, Longpeng(Mike) wrote:
->>>>  {
->>>> -	pgd_t *pgd;
->>>> -	p4d_t *p4d;
->>>> -	pud_t *pud;
->>>> -	pmd_t *pmd;
->>>> +	pgd_t *pgdp;
->>>> +	p4d_t *p4dp;
->>>> +	pud_t *pudp, pud;
->>>> +	pmd_t *pmdp, pmd;
->>>
->>> Renaming the variables as part of a fix is a really bad idea.  It obscures
->>> the actual fix and makes everybody's life harder.  Plus, it's not even
->>> renaming to follow the normal convention -- there are only two places
->>> (migrate.c and gup.c) which follow this pattern in mm/ while there are
->>> 33 that do not.
->>>
->> Good suggestion, I've never noticed this, thanks.
->> By the way, could you give an example if we use this way to fix the bug?
-> 
-> Matthew and others may have better suggestions for naming.  However, I would
-> keep the existing names and add:
-> 
-> pud_t pud_entry;
-> pmd_t pmd_entry;
-> 
-> Then the *_entry variables are the target of the READ_ONCE()
-> 
-> pud_entry = READ_ONCE(*pud);
-> if (sz != PUD_SIZE && pud_none(pud_entry))
-> ...
-> ...
-> pmd_entry = READ_ONCE(*pmd);
-> if (sz != PMD_SIZE && pmd_none(pmd_entry))
-> ...
-> ...
-> 
-Uh, looks much better.
+On Wed, Feb 19, 2020 at 01:35:25PM +0800, Jason Wang wrote:
+> > But it is
+> > open coded and duplicated because .. vdpa?
+>=20
+>=20
+> I'm not sure I get here, vhost module is reused for vhost-vdpa and all
+> current vhost device (e.g net) uses their own char device.
 
-BTW, I missed one of your email in my mail client, but I find it in lkml.org.
-'''
-I too would like some more information on the panic.
-If your analysis is correct, then I would expect the 'ptep' returned by
-huge_pte_offset() to not point to a pte but rather some random address.
-This is because the 'pmd' calculated by pmd_offset(pud, addr) is not
-really the address of a pmd.  So, perhaps there is an addressing exception
-at huge_ptep_get() near the beginning of hugetlb_fault()?
+I mean there shouldn't be two fops implementing the same uAPI
 
-	ptep = huge_pte_offset(mm, haddr, huge_page_size(h));
-	if (ptep) {
-		entry = huge_ptep_get(ptep);
-		...
-'''
-Yep, your analysis above is the same as mine, we got a 'dummy pmd' and then
-cause access a bad address.
-
-What's your opinion about the solution to fix this problem, not only
-huge_pte_offset, some other places also have the same problem(e.g.
-lookup_address_in_pgd) ?
-
-> BTW, thank you for finding this issue!
-> 
-
-
--- 
-Regards,
-Longpeng(Mike)
-
+Jason
