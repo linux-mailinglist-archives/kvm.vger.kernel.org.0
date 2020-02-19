@@ -2,93 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 20BE916430B
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 12:10:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D728716431B
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 12:14:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726632AbgBSLK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 06:10:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50317 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726487AbgBSLKz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 06:10:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582110654;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=G9ngAADFf0H6tNXWrWk3zBJLW6Dh0uOu2zK7HumFKqU=;
-        b=fjn8BEAhHJQ2Vsl/2d5uOdVCNBqJg1olIv4zM3ucAGAXqPB8w60hhUhJKhXMI59N4uw4yQ
-        aEnjGsl0fzK3dn4XDtj752g6Nzuiee8yvKvN6zzuzEzc9xH6zJjXxoFK4X1vSCggXMR1O2
-        JECEaXKtEhtOXP5iOeKTAGRbbFzs6X0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-k5HsDmYkPNqe45OOn9oz_w-1; Wed, 19 Feb 2020 06:10:52 -0500
-X-MC-Unique: k5HsDmYkPNqe45OOn9oz_w-1
-Received: by mail-wr1-f69.google.com with SMTP id m15so12320227wrs.22
-        for <kvm@vger.kernel.org>; Wed, 19 Feb 2020 03:10:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=G9ngAADFf0H6tNXWrWk3zBJLW6Dh0uOu2zK7HumFKqU=;
-        b=eu+ur599g9OAllK8IEGDxfUsk5HevPF6kQVp+xmV7mmmSmPMFG1srSs5R5vr/8zt4o
-         LGLONg77iKAiF88eM/DcnuTHkec8Evc7LcosRcMajiRJ1GZw7ZNoDnGa+XpSYr9Gvs5P
-         zHEKepE89MQ/wIzHmvcy3WyPkqRbfHx1zvjiu+V6kPdmI2W22CudFcQN/BlzIV5BX4+l
-         cStZmSbSZu6cOO020oHqPtwVcrOD/KZa8TwRqLOQZ94/iEsjxoCC0L82tM6LbMPII/Qf
-         RNqbtGXK34mvQ+2ijomdsi+e7kNunzruUWbO8n+HY1K+cGDkroCOFz80n2efJS1MFrkE
-         C5kQ==
-X-Gm-Message-State: APjAAAU+zgKjDS+yQm4Ner5W5keMVAB8qL5WA0LTeywXyBT3p/Dx16Au
-        86xCZtbSHd7FDrr/SSkbdo/MpwuF6WhJLpgLt6bQ24y2sZet9B2bOHVuri/oHjlyTU/rL9kfL7v
-        8qjSUzoIn3AKM
-X-Received: by 2002:a7b:c183:: with SMTP id y3mr8994471wmi.45.1582110651008;
-        Wed, 19 Feb 2020 03:10:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxgHklSoTJAASymtkOJdhkIhiMJIFRI+F05r4Zs/xNP/kGoNa/TNx+0pu+EJD1dPQoyvi+MUw==
-X-Received: by 2002:a7b:c183:: with SMTP id y3mr8994454wmi.45.1582110650820;
-        Wed, 19 Feb 2020 03:10:50 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:ec41:5e57:ff4d:8e51? ([2001:b07:6468:f312:ec41:5e57:ff4d:8e51])
-        by smtp.gmail.com with ESMTPSA id e1sm2438009wrt.84.2020.02.19.03.10.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Feb 2020 03:10:50 -0800 (PST)
-Subject: Re: [RFC] eventfd: add EFD_AUTORESET flag
-To:     Avi Kivity <avi@scylladb.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Davide Libenzi <davidel@xmailserver.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-References: <20200129172010.162215-1-stefanha@redhat.com>
- <66566792-58a4-bf65-6723-7d2887c84160@redhat.com>
- <20200212102912.GA464050@stefanha-x1.localdomain>
- <156cb709-282a-ddb6-6f34-82b4bb211f73@redhat.com>
- <cadb4320-4717-1a41-dfb5-bb782fd0a5da@scylladb.com>
- <20200219103704.GA1076032@stefanha-x1.localdomain>
- <c5ea733d-b766-041b-30b9-a9a9b5167462@scylladb.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ced21f4f-9e8a-7c61-8f50-cee33b74a210@redhat.com>
-Date:   Wed, 19 Feb 2020 12:10:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1726558AbgBSLOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 06:14:43 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60200 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726469AbgBSLOn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Feb 2020 06:14:43 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6951D24658;
+        Wed, 19 Feb 2020 11:14:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1582110882;
+        bh=t4vzpweClqjBcv8dfE7UQXkgRAqeUVPdgkwMN4FVeg0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=EK4/zBLpN2Xq0bcVNbO+o/rj59zbrufMthyreklPzIrj8cSI8s0564Ksfw2oidBY3
+         KgznGxD07C86IQalFv6CpZhpI5y6vQmkbOnKMCwOictJJaUaDDNukIPALdp3hEbEeM
+         YgiPWlcfva2qKdv6d8hjBH7dqi/QrIzd/2YsxfTk=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1j4NJQ-006UOX-Ds; Wed, 19 Feb 2020 11:14:40 +0000
 MIME-Version: 1.0
-In-Reply-To: <c5ea733d-b766-041b-30b9-a9a9b5167462@scylladb.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
+Date:   Wed, 19 Feb 2020 11:14:40 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 3/5] kvm: arm64: Limit PMU version to ARMv8.1
+In-Reply-To: <ed7f31d5-9a2b-6ea0-85f8-74fcd7d9ac61@arm.com>
+References: <20200216185324.32596-1-maz@kernel.org>
+ <20200216185324.32596-4-maz@kernel.org>
+ <eb0294ef-5ad2-9940-2d59-b92220948ffc@arm.com>
+ <c0a848e3ababff4ee9ecaa4b246d5875@kernel.org>
+ <ed7f31d5-9a2b-6ea0-85f8-74fcd7d9ac61@arm.com>
+Message-ID: <89155997285a33615093210d6c4de26d@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peter.maydell@linaro.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/02/20 11:43, Avi Kivity wrote:
+On 2020-02-19 10:18, James Morse wrote:
+> Hi Marc,
 > 
->> Thanks, that's a nice idea!� I already have experimental io_uring fd
->> monitoring code written for QEMU and will extend it to use
->> IORING_OP_READ.
+> On 2/19/20 9:46 AM, Marc Zyngier wrote:
+>> On 2020-02-18 17:43, James Morse wrote:
+>>> Hi Marc,
+>>> 
+>>> On 16/02/2020 18:53, Marc Zyngier wrote:
+>>>> Our PMU code is only implementing the ARMv8.1 features, so let's
+>>>> stick to this when reporting the feature set to the guest.
+>>> 
+>>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>>>> index 682fedd7700f..06b2d0dc6c73 100644
+>>>> --- a/arch/arm64/kvm/sys_regs.c
+>>>> +++ b/arch/arm64/kvm/sys_regs.c
+>>>> @@ -1093,6 +1093,11 @@ static u64 read_id_reg(const struct kvm_vcpu
+>>>> *vcpu,
+>>>>                   FEATURE(ID_AA64ISAR1_GPA) |
+>>>>                   FEATURE(ID_AA64ISAR1_GPI));
+>>>>          break;
+>>>> +    case SYS_ID_AA64DFR0_EL1:
+>>>> +        /* Limit PMU to ARMv8.1 */
+>>> 
+>>> Not just limit, but upgrade too! (force?)
+>>> This looks safe because ARMV8_PMU_EVTYPE_EVENT always includes the
+>>> extra bits this added, and the register is always trapped.
+>> 
+>> That's definitely not what I intended! Let me fix that one.
 > 
-> Note linux-aio can do IOCB_CMD_POLL, starting with 4.19.
+> What goes wrong?
+> 
+> The register description says to support v8.1 you need:
+> | Extended 16-bit PMEVTYPER<n>_EL0.evtCount field
+> | If EL2 is implemented, the MDCR_EL2.HPMD control bit
+> 
+> It looks like the extended PMEVTYPER would work via the emulation, and
+> EL2 guests are totally crazy.
+> 
+> Is the STALL_* bits in ARMv8.1-PMU the problem, ... or the extra work
+> for NV?
 
-That was on the todo list, but io_uring came first. :)
+What goes wrong is that on a v8.0 system, the guest could be tempted to
+use events in the 0x0400-0xffff range. It wouldn't break anything, but
+it wouldn't give the expected result.
 
-Paolo
+I don't care much for PMU support in EL2 guests at this stage.
 
+>>> The PMU version is also readable via ID_DFR0_EL1.PerfMon, should that
+>>> be sanitised to be the same? (I don't think we've hidden an aarch64
+>>> feature that also existed in aarch32 before).
+>> 
+>> Indeed, yet another oversight. I'll fix that too.
+> 
+> (Weird variation in the aarch32 and aarch64 ID registers isn't 
+> something
+> I care about ... who would ever look at both?)
+
+A 64bit guest running a 32bit EL0?
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
