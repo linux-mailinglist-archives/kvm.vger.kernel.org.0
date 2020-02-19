@@ -2,189 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E29E163FE3
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 10:02:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 16E6A16400A
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 10:13:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726636AbgBSJBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 04:01:48 -0500
-Received: from mga09.intel.com ([134.134.136.24]:35860 "EHLO mga09.intel.com"
+        id S1726484AbgBSJNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 04:13:40 -0500
+Received: from mga04.intel.com ([192.55.52.120]:29897 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726163AbgBSJBs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 04:01:48 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1726265AbgBSJNj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Feb 2020 04:13:39 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Feb 2020 01:01:47 -0800
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Feb 2020 01:13:39 -0800
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,459,1574150400"; 
-   d="scan'208";a="229051702"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.174.165]) ([10.249.174.165])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 19 Feb 2020 01:01:44 -0800
-Subject: Re: [PATCH v2 1/3] KVM: x86: Add EMULTYPE_PF when emulation is
- triggered by a page fault
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200218230310.29410-1-sean.j.christopherson@intel.com>
- <20200218230310.29410-2-sean.j.christopherson@intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <7d564331-9a77-d59a-73d3-a7452fd7b15f@intel.com>
-Date:   Wed, 19 Feb 2020 17:01:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+   d="scan'208";a="315339832"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga001.jf.intel.com with ESMTP; 19 Feb 2020 01:13:38 -0800
+Date:   Wed, 19 Feb 2020 04:04:17 -0500
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 0/3] vfio/type1: Reduce vfio_iommu.lock contention
+Message-ID: <20200219090417.GA30338@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <157919849533.21002.4782774695733669879.stgit@gimli.home>
+ <20200117011050.GC1759@joy-OptiPlex-7040>
 MIME-Version: 1.0
-In-Reply-To: <20200218230310.29410-2-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200117011050.GC1759@joy-OptiPlex-7040>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/19/2020 7:03 AM, Sean Christopherson wrote:
-> Add a new emulation type flag to explicitly mark emulation related to a
-> page fault.  Move the propation of the GPA into the emulator from the
-> page fault handler into x86_emulate_instruction, using EMULTYPE_PF as an
-> indicator that cr2 is valid.  Similarly, don't propagate cr2 into the
-> exception.address when it's *not* valid.
+On Fri, Jan 17, 2020 at 09:10:51AM +0800, Yan Zhao wrote:
+> Thank you, Alex!
+> I'll try it and let you know the result soon. :)
 > 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->   arch/x86/include/asm/kvm_host.h | 12 +++++++++---
->   arch/x86/kvm/mmu/mmu.c          | 10 ++--------
->   arch/x86/kvm/x86.c              | 25 +++++++++++++++++++------
->   3 files changed, 30 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 4dffbc10d3f8..10c1e8f472b6 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1370,8 +1370,9 @@ extern u64 kvm_mce_cap_supported;
->    *		   decode the instruction length.  For use *only* by
->    *		   kvm_x86_ops->skip_emulated_instruction() implementations.
->    *
-> - * EMULTYPE_ALLOW_RETRY - Set when the emulator should resume the guest to
-> - *			  retry native execution under certain conditions.
-> + * EMULTYPE_ALLOW_RETRY_PF - Set when the emulator should resume the guest to
-> + *			     retry native execution under certain conditions,
-> + *			     Can only be set in conjunction with EMULTYPE_PF.
->    *
->    * EMULTYPE_TRAP_UD_FORCED - Set when emulating an intercepted #UD that was
->    *			     triggered by KVM's magic "force emulation" prefix,
-> @@ -1384,13 +1385,18 @@ extern u64 kvm_mce_cap_supported;
->    *			backdoor emulation, which is opt in via module param.
->    *			VMware backoor emulation handles select instructions
->    *			and reinjects the #GP for all other cases.
-> + *
-> + * EMULTYPE_PF - Set when emulating MMIO by way of an intercepted #PF, in which
-> + *		 case the CR2/GPA value pass on the stack is valid.
->    */
->   #define EMULTYPE_NO_DECODE	    (1 << 0)
->   #define EMULTYPE_TRAP_UD	    (1 << 1)
->   #define EMULTYPE_SKIP		    (1 << 2)
-> -#define EMULTYPE_ALLOW_RETRY	    (1 << 3)
-> +#define EMULTYPE_ALLOW_RETRY_PF	    (1 << 3)
+> On Fri, Jan 17, 2020 at 02:17:49AM +0800, Alex Williamson wrote:
+> > Hi Yan,
+> > 
+> > I wonder if this might reduce the lock contention you're seeing in the
+> > vfio_dma_rw series.  These are only compile tested on my end, so I hope
+> > they're not too broken to test.  Thanks,
+> > 
+> > Alex
+> > 
+> > ---
+> > 
+> > Alex Williamson (3):
+> >       vfio/type1: Convert vfio_iommu.lock from mutex to rwsem
+> >       vfio/type1: Replace obvious read lock instances
+> >       vfio/type1: Introduce pfn_list mutex
+> > 
+> > 
+> >  drivers/vfio/vfio_iommu_type1.c |   67 ++++++++++++++++++++++++---------------
+> >  1 file changed, 41 insertions(+), 26 deletions(-)
+> >
 
-How about naming it as EMULTYPE_PF_ALLOW_RETRY and exchanging the bit 
-position with EMULTYPE_PF ?
+hi Alex
+I have finished testing of this series.
+It's quite stable and passed our MTBF testing :)
 
->   #define EMULTYPE_TRAP_UD_FORCED	    (1 << 4)
->   #define EMULTYPE_VMWARE_GP	    (1 << 5)
-> +#define EMULTYPE_PF		    (1 << 6)
-> +
->   int kvm_emulate_instruction(struct kvm_vcpu *vcpu, int emulation_type);
->   int kvm_emulate_instruction_from_buffer(struct kvm_vcpu *vcpu,
->   					void *insn, int insn_len);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 7011a4e54866..258624d46588 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5416,18 +5416,12 @@ EXPORT_SYMBOL_GPL(kvm_mmu_unprotect_page_virt);
->   int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
->   		       void *insn, int insn_len)
->   {
-> -	int r, emulation_type = 0;
-> +	int r, emulation_type = EMULTYPE_PF;
->   	bool direct = vcpu->arch.mmu->direct_map;
->   
->   	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa)))
->   		return RET_PF_RETRY;
->   
-> -	/* With shadow page tables, fault_address contains a GVA or nGPA.  */
-> -	if (vcpu->arch.mmu->direct_map) {
-> -		vcpu->arch.gpa_available = true;
-> -		vcpu->arch.gpa_val = cr2_or_gpa;
-> -	}
-> -
->   	r = RET_PF_INVALID;
->   	if (unlikely(error_code & PFERR_RSVD_MASK)) {
->   		r = handle_mmio_page_fault(vcpu, cr2_or_gpa, direct);
-> @@ -5472,7 +5466,7 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
->   	 * for L1 isn't going to magically fix whatever issue cause L2 to fail.
->   	 */
->   	if (!mmio_info_in_cache(vcpu, cr2_or_gpa, direct) && !is_guest_mode(vcpu))
-> -		emulation_type = EMULTYPE_ALLOW_RETRY;
-> +		emulation_type |= EMULTYPE_ALLOW_RETRY_PF;
->   emulate:
->   	/*
->   	 * On AMD platforms, under certain conditions insn_len may be zero on #NPF.
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fbabb2f06273..92af6c5a69e3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6483,10 +6483,11 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->   	gpa_t gpa = cr2_or_gpa;
->   	kvm_pfn_t pfn;
->   
-> -	if (!(emulation_type & EMULTYPE_ALLOW_RETRY))
-> +	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
->   		return false;
->   
-> -	if (WARN_ON_ONCE(is_guest_mode(vcpu)))
-> +	if (WARN_ON_ONCE(is_guest_mode(vcpu)) ||
-> +	    WARN_ON_ONCE(!(emulation_type & EMULTYPE_PF)))
->   		return false;
->   
->   	if (!vcpu->arch.mmu->direct_map) {
-> @@ -6574,10 +6575,11 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
->   	 */
->   	vcpu->arch.last_retry_eip = vcpu->arch.last_retry_addr = 0;
->   
-> -	if (!(emulation_type & EMULTYPE_ALLOW_RETRY))
-> +	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
->   		return false;
->   
-> -	if (WARN_ON_ONCE(is_guest_mode(vcpu)))
-> +	if (WARN_ON_ONCE(is_guest_mode(vcpu)) ||
-> +	    WARN_ON_ONCE(!(emulation_type & EMULTYPE_PF)))
->   		return false;
->   
->   	if (x86_page_table_writing_insn(ctxt))
-> @@ -6830,8 +6832,19 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->   	}
->   
->   restart:
-> -	/* Save the faulting GPA (cr2) in the address field */
-> -	ctxt->exception.address = cr2_or_gpa;
-> +	if (emulation_type & EMULTYPE_PF) {
-> +		/* Save the faulting GPA (cr2) in the address field */
-> +		ctxt->exception.address = cr2_or_gpa;
-> +
-> +		/* With shadow page tables, cr2 contains a GVA or nGPA. */
-> +		if (vcpu->arch.mmu->direct_map) {
-> +			vcpu->arch.gpa_available = true;
-> +			vcpu->arch.gpa_val = cr2_or_gpa;
-> +		}
-> +	} else {
-> +		/* Sanitize the address out of an abundance of paranoia. */
-> +		ctxt->exception.address = 0;
-> +	}
->   
->   	r = x86_emulate_insn(ctxt);
->   
-> 
+However, after comparing the performance data obtained from several
+benchmarks in guests (see below),
+it seems that this series does not bring in obvious benefit.
+(at least to cases we have tested, and though I cannot fully explain it yet).
+So, do you think it's good for me not to include this series into my next
+version of "use vfio_dma_rw to read/write IOVAs from CPU side"?
+
+
+B: stands for baseline code, where mutex is used for vfio_iommu.lock
+B+S: applied rwsem patches to convert vfio_iommu.lock from mutex to
+rwsem.
+
+==== comparison: benchmark scores ====
+(1) with 1 VM:
+
+ score  |     glmark2    |   lightsmark    |   openarena
+-----------------------------------------------------------
+      B | 1248 (100%)    | 219.70 (100%)   | 114.9 (100%)
+    B+S | 1252 (100.3%)  | 222.76 (101.2%) | 114.8 ( 99.9%)
+
+
+(2) with 2 VMs:
+
+ score  |     glmark2    |   lightsmark    |   openarena                                       
+-----------------------------------------------------------                                    
+      B | 812   (100%)   | 211.46 (100%)   | 115.3 (100%)                                      
+    B+S | 812.8 (100.1%) | 212.96 (100.7%) | 114.9 (99.6%) 
+
+
+==== comparison: average cycles spent on vfio_iommu.lock =====
+(1) with 1 VM:
+
+ cycles | glmark2   | lightsmark | openarena | VM boot up
+---------------------------------------------------------
+      B | 107       | 113        | 110       | 107
+    B+S | 112 (+5)  | 111  (-2)  | 108 (-2)  | 104 (-3)
+
+Note:
+a. during VM boot up, for rwsem, there are 24921 reads vs 67 writes
+(372:1)
+b. for the mesured 3 benchmarks, no write for rwsem.
+
+
+(2) with 2 VMs:
+
+ cycles | glmark2   | lightsmark | openarena | VM boot up
+----------------------------------------------------------
+      B | 113       | 119        | 112       | 119
+    B+S | 118 (+5)  | 138  (+19) | 110 (-2)  | 114 (-5)
+
+
+similar results obtained after applying patches of vfio_dma_rw.
+
+B: stands for baseline code, where mutex is used for vfio_iommu.lock
+B+V: baseline code + patches to convert from using kvm_read/write_guest
+to using vfio_dma_rw
+B+V+S: baseline code + patches to using vfio_dma_rw + patches to use
+rwsem
+
+==== comparison: benchmark scores =====
+(1) with 1 VM:
+
+ score  |     glmark2    |   lightsmark    |   openarena
+----------------------------------------------------------
+    B+V | 1244 (100%)    | 222.18 (100%)   | 114.4 (100%)
+  B+V+S | 1241 ( 99.8%)  | 223.90 (100.8%) | 114.6 (100.2%)
+
+(2) with 2 VMs:
+
+        |     glmark2    |   lightsmark    |   openarena
+----------------------------------------------------------
+    B+V | 811.2 (100%)   | 211.20 (100%)   | 115.4 (100%)
+  B+V+S | 811   (99.98%) | 211.81 (100.3%) | 115.5 (100.1%)
+
+
+==== comparison: average cycles spent on vfio_dma_rw =====
+(1) with 1 VM:
+
+cycles  |    glmark2  | lightsmark | openarena
+--------------------------------------------------
+    B+V | 1396        | 1592       | 1351 
+  B+V+S | 1415 (+19 ) | 1650 (+58) | 1357 (+6)
+
+(2) with 2 VMs:
+
+cycles  |    glmark2  | lightsmark | openarena
+--------------------------------------------------
+    B+V | 1974        | 2024       | 1636
+  B+V+S | 1979 (+5)   | 2051 (+27) | 1644 (+8)
+
+
+==== comparison: average cycles spent on vfio_iommu.lock =====
+(1) with 1 VM:
+
+ cycles | glmark2   | lightsmark | openarena | VM boot up
+---------------------------------------------------------
+    B+V | 137       | 139        | 156       | 124
+  B+V+S | 142 (+5)  | 143 (+4)   | 149 (-7)  | 114 (-10)
+
+(2) with 2 VMs:
+
+ cycles | glmark2   | lightsmark | openarena | VM boot up
+---------------------------------------------------------
+    B+V | 153       | 148        | 146       | 111
+  B+V+S | 155 (+2)  | 157 (+9)   | 156 (+10) | 118 (+7)
+
+
+P.S.
+You may find some inconsistency when comparing to the test result I sent
+at https://lkml.org/lkml/2020/1/14/1486. It is because I had to changed
+my test machine for personal reason and also because I made lightsmark not
+to sync on vblank events.
+
+
+Thanks
+Yan
+
 
