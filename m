@@ -2,61 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2497163F2C
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 09:31:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EFCB163F3E
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 09:32:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726739AbgBSIb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 03:31:26 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33043 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726617AbgBSIbZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Feb 2020 03:31:25 -0500
+        id S1726677AbgBSIcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 03:32:15 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59115 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726617AbgBSIcO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Feb 2020 03:32:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582101084;
+        s=mimecast20190719; t=1582101133;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=3MddeCprVbOIaN+lCKIurbPVsjYEAoMyh3zfLPA49wY=;
-        b=F/qeJ6JMYFcNHeAuNsObm6tgninj4IVH5C4Rg5wZ+/tBrzi2UkE3wHyg8cP8kx/69wjD1D
-        fsRwIipUd7DtyEwkm5VYQH/4l8s7zjozzbmmKHyidqF3VZ7NrtI85jUAIUWmjj+A6p6gqt
-        iY4VegkC83yfg9xbYqOi+Aw9T6LjX3M=
+        bh=RTO09PMajSsYzuU1lnXhYSeO8x4jjeSLpJG9ZPQjbfo=;
+        b=PPsv+BsSwxZrCPFpgx+s9Il1dIsIsAfk/9CEsRi+pRIZUciQ17Mv1hX9uxK7mp5Ovyt1Vg
+        1mHKVBbIKYJQItjFOhcjQKuTYaz7nBTqQi2f/nbzifmIIDlUnHNzD++NfH3/JzUxYMCrB1
+        PMX+Gk1Pu5RDjPMyOrzIda50b+9sGGE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303-4hzS_72_PY24Xg1IvOLH5Q-1; Wed, 19 Feb 2020 03:31:20 -0500
-X-MC-Unique: 4hzS_72_PY24Xg1IvOLH5Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-3-FYCOfOapPESU6wKlArCJKw-1; Wed, 19 Feb 2020 03:32:09 -0500
+X-MC-Unique: FYCOfOapPESU6wKlArCJKw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60BE3107B78C;
-        Wed, 19 Feb 2020 08:31:18 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A96C3107ACC7;
+        Wed, 19 Feb 2020 08:32:07 +0000 (UTC)
 Received: from [10.36.116.151] (ovpn-116-151.ams2.redhat.com [10.36.116.151])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A8631001B09;
-        Wed, 19 Feb 2020 08:31:15 +0000 (UTC)
-Subject: Re: [PATCH v2 01/42] mm:gup/writeback: add callbacks for inaccessible
- pages
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org
-References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-2-borntraeger@de.ibm.com>
- <107a8a72-b745-26f2-5805-c4d99ce77b35@redhat.com>
- <dd33cc1a-214d-b949-8f5e-9c2d40a8e518@de.ibm.com>
- <a8f8786e-1ed0-0c44-08d0-ebc58f43ae40@redhat.com>
- <20200218154610.GB27565@linux.intel.com>
- <20200218160242.GB1133@willie-the-truck>
- <d2536349-bc47-2b0f-79dc-4bb7cea5182d@de.ibm.com>
- <20200218213548.GI28156@linux.intel.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 50D8A9077D;
+        Wed, 19 Feb 2020 08:32:05 +0000 (UTC)
+Subject: Re: [PATCH v2.1] KVM: s390: protvirt: Add initial vm and cpu
+ lifecycle handling
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Ulrich.Weigand@de.ibm.com, cohuck@redhat.com,
+        frankja@linux.ibm.com, frankja@linux.vnet.ibm.com,
+        gor@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
+References: <20200214222658.12946-10-borntraeger@de.ibm.com>
+ <20200218083946.44720-1-borntraeger@de.ibm.com>
+ <42deaa19-d2ca-f1cc-3e83-af0d5d77347f@redhat.com>
+ <f6bc712e-44b0-233e-886f-c72485ea13c3@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -102,49 +89,62 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <e7050290-316d-f938-6ccb-690b2e7ef0e3@redhat.com>
-Date:   Wed, 19 Feb 2020 09:31:14 +0100
+Message-ID: <189b779d-c74d-5622-3c07-2b6db694de97@redhat.com>
+Date:   Wed, 19 Feb 2020 09:32:04 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200218213548.GI28156@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <f6bc712e-44b0-233e-886f-c72485ea13c3@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18.02.20 22:35, Sean Christopherson wrote:
-> On Tue, Feb 18, 2020 at 05:15:57PM +0100, Christian Borntraeger wrote:
 >>
+>>> +	return r;
+>>> +}
+>>> +
+>>> +static int kvm_s390_switch_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
+>>> +{
+>>> +	int i, r = 0;
+>>> +	u16 dummy;
+>>> +
+>>> +	struct kvm_vcpu *vcpu;
+>>> +
+>>> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+>>> +		mutex_lock(&vcpu->mutex);
+>>> +		r = kvm_s390_pv_create_cpu(vcpu, rc, rrc);
+>>> +		mutex_unlock(&vcpu->mutex);
+>>> +		if (r)
+>>> +			break;
+>>> +	}
+>>> +	if (r)
+>>> +		kvm_s390_switch_from_pv(kvm,&dummy, &dummy);
+>>> +	return r;
+>>> +}
+>>> +
+>>> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>>> +{
+>>> +	int r = 0;
+>>> +	u16 dummy;
+>>> +	void __user *argp = (void __user *)cmd->data;
+>>> +
+>>> +	switch (cmd->cmd) {
+>>> +	case KVM_PV_ENABLE: {
+>>> +		r = -EINVAL;
+>>> +		if (kvm_s390_pv_is_protected(kvm))
+>>> +			break;
 >>
->> On 18.02.20 17:02, Will Deacon wrote:
->>> On Tue, Feb 18, 2020 at 07:46:10AM -0800, Sean Christopherson wrote:
->>>> On Tue, Feb 18, 2020 at 09:27:20AM +0100, David Hildenbrand wrote:
->>>>> On 17.02.20 12:10, Christian Borntraeger wrote:
->>>>>> So yes, if everything is setup properly this should not fail in real life
->>>>>> and only we have a kernel (or firmware) bug.
->>>>>>
->>>>>
->>>>> Then, without feedback from other possible users, this should be a void
->>>>> function. So either introduce error handling or convert it to a void for
->>>>> now (and add e.g., BUG_ON and a comment inside the s390x implementation).
->>>>
->>>> My preference would also be for a void function (versus ignoring an int
->>>> return).
->>>
->>> The gup code could certainly handle the error value, although the writeback
->>> is a lot less clear (so a BUG_ON() would seem to be sufficient for now).
->>
->> Sean, David. Can we agree on merging patch 39?
+>> Why not factor out this check, it's common for all sucommands.
 > 
-> I'm a-ok with adding error checking, ignoring the return value is the only
-> option I don't like :-)
+> Unfortunately it is not common. Sometimes it has an "!" sometimes not.
 
-Same over here :)
+Right, makes sense.
+
 
 -- 
 Thanks,
