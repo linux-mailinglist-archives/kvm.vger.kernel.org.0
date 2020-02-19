@@ -2,274 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CBB0D16441F
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 13:24:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54A90164491
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 13:45:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726725AbgBSMYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 07:24:01 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:51464 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726788AbgBSMYB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 07:24:01 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id A1764FAFA392918E439C;
-        Wed, 19 Feb 2020 20:21:37 +0800 (CST)
-Received: from [127.0.0.1] (10.177.246.209) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Wed, 19 Feb 2020
- 20:21:27 +0800
-Subject: Re: [PATCH] mm/hugetlb: avoid get wrong ptep caused by race
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-CC:     <mike.kravetz@oracle.com>, <akpm@linux-foundation.org>,
-        <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-        <arei.gonglei@huawei.com>, <weidong.huang@huawei.com>,
-        <weifuqiang@huawei.com>, <kvm@vger.kernel.org>
-References: <1582027825-112728-1-git-send-email-longpeng2@huawei.com>
- <20200218203717.GE28156@linux.intel.com>
- <a041fdb4-bfd0-ac4b-2809-6fddfc4f8d83@huawei.com>
- <20200219015836.GM28156@linux.intel.com>
-From:   "Longpeng (Mike)" <longpeng2@huawei.com>
-Message-ID: <6ccbde03-953c-c006-a07e-8146b84389d9@huawei.com>
-Date:   Wed, 19 Feb 2020 20:21:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726891AbgBSMp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 07:45:56 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5564 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726786AbgBSMpz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Feb 2020 07:45:55 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01JCj4QM133843
+        for <kvm@vger.kernel.org>; Wed, 19 Feb 2020 07:45:54 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ubtu28n-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 19 Feb 2020 07:45:54 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Wed, 19 Feb 2020 12:45:51 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 19 Feb 2020 12:45:50 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01JCiouf50200850
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Feb 2020 12:44:50 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C3CD11C050;
+        Wed, 19 Feb 2020 12:45:46 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B5A9411C054;
+        Wed, 19 Feb 2020 12:45:45 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.166.21])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Feb 2020 12:45:45 +0000 (GMT)
+Subject: Re: [PATCH v2 29/42] KVM: s390: protvirt: Add diag 308 subcode 8 - 10
+ handling
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-30-borntraeger@de.ibm.com>
+ <9e5e7409-aaa2-47af-812f-169c2d290e18@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Wed, 19 Feb 2020 13:45:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200219015836.GM28156@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <9e5e7409-aaa2-47af-812f-169c2d290e18@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.177.246.209]
-X-CFilter-Loop: Reflected
+X-TM-AS-GCONF: 00
+x-cbid: 20021912-0028-0000-0000-000003DC6AE1
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021912-0029-0000-0000-000024A1779B
+Message-Id: <1ff8a25b-6998-b88f-763e-71f6db08c3fe@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-19_03:2020-02-19,2020-02-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ spamscore=0 priorityscore=1501 mlxlogscore=577 bulkscore=0 malwarescore=0
+ lowpriorityscore=0 clxscore=1015 adultscore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002190097
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-在 2020/2/19 9:58, Sean Christopherson 写道:
-> On Wed, Feb 19, 2020 at 09:39:59AM +0800, Longpeng (Mike) wrote:
->> 在 2020/2/19 4:37, Sean Christopherson 写道:
->>> On Tue, Feb 18, 2020 at 08:10:25PM +0800, Longpeng(Mike) wrote:
->>>> Our machine encountered a panic after run for a long time and
->>>> the calltrace is:
->>>
->>> What's the actual panic?  Is it a BUG() in hugetlb_fault(), a bad pointer
->>> dereference, etc...?
->>>
->> A bad pointer dereference.
->>
->> pgd -> pud -> user 1G hugepage
->> huge_pte_offset() wants to return NULL or pud (point to the entry), but it maybe
->> return the a bad pointer of the user 1G hugepage.
->>
->>>> RIP: 0010:[<ffffffff9dff0587>]  [<ffffffff9dff0587>] hugetlb_fault+0x307/0xbe0
->>>> RSP: 0018:ffff9567fc27f808  EFLAGS: 00010286
->>>> RAX: e800c03ff1258d48 RBX: ffffd3bb003b69c0 RCX: e800c03ff1258d48
->>>> RDX: 17ff3fc00eda72b7 RSI: 00003ffffffff000 RDI: e800c03ff1258d48
->>>> RBP: ffff9567fc27f8c8 R08: e800c03ff1258d48 R09: 0000000000000080
->>>> R10: ffffaba0704c22a8 R11: 0000000000000001 R12: ffff95c87b4b60d8
->>>> R13: 00005fff00000000 R14: 0000000000000000 R15: ffff9567face8074
->>>> FS:  00007fe2d9ffb700(0000) GS:ffff956900e40000(0000) knlGS:0000000000000000
->>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>> CR2: ffffd3bb003b69c0 CR3: 000000be67374000 CR4: 00000000003627e0
->>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>>> Call Trace:
->>>>  [<ffffffff9df9b71b>] ? unlock_page+0x2b/0x30
->>>>  [<ffffffff9dff04a2>] ? hugetlb_fault+0x222/0xbe0
->>>>  [<ffffffff9dff1405>] follow_hugetlb_page+0x175/0x540
->>>>  [<ffffffff9e15b825>] ? cpumask_next_and+0x35/0x50
->>>>  [<ffffffff9dfc7230>] __get_user_pages+0x2a0/0x7e0
->>>>  [<ffffffff9dfc648d>] __get_user_pages_unlocked+0x15d/0x210
->>>>  [<ffffffffc068cfc5>] __gfn_to_pfn_memslot+0x3c5/0x460 [kvm]
->>>>  [<ffffffffc06b28be>] try_async_pf+0x6e/0x2a0 [kvm]
->>>>  [<ffffffffc06b4b41>] tdp_page_fault+0x151/0x2d0 [kvm]
->>>>  [<ffffffffc075731c>] ? vmx_vcpu_run+0x2ec/0xc80 [kvm_intel]
->>>>  [<ffffffffc0757328>] ? vmx_vcpu_run+0x2f8/0xc80 [kvm_intel]
->>>>  [<ffffffffc06abc11>] kvm_mmu_page_fault+0x31/0x140 [kvm]
->>>>  [<ffffffffc074d1ae>] handle_ept_violation+0x9e/0x170 [kvm_intel]
->>>>  [<ffffffffc075579c>] vmx_handle_exit+0x2bc/0xc70 [kvm_intel]
->>>>  [<ffffffffc074f1a0>] ? __vmx_complete_interrupts.part.73+0x80/0xd0 [kvm_intel]
->>>>  [<ffffffffc07574c0>] ? vmx_vcpu_run+0x490/0xc80 [kvm_intel]
->>>>  [<ffffffffc069f3be>] vcpu_enter_guest+0x7be/0x13a0 [kvm]
->>>>  [<ffffffffc06cf53e>] ? kvm_check_async_pf_completion+0x8e/0xb0 [kvm]
->>>>  [<ffffffffc06a6f90>] kvm_arch_vcpu_ioctl_run+0x330/0x490 [kvm]
->>>>  [<ffffffffc068d919>] kvm_vcpu_ioctl+0x309/0x6d0 [kvm]
->>>>  [<ffffffff9deaa8c2>] ? dequeue_signal+0x32/0x180
->>>>  [<ffffffff9deae34d>] ? do_sigtimedwait+0xcd/0x230
->>>>  [<ffffffff9e03aed0>] do_vfs_ioctl+0x3f0/0x540
->>>>  [<ffffffff9e03b0c1>] SyS_ioctl+0xa1/0xc0
->>>>  [<ffffffff9e53879b>] system_call_fastpath+0x22/0x27
->>>>
->>>> ( The kernel we used is older, but we think the latest kernel also has this
->>>>   bug after dig into this problem. )
->>>>
->>>> For 1G hugepages, huge_pte_offset() wants to return NULL or pudp, but it
->>>> may return a wrong 'pmdp' if there is a race. Please look at the following
->>>> code snippet:
->>>>     ...
->>>>     pud = pud_offset(p4d, addr);
->>>>     if (sz != PUD_SIZE && pud_none(*pud))
->>>>         return NULL;
->>>>     /* hugepage or swap? */
->>>>     if (pud_huge(*pud) || !pud_present(*pud))
->>>>         return (pte_t *)pud;
->>>>
->>>>     pmd = pmd_offset(pud, addr);
->>>>     if (sz != PMD_SIZE && pmd_none(*pmd))
->>>>         return NULL;
->>>>     /* hugepage or swap? */
->>>>     if (pmd_huge(*pmd) || !pmd_present(*pmd))
->>>>         return (pte_t *)pmd;
->>>>     ...
->>>>
->>>> The following sequence would trigger this bug:
->>>> 1. CPU0: sz = PUD_SIZE and *pud = 0 , continue
->>>> 1. CPU0: "pud_huge(*pud)" is false
->>>> 2. CPU1: calling hugetlb_no_page and set *pud to xxxx8e7(PRESENT)
->>>> 3. CPU0: "!pud_present(*pud)" is false, continue
->>>> 4. CPU0: pmd = pmd_offset(pud, addr) and maybe return a wrong pmdp
->>>> However, we want CPU0 to return NULL or pudp.
->>>>
->>>> We can avoid this race by read the pud only once.
->>>
->>> Are there any other options for avoiding the panic you hit?  I ask because
->>> there are a variety of flows that use a very similar code pattern, e.g.
->>> lookup_address_in_pgd(), and using READ_ONCE() in huge_pte_offset() but not
->>> other flows could be confusing (or in my case, anxiety inducing[*]).  At
->>> the least, adding a comment in huge_pte_offset() to explain the need for
->>> READ_ONCE() would be helpful.
->>>
->> I hope the hugetlb and mm maintainers could give some other options if they
->> approve this bug.
-> 
-> The race and the fix make sense.  I assumed dereferencing garbage from the
-> huge page was the issue, but I wasn't 100% that was the case, which is why
-> I asked about alternative fixes.
-> 
->> We change the code from
->> 	if (pud_huge(*pud) || !pud_present(*pud))
->> to
->> 	if (pud_huge(*pud)
->> 		return (pte_t *)pud;
->> 	busy loop for 500ms
->> 	if (!pud_present(*pud))
->> 		return (pte_t *)pud;
->> and the panic will be hit quickly.
->>
->> ARM64 has already use READ/WRITE_ONCE to access the pagetable, look at this
->> commit 20a004e7 (arm64: mm: Use READ_ONCE/WRITE_ONCE when accessing page tables).
->>
->> The root cause is: 'if (pud_huge(*pud) || !pud_present(*pud))' read entry from
->> pud twice and the *pud maybe change in a race, so if we only read the pud once.
->> I use READ_ONCE here is just for safe, to prevents the complier mischief if
->> possible.
-> 
-> FWIW, I'd be in favor of going the READ/WRITE_ONCE() route for x86, e.g.
-> convert everything as a follow-up patch (or patches).  I'm fairly confident
-> that KVM's usage of lookup_address_in_mm() is safe, but I wouldn't exactly
-> bet my life on it.  I'd much rather the failing scenario be that KVM uses
-> a sub-optimal page size as opposed to exploding on a bad pointer.
-> 
-Um...our testcase starts 50 VMs with 2U4G(use 1G hugepage) and then do
-live-upgrade(private feature that just modify the qemu and libvirt) and
-live-migrate in turns for each one. However our live upgraded new QEMU won't do
-touch_all_pages.
-Suppose we start a VM without touch_all_pages in QEMU, the VM's guest memory is
-not mapped in the CR3 pagetable at the moment. When the 2 vcpus running, they
-could access some pages belong to the same 1G-hugepage, both of them will vmexit
-due to ept_violation and then call gup-->follow_hugetlb_page-->hugetlb_fault, so
-the race may encounter, right?
-
->> I'll add comments in v2.
->>
->>> [*] In kernel 5.6, KVM is moving to using lookup_address_in_pgd() (via
->>>     lookup_address_in_mm()) to identify large page mappings.  The function
->>>     itself is susceptible to such a race, but KVM only does the lookup
->>>     after it has done gup() and also ensures any zapping of ptes will cause
->>>     KVM to restart the faulting (guest) instruction or that the zap will be
->>>     blocked until after KVM does the lookup, i.e. racing with a transition
->>>     from !PRESENT -> PRESENT should be impossible (in theory).
->>>
->> This bug is from hugetlb core, we could trigger it in other usages even if the
->> latest KVM won't.
-> 
-> I was actually worried about the opposite, introducing a bug by moving to
-> lookup_address_in_mm().
-> 
->>>> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
->>>> ---
->>>>  mm/hugetlb.c | 34 ++++++++++++++++++----------------
->>>>  1 file changed, 18 insertions(+), 16 deletions(-)
->>>>
->>>> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
->>>> index dd8737a..3bde229 100644
->>>> --- a/mm/hugetlb.c
->>>> +++ b/mm/hugetlb.c
->>>> @@ -4908,31 +4908,33 @@ pte_t *huge_pte_alloc(struct mm_struct *mm,
->>>>  pte_t *huge_pte_offset(struct mm_struct *mm,
->>>>  		       unsigned long addr, unsigned long sz)
->>>>  {
->>>> -	pgd_t *pgd;
->>>> -	p4d_t *p4d;
->>>> -	pud_t *pud;
->>>> -	pmd_t *pmd;
->>>> +	pgd_t *pgdp;
->>>> +	p4d_t *p4dp;
->>>> +	pud_t *pudp, pud;
->>>> +	pmd_t *pmdp, pmd;
->>>>  
->>>> -	pgd = pgd_offset(mm, addr);
->>>> -	if (!pgd_present(*pgd))
->>>> +	pgdp = pgd_offset(mm, addr);
->>>> +	if (!pgd_present(*pgdp))
->>>>  		return NULL;
->>>> -	p4d = p4d_offset(pgd, addr);
->>>> -	if (!p4d_present(*p4d))
->>>> +	p4dp = p4d_offset(pgdp, addr);
->>>> +	if (!p4d_present(*p4dp))
->>>>  		return NULL;
->>>>  
->>>> -	pud = pud_offset(p4d, addr);
->>>> -	if (sz != PUD_SIZE && pud_none(*pud))
->>>> +	pudp = pud_offset(p4dp, addr);
->>>> +	pud = READ_ONCE(*pudp);
->>>> +	if (sz != PUD_SIZE && pud_none(pud))
->>>>  		return NULL;
->>>>  	/* hugepage or swap? */
->>>> -	if (pud_huge(*pud) || !pud_present(*pud))
->>>> -		return (pte_t *)pud;
->>>> +	if (pud_huge(pud) || !pud_present(pud))
->>>> +		return (pte_t *)pudp;
->>>>  
->>>> -	pmd = pmd_offset(pud, addr);
->>>> -	if (sz != PMD_SIZE && pmd_none(*pmd))
->>>> +	pmdp = pmd_offset(pudp, addr);
->>>> +	pmd = READ_ONCE(*pmdp);
->>>> +	if (sz != PMD_SIZE && pmd_none(pmd))
->>>>  		return NULL;
->>>>  	/* hugepage or swap? */
->>>> -	if (pmd_huge(*pmd) || !pmd_present(*pmd))
->>>> -		return (pte_t *)pmd;
->>>> +	if (pmd_huge(pmd) || !pmd_present(pmd))
->>>> +		return (pte_t *)pmdp;
->>>>  
->>>>  	return NULL;
->>>>  }
->>>> -- 
->>>> 1.8.3.1
->>>>
->>>>
->>>
->>> .
->>>
->>
->>
->> -- 
->> Regards,
->> Longpeng(Mike)
->>
-> 
 
 
--- 
-Regards,
-Longpeng(Mike)
+On 18.02.20 10:38, David Hildenbrand wrote:
+[...]
+
+set_kvm_facility(kvm->arch.model.fac_mask, 65);
+>>  
+>> +	if (is_prot_virt_host()) {
+>> +		set_kvm_facility(kvm->arch.model.fac_mask, 161);
+>> +		set_kvm_facility(kvm->arch.model.fac_list, 161);
+>> +	}
+>> +
+> 
+> Aren't these IPL subcodes completely emulated in QEMU? If so, rather
+> QEMU with support should enable them when the kernel capability for PV
+> (=== is_prot_virt_host()) is in place.
+
+ack. will drop this patch.
+
 
