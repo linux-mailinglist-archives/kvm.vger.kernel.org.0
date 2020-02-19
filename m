@@ -2,128 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 25F6A16452A
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 14:19:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4685C16460E
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 14:53:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgBSNTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 08:19:23 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2585 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726551AbgBSNTX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 08:19:23 -0500
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.57])
-        by Forcepoint Email with ESMTP id 07EE585EAA1D8F302C6B;
-        Wed, 19 Feb 2020 21:19:14 +0800 (CST)
-Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.16]) by
- DGGEMM406-HUB.china.huawei.com ([10.3.20.214]) with mapi id 14.03.0439.000;
- Wed, 19 Feb 2020 21:19:08 +0800
-From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "quintela@redhat.com" <quintela@redhat.com>,
-        "Liujinsong (Paul)" <liu.jinsong@huawei.com>,
-        "linfeng (M)" <linfeng23@huawei.com>,
-        "wangxin (U)" <wangxinxin.wang@huawei.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>
-Subject: RE: RFC: Split EPT huge pages in advance of dirty logging
-Thread-Topic: RFC: Split EPT huge pages in advance of dirty logging
-Thread-Index: AdXmU97BvyK5YKoyS5++my9GnvXVk///1+yA//428yA=
-Date:   Wed, 19 Feb 2020 13:19:08 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
-References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
- <20200218174311.GE1408806@xz-x1>
-In-Reply-To: <20200218174311.GE1408806@xz-x1>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.228.206]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727280AbgBSNxh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 08:53:37 -0500
+Received: from mail.kmu-office.ch ([178.209.48.109]:40068 "EHLO
+        mail.kmu-office.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726786AbgBSNxg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Feb 2020 08:53:36 -0500
+Received: from webmail.kmu-office.ch (unknown [IPv6:2a02:418:6a02::a3])
+        by mail.kmu-office.ch (Postfix) with ESMTPSA id BCFA25C4EA4;
+        Wed, 19 Feb 2020 14:53:32 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=agner.ch; s=dkim;
+        t=1582120412;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=584CG7iV8fP/g0uoqGFCOFV1KmVRFzk005+5LCc+GNE=;
+        b=v7bnLInYHzR7HlgS/jkPQ1zoPX1Zto/O0QTrCToF9nd44H+EiGKqZnQ5zYGGYvFvVytEzh
+        TeyHfp/ZV3fYGEa9vhIZtLPF2IZtILdUE+fFkNnVsaV3Fou/bQViT0gN3EWVVUymAmgvvB
+        /C2F7WFrsCH3J+1gGL4+2DMAMglkDO0=
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 19 Feb 2020 14:53:32 +0100
+From:   Stefan Agner <stefan@agner.ch>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Anders Berg <anders.berg@lsi.com>,
+        Vladimir Murzin <vladimir.murzin@arm.com>,
+        Russell King <linux@arm.linux.org.uk>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Christoffer Dall <Christoffer.Dall@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
+In-Reply-To: <20200210141324.21090-1-maz@kernel.org>
+References: <20200210141324.21090-1-maz@kernel.org>
+User-Agent: Roundcube Webmail/1.4.1
+Message-ID: <69845f739bbd91e73cd82e7c4683ab5a@agner.ch>
+X-Sender: stefan@agner.ch
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgUGV0ZXIsDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIg
-WHUgW21haWx0bzpwZXRlcnhAcmVkaGF0LmNvbV0NCj4gU2VudDogV2VkbmVzZGF5LCBGZWJydWFy
-eSAxOSwgMjAyMCAxOjQzIEFNDQo+IFRvOiBaaG91amlhbiAoamF5KSA8amlhbmpheS56aG91QGh1
-YXdlaS5jb20+DQo+IENjOiBrdm1Admdlci5rZXJuZWwub3JnOyBxZW11LWRldmVsQG5vbmdudS5v
-cmc7IHBib256aW5pQHJlZGhhdC5jb207DQo+IGRnaWxiZXJ0QHJlZGhhdC5jb207IHF1aW50ZWxh
-QHJlZGhhdC5jb207IExpdWppbnNvbmcgKFBhdWwpDQo+IDxsaXUuamluc29uZ0BodWF3ZWkuY29t
-PjsgbGluZmVuZyAoTSkgPGxpbmZlbmcyM0BodWF3ZWkuY29tPjsgd2FuZ3hpbiAoVSkNCj4gPHdh
-bmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPjsgSHVhbmd3ZWlkb25nIChDKQ0KPiA8d2VpZG9uZy5o
-dWFuZ0BodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogUkZDOiBTcGxpdCBFUFQgaHVnZSBwYWdl
-cyBpbiBhZHZhbmNlIG9mIGRpcnR5IGxvZ2dpbmcNCj4gDQo+IE9uIFR1ZSwgRmViIDE4LCAyMDIw
-IGF0IDAxOjEzOjQ3UE0gKzAwMDAsIFpob3VqaWFuIChqYXkpIHdyb3RlOg0KPiA+IEhpIGFsbCwN
-Cj4gPg0KPiA+IFdlIGZvdW5kIHRoYXQgdGhlIGd1ZXN0IHdpbGwgYmUgc29mdC1sb2NrdXAgb2Nj
-YXNpb25hbGx5IHdoZW4gbGl2ZQ0KPiA+IG1pZ3JhdGluZyBhIDYwIHZDUFUsIDUxMkdpQiBodWdl
-IHBhZ2UgYW5kIG1lbW9yeSBzZW5zaXRpdmUgVk0uIFRoZQ0KPiA+IHJlYXNvbiBpcyBjbGVhciwg
-YWxtb3N0IGFsbCBvZiB0aGUgdkNQVXMgYXJlIHdhaXRpbmcgZm9yIHRoZSBLVk0gTU1VDQo+ID4g
-c3Bpbi1sb2NrIHRvIGNyZWF0ZSA0SyBTUFRFcyB3aGVuIHRoZSBodWdlIHBhZ2VzIGFyZSB3cml0
-ZSBwcm90ZWN0ZWQuIFRoaXMNCj4gcGhlbm9tZW5vbiBpcyBhbHNvIGRlc2NyaWJlZCBpbiB0aGlz
-IHBhdGNoIHNldDoNCj4gPiBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL2NvdmVyLzExMTYz
-NDU5Lw0KPiA+IHdoaWNoIGFpbXMgdG8gaGFuZGxlIHBhZ2UgZmF1bHRzIGluIHBhcmFsbGVsIG1v
-cmUgZWZmaWNpZW50bHkuDQo+ID4NCj4gPiBPdXIgaWRlYSBpcyB0byB1c2UgdGhlIG1pZ3JhdGlv
-biB0aHJlYWQgdG8gdG91Y2ggYWxsIG9mIHRoZSBndWVzdA0KPiA+IG1lbW9yeSBpbiB0aGUgZ3Jh
-bnVsYXJpdHkgb2YgNEsgYmVmb3JlIGVuYWJsaW5nIGRpcnR5IGxvZ2dpbmcuIFRvIGJlDQo+ID4g
-bW9yZSBzcGVjaWZpYywgd2Ugc3BsaXQgYWxsIHRoZSBQRFBFX0xFVkVMIFNQVEVzIGludG8gRElS
-RUNUT1JZX0xFVkVMDQo+ID4gU1BURXMgYXMgdGhlIGZpcnN0IHN0ZXAsIGFuZCB0aGVuIHNwbGl0
-IGFsbCB0aGUgRElSRUNUT1JZX0xFVkVMIFNQVEVzIGludG8NCj4gUEFHRV9UQUJMRV9MRVZFTCBT
-UFRFcyBhcyB0aGUgZm9sbG93aW5nIHN0ZXAuDQo+IA0KPiBJSVVDLCBRRU1VIHdpbGwgcHJlZmVy
-IHRvIHVzZSBodWdlIHBhZ2VzIGZvciBhbGwgdGhlIGFub255bW91cyByYW1ibG9ja3MNCj4gKHBs
-ZWFzZSByZWZlciB0byByYW1fYmxvY2tfYWRkKToNCj4gDQo+ICAgICAgICAgcWVtdV9tYWR2aXNl
-KG5ld19ibG9jay0+aG9zdCwgbmV3X2Jsb2NrLT5tYXhfbGVuZ3RoLA0KPiBRRU1VX01BRFZfSFVH
-RVBBR0UpOw0KDQpZZXMsIHlvdSdyZSByaWdodA0KDQo+IA0KPiBBbm90aGVyIGFsdGVybmF0aXZl
-IEkgY2FuIHRoaW5rIG9mIGlzIHRvIGFkZCBhbiBleHRyYSBwYXJhbWV0ZXIgdG8gUUVNVSB0bw0K
-PiBleHBsaWNpdGx5IGRpc2FibGUgaHVnZSBwYWdlcyAoc28gdGhhdCBjYW4gZXZlbiBiZSBNQURW
-X05PSFVHRVBBR0UNCj4gaW5zdGVhZCBvZiBNQURWX0hVR0VQQUdFKS4gIEhvd2V2ZXIgdGhhdCBz
-aG91bGQgYWxzbyBkcmFnIGRvd24gdGhlDQo+IHBlcmZvcm1hbmNlIGZvciB0aGUgd2hvbGUgbGlm
-ZWN5Y2xlIG9mIHRoZSBWTS4gIA0KDQpGcm9tIHRoZSBwZXJmb3JtYW5jZSBwb2ludCBvZiB2aWV3
-LCBpdCBpcyBiZXR0ZXIgdG8ga2VlcCB0aGUgaHVnZSBwYWdlcw0Kd2hlbiB0aGUgVk0gaXMgbm90
-IGluIHRoZSBsaXZlIG1pZ3JhdGlvbiBzdGF0ZS4NCg0KPiBBIDNyZCBvcHRpb24gaXMgdG8gbWFr
-ZSBhIFFNUA0KPiBjb21tYW5kIHRvIGR5bmFtaWNhbGx5IHR1cm4gaHVnZSBwYWdlcyBvbi9vZmYg
-Zm9yIHJhbWJsb2NrcyBnbG9iYWxseS4NCg0KV2UncmUgc2VhcmNoaW5nIGEgZHluYW1pYyBtZXRo
-b2QgdG9vLg0KV2UgcGxhbiB0byBhZGQgdHdvIG5ldyBmbGFncyBmb3IgZWFjaCBtZW1vcnkgc2xv
-dCwgc2F5DQpLVk1fTUVNX0ZPUkNFX1BUX0RJUkVDVE9SWV9QQUdFUyBhbmQNCktWTV9NRU1fRk9S
-Q0VfUFRfUEFHRV9UQUJMRV9QQUdFUy4gVGhlc2UgZmxhZ3MgY2FuIGJlIHNldA0KdGhyb3VnaCBL
-Vk1fU0VUX1VTRVJfTUVNT1JZX1JFR0lPTiBpb2N0bC4NCg0KVGhlIG1hcHBpbmdfbGV2ZWwgd2hp
-Y2ggaXMgY2FsbGVkIGJ5IHRkcF9wYWdlX2ZhdWx0IGluIHRoZSBrZXJuZWwgc2lkZQ0Kd2lsbCBy
-ZXR1cm4gUFRfRElSRUNUT1JZX0xFVkVMIGlmIHRoZQ0KS1ZNX01FTV9GT1JDRV9QVF9ESVJFQ1RP
-UllfUEFHRVMgZmxhZyBvZiB0aGUgbWVtb3J5IHNsb3QgaXMNCnNldCwgYW5kIHJldHVybiBQVF9Q
-QUdFX1RBQkxFX0xFVkVMIGlmIHRoZQ0KS1ZNX01FTV9GT1JDRV9QVF9QQUdFX1RBQkxFX1BBR0VT
-IGZsYWcgaXMgc2V0Lg0KIA0KVGhlIGtleSBzdGVwcyB0byBzcGxpdCB0aGUgaHVnZSBwYWdlcyBp
-biBhZHZhbmNlIG9mIGVuYWJsaW5nIGRpcnR5IGxvZyBpcw0KYXMgZm9sbG93czoNCjEuIFRoZSBt
-aWdyYXRpb24gdGhyZWFkIGluIHVzZXIgc3BhY2UgdXNlcw0KS1ZNX1NFVF9VU0VSX01FTU9SWV9S
-RUdJT04gaW9jdGwgdG8gc2V0IHRoZQ0KS1ZNX01FTV9GT1JDRV9QVF9ESVJFQ1RPUllfUEFHRVMg
-ZmxhZyBmb3IgZWFjaCBtZW1vcnkgc2xvdC4NCjIuIFRoZSBtaWdyYXRpb24gdGhyZWFkIGNvbnRp
-bnVlcyB0byB1c2UgdGhlIEtWTV9TUExJVF9IVUdFX1BBR0VTDQppb2N0bCAod2hpY2ggaXMgbmV3
-bHkgYWRkZWQpIHRvIGRvIHRoZSBzcGxpdHRpbmcgb2YgbGFyZ2UgcGFnZXMgaW4gdGhlDQprZXJu
-ZWwgc2lkZS4NCjMuIEEgbmV3IHZDUFUgaXMgY3JlYXRlZCB0ZW1wb3JhbGx5KGRvIHNvbWUgaW5p
-dGlhbGl6YXRpb24gYnV0IHdpbGwgbm90DQpydW4pIHRvIGhlbHAgdG8gZG8gdGhlIHdvcmssIGku
-ZS4gYXMgdGhlIHBhcmFtZXRlciBvZiB0aGUgdGRwX3BhZ2VfZmF1bHQuDQo0LiBDb2xsZWN0IHRo
-ZSBHUEEgcmFuZ2VzIG9mIGFsbCB0aGUgbWVtb3J5IHNsb3RzIHdpdGggdGhlDQpLVk1fTUVNX0ZP
-UkNFX1BUX0RJUkVDVE9SWV9QQUdFUyBmbGFnIHNldC4NCjUuIFNwbGl0IHRoZSAxRyBodWdlIHBh
-Z2VzKGNvbGxlY3RlZCBpbiBzdGVwIDQpIGludG8gMk0gYnkgY2FsbGluZw0KdGRwX3BhZ2VfZmF1
-bHQsIHNpbmNlIHRoZSBtYXBwaW5nX2xldmVsIHdpbGwgcmV0dXJuDQpQVF9ESVJFQ1RPUllfTEVW
-RUwuIEhlcmUgaXMgdGhlIG1haW4gZGlmZmVyZW5jZSBmcm9tIHRoZSB1c3VhbA0KcGF0aCB3aGlj
-aCBpcyBjYXVzZWQgYnkgdGhlIEd1ZXN0IHNpZGUoRVBUIHZpb2xhdGlvbi9taXNjb25maWcgZXRj
-KSwNCndlIGNhbGwgaXQgZGlyZWN0bHkgaW4gdGhlIGh5cGVydmlzb3Igc2lkZS4NCjYuIERvIHNv
-bWUgY2xlYW51cHMsIGkuZS4gZnJlZSB0aGUgdkNQVSByZWxhdGVkIHJlc291cmNlcw0KNy4gVGhl
-IEtWTV9TUExJVF9IVUdFX1BBR0VTIGlvY3RsIHJldHVybmVkIHRvIHRoZSB1c2VyIHNwYWNlIHNp
-ZGUuDQo4LiBVc2luZyBLVk1fTUVNX0ZPUkNFX1BUX1BBR0VfVEFCTEVfUEFHRVMgaW5zdHJlYWQg
-b2YNCktWTV9NRU1fRk9SQ0VfUFRfRElSRUNUT1JZX1BBR0VTIHRvIHJlcGVhdCBzdGVwIDEgfiBz
-dGVwIDcsDQppbiBzdGVwIDUgdGhlIDJNIGh1Z2UgcGFnZXMgd2lsbCBiZSBzcGxpdHRlZCBpbnRv
-IDRLIHBhZ2VzLg0KOS4gQ2xlYXIgdGhlIEtWTV9NRU1fRk9SQ0VfUFRfRElSRUNUT1JZX1BBR0VT
-IGFuZA0KS1ZNX01FTV9GT1JDRV9QVF9QQUdFX1RBQkxFX1BBR0VTIGZsYWdzIGZvciBlYWNoIG1l
-bW9yeSBzbG90Lg0KMTAuIFRoZW4gdGhlIG1pZ3JhdGlvbiB0aHJlYWQgY2FsbHMgdGhlIGxvZ19z
-dGFydCBpb2N0bCB0byBlbmFibGUgdGhlIGRpcnR5DQpsb2dnaW5nLCBhbmQgdGhlIHJlbWFpbmlu
-ZyB0aGluZyBpcyB0aGUgc2FtZS4NCg0KV2hhdCdzIHlvdXIgdGFrZSBvbiB0aGlzLCB0aGFua3Mu
-DQoNClJlZ2FyZHMsDQpKYXkgWmhvdQ0KDQo+IEhhdmVuJ3QgdGhvdWdodCBkZWVwIGludG8gYW55
-IG9mIHRoZW0sIGJ1dCBzZWVtcyBkb2FibGUuDQo+IA0KPiBUaGFua3MsDQo+IA0KPiAtLQ0KPiBQ
-ZXRlciBYdQ0KDQo=
+On 2020-02-10 15:13, Marc Zyngier wrote:
+> KVM/arm was merged just over 7 years ago, and has lived a very quiet
+> life so far. It mostly works if you're prepared to deal with its
+> limitations, it has been a good prototype for the arm64 version,
+> but it suffers a few problems:
+> 
+> - It is incomplete (no debug support, no PMU)
+> - It hasn't followed any of the architectural evolutions
+> - It has zero users (I don't count myself here)
+> - It is more and more getting in the way of new arm64 developments
+> 
+> So here it is: unless someone screams and shows that they rely on
+> KVM/arm to be maintained upsteam, I'll remove 32bit host support
+> form the tree. One of the reasons that makes me confident nobody is
+> using it is that I never receive *any* bug report. Yes, it is perfect.
+
+Not entirely true:
+https://lore.kernel.org/m/e2f7196ca6c70c55463a45b490f6731a@agner.ch
+
+But, after that was fixed, it actually was perfect :-D
+https://blog.printk.io/2016/09/kvm-with-kvmtool-on-armv7/
+
+That said, I never used it in a real-world application, so from my side
+removing it is fine.
+
+--
+Stefan
+
+> But if you depend on KVM/arm being available in mainline, please shout.
+> 
+> To reiterate: 32bit guest support for arm64 stays, of course. Only
+> 32bit host goes. Once this is merged, I plan to move virt/kvm/arm to
+> arm64, and cleanup all the now unnecessary abstractions.
+> 
+> The patches have been generated with the -D option to avoid spamming
+> everyone with huge diffs, and there is a kvm-arm/goodbye branch in
+> my kernel.org repository.
+> 
+> Marc Zyngier (5):
+>   arm: Unplug KVM from the build system
+>   arm: Remove KVM from config files
+>   arm: Remove 32bit KVM host support
+>   arm: Remove HYP/Stage-2 page-table support
+>   arm: Remove GICv3 vgic compatibility macros
+> 
+>  Documentation/virt/kvm/arm/hyp-abi.txt |    5 +
+>  arch/arm/Kconfig                       |    2 -
+>  arch/arm/Makefile                      |    1 -
+>  arch/arm/configs/axm55xx_defconfig     |    2 -
+>  arch/arm/include/asm/arch_gicv3.h      |  114 --
+>  arch/arm/include/asm/kvm_arm.h         |  239 ----
+>  arch/arm/include/asm/kvm_asm.h         |   77 --
+>  arch/arm/include/asm/kvm_coproc.h      |   36 -
+>  arch/arm/include/asm/kvm_emulate.h     |  372 ------
+>  arch/arm/include/asm/kvm_host.h        |  459 --------
+>  arch/arm/include/asm/kvm_hyp.h         |  127 ---
+>  arch/arm/include/asm/kvm_mmu.h         |  435 -------
+>  arch/arm/include/asm/kvm_ras.h         |   14 -
+>  arch/arm/include/asm/pgtable-3level.h  |   20 -
+>  arch/arm/include/asm/pgtable.h         |    9 -
+>  arch/arm/include/asm/sections.h        |    6 +-
+>  arch/arm/include/asm/stage2_pgtable.h  |   75 --
+>  arch/arm/include/asm/virt.h            |   12 -
+>  arch/arm/include/uapi/asm/kvm.h        |  314 -----
+>  arch/arm/kernel/asm-offsets.c          |   11 -
+>  arch/arm/kernel/vmlinux-xip.lds.S      |    8 -
+>  arch/arm/kernel/vmlinux.lds.S          |    8 -
+>  arch/arm/kernel/vmlinux.lds.h          |   10 -
+>  arch/arm/kvm/Kconfig                   |   59 -
+>  arch/arm/kvm/Makefile                  |   43 -
+>  arch/arm/kvm/coproc.c                  | 1455 ------------------------
+>  arch/arm/kvm/coproc.h                  |  130 ---
+>  arch/arm/kvm/coproc_a15.c              |   39 -
+>  arch/arm/kvm/coproc_a7.c               |   42 -
+>  arch/arm/kvm/emulate.c                 |  166 ---
+>  arch/arm/kvm/guest.c                   |  387 -------
+>  arch/arm/kvm/handle_exit.c             |  175 ---
+>  arch/arm/kvm/hyp/Makefile              |   34 -
+>  arch/arm/kvm/hyp/banked-sr.c           |   70 --
+>  arch/arm/kvm/hyp/cp15-sr.c             |   72 --
+>  arch/arm/kvm/hyp/entry.S               |  121 --
+>  arch/arm/kvm/hyp/hyp-entry.S           |  295 -----
+>  arch/arm/kvm/hyp/s2-setup.c            |   22 -
+>  arch/arm/kvm/hyp/switch.c              |  242 ----
+>  arch/arm/kvm/hyp/tlb.c                 |   68 --
+>  arch/arm/kvm/hyp/vfp.S                 |   57 -
+>  arch/arm/kvm/init.S                    |  157 ---
+>  arch/arm/kvm/interrupts.S              |   36 -
+>  arch/arm/kvm/irq.h                     |   16 -
+>  arch/arm/kvm/reset.c                   |   86 --
+>  arch/arm/kvm/trace.h                   |   86 --
+>  arch/arm/kvm/vgic-v3-coproc.c          |   27 -
+>  arch/arm/mach-exynos/Kconfig           |    2 +-
+>  arch/arm/mm/mmu.c                      |   26 -
+>  49 files changed, 7 insertions(+), 6262 deletions(-)
+>  delete mode 100644 arch/arm/include/asm/kvm_arm.h
+>  delete mode 100644 arch/arm/include/asm/kvm_asm.h
+>  delete mode 100644 arch/arm/include/asm/kvm_coproc.h
+>  delete mode 100644 arch/arm/include/asm/kvm_emulate.h
+>  delete mode 100644 arch/arm/include/asm/kvm_host.h
+>  delete mode 100644 arch/arm/include/asm/kvm_hyp.h
+>  delete mode 100644 arch/arm/include/asm/kvm_mmu.h
+>  delete mode 100644 arch/arm/include/asm/kvm_ras.h
+>  delete mode 100644 arch/arm/include/asm/stage2_pgtable.h
+>  delete mode 100644 arch/arm/include/uapi/asm/kvm.h
+>  delete mode 100644 arch/arm/kvm/Kconfig
+>  delete mode 100644 arch/arm/kvm/Makefile
+>  delete mode 100644 arch/arm/kvm/coproc.c
+>  delete mode 100644 arch/arm/kvm/coproc.h
+>  delete mode 100644 arch/arm/kvm/coproc_a15.c
+>  delete mode 100644 arch/arm/kvm/coproc_a7.c
+>  delete mode 100644 arch/arm/kvm/emulate.c
+>  delete mode 100644 arch/arm/kvm/guest.c
+>  delete mode 100644 arch/arm/kvm/handle_exit.c
+>  delete mode 100644 arch/arm/kvm/hyp/Makefile
+>  delete mode 100644 arch/arm/kvm/hyp/banked-sr.c
+>  delete mode 100644 arch/arm/kvm/hyp/cp15-sr.c
+>  delete mode 100644 arch/arm/kvm/hyp/entry.S
+>  delete mode 100644 arch/arm/kvm/hyp/hyp-entry.S
+>  delete mode 100644 arch/arm/kvm/hyp/s2-setup.c
+>  delete mode 100644 arch/arm/kvm/hyp/switch.c
+>  delete mode 100644 arch/arm/kvm/hyp/tlb.c
+>  delete mode 100644 arch/arm/kvm/hyp/vfp.S
+>  delete mode 100644 arch/arm/kvm/init.S
+>  delete mode 100644 arch/arm/kvm/interrupts.S
+>  delete mode 100644 arch/arm/kvm/irq.h
+>  delete mode 100644 arch/arm/kvm/reset.c
+>  delete mode 100644 arch/arm/kvm/trace.h
+>  delete mode 100644 arch/arm/kvm/vgic-v3-coproc.c
