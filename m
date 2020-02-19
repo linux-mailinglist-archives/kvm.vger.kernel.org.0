@@ -2,69 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C74BD163C12
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 05:32:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BD32163C26
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 05:53:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726528AbgBSEcc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Feb 2020 23:32:32 -0500
-Received: from sonic311-15.consmr.mail.bf2.yahoo.com ([74.6.131.125]:36883
-        "EHLO sonic311-15.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726477AbgBSEcb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 23:32:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1582086750; bh=EoSOra7a2saN4Rx9MPg7CnNKAW+5S8RlMnV+0g1PH1E=; h=Date:From:Reply-To:Subject:References:From:Subject; b=e5Rva6aYOqdK0ttiaX819nHL5JT5KRIYcNQhSSelGF/ikhDPhfcjP4Sq717T3lsuKe/q9sv2skLILDBwKQciSPmHzHc0Woo8LZSRIaywJFas44N7IIGWyLZ0KPHirMwBFHHRvAaScaxlvhqsF+rIAAHnXdPIerRIYo6g6Yn4MhBtJ4cFVlh6f5+tolY21O518RqreOrhGmfr1zJKDjeaKVz/Hw+dUD/7Rb8xIMUdvaNG10XI3pm3dpP/2n4VRZdO9k5qbqoNz7xKJOkYNybLc0+mtclsIW+rO26JDfO8Z1AYjSGpktUWL7TgYBuwa/e8pDVFftVBtCeiz8iSW/hBpw==
-X-YMail-OSG: raJc3YEVM1mb_188ssRY6QmEYKHSiwg1dZosWmPHcld.skZhuR1lPGXKn0tA.2U
- 2aQD7b.Ehor_dR1IQnae1FSGqkFEKATwyim.wu7Zg7ya4xMKqknirvNgb0z4MAJ9Z7Xgi3jDwqPB
- .CYPlbdYYHOMh2FWE0_sih61GRgqBmCuQCuAy2.CzqjHUuF8nAGVT4eT8AYOZNytNKb8uicf7e8u
- zODvk4zjBulNkBAWZ9MSgyyZHeubf1RxT2JxbZWemEQZ2XqkwIi2MDKYzhURPaqByF1d8VM0VXpc
- oxzs673G.8BChJ7bvbCU6q7xKiV80vEkQY23TB3zgNwwI6efCeWgwWgNZE2JubXVqc_UIV3w_fbY
- rht5EY8kSD0VVc2LIVcMZNHkyhLacL.IpMB8A_vVQ4y_QZp3HlEkOt7L2gWnfd448BOKJLtddgF2
- 06z76TKv.6bx7F5SYZSzYKzAP6CqEw11euG1n9C3GP9_cw8VWgTLi.PVGwhsDZNONLcc43PYApNf
- 4N6QGOrxnyYG.ty3_t6LCx.eV1alYThPuL0mVVnjJfOw2Ubzk7E1ENgYzJOmDf4TU0cjVmDsz8.P
- rO4DB6Pr.2a.Mbn5A.e78Pn.ZoxLCUsdCuJYk2vnsd8WBaGclxJGlhDyVB26ZDbSA4gUV5hqktVd
- KNsGbimIY5IpuxmrH_dZQBm_rCFmAyBC9FCiIZxhmqx9XeSAh.4LWy7vwL39Ru2lezK7NAZw3eLG
- nkfYmM4Uy4NrkAwYj05oyyInFaX5akMevQ8qZZPVhxUJXB_Ypq0m1ow55JGjLLq.P_fKtY6r1fWr
- TPMYI.uMAhrMclyw9.nqp8JLs.Di9MOs0U1Rl8ZBWe.0JtLaQLdgWkWHfOCLIP3UvNl0l6WXJJhe
- p7bCNZNOSHXW4Gesrf9AE_8Zcx7zQIpq9dkoGjrEnHyvQ7WlnApHrueCeNmNkvmzNTo7y8qypiLP
- JebmmkykOgdhF7y1OxQpT0NIRPUzIxHBYmSTWE7wFn936NIekRSSEcj8lF3akuUT7OIDx02gepJt
- y9YaNaxnRsgLkB8onoivtxrHHC_RwyM4_h5.YTeamni8trZNXV8C61V1ifltlRnUmUOSDe6k_oJ0
- CPHcyD6r9YiQdXRA4G6LpJhBxJkQiRP3qmU3aGlaY7Voe6HeKyebsPiOzyg5tkXuaEJJtmsLkgzG
- M4m_AIWmk8Cd50z7qQgm933EOE2K9TPZxMqGbCzlpyh53MC77pJCBAprn1uquzO66STVsxmx90WK
- 6s2nYREKJK.ZrxMrq3NbyjJKhvgyndYkihPD5Q7PgbBZLZ6whU5.op3zAXUnco_lKBuuoUrnwa7w
- wCOXILQ--
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.bf2.yahoo.com with HTTP; Wed, 19 Feb 2020 04:32:30 +0000
-Date:   Wed, 19 Feb 2020 04:32:27 +0000 (UTC)
-From:   Mohaiyani Binti <mohaiyanibintis100@gmail.com>
-Reply-To: mohaiyanibintis100@gmail.com
-Message-ID: <904205497.3594406.1582086747363@mail.yahoo.com>
-Subject: Dear Sir or Madam
+        id S1726613AbgBSExm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Feb 2020 23:53:42 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59635 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726508AbgBSExl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Feb 2020 23:53:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582088020;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UZQEarcZjA+qw1NyzHHfk9yqsM61NrOnqWFEATw0uTg=;
+        b=f5FHnByVYP2NZI9YA5UWch4jxwIhAqd7C40YzOmu3KlTLbXjEGeHa/qCi92UKLlrhwYkJP
+        nvekB3tAzys1oUR4e9l4RVw6a5MGW3twK3j34255oPOG8YOEUt2hRoYNNhrSLmDUyeOlfQ
+        6DUdnNZma3YZFaAt/CZ4QssIzIKzjRg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-IlubJAgBOmqQ-v_yMUrPFw-1; Tue, 18 Feb 2020 23:53:36 -0500
+X-MC-Unique: IlubJAgBOmqQ-v_yMUrPFw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4D9413E2;
+        Wed, 19 Feb 2020 04:53:33 +0000 (UTC)
+Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BF8C75C10D;
+        Wed, 19 Feb 2020 04:53:30 +0000 (UTC)
+Date:   Tue, 18 Feb 2020 21:53:30 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v12 Kernel 4/7] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20200218215330.5bc8fc6a@w520.home>
+In-Reply-To: <96d9990f-b27f-759e-1395-9b2eff218bfa@nvidia.com>
+References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
+        <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
+        <20200210102518.490a0d87@x1.home>
+        <7e7356c8-29ed-31fa-5c0b-2545ae69f321@nvidia.com>
+        <20200212161320.02d8dfac@w520.home>
+        <0244aca6-80f7-1c1d-812e-d53a48b5479d@nvidia.com>
+        <20200213162011.40b760a8@w520.home>
+        <ea31fb62-4cd3-babb-634d-f69407586c93@nvidia.com>
+        <20200217135518.4d48ebd6@w520.home>
+        <57199367-e562-800a-ef73-f28bc5ddb2fe@nvidia.com>
+        <20200218144105.4076b7eb@w520.home>
+        <96d9990f-b27f-759e-1395-9b2eff218bfa@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-References: <904205497.3594406.1582086747363.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.15199 YMailNodin Mozilla/5.0 (Windows NT 6.1; rv:73.0) Gecko/20100101 Firefox/73.0
-To:     unlisted-recipients:; (no To-header on input)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear Sir or Madam
+On Wed, 19 Feb 2020 09:51:32 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-I am Mohaiyani binti Shamsudin, who works in ADB (BURKINA FASO) as a non-independent non-executive Director and President of AFRICAN DEVELOPMENT BANK.
-During our last banking audits, we discovered that an account abandoned belongs to one of our deceased foreign clients, the Mr. Wang Jian, co-founder and co-chair of the HNA Group, a conglomerate Chinese with important real estate properties throughout the US UU. in a accident during a business trip in France on Tuesday.
+> On 2/19/2020 3:11 AM, Alex Williamson wrote:
+> > On Tue, 18 Feb 2020 11:28:53 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> <snip>
+> >>  
+> >>>>>>>     As I understand the above algorithm, we find a vfio_dma
+> >>>>>>> overlapping the request and populate the bitmap for that range.  Then
+> >>>>>>> we go back and put_user() for each byte that we touched.  We could
+> >>>>>>> instead simply work on a one byte buffer as we enumerate the requested
+> >>>>>>> range and do a put_user() ever time we reach the end of it and have bits
+> >>>>>>> set. That would greatly simplify the above example.  But I would expect
+> >>>>>>> that we're a) more likely to get asked for ranges covering a single
+> >>>>>>> vfio_dma  
+> >>>>>>
+> >>>>>> QEMU ask for single vfio_dma during each iteration.
+> >>>>>>
+> >>>>>> If we restrict this ABI to cover single vfio_dma only, then it
+> >>>>>> simplifies the logic here. That was my original suggestion. Should we
+> >>>>>> think about that again?  
+> >>>>>
+> >>>>> But we currently allow unmaps that overlap multiple vfio_dmas as long
+> >>>>> as no vfio_dma is bisected, so I think that implies that an unmap while
+> >>>>> asking for the dirty bitmap has even further restricted semantics.  I'm
+> >>>>> also reluctant to design an ABI around what happens to be the current
+> >>>>> QEMU implementation.
+> >>>>>
+> >>>>> If we take your example above, ranges {0x0000,0xa000} and
+> >>>>> {0xa000,0x10000} ({start,end}), I think you're working with the
+> >>>>> following two bitmaps in this implementation:
+> >>>>>
+> >>>>> 00000011 11111111b
+> >>>>> 00111111b
+> >>>>>
+> >>>>> And we need to combine those into:
+> >>>>>
+> >>>>> 11111111 11111111b
+> >>>>>
+> >>>>> Right?
+> >>>>>
+> >>>>> But it seems like that would be easier if the second bitmap was instead:
+> >>>>>
+> >>>>> 11111100b
+> >>>>>
+> >>>>> Then we wouldn't need to worry about the entire bitmap being shifted by
+> >>>>> the bit offset within the byte, which limits our fixes to the boundary
+> >>>>> byte and allows us to use copy_to_user() directly for the bulk of the
+> >>>>> copy.  So how do we get there?
+> >>>>>
+> >>>>> I think we start with allocating the vfio_dma bitmap to account for
+> >>>>> this initial offset, so we calculate bitmap_base_iova as:
+> >>>>>      (iova & ~((PAGE_SIZE << 3) - 1))
+> >>>>> We then use bitmap_base_iova in calculating which bits to set.
+> >>>>>
+> >>>>> The user needs to follow the same rules, and maybe this adds some value
+> >>>>> to the user providing the bitmap size rather than the kernel
+> >>>>> calculating it.  For example, if the user wanted the dirty bitmap for
+> >>>>> the range {0xa000,0x10000} above, they'd provide at least a 1 byte
+> >>>>> bitmap, but we'd return bit #2 set to indicate 0xa000 is dirty.
+> >>>>>
+> >>>>> Effectively the user can ask for any iova range, but the buffer will be
+> >>>>> filled relative to the zeroth bit of the bitmap following the above
+> >>>>> bitmap_base_iova formula (and replacing PAGE_SIZE with the user
+> >>>>> requested pgsize).  I'm tempted to make this explicit in the user
+> >>>>> interface (ie. only allow bitmaps starting on aligned pages), but a
+> >>>>> user is able to map and unmap single pages and we need to support
+> >>>>> returning a dirty bitmap with an unmap, so I don't think we can do that.
+> >>>>>         
+> >>>>
+> >>>> Sigh, finding adjacent vfio_dmas within the same byte seems simpler than
+> >>>> this.  
+> >>>
+> >>> How does KVM do this?  My intent was that if all of our bitmaps share
+> >>> the same alignment then we can merge the intersection and continue to
+> >>> use copy_to_user() on either side.  However, if QEMU doesn't do the
+> >>> same, it doesn't really help us.  Is QEMU stuck with an implementation
+> >>> of only retrieving dirty bits per MemoryRegionSection exactly because
+> >>> of this issue and therefore we can rely on it in our implementation as
+> >>> well?  Thanks,
+> >>>      
+> >>
+> >> QEMU sync dirty_bitmap per MemoryRegionSection. Within
+> >> MemoryRegionSection there could be multiple KVMSlots. QEMU queries
+> >> dirty_bitmap per KVMSlot and mark dirty for each KVMSlot.
+> >> On kernel side, KVM_GET_DIRTY_LOG ioctl calls
+> >> kvm_get_dirty_log_protect(), where it uses copy_to_user() to copy bitmap
+> >> of that memSlot.
+> >> vfio_dma is per MemoryRegionSection. We can reply on MemoryRegionSection
+> >> in our implementation. But to get bitmap during unmap, we have to take
+> >> care of concatenating bitmaps.  
+> > 
+> > So KVM does not worry about bitmap alignment because the interface is
+> > based on slots, a dirty bitmap can only be retrieved for a single,
+> > entire slot.  We need VFIO_IOMMU_UNMAP_DMA to maintain its support for
+> > spanning multiple vfio_dmas, but maybe we have some leeway that we
+> > don't need to support both multiple vfio_dmas and dirty bitmap at the
+> > same time.  It seems like it would be a massive simplification if we
+> > required an unmap with dirty bitmap to span exactly one vfio_dma,
+> > right?   
+> 
+> Yes.
+> 
+> > I don't see that we'd break any existing users with that, it's
+> > unfortunate that we can't have the flexibility of the existing calling
+> > convention, but I think there's good reason for it here.  Our separate
+> > dirty bitmap log reporting would follow the same semantics.  I think
+> > this all aligns with how the MemoryListener works in QEMU right now,
+> > correct?  For example we wouldn't need any extra per MAP_DMA tracking
+> > in QEMU like KVM has for its slots.
+> >   
+> 
+> That right.
+> Should we go ahead with the implementation to get dirty bitmap for one 
+> vfio_dma for GET_DIRTY ioctl and unmap with dirty ioctl? Accordingly we 
+> can have sanity checks in these ioctls.
 
-Go to this link: https://observer.com/2018/07/wang-jian-hna-founder-dies-tragic-fall/
+Yes, I'm convinced that bitmap alignment is sufficiently too difficult
+and unnecessary to restrict the calling convention of UNMAP_DMA, when
+using the dirty bitmap extension, to exactly unmap a single vfio_dma.
+Thanks,
 
-I am writing to request your assistance to transfer the sum of $ 15,000,000.00 (fifteen million United States dollars) at its counts as Wang Jian's last foreign business partner, which I plan use the fund to invest in public benefit as follows
+Alex
 
-1. Establish an orphanage home to help orphaned children.
-2. Build a hospital to help the poor.
-3. Build an asylum for the elderly and homeless.
-
-Meanwhile, before contacting you, I did an investigation staff to locate one of the relatives of the late Mr. Wang Jian who knows the account, but I didn't succeed. However, I took this decision to support orphans and less privileged children with this fund, because I don't want this fund transferred to our Account of Government treasury as unclaimed fund. I am willing to offer you the 40% of the fund for your support and assistant to transfer the fund to your account.
-
-More detailed information will be sent to the disaggregation explaining how The fund will be transferred to you. Please continue to achieve the purpose.
-
-Waiting for your urgent response.
-Attentively
-Mohaiyani Binti Shamsudin.
