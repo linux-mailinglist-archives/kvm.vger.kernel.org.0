@@ -2,107 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7320D16436E
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 12:33:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D58051643B1
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 12:51:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726632AbgBSLds (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 06:33:48 -0500
-Received: from mail-db8eur05on2113.outbound.protection.outlook.com ([40.107.20.113]:32576
-        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
+        id S1727069AbgBSLvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 06:51:00 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:34714 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726270AbgBSLds (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 06:33:48 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Byeniih9piagA7RrjbZnDH35RaPKNR2D5X5i4kvSUlvRQGgFAdT/4kgso+PSYRUOG8/l3I24ALDWZLveH1igxpoAwqLn+mSeXPEqcagd15nNHj4XRTbdAdnq5Q6u9Pa6SuH6nukyQ84e88VL+oR3W9KgoBioUhGwANmpjYcOfkk9XPmPs3IjG2N+k5z+lBtZvB/em7geE306XeUJ7GoOKaZAaWMB8bEdNx41Hbrs11THdRN2RblaEoCqYXlsBc+0rOXHTMvp0nXLjGF57SuL96Eiyk9Ybdn8rFg40ENKw9gellJSw5xUh3zksd8m3UwRLCGf7AEufBMdL5lB9w2Q3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OhORqGGEeidanHLd2dJLxLKztCPUKuB8xsZZx046zwA=;
- b=lo4praxBC2q8t4DGAlIwKt6gjk9U9+0UR6RvK+ztom9tg39nNPbSGcy8oyeN5Bo3oOIwScWHQyuogr27dLrj/Td86aTQ4A2vP11DhwJm4oB60JkeRbZXCEPE/59DU1+wQz5Dz7L6ULU3+nFuECsJaa9JnB5zgO4oWfk3M+usTEFKjPSnPU6z005A9QpGmtF/JxuR6TM/CPYaETR/K1qfrC6LFv5ov5RwKPgnUlhFElRIva/WPB2pJFK0vFxCg7zV9koTr+Xzx9IIaUuM6VRpOugU54RtFWjfhhjY3k5JirmkcKRf0ZQw5+1PBJTjApzZkrAALuHeFxGrDjoAcAihBw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=criteo.com; dmarc=pass action=none header.from=criteo.com;
- dkim=pass header.d=criteo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=criteo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OhORqGGEeidanHLd2dJLxLKztCPUKuB8xsZZx046zwA=;
- b=H9nusnNdEECpDvggdu5dChIK1yiyAoH54Ozg06e2VVieOFI4j2CLay3dMRE750vRwSleTY836gKovZNJfTn8S5Zro/JIzmjV8HJ3bHneOay+he135VIEmaiG6cTytvH8eLFLi8Bo1fcY8a6s45d9nKIqTpMvGT2qXLczwyB9G48=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=e.velu@criteo.com; 
-Received: from VI1PR04MB4926.eurprd04.prod.outlook.com (20.177.48.80) by
- VI1PR04MB4094.eurprd04.prod.outlook.com (52.133.13.160) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.25; Wed, 19 Feb 2020 11:33:44 +0000
-Received: from VI1PR04MB4926.eurprd04.prod.outlook.com
- ([fe80::99f4:5892:158f:5ae4]) by VI1PR04MB4926.eurprd04.prod.outlook.com
- ([fe80::99f4:5892:158f:5ae4%5]) with mapi id 15.20.2729.032; Wed, 19 Feb 2020
- 11:33:44 +0000
-Subject: Re: [PATCH] kvm: x86: Print "disabled by bios" only once per host
-From:   Erwan Velu <e.velu@criteo.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Erwan Velu <erwanaliasr1@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        id S1726495AbgBSLu7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Feb 2020 06:50:59 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 79B762677E22060FC49B;
+        Wed, 19 Feb 2020 19:50:54 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Wed, 19 Feb 2020
+ 19:50:47 +0800
+Subject: Re: [PATCH v4 08/20] irqchip/gic-v4.1: Plumb get/set_irqchip_state
+ SGI callbacks
+To:     Marc Zyngier <maz@kernel.org>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Jason Cooper <jason@lakedaemon.net>,
+        "Robert Richter" <rrichter@marvell.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200214143035.607115-1-e.velu@criteo.com>
- <20200214170508.GB20690@linux.intel.com>
- <70b4d8fa-57c0-055b-8391-4952dec32a58@criteo.com>
- <20200218184802.GC28156@linux.intel.com>
- <91db305a-1d81-61a6-125b-3094e75b4b3e@criteo.com>
-Message-ID: <416e20b6-8f21-5949-bf51-f02603793b49@criteo.com>
-Date:   Wed, 19 Feb 2020 12:32:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-In-Reply-To: <91db305a-1d81-61a6-125b-3094e75b4b3e@criteo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: LO2P265CA0145.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:9::13) To VI1PR04MB4926.eurprd04.prod.outlook.com
- (2603:10a6:803:51::16)
+        "Eric Auger" <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        "Julien Thierry" <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200214145736.18550-1-maz@kernel.org>
+ <20200214145736.18550-9-maz@kernel.org>
+ <4b7f71f1-5e7f-e6af-f47d-7ed0d3a8739f@huawei.com>
+ <75597af0d2373ac4d92d8162a1338cbb@kernel.org>
+ <19a7c193f0e4b97343e822a35f0911ed@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <8db95a86-0981-710b-6c82-be7f7f844151@huawei.com>
+Date:   Wed, 19 Feb 2020 19:50:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Received: from [192.168.4.193] (91.199.242.236) by LO2P265CA0145.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:9::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.17 via Frontend Transport; Wed, 19 Feb 2020 11:33:44 +0000
-X-Originating-IP: [91.199.242.236]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1516dba4-aa3f-4a97-4845-08d7b52f93e1
-X-MS-TrafficTypeDiagnostic: VI1PR04MB4094:
-X-Microsoft-Antispam-PRVS: <VI1PR04MB4094D424B71DB08DF0CC14E8F2100@VI1PR04MB4094.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-Forefront-PRVS: 0318501FAE
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(189003)(199004)(956004)(81166006)(81156014)(53546011)(2906002)(8676002)(8936002)(86362001)(52116002)(5660300002)(26005)(36756003)(31686004)(31696002)(16526019)(7416002)(186003)(54906003)(16576012)(6916009)(2616005)(4326008)(66946007)(6486002)(66476007)(498600001)(558084003)(966005)(66556008)(6666004);DIR:OUT;SFP:1102;SCL:1;SRVR:VI1PR04MB4094;H:VI1PR04MB4926.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-Received-SPF: None (protection.outlook.com: criteo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qTRnLo2lXG7Tur0oBfXUYQXt8iOHk5Pfhh2G2J82yEH83n1udIrOF+jP42kk1icSIp0EoFHyELv0DPclDlXKj+2Z+OP7Ocnv5llYVi0zMVy/p1/hNGkEcwCs27hrTQk8J6m4NAvHvNyi/3ssb/rpLSRHP5gclV7sWYu3hp574Bm60+owELo1Oor0vvqKDrexRzMa7D178ClYXVbc4xDBeoKr3FNRxv+/wwqgkASQUzvxQYisR22zo4/vdWDq18JySmAbzN+LYseQgAj/l/2UkV4FHINL47S0rw0aj7ofRXClHk2j7X8V6AjHT38NZteE98rcMZemXaSWsHk+ptevcOyyNuvY7NEudumA2ndHJzuyT/dRfbRiV3nV9iSI9rgS2cJrB6/WXubKD/Gc5yUZRzUDbzuBY9sgmKectVhbxjhas+dGJl8esjspVLy6mpnpj3QluQ24CVDxsTBDJv5SKYqN5Hda6xW79gzhW0F+dPiKZnta15dE6P7AMEsuZnSu8D8BqlH9Huh2gXr9PTpjLA==
-X-MS-Exchange-AntiSpam-MessageData: fsE2UttsAyv9jIytySt8OjLszC8o7e+I3/sc9LGOOzw5FrZbF15hhGCh7tVg2K3udsko1SzWfRncgKSFtclRoyqxk/PdkDiUlzxim5fWIZQKmt3mhidijk93NVzEXRkXQtWlsUFk3aD8J0GLXXplAw==
-X-OriginatorOrg: criteo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1516dba4-aa3f-4a97-4845-08d7b52f93e1
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2020 11:33:44.7268
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2a35d8fd-574d-48e3-927c-8c398e225a01
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RBZ7RAVCRpLEeUNHulTIAhldZiuUvyX4NVAVq1HtcoXTmIOv96W/OpjFvHEB1F8ElPGaZ7u8dfZBswVn47DO0Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB4094
+In-Reply-To: <19a7c193f0e4b97343e822a35f0911ed@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/02/2020 12:19, Erwan Velu wrote:
+Hi Marc,
+
+On 2020/2/18 23:31, Marc Zyngier wrote:
+> Hi Zenghui,
+> 
+> On 2020-02-18 09:27, Marc Zyngier wrote:
+>> Hi Zenghui,
+>>
+>> On 2020-02-18 07:00, Zenghui Yu wrote:
+>>> Hi Marc,
+> 
+> [...]
+> 
+>>> There might be a race on reading the 'vpe->col_idx' against a concurrent
+>>> vPE schedule (col_idx will be modified in its_vpe_set_affinity)? Will we
+>>> end up accessing the GICR_VSGI* registers of the old redistributor,
+>>> while the vPE is now resident on the new one? Or is it harmful?
+>>
+>> Very well spotted. There is a potential problem if old and new RDs are 
+>> not part
+>> of the same CommonLPIAff group.
+>>
+>>> The same question for direct_lpi_inv(), where 'vpe->col_idx' will be
+>>> used in irq_to_cpuid().
+>>
+>> Same problem indeed. We need to ensure that no VMOVP operation can 
+>> occur whilst
+>> we use col_idx to access a redistributor. This means a vPE lock of 
+>> some sort
+>> that will protect the affinity.
+
+Yeah, I had the same view here, a vPE level lock might help.
+
+>> But I think there is a slightly more general problem here, which we 
+>> failed to
+>> see initially: the same issue exists for physical LPIs, as col_map[] 
+>> can be
+>> updated (its_set_affinity()) in parallel with a direct invalidate.
+>>
+>> The good old invalidation through the ITS does guarantee that the two 
+>> operation
+>> don't overlap, but direct invalidation breaks it.
+
+Agreed!
+
+>> Let me have a think about it.
+> 
+> So I've thought about it, wrote a patch, and I don't really like the 
+> look of it.
+> This is pretty invasive, and we end-up serializing a lot more than we 
+> used to
+> (the repurposing of vlpi_lock to a general "lpi mapping lock" is 
+> probably too
+> coarse).
+> 
+> It of course needs splitting over at least three patches, but it'd be 
+> good if
+> you could have a look (applies on top of the whole series).
+
+So the first thing is that
+
+1. there're races on choosing the RD against a concurrent LPI/vPE
+affinity changing.
+
+And sure, I will have a look on the following patch! But I'd first
+talk about some other issues I've seen today...
+
+2. Another potential race is on accessing the same RD by different
+CPUs, which gets more obvious after introducing the GICv4.1.
+We can as least take two registers for example:
+
+  - GICR_VSGIR:
+    Let's assume that vPE0 is just descheduled from CPU0 and then vPE1
+    is scheduled on. CPU0 is writing its GICR_VSGIR with vpeid1 to serve
+    vPE1's GICR_ISPENDR0 read trap, whilst userspace is getting vSGI's
+    pending state of vPE0 (i.e., by a debugfs read) thus another CPU
+    will try to write the same GICR_VSGIR with vpeid0... without waiting
+    GICR_VSGIPENDR.Busy reads as 0.
+    This is a CONSTRAINED UNPREDICTABLE behavior from the spec and at
+    least one of the queries will fail.
+  - GICR_INV{LPI,ALL}R:
+    Multiple LPIs can be targeted to the same RD, thus multiple writes to
+    the same GICR_INVLPIR (with different INITID, even with different V)
+    can happen concurrently...
+
+Above comes from the fact that the same redistributor can be accessed
+(concurrently) by multiple CPUs but we don't have a mechanism to ensure
+some extent of serialization. I also had a look at how KVM will handle
+this kind of access, but
+
+3. it looks like KVM makes the assumption that the per-RD MMIO region
+will only be accessed by the associated VCPU?  But I think this's not
+restricted by the architecture, we can do it better.  Or I've just
+missed some important points here.
+
+
+I will look at the following patch asap but may need some time to
+think about all above, and do some fix if possible :-)
+
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
+> b/drivers/irqchip/irq-gic-v3-its.c
+> index 7656b353a95f..0ed286dba827 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+
 [...]
-> - contacting the udev people to see the rational & fix it too : I'll 
-> do that 
 
-I created https://github.com/systemd/systemd/issues/14906, if some want 
-to participate/follow the discussions with systemd.
 
-Erwan,
+Thanks,
+Zenghui
 
