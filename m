@@ -2,138 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D9E2D163CBD
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 06:36:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 357D2163D54
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 07:58:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726634AbgBSFgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 00:36:01 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55296 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726609AbgBSFgA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Feb 2020 00:36:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582090559;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FnMyrS2ffrGzjTv2kAsMGrfcVGfLXQvqbV7CHWKXWPg=;
-        b=fxY2EoGMrH8FuWEyKwW35X7caTPa93kMMNvgTinZ+7VYVUcxCUR1OlGo8Ig+dpip/LjqdU
-        TevjBksX2gj3PVLC/KpKAoZeQwKSeIwL2ecep927+Ntm6tSk1FXWeKbCOw3zXWTWULT4Uh
-        4a4KyduwXkA+s750anNYFNNs/L3sBCs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-wJx9yaKzM8O55fVO3NXE4Q-1; Wed, 19 Feb 2020 00:35:52 -0500
-X-MC-Unique: wJx9yaKzM8O55fVO3NXE4Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E95B1085925;
-        Wed, 19 Feb 2020 05:35:49 +0000 (UTC)
-Received: from [10.72.13.212] (ovpn-13-212.pek2.redhat.com [10.72.13.212])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 44D3D87B1A;
-        Wed, 19 Feb 2020 05:35:27 +0000 (UTC)
-Subject: Re: [PATCH V2 3/5] vDPA: introduce vDPA bus
-To:     Jason Gunthorpe <jgg@mellanox.com>
-Cc:     "mst@redhat.com" <mst@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "aadam@redhat.com" <aadam@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>
-References: <20200211134746.GI4271@mellanox.com>
- <cf7abcc9-f8ef-1fe2-248e-9b9028788ade@redhat.com>
- <20200212125108.GS4271@mellanox.com>
- <12775659-1589-39e4-e344-b7a2c792b0f3@redhat.com>
- <20200213134128.GV4271@mellanox.com>
- <ebaea825-5432-65e2-2ab3-720a8c4030e7@redhat.com>
- <20200213150542.GW4271@mellanox.com>
- <8b3e6a9c-8bfd-fb3c-12a8-2d6a3879f1ae@redhat.com>
- <20200214135232.GB4271@mellanox.com>
- <01c86ebb-cf4b-691f-e682-2d6f93ddbcf7@redhat.com>
- <20200218135608.GS4271@mellanox.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <bbfc608b-2bfa-e4c7-c2b9-dbcfe63518cb@redhat.com>
-Date:   Wed, 19 Feb 2020 13:35:25 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726270AbgBSG6s convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 19 Feb 2020 01:58:48 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2583 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726163AbgBSG6s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Feb 2020 01:58:48 -0500
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id 70648AF3B0A2123914F7;
+        Wed, 19 Feb 2020 14:58:44 +0800 (CST)
+Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.16]) by
+ DGGEMM403-HUB.china.huawei.com ([10.3.20.211]) with mapi id 14.03.0439.000;
+ Wed, 19 Feb 2020 14:58:34 +0800
+From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "linfeng (M)" <linfeng23@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
+Subject: RE: [PATCH] KVM: x86: enable dirty log gradually in small chunks
+Thread-Topic: [PATCH] KVM: x86: enable dirty log gradually in small chunks
+Thread-Index: AQHV5kqezhdNltl9dkyyI6w50CaTlKgg8IOAgAEdM1A=
+Date:   Wed, 19 Feb 2020 06:58:33 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BAFEC8D@DGGEMM528-MBX.china.huawei.com>
+References: <20200218110013.15640-1-jianjay.zhou@huawei.com>
+ <20200218212303.GH28156@linux.intel.com>
+In-Reply-To: <20200218212303.GH28156@linux.intel.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.228.206]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <20200218135608.GS4271@mellanox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Sean,
 
-On 2020/2/18 =E4=B8=8B=E5=8D=889:56, Jason Gunthorpe wrote:
-> On Mon, Feb 17, 2020 at 02:08:03PM +0800, Jason Wang wrote:
->
->> I thought you were copied in the patch [1], maybe we can move vhost re=
-lated
->> discussion there to avoid confusion.
->>
->> [1] https://lwn.net/Articles/811210/
-> Wow, that is .. confusing.
->
-> So this is supposed to duplicate the uAPI of vhost-user?
+> -----Original Message-----
+> From: Sean Christopherson [mailto:sean.j.christopherson@intel.com]
+> Sent: Wednesday, February 19, 2020 5:23 AM
+> To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> Cc: kvm@vger.kernel.org; pbonzini@redhat.com; peterx@redhat.com;
+> wangxin (U) <wangxinxin.wang@huawei.com>; linfeng (M)
+> <linfeng23@huawei.com>; Huangweidong (C) <weidong.huang@huawei.com>
+> Subject: Re: [PATCH] KVM: x86: enable dirty log gradually in small chunks
+> 
+> On Tue, Feb 18, 2020 at 07:00:13PM +0800, Jay Zhou wrote:
+> > It could take kvm->mmu_lock for an extended period of time when
+> > enabling dirty log for the first time. The main cost is to clear all
+> > the D-bits of last level SPTEs. This situation can benefit from manual
+> > dirty log protect as well, which can reduce the mmu_lock time taken.
+> > The sequence is like this:
+> >
+> > 1. Set all the bits of the first dirty bitmap to 1 when enabling
+> >    dirty log for the first time
+> > 2. Only write protect the huge pages
+> > 3. KVM_GET_DIRTY_LOG returns the dirty bitmap info 4.
+> > KVM_CLEAR_DIRTY_LOG will clear D-bit for each of the leaf level
+> >    SPTEs gradually in small chunks
+> >
+> > Under the Intel(R) Xeon(R) Gold 6152 CPU @ 2.10GHz environment, I did
+> > some tests with a 128G windows VM and counted the time taken of
+> > memory_global_dirty_log_start, here is the numbers:
+> >
+> > VM Size        Before    After optimization
+> > 128G           460ms     10ms
+> >
+> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c   |  5 +++++
+> >  include/linux/kvm_host.h |  5 +++++
+> >  virt/kvm/kvm_main.c      | 10 ++++++++--
+> >  3 files changed, 18 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c index
+> > 3be25ec..a8d64f6 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -7201,7 +7201,12 @@ static void vmx_sched_in(struct kvm_vcpu *vcpu,
+> > int cpu)  static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+> >  				     struct kvm_memory_slot *slot)  {
+> > +#if CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> > +	if (!kvm->manual_dirty_log_protect)
+> > +		kvm_mmu_slot_leaf_clear_dirty(kvm, slot); #else
+> >  	kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+> > +#endif
+> 
+> The ifdef is unnecessary, this is in VMX (x86) code, i.e.
+> CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT is guaranteed to be
+> defined.
 
+I agree.
 
-It tries to reuse the uAPI of vhost with some extension.
+> 
+> >  	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);  }
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h index
+> > e89eb67..fd149b0 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -360,6 +360,11 @@ static inline unsigned long
+> *kvm_second_dirty_bitmap(struct kvm_memory_slot *mem
+> >  	return memslot->dirty_bitmap + len / sizeof(*memslot->dirty_bitmap);
+> > }
+> >
+> > +static inline void kvm_set_first_dirty_bitmap(struct kvm_memory_slot
+> > +*memslot) {
+> > +	bitmap_set(memslot->dirty_bitmap, 0, memslot->npages); }
+> 
+> I'd prefer this be open coded with a comment, e.g. "first" is misleading because
+> it's really "initial dirty bitmap for this memslot after enabling dirty logging".
 
+kvm_create_dirty_bitmap allocates twice size as large as the actual dirty bitmap
+size, and there is kvm_second_dirty_bitmap to get the second part of the map,
+this is the reason why I use first_dirty_bitmap here, which means the first part
+(not first time) of the dirty bitmap.
 
-> But it is
-> open coded and duplicated because .. vdpa?
+I'll try to be more clear if this is misleading...
 
+> > +
+> >  struct kvm_s390_adapter_int {
+> >  	u64 ind_addr;
+> >  	u64 summary_addr;
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c index
+> > 70f03ce..08565ed 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -862,7 +862,8 @@ static int kvm_vm_release(struct inode *inode,
+> struct file *filp)
+> >   * Allocation size is twice as large as the actual dirty bitmap size.
+> >   * See x86's kvm_vm_ioctl_get_dirty_log() why this is needed.
+> >   */
+> > -static int kvm_create_dirty_bitmap(struct kvm_memory_slot *memslot)
+> > +static int kvm_create_dirty_bitmap(struct kvm *kvm,
+> > +				struct kvm_memory_slot *memslot)
+> >  {
+> >  	unsigned long dirty_bytes = 2 * kvm_dirty_bitmap_bytes(memslot);
+> >
+> > @@ -870,6 +871,11 @@ static int kvm_create_dirty_bitmap(struct
+> kvm_memory_slot *memslot)
+> >  	if (!memslot->dirty_bitmap)
+> >  		return -ENOMEM;
+> >
+> > +#if CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> 
+> The ifdef is unnecessary, manual_dirty_log_protect always exists and is
+> guaranteed to be false if
+> CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=n.  This isn't exactly a
+> hot path so saving the uop isn't worth the #ifdef.
 
-I'm not sure I get here, vhost module is reused for vhost-vdpa and all=20
-current vhost device (e.g net) uses their own char device.
+After rereading the code, I think you're right.
 
+> 
+> > +	if (kvm->manual_dirty_log_protect)
+> > +		kvm_set_first_dirty_bitmap(memslot);
+> > +#endif
+> > +
+> >  	return 0;
+> >  }
+> >
+> > @@ -1094,7 +1100,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> >
+> >  	/* Allocate page dirty bitmap if needed */
+> >  	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
+> > -		if (kvm_create_dirty_bitmap(&new) < 0)
+> > +		if (kvm_create_dirty_bitmap(kvm, &new) < 0)
+> 
+> Rather than pass @kvm, what about doing bitmap_set() in
+> __kvm_set_memory_region() and
+> s/kvm_create_dirty_bitmap/kvm_alloc_dirty_bitmap to make it clear that the
+> helper is only responsible for allocation?  And opportunistically drop the
+> superfluous "< 0", e.g.
+> 
+> 	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
+> 		if (kvm_alloc_dirty_bitmap(&new))
+> 			goto out_free;
+> 
+> 		/*
+> 		 * WORDS!
+> 		 */
+> 		if (kvm->manual_dirty_log_protect)
+> 			bitmap_set(memslot->dirty_bitmap, 0, memslot->npages);
+> 	}
 
->
->> So it's cheaper and simpler to introduce a new bus instead of refactor=
-ing a
->> well known bus and API where brunches of drivers and devices had been
->> implemented for years.
-> If you reason for this approach is to ease the implementation then you
-> should talk about it in the cover letters/etc
+Seems to be more clear, thanks for the suggestion.
 
+Regards,
+Jay Zhou
 
-I will add more rationale in both cover letter and this patch.
-
-Thanks
-
-
->
-> Maybe it is reasonable to do this because the rework is too great, I
-> don't know, but to me this whole thing looks rather messy.
->
-> Remember this stuff is all uAPI as it shows up in sysfs, so you can
-> easilly get stuck with it forever.
->
-> Jason
->
-
+> >  			goto out_free;
+> >  	}
+> >
+> > --
+> > 1.8.3.1
+> >
+> >
