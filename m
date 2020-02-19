@@ -2,53 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB6D71642DB
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 12:03:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AF731642F9
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 12:06:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726484AbgBSLDG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 06:03:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13204 "EHLO
+        id S1727135AbgBSLGk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 06:06:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53570 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726469AbgBSLDF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Feb 2020 06:03:05 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01JB02EG051103
-        for <kvm@vger.kernel.org>; Wed, 19 Feb 2020 06:03:04 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y8ubv84c9-1
+        by vger.kernel.org with ESMTP id S1726962AbgBSLGi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Feb 2020 06:06:38 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01JB4jcB017451
+        for <kvm@vger.kernel.org>; Wed, 19 Feb 2020 06:06:37 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ubn7s8u-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 19 Feb 2020 06:03:03 -0500
+        for <kvm@vger.kernel.org>; Wed, 19 Feb 2020 06:06:36 -0500
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 19 Feb 2020 11:03:02 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Wed, 19 Feb 2020 11:06:35 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 19 Feb 2020 11:02:58 -0000
+        Wed, 19 Feb 2020 11:06:32 -0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01JB2shN48038084
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01JB6Sib46662120
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Feb 2020 11:02:55 GMT
+        Wed, 19 Feb 2020 11:06:28 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D82E511C05E;
-        Wed, 19 Feb 2020 11:02:54 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id B331411C04A;
+        Wed, 19 Feb 2020 11:06:28 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4498E11C05C;
-        Wed, 19 Feb 2020 11:02:54 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2F0B911C052;
+        Wed, 19 Feb 2020 11:06:28 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.166.21])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Feb 2020 11:02:54 +0000 (GMT)
-Subject: Re: [PATCH 2/2] merge vm/cpu create
-To:     Janosch Frank <frankja@linux.ibm.com>, david@redhat.com
-Cc:     Ulrich.Weigand@de.ibm.com, cohuck@redhat.com,
-        frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
-        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
-References: <c77dbb1b-0f4b-e40a-52a4-7110aec75e32@redhat.com>
- <20200217145302.19085-1-borntraeger@de.ibm.com>
- <20200217145302.19085-3-borntraeger@de.ibm.com>
- <5c0b4baa-4113-d183-5bc6-c1e7b1f3032c@linux.ibm.com>
+        Wed, 19 Feb 2020 11:06:28 +0000 (GMT)
+Subject: Re: [PATCH v2 32/42] KVM: s390: protvirt: Support cmd 5 operation
+ state
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-33-borntraeger@de.ibm.com>
+ <f84bdd3a-a305-9bc1-af92-0b1ff36bfca8@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -93,26 +98,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 19 Feb 2020 12:02:54 +0100
+Date:   Wed, 19 Feb 2020 12:06:27 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <5c0b4baa-4113-d183-5bc6-c1e7b1f3032c@linux.ibm.com>
+In-Reply-To: <f84bdd3a-a305-9bc1-af92-0b1ff36bfca8@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20021911-0020-0000-0000-000003AB8DF9
+x-cbid: 20021911-0008-0000-0000-0000035462D0
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021911-0021-0000-0000-000022038E82
-Message-Id: <f74eca96-89b4-cc01-e1f2-adfd6a851843@de.ibm.com>
+x-cbparentid: 20021911-0009-0000-0000-00004A756F1E
+Message-Id: <31c40864-4f34-42b2-0435-f0580033f1d1@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-19_03:2020-02-19,2020-02-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- lowpriorityscore=0 spamscore=0 suspectscore=0 mlxlogscore=862
- clxscore=1015 malwarescore=0 adultscore=0 impostorscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002190083
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
+ priorityscore=1501 suspectscore=0 spamscore=0 bulkscore=0 impostorscore=0
+ mlxlogscore=999 lowpriorityscore=0 malwarescore=0 phishscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002190084
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -120,41 +125,78 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 17.02.20 16:00, Janosch Frank wrote:
-
->> +static int kvm_s390_switch_from_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->> +{
->> +	int i, r = 0;
+On 18.02.20 10:50, David Hildenbrand wrote:
+> On 14.02.20 23:26, Christian Borntraeger wrote:
+>> From: Janosch Frank <frankja@linux.ibm.com>
+>>
+>> Code 5 for the set cpu state UV call tells the UV to load a PSW from
+>> the SE header (first IPL) or from guest location 0x0 (diag 308 subcode
+>> 0/1). Also it sets the cpu into operating state afterwards, so we can
+>> start it.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  arch/s390/include/asm/uv.h | 1 +
+>>  arch/s390/kvm/kvm-s390.c   | 8 ++++++++
+>>  include/uapi/linux/kvm.h   | 1 +
+>>  3 files changed, 10 insertions(+)
+>>
+>> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+>> index 7b82881ec3b4..d59825d95b9d 100644
+>> --- a/arch/s390/include/asm/uv.h
+>> +++ b/arch/s390/include/asm/uv.h
+>> @@ -169,6 +169,7 @@ struct uv_cb_unp {
+>>  #define PV_CPU_STATE_OPR	1
+>>  #define PV_CPU_STATE_STP	2
+>>  #define PV_CPU_STATE_CHKSTP	3
+>> +#define PV_CPU_STATE_OPR_LOAD	5
+>>  
+>>  struct uv_cb_cpu_set_state {
+>>  	struct uv_cb_header header;
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index 5426b01e3da1..b6113285f47f 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -4656,6 +4656,14 @@ static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu *vcpu,
+>>  		r = kvm_s390_pv_destroy_cpu(vcpu, &cmd->rc, &cmd->rrc);
+>>  		break;
+>>  	}
+>> +	case KVM_PV_VCPU_SET_IPL_PSW: {
+>> +		if (!kvm_s390_pv_handle_cpu(vcpu))
+>> +			return -EINVAL;
 >> +
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	kvm_for_each_vcpu(i, vcpu, kvm) {
->> +		r = kvm_s390_pv_destroy_cpu(vcpu, rc, rrc);
->> +		if (r)
->> +			break;
->> +	}
->> +	return r;
->> +}
->> +
->> +static int kvm_s390_switch_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->> +{
->> +	int i, r = 0;
->> +	u16 dummy;
->> +
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	kvm_for_each_vcpu(i, vcpu, kvm) {
->> +		r = kvm_s390_pv_create_cpu(vcpu, rc, rrc);
->> +		if (r)
->> +			break;
->> +	}
->> +	if (r)
->> +		kvm_s390_switch_from_pv(kvm,&dummy, &dummy);
->> +	return r;
->> +}
+>> +		r = kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR_LOAD,
+>> +					      &cmd->rc, &cmd->rrc);
 > 
-> Why does that only affect the cpus?
-> If we have a switch function it should do VM and VCPUs, no?
+> Can we squeeze that into kvm_arch_vcpu_ioctl_set_mpstate() instead? The
+> interface seems to do exactly what you want it to do.
+> 
+> KVM_MP_STATE_OPERATING_LOAD
+> 
+> Allow it only when in PV.
 
-I will rename that to kvm_s390_switch_cpus_to/from.
+Ack, something like this seems to work.
+
+
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index a95c82089386..9496616cccc7 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -3710,6 +3710,12 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+                kvm_s390_vcpu_start(vcpu);
+                break;
+        case KVM_MP_STATE_LOAD:
++               if (!kvm_s390_pv_cpu_is_protected(vcpu)) {
++                       rc = -ENXIO;
++                       break;
++               }
++               kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR_LOAD);
++               break;
+        case KVM_MP_STATE_CHECK_STOP:
+                /* fall through - CHECK_STOP and LOAD are not supported yet */
+        default:
 
