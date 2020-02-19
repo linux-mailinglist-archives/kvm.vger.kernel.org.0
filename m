@@ -2,96 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 041B41640B8
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 10:46:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5AB61640D4
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 10:53:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbgBSJqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 04:46:14 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57298 "EHLO mail.kernel.org"
+        id S1726510AbgBSJw7 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 19 Feb 2020 04:52:59 -0500
+Received: from mga17.intel.com ([192.55.52.151]:25065 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726210AbgBSJqO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 04:46:14 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 827582465D;
-        Wed, 19 Feb 2020 09:46:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582105573;
-        bh=l2TiWhrUXaBuX2+2Pq1CuvcDwByg8tH8hEVRAgq5hpQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Jy8hMAFnB3XFRvcNLvZhdJXbWEmXZdU7Unqf0eGMIV144a2MOFvhbu9venyIdOvj2
-         rkgtkUGH02+MrcibimIvj0Kz6a78iEs0Xqp7hHDVaUNJnek0JfdS6VAMHSotnFhp4n
-         zhlGK8eUbxmurWOYi8DySyeD13APjhPpWQ2NSYgc=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j4Lvn-006TMB-TE; Wed, 19 Feb 2020 09:46:11 +0000
+        id S1726210AbgBSJw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Feb 2020 04:52:59 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Feb 2020 01:52:59 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,459,1574150400"; 
+   d="scan'208";a="283066758"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by FMSMGA003.fm.intel.com with ESMTP; 19 Feb 2020 01:52:59 -0800
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 19 Feb 2020 01:52:58 -0800
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 19 Feb 2020 01:52:56 -0800
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Wed, 19 Feb 2020 01:52:56 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.138]) with mapi id 14.03.0439.000;
+ Wed, 19 Feb 2020 17:52:54 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+CC:     Chia-I Wu <olvaffe@gmail.com>, kvm list <kvm@vger.kernel.org>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        Gurchetan Singh <gurchetansingh@chromium.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        ML dri-devel <dri-devel@lists.freedesktop.org>
+Subject: RE: [RFC PATCH 0/3] KVM: x86: honor guest memory type
+Thread-Topic: [RFC PATCH 0/3] KVM: x86: honor guest memory type
+Thread-Index: AQHV4rTrI5AbOd4/PkCv4vZnvR6EuagZISQAgAAKbYCAAMs9AIAAnj+AgAAgCACAAAK0AIAAAeyAgAXrxoCAAaZGgA==
+Date:   Wed, 19 Feb 2020 09:52:53 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D78D6F4@SHSMSX104.ccr.corp.intel.com>
+References: <20200213213036.207625-1-olvaffe@gmail.com>
+ <8fdb85ea-6441-9519-ae35-eaf91ffe8741@redhat.com>
+ <CAPaKu7T8VYXTMc1_GOzJnwBaZSG214qNoqRr8c7Z4Lb3B7dtTg@mail.gmail.com>
+ <b82cd76c-0690-c13b-cf2c-75d7911c5c61@redhat.com>
+ <20200214195229.GF20690@linux.intel.com>
+ <CAPaKu7Q4gehyhEgG_Nw=tiZiTh+7A8-uuXq1w4he6knp6NWErQ@mail.gmail.com>
+ <CALMp9eRwTxdqxAcobZ7sYbD=F8Kga=jR3kaz-OEYdA9fV0AoKQ@mail.gmail.com>
+ <20200214220341.GJ20690@linux.intel.com>
+ <d3a6fac6-3831-3b8e-09b6-bfff4592f235@redhat.com>
+In-Reply-To: <d3a6fac6-3831-3b8e-09b6-bfff4592f235@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDFhNjgyZmEtNmE0YS00YzkzLWE2NGItNzRlZGFhNGQ2ZmFmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiRDhHM3RyOEF3dHhNQlFwcGRWZ1FUK1Jrb1RQNHB3SkxuTUhaS2lrUStIczlFVkEzZVJ2aHpudnQ4Z1pUVlRoSiJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 19 Feb 2020 09:46:11 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     James Morse <james.morse@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 3/5] kvm: arm64: Limit PMU version to ARMv8.1
-In-Reply-To: <eb0294ef-5ad2-9940-2d59-b92220948ffc@arm.com>
-References: <20200216185324.32596-1-maz@kernel.org>
- <20200216185324.32596-4-maz@kernel.org>
- <eb0294ef-5ad2-9940-2d59-b92220948ffc@arm.com>
-Message-ID: <c0a848e3ababff4ee9ecaa4b246d5875@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peter.maydell@linaro.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-02-18 17:43, James Morse wrote:
-> Hi Marc,
+> From: Paolo Bonzini
+> Sent: Wednesday, February 19, 2020 12:29 AM
 > 
-> On 16/02/2020 18:53, Marc Zyngier wrote:
->> Our PMU code is only implementing the ARMv8.1 features, so let's
->> stick to this when reporting the feature set to the guest.
+> On 14/02/20 23:03, Sean Christopherson wrote:
+> >> On Fri, Feb 14, 2020 at 1:47 PM Chia-I Wu <olvaffe@gmail.com> wrote:
+> >>> AFAICT, it is currently allowed on ARM (verified) and AMD (not
+> >>> verified, but svm_get_mt_mask returns 0 which supposedly means the
+> NPT
+> >>> does not restrict what the guest PAT can do).  This diff would do the
+> >>> trick for Intel without needing any uapi change:
+> >> I would be concerned about Intel CPU errata such as SKX40 and SKX59.
+> > The part KVM cares about, #MC, is already addressed by forcing UC for
+> MMIO.
+> > The data corruption issue is on the guest kernel to correctly use WC
+> > and/or non-temporal writes.
 > 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 682fedd7700f..06b2d0dc6c73 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1093,6 +1093,11 @@ static u64 read_id_reg(const struct kvm_vcpu 
->> *vcpu,
->>  				 FEATURE(ID_AA64ISAR1_GPA) |
->>  				 FEATURE(ID_AA64ISAR1_GPI));
->>  		break;
->> +	case SYS_ID_AA64DFR0_EL1:
->> +		/* Limit PMU to ARMv8.1 */
+> What about coherency across live migration?  The userspace process would
+> use cached accesses, and also a WBINVD could potentially corrupt guest
+> memory.
 > 
-> Not just limit, but upgrade too! (force?)
-> This looks safe because ARMV8_PMU_EVTYPE_EVENT always includes the
-> extra bits this added, and the register is always trapped.
 
-That's definitely not what I intended! Let me fix that one.
+In such case the userspace process possibly should conservatively use
+UC mapping, as if for MMIO regions on a passthrough device. However
+there remains a problem. the definition of KVM_MEM_DMA implies 
+favoring guest setting, which could be whatever type in concept. Then
+assuming UC is also problematic. I'm not sure whether inventing another
+interface to query effective memory type from KVM is a good idea. There
+is no guarantee that the guest will use same type for every page in the
+same slot, then such interface might be messy. Alternatively, maybe
+we could just have an interface for KVM userspace to force memory type
+for a given slot, if it is mainly used in para-virtualized scenarios (e.g. 
+virtio-gpu) where the guest is enlightened to use a forced type (e.g. WC)?
 
-> The PMU version is also readable via ID_DFR0_EL1.PerfMon, should that
-> be sanitised to be the same? (I don't think we've hidden an aarch64
-> feature that also existed in aarch32 before).
-
-Indeed, yet another oversight. I'll fix that too.
-
-> Regardless:
-> Reviewed-by: James Morse <james.morse@arm.com>
-
-You're way too kind! ;-)
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks
+Kevin
