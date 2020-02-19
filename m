@@ -2,323 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C6E50164D46
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 19:03:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DFD1164E0E
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 19:54:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726648AbgBSSDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 13:03:54 -0500
-Received: from mga18.intel.com ([134.134.136.126]:17830 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726598AbgBSSDx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 13:03:53 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Feb 2020 10:03:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,461,1574150400"; 
-   d="scan'208";a="436312513"
-Received: from gza.jf.intel.com ([10.54.75.28])
-  by fmsmga006.fm.intel.com with ESMTP; 19 Feb 2020 10:03:50 -0800
-From:   John Andersen <john.s.andersen@intel.com>
-To:     pbonzini@redhat.com, kvm@vger.kernel.org
-Cc:     John Andersen <john.s.andersen@intel.com>
-Subject: [PATCH 1/1] x86: Add control register pinning test
-Date:   Wed, 19 Feb 2020 10:04:36 -0800
-Message-Id: <20200219180436.6580-2-john.s.andersen@intel.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200219180436.6580-1-john.s.andersen@intel.com>
-References: <20200219180436.6580-1-john.s.andersen@intel.com>
+        id S1726648AbgBSSyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 13:54:03 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32977 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726710AbgBSSyD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Feb 2020 13:54:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582138441;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ooAVZmPqmpejcE1lho8HJzD9Jr6TIc1QTP2vQodr9hU=;
+        b=Rg0ZKshp8M0pAWk5gZuBEelgHbs2ORrC0rE/Rqtr5/rnNszDExFMOODikKlfYvoRoCnk9D
+        EOZkoXkMU6Ufghls0w8C3+1YkkFpteX5ek0aSwpmZPQIosDuuaboy6j6JgPCcTxyJmKA41
+        3H6gfoUC7wUDnSDz0CHMvarukTOpyhM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56-JYUDF0GWNu6vXN8CwF6baQ-1; Wed, 19 Feb 2020 13:53:51 -0500
+X-MC-Unique: JYUDF0GWNu6vXN8CwF6baQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F401107ACC5;
+        Wed, 19 Feb 2020 18:53:50 +0000 (UTC)
+Received: from gimli.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 80B505C1B0;
+        Wed, 19 Feb 2020 18:53:46 +0000 (UTC)
+Subject: [PATCH v2 0/7] vfio/pci: SR-IOV support
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dev@dpdk.org, mtosatti@redhat.com, thomas@monjalon.net,
+        bluca@debian.org, jerinjacobk@gmail.com,
+        bruce.richardson@intel.com, cohuck@redhat.com
+Date:   Wed, 19 Feb 2020 11:53:46 -0700
+Message-ID: <158213716959.17090.8399427017403507114.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paravirutalized control register pinning adds MSRs guests can use to
-discover which bits in CR0/4 they may pin, and MSRs for activating
-pinning for any of those bits.
+Changes since v1 are primarily to patch 3/7 where the commit log is
+rewritten, along with option parsing and failure logging based on
+upstream discussions.  The primary user visible difference is that
+option parsing is now much more strict.  If a vf_token option is
+provided that cannot be used, we generate an error.  As a result of
+this, opening a PF with a vf_token option will serve as a mechanism of
+setting the vf_token.  This seems like a more user friendly API than
+the alternative of sometimes requiring the option (VFs in use) and
+sometimes rejecting it, and upholds our desire that the option is
+always either used or rejected.
 
-We check that the bits allowed to be pinned for CR4 are UMIP, SMEP, and
-SMAP. Only WP should be allowed to be pinned in CR0.
+This also means that the VFIO_DEVICE_FEATURE ioctl is not the only
+means of setting the VF token, which might call into question whether
+we absolutely need this new ioctl.  Currently I'm keeping it because I
+can imagine use cases, for example if a hypervisor were to support
+SR-IOV, the PF device might be opened without consideration for a VF
+token and we'd require the hypservisor to close and re-open the PF in
+order to set a known VF token, which is impractical.
 
-We turn on all of the allowed bits, pin them, then attempt to disable
-them. We verify that the attempt to disable was unsuccessful, and that
-it generated a general protection fault.
+Series overview (same as provided with v1):
 
-Signed-off-by: John Andersen <john.s.andersen@intel.com>
+The synopsis of this series is that we have an ongoing desire to drive
+PCIe SR-IOV PFs from userspace with VFIO.  There's an immediate need
+for this with DPDK drivers and potentially interesting future use
+cases in virtualization.  We've been reluctant to add this support
+previously due to the dependency and trust relationship between the
+VF device and PF driver.  Minimally the PF driver can induce a denial
+of service to the VF, but depending on the specific implementation,
+the PF driver might also be responsible for moving data between VFs
+or have direct access to the state of the VF, including data or state
+otherwise private to the VF or VF driver.
+
+To help resolve these concerns, we introduce a VF token into the VFIO
+PCI ABI, which acts as a shared secret key between drivers.  The
+userspace PF driver is required to set the VF token to a known value
+and userspace VF drivers are required to provide the token to access
+the VF device.  If a PF driver is restarted with VF drivers in use, it
+must also provide the current token in order to prevent a rogue
+untrusted PF driver from replacing a known driver.  The degree to
+which this new token is considered secret is left to the userspace
+drivers, the kernel intentionally provides no means to retrieve the
+current token.
+
+Note that the above token is only required for this new model where
+both the PF and VF devices are usable through vfio-pci.  Existing
+models of VFIO drivers where the PF is used without SR-IOV enabled
+or the VF is bound to a userspace driver with an in-kernel, host PF
+driver are unaffected.
+
+The latter configuration above also highlights a new inverted scenario
+that is now possible, a userspace PF driver with in-kernel VF drivers.
+I believe this is a scenario that should be allowed, but should not be
+enabled by default.  This series includes code to set a default
+driver_override for VFs sourced from a vfio-pci user owned PF, such
+that the VFs are also bound to vfio-pci.  This model is compatible
+with tools like driverctl and allows the system administrator to
+decide if other bindings should be enabled.  The VF token interface
+above exists only between vfio-pci PF and VF drivers, once a VF is
+bound to another driver, the administrator has effectively pronounced
+the device as trusted.  The vfio-pci driver will note alternate
+binding in dmesg for logging and debugging purposes.
+
+Please review, comment, and test.  The example QEMU implementation
+provided with the RFC is still current for this version.  Thanks,
+
+Alex
+
+RFC: https://lore.kernel.org/lkml/158085337582.9445.17682266437583505502.stgit@gimli.home/
+v1: https://lore.kernel.org/lkml/158145472604.16827.15751375540102298130.stgit@gimli.home/
+
 ---
- x86/Makefile.common |   3 +-
- lib/x86/desc.h      |   1 +
- lib/x86/processor.h |   1 +
- lib/x86/desc.c      |   8 +++
- x86/cr_pin.c        | 163 ++++++++++++++++++++++++++++++++++++++++++++
- x86/pcid.c          |   8 ---
- x86/unittests.cfg   |   4 ++
- 7 files changed, 179 insertions(+), 9 deletions(-)
- create mode 100644 x86/cr_pin.c
 
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index ab67ca0..bb5e786 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -58,7 +58,8 @@ tests-common = $(TEST_DIR)/vmexit.flat $(TEST_DIR)/tsc.flat \
-                $(TEST_DIR)/init.flat $(TEST_DIR)/smap.flat \
-                $(TEST_DIR)/hyperv_synic.flat $(TEST_DIR)/hyperv_stimer.flat \
-                $(TEST_DIR)/hyperv_connections.flat \
--               $(TEST_DIR)/umip.flat $(TEST_DIR)/tsx-ctrl.flat
-+               $(TEST_DIR)/umip.flat $(TEST_DIR)/tsx-ctrl.flat \
-+               $(TEST_DIR)/cr_pin.flat
- 
- test_cases: $(tests-common) $(tests)
- 
-diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-index 00b9328..89df883 100644
---- a/lib/x86/desc.h
-+++ b/lib/x86/desc.h
-@@ -216,6 +216,7 @@ extern tss64_t tss;
- #endif
- 
- unsigned exception_vector(void);
-+int write_cr0_checking(unsigned long val);
- int write_cr4_checking(unsigned long val);
- unsigned exception_error_code(void);
- bool exception_rflags_rf(void);
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 03fdf64..dedbac0 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -141,6 +141,7 @@ static inline u8 cpuid_maxphyaddr(void)
- #define	X86_FEATURE_SMEP	        (CPUID(0x7, 0, EBX, 7))
- #define	X86_FEATURE_INVPCID		(CPUID(0x7, 0, EBX, 10))
- #define	X86_FEATURE_RTM			(CPUID(0x7, 0, EBX, 11))
-+#define	X86_FEATURE_SMEP		(CPUID(0x7, 0, EBX, 7))
- #define	X86_FEATURE_SMAP		(CPUID(0x7, 0, EBX, 20))
- #define	X86_FEATURE_PCOMMIT		(CPUID(0x7, 0, EBX, 22))
- #define	X86_FEATURE_CLFLUSHOPT		(CPUID(0x7, 0, EBX, 23))
-diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-index 451f504..c9363d0 100644
---- a/lib/x86/desc.c
-+++ b/lib/x86/desc.c
-@@ -251,6 +251,14 @@ unsigned exception_vector(void)
-     return vector;
- }
- 
-+int write_cr0_checking(unsigned long val)
-+{
-+    asm volatile(ASM_TRY("1f")
-+                 "mov %0, %%cr0\n\t"
-+                 "1:": : "r" (val));
-+    return exception_vector();
-+}
-+
- int write_cr4_checking(unsigned long val)
- {
-     asm volatile(ASM_TRY("1f")
-diff --git a/x86/cr_pin.c b/x86/cr_pin.c
-new file mode 100644
-index 0000000..fd25043
---- /dev/null
-+++ b/x86/cr_pin.c
-@@ -0,0 +1,163 @@
-+/* cr pinning tests */
-+
-+#include "libcflat.h"
-+#include "x86/desc.h"
-+#include "x86/processor.h"
-+#include "x86/vm.h"
-+#include "x86/msr.h"
-+
-+#define USER_BASE	(1 << 24)
-+
-+#define CR0_PINNED X86_CR0_WP
-+#define CR4_SOME_PINNED (X86_CR4_UMIP | X86_CR4_SMEP)
-+#define CR4_ALL_PINNED (CR4_SOME_PINNED | X86_CR4_SMAP)
-+
-+#define MSR_KVM_CR0_PIN_ALLOWED	0x4b564d06
-+#define MSR_KVM_CR4_PIN_ALLOWED	0x4b564d07
-+#define MSR_KVM_CR0_PINNED	0x4b564d08
-+#define MSR_KVM_CR4_PINNED	0x4b564d09
-+
-+static void test_cr0_pinning(void)
-+{
-+	unsigned long long r = 0;
-+	ulong cr0 = read_cr0();
-+	int vector = 0;
-+
-+	r = rdmsr(MSR_KVM_CR0_PIN_ALLOWED);
-+	report(r == CR0_PINNED, "[CR0] MSR_KVM_CR0_PIN_ALLOWED: %llx", r);
-+
-+	cr0 |= CR0_PINNED;
-+
-+	vector = write_cr0_checking(cr0);
-+	report(vector == 0, "[CR0] enable pinned bits. vector: %d", vector);
-+
-+	cr0 = read_cr0();
-+	report((cr0 & CR0_PINNED) == CR0_PINNED, "[CR0] after enabling pinned bits: %lx", cr0);
-+
-+	wrmsr(MSR_KVM_CR0_PINNED, CR0_PINNED);
-+	r = rdmsr(MSR_KVM_CR0_PINNED);
-+	report(r == CR0_PINNED, "[CR0] enable pinning. MSR_KVM_CR0_PINNED: %llx", r);
-+
-+	vector = write_cr0_checking(cr0);
-+	report(vector == 0, "[CR0] write same value");
-+
-+	vector = write_cr0_checking(cr0 & ~CR0_PINNED);
-+	report(vector == GP_VECTOR, "[CR0] disable pinned bits. vector: %d", vector);
-+
-+	cr0 = read_cr0();
-+	report((cr0 & CR0_PINNED) == CR0_PINNED, "[CR0] pinned bits: %lx", cr0 & CR0_PINNED);
-+}
-+
-+static void test_cr4_pin_allowed(void)
-+{
-+	unsigned long long r = 0;
-+
-+	r = rdmsr(MSR_KVM_CR4_PIN_ALLOWED);
-+	report(r == CR4_ALL_PINNED, "[CR4] MSR_KVM_CR4_PIN_ALLOWED: %llx", r);
-+}
-+
-+static void test_cr4_pinning_some_pinned(void)
-+{
-+	unsigned long long r = 0;
-+	ulong cr4 = read_cr4();
-+	int vector = 0;
-+
-+	cr4 |= CR4_SOME_PINNED;
-+
-+	vector = write_cr4_checking(cr4);
-+	report(vector == 0, "[CR4 SOME] enable pinned bits. vector: %d", vector);
-+
-+	wrmsr(MSR_KVM_CR4_PINNED, CR4_SOME_PINNED);
-+	r = rdmsr(MSR_KVM_CR4_PINNED);
-+	report(r == CR4_SOME_PINNED, "[CR4 SOME] enable pinning. MSR_KVM_CR4_PINNED: %llx", r);
-+
-+	cr4 = read_cr4();
-+	report((cr4 & CR4_SOME_PINNED) == CR4_SOME_PINNED, "[CR4 SOME] after enabling pinned bits: %lx", cr4);
-+	report(1, "[CR4 SOME] cr4: 0x%08lx", cr4);
-+
-+	vector = write_cr4_checking(cr4);
-+	report(vector == 0, "[CR4 SOME] write same value");
-+
-+	vector = write_cr4_checking(cr4 & ~CR4_SOME_PINNED);
-+	report(vector == GP_VECTOR, "[CR4 SOME] disable pinned bits. vector: %d", vector);
-+
-+	cr4 = read_cr4();
-+	report((cr4 & CR4_SOME_PINNED) == CR4_SOME_PINNED, "[CR4 SOME] pinned bits: %lx", cr4 & CR4_SOME_PINNED);
-+
-+	vector = write_cr4_checking(cr4 & ~X86_CR4_SMEP);
-+	report(vector == GP_VECTOR, "[CR4 SOME] disable single pinned bit. vector: %d", vector);
-+
-+	cr4 = read_cr4();
-+	report((cr4 & CR4_SOME_PINNED) == CR4_SOME_PINNED, "[CR4 SOME] pinned bits: %lx", cr4 & CR4_SOME_PINNED);
-+}
-+
-+static void test_cr4_pinning_all_pinned(void)
-+{
-+	unsigned long long r = 0;
-+	ulong cr4 = read_cr4();
-+	int vector = 0;
-+
-+	wrmsr(MSR_KVM_CR4_PINNED, CR4_ALL_PINNED);
-+	r = rdmsr(MSR_KVM_CR4_PINNED);
-+	report(r == CR4_ALL_PINNED, "[CR4 ALL] enable pinning. MSR_KVM_CR4_PINNED: %llx", r);
-+
-+	cr4 |= CR4_ALL_PINNED;
-+
-+	vector = write_cr4_checking(cr4);
-+	report(vector == 0, "[CR4 ALL] enable pinned bits. vector: %d", vector);
-+
-+	cr4 = read_cr4();
-+	report((cr4 & CR4_ALL_PINNED) == CR4_ALL_PINNED, "[CR4 ALL] after enabling pinned bits: %lx", cr4);
-+
-+	vector = write_cr4_checking(cr4);
-+	report(vector == 0, "[CR4 ALL] write same value");
-+
-+	vector = write_cr4_checking(cr4 & ~CR4_ALL_PINNED);
-+	report(vector == GP_VECTOR, "[CR4 ALL] disable pinned bits. vector: %d", vector);
-+
-+	cr4 = read_cr4();
-+	report((cr4 & CR4_ALL_PINNED) == CR4_ALL_PINNED, "[CR4 ALL] pinned bits: %lx", cr4 & CR4_ALL_PINNED);
-+}
-+
-+static void test_cr4_pinning(void)
-+{
-+	test_cr4_pin_allowed();
-+
-+	if (!this_cpu_has(X86_FEATURE_UMIP)) {
-+		printf("UMIP not available\n");
-+		return;
-+	}
-+
-+	if (!this_cpu_has(X86_FEATURE_SMEP)) {
-+		printf("SMEP not available\n");
-+		return;
-+	}
-+
-+	test_cr4_pinning_some_pinned();
-+
-+	if (!this_cpu_has(X86_FEATURE_SMAP)) {
-+		printf("SMAP not enabled\n");
-+		return;
-+	}
-+
-+	test_cr4_pinning_all_pinned();
-+}
-+
-+int main(int ac, char **av)
-+{
-+	unsigned long i;
-+
-+	setup_idt();
-+	setup_vm();
-+
-+	// Map first 16MB as supervisor pages
-+	for (i = 0; i < USER_BASE; i += PAGE_SIZE) {
-+		*get_pte(phys_to_virt(read_cr3()), phys_to_virt(i)) &= ~PT_USER_MASK;
-+	}
-+
-+	test_cr0_pinning();
-+	test_cr4_pinning();
-+
-+	return report_summary();
-+}
-+
-diff --git a/x86/pcid.c b/x86/pcid.c
-index ad9d30c..1f36f7d 100644
---- a/x86/pcid.c
-+++ b/x86/pcid.c
-@@ -10,14 +10,6 @@ struct invpcid_desc {
-     unsigned long addr : 64;
- };
- 
--static int write_cr0_checking(unsigned long val)
--{
--    asm volatile(ASM_TRY("1f")
--                 "mov %0, %%cr0\n\t"
--                 "1:": : "r" (val));
--    return exception_vector();
--}
--
- static int invpcid_checking(unsigned long type, void *desc)
- {
-     asm volatile (ASM_TRY("1f")
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index f2401eb..5630bb6 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -245,6 +245,10 @@ arch = x86_64
- file = umip.flat
- extra_params = -cpu qemu64,+umip
- 
-+[cr_pin]
-+file = cr_pin.flat
-+extra_params = -cpu qemu64,+umip,+smap,+smep
-+
- [vmx]
- file = vmx.flat
- extra_params = -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test"
--- 
-2.21.0
+Alex Williamson (7):
+      vfio: Include optional device match in vfio_device_ops callbacks
+      vfio/pci: Implement match ops
+      vfio/pci: Introduce VF token
+      vfio: Introduce VFIO_DEVICE_FEATURE ioctl and first user
+      vfio/pci: Add sriov_configure support
+      vfio/pci: Remove dev_fmt definition
+      vfio/pci: Cleanup .probe() exit paths
+
+
+ drivers/vfio/pci/vfio_pci.c         |  383 +++++++++++++++++++++++++++++++++--
+ drivers/vfio/pci/vfio_pci_private.h |   10 +
+ drivers/vfio/vfio.c                 |   20 +-
+ include/linux/vfio.h                |    4 
+ include/uapi/linux/vfio.h           |   37 +++
+ 5 files changed, 426 insertions(+), 28 deletions(-)
 
