@@ -2,80 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FB06164E22
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 19:54:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CC81164E27
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 19:55:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727448AbgBSSyq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 13:54:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29204 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727400AbgBSSyq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 13:54:46 -0500
+        id S1726799AbgBSSyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 13:54:54 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34307 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726739AbgBSSyy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Feb 2020 13:54:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582138485;
+        s=mimecast20190719; t=1582138493;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=djUCZD9yorww9xcqt93rHPDW+hZ4Iy4RFWxzB0gHRKI=;
-        b=H7158t0lol13STpM6aEhgrGn3UOxOaSnpNGksnGO41eM+l+w/IUzTOBjD4Fl7kAcqR1zOH
-        RkFW/gibfyLXnt30rUXbRO+a1DaFJRENBab0+KaOLE8Y3Udx+ozLzYvUozHEdKi3znPVMf
-        6jiWSYJq05LT7BX4HSfsAewMGVNBApU=
+        bh=oOG1xcfx/XK/BX/8Fvn0t0Ub7ouo5ivEiSJ+HCOiGlw=;
+        b=LnC+7vRtlcMObsBxcS1nv+sGGWelxraaUuDd2U5EzNwD57GF3BmWqVd6ZlKfjQPYsXLWlW
+        G78thYe0X1scgqntnsfbYnHeaxtiBHfkOKEEAHnGEcW0aFTG9KQ29Cwpdg/PKA16UW7TlA
+        69n9hglIdMuLK4TOnwFWyLrc3F9Gb2o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-q3YjCYkRPhai8GzuYnN_fg-1; Wed, 19 Feb 2020 13:54:41 -0500
-X-MC-Unique: q3YjCYkRPhai8GzuYnN_fg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-107-JTzWQq42OsiK8L_9c_iN8g-1; Wed, 19 Feb 2020 13:54:49 -0500
+X-MC-Unique: JTzWQq42OsiK8L_9c_iN8g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A817E107ACC7;
-        Wed, 19 Feb 2020 18:54:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 447DD1800D42;
+        Wed, 19 Feb 2020 18:54:48 +0000 (UTC)
 Received: from gimli.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7AE5D5C13C;
-        Wed, 19 Feb 2020 18:54:36 +0000 (UTC)
-Subject: [PATCH v2 6/7] vfio/pci: Remove dev_fmt definition
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 284F060BE1;
+        Wed, 19 Feb 2020 18:54:45 +0000 (UTC)
+Subject: [PATCH v2 7/7] vfio/pci: Cleanup .probe() exit paths
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
         dev@dpdk.org, mtosatti@redhat.com, thomas@monjalon.net,
         bluca@debian.org, jerinjacobk@gmail.com,
         bruce.richardson@intel.com, cohuck@redhat.com
-Date:   Wed, 19 Feb 2020 11:54:36 -0700
-Message-ID: <158213847608.17090.2262660641448703487.stgit@gimli.home>
+Date:   Wed, 19 Feb 2020 11:54:44 -0700
+Message-ID: <158213848474.17090.18286195387831295821.stgit@gimli.home>
 In-Reply-To: <158213716959.17090.8399427017403507114.stgit@gimli.home>
 References: <158213716959.17090.8399427017403507114.stgit@gimli.home>
 User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It currently results in messages like:
+The cleanup is getting a tad long.
 
- "vfio-pci 0000:03:00.0: vfio_pci: ..."
-
-Which is quite a bit redundant.
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- drivers/vfio/pci/vfio_pci.c |    1 -
- 1 file changed, 1 deletion(-)
+ drivers/vfio/pci/vfio_pci.c |   54 ++++++++++++++++++++-----------------------
+ 1 file changed, 25 insertions(+), 29 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index b40ade48a844..497ecadef2ba 100644
+index 497ecadef2ba..7d410224343a 100644
 --- a/drivers/vfio/pci/vfio_pci.c
 +++ b/drivers/vfio/pci/vfio_pci.c
-@@ -9,7 +9,6 @@
-  */
+@@ -1591,8 +1591,8 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
--#define dev_fmt pr_fmt
+ 	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
+ 	if (!vdev) {
+-		vfio_iommu_group_put(group, &pdev->dev);
+-		return -ENOMEM;
++		ret = -ENOMEM;
++		goto out_group_put;
+ 	}
  
- #include <linux/device.h>
- #include <linux/eventfd.h>
+ 	vdev->pdev = pdev;
+@@ -1603,43 +1603,27 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+ 
+ 	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+-	if (ret) {
+-		vfio_iommu_group_put(group, &pdev->dev);
+-		kfree(vdev);
+-		return ret;
+-	}
++	if (ret)
++		goto out_free;
+ 
+ 	ret = vfio_pci_reflck_attach(vdev);
+-	if (ret) {
+-		vfio_del_group_dev(&pdev->dev);
+-		vfio_iommu_group_put(group, &pdev->dev);
+-		kfree(vdev);
+-		return ret;
+-	}
++	if (ret)
++		goto out_del_group_dev;
+ 
+ 	if (pdev->is_physfn) {
+ 		vdev->vf_token = kzalloc(sizeof(*vdev->vf_token), GFP_KERNEL);
+ 		if (!vdev->vf_token) {
+-			vfio_pci_reflck_put(vdev->reflck);
+-			vfio_del_group_dev(&pdev->dev);
+-			vfio_iommu_group_put(group, &pdev->dev);
+-			kfree(vdev);
+-			return -ENOMEM;
+-		}
+-
+-		vdev->nb.notifier_call = vfio_pci_bus_notifier;
+-		ret = bus_register_notifier(&pci_bus_type, &vdev->nb);
+-		if (ret) {
+-			kfree(vdev->vf_token);
+-			vfio_pci_reflck_put(vdev->reflck);
+-			vfio_del_group_dev(&pdev->dev);
+-			vfio_iommu_group_put(group, &pdev->dev);
+-			kfree(vdev);
+-			return ret;
++			ret = -ENOMEM;
++			goto out_reflck;
+ 		}
+ 
+ 		mutex_init(&vdev->vf_token->lock);
+ 		uuid_gen(&vdev->vf_token->uuid);
++
++		vdev->nb.notifier_call = vfio_pci_bus_notifier;
++		ret = bus_register_notifier(&pci_bus_type, &vdev->nb);
++		if (ret)
++			goto out_vf_token;
+ 	}
+ 
+ 	if (vfio_pci_is_vga(pdev)) {
+@@ -1665,6 +1649,18 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	}
+ 
+ 	return ret;
++
++out_vf_token:
++	kfree(vdev->vf_token);
++out_reflck:
++	vfio_pci_reflck_put(vdev->reflck);
++out_del_group_dev:
++	vfio_del_group_dev(&pdev->dev);
++out_free:
++	kfree(vdev);
++out_group_put:
++	vfio_iommu_group_put(group, &pdev->dev);
++	return ret;
+ }
+ 
+ static void vfio_pci_remove(struct pci_dev *pdev)
 
