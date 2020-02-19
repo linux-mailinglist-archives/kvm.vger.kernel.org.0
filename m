@@ -2,129 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 808D1164B28
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 17:55:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11422164BB4
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2020 18:19:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726681AbgBSQzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Feb 2020 11:55:20 -0500
-Received: from mail-eopbgr150108.outbound.protection.outlook.com ([40.107.15.108]:51452
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726528AbgBSQzT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Feb 2020 11:55:19 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e05WwZrTgKxidXccki1aT0F2rr6pG84qSZLTrAuIXndG5j5ekUIVdn7dg1o0ZzSVrePkYfzuL5CofjTEsKKS6LFKe4BMIqDtx3Z+3JMTub/q83MNViWW2vpHGGKrqTsGMxnccRTTGGbZqcCO1BeTQRgT0SDLlvXw+UGcZMLKZPn90xhgN4VFd2sDMShpB/xS2sxHVKqIpKLvnH7I3hYYt5U8+Z/KNsX9TdBJrzIpUMJNyVZGfjyeUiUfe2tS5WYrBVIxIWO1qsMYioImPoDO5vODeaQE84l/LfGh6FlqzsCjg1yz360P+5P1ZSpm//IiCdET7e77TX2yoR8Sfdebqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rHl9EJJ7po8nT3ZbsDbBESrFzHDha8JioZVdpPCJVwo=;
- b=L5EWPMAcvbV9EXPkzp7D1svkwDx6f/9oaWxLYq66PIdGf83YtW2gFfTPMsHbY+mhDjgSOBPbvgwbsS5XS0pPrl2ln8YzK8G2e+XVSe3cnMFtIr0PDszv0FsBYAOEgOmajH1h+eWv8zkqjJpLy2S5NEc8hZGf57rX2nmczVKII1v0QWiqJugNqGAZ8M6/Rj147BIyJoJ52+h6SiBBlnzDCUFriMzBVV3zi+kOtrBwzLXbbt54IKlUwplIjSA4nZbjIoWP1ljiAbGdfcvldoDIbfB6FE/g44vUsYfAOq2FDD6aTVbhc7tetHsATj77BcqYIqB4sfU71NFeh/r6VZM/rA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=criteo.com; dmarc=pass action=none header.from=criteo.com;
- dkim=pass header.d=criteo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=criteo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rHl9EJJ7po8nT3ZbsDbBESrFzHDha8JioZVdpPCJVwo=;
- b=Fc02m0GGTWNtUC5bcgrIreGiHlT3fx14jkl2aMVDzAC12ZcQReKWfNDPNFsyQfBiiYBfGNoRhnUMDbBGcbc2mg1foKWCheg0Qbj5xjB53TE2haYGvQ7hRCrXKx7Yh1Zl1yfY/sYJguD3CbD6FO75lKcSSVMZVDU9hitUbS/HoXU=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=e.velu@criteo.com; 
-Received: from VI1PR04MB4926.eurprd04.prod.outlook.com (20.177.48.80) by
- VI1PR04MB7133.eurprd04.prod.outlook.com (10.186.157.77) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.22; Wed, 19 Feb 2020 16:55:14 +0000
-Received: from VI1PR04MB4926.eurprd04.prod.outlook.com
- ([fe80::99f4:5892:158f:5ae4]) by VI1PR04MB4926.eurprd04.prod.outlook.com
- ([fe80::99f4:5892:158f:5ae4%5]) with mapi id 15.20.2729.032; Wed, 19 Feb 2020
- 16:55:14 +0000
-Subject: Re: [PATCH] kvm: x86: Print "disabled by bios" only once per host
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Erwan Velu <erwanaliasr1@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200214143035.607115-1-e.velu@criteo.com>
- <20200214170508.GB20690@linux.intel.com>
- <70b4d8fa-57c0-055b-8391-4952dec32a58@criteo.com>
- <20200218184802.GC28156@linux.intel.com>
- <91db305a-1d81-61a6-125b-3094e75b4b3e@criteo.com>
- <20200219161827.GD15888@linux.intel.com>
-From:   Erwan Velu <e.velu@criteo.com>
-Message-ID: <646147a6-730b-0366-10db-ed74489ad11e@criteo.com>
-Date:   Wed, 19 Feb 2020 17:53:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-In-Reply-To: <20200219161827.GD15888@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: LO2P265CA0031.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:61::19) To VI1PR04MB4926.eurprd04.prod.outlook.com
- (2603:10a6:803:51::16)
+        id S1726593AbgBSRTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Feb 2020 12:19:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33698 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726514AbgBSRTa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Feb 2020 12:19:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582132769;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dK5oOLaqiDs2fEfuCHWpgQxQmx/QeSFAmRxrjHBhE/s=;
+        b=ICiaIWnClh2N8G0yYoOJkglVlg+4RW3sBKcUM9f18QnGDhpZYJXjY07XoxgiUPkPhgd+CP
+        hiOTTvs2yAqxBMfPat8VKlH62QVjjE6Q+tWg/hGxH2vPK8aBzMwN8BEE5fLeNvP+Wo9Hb1
+        DGK/aI+J+YWLM14bjJkFqPLrw9DBw78=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-BDNuLFR_MO-AhBvo4zLZWQ-1; Wed, 19 Feb 2020 12:19:24 -0500
+X-MC-Unique: BDNuLFR_MO-AhBvo4zLZWQ-1
+Received: by mail-qv1-f72.google.com with SMTP id dc2so681753qvb.7
+        for <kvm@vger.kernel.org>; Wed, 19 Feb 2020 09:19:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dK5oOLaqiDs2fEfuCHWpgQxQmx/QeSFAmRxrjHBhE/s=;
+        b=KhLZjHR8zcNo2BQu/9ZgmdbN5rGTxy+ohEQJjMc7YK4X1qEjTdSqPzFwdLrj6eEIwm
+         DlpFIPqt3JxCM2Ss3PI/klWioRX1agWT40yZ3seNMrGU0DpvFOzbY7p7UPpmGqbqByfO
+         B8SborpNaZyuQ4YtxQ3wBBAJf7f8CD3WHy49X56LzJCBdhdcxY3dlSKb0d0yZHrLKkXY
+         KSqphYM+huf20n/M8gpRQ+OoZEFrU1bewmhRo6fzXXNA0/ZHzn4XIog+JX8e8b6yXqll
+         yXG0ndHbypGTHBHlxTvghMA1SxUbi38l+uqImnWuUvEfYNGMq3hdAobIh7aAl8C0otKi
+         LaNQ==
+X-Gm-Message-State: APjAAAW1MEg17eNmzed18Sm8JbSkrxn6JtxoGZE+wlUKgeRVBS+/50xP
+        jl7JmYnt1jFh3TVy8R8S8ZReSvzpSjFSU6nq6RMnN2Z+lC7JaSbCulhB7u0QHobzDtiFr7+sJdN
+        skbzrDjDE0IYK
+X-Received: by 2002:a05:620a:63b:: with SMTP id 27mr23161554qkv.159.1582132763764;
+        Wed, 19 Feb 2020 09:19:23 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxjcYtGtErtygtf/94adebcA0XUns/LqaLGr58X6868SWjYDieDU8xN3zP9HIa6rCVTekPAxw==
+X-Received: by 2002:a05:620a:63b:: with SMTP id 27mr23161535qkv.159.1582132763441;
+        Wed, 19 Feb 2020 09:19:23 -0800 (PST)
+Received: from xz-x1 ([104.156.64.75])
+        by smtp.gmail.com with ESMTPSA id z21sm131280qka.122.2020.02.19.09.19.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Feb 2020 09:19:22 -0800 (PST)
+Date:   Wed, 19 Feb 2020 12:19:19 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "quintela@redhat.com" <quintela@redhat.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>,
+        "linfeng (M)" <linfeng23@huawei.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>
+Subject: Re: RFC: Split EPT huge pages in advance of dirty logging
+Message-ID: <20200219171919.GA34517@xz-x1>
+References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
+ <20200218174311.GE1408806@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
 MIME-Version: 1.0
-Received: from [192.168.4.193] (91.199.242.236) by LO2P265CA0031.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:61::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.18 via Frontend Transport; Wed, 19 Feb 2020 16:55:13 +0000
-X-Originating-IP: [91.199.242.236]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 93142053-3230-4579-d6d9-08d7b55c7d46
-X-MS-TrafficTypeDiagnostic: VI1PR04MB7133:
-X-Microsoft-Antispam-PRVS: <VI1PR04MB71332590BAA5F0B8271F2C6BF2100@VI1PR04MB7133.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 0318501FAE
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(136003)(39860400002)(346002)(376002)(366004)(189003)(199004)(31696002)(4744005)(52116002)(6486002)(36756003)(478600001)(2906002)(6916009)(86362001)(956004)(316002)(16526019)(31686004)(54906003)(8676002)(186003)(66556008)(66946007)(81166006)(16576012)(66476007)(8936002)(7416002)(6666004)(26005)(4326008)(2616005)(53546011)(5660300002)(81156014);DIR:OUT;SFP:1102;SCL:1;SRVR:VI1PR04MB7133;H:VI1PR04MB4926.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-Received-SPF: None (protection.outlook.com: criteo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1hppuCjeq6Oc+8ZiyT/mr9ni5CzrdrMIcBw5QTBEa5QVbPb+7FE+mr/vVCNUWaEJG+akPYi4wIgTeBcvqPpqq757DnyayBhyMc4KiXu26hNd+ujyhtdIeTghjWEuQLuBHsv9TkQKZR7ekCSmiNl8cZ+S+P2bVeiwcGOaExDj0hettKWcZSftQciodafyEpcTpffjG3jCsbA4uw6mY36dslmSg1Ebo8kYz0g0BoHFO3dFm+Pt1CIopNVZtun1fz1NL6cIDwefPh+FSIyU5rUMazC7VNEtjuP8mV5e2Q2oMhsxYtN5zauKWqX5xZ0Xld2en96auLNY4umbzykxjwljphfjFldEVw4ojhKR3nhAni68GELc4phvrL95L6bL4ov5sRbThcjNYDsLNoGXf5V4sMtfRInHpjyYTpPYUue9JJanjHX5Z/TAPPf2fvvNJXvw
-X-MS-Exchange-AntiSpam-MessageData: yXkwFnmUPCkyTYkkNDTXQ0obvh0wBaFDncuCpWsyQF1cOya/mSET3aIQQALC/589UDgoV1os2xWnrEUzlBX1EfcojqumgbLPD4bApqMslsiLbKEztkWrm6HnZPaY1TrD7YxiBY3X1Wg3d4dLHQy35g==
-X-OriginatorOrg: criteo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 93142053-3230-4579-d6d9-08d7b55c7d46
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2020 16:55:14.1436
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2a35d8fd-574d-48e3-927c-8c398e225a01
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UT20clGZEwsQDrHiXExFRx0xuH9X7ox650LdwqEAznLG9U0IfFrtxJ4iqffRRNAhlHcNy7ayVEFOS01Gj3oTeA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7133
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[..]
+On Wed, Feb 19, 2020 at 01:19:08PM +0000, Zhoujian (jay) wrote:
+> Hi Peter,
+> 
+> > -----Original Message-----
+> > From: Peter Xu [mailto:peterx@redhat.com]
+> > Sent: Wednesday, February 19, 2020 1:43 AM
+> > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > Cc: kvm@vger.kernel.org; qemu-devel@nongnu.org; pbonzini@redhat.com;
+> > dgilbert@redhat.com; quintela@redhat.com; Liujinsong (Paul)
+> > <liu.jinsong@huawei.com>; linfeng (M) <linfeng23@huawei.com>; wangxin (U)
+> > <wangxinxin.wang@huawei.com>; Huangweidong (C)
+> > <weidong.huang@huawei.com>
+> > Subject: Re: RFC: Split EPT huge pages in advance of dirty logging
+> > 
+> > On Tue, Feb 18, 2020 at 01:13:47PM +0000, Zhoujian (jay) wrote:
+> > > Hi all,
+> > >
+> > > We found that the guest will be soft-lockup occasionally when live
+> > > migrating a 60 vCPU, 512GiB huge page and memory sensitive VM. The
+> > > reason is clear, almost all of the vCPUs are waiting for the KVM MMU
+> > > spin-lock to create 4K SPTEs when the huge pages are write protected. This
+> > phenomenon is also described in this patch set:
+> > > https://patchwork.kernel.org/cover/11163459/
+> > > which aims to handle page faults in parallel more efficiently.
+> > >
+> > > Our idea is to use the migration thread to touch all of the guest
+> > > memory in the granularity of 4K before enabling dirty logging. To be
+> > > more specific, we split all the PDPE_LEVEL SPTEs into DIRECTORY_LEVEL
+> > > SPTEs as the first step, and then split all the DIRECTORY_LEVEL SPTEs into
+> > PAGE_TABLE_LEVEL SPTEs as the following step.
+> > 
+> > IIUC, QEMU will prefer to use huge pages for all the anonymous ramblocks
+> > (please refer to ram_block_add):
+> > 
+> >         qemu_madvise(new_block->host, new_block->max_length,
+> > QEMU_MADV_HUGEPAGE);
+> 
+> Yes, you're right
+> 
+> > 
+> > Another alternative I can think of is to add an extra parameter to QEMU to
+> > explicitly disable huge pages (so that can even be MADV_NOHUGEPAGE
+> > instead of MADV_HUGEPAGE).  However that should also drag down the
+> > performance for the whole lifecycle of the VM.  
+> 
+> From the performance point of view, it is better to keep the huge pages
+> when the VM is not in the live migration state.
+> 
+> > A 3rd option is to make a QMP
+> > command to dynamically turn huge pages on/off for ramblocks globally.
+> 
+> We're searching a dynamic method too.
+> We plan to add two new flags for each memory slot, say
+> KVM_MEM_FORCE_PT_DIRECTORY_PAGES and
+> KVM_MEM_FORCE_PT_PAGE_TABLE_PAGES. These flags can be set
+> through KVM_SET_USER_MEMORY_REGION ioctl.
+> 
+> The mapping_level which is called by tdp_page_fault in the kernel side
+> will return PT_DIRECTORY_LEVEL if the
+> KVM_MEM_FORCE_PT_DIRECTORY_PAGES flag of the memory slot is
+> set, and return PT_PAGE_TABLE_LEVEL if the
+> KVM_MEM_FORCE_PT_PAGE_TABLE_PAGES flag is set.
+>  
+> The key steps to split the huge pages in advance of enabling dirty log is
+> as follows:
+> 1. The migration thread in user space uses
+> KVM_SET_USER_MEMORY_REGION ioctl to set the
+> KVM_MEM_FORCE_PT_DIRECTORY_PAGES flag for each memory slot.
+> 2. The migration thread continues to use the KVM_SPLIT_HUGE_PAGES
+> ioctl (which is newly added) to do the splitting of large pages in the
+> kernel side.
+> 3. A new vCPU is created temporally(do some initialization but will not
+> run) to help to do the work, i.e. as the parameter of the tdp_page_fault.
+> 4. Collect the GPA ranges of all the memory slots with the
+> KVM_MEM_FORCE_PT_DIRECTORY_PAGES flag set.
+> 5. Split the 1G huge pages(collected in step 4) into 2M by calling
+> tdp_page_fault, since the mapping_level will return
+> PT_DIRECTORY_LEVEL. Here is the main difference from the usual
+> path which is caused by the Guest side(EPT violation/misconfig etc),
+> we call it directly in the hypervisor side.
+> 6. Do some cleanups, i.e. free the vCPU related resources
+> 7. The KVM_SPLIT_HUGE_PAGES ioctl returned to the user space side.
+> 8. Using KVM_MEM_FORCE_PT_PAGE_TABLE_PAGES instread of
+> KVM_MEM_FORCE_PT_DIRECTORY_PAGES to repeat step 1 ~ step 7,
+> in step 5 the 2M huge pages will be splitted into 4K pages.
+> 9. Clear the KVM_MEM_FORCE_PT_DIRECTORY_PAGES and
+> KVM_MEM_FORCE_PT_PAGE_TABLE_PAGES flags for each memory slot.
+> 10. Then the migration thread calls the log_start ioctl to enable the dirty
+> logging, and the remaining thing is the same.
 
-On 19/02/2020 17:18, Sean Christopherson wrote:
-> All of that being said, what about converting all of the error messages to
-> pr_err_ratelimited()?  That would take the edge off this particular problem,
-> wouldn't create incosistencies between error messages, and won't completely
-> squash error messages in corner case scenarios on misconfigured systems.
+I'm not sure... I think it would be good if there is a way to have
+finer granularity control on using huge pages for any process, then
+KVM can directly leverage that because KVM page tables should always
+respect the mm configurations on these (so e.g. when huge page split,
+KVM gets notifications via mmu notifiers).  Have you thought of such a
+more general way?
 
-Thanks Sean for your very detailed answer.
+(And I just noticed that MADV_NOHUGEPAGE is only a hint to khugepaged
+ and probably won't split any huge page at all after madvise() returns..)
 
-I've been testing the ratelimited which is far better but still prints 
-12 messages.
+To tell the truth I'm still confused on how split of huge pages helped
+in your case...  If I read it right the test reduced some execution
+time from 9s to a few ms after your splittion of huge pages.  The
+thing is I don't see how split of huge pages could solve the mmu_lock
+contention with the huge VM, because IMO even if we split the huge
+pages into smaller ones, those pages should still be write-protected
+and need merely the same number of page faults to resolve when
+accessed/written?  And I thought that should only be fixed with
+solutions like what Ben has proposed with the MMU rework. Could you
+show me what I've missed?
 
-I saw the ratelimit is on about 5 sec, I wonder if we can explicit a 
-longer one for this one.
+Thanks,
 
-I searched around this but it doesn't seems that hacking the delay is a 
-common usage.
-
-Do you have any insights/ideas around that ?
-
-
-Switching to ratelimit could be done by replacing the actual call or add 
-a macro similar to  kvm_pr_unimpl() so it can be reused easily.
-
-I can offer the patches for that.
-
-
-Erwan,
-
+-- 
+Peter Xu
 
