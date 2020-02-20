@@ -2,53 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E2AD165BCC
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 11:40:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F578165BD8
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 11:41:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728081AbgBTKkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 05:40:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3200 "EHLO
+        id S1727994AbgBTKkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 05:40:31 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64666 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727984AbgBTKkc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 05:40:32 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01KAZLhU057372;
-        Thu, 20 Feb 2020 05:40:26 -0500
+        by vger.kernel.org with ESMTP id S1727263AbgBTKk3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 05:40:29 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01KAYnwF058211;
+        Thu, 20 Feb 2020 05:40:28 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8uc13ytx-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ubpkr67-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Feb 2020 05:40:26 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01KAZQSq057826;
-        Thu, 20 Feb 2020 05:40:25 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8uc13ytf-1
+        Thu, 20 Feb 2020 05:40:27 -0500
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01KAaAQa061857;
+        Thu, 20 Feb 2020 05:40:27 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ubpkr59-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Feb 2020 05:40:25 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01KAGSwO027415;
-        Thu, 20 Feb 2020 10:40:24 GMT
+        Thu, 20 Feb 2020 05:40:27 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01KAVa7K021658;
+        Thu, 20 Feb 2020 10:40:25 GMT
 Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma02wdc.us.ibm.com with ESMTP id 2y6896uvdp-1
+        by ppma03dal.us.ibm.com with ESMTP id 2y6897ex8e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Feb 2020 10:40:24 +0000
+        Thu, 20 Feb 2020 10:40:25 +0000
 Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01KAeNDk16122860
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01KAeNGZ14156370
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 20 Feb 2020 10:40:23 GMT
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE206112066;
-        Thu, 20 Feb 2020 10:40:22 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0D070112062;
+        Thu, 20 Feb 2020 10:40:23 +0000 (GMT)
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D7EED112063;
+        by IMSVA (Postfix) with ESMTP id E9975112064;
         Thu, 20 Feb 2020 10:40:22 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.114.17.106])
         by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
         Thu, 20 Feb 2020 10:40:22 +0000 (GMT)
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>
+        Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         David Hildenbrand <david@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
@@ -56,12 +55,10 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
-        Will Deacon <will@kernel.org>
-Subject: [PATCH v3 01/37] mm:gup/writeback: add callbacks for inaccessible pages
-Date:   Thu, 20 Feb 2020 05:39:44 -0500
-Message-Id: <20200220104020.5343-2-borntraeger@de.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>
+Subject: [PATCH v3 02/37] KVM: s390/interrupt: do not pin adapter interrupt pages
+Date:   Thu, 20 Feb 2020 05:39:45 -0500
+Message-Id: <20200220104020.5343-3-borntraeger@de.ibm.com>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <20200220104020.5343-1-borntraeger@de.ibm.com>
 References: <20200220104020.5343-1-borntraeger@de.ibm.com>
@@ -70,9 +67,9 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-20_02:2020-02-19,2020-02-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- phishscore=0 impostorscore=0 mlxscore=0 mlxlogscore=822 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 clxscore=1015 suspectscore=2 malwarescore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
+ priorityscore=1501 suspectscore=2 spamscore=0 bulkscore=0 impostorscore=0
+ mlxlogscore=904 lowpriorityscore=0 malwarescore=0 phishscore=0 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
  definitions=main-2002200078
 Sender: kvm-owner@vger.kernel.org
@@ -80,123 +77,322 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+From: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
 
-With the introduction of protected KVM guests on s390 there is now a
-concept of inaccessible pages. These pages need to be made accessible
-before the host can access them.
+The adapter interrupt page containing the indicator bits is currently
+pinned. That means that a guest with many devices can pin a lot of
+memory pages in the host. This also complicates the reference tracking
+which is needed for memory management handling of protected virtual
+machines. It might also have some strange side effects for madvise
+MADV_DONTNEED and other things.
 
-While cpu accesses will trigger a fault that can be resolved, I/O
-accesses will just fail.  We need to add a callback into architecture
-code for places that will do I/O, namely when writeback is started or
-when a page reference is taken.
+We can simply try to get the userspace page set the bits and free the
+page. By storing the userspace address in the irq routing entry instead
+of the guest address we can actually avoid many lookups and list walks
+so that this variant is very likely not slower.
 
-This is not only to enable paging, file backing etc, it is also
-necessary to protect the host against a malicious user space. For
-example a bad QEMU could simply start direct I/O on such protected
-memory.  We do not want userspace to be able to trigger I/O errors and
-thus we the logic is "whenever somebody accesses that page (gup) or
-doing I/O, make sure that this page can be accessed. When the guest
-tries to access that page we will wait in the page fault handler for
-writeback to have finished and for the page_ref to be the expected
-value.
+If userspace messes around with the memory slots the worst thing that
+can happen is that we write to some other memory within that process.
+As we get the the page with FOLL_WRITE this can also not be used to
+write to shared read-only pages.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Acked-by: Will Deacon <will@kernel.org>
+Signed-off-by: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+[borntraeger@de.ibm.com: patch simplification]
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- include/linux/gfp.h |  6 ++++++
- mm/gup.c            | 15 ++++++++++++---
- mm/page-writeback.c |  5 +++++
- 3 files changed, 23 insertions(+), 3 deletions(-)
+ Documentation/virt/kvm/devices/s390_flic.rst |  11 +-
+ arch/s390/include/asm/kvm_host.h             |   3 -
+ arch/s390/kvm/interrupt.c                    | 170 ++++++-------------
+ 3 files changed, 53 insertions(+), 131 deletions(-)
 
-diff --git a/include/linux/gfp.h b/include/linux/gfp.h
-index e5b817cb86e7..be2754841369 100644
---- a/include/linux/gfp.h
-+++ b/include/linux/gfp.h
-@@ -485,6 +485,12 @@ static inline void arch_free_page(struct page *page, int order) { }
- #ifndef HAVE_ARCH_ALLOC_PAGE
- static inline void arch_alloc_page(struct page *page, int order) { }
- #endif
-+#ifndef HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
-+static inline int arch_make_page_accessible(struct page *page)
-+{
-+	return 0;
-+}
-+#endif
+diff --git a/Documentation/virt/kvm/devices/s390_flic.rst b/Documentation/virt/kvm/devices/s390_flic.rst
+index 954190da7d04..ea96559ba501 100644
+--- a/Documentation/virt/kvm/devices/s390_flic.rst
++++ b/Documentation/virt/kvm/devices/s390_flic.rst
+@@ -108,16 +108,9 @@ Groups:
+       mask or unmask the adapter, as specified in mask
  
- struct page *
- __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order, int preferred_nid,
-diff --git a/mm/gup.c b/mm/gup.c
-index 1b521e0ac1de..354bcfbd844b 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -193,6 +193,7 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
- 	struct page *page;
- 	spinlock_t *ptl;
- 	pte_t *ptep, pte;
-+	int ret;
- 
- 	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
- 	if (WARN_ON_ONCE((flags & (FOLL_PIN | FOLL_GET)) ==
-@@ -250,8 +251,6 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
- 		if (is_zero_pfn(pte_pfn(pte))) {
- 			page = pte_page(pte);
- 		} else {
--			int ret;
+     KVM_S390_IO_ADAPTER_MAP
+-      perform a gmap translation for the guest address provided in addr,
+-      pin a userspace page for the translated address and add it to the
+-      list of mappings
 -
- 			ret = follow_pfn_pte(vma, address, ptep, flags);
- 			page = ERR_PTR(ret);
- 			goto out;
-@@ -259,7 +258,6 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
- 	}
+-      .. note:: A new mapping will be created unconditionally; therefore,
+-	        the calling code should avoid making duplicate mappings.
+-
++      This is now a no-op. The mapping is purely done by the irq route.
+     KVM_S390_IO_ADAPTER_UNMAP
+-      release a userspace page for the translated address specified in addr
+-      from the list of mappings
++      This is now a no-op. The mapping is purely done by the irq route.
  
- 	if (flags & FOLL_SPLIT && PageTransCompound(page)) {
--		int ret;
- 		get_page(page);
- 		pte_unmap_unlock(ptep, ptl);
- 		lock_page(page);
-@@ -276,6 +274,12 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
- 			page = ERR_PTR(-ENOMEM);
- 			goto out;
- 		}
-+		ret = arch_make_page_accessible(page);
-+		if (ret) {
-+			put_page(page);
-+			page = ERR_PTR(ret);
-+			goto out;
-+		}
- 	}
- 	if (flags & FOLL_TOUCH) {
- 		if ((flags & FOLL_WRITE) &&
-@@ -1919,6 +1923,11 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+   KVM_DEV_FLIC_AISM
+     modify the adapter-interruption-suppression mode for a given isc if the
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 1726224e7772..d058289385a5 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -701,9 +701,6 @@ struct s390_io_adapter {
+ 	bool masked;
+ 	bool swap;
+ 	bool suppressible;
+-	struct rw_semaphore maps_lock;
+-	struct list_head maps;
+-	atomic_t nr_maps;
+ };
  
- 		VM_BUG_ON_PAGE(compound_head(page) != head, page);
+ #define MAX_S390_IO_ADAPTERS ((MAX_ISC + 1) * 8)
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index c06c89d370a7..0cebebf56515 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -2327,9 +2327,6 @@ static int register_io_adapter(struct kvm_device *dev,
+ 	if (!adapter)
+ 		return -ENOMEM;
  
-+		ret = arch_make_page_accessible(page);
-+		if (ret) {
-+			put_page(head);
-+			goto pte_unmap;
-+		}
- 		SetPageReferenced(page);
- 		pages[*nr] = page;
- 		(*nr)++;
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 2caf780a42e7..558d7063c117 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2807,6 +2807,11 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
- 		inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
- 	}
- 	unlock_page_memcg(page);
-+	/*
-+	 * If writeback has been triggered on a page that cannot be made
-+	 * accessible, it is too late.
-+	 */
-+	WARN_ON(arch_make_page_accessible(page));
+-	INIT_LIST_HEAD(&adapter->maps);
+-	init_rwsem(&adapter->maps_lock);
+-	atomic_set(&adapter->nr_maps, 0);
+ 	adapter->id = adapter_info.id;
+ 	adapter->isc = adapter_info.isc;
+ 	adapter->maskable = adapter_info.maskable;
+@@ -2354,87 +2351,12 @@ int kvm_s390_mask_adapter(struct kvm *kvm, unsigned int id, bool masked)
  	return ret;
- 
  }
+ 
+-static int kvm_s390_adapter_map(struct kvm *kvm, unsigned int id, __u64 addr)
+-{
+-	struct s390_io_adapter *adapter = get_io_adapter(kvm, id);
+-	struct s390_map_info *map;
+-	int ret;
+-
+-	if (!adapter || !addr)
+-		return -EINVAL;
+-
+-	map = kzalloc(sizeof(*map), GFP_KERNEL);
+-	if (!map) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-	INIT_LIST_HEAD(&map->list);
+-	map->guest_addr = addr;
+-	map->addr = gmap_translate(kvm->arch.gmap, addr);
+-	if (map->addr == -EFAULT) {
+-		ret = -EFAULT;
+-		goto out;
+-	}
+-	ret = get_user_pages_fast(map->addr, 1, FOLL_WRITE, &map->page);
+-	if (ret < 0)
+-		goto out;
+-	BUG_ON(ret != 1);
+-	down_write(&adapter->maps_lock);
+-	if (atomic_inc_return(&adapter->nr_maps) < MAX_S390_ADAPTER_MAPS) {
+-		list_add_tail(&map->list, &adapter->maps);
+-		ret = 0;
+-	} else {
+-		put_page(map->page);
+-		ret = -EINVAL;
+-	}
+-	up_write(&adapter->maps_lock);
+-out:
+-	if (ret)
+-		kfree(map);
+-	return ret;
+-}
+-
+-static int kvm_s390_adapter_unmap(struct kvm *kvm, unsigned int id, __u64 addr)
+-{
+-	struct s390_io_adapter *adapter = get_io_adapter(kvm, id);
+-	struct s390_map_info *map, *tmp;
+-	int found = 0;
+-
+-	if (!adapter || !addr)
+-		return -EINVAL;
+-
+-	down_write(&adapter->maps_lock);
+-	list_for_each_entry_safe(map, tmp, &adapter->maps, list) {
+-		if (map->guest_addr == addr) {
+-			found = 1;
+-			atomic_dec(&adapter->nr_maps);
+-			list_del(&map->list);
+-			put_page(map->page);
+-			kfree(map);
+-			break;
+-		}
+-	}
+-	up_write(&adapter->maps_lock);
+-
+-	return found ? 0 : -EINVAL;
+-}
+-
+ void kvm_s390_destroy_adapters(struct kvm *kvm)
+ {
+ 	int i;
+-	struct s390_map_info *map, *tmp;
+ 
+-	for (i = 0; i < MAX_S390_IO_ADAPTERS; i++) {
+-		if (!kvm->arch.adapters[i])
+-			continue;
+-		list_for_each_entry_safe(map, tmp,
+-					 &kvm->arch.adapters[i]->maps, list) {
+-			list_del(&map->list);
+-			put_page(map->page);
+-			kfree(map);
+-		}
++	for (i = 0; i < MAX_S390_IO_ADAPTERS; i++)
+ 		kfree(kvm->arch.adapters[i]);
+-	}
+ }
+ 
+ static int modify_io_adapter(struct kvm_device *dev,
+@@ -2456,12 +2378,13 @@ static int modify_io_adapter(struct kvm_device *dev,
+ 		if (ret > 0)
+ 			ret = 0;
+ 		break;
++	/*
++	 * We resolve the gpa to hva when setting the IRQ routing. the set_irq
++	 * code uses get_user_pages_remote to do the actual write.
++	 */
+ 	case KVM_S390_IO_ADAPTER_MAP:
+-		ret = kvm_s390_adapter_map(dev->kvm, req.id, req.addr);
+-		break;
+ 	case KVM_S390_IO_ADAPTER_UNMAP:
+-		ret = kvm_s390_adapter_unmap(dev->kvm, req.id, req.addr);
+-		break;
++		return 0;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -2699,19 +2622,21 @@ static unsigned long get_ind_bit(__u64 addr, unsigned long bit_nr, bool swap)
+ 	return swap ? (bit ^ (BITS_PER_LONG - 1)) : bit;
+ }
+ 
+-static struct s390_map_info *get_map_info(struct s390_io_adapter *adapter,
+-					  u64 addr)
++static struct page *get_map_page(struct kvm *kvm,
++				 struct s390_io_adapter *adapter,
++				 u64 uaddr)
+ {
+-	struct s390_map_info *map;
++	struct page *page = NULL;
+ 
+ 	if (!adapter)
+ 		return NULL;
+-
+-	list_for_each_entry(map, &adapter->maps, list) {
+-		if (map->guest_addr == addr)
+-			return map;
+-	}
+-	return NULL;
++	if (!uaddr)
++		return NULL;
++	down_read(&kvm->mm->mmap_sem);
++	get_user_pages_remote(NULL, kvm->mm, uaddr, 1, FOLL_WRITE,
++			      &page, NULL, NULL);
++	up_read(&kvm->mm->mmap_sem);
++	return page;
+ }
+ 
+ static int adapter_indicators_set(struct kvm *kvm,
+@@ -2720,30 +2645,35 @@ static int adapter_indicators_set(struct kvm *kvm,
+ {
+ 	unsigned long bit;
+ 	int summary_set, idx;
+-	struct s390_map_info *info;
++	struct page *ind_page, *summary_page;
+ 	void *map;
+ 
+-	info = get_map_info(adapter, adapter_int->ind_addr);
+-	if (!info)
++	ind_page = get_map_page(kvm, adapter, adapter_int->ind_addr);
++	if (!ind_page)
+ 		return -1;
+-	map = page_address(info->page);
+-	bit = get_ind_bit(info->addr, adapter_int->ind_offset, adapter->swap);
+-	set_bit(bit, map);
+-	idx = srcu_read_lock(&kvm->srcu);
+-	mark_page_dirty(kvm, info->guest_addr >> PAGE_SHIFT);
+-	set_page_dirty_lock(info->page);
+-	info = get_map_info(adapter, adapter_int->summary_addr);
+-	if (!info) {
+-		srcu_read_unlock(&kvm->srcu, idx);
++	summary_page = get_map_page(kvm, adapter, adapter_int->summary_addr);
++	if (!summary_page) {
++		put_page(ind_page);
+ 		return -1;
+ 	}
+-	map = page_address(info->page);
+-	bit = get_ind_bit(info->addr, adapter_int->summary_offset,
+-			  adapter->swap);
++
++	idx = srcu_read_lock(&kvm->srcu);
++	map = page_address(ind_page);
++	bit = get_ind_bit(adapter_int->ind_addr,
++			  adapter_int->ind_offset, adapter->swap);
++	set_bit(bit, map);
++	mark_page_dirty(kvm, adapter_int->ind_addr >> PAGE_SHIFT);
++	set_page_dirty_lock(ind_page);
++	map = page_address(summary_page);
++	bit = get_ind_bit(adapter_int->summary_addr,
++			  adapter_int->summary_offset, adapter->swap);
+ 	summary_set = test_and_set_bit(bit, map);
+-	mark_page_dirty(kvm, info->guest_addr >> PAGE_SHIFT);
+-	set_page_dirty_lock(info->page);
++	mark_page_dirty(kvm, adapter_int->summary_addr >> PAGE_SHIFT);
++	set_page_dirty_lock(summary_page);
+ 	srcu_read_unlock(&kvm->srcu, idx);
++
++	put_page(ind_page);
++	put_page(summary_page);
+ 	return summary_set ? 0 : 1;
+ }
+ 
+@@ -2765,9 +2695,7 @@ static int set_adapter_int(struct kvm_kernel_irq_routing_entry *e,
+ 	adapter = get_io_adapter(kvm, e->adapter.adapter_id);
+ 	if (!adapter)
+ 		return -1;
+-	down_read(&adapter->maps_lock);
+ 	ret = adapter_indicators_set(kvm, adapter, &e->adapter);
+-	up_read(&adapter->maps_lock);
+ 	if ((ret > 0) && !adapter->masked) {
+ 		ret = kvm_s390_inject_airq(kvm, adapter);
+ 		if (ret == 0)
+@@ -2818,23 +2746,27 @@ int kvm_set_routing_entry(struct kvm *kvm,
+ 			  struct kvm_kernel_irq_routing_entry *e,
+ 			  const struct kvm_irq_routing_entry *ue)
+ {
+-	int ret;
++	u64 uaddr;
+ 
+ 	switch (ue->type) {
++	/* we store the userspace addresses instead of the guest addresses */
+ 	case KVM_IRQ_ROUTING_S390_ADAPTER:
+ 		e->set = set_adapter_int;
+-		e->adapter.summary_addr = ue->u.adapter.summary_addr;
+-		e->adapter.ind_addr = ue->u.adapter.ind_addr;
++		uaddr =  gmap_translate(kvm->arch.gmap, ue->u.adapter.summary_addr);
++		if (uaddr == -EFAULT)
++			return -EFAULT;
++		e->adapter.summary_addr = uaddr;
++		uaddr =  gmap_translate(kvm->arch.gmap, ue->u.adapter.ind_addr);
++		if (uaddr == -EFAULT)
++			return -EFAULT;
++		e->adapter.ind_addr = uaddr;
+ 		e->adapter.summary_offset = ue->u.adapter.summary_offset;
+ 		e->adapter.ind_offset = ue->u.adapter.ind_offset;
+ 		e->adapter.adapter_id = ue->u.adapter.adapter_id;
+-		ret = 0;
+-		break;
++		return 0;
+ 	default:
+-		ret = -EINVAL;
++		return -EINVAL;
+ 	}
+-
+-	return ret;
+ }
+ 
+ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e, struct kvm *kvm,
 -- 
 2.25.0
 
