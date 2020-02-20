@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3357C165BC9
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 11:40:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E2AD165BCC
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 11:40:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728063AbgBTKkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 05:40:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4318 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727979AbgBTKkc (ORCPT
+        id S1728081AbgBTKkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 05:40:46 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3200 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727984AbgBTKkc (ORCPT
         <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 05:40:32 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01KAYcx2057932;
-        Thu, 20 Feb 2020 05:40:27 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01KAZLhU057372;
+        Thu, 20 Feb 2020 05:40:26 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8uchpgaa-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8uc13ytx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 20 Feb 2020 05:40:26 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01KAZmHm063773;
-        Thu, 20 Feb 2020 05:40:26 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8uchpg8d-1
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01KAZQSq057826;
+        Thu, 20 Feb 2020 05:40:25 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8uc13ytf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Feb 2020 05:40:26 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01KAH0AM020612;
+        Thu, 20 Feb 2020 05:40:25 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01KAGSwO027415;
         Thu, 20 Feb 2020 10:40:24 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma05wdc.us.ibm.com with ESMTP id 2y68973w8k-1
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma02wdc.us.ibm.com with ESMTP id 2y6896uvdp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 20 Feb 2020 10:40:24 +0000
 Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01KAeM7n53608710
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01KAeNDk16122860
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 Feb 2020 10:40:22 GMT
+        Thu, 20 Feb 2020 10:40:23 GMT
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D153A112062;
+        by IMSVA (Postfix) with ESMTP id DE206112066;
         Thu, 20 Feb 2020 10:40:22 +0000 (GMT)
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE8AD112064;
+        by IMSVA (Postfix) with ESMTP id D7EED112063;
         Thu, 20 Feb 2020 10:40:22 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.114.17.106])
         by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
@@ -57,197 +57,146 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org
-Subject: [PATCH v3 00/37] KVM: s390: Add support for protected VMs
-Date:   Thu, 20 Feb 2020 05:39:43 -0500
-Message-Id: <20200220104020.5343-1-borntraeger@de.ibm.com>
+        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
+        Will Deacon <will@kernel.org>
+Subject: [PATCH v3 01/37] mm:gup/writeback: add callbacks for inaccessible pages
+Date:   Thu, 20 Feb 2020 05:39:44 -0500
+Message-Id: <20200220104020.5343-2-borntraeger@de.ibm.com>
 X-Mailer: git-send-email 2.25.0
+In-Reply-To: <20200220104020.5343-1-borntraeger@de.ibm.com>
+References: <20200220104020.5343-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-20_02:2020-02-19,2020-02-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 malwarescore=0 suspectscore=0 adultscore=0
- clxscore=1015 impostorscore=0 spamscore=0 priorityscore=1501 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002200078
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ phishscore=0 impostorscore=0 mlxscore=0 mlxlogscore=822 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 clxscore=1015 suspectscore=2 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002200078
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-mm people: This series contains a "pretty small" common code memory
-management change that will allow paging, guest backing with files etc
-almost just like normal VMs. It should be a no-op for all architectures
-not opting in. And it should be usable for others that also try to get
-notified on "the pages are in the process of being used for things like
-I/O". This time I included error handling and an ACK from Will Deacon.
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-mm-related patches CCed on linux-mm, the complete list can be found on
-the KVM and linux-s390 list. 
+With the introduction of protected KVM guests on s390 there is now a
+concept of inaccessible pages. These pages need to be made accessible
+before the host can access them.
 
-Andrew, any chance to either take " mm:gup/writeback: add callbacks for
-inaccessible pages" or ACK so that I can take it?
+While cpu accesses will trigger a fault that can be resolved, I/O
+accesses will just fail.  We need to add a callback into architecture
+code for places that will do I/O, namely when writeback is started or
+when a page reference is taken.
 
-Overview
---------
-Protected VMs (PVM) are KVM VMs, where KVM can't access the VM's state
-like guest memory and guest registers anymore. Instead the PVMs are
-mostly managed by a new entity called Ultravisor (UV), which provides
-an API, so KVM and the PV can request management actions.
+This is not only to enable paging, file backing etc, it is also
+necessary to protect the host against a malicious user space. For
+example a bad QEMU could simply start direct I/O on such protected
+memory.  We do not want userspace to be able to trigger I/O errors and
+thus we the logic is "whenever somebody accesses that page (gup) or
+doing I/O, make sure that this page can be accessed. When the guest
+tries to access that page we will wait in the page fault handler for
+writeback to have finished and for the page_ref to be the expected
+value.
 
-PVMs are encrypted at rest and protected from hypervisor access while
-running. They switch from a normal operation into protected mode, so
-we can still use the standard boot process to load a encrypted blob
-and then move it into protected mode.
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Acked-by: Will Deacon <will@kernel.org>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ include/linux/gfp.h |  6 ++++++
+ mm/gup.c            | 15 ++++++++++++---
+ mm/page-writeback.c |  5 +++++
+ 3 files changed, 23 insertions(+), 3 deletions(-)
 
-Rebooting is only possible by passing through the unprotected/normal
-mode and switching to protected again.
-
-All patches are in the protvirtv4 branch of the korg s390 kvm git
-https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git/log/?h=protvirtv5
-
-Claudio presented the technology at his presentation at KVM Forum
-2019.
-
-https://static.sched.com/hosted_files/kvmforum2019/3b/ibm_protected_vms_s390x.pdf
-
-
-v2 -> v3
-- rebase against v5.6-rc2
-- move some checks into the callers
-- typo fixes
-- extend UV query size
-- do a tlb flush when entering/exiting protected mode
-- more comments
-- change interface to PV_ENABLE/DISABLE instead of vcpu/vm
-  create/destroy
-- lockdep checks for *is_protected calls
-- locking improments
-- move facility 161 to qemu
-- checkpatch fixes
-- merged error handling in mm patch
-- removed vcpu pv commands
-- use mp_state for setting the IPL PSW
-
-
-v1 -> v2
-- rebase on top of kvm/master
-- pipe through rc and rrc. This might have created some churn here and
-  there
-- turn off sclp masking when rebooting into "unsecure"
-- memory management simplification
-- prefix page handling now via intercept 112
-- io interrupt intervention request fix (do not use GISA)
-- api.txt conversion to rst
-- sample patches on top of mm/gup/writeback
-- tons of review feedback
-- kvm_uv debug feature fixes and unifications
-- ultravisor information for /sys/firmware
-- 
-
-RFCv2 -> v1 (you can diff the protvirtv2 and the protvirtv3 branch)
-- tons of review feedback integrated (see mail thread)
-- memory management now complete and working
-- Documentation patches merged
-- interrupt patches merged
-- CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST removed
-- SIDA interface integrated into memop
-- for merged patches I removed reviews that were not in all patches
-
-
-Christian Borntraeger (5):
-  KVM: s390/mm: Make pages accessible before destroying the guest
-  KVM: s390: protvirt: Add SCLP interrupt handling
-  KVM: s390: protvirt: do not inject interrupts after start
-  KVM: s390: rstify new ioctls in api.rst
-  KVM: s390: protvirt: introduce and enable KVM_CAP_S390_PROTECTED
-
-Claudio Imbrenda (3):
-  mm:gup/writeback: add callbacks for inaccessible pages
-  s390/mm: provide memory management functions for protected KVM guests
-  KVM: s390/mm: handle guest unpin events
-
-Janosch Frank (24):
-  KVM: s390: protvirt: Add UV debug trace
-  KVM: s390: add new variants of UV CALL
-  KVM: s390: protvirt: Add initial vm and cpu lifecycle handling
-  KVM: s390: protvirt: Add KVM api documentation
-  KVM: s390: protvirt: Secure memory is not mergeable
-  KVM: s390: protvirt: Handle SE notification interceptions
-  KVM: s390: protvirt: Instruction emulation
-  KVM: s390: protvirt: Handle spec exception loops
-  KVM: s390: protvirt: Add new gprs location handling
-  KVM: S390: protvirt: Introduce instruction data area bounce buffer
-  KVM: s390: protvirt: handle secure guest prefix pages
-  KVM: s390: protvirt: Write sthyi data to instruction data area
-  KVM: s390: protvirt: STSI handling
-  KVM: s390: protvirt: disallow one_reg
-  KVM: s390: protvirt: Do only reset registers that are accessible
-  KVM: s390: protvirt: Only sync fmt4 registers
-  KVM: s390: protvirt: Add program exception injection
-  KVM: s390: protvirt: UV calls in support of diag308 0, 1
-  KVM: s390: protvirt: Report CPU state to Ultravisor
-  KVM: s390: protvirt: Support cmd 5 operation state
-  KVM: s390: protvirt: Mask PSW interrupt bits for interception 104 and
-    112
-  KVM: s390: protvirt: Add UV cpu reset calls
-  DOCUMENTATION: Protected virtual machine introduction and IPL
-  s390: protvirt: Add sysfs firmware interface for Ultravisor
-    information
-
-Michael Mueller (1):
-  KVM: s390: protvirt: Implement interrupt injection
-
-Ulrich Weigand (1):
-  KVM: s390/interrupt: do not pin adapter interrupt pages
-
-Vasily Gorbik (3):
-  s390/protvirt: introduce host side setup
-  s390/protvirt: add ultravisor initialization
-  s390/mm: add (non)secure page access exceptions handlers
-
- .../admin-guide/kernel-parameters.txt         |   5 +
- Documentation/virt/kvm/api.rst                |  91 +++-
- Documentation/virt/kvm/devices/s390_flic.rst  |  11 +-
- Documentation/virt/kvm/index.rst              |   2 +
- Documentation/virt/kvm/s390-pv-boot.rst       |  83 +++
- Documentation/virt/kvm/s390-pv.rst            | 116 ++++
- MAINTAINERS                                   |   1 +
- arch/s390/boot/Makefile                       |   2 +-
- arch/s390/boot/uv.c                           |  21 +-
- arch/s390/include/asm/gmap.h                  |   6 +
- arch/s390/include/asm/kvm_host.h              | 113 +++-
- arch/s390/include/asm/mmu.h                   |   2 +
- arch/s390/include/asm/mmu_context.h           |   1 +
- arch/s390/include/asm/page.h                  |   5 +
- arch/s390/include/asm/pgtable.h               |  35 +-
- arch/s390/include/asm/uv.h                    | 252 ++++++++-
- arch/s390/kernel/Makefile                     |   1 +
- arch/s390/kernel/pgm_check.S                  |   4 +-
- arch/s390/kernel/setup.c                      |   9 +-
- arch/s390/kernel/uv.c                         | 413 ++++++++++++++
- arch/s390/kvm/Makefile                        |   2 +-
- arch/s390/kvm/diag.c                          |   4 +
- arch/s390/kvm/intercept.c                     | 115 +++-
- arch/s390/kvm/interrupt.c                     | 399 ++++++++------
- arch/s390/kvm/kvm-s390.c                      | 509 +++++++++++++++---
- arch/s390/kvm/kvm-s390.h                      |  51 +-
- arch/s390/kvm/priv.c                          |  11 +-
- arch/s390/kvm/pv.c                            | 286 ++++++++++
- arch/s390/mm/fault.c                          |  78 +++
- arch/s390/mm/gmap.c                           |  65 ++-
- include/linux/gfp.h                           |   6 +
- include/uapi/linux/kvm.h                      |  43 +-
- mm/gup.c                                      |  15 +-
- mm/page-writeback.c                           |   5 +
- 34 files changed, 2442 insertions(+), 320 deletions(-)
- create mode 100644 Documentation/virt/kvm/s390-pv-boot.rst
- create mode 100644 Documentation/virt/kvm/s390-pv.rst
- create mode 100644 arch/s390/kernel/uv.c
- create mode 100644 arch/s390/kvm/pv.c
-
+diff --git a/include/linux/gfp.h b/include/linux/gfp.h
+index e5b817cb86e7..be2754841369 100644
+--- a/include/linux/gfp.h
++++ b/include/linux/gfp.h
+@@ -485,6 +485,12 @@ static inline void arch_free_page(struct page *page, int order) { }
+ #ifndef HAVE_ARCH_ALLOC_PAGE
+ static inline void arch_alloc_page(struct page *page, int order) { }
+ #endif
++#ifndef HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
++static inline int arch_make_page_accessible(struct page *page)
++{
++	return 0;
++}
++#endif
+ 
+ struct page *
+ __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order, int preferred_nid,
+diff --git a/mm/gup.c b/mm/gup.c
+index 1b521e0ac1de..354bcfbd844b 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -193,6 +193,7 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+ 	struct page *page;
+ 	spinlock_t *ptl;
+ 	pte_t *ptep, pte;
++	int ret;
+ 
+ 	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+ 	if (WARN_ON_ONCE((flags & (FOLL_PIN | FOLL_GET)) ==
+@@ -250,8 +251,6 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+ 		if (is_zero_pfn(pte_pfn(pte))) {
+ 			page = pte_page(pte);
+ 		} else {
+-			int ret;
+-
+ 			ret = follow_pfn_pte(vma, address, ptep, flags);
+ 			page = ERR_PTR(ret);
+ 			goto out;
+@@ -259,7 +258,6 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+ 	}
+ 
+ 	if (flags & FOLL_SPLIT && PageTransCompound(page)) {
+-		int ret;
+ 		get_page(page);
+ 		pte_unmap_unlock(ptep, ptl);
+ 		lock_page(page);
+@@ -276,6 +274,12 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+ 			page = ERR_PTR(-ENOMEM);
+ 			goto out;
+ 		}
++		ret = arch_make_page_accessible(page);
++		if (ret) {
++			put_page(page);
++			page = ERR_PTR(ret);
++			goto out;
++		}
+ 	}
+ 	if (flags & FOLL_TOUCH) {
+ 		if ((flags & FOLL_WRITE) &&
+@@ -1919,6 +1923,11 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+ 
+ 		VM_BUG_ON_PAGE(compound_head(page) != head, page);
+ 
++		ret = arch_make_page_accessible(page);
++		if (ret) {
++			put_page(head);
++			goto pte_unmap;
++		}
+ 		SetPageReferenced(page);
+ 		pages[*nr] = page;
+ 		(*nr)++;
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 2caf780a42e7..558d7063c117 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -2807,6 +2807,11 @@ int __test_set_page_writeback(struct page *page, bool keep_write)
+ 		inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
+ 	}
+ 	unlock_page_memcg(page);
++	/*
++	 * If writeback has been triggered on a page that cannot be made
++	 * accessible, it is too late.
++	 */
++	WARN_ON(arch_make_page_accessible(page));
+ 	return ret;
+ 
+ }
 -- 
 2.25.0
 
