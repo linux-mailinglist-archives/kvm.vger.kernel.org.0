@@ -2,142 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90E38165E82
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:16:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE6E4165E87
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:17:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728072AbgBTNQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 08:16:48 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50655 "EHLO
+        id S1728105AbgBTNRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 08:17:31 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52043 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727931AbgBTNQs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 08:16:48 -0500
+        by vger.kernel.org with ESMTP id S1728042AbgBTNRb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 08:17:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582204607;
+        s=mimecast20190719; t=1582204650;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ru3ADtcHYP8MfN/oIVe5nGPDlqA+ClJ+343y1IgOloY=;
-        b=CSck3AKETPRi+rIlgust7ZVO+ImhQAT8qP4QFovK2zrcRgBT5xmmY19+ROetim4nhJzvpR
-        eV697Mg5X/tWObbzDzaesNEh8/vi4ICqTCzPiS7OkfM9WrKvv4WMvL0AYbOD18C+2lBuuQ
-        bjH6yL443mmL7UlvWE2/1sH3da2Wp6Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-RcZlOOoRPWG_gnpP3lfEWQ-1; Thu, 20 Feb 2020 08:16:45 -0500
-X-MC-Unique: RcZlOOoRPWG_gnpP3lfEWQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D202C1005510;
-        Thu, 20 Feb 2020 13:16:41 +0000 (UTC)
-Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1755B8B570;
-        Thu, 20 Feb 2020 13:16:28 +0000 (UTC)
-Subject: Re: [PATCH v3 02/20] hw: Remove unnecessary cast when calling
- dma_memory_read()
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc:     Fam Zheng <fam@euphon.net>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, qemu-block@nongnu.org,
-        David Hildenbrand <david@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        xen-devel@lists.xenproject.org,
-        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Stefan Weil <sw@weilnetz.de>,
-        Alistair Francis <alistair@alistair23.me>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Paul Durrant <paul@xen.org>,
-        Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
-        qemu-arm@nongnu.org,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        John Snow <jsnow@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Igor Mitsyanko <i.mitsyanko@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20200220130548.29974-1-philmd@redhat.com>
- <20200220130548.29974-3-philmd@redhat.com>
-From:   Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <68120807-6f6b-1602-8208-fd76d64e74bc@redhat.com>
-Date:   Thu, 20 Feb 2020 07:16:27 -0600
+        bh=XvMmChK6SbgG0/2Lm5qNdD29/GRoTprQuuIJ6y74DbY=;
+        b=OL4CmIvloyGVcCObFO+rKt31nQeBpfKoQDvKLpdQg8aKswvi7Pc35jR/Vd94SaaHopEf1a
+        5j+lk7U5m4POFz9E5AkM8OCLyz/8JvKqP6KD2exbfnc5ngnupYkA/eNVDyjZF+1fnYHcqh
+        WUpAg0j9GY3feuBt8Ygng/TEdz9qySU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-V49cwd0iO_Gs-1F3-aOELQ-1; Thu, 20 Feb 2020 08:17:28 -0500
+X-MC-Unique: V49cwd0iO_Gs-1F3-aOELQ-1
+Received: by mail-wr1-f72.google.com with SMTP id s13so1716943wru.7
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2020 05:17:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XvMmChK6SbgG0/2Lm5qNdD29/GRoTprQuuIJ6y74DbY=;
+        b=e+DzL64LX1WP65DDhEZav5qrhPF5XZSb6fLGuuTXtTUAykKlQ5dbohvut3E3tn1uMP
+         P1lMuuZNEJAmxE9ojeiRD+m+C3J9NGDdbPkPEFmc6Gq6RwPneddZizGgKqZHYKPopV+g
+         A6kgUSS1A7wvbnqUQf0aU2RloyfM7EjMTY58xdBskvIjekYDWYHKkmkjLUQuG/z7Pt3c
+         Odt1/mH0OnFdq7BEQ18E5uIXPCPqln13b127SaojYkXX0RjVptrMZ6SMTG2dsoa9AGwA
+         LpbJXofb139YGLenYr1oHvKitaqRngXSgmrTB9Vtlv8yveslNsxg32UW44Lx5s+8b1EC
+         35yQ==
+X-Gm-Message-State: APjAAAXYKXCAPTrw2iDkvjCA5N3KS1WEA4vLGn0shcbkdVl59RxfZOKv
+        jef9akGCOHEXtlwt4Y1AdrEjLAK7i4MYfuP5UsGVm2OoxzZhBzaYw6kQ142ww3RNRv8UOvwYXiO
+        CwJQCMEDp4fJW
+X-Received: by 2002:a05:6000:1012:: with SMTP id a18mr41811263wrx.113.1582204647567;
+        Thu, 20 Feb 2020 05:17:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz+bMIwb/40ta9G1MJyGw7FTeqK0evbAksgNT4fuWxaQqt0K6KuCAj18GyDem3xjd7ozBfutw==
+X-Received: by 2002:a05:6000:1012:: with SMTP id a18mr41811244wrx.113.1582204647347;
+        Thu, 20 Feb 2020 05:17:27 -0800 (PST)
+Received: from [10.201.49.12] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+        by smtp.gmail.com with ESMTPSA id x10sm4168085wrv.60.2020.02.20.05.17.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Feb 2020 05:17:26 -0800 (PST)
+Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
+To:     Marc Zyngier <maz@kernel.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Vladimir Murzin <vladimir.murzin@arm.com>,
+        Russell King <linux@arm.linux.org.uk>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Christoffer Dall <Christoffer.Dall@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+References: <CGME20200210141344eucas1p25a6da0b0251931ef3659397a6f34c0c3@eucas1p2.samsung.com>
+ <20200210141324.21090-1-maz@kernel.org>
+ <621a0a92-6432-6c3e-cb69-0b601764fa69@samsung.com>
+ <43446bd5e884ae92f243799cbe748871@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <250c6908-266f-0306-9d09-5ecf8dd6b736@redhat.com>
+Date:   Thu, 20 Feb 2020 14:17:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200220130548.29974-3-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <43446bd5e884ae92f243799cbe748871@kernel.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/20/20 7:05 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Since its introduction in commit d86a77f8abb, dma_memory_read()
-> always accepted void pointer argument. Remove the unnecessary
-> casts.
->=20
-> This commit was produced with the included Coccinelle script
-> scripts/coccinelle/exec_rw_const.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->   scripts/coccinelle/exec_rw_const.cocci | 15 +++++++++++++++
->   hw/arm/smmu-common.c                   |  3 +--
->   hw/arm/smmuv3.c                        | 10 ++++------
->   hw/sd/sdhci.c                          | 15 +++++----------
->   4 files changed, 25 insertions(+), 18 deletions(-)
->   create mode 100644 scripts/coccinelle/exec_rw_const.cocci
->=20
-> diff --git a/scripts/coccinelle/exec_rw_const.cocci b/scripts/coccinell=
-e/exec_rw_const.cocci
-> new file mode 100644
-> index 0000000000..a0054f009d
-> --- /dev/null
-> +++ b/scripts/coccinelle/exec_rw_const.cocci
-> @@ -0,0 +1,15 @@
-> +// Usage:
-> +//  spatch --sp-file scripts/coccinelle/exec_rw_const.cocci --dir . --=
-in-place
+On 20/02/20 14:15, Marc Zyngier wrote:
+>> That is a bit sad information. Mainline Exynos finally got everything
+>> that was needed to run it on the quite popular Samsung Exynos5422-based
+>> Odroid XU4/HC1/MC1 boards. According to the Odroid related forums it is
+>> being used. We also use it internally at Samsung.
+> 
+> Something like "too little, too late" springs to mind, but let's be
+> constructive. Is anyone using it in a production environment, where
+> they rely on the latest mainline kernel having KVM support?
 
-This command line should also use '--macro-file=20
-scripts/cocci-macro-file.h' to cover more of the code base (Coccinelle=20
-skips portions of the code that uses macros it doesn't recognize).
+Depends if you consider "production environment" somebody playing at
+home with a SBC.  But it's true that, these days, most of those that
+support EL2 do support ARM64, even if they are used with a 32-bit userland.
 
-
-> @@ -726,13 +724,10 @@ static void get_adma_description(SDHCIState *s, A=
-DMADescr *dscr)
->           }
->           break;
->       case SDHC_CTRL_ADMA2_64:
-> -        dma_memory_read(s->dma_as, entry_addr,
-> -                        (uint8_t *)(&dscr->attr), 1);
-> -        dma_memory_read(s->dma_as, entry_addr + 2,
-> -                        (uint8_t *)(&dscr->length), 2);
-> +        dma_memory_read(s->dma_as, entry_addr, (&dscr->attr), 1);
-> +        dma_memory_read(s->dma_as, entry_addr + 2, (&dscr->length), 2)=
-;
-
-The () around &dscr->length are now pointless.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Paolo
 
