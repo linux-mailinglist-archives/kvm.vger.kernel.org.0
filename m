@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08AB5165BC4
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 11:40:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD0F2165BC8
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 11:40:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728068AbgBTKkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 05:40:36 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7036 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726921AbgBTKkc (ORCPT
+        id S1728043AbgBTKkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 05:40:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5274 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727592AbgBTKkc (ORCPT
         <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 05:40:32 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01KAZaPo052099;
-        Thu, 20 Feb 2020 05:40:27 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01KAbBWU034118;
+        Thu, 20 Feb 2020 05:40:29 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y8ubtb32b-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ucmxc6c-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Feb 2020 05:40:27 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01KAZn2m053008;
-        Thu, 20 Feb 2020 05:40:26 -0500
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y8ubtb321-1
+        Thu, 20 Feb 2020 05:40:29 -0500
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01KAbVxv034823;
+        Thu, 20 Feb 2020 05:40:28 -0500
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ucmxc4x-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Feb 2020 05:40:26 -0500
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01KAY6uj009293;
-        Thu, 20 Feb 2020 10:40:25 GMT
+        Thu, 20 Feb 2020 05:40:28 -0500
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01KAXKxD029056;
+        Thu, 20 Feb 2020 10:40:26 GMT
 Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma01dal.us.ibm.com with ESMTP id 2y68976x0x-1
+        by ppma01wdc.us.ibm.com with ESMTP id 2y6896uvs3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Feb 2020 10:40:25 +0000
+        Thu, 20 Feb 2020 10:40:26 +0000
 Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01KAeN1u16188274
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01KAeOcr3998404
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 Feb 2020 10:40:23 GMT
+        Thu, 20 Feb 2020 10:40:24 GMT
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A6E0112061;
+        by IMSVA (Postfix) with ESMTP id 6DF9C112063;
         Thu, 20 Feb 2020 10:40:23 +0000 (GMT)
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 392FD112065;
+        by IMSVA (Postfix) with ESMTP id 5ECD4112067;
         Thu, 20 Feb 2020 10:40:23 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.114.17.106])
         by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
@@ -56,10 +56,11 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org
-Subject: [PATCH v3 05/37] s390/mm: provide memory management functions for protected KVM guests
-Date:   Thu, 20 Feb 2020 05:39:48 -0500
-Message-Id: <20200220104020.5343-6-borntraeger@de.ibm.com>
+        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: [PATCH v3 06/37] s390/mm: add (non)secure page access exceptions handlers
+Date:   Thu, 20 Feb 2020 05:39:49 -0500
+Message-Id: <20200220104020.5343-7-borntraeger@de.ibm.com>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <20200220104020.5343-1-borntraeger@de.ibm.com>
 References: <20200220104020.5343-1-borntraeger@de.ibm.com>
@@ -68,512 +69,142 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-20_02:2020-02-19,2020-02-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 clxscore=1015 adultscore=0 bulkscore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=2 spamscore=0
- mlxlogscore=903 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2001150001 definitions=main-2002200078
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ priorityscore=1501 clxscore=1015 suspectscore=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002200078
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+From: Vasily Gorbik <gor@linux.ibm.com>
 
-This provides the basic ultravisor calls and page table handling to cope
-with secure guests:
-- provide arch_make_page_accessible
-- make pages accessible after unmapping of secure guests
-- provide the ultravisor commands convert to/from secure
-- provide the ultravisor commands pin/unpin shared
-- provide callbacks to make pages secure (inacccessible)
- - we check for the expected pin count to only make pages secure if the
-   host is not accessing them
- - we fence hugetlbfs for secure pages
+Add exceptions handlers performing transparent transition of non-secure
+pages to secure (import) upon guest access and secure pages to
+non-secure (export) upon hypervisor access.
 
-Co-developed-by: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
-Signed-off-by: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+[frankja@linux.ibm.com: adding checks for failures]
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+[imbrenda@linux.ibm.com:  adding a check for gmap fault]
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- arch/s390/include/asm/gmap.h        |   4 +
- arch/s390/include/asm/mmu.h         |   2 +
- arch/s390/include/asm/mmu_context.h |   1 +
- arch/s390/include/asm/page.h        |   5 +
- arch/s390/include/asm/pgtable.h     |  35 ++++-
- arch/s390/include/asm/uv.h          |  31 ++++
- arch/s390/kernel/uv.c               | 227 ++++++++++++++++++++++++++++
- 7 files changed, 300 insertions(+), 5 deletions(-)
+ arch/s390/kernel/pgm_check.S |  4 +-
+ arch/s390/mm/fault.c         | 78 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 80 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
-index 37f96b6f0e61..3c4926aa78f4 100644
---- a/arch/s390/include/asm/gmap.h
-+++ b/arch/s390/include/asm/gmap.h
-@@ -9,6 +9,7 @@
- #ifndef _ASM_S390_GMAP_H
- #define _ASM_S390_GMAP_H
- 
-+#include <linux/radix-tree.h>
- #include <linux/refcount.h>
- 
- /* Generic bits for GMAP notification on DAT table entry changes. */
-@@ -31,6 +32,7 @@
-  * @table: pointer to the page directory
-  * @asce: address space control element for gmap page table
-  * @pfault_enabled: defines if pfaults are applicable for the guest
-+ * @guest_handle: protected virtual machine handle for the ultravisor
-  * @host_to_rmap: radix tree with gmap_rmap lists
-  * @children: list of shadow gmap structures
-  * @pt_list: list of all page tables used in the shadow guest address space
-@@ -54,6 +56,8 @@ struct gmap {
- 	unsigned long asce_end;
- 	void *private;
- 	bool pfault_enabled;
-+	/* only set for protected virtual machines */
-+	unsigned long guest_handle;
- 	/* Additional data for shadow guest address spaces */
- 	struct radix_tree_root host_to_rmap;
- 	struct list_head children;
-diff --git a/arch/s390/include/asm/mmu.h b/arch/s390/include/asm/mmu.h
-index bcfb6371086f..e21b618ad432 100644
---- a/arch/s390/include/asm/mmu.h
-+++ b/arch/s390/include/asm/mmu.h
-@@ -16,6 +16,8 @@ typedef struct {
- 	unsigned long asce;
- 	unsigned long asce_limit;
- 	unsigned long vdso_base;
-+	/* The mmu context belongs to a secure guest. */
-+	atomic_t is_protected;
- 	/*
- 	 * The following bitfields need a down_write on the mm
- 	 * semaphore when they are written to. As they are only
-diff --git a/arch/s390/include/asm/mmu_context.h b/arch/s390/include/asm/mmu_context.h
-index 8d04e6f3f796..afa836014076 100644
---- a/arch/s390/include/asm/mmu_context.h
-+++ b/arch/s390/include/asm/mmu_context.h
-@@ -23,6 +23,7 @@ static inline int init_new_context(struct task_struct *tsk,
- 	INIT_LIST_HEAD(&mm->context.gmap_list);
- 	cpumask_clear(&mm->context.cpu_attach_mask);
- 	atomic_set(&mm->context.flush_count, 0);
-+	atomic_set(&mm->context.is_protected, 0);
- 	mm->context.gmap_asce = 0;
- 	mm->context.flush_mm = 0;
- 	mm->context.compat_mm = test_thread_flag(TIF_31BIT);
-diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
-index 85e944f04c70..4ebcf891ff3c 100644
---- a/arch/s390/include/asm/page.h
-+++ b/arch/s390/include/asm/page.h
-@@ -153,6 +153,11 @@ static inline int devmem_is_allowed(unsigned long pfn)
- #define HAVE_ARCH_FREE_PAGE
- #define HAVE_ARCH_ALLOC_PAGE
- 
-+#if IS_ENABLED(CONFIG_PGSTE)
-+int arch_make_page_accessible(struct page *page);
-+#define HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
-+#endif
-+
- #endif /* !__ASSEMBLY__ */
- 
- #define __PAGE_OFFSET		0x0UL
-diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
-index 137a3920ca36..cc7a1adacb94 100644
---- a/arch/s390/include/asm/pgtable.h
-+++ b/arch/s390/include/asm/pgtable.h
-@@ -19,6 +19,7 @@
- #include <linux/atomic.h>
- #include <asm/bug.h>
- #include <asm/page.h>
-+#include <asm/uv.h>
- 
- extern pgd_t swapper_pg_dir[];
- extern void paging_init(void);
-@@ -520,6 +521,15 @@ static inline int mm_has_pgste(struct mm_struct *mm)
- 	return 0;
- }
- 
-+static inline int mm_is_protected(struct mm_struct *mm)
-+{
-+#ifdef CONFIG_PGSTE
-+	if (unlikely(atomic_read(&mm->context.is_protected)))
-+		return 1;
-+#endif
-+	return 0;
-+}
-+
- static inline int mm_alloc_pgste(struct mm_struct *mm)
- {
- #ifdef CONFIG_PGSTE
-@@ -1061,7 +1071,12 @@ static inline int ptep_clear_flush_young(struct vm_area_struct *vma,
- static inline pte_t ptep_get_and_clear(struct mm_struct *mm,
- 				       unsigned long addr, pte_t *ptep)
- {
--	return ptep_xchg_lazy(mm, addr, ptep, __pte(_PAGE_INVALID));
-+	pte_t res;
-+
-+	res = ptep_xchg_lazy(mm, addr, ptep, __pte(_PAGE_INVALID));
-+	if (mm_is_protected(mm) && pte_present(res))
-+		uv_convert_from_secure(pte_val(res) & PAGE_MASK);
-+	return res;
- }
- 
- #define __HAVE_ARCH_PTEP_MODIFY_PROT_TRANSACTION
-@@ -1073,7 +1088,12 @@ void ptep_modify_prot_commit(struct vm_area_struct *, unsigned long,
- static inline pte_t ptep_clear_flush(struct vm_area_struct *vma,
- 				     unsigned long addr, pte_t *ptep)
- {
--	return ptep_xchg_direct(vma->vm_mm, addr, ptep, __pte(_PAGE_INVALID));
-+	pte_t res;
-+
-+	res = ptep_xchg_direct(vma->vm_mm, addr, ptep, __pte(_PAGE_INVALID));
-+	if (mm_is_protected(vma->vm_mm) && pte_present(res))
-+		uv_convert_from_secure(pte_val(res) & PAGE_MASK);
-+	return res;
- }
- 
- /*
-@@ -1088,12 +1108,17 @@ static inline pte_t ptep_get_and_clear_full(struct mm_struct *mm,
- 					    unsigned long addr,
- 					    pte_t *ptep, int full)
- {
-+	pte_t res;
-+
- 	if (full) {
--		pte_t pte = *ptep;
-+		res = *ptep;
- 		*ptep = __pte(_PAGE_INVALID);
--		return pte;
-+	} else {
-+		res = ptep_xchg_lazy(mm, addr, ptep, __pte(_PAGE_INVALID));
- 	}
--	return ptep_xchg_lazy(mm, addr, ptep, __pte(_PAGE_INVALID));
-+	if (mm_is_protected(mm) && pte_present(res))
-+		uv_convert_from_secure(pte_val(res) & PAGE_MASK);
-+	return res;
- }
- 
- #define __HAVE_ARCH_PTEP_SET_WRPROTECT
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index cad643b05d19..7956868340c1 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -15,6 +15,7 @@
- #include <linux/errno.h>
- #include <linux/bug.h>
- #include <asm/page.h>
-+#include <asm/gmap.h>
- 
- #define UVC_RC_EXECUTED		0x0001
- #define UVC_RC_INV_CMD		0x0002
-@@ -24,6 +25,10 @@
- 
- #define UVC_CMD_QUI			0x0001
- #define UVC_CMD_INIT_UV			0x000f
-+#define UVC_CMD_CONV_TO_SEC_STOR	0x0200
-+#define UVC_CMD_CONV_FROM_SEC_STOR	0x0201
-+#define UVC_CMD_PIN_PAGE_SHARED		0x0341
-+#define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
- #define UVC_CMD_SET_SHARED_ACCESS	0x1000
- #define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
- 
-@@ -31,8 +36,12 @@
- enum uv_cmds_inst {
- 	BIT_UVC_CMD_QUI = 0,
- 	BIT_UVC_CMD_INIT_UV = 1,
-+	BIT_UVC_CMD_CONV_TO_SEC_STOR = 6,
-+	BIT_UVC_CMD_CONV_FROM_SEC_STOR = 7,
- 	BIT_UVC_CMD_SET_SHARED_ACCESS = 8,
- 	BIT_UVC_CMD_REMOVE_SHARED_ACCESS = 9,
-+	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
-+	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
- };
- 
- struct uv_cb_header {
-@@ -69,6 +78,19 @@ struct uv_cb_init {
- 	u64 reserved28[4];
- } __packed __aligned(8);
- 
-+struct uv_cb_cts {
-+	struct uv_cb_header header;
-+	u64 reserved08[2];
-+	u64 guest_handle;
-+	u64 gaddr;
-+} __packed __aligned(8);
-+
-+struct uv_cb_cfs {
-+	struct uv_cb_header header;
-+	u64 reserved08[2];
-+	u64 paddr;
-+} __packed __aligned(8);
-+
- struct uv_cb_share {
- 	struct uv_cb_header header;
- 	u64 reserved08[3];
-@@ -171,12 +193,21 @@ static inline int is_prot_virt_host(void)
- 	return prot_virt_host;
- }
- 
-+int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb);
-+int uv_convert_from_secure(unsigned long paddr);
-+int gmap_convert_to_secure(struct gmap *gmap, unsigned long gaddr);
-+
- void setup_uv(void);
- void adjust_to_uv_max(unsigned long *vmax);
- #else
- #define is_prot_virt_host() 0
- static inline void setup_uv(void) {}
- static inline void adjust_to_uv_max(unsigned long *vmax) {}
-+
-+static inline int uv_convert_from_secure(unsigned long paddr)
-+{
-+	return 0;
-+}
- #endif
- 
- #if defined(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) ||                          \
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index 1ddc42154ef6..4539003dac9d 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -12,6 +12,8 @@
- #include <linux/sizes.h>
- #include <linux/bitmap.h>
- #include <linux/memblock.h>
-+#include <linux/pagemap.h>
-+#include <linux/swap.h>
+diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
+index eee3a482195a..2c27907a5ffc 100644
+--- a/arch/s390/kernel/pgm_check.S
++++ b/arch/s390/kernel/pgm_check.S
+@@ -78,8 +78,8 @@ PGM_CHECK(do_dat_exception)		/* 39 */
+ PGM_CHECK(do_dat_exception)		/* 3a */
+ PGM_CHECK(do_dat_exception)		/* 3b */
+ PGM_CHECK_DEFAULT			/* 3c */
+-PGM_CHECK_DEFAULT			/* 3d */
+-PGM_CHECK_DEFAULT			/* 3e */
++PGM_CHECK(do_secure_storage_access)	/* 3d */
++PGM_CHECK(do_non_secure_storage_access)	/* 3e */
+ PGM_CHECK_DEFAULT			/* 3f */
+ PGM_CHECK(monitor_event_exception)	/* 40 */
+ PGM_CHECK_DEFAULT			/* 41 */
+diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+index 7b0bb475c166..7bd86ebc882f 100644
+--- a/arch/s390/mm/fault.c
++++ b/arch/s390/mm/fault.c
+@@ -38,6 +38,7 @@
+ #include <asm/irq.h>
+ #include <asm/mmu_context.h>
  #include <asm/facility.h>
- #include <asm/sections.h>
- #include <asm/uv.h>
-@@ -97,4 +99,229 @@ void adjust_to_uv_max(unsigned long *vmax)
- {
- 	*vmax = min_t(unsigned long, *vmax, uv_info.max_sec_stor_addr);
- }
++#include <asm/uv.h>
+ #include "../kernel/entry.h"
+ 
+ #define __FAIL_ADDR_MASK -4096L
+@@ -816,3 +817,80 @@ static int __init pfault_irq_init(void)
+ early_initcall(pfault_irq_init);
+ 
+ #endif /* CONFIG_PFAULT */
 +
-+/*
-+ * Requests the Ultravisor to pin the page in the shared state. This will
-+ * cause an intercept when the guest attempts to unshare the pinned page.
-+ */
-+static int uv_pin_shared(unsigned long paddr)
++#if IS_ENABLED(CONFIG_PGSTE)
++void do_secure_storage_access(struct pt_regs *regs)
 +{
-+	struct uv_cb_cfs uvcb = {
-+		.header.cmd = UVC_CMD_PIN_PAGE_SHARED,
-+		.header.len = sizeof(uvcb),
-+		.paddr = paddr,
-+	};
-+
-+	if (uv_call(0, (u64)&uvcb))
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+/*
-+ * Requests the Ultravisor to encrypt a guest page and make it
-+ * accessible to the host for paging (export).
-+ *
-+ * @paddr: Absolute host address of page to be exported
-+ */
-+int uv_convert_from_secure(unsigned long paddr)
-+{
-+	struct uv_cb_cfs uvcb = {
-+		.header.cmd = UVC_CMD_CONV_FROM_SEC_STOR,
-+		.header.len = sizeof(uvcb),
-+		.paddr = paddr
-+	};
-+
-+	if (uv_call(0, (u64)&uvcb))
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+/*
-+ * Calculate the expected ref_count for a page that would otherwise have no
-+ * further pins. This was cribbed from similar functions in other places in
-+ * the kernel, but with some slight modifications. We know that a secure
-+ * page can not be a huge page for example.
-+ */
-+static int expected_page_refs(struct page *page)
-+{
-+	int res;
-+
-+	res = page_mapcount(page);
-+	if (PageSwapCache(page)) {
-+		res++;
-+	} else if (page_mapping(page)) {
-+		res++;
-+		if (page_has_private(page))
-+			res++;
-+	}
-+	return res;
-+}
-+
-+static int make_secure_pte(pte_t *ptep, unsigned long addr,
-+			   struct page *exp_page, struct uv_cb_header *uvcb)
-+{
-+	pte_t entry = READ_ONCE(*ptep);
-+	struct page *page;
-+	int expected, rc = 0;
-+
-+	if (!pte_present(entry))
-+		return -ENXIO;
-+	if (pte_val(entry) & _PAGE_INVALID)
-+		return -ENXIO;
-+
-+	page = pte_page(entry);
-+	if (page != exp_page)
-+		return -ENXIO;
-+	if (PageWriteback(page))
-+		return -EAGAIN;
-+	expected = expected_page_refs(page);
-+	if (!page_ref_freeze(page, expected))
-+		return -EBUSY;
-+	set_bit(PG_arch_1, &page->flags);
-+	rc = uv_call(0, (u64)uvcb);
-+	page_ref_unfreeze(page, expected);
-+	/* Return -ENXIO if the page was not mapped, -EINVAL otherwise */
-+	if (rc)
-+		rc = uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
-+	return rc;
-+}
-+
-+/*
-+ * Requests the Ultravisor to make a page accessible to a guest.
-+ * If it's brought in the first time, it will be cleared. If
-+ * it has been exported before, it will be decrypted and integrity
-+ * checked.
-+ */
-+int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
-+{
++	unsigned long addr = regs->int_parm_long & __FAIL_ADDR_MASK;
 +	struct vm_area_struct *vma;
-+	bool local_drain = false;
-+	spinlock_t *ptelock;
-+	unsigned long uaddr;
++	struct mm_struct *mm;
 +	struct page *page;
-+	pte_t *ptep;
 +	int rc;
 +
-+again:
-+	rc = -EFAULT;
-+	down_read(&gmap->mm->mmap_sem);
-+
-+	uaddr = __gmap_translate(gmap, gaddr);
-+	if (IS_ERR_VALUE(uaddr))
-+		goto out;
-+	vma = find_vma(gmap->mm, uaddr);
-+	if (!vma)
-+		goto out;
-+	/*
-+	 * Secure pages cannot be huge and userspace should not combine both.
-+	 * In case userspace does it anyway this will result in an -EFAULT for
-+	 * the unpack. The guest is thus never reaching secure mode. If
-+	 * userspace is playing dirty tricky with mapping huge pages later
-+	 * on this will result in a segmentation fault.
-+	 */
-+	if (is_vm_hugetlb_page(vma))
-+		goto out;
-+
-+	rc = -ENXIO;
-+	page = follow_page(vma, uaddr, FOLL_WRITE);
-+	if (IS_ERR_OR_NULL(page))
-+		goto out;
-+
-+	lock_page(page);
-+	ptep = get_locked_pte(gmap->mm, uaddr, &ptelock);
-+	rc = make_secure_pte(ptep, uaddr, page, uvcb);
-+	pte_unmap_unlock(ptep, ptelock);
-+	unlock_page(page);
-+out:
-+	up_read(&gmap->mm->mmap_sem);
-+
-+	if (rc == -EAGAIN) {
-+		wait_on_page_writeback(page);
-+	} else if (rc == -EBUSY) {
-+		/*
-+		 * If we have tried a local drain and the page refcount
-+		 * still does not match our expected safe value, try with a
-+		 * system wide drain. This is needed if the pagevecs holding
-+		 * the page are on a different CPU.
-+		 */
-+		if (local_drain) {
-+			lru_add_drain_all();
-+			/* We give up here, and let the caller try again */
-+			return -EAGAIN;
++	switch (get_fault_type(regs)) {
++	case USER_FAULT:
++		mm = current->mm;
++		down_read(&mm->mmap_sem);
++		vma = find_vma(mm, addr);
++		if (!vma) {
++			up_read(&mm->mmap_sem);
++			do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
++			break;
 +		}
-+		/*
-+		 * We are here if the page refcount does not match the
-+		 * expected safe value. The main culprits are usually
-+		 * pagevecs. With lru_add_drain() we drain the pagevecs
-+		 * on the local CPU so that hopefully the refcount will
-+		 * reach the expected safe value.
-+		 */
-+		lru_add_drain();
-+		local_drain = true;
-+		/* And now we try again immediately after draining */
-+		goto again;
-+	} else if (rc == -ENXIO) {
-+		if (gmap_fault(gmap, gaddr, FAULT_FLAG_WRITE))
-+			return -EFAULT;
-+		return -EAGAIN;
++		page = follow_page(vma, addr, FOLL_WRITE | FOLL_GET);
++		if (IS_ERR_OR_NULL(page)) {
++			up_read(&mm->mmap_sem);
++			break;
++		}
++		if (arch_make_page_accessible(page))
++			send_sig(SIGSEGV, current, 0);
++		put_page(page);
++		up_read(&mm->mmap_sem);
++		break;
++	case KERNEL_FAULT:
++		page = phys_to_page(addr);
++		if (unlikely(!try_get_page(page)))
++			break;
++		rc = arch_make_page_accessible(page);
++		put_page(page);
++		if (rc)
++			BUG();
++		break;
++	case VDSO_FAULT:
++		/* fallthrough */
++	case GMAP_FAULT:
++		/* fallthrough */
++	default:
++		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
++		WARN_ON_ONCE(1);
 +	}
-+	return rc;
 +}
-+EXPORT_SYMBOL_GPL(gmap_make_secure);
++NOKPROBE_SYMBOL(do_secure_storage_access);
 +
-+int gmap_convert_to_secure(struct gmap *gmap, unsigned long gaddr)
++void do_non_secure_storage_access(struct pt_regs *regs)
 +{
-+	struct uv_cb_cts uvcb = {
-+		.header.cmd = UVC_CMD_CONV_TO_SEC_STOR,
-+		.header.len = sizeof(uvcb),
-+		.guest_handle = gmap->guest_handle,
-+		.gaddr = gaddr,
-+	};
++	unsigned long gaddr = regs->int_parm_long & __FAIL_ADDR_MASK;
++	struct gmap *gmap = (struct gmap *)S390_lowcore.gmap;
 +
-+	return gmap_make_secure(gmap, gaddr, &uvcb);
++	if (get_fault_type(regs) != GMAP_FAULT) {
++		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
++		WARN_ON_ONCE(1);
++		return;
++	}
++
++	if (gmap_convert_to_secure(gmap, gaddr) == -EINVAL)
++		send_sig(SIGSEGV, current, 0);
 +}
-+EXPORT_SYMBOL_GPL(gmap_convert_to_secure);
++NOKPROBE_SYMBOL(do_non_secure_storage_access);
 +
-+/*
-+ * To be called with the page locked or with an extra reference! This will
-+ * prevent gmap_make_secure from touching the page concurrently. Having 2
-+ * parallel make_page_accessible is fine, as the UV calls will become a
-+ * no-op if the page is already exported.
-+ */
-+int arch_make_page_accessible(struct page *page)
++#else
++void do_secure_storage_access(struct pt_regs *regs)
 +{
-+	int rc = 0;
-+
-+	/* Hugepage cannot be protected, so nothing to do */
-+	if (PageHuge(page))
-+		return 0;
-+
-+	/*
-+	 * PG_arch_1 is used in 3 places:
-+	 * 1. for kernel page tables during early boot
-+	 * 2. for storage keys of huge pages and KVM
-+	 * 3. As an indication that this page might be secure. This can
-+	 *    overindicate, e.g. we set the bit before calling
-+	 *    convert_to_secure.
-+	 * As secure pages are never huge, all 3 variants can co-exists.
-+	 */
-+	if (!test_bit(PG_arch_1, &page->flags))
-+		return 0;
-+
-+	rc = uv_pin_shared(page_to_phys(page));
-+	if (!rc) {
-+		clear_bit(PG_arch_1, &page->flags);
-+		return 0;
-+	}
-+
-+	rc = uv_convert_from_secure(page_to_phys(page));
-+	if (!rc) {
-+		clear_bit(PG_arch_1, &page->flags);
-+		return 0;
-+	}
-+
-+	return rc;
++	default_trap_handler(regs);
 +}
-+EXPORT_SYMBOL_GPL(arch_make_page_accessible);
 +
- #endif
++void do_non_secure_storage_access(struct pt_regs *regs)
++{
++	default_trap_handler(regs);
++}
++#endif
 -- 
 2.25.0
 
