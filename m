@@ -2,223 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D601165F32
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:51:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D946165F34
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:53:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728180AbgBTNvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 08:51:39 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37499 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728028AbgBTNvi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 08:51:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582206696;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rz0vm/fZ0lEcM/XVDnOZIU35A6myDohOkSLNpyLFR0o=;
-        b=jUnssPKEj7rVn4WDvm8MpPfNXm48GabHYm7oUbu2hBp/qXiaGMbx11AZjnkl6KQ8eo0MPn
-        c120Kv1dBsTOPC801+bd2qJOg47Bb1FBFlLuvudadluVT6CqmJUX/80d58f6RcDAAJ2BXD
-        dNZuUP634lW0yvL85c72Q8ZAlMKwix8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-7rBBbh6uNnuYG_AxV7IbUg-1; Thu, 20 Feb 2020 08:51:34 -0500
-X-MC-Unique: 7rBBbh6uNnuYG_AxV7IbUg-1
-Received: by mail-ed1-f69.google.com with SMTP id bc3so2738137edb.15
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2020 05:51:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Rz0vm/fZ0lEcM/XVDnOZIU35A6myDohOkSLNpyLFR0o=;
-        b=Z6/EuQoN53RlZ8ZFMzqzMERmXGVJhLxvKiNTLXzE+zfBRMiw7ech+lGXWgpKRVUvc2
-         6OueEravnPOqHARNCae/YE12TTdLMqwhOQUKcAst7KYPEy2IaNfKRA7FzvVLj4/p0LqQ
-         d8swe+QOyn2J9TEo9gZeITOl/sIO9E3zQaco/qu8tHijRd7n4mZ4PsJacxq/RhoezKsk
-         FUAD5Y1pqSZc9LaPuec7BictxQi+m+lQ8VEitwLwtbAfVAq0vTAkkIKkANnNgnUDwr5+
-         hm/s+C7VUBXuNjBnPPQc6ygikVM5d7sfMRVpkuJ4QHqF2b5GOnQ1lsiu4ndit2EE6p2m
-         4+Aw==
-X-Gm-Message-State: APjAAAVudUYLC7Iyitkmgj2hrsqwujnReAUNk216F2oRfPwQ4Fo2K/Pt
-        wz4mk676lorTHJ9G2DjHqjtZz7hoKihVVXHqTJDyo+mn0vrocEKiPPZyExl33WspZgQXaj0CJOG
-        rQpkTh69YAIKc
-X-Received: by 2002:aa7:dad0:: with SMTP id x16mr29014873eds.307.1582206692589;
-        Thu, 20 Feb 2020 05:51:32 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy7de7HT0Ttn+wiwPNp6Mm0oh07wL2K+KqpPJUSMIj5PmcHNzjHMG2ot2mUEYIe0pdxZ2904g==
-X-Received: by 2002:aa7:dad0:: with SMTP id x16mr29014855eds.307.1582206692375;
-        Thu, 20 Feb 2020 05:51:32 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net. [88.21.202.78])
-        by smtp.gmail.com with ESMTPSA id s12sm118618eja.79.2020.02.20.05.51.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Feb 2020 05:51:31 -0800 (PST)
-Subject: Re: [PATCH v3 02/20] hw: Remove unnecessary cast when calling
- dma_memory_read()
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To:     Eric Blake <eblake@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc:     Fam Zheng <fam@euphon.net>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, qemu-block@nongnu.org,
-        David Hildenbrand <david@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        xen-devel@lists.xenproject.org,
-        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Stefan Weil <sw@weilnetz.de>,
-        Alistair Francis <alistair@alistair23.me>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Paul Durrant <paul@xen.org>,
-        Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
-        qemu-arm@nongnu.org,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        John Snow <jsnow@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Igor Mitsyanko <i.mitsyanko@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20200220130548.29974-1-philmd@redhat.com>
- <20200220130548.29974-3-philmd@redhat.com>
- <68120807-6f6b-1602-8208-fd76d64e74bc@redhat.com>
- <be623afd-0605-0bdf-daae-f38ba5562012@redhat.com>
-Message-ID: <9b8baae3-d4f2-4b7c-604a-5f05d4db1eb2@redhat.com>
-Date:   Thu, 20 Feb 2020 14:51:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1728217AbgBTNxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 08:53:17 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3019 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728117AbgBTNxQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Feb 2020 08:53:16 -0500
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id C5684E22A96505805A5C;
+        Thu, 20 Feb 2020 21:53:09 +0800 (CST)
+Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.16]) by
+ DGGEMM404-HUB.china.huawei.com ([10.3.20.212]) with mapi id 14.03.0439.000;
+ Thu, 20 Feb 2020 21:52:59 +0800
+From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To:     Peter Xu <peterx@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "quintela@redhat.com" <quintela@redhat.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>,
+        "linfeng (M)" <linfeng23@huawei.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "bgardon@google.com" <bgardon@google.com>
+Subject: RE: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Topic: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Index: AdXmU97BvyK5YKoyS5++my9GnvXVk///1+yA//428yCAA1S3gP/+abug
+Date:   Thu, 20 Feb 2020 13:52:58 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
+References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
+ <20200218174311.GE1408806@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
+ <20200219171919.GA34517@xz-x1>
+In-Reply-To: <20200219171919.GA34517@xz-x1>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.228.206]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <be623afd-0605-0bdf-daae-f38ba5562012@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/20/20 2:43 PM, Philippe Mathieu-Daudé wrote:
-> On 2/20/20 2:16 PM, Eric Blake wrote:
->> On 2/20/20 7:05 AM, Philippe Mathieu-Daudé wrote:
->>> Since its introduction in commit d86a77f8abb, dma_memory_read()
->>> always accepted void pointer argument. Remove the unnecessary
->>> casts.
->>>
->>> This commit was produced with the included Coccinelle script
->>> scripts/coccinelle/exec_rw_const.
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>> ---
->>>   scripts/coccinelle/exec_rw_const.cocci | 15 +++++++++++++++
->>>   hw/arm/smmu-common.c                   |  3 +--
->>>   hw/arm/smmuv3.c                        | 10 ++++------
->>>   hw/sd/sdhci.c                          | 15 +++++----------
->>>   4 files changed, 25 insertions(+), 18 deletions(-)
->>>   create mode 100644 scripts/coccinelle/exec_rw_const.cocci
->>>
->>> diff --git a/scripts/coccinelle/exec_rw_const.cocci 
->>> b/scripts/coccinelle/exec_rw_const.cocci
->>> new file mode 100644
->>> index 0000000000..a0054f009d
->>> --- /dev/null
->>> +++ b/scripts/coccinelle/exec_rw_const.cocci
->>> @@ -0,0 +1,15 @@
->>> +// Usage:
->>> +//  spatch --sp-file scripts/coccinelle/exec_rw_const.cocci --dir . 
->>> --in-place
->>
->> This command line should also use '--macro-file 
->> scripts/cocci-macro-file.h' to cover more of the code base (Coccinelle 
->> skips portions of the code that uses macros it doesn't recognize).
->>
->>
->>> @@ -726,13 +724,10 @@ static void get_adma_description(SDHCIState *s, 
->>> ADMADescr *dscr)
->>>           }
->>>           break;
->>>       case SDHC_CTRL_ADMA2_64:
->>> -        dma_memory_read(s->dma_as, entry_addr,
->>> -                        (uint8_t *)(&dscr->attr), 1);
->>> -        dma_memory_read(s->dma_as, entry_addr + 2,
->>> -                        (uint8_t *)(&dscr->length), 2);
->>> +        dma_memory_read(s->dma_as, entry_addr, (&dscr->attr), 1);
->>> +        dma_memory_read(s->dma_as, entry_addr + 2, (&dscr->length), 2);
->>
->> The () around &dscr->length are now pointless.
-> 
-> Thanks Eric, patch updated. Peter are you OK if I change the cocci 
-> header using /* */ as:
-> 
-> -- >8 --
-> diff --git a/scripts/coccinelle/exec_rw_const.cocci 
-> b/scripts/coccinelle/exec_rw_const.cocci
-> index a0054f009d..7e42682240 100644
-> --- a/scripts/coccinelle/exec_rw_const.cocci
-> +++ b/scripts/coccinelle/exec_rw_const.cocci
-> @@ -1,5 +1,13 @@
-> -// Usage:
-> -//  spatch --sp-file scripts/coccinelle/exec_rw_const.cocci --dir . 
-> --in-place
-> +/*
-> +  Usage:
-> +
-> +    spatch \
-> +           --macro-file scripts/cocci-macro-file.h \
-> +           --sp-file scripts/coccinelle/exec_rw_const.cocci \
-> +           --keep-comments \
-> +           --in-place \
-> +           --dir .
-> +*/
-> 
->   // Remove useless cast
->   @@
-> @@ -7,9 +15,9 @@ expression E1, E2, E3, E4;
->   type T;
->   @@
->   (
-> -- dma_memory_read(E1, E2, (T *)E3, E4)
-> +- dma_memory_read(E1, E2, (T *)(E3), E4)
->   + dma_memory_read(E1, E2, E3, E4)
->   |
-> -- dma_memory_write(E1, E2, (T *)E3, E4)
-> +- dma_memory_write(E1, E2, (T *)(E3), E4)
->   + dma_memory_write(E1, E2, E3, E4)
->   )
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index d5abdaad41..de63ffb037 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -724,10 +724,10 @@ static void get_adma_description(SDHCIState *s, 
-> ADMADescr *dscr)
->           }
->           break;
->       case SDHC_CTRL_ADMA2_64:
-> -        dma_memory_read(s->dma_as, entry_addr, (&dscr->attr), 1);
-> -        dma_memory_read(s->dma_as, entry_addr + 2, (&dscr->length), 2);
-> +        dma_memory_read(s->dma_as, entry_addr, &dscr->attr, 1);
-> +        dma_memory_read(s->dma_as, entry_addr + 2, &dscr->length, 2);
->           dscr->length = le16_to_cpu(dscr->length);
-> -        dma_memory_read(s->dma_as, entry_addr + 4, (&dscr->addr), 8);
-> +        dma_memory_read(s->dma_as, entry_addr + 4, &dscr->addr, 8);
->           dscr->addr = le64_to_cpu(dscr->addr);
->           dscr->attr &= (uint8_t) ~0xC0;
->           dscr->incr = 12;
-> ---
-
-Series updated here:
-https://github.com/philmd/qemu/commits/exec_rw_const_v4
-
-Relevant spatch:
-https://github.com/philmd/qemu/blob/exec_rw_const_v4/scripts/coccinelle/exec_rw_const.cocci
-
-I will respin later to let people time to review.
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgWHUgW21haWx0
+bzpwZXRlcnhAcmVkaGF0LmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEZlYnJ1YXJ5IDIwLCAyMDIw
+IDE6MTkgQU0NCj4gVG86IFpob3VqaWFuIChqYXkpIDxqaWFuamF5Lnpob3VAaHVhd2VpLmNvbT4N
+Cj4gQ2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgcGJvbnpp
+bmlAcmVkaGF0LmNvbTsNCj4gZGdpbGJlcnRAcmVkaGF0LmNvbTsgcXVpbnRlbGFAcmVkaGF0LmNv
+bTsgTGl1amluc29uZyAoUGF1bCkNCj4gPGxpdS5qaW5zb25nQGh1YXdlaS5jb20+OyBsaW5mZW5n
+IChNKSA8bGluZmVuZzIzQGh1YXdlaS5jb20+OyB3YW5neGluIChVKQ0KPiA8d2FuZ3hpbnhpbi53
+YW5nQGh1YXdlaS5jb20+OyBIdWFuZ3dlaWRvbmcgKEMpDQo+IDx3ZWlkb25nLmh1YW5nQGh1YXdl
+aS5jb20+DQo+IFN1YmplY3Q6IFJlOiBSRkM6IFNwbGl0IEVQVCBodWdlIHBhZ2VzIGluIGFkdmFu
+Y2Ugb2YgZGlydHkgbG9nZ2luZw0KPiANCj4gT24gV2VkLCBGZWIgMTksIDIwMjAgYXQgMDE6MTk6
+MDhQTSArMDAwMCwgWmhvdWppYW4gKGpheSkgd3JvdGU6DQo+ID4gSGkgUGV0ZXIsDQo+ID4NCj4g
+PiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9tOiBQZXRlciBYdSBbbWFp
+bHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiA+ID4gU2VudDogV2VkbmVzZGF5LCBGZWJydWFyeSAx
+OSwgMjAyMCAxOjQzIEFNDQo+ID4gPiBUbzogWmhvdWppYW4gKGpheSkgPGppYW5qYXkuemhvdUBo
+dWF3ZWkuY29tPg0KPiA+ID4gQ2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IHFlbXUtZGV2ZWxAbm9u
+Z251Lm9yZzsNCj4gcGJvbnppbmlAcmVkaGF0LmNvbTsNCj4gPiA+IGRnaWxiZXJ0QHJlZGhhdC5j
+b207IHF1aW50ZWxhQHJlZGhhdC5jb207IExpdWppbnNvbmcgKFBhdWwpDQo+ID4gPiA8bGl1Lmpp
+bnNvbmdAaHVhd2VpLmNvbT47IGxpbmZlbmcgKE0pIDxsaW5mZW5nMjNAaHVhd2VpLmNvbT47DQo+
+ID4gPiB3YW5neGluIChVKSA8d2FuZ3hpbnhpbi53YW5nQGh1YXdlaS5jb20+OyBIdWFuZ3dlaWRv
+bmcgKEMpDQo+ID4gPiA8d2VpZG9uZy5odWFuZ0BodWF3ZWkuY29tPg0KPiA+ID4gU3ViamVjdDog
+UmU6IFJGQzogU3BsaXQgRVBUIGh1Z2UgcGFnZXMgaW4gYWR2YW5jZSBvZiBkaXJ0eSBsb2dnaW5n
+DQo+ID4gPg0KPiA+ID4gT24gVHVlLCBGZWIgMTgsIDIwMjAgYXQgMDE6MTM6NDdQTSArMDAwMCwg
+WmhvdWppYW4gKGpheSkgd3JvdGU6DQo+ID4gPiA+IEhpIGFsbCwNCj4gPiA+ID4NCj4gPiA+ID4g
+V2UgZm91bmQgdGhhdCB0aGUgZ3Vlc3Qgd2lsbCBiZSBzb2Z0LWxvY2t1cCBvY2Nhc2lvbmFsbHkg
+d2hlbiBsaXZlDQo+ID4gPiA+IG1pZ3JhdGluZyBhIDYwIHZDUFUsIDUxMkdpQiBodWdlIHBhZ2Ug
+YW5kIG1lbW9yeSBzZW5zaXRpdmUgVk0uIFRoZQ0KPiA+ID4gPiByZWFzb24gaXMgY2xlYXIsIGFs
+bW9zdCBhbGwgb2YgdGhlIHZDUFVzIGFyZSB3YWl0aW5nIGZvciB0aGUgS1ZNDQo+ID4gPiA+IE1N
+VSBzcGluLWxvY2sgdG8gY3JlYXRlIDRLIFNQVEVzIHdoZW4gdGhlIGh1Z2UgcGFnZXMgYXJlIHdy
+aXRlDQo+ID4gPiA+IHByb3RlY3RlZC4gVGhpcw0KPiA+ID4gcGhlbm9tZW5vbiBpcyBhbHNvIGRl
+c2NyaWJlZCBpbiB0aGlzIHBhdGNoIHNldDoNCj4gPiA+ID4gaHR0cHM6Ly9wYXRjaHdvcmsua2Vy
+bmVsLm9yZy9jb3Zlci8xMTE2MzQ1OS8NCj4gPiA+ID4gd2hpY2ggYWltcyB0byBoYW5kbGUgcGFn
+ZSBmYXVsdHMgaW4gcGFyYWxsZWwgbW9yZSBlZmZpY2llbnRseS4NCj4gPiA+ID4NCj4gPiA+ID4g
+T3VyIGlkZWEgaXMgdG8gdXNlIHRoZSBtaWdyYXRpb24gdGhyZWFkIHRvIHRvdWNoIGFsbCBvZiB0
+aGUgZ3Vlc3QNCj4gPiA+ID4gbWVtb3J5IGluIHRoZSBncmFudWxhcml0eSBvZiA0SyBiZWZvcmUg
+ZW5hYmxpbmcgZGlydHkgbG9nZ2luZy4gVG8NCj4gPiA+ID4gYmUgbW9yZSBzcGVjaWZpYywgd2Ug
+c3BsaXQgYWxsIHRoZSBQRFBFX0xFVkVMIFNQVEVzIGludG8NCj4gPiA+ID4gRElSRUNUT1JZX0xF
+VkVMIFNQVEVzIGFzIHRoZSBmaXJzdCBzdGVwLCBhbmQgdGhlbiBzcGxpdCBhbGwgdGhlDQo+ID4g
+PiA+IERJUkVDVE9SWV9MRVZFTCBTUFRFcyBpbnRvDQo+ID4gPiBQQUdFX1RBQkxFX0xFVkVMIFNQ
+VEVzIGFzIHRoZSBmb2xsb3dpbmcgc3RlcC4NCj4gPiA+DQo+ID4gPiBJSVVDLCBRRU1VIHdpbGwg
+cHJlZmVyIHRvIHVzZSBodWdlIHBhZ2VzIGZvciBhbGwgdGhlIGFub255bW91cw0KPiA+ID4gcmFt
+YmxvY2tzIChwbGVhc2UgcmVmZXIgdG8gcmFtX2Jsb2NrX2FkZCk6DQo+ID4gPg0KPiA+ID4gICAg
+ICAgICBxZW11X21hZHZpc2UobmV3X2Jsb2NrLT5ob3N0LCBuZXdfYmxvY2stPm1heF9sZW5ndGgs
+DQo+ID4gPiBRRU1VX01BRFZfSFVHRVBBR0UpOw0KPiA+DQo+ID4gWWVzLCB5b3UncmUgcmlnaHQN
+Cj4gPg0KPiA+ID4NCj4gPiA+IEFub3RoZXIgYWx0ZXJuYXRpdmUgSSBjYW4gdGhpbmsgb2YgaXMg
+dG8gYWRkIGFuIGV4dHJhIHBhcmFtZXRlciB0bw0KPiA+ID4gUUVNVSB0byBleHBsaWNpdGx5IGRp
+c2FibGUgaHVnZSBwYWdlcyAoc28gdGhhdCBjYW4gZXZlbiBiZQ0KPiA+ID4gTUFEVl9OT0hVR0VQ
+QUdFIGluc3RlYWQgb2YgTUFEVl9IVUdFUEFHRSkuICBIb3dldmVyIHRoYXQNCj4gc2hvdWxkIGFs
+c28NCj4gPiA+IGRyYWcgZG93biB0aGUgcGVyZm9ybWFuY2UgZm9yIHRoZSB3aG9sZSBsaWZlY3lj
+bGUgb2YgdGhlIFZNLg0KPiA+DQo+ID4gRnJvbSB0aGUgcGVyZm9ybWFuY2UgcG9pbnQgb2Ygdmll
+dywgaXQgaXMgYmV0dGVyIHRvIGtlZXAgdGhlIGh1Z2UNCj4gPiBwYWdlcyB3aGVuIHRoZSBWTSBp
+cyBub3QgaW4gdGhlIGxpdmUgbWlncmF0aW9uIHN0YXRlLg0KPiA+DQo+ID4gPiBBIDNyZCBvcHRp
+b24gaXMgdG8gbWFrZSBhIFFNUA0KPiA+ID4gY29tbWFuZCB0byBkeW5hbWljYWxseSB0dXJuIGh1
+Z2UgcGFnZXMgb24vb2ZmIGZvciByYW1ibG9ja3MgZ2xvYmFsbHkuDQo+ID4NCj4gPiBXZSdyZSBz
+ZWFyY2hpbmcgYSBkeW5hbWljIG1ldGhvZCB0b28uDQo+ID4gV2UgcGxhbiB0byBhZGQgdHdvIG5l
+dyBmbGFncyBmb3IgZWFjaCBtZW1vcnkgc2xvdCwgc2F5DQo+ID4gS1ZNX01FTV9GT1JDRV9QVF9E
+SVJFQ1RPUllfUEFHRVMgYW5kDQo+ID4gS1ZNX01FTV9GT1JDRV9QVF9QQUdFX1RBQkxFX1BBR0VT
+LiBUaGVzZSBmbGFncyBjYW4gYmUgc2V0IHRocm91Z2gNCj4gPiBLVk1fU0VUX1VTRVJfTUVNT1JZ
+X1JFR0lPTiBpb2N0bC4NCj4gPg0KPiA+IFRoZSBtYXBwaW5nX2xldmVsIHdoaWNoIGlzIGNhbGxl
+ZCBieSB0ZHBfcGFnZV9mYXVsdCBpbiB0aGUga2VybmVsIHNpZGUNCj4gPiB3aWxsIHJldHVybiBQ
+VF9ESVJFQ1RPUllfTEVWRUwgaWYgdGhlDQo+IEtWTV9NRU1fRk9SQ0VfUFRfRElSRUNUT1JZX1BB
+R0VTDQo+ID4gZmxhZyBvZiB0aGUgbWVtb3J5IHNsb3QgaXMgc2V0LCBhbmQgcmV0dXJuIFBUX1BB
+R0VfVEFCTEVfTEVWRUwgaWYgdGhlDQo+ID4gS1ZNX01FTV9GT1JDRV9QVF9QQUdFX1RBQkxFX1BB
+R0VTIGZsYWcgaXMgc2V0Lg0KPiA+DQo+ID4gVGhlIGtleSBzdGVwcyB0byBzcGxpdCB0aGUgaHVn
+ZSBwYWdlcyBpbiBhZHZhbmNlIG9mIGVuYWJsaW5nIGRpcnR5IGxvZw0KPiA+IGlzIGFzIGZvbGxv
+d3M6DQo+ID4gMS4gVGhlIG1pZ3JhdGlvbiB0aHJlYWQgaW4gdXNlciBzcGFjZSB1c2VzDQo+IEtW
+TV9TRVRfVVNFUl9NRU1PUllfUkVHSU9ODQo+ID4gaW9jdGwgdG8gc2V0IHRoZSBLVk1fTUVNX0ZP
+UkNFX1BUX0RJUkVDVE9SWV9QQUdFUyBmbGFnIGZvciBlYWNoDQo+IG1lbW9yeQ0KPiA+IHNsb3Qu
+DQo+ID4gMi4gVGhlIG1pZ3JhdGlvbiB0aHJlYWQgY29udGludWVzIHRvIHVzZSB0aGUgS1ZNX1NQ
+TElUX0hVR0VfUEFHRVMNCj4gPiBpb2N0bCAod2hpY2ggaXMgbmV3bHkgYWRkZWQpIHRvIGRvIHRo
+ZSBzcGxpdHRpbmcgb2YgbGFyZ2UgcGFnZXMgaW4gdGhlDQo+ID4ga2VybmVsIHNpZGUuDQo+ID4g
+My4gQSBuZXcgdkNQVSBpcyBjcmVhdGVkIHRlbXBvcmFsbHkoZG8gc29tZSBpbml0aWFsaXphdGlv
+biBidXQgd2lsbA0KPiA+IG5vdA0KPiA+IHJ1bikgdG8gaGVscCB0byBkbyB0aGUgd29yaywgaS5l
+LiBhcyB0aGUgcGFyYW1ldGVyIG9mIHRoZSB0ZHBfcGFnZV9mYXVsdC4NCj4gPiA0LiBDb2xsZWN0
+IHRoZSBHUEEgcmFuZ2VzIG9mIGFsbCB0aGUgbWVtb3J5IHNsb3RzIHdpdGggdGhlDQo+ID4gS1ZN
+X01FTV9GT1JDRV9QVF9ESVJFQ1RPUllfUEFHRVMgZmxhZyBzZXQuDQo+ID4gNS4gU3BsaXQgdGhl
+IDFHIGh1Z2UgcGFnZXMoY29sbGVjdGVkIGluIHN0ZXAgNCkgaW50byAyTSBieSBjYWxsaW5nDQo+
+ID4gdGRwX3BhZ2VfZmF1bHQsIHNpbmNlIHRoZSBtYXBwaW5nX2xldmVsIHdpbGwgcmV0dXJuDQo+
+ID4gUFRfRElSRUNUT1JZX0xFVkVMLiBIZXJlIGlzIHRoZSBtYWluIGRpZmZlcmVuY2UgZnJvbSB0
+aGUgdXN1YWwgcGF0aA0KPiA+IHdoaWNoIGlzIGNhdXNlZCBieSB0aGUgR3Vlc3Qgc2lkZShFUFQg
+dmlvbGF0aW9uL21pc2NvbmZpZyBldGMpLCB3ZQ0KPiA+IGNhbGwgaXQgZGlyZWN0bHkgaW4gdGhl
+IGh5cGVydmlzb3Igc2lkZS4NCj4gPiA2LiBEbyBzb21lIGNsZWFudXBzLCBpLmUuIGZyZWUgdGhl
+IHZDUFUgcmVsYXRlZCByZXNvdXJjZXMgNy4gVGhlDQo+ID4gS1ZNX1NQTElUX0hVR0VfUEFHRVMg
+aW9jdGwgcmV0dXJuZWQgdG8gdGhlIHVzZXIgc3BhY2Ugc2lkZS4NCj4gPiA4LiBVc2luZyBLVk1f
+TUVNX0ZPUkNFX1BUX1BBR0VfVEFCTEVfUEFHRVMgaW5zdHJlYWQgb2YNCj4gPiBLVk1fTUVNX0ZP
+UkNFX1BUX0RJUkVDVE9SWV9QQUdFUyB0byByZXBlYXQgc3RlcCAxIH4gc3RlcCA3LCBpbiBzdGVw
+DQo+IDUNCj4gPiB0aGUgMk0gaHVnZSBwYWdlcyB3aWxsIGJlIHNwbGl0dGVkIGludG8gNEsgcGFn
+ZXMuDQo+ID4gOS4gQ2xlYXIgdGhlIEtWTV9NRU1fRk9SQ0VfUFRfRElSRUNUT1JZX1BBR0VTIGFu
+ZA0KPiA+IEtWTV9NRU1fRk9SQ0VfUFRfUEFHRV9UQUJMRV9QQUdFUyBmbGFncyBmb3IgZWFjaCBt
+ZW1vcnkgc2xvdC4NCj4gPiAxMC4gVGhlbiB0aGUgbWlncmF0aW9uIHRocmVhZCBjYWxscyB0aGUg
+bG9nX3N0YXJ0IGlvY3RsIHRvIGVuYWJsZSB0aGUNCj4gPiBkaXJ0eSBsb2dnaW5nLCBhbmQgdGhl
+IHJlbWFpbmluZyB0aGluZyBpcyB0aGUgc2FtZS4NCj4gDQo+IEknbSBub3Qgc3VyZS4uLiBJIHRo
+aW5rIGl0IHdvdWxkIGJlIGdvb2QgaWYgdGhlcmUgaXMgYSB3YXkgdG8gaGF2ZSBmaW5lciBncmFu
+dWxhcml0eQ0KPiBjb250cm9sIG9uIHVzaW5nIGh1Z2UgcGFnZXMgZm9yIGFueSBwcm9jZXNzLCB0
+aGVuIEtWTSBjYW4gZGlyZWN0bHkgbGV2ZXJhZ2UNCj4gdGhhdCBiZWNhdXNlIEtWTSBwYWdlIHRh
+YmxlcyBzaG91bGQgYWx3YXlzIHJlc3BlY3QgdGhlIG1tIGNvbmZpZ3VyYXRpb25zIG9uDQo+IHRo
+ZXNlIChzbyBlLmcuIHdoZW4gaHVnZSBwYWdlIHNwbGl0LCBLVk0gZ2V0cyBub3RpZmljYXRpb25z
+IHZpYSBtbXUgbm90aWZpZXJzKS4NCj4gSGF2ZSB5b3UgdGhvdWdodCBvZiBzdWNoIGEgbW9yZSBn
+ZW5lcmFsIHdheT8NCg0KSSBkaWQgaGF2ZSB0aG91Z2h0IG9mIHRoaXMsIGlmIHdlIHNwbGl0IHRo
+ZSBodWdlIHBhZ2VzIGludG8gNEsgb2YgYSBwcm9jZXNzLCBJJ20NCmFmcmFpZCBpdCB3aWxsIG5v
+dCBiZSB3b3JrYWJsZSBmb3IgdGhlIGh1Z2UgcGFnZXMgc2hhcmluZyBzY2VuYXJpbywgZS5nLiBE
+UERLLA0KU1BESyBldGMuIFNvLCBvbmx5IHNwbGl0IHRoZSBFUFQgcGFnZSB0YWJsZSBhbmQga2Vl
+cCB0aGUgVk0gcHJvY2VzcyBwYWdlIHRhYmxlDQooZS5nLiBxZW11KSB1bnRvdWNoZWQgaXMgdGhl
+IGdvYWwuDQoNCj4gDQo+IChBbmQgSSBqdXN0IG5vdGljZWQgdGhhdCBNQURWX05PSFVHRVBBR0Ug
+aXMgb25seSBhIGhpbnQgdG8ga2h1Z2VwYWdlZA0KPiBhbmQgcHJvYmFibHkgd29uJ3Qgc3BsaXQg
+YW55IGh1Z2UgcGFnZSBhdCBhbGwgYWZ0ZXIgbWFkdmlzZSgpIHJldHVybnMuLikNCj4gVG8gdGVs
+bCB0aGUgdHJ1dGggSSdtIHN0aWxsIGNvbmZ1c2VkIG9uIGhvdyBzcGxpdCBvZiBodWdlIHBhZ2Vz
+IGhlbHBlZCBpbiB5b3VyDQo+IGNhc2UuLi4gIA0KDQpJJ20gc29ycnkgaWYgdGhlIG1lYW5pbmcg
+aXMgbm90IGV4cHJlc3NlZCBjbGVhcmx5LCBhbmQgdGhhbmtzIGZvciB5b3VyIHBhdGllbmNlLg0K
+DQo+IElmIEkgcmVhZCBpdCByaWdodCB0aGUgdGVzdCByZWR1Y2VkIHNvbWUgZXhlY3V0aW9uIHRp
+bWUgZnJvbSA5cyB0byBhDQo+IGZldyBtcyBhZnRlciB5b3VyIHNwbGl0dGlvbiBvZiBodWdlIHBh
+Z2VzLiAgDQoNClllcw0KDQo+IFRoZSB0aGluZyBpcyBJIGRvbid0IHNlZSBob3cgc3BsaXQgb2YN
+Cj4gaHVnZSBwYWdlcyBjb3VsZCBzb2x2ZSB0aGUgbW11X2xvY2sgY29udGVudGlvbiB3aXRoIHRo
+ZSBodWdlIFZNLCBiZWNhdXNlDQo+IElNTyBldmVuIGlmIHdlIHNwbGl0IHRoZSBodWdlIHBhZ2Vz
+IGludG8gc21hbGxlciBvbmVzLCB0aG9zZSBwYWdlcyBzaG91bGQgc3RpbGwNCj4gYmUgd3JpdGUt
+cHJvdGVjdGVkIGFuZCBuZWVkIG1lcmVseSB0aGUgc2FtZSBudW1iZXIgb2YgcGFnZSBmYXVsdHMg
+dG8gcmVzb2x2ZQ0KPiB3aGVuIGFjY2Vzc2VkL3dyaXR0ZW4/IEFuZCBJIHRob3VnaHQgdGhhdCBz
+aG91bGQgb25seSBiZSBmaXhlZCB3aXRoDQo+IHNvbHV0aW9ucyBsaWtlIHdoYXQgQmVuIGhhcyBw
+cm9wb3NlZCB3aXRoIHRoZSBNTVUgcmV3b3JrLiBDb3VsZCB5b3Ugc2hvdw0KPiBtZSB3aGF0IEkn
+dmUgbWlzc2VkPw0KDQpMZXQgbWUgdHJ5IHRvIGRlc2NyaWJlIHRoZSByZWFzb24gb2YgbW11X2xv
+Y2sgY29udGVudGlvbiBtb3JlIGNsZWFybHkgYW5kIHRoZQ0KZWZmb3J0IHdlIHRyaWVkIHRvIGRv
+Li4uDQpUaGUgaHVnZSBWTSBvbmx5IGhhcyBFUFQgPj0gbGV2ZWwgMiBzcHRlcywgYW5kIGxldmVs
+IDEgc3B0ZXMgZG9uJ3QNCmV4aXN0IGF0IHRoZSBiZWdpbm5pbmcuIFdyaXRlIHByb3RlY3QgYWxs
+IHRoZSBodWdlIHBhZ2VzIHdpbGwgdHJpZ2dlciBFUFQNCnZpb2xhdGlvbiB0byBjcmVhdGUgbGV2
+ZWwgMSBzcHRlcyBmb3IgYWxsIHRoZSB2Q1BVcyB3aGljaCB3YW50IHRvIHdyaXRlIHRoZQ0KY29u
+dGVudCBvZiB0aGUgbWVtb3J5LiBEaWZmZXJlbnQgdkNQVSB3cml0ZSB0aGUgZGlmZmVyZW50IGFy
+ZWFzIG9mDQp0aGUgbWVtb3J5LCBidXQgdGhleSBuZWVkIHRoZSBzYW1lIGt2bS0+bW11X2xvY2sg
+dG8gY3JlYXRlIHRoZSBsZXZlbCAxDQpzcHRlcywgdGhpcyBzaXR1YXRpb24gd2lsbCBiZSB3b3Jz
+ZSBpZiB0aGUgbnVtYmVyIG9mIHZDUFUgYW5kIHRoZSBtZW1vcnkgb2YNClZNIGlzIGxhcmdlKGlu
+IG91ciBjYXNlIDYwVTUxMkcpLCBtZWFud2hpbGUgdGhlIFZNIGhhcw0KbWVtb3J5LXdyaXRlLWlu
+dGVuc2l2ZSB3b3JrIHRvIGRvLiBJbiBvcmRlciB0byByZWR1Y2UgdGhlIG1tdV9sb2NrDQpjb250
+ZW50aW9uLCB3ZSB0cnkgdG86IHdyaXRlIHByb3RlY3QgVk0gbWVtb3J5IGdyYWR1YWxseSBpbiBz
+bWFsbCBjaHVua3MsDQpzdWNoIGFzIDFHIG9yIDJNLiBVc2luZyBhIHZDUFUgdGVtcG9yYXJ5IGNy
+ZWF0ZWx5IGJ5IG1pZ3JhdGlvbiB0aHJlYWQgdG8NCnNwbGl0IDFHIHRvIDJNIGFzIHRoZSBmaXJz
+dCBzdGVwLCBhbmQgdG8gc3BsaXQgMk0gdG8gNEsgYXMgdGhlIHNlY29uZCBzdGVwDQoodGhpcyBp
+cyBhIGxpdHRsZSBoYWNraW5nLi4uYW5kIEkgZG8gbm90IGtub3cgYW55IHNpZGUgZWZmZWN0IHdp
+bGwgYmUgdHJpZ2dlcmVkDQppbmRlZWQpLg0KQ29tcGFyaW5nIHRvIHdyaXRlIHByb3RlY3QgYWxs
+IFZNIG1lbW9yeSBpbiBvbmUgZ28sIHRoZSB3cml0ZQ0KcHJvdGVjdGVkIHJhbmdlIGlzIGxpbWl0
+ZWQgaW4gdGhpcyB3YXkgYW5kIG9ubHkgdGhlIHZDUFVzIHdyaXRlIHRoaXMgbGltaXRlZA0KcmFu
+Z2Ugd2lsbCBiZSBpbnZvbHZlZCB0byB0YWtlIHRoZSBtbXVfbG9jay4gVGhlIGNvbnRlbnRpb24g
+d2lsbCBiZSByZWR1Y2VkDQpzaW5jZSB0aGUgbWVtb3J5IHJhbmdlIGlzIHNtYWxsIGFuZCB0aGUg
+bnVtYmVyIG9mIHZDUFUgaW52b2x2ZWQgaXMgc21hbGwNCnRvby4NCg0KT2YgY291cnNlLCBpdCB3
+aWxsIHRha2Ugc29tZSBleHRyYSB0aW1lIHRvIHNwbGl0IGFsbCB0aGUgaHVnZSBwYWdlcyBpbnRv
+IDRLDQpwYWdlIGJlZm9yZSB0aGUgcmVhbCBtaWdyYXRpb24gc3RhcnRlZCwgYWJvdXQgNjBzIGZv
+ciA1MTJHIGluIG15IGV4cGVyaW1lbnQuDQoNCkR1cmluZyB0aGUgbWVtb3J5IGl0ZXJhdGl2ZSBj
+b3B5IHBoYXNlLCBQTUwgd2lsbCBkbyB0aGUgZGlydHkgbG9nZ2luZyB3b3JrDQoobm90IHdyaXRl
+IHByb3RlY3RlZCBjYXNlIGZvciA0SyksIG9yIElJUkMgdXNpbmcgZmFzdF9wYWdlX2ZhdWx0IHRv
+IG1hcmsgcGFnZQ0KZGlydHkgaWYgUE1MIGlzIG5vdCBzdXBwb3J0ZWQsIHdoaWNoIGNhc2UgdGhl
+IG1tdV9sb2NrIGRvZXMgbm90IG5lZWRlZC4NCg0KUmVnYXJkcywNCkpheSBaaG91DQo=
