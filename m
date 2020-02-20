@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A5D40165E15
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:03:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36D95165E21
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:05:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728043AbgBTNDC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 08:03:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41416 "EHLO
+        id S1727967AbgBTNFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 08:05:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27659 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727943AbgBTNDB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Feb 2020 08:03:01 -0500
+        with ESMTP id S1727285AbgBTNFS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Feb 2020 08:05:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582203781;
+        s=mimecast20190719; t=1582203916;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=q/2nOjjwcwBj1iqlZWZW67bop9S+zJlmH/W/Rvn+lvM=;
-        b=WNJK2JM68K5IYyizMIOtXdsIGS3XPvRxX5niZ6TS13S+bgLUbjBQZeU+tHwr15pheiZW9o
-        sVuKCtVThyTxNc6UJPs5WyJs5xh54d9Oyi+CvYDFd8c+/ZSFlqczjKqWlfoVMAAzzZQLI1
-        NZvcPisvc5D/PgBTGSIgpeV4X2EkEnE=
+        bh=evi3kAsT6QqG0O2Qu98Bf0c7kbuKDhECc5miM7IPHKU=;
+        b=KvBJPDCllfVh8cORgQlpUyBmV7aiICxD2OQR68+MaDgitwxPuDIXqFEV2KY/oEX5P3cBQV
+        9JFIUog46km3Ip6YZeQYed3DAwommZc1YqX6bVGmLeRrsKKBC2rh7Cwr/OR6Sb08uAm3Sm
+        I0DLGVuComtnUuVx06+5aGvUYn1yc28=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-z_rAXw6SNw20JWercynXCw-1; Thu, 20 Feb 2020 08:02:58 -0500
-X-MC-Unique: z_rAXw6SNw20JWercynXCw-1
+ us-mta-192-_JLOe8H3MFyN504w-ovD9A-1; Thu, 20 Feb 2020 08:05:14 -0500
+X-MC-Unique: _JLOe8H3MFyN504w-ovD9A-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17687108442A;
-        Thu, 20 Feb 2020 13:02:57 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C324F18C8C01;
+        Thu, 20 Feb 2020 13:05:12 +0000 (UTC)
 Received: from [10.36.118.29] (unknown [10.36.118.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 368821001B2D;
-        Thu, 20 Feb 2020 13:02:25 +0000 (UTC)
-Subject: Re: [PATCH v3 09/37] KVM: s390: protvirt: Add initial vm and cpu
- lifecycle handling
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 390D3100E805;
+        Thu, 20 Feb 2020 13:05:06 +0000 (UTC)
+Subject: Re: [PATCH v3 10/37] KVM: s390: protvirt: Add KVM api documentation
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -46,7 +45,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200220104020.5343-1-borntraeger@de.ibm.com>
- <20200220104020.5343-10-borntraeger@de.ibm.com>
+ <20200220104020.5343-11-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -92,342 +91,114 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <1f0c2c5a-5964-dc34-73af-7b1776391276@redhat.com>
-Date:   Thu, 20 Feb 2020 14:02:24 +0100
+Message-ID: <d9580cae-6448-4d7a-347a-281df969e945@redhat.com>
+Date:   Thu, 20 Feb 2020 14:05:05 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200220104020.5343-10-borntraeger@de.ibm.com>
+In-Reply-To: <20200220104020.5343-11-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 20.02.20 11:39, Christian Borntraeger wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> Add documentation for KVM_CAP_S390_PROTECTED capability and the
+> KVM_S390_PV_COMMAND and KVM_S390_PV_COMMAND_VCPU ioctls.
 
-> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
-> +{
-> +	int r =3D 0;
-> +	u16 dummy;
-> +	void __user *argp =3D (void __user *)cmd->data;
+Outdated.
+
+I suggest moving this after "[PATCH v3 37/37] KVM: s390: protvirt:
+introduce and enable KVM_CAP_S390_PROTECTED" or even squashing it into
+that one.
+
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 52 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 52 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 97a72a53fa4b..77e1edfe5d4c 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -4646,6 +4646,51 @@ the clear cpu reset definition in the POP. However, the cpu is not put
+>  into ESA mode. This reset is a superset of the initial reset.
+>  
+>  
+> +4.125 KVM_S390_PV_COMMAND
+> +-------------------------
 > +
-> +	switch (cmd->cmd) {
-> +	case KVM_PV_ENABLE: {
-> +		r =3D -EINVAL;
-> +		if (kvm_s390_pv_is_protected(kvm))
-> +			break;
+> +:Capability: KVM_CAP_S390_PROTECTED
+> +:Architectures: s390
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_pv_cmd
+> +:Returns: 0 on success, < 0 on error
 > +
-> +		r =3D kvm_s390_pv_alloc_vm(kvm);
-> +		if (r)
-> +			break;
+> +::
 > +
-> +		/* FMT 4 SIE needs esca */
-> +		r =3D sca_switch_to_extended(kvm);
-> +		if (r) {
-> +			kvm_s390_pv_dealloc_vm(kvm);
-> +			kvm_s390_vcpu_unblock_all(kvm);
-
-You forgot to remove that.
-
-> +			mutex_unlock(&kvm->lock);
-
-That's certainly wrong as well.
-
-> +			break;
-> +		}
-> +		r =3D kvm_s390_pv_create_vm(kvm, &cmd->rc, &cmd->rrc);
-> +		if (!r)
-> +			r =3D kvm_s390_cpus_to_pv(kvm, &cmd->rc, &cmd->rrc);
-> +		if (r)
-> +			kvm_s390_pv_destroy_vm(kvm, &dummy, &dummy);
-
-Should there be a kvm_s390_pv_dealloc_vm() as well?
-
+> +  struct kvm_pv_cmd {
+> +	__u32 cmd;	/* Command to be executed */
+> +	__u16 rc;	/* Ultravisor return code */
+> +	__u16 rrc;	/* Ultravisor return reason code */
+> +	__u64 data;	/* Data or address */
+> +	__u32 flags;    /* flags for future extensions. Must be 0 for now */
+> +	__u32 reserved[3];
+> +  };
 > +
-> +		break;
-> +	}
-> +	case KVM_PV_DISABLE: {
-> +		r =3D -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
+> +cmd values:
 > +
-> +		kvm_s390_cpus_from_pv(kvm, &cmd->rc, &cmd->rrc);
-> +		r =3D kvm_s390_pv_destroy_vm(kvm, &cmd->rc, &cmd->rrc);
-> +		if (!r)
-> +			kvm_s390_pv_dealloc_vm(kvm);
-
-Hm, if destroy fails, the CPUs would already have been removed.
-
-Is there a way to make kvm_s390_pv_destroy_vm() never fail? The return
-value is always ignored except here ... which looks wrong.
-
-> +		break;
-> +	}
-
-[...]
-
-> @@ -2558,10 +2724,21 @@ static void kvm_free_vcpus(struct kvm *kvm)
-> =20
->  void kvm_arch_destroy_vm(struct kvm *kvm)
->  {
-> +	u16 rc, rrc;
->  	kvm_free_vcpus(kvm);
->  	sca_dispose(kvm);
-> -	debug_unregister(kvm->arch.dbf);
->  	kvm_s390_gisa_destroy(kvm);
-> +	/*
-> +	 * We are already at the end of life and kvm->lock is not taken.
-> +	 * This is ok as the file descriptor is closed by now and nobody
-> +	 * can mess with the pv state. To avoid lockdep_assert_held from
-> +	 * complaining we do not use kvm_s390_pv_is_protected.
-> +	 */
-> +	if (kvm_s390_pv_get_handle(kvm)) {
-
-I'd prefer something like kvm_s390_pv_is_protected_unlocked(), but I
-guess for these few use cases, this is fine.
-
-
-> +		kvm_s390_pv_destroy_vm(kvm, &rc, &rrc);
-> +		kvm_s390_pv_dealloc_vm(kvm);
-> +	}
-> +	debug_unregister(kvm->arch.dbf);
->  	free_page((unsigned long)kvm->arch.sie_page2);
->  	if (!kvm_is_ucontrol(kvm))
->  		gmap_remove(kvm->arch.gmap);
-> @@ -2657,6 +2834,9 @@ static int sca_switch_to_extended(struct kvm *kvm=
-)
->  	unsigned int vcpu_idx;
->  	u32 scaol, scaoh;
-> =20
-> +	if (kvm->arch.use_esca)
-> +		return 0;
+> +KVM_PV_ENABLE
+> +  Allocate memory and register the VM with the Ultravisor, thereby
+> +  donating memory to the Ultravisor making it inaccessible to KVM.
+> +  Also converts all existing CPUs to protected ones. Future hotplug
+> +  CPUs will become protected during creation.
 > +
->  	new_sca =3D alloc_pages_exact(sizeof(*new_sca), GFP_KERNEL|__GFP_ZERO=
-);
->  	if (!new_sca)
->  		return -ENOMEM;
-> @@ -2908,6 +3088,7 @@ static void kvm_s390_vcpu_setup_model(struct kvm_=
-vcpu *vcpu)
->  static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
->  {
->  	int rc =3D 0;
-> +	u16 uvrc, uvrrc;
-> =20
->  	atomic_set(&vcpu->arch.sie_block->cpuflags, CPUSTAT_ZARCH |
->  						    CPUSTAT_SM |
-> @@ -2975,6 +3156,11 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *=
-vcpu)
-> =20
->  	kvm_s390_vcpu_crypto_setup(vcpu);
-> =20
-> +	mutex_lock(&vcpu->kvm->lock);
-> +	if (kvm_s390_pv_is_protected(vcpu->kvm))
-> +		rc =3D kvm_s390_pv_create_cpu(vcpu, &uvrc, &uvrrc);
-> +	mutex_unlock(&vcpu->kvm->lock);
-
-Do we have to cleanup anything? (e.g., cmma page) I *think*
-kvm_arch_vcpu_destroy() is not called when kvm_arch_vcpu_create() fails .=
-..
-
+> +KVM_PV_DISABLE
+> +  Deregisters the VM from the Ultravisor and frees memory that was
+> +  donated, so the kernel can use it again. All registered VCPUs are
+> +  converted back to non-protected ones.
 > +
->  	return rc;
->  }
-> =20
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index 83dabb18e4d9..d62de29b2d6c 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -15,6 +15,7 @@
->  #include <linux/hrtimer.h>
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
-> +#include <linux/lockdep.h>
->  #include <asm/facility.h>
->  #include <asm/processor.h>
->  #include <asm/sclp.h>
-> @@ -207,6 +208,40 @@ static inline int kvm_s390_user_cpu_state_ctrl(str=
-uct kvm *kvm)
->  	return kvm->arch.user_cpu_state_ctrl !=3D 0;
->  }
-> =20
-> +/* implemented in pv.c */
-> +void kvm_s390_pv_dealloc_vm(struct kvm *kvm);
-> +int kvm_s390_pv_alloc_vm(struct kvm *kvm);
-> +int kvm_s390_pv_create_vm(struct kvm *kvm, u16 *rc, u16 *rrc);
-> +int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc);
-> +int kvm_s390_pv_destroy_vm(struct kvm *kvm, u16 *rc, u16 *rrc);
-> +void kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)=
-;
-> +int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, =
-u16 *rc,
-> +			      u16 *rrc);
-> +int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned l=
-ong size,
-> +		       unsigned long tweak, u16 *rc, u16 *rrc);
+> +KVM_PV_VM_SET_SEC_PARMS
+> +  Pass the image header from VM memory to the Ultravisor in
+> +  preparation of image unpacking and verification.
 > +
-> +static inline u64 kvm_s390_pv_get_handle(struct kvm *kvm)
-> +{
-> +	return kvm->arch.pv.handle;
-> +}
+> +KVM_PV_VM_UNPACK
+> +  Unpack (protect and decrypt) a page of the encrypted boot image.
 > +
-> +static inline u64 kvm_s390_pv_cpu_get_handle(struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->arch.pv.handle;
-> +}
+> +KVM_PV_VM_VERIFY
+> +  Verify the integrity of the unpacked image. Only if this succeeds,
+> +  KVM is allowed to start protected VCPUs.
 > +
-> +static inline bool kvm_s390_pv_is_protected(struct kvm *kvm)
-
-Could have been "kvm_s390_is_protected" or "kvm_s390_is_pv", but also
-fine with me. (maybe I even suggested that one without caring about that
-detail :) )
-
-[...]
-
 > +
->  /* implemented in interrupt.c */
->  int kvm_s390_handle_wait(struct kvm_vcpu *vcpu);
->  void kvm_s390_vcpu_wakeup(struct kvm_vcpu *vcpu);
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> new file mode 100644
-> index 000000000000..67ea9a18ed8f
-> --- /dev/null
-> +++ b/arch/s390/kvm/pv.c
-> @@ -0,0 +1,256 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Hosting Secure Execution virtual machines
-> + *
-> + * Copyright IBM Corp. 2019
-> + *    Author(s): Janosch Frank <frankja@linux.ibm.com>
-
-I'd assume you're an author as well at this point ;)
-
-[...]
-
+>  5. The kvm_run structure
+>  ========================
+>  
+> @@ -6024,3 +6069,10 @@ Architectures: s390
+>  
+>  This capability indicates that the KVM_S390_NORMAL_RESET and
+>  KVM_S390_CLEAR_RESET ioctls are available.
 > +
-> +int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, =
-u16 *rc,
-> +			      u16 *rrc)
-> +{
-> +	struct uv_cb_ssc uvcb =3D {
-> +		.header.cmd =3D UVC_CMD_SET_SEC_CONF_PARAMS,
-> +		.header.len =3D sizeof(uvcb),
-> +		.sec_header_origin =3D (u64)hdr,
-> +		.sec_header_len =3D length,
-> +		.guest_handle =3D kvm_s390_pv_get_handle(kvm),
-> +	};
-> +	int cc;
+> +8.23 KVM_CAP_S390_PROTECTED
 > +
-> +	cc =3D uv_call(0, (u64)&uvcb);
-
-int cc =3D ... could be done.
-
-
-> +	*rc =3D uvcb.header.rc;
-> +	*rrc =3D uvcb.header.rrc;
-> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT VM SET PARMS: rc %x rrc %x",
-> +		     *rc, *rrc);
-> +	if (cc)
-> +		return -EINVAL;
-> +	return 0;
-> +}
+> +Architecture: s390
 > +
-> +static int unpack_one(struct kvm *kvm, unsigned long addr, u64 tweak[2=
-],
-> +		      u16 *rc, u16 *rrc)
-> +{
-> +	struct uv_cb_unp uvcb =3D {
-> +		.header.cmd =3D UVC_CMD_UNPACK_IMG,
-> +		.header.len =3D sizeof(uvcb),
-> +		.guest_handle =3D kvm_s390_pv_get_handle(kvm),
-> +		.gaddr =3D addr,
-> +		.tweak[0] =3D tweak[0],
-> +		.tweak[1] =3D tweak[1],
-> +	};
-> +	int ret;
-> +
-> +	ret =3D gmap_make_secure(kvm->arch.gmap, addr, &uvcb);
+> +This capability indicates that KVM can start protected VMs and the
+> +Ultravisor has therefore been initialized.
+> 
 
-... similarly, with ret.
+Maybe document that KVM_S390_PV_COMMAND and the new MP is available.
+Also maybe that MP commands can now fail.
 
-> +	*rc =3D uvcb.header.rc;
-> +	*rrc =3D uvcb.header.rrc;
-> +
-> +	if (ret && ret !=3D -EAGAIN)
-> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT VM UNPACK: failed addr %llx with rc %=
-x rrc %x",
-> +			     uvcb.gaddr, *rc, *rrc);
-> +	return ret;
-> +}
-> +
-> +int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned l=
-ong size,
-> +		       unsigned long tweak, u16 *rc, u16 *rrc)
-> +{
-> +	u64 tw[2] =3D {tweak, 0};
-
-I have no idea what tweaks are in this context. So I have to trust you
-guys on the implementation, because I don't understand it.
-
-Especially, why can't we simply have
-
-s/tweak/tweak/
-
-offset =3D 0;
-
-while (offset < size) {
-	...
-	ret =3D unpack_one(kvm, addr, tweak, offset, rc, rrc);
-				    ^ no idea what tweak is
-	...
-	... offset +=3D  PAGE_SIZE;
-}
-
-But maybe I am missing what the whole array is about.
-
-> +	int ret =3D 0;
-> +
-> +	if (addr & ~PAGE_MASK || !size || size & ~PAGE_MASK)
-> +		return -EINVAL;
-> +
-> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT VM UNPACK: start addr %lx size %lx",
-> +		     addr, size);
-> +
-> +	while (tw[1] < size) {> +		ret =3D unpack_one(kvm, addr, tw, rc, rrc)=
-;
-> +		if (ret =3D=3D -EAGAIN) {
-> +			cond_resched();
-> +			if (fatal_signal_pending(current))
-> +				break;
-> +			continue;
-> +		}
-> +		if (ret)
-> +			break;
-> +		addr +=3D PAGE_SIZE;
-> +		tw[1] +=3D PAGE_SIZE;
-> +	}
-> +	if (!ret)
-> +		KVM_UV_EVENT(kvm, 3, "%s", "PROTVIRT VM UNPACK: successful");
-> +	return ret;
-> +}
-
-[...]
-> +enum pv_cmd_id {
-> +	KVM_PV_ENABLE,
-> +	KVM_PV_DISABLE,
-> +	KVM_PV_VM_SET_SEC_PARMS,
-> +	KVM_PV_VM_UNPACK,
-> +	KVM_PV_VM_VERIFY,
-
-I wonder if we should just drop "_VM" from all of these ...
-
-[...]
-
-
---=20
+-- 
 Thanks,
 
 David / dhildenb
