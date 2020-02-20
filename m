@@ -2,204 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36D95165E21
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:05:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 340EB165E27
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:06:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727967AbgBTNFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 08:05:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27659 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727285AbgBTNFS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Feb 2020 08:05:18 -0500
+        id S1728102AbgBTNGC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 08:06:02 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24721 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728091AbgBTNGC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 08:06:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582203916;
+        s=mimecast20190719; t=1582203960;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=evi3kAsT6QqG0O2Qu98Bf0c7kbuKDhECc5miM7IPHKU=;
-        b=KvBJPDCllfVh8cORgQlpUyBmV7aiICxD2OQR68+MaDgitwxPuDIXqFEV2KY/oEX5P3cBQV
-        9JFIUog46km3Ip6YZeQYed3DAwommZc1YqX6bVGmLeRrsKKBC2rh7Cwr/OR6Sb08uAm3Sm
-        I0DLGVuComtnUuVx06+5aGvUYn1yc28=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-_JLOe8H3MFyN504w-ovD9A-1; Thu, 20 Feb 2020 08:05:14 -0500
-X-MC-Unique: _JLOe8H3MFyN504w-ovD9A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C324F18C8C01;
-        Thu, 20 Feb 2020 13:05:12 +0000 (UTC)
-Received: from [10.36.118.29] (unknown [10.36.118.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 390D3100E805;
-        Thu, 20 Feb 2020 13:05:06 +0000 (UTC)
-Subject: Re: [PATCH v3 10/37] KVM: s390: protvirt: Add KVM api documentation
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200220104020.5343-1-borntraeger@de.ibm.com>
- <20200220104020.5343-11-borntraeger@de.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <d9580cae-6448-4d7a-347a-281df969e945@redhat.com>
-Date:   Thu, 20 Feb 2020 14:05:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+         to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=gu1OfO+Xr177r6zD7C+F/TxHFq6mosreIYv9UCpXME0=;
+        b=MUCDutVhDBbvX3ov+Fy1NTGQKNeK9o2RCCGMZwVhiQZnKU4Uy/2f+jQYVj8gng8mP/n+xj
+        uGQBe1IlenUeVZppYdS5QW5juQnXTs6UhS0n+Xm1Bb1qAvwbFYSVD1pCv59YkyF0zf99GX
+        +xK23nJuP5wx7gJCbcervH+B538rAU4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-4YOFUXg1NmK0mY8QyJCT9A-1; Thu, 20 Feb 2020 08:05:54 -0500
+X-MC-Unique: 4YOFUXg1NmK0mY8QyJCT9A-1
+Received: by mail-wm1-f69.google.com with SMTP id g138so576653wmg.8
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2020 05:05:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gu1OfO+Xr177r6zD7C+F/TxHFq6mosreIYv9UCpXME0=;
+        b=BhEp4ycat83vSIjyap75qQusN6HSbqeLXFCzj1zhvIyUJyHz6C63KrDLKON5aB0OIh
+         R0xvrbev8VQhMJ6o1jOYE0N7bVwno1WRLzJaW136hUKysbwq0fBmnDwtHbv1FToDjihk
+         7ijo4uAxzDHk+ksgVnG1KQk9sA78nHbYQH3o+dk2+GEnJ+K39JdPi2xpXR8GHvpRH2c1
+         UYz9kEB8f9YgJWwWe2MMTrb3ymU4/uuLUTamnQ3oLD6kEiegyp2roDjwUhG0cXOmbb3Q
+         vUNAJLD9o50N4RRQrkbAbyMwLBaLhZwSK9M/pSroHt/m2tJbR09tAyqpARcfMNjHJXiy
+         ctaQ==
+X-Gm-Message-State: APjAAAWq05mwhFG/vh+f73bHsDrIpkyN3tAM03eFWYeC3rWM5RAQMf9k
+        L3Chow91Ogr0H4GlZKh296U8p10MOjBsdLsmQccjyoykmZQohRictYBCsvrx4bfD4jPqcDxOE35
+        AltI7qxFmr1kn
+X-Received: by 2002:a1c:f713:: with SMTP id v19mr4357657wmh.113.1582203953757;
+        Thu, 20 Feb 2020 05:05:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzh9hNepHCOwe2XDVm3wY3ajt8F8GOM+lVXRr3SymvEGFarpB4eXHypTAiBAMMl7y3VSmAESQ==
+X-Received: by 2002:a1c:f713:: with SMTP id v19mr4357638wmh.113.1582203953503;
+        Thu, 20 Feb 2020 05:05:53 -0800 (PST)
+Received: from localhost.localdomain (78.red-88-21-202.staticip.rima-tde.net. [88.21.202.78])
+        by smtp.gmail.com with ESMTPSA id b67sm4594690wmc.38.2020.02.20.05.05.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Feb 2020 05:05:52 -0800 (PST)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc:     "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Fam Zheng <fam@euphon.net>,
+        =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+        Eric Auger <eric.auger@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        qemu-s390x@nongnu.org,
+        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, qemu-arm@nongnu.org,
+        Alistair Francis <alistair@alistair23.me>,
+        qemu-block@nongnu.org,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+        Jason Wang <jasowang@redhat.com>,
+        xen-devel@lists.xenproject.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Igor Mitsyanko <i.mitsyanko@gmail.com>,
+        Paul Durrant <paul@xen.org>,
+        Richard Henderson <rth@twiddle.net>,
+        John Snow <jsnow@redhat.com>
+Subject: [PATCH v3 00/20] global exec/memory/dma APIs cleanup
+Date:   Thu, 20 Feb 2020 14:05:28 +0100
+Message-Id: <20200220130548.29974-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <20200220104020.5343-11-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20.02.20 11:39, Christian Borntraeger wrote:
-> From: Janosch Frank <frankja@linux.ibm.com>
-> 
-> Add documentation for KVM_CAP_S390_PROTECTED capability and the
-> KVM_S390_PV_COMMAND and KVM_S390_PV_COMMAND_VCPU ioctls.
+This series is inspired from Peter Maydel cleanup patch:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg680625.html
 
-Outdated.
+- Convert 'is_write' argument to boolean
+- Use void pointer for blob buffer
+- Remove unnecessary casts (Stefan Weil)
+- Replace [API]_rw() by [API]_read/write() when is_write is constant
 
-I suggest moving this after "[PATCH v3 37/37] KVM: s390: protvirt:
-introduce and enable KVM_CAP_S390_PROTECTED" or even squashing it into
-that one.
+Supersedes: <20200218112457.22712-1-peter.maydell@linaro.org>
 
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  Documentation/virt/kvm/api.rst | 52 ++++++++++++++++++++++++++++++++++
->  1 file changed, 52 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 97a72a53fa4b..77e1edfe5d4c 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -4646,6 +4646,51 @@ the clear cpu reset definition in the POP. However, the cpu is not put
->  into ESA mode. This reset is a superset of the initial reset.
->  
->  
-> +4.125 KVM_S390_PV_COMMAND
-> +-------------------------
-> +
-> +:Capability: KVM_CAP_S390_PROTECTED
-> +:Architectures: s390
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_pv_cmd
-> +:Returns: 0 on success, < 0 on error
-> +
-> +::
-> +
-> +  struct kvm_pv_cmd {
-> +	__u32 cmd;	/* Command to be executed */
-> +	__u16 rc;	/* Ultravisor return code */
-> +	__u16 rrc;	/* Ultravisor return reason code */
-> +	__u64 data;	/* Data or address */
-> +	__u32 flags;    /* flags for future extensions. Must be 0 for now */
-> +	__u32 reserved[3];
-> +  };
-> +
-> +cmd values:
-> +
-> +KVM_PV_ENABLE
-> +  Allocate memory and register the VM with the Ultravisor, thereby
-> +  donating memory to the Ultravisor making it inaccessible to KVM.
-> +  Also converts all existing CPUs to protected ones. Future hotplug
-> +  CPUs will become protected during creation.
-> +
-> +KVM_PV_DISABLE
-> +  Deregisters the VM from the Ultravisor and frees memory that was
-> +  donated, so the kernel can use it again. All registered VCPUs are
-> +  converted back to non-protected ones.
-> +
-> +KVM_PV_VM_SET_SEC_PARMS
-> +  Pass the image header from VM memory to the Ultravisor in
-> +  preparation of image unpacking and verification.
-> +
-> +KVM_PV_VM_UNPACK
-> +  Unpack (protect and decrypt) a page of the encrypted boot image.
-> +
-> +KVM_PV_VM_VERIFY
-> +  Verify the integrity of the unpacked image. Only if this succeeds,
-> +  KVM is allowed to start protected VCPUs.
-> +
-> +
->  5. The kvm_run structure
->  ========================
->  
-> @@ -6024,3 +6069,10 @@ Architectures: s390
->  
->  This capability indicates that the KVM_S390_NORMAL_RESET and
->  KVM_S390_CLEAR_RESET ioctls are available.
-> +
-> +8.23 KVM_CAP_S390_PROTECTED
-> +
-> +Architecture: s390
-> +
-> +This capability indicates that KVM can start protected VMs and the
-> +Ultravisor has therefore been initialized.
-> 
+Peter Maydell (1):
+  Avoid address_space_rw() with a constant is_write argument
 
-Maybe document that KVM_S390_PV_COMMAND and the new MP is available.
-Also maybe that MP commands can now fail.
+Philippe Mathieu-Daudé (19):
+  scripts/git.orderfile: Display Cocci scripts before code modifications
+  hw: Remove unnecessary cast when calling dma_memory_read()
+  exec: Let qemu_ram_*() functions take a const pointer argument
+  exec: Rename ram_ptr variable
+  exec: Let flatview API take void pointer arguments
+  exec: Let the address_space API use void pointer arguments
+  hw/net: Avoid casting non-const pointer, use address_space_write()
+  Remove unnecessary cast when using the address_space API
+  exec: Let the cpu_[physical]_memory API use void pointer arguments
+  Remove unnecessary cast when using the cpu_[physical]_memory API
+  hw/ide/internal: Remove unused DMARestartFunc typedef
+  hw/ide: Let the DMAIntFunc prototype use a boolean 'is_write' argument
+  hw/virtio: Let virtqueue_map_iovec() use a boolean 'is_write' argument
+  hw/virtio: Let vhost_memory_map() use a boolean 'is_write' argument
+  exec: Let address_space_unmap() use a boolean 'is_write' argument
+  Let address_space_rw() calls pass a boolean 'is_write' argument
+  exec: Let cpu_[physical]_memory API use a boolean 'is_write' argument
+  Let cpu_[physical]_memory() calls pass a boolean 'is_write' argument
+  Avoid cpu_physical_memory_rw() with a constant is_write argument
+
+ scripts/coccinelle/exec_rw_const.cocci | 103 +++++++++++++++++++++++++
+ include/exec/cpu-all.h                 |   2 +-
+ include/exec/cpu-common.h              |  18 ++---
+ include/exec/memory.h                  |  16 ++--
+ include/hw/ide/internal.h              |   3 +-
+ include/sysemu/xen-mapcache.h          |   4 +-
+ target/i386/hvf/vmx.h                  |   7 +-
+ accel/kvm/kvm-all.c                    |   6 +-
+ dma-helpers.c                          |   4 +-
+ exec.c                                 |  75 +++++++++---------
+ hw/arm/boot.c                          |   6 +-
+ hw/arm/smmu-common.c                   |   3 +-
+ hw/arm/smmuv3.c                        |  10 +--
+ hw/display/exynos4210_fimd.c           |   3 +-
+ hw/display/milkymist-tmu2.c            |   8 +-
+ hw/display/omap_dss.c                  |   2 +-
+ hw/display/omap_lcdc.c                 |  10 +--
+ hw/display/ramfb.c                     |   2 +-
+ hw/dma/etraxfs_dma.c                   |  25 +++---
+ hw/dma/rc4030.c                        |  10 +--
+ hw/dma/xlnx-zdma.c                     |  11 +--
+ hw/i386/xen/xen-mapcache.c             |   2 +-
+ hw/ide/ahci.c                          |   2 +-
+ hw/ide/core.c                          |   2 +-
+ hw/ide/macio.c                         |   2 +-
+ hw/ide/pci.c                           |   2 +-
+ hw/misc/pc-testdev.c                   |   2 +-
+ hw/net/cadence_gem.c                   |  21 +++--
+ hw/net/dp8393x.c                       |  70 +++++++++--------
+ hw/net/i82596.c                        |  25 +++---
+ hw/net/lasi_i82596.c                   |   5 +-
+ hw/nvram/spapr_nvram.c                 |   4 +-
+ hw/ppc/pnv_lpc.c                       |   8 +-
+ hw/ppc/ppc440_uc.c                     |   6 +-
+ hw/ppc/spapr_hcall.c                   |   4 +-
+ hw/s390x/css.c                         |  12 +--
+ hw/s390x/ipl.c                         |   2 +-
+ hw/s390x/s390-pci-bus.c                |   2 +-
+ hw/s390x/virtio-ccw.c                  |   2 +-
+ hw/scsi/vmw_pvscsi.c                   |   8 +-
+ hw/sd/sdhci.c                          |  15 ++--
+ hw/virtio/vhost.c                      |   8 +-
+ hw/virtio/virtio.c                     |   7 +-
+ hw/xen/xen_pt_graphics.c               |   2 +-
+ qtest.c                                |  52 ++++++-------
+ target/i386/hax-all.c                  |   6 +-
+ target/i386/hvf/x86_mmu.c              |  12 +--
+ target/i386/whpx-all.c                 |   2 +-
+ target/s390x/excp_helper.c             |   2 +-
+ target/s390x/helper.c                  |   6 +-
+ target/s390x/mmu_helper.c              |   2 +-
+ scripts/git.orderfile                  |   3 +
+ 52 files changed, 360 insertions(+), 266 deletions(-)
+ create mode 100644 scripts/coccinelle/exec_rw_const.cocci
 
 -- 
-Thanks,
-
-David / dhildenb
+2.21.1
 
