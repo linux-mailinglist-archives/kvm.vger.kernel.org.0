@@ -2,131 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C1DE5165EE6
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:35:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93A5C165F04
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:43:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728115AbgBTNfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 08:35:00 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40858 "EHLO
+        id S1728102AbgBTNnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 08:43:22 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20738 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728056AbgBTNfA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 08:35:00 -0500
+        by vger.kernel.org with ESMTP id S1727298AbgBTNnW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 08:43:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582205698;
+        s=mimecast20190719; t=1582206200;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=DbfI4nkBpEGD3ZjbSmdijatP27Ibu1TMUFEEBeREIdE=;
-        b=K+Vucoj48nWlGZgaZJ+xHTionOyziJ+xHLINFiLJ5CBTsIOoaNsDXJ6FQkDZDdF1xeQk3F
-        2/Q6wSJD6kXlwSgpzJ1IcqiOUia1g2POyJ7V2IskJ9sapLuKI0m2EVzC+PjbUvsMXZUoVa
-        V/zwXKZUYQfTUNYnQq75ReazN2NjqBs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-nAQ567sgO1utP_Gjm2S1kw-1; Thu, 20 Feb 2020 08:34:54 -0500
-X-MC-Unique: nAQ567sgO1utP_Gjm2S1kw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C11F801E53;
-        Thu, 20 Feb 2020 13:34:53 +0000 (UTC)
-Received: from [10.36.118.29] (unknown [10.36.118.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EB9E719E9C;
-        Thu, 20 Feb 2020 13:34:47 +0000 (UTC)
-Subject: Re: [PATCH v2 02/42] KVM: s390/interrupt: do not pin adapter
- interrupt pages
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+         in-reply-to:in-reply-to:references:references;
+        bh=qD/X+uvdAqiN2J4VmO38lFHYqqOLuyZd9jk531i2vDc=;
+        b=VbFX74fFzTvoitwdfmpVRLP4j4HFGnVOHWmnsy0jqShxi/CotYW83lxDVmZThYGo2BSt4/
+        BepTF2xJVMj2aJJoynqDZbTso9rCPT13WpcaDLMkzM+BZXChw1Nl1nisQUP0NUGQELgDRk
+        pNCqmxB1BNnSH2Y3yOqsepalZj641Bg=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273--nkqe9-HOIKNuE4g_MxS5w-1; Thu, 20 Feb 2020 08:43:16 -0500
+X-MC-Unique: -nkqe9-HOIKNuE4g_MxS5w-1
+Received: by mail-ed1-f69.google.com with SMTP id ay24so2738852edb.0
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2020 05:43:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qD/X+uvdAqiN2J4VmO38lFHYqqOLuyZd9jk531i2vDc=;
+        b=QtyRmUAgBxOBtQExFF8TjXgpv8LO8eHuv73nCPilgYHSuCIZcnYu4NvE9hKdD4dBAU
+         47iuLWAdLy3PW7qURbzzaHYOWYUuXYKdwgntNBuzjeOgUYXAS8+Vd+DCThUjc+7sUMJ6
+         HEpICzqmbKj/NyLF7eEm9Qhlh8F9T7KYC9VQ5HyvSa3LqYNShCpChEDl30pcIevA1m22
+         mPOpGQXjtJW9Q21L44NYg5j20fnTXBh/xlbPJa3hvoohWEkBKiW25v5dh1/I/LhXlVZZ
+         HXWnEaE2WsMYsMhHjWEK6ZtrlgT+8y0ZejYLJJKUNNVdUI6TZGTCvet0K1TBUg8XCzIm
+         V0SQ==
+X-Gm-Message-State: APjAAAVSnSke3JYfW6DAeiqJrqiEW7o6KKMWaW+mPWGIuyphM7mAt26c
+        B3rOOVFwQjB1hnptp98Lf7yNT8aM2KopZnPKAKNixnBeCpAi9KL0I5f3AKHUqS6yjl0f4BoyW2g
+        MuX1+mvps//AD
+X-Received: by 2002:a17:906:af66:: with SMTP id os6mr30252254ejb.87.1582206195521;
+        Thu, 20 Feb 2020 05:43:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy55S2TatA0f5hb66822wtWUhbSwpaXzdFOBOyYbycw17FXpGy5g+OlIEm49yhVSCxJsxpX7A==
+X-Received: by 2002:a17:906:af66:: with SMTP id os6mr30252228ejb.87.1582206195221;
+        Thu, 20 Feb 2020 05:43:15 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net. [88.21.202.78])
+        by smtp.gmail.com with ESMTPSA id ks2sm125224ejb.82.2020.02.20.05.43.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Feb 2020 05:43:14 -0800 (PST)
+Subject: Re: [PATCH v3 02/20] hw: Remove unnecessary cast when calling
+ dma_memory_read()
+To:     Eric Blake <eblake@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc:     Fam Zheng <fam@euphon.net>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>, qemu-block@nongnu.org,
+        David Hildenbrand <david@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        xen-devel@lists.xenproject.org,
+        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Laurent Vivier <lvivier@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-References: <20200214222658.12946-1-borntraeger@de.ibm.com>
- <20200214222658.12946-3-borntraeger@de.ibm.com>
- <073d3666-480e-5ba5-a46b-4cbd615f4174@redhat.com>
- <45954200-ccfe-cfac-200d-d1b903d9fc39@de.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <7f4c303f-a5e4-7e5b-1af9-72e3e256992d@redhat.com>
-Date:   Thu, 20 Feb 2020 14:34:45 +0100
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Stefan Weil <sw@weilnetz.de>,
+        Alistair Francis <alistair@alistair23.me>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Paul Durrant <paul@xen.org>,
+        Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
+        qemu-arm@nongnu.org,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        John Snow <jsnow@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Igor Mitsyanko <i.mitsyanko@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20200220130548.29974-1-philmd@redhat.com>
+ <20200220130548.29974-3-philmd@redhat.com>
+ <68120807-6f6b-1602-8208-fd76d64e74bc@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <be623afd-0605-0bdf-daae-f38ba5562012@redhat.com>
+Date:   Thu, 20 Feb 2020 14:43:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <45954200-ccfe-cfac-200d-d1b903d9fc39@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <68120807-6f6b-1602-8208-fd76d64e74bc@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->> AFAIK, leaving e->adapter.summary_addr set is not an issue.
+On 2/20/20 2:16 PM, Eric Blake wrote:
+> On 2/20/20 7:05 AM, Philippe Mathieu-Daudé wrote:
+>> Since its introduction in commit d86a77f8abb, dma_memory_read()
+>> always accepted void pointer argument. Remove the unnecessary
+>> casts.
 >>
->> Interesting, in kvm_s390_adapter_map(), we didn't synchronize again slot
->> updates when doing the gmap_translate(), which looks wrong to me ...
+>> This commit was produced with the included Coccinelle script
+>> scripts/coccinelle/exec_rw_const.
 >>
->> It seems to be the same thing here. I do wonder if it is safe to do a
->> gmap_translate() here, looks like this can race with
->> kvm_arch_commit_memory_region().
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>   scripts/coccinelle/exec_rw_const.cocci | 15 +++++++++++++++
+>>   hw/arm/smmu-common.c                   |  3 +--
+>>   hw/arm/smmuv3.c                        | 10 ++++------
+>>   hw/sd/sdhci.c                          | 15 +++++----------
+>>   4 files changed, 25 insertions(+), 18 deletions(-)
+>>   create mode 100644 scripts/coccinelle/exec_rw_const.cocci
 >>
->> I would have assumed we need e.g., the slots_lock while doing the
->> gmap_translate() - or a srcu_read_lock(&vcpu->kvm->srcu) or similar ...
+>> diff --git a/scripts/coccinelle/exec_rw_const.cocci 
+>> b/scripts/coccinelle/exec_rw_const.cocci
+>> new file mode 100644
+>> index 0000000000..a0054f009d
+>> --- /dev/null
+>> +++ b/scripts/coccinelle/exec_rw_const.cocci
+>> @@ -0,0 +1,15 @@
+>> +// Usage:
+>> +//  spatch --sp-file scripts/coccinelle/exec_rw_const.cocci --dir . 
+>> --in-place
 > 
-> gmap_translate does this via the gmap and it holds the mm sem. gmap_unmap_segment
-> takes the same lock. So I think we are ok here.
+> This command line should also use '--macro-file 
+> scripts/cocci-macro-file.h' to cover more of the code base (Coccinelle 
+> skips portions of the code that uses macros it doesn't recognize).
+> 
+> 
+>> @@ -726,13 +724,10 @@ static void get_adma_description(SDHCIState *s, 
+>> ADMADescr *dscr)
+>>           }
+>>           break;
+>>       case SDHC_CTRL_ADMA2_64:
+>> -        dma_memory_read(s->dma_as, entry_addr,
+>> -                        (uint8_t *)(&dscr->attr), 1);
+>> -        dma_memory_read(s->dma_as, entry_addr + 2,
+>> -                        (uint8_t *)(&dscr->length), 2);
+>> +        dma_memory_read(s->dma_as, entry_addr, (&dscr->attr), 1);
+>> +        dma_memory_read(s->dma_as, entry_addr + 2, (&dscr->length), 2);
+> 
+> The () around &dscr->length are now pointless.
 
-Ahh, I was looking at __gmap_translate(). Makes sense.
+Thanks Eric, patch updated. Peter are you OK if I change the cocci 
+header using /* */ as:
 
--- 
-Thanks,
+-- >8 --
+diff --git a/scripts/coccinelle/exec_rw_const.cocci 
+b/scripts/coccinelle/exec_rw_const.cocci
+index a0054f009d..7e42682240 100644
+--- a/scripts/coccinelle/exec_rw_const.cocci
++++ b/scripts/coccinelle/exec_rw_const.cocci
+@@ -1,5 +1,13 @@
+-// Usage:
+-//  spatch --sp-file scripts/coccinelle/exec_rw_const.cocci --dir . 
+--in-place
++/*
++  Usage:
++
++    spatch \
++           --macro-file scripts/cocci-macro-file.h \
++           --sp-file scripts/coccinelle/exec_rw_const.cocci \
++           --keep-comments \
++           --in-place \
++           --dir .
++*/
 
-David / dhildenb
+  // Remove useless cast
+  @@
+@@ -7,9 +15,9 @@ expression E1, E2, E3, E4;
+  type T;
+  @@
+  (
+-- dma_memory_read(E1, E2, (T *)E3, E4)
++- dma_memory_read(E1, E2, (T *)(E3), E4)
+  + dma_memory_read(E1, E2, E3, E4)
+  |
+-- dma_memory_write(E1, E2, (T *)E3, E4)
++- dma_memory_write(E1, E2, (T *)(E3), E4)
+  + dma_memory_write(E1, E2, E3, E4)
+  )
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index d5abdaad41..de63ffb037 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -724,10 +724,10 @@ static void get_adma_description(SDHCIState *s, 
+ADMADescr *dscr)
+          }
+          break;
+      case SDHC_CTRL_ADMA2_64:
+-        dma_memory_read(s->dma_as, entry_addr, (&dscr->attr), 1);
+-        dma_memory_read(s->dma_as, entry_addr + 2, (&dscr->length), 2);
++        dma_memory_read(s->dma_as, entry_addr, &dscr->attr, 1);
++        dma_memory_read(s->dma_as, entry_addr + 2, &dscr->length, 2);
+          dscr->length = le16_to_cpu(dscr->length);
+-        dma_memory_read(s->dma_as, entry_addr + 4, (&dscr->addr), 8);
++        dma_memory_read(s->dma_as, entry_addr + 4, &dscr->addr, 8);
+          dscr->addr = le64_to_cpu(dscr->addr);
+          dscr->attr &= (uint8_t) ~0xC0;
+          dscr->incr = 12;
+---
 
