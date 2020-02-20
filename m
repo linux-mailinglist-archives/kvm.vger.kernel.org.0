@@ -2,98 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 765F716643B
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 18:20:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D957E16646D
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 18:23:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728736AbgBTRUk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 12:20:40 -0500
-Received: from mga03.intel.com ([134.134.136.65]:11467 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727979AbgBTRUj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Feb 2020 12:20:39 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2020 09:20:38 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,465,1574150400"; 
-   d="scan'208";a="236307882"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga003.jf.intel.com with ESMTP; 20 Feb 2020 09:20:38 -0800
-Date:   Thu, 20 Feb 2020 09:20:38 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     linmiaohe <linmiaohe@huawei.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com,
-        rkrcmar@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com
-Subject: Re: [PATCH] KVM: apic: avoid calculating pending eoi from an
- uninitialized val
-Message-ID: <20200220172038.GB3972@linux.intel.com>
-References: <1582213006-488-1-git-send-email-linmiaohe@huawei.com>
- <8736b56wxe.fsf@vitty.brq.redhat.com>
+        id S1728799AbgBTRWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 12:22:45 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42233 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728896AbgBTRWP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Feb 2020 12:22:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582219335;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=rZyXD5q+onhmCDPHKZnUNJAstGhWUGrhi7Vh7fDt5g0=;
+        b=a9QKLynW6RUm++W22qLQQxtWjevCgd061TBDDHsrTYQ6nYITuvStFDXPItVzdd71dDodCt
+        0SytloLUuu3DN5cT6yVU0mJQ160bta3lGis185UIHS/akE7F+Gpx/wV6nlCXbo1fMQZctF
+        V4KOxWt2xRTfurypSgVE2+WKcZBKNEs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-QhU0mJ4QO262gXPKlvMnXw-1; Thu, 20 Feb 2020 12:22:09 -0500
+X-MC-Unique: QhU0mJ4QO262gXPKlvMnXw-1
+Received: by mail-wm1-f71.google.com with SMTP id g138so842921wmg.8
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2020 09:22:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rZyXD5q+onhmCDPHKZnUNJAstGhWUGrhi7Vh7fDt5g0=;
+        b=DAo83Xtpj5PJODzXvLkXFPSMc3Kc29mKr78T3GS9WZM/Ly/AtlhgbruKDjpdYWnsPM
+         4v7D58N2sFfByF6VUPpTnTNWDeLD+VVujyERHgosHBem2P/ELvChiH3GXIfMuRipQ5jN
+         jpYJQ+ebRNrnO7OoRy81KKgX/444gbd5EOM3yL0wMCQRP9nlHXcOqa44rpX/3KohE/z5
+         cJxGb13HLiWgcwZpZUnVkZiQflVK1/7/kztApaFT6Kpr8hzuvYyFXX9AsM4pAu9GSrxC
+         /xaZEJA6dpFfdZiVK7srX3qexWivakk4PeLVRCyTZcSnCWSer5D2BorVKLsRThZCabCp
+         /a4Q==
+X-Gm-Message-State: APjAAAVESP7Lvs6V8jwgvTR7hTraNxuQjqJJ9AmEt4vHhg9KVI+sx+xg
+        IM4vCBMWe8U8tzh5zFX7QXOLh5R8yixKvH1vWdD7fyoRYpUS9TXvC44yUtJ0aBSG6fvEgSvEybd
+        iJbMtO31gFdwk
+X-Received: by 2002:adf:fd87:: with SMTP id d7mr45699846wrr.226.1582219328193;
+        Thu, 20 Feb 2020 09:22:08 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyznpk/Mju2cxo6UDLosBl/WALhWP2M64Z82L2SgtLE3m4B2Qb1Kh7smxIT3jRFYoOJt4jZkQ==
+X-Received: by 2002:adf:fd87:: with SMTP id d7mr45699820wrr.226.1582219327916;
+        Thu, 20 Feb 2020 09:22:07 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id a184sm5355891wmf.29.2020.02.20.09.22.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Feb 2020 09:22:07 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH RFC 0/2] KVM: nVMX: fix apicv disablement for L1
+Date:   Thu, 20 Feb 2020 18:22:03 +0100
+Message-Id: <20200220172205.197767-1-vkuznets@redhat.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8736b56wxe.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 20, 2020 at 05:33:17PM +0100, Vitaly Kuznetsov wrote:
-> linmiaohe <linmiaohe@huawei.com> writes:
-> 
-> > From: Miaohe Lin <linmiaohe@huawei.com>
-> >
-> > When get user eoi value failed, var val would be uninitialized and result
-> > in calculating pending eoi from an uninitialized val. Initialize var val
-> > to 0 to fix this case.
-> 
-> Let me try to suggest an alternative wording,
-> 
-> "When pv_eoi_get_user() fails, 'val' may remain uninitialized and the
-> return value of pv_eoi_get_pending() becomes random. Fix the issue by
-> initializing the variable."
-> 
-> >
-> > Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> > ---
-> >  arch/x86/kvm/lapic.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 4f14ec7525f6..7e77e94f3176 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -626,7 +626,7 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
-> >  
-> >  static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
-> >  {
-> > -	u8 val;
-> > +	u8 val = 0;
+It was found that fine-grained VMX feature enablement in QEMU is broken
+when combined with SynIC:
 
-Rather than initialize @val, I'd prefer to explicitly handle the error,
-similar to pv_eoi_clr_pending() and pv_eoi_set_pending(), e.g.
+    qemu-system-x86_64 -machine q35,accel=kvm -cpu host,hv_vpindex,hv_synic -smp 2 -m 16384 -vnc :0
+    qemu-system-x86_64: error: failed to set MSR 0x48d to 0xff00000016
+    qemu-system-x86_64: <...>: kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+    Aborted
 
-	u8 val;
+QEMU thread: https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04838.html
 
-	if (pv_eoi_get_user(vcpu, &val) < 0) {
-		printk(KERN_WARNING "Can't read EOI MSR value: 0x%llx\n",
-			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
-		return false;
-	}
-	return val & 0x1;
+Turns out, this is a KVM issue: when SynIC is enabled, PIN_BASED_POSTED_INTR
+gets filtered out from VMX MSRs for all newly created (but not existent!)
+vCPUS. Patch1 addresses this. Also, apicv disablement for L1 doesn't seem
+to disable it for L2 (at least on CPU0) so unless there's a good reason
+to not allow this we need to make it work. PATCH2, suggested by Paolo,
+is supposed to do the job.
 
-> >  	if (pv_eoi_get_user(vcpu, &val) < 0)
-> >  		printk(KERN_WARNING "Can't read EOI MSR value: 0x%llx\n",
-> >  			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
-> 
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> 
-> But why compilers don't complain?
+RFC: I looked at the code and ran some tests and nothing suspicious popped
+out, however, I'm still not convinced this is a good idea to have apicv
+enabled for L2 when it's disabled for L1... Also, we may prefer to merge
+or re-order these two patches.
 
-Clang might?
+Vitaly Kuznetsov (2):
+  KVM: nVMX: clear PIN_BASED_POSTED_INTR from nested pinbased_ctls only
+    when apicv is globally disabled
+  KVM: nVMX: handle nested posted interrupts when apicv is disabled for
+    L1
+
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/lapic.c            |  5 +----
+ arch/x86/kvm/svm.c              |  7 ++++++-
+ arch/x86/kvm/vmx/capabilities.h |  1 +
+ arch/x86/kvm/vmx/nested.c       |  5 ++---
+ arch/x86/kvm/vmx/nested.h       |  3 +--
+ arch/x86/kvm/vmx/vmx.c          | 23 +++++++++++++----------
+ 7 files changed, 25 insertions(+), 21 deletions(-)
+
+-- 
+2.24.1
+
