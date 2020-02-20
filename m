@@ -2,221 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B625D165EAA
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:24:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 87646165ED5
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2020 14:31:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728143AbgBTNYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 08:24:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39624 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727996AbgBTNYI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Feb 2020 08:24:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582205045;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MHg/5UrUaWqOGPMbBFxMDVDMQH9eo1mTFc5tISJLXMw=;
-        b=Ia+ozEhhF3eUCi/ug6FgFDqKx0ACSKfdqlnwoC1648FeKBIFg33tpj65HDqZ49X+7vXOEq
-        8C60UPDxzFtCz2elSPe6YBZDmV6oK1169V/48KSH0fXh2R4BjX58+gT9Q6Xw+dGTav9MPt
-        CMl4bNd4rSus1RiexYAj2hmt1g1hoDc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-QCmmPJqaN9KOUb0RuWwslA-1; Thu, 20 Feb 2020 08:24:04 -0500
-X-MC-Unique: QCmmPJqaN9KOUb0RuWwslA-1
-Received: by mail-ed1-f70.google.com with SMTP id m21so2674606edp.14
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2020 05:24:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MHg/5UrUaWqOGPMbBFxMDVDMQH9eo1mTFc5tISJLXMw=;
-        b=nbOo/rIZ/DGEKFyV0ELGBTIBEsFhUuDRzQ2pTdpisjmJi3unkkKg2jId4iqECg+2b5
-         4hvwwLmSnb93dmdjNEPiksM69pYRf3t4GknWtKdrp7Gtkk4aUt39XLsVQ/ZBdFY/E2O9
-         mCUWwH429dJnJkrh5iKrs1fVlr9J2TgvpyZo/eV17bTmLStB9fz0BRuGGBvOAXm3av8Z
-         PV8eemC8SJ16pEQxWZoIY92GYBtv4Bmylvg35gG8CNcy5iTkSmIY3NCIqnYhdhlhA8UJ
-         gZP5E7AW1b1oEFip75gFbOm1TaCQ/iyoQjl0nzKJglxL0Vvzc/gbfVvK3H8/jOFjWoXc
-         W+NQ==
-X-Gm-Message-State: APjAAAXB7BeYbjN7qCvMVeyEmTN9evxp3FojSNNVvbp1ohGle9aLetfR
-        xDoF8e7aY1Rx/uOMnPdOPeVZiImOKuMPxm5hKRf/e0TNlP2LFGXLhN1CnWrNgWXYwex+FePgDRW
-        3pXAkz9CiomDg
-X-Received: by 2002:a50:fc05:: with SMTP id i5mr29170790edr.343.1582205042921;
-        Thu, 20 Feb 2020 05:24:02 -0800 (PST)
-X-Google-Smtp-Source: APXvYqznBcBibxmOR37VsiYJJjL+jelcdk8lkiHN5SpgVrHqzRKo/B7Z+Qf6ZCdlOSA+ufQfA3o7ew==
-X-Received: by 2002:a50:fc05:: with SMTP id i5mr29170765edr.343.1582205042706;
-        Thu, 20 Feb 2020 05:24:02 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net. [88.21.202.78])
-        by smtp.gmail.com with ESMTPSA id l11sm99933edi.28.2020.02.20.05.23.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Feb 2020 05:24:02 -0800 (PST)
-Subject: Re: [PATCH v3 03/20] exec: Let qemu_ram_*() functions take a const
- pointer argument
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc:     "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Fam Zheng <fam@euphon.net>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        qemu-s390x@nongnu.org,
-        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, qemu-arm@nongnu.org,
-        Alistair Francis <alistair@alistair23.me>,
-        qemu-block@nongnu.org,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Jason Wang <jasowang@redhat.com>,
-        xen-devel@lists.xenproject.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Igor Mitsyanko <i.mitsyanko@gmail.com>,
-        Paul Durrant <paul@xen.org>,
-        Richard Henderson <rth@twiddle.net>,
-        John Snow <jsnow@redhat.com>
-References: <20200220130548.29974-1-philmd@redhat.com>
- <20200220130548.29974-4-philmd@redhat.com>
- <fce0956e-e542-e8a5-bd02-a7941a9db627@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <34fc1b00-4e95-6235-3e82-294b572a209b@redhat.com>
-Date:   Thu, 20 Feb 2020 14:23:58 +0100
+        id S1728149AbgBTNbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 08:31:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13150 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726959AbgBTNbi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Feb 2020 08:31:38 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01KDUKv4072403
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2020 08:31:38 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8uc1a2c4-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 20 Feb 2020 08:31:37 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Thu, 20 Feb 2020 13:31:36 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 20 Feb 2020 13:31:33 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01KDVVdV65798334
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Feb 2020 13:31:31 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B445611C052;
+        Thu, 20 Feb 2020 13:31:31 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2BDF711C04A;
+        Thu, 20 Feb 2020 13:31:31 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.146.44])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 20 Feb 2020 13:31:31 +0000 (GMT)
+Subject: Re: [PATCH v2 02/42] KVM: s390/interrupt: do not pin adapter
+ interrupt pages
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20200214222658.12946-1-borntraeger@de.ibm.com>
+ <20200214222658.12946-3-borntraeger@de.ibm.com>
+ <073d3666-480e-5ba5-a46b-4cbd615f4174@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
+ J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
+ CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
+ 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
+ 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
+ +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
+ T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
+ OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
+ /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
+ IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABzUNDaHJpc3RpYW4g
+ Qm9ybnRyYWVnZXIgKDJuZCBJQk0gYWRkcmVzcykgPGJvcm50cmFlZ2VyQGxpbnV4LmlibS5j
+ b20+wsF5BBMBAgAjBQJdP/hMAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQEXu8
+ gLWmHHy/pA/+JHjpEnd01A0CCyfVnb5fmcOlQ0LdmoKWLWPvU840q65HycCBFTt6V62cDljB
+ kXFFxMNA4y/2wqU0H5/CiL963y3gWIiJsZa4ent+KrHl5GK1nIgbbesfJyA7JqlB0w/E/SuY
+ NRQwIWOo/uEvOgXnk/7+rtvBzNaPGoGiiV1LZzeaxBVWrqLtmdi1iulW/0X/AlQPuF9dD1Px
+ hx+0mPjZ8ClLpdSp5d0yfpwgHtM1B7KMuQPQZGFKMXXTUd3ceBUGGczsgIMipZWJukqMJiJj
+ QIMH0IN7XYErEnhf0GCxJ3xAn/J7iFpPFv8sFZTvukntJXSUssONnwiKuld6ttUaFhSuSoQg
+ OFYR5v7pOfinM0FcScPKTkrRsB5iUvpdthLq5qgwdQjmyINt3cb+5aSvBX2nNN135oGOtlb5
+ tf4dh00kUR8XFHRrFxXx4Dbaw4PKgV3QLIHKEENlqnthH5t0tahDygQPnSucuXbVQEcDZaL9
+ WgJqlRAAj0pG8M6JNU5+2ftTFXoTcoIUbb0KTOibaO9zHVeGegwAvPLLNlKHiHXcgLX1tkjC
+ DrvE2Z0e2/4q7wgZgn1kbvz7ZHQZB76OM2mjkFu7QNHlRJ2VXJA8tMXyTgBX6kq1cYMmd/Hl
+ OhFrAU3QO1SjCsXA2CDk9MM1471mYB3CTXQuKzXckJnxHkHOwU0ETpw8+AEQAJjyNXvMQdJN
+ t07BIPDtbAQk15FfB0hKuyZVs+0lsjPKBZCamAAexNRk11eVGXK/YrqwjChkk60rt3q5i42u
+ PpNMO9aS8cLPOfVft89Y654Qd3Rs1WRFIQq9xLjdLfHh0i0jMq5Ty+aiddSXpZ7oU6E+ud+X
+ Czs3k5RAnOdW6eV3+v10sUjEGiFNZwzN9Udd6PfKET0J70qjnpY3NuWn5Sp1ZEn6lkq2Zm+G
+ 9G3FlBRVClT30OWeiRHCYB6e6j1x1u/rSU4JiNYjPwSJA8EPKnt1s/Eeq37qXXvk+9DYiHdT
+ PcOa3aNCSbIygD3jyjkg6EV9ZLHibE2R/PMMid9FrqhKh/cwcYn9FrT0FE48/2IBW5mfDpAd
+ YvpawQlRz3XJr2rYZJwMUm1y+49+1ZmDclaF3s9dcz2JvuywNq78z/VsUfGz4Sbxy4ShpNpG
+ REojRcz/xOK+FqNuBk+HoWKw6OxgRzfNleDvScVmbY6cQQZfGx/T7xlgZjl5Mu/2z+ofeoxb
+ vWWM1YCJAT91GFvj29Wvm8OAPN/+SJj8LQazd9uGzVMTz6lFjVtH7YkeW/NZrP6znAwv5P1a
+ DdQfiB5F63AX++NlTiyA+GD/ggfRl68LheSskOcxDwgI5TqmaKtX1/8RkrLpnzO3evzkfJb1
+ D5qh3wM1t7PZ+JWTluSX8W25ABEBAAHCwV8EGAECAAkFAk6cPPgCGwwACgkQEXu8gLWmHHz8
+ 2w//VjRlX+tKF3szc0lQi4X0t+pf88uIsvR/a1GRZpppQbn1jgE44hgF559K6/yYemcvTR7r
+ 6Xt7cjWGS4wfaR0+pkWV+2dbw8Xi4DI07/fN00NoVEpYUUnOnupBgychtVpxkGqsplJZQpng
+ v6fauZtyEcUK3dLJH3TdVQDLbUcL4qZpzHbsuUnTWsmNmG4Vi0NsEt1xyd/Wuw+0kM/oFEH1
+ 4BN6X9xZcG8GYUbVUd8+bmio8ao8m0tzo4pseDZFo4ncDmlFWU6hHnAVfkAs4tqA6/fl7RLN
+ JuWBiOL/mP5B6HDQT9JsnaRdzqF73FnU2+WrZPjinHPLeE74istVgjbowvsgUqtzjPIG5pOj
+ cAsKoR0M1womzJVRfYauWhYiW/KeECklci4TPBDNx7YhahSUlexfoftltJA8swRshNA/M90/
+ i9zDo9ySSZHwsGxG06ZOH5/MzG6HpLja7g8NTgA0TD5YaFm/oOnsQVsf2DeAGPS2xNirmknD
+ jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
+ ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Thu, 20 Feb 2020 14:31:30 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <fce0956e-e542-e8a5-bd02-a7941a9db627@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <073d3666-480e-5ba5-a46b-4cbd615f4174@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20022013-0028-0000-0000-000003DCC4FB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022013-0029-0000-0000-000024A1D4FE
+Message-Id: <45954200-ccfe-cfac-200d-d1b903d9fc39@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-20_04:2020-02-19,2020-02-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ phishscore=0 impostorscore=0 mlxscore=0 mlxlogscore=999 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 clxscore=1015 suspectscore=2 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002200102
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/20/20 2:21 PM, Paolo Bonzini wrote:
-> On 20/02/20 14:05, Philippe Mathieu-Daudé wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+
+On 17.02.20 10:43, David Hildenbrand wrote:
+> On 14.02.20 23:26, Christian Borntraeger wrote:
+>> From: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+>>
+>> The adapter interrupt page containing the indicator bits is currently
+>> pinned. That means that a guest with many devices can pin a lot of
+>> memory pages in the host. This also complicates the reference tracking
+>> which is needed for memory management handling of protected virtual
+>> machines. It might also have some strange side effects for madvise
+>> MADV_DONTNEED and other things.
+>>
+>> We can simply try to get the userspace page set the bits and free the
+>> page. By storing the userspace address in the irq routing entry instead
+>> of the guest address we can actually avoid many lookups and list walks
+>> so that this variant is very likely not slower.
+>>
+>> If userspace messes around with the memory slots the worst thing that
+>> can happen is that we write to some other memory within that process.
+>> As we get the the page with FOLL_WRITE this can also not be used to
+>> write to shared read-only pages.
+>>
+>> Signed-off-by: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
+>> [borntraeger@de.ibm.com: patch simplification]
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 >> ---
->>   include/exec/cpu-common.h     | 6 +++---
->>   include/sysemu/xen-mapcache.h | 4 ++--
->>   exec.c                        | 8 ++++----
->>   hw/i386/xen/xen-mapcache.c    | 2 +-
->>   4 files changed, 10 insertions(+), 10 deletions(-)
+>>  Documentation/virt/kvm/devices/s390_flic.rst |  11 +-
+>>  arch/s390/include/asm/kvm_host.h             |   3 -
+>>  arch/s390/kvm/interrupt.c                    | 170 ++++++-------------
+>>  3 files changed, 53 insertions(+), 131 deletions(-)
 >>
->> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
->> index 81753bbb34..05ac1a5d69 100644
->> --- a/include/exec/cpu-common.h
->> +++ b/include/exec/cpu-common.h
->> @@ -48,11 +48,11 @@ typedef uint32_t CPUReadMemoryFunc(void *opaque, hwaddr addr);
->>   
->>   void qemu_ram_remap(ram_addr_t addr, ram_addr_t length);
->>   /* This should not be used by devices.  */
->> -ram_addr_t qemu_ram_addr_from_host(void *ptr);
->> +ram_addr_t qemu_ram_addr_from_host(const void *ptr);
+>> diff --git a/Documentation/virt/kvm/devices/s390_flic.rst b/Documentation/virt/kvm/devices/s390_flic.rst
+>> index 954190da7d04..ea96559ba501 100644
+>> --- a/Documentation/virt/kvm/devices/s390_flic.rst
+>> +++ b/Documentation/virt/kvm/devices/s390_flic.rst
+>> @@ -108,16 +108,9 @@ Groups:
+>>        mask or unmask the adapter, as specified in mask
+>>  
+>>      KVM_S390_IO_ADAPTER_MAP
+>> -      perform a gmap translation for the guest address provided in addr,
+>> -      pin a userspace page for the translated address and add it to the
+>> -      list of mappings
+>> -
+>> -      .. note:: A new mapping will be created unconditionally; therefore,
+>> -	        the calling code should avoid making duplicate mappings.
+>> -
+>> +      This is now a no-op. The mapping is purely done by the irq route.
+>>      KVM_S390_IO_ADAPTER_UNMAP
+>> -      release a userspace page for the translated address specified in addr
+>> -      from the list of mappings
+>> +      This is now a no-op. The mapping is purely done by the irq route.
+>>  
 > 
-> This is a bit ugly, because the pointer _can_ be modified via
-> qemu_map_ram_ptr.
+> The interface should have accepted a hva from the very start and not
+> guest addresses ...
 
-OK.
+right, but that is history. 
 
-> Is this needed for the rest of the series to apply?
-
-No!
-
-> Paolo
 > 
->>   RAMBlock *qemu_ram_block_by_name(const char *name);
->> -RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
->> +RAMBlock *qemu_ram_block_from_host(const void *ptr, bool round_offset,
->>                                      ram_addr_t *offset);
->> -ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host);
->> +ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, const void *host);
->>   void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
->>   void qemu_ram_unset_idstr(RAMBlock *block);
->>   const char *qemu_ram_get_idstr(RAMBlock *rb);
->> diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
->> index c8e7c2f6cf..81e9aa2fa6 100644
->> --- a/include/sysemu/xen-mapcache.h
->> +++ b/include/sysemu/xen-mapcache.h
->> @@ -19,7 +19,7 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f,
->>                           void *opaque);
->>   uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
->>                          uint8_t lock, bool dma);
->> -ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
->> +ram_addr_t xen_ram_addr_from_mapcache(const void *ptr);
->>   void xen_invalidate_map_cache_entry(uint8_t *buffer);
->>   void xen_invalidate_map_cache(void);
->>   uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
->> @@ -40,7 +40,7 @@ static inline uint8_t *xen_map_cache(hwaddr phys_addr,
->>       abort();
->>   }
->>   
->> -static inline ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
->> +static inline ram_addr_t xen_ram_addr_from_mapcache(const void *ptr)
->>   {
->>       abort();
->>   }
->> diff --git a/exec.c b/exec.c
->> index 8e9cc3b47c..02b4e6ea41 100644
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -2614,7 +2614,7 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
->>   }
->>   
->>   /* Return the offset of a hostpointer within a ramblock */
->> -ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host)
->> +ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, const void *host)
->>   {
->>       ram_addr_t res = (uint8_t *)host - (uint8_t *)rb->host;
->>       assert((uintptr_t)host >= (uintptr_t)rb->host);
->> @@ -2640,11 +2640,11 @@ ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host)
->>    * pointer, such as a reference to the region that includes the incoming
->>    * ram_addr_t.
->>    */
->> -RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
->> +RAMBlock *qemu_ram_block_from_host(const void *ptr, bool round_offset,
->>                                      ram_addr_t *offset)
->>   {
->>       RAMBlock *block;
->> -    uint8_t *host = ptr;
->> +    const uint8_t *host = ptr;
->>   
->>       if (xen_enabled()) {
->>           ram_addr_t ram_addr;
->> @@ -2705,7 +2705,7 @@ RAMBlock *qemu_ram_block_by_name(const char *name)
->>   
->>   /* Some of the softmmu routines need to translate from a host pointer
->>      (typically a TLB entry) back to a ram offset.  */
->> -ram_addr_t qemu_ram_addr_from_host(void *ptr)
->> +ram_addr_t qemu_ram_addr_from_host(const void *ptr)
->>   {
->>       RAMBlock *block;
->>       ram_addr_t offset;
->> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
->> index 5b120ed44b..432ad3354d 100644
->> --- a/hw/i386/xen/xen-mapcache.c
->> +++ b/hw/i386/xen/xen-mapcache.c
->> @@ -363,7 +363,7 @@ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
->>       return p;
->>   }
->>   
->> -ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
->> +ram_addr_t xen_ram_addr_from_mapcache(const void *ptr)
->>   {
->>       MapCacheEntry *entry = NULL;
->>       MapCacheRev *reventry;
->>
+> [...]
+
+>> +	/*
+>> +	 * We resolve the gpa to hva when setting the IRQ routing. the set_irq
+>> +	 * code uses get_user_pages_remote to do the actual write.
+> 
+> nit: "get_user_pages_remote()"
+
+ack.
+
+> 
+>> +	 */
+>>  	case KVM_S390_IO_ADAPTER_MAP:
+>> -		ret = kvm_s390_adapter_map(dev->kvm, req.id, req.addr);
+>> -		break;
+>>  	case KVM_S390_IO_ADAPTER_UNMAP:
+>> -		ret = kvm_s390_adapter_unmap(dev->kvm, req.id, req.addr);
+>> -		break;
+>> +		return 0;
+>>  	default:
+>>  		ret = -EINVAL;
+>>  	}
+>> @@ -2699,19 +2622,21 @@ static unsigned long get_ind_bit(__u64 addr, unsigned long bit_nr, bool swap)
+>>  	return swap ? (bit ^ (BITS_PER_LONG - 1)) : bit;
+>>  }
+>>  
+>> -static struct s390_map_info *get_map_info(struct s390_io_adapter *adapter,
+>> -					  u64 addr)
+>> +static struct page *get_map_page(struct kvm *kvm,
+>> +				 struct s390_io_adapter *adapter,
+>> +				 u64 uaddr)
+>>  {
+>> -	struct s390_map_info *map;
+>> +	struct page *page = NULL;
+>>  
+>>  	if (!adapter)
+>>  		return NULL;
+> 
+> AFAIKs, this check is not necessary.
+
+Right otherwise we would crash earlier.
+
+
+> 
+>> -
+>> -	list_for_each_entry(map, &adapter->maps, list) {
+>> -		if (map->guest_addr == addr)
+>> -			return map;
+>> -	}
+>> -	return NULL;
+>> +	if (!uaddr)
+>> +		return NULL;
+> 
+> I do wonder if that check is necessary. I don't think so but might be
+> missing something.
+
+Nothing should break when we remove this check. get_user_pages_remote will
+also return NULL (as newer kernels usually forbid mapping things at 0).
+
+Will remove. 
+
+[...]
+
+>> @@ -2818,23 +2746,27 @@ int kvm_set_routing_entry(struct kvm *kvm,
+>>  			  struct kvm_kernel_irq_routing_entry *e,
+>>  			  const struct kvm_irq_routing_entry *ue)
+>>  {
+>> -	int ret;
+>> +	u64 uaddr;
+>>  
+>>  	switch (ue->type) {
+>> +	/* we store the userspace addresses instead of the guest addresses */
+>>  	case KVM_IRQ_ROUTING_S390_ADAPTER:
+>>  		e->set = set_adapter_int;
+>> -		e->adapter.summary_addr = ue->u.adapter.summary_addr;
+>> -		e->adapter.ind_addr = ue->u.adapter.ind_addr;
+>> +		uaddr =  gmap_translate(kvm->arch.gmap, ue->u.adapter.summary_addr);
+>> +		if (uaddr == -EFAULT)
+>> +			return -EFAULT;
+>> +		e->adapter.summary_addr = uaddr;
+>> +		uaddr =  gmap_translate(kvm->arch.gmap, ue->u.adapter.ind_addr);
+>> +		if (uaddr == -EFAULT)
+>> +			return -EFAULT;
+> 
+> AFAIK, leaving e->adapter.summary_addr set is not an issue.
+> 
+> Interesting, in kvm_s390_adapter_map(), we didn't synchronize again slot
+> updates when doing the gmap_translate(), which looks wrong to me ...
+> 
+> It seems to be the same thing here. I do wonder if it is safe to do a
+> gmap_translate() here, looks like this can race with
+> kvm_arch_commit_memory_region().
+> 
+> I would have assumed we need e.g., the slots_lock while doing the
+> gmap_translate() - or a srcu_read_lock(&vcpu->kvm->srcu) or similar ...
+
+gmap_translate does this via the gmap and it holds the mm sem. gmap_unmap_segment
+takes the same lock. So I think we are ok here.
+ 
+> 
+> Apart from that, looks good to me.
 > 
 
