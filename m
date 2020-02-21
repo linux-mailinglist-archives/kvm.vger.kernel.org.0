@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DCF7B167B0C
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:45:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 966F0167B15
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:46:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728068AbgBUKoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 05:44:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52202 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726913AbgBUKoy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 05:44:54 -0500
+        id S1727686AbgBUKq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 05:46:57 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31178 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726934AbgBUKq5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 05:46:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582281892;
+        s=mimecast20190719; t=1582282015;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=+yNj5Z1FqKBnt1S/avscfWA+MdlKfdJolv8IGAIJh4Q=;
-        b=LpXXqiMBr62PE11oSKigFVN8vemjSt9liUBRj24MjD2QPd3xGQqrwXkd9j0X9mIptiwnri
-        btk1YRGDHpAF0SZY+mTrkThgfYbkX+02qzHrasO+7XWHI1xIVqGCapZiTazdLjRIbVz/sY
-        TXnxVxecYwjhikvPPzdOao53m+xT6w0=
+        bh=MWdFIGaN4vVGA2rn+y0DNLhAnokcl2mknwliiEst6Ok=;
+        b=WPzFZW00SUuhtOyKaNq3oymshrl5g1h0k+DjQ6IIA9XMqLwnGhhJpidmOZvV5JHOf7SIB1
+        YgCiIfLDuxC0vYig0JrpvJ/EsZxOi0Wh7TownZf5ITSl24Pyn0iv26pOl2/5be3TcOxQ0B
+        /fa0nWTu/7FZwOJRS9ayrUq/+W0uLok=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-_3BaFVA9M2e2VczxiLe95w-1; Fri, 21 Feb 2020 05:44:48 -0500
-X-MC-Unique: _3BaFVA9M2e2VczxiLe95w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-290-ISGoaoSOP5y9s_6Z6SahBw-1; Fri, 21 Feb 2020 05:46:51 -0500
+X-MC-Unique: ISGoaoSOP5y9s_6Z6SahBw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F9C11005512;
-        Fri, 21 Feb 2020 10:44:47 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 652341005512;
+        Fri, 21 Feb 2020 10:46:50 +0000 (UTC)
 Received: from [10.36.117.197] (ovpn-117-197.ams2.redhat.com [10.36.117.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BB07B87B11;
-        Fri, 21 Feb 2020 10:44:44 +0000 (UTC)
-Subject: Re: [PATCH v3 28/37] KVM: s390: protvirt: UV calls in support of
- diag308 0, 1
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1263860C87;
+        Fri, 21 Feb 2020 10:46:47 +0000 (UTC)
+Subject: Re: [PATCH v3 35/37] s390: protvirt: Add sysfs firmware interface for
+ Ultravisor information
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -46,7 +46,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200220104020.5343-1-borntraeger@de.ibm.com>
- <20200220104020.5343-29-borntraeger@de.ibm.com>
+ <20200220104020.5343-36-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -92,16 +92,16 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <c99906fe-b62c-c1b8-8476-16d6401bf9f2@redhat.com>
-Date:   Fri, 21 Feb 2020 11:44:43 +0100
+Message-ID: <4409e9ba-3b8c-69dd-815c-2b09d77d7598@redhat.com>
+Date:   Fri, 21 Feb 2020 11:46:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200220104020.5343-29-borntraeger@de.ibm.com>
+In-Reply-To: <20200220104020.5343-36-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -110,78 +110,116 @@ X-Mailing-List: kvm@vger.kernel.org
 On 20.02.20 11:40, Christian Borntraeger wrote:
 > From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> diag 308 subcode 0 and 1 require several KVM and Ultravisor interactions.
-> Specific to these "soft" reboots are
+> That information, e.g. the maximum number of guests or installed
+> Ultravisor facilities, is interesting for QEMU, Libvirt and
+> administrators.
 > 
-> * The "unshare all" UVC
-> * The "prepare for reset" UVC
+> Let's provide an easily parsable API to get that information.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/s390/include/asm/uv.h |  4 ++++
->  arch/s390/kvm/kvm-s390.c   | 22 ++++++++++++++++++++++
->  include/uapi/linux/kvm.h   |  2 ++
->  3 files changed, 28 insertions(+)
+>  arch/s390/kernel/uv.c | 86 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 86 insertions(+)
 > 
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 09dc6dba94a4..a7595c647759 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -36,6 +36,8 @@
->  #define UVC_CMD_SET_SEC_CONF_PARAMS	0x0300
->  #define UVC_CMD_UNPACK_IMG		0x0301
->  #define UVC_CMD_VERIFY_IMG		0x0302
-> +#define UVC_CMD_PREPARE_RESET		0x0320
-> +#define UVC_CMD_SET_UNSHARE_ALL		0x0340
->  #define UVC_CMD_PIN_PAGE_SHARED		0x0341
->  #define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
->  #define UVC_CMD_SET_SHARED_ACCESS	0x1000
-> @@ -56,6 +58,8 @@ enum uv_cmds_inst {
->  	BIT_UVC_CMD_SET_SEC_PARMS = 11,
->  	BIT_UVC_CMD_UNPACK_IMG = 13,
->  	BIT_UVC_CMD_VERIFY_IMG = 14,
-> +	BIT_UVC_CMD_PREPARE_RESET = 18,
-> +	BIT_UVC_CMD_UNSHARE_ALL = 20,
->  	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
->  	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
->  };
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 303f994f3d03..9ac73b717e25 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2310,6 +2310,28 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  			     cmd->rrc);
->  		break;
->  	}
-> +	case KVM_PV_VM_PREP_RESET: {
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index 4539003dac9d..550e9617c459 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -323,5 +323,91 @@ int arch_make_page_accessible(struct page *page)
+>  	return rc;
+>  }
+>  EXPORT_SYMBOL_GPL(arch_make_page_accessible);
+> +#endif
 > +
-> +		r = uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
-> +				  UVC_CMD_PREPARE_RESET, &cmd->rc, &cmd->rrc);
-> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT PREP RESET: rc %x rrc %x",
-> +			     cmd->rc, cmd->rrc);
-> +		break;
-> +	}
-> +	case KVM_PV_VM_UNSHARE_ALL: {
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
+> +#if defined(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) || IS_ENABLED(CONFIG_KVM)
+> +static ssize_t uv_query_facilities(struct kobject *kobj,
+> +				   struct kobj_attribute *attr, char *page)
+> +{
+> +	return snprintf(page, PAGE_SIZE, "%lx\n%lx\n%lx\n%lx\n",
+> +			uv_info.inst_calls_list[0],
+> +			uv_info.inst_calls_list[1],
+> +			uv_info.inst_calls_list[2],
+> +			uv_info.inst_calls_list[3]);
+> +}
 > +
-> +		r = uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
-> +				  UVC_CMD_SET_UNSHARE_ALL, &cmd->rc, &cmd->rrc);
-> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT UNSHARE: rc %x rrc %x",
-> +			     cmd->rc, cmd->rrc);
-> +		break;
-> +	}
->  	default:
->  		return -ENOTTY;
->  	}
+> +static struct kobj_attribute uv_query_facilities_attr =
+> +	__ATTR(facilities, 0444, uv_query_facilities, NULL);
+> +
+> +static ssize_t uv_query_max_guest_cpus(struct kobject *kobj,
+> +				       struct kobj_attribute *attr, char *page)
+> +{
+> +	return snprintf(page, PAGE_SIZE, "%d\n",
+> +			uv_info.max_guest_cpus);
+> +}
+> +
+> +static struct kobj_attribute uv_query_max_guest_cpus_attr =
+> +	__ATTR(max_cpus, 0444, uv_query_max_guest_cpus, NULL);
+> +
+> +static ssize_t uv_query_max_guest_vms(struct kobject *kobj,
+> +				      struct kobj_attribute *attr, char *page)
+> +{
+> +	return snprintf(page, PAGE_SIZE, "%d\n",
+> +			uv_info.max_num_sec_conf);
+> +}
+> +
+> +static struct kobj_attribute uv_query_max_guest_vms_attr =
+> +	__ATTR(max_guests, 0444, uv_query_max_guest_vms, NULL);
+> +
+> +static ssize_t uv_query_max_guest_addr(struct kobject *kobj,
+> +				       struct kobj_attribute *attr, char *page)
+> +{
+> +	return snprintf(page, PAGE_SIZE, "%lx\n",
+> +			uv_info.max_sec_stor_addr);
+> +}
+> +
+> +static struct kobj_attribute uv_query_max_guest_addr_attr =
+> +	__ATTR(max_address, 0444, uv_query_max_guest_addr, NULL);
+> +
+> +static struct attribute *uv_query_attrs[] = {
+> +	&uv_query_facilities_attr.attr,
+> +	&uv_query_max_guest_cpus_attr.attr,
+> +	&uv_query_max_guest_vms_attr.attr,
+> +	&uv_query_max_guest_addr_attr.attr,
+> +	NULL,
+> +};
+> +
+> +static struct attribute_group uv_query_attr_group = {
+> +	.attrs = uv_query_attrs,
+> +};
+>  
+> +static struct kset *uv_query_kset;
+> +struct kobject *uv_kobj;
+> +
+> +static int __init uv_info_init(void)
+> +{
+> +	int rc = -ENOMEM;
+> +
+> +	if (!test_facility(158))
+> +		return 0;
+> +
+> +	uv_kobj = kobject_create_and_add("uv", firmware_kobj);
+> +	if (!uv_kobj)
+> +		return -ENOMEM;
+> +
+> +	uv_query_kset = kset_create_and_add("query", NULL, uv_kobj);
+> +	if (!uv_query_kset)
+> +		goto out_kobj;
+> +
+> +	rc = sysfs_create_group(&uv_query_kset->kobj, &uv_query_attr_group);
+> +	if (!rc)
+> +		return 0;
+> +
+> +	kset_unregister(uv_query_kset);
+> +out_kobj:
+> +	kobject_del(uv_kobj);
+> +	kobject_put(uv_kobj);
+> +	return rc;
+> +}
+> +device_initcall(uv_info_init);
+>  #endif
+> 
 
-Acked-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
