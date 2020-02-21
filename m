@@ -2,161 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 38118167728
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 09:41:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31D2F167738
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 09:41:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731260AbgBUIjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 03:39:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30059 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730014AbgBUIjC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 03:39:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582274341;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+jKPj3gf+T3ocOqgvJULo7PhApveqgiAwsnEtaSBAEQ=;
-        b=e+q+v9FYiHBMDN9wgzsZpOa3UtSZDBM7LtPy2K5kxuriFeAtmhR+4jVNDL2IiJKwlHHtQ0
-        juP26Iv2eaV1qRklmE6iso7BC2xBdSH2AF/k+zKM6fu0mHrzx22ATRtpzsZamfHr+7WBx1
-        IT7YpkSlrN015YEQfOhKWkNmvG4O2zY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-icepWPbFPbqSoFkIU1jjaA-1; Fri, 21 Feb 2020 03:38:59 -0500
-X-MC-Unique: icepWPbFPbqSoFkIU1jjaA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7A62800D50;
-        Fri, 21 Feb 2020 08:38:55 +0000 (UTC)
-Received: from gondolin (ovpn-117-64.ams2.redhat.com [10.36.117.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DE7D75D9E2;
-        Fri, 21 Feb 2020 08:38:33 +0000 (UTC)
-Date:   Fri, 21 Feb 2020 09:38:30 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Cc:     Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Fam Zheng <fam@euphon.net>,
-        =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau 
-        <hpoussin@reactos.org>, kvm@vger.kernel.org,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>,
-        Eric Auger <eric.auger@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        qemu-s390x@nongnu.org,
-        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
-        Gerd Hoffmann <kraxel@redhat.com>, qemu-arm@nongnu.org,
-        Alistair Francis <alistair@alistair23.me>,
-        qemu-block@nongnu.org,
-        =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
-        Jason Wang <jasowang@redhat.com>,
-        xen-devel@lists.xenproject.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Igor Mitsyanko <i.mitsyanko@gmail.com>,
-        Paul Durrant <paul@xen.org>,
-        Richard Henderson <rth@twiddle.net>,
-        John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v3 08/20] Remove unnecessary cast when using the
- address_space API
-Message-ID: <20200221093830.63bc308e.cohuck@redhat.com>
-In-Reply-To: <20200220130548.29974-9-philmd@redhat.com>
-References: <20200220130548.29974-1-philmd@redhat.com>
-        <20200220130548.29974-9-philmd@redhat.com>
-Organization: Red Hat GmbH
+        id S1731832AbgBUIkS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 03:40:18 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17800 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731792AbgBUIkR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 03:40:17 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01L8cb7W123151
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 03:40:15 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y9sbv8e66-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 03:40:15 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Fri, 21 Feb 2020 08:40:13 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 21 Feb 2020 08:40:10 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01L8dArQ46596368
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Feb 2020 08:39:10 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A809C4205E;
+        Fri, 21 Feb 2020 08:40:06 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 25FB942041;
+        Fri, 21 Feb 2020 08:40:06 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.54.21])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Feb 2020 08:40:06 +0000 (GMT)
+Subject: Re: [PATCH v3 09/37] KVM: s390: protvirt: Add initial vm and cpu
+ lifecycle handling
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200220104020.5343-1-borntraeger@de.ibm.com>
+ <20200220104020.5343-10-borntraeger@de.ibm.com>
+ <1f0c2c5a-5964-dc34-73af-7b1776391276@redhat.com>
+ <b9aa96ce-9701-cefb-68d8-76d1cba4d5c7@de.ibm.com>
+ <abcad458-ff2d-2ec0-6a3c-f4491336d743@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date:   Fri, 21 Feb 2020 09:40:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <abcad458-ff2d-2ec0-6a3c-f4491336d743@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20022108-0016-0000-0000-000002E8E173
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022108-0017-0000-0000-0000334C0110
+Message-Id: <947e04fa-d5d3-f352-3b58-766dd463bfd9@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-21_02:2020-02-19,2020-02-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ mlxscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 adultscore=0 suspectscore=2
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002210064
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 20 Feb 2020 14:05:36 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-> This commit was produced with the included Coccinelle script
-> scripts/coccinelle/exec_rw_const.
->=20
-> Two lines in hw/net/dp8393x.c that Coccinelle produced that
-> were over 80 characters were re-wrapped by hand.
->=20
-> Suggested-by: Stefan Weil <sw@weilnetz.de>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  scripts/coccinelle/exec_rw_const.cocci | 15 +++++++++++++-
->  target/i386/hvf/vmx.h                  |  2 +-
->  hw/arm/boot.c                          |  6 ++----
->  hw/dma/rc4030.c                        |  4 ++--
->  hw/dma/xlnx-zdma.c                     |  2 +-
->  hw/net/cadence_gem.c                   | 21 +++++++++----------
->  hw/net/dp8393x.c                       | 28 +++++++++++++-------------
->  hw/s390x/css.c                         |  4 ++--
->  qtest.c                                | 12 +++++------
->  target/i386/hvf/x86_mmu.c              |  2 +-
->  target/i386/whpx-all.c                 |  2 +-
->  target/s390x/mmu_helper.c              |  2 +-
->  12 files changed, 54 insertions(+), 46 deletions(-)
->=20
 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 844caab408..f27f8c45a5 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -875,7 +875,7 @@ static inline int ida_read_next_idaw(CcwDataStream *c=
-ds)
->              return -EINVAL; /* channel program check */
->          }
->          ret =3D address_space_rw(&address_space_memory, idaw_addr,
-> -                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fm=
-t2,
-> +                               MEMTXATTRS_UNSPECIFIED, &idaw.fmt2,
->                                 sizeof(idaw.fmt2), false);
->          cds->cda =3D be64_to_cpu(idaw.fmt2);
->      } else {
-> @@ -884,7 +884,7 @@ static inline int ida_read_next_idaw(CcwDataStream *c=
-ds)
->              return -EINVAL; /* channel program check */
->          }
->          ret =3D address_space_rw(&address_space_memory, idaw_addr,
-> -                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fm=
-t1,
-> +                               MEMTXATTRS_UNSPECIFIED, &idaw.fmt1,
->                                 sizeof(idaw.fmt1), false);
->          cds->cda =3D be64_to_cpu(idaw.fmt1);
->          if (cds->cda & 0x80000000) {
+On 21.02.20 09:22, David Hildenbrand wrote:
+>>>> +
+>>>> +		break;
+>>>> +	}
+>>>> +	case KVM_PV_DISABLE: {
+>>>> +		r = -EINVAL;
+>>>> +		if (!kvm_s390_pv_is_protected(kvm))
+>>>> +			break;
+>>>> +
+>>>> +		kvm_s390_cpus_from_pv(kvm, &cmd->rc, &cmd->rrc);
+>>>> +		r = kvm_s390_pv_destroy_vm(kvm, &cmd->rc, &cmd->rrc);
+>>>> +		if (!r)
+>>>> +			kvm_s390_pv_dealloc_vm(kvm);
+>>>
+>>> Hm, if destroy fails, the CPUs would already have been removed.
+>>>
+>>> Is there a way to make kvm_s390_pv_destroy_vm() never fail? The return
+>>> value is always ignored except here ... which looks wrong.
+>>
+>> This should not fail. But if it does we should not free the memory that
+>> we donated to the ultravisor. We then do have a memory leak, but this is 
+>> necessary to keep the integrity of the host. 
+>> I will fix the other places to only call dealloc when destroy succeeded.
+>>
+>> Same for VCPU destroy. If that fails I should not free arch.pv.stor_base
+>> will fix.
+> 
+> A comment would be nice, documenting exactly that.
 
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index c9f3f34750..0be2f300bb 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -106,7 +106,7 @@ static inline bool read_table_entry(CPUS390XState *en=
-v, hwaddr gaddr,
->       * We treat them as absolute addresses and don't wrap them.
->       */
->      if (unlikely(address_space_read(cs->as, gaddr, MEMTXATTRS_UNSPECIFIE=
-D,
-> -                                    (uint8_t *)entry, sizeof(*entry)) !=
-=3D
-> +                                    entry, sizeof(*entry)) !=3D
->                   MEMTX_OK)) {
->          return false;
->      }
 
-s390 parts
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+something like this on top:
+
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 738f7fefcaec..cad04e26dccf 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2173,6 +2173,11 @@ static void kvm_s390_cpus_from_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
+        struct kvm_vcpu *vcpu;
+        int i;
+ 
++       /*
++        * we ignore failures and try to destroy as many CPUs as possible.
++        * At the same time we must not free the assigned ressources when
++        * this fails, as the ultravisor has still access to that memory.
++        */
+        kvm_for_each_vcpu(i, vcpu, kvm) {
+                mutex_lock(&vcpu->mutex);
+                kvm_s390_pv_destroy_cpu(vcpu, rc, rrc);
+@@ -2221,6 +2226,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+                        kvm_s390_pv_dealloc_vm(kvm);
+                        break;
+                }
++               /* we never switch back to bsca from esca */
+                r = kvm_s390_pv_create_vm(kvm, &cmd->rc, &cmd->rrc);
+                if (r) {
+                        kvm_s390_pv_dealloc_vm(kvm);
+diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+index 6b581b5f8521..f93811a0a441 100644
+--- a/arch/s390/kvm/pv.c
++++ b/arch/s390/kvm/pv.c
+@@ -16,6 +16,7 @@
+ #include <asm/mman.h>
+ #include "kvm-s390.h"
+ 
++/* only free ressources when the destroy was successful */
+ void kvm_s390_pv_dealloc_vm(struct kvm *kvm)
+ {
+        vfree(kvm->arch.pv.stor_var);
+@@ -62,6 +63,7 @@ int kvm_s390_pv_alloc_vm(struct kvm *kvm)
+        return -ENOMEM;
+ }
+ 
++/* this should not fail, but if it does we must not free the donated memory */
+ int kvm_s390_pv_destroy_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+ {
+        int cc;
 
