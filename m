@@ -2,99 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 465421678BB
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 09:51:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 670821678ED
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 10:05:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388879AbgBUIuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 03:50:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43163 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2388755AbgBUIud (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 03:50:33 -0500
+        id S1727370AbgBUJFP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 04:05:15 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45764 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727315AbgBUJFN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 04:05:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582275031;
+        s=mimecast20190719; t=1582275911;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EXWvx43O9g/ijJ52j/YuLCYIbjQQg+Dy1xNnaG2kadU=;
-        b=ffv3OMEhOl1ikMBkfvWep9kyYX7qQjxP4EJ5Vdkh4HtLcTg3FAH5MBLJHGT/FqNkm4ildw
-        a5cODwZmnv/T6hx82vMkacFeJaXPDpb5oF2Akpgr8nKHK36+vWq+bdYDaebw2dYepuAuC8
-        hx7ACIxuJaNXdaw6fHi1Ak6sEGNLx/Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-JRoNw5u6PxuSrSphnI0hbA-1; Fri, 21 Feb 2020 03:50:30 -0500
-X-MC-Unique: JRoNw5u6PxuSrSphnI0hbA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70707107ACC9;
-        Fri, 21 Feb 2020 08:50:27 +0000 (UTC)
-Received: from [10.72.13.208] (ovpn-13-208.pek2.redhat.com [10.72.13.208])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 87ECB5DD73;
-        Fri, 21 Feb 2020 08:50:11 +0000 (UTC)
-Subject: Re: [PATCH V4 5/5] vdpasim: vDPA device simulator
-To:     Harpreet Singh Anand <hanand@xilinx.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc:     "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
-        "jgg@mellanox.com" <jgg@mellanox.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "aadam@redhat.com" <aadam@redhat.com>,
-        "jiri@mellanox.com" <jiri@mellanox.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>
-References: <20200220061141.29390-1-jasowang@redhat.com>
- <20200220061141.29390-6-jasowang@redhat.com>
- <BY5PR02MB637195ECE0879F5F7CB72CE3BB120@BY5PR02MB6371.namprd02.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <2c0ad54d-c8bd-bb2e-5dff-ce79cf0d45b9@redhat.com>
-Date:   Fri, 21 Feb 2020 16:50:10 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        bh=A7s/AuKmwFQf2sqfO4uUSGYKrB01ygBEp8/pgU2iE1I=;
+        b=TYueL6cJSK+y3y8qaJ8ZfY+YG0RYgh5mAGnkCgqIhpp9Lc0fauiETsuuoKzsYvGA3P7H6E
+        2dpfxt6BeHBfO9lWwTUvUvLna0NAYRNwu9vxmfHkiWB3vDdwKOwbaK9JnfABP83p9AwRwU
+        CeoIbUMGfpgc9RbWU/auUI3MfT1Vsyg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-NkJkfxqyN2i3o4VLbL7rBg-1; Fri, 21 Feb 2020 04:05:09 -0500
+X-MC-Unique: NkJkfxqyN2i3o4VLbL7rBg-1
+Received: by mail-wr1-f69.google.com with SMTP id l1so747514wrt.4
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 01:05:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=A7s/AuKmwFQf2sqfO4uUSGYKrB01ygBEp8/pgU2iE1I=;
+        b=cXZb3riitFo0231S9yBZVQmfxqa+eXUkRhFYm/nW5VGdWiOie+uoytzPMA3Da2Egqh
+         pk2zJLahzL3xKAR/B4IAc8uMUUfGBtr0chY0H/inJ35e5+ETujy2mws9MqEMLnejrtWd
+         kaUDnb5+S/sQoY6iMd+Z19ZKO285yu0FNBSElUA90LE0CYlotrE8fRrFeGHPeSf3ipBn
+         I80E4Jl6qO6d9nLRofy7M/uzGsTGPLyQQnwmYh+ZW5VrVI4PDsP3kmdxFALeKp9dE/Fp
+         zGg7+Yli2xkGpAU9E1UbR9vlkJoIRteaiMGr6h7qklQcKfWqFgzml+3+PPUqGlyi4mkA
+         V4Mg==
+X-Gm-Message-State: APjAAAWoqe0IE7HRdlEThT+6EP6o5BJhNZfXV3SgmTKpFde/ONS/9IVd
+        pm+b6W55SCKiF9ZDoW+ALsPerOltfcNYWBatVKTlc9a6TXHO/eLcF3ckx3eanXvsREZPCps+TG8
+        HclazkKCOe8e6
+X-Received: by 2002:a1c:f009:: with SMTP id a9mr2443036wmb.73.1582275908623;
+        Fri, 21 Feb 2020 01:05:08 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwfgP9ZIAo+RGBG+fE7sgi6aJ5iK8F9+4avWIKxKhOLP/QG9udVgcEi8h8iXaivSGwfE6BSfQ==
+X-Received: by 2002:a1c:f009:: with SMTP id a9mr2442970wmb.73.1582275908010;
+        Fri, 21 Feb 2020 01:05:08 -0800 (PST)
+Received: from [192.168.178.40] ([151.20.135.128])
+        by smtp.gmail.com with ESMTPSA id l15sm3115011wrv.39.2020.02.21.01.05.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Feb 2020 01:05:07 -0800 (PST)
+Subject: Re: [PATCH] KVM: Suppress warning in __kvm_gfn_to_hva_cache_init
+To:     Oliver Upton <oupton@google.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm list <kvm@vger.kernel.org>
+References: <20200218184756.242904-1-oupton@google.com>
+ <20200218190729.GD28156@linux.intel.com>
+ <f08f7a3b-bd23-e8cd-2fd4-e0f546ad02e5@redhat.com>
+ <CAOQ_Qshafx78-O4_HnK9MbOdmoBdZx6_sdAdLmugmXjURTXs6g@mail.gmail.com>
+ <096c6b94-c629-7082-cd70-ab59fedffa7c@redhat.com>
+ <CAOQ_QshfVkvSG==rCbROaZ0E6V0s5gTQtcfnDSV-Ar5-jv-Cbg@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b1ad977a-02ba-2471-0065-6b1762964897@redhat.com>
+Date:   Fri, 21 Feb 2020 10:05:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <BY5PR02MB637195ECE0879F5F7CB72CE3BB120@BY5PR02MB6371.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAOQ_QshfVkvSG==rCbROaZ0E6V0s5gTQtcfnDSV-Ar5-jv-Cbg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 21/02/20 09:34, Oliver Upton wrote:
+> Absolutely. I thought it sensible to send out the fix in case of other
+> toolchains out in the wild. But if nobody else other than us has
+> complained it's quite obvious where the problem lies.
 
-On 2020/2/21 =E4=B8=8B=E5=8D=884:33, Harpreet Singh Anand wrote:
-> +       ret =3D device_register(&vdpasim->dev);
-> +       if (ret)
-> +               goto err_init;
-> +
-> +       vdpasim->vdpa =3D vdpa_alloc_device(dev, dev, &vdpasim_net_conf=
-ig_ops);
-> +       if (ret)
-> +               goto err_vdpa;
->
-> [HSA] Incorrect checking of the return value of vdpa_alloc_device.
+Here is another plausible (and untested) way to fix it, in case it's
+the alias analysis that is throwing off the compiler (plus possibly
+__always_inline).
 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 027259af883e..63c7dcd7c57f 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2218,6 +2218,8 @@ static int __kvm_gfn_to_hva_cache_init(struct kvm_memslots *slots,
+ 	gfn_t end_gfn = (gpa + len - 1) >> PAGE_SHIFT;
+ 	gfn_t nr_pages_needed = end_gfn - start_gfn + 1;
+ 	gfn_t nr_pages_avail;
++	unsigned long hva;
++	struct kvm_memslot *memslot;
+ 
+ 	/* Update ghc->generation before performing any error checks. */
+ 	ghc->generation = slots->generation;
+@@ -2231,19 +2233,22 @@ static int __kvm_gfn_to_hva_cache_init(struct kvm_memslots *slots,
+ 	 * If the requested region crosses two memslots, we still
+ 	 * verify that the entire region is valid here.
+ 	 */
+-	for ( ; start_gfn <= end_gfn; start_gfn += nr_pages_avail) {
+-		ghc->memslot = __gfn_to_memslot(slots, start_gfn);
+-		ghc->hva = gfn_to_hva_many(ghc->memslot, start_gfn,
+-					   &nr_pages_avail);
+-		if (kvm_is_error_hva(ghc->hva))
++	do {
++		memslot = __gfn_to_memslot(slots, start_gfn);
++		hva = gfn_to_hva_many(memslot, start_gfn, &nr_pages_avail);
++		if (kvm_is_error_hva(hva))
+ 			return -EFAULT;
+-	}
++		start_gfn += nr_pages_avail;
++	} while (start_gfn <= end_gfn);
+ 
+ 	/* Use the slow path for cross page reads and writes. */
+-	if (nr_pages_needed == 1)
+-		ghc->hva += offset;
+-	else
++	if (nr_pages_needed == 1) {
++		ghc->hva = hva + offset;
++		ghc->memslot = memslot;
++	} else {
++		ghc->hva = 0;
+ 		ghc->memslot = NULL;
++	}
+ 
+ 	ghc->gpa = gpa;
+ 	ghc->len = len;
 
-Yes, fixed.
-
-Thanks
+Paolo
 
