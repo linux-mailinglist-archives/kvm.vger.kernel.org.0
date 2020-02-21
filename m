@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B33B166C58
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 02:31:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 818B9166C64
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 02:36:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729537AbgBUBbf convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 20 Feb 2020 20:31:35 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2587 "EHLO huawei.com"
+        id S1729539AbgBUBgf convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 20 Feb 2020 20:36:35 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2588 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729502AbgBUBbe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Feb 2020 20:31:34 -0500
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.54])
-        by Forcepoint Email with ESMTP id 21462BDAFE3C774C6D18;
-        Fri, 21 Feb 2020 09:31:31 +0800 (CST)
-Received: from dggeme754-chm.china.huawei.com (10.3.19.100) by
- DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 21 Feb 2020 09:31:29 +0800
+        id S1728992AbgBUBge (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Feb 2020 20:36:34 -0500
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id E59ABF4BD2F240CF04C;
+        Fri, 21 Feb 2020 09:36:31 +0800 (CST)
+Received: from dggeme701-chm.china.huawei.com (10.1.199.97) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 21 Feb 2020 09:36:31 +0800
 Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
- dggeme754-chm.china.huawei.com (10.3.19.100) with Microsoft SMTP Server
+ dggeme701-chm.china.huawei.com (10.1.199.97) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Fri, 21 Feb 2020 09:31:28 +0800
+ 15.1.1713.5; Fri, 21 Feb 2020 09:36:31 +0800
 Received: from dggeme753-chm.china.huawei.com ([10.7.64.70]) by
  dggeme753-chm.china.huawei.com ([10.7.64.70]) with mapi id 15.01.1713.004;
- Fri, 21 Feb 2020 09:31:28 +0800
+ Fri, 21 Feb 2020 09:36:31 +0800
 From:   linmiaohe <linmiaohe@huawei.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
 CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "x86@kernel.org" <x86@kernel.org>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
         "wanpengli@tencent.com" <wanpengli@tencent.com>,
         "jmattson@google.com" <jmattson@google.com>,
         "joro@8bytes.org" <joro@8bytes.org>,
@@ -42,9 +42,9 @@ Subject: Re: [PATCH] KVM: apic: avoid calculating pending eoi from an
  uninitialized val
 Thread-Topic: [PATCH] KVM: apic: avoid calculating pending eoi from an
  uninitialized val
-Thread-Index: AdXoVXZpfpesId6ET2iiNj75bnuaGg==
-Date:   Fri, 21 Feb 2020 01:31:28 +0000
-Message-ID: <91e9222f333648db84cb06c77cbdfb2f@huawei.com>
+Thread-Index: AdXoVrOxSS/7U36ORtuu/no+ULXV5A==
+Date:   Fri, 21 Feb 2020 01:36:31 +0000
+Message-ID: <776348e8d2b844068bbe23ce67d23f7a@huawei.com>
 Accept-Language: en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
@@ -59,23 +59,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
->linmiaohe <linmiaohe@huawei.com> writes:
->> When get user eoi value failed, var val would be uninitialized and 
->> result in calculating pending eoi from an uninitialized val. 
->> Initialize var val to 0 to fix this case.
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+>On Thu, Feb 20, 2020 at 05:33:17PM +0100, Vitaly Kuznetsov wrote:
+>> linmiaohe <linmiaohe@huawei.com> writes:
+>> 
 >
->Let me try to suggest an alternative wording,
+>Rather than initialize @val, I'd prefer to explicitly handle the error, similar to pv_eoi_clr_pending() and pv_eoi_set_pending(), e.g.
 >
->"When pv_eoi_get_user() fails, 'val' may remain uninitialized and the return value of pv_eoi_get_pending() becomes random. Fix the issue by initializing the variable."
-
-Sounds much better. You're really good at it. :) Thanks.
-
->>
->>
->Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>	u8 val;
 >
->But why compilers don't complain?
+>	if (pv_eoi_get_user(vcpu, &val) < 0) {
+>		printk(KERN_WARNING "Can't read EOI MSR value: 0x%llx\n",
+>			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
+>		return false;
+>	}
+>	return val & 0x1;
 
-Maybe it's because @val only remain uninitialized when pv_eoi_get_user() failed?
+Looks good. Handle the error explicitly can help remind us @val is unusable.
+Will do. Thanks.
 
+>> >  	if (pv_eoi_get_user(vcpu, &val) < 0)
+>> >  		printk(KERN_WARNING "Can't read EOI MSR value: 0x%llx\n",
+>> >  			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
+>> 
+>> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> 
+>> But why compilers don't complain?
+>
+>Clang might?
+>
