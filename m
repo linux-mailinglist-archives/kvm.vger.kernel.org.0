@@ -2,108 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CFF041681F4
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 16:39:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60D5A168201
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 16:41:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728550AbgBUPjq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 10:39:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37643 "EHLO
+        id S1728441AbgBUPlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 10:41:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36827 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728198AbgBUPjp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 10:39:45 -0500
+        with ESMTP id S1728177AbgBUPlN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 10:41:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582299585;
+        s=mimecast20190719; t=1582299671;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KRcebtTHRi/kIYrBfNEoKmga6fbLI0TK02ClKxB6zpM=;
-        b=gqrAVNxhWYQXiKcWZGg7M7kSsFJj6LrAAGMEVah5jwkdeR8rusiVwSMcIn8UOJVCY0i5sd
-        MNhEyucY3p8qBC4psgCzmAoLYGs/Kdb5dqJ3ruIFHqJwYyOpQ11AyXH24cpza9lJy+XQcF
-        5z5Y0tq+1+Ld/4UHMQ05HNY/09NcFnU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-r1d-IdsxPaOl0d37jt8psQ-1; Fri, 21 Feb 2020 10:39:38 -0500
-X-MC-Unique: r1d-IdsxPaOl0d37jt8psQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCFCD1005512;
-        Fri, 21 Feb 2020 15:39:36 +0000 (UTC)
-Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3EF7B27183;
-        Fri, 21 Feb 2020 15:39:36 +0000 (UTC)
-Date:   Fri, 21 Feb 2020 08:39:34 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, joro@8bytes.org, jon.grimm@amd.com
-Subject: Re: [PATCH] kvm: x86: svm: Fix NULL pointer dereference when AVIC
- not enabled
-Message-ID: <20200221083934.3ed38014@x1.home>
-In-Reply-To: <1582296737-13086-1-git-send-email-suravee.suthikulpanit@amd.com>
-References: <1582296737-13086-1-git-send-email-suravee.suthikulpanit@amd.com>
-Organization: Red Hat
+        bh=PkrHTmMnLDCI5Vhqht83ivkWslTjiNlZ/bmjt1mLoEs=;
+        b=arHS8ZQ8Bsdxtg2duoIy76xqZdVYOoimmtQpvmuq1yz6c3Kol37EAp7cEdc51eEaDKWYPw
+        HZdtCBd8tTVvkX9Zea89gu2i9hwNY7S8MrJ+3cgQI0vMKzK/u78ZhBwR7YOSzBFAj73LHn
+        oVMyoo2cDI0iJcjxVERfDH6SfBvtprg=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-yKqwa6_DPpmY6Es37_QlIA-1; Fri, 21 Feb 2020 10:41:09 -0500
+X-MC-Unique: yKqwa6_DPpmY6Es37_QlIA-1
+Received: by mail-qt1-f197.google.com with SMTP id k27so2018617qtu.12
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 07:41:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PkrHTmMnLDCI5Vhqht83ivkWslTjiNlZ/bmjt1mLoEs=;
+        b=mMZOvzuLaPDbt5ZXiF+jQ13E/QLylgHMHHWdY10M6R+Zxb2SmAUMrQNXeUNjWbjLC1
+         XjBgB1qwBbnL5I8d4PmiWQ7CwykGNbzN9x1lEPzq+SZ3Cq++l9am/m4jHGhrjWxThYDd
+         y8jnYn4n9pm6wR5t1czv9i352KwuUKfIRrZaYkepkfzJWJGn+xLKfGOYk0p93jECHWKd
+         1XUM2AadGK//XvcxyWvpqXipP0b484FB9ot3TlQbsnBHSG7Fq+edlm2CdM6rsHxWnA/u
+         H6RAvF0B0fuphNHJPsNHf3uLgOpNzRd2Vqj9aLVcXxhanUqyb2dETXERwlMb7OsN0sX6
+         8/5Q==
+X-Gm-Message-State: APjAAAW+HcefNLK9Gwa4vqOCWaYsoYD6cp26mU9TwnSHf2HbjKbJO+dd
+        nVdyATQmxFLFkiVJwVZwK698KoGsX8btBVFFd3C+1F33mWZYacgu9sHXkMuMRlji/K2b3AU76il
+        /0zwt8s0cRipU
+X-Received: by 2002:a37:9b82:: with SMTP id d124mr14344049qke.74.1582299669230;
+        Fri, 21 Feb 2020 07:41:09 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwTnu54BnM/00MYCZYwvyC1xkx3Y08+1oCEHY9h9YebXryFCLr0kSOUoiZz9U/b4zV2f9LpSg==
+X-Received: by 2002:a37:9b82:: with SMTP id d124mr14344020qke.74.1582299668978;
+        Fri, 21 Feb 2020 07:41:08 -0800 (PST)
+Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca. [72.137.123.47])
+        by smtp.gmail.com with ESMTPSA id b84sm1661060qkc.73.2020.02.21.07.41.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2020 07:41:08 -0800 (PST)
+Date:   Fri, 21 Feb 2020 10:41:06 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
+Subject: Re: [PATCH v2] KVM: x86: enable dirty log gradually in small chunks
+Message-ID: <20200221154106.GB37727@xz-x1>
+References: <20200220042828.27464-1-jianjay.zhou@huawei.com>
+ <20200220192809.GA15253@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BB06606@DGGEMM528-MBX.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <B2D15215269B544CADD246097EACE7474BB06606@DGGEMM528-MBX.china.huawei.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 21 Feb 2020 08:52:17 -0600
-Suravee Suthikulpanit <suravee.suthikulpanit@amd.com> wrote:
+On Fri, Feb 21, 2020 at 09:53:51AM +0000, Zhoujian (jay) wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Peter Xu [mailto:peterx@redhat.com]
+> > Sent: Friday, February 21, 2020 3:28 AM
+> > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > Cc: kvm@vger.kernel.org; pbonzini@redhat.com; wangxin (U)
+> > <wangxinxin.wang@huawei.com>; Huangweidong (C)
+> > <weidong.huang@huawei.com>; sean.j.christopherson@intel.com; Liujinsong
+> > (Paul) <liu.jinsong@huawei.com>
+> > Subject: Re: [PATCH v2] KVM: x86: enable dirty log gradually in small chunks
+> > 
+> > On Thu, Feb 20, 2020 at 12:28:28PM +0800, Jay Zhou wrote:
+> > > @@ -5865,8 +5865,12 @@ void
+> > kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+> > >  	bool flush;
+> > >
+> > >  	spin_lock(&kvm->mmu_lock);
+> > > -	flush = slot_handle_all_level(kvm, memslot, slot_rmap_write_protect,
+> > > -				      false);
+> > > +	if (kvm->manual_dirty_log_protect & KVM_DIRTY_LOG_INITIALLY_SET)
+> > > +		flush = slot_handle_large_level(kvm, memslot,
+> > > +						slot_rmap_write_protect, false);
+> > > +	else
+> > > +		flush = slot_handle_all_level(kvm, memslot,
+> > > +						slot_rmap_write_protect, false);
+> > 
+> > Another extra comment:
+> > 
+> > I think we should still keep the old behavior for KVM_MEM_READONLY (in
+> > kvm_mmu_slot_apply_flags())) for this...  
+> 
+> I also realized this issue after posting this patch, and I agree.
+> 
+> > Say, instead of doing this, maybe we
+> > want kvm_mmu_slot_remove_write_access() to take a new parameter to
+> > decide to which level we do the wr-protect.
+> 
+> How about using the "flags" field to distinguish:
+> 
+> 		if ((kvm->manual_dirty_log_protect & KVM_DIRTY_LOG_INITIALLY_SET)
+>                 && (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES))
+>                 flush = slot_handle_large_level(kvm, memslot,
+>                                         slot_rmap_write_protect, false);
+>         else
+>                 flush = slot_handle_all_level(kvm, memslot,
+>                                         slot_rmap_write_protect, false);
 
-> Launching VM w/ AVIC disabled together with pass-through device
-> results in NULL pointer dereference bug with the following call trace.
-> 
->     RIP: 0010:svm_refresh_apicv_exec_ctrl+0x17e/0x1a0 [kvm_amd]
-> 
->     Call Trace:
->      kvm_vcpu_update_apicv+0x44/0x60 [kvm]
->      kvm_arch_vcpu_ioctl_run+0x3f4/0x1c80 [kvm]
->      kvm_vcpu_ioctl+0x3d8/0x650 [kvm]
->      do_vfs_ioctl+0xaa/0x660
->      ? tomoyo_file_ioctl+0x19/0x20
->      ksys_ioctl+0x67/0x90
->      __x64_sys_ioctl+0x1a/0x20
->      do_syscall_64+0x57/0x190
->      entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> 
-> Investigation shows that this is due to the uninitialized usage of
-> struct vapu_svm.ir_list in the svm_set_pi_irte_mode(), which is
-> called from svm_refresh_apicv_exec_ctrl().
-> 
-> The ir_list is initialized only if AVIC is enabled. So, fixes by
-> adding a check if AVIC is enabled in the svm_refresh_apicv_exec_ctrl().
-> 
-> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=206579
-> Fixes: 8937d762396d ("kvm: x86: svm: Add support to (de)activate posted interrupts.")
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  arch/x86/kvm/svm.c | 3 +++
->  1 file changed, 3 insertions(+)
+This seems to be OK too.  But just to show what I meant (which I still
+think could be a bit clearer; assuming kvm_manual_dirty_log_init_set()
+is the helper you'll introduce):
 
-Works for me, thanks Suravee!
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 40a0c0fd95ca..a90630cde92d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1312,7 +1312,8 @@ void kvm_mmu_set_mask_ptes(u64 user_mask, u64 accessed_mask,
 
-Tested-by: Alex Williamson <alex.williamson@redhat.com>
+ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu);
+ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+-                                     struct kvm_memory_slot *memslot);
++                                     struct kvm_memory_slot *memslot,
++                                     int start_level);
+ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+                                   const struct kvm_memory_slot *memslot);
+ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 87e9ba27ada1..f538b7977fa2 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5860,13 +5860,14 @@ static bool slot_rmap_write_protect(struct kvm *kvm,
+ }
 
-> 
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 19035fb..1858455 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -5222,6 +5222,9 @@ static void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
->  	struct vmcb *vmcb = svm->vmcb;
->  	bool activated = kvm_vcpu_apicv_active(vcpu);
->  
-> +	if (!avic)
-> +		return;
-> +
->  	if (activated) {
->  		/**
->  		 * During AVIC temporary deactivation, guest could update
+ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+-                                     struct kvm_memory_slot *memslot)
++                                     struct kvm_memory_slot *memslot,
++                                     int start_level)
+ {
+        bool flush;
+
+        spin_lock(&kvm->mmu_lock);
+-       flush = slot_handle_all_level(kvm, memslot, slot_rmap_write_protect,
+-                                     false);
++       flush = slot_handle_level(kvm, memslot, slot_rmap_write_protect,
++                                 start_level, PT_MAX_HUGEPAGE_LEVEL, false);
+        spin_unlock(&kvm->mmu_lock);
+
+        /*
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index fb5d64ebc35d..2ed3204dfd9f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9956,7 +9956,7 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+ {
+        /* Still write protect RO slot */
+        if (new->flags & KVM_MEM_READONLY) {
+-               kvm_mmu_slot_remove_write_access(kvm, new);
++               kvm_mmu_slot_remove_write_access(kvm, new, PT_PAGE_TABLE_LEVEL);
+                return;
+        }
+
+@@ -9993,8 +9993,20 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+        if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+                if (kvm_x86_ops->slot_enable_log_dirty)
+                        kvm_x86_ops->slot_enable_log_dirty(kvm, new);
+-               else
+-                       kvm_mmu_slot_remove_write_access(kvm, new);
++               else {
++                       int level = kvm_manual_dirty_log_init_set(kvm) ?
++                           PT_DIRECTORY_LEVEL : PT_PAGE_TABLE_LEVEL;
++
++                       /*
++                        * If we're with intial-all-set, we don't need
++                        * to write protect any small page because
++                        * they're reported as dirty already.  However
++                        * we still need to write-protect huge pages
++                        * so that the page split can happen lazily on
++                        * the first write to the huge page.
++                        */
++                       kvm_mmu_slot_remove_write_access(kvm, new, level);
++               }
+        } else {
+                if (kvm_x86_ops->slot_disable_log_dirty)
+                        kvm_x86_ops->slot_disable_log_dirty(kvm, new);
+
+Thanks,
+
+-- 
+Peter Xu
 
