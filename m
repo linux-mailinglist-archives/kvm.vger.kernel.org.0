@@ -2,46 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B8F8167C6D
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 12:45:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41A95167C80
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 12:48:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727137AbgBULpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 06:45:44 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52708 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727053AbgBULpn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 06:45:43 -0500
+        id S1728179AbgBULry (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 06:47:54 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53538 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728174AbgBULrx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 06:47:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582285541;
+        s=mimecast20190719; t=1582285671;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=HWWU1hUeQKAcUCpzk9GbB0RjRyxx6Ds/qfhc1QbQ+x0=;
-        b=F14Xr2sD2TMoZEf1m46TvSdnt5hTbTIt6jDqRbsy+NqWSugsKbL5QYUYQmwFFwKEHIVJj+
-        RGb+yd7Gg/u6BPaj9cthd3+lvhUJcrHJXD/udgWlXz/EGxNsSMVrTvkUNsy5Pb8FI2nepv
-        r/ajLf+aNEm683r9KjIvuHsgCx8z1yc=
+        bh=jaY0nUpCDoG/o/MW+hjpRpbWxcWAHtfTRa7XkDuxyKY=;
+        b=GZ8MeIDWJNn+S0UgJgxtp89KJlvSUw57qAt1BCDiBr1MCLne03GysZc0EFKtyOCxuUiwUS
+        vlBc0isiTkN8WljadXbQubzjOzRFkA7Bsv5x8wGmkNN0u6WYYreGV+Zy4EmAUwKsPP+xOn
+        ZCALHSsSmXFcvRTVS+tGDvkz4ElaHy8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-eetJg3DzMquJuoQxuzyReg-1; Fri, 21 Feb 2020 06:45:37 -0500
-X-MC-Unique: eetJg3DzMquJuoQxuzyReg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-12-V-MyfmohPdKvdlWuNZldqw-1; Fri, 21 Feb 2020 06:47:47 -0500
+X-MC-Unique: V-MyfmohPdKvdlWuNZldqw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36085100550E;
-        Fri, 21 Feb 2020 11:45:36 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2678E8018AC;
+        Fri, 21 Feb 2020 11:47:46 +0000 (UTC)
 Received: from [10.36.117.197] (ovpn-117-197.ams2.redhat.com [10.36.117.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EA2471001B34;
-        Fri, 21 Feb 2020 11:45:33 +0000 (UTC)
-Subject: Re: [PATCH v3.1 09/37] KVM: s390: protvirt: Add initial vm and cpu
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D2CF36E3EE;
+        Fri, 21 Feb 2020 11:47:43 +0000 (UTC)
+Subject: Re: [PATCH v3 09/37] KVM: s390: protvirt: Add initial vm and cpu
  lifecycle handling
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Ulrich.Weigand@de.ibm.com, cohuck@redhat.com,
-        frankja@linux.ibm.com, frankja@linux.vnet.ibm.com,
-        gor@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
-References: <b9aa96ce-9701-cefb-68d8-76d1cba4d5c7@de.ibm.com>
- <20200221080742.10233-1-borntraeger@de.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200220104020.5343-1-borntraeger@de.ibm.com>
+ <20200220104020.5343-10-borntraeger@de.ibm.com>
+ <1f0c2c5a-5964-dc34-73af-7b1776391276@redhat.com>
+ <b9aa96ce-9701-cefb-68d8-76d1cba4d5c7@de.ibm.com>
+ <abcad458-ff2d-2ec0-6a3c-f4491336d743@redhat.com>
+ <947e04fa-d5d3-f352-3b58-766dd463bfd9@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -87,114 +96,53 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <08f6ad60-1046-f281-ce81-539f2c967f30@redhat.com>
-Date:   Fri, 21 Feb 2020 12:45:33 +0100
+Message-ID: <712d6bb8-81d8-31d1-662b-7de270d204b5@redhat.com>
+Date:   Fri, 21 Feb 2020 12:47:42 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200221080742.10233-1-borntraeger@de.ibm.com>
+In-Reply-To: <947e04fa-d5d3-f352-3b58-766dd463bfd9@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+See my other mail, maybe we can merge alloc+create and handle most of
+that conditional freeing in there.
 
-> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
-> +{
-> +	int r =3D 0;
-> +	u16 dummy;
-> +	void __user *argp =3D (void __user *)cmd->data;
-> +
-> +	switch (cmd->cmd) {
-> +	case KVM_PV_ENABLE: {
-> +		r =3D -EINVAL;
-> +		if (kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r =3D kvm_s390_pv_alloc_vm(kvm);
-> +		if (r)
-> +			break;
-> +
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 738f7fefcaec..cad04e26dccf 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2173,6 +2173,11 @@ static void kvm_s390_cpus_from_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
+>         struct kvm_vcpu *vcpu;
+>         int i;
+>  
+> +       /*
+> +        * we ignore failures and try to destroy as many CPUs as possible.
+> +        * At the same time we must not free the assigned ressources when
+> +        * this fails, as the ultravisor has still access to that memory.
+> +        */
 
-To make this nicer, can we simply merge alloc+create into init
+Makes sense.
 
-	/* FMT 4 SIE needs esca */
-	r =3D sca_switch_to_extended(kvm);
-	if (r)
-		break;
-=09
-	r =3D kvm_s390_pv_init_vm();
-	if (r)
-		break;
+>         kvm_for_each_vcpu(i, vcpu, kvm) {
+>                 mutex_lock(&vcpu->mutex);
+>                 kvm_s390_pv_destroy_cpu(vcpu, rc, rrc);
+> @@ -2221,6 +2226,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>                         kvm_s390_pv_dealloc_vm(kvm);
+>                         break;
+>                 }
+> +               /* we never switch back to bsca from esca */
+>                 r = kvm_s390_pv_create_vm(kvm, &cmd->rc, &cmd->rrc);
 
-	r =3D kvm_s390_cpus_to_pv(kvm, &cmd->rc, &cmd->rrc);
-	if (r)
-		kvm_s390_pv_deinit_vm();
-	break;
+Helpful.
 
-I remember the split dates back to an earlier UAPI interface.
-
-Similarly from deinit.
-
-The you can just make deinit never fail and handle that freeing
-special-case in there and add a comment.
-
-[...]
-
-> +int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, =
-u16 *rc,
-> +			      u16 *rrc)
-> +{
-> +	struct uv_cb_ssc uvcb =3D {
-> +		.header.cmd =3D UVC_CMD_SET_SEC_CONF_PARAMS,
-> +		.header.len =3D sizeof(uvcb),
-> +		.sec_header_origin =3D (u64)hdr,
-> +		.sec_header_len =3D length,
-> +		.guest_handle =3D kvm_s390_pv_get_handle(kvm),
-> +	};
-> +	int cc =3D uv_call(0, (u64)&uvcb);
-
-empty line.
-
-> +	*rc =3D uvcb.header.rc;
-
-[...]
-
-> +int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned l=
-ong size,
-> +		       unsigned long tweak, u16 *rc, u16 *rrc)
-> +{
-> +	u64 offset =3D 0;
-> +	int ret =3D 0;
-> +
-> +	if (addr & ~PAGE_MASK || !size || size & ~PAGE_MASK)
-> +		return -EINVAL;
-> +
-> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT VM UNPACK: start addr %lx size %lx",
-> +		     addr, size);
-> +
-> +	while (offset < size) {
-> +		ret =3D unpack_one(kvm, addr, tweak, offset, rc, rrc);
-> +		if (ret =3D=3D -EAGAIN) {
-> +			cond_resched();
-> +			if (fatal_signal_pending(current))
-> +				break;
-> +			continue;
-> +		}
-> +		if (ret)
-> +			break;
-> +		addr +=3D PAGE_SIZE;
-> +		offset +=3D PAGE_SIZE;
-> +	}
-
-Much better :)
-
-
---=20
+-- 
 Thanks,
 
 David / dhildenb
