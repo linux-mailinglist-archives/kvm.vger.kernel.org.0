@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 93F88167AEB
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:38:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE7AE167AEE
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:39:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727470AbgBUKix (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 05:38:53 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33616 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726100AbgBUKix (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 05:38:53 -0500
+        id S1727188AbgBUKjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 05:39:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26181 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727077AbgBUKjh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 05:39:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582281531;
+        s=mimecast20190719; t=1582281575;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=f4Zbz7X/bDxLEUNN/ovstfT7QIE38ThlQRnz/7KX+Nw=;
-        b=M313Z3E0odp8+Tae2xzBtEnoZYJ58xqWriRLAC1lIze2e0FmG6dRZJgAnL3/TtPhOMTB0u
-        SDxM9BXnuAHolygGtX1B80dYvOWsQ8CgUYtp7BcudnyLP05xhqJsCRz3NjdKZSeDseh0Vv
-        AKykyps8RcFEMmv6vNaRypZCJ6AjTX0=
+        bh=ifjgrzXM9s1YtP8pOHpA/lIWIL6aWafxw7WfYyXkq1Y=;
+        b=KJWi0E6DqsebQod7uia5a2qD9XLyX6CiWfzKxQEwVkmf/hw/ER92zFCRcoVC0XOEdRxvPK
+        M9edvzRo03ekCk5lzNpaql6vg5krchABNB5C/NKM66TfIJ8mok9/1Zk3UBY0odZenyVyoB
+        R3hjk9OULtvPWJTG63dTtgpMoP55PY8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-2yWFbr3KNLqn72_sAaKf-A-1; Fri, 21 Feb 2020 05:38:46 -0500
-X-MC-Unique: 2yWFbr3KNLqn72_sAaKf-A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-76-UpD5kGQWNki6EKX3Ig_QIQ-1; Fri, 21 Feb 2020 05:39:32 -0500
+X-MC-Unique: UpD5kGQWNki6EKX3Ig_QIQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 043FC800D48;
-        Fri, 21 Feb 2020 10:38:45 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5178107ACCA;
+        Fri, 21 Feb 2020 10:39:30 +0000 (UTC)
 Received: from [10.36.117.197] (ovpn-117-197.ams2.redhat.com [10.36.117.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 407EB60C99;
-        Fri, 21 Feb 2020 10:38:42 +0000 (UTC)
-Subject: Re: [PATCH v3 06/37] s390/mm: add (non)secure page access exceptions
- handlers
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D4E75C241;
+        Fri, 21 Feb 2020 10:39:28 +0000 (UTC)
+Subject: Re: [PATCH v3 25/37] KVM: s390: protvirt: Do only reset registers
+ that are accessible
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -44,10 +44,9 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200220104020.5343-1-borntraeger@de.ibm.com>
- <20200220104020.5343-7-borntraeger@de.ibm.com>
+ <20200220104020.5343-26-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -93,151 +92,63 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <1a3c04d2-8dac-741a-e3db-e23414919ef4@redhat.com>
-Date:   Fri, 21 Feb 2020 11:38:41 +0100
+Message-ID: <e7d8fd95-320f-0cfc-23da-ae777b959b8d@redhat.com>
+Date:   Fri, 21 Feb 2020 11:39:27 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200220104020.5343-7-borntraeger@de.ibm.com>
+In-Reply-To: <20200220104020.5343-26-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20.02.20 11:39, Christian Borntraeger wrote:
-> From: Vasily Gorbik <gor@linux.ibm.com>
+On 20.02.20 11:40, Christian Borntraeger wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> Add exceptions handlers performing transparent transition of non-secure
-> pages to secure (import) upon guest access and secure pages to
-> non-secure (export) upon hypervisor access.
+> For protected VMs the hypervisor can not access guest breaking event
+> address, program parameter, bpbc and todpr. Do not reset those fields
+> as the control block does not provide access to these fields.
 > 
-> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
-> [frankja@linux.ibm.com: adding checks for failures]
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> [imbrenda@linux.ibm.com:  adding a check for gmap fault]
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/s390/kernel/pgm_check.S |  4 +-
->  arch/s390/mm/fault.c         | 78 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 80 insertions(+), 2 deletions(-)
+>  arch/s390/kvm/kvm-s390.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/s390/kernel/pgm_check.S b/arch/s390/kernel/pgm_check.S
-> index eee3a482195a..2c27907a5ffc 100644
-> --- a/arch/s390/kernel/pgm_check.S
-> +++ b/arch/s390/kernel/pgm_check.S
-> @@ -78,8 +78,8 @@ PGM_CHECK(do_dat_exception)		/* 39 */
->  PGM_CHECK(do_dat_exception)		/* 3a */
->  PGM_CHECK(do_dat_exception)		/* 3b */
->  PGM_CHECK_DEFAULT			/* 3c */
-> -PGM_CHECK_DEFAULT			/* 3d */
-> -PGM_CHECK_DEFAULT			/* 3e */
-> +PGM_CHECK(do_secure_storage_access)	/* 3d */
-> +PGM_CHECK(do_non_secure_storage_access)	/* 3e */
->  PGM_CHECK_DEFAULT			/* 3f */
->  PGM_CHECK(monitor_event_exception)	/* 40 */
->  PGM_CHECK_DEFAULT			/* 41 */
-> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-> index 7b0bb475c166..7bd86ebc882f 100644
-> --- a/arch/s390/mm/fault.c
-> +++ b/arch/s390/mm/fault.c
-> @@ -38,6 +38,7 @@
->  #include <asm/irq.h>
->  #include <asm/mmu_context.h>
->  #include <asm/facility.h>
-> +#include <asm/uv.h>
->  #include "../kernel/entry.h"
->  
->  #define __FAIL_ADDR_MASK -4096L
-> @@ -816,3 +817,80 @@ static int __init pfault_irq_init(void)
->  early_initcall(pfault_irq_init);
->  
->  #endif /* CONFIG_PFAULT */
-> +
-> +#if IS_ENABLED(CONFIG_PGSTE)
-> +void do_secure_storage_access(struct pt_regs *regs)
-> +{
-> +	unsigned long addr = regs->int_parm_long & __FAIL_ADDR_MASK;
-> +	struct vm_area_struct *vma;
-> +	struct mm_struct *mm;
-> +	struct page *page;
-> +	int rc;
-> +
-> +	switch (get_fault_type(regs)) {
-> +	case USER_FAULT:
-> +		mm = current->mm;
-> +		down_read(&mm->mmap_sem);
-> +		vma = find_vma(mm, addr);
-> +		if (!vma) {
-> +			up_read(&mm->mmap_sem);
-> +			do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
-> +			break;
-> +		}
-> +		page = follow_page(vma, addr, FOLL_WRITE | FOLL_GET);
-> +		if (IS_ERR_OR_NULL(page)) {
-> +			up_read(&mm->mmap_sem);
-> +			break;
-> +		}
-> +		if (arch_make_page_accessible(page))
-> +			send_sig(SIGSEGV, current, 0);
-> +		put_page(page);
-> +		up_read(&mm->mmap_sem);
-> +		break;
-> +	case KERNEL_FAULT:
-> +		page = phys_to_page(addr);
-> +		if (unlikely(!try_get_page(page)))
-> +			break;
-> +		rc = arch_make_page_accessible(page);
-> +		put_page(page);
-> +		if (rc)
-> +			BUG();
-> +		break;
-> +	case VDSO_FAULT:
-> +		/* fallthrough */
-> +	case GMAP_FAULT:
-> +		/* fallthrough */
-> +	default:
-> +		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
-> +		WARN_ON_ONCE(1);
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 436778d3dc14..db28a717a622 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3478,14 +3478,16 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+>  	kvm_s390_set_prefix(vcpu, 0);
+>  	kvm_s390_set_cpu_timer(vcpu, 0);
+>  	vcpu->arch.sie_block->ckc = 0;
+> -	vcpu->arch.sie_block->todpr = 0;
+>  	memset(vcpu->arch.sie_block->gcr, 0, sizeof(vcpu->arch.sie_block->gcr));
+>  	vcpu->arch.sie_block->gcr[0] = CR0_INITIAL_MASK;
+>  	vcpu->arch.sie_block->gcr[14] = CR14_INITIAL_MASK;
+>  	vcpu->run->s.regs.fpc = 0;
+> -	vcpu->arch.sie_block->gbea = 1;
+> -	vcpu->arch.sie_block->pp = 0;
+> -	vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+> +	if (!kvm_s390_pv_cpu_is_protected(vcpu)) {
+> +		vcpu->arch.sie_block->gbea = 1;
+> +		vcpu->arch.sie_block->pp = 0;
+> +		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+> +		vcpu->arch.sie_block->todpr = 0;
 > +	}
-> +}
-> +NOKPROBE_SYMBOL(do_secure_storage_access);
-> +
-> +void do_non_secure_storage_access(struct pt_regs *regs)
-> +{
-> +	unsigned long gaddr = regs->int_parm_long & __FAIL_ADDR_MASK;
-> +	struct gmap *gmap = (struct gmap *)S390_lowcore.gmap;
-> +
-> +	if (get_fault_type(regs) != GMAP_FAULT) {
-> +		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
-> +		WARN_ON_ONCE(1);
-> +		return;
-> +	}
-> +
-> +	if (gmap_convert_to_secure(gmap, gaddr) == -EINVAL)
-> +		send_sig(SIGSEGV, current, 0);
-> +}
-> +NOKPROBE_SYMBOL(do_non_secure_storage_access);
-> +
-> +#else
-> +void do_secure_storage_access(struct pt_regs *regs)
-> +{
-> +	default_trap_handler(regs);
-> +}
-> +
-> +void do_non_secure_storage_access(struct pt_regs *regs)
-> +{
-> +	default_trap_handler(regs);
-> +}
-> +#endif
+>  }
+>  
+>  static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
 > 
 
-Acked-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
