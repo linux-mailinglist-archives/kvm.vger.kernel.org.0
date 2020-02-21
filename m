@@ -2,52 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 664A9167C15
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 12:29:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B8F8167C6D
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 12:45:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728062AbgBUL3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 06:29:02 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29834 "EHLO
+        id S1727137AbgBULpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 06:45:44 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52708 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727978AbgBUL3B (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 06:29:01 -0500
+        by vger.kernel.org with ESMTP id S1727053AbgBULpn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 06:45:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582284540;
+        s=mimecast20190719; t=1582285541;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=HEZADrNzzmi9KSzlAIXgYmhYp2jBtjj3Xd60XQSr1Jo=;
-        b=TbY/NFqCN1beSuYFY37tsUHDqptXfbK+6GBPGUg4FtIl0OcJOuTGZ7iOksT8UJCmANrB6q
-        pk7KhSZ+OXYeUr1bapFpGd1uoAyz1UIxkCAvO6ZhEVo9xQ0uf7BbYvEP0yWt1pKsjEuSDJ
-        QJz4f1GWy5zesDh8N18fro4xGbd9d8E=
+        bh=HWWU1hUeQKAcUCpzk9GbB0RjRyxx6Ds/qfhc1QbQ+x0=;
+        b=F14Xr2sD2TMoZEf1m46TvSdnt5hTbTIt6jDqRbsy+NqWSugsKbL5QYUYQmwFFwKEHIVJj+
+        RGb+yd7Gg/u6BPaj9cthd3+lvhUJcrHJXD/udgWlXz/EGxNsSMVrTvkUNsy5Pb8FI2nepv
+        r/ajLf+aNEm683r9KjIvuHsgCx8z1yc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-6uMI0gloMd-ywc-jHAbzKQ-1; Fri, 21 Feb 2020 06:28:56 -0500
-X-MC-Unique: 6uMI0gloMd-ywc-jHAbzKQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-414-eetJg3DzMquJuoQxuzyReg-1; Fri, 21 Feb 2020 06:45:37 -0500
+X-MC-Unique: eetJg3DzMquJuoQxuzyReg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E144107ACC5;
-        Fri, 21 Feb 2020 11:28:55 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36085100550E;
+        Fri, 21 Feb 2020 11:45:36 +0000 (UTC)
 Received: from [10.36.117.197] (ovpn-117-197.ams2.redhat.com [10.36.117.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 756715D9C5;
-        Fri, 21 Feb 2020 11:28:52 +0000 (UTC)
-Subject: Re: [PATCH v3 00/37] KVM: s390: Add support for protected VMs
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org
-References: <20200220104020.5343-1-borntraeger@de.ibm.com>
- <5556ee4a-09c6-117a-be99-4a5e136b78ea@redhat.com>
- <0665a90a-19f2-39a8-8a48-d180a622e9f2@de.ibm.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EA2471001B34;
+        Fri, 21 Feb 2020 11:45:33 +0000 (UTC)
+Subject: Re: [PATCH v3.1 09/37] KVM: s390: protvirt: Add initial vm and cpu
+ lifecycle handling
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Ulrich.Weigand@de.ibm.com, cohuck@redhat.com,
+        frankja@linux.ibm.com, frankja@linux.vnet.ibm.com,
+        gor@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
+References: <b9aa96ce-9701-cefb-68d8-76d1cba4d5c7@de.ibm.com>
+ <20200221080742.10233-1-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -93,50 +87,111 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <1c54d830-79de-e3ee-4c11-d87f95f90c57@redhat.com>
-Date:   Fri, 21 Feb 2020 12:28:51 +0100
+Message-ID: <08f6ad60-1046-f281-ce81-539f2c967f30@redhat.com>
+Date:   Fri, 21 Feb 2020 12:45:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <0665a90a-19f2-39a8-8a48-d180a622e9f2@de.ibm.com>
+In-Reply-To: <20200221080742.10233-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> In fact you can do that. The hardware checks the integrity on guest phy=
-sical
-> address. So it is perfectly possible to remap a kvm slot as long as the
-> e=C5=84crypted content matches what counter, guest content hash and gue=
-st address
-> tell. (It is like swapping, you move the encrypted content from one hos=
-t=20
-> page to another).=20
-> For new pages (not unpacked and never touched by the guest) the ultravi=
-sor
-> will bring a zeroed out page on first import.
->=20
-> What does not work is when the user space address changes for a guest
-> virtio indicator. But this was already broken before (we never did an
-> adapter unmap/remap).
->=20
 
-Thanks for the info!
+> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+> +{
+> +	int r =3D 0;
+> +	u16 dummy;
+> +	void __user *argp =3D (void __user *)cmd->data;
+> +
+> +	switch (cmd->cmd) {
+> +	case KVM_PV_ENABLE: {
+> +		r =3D -EINVAL;
+> +		if (kvm_s390_pv_is_protected(kvm))
+> +			break;
+> +
+> +		r =3D kvm_s390_pv_alloc_vm(kvm);
+> +		if (r)
+> +			break;
+> +
 
->>
->> Can we get a new version once the other reviewers are done, so at leas=
-t
->> I can have a final look?
->=20
-> Just the updated patches as reply (e.g. a 3.2 for patch 9) or the full =
-monty?
+To make this nicer, can we simply merge alloc+create into init
 
-Whatever you others prefer. I can see that Conny has some feedback.
-maybe wait for that and then (selectively) resend.
+	/* FMT 4 SIE needs esca */
+	r =3D sca_switch_to_extended(kvm);
+	if (r)
+		break;
+=09
+	r =3D kvm_s390_pv_init_vm();
+	if (r)
+		break;
+
+	r =3D kvm_s390_cpus_to_pv(kvm, &cmd->rc, &cmd->rrc);
+	if (r)
+		kvm_s390_pv_deinit_vm();
+	break;
+
+I remember the split dates back to an earlier UAPI interface.
+
+Similarly from deinit.
+
+The you can just make deinit never fail and handle that freeing
+special-case in there and add a comment.
+
+[...]
+
+> +int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length, =
+u16 *rc,
+> +			      u16 *rrc)
+> +{
+> +	struct uv_cb_ssc uvcb =3D {
+> +		.header.cmd =3D UVC_CMD_SET_SEC_CONF_PARAMS,
+> +		.header.len =3D sizeof(uvcb),
+> +		.sec_header_origin =3D (u64)hdr,
+> +		.sec_header_len =3D length,
+> +		.guest_handle =3D kvm_s390_pv_get_handle(kvm),
+> +	};
+> +	int cc =3D uv_call(0, (u64)&uvcb);
+
+empty line.
+
+> +	*rc =3D uvcb.header.rc;
+
+[...]
+
+> +int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned l=
+ong size,
+> +		       unsigned long tweak, u16 *rc, u16 *rrc)
+> +{
+> +	u64 offset =3D 0;
+> +	int ret =3D 0;
+> +
+> +	if (addr & ~PAGE_MASK || !size || size & ~PAGE_MASK)
+> +		return -EINVAL;
+> +
+> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT VM UNPACK: start addr %lx size %lx",
+> +		     addr, size);
+> +
+> +	while (offset < size) {
+> +		ret =3D unpack_one(kvm, addr, tweak, offset, rc, rrc);
+> +		if (ret =3D=3D -EAGAIN) {
+> +			cond_resched();
+> +			if (fatal_signal_pending(current))
+> +				break;
+> +			continue;
+> +		}
+> +		if (ret)
+> +			break;
+> +		addr +=3D PAGE_SIZE;
+> +		offset +=3D PAGE_SIZE;
+> +	}
+
+Much better :)
 
 
 --=20
