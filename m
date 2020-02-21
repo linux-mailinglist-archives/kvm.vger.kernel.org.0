@@ -2,215 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BF06D166B0C
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 00:40:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB452166B8C
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 01:23:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729410AbgBTXkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 18:40:17 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:37728 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727135AbgBTXkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Feb 2020 18:40:16 -0500
-Received: by mail-pj1-f67.google.com with SMTP id m13so186610pjb.2
-        for <kvm@vger.kernel.org>; Thu, 20 Feb 2020 15:40:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=SP7bBr9H6yAJpQpgXdluiHzYEyyCb5Tm/zhjuI1xuyM=;
-        b=qT+BJTLm4n429j8H4zc/Q9rqsj+PoSmGOXjTZ/C+JOEVFfylStDjguWHyk9lmez1+0
-         RGsTz+vl/rFsm92F0kZCsaCqtNMUDPZPFtmDmEjZmUQq0/akx5cBR3Cd3mFKFdUW0ziJ
-         fbL21kk7tnVt79VUDfJDwX0vgRkfLjNZR+CVlPerfU8rKfJidoFOrHcBMAoaKW4lNuwG
-         UDh8O4uYTz1bbOKlZidSWPpikbXrt5euuuuxGCkOvpKForRVWjfHU66JIvAHmjyS1Szv
-         UbdNlGgOK6jJsu0d2dDqgZjKZ9HDODQlAMDG/QjYbpJBZMUCeT+/1ZCjRCvMpgZLsnw+
-         yuhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=SP7bBr9H6yAJpQpgXdluiHzYEyyCb5Tm/zhjuI1xuyM=;
-        b=Q+4xmvA/hBGpdTAP2XEwoMc1MYl020J592KMfNtjBv1GvAPJDF0eKA6pBPdfB6ffuO
-         W+e1+b/QiQaep5eJp4efwnWPVA+7W2J2dQiqJs1pUW3/iFgswYm24sVitKoUmXggPpQ+
-         cvRBfteWPoiBtnwq3WPIY/ul/ZkI4AtZ8GOE5DEBQ7YSnq7hDOqeKxx9Hd0bY5VAIl6i
-         SHpQ2ArRv6bR8xto/MB+hGrOasZLRTFUmlPTfHRLTcuH/OADJM+aeY4SJ8Wd1xLQvYnb
-         SeUGhG6ZjgrLmO4Il9kxF+E1ww7J6InUCOhPhx6MrwUt3aDEx3SvqLV07zqPcP4QwdGK
-         okPw==
-X-Gm-Message-State: APjAAAXTQ3PfsKZ0ffsTf/0PoJg4iIAygqth+AxSgp8IT2E/tb024H3Z
-        H+ZFWe3nZ+u1VVT8ZOMnIa7bSQ==
-X-Google-Smtp-Source: APXvYqyGrODzKW20w/f6l/YF43SlNclKGtwdZbS249wQ/YutI4hizWJWbxTX+QYjTuFBORnyJxwv5A==
-X-Received: by 2002:a17:90a:3268:: with SMTP id k95mr6540305pjb.48.1582242015549;
-        Thu, 20 Feb 2020 15:40:15 -0800 (PST)
-Received: from ?IPv6:2601:646:c200:1ef2:511c:ebc0:d124:b4a0? ([2601:646:c200:1ef2:511c:ebc0:d124:b4a0])
-        by smtp.gmail.com with ESMTPSA id o19sm4222728pjr.2.2020.02.20.15.40.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Feb 2020 15:40:14 -0800 (PST)
+        id S1729462AbgBUAXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 19:23:51 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:57752 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729441AbgBUAXu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Feb 2020 19:23:50 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01L0IuBc097560;
+        Fri, 21 Feb 2020 00:22:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=j3orcV8N7f6tsO1hzt4d6bYa8i40eAtvmiZrDeUsowc=;
+ b=cVgkuu1q0ENV4pHWiXR021YoDnJt/upxXvl+V7TptYMU6reyQ9uuYXRwAz5ius5oIyTO
+ YmwNJWi92N/4cDdoxdkAni9VqOlV+FR9E4F7GFK/r7pXVJ3E0XEpuXnjvvEmOqXngjow
+ CtPXx7EndrPPiiNOevB6oh5vwEoM5H6upA9kEQ3giDn9xX1UKjeigv4UkdsV8UvBMTHk
+ Pty3uFwFC1DoD8CcbRLZf8hAE/WGbNVKx6LGYYj+TOz6ppUHBu/5y+TzbjpsBWBpOe4J
+ 5X4q0LuRs/zDbbtQIJQ3skmEPVXUs+DF0+Qy1pOZKvAdgDr/l71Kaf5Szqh5LbKj/bis dg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2y8udddayy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Feb 2020 00:22:29 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01L0HssC082442;
+        Fri, 21 Feb 2020 00:22:28 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 2y8udgkksv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Feb 2020 00:22:28 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01L0MP4K016579;
+        Fri, 21 Feb 2020 00:22:26 GMT
+Received: from [192.168.1.206] (/71.63.128.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 20 Feb 2020 16:22:25 -0800
+Subject: Re: [PATCH] mm/hugetlb: avoid get wrong ptep caused by race
+To:     "Longpeng (Mike)" <longpeng2@huawei.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     akpm@linux-foundation.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
+        weidong.huang@huawei.com, weifuqiang@huawei.com,
+        kvm@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Matthew Wilcox <willy@infradead.org>
+References: <1582027825-112728-1-git-send-email-longpeng2@huawei.com>
+ <20200218203717.GE28156@linux.intel.com>
+ <a041fdb4-bfd0-ac4b-2809-6fddfc4f8d83@huawei.com>
+ <20200219015836.GM28156@linux.intel.com>
+ <098a5dd6-e1da-f161-97d7-cfe735d14fd8@oracle.com>
+ <502b5e52-060b-6864-d1b7-eab2dc951aed@huawei.com>
+From:   Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <a82956f7-26e4-5c1c-8d5d-4b2510f6b17d@oracle.com>
+Date:   Thu, 20 Feb 2020 16:22:24 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <502b5e52-060b-6864-d1b7-eab2dc951aed@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 10/12] mm: x86: Invoke hypercall when page encryption status is changed
-Date:   Thu, 20 Feb 2020 15:40:12 -0800
-Message-Id: <B5BDDC6D-4309-4A21-9F70-93BA64899C65@amacapital.net>
-References: <CABayD+fTa=dtbb3E4+kgQkNqDHYUfJGJTUfN5PirBit6Xp4JeQ@mail.gmail.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>, x86@kernel.org,
-        KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-In-Reply-To: <CABayD+fTa=dtbb3E4+kgQkNqDHYUfJGJTUfN5PirBit6Xp4JeQ@mail.gmail.com>
-To:     Steve Rutherford <srutherford@google.com>
-X-Mailer: iPhone Mail (17D50)
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9537 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ phishscore=0 suspectscore=0 mlxscore=0 malwarescore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002210000
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9537 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 impostorscore=0
+ mlxlogscore=999 malwarescore=0 mlxscore=0 suspectscore=0
+ priorityscore=1501 bulkscore=0 adultscore=0 spamscore=0 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002210000
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2/19/20 6:30 PM, Longpeng (Mike) wrote:
+> 在 2020/2/20 3:33, Mike Kravetz 写道:
+>> + Kirill
+>> On 2/18/20 5:58 PM, Sean Christopherson wrote:
+>>> On Wed, Feb 19, 2020 at 09:39:59AM +0800, Longpeng (Mike) wrote:
+<snip>
+>>> The race and the fix make sense.  I assumed dereferencing garbage from the
+>>> huge page was the issue, but I wasn't 100% that was the case, which is why
+>>> I asked about alternative fixes.
+>>>
+>>>> We change the code from
+>>>> 	if (pud_huge(*pud) || !pud_present(*pud))
+>>>> to
+>>>> 	if (pud_huge(*pud)
+>>>> 		return (pte_t *)pud;
+>>>> 	busy loop for 500ms
+>>>> 	if (!pud_present(*pud))
+>>>> 		return (pte_t *)pud;
+>>>> and the panic will be hit quickly.
+>>>>
+>>>> ARM64 has already use READ/WRITE_ONCE to access the pagetable, look at this
+>>>> commit 20a004e7 (arm64: mm: Use READ_ONCE/WRITE_ONCE when accessing page tables).
+>>>>
+>>>> The root cause is: 'if (pud_huge(*pud) || !pud_present(*pud))' read entry from
+>>>> pud twice and the *pud maybe change in a race, so if we only read the pud once.
+>>>> I use READ_ONCE here is just for safe, to prevents the complier mischief if
+>>>> possible.
+>>>
+>>> FWIW, I'd be in favor of going the READ/WRITE_ONCE() route for x86, e.g.
+>>> convert everything as a follow-up patch (or patches).  I'm fairly confident
+>>> that KVM's usage of lookup_address_in_mm() is safe, but I wouldn't exactly
+>>> bet my life on it.  I'd much rather the failing scenario be that KVM uses
+>>> a sub-optimal page size as opposed to exploding on a bad pointer.
+>>
+>> Longpeng(Mike) asked in another e-mail specifically about making similar
+>> changes to lookup_address_in_mm().  Replying here as there is more context.
+>>
+>> I 'think' lookup_address_in_mm is safe from this issue.  Why?  IIUC, the
+>> problem with the huge_pte_offset routine is that the pud changes from
+>> pud_none() to pud_huge() in the middle of
+>> 'if (pud_huge(*pud) || !pud_present(*pud))'.  In the case of
+>> lookup_address_in_mm, we know pud was not pud_none() as it was previously
+>> checked.  I am not aware of any other state transitions which could cause
+>> us trouble.  However, I am no expert in this area.
 
+Bad copy/paste by me.  Longpeng(Mike) was asking about lookup_address_in_pgd.
 
-> On Feb 20, 2020, at 3:24 PM, Steve Rutherford <srutherford@google.com> wro=
-te:
->=20
-> =EF=BB=BFOn Thu, Feb 20, 2020 at 2:43 PM Brijesh Singh <brijesh.singh@amd.=
-com> wrote:
->>=20
->>=20
->>=20
->>> On 2/20/20 2:43 PM, Steve Rutherford wrote:
->>> On Thu, Feb 20, 2020 at 7:55 AM Brijesh Singh <brijesh.singh@amd.com> wr=
-ote:
->>>>=20
->>>>=20
->>>>=20
->>>> On 2/19/20 8:12 PM, Andy Lutomirski wrote:
->>>>>=20
->>>>>=20
->>>>>> On Feb 19, 2020, at 5:58 PM, Steve Rutherford <srutherford@google.com=
-> wrote:
->>>>>>=20
->>>>>> =EF=BB=BFOn Wed, Feb 12, 2020 at 5:18 PM Ashish Kalra <Ashish.Kalra@a=
-md.com> wrote:
->>>>>>>=20
->>>>>>> From: Brijesh Singh <brijesh.singh@amd.com>
->>>>>>>=20
->>>>>>> Invoke a hypercall when a memory region is changed from encrypted ->=
+> So... I need just fix huge_pte_offset in mm/hugetlb.c, right?
 
->>>>>>> decrypted and vice versa. Hypervisor need to know the page encryptio=
-n
->>>>>>> status during the guest migration.
->>>>>>=20
->>>>>> One messy aspect, which I think is fine in practice, is that this
->>>>>> presumes that pages are either treated as encrypted or decrypted. If
->>>>>> also done on SEV, the in-place re-encryption supported by SME would
->>>>>> break SEV migration. Linux doesn't do this now on SEV, and I don't
->>>>>> have an intuition for why Linux might want this, but we will need to
->>>>>> ensure it is never done in order to ensure that migration works down
->>>>>> the line. I don't believe the AMD manual promises this will work
->>>>>> anyway.
->>>>>>=20
->>>>>> Something feels a bit wasteful about having all future kernels
->>>>>> universally announce c-bit status when SEV is enabled, even if KVM
->>>>>> isn't listening, since it may be too old (or just not want to know).
->>>>>> Might be worth eliding the hypercalls if you get ENOSYS back? There
->>>>>> might be a better way of passing paravirt config metadata across than=
+Let's start with just a fix for huge_pte_offset() as you can easily reproduce
+that issue by adding a delay.
 
->>>>>> just trying and seeing if the hypercall succeeds, but I'm not super
->>>>>> familiar with it.
->>>>>=20
->>>>> I actually think this should be a hard requirement to merge this. The h=
-ost needs to tell the guest that it supports this particular migration strat=
-egy and the guest needs to tell the host that it is using it.  And the guest=
- needs a way to tell the host that it=E2=80=99s *not* using it right now due=
- to kexec, for example.
->>>>>=20
->>>>> I=E2=80=99m still uneasy about a guest being migrated in the window wh=
-ere the hypercall tracking and the page encryption bit don=E2=80=99t match. =
- I guess maybe corruption in this window doesn=E2=80=99t matter?
->>>>>=20
->>>>=20
->>>> I don't think there is a corruption issue here. Let's consider the belo=
-w
->>>> case:
->>>>=20
->>>> 1) A page is transmitted as C=3D1 (encrypted)
->>>>=20
->>>> 2) During the migration window, the page encryption bit is changed
->>>>   to C=3D0 (decrypted)
->>>>=20
->>>> 3) #2 will cause a change in page table memory, thus dirty memory
->>>>   the tracker will create retransmission of the page table memory.
->>>>=20
->>>> 4) The page itself will not be re-transmitted because there was
->>>>   no change to the content of the page.
->>>>=20
->>>> On destination, the read from the page will get the ciphertext.
->>>>=20
->>>> The encryption bit change in the page table is used on the next access.=
+> Is it possible the pud changes from pud_huge() to pud_none() while another CPU
+> is walking the pagetable ?
 
->>>> The user of the page needs to ensure that data is written with the
->>>> correct encryption bit before reading.
->>>>=20
->>>> thanks
->>>=20
->>>=20
->>> I think the issue results from a slightly different perspective than
->>> the one you are using. I think the situation Andy is interested in is
->>> when a c-bit change and a write happen close in time. There are five
->>> events, and the ordering matters:
->>> 1) Guest dirties the c-bit in the guest
->>> 2) Guest dirties the page
->>> 3) Host userspace observes the c-bit logs
->>> 4) Host userspace observes the page dirty logs
->>> 5) Host transmits the page
->>>=20
->>> If these are reordered to:
->>> 3) Host userspace observes the c-bit logs
->>> 1) Guest dirties the c-bit in the guest
->>> 2) Guest dirties the page
->>> 4) Host userspace observes the page dirty logs
->>> 5) Host transmits the page (from the wrong c-bit perspective!)
->>>=20
->>> Then the host will transmit a page with the wrong c-bit status and
->>> clear the dirty bit for that page. If the guest page is not
->>> retransmitted incidentally later, then this page will be corrupted.
->>>=20
->>> If you treat pages with dirty c-bits as dirty pages, then you will
->>> check the c-bit logs later and observe the dirty c-bit and retransmit.
->>> There might be some cleverness around enforcing that you always fetch
->>> the c-bit logs after fetching the dirty logs, but I haven't convinced
->>> myself that this works yet. I think it might, since then the c-bits
->>> are at least as fresh as the dirty bits.
->>>=20
->>=20
->> Unlike the dirty log, the c-bit log maintains the complete state.
->> So, I think it is the Host userspace responsibility to ensure that it
->> either keeps track of any c-bit log changes since it last sync'ed.
->> During the migration, after pausing the guest it can get the recent
->> c-bit log and compare if something has changed since it last sync'ed.
->> If so, then retransmit the page with new c-bit state.
->>=20
->>> The main uncertainty that comes to mind for that strategy is if, on
->>> multi-vCPU VMs, the page dirtying event (from the new c-bit
->>> perspective) and the c-bit status change hypercall can themselves
->>> race. If a write from the new c-bit perspective can arrive before the
->>> c-bit status change arrives in the c-bit logs, we will need to treat
->>> pages with dirty c-bits as dirty pages.
->>>=20
->>=20
->> I believe if host userspace tracks the changes in the c-bit log since
->> it last synced then this problem can be avoided. Do you think we should
->> consider tracking the last sync changes in KVM or let the host userspace
->> handle it.
-> Punting this off to userspace to handle works. If storing the old
-> c-bit statuses in userspace becomes a memory issue (unlikely), we can
-> fix that down the line.
->=20
-> Andy, are your concerns about the raceyness of c-bit tracking resolved?
+I believe it is possible.  If we hole punch a hugetlbfs file, we will clear
+the corresponding pud's.  Hence, we can go from pud_huge() to pud_none().
+Unless I am missing something, that does imply we could have issues in places
+such as lookup_address_in_pgd:
 
-Probably, as long as the guest doesn=E2=80=99t play nasty games with trying t=
-o read its own ciphertext.=
+	pud = pud_offset(p4d, address);
+	if (pud_none(*pud))
+		return NULL;
+
+	*level = PG_LEVEL_1G;
+	if (pud_large(*pud) || !pud_present(*pud))
+		return (pte_t *)pud;
+
+I hope I am wrong, but it seems like pud_none(*pud) could become true after
+the initial check, and before the (pud_large) check.  If so, there could be
+a problem (addressing exception) when the code continues and looks up the pmd.
+
+	pmd = pmd_offset(pud, address);
+	if (pmd_none(*pmd))
+		return NULL;
+
+It has been mentioned before that there are many page table walks like this.
+What am I missing that prevents races like this?  Or, have we just been lucky?
+-- 
+Mike Kravetz
