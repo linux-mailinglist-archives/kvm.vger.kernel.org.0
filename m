@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 39B00167B04
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:44:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCF7B167B0C
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:45:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727646AbgBUKoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 05:44:05 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21198 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726913AbgBUKoE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 05:44:04 -0500
+        id S1728068AbgBUKoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 05:44:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52202 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726913AbgBUKoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 05:44:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582281843;
+        s=mimecast20190719; t=1582281892;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=+/siOJBkSseqlBOKUg1sVXbab3zUkIAaXiqvD0/ktbw=;
-        b=TruPKnVpQSDWPceRiyODlt2K9bx597G9LC04lBQ5I3FIOwSILlPsYDS6crSSDW7O2XG5pE
-        MESThfMOKGgXq/tWtkXykPuC/kB1riZdWyKneayKSRAeyyHhOTF1+BrBxlbKoiuHH/dnfi
-        7Bzq01bHdjMvsYcIBVJo78DtyiioKyI=
+        bh=+yNj5Z1FqKBnt1S/avscfWA+MdlKfdJolv8IGAIJh4Q=;
+        b=LpXXqiMBr62PE11oSKigFVN8vemjSt9liUBRj24MjD2QPd3xGQqrwXkd9j0X9mIptiwnri
+        btk1YRGDHpAF0SZY+mTrkThgfYbkX+02qzHrasO+7XWHI1xIVqGCapZiTazdLjRIbVz/sY
+        TXnxVxecYwjhikvPPzdOao53m+xT6w0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-bBuFBGzZNBKVO3UeMg9yZg-1; Fri, 21 Feb 2020 05:44:00 -0500
-X-MC-Unique: bBuFBGzZNBKVO3UeMg9yZg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-218-_3BaFVA9M2e2VczxiLe95w-1; Fri, 21 Feb 2020 05:44:48 -0500
+X-MC-Unique: _3BaFVA9M2e2VczxiLe95w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C095107ACC7;
-        Fri, 21 Feb 2020 10:43:58 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F9C11005512;
+        Fri, 21 Feb 2020 10:44:47 +0000 (UTC)
 Received: from [10.36.117.197] (ovpn-117-197.ams2.redhat.com [10.36.117.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EEFDC89A9C;
-        Fri, 21 Feb 2020 10:43:55 +0000 (UTC)
-Subject: Re: [PATCH v3 26/37] KVM: s390: protvirt: Only sync fmt4 registers
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB07B87B11;
+        Fri, 21 Feb 2020 10:44:44 +0000 (UTC)
+Subject: Re: [PATCH v3 28/37] KVM: s390: protvirt: UV calls in support of
+ diag308 0, 1
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -45,7 +46,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200220104020.5343-1-borntraeger@de.ibm.com>
- <20200220104020.5343-27-borntraeger@de.ibm.com>
+ <20200220104020.5343-29-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,16 +92,16 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <30e0805d-c7b5-a4c3-7a71-5300d2bd3057@redhat.com>
-Date:   Fri, 21 Feb 2020 11:43:55 +0100
+Message-ID: <c99906fe-b62c-c1b8-8476-16d6401bf9f2@redhat.com>
+Date:   Fri, 21 Feb 2020 11:44:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200220104020.5343-27-borntraeger@de.ibm.com>
+In-Reply-To: <20200220104020.5343-29-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -109,15 +110,78 @@ X-Mailing-List: kvm@vger.kernel.org
 On 20.02.20 11:40, Christian Borntraeger wrote:
 > From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> A lot of the registers are controlled by the Ultravisor and never
-> visible to KVM. Also some registers are overlayed, like gbea is with
-> sidad, which might leak data to userspace.
+> diag 308 subcode 0 and 1 require several KVM and Ultravisor interactions.
+> Specific to these "soft" reboots are
 > 
-> Hence we sync a minimal set of registers for both SIE formats and then
-> check and sync format 2 registers if necessary.
+> * The "unshare all" UVC
+> * The "prepare for reset" UVC
 > 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/include/asm/uv.h |  4 ++++
+>  arch/s390/kvm/kvm-s390.c   | 22 ++++++++++++++++++++++
+>  include/uapi/linux/kvm.h   |  2 ++
+>  3 files changed, 28 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 09dc6dba94a4..a7595c647759 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -36,6 +36,8 @@
+>  #define UVC_CMD_SET_SEC_CONF_PARAMS	0x0300
+>  #define UVC_CMD_UNPACK_IMG		0x0301
+>  #define UVC_CMD_VERIFY_IMG		0x0302
+> +#define UVC_CMD_PREPARE_RESET		0x0320
+> +#define UVC_CMD_SET_UNSHARE_ALL		0x0340
+>  #define UVC_CMD_PIN_PAGE_SHARED		0x0341
+>  #define UVC_CMD_UNPIN_PAGE_SHARED	0x0342
+>  #define UVC_CMD_SET_SHARED_ACCESS	0x1000
+> @@ -56,6 +58,8 @@ enum uv_cmds_inst {
+>  	BIT_UVC_CMD_SET_SEC_PARMS = 11,
+>  	BIT_UVC_CMD_UNPACK_IMG = 13,
+>  	BIT_UVC_CMD_VERIFY_IMG = 14,
+> +	BIT_UVC_CMD_PREPARE_RESET = 18,
+> +	BIT_UVC_CMD_UNSHARE_ALL = 20,
+>  	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
+>  	BIT_UVC_CMD_UNPIN_PAGE_SHARED = 22,
+>  };
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 303f994f3d03..9ac73b717e25 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2310,6 +2310,28 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>  			     cmd->rrc);
+>  		break;
+>  	}
+> +	case KVM_PV_VM_PREP_RESET: {
+> +		r = -EINVAL;
+> +		if (!kvm_s390_pv_is_protected(kvm))
+> +			break;
+> +
+> +		r = uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
+> +				  UVC_CMD_PREPARE_RESET, &cmd->rc, &cmd->rrc);
+> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT PREP RESET: rc %x rrc %x",
+> +			     cmd->rc, cmd->rrc);
+> +		break;
+> +	}
+> +	case KVM_PV_VM_UNSHARE_ALL: {
+> +		r = -EINVAL;
+> +		if (!kvm_s390_pv_is_protected(kvm))
+> +			break;
+> +
+> +		r = uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
+> +				  UVC_CMD_SET_UNSHARE_ALL, &cmd->rc, &cmd->rrc);
+> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT UNSHARE: rc %x rrc %x",
+> +			     cmd->rc, cmd->rrc);
+> +		break;
+> +	}
+>  	default:
+>  		return -ENOTTY;
+>  	}
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Acked-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
