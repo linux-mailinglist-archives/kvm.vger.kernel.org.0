@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 966F0167B15
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:46:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6821167B21
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:47:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727686AbgBUKq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 05:46:57 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31178 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726934AbgBUKq5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 05:46:57 -0500
+        id S1728148AbgBUKra (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 05:47:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48099 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728128AbgBUKr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 05:47:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582282015;
+        s=mimecast20190719; t=1582282047;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=MWdFIGaN4vVGA2rn+y0DNLhAnokcl2mknwliiEst6Ok=;
-        b=WPzFZW00SUuhtOyKaNq3oymshrl5g1h0k+DjQ6IIA9XMqLwnGhhJpidmOZvV5JHOf7SIB1
-        YgCiIfLDuxC0vYig0JrpvJ/EsZxOi0Wh7TownZf5ITSl24Pyn0iv26pOl2/5be3TcOxQ0B
-        /fa0nWTu/7FZwOJRS9ayrUq/+W0uLok=
+        bh=8oWqFAkH3FQS9xsmRJSERO5cC1FzQn8WQy8auEWM2UI=;
+        b=Xb5LeDjNnLcHvJK0xsNfX/KupaMJIQLxv5gKqJgj9DyOCLdWFyjQdzoj5aqbJxZaLBvFbK
+        gM3LLy9wiVNDVxvyqQYkieLlvtihCkLS4oYDJ84sz7I9+KDts8/bk7LXEwaSbVhbgjPoyf
+        nm9o9/nNWAEPJMA008ZHJAISFl6mAoc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-ISGoaoSOP5y9s_6Z6SahBw-1; Fri, 21 Feb 2020 05:46:51 -0500
-X-MC-Unique: ISGoaoSOP5y9s_6Z6SahBw-1
+ us-mta-423-apmicB6_ORae9zS8lkV5lw-1; Fri, 21 Feb 2020 05:47:25 -0500
+X-MC-Unique: apmicB6_ORae9zS8lkV5lw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 652341005512;
-        Fri, 21 Feb 2020 10:46:50 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7F38107ACC5;
+        Fri, 21 Feb 2020 10:47:23 +0000 (UTC)
 Received: from [10.36.117.197] (ovpn-117-197.ams2.redhat.com [10.36.117.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1263860C87;
-        Fri, 21 Feb 2020 10:46:47 +0000 (UTC)
-Subject: Re: [PATCH v3 35/37] s390: protvirt: Add sysfs firmware interface for
- Ultravisor information
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B14CE60C87;
+        Fri, 21 Feb 2020 10:47:21 +0000 (UTC)
+Subject: Re: [PATCH v3 36/37] KVM: s390: rstify new ioctls in api.rst
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -43,10 +42,9 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>
 References: <20200220104020.5343-1-borntraeger@de.ibm.com>
- <20200220104020.5343-36-borntraeger@de.ibm.com>
+ <20200220104020.5343-37-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -92,13 +90,13 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <4409e9ba-3b8c-69dd-815c-2b09d77d7598@redhat.com>
-Date:   Fri, 21 Feb 2020 11:46:47 +0100
+Message-ID: <766d49d0-531b-8ce7-55e4-bfb791e746c5@redhat.com>
+Date:   Fri, 21 Feb 2020 11:47:20 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200220104020.5343-36-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200220104020.5343-37-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
@@ -108,115 +106,72 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 20.02.20 11:40, Christian Borntraeger wrote:
-> From: Janosch Frank <frankja@linux.ibm.com>
+> We also need to rstify the new ioctls that we added in parallel to the
+> rstification of the kvm docs.
 > 
-> That information, e.g. the maximum number of guests or installed
-> Ultravisor facilities, is interesting for QEMU, Libvirt and
-> administrators.
-> 
-> Let's provide an easily parsable API to get that information.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/s390/kernel/uv.c | 86 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 86 insertions(+)
+>  Documentation/virt/kvm/api.rst | 33 ++++++++++++++++++---------------
+>  1 file changed, 18 insertions(+), 15 deletions(-)
 > 
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index 4539003dac9d..550e9617c459 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -323,5 +323,91 @@ int arch_make_page_accessible(struct page *page)
->  	return rc;
->  }
->  EXPORT_SYMBOL_GPL(arch_make_page_accessible);
-> +#endif
-> +
-> +#if defined(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) || IS_ENABLED(CONFIG_KVM)
-> +static ssize_t uv_query_facilities(struct kobject *kobj,
-> +				   struct kobj_attribute *attr, char *page)
-> +{
-> +	return snprintf(page, PAGE_SIZE, "%lx\n%lx\n%lx\n%lx\n",
-> +			uv_info.inst_calls_list[0],
-> +			uv_info.inst_calls_list[1],
-> +			uv_info.inst_calls_list[2],
-> +			uv_info.inst_calls_list[3]);
-> +}
-> +
-> +static struct kobj_attribute uv_query_facilities_attr =
-> +	__ATTR(facilities, 0444, uv_query_facilities, NULL);
-> +
-> +static ssize_t uv_query_max_guest_cpus(struct kobject *kobj,
-> +				       struct kobj_attribute *attr, char *page)
-> +{
-> +	return snprintf(page, PAGE_SIZE, "%d\n",
-> +			uv_info.max_guest_cpus);
-> +}
-> +
-> +static struct kobj_attribute uv_query_max_guest_cpus_attr =
-> +	__ATTR(max_cpus, 0444, uv_query_max_guest_cpus, NULL);
-> +
-> +static ssize_t uv_query_max_guest_vms(struct kobject *kobj,
-> +				      struct kobj_attribute *attr, char *page)
-> +{
-> +	return snprintf(page, PAGE_SIZE, "%d\n",
-> +			uv_info.max_num_sec_conf);
-> +}
-> +
-> +static struct kobj_attribute uv_query_max_guest_vms_attr =
-> +	__ATTR(max_guests, 0444, uv_query_max_guest_vms, NULL);
-> +
-> +static ssize_t uv_query_max_guest_addr(struct kobject *kobj,
-> +				       struct kobj_attribute *attr, char *page)
-> +{
-> +	return snprintf(page, PAGE_SIZE, "%lx\n",
-> +			uv_info.max_sec_stor_addr);
-> +}
-> +
-> +static struct kobj_attribute uv_query_max_guest_addr_attr =
-> +	__ATTR(max_address, 0444, uv_query_max_guest_addr, NULL);
-> +
-> +static struct attribute *uv_query_attrs[] = {
-> +	&uv_query_facilities_attr.attr,
-> +	&uv_query_max_guest_cpus_attr.attr,
-> +	&uv_query_max_guest_vms_attr.attr,
-> +	&uv_query_max_guest_addr_attr.attr,
-> +	NULL,
-> +};
-> +
-> +static struct attribute_group uv_query_attr_group = {
-> +	.attrs = uv_query_attrs,
-> +};
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 58be7aba0db2..faca9977cbe7 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -4613,35 +4613,38 @@ unpins the VPA pages and releases all the device pages that are used to
+>  track the secure pages by hypervisor.
 >  
-> +static struct kset *uv_query_kset;
-> +struct kobject *uv_kobj;
-> +
-> +static int __init uv_info_init(void)
-> +{
-> +	int rc = -ENOMEM;
-> +
-> +	if (!test_facility(158))
-> +		return 0;
-> +
-> +	uv_kobj = kobject_create_and_add("uv", firmware_kobj);
-> +	if (!uv_kobj)
-> +		return -ENOMEM;
-> +
-> +	uv_query_kset = kset_create_and_add("query", NULL, uv_kobj);
-> +	if (!uv_query_kset)
-> +		goto out_kobj;
-> +
-> +	rc = sysfs_create_group(&uv_query_kset->kobj, &uv_query_attr_group);
-> +	if (!rc)
-> +		return 0;
-> +
-> +	kset_unregister(uv_query_kset);
-> +out_kobj:
-> +	kobject_del(uv_kobj);
-> +	kobject_put(uv_kobj);
-> +	return rc;
-> +}
-> +device_initcall(uv_info_init);
->  #endif
+>  4.122 KVM_S390_NORMAL_RESET
+> +---------------------------
+>  
+> -Capability: KVM_CAP_S390_VCPU_RESETS
+> -Architectures: s390
+> -Type: vcpu ioctl
+> -Parameters: none
+> -Returns: 0
+> +:Capability: KVM_CAP_S390_VCPU_RESETS
+> +:Architectures: s390
+> +:Type: vcpu ioctl
+> +:Parameters: none
+> +:Returns: 0
+>  
+>  This ioctl resets VCPU registers and control structures according to
+>  the cpu reset definition in the POP (Principles Of Operation).
+>  
+>  4.123 KVM_S390_INITIAL_RESET
+> +----------------------------
+>  
+> -Capability: none
+> -Architectures: s390
+> -Type: vcpu ioctl
+> -Parameters: none
+> -Returns: 0
+> +:Capability: none
+> +:Architectures: s390
+> +:Type: vcpu ioctl
+> +:Parameters: none
+> +:Returns: 0
+>  
+>  This ioctl resets VCPU registers and control structures according to
+>  the initial cpu reset definition in the POP. However, the cpu is not
+>  put into ESA mode. This reset is a superset of the normal reset.
+>  
+>  4.124 KVM_S390_CLEAR_RESET
+> +--------------------------
+>  
+> -Capability: KVM_CAP_S390_VCPU_RESETS
+> -Architectures: s390
+> -Type: vcpu ioctl
+> -Parameters: none
+> -Returns: 0
+> +:Capability: KVM_CAP_S390_VCPU_RESETS
+> +:Architectures: s390
+> +:Type: vcpu ioctl
+> +:Parameters: none
+> +:Returns: 0
+>  
+>  This ioctl resets VCPU registers and control structures according to
+>  the clear cpu reset definition in the POP. However, the cpu is not put
 > 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
