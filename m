@@ -2,256 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40789166F4A
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 06:39:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14086166FA2
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 07:29:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726201AbgBUFjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 00:39:22 -0500
-Received: from mga18.intel.com ([134.134.136.126]:49680 "EHLO mga18.intel.com"
+        id S1726244AbgBUG2y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 01:28:54 -0500
+Received: from mga07.intel.com ([134.134.136.100]:53861 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725800AbgBUFjW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 00:39:22 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1726045AbgBUG2y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 01:28:54 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2020 21:39:21 -0800
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2020 22:28:52 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,467,1574150400"; 
-   d="scan'208";a="225111442"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga007.jf.intel.com with ESMTP; 20 Feb 2020 21:39:21 -0800
-Received: from fmsmsx158.amr.corp.intel.com (10.18.116.75) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 20 Feb 2020 21:39:20 -0800
-Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
- fmsmsx158.amr.corp.intel.com (10.18.116.75) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 20 Feb 2020 21:39:21 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
- SHSMSX151.ccr.corp.intel.com ([169.254.3.201]) with mapi id 14.03.0439.000;
- Fri, 21 Feb 2020 13:39:05 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Chia-I Wu <olvaffe@gmail.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        "kvm list" <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Wanpeng Li" <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Gurchetan Singh <gurchetansingh@chromium.org>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        "ML dri-devel" <dri-devel@lists.freedesktop.org>
-Subject: RE: [RFC PATCH 0/3] KVM: x86: honor guest memory type
-Thread-Topic: [RFC PATCH 0/3] KVM: x86: honor guest memory type
-Thread-Index: AQHV4rTrI5AbOd4/PkCv4vZnvR6EuagZISQAgAAKbYCAAMs9AIAAnj+AgAAgCACAAAK0AIAAAeyAgAXrxoCAAaZGgIAAIIsAgADkwxCAABT4UIAAx02AgACimmD//8gUAIAAAZSAgACPE8A=
-Date:   Fri, 21 Feb 2020 05:39:05 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D79359E@SHSMSX104.ccr.corp.intel.com>
-References: <20200213213036.207625-1-olvaffe@gmail.com>
- <8fdb85ea-6441-9519-ae35-eaf91ffe8741@redhat.com>
- <CAPaKu7T8VYXTMc1_GOzJnwBaZSG214qNoqRr8c7Z4Lb3B7dtTg@mail.gmail.com>
- <b82cd76c-0690-c13b-cf2c-75d7911c5c61@redhat.com>
- <20200214195229.GF20690@linux.intel.com>
- <CAPaKu7Q4gehyhEgG_Nw=tiZiTh+7A8-uuXq1w4he6knp6NWErQ@mail.gmail.com>
- <CALMp9eRwTxdqxAcobZ7sYbD=F8Kga=jR3kaz-OEYdA9fV0AoKQ@mail.gmail.com>
- <20200214220341.GJ20690@linux.intel.com>
- <d3a6fac6-3831-3b8e-09b6-bfff4592f235@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D78D6F4@SHSMSX104.ccr.corp.intel.com>
- <CAPaKu7RyTbuTPf0Tp=0DAD80G-RySLrON8OQsHJzhAYDh7zHuA@mail.gmail.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D78EE65@SHSMSX104.ccr.corp.intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D78EF58@SHSMSX104.ccr.corp.intel.com>
- <CAPaKu7RFY3nar9hmAdx6RYdZFPK3Cdg1O3cS+OvsEOT=yupyrQ@mail.gmail.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D792415@SHSMSX104.ccr.corp.intel.com>
- <CAPaKu7RHu5rz1Dvkvp4SDrZ0fAYq37xwRqUsdAiOmRTOz2sFTw@mail.gmail.com>
- <CAPaKu7RaF3+amPwdVBLj6q1na7JWUYuuWDN5XPwNYFB8Hpqi+w@mail.gmail.com>
-In-Reply-To: <CAPaKu7RaF3+amPwdVBLj6q1na7JWUYuuWDN5XPwNYFB8Hpqi+w@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzNjMGRiMGQtYjJiMS00ZTJiLTkxMjEtZjM3ZjJiNDRiMDlhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibEU2TDFmak0xZTdOZlhqRVwvZWpQd1NMRnptWkhUU0hDSjB4aVwveWtVbklObVJjNHZPOUlvbm1Ma2llYWNCbFFwIn0=
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="383375860"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga004.jf.intel.com with ESMTP; 20 Feb 2020 22:28:50 -0800
+Date:   Fri, 21 Feb 2020 01:19:29 -0500
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [RFC PATCH v3 1/9] vfio/pci: export vfio_pci_device public and
+ add vfio_pci_device_private
+Message-ID: <20200221061929.GC30338@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200211095727.20426-1-yan.y.zhao@intel.com>
+ <20200211101038.20772-1-yan.y.zhao@intel.com>
+ <20200220140011.79621d7f@w520.home>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200220140011.79621d7f@w520.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBDaGlhLUkgV3UgPG9sdmFmZmVAZ21haWwuY29tPg0KPiBTZW50OiBGcmlkYXksIEZl
-YnJ1YXJ5IDIxLCAyMDIwIDEyOjUxIFBNDQo+IA0KPiAocmVzZW5kIGJlY2F1c2UgZ21haWwgZGlk
-IG5vdCBmb3JtYXQgdG8gcGxhaW4gdGV4dC4uLikNCj4gDQo+IE9uIFRodSwgRmViIDIwLCAyMDIw
-IGF0IDg6NDUgUE0gQ2hpYS1JIFd1IDxvbHZhZmZlQGdtYWlsLmNvbT4gd3JvdGU6DQo+ID4NCj4g
-Pg0KPiA+DQo+ID4gT24gVGh1LCBGZWIgMjAsIDIwMjAgYXQgNDoyMyBQTSBUaWFuLCBLZXZpbiA8
-a2V2aW4udGlhbkBpbnRlbC5jb20+IHdyb3RlOg0KPiA+Pg0KPiA+PiA+IEZyb206IENoaWEtSSBX
-dSA8b2x2YWZmZUBnbWFpbC5jb20+DQo+ID4+ID4gU2VudDogRnJpZGF5LCBGZWJydWFyeSAyMSwg
-MjAyMCA2OjI0IEFNDQo+ID4+ID4NCj4gPj4gPiBPbiBXZWQsIEZlYiAxOSwgMjAyMCBhdCA2OjM4
-IFBNIFRpYW4sIEtldmluIDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gd3JvdGU6DQo+ID4+ID4g
-Pg0KPiA+PiA+ID4gPiBGcm9tOiBUaWFuLCBLZXZpbg0KPiA+PiA+ID4gPiBTZW50OiBUaHVyc2Rh
-eSwgRmVicnVhcnkgMjAsIDIwMjAgMTA6MDUgQU0NCj4gPj4gPiA+ID4NCj4gPj4gPiA+ID4gPiBG
-cm9tOiBDaGlhLUkgV3UgPG9sdmFmZmVAZ21haWwuY29tPg0KPiA+PiA+ID4gPiA+IFNlbnQ6IFRo
-dXJzZGF5LCBGZWJydWFyeSAyMCwgMjAyMCAzOjM3IEFNDQo+ID4+ID4gPiA+ID4NCj4gPj4gPiA+
-ID4gPiBPbiBXZWQsIEZlYiAxOSwgMjAyMCBhdCAxOjUyIEFNIFRpYW4sIEtldmluDQo+IDxrZXZp
-bi50aWFuQGludGVsLmNvbT4NCj4gPj4gPiB3cm90ZToNCj4gPj4gPiA+ID4gPiA+DQo+ID4+ID4g
-PiA+ID4gPiA+IEZyb206IFBhb2xvIEJvbnppbmkNCj4gPj4gPiA+ID4gPiA+ID4gU2VudDogV2Vk
-bmVzZGF5LCBGZWJydWFyeSAxOSwgMjAyMCAxMjoyOSBBTQ0KPiA+PiA+ID4gPiA+ID4gPg0KPiA+
-PiA+ID4gPiA+ID4gPiBPbiAxNC8wMi8yMCAyMzowMywgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90
-ZToNCj4gPj4gPiA+ID4gPiA+ID4gPj4gT24gRnJpLCBGZWIgMTQsIDIwMjAgYXQgMTo0NyBQTSBD
-aGlhLUkgV3UNCj4gPG9sdmFmZmVAZ21haWwuY29tPg0KPiA+PiA+ID4gPiB3cm90ZToNCj4gPj4g
-PiA+ID4gPiA+ID4gPj4+IEFGQUlDVCwgaXQgaXMgY3VycmVudGx5IGFsbG93ZWQgb24gQVJNICh2
-ZXJpZmllZCkgYW5kIEFNRA0KPiAobm90DQo+ID4+ID4gPiA+ID4gPiA+ID4+PiB2ZXJpZmllZCwg
-YnV0IHN2bV9nZXRfbXRfbWFzayByZXR1cm5zIDAgd2hpY2ggc3VwcG9zZWRseQ0KPiA+PiA+IG1l
-YW5zDQo+ID4+ID4gPiA+ID4gdGhlDQo+ID4+ID4gPiA+ID4gPiA+IE5QVA0KPiA+PiA+ID4gPiA+
-ID4gPiA+Pj4gZG9lcyBub3QgcmVzdHJpY3Qgd2hhdCB0aGUgZ3Vlc3QgUEFUIGNhbiBkbykuICBU
-aGlzIGRpZmYNCj4gd291bGQgZG8NCj4gPj4gPiB0aGUNCj4gPj4gPiA+ID4gPiA+ID4gPj4+IHRy
-aWNrIGZvciBJbnRlbCB3aXRob3V0IG5lZWRpbmcgYW55IHVhcGkgY2hhbmdlOg0KPiA+PiA+ID4g
-PiA+ID4gPiA+PiBJIHdvdWxkIGJlIGNvbmNlcm5lZCBhYm91dCBJbnRlbCBDUFUgZXJyYXRhIHN1
-Y2ggYXMgU0tYNDANCj4gYW5kDQo+ID4+ID4gPiA+IFNLWDU5Lg0KPiA+PiA+ID4gPiA+ID4gPiA+
-IFRoZSBwYXJ0IEtWTSBjYXJlcyBhYm91dCwgI01DLCBpcyBhbHJlYWR5IGFkZHJlc3NlZCBieQ0K
-PiBmb3JjaW5nDQo+ID4+ID4gVUMNCj4gPj4gPiA+ID4gZm9yDQo+ID4+ID4gPiA+ID4gPiA+IE1N
-SU8uDQo+ID4+ID4gPiA+ID4gPiA+ID4gVGhlIGRhdGEgY29ycnVwdGlvbiBpc3N1ZSBpcyBvbiB0
-aGUgZ3Vlc3Qga2VybmVsIHRvIGNvcnJlY3RseQ0KPiB1c2UNCj4gPj4gPiBXQw0KPiA+PiA+ID4g
-PiA+ID4gPiA+IGFuZC9vciBub24tdGVtcG9yYWwgd3JpdGVzLg0KPiA+PiA+ID4gPiA+ID4gPg0K
-PiA+PiA+ID4gPiA+ID4gPiBXaGF0IGFib3V0IGNvaGVyZW5jeSBhY3Jvc3MgbGl2ZSBtaWdyYXRp
-b24/ICBUaGUgdXNlcnNwYWNlDQo+ID4+ID4gcHJvY2Vzcw0KPiA+PiA+ID4gPiA+IHdvdWxkDQo+
-ID4+ID4gPiA+ID4gPiA+IHVzZSBjYWNoZWQgYWNjZXNzZXMsIGFuZCBhbHNvIGEgV0JJTlZEIGNv
-dWxkIHBvdGVudGlhbGx5DQo+IGNvcnJ1cHQNCj4gPj4gPiBndWVzdA0KPiA+PiA+ID4gPiA+ID4g
-PiBtZW1vcnkuDQo+ID4+ID4gPiA+ID4gPiA+DQo+ID4+ID4gPiA+ID4gPg0KPiA+PiA+ID4gPiA+
-ID4gSW4gc3VjaCBjYXNlIHRoZSB1c2Vyc3BhY2UgcHJvY2VzcyBwb3NzaWJseSBzaG91bGQgY29u
-c2VydmF0aXZlbHkNCj4gdXNlDQo+ID4+ID4gPiA+ID4gPiBVQyBtYXBwaW5nLCBhcyBpZiBmb3Ig
-TU1JTyByZWdpb25zIG9uIGEgcGFzc3Rocm91Z2ggZGV2aWNlLg0KPiA+PiA+IEhvd2V2ZXINCj4g
-Pj4gPiA+ID4gPiA+IHRoZXJlIHJlbWFpbnMgYSBwcm9ibGVtLiB0aGUgZGVmaW5pdGlvbiBvZiBL
-Vk1fTUVNX0RNQQ0KPiBpbXBsaWVzDQo+ID4+ID4gPiA+ID4gPiBmYXZvcmluZyBndWVzdCBzZXR0
-aW5nLCB3aGljaCBjb3VsZCBiZSB3aGF0ZXZlciB0eXBlIGluIGNvbmNlcHQuDQo+IFRoZW4NCj4g
-Pj4gPiA+ID4gPiA+IGFzc3VtaW5nIFVDIGlzIGFsc28gcHJvYmxlbWF0aWMuIEknbSBub3Qgc3Vy
-ZSB3aGV0aGVyIGludmVudGluZw0KPiA+PiA+IGFub3RoZXINCj4gPj4gPiA+ID4gPiA+IGludGVy
-ZmFjZSB0byBxdWVyeSBlZmZlY3RpdmUgbWVtb3J5IHR5cGUgZnJvbSBLVk0gaXMgYSBnb29kDQo+
-IGlkZWEuDQo+ID4+ID4gVGhlcmUNCj4gPj4gPiA+ID4gPiA+IGlzIG5vIGd1YXJhbnRlZSB0aGF0
-IHRoZSBndWVzdCB3aWxsIHVzZSBzYW1lIHR5cGUgZm9yIGV2ZXJ5IHBhZ2UNCj4gaW4gdGhlDQo+
-ID4+ID4gPiA+ID4gPiBzYW1lIHNsb3QsIHRoZW4gc3VjaCBpbnRlcmZhY2UgbWlnaHQgYmUgbWVz
-c3kuIEFsdGVybmF0aXZlbHksDQo+IG1heWJlDQo+ID4+ID4gPiA+ID4gPiB3ZSBjb3VsZCBqdXN0
-IGhhdmUgYW4gaW50ZXJmYWNlIGZvciBLVk0gdXNlcnNwYWNlIHRvIGZvcmNlDQo+IG1lbW9yeQ0K
-PiA+PiA+IHR5cGUNCj4gPj4gPiA+ID4gPiA+IGZvciBhIGdpdmVuIHNsb3QsIGlmIGl0IGlzIG1h
-aW5seSB1c2VkIGluIHBhcmEtdmlydHVhbGl6ZWQgc2NlbmFyaW9zDQo+IChlLmcuDQo+ID4+ID4g
-PiA+ID4gPiB2aXJ0aW8tZ3B1KSB3aGVyZSB0aGUgZ3Vlc3QgaXMgZW5saWdodGVuZWQgdG8gdXNl
-IGEgZm9yY2VkIHR5cGUNCj4gKGUuZy4NCj4gPj4gPiBXQyk/DQo+ID4+ID4gPiA+ID4gS1ZNIGZv
-cmNpbmcgdGhlIG1lbW9yeSB0eXBlIGZvciBhIGdpdmVuIHNsb3Qgc2hvdWxkIHdvcmsgdG9vLiAg
-QnV0DQo+IHRoZQ0KPiA+PiA+ID4gPiA+IGlnbm9yZS1ndWVzdC1wYXQgYml0IHNlZW1zIHRvIGJl
-IEludGVsLXNwZWNpZmljLiAgV2Ugd2lsbCBuZWVkIHRvDQo+ID4+ID4gPiA+ID4gZGVmaW5lIGhv
-dyB0aGUgc2Vjb25kLWxldmVsIHBhZ2UgYXR0cmlidXRlcyBjb21iaW5lIHdpdGggdGhlDQo+IGd1
-ZXN0DQo+ID4+ID4gPiA+ID4gcGFnZSBhdHRyaWJ1dGVzIHNvbWVob3cuDQo+ID4+ID4gPiA+DQo+
-ID4+ID4gPiA+IG9oLCBJJ20gbm90IGF3YXJlIG9mIHRoYXQgZGlmZmVyZW5jZS4gd2l0aG91dCBh
-biBpcGF0LWVxdWl2YWxlbnQNCj4gPj4gPiA+ID4gY2FwYWJpbGl0eSwgSSdtIG5vdCBzdXJlIGhv
-dyB0byBmb3JjaW5nIHJhbmRvbSB0eXBlIGhlcmUuIElmIHlvdSBsb29rDQo+IGF0DQo+ID4+ID4g
-PiA+IHRhYmxlIDExLTcgaW4gSW50ZWwgU0RNLCBub25lIG9mIE1UUlIgKEVQVCkgbWVtb3J5IHR5
-cGUgY2FuIGxlYWQNCj4gdG8NCj4gPj4gPiA+ID4gY29uc2lzdGVudCBlZmZlY3RpdmUgdHlwZSB3
-aGVuIGNvbWJpbmluZyB3aXRoIHJhbmRvbSBQQVQgdmFsdWUuIFNvDQo+ID4+ID4gPiA+ICBpdCBp
-cyBkZWZpbml0ZWx5IGEgZGVhZCBlbmQuDQo+ID4+ID4gPiA+DQo+ID4+ID4gPiA+ID4NCj4gPj4g
-PiA+ID4gPiBLVk0gc2hvdWxkIGluIHRoZW9yeSBiZSBhYmxlIHRvIHRlbGwgdGhhdCB0aGUgdXNl
-cnNwYWNlIHJlZ2lvbiBpcw0KPiA+PiA+ID4gPiA+IG1hcHBlZCB3aXRoIGEgY2VydGFpbiBtZW1v
-cnkgdHlwZSBhbmQgY2FuIGZvcmNlIHRoZSBzYW1lDQo+IG1lbW9yeQ0KPiA+PiA+IHR5cGUNCj4g
-Pj4gPiA+ID4gPiBvbnRvIHRoZSBndWVzdC4gIFRoZSB1c2Vyc3BhY2UgZG9lcyBub3QgbmVlZCB0
-byBiZSBpbnZvbHZlZC4gIEJ1dA0KPiB0aGF0DQo+ID4+ID4gPiA+ID4gc291bmRzIHZlcnkgc2xv
-dz8gIFRoaXMgbWF5IGJlIGEgZHVtYiBxdWVzdGlvbiwgYnV0IHdvdWxkIGl0IGhlbHANCj4gdG8N
-Cj4gPj4gPiA+ID4gPiBhZGQgS1ZNX1NFVF9ETUFfQlVGIGFuZCBsZXQgS1ZNIG5lZ290aWF0ZSB0
-aGUgbWVtb3J5IHR5cGUNCj4gd2l0aA0KPiA+PiA+IHRoZQ0KPiA+PiA+ID4gPiA+IGluLWtlcm5l
-bCBHUFUgZHJpdmVycz8NCj4gPj4gPiA+ID4gPg0KPiA+PiA+ID4gPiA+DQo+ID4+ID4gPiA+DQo+
-ID4+ID4gPiA+IEtWTV9TRVRfRE1BX0JVRiBsb29rcyBtb3JlIHJlYXNvbmFibGUuIEJ1dCBJIGd1
-ZXNzIHdlIGRvbid0DQo+IG5lZWQNCj4gPj4gPiA+ID4gS1ZNIHRvIGJlIGF3YXJlIG9mIHN1Y2gg
-bmVnb3RpYXRpb24uIFdlIGNhbiBjb250aW51ZSB5b3VyIG9yaWdpbmFsDQo+ID4+ID4gPiA+IHBy
-b3Bvc2FsIHRvIGhhdmUgS1ZNIHNpbXBseSBmYXZvciBndWVzdCBtZW1vcnkgdHlwZSAobWF5YmUg
-c3RpbGwNCj4gY2FsbA0KPiA+PiA+ID4gPiBLVk1fTUVNX0RNQSkuIE9uIHRoZSBvdGhlciBoYW5k
-LCBRZW11IHNob3VsZCBqdXN0IG1tYXAgb24NCj4gdGhlDQo+ID4+ID4gPiA+IGZkIGhhbmRsZSBv
-ZiB0aGUgZG1hYnVmIHBhc3NlZCBmcm9tIHRoZSB2aXJ0aW8tZ3B1IGRldmljZSBiYWNrZW5kLA0K
-PiBlLmcuDQo+ID4+ID4gPiA+IHRvIGNvbmR1Y3QgbWlncmF0aW9uLiBUaGF0IHdheSB0aGUgbW1h
-cCByZXF1ZXN0IGlzIGZpbmFsbHkgc2VydmVkIGJ5DQo+ID4+ID4gPiA+IERSTSBhbmQgdW5kZXJs
-eWluZyBHUFUgZHJpdmVycywgd2l0aCBwcm9wZXIgdHlwZSBlbmZvcmNlZA0KPiA+PiA+IGF1dG9t
-YXRpY2FsbHkuDQo+ID4+ID4gPiA+DQo+ID4+ID4gPg0KPiA+PiA+ID4gVGhpbmtpbmcgbW9yZSBw
-b3NzaWJseSB3ZSBkb24ndCBuZWVkIGludHJvZHVjZSBuZXcgaW50ZXJmYWNlIHRvIEtWTS4NCj4g
-Pj4gPiA+IEFzIGxvbmcgYXMgUWVtdSB1c2VzIGRtYWJ1ZiBpbnRlcmZhY2UgdG8gbW1hcCB0aGUg
-c3BlY2lmaWMgcmVnaW9uLA0KPiA+PiA+ID4gS1ZNIGNhbiBzaW1wbHkgY2hlY2sgbWVtb3J5IHR5
-cGUgaW4gaG9zdCBwYWdlIHRhYmxlIGdpdmVuIGh2YSBvZiBhDQo+ID4+ID4gPiBtZW1zbG90LiBJ
-ZiB0aGUgdHlwZSBpcyBVQyBvciBXQywgaXQgaW1wbGllcyB0aGF0IHVzZXJzcGFjZSB3YW50cyBh
-DQo+ID4+ID4gPiBub24tY29oZXJlbnQgbWFwcGluZyB3aGljaCBzaG91bGQgYmUgcmVmbGVjdGVk
-IGluIHRoZSBndWVzdCBzaWRlIHRvby4NCj4gPj4gPiA+IEluIHN1Y2ggY2FzZSwgS1ZNIGNhbiBn
-byB0byBub24tY29oZW5yZW50IERNQSBwYXRoIGFuZCBmYXZvciBndWVzdA0KPiA+PiA+ID4gbWVt
-b3J5IHR5cGUgYXV0b21hdGljYWxseS4NCj4gPj4gPiBTb3JyeSwgSSBtaXhlZCB0d28gdGhpbmdz
-IHRvZ2V0aGVyLg0KPiA+PiA+DQo+ID4+ID4gVXNlcnNwYWNlIGFjY2VzcyB0byBkbWFidWYgbW1h
-cCBtdXN0IGJlIGd1YXJkZWQgYnkNCj4gPj4gPiBETUFfQlVGX1NZTkNfe1NUQVJULEVORH0gaW9j
-dGxzLiAgSXQgaXMgcG9zc2libGUgdGhhdCB0aGUgR1BVIGRyaXZlcg0KPiA+PiA+IGFsd2F5cyBw
-aWNrcyBhIFdCIG1hcHBpbmcgYW5kIGxldCB0aGUgaW9jdGxzIGZsdXNoL2ludmFsaWRhdGUgQ1BV
-DQo+ID4+ID4gY2FjaGVzLiAgV2UgYWN0dWFsbHkgd2FudCB0aGUgZ3Vlc3QgbWVtb3J5IHR5cGUg
-dG8gbWF0Y2gNCj4gdmtNYXBNZW1vcnkncw0KPiA+PiA+IG1lbW9yeSB0eXBlLCB3aGljaCBjYW4g
-YmUgZGlmZmVyZW50IGZyb20gZG1hYnVmIG1tYXAncyBtZW1vcnkNCj4gdHlwZS4NCj4gPj4gPiBJ
-dCBpcyBub3QgZW5vdWdoIGZvciBLVk0gdG8gaW5zcGVjdCB0aGUgaHZhJ3MgbWVtb3J5IHR5cGUu
-DQo+ID4+DQo+ID4+IEknbSBub3QgZmFtaWxpYXIgd2l0aCBkbWFidWYgYW5kIHdoYXQgaXMgdGhl
-IGRpZmZlcmVuY2UgYmV0d2Vlbg0KPiA+PiB2a01hcE1lbW9yeSBhbmQgbW1hcC4gSnVzdCBhIHNp
-bXBsZSB0aG91Z2h0IHRoYXQgd2hhdGV2ZXINCj4gPj4gbWVtb3J5IHR5cGUvc3luY2hyb25pemF0
-aW9uIGVuZm9yY2VkIG9uIHRoZSBob3N0IHVzZXJzcGFjZSBzaG91bGQNCj4gPj4gaWRlYWxseSBi
-ZSBhcHBsaWVkIHRvIGd1ZXN0IHVzZXJzcGFjZSB0b28uIGUuZy4gaW4gYWJvdmUgZXhhbXBsZSB3
-ZQ0KPiA+PiBwb3NzaWJseSB3YW50IHRoZSBndWVzdCB0byB1c2UgV0IgYW5kIGlzc3VlIGZsdXNo
-L2ludmFsaWRhdGUgaHlwZXJjYWxscw0KPiA+PiB0byBndWFyZCB3aXRoIG90aGVyIHBvdGVudGlh
-bCBwYXJhbGxlbCBvcGVyYXRpb25zIGluIHRoZSBob3N0IHNpZGUuDQo+ID4+IG90aGVyd2lzZSBJ
-IGNhbm5vdCBzZWUgaG93IHN5bmNocm9uaXphdGlvbiBjYW4gYmUgZG9uZSB3aGVuIG9uZQ0KPiA+
-PiB1c2UgV0Igd2l0aCBzeW5jIHByaW1pdGl2ZXMgd2hpbGUgdGhlIG90aGVyIHNpbXBseSB1c2Ug
-V0Mgdy9vIHN1Y2gNCj4gPj4gcHJpbWl0aXZlcy4NCj4gPg0KPiBJIGFtIHJlYXNvbmFibHkgZmFt
-aWxpYXIgd2l0aCB0aGUgR1BVIHN0YWNrcywgYnV0IEkgYW0gbm90IGZhbWlsaWFyIHdpdGggS1ZN
-DQo+IDopDQo+IA0KPiBXaGVuIGFsbG9jYXRpbmcgYSBHUFUgbWVtb3J5LCB0aGUgdXNlcnNwYWNl
-IGNhbiBzcGVjaWZ5IHdoZXRoZXIgaXQgd2FudHMNCj4gYQ0KPiBjb2hlcmVudCBvbmUgb3IgYW4g
-aW5jb2hlcmVudCBvbmUuICB2a01hcE1lbW9yeSByZXR1cm5zIGEgY29oZXJlbnQgb3IgYQ0KPiBp
-bmNvaGVyZW50IG1hcHBpbmcgcmVzcGVjdGl2ZWx5LiAgSW5kZWVkIHdlIGFsc28gd2FudCB0aGUg
-Z3Vlc3QgdXNlcnNwYWNlDQo+IHRvDQo+IGhhdmUgYSBjb2hlcmVudCBvciBhIGluY29oZXJlbnQg
-bWFwcGluZyByZXNwZWN0aXZlbHkuDQo+IA0KPiBUaGUgR1BVIG1lbW9yeSBjYW4gYmUgZXhwb3J0
-ZWQgYXMgYSBkbWFidWYgdG8gc2hhcmUgd2l0aCBhbm90aGVyIGRldmljZQ0KPiBvcg0KPiBwcm9j
-ZXNzLiAgRm9yIHNlY3VyaXR5LCB3ZSBhbGxvY2F0ZSB0aGUgR1BVIG1lbW9yeSBpbiBhIEdQVSBw
-cm9jZXNzIGFuZCB3ZQ0KPiBleHBvcnQgdGhlIGRtYWJ1ZiB0byB0aGUgaHlwZXJ2aXNvci4gIG1t
-YXAgb2YgZG1hYnVmIHNlbWFudGljYWxseSByZXR1cm5zDQo+IGFuDQo+IGluY29oZXJlbnQgbWFw
-cGluZy4gIEFzIGEgcmVzdWx0LCB0aGUgZ3Vlc3Qgd2lsbCBzZXQgdXAgYSBtYXBwaW5nIHRoYXQg
-aGFzIHRoZQ0KPiBzYW1lIG1lbW9yeSB0eXBlIGFzIHRoZSB2a01hcE1lbW9yeSBtYXBwaW5nIGRv
-ZXMsIGJ1dCB0aGUgaHZhIGluDQo+IEtWTV9TRVRfVVNFUl9NRU1PUllfUkVHSU9OIHBvaW50cyB0
-byB0aGUgZG1hYnVmJ3MgaW5jb2hlcmVudA0KPiBtYXBwaW5nLg0KPiANCj4gSWYgeW91IHRoaW5r
-IGl0IGlzIHRoZSBiZXN0IGZvciBLVk0gdG8gaW5zcGVjdCBodmEgdG8gZGV0ZXJtaW5lIHRoZSBt
-ZW1vcnkNCj4gdHlwZSB3aXRoIHBhZ2UgZ3JhbnVsYXJpdHksIHRoYXQgaXMgcmVhc29uYWJsZSBh
-bmQgc2hvdWxkIHdvcmsgZm9yIHVzIHRvby4NCj4gVGhlIHVzZXJzcGFjZSBjYW4gZG8gc29tZXRo
-aW5nIChlLmcuLCBhZGQgYSBHUFUgZHJpdmVyIGRlcGVuZGVuY3kgdG8gdGhlDQo+IGh5cGVydmlz
-b3Igc3VjaCB0aGF0IHRoZSBkbWEtYnVmIGlzIGltcG9ydGVkIGFzIGEgR1BVIG1lbW9yeSBhbmQg
-bWFwcGVkDQo+IHVzaW5nDQo+IHZrTWFwTWVtb3J5KSBvciBJIGNhbiB3b3JrIHdpdGggZG1hLWJ1
-ZiBtYWludGFpbmVycyB0byBzZWUgaWYgZG1hLWJ1ZidzDQo+IHNlbWFudGljcyBjYW4gYmUgY2hh
-bmdlZC4NCg0KSSB0aGluayB5b3UgbmVlZCBjb25zaWRlciB0aGUgbGl2ZSBtaWdyYXRpb24gcmVx
-dWlyZW1lbnQgYXMgUGFvbG8gcG9pbnRlZCBvdXQuDQpUaGUgbWlncmF0aW9uIHRocmVhZCBuZWVk
-cyB0byByZWFkL3dyaXRlIHRoZSByZWdpb24sIHRoZW4gaXQgbXVzdCB1c2UgdGhlDQpzYW1lIHR5
-cGUgYXMgR1BVIHByb2Nlc3MgYW5kIGd1ZXN0IHRvIHJlYWQvd3JpdGUgdGhlIHJlZ2lvbi4gSW4g
-c3VjaCBjYXNlLCANCnRoZSBodmEgbWFwcGVkIGJ5IFFlbXUgc2hvdWxkIGhhdmUgdGhlIGRlc2ly
-ZWQgdHlwZSBhcyB0aGUgZ3Vlc3QuIEhvd2V2ZXIsDQphZGRpbmcgR1BVIGRyaXZlciBkZXBlbmRl
-bmN5IHRvIFFlbXUgbWlnaHQgdHJpZ2dlciBzb21lIGNvbmNlcm4uIEknbSBub3QNCnN1cmUgd2hl
-dGhlciB0aGVyZSBpcyBnZW5lcmljIG1lY2hhbmlzbSB0aG91Z2gsIHRvIHNoYXJlIGRtYWJ1ZiBm
-ZCBiZXR3ZWVuIEdQVQ0KcHJvY2VzcyBhbmQgUWVtdSB3aGlsZSBhbGxvd2luZyBRZW11IHRvIGZv
-bGxvdyB0aGUgZGVzaXJlZCB0eXBlIHcvbyB1c2luZw0KdmtNYXBNZW1vcnkuLi4NCg0KTm90ZSB0
-aGlzIGlzIG9ydGhvZ29uYWwgdG8gd2hldGhlciBpbnRyb2R1Y2luZyBhIG5ldyB1YXBpIG9yIGlt
-cGxpY2l0bHkgY2hlY2tpbmcNCmh2YSB0byBmYXZvciBndWVzdCBtZW1vcnkgdHlwZS4gSXQncyBw
-dXJlbHkgYWJvdXQgUWVtdSBpdHNlbGYuIElkZWFsbHkgYW55b25lIA0Kd2l0aCB0aGUgZGVzaXJl
-IHRvIGFjY2VzcyBhIGRtYS1idWYgb2JqZWN0IHNob3VsZCBmb2xsb3cgdGhlIGV4cGVjdGVkIHNl
-bWFudGljcy4NCkl0J3MgaW50ZXJlc3RpbmcgdGhhdCBkbWEtYnVmIHN1Yi1zeXN0ZW0gZG9lc24n
-dCBwcm92aWRlIGEgY2VudHJhbGl6ZWQgDQpzeW5jaHJvbml6YXRpb24gYWJvdXQgbWVtb3J5IHR5
-cGUgYmV0d2VlbiBtdWx0aXBsZSBtbWFwIHBhdGhzLiANCg0KPiANCj4gPg0KPiA+Pg0KPiA+PiA+
-DQo+ID4+ID4gS1ZNX1NFVF9ETUFfQlVGLCBpZiBzdXBwb3J0ZWQsIGlzIGEgc2lnbmFsIHRvIEtW
-TSB0aGF0IHRoZSBndWVzdA0KPiA+PiA+IG1lbW9yeSB0eXBlIHNob3VsZCBiZSBob25vcmVkIChv
-ciBmb3JjZWQgaWYgdGhlcmUgaXMgYSBuZXcgb3AgaW4NCj4gPj4gPiBkbWFfYnVmX29wcyB0aGF0
-IHRlbGxzIEtWTSB3aGljaCBtZW1vcnkgdHlwZSB0byBmb3JjZSkuDQo+IEtWTV9NRU1fRE1BDQo+
-ID4+ID4gZmxhZyBpbiB0aGlzIFJGQyBzZW5kcyB0aGUgc2FtZSBzaWduYWwuICBVbmxlc3MgS1ZN
-X1NFVF9ETUFfQlVGIGdpdmVzDQo+ID4+ID4gdGhlIHVzZXJzcGFjZSBvdGhlciBmZWF0dXJlcyBz
-dWNoIGFzIHNldHRpbmcgdW5saW1pdGVkIG51bWJlciBvZg0KPiA+PiA+IGRtYWJ1ZnMgdG8gc3Vi
-cmVnaW9ucyBvZiBhIG1lbXNsb3QsIGl0IGlzIG5vdCB2ZXJ5IHVzZWZ1bC4NCj4gPj4NCj4gPj4g
-dGhlIGdvb2QgcGFydCBvZiBhIG5ldyBpbnRlcmZhY2UgaXMgaXRzIHNpbXBsaWNpdHksIGJ1dCBv
-bmx5IGluIHNsb3QNCj4gPj4gZ3JhbnVsYXJpdHkuIGluc3RlYWQgaGF2aW5nIEtWTSB0byBpbnNw
-ZWN0IGh2YSBjYW4gc3VwcG9ydCBwYWdlDQo+ID4+IGdyYW51bGFyaXR5LCBidXQgYWRkaW5nIHJ1
-bi10aW1lIG92ZXJoZWFkLiBMZXQncyBzZWUgaG93IFBhb2xvDQo+ID4+IHRoaW5rcy4NCj4gPj4N
-Cj4gPj4gPg0KPiA+PiA+IElmIHVhcGkgY2hhbmdlIGlzIHRvIGJlIGF2b2lkZWQsIGl0IGlzIHRo
-ZSBlYXNpZXN0IHRoYXQgZ3Vlc3QgbWVtb3J5DQo+ID4+ID4gdHlwZSBpcyBhbHdheXMgaG9ub3Jl
-ZCB1bmxlc3MgaXQgY2F1c2VzICNNQyAoaS5lLixpc19tbWlvPT10cnVlKS4NCj4gPj4gPg0KPiA+
-Pg0KPiA+PiBJIGZlZWwgdGhpcyBnb2VzIHRvbyBmYXIuLi4NCj4gPj4NCj4gPj4gVGhhbmtzDQo+
-ID4+IEtldmluDQo=
+On Fri, Feb 21, 2020 at 05:00:11AM +0800, Alex Williamson wrote:
+> On Tue, 11 Feb 2020 05:10:38 -0500
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> 
+> > (1) make vfio_pci_device public, so it is accessible from external code.
+> > (2) add a private struct vfio_pci_device_private, which is only accessible
+> > from internal code. It extends struct vfio_pci_device.
+> > 
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci.c         | 256 +++++++++++++++-------------
+> >  drivers/vfio/pci/vfio_pci_config.c  | 186 ++++++++++++--------
+> >  drivers/vfio/pci/vfio_pci_igd.c     |  19 ++-
+> >  drivers/vfio/pci/vfio_pci_intrs.c   | 186 +++++++++++---------
+> >  drivers/vfio/pci/vfio_pci_nvlink2.c |  22 +--
+> >  drivers/vfio/pci/vfio_pci_private.h |   7 +-
+> >  drivers/vfio/pci/vfio_pci_rdwr.c    |  40 +++--
+> >  include/linux/vfio.h                |   5 +
+> >  8 files changed, 408 insertions(+), 313 deletions(-)
+> 
+> [SNIP!]
+> 
+> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> > index e42a711a2800..70a2b8fb6179 100644
+> > --- a/include/linux/vfio.h
+> > +++ b/include/linux/vfio.h
+> > @@ -195,4 +195,9 @@ extern int vfio_virqfd_enable(void *opaque,
+> >  			      void *data, struct virqfd **pvirqfd, int fd);
+> >  extern void vfio_virqfd_disable(struct virqfd **pvirqfd);
+> >  
+> > +struct vfio_pci_device {
+> > +	struct pci_dev			*pdev;
+> > +	int				num_regions;
+> > +	int				irq_type;
+> > +};
+> >  #endif /* VFIO_H */
+> 
+> Hi Yan,
+> 
+> Sorry for the delay.  I'm still not very happy with this result, I was
+> hoping the changes could be done less intrusively.  Maybe here's
+> another suggestion, why can't the vendor driver use a struct
+> vfio_pci_device* as an opaque pointer?  If you only want these three
+> things initially, I think this whole massive patch can be reduced to:
+> 
+> struct pci_dev *vfio_pci_pdev(struct vfio_pci_device *vdev)
+> {
+> 	return vdev->pdev;
+> }
+> EXPORT_SYMBOL_GPL(vfio_pci_dev);
+> 
+> int vfio_pci_num_regions(struct vfio_pci_device *vdev)
+> {
+> 	return vdev->num_regions;
+> }
+> EXPORT_SYMBOL_GPL(vfio_pci_num_region);
+> 
+> int vfio_pci_irq_type(struct vfio_pci_device *vdev)
+> {
+> 	return vdev->irq_type;
+> }
+> EXPORT_SYMBOL_GPL(vfio_pci_irq_type);
+> 
+> This is how vfio-pci works with vfio, we don't know a struct
+> vfio_device as anything other than an opaque pointer and we have access
+> function where we need to see some property of that object.
+> 
+> Patch 5/9 would become a vfio_pci_set_vendor_regions() interface.
+>
+you are right!
+I'll change it to this way. Thanks.
+
+Yan
