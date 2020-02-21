@@ -2,102 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D54A16837A
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 17:31:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B78FD16838F
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 17:33:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727636AbgBUQbw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 11:31:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38383 "EHLO
+        id S1726766AbgBUQdm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 11:33:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21268 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726710AbgBUQbu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 11:31:50 -0500
+        with ESMTP id S1725995AbgBUQdm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 11:33:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582302709;
+        s=mimecast20190719; t=1582302821;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x+/PwYVfKF+sGaYhdBB/ka7rcNSOJveuT3O5v5Xs6QM=;
-        b=ESGbxVw1HJjq1oBx2t4O0MDWKKz6SfhdePNBXnwuTwm+Kgsi9mC9O5yeauKJx/cAMn/urq
-        JaQVqrcB9TTqFczfM77GT0UG1stkXdcO6QIjovzMla2lc446NS9qY2+Y85YFZu78SQYYwU
-        6hIeUdWF4VBnXppaTwIzrUjCswVO298=
+         to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+wtlMqiYMfAtECyCFeq4h5JvYyRA49l8lzkwzoiW88E=;
+        b=Q+0GhxC0gqqoNYWP+gfMbm9lUQ6KMNT6I/qM3+Sm4pIwI8mRDlbHFFG1zWNyEDXieReNxc
+        Yl/oRwnr2k56OPH+6kOl/SKaSxy1d+rY0seuCz6vA4nRp6OvCH8G5/14rMrtmv8L7gns3Q
+        GtJ84A9oYjavIPyFyPJk8AimqX5ywPc=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-e8qgw5_xPKK3VlNMCuQdkQ-1; Fri, 21 Feb 2020 11:31:47 -0500
-X-MC-Unique: e8qgw5_xPKK3VlNMCuQdkQ-1
-Received: by mail-wr1-f71.google.com with SMTP id d7so1250163wrx.9
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 08:31:46 -0800 (PST)
+ us-mta-473-J4iylRzPPHKjGG_XXxozeQ-1; Fri, 21 Feb 2020 11:33:39 -0500
+X-MC-Unique: J4iylRzPPHKjGG_XXxozeQ-1
+Received: by mail-wr1-f71.google.com with SMTP id t6so1260255wru.3
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 08:33:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=x+/PwYVfKF+sGaYhdBB/ka7rcNSOJveuT3O5v5Xs6QM=;
-        b=MjGOlm+l2V7+NOP2u54DwD5TPIeKCpPWqQwb+/7AD/jWN2jy/nAZrQNNeMlCt85Rwt
-         39cmx70y0cKJf9kQrGsXzOnsjW3yUG8FSCSruWfp7RszflnQfJNHM5pCXcHldI6Ik9bz
-         BKxz2sXTAara1VPapvx58potGFHwCAgJ4+rKkz2p+PfectuIRXF+r7L+HDg4/RLyIo2j
-         8ua44fW/xrNDg8LT6vYnkaxDWYiXTQaS5IQx+DsrCa5bMYt09PsQ6ze9UTEy8PIzjbik
-         MVyfje71sWXxKYutGLQw0H2G608rVre7W3R0sf8LHH5xb8S9Uvdp0KhtA2u+JMh3Ib2D
-         IUXw==
-X-Gm-Message-State: APjAAAUji7u3AKrdgse5IaC3fRBY2MMneaJPocJDvmYUUnDu8WP1fKoR
-        ExDHBxCRBHXW0u7R31FqUhWIKC4LU0ZFc/WQe8ZyN4+D7Ua2Ns5do5MEOxJRTQ7KYLGpTvpp2ZG
-        lulEe5uAykjxR
-X-Received: by 2002:a1c:f606:: with SMTP id w6mr4632374wmc.109.1582302706099;
-        Fri, 21 Feb 2020 08:31:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzHPzw+vtsYsE0OyDcSB1eD9HXtMyBCN3d5TeUuNu7HSh1hgyKVqB1VcO5l07mSlsTnqf40YA==
-X-Received: by 2002:a1c:f606:: with SMTP id w6mr4632358wmc.109.1582302705882;
-        Fri, 21 Feb 2020 08:31:45 -0800 (PST)
-Received: from [192.168.178.40] ([151.20.135.128])
-        by smtp.gmail.com with ESMTPSA id w1sm4297148wmc.11.2020.02.21.08.31.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Feb 2020 08:31:44 -0800 (PST)
-Subject: Re: [PATCH] KVM: X86: eliminate some meaningless code
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        linmiaohe <linmiaohe@huawei.com>
-Cc:     rkrcmar@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-References: <1582293926-23388-1-git-send-email-linmiaohe@huawei.com>
- <20200221152358.GC12665@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e393431b-9e5e-9bcb-c03a-d40baeafa435@redhat.com>
-Date:   Fri, 21 Feb 2020 17:31:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        bh=+wtlMqiYMfAtECyCFeq4h5JvYyRA49l8lzkwzoiW88E=;
+        b=T8fJ4WYn1R6a8nrzbBVWE1zRbNPgH4PsKdh7IOgormIpS3w3r8ZEsU+x9Z9DWn9Eud
+         DUVENsuS4BSYU/ektjU8kF6yEwJmzGmmJcUSYTd/kysjxdYGOY86K1ypIT+tKyzw6Fi9
+         WoVctmZwEFgy0d3H1Yh5YCEVrtyX2KLyT7lU0XZ4fxQyTg6TmN0mWIzogny76DlC7vDg
+         2FqYZO6N87PQ9d2f/SPHWBrRfTbXlF6f2tqaK7vjh2443PRuhAFuiL1wUQ9KJ05aegWF
+         UVa3i7KivEQgO68D7LZ9olw+/rCRSEsIoZtUHqOX+DlJoFPBZi2s+MSc7gK7YVhNa+wY
+         teiQ==
+X-Gm-Message-State: APjAAAXHuIe9qrgCkOYO4zc3z1QHrPT/6YKqYCNu47D1pucOuLpi2RtV
+        S1QV9UJ2OAES1SmGMpgc93c2nA1Y7rEF3vk8srB7x/x8oc/A9iKn1pNcoBy7z5XCdP1Y7ln8pTt
+        4Ka2b/cFGQ+uv
+X-Received: by 2002:a5d:6411:: with SMTP id z17mr52257863wru.57.1582302818487;
+        Fri, 21 Feb 2020 08:33:38 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw/P0AiFwTiT7z/wiXEONKmFEX/+8KKpJaNr4hGDqfwDZfa9AgZLuHo195clbdhIrrAhDaBiQ==
+X-Received: by 2002:a5d:6411:: with SMTP id z17mr52257842wru.57.1582302818224;
+        Fri, 21 Feb 2020 08:33:38 -0800 (PST)
+Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net. [88.21.202.78])
+        by smtp.gmail.com with ESMTPSA id c15sm4522493wrt.1.2020.02.21.08.33.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2020 08:33:37 -0800 (PST)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH] accel/kvm: Check ioctl(KVM_SET_USER_MEMORY_REGION) return value
+Date:   Fri, 21 Feb 2020 17:33:36 +0100
+Message-Id: <20200221163336.2362-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <20200221152358.GC12665@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/02/20 16:23, Sean Christopherson wrote:
-> 
-> I'm guessing no VMM actually uses this ioctl(), e.g. neither Qemu or CrosVM
-> use it, which is why the broken behavior has gone unnoticed.  Don't suppose
-> you'd want to write a selftest to hammer KVM_{SET,GET}_CPUID2?
-> 
-> int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
->                               struct kvm_cpuid2 *cpuid,
->                               struct kvm_cpuid_entry2 __user *entries)
-> {
->         if (cpuid->nent < vcpu->arch.cpuid_nent)
->                 return -E2BIG;
-> 
->         if (copy_to_user(entries, &vcpu->arch.cpuid_entries,
->                          vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
->                 return -EFAULT;
-> 
-> 	cpuid->nent = vcpu->arch.cpuid_nent;
-> 
->         return 0;
-> }
+kvm_vm_ioctl() can fail, check its return value, and log an error
+when it failed. This fixes Coverity CID 1412229:
 
-I would just drop KVM_GET_CPUID2 altogether and see if someone complains.
+  Unchecked return value (CHECKED_RETURN)
 
-Paolo
+  check_return: Calling kvm_vm_ioctl without checking return value
+
+Reported-by: Coverity (CID 1412229)
+Fixes: 235e8982ad3 ("support using KVM_MEM_READONLY flag for regions")
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ accel/kvm/kvm-all.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index c111312dfd..6df3a4d030 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -308,13 +308,23 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, boo
+         /* Set the slot size to 0 before setting the slot to the desired
+          * value. This is needed based on KVM commit 75d61fbc. */
+         mem.memory_size = 0;
+-        kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
++        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
++        if (ret < 0) {
++            goto err;
++        }
+     }
+     mem.memory_size = slot->memory_size;
+     ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
+     slot->old_flags = mem.flags;
++err:
+     trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
+                               mem.memory_size, mem.userspace_addr, ret);
++    if (ret < 0) {
++        error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
++                     " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
++                     __func__, mem.slot, slot->start_addr,
++                     (uint64_t)mem.memory_size, strerror(errno));
++    }
+     return ret;
+ }
+ 
+-- 
+2.21.1
 
