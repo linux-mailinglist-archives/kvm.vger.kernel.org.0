@@ -2,125 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E9E67168455
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 18:04:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E07E16848E
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 18:12:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726472AbgBURED (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 12:04:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23740 "EHLO
+        id S1728364AbgBURMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 12:12:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22133 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726150AbgBURED (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 12:04:03 -0500
+        with ESMTP id S1725957AbgBURMh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 12:12:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582304641;
+        s=mimecast20190719; t=1582305156;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8G8BZBouM/mQbwFQpvSrCjCl8B0n5IMFrewnfRa7ZHQ=;
-        b=VGP5pkMdhxVbLW/kN/f1L1RbNAlrQB35hcUIxMPxh7JEMB6W5VMeqhXJNlhs1KJWwYoVjl
-        NBFxeLwDc8T7f1QGDto7Iv7ql5OeUyeCRkcOWWLRNB/TpWVdgP1HECqp7Mw3NGW8lVIIsM
-        CjhQviJYOCC6KmHh5qkypUSmBJHJ2Bw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-ITGPffGWMo6JJrikaMcrtg-1; Fri, 21 Feb 2020 12:03:59 -0500
-X-MC-Unique: ITGPffGWMo6JJrikaMcrtg-1
-Received: by mail-wr1-f70.google.com with SMTP id s13so1272068wrb.21
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 09:03:59 -0800 (PST)
+        bh=g3L1ZoX/TxjkXS/fwqsg0irgxYEbxhFv9zJWuTR+8M4=;
+        b=IAmyAQynDj01UY6WenRa4vmz0SBGmrwl9eUhEeDes1GV+f+tXDI0JBOq2MrMTTLpQRilA/
+        ExcE1/lFHtwgHsBo3N5Xy3jhhVSgFb/XGoHzGCJhh7s51MjQ6aZdyxHKNjos90iUti2mSN
+        cqT6gZzf13ss9ghXhvzxleL+I4ANlNI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-maAn_s6_Mh-M77TPa6ui0A-1; Fri, 21 Feb 2020 12:12:34 -0500
+X-MC-Unique: maAn_s6_Mh-M77TPa6ui0A-1
+Received: by mail-wr1-f71.google.com with SMTP id t3so1275748wrm.23
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 09:12:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=8G8BZBouM/mQbwFQpvSrCjCl8B0n5IMFrewnfRa7ZHQ=;
-        b=ebENw45niY0DwmbF1/+k9Li9wv4/3Uof9nCX6PF0d3fdkiW3SmuaX5SWCIc79mLeOy
-         RaFmzOpv+3NyInkXC1Oaw3xkrUgkHZdZ8Cmgi3Czx51jqnPFrZwYn7z5/e//4EkVp1Dv
-         Q5b+zQPu7jwfO84saGl2ykito4TF9zuyvrR8F/GoQOpyoL57K6NsX/TnPID/Ti3vMLHh
-         rAZGz8XWMoEnvdHdv5tv10ZFsXwPBA2TTwgr1ZMcpVqzFKSUneoQwJp1/6DzqEzld7WU
-         chXHqc0we3RaT4HyVCmRdHyIH4PWfQF7F6eX0ChOUZHQjxTWgeWhzpMcGY/bf0S643y2
-         0sIw==
-X-Gm-Message-State: APjAAAVJfR8k8oKGaYSrYQV+XbD3u21BBS9KFm3sBbVCj+PIsPsiWOUv
-        ROioy6hgLxKfepoeCI2/zVSf0/W+2V34ypIyMvINvOKL18JQesV35Pyb6tWvqMSNi/d4z/POw/p
-        KQBrhd1GJYPH0
-X-Received: by 2002:adf:f304:: with SMTP id i4mr21262854wro.379.1582304638126;
-        Fri, 21 Feb 2020 09:03:58 -0800 (PST)
-X-Google-Smtp-Source: APXvYqycqGQ/vXL+GcFTL84DXzdJhPFJsCbwR2zdeMb+niCcvVPE6dnEi0QtYrhmWkPHfR0VCvR2rA==
-X-Received: by 2002:adf:f304:: with SMTP id i4mr21262835wro.379.1582304637816;
-        Fri, 21 Feb 2020 09:03:57 -0800 (PST)
+        bh=g3L1ZoX/TxjkXS/fwqsg0irgxYEbxhFv9zJWuTR+8M4=;
+        b=QfTqWSWxJ6RJcN/K4OR5PGaE3ww9v2xmsyqUViv6ScgypNRWiFmepNdhXzzuq/sXVu
+         RV+b72ekY8t9bbVo6khCU6EHuiZ2SvsszjLnmOP3dMWILeq1+xOoFt1n7GboaB9Mqgta
+         K4Z0WYCRuyvA6YqqwUTb2+jmCX20Hfyrli0QgphThBaQVTQ82bIaVp8zqZ+QnQxmXXto
+         95l2Ks3//muWiyxy2AugliV48gZM7vlq6ueWU/dIjmQ7U1pFxqARlKcQtZ60H2irWNVa
+         1Y8tHzHmCLbzGMZYzDbVxzmZ35SJnzmephJ1D+pq/cZzj3xBVhQ58FYBhgZqJdhD4KwP
+         4d2g==
+X-Gm-Message-State: APjAAAUCquaPLrVJJiGGp0ECSIkqgfuWeBwr2ahQ1bbV5DtstEce/OcF
+        A7H3i6X1Fy1R1GyKHoY6fw0m5FnsnGNxxSiqbCkoE4QqZMWwQsyyYsbULq4RNcUeEIDb+hIJ8Gs
+        5ezg/hj1jxney
+X-Received: by 2002:adf:f6c8:: with SMTP id y8mr48865561wrp.167.1582305153493;
+        Fri, 21 Feb 2020 09:12:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxzWyB6s7IwAppJnceUdyTwctOskCid+p4JUdfGldG0cym2Ms87VdXP5N1NlYKfWlZBVYTZFA==
+X-Received: by 2002:adf:f6c8:: with SMTP id y8mr48865545wrp.167.1582305153286;
+        Fri, 21 Feb 2020 09:12:33 -0800 (PST)
 Received: from [192.168.178.40] ([151.20.135.128])
-        by smtp.gmail.com with ESMTPSA id k8sm4768060wrq.67.2020.02.21.09.03.56
+        by smtp.gmail.com with ESMTPSA id g15sm4814994wro.65.2020.02.21.09.12.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Feb 2020 09:03:57 -0800 (PST)
-Subject: Re: [PATCH] accel/kvm: Check ioctl(KVM_SET_USER_MEMORY_REGION) return
- value
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20200221163336.2362-1-philmd@redhat.com>
+        Fri, 21 Feb 2020 09:12:32 -0800 (PST)
+Subject: Re: [PATCH v2 1/3] KVM: x86: Add EMULTYPE_PF when emulation is
+ triggered by a page fault
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200218230310.29410-1-sean.j.christopherson@intel.com>
+ <20200218230310.29410-2-sean.j.christopherson@intel.com>
+ <7d564331-9a77-d59a-73d3-a7452fd7b15f@intel.com>
+ <20200220201145.GI3972@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a6d29e18-722c-77d1-ca56-220b3b02ae00@redhat.com>
-Date:   Fri, 21 Feb 2020 18:03:56 +0100
+Message-ID: <0b47c043-5fa5-3ae5-6c97-e2532dcff80e@redhat.com>
+Date:   Fri, 21 Feb 2020 18:12:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200221163336.2362-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200220201145.GI3972@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/02/20 17:33, Philippe Mathieu-Daudé wrote:
-> kvm_vm_ioctl() can fail, check its return value, and log an error
-> when it failed. This fixes Coverity CID 1412229:
-> 
->   Unchecked return value (CHECKED_RETURN)
-> 
->   check_return: Calling kvm_vm_ioctl without checking return value
-> 
-> Reported-by: Coverity (CID 1412229)
-> Fixes: 235e8982ad3 ("support using KVM_MEM_READONLY flag for regions")
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  accel/kvm/kvm-all.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index c111312dfd..6df3a4d030 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -308,13 +308,23 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, boo
->          /* Set the slot size to 0 before setting the slot to the desired
->           * value. This is needed based on KVM commit 75d61fbc. */
->          mem.memory_size = 0;
-> -        kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-> +        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-> +        if (ret < 0) {
-> +            goto err;
-> +        }
->      }
->      mem.memory_size = slot->memory_size;
->      ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
->      slot->old_flags = mem.flags;
-> +err:
->      trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
->                                mem.memory_size, mem.userspace_addr, ret);
-> +    if (ret < 0) {
-> +        error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
-> +                     " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
-> +                     __func__, mem.slot, slot->start_addr,
-> +                     (uint64_t)mem.memory_size, strerror(errno));
-> +    }
->      return ret;
->  }
->  
-> 
+On 20/02/20 21:11, Sean Christopherson wrote:
+>> How about naming it as EMULTYPE_PF_ALLOW_RETRY and exchanging the bit
+>> position with EMULTYPE_PF ?
+> Hmm, EMULTYPE_PF_ALLOW_RETRY does sound better.  I'm on the fence regarding
+> shuffling the bits.  If I were to shuffle the bits, I'd do a more thorough
+> reorder so that the #UD and #PF types are consecutive, e.g.
 
-Queued, thanks.
+Let's just change the name, I can do it.
 
 Paolo
 
