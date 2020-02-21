@@ -2,135 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0B231682BB
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 17:05:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 968EC1682F8
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 17:14:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729188AbgBUQFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 11:05:05 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38494 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728130AbgBUQFE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 11:05:04 -0500
+        id S1728684AbgBUQOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 11:14:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46878 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728299AbgBUQOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 11:14:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582301103;
+        s=mimecast20190719; t=1582301649;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=b/XFBGDvO3UXFNECW6P4x7ADbFivKxUA9DrB33OKpco=;
-        b=LrGOaPZZi+0r6jMswW8Kg3U+hUtKwG2LoeAK9htl6eR/aT8DoHOzHwhyJroOnm0UW88klz
-        CJKsyLw+8pFuqa6EKcBknGT8wQ8uonSu+si3RIWhpuN27edA+28NkfuBHugULODvSuY25U
-        A2nUMugumoZ9fZNzPRWR/b4YDgY24iY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-VLwmia8RN-eCpjy3yLpDzw-1; Fri, 21 Feb 2020 11:05:01 -0500
-X-MC-Unique: VLwmia8RN-eCpjy3yLpDzw-1
-Received: by mail-wm1-f72.google.com with SMTP id p2so799070wmi.8
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 08:05:01 -0800 (PST)
+        bh=sG/qxfL50KvHqT7UfD+irY9EmnZdcQz1VfBLgZqPoxs=;
+        b=iRr5f2G6w5ZhNFN3KIwSi1kcCP8wRmI4UG5x7tXqgy6WpGc44VA+CHOjUBU0RfyFVonVVq
+        0D6W1L3k5UGhWX5psPd/dMCBYYIgWtNrRGf/RaWQllB/+061lVTkL86JyCJ2cCQylomCwP
+        amnBetO2exkZzbXoVP/V4/1/bAIciHM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-71-1rZEBZ9EPguLoxblXMrl9w-1; Fri, 21 Feb 2020 11:14:07 -0500
+X-MC-Unique: 1rZEBZ9EPguLoxblXMrl9w-1
+Received: by mail-wr1-f72.google.com with SMTP id p8so1232870wrw.5
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 08:14:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=b/XFBGDvO3UXFNECW6P4x7ADbFivKxUA9DrB33OKpco=;
-        b=duYo/JDCwLd7QuyMPZDratdurZqmlKjX0NDoBsY+DXDBsXZJgaHEyPEEpH+C5eD23f
-         7G5CtnmQmqsZnW8fKeps9wCVBThtGB2vu70vH7amejhwv3aPtdAJraU1t5qz01NLtLAY
-         7eBKOyhSqfymK4xwBDRNWZR4MTbmu+n7sp/yRGugSKaRCJwUQDiKhtDCGYNVaUiwS0t+
-         lXLUSKO68DTg1i0MTNrQc8V6UVgnvRRZ3wk4xGqSvRG89x/un5XOIxVSV1UoaKJqZACt
-         +Pt4quKCUUq/mWyFOMVRUujQFpoV2b5RPT7fps5/RNIi4HIOVf/EDqrxxHZGj/Ifuuaf
-         8CUQ==
-X-Gm-Message-State: APjAAAXzyeOwKVWqFMAexKss8Ge7RP/11fuAVRMlmT09mynzo1GjsY5n
-        hsGDzQfuAPXx24pANwWzrHlvXxmPpfiRB3qQBU1G+LIuTdxHes+QJEF07IgYR0TS9yFiaGSylOY
-        5bIbZ0m5Z742p
-X-Received: by 2002:adf:c453:: with SMTP id a19mr49870871wrg.341.1582301097213;
-        Fri, 21 Feb 2020 08:04:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxcNZy47AONFyMZVt1Po1fABbweri3/gLj6WIymqQWTWEqb3bitDkuCMdiuyDTbVITIsZ7gWA==
-X-Received: by 2002:adf:c453:: with SMTP id a19mr49870335wrg.341.1582301089399;
-        Fri, 21 Feb 2020 08:04:49 -0800 (PST)
-Received: from [192.168.178.40] ([151.20.135.128])
-        by smtp.gmail.com with ESMTPSA id 25sm4424881wmi.32.2020.02.21.08.04.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Feb 2020 08:04:48 -0800 (PST)
-Subject: Re: [PATCH] kvm: x86: svm: Fix NULL pointer dereference when AVIC not
- enabled
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, joro@8bytes.org,
-        jon.grimm@amd.com
-References: <1582296737-13086-1-git-send-email-suravee.suthikulpanit@amd.com>
- <20200221083934.3ed38014@x1.home>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bad78ab6-45b6-5d8d-be36-2ff18a5373a2@redhat.com>
-Date:   Fri, 21 Feb 2020 17:04:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=sG/qxfL50KvHqT7UfD+irY9EmnZdcQz1VfBLgZqPoxs=;
+        b=W2uKO82VaKXIHybbMTAoD9BfTHfvrQkx7Yd1KsvT4QEwniM8SO2hKaiykMy/47OCW3
+         8606xcenV3t2lDGvUaXeWXQmtYt++L3SutDRgJx+gYuhh+4bJIqCF88vW744S08g9cSd
+         ixH3rYVn4VqWfn0YLNj0ncI76FMVrUkQc7gXfgjVm+mTVa+Z7zKJrz2qZF3STYEX8Rmh
+         VMbQ9ac6SXMvtbXx99BWK2qT+cHc6Wo+qjuwPbddb9P/YmMKP/1hnJuhBsK1c9vU0jfa
+         N2IBhE6RrVXyU6dJZp0Cfb46bHxYwHN5oaJc2PHFOdCEmJvgfRAHdegcqLOBwW5PSRN6
+         GCTQ==
+X-Gm-Message-State: APjAAAWOgEXAVfbi/86fhYvj/4EkbVM6Ay/RSXGhfX84mZsUkGd0XK6h
+        wM1nzKTIsK6QZ5hVW9vkqH2azOVDMewPaYbRzdybuI4OhX+W3wz2jO+Ps3NKNKgp0gb+uVy0wLR
+        AQYbtKPMuiRSE
+X-Received: by 2002:a7b:cf01:: with SMTP id l1mr4605532wmg.86.1582301646487;
+        Fri, 21 Feb 2020 08:14:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwke2sDU6jfLxQYJRrrHGm8vyfSBWYb99TFtIKX5F/sdOW44JfeZnpvYOIhr+mQWgUjE1ASJw==
+X-Received: by 2002:a7b:cf01:: with SMTP id l1mr4605492wmg.86.1582301646173;
+        Fri, 21 Feb 2020 08:14:06 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id 4sm4205116wmg.22.2020.02.21.08.14.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2020 08:14:05 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     linmiaohe <linmiaohe@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Subject: Re: [PATCH v2] KVM: apic: avoid calculating pending eoi from an uninitialized val
+In-Reply-To: <1582293886-23335-1-git-send-email-linmiaohe@huawei.com>
+References: <1582293886-23335-1-git-send-email-linmiaohe@huawei.com>
+Date:   Fri, 21 Feb 2020 17:14:04 +0100
+Message-ID: <8736b3rk8j.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200221083934.3ed38014@x1.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/02/20 16:39, Alex Williamson wrote:
-> On Fri, 21 Feb 2020 08:52:17 -0600
-> Suravee Suthikulpanit <suravee.suthikulpanit@amd.com> wrote:
-> 
->> Launching VM w/ AVIC disabled together with pass-through device
->> results in NULL pointer dereference bug with the following call trace.
->>
->>     RIP: 0010:svm_refresh_apicv_exec_ctrl+0x17e/0x1a0 [kvm_amd]
->>
->>     Call Trace:
->>      kvm_vcpu_update_apicv+0x44/0x60 [kvm]
->>      kvm_arch_vcpu_ioctl_run+0x3f4/0x1c80 [kvm]
->>      kvm_vcpu_ioctl+0x3d8/0x650 [kvm]
->>      do_vfs_ioctl+0xaa/0x660
->>      ? tomoyo_file_ioctl+0x19/0x20
->>      ksys_ioctl+0x67/0x90
->>      __x64_sys_ioctl+0x1a/0x20
->>      do_syscall_64+0x57/0x190
->>      entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> Investigation shows that this is due to the uninitialized usage of
->> struct vapu_svm.ir_list in the svm_set_pi_irte_mode(), which is
->> called from svm_refresh_apicv_exec_ctrl().
->>
->> The ir_list is initialized only if AVIC is enabled. So, fixes by
->> adding a check if AVIC is enabled in the svm_refresh_apicv_exec_ctrl().
->>
->> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=206579
->> Fixes: 8937d762396d ("kvm: x86: svm: Add support to (de)activate posted interrupts.")
->> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
->> Cc: Alex Williamson <alex.williamson@redhat.com>
->> ---
->>  arch/x86/kvm/svm.c | 3 +++
->>  1 file changed, 3 insertions(+)
-> 
-> Works for me, thanks Suravee!
-> 
-> Tested-by: Alex Williamson <alex.williamson@redhat.com>
-> 
->>
->> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
->> index 19035fb..1858455 100644
->> --- a/arch/x86/kvm/svm.c
->> +++ b/arch/x86/kvm/svm.c
->> @@ -5222,6 +5222,9 @@ static void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
->>  	struct vmcb *vmcb = svm->vmcb;
->>  	bool activated = kvm_vcpu_apicv_active(vcpu);
->>  
->> +	if (!avic)
->> +		return;
->> +
->>  	if (activated) {
->>  		/**
->>  		 * During AVIC temporary deactivation, guest could update
-> 
+linmiaohe <linmiaohe@huawei.com> writes:
 
-Thanks to both of you.  I'll get it to Linus next Monday.
+> From: Miaohe Lin <linmiaohe@huawei.com>
+>
+> When pv_eoi_get_user() fails, 'val' may remain uninitialized and the return
+> value of pv_eoi_get_pending() becomes random. Fix the issue by initializing
+> the variable.
 
-Paolo
+Well, now the 'perfect' commit message doesn't match the patch :-). I
+think you (or Paolo upon commit) can just drop the last sentence.
+
+>
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+> v1->v2:
+> Collect Vitaly' R-b.
+> Use Vitaly' alternative wording.
+> Explicitly handle the error, as suggested by Sean.
+> ---
+>  arch/x86/kvm/lapic.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 4f14ec7525f6..b4aca77efc8e 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -627,9 +627,11 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
+>  static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
+>  {
+>  	u8 val;
+> -	if (pv_eoi_get_user(vcpu, &val) < 0)
+> +	if (pv_eoi_get_user(vcpu, &val) < 0) {
+>  		printk(KERN_WARNING "Can't read EOI MSR value: 0x%llx\n",
+>  			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
+> +		return false;
+> +	}
+>  	return val & 0x1;
+>  }
+
+-- 
+Vitaly
 
