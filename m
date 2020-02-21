@@ -2,162 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EB452166B8C
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 01:23:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 63A0F166B89
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 01:23:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729462AbgBUAXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Feb 2020 19:23:51 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:57752 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729441AbgBUAXu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Feb 2020 19:23:50 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01L0IuBc097560;
-        Fri, 21 Feb 2020 00:22:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=j3orcV8N7f6tsO1hzt4d6bYa8i40eAtvmiZrDeUsowc=;
- b=cVgkuu1q0ENV4pHWiXR021YoDnJt/upxXvl+V7TptYMU6reyQ9uuYXRwAz5ius5oIyTO
- YmwNJWi92N/4cDdoxdkAni9VqOlV+FR9E4F7GFK/r7pXVJ3E0XEpuXnjvvEmOqXngjow
- CtPXx7EndrPPiiNOevB6oh5vwEoM5H6upA9kEQ3giDn9xX1UKjeigv4UkdsV8UvBMTHk
- Pty3uFwFC1DoD8CcbRLZf8hAE/WGbNVKx6LGYYj+TOz6ppUHBu/5y+TzbjpsBWBpOe4J
- 5X4q0LuRs/zDbbtQIJQ3skmEPVXUs+DF0+Qy1pOZKvAdgDr/l71Kaf5Szqh5LbKj/bis dg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2y8udddayy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Feb 2020 00:22:29 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01L0HssC082442;
-        Fri, 21 Feb 2020 00:22:28 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2y8udgkksv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Feb 2020 00:22:28 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01L0MP4K016579;
-        Fri, 21 Feb 2020 00:22:26 GMT
-Received: from [192.168.1.206] (/71.63.128.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 20 Feb 2020 16:22:25 -0800
-Subject: Re: [PATCH] mm/hugetlb: avoid get wrong ptep caused by race
-To:     "Longpeng (Mike)" <longpeng2@huawei.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     akpm@linux-foundation.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
-        weidong.huang@huawei.com, weifuqiang@huawei.com,
-        kvm@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Matthew Wilcox <willy@infradead.org>
-References: <1582027825-112728-1-git-send-email-longpeng2@huawei.com>
- <20200218203717.GE28156@linux.intel.com>
- <a041fdb4-bfd0-ac4b-2809-6fddfc4f8d83@huawei.com>
- <20200219015836.GM28156@linux.intel.com>
- <098a5dd6-e1da-f161-97d7-cfe735d14fd8@oracle.com>
- <502b5e52-060b-6864-d1b7-eab2dc951aed@huawei.com>
-From:   Mike Kravetz <mike.kravetz@oracle.com>
-Message-ID: <a82956f7-26e4-5c1c-8d5d-4b2510f6b17d@oracle.com>
-Date:   Thu, 20 Feb 2020 16:22:24 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <502b5e52-060b-6864-d1b7-eab2dc951aed@huawei.com>
-Content-Type: text/plain; charset=utf-8
+        id S1729449AbgBUAXo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Feb 2020 19:23:44 -0500
+Received: from mga11.intel.com ([192.55.52.93]:30758 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729365AbgBUAXn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Feb 2020 19:23:43 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2020 16:23:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,466,1574150400"; 
+   d="scan'208";a="269793973"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by fmsmga002.fm.intel.com with ESMTP; 20 Feb 2020 16:23:43 -0800
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 20 Feb 2020 16:23:43 -0800
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Thu, 20 Feb 2020 16:23:42 -0800
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Thu, 20 Feb 2020 16:23:42 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.222]) with mapi id 14.03.0439.000;
+ Fri, 21 Feb 2020 08:23:40 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Chia-I Wu <olvaffe@gmail.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        "kvm list" <kvm@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Wanpeng Li" <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Gurchetan Singh <gurchetansingh@chromium.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        "ML dri-devel" <dri-devel@lists.freedesktop.org>
+Subject: RE: [RFC PATCH 0/3] KVM: x86: honor guest memory type
+Thread-Topic: [RFC PATCH 0/3] KVM: x86: honor guest memory type
+Thread-Index: AQHV4rTrI5AbOd4/PkCv4vZnvR6EuagZISQAgAAKbYCAAMs9AIAAnj+AgAAgCACAAAK0AIAAAeyAgAXrxoCAAaZGgIAAIIsAgADkwxCAABT4UIAAx02AgACimmA=
+Date:   Fri, 21 Feb 2020 00:23:40 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D792415@SHSMSX104.ccr.corp.intel.com>
+References: <20200213213036.207625-1-olvaffe@gmail.com>
+ <8fdb85ea-6441-9519-ae35-eaf91ffe8741@redhat.com>
+ <CAPaKu7T8VYXTMc1_GOzJnwBaZSG214qNoqRr8c7Z4Lb3B7dtTg@mail.gmail.com>
+ <b82cd76c-0690-c13b-cf2c-75d7911c5c61@redhat.com>
+ <20200214195229.GF20690@linux.intel.com>
+ <CAPaKu7Q4gehyhEgG_Nw=tiZiTh+7A8-uuXq1w4he6knp6NWErQ@mail.gmail.com>
+ <CALMp9eRwTxdqxAcobZ7sYbD=F8Kga=jR3kaz-OEYdA9fV0AoKQ@mail.gmail.com>
+ <20200214220341.GJ20690@linux.intel.com>
+ <d3a6fac6-3831-3b8e-09b6-bfff4592f235@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78D6F4@SHSMSX104.ccr.corp.intel.com>
+ <CAPaKu7RyTbuTPf0Tp=0DAD80G-RySLrON8OQsHJzhAYDh7zHuA@mail.gmail.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78EE65@SHSMSX104.ccr.corp.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78EF58@SHSMSX104.ccr.corp.intel.com>
+ <CAPaKu7RFY3nar9hmAdx6RYdZFPK3Cdg1O3cS+OvsEOT=yupyrQ@mail.gmail.com>
+In-Reply-To: <CAPaKu7RFY3nar9hmAdx6RYdZFPK3Cdg1O3cS+OvsEOT=yupyrQ@mail.gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9537 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
- phishscore=0 suspectscore=0 mlxscore=0 malwarescore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002210000
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9537 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 impostorscore=0
- mlxlogscore=999 malwarescore=0 mlxscore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 adultscore=0 spamscore=0 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002210000
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiM2M0NWEwM2MtNTExYS00ZGMxLWFiMmItOTYyMTA2NGM4Y2M1IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSTVWOHBDaFdBcFBJQ1hFZmpoT1FoN3JCR3pjbzlOczBYaTlnVDFYeml2TXlwcFVKZFpncXlmUDRJYmQ1Z3ZZWCJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/19/20 6:30 PM, Longpeng (Mike) wrote:
-> 在 2020/2/20 3:33, Mike Kravetz 写道:
->> + Kirill
->> On 2/18/20 5:58 PM, Sean Christopherson wrote:
->>> On Wed, Feb 19, 2020 at 09:39:59AM +0800, Longpeng (Mike) wrote:
-<snip>
->>> The race and the fix make sense.  I assumed dereferencing garbage from the
->>> huge page was the issue, but I wasn't 100% that was the case, which is why
->>> I asked about alternative fixes.
->>>
->>>> We change the code from
->>>> 	if (pud_huge(*pud) || !pud_present(*pud))
->>>> to
->>>> 	if (pud_huge(*pud)
->>>> 		return (pte_t *)pud;
->>>> 	busy loop for 500ms
->>>> 	if (!pud_present(*pud))
->>>> 		return (pte_t *)pud;
->>>> and the panic will be hit quickly.
->>>>
->>>> ARM64 has already use READ/WRITE_ONCE to access the pagetable, look at this
->>>> commit 20a004e7 (arm64: mm: Use READ_ONCE/WRITE_ONCE when accessing page tables).
->>>>
->>>> The root cause is: 'if (pud_huge(*pud) || !pud_present(*pud))' read entry from
->>>> pud twice and the *pud maybe change in a race, so if we only read the pud once.
->>>> I use READ_ONCE here is just for safe, to prevents the complier mischief if
->>>> possible.
->>>
->>> FWIW, I'd be in favor of going the READ/WRITE_ONCE() route for x86, e.g.
->>> convert everything as a follow-up patch (or patches).  I'm fairly confident
->>> that KVM's usage of lookup_address_in_mm() is safe, but I wouldn't exactly
->>> bet my life on it.  I'd much rather the failing scenario be that KVM uses
->>> a sub-optimal page size as opposed to exploding on a bad pointer.
->>
->> Longpeng(Mike) asked in another e-mail specifically about making similar
->> changes to lookup_address_in_mm().  Replying here as there is more context.
->>
->> I 'think' lookup_address_in_mm is safe from this issue.  Why?  IIUC, the
->> problem with the huge_pte_offset routine is that the pud changes from
->> pud_none() to pud_huge() in the middle of
->> 'if (pud_huge(*pud) || !pud_present(*pud))'.  In the case of
->> lookup_address_in_mm, we know pud was not pud_none() as it was previously
->> checked.  I am not aware of any other state transitions which could cause
->> us trouble.  However, I am no expert in this area.
-
-Bad copy/paste by me.  Longpeng(Mike) was asking about lookup_address_in_pgd.
-
-> So... I need just fix huge_pte_offset in mm/hugetlb.c, right?
-
-Let's start with just a fix for huge_pte_offset() as you can easily reproduce
-that issue by adding a delay.
-
-> Is it possible the pud changes from pud_huge() to pud_none() while another CPU
-> is walking the pagetable ?
-
-I believe it is possible.  If we hole punch a hugetlbfs file, we will clear
-the corresponding pud's.  Hence, we can go from pud_huge() to pud_none().
-Unless I am missing something, that does imply we could have issues in places
-such as lookup_address_in_pgd:
-
-	pud = pud_offset(p4d, address);
-	if (pud_none(*pud))
-		return NULL;
-
-	*level = PG_LEVEL_1G;
-	if (pud_large(*pud) || !pud_present(*pud))
-		return (pte_t *)pud;
-
-I hope I am wrong, but it seems like pud_none(*pud) could become true after
-the initial check, and before the (pud_large) check.  If so, there could be
-a problem (addressing exception) when the code continues and looks up the pmd.
-
-	pmd = pmd_offset(pud, address);
-	if (pmd_none(*pmd))
-		return NULL;
-
-It has been mentioned before that there are many page table walks like this.
-What am I missing that prevents races like this?  Or, have we just been lucky?
--- 
-Mike Kravetz
+PiBGcm9tOiBDaGlhLUkgV3UgPG9sdmFmZmVAZ21haWwuY29tPg0KPiBTZW50OiBGcmlkYXksIEZl
+YnJ1YXJ5IDIxLCAyMDIwIDY6MjQgQU0NCj4gDQo+IE9uIFdlZCwgRmViIDE5LCAyMDIwIGF0IDY6
+MzggUE0gVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPiB3cm90ZToNCj4gPg0KPiA+
+ID4gRnJvbTogVGlhbiwgS2V2aW4NCj4gPiA+IFNlbnQ6IFRodXJzZGF5LCBGZWJydWFyeSAyMCwg
+MjAyMCAxMDowNSBBTQ0KPiA+ID4NCj4gPiA+ID4gRnJvbTogQ2hpYS1JIFd1IDxvbHZhZmZlQGdt
+YWlsLmNvbT4NCj4gPiA+ID4gU2VudDogVGh1cnNkYXksIEZlYnJ1YXJ5IDIwLCAyMDIwIDM6Mzcg
+QU0NCj4gPiA+ID4NCj4gPiA+ID4gT24gV2VkLCBGZWIgMTksIDIwMjAgYXQgMTo1MiBBTSBUaWFu
+LCBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+DQo+IHdyb3RlOg0KPiA+ID4gPiA+DQo+ID4g
+PiA+ID4gPiBGcm9tOiBQYW9sbyBCb256aW5pDQo+ID4gPiA+ID4gPiBTZW50OiBXZWRuZXNkYXks
+IEZlYnJ1YXJ5IDE5LCAyMDIwIDEyOjI5IEFNDQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gT24g
+MTQvMDIvMjAgMjM6MDMsIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3JvdGU6DQo+ID4gPiA+ID4gPiA+
+PiBPbiBGcmksIEZlYiAxNCwgMjAyMCBhdCAxOjQ3IFBNIENoaWEtSSBXdSA8b2x2YWZmZUBnbWFp
+bC5jb20+DQo+ID4gPiB3cm90ZToNCj4gPiA+ID4gPiA+ID4+PiBBRkFJQ1QsIGl0IGlzIGN1cnJl
+bnRseSBhbGxvd2VkIG9uIEFSTSAodmVyaWZpZWQpIGFuZCBBTUQgKG5vdA0KPiA+ID4gPiA+ID4g
+Pj4+IHZlcmlmaWVkLCBidXQgc3ZtX2dldF9tdF9tYXNrIHJldHVybnMgMCB3aGljaCBzdXBwb3Nl
+ZGx5DQo+IG1lYW5zDQo+ID4gPiA+IHRoZQ0KPiA+ID4gPiA+ID4gTlBUDQo+ID4gPiA+ID4gPiA+
+Pj4gZG9lcyBub3QgcmVzdHJpY3Qgd2hhdCB0aGUgZ3Vlc3QgUEFUIGNhbiBkbykuICBUaGlzIGRp
+ZmYgd291bGQgZG8NCj4gdGhlDQo+ID4gPiA+ID4gPiA+Pj4gdHJpY2sgZm9yIEludGVsIHdpdGhv
+dXQgbmVlZGluZyBhbnkgdWFwaSBjaGFuZ2U6DQo+ID4gPiA+ID4gPiA+PiBJIHdvdWxkIGJlIGNv
+bmNlcm5lZCBhYm91dCBJbnRlbCBDUFUgZXJyYXRhIHN1Y2ggYXMgU0tYNDAgYW5kDQo+ID4gPiBT
+S1g1OS4NCj4gPiA+ID4gPiA+ID4gVGhlIHBhcnQgS1ZNIGNhcmVzIGFib3V0LCAjTUMsIGlzIGFs
+cmVhZHkgYWRkcmVzc2VkIGJ5IGZvcmNpbmcNCj4gVUMNCj4gPiA+IGZvcg0KPiA+ID4gPiA+ID4g
+TU1JTy4NCj4gPiA+ID4gPiA+ID4gVGhlIGRhdGEgY29ycnVwdGlvbiBpc3N1ZSBpcyBvbiB0aGUg
+Z3Vlc3Qga2VybmVsIHRvIGNvcnJlY3RseSB1c2UNCj4gV0MNCj4gPiA+ID4gPiA+ID4gYW5kL29y
+IG5vbi10ZW1wb3JhbCB3cml0ZXMuDQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gV2hhdCBhYm91
+dCBjb2hlcmVuY3kgYWNyb3NzIGxpdmUgbWlncmF0aW9uPyAgVGhlIHVzZXJzcGFjZQ0KPiBwcm9j
+ZXNzDQo+ID4gPiA+IHdvdWxkDQo+ID4gPiA+ID4gPiB1c2UgY2FjaGVkIGFjY2Vzc2VzLCBhbmQg
+YWxzbyBhIFdCSU5WRCBjb3VsZCBwb3RlbnRpYWxseSBjb3JydXB0DQo+IGd1ZXN0DQo+ID4gPiA+
+ID4gPiBtZW1vcnkuDQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSW4gc3VjaCBj
+YXNlIHRoZSB1c2Vyc3BhY2UgcHJvY2VzcyBwb3NzaWJseSBzaG91bGQgY29uc2VydmF0aXZlbHkg
+dXNlDQo+ID4gPiA+ID4gVUMgbWFwcGluZywgYXMgaWYgZm9yIE1NSU8gcmVnaW9ucyBvbiBhIHBh
+c3N0aHJvdWdoIGRldmljZS4NCj4gSG93ZXZlcg0KPiA+ID4gPiA+IHRoZXJlIHJlbWFpbnMgYSBw
+cm9ibGVtLiB0aGUgZGVmaW5pdGlvbiBvZiBLVk1fTUVNX0RNQSBpbXBsaWVzDQo+ID4gPiA+ID4g
+ZmF2b3JpbmcgZ3Vlc3Qgc2V0dGluZywgd2hpY2ggY291bGQgYmUgd2hhdGV2ZXIgdHlwZSBpbiBj
+b25jZXB0LiBUaGVuDQo+ID4gPiA+ID4gYXNzdW1pbmcgVUMgaXMgYWxzbyBwcm9ibGVtYXRpYy4g
+SSdtIG5vdCBzdXJlIHdoZXRoZXIgaW52ZW50aW5nDQo+IGFub3RoZXINCj4gPiA+ID4gPiBpbnRl
+cmZhY2UgdG8gcXVlcnkgZWZmZWN0aXZlIG1lbW9yeSB0eXBlIGZyb20gS1ZNIGlzIGEgZ29vZCBp
+ZGVhLg0KPiBUaGVyZQ0KPiA+ID4gPiA+IGlzIG5vIGd1YXJhbnRlZSB0aGF0IHRoZSBndWVzdCB3
+aWxsIHVzZSBzYW1lIHR5cGUgZm9yIGV2ZXJ5IHBhZ2UgaW4gdGhlDQo+ID4gPiA+ID4gc2FtZSBz
+bG90LCB0aGVuIHN1Y2ggaW50ZXJmYWNlIG1pZ2h0IGJlIG1lc3N5LiBBbHRlcm5hdGl2ZWx5LCBt
+YXliZQ0KPiA+ID4gPiA+IHdlIGNvdWxkIGp1c3QgaGF2ZSBhbiBpbnRlcmZhY2UgZm9yIEtWTSB1
+c2Vyc3BhY2UgdG8gZm9yY2UgbWVtb3J5DQo+IHR5cGUNCj4gPiA+ID4gPiBmb3IgYSBnaXZlbiBz
+bG90LCBpZiBpdCBpcyBtYWlubHkgdXNlZCBpbiBwYXJhLXZpcnR1YWxpemVkIHNjZW5hcmlvcyAo
+ZS5nLg0KPiA+ID4gPiA+IHZpcnRpby1ncHUpIHdoZXJlIHRoZSBndWVzdCBpcyBlbmxpZ2h0ZW5l
+ZCB0byB1c2UgYSBmb3JjZWQgdHlwZSAoZS5nLg0KPiBXQyk/DQo+ID4gPiA+IEtWTSBmb3JjaW5n
+IHRoZSBtZW1vcnkgdHlwZSBmb3IgYSBnaXZlbiBzbG90IHNob3VsZCB3b3JrIHRvby4gIEJ1dCB0
+aGUNCj4gPiA+ID4gaWdub3JlLWd1ZXN0LXBhdCBiaXQgc2VlbXMgdG8gYmUgSW50ZWwtc3BlY2lm
+aWMuICBXZSB3aWxsIG5lZWQgdG8NCj4gPiA+ID4gZGVmaW5lIGhvdyB0aGUgc2Vjb25kLWxldmVs
+IHBhZ2UgYXR0cmlidXRlcyBjb21iaW5lIHdpdGggdGhlIGd1ZXN0DQo+ID4gPiA+IHBhZ2UgYXR0
+cmlidXRlcyBzb21laG93Lg0KPiA+ID4NCj4gPiA+IG9oLCBJJ20gbm90IGF3YXJlIG9mIHRoYXQg
+ZGlmZmVyZW5jZS4gd2l0aG91dCBhbiBpcGF0LWVxdWl2YWxlbnQNCj4gPiA+IGNhcGFiaWxpdHks
+IEknbSBub3Qgc3VyZSBob3cgdG8gZm9yY2luZyByYW5kb20gdHlwZSBoZXJlLiBJZiB5b3UgbG9v
+ayBhdA0KPiA+ID4gdGFibGUgMTEtNyBpbiBJbnRlbCBTRE0sIG5vbmUgb2YgTVRSUiAoRVBUKSBt
+ZW1vcnkgdHlwZSBjYW4gbGVhZCB0bw0KPiA+ID4gY29uc2lzdGVudCBlZmZlY3RpdmUgdHlwZSB3
+aGVuIGNvbWJpbmluZyB3aXRoIHJhbmRvbSBQQVQgdmFsdWUuIFNvDQo+ID4gPiAgaXQgaXMgZGVm
+aW5pdGVseSBhIGRlYWQgZW5kLg0KPiA+ID4NCj4gPiA+ID4NCj4gPiA+ID4gS1ZNIHNob3VsZCBp
+biB0aGVvcnkgYmUgYWJsZSB0byB0ZWxsIHRoYXQgdGhlIHVzZXJzcGFjZSByZWdpb24gaXMNCj4g
+PiA+ID4gbWFwcGVkIHdpdGggYSBjZXJ0YWluIG1lbW9yeSB0eXBlIGFuZCBjYW4gZm9yY2UgdGhl
+IHNhbWUgbWVtb3J5DQo+IHR5cGUNCj4gPiA+ID4gb250byB0aGUgZ3Vlc3QuICBUaGUgdXNlcnNw
+YWNlIGRvZXMgbm90IG5lZWQgdG8gYmUgaW52b2x2ZWQuICBCdXQgdGhhdA0KPiA+ID4gPiBzb3Vu
+ZHMgdmVyeSBzbG93PyAgVGhpcyBtYXkgYmUgYSBkdW1iIHF1ZXN0aW9uLCBidXQgd291bGQgaXQg
+aGVscCB0bw0KPiA+ID4gPiBhZGQgS1ZNX1NFVF9ETUFfQlVGIGFuZCBsZXQgS1ZNIG5lZ290aWF0
+ZSB0aGUgbWVtb3J5IHR5cGUgd2l0aA0KPiB0aGUNCj4gPiA+ID4gaW4ta2VybmVsIEdQVSBkcml2
+ZXJzPw0KPiA+ID4gPg0KPiA+ID4gPg0KPiA+ID4NCj4gPiA+IEtWTV9TRVRfRE1BX0JVRiBsb29r
+cyBtb3JlIHJlYXNvbmFibGUuIEJ1dCBJIGd1ZXNzIHdlIGRvbid0IG5lZWQNCj4gPiA+IEtWTSB0
+byBiZSBhd2FyZSBvZiBzdWNoIG5lZ290aWF0aW9uLiBXZSBjYW4gY29udGludWUgeW91ciBvcmln
+aW5hbA0KPiA+ID4gcHJvcG9zYWwgdG8gaGF2ZSBLVk0gc2ltcGx5IGZhdm9yIGd1ZXN0IG1lbW9y
+eSB0eXBlIChtYXliZSBzdGlsbCBjYWxsDQo+ID4gPiBLVk1fTUVNX0RNQSkuIE9uIHRoZSBvdGhl
+ciBoYW5kLCBRZW11IHNob3VsZCBqdXN0IG1tYXAgb24gdGhlDQo+ID4gPiBmZCBoYW5kbGUgb2Yg
+dGhlIGRtYWJ1ZiBwYXNzZWQgZnJvbSB0aGUgdmlydGlvLWdwdSBkZXZpY2UgYmFja2VuZCwgIGUu
+Zy4NCj4gPiA+IHRvIGNvbmR1Y3QgbWlncmF0aW9uLiBUaGF0IHdheSB0aGUgbW1hcCByZXF1ZXN0
+IGlzIGZpbmFsbHkgc2VydmVkIGJ5DQo+ID4gPiBEUk0gYW5kIHVuZGVybHlpbmcgR1BVIGRyaXZl
+cnMsIHdpdGggcHJvcGVyIHR5cGUgZW5mb3JjZWQNCj4gYXV0b21hdGljYWxseS4NCj4gPiA+DQo+
+ID4NCj4gPiBUaGlua2luZyBtb3JlIHBvc3NpYmx5IHdlIGRvbid0IG5lZWQgaW50cm9kdWNlIG5l
+dyBpbnRlcmZhY2UgdG8gS1ZNLg0KPiA+IEFzIGxvbmcgYXMgUWVtdSB1c2VzIGRtYWJ1ZiBpbnRl
+cmZhY2UgdG8gbW1hcCB0aGUgc3BlY2lmaWMgcmVnaW9uLA0KPiA+IEtWTSBjYW4gc2ltcGx5IGNo
+ZWNrIG1lbW9yeSB0eXBlIGluIGhvc3QgcGFnZSB0YWJsZSBnaXZlbiBodmEgb2YgYQ0KPiA+IG1l
+bXNsb3QuIElmIHRoZSB0eXBlIGlzIFVDIG9yIFdDLCBpdCBpbXBsaWVzIHRoYXQgdXNlcnNwYWNl
+IHdhbnRzIGENCj4gPiBub24tY29oZXJlbnQgbWFwcGluZyB3aGljaCBzaG91bGQgYmUgcmVmbGVj
+dGVkIGluIHRoZSBndWVzdCBzaWRlIHRvby4NCj4gPiBJbiBzdWNoIGNhc2UsIEtWTSBjYW4gZ28g
+dG8gbm9uLWNvaGVucmVudCBETUEgcGF0aCBhbmQgZmF2b3IgZ3Vlc3QNCj4gPiBtZW1vcnkgdHlw
+ZSBhdXRvbWF0aWNhbGx5Lg0KPiBTb3JyeSwgSSBtaXhlZCB0d28gdGhpbmdzIHRvZ2V0aGVyLg0K
+PiANCj4gVXNlcnNwYWNlIGFjY2VzcyB0byBkbWFidWYgbW1hcCBtdXN0IGJlIGd1YXJkZWQgYnkN
+Cj4gRE1BX0JVRl9TWU5DX3tTVEFSVCxFTkR9IGlvY3Rscy4gIEl0IGlzIHBvc3NpYmxlIHRoYXQg
+dGhlIEdQVSBkcml2ZXINCj4gYWx3YXlzIHBpY2tzIGEgV0IgbWFwcGluZyBhbmQgbGV0IHRoZSBp
+b2N0bHMgZmx1c2gvaW52YWxpZGF0ZSBDUFUNCj4gY2FjaGVzLiAgV2UgYWN0dWFsbHkgd2FudCB0
+aGUgZ3Vlc3QgbWVtb3J5IHR5cGUgdG8gbWF0Y2ggdmtNYXBNZW1vcnkncw0KPiBtZW1vcnkgdHlw
+ZSwgd2hpY2ggY2FuIGJlIGRpZmZlcmVudCBmcm9tIGRtYWJ1ZiBtbWFwJ3MgbWVtb3J5IHR5cGUu
+DQo+IEl0IGlzIG5vdCBlbm91Z2ggZm9yIEtWTSB0byBpbnNwZWN0IHRoZSBodmEncyBtZW1vcnkg
+dHlwZS4NCg0KSSdtIG5vdCBmYW1pbGlhciB3aXRoIGRtYWJ1ZiBhbmQgd2hhdCBpcyB0aGUgZGlm
+ZmVyZW5jZSBiZXR3ZWVuDQp2a01hcE1lbW9yeSBhbmQgbW1hcC4gSnVzdCBhIHNpbXBsZSB0aG91
+Z2h0IHRoYXQgd2hhdGV2ZXINCm1lbW9yeSB0eXBlL3N5bmNocm9uaXphdGlvbiBlbmZvcmNlZCBv
+biB0aGUgaG9zdCB1c2Vyc3BhY2Ugc2hvdWxkDQppZGVhbGx5IGJlIGFwcGxpZWQgdG8gZ3Vlc3Qg
+dXNlcnNwYWNlIHRvby4gZS5nLiBpbiBhYm92ZSBleGFtcGxlIHdlDQpwb3NzaWJseSB3YW50IHRo
+ZSBndWVzdCB0byB1c2UgV0IgYW5kIGlzc3VlIGZsdXNoL2ludmFsaWRhdGUgaHlwZXJjYWxscw0K
+dG8gZ3VhcmQgd2l0aCBvdGhlciBwb3RlbnRpYWwgcGFyYWxsZWwgb3BlcmF0aW9ucyBpbiB0aGUg
+aG9zdCBzaWRlLiANCm90aGVyd2lzZSBJIGNhbm5vdCBzZWUgaG93IHN5bmNocm9uaXphdGlvbiBj
+YW4gYmUgZG9uZSB3aGVuIG9uZQ0KdXNlIFdCIHdpdGggc3luYyBwcmltaXRpdmVzIHdoaWxlIHRo
+ZSBvdGhlciBzaW1wbHkgdXNlIFdDIHcvbyBzdWNoDQpwcmltaXRpdmVzLg0KDQo+IA0KPiBLVk1f
+U0VUX0RNQV9CVUYsIGlmIHN1cHBvcnRlZCwgaXMgYSBzaWduYWwgdG8gS1ZNIHRoYXQgdGhlIGd1
+ZXN0DQo+IG1lbW9yeSB0eXBlIHNob3VsZCBiZSBob25vcmVkIChvciBmb3JjZWQgaWYgdGhlcmUg
+aXMgYSBuZXcgb3AgaW4NCj4gZG1hX2J1Zl9vcHMgdGhhdCB0ZWxscyBLVk0gd2hpY2ggbWVtb3J5
+IHR5cGUgdG8gZm9yY2UpLiAgS1ZNX01FTV9ETUENCj4gZmxhZyBpbiB0aGlzIFJGQyBzZW5kcyB0
+aGUgc2FtZSBzaWduYWwuICBVbmxlc3MgS1ZNX1NFVF9ETUFfQlVGIGdpdmVzDQo+IHRoZSB1c2Vy
+c3BhY2Ugb3RoZXIgZmVhdHVyZXMgc3VjaCBhcyBzZXR0aW5nIHVubGltaXRlZCBudW1iZXIgb2YN
+Cj4gZG1hYnVmcyB0byBzdWJyZWdpb25zIG9mIGEgbWVtc2xvdCwgaXQgaXMgbm90IHZlcnkgdXNl
+ZnVsLg0KDQp0aGUgZ29vZCBwYXJ0IG9mIGEgbmV3IGludGVyZmFjZSBpcyBpdHMgc2ltcGxpY2l0
+eSwgYnV0IG9ubHkgaW4gc2xvdA0KZ3JhbnVsYXJpdHkuIGluc3RlYWQgaGF2aW5nIEtWTSB0byBp
+bnNwZWN0IGh2YSBjYW4gc3VwcG9ydCBwYWdlDQpncmFudWxhcml0eSwgYnV0IGFkZGluZyBydW4t
+dGltZSBvdmVyaGVhZC4gTGV0J3Mgc2VlIGhvdyBQYW9sbw0KdGhpbmtzLiDwn5iKDQoNCj4gDQo+
+IElmIHVhcGkgY2hhbmdlIGlzIHRvIGJlIGF2b2lkZWQsIGl0IGlzIHRoZSBlYXNpZXN0IHRoYXQg
+Z3Vlc3QgbWVtb3J5DQo+IHR5cGUgaXMgYWx3YXlzIGhvbm9yZWQgdW5sZXNzIGl0IGNhdXNlcyAj
+TUMgKGkuZS4saXNfbW1pbz09dHJ1ZSkuDQo+IA0KDQpJIGZlZWwgdGhpcyBnb2VzIHRvbyBmYXIu
+Li4NCg0KVGhhbmtzDQpLZXZpbg0K
