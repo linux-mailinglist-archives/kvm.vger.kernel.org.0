@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FB971676CF
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 09:41:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 003A6167685
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 09:37:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730701AbgBUH54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 02:57:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32270 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730139AbgBUH5y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 02:57:54 -0500
+        id S1732395AbgBUIf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 03:35:58 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40994 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731859AbgBUIGt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 03:06:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582271874;
+        s=mimecast20190719; t=1582272408;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qZ2vYX6aTEtYA+Rmtsl2PSnzUra/4wEX+6A+xs3OWnE=;
-        b=ZmlW3lDLLePnSLJ1QMezwCd2fEz+nLUnc8LQUdfrOLap5rQ3Q6UwKJtWofo86RvlDEVLWy
-        zzkZEqiGXJ7y4NuudqsVWaHKIyz76XoS99b5uYJd/8VRllJnhxSTS6iYXtfegirzivdDUg
-        pxBml2/bMV+JuEsi5YIbKbCpqzWhfJk=
+        bh=nZPMKkDRpIygusMljWBR/rOUYIWd4dKR+JmAgMAgsbA=;
+        b=Z2GvPJvRkWsfuiiAD27KB6TojxSjhRQp9S9Av5hbeOWTA4eru/Ntys8T8U3ZjjGUVGKFyo
+        LK4BLomJMkfe1UkZOHpR15hsVBTaTZVlHPXsg0kARuVsP4OXebVj1B5visGXu4zEsUj1Hb
+        3Lks0tO/7IUluBqN0C2ELNogBuAfwuA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-s328FKtIP_GiYZgic4bVwg-1; Fri, 21 Feb 2020 02:57:50 -0500
-X-MC-Unique: s328FKtIP_GiYZgic4bVwg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-382-db6s2tGWP_mUlg7iG2WDtg-1; Fri, 21 Feb 2020 03:06:47 -0500
+X-MC-Unique: db6s2tGWP_mUlg7iG2WDtg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89523107ACC5;
-        Fri, 21 Feb 2020 07:57:47 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 247D0107ACCA;
+        Fri, 21 Feb 2020 08:06:44 +0000 (UTC)
 Received: from [10.72.13.208] (ovpn-13-208.pek2.redhat.com [10.72.13.208])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A094B8ECFD;
-        Fri, 21 Feb 2020 07:57:31 +0000 (UTC)
-Subject: Re: [PATCH V4 5/5] vdpasim: vDPA device simulator
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A64978B740;
+        Fri, 21 Feb 2020 08:06:25 +0000 (UTC)
+Subject: Re: [PATCH V4 4/5] virtio: introduce a vDPA based transport
 To:     Jason Gunthorpe <jgg@mellanox.com>
 Cc:     "mst@redhat.com" <mst@redhat.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -62,18 +62,18 @@ Cc:     "mst@redhat.com" <mst@redhat.com>,
         "hanand@xilinx.com" <hanand@xilinx.com>,
         "mhabets@solarflare.com" <mhabets@solarflare.com>
 References: <20200220061141.29390-1-jasowang@redhat.com>
- <20200220061141.29390-6-jasowang@redhat.com>
- <20200220151215.GU23930@mellanox.com>
+ <20200220061141.29390-5-jasowang@redhat.com>
+ <20200220151914.GW23930@mellanox.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <6c341a77-a297-b7c7-dea5-b3f7b920b1f3@redhat.com>
-Date:   Fri, 21 Feb 2020 15:57:29 +0800
+Message-ID: <d6d910bb-8431-7e95-8808-9ed2d6ec9211@redhat.com>
+Date:   Fri, 21 Feb 2020 16:06:24 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200220151215.GU23930@mellanox.com>
+In-Reply-To: <20200220151914.GW23930@mellanox.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -81,132 +81,53 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2020/2/20 =E4=B8=8B=E5=8D=8811:12, Jason Gunthorpe wrote:
-> On Thu, Feb 20, 2020 at 02:11:41PM +0800, Jason Wang wrote:
->> +static void vdpasim_device_release(struct device *dev)
+On 2020/2/20 =E4=B8=8B=E5=8D=8811:19, Jason Gunthorpe wrote:
+> On Thu, Feb 20, 2020 at 02:11:40PM +0800, Jason Wang wrote:
+>> +static int virtio_vdpa_probe(struct vdpa_device *vdpa)
 >> +{
->> +	struct vdpasim *vdpasim =3D dev_to_sim(dev);
+>> +	const struct vdpa_config_ops *ops =3D vdpa->config;
+>> +	struct virtio_vdpa_device *vd_dev;
+>> +	int ret =3D -EINVAL;
 >> +
->> +	cancel_work_sync(&vdpasim->work);
->> +	kfree(vdpasim->buffer);
->> +	vhost_iotlb_free(vdpasim->iommu);
->> +	kfree(vdpasim);
->> +}
+>> +	vd_dev =3D kzalloc(sizeof(*vd_dev), GFP_KERNEL);
+>> +	if (!vd_dev)
+>> +		return -ENOMEM;
 >> +
->> +static struct vdpasim *vdpasim_create(void)
->> +{
->> +	struct virtio_net_config *config;
->> +	struct vhost_iotlb *iommu;
->> +	struct vdpasim *vdpasim;
->> +	struct device *dev;
->> +	void *buffer;
->> +	int ret =3D -ENOMEM;
+>> +	vd_dev->vdev.dev.parent =3D vdpa_get_dma_dev(vdpa);
+>> +	vd_dev->vdev.dev.release =3D virtio_vdpa_release_dev;
+>> +	vd_dev->vdev.config =3D &virtio_vdpa_config_ops;
+>> +	vd_dev->vdpa =3D vdpa;
+>> +	INIT_LIST_HEAD(&vd_dev->virtqueues);
+>> +	spin_lock_init(&vd_dev->lock);
 >> +
->> +	iommu =3D vhost_iotlb_alloc(2048, 0);
->> +	if (!iommu)
+>> +	vd_dev->vdev.id.device =3D ops->get_device_id(vdpa);
+>> +	if (vd_dev->vdev.id.device =3D=3D 0)
 >> +		goto err;
 >> +
->> +	buffer =3D kmalloc(PAGE_SIZE, GFP_KERNEL);
->> +	if (!buffer)
->> +		goto err_buffer;
->> +
->> +	vdpasim =3D kzalloc(sizeof(*vdpasim), GFP_KERNEL);
->> +	if (!vdpasim)
->> +		goto err_alloc;
->> +
->> +	vdpasim->buffer =3D buffer;
->> +	vdpasim->iommu =3D iommu;
->> +
->> +	config =3D &vdpasim->config;
->> +	config->mtu =3D 1500;
->> +	config->status =3D VIRTIO_NET_S_LINK_UP;
->> +	eth_random_addr(config->mac);
->> +
->> +	INIT_WORK(&vdpasim->work, vdpasim_work);
->> +	spin_lock_init(&vdpasim->lock);
->> +
->> +	vringh_set_iotlb(&vdpasim->vqs[0].vring, vdpasim->iommu);
->> +	vringh_set_iotlb(&vdpasim->vqs[1].vring, vdpasim->iommu);
->> +
->> +	dev =3D &vdpasim->dev;
->> +	dev->release =3D vdpasim_device_release;
->> +	dev->coherent_dma_mask =3D DMA_BIT_MASK(64);
->> +	set_dma_ops(dev, &vdpasim_dma_ops);
->> +	dev_set_name(dev, "%s", VDPASIM_NAME);
->> +
->> +	ret =3D device_register(&vdpasim->dev);
+>> +	vd_dev->vdev.id.vendor =3D ops->get_vendor_id(vdpa);
+>> +	ret =3D register_virtio_device(&vd_dev->vdev);
 >> +	if (ret)
->> +		goto err_init;
-> It is a bit weird to be creating this dummy parent, couldn't this be
-> done by just passing a NULL parent to vdpa_alloc_device, doing
-> set_dma_ops() on the vdpasim->vdpa->dev and setting dma_device to
-> vdpasim->vdpa->dev ?
+>> +		goto err;
+> This error unwind is wrong. register_virtio_device() does
+> device_initialize() as it's first action. After that point error
+> unwind must be done with put_device() - particularly calling
+> kfree(vd_dev) after doing dev_set_name() leaks memory.
 
 
-I think it works.
-
-
->> +	vdpasim->vdpa =3D vdpa_alloc_device(dev, dev, &vdpasim_net_config_op=
-s);
->> +	if (ret)
->> +		goto err_vdpa;
->> +	ret =3D vdpa_register_device(vdpasim->vdpa);
->> +	if (ret)
->> +		goto err_register;
->> +
->> +	return vdpasim;
->> +
->> +err_register:
->> +	put_device(&vdpasim->vdpa->dev);
->> +err_vdpa:
->> +	device_del(&vdpasim->dev);
->> +	goto err;
->> +err_init:
->> +	put_device(&vdpasim->dev);
->> +	goto err;
-> If you do the vdmasim alloc first, and immediately do
-> device_initialize() then all the failure paths can do put_device
-> instead of having this ugly goto unwind split. Just check for
-> vdpasim->iommu =3D=3D NULL during release.
-
-
-Yes, that looks simpler.
+Exactly.
 
 
 >
->> +static int __init vdpasim_dev_init(void)
->> +{
->> +	vdpasim_dev =3D vdpasim_create();
->> +
->> +	if (!IS_ERR(vdpasim_dev))
->> +		return 0;
->> +
->> +	return PTR_ERR(vdpasim_dev);
->> +}
->> +
->> +static int vdpasim_device_remove_cb(struct device *dev, void *data)
->> +{
->> +	struct vdpa_device *vdpa =3D dev_to_vdpa(dev);
->> +
->> +	vdpa_unregister_device(vdpa);
->> +
->> +	return 0;
->> +}
->> +
->> +static void __exit vdpasim_dev_exit(void)
->> +{
->> +	device_for_each_child(&vdpasim_dev->dev, NULL,
->> +			      vdpasim_device_remove_cb);
-> Why the loop? There is only one device, and it is in the global
-> varaible vdmasim_dev ?
+> Looks like about half of the register_virtio_device() users did this
+> right, the others not. Perhaps you should fix them too...
+>
+> Jason
 
 
-Not necessary but doesn't harm, will remove this.
+Will do.
 
 Thanks
 
 
->
-> Jason
 >
 
