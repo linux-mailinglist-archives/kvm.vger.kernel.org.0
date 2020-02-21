@@ -2,200 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A7E7168276
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 16:58:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A689168281
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 16:59:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729334AbgBUP6A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 10:58:00 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35030 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728512AbgBUP57 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 10:57:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582300677;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=df9ScOEFwTTls6r9Zf0yGfvIdb7PXr3kzlNYfvbsYsg=;
-        b=hUthrwSCxBvQHcbh+UCII9HIaYQiMwAQmyCfIbUR1O8Tm4/v9Q3b+R9Ypa2Z4apQp8N1O+
-        JZzmpJj8Ad1fFgudMG4CbMNTqQlfrkf7s98aNbXQG+TY5qCxNq24OpKwDEEBhIYEzySYle
-        PyIduGPf+QD9qpDqBnmRwLD6SVT2wGk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-iW9KUCn2OUy1w2o764jtOA-1; Fri, 21 Feb 2020 10:57:55 -0500
-X-MC-Unique: iW9KUCn2OUy1w2o764jtOA-1
-Received: by mail-wr1-f69.google.com with SMTP id c6so1189331wrm.18
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 07:57:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=df9ScOEFwTTls6r9Zf0yGfvIdb7PXr3kzlNYfvbsYsg=;
-        b=OS08r8Zx60M9h1DTLTtlo5eHQX3uzsMFvOhDEajIUUq5hmnqWsZgA43jEuzSldg4i2
-         G9Iik2GiAowFt9JjTWQuuOxI+yP80QN5qDzeiK5O1cwiG0zLzwc18Bf4TH7Xcg1RN/H6
-         NK2Y+Enr5VwWPxV5QSmaFEvn2LHYPAjcNQY9yHlHZaAmhwPfcl6DAnA/t//2wPubfYrC
-         Mb94cKMUWXZblggJ1qlxyt3OZBpsGbt7JijfgfqIyLD1RiMuC5HQ8Jv9BYNc+nQAGrsB
-         QrWgwaxgJQj1HGF27n8/HBC5Aouyicpu1OEo3+Y1aMkrO06LwCIfI1IQnXz1A9CFwfQV
-         QKXQ==
-X-Gm-Message-State: APjAAAXhinCB7E+ZYFSGWYdSAuLO8F6annLg3EStuV4D0JfErnFdhl5v
-        reACzH53/knvY/dRVNoasRhHV1CDafofZQriQrMeLtMaEZ+9WuYwPjesX4AtNW6zXr4rHhU9GoV
-        dNt4VhzEYp5gK
-X-Received: by 2002:adf:fa50:: with SMTP id y16mr47217036wrr.183.1582300674040;
-        Fri, 21 Feb 2020 07:57:54 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzDlkP5kKiX/apK/fdyvg4Z7dElRY33EXdeQ2VUj7qgatSBg7QtIiXPLhmh5NVFfYIkSZTSbQ==
-X-Received: by 2002:adf:fa50:: with SMTP id y16mr47217010wrr.183.1582300673719;
-        Fri, 21 Feb 2020 07:57:53 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id f8sm4240284wru.12.2020.02.21.07.57.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2020 07:57:53 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1729260AbgBUP7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 10:59:41 -0500
+Received: from mga07.intel.com ([134.134.136.100]:7937 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728235AbgBUP7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 10:59:40 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Feb 2020 07:59:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,468,1574150400"; 
+   d="scan'208";a="225252206"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga007.jf.intel.com with ESMTP; 21 Feb 2020 07:59:39 -0800
+Date:   Fri, 21 Feb 2020 07:59:39 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Chia-I Wu <olvaffe@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 26/61] KVM: x86: Introduce cpuid_entry_{get,has}() accessors
-In-Reply-To: <20200201185218.24473-27-sean.j.christopherson@intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-27-sean.j.christopherson@intel.com>
-Date:   Fri, 21 Feb 2020 16:57:52 +0100
-Message-ID: <875zg0q6f3.fsf@vitty.brq.redhat.com>
+        kvm list <kvm@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Gurchetan Singh <gurchetansingh@chromium.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        ML dri-devel <dri-devel@lists.freedesktop.org>
+Subject: Re: [RFC PATCH 0/3] KVM: x86: honor guest memory type
+Message-ID: <20200221155939.GG12665@linux.intel.com>
+References: <d3a6fac6-3831-3b8e-09b6-bfff4592f235@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78D6F4@SHSMSX104.ccr.corp.intel.com>
+ <CAPaKu7RyTbuTPf0Tp=0DAD80G-RySLrON8OQsHJzhAYDh7zHuA@mail.gmail.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78EE65@SHSMSX104.ccr.corp.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78EF58@SHSMSX104.ccr.corp.intel.com>
+ <CAPaKu7RFY3nar9hmAdx6RYdZFPK3Cdg1O3cS+OvsEOT=yupyrQ@mail.gmail.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D792415@SHSMSX104.ccr.corp.intel.com>
+ <CAPaKu7RHu5rz1Dvkvp4SDrZ0fAYq37xwRqUsdAiOmRTOz2sFTw@mail.gmail.com>
+ <CAPaKu7RaF3+amPwdVBLj6q1na7JWUYuuWDN5XPwNYFB8Hpqi+w@mail.gmail.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D79359E@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D79359E@SHSMSX104.ccr.corp.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Thu, Feb 20, 2020 at 09:39:05PM -0800, Tian, Kevin wrote:
+> > From: Chia-I Wu <olvaffe@gmail.com>
+> > Sent: Friday, February 21, 2020 12:51 PM
+> > If you think it is the best for KVM to inspect hva to determine the memory
+> > type with page granularity, that is reasonable and should work for us too.
+> > The userspace can do something (e.g., add a GPU driver dependency to the
+> > hypervisor such that the dma-buf is imported as a GPU memory and mapped
+> > using
+> > vkMapMemory) or I can work with dma-buf maintainers to see if dma-buf's
+> > semantics can be changed.
+> 
+> I think you need consider the live migration requirement as Paolo pointed out.
+> The migration thread needs to read/write the region, then it must use the
+> same type as GPU process and guest to read/write the region. In such case, 
+> the hva mapped by Qemu should have the desired type as the guest. However,
+> adding GPU driver dependency to Qemu might trigger some concern. I'm not
+> sure whether there is generic mechanism though, to share dmabuf fd between GPU
+> process and Qemu while allowing Qemu to follow the desired type w/o using
+> vkMapMemory...
 
-> Introduce accessors to retrieve feature bits from CPUID entries and use
-> the new accessors where applicable.  Using the accessors eliminates the
-> need to manually specify the register to be queried at no extra cost
-> (binary output is identical) and will allow adding runtime consistency
-> checks on the function and index in a future patch.
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/cpuid.c |  9 +++++----
->  arch/x86/kvm/cpuid.h | 46 +++++++++++++++++++++++++++++++++++---------
->  2 files changed, 42 insertions(+), 13 deletions(-)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index e3026fe638aa..3316963dad3d 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -68,7 +68,7 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
->  		best->edx |= F(APIC);
->  
->  	if (apic) {
-> -		if (best->ecx & F(TSC_DEADLINE_TIMER))
-> +		if (cpuid_entry_has(best, X86_FEATURE_TSC_DEADLINE_TIMER))
->  			apic->lapic_timer.timer_mode_mask = 3 << 17;
->  		else
->  			apic->lapic_timer.timer_mode_mask = 1 << 17;
-> @@ -96,7 +96,8 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
->  	}
->  
->  	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
-> -	if (best && (best->eax & (F(XSAVES) | F(XSAVEC))))
-> +	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
-> +		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
->  		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
->  
->  	/*
-> @@ -155,7 +156,7 @@ static void cpuid_fix_nx_cap(struct kvm_vcpu *vcpu)
->  			break;
->  		}
->  	}
-> -	if (entry && (entry->edx & F(NX)) && !is_efer_nx()) {
-> +	if (entry && cpuid_entry_has(entry, X86_FEATURE_NX) && !is_efer_nx()) {
->  		entry->edx &= ~F(NX);
->  		printk(KERN_INFO "kvm: guest NX capability removed\n");
->  	}
-> @@ -387,7 +388,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
->  		entry->ebx |= F(TSC_ADJUST);
->  
->  		entry->ecx &= kvm_cpuid_7_0_ecx_x86_features;
-> -		f_la57 = entry->ecx & F(LA57);
-> +		f_la57 = cpuid_entry_get(entry, X86_FEATURE_LA57);
->  		cpuid_mask(&entry->ecx, CPUID_7_ECX);
->  		/* Set LA57 based on hardware capability. */
->  		entry->ecx |= f_la57;
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index 72a79bdfed6b..64e96e4086e2 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -95,16 +95,10 @@ static __always_inline struct cpuid_reg x86_feature_cpuid(unsigned x86_feature)
->  	return reverse_cpuid[x86_leaf];
->  }
->  
-> -static __always_inline u32 *guest_cpuid_get_register(struct kvm_vcpu *vcpu, unsigned x86_feature)
-> +static __always_inline u32 *__cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry,
-> +						  const struct cpuid_reg *cpuid)
->  {
-> -	struct kvm_cpuid_entry2 *entry;
-> -	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
-> -
-> -	entry = kvm_find_cpuid_entry(vcpu, cpuid.function, cpuid.index);
-> -	if (!entry)
-> -		return NULL;
-> -
-> -	switch (cpuid.reg) {
-> +	switch (cpuid->reg) {
->  	case CPUID_EAX:
->  		return &entry->eax;
->  	case CPUID_EBX:
-> @@ -119,6 +113,40 @@ static __always_inline u32 *guest_cpuid_get_register(struct kvm_vcpu *vcpu, unsi
->  	}
->  }
->  
-> +static __always_inline u32 *cpuid_entry_get_reg(struct kvm_cpuid_entry2 *entry,
-> +						unsigned x86_feature)
+Alternatively, KVM could make KVM_MEM_DMA and KVM_MEM_LOG_DIRTY_PAGES
+mutually exclusive, i.e. force a transition to WB memtype for the guest
+(with appropriate zapping) when migration is activated.  I think that
+would work?
 
-It is just me who dislikes bare 'unsigned'?
-
-> +{
-> +	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
-> +
-> +	return __cpuid_entry_get_reg(entry, &cpuid);
-> +}
-> +
-> +static __always_inline u32 cpuid_entry_get(struct kvm_cpuid_entry2 *entry,
-> +					   unsigned x86_feature)
-> +{
-> +	u32 *reg = cpuid_entry_get_reg(entry, x86_feature);
-> +
-> +	return *reg & __feature_bit(x86_feature);
-> +}
-> +
-> +static __always_inline bool cpuid_entry_has(struct kvm_cpuid_entry2 *entry,
-> +					    unsigned x86_feature)
-> +{
-> +	return cpuid_entry_get(entry, x86_feature);
-> +}
-> +
-> +static __always_inline int *guest_cpuid_get_register(struct kvm_vcpu *vcpu, unsigned x86_feature)
-> +{
-> +	struct kvm_cpuid_entry2 *entry;
-> +	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
-> +
-> +	entry = kvm_find_cpuid_entry(vcpu, cpuid.function, cpuid.index);
-> +	if (!entry)
-> +		return NULL;
-> +
-> +	return __cpuid_entry_get_reg(entry, &cpuid);
-> +}
-> +
->  static __always_inline bool guest_cpuid_has(struct kvm_vcpu *vcpu, unsigned x86_feature)
->  {
->  	u32 *reg;
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
-
+> Note this is orthogonal to whether introducing a new uapi or implicitly checking
+> hva to favor guest memory type. It's purely about Qemu itself. Ideally anyone 
+> with the desire to access a dma-buf object should follow the expected semantics.
+> It's interesting that dma-buf sub-system doesn't provide a centralized 
+> synchronization about memory type between multiple mmap paths. 
