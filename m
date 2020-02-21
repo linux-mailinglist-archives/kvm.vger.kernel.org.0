@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F0D9167B9D
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 12:13:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 943EF167BF3
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 12:26:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727616AbgBULN0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 06:13:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28444 "EHLO
+        id S1726884AbgBUL0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 06:26:32 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46024 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726325AbgBULNZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 06:13:25 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01LB9BLw069373
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 06:13:25 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ubw7sbb-1
+        by vger.kernel.org with ESMTP id S1726325AbgBUL0c (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 06:26:32 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01LBJOLf016214
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 06:26:31 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ucp4an5-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 06:13:24 -0500
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 06:26:28 -0500
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 21 Feb 2020 11:13:22 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Fri, 21 Feb 2020 11:26:18 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 21 Feb 2020 11:13:18 -0000
+        Fri, 21 Feb 2020 11:26:14 -0000
 Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01LBCLSt39649622
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01LBQDcm30474698
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Feb 2020 11:12:21 GMT
+        Fri, 21 Feb 2020 11:26:13 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A0D84203F;
-        Fri, 21 Feb 2020 11:13:17 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 437E54203F;
+        Fri, 21 Feb 2020 11:26:13 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C18A64204C;
-        Fri, 21 Feb 2020 11:13:16 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id A633B42045;
+        Fri, 21 Feb 2020 11:26:12 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.54.21])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 21 Feb 2020 11:13:16 +0000 (GMT)
-Subject: Re: [PATCH v3 36/37] KVM: s390: rstify new ioctls in api.rst
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Fri, 21 Feb 2020 11:26:12 +0000 (GMT)
+Subject: Re: [PATCH v3 00/37] KVM: s390: Add support for protected VMs
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org
 References: <20200220104020.5343-1-borntraeger@de.ibm.com>
- <20200220104020.5343-37-borntraeger@de.ibm.com>
- <20200221115132.60b0fbde.cohuck@redhat.com>
+ <5556ee4a-09c6-117a-be99-4a5e136b78ea@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -96,26 +97,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Fri, 21 Feb 2020 12:13:16 +0100
+Date:   Fri, 21 Feb 2020 12:26:12 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200221115132.60b0fbde.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5556ee4a-09c6-117a-be99-4a5e136b78ea@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20022111-0020-0000-0000-000003AC428E
+x-cbid: 20022111-4275-0000-0000-000003A42128
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022111-0021-0000-0000-000022044C41
-Message-Id: <67b9a5ee-559b-6a21-4a03-40092a9fd41a@de.ibm.com>
+x-cbparentid: 20022111-4276-0000-0000-000038B8302F
+Message-Id: <0665a90a-19f2-39a8-8a48-d180a622e9f2@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
  definitions=2020-02-21_03:2020-02-19,2020-02-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
- spamscore=0 priorityscore=1501 mlxlogscore=725 bulkscore=0 malwarescore=0
- lowpriorityscore=0 clxscore=1015 adultscore=0 mlxscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002210085
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=970
+ priorityscore=1501 clxscore=1015 suspectscore=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002210086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -123,25 +124,51 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 21.02.20 11:51, Cornelia Huck wrote:
-> On Thu, 20 Feb 2020 05:40:19 -0500
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> We also need to rstify the new ioctls that we added in parallel to the
->> rstification of the kvm docs.
-> 
-> This looks like it could be merged independently of the protected virt
-> patches?
-> 
-Yes, but I did that while doing the other patch. Will go via kvm/master.
-
-
+On 21.02.20 11:54, David Hildenbrand wrote:
+> On 20.02.20 11:39, Christian Borntraeger wrote:
+>> mm people: This series contains a "pretty small" common code memory
+>> management change that will allow paging, guest backing with files etc
+>> almost just like normal VMs. It should be a no-op for all architectures
+>> not opting in. And it should be usable for others that also try to get
+>> notified on "the pages are in the process of being used for things like
+>> I/O". This time I included error handling and an ACK from Will Deacon.
 >>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  Documentation/virt/kvm/api.rst | 33 ++++++++++++++++++---------------
->>  1 file changed, 18 insertions(+), 15 deletions(-)
+>> mm-related patches CCed on linux-mm, the complete list can be found on
+>> the KVM and linux-s390 list. 
+>>
+>> Andrew, any chance to either take " mm:gup/writeback: add callbacks for
+>> inaccessible pages" or ACK so that I can take it?
 > 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Summary: Mostly LGTM. Especially
+> - UAPI interface is minimal and clean
+> - Core MM changes are minimal and clean (and AFAIKT Andrea was involved
+>   when discussing the approach, so it can't be wrong ;) )
+> - Is no longer prototype quality ;)
 > 
+> There are still some things I want to double check (esp. how KVM memory
+> slots are handled - I somewhat dislike that we cannot replace/add new
+> ones while in PV. One would have to fence that somehow in QEMU as long
+> as the guest is in PV mode e.g., once we would support memory hotplug
+> ... but looks like this is what the HW requires us to enforce for now),
+> certain races, etc. but I assume these things could be fixed later on.
+
+
+In fact you can do that. The hardware checks the integrity on guest physical
+address. So it is perfectly possible to remap a kvm slot as long as the
+eńcrypted content matches what counter, guest content hash and guest address
+tell. (It is like swapping, you move the encrypted content from one host 
+page to another). 
+For new pages (not unpacked and never touched by the guest) the ultravisor
+will bring a zeroed out page on first import.
+
+What does not work is when the user space address changes for a guest
+virtio indicator. But this was already broken before (we never did an
+adapter unmap/remap).
+
+> 
+> Can we get a new version once the other reviewers are done, so at least
+> I can have a final look?
+
+Just the updated patches as reply (e.g. a 3.2 for patch 9) or the full monty?
+
 
