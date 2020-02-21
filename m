@@ -2,130 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 32B81167E59
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 14:20:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EC51167E7B
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 14:26:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728510AbgBUNUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 08:20:49 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40896 "EHLO
+        id S1728392AbgBUN0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 08:26:54 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25808 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727352AbgBUNUt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 08:20:49 -0500
+        by vger.kernel.org with ESMTP id S1727053AbgBUN0v (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 08:26:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582291247;
+        s=mimecast20190719; t=1582291609;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=V45FPE8E/uSpIv1R1RMAVvbVJqCO9c9QhM88Z/L7IQI=;
-        b=KIpZPdVDzq24mU96yfjTo9tDyfyQtHZ1MKWslRUY/IFkzs+g579CK/jK3S/8ieXwvlqWjC
-        GX8mM2Ly5rslWweW2Sf+m9DE6PHNyDkOsk+ZucS1hyxTi+8Ir59oHObX154Mw1D5k5YGBG
-        M2UxrIauZ48/M8/0xLdOesrRPlooyXo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-pl1hUi6LPBCpEc7kxuJvHQ-1; Fri, 21 Feb 2020 08:20:45 -0500
-X-MC-Unique: pl1hUi6LPBCpEc7kxuJvHQ-1
-Received: by mail-wr1-f70.google.com with SMTP id u8so1009069wrp.10
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 05:20:45 -0800 (PST)
+        bh=pp52uql4euz6sc9/tpF3BoUO1r84mKC2NqpqrjvTgCE=;
+        b=ht15uYttCA70vhyz6GJezZ8yIhy6w+7SbNuKFOGJJkK3o7Kj6UYUSaHA05/XThEpt+RPyj
+        Piq+LwqTX7vLcMQJeJmHj2KRkBFFnmV/xsL49Gv+2dRulpHyOvtiFMDC8MMq3CXX2RlgMU
+        sfVFLwupqFu1t5Mw1me/xPAtiT8d0ws=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-ZYhr4KfQP32HiyA-IzvWFA-1; Fri, 21 Feb 2020 08:26:47 -0500
+X-MC-Unique: ZYhr4KfQP32HiyA-IzvWFA-1
+Received: by mail-wm1-f72.google.com with SMTP id m4so570670wmi.5
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 05:26:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=V45FPE8E/uSpIv1R1RMAVvbVJqCO9c9QhM88Z/L7IQI=;
-        b=qV5VNLpbAC+pxKz5uudflhyzIJ8JxgbiR0nWRIRl2Sz3RBKlSIn3Qq3FS27uXkMSBF
-         JgG/Enww5weHXBdSQWq1kAsG/dbO2Y8onPp1VUbuM2ApI0XLO4AbWo5GfvJYdFdnOELA
-         IQt8rx5SnhdJ95Mh7zAWMb5Ols53oj0O75oS0So3dEOb7S9GyeK2I8NUSCeQhF2eKwyi
-         cKWviQaZQD2ePk+Kp8fpaceXceKr61kS8MYGuLdef4lu94lNg5FdRMNIhhfN51A54uIU
-         rDs4Cc+U1MHk6Gd8r9kq7LT5Fe8YXj97L+tZMfTcfp60ZU9FyRqzwR6JPx/PgIwu5TiX
-         xCaw==
-X-Gm-Message-State: APjAAAX6WPUx2MDTdnz6rI2m2g/sQP4xm108/m2hNBFG0Gv/LiLxpCtN
-        g9IFjHyL4wpfm61ebgQpZ3cQTRANjRou9Eh1ctjmIZ0v/Z1KKJtlQo3E86KKBAU3ajzPVIxVhhx
-        IMbzoSIPP0+HK
-X-Received: by 2002:a05:6000:1208:: with SMTP id e8mr51009111wrx.351.1582291244366;
-        Fri, 21 Feb 2020 05:20:44 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwXgzt5blvA3I2e+h/HOQivRsOOnvHTyqfqBCG2YxfjYwz0b8N/EbQuo8Mp5i1XvX2dQVzGhg==
-X-Received: by 2002:a05:6000:1208:: with SMTP id e8mr51009081wrx.351.1582291244058;
-        Fri, 21 Feb 2020 05:20:44 -0800 (PST)
-Received: from [192.168.178.40] ([151.20.135.128])
-        by smtp.gmail.com with ESMTPSA id m9sm3971187wrx.55.2020.02.21.05.20.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Feb 2020 05:20:43 -0800 (PST)
-Subject: Re: [PATCH 00/10] KVM: x86: Clean up VMX's TLB flushing code
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=pp52uql4euz6sc9/tpF3BoUO1r84mKC2NqpqrjvTgCE=;
+        b=JjdZRf3zWxJP03lJ938/1qbxEcHGh3e2OTsyVbYPynuY3eiZUuajxOQY+G+LVPWpJ3
+         d7mp/EqlYUhoZ9xBs2R1o8zjMrajxXTGq4/wta4joOBx8/NrJdKgGHP2rrz/8m8NCoS1
+         4E8Fh2nWyFv5FXcFw9B0whWT9+EmB+5bwYLtAgmcOh82toggpaJz+haGHZ6Ol5ksmD2x
+         wgfchuRW3/Yg5QNSSUi93+s4p97LOnfiSt6lUuVqVGwM3wV4BkRFCMIipJV+OyX0DuLj
+         EkByDX1yAydgkbX/6NzyhNF4vp7F9NBULLAxx5LWqy+mHndx+T0+KayjOF2T98N49RkQ
+         eFjQ==
+X-Gm-Message-State: APjAAAWnGaRj8dQ6QRaKoIKghISttBaVxIDcyKA59H9O+jeZd7j399V1
+        xeM9XQLj0ZAJGZg8HR44IyP//QbHdC0F7DfXTRMcOFu8jR41CeYErTOKsfM08SzpzuQFuoSW5D2
+        TBVmE9sfVFKSx
+X-Received: by 2002:a1c:b0c3:: with SMTP id z186mr3858294wme.36.1582291606598;
+        Fri, 21 Feb 2020 05:26:46 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzxbF95OXsrWyungR3AunMn453gY9WbnEXGRp+W3FBe+YdiQTXfHAprgJwrb8V0Wwn3+8m1hA==
+X-Received: by 2002:a1c:b0c3:: with SMTP id z186mr3858273wme.36.1582291606366;
+        Fri, 21 Feb 2020 05:26:46 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id b17sm4095785wrp.49.2020.02.21.05.26.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2020 05:26:45 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20200220204356.8837-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <efb07c80-58ab-c3ce-1fed-832475190add@redhat.com>
-Date:   Fri, 21 Feb 2020 14:20:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+Subject: Re: [PATCH 03/10] KVM: VMX: Handle INVVPID fallback logic in vpid_sync_vcpu_addr()
+In-Reply-To: <20200220204356.8837-4-sean.j.christopherson@intel.com>
+References: <20200220204356.8837-1-sean.j.christopherson@intel.com> <20200220204356.8837-4-sean.j.christopherson@intel.com>
+Date:   Fri, 21 Feb 2020 14:26:45 +0100
+Message-ID: <8736b4t6ju.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200220204356.8837-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/02/20 21:43, Sean Christopherson wrote:
-> This series is technically x86 wide, but it only superficially affects
-> SVM, the motivation and primary touchpoints are all about VMX.
-> 
-> The goal of this series to ultimately clean up __vmx_flush_tlb(), which,
-> for me, manages to be extremely confusing despite being only ten lines of
-> code.
-> 
-> The most confusing aspect of __vmx_flush_tlb() is that it is overloaded
-> for multiple uses:
-> 
->  1) TLB flushes in response to a change in KVM's MMU
-> 
->  2) TLB flushes during nested VM-Enter/VM-Exit when VPID is enabled
-> 
->  3) Guest-scoped TLB flushes for paravirt TLB flushing
-> 
-> Handling (2) and (3) in the same flow as (1) is kludgy, because the rules
-> for (1) are quite different than the rules for (2) and (3).  They're all
-> squeezed into __vmx_flush_tlb() via the @invalidate_gpa param, which means
-> "invalidate gpa mappings", not "invalidate a specific gpa"; it took me
-> forever and a day to realize that.
-> 
-> To clean things up, handle (2) by directly calling vpid_sync_context()
-> instead of bouncing through __vmx_flush_tlb(), and handle (3) via a
-> dedicated kvm_x86_ops hook.  This allows for a less tricky implementation
-> of vmx_flush_tlb() for (1), and (hopefully) clarifies the rules for what
-> mappings must be invalidated when.
-> 
-> Sean Christopherson (10):
->   KVM: VMX: Use vpid_sync_context() directly when possible
->   KVM: VMX: Move vpid_sync_vcpu_addr() down a few lines
->   KVM: VMX: Handle INVVPID fallback logic in vpid_sync_vcpu_addr()
->   KVM: VMX: Fold vpid_sync_vcpu_{single,global}() into
->     vpid_sync_context()
->   KVM: nVMX: Use vpid_sync_vcpu_addr() to emulate INVVPID with address
->   KVM: x86: Move "flush guest's TLB" logic to separate kvm_x86_ops hook
->   KVM: VMX: Clean up vmx_flush_tlb_gva()
->   KVM: x86: Drop @invalidate_gpa param from kvm_x86_ops' tlb_flush()
->   KVM: VMX: Drop @invalidate_gpa from __vmx_flush_tlb()
->   KVM: VMX: Fold __vmx_flush_tlb() into vmx_flush_tlb()
-> 
->  arch/x86/include/asm/kvm_host.h |  8 +++++++-
->  arch/x86/kvm/mmu/mmu.c          |  2 +-
->  arch/x86/kvm/svm.c              | 14 ++++++++++----
->  arch/x86/kvm/vmx/nested.c       | 12 ++++--------
->  arch/x86/kvm/vmx/ops.h          | 32 +++++++++-----------------------
->  arch/x86/kvm/vmx/vmx.c          | 26 +++++++++++++++++---------
->  arch/x86/kvm/vmx/vmx.h          | 19 ++++++++++---------
->  arch/x86/kvm/x86.c              |  8 ++++----
->  8 files changed, 62 insertions(+), 59 deletions(-)
-> 
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Directly invoke vpid_sync_context() to do a global INVVPID when the
+> individual address variant is not supported instead of deferring such
+> behavior to the caller.  This allows for additional consolidation of
+> code as the logic is basically identical to the emulation of the
+> individual address variant in handle_invvpid().
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/vmx/ops.h | 12 +++++-------
+>  arch/x86/kvm/vmx/vmx.c |  3 +--
+>  2 files changed, 6 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/ops.h b/arch/x86/kvm/vmx/ops.h
+> index a2b0689e65e3..612df1bdb26b 100644
+> --- a/arch/x86/kvm/vmx/ops.h
+> +++ b/arch/x86/kvm/vmx/ops.h
+> @@ -276,17 +276,15 @@ static inline void vpid_sync_context(int vpid)
+>  		vpid_sync_vcpu_global();
+>  }
+>  
+> -static inline bool vpid_sync_vcpu_addr(int vpid, gva_t addr)
+> +static inline void vpid_sync_vcpu_addr(int vpid, gva_t addr)
+>  {
+>  	if (vpid == 0)
+> -		return true;
+> +		return;
+>  
+> -	if (cpu_has_vmx_invvpid_individual_addr()) {
+> +	if (cpu_has_vmx_invvpid_individual_addr())
+>  		__invvpid(VMX_VPID_EXTENT_INDIVIDUAL_ADDR, vpid, addr);
+> -		return true;
+> -	}
+> -
+> -	return false;
+> +	else
+> +		vpid_sync_context(vpid);
+>  }
+>  
+>  static inline void ept_sync_global(void)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 9a6664886f2e..349a6e054e0e 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2826,8 +2826,7 @@ static void vmx_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
+>  {
+>  	int vpid = to_vmx(vcpu)->vpid;
+>  
+> -	if (!vpid_sync_vcpu_addr(vpid, addr))
+> -		vpid_sync_context(vpid);
+> +	vpid_sync_vcpu_addr(vpid, addr);
+>  
+>  	/*
+>  	 * If VPIDs are not supported or enabled, then the above is a no-op.
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
