@@ -2,74 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 09A8F1684F8
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 18:31:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4F91168505
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 18:32:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728907AbgBURbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 12:31:17 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32001 "EHLO
+        id S1726423AbgBURc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 12:32:57 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50757 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726672AbgBURbQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 12:31:16 -0500
+        by vger.kernel.org with ESMTP id S1726066AbgBURc5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 12:32:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582306275;
+        s=mimecast20190719; t=1582306376;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Gre7ZeHoqmuVRTzKby7XOW3ou3/ssFLu22ygHR886dQ=;
-        b=ZZitFPxABZNGbsRTbHleA6Kwp7K5hxdIJJpLE1DdZ6mJCBgNvs5q3T2RXCRf0neK2tKvfF
-        8nHK0PaOBathXiBl8usEPkoI2rKi5uf0F0cepSBJ5zcZZiTAbUZ7Vn6gebMVhy+4vLNMdf
-        2pxermo5CiSefoLL0LTl2opiC6Ctj6U=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-usCV5GKNPAqyx8iSZqCi_g-1; Fri, 21 Feb 2020 12:31:12 -0500
-X-MC-Unique: usCV5GKNPAqyx8iSZqCi_g-1
-Received: by mail-wm1-f69.google.com with SMTP id g138so854411wmg.8
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 09:31:12 -0800 (PST)
+        bh=o96Yvzi87DPePCMyKdFlIusrR00b35JbPu9d8slr560=;
+        b=aXtayFz7oDLrtuZJ+w0OlOjX68eTYuW+goE4UL0e3dRX49/AzAj7JLe+nVcYcZcLDcYFT9
+        ZI3krBdLn2WCKkWA1bvCSvXSHOErP/i+55lqcOh9C0cqQoiXQ+thf/PZhCffNpXAA7NDM3
+        D3Gu//70az2lDvq98rqOYtUKQ5WMmPs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-30-BNv1xBD4Px2uTh0H0iIh3A-1; Fri, 21 Feb 2020 12:32:54 -0500
+X-MC-Unique: BNv1xBD4Px2uTh0H0iIh3A-1
+Received: by mail-wm1-f71.google.com with SMTP id f207so856839wme.6
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 09:32:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Gre7ZeHoqmuVRTzKby7XOW3ou3/ssFLu22ygHR886dQ=;
-        b=Mb4nRAcVxAptoDXXGUeTu4mHlvg5o+dOSniNdLFgYdBrmJC7vRWS6yOmLWmphadhGF
-         t8gY9OPUj8W8PCGgksvy7bN9K3L13fjoGBBNSHZFoOJkdvD6jTorejR2zj8y2OcSoK2F
-         LgyeDFgc5d3TZLOx4nyCt/Ve9ZC2qjRGI1kUw0E1pzHpOoq8dGb5VaDDFkYYAxdbPzXY
-         PMospRfHeGKohVv8Bd06j3cr36xW8m5PSWUuOLe20hBuhAweF2K7pxz0IxbZ4B3W05N7
-         fDwm3QztP4pNsdhX3s+6o8pxqMcblAedKQ9hTbZp/HCv90Ap317HDWvCi8DczeedoOE6
-         iKPw==
-X-Gm-Message-State: APjAAAXpQjVYXgdtm4yFGv34xRME6zaV3va7zvktWsaItfdRVT57J9/z
-        lUUBJFWzrfTumS3YgHPTktp1PzjQEdGJlZfAaYGPGGvpU1vIl4dWBERk5avib22wFszUe0LXah8
-        XKjAHxpg9VRME
-X-Received: by 2002:adf:a285:: with SMTP id s5mr52449174wra.118.1582306270990;
-        Fri, 21 Feb 2020 09:31:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz7DaCwm5dSXMY0+lvo38I3IH/+yBcp1BncOFZ36eQi1wCSVSKGwh91upvl4OmRXmjCzVSTDg==
-X-Received: by 2002:adf:a285:: with SMTP id s5mr52449151wra.118.1582306270694;
-        Fri, 21 Feb 2020 09:31:10 -0800 (PST)
+        bh=o96Yvzi87DPePCMyKdFlIusrR00b35JbPu9d8slr560=;
+        b=VpTN0NJ01ctbkDQGDINkyX8Ia+SqxftnnqqbRrYFGMuix48pYr+aEcPK1chgwlB8ew
+         z+Ej6xls/2CCz5H4gfW9zY6AwkrT15AXcfrPstP0lj56F2wLSXKZQuLwStTTuwTtC5J3
+         TVbFtYeagjm/lxBave0ZITbJxirYhBQeZ+XhZ2eUA4Z9yhLZih/z1oImnFD8k7LrtP4g
+         QN7LypJUgS8kKR3uG8zhKbPTHFagX7RYt5xTtPE2R0LdJuqJoyCPbCSKXHWBFVj93j/E
+         7Y6C540dAw9xonoWX3aEGTOhQSwDhngvZ2CgsnJPv0VIeofe5QONHn8HHRQM+wAF8y45
+         G7oQ==
+X-Gm-Message-State: APjAAAV7uPG53fQCpRMg1VpFOl5eFFlU8EwclPeKRCetn1iDvatrFycj
+        sGoXi4EaKwdMvheCTZv4lxu6S7OQwQFydC7wwu68vW8mlnj9OxLC7R26M5BoscZVD6eM5tebyvS
+        R41QBBVjZgvcy
+X-Received: by 2002:a1c:a4c3:: with SMTP id n186mr4955225wme.25.1582306373146;
+        Fri, 21 Feb 2020 09:32:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxayLNZ1h9vLVc5mYWPuuY1cdEKYHllZpJcPEvt3/MdMtEG+xA001YejVgYA0jVDbPLZm/vlg==
+X-Received: by 2002:a1c:a4c3:: with SMTP id n186mr4955201wme.25.1582306372831;
+        Fri, 21 Feb 2020 09:32:52 -0800 (PST)
 Received: from [192.168.178.40] ([151.20.135.128])
-        by smtp.gmail.com with ESMTPSA id j66sm4767694wmb.21.2020.02.21.09.31.06
+        by smtp.gmail.com with ESMTPSA id x11sm4493300wmg.46.2020.02.21.09.32.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Feb 2020 09:31:10 -0800 (PST)
+        Fri, 21 Feb 2020 09:32:52 -0800 (PST)
 Subject: Re: [PATCH 06/10] KVM: x86: Move "flush guest's TLB" logic to
  separate kvm_x86_ops hook
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20200220204356.8837-1-sean.j.christopherson@intel.com>
  <20200220204356.8837-7-sean.j.christopherson@intel.com>
- <87tv3krqta.fsf@vitty.brq.redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cef77bcf-0921-a530-9745-7922e657b013@redhat.com>
-Date:   Fri, 21 Feb 2020 18:31:06 +0100
+Message-ID: <ca7bcbc2-d7eb-bc7c-4e15-a77831af8a73@redhat.com>
+Date:   Fri, 21 Feb 2020 18:32:48 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <87tv3krqta.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200220204356.8837-7-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -77,27 +76,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/02/20 14:52, Vitaly Kuznetsov wrote:
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index fbabb2f06273..72f7ca4baa6d 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -2675,7 +2675,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
->>  	trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
->>  		st->preempted & KVM_VCPU_FLUSH_TLB);
->>  	if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
->> -		kvm_vcpu_flush_tlb(vcpu, false);
->> +		kvm_x86_ops->tlb_flush_guest(vcpu);
->>  
->>  	vcpu->arch.st.preempted = 0;
-> There is one additional place in hyperv.c where we do TLB flush on
-> behalf of the guest, kvm_hv_flush_tlb(). Currently, it does
-> KVM_REQ_TLB_FLUSH (resulting in kvm_x86_ops->tlb_flush()), do we need
-> something like KVM_REQ_TLB_FLUSH_GUEST instead?
+On 20/02/20 21:43, Sean Christopherson wrote:
+> Add a dedicated hook to handle flushing TLB entries on behalf of the
+> guest, i.e. for a paravirtualized TLB flush, and use it directly instead
+> of bouncing through kvm_vcpu_flush_tlb().  Change the effective VMX
+> implementation to never do INVEPT, i.e. to always flush via INVVPID.
+> The INVEPT performed by __vmx_flush_tlb() when @invalidate_gpa=false and
+> enable_vpid=0 is unnecessary, as it will only flush GPA->HPA mappings;
+> GVA->GPA and GVA->HPA translations are flushed by VM-Enter when VPID is
+> disabled, and changes in the guest pages tables only affect GVA->*PA
+> mappings.
+> 
+> When EPT and VPID are enabled, doing INVVPID is not required (by Intel's
+> architecture) to invalidate GPA mappings, i.e. TLB entries that cache
+> GPA->HPA translations can live across INVVPID as GPA->HPA mappings are
+> associated with an EPTP, not a VPID.  The intent of @invalidate_gpa is
+> to inform vmx_flush_tlb() that it needs to "invalidate gpa mappings",
+> i.e. do INVEPT and not simply INVVPID.  Other than nested VPID handling,
+> which now calls vpid_sync_context() directly, the only scenario where
+> KVM can safely do INVVPID instead of INVEPT (when EPT is enabled) is if
+> KVM is flushing TLB entries from the guest's perspective, i.e. is
+> invalidating GLA->GPA mappings.
 
-Yes, that would be better since INVEPT does not flush linear mappings.
-So, when EPT and VPID is enabled, KVM_REQ_TLB_FLUSH would not flush the
-guest's translations.
+Since you need a v2, can you replace the name of mappings with "linear",
+"guest-physical" and "combined" as in the SDM?  It takes a little to get
+used to them but it avoids three-letter acronym soup.
 
 Paolo
 
