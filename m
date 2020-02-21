@@ -2,93 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C894E167FB0
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 15:10:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01029167FFF
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 15:20:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728392AbgBUOKH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 09:10:07 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:38443 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727836AbgBUOKH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 09:10:07 -0500
-Received: by mail-oi1-f194.google.com with SMTP id r137so1677540oie.5
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 06:10:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FWVDkmsgLpByHs3eCi6sKclY4YV1R37ovc1jJnUhQAE=;
-        b=sYZNsPMdslZdcvPHvQQcr0WltYjiT/Uxn2SLB7obLof1d3EgJ7b4163UoteGPlJyI1
-         +s03NrPStjcs/pVGnIHr9ChIdcfXtK6BRPBd1Cp+mL8gjozESrb3QD8N1Fx1nL/MwLKa
-         pAzdzPqEtcG6RROcunEocDFvsspFUuVkJZd73lXwyt5e0llpr8oyujVqnZGKseJXdE7s
-         16ZFclOcmt6UjH8NLi0wkdjpxq76TL/EdfKJbXfCUIy88AC2t2O9c54P4yRnRISlE7eD
-         mx3AOfZ/SmkSaZOefFkfg3yyxutIppFJXE/2zrjoZtoAVP7kultq2C0dsqJzbVNwGtkJ
-         WYNg==
+        id S1728730AbgBUOUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 09:20:31 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54769 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727315AbgBUOU3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 09:20:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582294828;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SoBzR7ZqtKjiFmct3fll5NpKOfUjalkqOXKRmpcWspU=;
+        b=VZSFSvky/bkERBNFezM0ug9UgZkYMQeDf9QlZ5DViaPLbYJ84W062qVSHssTTRBziDc+Ew
+        skUjF4fR4WPz4WRhJ5nfbMn9yKhHRY0MA0Wv8rV++BzzhtYbuskbOChZWPg/Oel//SC8Ox
+        /F22Bd1u2+4Hsr/KbOHhJ5qewpPG1yg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-306-OZQpSkDCNvuWB1liPzoNtg-1; Fri, 21 Feb 2020 09:20:26 -0500
+X-MC-Unique: OZQpSkDCNvuWB1liPzoNtg-1
+Received: by mail-wm1-f70.google.com with SMTP id b205so677666wmh.2
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 06:20:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FWVDkmsgLpByHs3eCi6sKclY4YV1R37ovc1jJnUhQAE=;
-        b=HgVmE+EC5zazPil2i1WNTJitMq23qen1DZFBwWPlmDYRGibrEd6h1KPDPE1RpXes1j
-         vl2+No16LAkjUSyo2kfYrm7T4GUiizB0XFGva73IwoVm8BpPqhAR9oESfZZdz3wusWgG
-         uwsdYbGHb42OidNUGL7B0HVJZ811dQDAjR1aPhAATT8MNC62UoVHs8aWJTiUafG2Gtzu
-         +QrR0a5X34NkrmO82MEkNXhEFWqavoV1xroD9W163NVXWFrCvv2YFjKiRwHaCMueLUN+
-         g7jdD5/fpr5656cAvNa1EQr6vsgaaVgrQVC8zKIAo/JhRc9bXV5otOnRlyiYdnhwnB2x
-         F0nQ==
-X-Gm-Message-State: APjAAAUAGO1Rh88CA7U+WE8mRSAKzwUGp5tmdChB4XXR4fk/SIbr1J4v
-        ac7jHfOeoFAgvWo+5Wa9DdhI/ixM7IM+ek2kHX4r1Q==
-X-Google-Smtp-Source: APXvYqyX9eeSuvuFP09qcS1lkRxxupztYJ917FYlclPxtdjWxmrxfdLsQF2GBc3ux1gL+c/jP6I4magBfiAsdoLFwbE=
-X-Received: by 2002:a05:6808:289:: with SMTP id z9mr2098991oic.48.1582294206446;
- Fri, 21 Feb 2020 06:10:06 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=SoBzR7ZqtKjiFmct3fll5NpKOfUjalkqOXKRmpcWspU=;
+        b=lwfDJa+WMBcyoHMYgDRuFj4KstAKHQ9eTi3w3HevM70lsMm6mlJ1CJvxEgarSrI5bi
+         i5sBHYO6hax5H5oRVc34nLj0uDtTOoS39VZq5G/xdv5AD0hxNhEfIE7nCJYR48SH+ayf
+         2m3sjfAAhmlmzsNIR/VMGOE8U+4zZ8elg5U4AqtyAxMg02CVoWdBzbr6Wr7MJleyBGzO
+         jR6eo67E4CMYibDKbmIJLR0sjMowVMzvk0I0QqZhl6+VyDS4VztDrm7zR+X+CB+P3yjg
+         rqoCllnqJ6ba2jFlWRVqWzLf2HAOOgGrj8edjUTh8VUAexhv5Is92JmU8k08gnGM0KbD
+         ecpA==
+X-Gm-Message-State: APjAAAVRjngxNFTNwxgxZ/g26xKvN8haF99FuQdMgKQwz4oL+crk6lwK
+        OSYuTW+6YNjSnkcFmeCIB/6RJiXuNhowprjnf7jAILhyE/r1wEIZgPtkN670EYhUpSJnSpSLrMw
+        xGR0RyDWzYmWl
+X-Received: by 2002:adf:e68d:: with SMTP id r13mr48476865wrm.349.1582294825409;
+        Fri, 21 Feb 2020 06:20:25 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyeALhvpOT47CPYypy+gYe7rOAhcLd8Q3GisyBu9lp+EJJr+DkWBh6I7CXgvgL3PbKUdTP0tg==
+X-Received: by 2002:adf:e68d:: with SMTP id r13mr48476740wrm.349.1582294823532;
+        Fri, 21 Feb 2020 06:20:23 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id n3sm4158922wmc.27.2020.02.21.06.20.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2020 06:20:22 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/61] KVM: x86: Clean up CPUID 0x7 sub-leaf loop
+In-Reply-To: <20200201185218.24473-11-sean.j.christopherson@intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-11-sean.j.christopherson@intel.com>
+Date:   Fri, 21 Feb 2020 15:20:21 +0100
+Message-ID: <87ftf4rpi2.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <20200217131248.28273-1-gengdongjiu@huawei.com>
-In-Reply-To: <20200217131248.28273-1-gengdongjiu@huawei.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 21 Feb 2020 14:09:55 +0000
-Message-ID: <CAFEAcA9xd8fHiigZFFM7Symh0Mkm-jQ_aGJ7ifRCrXZvFY4DqQ@mail.gmail.com>
-Subject: Re: [PATCH v24 00/10] Add ARMv8 RAS virtualization support in QEMU
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Fam Zheng <fam@euphon.net>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Zheng Xiang <zhengxiang9@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Feb 2020 at 13:10, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->
-> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA) and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed information of guest, so it is expected that guest can do the recovery.
-> For example, if an exception happens in a guest user-space application, host does
-> not know which application encounters errors, only guest knows it.
->
-> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
-> After user space gets the notification, it will record the CPER into guest GHES
-> buffer and inject an exception or IRQ to guest.
->
-> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
-> treat it as a synchronous exception, and notify guest with ARMv8 SEA
-> notification type after recording CPER into guest.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-Hi; I have reviewed the remaining arm bit of this series (patch 9),
-and made some comments on patch 1. Still to be reviewed are
-patches 4, 5, 6, 8: I'm going to assume that Michael or Igor
-will look at those.
+> Refactor the sub-leaf loop for CPUID 0x7 to move the main leaf out of
+> said loop.  The emitted code savings is basically a mirage, as the
+> handling of the main leaf can easily be split to its own helper to avoid
+> code bloat.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 6e1685a16cca..b626893a11d5 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -573,16 +573,16 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>  	case 7: {
+>  		int i;
+>  
+> -		for (i = 0; ; ) {
+> +		do_cpuid_7_mask(entry, 0);
+> +
+> +		for (i = 1; i <= entry->eax; i++) {
+> +			if (*nent >= maxnent)
+> +				goto out;
+> +
+> +			do_host_cpuid(&entry[i], function, i);
+> +			++*nent;
+> +
+>  			do_cpuid_7_mask(&entry[i], i);
+> -			if (i == entry->eax)
+> -				break;
+> -			if (*nent >= maxnent)
+> -				goto out;
+> -
+> -			++i;
+> -			do_host_cpuid(&entry[i], function, i);
+> -			++*nent;
+>  		}
+>  		break;
+>  	}
 
-thanks
--- PMM
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
+
