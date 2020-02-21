@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6821167B21
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:47:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CBCC167B3A
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 11:47:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728148AbgBUKra (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 05:47:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48099 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728128AbgBUKr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 05:47:29 -0500
+        id S1728301AbgBUKro (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 05:47:44 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60561 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728259AbgBUKrn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 21 Feb 2020 05:47:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582282047;
+        s=mimecast20190719; t=1582282061;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=8oWqFAkH3FQS9xsmRJSERO5cC1FzQn8WQy8auEWM2UI=;
-        b=Xb5LeDjNnLcHvJK0xsNfX/KupaMJIQLxv5gKqJgj9DyOCLdWFyjQdzoj5aqbJxZaLBvFbK
-        gM3LLy9wiVNDVxvyqQYkieLlvtihCkLS4oYDJ84sz7I9+KDts8/bk7LXEwaSbVhbgjPoyf
-        nm9o9/nNWAEPJMA008ZHJAISFl6mAoc=
+        bh=Ta1INcFNzAA5uhUv+K2aju7L6Coeri0ceL47CjmHrWY=;
+        b=P0cIhZmh/TUuc2y+sIKto9ECLtLfUPZSQkX7bjbIjO3UOtS5I/ECNu1AnDP/us+xzQ7zK8
+        cFfQfwyAYFgSyf111ut1B+5XAWvov8SLNELN9Ky1wVkPQ53Iqn2qrgrE/e7P30FlVwnp3J
+        zUxbACnm3QWYtw2Xk3qcceiN1KwY02U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-apmicB6_ORae9zS8lkV5lw-1; Fri, 21 Feb 2020 05:47:25 -0500
-X-MC-Unique: apmicB6_ORae9zS8lkV5lw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-114-3pAaEIHlOc64auWNoC9j1w-1; Fri, 21 Feb 2020 05:47:39 -0500
+X-MC-Unique: 3pAaEIHlOc64auWNoC9j1w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7F38107ACC5;
-        Fri, 21 Feb 2020 10:47:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73D521005512;
+        Fri, 21 Feb 2020 10:47:38 +0000 (UTC)
 Received: from [10.36.117.197] (ovpn-117-197.ams2.redhat.com [10.36.117.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B14CE60C87;
-        Fri, 21 Feb 2020 10:47:21 +0000 (UTC)
-Subject: Re: [PATCH v3 36/37] KVM: s390: rstify new ioctls in api.rst
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 488E31001B28;
+        Fri, 21 Feb 2020 10:47:36 +0000 (UTC)
+Subject: Re: [PATCH v3 37/37] KVM: s390: protvirt: introduce and enable
+ KVM_CAP_S390_PROTECTED
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -44,7 +45,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Michael Mueller <mimu@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>
 References: <20200220104020.5343-1-borntraeger@de.ibm.com>
- <20200220104020.5343-37-borntraeger@de.ibm.com>
+ <20200220104020.5343-38-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -90,91 +91,58 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <766d49d0-531b-8ce7-55e4-bfb791e746c5@redhat.com>
-Date:   Fri, 21 Feb 2020 11:47:20 +0100
+Message-ID: <dd6ebcdb-2d28-eecc-6520-456e22c95e8c@redhat.com>
+Date:   Fri, 21 Feb 2020 11:47:35 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200220104020.5343-37-borntraeger@de.ibm.com>
+In-Reply-To: <20200220104020.5343-38-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 20.02.20 11:40, Christian Borntraeger wrote:
-> We also need to rstify the new ioctls that we added in parallel to the
-> rstification of the kvm docs.
+> Now that everything is in place, we can announce the feature.
 > 
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  Documentation/virt/kvm/api.rst | 33 ++++++++++++++++++---------------
->  1 file changed, 18 insertions(+), 15 deletions(-)
+>  arch/s390/kvm/kvm-s390.c | 3 +++
+>  include/uapi/linux/kvm.h | 1 +
+>  2 files changed, 4 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 58be7aba0db2..faca9977cbe7 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -4613,35 +4613,38 @@ unpins the VPA pages and releases all the device pages that are used to
->  track the secure pages by hypervisor.
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index d79ccd34b5cb..e5f823840c29 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -574,6 +574,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_S390_BPB:
+>  		r = test_facility(82);
+>  		break;
+> +	case KVM_CAP_S390_PROTECTED:
+> +		r = is_prot_virt_host();
+> +		break;
+>  	default:
+>  		r = 0;
+>  	}
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 60efbbc86209..2551de8bec57 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1015,6 +1015,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ARM_NISV_TO_USER 177
+>  #define KVM_CAP_ARM_INJECT_EXT_DABT 178
+>  #define KVM_CAP_S390_VCPU_RESETS 179
+> +#define KVM_CAP_S390_PROTECTED 180
 >  
->  4.122 KVM_S390_NORMAL_RESET
-> +---------------------------
->  
-> -Capability: KVM_CAP_S390_VCPU_RESETS
-> -Architectures: s390
-> -Type: vcpu ioctl
-> -Parameters: none
-> -Returns: 0
-> +:Capability: KVM_CAP_S390_VCPU_RESETS
-> +:Architectures: s390
-> +:Type: vcpu ioctl
-> +:Parameters: none
-> +:Returns: 0
->  
->  This ioctl resets VCPU registers and control structures according to
->  the cpu reset definition in the POP (Principles Of Operation).
->  
->  4.123 KVM_S390_INITIAL_RESET
-> +----------------------------
->  
-> -Capability: none
-> -Architectures: s390
-> -Type: vcpu ioctl
-> -Parameters: none
-> -Returns: 0
-> +:Capability: none
-> +:Architectures: s390
-> +:Type: vcpu ioctl
-> +:Parameters: none
-> +:Returns: 0
->  
->  This ioctl resets VCPU registers and control structures according to
->  the initial cpu reset definition in the POP. However, the cpu is not
->  put into ESA mode. This reset is a superset of the normal reset.
->  
->  4.124 KVM_S390_CLEAR_RESET
-> +--------------------------
->  
-> -Capability: KVM_CAP_S390_VCPU_RESETS
-> -Architectures: s390
-> -Type: vcpu ioctl
-> -Parameters: none
-> -Returns: 0
-> +:Capability: KVM_CAP_S390_VCPU_RESETS
-> +:Architectures: s390
-> +:Type: vcpu ioctl
-> +:Parameters: none
-> +:Returns: 0
->  
->  This ioctl resets VCPU registers and control structures according to
->  the clear cpu reset definition in the POP. However, the cpu is not put
-> 
+>  #ifdef KVM_CAP_IRQ_ROUTING
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
+
 
 -- 
 Thanks,
