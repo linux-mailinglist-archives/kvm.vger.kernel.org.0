@@ -2,109 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7756B167F7F
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 15:02:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EB6F167F82
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 15:03:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728544AbgBUOCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 09:02:44 -0500
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:44869 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728326AbgBUOCn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 09:02:43 -0500
-Received: by mail-oi1-f196.google.com with SMTP id d62so1625328oia.11
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 06:02:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ustmWK5mEvdAZcOBmaOSg4VtBioTYnOuWkx56ShVqRc=;
-        b=ksSrv+JQp6iia60+jXznBn1bDqYQPbMAYUjTQvr4KXPkqeSD2mwVnvhvOCiEd0nYMO
-         +fX3gUUCsG9jjZzmzjrXMHiRcjpNmmuHttONuw+J+gqM1rbz70fXx123EtxWjaiyUmoZ
-         QdwQXxqrzk+7yloQ46ZuZ2no4EmQOrZiRX9c3/FS4Uq6QmCtL0plHzM83fzklhUBE/kf
-         r91ZvTUhs0Oo4BE8652GkH8ZZXdXIwahEzUHL5SfSWE9AytFKP9tlQ8unhXEMNj1IH3m
-         wAlHaVkOqR53LXl85gOguvTn7u31lxWsKdGQbG9uoioc+M98IBpDaQeYFFm6EOlg8UDB
-         kNew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ustmWK5mEvdAZcOBmaOSg4VtBioTYnOuWkx56ShVqRc=;
-        b=jkS01tRPryGVd7ZbNXg1TZpxVzLdAADRAERuj0H3Pea/oC4V6pR1Sh5qRNUg5Bmcyn
-         uoe2qJRYEHzD97Avrlsq3ZoLIoixRq3qtQruZ50axnsOQM4sYKESk9wrKcF3gFePe90s
-         TEzKF7RB5GzeG/TUg4guKsFfgaK6gdUo+RYLcWUkEE2CeBT1SYhCNUcW2QEbBcDMyIlx
-         QaGKDcMHpsaC3ZrAyc6063w3b/oBzjXHjw3MP1a4L46iWiKEvuQfAIbj4YzThX74t1RR
-         WpgulpSpJwP6+EO8Z4OzL/DowoO6dm/nNZInDVzJyGqFXbSedfXKStKp5xFKoSivDDE6
-         Qh5g==
-X-Gm-Message-State: APjAAAWBwWrfGrSC1FlalfDCs5OvB0UcopXnGI71DDZ0CgoPvRRBi9wl
-        URGToJWS7s3DPir7vYVQ2oTVJRJhyBYTmhbsJOj8yA==
-X-Google-Smtp-Source: APXvYqxvQrgBavFAgPw3aYQcPGAqf36Tburz54dTfddYLHWZdLHBm1Io041OmFxhvi9reM6KXIqY2QZldRyCnxIkqSg=
-X-Received: by 2002:a05:6808:289:: with SMTP id z9mr2070195oic.48.1582293756639;
- Fri, 21 Feb 2020 06:02:36 -0800 (PST)
+        id S1728672AbgBUODa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 09:03:30 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:10662 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727876AbgBUODa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 09:03:30 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 7F25D60998780C0EA439;
+        Fri, 21 Feb 2020 22:03:22 +0800 (CST)
+Received: from huawei.com (10.175.105.18) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Fri, 21 Feb 2020
+ 22:03:13 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
+        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <hpa@zytor.com>
+CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <x86@kernel.org>
+Subject: [PATCH v2] KVM: apic: avoid calculating pending eoi from an uninitialized val
+Date:   Fri, 21 Feb 2020 22:04:46 +0800
+Message-ID: <1582293886-23335-1-git-send-email-linmiaohe@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-References: <20200217131248.28273-1-gengdongjiu@huawei.com> <20200217131248.28273-10-gengdongjiu@huawei.com>
-In-Reply-To: <20200217131248.28273-10-gengdongjiu@huawei.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 21 Feb 2020 14:02:25 +0000
-Message-ID: <CAFEAcA9MaRDKNovYjH1FJXTbAVOL3JaA20Sc_Haa3XjnRNkGvg@mail.gmail.com>
-Subject: Re: [PATCH v24 09/10] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Fam Zheng <fam@euphon.net>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Zheng Xiang <zhengxiang9@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.175.105.18]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Feb 2020 at 13:10, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->
-> Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-> translates the host VA delivered by host to guest PA, then fills this PA
-> to guest APEI GHES memory, then notifies guest according to the SIGBUS
-> type.
->
-> When guest accesses the poisoned memory, it will generate a Synchronous
-> External Abort(SEA). Then host kernel gets an APEI notification and calls
-> memory_failure() to unmapped the affected page in stage 2, finally
-> returns to guest.
->
-> Guest continues to access the PG_hwpoison page, it will trap to KVM as
-> stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
-> Qemu, Qemu records this error address into guest APEI GHES memory and
-> notifes guest using Synchronous-External-Abort(SEA).
->
-> In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
-> in which we can setup the type of exception and the syndrome information.
-> When switching to guest, the target vcpu will jump to the synchronous
-> external abort vector table entry.
->
-> The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
-> ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
-> not valid and hold an UNKNOWN value. These values will be set to KVM
-> register structures through KVM_SET_ONE_REG IOCTL.
->
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
+From: Miaohe Lin <linmiaohe@huawei.com>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+When pv_eoi_get_user() fails, 'val' may remain uninitialized and the return
+value of pv_eoi_get_pending() becomes random. Fix the issue by initializing
+the variable.
 
-thanks
--- PMM
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+---
+v1->v2:
+Collect Vitaly' R-b.
+Use Vitaly' alternative wording.
+Explicitly handle the error, as suggested by Sean.
+---
+ arch/x86/kvm/lapic.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 4f14ec7525f6..b4aca77efc8e 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -627,9 +627,11 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
+ static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
+ {
+ 	u8 val;
+-	if (pv_eoi_get_user(vcpu, &val) < 0)
++	if (pv_eoi_get_user(vcpu, &val) < 0) {
+ 		printk(KERN_WARNING "Can't read EOI MSR value: 0x%llx\n",
+ 			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
++		return false;
++	}
+ 	return val & 0x1;
+ }
+ 
+-- 
+2.19.1
+
