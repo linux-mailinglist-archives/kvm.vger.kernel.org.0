@@ -2,69 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DA9E168952
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 22:27:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F08A1689CA
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 23:08:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729866AbgBUV1C convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 21 Feb 2020 16:27:02 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40554 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727998AbgBUV1B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 16:27:01 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
- pointer dereference" and crashes
-Date:   Fri, 21 Feb 2020 21:27:00 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: bonzini@gnu.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-206579-28872-LecNbHMnsz@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
-References: <bug-206579-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1726826AbgBUWIS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 17:08:18 -0500
+Received: from mail-pj1-f47.google.com ([209.85.216.47]:56223 "EHLO
+        mail-pj1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726683AbgBUWIS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 17:08:18 -0500
+Received: by mail-pj1-f47.google.com with SMTP id d5so1358918pjz.5
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 14:08:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=subject:to:cc:references:from:organization:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jNjBXjAdVCy5awvtdHoOypna1zj38J0pg8CQSdMcaDo=;
+        b=u9q1zQdYJPKZ9WH5HewgltC6Opyxrtk0f1IEoD9S4k/3aRAlidhgR/JsnOSx0U7dap
+         cpdYtH3g8KAud5TFgV/1Hv2f+EIwPSFOMuVjqL3sKrvfyIZEoXAXiPDcFCxyi3W0pvOh
+         KS3gehjx5v7LCv3NJqk3ExEGTAMeblig3IotXjzLxQZwfyUMZTYk8RYaIhA/KVTOjRHg
+         9oXd6bN7OZOb0NalnKaioyHOfchao+AzLKfu++2LUH11KK8/cPiRuSgVXH94LfX5cCYz
+         pm/og+X94CNO7HhgfJnNwjUPP4nEF8sAL4oGo2H1pM0P2+ucAEdg6mORjGGBcxBKxzZ9
+         hiyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=jNjBXjAdVCy5awvtdHoOypna1zj38J0pg8CQSdMcaDo=;
+        b=CdP+tuofEmjNvTnVt1U979kEz9/e2RjAv14Vuk4bYaJMab6JXC6zPg40vE65ayNG+o
+         CuSK0WRCaUJz3KWgpN86nCTUDx/xnZ3YO+kLngLfiloB4UAmndYNiDrVZ+4pOCi8GK9Q
+         ieMaZOvQGV4+IhFVELT6dUF+bVkIRvuIUD5g5Qd7b4JqM7lgaBD8Ddgs0nOq8rFDz1i7
+         AVtogY5dd8LhlLtYrU+vBM3xoxkCy0cz4qzplIPIbNPrB9Oa0T1BxvqboZ9G6jQ17M9c
+         aWjFvtvqkVq87k6kqGz+wWRGvv8K5X79ul/wNl28H3QgPPdHehWszdhaNJxjFw2tWdFc
+         rSog==
+X-Gm-Message-State: APjAAAVgNnEGTClNHl1lx+AfjBpTXgkSv25One5DcklHi0iDKgMuVGrC
+        opURwXNiTcp5WzAAQyRTEqXC6K52qufOujC4
+X-Google-Smtp-Source: APXvYqwttH1vhpl3udu/KCeWv2UYptzXfNlDcvmcYzCt3xV2vaHF6IfqyEVN59jTbw75X+J5/mD4ig==
+X-Received: by 2002:a17:90b:8ce:: with SMTP id ds14mr5661172pjb.70.1582322897481;
+        Fri, 21 Feb 2020 14:08:17 -0800 (PST)
+Received: from ?IPv6:2620:15c:2c1:101:8085:b46d:4651:575f? ([2620:15c:2c1:101:8085:b46d:4651:575f])
+        by smtp.gmail.com with ESMTPSA id x197sm3921588pfc.1.2020.02.21.14.08.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Feb 2020 14:08:16 -0800 (PST)
+Subject: Re: RFC: Split EPT huge pages in advance of dirty logging
+To:     Ben Gardon <bgardon@google.com>,
+        "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc:     Peter Xu <peterx@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "quintela@redhat.com" <quintela@redhat.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>,
+        "linfeng (M)" <linfeng23@huawei.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>, pfeiner@google.com
+References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
+ <20200218174311.GE1408806@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
+ <20200219171919.GA34517@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
+ <CANgfPd-P_=GqcMiwLSSkUhZDt42aMLUsCJt+CPdUN5yR3RLHmQ@mail.gmail.com>
+From:   Junaid Shahid <junaids@google.com>
+Organization: Google
+Message-ID: <cd4626a1-44b5-1a62-cf4b-716950a6db1b@google.com>
+Date:   Fri, 21 Feb 2020 14:08:14 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <CANgfPd-P_=GqcMiwLSSkUhZDt42aMLUsCJt+CPdUN5yR3RLHmQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=206579
+On 2/20/20 9:34 AM, Ben Gardon wrote:
+> 
+> FWIW, we currently do this eager splitting at Google for live
+> migration. When the log-dirty-memory flag is set on a memslot we
+> eagerly split all pages in the slot down to 4k granularity.
+> As Jay said, this does not cause crippling lock contention because the
+> vCPU page faults generated by write protection / splitting can be
+> resolved in the fast page fault path without acquiring the MMU lock.
+> I believe +Junaid Shahid tried to upstream this approach at some point
+> in the past, but the patch set didn't make it in. (This was before my
+> time, so I'm hoping he has a link.)
+> I haven't done the analysis to know if eager splitting is more or less
+> efficient with parallel slow-path page faults, but it's definitely
+> faster under the MMU lock.
+> 
 
---- Comment #6 from Paolo Bonzini (bonzini@gnu.org) ---
-This is untested, but based on the crash dump it seems like the ir_list is
-uninitialized.  Can you try this:
+I am not sure if we ever posted those patches upstream. Peter Feiner would know for sure. One notable difference in what we do compared to the approach outlined by Jay is that we don't rely on tdp_page_fault() to do the splitting. So we don't have to create a dummy VCPU and the specialized split function is also much faster.
 
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 4b19188faaae..92afca7c252a 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2206,7 +2206,7 @@ static int avic_init_vcpu(struct vcpu_svm *svm)
- {
-        int ret;
-
--       if (!kvm_vcpu_apicv_active(&svm->vcpu))
-+       if (!avic)
-                return 0;
-
-        ret = avic_init_backing_page(&svm->vcpu);
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+Thanks,
+Junaid
