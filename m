@@ -2,110 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 09FA9166FA6
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 07:30:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B258E166FAC
+	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 07:36:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726930AbgBUG3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 01:29:45 -0500
-Received: from mga01.intel.com ([192.55.52.88]:34367 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726853AbgBUG3p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 01:29:45 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2020 22:29:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,467,1574150400"; 
-   d="scan'208";a="315971204"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga001.jf.intel.com with ESMTP; 20 Feb 2020 22:29:42 -0800
-Date:   Fri, 21 Feb 2020 01:20:21 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [RFC PATCH v3 6/9] vfio/pci: export vfio_pci_setup_barmap
-Message-ID: <20200221062021.GD30338@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200211095727.20426-1-yan.y.zhao@intel.com>
- <20200211101419.21067-1-yan.y.zhao@intel.com>
- <20200220140013.66a6b52c@w520.home>
+        id S1726440AbgBUGf7 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 21 Feb 2020 01:35:59 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3020 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726100AbgBUGf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 01:35:59 -0500
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.56])
+        by Forcepoint Email with ESMTP id 8CF9F309D89E45DD523F;
+        Fri, 21 Feb 2020 14:35:51 +0800 (CST)
+Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 21 Feb 2020 14:35:50 +0800
+Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
+ dggeme753-chm.china.huawei.com (10.3.19.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Fri, 21 Feb 2020 14:35:50 +0800
+Received: from dggeme753-chm.china.huawei.com ([10.7.64.70]) by
+ dggeme753-chm.china.huawei.com ([10.7.64.70]) with mapi id 15.01.1713.004;
+ Fri, 21 Feb 2020 14:35:50 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 01/10] KVM: VMX: Use vpid_sync_context() directly when
+ possible
+Thread-Topic: [PATCH 01/10] KVM: VMX: Use vpid_sync_context() directly when
+ possible
+Thread-Index: AdXogPOkawpbwJXN5EmRFC50KCVcoA==
+Date:   Fri, 21 Feb 2020 06:35:50 +0000
+Message-ID: <8e41f02ef7a54af19848efe572652248@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.221.158]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200220140013.66a6b52c@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 21, 2020 at 05:00:13AM +0800, Alex Williamson wrote:
-> On Tue, 11 Feb 2020 05:14:19 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > This allows vendor driver to read/write to bars directly which is useful
-> > in security checking condition.
-> > 
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_rdwr.c | 26 +++++++++++++-------------
-> >  include/linux/vfio.h             |  2 ++
-> >  2 files changed, 15 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-> > index a0ef1de4f74a..3ba85fb2af5b 100644
-> > --- a/drivers/vfio/pci/vfio_pci_rdwr.c
-> > +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-> > @@ -129,7 +129,7 @@ static ssize_t do_io_rw(void __iomem *io, char __user *buf,
-> >  	return done;
-> >  }
-> >  
-> > -static int vfio_pci_setup_barmap(struct vfio_pci_device *vdev, int bar)
-> > +void __iomem *vfio_pci_setup_barmap(struct vfio_pci_device *vdev, int bar)
-> >  {
-> >  	struct pci_dev *pdev = vdev->pdev;
-> >  	struct vfio_pci_device_private *priv = VDEV_TO_PRIV(vdev);
-> > @@ -137,22 +137,23 @@ static int vfio_pci_setup_barmap(struct vfio_pci_device *vdev, int bar)
-> >  	void __iomem *io;
-> >  
-> >  	if (priv->barmap[bar])
-> > -		return 0;
-> > +		return priv->barmap[bar];
-> >  
-> >  	ret = pci_request_selected_regions(pdev, 1 << bar, "vfio");
-> >  	if (ret)
-> > -		return ret;
-> > +		return NULL;
-> >  
-> >  	io = pci_iomap(pdev, bar, 0);
-> >  	if (!io) {
-> >  		pci_release_selected_regions(pdev, 1 << bar);
-> > -		return -ENOMEM;
-> > +		return NULL;
-> >  	}
-> >  
-> >  	priv->barmap[bar] = io;
-> >  
-> > -	return 0;
-> > +	return io;
-> >  }
-> > +EXPORT_SYMBOL_GPL(vfio_pci_setup_barmap);
-> 
-> This should instead become a vfio_pci_get_barmap() function that tests
-> for an optionally calls vfio_pci_setup_barmap before returning the
-> pointer.  I'm now willing to lose the better error returns in the
-> original.  Thanks,
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>Use vpid_sync_context() directly for flows that run if and only if enable_vpid=1, or more specifically, nested VMX flows that are gated by
+>vmx->nested.msrs.secondary_ctls_high.SECONDARY_EXEC_ENABLE_VPID being
+>set, which is allowed if and only if enable_vpid=1.  Because these flows call __vmx_flush_tlb() with @invalidate_gpa=false, the if-statement that decides between INVEPT and >INVVPID will always go down the INVVPID path, i.e. call vpid_sync_context() because "enable_ept && (invalidate_gpa || !enable_vpid)" always evaluates false.
 >
-Got it. will change it.
-Thanks!
+>This helps pave the way toward removing @invalidate_gpa and @vpid from
+>__vmx_flush_tlb() and its callers.
+>
+>No functional change intended.
+>
+>Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Yan
+Reviewed-by: Miaohe Lin <linmiaohe@huawei.com>
+
