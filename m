@@ -2,104 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B3C66168A0C
-	for <lists+kvm@lfdr.de>; Fri, 21 Feb 2020 23:42:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 933BD168AE5
+	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2020 01:19:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729173AbgBUWmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 17:42:35 -0500
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:54776 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726802AbgBUWme (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 17:42:34 -0500
-Received: by mail-pg1-f201.google.com with SMTP id l17so1951047pgh.21
-        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 14:42:33 -0800 (PST)
+        id S1726613AbgBVATb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 19:19:31 -0500
+Received: from mail-vk1-f172.google.com ([209.85.221.172]:44681 "EHLO
+        mail-vk1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726205AbgBVATb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 19:19:31 -0500
+Received: by mail-vk1-f172.google.com with SMTP id y184so1072291vkc.11
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 16:19:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=AYMrtaQFpEAhf4N2/PSLyY8BVuR8zCZktSQFDW5VeUU=;
-        b=J41etYRpVeAqdqvHtns7EtNVVbjYCZAT4uPwTfXxmVxBP1EywH9V7naMIWd8JKOJSi
-         K7Wn5PluMFO1qq21ZIL07fltzyJR/7kmvXNlng5dPs2SQ8GpoYrGYofV1WWHdxo3ts8x
-         mrzNRWXAy2ANyWXWY9qp1ZADnIWwUhGpXShQ8UJAjBuePE7EXawDC7WOrps0GlX3lhfW
-         nPR40Ce5lQAJwEmjc+x6h5EAsEP3JLWMUmEnEQA3zfzLNt9/C01LO/6l+IPk1wNCwsxz
-         tNV/VKd+lyqLwVRLzzhKr/fkvAgWtgSWZREkCmpno7vHpmkwqywbD+kq5YMkBGM5Is2n
-         4Gkg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=UsBd3ytqG92zDdNjImppskwLTVCcbm12JxL9OGg8W8I=;
+        b=QZzGm/11YvvaGeBVzyZmbqy0V7J/e5boHE1YJMQbye/Cbc7hOOS9L7EDK8rTb3O7Re
+         BNZL2L7F9T+xiY8aNHrw3+VuCTq15BhpWvFwHGsbxckNTkOg6wlYy4rnC4CukC9t1Xtg
+         g2JTp8Eu+Q5Nh/lJhJiHsBUM5LOpg4psg0mW7fRUI0VrW32met8lsb8/ElHaBF43nHpf
+         4ope4iraxD67EIFDR+FE7Iib0dW46X+9tKdGcWjax22XdUTF3XyboEVu1s2cw4SN+elD
+         tGcmW5MdL5hgsCCNq8ZhCljwCHsxwOdboigGXrFyR4FT/MnuH9Ke9uLTNGhY5NRId49l
+         ymag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=AYMrtaQFpEAhf4N2/PSLyY8BVuR8zCZktSQFDW5VeUU=;
-        b=D97JoEeQWPLAtBVPD6O6JlxNwwtrG4bp9eD7GP5SZ7kbg7hZyVMWkAxfNuTiP6h4rj
-         ojbIeT7mue2FaBpBEN1kpo/Whf6izwQHiyrV3MjyIYSNk2XKarXiispqbA9riJord0VG
-         4i4+xmxNYqnuEPI1+D2nTokt7iHWmDNKy5/2Y2dsmbQP90S5I+ow0g7hJwIQY0bAsFZN
-         TJ5UF1iDiQCEXmBoCZf4judOTmePQllPIBrT0KC9105PhITyk/EZYXV1uDVA9avtnEL0
-         zaM7xD9i4p9NbAcG+O0RZwO+reynPe44gUEwhnPt9ZO3j+ur8jOuySR8iAv48oGkXuhj
-         7OQQ==
-X-Gm-Message-State: APjAAAWcZvN/Hp8/0RFLUFYc/Wh1xvNfptBPs9gUX9SBFNFVw1Tt4TmI
-        yVlrykKgMXnUhBDd8Ii+iIY+mlFR6HhoOog=
-X-Google-Smtp-Source: APXvYqwhKRzJVoCpjzPLGuzmWUd8MIiF3zvv55ptCrBdix9MKGePuOLZi4sMXv45LyYtWbbT5/yE8lmhWXoMIAI=
-X-Received: by 2002:a63:aa07:: with SMTP id e7mr40537889pgf.90.1582324952547;
- Fri, 21 Feb 2020 14:42:32 -0800 (PST)
-Date:   Fri, 21 Feb 2020 14:41:33 -0800
-Message-Id: <20200221224133.103377-1-ehankland@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
-Subject: [kvm-unit-tests PATCH] x86: pmu: Test perfctr overflow after WRMSR on
- a running counter
-From:   Eric Hankland <ehankland@google.com>
-To:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Eric Hankland <ehankland@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=UsBd3ytqG92zDdNjImppskwLTVCcbm12JxL9OGg8W8I=;
+        b=NPX1bGDMMRzv3ytrDAahcRt+6GJAtniRiH7O92CasXPjUiUWDzwLVnS4zGbOw1ABuV
+         nXi2YagSy+3cxj/PzuToQJri6SVY/Cy4ULvZz5Cv63BZhLGZMOgOdXCDadRA6hMUIx1p
+         Yawwo/d5AKH5KI9Og+y0cf4As9rYOs04z4S+ZIsJpynlp8sqnyp3LBVuXKQcc45Y5yPu
+         XlMMmor5ixkS7kf+gDQ5EiufB7+vLPW+90AbphDE7nAync3ysOHpjP61caQKXjlxfKD2
+         S777SHSS970HZzw/4hYSyWMO0tYhMeRR5vLIJi/tIbSxKxtjohMDHUdelWWB4SVHDdaU
+         JUcg==
+X-Gm-Message-State: APjAAAVxi/4RZiSZUzfzXhG9Q8mduoU7jtZ0cDtE0GmFD+V1oEPcHgat
+        x6Gz9yhfL43THyNgHkcrAzM0U/GgyubnBqXSXZXrdQ==
+X-Google-Smtp-Source: APXvYqzlFUI7WlYELa0+SnZAhwG2Z/Xy5yDyHWgfFfREsId3qG8Ifl9kV4pZ81zRy29SRjyYbgs/DbW2AWnJ4Ff+WGw=
+X-Received: by 2002:a1f:bf86:: with SMTP id p128mr19261971vkf.3.1582330769692;
+ Fri, 21 Feb 2020 16:19:29 -0800 (PST)
+MIME-Version: 1.0
+References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
+ <20200218174311.GE1408806@xz-x1> <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
+ <20200219171919.GA34517@xz-x1> <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
+ <CANgfPd-P_=GqcMiwLSSkUhZDt42aMLUsCJt+CPdUN5yR3RLHmQ@mail.gmail.com> <cd4626a1-44b5-1a62-cf4b-716950a6db1b@google.com>
+In-Reply-To: <cd4626a1-44b5-1a62-cf4b-716950a6db1b@google.com>
+From:   Peter Feiner <pfeiner@google.com>
+Date:   Fri, 21 Feb 2020 16:19:18 -0800
+Message-ID: <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
+Subject: Re: RFC: Split EPT huge pages in advance of dirty logging
+To:     Junaid Shahid <junaids@google.com>
+Cc:     Ben Gardon <bgardon@google.com>,
+        "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
+        Peter Xu <peterx@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "quintela@redhat.com" <quintela@redhat.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>,
+        "linfeng (M)" <linfeng23@huawei.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ensure that a WRMSR on a running counter will correctly update when the
-counter should overflow (similar to the existing overflow test case but
-with the counter being written to while it is running).
+On Fri, Feb 21, 2020 at 2:08 PM Junaid Shahid <junaids@google.com> wrote:
+>
+> On 2/20/20 9:34 AM, Ben Gardon wrote:
+> >
+> > FWIW, we currently do this eager splitting at Google for live
+> > migration. When the log-dirty-memory flag is set on a memslot we
+> > eagerly split all pages in the slot down to 4k granularity.
+> > As Jay said, this does not cause crippling lock contention because the
+> > vCPU page faults generated by write protection / splitting can be
+> > resolved in the fast page fault path without acquiring the MMU lock.
+> > I believe +Junaid Shahid tried to upstream this approach at some point
+> > in the past, but the patch set didn't make it in. (This was before my
+> > time, so I'm hoping he has a link.)
+> > I haven't done the analysis to know if eager splitting is more or less
+> > efficient with parallel slow-path page faults, but it's definitely
+> > faster under the MMU lock.
+> >
+>
+> I am not sure if we ever posted those patches upstream. Peter Feiner woul=
+d know for sure. One notable difference in what we do compared to the appro=
+ach outlined by Jay is that we don't rely on tdp_page_fault() to do the spl=
+itting. So we don't have to create a dummy VCPU and the specialized split f=
+unction is also much faster.
 
-Signed-off-by: Eric Hankland <ehankland@google.com>
----
- x86/pmu.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+We've been carrying these patches since 2015. I've never posted them.
+Getting them in shape for upstream consumption will take some work. I
+can look into this next week.
 
-diff --git a/x86/pmu.c b/x86/pmu.c
-index c8096b8..f45621a 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -422,17 +422,34 @@ static void check_rdpmc(void)
- 
- static void check_running_counter_wrmsr(void)
- {
-+	uint64_t status;
- 	pmu_counter_t evt = {
- 		.ctr = MSR_IA32_PERFCTR0,
- 		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
- 		.count = 0,
- 	};
- 
-+	report_prefix_push("running counter wrmsr");
-+
- 	start_event(&evt);
- 	loop();
- 	wrmsr(MSR_IA32_PERFCTR0, 0);
- 	stop_event(&evt);
--	report(evt.count < gp_events[1].min, "running counter wrmsr");
-+	report(evt.count < gp_events[1].min, "cntr");
-+
-+	/* clear status before overflow test */
-+	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+	      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
-+
-+	evt.count = 0;
-+	start_event(&evt);
-+	wrmsr(MSR_IA32_PERFCTR0, -1);
-+	loop();
-+	stop_event(&evt);
-+	status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
-+	report(status & 1, "status");
-+
-+	report_prefix_pop();
- }
- 
- int main(int ac, char **av)
+Peter
