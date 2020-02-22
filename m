@@ -2,138 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC854168C00
-	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2020 03:16:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 980EF168C0D
+	for <lists+kvm@lfdr.de>; Sat, 22 Feb 2020 03:35:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727982AbgBVCQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Feb 2020 21:16:04 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:57724 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727614AbgBVCQD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Feb 2020 21:16:03 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 029D1CC4DAC9F3D0C1A2;
-        Sat, 22 Feb 2020 10:15:56 +0800 (CST)
-Received: from [127.0.0.1] (10.177.246.209) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Sat, 22 Feb 2020
- 10:15:49 +0800
-Subject: Re: [PATCH] mm/hugetlb: avoid get wrong ptep caused by race
-To:     Mike Kravetz <mike.kravetz@oracle.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-CC:     <akpm@linux-foundation.org>, <linux-mm@kvack.org>,
-        <linux-kernel@vger.kernel.org>, <arei.gonglei@huawei.com>,
-        <weidong.huang@huawei.com>, <weifuqiang@huawei.com>,
-        <kvm@vger.kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Matthew Wilcox <willy@infradead.org>
-References: <1582027825-112728-1-git-send-email-longpeng2@huawei.com>
- <20200218203717.GE28156@linux.intel.com>
- <a041fdb4-bfd0-ac4b-2809-6fddfc4f8d83@huawei.com>
- <20200219015836.GM28156@linux.intel.com>
- <098a5dd6-e1da-f161-97d7-cfe735d14fd8@oracle.com>
- <502b5e52-060b-6864-d1b7-eab2dc951aed@huawei.com>
- <a82956f7-26e4-5c1c-8d5d-4b2510f6b17d@oracle.com>
-From:   "Longpeng (Mike)" <longpeng2@huawei.com>
-Message-ID: <e2b9af10-b048-e5d2-e5b5-609622226a3c@huawei.com>
-Date:   Sat, 22 Feb 2020 10:15:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <a82956f7-26e4-5c1c-8d5d-4b2510f6b17d@oracle.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.177.246.209]
-X-CFilter-Loop: Reflected
+        id S1727874AbgBVCfT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Feb 2020 21:35:19 -0500
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:50542 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727646AbgBVCfT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Feb 2020 21:35:19 -0500
+Received: by mail-pl1-f201.google.com with SMTP id g5so2185655plq.17
+        for <kvm@vger.kernel.org>; Fri, 21 Feb 2020 18:35:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=YWE+MLnOjK4IvZZLwvQEPG2A0OjN+JMmVnFRhQHYJMc=;
+        b=eBgFXXFGkeT5/uAIvCLjYTs5ZF9zNsG77UJxFH5+o2fO8jOjzd7BGMrmBVaoruIcmq
+         0A3nJSGzQJTcqWdmwClNEhhIfJT3RlBglY+KM212kLV0k99Kbd5YtWGs1PoXp9H5jKW7
+         fOVGEWwtGLq/x6MQYFehTUpvgfVhndZL3KtWiczoGdaDqaOkzgAe2HIPD1oYzkop/d27
+         bXetWVCGNsizjssAiZ9RuI2W44NN+s0ZBRdbbT2JTQeO7T2JvyAGrQlT75NsjEnh0hXu
+         nA+4nlUufuZ0rl4P2+7v2D0jKFxRABY0AtwEUBgHKOAZbdzS1ZRBPGY3g0DaClPuv9pw
+         NDjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=YWE+MLnOjK4IvZZLwvQEPG2A0OjN+JMmVnFRhQHYJMc=;
+        b=Mo/vYEux0So3aQQAkSKV2TeZwYNp55zPFjvi7XXM86DLfqEf9PzbN6jCVLNqOM+Anw
+         gsiA9e4IGWeyq6z22Lrwy3zHAQmuwcF4dvWx9X52hDUxeb70R+xeBAy7X3KhGFHTOahg
+         qEtOB5LgOLmy5Bwnrc2Ma43JbnFKuPG5bD43+omvrFnAY09zVRHPOQfSZYrcCDNL1Zoi
+         EDiHsrlqfhSA4LcH/bognDUPFVu090hVzTbwRzWdlXQKFaF58XhucTtuNZIv46sKaXFa
+         ojnGiO32h/4PMceiu/EDX+wNzDjVjCfnge84ROLp5K9UZax5sdUA+WHfgBlXq2z48dyZ
+         Zv2w==
+X-Gm-Message-State: APjAAAVKStRZOceonxN0lP8g5EEy75D9juMzr//Z37qgvYVudXNDH92A
+        55+62YZOXJQ6npeLz7VZW63MveyAODe9ilw=
+X-Google-Smtp-Source: APXvYqz/5nZSxiCEMANum1t9/MuA4rvyDGQUbSoYAmrDG89Qk66FIjDXtoFPXPLbgqYWY+92O8YQeM6VQxVkOk8=
+X-Received: by 2002:a63:a807:: with SMTP id o7mr40015719pgf.407.1582338917117;
+ Fri, 21 Feb 2020 18:35:17 -0800 (PST)
+Date:   Fri, 21 Feb 2020 18:34:13 -0800
+Message-Id: <20200222023413.78202-1-ehankland@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+Subject: [PATCH] KVM: x86: Adjust counter sample period after a wrmsr
+From:   Eric Hankland <ehankland@google.com>
+To:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Eric Hankland <ehankland@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-在 2020/2/21 8:22, Mike Kravetz 写道:
-> On 2/19/20 6:30 PM, Longpeng (Mike) wrote:
->> 在 2020/2/20 3:33, Mike Kravetz 写道:
->>> + Kirill
->>> On 2/18/20 5:58 PM, Sean Christopherson wrote:
->>>> On Wed, Feb 19, 2020 at 09:39:59AM +0800, Longpeng (Mike) wrote:
-> <snip>
->>>> The race and the fix make sense.  I assumed dereferencing garbage from the
->>>> huge page was the issue, but I wasn't 100% that was the case, which is why
->>>> I asked about alternative fixes.
->>>>
->>>>> We change the code from
->>>>> 	if (pud_huge(*pud) || !pud_present(*pud))
->>>>> to
->>>>> 	if (pud_huge(*pud)
->>>>> 		return (pte_t *)pud;
->>>>> 	busy loop for 500ms
->>>>> 	if (!pud_present(*pud))
->>>>> 		return (pte_t *)pud;
->>>>> and the panic will be hit quickly.
->>>>>
->>>>> ARM64 has already use READ/WRITE_ONCE to access the pagetable, look at this
->>>>> commit 20a004e7 (arm64: mm: Use READ_ONCE/WRITE_ONCE when accessing page tables).
->>>>>
->>>>> The root cause is: 'if (pud_huge(*pud) || !pud_present(*pud))' read entry from
->>>>> pud twice and the *pud maybe change in a race, so if we only read the pud once.
->>>>> I use READ_ONCE here is just for safe, to prevents the complier mischief if
->>>>> possible.
->>>>
->>>> FWIW, I'd be in favor of going the READ/WRITE_ONCE() route for x86, e.g.
->>>> convert everything as a follow-up patch (or patches).  I'm fairly confident
->>>> that KVM's usage of lookup_address_in_mm() is safe, but I wouldn't exactly
->>>> bet my life on it.  I'd much rather the failing scenario be that KVM uses
->>>> a sub-optimal page size as opposed to exploding on a bad pointer.
->>>
->>> Longpeng(Mike) asked in another e-mail specifically about making similar
->>> changes to lookup_address_in_mm().  Replying here as there is more context.
->>>
->>> I 'think' lookup_address_in_mm is safe from this issue.  Why?  IIUC, the
->>> problem with the huge_pte_offset routine is that the pud changes from
->>> pud_none() to pud_huge() in the middle of
->>> 'if (pud_huge(*pud) || !pud_present(*pud))'.  In the case of
->>> lookup_address_in_mm, we know pud was not pud_none() as it was previously
->>> checked.  I am not aware of any other state transitions which could cause
->>> us trouble.  However, I am no expert in this area.
-> 
-> Bad copy/paste by me.  Longpeng(Mike) was asking about lookup_address_in_pgd.
-> 
->> So... I need just fix huge_pte_offset in mm/hugetlb.c, right?
-> 
-> Let's start with just a fix for huge_pte_offset() as you can easily reproduce
-> that issue by adding a delay.
-> 
->> Is it possible the pud changes from pud_huge() to pud_none() while another CPU
->> is walking the pagetable ?
-> 
-All right, I'll send V2 to fix it, thanks :)
+The sample_period of a counter tracks when that counter will
+overflow and set global status/trigger a PMI. However this currently
+only gets set when the initial counter is created or when a counter is
+resumed; this updates the sample period after a wrmsr so running
+counters will accurately reflect their new value.
 
-> I believe it is possible.  If we hole punch a hugetlbfs file, we will clear
-> the corresponding pud's.  Hence, we can go from pud_huge() to pud_none().
-> Unless I am missing something, that does imply we could have issues in places
-> such as lookup_address_in_pgd:
-> 
-> 	pud = pud_offset(p4d, address);
-> 	if (pud_none(*pud))
-> 		return NULL;
-> 
-> 	*level = PG_LEVEL_1G;
-> 	if (pud_large(*pud) || !pud_present(*pud))
-> 		return (pte_t *)pud;
-> 
-> I hope I am wrong, but it seems like pud_none(*pud) could become true after
-> the initial check, and before the (pud_large) check.  If so, there could be
-> a problem (addressing exception) when the code continues and looks up the pmd.
-> 
-> 	pmd = pmd_offset(pud, address);
-> 	if (pmd_none(*pmd))
-> 		return NULL;
-> 
-> It has been mentioned before that there are many page table walks like this.
-> What am I missing that prevents races like this?  Or, have we just been lucky?
-> 
-That's what I worry about. Maybe there is no usecase to hit it.
+Signed-off-by: Eric Hankland <ehankland@google.com>
+---
+ arch/x86/kvm/pmu.c           | 4 ++--
+ arch/x86/kvm/pmu.h           | 8 ++++++++
+ arch/x86/kvm/vmx/pmu_intel.c | 6 ++++++
+ 3 files changed, 16 insertions(+), 2 deletions(-)
 
--- 
-Regards,
-Longpeng(Mike)
-
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index bcc6a73d6628..d1f8ca57d354 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -111,7 +111,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+ 		.config = config,
+ 	};
+ 
+-	attr.sample_period = (-pmc->counter) & pmc_bitmask(pmc);
++	attr.sample_period = get_sample_period(pmc, pmc->counter);
+ 
+ 	if (in_tx)
+ 		attr.config |= HSW_IN_TX;
+@@ -158,7 +158,7 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
+ 
+ 	/* recalibrate sample period and check if it's accepted by perf core */
+ 	if (perf_event_period(pmc->perf_event,
+-			(-pmc->counter) & pmc_bitmask(pmc)))
++			      get_sample_period(pmc, pmc->counter)))
+ 		return false;
+ 
+ 	/* reuse perf_event to serve as pmc_reprogram_counter() does*/
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 13332984b6d5..354b8598b6c1 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -129,6 +129,15 @@ static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, u32 msr)
+ 	return NULL;
+ }
+ 
++static inline u64 get_sample_period(struct kvm_pmc *pmc, u64 counter_value)
++{
++	u64 sample_period = (-counter_value) & pmc_bitmask(pmc);
++
++	if (!sample_period)
++		sample_period = pmc_bitmask(pmc) + 1;
++	return sample_period;
++}
++
+ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel);
+ void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int fixed_idx);
+ void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index fd21cdb10b79..e933541751fb 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -263,9 +263,15 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			if (!msr_info->host_initiated)
+ 				data = (s64)(s32)data;
+ 			pmc->counter += data - pmc_read_counter(pmc);
++			if (pmc->perf_event)
++				perf_event_period(pmc->perf_event,
++						  get_sample_period(pmc, data));
+ 			return 0;
+ 		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
+ 			pmc->counter += data - pmc_read_counter(pmc);
++			if (pmc->perf_event)
++				perf_event_period(pmc->perf_event,
++						  get_sample_period(pmc, data));
+ 			return 0;
+ 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
+ 			if (data == pmc->eventsel)
