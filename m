@@ -2,107 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B89916ACA7
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 18:07:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A48E816ACB8
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 18:10:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727867AbgBXRHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 12:07:08 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:38174 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727090AbgBXRHI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 12:07:08 -0500
-Received: by mail-lj1-f195.google.com with SMTP id w1so10947188ljh.5
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2020 09:07:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nrrl85tfP3+j8IN2SaZuMHvzDaxDKgXRAJCCGGXQ3oo=;
-        b=P50dGBcAq+SlkOGoDSY2oS7hofcdNjtWGh+DTPGGuOUoK9eE0vJbL/KQuXIGj1qekS
-         03ODufalYMd22NIHZvemi+3+e82UpvLqC9eA+sdHl61c1fVmMg/F3+JGNoFcUCE5WITL
-         IjdEoVVREBLltBzVfVxEbAFFRkdYl8b/wU7Eyzf8WXoRxKs4C8gMlIcDgUn5b8ddEuR3
-         RbjvASTit6iGXpxDCj3H81xeph1+MBQVNHyE9Ds4t5c+R9pyCYBbkAraA9KnIKUms+pv
-         qKK13Ea7LIgl/iVKKhH3mQiPV7LzuyFkwMLs1YpBZxlD41wDWAEj1ji1qJYQAdsu+uKI
-         8OYg==
+        id S1727664AbgBXRKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 12:10:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38128 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727259AbgBXRKg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 12:10:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582564234;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MfCZv9bi2V0NBPfpYkHj1I4Z5YX6YopEZ8T+leiO1UA=;
+        b=XJn16QRFZyftIVDfQ2SXTz13ntA3Vk4EfgvGQ0r6dvhvk7sUAoqLGXD9gL13uAbEs4DekU
+        DqjbecGMDl2TF3WV9o4cr7Bod3x8XrxeUaA5HSU5hBnvLw7t4JGY0o0eDNUUwwBEOy58Go
+        qowAf1sQfqfq+hvnO9cW74jKQn3xPp0=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-7KfC6UkuPQmS0NYG0bykGQ-1; Mon, 24 Feb 2020 12:10:33 -0500
+X-MC-Unique: 7KfC6UkuPQmS0NYG0bykGQ-1
+Received: by mail-qt1-f198.google.com with SMTP id l1so11250910qtp.21
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2020 09:10:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nrrl85tfP3+j8IN2SaZuMHvzDaxDKgXRAJCCGGXQ3oo=;
-        b=Hp/nzIC2DETAOVf7HFilLMh57Qf1OwJzC0j6hNOoulGXd/v8JQfqZnR97/D9tTQv9o
-         Pb3GR4hQFLr8wReO5TBoRsWCeeoEikujq37AnWtJnvPkL77/O2Pi5J8UTbcuSKGN8e6i
-         7ioxX/YM2xQIo9YbTMeL1Pf1pgY62FqXeWI5rWflZBSzUp123z0htHAP0e5NK113vh6g
-         RS45i4IoOizak6VgSajwy/9EGUCM5iB3/g6xlX+SCQfgiQmofl6GpSLw/veDHZSMy6as
-         pSC3exkzLLH1jJRdsR+d4OfaG2bKsuphLgBWP4pNi6oP6afWgLgmm0lUMZKRRDabyXBX
-         UQMw==
-X-Gm-Message-State: APjAAAWe1zBARTqbIk8VSPhPGp8JQFPZBlQge8t5gL2/lW+e0l5n8Q38
-        nSuHr6XmhhCGGmGsd2iQVm2m1SWa7nueEgh2/7TT9g==
-X-Google-Smtp-Source: APXvYqxaDXcsjJVgERRtdyfPTI+w786LOeE0WURSB3GipQHeXd6m0WASZb59TrjCJdtVzD289XwzYHW1Qg/gzLhcORM=
-X-Received: by 2002:a05:651c:414:: with SMTP id 20mr29492608lja.165.1582564025902;
- Mon, 24 Feb 2020 09:07:05 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=MfCZv9bi2V0NBPfpYkHj1I4Z5YX6YopEZ8T+leiO1UA=;
+        b=WmXZy9Duc29P8O1tT2dPPuB2A2QhfJ9gOA9jutw8gap8rQECJpORBD3ZwMTt/OKnyP
+         TcK49jTamyQryv9kdYRQF/RlcsighSv750uRtKJW5O7nDXnLLhqL5bOxOiNRM4y2Uwq4
+         BvANx5IaBAkRSX7R3zlEI+KdSrJxAdrIRT2kwN/QGiOJQmVTcAyMnLeQkReTExGYofUy
+         rAQZaqITE38kK43nnWDy231VDoS1RlFiXx92IENoFt2/njx+fBpbZZktgEw5F2MWxROf
+         HO7kWboWBelaFeq8oePOfyvuHHosKSQssfCZ/cHyTM7d50TSUzYAX3+ada0udXw0MGRU
+         UHqQ==
+X-Gm-Message-State: APjAAAVBcHiHunKmfZ9dMbDNKkchR2N0bet8Q6T6NUYYwKkEG1cjLSPy
+        qdN/iAsxd+ToVMdGcX63DHJxkCvNuakhUibyTTt9C0Wu9dOkhuAsmRzwYr2bjoD8hbmjqQfEtiW
+        o2P11j/NDUmm0
+X-Received: by 2002:a37:9245:: with SMTP id u66mr52011468qkd.102.1582564232652;
+        Mon, 24 Feb 2020 09:10:32 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzyIQQ5WdGv+SPVQPUaYd1E25iBBNwQEg43XPvLQL/Q0L+cdnXzyt/fYXRfRkzmFLfCkH802g==
+X-Received: by 2002:a37:9245:: with SMTP id u66mr52011448qkd.102.1582564232435;
+        Mon, 24 Feb 2020 09:10:32 -0800 (PST)
+Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
+        by smtp.gmail.com with ESMTPSA id i7sm6067790qki.83.2020.02.24.09.10.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2020 09:10:31 -0800 (PST)
+Date:   Mon, 24 Feb 2020 12:10:25 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     kvm@vger.kernel.org, jasowang@redhat.com, cohuck@redhat.com,
+        slp@redhat.com, felipe@nutanix.com, john.g.johnson@oracle.com,
+        robert.bradford@intel.com, Dan Horobeanu <dhr@amazon.com>,
+        Stephen Barber <smbarber@chromium.org>,
+        Peter Shier <pshier@google.com>
+Subject: Re: Proposal for MMIO/PIO dispatch file descriptors (ioregionfd)
+Message-ID: <20200224120522-mutt-send-email-mst@kernel.org>
+References: <20200222201916.GA1763717@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
- <b0b69234-b971-6162-9a7c-afb42fa2b581@redhat.com>
-In-Reply-To: <b0b69234-b971-6162-9a7c-afb42fa2b581@redhat.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Mon, 24 Feb 2020 22:36:54 +0530
-Message-ID: <CA+G9fYu3RgTJ8BM3Js3_gUbhxFJrY6QTJR-ApNQtwFh+Ci0q8Q@mail.gmail.com>
-Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>, yzt356@gmail.com,
-        jmattson@google.com, namit@vmware.com,
-        sean.j.christopherson@intel.com,
-        Basil Eljuse <Basil.Eljuse@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200222201916.GA1763717@stefanha-x1.localdomain>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Sat, Feb 22, 2020 at 08:19:16PM +0000, Stefan Hajnoczi wrote:
+> The KVM_IOREGIONFD_POSTED_WRITES flag
+> skips waiting for an acknowledgement on write accesses.  This is
+> suitable for accesses that do not require synchronous emulation, such as
+> doorbell register writes.
 
-On Mon, 24 Feb 2020 at 18:36, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 24/02/20 13:53, Naresh Kamboju wrote:
-> > [Sorry for the spam]
-> >
-> > Greeting from Linaro !
-> > We are running kvm-unit-tests on our CI Continuous Integration and
-> > testing on x86_64 and arm64 Juno-r2.
-> > Linux stable branches and Linux mainline and Linux next.
-> >
-> > Few tests getting fail and skipped, we are interested in increasing the
-> > test coverage by adding required kernel config fragments,
-> > kernel command line arguments and user space tools.
->
-> The remainins SKIPs mostly depend on hardware, for example "svm" only
-> runs on AMD machines and "pku" only on more recent Intel processors than
-> you have.
+I would avoid hacks like this until we understand this better.
+Specificlly one needs to be very careful since memory ordering semantics
+can differ between a write into an uncacheable range and host writes into
+a data structure. Reads from one region are also assumed to be ordered with
+writes to another region, and drivers are known to make assumptions
+like this.
 
-Thanks for explaining the reason for skip.
+Memory ordering being what it is, this isn't a field I'd be comfortable
+device writes know what they are doing.
 
->
-> > FAIL  vmx (408624 tests, 3 unexpected failures, 2 expected
-> > failures, 5 skipped)
->
-> This could be fixed in a more recent kernel.
+-- 
+MST
 
-I will keep running these tests on most recent kernels.
-
-My two cents,
-OTOH, It would be great if we have monthly tag release for kvm-unit-tests.
-
-LKFT plan to keep track of metadata / release tag version of each test suites
-and kernel branches and versions details.
-
-Currently LKFT sending out kselftests results test summary on
-each linux-next release tag for x86_64, i386, arm and arm64 devices.
-
-The next plan is to enable kvm-unit-tests results reporting from LKFT.
-
->
-> Paolo
->
