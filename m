@@ -2,77 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 98E2716AFCD
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 19:56:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24A1716AFCA
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 19:56:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727964AbgBXS4l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727996AbgBXS4l (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 24 Feb 2020 13:56:41 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36873 "EHLO
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46132 "EHLO
         mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726664AbgBXS4l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1727483AbgBXS4l (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 24 Feb 2020 13:56:41 -0500
-Received: by mail-wr1-f66.google.com with SMTP id l5so7428311wrx.4;
-        Mon, 24 Feb 2020 10:56:39 -0800 (PST)
+Received: by mail-wr1-f66.google.com with SMTP id g4so5330103wro.13;
+        Mon, 24 Feb 2020 10:56:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=NnFSJ4wxz3IPiMj1BwmfM2ZfdupPqpOk/+KIyr1YuNI=;
-        b=LTL1hmvY+p9SeOwCwhvc0/8d1+N5Xvl5LEmWQb6BhL4wTAq7d/jNaj1hKzHjMU5T3a
-         3WId6E6jvuLSK+nx59o56vOQiXAYmJYa5hDWweuuoFQhEea+2rnx9MEsZlgy9FQxNqmE
-         DKLufNfq7H9drttHAqY9Ilup3GQ3tGB8y6KrUPhp/a7VuZiM9u1PW93bD8OjMBWe4f77
-         Vz1VQcEIFBSFqo8jfpOVTXSUNtMQu5suGQE2Nu1CB/vnDuispeYlKbUNjpJWT73KMnrx
-         vmR99rxf/JvPHhI7VywcOFisdc85QpSoPukMe3x6V9G4kGX1sDNGXMjPuNxUARZ/D59s
-         lSjA==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=ikUxpzI8l8qLhpgwUreS4zCEikhxIlpjQqZTs40gy+Q=;
+        b=LPoqAQiyQUYmQEjLUtNJRXXF95mlhD6culiLLXq2+V48pb7tcg8xVE1JVzOsCZzR3q
+         6ZoTNMn44iYy8n99BLwbZLIGRbvu+pVbHnf8hlO4b9mcu7zTzZZVM6hOz/0Rs+ufMsaj
+         7fJaejhn3uOoMLoMYoBVLiBJoOEXDSYLVvjBl5zWuepRBfYBVrupHMPgCOpv9NZ8rsBv
+         1tclil5HeWMM/VS1O3l0vmAAfSFx8gqN2ctGN7zjIYbfwDxaALv7IZNtlEqqK/MghrWh
+         Qc/GxcmQavOeD/r5R6LoQU//usivbBx/NShEm/Sbic64RkW19ObPjKT3VOvtxhMYpqqz
+         foeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=NnFSJ4wxz3IPiMj1BwmfM2ZfdupPqpOk/+KIyr1YuNI=;
-        b=AJEu3Kgem3Bo3W8gKERnO8QufKJEYY6aGRLrE/JAaq/2UcSRMUDN78dp1kels8RoGE
-         K1kYCQnXA6S1vZ98JMEqfFBP+MJ2UOTH0/GpihujAmgYl1gcQoh96ufhs4JdbNyedYWQ
-         pNqTHoooPxvyJdQ3AAC5Z0WjJq0rNHl00mt89iMMGIJtfl1NfBjyewTer1ZekOnIgdo6
-         ja2CbW3UUwGnsDJo2l3xX67brwojlRdiyVfJlrv1wlaPF3BmX0Gb3F8+Q8B/3+4HvEd3
-         5XZUKr0sv90KZaZpYCCm2rYJ4FMQb2LM/5/ZrNScKT1jh56YPQ3V3gS0oLBCYJ8R0sCi
-         mLDA==
-X-Gm-Message-State: APjAAAW9rgN/FYMvY2+U6kRIXTN5C0/4OnyHVDgmcJNCix9Y8NGcnVnV
-        771nKaNz3OBvvcR0kd40vEUAqYxt
-X-Google-Smtp-Source: APXvYqxFl7vEubY2+cyUaHD+DMOaNVtDmIUluQaMZIZnEibNMHQ66vXDhsuImjpo1M7sNxz4iDngdw==
-X-Received: by 2002:adf:bbcf:: with SMTP id z15mr69057763wrg.266.1582570598470;
-        Mon, 24 Feb 2020 10:56:38 -0800 (PST)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :in-reply-to:references;
+        bh=ikUxpzI8l8qLhpgwUreS4zCEikhxIlpjQqZTs40gy+Q=;
+        b=kTnPfGda3SW5D6Hq7ZmydUHjW5G3MRkEbDK1Ludhqym2qG4IrPsi90moF4fy8juiV1
+         fQNzD+gM9m19y2+cthMDk0FM9ZD1D0TlLf5DPW88PII7l0snTQ5tmUkC28SpZdGZLmZe
+         MZDN3NWxkRARS5Y5s5Ov2JVeIU9H+xR6u9dE3xqcvyTGyTqcSNH9oz9dV9k+1eOyyFmu
+         qbDzaSx8ToCDFcy2RzTFcCbOBExsqpHhgnVRBzAotVly3ZMXbA2meY6wdyPy699fdeh0
+         Vxmg6uwLrgbY5/NnU0nDydcmJc1ZP+uZIFDkOVINVhIdhoVZqeEpl+9o/oKgzFga1xQC
+         rE/w==
+X-Gm-Message-State: APjAAAXS+cBPO5HWrFsMt1H8j3Qy1Id6NqJ7hz/hy7/KirPE9k/+eNTA
+        rTFkIO2YmSesNQ1dkkF4XYjLJqi8
+X-Google-Smtp-Source: APXvYqzcRZQ6vWYKezVnQ0bBJdnNMViVoXcqthvKgokYnE68Ic9fZmFLOIM6SSm7tYQMGARVOgYmAA==
+X-Received: by 2002:a5d:4acb:: with SMTP id y11mr39392176wrs.111.1582570599273;
+        Mon, 24 Feb 2020 10:56:39 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id z8sm19900838wrv.74.2020.02.24.10.56.37
+        by smtp.gmail.com with ESMTPSA id z8sm19900838wrv.74.2020.02.24.10.56.38
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Feb 2020 10:56:37 -0800 (PST)
+        Mon, 24 Feb 2020 10:56:38 -0800 (PST)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     oupton@google.com
-Subject: [FYI PATCH 0/3] CVE-2020-2732
-Date:   Mon, 24 Feb 2020 19:56:33 +0100
-Message-Id: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
+Cc:     oupton@google.com, stable@vger.kernel.org
+Subject: [FYI PATCH 1/3] KVM: nVMX: Don't emulate instructions in guest mode
+Date:   Mon, 24 Feb 2020 19:56:34 +0100
+Message-Id: <1582570596-45387-2-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
+References: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vmx_check_intercept is not yet fully implemented by KVM on Intel processors,
-causing e.g. the I/O or MSR interception bitmaps not to be checked.
-In general we can just disallow instruction emulation on behalf of L1,
-but this series also implements I/O port checks.
+vmx_check_intercept is not yet fully implemented. To avoid emulating
+instructions disallowed by the L1 hypervisor, refuse to emulate
+instructions by default.
 
-Paolo
+Cc: stable@vger.kernel.org
+[Made commit, added commit msg - Oliver]
+Signed-off-by: Oliver Upton <oupton@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Oliver Upton (2):
-  KVM: nVMX: Refactor IO bitmap checks into helper function
-  KVM: nVMX: Check IO instruction VM-exit conditions
-
-Paolo Bonzini (1):
-  KVM: nVMX: Don't emulate instructions in guest mode
-
- arch/x86/kvm/vmx/nested.c | 39 ++++++++++++++++++++-----------
- arch/x86/kvm/vmx/nested.h |  2 ++
- arch/x86/kvm/vmx/vmx.c    | 59 +++++++++++++++++++++++++++++++++++++++++------
- 3 files changed, 79 insertions(+), 21 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index dcca514ffd42..5801a86f9c24 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7164,7 +7164,7 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
+ 	}
+ 
+ 	/* TODO: check more intercepts... */
+-	return X86EMUL_CONTINUE;
++	return X86EMUL_UNHANDLEABLE;
+ }
+ 
+ #ifdef CONFIG_X86_64
 -- 
 1.8.3.1
+
 
