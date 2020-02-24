@@ -2,49 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A276169E4E
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 07:14:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D3DF169EC7
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 07:49:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727229AbgBXGOP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 01:14:15 -0500
-Received: from mail-co1nam11on2082.outbound.protection.outlook.com ([40.107.220.82]:6194
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725895AbgBXGOP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 01:14:15 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cJgU1uKI1xdLScBkLPJaXeYX5ynoyD0LU5rVKQWZ5qmV9E/r4ZUzYOrZwFz0oAQKCuOr9MdV/5C8TUtGNPtIDZNU9FVC8r3THqEA3YDJmMyQClTK9xHxRbuhTAavBbESPARf1d6fSS8jNOQay1N7uMdTWVRiJVzGbc7F+8QyX9DWl7AREM0PFEa9FPN8gs70AOxXQGwIBgNC9X37PKHJJKPKwR3SvJuaYcS3atnKSOe74HFJyFf2Qs+K6UqvcqprZrEs3tTWkHJAqBffaXG8SBl/OuUxsoWmwzikfj2ODmwXEgh00gROgMvc9oDKjoDULgSEHUaRymQnMGjdBOZ8bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=alMWLtXvWLUFiKKeBW4jwPDU97fzPDrvvlOB4SsHxU0=;
- b=L+utFhOOYdh47zfAVWnZmrBsZB5NwrQZpOjVqeoZ7L2Zl7FSe85crSbIYUKJvtc8tt3m3KpbHy+3CmLgNOw45AxzFbBcZdURLB9o2OwlRvQk5/73hZ8eAcrpG9qQBF8008t5OWR8VPGJDMw5AzvvUvMoQARunncEO3Usr19iaobfq0lwI8ZULsmmMirfpamrDOzOXVU6+5+pjlnA6SF5gxlRIl4aYOBROGTbErH2VuXVYpe+UlqqBFzeT2buYNXDnQ2K8DJ7GLHhfukNQ7ukvUu/3ICGbG7Ai88A3knlcBPlJsWl3SjsMuk5z7DQyFMFvcZfwrcuW/Qs4l+jwI9IUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
- dkim=pass header.d=xilinx.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=alMWLtXvWLUFiKKeBW4jwPDU97fzPDrvvlOB4SsHxU0=;
- b=BN8nYHuCTjd6Wm6msxBxq4NJNaaY+kijUK3YD7YkP3zDjso3WfeFJ41XT1H8cpyS+WdXSjBBYjbter0S3CAU7yU5nEwRDBTvg28hITpwRx5yrCYNTPqAl16ofvW94Mh9VLM0ag6wxRUw22OfTDif4nUQyaBpeP5l9ikG/lKlu/0=
-Received: from BY5PR02MB6371.namprd02.prod.outlook.com (2603:10b6:a03:1fd::30)
- by BY5PR02MB6612.namprd02.prod.outlook.com (2603:10b6:a03:206::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.21; Mon, 24 Feb
- 2020 06:14:11 +0000
-Received: from BY5PR02MB6371.namprd02.prod.outlook.com
- ([fe80::a9b0:3f4f:bc1b:6af9]) by BY5PR02MB6371.namprd02.prod.outlook.com
- ([fe80::a9b0:3f4f:bc1b:6af9%7]) with mapi id 15.20.2729.033; Mon, 24 Feb 2020
- 06:14:11 +0000
-From:   Harpreet Singh Anand <hanand@xilinx.com>
-To:     Jason Wang <jasowang@redhat.com>,
+        id S1727282AbgBXGtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 01:49:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39003 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726452AbgBXGtN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 01:49:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582526952;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OFrZl6Sw3yEf+caSATqePnmBvtnNQFZ6PQ2MTTPkWY4=;
+        b=ZPUPeHm7W7bYUdLzxTLyCr/4UluFXuIVJj3AewnyRmTYQnCzMb2yOIRCyCEAnXam55Gfxh
+        J9JAqxZ6BTpOmeurmPNNDpX8KOqZNoaU67nTlKK+k5p5HnTT6qb2qXzPCkqPuVlMqLkMK6
+        pxpXLOoFT3779sf3VvExMkMVmiFliOU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-2pKoJM5WNTO2krrL8cQnhw-1; Mon, 24 Feb 2020 01:49:10 -0500
+X-MC-Unique: 2pKoJM5WNTO2krrL8cQnhw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB5E0800D54;
+        Mon, 24 Feb 2020 06:49:07 +0000 (UTC)
+Received: from [10.72.13.147] (ovpn-13-147.pek2.redhat.com [10.72.13.147])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4035A5C21B;
+        Mon, 24 Feb 2020 06:48:49 +0000 (UTC)
+Subject: Re: [PATCH V4 3/5] vDPA: introduce vDPA bus
+To:     Harpreet Singh Anand <hanand@xilinx.com>,
         "mst@redhat.com" <mst@redhat.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC:     "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
+Cc:     "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
         "jgg@mellanox.com" <jgg@mellanox.com>,
         "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
         "cunming.liang@intel.com" <cunming.liang@intel.com>,
@@ -64,64 +61,51 @@ CC:     "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
         "jiri@mellanox.com" <jiri@mellanox.com>,
         "shahafs@mellanox.com" <shahafs@mellanox.com>,
         "mhabets@solarflare.com" <mhabets@solarflare.com>
-Subject: RE: [PATCH V4 3/5] vDPA: introduce vDPA bus
-Thread-Topic: [PATCH V4 3/5] vDPA: introduce vDPA bus
-Thread-Index: AQHV57TR1Z0KZ5FfHE6YGohVy6yJOKgp4y6Q
-Date:   Mon, 24 Feb 2020 06:14:11 +0000
-Message-ID: <BY5PR02MB63714A03B7135F8C4054C1E8BBEC0@BY5PR02MB6371.namprd02.prod.outlook.com>
 References: <20200220061141.29390-1-jasowang@redhat.com>
  <20200220061141.29390-4-jasowang@redhat.com>
-In-Reply-To: <20200220061141.29390-4-jasowang@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=hanand@xilinx.com; 
-x-originating-ip: [149.199.50.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: a47f951c-5785-4eea-b3ce-08d7b8f0c3ff
-x-ms-traffictypediagnostic: BY5PR02MB6612:
-x-ld-processed: 657af505-d5df-48d0-8300-c31994686c5c,ExtAddr
-x-microsoft-antispam-prvs: <BY5PR02MB66127B421DAE5F59DF2FFFCCBBEC0@BY5PR02MB6612.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 032334F434
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(346002)(39860400002)(376002)(366004)(189003)(199004)(4326008)(6506007)(7696005)(76116006)(4744005)(7416002)(186003)(66446008)(86362001)(66476007)(66556008)(64756008)(66946007)(26005)(55016002)(9686003)(5660300002)(478600001)(8936002)(81166006)(8676002)(81156014)(2906002)(316002)(54906003)(110136005)(52536014)(71200400001)(33656002);DIR:OUT;SFP:1101;SCL:1;SRVR:BY5PR02MB6612;H:BY5PR02MB6371.namprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: xilinx.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: PPFarlK54GWEwrRZ4vqRoPDwaWRBpGf1Kqn9feiCY11G0pNG4/UprdPR5fIMosqyto8bz5s19afY0K3B+OdZUxsb4R/rRjaXApTzmIsJ8I8kSD7nV6ZFFuiHVfwgF2z5iO17/T5ZALqhIkQZoxrkjZunTpJdh1hb/eKnZf45r+O4tEKq4NvtYGUE4ovWrloLG/Ec0/UwAA/tb4jc5WkSw9b2v6gxdesLjZAHozyvnFqNVCB1JFexBOyvHAYKGLKy9AokKHDASvAe+M3mW6VPhIyoxjV5LPqLEuzwVgrNGJuB4R1vnWpBJ/aj7gDYrDk2FidcdSjssPfhvSdsg7onzXD5CiywYb+t6/9uE4NUKdFFZtMnmGXnahE9VDUnEH219IpjRxxvm7aerI2HD1Wu1gG3jFDOMGhSW0v+t7FBj+nVcsBFlCNfjkpGXXr0sf+U
-x-ms-exchange-antispam-messagedata: mjlywQv6V1vH+xE6nA4S4yQaRcAbRXK8Zjez6kN7rBxfPZMU3GtOo/iQuxCyqNQa0vcCn8WTCem1AGyKPx7j07vubR7KnVaH4j97wbHZ2ilsqWBHn2XNj6wldD8qLP6wFZKhMGnyWklUvE/nlJdzDw==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ <BY5PR02MB63714A03B7135F8C4054C1E8BBEC0@BY5PR02MB6371.namprd02.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <d6ea5dcb-3933-920b-523e-a494d323ef8a@redhat.com>
+Date:   Mon, 24 Feb 2020 14:48:48 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a47f951c-5785-4eea-b3ce-08d7b8f0c3ff
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Feb 2020 06:14:11.4702
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: i+N+9MB+sVvisll2J45o00lDUeKW29fM4+ThRJQvn8Wts//GPBCqiUO41fvmGX7iDQU5lN+8P7RHnTl6u7t8/g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR02MB6612
+In-Reply-To: <BY5PR02MB63714A03B7135F8C4054C1E8BBEC0@BY5PR02MB6371.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Is there a plan to add an API in vDPA_config_ops for getting the notificati=
-on area from the VDPA device (something similar to get_notify_area in the V=
-DPA DPDK case)? This will make the notifications from the guest  (vhost_vdp=
-a use case) to the VDPA device more efficient - at least for virtio 1.0+ dr=
-ivers in the VM.
 
-I believe this would require enhancement to the vhost ioctl (something simi=
-lar to the  VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG).
+On 2020/2/24 =E4=B8=8B=E5=8D=882:14, Harpreet Singh Anand wrote:
+> Is there a plan to add an API in vDPA_config_ops for getting the notifi=
+cation area from the VDPA device (something similar to get_notify_area in=
+ the VDPA DPDK case)? This will make the notifications from the guest  (v=
+host_vdpa use case) to the VDPA device more efficient - at least for virt=
+io 1.0+ drivers in the VM.
+>
+> I believe this would require enhancement to the vhost ioctl (something =
+similar to the  VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG).
 
 
-Regards,
-Harpreet
+Yes, we plan to add that on top. Basically, here's what we plan to do:=20
+(sorted by urgency)
+
+1) direct doorbell mapping as you asked here
+2) direct interrupt injection (when platform support, e.g through posted=20
+interrupt)
+3) control virtqueue support
+
+Thanks
+
+
+>
+>
+> Regards,
+> Harpreet
+>
 
