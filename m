@@ -2,169 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D7B6316AFC5
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 19:56:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ED8816AFD1
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 19:57:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728042AbgBXS4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 13:56:44 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33271 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727483AbgBXS4n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 13:56:43 -0500
-Received: by mail-wr1-f67.google.com with SMTP id u6so11710506wrt.0;
-        Mon, 24 Feb 2020 10:56:42 -0800 (PST)
+        id S1727730AbgBXS5x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 13:57:53 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39765 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727108AbgBXS5x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 13:57:53 -0500
+Received: by mail-wm1-f66.google.com with SMTP id c84so430163wme.4;
+        Mon, 24 Feb 2020 10:57:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=w9zV191iFIzgVf2uJex71w1ZLs3Fj/CvGHCv2DEAjG4=;
-        b=JXQW4VAozluhvyt3S72RHfXszgcYK0wN+RLSNY9LMAaD+H9LpZh8BKeaocbIjrHwWH
-         tqub/StDtuy7Wtw6zMbvLXucpg6FnHYAu0yEVGYUlLou6AAJ93sgSc+0dHwDLVTOBbxK
-         HaAIlxZYm7Ucz9z5rPVRmL2M3auC9CBmQSWKociHoVRDKhzLY9Qt52gmoIIe3dCKbFF1
-         oZDWQGY0T8tLx/m0ogM+9OC5il04mkkcnpCr0saxYy/MzxKZvUT2lwEbUuoDEzkmm85r
-         8oemZqHilTT9PXcP3AmUssENARryBwae3PtQfXZHQlJCVBhdcYijJJcCe23i/pZOifcn
-         Livg==
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=aQRhD9hViNOdfqkPRzFwHAM04jgTQv3FSxcn1Z2TBAs=;
+        b=ThSS+lG1FnRduPHMNFueF2fpUzcUWyQB63bcTouvvVJWxUMYRapCmy1E2wZoXY+sP6
+         6+ZtkFX+4eflwMBDBUD4ULb2iNtnvaASIjzFJMFM7+VCjNRJC5wSFtfhed3Yaqd12uJ7
+         T3kaKUXcVSBu7pJcE/12OMpu5RHpzy7hxwNBgdAjTee1KsGAIjrf4XGBu4jFrhy39A/d
+         TYdYnOZITlZEH66ZZeSk72PJWC9qPoXQ5pLnOAYMmmpZJf1p0ho3ndKBOQquHsuD88zA
+         z645dLZIEjvHmHjL4Oz47jSpHN2EmBASD+33w1nB0evjJsOp9ys5SuS2fah5LO4+lZK+
+         /9dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=w9zV191iFIzgVf2uJex71w1ZLs3Fj/CvGHCv2DEAjG4=;
-        b=PBtzof5TUd6FWvrx6gzopEJymArRyIRoxKakB64LjjcBj+++QLdysG0OswO0nmpKtB
-         PuoimAh+eyLHwIiPe6MhOFnJ1k81tQLSVQ+2YxPuVXwrhYqk7b6RBQXIA47xtfSx2fYO
-         gUDc7tBIxJAdPlUYL+n4AsFHk2EebNLtVnzXFA4x7zandPdrHo2AXoiKKgWHIXkeMnV3
-         iR3ChSxD9RS57k1HS+hbc6R7Gs6UXbLsYfX1cOcdvmHMtsEzC9p2hwrUzEc/6XzXNDQY
-         TnGE+2thy3CiFMmrb6J/QqteLZbRL8hyRK++F7H0E1QZzKlOgFOmusnD6c/dcxMcF7Vs
-         1trQ==
-X-Gm-Message-State: APjAAAX3zIzoKJQFmmX011zwYBhW+nyM66bTQ64FDgLI6O+j2bnlznid
-        /OCLGK3qVHt8akkS9oDSfwY7lGw7
-X-Google-Smtp-Source: APXvYqzaGtuqrAnDC33YD008DTvWW7rLyI9ADFirl4w+sEOfmdD4j0NSvu9sahbRuFHXtFStIQJ5kQ==
-X-Received: by 2002:adf:d4ca:: with SMTP id w10mr3123597wrk.407.1582570601249;
-        Mon, 24 Feb 2020 10:56:41 -0800 (PST)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=aQRhD9hViNOdfqkPRzFwHAM04jgTQv3FSxcn1Z2TBAs=;
+        b=CQdTzlmxBor/+b3yaN0QJfF1+pS1d3y8XTCSOyQ38QAu9XDPas/MaGw+OY4rP+KdKc
+         x3+yL6Phe9TfEnNT0lWv0HYNuwFRGFUW/mtWr4S2LEjpFoHaHGiMObvdQ6bVPo4XBDat
+         HnQRt34h7LcvGyCh/e7VGqjdz5h/2PXbwqI35pkPt/62k8Bpau+o9uCGLGR7huOnaBza
+         mi1DbT0nKEgxCkIvT7HSGppvzVADENJ9WWKP2Jlq//JlowE3n8NQqu25P0e3kcjNiIid
+         b5ji2JxUV4NAVTJo2UfY4FEJVUW3Tsnxi/gVV897YnOLO8TcKMq9t/Fv8j3VpRU07mNy
+         TqRw==
+X-Gm-Message-State: APjAAAVYJ8SkRaQF2+GAdRHqkWXoZ4zUuNfaha3XhHEZsJEX/Hh3MCm6
+        pSkh0IwTz2BVGtDyz6joR6AWSvf9
+X-Google-Smtp-Source: APXvYqwXtl93vM0GQoS/Inue+qM/b3QuF68VzbSt9SrrlANF/Xx786+GjGcyrQ6vVHF4Ij4wEx7x5A==
+X-Received: by 2002:a1c:44d:: with SMTP id 74mr431615wme.53.1582570671045;
+        Mon, 24 Feb 2020 10:57:51 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id z8sm19900838wrv.74.2020.02.24.10.56.40
+        by smtp.gmail.com with ESMTPSA id a16sm20491965wrx.87.2020.02.24.10.57.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Feb 2020 10:56:40 -0800 (PST)
+        Mon, 24 Feb 2020 10:57:50 -0800 (PST)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     oupton@google.com
-Subject: [FYI PATCH 3/3] KVM: nVMX: Check IO instruction VM-exit conditions
-Date:   Mon, 24 Feb 2020 19:56:36 +0100
-Message-Id: <1582570596-45387-4-git-send-email-pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM changes for Linux 5.6-rc4
+Date:   Mon, 24 Feb 2020 19:57:49 +0100
+Message-Id: <1582570669-45822-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
-References: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Oliver Upton <oupton@google.com>
+Linus,
 
-Consult the 'unconditional IO exiting' and 'use IO bitmaps' VM-execution
-controls when checking instruction interception. If the 'use IO bitmaps'
-VM-execution control is 1, check the instruction access against the IO
-bitmaps to determine if the instruction causes a VM-exit.
+The following changes since commit 120881b9e888689cbdb90a1dd1689684d8bc95f3:
 
-Signed-off-by: Oliver Upton <oupton@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/nested.c |  2 +-
- arch/x86/kvm/vmx/vmx.c    | 57 ++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 52 insertions(+), 7 deletions(-)
+  docs: virt: guest-halt-polling.txt convert to ReST (2020-02-12 20:10:08 +0100)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index f979832c394d..e920d7834d73 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5353,7 +5353,7 @@ static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
- 				       struct vmcs12 *vmcs12)
- {
- 	unsigned long exit_qualification;
--	unsigned int port;
-+	unsigned short port;
- 	int size;
- 
- 	if (!nested_cpu_has(vmcs12, CPU_BASED_USE_IO_BITMAPS))
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 5801a86f9c24..63aaf44edd1f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7145,6 +7145,39 @@ static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
- 	to_vmx(vcpu)->req_immediate_exit = true;
- }
- 
-+static int vmx_check_intercept_io(struct kvm_vcpu *vcpu,
-+				  struct x86_instruction_info *info)
-+{
-+	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-+	unsigned short port;
-+	bool intercept;
-+	int size;
-+
-+	if (info->intercept == x86_intercept_in ||
-+	    info->intercept == x86_intercept_ins) {
-+		port = info->src_val;
-+		size = info->dst_bytes;
-+	} else {
-+		port = info->dst_val;
-+		size = info->src_bytes;
-+	}
-+
-+	/*
-+	 * If the 'use IO bitmaps' VM-execution control is 0, IO instruction
-+	 * VM-exits depend on the 'unconditional IO exiting' VM-execution
-+	 * control.
-+	 *
-+	 * Otherwise, IO instruction VM-exits are controlled by the IO bitmaps.
-+	 */
-+	if (!nested_cpu_has(vmcs12, CPU_BASED_USE_IO_BITMAPS))
-+		intercept = nested_cpu_has(vmcs12,
-+					   CPU_BASED_UNCOND_IO_EXITING);
-+	else
-+		intercept = nested_vmx_check_io_bitmaps(vcpu, port, size);
-+
-+	return intercept ? X86EMUL_UNHANDLEABLE : X86EMUL_CONTINUE;
-+}
-+
- static int vmx_check_intercept(struct kvm_vcpu *vcpu,
- 			       struct x86_instruction_info *info,
- 			       enum x86_intercept_stage stage)
-@@ -7152,18 +7185,30 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
- 	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
- 
-+	switch (info->intercept) {
- 	/*
- 	 * RDPID causes #UD if disabled through secondary execution controls.
- 	 * Because it is marked as EmulateOnUD, we need to intercept it here.
- 	 */
--	if (info->intercept == x86_intercept_rdtscp &&
--	    !nested_cpu_has2(vmcs12, SECONDARY_EXEC_RDTSCP)) {
--		ctxt->exception.vector = UD_VECTOR;
--		ctxt->exception.error_code_valid = false;
--		return X86EMUL_PROPAGATE_FAULT;
--	}
-+	case x86_intercept_rdtscp:
-+		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_RDTSCP)) {
-+			ctxt->exception.vector = UD_VECTOR;
-+			ctxt->exception.error_code_valid = false;
-+			return X86EMUL_PROPAGATE_FAULT;
-+		}
-+		break;
-+
-+	case x86_intercept_in:
-+	case x86_intercept_ins:
-+	case x86_intercept_out:
-+	case x86_intercept_outs:
-+		return vmx_check_intercept_io(vcpu, info);
- 
- 	/* TODO: check more intercepts... */
-+	default:
-+		break;
-+	}
-+
- 	return X86EMUL_UNHANDLEABLE;
- }
- 
--- 
-1.8.3.1
+are available in the git repository at:
 
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to a93236fcbe1d0248461b29c0f87cb0b510c94e6f:
+
+  KVM: s390: rstify new ioctls in api.rst (2020-02-24 19:28:40 +0100)
+
+----------------------------------------------------------------
+Bugfixes, including the fix for CVE-2020-2732 and a few
+issues found by "make W=1".
+
+----------------------------------------------------------------
+Christian Borntraeger (1):
+      KVM: s390: rstify new ioctls in api.rst
+
+Li RongQing (1):
+      KVM: fix error handling in svm_hardware_setup
+
+Miaohe Lin (4):
+      KVM: nVMX: Fix some obsolete comments and grammar error
+      KVM: x86: don't notify userspace IOAPIC on edge-triggered interrupt EOI
+      KVM: apic: avoid calculating pending eoi from an uninitialized val
+      KVM: SVM: Fix potential memory leak in svm_cpu_init()
+
+Oliver Upton (3):
+      KVM: nVMX: Emulate MTF when performing instruction emulation
+      KVM: nVMX: Refactor IO bitmap checks into helper function
+      KVM: nVMX: Check IO instruction VM-exit conditions
+
+Paolo Bonzini (4):
+      KVM: x86: enable -Werror
+      KVM: x86: fix missing prototypes
+      KVM: x86: fix incorrect comparison in trace event
+      KVM: nVMX: Don't emulate instructions in guest mode
+
+Qian Cai (1):
+      kvm/emulate: fix a -Werror=cast-function-type
+
+Suravee Suthikulpanit (1):
+      kvm: x86: svm: Fix NULL pointer dereference when AVIC not enabled
+
+Vitaly Kuznetsov (2):
+      KVM: nVMX: handle nested posted interrupts when apicv is disabled for L1
+      KVM: nVMX: clear PIN_BASED_POSTED_INTR from nested pinbased_ctls only when apicv is globally disabled
+
+Xiaoyao Li (1):
+      KVM: VMX: Add VMX_FEATURE_USR_WAIT_PAUSE
+
+wanpeng li (1):
+      KVM: nVMX: Hold KVM's srcu lock when syncing vmcs12->shadow
+
+ Documentation/virt/kvm/api.rst     |  33 +++++-----
+ arch/x86/include/asm/kvm_emulate.h |  13 +++-
+ arch/x86/include/asm/kvm_host.h    |   3 +-
+ arch/x86/include/asm/vmx.h         |   2 +-
+ arch/x86/include/asm/vmxfeatures.h |   1 +
+ arch/x86/include/uapi/asm/kvm.h    |   1 +
+ arch/x86/kvm/Makefile              |   1 +
+ arch/x86/kvm/emulate.c             |  36 ++++------
+ arch/x86/kvm/irq_comm.c            |   2 +-
+ arch/x86/kvm/lapic.c               |   9 ++-
+ arch/x86/kvm/mmutrace.h            |   2 +-
+ arch/x86/kvm/svm.c                 |  65 ++++++++++---------
+ arch/x86/kvm/vmx/capabilities.h    |   1 +
+ arch/x86/kvm/vmx/nested.c          |  89 ++++++++++++++++++-------
+ arch/x86/kvm/vmx/nested.h          |  10 ++-
+ arch/x86/kvm/vmx/vmx.c             | 130 +++++++++++++++++++++++++++++++------
+ arch/x86/kvm/vmx/vmx.h             |   3 +
+ arch/x86/kvm/x86.c                 |   2 +
+ include/linux/kvm_host.h           |   2 +
+ 19 files changed, 284 insertions(+), 121 deletions(-)
