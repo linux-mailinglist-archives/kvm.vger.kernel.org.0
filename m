@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D4B0016AFC6
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 19:56:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7B6316AFC5
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 19:56:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728060AbgBXS4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728042AbgBXS4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 24 Feb 2020 13:56:44 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:44266 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728000AbgBXS4n (ORCPT <rfc822;kvm@vger.kernel.org>);
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33271 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727483AbgBXS4n (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 24 Feb 2020 13:56:43 -0500
-Received: by mail-wr1-f65.google.com with SMTP id m16so11646544wrx.11;
-        Mon, 24 Feb 2020 10:56:41 -0800 (PST)
+Received: by mail-wr1-f67.google.com with SMTP id u6so11710506wrt.0;
+        Mon, 24 Feb 2020 10:56:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=gkvBXvzMhYSRTcZy4oNhDjYmBjZXTwydzqi0XRBUfwo=;
-        b=ndr627BAdd19splYc1OkL4rR05y/Phvxmg6Rt5sEL/5+MjOb5ISJv1i1U4hzHcmV2C
-         bPY/rlhwWC9X7Ni8ZrBsMXyHGv1wByCDHb/j7VW/dUR8FQHU/yLCf0wJkxpeZLJl+o2o
-         9kEzQHOJ/85Q/Q9ZDPEdHasHZWJhood0QXB0Lja6ORXzlW+TxKdEOs1iO41GIDjIVIhE
-         hKmWVlIpvLRW75FCLjVTibEKwWZY0sRxonaQknDVsrCmd0NGTn0D8jgf+sznr5pK905p
-         IRzhzCKOpHqTA9vUMbJ68w6+v4BPWydAIAGIvPfcUBtb1wQGJStfqVYEgDyG6nRx+WJX
-         BZNg==
+        bh=w9zV191iFIzgVf2uJex71w1ZLs3Fj/CvGHCv2DEAjG4=;
+        b=JXQW4VAozluhvyt3S72RHfXszgcYK0wN+RLSNY9LMAaD+H9LpZh8BKeaocbIjrHwWH
+         tqub/StDtuy7Wtw6zMbvLXucpg6FnHYAu0yEVGYUlLou6AAJ93sgSc+0dHwDLVTOBbxK
+         HaAIlxZYm7Ucz9z5rPVRmL2M3auC9CBmQSWKociHoVRDKhzLY9Qt52gmoIIe3dCKbFF1
+         oZDWQGY0T8tLx/m0ogM+9OC5il04mkkcnpCr0saxYy/MzxKZvUT2lwEbUuoDEzkmm85r
+         8oemZqHilTT9PXcP3AmUssENARryBwae3PtQfXZHQlJCVBhdcYijJJcCe23i/pZOifcn
+         Livg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=gkvBXvzMhYSRTcZy4oNhDjYmBjZXTwydzqi0XRBUfwo=;
-        b=BGyOE2ETARf32VPxjzxTdC2ZguKSRkD7YlrVh+pBR4Z8e8HE15sGYZGhXeV4VqWSyp
-         O7fWj9osvH3f7liDOPGQtPmHI+6BKdDQTKkuQJylYQ5XJx6Pc1T7S9j3G0aG48fF+5N8
-         eLcC8nkxEgGeGUyBfflpFAjOF5aJ94DVjSrKjOOXJyN0sEHEdfXhT+GV+a+LVg8g3xaV
-         qk6UQDgPELZx3YGzMdWIuaDK46oRkECe0MHcbt0u85i17p6M3/PacBIFkPEE7Y5cE9qw
-         ggcyv3zRvDEZuNViCY2ErteWVU5xA1KmFdb9sU8Ub2oUXkkqkjgGnz7te9W+LOh/U2er
-         +ibw==
-X-Gm-Message-State: APjAAAVt0jW90CCCUt9PthDMZKCwbLQyRfAvIuaqmBqaWHMjlicKa1gc
-        BUFAC0/NLWYnuK+Dvl4RVaaipT/i
-X-Google-Smtp-Source: APXvYqxElkytF55z65Bb7mzhdXuWYY/dfaxj7PPmu1yAlTAgJH+GV5AyqDuHZdFopZAmUucJcvyAvw==
-X-Received: by 2002:adf:a19c:: with SMTP id u28mr67542832wru.221.1582570600410;
-        Mon, 24 Feb 2020 10:56:40 -0800 (PST)
+        bh=w9zV191iFIzgVf2uJex71w1ZLs3Fj/CvGHCv2DEAjG4=;
+        b=PBtzof5TUd6FWvrx6gzopEJymArRyIRoxKakB64LjjcBj+++QLdysG0OswO0nmpKtB
+         PuoimAh+eyLHwIiPe6MhOFnJ1k81tQLSVQ+2YxPuVXwrhYqk7b6RBQXIA47xtfSx2fYO
+         gUDc7tBIxJAdPlUYL+n4AsFHk2EebNLtVnzXFA4x7zandPdrHo2AXoiKKgWHIXkeMnV3
+         iR3ChSxD9RS57k1HS+hbc6R7Gs6UXbLsYfX1cOcdvmHMtsEzC9p2hwrUzEc/6XzXNDQY
+         TnGE+2thy3CiFMmrb6J/QqteLZbRL8hyRK++F7H0E1QZzKlOgFOmusnD6c/dcxMcF7Vs
+         1trQ==
+X-Gm-Message-State: APjAAAX3zIzoKJQFmmX011zwYBhW+nyM66bTQ64FDgLI6O+j2bnlznid
+        /OCLGK3qVHt8akkS9oDSfwY7lGw7
+X-Google-Smtp-Source: APXvYqzaGtuqrAnDC33YD008DTvWW7rLyI9ADFirl4w+sEOfmdD4j0NSvu9sahbRuFHXtFStIQJ5kQ==
+X-Received: by 2002:adf:d4ca:: with SMTP id w10mr3123597wrk.407.1582570601249;
+        Mon, 24 Feb 2020 10:56:41 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id z8sm19900838wrv.74.2020.02.24.10.56.39
+        by smtp.gmail.com with ESMTPSA id z8sm19900838wrv.74.2020.02.24.10.56.40
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Feb 2020 10:56:39 -0800 (PST)
+        Mon, 24 Feb 2020 10:56:40 -0800 (PST)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     oupton@google.com
-Subject: [FYI PATCH 2/3] KVM: nVMX: Refactor IO bitmap checks into helper function
-Date:   Mon, 24 Feb 2020 19:56:35 +0100
-Message-Id: <1582570596-45387-3-git-send-email-pbonzini@redhat.com>
+Subject: [FYI PATCH 3/3] KVM: nVMX: Check IO instruction VM-exit conditions
+Date:   Mon, 24 Feb 2020 19:56:36 +0100
+Message-Id: <1582570596-45387-4-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
 References: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
@@ -59,93 +59,112 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Oliver Upton <oupton@google.com>
 
-Checks against the IO bitmap are useful for both instruction emulation
-and VM-exit reflection. Refactor the IO bitmap checks into a helper
-function.
+Consult the 'unconditional IO exiting' and 'use IO bitmaps' VM-execution
+controls when checking instruction interception. If the 'use IO bitmaps'
+VM-execution control is 1, check the instruction access against the IO
+bitmaps to determine if the instruction causes a VM-exit.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 39 +++++++++++++++++++++++++--------------
- arch/x86/kvm/vmx/nested.h |  2 ++
- 2 files changed, 27 insertions(+), 14 deletions(-)
+ arch/x86/kvm/vmx/nested.c |  2 +-
+ arch/x86/kvm/vmx/vmx.c    | 57 ++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 52 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 50d8dbb3616d..f979832c394d 100644
+index f979832c394d..e920d7834d73 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -5312,24 +5312,17 @@ static int handle_vmfunc(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
--
--static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
--				       struct vmcs12 *vmcs12)
-+/*
-+ * Return true if an IO instruction with the specified port and size should cause
-+ * a VM-exit into L1.
-+ */
-+bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu, unsigned int port,
-+				 int size)
+@@ -5353,7 +5353,7 @@ static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
+ 				       struct vmcs12 *vmcs12)
  {
--	unsigned long exit_qualification;
-+	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
- 	gpa_t bitmap, last_bitmap;
+ 	unsigned long exit_qualification;
 -	unsigned int port;
--	int size;
- 	u8 b;
++	unsigned short port;
+ 	int size;
  
--	if (!nested_cpu_has(vmcs12, CPU_BASED_USE_IO_BITMAPS))
--		return nested_cpu_has(vmcs12, CPU_BASED_UNCOND_IO_EXITING);
--
--	exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
--
--	port = exit_qualification >> 16;
--	size = (exit_qualification & 7) + 1;
--
- 	last_bitmap = (gpa_t)-1;
- 	b = -1;
- 
-@@ -5356,6 +5349,24 @@ static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
- 	return false;
+ 	if (!nested_cpu_has(vmcs12, CPU_BASED_USE_IO_BITMAPS))
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 5801a86f9c24..63aaf44edd1f 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7145,6 +7145,39 @@ static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
+ 	to_vmx(vcpu)->req_immediate_exit = true;
  }
  
-+static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
-+				       struct vmcs12 *vmcs12)
++static int vmx_check_intercept_io(struct kvm_vcpu *vcpu,
++				  struct x86_instruction_info *info)
 +{
-+	unsigned long exit_qualification;
-+	unsigned int port;
++	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
++	unsigned short port;
++	bool intercept;
 +	int size;
 +
++	if (info->intercept == x86_intercept_in ||
++	    info->intercept == x86_intercept_ins) {
++		port = info->src_val;
++		size = info->dst_bytes;
++	} else {
++		port = info->dst_val;
++		size = info->src_bytes;
++	}
++
++	/*
++	 * If the 'use IO bitmaps' VM-execution control is 0, IO instruction
++	 * VM-exits depend on the 'unconditional IO exiting' VM-execution
++	 * control.
++	 *
++	 * Otherwise, IO instruction VM-exits are controlled by the IO bitmaps.
++	 */
 +	if (!nested_cpu_has(vmcs12, CPU_BASED_USE_IO_BITMAPS))
-+		return nested_cpu_has(vmcs12, CPU_BASED_UNCOND_IO_EXITING);
++		intercept = nested_cpu_has(vmcs12,
++					   CPU_BASED_UNCOND_IO_EXITING);
++	else
++		intercept = nested_vmx_check_io_bitmaps(vcpu, port, size);
 +
-+	exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
-+
-+	port = exit_qualification >> 16;
-+	size = (exit_qualification & 7) + 1;
-+
-+	return nested_vmx_check_io_bitmaps(vcpu, port, size);
++	return intercept ? X86EMUL_UNHANDLEABLE : X86EMUL_CONTINUE;
 +}
 +
- /*
-  * Return 1 if we should exit from L2 to L1 to handle an MSR access,
-  * rather than handle it ourselves in L0. I.e., check whether L1 expressed
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index 1db388f2a444..9aeda46f473e 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -33,6 +33,8 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
- 			u32 vmx_instruction_info, bool wr, int len, gva_t *ret);
- void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu);
-+bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu, unsigned int port,
-+				 int size);
+ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
+ 			       struct x86_instruction_info *info,
+ 			       enum x86_intercept_stage stage)
+@@ -7152,18 +7185,30 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+ 	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
  
- static inline struct vmcs12 *get_vmcs12(struct kvm_vcpu *vcpu)
- {
++	switch (info->intercept) {
+ 	/*
+ 	 * RDPID causes #UD if disabled through secondary execution controls.
+ 	 * Because it is marked as EmulateOnUD, we need to intercept it here.
+ 	 */
+-	if (info->intercept == x86_intercept_rdtscp &&
+-	    !nested_cpu_has2(vmcs12, SECONDARY_EXEC_RDTSCP)) {
+-		ctxt->exception.vector = UD_VECTOR;
+-		ctxt->exception.error_code_valid = false;
+-		return X86EMUL_PROPAGATE_FAULT;
+-	}
++	case x86_intercept_rdtscp:
++		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_RDTSCP)) {
++			ctxt->exception.vector = UD_VECTOR;
++			ctxt->exception.error_code_valid = false;
++			return X86EMUL_PROPAGATE_FAULT;
++		}
++		break;
++
++	case x86_intercept_in:
++	case x86_intercept_ins:
++	case x86_intercept_out:
++	case x86_intercept_outs:
++		return vmx_check_intercept_io(vcpu, info);
+ 
+ 	/* TODO: check more intercepts... */
++	default:
++		break;
++	}
++
+ 	return X86EMUL_UNHANDLEABLE;
+ }
+ 
 -- 
 1.8.3.1
-
 
