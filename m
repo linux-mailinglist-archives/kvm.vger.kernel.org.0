@@ -2,133 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED88916A78D
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 14:47:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6089816A793
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 14:49:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727440AbgBXNrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 08:47:47 -0500
-Received: from foss.arm.com ([217.140.110.172]:37318 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725535AbgBXNrr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 08:47:47 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A301731B;
-        Mon, 24 Feb 2020 05:47:46 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 46C853F534;
-        Mon, 24 Feb 2020 05:47:45 -0800 (PST)
-Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>, yzt356@gmail.com,
-        jmattson@google.com, Paolo Bonzini <pbonzini@redhat.com>,
-        namit@vmware.com, sean.j.christopherson@intel.com,
-        Basil Eljuse <Basil.Eljuse@arm.com>
-References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
- <c82f4386-702f-a2e9-a4d7-d5ebb1f335d1@arm.com>
- <20200224133818.gtxtrmzo4y4guk4z@kamzik.brq.redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <adf05c0d-6a19-da06-5e41-da63b0d0d8d8@arm.com>
-Date:   Mon, 24 Feb 2020 13:47:44 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727487AbgBXNtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 08:49:42 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27551 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727160AbgBXNtl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Feb 2020 08:49:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582552180;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tAQyvgVC9umTI3C0mE/08IO0Mq8UDdBPvvOVcWUX2u0=;
+        b=JnmpdHX03d51JwRgVgy9uLW4FBdZCv4mWKNz6jfcWwoN//FFrrlvX2YLwkP4Ak6PHYFSbj
+        ZAu2WdLcyzqKiZPmgICw4JBB2i2bfDk4j8sK41ncejwVN5GZH9r4uvcq0/oHao8pBGuoHR
+        92tIyvMXWVH+f3DEmEXtZX/cQdehhnY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-dSALV6CsMnWUi8Uov3xt4w-1; Mon, 24 Feb 2020 08:49:36 -0500
+X-MC-Unique: dSALV6CsMnWUi8Uov3xt4w-1
+Received: by mail-wr1-f72.google.com with SMTP id c6so5603085wrm.18
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2020 05:49:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=tAQyvgVC9umTI3C0mE/08IO0Mq8UDdBPvvOVcWUX2u0=;
+        b=SBDRSKm1z/w+MKyNTlwFnzNJSP4o47iAeehaIIsxdd+AmkylhudGbsP9Zsw7R9cptT
+         svbYDOkaS4ypycbGq1VYtlHDXC/jWpszluUuWoQz8XMqqgtPjgZbCkjKo/LReW5SIJyT
+         0UNZCeZRZiBiJJS8cRwRoqzdz5ssQFraTjXh2GFT0uuovre0Z+idITeWXA+rSSdbZaLz
+         hC1J82vSycbgyAE60pToQQmXj3FcVw3Zv1pz1UD1A3Yq2r+c6CZCOxUcPyJPI/tH9Cuj
+         S5+dDUTycynsFQqY9h8EtL83OtVLs7hOMUxXulaYeolaUrUC2r04WE74lpAL0iaStONM
+         U2pQ==
+X-Gm-Message-State: APjAAAVee5zimhIkmQUT0eVlQ25nXLheUtMhDi+5tEq6vA9KeHbGDYLd
+        7IaetAyDYtargvoLftF9borKVKqzykmsFTFAwaoD5mKy5RNvXWd3/jjmEmyW7uhfiXY1Bj40LiP
+        +eIfBg2RhuVHB
+X-Received: by 2002:a5d:4a06:: with SMTP id m6mr67336206wrq.155.1582552175128;
+        Mon, 24 Feb 2020 05:49:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxdBw9gt33lYnR/XKzr9wDVBrAP8s0iq8iWevpyYhiw+9MMonU5wAHsUexqdA1oN+hOyWiseQ==
+X-Received: by 2002:a5d:4a06:: with SMTP id m6mr67336184wrq.155.1582552174866;
+        Mon, 24 Feb 2020 05:49:34 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id t128sm19156199wmf.28.2020.02.24.05.49.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2020 05:49:34 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 28/61] KVM: x86: Refactor cpuid_mask() to auto-retrieve the register
+In-Reply-To: <20200201185218.24473-29-sean.j.christopherson@intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-29-sean.j.christopherson@intel.com>
+Date:   Mon, 24 Feb 2020 14:49:33 +0100
+Message-ID: <87d0a4p02a.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200224133818.gtxtrmzo4y4guk4z@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-On 2/24/20 1:38 PM, Andrew Jones wrote:
-> On Mon, Feb 24, 2020 at 01:21:23PM +0000, Alexandru Elisei wrote:
->> Hi Naresh,
->>
->> On 2/24/20 12:53 PM, Naresh Kamboju wrote:
->>> [Sorry for the spam]
->>>
->>> Greeting from Linaro !
->>> We are running kvm-unit-tests on our CI Continuous Integration and
->>> testing on x86_64 and arm64 Juno-r2.
->>> Linux stable branches and Linux mainline and Linux next.
->>>
->>> Few tests getting fail and skipped, we are interested in increasing the
->>> test coverage by adding required kernel config fragments,
->>> kernel command line arguments and user space tools.
->>>
->>> Your help is much appreciated.
->>>
->>> Here is the details of the LKFT kvm unit test logs,
->>>
->>> [..]
->> I am going to comment on the arm64 tests. As far as I am aware, you don't need any
->> kernel configs to run the tests.
->>
->> From looking at the java log [1], I can point out a few things:
->>
->> - The gicv3 tests are failing because Juno has a gicv2 and the kernel refuses to
->> create a virtual gicv3. It's normal.
-> Yup
+> Use the recently introduced cpuid_entry_get_reg() to automatically get
+> the appropriate register when masking a CPUID entry.
 >
->> - I am not familiar with the PMU test, so I cannot help you with that.
-> Where is the output from running the PMU test? I didn't see it in the link
-> below.
-
-It's toward the end, it just says that 2 tests failed:
-
-|TESTNAME=pmu TIMEOUT=90s ACCEL= ./arm/run arm/pmu.flat -smp 1|
-|[31mFAIL[0m pmu (3 tests, 2 unexpected failures)|
+> No functional change intended.
 >
->> - Without the logs, it's hard for me to say why the micro-bench test is failing.
->> Can you post the logs for that particular run? They are located in
->> /path/to/kvm-unit-tests/logs/micro-bench.log. My guess is that it has to do with
->> the fact that you are using taskset to keep the tests on one CPU. Micro-bench will
->> use 2 VCPUs to send 2^28 IPIs which will run on the same physical CPU, and sending
->> and receiving them will be serialized which will incur a *lot* of overhead. I
->> tried the same test without taskset, and it worked. With taskset -c 0, it timed
->> out like in your log.
-> We've also had "failures" of the micro-bench test when run under avocado
-> reported. The problem was/is the assert_msg() on line 107 is firing. We
-> could probably increase the number of tries or change the assert to a
-> warning. Of course micro-bench isn't a "test" anyway so it can't "fail".
-> Well, not unless one goes through the trouble of preparing expected times
-> for each measurement for a given host and then compares new results to
-> those expectations. Then it could fail when the results are too large
-> (some threshold must be defined too).
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 28 +++++++++++++++-------------
+>  1 file changed, 15 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 195f4dcc8c6a..cb5870a323cc 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -254,10 +254,12 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+>  	return r;
+>  }
+>  
+> -static __always_inline void cpuid_mask(u32 *word, int wordnum)
+> +static __always_inline void cpuid_entry_mask(struct kvm_cpuid_entry2 *entry,
+> +					     enum cpuid_leafs leaf)
+>  {
+> -	reverse_cpuid_check(wordnum);
+> -	*word &= boot_cpu_data.x86_capability[wordnum];
+> +	u32 *reg = cpuid_entry_get_reg(entry, leaf * 32);
+> +
+> +	*reg &= boot_cpu_data.x86_capability[leaf];
+>  }
+>  
+>  struct kvm_cpuid_array {
+> @@ -373,13 +375,13 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
+>  	case 0:
+>  		entry->eax = min(entry->eax, 1u);
+>  		entry->ebx &= kvm_cpuid_7_0_ebx_x86_features;
+> -		cpuid_mask(&entry->ebx, CPUID_7_0_EBX);
+> +		cpuid_entry_mask(entry, CPUID_7_0_EBX);
+>  		/* TSC_ADJUST is emulated */
+>  		cpuid_entry_set(entry, X86_FEATURE_TSC_ADJUST);
+>  
+>  		entry->ecx &= kvm_cpuid_7_0_ecx_x86_features;
+>  		f_la57 = cpuid_entry_get(entry, X86_FEATURE_LA57);
+> -		cpuid_mask(&entry->ecx, CPUID_7_ECX);
+> +		cpuid_entry_mask(entry, CPUID_7_ECX);
+>  		/* Set LA57 based on hardware capability. */
+>  		entry->ecx |= f_la57;
+>  		entry->ecx |= f_umip;
+> @@ -389,7 +391,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
+>  			cpuid_entry_clear(entry, X86_FEATURE_PKU);
+>  
+>  		entry->edx &= kvm_cpuid_7_0_edx_x86_features;
+> -		cpuid_mask(&entry->edx, CPUID_7_EDX);
+> +		cpuid_entry_mask(entry, CPUID_7_EDX);
+>  		if (boot_cpu_has(X86_FEATURE_IBPB) && boot_cpu_has(X86_FEATURE_IBRS))
+>  			cpuid_entry_set(entry, X86_FEATURE_SPEC_CTRL);
+>  		if (boot_cpu_has(X86_FEATURE_STIBP))
+> @@ -507,9 +509,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		break;
+>  	case 1:
+>  		entry->edx &= kvm_cpuid_1_edx_x86_features;
+> -		cpuid_mask(&entry->edx, CPUID_1_EDX);
+> +		cpuid_entry_mask(entry, CPUID_1_EDX);
+>  		entry->ecx &= kvm_cpuid_1_ecx_x86_features;
+> -		cpuid_mask(&entry->ecx, CPUID_1_ECX);
+> +		cpuid_entry_mask(entry, CPUID_1_ECX);
+>  		/* we support x2apic emulation even if host does not support
+>  		 * it since we emulate x2apic in software */
+>  		cpuid_entry_set(entry, X86_FEATURE_X2APIC);
+> @@ -619,7 +621,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  			goto out;
+>  
+>  		entry->eax &= kvm_cpuid_D_1_eax_x86_features;
+> -		cpuid_mask(&entry->eax, CPUID_D_1_EAX);
+> +		cpuid_entry_mask(entry, CPUID_D_1_EAX);
+>  		if (entry->eax & (F(XSAVES)|F(XSAVEC)))
+>  			entry->ebx = xstate_required_size(supported_xcr0, true);
+>  		else
+> @@ -699,9 +701,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		break;
+>  	case 0x80000001:
+>  		entry->edx &= kvm_cpuid_8000_0001_edx_x86_features;
+> -		cpuid_mask(&entry->edx, CPUID_8000_0001_EDX);
+> +		cpuid_entry_mask(entry, CPUID_8000_0001_EDX);
+>  		entry->ecx &= kvm_cpuid_8000_0001_ecx_x86_features;
+> -		cpuid_mask(&entry->ecx, CPUID_8000_0001_ECX);
+> +		cpuid_entry_mask(entry, CPUID_8000_0001_ECX);
+>  		break;
+>  	case 0x80000007: /* Advanced power management */
+>  		/* invariant TSC is CPUID.80000007H:EDX[8] */
+> @@ -720,7 +722,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		entry->eax = g_phys_as | (virt_as << 8);
+>  		entry->edx = 0;
+>  		entry->ebx &= kvm_cpuid_8000_0008_ebx_x86_features;
+> -		cpuid_mask(&entry->ebx, CPUID_8000_0008_EBX);
+> +		cpuid_entry_mask(entry, CPUID_8000_0008_EBX);
+>  		/*
+>  		 * AMD has separate bits for each SPEC_CTRL bit.
+>  		 * arch/x86/kernel/cpu/bugs.c is kind enough to
+> @@ -763,7 +765,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		break;
+>  	case 0xC0000001:
+>  		entry->edx &= kvm_cpuid_C000_0001_edx_x86_features;
+> -		cpuid_mask(&entry->edx, CPUID_C000_0001_EDX);
+> +		cpuid_entry_mask(entry, CPUID_C000_0001_EDX);
+>  		break;
+>  	case 3: /* Processor serial number */
+>  	case 5: /* MONITOR/MWAIT */
 
-That happens to me too on occasions when running under kvmtool. When it does I
-just rerun the test and it passes almost always. But I think that's not the case
-here, since the test times out:
 
-|TESTNAME=micro-bench TIMEOUT=90s ACCEL=kvm ./arm/run arm/micro-bench.flat -smp 2|
-|[31mFAIL[0m micro-bench (timeout; duration=90s)|
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-I tried it and I got the same message, and the in the log:
+-- 
+Vitaly
 
-$ cat logs/micro-bench.log
-timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64 -nodefaults -machine
-virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device
-virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none
--serial stdio -kernel arm/micro-bench.flat -smp 2 # -initrd /tmp/tmp.XXOYQIrjIM
-Timer Frequency 40000000 Hz (Output in microseconds)
-
-name                                    total ns                         avg
-ns            
---------------------------------------------------------------------------------------------
-hvc                                  87727475.0                        
-1338.0             
-mmio_read_user                      348083225.0                        
-5311.0             
-mmio_read_vgic                      125456300.0                        
-1914.0             
-eoi                                    820875.0                          
-12.0             
-qemu-system-aarch64: terminating on signal 15 from pid 23273 (timeout)
-
-Thanks,
-Alex
