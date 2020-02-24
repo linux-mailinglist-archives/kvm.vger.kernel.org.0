@@ -2,89 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 340B2169AA1
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 00:13:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10FFB169B91
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 02:07:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727181AbgBWXNN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 Feb 2020 18:13:13 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39634 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727133AbgBWXNN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 Feb 2020 18:13:13 -0500
-Received: by mail-wr1-f65.google.com with SMTP id y11so8218517wrt.6
-        for <kvm@vger.kernel.org>; Sun, 23 Feb 2020 15:13:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=17jafNN09kR214AJV/UiO1WaS1l0h7pxacDQ7S+m8cI=;
-        b=jliOvUS8RqUtzGqm9QO5M//+Js5++/fGeLeHvbawBnJF685R0C/LKXuYiCAg1Ao/FU
-         5vIF9m0fLIcj4zm0mtLhXcJ3kXeTm4LcCVsTUT/ecUhNSzwC6OV39mxcCy7xuOOFx6HE
-         LExChMI7ZqP0mGuZtYRX8M05JcPjs0iFfMVwieXJvpj1Zx21JpJ3l9mrVdF+GihoOBV4
-         lCcJkQPK0MoXcWRI2/QSy1KRW1I/KnddhJQWiYQ006ujeqLHLBX2kx8Jirb9WER3xfpe
-         xV0Ch8UySlBbon9WbcZHnuhnJium6w7UopPjCh4D4aLeqBiXrkfKUAwzcXDke8axFU3y
-         Znhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=17jafNN09kR214AJV/UiO1WaS1l0h7pxacDQ7S+m8cI=;
-        b=p1NgB6iq4/dOqG7rjOlBTFL4ajXbmNv3I3iutBaKf0kQOBM27aBB6q2YzI6IeoFR5k
-         xcM7rX6x5xMRcEX1a2GLNMBB2hdd/qUE3K5UvAr2hom1YvPtQXRbFCmZIm7RVqgWT/Ld
-         h/Hk4VeNR1Afs5BRUwQQ49iApR8dHW2oZ07RUy4LsYplvCcOkUhJoOBW3H3x9Z80QAiL
-         fIS6Wm9kWBSHxX0jC5/yJ1HXrfpbd1BJbgzMT57EDAAVdOU6I4zYrNAA4fU+TBVbpRQv
-         9YQl8pOqmz5MoOmKYUqN0b6Mnj43erR3pwYZGR0WbmD3MudVENezAqCVzrXryB6kw2Dz
-         03xQ==
-X-Gm-Message-State: APjAAAVMHxRI6tUakVeigBFVMhUjaI5Vr3h1olJm5x3vbJz1Ovcg+wVp
-        X4V5kN3B5NviVysKd9WK9jhKBio6sDc=
-X-Google-Smtp-Source: APXvYqy5GvHfvDu/xIN6Q/aavdQ6vgTyeEPdVzYXI39bUwpPGwsrO7O8orUVEov2mT3qy4HM2QkTFg==
-X-Received: by 2002:adf:9d4a:: with SMTP id o10mr12871277wre.392.1582499591334;
-        Sun, 23 Feb 2020 15:13:11 -0800 (PST)
-Received: from kali.home (lfbn-ren-1-602-70.w81-53.abo.wanadoo.fr. [81.53.179.70])
-        by smtp.gmail.com with ESMTPSA id v14sm10485050wrm.30.2020.02.23.15.13.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Feb 2020 15:13:10 -0800 (PST)
-From:   Fabrice Fontaine <fontaine.fabrice@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Fabrice Fontaine <fontaine.fabrice@gmail.com>
-Subject: [kvm-unit-tests PATCH] Makefile: fix stack-protector tests
-Date:   Mon, 24 Feb 2020 00:14:14 +0100
-Message-Id: <20200223231414.3178105-1-fontaine.fabrice@gmail.com>
-X-Mailer: git-send-email 2.25.0
+        id S1727189AbgBXBH5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Feb 2020 20:07:57 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2970 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727148AbgBXBH5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Feb 2020 20:07:57 -0500
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id 43B0C58324CD8F3D7D0C;
+        Mon, 24 Feb 2020 09:07:55 +0800 (CST)
+Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
+ DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 24 Feb 2020 09:07:54 +0800
+Received: from DGGEMM508-MBX.china.huawei.com ([169.254.2.45]) by
+ dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0439.000;
+ Mon, 24 Feb 2020 09:07:47 +0800
+From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To:     Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>
+CC:     Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "quintela@redhat.com" <quintela@redhat.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>,
+        "linfeng (M)" <linfeng23@huawei.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>
+Subject: RE: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Topic: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Index: AdXmU97BvyK5YKoyS5++my9GnvXVk///1+yA//428yCAA1S3gP/+abuggAMs8gCAAd62AIAAJJ4A//xJ+gA=
+Date:   Mon, 24 Feb 2020 01:07:47 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BB18354@dggemm508-mbx.china.huawei.com>
+References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
+ <20200218174311.GE1408806@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
+ <20200219171919.GA34517@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
+ <CANgfPd-P_=GqcMiwLSSkUhZDt42aMLUsCJt+CPdUN5yR3RLHmQ@mail.gmail.com>
+ <cd4626a1-44b5-1a62-cf4b-716950a6db1b@google.com>
+ <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
+In-Reply-To: <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.228.206]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename fnostack_protector into fno_stack_protector and
-fnostack_protector_all into fnostack_protector_all otherwise build will
-fail if -fstack-protector is passed by the toolchain
-
-Fixes:
- - http://autobuild.buildroot.org/results/ad689b08173548af21dd1fb0e827fd561de6dfef
-
-Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
----
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 767b6c6..754ed65 100644
---- a/Makefile
-+++ b/Makefile
-@@ -55,8 +55,8 @@ COMMON_CFLAGS += -Wignored-qualifiers -Werror
- 
- frame-pointer-flag=-f$(if $(KEEP_FRAME_POINTER),no-,)omit-frame-pointer
- fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
--fnostack_protector := $(call cc-option, -fno-stack-protector, "")
--fnostack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
-+fno_stack_protector := $(call cc-option, -fno-stack-protector, "")
-+fno_stack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
- wno_frame_address := $(call cc-option, -Wno-frame-address, "")
- fno_pic := $(call cc-option, -fno-pic, "")
- no_pie := $(call cc-option, -no-pie, "")
--- 
-2.25.0
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgRmVpbmVyIFtt
+YWlsdG86cGZlaW5lckBnb29nbGUuY29tXQ0KPiBTZW50OiBTYXR1cmRheSwgRmVicnVhcnkgMjIs
+IDIwMjAgODoxOSBBTQ0KPiBUbzogSnVuYWlkIFNoYWhpZCA8anVuYWlkc0Bnb29nbGUuY29tPg0K
+PiBDYzogQmVuIEdhcmRvbiA8YmdhcmRvbkBnb29nbGUuY29tPjsgWmhvdWppYW4gKGpheSkNCj4g
+PGppYW5qYXkuemhvdUBodWF3ZWkuY29tPjsgUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPjsN
+Cj4ga3ZtQHZnZXIua2VybmVsLm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBwYm9uemluaUBy
+ZWRoYXQuY29tOw0KPiBkZ2lsYmVydEByZWRoYXQuY29tOyBxdWludGVsYUByZWRoYXQuY29tOyBM
+aXVqaW5zb25nIChQYXVsKQ0KPiA8bGl1LmppbnNvbmdAaHVhd2VpLmNvbT47IGxpbmZlbmcgKE0p
+IDxsaW5mZW5nMjNAaHVhd2VpLmNvbT47IHdhbmd4aW4gKFUpDQo+IDx3YW5neGlueGluLndhbmdA
+aHVhd2VpLmNvbT47IEh1YW5nd2VpZG9uZyAoQykNCj4gPHdlaWRvbmcuaHVhbmdAaHVhd2VpLmNv
+bT4NCj4gU3ViamVjdDogUmU6IFJGQzogU3BsaXQgRVBUIGh1Z2UgcGFnZXMgaW4gYWR2YW5jZSBv
+ZiBkaXJ0eSBsb2dnaW5nDQo+IA0KPiBPbiBGcmksIEZlYiAyMSwgMjAyMCBhdCAyOjA4IFBNIEp1
+bmFpZCBTaGFoaWQgPGp1bmFpZHNAZ29vZ2xlLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBPbiAyLzIw
+LzIwIDk6MzQgQU0sIEJlbiBHYXJkb24gd3JvdGU6DQo+ID4gPg0KPiA+ID4gRldJVywgd2UgY3Vy
+cmVudGx5IGRvIHRoaXMgZWFnZXIgc3BsaXR0aW5nIGF0IEdvb2dsZSBmb3IgbGl2ZQ0KPiA+ID4g
+bWlncmF0aW9uLiBXaGVuIHRoZSBsb2ctZGlydHktbWVtb3J5IGZsYWcgaXMgc2V0IG9uIGEgbWVt
+c2xvdCB3ZQ0KPiA+ID4gZWFnZXJseSBzcGxpdCBhbGwgcGFnZXMgaW4gdGhlIHNsb3QgZG93biB0
+byA0ayBncmFudWxhcml0eS4NCj4gPiA+IEFzIEpheSBzYWlkLCB0aGlzIGRvZXMgbm90IGNhdXNl
+IGNyaXBwbGluZyBsb2NrIGNvbnRlbnRpb24gYmVjYXVzZQ0KPiA+ID4gdGhlIHZDUFUgcGFnZSBm
+YXVsdHMgZ2VuZXJhdGVkIGJ5IHdyaXRlIHByb3RlY3Rpb24gLyBzcGxpdHRpbmcgY2FuDQo+ID4g
+PiBiZSByZXNvbHZlZCBpbiB0aGUgZmFzdCBwYWdlIGZhdWx0IHBhdGggd2l0aG91dCBhY3F1aXJp
+bmcgdGhlIE1NVSBsb2NrLg0KPiA+ID4gSSBiZWxpZXZlICtKdW5haWQgU2hhaGlkIHRyaWVkIHRv
+IHVwc3RyZWFtIHRoaXMgYXBwcm9hY2ggYXQgc29tZQ0KPiA+ID4gcG9pbnQgaW4gdGhlIHBhc3Qs
+IGJ1dCB0aGUgcGF0Y2ggc2V0IGRpZG4ndCBtYWtlIGl0IGluLiAoVGhpcyB3YXMNCj4gPiA+IGJl
+Zm9yZSBteSB0aW1lLCBzbyBJJ20gaG9waW5nIGhlIGhhcyBhIGxpbmsuKSBJIGhhdmVuJ3QgZG9u
+ZSB0aGUNCj4gPiA+IGFuYWx5c2lzIHRvIGtub3cgaWYgZWFnZXIgc3BsaXR0aW5nIGlzIG1vcmUg
+b3IgbGVzcyBlZmZpY2llbnQgd2l0aA0KPiA+ID4gcGFyYWxsZWwgc2xvdy1wYXRoIHBhZ2UgZmF1
+bHRzLCBidXQgaXQncyBkZWZpbml0ZWx5IGZhc3RlciB1bmRlciB0aGUNCj4gPiA+IE1NVSBsb2Nr
+Lg0KPiA+ID4NCj4gPg0KPiA+IEkgYW0gbm90IHN1cmUgaWYgd2UgZXZlciBwb3N0ZWQgdGhvc2Ug
+cGF0Y2hlcyB1cHN0cmVhbS4gUGV0ZXIgRmVpbmVyIHdvdWxkDQo+IGtub3cgZm9yIHN1cmUuIE9u
+ZSBub3RhYmxlIGRpZmZlcmVuY2UgaW4gd2hhdCB3ZSBkbyBjb21wYXJlZCB0byB0aGUgYXBwcm9h
+Y2gNCj4gb3V0bGluZWQgYnkgSmF5IGlzIHRoYXQgd2UgZG9uJ3QgcmVseSBvbiB0ZHBfcGFnZV9m
+YXVsdCgpIHRvIGRvIHRoZSBzcGxpdHRpbmcuIFNvDQo+IHdlIGRvbid0IGhhdmUgdG8gY3JlYXRl
+IGEgZHVtbXkgVkNQVSBhbmQgdGhlIHNwZWNpYWxpemVkIHNwbGl0IGZ1bmN0aW9uIGlzIGFsc28N
+Cj4gbXVjaCBmYXN0ZXIuDQoNCkknbSBjdXJpb3VzIGFuZCBpbnRlcmVzdGVkIGluIHRoZSB3YXkg
+eW91IGltcGxlbWVudGVkLCBlc3BlY2lhbGx5IHlvdSBtZW50aW9uZWQNCnRoYXQgdGhlIHBlcmZv
+cm1hbmNlIGlzIG11Y2ggZmFzdGVyIHdpdGhvdXQgYSBkdW1teSBWQ1BVLg0KDQo+IFdlJ3ZlIGJl
+ZW4gY2FycnlpbmcgdGhlc2UgcGF0Y2hlcyBzaW5jZSAyMDE1LiBJJ3ZlIG5ldmVyIHBvc3RlZCB0
+aGVtLg0KPiBHZXR0aW5nIHRoZW0gaW4gc2hhcGUgZm9yIHVwc3RyZWFtIGNvbnN1bXB0aW9uIHdp
+bGwgdGFrZSBzb21lIHdvcmsuIEkgY2FuDQo+IGxvb2sgaW50byB0aGlzIG5leHQgd2Vlay4NCg0K
+SXQgd2lsbCBiZSBuaWNlIGlmIHlvdSdyZSBnb2luZyB0byBwb3N0IGl0IHRvIHRoZSB1cHN0cmVh
+bS4NCg0KUmVnYXJkcywNCkpheSBaaG91DQoNCj4gDQo+IFBldGVyDQo=
