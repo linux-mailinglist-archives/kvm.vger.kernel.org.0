@@ -2,156 +2,335 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B39CE16AA5D
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 16:45:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C5DE16AA7F
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 16:51:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727893AbgBXPpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 10:45:10 -0500
-Received: from mga02.intel.com ([134.134.136.20]:29575 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727859AbgBXPpK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 10:45:10 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Feb 2020 07:45:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,480,1574150400"; 
-   d="scan'208";a="284385389"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by FMSMGA003.fm.intel.com with ESMTP; 24 Feb 2020 07:45:08 -0800
-Date:   Mon, 24 Feb 2020 07:45:08 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 30/61] KVM: x86: Handle MPX CPUID adjustment in VMX code
-Message-ID: <20200224154508.GA29865@linux.intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-31-sean.j.christopherson@intel.com>
- <874kvgow3z.fsf@vitty.brq.redhat.com>
+        id S1728003AbgBXPvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 10:51:01 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21376 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727890AbgBXPvA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Feb 2020 10:51:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582559459;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QBzUZ88HV/a/URXm6yEfvQuZQiaiabo38k1vUrUp5ms=;
+        b=Ga8jHGpPcVkLbvL3t7f0/yvOxAN6ySAdDLAfcYL5MRD/6Iyn0iQwnjrF35SSszwcFgHEQN
+        yp5ki0olIxuLh7OZrvklluUoSkflxcIzRyR0YMNFetjnUCsAQkONplctFAtfmO59lK7OLe
+        olhGjMRgn63JilzejYKolbQEdYRGFsE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-467-yfLDZ9uRPrC00asKZvOedg-1; Mon, 24 Feb 2020 10:50:54 -0500
+X-MC-Unique: yfLDZ9uRPrC00asKZvOedg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EC25477;
+        Mon, 24 Feb 2020 15:50:50 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D41C060BF7;
+        Mon, 24 Feb 2020 15:50:45 +0000 (UTC)
+Date:   Mon, 24 Feb 2020 16:50:43 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     John Andersen <john.s.andersen@intel.com>
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        pbonzini@redhat.com, hpa@zytor.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, liran.alon@oracle.com,
+        luto@kernel.org, joro@8bytes.org, rick.p.edgecombe@intel.com,
+        kristen@linux.intel.com, arjan@linux.intel.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC v2 3/4] selftests: kvm: add test for CR pinning with SMM
+Message-ID: <20200224155043.m5ajw63g3p7kyfey@kamzik.brq.redhat.com>
+References: <20200218215902.5655-1-john.s.andersen@intel.com>
+ <20200218215902.5655-4-john.s.andersen@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <874kvgow3z.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200218215902.5655-4-john.s.andersen@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 24, 2020 at 04:14:56PM +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Tue, Feb 18, 2020 at 01:59:01PM -0800, John Andersen wrote:
+> Check that paravirtualized control register pinning blocks modifications
+> of pinned CR values stored in SMRAM on exit from SMM.
 > 
-> > Move the MPX CPUID adjustments into VMX to eliminate an instance of the
-> > undesirable "unsigned f_* = *_supported ? F(*) : 0" pattern in the
-> > common CPUID handling code.
-> >
-> > Note, VMX must manually check for kernel support via
-> > boot_cpu_has(X86_FEATURE_MPX).
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  arch/x86/kvm/cpuid.c   |  3 +--
-> >  arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++--
-> >  2 files changed, 13 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index cb5870a323cc..09e24d1d731c 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -340,7 +340,6 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
-> >  static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
-> >  {
-> >  	unsigned f_invpcid = kvm_x86_ops->invpcid_supported() ? F(INVPCID) : 0;
-> > -	unsigned f_mpx = kvm_mpx_supported() ? F(MPX) : 0;
-> >  	unsigned f_umip = kvm_x86_ops->umip_emulated() ? F(UMIP) : 0;
-> >  	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
-> >  	unsigned f_la57;
-> > @@ -349,7 +348,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry)
-> >  	/* cpuid 7.0.ebx */
-> >  	const u32 kvm_cpuid_7_0_ebx_x86_features =
-> >  		F(FSGSBASE) | F(BMI1) | F(HLE) | F(AVX2) | F(SMEP) |
-> > -		F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | f_mpx | F(RDSEED) |
-> > +		F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | 0 /*MPX*/ | F(RDSEED) |
-> >  		F(ADX) | F(SMAP) | F(AVX512IFMA) | F(AVX512F) | F(AVX512PF) |
-> >  		F(AVX512ER) | F(AVX512CD) | F(CLFLUSHOPT) | F(CLWB) | F(AVX512DQ) |
-> >  		F(SHA_NI) | F(AVX512BW) | F(AVX512VL) | f_intel_pt;
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 3ff830e2258e..143193fc178e 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7106,8 +7106,18 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
-> >  
-> >  static void vmx_set_supported_cpuid(struct kvm_cpuid_entry2 *entry)
-> >  {
-> > -	if (entry->function == 1 && nested)
-> > -		entry->ecx |= feature_bit(VMX);
-> > +	switch (entry->function) {
-> > +	case 0x1:
-> > +		if (nested)
-> > +			cpuid_entry_set(entry, X86_FEATURE_VMX);
-> > +		break;
-> > +	case 0x7:
-> > +		if (boot_cpu_has(X86_FEATURE_MPX) && kvm_mpx_supported())
-> > +			cpuid_entry_set(entry, X86_FEATURE_MPX);
-> > +		break;
-> > +	default:
-> > +		break;
-> > +	}
-> >  }
-> >  
-> >  static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
+> Signed-off-by: John Andersen <john.s.andersen@intel.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/include/x86_64/processor.h  |   9 +
+>  .../selftests/kvm/x86_64/smm_cr_pin_test.c    | 180 ++++++++++++++++++
+>  4 files changed, 191 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/smm_cr_pin_test.c
 > 
-> The word 'must' in the description seems to work like a trigger for
-> reviewers, their brains automatically turn into 'and what if not?' mode
-> :-)
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 30072c3f52fb..08e18ae1b80f 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -7,6 +7,7 @@
+>  /x86_64/platform_info_test
+>  /x86_64/set_sregs_test
+>  /x86_64/smm_test
+> +/x86_64/smm_cr_pin_test
+>  /x86_64/state_test
+>  /x86_64/sync_regs_test
+>  /x86_64/vmx_close_while_nested_test
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index d91c53b726e6..f3fdac72fc74 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -19,6 +19,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/smm_cr_pin_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/state_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 7428513a4c68..70394d2ffa5d 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -197,6 +197,11 @@ static inline uint64_t get_cr0(void)
+>  	return cr0;
+>  }
+>  
+> +static inline void set_cr0(uint64_t val)
+> +{
+> +	__asm__ __volatile__("mov %0, %%cr0" : : "r" (val) : "memory");
+> +}
+> +
+>  static inline uint64_t get_cr3(void)
+>  {
+>  	uint64_t cr3;
+> @@ -380,4 +385,8 @@ void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits);
+>  /* VMX_EPT_VPID_CAP bits */
+>  #define VMX_EPT_VPID_CAP_AD_BITS       (1ULL << 21)
+>  
+> +/* KVM MSRs */
+> +#define MSR_KVM_CR0_PINNED	0x4b564d08
+> +#define MSR_KVM_CR4_PINNED	0x4b564d09
+> +
+>  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> diff --git a/tools/testing/selftests/kvm/x86_64/smm_cr_pin_test.c b/tools/testing/selftests/kvm/x86_64/smm_cr_pin_test.c
+> new file mode 100644
+> index 000000000000..013983bb4ba4
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/smm_cr_pin_test.c
+> @@ -0,0 +1,180 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Tests for control register pinning not being affected by SMRAM writes.
+> + */
+> +#define _GNU_SOURCE /* for program_invocation_short_name */
+> +#include <fcntl.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <stdint.h>
+> +#include <string.h>
+> +#include <sys/ioctl.h>
+> +
+> +#include "test_util.h"
+> +
+> +#include "kvm_util.h"
+> +
+> +#include "processor.h"
+> +
+> +#define VCPU_ID	      1
+> +
+> +#define PAGE_SIZE  4096
+> +
+> +#define SMRAM_SIZE 65536
+> +#define SMRAM_MEMSLOT ((1 << 16) | 1)
+> +#define SMRAM_PAGES (SMRAM_SIZE / PAGE_SIZE)
+> +#define SMRAM_GPA 0x1000000
+> +#define SMRAM_STAGE 0xfe
+> +
+> +#define STR(x) #x
+> +#define XSTR(s) STR(s)
 
-This is the second time that sentence has caused confusion, I definitely
-need to tweak the changelog.  It's supposed to say something like:
+linux/stringify.h is in tools/
 
-  Note, to maintain existing behavior, VMX must manually check for kernel
-  support for MPX by querying boot_cpu_has(X86_FEATURE_MPX).  Previously,
-  do_cpuid_7_mask() masked MPX based on boot_cpu_data by invoking
-  cpuid_mask() on the associated cpufeatures word, but cpuid_mask() runs
-  prior to executing vmx_set_supported_cpuid().
- 
-> So do I understand correctly that kvm_mpx_supported() (which checks for
-> XFEATURE_MASK_BNDREGS/XFEATURE_MASK_BNDCSR) may actually return true
-> while 'boot_cpu_has(X86_FEATURE_MPX)' is false?
+> +
+> +#define SYNC_PORT 0xe
+> +#define DONE 0xff
+> +
+> +#define CR0_PINNED X86_CR0_WP
+> +#define CR4_PINNED (X86_CR4_SMAP | X86_CR4_UMIP)
+> +#define CR4_ALL (CR4_PINNED | X86_CR4_SMEP)
+> +
+> +/*
+> + * This is compiled as normal 64-bit code, however, SMI handler is executed
+> + * in real-address mode. To stay simple we're limiting ourselves to a mode
+> + * independent subset of asm here.
+> + * SMI handler always report back fixed stage SMRAM_STAGE.
+> + */
+> +uint8_t smi_handler[] = {
+> +	0xb0, SMRAM_STAGE,    /* mov $SMRAM_STAGE, %al */
+> +	0xe4, SYNC_PORT,      /* in $SYNC_PORT, %al */
+> +	0x0f, 0xaa,           /* rsm */
+> +};
+> +
+> +void sync_with_host(uint64_t phase)
+> +{
+> +	asm volatile("in $" XSTR(SYNC_PORT)", %%al \n"
+> +		     : : "a" (phase));
+> +}
 
-Yes.  The VMCS capabilities and host capabilities are tracked separately.
+Any reason not to use GUEST_SYNC() ?
 
-> Is this done on purpose, i.e. why don't we filter these out from vmcs_config
-> early, similar to SVM?
+> +
+> +void self_smi(void)
+> +{
+> +	wrmsr(APIC_BASE_MSR + (APIC_ICR >> 4),
+> +	      APIC_DEST_SELF | APIC_INT_ASSERT | APIC_DM_SMI);
+> +}
+> +
+> +void guest_code(void *unused)
+> +{
 
-Most (all?) SVM features that are conditionally available are enumerated
-via CPUID, and thus are naturally reflected in boot_cpu_data.
+Why not just define guest_code as 'void guest_code(void)' ?
 
-VMX enumerates its features via MSRs, which, except for a few synthetic
-flags in word 8 that are maintained for ABI compatibility, aren't reflected
-in boot_cpu_data.  It would be possible to update the global vmcs_config,
-but separating vmcs_config from boot_cpu_data has a few advantages:
+> +	uint64_t apicbase = rdmsr(MSR_IA32_APICBASE);
+> +
+> +	(void)unused;
+> +
+> +	sync_with_host(1);
+> +
+> +	wrmsr(MSR_IA32_APICBASE, apicbase | X2APIC_ENABLE);
+> +
+> +	sync_with_host(2);
+> +
+> +	set_cr0(get_cr0() | CR0_PINNED);
+> +
+> +	wrmsr(MSR_KVM_CR0_PINNED, CR0_PINNED);
+> +
+> +	sync_with_host(3);
+> +
+> +	set_cr4(get_cr4() | CR4_PINNED);
+> +
+> +	sync_with_host(4);
+> +
+> +	/* Pin SMEP low */
+> +	wrmsr(MSR_KVM_CR4_PINNED, CR4_PINNED);
+> +
+> +	sync_with_host(5);
+> +
+> +	self_smi();
+> +
+> +	sync_with_host(DONE);
 
-  - Allows KVM full control over using features, e.g. EPT can be toggled
-    simply by reloading kvm_intel, whereas controlling it via boot_cpu_data
-    would require a host reboot.
+GUEST_DONE() ?
 
-  - Instructions like RDSEED, RDRAND and ENCLS are exectuable in VMX
-    non-root by default, e.g. KVM needs to know that RDRAND-exiting is
-    supported in hardware even if it's "disabled" in the host so that KVM
-    can set the exiting control to intercept RDRAND and inject #UD.
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_regs regs;
+> +	struct kvm_sregs sregs;
+> +	struct kvm_vm *vm;
+> +	struct kvm_run *run;
+> +	struct kvm_x86_state *state;
+> +	int stage, stage_reported;
+> +	u64 *cr;
+> +
+> +	/* Create VM */
+> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
+> +
+> +	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
+> +
+> +	run = vcpu_state(vm, VCPU_ID);
+> +
+> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, SMRAM_GPA,
+> +				    SMRAM_MEMSLOT, SMRAM_PAGES, 0);
+> +	TEST_ASSERT(vm_phy_pages_alloc(vm, SMRAM_PAGES, SMRAM_GPA, SMRAM_MEMSLOT)
+> +		    == SMRAM_GPA, "could not allocate guest physical addresses?");
+> +
+> +	memset(addr_gpa2hva(vm, SMRAM_GPA), 0x0, SMRAM_SIZE);
+> +	memcpy(addr_gpa2hva(vm, SMRAM_GPA) + 0x8000, smi_handler,
+> +	       sizeof(smi_handler));
+> +
+> +	vcpu_set_msr(vm, VCPU_ID, MSR_IA32_SMBASE, SMRAM_GPA);
+> +
+> +	vcpu_args_set(vm, VCPU_ID, 1, 0);
 
-> 
-> The patch itself looks good, so
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> 
+guest_code() doesn't use inputs, so why set rdi to zero?
+
+> +
+> +	for (stage = 1;; stage++) {
+> +		_vcpu_run(vm, VCPU_ID);
+> +
+> +		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
+> +			    "Stage %d: unexpected exit reason: %u (%s),\n",
+> +			    stage, run->exit_reason,
+> +			    exit_reason_str(run->exit_reason));
+> +
+> +		memset(&regs, 0, sizeof(regs));
+> +		vcpu_regs_get(vm, VCPU_ID, &regs);
+> +
+> +		memset(&sregs, 0, sizeof(sregs));
+> +		vcpu_sregs_get(vm, VCPU_ID, &sregs);
+> +
+> +		stage_reported = regs.rax & 0xff;
+
+If you use GUEST_ASSERT() and get_ucall() then stage_reported is uc.args[1].
+Why mask it with 0xff? Shouldn't the test assert if the stage is an
+unexpected value?
+
+> +
+> +		if (stage_reported == DONE) {
+
+uc.cmd == UCALL_DONE
+
+> +			TEST_ASSERT((sregs.cr0 & CR0_PINNED) == CR0_PINNED,
+> +				    "Unexpected cr0. Bits missing: %llx",
+> +				    sregs.cr0 ^ (CR0_PINNED | sregs.cr0));
+> +			TEST_ASSERT((sregs.cr4 & CR4_ALL) == CR4_PINNED,
+> +				    "Unexpected cr4. Bits missing: %llx, cr4: %llx",
+> +				    sregs.cr4 ^ (CR4_ALL | sregs.cr4),
+> +				    sregs.cr4);
+> +			goto done;
+> +		}
+> +
+> +		TEST_ASSERT(stage_reported == stage ||
+> +			    stage_reported == SMRAM_STAGE,
+> +			    "Unexpected stage: #%x, got %x",
+> +			    stage, stage_reported);
+> +
+> +		/* Within SMM modify CR0/4 to not contain pinned bits. */
+> +		if (stage_reported == SMRAM_STAGE) {
+> +			cr = (u64 *)(addr_gpa2hva(vm, SMRAM_GPA + 0x8000 + 0x7f58));
+> +			*cr &= ~CR0_PINNED;
+> +
+> +			cr = (u64 *)(addr_gpa2hva(vm, SMRAM_GPA + 0x8000 + 0x7f48));
+> +			/* Unset pinned, set one that was pinned low */
+> +			*cr &= ~CR4_PINNED;
+> +			*cr |= X86_CR4_SMEP;
+> +		}
+> +
+> +		state = vcpu_save_state(vm, VCPU_ID);
+> +		kvm_vm_release(vm);
+> +		kvm_vm_restart(vm, O_RDWR);
+> +		vm_vcpu_add(vm, VCPU_ID);
+> +		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
+> +		vcpu_load_state(vm, VCPU_ID, state);
+> +		run = vcpu_state(vm, VCPU_ID);
+> +		free(state);
+> +	}
+> +
+> +done:
+> +	kvm_vm_free(vm);
+> +}
 > -- 
-> Vitaly
-> 
+> 2.21.0
+>
+
+Thanks,
+drew 
+
