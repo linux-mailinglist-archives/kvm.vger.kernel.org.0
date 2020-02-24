@@ -2,110 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D3DF169EC7
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 07:49:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E0BB169EDA
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 07:56:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727282AbgBXGtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 01:49:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39003 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726452AbgBXGtN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 01:49:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582526952;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OFrZl6Sw3yEf+caSATqePnmBvtnNQFZ6PQ2MTTPkWY4=;
-        b=ZPUPeHm7W7bYUdLzxTLyCr/4UluFXuIVJj3AewnyRmTYQnCzMb2yOIRCyCEAnXam55Gfxh
-        J9JAqxZ6BTpOmeurmPNNDpX8KOqZNoaU67nTlKK+k5p5HnTT6qb2qXzPCkqPuVlMqLkMK6
-        pxpXLOoFT3779sf3VvExMkMVmiFliOU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-2pKoJM5WNTO2krrL8cQnhw-1; Mon, 24 Feb 2020 01:49:10 -0500
-X-MC-Unique: 2pKoJM5WNTO2krrL8cQnhw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB5E0800D54;
-        Mon, 24 Feb 2020 06:49:07 +0000 (UTC)
-Received: from [10.72.13.147] (ovpn-13-147.pek2.redhat.com [10.72.13.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4035A5C21B;
-        Mon, 24 Feb 2020 06:48:49 +0000 (UTC)
-Subject: Re: [PATCH V4 3/5] vDPA: introduce vDPA bus
-To:     Harpreet Singh Anand <hanand@xilinx.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc:     "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
-        "jgg@mellanox.com" <jgg@mellanox.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "aadam@redhat.com" <aadam@redhat.com>,
-        "jiri@mellanox.com" <jiri@mellanox.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>
-References: <20200220061141.29390-1-jasowang@redhat.com>
- <20200220061141.29390-4-jasowang@redhat.com>
- <BY5PR02MB63714A03B7135F8C4054C1E8BBEC0@BY5PR02MB6371.namprd02.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <d6ea5dcb-3933-920b-523e-a494d323ef8a@redhat.com>
-Date:   Mon, 24 Feb 2020 14:48:48 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727183AbgBXG4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 01:56:13 -0500
+Received: from mga11.intel.com ([192.55.52.93]:43282 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726628AbgBXG4N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 01:56:13 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Feb 2020 22:56:13 -0800
+X-IronPort-AV: E=Sophos;i="5.70,479,1574150400"; 
+   d="scan'208";a="230549576"
+Received: from unknown (HELO [10.238.4.82]) ([10.238.4.82])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 23 Feb 2020 22:56:11 -0800
+Subject: Re: [PATCH] KVM: x86: Adjust counter sample period after a wrmsr
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Hankland <ehankland@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20200222023413.78202-1-ehankland@google.com>
+ <9adcb973-7b60-71dd-636d-1e451e664c55@redhat.com>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <0c66eae3-8983-0632-6d39-fd335620b76a@linux.intel.com>
+Date:   Mon, 24 Feb 2020 14:56:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <BY5PR02MB63714A03B7135F8C4054C1E8BBEC0@BY5PR02MB6371.namprd02.prod.outlook.com>
+In-Reply-To: <9adcb973-7b60-71dd-636d-1e451e664c55@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Hankland,
 
-On 2020/2/24 =E4=B8=8B=E5=8D=882:14, Harpreet Singh Anand wrote:
-> Is there a plan to add an API in vDPA_config_ops for getting the notifi=
-cation area from the VDPA device (something similar to get_notify_area in=
- the VDPA DPDK case)? This will make the notifications from the guest  (v=
-host_vdpa use case) to the VDPA device more efficient - at least for virt=
-io 1.0+ drivers in the VM.
->
-> I believe this would require enhancement to the vhost ioctl (something =
-similar to the  VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG).
+On 2020/2/22 15:34, Paolo Bonzini wrote:
+> On 22/02/20 03:34, Eric Hankland wrote:
+>> The sample_period of a counter tracks when that counter will
+>> overflow and set global status/trigger a PMI. However this currently
+>> only gets set when the initial counter is created or when a counter is
+>> resumed; this updates the sample period after a wrmsr so running
+>> counters will accurately reflect their new value.
+>>
+>> Signed-off-by: Eric Hankland <ehankland@google.com>
+>> ---
+>>   arch/x86/kvm/pmu.c           | 4 ++--
+>>   arch/x86/kvm/pmu.h           | 8 ++++++++
+>>   arch/x86/kvm/vmx/pmu_intel.c | 6 ++++++
+>>   3 files changed, 16 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+>> index bcc6a73d6628..d1f8ca57d354 100644
+>> --- a/arch/x86/kvm/pmu.c
+>> +++ b/arch/x86/kvm/pmu.c
+>> @@ -111,7 +111,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>>   		.config = config,
+>>   	};
+>>   
+>> -	attr.sample_period = (-pmc->counter) & pmc_bitmask(pmc);
+>> +	attr.sample_period = get_sample_period(pmc, pmc->counter);
+>>   
+>>   	if (in_tx)
+>>   		attr.config |= HSW_IN_TX;
+>> @@ -158,7 +158,7 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
+>>   
+>>   	/* recalibrate sample period and check if it's accepted by perf core */
+>>   	if (perf_event_period(pmc->perf_event,
+>> -			(-pmc->counter) & pmc_bitmask(pmc)))
+>> +			      get_sample_period(pmc, pmc->counter)))
+>>   		return false;
+>>   
+>>   	/* reuse perf_event to serve as pmc_reprogram_counter() does*/
+>> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+>> index 13332984b6d5..354b8598b6c1 100644
+>> --- a/arch/x86/kvm/pmu.h
+>> +++ b/arch/x86/kvm/pmu.h
+>> @@ -129,6 +129,15 @@ static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, u32 msr)
+>>   	return NULL;
+>>   }
+>>   
+>> +static inline u64 get_sample_period(struct kvm_pmc *pmc, u64 counter_value)
+>> +{
+>> +	u64 sample_period = (-counter_value) & pmc_bitmask(pmc);
+>> +
+>> +	if (!sample_period)
+>> +		sample_period = pmc_bitmask(pmc) + 1;
+>> +	return sample_period;
+>> +}
+>> +
+>>   void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel);
+>>   void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int fixed_idx);
+>>   void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
+>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>> index fd21cdb10b79..e933541751fb 100644
+>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>> @@ -263,9 +263,15 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>   			if (!msr_info->host_initiated)
+>>   				data = (s64)(s32)data;
+>>   			pmc->counter += data - pmc_read_counter(pmc);
+>> +			if (pmc->perf_event)
+>> +				perf_event_period(pmc->perf_event,
+>> +						  get_sample_period(pmc, data));
+>>   			return 0;
+>>   		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
+>>   			pmc->counter += data - pmc_read_counter(pmc);
+>> +			if (pmc->perf_event)
+>> +				perf_event_period(pmc->perf_event,
+>> +						  get_sample_period(pmc, data));
+>>   			return 0;
+>>   		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
+>>   			if (data == pmc->eventsel)
 
+Although resetting the running counters is allowed,
+it is not recommended to do it.
 
-Yes, we plan to add that on top. Basically, here's what we plan to do:=20
-(sorted by urgency)
+The motivation of this patch looks good to me.
 
-1) direct doorbell mapping as you asked here
-2) direct interrupt injection (when platform support, e.g through posted=20
-interrupt)
-3) control virtqueue support
+However, it does hurt performance due to more frequent calls to 
+perf_event_period() and we just took the perf_event_ctx_lock in the 
+perf_event_read_value().
 
-Thanks
+Thanks,
+Like Xu
 
-
->
->
-> Regards,
-> Harpreet
->
+>>
+> 
+> Queued, thanks.
+> 
+> Paolo
+> 
 
