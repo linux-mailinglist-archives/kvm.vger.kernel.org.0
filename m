@@ -2,71 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4FF5169C04
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 02:54:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 425E3169C3B
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 03:13:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727177AbgBXByY convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 23 Feb 2020 20:54:24 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2971 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727151AbgBXByX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 Feb 2020 20:54:23 -0500
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.57])
-        by Forcepoint Email with ESMTP id 354D02C6F0AA26C3EABB;
-        Mon, 24 Feb 2020 09:54:21 +0800 (CST)
-Received: from dggeme702-chm.china.huawei.com (10.1.199.98) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 24 Feb 2020 09:54:20 +0800
-Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
- dggeme702-chm.china.huawei.com (10.1.199.98) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Mon, 24 Feb 2020 09:54:20 +0800
-Received: from dggeme753-chm.china.huawei.com ([10.7.64.70]) by
- dggeme753-chm.china.huawei.com ([10.7.64.70]) with mapi id 15.01.1713.004;
- Mon, 24 Feb 2020 09:54:20 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
+        id S1727183AbgBXCND (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Feb 2020 21:13:03 -0500
+Received: from mga06.intel.com ([134.134.136.31]:24747 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727151AbgBXCND (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Feb 2020 21:13:03 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Feb 2020 18:13:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,478,1574150400"; 
+   d="scan'208";a="255437173"
+Received: from lxy-dell.sh.intel.com ([10.239.13.109])
+  by orsmga002.jf.intel.com with ESMTP; 23 Feb 2020 18:13:00 -0800
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-CC:     "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH] KVM: X86: eliminate some meaningless code
-Thread-Topic: [PATCH] KVM: X86: eliminate some meaningless code
-Thread-Index: AdXqtTmC+rut2bDwRPO7k/XEvhn+sQ==
-Date:   Mon, 24 Feb 2020 01:54:19 +0000
-Message-ID: <ddaeeccac5664e2a9ba570952585a474@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.158]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH 0/2] KVM: VMX: Use basic exit reason for cheking and indexing
+Date:   Mon, 24 Feb 2020 10:07:49 +0800
+Message-Id: <20200224020751.1469-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> wrote:
->On 21/02/20 16:23, Sean Christopherson wrote:
->> 
->> I'm guessing no VMM actually uses this ioctl(), e.g. neither Qemu or 
->> CrosVM use it, which is why the broken behavior has gone unnoticed.  
->> Don't suppose you'd want to write a selftest to hammer KVM_{SET,GET}_CPUID2?
->> 
->
->I would just drop KVM_GET_CPUID2 altogether and see if someone complains.
->
+Current KVM directly uses the whole 32-bit EXIT REASON when
+1) checking: if (vmx->exit_reason == EXIT_REASON_*)
+2) indexing: kvm_vmx_exit_handlers[exit_reason]
 
-Will do. Thanks.
+However, only the low 16-bit of EXIT REASON serves as basic Exit Reason.
+Fix it by using the 16-bit basic exit reason.
+
+BTW, I'm not sure if it's necessary to split nested case into a seperate
+patch.
+
+Xiaoyao Li (2):
+  kvm: vmx: Use basic exit reason to check if it's the specific VM EXIT
+  kvm: nvmx: Use basic(exit_reason) when checking specific EXIT_REASON
+
+ arch/x86/kvm/vmx/nested.c |  6 +++---
+ arch/x86/kvm/vmx/nested.h |  2 +-
+ arch/x86/kvm/vmx/vmx.c    | 44 ++++++++++++++++++++-------------------
+ arch/x86/kvm/vmx/vmx.h    |  2 ++
+ 4 files changed, 29 insertions(+), 25 deletions(-)
+
+-- 
+2.23.0
 
