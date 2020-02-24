@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40C0E16A83E
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 15:24:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42E7C16A8B9
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 15:45:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727640AbgBXOYP convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Feb 2020 09:24:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38416 "EHLO mail.kernel.org"
+        id S1727359AbgBXOoQ convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Feb 2020 09:44:16 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54404 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727483AbgBXOYO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 09:24:14 -0500
+        id S1726762AbgBXOoQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 09:44:16 -0500
 From:   bugzilla-daemon@bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     kvm@vger.kernel.org
 Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
  pointer dereference" and crashes
-Date:   Mon, 24 Feb 2020 14:24:13 +0000
+Date:   Mon, 24 Feb 2020 14:44:15 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -25,14 +25,14 @@ X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: bonzini@gnu.org
+X-Bugzilla-Who: suravee.suthikulpanit@amd.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-206579-28872-q23xwlSr23@https.bugzilla.kernel.org/>
+Message-ID: <bug-206579-28872-BANWpyiHQJ@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
 References: <bug-206579-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -47,8 +47,18 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=206579
 
---- Comment #9 from Paolo Bonzini (bonzini@gnu.org) ---
-Suravee, isn't that the same patch I asked about in comment 6?
+--- Comment #10 from Suravee Suthikulpanit (suravee.suthikulpanit@amd.com) ---
+(In reply to Paolo Bonzini from comment #9)
+> Suravee, isn't that the same patch I asked about in comment 6?
+
+Hm.. You are right. It is the same. Sorry for duplication. 
+
+However, I actually tested this patch and it fixed the issue reported by
+Muncrief with the same call trace signature.
+
+Let me look more into this then.
+
+Suravee
 
 -- 
 You are receiving this mail because:
