@@ -2,163 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E5CD16ADA1
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 18:36:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A35A716ADB0
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 18:38:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728011AbgBXRgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 12:36:09 -0500
-Received: from foss.arm.com ([217.140.110.172]:40596 "EHLO foss.arm.com"
+        id S1727421AbgBXRiy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 12:38:54 -0500
+Received: from mga03.intel.com ([134.134.136.65]:26531 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727259AbgBXRgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 12:36:09 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32EA01FB;
-        Mon, 24 Feb 2020 09:36:08 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA37A3F703;
-        Mon, 24 Feb 2020 09:36:06 -0800 (PST)
-Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Andrew Jones <drjones@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>, yzt356@gmail.com,
-        jmattson@google.com, Paolo Bonzini <pbonzini@redhat.com>,
-        namit@vmware.com, sean.j.christopherson@intel.com,
-        Basil Eljuse <Basil.Eljuse@arm.com>
-References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
- <c82f4386-702f-a2e9-a4d7-d5ebb1f335d1@arm.com>
- <20200224133818.gtxtrmzo4y4guk4z@kamzik.brq.redhat.com>
- <adf05c0d-6a19-da06-5e41-da63b0d0d8d8@arm.com>
- <20200224145936.mzpwveaoijjmb5ql@kamzik.brq.redhat.com>
- <CA+G9fYvt2LyqU5G2j_EFKzgPXzt8sDYYm8NxP+zD6Do07REsYw@mail.gmail.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <7b9209be-f880-a791-a2b9-c7e98bf05ecd@arm.com>
-Date:   Mon, 24 Feb 2020 17:36:05 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727108AbgBXRiy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 12:38:54 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Feb 2020 09:38:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,480,1574150400"; 
+   d="scan'208";a="409945745"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 24 Feb 2020 09:38:53 -0800
+Date:   Mon, 24 Feb 2020 09:38:53 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Jay Zhou <jianjay.zhou@huawei.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, wangxinxin.wang@huawei.com,
+        weidong.huang@huawei.com, liu.jinsong@huawei.com
+Subject: Re: [PATCH v3] KVM: x86: enable dirty log gradually in small chunks
+Message-ID: <20200224173853.GF29865@linux.intel.com>
+References: <20200224032558.2728-1-jianjay.zhou@huawei.com>
+ <20200224170538.GH37727@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <CA+G9fYvt2LyqU5G2j_EFKzgPXzt8sDYYm8NxP+zD6Do07REsYw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200224170538.GH37727@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Mon, Feb 24, 2020 at 12:05:38PM -0500, Peter Xu wrote:
+> On Mon, Feb 24, 2020 at 11:25:58AM +0800, Jay Zhou wrote:
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 3be25ec..0deb8c3 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -7201,7 +7201,8 @@ static void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu)
+> >  static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+> >  				     struct kvm_memory_slot *slot)
+> >  {
+> > -	kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+> > +	if (!kvm_manual_dirty_log_init_set(kvm))
+> > +		kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+> >  	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);
+> >  }
+> >  
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index fb5d64e..f816940 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -9956,7 +9956,7 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+> >  {
+> >  	/* Still write protect RO slot */
+> >  	if (new->flags & KVM_MEM_READONLY) {
+> > -		kvm_mmu_slot_remove_write_access(kvm, new);
+> > +		kvm_mmu_slot_remove_write_access(kvm, new, PT_PAGE_TABLE_LEVEL);
+> >  		return;
+> >  	}
+> >  
+> > @@ -9993,8 +9993,20 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+> >  	if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+> >  		if (kvm_x86_ops->slot_enable_log_dirty)
+> >  			kvm_x86_ops->slot_enable_log_dirty(kvm, new);
+> > -		else
+> > -			kvm_mmu_slot_remove_write_access(kvm, new);
+> > +		else {
 
-On 2/24/20 4:55 PM, Naresh Kamboju wrote:
-> On Mon, 24 Feb 2020 at 20:29, Andrew Jones <drjones@redhat.com> wrote:
->> On Mon, Feb 24, 2020 at 01:47:44PM +0000, Alexandru Elisei wrote:
->>> Hi,
->>>
->>> On 2/24/20 1:38 PM, Andrew Jones wrote:
->>>> On Mon, Feb 24, 2020 at 01:21:23PM +0000, Alexandru Elisei wrote:
->>>>> Hi Naresh,
->>>>>
->>>>> On 2/24/20 12:53 PM, Naresh Kamboju wrote:
->>>>>> [Sorry for the spam]
->>>>>>
->>>>>> Greeting from Linaro !
->>>>>> We are running kvm-unit-tests on our CI Continuous Integration and
->>>>>> testing on x86_64 and arm64 Juno-r2.
->>>>>> Linux stable branches and Linux mainline and Linux next.
->>>>>>
->>>>>> Few tests getting fail and skipped, we are interested in increasing the
->>>>>> test coverage by adding required kernel config fragments,
->>>>>> kernel command line arguments and user space tools.
->>>>>>
->>>>>> Your help is much appreciated.
->>>>>>
->>>>>> Here is the details of the LKFT kvm unit test logs,
->>>>>>
->>>>>> [..]
->>>>> I am going to comment on the arm64 tests. As far as I am aware, you don't need any
->>>>> kernel configs to run the tests.
-> Thanks for the confirmation on Kconfig part for arm64.
-> The next question is, How to enable and run nested virtual testing ?
+Braces need to be added to the "if" part as well.
 
-There's not support in KVM to run nested guests (yet [1]) and no support in
-kvm-unit-tests to run at EL2 (yet [2]) and no hardware that has supported for
-nested virtualization (yet).
+> > +			int level = kvm_manual_dirty_log_init_set(kvm) ?
+> > +				PT_DIRECTORY_LEVEL : PT_PAGE_TABLE_LEVEL;
+> > +
+> > +			/*
+> > +			 * If we're with initial-all-set, we don't need
+> > +			 * to write protect any small page because
+> > +			 * they're reported as dirty already.  However
+> > +			 * we still need to write-protect huge pages
+> > +			 * so that the page split can happen lazily on
+> > +			 * the first write to the huge page.
+> > +			 */
+> > +			kvm_mmu_slot_remove_write_access(kvm, new, level);
+> > +		}
+> >  	} else {
+> >  		if (kvm_x86_ops->slot_disable_log_dirty)
+> >  			kvm_x86_ops->slot_disable_log_dirty(kvm, new);
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index e89eb67..80ada94 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -360,6 +360,13 @@ static inline unsigned long *kvm_second_dirty_bitmap(struct kvm_memory_slot *mem
+> >  	return memslot->dirty_bitmap + len / sizeof(*memslot->dirty_bitmap);
+> >  }
+> >  
+> > +#define KVM_DIRTY_LOG_MANUAL_PROTECT2 (1 << 0)
+> > +#define KVM_DIRTY_LOG_INITIALLY_SET (1 << 1)
+> > +#define KVM_DIRTY_LOG_MANUAL_CAPS (KVM_DIRTY_LOG_MANUAL_PROTECT2 | \
+> > +				KVM_DIRTY_LOG_INITIALLY_SET)
+> > +
+> > +bool kvm_manual_dirty_log_init_set(struct kvm *kvm);
 
-[1] https://www.spinics.net/lists/arm-kernel/msg784744.html
-[2] https://www.spinics.net/lists/kvm/msg203527.html
->
->>>>> From looking at the java log [1], I can point out a few things:
->>>>>
->>>>> - The gicv3 tests are failing because Juno has a gicv2 and the kernel refuses to
->>>>> create a virtual gicv3. It's normal.
-> Got it.
-> Because of heterogeneous big.LITTLE CPU architecture of Juno device caused
-> test hang and "taskset -c 0 ./run_tests.sh -a -v -t " solved this problem.
+For me, INITIALLY_SET is awkward and confusing, e.g. IMO it's not at all
+obvious that kvm_manual_dirty_log_init_set() is a simple accessor.
 
-KVM doesn't normally care about big.little configurations, and kvm-unit-tests
-definitely doesn't do anything that is specific to a certain microarchitecture. I
-would say something else is wrong here. I'll try and reproduce it on my Juno when
-I get the time, but that might not happen until next week. Can you trigger this
-behaviour every run?
+Would something like KVM_DIRTY_LOG_START_DIRTY still be accurate?
 
->
->>>> Yup
-> timers test is intermittent failure due to timeout on the CPU 0 which
-> is configured
-> as LITTLE cpu cortext a53. If i change test to run on big CPU then it
-> always PASS.
-> "taskset -c $BIG_CPU_ID ./run_tests.sh -a -v -t"
-
-This might just be an unfortunate mix of events and kernel scheduling decisions
-for the VCPU thread that is causing an unexpected delay in receiving timer
-interrupts. Hard to know without a log.
-
->
->>>>> - I am not familiar with the PMU test, so I cannot help you with that.
->>>> Where is the output from running the PMU test? I didn't see it in the link
->>>> below.
->>> It's toward the end, it just says that 2 tests failed:
->> If the test runner isn't capturing all the output of the tests somewhere,
->> then it should. Naresh, is the pmu.log file somewhere?
-> For more detail I have shared LAVA log [1] and attached detail run output.
->
-> timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
-> -nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
-> virtio-serial-device -device virtconsole,chardev=ctd -chardev
-> testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
-> arm/pmu.flat -smp 1 # -initrd /tmp/tmp.ZJ05lRvgc4
-> INFO: PMU version: 3
-> INFO: pmu: PMU implementer/ID code/counters: 0x41(\"A\")/0x3/6
-> PASS: pmu: Control register
-> Read 0 then 0.
-> FAIL: pmu: Monotonically increasing cycle count
-> instrs : cycles0 cycles1 ...
-> 4:    0
-> cycles not incrementing!
-> FAIL: pmu: Cycle/instruction ratio
-> SUMMARY: 3 tests, 2 unexpected failures
-
-This when running the tests with taskset, right?
-
-> [..]
-> timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
-> -nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
-> virtio-serial-device -device virtconsole,chardev=ctd -chardev
-> testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
-> arm/micro-bench.flat -smp 2 # -initrd /tmp/tmp.urqlMsBpJd
-> Timer Frequency 50000000 Hz (Output in microseconds)
-> name                                    total ns                         avg ns
-> --------------------------------------------------------------------------------------------
-> hvc                                 296915440.0                         4530.0
-> mmio_read_user                     1322325100.0                        20177.0
-> mmio_read_vgic                      462255460.0                         7053.0
-> eoi                                   6779880.0                          103.0
-> qemu-system-aarch64: terminating on signal 15 from pid 3097 (timeout)
->
-> [..]
-
-I think this is because you are running it on one physical CPU (it's exactly the
-same message I am getting when I use taskset to run the tests). Can you try and
-run it without taskset and see if it solves your issue?
-
-Thanks,
-Alex
+> > +
+> >  struct kvm_s390_adapter_int {
+> >  	u64 ind_addr;
+> >  	u64 summary_addr;
+> > @@ -493,7 +500,7 @@ struct kvm {
+> >  #endif
+> >  	long tlbs_dirty;
+> >  	struct list_head devices;
+> > -	bool manual_dirty_log_protect;
+> > +	u64 manual_dirty_log_protect;
+> >  	struct dentry *debugfs_dentry;
+> >  	struct kvm_stat_data **debugfs_stat_data;
+> >  	struct srcu_struct srcu;
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 70f03ce..0ffb804 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -858,11 +858,17 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
+> >  	return 0;
+> >  }
+> >  
+> > +bool kvm_manual_dirty_log_init_set(struct kvm *kvm)
+> > +{
+> > +	return kvm->manual_dirty_log_protect & KVM_DIRTY_LOG_INITIALLY_SET;
+> > +}
+> 
+> Nit: this can be put into kvm_host.h as inlined.
