@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 016FE16AFE0
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 20:00:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC83E16AFF2
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 20:06:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727483AbgBXTA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 14:00:56 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42148 "EHLO
+        id S1726838AbgBXTGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 14:06:06 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39727 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727440AbgBXTA4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 Feb 2020 14:00:56 -0500
+        by vger.kernel.org with ESMTP id S1726216AbgBXTGG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Feb 2020 14:06:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582570855;
+        s=mimecast20190719; t=1582571164;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=becHdQoThPZufwyKtNUjo7M0YrNWBJiyTxkYprvq54w=;
-        b=ECbhCGfqbL+Xrg+PA1sRK6pRF882i4xCIZFODsqm4UEGIJ7i/fyZTwD9yGnxb/F377fPz8
-        HoyD2Tc0zO5lrEfAtR1crAl5R292W5IFyzAVlSY2ZDVO6UkkUsEZUEF4EcZMD0x3uMnA5M
-        RZeZENaMC9OsESixB4Bp/YAu6Tki0uc=
+        bh=9YLp5yPB9mueh17xU3o5x9F88iAr2QvOt9tGRKzZBUw=;
+        b=f1Rb/EAkaFIXYhxqcjO5pflq0sfK+9YBvs9nk6Bzn0r6KE5hRq8wX312MSeTMe52vQHWHX
+        SVFbpWK+fDoDZFl87VioGDzA9A2of9/ILIK1rcGTRfiVxlpYyDWVTLas9cchjqM2Nu3aCe
+        SxR0TsDJwvnIXDvoJ6jxDQrA36ruMNU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-lUoMiyKyOWG4GAlDebQBNQ-1; Mon, 24 Feb 2020 14:00:50 -0500
-X-MC-Unique: lUoMiyKyOWG4GAlDebQBNQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-180-4TXvKawAMHinxXTuEvs5zQ-1; Mon, 24 Feb 2020 14:05:59 -0500
+X-MC-Unique: 4TXvKawAMHinxXTuEvs5zQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7550C800D5A;
-        Mon, 24 Feb 2020 19:00:48 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B55213E2;
+        Mon, 24 Feb 2020 19:05:58 +0000 (UTC)
 Received: from [10.36.116.78] (ovpn-116-78.ams2.redhat.com [10.36.116.78])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 268D790092;
-        Mon, 24 Feb 2020 19:00:45 +0000 (UTC)
-Subject: Re: [PATCH v4 22/36] KVM: s390: protvirt: STSI handling
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 157CF1CB;
+        Mon, 24 Feb 2020 19:05:55 +0000 (UTC)
+Subject: Re: [PATCH v4 28/36] KVM: s390: protvirt: Report CPU state to
+ Ultravisor
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.vnet.ibm.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
@@ -45,7 +46,7 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>
 References: <20200224114107.4646-1-borntraeger@de.ibm.com>
- <20200224114107.4646-23-borntraeger@de.ibm.com>
+ <20200224114107.4646-29-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,16 +92,16 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <8fa8ebf6-ceed-940f-9ae2-e146c241ccb6@redhat.com>
-Date:   Mon, 24 Feb 2020 20:00:45 +0100
+Message-ID: <3c653e60-5ef4-4b81-3bbd-4d72144b9d0b@redhat.com>
+Date:   Mon, 24 Feb 2020 20:05:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200224114107.4646-23-borntraeger@de.ibm.com>
+In-Reply-To: <20200224114107.4646-29-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -109,59 +110,56 @@ X-Mailing-List: kvm@vger.kernel.org
 On 24.02.20 12:40, Christian Borntraeger wrote:
 > From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> Save response to sidad and disable address checking for protected
-> guests.
+> VCPU states have to be reported to the ultravisor for SIGP
+> interpretation, kdump, kexec and reboot.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
 > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > [borntraeger@de.ibm.com: patch merging, splitting, fixing]
 > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/kvm/priv.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index ed52ffa8d5d4..69a824f9ef0b 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -2,7 +2,7 @@
->  /*
->   * handling privileged instructions
->   *
-> - * Copyright IBM Corp. 2008, 2018
-> + * Copyright IBM Corp. 2008, 2020
->   *
->   *    Author(s): Carsten Otte <cotte@de.ibm.com>
->   *               Christian Borntraeger <borntraeger@de.ibm.com>
-> @@ -872,7 +872,7 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->  
->  	operand2 = kvm_s390_get_base_disp_s(vcpu, &ar);
->  
-> -	if (operand2 & 0xfff)
-> +	if (!kvm_s390_pv_cpu_is_protected(vcpu) && (operand2 & 0xfff))
->  		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
->  
->  	switch (fc) {
-> @@ -893,8 +893,13 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->  		handle_stsi_3_2_2(vcpu, (void *) mem);
->  		break;
->  	}
-> -
-> -	rc = write_guest(vcpu, operand2, ar, (void *)mem, PAGE_SIZE);
-> +	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
-> +		memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
-> +		       PAGE_SIZE);
-> +		rc = 0;
-> +	} else {
-> +		rc = write_guest(vcpu, operand2, ar, (void *)mem, PAGE_SIZE);
-> +	}
->  	if (rc) {
->  		rc = kvm_s390_inject_prog_cond(vcpu, rc);
->  		goto out;
-> 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+[...]
+
+>  
+> -void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+> +int kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>  {
+> -	int i, online_vcpus, started_vcpus = 0;
+> +	int i, online_vcpus, r = 0, started_vcpus = 0;
+>  	struct kvm_vcpu *started_vcpu = NULL;
+>  
+>  	if (is_vcpu_stopped(vcpu))
+> -		return;
+> +		return 0;
+>  
+>  	trace_kvm_s390_vcpu_start_stop(vcpu->vcpu_id, 0);
+>  	/* Only one cpu at a time may enter/leave the STOPPED state. */
+> @@ -4501,6 +4509,9 @@ void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>  	kvm_s390_clear_stop_irq(vcpu);
+>  
+>  	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
+> +	/* Let's tell the UV that we successfully stopped the vcpu */
+> +	if (kvm_s390_pv_cpu_is_protected(vcpu))
+> +		r = kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_STP);
+>  	__disable_ibs_on_vcpu(vcpu);
+>  
+>  	for (i = 0; i < online_vcpus; i++) {
+> @@ -4519,7 +4530,7 @@ void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	spin_unlock(&vcpu->kvm->arch.start_stop_lock);
+> -	return;
+> +	return r;
+>  }
+
+So... you stopped the CPU, the UV call failed, and you'll return an
+error. But you did stop the CPU. What is user space expected to do with
+that error?
+
+After all, it can't retrigger a STOP, due to if (is_vcpu_stopped(vcpu)).
+Same applies to the start path.
+
 
 -- 
 Thanks,
