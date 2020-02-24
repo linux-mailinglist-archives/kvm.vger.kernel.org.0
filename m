@@ -2,146 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 375B316B21D
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 22:22:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 978F616B28E
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 22:33:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727825AbgBXVWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 16:22:38 -0500
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:41845 "EHLO
-        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727703AbgBXVWh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 16:22:37 -0500
-Received: by mail-yw1-f66.google.com with SMTP id l22so5914675ywc.8
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2020 13:22:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=6PxC0BCfbx3csMqVviwI+8pCKIZ0mnMxq1BJVToobLM=;
-        b=eDCixjPg1Cj4kONZfEo6D2XdR/wX18fyuyJQMzSwr7LhoDss1pqjcv+8QXOor7g4/m
-         gv34ckOefr7VDnkKwMIwVF0e+C21L5t3nuf5ehmZe/UVNzExqRtbfOMTb6gVLaHpAOys
-         gbbZe5p5dib1x4ZI8LDSHdurHAe5yoxLkmhPyjh7q5b6FSYWFIC0vJY1s96JvOjANNrH
-         Elgfz+7a+0eD9H15AYsAoU0HV4pTlgH0H3Gg1guHvvP0oh+HxvpPUL4c00OTHDogzAdn
-         1AyDSXNkZalM3xV+z3yXqEoWeF/rFVqtEqt2vQH6GmogLVQq8zny6D0wJDO8JaTSwLOB
-         sSXA==
+        id S1728011AbgBXVdl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 16:33:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53069 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726980AbgBXVdl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 16:33:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582580019;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=c8+XmMTcQu9NRSgMktjQy1xQLejdPrZ1ttEMyUDWp7M=;
+        b=UYKvzaCa8066Drs2LbR8nopYGQUdmI983Yd541jbzPS3MH+Ls2jcCnxrwThNICA4qFCxzp
+        KagtaqMH0F63lZF7dY9rWNBkM8T7O9x9tVs9QI0XGXbv+eF+/q3+2H0tVM8Q9s+hRxkYTo
+        9T457KU5S0Mfkjor9V01G4fzlTKxczo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-416-V-TQwYAIOCaYncEzXOaLXg-1; Mon, 24 Feb 2020 16:33:38 -0500
+X-MC-Unique: V-TQwYAIOCaYncEzXOaLXg-1
+Received: by mail-wr1-f71.google.com with SMTP id m15so6172018wrs.22
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2020 13:33:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=6PxC0BCfbx3csMqVviwI+8pCKIZ0mnMxq1BJVToobLM=;
-        b=NS7QWSI6qbl6pzj84SQjeBi4LQDB4crUwqe4/dxd0C9wvP198NNMBy/1fUz+AWtbZz
-         mttqC1ac0ufUN5F2r476K86WRUlf4GgbrjBMVhr401pbltrbQTGUBNo5U+12eikEznAb
-         VhaqOzzTfXNW+yfX1ovbMu2nNwX96eRfXdWvqvmPMEnrXV/qyo4MNw+mARNBhl/Pq/AK
-         Zj7eGEM9eFYur/HeSHkUHONP4qZXbr/hHkUl1TGL2iZTaRkcTOM21bboxJ8+5LbCbIRB
-         eRGiMqpdpfGGOFryskjzDUej3FSbpB2JEtTMiASgQMFMIzzrpuEO0wVFWHT/rRZmPvD+
-         EJIw==
-X-Gm-Message-State: APjAAAVt38k8lpdNRQqv5L2ZwWpBo1S78bc87USDBoVArk1BW4OOwldR
-        61f5BF3gEL8GmUiuzyYXrR0B7Q==
-X-Google-Smtp-Source: APXvYqytWobHp3Rn6vYl4RGK5uX33Jz9ESjlJh0QQ1hVIhs+T9MfhBF9zAEgBwfjApYbDWUOpNLOnw==
-X-Received: by 2002:a0d:d9d4:: with SMTP id b203mr45497957ywe.297.1582579356337;
-        Mon, 24 Feb 2020 13:22:36 -0800 (PST)
-Received: from localhost (c-75-72-120-152.hsd1.mn.comcast.net. [75.72.120.152])
-        by smtp.gmail.com with ESMTPSA id o127sm132931ywf.43.2020.02.24.13.22.34
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=c8+XmMTcQu9NRSgMktjQy1xQLejdPrZ1ttEMyUDWp7M=;
+        b=nF+XHWdy3ETLafUeBTDqfK2CPdTeZm52+PN+t7R7Sgs4+n6EFKBcHvVd/w3rwZ8xmb
+         /nDpgZNg4jfoqxHIUvz5Z0Pb4ahfmA/ZWKPswC8r1oQ0YmBjiis/5pfyijvqwUZqvmOR
+         9prPvKDU+om5fVeXNw5yWlCYSly2yct4MP5cw4elIoYQQ7uIb76I++wrgtxEOxnZbckU
+         SOwV5C6FFH1yK6Wee4YnlvHrmVTwL1yjooyguWP+lLm9kCM4xvAHQvihU1U7yvyuSSWb
+         /LAdUUu+lQDj6eUXa/l5GfRj+E+xkFgGru7FpiYVHx8ZWsb2LW+nf5BfWD3JJV1qQ935
+         9ZJw==
+X-Gm-Message-State: APjAAAXHU/lReGxm1fLHDlR2slfXWLie0FEvC1s1WegWjTF+Wk+D94FK
+        rIsqfuJHpE9JfyXputGgh+UXvqJsF7tnmi3tLsxekUmwwpiTFRSnhYHvonYtCsX/idTOoTzVWtN
+        IlS7NsIsVbdir
+X-Received: by 2002:a1c:2b44:: with SMTP id r65mr963811wmr.72.1582580016824;
+        Mon, 24 Feb 2020 13:33:36 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwhJwlnq6aBlscqWEwyDJc0FvxuLMx0zkO0HNxZHKJdkV1VLwBYu8uFo3PsO3iYz3LrtvhQ6Q==
+X-Received: by 2002:a1c:2b44:: with SMTP id r65mr963789wmr.72.1582580016516;
+        Mon, 24 Feb 2020 13:33:36 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id y8sm1002966wma.10.2020.02.24.13.33.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2020 13:22:35 -0800 (PST)
-Date:   Mon, 24 Feb 2020 15:22:34 -0600
-From:   Dan Rue <dan.rue@linaro.org>
+        Mon, 24 Feb 2020 13:33:35 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Andrew Jones <drjones@redhat.com>,
-        kvm list <kvm@vger.kernel.org>, yzt356@gmail.com,
-        lkft-triage@lists.linaro.org, namit@vmware.com,
-        Basil Eljuse <Basil.Eljuse@arm.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        jmattson@google.com
-Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
-Message-ID: <20200224212234.m4gqvgxoqj3elni2@xps.therub.org>
-References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
- <b0b69234-b971-6162-9a7c-afb42fa2b581@redhat.com>
- <CA+G9fYu3RgTJ8BM3Js3_gUbhxFJrY6QTJR-ApNQtwFh+Ci0q8Q@mail.gmail.com>
- <20200224173033.GE29865@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 39/61] KVM: SVM: Convert feature updates from CPUID to KVM cpu caps
+In-Reply-To: <20200201185218.24473-40-sean.j.christopherson@intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-40-sean.j.christopherson@intel.com>
+Date:   Mon, 24 Feb 2020 22:33:34 +0100
+Message-ID: <87eeujoekx.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200224173033.GE29865@linux.intel.com>
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 24, 2020 at 09:30:33AM -0800, Sean Christopherson wrote:
-> On Mon, Feb 24, 2020 at 10:36:54PM +0530, Naresh Kamboju wrote:
-> > Hi Paolo,
-> > 
-> > On Mon, 24 Feb 2020 at 18:36, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > >
-> > > On 24/02/20 13:53, Naresh Kamboju wrote:
-> > > > FAIL  vmx (408624 tests, 3 unexpected failures, 2 expected
-> > > > failures, 5 skipped)
-> > >
-> > > This could be fixed in a more recent kernel.
-> > 
-> > I will keep running these tests on most recent kernels.
-> > 
-> > My two cents,
-> > OTOH, It would be great if we have monthly tag release for kvm-unit-tests.
-> > 
-> > LKFT plan to keep track of metadata / release tag version of each test suites
-> > and kernel branches and versions details.
-> > 
-> > Currently LKFT sending out kselftests results test summary on
-> > each linux-next release tag for x86_64, i386, arm and arm64 devices.
-> > 
-> > The next plan is to enable kvm-unit-tests results reporting from LKFT.
-> 
-> Rather than monthly tags, what about tagging a release for each major
-> kernel version?  E.g. for v5.5, v5.6, etc...  That way the compatibility
-> is embedded in the tag itself, i.e. there's no need to cross reference
-> release dates against kernel/KVM releases to figure out why version of
-> kvm-unit-tests should be run.
-> 
-> Paolo more or less agreed to the idea[*], it's just never been implemented.
-> 
-> [*] https://lkml.kernel.org/r/dc5ff4ed-c6dd-74ea-03ae-4f65c5d58073@redhat.com
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-The behavior of kvm in LTS kernels will change over time. In general, as
-I wrote in that original thread as well, we would much prefer to use the
-latest version of kvm-unit-tests against older kernels.
+> Use the recently introduced KVM CPU caps to propagate SVM-only (kernel)
+> settings to supported CPUID flags.
+>
+> Note, setting a flag based on a *different* feature is effectively
+> emulation, and so must be done at runtime via ->set_supported_cpuid().
+>
+> Opportunistically add a technically unnecessary break and fix an
+> indentation issue in svm_set_supported_cpuid().
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/svm.c | 40 +++++++++++++++++++++++-----------------
+>  1 file changed, 23 insertions(+), 17 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 630520f8adfa..f98a192459f7 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -1350,6 +1350,25 @@ static __init void svm_adjust_mmio_mask(void)
+>  	kvm_mmu_set_mmio_spte_mask(mask, mask, PT_WRITABLE_MASK | PT_USER_MASK);
+>  }
+>  
 
-I think this is a valid example (right?): v4.19 (Oct 22 2018) until now
-shows 245 kvm-related patches backported:
+Can we probably add the comment about what can be done here and what
+needs to go to svm_set_supported_cpuid()? (The one about 'emulation'
+from your commit message would do).
 
-    $ git log --oneline v4.19..v4.19.106 | grep -i kvm | wc -l
-    245
+> +static __init void svm_set_cpu_caps(void)
+> +{
+> +	/* CPUID 0x1 */
+> +	if (avic)
+> +		kvm_cpu_cap_clear(X86_FEATURE_X2APIC);
+> +
+> +	/* CPUID 0x80000001 */
+> +	if (nested)
+> +		kvm_cpu_cap_set(X86_FEATURE_SVM);
+> +
+> +	/* CPUID 0x8000000A */
+> +	/* Support next_rip if host supports it */
+> +	if (boot_cpu_has(X86_FEATURE_NRIPS))
+> +		kvm_cpu_cap_set(X86_FEATURE_NRIPS);
 
-Just for curiosity I took a look at patch counts per recent releases,
-and it seems to average around 250 or so. This means that a 6-year
-extended LTS kernel branch will likely receive several releases worth of
-fixes.
+Unrelated to your patch but the way we handle 'nrips' is a bit weird: we
+can disable it with 'nrips' module parameter but L1 hypervisor will get
+it unconditionally.
 
-    $ git log --oneline v5.1..v5.2 | grep -i kvm | wc -l
-    238
-    $ git log --oneline v5.2..v5.3 | grep -i kvm | wc -l
-    239
-    $ git log --oneline v5.3..v5.4 | grep -i kvm | wc -l
-    246
-    $ git log --oneline v5.4..v5.5 | grep -i kvm | wc -l
-    172
+Also, what about all the rest of 0x8000000A.EDX features? Nested SVM
+would appreciate some love... 
 
-Indeed, 4.9 has received almost two releases worth of changes since Dec
-2016, and is scheduled to still be supported until 2023.
+> +
+> +	if (npt_enabled)
+> +		kvm_cpu_cap_set(X86_FEATURE_NPT);
+> +}
+> +
+>  static __init int svm_hardware_setup(void)
+>  {
+>  	int cpu;
+> @@ -1462,6 +1481,8 @@ static __init int svm_hardware_setup(void)
+>  			pr_info("Virtual GIF supported\n");
+>  	}
+>  
+> +	svm_set_cpu_caps();
+> +
+>  	return 0;
+>  
+>  err:
+> @@ -6033,17 +6054,9 @@ static void svm_cpuid_update(struct kvm_vcpu *vcpu)
+>  static void svm_set_supported_cpuid(struct kvm_cpuid_entry2 *entry)
+>  {
+>  	switch (entry->function) {
+> -	case 0x1:
+> -		if (avic)
+> -			cpuid_entry_clear(entry, X86_FEATURE_X2APIC);
+> -		break;
+> -	case 0x80000001:
+> -		if (nested)
+> -			cpuid_entry_set(entry, X86_FEATURE_SVM);
+> -		break;
+>  	case 0x80000008:
+>  		if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
+> -		     boot_cpu_has(X86_FEATURE_AMD_SSBD))
+> +		    boot_cpu_has(X86_FEATURE_AMD_SSBD))
+>  			cpuid_entry_set(entry, X86_FEATURE_VIRT_SSBD);
+>  		break;
+>  	case 0x8000000A:
+> @@ -6053,14 +6066,7 @@ static void svm_set_supported_cpuid(struct kvm_cpuid_entry2 *entry)
+>  		entry->ecx = 0; /* Reserved */
+>  		entry->edx = 0; /* Per default do not support any
+>  				   additional features */
+> -
+> -		/* Support next_rip if host supports it */
+> -		if (boot_cpu_has(X86_FEATURE_NRIPS))
+> -			cpuid_entry_set(entry, X86_FEATURE_NRIPS);
+> -
+> -		/* Support NPT for the guest if enabled */
+> -		if (npt_enabled)
+> -			cpuid_entry_set(entry, X86_FEATURE_NPT);
+> +		break;
+>  	}
+>  }
 
-    $ git log --oneline v4.9..v4.9.214 | grep -i kvm | wc -l
-    387
-
-We would also like to be able to verify the additional test coverage
-that may be added to kvm-unit-tests against older kernels (I assume it's
-not all just new features that tests are added for?)
-
-Dan
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 -- 
-Linaro LKFT
-https://lkft.linaro.org
+Vitaly
+
