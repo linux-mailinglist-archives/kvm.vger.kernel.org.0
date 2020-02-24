@@ -2,99 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A16616A6D2
-	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 14:06:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A387916A6E1
+	for <lists+kvm@lfdr.de>; Mon, 24 Feb 2020 14:08:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727451AbgBXNGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 08:06:19 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26251 "EHLO
+        id S1727664AbgBXNIK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 08:08:10 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32628 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727329AbgBXNGT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 Feb 2020 08:06:19 -0500
+        by vger.kernel.org with ESMTP id S1726778AbgBXNII (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Feb 2020 08:08:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582549578;
+        s=mimecast20190719; t=1582549687;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yLmhaXFq9qnU+powtwGl3ZF8L7l7j/vIv8KeXymnTxo=;
-        b=iTJq7wLB27n01j7zFr/Bo8/bVQm0omOwZgS0+gpoNdJ1+tcpHGmX/+6OC0oRLxuU/v0mbP
-        kndk9Pd2Fn0fFfwRQ1btozd4BWpB9eroGu/r2UyAVQByGTZXS0z7v5r3bIq6wQd+Xx3WGy
-        BDFkPE02Cvc25Mczq8Jx/70AK7ept94=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-VVbSNxWWNIufY1mQDIk43A-1; Mon, 24 Feb 2020 08:06:14 -0500
-X-MC-Unique: VVbSNxWWNIufY1mQDIk43A-1
-Received: by mail-wr1-f69.google.com with SMTP id h4so344086wrp.13
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2020 05:06:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yLmhaXFq9qnU+powtwGl3ZF8L7l7j/vIv8KeXymnTxo=;
-        b=UHMuY+dsRdZccF8y5yo4ASeDpMEBnmjsUhNrulM/0FEmmZAmqleJ1jpK88XdrPinmb
-         Dw4JxMeV/dBzmcrWBCs91rLNZlUG5Q0uef04yHfYW7Jmu6F5HnFpPs/Xw47yp0ZuGjPQ
-         18kEoQKQGE8o/Scc/Zv3rK7YuDDxfK/ATUxhhJDAJHXQlZbyLw5YsLPXPqq+sN7dbVNL
-         Ep+n3ZD1zi85BKFyxyIg8uQU9l6T2D8EvQBbkEkFVmYMVfLRSsOHyiqP9Sge6E9KtQz1
-         WX8biWm2HTxwqcH9JBMOXlXiQ1TfvSlj+E/C23rfZTz8VlopJGM9OP3L5rKkbfwIrDDd
-         0uXA==
-X-Gm-Message-State: APjAAAXYJAhVBbVZAJDSQgsKfKv0RaCu6ZQFfchjpZDBY1Me83TvoBoD
-        wwiZy7DtA56rr2FlRBAdJqRTzVWT3EGknKKvKYoaGVjvGENP5Q0n5I63XWDurIEpD7g6+jkUve7
-        IXbn+DmILXv3K
-X-Received: by 2002:a1c:4c13:: with SMTP id z19mr21756304wmf.75.1582549573340;
-        Mon, 24 Feb 2020 05:06:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwNszRPZTmFvXNqR5FAhlQK3xRk59jChIGRkQ+lE5gH+dc2avcK6QahS2yJd9dGwfTXfTlLtg==
-X-Received: by 2002:a1c:4c13:: with SMTP id z19mr21756269wmf.75.1582549572739;
-        Mon, 24 Feb 2020 05:06:12 -0800 (PST)
-Received: from [192.168.178.40] ([151.21.175.179])
-        by smtp.gmail.com with ESMTPSA id o9sm19006167wrw.20.2020.02.24.05.06.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Feb 2020 05:06:12 -0800 (PST)
-Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, yzt356@gmail.com,
-        jmattson@google.com, namit@vmware.com,
-        sean.j.christopherson@intel.com,
-        Basil Eljuse <Basil.Eljuse@arm.com>,
-        Andrew Jones <drjones@redhat.com>, alexandru.elisei@arm.com
-References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b0b69234-b971-6162-9a7c-afb42fa2b581@redhat.com>
-Date:   Mon, 24 Feb 2020 14:06:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        bh=8hYIHZTnTP03p6Yp4LlShbTvxf4UyOXsFmmyMPgeaYI=;
+        b=ggAX4k2X/nrSgbEhTp+FSzWVvJrMksYG+aQw/fFewmeopr8t5GVMxVo8Ko0zK+ubk8SGlF
+        slcxuKjlsB4HV3HQwEEAPxAoRubW2aGHP3ny957SSRsMQ4nXgMxVuNFfuWmPsz8ZWuE8fb
+        Xrsh5GL39M8Fa5iDWYLTVJ0mm+w/AAE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-463-1KFA4pPFOt-nSzxZ1v6H2w-1; Mon, 24 Feb 2020 08:08:01 -0500
+X-MC-Unique: 1KFA4pPFOt-nSzxZ1v6H2w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A47AB107ACCA;
+        Mon, 24 Feb 2020 13:07:55 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF3FB909E9;
+        Mon, 24 Feb 2020 13:07:44 +0000 (UTC)
+Subject: Re: [RFC PATCH 01/11] vfio: Remove Calxeda XGMAC reset driver
+To:     Rob Herring <robh@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        soc@kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Robert Richter <rrichter@marvell.com>,
+        Jon Loeliger <jdl@jdl.com>, Alexander Graf <graf@amazon.com>,
+        Matthias Brugger <mbrugger@suse.com>,
+        Mark Langsdorf <mlangsdo@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, iommu@lists.linux-foundation.org,
+        James Morse <james.morse@arm.com>,
+        Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+        kvm@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-pm@vger.kernel.org,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        netdev@vger.kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Will Deacon <will@kernel.org>
+References: <20200218171321.30990-1-robh@kernel.org>
+ <20200218171321.30990-2-robh@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <23fda074-149e-9c77-5eee-4d6b591a6ebf@redhat.com>
+Date:   Mon, 24 Feb 2020 14:07:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200218171321.30990-2-robh@kernel.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/02/20 13:53, Naresh Kamboju wrote:
-> [Sorry for the spam]
+Hi Rob, Alex,
+
+On 2/18/20 6:13 PM, Rob Herring wrote:
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+> Do not apply yet.
 > 
-> Greeting from Linaro !
-> We are running kvm-unit-tests on our CI Continuous Integration and
-> testing on x86_64 and arm64 Juno-r2.
-> Linux stable branches and Linux mainline and Linux next.
+>  drivers/vfio/platform/reset/Kconfig           |  8 --
+>  drivers/vfio/platform/reset/Makefile          |  2 -
+>  .../reset/vfio_platform_calxedaxgmac.c        | 74 -------------------
+>  3 files changed, 84 deletions(-)
+>  delete mode 100644 drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
 > 
-> Few tests getting fail and skipped, we are interested in increasing the
-> test coverage by adding required kernel config fragments,
-> kernel command line arguments and user space tools.
+> diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
+> index 1edbe9ee7356..3668d1d92909 100644
+> --- a/drivers/vfio/platform/reset/Kconfig
+> +++ b/drivers/vfio/platform/reset/Kconfig
+> @@ -1,12 +1,4 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+> -config VFIO_PLATFORM_CALXEDAXGMAC_RESET
+> -	tristate "VFIO support for calxeda xgmac reset"
+> -	depends on VFIO_PLATFORM
+> -	help
+> -	  Enables the VFIO platform driver to handle reset for Calxeda xgmac
+> -
+> -	  If you don't know what to do here, say N.
+> -
+>  config VFIO_PLATFORM_AMDXGBE_RESET
+>  	tristate "VFIO support for AMD XGBE reset"
+>  	depends on VFIO_PLATFORM
+> diff --git a/drivers/vfio/platform/reset/Makefile b/drivers/vfio/platform/reset/Makefile
+> index 7294c5ea122e..be7960ce5dbc 100644
+> --- a/drivers/vfio/platform/reset/Makefile
+> +++ b/drivers/vfio/platform/reset/Makefile
+> @@ -1,7 +1,5 @@
+>  # SPDX-License-Identifier: GPL-2.0
+> -vfio-platform-calxedaxgmac-y := vfio_platform_calxedaxgmac.o
+>  vfio-platform-amdxgbe-y := vfio_platform_amdxgbe.o
+> 
+> -obj-$(CONFIG_VFIO_PLATFORM_CALXEDAXGMAC_RESET) += vfio-platform-calxedaxgmac.o
+>  obj-$(CONFIG_VFIO_PLATFORM_AMDXGBE_RESET) += vfio-platform-amdxgbe.o
+>  obj-$(CONFIG_VFIO_PLATFORM_BCMFLEXRM_RESET) += vfio_platform_bcmflexrm.o
+> diff --git a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
+> deleted file mode 100644
+> index 09a9453b75c5..000000000000
+> --- a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
+> +++ /dev/null
+> @@ -1,74 +0,0 @@
+> -// SPDX-License-Identifier: GPL-2.0-only
+> -/*
+> - * VFIO platform driver specialized for Calxeda xgmac reset
+> - * reset code is inherited from calxeda xgmac native driver
+> - *
+> - * Copyright 2010-2011 Calxeda, Inc.
+> - * Copyright (c) 2015 Linaro Ltd.
+> - *              www.linaro.org
+> - */
+> -
+> -#include <linux/module.h>
+> -#include <linux/kernel.h>
+> -#include <linux/init.h>
+> -#include <linux/io.h>
+> -
+> -#include "../vfio_platform_private.h"
+> -
+> -#define DRIVER_VERSION  "0.1"
+> -#define DRIVER_AUTHOR   "Eric Auger <eric.auger@linaro.org>"
+> -#define DRIVER_DESC     "Reset support for Calxeda xgmac vfio platform device"
+> -
+> -/* XGMAC Register definitions */
+> -#define XGMAC_CONTROL           0x00000000      /* MAC Configuration */
+> -
+> -/* DMA Control and Status Registers */
+> -#define XGMAC_DMA_CONTROL       0x00000f18      /* Ctrl (Operational Mode) */
+> -#define XGMAC_DMA_INTR_ENA      0x00000f1c      /* Interrupt Enable */
+> -
+> -/* DMA Control registe defines */
+> -#define DMA_CONTROL_ST          0x00002000      /* Start/Stop Transmission */
+> -#define DMA_CONTROL_SR          0x00000002      /* Start/Stop Receive */
+> -
+> -/* Common MAC defines */
+> -#define MAC_ENABLE_TX           0x00000008      /* Transmitter Enable */
+> -#define MAC_ENABLE_RX           0x00000004      /* Receiver Enable */
+> -
+> -static inline void xgmac_mac_disable(void __iomem *ioaddr)
+> -{
+> -	u32 value = readl(ioaddr + XGMAC_DMA_CONTROL);
+> -
+> -	value &= ~(DMA_CONTROL_ST | DMA_CONTROL_SR);
+> -	writel(value, ioaddr + XGMAC_DMA_CONTROL);
+> -
+> -	value = readl(ioaddr + XGMAC_CONTROL);
+> -	value &= ~(MAC_ENABLE_TX | MAC_ENABLE_RX);
+> -	writel(value, ioaddr + XGMAC_CONTROL);
+> -}
+> -
+> -static int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
+> -{
+> -	struct vfio_platform_region *reg = &vdev->regions[0];
+> -
+> -	if (!reg->ioaddr) {
+> -		reg->ioaddr =
+> -			ioremap(reg->addr, reg->size);
+> -		if (!reg->ioaddr)
+> -			return -ENOMEM;
+> -	}
+> -
+> -	/* disable IRQ */
+> -	writel(0, reg->ioaddr + XGMAC_DMA_INTR_ENA);
+> -
+> -	/* Disable the MAC core */
+> -	xgmac_mac_disable(reg->ioaddr);
+> -
+> -	return 0;
+> -}
+> -
+> -module_vfio_reset_handler("calxeda,hb-xgmac", vfio_platform_calxedaxgmac_reset);
+> -
+> -MODULE_VERSION(DRIVER_VERSION);
+> -MODULE_LICENSE("GPL v2");
+> -MODULE_AUTHOR(DRIVER_AUTHOR);
+> -MODULE_DESCRIPTION(DRIVER_DESC);
+> --
+> 2.20.1
+> 
+I do not have access to this HW anymore and I use Seattle to test
+vfio-platform. So
 
-The remainins SKIPs mostly depend on hardware, for example "svm" only
-runs on AMD machines and "pku" only on more recent Intel processors than
-you have.
+Acked-by: Eric Auger <eric.auger@redhat.com>
 
-> FAIL  vmx (408624 tests, 3 unexpected failures, 2 expected
-> failures, 5 skipped)
+Thanks
 
-This could be fixed in a more recent kernel.
-
-Paolo
+Eric
 
