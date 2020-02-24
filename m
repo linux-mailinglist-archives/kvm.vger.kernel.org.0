@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4199316B4E8
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 00:12:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 698E516B4FE
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 00:20:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727960AbgBXXM2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 18:12:28 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35428 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727721AbgBXXM1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 18:12:27 -0500
+        id S1728010AbgBXXUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 18:20:10 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21843 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727843AbgBXXUJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Feb 2020 18:20:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582585946;
+        s=mimecast20190719; t=1582586408;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Vs3dntWvSoZuKohT+PUhBTZyrkXf/ZjGkKMw3SgzXtU=;
-        b=cSwd29eCR3ZlzaQflWp6QwzXmEXTJfJQw4DDErM7Kv2L9iwV/70SWulXV8IGWRlhNcZJa6
-        h9FJeDZMtASGmvTe4aFviALpXzMMX8NN9zm3AndwMotQghKGm4Wz7w2Fc7hxoj8O5rXHgE
-        JpUAHkgv3Y2mOaZ2+XxMTxw+E7qNzJY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-dyaPUnjGOiOgsPaeOYEUHw-1; Mon, 24 Feb 2020 18:12:25 -0500
-X-MC-Unique: dyaPUnjGOiOgsPaeOYEUHw-1
-Received: by mail-wr1-f69.google.com with SMTP id t3so4555324wrp.2
-        for <kvm@vger.kernel.org>; Mon, 24 Feb 2020 15:12:24 -0800 (PST)
+        bh=3xN9hq90N1oCxmHLczxcJX9jZofURAy8C2m6ZpIZZKs=;
+        b=cKQHMhMnqZKg69DgkLqrXdyHbMTOdgi8DToVxGYzq5/YbPyhTbKMujbjTCqPSWpM3pKNgR
+        NyIWdBv7QW+e99AXKJlwTVPQ23utTC4g6iDDrxZEDEkd3vqBXfQgpzn9K+Z5VpId3aTKWR
+        ajchrLyhtpZHlQnCNVXcb8L21K/9D2I=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-0lQIe_ILNPGMrP8js9XiWw-1; Mon, 24 Feb 2020 18:20:06 -0500
+X-MC-Unique: 0lQIe_ILNPGMrP8js9XiWw-1
+Received: by mail-wm1-f69.google.com with SMTP id y125so289727wmg.1
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2020 15:20:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=Vs3dntWvSoZuKohT+PUhBTZyrkXf/ZjGkKMw3SgzXtU=;
-        b=uNPDxkkPfhlIIdXm5MPvDnYNIL10psbC7T2OwUKBKR18DZfSwG1dsM2ovdGKlilPDe
-         8gpoM1K5nGrWLOhhS9Vvia3hJpzndZFsaiao1P05gp5obpUS3t9pqZ4Pw37FTwJb9wU0
-         Z2qxnwQqNK/H2d8996+yOMCpeyktQNvZTOQoYK7riepdby05gEbvqoCdMYe8Y1wl00df
-         LJ3q1xCW17l522zZqCculgC9vfRcm96n2NmPq6dmKaYvqfjjSKv26SGR1VlE0KqMtXgW
-         YsW9yiktJaVLKI7JuUmglmByMbIDNmmRW3x1m5MJ4XlI0HPPaWarJyYwUt4yDV+Q55+c
-         zCVw==
-X-Gm-Message-State: APjAAAV4vwxALYsEooRKHRfCkoEWCfhzRMkrgTLTN+tOv9VpYlroj+gd
-        xQSwUhSx8PYlPO0WoOeFJtjX3kAFT6JJXxo6hM2QOVBnooKYaRStfPfaCAERj3bNEMiavhAxze9
-        /k6saqPMnURZF
-X-Received: by 2002:a05:600c:34b:: with SMTP id u11mr1238006wmd.69.1582585943916;
-        Mon, 24 Feb 2020 15:12:23 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwgQZ09o1S3AQ6goRcV2RRdIuwUHwSHfgfjMonpALA8g9GRiuIjN7qDVPsCp3yZB1JBAtesqw==
-X-Received: by 2002:a05:600c:34b:: with SMTP id u11mr1237992wmd.69.1582585943720;
-        Mon, 24 Feb 2020 15:12:23 -0800 (PST)
+        bh=3xN9hq90N1oCxmHLczxcJX9jZofURAy8C2m6ZpIZZKs=;
+        b=oevWplkfUv57HCb780K/RIz3QTjVlRDZdxpDJbCqZgWqvHYQDeolh/wzmBee8j4D1M
+         nhCNhGRTqm/nzgx1CjdkWfmbma99eGOP9DSYUCAjgfdRUF1DdKBzD+75I/vowJbHanE0
+         bq/sSamx33XT1q5gYtwCqDktdrHlInJQiPZ7fu5wGlrEAeeAwn/Szu1AOZ7PhpOqPCyC
+         bRsByH8A+c/0qDCBaopI88YTNZjyJQt1HPhtTWFKc7MeqW3rjxGQVw484c7NnprGmoxk
+         yY255/UgOJHOBQfKeprut3MmPN36UpngYPVR5zYYIdIk8+ThFKssXAffP406D2gBIaq2
+         fAmg==
+X-Gm-Message-State: APjAAAUGFVyDoZLdZV4T8w/NuJKqgNqij8CWS8uNWSa73llpoUlx9hO3
+        W2rdW7tCwuHWB2IqtEglvcJ7wdDUszYvCsP9rAB1TPM+fXrHSLH0MB0A5MY/u/oYqN6M34zAh/i
+        kp69h6XGCwZSD
+X-Received: by 2002:a1c:9d85:: with SMTP id g127mr1267505wme.75.1582586405668;
+        Mon, 24 Feb 2020 15:20:05 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw4/T7cggFhTWfC4KkRP75jACd72Qyu+h14eKTuE+dLWVQ5k57SvfKJwNvSwtdxDI6CJ+/UOw==
+X-Received: by 2002:a1c:9d85:: with SMTP id g127mr1267494wme.75.1582586405459;
+        Mon, 24 Feb 2020 15:20:05 -0800 (PST)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id t1sm1367352wma.43.2020.02.24.15.12.22
+        by smtp.gmail.com with ESMTPSA id o9sm21491605wrw.20.2020.02.24.15.20.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2020 15:12:23 -0800 (PST)
+        Mon, 24 Feb 2020 15:20:04 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -56,11 +56,11 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 16/61] KVM: x86: Encapsulate CPUID entries and metadata in struct
-In-Reply-To: <20200224215551.GL29865@linux.intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-17-sean.j.christopherson@intel.com> <87y2swq95k.fsf@vitty.brq.redhat.com> <20200224215551.GL29865@linux.intel.com>
-Date:   Tue, 25 Feb 2020 00:12:22 +0100
-Message-ID: <87imjvmvft.fsf@vitty.brq.redhat.com>
+Subject: Re: [PATCH 38/61] KVM: x86: Introduce kvm_cpu_caps to replace runtime CPUID masking
+In-Reply-To: <20200224225743.GP29865@linux.intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-39-sean.j.christopherson@intel.com> <87h7zgndxl.fsf@vitty.brq.redhat.com> <20200224225743.GP29865@linux.intel.com>
+Date:   Tue, 25 Feb 2020 00:20:03 +0100
+Message-ID: <87ftezmv30.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -70,46 +70,75 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> On Fri, Feb 21, 2020 at 03:58:47PM +0100, Vitaly Kuznetsov wrote:
+> On Mon, Feb 24, 2020 at 05:32:54PM +0100, Vitaly Kuznetsov wrote:
 >> Sean Christopherson <sean.j.christopherson@intel.com> writes:
 >> 
->
->> > +			if (!entry)
->> >  				goto out;
->> >  		}
->> >  		break;
->> > @@ -802,22 +814,22 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
->> >  	return r;
->> >  }
->> >  
->> > -static int do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 func,
->> > -			 int *nent, int maxnent, unsigned int type)
->> > +static int do_cpuid_func(struct kvm_cpuid_array *array, u32 func,
->> > +			 unsigned int type)
->> >  {
->> > -	if (*nent >= maxnent)
->> > +	if (array->nent >= array->maxnent)
->> >  		return -E2BIG;
->> >  
->> >  	if (type == KVM_GET_EMULATED_CPUID)
->> > -		return __do_cpuid_func_emulated(entry, func, nent, maxnent);
->> > +		return __do_cpuid_func_emulated(array, func);
->> 
->> Would it make sense to move 'if (array->nent >= array->maxnent)' check
->> to __do_cpuid_func_emulated() to match do_host_cpuid()?
->
-> I considered doing exactly that.  IIRC, I opted not to because at this
-> point in the series, the initial call to do_host_cpuid() is something like
-> halfway down the massive __do_cpuid_func(), and eliminating the early check
-> didn't feel quite right, e.g. there is a fair amount of unnecessary code
-> that runs before hitting the first do_host_cpuid().
->
-> What if I add a patch towards the end of the series to move this check into
-> __do_cpuid_func_emulated(), i.e. after __do_cpuid_func() has been trimmed
-> down to size and the early check really is superfluous.
->
 
-Works for me, thanks!
+...
+
+>
+>> > +
+>> > +	BUILD_BUG_ON(sizeof(kvm_cpu_caps) >
+>> > +		     sizeof(boot_cpu_data.x86_capability));
+>> > +
+>> > +	memcpy(&kvm_cpu_caps, &boot_cpu_data.x86_capability,
+>> > +	       sizeof(kvm_cpu_caps));
+>> > +
+>> > +	kvm_cpu_cap_mask(CPUID_1_EDX,
+>> > +		F(FPU) | F(VME) | F(DE) | F(PSE) |
+>> > +		F(TSC) | F(MSR) | F(PAE) | F(MCE) |
+>> > +		F(CX8) | F(APIC) | 0 /* Reserved */ | F(SEP) |
+>> > +		F(MTRR) | F(PGE) | F(MCA) | F(CMOV) |
+>> > +		F(PAT) | F(PSE36) | 0 /* PSN */ | F(CLFLUSH) |
+>> > +		0 /* Reserved, DS, ACPI */ | F(MMX) |
+>> > +		F(FXSR) | F(XMM) | F(XMM2) | F(SELFSNOOP) |
+>> > +		0 /* HTT, TM, Reserved, PBE */
+>> > +	);
+>> > +
+>> > +	kvm_cpu_cap_mask(CPUID_8000_0001_EDX,
+>> > +		F(FPU) | F(VME) | F(DE) | F(PSE) |
+>> > +		F(TSC) | F(MSR) | F(PAE) | F(MCE) |
+>> > +		F(CX8) | F(APIC) | 0 /* Reserved */ | F(SYSCALL) |
+>> > +		F(MTRR) | F(PGE) | F(MCA) | F(CMOV) |
+>> > +		F(PAT) | F(PSE36) | 0 /* Reserved */ |
+>> > +		f_nx | 0 /* Reserved */ | F(MMXEXT) | F(MMX) |
+>> > +		F(FXSR) | F(FXSR_OPT) | f_gbpages | F(RDTSCP) |
+>> > +		0 /* Reserved */ | f_lm | F(3DNOWEXT) | F(3DNOW)
+>> > +	);
+>> > +
+>> > +	kvm_cpu_cap_mask(CPUID_1_ECX,
+>> > +		/* NOTE: MONITOR (and MWAIT) are emulated as NOP,
+>> > +		 * but *not* advertised to guests via CPUID ! */
+>> > +		F(XMM3) | F(PCLMULQDQ) | 0 /* DTES64, MONITOR */ |
+>> > +		0 /* DS-CPL, VMX, SMX, EST */ |
+>> > +		0 /* TM2 */ | F(SSSE3) | 0 /* CNXT-ID */ | 0 /* Reserved */ |
+>> > +		F(FMA) | F(CX16) | 0 /* xTPR Update, PDCM */ |
+>> > +		F(PCID) | 0 /* Reserved, DCA */ | F(XMM4_1) |
+>> > +		F(XMM4_2) | F(X2APIC) | F(MOVBE) | F(POPCNT) |
+>> > +		0 /* Reserved*/ | F(AES) | F(XSAVE) | 0 /* OSXSAVE */ | F(AVX) |
+>> > +		F(F16C) | F(RDRAND)
+>> > +	);
+>> 
+>> I would suggest we order things by CPUID_NUM here, i.e.
+>> 
+>> CPUID_1_ECX
+>> CPUID_1_EDX
+>> CPUID_7_1_EAX
+>> CPUID_7_0_EBX
+>> CPUID_7_ECX
+>> CPUID_7_EDX
+>> CPUID_D_1_EAX
+>> ...
+>
+> Hmm, generally speaking I agree, but I didn't want to change the ordering
+> in this patch when moving the code.  Throw a patch on top?  Leave as is?
+> Something else?
+
+My line of thought was: it's not a mechanical "s,const u32
+xxx_x86_features =,kvm_cpu_cap_mask...," change, things get moved from
+do_cpuid_7_mask() and __do_cpuid_func() so we may as well re-order them,
+reviewing-wise it's more or less the same. But honestly, this is very
+minor, feel free to leave as-is.
 
 -- 
 Vitaly
