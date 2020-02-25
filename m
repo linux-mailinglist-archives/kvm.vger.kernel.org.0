@@ -2,242 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2BA616C384
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:12:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A76D16C380
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:12:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730638AbgBYOLs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 09:11:48 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55491 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730600AbgBYOLs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 09:11:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582639906;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GMUOFSvoynEkw0+tPUD1sT0XU9l8i9TQ3rKGSkx9Sj0=;
-        b=XWk73wsuWrXB7c2rOJvZIplr6i5EoxwMaLIxLjLUK9QjstvzPL76EmEwJoUdmhbumTypIF
-        b7MiW5UdKhBFEOe+DqJfUaud1iU6REPW7ZOIE3QG6lcY8NXsRgLXnwKkJ+BkALbb6nf3iD
-        Jofy/wd1Yp0iXzXPKPmN2Uss5S+inxs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-4ewP0dvAOkOoR-QExhingA-1; Tue, 25 Feb 2020 09:11:45 -0500
-X-MC-Unique: 4ewP0dvAOkOoR-QExhingA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3351A1005512;
-        Tue, 25 Feb 2020 14:11:43 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E26C260CD1;
-        Tue, 25 Feb 2020 14:11:35 +0000 (UTC)
-Date:   Tue, 25 Feb 2020 15:11:33 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     <mst@redhat.com>, <xiaoguangrong.eric@gmail.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <fam@euphon.net>, <rth@twiddle.net>, <ehabkost@redhat.com>,
-        <mtosatti@redhat.com>, <qemu-devel@nongnu.org>,
-        <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
-        <pbonzini@redhat.com>, <james.morse@arm.com>, <lersek@redhat.com>,
-        <jonathan.cameron@huawei.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <zhengxiang9@huawei.com>
-Subject: Re: [PATCH v24 06/10] ACPI: Record the Generic Error Status Block
- address
-Message-ID: <20200225151133.3c75f611@redhat.com>
-In-Reply-To: <20200217131248.28273-7-gengdongjiu@huawei.com>
-References: <20200217131248.28273-1-gengdongjiu@huawei.com>
-        <20200217131248.28273-7-gengdongjiu@huawei.com>
+        id S1730587AbgBYOLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 09:11:37 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:39109 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729386AbgBYOLh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 09:11:37 -0500
+Received: by mail-wm1-f65.google.com with SMTP id c84so3292419wme.4;
+        Tue, 25 Feb 2020 06:11:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9llSiqn9QmX37KJecnbve+X+EjpLa4SazqSQQgp9aV4=;
+        b=fHTaa6z5Tr/NBfx/fWZBN7VlcFm1bZgRK+nmwhlPW5F65Fosx+Tu9r3xAnzaIqU3zo
+         8KNv75T+PbR7l82fJcARNRGxPVb7h5RdRPXtQiv6qz/Jc9b39VAEbfEv4lBlUytnJ7LZ
+         NnqN6RvVM+Q2DSgzz6eMpUclpSxNy26JRG4jw3Os5/rXtSGd04u1c71rh/dDtRvYKLzL
+         0eXzYJS1L+lyfFs73LlHDwk+s4oAEbbfNpGHopvtlWaauQwW7DrxU3BfSci/GPAHXug1
+         BdlVvz93BxB51lSQJFCysGSIjAcgLxiAMLJpArYuwt9NXL7MNAXa1OTvkEOMqwVnAydP
+         G7QQ==
+X-Gm-Message-State: APjAAAWK4m2IphX3/J3VEAHXg8/0HlXdly+/a3PT3BgXIwb5wsQ5Yq6t
+        0W3ezuKxZRvdI8pKqDm+kek=
+X-Google-Smtp-Source: APXvYqzdNFz2/BYLFi72FFgE4SqlwoTvOVPcNUzf0X8k2HDo5fL4XJlZxrMCNKLRmzvrYSwv3huM/w==
+X-Received: by 2002:a7b:c8c5:: with SMTP id f5mr5368076wml.44.1582639895661;
+        Tue, 25 Feb 2020 06:11:35 -0800 (PST)
+Received: from localhost (prg-ext-pat.suse.com. [213.151.95.130])
+        by smtp.gmail.com with ESMTPSA id v17sm23338678wrt.91.2020.02.25.06.11.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2020 06:11:34 -0800 (PST)
+Date:   Tue, 25 Feb 2020 15:11:34 +0100
+From:   Michal Hocko <mhocko@kernel.org>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Oscar Salvador <osalvador@suse.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Wei Yang <richard.weiyang@gmail.com>,
+        Dan Williams <dan.j.williams@intel.com>, Qian Cai <cai@lca.pw>
+Subject: Re: [PATCH RFC v4 08/13] mm/memory_hotplug: Introduce
+ offline_and_remove_memory()
+Message-ID: <20200225141134.GU22443@dhcp22.suse.cz>
+References: <20191212171137.13872-1-david@redhat.com>
+ <20191212171137.13872-9-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191212171137.13872-9-david@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Feb 2020 21:12:44 +0800
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+On Thu 12-12-19 18:11:32, David Hildenbrand wrote:
+> virtio-mem wants to offline and remove a memory block once it unplugged
+> all subblocks (e.g., using alloc_contig_range()). Let's provide
+> an interface to do that from a driver. virtio-mem already supports to
+> offline partially unplugged memory blocks. Offlining a fully unplugged
+> memory block will not require to migrate any pages. All unplugged
+> subblocks are PageOffline() and have a reference count of 0 - so
+> offlining code will simply skip them.
+> 
+> All we need an interface to trigger the "offlining" and the removing in a
+> single operation - to make sure the memory block cannot get onlined by
+> user space again before it gets removed.
 
-> Record the GHEB address via fw_cfg file, when recording
-> a error to CPER, it will use this address to find out
-> Generic Error Data Entries and write the error.
+Why does that matter? Is it really likely that the userspace would
+interfere? What would be the scenario?
+
+Or is still mostly about not requiring callers to open code this general
+patter?
+
+> To keep things simple, allow to only work on a single memory block.
 > 
-> In order to avoid migration failure, make hardware
-> error table address to a part of GED device instead
-> of global variable, then this address will be migrated
-> to target QEMU.
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Oscar Salvador <osalvador@suse.com>
+> Cc: Michal Hocko <mhocko@suse.com>
+> Cc: Pavel Tatashin <pasha.tatashin@soleen.com>
+> Cc: Wei Yang <richard.weiyang@gmail.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Qian Cai <cai@lca.pw>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  hw/acpi/generic_event_device.c         | 18 ++++++++++++++++++
->  hw/acpi/ghes.c                         | 17 +++++++++++++++++
->  hw/arm/virt-acpi-build.c               | 10 ++++++++++
->  include/hw/acpi/generic_event_device.h |  2 ++
->  include/hw/acpi/ghes.h                 |  6 ++++++
->  5 files changed, 53 insertions(+)
+>  include/linux/memory_hotplug.h |  1 +
+>  mm/memory_hotplug.c            | 35 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 36 insertions(+)
 > 
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> index 021ed2b..d59607c 100644
-> --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -234,6 +234,23 @@ static const VMStateDescription vmstate_ged_state = {
->      }
->  };
+> diff --git a/include/linux/memory_hotplug.h b/include/linux/memory_hotplug.h
+> index ba0dca6aac6e..586f5c59c291 100644
+> --- a/include/linux/memory_hotplug.h
+> +++ b/include/linux/memory_hotplug.h
+> @@ -310,6 +310,7 @@ extern void try_offline_node(int nid);
+>  extern int offline_pages(unsigned long start_pfn, unsigned long nr_pages);
+>  extern int remove_memory(int nid, u64 start, u64 size);
+>  extern void __remove_memory(int nid, u64 start, u64 size);
+> +extern int offline_and_remove_memory(int nid, u64 start, u64 size);
 >  
-> +static bool ghes_needed(void *opaque)
-> +{
-> +    return object_property_get_bool(qdev_get_machine(), "ras", NULL);
-
-Try not to use qdev_get_machine() unless it's the only option.
-
-Following would do the job:
-
-  AcpiGedState *s = opaque
-  return s->ghes_state.ghes_addr_le
-
-> +}
-> +
-> +static const VMStateDescription vmstate_ghes_state = {
-> +    .name = "acpi-ged/ghes",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = ghes_needed,
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
-> +                       vmstate_ghes_state, AcpiGhesState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_acpi_ged = {
->      .name = "acpi-ged",
->      .version_id = 1,
-> @@ -244,6 +261,7 @@ static const VMStateDescription vmstate_acpi_ged = {
->      },
->      .subsections = (const VMStateDescription * []) {
->          &vmstate_memhp_state,
-> +        &vmstate_ghes_state,
->          NULL
->      }
->  };
-> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-> index 7a7381d..cea2bff 100644
-> --- a/hw/acpi/ghes.c
-> +++ b/hw/acpi/ghes.c
-> @@ -24,6 +24,8 @@
->  #include "hw/acpi/ghes.h"
->  #include "hw/acpi/aml-build.h"
->  #include "qemu/error-report.h"
-> +#include "hw/acpi/generic_event_device.h"
-> +#include "hw/nvram/fw_cfg.h"
->  
->  #define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
->  #define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
-> @@ -213,3 +215,18 @@ void acpi_build_hest(GArray *table_data, BIOSLinker *linker)
->      build_header(linker, table_data, (void *)(table_data->data + hest_start),
->          "HEST", table_data->len - hest_start, 1, NULL, "");
+>  #else
+>  static inline bool is_mem_section_removable(unsigned long pfn,
+> diff --git a/mm/memory_hotplug.c b/mm/memory_hotplug.c
+> index da01453a04e6..d04369e6d3cc 100644
+> --- a/mm/memory_hotplug.c
+> +++ b/mm/memory_hotplug.c
+> @@ -1825,4 +1825,39 @@ int remove_memory(int nid, u64 start, u64 size)
+>  	return rc;
 >  }
+>  EXPORT_SYMBOL_GPL(remove_memory);
 > +
-> +void acpi_ghes_add_fw_cfg(AcpiGhesState *ags, FWCfgState *s,
-> +                          GArray *hardware_error)
+> +/*
+> + * Try to offline and remove a memory block. Might take a long time to
+> + * finish in case memory is still in use. Primarily useful for memory devices
+> + * that logically unplugged all memory (so it's no longer in use) and want to
+> + * offline + remove the memory block.
+> + */
+> +int offline_and_remove_memory(int nid, u64 start, u64 size)
 > +{
-> +    size_t size = 2 * sizeof(uint64_t) + ACPI_GHES_MAX_RAW_DATA_LENGTH;
-> +    size_t request_block_size = ACPI_GHES_ERROR_SOURCE_COUNT * size;
+> +	struct memory_block *mem;
+> +	int rc = -EINVAL;
 > +
-> +    /* Create a read-only fw_cfg file for GHES */
-> +    fw_cfg_add_file(s, ACPI_GHES_ERRORS_FW_CFG_FILE, hardware_error->data,
-> +                    request_block_size);
-why do you calculate request_block_size instead of using hardware_error->len here
-
+> +	if (!IS_ALIGNED(start, memory_block_size_bytes()) ||
+> +	    size != memory_block_size_bytes())
+> +		return rc;
 > +
-> +    /* Create a read-write fw_cfg file for Address */
-> +    fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
-> +        NULL, &(ags->ghes_addr_le), sizeof(ags->ghes_addr_le), false);
+> +	lock_device_hotplug();
+> +	mem = find_memory_block(__pfn_to_section(PFN_DOWN(start)));
+> +	if (mem)
+> +		rc = device_offline(&mem->dev);
+> +	/* Ignore if the device is already offline. */
+> +	if (rc > 0)
+> +		rc = 0;
+> +
+> +	/*
+> +	 * In case we succeeded to offline the memory block, remove it.
+> +	 * This cannot fail as it cannot get onlined in the meantime.
+> +	 */
+> +	if (!rc && try_remove_memory(nid, start, size))
+> +		BUG();
+> +	unlock_device_hotplug();
+> +
+> +	return rc;
 > +}
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 12a9a78..d6e7521 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -832,6 +832,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->      build_spcr(tables_blob, tables->linker, vms);
->  
->      if (vms->ras) {
+> +EXPORT_SYMBOL_GPL(offline_and_remove_memory);
+>  #endif /* CONFIG_MEMORY_HOTREMOVE */
+> -- 
+> 2.23.0
 
-> +        assert(vms->acpi_dev);
-tables could be built without this device, so I'd drop this line so reader
-won't wonder why it's here.
-
-
->          acpi_add_table(table_offsets, tables_blob);
->          build_ghes_error_table(tables->hardware_errors, tables->linker);
->          acpi_build_hest(tables_blob, tables->linker);
-> @@ -924,6 +925,7 @@ void virt_acpi_setup(VirtMachineState *vms)
->  {
->      AcpiBuildTables tables;
->      AcpiBuildState *build_state;
-> +    AcpiGedState *acpi_ged_state;
->  
->      if (!vms->fw_cfg) {
->          trace_virt_acpi_setup();
-> @@ -954,6 +956,14 @@ void virt_acpi_setup(VirtMachineState *vms)
->      fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
->                      acpi_data_len(tables.tcpalog));
->  
-> +    if (vms->ras) {
-> +        assert(vms->acpi_dev);
-> +        acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
-> +                                                           NULL));
-lookup is not necessary, just do
-
-           AcpiGedState *acpi_ged_state = ACPI_GED(vms->acpi_dev)
-
-> +        acpi_ghes_add_fw_cfg(&acpi_ged_state->ghes_state,
-> +                             vms->fw_cfg, tables.hardware_errors);
-> +    }
-> +
->      build_state->rsdp_mr = acpi_add_rom_blob(virt_acpi_build_update,
->                                               build_state, tables.rsdp,
->                                               ACPI_BUILD_RSDP_FILE, 0);
-> diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-> index d157eac..037d2b5 100644
-> --- a/include/hw/acpi/generic_event_device.h
-> +++ b/include/hw/acpi/generic_event_device.h
-> @@ -61,6 +61,7 @@
->  
->  #include "hw/sysbus.h"
->  #include "hw/acpi/memory_hotplug.h"
-> +#include "hw/acpi/ghes.h"
->  
->  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
->  
-> @@ -95,6 +96,7 @@ typedef struct AcpiGedState {
->      GEDState ged_state;
->      uint32_t ged_event_bitmap;
->      qemu_irq irq;
-> +    AcpiGhesState ghes_state;
->  } AcpiGedState;
->  
->  void build_ged_aml(Aml *table, const char* name, HotplugHandler *hotplug_dev,
-> diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-> index 18debd8..a3420fc 100644
-> --- a/include/hw/acpi/ghes.h
-> +++ b/include/hw/acpi/ghes.h
-> @@ -62,6 +62,12 @@ enum {
->      ACPI_HEST_SRC_ID_RESERVED,
->  };
->  
-> +typedef struct AcpiGhesState {
-> +    uint64_t ghes_addr_le;
-> +} AcpiGhesState;
-> +
->  void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
->  void acpi_build_hest(GArray *table_data, BIOSLinker *linker);
-> +void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
-> +                          GArray *hardware_errors);
->  #endif
-
+-- 
+Michal Hocko
+SUSE Labs
