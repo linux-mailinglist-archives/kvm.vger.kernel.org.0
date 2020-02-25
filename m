@@ -2,104 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AB2816C3E8
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:30:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C64616C406
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:36:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730573AbgBYOai (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 09:30:38 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55875 "EHLO
+        id S1730740AbgBYOgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 09:36:09 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53864 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729065AbgBYOah (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 09:30:37 -0500
+        by vger.kernel.org with ESMTP id S1730638AbgBYOgJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 09:36:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582641037;
+        s=mimecast20190719; t=1582641367;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=koTgLB/h3FfY8DKoEzbvukIhrVm4ASkj0z5WG+Qybgc=;
-        b=Wq3BAiQr163Z+5ns61NgGfvU9x6JqAX5vpodVwtzjNbJFj30kuTjXLeUkcEjEFhqCE67st
-        aueDZVaiJj15br+cJAsuDrYq6sK92JgFJ73vmTBa8J9Dp6+hPjrDlRMv4L4U5kcaFosW8z
-        e/5ruL9XxB3ofNkhRoXh2kK4lKg5y5w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-229-VMqk_S0_OP2XuHSGEYKvpA-1; Tue, 25 Feb 2020 09:30:33 -0500
-X-MC-Unique: VMqk_S0_OP2XuHSGEYKvpA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E39D1005512;
-        Tue, 25 Feb 2020 14:30:31 +0000 (UTC)
-Received: from gondolin (dhcp-192-175.str.redhat.com [10.33.192.175])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6D4358ED01;
-        Tue, 25 Feb 2020 14:30:27 +0000 (UTC)
-Date:   Tue, 25 Feb 2020 15:30:24 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Subject: Re: [PATCH v4 20/36] KVM: s390/mm: handle guest unpin events
-Message-ID: <20200225153024.62e1ed7f.cohuck@redhat.com>
-In-Reply-To: <2c45d494-8fdf-69c1-e786-0f07c6f09a40@de.ibm.com>
-References: <20200224114107.4646-1-borntraeger@de.ibm.com>
-        <20200224114107.4646-21-borntraeger@de.ibm.com>
-        <20200225131838.2d68e7f9.cohuck@redhat.com>
-        <2c45d494-8fdf-69c1-e786-0f07c6f09a40@de.ibm.com>
-Organization: Red Hat GmbH
+        bh=qQkKAh+IMe5D8qRJbmj17S6Uf0KPiGWejl7b1aEjsRI=;
+        b=f1YFCBIDfvaDIaC6g7gxGuvxYcLu27DDupV7QY6o1FYKIhuUZl+Ag8ufO9MXA+2f5+fAcv
+        5T0Aemd03lL2bXU6v8vgFo3EjffIEYVywl1Y1zecQKC1tfmg7PT2v60MD+548NBh/zfARS
+        YzsljLVVQqSuoiFnW2GCIjNBm24K8Bw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-FwCusIvhNdSnNBS-JP5Rgg-1; Tue, 25 Feb 2020 09:36:05 -0500
+X-MC-Unique: FwCusIvhNdSnNBS-JP5Rgg-1
+Received: by mail-wr1-f71.google.com with SMTP id 90so7400052wrq.6
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 06:36:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qQkKAh+IMe5D8qRJbmj17S6Uf0KPiGWejl7b1aEjsRI=;
+        b=mUDLSIx7+ehfaEtuSLkTu0EFhQ65MTH1H+tYTpHzsAfI5dI6JqWGhq8u7u1mQDqMB/
+         HstuE9BaqChgqCLVorPFWOK9NqOHEUnWC3xxyK9T8rTopyUKnGAiogNDPRXQmBbROv75
+         8GyLQZ3ULVVdOcG0czG/u3MfT6heiA7CsflPDu2fhAjrg3Uhp2ohC+CuaWk3XGpI6GM8
+         cGQmMRbs0P12VODDaEgSLXBcF9gdQUvxH0y5msk5tuXKpADiPE95SqcHSpKVTfGxmFIk
+         L4sMzOKN8sNY/CKS7UOee4Cn7+Lk2p91ZrRNaEyDw0Ah4vV+zsMH+7LW5Hg+iHo0Mmjw
+         RndQ==
+X-Gm-Message-State: APjAAAXCQ23N2A5Vy71l2YjovhAYy3/3/e1r6qfgqDhq5ltmcgajq0vZ
+        DiikYh8wHUb2VDAyqd50v0b9n0cS4zXYxm+H3o7prXE+RuasIgvj8sxON3a/eBAJSkc3++2HlSH
+        chpvc2m3Dw4wo
+X-Received: by 2002:adf:f84a:: with SMTP id d10mr3391693wrq.208.1582641364779;
+        Tue, 25 Feb 2020 06:36:04 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxwNMJ2AmbkFH/U1r8SRcgK5A6QxWJZNkOjGHc8bd23bJs1LK+l3gqPf3Nnw3QaxqcOOSxbRw==
+X-Received: by 2002:adf:f84a:: with SMTP id d10mr3391670wrq.208.1582641364511;
+        Tue, 25 Feb 2020 06:36:04 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:3577:1cfe:d98a:5fb6? ([2001:b07:6468:f312:3577:1cfe:d98a:5fb6])
+        by smtp.gmail.com with ESMTPSA id y17sm24108400wrs.82.2020.02.25.06.36.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2020 06:36:03 -0800 (PST)
+Subject: Re: [PATCH 01/61] KVM: x86: Return -E2BIG when
+ KVM_GET_SUPPORTED_CPUID hits max entries
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
+ <20200201185218.24473-2-sean.j.christopherson@intel.com>
+ <87mu9zomnn.fsf@vitty.brq.redhat.com>
+ <20200203155903.GA19638@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <70f9ef36-b180-79d4-7d9a-8df8d6219122@redhat.com>
+Date:   Tue, 25 Feb 2020 15:36:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200203155903.GA19638@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 25 Feb 2020 15:21:42 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> On 25.02.20 13:18, Cornelia Huck wrote:
-> > On Mon, 24 Feb 2020 06:40:51 -0500
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >   
-> >> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> >>
-> >> The current code tries to first pin shared pages, if that fails (e.g.
-> >> because the page is not shared) it will export them. For shared pages
-> >> this means that we get a new intercept telling us that the guest is
-> >> unsharing that page. We will make the page secure at that point in time
-> >> and revoke the host access. This is synchronized with other host events,
-> >> e.g. the code will wait until host I/O has finished.
-> >>
-> >> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> >> Acked-by: David Hildenbrand <david@redhat.com>
-> >> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
-> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >> ---
-> >>  arch/s390/kvm/intercept.c | 24 ++++++++++++++++++++++++
-> >>  1 file changed, 24 insertions(+)
-
-> I will also fixup the misleading patch description:
+On 03/02/20 16:59, Sean Christopherson wrote:
 > 
-> The current code tries to first pin shared pages, if that fails (e.g.
-> because the page is not shared) it will export them. For shared pages
-> this means that we get a new intercept telling us that the guest is
-> unsharing that page. We will unpin the page at that point in time,
-> following the same rules as for make secure. (wait for writeback, no
-> elevated page refs etc).
+>> In particular, here the change is both the
+>> return value and the fact that we don't do copy_to_user() anymore so I
+>> think it's possible to meet a userspace which is going to get broken by
+>> the change.
+> Ugh, yeah, it would be possible.  Qemu (retries), CrosVM (hardcoded to
+> 256 entries) and Firecracker (doesn't use the ioctl()) are all ok,
+> hopefully all other VMMs used in production environments follow suit.
+> 
 
-I'd suggest:
+Also: lkvm and selftests both hardcode the limit to 100.
 
-"...as for making a page secure (i.e. waiting for writeback, no
-elevated page references, etc.)"
+Both would be broken by this change, but as long as the limit is < 100
+now it is fine to change.
 
-With the touchups,
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Paolo
 
