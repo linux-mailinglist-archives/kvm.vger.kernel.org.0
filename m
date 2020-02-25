@@ -2,103 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 233B716E9A6
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 16:09:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC9E716E9A8
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 16:10:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731010AbgBYPJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 10:09:55 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36635 "EHLO
+        id S1730628AbgBYPKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 10:10:23 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22709 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730455AbgBYPJy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 10:09:54 -0500
+        by vger.kernel.org with ESMTP id S1729947AbgBYPKX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 10:10:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582643393;
+        s=mimecast20190719; t=1582643422;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gyTVilWU1NTnU+gwoh7gkkLPBvMQOx5tHU2YNNnkGmw=;
-        b=K106GnymbFFM3Gsxd4rMCNE6iUTW6JRKlI3AAnHymi/roahZwLbJV6pbKXRgHxup6SmGNL
-        I+UTP9bLGBKP/4qLf15MuS2/6zXm9aCSg5Rq2KTTGpa00Iuhtqy4rYdGMkBeR0ijtOKXx/
-        bi9b8c8TE2q5H+epmcxuuPxqz7kBb+E=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-XSHY9MBDPLaoCkPbr9YIiQ-1; Tue, 25 Feb 2020 10:09:51 -0500
-X-MC-Unique: XSHY9MBDPLaoCkPbr9YIiQ-1
-Received: by mail-wr1-f69.google.com with SMTP id 90so7443392wrq.6
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 07:09:51 -0800 (PST)
+        bh=QRFD3PMjjqRPLYE/BqYxDm6sJvPkBl4qX28FKWyGGt0=;
+        b=ThrqcSwNl7zJ66bvrLSKf0MCEfX88FnYDczxaCZMtdeym8mWp+eB1Dxo373xv355MzkfGT
+        Burj2qOiBzCl7edjLDZQgR+Tr0qpwBVTRJLe6WCTCRFDrB6PCCif1l7tyeF8yEub0vktyH
+        S6aL0bn0L4tB8fQ4OJop82o9B/LucFQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-57-3qv5-C3ROySPONiHb2xBeg-1; Tue, 25 Feb 2020 10:10:20 -0500
+X-MC-Unique: 3qv5-C3ROySPONiHb2xBeg-1
+Received: by mail-wr1-f71.google.com with SMTP id p5so1895222wrj.17
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 07:10:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=gyTVilWU1NTnU+gwoh7gkkLPBvMQOx5tHU2YNNnkGmw=;
-        b=gl8Y8U/rabcCF8b7UhKrQplDPYW4IBKge6C9XlSwUmLTqsfTREDAacWPj3zfXGHHpe
-         A6Juegyir+RdjN0BV7Uv4VpcEfawrxH3VLskIAvx/S8W+ch5/cCL8PIo9PRA6CyAdgCI
-         wIB77c/HyHJUdO2ZkGOIc2kV/Q0ww+hMcCcLAx2wtiNeiTPY2MEwEdD1YtW8wcgn8Pw0
-         j+CV9cNnB3EbatMY/ZHCJ2IrLLT7LsUjJwV7mfXaPeneGHjk9KgRWEs6HRuOsw3B/Tcw
-         bZ8kxDQ7nweuluR6c5xxZjZFjyBPACI4712kfmYdAZb6ODIkzfqUNUnecUgTCvlsMsBo
-         3W8g==
-X-Gm-Message-State: APjAAAVkE/T2SyD06avp7VjdEiZsqwJRnxk5J5UA0WOxPOkTUjeGhtP8
-        eR4mpyq+9rvozPnxFcZ2tzyxmmETK97h735wFlNnXLTUQ1IB8Vz7VGRETaul8JMWwNTpT9WUhgK
-        gSupFnMf5zJNc
-X-Received: by 2002:a1c:7215:: with SMTP id n21mr6081882wmc.154.1582643390188;
-        Tue, 25 Feb 2020 07:09:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy/Law1OzKYUVZt2uhlIn4w3N2hJc84Pk770kM8VFpLZmbXFBnuvyrx0KYtY8KMSMKKFgwm0w==
-X-Received: by 2002:a1c:7215:: with SMTP id n21mr6081868wmc.154.1582643389949;
-        Tue, 25 Feb 2020 07:09:49 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id z19sm4455606wmi.43.2020.02.25.07.09.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2020 07:09:49 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QRFD3PMjjqRPLYE/BqYxDm6sJvPkBl4qX28FKWyGGt0=;
+        b=OZtdThuSvSs0IpTKip+tbpXdPmfV0DRkDitCMqY6UK7zlFsQwWIxG2HHv64rsWKS2S
+         c1S2/2T+zf+3yWi4GOWK7KxZPSmb4lvEaLzrRIMKEUiMUy3cHtej6WU6QseAPaDK2grR
+         oeiIQpyjQGK6Uetqd5Fcd1tf0cechYs/OA+84330F5y0yhwQcM945fTczYyaQJekctra
+         3L3fCy9z37bc1K6B8Kx3WelHGfunGwf7moVeXWg+TGDwYbsZpIIozdTqbrTuEyloiIzC
+         Mfn3OgwPbVFXFwnyJsESjtz2oJpkCc7e/dOQpdLfTAQqeFFkvx/KKGqSdTwLPGzrWWTh
+         23sQ==
+X-Gm-Message-State: APjAAAVtuT8O/rAENnvRJc5+wM2TKppo+7TS9EVZPMcIQ1sB8jS6wca4
+        +77oUlQW8uEfCsLUmGW30UhCWLxvu/R7ChFanODZgF0Rg34BY3gglnFkP3BX8Rod3RFZxt+gIRw
+        oiJhA8/JyQPQG
+X-Received: by 2002:a7b:c019:: with SMTP id c25mr29144wmb.126.1582643419596;
+        Tue, 25 Feb 2020 07:10:19 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzSlTbehjzt6fQaWvLGS5yyGzUn9gYwXqID+MDIjftANEs2/W8YYDcK4izZDikzk+F4PoUasw==
+X-Received: by 2002:a7b:c019:: with SMTP id c25mr29114wmb.126.1582643419296;
+        Tue, 25 Feb 2020 07:10:19 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:3577:1cfe:d98a:5fb6? ([2001:b07:6468:f312:3577:1cfe:d98a:5fb6])
+        by smtp.gmail.com with ESMTPSA id b7sm16100391wrs.97.2020.02.25.07.10.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2020 07:10:18 -0800 (PST)
+Subject: Re: [PATCH 39/61] KVM: SVM: Convert feature updates from CPUID to KVM
+ cpu caps
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/61] KVM: x86: Refactor loop around do_cpuid_func() to separate helper
-In-Reply-To: <04fb4fe9-017a-dcbb-6f18-0f6fd970bc99@redhat.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-3-sean.j.christopherson@intel.com> <87sgjng3ru.fsf@vitty.brq.redhat.com> <20200207195301.GM2401@linux.intel.com> <04fb4fe9-017a-dcbb-6f18-0f6fd970bc99@redhat.com>
-Date:   Tue, 25 Feb 2020 16:09:48 +0100
-Message-ID: <87zhd6k8jn.fsf@vitty.brq.redhat.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
+ <20200201185218.24473-40-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0f21b023-000d-9d78-b9b4-b9d377840385@redhat.com>
+Date:   Tue, 25 Feb 2020 16:10:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200201185218.24473-40-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 01/02/20 19:51, Sean Christopherson wrote:
+> +	/* CPUID 0x8000000A */
+> +	/* Support next_rip if host supports it */
+> +	if (boot_cpu_has(X86_FEATURE_NRIPS))
+> +		kvm_cpu_cap_set(X86_FEATURE_NRIPS);
 
-> On 07/02/20 20:53, Sean Christopherson wrote:
->> 
->>> 2) Return -EINVAL instead.
->> I agree that it _should_ be -EINVAL, but I just don't think it's worth
->> the possibility of breaking (stupid) userspace that was doing something
->> like:
->> 
->> 	for (i = 0; i < max_cpuid_size; i++) {
->> 		cpuid.nent = i;
->> 
->> 		r = ioctl(fd, KVM_GET_SUPPORTED_CPUID, &cpuid);
->> 		if (!r || r != -E2BIG)
->> 			break;
->> 	}
->> 
->
-> Apart from the stupidity of the above case, why would it be EINVAL?
->
+Should this also be conditional on "nested"?
 
-I suggested -EINVAL because issuing KVM_GET_SUPPORTED_CPUID with nent=0
-looks more like a completely invalid input and not 'too many
-entries'(-E2BIG) to me (but -E2BIG is already there, let's keep it, it's
-not a big deal).
-
-> I can do the change to drop the initializer when applying.
-
-We're agreed with Sean on a few cosmetic changes in other patches of
-this series, wait for v2)
-
--- 
-Vitaly
+Paolo
 
