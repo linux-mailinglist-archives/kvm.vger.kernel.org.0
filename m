@@ -2,84 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 65BD916E9FD
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 16:25:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A20616EA8D
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 16:51:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731082AbgBYPZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 10:25:41 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52054 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729501AbgBYPZl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 10:25:41 -0500
+        id S1730275AbgBYPvQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 10:51:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32866 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728515AbgBYPvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 10:51:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582644340;
+        s=mimecast20190719; t=1582645874;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XHRKxD00cTyT09o9LKocptIN+yLA1rFAZrxjnmWX1Ls=;
-        b=A9mYZegaqBmur605w4pDWZYwH52F9j+6BkW3vLJJfYc7sD+2mTMQl2XsI0fKlsmcWtC0R4
-        d343SIWuE0TSvreI2J+0KSZ89v/iekf9zdzPhBkISgpYbN9Sb4eDzvZryUUkGs/83H805z
-        F/EEnIkqehLH57dWlHloTOB1O4YX9Nc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-8XFhJLz4M_CVin5Ix3lNog-1; Tue, 25 Feb 2020 10:25:38 -0500
-X-MC-Unique: 8XFhJLz4M_CVin5Ix3lNog-1
-Received: by mail-wm1-f69.google.com with SMTP id u11so1170887wmb.4
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 07:25:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XHRKxD00cTyT09o9LKocptIN+yLA1rFAZrxjnmWX1Ls=;
-        b=t0DDkk9ol/JnWTCw+zA9n4vvOniX/uvMfsd4raaFCMDm4WGrTmcol5cT76DbGBOq0Y
-         9Dn//L8Av5y1zl85Q3zapqypM9mLLpcoSbak5057ZpJqf5Hp1eRwJxBUbQjleP4h39Zn
-         TcVR+WU+72VddsghCsffnlWyxNdkQXZ2OUdtHExNyVPOoW+0NKVEcyRBA2vXgjNZ91Cn
-         sfQ1+7nQrRXBGKKBLq1Xdpd8Avm3ojIlCYKzd9AQ1kYm8ifHY5sZK3d6x6GOYi0jY+F0
-         Sk3O5VNI67YVZsMOGxvUATmac65zaMDwM5CtQFMg6iL7+j5Sjpdi9W0f4VHuAf8aDrcl
-         uoHg==
-X-Gm-Message-State: APjAAAVd7N/u9KU3ChpNBFw10vDLpS+Ao1kfPVNNuAQBIkvU+uiQbVd+
-        98g9B57Ej0E3Ii9XMZUkqaKAFFs5Y3ocfnCYM6vSUpSdGWnvF/YBoyU6bX3QNiCOYtEw1Le7t1O
-        GqIJ2Woh2gXOm
-X-Received: by 2002:a1c:491:: with SMTP id 139mr5904257wme.117.1582644334821;
-        Tue, 25 Feb 2020 07:25:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxOEO5FTObReQwSnlZOzVoqdfjaEIdHk/sbsxSJs1qE1hoP1ta5zdOmm+8U8vuRcLcMmb2wTA==
-X-Received: by 2002:a1c:491:: with SMTP id 139mr5904230wme.117.1582644334563;
-        Tue, 25 Feb 2020 07:25:34 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:3577:1cfe:d98a:5fb6? ([2001:b07:6468:f312:3577:1cfe:d98a:5fb6])
-        by smtp.gmail.com with ESMTPSA id z21sm4445966wml.5.2020.02.25.07.25.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2020 07:25:33 -0800 (PST)
-Subject: Re: [PATCH 00/61] KVM: x86: Introduce KVM cpu caps
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <87wo8ak84x.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a52b3d92-5df6-39bd-f3e7-2cdd4f3be6cb@redhat.com>
-Date:   Tue, 25 Feb 2020 16:25:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        bh=Z0DlAdI9/sKGf97eqVEbAeNHhd5i8GxwMNlFZqYH+6A=;
+        b=HJqcXfaTr/nB9eaa68eIDFTD1WwvUYpgEDNIJhtdSI4ijVVkHCF1WiMFTD3okbyIBmGVvd
+        xcLKFjrj3M3CJBznVV2N9hGTSi1CGNg7mo5FK7aR7U9N6VA0RgnWSEyyb/IbZ+kcHSqBZr
+        kVe5MoNjJ8Md3HFfqS6lmrIJ+Svd4Eg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-0xYdur1VPuedMPipNBG-IA-1; Tue, 25 Feb 2020 10:51:10 -0500
+X-MC-Unique: 0xYdur1VPuedMPipNBG-IA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 115DC1902EA8;
+        Tue, 25 Feb 2020 15:51:09 +0000 (UTC)
+Received: from gondolin (dhcp-192-175.str.redhat.com [10.33.192.175])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B18065D9CD;
+        Tue, 25 Feb 2020 15:51:01 +0000 (UTC)
+Date:   Tue, 25 Feb 2020 16:50:59 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v4 36/36] KVM: s390: protvirt: Add KVM api documentation
+Message-ID: <20200225165059.5a2f48a5.cohuck@redhat.com>
+In-Reply-To: <20200224114107.4646-37-borntraeger@de.ibm.com>
+References: <20200224114107.4646-1-borntraeger@de.ibm.com>
+        <20200224114107.4646-37-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <87wo8ak84x.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/02/20 16:18, Vitaly Kuznetsov wrote:
-> Would it be better or worse if we eliminate set_supported_cpuid() hook
-> completely by doing an ugly hack like (completely untested):
+On Mon, 24 Feb 2020 06:41:07 -0500
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Yes, it makes sense.
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> Add documentation for KVM_CAP_S390_PROTECTED capability and the
+> KVM_S390_PV_COMMAND ioctl.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 55 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 55 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 7505d7a6c0d8..20abb8b2594e 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -4648,6 +4648,51 @@ the clear cpu reset definition in the POP. However, the cpu is not put
+>  into ESA mode. This reset is a superset of the initial reset.
+>  
+>  
+> +4.125 KVM_S390_PV_COMMAND
+> +-------------------------
+> +
+> +:Capability: KVM_CAP_S390_PROTECTED
+> +:Architectures: s390
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_pv_cmd
+> +:Returns: 0 on success, < 0 on error
+> +
+> +::
+> +
+> +  struct kvm_pv_cmd {
+> +	__u32 cmd;	/* Command to be executed */
+> +	__u16 rc;	/* Ultravisor return code */
+> +	__u16 rrc;	/* Ultravisor return reason code */
+> +	__u64 data;	/* Data or address */
+> +	__u32 flags;    /* flags for future extensions. Must be 0 for now */
+> +	__u32 reserved[3];
+> +  };
+> +
+> +cmd values:
+> +
+> +KVM_PV_ENABLE
+> +  Allocate memory and register the VM with the Ultravisor, thereby
+> +  donating memory to the Ultravisor making it inaccessible to KVM.
+> +  Also converts all existing CPUs to protected ones. Future hotplug
+> +  CPUs will become protected during creation.
 
-Paolo
+"Allocate memory and register the VM with the Ultravisor, thereby
+donating memory to the Ultravisor that will become inaccsessible to
+KVM. All existing CPUs are converted to protected ones. After this
+command has succeeded, any CPU added via hotplug will become protected
+during its creation as well."
+
+> +
+> +KVM_PV_DISABLE
+> +  Deregisters the VM from the Ultravisor and frees memory that was
+> +  donated, so the kernel can use it again. All registered VCPUs are
+> +  converted back to non-protected ones.
+
+"Deregister the VM from the Ultravisor and reclaim the memory that had
+been donated to the Ultravisor, making it usable by the kernel again.
+..."
+
+> +
+> +KVM_PV_VM_SET_SEC_PARMS
+> +  Pass the image header from VM memory to the Ultravisor in
+> +  preparation of image unpacking and verification.
+> +
+> +KVM_PV_VM_UNPACK
+> +  Unpack (protect and decrypt) a page of the encrypted boot image.
+> +
+> +KVM_PV_VM_VERIFY
+> +  Verify the integrity of the unpacked image. Only if this succeeds,
+> +  KVM is allowed to start protected VCPUs.
+> +
+> +
+>  5. The kvm_run structure
+>  ========================
+>  
+> @@ -6026,3 +6071,13 @@ Architectures: s390
+>  
+>  This capability indicates that the KVM_S390_NORMAL_RESET and
+>  KVM_S390_CLEAR_RESET ioctls are available.
+> +
+> +8.23 KVM_CAP_S390_PROTECTED
+> +
+> +Architecture: s390
+> +
+> +This capability indicates that KVM can start protected VMs and the
+> +Ultravisor has therefore been initialized.
+
+"This capability indicates that the Ultravisor has been initialized and
+KVM can therefore start protected VMs."
+
+> +This will provide the new KVM_S390_PV_COMMAND ioctl and it will allow
+> +KVM_MP_STATE_LOAD as new MP_STATE. KVM_SET_MP_STATE can now fail for
+> +protected guests when the state change is invalid.
+
+"This capability governs the KVM_S390_PV_COMMAND ioctl and the
+KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
+guests when the state change is invalid."
 
