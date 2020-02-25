@@ -2,86 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B3E516BB4F
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 08:54:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD59616BB51
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 08:55:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729430AbgBYHyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 02:54:44 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33025 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729124AbgBYHyo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 02:54:44 -0500
-Received: by mail-wr1-f66.google.com with SMTP id u6so13493643wrt.0;
-        Mon, 24 Feb 2020 23:54:41 -0800 (PST)
+        id S1729661AbgBYHzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 02:55:19 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:41419 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729124AbgBYHzT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 02:55:19 -0500
+Received: by mail-ot1-f66.google.com with SMTP id r27so11242836otc.8;
+        Mon, 24 Feb 2020 23:55:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=glUb0AVNqIpQp8+EfyRlMJSV0T1LLIsDxr1f5R3n23U=;
-        b=YTYL8An11i8aSQf4sKTgmdrYyR/dfGa7Qb4DGS30HCSWAGdmP6sqwYbaY5w4pUZX+F
-         Ec6ikdtNmWhcTq/N+bmYyyZ1WRW+zzp78RFs4b8G+Lz2KRhAfbPwzHLmXVf1FaWsrEtT
-         VJEV4OS4ufJtYQxfy8IPaOiu5Ip2GnUCa1YNWQav4ACHz87iO0fKZFRF5O5w2k1Dd87C
-         Rxq0y7dJazr6QECY9uHJPnHVzVgevDcTR6tFVW6q3cjXO/YoVhf97gmx9gvb4RcvWjrQ
-         lZL2Ucet2AtaBLUOowGCvamH6V3o4qa5dsfI27WVZLDRw+XZH/EoUzWVRk+ucD8IN54F
-         AgGw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wpB86MNPuQluf2px2PUoNrc0vpFzF/KBEDkkr6xZ3J8=;
+        b=VMwUMCXnkN7cgIefOvdxbEwUemR6aHEb0yF8PLWeG1CRXzztczvR2oXfs0yo+ijwWB
+         P/D6OYIitzl7n8cVMM2elKxxKU3P0t8iD12Dtu+6FRvrchxiTpydxqu+eck2yeGBtnaN
+         zBw+QpMNqj0p2PqsF1laoubsY9YxPmeessbRXu2vU17lK1EWQWm+63AHS2nentw4Mjoc
+         Aku/8f4FaXIqWyOopGSo0UnCAaMIYqsZXZWjP0vck2puBlP6JqoQnOwi1IQAv8LEf4iV
+         hWxxPdeg5SYJfKvsQl2RXhhJMFfsqCcgx78JmugNTb16w5BBTOltChqqKtxyBbYUGX6X
+         JTzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=glUb0AVNqIpQp8+EfyRlMJSV0T1LLIsDxr1f5R3n23U=;
-        b=Nq6MFql861USCwm4Se+vLaLNhFTVDy6QoQ6HTyO42dELahXQoQu3fjg4qpuHzB1Blh
-         jqHrfF8PKot07bntHZQYBhn9kd6BsBsgp+GGHe6TocmfUNU4q/hswlwhl9u4VZp+KPEG
-         nn9k17z8Q5/lkWFUW+ewnkVMjHYIZrWqEt9t3ahYKzcbb/J1/bBM2s0xsQNVccU+olzX
-         MksbG27gS59BeUO4q5Cd9WmDOku1a/9yUhk8tATBozLD3S5DEy7dFhzQl7GQDjIXKQAd
-         6hSiW/E56qDVRrNqZltXk8Daud61IUp121ORtn9WzBOVdPvcx1upbFY+KRcZm8bamiIC
-         ynDQ==
-X-Gm-Message-State: APjAAAWEKjMFK6u1sCKmxE3Lwiny6xzGi7rUsOSdxlahgCaRZF1JAiub
-        zcga6L3Ra+G1sXaaKBXkqqL73AhK
-X-Google-Smtp-Source: APXvYqxYAvZdflOr+QOEBUCYEa0kDK0vl0sue/gFMGZ5Lf7uq4GAJAyhiCqUv9BjOM94QloItSr80w==
-X-Received: by 2002:adf:fcc4:: with SMTP id f4mr75000995wrs.247.1582617280595;
-        Mon, 24 Feb 2020 23:54:40 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id x7sm22177786wrq.41.2020.02.24.23.54.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Feb 2020 23:54:39 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     rmuncrief@humanavance.com
-Subject: [PATCH] KVM: SVM: allocate AVIC data structures based on kvm_amd moduleparameter
-Date:   Tue, 25 Feb 2020 08:54:38 +0100
-Message-Id: <1582617278-50338-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wpB86MNPuQluf2px2PUoNrc0vpFzF/KBEDkkr6xZ3J8=;
+        b=MDriBajOo6SReCiM4+w9Khq/wtZrSGvjV7nLdjIJT084wF4oz1951+jhGJAXErwBg5
+         jngrCRvWsi2Sy5Q8gNWiDD7frHnXRiPdCnsZRYpQfF8kWfHTJLTUMDN3q/CsvnQP3k4S
+         hXbgSABXQ7b44+FBA83+ws/loePrddEB8a0+hx0KpmxnwkkKL1yuQQ51q9UtpOlZ65VS
+         maqS4MgkHcFNbQDfoXH23Lf2TrwqEtEkZrg1XZ0pd7Nrcj7BfvCXJFe29YVV1nHRvP7N
+         1TMUGSaU9hyFOfG4PlX/z6ss9kRgFciZDjdlYxSn28vlrymgsDAqgqnHSEGkHaO7Uik3
+         ldAg==
+X-Gm-Message-State: APjAAAWaCWkrUMeZLfRGijUcqgfQXI0DyMmdYvy2vlDfW14y6/69xXq0
+        NXDgRfiiz1p6fLE6EPYCwrKvZWX6fSBmRIqXkM2t2OhE
+X-Google-Smtp-Source: APXvYqymYkXowCBI+4o4n/9GqHmhmSVSEVBWrKTOLkggfySlEYVizOYcEujRZtWDeWgKvXGZC9a8gpnzCeWX5l4RXXw=
+X-Received: by 2002:a05:6830:1:: with SMTP id c1mr39975236otp.254.1582617317572;
+ Mon, 24 Feb 2020 23:55:17 -0800 (PST)
+MIME-Version: 1.0
+References: <1581988104-16628-1-git-send-email-wanpengli@tencent.com> <1581988104-16628-2-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1581988104-16628-2-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 25 Feb 2020 15:55:06 +0800
+Message-ID: <CANRm+CyHmdbsw572x=8=GYEOw-YQCXhz89i9+VEmROBVAu+rvg@mail.gmail.com>
+Subject: Re: [PATCH RESEND v2 2/2] KVM: Pre-allocate 1 cpumask variable per
+ cpu for both pv tlb and pv ipis
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Even if APICv is disabled at startup, the backing page and ir_list need
-to be initialized in case they are needed later.  The only case in
-which this can be skipped is for userspace irqchip, and that must be
-done because avic_init_backing_page dereferences vcpu->arch.apic
-(which is NULL for userspace irqchip).
-
-Tested-by: rmuncrief@humanavance.com
-Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=206579
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index ad3f5b178a03..bd02526300ab 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2194,8 +2194,9 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- static int avic_init_vcpu(struct vcpu_svm *svm)
- {
- 	int ret;
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
- 
--	if (!kvm_vcpu_apicv_active(&svm->vcpu))
-+	if (!avic || !irqchip_in_kernel(vcpu->kvm))
- 		return 0;
- 
- 	ret = avic_init_backing_page(&svm->vcpu);
--- 
-1.8.3.1
-
+ping,
+On Tue, 18 Feb 2020 at 09:12, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> Nick Desaulniers Reported:
+>
+>   When building with:
+>   $ make CC=clang arch/x86/ CFLAGS=-Wframe-larger-than=1000
+>   The following warning is observed:
+>   arch/x86/kernel/kvm.c:494:13: warning: stack frame size of 1064 bytes in
+>   function 'kvm_send_ipi_mask_allbutself' [-Wframe-larger-than=]
+>   static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int
+>   vector)
+>               ^
+>   Debugging with:
+>   https://github.com/ClangBuiltLinux/frame-larger-than
+>   via:
+>   $ python3 frame_larger_than.py arch/x86/kernel/kvm.o \
+>     kvm_send_ipi_mask_allbutself
+>   points to the stack allocated `struct cpumask newmask` in
+>   `kvm_send_ipi_mask_allbutself`. The size of a `struct cpumask` is
+>   potentially large, as it's CONFIG_NR_CPUS divided by BITS_PER_LONG for
+>   the target architecture. CONFIG_NR_CPUS for X86_64 can be as high as
+>   8192, making a single instance of a `struct cpumask` 1024 B.
+>
+> This patch fixes it by pre-allocate 1 cpumask variable per cpu and use it for
+> both pv tlb and pv ipis..
+>
+> Reported-by: Nick Desaulniers <ndesaulniers@google.com>
+> Acked-by: Nick Desaulniers <ndesaulniers@google.com>
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+> v1 -> v2:
+>  * remove '!alloc' check
+>  * use new pv check helpers
+>
+>  arch/x86/kernel/kvm.c | 33 +++++++++++++++++++++------------
+>  1 file changed, 21 insertions(+), 12 deletions(-)
+>
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 76ea8c4..377b224 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -432,6 +432,8 @@ static bool pv_tlb_flush_supported(void)
+>                 kvm_para_has_feature(KVM_FEATURE_STEAL_TIME));
+>  }
+>
+> +static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
+> +
+>  #ifdef CONFIG_SMP
+>
+>  static bool pv_ipi_supported(void)
+> @@ -510,12 +512,12 @@ static void kvm_send_ipi_mask(const struct cpumask *mask, int vector)
+>  static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int vector)
+>  {
+>         unsigned int this_cpu = smp_processor_id();
+> -       struct cpumask new_mask;
+> +       struct cpumask *new_mask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+>         const struct cpumask *local_mask;
+>
+> -       cpumask_copy(&new_mask, mask);
+> -       cpumask_clear_cpu(this_cpu, &new_mask);
+> -       local_mask = &new_mask;
+> +       cpumask_copy(new_mask, mask);
+> +       cpumask_clear_cpu(this_cpu, new_mask);
+> +       local_mask = new_mask;
+>         __send_ipi_mask(local_mask, vector);
+>  }
+>
+> @@ -595,7 +597,6 @@ static void __init kvm_apf_trap_init(void)
+>         update_intr_gate(X86_TRAP_PF, async_page_fault);
+>  }
+>
+> -static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
+>
+>  static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+>                         const struct flush_tlb_info *info)
+> @@ -603,7 +604,7 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+>         u8 state;
+>         int cpu;
+>         struct kvm_steal_time *src;
+> -       struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_tlb_mask);
+> +       struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+>
+>         cpumask_copy(flushmask, cpumask);
+>         /*
+> @@ -642,6 +643,7 @@ static void __init kvm_guest_init(void)
+>         if (pv_tlb_flush_supported()) {
+>                 pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
+>                 pv_ops.mmu.tlb_remove_table = tlb_remove_table;
+> +               pr_info("KVM setup pv remote TLB flush\n");
+>         }
+>
+>         if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+> @@ -748,24 +750,31 @@ static __init int activate_jump_labels(void)
+>  }
+>  arch_initcall(activate_jump_labels);
+>
+> -static __init int kvm_setup_pv_tlb_flush(void)
+> +static __init int kvm_alloc_cpumask(void)
+>  {
+>         int cpu;
+> +       bool alloc = false;
+>
+>         if (!kvm_para_available() || nopv)
+>                 return 0;
+>
+> -       if (pv_tlb_flush_supported()) {
+> +       if (pv_tlb_flush_supported())
+> +               alloc = true;
+> +
+> +#if defined(CONFIG_SMP)
+> +       if (pv_ipi_supported())
+> +               alloc = true;
+> +#endif
+> +
+> +       if (alloc)
+>                 for_each_possible_cpu(cpu) {
+> -                       zalloc_cpumask_var_node(per_cpu_ptr(&__pv_tlb_mask, cpu),
+> +                       zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
+>                                 GFP_KERNEL, cpu_to_node(cpu));
+>                 }
+> -               pr_info("KVM setup pv remote TLB flush\n");
+> -       }
+>
+>         return 0;
+>  }
+> -arch_initcall(kvm_setup_pv_tlb_flush);
+> +arch_initcall(kvm_alloc_cpumask);
+>
+>  #ifdef CONFIG_PARAVIRT_SPINLOCKS
+>
+> --
+> 2.7.4
+>
