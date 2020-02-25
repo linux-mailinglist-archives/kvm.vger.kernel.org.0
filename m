@@ -2,201 +2,271 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CE1916BBAC
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 09:18:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4B6E16BBB6
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 09:21:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729697AbgBYISL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 03:18:11 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22244 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729360AbgBYISL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 03:18:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582618689;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=qLZKCPGahKgdWnmoci4Iy2YJ811YiahFIzrFsDIzji8=;
-        b=bfaZBAuNnYhYjq40NJKRbWbpfYYLR3jWCB3WqPEem3CnahsIOXwUoo4EOfMc5juzlgidqp
-        /JfSzgTdSb/rxFLS91VAlV7pVYeCHNaUcTqusGTpgXol03vSYcme6Syrfg3D/gEAUUbuCy
-        fNjU3o60u0kIAEQ16D+66PxytMMj7Wk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-KwzumSKvPKWl6os7RVas4Q-1; Tue, 25 Feb 2020 03:18:05 -0500
-X-MC-Unique: KwzumSKvPKWl6os7RVas4Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C9E413F7;
-        Tue, 25 Feb 2020 08:18:04 +0000 (UTC)
-Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BF41D8B755;
-        Tue, 25 Feb 2020 08:18:01 +0000 (UTC)
-Subject: Re: [PATCH v4 18/36] KVM: S390: protvirt: Introduce instruction data
- area bounce buffer
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200224114107.4646-1-borntraeger@de.ibm.com>
- <20200224114107.4646-19-borntraeger@de.ibm.com>
- <3db82b2d-ad79-8178-e027-c19889d96558@redhat.com>
- <f8d7321e-400e-ed82-471e-166a2d18ede6@de.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <74359acb-6694-8cae-e2ae-9eda54fa12a4@redhat.com>
-Date:   Tue, 25 Feb 2020 09:18:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1729637AbgBYIVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 03:21:03 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:43487 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729360AbgBYIVD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 03:21:03 -0500
+Received: by mail-lj1-f196.google.com with SMTP id a13so12990213ljm.10
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 00:21:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=E1oNb9AMx6C5uQOfoywNSmQAuPih8254eQSZA8FjCVo=;
+        b=edo8WPgCckmEi697/1+N7Imoc8ABvjc3Nys6qXdrRYF0/uyweguSLxUhorGcZqnx4k
+         KJvmL0dsekm/Ltm2cHbVaICF/Vfn3o7z9kmBTP9BB7k9tMm5FtEVcp8cspGVvdUZ1464
+         fnPPtclKdHgL476s7KpRy5spRnI1lEX6Qqcgx3BfRkbRSdO0nEngB2b57JMgB8njcKQA
+         hEfMeMqPeQMibPnoHzSP4ZUEdslv8Z8r0ihumBoiVOV/Iqlx9m74E2VdvkXUE4+N+hK7
+         Vml5Q5JfHTE7uyUXfmFeObGat93gr5cOlxAQKiipyO3SY+lsqonhgJP9h31gB5zNqZAQ
+         eRTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=E1oNb9AMx6C5uQOfoywNSmQAuPih8254eQSZA8FjCVo=;
+        b=mwKFvrfspSoGcyo+P24mYRVl/6ZIpOkplSXCW37hioFx4XYnxYVhLh3oJzL/Rv96MU
+         5M2APC2fX9OnkNzwkfUJ2ydsHCaCovGwGZiSH9AKTuHb1J+ATs5pxyyP1eRwIqL7feb8
+         FVfmaApuHP7phgsMkSPXLDzPuRa8F3VKL/eml2QPLKswKFaLEUDmVBX2vBkb+rVcR1+W
+         hGpXvxR8AWvf3w4dm9t0HH+wmwde8u2n3/j8537aC7Cs/6XJ1vgH054KbI6RCKOvdtvA
+         4vhHmenI/P0CjmzKH7vdxMpHdzhUgKMoGkJoCZkmv+s+fcgGBiSwpH7GSxLa+WpRo/AT
+         8HHQ==
+X-Gm-Message-State: APjAAAWNarFvFB014BT7jfuPpAYd1G5pWIGaiHxAsjlRdS6ho9xJ56Pl
+        R1pfQAwPdOpSJxGjjjb9Y8WN+QP3gD6bxUtE7pGrOw==
+X-Google-Smtp-Source: APXvYqypfZVT2tXFJb/DYv6AwPAe+lb7UU0LwBUNu4k+SL6+sGX4XHSO/+rE2Pb0TGwL7OAlsoJ3yz6Iz/fAEX3r31k=
+X-Received: by 2002:a2e:9e55:: with SMTP id g21mr33445298ljk.245.1582618859162;
+ Tue, 25 Feb 2020 00:20:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <f8d7321e-400e-ed82-471e-166a2d18ede6@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
+ <c82f4386-702f-a2e9-a4d7-d5ebb1f335d1@arm.com> <20200224133818.gtxtrmzo4y4guk4z@kamzik.brq.redhat.com>
+ <adf05c0d-6a19-da06-5e41-da63b0d0d8d8@arm.com> <20200224145936.mzpwveaoijjmb5ql@kamzik.brq.redhat.com>
+ <CA+G9fYvt2LyqU5G2j_EFKzgPXzt8sDYYm8NxP+zD6Do07REsYw@mail.gmail.com>
+ <7b9209be-f880-a791-a2b9-c7e98bf05ecd@arm.com> <CA+G9fYvjoeLV5B951yFb8fc7r+WAejz+0kHcFYTNzW6+HfouXw@mail.gmail.com>
+In-Reply-To: <CA+G9fYvjoeLV5B951yFb8fc7r+WAejz+0kHcFYTNzW6+HfouXw@mail.gmail.com>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Tue, 25 Feb 2020 13:50:47 +0530
+Message-ID: <CA+G9fYuEfrhW_7vLCdK4nKBhDv6aQkK_knUY7mbgeDcuaETLyQ@mail.gmail.com>
+Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Andrew Jones <drjones@redhat.com>, kvm list <kvm@vger.kernel.org>,
+        lkft-triage@lists.linaro.org,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>, yzt356@gmail.com,
+        jmattson@google.com, Paolo Bonzini <pbonzini@redhat.com>,
+        namit@vmware.com, sean.j.christopherson@intel.com,
+        Basil Eljuse <Basil.Eljuse@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.02.20 08:50, Christian Borntraeger wrote:
->=20
->=20
-> On 24.02.20 20:13, David Hildenbrand wrote:
->> On 24.02.20 12:40, Christian Borntraeger wrote:
->>> From: Janosch Frank <frankja@linux.ibm.com>
->>>
->>> Now that we can't access guest memory anymore, we have a dedicated
->>> satellite block that's a bounce buffer for instruction data.
->>>
->>> We re-use the memop interface to copy the instruction data to / from
->>> userspace. This lets us re-use a lot of QEMU code which used that
->>> interface to make logical guest memory accesses which are not possibl=
-e
->>> anymore in protected mode anyway.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>
->> [...]
->>
->>> +
->>>  long kvm_arch_vcpu_async_ioctl(struct file *filp,
->>>  			       unsigned int ioctl, unsigned long arg)
->>>  {
->>> @@ -4683,7 +4732,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->>>  		struct kvm_s390_mem_op mem_op;
->>> =20
->>>  		if (copy_from_user(&mem_op, argp, sizeof(mem_op)) =3D=3D 0)
->>> -			r =3D kvm_s390_guest_mem_op(vcpu, &mem_op);
->>> +			r =3D kvm_s390_guest_memsida_op(vcpu, &mem_op);
->>>  		else
->>>  			r =3D -EFAULT;
->>>  		break;
->>> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
->>> index 014e53a41ead..cd81a58349a9 100644
->>> --- a/arch/s390/kvm/pv.c
->>> +++ b/arch/s390/kvm/pv.c
->>> @@ -33,10 +33,13 @@ int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu=
-, u16 *rc, u16 *rrc)
->>>  	if (!cc)
->>>  		free_pages(vcpu->arch.pv.stor_base,
->>>  			   get_order(uv_info.guest_cpu_stor_len));
->>> +
->>> +	free_page(sida_origin(vcpu->arch.sie_block));
->>>  	vcpu->arch.sie_block->pv_handle_cpu =3D 0;
->>>  	vcpu->arch.sie_block->pv_handle_config =3D 0;
->>>  	memset(&vcpu->arch.pv, 0, sizeof(vcpu->arch.pv));
->>>  	vcpu->arch.sie_block->sdf =3D 0;
->>> +	vcpu->arch.sie_block->gbea =3D 1;
->>
->> I am very confused why gbea is set to 1 when destroying the CPU. It's
->> otherwise never set (always 0). What's the meaning of this?
->=20
-> This is the guest breaking event address. So a guest (and QEMU) can rea=
-d it.
-> It is kind of overlaid sida and gbea. Something like this:
->=20
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index cd81a58349a9..055bf0ec8fbb 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -39,6 +39,11 @@ int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u=
-16 *rc, u16 *rrc)
->         vcpu->arch.sie_block->pv_handle_config =3D 0;
->         memset(&vcpu->arch.pv, 0, sizeof(vcpu->arch.pv));
->         vcpu->arch.sie_block->sdf =3D 0;
-> +       /*
-> +        * the sidad field (for sdf =3D=3D 2) is now the gbea field (fo=
-r sdf =3D=3D 0).
-> +        * Use the reset value of gbea to not leak the kernel pointer o=
-f the
-> +        * just free sida
+Hi Alexandru,
 
-"freed sida."
+On Mon, 24 Feb 2020 at 23:14, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+> >
+> > I think this is because you are running it on one physical CPU (it's exactly the
+> > same message I am getting when I use taskset to run the tests). Can you try and
+> > run it without taskset and see if it solves your issue?
 
-I guess I would have set the sidad to NULL in addition before the
-"vcpu->arch.sie_block->sdf =3D 0", so access to the sidad becomes actuall=
-y
-grep-able.
+We have a new problem when running [1] without taskset on Juno-r2.
+None of the test got pass [2] when running without taskset on Juno-r2.
 
+Test results summary on arm64 juno-r2.
+selftest-setup fail
+selftest-vectors-kernel fail
+selftest-vectors-user fail
+selftest-smp fail
+pci-test skip
+pmu skip
+gicv2-ipi skip
+gicv2-mmio fail
+gicv2-mmio-up skip
+gicv2-mmio-3p fail
+gicv3-ipi skip
+gicv2-active skip
+gicv3-active skip
+psci fail
+timer skip
+micro-bench skip
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+TAP 13 version and logs output on arm64 juno-r2.
 
---=20
-Thanks,
++ ./run_tests.sh -a -v -t
++ tee -a /lava-1250334/1/tests/2_kvm-unit-tests-tap13-1/automated/linux/kvm-unit-tests/output/result_log.txt
+TAP version 13
+[  129.497212] audit: type=1701 audit(1582614457.002:23):
+auid=4294967295 uid=0 gid=0 ses=4294967295 pid=3718
+comm=\"qemu-system-aar\" exe=\"/usr/bin/qemu-system-aarch64\" sig=6
+res=1
+[  129.513615] audit: type=1701 audit(1582614457.018:24):
+auid=4294967295 uid=0 gid=0 ses=4294967295 pid=3715 comm=\"timeout\"
+exe=\"/usr/bin/timeout.coreutils\" sig=6 res=1
+[  131.516562] audit: type=1701 audit(1582614459.022:25):
+auid=4294967295 uid=0 gid=0 ses=4294967295 pid=4008
+comm=\"qemu-system-aar\" exe=\"/usr/bin/qemu-system-aarch64\" sig=6
+res=1
+[  131.535440] audit: type=1701 audit(1582614459.038:26):
+auid=4294967295 uid=0 gid=0 ses=4294967295 pid=4005 comm=\"timeout\"
+exe=\"/usr/bin/timeout.coreutils\" sig=6 res=1
+[  137.918204] audit: type=1701 audit(1582614465.418:27):
+auid=4294967295 uid=0 gid=0 ses=4294967295 pid=5020
+comm=\"qemu-system-aar\" exe=\"/usr/bin/qemu-system-aarch64\" sig=6
+res=1
+[  137.944969] audit: type=1701 audit(1582614465.446:28):
+auid=4294967295 uid=0 gid=0 ses=4294967295 pid=5017 comm=\"timeout\"
+exe=\"/usr/bin/timeout.coreutils\" sig=6 res=1
+[  138.934361] audit: type=1701 audit(1582614466.438:29):
+auid=4294967295 uid=0 gid=0 ses=4294967295 pid=5169
+comm=\"qemu-system-aar\" exe=\"/usr/bin/qemu-system-aarch64\" sig=6
+res=1
+[  138.950974] audit: type=1701 audit(1582614466.450:30):
+auid=4294967295 uid=0 gid=0 ses=4294967295 pid=5166 comm=\"timeout\"
+exe=\"/usr/bin/timeout.coreutils\" sig=6 res=1
+1..0
++ ls logs/cache.log logs/gicv2-active.log logs/gicv2-ipi.log
+logs/gicv2-mmio-3p.log logs/gicv2-mmio-up.log logs/gicv2-mmio.log
+logs/gicv3-active.log logs/gicv3-ipi.log logs/micro-bench.log
+logs/pci-test.log logs/pmu.log logs/psci.log logs/selftest-setup.log
+logs/selftest-smp.log logs/selftest-vectors-kernel.log
+logs/selftest-vectors-user.log logs/timer.log
+logs/cache.log logs/gicv3-active.log  logs/selftest-setup.log
+logs/gicv2-active.log logs/gicv3-ipi.log     logs/selftest-smp.log
+logs/gicv2-ipi.log logs/micro-bench.log   logs/selftest-vectors-kernel.log
+logs/gicv2-mmio-3p.log logs/pci-test.log      logs/selftest-vectors-user.log
+logs/gicv2-mmio-up.log logs/pmu.log        logs/timer.log
+logs/gicv2-mmio.log logs/psci.log
++ cat logs/cache.log logs/gicv2-active.log logs/gicv2-ipi.log
+logs/gicv2-mmio-3p.log logs/gicv2-mmio-up.log logs/gicv2-mmio.log
+logs/gicv3-active.log logs/gicv3-ipi.log logs/micro-bench.log
+logs/pci-test.log logs/pmu.log logs/psci.log logs/selftest-setup.log
+logs/selftest-smp.log logs/selftest-vectors-kernel.log
+logs/selftest-vectors-user.log logs/timer.log
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/cache.flat -smp 1 # -initrd /tmp/tmp.34XgPJlN9a
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/gic.flat -smp 6 -machine gic-version=2 -append active # -initrd
+/tmp/tmp.OjpYr51BSm
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+_NO_FILE_4Uhere_ -smp 6 -machine gic-version=2 -append ipi # -initrd
+/tmp/tmp.Tu8YjEjozY
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+_NO_FILE_4Uhere_ -smp 3 -machine gic-version=2 -append mmio # -initrd
+/tmp/tmp.tP5NfvXIN1
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+_NO_FILE_4Uhere_ -smp 1 -machine gic-version=2 -append mmio # -initrd
+/tmp/tmp.YCCzSHAXbL
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+_NO_FILE_4Uhere_ -smp 6 -machine gic-version=2 -append mmio # -initrd
+/tmp/tmp.uotwZXn3uL
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+_NO_FILE_4Uhere_ -smp 6 -machine gic-version=3 -append active #
+-initrd /tmp/tmp.W2NfOxzsXx
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+_NO_FILE_4Uhere_ -smp 6 -machine gic-version=3 -append ipi # -initrd
+/tmp/tmp.VoJWeZB3q5
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/micro-bench.flat -smp 2 # -initrd /tmp/tmp.oOL0QMcBXU
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+_NO_FILE_4Uhere_ -smp 1 # -initrd /tmp/tmp.SxqK7GfycP
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/pmu.flat -smp 1 # -initrd /tmp/tmp.ikueOgLcuz
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/psci.flat -smp 6 # -initrd /tmp/tmp.DnL8Q0I9uT
+kvm_arm_vcpu_init failed: Invalid argument
+timeout: the monitored command dumped core
+QEMU Aborted
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/selftest.flat -smp 2 -m 256 -append setup smp=2 mem=256 # -initrd
+/tmp/tmp.BXVafuVRMR
+kvm_arm_vcpu_init failed: Invalid argument
+timeout: the monitored command dumped core
+QEMU Aborted
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+_NO_FILE_4Uhere_ -smp 6 -append smp # -initrd /tmp/tmp.oxILXsU6Lz
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/selftest.flat -smp 1 -append vectors-kernel # -initrd
+/tmp/tmp.04kmwQgtRW
+kvm_init_vcpu failed: Invalid argument
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64
+-nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/selftest.flat -smp 1 -append vectors-user # -initrd
+/tmp/tmp.xd7EZ8XBHo
+kvm_arm_vcpu_init failed: Invalid argument
+timeout: the monitored command dumped core
+QEMU Aborted
+timeout -k 1s --foreground 2s /usr/bin/qemu-system-aarch64 -nodefaults
+-machine virt,gic-version=host,accel=kvm -cpu host -device
+virtio-serial-device -device virtconsole,chardev=ctd -chardev
+testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
+arm/timer.flat -smp 1 # -initrd /tmp/tmp.NmNBOxyyxP
+kvm_arm_vcpu_init failed: Invalid argument
+timeout: the monitored command dumped core
+QEMU Aborted
 
-David / dhildenb
+[1] https://lkft.validation.linaro.org/scheduler/job/1250335#L2594
+[2] https://lkft.validation.linaro.org/scheduler/job/1250336#L1578
 
+- Naresh
