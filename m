@@ -2,308 +2,522 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 85CC016EE55
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 19:49:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89D2316EE95
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 20:07:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731581AbgBYSti (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 13:49:38 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51952 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727983AbgBYSth (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 13:49:37 -0500
+        id S1731307AbgBYTHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 14:07:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24433 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728787AbgBYTHY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 14:07:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582656575;
+        s=mimecast20190719; t=1582657641;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=0U2YIjcaH0sfDbbfCVMq4B9fMc4mFyqws5g8Fj7EgeU=;
-        b=fZV0fd6W2yfWNapbPXgaS2PC1dR/ohv1yVuh3JJrLkn8PimHMJuScszAQVvHElc1SN7ue6
-        aKHjEM4eiytEp/DIIXo8c6w0KKeA7L5+Um9HUWLw8s6TaBXq/eoEYWZGXjI0GnTckID3Wa
-        41SRqVr6xn0bs4P28j2ZRDyGjnAfMAw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-134-mEPfYc_cPrak1wILQNMV6A-1; Tue, 25 Feb 2020 13:49:32 -0500
-X-MC-Unique: mEPfYc_cPrak1wILQNMV6A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADB381005512;
-        Tue, 25 Feb 2020 18:49:29 +0000 (UTC)
-Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C7CA1001DC0;
-        Tue, 25 Feb 2020 18:49:22 +0000 (UTC)
-Subject: Re: [PATCH RFC v4 06/13] mm: Allow to offline unmovable PageOffline()
- pages via MEM_GOING_OFFLINE
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        linux-kernel@vger.kernel.org
-Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Pavel Tatashin <pavel.tatashin@microsoft.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Qian Cai <cai@lca.pw>, Pingfan Liu <kernelfans@gmail.com>
-References: <20191212171137.13872-1-david@redhat.com>
- <20191212171137.13872-7-david@redhat.com>
- <6ec496580ddcb629d22589a1cba8cd61cbd53206.camel@linux.intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <267ea186-aba8-1a93-bd55-ac641f78d07e@redhat.com>
-Date:   Tue, 25 Feb 2020 19:49:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+         in-reply-to:in-reply-to:references:references;
+        bh=Ep801ncFEQfWcLt8k0vy5J4XNQ6OpZHZbSdYTiu6vmU=;
+        b=gtAcRBOni+1hk6qTKxstvUbzhd0cxAB3Y1rdGCmLZU8xK0rue8JSzr5FxAcK/+Dfl1bf1v
+        h1IhscyIY2y38Y5y97I9cJ9qGI8GhIfd3FP0Nq/AYpAMf0oVd2fpOj1IijMwwRBRWfdVsQ
+        JB4X/pZXCZq2i3B3mBJWVhIqgH8DWSk=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-b7shNd5DOjy-AeTb7gd3LQ-1; Tue, 25 Feb 2020 14:07:19 -0500
+X-MC-Unique: b7shNd5DOjy-AeTb7gd3LQ-1
+Received: by mail-qt1-f197.google.com with SMTP id o24so575048qtr.17
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 11:07:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ep801ncFEQfWcLt8k0vy5J4XNQ6OpZHZbSdYTiu6vmU=;
+        b=NxgbdNWYvQwLmeQWO7TDD4XE2bwSzmrWVoLOIArM6oZW3HrP9ClevCXxQmIDmjZGId
+         kJj7PXNzPYJQhjRMM64cmN6P4xrlEsgpyw11g3rk6RvWnGBiqisSHrlg7NObIj4lwFGx
+         /hqVcjzMoNCxf1PDWQtQxOeUyAs4PKBnSLhSQycYkGk3lj7N1YiRtc+8CKOLHPqd71WX
+         Bkd3/z3fMb7uDFUCNObUghElnMkYTgxkoqMVSX7j9sLr5ZVsDgeBMuOWoFtGCkjikMa2
+         Cwx85HmG5NSG9Q4m0TpjxLW7rYN4y8GDhEkH/r1m8ktNwHSAeXZXjDMTXO5xyQ8ggBM0
+         224Q==
+X-Gm-Message-State: APjAAAXU37HjENR9C4RPjhAGnOQA1i2fB31H7lyx7tuaKE2dMpzLDre5
+        K1a6KpOIoX9IhZNYMaR6/Q+FmNB9XohCSBR7Z8lmljEwjklhGL502Xns9POsy69xK3DB0iaK+lk
+        nXBPhmAgWfFT3
+X-Received: by 2002:a0c:9c86:: with SMTP id i6mr401111qvf.214.1582657638816;
+        Tue, 25 Feb 2020 11:07:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqye3eUG2mB2YDkuxlHFxNK91lpl3gunXsnFR3haj0yhos8PaTMdfXgKzTwWTKqEDSkerLM/Yw==
+X-Received: by 2002:a0c:9c86:: with SMTP id i6mr401076qvf.214.1582657638439;
+        Tue, 25 Feb 2020 11:07:18 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id m23sm7879408qtp.6.2020.02.25.11.07.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2020 11:07:17 -0800 (PST)
+Date:   Tue, 25 Feb 2020 14:07:15 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
+Subject: Re: [PATCH v3] KVM: x86: enable dirty log gradually in small chunks
+Message-ID: <20200225190715.GA140200@xz-x1>
+References: <20200224032558.2728-1-jianjay.zhou@huawei.com>
+ <20200224170538.GH37727@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BB1B778@dggemm508-mbx.china.huawei.com>
+ <20200225160758.GB127720@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <6ec496580ddcb629d22589a1cba8cd61cbd53206.camel@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <20200225160758.GB127720@xz-x1>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->>  /*
->>   * Scan pfn range [start,end) to find movable/migratable pages (LRU p=
-ages,
->> - * non-lru movable pages and hugepages). We scan pfn because it's muc=
-h
->> - * easier than scanning over linked list. This function returns the p=
-fn
->> - * of the first found movable page if it's found, otherwise 0.
->> + * non-lru movable pages and hugepages).
->> + *
->> + * Returns:
->> + *	0 in case a movable page is found and movable_pfn was updated.
->> + *	-ENOENT in case no movable page was found.
->> + *	-EBUSY in case a definetly unmovable page was found.
->>   */
->> -static unsigned long scan_movable_pages(unsigned long start, unsigned=
- long end)
->> +static int scan_movable_pages(unsigned long start, unsigned long end,
->> +			      unsigned long *movable_pfn)
->>  {
->>  	unsigned long pfn;
->> =20
->> @@ -1247,18 +1251,29 @@ static unsigned long scan_movable_pages(unsign=
-ed long start, unsigned long end)
->>  			continue;
->>  		page =3D pfn_to_page(pfn);
->>  		if (PageLRU(page))
->> -			return pfn;
->> +			goto found;
->>  		if (__PageMovable(page))
->> -			return pfn;
->> +			goto found;
->> +
->> +		/*
->> +		 * Unmovable PageOffline() pages where somebody still holds
->> +		 * a reference count (after MEM_GOING_OFFLINE) can definetly
->> +		 * not be offlined.
->> +		 */
->> +		if (PageOffline(page) && page_count(page))
->> +			return -EBUSY;
->=20
-> So the comment confused me a bit because technically this function isn'=
-t
-> about offlining memory, it is about finding movable pages. I had to do =
-a
-> bit of digging to find the only consumer is __offline_pages, but if we =
-are
-> going to talk about "offlining" instead of "moving" in this function it
-> might make sense to rename it.
+On Tue, Feb 25, 2020 at 11:07:58AM -0500, Peter Xu wrote:
+> On Tue, Feb 25, 2020 at 03:15:37AM +0000, Zhoujian (jay) wrote:
+> > 
+> > 
+> > > -----Original Message-----
+> > > From: Peter Xu [mailto:peterx@redhat.com]
+> > > Sent: Tuesday, February 25, 2020 1:06 AM
+> > > To: Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > > Cc: kvm@vger.kernel.org; pbonzini@redhat.com;
+> > > sean.j.christopherson@intel.com; wangxin (U) <wangxinxin.wang@huawei.com>;
+> > > Huangweidong (C) <weidong.huang@huawei.com>; Liujinsong (Paul)
+> > > <liu.jinsong@huawei.com>
+> > > Subject: Re: [PATCH v3] KVM: x86: enable dirty log gradually in small chunks
+> > > 
+> > > On Mon, Feb 24, 2020 at 11:25:58AM +0800, Jay Zhou wrote:
+> > > > It could take kvm->mmu_lock for an extended period of time when
+> > > > enabling dirty log for the first time. The main cost is to clear all
+> > > > the D-bits of last level SPTEs. This situation can benefit from manual
+> > > > dirty log protect as well, which can reduce the mmu_lock time taken.
+> > > > The sequence is like this:
+> > > >
+> > > > 1. Initialize all the bits of the dirty bitmap to 1 when enabling
+> > > >    dirty log for the first time
+> > > > 2. Only write protect the huge pages
+> > > > 3. KVM_GET_DIRTY_LOG returns the dirty bitmap info 4.
+> > > > KVM_CLEAR_DIRTY_LOG will clear D-bit for each of the leaf level
+> > > >    SPTEs gradually in small chunks
+> > > >
+> > > > Under the Intel(R) Xeon(R) Gold 6152 CPU @ 2.10GHz environment, I did
+> > > > some tests with a 128G windows VM and counted the time taken of
+> > > > memory_global_dirty_log_start, here is the numbers:
+> > > >
+> > > > VM Size        Before    After optimization
+> > > > 128G           460ms     10ms
+> > > >
+> > > > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> > > > ---
+> > > > v3:
+> > > >   * add kvm_manual_dirty_log_init_set helper, add testcase on top and
+> > > >     keep old behavior for KVM_MEM_READONLY [Peter]
+> > > >   * tweak logic at enabling KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2
+> > > [Sean,
+> > > > Peter]
+> > > >
+> > > > v2:
+> > > >   * add new bit to KVM_ENABLE_CAP for
+> > > KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 [Paolo]
+> > > >   * support non-PML path [Peter]
+> > > >   * delete the unnecessary ifdef and make the initialization of bitmap
+> > > >     more clear [Sean]
+> > > >   * document the new bits and tweak the testcase
+> > > >
+> > > >  Documentation/virt/kvm/api.rst  | 16 +++++++++++++---
+> > > > arch/x86/include/asm/kvm_host.h |  3 ++-
+> > > >  arch/x86/kvm/mmu/mmu.c          |  7 ++++---
+> > > >  arch/x86/kvm/vmx/vmx.c          |  3 ++-
+> > > >  arch/x86/kvm/x86.c              | 18 +++++++++++++++---
+> > > >  include/linux/kvm_host.h        |  9 ++++++++-
+> > > >  virt/kvm/kvm_main.c             | 30 +++++++++++++++++++++++-------
+> > > >  7 files changed, 67 insertions(+), 19 deletions(-)
+> > > >
+> > > > diff --git a/Documentation/virt/kvm/api.rst
+> > > > b/Documentation/virt/kvm/api.rst index 97a72a5..807fcd7 100644
+> > > > --- a/Documentation/virt/kvm/api.rst
+> > > > +++ b/Documentation/virt/kvm/api.rst
+> > > > @@ -5704,10 +5704,20 @@ and injected exceptions.
+> > > >  :Architectures: x86, arm, arm64, mips
+> > > >  :Parameters: args[0] whether feature should be enabled or not
+> > > >
+> > > > -With this capability enabled, KVM_GET_DIRTY_LOG will not
+> > > > automatically -clear and write-protect all pages that are returned as dirty.
+> > > > +Valid flags are::
+> > > > +
+> > > > +  #define KVM_DIRTY_LOG_MANUAL_PROTECT2 (1 << 0)  #define
+> > > > + KVM_DIRTY_LOG_INITIALLY_SET (1 << 1)
+> > > 
+> > > I think I mis-read previously on the old version so my comment was misleading.
+> > > If this is the sub-capability within KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2,
+> > > then I don't think we need to have the ending "2" any more.  How about:
+> > 
+> > It's OK, :-)
+> > 
+> > > 
+> > >   KVM_MANUAL_PROTECT_ENABLE
+> > >   KVM_MANUAL_PROTECT_INIT_ALL_SET
+> > 
+> > I think this naming emphasizes more about "manual protect", and the
+> > original naming emphasizes more about "dirty log". The object of manual protect
+> > and initial-all-set is dirty log, so it seem that the original names are a little more
+> > close to the thing we do.
+> 
+> OK.  Then maybe rename bit 0 of KVM_DIRTY_LOG_MANUAL_PROTECT2 to
+> KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE?  No strong opinion but it looks
+> weird to have the ending "2" in the sub-caps..
+> 
+> > 
+> > > > +
+> > > > +With KVM_DIRTY_LOG_MANUAL_PROTECT2 set, KVM_GET_DIRTY_LOG will
+> > > not
+> > > > +automatically clear and write-protect all pages that are returned as dirty.
+> > > >  Rather, userspace will have to do this operation separately using
+> > > > KVM_CLEAR_DIRTY_LOG.
+> > > > +With KVM_DIRTY_LOG_INITIALLY_SET set, all the bits of the dirty
+> > > > +bitmap will be initialized to 1 when created, dirty logging will be
+> > > > +enabled gradually in small chunks using KVM_CLEAR_DIRTY_LOG.
+> > > > +However, the KVM_DIRTY_LOG_INITIALLY_SET depends on
+> > > > +KVM_DIRTY_LOG_MANUAL_PROTECT2, it can not be set individually and
+> > > supports x86 only for now.
+> > > >
+> > > >  At the cost of a slightly more complicated operation, this provides
+> > > > better  scalability and responsiveness for two reasons.  First, @@
+> > > > -5716,7 +5726,7 @@ than requiring to sync a full memslot; this ensures
+> > > > that KVM does not  take spinlocks for an extended period of time.
+> > > > Second, in some cases a  large amount of time can pass between a call
+> > > > to KVM_GET_DIRTY_LOG and  userspace actually using the data in the
+> > > > page.  Pages can be modified -during this time, which is inefficint for both the
+> > > guest and userspace:
+> > > > +during this time, which is inefficient for both the guest and userspace:
+> > > >  the guest will incur a higher penalty due to write protection faults,
+> > > > while userspace can see false reports of dirty pages.  Manual
+> > > > reprotection  helps reducing this time, improving guest performance
+> > > > and reducing the diff --git a/arch/x86/include/asm/kvm_host.h
+> > > > b/arch/x86/include/asm/kvm_host.h index 40a0c0f..a90630c 100644
+> > > > --- a/arch/x86/include/asm/kvm_host.h
+> > > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > > @@ -1312,7 +1312,8 @@ void kvm_mmu_set_mask_ptes(u64 user_mask, u64
+> > > > accessed_mask,
+> > > >
+> > > >  void kvm_mmu_reset_context(struct kvm_vcpu *vcpu);  void
+> > > > kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+> > > > -				      struct kvm_memory_slot *memslot);
+> > > > +				      struct kvm_memory_slot *memslot,
+> > > > +				      int start_level);
+> > > >  void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+> > > >  				   const struct kvm_memory_slot *memslot);  void
+> > > > kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm, diff --git
+> > > > a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c index
+> > > > 87e9ba2..a4e70eb 100644
+> > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > @@ -5860,13 +5860,14 @@ static bool slot_rmap_write_protect(struct kvm
+> > > > *kvm,  }
+> > > >
+> > > >  void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+> > > > -				      struct kvm_memory_slot *memslot)
+> > > > +				      struct kvm_memory_slot *memslot,
+> > > > +				      int start_level)
+> > > >  {
+> > > >  	bool flush;
+> > > >
+> > > >  	spin_lock(&kvm->mmu_lock);
+> > > > -	flush = slot_handle_all_level(kvm, memslot, slot_rmap_write_protect,
+> > > > -				      false);
+> > > > +	flush = slot_handle_level(kvm, memslot, slot_rmap_write_protect,
+> > > > +				start_level, PT_MAX_HUGEPAGE_LEVEL, false);
+> > > >  	spin_unlock(&kvm->mmu_lock);
+> > > >
+> > > >  	/*
+> > > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c index
+> > > > 3be25ec..0deb8c3 100644
+> > > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > > @@ -7201,7 +7201,8 @@ static void vmx_sched_in(struct kvm_vcpu *vcpu,
+> > > > int cpu)  static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+> > > >  				     struct kvm_memory_slot *slot)  {
+> > > > -	kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+> > > > +	if (!kvm_manual_dirty_log_init_set(kvm))
+> > > > +		kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+> > > >  	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);  }
+> > > >
+> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c index
+> > > > fb5d64e..f816940 100644
+> > > > --- a/arch/x86/kvm/x86.c
+> > > > +++ b/arch/x86/kvm/x86.c
+> > > > @@ -9956,7 +9956,7 @@ static void kvm_mmu_slot_apply_flags(struct kvm
+> > > > *kvm,  {
+> > > >  	/* Still write protect RO slot */
+> > > >  	if (new->flags & KVM_MEM_READONLY) {
+> > > > -		kvm_mmu_slot_remove_write_access(kvm, new);
+> > > > +		kvm_mmu_slot_remove_write_access(kvm, new,
+> > > PT_PAGE_TABLE_LEVEL);
+> > > >  		return;
+> > > >  	}
+> > > >
+> > > > @@ -9993,8 +9993,20 @@ static void kvm_mmu_slot_apply_flags(struct kvm
+> > > *kvm,
+> > > >  	if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+> > > >  		if (kvm_x86_ops->slot_enable_log_dirty)
+> > > >  			kvm_x86_ops->slot_enable_log_dirty(kvm, new);
+> > > > -		else
+> > > > -			kvm_mmu_slot_remove_write_access(kvm, new);
+> > > > +		else {
+> > > > +			int level = kvm_manual_dirty_log_init_set(kvm) ?
+> > > > +				PT_DIRECTORY_LEVEL : PT_PAGE_TABLE_LEVEL;
+> > > > +
+> > > > +			/*
+> > > > +			 * If we're with initial-all-set, we don't need
+> > > > +			 * to write protect any small page because
+> > > > +			 * they're reported as dirty already.  However
+> > > > +			 * we still need to write-protect huge pages
+> > > > +			 * so that the page split can happen lazily on
+> > > > +			 * the first write to the huge page.
+> > > > +			 */
+> > > > +			kvm_mmu_slot_remove_write_access(kvm, new, level);
+> > > > +		}
+> > > >  	} else {
+> > > >  		if (kvm_x86_ops->slot_disable_log_dirty)
+> > > >  			kvm_x86_ops->slot_disable_log_dirty(kvm, new); diff --git
+> > > > a/include/linux/kvm_host.h b/include/linux/kvm_host.h index
+> > > > e89eb67..80ada94 100644
+> > > > --- a/include/linux/kvm_host.h
+> > > > +++ b/include/linux/kvm_host.h
+> > > > @@ -360,6 +360,13 @@ static inline unsigned long
+> > > *kvm_second_dirty_bitmap(struct kvm_memory_slot *mem
+> > > >  	return memslot->dirty_bitmap + len / sizeof(*memslot->dirty_bitmap);
+> > > > }
+> > > >
+> > > > +#define KVM_DIRTY_LOG_MANUAL_PROTECT2 (1 << 0) #define
+> > > > +KVM_DIRTY_LOG_INITIALLY_SET (1 << 1) #define
+> > > > +KVM_DIRTY_LOG_MANUAL_CAPS (KVM_DIRTY_LOG_MANUAL_PROTECT2 |
+> > > \
+> > > > +				KVM_DIRTY_LOG_INITIALLY_SET)
+> > > > +
+> > > > +bool kvm_manual_dirty_log_init_set(struct kvm *kvm);
+> > > > +
+> > > >  struct kvm_s390_adapter_int {
+> > > >  	u64 ind_addr;
+> > > >  	u64 summary_addr;
+> > > > @@ -493,7 +500,7 @@ struct kvm {
+> > > >  #endif
+> > > >  	long tlbs_dirty;
+> > > >  	struct list_head devices;
+> > > > -	bool manual_dirty_log_protect;
+> > > > +	u64 manual_dirty_log_protect;
+> > > >  	struct dentry *debugfs_dentry;
+> > > >  	struct kvm_stat_data **debugfs_stat_data;
+> > > >  	struct srcu_struct srcu;
+> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c index
+> > > > 70f03ce..0ffb804 100644
+> > > > --- a/virt/kvm/kvm_main.c
+> > > > +++ b/virt/kvm/kvm_main.c
+> > > > @@ -858,11 +858,17 @@ static int kvm_vm_release(struct inode *inode,
+> > > struct file *filp)
+> > > >  	return 0;
+> > > >  }
+> > > >
+> > > > +bool kvm_manual_dirty_log_init_set(struct kvm *kvm) {
+> > > > +	return kvm->manual_dirty_log_protect & KVM_DIRTY_LOG_INITIALLY_SET;
+> > > > +}
+> > > 
+> > > Nit: this can be put into kvm_host.h as inlined.
+> > 
+> > I'm afraid not. I tried to do it, but it can't be compiled through. Since this
+> > function is shared between the kvm and kvm_intel(vmx part) module, it should be
+> > exported.
+> 
+> What's the error?  Did you add it into the right kvm_host.h (which is
+> ./include/linux/kvm_host.h, not per-arch one), and was it with "static
+> inline"?
+> 
+> > 
+> > BTW: how about using kvm_dirty_log_manual_protect and_init_set instead of
+> > kvm_manual_dirty_log_init_set (just an idea, your opinions are welcome).
+> 
+> I'm fine with either namings.
+> 
+> > 
+> > > 
+> > > > +EXPORT_SYMBOL_GPL(kvm_manual_dirty_log_init_set);
+> > > > +
+> > > >  /*
+> > > >   * Allocation size is twice as large as the actual dirty bitmap size.
+> > > >   * See x86's kvm_vm_ioctl_get_dirty_log() why this is needed.
+> > > >   */
+> > > > -static int kvm_create_dirty_bitmap(struct kvm_memory_slot *memslot)
+> > > > +static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
+> > > >  {
+> > > >  	unsigned long dirty_bytes = 2 * kvm_dirty_bitmap_bytes(memslot);
+> > > >
+> > > > @@ -1094,8 +1100,11 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> > > >
+> > > >  	/* Allocate page dirty bitmap if needed */
+> > > >  	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
+> > > > -		if (kvm_create_dirty_bitmap(&new) < 0)
+> > > > +		if (kvm_alloc_dirty_bitmap(&new))
+> > > >  			goto out_free;
+> > > > +
+> > > > +		if (kvm_manual_dirty_log_init_set(kvm))
+> > > > +			bitmap_set(new.dirty_bitmap, 0, new.npages);
+> > > >  	}
+> > > >
+> > > >  	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+> > > > @@ -3310,9 +3319,6 @@ static long
+> > > kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> > > >  	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+> > > >  	case KVM_CAP_CHECK_EXTENSION_VM:
+> > > >  	case KVM_CAP_ENABLE_CAP_VM:
+> > > > -#ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> > > > -	case KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2:
+> > > > -#endif
+> > > >  		return 1;
+> > > >  #ifdef CONFIG_KVM_MMIO
+> > > >  	case KVM_CAP_COALESCED_MMIO:
+> > > > @@ -3320,6 +3326,10 @@ static long
+> > > kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> > > >  	case KVM_CAP_COALESCED_PIO:
+> > > >  		return 1;
+> > > >  #endif
+> > > > +#ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> > > > +	case KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2:
+> > > > +		return KVM_DIRTY_LOG_MANUAL_CAPS;
+> > > 
+> > > We probably can only return the new feature bit when with CONFIG_X86?
+> > 
+> > How about to define different values in different architectures(see
+> > KVM_USER_MEM_SLOTS as an example), like this:
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> > index c3314b2..383a8ae 100644
+> > --- a/arch/arm/include/asm/kvm_host.h
+> > +++ b/arch/arm/include/asm/kvm_host.h
+> > @@ -23,6 +23,10 @@
+> >  #define KVM_HAVE_ONE_REG
+> >  #define KVM_HALT_POLL_NS_DEFAULT 500000
+> > 
+> > +#define KVM_DIRTY_LOG_MANUAL_PROTECT (1 << 0)
+> > +#define KVM_DIRTY_LOG_INITIALLY_SET 0
+> > +#define KVM_DIRTY_LOG_MANUAL_CAPS KVM_DIRTY_LOG_MANUAL_PROTECT
+> > +
+> >  #define KVM_VCPU_MAX_FEATURES 2
+> > 
+> >  #include <kvm/arm_vgic.h>
+> > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+> > index 41204a4..503ee17 100644
+> > --- a/arch/mips/include/asm/kvm_host.h
+> > +++ b/arch/mips/include/asm/kvm_host.h
+> > @@ -85,6 +85,10 @@
+> > 
+> >  #define KVM_HALT_POLL_NS_DEFAULT 500000
+> > 
+> > +#define KVM_DIRTY_LOG_MANUAL_PROTECT (1 << 0)
+> > +#define KVM_DIRTY_LOG_INITIALLY_SET 0
+> > +#define KVM_DIRTY_LOG_MANUAL_CAPS KVM_DIRTY_LOG_MANUAL_PROTECT
+> > +
+> >  #ifdef CONFIG_KVM_MIPS_VZ
+> >  extern unsigned long GUESTID_MASK;
+> >  extern unsigned long GUESTID_FIRST_VERSION;
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 40a0c0f..ac05172 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -49,6 +49,11 @@
+> > 
+> >  #define KVM_IRQCHIP_NUM_PINS  KVM_IOAPIC_NUM_PINS
+> > 
+> > +#define KVM_DIRTY_LOG_MANUAL_PROTECT (1 << 0)
+> > +#define KVM_DIRTY_LOG_INITIALLY_SET (1 << 1)
+> > +#define KVM_DIRTY_LOG_MANUAL_CAPS (KVM_DIRTY_LOG_MANUAL_PROTECT | \
+> > +               KVM_DIRTY_LOG_INITIALLY_SET)
+> > +
+> >  /* x86-specific vcpu->requests bit members */
+> >  #define KVM_REQ_MIGRATE_TIMER          KVM_ARCH_REQ(0)
+> >  #define KVM_REQ_REPORT_TPR_ACCESS      KVM_ARCH_REQ(1)
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index e89eb67..ebd3e55 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -360,6 +360,18 @@ static inline unsigned long *kvm_second_dirty_bitmap(struct kvm_memory_slot *mem
+> >         return memslot->dirty_bitmap + len / sizeof(*memslot->dirty_bitmap);
+> >  }
+> > 
+> > +#ifndef KVM_DIRTY_LOG_MANUAL_PROTECT
+> > +#define KVM_DIRTY_LOG_MANUAL_PROTECT 0
+> > +#endif
+> > +#ifndef KVM_DIRTY_LOG_INITIALLY_SET
+> > +#define KVM_DIRTY_LOG_INITIALLY_SET 0
+> > +#endif
+> > +#ifndef KVM_DIRTY_LOG_MANUAL_CAPS
+> > +#define KVM_DIRTY_LOG_MANUAL_CAPS 0
+> > +#endif
+> 
+> This seems a bit more awkward to me... You also reminded me that maybe
+> it's good we put the sub-cap definition into uapi.  How about:
+> 
+> ==========
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 40a0c0fd95ca..fcffaf8a6964 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1697,4 +1697,7 @@ static inline int kvm_cpu_get_apicid(int mps_cpu)
+>  #define GET_SMSTATE(type, buf, offset)         \
+>         (*(type *)((buf) + (offset) - 0x7e00))
+>  
+> +#define KVM_DIRTY_LOG_MANUAL_CAPS      (KVM_DIRTY_LOG_MANUAL_PROTECT | \
+> +                                        KVM_DIRTY_LOG_INITIALLY_SET)
+> +
+>  #endif /* _ASM_X86_KVM_HOST_H */
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index e89eb67356cb..39d49802ee87 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1410,4 +1410,8 @@ int kvm_vm_create_worker_thread(struct kvm *kvm, kvm_vm_thread_fn_t thread_fn,
+>                                 uintptr_t data, const char *name,
+>                                 struct task_struct **thread_ptr);
+>  
+> +#ifndef KVM_DIRTY_LOG_MANUAL_CAPS
+> +#define KVM_DIRTY_LOG_MANUAL_CAPS      KVM_DIRTY_LOG_MANUAL_PROTECT
+> +#endif
+> +
 
-Well, it's contained in memory_hotplug.c, and the only user of moving
-pages around in there is offlining code :) And it's job is to locate
-movable pages, skip over some (temporary? unmovable ones) and (now)
-indicate definitely unmovable ones.
+Hmm... Maybe this won't work, because I saw that asm/kvm_host.h and
+linux/kvm_host.h has no dependency between each other (which I thought
+they had).  Right now in most cases linux/ header can be included
+earlier than the asm/ header in C files.  So intead, maybe we can move
+these lines into kvm_main.c directly.
 
-Any idea for a better name?
-scan_movable_pages_and_stop_on_definitely_unmovable() is not so nice :)
+(I'm thinking ideally linux/kvm_host.h should include asm/kvm_host.h
+ within itself, then C files should not include asm/kvm_host.h
+ directly. However I dare not try that right now without being able to
+ test compile on all archs...)
 
-
->=20
->> =20
->>  		if (!PageHuge(page))
->>  			continue;
->>  		head =3D compound_head(page);
->>  		if (page_huge_active(head))
->> -			return pfn;
->> +			goto found;
->>  		skip =3D compound_nr(head) - (page - head);
->>  		pfn +=3D skip - 1;
->>  	}
->> +	return -ENOENT;
->> +found:
->> +	*movable_pfn =3D pfn;
->>  	return 0;
->>  }
->=20
-> So I am looking at this function and it seems like your change complete=
-ly
-> changes the behavior. The code before would walk the entire range and i=
-f
-> at least 1 page was available to move you would return the PFN of that
-> page. Now what seems to happen is that you will return -EBUSY as soon a=
-s
-> you encounter an offline page with a page count. I would think that wou=
-ld
-> slow down the offlining process since you have made the Unmovable
-> PageOffline() page a head of line blocker that you have to wait to get
-> around.
-
-So, the comment says "Unmovable PageOffline() pages where somebody still
-holds a reference count (after MEM_GOING_OFFLINE) can definitely not be
-offlined". And the doc "-EBUSY in case a definitely unmovable page was
-found."
-
-So why would this make offlining slow? Offlining will be aborted,
-because offlining is not possible.
-
-Please note that this is the exact old behavior, where isolating the
-page range would have failed directly and offlining would have been
-aborted early. The old offlining failure in the case in the offlining
-path would have been "failure to isolate range".
-
-Also, note that the users of PageOffline() with unmovable pages are very
-rare (only balloon drivers for now).
-
->=20
-> Would it perhaps make more sense to add a return value initialized to
-> ENOENT, and if you encounter one of these offline pages you change the
-> return value to EBUSY, and then if you walk through the entire list
-> without finding a movable page you just return the value?
-
-Did you have a look in  which context this function is used, especially
-[1] and [2]?
-
->=20
-> Otherwise you might want to add a comment explaining why the function
-> should stall instead of skipping over the unmovable section that will
-> hopefully become movable later.
-
-So we have "-EBUSY in case a definitely unmovable page was found.". Do
-you have a better suggestion?
-
->=20
->> @@ -1528,7 +1543,8 @@ static int __ref __offline_pages(unsigned long s=
-tart_pfn,
->>  	}
->> =20
->>  	do {
->> -		for (pfn =3D start_pfn; pfn;) {
->> +		pfn =3D start_pfn;
->> +		do {
->>  			if (signal_pending(current)) {
->>  				ret =3D -EINTR;
->>  				reason =3D "signal backoff";
->> @@ -1538,14 +1554,19 @@ static int __ref __offline_pages(unsigned long=
- start_pfn,
->>  			cond_resched();
->>  			lru_add_drain_all();
->> =20
->> -			pfn =3D scan_movable_pages(pfn, end_pfn);
->> -			if (pfn) {
->> +			ret =3D scan_movable_pages(pfn, end_pfn, &pfn);
->> +			if (!ret) {
->>  				/*
->>  				 * TODO: fatal migration failures should bail
->>  				 * out
->>  				 */
->>  				do_migrate_range(pfn, end_pfn);
->>  			}
-
-[1] we detect a definite offlining blocker and
-
->> +		} while (!ret);
->> +
->> +		if (ret !=3D -ENOENT) {
->> +			reason =3D "unmovable page";
-
-[2] we abort offlining
-
->> +			goto failed_removal_isolated;
->>  		}
->> =20
->>  		/*
->> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->> index 5334decc9e06..840c0bbe2d9f 100644
->> --- a/mm/page_alloc.c
->> +++ b/mm/page_alloc.c
->> @@ -8256,6 +8256,19 @@ bool has_unmovable_pages(struct zone *zone, str=
-uct page *page, int count,
->>  		if ((flags & MEMORY_OFFLINE) && PageHWPoison(page))
->>  			continue;
->> =20
->> +		/*
->> +		 * We treat all PageOffline() pages as movable when offlining
->> +		 * to give drivers a chance to decrement their reference count
->> +		 * in MEM_GOING_OFFLINE in order to signalize that these pages
->=20
-> You can probably just use "signal" or "indicate" instead of "signalize"=
-.
-
-Makes sense, "indicate" it is!
-
-Thanks!
-
---=20
 Thanks,
 
-David / dhildenb
+>  #endif
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4b95f9a31a2f..a83f7627c0c1 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1628,4 +1628,7 @@ struct kvm_hyperv_eventfd {
+>  #define KVM_HYPERV_CONN_ID_MASK                0x00ffffff
+>  #define KVM_HYPERV_EVENTFD_DEASSIGN    (1 << 0)
+>  
+> +#define KVM_DIRTY_LOG_MANUAL_PROTECT   (1 << 0)
+> +#define KVM_DIRTY_LOG_INITIALLY_SET    (1 << 1)
+> +
+>  #endif /* __LINUX_KVM_H */
+> 
+> ==========
+> 
+> Thanks,
+> 
+> -- 
+> Peter Xu
+
+-- 
+Peter Xu
 
