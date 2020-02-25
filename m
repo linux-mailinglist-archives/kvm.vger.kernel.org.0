@@ -2,53 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE52516F295
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 23:29:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D2DF16F2A4
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 23:37:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728162AbgBYW3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 17:29:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54451 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727227AbgBYW3L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 17:29:11 -0500
+        id S1726827AbgBYWhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 17:37:12 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49758 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727227AbgBYWhL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 17:37:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582669749;
+        s=mimecast20190719; t=1582670230;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=wdsgKmaoBenOYlPmT+FDhmrFMca+cTnREXlGwbrclNE=;
-        b=OuD1uaIrCUqv/P6nA4H7QlLTsksuqd00t4wwuH91Y7R3aW71uTxXGcvHLWGgai7kPqUSUd
-        4adugj4bYkf/KpLCScMbxlnIyUJM0XCGjv+d6qJloWgyKS29OvOuQUvdKsLW8eXKopLoQ+
-        ha6ngz+E7j8nLR26I7h8FrReiyILnOk=
+        bh=9ZhL4yH6AnGFbcJ5vbiFZlZVFuA4lpX1jUyat4IJcM0=;
+        b=caK1z1/fvyW6lic+NKztxkjmazttbhLJWYAUIVslVlJE1H2CalSxTYsl6AHv3x/nsKNfHw
+        EqmGwXUhjmS9X3O5boPyN+zoJShct3oOIRijKyp3hd2ObpMvOIE8DolzddT3lLjwKWJrwQ
+        0NfOVcp+hTyDOnXFIGD7YoreBonPOxk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-FgxbYuSCMD2rYZ-1sdQzPg-1; Tue, 25 Feb 2020 17:29:05 -0500
-X-MC-Unique: FgxbYuSCMD2rYZ-1sdQzPg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-150-oTW2A2L0OBKYjjDnrB-xrg-1; Tue, 25 Feb 2020 17:37:06 -0500
+X-MC-Unique: oTW2A2L0OBKYjjDnrB-xrg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A941DB22;
-        Tue, 25 Feb 2020 22:29:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD901107ACC4;
+        Tue, 25 Feb 2020 22:37:04 +0000 (UTC)
 Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 09392909FC;
-        Tue, 25 Feb 2020 22:29:01 +0000 (UTC)
-Subject: Re: [PATCH v4 09/36] KVM: s390: protvirt: Add initial vm and cpu
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F87060C18;
+        Tue, 25 Feb 2020 22:37:02 +0000 (UTC)
+Subject: Re: [PATCH v4.5 09/36] KVM: s390: protvirt: Add initial vm and cpu
  lifecycle handling
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20200224114107.4646-1-borntraeger@de.ibm.com>
- <20200224114107.4646-10-borntraeger@de.ibm.com>
- <f80a0b58-5ed2-33b7-5292-2c4899d765b7@redhat.com>
- <24689dd9-139d-3a0b-a57c-9f13ebda142b@de.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Ulrich.Weigand@de.ibm.com, cohuck@redhat.com,
+        frankja@linux.ibm.com, frankja@linux.vnet.ibm.com,
+        gor@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
+References: <f80a0b58-5ed2-33b7-5292-2c4899d765b7@redhat.com>
+ <20200225214822.3611-1-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -94,126 +87,98 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <cff6dcbe-7028-c518-e218-426c2d26acb0@redhat.com>
-Date:   Tue, 25 Feb 2020 23:29:01 +0100
+Message-ID: <a8bf1afc-8afe-a704-32f6-b20ed2f3a54c@redhat.com>
+Date:   Tue, 25 Feb 2020 23:37:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <24689dd9-139d-3a0b-a57c-9f13ebda142b@de.ibm.com>
+In-Reply-To: <20200225214822.3611-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->>
->> The question will repeat a couple of times in the patch: Do we want to
->> convert that to a proper error (e.g., EBUSY, EINVAL, EWHATSOEVER)
->> instead of returning "1" to user space (whoch looks weird).
->=20
-> Not sure about the right error code.=20
-> -EIO for cc =3D=3D 1?
 
-Makes sense.
+> +static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
+> +{
+> +	unsigned long base =3D uv_info.guest_base_stor_len;
+> +	unsigned long virt =3D uv_info.guest_virt_var_stor_len;
+> +	unsigned long npages =3D 0, vlen =3D 0;
+> +	struct kvm_memory_slot *memslot;
+> +
+> +	kvm->arch.pv.stor_var =3D NULL;
+> +	kvm->arch.pv.stor_base =3D __get_free_pages(GFP_KERNEL, get_order(bas=
+e));
+> +	if (!kvm->arch.pv.stor_base)
+> +		return -ENOMEM;
+> +
+> +	/*
+> +	 * Calculate current guest storage for allocation of the
+> +	 * variable storage, which is based on the length in MB.
+> +	 *
+> +	 * Slots are sorted by GFN
+> +	 */
+> +	mutex_lock(&kvm->slots_lock);
+> +	memslot =3D kvm_memslots(kvm)->memslots;
+> +	npages =3D memslot->base_gfn + memslot->npages;
+> +	mutex_unlock(&kvm->slots_lock);
+
+As discussed, I think we should just use mem_limit and check against
+some hardcoded upper limit. But yeah, we can do that as an addon (in
+which case memory hotplug will require special tweaks to detect this
+from user space ... e.g., a new capability)
+
 
 [...]
 
->>> +	if (!cc)
->>> +		free_pages(vcpu->arch.pv.stor_base,
->>> +			   get_order(uv_info.guest_cpu_stor_len));
->>
->> Should we clear arch.pv.handle?
->=20
-> this is done in the memset below
+> +int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+> +{
+> +		struct uv_cb_cgc uvcb =3D {
+> +		.header.cmd =3D UVC_CMD_CREATE_SEC_CONF,
+> +		.header.len =3D sizeof(uvcb)
+> +	};
+> +	int cc, ret;
+> +	u16 dummy;
+> +
+> +	ret =3D kvm_s390_pv_alloc_vm(kvm);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Inputs */
+> +	uvcb.guest_stor_origin =3D 0; /* MSO is 0 for KVM */
+> +	uvcb.guest_stor_len =3D kvm->arch.pv.guest_len;
+> +	uvcb.guest_asce =3D kvm->arch.gmap->asce;
+> +	uvcb.guest_sca =3D (unsigned long)kvm->arch.sca;
+> +	uvcb.conf_base_stor_origin =3D (u64)kvm->arch.pv.stor_base;
+> +	uvcb.conf_virt_stor_origin =3D (u64)kvm->arch.pv.stor_var;
+> +
+> +	cc =3D uv_call(0, (u64)&uvcb);
+> +	*rc =3D uvcb.header.rc;
+> +	*rrc =3D uvcb.header.rrc;
+> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT CREATE VM: handle %llx len %llx rc %x =
+rrc %x",
+> +		     uvcb.guest_handle, uvcb.guest_stor_len, *rc, *rrc);
+> +
+> +	/* Outputs */
+> +	kvm->arch.pv.handle =3D uvcb.guest_handle;
+> +
+> +	if (cc) {
+> +		if (uvcb.header.rc & UVC_RC_NEED_DESTROY)
+> +			kvm_s390_pv_deinit_vm(kvm, &dummy, &dummy);
+> +		else
+> +			kvm_s390_pv_dealloc_vm(kvm);
+> +		return -EIO;
 
-missed that, grepping betrayed me.
-
->>
->> Also, I do wonder if it makes sense to
->>
->> vcpu->arch.pv.stor_base =3D NULL;
->=20
-> same. We could do 4 single assignments instead, but the memset is proba=
-bly ok?
-
-yes, it's only harder to review ;)
-
-[...]
-
->>> +	mutex_lock(&kvm->slots_lock);
->>> +	memslot =3D kvm_memslots(kvm)->memslots;
->>> +	npages =3D memslot->base_gfn + memslot->npages;
->>
->> I remember I asked this question already, maybe I missed the reply :(
->>
->> 1. What if we have multiple slots?
->=20
-> memslot 0 is the last one, so this should actually have the last memory=
- address
-> so this should be ok.
-
-I think I got it wrong (thought there would be some start and length -
-but it's only a length, which makes sense).
-
->=20
->> 2. What is expected to happen if new slots are added (e.g., memory
->> hotplug in the future?)
->>
->> Shouldn't you bail out if there is more than one slot and make sure th=
-at
->> no new ones can be added as long as pv is active (I remember the latte=
-r
->> should be very easy from an arch callback)?
->=20
-> Yes, that should be easy, something like the following I guess
->=20
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4744,6 +4744,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kv=
-m,
->         if (mem->guest_phys_addr + mem->memory_size > kvm->arch.mem_lim=
-it)
->                 return -EINVAL;
-> =20
-> +       /* When we are protected we should not change the memory slots =
-*/
-> +       if (kvm_s390_pv_is_protected(kvm))
-> +               return -EINVAL;
->         return 0;
->  }
-> =20
->=20
->=20
->=20
-> I think we can extend that later to actually use
-> the memorysize from kvm->arch.mem_limit as long as this is reasonably s=
-mall.
-> This should then be done when we implement memory hotplug.
-
-IMHO mem_limit would make a lot of sense and even make hotplug work out
-of the box. I assume you can assume that user space properly sets this
-up for all PV guests (KVM_S390_VM_MEM_LIMIT_SIZE).
-
-So maybe use that directly and bail out if it's too big? (esp. if it's
-KVM_S390_NO_MEM_LIMIT).
-
-[...]
-
->> Similar to the VCPU path, should be set all pointers to NULL but skip
->> the freeing? With a similar comment /* Inteded memory leak ... */
->=20
-> This is done in kvm_s390_pv_dealloc_vm. And I think it makes sense to k=
-eep
-> the VM thing linked to the KVM struct. This will prevent the user from =
-doing
-> another PV_ENABLE on this guest.
+A lot easier to read :)
 
 
-Makes sense.
+Fell free add my rb with or without the mem_limit change.
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 --=20
 Thanks,
