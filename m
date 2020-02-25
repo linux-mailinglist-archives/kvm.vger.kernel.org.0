@@ -2,263 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 20B9B16B83A
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 04:54:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8400D16B85B
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 05:01:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728910AbgBYDxy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 22:53:54 -0500
-Received: from mga02.intel.com ([134.134.136.20]:13814 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726962AbgBYDxy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 22:53:54 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Feb 2020 19:53:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,482,1574150400"; 
-   d="scan'208";a="316951958"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga001.jf.intel.com with ESMTP; 24 Feb 2020 19:53:51 -0800
-Date:   Mon, 24 Feb 2020 22:44:28 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        id S1728846AbgBYEB4 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Feb 2020 23:01:56 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2973 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727402AbgBYEB4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 23:01:56 -0500
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.54])
+        by Forcepoint Email with ESMTP id 3791069C079F54552B1A;
+        Tue, 25 Feb 2020 12:01:53 +0800 (CST)
+Received: from DGGEMM422-HUB.china.huawei.com (10.1.198.39) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 25 Feb 2020 12:01:51 +0800
+Received: from DGGEMM508-MBX.china.huawei.com ([169.254.2.45]) by
+ dggemm422-hub.china.huawei.com ([10.1.198.39]) with mapi id 14.03.0439.000;
+ Tue, 25 Feb 2020 12:01:44 +0800
+From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Xu <peterx@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>
-Subject: Re: [PATCH v3 2/7] vfio: introduce vfio_dma_rw to read/write a range
- of IOVAs
-Message-ID: <20200225034428.GF30338@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200224084350.31574-1-yan.y.zhao@intel.com>
- <20200224084715.31753-1-yan.y.zhao@intel.com>
- <20200224121442.297a9931@w520.home>
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
+Subject: RE: [PATCH v3] KVM: x86: enable dirty log gradually in small chunks
+Thread-Topic: [PATCH v3] KVM: x86: enable dirty log gradually in small chunks
+Thread-Index: AQHV6sIxsDFZr7X1XEqnl6bLywYnuagqDaUAgAAJSoCAASdD0A==
+Date:   Tue, 25 Feb 2020 04:01:43 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BB1D7F1@dggemm508-mbx.china.huawei.com>
+References: <20200224032558.2728-1-jianjay.zhou@huawei.com>
+ <20200224170538.GH37727@xz-x1> <20200224173853.GF29865@linux.intel.com>
+In-Reply-To: <20200224173853.GF29865@linux.intel.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.228.206]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200224121442.297a9931@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 25, 2020 at 03:14:42AM +0800, Alex Williamson wrote:
-> On Mon, 24 Feb 2020 03:47:15 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
+
+
+> -----Original Message-----
+> From: Sean Christopherson [mailto:sean.j.christopherson@intel.com]
+> Sent: Tuesday, February 25, 2020 1:39 AM
+> To: Peter Xu <peterx@redhat.com>
+> Cc: Zhoujian (jay) <jianjay.zhou@huawei.com>; kvm@vger.kernel.org;
+> pbonzini@redhat.com; wangxin (U) <wangxinxin.wang@huawei.com>;
+> Huangweidong (C) <weidong.huang@huawei.com>; Liujinsong (Paul)
+> <liu.jinsong@huawei.com>
+> Subject: Re: [PATCH v3] KVM: x86: enable dirty log gradually in small chunks
 > 
-> > vfio_dma_rw will read/write a range of user space memory pointed to by
-> > IOVA into/from a kernel buffer without enforcing pinning the user space
-> > memory.
-> > 
-> > TODO: mark the IOVAs to user space memory dirty if they are written in
-> > vfio_dma_rw().
-> > 
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  drivers/vfio/vfio.c             | 49 +++++++++++++++++++++
-> >  drivers/vfio/vfio_iommu_type1.c | 77 +++++++++++++++++++++++++++++++++
-> >  include/linux/vfio.h            |  5 +++
-> >  3 files changed, 131 insertions(+)
-> > 
-> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> > index 914bdf4b9d73..902867627cbf 100644
-> > --- a/drivers/vfio/vfio.c
-> > +++ b/drivers/vfio/vfio.c
-> > @@ -1998,6 +1998,55 @@ int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn, int npage)
-> >  }
-> >  EXPORT_SYMBOL(vfio_unpin_pages);
-> >  
-> > +
-> > +/*
-> > + * This interface allows the CPUs to perform some sort of virtual DMA on
-> > + * behalf of the device.
-> > + *
-> > + * CPUs read/write a range of IOVAs pointing to user space memory into/from
-> > + * a kernel buffer.
-> > + *
-> > + * As the read/write of user space memory is conducted via the CPUs and is
-> > + * not a real device DMA, it is not necessary to pin the user space memory.
-> > + *
-> > + * The caller needs to call vfio_group_get_external_user() or
-> > + * vfio_group_get_external_user_from_dev() prior to calling this interface,
-> > + * so as to prevent the VFIO group from disposal in the middle of the call.
-> > + * But it can keep the reference to the VFIO group for several calls into
-> > + * this interface.
-> > + * After finishing using of the VFIO group, the caller needs to release the
-> > + * VFIO group by calling vfio_group_put_external_user().
-> > + *
-> > + * @group [in]: vfio group of a device
-> > + * @iova [in] : base IOVA of a user space buffer
-> > + * @data [in] : pointer to kernel buffer
-> > + * @len [in]  : kernel buffer length
-> > + * @write     : indicate read or write
-> > + * Return error code on failure or 0 on success.
-> > + */
-> > +int vfio_dma_rw(struct vfio_group *group, dma_addr_t iova,
-> > +		void *data, size_t len, bool write)
-> > +{
-> > +	struct vfio_container *container;
-> > +	struct vfio_iommu_driver *driver;
-> > +	int ret = 0;
-> > +
-> > +	if (!group || !data || len <= 0)
-> > +		return -EINVAL;
-> > +
-> > +	container = group->container;
-> > +	driver = container->iommu_driver;
-> > +
-> > +	if (likely(driver && driver->ops->dma_rw))
-> > +		ret = driver->ops->dma_rw(container->iommu_data,
-> > +					  iova, data, len, write);
-> > +	else
-> > +		ret = -ENOTTY;
-> > +
-> > +	return ret;
-> > +}
-> > +EXPORT_SYMBOL(vfio_dma_rw);
-> > +
-> >  static int vfio_register_iommu_notifier(struct vfio_group *group,
-> >  					unsigned long *events,
-> >  					struct notifier_block *nb)
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > index 2ada8e6cdb88..74e1c425943c 100644
-> > --- a/drivers/vfio/vfio_iommu_type1.c
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -27,6 +27,7 @@
-> >  #include <linux/iommu.h>
-> >  #include <linux/module.h>
-> >  #include <linux/mm.h>
-> > +#include <linux/mmu_context.h>
-> >  #include <linux/rbtree.h>
-> >  #include <linux/sched/signal.h>
-> >  #include <linux/sched/mm.h>
-> > @@ -2326,6 +2327,81 @@ static int vfio_iommu_type1_unregister_notifier(void *iommu_data,
-> >  	return blocking_notifier_chain_unregister(&iommu->notifier, nb);
-> >  }
-> >  
-> > +static size_t vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
-> > +					    dma_addr_t iova, void *data,
-> > +					    size_t count, bool write)
-> > +{
-> > +	struct mm_struct *mm;
-> > +	unsigned long vaddr;
-> > +	struct vfio_dma *dma;
-> > +	bool kthread = current->mm == NULL;
-> > +	size_t done = 0;
-> > +	size_t offset;
-> > +
-> > +	dma = vfio_find_dma(iommu, iova, 1);
-> > +	if (!dma)
-> > +		return 0;
-> > +
-> > +	if ((write && !(dma->prot & IOMMU_WRITE)) ||
-> > +			!(dma->prot & IOMMU_READ))
-> > +		return 0;
-> > +
-> > +	mm = get_task_mm(dma->task);
-> > +
-> > +	if (!mm)
-> > +		return 0;
-> > +
-> > +	if (kthread)
-> > +		use_mm(mm);
-> > +	else if (current->mm != mm)
-> > +		goto out;
-> > +
-> > +	offset = iova - dma->iova;
-> > +
-> > +	if (count > dma->size - offset)
-> > +		count = dma->size - offset;
-> > +
-> > +	vaddr = dma->vaddr + offset;
-> > +
-> > +	if (write)
-> > +		done = __copy_to_user((void __user *)vaddr,
-> > +				       data, count) ? 0 : count;
-> > +	else
-> > +		done = __copy_from_user(data, (void __user *)vaddr,
-> > +					count) ? 0 : count;
-> > +
-> > +	if (kthread)
-> > +		unuse_mm(mm);
-> > +out:
-> > +	mmput(mm);
-> > +	return done;
+> On Mon, Feb 24, 2020 at 12:05:38PM -0500, Peter Xu wrote:
+> > On Mon, Feb 24, 2020 at 11:25:58AM +0800, Jay Zhou wrote:
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c index
+> > > 3be25ec..0deb8c3 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -7201,7 +7201,8 @@ static void vmx_sched_in(struct kvm_vcpu
+> > > *vcpu, int cpu)  static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+> > >  				     struct kvm_memory_slot *slot)  {
+> > > -	kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+> > > +	if (!kvm_manual_dirty_log_init_set(kvm))
+> > > +		kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+> > >  	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);  }
+> > >
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c index
+> > > fb5d64e..f816940 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -9956,7 +9956,7 @@ static void kvm_mmu_slot_apply_flags(struct
+> > > kvm *kvm,  {
+> > >  	/* Still write protect RO slot */
+> > >  	if (new->flags & KVM_MEM_READONLY) {
+> > > -		kvm_mmu_slot_remove_write_access(kvm, new);
+> > > +		kvm_mmu_slot_remove_write_access(kvm, new,
+> PT_PAGE_TABLE_LEVEL);
+> > >  		return;
+> > >  	}
+> > >
+> > > @@ -9993,8 +9993,20 @@ static void kvm_mmu_slot_apply_flags(struct
+> kvm *kvm,
+> > >  	if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+> > >  		if (kvm_x86_ops->slot_enable_log_dirty)
+> > >  			kvm_x86_ops->slot_enable_log_dirty(kvm, new);
+> > > -		else
+> > > -			kvm_mmu_slot_remove_write_access(kvm, new);
+> > > +		else {
 > 
+> Braces need to be added to the "if" part as well.
+
+I think this is acceptable as default since I used the ./scripts/checkpatch.pl to
+check the patch and there's no error and warning.
+But I'll add it if it would be more clear and enhance readability.
+
 > 
-> Return 0 on error?  Why wouldn't this function decide the errno rather
-> than masking them all as -EFAULT by the callee below?  Thanks,
- 
-ok. let me return negative errno on error. Thanks!
-Yan
+> > > +			int level = kvm_manual_dirty_log_init_set(kvm) ?
+> > > +				PT_DIRECTORY_LEVEL : PT_PAGE_TABLE_LEVEL;
+> > > +
+> > > +			/*
+> > > +			 * If we're with initial-all-set, we don't need
+> > > +			 * to write protect any small page because
+> > > +			 * they're reported as dirty already.  However
+> > > +			 * we still need to write-protect huge pages
+> > > +			 * so that the page split can happen lazily on
+> > > +			 * the first write to the huge page.
+> > > +			 */
+> > > +			kvm_mmu_slot_remove_write_access(kvm, new, level);
+> > > +		}
+> > >  	} else {
+> > >  		if (kvm_x86_ops->slot_disable_log_dirty)
+> > >  			kvm_x86_ops->slot_disable_log_dirty(kvm, new); diff --git
+> > > a/include/linux/kvm_host.h b/include/linux/kvm_host.h index
+> > > e89eb67..80ada94 100644
+> > > --- a/include/linux/kvm_host.h
+> > > +++ b/include/linux/kvm_host.h
+> > > @@ -360,6 +360,13 @@ static inline unsigned long
+> *kvm_second_dirty_bitmap(struct kvm_memory_slot *mem
+> > >  	return memslot->dirty_bitmap + len /
+> > > sizeof(*memslot->dirty_bitmap);  }
+> > >
+> > > +#define KVM_DIRTY_LOG_MANUAL_PROTECT2 (1 << 0) #define
+> > > +KVM_DIRTY_LOG_INITIALLY_SET (1 << 1) #define
+> > > +KVM_DIRTY_LOG_MANUAL_CAPS (KVM_DIRTY_LOG_MANUAL_PROTECT2
+> | \
+> > > +				KVM_DIRTY_LOG_INITIALLY_SET)
+> > > +
+> > > +bool kvm_manual_dirty_log_init_set(struct kvm *kvm);
 > 
-> > +}
-> > +
-> > +static int vfio_iommu_type1_dma_rw(void *iommu_data, dma_addr_t iova,
-> > +				   void *data, size_t count, bool write)
-> > +{
-> > +	struct vfio_iommu *iommu = iommu_data;
-> > +	int ret = 0;
-> > +	size_t done = 0;
-> > +
-> > +	mutex_lock(&iommu->lock);
-> > +	while (count > 0) {
-> > +		done = vfio_iommu_type1_dma_rw_chunk(iommu, iova, data,
-> > +						     count, write);
-> > +		if (!done) {
-> > +			ret = -EFAULT;
-> > +			break;
-> > +		}
-> > +
-> > +		count -= done;
-> > +		data += done;
-> > +		iova += done;
-> > +	}
-> > +
-> > +	mutex_unlock(&iommu->lock);
-> > +	return ret;
-> > +}
-> > +
-> >  static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
-> >  	.name			= "vfio-iommu-type1",
-> >  	.owner			= THIS_MODULE,
-> > @@ -2338,6 +2414,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
-> >  	.unpin_pages		= vfio_iommu_type1_unpin_pages,
-> >  	.register_notifier	= vfio_iommu_type1_register_notifier,
-> >  	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
-> > +	.dma_rw			= vfio_iommu_type1_dma_rw,
-> >  };
-> >  
-> >  static int __init vfio_iommu_type1_init(void)
-> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> > index 2e1fa0c7396f..fea0cb1e61d2 100644
-> > --- a/include/linux/vfio.h
-> > +++ b/include/linux/vfio.h
-> > @@ -82,6 +82,8 @@ struct vfio_iommu_driver_ops {
-> >  					     struct notifier_block *nb);
-> >  	int		(*unregister_notifier)(void *iommu_data,
-> >  					       struct notifier_block *nb);
-> > +	int		(*dma_rw)(void *iommu_data, dma_addr_t iova,
-> > +				  void *data, size_t count, bool write);
-> >  };
-> >  
-> >  extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
-> > @@ -109,6 +111,9 @@ extern int vfio_pin_pages(struct device *dev, unsigned long *user_pfn,
-> >  extern int vfio_unpin_pages(struct device *dev, unsigned long *user_pfn,
-> >  			    int npage);
-> >  
-> > +extern int vfio_dma_rw(struct vfio_group *group, dma_addr_t iova, void *data,
-> > +		       size_t len, bool write);
-> > +
-> >  /* each type has independent events */
-> >  enum vfio_notify_type {
-> >  	VFIO_IOMMU_NOTIFY = 0,
+> For me, INITIALLY_SET is awkward and confusing, e.g. IMO it's not at all obvious
+> that kvm_manual_dirty_log_init_set() is a simple accessor.
 > 
+> Would something like KVM_DIRTY_LOG_START_DIRTY still be accurate?
+
+It depends on which aspect you care about.
+I think it is still accurate for the overall (kernel + userspace).
+
+With initial-all-set, the dirty pages reported by kernel side to userspace
+will increase, but it would not affect the calculation of real new dirtied pages,
+since these pages haven't sent, they will be merged with the migration bitmap
+in userspace(so they're not the new dirtied pages from the userspace side
+at last, this is the same as without initial-all-set).
+
+It is not needed to start dirty log at once when setting with
+KVM_MEM_LOG_DIRTY_PAGES, it needs only just before userspace will use
+it. As described in "7.18 KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2" of
+Documentation/virt/kvm/api.rst:
+
+"                                    ..... Second, in some cases a
+large amount of time can pass between a call to KVM_GET_DIRTY_LOG and
+userspace actually using the data in the page.  Pages can be modified
+during this time, which is inefficient for both the guest and userspace:
+the guest will incur a higher penalty due to write protection faults,
+while userspace can see false reports of dirty pages.  Manual reprotection
+helps reducing this time, improving guest performance and reducing the
+number of dirty log false positives. "
+
+
+Regards,
+Jay Zhou
+
+> 
+> > > +
+> > >  struct kvm_s390_adapter_int {
+> > >  	u64 ind_addr;
+> > >  	u64 summary_addr;
+> > > @@ -493,7 +500,7 @@ struct kvm {
+> > >  #endif
+> > >  	long tlbs_dirty;
+> > >  	struct list_head devices;
+> > > -	bool manual_dirty_log_protect;
+> > > +	u64 manual_dirty_log_protect;
+> > >  	struct dentry *debugfs_dentry;
+> > >  	struct kvm_stat_data **debugfs_stat_data;
+> > >  	struct srcu_struct srcu;
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c index
+> > > 70f03ce..0ffb804 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -858,11 +858,17 @@ static int kvm_vm_release(struct inode *inode,
+> struct file *filp)
+> > >  	return 0;
+> > >  }
+> > >
+> > > +bool kvm_manual_dirty_log_init_set(struct kvm *kvm) {
+> > > +	return kvm->manual_dirty_log_protect &
+> > > +KVM_DIRTY_LOG_INITIALLY_SET; }
+> >
+> > Nit: this can be put into kvm_host.h as inlined.
