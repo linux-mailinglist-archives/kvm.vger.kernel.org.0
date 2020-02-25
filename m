@@ -2,88 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EAD2A16C3BE
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:21:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60C2A16C3BF
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:21:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730692AbgBYOVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 09:21:50 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26993 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730569AbgBYOVu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 09:21:50 -0500
+        id S1730712AbgBYOVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 09:21:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43468 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730478AbgBYOVv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 09:21:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582640509;
+        s=mimecast20190719; t=1582640510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l8zoVfuT97QhV/VrbWfZXqBtdN1Hpx5Lgx8cGxD0214=;
-        b=ix05neEgiOANOTDrevZHBDEMHfhWsudO/kL62bYZPzOF/MgOWJfA0RR0WEFvgCL7nhQNY0
-        7cPafWtE/zaCVvp5XKg6Xc2Sqfz28G17yQ85HkRPivxf0vWx55TqMkzOLpzCjg5o86kdFC
-        Ik4EQPi3x9IDf9FZwsBGCBxb3aOOgY4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-bYhUFWfMOhGcf8SrabpeaQ-1; Tue, 25 Feb 2020 09:21:47 -0500
-X-MC-Unique: bYhUFWfMOhGcf8SrabpeaQ-1
-Received: by mail-wm1-f70.google.com with SMTP id y7so930756wmd.4
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 06:21:47 -0800 (PST)
+        bh=hVSqx3EzAvWE7ZUmVL6oGFZVbwypZGJIj1KXOM4Izws=;
+        b=aQkzqVrGK6RBFDyZ2Vtzz6n3AxKchTg0PpkbTlFyFfHpIoaACIKRiPK5WH2bztRK2xu8C0
+        dkPQ+BCqN0AMBC26LXvIRvkor6lg/ay4rnuKPXNm0/eAYE7N5LhqFMwq7iEmDYwbQ3+GbA
+        qCRLL8sITgdzSE4JocmE+CMyHExU70U=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-_P_9tnyOOdi4JyswXvXyDA-1; Tue, 25 Feb 2020 09:21:48 -0500
+X-MC-Unique: _P_9tnyOOdi4JyswXvXyDA-1
+Received: by mail-wm1-f71.google.com with SMTP id n17so1101625wmk.1
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 06:21:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=l8zoVfuT97QhV/VrbWfZXqBtdN1Hpx5Lgx8cGxD0214=;
-        b=XExYKmyU936/E7+AO1e6KxE9C5/tVzmLnwOA7NoIn4GleR6MAgqzVXtJeWLo6GQTmb
-         mlTXMAtZ0juE4bbaCEgc48kpgC3j3P64EGUjUZRLauDAANYHV3ACfu8GPgoApNYuZhn1
-         MJ5IE04FkH2dFobzUAqg2q0O1nh7xdH3FUONW8nXNWHXf44bTqWaSZ1tK+A1wfcA/aUm
-         qCC/H70wH3oagMMK5HbiMJDmBfFox5Gpt+2m3VI8Ku/1MCIsvuno7XYXy+VS6/b/qlFP
-         hohpITuCD7TG+xgr+yu3wXLSYwbT6xp6IMhNHDZl0AW1pwC7qa5ACYwQvJFoEA8oyULY
-         5FMw==
-X-Gm-Message-State: APjAAAVbIdb3JoxW0XGxTl0pNKze4oVKUQOK7MEIQOil3l9iTPQsh3qC
-        FLV4CRryDToysUgTMzlZLnR89gLvx/mBADeH8+Gjc3vVzOJzXcO7j1ytkbHTlJFRbxR72i5h2PN
-        SisuaKhPwgyKV
-X-Received: by 2002:a5d:528e:: with SMTP id c14mr74571606wrv.308.1582640506064;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=hVSqx3EzAvWE7ZUmVL6oGFZVbwypZGJIj1KXOM4Izws=;
+        b=VzEII7g17Z3ymEeM5IJmesjsN3X5sU/DQHA6VpTRjnIMqdEF6fOg2PS2hH+2goRXCc
+         1ILdK4mbffeU3eF4ss/z3FpenCfSJhhiW052d3tyNqNWYkLva2zM6kAtZ/6tDucublMo
+         nPyeqs4TPKJY8dj7SHlOMm2JdV0g186a0tIfD6fT2Imf3P8bHOktcCQETlTMcI5N+Rx3
+         to/r7jGSRZznqHHSDHyrguUCVCOIaWrTOO7qgfL2nzfXG8AUljY63fECg4PGscsvoe4I
+         mRqY360HzzDVpWTR/lJKO/shu5CA6kqm0GsXNWaKHVt3gNJr5WL1Ya7uGsOeyRpPEnmO
+         x7qQ==
+X-Gm-Message-State: APjAAAUfmX9mdskx462KmeNWChgZb0442kA1loC0mQa6PhTblofrnwTI
+        Ge7Asa97wqvUpDmz6zH6DsOwZXYpX0pQV6HJqaRWMu2b+4RSRkqmVEko2tHz/Rp8AgrZyYBJLGu
+        MGaP0h/lL4XCB
+X-Received: by 2002:a5d:5347:: with SMTP id t7mr72977038wrv.401.1582640507473;
+        Tue, 25 Feb 2020 06:21:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzZKH29/qzb/cUfFg4C2u8+Ed5dlfSDFPx6sbZ+diRIwyPfeca/Urx5e36yoK+eLMn+VpDe+Q==
+X-Received: by 2002:a5d:5347:: with SMTP id t7mr72977022wrv.401.1582640507243;
+        Tue, 25 Feb 2020 06:21:47 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id v131sm4551825wme.23.2020.02.25.06.21.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 25 Feb 2020 06:21:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwslpdVPtjbpEmq1sL3K0sJ92R01Ra27DqDcfEldCfb+so8/yvNfB3iDQYMdvtt1pMPJ7jqAA==
-X-Received: by 2002:a5d:528e:: with SMTP id c14mr74571576wrv.308.1582640505811;
-        Tue, 25 Feb 2020 06:21:45 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:3577:1cfe:d98a:5fb6? ([2001:b07:6468:f312:3577:1cfe:d98a:5fb6])
-        by smtp.gmail.com with ESMTPSA id g7sm24714487wrq.21.2020.02.25.06.21.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2020 06:21:45 -0800 (PST)
-Subject: Re: kvm-unit-tests : Kconfigs and extra kernel args for full coverage
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>, yzt356@gmail.com,
-        jmattson@google.com, namit@vmware.com,
-        sean.j.christopherson@intel.com,
-        Basil Eljuse <Basil.Eljuse@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-References: <CA+G9fYvx=WzyJqS4fUFLq8qXT8nbFQoFfXZoeL9kP-hvv549EA@mail.gmail.com>
- <9cb2dbed-356d-31cd-22aa-fa99beada9f7@redhat.com>
- <CA+G9fYuTNr3YrehjuQD=nCXhdrirxGaiNEVMS+mHcM0fGVigVQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fec48277-5f42-8f2d-288c-2b8591c33bee@redhat.com>
-Date:   Tue, 25 Feb 2020 15:21:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 56/61] KVM: SVM: Refactor logging of NPT enabled/disabled
+In-Reply-To: <20200201185218.24473-57-sean.j.christopherson@intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-57-sean.j.christopherson@intel.com>
+Date:   Tue, 25 Feb 2020 15:21:45 +0100
+Message-ID: <87h7zelpc6.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+G9fYuTNr3YrehjuQD=nCXhdrirxGaiNEVMS+mHcM0fGVigVQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/02/20 10:55, Naresh Kamboju wrote:
-> Running latest kvm-unit-tests on x86_64 got this output [1].
-> "VMX enabled and locked by BIOS"
-> We will enable on our BIOS and re-run these tests.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-The message is saying it is already enabled; you don't have to do anything.
+> Tweak SVM's logging of NPT enabled/disabled to handle the logging in a
+> single pr_info() in preparation for merging kvm_enable_tdp() and
+> kvm_disable_tdp() into a single function.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/svm.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index a27f83f7521c..80962c1eea8f 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -1440,16 +1440,14 @@ static __init int svm_hardware_setup(void)
+>  	if (!boot_cpu_has(X86_FEATURE_NPT))
+>  		npt_enabled = false;
+>  
+> -	if (npt_enabled && !npt) {
+> -		printk(KERN_INFO "kvm: Nested Paging disabled\n");
+> +	if (npt_enabled && !npt)
+>  		npt_enabled = false;
+> -	}
+>  
+> -	if (npt_enabled) {
+> -		printk(KERN_INFO "kvm: Nested Paging enabled\n");
+> +	if (npt_enabled)
+>  		kvm_enable_tdp();
+> -	} else
+> +	else
+>  		kvm_disable_tdp();
+> +	pr_info("kvm: Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
+>  
+>  	if (nrips) {
+>  		if (!boot_cpu_has(X86_FEATURE_NRIPS))
 
-Paolo
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
