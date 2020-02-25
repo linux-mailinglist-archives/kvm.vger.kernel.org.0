@@ -2,104 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED45516BBFF
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 09:41:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E033A16BC01
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 09:41:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729784AbgBYIlP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 03:41:15 -0500
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:42176 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726867AbgBYIlP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 03:41:15 -0500
-Received: by mail-ot1-f65.google.com with SMTP id 66so11357640otd.9;
-        Tue, 25 Feb 2020 00:41:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Q0vy786giS+lfp9bUB7XCIUFz0pQEN7EOGsmAN4eRm4=;
-        b=nKhOPmQ12wJJY6QSzkKm4CK+u010U9hKN8hfKFhUBkr97meisT8QguznR33/Z4Kl7z
-         Ub8spInGXBKTZE5yO2/VfS1vd4WJR/Xbf/TthA/OP/McjtwnLL2Av2EeM4VrrRjGaYwI
-         pI3xKVxC6wqvftu25MA08OL3HhAfyJhxCJbwDl+0T7LN7u5ckm0QfkuLmfxv1K6AVNkd
-         lLv5o4VeZBvi0BBtF6Fb4l+ppbV4hs994DBkXPaY/dq76RkBvW335kqEZH60kswOPAiL
-         u3YETeq6nnY6U3lt5CL6ACiqoQFZllNSrxS8eJnlCkhbNH/gwMGfR14B1mybcHBVckEa
-         eaxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Q0vy786giS+lfp9bUB7XCIUFz0pQEN7EOGsmAN4eRm4=;
-        b=Hiq8lOr7j2o3kt3zma0UU2V70bF1zzYvuiNbWVy/ZAUt5LqcvI90OM4OuCdDp+LOWQ
-         ynfdLdveMeuKvgNOeFdv/+ORcnbBYm/rfeNsFLfFNGkkV34MRo0g6sr7YMOXiXT5azmM
-         0wovHjTgxCq2v+/zDuja/HYKpqa9hky76dN3ZwYXeGuwX9SZdz9iJRZqL+SFlthsdp6V
-         09IqMALS/VxNGO+21bJxfRI0UV9y5k8LP1rXuQev9kWxuZ9xgIAdUsuAbUdS8h8GEOFS
-         pQajJ918eBjsZzkTFYWANbtYIU+lEzjeyUTJvMbUBkeyQ7FcOdoQQM52d6F1RjSTMkrP
-         v+lw==
-X-Gm-Message-State: APjAAAVwNO/xcFWt5Tq3wub1N2eGwp8aKnOlD8QlYUC/AKWBWYMOiu2O
-        BsOflYVPlbSv9DMFMN/mzvxBWqJkWCUJ9rfV9+M=
-X-Google-Smtp-Source: APXvYqzA2EItrptKtNT16zTMptHEmpZx46ZO+RBh1Rcrb41daUqfBQ8kLLZi82Lj75DFkuBbEx1awmuMPp2y/3v4QUM=
-X-Received: by 2002:a9d:7ccd:: with SMTP id r13mr42256692otn.56.1582620074234;
- Tue, 25 Feb 2020 00:41:14 -0800 (PST)
+        id S1729837AbgBYIlj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 03:41:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29412 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729481AbgBYIli (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 03:41:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582620097;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=cRg9yuXjEDpx1pC7d7tE+ZjO9/FomRagCD2CdOzfevM=;
+        b=RxyKo52KI4GtDg0+UDQRk/ZRB75kCn0ovtqf24EsXfdVXSjFAp/qtCI5FxxV5adXh43edc
+        W9SCEDvN2C5Sg4pIfpthpPd3nDvaIrxhR2HSfZOyia88w3T3CWUKHvOhuCj00ebdn1wKw5
+        WQYNsF7ZlKT/JMRuRRSOOvGEBSBE9M8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-wIl0IaijMr69gExTXgL7ZQ-1; Tue, 25 Feb 2020 03:41:34 -0500
+X-MC-Unique: wIl0IaijMr69gExTXgL7ZQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67D3A13E4;
+        Tue, 25 Feb 2020 08:41:32 +0000 (UTC)
+Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B8DD60BF7;
+        Tue, 25 Feb 2020 08:41:30 +0000 (UTC)
+Subject: Re: [PATCH v4 28/36] KVM: s390: protvirt: Report CPU state to
+ Ultravisor
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200224114107.4646-1-borntraeger@de.ibm.com>
+ <20200224114107.4646-29-borntraeger@de.ibm.com>
+ <3c653e60-5ef4-4b81-3bbd-4d72144b9d0b@redhat.com>
+ <d75b4759-9fff-fef0-e6ec-09dd81a01355@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <8b8c2a56-03d3-107d-3aeb-2651f31efbe4@redhat.com>
+Date:   Tue, 25 Feb 2020 09:41:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <07348bb2-c8a5-41d0-afca-26c1056570a5.bangcai.hrg@alibaba-inc.com>
- <CANRm+CwZq=FbCwRcyO=C7YinLevmMuVVu9auwPqyho3o-4Y-wQ@mail.gmail.com> <660daad7-afb0-496d-9f40-a1162d5451e2.bangcai.hrg@alibaba-inc.com>
-In-Reply-To: <660daad7-afb0-496d-9f40-a1162d5451e2.bangcai.hrg@alibaba-inc.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 25 Feb 2020 16:41:02 +0800
-Message-ID: <CANRm+Cw08uxwW8iUi96CJjmvfbtSd6ePXpAPPScByhoNLCrAWQ@mail.gmail.com>
-Subject: Re: [RFC] Question about async TLB flush and KVM pv tlb improvements
-To:     =?UTF-8?B?5L2V5a655YWJKOmCpumHhyk=?= <bangcai.hrg@alibaba-inc.com>
-Cc:     namit <namit@vmware.com>, peterz <peterz@infradead.org>,
-        pbonzini <pbonzini@redhat.com>,
-        "dave.hansen" <dave.hansen@intel.com>, mingo <mingo@redhat.com>,
-        tglx <tglx@linutronix.de>, x86 <x86@kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        "dave.hansen" <dave.hansen@linux.intel.com>, bp <bp@alien8.de>,
-        luto <luto@kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?5p6X5rC45ZCsKOa1t+aeqyk=?= <yongting.lyt@alibaba-inc.com>,
-        =?UTF-8?B?5ZC05ZCv57++KOWQr+e/vik=?= <qixuan.wqx@alibaba-inc.com>,
-        herongguang <herongguang@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <d75b4759-9fff-fef0-e6ec-09dd81a01355@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 25 Feb 2020 at 15:53, =E4=BD=95=E5=AE=B9=E5=85=89(=E9=82=A6=E9=87=
-=87) <bangcai.hrg@alibaba-inc.com> wrote:
->
-> > On Tue, 25 Feb 2020 at 12:12, =E4=BD=95=E5=AE=B9=E5=85=89(=E9=82=A6=E9=
-=87=87) <bangcai.hrg@alibaba-inc.com> wrote:
-> >>
-> >> Hi there,
-> >>
-> >> I saw this async TLB flush patch at https://lore.kernel.org/patchwork/=
-patch/1082481/ , and I am wondering after one year, do you think if this pa=
-tch is practical or there are functional flaws?
-> >> From my POV, Nadav's patch seems has no obvious flaw. But I am not fam=
-iliar about the relationship between CPU's speculation exec and stale TLB, =
-since it's usually transparent from programing. In which condition would ma=
-chine check occurs? Is there some reference I can learn?
-> >> BTW, I am trying to improve kvm pv tlb flush that if a vCPU is preempt=
-ed, as initiating CPU is not sending IPI to and waiting for the preempted v=
-CPU, when the preempted vCPU is resuming, I want the VMM to inject an inter=
-rupt, perhaps NMI, to the vCPU and letting vCPU flush TLB instead of flush =
-TLB for the vCPU, in case the vCPU is not in kernel mode or disabled interr=
-upt, otherwise stick to VMM flush. Since VMM flush using INVVPID would flus=
-h all TLB of all PCID thus has some negative performance impacting on the p=
-reempted vCPU. So is there same problem as the async TLB flush patch?
->
-> > PV TLB Shootdown is disabled in dedicated scenario, I believe there
-> > are already heavy tlb misses in overcommit scenarios before this
-> > feature, so flush all TLB associated with one specific VPID will not
-> > worse that much.
->
-> If vcpus running on one pcpu is limited to a few, from my test, there
-> can still be some beneficial. Especially if we can move all the logic to
+On 25.02.20 09:29, Christian Borntraeger wrote:
+> 
+> 
+> On 24.02.20 20:05, David Hildenbrand wrote:
+>> On 24.02.20 12:40, Christian Borntraeger wrote:
+>>> From: Janosch Frank <frankja@linux.ibm.com>
+>>>
+>>> VCPU states have to be reported to the ultravisor for SIGP
+>>> interpretation, kdump, kexec and reboot.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>
+>> [...]
+>>
+>>>  
+>>> -void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>>> +int kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>>>  {
+>>> -	int i, online_vcpus, started_vcpus = 0;
+>>> +	int i, online_vcpus, r = 0, started_vcpus = 0;
+>>>  	struct kvm_vcpu *started_vcpu = NULL;
+>>>  
+>>>  	if (is_vcpu_stopped(vcpu))
+>>> -		return;
+>>> +		return 0;
+>>>  
+>>>  	trace_kvm_s390_vcpu_start_stop(vcpu->vcpu_id, 0);
+>>>  	/* Only one cpu at a time may enter/leave the STOPPED state. */
+>>> @@ -4501,6 +4509,9 @@ void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>>>  	kvm_s390_clear_stop_irq(vcpu);
+>>>  
+>>>  	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
+>>> +	/* Let's tell the UV that we successfully stopped the vcpu */
+>>> +	if (kvm_s390_pv_cpu_is_protected(vcpu))
+>>> +		r = kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_STP);
+>>>  	__disable_ibs_on_vcpu(vcpu);
+>>>  
+>>>  	for (i = 0; i < online_vcpus; i++) {
+>>> @@ -4519,7 +4530,7 @@ void kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>>>  	}
+>>>  
+>>>  	spin_unlock(&vcpu->kvm->arch.start_stop_lock);
+>>> -	return;
+>>> +	return r;
+>>>  }
+>>
+>> So... you stopped the CPU, the UV call failed, and you'll return an
+>> error. But you did stop the CPU. What is user space expected to do with
+>> that error?
+> 
+> If that call returns with an error the QEMU and ultravisor are out of sync.
+> The only possible solution in such a case is probably to pause the guest (or
+> exit with an error) or to do a system_restart.
+> 
+> To make the system restart possible I will move the pv_set_cpu_state to the
+> beginning of the function and do an early exit on error. 
+> 
+>>
+>> After all, it can't retrigger a STOP, due to if (is_vcpu_stopped(vcpu)).
+>> Same applies to the start path.
+> 
+> Looks now like:
+> 
+> @@ -4445,18 +4451,27 @@ static void __enable_ibs_on_vcpu(struct kvm_vcpu *vcpu)
+>         kvm_s390_sync_request(KVM_REQ_ENABLE_IBS, vcpu);
+>  }
+> 
+> -void kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
+> +int kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
+>  {
+> -       int i, online_vcpus, started_vcpus = 0;
+> +       int i, online_vcpus, r = 0, started_vcpus = 0;
+> 
+>         if (!is_vcpu_stopped(vcpu))
+> -               return;
+> +               return 0;
+> 
+>         trace_kvm_s390_vcpu_start_stop(vcpu->vcpu_id, 1);
+>         /* Only one cpu at a time may enter/leave the STOPPED state. */
+>         spin_lock(&vcpu->kvm->arch.start_stop_lock);
+>         online_vcpus = atomic_read(&vcpu->kvm->online_vcpus);
+> 
+> +       /* Let's tell the UV that we want to change into the operating state */
+> +       if (kvm_s390_pv_cpu_is_protected(vcpu)) {
+> +               r = kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR);
+> +               if (r) {
+> +                       spin_unlock(&vcpu->kvm->arch.start_stop_lock);
+> +                       return r;
+> +               }
+> +       }
+> +
 
-Unless the vCPU is preempted.
+You can "return 0;" at the end of the function now. With the same
+handling on the stop path
 
-> VMM eliminating waiting of IPI, however correctness of functionally
-> is a concern. This is also why I found Nadav's patch, do you have
-> any advice on this?
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+
+-- 
+Thanks,
+
+David / dhildenb
+
