@@ -2,140 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D11EA16B96E
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 07:09:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF94B16B97F
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 07:13:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728955AbgBYGJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 01:09:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38674 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727005AbgBYGJ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 01:09:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582610964;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0IoUDI0r2nKt/KLH2gl0wTcdvg0oCDvDokn7okiLyHg=;
-        b=R4Kf+dOoIrZfig0mugI2di0BsODBOtZtaylwB/xm/qf3avyTjlsveNw53EQoQv4W2cg9of
-        QdTKyFpouMVjtJlUu+iQvv3Wv4pcHznNe7TQPkYnxYDYSIxOLE5B8sn4iAD3hxytv9ipfk
-        I1AxJymjBV4hsiENLb+V79YWeU4BhMQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-KEF-yYO0OPWKOZhO7cB7og-1; Tue, 25 Feb 2020 01:09:20 -0500
-X-MC-Unique: KEF-yYO0OPWKOZhO7cB7og-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FB92107ACC5;
-        Tue, 25 Feb 2020 06:09:19 +0000 (UTC)
-Received: from [10.72.13.170] (ovpn-13-170.pek2.redhat.com [10.72.13.170])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA7141001902;
-        Tue, 25 Feb 2020 06:09:09 +0000 (UTC)
-Subject: Re: [PATCH v2 0/7] vfio/pci: SR-IOV support
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dev@dpdk.org" <dev@dpdk.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "thomas@monjalon.net" <thomas@monjalon.net>,
-        "bluca@debian.org" <bluca@debian.org>,
-        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
-        "Richardson, Bruce" <bruce.richardson@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>
-References: <158213716959.17090.8399427017403507114.stgit@gimli.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D79A8A7@SHSMSX104.ccr.corp.intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <a6c04bac-0a37-f4c0-876e-e5cf2a8a6c3f@redhat.com>
-Date:   Tue, 25 Feb 2020 14:09:07 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728955AbgBYGNT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 01:13:19 -0500
+Received: from mga11.intel.com ([192.55.52.93]:8040 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726421AbgBYGNT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 01:13:19 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Feb 2020 22:13:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,483,1574150400"; 
+   d="scan'208";a="284574425"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by FMSMGA003.fm.intel.com with ESMTP; 24 Feb 2020 22:13:18 -0800
+Date:   Mon, 24 Feb 2020 22:13:17 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH 1/2] kvm: vmx: Use basic exit reason to check if it's the
+ specific VM EXIT
+Message-ID: <20200225061317.GV29865@linux.intel.com>
+References: <20200224020751.1469-1-xiaoyao.li@intel.com>
+ <20200224020751.1469-2-xiaoyao.li@intel.com>
+ <87lfosp9xs.fsf@vitty.brq.redhat.com>
+ <d9744594-4a66-d867-f785-64ce4d42b848@intel.com>
+ <87imjwp24x.fsf@vitty.brq.redhat.com>
+ <20200224161728.GC29865@linux.intel.com>
+ <50134028-ef7a-46c6-7602-095c47406ed7@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D79A8A7@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <50134028-ef7a-46c6-7602-095c47406ed7@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Feb 25, 2020 at 08:13:15AM +0800, Xiaoyao Li wrote:
+> On 2/25/2020 12:17 AM, Sean Christopherson wrote:
+> >On Mon, Feb 24, 2020 at 02:04:46PM +0100, Vitaly Kuznetsov wrote:
+> >>Xiaoyao Li <xiaoyao.li@intel.com> writes:
+> >>
+> >>>On 2/24/2020 6:16 PM, Vitaly Kuznetsov wrote:
+> >>>>Xiaoyao Li <xiaoyao.li@intel.com> writes:
+> >>>>
+> >>>Here variable basic_exit_reason is added for the cases where only basic
+> >>>exit reason number is needed.
+> >>>
+> >>
+> >>Can we do the other way around, i.e. introduce 'extended_exit_reason'
+> >>and use it where all 32 bits are needed? I'm fine with the change, just
+> >>trying to minimize the (unneeded) code churn.
+> >
+> >100% agree.  Even better than adding a second field to vcpu_vmx would be
+> >to make it a union, though we'd probably want to call it something like
+> >full_exit_reason in that case.  That should give us compile-time checks on
+> >exit_reason, e.g. if we try to query one of the upper bits using a u16, e.g.
+> 
+> I have thought about union, but it seems
+> 
+> union {
+> 	u16 exit_reason;
+> 	u32 full_exit_reason;
+> }
+> 
+> is not a good name. Since there are many codes in vmx.c and nested.c assume
+> that exit_reason stands for 32-bit EXIT REASON vmcs field as well as
+> evmcs->vm_exit_reason and vmcs12->vm_exit_reason. Do we really want to also
+> rename them to full_exit_reason?
 
-On 2020/2/25 =E4=B8=8A=E5=8D=8810:33, Tian, Kevin wrote:
->> From: Alex Williamson
->> Sent: Thursday, February 20, 2020 2:54 AM
->>
->> Changes since v1 are primarily to patch 3/7 where the commit log is
->> rewritten, along with option parsing and failure logging based on
->> upstream discussions.  The primary user visible difference is that
->> option parsing is now much more strict.  If a vf_token option is
->> provided that cannot be used, we generate an error.  As a result of
->> this, opening a PF with a vf_token option will serve as a mechanism of
->> setting the vf_token.  This seems like a more user friendly API than
->> the alternative of sometimes requiring the option (VFs in use) and
->> sometimes rejecting it, and upholds our desire that the option is
->> always either used or rejected.
->>
->> This also means that the VFIO_DEVICE_FEATURE ioctl is not the only
->> means of setting the VF token, which might call into question whether
->> we absolutely need this new ioctl.  Currently I'm keeping it because I
->> can imagine use cases, for example if a hypervisor were to support
->> SR-IOV, the PF device might be opened without consideration for a VF
->> token and we'd require the hypservisor to close and re-open the PF in
->> order to set a known VF token, which is impractical.
->>
->> Series overview (same as provided with v1):
-> Thanks for doing this!
->
->> The synopsis of this series is that we have an ongoing desire to drive
->> PCIe SR-IOV PFs from userspace with VFIO.  There's an immediate need
->> for this with DPDK drivers and potentially interesting future use
-> Can you provide a link to the DPDK discussion?
->
->> cases in virtualization.  We've been reluctant to add this support
->> previously due to the dependency and trust relationship between the
->> VF device and PF driver.  Minimally the PF driver can induce a denial
->> of service to the VF, but depending on the specific implementation,
->> the PF driver might also be responsible for moving data between VFs
->> or have direct access to the state of the VF, including data or state
->> otherwise private to the VF or VF driver.
-> Just a loud thinking. While the motivation of VF token sounds reasonabl=
-e
-> to me, I'm curious why the same concern is not raised in other usages.
-> For example, there is no such design in virtio framework, where the
-> virtio device could also be restarted, putting in separate process (vho=
-st-user),
-> and even in separate VM (virtio-vhost-user), etc.
+It's actually the opposite, almost all of the VMX code assumes exit_reason
+holds only the basic exit reason, i.e. a 16-bit value.  For example, SGX
+adds a modifier flag to denote a VM-Exit was from enclave mode, and that
+bit needs to be stripped from exit_reason, otherwise all the checks like
+"if (exit_reason == blah_blah_blah)" fail.  
 
+Making exit_reason a 16-bit alias of the full/extended exit_reason neatly
+sidesteps that issue.  And it is an issue that has caused actual problems
+in the past, e.g. see commit beb8d93b3e42 ("KVM: VMX: Fix handling of #MC
+that occurs during VM-Entry").  Coincidentally, that commit also removes a
+local "u16 basic_exit_reason" :-).
 
-AFAIK, the restart could only be triggered by either VM or qemu. But=20
-yes, the datapath could be offloaded.
+Except for one mistake, the pseudo-patch below is the entirety of required
+changes.  Most (all?) of the functions that take "u32 exit_reason" can (and
+should) continue to take a u32.
 
-But I'm not sure introducing another dedicated mechanism is better than=20
-using the exist generic POSIX mechanism to make sure the connection=20
-(AF_UINX) is secure.
+As for the name, I strongly prefer keeping the exit_reason name for the
+basic exit reason.  The vast majority of VM-Exits do not have modifiers
+set, i.e. "basic exit reason" == vmcs.EXIT_REASON for nearly all normal
+usage.  This holds true in every form of communication, e.g. when discussing
+VM-Exit reasons, it's never qualified with "basic", it's simply the exit
+reason.  IMO the code is better off following the colloquial usage of "exit
+reason".  A simple comment above the union would suffice to clear up any
+confusion with respect to the SDM.
 
+> Maybe we name it
+> 
+> union {
+> 	u16 basic_exit_reason;
+> 	u32 exit_reason;
+> }
+> 
+> as what SDM defines?
+> 
+> >--- a/arch/x86/kvm/vmx/vmx.c
+> >+++ b/arch/x86/kvm/vmx/vmx.c
+> >@@ -5818,7 +5818,7 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
+> >         if (is_guest_mode(vcpu) && nested_vmx_exit_reflected(vcpu, exit_reason))
+> >                 return nested_vmx_reflect_vmexit(vcpu, exit_reason);
+> >
+> >-       if (exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY) {
+> >+       if (vmx->full_exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY) {
 
->   Of course the para-
-> virtualized attribute of virtio implies some degree of trust, but as yo=
-u
-> mentioned many SR-IOV implementations support VF->PF communication
-> which also implies some level of trust. It's perfectly fine if VFIO jus=
-t tries
-> to do better than other sub-systems, but knowing how other people
-> tackle the similar problem may make the whole picture clearer. =F0=9F=98=
-=8A
->
-> +Jason.
+If we do go the union route, this snippet of code is insufficient, the
+full/extended exit reason needs to be snapshotted early for use in the
+tracepoint and in fail_entry.hardware_entry_failure_reason.
 
-
-I'm not quite sure e.g allowing userspace PF driver with kernel VF=20
-driver would not break the assumption of kernel security model. At least=20
-we should forbid a unprivileged PF driver running in userspace.
-
-Thanks
-
+> >                 dump_vmcs();
+> >                 vcpu->run->exit_reason = KVM_EXIT_FAIL_ENTRY;
+> >                 vcpu->run->fail_entry.hardware_entry_failure_reason
+> >@@ -6620,11 +6620,12 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> >         vmx->nested.nested_run_pending = 0;
+> >         vmx->idt_vectoring_info = 0;
+> >
+> >-       vmx->exit_reason = vmx->fail ? 0xdead : vmcs_read32(VM_EXIT_REASON);
+> >-       if ((u16)vmx->exit_reason == EXIT_REASON_MCE_DURING_VMENTRY)
+> >+       vmx->full_exit_reason = vmx->fail ? 0xdead : vmcs_read32(VM_EXIT_REASON);
+> >+       if (vmx->exit_reason == EXIT_REASON_MCE_DURING_VMENTRY)
+> >                 kvm_machine_check();
+> >
+> >-       if (vmx->fail || (vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
+> >+       if (vmx->fail ||
+> >+           (vmx->full_exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
+> >                 return;
+> >
+> >         vmx->loaded_vmcs->launched = 1;
+> >diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> >index 7f42cf3dcd70..60c09640ea59 100644
+> >--- a/arch/x86/kvm/vmx/vmx.h
+> >+++ b/arch/x86/kvm/vmx/vmx.h
+> >@@ -260,7 +260,10 @@ struct vcpu_vmx {
+> >         int vpid;
+> >         bool emulation_required;
+> >
+> >-       u32 exit_reason;
+> >+       union {
+> >+               u16 exit_reason;
+> >+               u32 full_exit_reason;
+> >+       }
+> >
+> >         /* Posted interrupt descriptor */
+> >         struct pi_desc pi_desc;
+> >
+> >
+> >
+> >
+> >
+> >>-- 
+> >>Vitaly
+> >>
+> 
