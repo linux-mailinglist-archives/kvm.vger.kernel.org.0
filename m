@@ -2,136 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B40A16F279
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 23:12:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 645AD16F283
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 23:19:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728968AbgBYWMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 17:12:36 -0500
-Received: from mga01.intel.com ([192.55.52.88]:13504 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726956AbgBYWMg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 17:12:36 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Feb 2020 14:12:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,485,1574150400"; 
-   d="scan'208";a="410387667"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 25 Feb 2020 14:12:34 -0800
-Date:   Tue, 25 Feb 2020 14:12:34 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jacob Keller <jacob.e.keller@intel.com>
-Cc:     TonyWWang-oc@zhaoxin.com, acme@kernel.org,
-        alexander.shishkin@linux.intel.com, bp@alien8.de, bp@suse.de,
-        hpa@zytor.com, jacob.jun.pan@linux.intel.com,
-        jarkko.sakkinen@linux.intel.com, jmattson@google.com,
-        jolsa@redhat.com, joro@8bytes.org, kvm@vger.kernel.org,
-        lenb@kernel.org, linux-edac@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-pm@vger.kernel.org, mark.rutland@arm.com, mingo@redhat.com,
-        namhyung@kernel.org, pbonzini@redhat.com, peterz@infradead.org,
-        rkrcmar@redhat.com, shuah@kernel.org, tglx@linutronix.de,
-        tony.luck@intel.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Subject: Re: [PATCH v5 13/19] x86/cpufeatures: Add flag to track whether MSR
- IA32_FEAT_CTL is configured
-Message-ID: <20200225221234.GL9245@linux.intel.com>
-References: <20191221044513.21680-14-sean.j.christopherson@intel.com>
- <e741196d-52aa-0f5e-8f1e-a37ddf2e5025@intel.com>
+        id S1727227AbgBYWTm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 17:19:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33747 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726827AbgBYWTl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 17:19:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582669178;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=gCSArIx/3mY9oSIUMRjqx2+R3OvuPX6j2QVZuQeM+/k=;
+        b=GHTS+twZm7rThRIRTIan3iEXMMTE22tyYPOnP0HDibeyc2iN4QA6J8xVzZ1eYEGNgIeo+K
+        7uAiQ0surOa3O/HWcIpbGl7SRFRIWJ8ODZEUJFjwTawr+RMy0bdb6WUWsvDPvlBZ5lnZaf
+        3Gpy7M1+EAIUHt9prW1N6Fy/s0U60to=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-478-W7WYJUYZNry96hYG-fYhtA-1; Tue, 25 Feb 2020 17:19:30 -0500
+X-MC-Unique: W7WYJUYZNry96hYG-fYhtA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AE78107ACC4;
+        Tue, 25 Feb 2020 22:19:27 +0000 (UTC)
+Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA1208B759;
+        Tue, 25 Feb 2020 22:19:18 +0000 (UTC)
+Subject: Re: [PATCH RFC v4 06/13] mm: Allow to offline unmovable PageOffline()
+ pages via MEM_GOING_OFFLINE
+To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        linux-kernel@vger.kernel.org
+Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Juergen Gross <jgross@suse.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Pavel Tatashin <pavel.tatashin@microsoft.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Anthony Yznaga <anthony.yznaga@oracle.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Qian Cai <cai@lca.pw>, Pingfan Liu <kernelfans@gmail.com>
+References: <20191212171137.13872-1-david@redhat.com>
+ <20191212171137.13872-7-david@redhat.com>
+ <6ec496580ddcb629d22589a1cba8cd61cbd53206.camel@linux.intel.com>
+ <267ea186-aba8-1a93-bd55-ac641f78d07e@redhat.com>
+ <3d719897039273a2bb8d0fe7d12563498ebd2897.camel@linux.intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <e0892179-b14c-84c3-1284-fc789f16e1c7@redhat.com>
+Date:   Tue, 25 Feb 2020 23:19:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e741196d-52aa-0f5e-8f1e-a37ddf2e5025@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <3d719897039273a2bb8d0fe7d12563498ebd2897.camel@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 25, 2020 at 01:49:13PM -0800, Jacob Keller wrote:
-> Hi Sean,
-> 
-> > Add a new feature flag, X86_FEATURE_MSR_IA32_FEAT_CTL, to track whether
-> > IA32_FEAT_CTL has been initialized.  This will allow KVM, and any future
-> > subsystems that depend on IA32_FEAT_CTL, to rely purely on cpufeatures
-> > to query platform support, e.g. allows a future patch to remove KVM's
-> > manual IA32_FEAT_CTL MSR checks.
-> > 
-> > Various features (on platforms that support IA32_FEAT_CTL) are dependent
-> > on IA32_FEAT_CTL being configured and locked, e.g. VMX and LMCE.  The
-> > MSR is always configured during boot, but only if the CPU vendor is
-> > recognized by the kernel.  Because CPUID doesn't incorporate the current
-> > IA32_FEAT_CTL value in its reporting of relevant features, it's possible
-> > for a feature to be reported as supported in cpufeatures but not truly
-> > enabled, e.g. if the CPU supports VMX but the kernel doesn't recognize
-> > the CPU.
-> > 
-> > As a result, without the flag, KVM would see VMX as supported even if
-> > IA32_FEAT_CTL hasn't been initialized, and so would need to manually
-> > read the MSR and check the various enabling bits to avoid taking an
-> > unexpected #GP on VMXON.
-> 
-> 
-> I recently ran into a general protection fault that I believe is the
-> fault of this patch:
-> 
-> > [   32.189584] general protection fault, maybe for address 0xffffb567801bcf58: 0000 [#1] SMP PTI
-> > [   32.198103] CPU: 1 PID: 2600 Comm: rngd Not tainted 5.6.0-rc2-jk+ #2
-> > [   32.204454] Hardware name: Intel Corporation S2600STQ/S2600STQ, BIOS SE5C620.86B.02.01.0008.031920191559 03/19/2019
-> > [   32.214887] RIP: 0010:hardware_enable+0x100/0x1a0 [kvm_intel]
-> > [   32.220628] Code: 00 00 48 39 f8 74 0f 65 48 89 3d 43 a2 cb 3c e8 66 d3 cc c5 66 90 48 89 df 57 9d 0f 1f 44 00 00 bf 01 00 00 00 e8 90 3d ca c5 <f3> 0f c7 34 24 31 c0 80 3d 59 8d 03 00 00 75 36 48 8b 5c 24 10 65
-> > [   32.239373] RSP: 0000:ffffb567801bcf58 EFLAGS: 00010002
-> > [   32.244598] RAX: 0000000000300000 RBX: 0000000000000086 RCX: ffff8f2650440000
-> > [   32.251730] RDX: 0000000000300000 RSI: 0000000000000000 RDI: ffff8f2650457020
-> > [   32.258862] RBP: 0000000000000007 R08: 000000077ea5d531 R09: 0000000000000000
-> > [   32.265986] R10: 000001432bf20982 R11: 0000000000000000 R12: ffffd55b80467110
-> > [   32.273118] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-> > [   32.280243] FS:  00007facfe66f700(0000) GS:ffff8f2650440000(0000) knlGS:0000000000000000
-> > [   32.288329] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [   32.294077] CR2: 00007facf0003000 CR3: 0000000b7d402006 CR4: 00000000007626e0
-> > [   32.301210] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > [   32.308342] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > [   32.315474] PKRU: 55555554
-> > [   32.318186] Call Trace:
-> > [   32.320642]  <IRQ>
-> > [   32.322689]  kvm_arch_hardware_enable+0x84/0x240 [kvm]
-> > [   32.327836]  hardware_enable_nolock+0x31/0x60 [kvm]
-> > [   32.332717]  flush_smp_call_function_queue+0x4d/0xe0
-> > [   32.337683]  smp_call_function_interrupt+0x3a/0xd0
-> > [   32.342471]  call_function_interrupt+0xf/0x20
-> > [   32.346830]  </IRQ>
-> > [   32.348935] RIP: 0033:0x7facffd4c753
-> > [   32.352514] Code: e8 48 c7 45 e0 00 00 00 00 eb 5f 48 8b 45 c8 48 8b 50 38 48 8b 45 c8 8b 40 40 89 c0 48 01 d0 48 89 45 f0 48 8b 45 f0 0f b6 00 <83> c0 01 89 c2 48 8b 45 f0 88 10 48 8b 45 c8 8b 50 40 48 8b 45 c8
-> > [   32.371263] RSP: 002b:00007facfe66ebf0 EFLAGS: 00000202 ORIG_RAX: ffffffffffffff03
-> > [   32.378826] RAX: 00000000000000ee RBX: 0000000000004097 RCX: 0000000000000000
-> > [   32.385961] RDX: 0000562781dbadf0 RSI: 0000000000000000 RDI: 00007ffd7edf9080
-> > [   32.393092] RBP: 00007facfe66ec30 R08: 00007ffd7edf9080 R09: 000000000000cd4a
-> > [   32.400226] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-> > [   32.407358] R13: 00007facf0000b20 R14: 0000562781dba2e8 R15: 00007facfe66ed10
-> > [   32.414493] Modules linked in: ip6table_mangle ip6table_nat iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter rfkill ib_isert iscsi
-> > _target_mod ib_srpt target_core_mod ib_srp scsi_transport_srp ib_ipoib vfat fat ib_umad rpcrdma sunrpc intel_rapl_msr intel_rapl_common rdma_ucm ib_iser rdma_cm isst_if_common iw_cm ib_cm libiscsi skx_edac scsi_transport_iscsi nfit libnv
-> > dimm x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel intel_cstate i40iw qat_c62x iTCO_wdt ipmi_ssif iTCO_vendor_support ib_uverbs mei_me intel_qat intel_uncore ib_c
-> > ore joydev intel_rapl_perf pcspkr ipmi_si authenc ioatdma mei i2c_i801 lpc_ich dca ipmi_devintf ipmi_msghandler acpi_power_meter acpi_pad ip_tables ast i2c_algo_bit drm_vram_helper drm_ttm_helper ttm drm_kms_helper cec drm ice i40e crc32
-> > c_intel wmi fuse
-> > [   32.498314] ---[ end trace bfeeeba337a01208 ]---
-> 
-> I noticed that a slightly older commit from before this does not fail.
-> Additionally, the system reports the following during boot:
-> 
-> kvm: disabled by bios
-> 
-> I looked into the vmx_disabled_by_bios and noticed that it checks for
-> both X86_FEATURE_MSR_IA32_FEAT_CTL and X86_FEATURE_VMX.
-> 
-> Compared to the older code before commit a4d0b2fdbcf7 ("KVM: VMX: Use
-> VMX feature flag to query BIOS enabling") it's not clear to me how
-> exactly this could fail to match up.
-> 
-> I suspect something is wrong and the features are enabled even though
-> the BIOS has it disabled, leading to later failure because of this.
+On 25.02.20 22:46, Alexander Duyck wrote:
+> On Tue, 2020-02-25 at 19:49 +0100, David Hildenbrand wrote:
+>>>>  /*
+>>>>   * Scan pfn range [start,end) to find movable/migratable pages (LRU=
+ pages,
+>>>> - * non-lru movable pages and hugepages). We scan pfn because it's m=
+uch
+>>>> - * easier than scanning over linked list. This function returns the=
+ pfn
+>>>> - * of the first found movable page if it's found, otherwise 0.
+>>>> + * non-lru movable pages and hugepages).
+>>>> + *
+>>>> + * Returns:
+>>>> + *	0 in case a movable page is found and movable_pfn was updated.
+>>>> + *	-ENOENT in case no movable page was found.
+>>>> + *	-EBUSY in case a definetly unmovable page was found.
+>>>>   */
+>>>> -static unsigned long scan_movable_pages(unsigned long start, unsign=
+ed long end)
+>>>> +static int scan_movable_pages(unsigned long start, unsigned long en=
+d,
+>>>> +			      unsigned long *movable_pfn)
+>>>>  {
+>>>>  	unsigned long pfn;
+>>>> =20
+>>>> @@ -1247,18 +1251,29 @@ static unsigned long scan_movable_pages(unsi=
+gned long start, unsigned long end)
+>>>>  			continue;
+>>>>  		page =3D pfn_to_page(pfn);
+>>>>  		if (PageLRU(page))
+>>>> -			return pfn;
+>>>> +			goto found;
+>>>>  		if (__PageMovable(page))
+>>>> -			return pfn;
+>>>> +			goto found;
+>>>> +
+>>>> +		/*
+>>>> +		 * Unmovable PageOffline() pages where somebody still holds
+>>>> +		 * a reference count (after MEM_GOING_OFFLINE) can definetly
+>>>> +		 * not be offlined.
+>>>> +		 */
+>>>> +		if (PageOffline(page) && page_count(page))
+>>>> +			return -EBUSY;
+>>>
+>>> So the comment confused me a bit because technically this function is=
+n't
+>>> about offlining memory, it is about finding movable pages. I had to d=
+o a
+>>> bit of digging to find the only consumer is __offline_pages, but if w=
+e are
+>>> going to talk about "offlining" instead of "moving" in this function =
+it
+>>> might make sense to rename it.
+>>
+>> Well, it's contained in memory_hotplug.c, and the only user of moving
+>> pages around in there is offlining code :) And it's job is to locate
+>> movable pages, skip over some (temporary? unmovable ones) and (now)
+>> indicate definitely unmovable ones.
+>>
+>> Any idea for a better name?
+>> scan_movable_pages_and_stop_on_definitely_unmovable() is not so nice :=
+)
+>=20
+> I dunno. What I was getting at is that the wording here would make it
+> clearer if you simply stated that these pages "can definately not be
+> moved". Saying you cannot offline a page that is PageOffline seems kind=
+ of
+> redundant, then again calling it an Unmovable and then saying it cannot=
+ be
+> moves is also redundant I suppose. In the end you don't move them, but
 
-Hrm.  On the failing kernel, what are the values of MSR 0x3a for all CPUs,
-i.e. what's the output of 'sudo rdmsr -a 0x3a'?
+So, in summary, there are
+- PageOffline() pages that are movable (balloon compaction).
+- PageOffline() pages that cannot be moved and cannot be offlined (e.g.,
+  no balloon compaction enabled, XEN, HyperV, ...) . page_count(page) >=3D
+  0
+- PageOffline() pages that cannot be moved, but can be offlined.
+  page_count(page) =3D=3D 0.
+
+
+> they can be switched to offline if the page count hits 0. When that
+> happens you simply end up skipping over them in the code for
+> __test_page_isolated_in_pageblock and __offline_isolated_pages.
+
+Yes. The thing with the wording is that pages with (PageOffline(page) &&
+!page_count(page)) can also not really be moved, but they can be skipped
+when offlining. If we call that "moving them to /dev/null", then yes,
+they can be moved to some degree :)
+
+I can certainly do here e.g.,
+
+/*
+ * PageOffline() pages that are not marked __PageMovable() and have a
+ * reference count > 0 (after MEM_GOING_OFFLINE) are definitely
+ * unmovable. If their reference count would be 0, they could be skipped
+ * when offlining memory sections.
+ */
+
+And maybe I'll add to the function doc, that unmovable pages that are
+skipped in this function can include pages that can be skipped when
+offlining (moving them to nirvana).
+
+Other suggestions?
+
+[...]
+
+>>
+>> [1] we detect a definite offlining blocker and
+>>
+>>>> +		} while (!ret);
+>>>> +
+>>>> +		if (ret !=3D -ENOENT) {
+>>>> +			reason =3D "unmovable page";
+>>
+>> [2] we abort offlining
+>>
+>>>> +			goto failed_removal_isolated;
+>>>>  		}
+>>>> =20
+>>>>  		/*
+>=20
+> Yeah, this is the piece I misread.  I knew the loop this was in previou=
+sly
+> was looping when returning -ENOENT so for some reason I had it in my he=
+ad
+> that you were still looping on -EBUSY.
+
+Ah okay, I see. Yeah, that wouldn't make sense for the use case I have :)
+
+>=20
+> So the one question I would have is if at this point are we guaranteed
+> that the balloon drivers have already taken care of the page count for =
+all
+> the pages they set to PageOffline? Based on the patch description I was
+> thinking that this was going to be looping for a while waiting for the
+> driver to clear the pages and then walking through them at the end of t=
+he
+> loop via check_pages_isolated_cb.
+
+So, e.g., the patch description states
+
+"Let's allow to do that by allowing to isolate any PageOffline() page
+when offlining. This way, we can reach the memory hotplug notifier
+MEM_GOING_OFFLINE, where the driver can signal that he is fine with
+offlining this page by dropping its reference count."
+
+Any balloon driver that does not allow offlining (e.g., XEN, HyperV,
+virtio-balloon), will always have a refcount of (at least) 1. Drivers
+that want to make use of that (esp. virtio-mem, but eventually also
+HyperV), will drop their refcount via the MEM_GOING_OFFLINE call.
+
+So yes, at this point, all applicable users were notified via
+MEM_GOING_OFFLINE and had their chance to decrement the refcount. If
+they didn't, offlining will be aborted.
+
+Thanks again!
+
+--=20
+Thanks,
+
+David / dhildenb
+
