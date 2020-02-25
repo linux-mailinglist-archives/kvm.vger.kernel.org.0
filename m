@@ -2,84 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 147E916BBE0
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 09:31:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53E7016BBEA
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 09:34:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729810AbgBYIbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 03:31:17 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:43523 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729142AbgBYIbQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 03:31:16 -0500
-Received: by mail-ot1-f68.google.com with SMTP id p8so11305783oth.10;
-        Tue, 25 Feb 2020 00:31:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=T1n3ktw5bPHodKuJWkYqa7LcyNgwBKRduxXfO03KSgk=;
-        b=PPtF6e4g3S/sEpHTe6yWznV3pLLYn4jvkZbGYyT1LHamFseFQCg8aHGs+syAQn4Aob
-         Jp/0iz1n5tZPJA/5IgQuGt3N7bLiUJu3Z2f4/Ris/HNhsLyhhwJj2FrAiYf4I7NPik1H
-         8L8rblY9IPH4PCf2m7g3P+nz8hgRIF4mVCqFLe4y2NKoRItTH/FfKV+MnAGzNzICM2pG
-         o3cyqKEdTSqBbE83IiBv9W4bvAhNOHaWnmYq1gzjBjvecwlPl4PXypHPdpW1A8JWPD3P
-         e8GFfxR5Be8JyXtDUq9rmisQfNyeZvaUvAd97/3q+AoazVyESRbYztISKWjfHprhhJAz
-         b9Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=T1n3ktw5bPHodKuJWkYqa7LcyNgwBKRduxXfO03KSgk=;
-        b=V6WcyjC3umXuqSCikxx3T32ZJ6Ce2ruR6+MlsxG7aCi3zi384CxMehZAgY2G5rQtSV
-         mrh591uOQ0q5z4eY6+LX9yA0BsaWbY5xUkJMWJsh7MEZ3DlKEpOba6f7OFc8vvvjX+O1
-         8TFf7HwPeIcVh3NwaoIHYI+0tVWlXBgyf1Ef2EVkjZNB74puIOjLL0uVQCxD0/9sXXh9
-         tlBa78/D+aSDQ2B3nNPmCsjhTcfgfBuCcv6Bf0T8Sd4OAVB1hDzqgpHpYZjCOI6p0Spv
-         8kiw0i/Se18YRhHd0rvlBcO9cnlOt8Z2/4lMmY0yInTHIopHm6aGkBeI/RUhrVJE0s46
-         O/fA==
-X-Gm-Message-State: APjAAAVYn+ClDfUBiWCVWt/GsvYSuioZxrcmzGwr7n/IvYlX1UnW0Ntk
-        dwOx/2Ti9OOhPNtAa9q9yksW7zTyA/TCTZF5onZbsTJh
-X-Google-Smtp-Source: APXvYqwf4tYE7xMxbpSLRtRLqsNTEz9tmoizRdcTISzmz8MO4Eb3Ofc4QxUWwhDN9FZG8XrYsxeYa9tB/Itt2Wv2G4s=
-X-Received: by 2002:a05:6830:1011:: with SMTP id a17mr41220600otp.45.1582619475111;
- Tue, 25 Feb 2020 00:31:15 -0800 (PST)
+        id S1729332AbgBYIeR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 03:34:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36021 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725783AbgBYIeR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 03:34:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582619656;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Zeq8bfWrbjUWuhe9VoT/P8t5pKlOCkcgFST3tqDuVYU=;
+        b=P1KgZ9l0Rql8o6OqicmvbC92lYT9MWGzYsQDlJKBSa0b/V9XVMEHDCvbllSHpcePxrjdpG
+        w6xfduxrhAIjrP5JgLbLnxf7p+gr1c0sp39ngcrDJsTKc3RzTPs5e7QKphGQhifizV78y9
+        elwXA453iL1ASWRreBmKl6I2gzkj0k8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-XRADUvImPiC2RjB3yHQlfg-1; Tue, 25 Feb 2020 03:34:14 -0500
+X-MC-Unique: XRADUvImPiC2RjB3yHQlfg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F4A0800D50;
+        Tue, 25 Feb 2020 08:34:12 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7EA3090A04;
+        Tue, 25 Feb 2020 08:34:06 +0000 (UTC)
+Date:   Tue, 25 Feb 2020 09:34:04 +0100
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     Dongjiu Geng <gengdongjiu@huawei.com>
+Cc:     <mst@redhat.com>, <xiaoguangrong.eric@gmail.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <fam@euphon.net>, <rth@twiddle.net>, <ehabkost@redhat.com>,
+        <mtosatti@redhat.com>, <qemu-devel@nongnu.org>,
+        <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
+        <pbonzini@redhat.com>, <james.morse@arm.com>, <lersek@redhat.com>,
+        <jonathan.cameron@huawei.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <zhengxiang9@huawei.com>
+Subject: Re: [PATCH v24 02/10] hw/arm/virt: Introduce a RAS machine option
+Message-ID: <20200225093404.0ee40224@redhat.com>
+In-Reply-To: <20200217131248.28273-3-gengdongjiu@huawei.com>
+References: <20200217131248.28273-1-gengdongjiu@huawei.com>
+        <20200217131248.28273-3-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-References: <1582022829-27032-1-git-send-email-wanpengli@tencent.com>
- <87zhdg84n6.fsf@vitty.brq.redhat.com> <CANRm+Cyx+J+YK8FzFBV8LRNPeCaXPc93vjFdpA0D_hA+wrpywQ@mail.gmail.com>
- <f433ff7e-72de-e2fd-5b71-a9ac92769c03@redhat.com>
-In-Reply-To: <f433ff7e-72de-e2fd-5b71-a9ac92769c03@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 25 Feb 2020 16:31:03 +0800
-Message-ID: <CANRm+CwfaZHHPyxC1qz_uq6ayw6vg2n0apLPoPH5dKXyy4FLeg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: LAPIC: Recalculate apic map in batch
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 25 Feb 2020 at 16:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 19/02/20 01:47, Wanpeng Li wrote:
-> >> An alternative idea: instead of making every caller return bool and
-> >> every call site handle the result (once) just add a
-> >> KVM_REQ_APIC_MAP_RECALC flag or a boolean flag to struct kvm. I
-> >> understand it may not be that easy as it sounds as we may be conunting
-> >> on valid mapping somewhere before we actually get to handiling
-> > Yes.
-> >
-> >> KVM_REQ_APIC_MAP_RECALC but we may preserve *some*
-> >> recalculate_apic_map() calls (and make it reset KVM_REQ_APIC_MAP_RECALC).
-> > Paolo, keep the caller return bool or add a booleen flag to struct
-> > kvm, what do you think?
->
-> A third possibility: add an apic_map field to struct kvm_lapic, so that
-> you don't have to add bool return values everywhere.
+On Mon, 17 Feb 2020 21:12:40 +0800
+Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 
-This apic_map field is boolean, right?
+> RAS Virtualization feature is not supported now, so add a RAS machine
 
-    Wanpeng
+> option and disable it by default.
+             ^^^^
+
+this doesn't match the patch.
+
+I'd rephrase it as:
+
+... feature is disabled by default ..
+add an option so user could enable it with
+
+   -machine virt,ras=on
+
+
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> ---
+>  hw/arm/virt.c         | 23 +++++++++++++++++++++++
+>  include/hw/arm/virt.h |  1 +
+>  2 files changed, 24 insertions(+)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index f788fe2..9555b8b 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1823,6 +1823,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
+>      vms->its = value;
+>  }
+>  
+> +static bool virt_get_ras(Object *obj, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    return vms->ras;
+> +}
+> +
+> +static void virt_set_ras(Object *obj, bool value, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    vms->ras = value;
+> +}
+> +
+>  static char *virt_get_gic_version(Object *obj, Error **errp)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(obj);
+> @@ -2126,6 +2140,15 @@ static void virt_instance_init(Object *obj)
+>                                      "Valid values are none and smmuv3",
+>                                      NULL);
+>  
+> +    /* Default disallows RAS instantiation */
+> +    vms->ras = false;
+> +    object_property_add_bool(obj, "ras", virt_get_ras,
+> +                             virt_set_ras, NULL);
+> +    object_property_set_description(obj, "ras",
+> +                                    "Set on/off to enable/disable reporting host memory errors "
+> +                                    "to a KVM guest using ACPI and guest external abort exceptions",
+> +                                    NULL);
+> +
+>      vms->irqmap = a15irqmap;
+>  
+>      virt_flash_create(vms);
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 71508bf..c32b7c7 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -123,6 +123,7 @@ typedef struct {
+>      bool highmem_ecam;
+>      bool its;
+>      bool virt;
+> +    bool ras;
+>      int32_t gic_version;
+>      VirtIOMMUType iommu;
+>      struct arm_boot_info bootinfo;
+
