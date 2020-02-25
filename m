@@ -2,64 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 645AD16F283
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 23:19:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE52516F295
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 23:29:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727227AbgBYWTm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 17:19:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33747 "EHLO
+        id S1728162AbgBYW3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 17:29:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54451 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726827AbgBYWTl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 17:19:41 -0500
+        with ESMTP id S1727227AbgBYW3L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 17:29:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582669178;
+        s=mimecast20190719; t=1582669749;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=gCSArIx/3mY9oSIUMRjqx2+R3OvuPX6j2QVZuQeM+/k=;
-        b=GHTS+twZm7rThRIRTIan3iEXMMTE22tyYPOnP0HDibeyc2iN4QA6J8xVzZ1eYEGNgIeo+K
-        7uAiQ0surOa3O/HWcIpbGl7SRFRIWJ8ODZEUJFjwTawr+RMy0bdb6WUWsvDPvlBZ5lnZaf
-        3Gpy7M1+EAIUHt9prW1N6Fy/s0U60to=
+        bh=wdsgKmaoBenOYlPmT+FDhmrFMca+cTnREXlGwbrclNE=;
+        b=OuD1uaIrCUqv/P6nA4H7QlLTsksuqd00t4wwuH91Y7R3aW71uTxXGcvHLWGgai7kPqUSUd
+        4adugj4bYkf/KpLCScMbxlnIyUJM0XCGjv+d6qJloWgyKS29OvOuQUvdKsLW8eXKopLoQ+
+        ha6ngz+E7j8nLR26I7h8FrReiyILnOk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-W7WYJUYZNry96hYG-fYhtA-1; Tue, 25 Feb 2020 17:19:30 -0500
-X-MC-Unique: W7WYJUYZNry96hYG-fYhtA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-386-FgxbYuSCMD2rYZ-1sdQzPg-1; Tue, 25 Feb 2020 17:29:05 -0500
+X-MC-Unique: FgxbYuSCMD2rYZ-1sdQzPg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AE78107ACC4;
-        Tue, 25 Feb 2020 22:19:27 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A941DB22;
+        Tue, 25 Feb 2020 22:29:04 +0000 (UTC)
 Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DA1208B759;
-        Tue, 25 Feb 2020 22:19:18 +0000 (UTC)
-Subject: Re: [PATCH RFC v4 06/13] mm: Allow to offline unmovable PageOffline()
- pages via MEM_GOING_OFFLINE
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        linux-kernel@vger.kernel.org
-Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Pavel Tatashin <pavel.tatashin@microsoft.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Qian Cai <cai@lca.pw>, Pingfan Liu <kernelfans@gmail.com>
-References: <20191212171137.13872-1-david@redhat.com>
- <20191212171137.13872-7-david@redhat.com>
- <6ec496580ddcb629d22589a1cba8cd61cbd53206.camel@linux.intel.com>
- <267ea186-aba8-1a93-bd55-ac641f78d07e@redhat.com>
- <3d719897039273a2bb8d0fe7d12563498ebd2897.camel@linux.intel.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 09392909FC;
+        Tue, 25 Feb 2020 22:29:01 +0000 (UTC)
+Subject: Re: [PATCH v4 09/36] KVM: s390: protvirt: Add initial vm and cpu
+ lifecycle handling
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200224114107.4646-1-borntraeger@de.ibm.com>
+ <20200224114107.4646-10-borntraeger@de.ibm.com>
+ <f80a0b58-5ed2-33b7-5292-2c4899d765b7@redhat.com>
+ <24689dd9-139d-3a0b-a57c-9f13ebda142b@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -105,177 +94,126 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <e0892179-b14c-84c3-1284-fc789f16e1c7@redhat.com>
-Date:   Tue, 25 Feb 2020 23:19:18 +0100
+Message-ID: <cff6dcbe-7028-c518-e218-426c2d26acb0@redhat.com>
+Date:   Tue, 25 Feb 2020 23:29:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <3d719897039273a2bb8d0fe7d12563498ebd2897.camel@linux.intel.com>
+In-Reply-To: <24689dd9-139d-3a0b-a57c-9f13ebda142b@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.02.20 22:46, Alexander Duyck wrote:
-> On Tue, 2020-02-25 at 19:49 +0100, David Hildenbrand wrote:
->>>>  /*
->>>>   * Scan pfn range [start,end) to find movable/migratable pages (LRU=
- pages,
->>>> - * non-lru movable pages and hugepages). We scan pfn because it's m=
-uch
->>>> - * easier than scanning over linked list. This function returns the=
- pfn
->>>> - * of the first found movable page if it's found, otherwise 0.
->>>> + * non-lru movable pages and hugepages).
->>>> + *
->>>> + * Returns:
->>>> + *	0 in case a movable page is found and movable_pfn was updated.
->>>> + *	-ENOENT in case no movable page was found.
->>>> + *	-EBUSY in case a definetly unmovable page was found.
->>>>   */
->>>> -static unsigned long scan_movable_pages(unsigned long start, unsign=
-ed long end)
->>>> +static int scan_movable_pages(unsigned long start, unsigned long en=
-d,
->>>> +			      unsigned long *movable_pfn)
->>>>  {
->>>>  	unsigned long pfn;
->>>> =20
->>>> @@ -1247,18 +1251,29 @@ static unsigned long scan_movable_pages(unsi=
-gned long start, unsigned long end)
->>>>  			continue;
->>>>  		page =3D pfn_to_page(pfn);
->>>>  		if (PageLRU(page))
->>>> -			return pfn;
->>>> +			goto found;
->>>>  		if (__PageMovable(page))
->>>> -			return pfn;
->>>> +			goto found;
->>>> +
->>>> +		/*
->>>> +		 * Unmovable PageOffline() pages where somebody still holds
->>>> +		 * a reference count (after MEM_GOING_OFFLINE) can definetly
->>>> +		 * not be offlined.
->>>> +		 */
->>>> +		if (PageOffline(page) && page_count(page))
->>>> +			return -EBUSY;
->>>
->>> So the comment confused me a bit because technically this function is=
-n't
->>> about offlining memory, it is about finding movable pages. I had to d=
-o a
->>> bit of digging to find the only consumer is __offline_pages, but if w=
-e are
->>> going to talk about "offlining" instead of "moving" in this function =
-it
->>> might make sense to rename it.
 >>
->> Well, it's contained in memory_hotplug.c, and the only user of moving
->> pages around in there is offlining code :) And it's job is to locate
->> movable pages, skip over some (temporary? unmovable ones) and (now)
->> indicate definitely unmovable ones.
->>
->> Any idea for a better name?
->> scan_movable_pages_and_stop_on_definitely_unmovable() is not so nice :=
-)
+>> The question will repeat a couple of times in the patch: Do we want to
+>> convert that to a proper error (e.g., EBUSY, EINVAL, EWHATSOEVER)
+>> instead of returning "1" to user space (whoch looks weird).
 >=20
-> I dunno. What I was getting at is that the wording here would make it
-> clearer if you simply stated that these pages "can definately not be
-> moved". Saying you cannot offline a page that is PageOffline seems kind=
- of
-> redundant, then again calling it an Unmovable and then saying it cannot=
- be
-> moves is also redundant I suppose. In the end you don't move them, but
+> Not sure about the right error code.=20
+> -EIO for cc =3D=3D 1?
 
-So, in summary, there are
-- PageOffline() pages that are movable (balloon compaction).
-- PageOffline() pages that cannot be moved and cannot be offlined (e.g.,
-  no balloon compaction enabled, XEN, HyperV, ...) . page_count(page) >=3D
-  0
-- PageOffline() pages that cannot be moved, but can be offlined.
-  page_count(page) =3D=3D 0.
-
-
-> they can be switched to offline if the page count hits 0. When that
-> happens you simply end up skipping over them in the code for
-> __test_page_isolated_in_pageblock and __offline_isolated_pages.
-
-Yes. The thing with the wording is that pages with (PageOffline(page) &&
-!page_count(page)) can also not really be moved, but they can be skipped
-when offlining. If we call that "moving them to /dev/null", then yes,
-they can be moved to some degree :)
-
-I can certainly do here e.g.,
-
-/*
- * PageOffline() pages that are not marked __PageMovable() and have a
- * reference count > 0 (after MEM_GOING_OFFLINE) are definitely
- * unmovable. If their reference count would be 0, they could be skipped
- * when offlining memory sections.
- */
-
-And maybe I'll add to the function doc, that unmovable pages that are
-skipped in this function can include pages that can be skipped when
-offlining (moving them to nirvana).
-
-Other suggestions?
+Makes sense.
 
 [...]
 
+>>> +	if (!cc)
+>>> +		free_pages(vcpu->arch.pv.stor_base,
+>>> +			   get_order(uv_info.guest_cpu_stor_len));
 >>
->> [1] we detect a definite offlining blocker and
->>
->>>> +		} while (!ret);
->>>> +
->>>> +		if (ret !=3D -ENOENT) {
->>>> +			reason =3D "unmovable page";
->>
->> [2] we abort offlining
->>
->>>> +			goto failed_removal_isolated;
->>>>  		}
->>>> =20
->>>>  		/*
+>> Should we clear arch.pv.handle?
 >=20
-> Yeah, this is the piece I misread.  I knew the loop this was in previou=
-sly
-> was looping when returning -ENOENT so for some reason I had it in my he=
-ad
-> that you were still looping on -EBUSY.
+> this is done in the memset below
 
-Ah okay, I see. Yeah, that wouldn't make sense for the use case I have :)
+missed that, grepping betrayed me.
+
+>>
+>> Also, I do wonder if it makes sense to
+>>
+>> vcpu->arch.pv.stor_base =3D NULL;
+>=20
+> same. We could do 4 single assignments instead, but the memset is proba=
+bly ok?
+
+yes, it's only harder to review ;)
+
+[...]
+
+>>> +	mutex_lock(&kvm->slots_lock);
+>>> +	memslot =3D kvm_memslots(kvm)->memslots;
+>>> +	npages =3D memslot->base_gfn + memslot->npages;
+>>
+>> I remember I asked this question already, maybe I missed the reply :(
+>>
+>> 1. What if we have multiple slots?
+>=20
+> memslot 0 is the last one, so this should actually have the last memory=
+ address
+> so this should be ok.
+
+I think I got it wrong (thought there would be some start and length -
+but it's only a length, which makes sense).
 
 >=20
-> So the one question I would have is if at this point are we guaranteed
-> that the balloon drivers have already taken care of the page count for =
-all
-> the pages they set to PageOffline? Based on the patch description I was
-> thinking that this was going to be looping for a while waiting for the
-> driver to clear the pages and then walking through them at the end of t=
-he
-> loop via check_pages_isolated_cb.
+>> 2. What is expected to happen if new slots are added (e.g., memory
+>> hotplug in the future?)
+>>
+>> Shouldn't you bail out if there is more than one slot and make sure th=
+at
+>> no new ones can be added as long as pv is active (I remember the latte=
+r
+>> should be very easy from an arch callback)?
+>=20
+> Yes, that should be easy, something like the following I guess
+>=20
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4744,6 +4744,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kv=
+m,
+>         if (mem->guest_phys_addr + mem->memory_size > kvm->arch.mem_lim=
+it)
+>                 return -EINVAL;
+> =20
+> +       /* When we are protected we should not change the memory slots =
+*/
+> +       if (kvm_s390_pv_is_protected(kvm))
+> +               return -EINVAL;
+>         return 0;
+>  }
+> =20
+>=20
+>=20
+>=20
+> I think we can extend that later to actually use
+> the memorysize from kvm->arch.mem_limit as long as this is reasonably s=
+mall.
+> This should then be done when we implement memory hotplug.
 
-So, e.g., the patch description states
+IMHO mem_limit would make a lot of sense and even make hotplug work out
+of the box. I assume you can assume that user space properly sets this
+up for all PV guests (KVM_S390_VM_MEM_LIMIT_SIZE).
 
-"Let's allow to do that by allowing to isolate any PageOffline() page
-when offlining. This way, we can reach the memory hotplug notifier
-MEM_GOING_OFFLINE, where the driver can signal that he is fine with
-offlining this page by dropping its reference count."
+So maybe use that directly and bail out if it's too big? (esp. if it's
+KVM_S390_NO_MEM_LIMIT).
 
-Any balloon driver that does not allow offlining (e.g., XEN, HyperV,
-virtio-balloon), will always have a refcount of (at least) 1. Drivers
-that want to make use of that (esp. virtio-mem, but eventually also
-HyperV), will drop their refcount via the MEM_GOING_OFFLINE call.
+[...]
 
-So yes, at this point, all applicable users were notified via
-MEM_GOING_OFFLINE and had their chance to decrement the refcount. If
-they didn't, offlining will be aborted.
+>> Similar to the VCPU path, should be set all pointers to NULL but skip
+>> the freeing? With a similar comment /* Inteded memory leak ... */
+>=20
+> This is done in kvm_s390_pv_dealloc_vm. And I think it makes sense to k=
+eep
+> the VM thing linked to the KVM struct. This will prevent the user from =
+doing
+> another PV_ENABLE on this guest.
 
-Thanks again!
+
+Makes sense.
+
 
 --=20
 Thanks,
