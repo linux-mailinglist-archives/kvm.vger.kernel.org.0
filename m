@@ -2,50 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E3B6416EC68
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 18:23:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0408016ECF8
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 18:46:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731181AbgBYRXg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 12:23:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32667 "EHLO
+        id S1730460AbgBYRqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 12:46:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49875 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729939AbgBYRXg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 12:23:36 -0500
+        with ESMTP id S1727983AbgBYRqU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 12:46:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582651414;
+        s=mimecast20190719; t=1582652778;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=IoCi0iBaspXw/yP3KM/TOlfiJk3jWe8/C1RZOLA99tE=;
-        b=ccyHoO3W+NhR6OXAQe87a9KX5Z60K00mmYab8aBWE7QTYX1Kchhc5w0oXzKCwlrXY2w2te
-        IJ4Don20DzYQXJfuy7iXnm5L6FKxZ8D5Q0XS5wBxLdTqjqd4tPPjOY2Qg8y2w5pne3wViI
-        gp4TtUe/5B4h0ysySdkNTB039IXDeYc=
+        bh=+ejOLs6ZuOGjps88cbB/YMCPyRAtJ6xGpeCTimQ2me4=;
+        b=euj8m2YOZpkeU9xmwdBrvcHI6NzkWxRh9DKTo+EbKVYEfUOVDdGWwWAhHWlBKneqjix/JK
+        jTXwifQQ2P2+X9Xn/s1hPlmu22rc8buD4qHL+M95dow+ALj8lTbnxrAWU/SE9DD623ogue
+        fF4Y0h3X78ih7trELQifWoYywOdGZl8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-bC5DqIZ8MBy5tpKLMLXxYg-1; Tue, 25 Feb 2020 12:23:31 -0500
-X-MC-Unique: bC5DqIZ8MBy5tpKLMLXxYg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-299-7cWbNyrGNumjw_K6R8X8-A-1; Tue, 25 Feb 2020 12:46:14 -0500
+X-MC-Unique: 7cWbNyrGNumjw_K6R8X8-A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44CDAA899E7;
-        Tue, 25 Feb 2020 17:23:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7003477;
+        Tue, 25 Feb 2020 17:46:12 +0000 (UTC)
 Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A6D4271A0;
-        Tue, 25 Feb 2020 17:23:24 +0000 (UTC)
-Subject: Re: [PATCH RFC v4 12/13] mm/vmscan: Export drop_slab() and
- drop_slab_node()
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>
-References: <20191212171137.13872-1-david@redhat.com>
- <20191212171137.13872-13-david@redhat.com>
- <20200225145829.GW22443@dhcp22.suse.cz>
- <afdf8600-2339-6d74-5e3d-fa1a23384318@redhat.com>
- <20200225170619.GC32720@dhcp22.suse.cz>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3786F8B759;
+        Tue, 25 Feb 2020 17:46:10 +0000 (UTC)
+Subject: Re: [PATCH v4 09/36] KVM: s390: protvirt: Add initial vm and cpu
+ lifecycle handling
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20200224114107.4646-1-borntraeger@de.ibm.com>
+ <20200224114107.4646-10-borntraeger@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -91,79 +92,369 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <9c21be0c-5eef-58c2-bfb9-ff787a5a2c08@redhat.com>
-Date:   Tue, 25 Feb 2020 18:23:23 +0100
+Message-ID: <f80a0b58-5ed2-33b7-5292-2c4899d765b7@redhat.com>
+Date:   Tue, 25 Feb 2020 18:46:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200225170619.GC32720@dhcp22.suse.cz>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200224114107.4646-10-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.02.20 18:06, Michal Hocko wrote:
-> On Tue 25-02-20 16:09:29, David Hildenbrand wrote:
->> On 25.02.20 15:58, Michal Hocko wrote:
->>> On Thu 12-12-19 18:11:36, David Hildenbrand wrote:
->>>> We already have a way to trigger reclaiming of all reclaimable slab objects
->>>> from user space (echo 2 > /proc/sys/vm/drop_caches). Let's allow drivers
->>>> to also trigger this when they really want to make progress and know what
->>>> they are doing.
->>>
->>> I cannot say I would be fan of this. This is a global action with user
->>> visible performance impact. I am worried that we will find out that all
->>> sorts of drivers have a very good idea that dropping slab caches is
->>> going to help their problem whatever it is. We have seen the same patter
->>> in the userspace already and that is the reason we are logging the usage
->>> to the log and count invocations in the counter.
->>
->> Yeah, I decided to hold back patch 11-13 for the v1 (which I am planning
->> to post in March after more testing). What we really want is to make
->> memory offlining an alloc_contig_range() work better with reclaimable
->> objects.
->>
->>>
->>>> virtio-mem wants to use these functions when it failed to unplug memory
->>>> for quite some time (e.g., after 30 minutes). It will then try to
->>>> free up reclaimable objects by dropping the slab caches every now and
->>>> then (e.g., every 30 minutes) as long as necessary. There will be a way to
->>>> disable this feature and info messages will be logged.
->>>>
->>>> In the future, we want to have a drop_slab_range() functionality
->>>> instead. Memory offlining code has similar demands and also other
->>>> alloc_contig_range() users (e.g., gigantic pages) could make good use of
->>>> this feature. Adding it, however, requires more work/thought.
->>>
->>> We already do have a memory_notify(MEM_GOING_OFFLINE) for that purpose
->>> and slab allocator implements a callback (slab_mem_going_offline_callback).
->>> The callback is quite dumb and it doesn't really try to free objects
->>> from the given memory range or even try to drop active objects which
->>> might turn out to be hard but this sounds like a more robust way to
->>> achieve what you want.
->>
->> Two things:
->>
->> 1. memory_notify(MEM_GOING_OFFLINE) is called after trying to isolate
->> the page range and checking if we only have movable pages. Won't help
->> much I guess.
-> 
-> You are right, I have missed that. Can we reorder those two calls?
+On 24.02.20 12:40, Christian Borntraeger wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
+>=20
+> This contains 3 main changes:
+> 1. changes in SIE control block handling for secure guests
+> 2. helper functions for create/destroy/unpack secure guests
+> 3. KVM_S390_PV_COMMAND ioctl to allow userspace dealing with secure
+> machines
 
-AFAIK no (would have to look up the details, but there was a good reason
-for the order, e.g., avoid races with other users of page isolation like
-alloc_contig_range()).
+side note: I really dislike such patch descriptions (lists!) and
+squashing a whole bunch of things that could be nicely split up into
+separat patches (with much nicer patch descriptions) into a single
+patch. E.g., enable/disable would be sufficiently complicated to review.
 
-Especially, "[PATCH RFC v4 06/13] mm: Allow to offline unmovable
-PageOffline() pages via MEM_GOING_OFFLINE" (which is still impatiently
-waiting for an ACK ;) ) also works around that ordering issue in a way
-we discussed back then.
+This makes review unnecessary complicated. But here we are in v4, so
+I'll try my best for (hopefully) the second last time ;)
 
--- 
+[...]
+
+> +static int kvm_s390_cpus_from_pv(struct kvm *kvm, u16 *rcp, u16 *rrcp)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	bool failed =3D false;
+> +	u16 rc, rrc;
+> +	int cc =3D 0;
+> +	int i;
+> +
+> +	/*
+> +	 * we ignore failures and try to destroy as many CPUs as possible.
+
+nit: "We"
+
+> +	 * At the same time we must not free the assigned resources when
+> +	 * this fails, as the ultravisor has still access to that memory.
+> +	 * So kvm_s390_pv_destroy_cpu can leave a "wanted" memory leak
+> +	 * behind.
+> +	 * We want to return the first failure rc and rrc though.
+
+nit, ", though".
+
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		mutex_lock(&vcpu->mutex);
+> +		if (kvm_s390_pv_destroy_cpu(vcpu, &rc, &rrc) && !failed) {
+> +			*rcp =3D rc;
+> +			*rrcp =3D rrc;
+> +			cc =3D 1;
+> +			failed =3D true;
+
+no need for "failed". Just check against cc !=3D 0 instead.
+
+> +		}
+> +		mutex_unlock(&vcpu->mutex);
+> +	}
+> +	return cc;
+
+The question will repeat a couple of times in the patch: Do we want to
+convert that to a proper error (e.g., EBUSY, EINVAL, EWHATSOEVER)
+instead of returning "1" to user space (whoch looks weird).
+
+> +}
+> +
+> +static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
+> +{
+> +	int i, r =3D 0;
+> +	u16 dummy;
+> +
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		mutex_lock(&vcpu->mutex);
+> +		r =3D kvm_s390_pv_create_cpu(vcpu, rc, rrc);
+> +		mutex_unlock(&vcpu->mutex);
+> +		if (r)
+> +			break;
+> +	}
+> +	if (r)
+> +		kvm_s390_cpus_from_pv(kvm, &dummy, &dummy);
+> +	return r;
+> +}
+
+[...]
+
+> @@ -0,0 +1,266 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Hosting Secure Execution virtual machines
+
+Just wondering "Protected Virtualization" vs. "Secure Execution".
+
+[...]
+
+> +int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
+> +{
+> +	int cc =3D 0;
+> +
+> +	if (kvm_s390_pv_cpu_get_handle(vcpu)) {
+> +		cc =3D uv_cmd_nodata(kvm_s390_pv_cpu_get_handle(vcpu),
+> +				   UVC_CMD_DESTROY_SEC_CPU, rc, rrc);
+> +
+> +		KVM_UV_EVENT(vcpu->kvm, 3,
+> +			     "PROTVIRT DESTROY VCPU %d: rc %x rrc %x",
+> +			     vcpu->vcpu_id, *rc, *rrc);
+> +		WARN_ONCE(cc, "protvirt destroy cpu failed rc %x rrc %x",
+> +			  *rc, *rrc);
+> +	}
+
+/* Intended memory leak for something that should never happen. */
+
+> +	if (!cc)
+> +		free_pages(vcpu->arch.pv.stor_base,
+> +			   get_order(uv_info.guest_cpu_stor_len));
+
+Should we clear arch.pv.handle?
+
+Also, I do wonder if it makes sense to
+
+vcpu->arch.pv.stor_base =3D NULL;
+
+So really remove any traces and act like the error never happened. Only
+skip the freeing. Makes sense? Then we're not stuck with a
+half-initialized VM state.
+
+
+> +	vcpu->arch.sie_block->pv_handle_cpu =3D 0;
+> +	vcpu->arch.sie_block->pv_handle_config =3D 0;
+> +	memset(&vcpu->arch.pv, 0, sizeof(vcpu->arch.pv));
+> +	vcpu->arch.sie_block->sdf =3D 0;
+> +	kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> +
+> +	return cc;
+
+Convert to a proper error?
+
+> +}
+> +
+> +int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
+> +{
+> +	struct uv_cb_csc uvcb =3D {
+> +		.header.cmd =3D UVC_CMD_CREATE_SEC_CPU,
+> +		.header.len =3D sizeof(uvcb),
+> +	};
+> +	int cc;
+> +
+> +	if (kvm_s390_pv_cpu_get_handle(vcpu))
+> +		return -EINVAL;
+> +
+> +	vcpu->arch.pv.stor_base =3D __get_free_pages(GFP_KERNEL,
+> +						   get_order(uv_info.guest_cpu_stor_len));
+> +	if (!vcpu->arch.pv.stor_base)
+> +		return -ENOMEM;
+> +
+> +	/* Input */
+> +	uvcb.guest_handle =3D kvm_s390_pv_get_handle(vcpu->kvm);
+> +	uvcb.num =3D vcpu->arch.sie_block->icpua;
+> +	uvcb.state_origin =3D (u64)vcpu->arch.sie_block;
+> +	uvcb.stor_origin =3D (u64)vcpu->arch.pv.stor_base;
+> +
+> +	cc =3D uv_call(0, (u64)&uvcb);
+> +	*rc =3D uvcb.header.rc;
+> +	*rrc =3D uvcb.header.rrc;
+> +	KVM_UV_EVENT(vcpu->kvm, 3,
+> +		     "PROTVIRT CREATE VCPU: cpu %d handle %llx rc %x rrc %x",
+> +		     vcpu->vcpu_id, uvcb.cpu_handle, uvcb.header.rc,
+> +		     uvcb.header.rrc);
+> +
+> +	if (cc) {
+> +		u16 dummy;
+> +
+> +		kvm_s390_pv_destroy_cpu(vcpu, &dummy, &dummy);
+> +		return -EINVAL;
+
+Ah, here we convert from cc to an actual error :)
+
+> +	}
+> +
+> +	/* Output */
+> +	vcpu->arch.pv.handle =3D uvcb.cpu_handle;
+> +	vcpu->arch.sie_block->pv_handle_cpu =3D uvcb.cpu_handle;
+> +	vcpu->arch.sie_block->pv_handle_config =3D kvm_s390_pv_get_handle(vcp=
+u->kvm);
+> +	vcpu->arch.sie_block->sdf =3D 2;
+> +	kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> +	return 0;
+> +}
+> +
+> +/* only free resources when the destroy was successful */
+
+s/destroy/deinit/
+
+> +static void kvm_s390_pv_dealloc_vm(struct kvm *kvm)
+> +{
+> +	vfree(kvm->arch.pv.stor_var);
+> +	free_pages(kvm->arch.pv.stor_base,
+> +		   get_order(uv_info.guest_base_stor_len));
+> +	memset(&kvm->arch.pv, 0, sizeof(kvm->arch.pv));
+> +}
+> +
+> +static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
+> +{
+> +	unsigned long base =3D uv_info.guest_base_stor_len;
+> +	unsigned long virt =3D uv_info.guest_virt_var_stor_len;
+> +	unsigned long npages =3D 0, vlen =3D 0;
+> +	struct kvm_memory_slot *memslot;
+> +
+> +	kvm->arch.pv.stor_var =3D NULL;
+> +	kvm->arch.pv.stor_base =3D __get_free_pages(GFP_KERNEL, get_order(bas=
+e));
+> +	if (!kvm->arch.pv.stor_base)
+> +		return -ENOMEM;
+> +
+> +	/*
+> +	 * Calculate current guest storage for allocation of the
+> +	 * variable storage, which is based on the length in MB.
+> +	 *
+> +	 * Slots are sorted by GFN
+> +	 */
+> +	mutex_lock(&kvm->slots_lock);
+> +	memslot =3D kvm_memslots(kvm)->memslots;
+> +	npages =3D memslot->base_gfn + memslot->npages;
+
+I remember I asked this question already, maybe I missed the reply :(
+
+1. What if we have multiple slots?
+2. What is expected to happen if new slots are added (e.g., memory
+hotplug in the future?)
+
+Shouldn't you bail out if there is more than one slot and make sure that
+no new ones can be added as long as pv is active (I remember the latter
+should be very easy from an arch callback)?
+
+> +	mutex_unlock(&kvm->slots_lock);
+> +
+> +	kvm->arch.pv.guest_len =3D npages * PAGE_SIZE;
+> +
+> +	/* Allocate variable storage */
+> +	vlen =3D ALIGN(virt * ((npages * PAGE_SIZE) / HPAGE_SIZE), PAGE_SIZE)=
+;
+> +	vlen +=3D uv_info.guest_virt_base_stor_len;
+> +	kvm->arch.pv.stor_var =3D vzalloc(vlen);
+> +	if (!kvm->arch.pv.stor_var)
+> +		goto out_err;
+> +	return 0;
+> +
+> +out_err:
+> +	kvm_s390_pv_dealloc_vm(kvm);
+> +	return -ENOMEM;
+> +}
+> +
+> +/* this should not fail, but if it does we must not free the donated m=
+emory */
+> +int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+> +{
+> +	int cc;
+> +
+> +	cc =3D uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
+> +			   UVC_CMD_DESTROY_SEC_CONF, rc, rrc);
+
+Could convert to
+
+int cc =3D ...
+
+> +	WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
+> +	atomic_set(&kvm->mm->context.is_protected, 0);
+> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", *rc, *rrc);
+> +	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", *rc, *rrc);
+> +	if (!cc)
+> +		kvm_s390_pv_dealloc_vm(kvm);
+
+Similar to the VCPU path, should be set all pointers to NULL but skip
+the freeing? With a similar comment /* Inteded memory leak ... */
+
+> +	return cc;
+
+Does it make more sense to translate that to a proper error? (EBUSY,
+EINVAL etc.) I'd assume we translate that to a proper error - if any.
+Returning e.g., "1" does not make too much sense IMHO.
+
+> +}
+> +
+> +int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+> +{
+> +	u16 drc, drrc;
+> +	int cc, ret;
+> +
+
+superfluous empty line.
+
+> +	struct uv_cb_cgc uvcb =3D {
+> +		.header.cmd =3D UVC_CMD_CREATE_SEC_CONF,
+> +		.header.len =3D sizeof(uvcb)
+> +	};
+
+maybe
+
+int ret =3D kvm_s390_pv_alloc_vm(kvm);
+
+no strong feelings.
+
+> +
+> +	ret =3D kvm_s390_pv_alloc_vm(kvm);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Inputs */
+> +	uvcb.guest_stor_origin =3D 0; /* MSO is 0 for KVM */
+> +	uvcb.guest_stor_len =3D kvm->arch.pv.guest_len;
+> +	uvcb.guest_asce =3D kvm->arch.gmap->asce;
+> +	uvcb.guest_sca =3D (unsigned long)kvm->arch.sca;
+> +	uvcb.conf_base_stor_origin =3D (u64)kvm->arch.pv.stor_base;
+> +	uvcb.conf_virt_stor_origin =3D (u64)kvm->arch.pv.stor_var;
+> +
+> +	cc =3D uv_call(0, (u64)&uvcb);
+> +	*rc =3D uvcb.header.rc;
+> +	*rrc =3D uvcb.header.rrc;
+> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT CREATE VM: handle %llx len %llx rc %x =
+rrc %x",
+> +		     uvcb.guest_handle, uvcb.guest_stor_len, *rc, *rrc);
+> +
+> +	/* Outputs */
+> +	kvm->arch.pv.handle =3D uvcb.guest_handle;
+> +
+> +	if (cc && (uvcb.header.rc & UVC_RC_NEED_DESTROY)) {
+
+So, in case cc!=3D0 and UVC_RC_NEED_DESTROY is not set, we would return a=
+n
+error (!=3D0 from this function) and not even try to deinit the vm?
+
+This is honestly confusing stuff.
+
+> +		if (!kvm_s390_pv_deinit_vm(kvm, &drc, &drrc))
+> +			kvm_s390_pv_dealloc_vm(kvm);
+
+kvm_s390_pv_deinit_vm() will already call kvm_s390_pv_dealloc_vm().
+
+> +		return -EINVAL;
+> +	}
+> +	kvm->arch.gmap->guest_handle =3D uvcb.guest_handle;
+> +	atomic_set(&kvm->mm->context.is_protected, 1);
+> +	return cc;
+
+Convert to a proper error?
+
+
+Feel free to send a new version of this patch only on top. I'll try to
+review it very fast :)
+
+--=20
 Thanks,
 
 David / dhildenb
