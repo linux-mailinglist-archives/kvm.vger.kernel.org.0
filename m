@@ -2,95 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F37B16C470
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:54:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 361B516C478
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:55:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730500AbgBYOy2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 09:54:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40794 "EHLO
+        id S1730933AbgBYOzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 09:55:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23459 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729489AbgBYOy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 09:54:27 -0500
+        with ESMTP id S1730601AbgBYOzU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 09:55:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582642466;
+        s=mimecast20190719; t=1582642519;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mK3STqvNpT3jDn9vLwtg+cXgS2sGksMMsz4/c3rFMHk=;
-        b=Ok6IKozm1LXlmGQDgtQj/4G2VOtNn0u3hVRFjvoq1o8oZb6Zxu0mIPdiQ+wD4CEYKuWOo7
-        3XV/NMJzXljg7BWMLf5IXy0nGIhnD78OU9Q12IjV9ZLnLjhX+u2hiPYGdSScJngeBRuNDj
-        grd3Tf+/ROjO/8a9NiyVQusHQwmIhAg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-ikvqLke2N7qt9_VyxbP45Q-1; Tue, 25 Feb 2020 09:54:25 -0500
-X-MC-Unique: ikvqLke2N7qt9_VyxbP45Q-1
-Received: by mail-wm1-f70.google.com with SMTP id p2so1123368wmi.8
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 06:54:24 -0800 (PST)
+        bh=Gji83vHKV1k5g/ChPkhalite2KXqbop0gZZfM2DEBYg=;
+        b=FJqTYZwHS4zMn92K9Y20eurDNQz4YEczt2exBxf5g3ryiKz1UyI5VlfmCCVF8AQCF0l7bY
+        V9rmSH/p2V1lFsOmlToX6XaeeWzWYZuBBvMbFj+MJNivo/tMjzvm+WNSgoold4Z5hGKuWU
+        OsUfF0XsGGCwmP/k05coM23r/7oVx74=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244-yvwjDiyjOdiWxPgGOAgnLg-1; Tue, 25 Feb 2020 09:55:14 -0500
+X-MC-Unique: yvwjDiyjOdiWxPgGOAgnLg-1
+Received: by mail-wm1-f71.google.com with SMTP id y7so969237wmd.4
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 06:55:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mK3STqvNpT3jDn9vLwtg+cXgS2sGksMMsz4/c3rFMHk=;
-        b=J+TszR14NjQgSLvxdzc3e6rse2FYpozH9Rxix8UMLfRLLM0JAoXBAvcwSHNl1p4GCU
-         up8H4fXFA2qam6uTE1pvNXTNgQS1VMs1n4c1sZE0ErsVcqzcY9rvynCwRpMC+rfX9FTd
-         MUkVf59actqEgFlnfFL7FAXxzEuz60KqxSvNtCGBfNqJ2SD5bZSuV175rY8xQa0NGneG
-         lpAJFPNWyJl9/j7tLDpLaTiA2Xub43h45dPv/+OMuo3VQfm5PHP9ptvNXJhDcOeJGDRF
-         AJpkZwTqhWnuevQncIl0IqGNFOgFctnicVwoZjwU06xfjWaJvSadcJfyUmqdwddOiGNb
-         8x4A==
-X-Gm-Message-State: APjAAAVAJWg+w8FG+lZLJD90GtheqDVTh7kujjbfiqwIROiiv7YZe5dF
-        sBUNvaNPbVYrjMAezEuh41Hk31slYxLHotWF3B7dwc1hqOd/IxL6MCA+ECg2ruLTCazDPRfBaK1
-        mKygDO4pANfsC
-X-Received: by 2002:adf:ef8e:: with SMTP id d14mr15574546wro.316.1582642462671;
-        Tue, 25 Feb 2020 06:54:22 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxNJivnFuLmBEUDYNzro50QPxzSsCchDfqLX6sY7HTC6bfACS5U6cknWPDlWhgge0XEZWwm3A==
-X-Received: by 2002:adf:ef8e:: with SMTP id d14mr15574535wro.316.1582642462449;
-        Tue, 25 Feb 2020 06:54:22 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:3577:1cfe:d98a:5fb6? ([2001:b07:6468:f312:3577:1cfe:d98a:5fb6])
-        by smtp.gmail.com with ESMTPSA id q3sm4200422wmj.38.2020.02.25.06.54.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2020 06:54:21 -0800 (PST)
-Subject: Re: [PATCH 19/61] KVM: VMX: Add helpers to query Intel PT mode
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Gji83vHKV1k5g/ChPkhalite2KXqbop0gZZfM2DEBYg=;
+        b=FyJwNhm0stb6E/BNnCOHCLeZE5jLQOSHoG0V465fbA4Xp/W1lCtQ0r7565dlu1opPz
+         16nOTWs71BClE8wMeZYZfZI2RyXzgV8rU1AIyNVZoZpylZqoiakV6pvnXq6tCaYO7Bm8
+         oLVcACEXcStOdJVHgIM+4t3Da9UBdkL63mGae8zRkecuCZbtg7IW9VGOy3C7KC56uW0Y
+         9Fqu/aXCk4QgMiOScRKUt4Vf+NWP3kmYDf55O0oKV6296RHiHKWbbRlSABtCHUmvje3+
+         zts0BfLmM6hGZL+gU3Xp5fnUEoqlGxjFsrGauk9+iJG3PbVhziyxM5NHwXuMm65FNy5m
+         o/tA==
+X-Gm-Message-State: APjAAAWT4U3vyX1NTZm1g6YbhdOgRJLNcib63V87zkjKHqz83svb1wAA
+        vF4xReo1I3Jg+QMX+NblTSkdmsyGLpqd9LgM9FPqYIBEsQKRC/0C4M4HjDjyLgd9K9hPmERkXBN
+        /aaI6NhhTBemm
+X-Received: by 2002:adf:fc12:: with SMTP id i18mr14772563wrr.354.1582642513259;
+        Tue, 25 Feb 2020 06:55:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwXr3wjuxnRC1UK23RsKWqBFdQZDHdHj223uHMid455IAOjAv00FvziRQO2xBJQYBw4ADY7dw==
+X-Received: by 2002:adf:fc12:: with SMTP id i18mr14772547wrr.354.1582642513041;
+        Tue, 25 Feb 2020 06:55:13 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id t10sm3180316wru.59.2020.02.25.06.55.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2020 06:55:12 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-20-sean.j.christopherson@intel.com>
- <87pne8q8c0.fsf@vitty.brq.redhat.com>
- <20200224221807.GM29865@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <33a4d99d-98da-0bd8-0f9c-fc04bef54350@redhat.com>
-Date:   Tue, 25 Feb 2020 15:54:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+Subject: Re: [PATCH 59/61] KVM: x86: Don't propagate MMU lpage support to memslot.disallow_lpage
+In-Reply-To: <20200201185218.24473-60-sean.j.christopherson@intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-60-sean.j.christopherson@intel.com>
+Date:   Tue, 25 Feb 2020 15:55:11 +0100
+Message-ID: <878skqlnsg.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200224221807.GM29865@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/02/20 23:18, Sean Christopherson wrote:
->>>  {
->>>  	u32 vmexit_ctrl = vmcs_config.vmexit_ctrl;
->>> -	if (pt_mode == PT_MODE_SYSTEM)
->>> +	if (vmx_pt_mode_is_system())
->> ... and here? I.e. to cover the currently unsupported 'host-only' mode.
-> Hmm, good question.  I don't think so?  On VM-Enter, RTIT_CTL would need to
-> be loaded to disable PT.  Clearing RTIT_CTL on VM-Exit would be redundant
-> at that point[1].  And AIUI, the PIP for VM-Enter/VM-Exit isn't needed
-> because there is no context switch from the decoder's perspective.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-How does host-only mode differ from "host-guest but don't expose PT to
-the guest"?  So I would say that host-only mode is a special case of
-host-guest, not of system mode.
+> Stop propagating MMU large page support into a memslot's disallow_lpage
+> now that the MMU's max_page_level handles the scenario where VMX's EPT is
+> enabled and EPT doesn't support 2M pages.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 3 ---
+>  arch/x86/kvm/x86.c     | 6 ++----
+>  2 files changed, 2 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 3ad24ca692a6..e349689ac0cf 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7633,9 +7633,6 @@ static __init int hardware_setup(void)
+>  	if (!cpu_has_vmx_tpr_shadow())
+>  		kvm_x86_ops->update_cr8_intercept = NULL;
+>  
+> -	if (enable_ept && !cpu_has_vmx_ept_2m_page())
+> -		kvm_disable_largepages();
+> -
+>  #if IS_ENABLED(CONFIG_HYPERV)
+>  	if (ms_hyperv.nested_features & HV_X64_NESTED_GUEST_MAPPING_FLUSH
+>  	    && enable_ept) {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 144143a57d0b..b40488fd2969 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9884,11 +9884,9 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+>  		ugfn = slot->userspace_addr >> PAGE_SHIFT;
+>  		/*
+>  		 * If the gfn and userspace address are not aligned wrt each
+> -		 * other, or if explicitly asked to, disable large page
+> -		 * support for this slot
+> +		 * other, disable large page support for this slot.
+>  		 */
+> -		if ((slot->base_gfn ^ ugfn) & (KVM_PAGES_PER_HPAGE(level) - 1) ||
+> -		    !kvm_largepages_enabled()) {
+> +		if ((slot->base_gfn ^ ugfn) & (KVM_PAGES_PER_HPAGE(level) - 1)) {
+>  			unsigned long j;
+>  
+>  			for (j = 0; j < lpages; ++j)
 
-Paolo
+MMU code always explodes my brain, this left me wondering why wasn't the
+original vmx_get_lpage_level() adjusted before...
+
+FWIW,
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
