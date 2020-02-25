@@ -2,192 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D12816C3A0
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:16:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42F7916C3B2
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:20:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730613AbgBYOQx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 09:16:53 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20809 "EHLO
+        id S1730525AbgBYOUs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 09:20:48 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58821 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729952AbgBYOQw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 09:16:52 -0500
+        by vger.kernel.org with ESMTP id S1730297AbgBYOUs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 09:20:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582640211;
+        s=mimecast20190719; t=1582640447;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IzQn+onzvBlxqocwz0NsyUCMnotTZ6aJbCpbo5ir5HI=;
-        b=hX7YyuaxiVUR+usQQEFrpEldVjwagU/7D9msyitaMqMdhZ6a6NQLZKqnoAr2RP1WyvQFN3
-        IFQecUMN377om6J5F++kjBsdh9ThghaVoEsm5bGXzBvxExzeczacYtx4oBwREGympYUDqN
-        eplg5KVX8WEtaDqIgdFDSLrZE2M5qqg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-1gSMBmE3NQ2ADcAKSFX8CA-1; Tue, 25 Feb 2020 09:16:49 -0500
-X-MC-Unique: 1gSMBmE3NQ2ADcAKSFX8CA-1
-Received: by mail-wr1-f72.google.com with SMTP id y28so3766523wrd.23
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 06:16:49 -0800 (PST)
+        bh=w6FPpUbqRjz4gpl8i29mEumqWVf8GMxTT6jsxq0Z1Hc=;
+        b=FA4DXFE8vzh0IpublXZB/DMSUfXFj2Gch4KvXq1v8cQNhmVUGkwQZ8Yw3e+YubV38bEbjb
+        MQpJ0n1KLIJa5CjIXVDHPF98qO5jmLT1Lk3uywhYMlKgnSiysJY1RxHXDY5rIvfrp/9Pyu
+        MipkGk8QdPw/zhfokAych96EQxvZrwg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-TPOCQsw4NFCfTYPaj3rhXg-1; Tue, 25 Feb 2020 09:20:45 -0500
+X-MC-Unique: TPOCQsw4NFCfTYPaj3rhXg-1
+Received: by mail-wr1-f70.google.com with SMTP id n12so5478275wrp.19
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 06:20:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=IzQn+onzvBlxqocwz0NsyUCMnotTZ6aJbCpbo5ir5HI=;
-        b=U9hX7W102by1y/a70fhsYIToycJqxqqr7MZHelCIbD04OrAXBwvPzotCBjHK+qHICA
-         Mcq8HbFoIdyJLsXVD7CoLXC5WJ6HYY0DGUCykEdf5taoPSvfe1NmrpAh/xJGM/uM2RCF
-         T207vTP2Oxsv6G3Swx/PgKKpP5kuSE2+lb30wLdH2l5Tx3W0PEHmJsgv9OjX9YfZIvJd
-         eHj3/WuLSZGK8K4XNjAK2ffqXuPkMa5sbhIHpoyETdTaDoS+DCsNBF933j0vAk/bDS00
-         SXiW9J9sWFg7GOi1CLqmEC5UJqJxnO/7nuJsjQsiM4KOL0X71rx2h9PnFCQz7b2JR47m
-         vPwA==
-X-Gm-Message-State: APjAAAXONMm8jFp4Vnp9Jxj13Bn3q2mXjmwXObJj7GgNb8ERePXHczkw
-        H3S16nItPELJF1zMQtSgf24FD4xmMFueUQCgPgCh9e0fa0aClwRbdUNH4ZCmeuqZOLsKOOkjWzi
-        /MvCCTRkv/fzD
-X-Received: by 2002:a5d:5044:: with SMTP id h4mr69727243wrt.4.1582640207935;
-        Tue, 25 Feb 2020 06:16:47 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxJp/qijxC/XruuNkhMbwA0G62eKvQ1UZq7MZO3LcjaKoXbLRecbRmkRft5llJb3hZkv2UPzw==
-X-Received: by 2002:a5d:5044:: with SMTP id h4mr69727222wrt.4.1582640207667;
-        Tue, 25 Feb 2020 06:16:47 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id z4sm24516180wrt.47.2020.02.25.06.16.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2020 06:16:47 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=w6FPpUbqRjz4gpl8i29mEumqWVf8GMxTT6jsxq0Z1Hc=;
+        b=bYtkFNa1EdRetcauU8ZeFWJuecN5CannS8UOTUzWhFpUWOG9Xko+FLmsMZjsgKSHJo
+         wbdBUjxEuRzyv8UDWj+fMwwERb8JOYxfUgiRCiWw9xBVzBekINMMmfSiKuFHo3iTi2Cu
+         ZX6I6MPeO0KOBpydwgSiMn1Wi7enq5OYtiI2Lgt3BVOvdpW/vmx7F6Cb+2tWk3bxUGoj
+         U5szO7DUNmkUc4cKi0BhJqEb/28596zw4yBgBDZIlOsP/+630fLXDQUMCxjEqaVoslBn
+         p30T9jmncEOgSbSGm/+qDHCA6kBrUZAioAp8v5g3B5YZzeqXgnUBFzvDDaFVMxnDKJZS
+         qgBQ==
+X-Gm-Message-State: APjAAAUW0Pyqu6Pj0I5+/aPhO+IsCziznrwEWi+0kdp3od+yj2H4scyt
+        OY4UPK+SgyPLEmKsSJYeUws1EsnNRv397QyXplAUZ17yCQPSnD9Scxkxx3qsPIDt6tYI2x1m9fx
+        EwF6lLFH14YsF
+X-Received: by 2002:a5d:4b91:: with SMTP id b17mr10625464wrt.325.1582640444254;
+        Tue, 25 Feb 2020 06:20:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw0/r6jYINhIO7NFbSrZU8U9CXVckXX4lL7VhdkK/P9c93FiJxF+RGAU6OqxmnOGX3IqqCZYg==
+X-Received: by 2002:a5d:4b91:: with SMTP id b17mr10625439wrt.325.1582640443944;
+        Tue, 25 Feb 2020 06:20:43 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:3577:1cfe:d98a:5fb6? ([2001:b07:6468:f312:3577:1cfe:d98a:5fb6])
+        by smtp.gmail.com with ESMTPSA id 133sm4826515wmd.5.2020.02.25.06.20.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2020 06:20:43 -0800 (PST)
+Subject: Re: [PATCH v2] KVM: LAPIC: Recalculate apic map in batch
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 55/61] KVM: VMX: Directly query Intel PT mode when refreshing PMUs
-In-Reply-To: <20200201185218.24473-56-sean.j.christopherson@intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-56-sean.j.christopherson@intel.com>
-Date:   Tue, 25 Feb 2020 15:16:46 +0100
-Message-ID: <87k14alpkh.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>
+References: <1582624061-5814-1-git-send-email-wanpengli@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0af6b96a-16ac-5054-7754-6ab4a239a2d4@redhat.com>
+Date:   Tue, 25 Feb 2020 15:20:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1582624061-5814-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
-
-> Use vmx_pt_mode_is_host_guest() in intel_pmu_refresh() instead of
-> bouncing through kvm_x86_ops->pt_supported, and remove ->pt_supported()
-> as the PMU code was the last remaining user.
->
-> Opportunistically clean up the wording of a comment that referenced
-> kvm_x86_ops->pt_supported().
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+On 25/02/20 10:47, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> In the vCPU reset and set APIC_BASE MSR path, the apic map will be recalculated 
+> several times, each time it will consume 10+ us observed by ftrace in my 
+> non-overcommit environment since the expensive memory allocate/mutex/rcu etc 
+> operations. This patch optimizes it by recaluating apic map in batch, I hope 
+> this can benefit the serverless scenario which can frequently create/destroy 
+> VMs.
+> 
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > ---
->  arch/x86/include/asm/kvm_host.h | 2 --
->  arch/x86/kvm/svm.c              | 7 -------
->  arch/x86/kvm/vmx/pmu_intel.c    | 2 +-
->  arch/x86/kvm/vmx/vmx.c          | 6 ------
->  arch/x86/kvm/x86.c              | 7 +++----
->  5 files changed, 4 insertions(+), 20 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 1dd5ac8a2136..a8bae9d88bce 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1162,8 +1162,6 @@ struct kvm_x86_ops {
->  	void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu,
->  		enum exit_fastpath_completion *exit_fastpath);
->  
-> -	bool (*pt_supported)(void);
-> -
->  	int (*check_nested_events)(struct kvm_vcpu *vcpu, bool external_intr);
->  	void (*request_immediate_exit)(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 6dd9c810c0dc..a27f83f7521c 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -6074,11 +6074,6 @@ static int svm_get_lpage_level(void)
->  	return PT_PDPE_LEVEL;
+> v1 -> v2:
+>  * add apic_map_dirty to kvm_lapic
+>  * error condition in kvm_apic_set_state, do recalcuate  unconditionally
+> 
+>  arch/x86/kvm/lapic.c | 29 +++++++++++++++++++----------
+>  arch/x86/kvm/lapic.h |  2 ++
+>  arch/x86/kvm/x86.c   |  2 ++
+>  3 files changed, 23 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index afcd30d..3476dbc 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -164,7 +164,7 @@ static void kvm_apic_map_free(struct rcu_head *rcu)
+>  	kvfree(map);
 >  }
 >  
-> -static bool svm_pt_supported(void)
-> -{
-> -	return false;
-> -}
-> -
->  static bool svm_has_wbinvd_exit(void)
+> -static void recalculate_apic_map(struct kvm *kvm)
+> +void kvm_recalculate_apic_map(struct kvm *kvm)
 >  {
->  	return true;
-> @@ -7438,8 +7433,6 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
->  
->  	.cpuid_update = svm_cpuid_update,
->  
-> -	.pt_supported = svm_pt_supported,
-> -
->  	.set_supported_cpuid = svm_set_supported_cpuid,
->  
->  	.has_wbinvd_exit = svm_has_wbinvd_exit,
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 34a3a17bb6d7..d8f5cb312b9d 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -330,7 +330,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  	pmu->global_ovf_ctrl_mask = pmu->global_ctrl_mask
->  			& ~(MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF |
->  			    MSR_CORE_PERF_GLOBAL_OVF_CTRL_COND_CHGD);
-> -	if (kvm_x86_ops->pt_supported())
-> +	if (vmx_pt_mode_is_host_guest())
->  		pmu->global_ovf_ctrl_mask &=
->  				~MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI;
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 98d54cfa0cbe..e6284b6aac56 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6283,11 +6283,6 @@ static bool vmx_has_emulated_msr(int index)
->  	}
->  }
->  
-> -static bool vmx_pt_supported(void)
-> -{
-> -	return vmx_pt_mode_is_host_guest();
-> -}
-> -
->  static void vmx_recover_nmi_blocking(struct vcpu_vmx *vmx)
->  {
->  	u32 exit_intr_info;
-> @@ -7876,7 +7871,6 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
->  
->  	.check_intercept = vmx_check_intercept,
->  	.handle_exit_irqoff = vmx_handle_exit_irqoff,
-> -	.pt_supported = vmx_pt_supported,
->  
->  	.request_immediate_exit = vmx_request_immediate_exit,
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9d38dcdbb613..144143a57d0b 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2805,10 +2805,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
->  			return 1;
->  		/*
-> -		 * We do support PT if kvm_x86_ops->pt_supported(), but we do
-> -		 * not support IA32_XSS[bit 8]. Guests will have to use
-> -		 * RDMSR/WRMSR rather than XSAVES/XRSTORS to save/restore PT
-> -		 * MSRs.
-> +		 * KVM supports exposing PT to the guest, but does not support
-> +		 * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
-> +		 * XSAVES/XRSTORS to save/restore PT MSRs.
 
-So the responsibility shifts from vague 'we' to KVM. There should be
-a juridical term for that :-)
+It's better to add an "if" here rather than in every caller.  It should
+be like:
 
->  		 */
->  		if (data != 0)
->  			return 1;
+	if (!apic->apic_map_dirty) {
+		/*
+		 * Read apic->apic_map_dirty before
+		 * kvm->arch.apic_map.
+		 */
+		smp_rmb();
+		return;
+	}
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+        mutex_lock(&kvm->arch.apic_map_lock);
+	if (!apic->apic_map_dirty) {
+		/* Someone else has updated the map.  */
+		mutex_unlock(&kvm->arch.apic_map_lock);
+		return;
+	}
+	...
+out:
+        old = rcu_dereference_protected(kvm->arch.apic_map,
+                        lockdep_is_held(&kvm->arch.apic_map_lock));
+        rcu_assign_pointer(kvm->arch.apic_map, new);
+	/*
+	 * Write kvm->arch.apic_map before
+	 * clearing apic->apic_map_dirty.
+	 */
+	smp_wmb();
+	apic->apic_map_dirty = false;
+        mutex_unlock(&kvm->arch.apic_map_lock);
+	...
 
--- 
-Vitaly
+But actually it seems to me that, given we're going through all this
+pain, it's better to put the "dirty" flag in kvm->arch, next to the
+mutex and the map itself.  This should also reduce the number of calls
+to kvm_recalculate_apic_map that recompute the map.  A lot of them will
+just wait on the mutex and exit.
+
+Paolo
 
