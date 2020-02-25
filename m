@@ -2,135 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B2B2B16C47C
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:56:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9ADF16E92B
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:59:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730923AbgBYO4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 09:56:39 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57223 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730601AbgBYO4i (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 09:56:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582642597;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Y/GTDDlt72QN2T+qefae0h4YDCB+SvgeS3qO+PQYb4o=;
-        b=LNXmec1zWoOGGUVReLV/Fg3X6MTGkYci+sIF5ytxMyS5wTHPMyzNLHwHqG0dHggTA88kD8
-        /NLRLTqojTwXeBdJyLRlzkeN6NZKrh1Vd6ItLDpm8AmJrNKRnIUMROWtLEmsyzwNtK33Wg
-        EzsHSjf18pB0Ul1lFVWuNdgO5lPX/Mw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-dEgkQxqENMuFtJfFeBsMBA-1; Tue, 25 Feb 2020 09:56:36 -0500
-X-MC-Unique: dEgkQxqENMuFtJfFeBsMBA-1
-Received: by mail-wm1-f71.google.com with SMTP id y7so970742wmd.4
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 06:56:35 -0800 (PST)
+        id S1730500AbgBYO6d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 09:58:33 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43176 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729390AbgBYO6d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 09:58:33 -0500
+Received: by mail-wr1-f67.google.com with SMTP id r11so15089779wrq.10;
+        Tue, 25 Feb 2020 06:58:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Y/GTDDlt72QN2T+qefae0h4YDCB+SvgeS3qO+PQYb4o=;
-        b=L5xuo1lrLuUOo0E+1W6DlZj9BKHDGqbrCH/6svioyITCQlJ7HeV1sGi99xX2EgYxGg
-         VATgZlq6hFQx5/Q5t9f9mlBvc73A7f2NqqqKJz7QCBdkv6JpyLZESX8Oj/N6pZI3b/9s
-         N9Ic9jJLgQi1qqW1z74EGBfH1kaQ3OBz5B6SiXvMNJFj5ZIO2z48ACTmJkiU3+oyqBCa
-         2tMrDUZgJMNTh8llOEVM9oOQYIY846bTuYiProxDkD7S7Sn48ggoi8T/w1ZsUdoWsrl7
-         QLslPmMCs15MsXj5JlSypPMGi/ty3TIRnYH/3y9B+SaI6ZUoU93RLGrBp6LrxlMi6xlP
-         JXMA==
-X-Gm-Message-State: APjAAAVhi/tR7ZK0U2yTvjZtLUCG5jntS1ABVpXNQx5G5dQ+wIUmKqb0
-        v/vTgu7dlfgfGc9oZfr40U6iD1zdqnbgY6UzAoWTz2L81AbgYyhkQPdlXVFZ7J6Cc2VTJBOkMgt
-        i+opTyB6KBQGK
-X-Received: by 2002:adf:ed4c:: with SMTP id u12mr10541453wro.204.1582642594084;
-        Tue, 25 Feb 2020 06:56:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzvBDqRtYQMrM8Ip0j6cyb6ZIz536smyCfSrj+e6/PDpnThv7CRNMUnxs2tXvvvIhTw7PNJDA==
-X-Received: by 2002:adf:ed4c:: with SMTP id u12mr10541435wro.204.1582642593898;
-        Tue, 25 Feb 2020 06:56:33 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id e1sm23863230wrt.84.2020.02.25.06.56.33
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0UgZMjEYrhnpUW+KD5jOXcu9LxkZxjWZEpMnARZ+WD0=;
+        b=MylaM5lwByuabEvTygcD+1QRKk5kRjb20X/DxbvxUaWNvQhhe8CsPHC6iKGav02Z1v
+         TRCUJ5i/Tm+3Scvp29RHgO4iaJqF5zTaO+XZ+14R/CYtvl+S4iYtZiilaYnQgQ4dbq2b
+         TAWTCk9hhkaDsUxr/qlsptSWn9LqtmyMJbotO2LVpPwnLHURqKmvPRXcFpUq1HmjjMX1
+         mAiEqAyj1WqKO7nGRiC4Gklzqi7hZWT4C3bTfLEu3oIV5M/hqmKOt4aM4Py4ApkeaA0b
+         xqpTWROTLzyntbvDntJpcb3rPC03jKi5OFyqm2koLPFkDQzB2TyntPoXqoqvWbug/nWh
+         uY5A==
+X-Gm-Message-State: APjAAAVRKXe8LST7OBwYKavM6insKZucWjJadUu9P5YrwhjNYxHzYK7/
+        PTrLimmndTSFDfQ+F9qJPZI=
+X-Google-Smtp-Source: APXvYqzpdPx0S/Ay341l/1VLTiTEph73dZr8/CzTbfXsVdnLAYyHzJiSa2C64DI7Obv90MD62NKfOw==
+X-Received: by 2002:adf:c445:: with SMTP id a5mr2759044wrg.14.1582642710508;
+        Tue, 25 Feb 2020 06:58:30 -0800 (PST)
+Received: from localhost (prg-ext-pat.suse.com. [213.151.95.130])
+        by smtp.gmail.com with ESMTPSA id p5sm23820841wrt.79.2020.02.25.06.58.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2020 06:56:33 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 60/61] KVM: Drop largepages_enabled and its accessor/mutator
-In-Reply-To: <20200201185218.24473-61-sean.j.christopherson@intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-61-sean.j.christopherson@intel.com>
-Date:   Tue, 25 Feb 2020 15:56:32 +0100
-Message-ID: <875zfulnq7.fsf@vitty.brq.redhat.com>
+        Tue, 25 Feb 2020 06:58:29 -0800 (PST)
+Date:   Tue, 25 Feb 2020 15:58:29 +0100
+From:   Michal Hocko <mhocko@kernel.org>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH RFC v4 12/13] mm/vmscan: Export drop_slab() and
+ drop_slab_node()
+Message-ID: <20200225145829.GW22443@dhcp22.suse.cz>
+References: <20191212171137.13872-1-david@redhat.com>
+ <20191212171137.13872-13-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191212171137.13872-13-david@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Thu 12-12-19 18:11:36, David Hildenbrand wrote:
+> We already have a way to trigger reclaiming of all reclaimable slab objects
+> from user space (echo 2 > /proc/sys/vm/drop_caches). Let's allow drivers
+> to also trigger this when they really want to make progress and know what
+> they are doing.
 
-> Drop largepages_enabled, kvm_largepages_enabled() and
-> kvm_disable_largepages() now that all users are gone.
->
-> Note, largepages_enabled was an x86-only flag that got left in common
-> KVM code when KVM gained support for multiple architectures.
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+I cannot say I would be fan of this. This is a global action with user
+visible performance impact. I am worried that we will find out that all
+sorts of drivers have a very good idea that dropping slab caches is
+going to help their problem whatever it is. We have seen the same patter
+in the userspace already and that is the reason we are logging the usage
+to the log and count invocations in the counter.
+
+> virtio-mem wants to use these functions when it failed to unplug memory
+> for quite some time (e.g., after 30 minutes). It will then try to
+> free up reclaimable objects by dropping the slab caches every now and
+> then (e.g., every 30 minutes) as long as necessary. There will be a way to
+> disable this feature and info messages will be logged.
+> 
+> In the future, we want to have a drop_slab_range() functionality
+> instead. Memory offlining code has similar demands and also other
+> alloc_contig_range() users (e.g., gigantic pages) could make good use of
+> this feature. Adding it, however, requires more work/thought.
+
+We already do have a memory_notify(MEM_GOING_OFFLINE) for that purpose
+and slab allocator implements a callback (slab_mem_going_offline_callback).
+The callback is quite dumb and it doesn't really try to free objects
+from the given memory range or even try to drop active objects which
+might turn out to be hard but this sounds like a more robust way to
+achieve what you want.
+ 
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Michal Hocko <mhocko@kernel.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  include/linux/kvm_host.h |  2 --
->  virt/kvm/kvm_main.c      | 13 -------------
->  2 files changed, 15 deletions(-)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 6d5331b0d937..50105b5c6370 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -683,8 +683,6 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->  				const struct kvm_memory_slot *old,
->  				const struct kvm_memory_slot *new,
->  				enum kvm_mr_change change);
-> -bool kvm_largepages_enabled(void);
-> -void kvm_disable_largepages(void);
->  /* flush all memory translations */
->  void kvm_arch_flush_shadow_all(struct kvm *kvm);
->  /* flush memory translations pointing to 'slot' */
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index eb3709d55139..5851a8c27a28 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -149,8 +149,6 @@ static void mark_page_dirty_in_slot(struct kvm_memory_slot *memslot, gfn_t gfn);
->  __visible bool kvm_rebooting;
->  EXPORT_SYMBOL_GPL(kvm_rebooting);
->  
-> -static bool largepages_enabled = true;
-> -
->  #define KVM_EVENT_CREATE_VM 0
->  #define KVM_EVENT_DESTROY_VM 1
->  static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm);
-> @@ -1368,17 +1366,6 @@ int kvm_clear_dirty_log_protect(struct kvm *kvm,
->  EXPORT_SYMBOL_GPL(kvm_clear_dirty_log_protect);
+>  include/linux/mm.h | 4 ++--
+>  mm/vmscan.c        | 2 ++
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 64799c5cb39f..483300f58be8 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -2706,8 +2706,8 @@ int drop_caches_sysctl_handler(struct ctl_table *, int,
+>  					void __user *, size_t *, loff_t *);
 >  #endif
 >  
-> -bool kvm_largepages_enabled(void)
-> -{
-> -	return largepages_enabled;
-> -}
-> -
-> -void kvm_disable_largepages(void)
-> -{
-> -	largepages_enabled = false;
-> -}
-> -EXPORT_SYMBOL_GPL(kvm_disable_largepages);
-> -
->  struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn)
+> -void drop_slab(void);
+> -void drop_slab_node(int nid);
+> +extern void drop_slab(void);
+> +extern void drop_slab_node(int nid);
+>  
+>  #ifndef CONFIG_MMU
+>  #define randomize_va_space 0
+> diff --git a/mm/vmscan.c b/mm/vmscan.c
+> index c3e53502a84a..4e1cdaaec5e6 100644
+> --- a/mm/vmscan.c
+> +++ b/mm/vmscan.c
+> @@ -719,6 +719,7 @@ void drop_slab_node(int nid)
+>  		} while ((memcg = mem_cgroup_iter(NULL, memcg, NULL)) != NULL);
+>  	} while (freed > 10);
+>  }
+> +EXPORT_SYMBOL(drop_slab_node);
+>  
+>  void drop_slab(void)
 >  {
->  	return __gfn_to_memslot(kvm_memslots(kvm), gfn);
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> @@ -728,6 +729,7 @@ void drop_slab(void)
+>  		drop_slab_node(nid);
+>  	count_vm_event(DROP_SLAB);
+>  }
+> +EXPORT_SYMBOL(drop_slab);
+>  
+>  static inline int is_page_cache_freeable(struct page *page)
+>  {
+> -- 
+> 2.23.0
 
 -- 
-Vitaly
-
+Michal Hocko
+SUSE Labs
