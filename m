@@ -2,99 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A93B816B639
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 01:02:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 795CA16B647
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 01:08:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728524AbgBYACr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 19:02:47 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:42670 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728316AbgBYACr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 19:02:47 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01P01MhI027842;
-        Tue, 25 Feb 2020 00:02:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=L9fyC16dmA1kfDXCiD6ng+Ni6BdC1r9errPPLzLDBMk=;
- b=zs+ahMgnxsPO3Sj+MLaxP/5hHf1yT4etT6IoI5tQtTs9dybFNcHlY2NT4ta7viNAaIyV
- 10oGpBsXkuuuKMZLXTR/End37uPC+jFs/2A+CcsdUgztJrggXYnjNeTvcgcO/wf5bFfy
- 5rx5hV2H93b8htua1suz0xrktfhFs9XnvEEy7I8Tq0mm0LTfJTdqQsyh6uuPXDnl6KKw
- QhQOpyaVv3OmYWM4SYSUfTwVEAmw/e9W4xVieUXy0Q8PAZqpZjITCW3YCiB96HE9g4o9
- SeTnaIAqhcmbQ4jKCLRs2ddW+5oCjK8NH2dTCz8iil5zrj524aSOerGt3tnm5FgtFKsg Ig== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2ycppr8fcf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Feb 2020 00:02:36 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01P02Hrh143719;
-        Tue, 25 Feb 2020 00:02:35 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2yby5e8cn5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Feb 2020 00:02:35 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01P02Zik024999;
-        Tue, 25 Feb 2020 00:02:35 GMT
-Received: from dhcp-10-132-97-93.usdhcp.oraclecorp.com (/10.132.97.93)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 24 Feb 2020 16:02:34 -0800
-Subject: Re: [PATCH] KVM: nVMX: Consolidate nested MTF checks to helper
- function
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>
-References: <20200224202744.221487-1-oupton@google.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <06e2e585-a7be-ce0f-4c7d-add8ce0c43b0@oracle.com>
-Date:   Mon, 24 Feb 2020 16:02:34 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        id S1728489AbgBYAIR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 19:08:17 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:36704 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726651AbgBYAIQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 19:08:16 -0500
+Received: by mail-io1-f66.google.com with SMTP id d15so12249945iog.3
+        for <kvm@vger.kernel.org>; Mon, 24 Feb 2020 16:08:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yYLHirngUHxt10qFoU9xmupylPxKXSewlxECiHVcCbc=;
+        b=pdVgPiWKRIZ6FGDifzN+jO7VW4qmMUPDK9hEVvS/Uzl7iTkfQxBqNCYbyruzNjkH3R
+         FUsq75ZEMBVuEZmMvqJlBUHbo+HQ9+bhK97Nb6Qn8c+k8WLWDt6OcSir14JkDnVim3VL
+         dAhGAYEIq3EX7SLhpFZDPFNtOPhCNiVDp+YX66sO+jg2+77959SfeDUcywD9q76Qcb+n
+         SXXL7OVxUHg7VJvpXpLbuUq1cGDk5BnhUbJeWXdWWsyTnXEW2RxfLnY6YvR6kf7QgwMi
+         G9Ug6sDiaWMxQY/sQIweYBoEk6YUqtOHp1K0Y5poF5WyQOhiz1YMlOp3J8K8ilB1XVBP
+         oXZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yYLHirngUHxt10qFoU9xmupylPxKXSewlxECiHVcCbc=;
+        b=eszK9y8A25GYinZrs4mKHj+NyRMhmEj3TiYrkpl1vOKi/KM8x/VItQrvdHdDK+9I2Q
+         91QeWEWmew9ceJsC5lL3WAzRSl1ouWkkfv5a0bGCtSzXJLx8V2LwoOVPNnT4bWH7XSVB
+         43ZgGFlNY6gw/NbKhOSDGb6qPu8yFt0X/XxXxa9tojPhBhXLesHiti2khSGGTOXj42+l
+         Y9g9RZbji+0nGJAoE7NT9V4nS3GlcOjgFyHFF7xT/8bxFMgZK584WxqpBzM1G8NAhCsK
+         bJmoJo1MDxxSPpPW24hUDM3UlURAo1dL3dlCmJLUCLyLGjv0Sx5B1G1lIoEUhYTDpyf1
+         RZQg==
+X-Gm-Message-State: APjAAAWpCws2StnR7XzX0joZeHh9SzNWUR9Q4jbEf8K4OnQHy1iOMM8Q
+        6PbGQiWFpBl50CGhXaxOPuyl8ZgyINDZXyrbSzSMYA==
+X-Google-Smtp-Source: APXvYqxTkakpljUYeVp2JLg4XJzRu6x6qf4LnVcCbcWcEYJgPZZWbcAnu6mgIc2I1Tomu0LoUoG8bchFDT2g5USxwpM=
+X-Received: by 2002:a6b:ee01:: with SMTP id i1mr54662261ioh.109.1582589295859;
+ Mon, 24 Feb 2020 16:08:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200224202744.221487-1-oupton@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 bulkscore=0
- suspectscore=3 mlxlogscore=999 phishscore=0 adultscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002240180
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999
- lowpriorityscore=0 malwarescore=0 suspectscore=3 impostorscore=0
- spamscore=0 phishscore=0 mlxscore=0 clxscore=1015 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240178
+References: <20200222023413.78202-1-ehankland@google.com> <9adcb973-7b60-71dd-636d-1e451e664c55@redhat.com>
+ <0c66eae3-8983-0632-6d39-fd335620b76a@linux.intel.com>
+In-Reply-To: <0c66eae3-8983-0632-6d39-fd335620b76a@linux.intel.com>
+From:   Eric Hankland <ehankland@google.com>
+Date:   Mon, 24 Feb 2020 16:08:04 -0800
+Message-ID: <CAOyeoRX8kXD4nHGCLk=pV2EHS4t9wykV5tYDfgKkTLBcN5=GGw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Adjust counter sample period after a wrmsr
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Like -
 
+Thanks for the feedback - is your recommendation to do the read and
+period change at the same time and only take the lock once or is there
+another way around this while still handling writes correctly?
 
-On 02/24/2020 12:27 PM, Oliver Upton wrote:
-> commit 5ef8acbdd687 ("KVM: nVMX: Emulate MTF when performing
-> instruction emulation") introduced a helper to check the MTF
-> VM-execution control in vmcs12. Change pre-existing check in
-> nested_vmx_exit_reflected() to instead use the helper.
->
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->   arch/x86/kvm/vmx/nested.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index e920d7834d73..b9caad70ac7c 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5627,7 +5627,7 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason)
->   	case EXIT_REASON_MWAIT_INSTRUCTION:
->   		return nested_cpu_has(vmcs12, CPU_BASED_MWAIT_EXITING);
->   	case EXIT_REASON_MONITOR_TRAP_FLAG:
-> -		return nested_cpu_has(vmcs12, CPU_BASED_MONITOR_TRAP_FLAG);
-> +		return nested_cpu_has_mtf(vmcs12);
->   	case EXIT_REASON_MONITOR_INSTRUCTION:
->   		return nested_cpu_has(vmcs12, CPU_BASED_MONITOR_EXITING);
->   	case EXIT_REASON_PAUSE_INSTRUCTION:
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Eric
