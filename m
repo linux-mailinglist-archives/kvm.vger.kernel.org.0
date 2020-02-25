@@ -2,166 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 28BE416F3E3
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 00:52:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B78E216F3F9
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 00:54:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729656AbgBYXwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 18:52:49 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47488 "EHLO mail.kernel.org"
+        id S1729683AbgBYXyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 18:54:37 -0500
+Received: from mga06.intel.com ([134.134.136.31]:56759 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729182AbgBYXwq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 18:52:46 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7F9CB24676;
-        Tue, 25 Feb 2020 23:52:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582674765;
-        bh=nW9Ojf+Onj3hkHhtHqQ6GbPRjL6Rw7C9mYC7UfzdDh8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KPyJ4K8sbQwj/MYcNjC9AG0YM5UEWqHjJF/jzzPKfx6UIiPGDTYGrUuASs7wtSRst
-         FGRycaBdPbNbKLF+4MOxi7iSEH8ftwy9xBrHqf4zAubIXR5XJ/XwmGzohkI7844e8I
-         nXkvkY7MAEj2NEiyTFw+qYv01g1eUdSja+SlURdM=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1j6k0J-007xuY-Qf; Tue, 25 Feb 2020 23:52:43 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Jeremy Cline <jcline@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 5/5] arm64: Ask the compiler to __always_inline functions used by KVM at HYP
-Date:   Tue, 25 Feb 2020 23:52:23 +0000
-Message-Id: <20200225235223.12839-6-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200225235223.12839-1-maz@kernel.org>
-References: <20200225235223.12839-1-maz@kernel.org>
+        id S1729090AbgBYXyh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 18:54:37 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Feb 2020 15:54:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,486,1574150400"; 
+   d="scan'208";a="230279712"
+Received: from jekeller-mobl1.amr.corp.intel.com (HELO [134.134.177.78]) ([134.134.177.78])
+  by fmsmga007.fm.intel.com with ESMTP; 25 Feb 2020 15:54:34 -0800
+Subject: Re: [PATCH v5 13/19] x86/cpufeatures: Add flag to track whether MSR
+ IA32_FEAT_CTL is configured
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     TonyWWang-oc@zhaoxin.com, acme@kernel.org,
+        alexander.shishkin@linux.intel.com, bp@alien8.de, bp@suse.de,
+        hpa@zytor.com, jacob.jun.pan@linux.intel.com,
+        jarkko.sakkinen@linux.intel.com, jmattson@google.com,
+        jolsa@redhat.com, joro@8bytes.org, kvm@vger.kernel.org,
+        lenb@kernel.org, linux-edac@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-pm@vger.kernel.org, mark.rutland@arm.com, mingo@redhat.com,
+        namhyung@kernel.org, pbonzini@redhat.com, peterz@infradead.org,
+        rkrcmar@redhat.com, shuah@kernel.org, tglx@linutronix.de,
+        tony.luck@intel.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+References: <20191221044513.21680-14-sean.j.christopherson@intel.com>
+ <e741196d-52aa-0f5e-8f1e-a37ddf2e5025@intel.com>
+ <20200225221234.GL9245@linux.intel.com>
+ <1eaf6fbe-0adb-5074-3bc4-1e8327e0cdb3@intel.com>
+ <20200225232900.GO9245@linux.intel.com>
+From:   Jacob Keller <jacob.e.keller@intel.com>
+Organization: Intel Corporation
+Message-ID: <5434303a-0742-3811-fd14-6445d296c0f0@intel.com>
+Date:   Tue, 25 Feb 2020 15:54:34 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, james.morse@arm.com, jcline@redhat.com, mark.rutland@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20200225232900.GO9245@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: James Morse <james.morse@arm.com>
+On 2/25/2020 3:29 PM, Sean Christopherson wrote:
+> On Tue, Feb 25, 2020 at 02:52:32PM -0800, Jacob Keller wrote:
+>> On 2/25/2020 2:12 PM, Sean Christopherson wrote:
+>>> On Tue, Feb 25, 2020 at 01:49:13PM -0800, Jacob Keller wrote:
+>>>> Hi Sean,
+>>>>
+>>>> I suspect something is wrong and the features are enabled even though
+>>>> the BIOS has it disabled, leading to later failure because of this.
+>>>
+>>> Hrm.  On the failing kernel, what are the values of MSR 0x3a for all CPUs,
+>>> i.e. what's the output of 'sudo rdmsr -a 0x3a'?
+>>>
+>>
+>> On the old (fedora 30) kernel, every cpu reports as '1'.
+>>
+>> I can't easily test the failing kernel because it crashes during boot.
+> 
+> No need, your BIOS is likely locking the MSR, I doubt the value is any
+> different when running the new kernel.
+> 
+> Does reverting commit a4d0b2fdbcf7 ("KVM: VMX: Use VMX feature flag to
+> query BIOS enabling") resolve the issue?
+> 
+> Is the failing kernel an (umodified) upstream kernel?  A stable kernel?
+> Or something else?  Assuming it's an unmodified upstream kernel, can you
+> send your .config?  I've tried all the obvious Kconfig combinations but
+> haven't been able to reproduce the problem.  Staring at the code hasn't
+> yielded any revelations either.
+> 
 
-KVM uses some of the static-inline helpers like icache_is_vipt() from
-its HYP code. This assumes the function is inlined so that the code is
-mapped to EL2. The compiler may decide not to inline these, and the
-out-of-line version may not be in the __hyp_text section.
+I reverted the suggested commit and added some prints:
 
-Add the additional __always_ hint to these static-inlines that are used
-by KVM.
+[   26.056398] X86_FEATURE_MSR_IA32_FEAT_CTL is enabled
+[   26.062426] X86_FEATURE_VMX is enabled
+[   26.066923] kvm: disabled by bios
 
-Signed-off-by: James Morse <james.morse@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Acked-by: Will Deacon <will@kernel.org>
-Link: https://lore.kernel.org/r/20200220165839.256881-4-james.morse@arm.com
----
- arch/arm64/include/asm/cache.h      | 2 +-
- arch/arm64/include/asm/cacheflush.h | 2 +-
- arch/arm64/include/asm/cpufeature.h | 8 ++++----
- arch/arm64/include/asm/io.h         | 4 ++--
- 4 files changed, 8 insertions(+), 8 deletions(-)
+So the old code flow is finding KVM to be disabled, but both features
+are set...
 
-diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
-index 806e9dc2a852..a4d1b5f771f6 100644
---- a/arch/arm64/include/asm/cache.h
-+++ b/arch/arm64/include/asm/cache.h
-@@ -69,7 +69,7 @@ static inline int icache_is_aliasing(void)
- 	return test_bit(ICACHEF_ALIASING, &__icache_flags);
- }
- 
--static inline int icache_is_vpipt(void)
-+static __always_inline int icache_is_vpipt(void)
- {
- 	return test_bit(ICACHEF_VPIPT, &__icache_flags);
- }
-diff --git a/arch/arm64/include/asm/cacheflush.h b/arch/arm64/include/asm/cacheflush.h
-index 665c78e0665a..e6cca3d4acf7 100644
---- a/arch/arm64/include/asm/cacheflush.h
-+++ b/arch/arm64/include/asm/cacheflush.h
-@@ -145,7 +145,7 @@ extern void copy_to_user_page(struct vm_area_struct *, struct page *,
- #define ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE 1
- extern void flush_dcache_page(struct page *);
- 
--static inline void __flush_icache_all(void)
-+static __always_inline void __flush_icache_all(void)
- {
- 	if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
- 		return;
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 0e6d03c7e368..be078699ac4b 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -435,13 +435,13 @@ cpuid_feature_extract_signed_field(u64 features, int field)
- 	return cpuid_feature_extract_signed_field_width(features, field, 4);
- }
- 
--static inline unsigned int __attribute_const__
-+static __always_inline unsigned int __attribute_const__
- cpuid_feature_extract_unsigned_field_width(u64 features, int field, int width)
- {
- 	return (u64)(features << (64 - width - field)) >> (64 - width);
- }
- 
--static inline unsigned int __attribute_const__
-+static __always_inline unsigned int __attribute_const__
- cpuid_feature_extract_unsigned_field(u64 features, int field)
- {
- 	return cpuid_feature_extract_unsigned_field_width(features, field, 4);
-@@ -564,7 +564,7 @@ static inline bool system_supports_mixed_endian(void)
- 	return val == 0x1;
- }
- 
--static inline bool system_supports_fpsimd(void)
-+static __always_inline bool system_supports_fpsimd(void)
- {
- 	return !cpus_have_const_cap(ARM64_HAS_NO_FPSIMD);
- }
-@@ -575,7 +575,7 @@ static inline bool system_uses_ttbr0_pan(void)
- 		!cpus_have_const_cap(ARM64_HAS_PAN);
- }
- 
--static inline bool system_supports_sve(void)
-+static __always_inline bool system_supports_sve(void)
- {
- 	return IS_ENABLED(CONFIG_ARM64_SVE) &&
- 		cpus_have_const_cap(ARM64_SVE);
-diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-index 4e531f57147d..6facd1308e7c 100644
---- a/arch/arm64/include/asm/io.h
-+++ b/arch/arm64/include/asm/io.h
-@@ -34,7 +34,7 @@ static inline void __raw_writew(u16 val, volatile void __iomem *addr)
- }
- 
- #define __raw_writel __raw_writel
--static inline void __raw_writel(u32 val, volatile void __iomem *addr)
-+static __always_inline void __raw_writel(u32 val, volatile void __iomem *addr)
- {
- 	asm volatile("str %w0, [%1]" : : "rZ" (val), "r" (addr));
- }
-@@ -69,7 +69,7 @@ static inline u16 __raw_readw(const volatile void __iomem *addr)
- }
- 
- #define __raw_readl __raw_readl
--static inline u32 __raw_readl(const volatile void __iomem *addr)
-+static __always_inline u32 __raw_readl(const volatile void __iomem *addr)
- {
- 	u32 val;
- 	asm volatile(ALTERNATIVE("ldr %w0, [%1]",
--- 
-2.20.1
+The code that sets this is run first:
 
+> Feb 25 15:46:05 jbrandeb-saw1 kernel: x86/cpu: FEAT_CTL_LOCKED is set
+> Feb 25 15:46:05 jbrandeb-saw1 kernel: x86/cpu: FEAT_CTL_VMX_ENABLED_INSIDE_SMX is unset
+> Feb 25 15:46:05 jbrandeb-saw1 kernel: x86/cpu: FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX is unset
+> Feb 25 15:46:05 jbrandeb-saw1 kernel: x86/cpu: MSR locked by bios
+> Feb 25 15:46:05 jbrandeb-saw1 kernel: x86/cpu: VMX (outside TXT) disabled by BIOS
+> Feb 25 15:46:05 jbrandeb-saw1 kernel: x86/cpu: disabling X86_FEATURE_VMX
+
+But somehow... it is still set later...
+
+So there's something weird going on. Maybe "boot_cpu_has" in the
+vmx_disabled_by_bios is wrong? Hmm.
