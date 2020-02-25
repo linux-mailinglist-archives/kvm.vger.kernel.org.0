@@ -2,283 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8943216B6B1
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 01:29:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7950B16B72D
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 02:29:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728376AbgBYA26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Feb 2020 19:28:58 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:41226 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728087AbgBYA25 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Feb 2020 19:28:57 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01P0Ie9g066583;
-        Tue, 25 Feb 2020 00:27:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=+lnVqoLrLWmECf/O86hPoD03qxUsbQs7CCpTBWwXoSI=;
- b=ljwifW9Jg5Jd/h/a0FKvdYigAInVolJWVE4p7TH5a/keQ3cJ92/cGFDiZ/75pV+nnAml
- LxVuEmD8Pd6CDhmSGOGfbvmsu2ik8z29Po+UglP25P1Se45555TOgKFP18VY2GCffaHS
- 2y1YnDMM1UvfpmuW/20X0O41Q6YUBSR0WkEilz1SnVqcBWoWXf/j93vBNEdiBotjyPgL
- eBtI0W6eow1zXPIsNt8YbHlOeqEnn708fu/uMDMFHSAnvaLDp1zOenCtG52DMgzodh+O
- McQeOxvLXsOe/C9XpjBU0FFHESIbFTAufGz4GVLi4VORLxsvlgxmk2iMISJ24qjjfKFN gA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2ybvr4q57b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Feb 2020 00:27:40 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01P0I7G0031500;
-        Tue, 25 Feb 2020 00:27:40 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2yby5eas1c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Feb 2020 00:27:39 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01P0RaQ6007666;
-        Tue, 25 Feb 2020 00:27:36 GMT
-Received: from dhcp-10-132-97-93.usdhcp.oraclecorp.com (/10.132.97.93)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 24 Feb 2020 16:27:36 -0800
-Subject: Re: [PATCH 1/2] kvm: vmx: Use basic exit reason to check if it's the
- specific VM EXIT
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1728529AbgBYB3O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Feb 2020 20:29:14 -0500
+Received: from mga18.intel.com ([134.134.136.126]:28784 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728011AbgBYB3N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Feb 2020 20:29:13 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Feb 2020 17:29:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,482,1574150400"; 
+   d="scan'208";a="241177888"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga006.jf.intel.com with ESMTP; 24 Feb 2020 17:29:12 -0800
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 24 Feb 2020 17:29:12 -0800
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 24 Feb 2020 17:29:11 -0800
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 24 Feb 2020 17:29:11 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.141]) with mapi id 14.03.0439.000;
+ Tue, 25 Feb 2020 09:29:09 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Chia-I Wu <olvaffe@gmail.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20200224020751.1469-1-xiaoyao.li@intel.com>
- <20200224020751.1469-2-xiaoyao.li@intel.com>
- <87lfosp9xs.fsf@vitty.brq.redhat.com>
- <d9744594-4a66-d867-f785-64ce4d42b848@intel.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <716806df-c0e4-43d5-b082-627d2c312f53@oracle.com>
-Date:   Mon, 24 Feb 2020 16:27:34 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
-MIME-Version: 1.0
-In-Reply-To: <d9744594-4a66-d867-f785-64ce4d42b848@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        kvm list <kvm@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Gurchetan Singh" <gurchetansingh@chromium.org>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        "ML dri-devel" <dri-devel@lists.freedesktop.org>
+Subject: RE: [RFC PATCH 0/3] KVM: x86: honor guest memory type
+Thread-Topic: [RFC PATCH 0/3] KVM: x86: honor guest memory type
+Thread-Index: AQHV4rTrI5AbOd4/PkCv4vZnvR6EuagZISQAgAAKbYCAAMs9AIAAnj+AgAAgCACAAAK0AIAAAeyAgAXrxoCAAaZGgIAAIIsAgADkwxCAABT4UIAAx02AgACimmD//8gUAIAAAZSAgACPE8CAACuogIAAJ5gAgAWxe0A=
+Date:   Tue, 25 Feb 2020 01:29:09 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D79A7BE@SHSMSX104.ccr.corp.intel.com>
+References: <d3a6fac6-3831-3b8e-09b6-bfff4592f235@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78D6F4@SHSMSX104.ccr.corp.intel.com>
+ <CAPaKu7RyTbuTPf0Tp=0DAD80G-RySLrON8OQsHJzhAYDh7zHuA@mail.gmail.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78EE65@SHSMSX104.ccr.corp.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D78EF58@SHSMSX104.ccr.corp.intel.com>
+ <CAPaKu7RFY3nar9hmAdx6RYdZFPK3Cdg1O3cS+OvsEOT=yupyrQ@mail.gmail.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D792415@SHSMSX104.ccr.corp.intel.com>
+ <CAPaKu7RHu5rz1Dvkvp4SDrZ0fAYq37xwRqUsdAiOmRTOz2sFTw@mail.gmail.com>
+ <CAPaKu7RaF3+amPwdVBLj6q1na7JWUYuuWDN5XPwNYFB8Hpqi+w@mail.gmail.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D79359E@SHSMSX104.ccr.corp.intel.com>
+ <20200221155939.GG12665@linux.intel.com>
+ <CAPaKu7Qjnur=ntTXmGn7L38UaCoNjf6avWBk7xTvO6eDkZbWFQ@mail.gmail.com>
+In-Reply-To: <CAPaKu7Qjnur=ntTXmGn7L38UaCoNjf6avWBk7xTvO6eDkZbWFQ@mail.gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 bulkscore=0
- suspectscore=4 mlxlogscore=999 phishscore=0 adultscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002250000
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0
- clxscore=1011 adultscore=0 lowpriorityscore=0 malwarescore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=4 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002250000
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzU3OGNhOTQtMjAzNC00YzJmLWJjMDAtM2YxZDE1ZjAwM2M1IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiUkZ0TjZUamxMcU5ENHluMlp6TUM4ZDZmK1hpQ01yN2FiVU1hNVp6M1ROZlpvaVFxZ21JUFBWK0x4UkdwbTRLOCJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 02/24/2020 04:01 AM, Xiaoyao Li wrote:
-> On 2/24/2020 6:16 PM, Vitaly Kuznetsov wrote:
->> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->>
->>> Current kvm uses the 32-bit exit reason to check if it's any 
->>> specific VM
->>> EXIT, however only the low 16-bit of VM EXIT REASON acts as the basic
->>> exit reason.
->>>
->>> Introduce Macro basic(exit_reaso)
->>
->> "exit_reason"
->
-> Ah, will correct it in v2.
->
->>>   to help retrieve the basic exit reason
->>> from VM EXIT REASON, and use the basic exit reason for checking and
->>> indexing the exit hanlder.
->>>
->>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>> ---
->>>   arch/x86/kvm/vmx/vmx.c | 44 
->>> ++++++++++++++++++++++--------------------
->>>   arch/x86/kvm/vmx/vmx.h |  2 ++
->>>   2 files changed, 25 insertions(+), 21 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>> index 9a6664886f2e..85da72d4dc92 100644
->>> --- a/arch/x86/kvm/vmx/vmx.c
->>> +++ b/arch/x86/kvm/vmx/vmx.c
->>> @@ -1584,7 +1584,7 @@ static int skip_emulated_instruction(struct 
->>> kvm_vcpu *vcpu)
->>>        * i.e. we end up advancing IP with some random value.
->>>        */
->>>       if (!static_cpu_has(X86_FEATURE_HYPERVISOR) ||
->>> -        to_vmx(vcpu)->exit_reason != EXIT_REASON_EPT_MISCONFIG) {
->>> +        basic(to_vmx(vcpu)->exit_reason) != 
->>> EXIT_REASON_EPT_MISCONFIG) {
->>
->> "basic" word is probably 'too basic' to be used for this purpose. Even
->> if we need a macro for it (I'm not really convinced it improves the
->> readability), I'd suggest we name it 'basic_exit_reason()' instead.
->
-> Agreed.
->
->>>           rip = kvm_rip_read(vcpu);
->>>           rip += vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
->>>           kvm_rip_write(vcpu, rip);
->>> @@ -5797,6 +5797,7 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
->>>   {
->>>       struct vcpu_vmx *vmx = to_vmx(vcpu);
->>>       u32 exit_reason = vmx->exit_reason;
->>> +    u16 basic_exit_reason = basic(exit_reason);
->>
->> I don't think renaming local variable is needed, let's just do
->>
->> 'u16 exit_reason = basic_exit_reason(vmx->exit_reason)' and keep the
->> rest of the code as-is.
->
-> No, we can't do this.
->
-> It's not just renaming local variable, the full 32-bit exit reason is 
-> used elsewhere in this function that needs the upper 16-bit.
->
-> Here variable basic_exit_reason is added for the cases where only 
-> basic exit reason number is needed.
->
->>>       u32 vectoring_info = vmx->idt_vectoring_info;
->>>         trace_kvm_exit(exit_reason, vcpu, KVM_ISA_VMX);
->>> @@ -5842,17 +5843,17 @@ static int vmx_handle_exit(struct kvm_vcpu 
->>> *vcpu,
->>>        * will cause infinite loop.
->>>        */
->>>       if ((vectoring_info & VECTORING_INFO_VALID_MASK) &&
->>> -            (exit_reason != EXIT_REASON_EXCEPTION_NMI &&
->>> -            exit_reason != EXIT_REASON_EPT_VIOLATION &&
->>> -            exit_reason != EXIT_REASON_PML_FULL &&
->>> -            exit_reason != EXIT_REASON_TASK_SWITCH)) {
->>> +            (basic_exit_reason != EXIT_REASON_EXCEPTION_NMI &&
->>> +             basic_exit_reason != EXIT_REASON_EPT_VIOLATION &&
->>> +             basic_exit_reason != EXIT_REASON_PML_FULL &&
->>> +             basic_exit_reason != EXIT_REASON_TASK_SWITCH)) {
->>>           vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
->>>           vcpu->run->internal.suberror = 
->>> KVM_INTERNAL_ERROR_DELIVERY_EV;
->>>           vcpu->run->internal.ndata = 3;
->>>           vcpu->run->internal.data[0] = vectoring_info;
->>>           vcpu->run->internal.data[1] = exit_reason;
->>>           vcpu->run->internal.data[2] = vcpu->arch.exit_qualification;
->>> -        if (exit_reason == EXIT_REASON_EPT_MISCONFIG) {
->>> +        if (basic_exit_reason == EXIT_REASON_EPT_MISCONFIG) {
->>>               vcpu->run->internal.ndata++;
->>>               vcpu->run->internal.data[3] =
->>>                   vmcs_read64(GUEST_PHYSICAL_ADDRESS);
->>> @@ -5884,32 +5885,32 @@ static int vmx_handle_exit(struct kvm_vcpu 
->>> *vcpu,
->>>           return 1;
->>>       }
->>>   -    if (exit_reason >= kvm_vmx_max_exit_handlers)
->>> +    if (basic_exit_reason >= kvm_vmx_max_exit_handlers)
->>>           goto unexpected_vmexit;
->>>   #ifdef CONFIG_RETPOLINE
->>> -    if (exit_reason == EXIT_REASON_MSR_WRITE)
->>> +    if (basic_exit_reason == EXIT_REASON_MSR_WRITE)
->>>           return kvm_emulate_wrmsr(vcpu);
->>> -    else if (exit_reason == EXIT_REASON_PREEMPTION_TIMER)
->>> +    else if (basic_exit_reason == EXIT_REASON_PREEMPTION_TIMER)
->>>           return handle_preemption_timer(vcpu);
->>> -    else if (exit_reason == EXIT_REASON_INTERRUPT_WINDOW)
->>> +    else if (basic_exit_reason == EXIT_REASON_INTERRUPT_WINDOW)
->>>           return handle_interrupt_window(vcpu);
->>> -    else if (exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
->>> +    else if (basic_exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
->>>           return handle_external_interrupt(vcpu);
->>> -    else if (exit_reason == EXIT_REASON_HLT)
->>> +    else if (basic_exit_reason == EXIT_REASON_HLT)
->>>           return kvm_emulate_halt(vcpu);
->>> -    else if (exit_reason == EXIT_REASON_EPT_MISCONFIG)
->>> +    else if (basic_exit_reason == EXIT_REASON_EPT_MISCONFIG)
->>>           return handle_ept_misconfig(vcpu);
->>>   #endif
->>>   -    exit_reason = array_index_nospec(exit_reason,
->>> +    basic_exit_reason = array_index_nospec(basic_exit_reason,
->>>                        kvm_vmx_max_exit_handlers);
->>> -    if (!kvm_vmx_exit_handlers[exit_reason])
->>> +    if (!kvm_vmx_exit_handlers[basic_exit_reason])
->>>           goto unexpected_vmexit;
->>>   -    return kvm_vmx_exit_handlers[exit_reason](vcpu);
->>> +    return kvm_vmx_exit_handlers[basic_exit_reason](vcpu);
->>>     unexpected_vmexit:
->>> -    vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n", 
->>> exit_reason);
->>> +    vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n", 
->>> basic_exit_reason);
->>>       dump_vmcs();
->>>       vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
->>>       vcpu->run->internal.suberror =
->>> @@ -6241,13 +6242,14 @@ static void vmx_handle_exit_irqoff(struct 
->>> kvm_vcpu *vcpu,
->>>       enum exit_fastpath_completion *exit_fastpath)
->>>   {
->>>       struct vcpu_vmx *vmx = to_vmx(vcpu);
->>> +    u16 basic_exit_reason = basic(vmx->exit_reason);
->>
->> Here I'd suggest we also use the same
->>
->> 'u16 exit_reason = basic_exit_reason(vmx->exit_reason)'
->>
->> as above.
->>
->>>   -    if (vmx->exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
->>> +    if (basic_exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
->>>           handle_external_interrupt_irqoff(vcpu);
->>> -    else if (vmx->exit_reason == EXIT_REASON_EXCEPTION_NMI)
->>> +    else if (basic_exit_reason == EXIT_REASON_EXCEPTION_NMI)
->>>           handle_exception_nmi_irqoff(vmx);
->>>       else if (!is_guest_mode(vcpu) &&
->>> -        vmx->exit_reason == EXIT_REASON_MSR_WRITE)
->>> +         basic_exit_reason == EXIT_REASON_MSR_WRITE)
->>>           *exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
->>>   }
->>>   @@ -6621,7 +6623,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>>       vmx->idt_vectoring_info = 0;
->>>         vmx->exit_reason = vmx->fail ? 0xdead : 
->>> vmcs_read32(VM_EXIT_REASON);
->>> -    if ((u16)vmx->exit_reason == EXIT_REASON_MCE_DURING_VMENTRY)
->>> +    if (basic(vmx->exit_reason) == EXIT_REASON_MCE_DURING_VMENTRY)
->>>           kvm_machine_check();
->>>         if (vmx->fail || (vmx->exit_reason & 
->>> VMX_EXIT_REASONS_FAILED_VMENTRY))
->>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->>> index 7f42cf3dcd70..c6ba33eedb59 100644
->>> --- a/arch/x86/kvm/vmx/vmx.h
->>> +++ b/arch/x86/kvm/vmx/vmx.h
->>> @@ -22,6 +22,8 @@ extern u32 get_umwait_control_msr(void);
->>>     #define X2APIC_MSR(r) (APIC_BASE_MSR + ((r) >> 4))
->>>   +#define basic(exit_reason) ((u16)(exit_reason))
-
-We have a macro for bit 31,
-
-     VMX_EXIT_REASONS_FAILED_VMENTRY                0x80000000
-
-
-Does it make sense to define a macro like that instead ? Say,
-
-     VMX_BASIC_EXIT_REASON        0x0000ffff
-
-and then we do,
-
-     u32 exit_reason = vmx->exit_reason;
-     u16 basic_exit_reason = exit_reason & VMX_BASIC_EXIT_REASON;
-
-
->>> +
->>>   #ifdef CONFIG_X86_64
->>>   #define NR_SHARED_MSRS    7
->>>   #else
->>
->
-
+PiBGcm9tOiBDaGlhLUkgV3UgPG9sdmFmZmVAZ21haWwuY29tPg0KPiBTZW50OiBTYXR1cmRheSwg
+RmVicnVhcnkgMjIsIDIwMjAgMjoyMSBBTQ0KPiANCj4gT24gRnJpLCBGZWIgMjEsIDIwMjAgYXQg
+Nzo1OSBBTSBTZWFuIENocmlzdG9waGVyc29uDQo+IDxzZWFuLmouY2hyaXN0b3BoZXJzb25AaW50
+ZWwuY29tPiB3cm90ZToNCj4gPg0KPiA+IE9uIFRodSwgRmViIDIwLCAyMDIwIGF0IDA5OjM5OjA1
+UE0gLTA4MDAsIFRpYW4sIEtldmluIHdyb3RlOg0KPiA+ID4gPiBGcm9tOiBDaGlhLUkgV3UgPG9s
+dmFmZmVAZ21haWwuY29tPg0KPiA+ID4gPiBTZW50OiBGcmlkYXksIEZlYnJ1YXJ5IDIxLCAyMDIw
+IDEyOjUxIFBNDQo+ID4gPiA+IElmIHlvdSB0aGluayBpdCBpcyB0aGUgYmVzdCBmb3IgS1ZNIHRv
+IGluc3BlY3QgaHZhIHRvIGRldGVybWluZSB0aGUNCj4gbWVtb3J5DQo+ID4gPiA+IHR5cGUgd2l0
+aCBwYWdlIGdyYW51bGFyaXR5LCB0aGF0IGlzIHJlYXNvbmFibGUgYW5kIHNob3VsZCB3b3JrIGZv
+ciB1cw0KPiB0b28uDQo+ID4gPiA+IFRoZSB1c2Vyc3BhY2UgY2FuIGRvIHNvbWV0aGluZyAoZS5n
+LiwgYWRkIGEgR1BVIGRyaXZlciBkZXBlbmRlbmN5IHRvDQo+IHRoZQ0KPiA+ID4gPiBoeXBlcnZp
+c29yIHN1Y2ggdGhhdCB0aGUgZG1hLWJ1ZiBpcyBpbXBvcnRlZCBhcyBhIEdQVSBtZW1vcnkgYW5k
+DQo+IG1hcHBlZA0KPiA+ID4gPiB1c2luZw0KPiA+ID4gPiB2a01hcE1lbW9yeSkgb3IgSSBjYW4g
+d29yayB3aXRoIGRtYS1idWYgbWFpbnRhaW5lcnMgdG8gc2VlIGlmIGRtYS0NCj4gYnVmJ3MNCj4g
+PiA+ID4gc2VtYW50aWNzIGNhbiBiZSBjaGFuZ2VkLg0KPiA+ID4NCj4gPiA+IEkgdGhpbmsgeW91
+IG5lZWQgY29uc2lkZXIgdGhlIGxpdmUgbWlncmF0aW9uIHJlcXVpcmVtZW50IGFzIFBhb2xvIHBv
+aW50ZWQNCj4gb3V0Lg0KPiA+ID4gVGhlIG1pZ3JhdGlvbiB0aHJlYWQgbmVlZHMgdG8gcmVhZC93
+cml0ZSB0aGUgcmVnaW9uLCB0aGVuIGl0IG11c3QgdXNlIHRoZQ0KPiA+ID4gc2FtZSB0eXBlIGFz
+IEdQVSBwcm9jZXNzIGFuZCBndWVzdCB0byByZWFkL3dyaXRlIHRoZSByZWdpb24uIEluIHN1Y2gN
+Cj4gY2FzZSwNCj4gPiA+IHRoZSBodmEgbWFwcGVkIGJ5IFFlbXUgc2hvdWxkIGhhdmUgdGhlIGRl
+c2lyZWQgdHlwZSBhcyB0aGUgZ3Vlc3QuDQo+IEhvd2V2ZXIsDQo+ID4gPiBhZGRpbmcgR1BVIGRy
+aXZlciBkZXBlbmRlbmN5IHRvIFFlbXUgbWlnaHQgdHJpZ2dlciBzb21lIGNvbmNlcm4uIEknbQ0K
+PiBub3QNCj4gPiA+IHN1cmUgd2hldGhlciB0aGVyZSBpcyBnZW5lcmljIG1lY2hhbmlzbSB0aG91
+Z2gsIHRvIHNoYXJlIGRtYWJ1ZiBmZA0KPiBiZXR3ZWVuIEdQVQ0KPiA+ID4gcHJvY2VzcyBhbmQg
+UWVtdSB3aGlsZSBhbGxvd2luZyBRZW11IHRvIGZvbGxvdyB0aGUgZGVzaXJlZCB0eXBlIHcvbw0K
+PiB1c2luZw0KPiA+ID4gdmtNYXBNZW1vcnkuLi4NCj4gPg0KPiA+IEFsdGVybmF0aXZlbHksIEtW
+TSBjb3VsZCBtYWtlIEtWTV9NRU1fRE1BIGFuZA0KPiBLVk1fTUVNX0xPR19ESVJUWV9QQUdFUw0K
+PiA+IG11dHVhbGx5IGV4Y2x1c2l2ZSwgaS5lLiBmb3JjZSBhIHRyYW5zaXRpb24gdG8gV0IgbWVt
+dHlwZSBmb3IgdGhlIGd1ZXN0DQo+ID4gKHdpdGggYXBwcm9wcmlhdGUgemFwcGluZykgd2hlbiBt
+aWdyYXRpb24gaXMgYWN0aXZhdGVkLiAgSSB0aGluayB0aGF0DQo+ID4gd291bGQgd29yaz8NCj4g
+SG0sIHZpcnRpby1ncHUgZG9lcyBub3QgYWxsb3cgbGl2ZSBtaWdyYXRpb24gd2hlbiB0aGUgM0Qg
+ZnVuY3Rpb24NCj4gKHZpcmdsPW9uKSBpcyBlbmFibGVkLiAgVGhpcyBpcyB0aGUgcmVsZXZhbnQg
+Y29kZSBpbiBxZW11Og0KPiANCj4gICAgIGlmICh2aXJ0aW9fZ3B1X3ZpcmdsX2VuYWJsZWQoZy0+
+Y29uZikpIHsNCj4gICAgICAgICBlcnJvcl9zZXRnKCZnLT5taWdyYXRpb25fYmxvY2tlciwgInZp
+cmdsIGlzIG5vdCB5ZXQgbWlncmF0YWJsZSIpOw0KPiANCj4gQWx0aG91Z2ggd2UgKHZpcnRpby1n
+cHUgYW5kIHZpcmdscmVuZGVyZXIgcHJvamVjdHMpIHBsYW4gdG8gbWFrZSBob3N0DQo+IEdQVSBi
+dWZmZXJzIGF2YWlsYWJsZSB0byB0aGUgZ3Vlc3QgdmlhIG1lbXNsb3RzLCB0aG9zZSBidWZmZXJz
+IHNob3VsZA0KPiBiZSBjb25zaWRlcmVkIGEgcGFydCBvZiB0aGUgIkdQVSBzdGF0ZSIuICBUaGUg
+bWlncmF0aW9uIHRocmVhZCBzaG91bGQNCj4gd29yayB3aXRoIHZpcmdscmVuZGVyZXIgYW5kIGxl
+dCB2aXJnbHJlbmRlcmVyIHNhdmUvcmVzdG9yZSB0aGVtLCBpZg0KPiBsaXZlIG1pZ3JhdGlvbiBp
+cyB0byBiZSBzdXBwb3J0ZWQuDQoNClRoYW5rcyBmb3IgeW91ciBleHBsYW5hdGlvbi4gWW91ciBS
+RkMgbWFrZXMgbW9yZSBzZW5zZSBub3cuDQoNCk9uZSByZW1haW5pbmcgb3BlbiBpcywgYWx0aG91
+Z2ggZm9yIGxpdmUgbWlncmF0aW9uIHdlIGNhbiBleHBsaWNpdGx5DQpzdGF0ZSB0aGF0IG1pZ3Jh
+dGlvbiB0aHJlYWQgaXRzZWxmIHNob3VsZCBub3QgYWNjZXNzIHRoZSBkbWEtYnVmDQpyZWdpb24s
+IGhvdyBjYW4gd2Ugd2FybiBvdGhlciB1c2FnZXMgd2hpY2ggbWF5IHBvdGVudGlhbGx5IHNpbXBs
+eQ0Kd2FsayBldmVyeSBtZW1zbG90IGFuZCBhY2Nlc3MgdGhlIGNvbnRlbnQgdGhyb3VnaCB0aGUg
+bW1hcC1lZA0KdmlydHVhbCBhZGRyZXNzPyBQb3NzaWJseSB3ZSBtYXkgbmVlZCBhIGZsYWcgdG8g
+aW5kaWNhdGUgYSBtZW1zbG90DQp3aGljaCBpcyBtbWFwZWQgb25seSBmb3IgS1ZNIHRvIHJldHJp
+ZXZlIGl0cyBwYWdlIHRhYmxlIG1hcHBpbmcNCmJ1dCBub3QgZm9yIGRpcmVjdCBhY2Nlc3MgaW4g
+UWVtdS4gDQoNCj4gDQo+IFFFTVUgZGVwZW5kcyBvbiBHUFUgZHJpdmVycyBhbHJlYWR5IHdoZW4g
+Y29uZmlndXJlZCB3aXRoDQo+IC0tZW5hYmxlLXZpcmdscmVuZGVyZXIuICBUaGVyZSBpcyB2aG9z
+dC11c2VyLWdwdSB0aGF0IGNhbiBtb3ZlIHRoZQ0KPiBkZXBlbmRlbmN5IHRvIGEgR1BVIHByb2Nl
+c3MuICBCdXQgdGhlcmUgYXJlIHN0aWxsIGdvaW5nIHRvIGJlIGNhc2VzDQo+IChlLmcuLCBuVmlk
+aWEncyBwcm9wcmlldGFyeSBkcml2ZXIgZG9lcyBub3Qgc3VwcG9ydCBkbWEtYnVmKSB3aGVyZQ0K
+PiBRRU1VIGNhbm5vdCBhdm9pZCBHUFUgZHJpdmVyIGRlcGVuZGVuY3kuDQo+IA0KPiANCj4gDQo+
+IA0KPiA+ID4gTm90ZSB0aGlzIGlzIG9ydGhvZ29uYWwgdG8gd2hldGhlciBpbnRyb2R1Y2luZyBh
+IG5ldyB1YXBpIG9yIGltcGxpY2l0bHkNCj4gY2hlY2tpbmcNCj4gPiA+IGh2YSB0byBmYXZvciBn
+dWVzdCBtZW1vcnkgdHlwZS4gSXQncyBwdXJlbHkgYWJvdXQgUWVtdSBpdHNlbGYuIElkZWFsbHkN
+Cj4gYW55b25lDQo+ID4gPiB3aXRoIHRoZSBkZXNpcmUgdG8gYWNjZXNzIGEgZG1hLWJ1ZiBvYmpl
+Y3Qgc2hvdWxkIGZvbGxvdyB0aGUgZXhwZWN0ZWQNCj4gc2VtYW50aWNzLg0KPiA+ID4gSXQncyBp
+bnRlcmVzdGluZyB0aGF0IGRtYS1idWYgc3ViLXN5c3RlbSBkb2Vzbid0IHByb3ZpZGUgYSBjZW50
+cmFsaXplZA0KPiA+ID4gc3luY2hyb25pemF0aW9uIGFib3V0IG1lbW9yeSB0eXBlIGJldHdlZW4g
+bXVsdGlwbGUgbW1hcCBwYXRocy4NCg==
