@@ -2,105 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AF7F16EBE9
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 17:59:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB9F516EC17
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 18:06:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729913AbgBYQ7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 11:59:30 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39716 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728051AbgBYQ7a (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 11:59:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582649969;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TjwoM0/StVfrn5wh2Yyffw44qkAt+KuH9t4IFN7loIA=;
-        b=LJLhK4Pc7nTo4TFcYmZN3bMMOEwHlccghJMOfjxbX8myvrdvBJBuYJ+kNbG2Zd5q38SE9I
-        0lA0QW63xIl4EU5KjaaZ99LwVQY3BGzUfLFTnIV7ix8ba6qCT0dv0KTkdPZgv920upVC8A
-        +ABq9dpEIx43qzCtui/CjUDXgzWeHSw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-gdSoGWxPPvK1FVQkeAeWDQ-1; Tue, 25 Feb 2020 11:59:27 -0500
-X-MC-Unique: gdSoGWxPPvK1FVQkeAeWDQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A9751005F72;
-        Tue, 25 Feb 2020 16:59:25 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8651590F5F;
-        Tue, 25 Feb 2020 16:59:19 +0000 (UTC)
-Date:   Tue, 25 Feb 2020 17:59:18 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     gengdongjiu <gengdongjiu@huawei.com>
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        Fam Zheng <fam@euphon.net>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Zheng Xiang <zhengxiang9@huawei.com>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        James Morse <james.morse@arm.com>,
-        "Shameerali Kolothum Thodi" <shameerali.kolothum.thodi@huawei.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        "Richard Henderson" <rth@twiddle.net>
-Subject: Re: [PATCH v24 00/10] Add ARMv8 RAS virtualization support in QEMU
-Message-ID: <20200225175918.5a81506f@redhat.com>
-In-Reply-To: <acd194e5-81d8-afa7-fb6d-6b7d744b5d81@huawei.com>
-References: <20200217131248.28273-1-gengdongjiu@huawei.com>
-        <CAFEAcA9xd8fHiigZFFM7Symh0Mkm-jQ_aGJ7ifRCrXZvFY4DqQ@mail.gmail.com>
-        <acd194e5-81d8-afa7-fb6d-6b7d744b5d81@huawei.com>
+        id S1731333AbgBYRGX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 12:06:23 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46237 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730784AbgBYRGX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 12:06:23 -0500
+Received: by mail-wr1-f66.google.com with SMTP id j7so3114893wrp.13;
+        Tue, 25 Feb 2020 09:06:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qXpNRZ9xs/Twatu1bWavafSUFsQ4scxT0/RdhBW/8jk=;
+        b=OEe9V9rC+kMulshRQAS8YM+L9iWzhcW1Xxz5rAcB3geQVg7wuS0cCmjvjE4yWyDDTD
+         t+5HcRu618R1CkPkuGzMnS1uWko6GaJlz4XDFkR8v8q7PY2W2N3OAstCfZEcab2iXfZ2
+         huFx6SHuesF4HqBfG0Nc3M/Hm/fDWaFks02qpWJvOQrUY9Bv7IZaK4csGq/0PiPopm5P
+         G6dwn0ATM05bDaDVeAf13C06TnG8fB6t13GVdn3Kc7JKU1CnVXozi/kNocPvv8xtNVtL
+         vRBvu1CeKfZWftQap++CIXvdmsLMr+aHxpa9nOkkyJzzwEMIUNKREHaYh8hW6NC3fLo6
+         fPDg==
+X-Gm-Message-State: APjAAAUzIiBLEFELDxJX7UgVoQ3ON4LI9fiR/xZ4IKJ8TZqgbv7ygEEF
+        MVuOD3+JDpUtvK4/Fstik4Q=
+X-Google-Smtp-Source: APXvYqzpvpcxN3LWok+bnCzox3t9IyXPxqeYk1sM9Majp9Pes3xoHsQ4h/KM6dXuKlBz1TOZ5uiKLw==
+X-Received: by 2002:a5d:61d1:: with SMTP id q17mr164163wrv.156.1582650380799;
+        Tue, 25 Feb 2020 09:06:20 -0800 (PST)
+Received: from localhost (ip-37-188-161-46.eurotel.cz. [37.188.161.46])
+        by smtp.gmail.com with ESMTPSA id o2sm4901117wmh.46.2020.02.25.09.06.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2020 09:06:19 -0800 (PST)
+Date:   Tue, 25 Feb 2020 18:06:19 +0100
+From:   Michal Hocko <mhocko@kernel.org>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH RFC v4 12/13] mm/vmscan: Export drop_slab() and
+ drop_slab_node()
+Message-ID: <20200225170619.GC32720@dhcp22.suse.cz>
+References: <20191212171137.13872-1-david@redhat.com>
+ <20191212171137.13872-13-david@redhat.com>
+ <20200225145829.GW22443@dhcp22.suse.cz>
+ <afdf8600-2339-6d74-5e3d-fa1a23384318@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <afdf8600-2339-6d74-5e3d-fa1a23384318@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 24 Feb 2020 16:37:44 +0800
-gengdongjiu <gengdongjiu@huawei.com> wrote:
-
-> On 2020/2/21 22:09, Peter Maydell wrote:
-> > On Mon, 17 Feb 2020 at 13:10, Dongjiu Geng <gengdongjiu@huawei.com> wrote:  
-> >>
-> >> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA) and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed information of guest, so it is expected that guest can do the recovery.
-> >> For example, if an exception happens in a guest user-space application, host does
-> >> not know which application encounters errors, only guest knows it.
-> >>
-> >> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
-> >> After user space gets the notification, it will record the CPER into guest GHES
-> >> buffer and inject an exception or IRQ to guest.
-> >>
-> >> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
-> >> treat it as a synchronous exception, and notify guest with ARMv8 SEA
-> >> notification type after recording CPER into guest.  
+On Tue 25-02-20 16:09:29, David Hildenbrand wrote:
+> On 25.02.20 15:58, Michal Hocko wrote:
+> > On Thu 12-12-19 18:11:36, David Hildenbrand wrote:
+> >> We already have a way to trigger reclaiming of all reclaimable slab objects
+> >> from user space (echo 2 > /proc/sys/vm/drop_caches). Let's allow drivers
+> >> to also trigger this when they really want to make progress and know what
+> >> they are doing.
 > > 
-> > Hi; I have reviewed the remaining arm bit of this series (patch 9),
-> > and made some comments on patch 1. Still to be reviewed are
-> > patches 4, 5, 6, 8: I'm going to assume that Michael or Igor
-> > will look at those.  
+> > I cannot say I would be fan of this. This is a global action with user
+> > visible performance impact. I am worried that we will find out that all
+> > sorts of drivers have a very good idea that dropping slab caches is
+> > going to help their problem whatever it is. We have seen the same patter
+> > in the userspace already and that is the reason we are logging the usage
+> > to the log and count invocations in the counter.
 > 
-> Thanks very much for Peter's review.
-> Michael/Igor, hope you can review patches 4, 5, 6, 8, thank you very much in advance.
-
-done
-
-> > 
-> > thanks
-> > -- PMM
-> > 
-> > .
-> >   
+> Yeah, I decided to hold back patch 11-13 for the v1 (which I am planning
+> to post in March after more testing). What we really want is to make
+> memory offlining an alloc_contig_range() work better with reclaimable
+> objects.
 > 
+> > 
+> >> virtio-mem wants to use these functions when it failed to unplug memory
+> >> for quite some time (e.g., after 30 minutes). It will then try to
+> >> free up reclaimable objects by dropping the slab caches every now and
+> >> then (e.g., every 30 minutes) as long as necessary. There will be a way to
+> >> disable this feature and info messages will be logged.
+> >>
+> >> In the future, we want to have a drop_slab_range() functionality
+> >> instead. Memory offlining code has similar demands and also other
+> >> alloc_contig_range() users (e.g., gigantic pages) could make good use of
+> >> this feature. Adding it, however, requires more work/thought.
+> > 
+> > We already do have a memory_notify(MEM_GOING_OFFLINE) for that purpose
+> > and slab allocator implements a callback (slab_mem_going_offline_callback).
+> > The callback is quite dumb and it doesn't really try to free objects
+> > from the given memory range or even try to drop active objects which
+> > might turn out to be hard but this sounds like a more robust way to
+> > achieve what you want.
+> 
+> Two things:
+> 
+> 1. memory_notify(MEM_GOING_OFFLINE) is called after trying to isolate
+> the page range and checking if we only have movable pages. Won't help
+> much I guess.
 
+You are right, I have missed that. Can we reorder those two calls?
+
+> 2. alloc_contig_range() won't benefit from that.
+
+True.
+
+> Something like drop_slab_range() would be better, and calling it from
+> the right spots in the core (e.g., set_migratetype_isolate() see below).
+> 
+> Especially, have a look at mm/page_isolation.c:set_migratetype_isolate()
+> 
+> "FIXME: Now, memory hotplug doesn't call shrink_slab() by itself. We
+> just check MOVABLE pages."
+
+shrink_slab is really a large hammer for this purpose. The notifier
+mechanism sounds more appropriate to me. If that means to move it
+outside of its current position then let's try to experiment with that.
+But there is a long route to have per pfn range reclaim.
+-- 
+Michal Hocko
+SUSE Labs
