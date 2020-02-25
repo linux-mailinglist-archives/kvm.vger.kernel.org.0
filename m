@@ -2,113 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 60C2A16C3BF
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:21:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C85F516C3D2
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 15:26:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730712AbgBYOVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 09:21:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43468 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730478AbgBYOVv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 09:21:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582640510;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hVSqx3EzAvWE7ZUmVL6oGFZVbwypZGJIj1KXOM4Izws=;
-        b=aQkzqVrGK6RBFDyZ2Vtzz6n3AxKchTg0PpkbTlFyFfHpIoaACIKRiPK5WH2bztRK2xu8C0
-        dkPQ+BCqN0AMBC26LXvIRvkor6lg/ay4rnuKPXNm0/eAYE7N5LhqFMwq7iEmDYwbQ3+GbA
-        qCRLL8sITgdzSE4JocmE+CMyHExU70U=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-_P_9tnyOOdi4JyswXvXyDA-1; Tue, 25 Feb 2020 09:21:48 -0500
-X-MC-Unique: _P_9tnyOOdi4JyswXvXyDA-1
-Received: by mail-wm1-f71.google.com with SMTP id n17so1101625wmk.1
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 06:21:48 -0800 (PST)
+        id S1730680AbgBYO0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 09:26:32 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:44484 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730525AbgBYO0c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 09:26:32 -0500
+Received: by mail-oi1-f194.google.com with SMTP id d62so12676354oia.11;
+        Tue, 25 Feb 2020 06:26:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QVZ+sybgO0aKAmVZ2qg1eROixluCRNPHwtU0MppkuKU=;
+        b=OpSF6Rm5Qu0v9jB/gF9QSNPI9lbEWCfSRdINO+sRis1bVFFjCgpvgvBMGjd7yjzLB3
+         F4waFiJD9U2jd9tfKG+hDsApfQKEXXe8K9/KDpY7Hksor9SHoO5+ixv4D4/F+8FLRo3Z
+         AyE8lrrqHwIGCOJuhmhZHKbNpjs7hcNKVLQuewbbZ5Rdh3Wd70vGyDLFlp47+Kukk2C0
+         xx0/TkYnSBGytZOSTtlRTDGW9sK4yX0l8tIXETx0Fpd9Dt+BjYEKD/amkrv5TYywErUO
+         7C07A9jDHhXSRc2i2oZVlLflOCg3P+miRrnHvQtJG0C41I8sicmB7TTQufRQmwj3StE/
+         UQkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=hVSqx3EzAvWE7ZUmVL6oGFZVbwypZGJIj1KXOM4Izws=;
-        b=VzEII7g17Z3ymEeM5IJmesjsN3X5sU/DQHA6VpTRjnIMqdEF6fOg2PS2hH+2goRXCc
-         1ILdK4mbffeU3eF4ss/z3FpenCfSJhhiW052d3tyNqNWYkLva2zM6kAtZ/6tDucublMo
-         nPyeqs4TPKJY8dj7SHlOMm2JdV0g186a0tIfD6fT2Imf3P8bHOktcCQETlTMcI5N+Rx3
-         to/r7jGSRZznqHHSDHyrguUCVCOIaWrTOO7qgfL2nzfXG8AUljY63fECg4PGscsvoe4I
-         mRqY360HzzDVpWTR/lJKO/shu5CA6kqm0GsXNWaKHVt3gNJr5WL1Ya7uGsOeyRpPEnmO
-         x7qQ==
-X-Gm-Message-State: APjAAAUfmX9mdskx462KmeNWChgZb0442kA1loC0mQa6PhTblofrnwTI
-        Ge7Asa97wqvUpDmz6zH6DsOwZXYpX0pQV6HJqaRWMu2b+4RSRkqmVEko2tHz/Rp8AgrZyYBJLGu
-        MGaP0h/lL4XCB
-X-Received: by 2002:a5d:5347:: with SMTP id t7mr72977038wrv.401.1582640507473;
-        Tue, 25 Feb 2020 06:21:47 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzZKH29/qzb/cUfFg4C2u8+Ed5dlfSDFPx6sbZ+diRIwyPfeca/Urx5e36yoK+eLMn+VpDe+Q==
-X-Received: by 2002:a5d:5347:: with SMTP id t7mr72977022wrv.401.1582640507243;
-        Tue, 25 Feb 2020 06:21:47 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id v131sm4551825wme.23.2020.02.25.06.21.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2020 06:21:46 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QVZ+sybgO0aKAmVZ2qg1eROixluCRNPHwtU0MppkuKU=;
+        b=BJREBdPqCQ/KDV2IOIESeZkFpOQtpDAroBc9ERX5D9K3KrGJJrzPqmxKFHVlK9OB3S
+         WTRPIqCTsd75l/jRT4VWv5RzkMkSS+okaFJA/GxteEB8qoCDntDOXVMTEWz0FTUSBf5l
+         ZckMKRzJwEO+WXNSNsfLatv6PYdYGOpAlnKm41i/sXfG/bZt2La/zImsR+YcXxnYEnCW
+         rVBdFSEBeootjaxHL61rJROphfKr41oAy2ss5gHaVDKis389r6YorydzjHk3Zf+/dwrg
+         AoaqKiVlpUCPht9T4FkeUwfz5iNPKjDWqrFoZSOTdU2ZpKyj7dkSamwuJRb7LDrFL49+
+         FmDg==
+X-Gm-Message-State: APjAAAUYxihWLJa5oyU/WmrH0WuiMUlyrYhv9xvhuFwjXUvVjNY129Ix
+        DByc2eV7esOf8GESRHLwwsMTZ9HE0/2yTcYOBEU=
+X-Google-Smtp-Source: APXvYqwqOF94zwr1nS6udLZXJncXxj33efGYNtHI3II4N+LmaoKu0DilqoeydV7O+QDHO5yTlVFJPFzuQkOU3grDp7Q=
+X-Received: by 2002:aca:1913:: with SMTP id l19mr3562113oii.47.1582640790320;
+ Tue, 25 Feb 2020 06:26:30 -0800 (PST)
+MIME-Version: 1.0
+References: <1582624061-5814-1-git-send-email-wanpengli@tencent.com> <0af6b96a-16ac-5054-7754-6ab4a239a2d4@redhat.com>
+In-Reply-To: <0af6b96a-16ac-5054-7754-6ab4a239a2d4@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 25 Feb 2020 22:26:19 +0800
+Message-ID: <CANRm+Cz7mKjm7_9H4O4y2XYEv8VnErTtu=dr-8fN0RCCjf0wvA@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: LAPIC: Recalculate apic map in batch
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 56/61] KVM: SVM: Refactor logging of NPT enabled/disabled
-In-Reply-To: <20200201185218.24473-57-sean.j.christopherson@intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <20200201185218.24473-57-sean.j.christopherson@intel.com>
-Date:   Tue, 25 Feb 2020 15:21:45 +0100
-Message-ID: <87h7zelpc6.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
-
-> Tweak SVM's logging of NPT enabled/disabled to handle the logging in a
-> single pr_info() in preparation for merging kvm_enable_tdp() and
-> kvm_disable_tdp() into a single function.
+On Tue, 25 Feb 2020 at 22:20, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> No functional change intended.
+> On 25/02/20 10:47, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > In the vCPU reset and set APIC_BASE MSR path, the apic map will be recalculated
+> > several times, each time it will consume 10+ us observed by ftrace in my
+> > non-overcommit environment since the expensive memory allocate/mutex/rcu etc
+> > operations. This patch optimizes it by recaluating apic map in batch, I hope
+> > this can benefit the serverless scenario which can frequently create/destroy
+> > VMs.
+> >
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> > v1 -> v2:
+> >  * add apic_map_dirty to kvm_lapic
+> >  * error condition in kvm_apic_set_state, do recalcuate  unconditionally
+> >
+> >  arch/x86/kvm/lapic.c | 29 +++++++++++++++++++----------
+> >  arch/x86/kvm/lapic.h |  2 ++
+> >  arch/x86/kvm/x86.c   |  2 ++
+> >  3 files changed, 23 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index afcd30d..3476dbc 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -164,7 +164,7 @@ static void kvm_apic_map_free(struct rcu_head *rcu)
+> >       kvfree(map);
+> >  }
+> >
+> > -static void recalculate_apic_map(struct kvm *kvm)
+> > +void kvm_recalculate_apic_map(struct kvm *kvm)
+> >  {
 >
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/svm.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
+> It's better to add an "if" here rather than in every caller.  It should
+> be like:
 >
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index a27f83f7521c..80962c1eea8f 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -1440,16 +1440,14 @@ static __init int svm_hardware_setup(void)
->  	if (!boot_cpu_has(X86_FEATURE_NPT))
->  		npt_enabled = false;
->  
-> -	if (npt_enabled && !npt) {
-> -		printk(KERN_INFO "kvm: Nested Paging disabled\n");
-> +	if (npt_enabled && !npt)
->  		npt_enabled = false;
-> -	}
->  
-> -	if (npt_enabled) {
-> -		printk(KERN_INFO "kvm: Nested Paging enabled\n");
-> +	if (npt_enabled)
->  		kvm_enable_tdp();
-> -	} else
-> +	else
->  		kvm_disable_tdp();
-> +	pr_info("kvm: Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
->  
->  	if (nrips) {
->  		if (!boot_cpu_has(X86_FEATURE_NRIPS))
+>         if (!apic->apic_map_dirty) {
+>                 /*
+>                  * Read apic->apic_map_dirty before
+>                  * kvm->arch.apic_map.
+>                  */
+>                 smp_rmb();
+>                 return;
+>         }
+>
+>         mutex_lock(&kvm->arch.apic_map_lock);
+>         if (!apic->apic_map_dirty) {
+>                 /* Someone else has updated the map.  */
+>                 mutex_unlock(&kvm->arch.apic_map_lock);
+>                 return;
+>         }
+>         ...
+> out:
+>         old = rcu_dereference_protected(kvm->arch.apic_map,
+>                         lockdep_is_held(&kvm->arch.apic_map_lock));
+>         rcu_assign_pointer(kvm->arch.apic_map, new);
+>         /*
+>          * Write kvm->arch.apic_map before
+>          * clearing apic->apic_map_dirty.
+>          */
+>         smp_wmb();
+>         apic->apic_map_dirty = false;
+>         mutex_unlock(&kvm->arch.apic_map_lock);
+>         ...
+>
+> But actually it seems to me that, given we're going through all this
+> pain, it's better to put the "dirty" flag in kvm->arch, next to the
+> mutex and the map itself.  This should also reduce the number of calls
+> to kvm_recalculate_apic_map that recompute the map.  A lot of them will
+> just wait on the mutex and exit.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Good point, will do in next version.
 
--- 
-Vitaly
-
+    Wanpeng
