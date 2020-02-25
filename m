@@ -2,89 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BB9D16E9D8
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 16:18:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83BA716E9DB
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 16:19:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731047AbgBYPSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 10:18:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49022 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729817AbgBYPSU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 10:18:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582643899;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A3UhdeKT+krjNlC+LM3bZB+rdh00isF5DS1fbUlbjE0=;
-        b=dk+NOCKANhzg0WkZepYFvCYl7rOsWNGsnTEE50S1cZZiDq/XDNyou8ansPXTBrk6ciQsGd
-        0wSlUsgAj+Q0R49IgReaC48aijyaZg+6D635EWpK2oIAHUiSU/AA1CybZZx/ZY7oe3kTvd
-        wc88oaH8CcogusUJH5adB3ma5pl0qrQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-ygIvsOevPiqMtT5SkkNnjg-1; Tue, 25 Feb 2020 10:18:16 -0500
-X-MC-Unique: ygIvsOevPiqMtT5SkkNnjg-1
-Received: by mail-wm1-f70.google.com with SMTP id z7so1005936wmi.0
-        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 07:18:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=A3UhdeKT+krjNlC+LM3bZB+rdh00isF5DS1fbUlbjE0=;
-        b=VIQXFo3xiYqFG4UnLar8hYH4NM6ujbtHeh4thljf/cIk+R+JskPx2jZ/V32jIDevK6
-         5ATUW85M6CPAgL9n35+8s+z5+uQCLYxSQhifu1RmCVI1wrTLyk5flOpZOz/c6fJLWqEp
-         SkoTUKk7snRrxxSS4yOC0KwspEduSx77TWO1Ou/yz/BE3lgL4+VTbjHvVs41b6dxXxaI
-         XLHy5P/jem0hZcPA0KXq16jWFFAuT+BRZE8v3mNjYvlMm2nY328706vDg7pQ7eMBLqRu
-         vSEnqB2eL/U+6L4ehP5lqyvjuyVg/Q3U5YNbo3YLRg/59wTfFf6gk+XaDSNE2CDHjZvW
-         EPYA==
-X-Gm-Message-State: APjAAAULL2+CVIjMDbsL1J8InM1olqj/26tf2n1kVklbBoXniuaUuGwZ
-        qNdyJ/kKmATeihLAYZqcKHWSxC8rr+4+or0H5f1bjLqNAD9O+cGfzhjSPyI7UyFRPW52lazoKDt
-        BDmeMTlTwoQNz
-X-Received: by 2002:a1c:a382:: with SMTP id m124mr5758518wme.90.1582643894059;
-        Tue, 25 Feb 2020 07:18:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxQ4GB2bbPWgq4zi3drCuNanKtM0d7Lh04HjmIfnH07Op+Coz/HCusYRfj4lHibPbvl/9iiKg==
-X-Received: by 2002:a1c:a382:: with SMTP id m124mr5758499wme.90.1582643893839;
-        Tue, 25 Feb 2020 07:18:13 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:3577:1cfe:d98a:5fb6? ([2001:b07:6468:f312:3577:1cfe:d98a:5fb6])
-        by smtp.gmail.com with ESMTPSA id a198sm4577277wme.12.2020.02.25.07.18.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2020 07:18:13 -0800 (PST)
-Subject: Re: [PATCH 48/61] KVM: x86: Do host CPUID at load time to mask KVM
- cpu caps
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1731050AbgBYPTT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 10:19:19 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:30238 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730753AbgBYPTT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Feb 2020 10:19:19 -0500
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-181-PygZP9mHNwW0TQKcmdPTxQ-1; Tue, 25 Feb 2020 15:19:14 +0000
+X-MC-Unique: PygZP9mHNwW0TQKcmdPTxQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Tue, 25 Feb 2020 15:19:14 +0000
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Tue, 25 Feb 2020 15:19:14 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Paolo Bonzini' <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+CC:     Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 43/61] KVM: x86: Use KVM cpu caps to mark CR4.LA57 as
+ not-reserved
+Thread-Topic: [PATCH 43/61] KVM: x86: Use KVM cpu caps to mark CR4.LA57 as
+ not-reserved
+Thread-Index: AQHV6+4E9BqMh7ePK0SVXxTqp0vBfqgsBIsQ
+Date:   Tue, 25 Feb 2020 15:19:14 +0000
+Message-ID: <5c0282a66ae54d36af674a568b58071b@AcuMS.aculab.com>
 References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-49-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fd7c8e54-b5e1-fa0c-02c7-d308ecfbac80@redhat.com>
-Date:   Tue, 25 Feb 2020 16:18:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200201185218.24473-49-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
+ <20200201185218.24473-44-sean.j.christopherson@intel.com>
+ <8736azocyp.fsf@vitty.brq.redhat.com>
+ <66467dd7-09f0-7975-5c4e-c0404d779d8d@redhat.com>
+In-Reply-To: <66467dd7-09f0-7975-5c4e-c0404d779d8d@redhat.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/02/20 19:52, Sean Christopherson wrote:
-> +#ifdef CONFIG_KVM_CPUID_AUDIT
-> +	/* Entry needs to be fully populated when auditing is enabled. */
-> +	entry.function = cpuid.function;
-> +	entry.index = cpuid.index;
-> +#endif
-
-This shows that the audit case is prone to bitrot, which is good reason
-to enable it by default.
-
-Paolo
+RnJvbTogUGFvbG8gQm9uemluaQ0KPiBTZW50OiAyNSBGZWJydWFyeSAyMDIwIDE1OjEyDQo+IE9u
+IDI0LzAyLzIwIDIzOjA4LCBWaXRhbHkgS3V6bmV0c292IHdyb3RlOg0KPiA+PiArDQo+ID4+ICtz
+dGF0aWMgX19hbHdheXNfaW5saW5lIGJvb2wga3ZtX2NwdV9jYXBfaGFzKHVuc2lnbmVkIHg4Nl9m
+ZWF0dXJlKQ0KPiA+PiArew0KPiA+PiArCXJldHVybiBrdm1fY3B1X2NhcF9nZXQoeDg2X2ZlYXR1
+cmUpOw0KPiA+PiArfQ0KPiA+IEkga25vdyB0aGlzIHdvcmtzIChhbmQgSSBldmVuIGNoZWNrZWQg
+Qzk5IHRvIG1ha2Ugc3VyZSB0aGF0IGl0IHdvcmtzIG5vdA0KPiA+IGJ5IGFjY2lkZW50KSBidXQg
+SSBoYXZlIHRvIGFkbWl0IHRoYXQgZXhwbGljaXQgJyEhJyBjb252ZXJzaW9uIHRvIGJvb2wNCj4g
+PiBhbHdheXMgbWFrZXMgbWUgZmVlbCBzYWZlciA6LSkNCj4gDQo+IFNhbWUgaGVyZSwgSSBkb24n
+dCByZWFsbHkgbGlrZSB0aGUgYXV0b21hZ2ljIGJvb2wgYmVoYXZpb3IuLi4NCg0KSSBqdXN0IGRp
+c2xpa2UgJ2Jvb2wnLg0KDQpDb252ZXJzaW9uIG9mIDAvbm9uLXplcm8gdG8gMC8xIGlzbid0IGNv
+bXBsZXRlbHkgZnJlZS4NCkFuZCBzb21ldGhpbmcgaGFzIHRvICdnaXZlJyB3aGVuIHRoZSByZWZl
+cmVuY2VkIG1lbW9yeSBsb2NhdGlvbg0KZG9lc24ndCBjb250YWluIDAgb3IgMS4NCg0KT25lIHZl
+cnkgb2xkIHZlcnNpb24gb2YgZ2NjIG1hZGUgYSBjb21wbGV0ZSBoYXNoIG9mOg0KCWJvb2xfdmFy
+IHw9IGZ1bmN0aW9uX3JldHVybmluZ19ib29sKCk7DQoNCkknbSBub3Qgc3VyZSB3aGF0IHRoZSBz
+dGFuZGFyZCByZXF1aXJlcyBub3Igd2hhdCBjdXJyZW50IGdjYw0KZ2VuZXJhdGVzIC0gYnV0IHlv
+dSB3YW50IGEgJ2xvZ2ljYWwgb3InIGluc3RydWN0aW9uLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0
+ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBL
+ZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
