@@ -2,79 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B984716BB4C
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 08:53:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B3E516BB4F
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 08:54:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729475AbgBYHxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 02:53:23 -0500
-Received: from out0-138.mail.aliyun.com ([140.205.0.138]:40245 "EHLO
-        out0-138.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729111AbgBYHxW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 02:53:22 -0500
+        id S1729430AbgBYHyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 02:54:44 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:33025 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729124AbgBYHyo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 02:54:44 -0500
+Received: by mail-wr1-f66.google.com with SMTP id u6so13493643wrt.0;
+        Mon, 24 Feb 2020 23:54:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=alibaba-inc.com; s=default;
-        t=1582617199; h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type;
-        bh=/puhnCRsreW0Ri4vztcPQdwutZNhsyKqRStaan379Pc=;
-        b=vcnxWliAjKnw0QmJv+mfVhYVY5ahTkbQqi3ARAi4BWNDotPq8gVuQfjIy50MzIocMHyaGqu8bwHoV7Og8z/Ili56Q5i1X1wcLTg/t1uvFsaZWUOABpgU4cTCrYrRydDtBwZWqu7ANo3K9ipIs4gD3Tm2FJrjqRMFOp2r85QnSok=
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e02c03293;MF=bangcai.hrg@alibaba-inc.com;NM=1;PH=DW;RN=16;SR=0;TI=W4_5790132_DEFAULT_0AB10216_1582615630451_o7001c563;
-Received: from WS-web (bangcai.hrg@alibaba-inc.com[W4_5790132_DEFAULT_0AB10216_1582615630451_o7001c563]) by e01e04486.eu6 at Tue, 25 Feb 2020 15:53:17 +0800
-Date:   Tue, 25 Feb 2020 15:53:17 +0800
-From:   "=?UTF-8?B?5L2V5a655YWJKOmCpumHhyk=?=" <bangcai.hrg@alibaba-inc.com>
-To:     "Wanpeng Li" <kernellwp@gmail.com>
-Cc:     "namit" <namit@vmware.com>, "peterz" <peterz@infradead.org>,
-        "pbonzini" <pbonzini@redhat.com>,
-        "dave.hansen" <dave.hansen@intel.com>, "mingo" <mingo@redhat.com>,
-        "tglx" <tglx@linutronix.de>, "x86" <x86@kernel.org>,
-        "linux-kernel" <linux-kernel@vger.kernel.org>,
-        "dave.hansen" <dave.hansen@linux.intel.com>, "bp" <bp@alien8.de>,
-        "luto" <luto@kernel.org>, "kvm" <kvm@vger.kernel.org>,
-        "=?UTF-8?B?5p6X5rC45ZCsKOa1t+aeqyk=?=" <yongting.lyt@alibaba-inc.com>,
-        "=?UTF-8?B?5ZC05ZCv57++KOWQr+e/vik=?=" <qixuan.wqx@alibaba-inc.com>,
-        "herongguang" <herongguang@linux.alibaba.com>
-Reply-To: "=?UTF-8?B?5L2V5a655YWJKOmCpumHhyk=?=" 
-          <bangcai.hrg@alibaba-inc.com>
-Message-ID: <660daad7-afb0-496d-9f40-a1162d5451e2.bangcai.hrg@alibaba-inc.com>
-Subject: =?UTF-8?B?5Zue5aSN77yaW1JGQ10gUXVlc3Rpb24gYWJvdXQgYXN5bmMgVExCIGZsdXNoIGFuZCBLVk0g?=
-  =?UTF-8?B?cHYgdGxiIGltcHJvdmVtZW50cw==?=
-X-Mailer: [Alimail-Mailagent revision 59873560][W4_5790132][DEFAULT][Chrome]
-MIME-Version: 1.0
-References: <07348bb2-c8a5-41d0-afca-26c1056570a5.bangcai.hrg@alibaba-inc.com>,<CANRm+CwZq=FbCwRcyO=C7YinLevmMuVVu9auwPqyho3o-4Y-wQ@mail.gmail.com>
-x-aliyun-mail-creator: W4_5790132_DEFAULT_M2ITW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzgwLjAuMzk4Ny4xMTYgU2FmYXJpLzUzNy4zNg==3L
-In-Reply-To: <CANRm+CwZq=FbCwRcyO=C7YinLevmMuVVu9auwPqyho3o-4Y-wQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=glUb0AVNqIpQp8+EfyRlMJSV0T1LLIsDxr1f5R3n23U=;
+        b=YTYL8An11i8aSQf4sKTgmdrYyR/dfGa7Qb4DGS30HCSWAGdmP6sqwYbaY5w4pUZX+F
+         Ec6ikdtNmWhcTq/N+bmYyyZ1WRW+zzp78RFs4b8G+Lz2KRhAfbPwzHLmXVf1FaWsrEtT
+         VJEV4OS4ufJtYQxfy8IPaOiu5Ip2GnUCa1YNWQav4ACHz87iO0fKZFRF5O5w2k1Dd87C
+         Rxq0y7dJazr6QECY9uHJPnHVzVgevDcTR6tFVW6q3cjXO/YoVhf97gmx9gvb4RcvWjrQ
+         lZL2Ucet2AtaBLUOowGCvamH6V3o4qa5dsfI27WVZLDRw+XZH/EoUzWVRk+ucD8IN54F
+         AgGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=glUb0AVNqIpQp8+EfyRlMJSV0T1LLIsDxr1f5R3n23U=;
+        b=Nq6MFql861USCwm4Se+vLaLNhFTVDy6QoQ6HTyO42dELahXQoQu3fjg4qpuHzB1Blh
+         jqHrfF8PKot07bntHZQYBhn9kd6BsBsgp+GGHe6TocmfUNU4q/hswlwhl9u4VZp+KPEG
+         nn9k17z8Q5/lkWFUW+ewnkVMjHYIZrWqEt9t3ahYKzcbb/J1/bBM2s0xsQNVccU+olzX
+         MksbG27gS59BeUO4q5Cd9WmDOku1a/9yUhk8tATBozLD3S5DEy7dFhzQl7GQDjIXKQAd
+         6hSiW/E56qDVRrNqZltXk8Daud61IUp121ORtn9WzBOVdPvcx1upbFY+KRcZm8bamiIC
+         ynDQ==
+X-Gm-Message-State: APjAAAWEKjMFK6u1sCKmxE3Lwiny6xzGi7rUsOSdxlahgCaRZF1JAiub
+        zcga6L3Ra+G1sXaaKBXkqqL73AhK
+X-Google-Smtp-Source: APXvYqxYAvZdflOr+QOEBUCYEa0kDK0vl0sue/gFMGZ5Lf7uq4GAJAyhiCqUv9BjOM94QloItSr80w==
+X-Received: by 2002:adf:fcc4:: with SMTP id f4mr75000995wrs.247.1582617280595;
+        Mon, 24 Feb 2020 23:54:40 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id x7sm22177786wrq.41.2020.02.24.23.54.39
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 24 Feb 2020 23:54:39 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     rmuncrief@humanavance.com
+Subject: [PATCH] KVM: SVM: allocate AVIC data structures based on kvm_amd moduleparameter
+Date:   Tue, 25 Feb 2020 08:54:38 +0100
+Message-Id: <1582617278-50338-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBPbiBUdWUsIDI1IEZlYiAyMDIwIGF0IDEyOjEyLCDkvZXlrrnlhYko6YKm6YeHKSA8YmFuZ2Nh
-aS5ocmdAYWxpYmFiYS1pbmMuY29tPiB3cm90ZToKPj4KPj4gSGkgdGhlcmUsCj4+Cj4+IEkgc2F3
-IHRoaXMgYXN5bmMgVExCIGZsdXNoIHBhdGNoIGF0IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL3Bh
-dGNod29yay9wYXRjaC8xMDgyNDgxLyAsIGFuZCBJIGFtIHdvbmRlcmluZyBhZnRlciBvbmUgeWVh
-ciwgZG8geW91IHRoaW5rIGlmIHRoaXMgcGF0Y2ggaXMgcHJhY3RpY2FsIG9yIHRoZXJlIGFyZSBm
-dW5jdGlvbmFsIGZsYXdzPwo+PiBGcm9tIG15IFBPViwgTmFkYXYncyBwYXRjaCBzZWVtcyBoYXMg
-bm8gb2J2aW91cyBmbGF3LiBCdXQgSSBhbSBub3QgZmFtaWxpYXIgYWJvdXQgdGhlIHJlbGF0aW9u
-c2hpcCBiZXR3ZWVuIENQVSdzIHNwZWN1bGF0aW9uIGV4ZWMgYW5kIHN0YWxlIFRMQiwgc2luY2Ug
-aXQncyB1c3VhbGx5IHRyYW5zcGFyZW50IGZyb20gcHJvZ3JhbWluZy4gSW4gd2hpY2ggY29uZGl0
-aW9uIHdvdWxkIG1hY2hpbmUgY2hlY2sgb2NjdXJzPyBJcyB0aGVyZSBzb21lIHJlZmVyZW5jZSBJ
-IGNhbiBsZWFybj8KPj4gQlRXLCBJIGFtIHRyeWluZyB0byBpbXByb3ZlIGt2bSBwdiB0bGIgZmx1
-c2ggdGhhdCBpZiBhIHZDUFUgaXMgcHJlZW1wdGVkLCBhcyBpbml0aWF0aW5nIENQVSBpcyBub3Qg
-c2VuZGluZyBJUEkgdG8gYW5kIHdhaXRpbmcgZm9yIHRoZSBwcmVlbXB0ZWQgdkNQVSwgd2hlbiB0
-aGUgcHJlZW1wdGVkIHZDUFUgaXMgcmVzdW1pbmcsIEkgd2FudCB0aGUgVk1NIHRvIGluamVjdCBh
-biBpbnRlcnJ1cHQsIHBlcmhhcHMgTk1JLCB0byB0aGUgdkNQVSBhbmQgbGV0dGluZyB2Q1BVIGZs
-dXNoIFRMQiBpbnN0ZWFkIG9mIGZsdXNoIFRMQiBmb3IgdGhlIHZDUFUsIGluIGNhc2UgdGhlIHZD
-UFUgaXMgbm90IGluIGtlcm5lbCBtb2RlIG9yIGRpc2FibGVkIGludGVycnVwdCwgb3RoZXJ3aXNl
-IHN0aWNrIHRvIFZNTSBmbHVzaC4gU2luY2UgVk1NIGZsdXNoIHVzaW5nIElOVlZQSUQgd291bGQg
-Zmx1c2ggYWxsIFRMQiBvZiBhbGwgUENJRCB0aHVzIGhhcyBzb21lIG5lZ2F0aXZlIHBlcmZvcm1h
-bmNlIGltcGFjdGluZyBvbiB0aGUgcHJlZW1wdGVkIHZDUFUuIFNvIGlzIHRoZXJlIHNhbWUgcHJv
-YmxlbSBhcyB0aGUgYXN5bmMgVExCIGZsdXNoIHBhdGNoPwoKPiBQViBUTEIgU2hvb3Rkb3duIGlz
-IGRpc2FibGVkIGluIGRlZGljYXRlZCBzY2VuYXJpbywgSSBiZWxpZXZlIHRoZXJlCj4gYXJlIGFs
-cmVhZHkgaGVhdnkgdGxiIG1pc3NlcyBpbiBvdmVyY29tbWl0IHNjZW5hcmlvcyBiZWZvcmUgdGhp
-cwo+IGZlYXR1cmUsIHNvIGZsdXNoIGFsbCBUTEIgYXNzb2NpYXRlZCB3aXRoIG9uZSBzcGVjaWZp
-YyBWUElEIHdpbGwgbm90Cj4gd29yc2UgdGhhdCBtdWNoLgoKSWYgdmNwdXMgcnVubmluZyBvbiBv
-bmUgcGNwdSBpcyBsaW1pdGVkIHRvIGEgZmV3LCBmcm9tIG15IHRlc3QsIHRoZXJlIApjYW4gc3Rp
-bGwgYmUgc29tZSBiZW5lZmljaWFsLiBFc3BlY2lhbGx5IGlmIHdlIGNhbiBtb3ZlIGFsbCB0aGUg
-bG9naWMgdG8KVk1NIGVsaW1pbmF0aW5nIHdhaXRpbmcgb2YgSVBJLCBob3dldmVyIGNvcnJlY3Ru
-ZXNzIG9mIGZ1bmN0aW9uYWxseSAKaXMgYSBjb25jZXJuLiBUaGlzIGlzIGFsc28gd2h5IEkgZm91
-bmQgTmFkYXYncyBwYXRjaCwgZG8geW91IGhhdmUgCmFueSBhZHZpY2Ugb24gdGhpcz8=
+Even if APICv is disabled at startup, the backing page and ir_list need
+to be initialized in case they are needed later.  The only case in
+which this can be skipped is for userspace irqchip, and that must be
+done because avic_init_backing_page dereferences vcpu->arch.apic
+(which is NULL for userspace irqchip).
+
+Tested-by: rmuncrief@humanavance.com
+Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=206579
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index ad3f5b178a03..bd02526300ab 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -2194,8 +2194,9 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ static int avic_init_vcpu(struct vcpu_svm *svm)
+ {
+ 	int ret;
++	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 
+-	if (!kvm_vcpu_apicv_active(&svm->vcpu))
++	if (!avic || !irqchip_in_kernel(vcpu->kvm))
+ 		return 0;
+ 
+ 	ret = avic_init_backing_page(&svm->vcpu);
+-- 
+1.8.3.1
+
