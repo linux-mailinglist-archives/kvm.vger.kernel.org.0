@@ -2,63 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2970016F052
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 21:43:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E4DA16F087
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 21:49:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729439AbgBYUnA convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 25 Feb 2020 15:43:00 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35500 "EHLO mail.kernel.org"
+        id S1729301AbgBYUtC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 15:49:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45592 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729183AbgBYUnA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 15:43:00 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
- pointer dereference" and crashes
-Date:   Tue, 25 Feb 2020 20:42:59 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: rmuncrief@humanavance.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-206579-28872-5k7N8No4mM@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
-References: <bug-206579-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1728119AbgBYUtB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 15:49:01 -0500
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 96B1420675;
+        Tue, 25 Feb 2020 20:48:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1582663740;
+        bh=kfn4BOutf8VSzmXv4R9jJuTcjrVzRzSU9qapXJ87YHo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HG2hx093k72plkDwqqaCQJEmqciFZs7ZqqkFN4Aeo+Zay+CBhL3fzfMyE7GxV/v0T
+         1LG/B/Mzq0U9jltQ+jxnFAUcjM9STmO/7TPiftm3dq99ohHYSy0SoJ0+s+prZ6GAlR
+         OTAIxMEAYkoH70JPO8owMx1NFnE1Xy2yOcTwoO54=
+Date:   Tue, 25 Feb 2020 21:48:57 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     yangerkun <yangerkun@huawei.com>
+Cc:     gleb@kernel.org, pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [Question] fix about CVE-2018-12207 for linux-4.4.y
+Message-ID: <20200225204857.GB14366@kroah.com>
+References: <26d70537-48a6-8c50-a496-acb1b20e8dd0@huawei.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <26d70537-48a6-8c50-a496-acb1b20e8dd0@huawei.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=206579
-
---- Comment #23 from muncrief (rmuncrief@humanavance.com) ---
-(In reply to Paolo Bonzini from comment #20)
+On Tue, Feb 25, 2020 at 05:31:06PM +0800, yangerkun wrote:
+> Hi,
 > 
-> Uff, my bad, I used an OR here for testing and wrote an AND in the comment. 
-> Age seems not to matter at all. :) ...
+> I have notice that the status of CVE-2018-12207 for linux-4.4.y stay
+> vulnerable for a long time(linux-4.9.y has fix it, and I have try to fix it,
+> but the different of kvm between linux-4.4.y and linux-4.9.y make it hard to
+> do this). So I wander does there some plan to fix it in linux-4.4.y?
 
-Ha! No problem Paolo. I greatly appreciate your help, and actually wondered if
-you were just testing to see if I was really an engineer. In any case, I've
-always been the classic "absent minded professor" type myself, and even had a
-manager once tell me I did a fantastic job, but that it was "terrifying" to
-watch me work :)
+Is it really an issue in 4.4.y?  And if so, and it affects you, can you
+please provide working patches for it?
 
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+Otherwise I'd strongly recommend not using 4.4.y for KVM, that ship
+should have sailed a long time ago...
+
+thanks,
+
+greg k-h
