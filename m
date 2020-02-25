@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0025716F3DB
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 00:52:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40FE116F3DC
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 00:52:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729566AbgBYXwp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 18:52:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47330 "EHLO mail.kernel.org"
+        id S1729583AbgBYXwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 18:52:46 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47370 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728989AbgBYXwo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 18:52:44 -0500
+        id S1729429AbgBYXwp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 18:52:45 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CEE1224650;
-        Tue, 25 Feb 2020 23:52:43 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6C04D21D7E;
+        Tue, 25 Feb 2020 23:52:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1582674764;
-        bh=iBBwlWbCwGpC+/ma5xl8Yn/0zKLQQaEp1vrpjPaXUgo=;
+        bh=CclWsaZY9hYYuPJbs5HY/W1O08RLE98XK+5LY530Big=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=CIKtyFFpCUUTmGxj6eexXZVhXiKctFHZIDmi6flhC15MDHTAi8wQjDtPYuzler6sb
-         sgn557K2KkP39XRhmGh+LMt/GeyNXdSxUjhakF72vX1/aVxnUmmDW1sGD6BpI5lxix
-         Hzdd/jz3S+p50ktFUqZA1zNPsOwmMPHwC/DEpCwY=
+        b=Z5cQFk7bN8HatK2x7rU+/QQk5CXI1UnFUExaQTTYskDdN6B7wa+bHQpmle67huyDf
+         Z7CFzNqpc50eStEcRmTp9uw80KOaXlGNA19zgbJDiLItg5kk0dOe3yxDknz+lFA0zP
+         8cvOt8GoabO/mX2tTj/yS/eh4dBPb7sJoF+ECX1E=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1j6k0I-007xuY-1g; Tue, 25 Feb 2020 23:52:42 +0000
+        id 1j6k0I-007xuY-L2; Tue, 25 Feb 2020 23:52:42 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     James Morse <james.morse@arm.com>,
@@ -38,9 +38,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 2/5] kvm: arm/arm64: Fold VHE entry/exit work into kvm_vcpu_run_vhe()
-Date:   Tue, 25 Feb 2020 23:52:20 +0000
-Message-Id: <20200225235223.12839-3-maz@kernel.org>
+Subject: [PATCH 3/5] KVM: arm64: Ask the compiler to __always_inline functions used at HYP
+Date:   Tue, 25 Feb 2020 23:52:21 +0000
+Message-Id: <20200225235223.12839-4-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200225235223.12839-1-maz@kernel.org>
 References: <20200225235223.12839-1-maz@kernel.org>
@@ -55,166 +55,284 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mark Rutland <mark.rutland@arm.com>
+From: James Morse <james.morse@arm.com>
 
-With VHE, running a vCPU always requires the sequence:
+On non VHE CPUs, KVM's __hyp_text contains code run at EL2 while the rest
+of the kernel runs at EL1. This code lives in its own section with start
+and end markers so we can map it to EL2.
 
-1. kvm_arm_vhe_guest_enter();
-2. kvm_vcpu_run_vhe();
-3. kvm_arm_vhe_guest_exit()
+The compiler may decide not to inline static-inline functions from the
+header file. It may also decide not to put these out-of-line functions
+in the same section, meaning they aren't mapped when called at EL2.
 
-... and as we invoke this from the shared arm/arm64 KVM code, 32-bit arm
-has to provide stubs for all three functions.
+Clang-9 does exactly this with __kern_hyp_va() and a few others when
+x18 is reserved for the shadow call stack. Add the additional __always_
+hint to all the static-inlines that are called from a hyp file.
 
-To simplify the common code, and make it easier to make further
-modifications to the arm64-specific portions in the near future, let's
-fold kvm_arm_vhe_guest_enter() and kvm_arm_vhe_guest_exit() into
-kvm_vcpu_run_vhe().
-
-The 32-bit stubs for kvm_arm_vhe_guest_enter() and
-kvm_arm_vhe_guest_exit() are removed, as they are no longer used. The
-32-bit stub for kvm_vcpu_run_vhe() is left as-is.
-
-There should be no functional change as a result of this patch.
-
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200210114757.2889-1-mark.rutland@arm.com
----
- arch/arm/include/asm/kvm_host.h   |  3 ---
- arch/arm64/include/asm/kvm_host.h | 32 -------------------------
- arch/arm64/kvm/hyp/switch.c       | 39 +++++++++++++++++++++++++++++--
- virt/kvm/arm/arm.c                |  2 --
- 4 files changed, 37 insertions(+), 39 deletions(-)
+Link: https://lore.kernel.org/r/20200220165839.256881-2-james.morse@arm.com
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index bd2233805d99..cbd26ae95e7e 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -394,9 +394,6 @@ static inline void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu) {}
- static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
- static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
- 
--static inline void kvm_arm_vhe_guest_enter(void) {}
--static inline void kvm_arm_vhe_guest_exit(void) {}
--
- #define KVM_BP_HARDEN_UNKNOWN		-1
- #define KVM_BP_HARDEN_WA_NEEDED		0
- #define KVM_BP_HARDEN_NOT_REQUIRED	1
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f6a77ddab956..d740ec00ecd3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -628,38 +628,6 @@ static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
- static inline void kvm_clr_pmu_events(u32 clr) {}
- #endif
- 
--static inline void kvm_arm_vhe_guest_enter(void)
--{
--	local_daif_mask();
--
--	/*
--	 * Having IRQs masked via PMR when entering the guest means the GIC
--	 * will not signal the CPU of interrupts of lower priority, and the
--	 * only way to get out will be via guest exceptions.
--	 * Naturally, we want to avoid this.
--	 *
--	 * local_daif_mask() already sets GIC_PRIO_PSR_I_SET, we just need a
--	 * dsb to ensure the redistributor is forwards EL2 IRQs to the CPU.
--	 */
--	pmr_sync();
--}
--
--static inline void kvm_arm_vhe_guest_exit(void)
--{
--	/*
--	 * local_daif_restore() takes care to properly restore PSTATE.DAIF
--	 * and the GIC PMR if the host is using IRQ priorities.
--	 */
--	local_daif_restore(DAIF_PROCCTX_NOIRQ);
--
--	/*
--	 * When we exit from the guest we change a number of CPU configuration
--	 * parameters, such as traps.  Make sure these changes take effect
--	 * before running the host or additional guests.
--	 */
--	isb();
--}
--
- #define KVM_BP_HARDEN_UNKNOWN		-1
- #define KVM_BP_HARDEN_WA_NEEDED		0
- #define KVM_BP_HARDEN_NOT_REQUIRED	1
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 72fbbd86eb5e..457067706b75 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -617,7 +617,7 @@ static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+----
+kvm_get_hyp_vector() pulls in all the regular per-cpu accessors
+and this_cpu_has_cap(), fortunately its only called for VHE.
+---
+ arch/arm64/include/asm/arch_gicv3.h  |  2 +-
+ arch/arm64/include/asm/cpufeature.h  |  2 +-
+ arch/arm64/include/asm/kvm_emulate.h | 48 ++++++++++++++--------------
+ arch/arm64/include/asm/kvm_mmu.h     |  3 +-
+ arch/arm64/include/asm/virt.h        |  2 +-
+ 5 files changed, 29 insertions(+), 28 deletions(-)
+
+diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
+index 89e4c8b79349..07597028bb00 100644
+--- a/arch/arm64/include/asm/arch_gicv3.h
++++ b/arch/arm64/include/asm/arch_gicv3.h
+@@ -32,7 +32,7 @@ static inline void gic_write_eoir(u32 irq)
+ 	isb();
  }
  
- /* Switch to the guest for VHE systems running in EL2 */
--int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
-+static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+-static inline void gic_write_dir(u32 irq)
++static __always_inline void gic_write_dir(u32 irq)
  {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-@@ -670,7 +670,42 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 
- 	return exit_code;
+ 	write_sysreg_s(irq, SYS_ICC_DIR_EL1);
+ 	isb();
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 4261d55e8506..0e6d03c7e368 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -581,7 +581,7 @@ static inline bool system_supports_sve(void)
+ 		cpus_have_const_cap(ARM64_SVE);
  }
--NOKPROBE_SYMBOL(kvm_vcpu_run_vhe);
-+NOKPROBE_SYMBOL(__kvm_vcpu_run_vhe);
-+
-+int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
-+{
-+	int ret;
-+
-+	local_daif_mask();
-+
-+	/*
-+	 * Having IRQs masked via PMR when entering the guest means the GIC
-+	 * will not signal the CPU of interrupts of lower priority, and the
-+	 * only way to get out will be via guest exceptions.
-+	 * Naturally, we want to avoid this.
-+	 *
-+	 * local_daif_mask() already sets GIC_PRIO_PSR_I_SET, we just need a
-+	 * dsb to ensure the redistributor is forwards EL2 IRQs to the CPU.
-+	 */
-+	pmr_sync();
-+
-+	ret = __kvm_vcpu_run_vhe(vcpu);
-+
-+	/*
-+	 * local_daif_restore() takes care to properly restore PSTATE.DAIF
-+	 * and the GIC PMR if the host is using IRQ priorities.
-+	 */
-+	local_daif_restore(DAIF_PROCCTX_NOIRQ);
-+
-+	/*
-+	 * When we exit from the guest we change a number of CPU configuration
-+	 * parameters, such as traps.  Make sure these changes take effect
-+	 * before running the host or additional guests.
-+	 */
-+	isb();
-+
-+	return ret;
-+}
  
- /* Switch to the guest for legacy non-VHE systems */
- int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index efda376ab3c5..560d6f258297 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -797,9 +797,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		guest_enter_irqoff();
+-static inline bool system_supports_cnp(void)
++static __always_inline bool system_supports_cnp(void)
+ {
+ 	return IS_ENABLED(CONFIG_ARM64_CNP) &&
+ 		cpus_have_const_cap(ARM64_HAS_CNP);
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 688c63412cc2..f658dda12364 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -36,7 +36,7 @@ void kvm_inject_undef32(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
  
- 		if (has_vhe()) {
--			kvm_arm_vhe_guest_enter();
- 			ret = kvm_vcpu_run_vhe(vcpu);
--			kvm_arm_vhe_guest_exit();
- 		} else {
- 			ret = kvm_call_hyp_ret(__kvm_vcpu_run_nvhe, vcpu);
- 		}
+-static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
++static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+ {
+ 	return !(vcpu->arch.hcr_el2 & HCR_RW);
+ }
+@@ -127,7 +127,7 @@ static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
+ 	vcpu->arch.vsesr_el2 = vsesr;
+ }
+ 
+-static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
++static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
+ {
+ 	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pc;
+ }
+@@ -153,17 +153,17 @@ static inline void vcpu_write_elr_el1(const struct kvm_vcpu *vcpu, unsigned long
+ 		*__vcpu_elr_el1(vcpu) = v;
+ }
+ 
+-static inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
++static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
+ {
+ 	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pstate;
+ }
+ 
+-static inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
++static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
+ {
+ 	return !!(*vcpu_cpsr(vcpu) & PSR_MODE32_BIT);
+ }
+ 
+-static inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
++static __always_inline bool kvm_condition_valid(const struct kvm_vcpu *vcpu)
+ {
+ 	if (vcpu_mode_is_32bit(vcpu))
+ 		return kvm_condition_valid32(vcpu);
+@@ -181,13 +181,13 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
+  * coming from a read of ESR_EL2. Otherwise, it may give the wrong result on
+  * AArch32 with banked registers.
+  */
+-static inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
++static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
+ 					 u8 reg_num)
+ {
+ 	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs.regs[reg_num];
+ }
+ 
+-static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
++static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 				unsigned long val)
+ {
+ 	if (reg_num != 31)
+@@ -264,12 +264,12 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+ 	return mode != PSR_MODE_EL0t;
+ }
+ 
+-static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
++static __always_inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.fault.esr_el2;
+ }
+ 
+-static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
++static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+ {
+ 	u32 esr = kvm_vcpu_get_hsr(vcpu);
+ 
+@@ -279,12 +279,12 @@ static inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+ 	return -1;
+ }
+ 
+-static inline unsigned long kvm_vcpu_get_hfar(const struct kvm_vcpu *vcpu)
++static __always_inline unsigned long kvm_vcpu_get_hfar(const struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.fault.far_el2;
+ }
+ 
+-static inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
++static __always_inline phys_addr_t kvm_vcpu_get_fault_ipa(const struct kvm_vcpu *vcpu)
+ {
+ 	return ((phys_addr_t)vcpu->arch.fault.hpfar_el2 & HPFAR_MASK) << 8;
+ }
+@@ -299,7 +299,7 @@ static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_xVC_IMM_MASK;
+ }
+ 
+-static inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
++static __always_inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
+ {
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_ISV);
+ }
+@@ -319,17 +319,17 @@ static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SF);
+ }
+ 
+-static inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
++static __always_inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
+ {
+ 	return (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
+ }
+ 
+-static inline bool kvm_vcpu_dabt_iss1tw(const struct kvm_vcpu *vcpu)
++static __always_inline bool kvm_vcpu_dabt_iss1tw(const struct kvm_vcpu *vcpu)
+ {
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_S1PTW);
+ }
+ 
+-static inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
++static __always_inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
+ {
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WNR) ||
+ 		kvm_vcpu_dabt_iss1tw(vcpu); /* AF/DBM update */
+@@ -340,18 +340,18 @@ static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_CM);
+ }
+ 
+-static inline unsigned int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
++static __always_inline unsigned int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
+ {
+ 	return 1 << ((kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
+ }
+ 
+ /* This one is not specific to Data Abort */
+-static inline bool kvm_vcpu_trap_il_is32bit(const struct kvm_vcpu *vcpu)
++static __always_inline bool kvm_vcpu_trap_il_is32bit(const struct kvm_vcpu *vcpu)
+ {
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_IL);
+ }
+ 
+-static inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
++static __always_inline u8 kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
+ {
+ 	return ESR_ELx_EC(kvm_vcpu_get_hsr(vcpu));
+ }
+@@ -361,17 +361,17 @@ static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
+ }
+ 
+-static inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
++static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_FSC;
+ }
+ 
+-static inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
++static __always_inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_get_hsr(vcpu) & ESR_ELx_FSC_TYPE;
+ }
+ 
+-static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
++static __always_inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
+ {
+ 	switch (kvm_vcpu_trap_get_fault(vcpu)) {
+ 	case FSC_SEA:
+@@ -390,7 +390,7 @@ static inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-static inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
++static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+ {
+ 	u32 esr = kvm_vcpu_get_hsr(vcpu);
+ 	return ESR_ELx_SYS64_ISS_RT(esr);
+@@ -504,7 +504,7 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+ 	return data;		/* Leave LE untouched */
+ }
+ 
+-static inline void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr)
++static __always_inline void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr)
+ {
+ 	if (vcpu_mode_is_32bit(vcpu))
+ 		kvm_skip_instr32(vcpu, is_wide_instr);
+@@ -519,7 +519,7 @@ static inline void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr)
+  * Skip an instruction which has been emulated at hyp while most guest sysregs
+  * are live.
+  */
+-static inline void __hyp_text __kvm_skip_instr(struct kvm_vcpu *vcpu)
++static __always_inline void __hyp_text __kvm_skip_instr(struct kvm_vcpu *vcpu)
+ {
+ 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
+ 	vcpu->arch.ctxt.gp_regs.regs.pstate = read_sysreg_el2(SYS_SPSR);
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 53d846f1bfe7..785762860c63 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -93,7 +93,7 @@ void kvm_update_va_mask(struct alt_instr *alt,
+ 			__le32 *origptr, __le32 *updptr, int nr_inst);
+ void kvm_compute_layout(void);
+ 
+-static inline unsigned long __kern_hyp_va(unsigned long v)
++static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+ {
+ 	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"
+ 				    "ror %0, %0, #1\n"
+@@ -473,6 +473,7 @@ static inline int kvm_write_guest_lock(struct kvm *kvm, gpa_t gpa,
+ extern void *__kvm_bp_vect_base;
+ extern int __kvm_harden_el2_vector_slot;
+ 
++/*  This is only called on a VHE system */
+ static inline void *kvm_get_hyp_vector(void)
+ {
+ 	struct bp_hardening_data *data = arm64_get_bp_hardening_data();
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 0958ed6191aa..61fd26752adc 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -83,7 +83,7 @@ static inline bool is_kernel_in_hyp_mode(void)
+ 	return read_sysreg(CurrentEL) == CurrentEL_EL2;
+ }
+ 
+-static inline bool has_vhe(void)
++static __always_inline bool has_vhe(void)
+ {
+ 	if (cpus_have_const_cap(ARM64_HAS_VIRT_HOST_EXTN))
+ 		return true;
 -- 
 2.20.1
 
