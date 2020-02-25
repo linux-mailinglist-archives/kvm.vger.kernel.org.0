@@ -2,213 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0AC816B93D
-	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 06:44:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D11EA16B96E
+	for <lists+kvm@lfdr.de>; Tue, 25 Feb 2020 07:09:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728725AbgBYFoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Feb 2020 00:44:08 -0500
-Received: from mail-eopbgr1300098.outbound.protection.outlook.com ([40.107.130.98]:49755
-        "EHLO APC01-HK2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725837AbgBYFoI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 00:44:08 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xcb8Oa/oFANdDUXq5AzJSZK/J/PwXJLCrif76rxvJGrXy8IA6JBUgHsdb0Arc0uj4qEC2iA4ntv8cOxGOB7vgdmn1kL1xGstjCxKIhAdQM/dF6FJ/YMbt5NuM3V2IP+GwUVQ0+SHH73yVgrBtqSnjgMicl5cCfaetYaLxTb6vQo7okLIQ0TZdGHFw9p5SB0gEQNxizmFU3xUNp7Z2CSuYY9AY8Q8suoEpUsJPjoGH4jn6TZoBibYw/qJm1DO8Wt2zUuuJzxsPvBJfYqecvIBD2YovrFZaF2dnei/047/gRhaRGNA16SwXqP6ieDKEKr1b4RuX6pcRPANP/+VnCnuVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cJ544hrnEvPO4y3apa1/ZMmRMPQl/dOGTkbKlXDPPxc=;
- b=Lzqh2Ug+y96+iRAPdD90sYF8aJAoVgs/St3lLIe7xGqdjbobKe7dA1xrGQhLw01SY8Nm76PQ9iY2i7oHOwtI7dxXdPgje+hoFyvyUB3pEBPTovOuLAs1hsck+aOWjTof0av4o5pxa3M/9NyvEYcyZnQgr2YqKLnjPLe/fWJ11W2lL9Tr36HchsSfw/1dxH4vYh0I/tQvrfWxFrG+X+CAbHWgJa3L/CpE3nUSFe4Uq3rbhXZYAIK+Pwu6Ej+DtJBHy2QUQ7ZZTvPX0i7Se36javZ53Qwu8zfreuMuEfYvJDszdMWl5CZONnYY0hekQ3cuCnSJx9YX87R0H7uxHEwnPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cJ544hrnEvPO4y3apa1/ZMmRMPQl/dOGTkbKlXDPPxc=;
- b=aXgNOssTUHDQ7wfRHYvzF31ANtA7D/Bd+/5Jch1/I48D33bl5QeY5LxRinJcg1H501ik1/rIMq3skLVww+zjrKrmD2bQbbKMSva/wK8h/tnmOwwJyG13TqrN7VVFrbKlfn0u4nrEex02i7Wiraf2ubQQYUuZEVqDrGEMH8Tr6mg=
-Received: from HK0P153MB0148.APCP153.PROD.OUTLOOK.COM (52.133.156.139) by
- HK0P153MB0323.APCP153.PROD.OUTLOOK.COM (52.132.237.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2793.1; Tue, 25 Feb 2020 05:44:03 +0000
-Received: from HK0P153MB0148.APCP153.PROD.OUTLOOK.COM
- ([fe80::a02a:44fa:5f1:dd74]) by HK0P153MB0148.APCP153.PROD.OUTLOOK.COM
- ([fe80::a02a:44fa:5f1:dd74%2]) with mapi id 15.20.2793.003; Tue, 25 Feb 2020
- 05:44:03 +0000
-From:   Dexuan Cui <decui@microsoft.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-CC:     syzbot <syzbot+731710996d79d0d58fbc@syzkaller.appspotmail.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        id S1728955AbgBYGJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 01:09:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38674 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727005AbgBYGJ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 01:09:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582610964;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0IoUDI0r2nKt/KLH2gl0wTcdvg0oCDvDokn7okiLyHg=;
+        b=R4Kf+dOoIrZfig0mugI2di0BsODBOtZtaylwB/xm/qf3avyTjlsveNw53EQoQv4W2cg9of
+        QdTKyFpouMVjtJlUu+iQvv3Wv4pcHznNe7TQPkYnxYDYSIxOLE5B8sn4iAD3hxytv9ipfk
+        I1AxJymjBV4hsiENLb+V79YWeU4BhMQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-323-KEF-yYO0OPWKOZhO7cB7og-1; Tue, 25 Feb 2020 01:09:20 -0500
+X-MC-Unique: KEF-yYO0OPWKOZhO7cB7og-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FB92107ACC5;
+        Tue, 25 Feb 2020 06:09:19 +0000 (UTC)
+Received: from [10.72.13.170] (ovpn-13-170.pek2.redhat.com [10.72.13.170])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AA7141001902;
+        Tue, 25 Feb 2020 06:09:09 +0000 (UTC)
+Subject: Re: [PATCH v2 0/7] vfio/pci: SR-IOV support
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-Subject: RE: INFO: task hung in lock_sock_nested (2)
-Thread-Topic: INFO: task hung in lock_sock_nested (2)
-Thread-Index: AQHV6vp3dmjBMCIIPkOhqBCQTbJmP6gq7WJg
-Date:   Tue, 25 Feb 2020 05:44:03 +0000
-Message-ID: <HK0P153MB0148B4C74BA6A60E295A03D8BFED0@HK0P153MB0148.APCP153.PROD.OUTLOOK.COM>
-References: <0000000000004241ff059f2eb8a4@google.com>
- <20200223075025.9068-1-hdanton@sina.com>
- <20200224100853.wd67e7rqmtidfg7y@steredhat>
-In-Reply-To: <20200224100853.wd67e7rqmtidfg7y@steredhat>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=decui@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-02-25T05:44:01.4499098Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=d56ff2b7-befc-4546-a08f-b67215e9b71c;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=decui@microsoft.com; 
-x-originating-ip: [2601:600:a280:7f70:b028:3e64:8d77:da03]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 0e07591d-bb34-408e-52cb-08d7b9b5b8ec
-x-ms-traffictypediagnostic: HK0P153MB0323:
-x-microsoft-antispam-prvs: <HK0P153MB03239F97DA1BD1B151625EE9BFED0@HK0P153MB0323.APCP153.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0324C2C0E2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(366004)(136003)(346002)(39860400002)(376002)(189003)(199004)(86362001)(81166006)(7696005)(8936002)(8990500004)(8676002)(5660300002)(71200400001)(6506007)(9686003)(55016002)(186003)(478600001)(10290500003)(316002)(52536014)(76116006)(66946007)(54906003)(66556008)(4326008)(66446008)(81156014)(64756008)(110136005)(66476007)(33656002)(2906002)(7416002);DIR:OUT;SFP:1102;SCL:1;SRVR:HK0P153MB0323;H:HK0P153MB0148.APCP153.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: v9cCIv7Mcf7+9RH0cjq0gRZ6SYEuGMIbcwvZXJqYLGGMSAjwM/PzkJxTqePvoXKgZGq9ZOG/PVdNYQ7Pl5qrkELTVQ66qu4/spqQgGMMPO0jIAZCft+TEO349xly3PxiyI5C8U9ISsjTqnzGE5QZ45KY4HCnXsA145B9MyjryvxAr2A2mTcH4YYDYqCPbWtGTbr89H+CCX6eTVKGAnDbwU+1hz836urq1mpewz8TeK3GJEPzPfblRoGRGlvl7T/QI6J9T4nCQtWN2dRTySmV6szJPgXcF5LOTU9cImnkuGaqi5GGwFJ2U/yQRxtnXRnTG/FCjkQFxOEgSAJwA+La9eB7HEqI7rIygb4uneiYHNX4Jb7TbBb2rZwmw3Nmi/LNvqZRqh2+53gDEbOSItmf9V5WTfFIUqhuPfKIRH8s9QpJsAeslB8xVA9ix08aCKKt
-x-ms-exchange-antispam-messagedata: QftfeL3GIGVBZ6K7+3W/Sn88F41hnZRawL4vx2prJuJwYcpwdwvSvz+w4gZDARfWjh3Lt71uBBxm/AP2pEfNn9ri/nXod/r2TvyoRmDo54YdfE9xZKCJJzd0jZmisTTOJBJv8pjhfAAhX0S6V+g5PGBlErqaoS7zfYU0HItAgSTxYcBRjCWPip/TBb0MnwJnaJzevLM41XHsf+h2Wl9OXQ==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        "dev@dpdk.org" <dev@dpdk.org>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "thomas@monjalon.net" <thomas@monjalon.net>,
+        "bluca@debian.org" <bluca@debian.org>,
+        "jerinjacobk@gmail.com" <jerinjacobk@gmail.com>,
+        "Richardson, Bruce" <bruce.richardson@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>
+References: <158213716959.17090.8399427017403507114.stgit@gimli.home>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D79A8A7@SHSMSX104.ccr.corp.intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <a6c04bac-0a37-f4c0-876e-e5cf2a8a6c3f@redhat.com>
+Date:   Tue, 25 Feb 2020 14:09:07 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e07591d-bb34-408e-52cb-08d7b9b5b8ec
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Feb 2020 05:44:03.4761
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2ZSCqWt4vyQlVnXpWJS77SEPzyx2Me4wK9M9dn9y1RWwgNIlC6anJT2PTL0CMuDR/kiAp4rFnBuH0ZgXd6Iz3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HK0P153MB0323
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D79A8A7@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> Sent: Monday, February 24, 2020 2:09 AM
-> ...
-> > > syz-executor280 D27912  9768   9766 0x00000000
-> > > Call Trace:
-> > >  context_switch kernel/sched/core.c:3386 [inline]
-> > >  __schedule+0x934/0x1f90 kernel/sched/core.c:4082
-> > >  schedule+0xdc/0x2b0 kernel/sched/core.c:4156
-> > >  __lock_sock+0x165/0x290 net/core/sock.c:2413
-> > >  lock_sock_nested+0xfe/0x120 net/core/sock.c:2938
-> > >  virtio_transport_release+0xc4/0xd60
-> net/vmw_vsock/virtio_transport_common.c:832
-> > >  vsock_assign_transport+0xf3/0x3b0 net/vmw_vsock/af_vsock.c:454
-> > >  vsock_stream_connect+0x2b3/0xc70 net/vmw_vsock/af_vsock.c:1288
-> > >  __sys_connect_file+0x161/0x1c0 net/socket.c:1857
-> > >  __sys_connect+0x174/0x1b0 net/socket.c:1874
-> > >  __do_sys_connect net/socket.c:1885 [inline]
-> > >  __se_sys_connect net/socket.c:1882 [inline]
-> > >  __x64_sys_connect+0x73/0xb0 net/socket.c:1882
-> > >  do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
 
-My understanding about the call trace is: in vsock_stream_connect()=20
-after we call lock_sock(sk), we call vsock_assign_transport(), which may
-call vsk->transport->release(vsk), i.e. virtio_transport_release(), and in
-virtio_transport_release() we try to get the same lock and hang.
-
-> > Seems like vsock needs a word to track lock owner in an attempt to
-> > avoid trying to lock sock while the current is the lock owner.
-
-I'm unfamilar with the g2h/h2g :-)=20
-Here I'm wondering if it's acceptable to add an 'already_locked'
-parameter like this:
-  bool already_locked =3D true;
-  vsk->transport->release(vsk, already_locked) ?
-=20
-> Thanks for this possible solution.
-> What about using sock_owned_by_user()?
-=20
-> We should fix also hyperv_transport, because it could suffer from the sam=
+On 2020/2/25 =E4=B8=8A=E5=8D=8810:33, Tian, Kevin wrote:
+>> From: Alex Williamson
+>> Sent: Thursday, February 20, 2020 2:54 AM
+>>
+>> Changes since v1 are primarily to patch 3/7 where the commit log is
+>> rewritten, along with option parsing and failure logging based on
+>> upstream discussions.  The primary user visible difference is that
+>> option parsing is now much more strict.  If a vf_token option is
+>> provided that cannot be used, we generate an error.  As a result of
+>> this, opening a PF with a vf_token option will serve as a mechanism of
+>> setting the vf_token.  This seems like a more user friendly API than
+>> the alternative of sometimes requiring the option (VFs in use) and
+>> sometimes rejecting it, and upholds our desire that the option is
+>> always either used or rejected.
+>>
+>> This also means that the VFIO_DEVICE_FEATURE ioctl is not the only
+>> means of setting the VF token, which might call into question whether
+>> we absolutely need this new ioctl.  Currently I'm keeping it because I
+>> can imagine use cases, for example if a hypervisor were to support
+>> SR-IOV, the PF device might be opened without consideration for a VF
+>> token and we'd require the hypservisor to close and re-open the PF in
+>> order to set a known VF token, which is impractical.
+>>
+>> Series overview (same as provided with v1):
+> Thanks for doing this!
+>
+>> The synopsis of this series is that we have an ongoing desire to drive
+>> PCIe SR-IOV PFs from userspace with VFIO.  There's an immediate need
+>> for this with DPDK drivers and potentially interesting future use
+> Can you provide a link to the DPDK discussion?
+>
+>> cases in virtualization.  We've been reluctant to add this support
+>> previously due to the dependency and trust relationship between the
+>> VF device and PF driver.  Minimally the PF driver can induce a denial
+>> of service to the VF, but depending on the specific implementation,
+>> the PF driver might also be responsible for moving data between VFs
+>> or have direct access to the state of the VF, including data or state
+>> otherwise private to the VF or VF driver.
+> Just a loud thinking. While the motivation of VF token sounds reasonabl=
 e
-> problem.
+> to me, I'm curious why the same concern is not raised in other usages.
+> For example, there is no such design in virtio framework, where the
+> virtio device could also be restarted, putting in separate process (vho=
+st-user),
+> and even in separate VM (virtio-vhost-user), etc.
 
-IIUC hyperv_transport doesn't supprot the h2g/g2h feature, so it should not
-suffers from the deadlock issue here?
 
-> At this point, it might be better to call vsk->transport->release(vsk)
-> always with the lock taken and remove it in the transports as in the
-> following patch.
->=20
-> What do you think?
->=20
->=20
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index 9c5b2a91baad..a073d8efca33 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -753,20 +753,18 @@ static void __vsock_release(struct sock *sk, int
-> level)
->  		vsk =3D vsock_sk(sk);
->  		pending =3D NULL;	/* Compiler warning. */
->=20
-> -		/* The release call is supposed to use lock_sock_nested()
-> -		 * rather than lock_sock(), if a sock lock should be acquired.
-> -		 */
-> -		if (vsk->transport)
-> -			vsk->transport->release(vsk);
-> -		else if (sk->sk_type =3D=3D SOCK_STREAM)
-> -			vsock_remove_sock(vsk);
-> -
->  		/* When "level" is SINGLE_DEPTH_NESTING, use the nested
->  		 * version to avoid the warning "possible recursive locking
->  		 * detected". When "level" is 0, lock_sock_nested(sk, level)
->  		 * is the same as lock_sock(sk).
->  		 */
->  		lock_sock_nested(sk, level);
-> +
-> +		if (vsk->transport)
-> +			vsk->transport->release(vsk);
-> +		else if (sk->sk_type =3D=3D SOCK_STREAM)
-> +			vsock_remove_sock(vsk);
-> +
->  		sock_orphan(sk);
->  		sk->sk_shutdown =3D SHUTDOWN_MASK;
->=20
-> diff --git a/net/vmw_vsock/hyperv_transport.c
-> b/net/vmw_vsock/hyperv_transport.c
-> index 3492c021925f..510f25f4a856 100644
-> --- a/net/vmw_vsock/hyperv_transport.c
-> +++ b/net/vmw_vsock/hyperv_transport.c
-> @@ -529,9 +529,7 @@ static void hvs_release(struct vsock_sock *vsk)
->  	struct sock *sk =3D sk_vsock(vsk);
->  	bool remove_sock;
->=20
-> -	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
->  	remove_sock =3D hvs_close_lock_held(vsk);
-> -	release_sock(sk);
->  	if (remove_sock)
->  		vsock_remove_sock(vsk);
->  }
+AFAIK, the restart could only be triggered by either VM or qemu. But=20
+yes, the datapath could be offloaded.
 
-This looks good to me, but do we know why vsk->transport->release(vsk)
-is called without holding the lock for 'sk' in the first place?
+But I'm not sure introducing another dedicated mechanism is better than=20
+using the exist generic POSIX mechanism to make sure the connection=20
+(AF_UINX) is secure.
 
-Thanks,
-Dexuan
+
+>   Of course the para-
+> virtualized attribute of virtio implies some degree of trust, but as yo=
+u
+> mentioned many SR-IOV implementations support VF->PF communication
+> which also implies some level of trust. It's perfectly fine if VFIO jus=
+t tries
+> to do better than other sub-systems, but knowing how other people
+> tackle the similar problem may make the whole picture clearer. =F0=9F=98=
+=8A
+>
+> +Jason.
+
+
+I'm not quite sure e.g allowing userspace PF driver with kernel VF=20
+driver would not break the assumption of kernel security model. At least=20
+we should forbid a unprivileged PF driver running in userspace.
+
+Thanks
 
