@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B92716FB2A
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 10:45:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55F9F16FB2C
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 10:45:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727968AbgBZJpE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 04:45:04 -0500
-Received: from mail-qv1-f73.google.com ([209.85.219.73]:51186 "EHLO
-        mail-qv1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727952AbgBZJpE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 04:45:04 -0500
-Received: by mail-qv1-f73.google.com with SMTP id c1so3152450qvw.17
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 01:45:03 -0800 (PST)
+        id S1727939AbgBZJpI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 04:45:08 -0500
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:42900 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727959AbgBZJpI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 04:45:08 -0500
+Received: by mail-pg1-f202.google.com with SMTP id m29so1510840pgd.9
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 01:45:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=X8sk38JcHcyj3teXeT7Jj1TNQ3W5tYgn8rNWYfS/zck=;
-        b=G5aNBFlQLED8pf5uEEbDE/9htzAgojcJ92v/B9SXLqHaeB7nu8sW98f4IurmSL2+ap
-         S0kcTCUNlm7xx4MAHnQMfjOMBl/33f6Tcr2xM4apxR6vKGqcPrY7jbaHWcqsm51lyBYc
-         7haqBk7n1fWwH2arwRCgDmrraR2vuTgQDVrEpXMZAZaId1ROjATK7rhmTupaOap3YYYa
-         SBuNBUPahPsZJcxUkq5F2UxmVqp3yAco66JLJ7kEJFmTi5uxqLz6oiJzHVqYr7LYl89Z
-         VI5tMuMayVBN203Ix6LANAdZrgum9Kxgjc/lvcFNWsUIhSI80RAa8dfUfXG5Ummt/612
-         rH2g==
+        bh=UtzL/mOBJbhx1wqaitkgRIuidwcFWAMCohGe1UdpshI=;
+        b=X+ZddKFSVjmYx//5ODHFJwhJaxEg/vQNbaS0/9McIw/EgtcDrqzxwwnc5udMNOc8y5
+         8iJseZCMYXXYmgBIQIc6cxijuLCEdmjFbmMBj9C+2c1jSfWQBo83OejI0BRgKVirwFI1
+         GGPaiBXuKFtxL+LdTbn0HgPMChuJeK+LMRxx6B5zf2EUkFh2QnNYOEsYk99hq4Qx+CwU
+         vbjWnRy3I55DFOsctA9xennNTgNeir678PmfJZ0AC/NqD1Zvc0kDfI442NeWlmS2nmML
+         B8Y5UnXCTlMWD2pSIhSA+vWzwJcO2oGnyA9PJNk+Ze6Rk6vDvWnVXB1BvIzBcdBW4dTG
+         9bBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=X8sk38JcHcyj3teXeT7Jj1TNQ3W5tYgn8rNWYfS/zck=;
-        b=KkXXDKCAhV4ezxu4LgK+QC8Q5SOL5OAOObO6e9bklHU9dgKazBPEe/Js91qm0WrEtl
-         aRJXQlEvRaSJURGObjl+Y5C/Klqh9NrjdHEbSqGfnMa1B5W8K1nJ8N7PQy7HLf2BaShG
-         /nHZnS58CJVq4liIGtUC6ase19qSMmcoN0ybQkpWfAGEMnitqUcevw9BHRP6rwYKCz3o
-         6lwrTccMbsKBl3GilNfnVdu/OhroPDCHFh1qbncqViYT6fOGtE/UuRqoExItkz7NdMaa
-         d2UbrkYGH84n2YMVXgSA5cXYL78yCO7cVj7Xo7Omq+C18kWkya3VGsZ4opWC1hD1OANc
-         vylQ==
-X-Gm-Message-State: APjAAAVq5y9ZUNiSPkHAbsjud8Ng2KFsZTAYTOZfzJsgG732gAHmRzqb
-        EpkbFd93Pkv77aII8sBGEdLejiNsP8GuUSrqg+vt3yBLGh3QgDPJdpmVdkwhu8h0llV0huNscEv
-        P46ChxLC14RSRCcQT0OFchnWfObkEYnWRYcJUybZSYlqIDGS0WOmkcw==
-X-Google-Smtp-Source: APXvYqxPzL4WoT4R6nk4hX7bPsf19ptKB1Psb2Id6qzb6C0JW0ulSvBV/eklvely4sPU2TN2f+Jscq8Sfw==
-X-Received: by 2002:ac8:4cc9:: with SMTP id l9mr3558474qtv.207.1582710302954;
- Wed, 26 Feb 2020 01:45:02 -0800 (PST)
-Date:   Wed, 26 Feb 2020 01:44:29 -0800
+        bh=UtzL/mOBJbhx1wqaitkgRIuidwcFWAMCohGe1UdpshI=;
+        b=rsqi4XVWyaC7GgxoB33t1+TrcO4rz+pMNRfwrCFt375DNpB+KlBQCD+Altk+iFNkPU
+         vMM/3UCaiRuv6iqyICeLp+QE1C8eUcU2gksnk9BUKOcmUizMf53BWMhyeMo+mZ4cRiC/
+         ndDY6Xr/aC0FCvmHH7GAki/5ubvKGjiGeDvW2NO46UwOZX8CUiXYhLYGcYpNvoqrpZHy
+         kuEz8q0PVaeqGdLpdEQWmWoLzKPbAA0xzDm5eccrFm0NI+N87WNbvKAVAImi2KyS1hCi
+         PKegp+yKSpx4uo7qNKXwiNcnxzVPPpZUmuU7esLj7dIwAW4F3VuWoka00D7j5IF8dSfA
+         d3cw==
+X-Gm-Message-State: APjAAAXH1tX/Ya+gdmR8q6q97tIkvXUcqFgExbaEWOR1nkzpJMi66nKE
+        Sa9CS81uT0FUKA2g/tJdPSqhugLugJK6Oyk4g0+9gIhPfSNwRTewZCqjsq69pYObbQUDdZBkz7Z
+        ZbL7234t3WO0NQFebM0aLt5l0pw/sxau1v3N+42gg/i1bhb0HfAJX1w==
+X-Google-Smtp-Source: APXvYqzSgz7MffRoXeBj95R2xBrN3ltqOstk0iZ2kZBeQ4hlG3i5Srri1DhEqHld3wABCaPm2XYghOiYPg==
+X-Received: by 2002:a65:5c46:: with SMTP id v6mr3204635pgr.333.1582710305549;
+ Wed, 26 Feb 2020 01:45:05 -0800 (PST)
+Date:   Wed, 26 Feb 2020 01:44:30 -0800
 In-Reply-To: <20200226094433.210968-1-morbo@google.com>
-Message-Id: <20200226094433.210968-11-morbo@google.com>
+Message-Id: <20200226094433.210968-12-morbo@google.com>
 Mime-Version: 1.0
 References: <20200226074427.169684-1-morbo@google.com> <20200226094433.210968-1-morbo@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
-Subject: [kvm-unit-tests PATCH v2 5/7] x86: VMX: Add tests for monitor trap flag
+Subject: [kvm-unit-tests PATCH v2 6/7] x86: emulator: use "SSE2" for the target
 From:   Bill Wendling <morbo@google.com>
 To:     kvm@vger.kernel.org
 Cc:     oupton@google.com, pbonzini@redhat.com, drjones@redhat.com,
-        Jim Mattson <jmattson@google.com>,
         Bill Wendling <morbo@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
@@ -59,215 +58,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Oliver Upton <oupton@google.com>
+The movdqu and movapd instructions are SSE2 instructions. Clang
+interprets the __attribute__((target("sse"))) as allowing SSE only
+instructions. Using SSE2 instructions cause an error.
 
-Test to verify that MTF VM-exits into host are synthesized when the
-'monitor trap flag' processor-based VM-execution control is set under
-various conditions.
-
-Expect an MTF VM-exit if instruction execution produces no events other
-than MTF. Should instruction execution produce a concurrent debug-trap
-and MTF event, expect an MTF VM-exit with the 'pending debug exceptions'
-VMCS field set. Expect an MTF VM-exit to follow event delivery should
-instruction execution generate a higher-priority event, such as a
-general-protection fault. Lastly, expect an MTF VM-exit to follow
-delivery of a debug-trap software exception (INT1/INT3/INTO/INT n).
-
-Signed-off-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Bill Wendling <morbo@google.com>
 ---
- x86/vmx.h       |   1 +
- x86/vmx_tests.c | 157 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 158 insertions(+)
+ x86/emulator.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/x86/vmx.h b/x86/vmx.h
-index 6214400..6adf091 100644
---- a/x86/vmx.h
-+++ b/x86/vmx.h
-@@ -399,6 +399,7 @@ enum Ctrl0 {
- 	CPU_NMI_WINDOW		= 1ul << 22,
- 	CPU_IO			= 1ul << 24,
- 	CPU_IO_BITMAP		= 1ul << 25,
-+	CPU_MTF			= 1ul << 27,
- 	CPU_MSR_BITMAP		= 1ul << 28,
- 	CPU_MONITOR		= 1ul << 29,
- 	CPU_PAUSE		= 1ul << 30,
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 1323dc5..a7abd63 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -4970,6 +4970,162 @@ static void test_vmx_preemption_timer(void)
- 	vmcs_write(EXI_CONTROLS, saved_exit);
+diff --git a/x86/emulator.c b/x86/emulator.c
+index 8fe03b8..2990550 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -658,7 +658,7 @@ static bool sseeq(sse_union *v1, sse_union *v2)
+     return ok;
  }
  
-+extern unsigned char test_mtf1;
-+extern unsigned char test_mtf2;
-+extern unsigned char test_mtf3;
-+
-+__attribute__((noclone)) static void test_mtf_guest(void)
-+{
-+	asm ("vmcall;\n\t"
-+	     "out %al, $0x80;\n\t"
-+	     "test_mtf1:\n\t"
-+	     "vmcall;\n\t"
-+	     "out %al, $0x80;\n\t"
-+	     "test_mtf2:\n\t"
-+	     /*
-+	      * Prepare for the 'MOV CR3' test. Attempt to induce a
-+	      * general-protection fault by moving a non-canonical address into
-+	      * CR3. The 'MOV CR3' instruction does not take an imm64 operand,
-+	      * so we must MOV the desired value into a register first.
-+	      *
-+	      * MOV RAX is done before the VMCALL such that MTF is only enabled
-+	      * for the instruction under test.
-+	      */
-+	     "mov $0x8000000000000000, %rax;\n\t"
-+	     "vmcall;\n\t"
-+	     "mov %rax, %cr3;\n\t"
-+	     "test_mtf3:\n\t"
-+	     "vmcall;\n\t"
-+	     /*
-+	      * ICEBP/INT1 instruction. Though the instruction is now
-+	      * documented, don't rely on assemblers enumerating the
-+	      * instruction. Resort to hand assembly.
-+	      */
-+	     ".byte 0xf1;\n\t");
-+}
-+
-+static void test_mtf_gp_handler(struct ex_regs *regs)
-+{
-+	regs->rip = (unsigned long) &test_mtf3;
-+}
-+
-+static void test_mtf_db_handler(struct ex_regs *regs)
-+{
-+}
-+
-+static void enable_mtf(void)
-+{
-+	u32 ctrl0 = vmcs_read(CPU_EXEC_CTRL0);
-+
-+	vmcs_write(CPU_EXEC_CTRL0, ctrl0 | CPU_MTF);
-+}
-+
-+static void disable_mtf(void)
-+{
-+	u32 ctrl0 = vmcs_read(CPU_EXEC_CTRL0);
-+
-+	vmcs_write(CPU_EXEC_CTRL0, ctrl0 & ~CPU_MTF);
-+}
-+
-+static void enable_tf(void)
-+{
-+	unsigned long rflags = vmcs_read(GUEST_RFLAGS);
-+
-+	vmcs_write(GUEST_RFLAGS, rflags | X86_EFLAGS_TF);
-+}
-+
-+static void disable_tf(void)
-+{
-+	unsigned long rflags = vmcs_read(GUEST_RFLAGS);
-+
-+	vmcs_write(GUEST_RFLAGS, rflags & ~X86_EFLAGS_TF);
-+}
-+
-+static void report_mtf(const char *insn_name, unsigned long exp_rip)
-+{
-+	unsigned long rip = vmcs_read(GUEST_RIP);
-+
-+	assert_exit_reason(VMX_MTF);
-+	report(rip == exp_rip, "MTF VM-exit after %s instruction. RIP: 0x%lx (expected 0x%lx)",
-+	       insn_name, rip, exp_rip);
-+}
-+
-+static void vmx_mtf_test(void)
-+{
-+	unsigned long pending_dbg;
-+	handler old_gp, old_db;
-+
-+	if (!(ctrl_cpu_rev[0].clr & CPU_MTF)) {
-+		printf("CPU does not support the 'monitor trap flag' processor-based VM-execution control.\n");
-+		return;
-+	}
-+
-+	test_set_guest(test_mtf_guest);
-+
-+	/* Expect an MTF VM-exit after OUT instruction */
-+	enter_guest();
-+	skip_exit_vmcall();
-+
-+	enable_mtf();
-+	enter_guest();
-+	report_mtf("OUT", (unsigned long) &test_mtf1);
-+	disable_mtf();
-+
-+	/*
-+	 * Concurrent #DB trap and MTF on instruction boundary. Expect MTF
-+	 * VM-exit with populated 'pending debug exceptions' VMCS field.
-+	 */
-+	enter_guest();
-+	skip_exit_vmcall();
-+
-+	enable_mtf();
-+	enable_tf();
-+
-+	enter_guest();
-+	report_mtf("OUT", (unsigned long) &test_mtf2);
-+	pending_dbg = vmcs_read(GUEST_PENDING_DEBUG);
-+	report(pending_dbg & DR_STEP,
-+	       "'pending debug exceptions' field after MTF VM-exit: 0x%lx (expected 0x%lx)",
-+	       pending_dbg, (unsigned long) DR_STEP);
-+
-+	disable_mtf();
-+	disable_tf();
-+	vmcs_write(GUEST_PENDING_DEBUG, 0);
-+
-+	/*
-+	 * #GP exception takes priority over MTF. Expect MTF VM-exit with RIP
-+	 * advanced to first instruction of #GP handler.
-+	 */
-+	enter_guest();
-+	skip_exit_vmcall();
-+
-+	old_gp = handle_exception(GP_VECTOR, test_mtf_gp_handler);
-+
-+	enable_mtf();
-+	enter_guest();
-+	report_mtf("MOV CR3", (unsigned long) get_idt_addr(&boot_idt[GP_VECTOR]));
-+	disable_mtf();
-+
-+	/*
-+	 * Concurrent MTF and privileged software exception (i.e. ICEBP/INT1).
-+	 * MTF should follow the delivery of #DB trap, though the SDM doesn't
-+	 * provide clear indication of the relative priority.
-+	 */
-+	enter_guest();
-+	skip_exit_vmcall();
-+
-+	handle_exception(GP_VECTOR, old_gp);
-+	old_db = handle_exception(DB_VECTOR, test_mtf_db_handler);
-+
-+	enable_mtf();
-+	enter_guest();
-+	report_mtf("INT1", (unsigned long) get_idt_addr(&boot_idt[DB_VECTOR]));
-+	disable_mtf();
-+
-+	enter_guest();
-+	handle_exception(DB_VECTOR, old_db);
-+}
-+
- /*
-  * Tests for VM-execution control fields
-  */
-@@ -9505,5 +9661,6 @@ struct vmx_test vmx_tests[] = {
- 	TEST(atomic_switch_max_msrs_test),
- 	TEST(atomic_switch_overflow_msrs_test),
- 	TEST(rdtsc_vmexit_diff_test),
-+	TEST(vmx_mtf_test),
- 	{ NULL, NULL, NULL, NULL, NULL, {0} },
- };
+-static __attribute__((target("sse"))) void test_sse(sse_union *mem)
++static __attribute__((target("sse2"))) void test_sse(sse_union *mem)
+ {
+     sse_union v;
+ 
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
