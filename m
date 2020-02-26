@@ -2,85 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F735170942
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 21:13:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02E201709B8
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 21:34:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727471AbgBZUNX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 15:13:23 -0500
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:54830 "EHLO
-        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727456AbgBZUNW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 15:13:22 -0500
-Received: by mail-pg1-f202.google.com with SMTP id l17so265644pgh.21
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 12:13:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=juAXt12km2i38jzPz/B2i0wdAoJlFZOk1KJ1Ao5kVQE=;
-        b=bEJ/WLERUZo3ivhXzYuTnPOA9PVkOMnuKD2qz7Sgn6ajrBEj62ZmJFuslY081CSDPw
-         klqjoshGAmxT7x8hvlfX/bXIX3SUlp1WZxUAXxLL274JYgi/CJB5k+FKzBdgA3fyIDJF
-         r7PUjhz6UJECn2Sztnpik9WyE9fEhXLQrsCXmnKB+l8SyFftbCmXbAh2QDWJNYeezty6
-         JuhOIMopnjd7cVXVrJgjTZMfHldomHpIcaJ/Um5ufin0RtYvjmryZBdF5ftOvSbuopsC
-         D+RGZFPETVBjSDMrdKy7oGl2kRqVljTRkKpRgiWZVvuLjp5reKhh35kgBpVz81nUsBPp
-         bdVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=juAXt12km2i38jzPz/B2i0wdAoJlFZOk1KJ1Ao5kVQE=;
-        b=Gw/oaNnBGCgSxd9GMsu20lpgxrr9mo71rVRKhTtrCA/jdmauyxLnPmnhzzSKLFPw1R
-         IIlYCxUq5o5r48n/aELrBIAwRXfUKtfrYtgtgXKeELimvCS733njHmPTMWVTFPIXZ0g4
-         hsc3uULMALs9V86RZRR7Q7JpIhZbX3CN/PyxNAfQa+OjuBidWTvsiVcVVJAka6L/JWww
-         BEHxlmmhQ3PcggP/nomTkic6EzBi8wYYWnIg44px0gFqtRsw5uCrgO6I0wAHtLVWU8xw
-         uAMdkSZR/MDp0E8j81x/taVOtSvCJWa/AJP/38Bue52mZei783yPHJJrYNciQfc/cGTB
-         MA2w==
-X-Gm-Message-State: APjAAAXcyOCnR3MHFNsNjqygUTvEPh/7HejlEENI5r7FKOmvD1NASn31
-        C2U79xTxOFPCotCjyXfJjdXVEv3LBxyU1AeWVLIKix8B0Wy8k78nbUyGtrd6xOaXQcJ3uIB9I4p
-        ieSWTGngaE3hyxk3NEvG6e86qyDH4sOSV6IExtrRh+zmkVi0EcVnk6Q==
-X-Google-Smtp-Source: APXvYqyFPMwO3UjdtV9KZS+Gmczt/6s35R5gwP1hWY2iDENsA0f8Wug5lB3xb2K4izUF2Wgc0QgUD3tjHg==
-X-Received: by 2002:a63:d90c:: with SMTP id r12mr582562pgg.106.1582748000094;
- Wed, 26 Feb 2020 12:13:20 -0800 (PST)
-Date:   Wed, 26 Feb 2020 12:12:43 -0800
-In-Reply-To: <20200226201243.86988-1-morbo@google.com>
-Message-Id: <20200226201243.86988-8-morbo@google.com>
-Mime-Version: 1.0
-References: <20200226094433.210968-1-morbo@google.com> <20200226201243.86988-1-morbo@google.com>
-X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
-Subject: [kvm-unit-tests PATCH v3 7/7] x86: VMX: the "noclone" attribute is gcc-specific
-From:   Bill Wendling <morbo@google.com>
+        id S1727429AbgBZUeE convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 26 Feb 2020 15:34:04 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60282 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727306AbgBZUeE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 15:34:04 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, oupton@google.com, drjones@redhat.com,
-        Bill Wendling <morbo@google.com>
+Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
+ pointer dereference" and crashes
+Date:   Wed, 26 Feb 2020 20:34:03 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: rmuncrief@humanavance.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-206579-28872-xLY6iY9rqb@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
+References: <bug-206579-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't use the "noclone" attribute for clang as it's not supported.
+https://bugzilla.kernel.org/show_bug.cgi?id=206579
 
-Signed-off-by: Bill Wendling <morbo@google.com>
----
- x86/vmx_tests.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+--- Comment #25 from muncrief (rmuncrief@humanavance.com) ---
+Created attachment 287639
+  --> https://bugzilla.kernel.org/attachment.cgi?id=287639&action=edit
+qemu-vkm setup info resulting in nonfunctional avic
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index ad8c002..ec88016 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -4976,7 +4976,10 @@ extern unsigned char test_mtf1;
- extern unsigned char test_mtf2;
- extern unsigned char test_mtf3;
- 
--__attribute__((noclone)) static void test_mtf_guest(void)
-+#ifndef __clang__
-+__attribute__((noclone))
-+#endif
-+static void test_mtf_guest(void)
- {
- 	asm ("vmcall;\n\t"
- 	     "out %al, $0x80;\n\t"
+It occurred to me that the original bug may be solved, and that my problems
+getting avic to function may need to be addressed by creating a separate bug
+report. I'm not sure though, so I created an attachment with my current grub
+command line, qemu-kvm command line, and VM XML to this comment. And you can
+look at Comment 22 to see my resulting system configuration.
+
+And by the way, I've tried a myriad of other options in the command lines and
+XML as well, but they all resulted in avic not functioning so there's no point
+in detailing them all.
+
+So if someone could review this information to verify that everything is setup
+correctly, and let me know if it's time to file a different bug report, I'd
+appreciate it. I know you're all very busy and don't want to bother you with
+inquiries outside the scope of the initial bug.
+
 -- 
-2.25.1.481.gfbce0eb801-goog
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
