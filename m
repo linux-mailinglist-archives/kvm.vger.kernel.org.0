@@ -2,362 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A97616FEED
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 13:26:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4A5716FFB0
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 14:11:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726906AbgBZM04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 07:26:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32641 "EHLO
+        id S1727018AbgBZNLC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 08:11:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57525 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726579AbgBZM04 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 07:26:56 -0500
+        with ESMTP id S1726765AbgBZNLC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 08:11:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582720014;
+        s=mimecast20190719; t=1582722661;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QWhxHToUIqEcThcdCcjqKvcJE1lo575pzZryC31y0DU=;
-        b=RAdBfUyBxjnBfpyfTcegfVH4Wlw6CRxY9Lf7CRUPTlgtPTzoXVzWmba/UrlxeyrrS0qfql
-        SZR+sKVojGdKkIdjnMHhRoQaevUpl1AAoCuTrcyXw2QgiqAdprI/eb2AeBOo6TSLWqANS0
-        wcvSIH/mYLs2vU1G4gDBaBIM1KX5zJM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-_IgPqQmMMwqpVC4MkGmX_g-1; Wed, 26 Feb 2020 07:26:50 -0500
-X-MC-Unique: _IgPqQmMMwqpVC4MkGmX_g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AED63DBA3;
-        Wed, 26 Feb 2020 12:26:48 +0000 (UTC)
-Received: from gondolin (ovpn-117-69.ams2.redhat.com [10.36.117.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 057858C06A;
-        Wed, 26 Feb 2020 12:26:43 +0000 (UTC)
-Date:   Wed, 26 Feb 2020 13:26:40 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     david@redhat.com, Ulrich.Weigand@de.ibm.com, frankja@linux.ibm.com,
-        frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
-        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
-Subject: Re: [PATCH v4.5 09/36] KVM: s390: protvirt: Add initial vm and cpu
- lifecycle handling
-Message-ID: <20200226132640.36c32fd3.cohuck@redhat.com>
-In-Reply-To: <20200225214822.3611-1-borntraeger@de.ibm.com>
-References: <f80a0b58-5ed2-33b7-5292-2c4899d765b7@redhat.com>
-        <20200225214822.3611-1-borntraeger@de.ibm.com>
-Organization: Red Hat GmbH
+        bh=m0TtEHDHCO42Q9GTo9Ybh1BaRZcDi57GOxuE4MyXihQ=;
+        b=YhcZ/SVniwnPR0FpE/39Z05byIhdWGlwZk9h49NPknYlavhltgpfsl5bFIlZeGDu4HGDBI
+        h9E86CRus83qQGjTx9aGLOWDqYu+1F4bZizvYLsV+feU1KuR4pNIX4WjTtp8VfOUg6IWxj
+        YuHXFL692m7F1xqZ8AEQ4gb21mfhos8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351-3pOqwPTtPR6aSK2-41ifbg-1; Wed, 26 Feb 2020 08:10:59 -0500
+X-MC-Unique: 3pOqwPTtPR6aSK2-41ifbg-1
+Received: by mail-wm1-f72.google.com with SMTP id j130so678439wmj.9
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 05:10:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=m0TtEHDHCO42Q9GTo9Ybh1BaRZcDi57GOxuE4MyXihQ=;
+        b=GtesMndCOVg6I2bNPEEXpbDRmkkEfblu1XqZ7aLCjWaGWJUhFGDUkSRU4zi3K3n0fl
+         TAssIy+BbueXkui7iP7ghTsx5aflk4FLUJSDYvYWFZWrC+a+tqjuQ01nBivQTn8Wbkj4
+         3c+jff1RxfQJWM3aEAPLf9uRtLnfgmfQi3fSxvlQ372Y51cvnq4115A4TrLdJZF7yaLE
+         iqadN5TtJOVMyZYcO0jfygWvcvfR88K9+FL5WHeYSSUkg/i6zFNOZPvS/xS27G1+fmED
+         6cRfRMhA7v1ezKxRv04KjBtya1su2+Q1wS508cWrRnbltiJLhXQOxMHjcTB5map+CdA0
+         c4vw==
+X-Gm-Message-State: APjAAAVUFE2mZwU+6ajOr4htYg1HNdXFtkZJ7NJHnAl7MIL+CY14WxbT
+        l5quPNoR9YGUIpIQo2EJMHMHz4Gmxb47A8vzkNzbgHkDXupqiArRu1vFVPh/mtWiZjlmyNnTifw
+        s70v7wA+jpVau
+X-Received: by 2002:adf:ee4c:: with SMTP id w12mr5484067wro.310.1582722658316;
+        Wed, 26 Feb 2020 05:10:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxqfgaBcw9P54nxu0njwaxXrTFvBjiwsyYYA1AskRRYgdt+S83CzUmE04FqC5v5uQVR5VjdlA==
+X-Received: by 2002:adf:ee4c:: with SMTP id w12mr5484050wro.310.1582722658112;
+        Wed, 26 Feb 2020 05:10:58 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id z1sm2777575wmf.42.2020.02.26.05.10.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2020 05:10:57 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Nick Desaulniers <ndesaulniers@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>
+Subject: Re: [PATCH RESEND v2 2/2] KVM: Pre-allocate 1 cpumask variable per cpu for both pv tlb and pv ipis
+In-Reply-To: <CAKwvOd=bDW6K3PC7S5fiG5n_kwgqhbnVsBHUSGgYaPQY-L_YmA@mail.gmail.com>
+References: <1581988104-16628-1-git-send-email-wanpengli@tencent.com> <1581988104-16628-2-git-send-email-wanpengli@tencent.com> <CANRm+CyHmdbsw572x=8=GYEOw-YQCXhz89i9+VEmROBVAu+rvg@mail.gmail.com> <CAKwvOd=bDW6K3PC7S5fiG5n_kwgqhbnVsBHUSGgYaPQY-L_YmA@mail.gmail.com>
+Date:   Wed, 26 Feb 2020 14:10:56 +0100
+Message-ID: <87mu95jxy7.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 25 Feb 2020 16:48:22 -0500
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+Nick Desaulniers <ndesaulniers@google.com> writes:
 
-> From: Janosch Frank <frankja@linux.ibm.com>
-> 
-> This contains 3 main changes:
-> 1. changes in SIE control block handling for secure guests
-> 2. helper functions for create/destroy/unpack secure guests
-> 3. KVM_S390_PV_COMMAND ioctl to allow userspace dealing with secure
-> machines
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_host.h |  24 ++-
->  arch/s390/include/asm/uv.h       |  69 ++++++++
->  arch/s390/kvm/Makefile           |   2 +-
->  arch/s390/kvm/kvm-s390.c         | 209 +++++++++++++++++++++++-
->  arch/s390/kvm/kvm-s390.h         |  33 ++++
->  arch/s390/kvm/pv.c               | 269 +++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h         |  31 ++++
->  7 files changed, 633 insertions(+), 4 deletions(-)
->  create mode 100644 arch/s390/kvm/pv.c
+> (putting Paolo in To: field, in case email filters are to blame.
+> Vitaly, maybe you could ping Paolo internally?)
+>
 
-(...)
+I could, but the only difference from what I'm doing right now would
+proabbly be the absence of non-@redaht.com emails in To/Cc: fields of
+this email :-)
 
-> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
-> +{
-> +	int r = 0;
-> +	u16 dummy;
-> +	void __user *argp = (void __user *)cmd->data;
-> +
-> +	switch (cmd->cmd) {
-> +	case KVM_PV_ENABLE: {
-> +		r = -EINVAL;
-> +		if (kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		/*
-> +		 *  FMT 4 SIE needs esca. As we never switch back to bsca from
-> +		 *  esca, we need no cleanup in the error cases below
-> +		 */
-> +		r = sca_switch_to_extended(kvm);
-> +		if (r)
-> +			break;
-> +
-> +		r = kvm_s390_pv_init_vm(kvm, &cmd->rc, &cmd->rrc);
-> +		if (r)
-> +			break;
-> +
-> +		r = kvm_s390_cpus_to_pv(kvm, &cmd->rc, &cmd->rrc);
-> +		if (r)
-> +			kvm_s390_pv_deinit_vm(kvm, &dummy, &dummy);
-> +		break;
-> +	}
-> +	case KVM_PV_DISABLE: {
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r = kvm_s390_cpus_from_pv(kvm, &cmd->rc, &cmd->rrc);
-> +		/*
-> +		 * If a CPU could not be destroyed, destroy VM will also fail.
-> +		 * There is no point in trying to destroy it. Instead return
-> +		 * the rc and rrc from the first CPU that failed destroying.
-> +		 */
-> +		if (r)
-> +			break;
-> +		r = kvm_s390_pv_deinit_vm(kvm, &cmd->rc, &cmd->rrc);
-> +		break;
-> +	}
+Do we want this fix for one of the last 5.6 RCs or 5.7 would be fine?
+Personally, I'd say we're not in a great hurry and 5.7 is OK.
 
-IIUC, we may end up in an odd state in the failure case, because we
-might not be able to free up the donated memory, depending on what goes
-wrong. Can userspace do anything useful with the vm if that happens?
-
-Even more important, userspace cannot cause repeated donations by
-repeatedly calling this ioctl, right?
-
-> +	case KVM_PV_SET_SEC_PARMS: {
-> +		struct kvm_s390_pv_sec_parm parms = {};
-> +		void *hdr;
-> +
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&parms, argp, sizeof(parms)))
-> +			break;
-> +
-> +		/* Currently restricted to 8KB */
-> +		r = -EINVAL;
-> +		if (parms.length > PAGE_SIZE * 2)
-> +			break;
-> +
-> +		r = -ENOMEM;
-> +		hdr = vmalloc(parms.length);
-> +		if (!hdr)
-> +			break;
-> +
-> +		r = -EFAULT;
-> +		if (!copy_from_user(hdr, (void __user *)parms.origin,
-> +				    parms.length))
-> +			r = kvm_s390_pv_set_sec_parms(kvm, hdr, parms.length,
-> +						      &cmd->rc, &cmd->rrc);
-> +
-> +		vfree(hdr);
-> +		break;
-> +	}
-> +	case KVM_PV_UNPACK: {
-> +		struct kvm_s390_pv_unp unp = {};
-> +
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&unp, argp, sizeof(unp)))
-> +			break;
-> +
-> +		r = kvm_s390_pv_unpack(kvm, unp.addr, unp.size, unp.tweak,
-> +				       &cmd->rc, &cmd->rrc);
-> +		break;
-> +	}
-> +	case KVM_PV_VERIFY: {
-> +		r = -EINVAL;
-> +		if (!kvm_s390_pv_is_protected(kvm))
-> +			break;
-> +
-> +		r = uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
-> +				  UVC_CMD_VERIFY_IMG, &cmd->rc, &cmd->rrc);
-> +		KVM_UV_EVENT(kvm, 3, "PROTVIRT VERIFY: rc %x rrc %x", cmd->rc,
-> +			     cmd->rrc);
-> +		break;
-> +	}
-> +	default:
-> +		return -ENOTTY;
-
-Nit: why not r = -ENOTTY, so you get a single exit point?
-
-> +	}
-> +	return r;
-> +}
-> +
->  long kvm_arch_vm_ioctl(struct file *filp,
->  		       unsigned int ioctl, unsigned long arg)
->  {
-> @@ -2262,6 +2419,27 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  		mutex_unlock(&kvm->slots_lock);
->  		break;
->  	}
-> +	case KVM_S390_PV_COMMAND: {
-> +		struct kvm_pv_cmd args;
-> +
-> +		r = 0;
-> +		if (!is_prot_virt_host()) {
-> +			r = -EINVAL;
-> +			break;
-> +		}
-> +		if (copy_from_user(&args, argp, sizeof(args))) {
-> +			r = -EFAULT;
-> +			break;
-> +		}
-
-The api states that args.flags must be 0... better enforce that?
-
-> +		mutex_lock(&kvm->lock);
-> +		r = kvm_s390_handle_pv(kvm, &args);
-> +		mutex_unlock(&kvm->lock);
-> +		if (copy_to_user(argp, &args, sizeof(args))) {
-> +			r = -EFAULT;
-> +			break;
-> +		}
-> +		break;
-> +	}
->  	default:
->  		r = -ENOTTY;
->  	}
-
-(...)
-
-> @@ -2558,10 +2741,19 @@ static void kvm_free_vcpus(struct kvm *kvm)
->  
->  void kvm_arch_destroy_vm(struct kvm *kvm)
->  {
-> +	u16 rc, rrc;
-
-Nit: missing empty line.
-
->  	kvm_free_vcpus(kvm);
->  	sca_dispose(kvm);
-> -	debug_unregister(kvm->arch.dbf);
->  	kvm_s390_gisa_destroy(kvm);
-> +	/*
-> +	 * We are already at the end of life and kvm->lock is not taken.
-> +	 * This is ok as the file descriptor is closed by now and nobody
-> +	 * can mess with the pv state. To avoid lockdep_assert_held from
-> +	 * complaining we do not use kvm_s390_pv_is_protected.
-> +	 */
-> +	if (kvm_s390_pv_get_handle(kvm))
-> +		kvm_s390_pv_deinit_vm(kvm, &rc, &rrc);
-> +	debug_unregister(kvm->arch.dbf);
->  	free_page((unsigned long)kvm->arch.sie_page2);
->  	if (!kvm_is_ucontrol(kvm))
->  		gmap_remove(kvm->arch.gmap);
-
-(...)
-
-> @@ -4540,6 +4744,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  	if (mem->guest_phys_addr + mem->memory_size > kvm->arch.mem_limit)
->  		return -EINVAL;
->  
-> +	/* When we are protected we should not change the memory slots */
-
-s/protected/protected,/
-
-> +	if (kvm_s390_pv_is_protected(kvm))
-> +		return -EINVAL;
->  	return 0;
->  }
->  
-
-(...)
-
-> +static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
-> +{
-> +	unsigned long base = uv_info.guest_base_stor_len;
-> +	unsigned long virt = uv_info.guest_virt_var_stor_len;
-
-base_len and virt_len? Makes the code below less confusing.
-
-> +	unsigned long npages = 0, vlen = 0;
-> +	struct kvm_memory_slot *memslot;
-> +
-> +	kvm->arch.pv.stor_var = NULL;
-> +	kvm->arch.pv.stor_base = __get_free_pages(GFP_KERNEL, get_order(base));
-> +	if (!kvm->arch.pv.stor_base)
-> +		return -ENOMEM;
-> +
-> +	/*
-> +	 * Calculate current guest storage for allocation of the
-> +	 * variable storage, which is based on the length in MB.
-> +	 *
-> +	 * Slots are sorted by GFN
-> +	 */
-> +	mutex_lock(&kvm->slots_lock);
-> +	memslot = kvm_memslots(kvm)->memslots;
-> +	npages = memslot->base_gfn + memslot->npages;
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	kvm->arch.pv.guest_len = npages * PAGE_SIZE;
-> +
-> +	/* Allocate variable storage */
-> +	vlen = ALIGN(virt * ((npages * PAGE_SIZE) / HPAGE_SIZE), PAGE_SIZE);
-> +	vlen += uv_info.guest_virt_base_stor_len;
-> +	kvm->arch.pv.stor_var = vzalloc(vlen);
-> +	if (!kvm->arch.pv.stor_var)
-> +		goto out_err;
-> +	return 0;
-> +
-> +out_err:
-> +	kvm_s390_pv_dealloc_vm(kvm);
-> +	return -ENOMEM;
-> +}
-> +
-> +/* this should not fail, but if it does we must not free the donated memory */
-
-s/does/does,/
-
-> +int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
-> +{
-> +	int cc;
-> +
-> +	cc = uv_cmd_nodata(kvm_s390_pv_get_handle(kvm),
-> +			   UVC_CMD_DESTROY_SEC_CONF, rc, rrc);
-> +	WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
-> +	atomic_set(&kvm->mm->context.is_protected, 0);
-> +	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", *rc, *rrc);
-> +	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", *rc, *rrc);
-> +	/* Inteded memory leak on "impossible" error */
-> +	if (!cc)
-> +		kvm_s390_pv_dealloc_vm(kvm);
-> +	return cc ? -EIO : 0;
-> +}
-
-(...)
-
-> +struct kvm_pv_cmd {
-> +	__u32 cmd;	/* Command to be executed */
-> +	__u16 rc;	/* Ultravisor return code */
-> +	__u16 rrc;	/* Ultravisor return reason code */
-> +	__u64 data;	/* Data or address */
-> +	__u32 flags;    /* flags for future extensions. Must be 0 for now */
-> +	__u32 reserved[3];
-> +};
-> +
-> +/* Available with KVM_CAP_S390_PROTECTED */
-> +#define KVM_S390_PV_COMMAND		_IOWR(KVMIO, 0xc5, struct kvm_pv_cmd)
-> +
->  /* Secure Encrypted Virtualization command */
->  enum sev_cmd_id {
->  	/* Guest initialization commands */
+-- 
+Vitaly
 
