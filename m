@@ -2,131 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 28FB417034B
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 16:56:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C20117044E
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 17:27:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728629AbgBZP4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 10:56:42 -0500
-Received: from mga07.intel.com ([134.134.136.100]:36551 "EHLO mga07.intel.com"
+        id S1727095AbgBZQ1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 11:27:06 -0500
+Received: from mga18.intel.com ([134.134.136.126]:56029 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728326AbgBZP4m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 10:56:42 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1726148AbgBZQ1G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 11:27:06 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Feb 2020 07:56:41 -0800
-X-ExtLoop1: 1
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Feb 2020 08:27:05 -0800
 X-IronPort-AV: E=Sophos;i="5.70,488,1574150400"; 
-   d="scan'208";a="317457075"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga001.jf.intel.com with ESMTP; 26 Feb 2020 07:56:41 -0800
-Date:   Wed, 26 Feb 2020 07:56:41 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 58/61] KVM: x86/mmu: Configure max page level during
- hardware setup
-Message-ID: <20200226155641.GC9940@linux.intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-59-sean.j.christopherson@intel.com>
- <87blpmlobr.fsf@vitty.brq.redhat.com>
- <20200225210149.GH9245@linux.intel.com>
- <87k149jt38.fsf@vitty.brq.redhat.com>
+   d="scan'208";a="226774328"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Feb 2020 08:27:05 -0800
+Message-ID: <85a8e60bb5fe139424ec6dcc9e827e37fbec3afe.camel@linux.intel.com>
+Subject: Re: [PATCH RFC v4 06/13] mm: Allow to offline unmovable
+ PageOffline() pages via MEM_GOING_OFFLINE
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Juergen Gross <jgross@suse.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Pavel Tatashin <pavel.tatashin@microsoft.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Anthony Yznaga <anthony.yznaga@oracle.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Qian Cai <cai@lca.pw>, Pingfan Liu <kernelfans@gmail.com>
+Date:   Wed, 26 Feb 2020 08:27:04 -0800
+In-Reply-To: <e0892179-b14c-84c3-1284-fc789f16e1c7@redhat.com>
+References: <20191212171137.13872-1-david@redhat.com>
+         <20191212171137.13872-7-david@redhat.com>
+         <6ec496580ddcb629d22589a1cba8cd61cbd53206.camel@linux.intel.com>
+         <267ea186-aba8-1a93-bd55-ac641f78d07e@redhat.com>
+         <3d719897039273a2bb8d0fe7d12563498ebd2897.camel@linux.intel.com>
+         <e0892179-b14c-84c3-1284-fc789f16e1c7@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87k149jt38.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 26, 2020 at 03:55:55PM +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Tue, 2020-02-25 at 23:19 +0100, David Hildenbrand wrote:
+> On 25.02.20 22:46, Alexander Duyck wrote:
+> > On Tue, 2020-02-25 at 19:49 +0100, David Hildenbrand wrote:
+> > > > >  /*
+> > > > >   * Scan pfn range [start,end) to find movable/migratable pages (LRU pages,
+> > > > > - * non-lru movable pages and hugepages). We scan pfn because it's much
+> > > > > - * easier than scanning over linked list. This function returns the pfn
+> > > > > - * of the first found movable page if it's found, otherwise 0.
+> > > > > + * non-lru movable pages and hugepages).
+> > > > > + *
+> > > > > + * Returns:
+> > > > > + *	0 in case a movable page is found and movable_pfn was updated.
+> > > > > + *	-ENOENT in case no movable page was found.
+> > > > > + *	-EBUSY in case a definetly unmovable page was found.
+> > > > >   */
+> > > > > -static unsigned long scan_movable_pages(unsigned long start, unsigned long end)
+> > > > > +static int scan_movable_pages(unsigned long start, unsigned long end,
+> > > > > +			      unsigned long *movable_pfn)
+> > > > >  {
+> > > > >  	unsigned long pfn;
+> > > > >  
+> > > > > @@ -1247,18 +1251,29 @@ static unsigned long scan_movable_pages(unsigned long start, unsigned long end)
+> > > > >  			continue;
+> > > > >  		page = pfn_to_page(pfn);
+> > > > >  		if (PageLRU(page))
+> > > > > -			return pfn;
+> > > > > +			goto found;
+> > > > >  		if (__PageMovable(page))
+> > > > > -			return pfn;
+> > > > > +			goto found;
+> > > > > +
+> > > > > +		/*
+> > > > > +		 * Unmovable PageOffline() pages where somebody still holds
+> > > > > +		 * a reference count (after MEM_GOING_OFFLINE) can definetly
+> > > > > +		 * not be offlined.
+> > > > > +		 */
+> > > > > +		if (PageOffline(page) && page_count(page))
+> > > > > +			return -EBUSY;
+> > > > 
+> > > > So the comment confused me a bit because technically this function isn't
+> > > > about offlining memory, it is about finding movable pages. I had to do a
+> > > > bit of digging to find the only consumer is __offline_pages, but if we are
+> > > > going to talk about "offlining" instead of "moving" in this function it
+> > > > might make sense to rename it.
+> > > 
+> > > Well, it's contained in memory_hotplug.c, and the only user of moving
+> > > pages around in there is offlining code :) And it's job is to locate
+> > > movable pages, skip over some (temporary? unmovable ones) and (now)
+> > > indicate definitely unmovable ones.
+> > > 
+> > > Any idea for a better name?
+> > > scan_movable_pages_and_stop_on_definitely_unmovable() is not so nice :)
+> > 
+> > I dunno. What I was getting at is that the wording here would make it
+> > clearer if you simply stated that these pages "can definately not be
+> > moved". Saying you cannot offline a page that is PageOffline seems kind of
+> > redundant, then again calling it an Unmovable and then saying it cannot be
+> > moves is also redundant I suppose. In the end you don't move them, but
 > 
-> > On Tue, Feb 25, 2020 at 03:43:36PM +0100, Vitaly Kuznetsov wrote:
-> >> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> >> 
-> >> > Configure the max page level during hardware setup to avoid a retpoline
-> >> > in the page fault handler.  Drop ->get_lpage_level() as the page fault
-> >> > handler was the last user.
-> >> > @@ -6064,11 +6064,6 @@ static void svm_set_supported_cpuid(struct kvm_cpuid_entry2 *entry)
-> >> >  	}
-> >> >  }
-> >> >  
-> >> > -static int svm_get_lpage_level(void)
-> >> > -{
-> >> > -	return PT_PDPE_LEVEL;
-> >> > -}
-> >> 
-> >> I've probably missed something but before the change, get_lpage_level()
-> >> on AMD was always returning PT_PDPE_LEVEL, but after the change and when
-> >> NPT is disabled, we set max_page_level to either PT_PDPE_LEVEL (when
-> >> boot_cpu_has(X86_FEATURE_GBPAGES)) or PT_DIRECTORY_LEVEL
-> >> (otherwise). This sounds like a change) unless we think that
-> >> boot_cpu_has(X86_FEATURE_GBPAGES) is always true on AMD.
-> >
-> > It looks like a functional change, but isn't.  kvm_mmu_hugepage_adjust()
-> > caps the page size used by KVM's MMU at the minimum of ->get_lpage_level()
-> > and the host's mapping level.  Barring an egregious bug in the kernel MMU,
-> > the host page tables will max out at PT_DIRECTORY_LEVEL (2mb) unless
-> > boot_cpu_has(X86_FEATURE_GBPAGES) is true.
-> >
-> > In other words, this is effectively a "documentation" change.  I'll figure
-> > out a way to explain this in the changelog...
-> >
-> >         max_level = min(max_level, kvm_x86_ops->get_lpage_level());
-> >         for ( ; max_level > PT_PAGE_TABLE_LEVEL; max_level--) {
-> >                 linfo = lpage_info_slot(gfn, slot, max_level);
-> >                 if (!linfo->disallow_lpage)
-> >                         break;
-> >         }
-> >
-> >         if (max_level == PT_PAGE_TABLE_LEVEL)
-> >                 return PT_PAGE_TABLE_LEVEL;
-> >
-> >         level = host_pfn_mapping_level(vcpu, gfn, pfn, slot);
-> >         if (level == PT_PAGE_TABLE_LEVEL)
-> >                 return level;
-> >
-> >         level = min(level, max_level); <---------
+> So, in summary, there are
+> - PageOffline() pages that are movable (balloon compaction).
+> - PageOffline() pages that cannot be moved and cannot be offlined (e.g.,
+>   no balloon compaction enabled, XEN, HyperV, ...) . page_count(page) >=
+>   0
+> - PageOffline() pages that cannot be moved, but can be offlined.
+>   page_count(page) == 0.
 > 
-> Ok, I see (I believe):
 > 
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > they can be switched to offline if the page count hits 0. When that
+> > happens you simply end up skipping over them in the code for
+> > __test_page_isolated_in_pageblock and __offline_isolated_pages.
 > 
-> It would've helped me a bit if kvm_configure_mmu() was written the
-> following way:
+> Yes. The thing with the wording is that pages with (PageOffline(page) &&
+> !page_count(page)) can also not really be moved, but they can be skipped
+> when offlining. If we call that "moving them to /dev/null", then yes,
+> they can be moved to some degree :)
 > 
-> void kvm_configure_mmu(bool enable_tdp, int tdp_page_level)
-> {
->         tdp_enabled = enable_tdp;
+> I can certainly do here e.g.,
 > 
-> 	if (boot_cpu_has(X86_FEATURE_GBPAGES))
->                 max_page_level = PT_PDPE_LEVEL;
->         else
->                 max_page_level = PT_DIRECTORY_LEVEL;
+> /*
+>  * PageOffline() pages that are not marked __PageMovable() and have a
+>  * reference count > 0 (after MEM_GOING_OFFLINE) are definitely
+>  * unmovable. If their reference count would be 0, they could be skipped
+>  * when offlining memory sections.
+>  */
 > 
->         if (tdp_enabled)
-> 		max_page_level = min(tdp_page_level, max_page_level);
-> }
+> And maybe I'll add to the function doc, that unmovable pages that are
+> skipped in this function can include pages that can be skipped when
+> offlining (moving them to nirvana).
 > 
-> (we can't have cpu_has_vmx_ept_1g_page() and not
-> boot_cpu_has(X86_FEATURE_GBPAGES), right?)
+> Other suggestions?
 
-Wrong, because VMX.  It could even occur on a real system if the user
-disables the feature via kernel param, e.g. "clearcpuid=58".  In the end it
-won't actually change anything because KVM caps its page size at the kernel
-page size (as above).  Well, unless someone is running a custom kernel that
-does funky things.
+No, this sounds good and makes it much clearer.
 
-> But this is certainly just a personal preference, feel free to ignore)
+> [...]
+> 
+> > > [1] we detect a definite offlining blocker and
+> > > 
+> > > > > +		} while (!ret);
+> > > > > +
+> > > > > +		if (ret != -ENOENT) {
+> > > > > +			reason = "unmovable page";
+> > > 
+> > > [2] we abort offlining
+> > > 
+> > > > > +			goto failed_removal_isolated;
+> > > > >  		}
+> > > > >  
+> > > > >  		/*
+> > 
+> > Yeah, this is the piece I misread.  I knew the loop this was in previously
+> > was looping when returning -ENOENT so for some reason I had it in my head
+> > that you were still looping on -EBUSY.
+> 
+> Ah okay, I see. Yeah, that wouldn't make sense for the use case I have :)
+> 
+> > So the one question I would have is if at this point are we guaranteed
+> > that the balloon drivers have already taken care of the page count for all
+> > the pages they set to PageOffline? Based on the patch description I was
+> > thinking that this was going to be looping for a while waiting for the
+> > driver to clear the pages and then walking through them at the end of the
+> > loop via check_pages_isolated_cb.
+> 
+> So, e.g., the patch description states
+> 
+> "Let's allow to do that by allowing to isolate any PageOffline() page
+> when offlining. This way, we can reach the memory hotplug notifier
+> MEM_GOING_OFFLINE, where the driver can signal that he is fine with
+> offlining this page by dropping its reference count."
+> 
+> Any balloon driver that does not allow offlining (e.g., XEN, HyperV,
+> virtio-balloon), will always have a refcount of (at least) 1. Drivers
+> that want to make use of that (esp. virtio-mem, but eventually also
+> HyperV), will drop their refcount via the MEM_GOING_OFFLINE call.
+> 
+> So yes, at this point, all applicable users were notified via
+> MEM_GOING_OFFLINE and had their chance to decrement the refcount. If
+> they didn't, offlining will be aborted.
+> 
+> Thanks again!
 
-I'm on the fence.  Part of me likes having max_page_level reflect what KVM
-is capable of, irrespective of the kernel.
+Thank you as well. I'm still getting up to speed on the inner workings of
+much of this and so discussions such as this usually prove to be quite
+beneficial for me.
+
