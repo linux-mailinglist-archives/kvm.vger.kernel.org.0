@@ -2,85 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 00DD716FB30
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 10:45:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26BC716FB8D
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 11:02:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728000AbgBZJpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 04:45:15 -0500
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:32874 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727973AbgBZJpO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 04:45:14 -0500
-Received: by mail-pg1-f201.google.com with SMTP id 37so1523816pgq.0
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 01:45:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=ansmD08qeSQd3zCEhBBHvF2ZiEtCQ7Cypjwva684W3Y=;
-        b=bSg/lgzO8EyFmpdJa2X9yE+aw7omAzEe9b9MN0UpOqHdJFzplGKmhAesP+WMvUIDrI
-         d3/0M5sRUyLVelAeJxhhqyo5hXn4A02sR3tS0HIs8rO4FuedRefAi9WxyNETryov/+ru
-         VzhtVqsEQ1YQlWwDviU76BXc7+2G+D9UXp4mxzdyhicvhhvycR23ofF65zNCLC1E25ul
-         fmX0NbdyEq2cKOw7lfVIe5C421n0RzvVZouIJH/mW9x4RVPyV3QEYLvvi9ehwRJTXY2W
-         eL53JViDy4p776qC8pXqse9wztUajrD+U7oUc4rfdi80447xXd9pJAZY5kWGpG4DpzWq
-         k6Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=ansmD08qeSQd3zCEhBBHvF2ZiEtCQ7Cypjwva684W3Y=;
-        b=nL/FglODf68Coo6OhgC0mo6I0SglRq6rbbVZGouDew5f0JzDs6e4lbB6p7d3+vpgRX
-         9tuZEXODFJdKPP1GrIbPCyhEhzG/LKSmjxeEyd2zazkTTaYptZ5E3gEnkdYOUuvjJCA+
-         /HJ/DrPKAKUFihxo/COMsNW4LYuCU/NrDYSUDbOCu35qrdwU34r26YoJM7SFsTPuVc80
-         JpdNFInkTwfsGTs1DlbAypD2kyjvucqMDg0FrPAukM9xvjt5Vj3AHLByPazp6LflSRaw
-         LlRZQgIMLZOj6T1idL1RfbdnGlLGadKAdAgKWRlq+EYD+GIeghn+6YSHMu9ZShEs7uEu
-         8YVw==
-X-Gm-Message-State: APjAAAWheNpyyn6NXTsLEF5K5X6AcXDn1naB6uo+UQV9sret0RcaifQO
-        NSG7hwXZaDBWwp1lyT29QcMVfiOywjsvPDvHpaUy5HOyOQV1NN8dmsUFiqoGf7WmSazs672TW8l
-        RCOGWZ2pThQ7fBU1Nqo90jD3tRV4zghyUdU1S6GPHqJprKJJQ8mXrgA==
-X-Google-Smtp-Source: APXvYqxtDaimY5cY7HlA/FVJiMnSVTNbWXaOP/GHptQrOggE8upKzyNBA59154aPbwXqe4FyTqfA8XtYJQ==
-X-Received: by 2002:a63:68a:: with SMTP id 132mr3136042pgg.12.1582710313516;
- Wed, 26 Feb 2020 01:45:13 -0800 (PST)
-Date:   Wed, 26 Feb 2020 01:44:33 -0800
-In-Reply-To: <20200226094433.210968-1-morbo@google.com>
-Message-Id: <20200226094433.210968-15-morbo@google.com>
-Mime-Version: 1.0
-References: <20200226074427.169684-1-morbo@google.com> <20200226094433.210968-1-morbo@google.com>
-X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
-Subject: [kvm-unit-tests PATCH 7/7] x86: VMX: the "noclone" attribute is gcc-specific
-From:   Bill Wendling <morbo@google.com>
-To:     kvm@vger.kernel.org
-Cc:     oupton@google.com, pbonzini@redhat.com, drjones@redhat.com,
-        Bill Wendling <morbo@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727711AbgBZKB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 05:01:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34778 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726936AbgBZKB7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Feb 2020 05:01:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582711318;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WQzA3mK4mHtYXw0jrMCpxXNAFmo6TM/Bwek6CpY7xvI=;
+        b=ew7N13U/C9pfrQ4vLZWhrq9s3O01cYUHLtKA4OTYQo4SqfWoRLCZ6rhWvP+RpnacNzqsJv
+        J/gSWaFNX22HOkzchHIxa8Os/Fg+HqLh/9xO2hRIjPmo95jHz2WpVFvGUWywsvtF3z9Rc8
+        GvjtA0dfLKWDszOrh0M/OLTgMYzZSKs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-FN-vSzuBPSmNK0WO_TV_MQ-1; Wed, 26 Feb 2020 05:01:54 -0500
+X-MC-Unique: FN-vSzuBPSmNK0WO_TV_MQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A25F8107ACCA;
+        Wed, 26 Feb 2020 10:01:52 +0000 (UTC)
+Received: from gondolin (ovpn-117-69.ams2.redhat.com [10.36.117.69])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA1C35D9CD;
+        Wed, 26 Feb 2020 10:01:47 +0000 (UTC)
+Date:   Wed, 26 Feb 2020 11:01:44 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     david@redhat.com, Ulrich.Weigand@de.ibm.com, frankja@linux.ibm.com,
+        frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
+        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
+Subject: Re: [PATCH v4.5 09/36] KVM: s390: protvirt: Add initial vm and cpu
+ lifecycle handling
+Message-ID: <20200226110144.4677ac60.cohuck@redhat.com>
+In-Reply-To: <20200225214822.3611-1-borntraeger@de.ibm.com>
+References: <f80a0b58-5ed2-33b7-5292-2c4899d765b7@redhat.com>
+        <20200225214822.3611-1-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't use the "noclone" attribute for clang as it's not supported.
+On Tue, 25 Feb 2020 16:48:22 -0500
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Signed-off-by: Bill Wendling <morbo@google.com>
----
- x86/vmx_tests.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> This contains 3 main changes:
+> 1. changes in SIE control block handling for secure guests
+> 2. helper functions for create/destroy/unpack secure guests
+> 3. KVM_S390_PV_COMMAND ioctl to allow userspace dealing with secure
+> machines
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/include/asm/kvm_host.h |  24 ++-
+>  arch/s390/include/asm/uv.h       |  69 ++++++++
+>  arch/s390/kvm/Makefile           |   2 +-
+>  arch/s390/kvm/kvm-s390.c         | 209 +++++++++++++++++++++++-
+>  arch/s390/kvm/kvm-s390.h         |  33 ++++
+>  arch/s390/kvm/pv.c               | 269 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h         |  31 ++++
+>  7 files changed, 633 insertions(+), 4 deletions(-)
+>  create mode 100644 arch/s390/kvm/pv.c
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index ad8c002..ec88016 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -4976,7 +4976,10 @@ extern unsigned char test_mtf1;
- extern unsigned char test_mtf2;
- extern unsigned char test_mtf3;
- 
--__attribute__((noclone)) static void test_mtf_guest(void)
-+#ifndef __clang__
-+__attribute__((noclone))
-+#endif
-+static void test_mtf_guest(void)
- {
- 	asm ("vmcall;\n\t"
- 	     "out %al, $0x80;\n\t"
--- 
-2.25.0.265.gbab2e86ba0-goog
+(...)
+
+> @@ -2165,6 +2168,160 @@ static int kvm_s390_set_cmma_bits(struct kvm *kvm,
+>  	return r;
+>  }
+>  
+> +static int kvm_s390_cpus_from_pv(struct kvm *kvm, u16 *rcp, u16 *rrcp)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	u16 rc, rrc;
+> +	int ret = 0;
+> +	int i;
+> +
+> +	/*
+> +	 * We ignore failures and try to destroy as many CPUs as possible.
+
+What is this 'destroying'? Is that really the right terminology? From a
+quick glance, I would expect something more in the vein of cpu
+unplugging, and I don't think that's what is happening here.
+
+(I have obviously not yet read the whole thing, please give people some
+more time to review this huge patch.)
+
+> +	 * At the same time we must not free the assigned resources when
+> +	 * this fails, as the ultravisor has still access to that memory.
+> +	 * So kvm_s390_pv_destroy_cpu can leave a "wanted" memory leak
+> +	 * behind.
+> +	 * We want to return the first failure rc and rrc, though.
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		mutex_lock(&vcpu->mutex);
+> +		if (kvm_s390_pv_destroy_cpu(vcpu, &rc, &rrc) && !ret) {
+> +			*rcp = rc;
+> +			*rrcp = rrc;
+> +			ret = -EIO;
+> +		}
+> +		mutex_unlock(&vcpu->mutex);
+> +	}
+> +	return ret;
+> +}
+> +
+> +static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
+> +{
+> +	int i, r = 0;
+> +	u16 dummy;
+> +
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		mutex_lock(&vcpu->mutex);
+> +		r = kvm_s390_pv_create_cpu(vcpu, rc, rrc);
+> +		mutex_unlock(&vcpu->mutex);
+> +		if (r)
+> +			break;
+> +	}
+> +	if (r)
+> +		kvm_s390_cpus_from_pv(kvm, &dummy, &dummy);
+
+This is a rather unlikely case, so we don't need to optimize this,
+right?
+
+Would rc/rrc from the rollback contain anything of interest if the
+create fails (that is, anything more interesting than what that
+function returns?
+
+Similar comment for the 'create' as for the 'destroy' above. (Not
+trying to nitpick, just a bit confused.)
+
+Or is that not the cpu that is created/destroyed, but something else?
+Sorry, just trying to understand where this is coming from.
+
+> +	return r;
+> +}
+
+(...)
+
+Will look at the remainder of the patch later, maybe I understand the
+stuff above better after that.
 
