@@ -2,163 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 775D816F7E1
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 07:22:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F8E616F8AD
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 08:44:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727262AbgBZGNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 01:13:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38300 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726407AbgBZGNK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 01:13:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582697588;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Qomx+ZbKWIrzZtErXMfwcPJrjlc3eZgjsPhGLKwY99k=;
-        b=ikzo3AStrM2846tHd/S5/F/ytuVHn8z+qpwTGY8EK53fqgxvWuN3kXXuzl95M4KZIf28JZ
-        hWefZKC+SCzVFyZhCds5+TrngI2OjrPDKPTF4RtqzyhDDrSoMhyldTdm+kyaCgdUEGRFRV
-        aDiz701cRWmQwUVYQ0ZpTFfAyIUupO4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-mlezykjlOrKrQv0WTr5MZQ-1; Wed, 26 Feb 2020 01:13:07 -0500
-X-MC-Unique: mlezykjlOrKrQv0WTr5MZQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4343A800053;
-        Wed, 26 Feb 2020 06:13:04 +0000 (UTC)
-Received: from [10.72.13.217] (ovpn-13-217.pek2.redhat.com [10.72.13.217])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 09EC0396;
-        Wed, 26 Feb 2020 06:12:30 +0000 (UTC)
-Subject: Re: [PATCH V4 5/5] vdpasim: vDPA device simulator
-From:   Jason Wang <jasowang@redhat.com>
-To:     Jason Gunthorpe <jgg@mellanox.com>
-Cc:     "mst@redhat.com" <mst@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "aadam@redhat.com" <aadam@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        Shahaf Shuler <shahafs@mellanox.com>,
-        "hanand@xilinx.com" <hanand@xilinx.com>,
-        "mhabets@solarflare.com" <mhabets@solarflare.com>
-References: <20200220061141.29390-1-jasowang@redhat.com>
- <20200220061141.29390-6-jasowang@redhat.com>
- <20200220151215.GU23930@mellanox.com>
- <6c341a77-a297-b7c7-dea5-b3f7b920b1f3@redhat.com>
-Message-ID: <793a1b81-4f78-c405-4aae-f32a2bf67d87@redhat.com>
-Date:   Wed, 26 Feb 2020 14:12:26 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <6c341a77-a297-b7c7-dea5-b3f7b920b1f3@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
+        id S1727223AbgBZHou (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 02:44:50 -0500
+Received: from mail-pj1-f73.google.com ([209.85.216.73]:34264 "EHLO
+        mail-pj1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726587AbgBZHou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 02:44:50 -0500
+Received: by mail-pj1-f73.google.com with SMTP id v8so3003392pju.1
+        for <kvm@vger.kernel.org>; Tue, 25 Feb 2020 23:44:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Dvhrew6bJQSEcOdx0LzKYO1ItCUbvb7ulg82U8Cs/x4=;
+        b=r1rbRrBoqOcHZEEks629lSsI0EwzmHU6fFI5X2n1T+ASmdVyGZAAioTDr6TYSItEmx
+         zNIUkC3t18J8Cs7zAGnLlGGcLsJgsPdPZABWsNS96z0il8889+6clORwMhEhoZGsK2eE
+         iL9Tv08RvRFmUfKLYSMykRjBsXEvFVUrWa0IcWwk+z0g4uhTQyLcCAe/7Z+Q0B2Ay+xZ
+         xNxYqYMsakI/2SEX/dNepiMi2CZNsVt14BcGX2lsYO1NoMp4FXwhPeFRGD590PEPFDyM
+         qDM02Ua/DRY6L+SAxIQBX+1re1J02sA5EjUsAGcQAikneReLiWj9f/s01JqpmCGu8CzN
+         4hiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Dvhrew6bJQSEcOdx0LzKYO1ItCUbvb7ulg82U8Cs/x4=;
+        b=gYqKBT8fCX/xguZNrHZIKIqoAja0UdiF99a7xVl0rNg6hCgxCzwQ9mr5TR+VxbghQY
+         +ZYiacLZq5T1zZ1i4DlqvZ2EDmMlDFB/AWjeM+GRt3BeJgOi2KFoLgfj1juW1yP84/7O
+         PsPvR3cJFmk4ChOi1+UzC7jxs77AQw930HDRqn0XDAcCIJ8pR8UsUbj6CA23IWh4DKKz
+         Ug6KqZ1vGoxnPEH/cCQTTgDeRMyDkbEeLlLoPg5E85Esw9PgmHy7Oj+j7Td3/mCxDwJq
+         kaMwkOG+Jf9VvBYjeW1XrY1E16muaD9njzZ3kNWGbWug/edE9OO6vTXAzooFlPVNYdPR
+         RukA==
+X-Gm-Message-State: APjAAAXaW2/3jTmOWSsy0GD/MGEkwFs0xYAIEUztRNaISqTZ1H+IaXvI
+        HjjgwGrSHrPeWZ8QJ234sQftldO3LzbsKVLUxEbofZh/EBdqNNgqtTfUv0zJMmEoP6ZVULEAqyp
+        KbrkDFDTCN6xQVtt63e0JvGJRXFQ2brcL+O+nl3Ar2pUzKbGoBoid1A==
+X-Google-Smtp-Source: APXvYqyRwxXJMYEbSR91aXCwv5WqK+2o+xKZCoVWnh5Bm7FRiEEhQaoJDsdzgSeQhbyR4qS4Qd5PcbkoWw==
+X-Received: by 2002:a63:e65:: with SMTP id 37mr2523168pgo.171.1582703089253;
+ Tue, 25 Feb 2020 23:44:49 -0800 (PST)
+Date:   Tue, 25 Feb 2020 23:44:20 -0800
+Message-Id: <20200226074427.169684-1-morbo@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+Subject: [kvm-unit-tests PATCH 0/7] Fixes for clang builds
+From:   morbo@google.com
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, Bill Wendling <morbo@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Bill Wendling <morbo@google.com>
 
-On 2020/2/21 =E4=B8=8B=E5=8D=883:57, Jason Wang wrote:
->
-> On 2020/2/20 =E4=B8=8B=E5=8D=8811:12, Jason Gunthorpe wrote:
->> On Thu, Feb 20, 2020 at 02:11:41PM +0800, Jason Wang wrote:
->>> +static void vdpasim_device_release(struct device *dev)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 struct vdpasim *vdpasim =3D dev_to_sim(dev);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 cancel_work_sync(&vdpasim->work);
->>> +=C2=A0=C2=A0=C2=A0 kfree(vdpasim->buffer);
->>> +=C2=A0=C2=A0=C2=A0 vhost_iotlb_free(vdpasim->iommu);
->>> +=C2=A0=C2=A0=C2=A0 kfree(vdpasim);
->>> +}
->>> +
->>> +static struct vdpasim *vdpasim_create(void)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 struct virtio_net_config *config;
->>> +=C2=A0=C2=A0=C2=A0 struct vhost_iotlb *iommu;
->>> +=C2=A0=C2=A0=C2=A0 struct vdpasim *vdpasim;
->>> +=C2=A0=C2=A0=C2=A0 struct device *dev;
->>> +=C2=A0=C2=A0=C2=A0 void *buffer;
->>> +=C2=A0=C2=A0=C2=A0 int ret =3D -ENOMEM;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 iommu =3D vhost_iotlb_alloc(2048, 0);
->>> +=C2=A0=C2=A0=C2=A0 if (!iommu)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto err;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 buffer =3D kmalloc(PAGE_SIZE, GFP_KERNEL);
->>> +=C2=A0=C2=A0=C2=A0 if (!buffer)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto err_buffer;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 vdpasim =3D kzalloc(sizeof(*vdpasim), GFP_KERNEL)=
-;
->>> +=C2=A0=C2=A0=C2=A0 if (!vdpasim)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto err_alloc;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 vdpasim->buffer =3D buffer;
->>> +=C2=A0=C2=A0=C2=A0 vdpasim->iommu =3D iommu;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 config =3D &vdpasim->config;
->>> +=C2=A0=C2=A0=C2=A0 config->mtu =3D 1500;
->>> +=C2=A0=C2=A0=C2=A0 config->status =3D VIRTIO_NET_S_LINK_UP;
->>> +=C2=A0=C2=A0=C2=A0 eth_random_addr(config->mac);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 INIT_WORK(&vdpasim->work, vdpasim_work);
->>> +=C2=A0=C2=A0=C2=A0 spin_lock_init(&vdpasim->lock);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 vringh_set_iotlb(&vdpasim->vqs[0].vring, vdpasim-=
->iommu);
->>> +=C2=A0=C2=A0=C2=A0 vringh_set_iotlb(&vdpasim->vqs[1].vring, vdpasim-=
->iommu);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 dev =3D &vdpasim->dev;
->>> +=C2=A0=C2=A0=C2=A0 dev->release =3D vdpasim_device_release;
->>> +=C2=A0=C2=A0=C2=A0 dev->coherent_dma_mask =3D DMA_BIT_MASK(64);
->>> +=C2=A0=C2=A0=C2=A0 set_dma_ops(dev, &vdpasim_dma_ops);
->>> +=C2=A0=C2=A0=C2=A0 dev_set_name(dev, "%s", VDPASIM_NAME);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 ret =3D device_register(&vdpasim->dev);
->>> +=C2=A0=C2=A0=C2=A0 if (ret)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto err_init;
->> It is a bit weird to be creating this dummy parent, couldn't this be
->> done by just passing a NULL parent to vdpa_alloc_device, doing
->> set_dma_ops() on the vdpasim->vdpa->dev and setting dma_device to
->> vdpasim->vdpa->dev ?
->
->
-> I think it works.
+This is a series of patches which allow clang to build the
+kvm-unit-tests.
 
+Bill Wendling (7):
+  x86: emulator: use "SSE2" for the target
+  pci: use uint32_t for unsigned long values
+  x86: realmode: syscall: add explicit size suffix to ambiguous
+    instructions
+  svm: change operand to output-only for matching constraint
+  svm: convert neg shift to unsigned shift
+  x86: VMX: use inline asm to get stack pointer
+  x86: VMX: the "noclone" attribute is gcc-specific
 
-Rethink about this, since most hardware vDPA driver will have a parent=20
-and will use it to find the parent structure e.g
+ lib/linux/pci_regs.h |  4 ++--
+ x86/emulator.c       |  2 +-
+ x86/realmode.c       |  6 +++---
+ x86/svm.c            |  6 +++---
+ x86/syscall.c        |  2 +-
+ x86/vmx_tests.c      | 11 ++++++++---
+ 6 files changed, 18 insertions(+), 13 deletions(-)
 
-dev_get_drvdata(vdpa->dev->parent)
-
-So I keep this dummy parent in V5.
-
-Thanks
-
+-- 
+2.25.0.265.gbab2e86ba0-goog
 
