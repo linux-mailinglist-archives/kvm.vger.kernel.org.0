@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 43BCD16FB28
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 10:45:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B92716FB2A
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 10:45:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727736AbgBZJpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 04:45:01 -0500
-Received: from mail-pl1-f201.google.com ([209.85.214.201]:40356 "EHLO
-        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727377AbgBZJpB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 04:45:01 -0500
-Received: by mail-pl1-f201.google.com with SMTP id y2so1599180plt.7
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 01:45:00 -0800 (PST)
+        id S1727968AbgBZJpE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 04:45:04 -0500
+Received: from mail-qv1-f73.google.com ([209.85.219.73]:51186 "EHLO
+        mail-qv1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727952AbgBZJpE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 04:45:04 -0500
+Received: by mail-qv1-f73.google.com with SMTP id c1so3152450qvw.17
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 01:45:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=cP9wqX9zD2QYAnoO8iF4RES2Unhc0okGozzqNVM7XW8=;
-        b=EP8ktxywocUVJ4ej5D4iYSH9iUPGY4PibcySxzKGTh5bA/uY0HgOpHEd6iwccjhvrg
-         WnzJQlcoSlfx4WqObOsofopXyHh7NCC1hD+F305EVCz0LsQEm1qSSk1ZovqBHqTKLy0D
-         Ip8XV9fi2fOEpvmdICVcAQpLv33TivtZ/g39lZ4vq+qM6Qoy/tdsK+HW7GYpxY+jCQFR
-         NrP20qLjgWWWi5/kpS6nK+tZjXTW0c5U35ueX1ovQSSef3yj885DWk9Aa6hqC/Iqd1pt
-         NrYbA+01NucgrxVAfBRHATipEqQNlfw8qrwEX4vuYKyuh0y/r1SL5qPOCB4gOiNtTWhC
-         F6Gw==
+        bh=X8sk38JcHcyj3teXeT7Jj1TNQ3W5tYgn8rNWYfS/zck=;
+        b=G5aNBFlQLED8pf5uEEbDE/9htzAgojcJ92v/B9SXLqHaeB7nu8sW98f4IurmSL2+ap
+         S0kcTCUNlm7xx4MAHnQMfjOMBl/33f6Tcr2xM4apxR6vKGqcPrY7jbaHWcqsm51lyBYc
+         7haqBk7n1fWwH2arwRCgDmrraR2vuTgQDVrEpXMZAZaId1ROjATK7rhmTupaOap3YYYa
+         SBuNBUPahPsZJcxUkq5F2UxmVqp3yAco66JLJ7kEJFmTi5uxqLz6oiJzHVqYr7LYl89Z
+         VI5tMuMayVBN203Ix6LANAdZrgum9Kxgjc/lvcFNWsUIhSI80RAa8dfUfXG5Ummt/612
+         rH2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=cP9wqX9zD2QYAnoO8iF4RES2Unhc0okGozzqNVM7XW8=;
-        b=LeAv23AFtP53qpxtO56kRkbER7UJhp8Qf4m+I/ZBfwv28WNMTnQoDDNtj+h4qFVKB6
-         oLn2KX8hSPAbkcjPaqM7wdWlaTgoAFIcqSWGbAA3O2kvkG0zplytjLjp32SFPbW7JMku
-         vkhvR1cT/vxqGrPEOYIIQL26H6W7Z0sDDmkRwYrEW7uQCv9r8gJ/j46nOaCTk/GKEn2Q
-         SGPo09u960981SIILBah7RyciBqQm4AGzfyHaTzz61cu+FbqaM6ZUw0rnmSwuwgRmrTL
-         A914HwmdRdIqG6CxT1JYFcUP72Gp5TBnj6WLt4sjZxPBnmu7P5FOq4wNc6rE8ITQSMBY
-         pUNw==
-X-Gm-Message-State: APjAAAVELLszVbjHrzA8bTkm8/lx1H+G0igk0RweXecS8i5uLUQKSSU+
-        dSC4Giy/Et/X2i3GELLhg/uvNvHEnhbOePXCfwv6AbDpouzjsFGALirppQG733sFdJfye/o9Gsh
-        jRS2T/0qbxC5ffP+XDF+pMH+RPh2pBNInXmkcbizpSUSMvoxC+k+6kg==
-X-Google-Smtp-Source: APXvYqyTJQYmcRl3J9RT+hOz8gZ6UkhpgnMwSgBGIwnIvLs6/1t+gbJ5JvCgoEExBYNSKM0vkrjN2Vb5NQ==
-X-Received: by 2002:a63:7e52:: with SMTP id o18mr3091857pgn.46.1582710299978;
- Wed, 26 Feb 2020 01:44:59 -0800 (PST)
-Date:   Wed, 26 Feb 2020 01:44:28 -0800
+        bh=X8sk38JcHcyj3teXeT7Jj1TNQ3W5tYgn8rNWYfS/zck=;
+        b=KkXXDKCAhV4ezxu4LgK+QC8Q5SOL5OAOObO6e9bklHU9dgKazBPEe/Js91qm0WrEtl
+         aRJXQlEvRaSJURGObjl+Y5C/Klqh9NrjdHEbSqGfnMa1B5W8K1nJ8N7PQy7HLf2BaShG
+         /nHZnS58CJVq4liIGtUC6ase19qSMmcoN0ybQkpWfAGEMnitqUcevw9BHRP6rwYKCz3o
+         6lwrTccMbsKBl3GilNfnVdu/OhroPDCHFh1qbncqViYT6fOGtE/UuRqoExItkz7NdMaa
+         d2UbrkYGH84n2YMVXgSA5cXYL78yCO7cVj7Xo7Omq+C18kWkya3VGsZ4opWC1hD1OANc
+         vylQ==
+X-Gm-Message-State: APjAAAVq5y9ZUNiSPkHAbsjud8Ng2KFsZTAYTOZfzJsgG732gAHmRzqb
+        EpkbFd93Pkv77aII8sBGEdLejiNsP8GuUSrqg+vt3yBLGh3QgDPJdpmVdkwhu8h0llV0huNscEv
+        P46ChxLC14RSRCcQT0OFchnWfObkEYnWRYcJUybZSYlqIDGS0WOmkcw==
+X-Google-Smtp-Source: APXvYqxPzL4WoT4R6nk4hX7bPsf19ptKB1Psb2Id6qzb6C0JW0ulSvBV/eklvely4sPU2TN2f+Jscq8Sfw==
+X-Received: by 2002:ac8:4cc9:: with SMTP id l9mr3558474qtv.207.1582710302954;
+ Wed, 26 Feb 2020 01:45:02 -0800 (PST)
+Date:   Wed, 26 Feb 2020 01:44:29 -0800
 In-Reply-To: <20200226094433.210968-1-morbo@google.com>
-Message-Id: <20200226094433.210968-10-morbo@google.com>
+Message-Id: <20200226094433.210968-11-morbo@google.com>
 Mime-Version: 1.0
 References: <20200226074427.169684-1-morbo@google.com> <20200226094433.210968-1-morbo@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
-Subject: [kvm-unit-tests PATCH 5/7] svm: convert neg shift to unsigned shift
+Subject: [kvm-unit-tests PATCH v2 5/7] x86: VMX: Add tests for monitor trap flag
 From:   Bill Wendling <morbo@google.com>
 To:     kvm@vger.kernel.org
 Cc:     oupton@google.com, pbonzini@redhat.com, drjones@redhat.com,
+        Jim Mattson <jmattson@google.com>,
         Bill Wendling <morbo@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
@@ -58,27 +59,215 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Shifting a negative signed value is undefined. Use a shift of an
-unsigned value instead.
+From: Oliver Upton <oupton@google.com>
 
+Test to verify that MTF VM-exits into host are synthesized when the
+'monitor trap flag' processor-based VM-execution control is set under
+various conditions.
+
+Expect an MTF VM-exit if instruction execution produces no events other
+than MTF. Should instruction execution produce a concurrent debug-trap
+and MTF event, expect an MTF VM-exit with the 'pending debug exceptions'
+VMCS field set. Expect an MTF VM-exit to follow event delivery should
+instruction execution generate a higher-priority event, such as a
+general-protection fault. Lastly, expect an MTF VM-exit to follow
+delivery of a debug-trap software exception (INT1/INT3/INTO/INT n).
+
+Signed-off-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Bill Wendling <morbo@google.com>
 ---
- x86/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ x86/vmx.h       |   1 +
+ x86/vmx_tests.c | 157 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 158 insertions(+)
 
-diff --git a/x86/svm.c b/x86/svm.c
-index ae85194..17be4b0 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -1148,7 +1148,7 @@ static bool npt_rw_l1mmio_check(struct test *test)
+diff --git a/x86/vmx.h b/x86/vmx.h
+index 6214400..6adf091 100644
+--- a/x86/vmx.h
++++ b/x86/vmx.h
+@@ -399,6 +399,7 @@ enum Ctrl0 {
+ 	CPU_NMI_WINDOW		= 1ul << 22,
+ 	CPU_IO			= 1ul << 24,
+ 	CPU_IO_BITMAP		= 1ul << 25,
++	CPU_MTF			= 1ul << 27,
+ 	CPU_MSR_BITMAP		= 1ul << 28,
+ 	CPU_MONITOR		= 1ul << 29,
+ 	CPU_PAUSE		= 1ul << 30,
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 1323dc5..a7abd63 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -4970,6 +4970,162 @@ static void test_vmx_preemption_timer(void)
+ 	vmcs_write(EXI_CONTROLS, saved_exit);
  }
  
- #define TSC_ADJUST_VALUE    (1ll << 32)
--#define TSC_OFFSET_VALUE    (-1ll << 48)
-+#define TSC_OFFSET_VALUE    (~0ull << 48)
- static bool ok;
- 
- static void tsc_adjust_prepare(struct test *test)
++extern unsigned char test_mtf1;
++extern unsigned char test_mtf2;
++extern unsigned char test_mtf3;
++
++__attribute__((noclone)) static void test_mtf_guest(void)
++{
++	asm ("vmcall;\n\t"
++	     "out %al, $0x80;\n\t"
++	     "test_mtf1:\n\t"
++	     "vmcall;\n\t"
++	     "out %al, $0x80;\n\t"
++	     "test_mtf2:\n\t"
++	     /*
++	      * Prepare for the 'MOV CR3' test. Attempt to induce a
++	      * general-protection fault by moving a non-canonical address into
++	      * CR3. The 'MOV CR3' instruction does not take an imm64 operand,
++	      * so we must MOV the desired value into a register first.
++	      *
++	      * MOV RAX is done before the VMCALL such that MTF is only enabled
++	      * for the instruction under test.
++	      */
++	     "mov $0x8000000000000000, %rax;\n\t"
++	     "vmcall;\n\t"
++	     "mov %rax, %cr3;\n\t"
++	     "test_mtf3:\n\t"
++	     "vmcall;\n\t"
++	     /*
++	      * ICEBP/INT1 instruction. Though the instruction is now
++	      * documented, don't rely on assemblers enumerating the
++	      * instruction. Resort to hand assembly.
++	      */
++	     ".byte 0xf1;\n\t");
++}
++
++static void test_mtf_gp_handler(struct ex_regs *regs)
++{
++	regs->rip = (unsigned long) &test_mtf3;
++}
++
++static void test_mtf_db_handler(struct ex_regs *regs)
++{
++}
++
++static void enable_mtf(void)
++{
++	u32 ctrl0 = vmcs_read(CPU_EXEC_CTRL0);
++
++	vmcs_write(CPU_EXEC_CTRL0, ctrl0 | CPU_MTF);
++}
++
++static void disable_mtf(void)
++{
++	u32 ctrl0 = vmcs_read(CPU_EXEC_CTRL0);
++
++	vmcs_write(CPU_EXEC_CTRL0, ctrl0 & ~CPU_MTF);
++}
++
++static void enable_tf(void)
++{
++	unsigned long rflags = vmcs_read(GUEST_RFLAGS);
++
++	vmcs_write(GUEST_RFLAGS, rflags | X86_EFLAGS_TF);
++}
++
++static void disable_tf(void)
++{
++	unsigned long rflags = vmcs_read(GUEST_RFLAGS);
++
++	vmcs_write(GUEST_RFLAGS, rflags & ~X86_EFLAGS_TF);
++}
++
++static void report_mtf(const char *insn_name, unsigned long exp_rip)
++{
++	unsigned long rip = vmcs_read(GUEST_RIP);
++
++	assert_exit_reason(VMX_MTF);
++	report(rip == exp_rip, "MTF VM-exit after %s instruction. RIP: 0x%lx (expected 0x%lx)",
++	       insn_name, rip, exp_rip);
++}
++
++static void vmx_mtf_test(void)
++{
++	unsigned long pending_dbg;
++	handler old_gp, old_db;
++
++	if (!(ctrl_cpu_rev[0].clr & CPU_MTF)) {
++		printf("CPU does not support the 'monitor trap flag' processor-based VM-execution control.\n");
++		return;
++	}
++
++	test_set_guest(test_mtf_guest);
++
++	/* Expect an MTF VM-exit after OUT instruction */
++	enter_guest();
++	skip_exit_vmcall();
++
++	enable_mtf();
++	enter_guest();
++	report_mtf("OUT", (unsigned long) &test_mtf1);
++	disable_mtf();
++
++	/*
++	 * Concurrent #DB trap and MTF on instruction boundary. Expect MTF
++	 * VM-exit with populated 'pending debug exceptions' VMCS field.
++	 */
++	enter_guest();
++	skip_exit_vmcall();
++
++	enable_mtf();
++	enable_tf();
++
++	enter_guest();
++	report_mtf("OUT", (unsigned long) &test_mtf2);
++	pending_dbg = vmcs_read(GUEST_PENDING_DEBUG);
++	report(pending_dbg & DR_STEP,
++	       "'pending debug exceptions' field after MTF VM-exit: 0x%lx (expected 0x%lx)",
++	       pending_dbg, (unsigned long) DR_STEP);
++
++	disable_mtf();
++	disable_tf();
++	vmcs_write(GUEST_PENDING_DEBUG, 0);
++
++	/*
++	 * #GP exception takes priority over MTF. Expect MTF VM-exit with RIP
++	 * advanced to first instruction of #GP handler.
++	 */
++	enter_guest();
++	skip_exit_vmcall();
++
++	old_gp = handle_exception(GP_VECTOR, test_mtf_gp_handler);
++
++	enable_mtf();
++	enter_guest();
++	report_mtf("MOV CR3", (unsigned long) get_idt_addr(&boot_idt[GP_VECTOR]));
++	disable_mtf();
++
++	/*
++	 * Concurrent MTF and privileged software exception (i.e. ICEBP/INT1).
++	 * MTF should follow the delivery of #DB trap, though the SDM doesn't
++	 * provide clear indication of the relative priority.
++	 */
++	enter_guest();
++	skip_exit_vmcall();
++
++	handle_exception(GP_VECTOR, old_gp);
++	old_db = handle_exception(DB_VECTOR, test_mtf_db_handler);
++
++	enable_mtf();
++	enter_guest();
++	report_mtf("INT1", (unsigned long) get_idt_addr(&boot_idt[DB_VECTOR]));
++	disable_mtf();
++
++	enter_guest();
++	handle_exception(DB_VECTOR, old_db);
++}
++
+ /*
+  * Tests for VM-execution control fields
+  */
+@@ -9505,5 +9661,6 @@ struct vmx_test vmx_tests[] = {
+ 	TEST(atomic_switch_max_msrs_test),
+ 	TEST(atomic_switch_overflow_msrs_test),
+ 	TEST(rdtsc_vmexit_diff_test),
++	TEST(vmx_mtf_test),
+ 	{ NULL, NULL, NULL, NULL, NULL, {0} },
+ };
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
