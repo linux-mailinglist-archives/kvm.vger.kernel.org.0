@@ -2,138 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4D7816F60C
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 04:20:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF13C16F61D
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 04:33:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730135AbgBZDUh convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 25 Feb 2020 22:20:37 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3024 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729618AbgBZDUh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Feb 2020 22:20:37 -0500
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.56])
-        by Forcepoint Email with ESMTP id 07EDB3C5C916C980CE03;
-        Wed, 26 Feb 2020 11:20:34 +0800 (CST)
-Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 26 Feb 2020 11:20:33 +0800
-Received: from dggeme753-chm.china.huawei.com (10.3.19.99) by
- dggeme753-chm.china.huawei.com (10.3.19.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Wed, 26 Feb 2020 11:20:33 +0800
-Received: from dggeme753-chm.china.huawei.com ([10.7.64.70]) by
- dggeme753-chm.china.huawei.com ([10.7.64.70]) with mapi id 15.01.1713.004;
- Wed, 26 Feb 2020 11:20:33 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
-Subject: Re: [PATCH] KVM: X86: avoid meaningless kvm_apicv_activated() check
-Thread-Topic: [PATCH] KVM: X86: avoid meaningless kvm_apicv_activated() check
-Thread-Index: AdXsTYQADvvEvYWnS0muVSd7lZBEtQ==
-Date:   Wed, 26 Feb 2020 03:20:33 +0000
-Message-ID: <5d633c81d24d40aa848e1605eb0df857@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.158]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726806AbgBZDdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Feb 2020 22:33:06 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:34314 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726671AbgBZDdG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Feb 2020 22:33:06 -0500
+Received: by mail-ot1-f65.google.com with SMTP id j16so1698091otl.1;
+        Tue, 25 Feb 2020 19:33:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=nAuQSDRahRWvh/vYkNzOtlSh60I0RAv61gNTFTFOsjs=;
+        b=RJqqS7hkNae+vFD3w5QVk5o9bnNDLXSHHp1dt++J5YWq3q7h3yFv2pj54P3Y4whroz
+         HcyQXYoBbEPewRaT2Fv8HCA1fg8I1buEob6QCR6uo2lGtTr23YukvZ5tykoUbJYR/pX+
+         dbJ8oQSMdEm9pwu0CnwHSrHnTOp7WiB1K5Wkt56u9ihEBN758F/igzkb2srNE+GvwUdH
+         OXOm+0lfUtuWt0TYYLC0wX8/VIIunY+ydePvKsHh4EAUp5LVtRue0a5JK7LHCB4GGDYu
+         2tZlr5TApNnDS18QiUwO9TnJ2YJXwyKlUuAwdDpp0vu5gdrGWZWU7IRaDkpVxB1kH+md
+         wtrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=nAuQSDRahRWvh/vYkNzOtlSh60I0RAv61gNTFTFOsjs=;
+        b=rpddsdwvu7sXv+9v+b67PxZbEHHfUCHXRjvI5dJBCCHrBsWwUL4k9I5FsCn7VLehCz
+         wWJ/z+vD+9zT8/9PBN43iDGWAQhsSetBh7S8CI1YcVQIxEZG7ojPSEqckD6MaPqaKDmd
+         OscWqLG9Ed0mI/ZMCCib0zJAoOtGYPXcpGZkiJ65Tj45q0awGPrvV5i2/xKMOVOurDGF
+         5+NSkxOu5rdykL8a3+uDelY5rQq64oGg86ZnfyUlMV8BBkP6TA/jcebJAgoTgNkd22TM
+         EjCHzn/cuflrDHYpkuLIUBZn5jdKFJJ5014kth4vCcRQrZTfM8a5MlVqkg0NW4K6hKlh
+         ukXA==
+X-Gm-Message-State: APjAAAWBCmToMoZ1pnA27TnT6mQvwomMRryH84uGph5Aq732n4WBDjLB
+        n3ksTVGzfhKyMJNSTWrF9Vr2eIoEPxbvGuIg74RuToC4S7POFw==
+X-Google-Smtp-Source: APXvYqzRAj4nyh2dngKFn6VI/cdgGnlu2Fv8iTw+DGtJVZcXcPPMQyvp8siup6ZVBQvXwVzKfhoplxgS2Uqtg3jWtD0=
+X-Received: by 2002:a9d:63d6:: with SMTP id e22mr1421440otl.185.1582687984972;
+ Tue, 25 Feb 2020 19:33:04 -0800 (PST)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+References: <1574306232-872-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1574306232-872-1-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Wed, 26 Feb 2020 11:32:53 +0800
+Message-ID: <CANRm+Cz0RnF=roCkJf-X8pEyVY5wH4ZgQKWv8o0Whu59t8_A2w@mail.gmail.com>
+Subject: Re: [PATCH v4 1/2] KVM: VMX: FIXED+PHYSICAL mode single target IPI fastpath
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
->linmiaohe <linmiaohe@huawei.com> writes:
+On Thu, 21 Nov 2019 at 11:17, Wanpeng Li <kernellwp@gmail.com> wrote:
 >
->> From: Miaohe Lin <linmiaohe@huawei.com>
->>
->> After test_and_set_bit() for kvm->arch.apicv_inhibit_reasons, we will 
->> always get false when calling kvm_apicv_activated() because it's sure 
->> apicv_inhibit_reasons do not equal to 0.
->>
->> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
->> ---
->>  arch/x86/kvm/x86.c | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c index 
->> ddcc51b89e2c..fa62dcb0ed0c 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -8018,8 +8018,7 @@ void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
->>  		    !kvm_apicv_activated(kvm))
->>  			return;
->>  	} else {
->> -		if (test_and_set_bit(bit, &kvm->arch.apicv_inhibit_reasons) ||
->> -		    kvm_apicv_activated(kvm))
->> +		if (test_and_set_bit(bit, &kvm->arch.apicv_inhibit_reasons))
->>  			return;
->>  	}
+> From: Wanpeng Li <wanpengli@tencent.com>
 >
->This seems to be correct in a sense that we are not really protected against concurrent modifications of 'apicv_inhibit_reasons' (like what if 'apicv_inhibit_reasons' gets modified right after we've checked 'kvm_apicv_activated(kvm)').
+> ICR and TSCDEADLINE MSRs write cause the main MSRs write vmexits in our
+> product observation, multicast IPIs are not as common as unicast IPI like
+> RESCHEDULE_VECTOR and CALL_FUNCTION_SINGLE_VECTOR etc.
+>
+> This patch introduce a mechanism to handle certain performance-critical
+> WRMSRs in a very early stage of KVM VMExit handler.
+>
+> This mechanism is specifically used for accelerating writes to x2APIC ICR
+> that attempt to send a virtual IPI with physical destination-mode, fixed
+> delivery-mode and single target. Which was found as one of the main cause=
+s
+> of VMExits for Linux workloads.
+>
+> The reason this mechanism significantly reduce the latency of such virtua=
+l
+> IPIs is by sending the physical IPI to the target vCPU in a very early st=
+age
+> of KVM VMExit handler, before host interrupts are enabled and before expe=
+nsive
+> operations such as reacquiring KVM=E2=80=99s SRCU lock.
+> Latency is reduced even more when KVM is able to use APICv posted-interru=
+pt
+> mechanism (which allows to deliver the virtual IPI directly to target vCP=
+U
+> without the need to kick it to host).
+>
+> Testing on Xeon Skylake server:
+>
+> The virtual IPI latency from sender send to receiver receive reduces
+> more than 200+ cpu cycles.
 
-Yes, there might be a race window. But this looks benign as we recalculate kvm_apicv_activated() when we proceed with KVM_REQ_APICV_UPDATE.
+Testing by IPI microbenchmark(https://lkml.org/lkml/2017/12/19/141):
 
->
->The function, however, still gives a flase impression it is somewhat protected against concurent modifications. Like what are these
->test_and_{set,clear}_bit() for?
+Normal IPI:           Improved 3%
+Broadcast IPI:      Improved 5%
 
-Yes, I think so too. And also test_and_{set,clear}_bit() checks wheather the requested bit is {set,clear} to the requested state.
+w/ --overcommit cpu-pm=3Don
 
->
->If I'm not mistaken, the logic this function was supposed to implement
->is: change the requested bit to the requested state and, if
->kvm_apicv_activated() changed (we set the first bit or cleared the last), proceed with KVM_REQ_APICV_UPDATE. What if we re-write it like
->
->diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c index 2103101eca78..b97b8ff4a789 100644
->--- a/arch/x86/kvm/x86.c
->+++ b/arch/x86/kvm/x86.c
->@@ -8027,19 +8027,19 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_update_apicv);
->  */
-> void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)  {
->+       bool apicv_was_activated = kvm_apicv_activated(kvm);
->+
->        if (!kvm_x86_ops->check_apicv_inhibit_reasons ||
->            !kvm_x86_ops->check_apicv_inhibit_reasons(bit))
->                return;
-> 
->-       if (activate) {
->-               if (!test_and_clear_bit(bit, &kvm->arch.apicv_inhibit_reasons) ||
->-                   !kvm_apicv_activated(kvm))
->-                       return;
->-       } else {
->-               if (test_and_set_bit(bit, &kvm->arch.apicv_inhibit_reasons) ||
->-                   kvm_apicv_activated(kvm))
->-                       return;
->-       }
->+       if (activate)
->+               clear_bit(bit, &kvm->arch.apicv_inhibit_reasons);
->+       else
->+               set_bit(bit, &kvm->arch.apicv_inhibit_reasons);
->+
->+       if (kvm_apicv_activated(kvm) == apicv_was_activated)
->+               return;
-> 
->        trace_kvm_apicv_update_request(activate, bit);
->        if (kvm_x86_ops->pre_update_apicv_exec_ctrl)
->
->Is this equal?
->
+Normal IPI:           Improved 14%
+Broadcast IPI:      Improved 3.6%
 
-Looks good. I think this version also improves the readability. Many thanks for your advice and review!
-
+    Wanpeng
