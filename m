@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 99A5417093B
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 21:13:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C297E17093C
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 21:13:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727305AbgBZUNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 15:13:04 -0500
-Received: from mail-pl1-f201.google.com ([209.85.214.201]:33612 "EHLO
-        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727240AbgBZUNE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 15:13:04 -0500
-Received: by mail-pl1-f201.google.com with SMTP id bd7so357508plb.0
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 12:13:03 -0800 (PST)
+        id S1727335AbgBZUNG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 15:13:06 -0500
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:37197 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727240AbgBZUNG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 15:13:06 -0500
+Received: by mail-pl1-f202.google.com with SMTP id t12so350920plo.4
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 12:13:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=eE7m91og2qy8dUqhBgCzX0N5xowRQsCQ0yF3s3lmQnM=;
-        b=TM42qedM8DksnVEF0SiVXay32fTG103XsIThRVSSFezzKCW4SqZRIbLmpF38YQ2FQK
-         ED0jqzm6gcFoJ8QYjOkmlw6dh2hwf3QbK8UM3++hYsBigXf8I0clqreV6yTl4TMz2idx
-         NkDu5RM1qj01+zRUyd8UmKIum9VY+w0m5BImQxmEnS+VvQE7u+7f9yRd7MwF9XlpKSR2
-         +7MLS3Iok08Ux1f2v4jEmSG1Vey5Tw6AB+isPo3KzPlO3G2NFJkFKr9U0R1AUgaU5X9p
-         pXF2c+jR/HmhfahIicFZK/1k5jVcQ9Pvht0MxPFVfMg8Kom7ITzpvGgsZON/ijH4bhBJ
-         QwCQ==
+        bh=RIB7zoLlqFIQoJvqoI2dpWIxGsE/dMGJkqPhxqkMWkE=;
+        b=tvBy16g+l1UdG6TNTnJ2Mq7UwRcD9jLdze/j7ZtM8llI83AtzFBSamQCQiyvV9tzXO
+         RNGdcZbVTTD5IKQWO52jRwmcXSVzX1tdhQpRiN+MAkYkr7WdFdn9ysBj5Tj9YFhi1GRM
+         CNkHJWqNE3o78dnk0P/PxJXWHkr0cHEK01ah7suwahUnC8y41z0XP5A6fcRgUI13L/Sw
+         OZqwlI6GWJB2AfC0DjfSYLCBpls74+4bst5xR4fE219ixvo/PQM0my+FAEtRX6RFbefv
+         qU/Lgr0Akf6MLzyziSboAWjEPWos/PNrjNxZtVV1o6OZ30eVHW28XzLaODyXYLDK9ClN
+         qJLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=eE7m91og2qy8dUqhBgCzX0N5xowRQsCQ0yF3s3lmQnM=;
-        b=Ilxffo4LsBmuSW6/viyCfJWgvapdNAQtSKvjPR1bfobcKlBqLpJaxHvKRoFQfflpz2
-         WWkM0wECGCy4DjWYAurRTBdPZRc90PvOXa/WQQP5yAvUzJBnm+obnF+yMFo9fMiAvRuN
-         VKlg4PF+QXf7VlNgWzpY8O8jaukDMYvQ3LmOhBljAEjvImqHCp0BeryLVWqmm7amrSKB
-         btJiRQxHduyM+X2N4wpuXfC3mrf7BthoOz5hMls//8p+ZIOSQme50ujwCjFuKXqUwESp
-         6g33BtwMDjlqU0HoMY5fP/I6wvfhpIVMDsm7x2zeC6FTqu5a++QKRwqkEn9scD6P2gEe
-         rZdw==
-X-Gm-Message-State: APjAAAW9vQZf0EoJELmYrXopT3BPm3FJRTO7DTxpLaxGW3J2MNSVK1+T
-        sn8CJ6xx1D3gknsafBPtOwZivWg9uled5pDYvMUk4wGc7ZOZO2tu9sVPnCdQADnT1MMJUEuXjAw
-        0SW2swgJjbnns7tLnDEVM4fhCFsBGsl/9rUCcl+ZrtiLZpVwIWxtvrw==
-X-Google-Smtp-Source: APXvYqxfqT4rvxxcBLpgjXUmxhik05IecVBB4jbhiYl13UObopY2h4rIxVfYzU+bWy8WRwX/w3VvXKLt7g==
-X-Received: by 2002:a63:1051:: with SMTP id 17mr482885pgq.291.1582747982494;
- Wed, 26 Feb 2020 12:13:02 -0800 (PST)
-Date:   Wed, 26 Feb 2020 12:12:36 -0800
-In-Reply-To: <20200226094433.210968-1-morbo@google.com>
-Message-Id: <20200226201243.86988-1-morbo@google.com>
+        bh=RIB7zoLlqFIQoJvqoI2dpWIxGsE/dMGJkqPhxqkMWkE=;
+        b=BjW81TptoQV4F0I/ccPLPdTWTlhVaKzqCSdPejCDtfQmRcz+8VpP3NFJofNRvcFgoH
+         3nSMjyX9v0sy/HOCXukbPDjACR07LexdntXM4IE5jemK7qh/g57imHoSViH8oxQFWT6x
+         sOkROGlMWzjmIoIWlnlghaepGuexzxrfadjhNw2S+x4WIhwKpmJw44h/lGOi/NEPYjPs
+         mliKBieqgZ4otBcsTo4f8xh8YZZPSecI7fwlbAMca2MLIpDFqmZkfGvH24vIgDjcsN+M
+         bfKoPx/XJnuH0h1/7155jGMQj8MzHUW/lMbpw2bWIA4/WpbYKSDfHQ2DO/0UhnJVJmvq
+         MkYg==
+X-Gm-Message-State: APjAAAXuRtLT72FT8pmPnhYo6kzNhfi/HohxONE6uRIsztizu6XcMs1J
+        HAA3HfWZgEdHDk8HKjAyPvHLsGIIXZGVNGE1b7RwUirakS0BukiH5uG3f2FXJAPq4UD5l3Y4o2B
+        COC4NI9UvdLFW3i3ZVjt2ZsbTDnE/VM7wnQ73Xi0siMpmUEqYXUihnQ==
+X-Google-Smtp-Source: APXvYqy1OUTt879OCKhac5X76HmflHSqbTYXTIuLsgQzglZqBNOdO7pUAZ1q+tSVPLhqmJBM8B/eEFxjtQ==
+X-Received: by 2002:a63:6101:: with SMTP id v1mr527939pgb.318.1582747985132;
+ Wed, 26 Feb 2020 12:13:05 -0800 (PST)
+Date:   Wed, 26 Feb 2020 12:12:37 -0800
+In-Reply-To: <20200226201243.86988-1-morbo@google.com>
+Message-Id: <20200226201243.86988-2-morbo@google.com>
 Mime-Version: 1.0
-References: <20200226094433.210968-1-morbo@google.com>
+References: <20200226094433.210968-1-morbo@google.com> <20200226201243.86988-1-morbo@google.com>
 X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
-Subject: [kvm-unit-tests PATCH v3 0/7] Fixes for clang builds
+Subject: [kvm-unit-tests PATCH v3 1/7] x86: emulator: use "SSE2" for the target
 From:   Bill Wendling <morbo@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, oupton@google.com, drjones@redhat.com,
@@ -58,30 +58,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Changes to "pci: cast masks to uint32_t for unsigned long values" to
-cast the masks instead of changing the values in the header.
+The movdqu and movapd instructions are SSE2 instructions. Clang
+interprets the __attribute__((target("sse"))) as allowing SSE only
+instructions. Using SSE2 instructions cause an error.
 
-This is a re-send of the v2 patches, which included patches that
-shouldn't have been included.
+Signed-off-by: Bill Wendling <morbo@google.com>
+---
+ x86/emulator.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Bill Wendling (7):
-  x86: emulator: use "SSE2" for the target
-  pci: cast masks to uint32_t for unsigned long values
-  x86: realmode: syscall: add explicit size suffix to ambiguous
-    instructions
-  svm: change operand to output-only for matching constraint
-  svm: convert neg shift to unsigned shift
-  x86: VMX: use inline asm to get stack pointer
-  x86: VMX: the "noclone" attribute is gcc-specific
-
- lib/pci.c       |  3 ++-
- x86/emulator.c  |  2 +-
- x86/realmode.c  |  6 +++---
- x86/svm.c       |  6 +++---
- x86/syscall.c   |  2 +-
- x86/vmx_tests.c | 11 ++++++++---
- 6 files changed, 18 insertions(+), 12 deletions(-)
-
+diff --git a/x86/emulator.c b/x86/emulator.c
+index 8fe03b8..2990550 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -658,7 +658,7 @@ static bool sseeq(sse_union *v1, sse_union *v2)
+     return ok;
+ }
+ 
+-static __attribute__((target("sse"))) void test_sse(sse_union *mem)
++static __attribute__((target("sse2"))) void test_sse(sse_union *mem)
+ {
+     sse_union v;
+ 
 -- 
 2.25.1.481.gfbce0eb801-goog
 
