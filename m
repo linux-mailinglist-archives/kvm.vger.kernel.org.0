@@ -2,131 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 972151705C6
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 18:13:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 551481705DF
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 18:19:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726872AbgBZRNm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 12:13:42 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48590 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726614AbgBZRNm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 26 Feb 2020 12:13:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582737221;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fqZFM5WybXIvQpsE6lMDlBCaWfGorF8koi4lLfvGmOg=;
-        b=QmlbHnqcdK3Lh//aa9gjsmhf1AvXFlsT0vRJ488uLLcZ2wlHbpw5u6G5JE7tugTzROcm53
-        0GrUybuHplFnxNasTvfHAzZIw7ThQ8ECFx1JJvZU4p2MkvLGP/dJn3ih43flnCzTP+pL2B
-        6lOFDygGd1Hk0Y49/ONmPbkwCsHQV9Y=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-zhx-PmYlOiCdcXfO_WV4ZA-1; Wed, 26 Feb 2020 12:13:39 -0500
-X-MC-Unique: zhx-PmYlOiCdcXfO_WV4ZA-1
-Received: by mail-wr1-f70.google.com with SMTP id o9so36076wrw.14
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 09:13:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=fqZFM5WybXIvQpsE6lMDlBCaWfGorF8koi4lLfvGmOg=;
-        b=oe6rfJiyjFSS+ynz3hUWAczWkQuVtslRYQW4hdeLuqxC/xs5d+oj6u/0QG6gqBw4zD
-         qjg69mrl2HdTtW1cWqb5wos6x8i4hGGmB3kMEEgQNM2Ypac2iJshSsqfqBakLwHanhFj
-         ZG2T3C3OZocZwYwGOTYIMiiGGJbckGMWLLUPjDeNBmdpzoXb0VTvkwGN2NTsvTF+BRbs
-         z1dLI7G1aTJc8dPjh9nvwk3HcPoTMcmNg8ppLqeG4kf+GrOkGmdwP7lJdHZGwfe+QkJ9
-         kFzfL9i3ahtZRdv+ty81LQStDCxq0PG6KupjwN1MFS9XLMc+ziI1Vvmp2rQNVMX4g9uC
-         cT4g==
-X-Gm-Message-State: APjAAAVZzFVnb/5eyGttPeuH4NqW4VmAYKFgUqT94FWf2dKeVqJsRrxN
-        GkRO/AMPfqpDHmS2xBkl8vvfQe8QLBVcUqPw0ZOfQaTvWTrC81fRXVlV8LteKgihEb3w/AKq6R6
-        FqYtBcQXtlisn
-X-Received: by 2002:adf:80cb:: with SMTP id 69mr6274379wrl.320.1582737218631;
-        Wed, 26 Feb 2020 09:13:38 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxdQ3flDUJS3yOciIAFWcmCDmYkKBelGFeV/kFIBn5FjKHz6HuPhGD9HWhgO281p32eDfwCNA==
-X-Received: by 2002:adf:80cb:: with SMTP id 69mr6274361wrl.320.1582737218383;
-        Wed, 26 Feb 2020 09:13:38 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id x12sm3765817wmc.20.2020.02.26.09.13.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2020 09:13:37 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 07/13] KVM: x86: Refactor init_emulate_ctxt() to explicitly take context
-In-Reply-To: <20200218232953.5724-8-sean.j.christopherson@intel.com>
-References: <20200218232953.5724-1-sean.j.christopherson@intel.com> <20200218232953.5724-8-sean.j.christopherson@intel.com>
-Date:   Wed, 26 Feb 2020 18:13:37 +0100
-Message-ID: <87zhd5i85a.fsf@vitty.brq.redhat.com>
+        id S1726748AbgBZRTO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 12:19:14 -0500
+Received: from mail-db8eur05on2075.outbound.protection.outlook.com ([40.107.20.75]:6242
+        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726277AbgBZRTN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 12:19:13 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gFPb2zOESN7WXAg6t557Ixx27Sdiq8ONR6RGPTF4HJVjeBklV964meEEntgCL6mNRweU+llPZ+avDFY3Ruqww3TUzQnlmUVaMx+4Y8enNmf2JgjfHV/S7UhDo1d+a+xKb8wwa9d8NJ/sSf9ojk+DNOvNHFMvkM8FbEQbfVkjQcmj2DZ9UVIg0PZ0uAmxJax/aNHShCFyc5F80FGKhc1Nd7qOnJcZXFa4S1rTJUb/G4ArcKmskY7NHmgqecYwj0wVcMkIePS7nkOY+mYzm/ky5OMZzBm2lE0C8QdtJqpJyLjic3zRNQVw7LpK8xtqt5X8oSPhDTWUatTQzVxUSLc78A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rTa4Vioq81O3+93Nkq8/5gs+Zdq/m9mThAJ3d5+2BNI=;
+ b=mVDoTK/VrRcXAIyFkX7+f1ed7jwQJm0iGTtLkBORwt8ThnUP2zNGbNabbDmDJyrYBGXE4Fliwk6tPIf6HkO2QWvzrRmwe3XoMupigvW7ykze1EChSRwjwNt2U46/hcAC3/+3JszqkGivqnl51srebe3KX0FciBdVbaJDUVy76wI9XhrDMDGTgT0plrrBLB4rkD1oYKpDiB2BXTdSf4yLWVmLfmIbsuTXk/HGwvv0Mabwv7dbNiyF+c6srB6bKK2wTHI8oF/JTtdc4gmfIkIHkSAfmWf/llPhpve4NYBye74n7t8P/0JX/wTNPWoof7yrFiDj/padd8HKJbGXqaFP2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rTa4Vioq81O3+93Nkq8/5gs+Zdq/m9mThAJ3d5+2BNI=;
+ b=f930Im1Jt+r+uS6t139vVf4Lh0u/bpULiTrp0awc58WDJO83xf5KUVCFGl08QeWLOq3i3pPpfDwdw6niBhJshMPxcmTfJwLJaNkgSQAcHPfmwXneTVabMb5EwWWn4+bpk7ODaUquLXwAFsrM+0AJraGvpq7MMV17kjZ/1A7Z0xU=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=jgg@mellanox.com; 
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (52.133.14.15) by
+ VI1PR05MB6543.eurprd05.prod.outlook.com (20.179.26.208) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.21; Wed, 26 Feb 2020 17:19:09 +0000
+Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d]) by VI1PR05MB4141.eurprd05.prod.outlook.com
+ ([fe80::1c00:7925:d5c6:d60d%7]) with mapi id 15.20.2750.021; Wed, 26 Feb 2020
+ 17:19:09 +0000
+Date:   Wed, 26 Feb 2020 13:19:05 -0400
+From:   Jason Gunthorpe <jgg@mellanox.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "mst@redhat.com" <mst@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "tiwei.bie@intel.com" <tiwei.bie@intel.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "rdunlap@infradead.org" <rdunlap@infradead.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "aadam@redhat.com" <aadam@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        Shahaf Shuler <shahafs@mellanox.com>,
+        "hanand@xilinx.com" <hanand@xilinx.com>,
+        "mhabets@solarflare.com" <mhabets@solarflare.com>
+Subject: Re: [PATCH V4 5/5] vdpasim: vDPA device simulator
+Message-ID: <20200226171905.GS26318@mellanox.com>
+References: <20200220061141.29390-1-jasowang@redhat.com>
+ <20200220061141.29390-6-jasowang@redhat.com>
+ <20200220151215.GU23930@mellanox.com>
+ <6c341a77-a297-b7c7-dea5-b3f7b920b1f3@redhat.com>
+ <793a1b81-4f78-c405-4aae-f32a2bf67d87@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <793a1b81-4f78-c405-4aae-f32a2bf67d87@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: BL0PR02CA0070.namprd02.prod.outlook.com
+ (2603:10b6:207:3d::47) To VI1PR05MB4141.eurprd05.prod.outlook.com
+ (2603:10a6:803:44::15)
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.68.57.212) by BL0PR02CA0070.namprd02.prod.outlook.com (2603:10b6:207:3d::47) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.21 via Frontend Transport; Wed, 26 Feb 2020 17:19:09 +0000
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)     (envelope-from <jgg@mellanox.com>)      id 1j70Kv-0004T2-Pj; Wed, 26 Feb 2020 13:19:05 -0400
+X-Originating-IP: [142.68.57.212]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: ed6a34cd-4d7c-49a6-aa20-08d7badffda5
+X-MS-TrafficTypeDiagnostic: VI1PR05MB6543:|VI1PR05MB6543:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR05MB6543903DFB3972E583125EE9CFEA0@VI1PR05MB6543.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Forefront-PRVS: 0325F6C77B
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39860400002)(366004)(376002)(346002)(136003)(199004)(189003)(8676002)(316002)(81156014)(9786002)(52116002)(2616005)(26005)(478600001)(54906003)(81166006)(2906002)(9746002)(33656002)(4744005)(7416002)(4326008)(6916009)(66556008)(86362001)(36756003)(8936002)(186003)(5660300002)(66946007)(66476007)(1076003)(24400500001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB6543;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+Received-SPF: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: K+0wfyiIkq1srC5QKEGHCHxPLfnAMtQr9k0axoqfggasL7aESpaLHIjMbkdSNYKMXlijYsHkbarUKWARRsz9b/rpq0aq94CU9YVYSZPZCESvuIOjmOZSsq67EV1HrfaL7svW3zwLhQXg5oMsFJJQyWha6TZA1UR1HGSNpDlmrssb/k2sAh/mDuvo3eCVGACBGxUMzjAXEQOS2guIquqLB4Ldp9FEQ8AyWgCPCez8SSE+UBZndD1XZoyrXQHYiHZv05CWHdZG0gz56MhTNlOYK2EutHGkq1DlQbpIfAW6tAQfWd94ruOxr62HgjBFYabctgt7VSD3ZYGa+quyszik70wKoSfqJENuxFOZWo518mndscrpW4M35K8bbm7pGAujDsHj/AIFf+9ZtOL5RR96i4LG97TV8XMD2O0FRavLqlpHUNZ8QSmdtzFMXmq50OWbGZ/0imdB/TH2iP0Fr2GTNkQHyrDr5IgDVs6AVZ4P2wK0mrgSRLXzGEr2OHFy54R1
+X-MS-Exchange-AntiSpam-MessageData: i2VC+9mj04/g+se0zfNtQvQYSyQlh/qZz9Jh6c8VEk67KWY1VzC6DvB6aXi1sNizKvXuQgTbLVKqqXZ9i674ZPJd6qEYh3BNoWvU93fxWSdf/npI8dnqSb3QDrpoqRz7WYFBQWgu8qal0ZO2I/s1qg==
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed6a34cd-4d7c-49a6-aa20-08d7badffda5
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2020 17:19:09.6288
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bidSoB3arg9mIl2Doior3Qnku9G5o1W26r+ZvMzsv/W/rcmJh2ZlUrZkBnKoDyPImAehJdvdhY1huxkAJvOX6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB6543
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Wed, Feb 26, 2020 at 02:12:26PM +0800, Jason Wang wrote:
+> > > It is a bit weird to be creating this dummy parent, couldn't this be
+> > > done by just passing a NULL parent to vdpa_alloc_device, doing
+> > > set_dma_ops() on the vdpasim->vdpa->dev and setting dma_device to
+> > > vdpasim->vdpa->dev ?
+> > 
+> > 
+> > I think it works.
+> 
+> 
+> Rethink about this, since most hardware vDPA driver will have a parent and
+> will use it to find the parent structure e.g
+> 
+> dev_get_drvdata(vdpa->dev->parent)
 
-> Explicitly pass the emulation context when initializing said context in
-> preparation of dynamically allocation the emulation context.
+Oh that seems like a sketchy pattern
 
-"The said said context" :-)
+> So I keep this dummy parent in V5.
 
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/x86.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 69d3dd64d90c..0e67f90db9a6 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6414,9 +6414,9 @@ static bool inject_emulated_exception(struct x86_emulate_ctxt *ctxt)
->  	return false;
->  }
->  
-> -static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
-> +static void init_emulate_ctxt(struct x86_emulate_ctxt *ctxt)
->  {
-> -	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
-> +	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
->  	int cs_db, cs_l;
->  
->  	kvm_x86_ops->get_cs_db_l_bits(vcpu, &cs_db, &cs_l);
-> @@ -6443,7 +6443,7 @@ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip)
->  	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
->  	int ret;
->  
-> -	init_emulate_ctxt(vcpu);
-> +	init_emulate_ctxt(ctxt);
->  
->  	ctxt->op_bytes = 2;
->  	ctxt->ad_bytes = 2;
-> @@ -6770,7 +6770,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  	kvm_clear_exception_queue(vcpu);
->  
->  	if (!(emulation_type & EMULTYPE_NO_DECODE)) {
-> -		init_emulate_ctxt(vcpu);
-> +		init_emulate_ctxt(ctxt);
->  
->  		/*
->  		 * We will reenter on the same instruction since
-> @@ -8943,7 +8943,7 @@ int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
->  	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
->  	int ret;
->  
-> -	init_emulate_ctxt(vcpu);
-> +	init_emulate_ctxt(ctxt);
->  
->  	ret = emulator_task_switch(ctxt, tss_selector, idt_index, reason,
->  				   has_error_code, error_code);
+The dummy parent is visible in sysfs, I think you should remove it so
+the syfs for this virtual device makes sense.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
-
+Jason
