@@ -2,53 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF9A717093F
-	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 21:13:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 683EB170940
+	for <lists+kvm@lfdr.de>; Wed, 26 Feb 2020 21:13:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727443AbgBZUNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 15:13:14 -0500
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:50429 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727444AbgBZUNO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 15:13:14 -0500
-Received: by mail-pg1-f201.google.com with SMTP id 22so271659pgw.17
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 12:13:13 -0800 (PST)
+        id S1727460AbgBZUNQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 15:13:16 -0500
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:55191 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727260AbgBZUNQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 15:13:16 -0500
+Received: by mail-pl1-f201.google.com with SMTP id s13so320783plr.21
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 12:13:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=OdYlpv2ga298KF/gq7X6DdauhYrmwjzn6r6GXhMlTFY=;
-        b=acW9weaZrIae64ShTa5DEXYIEHCSozEW83xlO15vq6HZz7lT896h58NTTRaLqWoC7s
-         k1bMAAgi8WvA1wFKjId1/+Ll5xKd9WQkT+6y6HK9qnsgbhszi/ISgG1anfIw+XHwrx6P
-         g8fmZ9reIo+9h5uRKerCgiySOvBnElWo4BdxajxOKjCiICGesrN0Zz905P9xZSyzUJBZ
-         xWEjALDxGkib9/A2tuisAFDmIraTKHsbABUh2zZ+eFtVFY7fzETic0Gc4Yf5SIYrWtv1
-         UaIMXdKXvD00EYoWuDMHKcF8sNu7JSTa7TW1HTZMLnUBJRA6GPBe+t0J7jvhFpcz00rS
-         GsdQ==
+        bh=ToWeorAUFnUXwAhb7jaBBmGub+OaoJimWpyK5/Q9FSo=;
+        b=fFQpNZdUYsBG0yoNSuVwfOheETmUiVXL4UgudFnyHagIFn53mTMuoz+P0bCQ+HGzwC
+         8SMMMXZEJ2pBZeIj8SZEZ4O0Cj/kpZ2fVOqMChVU7Aj7Rpm6tZx4ypdA+RkKSdJCfcgX
+         CyGO/EjYqdhlYZZ50LFD6URmB2Kzmvb/KTI6R4JpM4ygxBe9YRAUYI5q211ZPxrI1pU7
+         yDHpZSeaCikg2GDVD3w9jlJWS3b2Kf705Oo7d+K29+9fcG2pe58a8GaOthb1dCboR+LE
+         O4/l2poRzSScK6aADyu6QCKpFBMg/W+s9V+xGe9jncDzqpA1b6Mqv/uKc01zeXThCXKT
+         ZsCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=OdYlpv2ga298KF/gq7X6DdauhYrmwjzn6r6GXhMlTFY=;
-        b=Pg+IOjc+7UBzgQAp2PmkfdbEkNPk1GtDsOm+55OBFMG627xFJF1uBs7Neis+Uly/5K
-         IFYwMTCby6YVvqoinMt96YGIgDynkMAPLiWmY43uxMIKIdvJeZpdjnzZ/5+NvzlBmJxW
-         tjCDYvD8nFviLuV1sdyQW2r8Afae+GxtlNfLTx0umKEXIpExC3UIAxWn6o1C34vt9+WW
-         CUnaC2GLp6lzWB/rckuYfOKKoIktqtk6pEQ0FKddJaXmFIdpiW3gYbVLr8fGVXF3HMmG
-         P/BJwkl8i3uL7QPcy6Qp1nITGtYzFe+Uq2isJOiAN9VXjJM8j6h34mU1LxwLrm7x034H
-         WxZA==
-X-Gm-Message-State: APjAAAWZU92JmnDHZWd3Y6FszgRvKXx82trETVgKm2FAdo1DPJ5EGEck
-        qSMye9hf9tJdIMM8NteaINdNkQT8PrLgU6ZnIbH6NAb90XecpF0nr2w7HEKi01o61VjrBqUtefw
-        2eF+T6gX00VI3wvRKOSG/8TcM3rrH4Adny4KCGC4LiuOWKz4TAGstbQ==
-X-Google-Smtp-Source: APXvYqzsj4/uYcHspUiV1VEsrYEp8PRW3TP7VSa28A4OliGP9du6wxTK7mxr1vR1v4V8gze6uohOVT9FKw==
-X-Received: by 2002:a63:360a:: with SMTP id d10mr510305pga.366.1582747992896;
- Wed, 26 Feb 2020 12:13:12 -0800 (PST)
-Date:   Wed, 26 Feb 2020 12:12:40 -0800
+        bh=ToWeorAUFnUXwAhb7jaBBmGub+OaoJimWpyK5/Q9FSo=;
+        b=dEut22CTAAc6miwDxEZvwBJUY5H/1aS2LiMshCc0VnPitQdgmmLDlgAejp7b8Cjeb5
+         NEdrPTK/SFWPzhSDvWXT0Xu89vdnAznl1ja1Ojva3D3o3Ujc6wr3Sn7hWM+IuAFpMkhf
+         zPaunvg0BFVnfM4mJmt+clxtTFiyOGOirQ4zZxEhzINK21K2e88qcP9EfsHKy3obciqw
+         ZT7jlicnhU09TdO3dwe3pZy8tvsSf5Vq9GlRhssxOQc1q8RFZYIikmFiYRFMrZ7H3mAK
+         Iz0yP8laeoF4DaUvdUYg4fikOcpCYc/LIwxHTx7vevdajET41kqNSFLbyhETyuJYtdJ1
+         O0Zw==
+X-Gm-Message-State: APjAAAULxh/h4XvsZCY9QFsgT64YqXERWJEgN/rkbtxCAepBkk5t2vGY
+        nCCg65PmyShqQ2eJ5prymYdcylQGmbm/nM7rhiBaU//wpXfhmAKyFne1Nlx0IC4gz2upw/w1tbC
+        pLagrpqnD4ajuLCV2ndhMrsxnffHnk0tSE/Eyj5t08KKi2IlhGk5Hrw==
+X-Google-Smtp-Source: APXvYqwl82W7+I6hrIYSq0LLhCkLCaPYYqDUcSxPSoUtm6xQ/iFxztxwS1tLpqxwsY7kxLldWi2TOib2jA==
+X-Received: by 2002:a63:4e63:: with SMTP id o35mr480111pgl.279.1582747995137;
+ Wed, 26 Feb 2020 12:13:15 -0800 (PST)
+Date:   Wed, 26 Feb 2020 12:12:41 -0800
 In-Reply-To: <20200226201243.86988-1-morbo@google.com>
-Message-Id: <20200226201243.86988-5-morbo@google.com>
+Message-Id: <20200226201243.86988-6-morbo@google.com>
 Mime-Version: 1.0
 References: <20200226094433.210968-1-morbo@google.com> <20200226201243.86988-1-morbo@google.com>
 X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
-Subject: [kvm-unit-tests PATCH v3 4/7] svm: change operand to output-only for
- matching constraint
+Subject: [kvm-unit-tests PATCH v3 5/7] svm: convert neg shift to unsigned shift
 From:   Bill Wendling <morbo@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, oupton@google.com, drjones@redhat.com,
@@ -59,31 +58,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to GNU extended asm documentation, "the two operands [of
-matching constraints] must include one input-only operand and one
-output-only operand." So remove the read/write modifier from the output
-constraint.
+Shifting a negative signed value is undefined. Use a shift of an
+unsigned value instead.
 
 Signed-off-by: Bill Wendling <morbo@google.com>
 ---
- x86/svm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ x86/svm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/x86/svm.c b/x86/svm.c
-index aa3d995..ae85194 100644
+index ae85194..17be4b0 100644
 --- a/x86/svm.c
 +++ b/x86/svm.c
-@@ -288,8 +288,8 @@ static void test_run(struct test *test, struct vmcb *vmcb)
-             "cli \n\t"
-             "stgi"
-             : // inputs clobbered by the guest:
--	      "+D" (the_test),            // first argument register
--	      "+b" (the_vmcb)             // callee save register!
-+	      "=D" (the_test),            // first argument register
-+	      "=b" (the_vmcb)             // callee save register!
-             : [test] "0" (the_test),
- 	      [vmcb_phys] "1"(the_vmcb),
- 	      [PREPARE_GIF_CLEAR] "i" (offsetof(struct test, prepare_gif_clear))
+@@ -1148,7 +1148,7 @@ static bool npt_rw_l1mmio_check(struct test *test)
+ }
+ 
+ #define TSC_ADJUST_VALUE    (1ll << 32)
+-#define TSC_OFFSET_VALUE    (-1ll << 48)
++#define TSC_OFFSET_VALUE    (~0ull << 48)
+ static bool ok;
+ 
+ static void tsc_adjust_prepare(struct test *test)
 -- 
 2.25.1.481.gfbce0eb801-goog
 
