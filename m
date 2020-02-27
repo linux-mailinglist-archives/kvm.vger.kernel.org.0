@@ -2,122 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 695851713A4
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 10:05:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 699601713C7
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 10:10:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728657AbgB0JFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 04:05:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35031 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728554AbgB0JFE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 04:05:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582794303;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=e/JnuGwt/RIzUAmg6DM6H46ShUb0PP4MBCjOmt5H8X8=;
-        b=NOIy2bd4CBmDdGYdYeQS2AQd7tXkbPUgr13LFNOFq8TbCY9Z9qJ3S+35BDWLNAmvURfq9p
-        JSbqaIn7bh/vYJF+8ZrPlnQ2jtskFmd/Zbv2j+RmEAXVoG2LhaIf/Kv6PYtsrnfeHKSCFd
-        yaMBhJ471mNw4PkI+VdQxfA/DWLZWsA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-6oipT42LOvuu82pf8m6K9A-1; Thu, 27 Feb 2020 04:04:59 -0500
-X-MC-Unique: 6oipT42LOvuu82pf8m6K9A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C511D1005512;
-        Thu, 27 Feb 2020 09:04:57 +0000 (UTC)
-Received: from gondolin (ovpn-117-2.ams2.redhat.com [10.36.117.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD7538C08C;
-        Thu, 27 Feb 2020 09:04:51 +0000 (UTC)
-Date:   Thu, 27 Feb 2020 10:04:48 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Ulrich.Weigand@de.ibm.com, david@redhat.com, frankja@linux.ibm.com,
-        frankja@linux.vnet.ibm.com, gor@linux.ibm.com,
-        imbrenda@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, mimu@linux.ibm.com, thuth@redhat.com
-Subject: Re: [PATCH v4.1 36/36] KVM: s390: protvirt: Add KVM api
- documentation
-Message-ID: <20200227100448.4b795562.cohuck@redhat.com>
-In-Reply-To: <20200227084717.13449-1-borntraeger@de.ibm.com>
-References: <a392d135-c0aa-3513-b633-70aa6c7e88bd@de.ibm.com>
-        <20200227084717.13449-1-borntraeger@de.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S1728621AbgB0JKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Feb 2020 04:10:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22082 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728624AbgB0JKn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Feb 2020 04:10:43 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01R9597I084018
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 04:10:42 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ydxenx2gc-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 04:10:41 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Thu, 27 Feb 2020 09:10:39 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 27 Feb 2020 09:10:37 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01R99dVM50921732
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Feb 2020 09:09:39 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5E813A4040;
+        Thu, 27 Feb 2020 09:10:36 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1BB1CA4051;
+        Thu, 27 Feb 2020 09:10:36 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Feb 2020 09:10:36 +0000 (GMT)
+From:   Michael Mueller <mimu@linux.ibm.com>
+To:     borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com,
+        mimu@linux.ibm.com
+Cc:     kvm@vger.kernel.org, cohuck@redhat.com, david@redhat.com,
+        thuth@redhat.com, linux-s390@vger.kernel.org
+Subject: [PATCH] KVM: s390: introduce module parameter kvm.use_gisa
+Date:   Thu, 27 Feb 2020 10:10:31 +0100
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+x-cbid: 20022709-0028-0000-0000-000003DE6E4F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022709-0029-0000-0000-000024A38CE3
+Message-Id: <20200227091031.102993-1-mimu@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-27_02:2020-02-26,2020-02-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 spamscore=0 suspectscore=0
+ impostorscore=0 malwarescore=0 phishscore=0 mlxlogscore=999 mlxscore=0
+ clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002270074
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 Feb 2020 03:47:17 -0500
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+The boolean module parameter "kvm.use_gisa" controls if newly
+created guests will use the GISA facility if provided by the
+host system. The default is yes.
 
-> From: Janosch Frank <frankja@linux.ibm.com>
-> 
-> Add documentation for KVM_CAP_S390_PROTECTED capability and the
-> KVM_S390_PV_COMMAND ioctl.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> [borntraeger@de.ibm.com: patch merging, splitting, fixing]
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  Documentation/virt/kvm/api.rst | 59 ++++++++++++++++++++++++++++++++++
->  1 file changed, 59 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 7505d7a6c0d8..bae90f3cd11d 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -4648,6 +4648,54 @@ the clear cpu reset definition in the POP. However, the cpu is not put
->  into ESA mode. This reset is a superset of the initial reset.
->  
->  
-> +4.125 KVM_S390_PV_COMMAND
-> +-------------------------
-> +
-> +:Capability: KVM_CAP_S390_PROTECTED
-> +:Architectures: s390
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_pv_cmd
-> +:Returns: 0 on success, < 0 on error
-> +
-> +::
-> +
-> +  struct kvm_pv_cmd {
-> +	__u32 cmd;	/* Command to be executed */
-> +	__u16 rc;	/* Ultravisor return code */
-> +	__u16 rrc;	/* Ultravisor return reason code */
-> +	__u64 data;	/* Data or address */
-> +	__u32 flags;    /* flags for future extensions. Must be 0 for now */
-> +	__u32 reserved[3];
-> +  };
-> +
-> +cmd values:
-> +
-> +KVM_PV_ENABLE
-> +  Allocate memory and register the VM with the Ultravisor, thereby
-> +  donating memory to the Ultravisor that will become inaccessible to
-> +  KVM. All existing CPUs are converted to protected ones. After this
-> +  command has succeeded, any CPU added via hotplug will become
-> +  protected during its creation as well.
-> +
-> +KVM_PV_DISABLE
-> +
-> +  Deregister the VM from the Ultravisor and reclaim the memory that
-> +  had been donated to the Ultravisor, making it usable by the kernel
-> +  again.  All registered VCPUs are converted back to non-protected
-> +  ones.
+  # cat /sys/module/kvm/parameters/use_gisa
+  Y
 
-Do you want to mention that memory might be lost on error? Or is that
-too far in should-not-happen-land for callers to care about?
+The parameter can be changed on the fly.
 
-Anyway,
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+  # echo N > /sys/module/kvm/parameters/use_gisa
+
+Already running guests are not affected by this change.
+
+The kvm s390 debug feature shows if a guest is running with GISA.
+
+  # grep gisa /sys/kernel/debug/s390dbf/kvm-$pid/sprintf
+  00 01582725059:843303 3 - 08 00000000e119bc01  gisa 0x00000000c9ac2642 initialized
+  00 01582725059:903840 3 - 11 000000004391ee22  00[0000000000000000-0000000000000000]: AIV gisa format-1 enabled for cpu 000
+  ...
+  00 01582725059:916847 3 - 08 0000000094fff572  gisa 0x00000000c9ac2642 cleared
+
+In general, that value should not be changed as the GISA facility
+enhances interruption delivery performance.
+
+A reason to switch the GISA facility off might be a performance
+comparison run or debugging.
+
+Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+---
+ arch/s390/kvm/kvm-s390.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index d7ff30e45589..5c2081488024 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -184,6 +184,11 @@ static u8 halt_poll_max_steal = 10;
+ module_param(halt_poll_max_steal, byte, 0644);
+ MODULE_PARM_DESC(halt_poll_max_steal, "Maximum percentage of steal time to allow polling");
+ 
++/* if set to true, the GISA will be initialized and used if available */
++static bool use_gisa  = true;
++module_param(use_gisa, bool, 0644);
++MODULE_PARM_DESC(use_gisa, "Use the GISA if the host supports it.");
++
+ /*
+  * For now we handle at most 16 double words as this is what the s390 base
+  * kernel handles and stores in the prefix page. If we ever need to go beyond
+@@ -2504,7 +2509,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	kvm->arch.use_skf = sclp.has_skey;
+ 	spin_lock_init(&kvm->arch.start_stop_lock);
+ 	kvm_s390_vsie_init(kvm);
+-	kvm_s390_gisa_init(kvm);
++	if (use_gisa)
++		kvm_s390_gisa_init(kvm);
+ 	KVM_EVENT(3, "vm 0x%pK created by pid %u", kvm, current->pid);
+ 
+ 	return 0;
+-- 
+2.17.1
 
