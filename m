@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D0F55170EEB
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 04:19:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E93A170EEE
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 04:20:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728253AbgB0DTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 22:19:39 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:40744 "EHLO huawei.com"
+        id S1728303AbgB0DUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 22:20:13 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:10701 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728220AbgB0DTi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 22:19:38 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 66B70344DEC26ED07C0F;
-        Thu, 27 Feb 2020 11:19:35 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Thu, 27 Feb 2020
- 11:19:25 +0800
+        id S1728220AbgB0DUN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 22:20:13 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 90D6C3EA773AAD8D60D2;
+        Thu, 27 Feb 2020 11:20:08 +0800 (CST)
+Received: from huawei.com (10.175.105.18) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Thu, 27 Feb 2020
+ 11:19:59 +0800
 From:   linmiaohe <linmiaohe@huawei.com>
 To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
         <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
@@ -25,9 +25,9 @@ To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
         <hpa@zytor.com>
 CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH v2] KVM: Fix some obsolete comments
-Date:   Thu, 27 Feb 2020 11:20:54 +0800
-Message-ID: <1582773654-4911-1-git-send-email-linmiaohe@huawei.com>
+Subject: [PATCH v2] KVM: X86: deprecate obsolete KVM_GET_CPUID2 ioctl
+Date:   Thu, 27 Feb 2020 11:21:28 +0800
+Message-ID: <1582773688-4956-1-git-send-email-linmiaohe@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -40,54 +40,120 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Miaohe Lin <linmiaohe@huawei.com>
 
-Remove some obsolete comments, fix wrong function name and description.
+When kvm_vcpu_ioctl_get_cpuid2() fails, we set cpuid->nent to the value of
+vcpu->arch.cpuid_nent. But this is in vain as cpuid->nent is not copied to
+userspace by copy_to_user() from call site. Also cpuid->nent is not updated
+to indicate how many entries were retrieved on success case. So this ioctl
+is straight up broken. And in fact, it's not used anywhere. So it should be
+deprecated.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
-v1->v2:
-Use Oxford comma
-Collect Vitaly's R-b
----
- arch/x86/kvm/vmx/nested.c | 4 ++--
- arch/x86/kvm/vmx/vmx.c    | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/kvm/cpuid.c           | 20 --------------------
+ arch/x86/kvm/cpuid.h           |  3 ---
+ arch/x86/kvm/x86.c             | 16 ++--------------
+ include/uapi/linux/kvm.h       |  1 +
+ tools/include/uapi/linux/kvm.h |  1 +
+ 5 files changed, 4 insertions(+), 37 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 0946122a8d3b..966a5c394c06 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2960,7 +2960,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
- 	/*
- 	 * Induce a consistency check VMExit by clearing bit 1 in GUEST_RFLAGS,
- 	 * which is reserved to '1' by hardware.  GUEST_RFLAGS is guaranteed to
--	 * be written (by preparve_vmcs02()) before the "real" VMEnter, i.e.
-+	 * be written (by prepare_vmcs02()) before the "real" VMEnter, i.e.
- 	 * there is no need to preserve other bits or save/restore the field.
- 	 */
- 	vmcs_writel(GUEST_RFLAGS, 0);
-@@ -4382,7 +4382,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
-  * Decode the memory-address operand of a vmx instruction, as recorded on an
-  * exit caused by such an instruction (run by a guest hypervisor).
-  * On success, returns 0. When the operand is invalid, returns 1 and throws
-- * #UD or #GP.
-+ * #UD, #GP, or #SS.
-  */
- int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
- 			u32 vmx_instruction_info, bool wr, int len, gva_t *ret)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a04017bdae05..efc509a7945a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -808,7 +808,7 @@ void update_exception_bitmap(struct kvm_vcpu *vcpu)
- 	if (to_vmx(vcpu)->rmode.vm86_active)
- 		eb = ~0;
- 	if (enable_ept)
--		eb &= ~(1u << PF_VECTOR); /* bypass_guest_pf = 0 */
-+		eb &= ~(1u << PF_VECTOR);
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index b1c469446b07..5e041a1282b8 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -261,26 +261,6 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
+ 	return r;
+ }
  
- 	/* When we are running a nested L2 guest and L1 specified for it a
- 	 * certain exception bitmap, we must trap the same exceptions and pass
+-int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+-			      struct kvm_cpuid2 *cpuid,
+-			      struct kvm_cpuid_entry2 __user *entries)
+-{
+-	int r;
+-
+-	r = -E2BIG;
+-	if (cpuid->nent < vcpu->arch.cpuid_nent)
+-		goto out;
+-	r = -EFAULT;
+-	if (copy_to_user(entries, &vcpu->arch.cpuid_entries,
+-			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
+-		goto out;
+-	return 0;
+-
+-out:
+-	cpuid->nent = vcpu->arch.cpuid_nent;
+-	return r;
+-}
+-
+ static __always_inline void cpuid_mask(u32 *word, int wordnum)
+ {
+ 	reverse_cpuid_check(wordnum);
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 7366c618aa04..76555de38e1b 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -19,9 +19,6 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
+ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
+ 			      struct kvm_cpuid2 *cpuid,
+ 			      struct kvm_cpuid_entry2 __user *entries);
+-int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+-			      struct kvm_cpuid2 *cpuid,
+-			      struct kvm_cpuid_entry2 __user *entries);
+ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+ 	       u32 *ecx, u32 *edx, bool check_limit);
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ddd1d296bd20..a6d99abedb2c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4295,21 +4295,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 					      cpuid_arg->entries);
+ 		break;
+ 	}
++	/* KVM_GET_CPUID2 is deprecated, should not be used. */
+ 	case KVM_GET_CPUID2: {
+-		struct kvm_cpuid2 __user *cpuid_arg = argp;
+-		struct kvm_cpuid2 cpuid;
+-
+-		r = -EFAULT;
+-		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
+-			goto out;
+-		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
+-					      cpuid_arg->entries);
+-		if (r)
+-			goto out;
+-		r = -EFAULT;
+-		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
+-			goto out;
+-		r = 0;
++		r = -EINVAL;
+ 		break;
+ 	}
+ 	case KVM_GET_MSRS: {
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 4b95f9a31a2f..61524780603d 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1380,6 +1380,7 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_GET_LAPIC             _IOR(KVMIO,  0x8e, struct kvm_lapic_state)
+ #define KVM_SET_LAPIC             _IOW(KVMIO,  0x8f, struct kvm_lapic_state)
+ #define KVM_SET_CPUID2            _IOW(KVMIO,  0x90, struct kvm_cpuid2)
++/* KVM_GET_CPUID2 is deprecated, should not be used. */
+ #define KVM_GET_CPUID2            _IOWR(KVMIO, 0x91, struct kvm_cpuid2)
+ /* Available with KVM_CAP_VAPIC */
+ #define KVM_TPR_ACCESS_REPORTING  _IOWR(KVMIO, 0x92, struct kvm_tpr_access_ctl)
+diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+index f0a16b4adbbd..2ef719af4c57 100644
+--- a/tools/include/uapi/linux/kvm.h
++++ b/tools/include/uapi/linux/kvm.h
+@@ -1379,6 +1379,7 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_GET_LAPIC             _IOR(KVMIO,  0x8e, struct kvm_lapic_state)
+ #define KVM_SET_LAPIC             _IOW(KVMIO,  0x8f, struct kvm_lapic_state)
+ #define KVM_SET_CPUID2            _IOW(KVMIO,  0x90, struct kvm_cpuid2)
++/* KVM_GET_CPUID2 is deprecated, should not be used. */
+ #define KVM_GET_CPUID2            _IOWR(KVMIO, 0x91, struct kvm_cpuid2)
+ /* Available with KVM_CAP_VAPIC */
+ #define KVM_TPR_ACCESS_REPORTING  _IOWR(KVMIO, 0x92, struct kvm_tpr_access_ctl)
 -- 
 2.19.1
 
