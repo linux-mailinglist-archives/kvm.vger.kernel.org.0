@@ -2,92 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC913172C83
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 00:49:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20F19172C97
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 00:57:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729867AbgB0Xta (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 18:49:30 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:36297 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729809AbgB0Xt3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 18:49:29 -0500
-Received: by mail-pj1-f65.google.com with SMTP id gv17so477184pjb.1
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 15:49:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0ZF5PxVG84+TcO4AGDk4hTXuR0g3a2lAghAPZZezWAQ=;
-        b=FGNJJ8TIZbEQeDUTHLzthiH7gYzaIpI1ZJA3XXho7n4IcK4vq2ltzAcqbjsmvYzX36
-         zD7ixqbETkWw2eDR1zKFmbrGVME7/TxjiJ0ZdP1+cA6LI4TSIDmovCW1qDEUHfRwqOiE
-         3iTQ81jQ5pn4CkXS5zbAphSmUx4QVkdWj1krgdBnAPuUm+/gujo32b14iqFpETsrDuv4
-         Fbafx5Sq6NfItx31yjOO/mkBiQ8vkSiGQs+dHET8yMBirlarM/xa73kVEcbN39cFa9I4
-         Vu3UDVIghVT5PWwEcnxXhBM+UPjN3nkVWg96faRN9plrIZg77Yyl4UfYIAmRMQ/hGQWD
-         YzYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0ZF5PxVG84+TcO4AGDk4hTXuR0g3a2lAghAPZZezWAQ=;
-        b=SvwvwaFhSbm5m1FAaoDYOT723MEWcslQxvWj9xOvz/Win/M3/3SUCGj1aKwJcPPBE2
-         4norlx2YlukHdcCNmKc2oNhvZUlnAcrHu3me7Fe/GSBsu8QpyWM487CwKkDCbvf2KAdA
-         o2ZkUNlzm3C9RYo0EUEZMjW7BcuRwtPHTPIM0CaofMJQH+aVl3ca9K9S84k/88AK/K3K
-         RJ9RflhzKt2Fsn8ipUPPW7NTHJUQ9XKf9XTXbUlM5oX5R//jFFhmNglvVKP+p0fPz3kS
-         L+JDYjGvIcb6bYdIauu/GsGaIwCoSvSI/vT3VeutHa8pIJezLXYeW7+7pfIP8U7TWZhf
-         C5Lg==
-X-Gm-Message-State: APjAAAWrTJ4jFreVXXfxNvnmPmxRshTzdfvrh45MnBXWKqtKvyderGUp
-        5U5vqpKulfVhvcM5LXfKYQsHmkGenoBPO6tX1S5zEw==
-X-Google-Smtp-Source: APXvYqw0egRKbJSIQcP/k3vUTH6RVXMgfH+NgFS+3a2pz81BzPEZzxWwvZzJpQRmMCe+9YjvwY5iOzKNBRHn/yxwaAo=
-X-Received: by 2002:a17:902:760e:: with SMTP id k14mr1194526pll.119.1582847368858;
- Thu, 27 Feb 2020 15:49:28 -0800 (PST)
-MIME-Version: 1.0
-References: <1581988104-16628-1-git-send-email-wanpengli@tencent.com>
- <1581988104-16628-2-git-send-email-wanpengli@tencent.com> <CANRm+CyHmdbsw572x=8=GYEOw-YQCXhz89i9+VEmROBVAu+rvg@mail.gmail.com>
- <CAKwvOd=bDW6K3PC7S5fiG5n_kwgqhbnVsBHUSGgYaPQY-L_YmA@mail.gmail.com>
- <87mu95jxy7.fsf@vitty.brq.redhat.com> <9506da2d-53fb-c4a3-55b4-fb78e185e9c2@redhat.com>
-In-Reply-To: <9506da2d-53fb-c4a3-55b4-fb78e185e9c2@redhat.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Thu, 27 Feb 2020 15:49:17 -0800
-Message-ID: <CAKwvOd=tOURgAFUNQPX3DDqd-eAbZ9kMmyksXEUK-a2N_Gky1g@mail.gmail.com>
-Subject: Re: [PATCH RESEND v2 2/2] KVM: Pre-allocate 1 cpumask variable per
- cpu for both pv tlb and pv ipis
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1730083AbgB0X5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Feb 2020 18:57:41 -0500
+Received: from mga03.intel.com ([134.134.136.65]:12972 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728993AbgB0X5l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Feb 2020 18:57:41 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2020 15:57:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,493,1574150400"; 
+   d="scan'208";a="232368034"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga008.fm.intel.com with ESMTP; 27 Feb 2020 15:57:39 -0800
+Date:   Thu, 27 Feb 2020 15:57:39 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH 1/2] kvm: vmx: Use basic exit reason to check if it's the
+ specific VM EXIT
+Message-ID: <20200227235739.GM17014@linux.intel.com>
+References: <20200224020751.1469-2-xiaoyao.li@intel.com>
+ <87lfosp9xs.fsf@vitty.brq.redhat.com>
+ <d9744594-4a66-d867-f785-64ce4d42b848@intel.com>
+ <87imjwp24x.fsf@vitty.brq.redhat.com>
+ <20200224161728.GC29865@linux.intel.com>
+ <50134028-ef7a-46c6-7602-095c47406ed7@intel.com>
+ <20200225061317.GV29865@linux.intel.com>
+ <bb2d36b4-a077-691e-d59e-f65bf534d1ff@intel.com>
+ <20200226235924.GW9940@linux.intel.com>
+ <022bf970-1b86-d952-5563-0d18c9eea6e2@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <022bf970-1b86-d952-5563-0d18c9eea6e2@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 26, 2020 at 5:27 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 26/02/20 14:10, Vitaly Kuznetsov wrote:
-> > Nick Desaulniers <ndesaulniers@google.com> writes:
+On Thu, Feb 27, 2020 at 04:35:20PM +0800, Xiaoyao Li wrote:
+> On 2/27/2020 7:59 AM, Sean Christopherson wrote:
+> >Ah, good point.  But, that's just another bug in my psuedo patch :-)
+> >It's literally one call site that needs to be updated.  E.g.
 > >
-> >> (putting Paolo in To: field, in case email filters are to blame.
-> >> Vitaly, maybe you could ping Paolo internally?)
-> >>
+> >	if (is_guest_mode(vcpu) && nested_vmx_exit_reflected(vcpu, exit_reason))
+> >		return nested_vmx_reflect_vmexit(vcpu, full_exit_reason);
 > >
-> > I could, but the only difference from what I'm doing right now would
-> > proabbly be the absence of non-@redaht.com emails in To/Cc: fields of
-> > this email :-)
-> >
-> > Do we want this fix for one of the last 5.6 RCs or 5.7 would be fine?
-> > Personally, I'd say we're not in a great hurry and 5.7 is OK.
->
-> I think we can do it for 5.6, but we're not in a great hurry. :)  The
-> rc4 pull request was already going to be relatively large and I had just
-> been scolded by Linus so I postponed this, but I am going to include it
-> this week.
+> 
+> shouldn't we also pass full_exit_reason to nested_vmx_exit_reflected()?
 
-No rush; soak time is good.
--- 
-Thanks,
-~Nick Desaulniers
+Yep, see the patch I sent.  Alternatively, and perhaps a better approach
+once we have the union, would be to not pass exit_reason at all and instead
+have nested_vmx_exit_reflected() grab it directly from vmx->...
+
+> 
+> >Everywhere else KVM calls nested_vmx_reflect_vmexit() is (currently) done
+> 
+> I guess you wanted to say nested_vmx_vmexit() not
+> nested_vmx_reflect_vmexit() here.
+
+Ya.
+ 
+> >with a hardcoded value (except handle_vmfunc(), but I actually want to
+> >change that one).
+> >
+> 
