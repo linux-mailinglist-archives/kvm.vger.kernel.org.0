@@ -2,158 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E93A170EEE
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 04:20:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 235C8170F05
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 04:33:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728303AbgB0DUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 22:20:13 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:10701 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728220AbgB0DUN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 22:20:13 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 90D6C3EA773AAD8D60D2;
-        Thu, 27 Feb 2020 11:20:08 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Thu, 27 Feb 2020
- 11:19:59 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <hpa@zytor.com>
-CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH v2] KVM: X86: deprecate obsolete KVM_GET_CPUID2 ioctl
-Date:   Thu, 27 Feb 2020 11:21:28 +0800
-Message-ID: <1582773688-4956-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1728276AbgB0Ddf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 22:33:35 -0500
+Received: from ozlabs.org ([203.11.71.1]:40231 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728238AbgB0Dde (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 22:33:34 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 48SdYS6fpjz9sRQ;
+        Thu, 27 Feb 2020 14:33:32 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1582774413;
+        bh=Dor7dcwvpsNbsL7046VI5GfMcMzut5cyU0ZI1YD/FhE=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=Eg1fnyGPDBsCRIvLtiUzT228EP+RPP0YGqznCGILGSb6SuEsfKYi8uybQw8UhyfE4
+         zEQPQWWGR1Mf/EeFHUHD5GrYdnX4GQFy0ts9XKTQaFtQjtezI4zGffjZu4OwMP2tfJ
+         ubrxUwHovUOsbBKtrKQyEFGyOS53eoleDA7MEjQipo+tYMoxOVbeUIM7YscSeiCI3C
+         +sbNWDoPk3F5UtyO98IJoWDShn6V+IPwpbuGn6LcCDXR575TJM+dxFStG2LxBYDfRS
+         PlGP+0xZdz9OLxrQoCDGqV4D0qebc9066U9haeIFvjVaEEPqwYSPRRdBT676oUuR1A
+         rcGIAANrN3u0g==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Christoph Hellwig <hch@lst.de>, torvalds@linux-foundation.org
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Revert "KVM: x86: enable -Werror"
+In-Reply-To: <20200226153929.786743-1-hch@lst.de>
+References: <20200226153929.786743-1-hch@lst.de>
+Date:   Thu, 27 Feb 2020 14:33:30 +1100
+Message-ID: <87v9ns1z79.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
+Christoph Hellwig <hch@lst.de> writes:
+> This reverts commit ead68df94d248c80fdbae220ae5425eb5af2e753.
+>
+> Using the brain dead Werror flag fixes the build for me due to mostly
+> harmless KASAN or similar warnings:
+>
+> arch/x86/kvm/x86.c: In function =E2=80=98kvm_timer_init=E2=80=99:
+> arch/x86/kvm/x86.c:7209:1: error: the frame size of 1112 bytes is larger =
+than 1024 bytes [-Werror=3Dframe-larger-than=3D]
+>  7209 | }
+>
+> Feel free to add a CONFIG_WERROR if you care strong enough, but don't bre=
+ak
+> peoples builds for absolutely no good reason.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  arch/x86/kvm/Makefile | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index 4654e97a05cc..b19ef421084d 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -1,7 +1,6 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>=20=20
+>  ccflags-y +=3D -Iarch/x86/kvm
+> -ccflags-y +=3D -Werror
+>=20=20
+>  KVM :=3D ../../../virt/kvm
 
-When kvm_vcpu_ioctl_get_cpuid2() fails, we set cpuid->nent to the value of
-vcpu->arch.cpuid_nent. But this is in vain as cpuid->nent is not copied to
-userspace by copy_to_user() from call site. Also cpuid->nent is not updated
-to indicate how many entries were retrieved on success case. So this ioctl
-is straight up broken. And in fact, it's not used anywhere. So it should be
-deprecated.
+We've had -Werror enabled by default on powerpc for over 10 years, and
+haven't had many complaints. Possibly that's just because no one builds
+powerpc kernels ...
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
- arch/x86/kvm/cpuid.c           | 20 --------------------
- arch/x86/kvm/cpuid.h           |  3 ---
- arch/x86/kvm/x86.c             | 16 ++--------------
- include/uapi/linux/kvm.h       |  1 +
- tools/include/uapi/linux/kvm.h |  1 +
- 5 files changed, 4 insertions(+), 37 deletions(-)
+The key thing is that it's configurable, so if it does break the build
+for someone they can just turn it off. It's also off by default for
+allyes/allmod builds because the user-selectable option disables
+-Werror, eg:
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index b1c469446b07..5e041a1282b8 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -261,26 +261,6 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
- 	return r;
- }
- 
--int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
--			      struct kvm_cpuid2 *cpuid,
--			      struct kvm_cpuid_entry2 __user *entries)
--{
--	int r;
--
--	r = -E2BIG;
--	if (cpuid->nent < vcpu->arch.cpuid_nent)
--		goto out;
--	r = -EFAULT;
--	if (copy_to_user(entries, &vcpu->arch.cpuid_entries,
--			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
--		goto out;
--	return 0;
--
--out:
--	cpuid->nent = vcpu->arch.cpuid_nent;
--	return r;
--}
--
- static __always_inline void cpuid_mask(u32 *word, int wordnum)
- {
- 	reverse_cpuid_check(wordnum);
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index 7366c618aa04..76555de38e1b 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -19,9 +19,6 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
- int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
- 			      struct kvm_cpuid2 *cpuid,
- 			      struct kvm_cpuid_entry2 __user *entries);
--int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
--			      struct kvm_cpuid2 *cpuid,
--			      struct kvm_cpuid_entry2 __user *entries);
- bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
- 	       u32 *ecx, u32 *edx, bool check_limit);
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ddd1d296bd20..a6d99abedb2c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4295,21 +4295,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 					      cpuid_arg->entries);
- 		break;
- 	}
-+	/* KVM_GET_CPUID2 is deprecated, should not be used. */
- 	case KVM_GET_CPUID2: {
--		struct kvm_cpuid2 __user *cpuid_arg = argp;
--		struct kvm_cpuid2 cpuid;
--
--		r = -EFAULT;
--		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
--			goto out;
--		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
--					      cpuid_arg->entries);
--		if (r)
--			goto out;
--		r = -EFAULT;
--		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
--			goto out;
--		r = 0;
-+		r = -EINVAL;
- 		break;
- 	}
- 	case KVM_GET_MSRS: {
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 4b95f9a31a2f..61524780603d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1380,6 +1380,7 @@ struct kvm_s390_ucas_mapping {
- #define KVM_GET_LAPIC             _IOR(KVMIO,  0x8e, struct kvm_lapic_state)
- #define KVM_SET_LAPIC             _IOW(KVMIO,  0x8f, struct kvm_lapic_state)
- #define KVM_SET_CPUID2            _IOW(KVMIO,  0x90, struct kvm_cpuid2)
-+/* KVM_GET_CPUID2 is deprecated, should not be used. */
- #define KVM_GET_CPUID2            _IOWR(KVMIO, 0x91, struct kvm_cpuid2)
- /* Available with KVM_CAP_VAPIC */
- #define KVM_TPR_ACCESS_REPORTING  _IOWR(KVMIO, 0x92, struct kvm_tpr_access_ctl)
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index f0a16b4adbbd..2ef719af4c57 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -1379,6 +1379,7 @@ struct kvm_s390_ucas_mapping {
- #define KVM_GET_LAPIC             _IOR(KVMIO,  0x8e, struct kvm_lapic_state)
- #define KVM_SET_LAPIC             _IOW(KVMIO,  0x8f, struct kvm_lapic_state)
- #define KVM_SET_CPUID2            _IOW(KVMIO,  0x90, struct kvm_cpuid2)
-+/* KVM_GET_CPUID2 is deprecated, should not be used. */
- #define KVM_GET_CPUID2            _IOWR(KVMIO, 0x91, struct kvm_cpuid2)
- /* Available with KVM_CAP_VAPIC */
- #define KVM_TPR_ACCESS_REPORTING  _IOWR(KVMIO, 0x92, struct kvm_tpr_access_ctl)
--- 
-2.19.1
+config PPC_DISABLE_WERROR
+	bool "Don't build arch/powerpc code with -Werror"
+	help
+	  This option tells the compiler NOT to build the code under
+	  arch/powerpc with the -Werror flag (which means warnings
+	  are treated as errors).
 
+	  Only enable this if you are hitting a build failure in the
+	  arch/powerpc code caused by a warning, and you don't feel
+	  inclined to fix it.
+
+config PPC_WERROR
+	bool
+	depends on !PPC_DISABLE_WERROR
+	default y
+
+
+In fact these days with shell support in Kconfig we could make it even
+smarter, eg:
+
+diff --git a/arch/powerpc/Kconfig.debug b/arch/powerpc/Kconfig.debug
+index 0b063830eea8..e7564f7cabc6 100644
+--- a/arch/powerpc/Kconfig.debug
++++ b/arch/powerpc/Kconfig.debug
+@@ -2,6 +2,7 @@
+=20
+ config PPC_DISABLE_WERROR
+        bool "Don't build arch/powerpc code with -Werror"
++       default $(success,whoami | grep hch)
+        help
+          This option tells the compiler NOT to build the code under
+          arch/powerpc with the -Werror flag (which means warnings
+
+
+cheers
