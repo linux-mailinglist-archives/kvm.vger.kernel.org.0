@@ -2,162 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 73262172A55
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 22:42:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 011D9172B4C
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 23:31:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729924AbgB0VmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 16:42:19 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:57002 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729813AbgB0VmT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 16:42:19 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01RLdT9K001160;
-        Thu, 27 Feb 2020 21:41:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=sz3JDAysielxn6T2+wpmciuqWFvOq9Y62Xr0v5KTiNU=;
- b=pEp70LgOkQIQpH9jrE4EV/ydQ28ez2Ad/LN9TUPk8U/KBFMZEqF3Ak0oTaSJB7vYKCZ+
- gM/LDOj92TLG6QoF+SwNA2R8FAHs03C6gvKzFGO/S0FR4qkEZgWIMKvd0l/5/pPRQPqp
- cNXeYhLhicwdfFvaso2D+PPEjI/xdd97aN6Kd2sruSblD93yQZlw+W+4LeriwmdJcWCF
- VgmCIsWRuRZaLpzLNgXTEE1/EPXJ6qewz1HM3KnVYgPaC/gq0SthvRDDe91sejntZpKc
- 88010j0vryi04DNt02JCqN3MwjKnoJuDJJLdAs9t7tuZR5br+rZ2psBOpqLlNHbxawmc EQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2ydcsnnuc6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Feb 2020 21:41:56 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01RLalCc131406;
-        Thu, 27 Feb 2020 21:41:55 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2ydcsdeqy4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Feb 2020 21:41:55 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01RLfmSZ031235;
-        Thu, 27 Feb 2020 21:41:49 GMT
-Received: from [192.168.1.206] (/71.63.128.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 27 Feb 2020 13:41:48 -0800
-Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
- huge_pte_offset()
-To:     "Longpeng (Mike)" <longpeng2@huawei.com>,
-        Matthew Wilcox <willy@infradead.org>, Qian Cai <cai@lca.pw>
-Cc:     akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
-        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
-        weidong.huang@huawei.com, weifuqiang@huawei.com,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        stable@vger.kernel.org
-References: <C4ED630A-FAD8-4998-A0A3-9C36F3303379@lca.pw>
- <f274b368-6fdb-2ae3-160e-fd8b105b9ac4@huawei.com>
- <20200222170222.GJ24185@bombadil.infradead.org>
- <dfbfbf46-483a-808f-d197-388f75569d9c@huawei.com>
-From:   Mike Kravetz <mike.kravetz@oracle.com>
-Message-ID: <1b61f55a-d825-5721-2bfe-5e0efc9c9c2d@oracle.com>
-Date:   Thu, 27 Feb 2020 13:41:46 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1730117AbgB0Wav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Feb 2020 17:30:51 -0500
+Received: from mga04.intel.com ([192.55.52.120]:35152 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729808AbgB0Wau (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Feb 2020 17:30:50 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2020 14:30:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,493,1574150400"; 
+   d="scan'208";a="385312249"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by orsmga004.jf.intel.com with ESMTP; 27 Feb 2020 14:30:49 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] KVM: VMX: Fix for kexec VMCLEAR and VMXON cleanup
+Date:   Thu, 27 Feb 2020 14:30:44 -0800
+Message-Id: <20200227223047.13125-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <dfbfbf46-483a-808f-d197-388f75569d9c@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9544 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 bulkscore=0
- spamscore=0 mlxlogscore=999 mlxscore=0 suspectscore=27 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002270143
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9544 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=999 phishscore=0 spamscore=0 adultscore=0
- suspectscore=27 impostorscore=0 clxscore=1015 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002270143
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/22/20 5:24 PM, Longpeng (Mike) wrote:
-> 在 2020/2/23 1:02, Matthew Wilcox 写道:
->> On Sat, Feb 22, 2020 at 02:33:10PM +0800, Longpeng (Mike) wrote:
->>> 在 2020/2/22 13:23, Qian Cai 写道:
->>>>> On Feb 21, 2020, at 10:34 PM, Longpeng(Mike) <longpeng2@huawei.com> wrote:
->>>>>
->>>>> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
->>>>> index dd8737a..90daf37 100644
->>>>> --- a/mm/hugetlb.c
->>>>> +++ b/mm/hugetlb.c
->>>>> @@ -4910,28 +4910,30 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
->>>>> {
->>>>>    pgd_t *pgd;
->>>>>    p4d_t *p4d;
->>>>> -    pud_t *pud;
->>>>> -    pmd_t *pmd;
->>>>> +    pud_t *pud, pud_entry;
->>>>> +    pmd_t *pmd, pmd_entry;
->>>>>
->>>>>    pgd = pgd_offset(mm, addr);
->>>>> -    if (!pgd_present(*pgd))
->>>>> +    if (!pgd_present(READ_ONCE(*pgd)))
->>>>>        return NULL;
->>>>>    p4d = p4d_offset(pgd, addr);
->>>>> -    if (!p4d_present(*p4d))
->>>>> +    if (!p4d_present(READ_ONCE(*p4d)))
->>>>>        return NULL;
->>>>
->>>> What’s the point of READ_ONCE() on those two places?
->>>>
->>> As explained in the commit messages, it's for safe(e.g. avoid the compilier
->>> mischief). You can also find the same usage in the ARM64's huge_pte_offset() in
->>> arch/arm64/mm/hugetlbpage.c
->>
->> I rather agree with Qian; if we need something like READ_ONCE() here,
->> why don't we always need it as part of pgd_present()?  It seems like an
->> unnecessary burden for every user.
->>
-> Hi Matthew & Qian,
-> 
-> Firstly, this is NOT a 'blindly copy', it's an unwise words. I don't know
-> whether you read the commit message (commit 20a004e7) of ARM64's huge_pte_offset
-> ? If you read, I think worry about the safe is necessary.
-> 
-> Secondly, huge_pte_offset in mm/hugetlb.c is for ARCH_WANT_GENERAL_HUGETLB, many
-> architectures use it, can you make sure there is no issue on all the
-> architectures using it with all the version of gcc ?
-> 
-> Thirdly, there are several places use READ_ONCE to access the page table in mm/*
-> (e.g. gup_pmd_range), they're also generical for all architectures, and they're
-> much more like unnecessary than here, so why there can use but not here? What's
-> more, you can read this commit 688272809.
+Patch 1 fixes a a theoretical bug where a crashdump NMI that arrives
+while KVM is messing with the percpu VMCS list would result in one or more
+VMCSes not being cleared, potentially causing memory corruption in the new
+kexec'd kernel.
 
-Apologies for the late reply.
+Patch 2 isn't directly related, but it conflicts with the crash cleanup
+changes, both from a code and a semantics perspective.  Without the crash
+cleanup, IMO hardware_enable() should do crash_disable_local_vmclear()
+if VMXON fails, i.e. clean up after itself.  But hardware_disable()
+doesn't even do crash_disable_local_vmclear() (which is what got me
+looking at that code in the first place).  Basing the VMXON change on top
+of the crash cleanup avoids the debate entirely.
 
-In commit 20a004e7 the message says that "Whilst there are some scenarios
-where this cannot happen ... the overhead of using READ_ONCE/WRITE_ONCE
-everywhere is minimal and makes the code an awful lot easier to reason about."
-Therefore, a decision was made to ALWAYS use READ_ONCE in the arm64 code
-whether or not it was absolutely necessary.  Therefore, I do not think
-we can assume all the READ_ONCE additions made in 20a004e7 are necessary.
-Then the question remains, it it necessary in two statements above?
-I do not believe it is necessary.  Why?  In the statements,
-	if (!pgd_present(*pgd))
-and
-	if (!p4d_present(*p4d))
-the variables are only accessed and dereferenced once.  I can not imagine
-any way in which the compiler could perform multiple accesses of the variable.
+Patch 3 is a simple clean up (no functional change intended ;-) ).
 
-I do believe the READ_ONCE in code accessing the pud and pmd is necessary.
-This is because the variables (pud_entry or pmd_entry) are accessed more than
-once.  And, I could imagine some strange compiler optimization where it would
-dereference the pud or pmd pointer more than once.  For this same reason
-(multiple accesses), I believe the READ_ONCE was added in commit 688272809.
+I verified my analysis of the NMI bug by simulating what would happen if
+an NMI arrived in the middle of list_add() and list_del().  The below
+output matches expectations, e.g. nothing hangs, the entry being added
+doesn't show up, and the entry being deleted _does_ show up.
 
-I am no expert in this area, so corrections/comments appreciated.
+[    8.205898] KVM: testing NMI in list_add()
+[    8.205898] KVM: testing NMI in list_del()
+[    8.205899] KVM: found e3
+[    8.205899] KVM: found e2
+[    8.205899] KVM: found e1
+[    8.205900] KVM: found e3
+[    8.205900] KVM: found e1
 
-BTW, I still think there may be races present in lookup_address_in_pgd().
-Multiple dereferences of a p4d, pud and pmd are done.
+static void vmx_test_list(struct list_head *list, struct list_head *e1,
+			  struct list_head *e2, struct list_head *e3)
+{
+	struct list_head *tmp;
+
+	list_for_each(tmp, list) {
+		if (tmp == e1)
+			pr_warn("KVM: found e1\n");
+		else if (tmp == e2)
+			pr_warn("KVM: found e2\n");
+		else if (tmp == e3)
+			pr_warn("KVM: found e3\n");
+		else
+			pr_warn("KVM: kaboom\n");
+	}
+}
+
+static int __init vmx_init(void)
+{
+	LIST_HEAD(list);
+	LIST_HEAD(e1);
+	LIST_HEAD(e2);
+	LIST_HEAD(e3);
+
+	pr_warn("KVM: testing NMI in list_add()\n");
+
+	list.next->prev = &e1;
+	vmx_test_list(&list, &e1, &e2, &e3);
+
+	e1.next = list.next;
+	vmx_test_list(&list, &e1, &e2, &e3);
+
+	e1.prev = &list;
+	vmx_test_list(&list, &e1, &e2, &e3);
+
+	INIT_LIST_HEAD(&list);
+	INIT_LIST_HEAD(&e1);
+
+	list_add(&e1, &list);
+	list_add(&e2, &list);
+	list_add(&e3, &list);
+
+	pr_warn("KVM: testing NMI in list_del()\n");
+
+	e3.prev = &e1;
+	vmx_test_list(&list, &e1, &e2, &e3);
+
+	list_del(&e2);
+	list.prev = &e1;
+	vmx_test_list(&list, &e1, &e2, &e3);
+}
+
+Sean Christopherson (3):
+  KVM: VMX: Always VMCLEAR in-use VMCSes during crash with kexec support
+  KVM: VMX: Gracefully handle faults on VMXON
+  KVM: VMX: Make loaded_vmcs_init() a static function
+
+ arch/x86/kvm/vmx/vmx.c | 101 +++++++++++++++++------------------------
+ arch/x86/kvm/vmx/vmx.h |   1 -
+ 2 files changed, 41 insertions(+), 61 deletions(-)
+
 -- 
-Mike Kravetz
+2.24.1
+
