@@ -2,104 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E4FDB1729B7
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 21:52:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73262172A55
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 22:42:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729642AbgB0Uvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 15:51:54 -0500
-Received: from mga05.intel.com ([192.55.52.43]:41482 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726758AbgB0Uvy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 15:51:54 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2020 12:51:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,493,1574150400"; 
-   d="scan'208";a="272366192"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 27 Feb 2020 12:51:53 -0800
-Date:   Thu, 27 Feb 2020 12:51:53 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [PATCH] KVM: nVMX: Consult only the "basic" exit reason when
- routing nested exit
-Message-ID: <20200227205153.GC17014@linux.intel.com>
-References: <20200227174430.26371-1-sean.j.christopherson@intel.com>
- <ee8c5eb6-9e3d-620b-d51f-bf0534a05d43@oracle.com>
+        id S1729924AbgB0VmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Feb 2020 16:42:19 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:57002 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729813AbgB0VmT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Feb 2020 16:42:19 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01RLdT9K001160;
+        Thu, 27 Feb 2020 21:41:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=sz3JDAysielxn6T2+wpmciuqWFvOq9Y62Xr0v5KTiNU=;
+ b=pEp70LgOkQIQpH9jrE4EV/ydQ28ez2Ad/LN9TUPk8U/KBFMZEqF3Ak0oTaSJB7vYKCZ+
+ gM/LDOj92TLG6QoF+SwNA2R8FAHs03C6gvKzFGO/S0FR4qkEZgWIMKvd0l/5/pPRQPqp
+ cNXeYhLhicwdfFvaso2D+PPEjI/xdd97aN6Kd2sruSblD93yQZlw+W+4LeriwmdJcWCF
+ VgmCIsWRuRZaLpzLNgXTEE1/EPXJ6qewz1HM3KnVYgPaC/gq0SthvRDDe91sejntZpKc
+ 88010j0vryi04DNt02JCqN3MwjKnoJuDJJLdAs9t7tuZR5br+rZ2psBOpqLlNHbxawmc EQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2ydcsnnuc6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Feb 2020 21:41:56 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01RLalCc131406;
+        Thu, 27 Feb 2020 21:41:55 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2ydcsdeqy4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Feb 2020 21:41:55 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01RLfmSZ031235;
+        Thu, 27 Feb 2020 21:41:49 GMT
+Received: from [192.168.1.206] (/71.63.128.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 27 Feb 2020 13:41:48 -0800
+Subject: Re: [PATCH v2] mm/hugetlb: fix a addressing exception caused by
+ huge_pte_offset()
+To:     "Longpeng (Mike)" <longpeng2@huawei.com>,
+        Matthew Wilcox <willy@infradead.org>, Qian Cai <cai@lca.pw>
+Cc:     akpm@linux-foundation.org, kirill.shutemov@linux.intel.com,
+        linux-kernel@vger.kernel.org, arei.gonglei@huawei.com,
+        weidong.huang@huawei.com, weifuqiang@huawei.com,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        stable@vger.kernel.org
+References: <C4ED630A-FAD8-4998-A0A3-9C36F3303379@lca.pw>
+ <f274b368-6fdb-2ae3-160e-fd8b105b9ac4@huawei.com>
+ <20200222170222.GJ24185@bombadil.infradead.org>
+ <dfbfbf46-483a-808f-d197-388f75569d9c@huawei.com>
+From:   Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <1b61f55a-d825-5721-2bfe-5e0efc9c9c2d@oracle.com>
+Date:   Thu, 27 Feb 2020 13:41:46 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ee8c5eb6-9e3d-620b-d51f-bf0534a05d43@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <dfbfbf46-483a-808f-d197-388f75569d9c@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9544 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 bulkscore=0
+ spamscore=0 mlxlogscore=999 mlxscore=0 suspectscore=27 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002270143
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9544 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 bulkscore=0
+ lowpriorityscore=0 mlxlogscore=999 phishscore=0 spamscore=0 adultscore=0
+ suspectscore=27 impostorscore=0 clxscore=1015 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002270143
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 27, 2020 at 12:08:55PM -0800, Krish Sadhukhan wrote:
+On 2/22/20 5:24 PM, Longpeng (Mike) wrote:
+> 在 2020/2/23 1:02, Matthew Wilcox 写道:
+>> On Sat, Feb 22, 2020 at 02:33:10PM +0800, Longpeng (Mike) wrote:
+>>> 在 2020/2/22 13:23, Qian Cai 写道:
+>>>>> On Feb 21, 2020, at 10:34 PM, Longpeng(Mike) <longpeng2@huawei.com> wrote:
+>>>>>
+>>>>> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+>>>>> index dd8737a..90daf37 100644
+>>>>> --- a/mm/hugetlb.c
+>>>>> +++ b/mm/hugetlb.c
+>>>>> @@ -4910,28 +4910,30 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
+>>>>> {
+>>>>>    pgd_t *pgd;
+>>>>>    p4d_t *p4d;
+>>>>> -    pud_t *pud;
+>>>>> -    pmd_t *pmd;
+>>>>> +    pud_t *pud, pud_entry;
+>>>>> +    pmd_t *pmd, pmd_entry;
+>>>>>
+>>>>>    pgd = pgd_offset(mm, addr);
+>>>>> -    if (!pgd_present(*pgd))
+>>>>> +    if (!pgd_present(READ_ONCE(*pgd)))
+>>>>>        return NULL;
+>>>>>    p4d = p4d_offset(pgd, addr);
+>>>>> -    if (!p4d_present(*p4d))
+>>>>> +    if (!p4d_present(READ_ONCE(*p4d)))
+>>>>>        return NULL;
+>>>>
+>>>> What’s the point of READ_ONCE() on those two places?
+>>>>
+>>> As explained in the commit messages, it's for safe(e.g. avoid the compilier
+>>> mischief). You can also find the same usage in the ARM64's huge_pte_offset() in
+>>> arch/arm64/mm/hugetlbpage.c
+>>
+>> I rather agree with Qian; if we need something like READ_ONCE() here,
+>> why don't we always need it as part of pgd_present()?  It seems like an
+>> unnecessary burden for every user.
+>>
+> Hi Matthew & Qian,
 > 
-> On 2/27/20 9:44 AM, Sean Christopherson wrote:
-> >Consult only the basic exit reason, i.e. bits 15:0 of vmcs.EXIT_REASON,
-> >when determining whether a nested VM-Exit should be reflected into L1 or
-> >handled by KVM in L0.
-> >
-> >For better or worse, the switch statement in nested_vmx_exit_reflected()
-> >currently defaults to "true", i.e. reflects any nested VM-Exit without
-> >dedicated logic.  Because the case statements only contain the basic
-> >exit reason, any VM-Exit with modifier bits set will be reflected to L1,
-> >even if KVM intended to handle it in L0.
-> >
-> >Practically speaking, this only affects EXIT_REASON_MCE_DURING_VMENTRY,
-> >i.e. a #MC that occurs on nested VM-Enter would be incorrectly routed to
-> >L1, as "failed VM-Entry" is the only modifier that KVM can currently
-> >encounter.  The SMM modifiers will never be generated as KVM doesn't
-> >support/employ a SMI Transfer Monitor.  Ditto for "exit from enclave",
-> >as KVM doesn't yet support virtualizing SGX, i.e. it's impossible to
-> >enter an enclave in a KVM guest (L1 or L2).
+> Firstly, this is NOT a 'blindly copy', it's an unwise words. I don't know
+> whether you read the commit message (commit 20a004e7) of ARM64's huge_pte_offset
+> ? If you read, I think worry about the safe is necessary.
 > 
+> Secondly, huge_pte_offset in mm/hugetlb.c is for ARCH_WANT_GENERAL_HUGETLB, many
+> architectures use it, can you make sure there is no issue on all the
+> architectures using it with all the version of gcc ?
 > 
-> It seems nested_vmx_exit_reflected() deals only with the basic exit reason.
-> If it doesn't need anything beyond bits 15:0, may be vmx_handle_exit() can
-> pass just the base exit reason ?
+> Thirdly, there are several places use READ_ONCE to access the page table in mm/*
+> (e.g. gup_pmd_range), they're also generical for all architectures, and they're
+> much more like unnecessary than here, so why there can use but not here? What's
+> more, you can read this commit 688272809.
 
-Argh.  I was going to simply respond with "It traces exit_reason via
-trace_kvm_nested_vmexit().", but then I looked at the tracing code :-(
+Apologies for the late reply.
 
-The tracepoints that print the names of the VM-Exit are flawed in the sense
-that they'll always print the raw value for VM-Exits with modifiers.  E.g.
-a consistency check VM-Exit on invalid guest state will print 0x80000021
-instead of INVALID_STATE.
+In commit 20a004e7 the message says that "Whilst there are some scenarios
+where this cannot happen ... the overhead of using READ_ONCE/WRITE_ONCE
+everywhere is minimal and makes the code an awful lot easier to reason about."
+Therefore, a decision was made to ALWAYS use READ_ONCE in the arm64 code
+whether or not it was absolutely necessary.  Therefore, I do not think
+we can assume all the READ_ONCE additions made in 20a004e7 are necessary.
+Then the question remains, it it necessary in two statements above?
+I do not believe it is necessary.  Why?  In the statements,
+	if (!pgd_present(*pgd))
+and
+	if (!p4d_present(*p4d))
+the variables are only accessed and dereferenced once.  I can not imagine
+any way in which the compiler could perform multiple accesses of the variable.
 
-Stripping bits 31:16 when invoking the tracepoint would fix the immediate
-issue, but I'm not sure I like that approach because doing so drops
-information that could potentially be quite helpful, e.g. if nested VM-Exit
-injection injected EXIT_REASON_MSR_LOAD_FAIL without also setting
-VMX_EXIT_REASONS_FAILED_VMENTRY, which could break/confuse the L1 VMM.
-I'm also not remotely confident that we won't screw this up again in the
-future :-)
+I do believe the READ_ONCE in code accessing the pud and pmd is necessary.
+This is because the variables (pud_entry or pmd_entry) are accessed more than
+once.  And, I could imagine some strange compiler optimization where it would
+dereference the pud or pmd pointer more than once.  For this same reason
+(multiple accesses), I believe the READ_ONCE was added in commit 688272809.
 
-So part of me thinks the best way to resolve the printing would be to
-modify VMX_EXIT_REASONS to do "| VMX_EXIT_REASONS_FAILED_VMENTRY" where
-appropriate, i.e. on INVALID_STATE, MSR_LOAD_FAIL and MCE_DURING_VMENTRY.
-The downside of that approach is it breaks again when new modifiers come
-along, e.g. SGX's ENCLAVE_EXIT.  But again, the modifier is likely useful
-information.
+I am no expert in this area, so corrections/comments appreciated.
 
-I think the most foolproof and informative way to handle this would be to
-add a macro and/or helper function, e.g. kvm_print_vmx_exit_reason(), to
-wrap __print_symbolic(__entry->exit_code, VMX_EXIT_REASONS) so that it
-prints both the name of the basic exit reason as well as the names for
-any modifiers.
-
-TL;DR: I still like this patch as is, especially since it'll be easy to
-backport.  I'll send a separate patch for the tracepoint issue.
-
+BTW, I still think there may be races present in lookup_address_in_pgd().
+Multiple dereferences of a p4d, pud and pmd are done.
+-- 
+Mike Kravetz
