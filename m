@@ -2,78 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E074172B43
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 23:31:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BF65172BCC
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 00:01:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730376AbgB0Waw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 17:30:52 -0500
-Received: from mga04.intel.com ([192.55.52.120]:35152 "EHLO mga04.intel.com"
+        id S1729733AbgB0XBJ convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 27 Feb 2020 18:01:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54068 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730279AbgB0Waw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 17:30:52 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2020 14:30:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,493,1574150400"; 
-   d="scan'208";a="385312255"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga004.jf.intel.com with ESMTP; 27 Feb 2020 14:30:49 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] KVM: VMX: Make loaded_vmcs_init() a static function
-Date:   Thu, 27 Feb 2020 14:30:47 -0800
-Message-Id: <20200227223047.13125-4-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200227223047.13125-1-sean.j.christopherson@intel.com>
-References: <20200227223047.13125-1-sean.j.christopherson@intel.com>
+        id S1726845AbgB0XBI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Feb 2020 18:01:08 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
+ pointer dereference" and crashes
+Date:   Thu, 27 Feb 2020 23:00:46 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: anthonysanwo@googlemail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc attachments.created
+Message-ID: <bug-206579-28872-hgh3r9UIhX@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
+References: <bug-206579-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make loaded_vmcs_init() static as it's only used in vmx.c.
+https://bugzilla.kernel.org/show_bug.cgi?id=206579
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/vmx/vmx.c | 2 +-
- arch/x86/kvm/vmx/vmx.h | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+Anthony (anthonysanwo@googlemail.com) changed:
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a5109804abee..1aeb3359c4d1 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -654,7 +654,7 @@ static int vmx_set_guest_msr(struct vcpu_vmx *vmx, struct shared_msr_entry *msr,
- 	return ret;
- }
- 
--void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs, bool in_use)
-+static void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs, bool in_use)
- {
- 	vmcs_clear(loaded_vmcs->vmcs);
- 	if (loaded_vmcs->shadow_vmcs && loaded_vmcs->launched)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index a0a93b2a238e..8df23af2cb58 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -493,7 +493,6 @@ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags);
- void free_vmcs(struct vmcs *vmcs);
- int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
- void free_loaded_vmcs(struct loaded_vmcs *loaded_vmcs);
--void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs, bool in_use);
- void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs);
- 
- static inline struct vmcs *alloc_vmcs(bool shadow)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |anthonysanwo@googlemail.com
+
+--- Comment #28 from Anthony (anthonysanwo@googlemail.com) ---
+Created attachment 287685
+  --> https://bugzilla.kernel.org/attachment.cgi?id=287685&action=edit
+avic_inhibit_reasons-anthony
+
+Hi I also just wanted to give my observations I have found when testing the
+patches.
+
+I confirm I also don't have don't have crashes relating to the original report. 
+
+I have been trying out the SVM AVIC patches since around the first patch that
+was submitted but never got round to documentation my testing until recently.
+
+I can't remember the specific patch set/kernel version I tried but I remember
+having avic apparently working with when synic + stimer where enabled but not
+without. If my understanding is correctly this shouldn't be the case as synic
+is meant to be a case when avic is permanently disabled.
+
+This is still the case with current patchset. 
+
+In summary I can get avic reporting it's working according to perf stat and
+trace logs when synic is on but not working when synic is off. Using EPYC-IBPB
+or passthrough doesn't change the avic_inhibit_reasons.
+
+With Synic I get avic_inhibit_reasons - 10
+With Synic+Stimer off I get - 0
+
+
+To note I am using arch linux + qemu 4.2 + linux-mainline-5.6.0-rc2.
+
+Please see a small trace log of synic on vs off, domain capabilities, perf stat
+and patches used.
+
+These were recording once the VM was launched and sitting at the login screen.
+
+Please let me know if there is any other info I get provide to help.
+
 -- 
-2.24.1
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
