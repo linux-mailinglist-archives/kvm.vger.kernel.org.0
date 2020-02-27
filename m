@@ -2,120 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CE2A31725C1
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 18:56:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 298F41725CB
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 18:58:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730405AbgB0Rzo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 12:55:44 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:46087 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729624AbgB0Rzo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 12:55:44 -0500
-Received: by mail-io1-f68.google.com with SMTP id e7so362944ioe.13
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 09:55:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NylVHJE6upVF29IVdBuSvP++A0hZb65rcSiVqx/spX0=;
-        b=eOiS86viM71jTaieN8tpKi/iZHr0ck18Lvx7IOIytjUhy17X68LguUFd/elbTXuZLH
-         lM6D06RdoG36UyIH1ELD/OKP4tk2qxDf3avqVhYoVcNgtYw3AgmEXz0Av6gshpEehdP/
-         AO0BzoR/+HGd1J+/TYdPwercOcnCP44Om7rOZiJIJovsCbo5eT78DOyShKW9mdw8lSH/
-         x/QD7aSj0jOfyn4RMFjxgL48f2ZF00YY4/95eP/WgT9N0lCVpWGsHzbS6fecmWThDueV
-         ywuDRWa2kMVvy00eIgULbTOZdthUVPjBNVtNwrwWvMIPB/BmthzIxfXLtVyUOZW9vuou
-         3uOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NylVHJE6upVF29IVdBuSvP++A0hZb65rcSiVqx/spX0=;
-        b=gaoyscUss+Z0Kr0jLXT4LzsZKoLCa30Mu2P86gIdwcVDNlcm9fU+/JPGlRmejS6ysn
-         4u70REeye30l5pmrm8M96HtgvnW8ZWo38NvMv/fEHglnWz+0z8uw7XPNSdPnuevTaYTS
-         kmEvCs5PPM9yHV67DYSMYztmZDSFR8sdK0N9TjtTacZof71R1LjK89XYngic+0sjhkFf
-         Ph4c/dXKAFe/QLF13OZXEW2r+Jlq8fMfXGRfAyaFk3MmYaJzj9BYq4GkLqCHnx8vsN5C
-         FflHAMeb+370PY6RVXViLJu0PJmxYIewruWWoLu+DArVWkmoj5HjhtyhBkWzYJz4/szr
-         WFxw==
-X-Gm-Message-State: APjAAAUnjcAwOMpP6YTB2NFuOtheYpmizPhwRGMXYYBzuvPBmsrREaF3
-        O1C1TiiKkDWxUQ3Q+V/hSdkfeCkpjSjs+MRx4NYdYg==
-X-Google-Smtp-Source: APXvYqwFptUgwySCKOI0OSvyxECMDGUM5f6sOv8slHlp/a4KD/nPi+VDoaD1TXchnUg04QgiHVgi/lUA/uQgZeQjMAg=
-X-Received: by 2002:a05:6602:2c91:: with SMTP id i17mr443965iow.26.1582826143722;
- Thu, 27 Feb 2020 09:55:43 -0800 (PST)
+        id S1729816AbgB0R6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Feb 2020 12:58:19 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:53886 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726805AbgB0R6T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Feb 2020 12:58:19 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01RHrWAR154105;
+        Thu, 27 Feb 2020 17:57:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=corp-2020-01-29;
+ bh=hkoYA9sZ3xZiQrJDY9TW2iIfqHDj+HbXHnqg8LVRD34=;
+ b=ZSNtWzg6mYI1OQKwCFeV6Br7wBMQQMcpMhKEU1rSoVoLv1EbPQUz8M+2iVyLO+KLlWeb
+ L1D4Az1SGQlvbJoQu6oSSLjB3LongLFYQeGHrZjaQZsXlxwbXSEhPYfMrQwjPRygzMYF
+ swnsI7tuleIAveaRoFCbNrsqJLzimaGTHYWnA9OVPHWt/Ugt+rfX5MZdhzdHz1y5CBKo
+ zh5DfkZc7h39JpEUPaySpj5ti+Kh5IRpTviH07Q7Fo59Rv1u69/8k03adD6PE3K5N7Mw
+ DpgyxJFJCqc3HGmLKscOu/1n/NUKDX21ldl7KZgmlR7Py0zYf31Lra8+WW+ngwgMD1di tg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2ydcsnmr55-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Feb 2020 17:57:57 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01RHiRD2058593;
+        Thu, 27 Feb 2020 17:57:56 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2ydcsa1fq6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Feb 2020 17:57:56 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01RHvnFR004582;
+        Thu, 27 Feb 2020 17:57:50 GMT
+Received: from vbusired-dt (/10.154.159.233)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 27 Feb 2020 09:57:49 -0800
+Date:   Thu, 27 Feb 2020 11:57:48 -0600
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, rkrcmar@redhat.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, rientjes@google.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 09/12] KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
+Message-ID: <20200227175748.GA268253@vbusired-dt>
+References: <cover.1581555616.git.ashish.kalra@amd.com>
+ <efe6a4d829af0b2ed9fe1b58fd2dfb343f5b8de0.1581555616.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-References: <20200227172306.21426-1-mgamal@redhat.com> <20200227172306.21426-3-mgamal@redhat.com>
-In-Reply-To: <20200227172306.21426-3-mgamal@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 27 Feb 2020 09:55:32 -0800
-Message-ID: <CALMp9eR7heTGQ6zwYrK5rJ-xs_wKqz49gfcNtaEC7S6J7n2aFQ@mail.gmail.com>
-Subject: Re: [PATCH 2/5] KVM: VMX: Add guest physical address check in EPT
- violation and misconfig
-To:     Mohammed Gamal <mgamal@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <efe6a4d829af0b2ed9fe1b58fd2dfb343f5b8de0.1581555616.git.ashish.kalra@amd.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9543 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 spamscore=0 suspectscore=1 mlxscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002270128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9543 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 bulkscore=0
+ lowpriorityscore=0 mlxlogscore=999 phishscore=0 spamscore=0 adultscore=0
+ suspectscore=1 impostorscore=0 clxscore=1011 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002270129
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 27, 2020 at 9:23 AM Mohammed Gamal <mgamal@redhat.com> wrote:
->
-> Check guest physical address against it's maximum physical memory. If
-Nit: "its," without an apostrophe.
+On 2020-02-13 01:17:45 +0000, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> The ioctl can be used to retrieve page encryption bitmap for a given
+> gfn range.
+> 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 
-> the guest's physical address exceeds the maximum (i.e. has reserved bits
-> set), inject a guest page fault with PFERR_RSVD_MASK.
->
-> Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
+This patch does not apply to upstream Linux version 5.5.6.
+
+  <snip>
+  Applying: KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
+  error: patch failed: Documentation/virt/kvm/api.txt:4213
+  error: Documentation/virt/kvm/api.txt: patch does not apply
+  error: patch failed: include/uapi/linux/kvm.h:1478
+  error: include/uapi/linux/kvm.h: patch does not apply
+  Patch failed at 0009 KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
+  <snip>
+
+Which kernel version does this patch series apply to, cleanly?
+
+Thanks,
+
+Venu
+
 > ---
->  arch/x86/kvm/vmx/vmx.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 63aaf44edd1f..477d196aa235 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5162,6 +5162,12 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
->         gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
->         trace_kvm_page_fault(gpa, exit_qualification);
->
-> +       /* Check if guest gpa doesn't exceed physical memory limits */
-> +       if (gpa >= (1ull << cpuid_maxphyaddr(vcpu))) {
-> +               kvm_inject_rsvd_bits_pf(vcpu, gpa);
-
-Even if PFERR_RSVD_MASK is set in the page fault error code, shouldn't
-we set still conditionally set:
-    PFERR_WRITE_MASK - for an attempted write
-    PFERR_USER_MASK - for a usermode access
-    PFERR_FETCH_MASK - for an instruction fetch
-
-> +               return 1;
-> +       }
+>  Documentation/virt/kvm/api.txt  | 27 +++++++++++++++++++++
+>  arch/x86/include/asm/kvm_host.h |  2 ++
+>  arch/x86/kvm/svm.c              | 43 +++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.c              | 12 +++++++++
+>  include/uapi/linux/kvm.h        | 12 +++++++++
+>  5 files changed, 96 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+> index c6e1ce5d40de..053aecfabe74 100644
+> --- a/Documentation/virt/kvm/api.txt
+> +++ b/Documentation/virt/kvm/api.txt
+> @@ -4213,6 +4213,33 @@ the clear cpu reset definition in the POP. However, the cpu is not put
+>  into ESA mode. This reset is a superset of the initial reset.
+>  
+>  
+> +4.120 KVM_GET_PAGE_ENC_BITMAP (vm ioctl)
 > +
->         /* Is it a read fault? */
->         error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
->                      ? PFERR_USER_MASK : 0;
-> @@ -5193,6 +5199,13 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
->          * nGPA here instead of the required GPA.
->          */
->         gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
+> +Capability: basic
+> +Architectures: x86
+> +Type: vm ioctl
+> +Parameters: struct kvm_page_enc_bitmap (in/out)
+> +Returns: 0 on success, -1 on error
 > +
-> +       /* Check if guest gpa doesn't exceed physical memory limits */
-> +       if (gpa >= (1ull << cpuid_maxphyaddr(vcpu))) {
-> +               kvm_inject_rsvd_bits_pf(vcpu, gpa);
-
-And here as well?
-
-> +               return 1;
-> +       }
+> +/* for KVM_GET_PAGE_ENC_BITMAP */
+> +struct kvm_page_enc_bitmap {
+> +	__u64 start_gfn;
+> +	__u64 num_pages;
+> +	union {
+> +		void __user *enc_bitmap; /* one bit per page */
+> +		__u64 padding2;
+> +	};
+> +};
 > +
->         if (!is_guest_mode(vcpu) &&
->             !kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
->                 trace_kvm_fast_mmio(gpa);
-> --
-> 2.21.1
->
+> +The encrypted VMs have concept of private and shared pages. The private
+> +page is encrypted with the guest-specific key, while shared page may
+> +be encrypted with the hypervisor key. The KVM_GET_PAGE_ENC_BITMAP can
+> +be used to get the bitmap indicating whether the guest page is private
+> +or shared. The bitmap can be used during the guest migration, if the page
+> +is private then userspace need to use SEV migration commands to transmit
+> +the page.
+> +
+> +
+>  5. The kvm_run structure
+>  ------------------------
+>  
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 4ae7293033b2..a6882c5214b4 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1258,6 +1258,8 @@ struct kvm_x86_ops {
+>  	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
+>  	int (*page_enc_status_hc)(struct kvm *kvm, unsigned long gpa,
+>  				  unsigned long sz, unsigned long mode);
+> +	int (*get_page_enc_bitmap)(struct kvm *kvm,
+> +				struct kvm_page_enc_bitmap *bmap);
+>  };
+>  
+>  struct kvm_arch_async_pf {
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index f09791109075..f1c8806a97c6 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7673,6 +7673,48 @@ static int svm_page_enc_status_hc(struct kvm *kvm, unsigned long gpa,
+>  	return ret;
+>  }
+>  
+> +static int svm_get_page_enc_bitmap(struct kvm *kvm,
+> +				   struct kvm_page_enc_bitmap *bmap)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	unsigned long gfn_start, gfn_end;
+> +	unsigned long *bitmap;
+> +	unsigned long sz, i;
+> +	int ret;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	gfn_start = bmap->start_gfn;
+> +	gfn_end = gfn_start + bmap->num_pages;
+> +
+> +	sz = ALIGN(bmap->num_pages, BITS_PER_LONG) / 8;
+> +	bitmap = kmalloc(sz, GFP_KERNEL);
+> +	if (!bitmap)
+> +		return -ENOMEM;
+> +
+> +	/* by default all pages are marked encrypted */
+> +	memset(bitmap, 0xff, sz);
+> +
+> +	mutex_lock(&kvm->lock);
+> +	if (sev->page_enc_bmap) {
+> +		i = gfn_start;
+> +		for_each_clear_bit_from(i, sev->page_enc_bmap,
+> +				      min(sev->page_enc_bmap_size, gfn_end))
+> +			clear_bit(i - gfn_start, bitmap);
+> +	}
+> +	mutex_unlock(&kvm->lock);
+> +
+> +	ret = -EFAULT;
+> +	if (copy_to_user(bmap->enc_bitmap, bitmap, sz))
+> +		goto out;
+> +
+> +	ret = 0;
+> +out:
+> +	kfree(bitmap);
+> +	return ret;
+> +}
+> +
+>  static int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_sev_cmd sev_cmd;
+> @@ -8066,6 +8108,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+>  	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
+>  
+>  	.page_enc_status_hc = svm_page_enc_status_hc,
+> +	.get_page_enc_bitmap = svm_get_page_enc_bitmap,
+>  };
+>  
+>  static int __init svm_init(void)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 298627fa3d39..e955f886ee17 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5213,6 +5213,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>  	case KVM_SET_PMU_EVENT_FILTER:
+>  		r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
+>  		break;
+> +	case KVM_GET_PAGE_ENC_BITMAP: {
+> +		struct kvm_page_enc_bitmap bitmap;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&bitmap, argp, sizeof(bitmap)))
+> +			goto out;
+> +
+> +		r = -ENOTTY;
+> +		if (kvm_x86_ops->get_page_enc_bitmap)
+> +			r = kvm_x86_ops->get_page_enc_bitmap(kvm, &bitmap);
+> +		break;
+> +	}
+>  	default:
+>  		r = -ENOTTY;
+>  	}
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4e80c57a3182..9377b26c5f4e 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -500,6 +500,16 @@ struct kvm_dirty_log {
+>  	};
+>  };
+>  
+> +/* for KVM_GET_PAGE_ENC_BITMAP */
+> +struct kvm_page_enc_bitmap {
+> +	__u64 start_gfn;
+> +	__u64 num_pages;
+> +	union {
+> +		void __user *enc_bitmap; /* one bit per page */
+> +		__u64 padding2;
+> +	};
+> +};
+> +
+>  /* for KVM_CLEAR_DIRTY_LOG */
+>  struct kvm_clear_dirty_log {
+>  	__u32 slot;
+> @@ -1478,6 +1488,8 @@ struct kvm_enc_region {
+>  #define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
+>  #define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
+>  
+> +#define KVM_GET_PAGE_ENC_BITMAP	_IOW(KVMIO, 0xc2, struct kvm_page_enc_bitmap)
+> +
+>  /* Secure Encrypted Virtualization command */
+>  enum sev_cmd_id {
+>  	/* Guest initialization commands */
+> -- 
+> 2.17.1
+> 
