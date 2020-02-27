@@ -2,69 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F6B0171118
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 07:41:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3845C17129D
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 09:35:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727409AbgB0Gl4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 01:41:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55784 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726602AbgB0Gl4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 01:41:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582785714;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3WtQm8cciAT/fjByiLCd+SwYSU+Wsh17sH8Rz+Ha9TQ=;
-        b=dU7AHXyuYYKpvTIZvdq4Gv6uPyukw0O3nXhpyWq/5+jNpOUHcybiMhRezGsvVQLVMT+7GN
-        JE0v//XU6QEjTpt+qjnPm/XEiRUU/8Ya5b2zzrNIb1AsVnyDTuzZNkK7PmhBlGyE+USY7j
-        CR33O+BnwEcV5JCuOJkZs4BG57PNE+Q=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-28J9UUYfPXCE9ibhziC52w-1; Thu, 27 Feb 2020 01:41:53 -0500
-X-MC-Unique: 28J9UUYfPXCE9ibhziC52w-1
-Received: by mail-wm1-f72.google.com with SMTP id 7so324446wmf.9
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 22:41:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3WtQm8cciAT/fjByiLCd+SwYSU+Wsh17sH8Rz+Ha9TQ=;
-        b=KoYXUVYFoiVD+/C6fW97expLzBFx+pP2uQlMyBFuSQHLD87arttTUhSFScuFK2JV17
-         6TdaE0bB5hRhsQJLHqxj9cbbfZCVeHciHvej2qYnk3sU5KmH/TXhpCc11fbz6roB06z+
-         aFpOXplnPeLGVK1M9i5hOeb55gjhDHIJV+kZUNiU6FphSjOsmIfzJc+T7UZSzaBQ5wEJ
-         srCHrsmJCz+U6LNiTtm85ZMioETc+KAouIYYXh39xipQwzztkeQgKiR47BZjuh5/L3ru
-         xlcuwyV2sQhoXc+Bq5hP9M4I2d78031/HRj7qwJ7sbQje5xbozsfHDoWYrAwPOVkOxEI
-         8/bw==
-X-Gm-Message-State: APjAAAUBAFjmnO5yJ4srjORUbPaXjXBJbtbbZcEyd2S+YYF5QvOoXqdO
-        AKLUSpj9dIfSEz/HOPN6oyQiHPovOYNCY4J9NmFt7jQMYAtCWr2OBAUXiATM+4jENq2YHeB+e53
-        tN1aW30OFWCAk
-X-Received: by 2002:adf:f3d1:: with SMTP id g17mr2822677wrp.378.1582785712302;
-        Wed, 26 Feb 2020 22:41:52 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyArG/FMFCYBNGHUeD0cJCcpopv6q6Q0n5+XKSdmGhLCIy+1iyQ2uDjJJoigYpVcciUwPCVQg==
-X-Received: by 2002:adf:f3d1:: with SMTP id g17mr2822649wrp.378.1582785711971;
-        Wed, 26 Feb 2020 22:41:51 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:d0d9:ea10:9775:f33f? ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
-        by smtp.gmail.com with ESMTPSA id g206sm5552090wme.46.2020.02.26.22.41.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Feb 2020 22:41:51 -0800 (PST)
-Subject: Re: [PATCH] Revert "KVM: x86: enable -Werror"
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        Christoph Hellwig <hch@lst.de>, torvalds@linux-foundation.org
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200226153929.786743-1-hch@lst.de>
- <87v9ns1z79.fsf@mpe.ellerman.id.au>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5f31e38e-2f78-7919-7c60-a1761b9abb2e@redhat.com>
-Date:   Thu, 27 Feb 2020 07:41:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1728542AbgB0IfZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Feb 2020 03:35:25 -0500
+Received: from mga05.intel.com ([192.55.52.43]:49942 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728440AbgB0IfZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Feb 2020 03:35:25 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2020 00:35:25 -0800
+X-IronPort-AV: E=Sophos;i="5.70,491,1574150400"; 
+   d="scan'208";a="231749398"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.169.149]) ([10.249.169.149])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 27 Feb 2020 00:35:20 -0800
+Subject: Re: [PATCH 1/2] kvm: vmx: Use basic exit reason to check if it's the
+ specific VM EXIT
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <20200224020751.1469-1-xiaoyao.li@intel.com>
+ <20200224020751.1469-2-xiaoyao.li@intel.com>
+ <87lfosp9xs.fsf@vitty.brq.redhat.com>
+ <d9744594-4a66-d867-f785-64ce4d42b848@intel.com>
+ <87imjwp24x.fsf@vitty.brq.redhat.com>
+ <20200224161728.GC29865@linux.intel.com>
+ <50134028-ef7a-46c6-7602-095c47406ed7@intel.com>
+ <20200225061317.GV29865@linux.intel.com>
+ <bb2d36b4-a077-691e-d59e-f65bf534d1ff@intel.com>
+ <20200226235924.GW9940@linux.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <022bf970-1b86-d952-5563-0d18c9eea6e2@intel.com>
+Date:   Thu, 27 Feb 2020 16:35:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <87v9ns1z79.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200226235924.GW9940@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -72,24 +52,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/02/20 04:33, Michael Ellerman wrote:
-> We've had -Werror enabled by default on powerpc for over 10 years, and
-> haven't had many complaints. Possibly that's just because no one builds
-> powerpc kernels ...
+On 2/27/2020 7:59 AM, Sean Christopherson wrote:
+> On Tue, Feb 25, 2020 at 02:41:20PM +0800, Xiaoyao Li wrote:
+>> On 2/25/2020 2:13 PM, Sean Christopherson wrote:
+>>> On Tue, Feb 25, 2020 at 08:13:15AM +0800, Xiaoyao Li wrote:
+>>>> On 2/25/2020 12:17 AM, Sean Christopherson wrote:
+>>>> I have thought about union, but it seems
+>>>>
+>>>> union {
+>>>> 	u16 exit_reason;
+>>>> 	u32 full_exit_reason;
+>>>> }
+>>>>
+>>>> is not a good name. Since there are many codes in vmx.c and nested.c assume
+>>>> that exit_reason stands for 32-bit EXIT REASON vmcs field as well as
+>>>> evmcs->vm_exit_reason and vmcs12->vm_exit_reason. Do we really want to also
+>>>> rename them to full_exit_reason?
+>>>
+>>> It's actually the opposite, almost all of the VMX code assumes exit_reason
+>>> holds only the basic exit reason, i.e. a 16-bit value.  For example, SGX
+>>> adds a modifier flag to denote a VM-Exit was from enclave mode, and that
+>>> bit needs to be stripped from exit_reason, otherwise all the checks like
+>>> "if (exit_reason == blah_blah_blah)" fail.
+>>>
+>>> Making exit_reason a 16-bit alias of the full/extended exit_reason neatly
+>>> sidesteps that issue.  And it is an issue that has caused actual problems
+>>> in the past, e.g. see commit beb8d93b3e42 ("KVM: VMX: Fix handling of #MC
+>>> that occurs during VM-Entry").  Coincidentally, that commit also removes a
+>>> local "u16 basic_exit_reason" :-).
+>>>
+>>> Except for one mistake, the pseudo-patch below is the entirety of required
+>>> changes.  Most (all?) of the functions that take "u32 exit_reason" can (and
+>>> should) continue to take a u32.
+>>>
+>>> As for the name, I strongly prefer keeping the exit_reason name for the
+>>> basic exit reason.  The vast majority of VM-Exits do not have modifiers
+>>> set, i.e. "basic exit reason" == vmcs.EXIT_REASON for nearly all normal
+>>> usage.  This holds true in every form of communication, e.g. when discussing
+>>> VM-Exit reasons, it's never qualified with "basic", it's simply the exit
+>>> reason.  IMO the code is better off following the colloquial usage of "exit
+>>> reason".  A simple comment above the union would suffice to clear up any
+>>> confusion with respect to the SDM.
+>>
+>> Well, for this reason we can keep exit_reason for 16-bit usage, and define
+>> full/extended_exit_reason for 32-bit cases. This makes less code churn.
+>>
+>> But after we choose to use exit_reason and full/extended_exit_reason, what
+>> if someday new modifier flags are added and we want to enable some modifier
+>> flags for nested case?
+>> I guess we need to change existing exit_reason to full/extended_exit_reason
+>> in nested.c/nested.h to keep the naming rule consistent.
+> 
+> Ah, good point.  But, that's just another bug in my psuedo patch :-)
+> It's literally one call site that needs to be updated.  E.g.
+> 
+> 	if (is_guest_mode(vcpu) && nested_vmx_exit_reflected(vcpu, exit_reason))
+> 		return nested_vmx_reflect_vmexit(vcpu, full_exit_reason);
+> 
 
-I looked for other cases of -Werror being always on in Linux before
-writing this patch.  There are both unconditional cases and others like
-PPC where it's governed by Kconfig.
+shouldn't we also pass full_exit_reason to nested_vmx_exit_reflected()?
 
-I will add a Kconfig for now.  It probably should be made global instead
-of having a dozen different Kconfig symbols.
+> Everywhere else KVM calls nested_vmx_reflect_vmexit() is (currently) done
 
-kvm_timer_init should be fixed, though.
+I guess you wanted to say nested_vmx_vmexit() not 
+nested_vmx_reflect_vmexit() here.
 
-Paolo
-
-> The key thing is that it's configurable, so if it does break the build
-> for someone they can just turn it off. It's also off by default for
-> allyes/allmod builds because the user-selectable option disables
-> -Werror, eg:
+> with a hardcoded value (except handle_vmfunc(), but I actually want to
+> change that one).
+> 
 
