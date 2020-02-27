@@ -2,126 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 699601713C7
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 10:10:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71EE51713CF
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 10:12:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728621AbgB0JKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 04:10:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22082 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728624AbgB0JKn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Feb 2020 04:10:43 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01R9597I084018
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 04:10:42 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ydxenx2gc-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 04:10:41 -0500
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Thu, 27 Feb 2020 09:10:39 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 27 Feb 2020 09:10:37 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01R99dVM50921732
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Feb 2020 09:09:39 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E813A4040;
-        Thu, 27 Feb 2020 09:10:36 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1BB1CA4051;
-        Thu, 27 Feb 2020 09:10:36 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 27 Feb 2020 09:10:36 +0000 (GMT)
-From:   Michael Mueller <mimu@linux.ibm.com>
-To:     borntraeger@de.ibm.com, frankja@linux.vnet.ibm.com,
-        mimu@linux.ibm.com
-Cc:     kvm@vger.kernel.org, cohuck@redhat.com, david@redhat.com,
-        thuth@redhat.com, linux-s390@vger.kernel.org
-Subject: [PATCH] KVM: s390: introduce module parameter kvm.use_gisa
-Date:   Thu, 27 Feb 2020 10:10:31 +0100
-X-Mailer: git-send-email 2.17.1
-X-TM-AS-GCONF: 00
-x-cbid: 20022709-0028-0000-0000-000003DE6E4F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022709-0029-0000-0000-000024A38CE3
-Message-Id: <20200227091031.102993-1-mimu@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-27_02:2020-02-26,2020-02-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 priorityscore=1501 spamscore=0 suspectscore=0
- impostorscore=0 malwarescore=0 phishscore=0 mlxlogscore=999 mlxscore=0
- clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002270074
+        id S1728616AbgB0JMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Feb 2020 04:12:07 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:39905 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728555AbgB0JMG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Feb 2020 04:12:06 -0500
+Received: by mail-lf1-f66.google.com with SMTP id n30so1508423lfh.6
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 01:12:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=R2lIUx+nuCng7WT5OBlXhdq9LBq1TmJJFlRXaUTRA8Y=;
+        b=NPUW0v2heoUFp9zL/k4LKptrBstq8o67ceZ32apKGs1AYmB87dzmEZG2HY+pivTRdO
+         Z4n+UTGPe3jxAEs19A2zwzsbghObVIFrupxcEVbuD7Cg4QarlG0y3/KArDq4KfSCeaxi
+         KMEn8SPEsjTKOFFJQTQU6wR5zsA8dp+8AiYaN8ZamyuUQlJxLIryVoFaSSfiPJkmmdYn
+         2+8xU0Hflt/+wsasb7F9bSu/17F/INQfZBviSY4kxHJh9M9uP4TMN6Fg3vK05KF0eBP/
+         +jfIs5ef2ev1VDnxnQG8G0VGpHqC7NJAUMBVMBmhs8BJewVMVAfOydHGqv0Ltr/ZU6tp
+         P5Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=R2lIUx+nuCng7WT5OBlXhdq9LBq1TmJJFlRXaUTRA8Y=;
+        b=miuR8/ZVgGHkUb4HVHH3NbAQVNAB38Le9Sr+KJXkZ5tVay4qukiDzOHw82tcdBhZ9H
+         c55fpECCDTMvFgPsS+OjCHnZPYZ5VPy/82IgYIeyB6JPa0bqIcJJvTv1s3h6qZzDP42g
+         hKB3VPwQF5rBRgD0kwxdMpG7LY823vY/z+hey6jzP9IcUK0M+eEluX7i/nKcG/Yonjbj
+         LS/Mfl/5wk7eXKdgwYelVmQsDwCgB19o9t1TnvDFb7k4LK/8oO3379c6gH6X7wjjjy/c
+         S8PpfiOVpQ+3T1B3c5cpphbOPRHAxaIIwdp07RshmD8M0+qRP5du2iinxeRwf3ZGFaoO
+         389g==
+X-Gm-Message-State: ANhLgQ3b5kMM7kJ1HkIknZQSnCa8bFMojajL+OYaDt13zfUpJEICqGOw
+        UKSj/cgqBS1hoy63JlZnjz6sbG4Xli74rFqBs8ZGamjT
+X-Google-Smtp-Source: ADFU+vvteeecMfZgOxab6UBZtLxxHe9G73CiOuHuI60I/5KbA5+l8DPWGErhtgCuv/uEV4rN1LApR7ce5b7tykqONDY=
+X-Received: by 2002:a19:550d:: with SMTP id n13mr1671390lfe.110.1582794724791;
+ Thu, 27 Feb 2020 01:12:04 -0800 (PST)
+MIME-Version: 1.0
+References: <20200207103608.110305-1-oupton@google.com> <045fcfb5-8578-ad22-7c3e-6bbf20c4ea35@redhat.com>
+ <CAOQ_Qsg6DnSGU26xBJAQ6CGb6Lh5jX7VTvoXFZRnx3_f0eKYGQ@mail.gmail.com> <74650413-5cbc-6dd7-498e-22e89f1f6732@redhat.com>
+In-Reply-To: <74650413-5cbc-6dd7-498e-22e89f1f6732@redhat.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Thu, 27 Feb 2020 01:11:53 -0800
+Message-ID: <CAOQ_QsgbDUNxKgqEnQUs_sHShrRREpqwJ_=Cg9bjdo9-sBBH9A@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] Handle monitor trap flag during instruction emulation
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The boolean module parameter "kvm.use_gisa" controls if newly
-created guests will use the GISA facility if provided by the
-host system. The default is yes.
+On Wed, Feb 26, 2020 at 10:38 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 27/02/20 01:22, Oliver Upton wrote:
+> > Are there any strong opinions about how the newly introduced nested
+> > state should be handled across live migrations? When applying this
+> > patch set internally I realized live migration would be busted in the
+> > case of a kernel rollback (i.e. a kernel with this patchset emits the
+> > nested state, kernel w/o receives it + refuses).
+>
+> Only if you use MTF + emulation.  In this case it's a pure bugfix so
+> it's okay to break backwards migration.  If it's really a new feature,
+> it should support KVM_ENABLE_CAP to enable it.
+>
+> Paolo
+>
 
-  # cat /sys/module/kvm/parameters/use_gisa
-  Y
+True. I suppose I've conflated the pure bugfix here with the fact that
+MTF is new to us.
 
-The parameter can be changed on the fly.
+Thanks Paolo!
 
-  # echo N > /sys/module/kvm/parameters/use_gisa
+--
+Best,
+Oliver
 
-Already running guests are not affected by this change.
-
-The kvm s390 debug feature shows if a guest is running with GISA.
-
-  # grep gisa /sys/kernel/debug/s390dbf/kvm-$pid/sprintf
-  00 01582725059:843303 3 - 08 00000000e119bc01  gisa 0x00000000c9ac2642 initialized
-  00 01582725059:903840 3 - 11 000000004391ee22  00[0000000000000000-0000000000000000]: AIV gisa format-1 enabled for cpu 000
-  ...
-  00 01582725059:916847 3 - 08 0000000094fff572  gisa 0x00000000c9ac2642 cleared
-
-In general, that value should not be changed as the GISA facility
-enhances interruption delivery performance.
-
-A reason to switch the GISA facility off might be a performance
-comparison run or debugging.
-
-Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
----
- arch/s390/kvm/kvm-s390.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index d7ff30e45589..5c2081488024 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -184,6 +184,11 @@ static u8 halt_poll_max_steal = 10;
- module_param(halt_poll_max_steal, byte, 0644);
- MODULE_PARM_DESC(halt_poll_max_steal, "Maximum percentage of steal time to allow polling");
- 
-+/* if set to true, the GISA will be initialized and used if available */
-+static bool use_gisa  = true;
-+module_param(use_gisa, bool, 0644);
-+MODULE_PARM_DESC(use_gisa, "Use the GISA if the host supports it.");
-+
- /*
-  * For now we handle at most 16 double words as this is what the s390 base
-  * kernel handles and stores in the prefix page. If we ever need to go beyond
-@@ -2504,7 +2509,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm->arch.use_skf = sclp.has_skey;
- 	spin_lock_init(&kvm->arch.start_stop_lock);
- 	kvm_s390_vsie_init(kvm);
--	kvm_s390_gisa_init(kvm);
-+	if (use_gisa)
-+		kvm_s390_gisa_init(kvm);
- 	KVM_EVENT(3, "vm 0x%pK created by pid %u", kvm, current->pid);
- 
- 	return 0;
--- 
-2.17.1
-
+> > Easy fix is to only turn on the feature once it is rollback-proof, but
+> > I wonder if there is any room for improvement on this topic..
+>
