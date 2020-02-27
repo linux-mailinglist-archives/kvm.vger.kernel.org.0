@@ -2,107 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 38818170D06
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 01:11:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD36A170D1E
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 01:22:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728087AbgB0ALT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 19:11:19 -0500
-Received: from mga02.intel.com ([134.134.136.20]:62235 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727987AbgB0ALS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 19:11:18 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Feb 2020 16:11:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,490,1574150400"; 
-   d="scan'208";a="271951474"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 26 Feb 2020 16:11:17 -0800
-Date:   Wed, 26 Feb 2020 16:11:17 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@amacapital.net>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Laight <David.Laight@aculab.com>
-Subject: Re: [PATCH v2 3/6] kvm: x86: Emulate split-lock access as a write
-Message-ID: <20200227001117.GX9940@linux.intel.com>
-References: <20200203151608.28053-1-xiaoyao.li@intel.com>
- <20200203151608.28053-4-xiaoyao.li@intel.com>
- <95d29a81-62d5-f5b6-0eb6-9d002c0bba23@redhat.com>
- <878sl945tj.fsf@nanos.tec.linutronix.de>
- <d690c2e3-e9ef-a504-ede3-d0059ec1e0f6@redhat.com>
+        id S1728018AbgB0AWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 19:22:45 -0500
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:36906 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727987AbgB0AWp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 19:22:45 -0500
+Received: by mail-lj1-f194.google.com with SMTP id q23so1241419ljm.4
+        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 16:22:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IyMTMGg9qSQuPJl52d443YEIDtTm0XZjcRQmq1/vbRA=;
+        b=QwvsLqWMae8znfjZZJMBhS8m6ZCGFux9CEaI48MtozDXC0VwHJuuaofy6D+Hc11xvh
+         Fz1AEn8bt7iCoxNiZDBAKLPCakpXQBMieL2zRfS74t9eYbe0ME7CIfcY8GLZufEiaNZU
+         j2mF0vtEd8wiSSFQySq/09aZ/9PGK5SBGizd/n3j4kJwucxw/U9GOvoc7s75srHSrYZa
+         GYbEZ+KBVQiBbjxh5VbA95/ykW69XNHRt5b7QoqT0cK08nP/dKEZpbDiCSbE84mc0ees
+         heKi+wCn2OsbOp38S7FCGbodrS+ATU/tiapzeIthvfvXPERjxXboa7M9xjFU5h57/Vos
+         Htmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IyMTMGg9qSQuPJl52d443YEIDtTm0XZjcRQmq1/vbRA=;
+        b=rpG95MA/3IF/skVqTJOfbBqluygA2yFEvzbirgGFBw6xvPgyBVeGkIMHXhO1SXOWUb
+         FJmpxfuWVhPTEEWl6LFDVt02j2BdRZooQhpYrqAh+xewIVPclzzQTjMTrVRRjiEN00tw
+         YDFBU0L1Fjhqyg9sz76D+VR30eQUloOqom+2fPf5hRthz7c025is6Oon9f2TeqdF4V9/
+         vJS3NMsXcla5FDtgzelEaSGqI/CxmE0a1mt+yLpEuQ6/osAZUd3KHV5GrkXDm2GF4nk7
+         XD1SoDg/CkvYv1nNK/1Zi9jlp9lu2ivzQjoZQIkwWF9LIqdcD6zZ0thpnz37n2VpcArL
+         OqIg==
+X-Gm-Message-State: ANhLgQ2lXzytvmWrNvC1T3WIKp2DBKc35ujF475p6UXn5Lue99zLvdaC
+        lu9Zc25nK6xL/OrVJ4SCB4nA2HjTzaJQiMgcM2Fb3A==
+X-Google-Smtp-Source: ADFU+vvKha2nMpHbQ/3UrIlL2h8uvZNejW76k/ukKlnxhJDtEmiDks83eLjFtMxqWe9fAi3rXMq+bLvHzddjG63owhU=
+X-Received: by 2002:a2e:3608:: with SMTP id d8mr993106lja.152.1582762960291;
+ Wed, 26 Feb 2020 16:22:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d690c2e3-e9ef-a504-ede3-d0059ec1e0f6@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200207103608.110305-1-oupton@google.com> <045fcfb5-8578-ad22-7c3e-6bbf20c4ea35@redhat.com>
+In-Reply-To: <045fcfb5-8578-ad22-7c3e-6bbf20c4ea35@redhat.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Wed, 26 Feb 2020 16:22:29 -0800
+Message-ID: <CAOQ_Qsg6DnSGU26xBJAQ6CGb6Lh5jX7VTvoXFZRnx3_f0eKYGQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] Handle monitor trap flag during instruction emulation
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 11, 2020 at 02:34:18PM +0100, Paolo Bonzini wrote:
-> On 11/02/20 14:22, Thomas Gleixner wrote:
-> > Paolo Bonzini <pbonzini@redhat.com> writes:
-> >> On 03/02/20 16:16, Xiaoyao Li wrote:
-> >>> A sane guest should never tigger emulation on a split-lock access, but
-> >>> it cannot prevent malicous guest from doing this. So just emulating the
-> >>> access as a write if it's a split-lock access to avoid malicous guest
-> >>> polluting the kernel log.
-> >>
-> >> Saying that anything doing a split lock access is malicious makes little
-> >> sense.
-> > 
-> > Correct, but we also have to accept, that split lock access can be used
-> > in a malicious way, aka. DoS.
-> 
-> Indeed, a more accurate emulation such as temporarily disabling
-> split-lock detection in the emulator would allow the guest to use split
-> lock access as a vehicle for DoS, but that's not what the commit message
-> says.  If it were only about polluting the kernel log, there's
-> printk_ratelimited for that.  (In fact, if we went for incorrect
-> emulation as in this patch, a rate-limited pr_warn would be a good idea).
-> 
-> It is much more convincing to say that since this is pretty much a
-> theoretical case, we can assume that it is only done with the purpose of
-> DoS-ing the host or something like that, and therefore we kill the guest.
-
-The problem with "kill the guest", and the reason I'd prefer to emulate the
-split-lock as a write, is that killing the guest in this case is annoyingly
-difficult.
-
-Returning X86EMUL_UNHANDLEABLE / EMULATION_FAILED gets KVM to
-handle_emulation_failure(), but handle_emulation_failure() will only "kill"
-the guest if emulation failed in L1 CPL==0.  For all other modes, it will
-inject a #UD and resume the guest.  KVM also injects a #UD for L1 CPL==0,
-but that's the least annoying thing.
-
-Adding a new emulation type isn't an option because this code can be
-triggered through normal emulation.  A new return type could be added for
-split-lock, but that's code I'd really not add, both from an Intel
-perspective and a KVM maintenance perspective.  And, we'd still have the
-conundrum of what to do if/when split-lock #AC is exposed to L1, e.g. in
-that case, KVM should inject an #AC into L1, not kill the guest.  Again,
-totally doable, but ugly and IMO an unnecessary maintenance burden.
-
-I completely agree that poorly emulating the instruction from the (likely)
-malicious guest is a hack, but it's a simple and easy to maintain hack.
-
-> >> Split lock detection is essentially a debugging feature, there's a
-> >> reason why the MSR is called "TEST_CTL".  So you don't want to make the
-> > 
-> > The fact that it ended up in MSR_TEST_CTL does not say anything. That's
-> > where they it ended up to be as it was hastily cobbled together for
-> > whatever reason.
-> 
-> Or perhaps it was there all the time in test silicon or something like
-> that...  That would be a very plausible reason for all the quirks behind it.
-> 
+On Wed, Feb 12, 2020 at 3:34 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 07/02/20 11:36, Oliver Upton wrote:
+> > v1: http://lore.kernel.org/r/20200113221053.22053-1-oupton@google.com
+> > v2: http://lore.kernel.org/r/20200128092715.69429-1-oupton@google.com
+> >
+> > v1 => v2:
+> >  - Don't split the #DB delivery by vendors. Unconditionally injecting
+> >    #DB payloads into the 'pending debug exceptions' field will cause KVM
+> >    to get stuck in a loop. Per the SDM, when hardware injects an event
+> >    resulting from this field's value, it is checked against the
+> >    exception interception bitmap.
+> >  - Address Sean's comments by injecting the VM-exit into L1 from
+> >    vmx_check_nested_events().
+> >  - Added fix for nested INIT VM-exits + 'pending debug exceptions' field
+> >    as it was noticed in implementing v2.
+> >  - Drop Peter + Jim's Reviewed-by tags, as the patch set has changed
+> >    since v1.
+> >
+> > v2 => v3:
+> >  - Merge the check/set_pending_dbg helpers into a single helper,
+> >    vmx_update_pending_dbg(). Add clarifying comment to this helper.
+> >  - Rewrite commit message, descriptive comment for change in 3/5 to
+> >    explicitly describe the reason for mutating payload delivery
+> >    behavior.
+> >  - Undo the changes to kvm_vcpu_do_singlestep(). Instead, add a new hook
+> >    to call for 'full' instruction emulation + 'fast' emulation.
+> >
+> > KVM already provides guests the ability to use the 'monitor trap flag'
+> > VM-execution control. Support for this flag is provided by the fact that
+> > KVM unconditionally forwards MTF VM-exits to the guest (if requested),
+> > as KVM doesn't utilize MTF. While this provides support during hardware
+> > instruction execution, it is insufficient for instruction emulation.
+> >
+> > Should L0 emulate an instruction on the behalf of L2, L0 should also
+> > synthesize an MTF VM-exit into L1, should control be set.
+> >
+> > The first patch corrects a nuanced difference between the definition of
+> > a #DB exception payload field and DR6 register. Mask off bit 12 which is
+> > defined in the 'pending debug exceptions' field when applying to DR6,
+> > since the payload field is said to be compatible with the aforementioned
+> > VMCS field.
+> >
+> > The second patch sets the 'pending debug exceptions' VMCS field when
+> > delivering an INIT signal VM-exit to L1, as described in the SDM. This
+> > patch also introduces helpers for setting the 'pending debug exceptions'
+> > VMCS field.
+> >
+> > The third patch massages KVM's handling of exception payloads with
+> > regard to API compatibility. Rather than immediately delivering the
+> > payload w/o opt-in, instead defer the payload + inject
+> > before completing a KVM_GET_VCPU_EVENTS. This maintains API
+> > compatibility whilst correcting #DB behavior with regard to higher
+> > priority VM-exit events.
+> >
+> > Fourth patch introduces MTF implementation for emulated instructions.
+> > Identify if an MTF is due on an instruction boundary from
+> > kvm_vcpu_do_singlestep(), however only deliver this VM-exit from
+> > vmx_check_nested_events() to respect the relative prioritization to
+> > other VM-exits. Since this augments the nested state, introduce a new
+> > flag for (de)serialization.
+> >
+> > Last patch adds tests to kvm-unit-tests to assert the correctness of MTF
+> > under several conditions (concurrent #DB trap, #DB fault, etc). These
+> > tests pass under virtualization with this series as well as on
+> > bare-metal.
+> >
+> > Based on commit 2c2787938512 ("KVM: selftests: Stop memslot creation in
+> > KVM internal memslot region").
+> >
+> > Oliver Upton (4):
+> >   KVM: x86: Mask off reserved bit from #DB exception payload
+> >   KVM: nVMX: Handle pending #DB when injecting INIT VM-exit
+> >   KVM: x86: Deliver exception payload on KVM_GET_VCPU_EVENTS
+> >   KVM: nVMX: Emulate MTF when performing instruction emulation
+> >
+> >  arch/x86/include/asm/kvm_host.h |  1 +
+> >  arch/x86/include/uapi/asm/kvm.h |  1 +
+> >  arch/x86/kvm/svm.c              |  1 +
+> >  arch/x86/kvm/vmx/nested.c       | 54 ++++++++++++++++++++++++++++++++-
+> >  arch/x86/kvm/vmx/nested.h       |  5 +++
+> >  arch/x86/kvm/vmx/vmx.c          | 37 +++++++++++++++++++++-
+> >  arch/x86/kvm/vmx/vmx.h          |  3 ++
+> >  arch/x86/kvm/x86.c              | 39 ++++++++++++++++--------
+> >  8 files changed, 126 insertions(+), 15 deletions(-)
+> >
+>
+> Queued (for 5.6-rc2), thanks.
+>
 > Paolo
-> 
+>
+
+Are there any strong opinions about how the newly introduced nested
+state should be handled across live migrations? When applying this
+patch set internally I realized live migration would be busted in the
+case of a kernel rollback (i.e. a kernel with this patchset emits the
+nested state, kernel w/o receives it + refuses).
+
+Easy fix is to only turn on the feature once it is rollback-proof, but
+I wonder if there is any room for improvement on this topic..
+
+--
+Thanks,
+Oliver
