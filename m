@@ -2,162 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BD36A170D1E
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 01:22:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E844A170D9A
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 02:04:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728018AbgB0AWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Feb 2020 19:22:45 -0500
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:36906 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727987AbgB0AWp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Feb 2020 19:22:45 -0500
-Received: by mail-lj1-f194.google.com with SMTP id q23so1241419ljm.4
-        for <kvm@vger.kernel.org>; Wed, 26 Feb 2020 16:22:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IyMTMGg9qSQuPJl52d443YEIDtTm0XZjcRQmq1/vbRA=;
-        b=QwvsLqWMae8znfjZZJMBhS8m6ZCGFux9CEaI48MtozDXC0VwHJuuaofy6D+Hc11xvh
-         Fz1AEn8bt7iCoxNiZDBAKLPCakpXQBMieL2zRfS74t9eYbe0ME7CIfcY8GLZufEiaNZU
-         j2mF0vtEd8wiSSFQySq/09aZ/9PGK5SBGizd/n3j4kJwucxw/U9GOvoc7s75srHSrYZa
-         GYbEZ+KBVQiBbjxh5VbA95/ykW69XNHRt5b7QoqT0cK08nP/dKEZpbDiCSbE84mc0ees
-         heKi+wCn2OsbOp38S7FCGbodrS+ATU/tiapzeIthvfvXPERjxXboa7M9xjFU5h57/Vos
-         Htmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IyMTMGg9qSQuPJl52d443YEIDtTm0XZjcRQmq1/vbRA=;
-        b=rpG95MA/3IF/skVqTJOfbBqluygA2yFEvzbirgGFBw6xvPgyBVeGkIMHXhO1SXOWUb
-         FJmpxfuWVhPTEEWl6LFDVt02j2BdRZooQhpYrqAh+xewIVPclzzQTjMTrVRRjiEN00tw
-         YDFBU0L1Fjhqyg9sz76D+VR30eQUloOqom+2fPf5hRthz7c025is6Oon9f2TeqdF4V9/
-         vJS3NMsXcla5FDtgzelEaSGqI/CxmE0a1mt+yLpEuQ6/osAZUd3KHV5GrkXDm2GF4nk7
-         XD1SoDg/CkvYv1nNK/1Zi9jlp9lu2ivzQjoZQIkwWF9LIqdcD6zZ0thpnz37n2VpcArL
-         OqIg==
-X-Gm-Message-State: ANhLgQ2lXzytvmWrNvC1T3WIKp2DBKc35ujF475p6UXn5Lue99zLvdaC
-        lu9Zc25nK6xL/OrVJ4SCB4nA2HjTzaJQiMgcM2Fb3A==
-X-Google-Smtp-Source: ADFU+vvKha2nMpHbQ/3UrIlL2h8uvZNejW76k/ukKlnxhJDtEmiDks83eLjFtMxqWe9fAi3rXMq+bLvHzddjG63owhU=
-X-Received: by 2002:a2e:3608:: with SMTP id d8mr993106lja.152.1582762960291;
- Wed, 26 Feb 2020 16:22:40 -0800 (PST)
+        id S1728087AbgB0BEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Feb 2020 20:04:33 -0500
+Received: from mga04.intel.com ([192.55.52.120]:10330 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727964AbgB0BEd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Feb 2020 20:04:33 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Feb 2020 17:04:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,490,1574150400"; 
+   d="scan'208";a="410822859"
+Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
+  by orsmga005.jf.intel.com with ESMTP; 26 Feb 2020 17:04:30 -0800
+Received: from orsmsx162.amr.corp.intel.com (10.22.240.85) by
+ ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 26 Feb 2020 17:04:30 -0800
+Received: from orsmsx111.amr.corp.intel.com ([169.254.12.135]) by
+ ORSMSX162.amr.corp.intel.com ([169.254.3.233]) with mapi id 14.03.0439.000;
+ Wed, 26 Feb 2020 17:04:30 -0800
+From:   "Andersen, John S" <john.s.andersen@intel.com>
+To:     "drjones@redhat.com" <drjones@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "liran.alon@oracle.com" <liran.alon@oracle.com>,
+        "arjan@linux.intel.com" <arjan@linux.intel.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kristen@linux.intel.com" <kristen@linux.intel.com>
+Subject: Re: [RFC v2 3/4] selftests: kvm: add test for CR pinning with SMM
+Thread-Topic: [RFC v2 3/4] selftests: kvm: add test for CR pinning with SMM
+Thread-Index: AQHV5qaSmTP7bgSMzkuHnErPjqji9qgrDSaAgAO/4gA=
+Date:   Thu, 27 Feb 2020 01:04:29 +0000
+Message-ID: <de73d40fd1aff03789ef1b66f854b9997f769834.camel@intel.com>
+References: <20200218215902.5655-1-john.s.andersen@intel.com>
+         <20200218215902.5655-4-john.s.andersen@intel.com>
+         <20200224155043.m5ajw63g3p7kyfey@kamzik.brq.redhat.com>
+In-Reply-To: <20200224155043.m5ajw63g3p7kyfey@kamzik.brq.redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.3.86.139]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <619F59AB3A2A92429A860586EA4ED172@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200207103608.110305-1-oupton@google.com> <045fcfb5-8578-ad22-7c3e-6bbf20c4ea35@redhat.com>
-In-Reply-To: <045fcfb5-8578-ad22-7c3e-6bbf20c4ea35@redhat.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Wed, 26 Feb 2020 16:22:29 -0800
-Message-ID: <CAOQ_Qsg6DnSGU26xBJAQ6CGb6Lh5jX7VTvoXFZRnx3_f0eKYGQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] Handle monitor trap flag during instruction emulation
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 12, 2020 at 3:34 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 07/02/20 11:36, Oliver Upton wrote:
-> > v1: http://lore.kernel.org/r/20200113221053.22053-1-oupton@google.com
-> > v2: http://lore.kernel.org/r/20200128092715.69429-1-oupton@google.com
-> >
-> > v1 => v2:
-> >  - Don't split the #DB delivery by vendors. Unconditionally injecting
-> >    #DB payloads into the 'pending debug exceptions' field will cause KVM
-> >    to get stuck in a loop. Per the SDM, when hardware injects an event
-> >    resulting from this field's value, it is checked against the
-> >    exception interception bitmap.
-> >  - Address Sean's comments by injecting the VM-exit into L1 from
-> >    vmx_check_nested_events().
-> >  - Added fix for nested INIT VM-exits + 'pending debug exceptions' field
-> >    as it was noticed in implementing v2.
-> >  - Drop Peter + Jim's Reviewed-by tags, as the patch set has changed
-> >    since v1.
-> >
-> > v2 => v3:
-> >  - Merge the check/set_pending_dbg helpers into a single helper,
-> >    vmx_update_pending_dbg(). Add clarifying comment to this helper.
-> >  - Rewrite commit message, descriptive comment for change in 3/5 to
-> >    explicitly describe the reason for mutating payload delivery
-> >    behavior.
-> >  - Undo the changes to kvm_vcpu_do_singlestep(). Instead, add a new hook
-> >    to call for 'full' instruction emulation + 'fast' emulation.
-> >
-> > KVM already provides guests the ability to use the 'monitor trap flag'
-> > VM-execution control. Support for this flag is provided by the fact that
-> > KVM unconditionally forwards MTF VM-exits to the guest (if requested),
-> > as KVM doesn't utilize MTF. While this provides support during hardware
-> > instruction execution, it is insufficient for instruction emulation.
-> >
-> > Should L0 emulate an instruction on the behalf of L2, L0 should also
-> > synthesize an MTF VM-exit into L1, should control be set.
-> >
-> > The first patch corrects a nuanced difference between the definition of
-> > a #DB exception payload field and DR6 register. Mask off bit 12 which is
-> > defined in the 'pending debug exceptions' field when applying to DR6,
-> > since the payload field is said to be compatible with the aforementioned
-> > VMCS field.
-> >
-> > The second patch sets the 'pending debug exceptions' VMCS field when
-> > delivering an INIT signal VM-exit to L1, as described in the SDM. This
-> > patch also introduces helpers for setting the 'pending debug exceptions'
-> > VMCS field.
-> >
-> > The third patch massages KVM's handling of exception payloads with
-> > regard to API compatibility. Rather than immediately delivering the
-> > payload w/o opt-in, instead defer the payload + inject
-> > before completing a KVM_GET_VCPU_EVENTS. This maintains API
-> > compatibility whilst correcting #DB behavior with regard to higher
-> > priority VM-exit events.
-> >
-> > Fourth patch introduces MTF implementation for emulated instructions.
-> > Identify if an MTF is due on an instruction boundary from
-> > kvm_vcpu_do_singlestep(), however only deliver this VM-exit from
-> > vmx_check_nested_events() to respect the relative prioritization to
-> > other VM-exits. Since this augments the nested state, introduce a new
-> > flag for (de)serialization.
-> >
-> > Last patch adds tests to kvm-unit-tests to assert the correctness of MTF
-> > under several conditions (concurrent #DB trap, #DB fault, etc). These
-> > tests pass under virtualization with this series as well as on
-> > bare-metal.
-> >
-> > Based on commit 2c2787938512 ("KVM: selftests: Stop memslot creation in
-> > KVM internal memslot region").
-> >
-> > Oliver Upton (4):
-> >   KVM: x86: Mask off reserved bit from #DB exception payload
-> >   KVM: nVMX: Handle pending #DB when injecting INIT VM-exit
-> >   KVM: x86: Deliver exception payload on KVM_GET_VCPU_EVENTS
-> >   KVM: nVMX: Emulate MTF when performing instruction emulation
-> >
-> >  arch/x86/include/asm/kvm_host.h |  1 +
-> >  arch/x86/include/uapi/asm/kvm.h |  1 +
-> >  arch/x86/kvm/svm.c              |  1 +
-> >  arch/x86/kvm/vmx/nested.c       | 54 ++++++++++++++++++++++++++++++++-
-> >  arch/x86/kvm/vmx/nested.h       |  5 +++
-> >  arch/x86/kvm/vmx/vmx.c          | 37 +++++++++++++++++++++-
-> >  arch/x86/kvm/vmx/vmx.h          |  3 ++
-> >  arch/x86/kvm/x86.c              | 39 ++++++++++++++++--------
-> >  8 files changed, 126 insertions(+), 15 deletions(-)
-> >
->
-> Queued (for 5.6-rc2), thanks.
->
-> Paolo
->
-
-Are there any strong opinions about how the newly introduced nested
-state should be handled across live migrations? When applying this
-patch set internally I realized live migration would be busted in the
-case of a kernel rollback (i.e. a kernel with this patchset emits the
-nested state, kernel w/o receives it + refuses).
-
-Easy fix is to only turn on the feature once it is rollback-proof, but
-I wonder if there is any room for improvement on this topic..
-
---
-Thanks,
-Oliver
+T24gTW9uLCAyMDIwLTAyLTI0IGF0IDE2OjUwICswMTAwLCBBbmRyZXcgSm9uZXMgd3JvdGU6DQo+
+IE9uIFR1ZSwgRmViIDE4LCAyMDIwIGF0IDAxOjU5OjAxUE0gLTA4MDAsIEpvaG4gQW5kZXJzZW4g
+d3JvdGU6DQo+ID4gQ2hlY2sgdGhhdCBwYXJhdmlydHVhbGl6ZWQgY29udHJvbCByZWdpc3RlciBw
+aW5uaW5nIGJsb2Nrcw0KPiA+IG1vZGlmaWNhdGlvbnMNCj4gPiBvZiBwaW5uZWQgQ1IgdmFsdWVz
+IHN0b3JlZCBpbiBTTVJBTSBvbiBleGl0IGZyb20gU01NLg0KPiA+IA0KPiA+IFNpZ25lZC1vZmYt
+Ynk6IEpvaG4gQW5kZXJzZW4gPGpvaG4ucy5hbmRlcnNlbkBpbnRlbC5jb20+DQo+ID4gLS0tDQo+
+ID4gIHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS8uZ2l0aWdub3JlICAgICAgICB8ICAgMSAr
+DQo+ID4gIHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9NYWtlZmlsZSAgICAgICAgICB8ICAg
+MSArDQo+ID4gIC4uLi9zZWxmdGVzdHMva3ZtL2luY2x1ZGUveDg2XzY0L3Byb2Nlc3Nvci5oICB8
+ICAgOSArDQo+ID4gIC4uLi9zZWxmdGVzdHMva3ZtL3g4Nl82NC9zbW1fY3JfcGluX3Rlc3QuYyAg
+ICB8IDE4MA0KPiA+ICsrKysrKysrKysrKysrKysrKw0KPiA+ICA0IGZpbGVzIGNoYW5nZWQsIDE5
+MSBpbnNlcnRpb25zKCspDQo+ID4gIGNyZWF0ZSBtb2RlIDEwMDY0NA0KPiA+IHRvb2xzL3Rlc3Rp
+bmcvc2VsZnRlc3RzL2t2bS94ODZfNjQvc21tX2NyX3Bpbl90ZXN0LmMNCj4gPiANCj4gPiBkaWZm
+IC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtLy5naXRpZ25vcmUNCj4gPiBiL3Rv
+b2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS8uZ2l0aWdub3JlDQo+ID4gaW5kZXggMzAwNzJjM2Y1
+MmZiLi4wOGUxOGFlMWI4MGYgMTAwNjQ0DQo+ID4gLS0tIGEvdG9vbHMvdGVzdGluZy9zZWxmdGVz
+dHMva3ZtLy5naXRpZ25vcmUNCj4gPiArKysgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0v
+LmdpdGlnbm9yZQ0KPiA+IEBAIC03LDYgKzcsNyBAQA0KPiA+ICAveDg2XzY0L3BsYXRmb3JtX2lu
+Zm9fdGVzdA0KPiA+ICAveDg2XzY0L3NldF9zcmVnc190ZXN0DQo+ID4gIC94ODZfNjQvc21tX3Rl
+c3QNCj4gPiArL3g4Nl82NC9zbW1fY3JfcGluX3Rlc3QNCj4gPiAgL3g4Nl82NC9zdGF0ZV90ZXN0
+DQo+ID4gIC94ODZfNjQvc3luY19yZWdzX3Rlc3QNCj4gPiAgL3g4Nl82NC92bXhfY2xvc2Vfd2hp
+bGVfbmVzdGVkX3Rlc3QNCj4gPiBkaWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMv
+a3ZtL01ha2VmaWxlDQo+ID4gYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vTWFrZWZpbGUN
+Cj4gPiBpbmRleCBkOTFjNTNiNzI2ZTYuLmYzZmRhYzcyZmM3NCAxMDA2NDQNCj4gPiAtLS0gYS90
+b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vTWFrZWZpbGUNCj4gPiArKysgYi90b29scy90ZXN0
+aW5nL3NlbGZ0ZXN0cy9rdm0vTWFrZWZpbGUNCj4gPiBAQCAtMTksNiArMTksNyBAQCBURVNUX0dF
+Tl9QUk9HU194ODZfNjQgKz0geDg2XzY0L21taW9fd2FybmluZ190ZXN0DQo+ID4gIFRFU1RfR0VO
+X1BST0dTX3g4Nl82NCArPSB4ODZfNjQvcGxhdGZvcm1faW5mb190ZXN0DQo+ID4gIFRFU1RfR0VO
+X1BST0dTX3g4Nl82NCArPSB4ODZfNjQvc2V0X3NyZWdzX3Rlc3QNCj4gPiAgVEVTVF9HRU5fUFJP
+R1NfeDg2XzY0ICs9IHg4Nl82NC9zbW1fdGVzdA0KPiA+ICtURVNUX0dFTl9QUk9HU194ODZfNjQg
+Kz0geDg2XzY0L3NtbV9jcl9waW5fdGVzdA0KPiA+ICBURVNUX0dFTl9QUk9HU194ODZfNjQgKz0g
+eDg2XzY0L3N0YXRlX3Rlc3QNCj4gPiAgVEVTVF9HRU5fUFJPR1NfeDg2XzY0ICs9IHg4Nl82NC9z
+eW5jX3JlZ3NfdGVzdA0KPiA+ICBURVNUX0dFTl9QUk9HU194ODZfNjQgKz0geDg2XzY0L3ZteF9j
+bG9zZV93aGlsZV9uZXN0ZWRfdGVzdA0KPiA+IGRpZmYgLS1naXQgYS90b29scy90ZXN0aW5nL3Nl
+bGZ0ZXN0cy9rdm0vaW5jbHVkZS94ODZfNjQvcHJvY2Vzc29yLmgNCj4gPiBiL3Rvb2xzL3Rlc3Rp
+bmcvc2VsZnRlc3RzL2t2bS9pbmNsdWRlL3g4Nl82NC9wcm9jZXNzb3IuaA0KPiA+IGluZGV4IDc0
+Mjg1MTNhNGM2OC4uNzAzOTRkMmZmYTVkIDEwMDY0NA0KPiA+IC0tLSBhL3Rvb2xzL3Rlc3Rpbmcv
+c2VsZnRlc3RzL2t2bS9pbmNsdWRlL3g4Nl82NC9wcm9jZXNzb3IuaA0KPiA+ICsrKyBiL3Rvb2xz
+L3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9pbmNsdWRlL3g4Nl82NC9wcm9jZXNzb3IuaA0KPiA+IEBA
+IC0xOTcsNiArMTk3LDExIEBAIHN0YXRpYyBpbmxpbmUgdWludDY0X3QgZ2V0X2NyMCh2b2lkKQ0K
+PiA+ICAJcmV0dXJuIGNyMDsNCj4gPiAgfQ0KPiA+ICANCj4gPiArc3RhdGljIGlubGluZSB2b2lk
+IHNldF9jcjAodWludDY0X3QgdmFsKQ0KPiA+ICt7DQo+ID4gKwlfX2FzbV9fIF9fdm9sYXRpbGVf
+XygibW92ICUwLCAlJWNyMCIgOiA6ICJyIiAodmFsKSA6ICJtZW1vcnkiKTsNCj4gPiArfQ0KPiA+
+ICsNCj4gPiAgc3RhdGljIGlubGluZSB1aW50NjRfdCBnZXRfY3IzKHZvaWQpDQo+ID4gIHsNCj4g
+PiAgCXVpbnQ2NF90IGNyMzsNCj4gPiBAQCAtMzgwLDQgKzM4NSw4IEBAIHZvaWQga3ZtX2dldF9j
+cHVfYWRkcmVzc193aWR0aCh1bnNpZ25lZCBpbnQNCj4gPiAqcGFfYml0cywgdW5zaWduZWQgaW50
+ICp2YV9iaXRzKTsNCj4gPiAgLyogVk1YX0VQVF9WUElEX0NBUCBiaXRzICovDQo+ID4gICNkZWZp
+bmUgVk1YX0VQVF9WUElEX0NBUF9BRF9CSVRTICAgICAgICgxVUxMIDw8IDIxKQ0KPiA+ICANCj4g
+PiArLyogS1ZNIE1TUnMgKi8NCj4gPiArI2RlZmluZSBNU1JfS1ZNX0NSMF9QSU5ORUQJMHg0YjU2
+NGQwOA0KPiA+ICsjZGVmaW5lIE1TUl9LVk1fQ1I0X1BJTk5FRAkweDRiNTY0ZDA5DQo+ID4gKw0K
+PiA+ICAjZW5kaWYgLyogU0VMRlRFU1RfS1ZNX1BST0NFU1NPUl9IICovDQo+ID4gZGlmZiAtLWdp
+dCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS94ODZfNjQvc21tX2NyX3Bpbl90ZXN0LmMN
+Cj4gPiBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS94ODZfNjQvc21tX2NyX3Bpbl90ZXN0
+LmMNCj4gPiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPiA+IGluZGV4IDAwMDAwMDAwMDAwMC4uMDEz
+OTgzYmI0YmE0DQo+ID4gLS0tIC9kZXYvbnVsbA0KPiA+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2Vs
+ZnRlc3RzL2t2bS94ODZfNjQvc21tX2NyX3Bpbl90ZXN0LmMNCj4gPiBAQCAtMCwwICsxLDE4MCBA
+QA0KPiA+ICsvLyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMA0KPiA+ICsvKg0KPiA+
+ICsgKiBUZXN0cyBmb3IgY29udHJvbCByZWdpc3RlciBwaW5uaW5nIG5vdCBiZWluZyBhZmZlY3Rl
+ZCBieSBTTVJBTQ0KPiA+IHdyaXRlcy4NCj4gPiArICovDQo+ID4gKyNkZWZpbmUgX0dOVV9TT1VS
+Q0UgLyogZm9yIHByb2dyYW1faW52b2NhdGlvbl9zaG9ydF9uYW1lICovDQo+ID4gKyNpbmNsdWRl
+IDxmY250bC5oPg0KPiA+ICsjaW5jbHVkZSA8c3RkaW8uaD4NCj4gPiArI2luY2x1ZGUgPHN0ZGxp
+Yi5oPg0KPiA+ICsjaW5jbHVkZSA8c3RkaW50Lmg+DQo+ID4gKyNpbmNsdWRlIDxzdHJpbmcuaD4N
+Cj4gPiArI2luY2x1ZGUgPHN5cy9pb2N0bC5oPg0KPiA+ICsNCj4gPiArI2luY2x1ZGUgInRlc3Rf
+dXRpbC5oIg0KPiA+ICsNCj4gPiArI2luY2x1ZGUgImt2bV91dGlsLmgiDQo+ID4gKw0KPiA+ICsj
+aW5jbHVkZSAicHJvY2Vzc29yLmgiDQo+ID4gKw0KPiA+ICsjZGVmaW5lIFZDUFVfSUQJICAgICAg
+MQ0KPiA+ICsNCj4gPiArI2RlZmluZSBQQUdFX1NJWkUgIDQwOTYNCj4gPiArDQo+ID4gKyNkZWZp
+bmUgU01SQU1fU0laRSA2NTUzNg0KPiA+ICsjZGVmaW5lIFNNUkFNX01FTVNMT1QgKCgxIDw8IDE2
+KSB8IDEpDQo+ID4gKyNkZWZpbmUgU01SQU1fUEFHRVMgKFNNUkFNX1NJWkUgLyBQQUdFX1NJWkUp
+DQo+ID4gKyNkZWZpbmUgU01SQU1fR1BBIDB4MTAwMDAwMA0KPiA+ICsjZGVmaW5lIFNNUkFNX1NU
+QUdFIDB4ZmUNCj4gPiArDQo+ID4gKyNkZWZpbmUgU1RSKHgpICN4DQo+ID4gKyNkZWZpbmUgWFNU
+UihzKSBTVFIocykNCj4gDQo+IGxpbnV4L3N0cmluZ2lmeS5oIGlzIGluIHRvb2xzLw0KPiANCj4g
+PiArDQo+ID4gKyNkZWZpbmUgU1lOQ19QT1JUIDB4ZQ0KPiA+ICsjZGVmaW5lIERPTkUgMHhmZg0K
+PiA+ICsNCj4gPiArI2RlZmluZSBDUjBfUElOTkVEIFg4Nl9DUjBfV1ANCj4gPiArI2RlZmluZSBD
+UjRfUElOTkVEIChYODZfQ1I0X1NNQVAgfCBYODZfQ1I0X1VNSVApDQo+ID4gKyNkZWZpbmUgQ1I0
+X0FMTCAoQ1I0X1BJTk5FRCB8IFg4Nl9DUjRfU01FUCkNCj4gPiArDQo+ID4gKy8qDQo+ID4gKyAq
+IFRoaXMgaXMgY29tcGlsZWQgYXMgbm9ybWFsIDY0LWJpdCBjb2RlLCBob3dldmVyLCBTTUkgaGFu
+ZGxlciBpcw0KPiA+IGV4ZWN1dGVkDQo+ID4gKyAqIGluIHJlYWwtYWRkcmVzcyBtb2RlLiBUbyBz
+dGF5IHNpbXBsZSB3ZSdyZSBsaW1pdGluZyBvdXJzZWx2ZXMNCj4gPiB0byBhIG1vZGUNCj4gPiAr
+ICogaW5kZXBlbmRlbnQgc3Vic2V0IG9mIGFzbSBoZXJlLg0KPiA+ICsgKiBTTUkgaGFuZGxlciBh
+bHdheXMgcmVwb3J0IGJhY2sgZml4ZWQgc3RhZ2UgU01SQU1fU1RBR0UuDQo+ID4gKyAqLw0KPiA+
+ICt1aW50OF90IHNtaV9oYW5kbGVyW10gPSB7DQo+ID4gKwkweGIwLCBTTVJBTV9TVEFHRSwgICAg
+LyogbW92ICRTTVJBTV9TVEFHRSwgJWFsICovDQo+ID4gKwkweGU0LCBTWU5DX1BPUlQsICAgICAg
+LyogaW4gJFNZTkNfUE9SVCwgJWFsICovDQo+ID4gKwkweDBmLCAweGFhLCAgICAgICAgICAgLyog
+cnNtICovDQo+ID4gK307DQo+ID4gKw0KPiA+ICt2b2lkIHN5bmNfd2l0aF9ob3N0KHVpbnQ2NF90
+IHBoYXNlKQ0KPiA+ICt7DQo+ID4gKwlhc20gdm9sYXRpbGUoImluICQiIFhTVFIoU1lOQ19QT1JU
+KSIsICUlYWwgXG4iDQo+ID4gKwkJICAgICA6IDogImEiIChwaGFzZSkpOw0KPiA+ICt9DQo+IA0K
+PiBBbnkgcmVhc29uIG5vdCB0byB1c2UgR1VFU1RfU1lOQygpID8NCj4gDQo+ID4gKw0KPiA+ICt2
+b2lkIHNlbGZfc21pKHZvaWQpDQo+ID4gK3sNCj4gPiArCXdybXNyKEFQSUNfQkFTRV9NU1IgKyAo
+QVBJQ19JQ1IgPj4gNCksDQo+ID4gKwkgICAgICBBUElDX0RFU1RfU0VMRiB8IEFQSUNfSU5UX0FT
+U0VSVCB8IEFQSUNfRE1fU01JKTsNCj4gPiArfQ0KPiA+ICsNCj4gPiArdm9pZCBndWVzdF9jb2Rl
+KHZvaWQgKnVudXNlZCkNCj4gPiArew0KPiANCj4gV2h5IG5vdCBqdXN0IGRlZmluZSBndWVzdF9j
+b2RlIGFzICd2b2lkIGd1ZXN0X2NvZGUodm9pZCknID8NCj4gDQo+ID4gKwl1aW50NjRfdCBhcGlj
+YmFzZSA9IHJkbXNyKE1TUl9JQTMyX0FQSUNCQVNFKTsNCj4gPiArDQo+ID4gKwkodm9pZCl1bnVz
+ZWQ7DQo+ID4gKw0KPiA+ICsJc3luY193aXRoX2hvc3QoMSk7DQo+ID4gKw0KPiA+ICsJd3Jtc3Io
+TVNSX0lBMzJfQVBJQ0JBU0UsIGFwaWNiYXNlIHwgWDJBUElDX0VOQUJMRSk7DQo+ID4gKw0KPiA+
+ICsJc3luY193aXRoX2hvc3QoMik7DQo+ID4gKw0KPiA+ICsJc2V0X2NyMChnZXRfY3IwKCkgfCBD
+UjBfUElOTkVEKTsNCj4gPiArDQo+ID4gKwl3cm1zcihNU1JfS1ZNX0NSMF9QSU5ORUQsIENSMF9Q
+SU5ORUQpOw0KPiA+ICsNCj4gPiArCXN5bmNfd2l0aF9ob3N0KDMpOw0KPiA+ICsNCj4gPiArCXNl
+dF9jcjQoZ2V0X2NyNCgpIHwgQ1I0X1BJTk5FRCk7DQo+ID4gKw0KPiA+ICsJc3luY193aXRoX2hv
+c3QoNCk7DQo+ID4gKw0KPiA+ICsJLyogUGluIFNNRVAgbG93ICovDQo+ID4gKwl3cm1zcihNU1Jf
+S1ZNX0NSNF9QSU5ORUQsIENSNF9QSU5ORUQpOw0KPiA+ICsNCj4gPiArCXN5bmNfd2l0aF9ob3N0
+KDUpOw0KPiA+ICsNCj4gPiArCXNlbGZfc21pKCk7DQo+ID4gKw0KPiA+ICsJc3luY193aXRoX2hv
+c3QoRE9ORSk7DQo+IA0KPiBHVUVTVF9ET05FKCkgPw0KPiANCj4gPiArfQ0KPiA+ICsNCj4gPiAr
+aW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkNCj4gPiArew0KPiA+ICsJc3RydWN0IGt2
+bV9yZWdzIHJlZ3M7DQo+ID4gKwlzdHJ1Y3Qga3ZtX3NyZWdzIHNyZWdzOw0KPiA+ICsJc3RydWN0
+IGt2bV92bSAqdm07DQo+ID4gKwlzdHJ1Y3Qga3ZtX3J1biAqcnVuOw0KPiA+ICsJc3RydWN0IGt2
+bV94ODZfc3RhdGUgKnN0YXRlOw0KPiA+ICsJaW50IHN0YWdlLCBzdGFnZV9yZXBvcnRlZDsNCj4g
+PiArCXU2NCAqY3I7DQo+ID4gKw0KPiA+ICsJLyogQ3JlYXRlIFZNICovDQo+ID4gKwl2bSA9IHZt
+X2NyZWF0ZV9kZWZhdWx0KFZDUFVfSUQsIDAsIGd1ZXN0X2NvZGUpOw0KPiA+ICsNCj4gPiArCXZj
+cHVfc2V0X2NwdWlkKHZtLCBWQ1BVX0lELCBrdm1fZ2V0X3N1cHBvcnRlZF9jcHVpZCgpKTsNCj4g
+PiArDQo+ID4gKwlydW4gPSB2Y3B1X3N0YXRlKHZtLCBWQ1BVX0lEKTsNCj4gPiArDQo+ID4gKwl2
+bV91c2Vyc3BhY2VfbWVtX3JlZ2lvbl9hZGQodm0sIFZNX01FTV9TUkNfQU5PTllNT1VTLA0KPiA+
+IFNNUkFNX0dQQSwNCj4gPiArCQkJCSAgICBTTVJBTV9NRU1TTE9ULCBTTVJBTV9QQUdFUywgMCk7
+DQo+ID4gKwlURVNUX0FTU0VSVCh2bV9waHlfcGFnZXNfYWxsb2Modm0sIFNNUkFNX1BBR0VTLCBT
+TVJBTV9HUEEsDQo+ID4gU01SQU1fTUVNU0xPVCkNCj4gPiArCQkgICAgPT0gU01SQU1fR1BBLCAi
+Y291bGQgbm90IGFsbG9jYXRlIGd1ZXN0IHBoeXNpY2FsDQo+ID4gYWRkcmVzc2VzPyIpOw0KPiA+
+ICsNCj4gPiArCW1lbXNldChhZGRyX2dwYTJodmEodm0sIFNNUkFNX0dQQSksIDB4MCwgU01SQU1f
+U0laRSk7DQo+ID4gKwltZW1jcHkoYWRkcl9ncGEyaHZhKHZtLCBTTVJBTV9HUEEpICsgMHg4MDAw
+LCBzbWlfaGFuZGxlciwNCj4gPiArCSAgICAgICBzaXplb2Yoc21pX2hhbmRsZXIpKTsNCj4gPiAr
+DQo+ID4gKwl2Y3B1X3NldF9tc3Iodm0sIFZDUFVfSUQsIE1TUl9JQTMyX1NNQkFTRSwgU01SQU1f
+R1BBKTsNCj4gPiArDQo+ID4gKwl2Y3B1X2FyZ3Nfc2V0KHZtLCBWQ1BVX0lELCAxLCAwKTsNCj4g
+DQo+IGd1ZXN0X2NvZGUoKSBkb2Vzbid0IHVzZSBpbnB1dHMsIHNvIHdoeSBzZXQgcmRpIHRvIHpl
+cm8/DQo+IA0KPiA+ICsNCj4gPiArCWZvciAoc3RhZ2UgPSAxOzsgc3RhZ2UrKykgew0KPiA+ICsJ
+CV92Y3B1X3J1bih2bSwgVkNQVV9JRCk7DQo+ID4gKw0KPiA+ICsJCVRFU1RfQVNTRVJUKHJ1bi0+
+ZXhpdF9yZWFzb24gPT0gS1ZNX0VYSVRfSU8sDQo+ID4gKwkJCSAgICAiU3RhZ2UgJWQ6IHVuZXhw
+ZWN0ZWQgZXhpdCByZWFzb246ICV1DQo+ID4gKCVzKSxcbiIsDQo+ID4gKwkJCSAgICBzdGFnZSwg
+cnVuLT5leGl0X3JlYXNvbiwNCj4gPiArCQkJICAgIGV4aXRfcmVhc29uX3N0cihydW4tPmV4aXRf
+cmVhc29uKSk7DQo+ID4gKw0KPiA+ICsJCW1lbXNldCgmcmVncywgMCwgc2l6ZW9mKHJlZ3MpKTsN
+Cj4gPiArCQl2Y3B1X3JlZ3NfZ2V0KHZtLCBWQ1BVX0lELCAmcmVncyk7DQo+ID4gKw0KPiA+ICsJ
+CW1lbXNldCgmc3JlZ3MsIDAsIHNpemVvZihzcmVncykpOw0KPiA+ICsJCXZjcHVfc3JlZ3NfZ2V0
+KHZtLCBWQ1BVX0lELCAmc3JlZ3MpOw0KPiA+ICsNCj4gPiArCQlzdGFnZV9yZXBvcnRlZCA9IHJl
+Z3MucmF4ICYgMHhmZjsNCj4gDQo+IElmIHlvdSB1c2UgR1VFU1RfQVNTRVJUKCkgYW5kIGdldF91
+Y2FsbCgpIHRoZW4gc3RhZ2VfcmVwb3J0ZWQgaXMNCj4gdWMuYXJnc1sxXS4NCj4gV2h5IG1hc2sg
+aXQgd2l0aCAweGZmPyBTaG91bGRuJ3QgdGhlIHRlc3QgYXNzZXJ0IGlmIHRoZSBzdGFnZSBpcyBh
+bg0KPiB1bmV4cGVjdGVkIHZhbHVlPw0KPiANCj4gPiArDQo+ID4gKwkJaWYgKHN0YWdlX3JlcG9y
+dGVkID09IERPTkUpIHsNCj4gDQo+IHVjLmNtZCA9PSBVQ0FMTF9ET05FDQo+IA0KPiA+ICsJCQlU
+RVNUX0FTU0VSVCgoc3JlZ3MuY3IwICYgQ1IwX1BJTk5FRCkgPT0NCj4gPiBDUjBfUElOTkVELA0K
+PiA+ICsJCQkJICAgICJVbmV4cGVjdGVkIGNyMC4gQml0cyBtaXNzaW5nOg0KPiA+ICVsbHgiLA0K
+PiA+ICsJCQkJICAgIHNyZWdzLmNyMCBeIChDUjBfUElOTkVEIHwNCj4gPiBzcmVncy5jcjApKTsN
+Cj4gPiArCQkJVEVTVF9BU1NFUlQoKHNyZWdzLmNyNCAmIENSNF9BTEwpID09DQo+ID4gQ1I0X1BJ
+Tk5FRCwNCj4gPiArCQkJCSAgICAiVW5leHBlY3RlZCBjcjQuIEJpdHMgbWlzc2luZzoNCj4gPiAl
+bGx4LCBjcjQ6ICVsbHgiLA0KPiA+ICsJCQkJICAgIHNyZWdzLmNyNCBeIChDUjRfQUxMIHwgc3Jl
+Z3MuY3I0KSwNCj4gPiArCQkJCSAgICBzcmVncy5jcjQpOw0KPiA+ICsJCQlnb3RvIGRvbmU7DQo+
+ID4gKwkJfQ0KPiA+ICsNCj4gPiArCQlURVNUX0FTU0VSVChzdGFnZV9yZXBvcnRlZCA9PSBzdGFn
+ZSB8fA0KPiA+ICsJCQkgICAgc3RhZ2VfcmVwb3J0ZWQgPT0gU01SQU1fU1RBR0UsDQo+ID4gKwkJ
+CSAgICAiVW5leHBlY3RlZCBzdGFnZTogIyV4LCBnb3QgJXgiLA0KPiA+ICsJCQkgICAgc3RhZ2Us
+IHN0YWdlX3JlcG9ydGVkKTsNCj4gPiArDQo+ID4gKwkJLyogV2l0aGluIFNNTSBtb2RpZnkgQ1Iw
+LzQgdG8gbm90IGNvbnRhaW4gcGlubmVkIGJpdHMuDQo+ID4gKi8NCj4gPiArCQlpZiAoc3RhZ2Vf
+cmVwb3J0ZWQgPT0gU01SQU1fU1RBR0UpIHsNCj4gPiArCQkJY3IgPSAodTY0ICopKGFkZHJfZ3Bh
+Mmh2YSh2bSwgU01SQU1fR1BBICsNCj4gPiAweDgwMDAgKyAweDdmNTgpKTsNCj4gPiArCQkJKmNy
+ICY9IH5DUjBfUElOTkVEOw0KPiA+ICsNCj4gPiArCQkJY3IgPSAodTY0ICopKGFkZHJfZ3BhMmh2
+YSh2bSwgU01SQU1fR1BBICsNCj4gPiAweDgwMDAgKyAweDdmNDgpKTsNCj4gPiArCQkJLyogVW5z
+ZXQgcGlubmVkLCBzZXQgb25lIHRoYXQgd2FzIHBpbm5lZCBsb3cgKi8NCj4gPiArCQkJKmNyICY9
+IH5DUjRfUElOTkVEOw0KPiA+ICsJCQkqY3IgfD0gWDg2X0NSNF9TTUVQOw0KPiA+ICsJCX0NCj4g
+PiArDQo+ID4gKwkJc3RhdGUgPSB2Y3B1X3NhdmVfc3RhdGUodm0sIFZDUFVfSUQpOw0KPiA+ICsJ
+CWt2bV92bV9yZWxlYXNlKHZtKTsNCj4gPiArCQlrdm1fdm1fcmVzdGFydCh2bSwgT19SRFdSKTsN
+Cj4gPiArCQl2bV92Y3B1X2FkZCh2bSwgVkNQVV9JRCk7DQo+ID4gKwkJdmNwdV9zZXRfY3B1aWQo
+dm0sIFZDUFVfSUQsIGt2bV9nZXRfc3VwcG9ydGVkX2NwdWlkKCkpOw0KPiA+ICsJCXZjcHVfbG9h
+ZF9zdGF0ZSh2bSwgVkNQVV9JRCwgc3RhdGUpOw0KPiA+ICsJCXJ1biA9IHZjcHVfc3RhdGUodm0s
+IFZDUFVfSUQpOw0KPiA+ICsJCWZyZWUoc3RhdGUpOw0KPiA+ICsJfQ0KPiA+ICsNCj4gPiArZG9u
+ZToNCj4gPiArCWt2bV92bV9mcmVlKHZtKTsNCj4gPiArfQ0KPiA+IC0tIA0KPiA+IDIuMjEuMA0K
+PiA+IA0KPiANCj4gVGhhbmtzLA0KPiBkcmV3IA0KPiANCg0KDQpUaGFuayB5b3UgRHJldywNCg0K
+SSBkaWRuJ3Qga25vdyBhYm91dCB0aGVzZSBmdW5jdGlvbnMgYW5kIG1hY3JvcywgSSdsbCB1c2Ug
+dGhlbS4NCg0KLSBKb2huDQo=
