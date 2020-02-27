@@ -2,204 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F45B17161F
-	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 12:36:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A3451716BA
+	for <lists+kvm@lfdr.de>; Thu, 27 Feb 2020 13:03:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728910AbgB0LgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 06:36:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29994 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728872AbgB0LgI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 06:36:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582803366;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uVQ4UrFOEJRzhioCmCv1VYaFqrxHNCAJFi8KjCa8cJg=;
-        b=N96mK6rdIWjViAbGX8LcWWjlVecy2UxjAXQZfwmNKmqEyiuZi5ciKG+bYhLQXxuvKqkKiY
-        dUu/hznAZqm5/iV9kVADzJWL2kCBMuqrbMupJI0VZuXKb+/x4cciF1yBk+uQ9iKNz/coRz
-        fn2+5uUUTYTJnskUzCwkdJ4Ejy5GmPk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-geG7wH2WNc2-uuh8sbph6w-1; Thu, 27 Feb 2020 06:36:05 -0500
-X-MC-Unique: geG7wH2WNc2-uuh8sbph6w-1
-Received: by mail-wm1-f69.google.com with SMTP id w3so602366wmg.4
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 03:36:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=uVQ4UrFOEJRzhioCmCv1VYaFqrxHNCAJFi8KjCa8cJg=;
-        b=A85yMpGRodyxVvu5TPceUhqaPwH5so+VV7jWNm7s1H/3uwtMfPfU2arDRpEnV23gnd
-         dlaX8Q4dL4M2vsplWljBYHcfNJo9OTgwzFbBprL7MlT/ZDDJi/RVjl0U14E2XYxsHXs0
-         /TymbNaF/jriED43YbOvaaxMyna78F2cIpRRnGsKwnjLkaRCMfgVaqPbC0awYZWx4XXr
-         /2fPPHQ/VcMjNkapf+dpJBBootrSJqxwmEhNG8m7vhe5FWGNQhCq7MFYP+pJN5R/4fos
-         VnH6MjSQemuhNKCpN2fHBiObuMlf/vK/rc0KPyQ+XQfNbGyjqKXjfGZS7I65FnBc86Df
-         DWnQ==
-X-Gm-Message-State: APjAAAVZ7NZ77HQ3UDZdoW/f6j7H18y77Q0ORjwZy8j9AtiVe5NNwwHG
-        ohEY0VCcq/LaC+xA6KU9jBlgAHNPHjLluNWtFtQ1yfF0f+zINTln2E2+BazXEFP4BE5VFkTM6za
-        ANPjaivLwR8t8
-X-Received: by 2002:adf:e8c9:: with SMTP id k9mr4544675wrn.168.1582803363754;
-        Thu, 27 Feb 2020 03:36:03 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzDaaM12pU1FU72etvD1vEMwgRRIG+zPVsAVVfIIHJu3O+u7sapzuEbKCmrJwKJUKhyeSmG6A==
-X-Received: by 2002:adf:e8c9:: with SMTP id k9mr4544621wrn.168.1582803363388;
-        Thu, 27 Feb 2020 03:36:03 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id y17sm7457215wrs.82.2020.02.27.03.36.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2020 03:36:02 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     linmiaohe <linmiaohe@huawei.com>, pbonzini@redhat.com,
-        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Cc:     linmiaohe@huawei.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v2] KVM: X86: deprecate obsolete KVM_GET_CPUID2 ioctl
-In-Reply-To: <1582773688-4956-1-git-send-email-linmiaohe@huawei.com>
-References: <1582773688-4956-1-git-send-email-linmiaohe@huawei.com>
-Date:   Thu, 27 Feb 2020 12:36:00 +0100
-Message-ID: <87ftewi7of.fsf@vitty.brq.redhat.com>
+        id S1729237AbgB0MDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Feb 2020 07:03:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36448 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729225AbgB0MDw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Feb 2020 07:03:52 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01RBwm7Q109038
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 07:03:52 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ydq6xcqrv-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 07:03:52 -0500
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Thu, 27 Feb 2020 12:03:50 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 27 Feb 2020 12:03:47 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01RC3kJc59506714
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Feb 2020 12:03:46 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E462442063;
+        Thu, 27 Feb 2020 12:03:45 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9F2EA42049;
+        Thu, 27 Feb 2020 12:03:45 +0000 (GMT)
+Received: from [9.152.99.203] (unknown [9.152.99.203])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Feb 2020 12:03:45 +0000 (GMT)
+Reply-To: mimu@linux.ibm.com
+Subject: Re: [PATCH] KVM: s390: introduce module parameter kvm.use_gisa
+To:     David Hildenbrand <david@redhat.com>, borntraeger@de.ibm.com,
+        frankja@linux.vnet.ibm.com
+Cc:     kvm@vger.kernel.org, cohuck@redhat.com, thuth@redhat.com,
+        linux-s390@vger.kernel.org
+References: <20200227091031.102993-1-mimu@linux.ibm.com>
+ <2ff28c9a-d6ae-4fe8-1660-5765fd3f3c41@redhat.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+Organization: IBM
+Date:   Thu, 27 Feb 2020 13:04:50 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <2ff28c9a-d6ae-4fe8-1660-5765fd3f3c41@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20022712-4275-0000-0000-000003A5F990
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022712-4276-0000-0000-000038BA3D2D
+Message-Id: <175aad02-9a30-6be0-a203-c696158168e1@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-27_03:2020-02-26,2020-02-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 malwarescore=0 lowpriorityscore=0 spamscore=0
+ mlxlogscore=999 clxscore=1015 mlxscore=0 adultscore=0 impostorscore=0
+ phishscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2001150001 definitions=main-2002270098
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-linmiaohe <linmiaohe@huawei.com> writes:
 
-> From: Miaohe Lin <linmiaohe@huawei.com>
->
-> When kvm_vcpu_ioctl_get_cpuid2() fails, we set cpuid->nent to the value of
-> vcpu->arch.cpuid_nent. But this is in vain as cpuid->nent is not copied to
-> userspace by copy_to_user() from call site. Also cpuid->nent is not updated
-> to indicate how many entries were retrieved on success case. So this ioctl
-> is straight up broken. And in fact, it's not used anywhere. So it should be
-> deprecated.
->
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  arch/x86/kvm/cpuid.c           | 20 --------------------
->  arch/x86/kvm/cpuid.h           |  3 ---
->  arch/x86/kvm/x86.c             | 16 ++--------------
->  include/uapi/linux/kvm.h       |  1 +
->  tools/include/uapi/linux/kvm.h |  1 +
->  5 files changed, 4 insertions(+), 37 deletions(-)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index b1c469446b07..5e041a1282b8 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -261,26 +261,6 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
->  	return r;
->  }
->  
-> -int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
-> -			      struct kvm_cpuid2 *cpuid,
-> -			      struct kvm_cpuid_entry2 __user *entries)
-> -{
-> -	int r;
-> -
-> -	r = -E2BIG;
-> -	if (cpuid->nent < vcpu->arch.cpuid_nent)
-> -		goto out;
-> -	r = -EFAULT;
-> -	if (copy_to_user(entries, &vcpu->arch.cpuid_entries,
-> -			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
-> -		goto out;
-> -	return 0;
-> -
-> -out:
-> -	cpuid->nent = vcpu->arch.cpuid_nent;
-> -	return r;
-> -}
-> -
->  static __always_inline void cpuid_mask(u32 *word, int wordnum)
->  {
->  	reverse_cpuid_check(wordnum);
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index 7366c618aa04..76555de38e1b 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -19,9 +19,6 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
->  int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
->  			      struct kvm_cpuid2 *cpuid,
->  			      struct kvm_cpuid_entry2 __user *entries);
-> -int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
-> -			      struct kvm_cpuid2 *cpuid,
-> -			      struct kvm_cpuid_entry2 __user *entries);
->  bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
->  	       u32 *ecx, u32 *edx, bool check_limit);
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ddd1d296bd20..a6d99abedb2c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4295,21 +4295,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  					      cpuid_arg->entries);
->  		break;
->  	}
-> +	/* KVM_GET_CPUID2 is deprecated, should not be used. */
->  	case KVM_GET_CPUID2: {
-> -		struct kvm_cpuid2 __user *cpuid_arg = argp;
-> -		struct kvm_cpuid2 cpuid;
-> -
-> -		r = -EFAULT;
-> -		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
-> -			goto out;
-> -		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
-> -					      cpuid_arg->entries);
-> -		if (r)
-> -			goto out;
-> -		r = -EFAULT;
-> -		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
-> -			goto out;
-> -		r = 0;
-> +		r = -EINVAL;
->  		break;
->  	}
 
-Braces are not really needed not but all other cases in the switch have
-it so let's leave them here too.
+On 27.02.20 10:26, David Hildenbrand wrote:
+> On 27.02.20 10:10, Michael Mueller wrote:
+>> The boolean module parameter "kvm.use_gisa" controls if newly
+>> created guests will use the GISA facility if provided by the
+>> host system. The default is yes.
+>>
+>>    # cat /sys/module/kvm/parameters/use_gisa
+>>    Y
+>>
+>> The parameter can be changed on the fly.
+>>
+>>    # echo N > /sys/module/kvm/parameters/use_gisa
+>>
+>> Already running guests are not affected by this change.
+>>
+>> The kvm s390 debug feature shows if a guest is running with GISA.
+>>
+>>    # grep gisa /sys/kernel/debug/s390dbf/kvm-$pid/sprintf
+>>    00 01582725059:843303 3 - 08 00000000e119bc01  gisa 0x00000000c9ac2642 initialized
+>>    00 01582725059:903840 3 - 11 000000004391ee22  00[0000000000000000-0000000000000000]: AIV gisa format-1 enabled for cpu 000
+>>    ...
+>>    00 01582725059:916847 3 - 08 0000000094fff572  gisa 0x00000000c9ac2642 cleared
+>>
+>> In general, that value should not be changed as the GISA facility
+>> enhances interruption delivery performance.
+>>
+>> A reason to switch the GISA facility off might be a performance
+>> comparison run or debugging.
+>>
+>> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+>> ---
+>>   arch/s390/kvm/kvm-s390.c | 8 +++++++-
+>>   1 file changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index d7ff30e45589..5c2081488024 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -184,6 +184,11 @@ static u8 halt_poll_max_steal = 10;
+>>   module_param(halt_poll_max_steal, byte, 0644);
+>>   MODULE_PARM_DESC(halt_poll_max_steal, "Maximum percentage of steal time to allow polling");
+>>   
+>> +/* if set to true, the GISA will be initialized and used if available */
+>> +static bool use_gisa  = true;
+>> +module_param(use_gisa, bool, 0644);
+>> +MODULE_PARM_DESC(use_gisa, "Use the GISA if the host supports it.");
+>> +
+>>   /*
+>>    * For now we handle at most 16 double words as this is what the s390 base
+>>    * kernel handles and stores in the prefix page. If we ever need to go beyond
+>> @@ -2504,7 +2509,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>>   	kvm->arch.use_skf = sclp.has_skey;
+>>   	spin_lock_init(&kvm->arch.start_stop_lock);
+>>   	kvm_s390_vsie_init(kvm);
+>> -	kvm_s390_gisa_init(kvm);
+>> +	if (use_gisa)
+>> +		kvm_s390_gisa_init(kvm);
+> 
+> Looks sane to me. gi->origin will remain NULL and act like
+> css_general_characteristics.aiv wouldn't be around.
 
->  	case KVM_GET_MSRS: {
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4b95f9a31a2f..61524780603d 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1380,6 +1380,7 @@ struct kvm_s390_ucas_mapping {
->  #define KVM_GET_LAPIC             _IOR(KVMIO,  0x8e, struct kvm_lapic_state)
->  #define KVM_SET_LAPIC             _IOW(KVMIO,  0x8f, struct kvm_lapic_state)
->  #define KVM_SET_CPUID2            _IOW(KVMIO,  0x90, struct kvm_cpuid2)
-> +/* KVM_GET_CPUID2 is deprecated, should not be used. */
->  #define KVM_GET_CPUID2            _IOWR(KVMIO, 0x91, struct kvm_cpuid2)
->  /* Available with KVM_CAP_VAPIC */
->  #define KVM_TPR_ACCESS_REPORTING  _IOWR(KVMIO, 0x92, struct kvm_tpr_access_ctl)
-> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> index f0a16b4adbbd..2ef719af4c57 100644
-> --- a/tools/include/uapi/linux/kvm.h
-> +++ b/tools/include/uapi/linux/kvm.h
-> @@ -1379,6 +1379,7 @@ struct kvm_s390_ucas_mapping {
->  #define KVM_GET_LAPIC             _IOR(KVMIO,  0x8e, struct kvm_lapic_state)
->  #define KVM_SET_LAPIC             _IOW(KVMIO,  0x8f, struct kvm_lapic_state)
->  #define KVM_SET_CPUID2            _IOW(KVMIO,  0x90, struct kvm_cpuid2)
-> +/* KVM_GET_CPUID2 is deprecated, should not be used. */
+right
 
-"should not be used" pre-patch, post-patch we can say "Can only be used
-as a reliable source of -EINVAL" :-)
+> 
+> I assume initializing the gib is fine, and having some guests use it and
+> others not?
 
->  #define KVM_GET_CPUID2            _IOWR(KVMIO, 0x91, struct kvm_cpuid2)
->  /* Available with KVM_CAP_VAPIC */
->  #define KVM_TPR_ACCESS_REPORTING  _IOWR(KVMIO, 0x92, struct kvm_tpr_access_ctl)
+Is fine as well.
 
-Surprisingly (or not), KVM_GET_CPUID2 is not even described in
-Documentation/virt/kvm/api.txt.
+> 
+> I do wonder if it would be even clearer/cleaner to not allow to change
+> this property on the fly, and to also not init the gib if disabled.
+> 
+> If you want to perform performance tests, simply unload+reload KVM.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+That would work if kvm is build as module but not in-kernel, then
+a reboot would be required with kvm.use_gisa=Y/N
 
--- 
-Vitaly
+I tend to leave it as it is.
+
+Thanks,
+Michael
+
+> 
 
