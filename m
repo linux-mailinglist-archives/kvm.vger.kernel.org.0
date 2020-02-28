@@ -2,98 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BD96172F15
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 04:03:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28096172F40
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 04:21:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730619AbgB1DDT convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 27 Feb 2020 22:03:19 -0500
-Received: from outbound.smtp.vt.edu ([198.82.183.121]:59664 "EHLO
-        omr2.cc.vt.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730569AbgB1DDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 22:03:18 -0500
-X-Greylist: delayed 798 seconds by postgrey-1.27 at vger.kernel.org; Thu, 27 Feb 2020 22:03:18 EST
-Received: from mr5.cc.vt.edu (mail.ipv6.vt.edu [IPv6:2607:b400:92:9:0:9d:8fcb:4116])
-        by omr2.cc.vt.edu (8.14.4/8.14.4) with ESMTP id 01S2o00C019644
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 21:50:00 -0500
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
-        by mr5.cc.vt.edu (8.14.7/8.14.7) with ESMTP id 01S2ntAd012834
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 21:50:00 -0500
-Received: by mail-qv1-f72.google.com with SMTP id cn2so1444552qvb.1
-        for <kvm@vger.kernel.org>; Thu, 27 Feb 2020 18:50:00 -0800 (PST)
+        id S1730722AbgB1DVG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Feb 2020 22:21:06 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:42976 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730569AbgB1DVG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Feb 2020 22:21:06 -0500
+Received: by mail-pl1-f196.google.com with SMTP id u3so650584plr.9;
+        Thu, 27 Feb 2020 19:21:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=rIXCm5M81d91xnd3Gd+yipbJxz4KGDW+jKNm3v5D9gk=;
+        b=XPn2INuxdUtQeXgF2JFagwKBhjD8Xu8RwD86VmOBcImn8OPYR+JMgLyfejr2lHKd+/
+         RTCuZ/a57sQcuv5TgR9DV9lQ4aYdZgWEPVyuPstCbC726RYaGUjhA5t/KlSYYOAIPPUb
+         E8MKSpqmDjdpIhqi2iEU2OYzirWW1385QP2mFEIjkii/a5EKOniWHB+wkyHzNFaELsGL
+         7eYRTXzVFf1612T8a75KvCicWXEn+ukYqvKUo7heiFg3YtpoAE/lNg3IvgKfCYNfglLz
+         m8b678AX3VhxQlhH3IXXVkyG/sZUhV5IolwQRNX6r/BrrUNG5aoLm9U2JI8AsnhjKbe1
+         v/Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:mime-version
-         :content-id:content-transfer-encoding:date:message-id;
-        bh=TMxAIoujXzqS3798HgNWfd0wXc3IAjXqWU595ApRFSw=;
-        b=oxOnJz/hnvKBj0svZUOy8bOCo+sP8YFpYZMa4+TnKrNvd8EyA+QUT24gNrMD147q7l
-         XClrwXtHitljc6wq1jTLcD7ekXrQevcpu/K1k+Pn6cDW9Vz9t1Qho3HKu9hIhDpbn+db
-         IqfrIO9GfMcjF/opFQB1H9nqtFgr0PHwKYi4fbRfkV0ZEkQGUJFJOS5shfb54Ph9bLT3
-         RmFKl60QIiuBSl5DSmnfcezeHeMgzyibgSC87pHLpbQYj2cqg0KjFjB/CEI0p2oM0xbM
-         xHknkzB7nWH3a1kxpJonlMJ4L8XpVuaF6dZh7AcYCpxP9vanjLLw9TDHXFlUtKuP4kjl
-         y2hQ==
-X-Gm-Message-State: APjAAAWOd8m21ualukE1YQLBv5F3XrYARGx71rVwRkljOO5qGdQo0BZ1
-        GesJJsnGIEU3MWpAtqgXM1rPFLLD7sgs3kApbAYXLtFZIl9PLzobtY+BneI0FYisJ8pHP08HUkC
-        QNQTvptkYpB77A2V3juFHpVU=
-X-Received: by 2002:a37:6111:: with SMTP id v17mr2544755qkb.210.1582858195018;
-        Thu, 27 Feb 2020 18:49:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxqpvtFlPmXpm9FoxRteLLKVlXXhcaTG1YqTU72QLXMBBhjrUVYf45oDs0UAE5r0eZa9rO8Kg==
-X-Received: by 2002:a37:6111:: with SMTP id v17mr2544735qkb.210.1582858194753;
-        Thu, 27 Feb 2020 18:49:54 -0800 (PST)
-Received: from turing-police ([2601:5c0:c001:c9e1::359])
-        by smtp.gmail.com with ESMTPSA id t4sm4300738qkm.82.2020.02.27.18.49.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2020 18:49:53 -0800 (PST)
-From:   "Valdis =?utf-8?Q?Kl=c4=93tnieks?=" <valdis.kletnieks@vt.edu>
-X-Google-Original-From: "Valdis =?utf-8?Q?Kl=c4=93tnieks?=" <Valdis.Kletnieks@vt.edu>
-X-Mailer: exmh version 2.9.0 11/07/2018 with nmh-1.7+dev
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>
-cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: nVMX: allow compiling with W=1
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <263440.1582858192.1@turing-police>
-Content-Transfer-Encoding: 8BIT
-Date:   Thu, 27 Feb 2020 21:49:52 -0500
-Message-ID: <263441.1582858192@turing-police>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=rIXCm5M81d91xnd3Gd+yipbJxz4KGDW+jKNm3v5D9gk=;
+        b=lQ6mj8+2rzj7akAVwBd/F0gIymOrIXE2vCily71DFC3pQSEyJMuN7wH3WkK8ogBQNC
+         nHAHVqvewlyMUnmO5KbwLVNvn6AKdkqsnNQg8t0lLS6pFaf5/+BBnVqZOjGSV50i9dJG
+         Mtsv95WxakDqsXFFnwceoyF/IkNttPSjywX1AUrf/YtbM0tGUW+jW/WsRMIZJ9CcMau3
+         o4BmdEODSNjnyVwWdZAK0VPbmBDTJZthsFssIQAZ9D2ESqAmvfEriKWHHB3F3Uua02Iv
+         /n1sKavh1iqSPdAxglgyMrM166yY4+fjgXVMHzxix+P8TyU8IHY78PsLnP0XORKU3u6+
+         CV0g==
+X-Gm-Message-State: APjAAAWzd/+uEFB3jSiNo6Xu+xFQhtiy43e4Bf0nNkETclOlN4MgMCgo
+        2184pK8crL9xXgEgeXl8I4m5bP/szQvl8A==
+X-Google-Smtp-Source: APXvYqyRTgQvWLHeivT3wAVpwiccEkXlX8bq7fFjVmzw+54PY2Cu3W1F3m7+XFt7JuJPSrLQZCi7AA==
+X-Received: by 2002:a17:902:8a8e:: with SMTP id p14mr2022551plo.28.1582860064936;
+        Thu, 27 Feb 2020 19:21:04 -0800 (PST)
+Received: from kernel.DHCP ([120.244.140.54])
+        by smtp.googlemail.com with ESMTPSA id b6sm8854260pfg.17.2020.02.27.19.20.59
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 27 Feb 2020 19:21:04 -0800 (PST)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH v3] KVM: X86: Just one leader to trigger kvmclock sync request
+Date:   Fri, 28 Feb 2020 11:18:41 +0800
+Message-Id: <1582859921-11932-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Compile error with CONFIG_KVM_INTEL=y and W=1:
+From: Wanpeng Li <wanpengli@tencent.com>
 
-  CC      arch/x86/kvm/vmx/vmx.o
-arch/x86/kvm/vmx/vmx.c:68:32: error: 'vmx_cpu_id' defined but not used [-Werror=unused-const-variable=]
-   68 | static const struct x86_cpu_id vmx_cpu_id[] = {
-      |                                ^~~~~~~~~~
-cc1: all warnings being treated as errors
+In the progress of vCPUs creation, it queues a kvmclock sync worker to the global
+workqueue before each vCPU creation completes. The workqueue subsystem guarantees 
+not to queue the already queued work, however, we can make the logic more clear by 
+make just one leader to trigger this kvmclock sync request and save on cacheline 
+boucing due to test_and_set_bit.
 
-When building with =y, the MODULE_DEVICE_TABLE macro doesn't generate a
-reference to the structure (or any code at all).  This makes W=1 compiles
-unhappy.
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+v2 -> v3:
+ * update patch description
+v1 -> v2:
+ * check vcpu->vcpu_idx
 
-Wrap both in a #ifdef to avoid the issue.
+ arch/x86/kvm/x86.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 40a1467d1655..5c2fc2177b0d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -65,11 +65,13 @@
- MODULE_AUTHOR("Qumranet");
- MODULE_LICENSE("GPL");
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index fb5d64e..79bc995 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9390,8 +9390,9 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ 	if (!kvmclock_periodic_sync)
+ 		return;
  
-+#ifdef MODULE
- static const struct x86_cpu_id vmx_cpu_id[] = {
- 	X86_FEATURE_MATCH(X86_FEATURE_VMX),
- 	{}
- };
- MODULE_DEVICE_TABLE(x86cpu, vmx_cpu_id);
-+#endif
+-	schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
+-					KVMCLOCK_SYNC_PERIOD);
++	if (vcpu->vcpu_idx == 0)
++		schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
++						KVMCLOCK_SYNC_PERIOD);
+ }
  
- bool __read_mostly enable_vpid = 1;
- module_param_named(vpid, enable_vpid, bool, 0444);
+ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+-- 
+2.7.4
 
