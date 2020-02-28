@@ -2,86 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F1C2717332E
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 09:46:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A1C2173347
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 09:49:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbgB1IqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 03:46:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24058 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726287AbgB1IqR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 03:46:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582879576;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DniqYTbN+x5CT96Mk51QmCB3SzOjbyBDXwojZbMjovY=;
-        b=T+Jh6USunCOdp31unW3s3QcbRimIyQn3gYJ17UCoA5BkpfKtNSHYY5kyJppnNfPJWmHzAR
-        NdkwNNDQSFOf7ZMWEe7tyOA5qcUSO6zh/20WYTtf1mDGCC7W6FfYca6/gxdSV5RBOMTH+/
-        s7VtIjXZ/1YhT3MY+FlrzdT32SeGua0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-ZpJ_x_B1N32ocOUPYvfakg-1; Fri, 28 Feb 2020 03:46:14 -0500
-X-MC-Unique: ZpJ_x_B1N32ocOUPYvfakg-1
-Received: by mail-wm1-f71.google.com with SMTP id o24so428235wmh.0
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 00:46:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DniqYTbN+x5CT96Mk51QmCB3SzOjbyBDXwojZbMjovY=;
-        b=bDObdZ2TSgEMyrQ2ESIlPoCqMTteUz/fVHLhtON+ZnAy4sk/wZ7JNm9CAKrEBlEKKQ
-         /HDjBV5mlfGPKJ8Ih4HoVwzRBAM5ubisFpIWnaiYGOuprNq7NFXlZNarcSAzBdvx5Z+I
-         efvVfJJfKvDJ8+46Sygv5fScmUJf/csIWF3EquvXlbYj8TvMR4rNyUEJsU5FFTm1Oqm9
-         oYk+zFbk18xuuELy5zgiGsJeMfOkYYqD7CU5N7/Dli073br7nsnOaGd8CWxAq2th/MZ1
-         gvqkMfyo2ajuYxd3D35AI0YQ0LTIQvZa+OY/ODoO/hvnhfXBFzH9hC4OTfagsMNdehF5
-         Y4Rg==
-X-Gm-Message-State: APjAAAXsbTefiHpexpyolYtLj2K5fq+pb9TBLwa2n3epMcWb2Z9LwbiB
-        NSLl5bf7IyF90vBpF3TAoGrsWc7/IgCjOKWlTcdNeTS/EnIENNflT/ZUdviFfAEaZmyGwWWzycG
-        M5VmKg3xRSA9A
-X-Received: by 2002:a7b:ca58:: with SMTP id m24mr3913784wml.129.1582879573429;
-        Fri, 28 Feb 2020 00:46:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxIXBQSqnsfQaO7I7rg0h4eoBg+y4OioioQJskwEc2kREvl4ILOh1QAMufeM4cFxtqBOcgq5Q==
-X-Received: by 2002:a7b:ca58:: with SMTP id m24mr3913752wml.129.1582879573103;
-        Fri, 28 Feb 2020 00:46:13 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:30cb:d037:e500:2b47? ([2001:b07:6468:f312:30cb:d037:e500:2b47])
-        by smtp.gmail.com with ESMTPSA id m21sm1166528wmi.27.2020.02.28.00.46.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Feb 2020 00:46:12 -0800 (PST)
-Subject: Re: [PATCH] KVM: SVM: Inhibit APIC virtualization for X2APIC guest
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>
-References: <20200228003523.114071-1-oupton@google.com>
- <bde391f9-1f87-dfc9-c0d6-ccd80d537e7d@redhat.com>
- <20200228084501.GA11772@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9bbdff9b-cca3-f41a-1952-d529360ec834@redhat.com>
-Date:   Fri, 28 Feb 2020 09:46:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1726603AbgB1Itt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 03:49:49 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63550 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726005AbgB1Itt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 28 Feb 2020 03:49:49 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01S8nici061012
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 03:49:47 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2yepy26cv9-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 03:49:47 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Fri, 28 Feb 2020 08:49:46 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 28 Feb 2020 08:49:43 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01S8ngR219398664
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 Feb 2020 08:49:42 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6DB99A4051;
+        Fri, 28 Feb 2020 08:49:42 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C9D2A4040;
+        Fri, 28 Feb 2020 08:49:42 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 28 Feb 2020 08:49:42 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 1B3DAE01EF; Fri, 28 Feb 2020 09:49:42 +0100 (CET)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, arc Zyngier <maz@kernel.org>
+Subject: [PATCH] KVM: let declaration of kvm_get_running_vcpus match implementation
+Date:   Fri, 28 Feb 2020 09:49:41 +0100
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200228084501.GA11772@google.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20022808-0028-0000-0000-000003DECAA7
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022808-0029-0000-0000-000024A3ECA5
+Message-Id: <20200228084941.9362-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-28_02:2020-02-26,2020-02-28 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 mlxscore=0 spamscore=0 mlxlogscore=863 bulkscore=0
+ malwarescore=0 priorityscore=1501 clxscore=1015 adultscore=0 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002280073
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/02/20 09:45, Oliver Upton wrote:
->> - a PV CPUID leaf to tell <=255 vCPUs on AMD virtualization _not_ to use
->> x2apic.
->>
-> If a VMM didn't want the guest to use x2APIC in the first place, shouldn't
-> it instead omit x2APIC from the guest CPUID? I can see a point for this
-> if folks are inclined to use the same CPUID for VMs regardless of shape.
-> Just a thought to tackle later down the road :)
+Sparse notices that declaration and implementation do not match:
+arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17: warning: incorrect type in return expression (different address spaces)
+arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17:    expected struct kvm_vcpu [noderef] <asn:3> **
+arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17:    got struct kvm_vcpu *[noderef] <asn:3> *
 
-Yes, it's mostly for simplicity of configuration.
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ include/linux/kvm_host.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Paolo
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7944ad6ac10b..bcb9b2ac0791 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1344,7 +1344,7 @@ static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
+ #endif /* CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT */
+ 
+ struct kvm_vcpu *kvm_get_running_vcpu(void);
+-struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
++struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+ 
+ #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+ bool kvm_arch_has_irq_bypass(void);
+-- 
+2.24.1
 
