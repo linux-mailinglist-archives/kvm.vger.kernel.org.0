@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 78D6D173A81
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 15:59:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64A82173B05
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 16:10:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727027AbgB1O7p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 09:59:45 -0500
-Received: from mga09.intel.com ([134.134.136.24]:36391 "EHLO mga09.intel.com"
+        id S1727459AbgB1PJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 10:09:16 -0500
+Received: from mga01.intel.com ([192.55.52.88]:29335 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726788AbgB1O7o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 09:59:44 -0500
+        id S1726720AbgB1PJP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 10:09:15 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2020 06:59:44 -0800
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2020 07:09:15 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,496,1574150400"; 
-   d="scan'208";a="437437616"
+   d="scan'208";a="437442091"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga005.fm.intel.com with ESMTP; 28 Feb 2020 06:59:43 -0800
-Date:   Fri, 28 Feb 2020 06:59:43 -0800
+  by fmsmga005.fm.intel.com with ESMTP; 28 Feb 2020 07:09:14 -0800
+Date:   Fri, 28 Feb 2020 07:09:14 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -29,118 +29,37 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: VMX: Always VMCLEAR in-use VMCSes during crash
- with kexec support
-Message-ID: <20200228145942.GA2329@linux.intel.com>
-References: <20200227223047.13125-1-sean.j.christopherson@intel.com>
- <20200227223047.13125-2-sean.j.christopherson@intel.com>
- <9edc8cef-9aa4-11ca-f8f2-a1fea990b87e@redhat.com>
+Subject: Re: [PATCH 39/61] KVM: SVM: Convert feature updates from CPUID to
+ KVM cpu caps
+Message-ID: <20200228150914.GB2329@linux.intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
+ <20200201185218.24473-40-sean.j.christopherson@intel.com>
+ <0f21b023-000d-9d78-b9b4-b9d377840385@redhat.com>
+ <20200228002833.GB30452@linux.intel.com>
+ <20200228003613.GC30452@linux.intel.com>
+ <052d2bdf-d2da-36c0-2fb5-563b5bf5f2ed@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9edc8cef-9aa4-11ca-f8f2-a1fea990b87e@redhat.com>
+In-Reply-To: <052d2bdf-d2da-36c0-2fb5-563b5bf5f2ed@redhat.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 28, 2020 at 11:16:10AM +0100, Paolo Bonzini wrote:
-> On 27/02/20 23:30, Sean Christopherson wrote:
-> > -void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs)
-> > +void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs, bool in_use)
-> >  {
-> >  	vmcs_clear(loaded_vmcs->vmcs);
-> >  	if (loaded_vmcs->shadow_vmcs && loaded_vmcs->launched)
-> >  		vmcs_clear(loaded_vmcs->shadow_vmcs);
-> > +
-> > +	if (in_use) {
-> > +		list_del(&loaded_vmcs->loaded_vmcss_on_cpu_link);
-> > +
-> > +		/*
-> > +		 * Ensure deleting loaded_vmcs from its current percpu list
-> > +		 * completes before setting loaded_vmcs->vcpu to -1, otherwise
-> > +		 * a different cpu can see vcpu == -1 first and add loaded_vmcs
-> > +		 * to its percpu list before it's deleted from this cpu's list.
-> > +		 * Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
-> > +		 */
-> > +		smp_wmb();
-> > +	}
-> > +
+On Fri, Feb 28, 2020 at 08:03:33AM +0100, Paolo Bonzini wrote:
+> On 28/02/20 01:36, Sean Christopherson wrote:
+> > Regarding NRIPS, the original commit added the "Support next_rip if host
+> > supports it" comment, but I can't tell is "host supports" means "supported
+> > in hardware" or "supported by KVM".  In other words, should I make the cap
+> > dependent "nrips" or leave it as is?
+> > 
 > 
-> I'd like to avoid the new in_use argument and, also, I think it's a
-> little bit nicer to always invoke the memory barrier.  Even though we 
-> use "asm volatile" for vmclear and therefore the compiler is already 
-> taken care of, in principle it's more correct to order the ->cpu write 
-> against vmclear's.
+> The "nrips" parameter came later.  For VMX we generally remove guest
+> capabilities if the corresponding parameter is on, so it's a good idea
+> to do the same for SVM.
 
-Completely agree on all points.  I wanted to avoid in_use as well, but it
-didn't occur to me to use list_empty()...
-
-> This gives the following patch on top:
-
-Looks good.
-
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c9d6152e7a4d..77a64110577b 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -656,25 +656,24 @@ static int vmx_set_guest_msr(struct vcpu_vmx *vmx, struct shared_msr_entry *msr,
->  	return ret;
->  }
->  
-> -void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs, bool in_use)
-> +void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs)
->  {
->  	vmcs_clear(loaded_vmcs->vmcs);
->  	if (loaded_vmcs->shadow_vmcs && loaded_vmcs->launched)
->  		vmcs_clear(loaded_vmcs->shadow_vmcs);
->  
-> -	if (in_use) {
-> +	if (!list_empty(&loaded_vmcs->loaded_vmcss_on_cpu_link))
->  		list_del(&loaded_vmcs->loaded_vmcss_on_cpu_link);
->  
-> -		/*
-> -		 * Ensure deleting loaded_vmcs from its current percpu list
-> -		 * completes before setting loaded_vmcs->vcpu to -1, otherwise
-> -		 * a different cpu can see vcpu == -1 first and add loaded_vmcs
-> -		 * to its percpu list before it's deleted from this cpu's list.
-> -		 * Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
-> -		 */
-> -		smp_wmb();
-> -	}
-> -
-> +	/*
-> +	 * Ensure all writes to loaded_vmcs, including deleting it
-> +	 * from its current percpu list, complete before setting
-> +	 * loaded_vmcs->vcpu to -1; otherwise,, a different cpu can
-> +	 * see vcpu == -1 first and add loaded_vmcs to its percpu
-> +	 * list before it's deleted from this cpu's list.  Pairs
-> +	 * with the smp_rmb() in vmx_vcpu_load_vmcs().
-> +	 */
-> +	smp_wmb();
->  	loaded_vmcs->cpu = -1;
->  	loaded_vmcs->launched = 0;
->  }
-> @@ -701,7 +700,7 @@ static void __loaded_vmcs_clear(void *arg)
->  	if (per_cpu(current_vmcs, cpu) == loaded_vmcs->vmcs)
->  		per_cpu(current_vmcs, cpu) = NULL;
->  
-> -	loaded_vmcs_init(loaded_vmcs, true);
-> +	loaded_vmcs_init(loaded_vmcs);
->  }
->  
->  void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs)
-> @@ -2568,7 +2567,8 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
->  
->  	loaded_vmcs->shadow_vmcs = NULL;
->  	loaded_vmcs->hv_timer_soft_disabled = false;
-> -	loaded_vmcs_init(loaded_vmcs, false);
-> +	INIT_LIST_HEAD(&loaded_vmcs->loaded_vmcss_on_cpu_link);
-> +	loaded_vmcs_init(loaded_vmcs);
->  
->  	if (cpu_has_vmx_msr_bitmap()) {
->  		loaded_vmcs->msr_bitmap = (unsigned long *)
-> 
-> Paolo
-> 
+Huh.  I swear I looked at the code from the original commit and saw nrips
+there, but it was clearly added in 2019 via commit d647eb63e671 ("KVM: svm:
+add nrips module parameter").
