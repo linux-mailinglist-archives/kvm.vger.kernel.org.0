@@ -2,184 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36FC4173328
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 09:45:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1C2717332E
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 09:46:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726148AbgB1IpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 03:45:10 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:33902 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725877AbgB1IpK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 03:45:10 -0500
-Received: by mail-pf1-f196.google.com with SMTP id i6so1382621pfc.1
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 00:45:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Su9H9ej9DZUb94i0Qqtg6/v9PelYuy4NE1KKJGeMEeU=;
-        b=JtkjAEIAPmQ9mHy1wQUro85Xky5kvSr3wa20ZlclSYEVAmAm1XixC2kaRu3Qhe1suR
-         oBk7neniqNlDe1IpkVJB2x7QWY/JIvYlOdbSXHj2x3EYtw3WeiJtWMZQHDFIw8HBgPo0
-         WXdZBy1dmU7JjMIcyYtF6rJuSMjxsg/PBYhKGkI4LBlv0lAWaOqZt61qhcAvk9unDUuG
-         wqQHsDmnhyOfFnhmKq+MTYVuwGH772Qexu2p34Drl3LQUTrinl89ism6L9GhWuk06dl6
-         aG92xOJ9Yzq/k7JgtdwIlhu+Qzf8/YzB33FGzCW3a34aMylqCEMybyFrAiLKsmNPJQr7
-         cI5g==
+        id S1726490AbgB1IqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 03:46:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24058 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726287AbgB1IqR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 03:46:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582879576;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DniqYTbN+x5CT96Mk51QmCB3SzOjbyBDXwojZbMjovY=;
+        b=T+Jh6USunCOdp31unW3s3QcbRimIyQn3gYJ17UCoA5BkpfKtNSHYY5kyJppnNfPJWmHzAR
+        NdkwNNDQSFOf7ZMWEe7tyOA5qcUSO6zh/20WYTtf1mDGCC7W6FfYca6/gxdSV5RBOMTH+/
+        s7VtIjXZ/1YhT3MY+FlrzdT32SeGua0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-ZpJ_x_B1N32ocOUPYvfakg-1; Fri, 28 Feb 2020 03:46:14 -0500
+X-MC-Unique: ZpJ_x_B1N32ocOUPYvfakg-1
+Received: by mail-wm1-f71.google.com with SMTP id o24so428235wmh.0
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 00:46:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Su9H9ej9DZUb94i0Qqtg6/v9PelYuy4NE1KKJGeMEeU=;
-        b=XgZYP4BlneoXM7w2+z9WKnLiwKbCz1BcA9+KUPzOM0Ict6NsLGh8k77cR9ysXpVWd0
-         FYFzrZw6Im6LqmIWMlnVfuJe3BkzLXG1/k46aKiU0YrJla/63hJeJ13n1Eo1dBBk7nva
-         HHPSKMiPAyFG6WJ7OpSExgWQDwndUph+Gq2PhQBC26s1+yblhy/Bf4LCV0aRrhAKC5pq
-         GMSOu7UNRnFTEvY65BwTC4maqEYKTFX4jE8ducosY/lYJoYGBxf9f9NDADdpYegwlYBF
-         SWiINMY7/N9zWYneFgKY6PaiUeiT2Rag+mbdEF6xcXlVRMD/nv1oWi3Zs/HUhfQIrTdL
-         qKew==
-X-Gm-Message-State: APjAAAVHricKcH/L+I7eJeyeljS5L4lgrvPD7LBnLNHHu14Blo80nTzB
-        L/Cx34V7hfFQZKsRTex1eCCfhOOctp0=
-X-Google-Smtp-Source: APXvYqzUPE7AWJ/kOni6jECkNw/626T3Yf/l/SrXls3gBpMLCSOgAhqFn9teCfLl24iMERcyv/F6Aw==
-X-Received: by 2002:a63:b22:: with SMTP id 34mr3445208pgl.78.1582879507067;
-        Fri, 28 Feb 2020 00:45:07 -0800 (PST)
-Received: from google.com ([2620:15c:100:202:d78:d09d:ec00:5fa7])
-        by smtp.gmail.com with ESMTPSA id g19sm9988877pfh.134.2020.02.28.00.45.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2020 00:45:06 -0800 (PST)
-Date:   Fri, 28 Feb 2020 00:45:01 -0800
-From:   Oliver Upton <oupton@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DniqYTbN+x5CT96Mk51QmCB3SzOjbyBDXwojZbMjovY=;
+        b=bDObdZ2TSgEMyrQ2ESIlPoCqMTteUz/fVHLhtON+ZnAy4sk/wZ7JNm9CAKrEBlEKKQ
+         /HDjBV5mlfGPKJ8Ih4HoVwzRBAM5ubisFpIWnaiYGOuprNq7NFXlZNarcSAzBdvx5Z+I
+         efvVfJJfKvDJ8+46Sygv5fScmUJf/csIWF3EquvXlbYj8TvMR4rNyUEJsU5FFTm1Oqm9
+         oYk+zFbk18xuuELy5zgiGsJeMfOkYYqD7CU5N7/Dli073br7nsnOaGd8CWxAq2th/MZ1
+         gvqkMfyo2ajuYxd3D35AI0YQ0LTIQvZa+OY/ODoO/hvnhfXBFzH9hC4OTfagsMNdehF5
+         Y4Rg==
+X-Gm-Message-State: APjAAAXsbTefiHpexpyolYtLj2K5fq+pb9TBLwa2n3epMcWb2Z9LwbiB
+        NSLl5bf7IyF90vBpF3TAoGrsWc7/IgCjOKWlTcdNeTS/EnIENNflT/ZUdviFfAEaZmyGwWWzycG
+        M5VmKg3xRSA9A
+X-Received: by 2002:a7b:ca58:: with SMTP id m24mr3913784wml.129.1582879573429;
+        Fri, 28 Feb 2020 00:46:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxIXBQSqnsfQaO7I7rg0h4eoBg+y4OioioQJskwEc2kREvl4ILOh1QAMufeM4cFxtqBOcgq5Q==
+X-Received: by 2002:a7b:ca58:: with SMTP id m24mr3913752wml.129.1582879573103;
+        Fri, 28 Feb 2020 00:46:13 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:30cb:d037:e500:2b47? ([2001:b07:6468:f312:30cb:d037:e500:2b47])
+        by smtp.gmail.com with ESMTPSA id m21sm1166528wmi.27.2020.02.28.00.46.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Feb 2020 00:46:12 -0800 (PST)
 Subject: Re: [PATCH] KVM: SVM: Inhibit APIC virtualization for X2APIC guest
-Message-ID: <20200228084501.GA11772@google.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>
 References: <20200228003523.114071-1-oupton@google.com>
  <bde391f9-1f87-dfc9-c0d6-ccd80d537e7d@redhat.com>
+ <20200228084501.GA11772@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9bbdff9b-cca3-f41a-1952-d529360ec834@redhat.com>
+Date:   Fri, 28 Feb 2020 09:46:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bde391f9-1f87-dfc9-c0d6-ccd80d537e7d@redhat.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+In-Reply-To: <20200228084501.GA11772@google.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On 28/02/20 09:45, Oliver Upton wrote:
+>> - a PV CPUID leaf to tell <=255 vCPUs on AMD virtualization _not_ to use
+>> x2apic.
+>>
+> If a VMM didn't want the guest to use x2APIC in the first place, shouldn't
+> it instead omit x2APIC from the guest CPUID? I can see a point for this
+> if folks are inclined to use the same CPUID for VMs regardless of shape.
+> Just a thought to tackle later down the road :)
 
-On Fri, Feb 28, 2020 at 09:01:11AM +0100, Paolo Bonzini wrote:
-> On 28/02/20 01:35, Oliver Upton wrote:
-> > The AVIC does not support guest use of the x2APIC interface. Currently,
-> > KVM simply chooses to squash the x2APIC feature in the guest's CPUID
-> > If the AVIC is enabled. Doing so prevents KVM from running a guest
-> > with greater than 255 vCPUs, as such a guest necessitates the use
-> > of the x2APIC interface.
-> > 
-> > Instead, inhibit AVIC enablement on a per-VM basis whenever the x2APIC
-> > feature is set in the guest's CPUID. Since this changes the behavior of
-> > KVM as seen by userspace, add a module parameter, avic_per_vm, to opt-in
-> > for the new behavior. If this parameter is set, report x2APIC as
-> > available on KVM_GET_SUPPORTED_CPUID. Without opt-in, continue to
-> > suppress x2APIC from the guest's CPUID.
-> > 
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > Reviewed-by: Jim Mattson <jmattson@google.com>
-> 
-> Since AVIC is not enabled by default, let's do this always and flip the
-> default to avic=1 in 5.7.  People using avic=1 will have to disable
-> x2apic manually instead but the default will be the same in practice
-> (AVIC not enabled).  And then we can figure out:
-> 
+Yes, it's mostly for simplicity of configuration.
 
-I'll drop the new module param in v2 and adopt this suggested behavior.
+Paolo
 
-> - how to do emulation of x2apic when avic is enabled (so it will cause
-> vmexits but still use the AVIC for e.g. assigned devices)
->
-> - a PV CPUID leaf to tell <=255 vCPUs on AMD virtualization _not_ to use
-> x2apic.
->
-
-If a VMM didn't want the guest to use x2APIC in the first place, shouldn't
-it instead omit x2APIC from the guest CPUID? I can see a point for this
-if folks are inclined to use the same CPUID for VMs regardless of shape.
-Just a thought to tackle later down the road :)
-
-Thanks for the review, I'll send a new patch out shortly.
-
---
-Thanks,
-Oliver
-
-> Paolo
-> 
-> > ---
-> > 
-> >  Parent commit: a93236fcbe1d ("KVM: s390: rstify new ioctls in api.rst")
-> > 
-> >  arch/x86/include/asm/kvm_host.h |  1 +
-> >  arch/x86/kvm/svm.c              | 19 ++++++++++++++++---
-> >  2 files changed, 17 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 98959e8cd448..9d40132a3ae2 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -890,6 +890,7 @@ enum kvm_irqchip_mode {
-> >  #define APICV_INHIBIT_REASON_NESTED     2
-> >  #define APICV_INHIBIT_REASON_IRQWIN     3
-> >  #define APICV_INHIBIT_REASON_PIT_REINJ  4
-> > +#define APICV_INHIBIT_REASON_X2APIC	5
-> >  
-> >  struct kvm_arch {
-> >  	unsigned long n_used_mmu_pages;
-> > diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> > index ad3f5b178a03..95c03c75f51a 100644
-> > --- a/arch/x86/kvm/svm.c
-> > +++ b/arch/x86/kvm/svm.c
-> > @@ -382,6 +382,10 @@ module_param(sev, int, 0444);
-> >  static bool __read_mostly dump_invalid_vmcb = 0;
-> >  module_param(dump_invalid_vmcb, bool, 0644);
-> >  
-> > +/* enable/disable opportunistic use of the AVIC on a per-VM basis */
-> > +static bool __read_mostly avic_per_vm;
-> > +module_param(avic_per_vm, bool, 0444);
-> > +
-> >  static u8 rsm_ins_bytes[] = "\x0f\xaa";
-> >  
-> >  static void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
-> > @@ -6027,7 +6031,15 @@ static void svm_cpuid_update(struct kvm_vcpu *vcpu)
-> >  	if (!kvm_vcpu_apicv_active(vcpu))
-> >  		return;
-> >  
-> > -	guest_cpuid_clear(vcpu, X86_FEATURE_X2APIC);
-> > +	/*
-> > +	 * AVIC does not work with an x2APIC mode guest. If the X2APIC feature
-> > +	 * is exposed to the guest, disable AVIC.
-> > +	 */
-> > +	if (avic_per_vm && guest_cpuid_has(vcpu, X86_FEATURE_X2APIC))
-> > +		kvm_request_apicv_update(vcpu->kvm, false,
-> > +					 APICV_INHIBIT_REASON_X2APIC);
-> > +	else
-> > +		guest_cpuid_clear(vcpu, X86_FEATURE_X2APIC);
-> >  
-> >  	/*
-> >  	 * Currently, AVIC does not work with nested virtualization.
-> > @@ -6044,7 +6056,7 @@ static void svm_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2 *entry)
-> >  {
-> >  	switch (func) {
-> >  	case 0x1:
-> > -		if (avic)
-> > +		if (avic && !avic_per_vm)
-> >  			entry->ecx &= ~F(X2APIC);
-> >  		break;
-> >  	case 0x80000001:
-> > @@ -7370,7 +7382,8 @@ static bool svm_check_apicv_inhibit_reasons(ulong bit)
-> >  			  BIT(APICV_INHIBIT_REASON_HYPERV) |
-> >  			  BIT(APICV_INHIBIT_REASON_NESTED) |
-> >  			  BIT(APICV_INHIBIT_REASON_IRQWIN) |
-> > -			  BIT(APICV_INHIBIT_REASON_PIT_REINJ);
-> > +			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
-> > +			  BIT(APICV_INHIBIT_REASON_X2APIC);
-> >  
-> >  	return supported & BIT(bit);
-> >  }
-> > 
-> 
