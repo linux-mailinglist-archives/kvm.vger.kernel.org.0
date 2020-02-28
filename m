@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C66BA173891
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 14:43:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC44B173988
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 15:11:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726805AbgB1NnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 08:43:02 -0500
-Received: from foss.arm.com ([217.140.110.172]:38328 "EHLO foss.arm.com"
+        id S1726899AbgB1OLi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 09:11:38 -0500
+Received: from foss.arm.com ([217.140.110.172]:39026 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726366AbgB1NnC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 08:43:02 -0500
+        id S1725796AbgB1OLi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 09:11:38 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A33A31B;
-        Fri, 28 Feb 2020 05:43:01 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A6DC31B;
+        Fri, 28 Feb 2020 06:11:37 -0800 (PST)
 Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C8153F7B4;
-        Fri, 28 Feb 2020 05:42:57 -0800 (PST)
-Date:   Fri, 28 Feb 2020 13:42:54 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B99B3F7B4;
+        Fri, 28 Feb 2020 06:11:33 -0800 (PST)
+Date:   Fri, 28 Feb 2020 14:11:30 +0000
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Will Deacon <will@kernel.org>
 Cc:     Rob Herring <robh@kernel.org>,
@@ -51,8 +51,8 @@ Cc:     Rob Herring <robh@kernel.org>,
         Viresh Kumar <viresh.kumar@linaro.org>
 Subject: Re: [RFC PATCH 06/11] iommu: arm-smmu: Remove Calxeda secure mode
  quirk
-Message-ID: <20200228134254.03fc5e1b@donnerap.cambridge.arm.com>
-In-Reply-To: <20200228105024.GC2395@willie-the-truck>
+Message-ID: <20200228141130.18be5bb8@donnerap.cambridge.arm.com>
+In-Reply-To: <20200228135645.GA4745@willie-the-truck>
 References: <20200218171321.30990-1-robh@kernel.org>
         <20200218171321.30990-7-robh@kernel.org>
         <20200218172000.GF1133@willie-the-truck>
@@ -60,6 +60,8 @@ References: <20200218171321.30990-1-robh@kernel.org>
         <20200228100446.GA2395@willie-the-truck>
         <20200228102556.1dde016e@donnerap.cambridge.arm.com>
         <20200228105024.GC2395@willie-the-truck>
+        <20200228134254.03fc5e1b@donnerap.cambridge.arm.com>
+        <20200228135645.GA4745@willie-the-truck>
 Organization: ARM
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
@@ -70,83 +72,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 28 Feb 2020 10:50:25 +0000
+On Fri, 28 Feb 2020 13:56:46 +0000
 Will Deacon <will@kernel.org> wrote:
 
-> On Fri, Feb 28, 2020 at 10:25:56AM +0000, Andre Przywara wrote:
-> > On Fri, 28 Feb 2020 10:04:47 +0000
-> > Will Deacon <will@kernel.org> wrote:
-> > 
-> > Hi,
-> >   
-> > > On Tue, Feb 25, 2020 at 04:01:54PM -0600, Rob Herring wrote:  
-> > > > On Tue, Feb 18, 2020 at 11:20 AM Will Deacon <will@kernel.org> wrote:    
-> > > > >
-> > > > > On Tue, Feb 18, 2020 at 11:13:16AM -0600, Rob Herring wrote:    
-> > > > > > Cc: Will Deacon <will@kernel.org>
-> > > > > > Cc: Robin Murphy <robin.murphy@arm.com>
-> > > > > > Cc: Joerg Roedel <joro@8bytes.org>
-> > > > > > Cc: iommu@lists.linux-foundation.org
-> > > > > > Signed-off-by: Rob Herring <robh@kernel.org>
-> > > > > > ---
-> > > > > > Do not apply yet.    
-> > > > >
-> > > > > Pleeeeease? ;)
-> > > > >    
-> > > > > >  drivers/iommu/arm-smmu-impl.c | 43 -----------------------------------
-> > > > > >  1 file changed, 43 deletions(-)    
-> > > > >
-> > > > > Yes, I'm happy to get rid of this. Sadly, I don't think we can remove
-> > > > > anything from 'struct arm_smmu_impl' because most implementations fall
-> > > > > just short of perfect.
-> > > > >
-> > > > > Anyway, let me know when I can push the button and I'll queue this in
-> > > > > the arm-smmu tree.    
+> On Fri, Feb 28, 2020 at 01:42:54PM +0000, Andre Przywara wrote:
+> > On Fri, 28 Feb 2020 10:50:25 +0000
+> > Will Deacon <will@kernel.org> wrote:  
+> > > On Fri, Feb 28, 2020 at 10:25:56AM +0000, Andre Przywara wrote:  
+> > > > > On Tue, Feb 25, 2020 at 04:01:54PM -0600, Rob Herring wrote:    
+> > > > > > Seems we're leaving the platform support for now, but I think we never
+> > > > > > actually enabled SMMU support. It's not in the dts either in mainline
+> > > > > > nor the version I have which should be close to what shipped in
+> > > > > > firmware. So as long as Andre agrees, this one is good to apply.      
+> > > > > 
+> > > > > Andre? Can I queue this one for 5.7, please?    
 > > > > 
-> > > > Seems we're leaving the platform support for now, but I think we never
-> > > > actually enabled SMMU support. It's not in the dts either in mainline
-> > > > nor the version I have which should be close to what shipped in
-> > > > firmware. So as long as Andre agrees, this one is good to apply.    
+> > > > I was wondering how much of a pain it is to keep it in? AFAICS there are
+> > > > other users of the "impl" indirection. If those goes away, I would be
+> > > > happy to let Calxeda go.    
 > > > 
-> > > Andre? Can I queue this one for 5.7, please?  
+> > > The impl stuff is new, so we'll keep it around. The concern is more about
+> > > testing (see below).
+> > >   
+> > > > But Eric had the magic DT nodes to get the SMMU working, and I used that
+> > > > before, with updating the DT either on flash or dynamically via U-Boot.    
+> > > 
+> > > What did you actually use the SMMU for, though? The
+> > > 'arm_iommu_create_mapping()' interface isn't widely used and, given that
+> > > highbank doesn't support KVM, the use-cases for VFIO are pretty limited
+> > > too.  
 > > 
-> > I was wondering how much of a pain it is to keep it in? AFAICS there are
-> > other users of the "impl" indirection. If those goes away, I would be
-> > happy to let Calxeda go.  
+> > AFAIK Highbank doesn't have the SMMU, probably mostly for that reason.
+> > I have a DT snippet for Midway, and that puts the MMIO base at ~36GB, which is not possible on Highbank.
+> > So I think that the quirk is really meant and needed for Midway.  
 > 
-> The impl stuff is new, so we'll keep it around. The concern is more about
-> testing (see below).
-> 
-> > But Eric had the magic DT nodes to get the SMMU working, and I used that
-> > before, with updating the DT either on flash or dynamically via U-Boot.  
-> 
-> What did you actually use the SMMU for, though? The
-> 'arm_iommu_create_mapping()' interface isn't widely used and, given that
-> highbank doesn't support KVM, the use-cases for VFIO are pretty limited
-> too.
+> Sorry, but I don't follow your reasoning here. The MMIO base has nothing
+> to do with the quirk,
 
-AFAIK Highbank doesn't have the SMMU, probably mostly for that reason.
-I have a DT snippet for Midway, and that puts the MMIO base at ~36GB, which is not possible on Highbank.
-So I think that the quirk is really meant and needed for Midway.
+It hasn't, but Highbank has no LPAE, so couldn't possible have a device at such an address. And this is the only MMIO address I know of.
 
-> > So I don't know exactly *how* desperate you are with removing this, or if
-> > there are other reasons than "negative diffstat", but if possible I would
-> > like to keep it in.  
+> although doing some digging it looks like your
+> conclusion about this applying to Midway (ecx-2000?) is correct:
 > 
-> It's more that we *do* make quite a lot of changes to the arm-smmu driver
-> and it's never tested with this quirk. If you're stepping up to run smmu
-> tests on my queue for each release on highbank, then great, but otherwise
-> I'd rather not carry the code for fun. The change in diffstat is minimal
-> (we're going to need to hooks for nvidia, who broke things in a different
-> way).
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2014-January/226095.html
 
-I am about to set up some more sophisticated testing, and will include some SMMU bits in it.
+Right, thanks for that find. Yes, Midway is the codename for the ECX-2000 SoC product.
 
 Cheers,
-Andre.
-
-> Also, since the hooks aren't going away, if you /do/ end up using the SMMU
-> in future, then we could re-add the driver quirk without any fuss.
+Andre
+ 
+> > > > So I don't know exactly *how* desperate you are with removing this, or if
+> > > > there are other reasons than "negative diffstat", but if possible I would
+> > > > like to keep it in.    
+> > > 
+> > > It's more that we *do* make quite a lot of changes to the arm-smmu driver
+> > > and it's never tested with this quirk. If you're stepping up to run smmu
+> > > tests on my queue for each release on highbank, then great, but otherwise
+> > > I'd rather not carry the code for fun. The change in diffstat is minimal
+> > > (we're going to need to hooks for nvidia, who broke things in a different
+> > > way).  
+> > 
+> > I am about to set up some more sophisticated testing, and will include
+> > some SMMU bits in it.  
+> 
+> Yes, please.
 > 
 > Will
 
