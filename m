@@ -2,86 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2A791735F2
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 12:19:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D03A117377F
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 13:47:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725911AbgB1LTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 06:19:12 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27892 "EHLO
+        id S1725943AbgB1MrF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 07:47:05 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31624 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725536AbgB1LTM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Feb 2020 06:19:12 -0500
+        by vger.kernel.org with ESMTP id S1725876AbgB1MrF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 28 Feb 2020 07:47:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582888751;
+        s=mimecast20190719; t=1582894024;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2LF4vxrQoNc+qf/xWDRbrWWv5/eEgIg6jIqS42FyThg=;
-        b=hM3dzSgvQDchhCKvlsytZwaSZtQ/krRKGDxguqT0JJBzw4oGf1NL08zd9+1XCkT8YYd39w
-        oJrz8OLAKy/LrOBVhOvbrRh/W/nXRGAIth5QhczR5e1tHrgoDol6yjkOpg9LzYqnicZymO
-        vg75PjP/72ENpcnMe74X819peFC/CMc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-OBaxcVpqNneOBEy5j2tGbg-1; Fri, 28 Feb 2020 06:19:08 -0500
-X-MC-Unique: OBaxcVpqNneOBEy5j2tGbg-1
-Received: by mail-wm1-f70.google.com with SMTP id p2so575467wmi.8
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 03:19:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2LF4vxrQoNc+qf/xWDRbrWWv5/eEgIg6jIqS42FyThg=;
-        b=jV3NqlYKp1jBcToXZGkvkOP9q0WB8lBvypMZKcSTHWPj156pgxSsZRZn07/kjBmIZ9
-         lcb+1/ZPhbmDigbjgIJvXOrHLdI/AVq0wkcFvIrf9/cev6F5wcLq1qQYyu14iQxkC/VD
-         Hp4EhE1ho5ArcrBojjohHqyansw635m8WKs3CxW/CxXoECXmoDaWjeoVRB9cwHH0NJIR
-         77fIx4GLMMp6r0URc2FuMcXkIJ5JapYsenumvb20lqS3mCruKGdWrgjD6AtCxQDKb/U/
-         ggND8in7c8ylNHg7G1Tgl8EuyEMvCtPwgXVxgha2SPuqh45dYdv8Yvq37hNhvRoCQCzU
-         SBGw==
-X-Gm-Message-State: APjAAAWLefiUIQzECPn6YYXdyoc845QOaLg5qtZnfjmfgHrwxqMIQ+v0
-        Wyywc7NRxX1afeWjB8Q0K/Sk+IqkfBCi230mRyNyPaeLYorDC5xfpJ2woTG1jxUXGJTVai+D2s4
-        u+fUrph74E6Nt
-X-Received: by 2002:a05:600c:149:: with SMTP id w9mr4171672wmm.132.1582888747385;
-        Fri, 28 Feb 2020 03:19:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyNwAs7pkv3DkkKQ6tnmOPKj906dE5yehxSZVKxwLON8A6HswN4SQ4sv53S6NKieRqdYN23AQ==
-X-Received: by 2002:a05:600c:149:: with SMTP id w9mr4171644wmm.132.1582888747026;
-        Fri, 28 Feb 2020 03:19:07 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:d0d9:ea10:9775:f33f? ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
-        by smtp.gmail.com with ESMTPSA id v17sm11280846wrt.91.2020.02.28.03.19.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Feb 2020 03:19:06 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 0/7] Fixes for clang builds
-To:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org
-Cc:     oupton@google.com, drjones@redhat.com
+        bh=bYfwvVWtwwus79V/0XOxgEz7ltZQJ9gLNNGr2YS6Rx8=;
+        b=e7+XOG3zKjggXB1k2W544vvj4E8+z8r1/oxE8u/x1n1B9F8PBv34H0hN0t/OmsFCkqX2WD
+        nAfIgH1qPbIR863M0+EIPkXuxtpq2QuWHx4lDSX952bGy//zRcH9a+xh0vV7eHergZxeDN
+        oAXE/YhmPWJ+Ij6xzkAfmQrV59N974U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-JLLb7-eCPcav57GXXXRaOw-1; Fri, 28 Feb 2020 07:47:02 -0500
+X-MC-Unique: JLLb7-eCPcav57GXXXRaOw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2082BDBA9;
+        Fri, 28 Feb 2020 12:47:01 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BB0910027BA;
+        Fri, 28 Feb 2020 12:46:59 +0000 (UTC)
+Date:   Fri, 28 Feb 2020 13:46:57 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org,
+        oupton@google.com
+Subject: Re: [kvm-unit-tests PATCH 2/7] pci: use uint32_t for unsigned long
+ values
+Message-ID: <20200228124657.aqgrty74dbki6d4g@kamzik.brq.redhat.com>
 References: <20200226074427.169684-1-morbo@google.com>
  <20200226094433.210968-1-morbo@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5836cc23-2631-8f8e-4eee-0560ac9e5362@redhat.com>
-Date:   Fri, 28 Feb 2020 12:19:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ <20200226094433.210968-4-morbo@google.com>
+ <91b0fdf5-a948-ef61-8b05-1c5757937521@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200226094433.210968-1-morbo@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <91b0fdf5-a948-ef61-8b05-1c5757937521@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/02/20 10:44, Bill Wendling wrote:
-> Changes to "pci: cast masks to uint32_t for unsigned long values" to
-> cast the masks instead of changing the values in the header.
+On Fri, Feb 28, 2020 at 12:04:38PM +0100, Paolo Bonzini wrote:
+> On 26/02/20 10:44, Bill Wendling wrote:
+> > The "pci_bar_*" functions use 64-bit masks, but the results are assigned
+> > to 32-bit variables. Use 32-bit masks, since we're interested only in
+> > the least significant 4-bits.
+> > 
+> > Signed-off-by: Bill Wendling <morbo@google.com>
+> > ---
+> >  lib/linux/pci_regs.h | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/lib/linux/pci_regs.h b/lib/linux/pci_regs.h
+> > index 1becea8..3bc2b92 100644
+> > --- a/lib/linux/pci_regs.h
+> > +++ b/lib/linux/pci_regs.h
+> > @@ -96,8 +96,8 @@
+> >  #define  PCI_BASE_ADDRESS_MEM_TYPE_1M	0x02	/* Below 1M [obsolete] */
+> >  #define  PCI_BASE_ADDRESS_MEM_TYPE_64	0x04	/* 64 bit address */
+> >  #define  PCI_BASE_ADDRESS_MEM_PREFETCH	0x08	/* prefetchable? */
+> > -#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fUL)
+> > -#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03UL)
+> > +#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fU)
+> > +#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03U)
+> >  /* bit 1 is reserved if address_space = 1 */
+> >  
+> >  /* Header type 0 (normal devices) */
+> > 
+> 
+> Removing the "U" is even better because it will then sign-extend
+> automatically.
+>
 
-Applied 1-3-4 and a tweaked version of 2 and 7.
+We don't want this patch at all though. We shouldn't change pci_regs.h
+since it comes from linux and someday we may update again and lose
+any changes we make. We should change how these masks are used instead.
 
-For 5, let's use -fwrapv instead.
-
-For 6, clang people should stop implementing GCC extensions in half and
-declaring themselves compatible.  It's just a sanity check, you can wrap
-it all with #ifndef __clang__.
-
-Paolo
+Thanks,
+drew
 
