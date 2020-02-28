@@ -2,114 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF9FD173427
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 10:36:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD86E1734A0
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 10:56:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726918AbgB1JgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 04:36:18 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58560 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726614AbgB1JgP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Feb 2020 04:36:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582882574;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xGQ30kUvc7fIP0RyINOYfwYjQETpcqZNSK+cVjV0fQQ=;
-        b=NC1u/AoaRwfKzkEGtvQ+Q/3URcJfhhSFpgKANRQKmLu3sNhvqaMrYH6VMNBvLjiELnwO4N
-        C3gV1GFRQataJIHbZBWUQuagvzhWYf0C80HVRTEhnYtXqRb5lnVWyCsoIaJqt1SQQX2vei
-        Zm2hw1T/rvB9n4A0uo7vZDSJqH1sVzY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-8mOUnVyNP3uU7l9s5_VnbQ-1; Fri, 28 Feb 2020 04:36:12 -0500
-X-MC-Unique: 8mOUnVyNP3uU7l9s5_VnbQ-1
-Received: by mail-wr1-f72.google.com with SMTP id u18so1084263wrn.11
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 01:36:12 -0800 (PST)
+        id S1726778AbgB1J4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 04:56:08 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:50758 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726536AbgB1J4I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 04:56:08 -0500
+Received: by mail-wm1-f66.google.com with SMTP id a5so2543118wmb.0;
+        Fri, 28 Feb 2020 01:56:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=zKGXK9SAs0Ecacz7HFCrkRE8+zApqJ5J3A2oMtz1fqU=;
+        b=AjGi9oKXYefDfw5yebzDzw4qIkTe3S/U2jkj5sanwnGoPZKDcclQeuZ+7tC2KDV73Z
+         x2M0soNYFSdHwsQNzRbtFt+ukkVKkkqKGo/wxqaze688veIAJLqslmFLLwZ6nxm7IjVZ
+         w34vMJLgBC5R9ESLI35r8CT2b7X5PfnJyq1L7G1VZvgN7tXI6sLOaK5aayN/mfKZyVoy
+         XHCNIHcBfMHqbqUISLmm0aBO/e80qaEKZvyuOuezzy2KmdVhcKPkj/IRVRP2t+5ClFV6
+         PX7vqfHU2pI6SWmbrbAXQRp6fYmcTtQb0USv32sArRPGt/S9BVPyve4GpULxers20YS/
+         P1cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xGQ30kUvc7fIP0RyINOYfwYjQETpcqZNSK+cVjV0fQQ=;
-        b=bLcL1xGTLIuQRByf9mktawy1pAY3QNgbm2GivqcpZx5Ii8vGGfado5yR5CaEp/k4NN
-         APUG/DCujUAt2ETjxEY0QPY8Z4R0tq7cr0V4ypnie1TPRC2CV6NN1CpZP9U7DBywgNdT
-         9uNzN5PBlFZuxmA9ANBAMSuqN18P5el3fP7YX1PlJoxp4yYOxpaDy42dsWrdXbWFrMMQ
-         D4ni26TDuqgQics/738TUoALlO2nRc3T2oADAjbU+x6Si7KfdNW6J28YqfQAIa1dtbHi
-         tPlSzULkh+W6ZacTiuyxmH7JypUazqAh4nVk8vEO8pzwUyH4kMWY47VQvX1rgwBcvHYf
-         +OSQ==
-X-Gm-Message-State: APjAAAUVi0OuuN9EBFJpD8gaD91tPjAD3TVtfvyrJlb3u/HrBLBOSABS
-        BOjzSesgHm/KzJtOeFvWXbf044xqIcQpkSXZeVr3jMATpNRjm0YouB8zb+KXUZ0mFIgLSTEwIBl
-        HxsqcIVgwpHRx
-X-Received: by 2002:a05:600c:3d1:: with SMTP id z17mr4119294wmd.90.1582882571462;
-        Fri, 28 Feb 2020 01:36:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwMpaEMR5F3/oHm6BUQh6V6cohnmDW6MF7pyQrno3k4L7OwqhL0nlcd2ky/TZgElcMLgwXadw==
-X-Received: by 2002:a05:600c:3d1:: with SMTP id z17mr4119276wmd.90.1582882571220;
-        Fri, 28 Feb 2020 01:36:11 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:d0d9:ea10:9775:f33f? ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
-        by smtp.gmail.com with ESMTPSA id u23sm1371280wmu.14.2020.02.28.01.36.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Feb 2020 01:36:10 -0800 (PST)
-Subject: Re: [PATCH] KVM: nVMX: allow compiling with W=1
-To:     =?UTF-8?Q?Valdis_Kl=c4=93tnieks?= <valdis.kletnieks@vt.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <263441.1582858192@turing-police>
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=zKGXK9SAs0Ecacz7HFCrkRE8+zApqJ5J3A2oMtz1fqU=;
+        b=s+GGq6qVcSCY/Q55VxrRWarLJ+ZvzQWcDENL1x0tJvgaK5SfAZc+OfzFqy0yNG9RYm
+         ACqejSY3jO0+2a2LijvUyxpwaMQP3mI/ggZVUxmp4s8eM6yIlsFcXqMwwXgJG2/i16TF
+         lZzwCGdzZupp/yBvKE21WK3mimde1CTFXAzrwhWPbd7BHXsNFA0MLeXJ5N7A4HjiQgbL
+         4sDMGZcLPGTeyDTj+zo3Yw9iJPPVbkaAzsACpFi/X6CelDyq5M9E5XxdbKr1vpaHv8YX
+         ZlzzX8bLNUz3rYIMCtDm1jkGaGZISc6eiKZk4vSKh4tyVW/3sznD6h6eeeOO/kG56Aee
+         aW+w==
+X-Gm-Message-State: APjAAAV4lJZ+tRAeQzj/4ZFZsBPLN4pCmY8OpGras2N1AkW7NEX9pR30
+        nAfXDwq2+KtGOHmwxrCsWH/XnE/A
+X-Google-Smtp-Source: APXvYqxwIh2KTYZXXyArYgBQzV4t5qeE+7xhHbRZR6CI30Br31D4xn9E18Gc7TX0/GIk1PDqBEnUIQ==
+X-Received: by 2002:a7b:c119:: with SMTP id w25mr4150009wmi.116.1582883766312;
+        Fri, 28 Feb 2020 01:56:06 -0800 (PST)
+Received: from 640k.localdomain ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id t3sm11664565wrx.38.2020.02.28.01.56.05
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 28 Feb 2020 01:56:05 -0800 (PST)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <96d8eb48-2961-8b85-9687-6bbc27e443a9@redhat.com>
-Date:   Fri, 28 Feb 2020 10:36:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <263441.1582858192@turing-police>
-Content-Type: text/plain; charset=UTF-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     hch@lst.de
+Subject: [PATCH] KVM: allow disabling -Werror
+Date:   Fri, 28 Feb 2020 10:56:03 +0100
+Message-Id: <1582883764-26125-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/02/20 03:49, Valdis Klētnieks wrote:
-> Compile error with CONFIG_KVM_INTEL=y and W=1:
-> 
->   CC      arch/x86/kvm/vmx/vmx.o
-> arch/x86/kvm/vmx/vmx.c:68:32: error: 'vmx_cpu_id' defined but not used [-Werror=unused-const-variable=]
->    68 | static const struct x86_cpu_id vmx_cpu_id[] = {
->       |                                ^~~~~~~~~~
-> cc1: all warnings being treated as errors
-> 
-> When building with =y, the MODULE_DEVICE_TABLE macro doesn't generate a
-> reference to the structure (or any code at all).  This makes W=1 compiles
-> unhappy.
-> 
-> Wrap both in a #ifdef to avoid the issue.
-> 
-> Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 40a1467d1655..5c2fc2177b0d 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -65,11 +65,13 @@
->  MODULE_AUTHOR("Qumranet");
->  MODULE_LICENSE("GPL");
->  
-> +#ifdef MODULE
->  static const struct x86_cpu_id vmx_cpu_id[] = {
->  	X86_FEATURE_MATCH(X86_FEATURE_VMX),
->  	{}
->  };
->  MODULE_DEVICE_TABLE(x86cpu, vmx_cpu_id);
-> +#endif
->  
->  bool __read_mostly enable_vpid = 1;
->  module_param_named(vpid, enable_vpid, bool, 0444);
-> 
+Restrict -Werror to well-tested configurations and allow disabling it
+via Kconfig.
 
-Queued, and doing the same for AMD.
+Reported-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/Kconfig  | 13 +++++++++++++
+ arch/x86/kvm/Makefile |  2 +-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-Paolo
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 991019d5eee1..1bb4927030af 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -59,6 +59,19 @@ config KVM
+ 
+ 	  If unsure, say N.
+ 
++config KVM_WERROR
++	bool "Compile KVM with -Werror"
++	# KASAN may cause the build to fail due to larger frames
++	default y if X86_64 && !KASAN
++	# We use the dependency on !COMPILE_TEST to not be enabled
++	# blindly in allmodconfig or allyesconfig configurations
++	depends on (X86_64 && !KASAN) || !COMPILE_TEST
++	depends on EXPERT
++	help
++	  Add -Werror to the build flags for (and only for) i915.ko.
++
++	  If in doubt, say "N".
++
+ config KVM_INTEL
+ 	tristate "KVM for Intel (and compatible) processors support"
+ 	depends on KVM && IA32_FEAT_CTL
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index 4654e97a05cc..e553f0fdd87d 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+ ccflags-y += -Iarch/x86/kvm
+-ccflags-y += -Werror
++ccflags-$(CONFIG_KVM_WERROR) += -Werror
+ 
+ KVM := ../../../virt/kvm
+ 
+-- 
+1.8.3.1
 
