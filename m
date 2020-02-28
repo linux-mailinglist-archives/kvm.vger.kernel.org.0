@@ -2,118 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 617BE1737C9
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 14:02:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C66BA173891
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 14:43:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725876AbgB1NCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 08:02:18 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29762 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725805AbgB1NCS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Feb 2020 08:02:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582894937;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qOYh55Sc6wrpHyCk5I3nHReNLrRQaG9oThpXrCZTmRs=;
-        b=Pn2bCbJBFHyX7ulntuweozwzCXQ/mlBf8iL87UUQ8rNxtGIxit2UmkoQNEZjuZSWvnbOLE
-        7z/bLN8XGOH9Z6gn+28Vvm3nFV9Y/xvKWBWrQYFR6tch0cC5U8NViRlar99jGkuTIa3/LG
-        EmEKGp8epXsJpAGmEj0BSMV3Q2IvjfQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-iFwuq0-ENFqf4C7waziIXw-1; Fri, 28 Feb 2020 08:02:15 -0500
-X-MC-Unique: iFwuq0-ENFqf4C7waziIXw-1
-Received: by mail-wr1-f72.google.com with SMTP id z15so1310780wrw.0
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 05:02:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qOYh55Sc6wrpHyCk5I3nHReNLrRQaG9oThpXrCZTmRs=;
-        b=rpisAcSoM9Keb30SlcpMBhxIkilgHnVwvv4DbBCua6jiitCcDlDRXkMalRbTz/UJUN
-         HSVMIL9S0dEvowKbKcHH8LPvtwWbmz4p98kKcW/PLSFwV83/yIaLa3UmH3KstRtIe/+d
-         ULe74+7NrsZJwgL/2zfAsQPZvzxx557k1Vm3O3PRVIODz/rOolEKqE2eUGTHg7JsMXMy
-         hl+P3CghnpCENzFdAidd9z+ePNB7/EQmgsJFOpHuBjaaNcUnYqErO4Xw99UHRTr4LFsA
-         WiYfBMCWBCMpfjQu26/+W2V91VNI6lRcp24zX57lhCZsCvvST5Xhet4qDrFklUNnOQPo
-         TZ/w==
-X-Gm-Message-State: APjAAAWmgzrjK55xqfZVc/xTwwCgCpwIB4I79hFW3MUIf7uTarri4nVW
-        yfmamo+b1/cZIIlONi9UbSFsYnGKnm92/+A2YNJSHQdWaBOWMZg1SLVzRPgcGUh548B8QI8cElC
-        jHp2ZHcJz154A
-X-Received: by 2002:a05:6000:1142:: with SMTP id d2mr4688920wrx.62.1582894934216;
-        Fri, 28 Feb 2020 05:02:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzp+6kG79EG3wtgSuQFs/Xpq7Y1C/dKtm3Potgr/5etRMRqJSu2nVqLFDrEnuwb0vspTPbt8g==
-X-Received: by 2002:a05:6000:1142:: with SMTP id d2mr4688896wrx.62.1582894933882;
-        Fri, 28 Feb 2020 05:02:13 -0800 (PST)
-Received: from [192.168.178.40] ([151.20.130.54])
-        by smtp.gmail.com with ESMTPSA id t3sm12316069wrx.38.2020.02.28.05.02.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Feb 2020 05:02:13 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 2/7] pci: use uint32_t for unsigned long
- values
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org,
-        oupton@google.com
-References: <20200226074427.169684-1-morbo@google.com>
- <20200226094433.210968-1-morbo@google.com>
- <20200226094433.210968-4-morbo@google.com>
- <91b0fdf5-a948-ef61-8b05-1c5757937521@redhat.com>
- <20200228124657.aqgrty74dbki6d4g@kamzik.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c025bd4c-b390-0b8e-f788-dc01ba0040f1@redhat.com>
-Date:   Fri, 28 Feb 2020 14:02:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1726805AbgB1NnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 08:43:02 -0500
+Received: from foss.arm.com ([217.140.110.172]:38328 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726366AbgB1NnC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 08:43:02 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A33A31B;
+        Fri, 28 Feb 2020 05:43:01 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C8153F7B4;
+        Fri, 28 Feb 2020 05:42:57 -0800 (PST)
+Date:   Fri, 28 Feb 2020 13:42:54 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     Rob Herring <robh@kernel.org>,
+        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        soc@kernel.org, Robert Richter <rrichter@marvell.com>,
+        Jon Loeliger <jdl@jdl.com>, Alexander Graf <graf@amazon.com>,
+        Matthias Brugger <mbrugger@suse.com>,
+        Mark Langsdorf <mlangsdo@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
+        Linux IOMMU <iommu@lists.linux-foundation.org>,
+        James Morse <james.morse@arm.com>,
+        Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+        kvm@vger.kernel.org, linux-clk <linux-clk@vger.kernel.org>,
+        linux-edac <linux-edac@vger.kernel.org>,
+        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
+        <linux-ide@vger.kernel.org>,
+        "open list:THERMAL" <linux-pm@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>
+Subject: Re: [RFC PATCH 06/11] iommu: arm-smmu: Remove Calxeda secure mode
+ quirk
+Message-ID: <20200228134254.03fc5e1b@donnerap.cambridge.arm.com>
+In-Reply-To: <20200228105024.GC2395@willie-the-truck>
+References: <20200218171321.30990-1-robh@kernel.org>
+        <20200218171321.30990-7-robh@kernel.org>
+        <20200218172000.GF1133@willie-the-truck>
+        <CAL_JsqJn1kG6gah+4318NQfJ4PaS3x3woWEUh08+OTfOcD+1MQ@mail.gmail.com>
+        <20200228100446.GA2395@willie-the-truck>
+        <20200228102556.1dde016e@donnerap.cambridge.arm.com>
+        <20200228105024.GC2395@willie-the-truck>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200228124657.aqgrty74dbki6d4g@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/02/20 13:46, Andrew Jones wrote:
-> On Fri, Feb 28, 2020 at 12:04:38PM +0100, Paolo Bonzini wrote:
->> On 26/02/20 10:44, Bill Wendling wrote:
->>> The "pci_bar_*" functions use 64-bit masks, but the results are assigned
->>> to 32-bit variables. Use 32-bit masks, since we're interested only in
->>> the least significant 4-bits.
->>>
->>> Signed-off-by: Bill Wendling <morbo@google.com>
->>> ---
->>>  lib/linux/pci_regs.h | 4 ++--
->>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/lib/linux/pci_regs.h b/lib/linux/pci_regs.h
->>> index 1becea8..3bc2b92 100644
->>> --- a/lib/linux/pci_regs.h
->>> +++ b/lib/linux/pci_regs.h
->>> @@ -96,8 +96,8 @@
->>>  #define  PCI_BASE_ADDRESS_MEM_TYPE_1M	0x02	/* Below 1M [obsolete] */
->>>  #define  PCI_BASE_ADDRESS_MEM_TYPE_64	0x04	/* 64 bit address */
->>>  #define  PCI_BASE_ADDRESS_MEM_PREFETCH	0x08	/* prefetchable? */
->>> -#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fUL)
->>> -#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03UL)
->>> +#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fU)
->>> +#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03U)
->>>  /* bit 1 is reserved if address_space = 1 */
->>>  
->>>  /* Header type 0 (normal devices) */
->>>
->>
->> Removing the "U" is even better because it will then sign-extend
->> automatically.
->>
+On Fri, 28 Feb 2020 10:50:25 +0000
+Will Deacon <will@kernel.org> wrote:
+
+> On Fri, Feb 28, 2020 at 10:25:56AM +0000, Andre Przywara wrote:
+> > On Fri, 28 Feb 2020 10:04:47 +0000
+> > Will Deacon <will@kernel.org> wrote:
+> > 
+> > Hi,
+> >   
+> > > On Tue, Feb 25, 2020 at 04:01:54PM -0600, Rob Herring wrote:  
+> > > > On Tue, Feb 18, 2020 at 11:20 AM Will Deacon <will@kernel.org> wrote:    
+> > > > >
+> > > > > On Tue, Feb 18, 2020 at 11:13:16AM -0600, Rob Herring wrote:    
+> > > > > > Cc: Will Deacon <will@kernel.org>
+> > > > > > Cc: Robin Murphy <robin.murphy@arm.com>
+> > > > > > Cc: Joerg Roedel <joro@8bytes.org>
+> > > > > > Cc: iommu@lists.linux-foundation.org
+> > > > > > Signed-off-by: Rob Herring <robh@kernel.org>
+> > > > > > ---
+> > > > > > Do not apply yet.    
+> > > > >
+> > > > > Pleeeeease? ;)
+> > > > >    
+> > > > > >  drivers/iommu/arm-smmu-impl.c | 43 -----------------------------------
+> > > > > >  1 file changed, 43 deletions(-)    
+> > > > >
+> > > > > Yes, I'm happy to get rid of this. Sadly, I don't think we can remove
+> > > > > anything from 'struct arm_smmu_impl' because most implementations fall
+> > > > > just short of perfect.
+> > > > >
+> > > > > Anyway, let me know when I can push the button and I'll queue this in
+> > > > > the arm-smmu tree.    
+> > > > 
+> > > > Seems we're leaving the platform support for now, but I think we never
+> > > > actually enabled SMMU support. It's not in the dts either in mainline
+> > > > nor the version I have which should be close to what shipped in
+> > > > firmware. So as long as Andre agrees, this one is good to apply.    
+> > > 
+> > > Andre? Can I queue this one for 5.7, please?  
+> > 
+> > I was wondering how much of a pain it is to keep it in? AFAICS there are
+> > other users of the "impl" indirection. If those goes away, I would be
+> > happy to let Calxeda go.  
 > 
-> We don't want this patch at all though. We shouldn't change pci_regs.h
-> since it comes from linux and someday we may update again and lose
-> any changes we make. We should change how these masks are used instead.
+> The impl stuff is new, so we'll keep it around. The concern is more about
+> testing (see below).
+> 
+> > But Eric had the magic DT nodes to get the SMMU working, and I used that
+> > before, with updating the DT either on flash or dynamically via U-Boot.  
+> 
+> What did you actually use the SMMU for, though? The
+> 'arm_iommu_create_mapping()' interface isn't widely used and, given that
+> highbank doesn't support KVM, the use-cases for VFIO are pretty limited
+> too.
 
-I will try to get the change into Linux.
+AFAIK Highbank doesn't have the SMMU, probably mostly for that reason.
+I have a DT snippet for Midway, and that puts the MMIO base at ~36GB, which is not possible on Highbank.
+So I think that the quirk is really meant and needed for Midway.
 
-Paolo
+> > So I don't know exactly *how* desperate you are with removing this, or if
+> > there are other reasons than "negative diffstat", but if possible I would
+> > like to keep it in.  
+> 
+> It's more that we *do* make quite a lot of changes to the arm-smmu driver
+> and it's never tested with this quirk. If you're stepping up to run smmu
+> tests on my queue for each release on highbank, then great, but otherwise
+> I'd rather not carry the code for fun. The change in diffstat is minimal
+> (we're going to need to hooks for nvidia, who broke things in a different
+> way).
+
+I am about to set up some more sophisticated testing, and will include some SMMU bits in it.
+
+Cheers,
+Andre.
+
+> Also, since the hooks aren't going away, if you /do/ end up using the SMMU
+> in future, then we could re-add the driver quirk without any fuss.
+> 
+> Will
 
