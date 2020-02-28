@@ -2,140 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EC44B173988
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 15:11:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78D6D173A81
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 15:59:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726899AbgB1OLi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 09:11:38 -0500
-Received: from foss.arm.com ([217.140.110.172]:39026 "EHLO foss.arm.com"
+        id S1727027AbgB1O7p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 09:59:45 -0500
+Received: from mga09.intel.com ([134.134.136.24]:36391 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725796AbgB1OLi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 09:11:38 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A6DC31B;
-        Fri, 28 Feb 2020 06:11:37 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B99B3F7B4;
-        Fri, 28 Feb 2020 06:11:33 -0800 (PST)
-Date:   Fri, 28 Feb 2020 14:11:30 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     Rob Herring <robh@kernel.org>,
-        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        soc@kernel.org, Robert Richter <rrichter@marvell.com>,
-        Jon Loeliger <jdl@jdl.com>, Alexander Graf <graf@amazon.com>,
-        Matthias Brugger <mbrugger@suse.com>,
-        Mark Langsdorf <mlangsdo@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        devicetree@vger.kernel.org, Eric Auger <eric.auger@redhat.com>,
-        Linux IOMMU <iommu@lists.linux-foundation.org>,
-        James Morse <james.morse@arm.com>,
-        Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-        kvm@vger.kernel.org, linux-clk <linux-clk@vger.kernel.org>,
-        linux-edac <linux-edac@vger.kernel.org>,
-        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
-        <linux-ide@vger.kernel.org>,
-        "open list:THERMAL" <linux-pm@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Viresh Kumar <viresh.kumar@linaro.org>
-Subject: Re: [RFC PATCH 06/11] iommu: arm-smmu: Remove Calxeda secure mode
- quirk
-Message-ID: <20200228141130.18be5bb8@donnerap.cambridge.arm.com>
-In-Reply-To: <20200228135645.GA4745@willie-the-truck>
-References: <20200218171321.30990-1-robh@kernel.org>
-        <20200218171321.30990-7-robh@kernel.org>
-        <20200218172000.GF1133@willie-the-truck>
-        <CAL_JsqJn1kG6gah+4318NQfJ4PaS3x3woWEUh08+OTfOcD+1MQ@mail.gmail.com>
-        <20200228100446.GA2395@willie-the-truck>
-        <20200228102556.1dde016e@donnerap.cambridge.arm.com>
-        <20200228105024.GC2395@willie-the-truck>
-        <20200228134254.03fc5e1b@donnerap.cambridge.arm.com>
-        <20200228135645.GA4745@willie-the-truck>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1726788AbgB1O7o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 09:59:44 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2020 06:59:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,496,1574150400"; 
+   d="scan'208";a="437437616"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga005.fm.intel.com with ESMTP; 28 Feb 2020 06:59:43 -0800
+Date:   Fri, 28 Feb 2020 06:59:43 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: VMX: Always VMCLEAR in-use VMCSes during crash
+ with kexec support
+Message-ID: <20200228145942.GA2329@linux.intel.com>
+References: <20200227223047.13125-1-sean.j.christopherson@intel.com>
+ <20200227223047.13125-2-sean.j.christopherson@intel.com>
+ <9edc8cef-9aa4-11ca-f8f2-a1fea990b87e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9edc8cef-9aa4-11ca-f8f2-a1fea990b87e@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 28 Feb 2020 13:56:46 +0000
-Will Deacon <will@kernel.org> wrote:
-
-> On Fri, Feb 28, 2020 at 01:42:54PM +0000, Andre Przywara wrote:
-> > On Fri, 28 Feb 2020 10:50:25 +0000
-> > Will Deacon <will@kernel.org> wrote:  
-> > > On Fri, Feb 28, 2020 at 10:25:56AM +0000, Andre Przywara wrote:  
-> > > > > On Tue, Feb 25, 2020 at 04:01:54PM -0600, Rob Herring wrote:    
-> > > > > > Seems we're leaving the platform support for now, but I think we never
-> > > > > > actually enabled SMMU support. It's not in the dts either in mainline
-> > > > > > nor the version I have which should be close to what shipped in
-> > > > > > firmware. So as long as Andre agrees, this one is good to apply.      
-> > > > > 
-> > > > > Andre? Can I queue this one for 5.7, please?    
-> > > > 
-> > > > I was wondering how much of a pain it is to keep it in? AFAICS there are
-> > > > other users of the "impl" indirection. If those goes away, I would be
-> > > > happy to let Calxeda go.    
-> > > 
-> > > The impl stuff is new, so we'll keep it around. The concern is more about
-> > > testing (see below).
-> > >   
-> > > > But Eric had the magic DT nodes to get the SMMU working, and I used that
-> > > > before, with updating the DT either on flash or dynamically via U-Boot.    
-> > > 
-> > > What did you actually use the SMMU for, though? The
-> > > 'arm_iommu_create_mapping()' interface isn't widely used and, given that
-> > > highbank doesn't support KVM, the use-cases for VFIO are pretty limited
-> > > too.  
-> > 
-> > AFAIK Highbank doesn't have the SMMU, probably mostly for that reason.
-> > I have a DT snippet for Midway, and that puts the MMIO base at ~36GB, which is not possible on Highbank.
-> > So I think that the quirk is really meant and needed for Midway.  
+On Fri, Feb 28, 2020 at 11:16:10AM +0100, Paolo Bonzini wrote:
+> On 27/02/20 23:30, Sean Christopherson wrote:
+> > -void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs)
+> > +void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs, bool in_use)
+> >  {
+> >  	vmcs_clear(loaded_vmcs->vmcs);
+> >  	if (loaded_vmcs->shadow_vmcs && loaded_vmcs->launched)
+> >  		vmcs_clear(loaded_vmcs->shadow_vmcs);
+> > +
+> > +	if (in_use) {
+> > +		list_del(&loaded_vmcs->loaded_vmcss_on_cpu_link);
+> > +
+> > +		/*
+> > +		 * Ensure deleting loaded_vmcs from its current percpu list
+> > +		 * completes before setting loaded_vmcs->vcpu to -1, otherwise
+> > +		 * a different cpu can see vcpu == -1 first and add loaded_vmcs
+> > +		 * to its percpu list before it's deleted from this cpu's list.
+> > +		 * Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
+> > +		 */
+> > +		smp_wmb();
+> > +	}
+> > +
 > 
-> Sorry, but I don't follow your reasoning here. The MMIO base has nothing
-> to do with the quirk,
+> I'd like to avoid the new in_use argument and, also, I think it's a
+> little bit nicer to always invoke the memory barrier.  Even though we 
+> use "asm volatile" for vmclear and therefore the compiler is already 
+> taken care of, in principle it's more correct to order the ->cpu write 
+> against vmclear's.
 
-It hasn't, but Highbank has no LPAE, so couldn't possible have a device at such an address. And this is the only MMIO address I know of.
+Completely agree on all points.  I wanted to avoid in_use as well, but it
+didn't occur to me to use list_empty()...
 
-> although doing some digging it looks like your
-> conclusion about this applying to Midway (ecx-2000?) is correct:
+> This gives the following patch on top:
+
+Looks good.
+
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c9d6152e7a4d..77a64110577b 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -656,25 +656,24 @@ static int vmx_set_guest_msr(struct vcpu_vmx *vmx, struct shared_msr_entry *msr,
+>  	return ret;
+>  }
+>  
+> -void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs, bool in_use)
+> +void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs)
+>  {
+>  	vmcs_clear(loaded_vmcs->vmcs);
+>  	if (loaded_vmcs->shadow_vmcs && loaded_vmcs->launched)
+>  		vmcs_clear(loaded_vmcs->shadow_vmcs);
+>  
+> -	if (in_use) {
+> +	if (!list_empty(&loaded_vmcs->loaded_vmcss_on_cpu_link))
+>  		list_del(&loaded_vmcs->loaded_vmcss_on_cpu_link);
+>  
+> -		/*
+> -		 * Ensure deleting loaded_vmcs from its current percpu list
+> -		 * completes before setting loaded_vmcs->vcpu to -1, otherwise
+> -		 * a different cpu can see vcpu == -1 first and add loaded_vmcs
+> -		 * to its percpu list before it's deleted from this cpu's list.
+> -		 * Pairs with the smp_rmb() in vmx_vcpu_load_vmcs().
+> -		 */
+> -		smp_wmb();
+> -	}
+> -
+> +	/*
+> +	 * Ensure all writes to loaded_vmcs, including deleting it
+> +	 * from its current percpu list, complete before setting
+> +	 * loaded_vmcs->vcpu to -1; otherwise,, a different cpu can
+> +	 * see vcpu == -1 first and add loaded_vmcs to its percpu
+> +	 * list before it's deleted from this cpu's list.  Pairs
+> +	 * with the smp_rmb() in vmx_vcpu_load_vmcs().
+> +	 */
+> +	smp_wmb();
+>  	loaded_vmcs->cpu = -1;
+>  	loaded_vmcs->launched = 0;
+>  }
+> @@ -701,7 +700,7 @@ static void __loaded_vmcs_clear(void *arg)
+>  	if (per_cpu(current_vmcs, cpu) == loaded_vmcs->vmcs)
+>  		per_cpu(current_vmcs, cpu) = NULL;
+>  
+> -	loaded_vmcs_init(loaded_vmcs, true);
+> +	loaded_vmcs_init(loaded_vmcs);
+>  }
+>  
+>  void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs)
+> @@ -2568,7 +2567,8 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
+>  
+>  	loaded_vmcs->shadow_vmcs = NULL;
+>  	loaded_vmcs->hv_timer_soft_disabled = false;
+> -	loaded_vmcs_init(loaded_vmcs, false);
+> +	INIT_LIST_HEAD(&loaded_vmcs->loaded_vmcss_on_cpu_link);
+> +	loaded_vmcs_init(loaded_vmcs);
+>  
+>  	if (cpu_has_vmx_msr_bitmap()) {
+>  		loaded_vmcs->msr_bitmap = (unsigned long *)
 > 
-> http://lists.infradead.org/pipermail/linux-arm-kernel/2014-January/226095.html
-
-Right, thanks for that find. Yes, Midway is the codename for the ECX-2000 SoC product.
-
-Cheers,
-Andre
- 
-> > > > So I don't know exactly *how* desperate you are with removing this, or if
-> > > > there are other reasons than "negative diffstat", but if possible I would
-> > > > like to keep it in.    
-> > > 
-> > > It's more that we *do* make quite a lot of changes to the arm-smmu driver
-> > > and it's never tested with this quirk. If you're stepping up to run smmu
-> > > tests on my queue for each release on highbank, then great, but otherwise
-> > > I'd rather not carry the code for fun. The change in diffstat is minimal
-> > > (we're going to need to hooks for nvidia, who broke things in a different
-> > > way).  
-> > 
-> > I am about to set up some more sophisticated testing, and will include
-> > some SMMU bits in it.  
+> Paolo
 > 
-> Yes, please.
-> 
-> Will
-
