@@ -2,148 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AD8E174209
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 23:36:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C445917427A
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 23:47:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbgB1WgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 17:36:24 -0500
-Received: from mga14.intel.com ([192.55.52.115]:63859 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725957AbgB1WgX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 17:36:23 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2020 14:36:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,497,1574150400"; 
-   d="scan'208";a="411545131"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 28 Feb 2020 14:36:22 -0800
-Date:   Fri, 28 Feb 2020 14:36:22 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Mohammed Gamal <mgamal@redhat.com>, kvm list <kvm@vger.kernel.org>,
+        id S1726277AbgB1Wry (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 17:47:54 -0500
+Received: from mail-bn7nam10on2074.outbound.protection.outlook.com ([40.107.92.74]:8128
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726046AbgB1Wry (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 17:47:54 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZGo12Ib4XezsWMX6tZOyprIzzxn12d6/5EO9ddki1ZEsDuDguUDryznwOenS2PUMpxv6eR6krwJhpSr3tiJaIvkrwXyjLadLWN2rkOBOe48W+FjohYOEHMzQblKCewxwzbdwPvp97URBpfdUPJAj7r1o76Pli5ApsRwdGrbklqO1+9d7IhaeHZa16vmNpEmsDybzJ9DUF6Ft6Fg9KzwxQSzQHU7qChYLCWty2Bt/uDKo1qIldZ2ZhYRt3wo7DWbSgRuynYko1xO8pKkd6p7BO4AndKyz29dEya7bBRdF5Qe4435tznZHq3N31VcL080r4ECd2WFvV1hLksuhgWLo4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qc802e8N2QIB8oJJcBXP6ccWgj8ge4NvUHdacbUaUnE=;
+ b=VMTtQKgSPoZf+hzrxQcG15HmAD2YsCkG3RSZOmmqd5g184V8UKEGRx5LB7phhrJ2KX1YNk4pNk7ihNyAdI7pY4JgskmXTz5fDsMjGFQXuFQoxBCs8kCHMz8IsPrihtTCAFR0TM0X8XtSgRV8tBQ0e/HTv5BrzQM7OIc3PZBZffM0doNGjQZL36FUKxNdAt2SYherldolCyltZa4fS5q5K7o6HqNtzvyxIMjiUpvg4CcthLq03qaVZGQ74L1PjfdTuJs67Cx1H0TEISR3PiqQCL2aM8FIQRf7tj0GhQ/m543750vP7sW6PxUGc4HYUvoSKzFd2pE72q8OAiXm/AM17g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qc802e8N2QIB8oJJcBXP6ccWgj8ge4NvUHdacbUaUnE=;
+ b=e6JJ5FSFJtqricK+2uW8455i+Oab2TnVbrropYmyGB9vI4+3sq8Fl3BR3HXgpnHkdxovQwrUYAdczYqgEpiL3xKZnGFZJ7a0cRIuUpmKuaVUD+MDLKbqujDNuofkyOuVz32/8IdbemAcaSqA42yXsAhCcJGrqOM6pBONI66WydI=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Wei.Huang2@amd.com; 
+Received: from MN2PR12MB3999.namprd12.prod.outlook.com (2603:10b6:208:158::27)
+ by MN2PR12MB4439.namprd12.prod.outlook.com (2603:10b6:208:262::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.15; Fri, 28 Feb
+ 2020 22:47:50 +0000
+Received: from MN2PR12MB3999.namprd12.prod.outlook.com
+ ([fe80::54b3:f596:c0d9:7409]) by MN2PR12MB3999.namprd12.prod.outlook.com
+ ([fe80::54b3:f596:c0d9:7409%4]) with mapi id 15.20.2772.018; Fri, 28 Feb 2020
+ 22:47:49 +0000
+Subject: Re: [PATCH v2 2/2] KVM: SVM: Enable AVIC by default
+To:     Jim Mattson <jmattson@google.com>, Oliver Upton <oupton@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/5] KVM: VMX: Add guest physical address check in EPT
- violation and misconfig
-Message-ID: <20200228223622.GK2329@linux.intel.com>
-References: <20200227172306.21426-1-mgamal@redhat.com>
- <20200227172306.21426-3-mgamal@redhat.com>
- <CALMp9eR7heTGQ6zwYrK5rJ-xs_wKqz49gfcNtaEC7S6J7n2aFQ@mail.gmail.com>
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <20200228085905.22495-1-oupton@google.com>
+ <20200228085905.22495-2-oupton@google.com>
+ <CALMp9eRUQFDvZtGBGs6oKX=-j+Zz6SV8zTpLPukiRjmA=nO0wg@mail.gmail.com>
+From:   Wei Huang <whuang2@amd.com>
+Message-ID: <6487d313-dedb-1210-1c7a-160db2c816ad@amd.com>
+Date:   Fri, 28 Feb 2020 16:47:46 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+In-Reply-To: <CALMp9eRUQFDvZtGBGs6oKX=-j+Zz6SV8zTpLPukiRjmA=nO0wg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN2PR01CA0062.prod.exchangelabs.com (2603:10b6:800::30) To
+ MN2PR12MB3999.namprd12.prod.outlook.com (2603:10b6:208:158::27)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eR7heTGQ6zwYrK5rJ-xs_wKqz49gfcNtaEC7S6J7n2aFQ@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.252.23.94] (165.204.77.11) by SN2PR01CA0062.prod.exchangelabs.com (2603:10b6:800::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.15 via Frontend Transport; Fri, 28 Feb 2020 22:47:48 +0000
+X-Originating-IP: [165.204.77.11]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: fdd64c78-075f-4454-e690-08d7bca03ca3
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4439:|MN2PR12MB4439:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <MN2PR12MB4439E3DFDC2AF7D34FCE8B21CFE80@MN2PR12MB4439.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1227;
+X-Forefront-PRVS: 0327618309
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(136003)(346002)(39860400002)(396003)(376002)(189003)(199004)(53546011)(52116002)(478600001)(5660300002)(66476007)(66556008)(66946007)(31686004)(6486002)(4326008)(8936002)(81156014)(81166006)(8676002)(316002)(54906003)(16576012)(26005)(16526019)(186003)(2616005)(956004)(36756003)(31696002)(2906002)(110136005);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR12MB4439;H:MN2PR12MB3999.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WCHzgTqwo0LZAXoNinPqKTKKjVgciilZf2M8Jq0b575MVFzeq6aW+aFiFiGdR4lyL8Y7hTMDuxZb2OOvCJvPKuPNxFnHtED2oG8Ikc15Ea9SqQ0py3OIv6Kqz8BYmNQ6Bzzoc19KuOsaS/j3zgTo9pdTsmiR4PylxQNz06mlOdlavBNnQhObPce+yptb+jq4/TpUbAcbbtA815v7mXINvM+uSKKG1r3xM07FQ6nM2o8HeAlJzUq1pe9pVS9ia94kWJcYp098jqHBx054cgJlMQ9wzWu+3UEcDenf6E3To/f9OOBzkGnrl+xpjYZohd7HtSQY9yaloKBjCye9I04/xHJyetXQE0zugEAzAoFBl1ijwlryRS04gIwCJBUdIOnK8Rh46jmoICwMWR7ARbZ23TlndO46zx0TmaIVIaVPMSxdpBnI1p20vEH/JbcmDTxA
+X-MS-Exchange-AntiSpam-MessageData: TW+tCcqec6MpjzjnzyZE7Lv5DkvwFO/WQ6fLH1/CfLhnjiLTYFdW5wmb8ktluZH9GALMP746TN6G3q885fFUarJ2/oxtkV7EAiISobZxyPIPadN5ypm0PVnjJTj4pxCwUE8O9SFVkxsXXluFOp2JrQ==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fdd64c78-075f-4454-e690-08d7bca03ca3
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2020 22:47:49.6386
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Cz4rdNTHDgiZppmxXOVleM2XwfFwxwBIxGq2aBulGc9xqkJ2lS61bVZiZ9m/t4hd
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4439
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 27, 2020 at 09:55:32AM -0800, Jim Mattson wrote:
-> On Thu, Feb 27, 2020 at 9:23 AM Mohammed Gamal <mgamal@redhat.com> wrote:
-> >
-> > Check guest physical address against it's maximum physical memory. If
-> Nit: "its," without an apostrophe.
+
+On 2/28/20 1:40 PM, Jim Mattson wrote:
+> On Fri, Feb 28, 2020 at 12:59 AM Oliver Upton <oupton@google.com> wrote:
+>>
+>> Switch the default value of the 'avic' module parameter to 1.
+>>
+>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Oliver Upton <oupton@google.com>
+>> ---
+>>  arch/x86/kvm/svm.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+>> index b82a500bccb7..70d2df13eb02 100644
+>> --- a/arch/x86/kvm/svm.c
+>> +++ b/arch/x86/kvm/svm.c
+>> @@ -358,7 +358,7 @@ static int nested = true;
+>>  module_param(nested, int, S_IRUGO);
+>>
+>>  /* enable / disable AVIC */
+>> -static int avic;
+>> +static int avic = 1;
+>>  #ifdef CONFIG_X86_LOCAL_APIC
+>>  module_param(avic, int, S_IRUGO);
+>>  #endif
+>> --
+>> 2.25.1.481.gfbce0eb801-goog
 > 
-> > the guest's physical address exceeds the maximum (i.e. has reserved bits
-> > set), inject a guest page fault with PFERR_RSVD_MASK.
+> How extensively has this been tested? Why hasn't someone from AMD
+> suggested this change?
 
-Wish I had actually read this series when it first flew by, just spent
-several hours debugging this exact thing when running the "access" test.
-
-> > Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 63aaf44edd1f..477d196aa235 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -5162,6 +5162,12 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
-> >         gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
-> >         trace_kvm_page_fault(gpa, exit_qualification);
-> >
-> > +       /* Check if guest gpa doesn't exceed physical memory limits */
-> > +       if (gpa >= (1ull << cpuid_maxphyaddr(vcpu))) {
-
-Add a helper for this, it's easier than copy-pasting the comment and code
-everywhere.  BIT_ULL() is also handy.
-
-static inline bool kvm_mmu_is_illegal_gpa(gpa_t gpa)
-{
-	return (gpa < BIT_ULL(cpuid_maxphyaddr(vcpu)));
-}
-
-> > +               kvm_inject_rsvd_bits_pf(vcpu, gpa);
-> 
-> Even if PFERR_RSVD_MASK is set in the page fault error code, shouldn't
-> we set still conditionally set:
->     PFERR_WRITE_MASK - for an attempted write
->     PFERR_USER_MASK - for a usermode access
->     PFERR_FETCH_MASK - for an instruction fetch
-
-Yep.  Move this down below where error_code is calculated.  Then the code
-should be something like this.  Not fun to handle this with EPT :-(
-
-Note, VMCS.GUEST_LINEAR_ADDRESS isn't guaranteed to be accurate, e.g. if
-the guest is putting bad gpas into Intel PT, but I don't think we have any
-choice but to blindly cram it in and hope for the best.
-
-	if (unlikely(kvm_mmu_is_illegal_gpa(vcpu, gpa))) {
-		/* Morph the EPT error code into a #PF error code. */
-		error_code &= ~(PFERR_USER_MASK | PFERR_GUEST_FINAL_MASK |
-				PFERR_GUEST_PAGE_MASK);
-		if (vmx_get_cpl(vcpu) == 3)
-			error_code |= PFERR_USER_MASK;
-		error_code |= PFERR_PRESENT_MASK;
-
-		kvm_inject_rsvd_bits_pf(vcpu, vmcs_readl(GUEST_LINEAR_ADDRESS),
-					error_code);
-
-		return 1;
-	}
-
- 
-> > +               return 1;
-> > +       }
-> > +
-> >         /* Is it a read fault? */
-> >         error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
-> >                      ? PFERR_USER_MASK : 0;
-> > @@ -5193,6 +5199,13 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
-> >          * nGPA here instead of the required GPA.
-> >          */
-> >         gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
-> > +
-> > +       /* Check if guest gpa doesn't exceed physical memory limits */
-> > +       if (gpa >= (1ull << cpuid_maxphyaddr(vcpu))) {
-> > +               kvm_inject_rsvd_bits_pf(vcpu, gpa);
-> 
-> And here as well?
-
-This shouldn't happen.  If KVM creates a bad EPTE for an illegal GPA, we
-done goofed up.  I.e.
-
-	if (WARN_ON_ONCE(kvm_mmu_is_illegal_gpa(vcpu, gpa))) {
-		vcpu->run->blah = blah;
-		return 0;
-	}
+I personally don't suggest enable AVIC by default. There are cases of
+slow AVIC doorbell delivery, due to delivery path and contention under a
+large number of guest cores.
 
 > 
-> > +               return 1;
-> > +       }
-> > +
-> >         if (!is_guest_mode(vcpu) &&
-> >             !kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
-> >                 trace_kvm_fast_mmio(gpa);
-> > --
-> > 2.21.1
-> >
