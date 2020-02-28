@@ -2,80 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 43C331735EA
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 12:16:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75D441735EB
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 12:16:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725769AbgB1LQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 06:16:36 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37124 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725536AbgB1LQf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 06:16:35 -0500
-Received: by mail-wm1-f66.google.com with SMTP id a141so2769311wme.2
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 03:16:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=VAKXZjZM/wZQW2c0BGuG9pHq04sQRkDdMI+raG9ELUM=;
-        b=pfKgI+X1E0Ej49Z+/23UQHdasEGzF8YDWtmUa6yXrWNHptH8SdlPGl3/bxogo41qao
-         5SJElK3yInB2eKcYb/j0w94vgjbuhABzPG8hW6DL3HYE2D1+e6Fn1LO4jOakilTQ5Q6v
-         8THJmvURUGKpHyY7UyFMBLAtHWOBe260DbPgyVRYsSQ+UzJoix43FANpB3qNmqen8JPt
-         llwPE1x4prI6rh+por4o0vBhUFwE/3QMUtdTyNX/VKMpvNhDhtaFY/4LnsJWG9o1TEtk
-         OQOM9xJjpCqtOb/HvDt5YIPNCkpRq4cxNJ2wdnJomzfnm4O3W7zu9Zfnq61pz1c0Ix+T
-         d8oQ==
+        id S1725856AbgB1LQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 06:16:48 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45657 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725805AbgB1LQs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 28 Feb 2020 06:16:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582888606;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8juBUIQcASEQkK4RsQ4PbQ+cv9mXIpgo3gtzRWCJ7tg=;
+        b=CX/NWNXpWTUgJJ0r2dEFPGVMl5RDJ45sSWHcEnbuOLtBGb2c8/qYecrjLIIs6h0ZE36NNA
+        XwaWSBaN2OwFx4Aa4t8e07ls4HbbWCE1UxofyOTp4iRb+ZKEpFnogGLqN3OrDFdS8Q+rlp
+        BpNbfhkSULtLoLI5VkJsndra+Sz4E+c=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-cO9oFK5BM_y4Cwx3ff7QMg-1; Fri, 28 Feb 2020 06:16:45 -0500
+X-MC-Unique: cO9oFK5BM_y4Cwx3ff7QMg-1
+Received: by mail-wr1-f72.google.com with SMTP id t14so1186256wrs.12
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 03:16:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=VAKXZjZM/wZQW2c0BGuG9pHq04sQRkDdMI+raG9ELUM=;
-        b=AmYB5wF2+9hSwXBslBqG0n3hJ9Y+EXQApsuKe87MX3YE9UDXViWAWFsR2ZgH9F1n6Q
-         p61pEVtDZ/h153ZScd0MKqe7rz8lL3CzaehhOae3KjvwjAHx6TCnv912j2rDhd544mI+
-         P/DfUP1F9CnFGQ6F39pq/mB1iGOq40qmu2d6D6OB1cG3sDWncqceqOAP0eQwbeYzgUbe
-         pGVuNgIZ3xFUYXt0dem2IAPqWEA+IRxqgBoa6bpnPU/G4MFklUz2duh4nGbSlU5MoXaL
-         SZk1Z9h+bzqOuVWVS/nk1Ktgl1ytBNAn+IKhzRWNYX7mQ62mr+EWl7Mpmqnp/PFieHkt
-         oTCw==
-X-Gm-Message-State: APjAAAVBq5O0VVZFTmQAU7MNeoYqeW/que/LLa1ralLUyoRr/ZBbcgaE
-        kKuk0pCsT3W3elrSnpk6ydo/ONCl
-X-Google-Smtp-Source: APXvYqzAtJacrRI3km5UGtXuDc+eVJv6TvBBzUqc8W2oKlLVPt8p1O010XmG+KhWdNPR6ZXXmomBhQ==
-X-Received: by 2002:a7b:c4cc:: with SMTP id g12mr4743922wmk.68.1582888593596;
-        Fri, 28 Feb 2020 03:16:33 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id 61sm12041380wrf.65.2020.02.28.03.16.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 28 Feb 2020 03:16:33 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8juBUIQcASEQkK4RsQ4PbQ+cv9mXIpgo3gtzRWCJ7tg=;
+        b=FYHRv1Vg4x33vYEJeSYVzhIaxeV427VWxgz0GBPZCMATrDkDiMkPNFdBi3jIAcobw+
+         4Hv7ByRLTdPv9abU69moyqsLVzESMEJ9S52RCnrw0i+nor6Bhi3ZgvUmp7v/IeHkRNv6
+         5jgGTAoedX51A0vBTJY1//iF5xiV6CDrrPVzdxi534HfF1PhIts6VZK1QSmPB7cU1v2E
+         33FC/FsPpv+iq+0BHA6ef0eGH6SoqWFFix1ZiuCTP5bvNTHS4xhkOhv1FRMb1MtRM7Lw
+         la4FH1eVO1uONm/lV84+JdTlvtLmRtF8rjBYH7MqNzZ3NDiR4irGA9iU4he0jLXGljbJ
+         C/Cw==
+X-Gm-Message-State: APjAAAVMKvv7QBHX5s867BIe5H/5ToEGohkreWYpQXBsnwS6wIZTNomc
+        sR40Xat75TcaX6L6FkdAfSVuhaXP30jZTNdz4YJcw/zBucCNNQhOL/uKX12iXVnE+l/UTytpWjk
+        /aF4UA52tLdrJ
+X-Received: by 2002:adf:cf02:: with SMTP id o2mr1602870wrj.27.1582888603834;
+        Fri, 28 Feb 2020 03:16:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqycwsOKNNEFeHqcno6E3ygb3mwbu43znKVGY4wXFMTRy9aJvtPesjSASOO66zMl5xj7QJfoAg==
+X-Received: by 2002:adf:cf02:: with SMTP id o2mr1602859wrj.27.1582888603602;
+        Fri, 28 Feb 2020 03:16:43 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:d0d9:ea10:9775:f33f? ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
+        by smtp.gmail.com with ESMTPSA id b10sm12070614wrw.61.2020.02.28.03.16.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Feb 2020 03:16:42 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 7/7] x86: VMX: the "noclone" attribute is
+ gcc-specific
+To:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org
+Cc:     oupton@google.com, drjones@redhat.com
+References: <20200226074427.169684-1-morbo@google.com>
+ <20200226094433.210968-1-morbo@google.com>
+ <20200226094433.210968-15-morbo@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     morbo@google.com
-Subject: [PATCH kvm-unit-tests] x86: VMX: the "noclone" attribute is not needed
-Date:   Fri, 28 Feb 2020 12:16:31 +0100
-Message-Id: <1582888591-51441-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Message-ID: <643086be-7251-92cf-c9f5-5a467dd2827d@redhat.com>
+Date:   Fri, 28 Feb 2020 12:16:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200226094433.210968-15-morbo@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't use the "noclone" attribute as it's not needed.
-Also, clang does not support it.
+On 26/02/20 10:44, Bill Wendling wrote:
+> Don't use the "noclone" attribute for clang as it's not supported.
+> 
+> Signed-off-by: Bill Wendling <morbo@google.com>
+> ---
+>  x86/vmx_tests.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index ad8c002..ec88016 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -4976,7 +4976,10 @@ extern unsigned char test_mtf1;
+>  extern unsigned char test_mtf2;
+>  extern unsigned char test_mtf3;
+>  
+> -__attribute__((noclone)) static void test_mtf_guest(void)
+> +#ifndef __clang__
+> +__attribute__((noclone))
+> +#endif
+> +static void test_mtf_guest(void)
+>  {
+>  	asm ("vmcall;\n\t"
+>  	     "out %al, $0x80;\n\t"
+> 
 
-Reported-by: Bill Wendling <morbo@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/vmx_tests.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It's not needed at all, let's drop it.
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index a7abd63..e2fa034 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -4974,7 +4974,7 @@ extern unsigned char test_mtf1;
- extern unsigned char test_mtf2;
- extern unsigned char test_mtf3;
- 
--__attribute__((noclone)) static void test_mtf_guest(void)
-+static void test_mtf_guest(void)
- {
- 	asm ("vmcall;\n\t"
- 	     "out %al, $0x80;\n\t"
--- 
-1.8.3.1
+Paolo
 
