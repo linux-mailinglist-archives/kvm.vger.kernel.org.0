@@ -2,80 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 20F19172C97
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 00:57:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B17BB172CCE
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 01:12:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730083AbgB0X5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Feb 2020 18:57:41 -0500
-Received: from mga03.intel.com ([134.134.136.65]:12972 "EHLO mga03.intel.com"
+        id S1729984AbgB1AMs convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 27 Feb 2020 19:12:48 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35128 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728993AbgB0X5l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Feb 2020 18:57:41 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2020 15:57:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,493,1574150400"; 
-   d="scan'208";a="232368034"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga008.fm.intel.com with ESMTP; 27 Feb 2020 15:57:39 -0800
-Date:   Thu, 27 Feb 2020 15:57:39 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 1/2] kvm: vmx: Use basic exit reason to check if it's the
- specific VM EXIT
-Message-ID: <20200227235739.GM17014@linux.intel.com>
-References: <20200224020751.1469-2-xiaoyao.li@intel.com>
- <87lfosp9xs.fsf@vitty.brq.redhat.com>
- <d9744594-4a66-d867-f785-64ce4d42b848@intel.com>
- <87imjwp24x.fsf@vitty.brq.redhat.com>
- <20200224161728.GC29865@linux.intel.com>
- <50134028-ef7a-46c6-7602-095c47406ed7@intel.com>
- <20200225061317.GV29865@linux.intel.com>
- <bb2d36b4-a077-691e-d59e-f65bf534d1ff@intel.com>
- <20200226235924.GW9940@linux.intel.com>
- <022bf970-1b86-d952-5563-0d18c9eea6e2@intel.com>
+        id S1728993AbgB1AMs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Feb 2020 19:12:48 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
+ pointer dereference" and crashes
+Date:   Fri, 28 Feb 2020 00:12:47 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: rmuncrief@humanavance.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206579-28872-iGnbDg1oIl@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
+References: <bug-206579-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <022bf970-1b86-d952-5563-0d18c9eea6e2@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 27, 2020 at 04:35:20PM +0800, Xiaoyao Li wrote:
-> On 2/27/2020 7:59 AM, Sean Christopherson wrote:
-> >Ah, good point.  But, that's just another bug in my psuedo patch :-)
-> >It's literally one call site that needs to be updated.  E.g.
-> >
-> >	if (is_guest_mode(vcpu) && nested_vmx_exit_reflected(vcpu, exit_reason))
-> >		return nested_vmx_reflect_vmexit(vcpu, full_exit_reason);
-> >
-> 
-> shouldn't we also pass full_exit_reason to nested_vmx_exit_reflected()?
+https://bugzilla.kernel.org/show_bug.cgi?id=206579
 
-Yep, see the patch I sent.  Alternatively, and perhaps a better approach
-once we have the union, would be to not pass exit_reason at all and instead
-have nested_vmx_exit_reflected() grab it directly from vmx->...
+--- Comment #29 from muncrief (rmuncrief@humanavance.com) ---
+I have to knock off for today gentlemen, but just wanted to let you know that
+if I disable nested virtualization in the host-passthrough configuration I get
+the same avic_inhibit_reasons value as the EPYC-IBPB configuration. So instead
+of "20 28" for host-passthrough I get the same "16 24" as EPYC.
 
-> 
-> >Everywhere else KVM calls nested_vmx_reflect_vmexit() is (currently) done
-> 
-> I guess you wanted to say nested_vmx_vmexit() not
-> nested_vmx_reflect_vmexit() here.
+I also saw Anthony's comment about synic so I turned it off in both
+configurations with "<synic state='off'/>", but it didn't affect anything on my
+system. I think it's actually off by default though because when I tried to
+turn it on with "<synic state='on'/>" I got an error when trying to save the
+XML.
 
-Ya.
- 
-> >with a hardcoded value (except handle_vmfunc(), but I actually want to
-> >change that one).
-> >
-> 
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
