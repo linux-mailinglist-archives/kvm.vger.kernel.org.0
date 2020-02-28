@@ -2,84 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 83B14173364
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 09:59:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70A8C17341C
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 10:34:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726440AbgB1I71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 03:59:27 -0500
-Received: from mail-pf1-f201.google.com ([209.85.210.201]:50327 "EHLO
-        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726005AbgB1I71 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 03:59:27 -0500
-Received: by mail-pf1-f201.google.com with SMTP id r13so1582847pfr.17
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 00:59:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=DC9Dr2U6wvnIG9u1LjZFIqDbiUYzoga4sFSPARDkVp8=;
-        b=lFxVH7gdKFwR8I/kc/yt0XIhW2pUcfL23CcZEAEXcvWSOu/qM8edtY0DRzRmm+iyef
-         5FHNoqDfi9luJKkwJ651hBpt85BD1Ui5aouS8ndAPHNHFu+sxesXwjmsjPGsDpm0ceNS
-         1m0UzaDWzAcRXWqXH9jIhMlPaOjsplKPMGLeGZ7kWSOf4AODiHqXfCduaG0DuCke+ZvJ
-         ibsCvmiVg3KCGGO/6AAxTJvZ0zp+sZ4t6knPpq3P5Y7DlN1l7G0hhPxRAgQ5u0zL/vEn
-         O4X4U3eJ+0YlVB7Ee/NYY9B7hPneACRYWd5JjO4yygi0nBdvec2UUyJ7xQrbnGC+iThr
-         jY7Q==
+        id S1726796AbgB1JeK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 04:34:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35803 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726673AbgB1JeK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 04:34:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1582882449;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dJS5edUophByPUq1NZYfyTaIBLl4lfPmtJVzJ7bVJ88=;
+        b=Nrttei951d30slxENyUKIp7qlx5pU99fZtYNksJY04awIr6nyJwzP1nBtNygvEZMHQqpZo
+        RSaeB7k18DZoxpi165p0DVJ1gKRSsnXrwMgZleM3jRX7nM7aZBpLDXBKSPRNQzrkapc/Dh
+        rpIbQo3PXJegQxy99xO1xyyKydJVUK8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-q3zc18MvPESzM0c7eoJo7A-1; Fri, 28 Feb 2020 04:34:07 -0500
+X-MC-Unique: q3zc18MvPESzM0c7eoJo7A-1
+Received: by mail-wr1-f70.google.com with SMTP id t14so1081251wrs.12
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 01:34:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=DC9Dr2U6wvnIG9u1LjZFIqDbiUYzoga4sFSPARDkVp8=;
-        b=UKpjQf8mxZsKnPVzjs59x5fFmbX1FcSCuh1gb8gXJvqXBdgX1wtfnu/NOl9sgxJdrj
-         2tpxQQOo4OfA7z22CYmGfE+R+61PaNPPn9MTupJixv1jIe7Vped7IKiCZoGGKvZALeOj
-         CXvr+PaPrslZjVHB5SMwdrnRb/GWVWMVgPPI9zJJNJ+7GOmrcOh/qzKEzsz3qrOdvyUP
-         BONV0sxzIHmfd70yaygxrdpY/Dk0s6/nbm1P8T43jEbXZHXAa8sQBHGZl57JOcbH19gT
-         DlaiK1ZygldmQj3oICnQ6xpGnVU1UyHTbtHaZBUj+HYP/VwKMw/Mo46gwLyZndvk74Ba
-         hARg==
-X-Gm-Message-State: APjAAAUYOW8oMNa3jbxwgZOvDjlhniKezNTZDlQ5jCi++xxGkvQxfq+F
-        +LaK/AsdXfpgMwfp6JYoGlx52tEF/+UMf+YCXfp/lEx32fWOYehf+sD5VVT5fAQgGAJ11vb4vWN
-        9c3+fJAaHJDTMY+wfsK65kQ9doPK5w3aSqUAh7HRtzQKR+FX8uFWAXZQRNA==
-X-Google-Smtp-Source: APXvYqww2B/p/THhnO5vUYlgorA2EOseM8PZK+P1OocS3fuV3RsoyosDoanCqRvJAN0fVTt4b4NBwBfEe1U=
-X-Received: by 2002:a63:8342:: with SMTP id h63mr3635338pge.141.1582880366122;
- Fri, 28 Feb 2020 00:59:26 -0800 (PST)
-Date:   Fri, 28 Feb 2020 00:59:05 -0800
-In-Reply-To: <20200228085905.22495-1-oupton@google.com>
-Message-Id: <20200228085905.22495-2-oupton@google.com>
-Mime-Version: 1.0
-References: <20200228085905.22495-1-oupton@google.com>
-X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
-Subject: [PATCH v2 2/2] KVM: SVM: Enable AVIC by default
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=dJS5edUophByPUq1NZYfyTaIBLl4lfPmtJVzJ7bVJ88=;
+        b=T+OZ3qRKw+4RQ6S+WtcrwR1Pcsb2iYRoYrgpQUL6VAnWakVSINNmirG0seWGxgFofU
+         6Neg5I1JSbiOSyO82EP8hFD6rgEO2HdioSKVFxXFSB18DS1cAHCtBg513r26jyQn/dYp
+         zKIjCOFIOIpadEoLdWMWsBqp25PB5Tbff9Ohdch6F8ZYhYXMHP5KjCWd/ZZ4RTtuW/QT
+         t7SmkVjI6x2TDL5F/Ch9KPpmxxHY0pUvsTKFvyO1xdUrmgT8COzqGlZ8zP8zCfptsIrT
+         InOo4zgcCNChUaRovBrSsoBnnJaPguhzhmKvcHBOw0P2hESGwBmb/M8y2h/H4OtjgH7A
+         AeQg==
+X-Gm-Message-State: APjAAAU+m2RInUZut7APQvBC3FDUcr0dcb10Q4/nB0F6Jcb5CeZFWr3h
+        jbBkrtZD3euL4BEURCEJaqLdsOHIgiXGibLJCXdaSddPWB7MHU2nrK5zYk+EvZfBRdL4S9ynCV0
+        qk85QaqBvbVFH
+X-Received: by 2002:adf:e50f:: with SMTP id j15mr4021127wrm.356.1582882446555;
+        Fri, 28 Feb 2020 01:34:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyBrOkOWkCFrAUc//lPtO3JxsVbjsm/8NYjxtbD8S+PxeP88y1019tbTcXq/GWJFRSkOP1gtg==
+X-Received: by 2002:adf:e50f:: with SMTP id j15mr4021108wrm.356.1582882446322;
+        Fri, 28 Feb 2020 01:34:06 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:d0d9:ea10:9775:f33f? ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
+        by smtp.gmail.com with ESMTPSA id a9sm1411012wmm.15.2020.02.28.01.34.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Feb 2020 01:34:05 -0800 (PST)
+Subject: Re: [PATCH] KVM: let declaration of kvm_get_running_vcpus match
+ implementation
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, arc Zyngier <maz@kernel.org>
+References: <20200228084941.9362-1-borntraeger@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8c3e2a26-c04d-338e-16c6-39bb13c715af@redhat.com>
+Date:   Fri, 28 Feb 2020 10:34:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200228084941.9362-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Switch the default value of the 'avic' module parameter to 1.
+On 28/02/20 09:49, Christian Borntraeger wrote:
+> Sparse notices that declaration and implementation do not match:
+> arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17: warning: incorrect type in return expression (different address spaces)
+> arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17:    expected struct kvm_vcpu [noderef] <asn:3> **
+> arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17:    got struct kvm_vcpu *[noderef] <asn:3> *
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  include/linux/kvm_host.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 7944ad6ac10b..bcb9b2ac0791 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1344,7 +1344,7 @@ static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
+>  #endif /* CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT */
+>  
+>  struct kvm_vcpu *kvm_get_running_vcpu(void);
+> -struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
+> +struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+>  
+>  #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+>  bool kvm_arch_has_irq_bypass(void);
+> 
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arch/x86/kvm/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Queued, thanks.
 
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index b82a500bccb7..70d2df13eb02 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -358,7 +358,7 @@ static int nested = true;
- module_param(nested, int, S_IRUGO);
- 
- /* enable / disable AVIC */
--static int avic;
-+static int avic = 1;
- #ifdef CONFIG_X86_LOCAL_APIC
- module_param(avic, int, S_IRUGO);
- #endif
--- 
-2.25.1.481.gfbce0eb801-goog
+Paolo
 
