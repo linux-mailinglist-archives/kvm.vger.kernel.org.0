@@ -2,93 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A1C2173347
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 09:49:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B13D173363
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 09:59:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726603AbgB1Itt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 03:49:49 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63550 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726005AbgB1Itt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Feb 2020 03:49:49 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01S8nici061012
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 03:49:47 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2yepy26cv9-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 03:49:47 -0500
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 28 Feb 2020 08:49:46 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 28 Feb 2020 08:49:43 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01S8ngR219398664
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Feb 2020 08:49:42 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6DB99A4051;
-        Fri, 28 Feb 2020 08:49:42 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C9D2A4040;
-        Fri, 28 Feb 2020 08:49:42 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 28 Feb 2020 08:49:42 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 1B3DAE01EF; Fri, 28 Feb 2020 09:49:42 +0100 (CET)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, arc Zyngier <maz@kernel.org>
-Subject: [PATCH] KVM: let declaration of kvm_get_running_vcpus match implementation
-Date:   Fri, 28 Feb 2020 09:49:41 +0100
-X-Mailer: git-send-email 2.24.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20022808-0028-0000-0000-000003DECAA7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022808-0029-0000-0000-000024A3ECA5
-Message-Id: <20200228084941.9362-1-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-28_02:2020-02-26,2020-02-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 mlxscore=0 spamscore=0 mlxlogscore=863 bulkscore=0
- malwarescore=0 priorityscore=1501 clxscore=1015 adultscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002280073
+        id S1726151AbgB1I7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 03:59:22 -0500
+Received: from mail-yw1-f74.google.com ([209.85.161.74]:52004 "EHLO
+        mail-yw1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726005AbgB1I7V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 03:59:21 -0500
+Received: by mail-yw1-f74.google.com with SMTP id a16so3725122ywa.18
+        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 00:59:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=o3P8/n3NO+y1mFt3LRRLUFHUv02ncTruiTBoZVHd2vw=;
+        b=Z0t18VO20mFKl+fhMEs/z9vvkN/3Aq7WvXT/M2GN2DxBtZW3HkmUlAQLkV3ViReM4+
+         umoGHntd1Xq6NLIfe2J+xoho3TQp6fa7ihrvcALCX9jZWTgBiG6/QrKe4aj9pHxKkIl0
+         2O4Og+Cbhg56SilJ5hHz6JoNOA3xx8vJIhDvTYcXmN5LlFbxUZ3j2dBg7kf7TUUD4Ejw
+         lO6hc8yNg8xLSRAsrKvBhcFn5zrF+cruA0U0qU2UuUTUO/P+FR9iR+azXGleuM9bLyag
+         w0MW/h7X8QfKbF0tQktyT6gBUNP7QLjl6SyXBIeBnE7p0lzntqiyBvHlzZOJit7+IITr
+         P4BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=o3P8/n3NO+y1mFt3LRRLUFHUv02ncTruiTBoZVHd2vw=;
+        b=PZta6+6x4rpee5RekVS1AAqySIsDb4OxJSlxXxxTrF0nStc2SRxcS3Crq7BpFSQMHc
+         dfJ9uB5ArKHFBifAcWrX42oGzmheZMkF+W0qVzvQfEYLKg6fRQa25fT55ye3sLTVJrrF
+         OhTvbCYxGo+EX7UvsHZepTvC7ErpvhlwbHt72lipMnHprvQ/Ft9OJkFsWnrkSXOeEF/W
+         8z1D0J0hkl3q5kFS9kMoCIBRG7tuIgRUWNtWm4Ysd5HXdBIkG/rqFxGJHAB0HgqsPyxt
+         bfRQT4VoJ+iJ9GJy3JAD8SFHSVSC4fzCEt8jaJaBZ0GvrLSYj/dCRFN+RWJeEPOMo2iF
+         fOyg==
+X-Gm-Message-State: APjAAAXq0y0Klxc9VL90w+SOLWPFfEJot1fBQEDMchCG14ZlAlwPQOCE
+        GB+a2b1mS6xZ5CUwaMJwV26mA/j6V+V4rACYskUXEDbpcXgGF0ZG8lLEis5d+pTajRlwcuppmI9
+        1Nbxfq2Xa33nqSw0sgJvrIdqYxBE4J0UFBK0/KxdgEEbyz64mJkM3ZmPByQ==
+X-Google-Smtp-Source: APXvYqzP3RUnZIVjaQfNcil/MS/vuswAhJ2e1PJwwii/DjJffySzTP6e5msxU1Gn2LHXCVfh0j7NJfpTSdE=
+X-Received: by 2002:a81:2e52:: with SMTP id u79mr3698169ywu.70.1582880359137;
+ Fri, 28 Feb 2020 00:59:19 -0800 (PST)
+Date:   Fri, 28 Feb 2020 00:59:04 -0800
+Message-Id: <20200228085905.22495-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
+Subject: [PATCH v2 1/2] KVM: SVM: Inhibit APIC virtualization for X2APIC guest
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sparse notices that declaration and implementation do not match:
-arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17: warning: incorrect type in return expression (different address spaces)
-arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17:    expected struct kvm_vcpu [noderef] <asn:3> **
-arch/s390/kvm/../../../virt/kvm/kvm_main.c:4435:17:    got struct kvm_vcpu *[noderef] <asn:3> *
+The AVIC does not support guest use of the x2APIC interface. Currently,
+KVM simply chooses to squash the x2APIC feature in the guest's CPUID
+If the AVIC is enabled. Doing so prevents KVM from running a guest
+with greater than 255 vCPUs, as such a guest necessitates the use
+of the x2APIC interface.
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Instead, inhibit AVIC enablement on a per-VM basis whenever the x2APIC
+feature is set in the guest's CPUID.
+
+Signed-off-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 ---
- include/linux/kvm_host.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 7944ad6ac10b..bcb9b2ac0791 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1344,7 +1344,7 @@ static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
- #endif /* CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT */
+ Parent commit: a93236fcbe1d ("KVM: s390: rstify new ioctls in api.rst")
+
+ v1 => v2:
+  - Adopt Paolo's suggestion to inhibit the AVIC by default rather than
+    requiring opt-in
+  - Drop now unnecessary module parameter
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/svm.c              | 15 +++++++++------
+ 2 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 98959e8cd448..9d40132a3ae2 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -890,6 +890,7 @@ enum kvm_irqchip_mode {
+ #define APICV_INHIBIT_REASON_NESTED     2
+ #define APICV_INHIBIT_REASON_IRQWIN     3
+ #define APICV_INHIBIT_REASON_PIT_REINJ  4
++#define APICV_INHIBIT_REASON_X2APIC	5
  
- struct kvm_vcpu *kvm_get_running_vcpu(void);
--struct kvm_vcpu __percpu **kvm_get_running_vcpus(void);
-+struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+ struct kvm_arch {
+ 	unsigned long n_used_mmu_pages;
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index ad3f5b178a03..b82a500bccb7 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -6027,7 +6027,13 @@ static void svm_cpuid_update(struct kvm_vcpu *vcpu)
+ 	if (!kvm_vcpu_apicv_active(vcpu))
+ 		return;
  
- #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
- bool kvm_arch_has_irq_bypass(void);
+-	guest_cpuid_clear(vcpu, X86_FEATURE_X2APIC);
++	/*
++	 * AVIC does not work with an x2APIC mode guest. If the X2APIC feature
++	 * is exposed to the guest, disable AVIC.
++	 */
++	if (guest_cpuid_has(vcpu, X86_FEATURE_X2APIC))
++		kvm_request_apicv_update(vcpu->kvm, false,
++					 APICV_INHIBIT_REASON_X2APIC);
+ 
+ 	/*
+ 	 * Currently, AVIC does not work with nested virtualization.
+@@ -6043,10 +6049,6 @@ static void svm_cpuid_update(struct kvm_vcpu *vcpu)
+ static void svm_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2 *entry)
+ {
+ 	switch (func) {
+-	case 0x1:
+-		if (avic)
+-			entry->ecx &= ~F(X2APIC);
+-		break;
+ 	case 0x80000001:
+ 		if (nested)
+ 			entry->ecx |= (1 << 2); /* Set SVM bit */
+@@ -7370,7 +7372,8 @@ static bool svm_check_apicv_inhibit_reasons(ulong bit)
+ 			  BIT(APICV_INHIBIT_REASON_HYPERV) |
+ 			  BIT(APICV_INHIBIT_REASON_NESTED) |
+ 			  BIT(APICV_INHIBIT_REASON_IRQWIN) |
+-			  BIT(APICV_INHIBIT_REASON_PIT_REINJ);
++			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
++			  BIT(APICV_INHIBIT_REASON_X2APIC);
+ 
+ 	return supported & BIT(bit);
+ }
 -- 
-2.24.1
+2.25.1.481.gfbce0eb801-goog
 
