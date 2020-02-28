@@ -2,86 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4A79174063
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 20:40:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DB8B81740C5
+	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 21:14:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726940AbgB1TkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 14:40:15 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:43013 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726766AbgB1TkP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 14:40:15 -0500
-Received: by mail-io1-f65.google.com with SMTP id n21so4699738ioo.10
-        for <kvm@vger.kernel.org>; Fri, 28 Feb 2020 11:40:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KPtMn1DRr9XvortjUITPDZ3CEbiHBiNte82vuONVh9o=;
-        b=cDHRNBL+DGb0SwIW5hKVvIEk/rKsc3Qa/m3QWhsM9EfjGpCSpswe5FAwggWnLXfZYb
-         apyEZ3/qVKdvxvBhnmagMWIYVhXzcl1nl1nqZ8CFf7YTYK6Zx8FleZUfdr92c3zK5EPI
-         OJagCvhXGdyESUjn9v2uxCOF1V6F1L3LVYtrF+wloSm7v8gDaE/zdTMlmq/R0ApRomv7
-         XCQTY+nvdtYYTS/lHF9gmLmRI0u+iN9GemgTOFqCdHU40ei3Rai2YrFq6akSwrSVCpBz
-         MIp4XD3vKHPW/LWJBJt4qWaWvtcKGA8eLqpzcSmH8aU6XKWmawTEIRAWmGB4aB7dndOa
-         pljw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KPtMn1DRr9XvortjUITPDZ3CEbiHBiNte82vuONVh9o=;
-        b=mhD95NveNoz7BUOWwkgVnBfkdEuiRWqUdFHV+SsTrdbxwkzPTJaYOIWNMtPF+59JBg
-         /gnMe14VH708qX599nBp/gcFNb2WcLc/CZWu1Iq4LSwhhsXxFinoG4nJh4qfKwMPLk9u
-         /a4dFOdYIy0VO6+6hQBv0F+h5B+v4yHalKiFzmP7zOVjBRKoWV2n9YbuMVR5lubp2qBB
-         H2HvGR91puFlnkmWJ7HlvOoI7auEkbvRxyZ042Wx/PNbLB/ipCgGym4IUHvhSmO5pk6r
-         TZrJrjagVKSt56/KR1cZuuUfsVOkhVBRPjDb9D8GPv/ijr0KPq26x86xgoGquvike91C
-         HmCw==
-X-Gm-Message-State: APjAAAXKyJYIZ0AtRQEt+Bak2pshR5QXzTZVF9c24wVA2ygbYbn0YLGx
-        965ZJmvocb5ph70GhdOAQI2M4O0m8fB8oFdXUINI+w==
-X-Google-Smtp-Source: APXvYqyEoF4X3ARGk0tM2iH0JFYNphuD8sW56MfDi2pW2PQ5LxAd41Kqp9Dn0hjBJx4XkWsF+imcnXVzJbf29oDpyCk=
-X-Received: by 2002:a02:cd3b:: with SMTP id h27mr4685466jaq.18.1582918814624;
- Fri, 28 Feb 2020 11:40:14 -0800 (PST)
-MIME-Version: 1.0
-References: <20200228085905.22495-1-oupton@google.com> <20200228085905.22495-2-oupton@google.com>
-In-Reply-To: <20200228085905.22495-2-oupton@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 28 Feb 2020 11:40:03 -0800
-Message-ID: <CALMp9eRUQFDvZtGBGs6oKX=-j+Zz6SV8zTpLPukiRjmA=nO0wg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: SVM: Enable AVIC by default
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
+        id S1726287AbgB1UO6 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 28 Feb 2020 15:14:58 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37060 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726046AbgB1UO6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 15:14:58 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
+ pointer dereference" and crashes
+Date:   Fri, 28 Feb 2020 20:14:56 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: anthonysanwo@googlemail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-206579-28872-Dzz1bjKQk4@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
+References: <bug-206579-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 28, 2020 at 12:59 AM Oliver Upton <oupton@google.com> wrote:
->
-> Switch the default value of the 'avic' module parameter to 1.
->
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/x86/kvm/svm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index b82a500bccb7..70d2df13eb02 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -358,7 +358,7 @@ static int nested = true;
->  module_param(nested, int, S_IRUGO);
->
->  /* enable / disable AVIC */
-> -static int avic;
-> +static int avic = 1;
->  #ifdef CONFIG_X86_LOCAL_APIC
->  module_param(avic, int, S_IRUGO);
->  #endif
-> --
-> 2.25.1.481.gfbce0eb801-goog
+https://bugzilla.kernel.org/show_bug.cgi?id=206579
 
-How extensively has this been tested? Why hasn't someone from AMD
-suggested this change?
+--- Comment #37 from Anthony (anthonysanwo@googlemail.com) ---
+Created attachment 287701
+  --> https://bugzilla.kernel.org/attachment.cgi?id=287701&action=edit
+Perf_stat_anthony_apicv
+
+(In reply to Suravee Suthikulpanit from comment #32)
+> (In reply to Anthony from comment #28)
+> > Created attachment 287685 [details]
+> > avic_inhibit_reasons-anthony
+> > 
+> > Hi I also just wanted to give my observations I have found when testing the
+> > patches.
+> > 
+> > I confirm I also don't have don't have crashes relating to the original
+> > report. 
+> > 
+> > I have been trying out the SVM AVIC patches since around the first patch
+> > that was submitted but never got round to documentation my testing until
+> > recently.
+> > 
+> > I can't remember the specific patch set/kernel version I tried but I
+> > remember having avic apparently working with when synic + stimer where
+> > enabled but not without. If my understanding is correctly this shouldn't be
+> > the case as synic is meant to be a case when avic is permanently disabled.
+> > 
+> > This is still the case with current patchset. 
+> > 
+> > In summary I can get avic reporting it's working according to perf stat and
+> > trace logs when synic is on but not working when synic is off. Using
+> > EPYC-IBPB or passthrough doesn't change the avic_inhibit_reasons.
+> > 
+> > With Synic I get avic_inhibit_reasons - 10
+> > With Synic+Stimer off I get - 0
+> > 
+> > 
+> > To note I am using arch linux + qemu 4.2 + linux-mainline-5.6.0-rc2.
+> > 
+> > Please see a small trace log of synic on vs off, domain capabilities, perf
+> > stat and patches used.
+> > 
+> > These were recording once the VM was launched and sitting at the login
+> > screen.
+> > 
+> > Please let me know if there is any other info I get provide to help.
+> 
+> Thanks for the observation info, and your observation makes sense. AVIC is
+> also deactivated w/ synic enabled.
+> (https://elixir.bootlin.com/linux/v5.6-rc3/source/arch/x86/kvm/hyperv.c#L773)
+> 
+> Thanks,
+> Suravee
+
+I see. I remember reading through your patchset and trying work things out good
+to see my basic understanding wasn't too far off :)
+
+If it's not too much of a bother I was wondering if you could list the
+requirements needed to enable avic from a kvm/qemu setup. I just wanted to
+check if I am missing anything on my side as I am not 100% sure on how to tell
+avic is working looking a trace, perf stat/live. 
+
+I did a perf stat from when the vm was launch via libvirt to about when it gets
+to the login screen I about 36 "kvm_apicv_update_request".The attachement has a
+full output if that is of use. I also got a trace of this but as I redirected
+all the output to a file I ended up with quite a large file(462MB). So I wanted
+to see if there is anything I should be looking out for in the trace to see if
+avic is working as intended. Also, if you don't mind could you show a sample of
+trace where avic is working.
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
