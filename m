@@ -2,100 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7737A174283
-	for <lists+kvm@lfdr.de>; Fri, 28 Feb 2020 23:52:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8231A17448D
+	for <lists+kvm@lfdr.de>; Sat, 29 Feb 2020 03:47:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726695AbgB1Wwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 17:52:43 -0500
-Received: from mga01.intel.com ([192.55.52.88]:64083 "EHLO mga01.intel.com"
+        id S1726621AbgB2Cmd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Feb 2020 21:42:33 -0500
+Received: from mga12.intel.com ([192.55.52.136]:12075 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726151AbgB1Wwn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 17:52:43 -0500
+        id S1726046AbgB2Cmc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Feb 2020 21:42:32 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2020 14:52:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,497,1574150400"; 
-   d="scan'208";a="439387489"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga006.fm.intel.com with ESMTP; 28 Feb 2020 14:52:42 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2020 18:42:31 -0800
+X-IronPort-AV: E=Sophos;i="5.70,498,1574150400"; 
+   d="scan'208";a="232442560"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.169.149]) ([10.249.169.149])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 28 Feb 2020 18:42:28 -0800
+Subject: Re: [PATCH] KVM: x86: Remove superfluous brackets in
+ kvm_arch_dev_ioctl()
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: x86/mmu: Reuse the current root if possible for fast switch
-Date:   Fri, 28 Feb 2020 14:52:40 -0800
-Message-Id: <20200228225240.8646-3-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200228225240.8646-1-sean.j.christopherson@intel.com>
-References: <20200228225240.8646-1-sean.j.christopherson@intel.com>
+References: <20200228052527.148384-1-xiaoyao.li@intel.com>
+ <20200228154453.GC2329@linux.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <026f7e03-313a-dafd-e7c2-08c45db6681b@intel.com>
+Date:   Sat, 29 Feb 2020 10:42:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200228154453.GC2329@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reuse the current root when possible instead of grabbing a different
-root from the array of cached roots.  Doing so avoids unnecessary MMU
-switches and also fixes a quirk where KVM can't reuse roots without
-creating multiple roots since the cache is a victim cache, i.e. roots
-are added to the cache when they're "evicted", not when they are
-created.  The quirk could be fixed by adding roots to the cache on
-creation, but that would reduce the effective size of the cache as one
-of its entries would be burned to track the current root.
+On 2/28/2020 11:44 PM, Sean Christopherson wrote:
+> On Fri, Feb 28, 2020 at 01:25:27PM +0800, Xiaoyao Li wrote:
+>> Remove unnecessary brackets from the case statements in
+> 
+> They aren't unnecessary, e.g. simply taking away brackets without
+> refactoring the code will break the build.
+> 
+>> kvm_arch_dev_ioctl().
+>>
+>> The brackets are visually confusing and error-prone, e.g., brackets of
+> 
+> They're confusing when they're broken, but IMO they're a non-issue when
+> used correctly, which is the vast majority of the time.  I wouldn't say I
+> love brackets, but for me it's preferrable to having a big pile of
+> variables at the top of the function.  I also find having the struct type
+> in the case helpful, e.g. it's easy to figure out which struct corresponds
+> to which ioctl in the API.
+> 
+> And despite this being the second instance of this style of bug in KVM in
+> the last few months, I don't think it's fair to call brackets error-prone.
+> These are literally the only two times I've ever seen this class of bug.
 
-Reusing the current root is especially helpful for nested virt as the
-current root is almost always usable for the "new" MMU on nested
-VM-entry/VM-exit.
+Fair enough.
 
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+> Regardless, using brackets to create a new scope in a case statement is a
+> widely used pattern:
+> 
+>    $ git grep case | grep ": {" | wc -l
+>    1954
+> 
+> Eliminating all current and future uses isn't realistic.
+> 
+> A better way to help prevent these type of bugs from being introduced
+> would be to teach checkpatch to issue a warning if a set of brackets
+> encapsulates a case statement.
+> 
+> Fixing this particular bug is then a small patch, and maybe throw in an
+> opportunistic cleanup to add a "break" in the default path.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 9d617b9dc78f..53b776dfc949 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4253,6 +4253,14 @@ static void nonpaging_init_context(struct kvm_vcpu *vcpu,
- 	context->nx = false;
- }
- 
-+static inline bool is_root_usable(struct kvm_mmu_root_info *root, gpa_t cr3,
-+				  union kvm_mmu_page_role role)
-+{
-+	return (role.direct || cr3 == root->cr3) &&
-+	       VALID_PAGE(root->hpa) && page_header(root->hpa) &&
-+	       role.word == page_header(root->hpa)->role.word;
-+}
-+
- /*
-  * Find out if a previously cached root matching the new CR3/role is available.
-  * The current root is also inserted into the cache.
-@@ -4271,12 +4279,13 @@ static bool cached_root_available(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 	root.cr3 = mmu->root_cr3;
- 	root.hpa = mmu->root_hpa;
- 
-+	if (is_root_usable(&root, new_cr3, new_role))
-+		return true;
-+
- 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
- 		swap(root, mmu->prev_roots[i]);
- 
--		if ((new_role.direct || new_cr3 == root.cr3) &&
--		    VALID_PAGE(root.hpa) && page_header(root.hpa) &&
--		    new_role.word == page_header(root.hpa)->role.word)
-+		if (is_root_usable(&root, new_cr3, new_role))
- 			break;
- 	}
- 
--- 
-2.24.1
+OK. I'll go this way.
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2103101eca78..f059697bf61e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3485,6 +3485,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>                          goto out;
+>                  r = 0;
+>                  break;
+> +       }
+>          case KVM_GET_MSR_FEATURE_INDEX_LIST: {
+>                  struct kvm_msr_list __user *user_msr_list = argp;
+>                  struct kvm_msr_list msr_list;
+> @@ -3510,9 +3511,9 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>          case KVM_GET_MSRS:
+>                  r = msr_io(NULL, argp, do_get_msr_feature, 1);
+>                  break;
+> -       }
+>          default:
+>                  r = -EINVAL;
+> +               break;
+>          }
+>   out:
+>          return r;
+> 
+>> case KVM_X86_GET_MCE_CAP_SUPPORTED accidently includes case
+>> KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS.
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   arch/x86/kvm/x86.c | 33 ++++++++++++++-------------------
+>>   1 file changed, 14 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index ddd1d296bd20..9efd693189df 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -3412,14 +3412,16 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>   long kvm_arch_dev_ioctl(struct file *filp,
+>>   			unsigned int ioctl, unsigned long arg)
+>>   {
+>> -	void __user *argp = (void __user *)arg;
+>> +	struct kvm_msr_list __user *user_msr_list;
+>> +	struct kvm_cpuid2 __user *cpuid_arg;
+>> +	struct kvm_msr_list msr_list;
+>> +	struct kvm_cpuid2 cpuid;
+>> +	unsigned int n;
+>>   	long r;
+>>   
+>>   	switch (ioctl) {
+>> -	case KVM_GET_MSR_INDEX_LIST: {
+>> -		struct kvm_msr_list __user *user_msr_list = argp;
+>> -		struct kvm_msr_list msr_list;
+>> -		unsigned n;
+>> +	case KVM_GET_MSR_INDEX_LIST:
+>> +		user_msr_list = (void __user *)arg;
+>>   
+>>   		r = -EFAULT;
+>>   		if (copy_from_user(&msr_list, user_msr_list, sizeof(msr_list)))
+>> @@ -3441,11 +3443,9 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>>   			goto out;
+>>   		r = 0;
+>>   		break;
+>> -	}
+>>   	case KVM_GET_SUPPORTED_CPUID:
+>> -	case KVM_GET_EMULATED_CPUID: {
+>> -		struct kvm_cpuid2 __user *cpuid_arg = argp;
+>> -		struct kvm_cpuid2 cpuid;
+>> +	case KVM_GET_EMULATED_CPUID:
+>> +		cpuid_arg = (void __user *)arg;
+>>   
+>>   		r = -EFAULT;
+>>   		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
+>> @@ -3461,18 +3461,15 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>>   			goto out;
+>>   		r = 0;
+>>   		break;
+>> -	}
+>> -	case KVM_X86_GET_MCE_CAP_SUPPORTED: {
+>> +	case KVM_X86_GET_MCE_CAP_SUPPORTED:
+>>   		r = -EFAULT;
+>> -		if (copy_to_user(argp, &kvm_mce_cap_supported,
+>> +		if (copy_to_user((void __user *)arg, &kvm_mce_cap_supported,
+>>   				 sizeof(kvm_mce_cap_supported)))
+>>   			goto out;
+>>   		r = 0;
+>>   		break;
+>> -	case KVM_GET_MSR_FEATURE_INDEX_LIST: {
+>> -		struct kvm_msr_list __user *user_msr_list = argp;
+>> -		struct kvm_msr_list msr_list;
+>> -		unsigned int n;
+>> +	case KVM_GET_MSR_FEATURE_INDEX_LIST:
+>> +		user_msr_list = (void __user *)arg;
+>>   
+>>   		r = -EFAULT;
+>>   		if (copy_from_user(&msr_list, user_msr_list, sizeof(msr_list)))
+>> @@ -3490,11 +3487,9 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>>   			goto out;
+>>   		r = 0;
+>>   		break;
+>> -	}
+>>   	case KVM_GET_MSRS:
+>> -		r = msr_io(NULL, argp, do_get_msr_feature, 1);
+>> +		r = msr_io(NULL, (void __user *)arg, do_get_msr_feature, 1);
+>>   		break;
+>> -	}
+>>   	default:
+>>   		r = -EINVAL;
+>>   	}
+>> -- 
+>> 2.19.1
+>>
 
