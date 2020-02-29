@@ -2,82 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FBC31748D0
-	for <lists+kvm@lfdr.de>; Sat, 29 Feb 2020 20:01:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58A0A1748DA
+	for <lists+kvm@lfdr.de>; Sat, 29 Feb 2020 20:22:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727314AbgB2TA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 Feb 2020 14:00:57 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:40439 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727209AbgB2TA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 29 Feb 2020 14:00:57 -0500
-Received: by mail-il1-f196.google.com with SMTP id g6so4548577ilc.7
-        for <kvm@vger.kernel.org>; Sat, 29 Feb 2020 11:00:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OPm3hrGauL8biCEinhFnHGuE8NuHgMpT90ceO6W2+s4=;
-        b=QJRcbgBgFWGY+IrI2mhQ7YcO+C450KRWfGWjarnZjMkLID6dMBo3yjnc+lQd0ydDFn
-         Klpp6Lriyv205JzqPsR25dMpi5rZ4lQ2RpeJeqCd19TrmhuTHzLDDTb5Nq/8PMZMN9Wn
-         ugiLU+5PnffMZMQ26oBpkrsEmuM5q72VpN9VNh4jrHvx7liqcf5GMjVURgiRgRjV5FA2
-         4ZXZKXSKZQnNOBnvBSiF0uqAwELvZbZjFgLwrwfB6WvEmoZGbcqZQGaotUqc1I0tMNOK
-         3golkHykUqQeytTOq9wxrN+T+s2keqAK8gMUmLBCp9A8HSp6ARkP+5O0d0I3bDPu+sMM
-         C0Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OPm3hrGauL8biCEinhFnHGuE8NuHgMpT90ceO6W2+s4=;
-        b=iOwkNVmlXYE/AJpJK8q4GsSblGGpc9FGHoAU4lEQSsy4RBBG7UYiTPOOcV77KHaO37
-         2+uim9ZkiXze9GNOFErQJvdBZoGVp9lDmwBsNC60YtiG0SOD6uz8kWJ5K1Qqvw5isRLV
-         ZY6eBAIPzNyV0Jj7dpb+86CNO6dSq4A0lzWhWAnx9MnWRzx+hnxED63PaXiM7AAZYts8
-         Pks6kYxNhQgiFvJ9n2nR/xC4dTzB/A8MBlCUXH2SKQH0MwiAL+AEUIEMNMBtiEDJzgWw
-         exfOJWs7Xf3/2TmPC0+9yNDT3kPa/zTwMezgVBoaatttojmO4n2eHAS7BFcjqfUy8Dsq
-         EAgg==
-X-Gm-Message-State: APjAAAX9CGH7miUm0dh51qsRLSFu3lzFFu96vBHBcCXrZ4+NP69ViK7J
-        s1mJmfOgD2JSoHZeXInY6T9OM8Dfk15oCH4hEsnGHw==
-X-Google-Smtp-Source: APXvYqzrtg94iuKISLZUq15kVQq0EevQ7IO9b8IvdausgoC11wtDjBdvYeDl00RI2xRJ3xxCbc1E/KnknBPk4DBeVq8=
-X-Received: by 2002:a92:981b:: with SMTP id l27mr9968372ili.118.1583002855957;
- Sat, 29 Feb 2020 11:00:55 -0800 (PST)
-MIME-Version: 1.0
-References: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
- <1582570596-45387-2-git-send-email-pbonzini@redhat.com> <41d80479-7dbc-d912-ff0e-acd48746de0f@web.de>
- <CAOQ_QshE7SMX2cO7H+21Fkdpg53oE2D3xrHPJHR_MCfH4r9QCQ@mail.gmail.com>
-In-Reply-To: <CAOQ_QshE7SMX2cO7H+21Fkdpg53oE2D3xrHPJHR_MCfH4r9QCQ@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Sat, 29 Feb 2020 11:00:44 -0800
-Message-ID: <CALMp9eRETy1RLWHWKtFHqpcpFHbQKtPgJHDD_N+LPzaUPx-Jvg@mail.gmail.com>
-Subject: Re: [FYI PATCH 1/3] KVM: nVMX: Don't emulate instructions in guest mode
-To:     Oliver Upton <oupton@google.com>
-Cc:     Jan Kiszka <jan.kiszka@web.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S1727211AbgB2TV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Feb 2020 14:21:56 -0500
+Received: from mout.web.de ([217.72.192.78]:55279 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727102AbgB2TV4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Feb 2020 14:21:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1583004110;
+        bh=4vOX+xF+xSTLGy9c2nd2Kp1RnOhFtxVGsaRmPIJi/0o=;
+        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=dzbp/1QVeX4ZE75s/GLL7DZtLRHTmFj+U0u3eF7VRqEZfOaU266PedXX5jcVJYIYi
+         PyZq6yRvxbfavoZgqukJc2AMW8W8UDUsMZz5aPkYt/R6tdnjRNYG2K2K8h75EiFHVZ
+         P51eZzxfK7iIPLl4HY9K7mXP6OY+R28dlq6c9aFM=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MHY1o-1j71DW2xDA-003NBz; Sat, 29
+ Feb 2020 20:21:50 +0100
+Subject: Re: [FYI PATCH 1/3] KVM: nVMX: Don't emulate instructions in guest
+ mode
+To:     Jim Mattson <jmattson@google.com>, Oliver Upton <oupton@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         kvm list <kvm@vger.kernel.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
+ <1582570596-45387-2-git-send-email-pbonzini@redhat.com>
+ <41d80479-7dbc-d912-ff0e-acd48746de0f@web.de>
+ <CAOQ_QshE7SMX2cO7H+21Fkdpg53oE2D3xrHPJHR_MCfH4r9QCQ@mail.gmail.com>
+ <CALMp9eRETy1RLWHWKtFHqpcpFHbQKtPgJHDD_N+LPzaUPx-Jvg@mail.gmail.com>
+From:   Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <e8fe4664-d948-f239-4ec9-82d9010b7d26@web.de>
+Date:   Sat, 29 Feb 2020 20:21:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <CALMp9eRETy1RLWHWKtFHqpcpFHbQKtPgJHDD_N+LPzaUPx-Jvg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:EKz25Ah2+8MOc9guJNdx+0x6R3CUt0e4NA8KwV3MJliBvCABGiI
+ 0g/hZLKsFuP0fRjjbEqsZajUWwGYCUNJ4bL64XgiV0OzuFbjRpqa20gFm0LXsR5J4Dt2iBF
+ dcv4zg6GIAuaAwoXpSqU8VWiG8dw/olg5NG07gNVvlGO4eNpmV4Q1qCfN1ALkruLE/XD7B7
+ v+GsIrTrPzqdIZ3mmQxjg==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/OfomhGOPdk=:Z34tYd4LHWxvt2dpONy5Ak
+ aaz4GxNDzUe9LdaErqv3x3pLtvVSzsxM382VkMEx8sOYqUnu5Wz3N3kBrKGxIV6duSKI8d/OD
+ xEysCygDxvmDVE0V3VIH/T40l1PZWF2M7I0iC+Hg+u+ZeaawvQ/dmLSrQXktf+I7HyZn+Xdtb
+ D6bDzdtIvXGRzRgChQMNziP11xNDclUyWsrODlxJsn/ieGEZsQtv6DlUKnjLuqf62naTUqU/w
+ TF9FLglzoqp57P750dQ+s5cIG/dfrDYmkzTyjGb/QHw6KcGc5hYCnWctAIiIzgp9DtYAxZhD1
+ W3tFVvLa+kr9x7irk/AZ+PrIU5Ry09vSHUCTuJzzeRLqPf0FzN7DGne38LPqWWpNnie1mKiGy
+ YDBpXjCLePc1jlx7m3yCXPQG9ZV3kRUqU5bdEem8wgL9nioNUPCeWcnRRykRWktrnAVfLw+NN
+ Fbt0nBY0N1xKE5jZrxfZrNszyZcdsanjQVr/NtwHNW9zp56zBLvo2q58jhG85Az4muJFWAJ+v
+ MPIVQSL8hrNAXAGwsh/8GepITITUOVQd/NxeSf2ZIzJLa/RO5uuZpMzsHK9CLMj6yfUjtf7KN
+ PPY5UrRP9ST4x/UBWjsKRFWiRjofDtQY2ifzjyP37S9qLfQdyuwvw2xVe6ooUr48KIilHPlEY
+ txcwC0ssJLThwP+SHu66oHhHx/kt3kyFpcUG2EOmR9s5N2YTJV8GWoURTJd+t5dqA6TYDomrn
+ xr0XkPwdOzB/fvUr9KPSyL/hdkLPp/Uv3ehiCOwSNJ8amJvJmmOqxcvqLvZQGXo0F+zqmXxuq
+ wyGZPjXlg89q2pkkxqFThS5k5ecdvusO7QEKSOvP6ZD3lUHbNUVBKk7mN38ZKonG3Kno44+ZE
+ AYLbY3br3fk6+4OOsiSDCuoMEnR+pKBRciKbDgtNwBNRsu5KJLMzW7L6gZAJXXga0pMrPMwkz
+ wMGRV9W9i8f6/DCLf40th4Y8JAMCXM21swdL9yJrtqMlBjCyepPp1u2wRUjdrgQmeTtZYKYzo
+ EMa1O5ssZUEJTB5w/skmmCT7DC4Iwj7L3SgKVZUN80OWXQoczUOCBOEN40Rw9X2qgUIUicYRQ
+ n6yNM2n6wawouqpqojA+dcJa6J/Em3/PIXqJD5ektNYsbdAwiN0Oi5/30ZqIVMjp3NzD0bkj+
+ KZdkNvsS+lz5GxrN8isJyhAPvSYOF/lz3pA6Vuc8+lCSZlQNl3Ei0L3zC99zZmg3y/YMx0kf4
+ VlcXydJX6dv5CGANz
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 29, 2020 at 10:33 AM Oliver Upton <oupton@google.com> wrote:
+On 29.02.20 20:00, Jim Mattson wrote:
+> On Sat, Feb 29, 2020 at 10:33 AM Oliver Upton <oupton@google.com> wrote:
+>>
+>> Hi Jan,
+>>
+>> On Sat, Feb 29, 2020 at 10:00 AM Jan Kiszka <jan.kiszka@web.de> wrote:
+>>> Is this expected to cause regressions on less common workloads?
+>>> Jailhouse as L1 now fails when Linux as L2 tries to boot a CPU: L2-Lin=
+ux
+>>> gets a triple fault on load_current_idt() in start_secondary(). Only
+>>> bisected so far, didn't debug further.
+>>
+>> I'm guessing that Jailhouse doesn't use 'descriptor table exiting', so
+>> when KVM gets the corresponding exit from L2 the emulation burden is
+>> on L0. We now refuse the emulation, which kicks a #UD back to L2. I
+>> can get a patch out quickly to address this case (like the PIO exiting
+>> one that came in this series) but the eventual solution is to map
+>> emulator intercept checks into VM-exits + call into the
+>> nested_vmx_exit_reflected() plumbing.
 >
-> Hi Jan,
+> If Jailhouse doesn't use descriptor table exiting, why is L0
+> intercepting descriptor table instructions? Is this just so that L0
+> can partially emulate UMIP on hardware that doesn't support it?
 >
-> On Sat, Feb 29, 2020 at 10:00 AM Jan Kiszka <jan.kiszka@web.de> wrote:
-> > Is this expected to cause regressions on less common workloads?
-> > Jailhouse as L1 now fails when Linux as L2 tries to boot a CPU: L2-Linux
-> > gets a triple fault on load_current_idt() in start_secondary(). Only
-> > bisected so far, didn't debug further.
->
-> I'm guessing that Jailhouse doesn't use 'descriptor table exiting', so
-> when KVM gets the corresponding exit from L2 the emulation burden is
-> on L0. We now refuse the emulation, which kicks a #UD back to L2. I
-> can get a patch out quickly to address this case (like the PIO exiting
-> one that came in this series) but the eventual solution is to map
-> emulator intercept checks into VM-exits + call into the
-> nested_vmx_exit_reflected() plumbing.
 
-If Jailhouse doesn't use descriptor table exiting, why is L0
-intercepting descriptor table instructions? Is this just so that L0
-can partially emulate UMIP on hardware that doesn't support it?
+That seems to be the case: My host lacks umip, L1 has it. So, KVM is
+intercepting descriptor table load instructions to emulate umip.
+Jailhouse never activates that interception.
+
+Jan
