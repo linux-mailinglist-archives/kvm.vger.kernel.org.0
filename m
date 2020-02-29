@@ -2,69 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 83B841748B6
-	for <lists+kvm@lfdr.de>; Sat, 29 Feb 2020 19:38:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FBC31748D0
+	for <lists+kvm@lfdr.de>; Sat, 29 Feb 2020 20:01:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727366AbgB2Sib (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 Feb 2020 13:38:31 -0500
-Received: from mga14.intel.com ([192.55.52.115]:58868 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727209AbgB2Sib (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 29 Feb 2020 13:38:31 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Feb 2020 10:38:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,500,1574150400"; 
-   d="scan'208";a="385812059"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga004.jf.intel.com with ESMTP; 29 Feb 2020 10:38:30 -0800
-Date:   Sat, 29 Feb 2020 10:38:30 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 48/61] KVM: x86: Do host CPUID at load time to mask KVM
- cpu caps
-Message-ID: <20200229183830.GB22451@linux.intel.com>
-References: <20200201185218.24473-1-sean.j.christopherson@intel.com>
- <20200201185218.24473-49-sean.j.christopherson@intel.com>
- <fd7c8e54-b5e1-fa0c-02c7-d308ecfbac80@redhat.com>
- <20200225210843.GI9245@linux.intel.com>
+        id S1727314AbgB2TA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Feb 2020 14:00:57 -0500
+Received: from mail-il1-f196.google.com ([209.85.166.196]:40439 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727209AbgB2TA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Feb 2020 14:00:57 -0500
+Received: by mail-il1-f196.google.com with SMTP id g6so4548577ilc.7
+        for <kvm@vger.kernel.org>; Sat, 29 Feb 2020 11:00:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OPm3hrGauL8biCEinhFnHGuE8NuHgMpT90ceO6W2+s4=;
+        b=QJRcbgBgFWGY+IrI2mhQ7YcO+C450KRWfGWjarnZjMkLID6dMBo3yjnc+lQd0ydDFn
+         Klpp6Lriyv205JzqPsR25dMpi5rZ4lQ2RpeJeqCd19TrmhuTHzLDDTb5Nq/8PMZMN9Wn
+         ugiLU+5PnffMZMQ26oBpkrsEmuM5q72VpN9VNh4jrHvx7liqcf5GMjVURgiRgRjV5FA2
+         4ZXZKXSKZQnNOBnvBSiF0uqAwELvZbZjFgLwrwfB6WvEmoZGbcqZQGaotUqc1I0tMNOK
+         3golkHykUqQeytTOq9wxrN+T+s2keqAK8gMUmLBCp9A8HSp6ARkP+5O0d0I3bDPu+sMM
+         C0Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OPm3hrGauL8biCEinhFnHGuE8NuHgMpT90ceO6W2+s4=;
+        b=iOwkNVmlXYE/AJpJK8q4GsSblGGpc9FGHoAU4lEQSsy4RBBG7UYiTPOOcV77KHaO37
+         2+uim9ZkiXze9GNOFErQJvdBZoGVp9lDmwBsNC60YtiG0SOD6uz8kWJ5K1Qqvw5isRLV
+         ZY6eBAIPzNyV0Jj7dpb+86CNO6dSq4A0lzWhWAnx9MnWRzx+hnxED63PaXiM7AAZYts8
+         Pks6kYxNhQgiFvJ9n2nR/xC4dTzB/A8MBlCUXH2SKQH0MwiAL+AEUIEMNMBtiEDJzgWw
+         exfOJWs7Xf3/2TmPC0+9yNDT3kPa/zTwMezgVBoaatttojmO4n2eHAS7BFcjqfUy8Dsq
+         EAgg==
+X-Gm-Message-State: APjAAAX9CGH7miUm0dh51qsRLSFu3lzFFu96vBHBcCXrZ4+NP69ViK7J
+        s1mJmfOgD2JSoHZeXInY6T9OM8Dfk15oCH4hEsnGHw==
+X-Google-Smtp-Source: APXvYqzrtg94iuKISLZUq15kVQq0EevQ7IO9b8IvdausgoC11wtDjBdvYeDl00RI2xRJ3xxCbc1E/KnknBPk4DBeVq8=
+X-Received: by 2002:a92:981b:: with SMTP id l27mr9968372ili.118.1583002855957;
+ Sat, 29 Feb 2020 11:00:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200225210843.GI9245@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <1582570596-45387-1-git-send-email-pbonzini@redhat.com>
+ <1582570596-45387-2-git-send-email-pbonzini@redhat.com> <41d80479-7dbc-d912-ff0e-acd48746de0f@web.de>
+ <CAOQ_QshE7SMX2cO7H+21Fkdpg53oE2D3xrHPJHR_MCfH4r9QCQ@mail.gmail.com>
+In-Reply-To: <CAOQ_QshE7SMX2cO7H+21Fkdpg53oE2D3xrHPJHR_MCfH4r9QCQ@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Sat, 29 Feb 2020 11:00:44 -0800
+Message-ID: <CALMp9eRETy1RLWHWKtFHqpcpFHbQKtPgJHDD_N+LPzaUPx-Jvg@mail.gmail.com>
+Subject: Re: [FYI PATCH 1/3] KVM: nVMX: Don't emulate instructions in guest mode
+To:     Oliver Upton <oupton@google.com>
+Cc:     Jan Kiszka <jan.kiszka@web.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 25, 2020 at 01:08:43PM -0800, Sean Christopherson wrote:
-> On Tue, Feb 25, 2020 at 04:18:12PM +0100, Paolo Bonzini wrote:
-> > On 01/02/20 19:52, Sean Christopherson wrote:
-> > > +#ifdef CONFIG_KVM_CPUID_AUDIT
-> > > +	/* Entry needs to be fully populated when auditing is enabled. */
-> > > +	entry.function = cpuid.function;
-> > > +	entry.index = cpuid.index;
-> > > +#endif
-> > 
-> > This shows that the audit case is prone to bitrot, which is good reason
-> > to enable it by default.
-> 
-> I have no argument against that, especially since I missed this case during
-> development and only caught it when running on a different system that I
-> had happened to configure with CONFIG_KVM_CPUID_AUDIT=y. :-)
+On Sat, Feb 29, 2020 at 10:33 AM Oliver Upton <oupton@google.com> wrote:
+>
+> Hi Jan,
+>
+> On Sat, Feb 29, 2020 at 10:00 AM Jan Kiszka <jan.kiszka@web.de> wrote:
+> > Is this expected to cause regressions on less common workloads?
+> > Jailhouse as L1 now fails when Linux as L2 tries to boot a CPU: L2-Linux
+> > gets a triple fault on load_current_idt() in start_secondary(). Only
+> > bisected so far, didn't debug further.
+>
+> I'm guessing that Jailhouse doesn't use 'descriptor table exiting', so
+> when KVM gets the corresponding exit from L2 the emulation burden is
+> on L0. We now refuse the emulation, which kicks a #UD back to L2. I
+> can get a patch out quickly to address this case (like the PIO exiting
+> one that came in this series) but the eventual solution is to map
+> emulator intercept checks into VM-exits + call into the
+> nested_vmx_exit_reflected() plumbing.
 
-I ended up dropping the audit code altogether.  The uops overhead wasn't
-bad, but the code bloat was pretty rough, ~16 bytes per instance.  The
-final nail in the coffin was that the auditing would trigger false
-positives if userspace configured CPUID leafs with a non-signficant index
-to have a non-zero index, e.g. is_matching_cpuid_entry() ignores the index
-if KVM_CPUID_FLAG_SIGNIFCANT_INDEX isn't set.
+If Jailhouse doesn't use descriptor table exiting, why is L0
+intercepting descriptor table instructions? Is this just so that L0
+can partially emulate UMIP on hardware that doesn't support it?
