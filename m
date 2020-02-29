@@ -2,81 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AA031744AB
-	for <lists+kvm@lfdr.de>; Sat, 29 Feb 2020 04:09:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF04A17457B
+	for <lists+kvm@lfdr.de>; Sat, 29 Feb 2020 08:06:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726859AbgB2DJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Feb 2020 22:09:29 -0500
-Received: from mga06.intel.com ([134.134.136.31]:7144 "EHLO mga06.intel.com"
+        id S1726170AbgB2HCx convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 29 Feb 2020 02:02:53 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52686 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726798AbgB2DJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Feb 2020 22:09:28 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2020 19:09:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,498,1574150400"; 
-   d="scan'208";a="232447150"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.43.60])
-  by orsmga008.jf.intel.com with ESMTP; 28 Feb 2020 19:09:25 -0800
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: x86: Remove unnecessary brackets in kvm_arch_dev_ioctl()
-Date:   Sat, 29 Feb 2020 10:52:12 +0800
-Message-Id: <20200229025212.156388-1-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.19.1
+        id S1725747AbgB2HCx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Feb 2020 02:02:53 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
+ pointer dereference" and crashes
+Date:   Sat, 29 Feb 2020 07:02:52 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: anthonysanwo@googlemail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206579-28872-fxqSiKDZJJ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
+References: <bug-206579-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In kvm_arch_dev_ioctl(), the brackets of case KVM_X86_GET_MCE_CAP_SUPPORTED
-accidently encapsulates case KVM_GET_MSR_FEATURE_INDEX_LIST and case
-KVM_GET_MSRS. It doesn't affect functionality but it's misleading.
+https://bugzilla.kernel.org/show_bug.cgi?id=206579
 
-Remove unnecessary brackets and opportunistically add a "break" in the
-default path.
+--- Comment #39 from Anthony (anthonysanwo@googlemail.com) ---
+(In reply to muncrief from comment #38)
+> (In reply to Anthony from comment #37)
+> > ... I just wanted to check if I am missing anything on my side as I am not
+> 100% sure on how to tell avic is working looking a trace, perf stat/live. ... 
+> 
+> You can tell if avic is working by executing "perf kvm stat live" and then
+> looking for "avic_incomplete_ipi" and "avic_unaccelerated_" in the VM-EXIT
+> column. If it's not working you'll see "vintr" instead.
+> 
+> By the way the way "avic_unaccelerated_" is actually
+> "avic_unaccelerated_access" in the code but evidently it gets truncated in
+> the perf command output.
 
-Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
----
- arch/x86/kvm/x86.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Oh if that's the case then my understanding has just been poor as I assumed the
+kvm_apicv_update_request counter should be higher to show the times where apicv
+has been activated and deactivated which should also be reflected in a trace.
+At least that is what it reads like to me reading this patch -
+https://lore.kernel.org/patchwork/patch/1153605/
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5de200663f51..e49f3e735f77 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3464,7 +3464,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
- 		r = 0;
- 		break;
- 	}
--	case KVM_X86_GET_MCE_CAP_SUPPORTED: {
-+	case KVM_X86_GET_MCE_CAP_SUPPORTED:
- 		r = -EFAULT;
- 		if (copy_to_user(argp, &kvm_mce_cap_supported,
- 				 sizeof(kvm_mce_cap_supported)))
-@@ -3496,9 +3496,9 @@ long kvm_arch_dev_ioctl(struct file *filp,
- 	case KVM_GET_MSRS:
- 		r = msr_io(NULL, argp, do_get_msr_feature, 1);
- 		break;
--	}
- 	default:
- 		r = -EINVAL;
-+		break;
- 	}
- out:
- 	return r;
 -- 
-2.19.1
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
