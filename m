@@ -2,103 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91B0E1748E3
-	for <lists+kvm@lfdr.de>; Sat, 29 Feb 2020 20:30:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABDA41748ED
+	for <lists+kvm@lfdr.de>; Sat, 29 Feb 2020 20:43:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727102AbgB2Ta1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 Feb 2020 14:30:27 -0500
-Received: from mail-pf1-f201.google.com ([209.85.210.201]:48973 "EHLO
-        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727335AbgB2Ta0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 29 Feb 2020 14:30:26 -0500
-Received: by mail-pf1-f201.google.com with SMTP id c17so4396086pfo.15
-        for <kvm@vger.kernel.org>; Sat, 29 Feb 2020 11:30:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=zN9W9s3tt491wsnTdiI9FOLxD/Do99w+fhxd16Xg1BY=;
-        b=H6fOuXZWG6Gmg2u0weRkAjplqipjfftT45Au+HJwKOA76nFIdZXu3E9erT+Eq7vgav
-         RwJaQO3vVoKIN/1fZI7iXsk00/J5BEyRLssxY14MVSTpnggWkH1mEivpveZnZ3PQI6iM
-         kQVzPijSvSWogcX1IpBxE5wTofMXvS/C99X/8LZvuK/zx9AZJ5Z5dI44vliL0WmCqqFN
-         x76MiyPCZMvMOFzxM60Ly9aAmGwR7htbsNL0Af4nPxCnQ8tDPN7ZAz316o2cFM5w3AD9
-         jR/oNQ8knQpCP4tW8Pci6j8rtQQD8SssYNoxqApjTfnIGbZ6RohdEkNtb7k9jBGb3mcJ
-         OYxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=zN9W9s3tt491wsnTdiI9FOLxD/Do99w+fhxd16Xg1BY=;
-        b=W4T6vBfdJRMxyIKjSfwo5xA8zb/k7Yt953qLp+6MSH17dFhCDVM4RsMhAfUkD5oT0P
-         WMitqcMfurEwY6KdBfGrXQRWekZjlwWJUgPHRSfeAUEPbl40IeZdn1hUEB811gYuYa6c
-         bMivT1c0REmAiPSnVhgynm/sE0NX08InEKjUV4WoEs+qcn8egZVBdtzjkxtCEtZj4WOE
-         hTuG0Sc3vZwJOVIG2bNAgEJQ799VwNTW3aLcJBU5VOvHkyTxXRQTOdHKh0HbNyR+6PmX
-         wCQtb/ZrCP3hNfFwwucwVEF7qi1mhvsX6/MPawfcIC4l3IcWd6hI+AHfTT4bwofGhPIW
-         2JyQ==
-X-Gm-Message-State: APjAAAV7u7RFkKnUy/5rIcd1JnO4oCC+XVVZCXKM7O4lUy7vU95i1OS+
-        e8fjt4OvDT7p+vN84y9+N933It8EwgfUGYm7XVP8gJNWb7E8HavdB6P8UyZvNeOo5taEqJVeerJ
-        0QTLmv1wRrUEES7pskLy3Bvtec5gFImcPfb9dU8ogB+yv0rL30P2bAI/AfA==
-X-Google-Smtp-Source: APXvYqyNjIU+ikUX/0d+vVdKRVbkUdm8fqhXOh6WEkz04PCj0Qrl9MJT3wDbQrX+snIufKZ/yRAnKMfHG2s=
-X-Received: by 2002:a65:5948:: with SMTP id g8mr11544791pgu.161.1583004625445;
- Sat, 29 Feb 2020 11:30:25 -0800 (PST)
-Date:   Sat, 29 Feb 2020 11:30:14 -0800
-In-Reply-To: <e8fe4664-d948-f239-4ec9-82d9010b7d26@web.de>
-Message-Id: <20200229193014.106806-1-oupton@google.com>
-Mime-Version: 1.0
-References: <e8fe4664-d948-f239-4ec9-82d9010b7d26@web.de>
-X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
-Subject: [PATCH] KVM: VMX: check descriptor table exits on instruction emulation
-From:   Oliver Upton <oupton@google.com>
+        id S1727213AbgB2Tns convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 29 Feb 2020 14:43:48 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48938 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727102AbgB2Tns (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Feb 2020 14:43:48 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     kvm@vger.kernel.org
-Cc:     Oliver Upton <oupton@google.com>, Jan Kiszka <jan.kiszka@web.de>,
-        stable@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
+Subject: [Bug 206579] KVM with passthrough generates "BUG: kernel NULL
+ pointer dereference" and crashes
+Date:   Sat, 29 Feb 2020 19:43:47 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: anthonysanwo@googlemail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206579-28872-CiGKUk8y6Q@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206579-28872@https.bugzilla.kernel.org/>
+References: <bug-206579-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM emulates UMIP on hardware that doesn't support it by setting the
-'descriptor table exiting' VM-execution control and performing
-instruction emulation. When running nested, this emulation is broken as
-KVM refuses to emulate L2 instructions by default.
+https://bugzilla.kernel.org/show_bug.cgi?id=206579
 
-Correct this regression by allowing the emulation of descriptor table
-instructions if L1 hasn't requested 'descriptor table exiting'.
+--- Comment #41 from Anthony (anthonysanwo@googlemail.com) ---
+(In reply to muncrief from comment #40)
+> (In reply to Anthony from comment #39)
+> > (In reply to muncrief from comment #38)
+> > > (In reply to Anthony from comment #37)
+> > ... Oh if that's the case then my understanding has just been poor as I
+> assumed
+> > the kvm_apicv_update_request counter should be higher to show the times
+> > where apicv has been activated and deactivated which should also be
+> > reflected in a trace. At least that is what it reads like to me reading
+> this
+> > patch - https://lore.kernel.org/patchwork/patch/1153605/
+> 
+> I took a look at that just out of curiosity Anthony but unfortunately I
+> don't know anything about the Linux kernel code, I've just been following
+> along with the devs as best I can. I'm simply a retired
+> hardware/firmware/software designer from the olden days. And by "olden" I
+> mean before Linux, and even things like CGA graphics, existed :)
+> 
+> I was just passing along what I learned from Suravee, and some cursory
+> observation of tiny related code segments. All I was ever able to accomplish
+> was a partial understanding of the first 5 bits of the avic_inhibit_reasons
+> output :)
+> 
+> Your question is an interesting one though, I wasn't even aware that a
+> request counter existed!
 
-Fixes: 07721feee46b ("KVM: nVMX: Don't emulate instructions in guest mode")
-Reported-by: Jan Kiszka <jan.kiszka@web.de>
-Cc: stable@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jim Mattson <jmattson@google.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Woah that's quite the background you got there :)
+For me I have just done some basic programming in my life and just try to piece
+things together as I go along.
+The only reason I asked was because if I recall correctly in earlier patchsets
+the debugging interface for apicv was different and the counter(probably not
+the correct term) that showed apicv activity had more updates when it was
+working. Although given it's changed since then am not sure how it's meant to
+work now. 
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 63aaf44edd1f..e718b4c9455f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7204,6 +7204,17 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
- 	case x86_intercept_outs:
- 		return vmx_check_intercept_io(vcpu, info);
- 
-+	case x86_intercept_lgdt:
-+	case x86_intercept_lidt:
-+	case x86_intercept_lldt:
-+	case x86_intercept_ltr:
-+	case x86_intercept_sgdt:
-+	case x86_intercept_sidt:
-+	case x86_intercept_sldt:
-+	case x86_intercept_str:
-+		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_DESC))
-+			return X86EMUL_CONTINUE;
-+
- 	/* TODO: check more intercepts... */
- 	default:
- 		break;
+Below is a sample of the output when you enable the trace -
+
+"echo 1 >/sys/kernel/debug/tracing/events/kvm/kvm_apicv_update_request/enable"
+
+Then to see the output
+
+"cat /sys/kernel/debug/tracing/trace_pipe"
+
+           <...>-211863 [000] .... 22493.097745: kvm_apicv_update_request:
+deactivate bit=4
+           <...>-211863 [000] .... 22493.097818: kvm_apicv_update_request:
+activate bit=4
+
 -- 
-2.25.0.265.gbab2e86ba0-goog
-
+You are receiving this mail because:
+You are watching the assignee of the bug.
