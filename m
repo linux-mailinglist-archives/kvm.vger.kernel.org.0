@@ -2,123 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 087431751DB
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 03:40:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F09AB1752FE
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 06:11:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726751AbgCBCkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 1 Mar 2020 21:40:42 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60226 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726695AbgCBCkm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 1 Mar 2020 21:40:42 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 66F8A3F26BA126D15212;
-        Mon,  2 Mar 2020 10:40:39 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Mon, 2 Mar 2020
- 10:40:32 +0800
-Subject: Re: [PATCH v4 16/20] KVM: arm64: GICv4.1: Allow SGIs to switch
- between HW and SW interrupts
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Jason Cooper <jason@lakedaemon.net>,
-        "Robert Richter" <rrichter@marvell.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Eric Auger" <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        "Julien Thierry" <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200214145736.18550-1-maz@kernel.org>
- <20200214145736.18550-17-maz@kernel.org>
- <6798eb13-a7e9-2a92-91b2-9b657962ea79@huawei.com>
- <7aa668a5920b8deb8c2ee2fec3ef69b3@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <865e3cc6-19e3-a1ec-84a6-8c15ad738345@huawei.com>
-Date:   Mon, 2 Mar 2020 10:40:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1726969AbgCBFLV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 00:11:21 -0500
+Received: from mail.dsns.gov.ua ([194.0.148.101]:53136 "EHLO mail.dsns.gov.ua"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726263AbgCBFLV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 00:11:21 -0500
+X-Greylist: delayed 18098 seconds by postgrey-1.27 at vger.kernel.org; Mon, 02 Mar 2020 00:11:20 EST
+Received: from localhost (localhost [127.0.0.1])
+        by mail.dsns.gov.ua (Postfix) with ESMTP id E8AFA1FC7A3D;
+        Sun,  1 Mar 2020 22:26:53 +0200 (EET)
+Received: from mail.dsns.gov.ua ([127.0.0.1])
+        by localhost (mail.dsns.gov.ua [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id 3BgKqF57BT-W; Sun,  1 Mar 2020 22:26:53 +0200 (EET)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.dsns.gov.ua (Postfix) with ESMTP id 676C91FC6FEB;
+        Sun,  1 Mar 2020 22:21:38 +0200 (EET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.dsns.gov.ua 676C91FC6FEB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dsns.gov.ua;
+        s=1E60DAC0-2607-11E9-81E6-7A77C2B36653; t=1583094099;
+        bh=njlCkWFc0hcw8eBX6ul4CN7Q0eDgIqGtksJn7ge99kc=;
+        h=Date:From:Message-ID:MIME-Version;
+        b=N3htFdzUSXsQ38gUAOPbOfG5HZztTEYBSWfg4pwhgUDMW3fPlX/b7gvUrI6UqsJOm
+         vYZYr3lSJqCmGCXkjGAhjJP6+QlCsipb/5mrkWo64RP4JSzMLStnb0nMS4vQ5kQ+aM
+         B2zVROlHJZZwn3W/6GeccsRsMAzWmlettmeZJP3/yzfsFGr6BEBP2GnCImbLLf5QGG
+         sQRNXt9vuGSEyb5NrqCN/UIM0/ip9ON/BGlK8f0tZa5Wj20QeGD/zEeZ+TOz+p+NI6
+         Jqkwe9j94a/pvYesk1VAzKTv2J6dyPKdUTVIGLwt7Oo5ryQAHmAoKfRGvL0PIyvpo1
+         PGSQZimYY7fLA==
+X-Virus-Scanned: amavisd-new at dsns.gov.ua
+Received: from mail.dsns.gov.ua ([127.0.0.1])
+        by localhost (mail.dsns.gov.ua [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id X7cJ-lnp1rux; Sun,  1 Mar 2020 22:21:38 +0200 (EET)
+Received: from mail.dsns.gov.ua (localhost [127.0.0.1])
+        by mail.dsns.gov.ua (Postfix) with ESMTP id 5F4091FC51E1;
+        Sun,  1 Mar 2020 21:58:05 +0200 (EET)
+Date:   Sun, 1 Mar 2020 21:58:05 +0200 (EET)
+From:   Peter Wong <sport08@dsns.gov.ua>
+Reply-To: petrwong@hotmail.com
+Message-ID: <1905824079.3672764.1583092685300.JavaMail.zimbra@dsns.gov.ua>
+Subject: Hello
 MIME-Version: 1.0
-In-Reply-To: <7aa668a5920b8deb8c2ee2fec3ef69b3@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [5.154.174.49, 172.68.102.151]
+X-Mailer: Zimbra 8.8.15_GA_3899 (zclient/8.8.15_GA_3899)
+Thread-Index: LBbFXEsIxFh9GhFmJqLJL6dcqRFSUw==
+Thread-Topic: Hello
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 2020/2/29 3:16, Marc Zyngier wrote:
-> Hi Zenghui,
-> 
-> On 2020-02-20 03:55, Zenghui Yu wrote:
->> Hi Marc,
->>
->> On 2020/2/14 22:57, Marc Zyngier wrote:
->>> In order to let a guest buy in the new, active-less SGIs, we
->>> need to be able to switch between the two modes.
->>>
->>> Handle this by stopping all guest activity, transfer the state
->>> from one mode to the other, and resume the guest.
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>
->> [...]
->>
->>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->>> index 1bc09b523486..2c9fc13e2c59 100644
->>> --- a/virt/kvm/arm/vgic/vgic-v3.c
->>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->>> @@ -540,6 +540,8 @@ int vgic_v3_map_resources(struct kvm *kvm)
->>>           goto out;
->>>       }
->>>   +    if (kvm_vgic_global_state.has_gicv4_1)
->>> +        vgic_v4_configure_vsgis(kvm);
->>>       dist->ready = true;
->>>     out:
->>
->> Is there any reason to invoke vgic_v4_configure_vsgis() here?
->> This is called on the first VCPU run, through kvm_vgic_map_resources().
->> Shouldn't the vSGI configuration only driven by a GICD_CTLR.nASSGIreq
->> writing (from guest, or from userspace maybe)?
-> 
-> What I'm trying to catch here is the guest that has been restored with
-> nASSGIreq set. At the moment, we don't do anything on the userspace
-> side, because the vmm could decide to write that particular bit
-> multiple times, and switching between the two modes is expensive (not
-> to mention that all the vcpus may not have been created yet).
-> 
-> Moving it to the first run makes all these pitfalls go away (we have the
-> final nASSSGIreq value, and all the vcpus are accounted for).
-
-So what will happen on restoration is (roughly):
-
-  - for GICR_ISPENR0: We will restore the pending status of vSGIs into
-    software pending_latch, just like what we've done for normal SGIs.
-  - for GICD_CTLR.nASSGIreq: We will only record the written value.
-    (Note to myself: No invocation of configure_vsgis() in uaccess_write
-     callback, I previously mixed it up with the guest write callback.)
-  - Finally, you choose the first vcpu run as the appropriate point to
-    potentially flush the pending status to HW according to the final
-    nASSGIreq value.
-
-> 
-> Does this make sense to you?
-
-Yeah, it sounds like a good idea! And please ignore what I've replied to
-patch #15, I obviously missed your intention at that time, sorry...
-
-But can we move this hunk to some places more appropriate, for example,
-put it together with the GICD_CTLR's uaccess_write change? It might make
-things a bit clearer for other reviewers. :-)
 
 
-Thanks,
-Zenghui
-
+Can we talk now?
