@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B9551768CF
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 01:00:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C20DB1768BB
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2020 00:59:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727618AbgCBX7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 18:59:41 -0500
-Received: from mga02.intel.com ([134.134.136.20]:25524 "EHLO mga02.intel.com"
+        id S1727473AbgCBX52 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 18:57:28 -0500
+Received: from mga02.intel.com ([134.134.136.20]:25521 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727420AbgCBX52 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727426AbgCBX52 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 2 Mar 2020 18:57:28 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from orsmga006.jf.intel.com ([10.7.209.51])
   by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Mar 2020 15:57:22 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,509,1574150400"; 
-   d="scan'208";a="243384680"
+   d="scan'208";a="243384683"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by orsmga006.jf.intel.com with ESMTP; 02 Mar 2020 15:57:22 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -28,9 +28,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v2 19/66] KVM: VMX: Add helpers to query Intel PT mode
-Date:   Mon,  2 Mar 2020 15:56:22 -0800
-Message-Id: <20200302235709.27467-20-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 20/66] KVM: x86: Calculate the supported xcr0 mask at load time
+Date:   Mon,  2 Mar 2020 15:56:23 -0800
+Message-Id: <20200302235709.27467-21-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200302235709.27467-1-sean.j.christopherson@intel.com>
 References: <20200302235709.27467-1-sean.j.christopherson@intel.com>
@@ -41,200 +41,208 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add helpers to query which of the (two) supported PT modes is active.
-The primary motivation is to help document that there is a third PT mode
-(host-only) that's currently not supported by KVM.  As is, it's not
-obvious that PT_MODE_SYSTEM != !PT_MODE_HOST_GUEST and vice versa, e.g.
-that "pt_mode == PT_MODE_SYSTEM" and "pt_mode != PT_MODE_HOST_GUEST" are
-two distinct checks.
+Add a new global variable, supported_xcr0, to track which xcr0 bits can
+be exposed to the guest instead of calculating the mask on every call.
+The supported bits are constant for a given instance of KVM.
+
+This paves the way toward eliminating the ->mpx_supported() call in
+kvm_mpx_supported(), e.g. eliminates multiple retpolines in VMX's nested
+VM-Enter path, and eventually toward eliminating ->mpx_supported()
+altogether.
 
 No functional change intended.
 
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/capabilities.h | 18 ++++++++++++++++++
- arch/x86/kvm/vmx/nested.c       |  2 +-
- arch/x86/kvm/vmx/vmx.c          | 26 +++++++++++++-------------
- arch/x86/kvm/vmx/vmx.h          |  4 ++--
- 4 files changed, 34 insertions(+), 16 deletions(-)
+ arch/x86/kvm/cpuid.c   | 32 +++++++++-----------------------
+ arch/x86/kvm/svm.c     |  2 ++
+ arch/x86/kvm/vmx/vmx.c |  4 ++++
+ arch/x86/kvm/x86.c     | 14 +++++++++++---
+ arch/x86/kvm/x86.h     |  7 +------
+ 5 files changed, 27 insertions(+), 32 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index f486e2606247..80eec8cffbe2 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -354,4 +354,22 @@ static inline bool cpu_has_vmx_intel_pt(void)
- 		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_RTIT_CTL);
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 85f292088d91..1eb775c33c4e 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -52,16 +52,6 @@ bool kvm_mpx_supported(void)
  }
+ EXPORT_SYMBOL_GPL(kvm_mpx_supported);
  
-+/*
-+ * Processor Trace can operate in one of three modes:
-+ *  a. system-wide: trace both host/guest and output to host buffer
-+ *  b. host-only:   only trace host and output to host buffer
-+ *  c. host-guest:  trace host and guest simultaneously and output to their
-+ *                  respective buffer
-+ *
-+ * KVM currently only supports (a) and (c).
-+ */
-+static inline bool vmx_pt_mode_is_system(void)
-+{
-+	return pt_mode == PT_MODE_SYSTEM;
-+}
-+static inline bool vmx_pt_mode_is_host_guest(void)
-+{
-+	return pt_mode == PT_MODE_HOST_GUEST;
-+}
-+
- #endif /* __KVM_X86_VMX_CAPS_H */
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 0946122a8d3b..ae84b3c66e0d 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4602,7 +4602,7 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
- 	vmx->nested.vmcs02_initialized = false;
- 	vmx->nested.vmxon = true;
+-u64 kvm_supported_xcr0(void)
+-{
+-	u64 xcr0 = KVM_SUPPORTED_XCR0 & host_xcr0;
+-
+-	if (!kvm_mpx_supported())
+-		xcr0 &= ~(XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
+-
+-	return xcr0;
+-}
+-
+ #define F feature_bit
  
--	if (pt_mode == PT_MODE_HOST_GUEST) {
-+	if (vmx_pt_mode_is_host_guest()) {
- 		vmx->pt_desc.guest.ctl = 0;
- 		pt_update_intercept_for_msr(vmx);
+ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+@@ -107,8 +97,7 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.guest_xstate_size = XSAVE_HDR_SIZE + XSAVE_HDR_OFFSET;
+ 	} else {
+ 		vcpu->arch.guest_supported_xcr0 =
+-			(best->eax | ((u64)best->edx << 32)) &
+-			kvm_supported_xcr0();
++			(best->eax | ((u64)best->edx << 32)) & supported_xcr0;
+ 		vcpu->arch.guest_xstate_size = best->ebx =
+ 			xstate_required_size(vcpu->arch.xcr0, false);
  	}
+@@ -633,14 +622,12 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 				goto out;
+ 		}
+ 		break;
+-	case 0xd: {
+-		u64 supported = kvm_supported_xcr0();
+-
+-		entry->eax &= supported;
+-		entry->ebx = xstate_required_size(supported, false);
++	case 0xd:
++		entry->eax &= supported_xcr0;
++		entry->ebx = xstate_required_size(supported_xcr0, false);
+ 		entry->ecx = entry->ebx;
+-		entry->edx &= supported >> 32;
+-		if (!supported)
++		entry->edx &= supported_xcr0 >> 32;
++		if (!supported_xcr0)
+ 			break;
+ 
+ 		entry = do_host_cpuid(array, function, 1);
+@@ -650,7 +637,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		entry->eax &= kvm_cpuid_D_1_eax_x86_features;
+ 		cpuid_mask(&entry->eax, CPUID_D_1_EAX);
+ 		if (entry->eax & (F(XSAVES)|F(XSAVEC)))
+-			entry->ebx = xstate_required_size(supported, true);
++			entry->ebx = xstate_required_size(supported_xcr0, true);
+ 		else
+ 			entry->ebx = 0;
+ 		/* Saving XSS controlled state via XSAVES isn't supported. */
+@@ -658,7 +645,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		entry->edx = 0;
+ 
+ 		for (i = 2; i < 64; ++i) {
+-			if (!(supported & BIT_ULL(i)))
++			if (!(supported_xcr0 & BIT_ULL(i)))
+ 				continue;
+ 
+ 			entry = do_host_cpuid(array, function, i);
+@@ -666,7 +653,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 				goto out;
+ 
+ 			/*
+-			 * The @supported check above should have filtered out
++			 * The supported check above should have filtered out
+ 			 * invalid sub-leafs as well as sub-leafs managed by
+ 			 * IA32_XSS MSR.  Only XCR0-managed sub-leafs should
+ 			 * reach this point, and they should have a non-zero
+@@ -681,7 +668,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 			entry->edx = 0;
+ 		}
+ 		break;
+-	}
+ 	/* Intel PT */
+ 	case 0x14:
+ 		if (!f_intel_pt)
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index fd3fc9fbefff..51db8addda04 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -1385,6 +1385,8 @@ static __init int svm_hardware_setup(void)
+ 
+ 	init_msrpm_offsets();
+ 
++	supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
++
+ 	if (boot_cpu_has(X86_FEATURE_NX))
+ 		kvm_enable_efer_bits(EFER_NX);
+ 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a04017bdae05..2dcf27e3a7a6 100644
+index 2dcf27e3a7a6..cf874c364c8f 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1059,7 +1059,7 @@ static unsigned long segment_base(u16 selector)
+@@ -7655,6 +7655,10 @@ static __init int hardware_setup(void)
+ 		WARN_ONCE(host_bndcfgs, "KVM: BNDCFGS in host will be lost");
+ 	}
  
- static inline bool pt_can_write_msr(struct vcpu_vmx *vmx)
- {
--	return (pt_mode == PT_MODE_HOST_GUEST) &&
-+	return vmx_pt_mode_is_host_guest() &&
- 	       !(vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN);
- }
++	if (!kvm_mpx_supported())
++		supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
++				    XFEATURE_MASK_BNDCSR);
++
+ 	if (!cpu_has_vmx_vpid() || !cpu_has_vmx_invvpid() ||
+ 	    !(cpu_has_vmx_invvpid_single() || cpu_has_vmx_invvpid_global()))
+ 		enable_vpid = 0;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ddd1d296bd20..e3598fe171a5 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -180,6 +180,11 @@ struct kvm_shared_msrs {
+ static struct kvm_shared_msrs_global __read_mostly shared_msrs_global;
+ static struct kvm_shared_msrs __percpu *shared_msrs;
  
-@@ -1093,7 +1093,7 @@ static inline void pt_save_msr(struct pt_ctx *ctx, u32 addr_range)
++#define KVM_SUPPORTED_XCR0     (XFEATURE_MASK_FP | XFEATURE_MASK_SSE \
++				| XFEATURE_MASK_YMM | XFEATURE_MASK_BNDREGS \
++				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
++				| XFEATURE_MASK_PKRU)
++
+ static u64 __read_mostly host_xss;
  
- static void pt_guest_enter(struct vcpu_vmx *vmx)
- {
--	if (pt_mode == PT_MODE_SYSTEM)
-+	if (vmx_pt_mode_is_system())
- 		return;
+ struct kvm_stats_debugfs_item debugfs_entries[] = {
+@@ -226,6 +231,8 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ };
  
- 	/*
-@@ -1110,7 +1110,7 @@ static void pt_guest_enter(struct vcpu_vmx *vmx)
+ u64 __read_mostly host_xcr0;
++u64 __read_mostly supported_xcr0;
++EXPORT_SYMBOL_GPL(supported_xcr0);
  
- static void pt_guest_exit(struct vcpu_vmx *vmx)
- {
--	if (pt_mode == PT_MODE_SYSTEM)
-+	if (vmx_pt_mode_is_system())
- 		return;
+ struct kmem_cache *x86_fpu_cache;
+ EXPORT_SYMBOL_GPL(x86_fpu_cache);
+@@ -4099,8 +4106,7 @@ static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
+ 		 * CPUID leaf 0xD, index 0, EDX:EAX.  This is for compatibility
+ 		 * with old userspace.
+ 		 */
+-		if (xstate_bv & ~kvm_supported_xcr0() ||
+-			mxcsr & ~mxcsr_feature_mask)
++		if (xstate_bv & ~supported_xcr0 || mxcsr & ~mxcsr_feature_mask)
+ 			return -EINVAL;
+ 		load_xsave(vcpu, (u8 *)guest_xsave->region);
+ 	} else {
+@@ -7304,8 +7310,10 @@ int kvm_arch_init(void *opaque)
  
- 	if (vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN) {
-@@ -1904,24 +1904,24 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 							&msr_info->data);
- 		break;
- 	case MSR_IA32_RTIT_CTL:
--		if (pt_mode != PT_MODE_HOST_GUEST)
-+		if (!vmx_pt_mode_is_host_guest())
- 			return 1;
- 		msr_info->data = vmx->pt_desc.guest.ctl;
- 		break;
- 	case MSR_IA32_RTIT_STATUS:
--		if (pt_mode != PT_MODE_HOST_GUEST)
-+		if (!vmx_pt_mode_is_host_guest())
- 			return 1;
- 		msr_info->data = vmx->pt_desc.guest.status;
- 		break;
- 	case MSR_IA32_RTIT_CR3_MATCH:
--		if ((pt_mode != PT_MODE_HOST_GUEST) ||
-+		if (!vmx_pt_mode_is_host_guest() ||
- 			!intel_pt_validate_cap(vmx->pt_desc.caps,
- 						PT_CAP_cr3_filtering))
- 			return 1;
- 		msr_info->data = vmx->pt_desc.guest.cr3_match;
- 		break;
- 	case MSR_IA32_RTIT_OUTPUT_BASE:
--		if ((pt_mode != PT_MODE_HOST_GUEST) ||
-+		if (!vmx_pt_mode_is_host_guest() ||
- 			(!intel_pt_validate_cap(vmx->pt_desc.caps,
- 					PT_CAP_topa_output) &&
- 			 !intel_pt_validate_cap(vmx->pt_desc.caps,
-@@ -1930,7 +1930,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		msr_info->data = vmx->pt_desc.guest.output_base;
- 		break;
- 	case MSR_IA32_RTIT_OUTPUT_MASK:
--		if ((pt_mode != PT_MODE_HOST_GUEST) ||
-+		if (!vmx_pt_mode_is_host_guest() ||
- 			(!intel_pt_validate_cap(vmx->pt_desc.caps,
- 					PT_CAP_topa_output) &&
- 			 !intel_pt_validate_cap(vmx->pt_desc.caps,
-@@ -1940,7 +1940,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
- 		index = msr_info->index - MSR_IA32_RTIT_ADDR0_A;
--		if ((pt_mode != PT_MODE_HOST_GUEST) ||
-+		if (!vmx_pt_mode_is_host_guest() ||
- 			(index >= 2 * intel_pt_validate_cap(vmx->pt_desc.caps,
- 					PT_CAP_num_address_ranges)))
- 			return 1;
-@@ -2146,7 +2146,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		return vmx_set_vmx_msr(vcpu, msr_index, data);
- 	case MSR_IA32_RTIT_CTL:
--		if ((pt_mode != PT_MODE_HOST_GUEST) ||
-+		if (!vmx_pt_mode_is_host_guest() ||
- 			vmx_rtit_ctl_check(vcpu, data) ||
- 			vmx->nested.vmxon)
- 			return 1;
-@@ -4024,7 +4024,7 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+ 	perf_register_guest_info_callbacks(&kvm_guest_cbs);
  
- 	u32 exec_control = vmcs_config.cpu_based_2nd_exec_ctrl;
+-	if (boot_cpu_has(X86_FEATURE_XSAVE))
++	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
+ 		host_xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
++		supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
++	}
  
--	if (pt_mode == PT_MODE_SYSTEM)
-+	if (vmx_pt_mode_is_system())
- 		exec_control &= ~(SECONDARY_EXEC_PT_USE_GPA | SECONDARY_EXEC_PT_CONCEAL_VMX);
- 	if (!cpu_need_virtualize_apic_accesses(vcpu))
- 		exec_control &= ~SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES;
-@@ -4265,7 +4265,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
- 	if (cpu_has_vmx_encls_vmexit())
- 		vmcs_write64(ENCLS_EXITING_BITMAP, -1ull);
+ 	kvm_lapic_init();
+ 	if (pi_inject_timer == -1)
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 3624665acee4..02b49ee49e24 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -280,13 +280,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 			    int emulation_type, void *insn, int insn_len);
+ enum exit_fastpath_completion handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu);
  
--	if (pt_mode == PT_MODE_HOST_GUEST) {
-+	if (vmx_pt_mode_is_host_guest()) {
- 		memset(&vmx->pt_desc, 0, sizeof(vmx->pt_desc));
- 		/* Bit[6~0] are forced to 1, writes are ignored. */
- 		vmx->pt_desc.guest.output_mask = 0x7F;
-@@ -6314,7 +6314,7 @@ static bool vmx_has_emulated_msr(int index)
+-#define KVM_SUPPORTED_XCR0     (XFEATURE_MASK_FP | XFEATURE_MASK_SSE \
+-				| XFEATURE_MASK_YMM | XFEATURE_MASK_BNDREGS \
+-				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
+-				| XFEATURE_MASK_PKRU)
+ extern u64 host_xcr0;
+-
+-extern u64 kvm_supported_xcr0(void);
++extern u64 supported_xcr0;
  
- static bool vmx_pt_supported(void)
- {
--	return pt_mode == PT_MODE_HOST_GUEST;
-+	return vmx_pt_mode_is_host_guest();
- }
+ extern unsigned int min_timer_period_us;
  
- static void vmx_recover_nmi_blocking(struct vcpu_vmx *vmx)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index e64da06c7009..9a51a3a77233 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -452,7 +452,7 @@ static inline void vmx_segment_cache_clear(struct vcpu_vmx *vmx)
- static inline u32 vmx_vmentry_ctrl(void)
- {
- 	u32 vmentry_ctrl = vmcs_config.vmentry_ctrl;
--	if (pt_mode == PT_MODE_SYSTEM)
-+	if (vmx_pt_mode_is_system())
- 		vmentry_ctrl &= ~(VM_ENTRY_PT_CONCEAL_PIP |
- 				  VM_ENTRY_LOAD_IA32_RTIT_CTL);
- 	/* Loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically */
-@@ -463,7 +463,7 @@ static inline u32 vmx_vmentry_ctrl(void)
- static inline u32 vmx_vmexit_ctrl(void)
- {
- 	u32 vmexit_ctrl = vmcs_config.vmexit_ctrl;
--	if (pt_mode == PT_MODE_SYSTEM)
-+	if (vmx_pt_mode_is_system())
- 		vmexit_ctrl &= ~(VM_EXIT_PT_CONCEAL_PIP |
- 				 VM_EXIT_CLEAR_IA32_RTIT_CTL);
- 	/* Loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically */
 -- 
 2.24.1
 
