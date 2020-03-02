@@ -2,96 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33B7A1762B7
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 19:30:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 544841762DE
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 19:40:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727388AbgCBSae (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 13:30:34 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:40726 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727255AbgCBSae (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 13:30:34 -0500
-Received: by mail-il1-f196.google.com with SMTP id g6so368601ilc.7
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 10:30:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=c9N8pmiznJwsvAz0Mn6RIRQBpDbT8QYW9ssTcn5Srt0=;
-        b=ofrDh/W03+qXgcSrm3KyNkAyQydWdBRXEXFaC9ZchLmfzEVU1Y60uEB3nFcuG7bgJE
-         +Z6e5pb9O93lPOefpvXtL85n8V3UhvZmr4hxaKsvf53treihjwahZH6t5cQrwZHUDEl6
-         gZhEGy5ZG9qzRUf/4W8I3f2w3G2NKzmf01J6xyd2jottQIPjMYgYuSoQGuqfSRtKjvmE
-         07hYHcN8TjXtTAE2BvqPIdSOtRvhkmrXJ4GwZeKtmuAH1YSRA6vlSXYp9Hsz86kJPPjl
-         cOnbrQyg9ijriyRgciuxqarlh4bzlG28g0N3DuIdHVZwU6SX40gRznJheV22kpJvu8fs
-         zL3g==
+        id S1727526AbgCBSkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 13:40:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51876 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727412AbgCBSkd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 13:40:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583174431;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1X0PQLF6NwaqQ0Dzv48A0q1FZz95BzWsFQZPymTOR4A=;
+        b=TltPo9rWMvjApVCQZ68UK7aBQGjZ2Gqql74arRbuxOs5ArNIo2DF2JFOmw9rBBP8Mp3Haa
+        JMFTloWvovkooL9DUATvMO9BnCoewY2Zdad1RIVosXweW4nPWXfJ5HZ+wGYVKOVTmZpMeT
+        SXXHJ+KyYIb/mgfyzugyINqWdWet6x0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-MFBOnHo6POuQaWgLB-hwUg-1; Mon, 02 Mar 2020 13:40:30 -0500
+X-MC-Unique: MFBOnHo6POuQaWgLB-hwUg-1
+Received: by mail-wr1-f72.google.com with SMTP id f10so99100wrv.1
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 10:40:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=c9N8pmiznJwsvAz0Mn6RIRQBpDbT8QYW9ssTcn5Srt0=;
-        b=HvkzmhUL4IO8WSMkj+Zp/ukOswTNurYd+ChLtQ/S511oDQTzCNL5MC9TJ4hKhMkwrr
-         lzS69Jwck37PLvRkdbj8JSGiPPyayoVYR/YMiSCkmPZ6QT37mI4Sw+zPFWKeSnxGg10H
-         0DGPL5zUoRsSatNmySvKUY5BL2s6yEoS5jTHY5vSBL/CTJ7NxgPu2Xt7dVeww4/kXZ24
-         qUrYVebchhv97XlHwaXaJfC4Lv0naU5/uWKQJcBVGExva097bhxFt3SEjhdg0XycqJm6
-         hOZlUL6oWgKJ0yjn/dMHDC936XXfzkPMArxOBehiGqvDmSD9R/j4dqxZVmXEdR+LptKQ
-         coMg==
-X-Gm-Message-State: ANhLgQ1SU+l5tydYjCa6/0m+9kPhMP0oAJIxee7IuS5RIrgBiyp1P+qt
-        60mMnw7XEDpQ/s6n5+t0IaYwVZ24b6gYsKUz93pFwA==
-X-Google-Smtp-Source: ADFU+vvfk/PTke3DmzOx8p1qiyiPWh39Gz/B81yPLGojcctURiXpbxbIgA4e1hpdnL9cY23/exLfgXJeZpz9wnvlANI=
-X-Received: by 2002:a92:8547:: with SMTP id f68mr976871ilh.26.1583173833493;
- Mon, 02 Mar 2020 10:30:33 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1X0PQLF6NwaqQ0Dzv48A0q1FZz95BzWsFQZPymTOR4A=;
+        b=Aiy8GMkBM8LSraa8v8i1bwgThZmGSC9gVbqBDtow+slUsjUhyC081aWN+xCU73Q87U
+         EA1QWEbxNLUWiS8PSW26tmx3C67eZYz8Air100ePtbmulx+q8w3NDsplkJs23eHmxIc8
+         qw9CKHWhkCo/sfrMYUZYM4xe2fF20Ty04RJFQtrlTM8meFvLoFSmZODYnwfkcqoyvKoA
+         3xiF9z325exy+Lq24tJ+eu90I7MU6dWYGZbAHC2lbwYCUcuWe9Gp6dylaWlE4Y5itqA/
+         Cwyt+VhXJPfKFfqt1rs8wGC9ObH5Yaf1S1QCLL5y0mQtZVs/TJSz7MIxejbo3ZXY82Yj
+         cs8A==
+X-Gm-Message-State: ANhLgQ3KJVWg+Q1VBRgO5hnFHCzn14tZIDgxU/JHGAPUPkHV8FqxX2DN
+        OS/zSEla2DrZDOqKMXP0wxAvDPYVPmc7UtA2bMkOO+fYQ3ZVctPjIw+a0v+k4KK8BWZxtxcXfB+
+        UPdpA1CL2uN08
+X-Received: by 2002:a1c:7907:: with SMTP id l7mr343894wme.37.1583174429142;
+        Mon, 02 Mar 2020 10:40:29 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vvwC0ey9J226DWJuc8knmd1FpRwvKZZlAuQKol2FcrrUa/BQT+AdmMNebVCCPpOKiNw/O24wA==
+X-Received: by 2002:a1c:7907:: with SMTP id l7mr343883wme.37.1583174428928;
+        Mon, 02 Mar 2020 10:40:28 -0800 (PST)
+Received: from [192.168.178.40] ([151.30.85.6])
+        by smtp.gmail.com with ESMTPSA id b12sm1049163wro.66.2020.03.02.10.40.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2020 10:40:28 -0800 (PST)
+Subject: Re: [PATCH v2 10/13] KVM: x86: Shrink the usercopy region of the
+ emulation context
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200218232953.5724-1-sean.j.christopherson@intel.com>
+ <20200218232953.5724-11-sean.j.christopherson@intel.com>
+ <87r1yhi6ex.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <727b8d16-2bab-6621-1f20-dc024ee65f10@redhat.com>
+Date:   Mon, 2 Mar 2020 19:40:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <1582773688-4956-1-git-send-email-linmiaohe@huawei.com>
- <CALMp9eSaZ557-GaQUVXW6-ZrMkz8jxOC1S6QPk-EVNJ-f2pT5w@mail.gmail.com>
- <a1ff3db1-1f5a-7bab-6c4b-f76e6d76d468@redhat.com> <CALMp9eQqFKnCLYGXdab-k=Q=h-H5x8VnV20F3HH9fDZTDuQcEQ@mail.gmail.com>
- <e173c489-dee7-a86d-3ec4-6fe45938a2d8@redhat.com>
-In-Reply-To: <e173c489-dee7-a86d-3ec4-6fe45938a2d8@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 2 Mar 2020 10:30:22 -0800
-Message-ID: <CALMp9eR9uanguked_O97BXMVGSE032m8QVsBP2qe2SS97j+qmg@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: X86: deprecate obsolete KVM_GET_CPUID2 ioctl
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linmiaohe <linmiaohe@huawei.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87r1yhi6ex.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 2, 2020 at 10:02 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 02/03/20 18:44, Jim Mattson wrote:
-> > On Mon, Mar 2, 2020 at 9:09 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 02/03/20 18:01, Jim Mattson wrote:
-> >>>> And in fact, it's not used anywhere. So it should be
-> >>>> deprecated.
-> >>> I don't know how you can make the assertion that this ioctl is not
-> >>> used anywhere. For instance, I see a use of it in Google's code base.
-> >>
-> >> Right, it does not seem to be used anywhere according to e.g. Debian
-> >> code search but of course it can have users.
-> >>
-> >> What are you using it for?  It's true that cpuid->nent is never written
-> >> back to userspace, so the ioctl is basically unusable unless you already
-> >> know how many entries are written.  Or unless you fill the CPUID entries
-> >> with garbage before calling it, I guess; is that what you are doing?
-> >
-> > One could use GET_CPUID2 after SET_CPUID2, to see what changes kvm
-> > made to the requested guest CPUID information without telling you.
->
-> Yeah, I think GET_CPUID2 with the same number of leaves that you have
-> passed to SET_CPUID2 should work.
+On 26/02/20 18:51, Vitaly Kuznetsov wrote:
+>> +
+>> +	/* Here begins the usercopy section. */
+>> +	struct operand src;
+>> +	struct operand src2;
+>> +	struct operand dst;
+> Out of pure curiosity, how certain are we that this is going to be
+> enough for userspaces?
+> 
 
-Having said that, it doesn't look like the method that invokes this
-ioctl (in Google's code base) gets called from anywhere.
+And also, where exactly are the user copies done?
+
+Paolo
+
