@@ -2,157 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AEAF175AD6
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 13:53:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1506C175AE2
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 13:54:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727769AbgCBMxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 07:53:24 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38572 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727267AbgCBMxX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 07:53:23 -0500
+        id S1727753AbgCBMyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 07:54:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52209 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727595AbgCBMyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 07:54:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583153601;
+        s=mimecast20190719; t=1583153659;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=9PtSLdZCaRnvpSBdCFBQ5RSyzQpwkCGpqNVbV6e41Lg=;
-        b=d3GoMsGfMcKFGvFaRQyT/DZiDifGFv0rvcKSm31RvS4uzBlGA537+oUQ2RrQ7UuWiPDHtr
-        2Fr0bHujWjqSRCb+0GQJECIOh1wFjfeyYq1+7ksWizZ0BFY4+usYeHC+szN0jwrHX4g4xm
-        JnLYVDKbOwnPBvRjDPa93u3eKClA+P0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-TwRprTWlNmCszp0mRNiWlg-1; Mon, 02 Mar 2020 07:53:20 -0500
-X-MC-Unique: TwRprTWlNmCszp0mRNiWlg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9395B8017DF;
-        Mon,  2 Mar 2020 12:53:17 +0000 (UTC)
-Received: from [10.36.116.114] (ovpn-116-114.ams2.redhat.com [10.36.116.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 21EB9100E805;
-        Mon,  2 Mar 2020 12:53:08 +0000 (UTC)
-Subject: Re: [PATCH RFC v4 08/13] mm/memory_hotplug: Introduce
- offline_and_remove_memory()
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Oscar Salvador <osalvador@suse.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Wei Yang <richard.weiyang@gmail.com>,
-        Dan Williams <dan.j.williams@intel.com>, Qian Cai <cai@lca.pw>
-References: <20191212171137.13872-1-david@redhat.com>
- <20191212171137.13872-9-david@redhat.com>
- <20200225141134.GU22443@dhcp22.suse.cz>
- <d1dbb687-7959-f4f1-6a64-33ee039782ef@redhat.com>
- <20200302124852.GJ4380@dhcp22.suse.cz>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <db703da8-cef6-c4bd-a4ba-0863408574d3@redhat.com>
-Date:   Mon, 2 Mar 2020 13:53:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+         in-reply-to:in-reply-to:references:references;
+        bh=uio7FC4gUy07vPE5jHOFetkzB5/dTbCYvaj0gXJ70aY=;
+        b=X44uuMWFSWiXHKgy9yxdtsIAgPCNO2GYBXseyHYYZXZl81AxtYIV3iWFKc+f6n89CK1fH0
+        HAuBIWTRXr+RmoR+VsVViwaBBzJ06b5jTQFvlEkTR1vO4yOzwBqbhW2o3xBLAPVe8MkMM2
+        mSgNZxQ4VioiEFDwvUnIRfMVYfFObn8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-2xYC-nkFPXOOOotAD5HiJg-1; Mon, 02 Mar 2020 07:54:18 -0500
+X-MC-Unique: 2xYC-nkFPXOOOotAD5HiJg-1
+Received: by mail-wr1-f69.google.com with SMTP id n12so5745176wrp.19
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 04:54:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=uio7FC4gUy07vPE5jHOFetkzB5/dTbCYvaj0gXJ70aY=;
+        b=s9oNMLqjBX8JCYbyuHx0I8kHAe4XSur0U/e++NXILm+TzAWmwqxDvGWtpTDHCsAirH
+         8A4ssQDrEy7Wp4tgLR/9SH5FN4wwDlNW4841AB74a13SZ6tvnOvb36RQl9MrzAVlX7H1
+         JuxG5GGkpMQTo8WV0BKFXWhKnBJP66CELMGv6+xw5LiVYH45F8gaAB47shro7o0lGFyp
+         XoJ6rGnpLDiQh+3UXNaRRibpe1E2uapavwug2SDumxJfbpzwSdh5hLOtBhrzV5tLRwn1
+         UW+Fas51XkN3lbdSGNLz6AqRw60ZBERwbZZeP/rt0ancOI0mc3f/SJRziv2OCQXZuKR3
+         8MIg==
+X-Gm-Message-State: ANhLgQ2swYXLa6ZBPxcp113MV3NdDIGENch6KFp9zGD7V5+zTLdcuYDz
+        +ZDtUJvtfwOCAnRR1oOKyQAJnVZx9E7giPxCN3mhRLySZLDWuK3ZrGMubWM0lMGlkW9h+DulQGr
+        uOcMXpJlserq/
+X-Received: by 2002:a05:600c:351:: with SMTP id u17mr6272759wmd.22.1583153657284;
+        Mon, 02 Mar 2020 04:54:17 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vu04jKN+g6wcSyVSSwVKb7MS+iuJ47n+yTcTQbU+MMAorQDO+ZNDo97ikUeXVPR3pW0sjgjCA==
+X-Received: by 2002:a05:600c:351:: with SMTP id u17mr6272735wmd.22.1583153657057;
+        Mon, 02 Mar 2020 04:54:17 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id l17sm7282334wmi.10.2020.03.02.04.54.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2020 04:54:16 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Haiwei Li <lihaiwei.kernel@gmail.com>
+Cc:     hpa@zytor.com, bp@alien8.de,
+        "mingo\@redhat.com" <mingo@redhat.com>,
+        "tglx\@linutronix.de" <tglx@linutronix.de>,
+        "joro\@8bytes.org" <joro@8bytes.org>, jmattson@google.com,
+        wanpengli@tencent.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH] KVM: SVM: Fix svm the vmexit error_code of WRMSR
+In-Reply-To: <CAB5KdOZwZUvgmHX5C53SBU0WttEF4wBFpgqiGahD2OkojQJZ-Q@mail.gmail.com>
+References: <CAB5KdOZwZUvgmHX5C53SBU0WttEF4wBFpgqiGahD2OkojQJZ-Q@mail.gmail.com>
+Date:   Mon, 02 Mar 2020 13:54:15 +0100
+Message-ID: <87o8tehq88.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200302124852.GJ4380@dhcp22.suse.cz>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.03.20 13:48, Michal Hocko wrote:
-> On Tue 25-02-20 15:27:28, David Hildenbrand wrote:
->> On 25.02.20 15:11, Michal Hocko wrote:
->>> On Thu 12-12-19 18:11:32, David Hildenbrand wrote:
->>>> virtio-mem wants to offline and remove a memory block once it unplugged
->>>> all subblocks (e.g., using alloc_contig_range()). Let's provide
->>>> an interface to do that from a driver. virtio-mem already supports to
->>>> offline partially unplugged memory blocks. Offlining a fully unplugged
->>>> memory block will not require to migrate any pages. All unplugged
->>>> subblocks are PageOffline() and have a reference count of 0 - so
->>>> offlining code will simply skip them.
->>>>
->>>> All we need an interface to trigger the "offlining" and the removing in a
->>>> single operation - to make sure the memory block cannot get onlined by
->>>> user space again before it gets removed.
->>>
->>> Why does that matter? Is it really likely that the userspace would
->>> interfere? What would be the scenario?
->>
->> I guess it's not that relevant after all (I think this comment dates
->> back to the times where we didn't have try_remove_memory() and could
->> actually BUG_ON() in remove_memory() if there would have been a race).
->> Can drop that part.
->>
->>>
->>> Or is still mostly about not requiring callers to open code this general
->>> patter?
->>
->> From kernel module context, I cannot get access to the actual memory
->> block device (find_memory_block()) and call the device_unregister().
->>
->> Especially, also the device hotplug lock is not exported. So this is a
->> clean helper function to be used from kernel module context. (e.g., also
->> hyper-v showed interest for using that)
-> 
-> Fair enough.
-> 
+Haiwei Li <lihaiwei.kernel@gmail.com> writes:
 
-I'll send a v1 shortly, I rephrased the description to make this clear.
-Thanks!
+>  From 1f755f75dfd73ad7cabb0e0f43e9993dd9f69120 Mon Sep 17 00:00:00 2001
+> From: Haiwei Li <lihaiwei@tencent.com>
+> Date: Mon, 2 Mar 2020 19:19:59 +0800
+> Subject: [PATCH] KVM: SVM: Fix svm the vmexit error_code of WRMSR
+>
+> In svm, exit_code of write_msr is not EXIT_REASON_MSR_WRITE which
+> belongs to vmx.
+
+EXIT_REASON_MSR_WRITE is '32', in SVM this corresponds to
+SVM_EXIT_READ_DR0. There were issues I guess. Or did you only detect
+that the fastpath is not working?
+
+>
+> According to amd manual, SVM_EXIT_MSR(7ch) is the exit_code of VMEXIT_MSR
+> due to RDMSR or WRMSR access to protected MSR. Additionally, the processor
+> indicates in the VMCB's EXITINFO1 whether a RDMSR(EXITINFO1=0) or
+> WRMSR(EXITINFO1=1) was intercepted.
+>
+> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+
+Fixes: 1e9e2622a149 ("KVM: VMX: FIXED+PHYSICAL mode single target IPI fastpath")
+
+> ---
+>   arch/x86/kvm/svm.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index fd3fc9f..ef71755 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -6296,7 +6296,8 @@ static void svm_handle_exit_irqoff(struct kvm_vcpu
+> *vcpu,
+>          enum exit_fastpath_completion *exit_fastpath)
+>   {
+>          if (!is_guest_mode(vcpu) &&
+> -               to_svm(vcpu)->vmcb->control.exit_code ==
+> EXIT_REASON_MSR_WRITE)
+
+There is an extra newline here (in case it's not just me).
+
+> +               (to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR) &&
+> +               (to_svm(vcpu)->vmcb->control.exit_info_1 & 1))
+
+Could we add defines for '1' and '0', like
+SVM_EXITINFO_MSR_WRITE/SVM_EXITINFO_MSR_READ maybe?
+
+>                  *exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
+>   }
+>
+> --
+> 1.8.3.1
+>
 
 -- 
-Thanks,
-
-David / dhildenb
+Vitaly
 
