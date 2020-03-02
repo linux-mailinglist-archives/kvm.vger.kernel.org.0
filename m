@@ -2,101 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D59C176268
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 19:22:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AB2E1762B0
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 19:29:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727407AbgCBSWN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 13:22:13 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56861 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726451AbgCBSWN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 13:22:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583173332;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ih5//RAv6LhCAV7ANNWMSlbgMbwpFxJEPQWnbvDX1pk=;
-        b=bN5i+rDRRehkh6Ub9LLvs7GniUBaTvaMvyCIXVrfio8rZEHSNUGYEuyw34Hru5jmEOiejA
-        y3RMBqcGnzNLf+vpX94ooMCflne/uh9idDqPW/RkKMMLRcaY9YzQrV0FhhXwJBa9vjl6Q8
-        R70pDOHF6wgCm89qig/2WYtpRGgM/50=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-nrdEyi_9Ns-PXnBHF-Bodg-1; Mon, 02 Mar 2020 13:22:11 -0500
-X-MC-Unique: nrdEyi_9Ns-PXnBHF-Bodg-1
-Received: by mail-wr1-f71.google.com with SMTP id w6so59762wrm.16
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 10:22:11 -0800 (PST)
+        id S1727502AbgCBS31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 13:29:27 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:34986 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727316AbgCBS31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 13:29:27 -0500
+Received: by mail-wm1-f68.google.com with SMTP id m3so136776wmi.0;
+        Mon, 02 Mar 2020 10:29:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ih5//RAv6LhCAV7ANNWMSlbgMbwpFxJEPQWnbvDX1pk=;
-        b=Bpo/bRH88mHRnNz9Wps/y06SqkKdZaLowGde+LwoNZ9QVNUc9CSnMrjqiYYK6xPWi4
-         vyN+E0KYA/42iaCHoJeNFlihWhGZMsI0AQoJLGi0JBE2eBD0Jc+5Yg+UteWXIi7Tvg5u
-         Hn5KDa8zCr2e31LnAyNfwVTwE2AaY838IPwwtLfK1w3J8+sL+ZT1Of0H8yEqNepjfUuC
-         tjtdJBoWIUMJYh82EZPi11urubdDOmCtaliN5cifwyTNTm2W1Ax2wdUgtHQZB4cmN0Yq
-         O1gn78NNox3s6iAMIyNxRdeUbtokPDiTjYLvAmv1qPIg6OgSeN/FqyJXPb0jdOcXrttX
-         eGWA==
-X-Gm-Message-State: ANhLgQ1u8WRRanc+Cni6IngvIt2Lnuwe8/Xkj5MSxl7suww7yeUQPvq4
-        CHdH7OM0SMQ43jeuVejvxecCXMBcwy6QSl949Fg29qxgzXpcht75qFB50NaUXmlqLh43jRclKX/
-        c+O9FNRzv1AvH
-X-Received: by 2002:a1c:cc06:: with SMTP id h6mr40737wmb.118.1583173330032;
-        Mon, 02 Mar 2020 10:22:10 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vs9ZQ2SoIISj8TdDsBbhc3slcREpZ8XKsZ1xcKoa/2yEi4GDeN1FpR2ke/iKZ7ArhjCgTZ7JA==
-X-Received: by 2002:a1c:cc06:: with SMTP id h6mr40717wmb.118.1583173329766;
-        Mon, 02 Mar 2020 10:22:09 -0800 (PST)
-Received: from [192.168.178.40] ([151.30.85.6])
-        by smtp.gmail.com with ESMTPSA id a184sm346359wmf.29.2020.03.02.10.22.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2020 10:22:09 -0800 (PST)
-Subject: Re: [PATCH v3] KVM: X86: Just one leader to trigger kvmclock sync
- request
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <kernellwp@gmail.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <1582859921-11932-1-git-send-email-wanpengli@tencent.com>
- <87lfoihpwt.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f0fe943d-bdd0-1150-6d22-e7e48416da6d@redhat.com>
-Date:   Mon, 2 Mar 2020 19:22:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hKkgF2JN7gykCZKvbDhRvANS70H1+8HoXvuiM9rtoLA=;
+        b=qZVioLE+WftFPjkmp8r/hCYKdNuz8Nqd1wQhgTv41irFucKMUR8GCL3f6CiChOsl7I
+         EHwGHd1nwc+fgobvS5tYHhWAHRgv7BwxM3MWN7a+2k6u+P1YmBk9spBgpaZh6jf7bR+d
+         VuI2rEofepRiOAjbvnfygNfF0rV03rijolL1OsJQGozw2uowdZ/G5HG8TIaf7va/fm/K
+         TNGb7sv+xx6dgeeZWVcXtt+nJAgJjNsAD3w6s+/5Bt9QmuOnR2x/5vRoD2/sqoDhvcNB
+         CPlztvlVe67kfYmvrsh2dOIWMBtahM3cPpQj4t7KMfEM7SL60uKw0qzbMX3dBx9HWVSn
+         YHXw==
+X-Gm-Message-State: ANhLgQ3DAwbynbWPKVx/ta/GRhMZsmpyt5mgECs+mJYnPHpfdeucNsRe
+        1RO8MF1mySGVwE19/vh3Zw0=
+X-Google-Smtp-Source: ADFU+vuD+iUqdIsN7GsQwMdgoFIg5mjnb/d3Y1e+SHBuYQQus1FBM/XQRItFBGMXPRhig1FWUl0HpQ==
+X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr330579wmi.21.1583173764395;
+        Mon, 02 Mar 2020 10:29:24 -0800 (PST)
+Received: from localhost (ip-37-188-163-134.eurotel.cz. [37.188.163.134])
+        by smtp.gmail.com with ESMTPSA id j5sm29915868wrw.24.2020.03.02.10.29.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2020 10:29:23 -0800 (PST)
+Date:   Mon, 2 Mar 2020 19:29:22 +0100
+From:   Michal Hocko <mhocko@kernel.org>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        Samuel Ortiz <samuel.ortiz@intel.com>,
+        Robert Bradford <robert.bradford@intel.com>,
+        Luiz Capitulino <lcapitulino@redhat.com>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+        teawater <teawaterz@linux.alibaba.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Alexander Potapenko <glider@google.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Anthony Yznaga <anthony.yznaga@oracle.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Young <dyoung@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Juergen Gross <jgross@suse.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Len Brown <lenb@kernel.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Oscar Salvador <osalvador@suse.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Pavel Tatashin <pavel.tatashin@microsoft.com>,
+        Pingfan Liu <kernelfans@gmail.com>, Qian Cai <cai@lca.pw>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Wei Yang <richard.weiyang@gmail.com>
+Subject: Re: [PATCH v1 00/11] virtio-mem: paravirtualized memory
+Message-ID: <20200302182922.GT4380@dhcp22.suse.cz>
+References: <20200302134941.315212-1-david@redhat.com>
+ <7f8a9225-99f2-b00d-241f-ef934395c667@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87lfoihpwt.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7f8a9225-99f2-b00d-241f-ef934395c667@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/03/20 14:01, Vitaly Kuznetsov wrote:
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9389,11 +9389,9 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  
->         mutex_unlock(&vcpu->mutex);
->  
-> -       if (!kvmclock_periodic_sync)
-> -               return;
-> -
-> -       schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
-> -                                       KVMCLOCK_SYNC_PERIOD);
-> +       if (vcpu->vcpu_idx == 0 && kvmclock_periodic_sync)
-> +               schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
-> +                                     KVMCLOCK_SYNC_PERIOD);
->  }
+On Mon 02-03-20 19:15:09, David Hildenbrand wrote:
+[...]
+> As requested by Michal, I will squash some patches.
 
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Just to clarify. If I am the only one to care then do not bother.
+Btw. I still have patch 6 on the todo list to review. I just didn't find
+time for it today.
 
-Good idea, I squashed the change.
-
-Paolo
-
+-- 
+Michal Hocko
+SUSE Labs
