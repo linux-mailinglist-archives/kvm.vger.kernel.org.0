@@ -2,129 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 73D621762E7
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 19:42:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58DC21762EF
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 19:42:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727439AbgCBSmL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 13:42:11 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35011 "EHLO
+        id S1727647AbgCBSmk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 13:42:40 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52513 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727388AbgCBSmL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 13:42:11 -0500
+        by vger.kernel.org with ESMTP id S1727542AbgCBSmh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 13:42:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583174530;
+        s=mimecast20190719; t=1583174557;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=x+PcEaMz7vD6r/sekHWdoFeMEXe7RrhKK1hXyARhweQ=;
-        b=Zvw7P6UezZW0uzjslnqGdGXALYEl3gct2vxZAg9UMzh3crsCgN6MrlwK+5TmKLXNhaYRCg
-        rv2qp2wlFvnbONUkRDVt0Be85/AaZZmhKdnT5Jtrc65vbRUGGBa4ZQLkVz+UcbV5lly/DU
-        zCv+x6YFvsTf/6nSkySeh6FjAIsLQkw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-SKy6hr5lPZykom0-L2Nqvw-1; Mon, 02 Mar 2020 13:42:06 -0500
-X-MC-Unique: SKy6hr5lPZykom0-L2Nqvw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77684107ACC4;
-        Mon,  2 Mar 2020 18:42:03 +0000 (UTC)
-Received: from [10.36.116.60] (ovpn-116-60.ams2.redhat.com [10.36.116.60])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DCDBB19C7F;
-        Mon,  2 Mar 2020 18:41:55 +0000 (UTC)
-Subject: Re: [PATCH v1 06/11] mm: Allow to offline unmovable PageOffline()
- pages via MEM_GOING_OFFLINE
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+         in-reply-to:in-reply-to:references:references;
+        bh=6nZFkyEGmcNit7gYHhD2J1/glw8rNRs29/DOfk8LqAE=;
+        b=aV+iUx7ohVDE4vK1ab3j1AyIM4g3yycDNqXJGm3is9IXRKOVjN3qS4alAhmc+EhL8MFZZn
+        vjYIMeav0z1GsHjUOumkULtLb0HUGUauVJJbgjyyktZXcCXYk94q2BXrOFc9LOvWQd52Hs
+        bXgS3lf4lcLRq+p9Y6en8Qwea0y21gM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-aIljVPf6MzuXcK5T5GLE-A-1; Mon, 02 Mar 2020 13:42:35 -0500
+X-MC-Unique: aIljVPf6MzuXcK5T5GLE-A-1
+Received: by mail-wr1-f72.google.com with SMTP id z16so82899wrm.15
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 10:42:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6nZFkyEGmcNit7gYHhD2J1/glw8rNRs29/DOfk8LqAE=;
+        b=bWY5M8FfsPVjA1lPq1qSQ9xTmTBHelZtYnm2/0APJCZEIpUxu4rsJFwFCf+Toe3jE7
+         /4sD6Wm0InfQzkOVnmanHPoJMSgsIcjlc41dStWO2GcrMsPJUYNBWFKaESCIuHEbjMJt
+         +ekP44VWZdi/kzKdEwVKslVQRrVuw30z2fHMpzVMUpG9XZc/cscVXpSJ2VGNIu07banC
+         c+nFTiaLfati2LUneTOSv9xnbz/jeoiN7eWaQVGtJezhAJAFj0Debf92KZ88CmfEeXJa
+         Sb5huhJltSmYPKK0KtoKNnP7xve2cY59rCDliDOb/8keLphS3QPLRFQvv+Hxw7czklE1
+         SohA==
+X-Gm-Message-State: ANhLgQ1VSuwjApXsNBOvza18LrqSn+FhYd1iuHizpp4bBr9nVqArehhO
+        qqXTJ899if4QpkRXz1JPSDPoMp5CVoLLqFxDsFAy8YniYBTztmaGN30a/8QGBm2TA3BELW2kNoP
+        a7A77xN/eeMHp
+X-Received: by 2002:adf:dccb:: with SMTP id x11mr870747wrm.214.1583174554008;
+        Mon, 02 Mar 2020 10:42:34 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtIlUFnhvyvv59cDdCKG7b+P9Hle/BB4YizYqxjffgshDK3TzmwPGP72+wVgq4/Dcv41kNI2A==
+X-Received: by 2002:adf:dccb:: with SMTP id x11mr870739wrm.214.1583174553703;
+        Mon, 02 Mar 2020 10:42:33 -0800 (PST)
+Received: from [192.168.178.40] ([151.30.85.6])
+        by smtp.gmail.com with ESMTPSA id r19sm394854wmh.26.2020.03.02.10.42.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2020 10:42:32 -0800 (PST)
+Subject: Re: [PATCH v2 00/13] KVM: x86: Allow userspace to disable the
+ emulator
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Pavel Tatashin <pavel.tatashin@microsoft.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Qian Cai <cai@lca.pw>, Pingfan Liu <kernelfans@gmail.com>
-References: <20200302134941.315212-1-david@redhat.com>
- <20200302134941.315212-7-david@redhat.com>
- <abac569d8d1978aebadf71b65cdeb240a6256ad2.camel@linux.intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <65d4aadd-4d19-865a-3b65-d6a6d4f23dc5@redhat.com>
-Date:   Mon, 2 Mar 2020 19:41:39 +0100
+References: <20200218232953.5724-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3ec358a8-859d-9ef1-7392-372d55b28ee4@redhat.com>
+Date:   Mon, 2 Mar 2020 19:42:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <abac569d8d1978aebadf71b65cdeb240a6256ad2.camel@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200218232953.5724-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.03.20 18:40, Alexander Duyck wrote:
-> Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On 19/02/20 00:29, Sean Christopherson wrote:
+> The primary intent of this series is to dynamically allocate the emulator
+> and get KVM to a state where the emulator *could* be disabled at some
+> point in the future.  Actually allowing userspace to disable the emulator
+> was a minor change at that point, so I threw it in.
+> 
+> Dynamically allocating the emulator shrinks the size of x86 vcpus by
+> ~2.5k bytes, which is important because 'struct vcpu_vmx' has once again
+> fattened up and squeaked past the PAGE_ALLOC_COSTLY_ORDER threshold.
+> Moving the emulator to its own allocation gives us some breathing room
+> for the near future, and has some other nice side effects.
+> 
+> As for disabling the emulator... in the not-too-distant future, I expect
+> there will be use cases that can truly disable KVM's emulator, e.g. for
+> security (KVM's and/or the guests).  I don't have a strong opinion on
+> whether or not KVM should actually allow userspace to disable the emulator
+> without a concrete use case (unless there already is a use case?), which
+> is why that part is done in its own tiny patch.
+> 
+> Running without an emulator has been "tested" in the sense that the
+> selftests that don't require emulation continue to pass, and everything
+> else fails with the expected "emulation error".
 
-Thanks a lot Alex!
+I agree with Vitaly that, if we want this, it should be a KVM_ENABLE_CAP
+instead.  The first 10 patches are very nice cleanups though so I plan
+to apply them (with Vitaly's suggested nits for review) after you answer
+the question on patch 10.
 
--- 
-Thanks,
+Paolo
 
-David / dhildenb
+> 
+> v2:
+>   - Rebase to kvm/queue, 2c2787938512 ("KVM: selftests: Stop ...")
+> 
+> Sean Christopherson (13):
+>   KVM: x86: Refactor I/O emulation helpers to provide vcpu-only variant
+>   KVM: x86: Explicitly pass an exception struct to check_intercept
+>   KVM: x86: Move emulation-only helpers to emulate.c
+>   KVM: x86: Refactor R/W page helper to take the emulation context
+>   KVM: x86: Refactor emulated exception injection to take the emul
+>     context
+>   KVM: x86: Refactor emulate tracepoint to explicitly take context
+>   KVM: x86: Refactor init_emulate_ctxt() to explicitly take context
+>   KVM: x86: Dynamically allocate per-vCPU emulation context
+>   KVM: x86: Move kvm_emulate.h into KVM's private directory
+>   KVM: x86: Shrink the usercopy region of the emulation context
+>   KVM: x86: Add helper to "handle" internal emulation error
+>   KVM: x86: Add variable to control existence of emulator
+>   KVM: x86: Allow userspace to disable the kernel's emulator
+> 
+>  arch/x86/include/asm/kvm_host.h             |  12 +-
+>  arch/x86/kvm/emulate.c                      |  13 +-
+>  arch/x86/{include/asm => kvm}/kvm_emulate.h |   9 +-
+>  arch/x86/kvm/mmu/mmu.c                      |   1 +
+>  arch/x86/kvm/svm.c                          |   5 +-
+>  arch/x86/kvm/trace.h                        |  22 +--
+>  arch/x86/kvm/vmx/vmx.c                      |  15 +-
+>  arch/x86/kvm/x86.c                          | 193 +++++++++++++-------
+>  arch/x86/kvm/x86.h                          |  12 +-
+>  9 files changed, 183 insertions(+), 99 deletions(-)
+>  rename arch/x86/{include/asm => kvm}/kvm_emulate.h (99%)
+> 
 
