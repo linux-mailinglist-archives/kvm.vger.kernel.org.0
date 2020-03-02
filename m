@@ -2,83 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 79387176525
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 21:37:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6429D17654D
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 21:49:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726791AbgCBUhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 15:37:32 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23498 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726778AbgCBUhc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 15:37:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583181451;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=zqvrLEQk5BMgju+RSyn/5B7EOYMlf2EShnIdivH2s10=;
-        b=S0v6yfLq492eJgoGqghjFJDuFhWVEqZHP1Cfw83ioab3FDqMtt0v48jWRXcQMhlb9QXcW3
-        M0NlY6Cu+IBIieFQWUDFgyV9mGxWGcHsMR5amqKERAG8zj9Piz0fX10ApYNBkOoTBzKVsP
-        PKxfM2CP0O9WfDXxtEihwGoC5de1dnQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-bC9Ty_ouO8GLgdEtXWVwHg-1; Mon, 02 Mar 2020 15:37:27 -0500
-X-MC-Unique: bC9Ty_ouO8GLgdEtXWVwHg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6328D13E5;
-        Mon,  2 Mar 2020 20:37:26 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-59.ams2.redhat.com [10.36.116.59])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B5045DD73;
-        Mon,  2 Mar 2020 20:37:19 +0000 (UTC)
-From:   Eric Auger <eric.auger@redhat.com>
-To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        alex.williamson@redhat.com
-Cc:     andre.przywara@arm.com, stable@vger.kernel.org, cohuck@redhat.com
-Subject: [PATCH] vfio: platform: Switch to platform_get_irq_optional()
-Date:   Mon,  2 Mar 2020 21:37:15 +0100
-Message-Id: <20200302203715.13889-1-eric.auger@redhat.com>
+        id S1726906AbgCBUsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 15:48:50 -0500
+Received: from goliath.siemens.de ([192.35.17.28]:50115 "EHLO
+        goliath.siemens.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725911AbgCBUsu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 15:48:50 -0500
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+        by goliath.siemens.de (8.15.2/8.15.2) with ESMTPS id 022KmR6k007017
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 2 Mar 2020 21:48:29 +0100
+Received: from [139.25.68.37] ([139.25.68.37])
+        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 022KmQfk011003;
+        Mon, 2 Mar 2020 21:48:26 +0100
+Subject: Re: [PATCH 5/6] KVM: x86: Rename "found" variable in kvm_cpuid() to
+ "exact_entry_exists"
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
+ <20200302195736.24777-6-sean.j.christopherson@intel.com>
+ <680d85ee-948c-6968-2d1a-d563d4863140@siemens.com>
+ <20200302203510.GF6244@linux.intel.com>
+From:   Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <42135019-bbb8-40e0-35c7-070365a5ad79@siemens.com>
+Date:   Mon, 2 Mar 2020 21:48:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200302203510.GF6244@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since commit 7723f4c5ecdb ("driver core: platform: Add an error
-message to platform_get_irq*()"), platform_get_irq() calls dev_err()
-on an error. As we enumerate all interrupts until platform_get_irq()
-fails, we now systematically get a message such as:
-"vfio-platform fff51000.ethernet: IRQ index 3 not found" which is
-a false positive.
+On 02.03.20 21:35, Sean Christopherson wrote:
+> On Mon, Mar 02, 2020 at 09:20:52PM +0100, Jan Kiszka wrote:
+>> On 02.03.20 20:57, Sean Christopherson wrote:
+>>> Rename "found" in kvm_cpuid() to "exact_entry_exists" to better convey
+>>> that the intent of the tracepoint's "found/not found" output is to trace
+>>> whether the output values are for the actual requested leaf or for some
+>>> other (likely unrelated) leaf that was found while processing entries to
+>>> emulate funky CPU behavior, e.g. the max basic leaf on Intel CPUs when
+>>> the requested CPUID leaf is out of range.
+>>>
+>>> Suggested-by: Jan Kiszka <jan.kiszka@siemens.com>
+>>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>>> ---
+>>>   arch/x86/kvm/cpuid.c | 6 +++---
+>>>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>>> index 869526930cf7..b0a4f3c17932 100644
+>>> --- a/arch/x86/kvm/cpuid.c
+>>> +++ b/arch/x86/kvm/cpuid.c
+>>> @@ -1002,10 +1002,10 @@ void kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>>>   {
+>>>   	const u32 function = *eax, index = *ecx;
+>>>   	struct kvm_cpuid_entry2 *entry;
+>>> -	bool found;
+>>> +	bool exact_entry_exists;
+>>>   	entry = kvm_find_cpuid_entry(vcpu, function, index);
+>>> -	found = entry;
+>>> +	exact_entry_exists = !!entry;
+>>>   	/*
+>>>   	 * Intel CPUID semantics treats any query for an out-of-range
+>>>   	 * leaf as if the highest basic leaf (i.e. CPUID.0H:EAX) were
+>>> @@ -1047,7 +1047,7 @@ void kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>>>   			}
+>>>   		}
+>>>   	}
+>>> -	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, found);
+>>> +	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, exact_entry_exists);
+>>
+>> Actually, I think we also what to change output in the tracepoint.
+> 
+> Oh, I definitely want to change it, but AIUI it's ABI and shouldn't be
+> changed.  Paolo?
+> 
 
-Let's use platform_get_irq_optional() instead.
+This can be discovered via the format string in sysfs and handled by the 
+consumer. But I'm not an expert in the tracing ABI.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Cc: stable@vger.kernel.org # v5.3+
----
- drivers/vfio/platform/vfio_platform.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Jan
 
-diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platfor=
-m/vfio_platform.c
-index ae1a5eb98620..1e2769010089 100644
---- a/drivers/vfio/platform/vfio_platform.c
-+++ b/drivers/vfio/platform/vfio_platform.c
-@@ -44,7 +44,7 @@ static int get_platform_irq(struct vfio_platform_device=
- *vdev, int i)
- {
- 	struct platform_device *pdev =3D (struct platform_device *) vdev->opaqu=
-e;
-=20
--	return platform_get_irq(pdev, i);
-+	return platform_get_irq_optional(pdev, i);
- }
-=20
- static int vfio_platform_probe(struct platform_device *pdev)
---=20
-2.20.1
-
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
