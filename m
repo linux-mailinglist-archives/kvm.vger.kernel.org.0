@@ -2,98 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A215D175A28
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 13:15:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75A4F175A4D
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 13:19:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727589AbgCBMPQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 07:15:16 -0500
-Received: from gate.crashing.org ([63.228.1.57]:40759 "EHLO gate.crashing.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725802AbgCBMPQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 07:15:16 -0500
-Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
-        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 022CEvNK020865;
-        Mon, 2 Mar 2020 06:14:58 -0600
-Received: (from segher@localhost)
-        by gate.crashing.org (8.14.1/8.14.1/Submit) id 022CEtSw020859;
-        Mon, 2 Mar 2020 06:14:55 -0600
-X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
-Date:   Mon, 2 Mar 2020 06:14:55 -0600
-From:   Segher Boessenkool <segher@kernel.crashing.org>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>
-Subject: Re: [GIT PULL] Second batch of KVM changes for Linux 5.6-rc4 (or rc5)
-Message-ID: <20200302121455.GH22482@gate.crashing.org>
-References: <1583089390-36084-1-git-send-email-pbonzini@redhat.com> <CAHk-=wiin_LkqP2Cm5iPc5snUXYqZVoMFawZ-rjhZnawven8SA@mail.gmail.com> <87pndvrpvj.fsf@mpe.ellerman.id.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87pndvrpvj.fsf@mpe.ellerman.id.au>
-User-Agent: Mutt/1.4.2.3i
+        id S1727851AbgCBMTl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 07:19:41 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:44062 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727267AbgCBMTl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 07:19:41 -0500
+Received: by mail-ed1-f66.google.com with SMTP id g19so13005657eds.11;
+        Mon, 02 Mar 2020 04:19:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=G/f6M+HBAL4DqhW0c1p6bk4sytP2vYJy/i55zifn5Jk=;
+        b=KXBL9v6wyp6mGHBavSEyUHPC7wdx5NE9+19vaHLaQPb6Ln6uPjQLYM6gkPhEIy7LbZ
+         zjR/je8Rualwm5StcN/6KtHwZAygVAPkHHufletcymi5MBwT/JtvVTlBQWkvNxgSNWL2
+         btjgci44eHkrXqZiKqqZfO3ukli+j6gc/3T8FBnUiWRVo+WqVppV/tJQt2sxxYp5C8oO
+         3jbk8nBHvrTVAcYJUqq9YuKyNbzeBUpcgEnXMkj6sZGJDxshQ7fHBufzvj2RV5QUQezE
+         YHZKOkuTpDhTfQjSOToHoFC6hMFj4FSPWJr3ByOOsOVQ2EN6obPxD0dSknI1n4UP2vZ7
+         dF8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=G/f6M+HBAL4DqhW0c1p6bk4sytP2vYJy/i55zifn5Jk=;
+        b=UbMQ4oTzgR/gYkh++TPlHcpQnMnwV17CcgKRWhsJzehuYpZNlTYmDCWF7ru3I7KIZY
+         njxb54aVV5NUaQo+O/dzGOwI0co68EUDsrKlqbiig6BqlMFBnULCeEwcZySXsHZdWI53
+         rJbEt1kJCzN9rq/kA+IsO/DiWNQHFs8LuCNFtD+EtcE9ZU+I5bIsDcKfYqzaSq7dsb00
+         JQCzVLBZsSCEfE5u/old56Hf3alvEImB0mYnIpK3Dm0drAgT491Oh7RZTmDG6LWxZfo8
+         oX22uSGWo48HdqiVdCv+6iitKYTH62iigvEmZbSnDTqXPY0gBbKhElMgpBG/pVVqbuED
+         hsMw==
+X-Gm-Message-State: ANhLgQ1jAVYEDBUrzGkKxJE2+BT7/iv5Lb9CwhJreZDEwOj9mUicl+Os
+        xThhA8oAPLsorpwBZnirz7DzF9woevK2sJyZs18+
+X-Google-Smtp-Source: ADFU+vvc/UCNpbkJV2EIc9o+6JskdV54r70wFEAdITkyCL/3CMdTefLpyOzqHlscsZu6AjkA+qVd42CsAvWgIimb5x4=
+X-Received: by 2002:a50:9f68:: with SMTP id b95mr770815edf.96.1583151579669;
+ Mon, 02 Mar 2020 04:19:39 -0800 (PST)
+MIME-Version: 1.0
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Date:   Mon, 2 Mar 2020 20:19:28 +0800
+Message-ID: <CAB5KdOZwZUvgmHX5C53SBU0WttEF4wBFpgqiGahD2OkojQJZ-Q@mail.gmail.com>
+Subject: [PATCH] KVM: SVM: Fix svm the vmexit error_code of WRMSR
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        kvm@vger.kernel.org, x86@kernel.org
+Cc:     hpa@zytor.com, bp@alien8.de, "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "joro@8bytes.org" <joro@8bytes.org>, jmattson@google.com,
+        wanpengli@tencent.com, "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 02, 2020 at 09:51:44PM +1100, Michael Ellerman wrote:
-> Linus Torvalds <torvalds@linux-foundation.org> writes:
-> > Michael, what tends to be the triggers for people using
-> > PPC_DISABLE_WERROR? Do you have reports for it?
-> 
-> My memory is that we have had very few reports of it actually causing
-> problems. But I don't have hard data to back that up.
+ From 1f755f75dfd73ad7cabb0e0f43e9993dd9f69120 Mon Sep 17 00:00:00 2001
+From: Haiwei Li <lihaiwei@tencent.com>
+Date: Mon, 2 Mar 2020 19:19:59 +0800
+Subject: [PATCH] KVM: SVM: Fix svm the vmexit error_code of WRMSR
 
-I build all archs with GCC trunk.
+In svm, exit_code of write_msr is not EXIT_REASON_MSR_WRITE which
+belongs to vmx.
 
-It always breaks for me, with thousands of errors, which is why since
-many years I carry 21 lines of patch to thoroughly disable -Werror for
-the powerpc arch.  It takes over a year from when a warning is added to
-the kernel taking care of it -- and of course, I build with the current
-development version of the compiler, so I get to see many misfiring
-warnings and other fallout as well.  (Currently there are more than 100
-warnings, this is way too many to consider attacking that as well).
+According to amd manual, SVM_EXIT_MSR(7ch) is the exit_code of VMEXIT_MSR
+due to RDMSR or WRMSR access to protected MSR. Additionally, the processor
+indicates in the VMCB's EXITINFO1 whether a RDMSR(EXITINFO1=0) or
+WRMSR(EXITINFO1=1) was intercepted.
 
-> It has tripped up the Clang folks, but that's partly because they're
-> building clang HEAD, and also because ~zero powerpc kernel developers
-> are building regularly with clang. I'm trying to fix the latter ...
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+  arch/x86/kvm/svm.c | 3 ++-
+  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Is anyone building regularly with GCC HEAD?  Power or any other arch?
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index fd3fc9f..ef71755 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -6296,7 +6296,8 @@ static void svm_handle_exit_irqoff(struct kvm_vcpu
+*vcpu,
+         enum exit_fastpath_completion *exit_fastpath)
+  {
+         if (!is_guest_mode(vcpu) &&
+-               to_svm(vcpu)->vmcb->control.exit_code ==
+EXIT_REASON_MSR_WRITE)
++               (to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR) &&
++               (to_svm(vcpu)->vmcb->control.exit_info_1 & 1))
+                 *exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
+  }
 
-> And then building with GCC head sometimes requires disabling -Werror
-> because of some new warning, sometimes valid sometimes not.
-
-Yes.  And never worth breaking the build for.
-
--Werror is something you use if you do not trust your developers.
-
-Warnings are not errors.  The compiler warns for things that
-heuristically look suspicious.  And it errors for things that are wrong.
-
-Some warnings have many false positives, but are so useful (find many
-nasty problems, for example) that it is worth enabling them often.
--Werror sabotages that, giving people an extra incentive to disable
-useful warnings.
-
-> I think we could mostly avoid those problems by having the option only
-> on by default for known compiler versions.
-
-Well, the kernel disables most useful warnings anyway, so that might
-even work, sure.
-
-> It'd also be nice if we could do:
-> 
->  $ make WERROR=0
-> 
-> Or something similarly obvious to turn off the WERROR option. That way
-> users don't even have to edit their .config manually, they just rerun
-> make with WERROR=0 and it works.
-
-That would be nice, yes, that would help my situation as well.
-
-
-Segher
+--
+1.8.3.1
