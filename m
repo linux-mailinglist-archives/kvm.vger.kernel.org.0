@@ -2,91 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 09DA3175891
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 11:41:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E0791758B2
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 11:52:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727146AbgCBKl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 05:41:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37225 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726654AbgCBKl0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 05:41:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583145685;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W/No+zSqneGbjc27RGNY0R0gIKfmegvgk6I94PCXiQI=;
-        b=Jb59s3/MuVttVOpl+gBeLwdTafjUpK8T1oMgbKeQRp6GJmoJ8Vyh5Su98GextM3cG2Xv9d
-        aBPAp8TRVRDETYGMvN7If9YSRvM51yLoU5whVNGOtkY+8zWcLP1MsIiJlAXXOt/CrxVZeh
-        AAQt2hksGGEEzuzDupGH/+pq888WnPc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-aeS6HzSoM9Srvb4FwdZyxQ-1; Mon, 02 Mar 2020 05:41:24 -0500
-X-MC-Unique: aeS6HzSoM9Srvb4FwdZyxQ-1
-Received: by mail-wm1-f70.google.com with SMTP id b23so648699wmj.3
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 02:41:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=W/No+zSqneGbjc27RGNY0R0gIKfmegvgk6I94PCXiQI=;
-        b=dq7DNOjJs18qFSUwoatX4wtw6Gqjt2Oq+8OpT+QJftk1Vg4NOwMeBb26jXcKiVZVVr
-         HQ/2nv86xknIYSkjnTPXDfBdTnDPFl2NreUc7cjhuLOOcxeK+Fj7ATqWeCcdxGGz26+7
-         XAwU3oLrCnfWqf7yPDf+tEEy5BKr107Aydtq/m4gzwNcTbbrTQYMDw/okQXQW0yFFR/S
-         bhOTMiDWEKoj6sRURC+m+JUuLYaWpaQ7MqIYPlow8aTlRbLAzG7SPkrPNiiwWpnBxoF9
-         2SMhxk7yP83dCROF7WkSUEka79ACTMR8TZKVq7vh+xJzZUxJVjs3HlVx08SNqjd+/Ukd
-         PxOg==
-X-Gm-Message-State: APjAAAUDyy0OnZbOq0+TJjuqxEJwquGyNIxLQW0iqsl1yvL8BeRAI0IF
-        iCpK+xKnnoxzq7NRIw1BgXTmiVp4X7egnnVsLpkIGmdNrWmfU5CSAm9OvmD5IEkiZi6gFPmO/C0
-        5NKgFCde74nlZ
-X-Received: by 2002:adf:ec0e:: with SMTP id x14mr20684970wrn.270.1583145682637;
-        Mon, 02 Mar 2020 02:41:22 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxr5BG762XJibpFKMG4qKy++MMibwFPZUGzvUBIxE+6bF6Hv9ol6loBGjhblNJ67DPHLJxYFQ==
-X-Received: by 2002:adf:ec0e:: with SMTP id x14mr20684948wrn.270.1583145682375;
-        Mon, 02 Mar 2020 02:41:22 -0800 (PST)
-Received: from [192.168.178.40] ([151.30.85.6])
-        by smtp.gmail.com with ESMTPSA id o18sm23121454wrv.60.2020.03.02.02.41.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2020 02:41:21 -0800 (PST)
-Subject: Re: [PATCH v2] x86/kvm: Handle async page faults directly through
- do_page_fault()
-To:     Nadav Amit <nadav.amit@gmail.com>,
-        Andy Lutomirski <luto@kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86 <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>
-References: <53626d08de5df34eacce80cb74f19a06fdc690c6.1582998497.git.luto@kernel.org>
- <34082A11-321D-4DF0-A076-7BBF332DCA66@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <328119b6-38a3-8b74-9e89-629977316ff4@redhat.com>
-Date:   Mon, 2 Mar 2020 11:41:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1727365AbgCBKvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 05:51:52 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:56029 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726874AbgCBKvw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 05:51:52 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 48WH5J5J6mz9sSb;
+        Mon,  2 Mar 2020 21:51:48 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1583146309;
+        bh=b16uewG1Ij2M7fZzm8YX4KBgHz05Ojayzf65tUSrteo=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=WRPVw0MYXwNvewO+4MvrFWaQWlL9dS4BusnrqtmZQRlGB+6kh6XdQbJ/NkeAkZ62e
+         rlG+sfqNrJSwQZkKVb1KYy++Hwq3hKemJCshjrf8Ul5gYnrEvmiUMs9rYyRGr4zZMO
+         QYD1e9yH1usGu4q46IOfyy79zR4/gTgA/r7v70iHo0En1K88RvIPnU7aEw/XfgBxCC
+         yTIV7VGmeV35zMHdeCXfeOCtivsGQeFeUJxLuVxvoQzZY9HqbT+f46YCgXrabWIDX/
+         ObdNVmIgrcAwBbyKsB4NpkWSMMnJzuTnrqCohNz/LkiwWjnmvAN98GsRzO/41qd6rl
+         t+SkcBlfdgzHA==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: Re: [GIT PULL] Second batch of KVM changes for Linux 5.6-rc4 (or rc5)
+In-Reply-To: <CAHk-=wiin_LkqP2Cm5iPc5snUXYqZVoMFawZ-rjhZnawven8SA@mail.gmail.com>
+References: <1583089390-36084-1-git-send-email-pbonzini@redhat.com> <CAHk-=wiin_LkqP2Cm5iPc5snUXYqZVoMFawZ-rjhZnawven8SA@mail.gmail.com>
+Date:   Mon, 02 Mar 2020 21:51:44 +1100
+Message-ID: <87pndvrpvj.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <34082A11-321D-4DF0-A076-7BBF332DCA66@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/03/20 10:28, Nadav Amit wrote:
-> 
-> Yet, this might be a slippery slope, making Linux optimized to run on KVM
-> (and maybe Xen). In other words, I wonder whether a similar change was
-> acceptable for a paravirtual feature that is only supported by a proprietary
-> hypervisor, such as Hyper-V or VMware.
+Linus Torvalds <torvalds@linux-foundation.org> writes:
+> On Sun, Mar 1, 2020 at 1:03 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> Paolo Bonzini (4):
+>>       KVM: allow disabling -Werror
+>
+> Honestly, this is just badly done.
+>
+> You've basically made it enable -Werror only for very random
+> configurations - and apparently the one you test.
+>
+> Doing things like COMPILE_TEST disables it, but so does not having
+> EXPERT enabled.
+>
+> So it looks entirely ad-hoc and makes very little sense. At least the
+> "with KASAN, disable this" part makes sense, since that's a known
+> source or warnings. But everything else looks very random.
+>
+> I've merged this, but I wonder why you couldn't just do what I
+> suggested originally?
+>
+> Seriously, if you script your build tests, and don't even look at the
+> results, then you might as well use
+>
+>    make KCFLAGS=-Werror
+>
+> instead of having this kind of completely random option that has
+> almost no logic to it at all.
+>
+> And if you depend entirely on random build infrastructure like the
+> 0day bot etc, this likely _is_ going to break when it starts using a
+> new gcc version, or when it starts testing using clang, or whatever.
+> So then we end up with another odd random situation where now kvm (and
+> only kvm) will fail those builds just because they are automated.
+>
+> Yes, as I said in that original thread, I'd love to do -Werror in
+> general, at which point it wouldn't be some random ad-hoc kvm special
+> case for some random option. But the "now it causes problems for
+> random compiler versions" is a real issue again - but at least it
+> wouldn't be a random kernel subsystem that happens to trigger it, it
+> would be a _generic_ issue, and we'd have everybody involved when a
+> compiler change introduces a new warning.
+>
+> I've pulled this for now, but I really think it's a horrible hack, and
+> it's just done entirely wrong.
+>
+> Adding the powerpc people, since they have more history with their
+> somewhat less hacky one. Except that one automatically gets disabled
+> by "make allmodconfig" and friends, which is also kind of pointless.
+>
+> Michael, what tends to be the triggers for people using
+> PPC_DISABLE_WERROR? Do you have reports for it?
 
-Your concern is understandable.  I think in this case Andy's patch makes
-sense since there is a hooking mechanism that is used in exactly one
-case and there are no performance issues in removing it.  In fact if
-more hypervisors implemented a #PF extension I would keep the static
-branch, but use it to choose between a pvop and the default case; this
-would be a much more localized change, so arguably better than trap_init.
+My memory is that we have had very few reports of it actually causing
+problems. But I don't have hard data to back that up.
 
-Paolo
+It has tripped up the Clang folks, but that's partly because they're
+building clang HEAD, and also because ~zero powerpc kernel developers
+are building regularly with clang. I'm trying to fix the latter ...
 
+
+The thing that makes me disable -Werror (enable PPC_DISABLE_WERROR) most
+often is bisecting back to before fixes for my current compiler were
+merged.
+
+For example with GCC 8 if you go back before ~4.18 you hit the warning
+fixed by bee20031772a ("disable -Wattribute-alias warning for
+SYSCALL_DEFINEx()").
+
+And then building with GCC head sometimes requires disabling -Werror
+because of some new warning, sometimes valid sometimes not.
+
+I think we could mostly avoid those problems by having the option only
+on by default for known compiler versions.
+
+eg:
+
+config WERROR
+	bool "Build with -Werror"
+	default CC_IS_GCC && (GCC_VERSION >= 70000 && GCC_VERSION <= 90000)
+
+And we could bump the upper version up once each new GCC version has had
+any problems ironed out.
+
+> Could we have a _generic_ option that just gets enabled by default,
+> except it gets disabled by _known_ issues (like KASAN).
+
+Right now I don't think we could have a generic option that's enabled by
+default, there's too many warnings floating around on minor arches and
+in odd configurations.
+
+But we could have a generic option that signifies the desire to build
+with -Werror where possible, and then each arch/subsystem/etc could use
+that config option to enable -Werror in stages.
+
+Then after a release or three we could change the option to globally
+enable -Werror and opt-out any areas that are still problematic.
+
+It's also possible to use -Wno-error to turn certain warnings back into
+warnings even when -Werror is set, so that's another way we could
+incrementally attack the problem.
+
+
+It'd also be nice if we could do:
+
+ $ make WERROR=0
+
+Or something similarly obvious to turn off the WERROR option. That way
+users don't even have to edit their .config manually, they just rerun
+make with WERROR=0 and it works.
+
+
+> Being disabled for "make allmodconfig" is kind of against one of the
+> _points_ of "the build should be warning-free".
+
+True, it was just the conservative choice to disable it for allmod/yes.
+We should probably revisit that these days.
+
+cheers
