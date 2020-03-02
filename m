@@ -2,112 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5873617565C
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 09:58:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3A5B175687
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 10:02:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727077AbgCBI6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 03:58:40 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:45563 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726382AbgCBI6k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 03:58:40 -0500
-Received: by mail-lf1-f68.google.com with SMTP id d27so4204290lfq.12
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 00:58:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9Al5IFuoY2rtnym3clzN0RNUtkS0nsC5av4BTRm+2H8=;
-        b=s+DXo/4QB+gzeWecrfZeKjqe+Xn6/LZLwpd0Cm8a4dB5lSDFfBVny//mDtHl1R/ai8
-         3zYOJwaHiw3RUktuC7V69MDGGfL9r3ODivQhmIs9Ai6nASDMOWfrQzqsEMDwuu0xlDq7
-         jVajW5Wq0jZPWwjlhXf5Zw2G/7d+ykOVa9twrUwY/pSIiNebSJcnhLe0ERcCXgHhFD+d
-         VNaIIOZUBRJvTs1GRk/t35WpDjgFhPR9hG/DA/W+daYuaGNNxt7FTMeYXuU6sKuAf2N+
-         WhgSUixDeoDy5jb7ZHjTQt7W0xbrAisaBWZ0Xe8fn9Ipbfy0IdoK9NTqBaRSAR3zlHZU
-         jRkg==
+        id S1727323AbgCBJB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 04:01:59 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20422 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726887AbgCBJB6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 04:01:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1583139717;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+cKCStZlaFnACnF/GtwjtjakSchn0Oxyd9JsHfbu4KE=;
+        b=U/RIHTHig8TV28Wf4XusLYqjL+taYlIwFQZOiOC1BLXrHm/u8V8yfvPB5rgWDButAQvo/7
+        IqhN87tZWq3VifN+LYZ/L0XcCpq2tHZXIgG/iJ0JZywfo0CE1bQgWsbL2dDlqmeKNGsp3o
+        pbzpxt7LAXuQhw3Wh++hTfGNRFQ1lBU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-_p1OvF1SOZaD_ZqhYdeViA-1; Mon, 02 Mar 2020 04:01:55 -0500
+X-MC-Unique: _p1OvF1SOZaD_ZqhYdeViA-1
+Received: by mail-wm1-f69.google.com with SMTP id d129so2646037wmd.2
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 01:01:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9Al5IFuoY2rtnym3clzN0RNUtkS0nsC5av4BTRm+2H8=;
-        b=h23dUbJxJF8+PnxKhPxNJv0kTzbVuxdhO2mZwSBTcHk2Ea1rIqmsPtla8Pbw04DiYi
-         FtDARn6Tt8RQf90WG3YcOnhs3J0Lswx35pJIRBJL05waFD5mlizE8+qGqpJAcOqzRsju
-         503UBCzpN9jQOV9FYh8wEuOq+KRbpTi1iHQQap7aKVWWXH6QcmVavGEv6BA8RzksjHhx
-         TR3G2JQKOR5oo0orhJaEK67WSDWkQQ0gBCTCN4+UT9AluPifWjMDokOcQhed6tPFIfKN
-         2Ih+1V1+8db2PnDWJK8ZD3hHmk9PfCNWwbqboLGsFLHfgp/yhmxahDnlR18+VNW5Fbmj
-         KX7A==
-X-Gm-Message-State: ANhLgQ32wMo1EaF9Rmf1p/MLnjO1rJoQ2EnpLq9knDaJNlxdbjGlGxjj
-        28Jl4U65o40PJJa1rIqC1O2K1g0UKcOw0CtgRgnGlA==
-X-Google-Smtp-Source: ADFU+vsfA5pYmFGJV50ALCmK9XG6w4XRbq54i4YJwt2GzCZisxPtols/qSbqZqDlSvdlO2myf6Uo6NfLAsAVuWjSkNo=
-X-Received: by 2002:ac2:4d16:: with SMTP id r22mr9484343lfi.74.1583139517083;
- Mon, 02 Mar 2020 00:58:37 -0800 (PST)
-MIME-Version: 1.0
-References: <1583133336-7832-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1583133336-7832-1-git-send-email-wanpengli@tencent.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Mon, 2 Mar 2020 14:28:25 +0530
-Message-ID: <CA+G9fYvnHwNHpkkEG951VcTBCVuvfMP98WDHf04dVy7K=E4pLg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: X86: Fix dereference null cpufreq policy
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=+cKCStZlaFnACnF/GtwjtjakSchn0Oxyd9JsHfbu4KE=;
+        b=m0uoiInDMBBVuKWDN5khYO7B/m9LqUXBUKBFrZoEr3phzZNtdvi/NKvkOTHpyIP6gy
+         OmF3TxUDt9qXJr0h3OXm3K+X3F5Na+zDhjcAnxiN3y4EERXZVKXM+c1aoI76gcqekveP
+         2mQVKKIdLEbR/KXvqdznWmP1mS/cFFV++pitIHZD80Oy0SQlo4DT8o0ZrRYMAuWqMqXj
+         wOoU7xeN75aBPlIZW3ui40KtrPzdNFKCNDeDCNF5owiM473ejGLjaQHBh7icqLE5zy5F
+         e8uDkEI5isTDASBLxG1xQS3UW27YYs/srEnJN70mMHngV3fB7rB8IkBJEbNAZgY9i9m/
+         GSbA==
+X-Gm-Message-State: ANhLgQ03OXgkRYkqgZowIqH+doD8nE0b9n/A69VPoO2oy+/3xSnX5LH2
+        n6Oi+KXloehq+VQgkWdzU4ZKUwQ+KDAoQ21MsjooaGMfMx7/OIiLQXK8MZMGuIIvRBNimb8PUvK
+        16U6LJSq26j5F
+X-Received: by 2002:a5d:538e:: with SMTP id d14mr10266205wrv.62.1583139714030;
+        Mon, 02 Mar 2020 01:01:54 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vugaTJBFeQrMq8aQNmO8wrOwb5Q1L0SrJJuYOv3anP+L+JfncyGZAAgaay46uJHvS+mTnXzHQ==
+X-Received: by 2002:a5d:538e:: with SMTP id d14mr10266175wrv.62.1583139713721;
+        Mon, 02 Mar 2020 01:01:53 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id a7sm13794928wmj.12.2020.03.02.01.01.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2020 01:01:52 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v2] KVM: x86: Remove unnecessary brackets in kvm_arch_dev_ioctl()
+In-Reply-To: <20200229025212.156388-1-xiaoyao.li@intel.com>
+References: <20200229025212.156388-1-xiaoyao.li@intel.com>
+Date:   Mon, 02 Mar 2020 10:01:52 +0100
+Message-ID: <875zfni0zj.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2 Mar 2020 at 12:48, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> Naresh Kamboju reported:
->
->    Linux version 5.6.0-rc4 (oe-user@oe-host) (gcc version
->   (GCC)) #1 SMP Sun Mar 1 22:59:08 UTC 2020
->    kvm: no hardware support
->    BUG: kernel NULL pointer dereference, address: 000000000000028c
->    #PF: supervisor read access in kernel mode
->    #PF: error_code(0x0000) - not-present page
->    PGD 0 P4D 0
->    Oops: 0000 [#1] SMP NOPTI
->    CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.6.0-rc4 #1
->    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
->   04/01/2014
->    RIP: 0010:kobject_put+0x12/0x1c0
->    Call Trace:
->     cpufreq_cpu_put+0x15/0x20
->     kvm_arch_init+0x1f6/0x2b0
->     kvm_init+0x31/0x290
->     ? svm_check_processor_compat+0xd/0xd
->     ? svm_check_processor_compat+0xd/0xd
->     svm_init+0x21/0x23
->     do_one_initcall+0x61/0x2f0
->     ? rdinit_setup+0x30/0x30
->     ? rcu_read_lock_sched_held+0x4f/0x80
->     kernel_init_freeable+0x219/0x279
->     ? rest_init+0x250/0x250
->     kernel_init+0xe/0x110
->     ret_from_fork+0x27/0x50
->    Modules linked in:
->    CR2: 000000000000028c
->    ---[ end trace 239abf40c55c409b ]---
->    RIP: 0010:kobject_put+0x12/0x1c0
->
-> cpufreq policy which is get by cpufreq_cpu_get() can be NULL if it is failure,
-> this patch takes care of it.
->
-> Fixes: aaec7c03de (KVM: x86: avoid useless copy of cpufreq policy)
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-Tested-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+Xiaoyao Li <xiaoyao.li@intel.com> writes:
 
-Applied this patch and test boot pass.
+> In kvm_arch_dev_ioctl(), the brackets of case KVM_X86_GET_MCE_CAP_SUPPORTED
+> accidently encapsulates case KVM_GET_MSR_FEATURE_INDEX_LIST and case
+> KVM_GET_MSRS. It doesn't affect functionality but it's misleading.
+>
+> Remove unnecessary brackets and opportunistically add a "break" in the
+> default path.
+>
+> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 5de200663f51..e49f3e735f77 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3464,7 +3464,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>  		r = 0;
+>  		break;
+>  	}
+> -	case KVM_X86_GET_MCE_CAP_SUPPORTED: {
+> +	case KVM_X86_GET_MCE_CAP_SUPPORTED:
+>  		r = -EFAULT;
+>  		if (copy_to_user(argp, &kvm_mce_cap_supported,
+>  				 sizeof(kvm_mce_cap_supported)))
+> @@ -3496,9 +3496,9 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>  	case KVM_GET_MSRS:
+>  		r = msr_io(NULL, argp, do_get_msr_feature, 1);
+>  		break;
+> -	}
+>  	default:
+>  		r = -EINVAL;
+> +		break;
+>  	}
+>  out:
+>  	return r;
 
-- Naresh
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
+
