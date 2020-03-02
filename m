@@ -2,49 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 99D46175C96
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 15:09:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D435A175CC6
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 15:18:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726969AbgCBOJX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 09:09:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42240 "EHLO
+        id S1727192AbgCBORz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 09:17:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42079 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726878AbgCBOJW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 09:09:22 -0500
+        with ESMTP id S1727170AbgCBORy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 09:17:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583158161;
+        s=mimecast20190719; t=1583158672;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=lsSEpDEIdaSjPCaTAzHcypnn9SKd5JBtv3AdQccvjrA=;
-        b=H3SoCXKv0nh6m2i3uyHS3Ist932YwqEkqG1GC00/nkLmghyeNXHnvxg6eBXvIeSMBRagFy
-        tI4gvHByWRlkYdYdzPoeVH1OCk4MJLDtoWmhe6kKktnnM7Tw6zOQnf0I3eYfRizbEZ/yKD
-        ELI77hT493WMLiR+N2n73xs1UAzST1s=
+        bh=aSlbqTfXB8KK40C4UbS0ygfhPT9hTLVPTl4nVXr8U48=;
+        b=WG/2WBrbf7lPNY5fvHa+BZo+XNIS8hra5g6m6R0qHrP9g3dbONuCd1Wfaivp+FE5rWsaV+
+        ebLTR44IpPcFR3LXgLphstSg3uskGFfrad7BwP6BDSpb1ewO5j2u47+HVxtXSJ0VQpOb07
+        uCfIRdJxqI6AWLnLCLnUnjIPxok0sOo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-gB2LR1ftNb2ukcpmkyuakw-1; Mon, 02 Mar 2020 09:09:19 -0500
-X-MC-Unique: gB2LR1ftNb2ukcpmkyuakw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-360-cJl0n0beP5iUYhC6PrB-kA-1; Mon, 02 Mar 2020 09:17:50 -0500
+X-MC-Unique: cJl0n0beP5iUYhC6PrB-kA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25D581005510;
-        Mon,  2 Mar 2020 14:09:18 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBBE1190B2D3;
+        Mon,  2 Mar 2020 14:17:47 +0000 (UTC)
 Received: from [10.36.116.114] (ovpn-116-114.ams2.redhat.com [10.36.116.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C0C15C122;
-        Mon,  2 Mar 2020 14:09:11 +0000 (UTC)
-Subject: Re: [PATCH v1 01/11] ACPI: NUMA: export pxm_to_node
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB7CD60C80;
+        Mon,  2 Mar 2020 14:17:39 +0000 (UTC)
+Subject: Re: [PATCH v1 04/11] mm: Export alloc_contig_range() /
+ free_contig_range()
 To:     Michal Hocko <mhocko@kernel.org>
 Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         Andrew Morton <akpm@linux-foundation.org>,
         "Michael S . Tsirkin" <mst@redhat.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org
+        Vlastimil Babka <vbabka@suse.cz>,
+        Oscar Salvador <osalvador@suse.de>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Pavel Tatashin <pavel.tatashin@microsoft.com>,
+        Alexander Potapenko <glider@google.com>
 References: <20200302134941.315212-1-david@redhat.com>
- <20200302134941.315212-2-david@redhat.com>
- <20200302140309.GM4380@dhcp22.suse.cz>
+ <20200302134941.315212-5-david@redhat.com>
+ <20200302140519.GN4380@dhcp22.suse.cz>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -90,41 +97,61 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <baff6701-fc75-d205-2e78-904166f63030@redhat.com>
-Date:   Mon, 2 Mar 2020 15:09:10 +0100
+Message-ID: <dd34277f-21ad-cae8-8f07-10915fea305e@redhat.com>
+Date:   Mon, 2 Mar 2020 15:17:38 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200302140309.GM4380@dhcp22.suse.cz>
+In-Reply-To: <20200302140519.GN4380@dhcp22.suse.cz>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.03.20 15:03, Michal Hocko wrote:
-> On Mon 02-03-20 14:49:31, David Hildenbrand wrote:
->> Will be needed by virtio-mem to identify the node from a pxm.
-> 
-> No objection to export the symbol. But it is almost always better to add
-> the export in the patch that actually uses it. The intention is much
-> more clear that way.
+On 02.03.20 15:05, Michal Hocko wrote:
+> On Mon 02-03-20 14:49:34, David Hildenbrand wrote:
+>> A virtio-mem device wants to allocate memory from the memory region it
+>> manages in order to unplug it in the hypervisor - similar to
+>> a balloon driver. Also, it might want to plug previously unplugged
+>> (allocated) memory and give it back to Linux. alloc_contig_range() /
+>> free_contig_range() seem to be the perfect interface for this task.
+>>
+>> In contrast to existing balloon devices, a virtio-mem device operates
+>> on bigger chunks (e.g., 4MB) and only on physical memory it manages. I=
+t
+>> tracks which chunks (subblocks) are still plugged, so it can go ahead
+>> and try to alloc_contig_range()+unplug them on unplug request, or
+>> plug+free_contig_range() unplugged chunks on plug requests.
+>>
+>> A virtio-mem device will use alloc_contig_range() / free_contig_range(=
+)
+>> only on ranges that belong to the same node/zone in at least
+>> MAX(MAX_ORDER - 1, pageblock_order) order granularity - e.g., 4MB on
+>> x86-64. The virtio-mem device added that memory, so the memory
+>> exists and does not contain any holes. virtio-mem will only try to all=
+ocate
+>> on ZONE_NORMAL, never on ZONE_MOVABLE, just like when allocating
+>> gigantic pages (we don't put unmovable data into the movable zone).
+>=20
+> Same feedback as in pxm_to_node export. No objections to exporting the
+> symbol but it would be better to squash this function into the patch
+> which uses it. The changelog is highly virtio-mem specific anyway.
+> Maybe it is just a dejavu but I feel I have already said that but I do
+> not remember any details.
 
-Yeah, but I guess this way people might take more likely a look as if
-this would be squashed into a
- 5 files changed, 1786 insertions(+)
+As I said back then, I am not a friend of squashing core changes into
+driver changes (and AFAIK separating such is the common practice - well
+I have never written a driver myself). I doubt it will make review
+easier or faster (especially when it comes to patch #1).
 
-patch. At least that's what my experience tells me :)
+I can squash #4 into #5, #6 into #7, #8 into #9 if it makes your review
+easier.
 
-If there are hard feelings, I can squash (but I am afraid it will be
-even harder to get ACKs/RBs for core-mm changes that way ...)
-
-Thanks for having a look!
-
--- 
+--=20
 Thanks,
 
 David / dhildenb
