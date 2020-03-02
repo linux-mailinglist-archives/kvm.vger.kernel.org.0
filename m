@@ -2,135 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2FB0175B13
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 14:01:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 863C7175BDB
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 14:38:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727595AbgCBNBM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 08:01:12 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50396 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727173AbgCBNBM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 08:01:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583154071;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vFEYElovxs1he3jW2L/2OIMoWJCYaK4R5aZbj7powQE=;
-        b=FuUV2gj2jcHRvtYO0OqD2T5KN8sjT90IZfmfq7tDlKZYoJz/8vx8Jq6gLJSyPgPNgRiDUm
-        MiE9jC/p+4COuNXjE3rVG0DWD6t0ChMrSIuU0g6LAX4mWOMjSWcQZnoB3h/d8fULk5LDZE
-        +0S3wECs+n6/Cl6+zkjvRXArt3yb3R4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-437-66urbnbfP0-nvsLxk13K0g-1; Mon, 02 Mar 2020 08:01:09 -0500
-X-MC-Unique: 66urbnbfP0-nvsLxk13K0g-1
-Received: by mail-wr1-f71.google.com with SMTP id w18so5793332wro.2
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 05:01:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=vFEYElovxs1he3jW2L/2OIMoWJCYaK4R5aZbj7powQE=;
-        b=Q0CbKo008Nw7buvLl7LYDMK/dhw9U7rCeg/1sg/eeMIs0vzHF0KxgMP3PiewJTDRKc
-         +V4+6L938akgpX4k+L+QXSaf0WpVZzoT4ERWl+VysxWUsoTvRn6V6zPgnBGL+TeTbmhg
-         kp+JOlcVMpRy4F7U0d8CR+gZb7QQ9NKEv9PIVHGgSZKC+x59JMn8ZDGUR8U7aRFqiq/S
-         QGYSHCi+C3ZuzQ/7XOgLAnb5+fdguN5AFnoXK+0pm0ngm3B7TsQsPsPL5vqrAV83IlSb
-         EQg1E82Li2l4HGTxOEge6yzdxR5UW+vWiRG6VOPKe2IRx/Jmbv1b/eFKS1HMAG10UXF0
-         wtNQ==
-X-Gm-Message-State: APjAAAUn4SckBgrj1T/14P1G7mxv2tARIlcAEkER4o7UaBBA4GUo0YAK
-        hI6GB86OmUH49Ey4EUCI1QJK51tbALnfeL3NPq2Hl5BnQTaGNO4Sw5/bCcINFyWdwj+WuvDS8rC
-        EZA/LeJdYNVw+
-X-Received: by 2002:a05:600c:251:: with SMTP id 17mr19492302wmj.59.1583154068053;
-        Mon, 02 Mar 2020 05:01:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqytInT/vs8uW+zSLol0sFtoMeXPxy5TDYEfalNY4crz/GnJg2mECfgk9LJfq+x+gQ9Zc8kXIg==
-X-Received: by 2002:a05:600c:251:: with SMTP id 17mr19492281wmj.59.1583154067821;
-        Mon, 02 Mar 2020 05:01:07 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id i204sm16306020wma.44.2020.03.02.05.01.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2020 05:01:07 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v3] KVM: X86: Just one leader to trigger kvmclock sync request
-In-Reply-To: <1582859921-11932-1-git-send-email-wanpengli@tencent.com>
-References: <1582859921-11932-1-git-send-email-wanpengli@tencent.com>
-Date:   Mon, 02 Mar 2020 14:01:06 +0100
-Message-ID: <87lfoihpwt.fsf@vitty.brq.redhat.com>
+        id S1727829AbgCBNi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 08:38:27 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2594 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727702AbgCBNi1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 08:38:27 -0500
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.56])
+        by Forcepoint Email with ESMTP id E2783B68B718EA79284A;
+        Mon,  2 Mar 2020 21:38:22 +0800 (CST)
+Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.90]) by
+ DGGEMM403-HUB.china.huawei.com ([10.3.20.211]) with mapi id 14.03.0439.000;
+ Mon, 2 Mar 2020 21:38:13 +0800
+From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To:     Peter Feiner <pfeiner@google.com>
+CC:     Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "quintela@redhat.com" <quintela@redhat.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>,
+        "linfeng (M)" <linfeng23@huawei.com>,
+        "wangxin (U)" <wangxinxin.wang@huawei.com>,
+        "Huangweidong (C)" <weidong.huang@huawei.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: RE: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Topic: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Index: AdXmU97BvyK5YKoyS5++my9GnvXVk///1+yA//428yCAA1S3gP/+abuggAMs8gCAAd62AIAAJJ4A//B2yiA=
+Date:   Mon, 2 Mar 2020 13:38:12 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BB4A71D@DGGEMM528-MBX.china.huawei.com>
+References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
+ <20200218174311.GE1408806@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
+ <20200219171919.GA34517@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
+ <CANgfPd-P_=GqcMiwLSSkUhZDt42aMLUsCJt+CPdUN5yR3RLHmQ@mail.gmail.com>
+ <cd4626a1-44b5-1a62-cf4b-716950a6db1b@google.com>
+ <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
+In-Reply-To: <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.228.206]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
-
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> In the progress of vCPUs creation, it queues a kvmclock sync worker to the global
-> workqueue before each vCPU creation completes. The workqueue subsystem guarantees 
-> not to queue the already queued work, however, we can make the logic more clear by 
-> make just one leader to trigger this kvmclock sync request and save on cacheline 
-> boucing due to test_and_set_bit.
->
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
-> v2 -> v3:
->  * update patch description
-> v1 -> v2:
->  * check vcpu->vcpu_idx
->
->  arch/x86/kvm/x86.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fb5d64e..79bc995 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9390,8 +9390,9 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  	if (!kvmclock_periodic_sync)
->  		return;
->  
-> -	schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
-> -					KVMCLOCK_SYNC_PERIOD);
-> +	if (vcpu->vcpu_idx == 0)
-> +		schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
-> +						KVMCLOCK_SYNC_PERIOD);
-
-I would've merged this new check with !kvmclock_periodic_sync above
-making it more obvious when the work is scheduled
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5de200663f51..93550976f991 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9389,11 +9389,9 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
- 
-        mutex_unlock(&vcpu->mutex);
- 
--       if (!kvmclock_periodic_sync)
--               return;
--
--       schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
--                                       KVMCLOCK_SYNC_PERIOD);
-+       if (vcpu->vcpu_idx == 0 && kvmclock_periodic_sync)
-+               schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
-+                                     KVMCLOCK_SYNC_PERIOD);
- }
-
->  }
->  
->  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
-
-With or without the change mentioned above,
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgRmVpbmVyIFtt
+YWlsdG86cGZlaW5lckBnb29nbGUuY29tXQ0KPiBTZW50OiBTYXR1cmRheSwgRmVicnVhcnkgMjIs
+IDIwMjAgODoxOSBBTQ0KPiBUbzogSnVuYWlkIFNoYWhpZCA8anVuYWlkc0Bnb29nbGUuY29tPg0K
+PiBDYzogQmVuIEdhcmRvbiA8YmdhcmRvbkBnb29nbGUuY29tPjsgWmhvdWppYW4gKGpheSkNCj4g
+PGppYW5qYXkuemhvdUBodWF3ZWkuY29tPjsgUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPjsN
+Cj4ga3ZtQHZnZXIua2VybmVsLm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBwYm9uemluaUBy
+ZWRoYXQuY29tOw0KPiBkZ2lsYmVydEByZWRoYXQuY29tOyBxdWludGVsYUByZWRoYXQuY29tOyBM
+aXVqaW5zb25nIChQYXVsKQ0KPiA8bGl1LmppbnNvbmdAaHVhd2VpLmNvbT47IGxpbmZlbmcgKE0p
+IDxsaW5mZW5nMjNAaHVhd2VpLmNvbT47IHdhbmd4aW4gKFUpDQo+IDx3YW5neGlueGluLndhbmdA
+aHVhd2VpLmNvbT47IEh1YW5nd2VpZG9uZyAoQykNCj4gPHdlaWRvbmcuaHVhbmdAaHVhd2VpLmNv
+bT4NCj4gU3ViamVjdDogUmU6IFJGQzogU3BsaXQgRVBUIGh1Z2UgcGFnZXMgaW4gYWR2YW5jZSBv
+ZiBkaXJ0eSBsb2dnaW5nDQo+IA0KPiBPbiBGcmksIEZlYiAyMSwgMjAyMCBhdCAyOjA4IFBNIEp1
+bmFpZCBTaGFoaWQgPGp1bmFpZHNAZ29vZ2xlLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBPbiAyLzIw
+LzIwIDk6MzQgQU0sIEJlbiBHYXJkb24gd3JvdGU6DQo+ID4gPg0KPiA+ID4gRldJVywgd2UgY3Vy
+cmVudGx5IGRvIHRoaXMgZWFnZXIgc3BsaXR0aW5nIGF0IEdvb2dsZSBmb3IgbGl2ZQ0KPiA+ID4g
+bWlncmF0aW9uLiBXaGVuIHRoZSBsb2ctZGlydHktbWVtb3J5IGZsYWcgaXMgc2V0IG9uIGEgbWVt
+c2xvdCB3ZQ0KPiA+ID4gZWFnZXJseSBzcGxpdCBhbGwgcGFnZXMgaW4gdGhlIHNsb3QgZG93biB0
+byA0ayBncmFudWxhcml0eS4NCj4gPiA+IEFzIEpheSBzYWlkLCB0aGlzIGRvZXMgbm90IGNhdXNl
+IGNyaXBwbGluZyBsb2NrIGNvbnRlbnRpb24gYmVjYXVzZQ0KPiA+ID4gdGhlIHZDUFUgcGFnZSBm
+YXVsdHMgZ2VuZXJhdGVkIGJ5IHdyaXRlIHByb3RlY3Rpb24gLyBzcGxpdHRpbmcgY2FuDQo+ID4g
+PiBiZSByZXNvbHZlZCBpbiB0aGUgZmFzdCBwYWdlIGZhdWx0IHBhdGggd2l0aG91dCBhY3F1aXJp
+bmcgdGhlIE1NVSBsb2NrLg0KPiA+ID4gSSBiZWxpZXZlICtKdW5haWQgU2hhaGlkIHRyaWVkIHRv
+IHVwc3RyZWFtIHRoaXMgYXBwcm9hY2ggYXQgc29tZQ0KPiA+ID4gcG9pbnQgaW4gdGhlIHBhc3Qs
+IGJ1dCB0aGUgcGF0Y2ggc2V0IGRpZG4ndCBtYWtlIGl0IGluLiAoVGhpcyB3YXMNCj4gPiA+IGJl
+Zm9yZSBteSB0aW1lLCBzbyBJJ20gaG9waW5nIGhlIGhhcyBhIGxpbmsuKSBJIGhhdmVuJ3QgZG9u
+ZSB0aGUNCj4gPiA+IGFuYWx5c2lzIHRvIGtub3cgaWYgZWFnZXIgc3BsaXR0aW5nIGlzIG1vcmUg
+b3IgbGVzcyBlZmZpY2llbnQgd2l0aA0KPiA+ID4gcGFyYWxsZWwgc2xvdy1wYXRoIHBhZ2UgZmF1
+bHRzLCBidXQgaXQncyBkZWZpbml0ZWx5IGZhc3RlciB1bmRlciB0aGUNCj4gPiA+IE1NVSBsb2Nr
+Lg0KPiA+ID4NCj4gPg0KPiA+IEkgYW0gbm90IHN1cmUgaWYgd2UgZXZlciBwb3N0ZWQgdGhvc2Ug
+cGF0Y2hlcyB1cHN0cmVhbS4gUGV0ZXIgRmVpbmVyIHdvdWxkDQo+IGtub3cgZm9yIHN1cmUuIE9u
+ZSBub3RhYmxlIGRpZmZlcmVuY2UgaW4gd2hhdCB3ZSBkbyBjb21wYXJlZCB0byB0aGUgYXBwcm9h
+Y2gNCj4gb3V0bGluZWQgYnkgSmF5IGlzIHRoYXQgd2UgZG9uJ3QgcmVseSBvbiB0ZHBfcGFnZV9m
+YXVsdCgpIHRvIGRvIHRoZSBzcGxpdHRpbmcuIFNvIHdlDQo+IGRvbid0IGhhdmUgdG8gY3JlYXRl
+IGEgZHVtbXkgVkNQVSBhbmQgdGhlIHNwZWNpYWxpemVkIHNwbGl0IGZ1bmN0aW9uIGlzIGFsc28N
+Cj4gbXVjaCBmYXN0ZXIuDQo+IA0KPiBXZSd2ZSBiZWVuIGNhcnJ5aW5nIHRoZXNlIHBhdGNoZXMg
+c2luY2UgMjAxNS4gSSd2ZSBuZXZlciBwb3N0ZWQgdGhlbS4NCj4gR2V0dGluZyB0aGVtIGluIHNo
+YXBlIGZvciB1cHN0cmVhbSBjb25zdW1wdGlvbiB3aWxsIHRha2Ugc29tZSB3b3JrLiBJIGNhbiBs
+b29rDQo+IGludG8gdGhpcyBuZXh0IHdlZWsuDQoNCkhpIFBldGVyIEZlaW5lciwNCg0KTWF5IEkg
+YXNrIGFueSBuZXcgdXBkYXRlcyBhYm91dCB5b3VyIHBsYW4/IFNvcnJ5IHRvIGRpc3R1cmIuDQoN
+ClJlZ2FyZHMsDQpKYXkgWmhvdQ0K
