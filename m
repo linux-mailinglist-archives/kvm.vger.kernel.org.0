@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3A5B175687
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 10:02:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 772B817568D
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 10:03:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727323AbgCBJB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 04:01:59 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20422 "EHLO
+        id S1727154AbgCBJDY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 04:03:24 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48226 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726887AbgCBJB6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 04:01:58 -0500
+        by vger.kernel.org with ESMTP id S1727104AbgCBJDY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 04:03:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583139717;
+        s=mimecast20190719; t=1583139802;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+cKCStZlaFnACnF/GtwjtjakSchn0Oxyd9JsHfbu4KE=;
-        b=U/RIHTHig8TV28Wf4XusLYqjL+taYlIwFQZOiOC1BLXrHm/u8V8yfvPB5rgWDButAQvo/7
-        IqhN87tZWq3VifN+LYZ/L0XcCpq2tHZXIgG/iJ0JZywfo0CE1bQgWsbL2dDlqmeKNGsp3o
-        pbzpxt7LAXuQhw3Wh++hTfGNRFQ1lBU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-_p1OvF1SOZaD_ZqhYdeViA-1; Mon, 02 Mar 2020 04:01:55 -0500
-X-MC-Unique: _p1OvF1SOZaD_ZqhYdeViA-1
-Received: by mail-wm1-f69.google.com with SMTP id d129so2646037wmd.2
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 01:01:55 -0800 (PST)
+        bh=zh8cgchJm1y3v+DF2yCaLs1qahz0gPLON0uwqCUOxqk=;
+        b=HrYmg+euQHQWv0TvJAcWx6crGLCRvphnXsr4FMzx2DUJp9noXN0/cpyQyqMjhap25BzyST
+        V++z581Wj+Kl9ke2Q84JNbpy9rzpe2c2Vp+/B69LmgNz5vVf8ulczQxM2gZGU8KRCByzEK
+        pNJONW+jZf/kovu3liSTzD+0ASO4gyI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-K3t7KUAhPnSgXKKOWeP0Kw-1; Mon, 02 Mar 2020 04:03:19 -0500
+X-MC-Unique: K3t7KUAhPnSgXKKOWeP0Kw-1
+Received: by mail-wr1-f70.google.com with SMTP id 72so5497333wrc.6
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 01:03:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=+cKCStZlaFnACnF/GtwjtjakSchn0Oxyd9JsHfbu4KE=;
-        b=m0uoiInDMBBVuKWDN5khYO7B/m9LqUXBUKBFrZoEr3phzZNtdvi/NKvkOTHpyIP6gy
-         OmF3TxUDt9qXJr0h3OXm3K+X3F5Na+zDhjcAnxiN3y4EERXZVKXM+c1aoI76gcqekveP
-         2mQVKKIdLEbR/KXvqdznWmP1mS/cFFV++pitIHZD80Oy0SQlo4DT8o0ZrRYMAuWqMqXj
-         wOoU7xeN75aBPlIZW3ui40KtrPzdNFKCNDeDCNF5owiM473ejGLjaQHBh7icqLE5zy5F
-         e8uDkEI5isTDASBLxG1xQS3UW27YYs/srEnJN70mMHngV3fB7rB8IkBJEbNAZgY9i9m/
-         GSbA==
-X-Gm-Message-State: ANhLgQ03OXgkRYkqgZowIqH+doD8nE0b9n/A69VPoO2oy+/3xSnX5LH2
-        n6Oi+KXloehq+VQgkWdzU4ZKUwQ+KDAoQ21MsjooaGMfMx7/OIiLQXK8MZMGuIIvRBNimb8PUvK
-        16U6LJSq26j5F
-X-Received: by 2002:a5d:538e:: with SMTP id d14mr10266205wrv.62.1583139714030;
-        Mon, 02 Mar 2020 01:01:54 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vugaTJBFeQrMq8aQNmO8wrOwb5Q1L0SrJJuYOv3anP+L+JfncyGZAAgaay46uJHvS+mTnXzHQ==
-X-Received: by 2002:a5d:538e:: with SMTP id d14mr10266175wrv.62.1583139713721;
-        Mon, 02 Mar 2020 01:01:53 -0800 (PST)
+        bh=zh8cgchJm1y3v+DF2yCaLs1qahz0gPLON0uwqCUOxqk=;
+        b=NrpTwbpBP730JOnordZgIHNZuhToZME7Y+uMOzaix9R98WoVzJkW+HJKQ8Wykl1CaL
+         HaBVNAf50QfyjpfaK3oyOkf4jXoxrGufTmkWYmYnxDcQou7MmL5pNA/J6iWHkjKr3pXI
+         i2Nv72O36kmVgWA4PtMnQ5TU24iBNbTqSKRE44NkJtVi2h0xEYM2qMgEyAVCCtTUjQat
+         oZ00akbUhtNtL7KrYcsP5SKHGthZtLuRilgONGN0MCn/iTZrA/b246BmneXr1wX8wwLb
+         OL4QsYv4Zkxw8h6pLnq4/ibhvYZSV8rnxn6WiPa4d/875vpb2AwBoNCkBH1LlXPHScJ4
+         5qmg==
+X-Gm-Message-State: APjAAAWyir2FwCgwL7D1JgeeEs6tAxS0YPPC4WsquA43EMnDagHphDNP
+        opiBZolFtb6x6ObQZ1+258S/sTd+gN/h5Na7SAk8UyxresXwQWfU6NPZ/8Am62yPa6+W95hQxGV
+        70W84m9CuQsFz
+X-Received: by 2002:a5d:4b82:: with SMTP id b2mr21266774wrt.102.1583139798117;
+        Mon, 02 Mar 2020 01:03:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyC8l2PJhEaf0MiIHxDflEbFnI0+GLughJFRf0goS12IzY5n+bQfTBb90jKAb24wmRK/g4wRA==
+X-Received: by 2002:a5d:4b82:: with SMTP id b2mr21266722wrt.102.1583139797799;
+        Mon, 02 Mar 2020 01:03:17 -0800 (PST)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id a7sm13794928wmj.12.2020.03.02.01.01.52
+        by smtp.gmail.com with ESMTPSA id w1sm14213034wmc.11.2020.03.02.01.03.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2020 01:01:52 -0800 (PST)
+        Mon, 02 Mar 2020 01:03:17 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2] KVM: x86: Remove unnecessary brackets in kvm_arch_dev_ioctl()
-In-Reply-To: <20200229025212.156388-1-xiaoyao.li@intel.com>
-References: <20200229025212.156388-1-xiaoyao.li@intel.com>
-Date:   Mon, 02 Mar 2020 10:01:52 +0100
-Message-ID: <875zfni0zj.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/61] KVM: x86: Introduce KVM cpu caps
+In-Reply-To: <20200229183219.GA22451@linux.intel.com>
+References: <20200201185218.24473-1-sean.j.christopherson@intel.com> <87wo8ak84x.fsf@vitty.brq.redhat.com> <20200229183219.GA22451@linux.intel.com>
+Date:   Mon, 02 Mar 2020 10:03:16 +0100
+Message-ID: <8736ari0x7.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -69,47 +68,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Xiaoyao Li <xiaoyao.li@intel.com> writes:
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> In kvm_arch_dev_ioctl(), the brackets of case KVM_X86_GET_MCE_CAP_SUPPORTED
-> accidently encapsulates case KVM_GET_MSR_FEATURE_INDEX_LIST and case
-> KVM_GET_MSRS. It doesn't affect functionality but it's misleading.
+> On Tue, Feb 25, 2020 at 04:18:38PM +0100, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>> 
+>> >
+>> >   7. Profit!
+>> 
+>> Would it be better or worse if we eliminate set_supported_cpuid() hook
+>> completely by doing an ugly hack like (completely untested):
+>> 
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index a2a091d328c6..5ad291d48e1b 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1145,8 +1145,6 @@ struct kvm_x86_ops {
+>>  
+>>         void (*set_tdp_cr3)(struct kvm_vcpu *vcpu, unsigned long cr3);
+>>  
+>> -       void (*set_supported_cpuid)(struct kvm_cpuid_entry2 *entry);
+>> -
+>>         bool (*has_wbinvd_exit)(void);
+>>  
+>>         u64 (*read_l1_tsc_offset)(struct kvm_vcpu *vcpu);
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index e8beb1e542a8..88431fc02797 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -749,6 +749,16 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>>  		cpuid_entry_override(entry, CPUID_8000_0008_EBX);
+>>  		break;
+>>  	}
+>> +	case 0x8000000A:
+>> +		if (boot_cpu_has(X86_FEATURE_SVM)) {
+>> +			entry->eax = 1; /* SVM revision 1 */
+>> +			entry->ebx = 8; /* Lets support 8 ASIDs in case we add proper
+>> +					   ASID emulation to nested SVM */
+>> +			entry->ecx = 0; /* Reserved */
+>> +			entry->edx = 0; /* Per default do not support any
+>> +					   additional features */
 >
-> Remove unnecessary brackets and opportunistically add a "break" in the
-> default path.
+> Lucky thing that you suggested this change, patch ("KVM: SVM: Convert
+> feature updates from CPUID to KVM cpu caps") was buggy in that clearing
+> entry->edx here would wipe out all X86_FEATURE_NRIPS and X86_FEATURE_NPT.
+> Only noticed it when moving this code. 
 >
-> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  arch/x86/kvm/x86.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5de200663f51..e49f3e735f77 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3464,7 +3464,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
->  		r = 0;
->  		break;
->  	}
-> -	case KVM_X86_GET_MCE_CAP_SUPPORTED: {
-> +	case KVM_X86_GET_MCE_CAP_SUPPORTED:
->  		r = -EFAULT;
->  		if (copy_to_user(argp, &kvm_mce_cap_supported,
->  				 sizeof(kvm_mce_cap_supported)))
-> @@ -3496,9 +3496,9 @@ long kvm_arch_dev_ioctl(struct file *filp,
->  	case KVM_GET_MSRS:
->  		r = msr_io(NULL, argp, do_get_msr_feature, 1);
->  		break;
-> -	}
->  	default:
->  		r = -EINVAL;
-> +		break;
->  	}
->  out:
->  	return r;
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+I plan to give your v2 a spin on AMD Epyc, just in case)
 
 -- 
 Vitaly
