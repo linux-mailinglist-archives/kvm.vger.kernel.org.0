@@ -2,67 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6803C17613D
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 18:40:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE1C2176142
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 18:41:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727403AbgCBRkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 12:40:40 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:33550 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727126AbgCBRkk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 12:40:40 -0500
-Received: by mail-il1-f196.google.com with SMTP id r4so270672iln.0
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 09:40:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5ksD8dmttNXm4+inhvFStNZSPi/gQ9lBZA/qTTCxdeU=;
-        b=mSqxHJ2+c/jBWiHLSWxaAbxahVU8ObgqQnRzD9e6LBPbhAHMZ4bPULCRAR6ndafm20
-         2Taqrg/JYOqyRD0HzS90xaZOy/OFkea4vTJe8DzSw1Zrt/Ppdti446gVt/iOb3KQpAcW
-         u0N+FH8rE/dDGCmq55dntIkGRQVKcZAyyhp1OyD4OTs1XVMLO5YKA+c2w3Fi1zqXoyDC
-         qyidBtduQydYw/Nxmj1YXeCh2Dw4ey9ziw3DEZnUvqEyEMb2vLIsjinZeOAqiVf8Wpv6
-         9hnuUed26pUQx0eIj6Xmar94z7Ej4pXzcd/LOusYwMimGeDhVwPxotAVTLUE39ApvZMu
-         mfYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5ksD8dmttNXm4+inhvFStNZSPi/gQ9lBZA/qTTCxdeU=;
-        b=ttO2blDRMSMreYbbfVkuSp0rr6LQQjaT7aQzvRh7Em4D/Bo5oTdjaDqcmtun+jilXv
-         GPw9vrJ4CjWYQn83+BjNelGUi4Gx7hB1g3uM1ZS5l2A6gKPL6x5WExZnpqdgRams+8Su
-         B/iFsEurMPfNcyWC7o2E4C/Yevacp3HFo1iCKJZc0mYejCFRNQqMvm8GbymeKkGDdiBC
-         Yv0Y90jcrGtb1U0ZI5nJpokwo2L+rUljV6Kmc2W5LCcOnf13VAXORKXE3UwXAQ+ouJFY
-         WLMtXuADrcxevp3BDXEHztL25wagd/kG+yp5c0ajJpxlr6G1V6Cm7Hd/xC9ii166gED1
-         lrzg==
-X-Gm-Message-State: ANhLgQ2lkTRTtYvomuEfEs1EV/nttkAi6uWlwceQZTiqFqtG9dthfyPR
-        2Uoubfou4GX9p8QjwIYKTfpTe8cCMkHGXCdsbywVvQ==
-X-Google-Smtp-Source: ADFU+vtji4jtuFdVSISD0TFeUATVqU3fVoefcW5GeZgC7PFacB7z75v4J0ttrcpRHzD+QT18Ayt7hrQtMbDwPNUkX0I=
-X-Received: by 2002:a92:c510:: with SMTP id r16mr681031ilg.119.1583170839039;
- Mon, 02 Mar 2020 09:40:39 -0800 (PST)
-MIME-Version: 1.0
-References: <20200228085905.22495-1-oupton@google.com> <20200228085905.22495-2-oupton@google.com>
- <CALMp9eRUQFDvZtGBGs6oKX=-j+Zz6SV8zTpLPukiRjmA=nO0wg@mail.gmail.com> <6487d313-dedb-1210-1c7a-160db2c816ad@amd.com>
-In-Reply-To: <6487d313-dedb-1210-1c7a-160db2c816ad@amd.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 2 Mar 2020 09:40:28 -0800
-Message-ID: <CALMp9eTj2ypUjpa-9FU_Pz1KdgvDSa_AVqbkOgUErUC5oJJWWg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: SVM: Enable AVIC by default
-To:     Wei Huang <whuang2@amd.com>
-Cc:     Oliver Upton <oupton@google.com>, kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>
+        id S1727439AbgCBRkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 12:40:49 -0500
+Received: from mga01.intel.com ([192.55.52.88]:7421 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727159AbgCBRks (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 12:40:48 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Mar 2020 09:40:48 -0800
+X-IronPort-AV: E=Sophos;i="5.70,507,1574150400"; 
+   d="scan'208";a="319136975"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Mar 2020 09:40:48 -0800
+Message-ID: <abac569d8d1978aebadf71b65cdeb240a6256ad2.camel@linux.intel.com>
+Subject: Re: [PATCH v1 06/11] mm: Allow to offline unmovable PageOffline()
+ pages via MEM_GOING_OFFLINE
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Juergen Gross <jgross@suse.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Pavel Tatashin <pavel.tatashin@microsoft.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Anthony Yznaga <anthony.yznaga@oracle.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Qian Cai <cai@lca.pw>, Pingfan Liu <kernelfans@gmail.com>
+Date:   Mon, 02 Mar 2020 09:40:47 -0800
+In-Reply-To: <20200302134941.315212-7-david@redhat.com>
+References: <20200302134941.315212-1-david@redhat.com>
+         <20200302134941.315212-7-david@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 28, 2020 at 2:47 PM Wei Huang <whuang2@amd.com> wrote:
+On Mon, 2020-03-02 at 14:49 +0100, David Hildenbrand wrote:
+> virtio-mem wants to allow to offline memory blocks of which some parts
+> were unplugged (allocated via alloc_contig_range()), especially, to later
+> offline and remove completely unplugged memory blocks. The important part
+> is that PageOffline() has to remain set until the section is offline, so
+> these pages will never get accessed (e.g., when dumping). The pages should
+> not be handed back to the buddy (which would require clearing PageOffline()
+> and result in issues if offlining fails and the pages are suddenly in the
+> buddy).
+> 
+> Let's allow to do that by allowing to isolate any PageOffline() page
+> when offlining. This way, we can reach the memory hotplug notifier
+> MEM_GOING_OFFLINE, where the driver can signal that he is fine with
+> offlining this page by dropping its reference count. PageOffline() pages
+> with a reference count of 0 can then be skipped when offlining the
+> pages (like if they were free, however they are not in the buddy).
+> 
+> Anybody who uses PageOffline() pages and does not agree to offline them
+> (e.g., Hyper-V balloon, XEN balloon, VMWare balloon for 2MB pages) will not
+> decrement the reference count and make offlining fail when trying to
+> migrate such an unmovable page. So there should be no observable change.
+> Same applies to balloon compaction users (movable PageOffline() pages), the
+> pages will simply be migrated.
+> 
+> Note 1: If offlining fails, a driver has to increment the reference
+> 	count again in MEM_CANCEL_OFFLINE.
+> 
+> Note 2: A driver that makes use of this has to be aware that re-onlining
+> 	the memory block has to be handled by hooking into onlining code
+> 	(online_page_callback_t), resetting the page PageOffline() and
+> 	not giving them to the buddy.
+> 
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Juergen Gross <jgross@suse.com>
+> Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> Cc: Pavel Tatashin <pavel.tatashin@microsoft.com>
+> Cc: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> Cc: Vlastimil Babka <vbabka@suse.cz>
+> Cc: Johannes Weiner <hannes@cmpxchg.org>
+> Cc: Anthony Yznaga <anthony.yznaga@oracle.com>
+> Cc: Michal Hocko <mhocko@suse.com>
+> Cc: Oscar Salvador <osalvador@suse.de>
+> Cc: Mel Gorman <mgorman@techsingularity.net>
+> Cc: Mike Rapoport <rppt@linux.ibm.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Anshuman Khandual <anshuman.khandual@arm.com>
+> Cc: Qian Cai <cai@lca.pw>
+> Cc: Pingfan Liu <kernelfans@gmail.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-> I personally don't suggest enable AVIC by default. There are cases of
-> slow AVIC doorbell delivery, due to delivery path and contention under a
-> large number of guest cores.
+This addresses the core concerns I had with the patch.
 
-Under what conditions would you suggest enabling AVIC?
+Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+
+
