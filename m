@@ -2,78 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4494F1762ED
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 19:42:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73D621762E7
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 19:42:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727621AbgCBSmh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 13:42:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42899 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727372AbgCBSme (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 13:42:34 -0500
+        id S1727439AbgCBSmL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 13:42:11 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35011 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727388AbgCBSmL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Mar 2020 13:42:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583174552;
+        s=mimecast20190719; t=1583174530;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=IOJ5kUOcS4sT5/CvsUeQUkAvG7HltAxhUW4WdRFZRGY=;
-        b=IBz6dlDECzW/8MQaQ5Uzb1CtHD+U3plMDQPh5f/vhAuecSTdry7K327U82+uURQNvQ+Pln
-        LbETMtgMH2+Yxh7bBis0jqFppJ3TlEWbKFjHJkVDIqO1Bkhp/1Z+wVGPOVCORKjpb86MTL
-        8JXZq4+2rnpQttcYpvUiEeBhL9qXczw=
+        bh=x+PcEaMz7vD6r/sekHWdoFeMEXe7RrhKK1hXyARhweQ=;
+        b=Zvw7P6UezZW0uzjslnqGdGXALYEl3gct2vxZAg9UMzh3crsCgN6MrlwK+5TmKLXNhaYRCg
+        rv2qp2wlFvnbONUkRDVt0Be85/AaZZmhKdnT5Jtrc65vbRUGGBa4ZQLkVz+UcbV5lly/DU
+        zCv+x6YFvsTf/6nSkySeh6FjAIsLQkw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-ZvH5PoL5NNG80lXvv-1HsA-1; Mon, 02 Mar 2020 13:42:29 -0500
-X-MC-Unique: ZvH5PoL5NNG80lXvv-1HsA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-361-SKy6hr5lPZykom0-L2Nqvw-1; Mon, 02 Mar 2020 13:42:06 -0500
+X-MC-Unique: SKy6hr5lPZykom0-L2Nqvw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D78D107ACC7;
-        Mon,  2 Mar 2020 18:42:25 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77684107ACC4;
+        Mon,  2 Mar 2020 18:42:03 +0000 (UTC)
 Received: from [10.36.116.60] (ovpn-116-60.ams2.redhat.com [10.36.116.60])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DE26C73860;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DCDBB19C7F;
         Mon,  2 Mar 2020 18:41:55 +0000 (UTC)
-Subject: Re: [PATCH v1 00/11] virtio-mem: paravirtualized memory
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        virtio-dev@lists.oasis-open.org,
+Subject: Re: [PATCH v1 06/11] mm: Allow to offline unmovable PageOffline()
+ pages via MEM_GOING_OFFLINE
+To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        linux-kernel@vger.kernel.org
+Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         "Michael S . Tsirkin" <mst@redhat.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        Samuel Ortiz <samuel.ortiz@intel.com>,
-        Robert Bradford <robert.bradford@intel.com>,
-        Luiz Capitulino <lcapitulino@redhat.com>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        teawater <teawaterz@linux.alibaba.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Potapenko <glider@google.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Young <dyoung@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
         Juergen Gross <jgross@suse.com>,
         Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Len Brown <lenb@kernel.org>,
+        Pavel Tatashin <pavel.tatashin@microsoft.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Anthony Yznaga <anthony.yznaga@oracle.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Oscar Salvador <osalvador@suse.de>,
         Mel Gorman <mgorman@techsingularity.net>,
         Mike Rapoport <rppt@linux.ibm.com>,
-        Oscar Salvador <osalvador@suse.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Pavel Tatashin <pavel.tatashin@microsoft.com>,
-        Pingfan Liu <kernelfans@gmail.com>, Qian Cai <cai@lca.pw>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Wei Yang <richard.weiyang@gmail.com>
+        Dan Williams <dan.j.williams@intel.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Qian Cai <cai@lca.pw>, Pingfan Liu <kernelfans@gmail.com>
 References: <20200302134941.315212-1-david@redhat.com>
- <7f8a9225-99f2-b00d-241f-ef934395c667@redhat.com>
- <20200302182922.GT4380@dhcp22.suse.cz>
+ <20200302134941.315212-7-david@redhat.com>
+ <abac569d8d1978aebadf71b65cdeb240a6256ad2.camel@linux.intel.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -119,38 +103,25 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <8de97b11-2eb5-8fe4-1867-ade57e5aee37@redhat.com>
-Date:   Mon, 2 Mar 2020 19:41:21 +0100
+Message-ID: <65d4aadd-4d19-865a-3b65-d6a6d4f23dc5@redhat.com>
+Date:   Mon, 2 Mar 2020 19:41:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200302182922.GT4380@dhcp22.suse.cz>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <abac569d8d1978aebadf71b65cdeb240a6256ad2.camel@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.03.20 19:29, Michal Hocko wrote:
-> On Mon 02-03-20 19:15:09, David Hildenbrand wrote:
-> [...]
->> As requested by Michal, I will squash some patches.
-> 
-> Just to clarify. If I am the only one to care then do not bother.
+On 02.03.20 18:40, Alexander Duyck wrote:
+> Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-Oh, I do bother about your review comments a lot :) And pulling out the
-NID part from patch #2 makes a lot of sense (so I can properly squash
-patch #1 into that). Looks much cleaner.
-
-> Btw. I still have patch 6 on the todo list to review. I just didn't find
-> time for it today.
-
-Perfect, I'll definitely wait until I resend a v2 - thanks.
-
-Cheers!
+Thanks a lot Alex!
 
 -- 
 Thanks,
