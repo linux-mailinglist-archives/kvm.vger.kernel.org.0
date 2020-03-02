@@ -2,78 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E68BF1764B6
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 21:13:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61F491764D3
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2020 21:21:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726661AbgCBUNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Mar 2020 15:13:11 -0500
-Received: from mail-qt1-f174.google.com ([209.85.160.174]:40844 "EHLO
-        mail-qt1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725446AbgCBUNL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Mar 2020 15:13:11 -0500
-Received: by mail-qt1-f174.google.com with SMTP id o10so990234qtr.7
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2020 12:13:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=0eFo90vowkQ//n5Sm8HSsjwuDZ8O2rscJrJ7W+9BphU=;
-        b=aBpbpDeytpAA9bsazio8o/mPLMo8EHuvLjvEKRzzljIeIK/VBGE/C0rh2jmgnX6ld9
-         /kUUj+BQxTRbjY63fxZdeLuiX2qImU8bIZS1v7rcFIlJGT4L246OE3gXKhg+NlST69Ib
-         1LDNlqcPawyQ8NYZZ6Hy2n6KlfqSyL3n/D2p+YucbNWhcehG+bh0BfFyGSehjmwLrEHC
-         +BRNc3A8NreG2N4HmrhAE9SIFBT7nIIm851ZpOEgyapv+cez8wHRe+3ATTrr3T51Hl7Z
-         AFg0WQzy2RSIWoGULhDC6pnPpqWrsaeKi8ro/pXklBomuBDrDYmSCNS7oFQpVs4ug0pi
-         ro7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=0eFo90vowkQ//n5Sm8HSsjwuDZ8O2rscJrJ7W+9BphU=;
-        b=MJ29AecrMZNRyPyyV6h44h7RLU9zt7XIQXVuwBKZ+xrGg04Af2QkEKjX8Yiw2eCfl6
-         igo+4D9qGmER5vH10vuSyoP4VGBjua+PNZm7ip8i5aMF4fa+VAreyRwrhZFqAuWy3RnH
-         5frzcmBcOsZTQNDFIfsyqtGH3PzkkJajn8H+YiXrfOyoayOz0b9ona9YZef4mn+j8YHo
-         baBDuOj1uQ4uUAzn6y/Yj3INn9sjry0HQ8inE21OgJADRAdeuOp1niNSVFCAmC5eWHjb
-         zIztI4dUIzfFV1efGOCpnRDIe38ocsYGj0HP7hg/scs8O+7QZh0XgmohtDHVsmw/4XUw
-         xi2Q==
-X-Gm-Message-State: ANhLgQ06HSU5XWxmEVATYpbIsXCL3+pmMxs4fGVmsjY7U3dTkhWz0xqX
-        8O7FdpP14sJ0QosQsnos2KHL6jHSUGis9608tnCeXmX8
-X-Google-Smtp-Source: ADFU+vuBI6ZxcNuvA5rfTBvEBWnWE/135RIgkm0ps1Xe+2zDrivkMcXIIoLsu4H2PqCnz9gyN2tTcOWvufQD3hncBwQ=
-X-Received: by 2002:ac8:5452:: with SMTP id d18mr1399240qtq.43.1583179988255;
- Mon, 02 Mar 2020 12:13:08 -0800 (PST)
+        id S1726845AbgCBUVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Mar 2020 15:21:23 -0500
+Received: from thoth.sbs.de ([192.35.17.2]:36338 "EHLO thoth.sbs.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726700AbgCBUVX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Mar 2020 15:21:23 -0500
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+        by thoth.sbs.de (8.15.2/8.15.2) with ESMTPS id 022KKr7x020818
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 2 Mar 2020 21:20:53 +0100
+Received: from [139.25.68.37] ([139.25.68.37])
+        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 022KKqOB014549;
+        Mon, 2 Mar 2020 21:20:52 +0100
+Subject: Re: [PATCH 5/6] KVM: x86: Rename "found" variable in kvm_cpuid() to
+ "exact_entry_exists"
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+References: <20200302195736.24777-1-sean.j.christopherson@intel.com>
+ <20200302195736.24777-6-sean.j.christopherson@intel.com>
+From:   Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <680d85ee-948c-6968-2d1a-d563d4863140@siemens.com>
+Date:   Mon, 2 Mar 2020 21:20:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-From:   Satish Patel <satish.txt@gmail.com>
-Date:   Mon, 2 Mar 2020 15:12:57 -0500
-Message-ID: <CAPgF-fpYbaCvHsLfJJjb4AnMjCBv7HanZRpxcqiZvBZObHHMww@mail.gmail.com>
-Subject: kvm exposing wrong CPU Topology to guest vm
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200302195736.24777-6-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Folks,
+On 02.03.20 20:57, Sean Christopherson wrote:
+> Rename "found" in kvm_cpuid() to "exact_entry_exists" to better convey
+> that the intent of the tracepoint's "found/not found" output is to trace
+> whether the output values are for the actual requested leaf or for some
+> other (likely unrelated) leaf that was found while processing entries to
+> emulate funky CPU behavior, e.g. the max basic leaf on Intel CPUs when
+> the requested CPUID leaf is out of range.
+> 
+> Suggested-by: Jan Kiszka <jan.kiszka@siemens.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>   arch/x86/kvm/cpuid.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 869526930cf7..b0a4f3c17932 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1002,10 +1002,10 @@ void kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>   {
+>   	const u32 function = *eax, index = *ecx;
+>   	struct kvm_cpuid_entry2 *entry;
+> -	bool found;
+> +	bool exact_entry_exists;
+>   
+>   	entry = kvm_find_cpuid_entry(vcpu, function, index);
+> -	found = entry;
+> +	exact_entry_exists = !!entry;
+>   	/*
+>   	 * Intel CPUID semantics treats any query for an out-of-range
+>   	 * leaf as if the highest basic leaf (i.e. CPUID.0H:EAX) were
+> @@ -1047,7 +1047,7 @@ void kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>   			}
+>   		}
+>   	}
+> -	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, found);
+> +	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, exact_entry_exists);
 
-I am having major performance issue with my Erlang application running
-on openstack KVM hypervisor and after so many test i found something
-wrong with my KVM guest CPU Topology
+Actually, I think we also what to change output in the tracepoint.
 
-This is KVM host - http://paste.openstack.org/show/790120/
-This is KVM guest - http://paste.openstack.org/show/790121/
+Jan
 
-If you carefully observe output of both host and guest you can see
-guest machine threads has own cache that is very strange
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_cpuid);
+>   
+> 
 
-L2 L#0 (4096KB) + Core L#0
-      L1d L#0 (32KB) + L1i L#0 (32KB) + PU L#0 (P#0)
-      L1d L#1 (32KB) + L1i L#1 (32KB) + PU L#1 (P#1)
-
-I believe because of that my erlang doesn't understand topology and
-going crazy..
-
-I have Ali Cloud and AWS and when i compare with them they are showing
-correct CPU Topology the way physical machine showing, something is
-wrong with my KVM look like.
-
-I am running qemu-kvm-2.12 on centos 7.6 and i have tune my KVM at my
-best level, like CPU vining, NUMA and cpu host-passthrough.
-
-Thanks in advance for your help.
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
